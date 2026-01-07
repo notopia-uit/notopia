@@ -1,0 +1,3 @@
+# vim:ft=gitignore:
+node_modules
+docs/node_modules

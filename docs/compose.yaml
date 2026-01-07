@@ -1,0 +1,7 @@
+name: notopia-docs
+
+services:
+  kroki:
+    image: yuzutech/kroki
+    ports:
+      - 8002:8002

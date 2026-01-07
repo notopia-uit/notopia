@@ -1,0 +1,7 @@
+[env]
+KROKI_SERVER_UR = "http://127.0.0.1:8002"
+
+[tools]
+pnpm = "10.27.0"
+node = "24.11.1"
+bazel = "8.5.0"

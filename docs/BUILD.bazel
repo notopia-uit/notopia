@@ -1,0 +1,27 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//:vitepress/package_json.bzl", vitepress_bin = "bin")
+
+npm_link_all_packages(name = "node_modules")
+
+vitepress_bin.vitepress(
+    name = "build",
+    args = ["build"],
+    srcs = glob([
+        "**.md",
+        ".vitepress/**",
+        "public/**",
+    ]) + [
+        ":node_modules",
+        "package.json",
+    ],
+    outs = [".vitepress/dist"],
+)
+
+vitepress_bin.vitepress_binary(
+    name = "dev",
+    args = ["dev"],
+    data = glob([
+        "**.md",
+        ".vitepress/**",
+    ]) + [":node_modules"],
+)
