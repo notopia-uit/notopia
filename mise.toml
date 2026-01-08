@@ -1,5 +1,5 @@
 [env]
-KROKI_SERVER_UR = "http://127.0.0.1:8002"
+# KROKI_SERVER_URL = "http://127.0.0.1:8002"
 
 [tools]
 pnpm = "10.27.0"

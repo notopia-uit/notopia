@@ -9,8 +9,8 @@ skinparam packageStyle rectangle
 /' skinparam linetype ortho '/
 /' skinparam linetype polyline '/
 
-package "AuthorizeServer" {
-  class "User" as AuthorizeServer.User {
+package "AuthorizationServer" {
+  class "User" as AuthorizationServer.User {
     id: uuid
     username: string
     email: string
@@ -25,7 +25,7 @@ package "EditService" {
 }
 
 package "NoteService" {
-  class "User" as NoteService.User {
+  class "User" as NoteService.User <<type>> {
     id: uuid
   }
 
@@ -93,8 +93,6 @@ package "NoteService" {
       createdAt: time
     }
 
-    NoteService.Note.Workspace "1" *--> "1..*" NoteService.Note.Folder : contains
-    NoteService.Note.Folder "1" *--> "0..*" NoteService.Note.Note : contains
     NoteService.Note.Note "1" *--> "0..*" NoteService.Note.History : has
     NoteService.Note.Note "0..*" --> "0..*" NoteService.Note.Tag : tagged with
   }
@@ -112,7 +110,7 @@ package "NoteService" {
   NoteService.Note.Tag "1" --- "1" NoteService.Tag.Tag
 }
 
-NoteService.User "1" ... "1" AuthorizeServer.User
+NoteService.User "1" ... "1" AuthorizationServer.User
 EditService.Document "1" ... "1" NoteService.Note.Note
 
 @enduml

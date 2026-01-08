@@ -1,27 +1,75 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("@npm//:vitepress/package_json.bzl", vitepress_bin = "bin")
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_run_devserver")
+load("@npm//docs:vitepress/package_json.bzl", vitepress_bin = "bin")
 
 npm_link_all_packages(name = "node_modules")
 
-vitepress_bin.vitepress(
-    name = "build",
-    args = ["build"],
-    srcs = glob([
-        "**.md",
-        ".vitepress/**",
-        "public/**",
-    ]) + [
-        ":node_modules",
-        "package.json",
-    ],
-    outs = [".vitepress/dist"],
+vitepress_bin.vitepress_binary(
+    name = "vitepress",
 )
 
-vitepress_bin.vitepress_binary(
+js_library(
+    name = "docs_lib",
+    srcs = glob(
+        [
+            ".vitepress/**",
+            "docs/**/*.md",
+            "index.md",
+            "public/**",
+        ],
+        exclude = [
+            ".vitepress/cache/**",
+            "README.md",
+            "public/diagrams/**",
+        ],
+    ),
+    deps = [
+        ":node_modules/vitepress-plugin-diagrams",
+        ":node_modules/vitepress",
+        ":node_modules/@catppuccin/vitepress",
+    ],
+)
+
+js_run_devserver(
     name = "dev",
     args = ["dev"],
-    data = glob([
-        "**.md",
-        ".vitepress/**",
-    ]) + [":node_modules"],
+    data =  [
+        ":docs_lib",
+        "package.json",
+    ],
+    tool = ":vitepress",
+    chdir = package_name(),
+    tags = [
+        "requires-network",
+        # "no-sandbox",
+    ],
+    grant_sandbox_write_permissions = True,
+    env = {
+        "NODE_ENV": "development",
+        "KROKI_SERVER_URL": "http://127.0.0.1:8002",
+    },
 )
+
+# vitepress_bin.vitepress(
+#     name = "build",
+#     args = ["build"],
+#     srcs = glob([
+#                 "**/*.md",
+#                 ".vitepress/**",
+#             ],
+#             exclude = [".vitepress/dist/**", "README.md"]
+#         ) + [
+#         ":node_modules",
+#         "package.json",
+#     ],
+#     outs = [".vitepress/dist"],
+# )
+#
+# vitepress_bin.vitepress_binary(
+#     name = "dev",
+#     args = ["dev"],
+#     data = glob([
+#         "**.md",
+#         ".vitepress/**",
+#     ]) + [":node_modules"],
+# )
