@@ -1,0 +1,23 @@
+description: Payment Required - Payment is required to access this resource
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/Error.yaml
+    examples:
+      paymentRequired:
+        value:
+          code: "PAYMENT_REQUIRED"
+          message: "Payment is required to access this feature"
+          details:
+            feature: "premium_notes"
+            upgradeUrl: "https://notopia.example.com/upgrade"
+          timestamp: "2026-01-10T10:30:00Z"
+      quotaExceeded:
+        value:
+          code: "QUOTA_EXCEEDED"
+          message: "You have exceeded your free tier quota"
+          details:
+            currentUsage: 150
+            limit: 100
+            upgradeUrl: "https://notopia.example.com/upgrade"
+          timestamp: "2026-01-10T10:30:00Z"

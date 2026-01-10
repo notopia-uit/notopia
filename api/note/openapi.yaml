@@ -1,0 +1,61 @@
+---
+# yaml-language-server: $schema=https://www.schemastore.org/openapi-3.X.json
+openapi: 3.0.0
+servers:
+  - url: http://note.localhost:8080/api
+    description: Local development server
+  - url: https://api.notopia.example.com
+    description: Production server
+
+info:
+  description: >
+    Notopia API - A comprehensive note-taking service API.
+    This API provides endpoints for creating, reading, updating, and deleting notes.
+  version: 0.1.0
+  title: Notopia API
+  license:
+    name: MIT
+  contact:
+    name: Notopia Support
+    email: support@notopia.example.com
+
+tags:
+  - name: note
+    description: Operations related to notes management
+  - name: edit
+    description: Operations related to editing notes
+
+paths:
+  /notes:
+    $ref: ./paths/notes.yaml
+  /notes/{noteId}:
+    $ref: ./paths/notes_{noteId}.yaml
+
+components:
+  schemas:
+    Note:
+      $ref: ./components/schemas/Note.yaml
+    NoteInput:
+      $ref: ./components/schemas/NoteInput.yaml
+    NoteUpdate:
+      $ref: ./components/schemas/NoteUpdate.yaml
+    Error:
+      $ref: ./components/schemas/Error.yaml
+
+  responses:
+    Error400:
+      $ref: ./components/responses/Error400.yaml
+    Error402:
+      $ref: ./components/responses/Error402.yaml
+    Error404:
+      $ref: ./components/responses/Error404.yaml
+    Error500:
+      $ref: ./components/responses/Error500.yaml
+
+  parameters:
+    noteId:
+      $ref: ./components/parameters/noteId.yaml
+
+externalDocs:
+  description: Find out more about Notopia
+  url: https://notopia-uit.github.io/notopia

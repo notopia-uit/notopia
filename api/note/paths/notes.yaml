@@ -1,0 +1,103 @@
+get:
+  tags:
+    - note
+  summary: List all notes
+  description: Retrieve a paginated list of all notes
+  operationId: listNotes
+  parameters:
+    - name: page
+      in: query
+      description: Page number for pagination
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      example: 1
+    - name: limit
+      in: query
+      description: Number of items per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      example: 20
+    - name: sortBy
+      in: query
+      description: Field to sort by
+      schema:
+        type: string
+        enum: [createdAt, updatedAt, title]
+        default: createdAt
+      example: createdAt
+    - name: order
+      in: query
+      description: Sort order
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+      example: desc
+  responses:
+    "200":
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: ../components/schemas/Note.yaml
+              pagination:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 20
+                  total:
+                    type: integer
+                    example: 100
+                  totalPages:
+                    type: integer
+                    example: 5
+    "400":
+      $ref: ../components/responses/Error400.yaml
+    "500":
+      $ref: ../components/responses/Error500.yaml
+
+post:
+  tags:
+    - note
+  summary: Create a new note
+  description: Create a new note with the provided data
+  operationId: createNote
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/NoteInput.yaml
+  responses:
+    "201":
+      description: Note created successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Note.yaml
+      headers:
+        Location:
+          description: URL of the created note
+          schema:
+            type: string
+          example: "/api/notes/note-123"
+    "400":
+      $ref: ../components/responses/Error400.yaml
+    "402":
+      $ref: ../components/responses/Error402.yaml
+    "500":
+      $ref: ../components/responses/Error500.yaml

@@ -1,0 +1,99 @@
+get:
+  tags:
+    - note
+  summary: Get a note by ID
+  description: Retrieve a specific note by its unique identifier
+  operationId: getNoteById
+  parameters:
+    - $ref: ../components/parameters/noteId.yaml
+  responses:
+    "200":
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Note.yaml
+    "400":
+      $ref: ../components/responses/Error400.yaml
+    "404":
+      $ref: ../components/responses/Error404.yaml
+    "500":
+      $ref: ../components/responses/Error500.yaml
+
+put:
+  tags:
+    - note
+  summary: Update a note (full update)
+  description: Replace the entire note with new data
+  operationId: updateNote
+  parameters:
+    - $ref: ../components/parameters/noteId.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/NoteInput.yaml
+  responses:
+    "200":
+      description: Note updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Note.yaml
+    "400":
+      $ref: ../components/responses/Error400.yaml
+    "402":
+      $ref: ../components/responses/Error402.yaml
+    "404":
+      $ref: ../components/responses/Error404.yaml
+    "500":
+      $ref: ../components/responses/Error500.yaml
+
+patch:
+  tags:
+    - note
+  summary: Partially update a note
+  description: Update specific fields of a note
+  operationId: patchNote
+  parameters:
+    - $ref: ../components/parameters/noteId.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/NoteUpdate.yaml
+  responses:
+    "200":
+      description: Note partially updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Note.yaml
+    "400":
+      $ref: ../components/responses/Error400.yaml
+    "402":
+      $ref: ../components/responses/Error402.yaml
+    "404":
+      $ref: ../components/responses/Error404.yaml
+    "500":
+      $ref: ../components/responses/Error500.yaml
+
+delete:
+  tags:
+    - note
+  summary: Delete a note
+  description: Remove a note from the system
+  operationId: deleteNote
+  parameters:
+    - $ref: ../components/parameters/noteId.yaml
+  responses:
+    "204":
+      description: Note deleted successfully
+    "400":
+      $ref: ../components/responses/Error400.yaml
+    "404":
+      $ref: ../components/responses/Error404.yaml
+    "500":
+      $ref: ../components/responses/Error500.yaml

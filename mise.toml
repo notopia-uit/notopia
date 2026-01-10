@@ -1,3 +1,6 @@
+[env]
+REDOCLY_TELEMETRY = "off"
+
 [tools]
 pnpm = "10.27.0"
 "npm:nx" = "22.3.3"

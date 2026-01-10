@@ -1,0 +1,8 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Redocly/redocly-cli/refs/heads/main/docs/%40v1/configuration/schema.yaml
+apis:
+  notopia@v1:
+    root: api/note/openapi.yaml
+
+extends:
+  - recommended

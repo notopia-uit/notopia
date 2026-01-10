@@ -1,5 +1,10 @@
 packages:
   - docs
+  - api
+  - page
 
 onlyBuiltDependencies:
+  - core-js
   - esbuild
+  - nx
+  - protobufjs

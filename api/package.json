@@ -1,0 +1,9 @@
+{
+  "name": "api",
+  "scripts": {
+    "redocly": "redocly"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^2.14.4"
+  }
+}

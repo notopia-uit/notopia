@@ -1,0 +1,22 @@
+type: object
+properties:
+  code:
+    type: string
+    description: Error code
+    example: "RESOURCE_NOT_FOUND"
+  message:
+    type: string
+    description: Human-readable error message
+    example: "The requested resource was not found"
+  details:
+    type: object
+    description: Additional error details
+    additionalProperties: true
+  timestamp:
+    type: string
+    format: date-time
+    description: Timestamp when the error occurred
+    example: "2026-01-10T10:30:00Z"
+required:
+  - code
+  - message
