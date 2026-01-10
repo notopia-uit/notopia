@@ -76,3 +76,5 @@ jobs:
 
       - name: Deploy
         run: npx nx affected -t deploy --parallel=3
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
