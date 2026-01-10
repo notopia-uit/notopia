@@ -9,7 +9,7 @@
         "commands": ["mkdir -p dist", "cp -r ../docs/.vitepress/dist/. dist/"],
         "cwd": "{projectRoot}"
       },
-      "outputs": ["dist"],
+      "outputs": ["{projectRoot}/dist"],
       "dependsOn": [
         {
           "projects": ["docs"],
