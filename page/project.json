@@ -16,6 +16,11 @@
           "target": "build"
         }
       ]
+    },
+    "deploy": {
+      "executor": "nx-github-pages:deploy",
+      "options": {},
+      "dependsOn": ["build"]
     }
   }
 }
