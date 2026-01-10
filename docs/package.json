@@ -1,13 +1,8 @@
 {
-  "name": "docs",
+  "name": "@notopia-uit/docs",
   "devDependencies": {
     "vitepress": "2.0.0-alpha.15",
     "vitepress-plugin-diagrams": "^1.1.2"
-  },
-  "scripts": {
-    "dev": "vitepress dev",
-    "build": "vitepress build",
-    "preview": "vitepress preview"
   },
   "dependencies": {
     "@catppuccin/vitepress": "^0.1.2"
