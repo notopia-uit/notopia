@@ -39,7 +39,7 @@ jobs:
       #     go-version-file: go-work
 
       - name: Install Node Dependencies
-        run: pnpm ci
+        run: pnpm install
 
       # - name: Install Go Dependencies
       #   run: go mod download
