@@ -6,7 +6,11 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["mkdir -p dist", "cp -r ../docs/.vitepress/dist/. dist/"],
+        "commands": [
+          "mkdir -p dist",
+          "rm -rf dist/*",
+          "cp -r ../docs/.vitepress/dist/. dist/"
+        ],
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/dist"],
@@ -22,5 +26,6 @@
       "options": {},
       "dependsOn": ["build"]
     }
-  }
+  },
+  "implicitDependencies": ["docs"]
 }
