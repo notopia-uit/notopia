@@ -15,7 +15,7 @@ export default defineConfig({
     config: (md) => {
       configureDiagramsPlugin(md, {
         diagramsDir: "public/diagrams",
-        publicPath: "/notopia/public/diagrams",
+        publicPath: "/notopia/diagrams",
         krokiServerUrl: process.env.CI
           ? undefined
           : process.env.KROKI_SERVER_URL,
