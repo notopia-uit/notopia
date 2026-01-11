@@ -12,7 +12,7 @@ hero:
       link: /docs
     - theme: alt
       text: API
-      link: /api
+      link: /api/index.html
       target: _self
       rel: noopener
 
