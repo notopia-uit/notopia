@@ -2,16 +2,17 @@
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
     "openapiSpec": [
-      "{projectRoot}/**/*.yaml",
       "{projectRoot}/**/*.md",
-      "!{projectRoot}/**/README.md",
+      "{projectRoot}/**/*.yaml",
+      "{projectRoot}/../shared/**/*.md",
       "{projectRoot}/../shared/**/*.yaml",
-      "{projectRoot}/../shared/**/*.md"
+      "!{projectRoot}/**/README.md",
+      "!{projectRoot}/dist"
     ]
   },
   "targetDefaults": {
-    "build": {
-      "dependsOn": ["^build"],
+    "build*": {
+      "dependsOn": ["^build*"],
       "cache": true
     },
     "lint": {
