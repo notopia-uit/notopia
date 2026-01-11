@@ -4,6 +4,7 @@
     "redocly": "redocly"
   },
   "devDependencies": {
-    "@redocly/cli": "^2.14.4"
+    "@redocly/cli": "^2.14.4",
+    "ajv": "^8.0.0"
   }
 }

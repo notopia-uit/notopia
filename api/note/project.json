@@ -1,0 +1,25 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "api/note",
+  "projectType": "application",
+  "namedInputs": {
+    "spec": [
+      "{projectRoot}/**/*.yaml",
+      "{projectRoot}/**/*.md",
+      "!{projectRoot}/**/README.md",
+      "{projectRoot}/../shared/**/*.yaml",
+      "{projectRoot}/../shared/**/*.md"
+    ]
+  },
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm redocly bundle note -o ./dist/note.openapi.yaml",
+        "cwd": "{projectRoot}/../"
+      },
+      "outputs": ["{projectRoot}/../dist/note.openapi.yaml"],
+      "inputs": ["spec"]
+    }
+  }
+}

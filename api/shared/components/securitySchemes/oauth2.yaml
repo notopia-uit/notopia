@@ -1,0 +1,6 @@
+type: oauth2
+flows:
+  authorizationCode:
+    authorizationUrl: http://localhost:8081/realms/notopia/protocol/openid-connect/auth
+    tokenUrl: http://localhost:8081/realms/notopia/protocol/openid-connect/token
+    scopes: {}

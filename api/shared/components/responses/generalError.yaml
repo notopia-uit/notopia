@@ -1,0 +1,21 @@
+description: General error response
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code
+          example: EXAMPLE_CODE
+        message:
+          type: string
+          description: Human-readable error message
+          example: Example error
+        more_info:
+          type: string
+          description: URL with more information about the error
+          example: https://api.example.com/docs/errors/EXAMPLE_CODE
+      required:
+        - code
+        - message

@@ -1,0 +1,16 @@
+description: Internal Server Error response
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: ./generalError.yaml
+        - type: object
+          description: Internal Server Error
+          properties:
+            code:
+              type: string
+              enum: [INTERNAL_SERVER]
+              example: INTERNAL_SERVER
+            message:
+              type: string
+              example: An internal server error occurred. Please try again later.
