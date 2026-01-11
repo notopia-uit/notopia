@@ -3,7 +3,7 @@ get:
     - oauth2: []
   tags:
     - note
-  summary: List all notes
+  summary: List notes
   description: Retrieve a paginated list of all notes with optional filtering and sorting
   operationId: listNotes
   parameters:
@@ -39,8 +39,8 @@ post:
     - oauth2: []
   tags:
     - note
-  summary: Create a new note
-  description: Create a new note with title and content. Returns the created note with assigned ID.
+  summary: Create note
+  description: Create a new note
   operationId: createNote
   requestBody:
     $ref: ../components/requestBodies/createNote.yaml

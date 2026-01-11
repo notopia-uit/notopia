@@ -3,7 +3,7 @@ get:
     - oauth2: []
   tags:
     - note
-  summary: Get a note by ID
+  summary: Get note
   description: Retrieve a single note by its unique identifier
   operationId: getNoteById
   parameters:
@@ -27,8 +27,8 @@ put:
     - oauth2: []
   tags:
     - note
-  summary: Update a note (full replacement)
-  description: Replace an existing note with new data. All fields are required.
+  summary: Put note
+  description: Replace an existing note with new data (all fields are required)
   operationId: updateNote
   parameters:
     - $ref: ../components/parameters/noteId.yaml
@@ -53,8 +53,8 @@ patch:
     - oauth2: []
   tags:
     - note
-  summary: Partially update a note
-  description: Update specific fields of a note. Only provided fields will be updated.
+  summary: Patch note
+  description: Update specific fields of a note (only provided fields will be updated)
   operationId: patchNote
   parameters:
     - $ref: ../components/parameters/noteId.yaml
@@ -79,8 +79,8 @@ delete:
     - oauth2: []
   tags:
     - note
-  summary: Delete a note
-  description: Permanently delete a note by its unique identifier. This action cannot be undone.
+  summary: Delete note
+  description: Delete a note by its unique identifier
   operationId: deleteNote
   parameters:
     - $ref: ../components/parameters/noteId.yaml
