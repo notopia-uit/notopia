@@ -24,6 +24,37 @@
     "build": {
       "dependsOn": ["build:yaml", "build:json"]
     },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx watch --projects=api/note --includeDependentProjects -- nx build:json api/note",
+          "pnpm scalar document serve -w ./dist/openapi.json --port 9081"
+        ],
+        "parallel": true,
+        "forwardAllArgs": false,
+        "cwd": "{projectRoot}",
+        "continuous": true
+      }
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm scalar document serve ./dist/openapi.json --port 9081",
+        "cwd": "{projectRoot}"
+      },
+      "continuous": true,
+      "dependsOn": ["build:json"]
+    },
+    "mock": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm scalar document mock ./dist/openapi.json --port 8081",
+        "cwd": "{projectRoot}"
+      },
+      "continuous": true,
+      "dependsOn": ["build:json"]
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {

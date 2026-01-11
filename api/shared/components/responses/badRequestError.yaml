@@ -6,6 +6,7 @@ content:
     example:
       code: BAD_REQUEST
       message: The request could not be understood by the server due to malformed syntax
+      more_info: https://api.notopia.com/docs/errors/BAD_REQUEST
       details:
         - field: title
           message: Title must not be empty

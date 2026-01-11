@@ -2,8 +2,10 @@
 # yaml-language-server: $schema=https://www.schemastore.org/openapi-3.X.json
 openapi: 3.0.0
 servers:
-  - url: http://note.localhost:8080/api
-    description: Local development server
+  - url: http://note.localhost:8080
+    description: Local dev server via gateway
+  - url: http://localhost:8081
+    description: Local dev/mock server direct
 
 info:
   description: >

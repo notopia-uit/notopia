@@ -3,3 +3,9 @@ content:
   application/json:
     schema:
       $ref: ../schemas/Note.yaml
+    example:
+      id: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+      title: Meeting Notes
+      content: Discussed Q1 objectives and team goals
+      createdAt: 2026-01-11T10:30:00Z
+      updatedAt: 2026-01-11T14:45:00Z

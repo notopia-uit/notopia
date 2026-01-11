@@ -15,6 +15,12 @@
     "lint": {
       "executor": "nx:noop",
       "dependsOn": ["^lint"]
+    },
+    "mock": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node ./tools/mock-api-server.js"
+      }
     }
   },
   "implicitDependencies": ["api/note"]

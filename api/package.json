@@ -1,10 +1,12 @@
 {
   "name": "api",
   "scripts": {
-    "redocly": "redocly"
+    "redocly": "redocly",
+    "scalar": "scalar"
   },
   "devDependencies": {
     "@redocly/cli": "^2.14.4",
+    "@scalar/cli": "^1.4.1",
     "ajv": "^8.0.0"
   }
 }
