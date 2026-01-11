@@ -10,8 +10,8 @@
           "rm -rf dist/",
           "mkdir -p dist",
           "mkdir -p dist/api",
-          "cp -r ../docs/.vitepress/dist/. dist/",
-          "cp -r ../packages/notopia-api-web/dist/. dist/api/"
+          "cp -a ../docs/.vitepress/dist/. dist/",
+          "cp -a ../packages/notopia-api-web/dist/. dist/api/"
         ],
         "cwd": "{projectRoot}"
       },
