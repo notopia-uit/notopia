@@ -27,7 +27,7 @@ export default defineConfig({
     nav: [
       { text: "Home", link: "../" },
       { text: "Docs", link: "/docs" },
-      { text: "API", link: "/api", target: "_blank" },
+      { text: "API", link: "/api", target: "_self", rel: "noopener" },
     ],
 
     sidebar: [

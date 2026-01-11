@@ -13,6 +13,8 @@ hero:
     - theme: alt
       text: API
       link: /api
+      target: _self
+      rel: noopener
 
 features:
   - title: Feature A
