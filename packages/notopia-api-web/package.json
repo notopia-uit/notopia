@@ -1,0 +1,9 @@
+{
+  "name": "notopia-api-web",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@scalar/api-reference-react": "^0.8.20",
+    "notopia-api-note": "workspace:^"
+  }
+}

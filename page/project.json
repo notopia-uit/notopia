@@ -7,19 +7,30 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
+          "rm -rf dist/",
           "mkdir -p dist",
-          "rm -rf dist/*",
-          "cp -r ../docs/.vitepress/dist/. dist/"
+          "mkdir -p dist/api",
+          "cp -r ../docs/.vitepress/dist/. dist/",
+          "cp -r ../packages/notopia-api-web/dist/. dist/api/"
         ],
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/dist"],
       "dependsOn": ["^build"]
     },
+    "preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["pnpm preview"],
+        "cwd": "{projectRoot}"
+      },
+      "continuous": true,
+      "dependsOn": ["build"]
+    },
     "deploy": {
       "executor": "nx-github-pages:deploy",
       "dependsOn": ["build"]
     }
   },
-  "implicitDependencies": ["docs"]
+  "implicitDependencies": ["docs", "packages/notopia-api-web"]
 }

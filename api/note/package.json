@@ -1,0 +1,7 @@
+{
+  "name": "notopia-api-note",
+  "private": true,
+  "exports": {
+    ".": "./dist/openapi.json"
+  }
+}

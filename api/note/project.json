@@ -2,33 +2,24 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "api/note",
   "projectType": "application",
-  "namedInputs": {
-    "spec": [
-      "{projectRoot}/**/*.yaml",
-      "{projectRoot}/**/*.md",
-      "!{projectRoot}/**/README.md",
-      "{projectRoot}/../shared/**/*.yaml",
-      "{projectRoot}/../shared/**/*.md"
-    ]
-  },
   "targets": {
     "build:yaml": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm redocly bundle note -o ./dist/note.openapi.yaml",
-        "cwd": "{projectRoot}/../"
+        "command": "pnpm redocly bundle note --config ../redocly.yaml -o ./dist/openapi.yaml",
+        "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/../dist/note.openapi.yaml"],
-      "inputs": ["spec"]
+      "outputs": ["{projectRoot}/dist/openapi.yaml"],
+      "inputs": ["openapiSpec"]
     },
     "build:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm redocly bundle note -o ./dist/note.openapi.json",
-        "cwd": "{projectRoot}/../"
+        "command": "pnpm redocly bundle note --config ../redocly.yaml -o ./dist/openapi.json",
+        "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/../dist/note.openapi.json"],
-      "inputs": ["spec"]
+      "outputs": ["{projectRoot}/dist/openapi.json"],
+      "inputs": ["openapiSpec"]
     },
     "build": {
       "executor": "nx:noop",
@@ -37,10 +28,10 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm redocly lint note --config ./redocly.yaml",
-        "cwd": "{projectRoot}/../"
+        "command": "pnpm redocly lint note --config ../redocly.yaml",
+        "cwd": "{projectRoot}"
       },
-      "inputs": ["spec"]
+      "inputs": ["openapiSpec"]
     }
   }
 }

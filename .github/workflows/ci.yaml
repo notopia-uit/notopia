@@ -46,12 +46,21 @@ jobs:
       # - name: Install Go Dependencies
       #   run: go mod download
 
-      - uses: actions/cache@v4
+      - name: Cache Nx
+        uses: actions/cache@v4
         with:
           path: .nx
-          key: ${{ runner.os }}-nx-${{ github.sha }}
+          key: ${{ runner.os }}-nx-${{ hashFiles('.nx/**') }}
           restore-keys: |
             ${{ runner.os }}-nx-
+
+      - name: Cache docs public diagrams
+        uses: actions/cache@v4
+        with:
+          path: docs/public/diagrams/
+          key: ${{ runner.os }}-docs-public-diagrams-${{ hashFiles('docs/public/diagrams/**') }}
+          restore-keys: |
+            ${{ runner.os }}-docs-public-diagrams-
 
       - name: Derive SHAs for Nx Affected
         uses: nrwl/nx-set-shas@v4
