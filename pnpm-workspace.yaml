@@ -3,6 +3,10 @@ packages:
   - api
   - page
 
+catalog:
+  react: ^19.0.0
+  react-dom: ^19.0.0
+
 onlyBuiltDependencies:
   - core-js
   - esbuild

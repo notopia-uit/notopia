@@ -3,6 +3,7 @@
   "devDependencies": {
     "@nx/eslint": "22.3.3",
     "@nx/eslint-plugin": "22.3.3",
+    "@nx/react": "22.3.3",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "nx": "22.3.3",
@@ -11,5 +12,9 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.52.0"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
 }

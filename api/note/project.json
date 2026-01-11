@@ -12,7 +12,7 @@
     ]
   },
   "targets": {
-    "build": {
+    "build:yaml": {
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm redocly bundle note -o ./dist/note.openapi.yaml",
@@ -20,6 +20,19 @@
       },
       "outputs": ["{projectRoot}/../dist/note.openapi.yaml"],
       "inputs": ["spec"]
+    },
+    "build:json": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm redocly bundle note -o ./dist/note.openapi.json",
+        "cwd": "{projectRoot}/../"
+      },
+      "outputs": ["{projectRoot}/../dist/note.openapi.json"],
+      "inputs": ["spec"]
+    },
+    "build": {
+      "executor": "nx:noop",
+      "dependsOn": ["build:yaml", "build:json"]
     },
     "lint": {
       "executor": "nx:run-commands",

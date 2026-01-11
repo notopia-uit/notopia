@@ -14,16 +14,10 @@
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/dist"],
-      "dependsOn": [
-        {
-          "projects": ["docs"],
-          "target": "build"
-        }
-      ]
+      "dependsOn": ["^build"]
     },
     "deploy": {
       "executor": "nx-github-pages:deploy",
-      "options": {},
       "dependsOn": ["build"]
     }
   },
