@@ -22,7 +22,6 @@
       "inputs": ["openapiSpec"]
     },
     "build": {
-      "executor": "nx:noop",
       "dependsOn": ["build:yaml", "build:json"]
     },
     "lint": {

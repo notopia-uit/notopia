@@ -4,15 +4,12 @@
   "projectType": "application",
   "targets": {
     "build:yaml": {
-      "executor": "nx:noop",
       "dependsOn": ["^build:yaml"]
     },
     "build:json": {
-      "executor": "nx:noop",
       "dependsOn": ["^build:json"]
     },
     "build": {
-      "executor": "nx:noop",
       "dependsOn": ["^build"]
     },
     "lint": {
