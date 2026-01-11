@@ -1,0 +1,9 @@
+description: Unauthorized Error response
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/errorResponse.yaml
+    example:
+      code: UNAUTHORIZED
+      message: Authentication is required to access this resource
+      more_info: https://api.notopia.com/docs/errors/UNAUTHORIZED

@@ -7,3 +7,4 @@ extends:
   - recommended
 rules:
   no-server-example.com: off
+  scalar-property-missing-example: error

@@ -1,0 +1,32 @@
+---
+type: object
+properties:
+  code:
+    type: string
+    description: Error code
+    example: EXAMPLE_CODE
+  message:
+    type: string
+    description: Human-readable error message
+    example: Example error
+  more_info:
+    type: string
+    description: URL with more information about the error
+    example: https://api.notopia.com/docs/errors/EXAMPLE_CODE
+  details:
+    type: array
+    description: Additional error details (e.g., validation errors)
+    items:
+      type: object
+      properties:
+        field:
+          type: string
+          description: Field name that caused the error
+          example: title
+        message:
+          type: string
+          description: Specific error message for this field
+          example: Title is required
+required:
+  - code
+  - message

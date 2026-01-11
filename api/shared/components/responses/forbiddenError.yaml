@@ -1,0 +1,9 @@
+description: Forbidden Error response
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/errorResponse.yaml
+    example:
+      code: FORBIDDEN
+      message: You do not have permission to access this resource
+      more_info: https://api.notopia.com/docs/errors/FORBIDDEN

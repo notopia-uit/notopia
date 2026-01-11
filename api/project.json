@@ -5,12 +5,12 @@
   "targets": {
     "build": {
       "executor": "nx:noop",
-      "dependsOn": [
-        {
-          "target": "build",
-          "projects": ["api/note"]
-        }
-      ]
+      "dependsOn": ["^build"]
+    },
+    "lint": {
+      "executor": "nx:noop",
+      "dependsOn": ["^lint"]
     }
-  }
+  },
+  "implicitDependencies": ["api/note"]
 }

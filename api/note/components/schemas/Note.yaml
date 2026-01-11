@@ -6,11 +6,15 @@ properties:
   title:
     type: string
     description: Title of the note
+    minLength: 1
+    maxLength: 255
     example: My Note
   content:
     type: string
-    description: Content of the note
-    example: Content of the note
+    description: Content of the note (supports Markdown)
+    example: |
+      # My Note Content
+      This is a **markdown** formatted note.
   createdAt:
     type: string
     format: date-time

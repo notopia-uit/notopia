@@ -26,17 +26,23 @@ tags:
 paths:
   /notes:
     $ref: ./paths/notes.yaml
+  /notes/{noteId}:
+    $ref: ./paths/notes_{noteId}.yaml
 
 components:
   schemas:
     Note:
       $ref: ./components/schemas/Note.yaml
+    NoteInput:
+      $ref: ./components/schemas/NoteInput.yaml
+    NotePatch:
+      $ref: ./components/schemas/NotePatch.yaml
 
   responses:
-    GeneralError:
-      $ref: ../shared/components/responses/generalError.yaml
     BadRequest:
       $ref: ../shared/components/responses/badRequestError.yaml
+    NotFound:
+      $ref: ../shared/components/responses/notFoundError.yaml
 
   parameters:
     noteId:

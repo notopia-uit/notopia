@@ -1,0 +1,14 @@
+---
+type: object
+properties:
+  title:
+    type: string
+    description: Title of the note
+    minLength: 1
+    maxLength: 255
+    example: Updated Note Title
+  content:
+    type: string
+    description: Content of the note (supports Markdown)
+    example: Updated content
+minProperties: 1

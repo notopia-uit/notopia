@@ -9,17 +9,7 @@ content:
           items:
             $ref: ../schemas/Note.yaml
         pagination:
-          type: object
-          properties:
-            page:
-              type: integer
-              example: 1
-            limit:
-              type: integer
-              example: 20
-            total:
-              type: integer
-              example: 100
-            totalPages:
-              type: integer
-              example: 5
+          $ref: ../../../shared/components/schemas/pagination.yaml
+      required:
+        - data
+        - pagination

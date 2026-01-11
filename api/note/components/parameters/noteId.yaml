@@ -1,4 +1,3 @@
-# NOTE: maybe change
 name: noteId
 in: path
 required: true

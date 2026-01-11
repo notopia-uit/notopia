@@ -1,0 +1,99 @@
+get:
+  security:
+    - oauth2: []
+  tags:
+    - note
+  summary: Get a note by ID
+  description: Retrieve a single note by its unique identifier
+  operationId: getNoteById
+  parameters:
+    - $ref: ../components/parameters/noteId.yaml
+  responses:
+    200:
+      $ref: ../components/responses/getNote.yaml
+    400:
+      $ref: ../../shared/components/responses/badRequestError.yaml
+    401:
+      $ref: ../../shared/components/responses/unauthorizedError.yaml
+    403:
+      $ref: ../../shared/components/responses/forbiddenError.yaml
+    404:
+      $ref: ../../shared/components/responses/notFoundError.yaml
+    500:
+      $ref: ../../shared/components/responses/internalServerError.yaml
+
+put:
+  security:
+    - oauth2: []
+  tags:
+    - note
+  summary: Update a note (full replacement)
+  description: Replace an existing note with new data. All fields are required.
+  operationId: updateNote
+  parameters:
+    - $ref: ../components/parameters/noteId.yaml
+  requestBody:
+    $ref: ../components/requestBodies/updateNote.yaml
+  responses:
+    200:
+      $ref: ../components/responses/getNote.yaml
+    400:
+      $ref: ../../shared/components/responses/badRequestError.yaml
+    401:
+      $ref: ../../shared/components/responses/unauthorizedError.yaml
+    403:
+      $ref: ../../shared/components/responses/forbiddenError.yaml
+    404:
+      $ref: ../../shared/components/responses/notFoundError.yaml
+    500:
+      $ref: ../../shared/components/responses/internalServerError.yaml
+
+patch:
+  security:
+    - oauth2: []
+  tags:
+    - note
+  summary: Partially update a note
+  description: Update specific fields of a note. Only provided fields will be updated.
+  operationId: patchNote
+  parameters:
+    - $ref: ../components/parameters/noteId.yaml
+  requestBody:
+    $ref: ../components/requestBodies/patchNote.yaml
+  responses:
+    200:
+      $ref: ../components/responses/getNote.yaml
+    400:
+      $ref: ../../shared/components/responses/badRequestError.yaml
+    401:
+      $ref: ../../shared/components/responses/unauthorizedError.yaml
+    403:
+      $ref: ../../shared/components/responses/forbiddenError.yaml
+    404:
+      $ref: ../../shared/components/responses/notFoundError.yaml
+    500:
+      $ref: ../../shared/components/responses/internalServerError.yaml
+
+delete:
+  security:
+    - oauth2: []
+  tags:
+    - note
+  summary: Delete a note
+  description: Permanently delete a note by its unique identifier. This action cannot be undone.
+  operationId: deleteNote
+  parameters:
+    - $ref: ../components/parameters/noteId.yaml
+  responses:
+    204:
+      description: Note successfully deleted
+    400:
+      $ref: ../../shared/components/responses/badRequestError.yaml
+    401:
+      $ref: ../../shared/components/responses/unauthorizedError.yaml
+    403:
+      $ref: ../../shared/components/responses/forbiddenError.yaml
+    404:
+      $ref: ../../shared/components/responses/notFoundError.yaml
+    500:
+      $ref: ../../shared/components/responses/internalServerError.yaml

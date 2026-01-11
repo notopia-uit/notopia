@@ -4,7 +4,7 @@ get:
   tags:
     - note
   summary: List all notes
-  description: Retrieve a paginated list of all notes
+  description: Retrieve a paginated list of all notes with optional filtering and sorting
   operationId: listNotes
   parameters:
     - $ref: ../../shared/components/parameters/page.yaml
@@ -18,10 +18,38 @@ get:
         default: createdAt
       example: createdAt
     - $ref: ../../shared/components/parameters/order.yaml
+    - name: search
+      in: query
+      description: Search notes by title or content
+      schema:
+        type: string
+      example: meeting notes
   responses:
     200:
       $ref: ../components/responses/listNotes.yaml
     400:
       $ref: ../../shared/components/responses/badRequestError.yaml
+    401:
+      $ref: ../../shared/components/responses/unauthorizedError.yaml
+    500:
+      $ref: ../../shared/components/responses/internalServerError.yaml
+
+post:
+  security:
+    - oauth2: []
+  tags:
+    - note
+  summary: Create a new note
+  description: Create a new note with title and content. Returns the created note with assigned ID.
+  operationId: createNote
+  requestBody:
+    $ref: ../components/requestBodies/createNote.yaml
+  responses:
+    201:
+      $ref: ../components/responses/createNote.yaml
+    400:
+      $ref: ../../shared/components/responses/badRequestError.yaml
+    401:
+      $ref: ../../shared/components/responses/unauthorizedError.yaml
     500:
       $ref: ../../shared/components/responses/internalServerError.yaml

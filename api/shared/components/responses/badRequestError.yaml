@@ -2,15 +2,12 @@ description: Bad Request Error response
 content:
   application/json:
     schema:
-      allOf:
-        - $ref: ./generalError.yaml
-        - type: object
-          description: Bad Request Error
-          properties:
-            code:
-              type: string
-              enum: [BAD_REQUEST]
-              example: BAD_REQUEST
-            message:
-              type: string
-              example: The request could not be understood by the server due to malformed syntax.
+      $ref: ../schemas/errorResponse.yaml
+    example:
+      code: BAD_REQUEST
+      message: The request could not be understood by the server due to malformed syntax
+      details:
+        - field: title
+          message: Title must not be empty
+        - field: content
+          message: Content is required

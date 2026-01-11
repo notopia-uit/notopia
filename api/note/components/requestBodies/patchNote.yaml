@@ -1,0 +1,20 @@
+description: Partial update note request
+required: true
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/NotePatch.yaml
+    examples:
+      titleOnly:
+        summary: Update only title
+        value:
+          title: New Title
+      contentOnly:
+        summary: Update only content
+        value:
+          content: New content here
+      both:
+        summary: Update both fields
+        value:
+          title: Updated Title
+          content: Updated content
