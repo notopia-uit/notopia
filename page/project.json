@@ -13,6 +13,7 @@
           "cp -a ../docs/.vitepress/dist/. dist/",
           "cp -a ../packages/notopia-api-web/dist/. dist/api/"
         ],
+        "parallel": false,
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/dist"],
