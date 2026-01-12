@@ -11,7 +11,7 @@ hero:
       text: Docs
       link: /docs
     - theme: alt
-      text: API
+      text: Scalar API
       link: /api/index.html
       target: _self
       rel: noopener

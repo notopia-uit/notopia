@@ -1,3 +1,5 @@
 # Docs
 
-Hah let's see
+- [Class diagram](./class.md)
+- [Vitepress Openapi](./api.md)
+- [Notopia Scalar API](/api/index)

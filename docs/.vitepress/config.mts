@@ -1,5 +1,6 @@
 import { defineConfig } from "vitepress";
 import { configureDiagramsPlugin } from "vitepress-plugin-diagrams";
+import { pagefindPlugin } from "vitepress-plugin-pagefind";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -28,7 +29,7 @@ export default defineConfig({
       { text: "Home", link: "../" },
       { text: "Docs", link: "/docs" },
       {
-        text: "API",
+        text: "Scalar API",
         link: "/api/index.html",
         target: "_blank",
         rel: "noopener",
@@ -39,7 +40,10 @@ export default defineConfig({
       {
         text: "Docs",
         link: "/docs",
-        items: [{ text: "Class", link: "/docs/class" }],
+        items: [
+          { text: "Class", link: "/docs/class" },
+          { text: "API", link: "/docs/api" },
+        ],
       },
     ],
 
@@ -49,9 +53,9 @@ export default defineConfig({
         link: "https://github.com/notopia-uit/notopia",
       },
     ],
-
-    search: {
-      provider: "local",
-    },
   },
+  vite: {
+    plugins: [pagefindPlugin()],
+  },
+  ignoreDeadLinks: ["/api/index"],
 });
