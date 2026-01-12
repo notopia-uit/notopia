@@ -4,8 +4,8 @@
     "openapiSpec": [
       "{projectRoot}/**/*.md",
       "{projectRoot}/**/*.yaml",
-      "{projectRoot}/../shared/**/*.md",
-      "{projectRoot}/../shared/**/*.yaml",
+      "{workspaceRoot}/api/shared/**/*.md",
+      "{workspaceRoot}/api/shared/**/*.yaml",
       "!{projectRoot}/**/README.md",
       "!{projectRoot}/dist"
     ]
