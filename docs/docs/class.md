@@ -1,3 +1,5 @@
+<!-- vim:set tabstop=4 shiftwidth=4: -->
+
 # Class diagram
 
 ```plantuml
@@ -10,108 +12,148 @@ skinparam packageStyle rectangle
 /' skinparam linetype polyline '/
 
 package "AuthorizationServer" {
-  class "User" as AuthorizationServer.User {
-    id: uuid
-    username: string
-    email: string
-  }
+    class "User" as AuthorizationServer.User {
+        id: uuid
+        username: string
+        email: string
+    }
 }
 
 package "EditService" {
-  class "Document" as EditService.Document {
-    name: string
-    data: []byte
-  }
+    class "Document" as EditService.Document {
+        name: string
+        data: []byte
+    }
 }
 
 package "NoteService" {
-  class "User" as NoteService.User <<type>> {
-    id: uuid
-  }
-
-  package "NoteService.Workspace" <<Frame>> {
-    class "Workspace" as NoteService.Workspace.Workspace {
-      id: uuid
-      name: string
-      owner: User
-      collaborators: []User
+    class "UserID" as NoteService.UserID <<Type>> {
+        uuid.UUID
     }
 
-    class "Folder" as NoteService.Workspace.Folder {
-      id: uuid
-      name: string
-      children: []Folder
-      notes: []Note
+    class "WorkspaceID" as NoteService.WorkspaceID <<Type>> {
+        uuid.UUID
     }
 
-    class "Note" as NoteService.Workspace.Note {
-      id: uuid
-      title: string
+    class "FolderID" as NoteService.FolderID <<Type>> {
+        uuid.UUID
     }
 
-    NoteService.Workspace.Workspace "1" *--> "0..*" NoteService.Workspace.Folder : contains
-    NoteService.Workspace.Folder "1" *--> "0..*" NoteService.Workspace.Note : contains
-    NoteService.Workspace.Folder "1" *--> "0..*" NoteService.Workspace.Folder : contains
-
-    NoteService.Workspace.Workspace "1..*" ... "1" NoteService.User: owned by
-    NoteService.Workspace.Workspace "0..n" ... "0..*" NoteService.User: collaborated with
-  }
-
-  package "NoteService.Folder" <<Frame>> {
-    class "Folder" as NoteService.Folder.Folder {
-      id: uuid
-      name: string
-      children: []Folder
-      notes: []Note
+    class "NoteID" as NoteService.NoteID <<Type>> {
+        uuid.UUID
     }
 
-    class "Note" as NoteService.Folder.Note {
-      id: uuid
-      title: string
+    class "TagID" as NoteService.TagID <<Type>> {
+        uuid.UUID
     }
 
-    NoteService.Folder.Folder "1" *--> "0..*" NoteService.Folder.Folder : contains
-    NoteService.Folder.Folder "1" *--> "0..*" NoteService.Folder.Note : contains
-  }
-
-  package "NoteService.Note" <<Frame>> {
-    class "Note" as NoteService.Note.Note {
-      id: uuid
-      title: string
-      tags: []Tag
-      history: []History
+    class "NoteHistoryID" as NoteService.NoteHistoryID <<Type>> {
+        uuid.UUID
     }
 
-    class "Tag" as NoteService.Note.Tag {
-      id: uuid
-      name: string
+    package "NoteService.Workspace" <<Frame>> {
+        enum "Role" as NoteService.Workspace.Role {
+            OWNER
+            EDITOR
+            VIEWER
+        }
+
+        struct "Workspace" as NoteService.Workspace.Workspace <<Aggregate Root>> {
+            id: WorkspaceID
+            name: string
+            ownerID: UserID
+            collaborators: []*Collaborator
+            folders: []*Folder
+            createdAt: time.Time
+            updatedAt: time.Time
+            deletedAt: *time.Time
+
+            AddCollaborators(userID...)
+            RemoveCollaborators(userID...)
+            DeleteFolder(folderID)
+            CreateFolder(name, parentID)
+            GetRootFolder(): *Folder
+        }
+
+        struct "Folder" as NoteService.Workspace.Folder <<Entity>> {
+            id: FolderID
+            parentID: *FolderID
+            name: string
+            createdAt: time.Time
+            updatedAt: time.Time
+            deletedAt: *time.Time
+
+            IsRoot(): bool
+        }
+
+        struct "Collaborator" as NoteService.Workspace.Collaborator <<Value Object>> {
+              userID: UserID
+              role: Role
+              joinedAt: time.Time
+
+              HasEditorPermissions(): bool
+        }
+
+        NoteService.Workspace.Workspace "1" *--> "0..*" NoteService.Workspace.Folder : contains
+        NoteService.Workspace.Workspace "1" *--> "0..*" NoteService.Workspace.Collaborator : includes
+        NoteService.Workspace.Collaborator --> NoteService.Workspace.Role : has
     }
 
-    class "History" as NoteService.Note.History {
-      id: uuid
-      jsonContent: string
-      createdAt: time
+    package "NoteService.Note" <<Frame>> {
+        struct "Note" as NoteService.Note.Note <<Aggregate Root>> {
+            id: NoteID
+            FolderID: FolderID
+            tagIDs: []*TagID
+            CurrentVersionID: *NoteHistoryID
+            title: string
+            createdAt: time.Time
+            updatedAt: time.Time
+            deletedAt: *time.Time
+
+            MoveNoteToFolder(FolderID)
+            AddTag(TagID)
+            RemoveTag(TagID)
+        }
     }
 
-    NoteService.Note.Note "1" *--> "0..*" NoteService.Note.History : has
-    NoteService.Note.Note "0..*" --> "0..*" NoteService.Note.Tag : tagged with
-  }
+    package "NoteService.NoteHistory" <<Frame>> {
+        struct "History" as NoteService.NoteHistory.History <<Aggregate Root>> {
+            id: NoteHistoryID
+            noteID: NoteID
+            name: string
+            blockNoteJsonData: string
+            createdAt: time.Time
+            updatedAt: time.Time
+            deletedAt: *time.Time
 
-  package "NoteService.Tag" <<Frame>> {
-    class "Tag" as NoteService.Tag.Tag {
-      id: uuid
-      name: string
+            rename(newName)
+        }
     }
-  }
 
-  NoteService.Workspace.Folder "1" ... "1" NoteService.Folder.Folder
-  NoteService.Workspace.Note "1" ... "1" NoteService.Note.Note
-  NoteService.Folder.Note "1" ... "1" NoteService.Note.Note
-  NoteService.Note.Tag "1" --- "1" NoteService.Tag.Tag
+    package "NoteService.Tag" <<Frame>> {
+        struct "Tag" as NoteService.Tag.Tag <<Aggregate Root>> {
+            id: TagID
+            name: string
+            createdAt: time.Time
+            updatedAt: time.Time
+            deletedAt: *time.Time
+
+            rename(newName)
+        }
+    }
+
+    NoteService.Note.Note *...> "0..1" NoteService.NoteHistory.History : current version
+    NoteService.Note.Note ...> "0..*" NoteService.Tag.Tag : tagged with
+    NoteService.Note.Note ...* "1" NoteService.Workspace.Folder: located in
+
+    NoteService.NoteHistory.History ... EditService.Document: ydoc stored in
+    NoteService.NoteHistory.History ...* "1" NoteService.Note.Note: version of
 }
 
-NoteService.User "1" ... "1" AuthorizationServer.User
-EditService.Document "1" ... "1" NoteService.Note.Note
+NoteService.Workspace.Workspace "1..*" ....> "1" AuthorizationServer.User: owned by
+NoteService.Workspace.Collaborator "0..*" ....> "0..*" AuthorizationServer.User: has collaborators
+
+EditService.Document "1" .... "1" NoteService.Note.Note
 
 @enduml
 ```

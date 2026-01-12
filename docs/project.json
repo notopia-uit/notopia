@@ -11,7 +11,7 @@
     ]
   },
   "targets": {
-    "serve": {
+    "dev": {
       "executor": "nx:run-commands",
       "options": {
         "command": "vitepress dev",
