@@ -9,7 +9,10 @@ content:
           type: array
           items:
             $ref: ../schemas/Note.yaml
-          example:
+          # HACK: got warning "Example value must conform to the schema: type must be array."
+          # from redocly "no-invalid-schema-examples"
+          # So moved example to x-example and hope other tools can still use it.
+          x-example:
             $ref: ../examples/ListNoteResponseData.yaml
         pagination:
           allOf:

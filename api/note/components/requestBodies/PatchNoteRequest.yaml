@@ -4,12 +4,6 @@ required: true
 content:
   application/json:
     schema:
-      type: object
-      properties:
-        title:
-          type: string
-          description: Title of the note
-          minLength: 1
-          maxLength: 255
+      $ref: ../schemas/Note.yaml
       example:
         $ref: ../examples/PatchNoteRequest.yaml
