@@ -5,8 +5,7 @@
     "scalar": "scalar"
   },
   "devDependencies": {
-    "@redocly/cli": "^2.14.4",
-    "@scalar/cli": "^1.4.1",
-    "ajv": "^8.0.0"
+    "@redocly/cli": "^2.14.5",
+    "@scalar/cli": "^1.4.2"
   }
 }
