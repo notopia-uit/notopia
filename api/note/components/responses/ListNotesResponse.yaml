@@ -1,0 +1,22 @@
+# vim: ft=yaml.openapi
+description: Successful response
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: ../schemas/Note.yaml
+          example:
+            $ref: ../examples/ListNoteResponseData.yaml
+        pagination:
+          allOf:
+            - $ref: ../../../shared/components/schemas/Pagination.yaml
+            - description: Pagination details for the list of notes
+              example:
+                $ref: ../examples/ListNoteResponsePagination.yaml
+      required:
+        - data
+        - pagination

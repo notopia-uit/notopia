@@ -1,3 +1,4 @@
+# vim: ft=yaml.openapi
 name: page
 in: query
 description: Page number for pagination

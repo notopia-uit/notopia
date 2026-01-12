@@ -1,11 +1,11 @@
----
 # yaml-language-server: $schema=https://www.schemastore.org/openapi-3.X.json
-openapi: 3.0.0
+# vim: ft=yaml.openapi
+openapi: 3.0.4
 servers:
-  - url: http://note.localhost:8080
-    description: Local dev server via gateway
   - url: http://localhost:8081
     description: Local dev/mock server direct
+  - url: http://localhost:8080
+    description: Local dev server via gateway
 
 info:
   description: >
@@ -22,38 +22,17 @@ info:
 tags:
   - name: note
     description: Operations related to notes management
-  - name: edit
-    description: Operations related to editing notes
 
 paths:
-  /notes:
+  /api/note/notes:
     $ref: ./paths/notes.yaml
-  /notes/{noteId}:
-    $ref: ./paths/notes_{noteId}.yaml
+  # /api/note/notes/{noteId}:
+  #   $ref: ./paths/notes_{noteId}.yaml
 
 components:
-  schemas:
-    Note:
-      $ref: ./components/schemas/Note.yaml
-    NoteInput:
-      $ref: ./components/schemas/NoteInput.yaml
-    NotePatch:
-      $ref: ./components/schemas/NotePatch.yaml
-
-  responses:
-    BadRequest:
-      $ref: ../shared/components/responses/badRequestError.yaml
-    NotFound:
-      $ref: ../shared/components/responses/notFoundError.yaml
-
-  parameters:
-    noteId:
-      $ref: ./components/parameters/noteId.yaml
-
   securitySchemes:
     oauth2:
-      $ref: ../shared/components/securitySchemes/oauth2.yaml
+      $ref: ../shared/components/securitySchemes/Oauth2.yaml
 
 externalDocs:
-  description: Find out more about Notopia
   url: https://notopia-uit.github.io/notopia

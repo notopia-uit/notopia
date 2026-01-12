@@ -1,14 +1,10 @@
+# vim: ft=yaml.openapi
 description: Bad Request Error response
 content:
   application/json:
     schema:
-      $ref: ../schemas/errorResponse.yaml
+      $ref: ../schemas/Error.yaml
     example:
       code: BAD_REQUEST
       message: The request could not be understood by the server due to malformed syntax
       more_info: https://api.notopia.com/docs/errors/BAD_REQUEST
-      details:
-        - field: title
-          message: Title must not be empty
-        - field: content
-          message: Content is required

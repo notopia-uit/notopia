@@ -1,8 +1,9 @@
+# vim: ft=yaml.openapi
 description: Internal Server Error response
 content:
   application/json:
     schema:
-      $ref: ../schemas/errorResponse.yaml
+      $ref: ../schemas/Error.yaml
     example:
       code: INTERNAL_SERVER_ERROR
       message: An internal server error occurred. Please try again later

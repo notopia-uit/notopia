@@ -1,0 +1,12 @@
+# vim: ft=yaml.openapi
+type: object
+
+allOf:
+  - $ref: ./Note.yaml
+
+  - type: object
+    required:
+      - id
+      - title
+      - createdAt
+      - updatedAt

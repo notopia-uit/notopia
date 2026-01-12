@@ -1,4 +1,6 @@
+# vim: ft=yaml.openapi
 type: oauth2
+description: OAuth2 Security Scheme
 flows:
   authorizationCode:
     authorizationUrl: http://localhost:8081/realms/notopia/protocol/openid-connect/auth

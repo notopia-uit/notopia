@@ -1,0 +1,13 @@
+# vim: ft=yaml.openapi
+- id: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+  title: Meeting Notes
+  createdAt: 2026-01-11T10:30:00Z
+  updatedAt: 2026-01-11T14:45:00Z
+- id: afe66e33-2cf0-43da-a9a7-a62fca939e87
+  title: Project Ideas
+  createdAt: 2026-01-10T09:15:00Z
+  updatedAt: 2026-01-10T09:15:00Z
+- id: d6942438-d381-4506-a984-5c28e20d9664
+  title: Shopping List
+  createdAt: 2026-01-09T18:20:00Z
+  updatedAt: 2026-01-11T08:00:00Z

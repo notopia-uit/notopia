@@ -1,8 +1,9 @@
+# vim: ft=yaml.openapi
 description: Unauthorized Error response
 content:
   application/json:
     schema:
-      $ref: ../schemas/errorResponse.yaml
+      $ref: ../schemas/Error.yaml
     example:
       code: UNAUTHORIZED
       message: Authentication is required to access this resource

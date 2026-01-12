@@ -1,9 +1,0 @@
-description: Update note request (full replacement)
-required: true
-content:
-  application/json:
-    schema:
-      $ref: ../schemas/NoteInput.yaml
-    example:
-      title: Updated Note Title
-      content: This is the updated content

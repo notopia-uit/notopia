@@ -1,0 +1,9 @@
+# vim: ft=yaml.openapi
+name: noteId
+in: path
+required: true
+description: Unique identifier of the note
+schema:
+  type: string
+  format: uuid
+example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97

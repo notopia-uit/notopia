@@ -1,0 +1,7 @@
+# vim: ft=yaml.openapi
+page: 1
+limit: 20
+total: 3
+totalPages: 1
+hasNext: false
+hasPrev: false

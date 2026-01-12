@@ -1,0 +1,9 @@
+# vim: ft=yaml.openapi
+description: Note successfully created
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: ../schemas/Note.yaml
+        - example:
+            $ref: ../examples/CreateNoteResponse.yaml

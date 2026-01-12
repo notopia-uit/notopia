@@ -1,3 +1,4 @@
+# vim: ft=yaml.openapi
 get:
   security:
     - oauth2: []
@@ -7,8 +8,9 @@ get:
   description: Retrieve a paginated list of all notes with optional filtering and sorting
   operationId: listNotes
   parameters:
-    - $ref: ../../shared/components/parameters/page.yaml
-    - $ref: ../../shared/components/parameters/limit.yaml
+    - $ref: ../../shared/components/parameters/pageQuery.yaml
+    - $ref: ../../shared/components/parameters/limitQuery.yaml
+    - $ref: ../../shared/components/parameters/orderQuery.yaml
     - name: sortBy
       in: query
       description: Field to sort by
@@ -17,7 +19,6 @@ get:
         enum: [createdAt, updatedAt, title]
         default: createdAt
       example: createdAt
-    - $ref: ../../shared/components/parameters/order.yaml
     - name: search
       in: query
       description: Search notes by title or content
@@ -26,13 +27,13 @@ get:
       example: meeting notes
   responses:
     200:
-      $ref: ../components/responses/listNotes.yaml
+      $ref: ../components/responses/ListNotesResponse.yaml
     400:
-      $ref: ../../shared/components/responses/badRequestError.yaml
+      $ref: ../../shared/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/unauthorizedError.yaml
+      $ref: ../../shared/components/responses/UnauthorizedError.yaml
     500:
-      $ref: ../../shared/components/responses/internalServerError.yaml
+      $ref: ../../shared/components/responses/InternalServerError.yaml
 
 post:
   security:
@@ -43,13 +44,13 @@ post:
   description: Create a new note
   operationId: createNote
   requestBody:
-    $ref: ../components/requestBodies/createNote.yaml
+    $ref: ../components/requestBodies/CreateNoteRequest.yaml
   responses:
     201:
-      $ref: ../components/responses/createNote.yaml
+      $ref: ../components/responses/CreateNoteResponse.yaml
     400:
-      $ref: ../../shared/components/responses/badRequestError.yaml
+      $ref: ../../shared/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/unauthorizedError.yaml
+      $ref: ../../shared/components/responses/UnauthorizedError.yaml
     500:
-      $ref: ../../shared/components/responses/internalServerError.yaml
+      $ref: ../../shared/components/responses/InternalServerError.yaml

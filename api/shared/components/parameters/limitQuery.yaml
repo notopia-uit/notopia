@@ -1,3 +1,4 @@
+# vim: ft=yaml.openapi
 name: limit
 in: query
 description: Number of items per page

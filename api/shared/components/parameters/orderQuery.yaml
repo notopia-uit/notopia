@@ -1,3 +1,4 @@
+# vim: ft=yaml.openapi
 name: order
 in: query
 description: Sort order

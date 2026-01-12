@@ -1,8 +1,9 @@
+# vim: ft=yaml.openapi
 description: Not Found Error response
 content:
   application/json:
     schema:
-      $ref: ../schemas/errorResponse.yaml
+      $ref: ../schemas/Error.yaml
     example:
       code: NOT_FOUND
       message: The requested resource was not found

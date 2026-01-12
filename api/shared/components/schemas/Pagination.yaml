@@ -1,4 +1,4 @@
----
+# vim: ft=yaml.openapi
 type: object
 properties:
   page:

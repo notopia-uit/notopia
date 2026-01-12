@@ -1,8 +1,9 @@
+# vim: ft=yaml.openapi
 description: Forbidden Error response
 content:
   application/json:
     schema:
-      $ref: ../schemas/errorResponse.yaml
+      $ref: ../schemas/Error.yaml
     example:
       code: FORBIDDEN
       message: You do not have permission to access this resource

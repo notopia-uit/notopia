@@ -1,3 +1,4 @@
+# vim: ft=yaml.openapi
 type: string
 format: uuid
 description: Universally Unique Identifier (UUID)

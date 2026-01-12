@@ -1,3 +1,4 @@
+# vim: ft=yaml.openapi
 get:
   security:
     - oauth2: []
@@ -5,22 +6,22 @@ get:
     - note
   summary: Get note
   description: Retrieve a single note by its unique identifier
-  operationId: getNoteById
+  operationId: getNote
   parameters:
-    - $ref: ../components/parameters/noteId.yaml
+    - $ref: ../components/parameters/noteIdPath.yaml
   responses:
     200:
-      $ref: ../components/responses/getNote.yaml
+      $ref: ../components/responses/GetNoteResponse.yaml
     400:
-      $ref: ../../shared/components/responses/badRequestError.yaml
+      $ref: ../../shared/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/unauthorizedError.yaml
+      $ref: ../../shared/components/responses/UnauthorizedError.yaml
     403:
-      $ref: ../../shared/components/responses/forbiddenError.yaml
+      $ref: ../../shared/components/responses/ForbiddenError.yaml
     404:
-      $ref: ../../shared/components/responses/notFoundError.yaml
+      $ref: ../../shared/components/responses/NotFoundError.yaml
     500:
-      $ref: ../../shared/components/responses/internalServerError.yaml
+      $ref: ../../shared/components/responses/InternalServerError.yaml
 
 put:
   security:
@@ -31,22 +32,22 @@ put:
   description: Replace an existing note with new data (all fields are required)
   operationId: updateNote
   parameters:
-    - $ref: ../components/parameters/noteId.yaml
+    - $ref: ../components/parameters/noteIdPath.yaml
   requestBody:
-    $ref: ../components/requestBodies/updateNote.yaml
+    $ref: ../components/requestBodies/PutNoteRequest.yaml
   responses:
     200:
-      $ref: ../components/responses/getNote.yaml
+      $ref: ../components/responses/PutNoteResponse.yaml
     400:
-      $ref: ../../shared/components/responses/badRequestError.yaml
+      $ref: ../../shared/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/unauthorizedError.yaml
+      $ref: ../../shared/components/responses/UnauthorizedError.yaml
     403:
-      $ref: ../../shared/components/responses/forbiddenError.yaml
+      $ref: ../../shared/components/responses/ForbiddenError.yaml
     404:
-      $ref: ../../shared/components/responses/notFoundError.yaml
+      $ref: ../../shared/components/responses/NotFoundError.yaml
     500:
-      $ref: ../../shared/components/responses/internalServerError.yaml
+      $ref: ../../shared/components/responses/InternalServerError.yaml
 
 patch:
   security:
@@ -57,22 +58,22 @@ patch:
   description: Update specific fields of a note (only provided fields will be updated)
   operationId: patchNote
   parameters:
-    - $ref: ../components/parameters/noteId.yaml
+    - $ref: ../components/parameters/noteIdPath.yaml
   requestBody:
-    $ref: ../components/requestBodies/patchNote.yaml
+    $ref: ../components/requestBodies/PatchNoteRequest.yaml
   responses:
     200:
-      $ref: ../components/responses/getNote.yaml
+      $ref: ../components/responses/PatchNoteResponse.yaml
     400:
-      $ref: ../../shared/components/responses/badRequestError.yaml
+      $ref: ../../shared/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/unauthorizedError.yaml
+      $ref: ../../shared/components/responses/UnauthorizedError.yaml
     403:
-      $ref: ../../shared/components/responses/forbiddenError.yaml
+      $ref: ../../shared/components/responses/ForbiddenError.yaml
     404:
-      $ref: ../../shared/components/responses/notFoundError.yaml
+      $ref: ../../shared/components/responses/NotFoundError.yaml
     500:
-      $ref: ../../shared/components/responses/internalServerError.yaml
+      $ref: ../../shared/components/responses/InternalServerError.yaml
 
 delete:
   security:
@@ -83,17 +84,17 @@ delete:
   description: Delete a note by its unique identifier
   operationId: deleteNote
   parameters:
-    - $ref: ../components/parameters/noteId.yaml
+    - $ref: ../components/parameters/noteIdPath.yaml
   responses:
     204:
       description: Note successfully deleted
     400:
-      $ref: ../../shared/components/responses/badRequestError.yaml
+      $ref: ../../shared/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/unauthorizedError.yaml
+      $ref: ../../shared/components/responses/UnauthorizedError.yaml
     403:
-      $ref: ../../shared/components/responses/forbiddenError.yaml
+      $ref: ../../shared/components/responses/ForbiddenError.yaml
     404:
-      $ref: ../../shared/components/responses/notFoundError.yaml
+      $ref: ../../shared/components/responses/NotFoundError.yaml
     500:
-      $ref: ../../shared/components/responses/internalServerError.yaml
+      $ref: ../../shared/components/responses/InternalServerError.yaml

@@ -1,0 +1,10 @@
+# vim: ft=yaml.openapi
+description: Create note request
+required: true
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: ../schemas/NoteRequired.yaml
+        - example:
+            $ref: ../examples/CreateNoteRequest.yaml
