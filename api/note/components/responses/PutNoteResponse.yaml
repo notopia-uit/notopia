@@ -1,0 +1,9 @@
+# vim: ft=yaml.openapi
+description: Note successfully updated
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: ../schemas/NoteRequired.yaml
+        - example:
+            $ref: ../examples/PutNoteResponse.yaml

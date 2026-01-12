@@ -1,0 +1,17 @@
+# vim: ft=yaml.openapi
+description: Put note request (replace entire note)
+required: true
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the note
+          minLength: 1
+          maxLength: 255
+      required:
+        - title
+      example:
+        $ref: ../examples/PutNoteRequest.yaml

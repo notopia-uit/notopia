@@ -1,0 +1,9 @@
+# vim: ft=yaml.openapi
+description: Note successfully patched
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: ../schemas/Note.yaml
+        - example:
+            $ref: ../examples/PatchNoteResponse.yaml

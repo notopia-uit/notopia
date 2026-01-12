@@ -1,0 +1,4 @@
+# vim: ft=yaml.openapi
+summary: Partial update of note
+value:
+  title: Partially Updated Meeting Notes

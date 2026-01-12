@@ -26,8 +26,8 @@ tags:
 paths:
   /api/note/notes:
     $ref: ./paths/notes.yaml
-  # /api/note/notes/{noteId}:
-  #   $ref: ./paths/notes_{noteId}.yaml
+  /api/note/notes/{noteId}:
+    $ref: ./paths/notes_{noteId}.yaml
 
 components:
   securitySchemes:
