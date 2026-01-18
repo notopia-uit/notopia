@@ -1,7 +1,7 @@
 ---
 aside: false
 outline: false
-title: API
+title: Note OpenAPI
 ---
 
 <script setup>
