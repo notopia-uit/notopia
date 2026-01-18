@@ -6,7 +6,7 @@
     "build:yaml": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm redocly bundle note --config ../redocly.yaml -o ./dist/openapi.yaml",
+        "command": "redocly bundle note --config ../redocly.yaml -o ./dist/openapi.yaml",
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/dist/openapi.yaml"],
@@ -15,7 +15,7 @@
     "build:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm redocly bundle note --config ../redocly.yaml -o ./dist/openapi.json",
+        "command": "redocly bundle note --config ../redocly.yaml -o ./dist/openapi.json",
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/dist/openapi.json"],
@@ -29,7 +29,7 @@
       "options": {
         "commands": [
           "nx watch --projects=api/note --includeDependentProjects -- nx build:json api/note",
-          "pnpm scalar document serve -w ./dist/openapi.json --port 9081"
+          "scalar document serve -w ./dist/openapi.json --port 9081"
         ],
         "parallel": true,
         "forwardAllArgs": false,
@@ -40,7 +40,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm scalar document serve ./dist/openapi.json --port 9081",
+        "command": "scalar document serve ./dist/openapi.json --port 9081",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
@@ -49,7 +49,7 @@
     "mock": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm scalar document mock ./dist/openapi.json --port 8081",
+        "command": "scalar document mock ./dist/openapi.json --port 8081",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
@@ -58,7 +58,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm redocly lint note --config ../redocly.yaml",
+        "command": "redocly lint note --config ../redocly.yaml",
         "cwd": "{projectRoot}"
       },
       "inputs": ["openapiSpec"]

@@ -6,8 +6,8 @@
     "vitepressFiles": [
       "{projectRoot}/.vitepress/config.{mts,ts}",
       "{projectRoot}/.vitepress/theme/**/*.{vue,ts,mts}",
-      "{projectRoot}/docs/**/*.md",
-      "{projectRoot}/index.md"
+      "{projectRoot}/src/**/*.md",
+      "{projectRoot}/public/**"
     ]
   },
   "targets": {
@@ -20,7 +20,7 @@
       },
       "continuous": true
     },
-    "build": {
+    "build:1": {
       "executor": "nx:run-commands",
       "options": {
         "command": "vitepress build",
@@ -28,6 +28,19 @@
       },
       "outputs": ["{projectRoot}/.vitepress/dist"],
       "inputs": ["vitepressFiles"]
+    },
+    "build:2": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitepress build",
+        "cwd": "{projectRoot}"
+      },
+      "outputs": ["{projectRoot}/.vitepress/dist"],
+      "inputs": ["vitepressFiles"],
+      "dependsOn": ["build:1"]
+    },
+    "build": {
+      "dependsOn": ["build:1", "build:2"]
     },
     "preview": {
       "executor": "nx:run-commands",
