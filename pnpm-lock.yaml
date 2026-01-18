@@ -153,6 +153,9 @@ importers:
       vitepress-plugin-diagrams:
         specifier: ^1.1.2
         version: 1.1.2(vite@7.3.1(@types/node@25.0.9)(jiti@2.4.2)(terser@5.44.1)(yaml@2.8.2))(vitepress@2.0.0-alpha.15(@algolia/client-search@5.46.2)(@types/node@25.0.9)(@types/react@19.2.8)(axios@1.13.2)(fuse.js@7.1.0)(jiti@2.4.2)(postcss@8.5.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(search-insights@2.17.3)(terser@5.44.1)(typescript@5.9.3)(yaml@2.8.2))
+      vitepress-sidebar:
+        specifier: ^1.33.1
+        version: 1.33.1
 
   packages/notopia-api-web:
     dependencies:
@@ -6614,6 +6617,10 @@ packages:
     resolution: {integrity: sha512-4EK3+xJl8Ts67nLYNwqw/dsFVnCf+qR7RgXSK9jEEm9unao3njwMDdmsdvoKBKHzxd7tCYz5e5M+SnMjdtXGQQ==}
     engines: {node: '>=0.6'}
 
+  qsu@1.11.0:
+    resolution: {integrity: sha512-ymAVupKRbaL735rWhEhMyEHY9PjW5WYeiO93tunUTCRBjFv1wImwBzhXcKZDYeiDUhpUN2earPu67pngGO2Ipw==}
+    engines: {node: '>=18.0.0'}
+
   querystringify@2.2.0:
     resolution: {integrity: sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==}
 
@@ -7708,6 +7715,10 @@ packages:
     peerDependencies:
       pagefind: ^1.1.0
       vitepress: ^1 || ^2
+
+  vitepress-sidebar@1.33.1:
+    resolution: {integrity: sha512-wPUbXezGakVldawixeRW5tKQTLKoMj2t4nWoThKfCltBM/9a38IE+wCXmmRNW22ZKC32SD/X/sG6NyCTK8QBRg==}
+    engines: {node: '>=18.0.0'}
 
   vitepress@2.0.0-alpha.15:
     resolution: {integrity: sha512-jhjSYd10Z6RZiKOa7jy0xMVf5NB5oSc/lS3bD/QoUc6V8PrvQR5JhC9104NEt6+oTGY/ftieVWxY9v7YI+1IjA==}
@@ -15907,6 +15918,8 @@ snapshots:
     dependencies:
       side-channel: 1.1.0
 
+  qsu@1.11.0: {}
+
   querystringify@2.2.0: {}
 
   queue-microtask@1.2.3: {}
@@ -17270,6 +17283,12 @@ snapshots:
       vue-command-palette: 0.1.4
     transitivePeerDependencies:
       - vue
+
+  vitepress-sidebar@1.33.1:
+    dependencies:
+      glob: 11.1.0
+      gray-matter: 4.0.3
+      qsu: 1.11.0
 
   vitepress@2.0.0-alpha.15(@algolia/client-search@5.46.2)(@types/node@25.0.9)(@types/react@19.2.8)(axios@1.13.2)(fuse.js@7.1.0)(jiti@2.4.2)(postcss@8.5.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(search-insights@2.17.3)(terser@5.44.1)(typescript@5.9.3)(yaml@2.8.2):
     dependencies:

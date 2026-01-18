@@ -1,5 +1,3 @@
-<!-- vim:set tabstop=4 shiftwidth=4: -->
-
 # Class diagram
 
 ```plantuml
@@ -162,3 +160,5 @@ EditService.Document "1" .... "1" NoteService.Domain.Note.Note
 ```
 
 <!-- diagram id="class-diagram" -->
+
+<!-- vim:set tabstop=4 shiftwidth=4: -->
