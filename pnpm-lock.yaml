@@ -30,6 +30,9 @@ importers:
         specifier: 'catalog:'
         version: 19.2.3(react@19.2.3)
     devDependencies:
+      '@naxodev/gonx':
+        specifier: ^3.0.0
+        version: 3.0.0(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.5.29(@swc/helpers@0.5.18))
       '@nx/eslint':
         specifier: 22.3.3
         version: 22.3.3(@babel/traverse@7.28.5)(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.5.29(@swc/helpers@0.5.18))(@zkochan/js-yaml@0.0.7)(eslint@9.39.2(jiti@2.4.2))(nx@22.3.3(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.5.29(@swc/helpers@0.5.18)))
@@ -1473,6 +1476,47 @@ packages:
   '@marijn/find-cluster-break@1.0.2':
     resolution: {integrity: sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g==}
 
+  '@melkeydev/go-blueprint-darwin-arm64@0.10.11':
+    resolution: {integrity: sha512-5flr8v70HxBXruDojsCy9VRh8aWDtGhLTu4pPmuTPs/a4BPrSEq4a3TufcN0N5o9z0DX4cVtfnTsB8mlxssGMA==}
+    cpu: [arm64]
+    os: [darwin]
+    hasBin: true
+
+  '@melkeydev/go-blueprint-darwin-x64@0.10.11':
+    resolution: {integrity: sha512-eDAUUTF/6dAgBLShXUG8QrdOp6vO8z6XeWe9Ydi1TrmBPvIGHO6c86bwTCYCGZD+tM58IzRRX0h0FXgCdmQImg==}
+    cpu: [x64]
+    os: [darwin]
+    hasBin: true
+
+  '@melkeydev/go-blueprint-linux-arm64@0.10.11':
+    resolution: {integrity: sha512-LTsX5FDYnnfbck27Hj28Tez0R/43+xGxaD0OWZUNrY2BphSQP8SzD7JeBtBuSlzs3ddUwmMIaXxm4Rx5368bvA==}
+    cpu: [arm64]
+    os: [linux]
+    hasBin: true
+
+  '@melkeydev/go-blueprint-linux-x64@0.10.11':
+    resolution: {integrity: sha512-ruDGU+KxokxlWe+DmRGCqhsxy3GByXKGMBZIRkB2JI+DbA679nFCBPRhPFfTA093tyH4Ohgm/Guil/XSFJByNQ==}
+    cpu: [x64]
+    os: [linux]
+    hasBin: true
+
+  '@melkeydev/go-blueprint-win32-arm64@0.10.11':
+    resolution: {integrity: sha512-65vTWl3+rOCbq0Ig39/I8VF7GdrCesjgXwWMgEDBsTJu2BZYWvAwZFkt++5Mrk8zmMczpDzL4cZ7DuEaJjDRHA==}
+    cpu: [arm64]
+    os: [win32]
+    hasBin: true
+
+  '@melkeydev/go-blueprint-win32-x64@0.10.11':
+    resolution: {integrity: sha512-d+8R4hqOTRodmvrfUV2s7E68R3I2/swVkX4XVWRaEyG+q9cDAERKSGMBuhSHygc9f6MkCMIfa6iM2aA5zm7C1A==}
+    cpu: [x64]
+    os: [win32]
+    hasBin: true
+
+  '@melkeydev/go-blueprint@0.10.11':
+    resolution: {integrity: sha512-N8OuTmgcF+4udNWsUIVOhOKOqobUttVbdDctq6uDLgKWpdbCPXvx54dFFshxFwabj2vj2R9dTBZLWhftmrtfqA==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
+
   '@module-federation/bridge-react-webpack-plugin@0.21.6':
     resolution: {integrity: sha512-lJMmdhD4VKVkeg8RHb+Jwe6Ou9zKVgjtb1inEURDG/sSS2ksdZA8pVKLYbRPRbdmjr193Y8gJfqFbI2dqoyc/g==}
 
@@ -1763,6 +1807,9 @@ packages:
 
   '@napi-rs/wasm-runtime@1.0.7':
     resolution: {integrity: sha512-SeDnOO0Tk7Okiq6DbXmmBODgOAb9dp9gjlphokTUxmt8U3liIP1ZsozBahH69j/RJv+Rfs6IwUKHTgQYJ/HBAw==}
+
+  '@naxodev/gonx@3.0.0':
+    resolution: {integrity: sha512-Jxv9SM+HICyimsJOmXYSmHqyoeW0Kd2VJ0Dn6kLrHWxUhmO2p5wVs9rk2SUcbCMV2kKjt/YaOG9vNa6oIPPd0w==}
 
   '@noble/hashes@1.8.0':
     resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
@@ -9451,6 +9498,33 @@ snapshots:
 
   '@marijn/find-cluster-break@1.0.2': {}
 
+  '@melkeydev/go-blueprint-darwin-arm64@0.10.11':
+    optional: true
+
+  '@melkeydev/go-blueprint-darwin-x64@0.10.11':
+    optional: true
+
+  '@melkeydev/go-blueprint-linux-arm64@0.10.11':
+    optional: true
+
+  '@melkeydev/go-blueprint-linux-x64@0.10.11':
+    optional: true
+
+  '@melkeydev/go-blueprint-win32-arm64@0.10.11':
+    optional: true
+
+  '@melkeydev/go-blueprint-win32-x64@0.10.11':
+    optional: true
+
+  '@melkeydev/go-blueprint@0.10.11':
+    optionalDependencies:
+      '@melkeydev/go-blueprint-darwin-arm64': 0.10.11
+      '@melkeydev/go-blueprint-darwin-x64': 0.10.11
+      '@melkeydev/go-blueprint-linux-arm64': 0.10.11
+      '@melkeydev/go-blueprint-linux-x64': 0.10.11
+      '@melkeydev/go-blueprint-win32-arm64': 0.10.11
+      '@melkeydev/go-blueprint-win32-x64': 0.10.11
+
   '@module-federation/bridge-react-webpack-plugin@0.21.6':
     dependencies:
       '@module-federation/sdk': 0.21.6
@@ -9870,6 +9944,19 @@ snapshots:
       '@emnapi/runtime': 1.8.1
       '@tybys/wasm-util': 0.10.1
     optional: true
+
+  '@naxodev/gonx@3.0.0(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.5.29(@swc/helpers@0.5.18))':
+    dependencies:
+      '@melkeydev/go-blueprint': 0.10.11
+      '@nx/devkit': 22.3.3(nx@22.3.3(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.5.29(@swc/helpers@0.5.18)))
+      chalk: 4.1.2
+      npm-run-path: 4.0.1
+      nx: 22.3.3(@swc-node/register@1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.5.29(@swc/helpers@0.5.18))
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - '@swc-node/register'
+      - '@swc/core'
+      - debug
 
   '@noble/hashes@1.8.0': {}
 

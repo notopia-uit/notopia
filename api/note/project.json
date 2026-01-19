@@ -24,7 +24,7 @@
     "build": {
       "dependsOn": ["build:yaml", "build:json"]
     },
-    "dev": {
+    "serve": {
       "executor": "nx:run-commands",
       "options": {
         "commands": [
