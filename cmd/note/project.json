@@ -1,0 +1,7 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "cmd/note",
+  "projectType": "application",
+  "targets": {},
+  "implicitDependencies": ["pkg/noteopenapi"]
+}

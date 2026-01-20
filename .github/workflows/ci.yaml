@@ -10,6 +10,9 @@ on:
     branches:
       - main
 
+env:
+  MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
+
 jobs:
   main:
     name: Main
@@ -31,20 +34,30 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version-file: .tool-versions
           cache: pnpm
 
-      # - name: Setup Go
-      #   uses: actions/setup-go@v6
-      #   with:
-      #     cache-dependency-path: **/*.sum
-      #     go-version-file: go-work
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: .tool-versions
+
+      - name: Setup golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          install-only: true
+          version-file: .tool-versions
+
+      - name: Setup Mise
+        uses: jdx/mise-action@v3
+        with:
+          experimental: true
 
       - name: Install Node Dependencies
         run: pnpm install
 
-      # - name: Install Go Dependencies
-      #   run: go mod download
+      - name: Install Go Dependencies
+        run: go mod download
 
       - name: Restore Nx Cache
         uses: actions/cache/restore@v4

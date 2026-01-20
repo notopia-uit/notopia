@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "gen": {
+      "dependsOn": [
+        {
+          "projects": ["api/gen/go"],
+          "target": "gen"
+        }
+      ]
+    }
+  }
+}

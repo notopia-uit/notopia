@@ -1,0 +1,20 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "packages/notopia-note-api",
+  "projectType": "library",
+  "targets": {
+    "gen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run gen",
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": [
+        {
+          "projects": "api/note",
+          "target": "build:yaml"
+        }
+      ]
+    }
+  }
+}

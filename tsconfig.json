@@ -8,6 +8,12 @@
     },
     {
       "path": "./packages/notopia-api-web"
+    },
+    {
+      "path": "./packages/notopia-note-api/"
+    },
+    {
+      "path": "./packages/notopia-note-api"
     }
   ]
 }

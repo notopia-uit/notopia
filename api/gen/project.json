@@ -1,0 +1,24 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "api/gen",
+  "projectType": "library",
+  "targets": {
+    "gen:note": {
+      "inputs": ["{projectRoot}/note.oapi-codegen.yaml"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "oapi-codegen --config ./note.oapi-codegen.yaml ../note/dist/openapi.yaml",
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": [
+        {
+          "projects": "api/note",
+          "target": "build:yaml"
+        }
+      ]
+    },
+    "gen": {
+      "dependsOn": ["gen:note"]
+    }
+  }
+}

@@ -11,8 +11,11 @@
     ]
   },
   "targetDefaults": {
+    "gen*": {
+      "cache": true
+    },
     "build*": {
-      "dependsOn": ["^build*"],
+      "dependsOn": ["^build*", "^gen*"],
       "cache": true
     },
     "lint": {
@@ -52,16 +55,6 @@
         "typecheckTargetName": "typecheck",
         "buildDepsTargetName": "build-deps",
         "watchDepsTargetName": "watch-deps"
-      }
-    },
-    {
-      "plugin": "@naxodev/gonx",
-      "options": {
-        "buildTargetName": "build",
-        "serveTargetName": "serve",
-        "testTargetName": "test",
-        "lintTargetName": "lint",
-        "tidyTargetName": "tidy"
       }
     }
   ],

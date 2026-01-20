@@ -1,7 +1,6 @@
 {
   "packageManager": "pnpm@10.27.0",
   "devDependencies": {
-    "@naxodev/gonx": "^3.0.0",
     "@nx/eslint": "22.3.3",
     "@nx/eslint-plugin": "22.3.3",
     "@nx/js": "22.3.3",

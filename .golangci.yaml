@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
+version: "2"
+linters:
+  enable:
+    - testifylint
+    - exhaustive
+    - exhaustruct
+  disable:
+    - unused
+  exclusions:
+    generated: strict
+formatters:
+  enable:
+    - gofumpt
+  settings:
+    gofumpt:
+      module-path: github.com/notopia-uit
+  exclusions:
+    generated: strict
+run:
+  build-tags:
+    - integration
