@@ -11,7 +11,7 @@
     "@swc/cli": "~0.7.0",
     "@swc/core": "~1.15.0",
     "@swc/helpers": "~0.5.11",
-    "@types/node": "^20.0.0",
+    "@types/node": "^24.0.0",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "^4.2.0",
