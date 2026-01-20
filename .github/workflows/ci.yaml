@@ -60,13 +60,13 @@ jobs:
         run: go mod download
 
       - name: Restore Nx Cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: .nx
           key: ${{ runner.os }}-nx-
 
       - name: Restore Docs diagrams Cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: docs/src/public/diagrams/
           key: ${{ runner.os }}-docs-diagrams-
@@ -101,13 +101,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache Nx
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: .nx
           key: ${{ runner.os }}-nx-${{ hashFiles('.nx/**') }}
 
       - name: Cache Docs diagrams
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: docs/src/public/diagrams/
           key: ${{ runner.os }}-docs-diagrams-${{ hashFiles('docs/src/public/diagrams/**') }}
