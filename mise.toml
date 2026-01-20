@@ -4,6 +4,6 @@
 REDOCLY_TELEMETRY = "off"
 
 [tools]
-pnpm = "10.27.0"
+pnpm = "10.28.1"
 "npm:nx" = "22.3.3"
 oapi-codegen = "2.4.1"
