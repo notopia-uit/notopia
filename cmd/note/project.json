@@ -2,6 +2,53 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "cmd/note",
   "projectType": "application",
-  "targets": {},
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "inputs": ["goDependencies"],
+      "outputs": ["{projectRoot}/dist/note"],
+      "options": {
+        "command": "go build -o ./dist/note .",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "inputs": ["goDependencies"],
+      "options": {
+        "command": "./dist/note",
+        "cwd": "{projectRoot}",
+        "tty": true
+      },
+      "continuous": true,
+      "dependsOn": ["build"]
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "inputs": ["goDependencies"],
+      "options": {
+        "command": "go run -gcflags='all=-N -l' .",
+        "cwd": "{projectRoot}",
+        "tty": true
+      },
+      "continuous": true
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "inputs": ["goDependencies"],
+      "options": {
+        "command": "golangci-lint run .",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "tidy": {
+      "executor": "nx:run-commands",
+      "inputs": ["goDependencies"],
+      "options": {
+        "command": "go mod tidy",
+        "cwd": "{projectRoot}"
+      }
+    }
+  },
   "implicitDependencies": ["pkg/noteopenapi"]
 }

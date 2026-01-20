@@ -8,17 +8,25 @@
       "{workspaceRoot}/api/shared/**/*.yaml",
       "!{projectRoot}/**/README.md",
       "!{projectRoot}/dist"
+    ],
+    "goDependencies": [
+      "{workspaceRoot}/go.mod",
+      "{workspaceRoot}/go.sum",
+      "{projectRoot}/**/*.{go}"
     ]
   },
   "targetDefaults": {
     "gen*": {
       "cache": true
     },
-    "build*": {
-      "dependsOn": ["^build*", "^gen*"],
+    "build": {
+      "dependsOn": ["^build"],
       "cache": true
     },
-    "lint": {
+    "build*": {
+      "cache": true
+    },
+    "lint*": {
       "cache": true
     }
   },
