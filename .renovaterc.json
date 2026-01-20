@@ -1,0 +1,9 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "local>notopia-uit/renovate-config",
+    ":automergeBranch",
+    ":automergePatch"
+  ],
+  "schedule": ["* 1-18 * * 3,0"]
+}
