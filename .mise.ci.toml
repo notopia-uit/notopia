@@ -2,3 +2,6 @@
 
 [tools]
 oapi-codegen = "2.4.1"
+
+[settings]
+legacy_version_file = false
