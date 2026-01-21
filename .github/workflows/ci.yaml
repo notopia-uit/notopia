@@ -4,11 +4,16 @@ on:
   push:
     branches:
       - main
+      - dev
     tags:
       - v*.*.*
   pull_request:
     branches:
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
@@ -55,17 +60,15 @@ jobs:
         with:
           experimental: true
 
-      - name: Install Node Dependencies
-        run: pnpm install
-
-      - name: Install Go Dependencies
-        run: go mod download
+      - name: Derive SHAs for Nx Affected
+        id: set-shas
+        uses: nrwl/nx-set-shas@v4
 
       - name: Restore Nx Cache
         uses: actions/cache/restore@v5
         with:
           path: .nx
-          key: ${{ runner.os }}-nx-${{ github.ref }}-
+          key: ${{ runner.os }}-nx-${{ steps.set-shas.outputs.base }}
 
       - name: Restore Docs diagrams Cache
         uses: actions/cache/restore@v5
@@ -73,8 +76,11 @@ jobs:
           path: docs/src/public/diagrams/
           key: docs-diagrams-
 
-      - name: Derive SHAs for Nx Affected
-        uses: nrwl/nx-set-shas@v4
+      - name: Install Node Dependencies
+        run: pnpm install
+
+      - name: Install Go Dependencies
+        run: go mod download
 
       - name: Lint & Format
         run: npx nx affected -t lint format:check --parallel=5
@@ -106,7 +112,7 @@ jobs:
         uses: actions/cache/save@v5
         with:
           path: .nx
-          key: ${{ runner.os }}-nx-${{ github.ref }}-${{ hashFiles('.nx/**') }}
+          key: ${{ runner.os }}-nx-${{ steps.set-shas.outputs.head }}
 
       - name: Cache Docs diagrams
         uses: actions/cache/save@v5

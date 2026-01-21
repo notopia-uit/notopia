@@ -39,7 +39,8 @@
       "options": {
         "command": "golangci-lint run .",
         "cwd": "{projectRoot}"
-      }
+      },
+      "parallelism": false
     },
     "tidy": {
       "executor": "nx:run-commands",
