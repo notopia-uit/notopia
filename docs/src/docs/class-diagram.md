@@ -1,4 +1,4 @@
-# Class diagram
+# Class Diagram
 
 ```plantuml
 @startuml Notopia

@@ -20,8 +20,8 @@ services: Services {
     icon: https://simpleicons.org/icons/traefikproxy.svg
   }
 
-  authorization_server: Authorization Server {
-    icon: https://simpleicons.org/icons/keycloak.svg
+  identity_provider: Identity Provider {
+    icon: https://simpleicons.org/icons/authentik.svg
   }
 
   object_storage: Object Storage {
@@ -66,27 +66,39 @@ services: Services {
     meilisearch_sync_service -> meilisearch_sync_service_database
   }
 
+  authorization_database: Authorization Database {
+    icon: https://simpleicons.org/icons/postgresql.svg
+  }
+
   kafka: Kafka {
     icon: https://simpleicons.org/icons/apachekafka.svg
   }
 }
 
 apps -> services.gateway
-apps -> services.authorization_server
+apps -> services.identity_provider
 apps -> services.object_storage
 
 services.gateway -> services.edit.edit_service
 services.gateway -> services.note.note_service
-services.gateway -> services.search.meilisearch
+services.gateway -> services.identity_provider
 
 services.edit.edit_service -> services.note.note_service
 services.edit.edit_service -> services.kafka
 
-services.note.note_service -> services.authorization_server
+services.note.note_service -> services.identity_provider
 services.note.note_service -> services.object_storage
 services.note.note_service -> services.kafka
 
+services.note.note_service -> services.authorization_database
+services.edit.edit_service -> services.authorization_database
+
 services.kafka <- services.search.meilisearch_sync_service
+
+style.border-radius: 15
+*.style.border-radius: 15
+*.*.style.border-radius: 15
+*.*.*.style.border-radius: 15
 ```
 
 <!-- diagram id="architecture-diagram" -->
