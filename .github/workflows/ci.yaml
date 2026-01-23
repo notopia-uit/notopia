@@ -17,6 +17,15 @@ on:
 
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
+  IS_PRIMARY_BRANCH: >-
+    ${{
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/dev' ||
+      startsWith(github.ref, 'refs/tags/v') ||
+      github.base_ref == 'main' ||
+      github.base_ref == 'dev'
+    }}
+  IS_RENOVATE: ${{ startsWith(github.head_ref, 'renovate/') }}
 
 jobs:
   main:
@@ -36,29 +45,53 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          cache: true
+          cache: >-
+            ${{
+              env.IS_PRIMARY_BRANCH == 'true' &&
+              env.IS_RENOVATE == 'false'
+            }}
 
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version-file: .tool-versions
-          cache: pnpm
+          cache: >-
+            ${{
+              (env.IS_PRIMARY_BRANCH == 'true' && env.IS_RENOVATE == 'false')
+              && 'pnpm'
+              || ''
+            }}
 
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
           go-version-file: .tool-versions
+          cache: >-
+            ${{
+              env.IS_PRIMARY_BRANCH == 'true' &&
+              env.IS_RENOVATE == 'false'
+            }}
 
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
           install-only: true
           version-file: .tool-versions
+          skip-save-cache: >-
+            ${{
+              env.IS_PRIMARY_BRANCH == 'true' &&
+              env.IS_RENOVATE == 'false'
+            }}
 
       - name: Setup Mise
         uses: jdx/mise-action@v3
         with:
           experimental: true
+          cache: >-
+            ${{
+              env.IS_PRIMARY_BRANCH == 'true' &&
+              env.IS_RENOVATE == 'false'
+            }}
 
       - name: Derive SHAs for Nx Affected
         id: set-shas
@@ -110,12 +143,22 @@ jobs:
 
       - name: Cache Nx
         uses: actions/cache/save@v5
+        if: >-
+          ${{
+            env.IS_PRIMARY_BRANCH == 'true' &&
+            env.IS_RENOVATE == 'false'
+          }}
         with:
           path: .nx
           key: ${{ runner.os }}-nx-${{ steps.set-shas.outputs.head }}
 
       - name: Cache Docs diagrams
         uses: actions/cache/save@v5
+        if: >-
+          ${{
+            env.IS_PRIMARY_BRANCH == 'true' &&
+            env.IS_RENOVATE == 'false'
+          }}
         with:
           path: docs/src/public/diagrams/
           key: docs-diagrams-${{ hashFiles('docs/src/public/diagrams/**') }}
