@@ -70,7 +70,7 @@ services: Services {
     icon: https://simpleicons.org/icons/postgresql.svg
   }
 
-  kafka: Kafka {
+  message_broker: Message Broker {
     icon: https://simpleicons.org/icons/apachekafka.svg
   }
 }
@@ -84,16 +84,16 @@ services.gateway -> services.note.note_service
 services.gateway -> services.identity_provider
 
 services.edit.edit_service -> services.note.note_service
-services.edit.edit_service -> services.kafka
+services.edit.edit_service -> services.message_broker
 
 services.note.note_service -> services.identity_provider
 services.note.note_service -> services.object_storage
-services.note.note_service -> services.kafka
+services.note.note_service -> services.message_broker
 
 services.note.note_service -> services.authorization_database
 services.edit.edit_service -> services.authorization_database
 
-services.kafka <- services.search.meilisearch_sync_service
+services.message_broker <- services.search.meilisearch_sync_service
 
 style.border-radius: 15
 *.style.border-radius: 15

@@ -1,0 +1,28 @@
+# vim:ft=yaml.docker-compose:
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  minio:
+    container_name: minio
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    command:
+      - server
+      - /data
+      - --console-address=:9001
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-notopia}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-notopia}
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - minio:/data
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:9000/minio/health/live
+    restart: unless-stopped
+
+volumes:
+  minio:

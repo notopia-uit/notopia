@@ -1,0 +1,20 @@
+# vim:ft=yaml.docker-compose:
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  casbin_postgresql:
+    container_name: casbin_postgresql
+    image: postgres:18.1-alpine3.23
+    environment:
+      POSTGRES_DB: ${CASBIN_POSTGRESQL_DB:-notopia}
+      POSTGRES_USER: ${CASBIN_POSTGRESQL_USER:-notopia}
+      POSTGRES_PASSWORD: ${CASBIN_POSTGRESQL_PASSWORD:-notopia}
+    volumes:
+      - casbin_postgresql_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+    restart: unless-stopped
+
+volumes:
+  casbin_postgresql_data:

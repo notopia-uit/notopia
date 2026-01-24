@@ -1,0 +1,12 @@
+# vim:ft=yaml.docker-compose:
+name: notopia
+
+include:
+  - ./infrastructure/authorize.yaml
+  - ./infrastructure/gateway.yaml
+  - ./infrastructure/identity_provider.yaml
+  - ./infrastructure/message_broker.yaml
+  - ./infrastructure/object_storage.yaml
+
+networks:
+  public:
