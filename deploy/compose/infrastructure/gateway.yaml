@@ -8,12 +8,16 @@ services:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --providers.docker.network=public
+      - --providers.file.directory=/etc/traefik/dynamic
       - --entryPoints.web.address=:80
+
     ports:
       - 80:80
       - 8080:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/:/etc/traefik/dynamic:ro
+
     networks:
       - public
     restart: unless-stopped

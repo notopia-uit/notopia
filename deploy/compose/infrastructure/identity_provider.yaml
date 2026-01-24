@@ -11,16 +11,22 @@ services:
       AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopia}
       AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_POSTGRESQL__USER:-notopia}
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-notopia}
-    ports:
-      - 9000:9000
-      - 9443:9443
     volumes:
       - authentik_data:/data
       # - ./custom-templates:/templates
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.authentik.rule=Host(`authentik.notopia.localhost`)
+      - traefik.http.routers.authentik.entrypoints=web
+      - traefik.http.services.authentik.loadbalancer.server.port=9000
+    networks:
+      - default
+      - public
     depends_on:
       authentik_postgresql:
         condition: service_healthy
     restart: unless-stopped
+
 
   authentik_worker:
     container_name: authentik_worker

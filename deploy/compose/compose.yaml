@@ -7,6 +7,10 @@ include:
   - ./infrastructure/identity_provider.yaml
   - ./infrastructure/message_broker.yaml
   - ./infrastructure/object_storage.yaml
+  - ./infrastructure/search.yaml
+  - ./services/note.yaml
 
 networks:
   public:
+    name: notopia_public
+    external: true

@@ -8,6 +8,8 @@ services:
       POSTGRES_DB: ${NOTE_POSTGRESQL_DB:-notopia}
       POSTGRES_USER: ${NOTE_POSTGRESQL_USER:-notopia}
       POSTGRES_PASSWORD: ${NOTE_POSTGRESQL_PASSWORD:-notopia}
+    ports:
+      - ${NOTE_POSTGRESQL_PORT:-5432}:5432
     volumes:
       - note_postgresql_data:/var/lib/postgresql/data
     healthcheck:

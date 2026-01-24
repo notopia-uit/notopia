@@ -6,10 +6,16 @@ services:
     image: getmeili/meilisearch:v1.33
     environment:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-notopia}
-    ports:
-      - 7700:7700
     volumes:
       - meilisearch_data:/meili_data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.meilisearch.rule=Host(`meilisearch.notopia.localhost`)
+      - traefik.http.routers.meilisearch.entrypoints=web
+      - traefik.http.services.meilisearch.loadbalancer.server.port=7700
+    networks:
+      - default
+      - public
     restart: unless-stopped
 
 volumes:

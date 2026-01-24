@@ -11,14 +11,23 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-notopia}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-notopia}
-    ports:
-      - 9000:9000
-      - 9001:9001
     volumes:
       - minio:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minio.rule=Host(`minio-api.notopia.localhost`)
+      - traefik.http.routers.minio.entrypoints=web
+      - traefik.http.services.minio.loadbalancer.server.port=9000
+      - traefik.http.routers.minio-console.rule=Host(`minio.notopia.localhost`)
+      - traefik.http.routers.minio-console.entrypoints=web
+      - traefik.http.services.minio-console.loadbalancer.server.port=9001
+    networks:
+      - default
+      - public
     healthcheck:
       test:
         - CMD
+
         - curl
         - -f
         - http://localhost:9000/minio/health/live
