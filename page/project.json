@@ -30,7 +30,8 @@
     },
     "deploy": {
       "executor": "nx-github-pages:deploy",
-      "dependsOn": ["build"]
+      "dependsOn": ["build"],
+      "cache": true
     }
   },
   "implicitDependencies": ["docs", "packages/notopia-api-web"]
