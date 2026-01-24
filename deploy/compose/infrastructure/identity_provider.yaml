@@ -21,7 +21,7 @@ services:
       - traefik.http.services.authentik.loadbalancer.server.port=9000
     networks:
       - default
-      - public
+      - proxy
     depends_on:
       authentik_postgresql:
         condition: service_healthy
@@ -44,7 +44,7 @@ services:
       - authentik_data:/data
       # - ./certs:/certs
       # - ./custom-templates:/templates
-      # - ./authentik-blueprints/sth:/blueprints/sth:ro
+      - ./authentik-blueprints/:/blueprints/notopia:ro
     depends_on:
       authentik_postgresql:
         condition: service_healthy

@@ -23,7 +23,7 @@ services:
       - traefik.http.services.minio-console.loadbalancer.server.port=9001
     networks:
       - default
-      - public
+      - proxy
     healthcheck:
       test:
         - CMD

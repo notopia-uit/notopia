@@ -11,6 +11,6 @@ include:
   - ./services/note.yaml
 
 networks:
-  public:
-    name: notopia_public
+  proxy:
+    name: notopia_proxy
     external: true

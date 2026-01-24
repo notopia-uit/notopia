@@ -15,7 +15,7 @@ services:
       - traefik.http.services.meilisearch.loadbalancer.server.port=7700
     networks:
       - default
-      - public
+      - proxy
     restart: unless-stopped
 
 volumes:

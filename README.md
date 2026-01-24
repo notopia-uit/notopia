@@ -1,5 +1,5 @@
 ### Dev
 
 ```sh
-docker network create notopia_public
+docker network create notopia_proxy
 ```

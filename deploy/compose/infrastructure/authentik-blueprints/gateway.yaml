@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Notopia - Gateway
+  labels:
+    blueprint-group: notopia
+    blueprints.goauthentik.io/description: |
+      Blueprint to configure the OAuth2 Source and Application for Notopia Gateway.
+
+entries:
+  - model: authentik_providers_oauth2.oauth2provider
+    identifiers:
+      name: gateway
+    attrs:
+      name: gateway
+      client_id: gateway
+      client_secret: notopia-uit
+      client_type: confidential
+      access_code_validity: minutes=10
+      access_token_validity: days=30
+      refresh_token_threshold: hours=1
+      refresh_token_validity: days=90
+      authorization_flow:
+        !Find [
+          authentik_flows.flow,
+          [slug, default-provider-authorization-explicit-consent],
+        ]
+      invalidation_flow:
+        !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+      property_mappings:
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, openid]]
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, profile]]
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, email]]
+      redirect_uris: []
+
+  - model: authentik_core.application
+    identifiers:
+      name: gateway
+    attrs:
+      name: Gateway
+      provider:
+        !Find [authentik_providers_oauth2.oauth2provider, [name, gateway]]
+      slug: gateway

@@ -6,6 +6,8 @@ http:
         - web
       rule: Host(`api.notopia.localhost`) && PathPrefix(`/note`)
       service: note
+      middlewares:
+        - jwt
 
   services:
     note:
