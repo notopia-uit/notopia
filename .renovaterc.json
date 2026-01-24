@@ -5,5 +5,10 @@
     ":automergeBranch",
     ":automergePatch"
   ],
-  "schedule": ["* 1-18 * * 3,0"]
+  "schedule": ["* 1-18 * * 3,0"],
+  "docker-compose": {
+    "fileMatch": [
+      "deploy/compose/.*\\.yaml$"
+    ]
+  }
 }

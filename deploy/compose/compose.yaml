@@ -1,5 +1,4 @@
 # vim:ft=yaml.docker-compose:
-# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
 name: notopia
 
 include:
