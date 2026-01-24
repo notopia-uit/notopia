@@ -2,10 +2,10 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
 services:
   meilisearch:
-    container_name: meilisearch
+    container_name: notopia-meilisearch
     image: getmeili/meilisearch:v1.33
     environment:
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-notopia}
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-notopia-uit}
     volumes:
       - meilisearch_data:/meili_data
     labels:

@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: "OIDC-Application-Blueprint"
+entries:
+  # 1. Create the OAuth2/OpenID Provider
+  - model: authentik_sources_oauth.oauthsource
+    identifiers:
+      slug: my-app-provider
+    attrs:
+      name: "My App Provider"
+      client_id: "my-client-id"
+      client_secret: "my-secure-secret-key"
+      # Change these to your application's redirect URIs
+      redirect_uris: "https://myapp.example.com/auth/callback"
+      authorization_flow: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-explicit-consent]]
+      property_mappings:
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, openid]]
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, profile]]
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, email]]
+      client_type: confidential
+      signing_key: !Find [authentik_crypto.certificatekeypair, [name, "authentik Self-signed Certificate"]]
+
+  # 2. Create the Application and link it to the Provider
+  - model: authentik_core.application
+    identifiers:
+      slug: my-app
+    attrs:
+      name: "My Application"
+      provider: !Find [authentik_providers_oauth2.oauth2provider, [slug: my-app-provider]]
+      group: "Internal Apps"
+      meta_icon: "https://myapp.example.com/logo.png"

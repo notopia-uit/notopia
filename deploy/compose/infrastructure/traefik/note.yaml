@@ -4,11 +4,11 @@ http:
     note:
       entryPoints:
         - web
-      rule: Host(`note.notopia.localhost`)
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/note`)
       service: note
 
   services:
     note:
       loadBalancer:
         servers:
-          - url: http://localhost:8081
+          - url: http://host.docker.internal:8081

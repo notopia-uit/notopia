@@ -2,15 +2,15 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
 services:
   authentik_server:
-    container_name: authentik_server
+    container_name: notopia-authentik_server
     image: ghcr.io/goauthentik/server:2025.12.1
     command: server
     environment:
       AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql
-      AUTHENTIK_POSTGRESQL__NAME: ${AUTHENTIK_POSTGRESQL__NAME:-notopia}
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopia}
-      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_POSTGRESQL__USER:-notopia}
-      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-notopia}
+      AUTHENTIK_POSTGRESQL__NAME: ${AUTHENTIK_POSTGRESQL__NAME:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopia-uit}
+      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_POSTGRESQL__USER:-notopia-uit}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-notopia-uit}
     volumes:
       - authentik_data:/data
       # - ./custom-templates:/templates
@@ -27,22 +27,24 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-
   authentik_worker:
-    container_name: authentik_worker
+    container_name: notopia-authentik_worker
     image: ghcr.io/goauthentik/server:2025.12.1
     command: worker
     environment:
       AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql
-      AUTHENTIK_POSTGRESQL__NAME: ${AUTHENTIK_POSTGRESQL__NAME:-notopia}
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopia}
-      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_POSTGRESQL__USER:-notopia}
-      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-notopia}
+      AUTHENTIK_POSTGRESQL__NAME: ${AUTHENTIK_POSTGRESQL__NAME:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopia-uit}
+      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_POSTGRESQL__USER:-notopia-uit}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-notopia-uit}
+      AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD:-notopia-uit}
+      AUTHENTIK_BOOTSTRAP_TOKEN: ${AUTHENTIK_BOOTSTRAP_TOKEN:-notopia-uit}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - authentik_data:/data
       # - ./certs:/certs
       # - ./custom-templates:/templates
+      # - ./authentik-blueprints/sth:/blueprints/sth:ro
     depends_on:
       authentik_postgresql:
         condition: service_healthy
@@ -50,12 +52,12 @@ services:
     user: root
 
   authentik_postgresql:
-    container_name: authentik_postgresql
+    container_name: notopia-authentik_postgresql
     image: postgres:18.1-alpine3.23
     environment:
-      POSTGRES_DB: ${AUTHENTIK_POSTGRESQL__NAME:-notopia}
-      POSTGRES_PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopia}
-      POSTGRES_USER: ${AUTHENTIK_POSTGRESQL__USER:-notopia}
+      POSTGRES_DB: ${AUTHENTIK_POSTGRESQL__NAME:-authentik}
+      POSTGRES_PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopia-uit}
+      POSTGRES_USER: ${AUTHENTIK_POSTGRESQL__USER:-notopia-uit}
     volumes:
       - authentik_postgresql_data:/var/lib/postgresql/data
     healthcheck:

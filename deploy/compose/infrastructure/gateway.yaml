@@ -1,25 +1,29 @@
 # vim:ft=yaml.docker-compose:
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
 services:
-  gateway:
-    container_name: traefik
-    image: traefik:v3.4
+  traefik:
+    container_name: notopia-traefik
+    image: traefik:3.6.7
     command:
+      - --api.insecure=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
-      - --providers.docker.network=public
+      - --providers.docker.network=notopia_public
       - --providers.file.directory=/etc/traefik/dynamic
       - --entryPoints.web.address=:80
-
+      - --log.level=INFO
+    environment:
+      TZ: Asia/Ho_Chi_Minh
     ports:
       - 80:80
       - 8080:8080
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/:/etc/traefik/dynamic:ro
-
     networks:
       - public
+    extra_hosts:
+      - host.docker.internal:host-gateway
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
