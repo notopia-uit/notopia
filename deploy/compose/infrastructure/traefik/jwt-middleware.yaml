@@ -4,7 +4,9 @@ http:
     jwt:
       plugin:
         jwt:
-          Keys: http://authentik/application/o/gateway/jwks/
+          Keys:
+            - http://authentik.notopia.localhost/application/o/api-web/jwks/
+            - http://authentik.notopia.localhost/application/o/app-web/jwks/
           Required: true
           PayloadFields:
             - exp

@@ -1,19 +1,19 @@
 # yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
 version: 1
 metadata:
-  name: Notopia - Gateway
+  name: Notopia - App Web
   labels:
     blueprint-group: notopia
     blueprints.goauthentik.io/description: |
-      Blueprint to configure the OAuth2 Source and Application for Notopia Gateway.
+      Notopia - App Web OAuth2 Provider and Application
 
 entries:
-  - model: authentik_providers_oauth2.oauth2provider
+  - id: provider
+    model: authentik_providers_oauth2.oauth2provider
     identifiers:
-      name: gateway
+      client_id: app-web
     attrs:
-      name: gateway
-      client_id: gateway
+      name: App Web
       client_secret: notopia-uit
       client_type: confidential
       access_code_validity: minutes=10
@@ -27,17 +27,22 @@ entries:
         ]
       invalidation_flow:
         !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+      signing_key:
+        !Find [
+          authentik_crypto.certificatekeypair,
+          [name, authentik Self-signed Certificate],
+        ]
       property_mappings:
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, openid]]
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, profile]]
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, email]]
-      redirect_uris: []
+      redirect_uris:
+        - url: https://web.notopia.localhost/api/auth/oauth2/callback/.*
+          matching_mode: regex
 
   - model: authentik_core.application
     identifiers:
-      name: gateway
+      slug: app-web
     attrs:
-      name: Gateway
-      provider:
-        !Find [authentik_providers_oauth2.oauth2provider, [name, gateway]]
-      slug: gateway
+      name: App Web
+      provider: !KeyOf provider

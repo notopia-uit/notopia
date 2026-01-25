@@ -23,7 +23,7 @@
       "continuous": true,
       "dependsOn": ["build"]
     },
-    "serve": {
+    "dev": {
       "executor": "nx:run-commands",
       "inputs": ["goDependencies"],
       "options": {

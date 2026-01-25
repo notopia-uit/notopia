@@ -4,14 +4,14 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: "../../node_modules/.vite/api/web",
+  cacheDir: "../../node_modules/.vite/packages/notopia-api-web",
   server: {
-    port: 4200,
-    host: "localhost",
+    port: 9080,
+    host: true
   },
   preview: {
-    port: 4200,
-    host: "localhost",
+    port: 9080,
+    host: true
   },
   plugins: [react()],
   // Uncomment this if you are using workers.

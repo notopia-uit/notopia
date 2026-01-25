@@ -8,9 +8,10 @@ services:
       - --api.insecure=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=notopia_default
       - --providers.file.directory=/etc/traefik/dynamic
       - --entryPoints.web.address=:80
-      - --log.level=INFO
+      - --log.level=DEBUG
       - --experimental.plugins.jwt.moduleName=github.com/traefik-plugins/traefik-jwt-plugin
       - --experimental.plugins.jwt.version=v0.10.0
     environment:
@@ -21,14 +22,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/:/etc/traefik/dynamic:ro
-    labels:
-      - traefik.http.middlewares.jwt-auth.plugin.jwt.Keys=http://authentik/application/o/gateway/jwks/
-      - traefik.http.middlewares.jwt-auth.plugin.jwt.Required=true
-      - traefik.http.middlewares.jwt-auth.plugin.jwt.PayloadFields=exp,sub
-      - traefik.http.middlewares.jwt-auth.plugin.jwt.JwtHeaders.X-JWT-User=sub
-      - traefik.http.middlewares.jwt-auth.plugin.jwt.JwtHeaders.X-JWT-Email=email
     extra_hosts:
       - host.docker.internal:host-gateway
+      - authentik.notopia.localhost:host-gateway
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true

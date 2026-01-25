@@ -139,8 +139,6 @@ importers:
         specifier: ^1.4.2
         version: 1.5.4(encoding@0.1.13)
 
-  api/gen: {}
-
   api/note: {}
 
   docs:

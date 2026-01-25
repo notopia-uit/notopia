@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Notopia - API Web
+  labels:
+    blueprint-group: notopia
+    blueprints.goauthentik.io/description: |
+      Notopia - API Web OAuth2 Provider and Application
+
+entries:
+  - id: provider
+    model: authentik_providers_oauth2.oauth2provider
+    identifiers:
+      client_id: api-web
+    attrs:
+      name: API Web
+      client_secret: notopia-uit
+      client_type: public
+      access_code_validity: minutes=10
+      access_token_validity: days=30
+      refresh_token_threshold: hours=1
+      refresh_token_validity: days=90
+      authorization_flow:
+        !Find [
+          authentik_flows.flow,
+          [slug, default-provider-authorization-explicit-consent],
+        ]
+      invalidation_flow:
+        !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+      signing_key:
+        !Find [
+          authentik_crypto.certificatekeypair,
+          [name, authentik Self-signed Certificate],
+        ]
+      property_mappings:
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, openid]]
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, profile]]
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, email]]
+      redirect_uris:
+        - url: ^http://api\.notopia\.localhost/.*$
+          matching_mode: regex
+        - url: http://api.notopia.localhost
+          matching_mode: strict
+
+  - model: authentik_core.application
+    identifiers:
+      slug: api-web
+    attrs:
+      name: API Web
+      provider: !KeyOf provider

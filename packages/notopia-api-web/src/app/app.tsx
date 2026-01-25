@@ -9,7 +9,6 @@ export function App() {
     <div>
       <ApiReferenceReact
         configuration={{
-          url: "https://registry.scalar.com/@scalar/apis/galaxy?format=yaml",
           sources: [
             {
               content: noteApiSpec,
@@ -17,6 +16,8 @@ export function App() {
               title: "Note API",
             },
           ],
+          persistAuth: true,
+          telemetry: false,
         }}
       />
     </div>

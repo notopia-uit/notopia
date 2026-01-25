@@ -3,8 +3,11 @@ type: oauth2
 description: OAuth2 Security Scheme
 flows:
   authorizationCode:
-    authorizationUrl: http://traefik.notopia.localhost/application/o/gateway/authorize/
-    tokenUrl: http://traefik.notopia.localhost/application/o/gateway/token/
+    authorizationUrl: http://authentik.notopia.localhost/application/o/authorize/
+    tokenUrl: http://authentik.notopia.localhost/application/o/token/
     scopes:
       openid: Required for OIDC
       profile: Access to user profile
+
+x-defaultClientId: api-web
+x-usePkce: SHA-256

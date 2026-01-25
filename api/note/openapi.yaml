@@ -1,11 +1,12 @@
 ## yaml-language-server: $schema=https://www.schemastore.org/openapi-3.X.json
 # vim: ft=yaml.openapi
 openapi: 3.0.4
+
 servers:
+  - url: http://api.notopia.localhost
+    description: Local dev server via gateway
   - url: http://localhost:8081
     description: Local dev/mock server direct
-  - url: http://localhost:8080
-    description: Local dev server via gateway
 
 info:
   description: >
@@ -24,9 +25,9 @@ tags:
     description: Operations related to notes management
 
 paths:
-  /api/note/notes:
+  /note/notes:
     $ref: ./paths/notes.yaml
-  /api/note/notes/{noteId}:
+  /note/notes/{noteId}:
     $ref: ./paths/notes_{noteId}.yaml
 
 components:
