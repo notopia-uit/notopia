@@ -6,4 +6,4 @@ REDOCLY_TELEMETRY = "off"
 [tools]
 pnpm = "10.28.1"
 "npm:nx" = "22.4.1"
-oapi-codegen = "2.4.1"
+"go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.4.1"
