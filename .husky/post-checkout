@@ -5,12 +5,36 @@ NEW_HEAD=$2
 CHECKOUT_TYPE=$3
 
 # Only run if it's a branch checkout (CHECKOUT_TYPE = 1)
-if [ "$CHECKOUT_TYPE" = "1" ]; then
-  if git diff --name-only $PREV_HEAD $NEW_HEAD | grep -q "pnpm-lock.yaml"; then
-    pnpm install
-  fi
+if ! [ "$CHECKOUT_TYPE" = "1" ]; then
+  exit 0
 
-  if git diff --name-only $PREV_HEAD $NEW_HEAD | grep -q "go.sum"; then
-    go mod download
-  fi
+fi
+CHANGED_FILES=$(git diff --name-only "$PREV_HEAD" "$NEW_HEAD")
+
+PNPM_CHANGED=false
+GO_CHANGED=false
+MISE_CHANGED=false
+
+echo "$CHANGED_FILES" | grep -q "pnpm-lock.yaml" && PNPM_CHANGED=true
+echo "$CHANGED_FILES" | grep -q "go.sum" && GO_CHANGED=true
+echo "$CHANGED_FILES" | grep -qE ".*mise.*\.toml" && MISE_CHANGED=true
+
+if [ "$PNPM_CHANGED" = false ] && [ "$GO_CHANGED" = false ] && [ "$MISE_CHANGED" = false ]; then
+  exit 0
+fi
+
+echo "Detected changes in dependencies:"
+[ "$PNPM_CHANGED" = true ] && echo " - Node.js (pnpm-lock.yaml)"
+[ "$GO_CHANGED" = true ] && echo " - Go (go.sum)"
+[ "$MISE_CHANGED" = true ] && echo " - Mise config (*mise*.toml)"
+
+read -rp "Would you like to sync dependencies? (Y/n): " confirm
+
+if [[ -z "$confirm" || "$confirm" =~ ^[Yy]$ ]]; then
+  [ "$PNPM_CHANGED" = true ] && echo "Running pnpm install..." && pnpm install
+  [ "$GO_CHANGED" = true ] && echo "Running go mod download..." && go mod download
+  [ "$MISE_CHANGED" = true ] && echo "Running mise install..." && mise install
+  echo "Sync complete."
+else
+  echo "Skipping installation."
 fi
