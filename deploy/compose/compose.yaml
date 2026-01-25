@@ -9,8 +9,3 @@ include:
   - ./infrastructure/object_storage.yaml
   - ./infrastructure/search.yaml
   - ./services/note.yaml
-
-networks:
-  proxy:
-    name: notopia_proxy
-    external: true

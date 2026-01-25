@@ -13,9 +13,6 @@ services:
       - traefik.http.routers.meilisearch.rule=Host(`meilisearch.notopia.localhost`)
       - traefik.http.routers.meilisearch.entrypoints=web
       - traefik.http.services.meilisearch.loadbalancer.server.port=7700
-    networks:
-      - default
-      - proxy
     restart: unless-stopped
 
 volumes:

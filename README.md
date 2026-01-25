@@ -5,9 +5,3 @@
     <img alt="Wakatime" src="https://wakatime.com/badge/github/notopia-uit/notopia.svg"/>
   </a>
 </div>
-
-### Dev
-
-```sh
-docker network create notopia_proxy
-```

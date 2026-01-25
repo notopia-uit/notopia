@@ -21,9 +21,6 @@ services:
       - traefik.http.routers.minio-console.rule=Host(`minio.notopia.localhost`)
       - traefik.http.routers.minio-console.entrypoints=web
       - traefik.http.services.minio-console.loadbalancer.server.port=9001
-    networks:
-      - default
-      - proxy
     healthcheck:
       test:
         - CMD

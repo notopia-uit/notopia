@@ -19,9 +19,6 @@ services:
       - traefik.http.routers.authentik.rule=Host(`authentik.notopia.localhost`)
       - traefik.http.routers.authentik.entrypoints=web
       - traefik.http.services.authentik.loadbalancer.server.port=9000
-    networks:
-      - default
-      - proxy
     depends_on:
       authentik_postgresql:
         condition: service_healthy
