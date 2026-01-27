@@ -1,4 +1,14 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "api-web"
+  "name": "api-web",
+  "targets": {
+    "dev": {
+      "dependsOn": [
+        {
+          "projects": ["api/note"],
+          "target": "watch-build:json"
+        }
+      ]
+    }
+  }
 }

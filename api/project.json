@@ -12,6 +12,9 @@
     "build": {
       "dependsOn": ["^build"]
     },
+    "watch-build:json": {
+      "dependsOn": ["^watch-build:json"]
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },
