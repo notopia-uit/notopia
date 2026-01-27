@@ -97,6 +97,12 @@
         "style": "css",
         "linter": "eslint"
       }
+    },
+    "@nx/next": {
+      "application": {
+        "style": "tailwind",
+        "linter": "eslint"
+      }
     }
   }
 }

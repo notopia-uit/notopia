@@ -14,6 +14,9 @@
     },
     {
       "path": "./packages/notopia-note-api"
+    },
+    {
+      "path": "./apps/web"
     }
   ]
 }
