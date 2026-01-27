@@ -37,7 +37,7 @@ entries:
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, profile]]
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, email]]
       redirect_uris:
-        - url: https://web.notopia.localhost/api/auth/oauth2/callback/.*
+        - url: ^https:\/\/web.notopia.localhost\/api\/auth\/oauth2\/callback\/.*$
           matching_mode: regex
 
   - model: authentik_core.application

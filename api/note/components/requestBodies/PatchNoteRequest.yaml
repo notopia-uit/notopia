@@ -4,6 +4,7 @@ required: true
 content:
   application/json:
     schema:
-      $ref: ../schemas/Note.yaml
-      example:
-        $ref: ../examples/PatchNoteRequest.yaml
+      allOf:
+        - $ref: ../schemas/Note.yaml
+        - example:
+            $ref: ../examples/PatchNoteRequest.yaml
