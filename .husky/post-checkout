@@ -28,13 +28,13 @@ echo "Detected changes in dependencies:"
 [ "$GO_CHANGED" = true ] && echo " - Go (go.sum)"
 [ "$MISE_CHANGED" = true ] && echo " - Mise config (*mise*.toml)"
 
-read -rp "Would you like to sync dependencies? (Y/n): " confirm
-
-if [[ -z "$confirm" || "$confirm" =~ ^[Yy]$ ]]; then
-  [ "$PNPM_CHANGED" = true ] && echo "Running pnpm install..." && pnpm install
-  [ "$GO_CHANGED" = true ] && echo "Running go mod download..." && go mod download
-  [ "$MISE_CHANGED" = true ] && echo "Running mise install..." && mise install
-  echo "Sync complete."
-else
-  echo "Skipping installation."
+if read -rp "Would you like to sync dependencies? (Y/n): " confirm </dev/tty; then
+  if [[ -z "$confirm" || "$confirm" =~ ^[Yy]$ ]]; then
+    [ "$PNPM_CHANGED" = true ] && echo "Running pnpm install..." && pnpm install
+    [ "$GO_CHANGED" = true ] && echo "Running go mod download..." && go mod download
+    [ "$MISE_CHANGED" = true ] && echo "Running mise install..." && mise install
+    echo "Sync complete."
+  else
+    echo "Skipping installation."
+  fi
 fi
