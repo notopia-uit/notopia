@@ -6,14 +6,14 @@ packages:
   - packages/*
 
 catalog:
-  react: ^19.0.0
-  react-dom: ^19.0.0
-  "@types/react": ^19.0.0
-  "@types/react-dom": ^19.0.0
-  "openapi-typescript": ^7.10.1
+  '@types/react': ^19.2.10
+  '@types/react-dom': ^19.2.3
+  openapi-typescript: ^7.10.1
+  react: ^19.2.4
+  react-dom: ^19.2.4
 
 onlyBuiltDependencies:
-  - "@swc/core"
+  - '@swc/core'
   - core-js
   - esbuild
   - nx
