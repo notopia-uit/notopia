@@ -1,15 +1,6 @@
 # vim:ft=sh:
 
-PREV_HEAD=$1
-NEW_HEAD=$2
-CHECKOUT_TYPE=$3
-
-# Only run if it's a branch checkout (CHECKOUT_TYPE = 1)
-if ! [ "$CHECKOUT_TYPE" = "1" ]; then
-  exit 0
-
-fi
-CHANGED_FILES=$(git diff --name-only "$PREV_HEAD" "$NEW_HEAD")
+CHANGED_FILES=$(git diff --name-only 'HEAD@{1}' 'HEAD')
 
 PNPM_CHANGED=false
 GO_CHANGED=false
