@@ -5,5 +5,14 @@
     ":automergeBranch",
     ":automergePatch"
   ],
+  "packageRules": [
+    {
+      "groupName": "Nx Monorepo Toolkit",
+      "matchPackagePatterns": ["^@nx/", "^nx$"],
+      "matchPackageNames": ["nx"],
+      "automerge": false,
+      "description": "Group all Nx packages to prevent version mismatch and allow manual migration."
+    }
+  ],
   "schedule": ["* 1-18 * * 3,0"]
 }
