@@ -1,14 +1,22 @@
 ---
 # yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
 version: "2"
+
 linters:
   enable:
     - exhaustive
     - exhaustruct
+    - tagalign
   disable:
     - unused
   exclusions:
     generated: strict
+  settings:
+    tagalign:
+      align: true
+      sort: true
+      strict: true
+
 formatters:
   enable:
     - gofumpt
@@ -17,6 +25,7 @@ formatters:
       module-path: github.com/notopia-uit
   exclusions:
     generated: strict
+
 run:
   build-tags:
     - integration
