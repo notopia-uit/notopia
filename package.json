@@ -28,7 +28,7 @@
     "eslint-plugin-react-hooks": "5.2.0",
     "husky": "^9.1.7",
     "jiti": "2.6.1",
-    "jsdom": "~22.1.0",
+    "jsdom": "~27.4.0",
     "nx": "22.4.2",
     "nx-github-pages": "^1.2.0",
     "postcss": "8.4.49",
