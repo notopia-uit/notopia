@@ -16,7 +16,7 @@
     "@types/node": "^24.10.9",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@vitejs/plugin-react": "^4.7.0",
+    "@vitejs/plugin-react": "^5.0.0",
     "@vitest/ui": "^4.0.18",
     "autoprefixer": "10.4.24",
     "eslint": "^9.39.2",
