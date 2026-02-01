@@ -9,6 +9,16 @@ vars: {
   }
 }
 
+user: User {
+  browser: Browser {
+    icon: https://simpleicons.org/icons/googlechrome.svg
+  }
+}
+
+gateway: Gateway {
+  icon: https://simpleicons.org/icons/traefikproxy.svg
+}
+
 apps: Apps {
   web: Web {
     icon: https://simpleicons.org/icons/nextdotjs.svg
@@ -16,10 +26,6 @@ apps: Apps {
 }
 
 services: Services {
-  gateway: Gateway {
-    icon: https://simpleicons.org/icons/traefikproxy.svg
-  }
-
   identity_provider: Identity Provider {
     icon: https://simpleicons.org/icons/authentik.svg
   }
@@ -52,48 +58,57 @@ services: Services {
     note_service -> note_service_database
   }
 
-  search: Search Group {
-    meilisearch: Meilisearch {
+  search: Search Service Group {
+    search_service: Meilisearch {
       icon: https://simpleicons.org/icons/meilisearch.svg
     }
-    meilisearch_sync_service: Sync Service {
+    search_sync_service: Sync Service {
       icon: https://simpleicons.org/icons/go.svg
     }
-    meilisearch_sync_service_database: Sync Database {
+    search_sync_service_database: Sync Database {
       icon: https://simpleicons.org/icons/redis.svg
     }
-    meilisearch_sync_service -> meilisearch
-    meilisearch_sync_service -> meilisearch_sync_service_database
+    search_sync_service -> search_service
+    search_sync_service -> search_sync_service_database
   }
 
   authorization_database: Authorization Database {
     icon: https://simpleicons.org/icons/postgresql.svg
   }
 
-  message_broker: Message Broker {
-    icon: https://simpleicons.org/icons/apachekafka.svg
+  event_bus: Event Bus {
+    message_broker: Message Broker {
+      icon: https://simpleicons.org/icons/apachekafka.svg
+    }
+
+    pub_sub: Pub/Sub {
+      icon: https://simpleicons.org/icons/redis.svg
+    }
   }
 }
 
-apps -> services.gateway
+user.browser -> gateway
+
 apps -> services.identity_provider
 apps -> services.object_storage
 
-services.gateway -> services.edit.edit_service
-services.gateway -> services.note.note_service
-services.gateway -> services.identity_provider
+gateway -> apps
+gateway -> services.edit
+gateway -> services.note
+gateway -> services.identity_provider
+gateway -> services.object_storage
+gateway -> services.search
 
-services.edit.edit_service -> services.note.note_service
-services.edit.edit_service -> services.message_broker
+services.edit -> services.note
+services.edit <-> services.event_bus
+services.edit -> services.authorization_database
 
-services.note.note_service -> services.identity_provider
-services.note.note_service -> services.object_storage
-services.note.note_service -> services.message_broker
+services.note -> services.identity_provider
+services.note -> services.object_storage
+services.note <-> services.event_bus
+services.note -> services.authorization_database
 
-services.note.note_service -> services.authorization_database
-services.edit.edit_service -> services.authorization_database
-
-services.message_broker <- services.search.meilisearch_sync_service
+services.event_bus <- services.search
 
 style.border-radius: 15
 *.style.border-radius: 15
