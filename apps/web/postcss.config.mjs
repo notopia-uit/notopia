@@ -3,7 +3,7 @@
 //
 // See: https://nx.dev/guides/using-tailwind-css-in-react#step-4:-applying-configuration-to-libraries
 
-module.exports = {
+export default {
   plugins: {
     "@tailwindcss/postcss": {},
     autoprefixer: {},
