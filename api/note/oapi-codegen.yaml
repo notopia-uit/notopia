@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/oapi-codegen/oapi-codegen/HEAD/configuration-schema.json
-package: gen
+package: api
 generate:
   gin-server: true
   models: true
-output: note.go
+output: ../../pkg/api/note.go
 output-options:
   nullable-type: true

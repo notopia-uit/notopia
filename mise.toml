@@ -2,6 +2,7 @@
 
 [env]
 REDOCLY_TELEMETRY = "off"
+REDOCLY_SUPPRESS_UPDATE_NOTICE = "true"
 
 [tools]
 pnpm = "10.28.2"

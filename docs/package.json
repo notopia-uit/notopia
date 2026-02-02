@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@catppuccin/vitepress": "^0.1.2",
-    "notopia-api-note": "workspace:^",
+    "@notopia/note-api": "workspace:^",
     "pagefind": "^1.4.0",
     "vitepress-openapi": "^0.1.13",
     "vitepress-plugin-pagefind": "^0.4.18"

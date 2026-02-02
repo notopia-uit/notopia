@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/note/notes": {
+    "/note/notes": {
         parameters: {
             query?: never;
             header?: never;
@@ -28,7 +28,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/note/notes/{noteId}": {
+    "/note/notes/{noteId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -298,13 +298,13 @@ export interface components {
         /** @description Put note request (replace entire note) */
         PutNoteRequest: {
             content: {
-                "application/json": components["schemas"]["NoteRequired"];
+                "application/json": components["schemas"]["NoteRequired"] & unknown;
             };
         };
         /** @description Patch note request (partial update) */
         PatchNoteRequest: {
             content: {
-                "application/json": components["schemas"]["Note"];
+                "application/json": components["schemas"]["Note"] & unknown;
             };
         };
     };

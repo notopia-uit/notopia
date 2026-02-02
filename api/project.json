@@ -20,6 +20,15 @@
     },
     "mock": {
       "dependsOn": ["^mock"]
+    },
+    "gen:go": {
+      "dependsOn": ["^gen:go"]
+    },
+    "gen:ts": {
+      "dependsOn": ["^gen:ts"]
+    },
+    "gen": {
+      "dependsOn": ["^gen"]
     }
   },
   "implicitDependencies": ["api/note"]

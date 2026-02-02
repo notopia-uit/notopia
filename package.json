@@ -2,6 +2,7 @@
   "packageManager": "pnpm@10.28.2",
   "devDependencies": {
     "@next/eslint-plugin-next": "^16.0.1",
+    "@nx/docker": "22.4.4",
     "@nx/eslint": "22.4.4",
     "@nx/eslint-plugin": "22.4.4",
     "@nx/js": "22.4.4",

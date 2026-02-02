@@ -68,6 +68,26 @@
         "cwd": "{projectRoot}"
       },
       "inputs": ["openapiFiles"]
+    },
+    "gen:go": {
+      "inputs": ["{projectRoot}/oapi-codegen.yaml"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "oapi-codegen --config ./oapi-codegen.yaml ./dist/openapi.yaml",
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": ["bundle:yaml"]
+    },
+    "gen:ts": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm exec openapi-typescript ./dist/openapi.json --output ../../packages/notopia-api/src/note.d.ts",
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": ["bundle:json"]
+    },
+    "gen": {
+      "dependsOn": ["gen:go", "gen:ts"]
     }
   }
 }

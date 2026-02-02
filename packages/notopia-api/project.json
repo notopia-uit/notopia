@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "packages/notopia-api",
+  "projectType": "library",
+  "targets": {
+    "gen": {
+      "dependsOn": [
+        {
+          "projects": "api",
+          "target": "gen:ts"
+        }
+      ]
+    }
+  }
+}

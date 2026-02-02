@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "pkg/noteopenapi",
+  "projectType": "library",
+  "targets": {
+    "gen": {
+      "dependsOn": [
+        {
+          "projects": "api",
+          "target": "gen:go"
+        }
+      ]
+    }
+  }
+}

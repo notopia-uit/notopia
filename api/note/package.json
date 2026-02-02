@@ -1,5 +1,5 @@
 {
-  "name": "notopia-api-note",
+  "name": "@notopia/note-api",
   "private": true,
   "exports": {
     ".": "./dist/openapi.json"

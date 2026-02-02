@@ -2,7 +2,7 @@
 // import styles from './app.module.css';
 import { ApiReferenceReact } from "@scalar/api-reference-react";
 import "@scalar/api-reference-react/style.css";
-import noteApiSpec from "notopia-api-note" with { type: "json" };
+import noteApiSpec from "@notopia/note-api" with { type: "json" };
 
 export function App() {
   return (

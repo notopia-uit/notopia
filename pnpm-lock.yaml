@@ -93,6 +93,9 @@ importers:
       '@next/eslint-plugin-next':
         specifier: ^16.0.1
         version: 16.1.6
+      '@nx/docker':
+        specifier: 22.4.4
+        version: 22.4.4(nx@22.4.4(@swc-node/register@1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.15.11(@swc/helpers@0.5.18)))
       '@nx/eslint':
         specifier: 22.4.4
         version: 22.4.4(@babel/traverse@7.28.6)(@swc-node/register@1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.15.11(@swc/helpers@0.5.18))(@zkochan/js-yaml@0.0.7)(eslint@9.39.2(jiti@2.6.1))(nx@22.4.4(@swc-node/register@1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.15.11(@swc/helpers@0.5.18)))
@@ -213,6 +216,9 @@ importers:
       '@scalar/cli':
         specifier: ^1.4.2
         version: 1.5.5(encoding@0.1.13)
+      openapi-typescript:
+        specifier: 'catalog:'
+        version: 7.10.1(typescript@5.9.3)
 
   api/note: {}
 
@@ -233,7 +239,7 @@ importers:
       '@catppuccin/vitepress':
         specifier: ^0.1.2
         version: 0.1.2(typescript@5.9.3)
-      notopia-api-note:
+      '@notopia/note-api':
         specifier: workspace:^
         version: link:../api/note
       pagefind:
@@ -256,20 +262,16 @@ importers:
         specifier: ^1.33.1
         version: 1.33.1
 
+  packages/notopia-api: {}
+
   packages/notopia-api-web:
     dependencies:
+      '@notopia/note-api':
+        specifier: workspace:^
+        version: link:../../api/note
       '@scalar/api-reference-react':
         specifier: ^0.8.20
         version: 0.8.43(axios@1.13.3)(change-case@5.4.4)(react@19.2.4)(tailwindcss@4.1.18)(typescript@5.9.3)
-      notopia-api-note:
-        specifier: workspace:^
-        version: link:../../api/note
-
-  packages/notopia-note-api:
-    devDependencies:
-      openapi-typescript:
-        specifier: 'catalog:'
-        version: 7.10.1(typescript@5.9.3)
 
   packages/notopia-pb:
     dependencies:
@@ -2162,6 +2164,9 @@ packages:
     resolution: {integrity: sha512-FAq0LdIVKjSsbGrZJc1HsgVlf8CkBGD31DZycaTXa8rtPBbkAdQRs6i6DK59GJADURwrsx6bKjsyIOtpCAoO+g==}
     peerDependencies:
       nx: '>= 21 <= 23 || ^22.0.0-0'
+
+  '@nx/docker@22.4.4':
+    resolution: {integrity: sha512-lUToRwZgDzZ/7CP9uiw8mCYo31S4Ob3WAtr9pR8Q6IvPYWlhenDvIXPOZ/Bc+yyDvvPUn8Mg9Lp7zDpPry1ULQ==}
 
   '@nx/eslint-plugin@22.4.4':
     resolution: {integrity: sha512-ejOXH+oR5yMjgET8/MdVPRkoMeinjArLMRuggJ2YSG2h4yOq0/nqBPfviQ5shKWqjsvu81QTJKapE/V6mFtQXw==}
@@ -11669,6 +11674,14 @@ snapshots:
       semver: 7.7.3
       tslib: 2.8.1
       yargs-parser: 21.1.1
+
+  '@nx/docker@22.4.4(nx@22.4.4(@swc-node/register@1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.15.11(@swc/helpers@0.5.18)))':
+    dependencies:
+      '@nx/devkit': 22.4.4(nx@22.4.4(@swc-node/register@1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.15.11(@swc/helpers@0.5.18)))
+      enquirer: 2.3.6
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - nx
 
   '@nx/eslint-plugin@22.4.4(@babel/traverse@7.28.6)(@swc-node/register@1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.15.11(@swc/helpers@0.5.18))(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-config-prettier@10.1.8(eslint@9.39.2(jiti@2.6.1)))(eslint@9.39.2(jiti@2.6.1))(nx@22.4.4(@swc-node/register@1.11.1(@swc/core@1.15.11(@swc/helpers@0.5.18))(@swc/types@0.1.25)(typescript@5.9.3))(@swc/core@1.15.11(@swc/helpers@0.5.18)))(typescript@5.9.3)':
     dependencies:
