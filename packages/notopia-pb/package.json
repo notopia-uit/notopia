@@ -1,0 +1,14 @@
+{
+  "name": "notopia-pb",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": {
+      "types": "./*_pb.d.ts",
+      "import": "./*_pb.js"
+    }
+  },
+  "peerDependencies": {
+    "@bufbuild/protobuf": "catalog:"
+  }
+}

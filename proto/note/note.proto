@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package note;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+service NoteService {
+  rpc GetNote(GetNoteRequest) returns (GetNoteResponse);
+}
+
+message GetNoteRequest {
+  string id = 1 [(buf.validate.field).required = true];
+}
+
+message GetNoteResponse {
+  Note note = 1 [(buf.validate.field).required = true];
+}
+
+message Note {
+  string id = 1 [(buf.validate.field).required = true];
+  string title = 2 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp created_at = 3 [(buf.validate.field).required = true];
+  optional google.protobuf.Timestamp updated_at = 4;
+}

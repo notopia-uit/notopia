@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://www.schemastore.org/buf.gen.json
+version: v2
+inputs:
+  - directory: ./proto/
+plugins:
+  - remote: buf.build/protocolbuffers/go:v1.36.11
+    out: ./pkg/pb/
+    opt:
+      - paths=source_relative
+  - remote: buf.build/connectrpc/go:v1.19.1
+    out: ./pkg/pb/
+    opt:
+      - paths=source_relative
+  - remote: buf.build/bufbuild/es:v2.11.0
+    out: packages/notopia-pb/
+    include_imports: true
+    opt:
+      - target=js+dts
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/notopia-uit/notopia/pkg/pb

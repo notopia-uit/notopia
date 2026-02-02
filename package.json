@@ -42,6 +42,10 @@
   },
   "private": true,
   "dependencies": {
+    "@bufbuild/buf": "catalog:",
+    "@bufbuild/protobuf": "catalog:",
+    "@connectrpc/connect": "catalog:",
+    "@connectrpc/validate": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
