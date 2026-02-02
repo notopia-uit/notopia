@@ -5,5 +5,5 @@ REDOCLY_TELEMETRY = "off"
 
 [tools]
 pnpm = "10.28.2"
-"npm:nx" = "22.4.2"
+"npm:nx" = "22.4.4"
 "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.5.1"

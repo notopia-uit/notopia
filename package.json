@@ -2,13 +2,13 @@
   "packageManager": "pnpm@10.28.2",
   "devDependencies": {
     "@next/eslint-plugin-next": "^16.0.1",
-    "@nx/eslint": "22.4.2",
-    "@nx/eslint-plugin": "22.4.2",
-    "@nx/js": "22.4.2",
-    "@nx/next": "22.4.2",
-    "@nx/react": "22.4.2",
-    "@nx/vite": "22.4.2",
-    "@nx/web": "22.4.2",
+    "@nx/eslint": "22.4.4",
+    "@nx/eslint-plugin": "22.4.4",
+    "@nx/js": "22.4.4",
+    "@nx/next": "22.4.4",
+    "@nx/react": "22.4.4",
+    "@nx/vite": "22.4.4",
+    "@nx/web": "22.4.4",
     "@swc-node/register": "~1.11.1",
     "@swc/cli": "~0.7.10",
     "@swc/core": "~1.15.10",
@@ -29,7 +29,7 @@
     "husky": "^9.1.7",
     "jiti": "2.6.1",
     "jsdom": "~22.1.0",
-    "nx": "22.4.2",
+    "nx": "22.4.4",
     "nx-github-pages": "^1.2.0",
     "postcss": "8.4.49",
     "prettier": "~3.8.1",
@@ -42,7 +42,7 @@
   },
   "private": true,
   "dependencies": {
-    "next": "~16.0.11",
+    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   }

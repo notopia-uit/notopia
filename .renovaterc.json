@@ -11,7 +11,7 @@
       "matchPackagePatterns": ["^@nx/", "^nx$"],
       "matchPackageNames": ["nx"],
       "automerge": false,
-      "description": "Group all Nx packages to prevent version mismatch and allow manual migration."
+      "description": "Group all Nx packages to prevent version mismatch and allow manual migration. Note that renovate still create PRs for minor/major updates, but they will not be automerged."
     }
   ],
   "schedule": ["* 1-18 * * 3,0"]
