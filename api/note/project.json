@@ -55,7 +55,7 @@
     "mock": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document mock ./dist/openapi.json --port 8081",
+        "command": "scalar document mock -w ./dist/openapi.json --port 8081",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
