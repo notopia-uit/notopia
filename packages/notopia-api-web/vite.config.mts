@@ -7,18 +7,18 @@ export default defineConfig(() => ({
   cacheDir: "../../node_modules/.vite/packages/notopia-api-web",
   server: {
     port: 9080,
-    host: true
+    host: true,
   },
   preview: {
     port: 9080,
-    host: true
+    host: true,
   },
   plugins: [react()],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [],
   // },
-  base: "",
+  base: "/notopia/api/",
   build: {
     outDir: "./dist",
     emptyOutDir: true,

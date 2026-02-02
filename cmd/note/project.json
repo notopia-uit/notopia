@@ -23,7 +23,7 @@
       "continuous": true,
       "dependsOn": ["build"]
     },
-    "dev": {
+    "run": {
       "executor": "nx:run-commands",
       "inputs": ["goFiles"],
       "options": {
@@ -32,6 +32,9 @@
         "tty": true
       },
       "continuous": true
+    },
+    "serve": {
+      "dependsOn": ["run"]
     },
     "lint": {
       "executor": "nx:run-commands",
