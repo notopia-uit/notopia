@@ -9,8 +9,8 @@ services:
       - /data
       - --console-address=:9001
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-notopia-uit}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-notopia-uit}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-notopiauit}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-notopiauit}
     volumes:
       - minio:/data
     labels:

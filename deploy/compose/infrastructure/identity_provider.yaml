@@ -8,9 +8,9 @@ services:
     environment:
       AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql
       AUTHENTIK_POSTGRESQL__NAME: ${AUTHENTIK_POSTGRESQL__NAME:-authentik}
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopia-uit}
-      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_POSTGRESQL__USER:-notopia-uit}
-      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-notopia-uit}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopiauit}
+      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_POSTGRESQL__USER:-notopiauit}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-notopiauit}
     volumes:
       - authentik_data:/data
       # - ./custom-templates:/templates
@@ -31,11 +31,11 @@ services:
     environment:
       AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql
       AUTHENTIK_POSTGRESQL__NAME: ${AUTHENTIK_POSTGRESQL__NAME:-authentik}
-      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopia-uit}
-      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_POSTGRESQL__USER:-notopia-uit}
-      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-notopia-uit}
-      AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD:-notopia-uit}
-      AUTHENTIK_BOOTSTRAP_TOKEN: ${AUTHENTIK_BOOTSTRAP_TOKEN:-notopia-uit}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopiauit}
+      AUTHENTIK_POSTGRESQL__USER: ${AUTHENTIK_POSTGRESQL__USER:-notopiauit}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-notopiauit}
+      AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD:-notopiauit}
+      AUTHENTIK_BOOTSTRAP_TOKEN: ${AUTHENTIK_BOOTSTRAP_TOKEN:-notopiauit}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - authentik_data:/data
@@ -53,8 +53,8 @@ services:
     image: postgres:18.1-alpine3.23
     environment:
       POSTGRES_DB: ${AUTHENTIK_POSTGRESQL__NAME:-authentik}
-      POSTGRES_PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopia-uit}
-      POSTGRES_USER: ${AUTHENTIK_POSTGRESQL__USER:-notopia-uit}
+      POSTGRES_PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopiauit}
+      POSTGRES_USER: ${AUTHENTIK_POSTGRESQL__USER:-notopiauit}
     volumes:
       - authentik_postgresql_data:/var/lib/postgresql/data
     healthcheck:

@@ -5,9 +5,9 @@ services:
     container_name: notopia-casbin_postgresql
     image: postgres:18.1-alpine3.23
     environment:
-      POSTGRES_DB: ${CASBIN_POSTGRESQL_DB:-notopia-uit}
-      POSTGRES_USER: ${CASBIN_POSTGRESQL_USER:-notopia-uit}
-      POSTGRES_PASSWORD: ${CASBIN_POSTGRESQL_PASSWORD:-notopia-uit}
+      POSTGRES_DB: ${CASBIN_POSTGRESQL_DB:-main}
+      POSTGRES_USER: ${CASBIN_POSTGRESQL_USER:-notopiauit}
+      POSTGRES_PASSWORD: ${CASBIN_POSTGRESQL_PASSWORD:-notopiauit}
     volumes:
       - casbin_postgresql_data:/var/lib/postgresql/data
     healthcheck:

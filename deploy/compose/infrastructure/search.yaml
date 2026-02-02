@@ -5,7 +5,7 @@ services:
     container_name: notopia-meilisearch
     image: getmeili/meilisearch:v1.33
     environment:
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-notopia-uit}
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-notopiauit}
     volumes:
       - meilisearch_data:/meili_data
     labels:
