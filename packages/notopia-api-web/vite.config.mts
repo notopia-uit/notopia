@@ -18,7 +18,7 @@ export default defineConfig(() => ({
   // worker: {
   //  plugins: [],
   // },
-  base: "/notopia/api/",
+  base: "./",
   build: {
     outDir: "./dist",
     emptyOutDir: true,
