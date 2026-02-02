@@ -1,7 +1,8 @@
 #:schema https://raw.githubusercontent.com/jdx/mise/refs/heads/main/schema/mise.json
 
 [tools]
-oapi-codegen = "2.4.1"
+"go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.5.1"
+buf = "1.64.0"
 
 [settings]
 legacy_version_file = false
