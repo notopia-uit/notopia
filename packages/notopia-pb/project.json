@@ -1,0 +1,9 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "packages/notopia-pb",
+  "projectType": "library",
+  "targets": {
+    "gen": {}
+  },
+  "implicitDependencies": ["proto"]
+}

@@ -3,17 +3,17 @@
   "name": "api",
   "projectType": "application",
   "targets": {
-    "build:yaml": {
-      "dependsOn": ["^build:yaml"]
+    "bundle:yaml": {
+      "dependsOn": ["^bundle:yaml"]
     },
-    "build:json": {
-      "dependsOn": ["^build:json"]
+    "bundle:json": {
+      "dependsOn": ["^bundle:json"]
     },
-    "build": {
-      "dependsOn": ["^build"]
+    "bundle": {
+      "dependsOn": ["^bundle"]
     },
-    "watch-build:json": {
-      "dependsOn": ["^watch-build:json"]
+    "watch-bundle:json": {
+      "dependsOn": ["^watch-bundle:json"]
     },
     "lint": {
       "dependsOn": ["^lint"]

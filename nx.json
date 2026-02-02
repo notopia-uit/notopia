@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
-    "openapiSpec": [
+    "openapiFiles": [
       "{projectRoot}/**/*.md",
       "{projectRoot}/**/*.yaml",
       "{workspaceRoot}/api/shared/**/*.md",
@@ -9,21 +9,22 @@
       "!{projectRoot}/**/README.md",
       "!{projectRoot}/dist"
     ],
-    "goDependencies": [
+    "goFiles": [
       "{workspaceRoot}/go.mod",
       "{workspaceRoot}/go.sum",
       "{projectRoot}/**/*.{go}"
-    ]
+    ],
+    "protoFiles": ["{projectRoot}/**/*.proto"]
   },
   "targetDefaults": {
     "gen*": {
       "cache": true
     },
-    "build": {
-      "dependsOn": ["^build"],
+    "bundle*": {
       "cache": true
     },
     "build*": {
+      "dependsOn": ["^build*", "^bundle*", "^gen"],
       "cache": true
     },
     "lint*": {

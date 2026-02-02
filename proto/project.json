@@ -1,0 +1,18 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "proto",
+  "projectType": "library",
+  "targets": {
+    "gen": {
+      "inputs": ["protoFiles"],
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/pkg/pb",
+        "{workspaceRoot}/packages/notopia-pb"
+      ],
+      "options": {
+        "command": "buf generate proto/note"
+      }
+    }
+  }
+}

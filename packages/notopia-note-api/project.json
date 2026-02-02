@@ -6,13 +6,13 @@
     "gen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm gen",
+        "command": "pnpm exec openapi-typescript ../../api/note/dist/openapi.json --output src/index.ts",
         "cwd": "{projectRoot}"
       },
       "dependsOn": [
         {
           "projects": "api/note",
-          "target": "build:json"
+          "target": "bundle:json"
         }
       ]
     }

@@ -3,31 +3,31 @@
   "name": "api/note",
   "projectType": "application",
   "targets": {
-    "build:yaml": {
+    "bundle:yaml": {
       "executor": "nx:run-commands",
       "options": {
         "command": "redocly bundle note --config ../redocly.yaml -o ./dist/openapi.yaml",
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/dist/openapi.yaml"],
-      "inputs": ["openapiSpec"]
+      "inputs": ["openapiFiles"]
     },
-    "build:json": {
+    "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
         "command": "redocly bundle note --config ../redocly.yaml -o ./dist/openapi.json",
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/dist/openapi.json"],
-      "inputs": ["openapiSpec"]
+      "inputs": ["openapiFiles"]
     },
     "build": {
-      "dependsOn": ["build:yaml", "build:json"]
+      "dependsOn": ["bundle:yaml", "bundle:json"]
     },
-    "watch-build:json": {
+    "watch-bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm nx watch --projects=api/note -- pnpm nx build:json \\$NX_PROJECT_NAME",
+        "command": "pnpm nx watch --projects=api/note -- pnpm nx bundle:json \\$NX_PROJECT_NAME",
         "forwardAllArgs": false,
         "cwd": "{projectRoot}"
       },
@@ -41,7 +41,7 @@
         "cwd": "{projectRoot}"
       },
       "continuous": true,
-      "dependsOn": ["build:json", "watch-build:json"]
+      "dependsOn": ["bundle:json", "watch-bundle:json"]
     },
     "preview": {
       "executor": "nx:run-commands",
@@ -50,7 +50,7 @@
         "cwd": "{projectRoot}"
       },
       "continuous": true,
-      "dependsOn": ["build:json"]
+      "dependsOn": ["bundle:json"]
     },
     "mock": {
       "executor": "nx:run-commands",
@@ -59,7 +59,7 @@
         "cwd": "{projectRoot}"
       },
       "continuous": true,
-      "dependsOn": ["build:json"]
+      "dependsOn": ["bundle:json"]
     },
     "lint": {
       "executor": "nx:run-commands",
@@ -67,7 +67,7 @@
         "command": "redocly lint note --config ../redocly.yaml",
         "cwd": "{projectRoot}"
       },
-      "inputs": ["openapiSpec"]
+      "inputs": ["openapiFiles"]
     }
   }
 }

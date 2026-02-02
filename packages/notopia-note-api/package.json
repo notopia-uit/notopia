@@ -8,8 +8,7 @@
     }
   },
   "scripts": {
-    "openapi-typescript": "openapi-typescript",
-    "gen": "openapi-typescript ../../api/note/dist/openapi.json --output src/index.ts"
+    "openapi-typescript": "openapi-typescript"
   },
   "devDependencies": {
     "openapi-typescript": "catalog:"
