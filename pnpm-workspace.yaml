@@ -15,14 +15,13 @@ catalog:
   "@types/react": ^19.2.10
   "@types/react-dom": ^19.2.3
   "@vitejs/plugin-react": ^5.1.2
-  eslint-config-next: ^16.0.1
   eslint-config-prettier: ^10.1.8
+  eslint-plugin-better-tailwindcss: ^4.1.1
   eslint-plugin-import: 2.32.0
   eslint-plugin-jsx-a11y: 6.10.2
   eslint-plugin-react-hooks: 7.0.1
   eslint-plugin-react: 7.37.5
   eslint: ^9.39.2
-  next: ^16.1.6
   openapi-typescript: ^7.10.1
   prettier: ~3.8.1
   react-dom: ^19.2.4
@@ -33,6 +32,9 @@ catalog:
   typescript: ^5.9.3
   vite: ^7.3.1
   vitest: ^4.0.18
+
+  eslint-config-next: ^16.1.6
+  next: ^16.1.6
 
 onlyBuiltDependencies:
   - "@bufbuild/buf"

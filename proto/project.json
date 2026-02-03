@@ -11,7 +11,14 @@
         "{workspaceRoot}/packages/notopia-pb"
       ],
       "options": {
-        "command": "buf generate proto/note"
+        "command": "buf generate"
+      }
+    },
+    "lint": {
+      "inputs": ["protoFiles"],
+      "executor": "nx-run-commands",
+      "options": {
+        "command": "buf lint"
       }
     }
   }

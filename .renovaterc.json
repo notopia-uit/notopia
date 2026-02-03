@@ -14,5 +14,11 @@
       "description": "Group all Nx packages to prevent version mismatch and allow manual migration. Note that renovate still create PRs for minor/major updates, but they will not be automerged."
     }
   ],
+  "docker-compose": {
+    "managerFilePatterns": [
+      "/(^|/)(?:docker-)?compose[^/]*\\.ya?ml$/",
+      "^deploy/compose/.+\\.yaml$"
+    ]
+  },
   "schedule": ["* 1-18 * * 3,0"]
 }
