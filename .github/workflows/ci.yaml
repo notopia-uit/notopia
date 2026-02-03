@@ -122,15 +122,25 @@ jobs:
       - name: Install Go Dependencies
         run: go mod download
 
-      - name: Lint & Format
-        run: npx nx affected -t lint format:check --parallel=5
+      - name: Nx Affected Build, Test, Lint, Format Check, Gen, Bundle
+        run: |
+          npx nx affected \
+            --target lint \
+            --target format:check \
+            --target gen \
+            --target bundle \
+            --target build \
+            --target test \
+            --parallel=5
 
-      - name: Test
-        run: npx nx affected -t test --parallel=5 --ci
-
-      - name: Build
-        if: github.event_name != 'pull_request'
-        run: npx nx affected -t build --parallel=5
+      - name: Check for Changes after Build/Gen
+        run: |
+          git add .
+          if ! git diff --staged --exit-code; then
+            echo "ERROR: There are uncommitted changes after build/gen. Please commit the changes.";
+            git status --short
+            exit 1;
+          fi
 
       # - name: Publish Release
       #   if: startsWith(github.ref, 'refs/tags/v')
@@ -144,7 +154,7 @@ jobs:
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
-        run: npx nx affected -t deploy --parallel=3
+        run: npx nx affected -t deploy --parallel=5
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
