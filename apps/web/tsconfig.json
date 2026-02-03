@@ -6,11 +6,7 @@
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -21,9 +17,7 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "outDir": "dist",
     "rootDir": "src",
@@ -36,7 +30,9 @@
     "src/**/*.jsx",
     "../../apps/web/.next/types/**/*.ts",
     "../../dist/apps/web/.next/types/**/*.ts",
-    "next-env.d.ts"
+    "next-env.d.ts",
+    "next.config.ts",
+    "index.d.ts"
   ],
   "exclude": [
     "out-tsc",
