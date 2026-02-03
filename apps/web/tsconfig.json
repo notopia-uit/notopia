@@ -31,7 +31,6 @@
     "../../apps/web/.next/types/**/*.ts",
     "../../dist/apps/web/.next/types/**/*.ts",
     "next-env.d.ts",
-    "next.config.ts",
     "index.d.ts"
   ],
   "exclude": [

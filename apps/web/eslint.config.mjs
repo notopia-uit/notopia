@@ -43,6 +43,6 @@ export default defineConfig(
     },
   },
   {
-    ignores: [".next/**/*", "**/out-tsc"],
+    ignores: [".next/**/*", "**/out-tsc", "./next.config.ts"],
   },
 );
