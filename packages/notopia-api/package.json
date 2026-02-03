@@ -5,7 +5,7 @@
   "exports": {
     "./package.json": "./package.json",
     "./*": {
-      "types": "./src/*"
+      "types": "./src/*.d.ts"
     }
   }
 }
