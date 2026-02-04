@@ -1,10 +1,10 @@
 {
   "name": "page",
   "private": true,
-  "dependencies": {
-    "serve": "^14.2.5"
-  },
   "scripts": {
     "preview": "serve dist -l 4173"
+  },
+  "dependencies": {
+    "serve": "^14.2.5"
   }
 }

@@ -45,5 +45,5 @@ export default defineConfig(
   },
   {
     ignores: ['.next/**/*', '**/out-tsc', './next.config.ts'],
-  },
+  }
 );

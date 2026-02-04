@@ -1,15 +1,15 @@
 {
   "name": "@notopia-uit/docs",
-  "devDependencies": {
-    "vitepress": "2.0.0-alpha.16",
-    "vitepress-plugin-diagrams": "^1.1.2",
-    "vitepress-sidebar": "^1.33.1"
-  },
   "dependencies": {
     "@catppuccin/vitepress": "^0.1.2",
     "@notopia/note-api": "workspace:^",
     "pagefind": "^1.4.0",
     "vitepress-openapi": "^0.1.13",
     "vitepress-plugin-pagefind": "^0.4.18"
+  },
+  "devDependencies": {
+    "vitepress": "2.0.0-alpha.16",
+    "vitepress-plugin-diagrams": "^1.1.2",
+    "vitepress-sidebar": "^1.33.1"
   }
 }

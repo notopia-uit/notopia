@@ -1,5 +1,11 @@
 {
-  "packageManager": "pnpm@10.28.2",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
   "devDependencies": {
     "@next/eslint-plugin-next": "^16.0.1",
     "@nx/docker": "22.4.4",
@@ -36,6 +42,8 @@
     "nx": "22.4.4",
     "nx-github-pages": "^1.2.0",
     "prettier": "catalog:",
+    "prettier-plugin-package": "^2.0.0",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "catalog:",
     "tslib": "catalog:",
     "typescript": "catalog:",
@@ -43,10 +51,5 @@
     "vite": "catalog:",
     "vitest": "catalog:"
   },
-  "private": true,
-  "dependencies": {
-    "next": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:"
-  }
+  "packageManager": "pnpm@10.28.2"
 }

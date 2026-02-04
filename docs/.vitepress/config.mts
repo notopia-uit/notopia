@@ -66,5 +66,5 @@ const vitePressSidebarOptions = {
 } satisfies VitePressSidebarOptions;
 
 export default defineConfig(
-  withSidebar(vitePressOptions, vitePressSidebarOptions),
+  withSidebar(vitePressOptions, vitePressSidebarOptions)
 );
