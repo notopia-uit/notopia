@@ -12,3 +12,4 @@ pnpm-workspace.yaml
 packages/notopia-api/src/**/*.d.ts
 packages/notopia-pb/**/*.d.ts
 packages/notopia-pb/**/*.js
+**/next-env.d.ts
