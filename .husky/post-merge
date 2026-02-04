@@ -1,0 +1,3 @@
+# vim:ft=sh:
+
+../scripts/sync-deps.sh "ORIG_HEAD" "HEAD" "1"

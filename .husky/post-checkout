@@ -1,31 +1,3 @@
 # vim:ft=sh:
 
-CHANGED_FILES=$(git diff --name-only 'HEAD@{1}' 'HEAD')
-
-PNPM_CHANGED=false
-GO_CHANGED=false
-MISE_CHANGED=false
-
-echo "$CHANGED_FILES" | grep -q "pnpm-lock.yaml" && PNPM_CHANGED=true
-echo "$CHANGED_FILES" | grep -q "go.sum" && GO_CHANGED=true
-echo "$CHANGED_FILES" | grep -qE ".*mise.*\.toml" && MISE_CHANGED=true
-
-if [ "$PNPM_CHANGED" = false ] && [ "$GO_CHANGED" = false ] && [ "$MISE_CHANGED" = false ]; then
-  exit 0
-fi
-
-echo "Detected changes in dependencies:"
-[ "$PNPM_CHANGED" = true ] && echo " - Node.js (pnpm-lock.yaml)"
-[ "$GO_CHANGED" = true ] && echo " - Go (go.sum)"
-[ "$MISE_CHANGED" = true ] && echo " - Mise config (*mise*.toml)"
-
-if read -rp "Would you like to sync dependencies? (Y/n): " confirm </dev/tty; then
-  if [[ -z "$confirm" || "$confirm" =~ ^[Yy]$ ]]; then
-    [ "$PNPM_CHANGED" = true ] && echo "Running pnpm install..." && pnpm install
-    [ "$GO_CHANGED" = true ] && echo "Running go mod download..." && go mod download
-    [ "$MISE_CHANGED" = true ] && echo "Running mise install..." && mise install
-    echo "Sync complete."
-  else
-    echo "Skipping installation."
-  fi
-fi
+../scripts/sync-deps.sh "$1" "$2" "$3"
