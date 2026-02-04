@@ -9,3 +9,6 @@
 /.nx/workspace-data
 pnpm-lock.yaml
 pnpm-workspace.yaml
+packages/notopia-api/src/**/*.d.ts
+packages/notopia-pb/**/*.d.ts
+packages/notopia-pb/**/*.js

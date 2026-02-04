@@ -2,43 +2,40 @@
 // @generated from file note.proto (package note, syntax proto3)
 /* eslint-disable */
 
-import {
-  fileDesc,
-  messageDesc,
-  serviceDesc,
-} from '@bufbuild/protobuf/codegenv2';
-import { file_buf_validate_validate } from './buf/validate/validate_pb';
-import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt';
+import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import { file_buf_validate_validate } from "./buf/validate/validate_pb";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 
 /**
  * Describes the file note.proto.
  */
-export const file_note =
-  /*@__PURE__*/
-  fileDesc(
-    'Cgpub3RlLnByb3RvEgRub3RlIiQKDkdldE5vdGVSZXF1ZXN0EhIKAmlkGAEgASgJQga6SAPIAQEiMwoPR2V0Tm90ZVJlc3BvbnNlEiAKBG5vdGUYASABKAsyCi5ub3RlLk5vdGVCBrpIA8gBASKtAQoETm90ZRISCgJpZBgBIAEoCUIGukgDyAEBEhUKBXRpdGxlGAIgASgJQga6SAPIAQESNgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBARIzCgp1cGRhdGVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBQg0KC191cGRhdGVkX2F0MkUKC05vdGVTZXJ2aWNlEjYKB0dldE5vdGUSFC5ub3RlLkdldE5vdGVSZXF1ZXN0GhUubm90ZS5HZXROb3RlUmVzcG9uc2VCbAoIY29tLm5vdGVCCU5vdGVQcm90b1ABWiVnaXRodWIuY29tL25vdG9waWEtdWl0L25vdG9waWEvcGtnL3BiogIDTlhYqgIETm90ZcoCBE5vdGXiAhBOb3RlXEdQQk1ldGFkYXRh6gIETm90ZWIGcHJvdG8z',
-    [file_buf_validate_validate, file_google_protobuf_timestamp]
-  );
+export const file_note = /*@__PURE__*/
+  fileDesc("Cgpub3RlLnByb3RvEgRub3RlIiQKDkdldE5vdGVSZXF1ZXN0EhIKAmlkGAEgASgJQga6SAPIAQEiMwoPR2V0Tm90ZVJlc3BvbnNlEiAKBG5vdGUYASABKAsyCi5ub3RlLk5vdGVCBrpIA8gBASKtAQoETm90ZRISCgJpZBgBIAEoCUIGukgDyAEBEhUKBXRpdGxlGAIgASgJQga6SAPIAQESNgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBARIzCgp1cGRhdGVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBQg0KC191cGRhdGVkX2F0MkUKC05vdGVTZXJ2aWNlEjYKB0dldE5vdGUSFC5ub3RlLkdldE5vdGVSZXF1ZXN0GhUubm90ZS5HZXROb3RlUmVzcG9uc2VCbAoIY29tLm5vdGVCCU5vdGVQcm90b1ABWiVnaXRodWIuY29tL25vdG9waWEtdWl0L25vdG9waWEvcGtnL3BiogIDTlhYqgIETm90ZcoCBE5vdGXiAhBOb3RlXEdQQk1ldGFkYXRh6gIETm90ZWIGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_timestamp]);
 
 /**
  * Describes the message note.GetNoteRequest.
  * Use `create(GetNoteRequestSchema)` to create a new message.
  */
-export const GetNoteRequestSchema = /*@__PURE__*/ messageDesc(file_note, 0);
+export const GetNoteRequestSchema = /*@__PURE__*/
+  messageDesc(file_note, 0);
 
 /**
  * Describes the message note.GetNoteResponse.
  * Use `create(GetNoteResponseSchema)` to create a new message.
  */
-export const GetNoteResponseSchema = /*@__PURE__*/ messageDesc(file_note, 1);
+export const GetNoteResponseSchema = /*@__PURE__*/
+  messageDesc(file_note, 1);
 
 /**
  * Describes the message note.Note.
  * Use `create(NoteSchema)` to create a new message.
  */
-export const NoteSchema = /*@__PURE__*/ messageDesc(file_note, 2);
+export const NoteSchema = /*@__PURE__*/
+  messageDesc(file_note, 2);
 
 /**
  * @generated from service note.NoteService
  */
-export const NoteService = /*@__PURE__*/ serviceDesc(file_note, 0);
+export const NoteService = /*@__PURE__*/
+  serviceDesc(file_note, 0);
+
