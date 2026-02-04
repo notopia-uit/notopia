@@ -2,7 +2,7 @@
 
 [tools]
 "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.5.1"
-buf = "1.64.0"
+buf = "1.65.0"
 
 [settings]
 legacy_version_file = false
