@@ -30,7 +30,7 @@
     "eslint-plugin-react-hooks": "catalog:",
     "husky": "^9.1.7",
     "jiti": "2.6.1",
-    "jsdom": "~22.1.0",
+    "jsdom": "~28.0.0",
     "nx": "22.4.4",
     "nx-github-pages": "^1.2.0",
     "prettier": "catalog:",
