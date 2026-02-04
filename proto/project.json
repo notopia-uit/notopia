@@ -8,7 +8,10 @@
       "executor": "nx:run-commands",
       "outputs": [
         "{workspaceRoot}/pkg/pb",
-        "{workspaceRoot}/packages/notopia-pb"
+        "!{workspaceRoot}/pkg/pb/project.json",
+        "{workspaceRoot}/packages/notopia-pb",
+        "!{workspaceRoot}/packages/notopia-pb/project.json",
+        "!{workspaceRoot}/packages/notopia-pb/package.json"
       ],
       "options": {
         "command": "buf generate"
