@@ -1,10 +1,10 @@
 /// <reference types='vitest' />
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: "../../node_modules/.vite/packages/notopia-api-web",
+  cacheDir: '../../node_modules/.vite/packages/notopia-api-web',
   server: {
     port: 9080,
     host: true,
@@ -18,9 +18,9 @@ export default defineConfig(() => ({
   // worker: {
   //  plugins: [],
   // },
-  base: "/notopia/api/",
+  base: '/notopia/api/',
   build: {
-    outDir: "./dist",
+    outDir: './dist',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {

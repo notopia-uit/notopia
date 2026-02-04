@@ -2,9 +2,13 @@
 // @generated from file note.proto (package note, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import type { Message } from "@bufbuild/protobuf";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from '@bufbuild/protobuf/codegenv2';
+import type { Message } from '@bufbuild/protobuf';
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
 
 /**
  * Describes the file note.proto.
@@ -14,7 +18,7 @@ export declare const file_note: GenFile;
 /**
  * @generated from message note.GetNoteRequest
  */
-export declare type GetNoteRequest = Message<"note.GetNoteRequest"> & {
+export declare type GetNoteRequest = Message<'note.GetNoteRequest'> & {
   /**
    * @generated from field: string id = 1;
    */
@@ -30,7 +34,7 @@ export declare const GetNoteRequestSchema: GenMessage<GetNoteRequest>;
 /**
  * @generated from message note.GetNoteResponse
  */
-export declare type GetNoteResponse = Message<"note.GetNoteResponse"> & {
+export declare type GetNoteResponse = Message<'note.GetNoteResponse'> & {
   /**
    * @generated from field: note.Note note = 1;
    */
@@ -46,7 +50,7 @@ export declare const GetNoteResponseSchema: GenMessage<GetNoteResponse>;
 /**
  * @generated from message note.Note
  */
-export declare type Note = Message<"note.Note"> & {
+export declare type Note = Message<'note.Note'> & {
   /**
    * @generated from field: string id = 1;
    */
@@ -82,9 +86,8 @@ export declare const NoteService: GenService<{
    * @generated from rpc note.NoteService.GetNote
    */
   getNote: {
-    methodKind: "unary";
+    methodKind: 'unary';
     input: typeof GetNoteRequestSchema;
     output: typeof GetNoteResponseSchema;
-  },
+  };
 }>;
-

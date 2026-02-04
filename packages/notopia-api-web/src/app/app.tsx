@@ -1,8 +1,9 @@
 // Uncomment this line to use CSS modules
 // import styles from './app.module.css';
-import { ApiReferenceReact } from "@scalar/api-reference-react";
-import "@scalar/api-reference-react/style.css";
-import noteApiSpec from "@notopia/note-api" with { type: "json" };
+import '@scalar/api-reference-react/style.css';
+
+import noteApiSpec from '@notopia/note-api' with { type: 'json' };
+import { ApiReferenceReact } from '@scalar/api-reference-react';
 
 export function App() {
   return (
@@ -13,7 +14,7 @@ export function App() {
             {
               content: noteApiSpec,
               default: true,
-              title: "Note API",
+              title: 'Note API',
             },
           ],
           persistAuth: true,

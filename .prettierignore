@@ -1,5 +1,11 @@
-# Add files here to ignore them from prettier formatting
-/dist
-/coverage
+**/.next/**
+**/.vitepress/cache/**
+**/build/**
+**/coverage/**
+**/dist/**
+**/node_modules/**
+**/out/**
 /.nx/cache
 /.nx/workspace-data
+pnpm-lock.yaml
+pnpm-workspace.yaml

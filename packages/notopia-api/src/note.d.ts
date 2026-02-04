@@ -4,464 +4,464 @@
  */
 
 export interface paths {
-    "/note/notes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List notes
-         * @description Retrieve a paginated list of all notes with optional filtering and sorting
-         */
-        get: operations["listNotes"];
-        put?: never;
-        /**
-         * Create note
-         * @description Create a new note
-         */
-        post: operations["createNote"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  '/note/notes': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/note/notes/{noteId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get note
-         * @description Retrieve a single note by its unique identifier
-         */
-        get: operations["getNote"];
-        /**
-         * Put note
-         * @description Replace an existing note with new data (all fields are required)
-         */
-        put: operations["updateNote"];
-        post?: never;
-        /**
-         * Delete note
-         * @description Delete a note by its unique identifier
-         */
-        delete: operations["deleteNote"];
-        options?: never;
-        head?: never;
-        /**
-         * Patch note
-         * @description Update specific fields of a note (only provided fields will be updated)
-         */
-        patch: operations["patchNote"];
-        trace?: never;
+    /**
+     * List notes
+     * @description Retrieve a paginated list of all notes with optional filtering and sorting
+     */
+    get: operations['listNotes'];
+    put?: never;
+    /**
+     * Create note
+     * @description Create a new note
+     */
+    post: operations['createNote'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/note/notes/{noteId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    /**
+     * Get note
+     * @description Retrieve a single note by its unique identifier
+     */
+    get: operations['getNote'];
+    /**
+     * Put note
+     * @description Replace an existing note with new data (all fields are required)
+     */
+    put: operations['updateNote'];
+    post?: never;
+    /**
+     * Delete note
+     * @description Delete a note by its unique identifier
+     */
+    delete: operations['deleteNote'];
+    options?: never;
+    head?: never;
+    /**
+     * Patch note
+     * @description Update specific fields of a note (only provided fields will be updated)
+     */
+    patch: operations['patchNote'];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        Note: {
-            /**
-             * Format: uuid
-             * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
-             */
-            readonly id?: string;
-            /**
-             * @description Title of the note
-             * @example Meeting Notes
-             */
-            title?: string;
-            /**
-             * Format: date-time
-             * @description Timestamp when the note was created
-             * @example 2026-01-11T10:30:00Z
-             */
-            readonly createdAt?: string;
-            /**
-             * Format: date-time
-             * @description Timestamp when the note was last updated
-             * @example 2026-01-11T14:45:00Z
-             */
-            readonly updatedAt?: string | null;
-        };
-        Pagination: {
-            /**
-             * @description Current page number
-             * @example 1
-             */
-            page: number;
-            /**
-             * @description Number of items per page
-             * @example 20
-             */
-            limit: number;
-            /**
-             * @description Total number of items
-             * @example 100
-             */
-            total: number;
-            /**
-             * @description Total number of pages
-             * @example 5
-             */
-            totalPages: number;
-            /**
-             * @description Whether there is a next page
-             * @example true
-             */
-            hasNext: boolean;
-            /**
-             * @description Whether there is a previous page
-             * @example false
-             */
-            hasPrev: boolean;
-        };
-        Error: {
-            /**
-             * @description Error code
-             * @example EXAMPLE_CODE
-             */
-            code: string;
-            /**
-             * @description Human-readable error message
-             * @example Example error
-             */
-            message: string;
-            /**
-             * @description URL with more information about the error
-             * @example https://api.notopia.com/docs/errors/EXAMPLE_CODE
-             */
-            more_info?: string;
-        };
-        NoteRequired: components["schemas"]["Note"] & Record<string, never>;
+  schemas: {
+    Note: {
+      /**
+       * Format: uuid
+       * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+       */
+      readonly id?: string;
+      /**
+       * @description Title of the note
+       * @example Meeting Notes
+       */
+      title?: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the note was created
+       * @example 2026-01-11T10:30:00Z
+       */
+      readonly createdAt?: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the note was last updated
+       * @example 2026-01-11T14:45:00Z
+       */
+      readonly updatedAt?: string | null;
     };
-    responses: {
-        /** @description Successful response */
-        ListNotesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    data: components["schemas"]["Note"][];
-                    pagination: components["schemas"]["Pagination"] & unknown;
-                };
-            };
-        };
-        /** @description Bad Request Error response */
-        BadRequestError: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                /**
-                 * @example {
-                 *       "code": "BAD_REQUEST",
-                 *       "message": "The request could not be understood by the server due to malformed syntax",
-                 *       "more_info": "https://api.notopia.com/docs/errors/BAD_REQUEST"
-                 *     }
-                 */
-                "application/json": components["schemas"]["Error"];
-            };
-        };
-        /** @description Unauthorized Error response */
-        UnauthorizedError: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                /**
-                 * @example {
-                 *       "code": "UNAUTHORIZED",
-                 *       "message": "Authentication is required to access this resource",
-                 *       "more_info": "https://api.notopia.com/docs/errors/UNAUTHORIZED"
-                 *     }
-                 */
-                "application/json": components["schemas"]["Error"];
-            };
-        };
-        /** @description Internal Server Error response */
-        InternalServerError: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                /**
-                 * @example {
-                 *       "code": "INTERNAL_SERVER_ERROR",
-                 *       "message": "An internal server error occurred. Please try again later",
-                 *       "more_info": "https://api.notopia.com/docs/errors/INTERNAL_SERVER_ERROR"
-                 *     }
-                 */
-                "application/json": components["schemas"]["Error"];
-            };
-        };
-        /** @description Note successfully created */
-        CreateNoteResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["Note"] & unknown;
-            };
-        };
-        /** @description Successful response */
-        GetNoteResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["NoteRequired"] & unknown;
-            };
-        };
-        /** @description Forbidden Error response */
-        ForbiddenError: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                /**
-                 * @example {
-                 *       "code": "FORBIDDEN",
-                 *       "message": "You do not have permission to access this resource",
-                 *       "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
-                 *     }
-                 */
-                "application/json": components["schemas"]["Error"];
-            };
-        };
-        /** @description Not Found Error response */
-        NotFoundError: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                /**
-                 * @example {
-                 *       "code": "NOT_FOUND",
-                 *       "message": "The requested resource was not found",
-                 *       "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
-                 *     }
-                 */
-                "application/json": components["schemas"]["Error"];
-            };
-        };
-        /** @description Note successfully updated */
-        PutNoteResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["NoteRequired"] & unknown;
-            };
-        };
-        /** @description Note successfully patched */
-        PatchNoteResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["Note"] & unknown;
-            };
-        };
+    Pagination: {
+      /**
+       * @description Current page number
+       * @example 1
+       */
+      page: number;
+      /**
+       * @description Number of items per page
+       * @example 20
+       */
+      limit: number;
+      /**
+       * @description Total number of items
+       * @example 100
+       */
+      total: number;
+      /**
+       * @description Total number of pages
+       * @example 5
+       */
+      totalPages: number;
+      /**
+       * @description Whether there is a next page
+       * @example true
+       */
+      hasNext: boolean;
+      /**
+       * @description Whether there is a previous page
+       * @example false
+       */
+      hasPrev: boolean;
     };
+    Error: {
+      /**
+       * @description Error code
+       * @example EXAMPLE_CODE
+       */
+      code: string;
+      /**
+       * @description Human-readable error message
+       * @example Example error
+       */
+      message: string;
+      /**
+       * @description URL with more information about the error
+       * @example https://api.notopia.com/docs/errors/EXAMPLE_CODE
+       */
+      more_info?: string;
+    };
+    NoteRequired: components['schemas']['Note'] & Record<string, never>;
+  };
+  responses: {
+    /** @description Successful response */
+    ListNotesResponse: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': {
+          data: components['schemas']['Note'][];
+          pagination: components['schemas']['Pagination'] & unknown;
+        };
+      };
+    };
+    /** @description Bad Request Error response */
+    BadRequestError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        /**
+         * @example {
+         *       "code": "BAD_REQUEST",
+         *       "message": "The request could not be understood by the server due to malformed syntax",
+         *       "more_info": "https://api.notopia.com/docs/errors/BAD_REQUEST"
+         *     }
+         */
+        'application/json': components['schemas']['Error'];
+      };
+    };
+    /** @description Unauthorized Error response */
+    UnauthorizedError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        /**
+         * @example {
+         *       "code": "UNAUTHORIZED",
+         *       "message": "Authentication is required to access this resource",
+         *       "more_info": "https://api.notopia.com/docs/errors/UNAUTHORIZED"
+         *     }
+         */
+        'application/json': components['schemas']['Error'];
+      };
+    };
+    /** @description Internal Server Error response */
+    InternalServerError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        /**
+         * @example {
+         *       "code": "INTERNAL_SERVER_ERROR",
+         *       "message": "An internal server error occurred. Please try again later",
+         *       "more_info": "https://api.notopia.com/docs/errors/INTERNAL_SERVER_ERROR"
+         *     }
+         */
+        'application/json': components['schemas']['Error'];
+      };
+    };
+    /** @description Note successfully created */
+    CreateNoteResponse: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': components['schemas']['Note'] & unknown;
+      };
+    };
+    /** @description Successful response */
+    GetNoteResponse: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': components['schemas']['NoteRequired'] & unknown;
+      };
+    };
+    /** @description Forbidden Error response */
+    ForbiddenError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        /**
+         * @example {
+         *       "code": "FORBIDDEN",
+         *       "message": "You do not have permission to access this resource",
+         *       "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
+         *     }
+         */
+        'application/json': components['schemas']['Error'];
+      };
+    };
+    /** @description Not Found Error response */
+    NotFoundError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        /**
+         * @example {
+         *       "code": "NOT_FOUND",
+         *       "message": "The requested resource was not found",
+         *       "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
+         *     }
+         */
+        'application/json': components['schemas']['Error'];
+      };
+    };
+    /** @description Note successfully updated */
+    PutNoteResponse: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': components['schemas']['NoteRequired'] & unknown;
+      };
+    };
+    /** @description Note successfully patched */
+    PatchNoteResponse: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': components['schemas']['Note'] & unknown;
+      };
+    };
+  };
+  parameters: {
+    /**
+     * @description Page number for pagination
+     * @example 1
+     */
+    pageQuery: number;
+    /**
+     * @description Number of items per page
+     * @example 20
+     */
+    limitQuery: number;
+    /** @description Sort order */
+    orderQuery: 'asc' | 'desc';
+    /**
+     * @description Unique identifier of the note
+     * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+     */
+    noteIdPath: string;
+  };
+  requestBodies: {
+    /** @description Create note request */
+    CreateNoteRequest: {
+      content: {
+        'application/json': components['schemas']['NoteRequired'] & unknown;
+      };
+    };
+    /** @description Put note request (replace entire note) */
+    PutNoteRequest: {
+      content: {
+        'application/json': components['schemas']['NoteRequired'] & unknown;
+      };
+    };
+    /** @description Patch note request (partial update) */
+    PatchNoteRequest: {
+      content: {
+        'application/json': components['schemas']['Note'] & unknown;
+      };
+    };
+  };
+  headers: never;
+  pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+  listNotes: {
     parameters: {
+      query?: {
         /**
          * @description Page number for pagination
          * @example 1
          */
-        pageQuery: number;
+        page?: components['parameters']['pageQuery'];
         /**
          * @description Number of items per page
          * @example 20
          */
-        limitQuery: number;
+        limit?: components['parameters']['limitQuery'];
         /** @description Sort order */
-        orderQuery: "asc" | "desc";
+        order?: components['parameters']['orderQuery'];
+        /**
+         * @description Field to sort by
+         * @example createdAt
+         */
+        sortBy?: 'createdAt' | 'updatedAt' | 'title';
+        /**
+         * @description Search notes by title or content
+         * @example meeting notes
+         */
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: components['responses']['ListNotesResponse'];
+      400: components['responses']['BadRequestError'];
+      401: components['responses']['UnauthorizedError'];
+      500: components['responses']['InternalServerError'];
+    };
+  };
+  createNote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: components['requestBodies']['CreateNoteRequest'];
+    responses: {
+      201: components['responses']['CreateNoteResponse'];
+      400: components['responses']['BadRequestError'];
+      401: components['responses']['UnauthorizedError'];
+      500: components['responses']['InternalServerError'];
+    };
+  };
+  getNote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
         /**
          * @description Unique identifier of the note
          * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
          */
-        noteIdPath: string;
+        noteId: components['parameters']['noteIdPath'];
+      };
+      cookie?: never;
     };
-    requestBodies: {
-        /** @description Create note request */
-        CreateNoteRequest: {
-            content: {
-                "application/json": components["schemas"]["NoteRequired"] & unknown;
-            };
-        };
-        /** @description Put note request (replace entire note) */
-        PutNoteRequest: {
-            content: {
-                "application/json": components["schemas"]["NoteRequired"] & unknown;
-            };
-        };
-        /** @description Patch note request (partial update) */
-        PatchNoteRequest: {
-            content: {
-                "application/json": components["schemas"]["Note"] & unknown;
-            };
-        };
+    requestBody?: never;
+    responses: {
+      200: components['responses']['GetNoteResponse'];
+      400: components['responses']['BadRequestError'];
+      401: components['responses']['UnauthorizedError'];
+      403: components['responses']['ForbiddenError'];
+      404: components['responses']['NotFoundError'];
+      500: components['responses']['InternalServerError'];
     };
-    headers: never;
-    pathItems: never;
-}
-export type $defs = Record<string, never>;
-export interface operations {
-    listNotes: {
-        parameters: {
-            query?: {
-                /**
-                 * @description Page number for pagination
-                 * @example 1
-                 */
-                page?: components["parameters"]["pageQuery"];
-                /**
-                 * @description Number of items per page
-                 * @example 20
-                 */
-                limit?: components["parameters"]["limitQuery"];
-                /** @description Sort order */
-                order?: components["parameters"]["orderQuery"];
-                /**
-                 * @description Field to sort by
-                 * @example createdAt
-                 */
-                sortBy?: "createdAt" | "updatedAt" | "title";
-                /**
-                 * @description Search notes by title or content
-                 * @example meeting notes
-                 */
-                search?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["ListNotesResponse"];
-            400: components["responses"]["BadRequestError"];
-            401: components["responses"]["UnauthorizedError"];
-            500: components["responses"]["InternalServerError"];
-        };
+  };
+  updateNote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Unique identifier of the note
+         * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+         */
+        noteId: components['parameters']['noteIdPath'];
+      };
+      cookie?: never;
     };
-    createNote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: components["requestBodies"]["CreateNoteRequest"];
-        responses: {
-            201: components["responses"]["CreateNoteResponse"];
-            400: components["responses"]["BadRequestError"];
-            401: components["responses"]["UnauthorizedError"];
-            500: components["responses"]["InternalServerError"];
-        };
+    requestBody: components['requestBodies']['PutNoteRequest'];
+    responses: {
+      200: components['responses']['PutNoteResponse'];
+      400: components['responses']['BadRequestError'];
+      401: components['responses']['UnauthorizedError'];
+      403: components['responses']['ForbiddenError'];
+      404: components['responses']['NotFoundError'];
+      500: components['responses']['InternalServerError'];
     };
-    getNote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Unique identifier of the note
-                 * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
-                 */
-                noteId: components["parameters"]["noteIdPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetNoteResponse"];
-            400: components["responses"]["BadRequestError"];
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            404: components["responses"]["NotFoundError"];
-            500: components["responses"]["InternalServerError"];
-        };
+  };
+  deleteNote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Unique identifier of the note
+         * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+         */
+        noteId: components['parameters']['noteIdPath'];
+      };
+      cookie?: never;
     };
-    updateNote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Unique identifier of the note
-                 * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
-                 */
-                noteId: components["parameters"]["noteIdPath"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Note successfully deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: components["requestBodies"]["PutNoteRequest"];
-        responses: {
-            200: components["responses"]["PutNoteResponse"];
-            400: components["responses"]["BadRequestError"];
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            404: components["responses"]["NotFoundError"];
-            500: components["responses"]["InternalServerError"];
-        };
+        content?: never;
+      };
+      400: components['responses']['BadRequestError'];
+      401: components['responses']['UnauthorizedError'];
+      403: components['responses']['ForbiddenError'];
+      404: components['responses']['NotFoundError'];
+      500: components['responses']['InternalServerError'];
     };
-    deleteNote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Unique identifier of the note
-                 * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
-                 */
-                noteId: components["parameters"]["noteIdPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Note successfully deleted */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            400: components["responses"]["BadRequestError"];
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            404: components["responses"]["NotFoundError"];
-            500: components["responses"]["InternalServerError"];
-        };
+  };
+  patchNote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /**
+         * @description Unique identifier of the note
+         * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+         */
+        noteId: components['parameters']['noteIdPath'];
+      };
+      cookie?: never;
     };
-    patchNote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Unique identifier of the note
-                 * @example 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
-                 */
-                noteId: components["parameters"]["noteIdPath"];
-            };
-            cookie?: never;
-        };
-        requestBody: components["requestBodies"]["PatchNoteRequest"];
-        responses: {
-            200: components["responses"]["PatchNoteResponse"];
-            400: components["responses"]["BadRequestError"];
-            401: components["responses"]["UnauthorizedError"];
-            403: components["responses"]["ForbiddenError"];
-            404: components["responses"]["NotFoundError"];
-            500: components["responses"]["InternalServerError"];
-        };
+    requestBody: components['requestBodies']['PatchNoteRequest'];
+    responses: {
+      200: components['responses']['PatchNoteResponse'];
+      400: components['responses']['BadRequestError'];
+      401: components['responses']['UnauthorizedError'];
+      403: components['responses']['ForbiddenError'];
+      404: components['responses']['NotFoundError'];
+      500: components['responses']['InternalServerError'];
     };
+  };
 }
