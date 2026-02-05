@@ -27,7 +27,7 @@ services:
     volumes:
       - redpanda_data:/var/lib/redpanda/data
 
-  console:
+  redpanda_console:
     image: redpandadata/console:v3.5.1
     container_name: notopia-redpanda_console
     environment:
