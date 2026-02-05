@@ -1,0 +1,48 @@
+# vim:ft=yaml.docker-compose:
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  redpanda:
+    image: redpandadata/redpanda:v25.3.6
+    command:
+      - redpanda start
+      - --smp 1
+      - --memory 512M
+      - --reserve-memory 0M
+      - --overprovisioned
+      - --dev-containers
+      - --overprovisioned
+      - --check=false
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr 0.0.0.0:33145
+      - --advertise-rpc-addr redpanda:33145
+    ports:
+      - 18081:18081
+      - 18082:18082
+      - 19092:19092
+      - 19644:9644
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+
+  console:
+    image: redpandadata/console:v3.5.1
+    container_name: notopia-redpanda_console
+    environment:
+      CONFIG_FILEPATH: /etc/redpanda/config.yaml
+    volumes:
+      - ./redpanda/console-config.yaml:/etc/redpanda/config.yaml:ro
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.redpanda-console.rule: Host(`redpanda-console.notopia.localhost`)
+      traefik.http.routers.redpanda-console.entrypoints: web
+      traefik.http.services.redpanda-console.loadbalancer.server.port: 8080
+    depends_on:
+      - redpanda
+    profiles:
+      - dev-ui
+
+volumes:
+  redpanda_data:

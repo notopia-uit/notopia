@@ -9,10 +9,10 @@ services:
     volumes:
       - meilisearch_data:/meili_data
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.meilisearch.rule=Host(`meilisearch.notopia.localhost`)
-      - traefik.http.routers.meilisearch.entrypoints=web
-      - traefik.http.services.meilisearch.loadbalancer.server.port=7700
+      traefik.enable: 'true'
+      traefik.http.routers.meilisearch.rule: Host(`meilisearch.notopia.localhost`)
+      traefik.http.routers.meilisearch.entrypoints: web
+      traefik.http.services.meilisearch.loadbalancer.server.port: '7700'
     restart: unless-stopped
 
 volumes:

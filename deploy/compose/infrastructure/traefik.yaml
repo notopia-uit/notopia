@@ -22,6 +22,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/:/etc/traefik/dynamic:ro
+    profiles:
+      - dev-api
     extra_hosts:
       - host.docker.internal:host-gateway
       - authentik.notopia.localhost:host-gateway

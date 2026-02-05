@@ -2,3 +2,4 @@
 
 [env]
 COMPOSE_FILE = "./deploy/compose/compose.yaml"
+COMPOSE_PROFILES = "*"

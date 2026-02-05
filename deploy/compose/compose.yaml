@@ -2,10 +2,12 @@
 name: notopia
 
 include:
-  - ./infrastructure/authorize.yaml
-  - ./infrastructure/gateway.yaml
-  - ./infrastructure/identity_provider.yaml
-  - ./infrastructure/message_broker.yaml
-  - ./infrastructure/object_storage.yaml
-  - ./infrastructure/search.yaml
+  - ./infrastructure/authentik.yaml
+  - ./infrastructure/casbin.yaml
+  - ./infrastructure/dbgate.yaml
+  - ./infrastructure/meilisearch.yaml
+  - ./infrastructure/minio.yaml
+  - ./infrastructure/redis_pub_sub.yaml
+  - ./infrastructure/redpanda.yaml
+  - ./infrastructure/traefik.yaml
   - ./services/note.yaml

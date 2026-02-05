@@ -1,0 +1,8 @@
+# vim:ft=yaml.docker-compose:
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  redis_pubsub:
+    container_name: notopia-redis_pubsub
+    image: redis:8.4.0-alpine3.22
+    ports:
+      - 6379:6379
