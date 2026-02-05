@@ -8,8 +8,7 @@ services:
       - --smp 1
       - --memory 512M
       - --reserve-memory 0M
-      - --overprovisioned
-      - --dev-containers
+      - --mode dev-container
       - --overprovisioned
       - --check=false
       - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
@@ -36,7 +35,7 @@ services:
       - ./redpanda/console-config.yaml:/etc/redpanda/config.yaml:ro
     labels:
       traefik.enable: 'true'
-      traefik.http.routers.redpanda-console.rule: Host(`redpanda-console.notopia.localhost`)
+      traefik.http.routers.redpanda-console.rule: Host(`redpanda.notopia.localhost`)
       traefik.http.routers.redpanda-console.entrypoints: web
       traefik.http.services.redpanda-console.loadbalancer.server.port: 8080
     depends_on:

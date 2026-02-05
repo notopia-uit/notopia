@@ -11,7 +11,7 @@ services:
       - --providers.docker.network=notopia_default
       - --providers.file.directory=/etc/traefik/dynamic
       - --entryPoints.web.address=:80
-      - --log.level=DEBUG
+      - --log.level=INFO
       - --experimental.plugins.jwt.moduleName=github.com/traefik-plugins/traefik-jwt-plugin
       - --experimental.plugins.jwt.version=v0.10.0
     environment:
