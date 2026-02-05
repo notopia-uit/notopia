@@ -71,7 +71,7 @@
     },
     "gen:go": {
       "inputs": ["{projectRoot}/oapi-codegen.yaml"],
-      "outputs": ["{workspaceRoot}/pkg/api/note.go"],
+      "outputs": ["{workspaceRoot}/pkg/api/gen/note.gen.go"],
       "executor": "nx:run-commands",
       "options": {
         "command": "oapi-codegen --config ./oapi-codegen.yaml ./dist/openapi.yaml",
