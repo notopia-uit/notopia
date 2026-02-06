@@ -12,33 +12,33 @@ func TestPostGresConfigValidation(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		cfg     config.PG
+		cfg     config.SQL
 		wantErr bool
 	}{
 		{
 			name: "valid DSN with postgres prefix",
-			cfg: config.PG{
+			cfg: config.SQL{
 				DSN: "postgres://user:password@localhost:5432/dbname",
 			},
 			wantErr: false,
 		},
 		{
 			name: "invalid DSN - missing postgres prefix",
-			cfg: config.PG{
+			cfg: config.SQL{
 				DSN: "mysql://user:password@localhost:5432/dbname",
 			},
 			wantErr: true,
 		},
 		{
 			name: "invalid DSN - empty string requires Host",
-			cfg: config.PG{
+			cfg: config.SQL{
 				DSN: "",
 			},
 			wantErr: true,
 		},
 		{
 			name: "valid individual fields with valid SSLMode",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host:     "localhost",
 				Port:     5432,
 				User:     "testuser",
@@ -50,7 +50,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid individual fields with SSLMode disable",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "disable",
@@ -59,7 +59,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid individual fields with empty SSLMode",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host: "localhost",
 				Port: 5432,
 			},
@@ -67,7 +67,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid with DSN and empty Host/Port",
-			cfg: config.PG{
+			cfg: config.SQL{
 				DSN:  "postgres://user:password@localhost:5432/dbname",
 				Host: "",
 				Port: 0,
@@ -76,7 +76,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "invalid SSLMode - not in allowed values",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "invalid",
@@ -85,7 +85,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid SSLMode allow",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "allow",
@@ -94,7 +94,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid SSLMode prefer",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "prefer",
@@ -103,7 +103,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid SSLMode verify-ca",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "verify-ca",
@@ -112,7 +112,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid SSLMode verify-full",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "verify-full",
@@ -121,7 +121,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid port omitted (zero value skipped by omitempty)",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host: "localhost",
 				Port: 0,
 			},
@@ -129,7 +129,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "invalid port - negative value",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host: "localhost",
 				Port: -1,
 			},
@@ -137,7 +137,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "invalid port - above maximum",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host: "localhost",
 				Port: 65536,
 			},
@@ -145,7 +145,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid port at minimum boundary",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host: "localhost",
 				Port: 1,
 			},
@@ -153,7 +153,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid port at maximum boundary",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host: "localhost",
 				Port: 65535,
 			},
@@ -161,7 +161,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "invalid hostname format - underscore not allowed",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host: "invalid_host_with_underscore",
 				Port: 5432,
 			},
@@ -169,19 +169,19 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name:    "missing required fields - neither DSN nor Host",
-			cfg:     config.PG{},
+			cfg:     config.SQL{},
 			wantErr: true,
 		},
 		{
 			name: "missing Host when DSN not provided",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Port: 5432,
 			},
 			wantErr: true,
 		},
 		{
 			name: "valid FQDN hostname",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host: "db.example.com",
 				Port: 5432,
 			},
@@ -189,7 +189,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid IP address hostname",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host: "192.168.1.1",
 				Port: 5432,
 			},
@@ -210,19 +210,19 @@ func TestPostGresConfigValidation(t *testing.T) {
 func TestGetDSN(t *testing.T) {
 	tests := []struct {
 		name     string
-		cfg      config.PG
+		cfg      config.SQL
 		expected string
 	}{
 		{
 			name: "returns provided DSN",
-			cfg: config.PG{
+			cfg: config.SQL{
 				DSN: "postgres://user:password@localhost:5432/dbname",
 			},
 			expected: "postgres://user:password@localhost:5432/dbname",
 		},
 		{
 			name: "constructs DSN from fields",
-			cfg: config.PG{
+			cfg: config.SQL{
 				Host:     "localhost",
 				Port:     5432,
 				User:     "testuser",

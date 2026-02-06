@@ -1,4 +1,4 @@
-package note
+package components
 
 import (
 	"github.com/go-playground/validator/v10"

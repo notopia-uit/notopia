@@ -2,7 +2,7 @@ package config
 
 import "fmt"
 
-type PG struct {
+type SQL struct {
 	DSN      string `json:"dsn"      mapstructure:"dsn"      validate:"omitempty,startswith=postgres://"                                   yaml:"dsn"`
 	Host     string `json:"host"     mapstructure:"host"     validate:"required_without=DSN,omitempty,hostname_rfc1123"                    yaml:"host"`
 	Port     int    `json:"port"     mapstructure:"port"     validate:"omitempty,min=1,max=65535"                                          yaml:"port"`
@@ -12,7 +12,7 @@ type PG struct {
 	SSLMode  string `json:"sslmode"  mapstructure:"sslmode"  validate:"omitempty,oneof=disable allow prefer require verify-ca verify-full" yaml:"sslmode"`
 }
 
-func (pg *PG) GetDSN() string {
+func (pg *SQL) GetDSN() string {
 	if pg.DSN != "" {
 		return pg.DSN
 	}

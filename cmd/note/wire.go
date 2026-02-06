@@ -1,13 +1,15 @@
 //go:build wireinject
 
-package note
+package main
 
 import (
+	"context"
+
 	"github.com/goforj/wire"
-	"github.com/notopia-uit/notopia/pkg/note/validator"
+	"github.com/notopia-uit/notopia/pkg/note"
 )
 
-func InitializeApp(cfg *Config) (*App, error) {
-	wire.Build(validator.ProviderSet)
+func InitializeServer(ctx context.Context) (*note.Server, error) {
+	wire.Build(note.ProviderSet)
 	return nil, nil
 }
