@@ -9,3 +9,5 @@ vite.config.*.timestamp*
 # Next.js
 .next
 out
+
+coverage.out
