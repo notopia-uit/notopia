@@ -1,4 +1,4 @@
-package ports
+package server
 
 import (
 	"log/slog"
@@ -7,7 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 	"github.com/notopia-uit/notopia/pkg/note/config"
-	"github.com/notopia-uit/notopia/pkg/note/ports/rpc"
+)
+
+type (
+	IHTTPHandler       = note.ServerInterface
+	IStrictHTTPHandler = note.StrictServerInterface
 )
 
 type Server struct {
@@ -16,8 +20,8 @@ type Server struct {
 
 func NewServer(
 	ginEngine *gin.Engine,
-	httpHandler note.ServerInterface,
-	httpRpcHandler *rpc.HTTPServiceHandler,
+	httpHandler IHTTPHandler,
+	rpcHTTPHandlerRegister *RPCHTTPHandlerRegister,
 	logger *slog.Logger,
 	cfg *config.Config,
 ) *Server {
@@ -25,7 +29,10 @@ func NewServer(
 
 	s := &Server{}
 	note.RegisterHandlers(ginEngine, httpHandler)
-	ginEngine.Any(httpRpcHandler.Path+"*", gin.WrapH(httpRpcHandler.Handler))
+	ginEngine.Any(
+		rpcHTTPHandlerRegister.Path+"*",
+		gin.WrapH(rpcHTTPHandlerRegister.Handler),
+	)
 
 	s.server = &http.Server{
 		Addr:    cfg.Server.Address(),

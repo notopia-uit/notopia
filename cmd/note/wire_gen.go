@@ -8,19 +8,18 @@ package main
 
 import (
 	"context"
+	server2 "github.com/notopia-uit/notopia/pkg/common/handler/server"
 	"github.com/notopia-uit/notopia/pkg/common/otlp"
 	"github.com/notopia-uit/notopia/pkg/note/app"
-	"github.com/notopia-uit/notopia/pkg/note/components"
+	"github.com/notopia-uit/notopia/pkg/note/component"
 	"github.com/notopia-uit/notopia/pkg/note/config"
-	"github.com/notopia-uit/notopia/pkg/note/ports"
-	"github.com/notopia-uit/notopia/pkg/note/ports/http"
-	"github.com/notopia-uit/notopia/pkg/note/ports/rpc"
+	"github.com/notopia-uit/notopia/pkg/note/handler/server"
 	"github.com/spf13/viper"
 )
 
 // Injectors from wire.go:
 
-func InitializeServer(ctx context.Context) (*ports.Server, func(), error) {
+func InitializeServer(ctx context.Context) (*server.Server, func(), error) {
 	serviceName := _wireServiceNameValue
 	validate := components.ProvideValidate()
 	viperViper := viper.New()
@@ -34,37 +33,38 @@ func InitializeServer(ctx context.Context) (*ports.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	loggerProvider, cleanup, err := otlp.NewLoggerProvider(ctx, configOTLP, resource)
+	meterProvider, cleanup, err := otlp.NewMeterProvider(ctx, configOTLP, resource)
 	if err != nil {
 		return nil, nil, err
 	}
-	logger := otlp.NewSlog(serviceName, configOTLP, loggerProvider)
-	handlerFunc := http.NewSlogHandler(logger)
-	engine := http.NewGin(handlerFunc)
-	appApp := app.NewApp()
-	strictServer := http.NewStrictServer(appApp)
-	serverInterface := http.NewServer(strictServer)
-	rpcHandler := rpc.NewRPCHandler(appApp)
 	tracerProvider, cleanup2, err := otlp.NewTracerProvider(ctx, configOTLP, resource)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	meterProvider, cleanup3, err := otlp.NewMeterProvider(ctx, configOTLP, resource)
+	loggerProvider, cleanup3, err := otlp.NewLoggerProvider(ctx, configOTLP, resource)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	httpServiceHandler, err := rpc.NewHTTPServiceHandler(rpcHandler, tracerProvider, meterProvider)
+	logger := otlp.NewSlog(serviceName, configOTLP, loggerProvider)
+	ginSlogHandlerFunc := server2.NewGinSlogHandler(logger)
+	otelGinHandlerFunc := server2.NewOtelGinHandler(serviceName, meterProvider, tracerProvider)
+	engine := server2.NewGin(serviceName, meterProvider, tracerProvider, ginSlogHandlerFunc, otelGinHandlerFunc)
+	appApp := app.NewApp()
+	strictHTTPHandler := server.NewStrictHTTPHandler(appApp)
+	serverInterface := server.NewHTTPHandler(strictHTTPHandler)
+	rpcHandler := server.NewRPCHandler(appApp)
+	rpchttpHandlerRegister, err := server.NewRPCHTTPHandlerRegister(rpcHandler, tracerProvider, meterProvider)
 	if err != nil {
 		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	server := ports.NewServer(engine, serverInterface, httpServiceHandler, logger, configConfig)
-	return server, func() {
+	serverServer := server.NewServer(engine, serverInterface, rpchttpHandlerRegister, logger, configConfig)
+	return serverServer, func() {
 		cleanup3()
 		cleanup2()
 		cleanup()

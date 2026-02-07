@@ -1,4 +1,4 @@
-package rpc
+package server
 
 import (
 	"errors"
@@ -13,11 +13,13 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 
+type IRCPHandler = pbconnect.NoteServiceHandler
+
 type RPCHandler struct {
 	app app.App
 }
 
-var _ pbconnect.NoteServiceHandler = (*RPCHandler)(nil)
+var _ IRCPHandler = (*RPCHandler)(nil)
 
 func NewRPCHandler(app *app.App) *RPCHandler {
 	return &RPCHandler{
@@ -28,22 +30,22 @@ func NewRPCHandler(app *app.App) *RPCHandler {
 var ProvideRPCHandler = NewRPCHandler
 
 type (
-	HTTPPath    = string
-	HTTPHandler = http.Handler
+	RPCHTTPPath    = string
+	RPCHTTPHandler = http.Handler
 )
 
-type HTTPServiceHandler struct {
-	Path    HTTPPath
-	Handler HTTPHandler
+type RPCHTTPHandlerRegister struct {
+	Path    RPCHTTPPath
+	Handler RPCHTTPHandler
 }
 
 var ErrCreateOtelInterceptor = errors.New("failed to create otel connect interceptor")
 
-func NewHTTPServiceHandler(
+func NewRPCHTTPHandlerRegister(
 	rpcHandler pbconnect.NoteServiceHandler,
 	traceProvider *trace.TracerProvider,
 	meterProvider *metric.MeterProvider,
-) (*HTTPServiceHandler, error) {
+) (*RPCHTTPHandlerRegister, error) {
 	interceptor, err := otelconnect.NewInterceptor(
 		otelconnect.WithTracerProvider(traceProvider),
 		otelconnect.WithMeterProvider(meterProvider),
@@ -56,10 +58,10 @@ func NewHTTPServiceHandler(
 		rpcHandler,
 		connect.WithInterceptors(interceptor),
 	)
-	return &HTTPServiceHandler{
+	return &RPCHTTPHandlerRegister{
 		Path:    Path,
 		Handler: Handler,
 	}, nil
 }
 
-var ProvideHTTPServiceHandler = NewHTTPServiceHandler
+var ProvideRPCHTTPHandlerRegister = NewRPCHTTPHandlerRegister

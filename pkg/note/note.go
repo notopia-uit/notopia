@@ -1,5 +1,5 @@
 package note
 
-import "github.com/notopia-uit/notopia/pkg/note/ports"
+import "github.com/notopia-uit/notopia/pkg/note/handler/server"
 
-type Server = ports.Server
+type Server = server.Server
