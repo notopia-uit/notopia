@@ -6,7 +6,7 @@ REDOCLY_SUPPRESS_UPDATE_NOTICE = "true"
 
 [tools]
 pnpm = "10.28.2"
-"npm:nx" = "22.4.4"
+"npm:nx" = "22.4.5"
 "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.5.1"
 "go:github.com/goforj/wire/cmd/wire" = "v1.1.0"
 buf = "1.65.0"
