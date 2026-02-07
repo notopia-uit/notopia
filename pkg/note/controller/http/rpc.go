@@ -1,7 +1,6 @@
 package http
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -38,8 +37,6 @@ type RPCHTTPHandlerRegister struct {
 	Path    RPCHTTPPath
 	Handler RPCHTTPHandler
 }
-
-var ErrCreateOtelInterceptor = errors.New("failed to create otel connect interceptor")
 
 func NewRPCHTTPHandlerRegister(
 	rpcHandler pbconnect.NoteServiceHandler,
