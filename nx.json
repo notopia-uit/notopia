@@ -14,7 +14,12 @@
       "{workspaceRoot}/go.sum",
       "{projectRoot}/**/*.{go}"
     ],
-    "protoFiles": ["{projectRoot}/**/*.proto"]
+    "protoFiles": [
+      "{projectRoot}/**/*.proto",
+      "{workspaceRoot}/buf.gen.yaml",
+      "{workspaceRoot}/buf.mock.yaml",
+      "{workspaceRoot}/buf.yaml"
+    ]
   },
   "targetDefaults": {
     "gen*": {

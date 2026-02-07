@@ -5,6 +5,7 @@ inputs:
 plugins:
   - remote: buf.build/protocolbuffers/go:v1.36.11
     out: ./pkg/pb/
+    include_imports: true
     opt:
       - paths=source_relative
   - remote: buf.build/connectrpc/go:v1.19.1
@@ -21,3 +22,6 @@ managed:
   override:
     - file_option: go_package_prefix
       value: github.com/notopia-uit/notopia/pkg/pb
+  disable:
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate

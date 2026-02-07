@@ -4,6 +4,8 @@
 package note
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -11,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/oapi-codegen/nullable"
 	"github.com/oapi-codegen/runtime"
+	strictgin "github.com/oapi-codegen/runtime/strictmiddleware/gin"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
@@ -553,4 +556,652 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/note/notes/:noteId", wrapper.GetNote)
 	router.PATCH(options.BaseURL+"/note/notes/:noteId", wrapper.PatchNote)
 	router.PUT(options.BaseURL+"/note/notes/:noteId", wrapper.UpdateNote)
+}
+
+type BadRequestErrorJSONResponse Error
+
+type CreateNoteResponseJSONResponse struct {
+	// CreatedAt Timestamp when the note was created
+	CreatedAt *time.Time          `json:"createdAt,omitempty"`
+	Id        *openapi_types.UUID `json:"id,omitempty"`
+
+	// Title Title of the note
+	Title *string `json:"title,omitempty"`
+
+	// UpdatedAt Timestamp when the note was last updated
+	UpdatedAt nullable.Nullable[time.Time] `json:"updatedAt,omitempty"`
+}
+
+type ForbiddenErrorJSONResponse Error
+
+type GetNoteResponseJSONResponse struct {
+	// CreatedAt Timestamp when the note was created
+	CreatedAt *time.Time          `json:"createdAt,omitempty"`
+	Id        *openapi_types.UUID `json:"id,omitempty"`
+
+	// Title Title of the note
+	Title string `json:"title"`
+
+	// UpdatedAt Timestamp when the note was last updated
+	UpdatedAt nullable.Nullable[time.Time] `json:"updatedAt,omitempty"`
+}
+
+type InternalServerErrorJSONResponse Error
+
+type ListNotesResponseJSONResponse struct {
+	Data       []Note `json:"data"`
+	Pagination struct {
+		// HasNext Whether there is a next page
+		HasNext bool `json:"hasNext"`
+
+		// HasPrev Whether there is a previous page
+		HasPrev bool `json:"hasPrev"`
+
+		// Limit Number of items per page
+		Limit int `json:"limit"`
+
+		// Page Current page number
+		Page int `json:"page"`
+
+		// Total Total number of items
+		Total int `json:"total"`
+
+		// TotalPages Total number of pages
+		TotalPages int `json:"totalPages"`
+	} `json:"pagination"`
+}
+
+type NotFoundErrorJSONResponse Error
+
+type PatchNoteResponseJSONResponse struct {
+	// CreatedAt Timestamp when the note was created
+	CreatedAt *time.Time          `json:"createdAt,omitempty"`
+	Id        *openapi_types.UUID `json:"id,omitempty"`
+
+	// Title Title of the note
+	Title *string `json:"title,omitempty"`
+
+	// UpdatedAt Timestamp when the note was last updated
+	UpdatedAt nullable.Nullable[time.Time] `json:"updatedAt,omitempty"`
+}
+
+type PutNoteResponseJSONResponse struct {
+	// CreatedAt Timestamp when the note was created
+	CreatedAt *time.Time          `json:"createdAt,omitempty"`
+	Id        *openapi_types.UUID `json:"id,omitempty"`
+
+	// Title Title of the note
+	Title string `json:"title"`
+
+	// UpdatedAt Timestamp when the note was last updated
+	UpdatedAt nullable.Nullable[time.Time] `json:"updatedAt,omitempty"`
+}
+
+type UnauthorizedErrorJSONResponse Error
+
+type ListNotesRequestObject struct {
+	Params ListNotesParams
+}
+
+type ListNotesResponseObject interface {
+	VisitListNotesResponse(w http.ResponseWriter) error
+}
+
+type ListNotes200JSONResponse struct{ ListNotesResponseJSONResponse }
+
+func (response ListNotes200JSONResponse) VisitListNotesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListNotes400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response ListNotes400JSONResponse) VisitListNotesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListNotes401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response ListNotes401JSONResponse) VisitListNotesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListNotes500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response ListNotes500JSONResponse) VisitListNotesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateNoteRequestObject struct {
+	Body *CreateNoteJSONRequestBody
+}
+
+type CreateNoteResponseObject interface {
+	VisitCreateNoteResponse(w http.ResponseWriter) error
+}
+
+type CreateNote201JSONResponse struct{ CreateNoteResponseJSONResponse }
+
+func (response CreateNote201JSONResponse) VisitCreateNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateNote400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response CreateNote400JSONResponse) VisitCreateNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateNote401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response CreateNote401JSONResponse) VisitCreateNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateNote500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response CreateNote500JSONResponse) VisitCreateNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteNoteRequestObject struct {
+	NoteId NoteIdPath `json:"noteId"`
+}
+
+type DeleteNoteResponseObject interface {
+	VisitDeleteNoteResponse(w http.ResponseWriter) error
+}
+
+type DeleteNote204Response struct {
+}
+
+func (response DeleteNote204Response) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteNote400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response DeleteNote400JSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteNote401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response DeleteNote401JSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteNote403JSONResponse struct{ ForbiddenErrorJSONResponse }
+
+func (response DeleteNote403JSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteNote404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response DeleteNote404JSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteNote500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response DeleteNote500JSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNoteRequestObject struct {
+	NoteId NoteIdPath `json:"noteId"`
+}
+
+type GetNoteResponseObject interface {
+	VisitGetNoteResponse(w http.ResponseWriter) error
+}
+
+type GetNote200JSONResponse struct{ GetNoteResponseJSONResponse }
+
+func (response GetNote200JSONResponse) VisitGetNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNote400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response GetNote400JSONResponse) VisitGetNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNote401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response GetNote401JSONResponse) VisitGetNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNote403JSONResponse struct{ ForbiddenErrorJSONResponse }
+
+func (response GetNote403JSONResponse) VisitGetNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNote404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response GetNote404JSONResponse) VisitGetNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNote500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetNote500JSONResponse) VisitGetNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PatchNoteRequestObject struct {
+	NoteId NoteIdPath `json:"noteId"`
+	Body   *PatchNoteJSONRequestBody
+}
+
+type PatchNoteResponseObject interface {
+	VisitPatchNoteResponse(w http.ResponseWriter) error
+}
+
+type PatchNote200JSONResponse struct{ PatchNoteResponseJSONResponse }
+
+func (response PatchNote200JSONResponse) VisitPatchNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PatchNote400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response PatchNote400JSONResponse) VisitPatchNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PatchNote401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response PatchNote401JSONResponse) VisitPatchNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PatchNote403JSONResponse struct{ ForbiddenErrorJSONResponse }
+
+func (response PatchNote403JSONResponse) VisitPatchNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PatchNote404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response PatchNote404JSONResponse) VisitPatchNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PatchNote500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PatchNote500JSONResponse) VisitPatchNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateNoteRequestObject struct {
+	NoteId NoteIdPath `json:"noteId"`
+	Body   *UpdateNoteJSONRequestBody
+}
+
+type UpdateNoteResponseObject interface {
+	VisitUpdateNoteResponse(w http.ResponseWriter) error
+}
+
+type UpdateNote200JSONResponse struct{ PutNoteResponseJSONResponse }
+
+func (response UpdateNote200JSONResponse) VisitUpdateNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateNote400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response UpdateNote400JSONResponse) VisitUpdateNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateNote401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response UpdateNote401JSONResponse) VisitUpdateNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateNote403JSONResponse struct{ ForbiddenErrorJSONResponse }
+
+func (response UpdateNote403JSONResponse) VisitUpdateNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateNote404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response UpdateNote404JSONResponse) VisitUpdateNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateNote500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response UpdateNote500JSONResponse) VisitUpdateNoteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+// StrictServerInterface represents all server handlers.
+type StrictServerInterface interface {
+	// List notes
+	// (GET /note/notes)
+	ListNotes(ctx context.Context, request ListNotesRequestObject) (ListNotesResponseObject, error)
+	// Create note
+	// (POST /note/notes)
+	CreateNote(ctx context.Context, request CreateNoteRequestObject) (CreateNoteResponseObject, error)
+	// Delete note
+	// (DELETE /note/notes/{noteId})
+	DeleteNote(ctx context.Context, request DeleteNoteRequestObject) (DeleteNoteResponseObject, error)
+	// Get note
+	// (GET /note/notes/{noteId})
+	GetNote(ctx context.Context, request GetNoteRequestObject) (GetNoteResponseObject, error)
+	// Patch note
+	// (PATCH /note/notes/{noteId})
+	PatchNote(ctx context.Context, request PatchNoteRequestObject) (PatchNoteResponseObject, error)
+	// Put note
+	// (PUT /note/notes/{noteId})
+	UpdateNote(ctx context.Context, request UpdateNoteRequestObject) (UpdateNoteResponseObject, error)
+}
+
+type StrictHandlerFunc = strictgin.StrictGinHandlerFunc
+type StrictMiddlewareFunc = strictgin.StrictGinMiddlewareFunc
+
+func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareFunc) ServerInterface {
+	return &strictHandler{ssi: ssi, middlewares: middlewares}
+}
+
+type strictHandler struct {
+	ssi         StrictServerInterface
+	middlewares []StrictMiddlewareFunc
+}
+
+// ListNotes operation middleware
+func (sh *strictHandler) ListNotes(ctx *gin.Context, params ListNotesParams) {
+	var request ListNotesRequestObject
+
+	request.Params = params
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ListNotes(ctx, request.(ListNotesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListNotes")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(ListNotesResponseObject); ok {
+		if err := validResponse.VisitListNotesResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateNote operation middleware
+func (sh *strictHandler) CreateNote(ctx *gin.Context) {
+	var request CreateNoteRequestObject
+
+	var body CreateNoteJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateNote(ctx, request.(CreateNoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateNote")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(CreateNoteResponseObject); ok {
+		if err := validResponse.VisitCreateNoteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteNote operation middleware
+func (sh *strictHandler) DeleteNote(ctx *gin.Context, noteId NoteIdPath) {
+	var request DeleteNoteRequestObject
+
+	request.NoteId = noteId
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteNote(ctx, request.(DeleteNoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteNote")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(DeleteNoteResponseObject); ok {
+		if err := validResponse.VisitDeleteNoteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetNote operation middleware
+func (sh *strictHandler) GetNote(ctx *gin.Context, noteId NoteIdPath) {
+	var request GetNoteRequestObject
+
+	request.NoteId = noteId
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetNote(ctx, request.(GetNoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetNote")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(GetNoteResponseObject); ok {
+		if err := validResponse.VisitGetNoteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PatchNote operation middleware
+func (sh *strictHandler) PatchNote(ctx *gin.Context, noteId NoteIdPath) {
+	var request PatchNoteRequestObject
+
+	request.NoteId = noteId
+
+	var body PatchNoteJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.PatchNote(ctx, request.(PatchNoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PatchNote")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(PatchNoteResponseObject); ok {
+		if err := validResponse.VisitPatchNoteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateNote operation middleware
+func (sh *strictHandler) UpdateNote(ctx *gin.Context, noteId NoteIdPath) {
+	var request UpdateNoteRequestObject
+
+	request.NoteId = noteId
+
+	var body UpdateNoteJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateNote(ctx, request.(UpdateNoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateNote")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(UpdateNoteResponseObject); ok {
+		if err := validResponse.VisitUpdateNoteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
 }

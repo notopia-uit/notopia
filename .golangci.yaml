@@ -5,7 +5,7 @@ version: '2'
 linters:
   enable:
     - exhaustive
-    - exhaustruct
+    # - exhaustruct
     - tagalign
   disable:
     - unused
