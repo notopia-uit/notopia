@@ -1,17 +1,17 @@
-package server
+package http
 
 import (
 	"github.com/goforj/wire"
-	"github.com/notopia-uit/notopia/pkg/common/handler/server"
+	"github.com/notopia-uit/notopia/pkg/common/controller/http"
 )
 
-var ProvideSet = wire.NewSet(
+var ProviderSet = wire.NewSet(
 	ProvideHTTPHandler,
 	ProvideRPCHTTPHandlerRegister,
 	ProvideRPCHandler,
 	ProvideServer,
 	ProvideStrictHTTPHandler,
-	server.ProviderSet,
+	http.ProviderSet,
 	wire.Bind(new(IRCPHandler), new(*RPCHandler)),
 	wire.Bind(new(IStrictHTTPHandler), new(*StrictHTTPHandler)),
 )

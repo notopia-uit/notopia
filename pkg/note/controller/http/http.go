@@ -1,4 +1,4 @@
-package server
+package http
 
 import (
 	"github.com/notopia-uit/notopia/pkg/api/note"

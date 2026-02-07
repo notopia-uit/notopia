@@ -6,7 +6,7 @@ import (
 	"github.com/notopia-uit/notopia/pkg/note/app"
 	"github.com/notopia-uit/notopia/pkg/note/component"
 	"github.com/notopia-uit/notopia/pkg/note/config"
-	"github.com/notopia-uit/notopia/pkg/note/handler/server"
+	"github.com/notopia-uit/notopia/pkg/note/controller/http"
 )
 
 var ProviderSet = wire.NewSet(
@@ -14,5 +14,5 @@ var ProviderSet = wire.NewSet(
 	components.ProviderSet,
 	config.ProviderSet,
 	otlp.ProviderSet,
-	server.ProvideSet,
+	http.ProviderSet,
 )
