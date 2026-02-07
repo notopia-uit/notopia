@@ -10,7 +10,6 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
-	ProviderServer,
 	app.ProviderSet,
 	components.ProviderSet,
 	config.ProviderSet,

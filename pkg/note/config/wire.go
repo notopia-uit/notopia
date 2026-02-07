@@ -7,5 +7,6 @@ import (
 
 var ProviderSet = wire.NewSet(
 	ProvideConfig,
+	wire.FieldsOf(new(*Config), "OTLP"),
 	viper.New,
 )

@@ -8,12 +8,13 @@ package main
 
 import (
 	"context"
+	"github.com/notopia-uit/notopia/pkg/common/otlp"
 	"github.com/notopia-uit/notopia/pkg/note/app"
 	"github.com/notopia-uit/notopia/pkg/note/components"
 	"github.com/notopia-uit/notopia/pkg/note/config"
 	"github.com/notopia-uit/notopia/pkg/note/ports"
 	"github.com/notopia-uit/notopia/pkg/note/ports/http"
-	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
+	"github.com/notopia-uit/notopia/pkg/note/ports/rpc"
 	"github.com/spf13/viper"
 )
 
@@ -24,13 +25,37 @@ func InitializeServer(ctx context.Context) (*ports.Server, error) {
 	appApp := app.NewApp()
 	strictServer := http.newStrictServer(appApp)
 	serverInterface := http.NewServer(strictServer)
-	unimplementedNoteServiceHandler := &pbconnect.UnimplementedNoteServiceHandler{}
+	rpcHandler := rpc.NewRPCHandler(appApp)
 	validate := components.ProvideValidate()
 	viperViper := viper.New()
 	configConfig, err := config.NewConfig(validate, viperViper)
 	if err != nil {
 		return nil, err
 	}
-	server := ports.NewServer(engine, serverInterface, unimplementedNoteServiceHandler, configConfig)
+	configOTLP := configConfig.OTLP
+	serviceName := _wireServiceNameValue
+	serviceVersion := _wireServiceVersionValue
+	resource, err := otlp.NewResource(serviceName, serviceVersion)
+	if err != nil {
+		return nil, err
+	}
+	tracerProvider, err := otlp.NewTracerProvider(ctx, configOTLP, resource)
+	if err != nil {
+		return nil, err
+	}
+	meterProvider, err := otlp.NewMeterProvider(ctx, configOTLP, resource)
+	if err != nil {
+		return nil, err
+	}
+	httpServiceHandler, err := rpc.NewHTTPServiceHandler(rpcHandler, tracerProvider, meterProvider)
+	if err != nil {
+		return nil, err
+	}
+	server := ports.NewServer(engine, serverInterface, httpServiceHandler, configConfig)
 	return server, nil
 }
+
+var (
+	_wireServiceNameValue    = components.ServiceName
+	_wireServiceVersionValue = components.ServiceVersion
+)

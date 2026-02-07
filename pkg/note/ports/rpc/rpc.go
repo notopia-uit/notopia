@@ -9,7 +9,6 @@ import (
 	"connectrpc.com/otelconnect"
 	"github.com/notopia-uit/notopia/pkg/note/app"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
-	"go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
@@ -43,7 +42,6 @@ var ErrCreateOtelInterceptor = errors.New("failed to create otel connect interce
 func NewHTTPServiceHandler(
 	rpcHandler pbconnect.NoteServiceHandler,
 	traceProvider *trace.TracerProvider,
-	logProvider *log.LoggerProvider,
 	meterProvider *metric.MeterProvider,
 ) (*HTTPServiceHandler, error) {
 	interceptor, err := otelconnect.NewInterceptor(

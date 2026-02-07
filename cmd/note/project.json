@@ -3,6 +3,14 @@
   "name": "note",
   "projectType": "application",
   "targets": {
+    "gen:wire": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "wire",
+        "cwd": "{projectRoot}"
+      },
+      "cache": false
+    },
     "build": {
       "executor": "nx:run-commands",
       "inputs": ["goFiles"],
@@ -10,7 +18,8 @@
       "options": {
         "command": "go build -o ./dist/note .",
         "cwd": "{projectRoot}"
-      }
+      },
+      "dependsOn": ["gen:wire", "^gen*", "^build*"]
     },
     "preview": {
       "executor": "nx:run-commands",
