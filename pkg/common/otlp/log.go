@@ -10,7 +10,11 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
-func InitLogExporter(ctx context.Context, cfg *config.OTLP, res *resource.Resource) (*sdk.LoggerProvider, error) {
+func NewLoggerProvider(
+	ctx context.Context,
+	cfg *config.OTLP,
+	res *resource.Resource,
+) (*sdk.LoggerProvider, error) {
 	var exporters []sdk.Exporter
 
 	if cfg.LogStdoutEnabled() {
@@ -35,16 +39,18 @@ func InitLogExporter(ctx context.Context, cfg *config.OTLP, res *resource.Resour
 		exporters = append(exporters, exporter)
 	}
 
-	otions := []sdk.LoggerProviderOption{
+	options := []sdk.LoggerProviderOption{
 		sdk.WithResource(res),
 	}
 
 	for _, exporter := range exporters {
-		otions = append(
-			otions,
+		options = append(
+			options,
 			sdk.WithProcessor(sdk.NewBatchProcessor(exporter)),
 		)
 	}
 
-	return sdk.NewLoggerProvider(otions...), nil
+	return sdk.NewLoggerProvider(options...), nil
 }
+
+var ProvideLoggerProvider = NewLoggerProvider

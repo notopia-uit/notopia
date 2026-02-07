@@ -3,6 +3,7 @@ package: note
 generate:
   gin-server: true
   models: true
+  strict-server: true
 output: ../../pkg/api/note/note.gen.go
 output-options:
   nullable-type: true

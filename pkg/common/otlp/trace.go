@@ -10,7 +10,11 @@ import (
 	sdk "go.opentelemetry.io/otel/sdk/trace"
 )
 
-func NewTracerProvider(ctx context.Context, cfg *config.OTLP, res *resource.Resource) (*sdk.TracerProvider, error) {
+func NewTracerProvider(
+	ctx context.Context,
+	cfg *config.OTLP,
+	res *resource.Resource,
+) (*sdk.TracerProvider, error) {
 	var exporters []sdk.SpanExporter
 
 	if cfg.TraceStdoutEnabled() {
@@ -48,3 +52,5 @@ func NewTracerProvider(ctx context.Context, cfg *config.OTLP, res *resource.Reso
 
 	return sdk.NewTracerProvider(options...), nil
 }
+
+var ProvideTracerProvider = NewTracerProvider

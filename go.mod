@@ -25,6 +25,7 @@ require (
 )
 
 require (
+	connectrpc.com/otelconnect v0.9.0 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/bytedance/sonic v1.15.0 // indirect
@@ -77,5 +78,3 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260128011058-8636f8732409 // indirect
 	google.golang.org/grpc v1.78.0 // indirect
 )
-
-replace github.com/google/wire => github.com/goforj/wire v1.1.0

@@ -1,12 +1,9 @@
 package app
 
-import (
-	"net/http"
+type App struct{}
 
-	"github.com/gin-gonic/gin"
-)
-
-type App struct {
-	GinServer  *gin.Engine
-	GRPCServer *http.Server
+func NewApp() *App {
+	return &App{}
 }
+
+var ProvideApp = NewApp

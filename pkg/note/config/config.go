@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -23,19 +24,29 @@ type Config struct {
 	Database *config.SQL  `json:"database" mapstructure:"database" validate:"required" yaml:"database"`
 }
 
-func ProvideConfig(validate *validator.Validate, v *viper.Viper) (*Config, error) {
+func NewConfig(validate *validator.Validate, v *viper.Viper) (*Config, error) {
 	v.SetDefault("server.port", 8081)
 
 	v.SetEnvPrefix("NOTOPIA_NOTE")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	v.SetConfigName("note.notopia.config")
+	v.AddConfigPath(".")
+
 	v.AutomaticEnv()
+	if err := v.ReadInConfig(); err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrReadFromFile, err)
+	}
 
 	var cfg Config
 	if err := v.Unmarshal(&cfg); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrUnmarshalConfig, err)
 	}
+
 	if err := validate.Struct(&cfg); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %v", ErrValidateConfig, err)
 	}
+
 	return &cfg, nil
 }
+
+var ProvideConfig = NewConfig

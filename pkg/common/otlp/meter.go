@@ -11,7 +11,11 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
-func InitMeterProvider(ctx context.Context, cfg *config.OTLP, res *resource.Resource) (*sdk.MeterProvider, error) {
+func NewMeterProvider(
+	ctx context.Context,
+	cfg *config.OTLP,
+	res *resource.Resource,
+) (*sdk.MeterProvider, error) {
 	var exporters []sdk.Exporter
 
 	if cfg.MeterStdoutEnabled() {
@@ -47,7 +51,7 @@ func InitMeterProvider(ctx context.Context, cfg *config.OTLP, res *resource.Reso
 				sdk.NewPeriodicReader(
 					exporter,
 					sdk.WithInterval(
-						time.Duration(cfg.MetricExportInterval())*time.Second,
+						cfg.MetricExportInterval()*time.Second,
 					),
 				),
 			),
@@ -56,3 +60,5 @@ func InitMeterProvider(ctx context.Context, cfg *config.OTLP, res *resource.Reso
 
 	return sdk.NewMeterProvider(options...), nil
 }
+
+var ProvideMeterProvider = NewMeterProvider

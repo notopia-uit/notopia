@@ -8,24 +8,29 @@ package main
 
 import (
 	"context"
-	"github.com/notopia-uit/notopia/pkg/note"
+	"github.com/notopia-uit/notopia/pkg/note/app"
 	"github.com/notopia-uit/notopia/pkg/note/components"
 	"github.com/notopia-uit/notopia/pkg/note/config"
+	"github.com/notopia-uit/notopia/pkg/note/ports"
+	"github.com/notopia-uit/notopia/pkg/note/ports/http"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
 	"github.com/spf13/viper"
 )
 
 // Injectors from wire.go:
 
-func InitializeServer(ctx context.Context) (*note.Server, error) {
-	engine := note.ProvideGinEngine()
+func InitializeServer(ctx context.Context) (*ports.Server, error) {
+	engine := http.NewGin()
+	appApp := app.NewApp()
+	strictServer := http.newStrictServer(appApp)
+	serverInterface := http.NewServer(strictServer)
 	unimplementedNoteServiceHandler := &pbconnect.UnimplementedNoteServiceHandler{}
 	validate := components.ProvideValidate()
 	viperViper := viper.New()
-	configConfig, err := config.ProvideConfig(validate, viperViper)
+	configConfig, err := config.NewConfig(validate, viperViper)
 	if err != nil {
 		return nil, err
 	}
-	server := note.ProvideServer(engine, unimplementedNoteServiceHandler, configConfig)
+	server := ports.NewServer(engine, serverInterface, unimplementedNoteServiceHandler, configConfig)
 	return server, nil
 }

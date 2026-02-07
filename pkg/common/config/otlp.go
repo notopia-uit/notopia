@@ -1,5 +1,7 @@
 package config
 
+import "time"
+
 type OTLPTrace struct {
 	Enabled    bool        `json:"enabled"     mapstructure:"enabled"     validate:""             yaml:"enabled"`
 	SampleRate float64     `json:"sample_rate" mapstructure:"sample_rate" validate:"gte=0,lte=1"  yaml:"sample_rate"`
@@ -20,10 +22,10 @@ type OTLPLog struct {
 }
 
 type OTLPMeter struct {
-	Enabled  bool        `json:"enabled"         mapstructure:"enabled"         validate:""                      yaml:"enabled"`
-	GRPC     *OTLPRemote `json:"grpc"            mapstructure:"grpc"            validate:"omitnil,dive"          yaml:"grpc"`
-	Stdout   bool        `json:"stdout"          mapstructure:"stdout"          validate:""                      yaml:"stdout"`
-	Interval int         `json:"export_interval" mapstructure:"export_interval" validate:"required_with=Enabled" yaml:"export_interval"`
+	Enabled  bool          `json:"enabled"         mapstructure:"enabled"         validate:""                      yaml:"enabled"`
+	GRPC     *OTLPRemote   `json:"grpc"            mapstructure:"grpc"            validate:"omitnil,dive"          yaml:"grpc"`
+	Stdout   bool          `json:"stdout"          mapstructure:"stdout"          validate:""                      yaml:"stdout"`
+	Interval time.Duration `json:"export_interval" mapstructure:"export_interval" validate:"required_with=Enabled" yaml:"export_interval"`
 }
 
 type OTLP struct {
@@ -98,7 +100,7 @@ func (o *OTLP) MeterStdoutEnabled() bool {
 	return o.Meter.Stdout
 }
 
-func (o *OTLP) MetricExportInterval() int {
+func (o *OTLP) MetricExportInterval() time.Duration {
 	if o.Meter != nil && o.Meter.Interval > 0 {
 		return o.Meter.Interval
 	}

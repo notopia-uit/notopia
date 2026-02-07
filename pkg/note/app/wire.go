@@ -2,4 +2,6 @@ package app
 
 import "github.com/goforj/wire"
 
-var ProviderSet = wire.NewSet(NewApp)
+var ProviderSet = wire.NewSet(
+	ProvideApp,
+)
