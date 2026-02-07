@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://www.schemastore.org/loki.json
+auth_enabled: false
+
+analytics:
+  reporting_enabled: false
+
+ingester:
+  chunk_idle_period: 2m
+  chunk_retain_period: 30s
+  max_chunk_age: 1h
+  chunk_encoding: snappy
+
+limits_config:
+  enforce_metric_name: false
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+  max_cache_freshness_per_query: 10m
+
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h

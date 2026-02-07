@@ -11,3 +11,8 @@ include:
   - ./infrastructure/redpanda.yaml
   - ./infrastructure/traefik.yaml
   - ./services/note.yaml
+  - ./monitoring/grafana.yaml
+  - ./monitoring/prometheus.yaml
+  - ./monitoring/loki.yaml
+  - ./monitoring/tempo.yaml
+  - ./monitoring/alloy.yaml

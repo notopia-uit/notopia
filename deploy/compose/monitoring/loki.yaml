@@ -1,0 +1,24 @@
+# vim:ft=yaml.docker-compose:
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  loki:
+    container_name: notopia-loki
+    image: grafana/loki:3.6.5
+    command:
+      - -config.file=/etc/loki/local-config.yaml
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - ./monitoring/loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.loki.rule: Host(`loki.notopia.localhost`)
+      traefik.http.routers.loki.entrypoints: web
+      traefik.http.services.loki.loadbalancer.server.port: '3100'
+    profiles:
+      - monitoring
+    restart: unless-stopped
+
+volumes:
+  loki_data:

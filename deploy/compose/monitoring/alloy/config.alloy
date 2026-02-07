@@ -1,0 +1,98 @@
+logging {
+	level  = "info"
+	format = "logfmt"
+}
+
+discovery.docker "containers" {
+	host = "unix:///var/run/docker.sock"
+}
+
+prometheus.scrape "docker_engine" {
+	targets    = [{"__address__" = "host.docker.internal:9323", "job" = "docker"}]
+	forward_to = [prometheus.remote_write.prometheus.receiver]
+}
+
+prometheus.scrape "containers" {
+	targets    = discovery.docker.containers.targets
+	forward_to = [prometheus.remote_write.prometheus.receiver]
+}
+
+prometheus.remote_write "prometheus" {
+	endpoint {
+		url = "http://prometheus:9090/api/v1/write"
+	}
+}
+
+loki.source.docker "logs" {
+	host       = "unix:///var/run/docker.sock"
+	targets    = discovery.docker.containers.targets
+	forward_to = [loki.relabel.logs.receiver]
+}
+
+loki.relabel "logs" {
+	forward_to = [loki.write.loki.receiver]
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		regex         = "/(.*)"
+		target_label  = "container_name"
+	}
+}
+
+loki.write "loki" {
+	endpoint {
+		url = "http://loki:3100/loki/api/v1/push"
+	}
+}
+
+otelcol.receiver.otlp "default" {
+	grpc {
+		endpoint = "0.0.0.0:4317"
+	}
+
+	http {
+		endpoint = "0.0.0.0:4318"
+	}
+
+	output {
+		metrics = [otelcol.processor.resourcedetection.docker.input]
+		logs    = [otelcol.processor.resourcedetection.docker.input]
+		traces  = [otelcol.processor.resourcedetection.docker.input]
+	}
+}
+
+otelcol.processor.resourcedetection "docker" {
+	detectors = ["docker", "env"]
+
+	output {
+		metrics = [otelcol.processor.batch.default.input]
+		logs    = [otelcol.processor.batch.default.input]
+		traces  = [otelcol.processor.batch.default.input]
+	}
+}
+
+otelcol.processor.batch "default" {
+	output {
+		metrics = [otelcol.exporter.prometheus.prometheus.input]
+		logs    = [otelcol.exporter.loki.loki.input]
+		traces  = [otelcol.exporter.otlp.tempo.input]
+	}
+}
+
+otelcol.exporter.prometheus "prometheus" {
+	forward_to = [prometheus.remote_write.prometheus.receiver]
+}
+
+otelcol.exporter.loki "loki" {
+	forward_to = [loki.write.loki.receiver]
+}
+
+otelcol.exporter.otlp "tempo" {
+	client {
+		endpoint = "http://tempo:4317"
+
+		tls {
+			insecure = true
+		}
+	}
+}

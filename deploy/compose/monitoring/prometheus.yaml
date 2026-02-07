@@ -1,0 +1,30 @@
+# vim:ft=yaml.docker-compose:
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  prometheus:
+    container_name: notopia-prometheus
+    image: prom/prometheus:v3.9.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-remote-write-receiver
+      - --storage.tsdb.retention.time=7d
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+    ports:
+      - 9090:9090
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus_data:/prometheus
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.prometheus.rule: Host(`prometheus.notopia.localhost`)
+      traefik.http.routers.prometheus.entrypoints: web
+      traefik.http.services.prometheus.loadbalancer.server.port: '9090'
+    profiles:
+      - monitoring
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:

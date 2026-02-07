@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://www.schemastore.org/prometheus.rules.json
+groups:
+  - name: notopia_alerts
+    interval: 30s
+    rules:
+      - alert: HighMemoryUsage
+        expr: 'container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.8'
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High memory usage detected'
+          description: 'Container {{ $labels.container_name }} memory usage is above 80%'
+
+      - alert: HighCpuUsage
+        expr: 'rate(container_cpu_usage_seconds_total[5m]) > 0.8'
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High CPU usage detected'
+          description: 'Container {{ $labels.container_name }} CPU usage is above 80%'
