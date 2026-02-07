@@ -11,3 +11,6 @@ vite.config.*.timestamp*
 out
 
 coverage.out
+
+# go bin, usually run with nx won't generate this, but if you accidentally run go build
+note

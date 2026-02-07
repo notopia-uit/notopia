@@ -66,4 +66,12 @@ map("n", "<localleader>b", function()
   end)
 end, { desc = "LSP | Switch buildFlags", silent = true })
 
+map("n", "<localleader>lr", function()
+  local clients = lsp.get_clients({ name = "gopls" })
+  for client in vim.iter(clients) do ---@cast client vim.lsp.Client
+    client:stop()
+  end
+  lsp.start(lsp.config["gopls"])
+end, { desc = "LSP | Restart gopls", silent = true })
+
 vim.o.backupcopy = "yes" -- https://github.com/nrwl/nx/issues/20622

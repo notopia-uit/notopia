@@ -7,7 +7,8 @@ import (
 
 var ProviderSet = wire.NewSet(
 	ProvideGin,
+	ProvideGinSlog,
+	ProvideServer,
 	ProvideStrictServer,
 	wire.Bind(new(note.StrictServerInterface), new(*strictServer)),
-	ProvideServer,
 )

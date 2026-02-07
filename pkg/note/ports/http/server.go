@@ -9,7 +9,7 @@ type strictServer struct {
 	app *app.App
 }
 
-func newStrictServer(app *app.App) *strictServer {
+func NewStrictServer(app *app.App) *strictServer {
 	return &strictServer{
 		app: app,
 	}
@@ -17,7 +17,7 @@ func newStrictServer(app *app.App) *strictServer {
 
 var _ note.StrictServerInterface = (*strictServer)(nil)
 
-var ProvideStrictServer = newStrictServer
+var ProvideStrictServer = NewStrictServer
 
 func NewServer(
 	strictServer note.StrictServerInterface,

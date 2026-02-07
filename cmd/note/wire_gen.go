@@ -20,39 +20,55 @@ import (
 
 // Injectors from wire.go:
 
-func InitializeServer(ctx context.Context) (*ports.Server, error) {
-	engine := http.NewGin()
-	appApp := app.NewApp()
-	strictServer := http.newStrictServer(appApp)
-	serverInterface := http.NewServer(strictServer)
-	rpcHandler := rpc.NewRPCHandler(appApp)
+func InitializeServer(ctx context.Context) (*ports.Server, func(), error) {
+	serviceName := _wireServiceNameValue
 	validate := components.ProvideValidate()
 	viperViper := viper.New()
 	configConfig, err := config.NewConfig(validate, viperViper)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	configOTLP := configConfig.OTLP
-	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otlp.NewResource(serviceName, serviceVersion)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	tracerProvider, err := otlp.NewTracerProvider(ctx, configOTLP, resource)
+	loggerProvider, cleanup, err := otlp.NewLoggerProvider(ctx, configOTLP, resource)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	meterProvider, err := otlp.NewMeterProvider(ctx, configOTLP, resource)
+	logger := otlp.NewSlog(serviceName, configOTLP, loggerProvider)
+	handlerFunc := http.NewSlogHandler(logger)
+	engine := http.NewGin(handlerFunc)
+	appApp := app.NewApp()
+	strictServer := http.NewStrictServer(appApp)
+	serverInterface := http.NewServer(strictServer)
+	rpcHandler := rpc.NewRPCHandler(appApp)
+	tracerProvider, cleanup2, err := otlp.NewTracerProvider(ctx, configOTLP, resource)
 	if err != nil {
-		return nil, err
+		cleanup()
+		return nil, nil, err
+	}
+	meterProvider, cleanup3, err := otlp.NewMeterProvider(ctx, configOTLP, resource)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
 	}
 	httpServiceHandler, err := rpc.NewHTTPServiceHandler(rpcHandler, tracerProvider, meterProvider)
 	if err != nil {
-		return nil, err
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
 	}
-	server := ports.NewServer(engine, serverInterface, httpServiceHandler, configConfig)
-	return server, nil
+	server := ports.NewServer(engine, serverInterface, httpServiceHandler, logger, configConfig)
+	return server, func() {
+		cleanup3()
+		cleanup2()
+		cleanup()
+	}, nil
 }
 
 var (

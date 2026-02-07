@@ -1,6 +1,7 @@
 package ports
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,8 +18,11 @@ func NewServer(
 	ginEngine *gin.Engine,
 	httpHandler note.ServerInterface,
 	httpRpcHandler *rpc.HTTPServiceHandler,
+	logger *slog.Logger,
 	cfg *config.Config,
 ) *Server {
+	slog.SetDefault(logger)
+
 	s := &Server{}
 	note.RegisterHandlers(ginEngine, httpHandler)
 	ginEngine.Any(httpRpcHandler.Path+"*", gin.WrapH(httpRpcHandler.Handler))

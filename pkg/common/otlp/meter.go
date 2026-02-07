@@ -2,6 +2,7 @@ package otlp
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/notopia-uit/notopia/pkg/common/config"
@@ -15,13 +16,13 @@ func NewMeterProvider(
 	ctx context.Context,
 	cfg *config.OTLP,
 	res *resource.Resource,
-) (*sdk.MeterProvider, error) {
+) (*sdk.MeterProvider, func(), error) {
 	var exporters []sdk.Exporter
 
 	if cfg.MeterStdoutEnabled() {
 		stdoutExp, err := stdoutmetric.New(stdoutmetric.WithPrettyPrint())
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		exporters = append(exporters, stdoutExp)
 	}
@@ -35,7 +36,7 @@ func NewMeterProvider(
 		}
 		exporter, err := otlpmetricgrpc.New(ctx, opts...)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		exporters = append(exporters, exporter)
 	}
@@ -58,7 +59,15 @@ func NewMeterProvider(
 		)
 	}
 
-	return sdk.NewMeterProvider(options...), nil
+	mp := sdk.NewMeterProvider(options...)
+
+	cleanup := func() {
+		if err := mp.Shutdown(ctx); err != nil {
+			log.Printf("Error shutting down MeterProvider: %v", err)
+		}
+	}
+
+	return mp, cleanup, nil
 }
 
 var ProvideMeterProvider = NewMeterProvider

@@ -1,6 +1,10 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	"go.opentelemetry.io/otel/log"
+)
 
 type OTLPTrace struct {
 	Enabled    bool        `json:"enabled"     mapstructure:"enabled"     validate:""             yaml:"enabled"`
@@ -19,6 +23,19 @@ type OTLPLog struct {
 	Level   string      `json:"level"   mapstructure:"level"   validate:"omitempty,oneof=debug info warn error" yaml:"level"`
 	GRPC    *OTLPRemote `json:"grpc"    mapstructure:"grpc"    validate:"omitnil,dive"                          yaml:"grpc"`
 	Stdout  bool        `json:"stdout"  mapstructure:"stdout"  validate:""                                      yaml:"stdout"`
+}
+
+func (o *OTLPLog) GetOTelSeverity() log.Severity {
+	switch o.Level {
+	case "debug":
+		return log.SeverityDebug
+	case "warn":
+		return log.SeverityWarn
+	case "error":
+		return log.SeverityError
+	default:
+		return log.SeverityInfo
+	}
 }
 
 type OTLPMeter struct {

@@ -6,5 +6,6 @@ var ProviderSet = wire.NewSet(
 	ProvideLoggerProvider,
 	ProvideMeterProvider,
 	ProvideResource,
+	ProvideSlog,
 	ProvideTracerProvider,
 )

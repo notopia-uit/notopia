@@ -14,13 +14,13 @@ func NewTracerProvider(
 	ctx context.Context,
 	cfg *config.OTLP,
 	res *resource.Resource,
-) (*sdk.TracerProvider, error) {
+) (*sdk.TracerProvider, func(), error) {
 	var exporters []sdk.SpanExporter
 
 	if cfg.TraceStdoutEnabled() {
 		stdoutExp, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		exporters = append(exporters, stdoutExp)
 	}
@@ -34,7 +34,7 @@ func NewTracerProvider(
 		}
 		exporter, err := otlptracegrpc.New(ctx, opts...)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		exporters = append(exporters, exporter)
 	}
@@ -50,7 +50,16 @@ func NewTracerProvider(
 		options = append(options, sdk.WithBatcher(exporter))
 	}
 
-	return sdk.NewTracerProvider(options...), nil
+	tp := sdk.NewTracerProvider(options...)
+
+	cleanup := func() {
+		_ = tp.Shutdown(ctx)
+		for _, exporter := range exporters {
+			_ = exporter.Shutdown(ctx)
+		}
+	}
+
+	return tp, cleanup, nil
 }
 
 var ProvideTracerProvider = NewTracerProvider

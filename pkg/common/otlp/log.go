@@ -2,25 +2,45 @@ package otlp
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/notopia-uit/notopia/pkg/common/config"
+	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
+	"go.opentelemetry.io/otel/log"
 	sdk "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
+
+// HACK: This struct created by AI
+type severityFilter struct {
+	sdk.Processor
+	minSeverity log.Severity
+}
+
+func (f *severityFilter) Enabled(_ context.Context, param sdk.EnabledParameters) bool {
+	return param.Severity >= f.minSeverity
+}
+
+func (f *severityFilter) OnEmit(ctx context.Context, record *sdk.Record) error {
+	if record.Severity() < f.minSeverity {
+		return nil
+	}
+	return f.Processor.OnEmit(ctx, record)
+}
 
 func NewLoggerProvider(
 	ctx context.Context,
 	cfg *config.OTLP,
 	res *resource.Resource,
-) (*sdk.LoggerProvider, error) {
+) (*sdk.LoggerProvider, func(), error) {
 	var exporters []sdk.Exporter
 
 	if cfg.LogStdoutEnabled() {
 		stdoutExp, err := stdoutlog.New(stdoutlog.WithPrettyPrint())
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		exporters = append(exporters, stdoutExp)
 	}
@@ -34,7 +54,7 @@ func NewLoggerProvider(
 		}
 		exporter, err := otlploggrpc.New(ctx, opts...)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		exporters = append(exporters, exporter)
 	}
@@ -44,13 +64,39 @@ func NewLoggerProvider(
 	}
 
 	for _, exporter := range exporters {
+		processor := sdk.NewBatchProcessor(exporter)
+		filter := &severityFilter{
+			minSeverity: cfg.Log.GetOTelSeverity(),
+			Processor:   processor,
+		}
+
 		options = append(
 			options,
-			sdk.WithProcessor(sdk.NewBatchProcessor(exporter)),
+			sdk.WithProcessor(filter),
 		)
 	}
 
-	return sdk.NewLoggerProvider(options...), nil
+	lp := sdk.NewLoggerProvider(options...)
+
+	cleanup := func() {
+		_ = lp.Shutdown(ctx)
+	}
+
+	return lp, cleanup, nil
 }
 
 var ProvideLoggerProvider = NewLoggerProvider
+
+func NewSlog(
+	serviceName ServiceName,
+	cfg *config.OTLP,
+	provider *sdk.LoggerProvider,
+) *slog.Logger {
+	logger := otelslog.NewLogger(
+		serviceName.String(),
+		otelslog.WithLoggerProvider(provider),
+	)
+	return logger
+}
+
+var ProvideSlog = NewSlog

@@ -8,7 +8,8 @@ import (
 
 func main() {
 	ctx := context.Background()
-	server, err := InitializeServer(ctx)
+	server, cleanup, err := InitializeServer(ctx)
+	defer cleanup()
 	if err != nil {
 		slog.Error("failed to initialize server", slog.String("error", err.Error()))
 		os.Exit(1)
