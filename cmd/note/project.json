@@ -72,7 +72,6 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "goose",
-        "forwardAllArgs": true,
         "cwd": "{projectRoot}"
       }
     },
@@ -80,7 +79,6 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "goose create",
-        "forwardAllArgs": true,
         "cwd": "{projectRoot}"
       }
     },
@@ -88,7 +86,6 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "goose up",
-        "forwardAllArgs": true,
         "cwd": "{projectRoot}"
       }
     },
@@ -96,7 +93,6 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "goose down",
-        "forwardAllArgs": true,
         "cwd": "{projectRoot}"
       }
     },
@@ -104,7 +100,6 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "goose validate",
-        "forwardAllArgs": true,
         "cwd": "{projectRoot}"
       }
     },

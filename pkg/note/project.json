@@ -5,14 +5,15 @@
   "targets": {
     "gen:sqlc": {
       "inputs": [
-        "{workspaceRoot}/migration/note/",
-        "{workspaceRoot}/sqlc.yaml",
-        "{projectRoot}/infra/persistence/pgsqlc/*.sql"
+        "{projectRoot}/infra/persistence/pgsqlc/*.sql",
+        "{projectRoot}/migration/",
+        "{projectRoot}/sqlc.yaml"
       ],
       "outputs": ["{projectRoot}/infra/persistence/pgsqlc/*.go"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "sqlc generate"
+        "command": "sqlc generate",
+        "cwd": "{projectRoot}"
       },
       "cache": true,
       "parallelism": false
