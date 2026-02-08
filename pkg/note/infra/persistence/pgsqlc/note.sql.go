@@ -11,7 +11,7 @@ import (
 
 const getNote = `-- name: GetNote :one
 SELECT
-  id, title, content, created_at, updated_at, deleted_at
+  id, title, created_at, updated_at, deleted_at
 FROM
   notes
 WHERE
@@ -25,7 +25,6 @@ func (q *Queries) GetNote(ctx context.Context, id int32) (*Note, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
-		&i.Content,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,

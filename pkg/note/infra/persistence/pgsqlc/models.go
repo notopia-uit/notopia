@@ -11,7 +11,6 @@ import (
 type Note struct {
 	ID        int32
 	Title     string
-	Content   *string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
