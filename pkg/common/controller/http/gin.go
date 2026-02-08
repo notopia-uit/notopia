@@ -5,7 +5,7 @@ import (
 
 	ginslog "github.com/gin-contrib/slog"
 	"github.com/gin-gonic/gin"
-	"github.com/notopia-uit/notopia/pkg/common/otlp"
+	"github.com/notopia-uit/notopia/pkg/common/metadata"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/metric"
@@ -37,7 +37,7 @@ var ProvideGinSlogHandler = NewGinSlogHandler
 type OtelGinHandlerFunc gin.HandlerFunc
 
 func NewOtelGinHandler(
-	serviceName otlp.ServiceName,
+	serviceName metadata.ServiceName,
 	meterProvider *metric.MeterProvider,
 	traceProvider *trace.TracerProvider,
 ) OtelGinHandlerFunc {
@@ -55,9 +55,6 @@ func NewOtelGinHandler(
 var ProvideOtelGinHandler = NewOtelGinHandler
 
 func NewGin(
-	serviceName otlp.ServiceName,
-	meterProvider *metric.MeterProvider,
-	traceProvider *trace.TracerProvider,
 	slogHandler GinSlogHandlerFunc,
 	otelHandler OtelGinHandlerFunc,
 ) *gin.Engine {

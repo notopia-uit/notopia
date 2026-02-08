@@ -5,6 +5,7 @@
   "targets": {
     "gen:wire": {
       "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/wire_gen.go"],
       "options": {
         "command": "wire",
         "cwd": "{projectRoot}"

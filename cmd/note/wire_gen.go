@@ -9,11 +9,12 @@ package main
 import (
 	"context"
 	http2 "github.com/notopia-uit/notopia/pkg/common/controller/http"
-	"github.com/notopia-uit/notopia/pkg/common/otlp"
+	"github.com/notopia-uit/notopia/pkg/note"
 	"github.com/notopia-uit/notopia/pkg/note/app"
 	"github.com/notopia-uit/notopia/pkg/note/component"
 	"github.com/notopia-uit/notopia/pkg/note/config"
 	"github.com/notopia-uit/notopia/pkg/note/controller/http"
+	"github.com/notopia-uit/notopia/pkg/otel"
 	"github.com/spf13/viper"
 )
 
@@ -27,31 +28,34 @@ func InitializeServer(ctx context.Context) (*http.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	configOTLP := configConfig.OTLP
+	otlp := configConfig.OTLP
+	otlpLog := otlp.Log
 	serviceVersion := _wireServiceVersionValue
-	resource, err := otlp.NewResource(serviceName, serviceVersion)
+	resource, err := otel.NewResource(serviceName, serviceVersion)
 	if err != nil {
 		return nil, nil, err
 	}
-	meterProvider, cleanup, err := otlp.NewMeterProvider(ctx, configOTLP, resource)
+	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, otlpLog, resource)
 	if err != nil {
 		return nil, nil, err
 	}
-	tracerProvider, cleanup2, err := otlp.NewTracerProvider(ctx, configOTLP, resource)
+	logger := otel.NewSlog(serviceName, loggerProvider)
+	ginSlogHandlerFunc := http2.NewGinSlogHandler(logger)
+	otlpMeter := otlp.Meter
+	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, otlpMeter, resource)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	loggerProvider, cleanup3, err := otlp.NewLoggerProvider(ctx, configOTLP, resource)
+	otlpTrace := otlp.Trace
+	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, otlpTrace, resource)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	logger := otlp.NewSlog(serviceName, configOTLP, loggerProvider)
-	ginSlogHandlerFunc := http2.NewGinSlogHandler(logger)
 	otelGinHandlerFunc := http2.NewOtelGinHandler(serviceName, meterProvider, tracerProvider)
-	engine := http2.NewGin(serviceName, meterProvider, tracerProvider, ginSlogHandlerFunc, otelGinHandlerFunc)
+	engine := http2.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc)
 	appApp := app.NewApp()
 	strictHTTPHandler := http.NewStrictHTTPHandler(appApp)
 	serverInterface := http.NewHTTPHandler(strictHTTPHandler)
@@ -63,8 +67,9 @@ func InitializeServer(ctx context.Context) (*http.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	server := http.NewServer(engine, serverInterface, rpchttpHandlerRegister, logger, configConfig)
-	return server, func() {
+	server := configConfig.Server
+	httpServer := http.NewServer(engine, serverInterface, rpchttpHandlerRegister, logger, server)
+	return httpServer, func() {
 		cleanup3()
 		cleanup2()
 		cleanup()
@@ -72,6 +77,6 @@ func InitializeServer(ctx context.Context) (*http.Server, func(), error) {
 }
 
 var (
-	_wireServiceNameValue    = components.ServiceName
-	_wireServiceVersionValue = components.ServiceVersion
+	_wireServiceNameValue    = note.ServiceName
+	_wireServiceVersionValue = note.ServiceVersion
 )

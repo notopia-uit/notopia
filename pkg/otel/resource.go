@@ -1,29 +1,17 @@
-package otlp
+package otel
 
 import (
 	"os"
 
+	"github.com/notopia-uit/notopia/pkg/common/metadata"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
 )
 
-type (
-	ServiceName    string
-	ServiceVersion string
-)
-
-func (sn *ServiceName) String() string {
-	return string(*sn)
-}
-
-func (sv *ServiceVersion) String() string {
-	return string(*sv)
-}
-
 func NewResource(
-	serviceName ServiceName,
-	serviceVersion ServiceVersion,
+	serviceName metadata.ServiceName,
+	serviceVersion metadata.ServiceVersion,
 ) (*resource.Resource, error) {
 	attrs := []attribute.KeyValue{
 		semconv.ServiceName(serviceName.String()),

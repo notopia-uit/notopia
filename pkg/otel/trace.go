@@ -1,23 +1,29 @@
-package otlp
+package otel
 
 import (
 	"context"
 
-	"github.com/notopia-uit/notopia/pkg/common/config"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdk "go.opentelemetry.io/otel/sdk/trace"
 )
 
+type TraceConfig interface {
+	ShouldExportStdout() bool
+	ShouldExportGRPC() bool
+	GetGRPCRemote() *Remote
+	GetSampleRate() float64
+}
+
 func NewTracerProvider(
 	ctx context.Context,
-	cfg *config.OTLP,
+	cfg TraceConfig,
 	res *resource.Resource,
 ) (*sdk.TracerProvider, func(), error) {
 	var exporters []sdk.SpanExporter
 
-	if cfg.TraceStdoutEnabled() {
+	if cfg.ShouldExportStdout() {
 		stdoutExp, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
 		if err != nil {
 			return nil, nil, err
@@ -25,11 +31,12 @@ func NewTracerProvider(
 		exporters = append(exporters, stdoutExp)
 	}
 
-	if remoteCfg, ok := cfg.TraceEndpoint(); ok {
+	if cfg.ShouldExportGRPC() {
+		remote := cfg.GetGRPCRemote()
 		opts := []otlptracegrpc.Option{
-			otlptracegrpc.WithEndpoint(remoteCfg.Endpoint),
+			otlptracegrpc.WithEndpoint(remote.Endpoint),
 		}
-		if !remoteCfg.InSecure {
+		if !remote.Insecure {
 			opts = append(opts, otlptracegrpc.WithInsecure())
 		}
 		exporter, err := otlptracegrpc.New(ctx, opts...)
@@ -39,7 +46,7 @@ func NewTracerProvider(
 		exporters = append(exporters, exporter)
 	}
 
-	sampler := sdk.ParentBased(sdk.TraceIDRatioBased(cfg.Trace.SampleRate))
+	sampler := sdk.ParentBased(sdk.TraceIDRatioBased(cfg.GetSampleRate()))
 
 	options := []sdk.TracerProviderOption{
 		sdk.WithResource(res),

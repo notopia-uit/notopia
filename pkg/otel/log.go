@@ -1,10 +1,10 @@
-package otlp
+package otel
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/notopia-uit/notopia/pkg/common/config"
+	"github.com/notopia-uit/notopia/pkg/common/metadata"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
@@ -30,14 +30,21 @@ func (f *severityFilter) OnEmit(ctx context.Context, record *sdk.Record) error {
 	return f.Processor.OnEmit(ctx, record)
 }
 
+type LogConfig interface {
+	ShouldExportStdout() bool
+	ShouldExportGRPC() bool
+	GetGRPCRemote() *Remote
+	GetMinSecurity() log.Severity
+}
+
 func NewLoggerProvider(
 	ctx context.Context,
-	cfg *config.OTLP,
+	cfg LogConfig,
 	res *resource.Resource,
 ) (*sdk.LoggerProvider, func(), error) {
 	var exporters []sdk.Exporter
 
-	if cfg.LogStdoutEnabled() {
+	if cfg.ShouldExportStdout() {
 		stdoutExp, err := stdoutlog.New(stdoutlog.WithPrettyPrint())
 		if err != nil {
 			return nil, nil, err
@@ -45,11 +52,12 @@ func NewLoggerProvider(
 		exporters = append(exporters, stdoutExp)
 	}
 
-	if remoteCfg, ok := cfg.LogEndpoint(); ok {
+	if cfg.ShouldExportGRPC() {
+		remote := cfg.GetGRPCRemote()
 		opts := []otlploggrpc.Option{
-			otlploggrpc.WithEndpoint(remoteCfg.Endpoint),
+			otlploggrpc.WithEndpoint(remote.Endpoint),
 		}
-		if !remoteCfg.InSecure {
+		if !remote.Insecure {
 			opts = append(opts, otlploggrpc.WithInsecure())
 		}
 		exporter, err := otlploggrpc.New(ctx, opts...)
@@ -66,7 +74,7 @@ func NewLoggerProvider(
 	for _, exporter := range exporters {
 		processor := sdk.NewBatchProcessor(exporter)
 		filter := &severityFilter{
-			minSeverity: cfg.Log.GetOTelSeverity(),
+			minSeverity: cfg.GetMinSecurity(),
 			Processor:   processor,
 		}
 
@@ -88,8 +96,7 @@ func NewLoggerProvider(
 var ProvideLoggerProvider = NewLoggerProvider
 
 func NewSlog(
-	serviceName ServiceName,
-	cfg *config.OTLP,
+	serviceName metadata.ServiceName,
 	provider *sdk.LoggerProvider,
 ) *slog.Logger {
 	logger := otelslog.NewLogger(

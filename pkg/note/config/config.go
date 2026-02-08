@@ -21,17 +21,23 @@ func (s *Server) Address() string {
 
 type Config struct {
 	Server   *Server      `json:"server"   mapstructure:"server"   validate:"required" yaml:"server"`
-	OTLP     *config.OTLP `json:"otlp"     mapstructure:"otlp"     validate:"required" yaml:"otlp"`
-	Database *config.SQL  `json:"database" mapstructure:"database" validate:"required" yaml:"database"`
+	OTLP     *config.OTLP `json:"otlp"     mapstructure:"otlp"     validate:"omitnil"  yaml:"otlp"`
+	Database *config.SQL  `json:"database" mapstructure:"database" validate:"omitnil"  yaml:"database"`
 }
 
-func NewConfig(validate *validator.Validate, v *viper.Viper) (*Config, error) {
-	v.SetDefault("server.port", 8081)
-
+func NewConfig(
+	validate *validator.Validate,
+	v *viper.Viper,
+) (*Config, error) {
 	v.SetEnvPrefix("NOTOPIA_NOTE")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
 	v.SetConfigName("note.notopia.config")
 	v.AddConfigPath(".")
+
+	v.SetDefault("server.port", 8081)
+	config.OTLPViperSetDefault(v, "otlp")
+	config.SQLViperSetDefault(v, "database")
 
 	v.AutomaticEnv()
 	if err := v.ReadInConfig(); err == nil {

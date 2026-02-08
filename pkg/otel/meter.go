@@ -1,25 +1,31 @@
-package otlp
+package otel
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"time"
 
-	"github.com/notopia-uit/notopia/pkg/common/config"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
 	sdk "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
+type MeterConfig interface {
+	ShouldExportStdout() bool
+	ShouldExportGRPC() bool
+	GetGRPCRemote() *Remote
+	GetExportInterval() time.Duration
+}
+
 func NewMeterProvider(
 	ctx context.Context,
-	cfg *config.OTLP,
+	cfg MeterConfig,
 	res *resource.Resource,
 ) (*sdk.MeterProvider, func(), error) {
 	var exporters []sdk.Exporter
 
-	if cfg.MeterStdoutEnabled() {
+	if cfg.ShouldExportStdout() {
 		stdoutExp, err := stdoutmetric.New(stdoutmetric.WithPrettyPrint())
 		if err != nil {
 			return nil, nil, err
@@ -27,11 +33,12 @@ func NewMeterProvider(
 		exporters = append(exporters, stdoutExp)
 	}
 
-	if remoteCfg, ok := cfg.MeterEndpoint(); ok {
+	if cfg.ShouldExportGRPC() {
+		remote := cfg.GetGRPCRemote()
 		opts := []otlpmetricgrpc.Option{
-			otlpmetricgrpc.WithEndpoint(remoteCfg.Endpoint),
+			otlpmetricgrpc.WithEndpoint(remote.Endpoint),
 		}
-		if !remoteCfg.InSecure {
+		if !remote.Insecure {
 			opts = append(opts, otlpmetricgrpc.WithInsecure())
 		}
 		exporter, err := otlpmetricgrpc.New(ctx, opts...)
@@ -51,9 +58,7 @@ func NewMeterProvider(
 			sdk.WithReader(
 				sdk.NewPeriodicReader(
 					exporter,
-					sdk.WithInterval(
-						cfg.MetricExportInterval()*time.Second,
-					),
+					sdk.WithInterval(cfg.GetExportInterval()),
 				),
 			),
 		)
@@ -63,7 +68,10 @@ func NewMeterProvider(
 
 	cleanup := func() {
 		if err := mp.Shutdown(ctx); err != nil {
-			log.Printf("Error shutting down MeterProvider: %v", err)
+			slog.Error(
+				"Error shutting down MeterProvider",
+				slog.String("error", err.Error()),
+			)
 		}
 	}
 

@@ -23,7 +23,7 @@ func NewServer(
 	httpHandler IHTTPHandler,
 	rpcHTTPHandlerRegister *RPCHTTPHandlerRegister,
 	logger *slog.Logger,
-	cfg *config.Config,
+	cfg *config.Server,
 ) *Server {
 	slog.SetDefault(logger)
 
@@ -35,7 +35,7 @@ func NewServer(
 	)
 
 	s.server = &http.Server{
-		Addr:    cfg.Server.Address(),
+		Addr:    cfg.Address(),
 		Handler: ginEngine,
 	}
 	return s

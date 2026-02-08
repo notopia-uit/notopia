@@ -1,4 +1,4 @@
-package otlp
+package otel
 
 import "github.com/goforj/wire"
 

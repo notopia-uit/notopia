@@ -16,23 +16,23 @@ func TestPostGresConfigValidation(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "valid DSN with postgres prefix",
+			name: "valid URL with postgres prefix",
 			cfg: config.SQL{
-				DSN: "postgres://user:password@localhost:5432/dbname",
+				URL: "postgres://user:password@localhost:5432/dbname",
 			},
 			wantErr: false,
 		},
 		{
-			name: "invalid DSN - missing postgres prefix",
+			name: "invalid URL - missing postgres prefix",
 			cfg: config.SQL{
-				DSN: "mysql://user:password@localhost:5432/dbname",
+				URL: "mysql://user:password@localhost:5432/dbname",
 			},
 			wantErr: true,
 		},
 		{
-			name: "invalid DSN - empty string requires Host",
+			name: "invalid URL - empty string requires Host",
 			cfg: config.SQL{
-				DSN: "",
+				URL: "",
 			},
 			wantErr: true,
 		},
@@ -66,9 +66,9 @@ func TestPostGresConfigValidation(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "valid with DSN and empty Host/Port",
+			name: "valid with URL and empty Host/Port",
 			cfg: config.SQL{
-				DSN:  "postgres://user:password@localhost:5432/dbname",
+				URL:  "postgres://user:password@localhost:5432/dbname",
 				Host: "",
 				Port: 0,
 			},
@@ -152,12 +152,12 @@ func TestPostGresConfigValidation(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:    "missing required fields - neither DSN nor Host",
+			name:    "missing required fields - neither URL nor Host",
 			cfg:     config.SQL{},
 			wantErr: true,
 		},
 		{
-			name: "missing Host when DSN not provided",
+			name: "missing Host when URL not provided",
 			cfg: config.SQL{
 				Port: 5432,
 			},
@@ -191,21 +191,21 @@ func TestPostGresConfigValidation(t *testing.T) {
 	}
 }
 
-func TestGetDSN(t *testing.T) {
+func TestGetURL(t *testing.T) {
 	tests := []struct {
 		name     string
 		cfg      config.SQL
 		expected string
 	}{
 		{
-			name: "returns provided DSN",
+			name: "returns provided URL",
 			cfg: config.SQL{
-				DSN: "postgres://user:password@localhost:5432/dbname",
+				URL: "postgres://user:password@localhost:5432/dbname",
 			},
 			expected: "postgres://user:password@localhost:5432/dbname",
 		},
 		{
-			name: "constructs DSN from fields",
+			name: "constructs URL from fields",
 			cfg: config.SQL{
 				Host:     "localhost",
 				Port:     5432,
@@ -220,9 +220,9 @@ func TestGetDSN(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.cfg.GetDSN()
+			got := tt.cfg.GetURL()
 			if got != tt.expected {
-				t.Errorf("GetDSN() = %q, want %q", got, tt.expected)
+				t.Errorf("GetURL() = %q, want %q", got, tt.expected)
 			}
 		})
 	}
