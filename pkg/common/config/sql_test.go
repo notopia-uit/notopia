@@ -43,7 +43,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 				Port:     5432,
 				User:     "testuser",
 				Password: "testpass",
-				DBName:   "testdb",
+				Name:     "testdb",
 				SSLMode:  "require",
 			},
 			wantErr: false,
@@ -126,22 +126,6 @@ func TestPostGresConfigValidation(t *testing.T) {
 				Port: 0,
 			},
 			wantErr: false,
-		},
-		{
-			name: "invalid port - negative value",
-			cfg: config.SQL{
-				Host: "localhost",
-				Port: -1,
-			},
-			wantErr: true,
-		},
-		{
-			name: "invalid port - above maximum",
-			cfg: config.SQL{
-				Host: "localhost",
-				Port: 65536,
-			},
-			wantErr: true,
 		},
 		{
 			name: "valid port at minimum boundary",
@@ -227,7 +211,7 @@ func TestGetDSN(t *testing.T) {
 				Port:     5432,
 				User:     "testuser",
 				Password: "testpass",
-				DBName:   "testdb",
+				Name:     "testdb",
 				SSLMode:  "require",
 			},
 			expected: "host=localhost port=5432 user=testuser password=testpass dbname=testdb sslmode=require",

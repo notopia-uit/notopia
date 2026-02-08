@@ -67,6 +67,48 @@
     },
     "docker:run": {
       "inputs": ["goFiles"]
+    },
+    "goose": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "goose",
+        "forwardAllArgs": true,
+        "cwd": "{projectRoot}"
+      }
+    },
+    "migration:create": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "goose create",
+        "forwardAllArgs": true,
+        "cwd": "{projectRoot}"
+      }
+    },
+    "migration:up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "goose up",
+        "forwardAllArgs": true,
+        "cwd": "{projectRoot}"
+      }
+    },
+    "migration:down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "goose down",
+        "forwardAllArgs": true,
+        "cwd": "{projectRoot}"
+      }
+    },
+    "migration:validate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "goose validate",
+        "forwardAllArgs": true
+      }
+    },
+    "lint:migration": {
+      "dependsOn": ["migration:validate"]
     }
   },
   "implicitDependencies": ["pkg/noteopenapi", "pkg/note", "pkg/pb"]

@@ -66,7 +66,15 @@ map("n", "<localleader>b", function()
   end)
 end, { desc = "LSP | Switch buildFlags", silent = true })
 
-map("n", "<localleader>lr", function()
+map("n", "<localleader>lrt", function()
+  local clients = lsp.get_clients({ name = "tsgo" })
+  for client in vim.iter(clients) do ---@cast client vim.lsp.Client
+    client:stop()
+  end
+  lsp.start(lsp.config["gopls"])
+end, { desc = "LSP | Restart TSGO", silent = true })
+
+map("n", "<localleader>lrg", function()
   local clients = lsp.get_clients({ name = "gopls" })
   for client in vim.iter(clients) do ---@cast client vim.lsp.Client
     client:stop()

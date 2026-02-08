@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -11,11 +12,11 @@ import (
 
 type Server struct {
 	Host string `json:"host" mapstructure:"host" validate:"omitempty,hostname" yaml:"host"`
-	Port string `json:"port" mapstructure:"port" validate:"required,port"      yaml:"port"`
+	Port uint16 `json:"port" mapstructure:"port" validate:"required,port"      yaml:"port"`
 }
 
 func (s *Server) Address() string {
-	return s.Host + ":" + s.Port
+	return fmt.Sprintf("%s:%d", s.Host, s.Port)
 }
 
 type Config struct {
@@ -33,8 +34,8 @@ func NewConfig(validate *validator.Validate, v *viper.Viper) (*Config, error) {
 	v.AddConfigPath(".")
 
 	v.AutomaticEnv()
-	if err := v.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrReadFromFile, err)
+	if err := v.ReadInConfig(); err == nil {
+		slog.Info("configuration loaded", slog.String("file", v.ConfigFileUsed()))
 	}
 
 	var cfg Config

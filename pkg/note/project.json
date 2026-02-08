@@ -1,5 +1,20 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "pkg/note",
-  "projectType": "library"
+  "projectType": "library",
+  "targets": {
+    "gen:sqlc": {
+      "inputs": [
+        "{workspaceRoot}/migration/note/",
+        "{workspaceRoot}/sqlc.yaml",
+        "{projectRoot}/infra/persistence/pgsqlc/*.sql"
+      ],
+      "outputs": ["{projectRoot}/infra/persistence/pgsqlc/*.go"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "sqlc generate"
+      },
+      "cache": true
+    }
+  }
 }

@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://www.schemastore.org/sqlc-2.0.json
+version: '2'
+
+sql:
+  - engine: postgresql
+    schema: ./migration/note/
+    queries: ./pkg/note/infra/persistence/pgsqlc/
+    gen:
+      go:
+        emit_interface: true
+        emit_result_struct_pointers: true
+        emit_params_struct_pointers: true
+        emit_pointers_for_null_types: true
+        emit_enum_valid_method: true
+        emit_all_enum_values: true
+        out: ./pkg/note/infra/persistence/pgsqlc/
+        sql_driver: github.com/jackc/pgx/v5
+        sql_package: pgx/v5
+        initialisms:
+          - id
+          - url
+    rules:
+      - sqlc/db-prepare
+      - postgresql-query-too-costly
+      - postgresql-no-seq-scan
+
+overrides:
+  go:
+    rename:
+      ids: IDs
+      urls: URLs
+      status_ids: StatusIDs
+    overrides:
+      - db_type: uuid
+        nullable: false
+        go_type:
+          import: github.com/google/uuid
+          type: UUID
+      - db_type: timestamptz
+        nullable: true
+        go_type:
+          import: time
+          type: Time
+          pointer: true
+      - db_type: timestamptz
+        nullable: false
+        go_type:
+          import: time
+          type: Time
+          pointer: false
+
+rules:
+  - name: postgresql-query-too-costly
+    message: Query cost estimate is too high
+    rule: postgresql.explain.plan.total_cost > 1.0
+  - name: postgresql-no-seq-scan
+    message: Query plan results in a sequential scan
+    rule: postgresql.explain.plan.node_type == 'Seq Scan'
+  - name: debug
+    rule: '!has(postgresql.explain)'
