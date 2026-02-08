@@ -6,10 +6,12 @@ package pgsqlc
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
-	GetNote(ctx context.Context, id int32) (*Note, error)
+	GetNote(ctx context.Context, id uuid.UUID) (*Note, error)
 }
 
 var _ Querier = (*Queries)(nil)

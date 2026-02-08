@@ -7,6 +7,8 @@ package pgsqlc
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const getNote = `-- name: GetNote :one
@@ -19,7 +21,7 @@ WHERE
   AND deleted_at IS NULL
 `
 
-func (q *Queries) GetNote(ctx context.Context, id int32) (*Note, error) {
+func (q *Queries) GetNote(ctx context.Context, id uuid.UUID) (*Note, error) {
 	row := q.db.QueryRow(ctx, getNote, id)
 	var i Note
 	err := row.Scan(

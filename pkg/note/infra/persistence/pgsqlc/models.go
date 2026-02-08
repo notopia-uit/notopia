@@ -6,10 +6,12 @@ package pgsqlc
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Note struct {
-	ID        int32
+	ID        uuid.UUID
 	Title     string
 	CreatedAt time.Time
 	UpdatedAt time.Time

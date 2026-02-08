@@ -105,7 +105,21 @@
     },
     "lint:migration": {
       "dependsOn": ["migration:validate"]
+    },
+    "gen:sqlc": {
+      "inputs": [
+        "{workspaceRoot}/pkg/note/infra/persistence/pgsqlc/*.sql",
+        "{workspaceRoot}/pkg/note/migration/",
+        "{projectRoot}/sqlc.yaml"
+      ],
+      "outputs": ["{workspaceRoot}/pkg/note/infra/persistence/pgsqlc/*.go"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "sqlc generate",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
     }
   },
-  "implicitDependencies": ["pkg/noteopenapi", "pkg/note", "pkg/pb"]
+  "implicitDependencies": ["pkg/noteopenapi", "pkg/pb"]
 }
