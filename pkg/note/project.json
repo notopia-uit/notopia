@@ -14,7 +14,8 @@
       "options": {
         "command": "sqlc generate"
       },
-      "cache": true
+      "cache": true,
+      "parallelism": false
     }
   }
 }
