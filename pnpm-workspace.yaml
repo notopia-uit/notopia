@@ -12,6 +12,7 @@ catalog:
   '@connectrpc/connect': ^2.1.1
   '@connectrpc/validate': ^0.2.0
   '@tailwindcss/postcss': ^4.1.18
+  '@tanstack/react-query': ^5.90.20
   '@types/react': ^19.2.10
   '@types/react-dom': ^19.2.3
   '@vitejs/plugin-react': ^5.1.2
@@ -33,10 +34,12 @@ catalog:
   typescript-eslint: ^8.54.0
   vite: ^7.3.1
   vitest: ^4.0.18
-  '@tanstack/react-query': ^5.90.20
+  zod: ^4.3.6
 
 onlyBuiltDependencies:
   - '@bufbuild/buf'
+  - '@nestjs/core'
+  - '@openapitools/openapi-generator-cli'
   - '@parcel/watcher'
   - '@swc/core'
   - core-js

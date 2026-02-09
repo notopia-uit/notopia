@@ -12,14 +12,6 @@ get:
   responses:
     101:
       description: Switching Protocols - WebSocket connection established.
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-                example: WebSocket connection established.
     400:
       $ref: ../../shared/components/responses/BadRequestError.yaml
     401:

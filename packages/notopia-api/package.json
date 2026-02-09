@@ -3,16 +3,16 @@
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "types": "./src/index.d.ts",
-      "default": "./src/index.ts"
+    "./*": {
+      "default": "./src/*"
     }
   },
   "peerDependencies": {
-    "@tanstack/react-query": "catalog:"
+    "@tanstack/react-query": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@tanstack/react-query": "catalog:"
-  },
-  "types": "./src/index.d.ts"
+    "@tanstack/react-query": "catalog:",
+    "zod": "catalog:"
+  }
 }

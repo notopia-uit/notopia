@@ -1,0 +1,13 @@
+.gitignore
+.openapi-generator-ignore
+README.md
+api-implementations.ts
+api.module.ts
+api/EditApi.ts
+api/index.ts
+controllers/EditApi.controller.ts
+controllers/index.ts
+index.ts
+models/error.ts
+models/index.ts
+tsconfig.json

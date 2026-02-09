@@ -24,8 +24,8 @@
     "gen:go": {
       "dependsOn": ["^gen:go"]
     },
-    "gen:ts": {
-      "outputs": ["{workspaceRoot}/packages/notopia-api/src/"],
+    "gen:hey-api": {
+      "outputs": ["{workspaceRoot}/packages/notopia-api/src/hey-api/"],
       "inputs": [
         "{projectRoot}/edit/dist/openapi.json",
         "{projectRoot}/note/dist/openapi.json",
@@ -39,8 +39,28 @@
       },
       "dependsOn": ["^bundle:json"]
     },
+    "gen:edit-nestjs-server": {
+      "outputs": [
+        "{workspaceRoot}/packages/notopia-api/src/edit-nestjs-server/"
+      ],
+      "inputs": [
+        "{projectRoot}/edit/dist/openapi.json",
+        "{projectRoot}/openapitools.json"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm exec openapi-generator-cli generate --generator-key edit-nestjs-server",
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": [
+        {
+          "projects": "edit",
+          "target": "bundle:json"
+        }
+      ]
+    },
     "gen": {
-      "dependsOn": ["gen:ts", "^gen*"]
+      "dependsOn": ["gen:hey-api", "gen:edit-nestjs-server", "^gen*"]
     }
   },
   "implicitDependencies": ["api/note", "api/edit"]
