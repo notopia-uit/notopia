@@ -69,15 +69,6 @@
       },
       "inputs": ["openapiFiles"]
     },
-    "gen:ts": {
-      "outputs": ["{workspaceRoot}/packages/notopia-api/src/edit/"],
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pnpm exec openapi-ts",
-        "cwd": "{projectRoot}"
-      },
-      "dependsOn": ["bundle:json"]
-    },
     "gen": {
       "dependsOn": ["gen:ts"]
     }

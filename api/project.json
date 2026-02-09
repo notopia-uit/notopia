@@ -25,11 +25,23 @@
       "dependsOn": ["^gen:go"]
     },
     "gen:ts": {
-      "dependsOn": ["^gen:ts"]
+      "outputs": ["{workspaceRoot}/packages/notopia-api/src/"],
+      "inputs": [
+        "{projectRoot}/edit/dist/openapi.json",
+        "{projectRoot}/note/dist/openapi.json",
+        "{projectRoot}/openapi-ts.config.ts",
+        "{projectRoot}/redocly.yaml"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm exec openapi-ts",
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": ["^bundle:json"]
     },
     "gen": {
-      "dependsOn": ["^gen"]
+      "dependsOn": ["gen:ts", "^gen*"]
     }
   },
-  "implicitDependencies": ["api/note"]
+  "implicitDependencies": ["api/note", "api/edit"]
 }

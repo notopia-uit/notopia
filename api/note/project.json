@@ -79,17 +79,8 @@
       },
       "dependsOn": ["bundle:yaml"]
     },
-    "gen:ts": {
-      "outputs": ["{workspaceRoot}/packages/notopia-api/src/note.d.ts"],
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pnpm exec openapi-typescript ./dist/openapi.json --output ../../packages/notopia-api/src/note.d.ts",
-        "cwd": "{projectRoot}"
-      },
-      "dependsOn": ["bundle:json"]
-    },
     "gen": {
-      "dependsOn": ["gen:go", "gen:ts"]
+      "dependsOn": ["gen:go"]
     }
   }
 }
