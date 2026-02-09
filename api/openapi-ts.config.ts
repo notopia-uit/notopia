@@ -2,7 +2,7 @@ import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
   input: ['./note/dist/openapi.json', './edit/dist/openapi.json'],
-  output: '../packages/notopia-api/src/hey-api/',
+  output: '../packages/notopia-api/src/',
   plugins: [
     '@hey-api/client-next',
     {

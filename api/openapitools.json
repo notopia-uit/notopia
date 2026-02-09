@@ -6,7 +6,7 @@
     "generators": {
       "edit-nestjs-server": {
         "generatorName": "typescript-nestjs-server",
-        "output": "#{cwd}/../packages/notopia-api/src/edit-nestjs-server",
+        "output": "#{cwd}/../packages/notopia-api-edit-nestjs-server",
         "glob": "./edit/dist/openapi.json",
         "additionalProperties": {
           "stringEnums": "true"

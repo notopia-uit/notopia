@@ -8,6 +8,12 @@
     },
     {
       "path": "./apps/web"
+    },
+    {
+      "path": "./apps/edit-e2e"
+    },
+    {
+      "path": "./apps/edit"
     }
   ]
 }

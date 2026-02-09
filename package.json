@@ -2,26 +2,37 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@nestjs/common": "catalog:",
+    "@nestjs/core": "catalog:",
+    "@nestjs/platform-express": "catalog:",
+    "axios": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:"
   },
   "devDependencies": {
+    "@nestjs/schematics": "catalog:",
+    "@nestjs/testing": "catalog:",
     "@next/eslint-plugin-next": "^16.0.1",
     "@nx/docker": "22.4.5",
     "@nx/eslint": "22.4.5",
     "@nx/eslint-plugin": "22.4.5",
     "@nx/js": "22.4.5",
+    "@nx/nest": "22.4.5",
     "@nx/next": "22.4.5",
+    "@nx/node": "22.4.5",
     "@nx/react": "22.4.5",
     "@nx/vite": "22.4.5",
     "@nx/web": "22.4.5",
+    "@nx/webpack": "22.4.5",
     "@swc-node/register": "~1.11.1",
     "@swc/cli": "~0.7.10",
     "@swc/core": "~1.15.10",
     "@swc/helpers": "~0.5.18",
     "@tailwindcss/postcss": "catalog:",
-    "@types/node": "^24.10.9",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
@@ -49,7 +60,8 @@
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "webpack-cli": "^5.1.4"
   },
   "packageManager": "pnpm@10.28.2"
 }

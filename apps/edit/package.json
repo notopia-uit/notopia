@@ -1,0 +1,17 @@
+{
+  "name": "edit",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@nestjs/common": "catalog:",
+    "@nestjs/core": "catalog:",
+    "@nestjs/platform-express": "catalog:",
+    "@notopia/api-edit-nestjs-server": "workspace:",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:",
+    "tslib": "catalog:"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "catalog:"
+  }
+}

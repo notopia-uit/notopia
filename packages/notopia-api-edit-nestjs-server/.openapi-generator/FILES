@@ -7,7 +7,9 @@ api/EditApi.ts
 api/index.ts
 controllers/EditApi.controller.ts
 controllers/index.ts
+git_push.sh
 index.ts
 models/error.ts
 models/index.ts
+package.json
 tsconfig.json
