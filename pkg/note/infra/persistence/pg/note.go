@@ -42,7 +42,7 @@ func (n *Note) toDomainError(err error) error {
 		pgerrcode.InvalidTextRepresentation,
 		pgerrcode.InvalidBinaryRepresentation,
 		pgerrcode.ForeignKeyViolation:
-		return fmt.Errorf("%w: %v", domain.ErrInvalidInput, err)
+		return fmt.Errorf("%w: %v", domain.ErrInvalid, err)
 	default:
 		return fmt.Errorf("%w: %v", domain.ErrInternal, err)
 	}

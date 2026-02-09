@@ -65,3 +65,29 @@ func NewGin(
 }
 
 var ProvideGin = NewGin
+
+func SetupHealthRoutes(
+	r *gin.Engine,
+	health Health,
+) {
+	g := r.Group("/health")
+	g.GET("/startup", func(c *gin.Context) {
+		healthResponse := health.StartupCheck()
+		statusCode := 200
+		if healthResponse.Status != StartupStatusStarted {
+			statusCode = 503
+		}
+		c.JSON(statusCode, healthResponse)
+	})
+	g.GET("/readiness", func(c *gin.Context) {
+		healthResponse := health.ReadinessCheck()
+		statusCode := 200
+		if healthResponse.Status != ReadinessStatusReady {
+			statusCode = 503
+		}
+		c.JSON(statusCode, healthResponse)
+	})
+	g.GET("/live", func(c *gin.Context) {
+		c.Status(200)
+	})
+}
