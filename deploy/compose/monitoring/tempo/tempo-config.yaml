@@ -36,7 +36,7 @@ querier:
   max_concurrent_queries: 20
 
 query_frontend:
-  cache_control_header: "public, max-age=300"
+  cache_control_header: 'public, max-age=300'
 
 memberlist:
   node_name: tempo
