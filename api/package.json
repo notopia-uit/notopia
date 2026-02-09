@@ -2,11 +2,13 @@
   "name": "api",
   "private": true,
   "scripts": {
+    "openapi-ts": "openapi-ts",
     "openapi-typescript": "openapi-typescript",
     "redocly": "redocly",
     "scalar": "scalar"
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "^0.92.3",
     "@redocly/cli": "^2.14.5",
     "@scalar/cli": "^1.4.2",
     "openapi-typescript": "catalog:"

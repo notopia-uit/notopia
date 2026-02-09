@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/notopia-uit/notopia/pkg/note/domain"
 	"github.com/notopia-uit/notopia/pkg/note/infra/persistence/pgsqlc"
@@ -21,10 +22,9 @@ var _ domain.NoteRepo = (*Note)(nil)
 func (n *Note) GetByID(ctx context.Context, id uuid.UUID) (*domain.Note, error) {
 	result, err := n.queries.GetNote(ctx, id)
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if !errors.As(err, &pgErr) {
-			return nil, fmt.Errorf("%w: %v", domain.ErrInternal, err)
+		if errors.Is(err, pgx.ErrNoRows) {
 		}
+		return nil, fmt.Errorf("%w: %v", domain.ErrInternal, err)
 	}
 	return noteToDomain(result), nil
 }

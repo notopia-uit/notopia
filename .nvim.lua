@@ -83,3 +83,4 @@ map("n", "<localleader>lrg", function()
 end, { desc = "LSP | Restart gopls", silent = true })
 
 vim.o.backupcopy = "yes" -- https://github.com/nrwl/nx/issues/20622
+vim.opt.isfname:append("{,},@")

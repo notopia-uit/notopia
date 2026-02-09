@@ -1,0 +1,30 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - oauth2: []
+  tags:
+    - edit
+  summary: WebSocket for editing a document
+  description: Establish a WebSocket connection for real-time collaborative editing of a document.
+  operationId: wsEditsDocument
+  parameters:
+    - $ref: ../components/parameters/documentIdPath.yaml
+  responses:
+    101:
+      description: Switching Protocols - WebSocket connection established.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: WebSocket connection established.
+    400:
+      $ref: ../../shared/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../shared/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../shared/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../shared/components/responses/InternalServerError.yaml

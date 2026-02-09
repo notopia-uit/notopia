@@ -3,6 +3,8 @@
 apis:
   note:
     root: ./note/openapi.yaml
+  edit:
+    root: ./edit/openapi.yaml
 extends:
   - recommended
 rules:

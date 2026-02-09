@@ -5,7 +5,7 @@ openapi: 3.0.4
 servers:
   - url: http://api.notopia.localhost
     description: Local dev server via gateway
-  - url: http://localhost:8081
+  - url: http://localhost:8082
     description: Local dev/mock server direct
 
 info:
@@ -21,14 +21,12 @@ info:
     email: kevinnitro@duck.com
 
 tags:
-  - name: note
-    description: Operations related to notes management
+  - name: edit
+    description: Operations related to editing notes, collaboration.
 
 paths:
-  /note/notes:
-    $ref: ./paths/notes.yaml
-  /note/notes/{noteId}:
-    $ref: ./paths/notes_{noteId}.yaml
+  /ws/edits/{documentId}:
+    $ref: ./paths/ws_edits_{documentId}.yaml
 
 components:
   securitySchemes:
