@@ -82,5 +82,13 @@ map("n", "<localleader>lrg", function()
   lsp.start(lsp.config["gopls"])
 end, { desc = "LSP | Restart gopls", silent = true })
 
+map("n", "<localleader>lrr", function()
+  local clients = lsp.get_clients({ name = "redocly_ls" })
+  for client in vim.iter(clients) do ---@cast client vim.lsp.Client
+    client:stop()
+  end
+  lsp.start(lsp.config["redocly_ls"])
+end, { desc = "LSP | Restart redocly_ls", silent = true })
+
 vim.o.backupcopy = "yes" -- https://github.com/nrwl/nx/issues/20622
 vim.opt.isfname:append("{,},@")

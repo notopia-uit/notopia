@@ -1,0 +1,30 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  type:
+    type: string
+    enum:
+      - NoteMovedEvent
+    example: NoteMovedEvent
+  data:
+    type: object
+    properties:
+      noteId:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+      fromFolderId:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174001
+      toFolderId:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174002
+    required:
+      - noteId
+      - fromFolderId
+      - toFolderId
+required:
+  - type
+  - data

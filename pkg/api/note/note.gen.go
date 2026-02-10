@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -19,6 +20,26 @@ import (
 
 const (
 	Oauth2Scopes = "oauth2.Scopes"
+)
+
+// Defines values for FolderMovedEventType.
+const (
+	FolderMovedEventTypeFolderRenamedEvent FolderMovedEventType = "FolderRenamedEvent"
+)
+
+// Defines values for FolderRenamedEventType.
+const (
+	FolderRenamedEventTypeFolderRenamedEvent FolderRenamedEventType = "FolderRenamedEvent"
+)
+
+// Defines values for NoteMovedEventType.
+const (
+	NoteMovedEventTypeNoteMovedEvent NoteMovedEventType = "NoteMovedEvent"
+)
+
+// Defines values for WorkspaceRenamedEventType.
+const (
+	WorkspaceRenamedEventTypeWorkspaceRenamedEvent WorkspaceRenamedEventType = "WorkspaceRenamedEvent"
 )
 
 // Defines values for OrderQuery.
@@ -52,6 +73,32 @@ type Error struct {
 	MoreInfo *string `json:"more_info,omitempty"`
 }
 
+// FolderMovedEvent defines model for FolderMovedEvent.
+type FolderMovedEvent struct {
+	Data struct {
+		FolderId    openapi_types.UUID `json:"folderId"`
+		NewFolderId openapi_types.UUID `json:"newFolderId"`
+		OldFolderId openapi_types.UUID `json:"oldFolderId"`
+	} `json:"data"`
+	Type FolderMovedEventType `json:"type"`
+}
+
+// FolderMovedEventType defines model for FolderMovedEvent.Type.
+type FolderMovedEventType string
+
+// FolderRenamedEvent defines model for FolderRenamedEvent.
+type FolderRenamedEvent struct {
+	Data struct {
+		FolderId openapi_types.UUID `json:"folderId"`
+		NewName  string             `json:"newName"`
+		OldName  string             `json:"oldName"`
+	} `json:"data"`
+	Type FolderRenamedEventType `json:"type"`
+}
+
+// FolderRenamedEventType defines model for FolderRenamedEvent.Type.
+type FolderRenamedEventType string
+
 // Note defines model for Note.
 type Note struct {
 	// CreatedAt Timestamp when the note was created
@@ -64,6 +111,19 @@ type Note struct {
 	// UpdatedAt Timestamp when the note was last updated
 	UpdatedAt nullable.Nullable[time.Time] `json:"updatedAt,omitempty"`
 }
+
+// NoteMovedEvent defines model for NoteMovedEvent.
+type NoteMovedEvent struct {
+	Data struct {
+		FromFolderId openapi_types.UUID `json:"fromFolderId"`
+		NoteId       openapi_types.UUID `json:"noteId"`
+		ToFolderId   openapi_types.UUID `json:"toFolderId"`
+	} `json:"data"`
+	Type NoteMovedEventType `json:"type"`
+}
+
+// NoteMovedEventType defines model for NoteMovedEvent.Type.
+type NoteMovedEventType string
 
 // NoteRequired defines model for NoteRequired.
 type NoteRequired struct {
@@ -99,6 +159,19 @@ type Pagination struct {
 	TotalPages int `json:"totalPages"`
 }
 
+// WorkspaceRenamedEvent defines model for WorkspaceRenamedEvent.
+type WorkspaceRenamedEvent struct {
+	Data struct {
+		NewName     string             `json:"newName"`
+		OldName     string             `json:"oldName"`
+		WorkspaceId openapi_types.UUID `json:"workspaceId"`
+	} `json:"data"`
+	Type WorkspaceRenamedEventType `json:"type"`
+}
+
+// WorkspaceRenamedEventType defines model for WorkspaceRenamedEvent.Type.
+type WorkspaceRenamedEventType string
+
 // LimitQuery defines model for limitQuery.
 type LimitQuery = int
 
@@ -110,6 +183,9 @@ type OrderQuery string
 
 // PageQuery defines model for pageQuery.
 type PageQuery = int
+
+// WorkspaceIdPath The unique identifier of the workspace.
+type WorkspaceIdPath = openapi_types.UUID
 
 // BadRequestError defines model for BadRequestError.
 type BadRequestError = Error
@@ -333,6 +409,9 @@ type ServerInterface interface {
 	// Put note
 	// (PUT /note/notes/{noteId})
 	UpdateNote(c *gin.Context, noteId NoteIdPath)
+	// Subscribe to real-time workspace updates
+	// (GET /note/workspaces/{workspaceId}/events)
+	GetWorkspaceEvents(c *gin.Context, workspaceId WorkspaceIdPath)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -523,6 +602,32 @@ func (siw *ServerInterfaceWrapper) UpdateNote(c *gin.Context) {
 	siw.Handler.UpdateNote(c, noteId)
 }
 
+// GetWorkspaceEvents operation middleware
+func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "workspaceId" -------------
+	var workspaceId WorkspaceIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetWorkspaceEvents(c, workspaceId)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -556,6 +661,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/note/notes/:noteId", wrapper.GetNote)
 	router.PATCH(options.BaseURL+"/note/notes/:noteId", wrapper.PatchNote)
 	router.PUT(options.BaseURL+"/note/notes/:noteId", wrapper.UpdateNote)
+	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/events", wrapper.GetWorkspaceEvents)
 }
 
 type BadRequestErrorJSONResponse Error
@@ -584,6 +690,12 @@ type GetNoteResponseJSONResponse struct {
 
 	// UpdatedAt Timestamp when the note was last updated
 	UpdatedAt nullable.Nullable[time.Time] `json:"updatedAt,omitempty"`
+}
+
+type GetWorkspaceEventsResponseTexteventStreamResponse struct {
+	Body io.Reader
+
+	ContentLength int64
 }
 
 type InternalServerErrorJSONResponse Error
@@ -988,6 +1100,61 @@ func (response UpdateNote500JSONResponse) VisitUpdateNoteResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type GetWorkspaceEventsRequestObject struct {
+	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+}
+
+type GetWorkspaceEventsResponseObject interface {
+	VisitGetWorkspaceEventsResponse(w http.ResponseWriter) error
+}
+
+type GetWorkspaceEvents200TexteventStreamResponse struct {
+	GetWorkspaceEventsResponseTexteventStreamResponse
+}
+
+func (response GetWorkspaceEvents200TexteventStreamResponse) VisitGetWorkspaceEventsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "text/event-stream")
+	if response.ContentLength != 0 {
+		w.Header().Set("Content-Length", fmt.Sprint(response.ContentLength))
+	}
+	w.WriteHeader(200)
+
+	if closer, ok := response.Body.(io.ReadCloser); ok {
+		defer closer.Close()
+	}
+	_, err := io.Copy(w, response.Body)
+	return err
+}
+
+type GetWorkspaceEvents400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response GetWorkspaceEvents400JSONResponse) VisitGetWorkspaceEventsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceEvents401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response GetWorkspaceEvents401JSONResponse) VisitGetWorkspaceEventsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceEvents500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetWorkspaceEvents500JSONResponse) VisitGetWorkspaceEventsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 	// List notes
@@ -1008,6 +1175,9 @@ type StrictServerInterface interface {
 	// Put note
 	// (PUT /note/notes/{noteId})
 	UpdateNote(ctx context.Context, request UpdateNoteRequestObject) (UpdateNoteResponseObject, error)
+	// Subscribe to real-time workspace updates
+	// (GET /note/workspaces/{workspaceId}/events)
+	GetWorkspaceEvents(ctx context.Context, request GetWorkspaceEventsRequestObject) (GetWorkspaceEventsResponseObject, error)
 }
 
 type StrictHandlerFunc = strictgin.StrictGinHandlerFunc
@@ -1199,6 +1369,33 @@ func (sh *strictHandler) UpdateNote(ctx *gin.Context, noteId NoteIdPath) {
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(UpdateNoteResponseObject); ok {
 		if err := validResponse.VisitUpdateNoteResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetWorkspaceEvents operation middleware
+func (sh *strictHandler) GetWorkspaceEvents(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+	var request GetWorkspaceEventsRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetWorkspaceEvents(ctx, request.(GetWorkspaceEventsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetWorkspaceEvents")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(GetWorkspaceEventsResponseObject); ok {
+		if err := validResponse.VisitGetWorkspaceEventsResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

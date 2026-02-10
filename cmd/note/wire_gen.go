@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/notopia-uit/notopia/pkg/common/controller/http"
 	"github.com/notopia-uit/notopia/pkg/note"
 	"github.com/notopia-uit/notopia/pkg/note/app"
@@ -26,7 +27,7 @@ func InitializeServer(ctx context.Context) (*controller.Server, func(), error) {
 	serviceName := _wireServiceNameValue
 	validate := components.ProvideValidate()
 	viperViper := viper.New()
-	configConfig, err := config.NewConfig(validate, viperViper)
+	configConfig, err := config.New(validate, viperViper)
 	if err != nil {
 		return nil, nil, err
 	}

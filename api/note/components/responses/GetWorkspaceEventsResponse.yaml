@@ -1,0 +1,17 @@
+# vim: ft=yaml.openapi
+description: A persistent stream of events
+content:
+  text/event-stream:
+    schema:
+      oneOf:
+        - $ref: ../schemas/NoteMovedEvent.yaml
+        - $ref: ../schemas/FolderMovedEvent.yaml
+        - $ref: ../schemas/FolderRenamedEvent.yaml
+        - $ref: ../schemas/WorkspaceRenamedEvent.yaml
+      discriminator:
+        propertyName: type
+        mapping:
+          NoteMovedEvent: ../schemas/NoteMovedEvent.yaml
+          FolderMovedEvent: ../schemas/FolderMovedEvent.yaml
+          FolderRenamedEvent: ../schemas/FolderRenamedEvent.yaml
+          WorkspaceRenamedEvent: ../schemas/WorkspaceRenamedEvent.yaml

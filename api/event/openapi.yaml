@@ -2,9 +2,4 @@
 # vim: ft=yaml.openapi
 openapi: 3.0.4
 
-components:
-  schemas:
-    NoteMoved:
-      $ref: ./NoteMoved.yaml
-    FolderMoved:
-      $ref: ./FolderMoved.yaml
+components: {}

@@ -1,0 +1,19 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - oauth2: []
+  tags:
+    - workspace
+  summary: Subscribe to real-time workspace updates
+  operationId: getWorkspaceEvents
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  responses:
+    200:
+      $ref: ../components/responses/GetWorkspaceEventsResponse.yaml
+    400:
+      $ref: ../../shared/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../shared/components/responses/UnauthorizedError.yaml
+    500:
+      $ref: ../../shared/components/responses/InternalServerError.yaml

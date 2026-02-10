@@ -2,8 +2,8 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { OpenapiCreateNoteData, OpenapiCreateNoteErrors, OpenapiCreateNoteResponses, OpenapiDeleteNoteData, OpenapiDeleteNoteErrors, OpenapiDeleteNoteResponses, OpenapiGetNoteData, OpenapiGetNoteErrors, OpenapiGetNoteResponses, OpenapiListNotesData, OpenapiListNotesErrors, OpenapiListNotesResponses, OpenapiPatchNoteData, OpenapiPatchNoteErrors, OpenapiPatchNoteResponses, OpenapiUpdateNoteData, OpenapiUpdateNoteErrors, OpenapiUpdateNoteResponses, OpenapiWsEditsDocumentData, OpenapiWsEditsDocumentErrors, OpenapiWsEditsDocumentResponses } from './types.gen';
-import { zOpenapiCreateNoteData, zOpenapiCreateNoteResponse, zOpenapiDeleteNoteData, zOpenapiDeleteNoteResponse, zOpenapiGetNoteData, zOpenapiGetNoteResponse, zOpenapiListNotesData, zOpenapiListNotesResponse, zOpenapiPatchNoteData, zOpenapiPatchNoteResponse, zOpenapiUpdateNoteData, zOpenapiUpdateNoteResponse, zOpenapiWsEditsDocumentData } from './zod.gen';
+import type { OpenapiCreateNoteData, OpenapiCreateNoteErrors, OpenapiCreateNoteResponses, OpenapiDeleteNoteData, OpenapiDeleteNoteErrors, OpenapiDeleteNoteResponses, OpenapiGetNoteData, OpenapiGetNoteErrors, OpenapiGetNoteResponses, OpenapiGetWorkspaceEventsData, OpenapiGetWorkspaceEventsErrors, OpenapiGetWorkspaceEventsResponses, OpenapiListNotesData, OpenapiListNotesErrors, OpenapiListNotesResponses, OpenapiPatchNoteData, OpenapiPatchNoteErrors, OpenapiPatchNoteResponses, OpenapiUpdateNoteData, OpenapiUpdateNoteErrors, OpenapiUpdateNoteResponses, OpenapiWsEditsDocumentData, OpenapiWsEditsDocumentErrors, OpenapiWsEditsDocumentResponses } from './types.gen';
+import { zOpenapiCreateNoteData, zOpenapiCreateNoteResponse, zOpenapiDeleteNoteData, zOpenapiDeleteNoteResponse, zOpenapiGetNoteData, zOpenapiGetNoteResponse, zOpenapiGetWorkspaceEventsData, zOpenapiGetWorkspaceEventsResponse, zOpenapiListNotesData, zOpenapiListNotesResponse, zOpenapiPatchNoteData, zOpenapiPatchNoteResponse, zOpenapiUpdateNoteData, zOpenapiUpdateNoteResponse, zOpenapiWsEditsDocumentData } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -112,4 +112,14 @@ export const openapiUpdateNote = <ThrowOnError extends boolean = false>(options:
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Subscribe to real-time workspace updates
+ */
+export const openapiGetWorkspaceEvents = <ThrowOnError extends boolean = false>(options: Options<OpenapiGetWorkspaceEventsData, ThrowOnError>) => (options.client ?? client).sse.get<OpenapiGetWorkspaceEventsResponses, OpenapiGetWorkspaceEventsErrors, ThrowOnError>({
+    requestValidator: async (data) => await zOpenapiGetWorkspaceEventsData.parseAsync(data),
+    responseValidator: async (data) => await zOpenapiGetWorkspaceEventsResponse.parseAsync(data),
+    url: '/note/workspaces/{workspaceId}/events',
+    ...options
 });

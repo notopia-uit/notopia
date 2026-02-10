@@ -19,27 +19,6 @@ export type OpenapiError = {
     more_info?: string;
 };
 
-export type OpenapiNoteMoved = {
-    noteId: string;
-    noteTitle?: string;
-    fromFolderId: string;
-    fromFolderName?: string;
-    toFolderId: string;
-    toFolderName?: string;
-    actorId: string;
-    actorName?: string;
-    occurredAt: string;
-};
-
-export type OpenapiFolderMoved = {
-    folderId: string;
-    oldName: string;
-    newName: string;
-    actorId: string;
-    actorName?: string;
-    occurredAt: string;
-};
-
 export type OpenapiNote = {
     readonly id?: string;
     /**
@@ -85,6 +64,42 @@ export type OpenapiPagination = {
 
 export type OpenapiNoteRequired = OpenapiNote;
 
+export type OpenapiNoteMovedEvent = {
+    type: 'NoteMovedEvent';
+    data: {
+        noteId: string;
+        fromFolderId: string;
+        toFolderId: string;
+    };
+};
+
+export type OpenapiFolderMovedEvent = {
+    type: 'FolderRenamedEvent';
+    data: {
+        folderId: string;
+        oldFolderId: string;
+        newFolderId: string;
+    };
+};
+
+export type OpenapiFolderRenamedEvent = {
+    type: 'FolderRenamedEvent';
+    data: {
+        folderId: string;
+        oldName: string;
+        newName: string;
+    };
+};
+
+export type OpenapiWorkspaceRenamedEvent = {
+    type: 'WorkspaceRenamedEvent';
+    data: {
+        workspaceId: string;
+        oldName: string;
+        newName: string;
+    };
+};
+
 export type OpenapiNoteWritable = {
     /**
      * Title of the note
@@ -123,6 +138,11 @@ export type OpenapiOrderQuery = typeof OpenapiOrderQuery[keyof typeof OpenapiOrd
  * Unique identifier of the note
  */
 export type OpenapiNoteIdPath = string;
+
+/**
+ * The unique identifier of the workspace.
+ */
+export type OpenapiWorkspaceIdPath = string;
 
 /**
  * Create note request
@@ -461,3 +481,49 @@ export type OpenapiUpdateNoteResponses = {
 };
 
 export type OpenapiUpdateNoteResponse = OpenapiUpdateNoteResponses[keyof OpenapiUpdateNoteResponses];
+
+export type OpenapiGetWorkspaceEventsData = {
+    body?: never;
+    path: {
+        /**
+         * The unique identifier of the workspace.
+         */
+        workspaceId: string;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceId}/events';
+};
+
+export type OpenapiGetWorkspaceEventsErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: OpenapiError;
+    /**
+     * Unauthorized Error response
+     */
+    401: OpenapiError;
+    /**
+     * Internal Server Error response
+     */
+    500: OpenapiError;
+};
+
+export type OpenapiGetWorkspaceEventsError = OpenapiGetWorkspaceEventsErrors[keyof OpenapiGetWorkspaceEventsErrors];
+
+export type OpenapiGetWorkspaceEventsResponses = {
+    /**
+     * A persistent stream of events
+     */
+    200: ({
+        type: 'openapi_NoteMovedEvent';
+    } & OpenapiNoteMovedEvent) | ({
+        type: 'openapi_FolderMovedEvent';
+    } & OpenapiFolderMovedEvent) | ({
+        type: 'openapi_FolderRenamedEvent';
+    } & OpenapiFolderRenamedEvent) | ({
+        type: 'openapi_WorkspaceRenamedEvent';
+    } & OpenapiWorkspaceRenamedEvent);
+};
+
+export type OpenapiGetWorkspaceEventsResponse = OpenapiGetWorkspaceEventsResponses[keyof OpenapiGetWorkspaceEventsResponses];

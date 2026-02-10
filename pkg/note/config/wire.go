@@ -7,7 +7,7 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
-	ProvideConfig,
+	Provide,
 	wire.FieldsOf(
 		new(*Config),
 		"Server",

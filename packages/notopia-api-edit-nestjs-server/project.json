@@ -1,18 +1,10 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "packages/notopia-api",
+  "name": "packages/notopia-api-edit-nestjs-server",
   "projectType": "library",
   "targets": {
     "lint": {
       "executor": "nx:noop"
-    },
-    "gen": {
-      "dependsOn": [
-        {
-          "projects": "api",
-          "target": "gen:ts"
-        }
-      ]
     }
   }
 }

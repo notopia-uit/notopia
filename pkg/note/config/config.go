@@ -21,7 +21,7 @@ type Config struct {
 	Database *config.SQL  `json:"database" mapstructure:"database" validate:"omitnil"  yaml:"database"`
 }
 
-func NewConfig(
+func New(
 	validate *validator.Validate,
 	v *viper.Viper,
 ) (*Config, error) {
@@ -43,14 +43,14 @@ func NewConfig(
 
 	var cfg Config
 	if err := v.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrUnmarshalConfig, err)
+		return nil, fmt.Errorf("%w: %v", ErrUnmarshal, err)
 	}
 
 	if err := validate.Struct(&cfg); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrValidateConfig, err)
+		return nil, fmt.Errorf("%w: %v", ErrValidate, err)
 	}
 
 	return &cfg, nil
 }
 
-var ProvideConfig = NewConfig
+var Provide = New

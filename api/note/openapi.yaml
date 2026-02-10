@@ -29,6 +29,8 @@ paths:
     $ref: ./paths/notes.yaml
   /note/notes/{noteId}:
     $ref: ./paths/notes_{noteId}.yaml
+  /note/workspaces/{workspaceId}/events:
+    $ref: ./paths/workspaces_{workspaceId}_events.yaml
 
 components:
   securitySchemes:

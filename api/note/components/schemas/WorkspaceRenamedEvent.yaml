@@ -1,0 +1,28 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  type:
+    type: string
+    enum:
+      - WorkspaceRenamedEvent
+    example: WorkspaceRenamedEvent
+  data:
+    type: object
+    properties:
+      workspaceId:
+        type: string
+        format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      oldName:
+        type: string
+        example: Old Workspace Name
+      newName:
+        type: string
+        example: New Workspace Name
+    required:
+      - workspaceId
+      - oldName
+      - newName
+required:
+  - type
+  - data

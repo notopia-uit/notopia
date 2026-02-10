@@ -16,6 +16,7 @@
       "dependsOn": ["^watch-bundle:json"]
     },
     "lint": {
+      "executor": "nx:noop",
       "dependsOn": ["^lint"]
     },
     "mock": {

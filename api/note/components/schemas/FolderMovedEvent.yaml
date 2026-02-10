@@ -1,0 +1,30 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  type:
+    type: string
+    enum:
+      - FolderRenamedEvent
+    example: FolderRenamedEvent
+  data:
+    type: object
+    properties:
+      folderId:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174004
+      oldFolderId:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174001
+      newFolderId:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174002
+    required:
+      - folderId
+      - oldFolderId
+      - newFolderId
+required:
+  - type
+  - data

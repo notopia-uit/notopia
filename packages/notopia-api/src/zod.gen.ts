@@ -8,27 +8,6 @@ export const zOpenapiError = z.object({
     more_info: z.optional(z.string())
 });
 
-export const zOpenapiNoteMoved = z.object({
-    noteId: z.uuid(),
-    noteTitle: z.optional(z.string()),
-    fromFolderId: z.uuid(),
-    fromFolderName: z.optional(z.string()),
-    toFolderId: z.uuid(),
-    toFolderName: z.optional(z.string()),
-    actorId: z.uuid(),
-    actorName: z.optional(z.string()),
-    occurredAt: z.iso.datetime()
-});
-
-export const zOpenapiFolderMoved = z.object({
-    folderId: z.uuid(),
-    oldName: z.string(),
-    newName: z.string(),
-    actorId: z.uuid(),
-    actorName: z.optional(z.string()),
-    occurredAt: z.iso.datetime()
-});
-
 export const zOpenapiNote = z.object({
     id: z.optional(z.uuid().readonly()),
     title: z.optional(z.string().min(1).max(255)),
@@ -49,6 +28,42 @@ export const zOpenapiPagination = z.object({
 });
 
 export const zOpenapiNoteRequired = zOpenapiNote;
+
+export const zOpenapiNoteMovedEvent = z.object({
+    type: z.enum(['NoteMovedEvent']),
+    data: z.object({
+        noteId: z.uuid(),
+        fromFolderId: z.uuid(),
+        toFolderId: z.uuid()
+    })
+});
+
+export const zOpenapiFolderMovedEvent = z.object({
+    type: z.enum(['FolderRenamedEvent']),
+    data: z.object({
+        folderId: z.uuid(),
+        oldFolderId: z.uuid(),
+        newFolderId: z.uuid()
+    })
+});
+
+export const zOpenapiFolderRenamedEvent = z.object({
+    type: z.enum(['FolderRenamedEvent']),
+    data: z.object({
+        folderId: z.uuid(),
+        oldName: z.string(),
+        newName: z.string()
+    })
+});
+
+export const zOpenapiWorkspaceRenamedEvent = z.object({
+    type: z.enum(['WorkspaceRenamedEvent']),
+    data: z.object({
+        workspaceId: z.uuid(),
+        oldName: z.string(),
+        newName: z.string()
+    })
+});
 
 export const zOpenapiNoteWritable = z.object({
     title: z.optional(z.string().min(1).max(255))
@@ -80,6 +95,11 @@ export const zOpenapiOrderQuery = z.enum(['asc', 'desc']);
  * Unique identifier of the note
  */
 export const zOpenapiNoteIdPath = z.uuid();
+
+/**
+ * The unique identifier of the workspace.
+ */
+export const zOpenapiWorkspaceIdPath = z.uuid();
 
 /**
  * Create note request
@@ -190,3 +210,29 @@ export const zOpenapiUpdateNoteData = z.object({
  * Note successfully updated
  */
 export const zOpenapiUpdateNoteResponse = zOpenapiNoteRequired.and(z.unknown());
+
+export const zOpenapiGetWorkspaceEventsData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        workspaceId: z.uuid()
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * A persistent stream of events
+ */
+export const zOpenapiGetWorkspaceEventsResponse = z.union([
+    z.object({
+        type: z.literal('openapi_NoteMovedEvent')
+    }).and(zOpenapiNoteMovedEvent),
+    z.object({
+        type: z.literal('openapi_FolderMovedEvent')
+    }).and(zOpenapiFolderMovedEvent),
+    z.object({
+        type: z.literal('openapi_FolderRenamedEvent')
+    }).and(zOpenapiFolderRenamedEvent),
+    z.object({
+        type: z.literal('openapi_WorkspaceRenamedEvent')
+    }).and(zOpenapiWorkspaceRenamedEvent)
+]);

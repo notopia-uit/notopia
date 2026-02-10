@@ -70,7 +70,7 @@
       "inputs": ["openapiFiles"]
     },
     "gen:go": {
-      "inputs": ["{projectRoot}/oapi-codegen.yaml"],
+      "inputs": ["{projectRoot}/oapi-codegen.yaml", "openapiFiles"],
       "outputs": ["{workspaceRoot}/pkg/api/gen/note.gen.go"],
       "executor": "nx:run-commands",
       "options": {
