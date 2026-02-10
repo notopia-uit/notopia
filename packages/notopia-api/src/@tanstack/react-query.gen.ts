@@ -39,6 +39,26 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
     return [params];
 };
 
+export const openapiWsEditsDocumentQueryKey = (options: Options<OpenapiWsEditsDocumentData>) => createQueryKey('openapiWsEditsDocument', options);
+
+/**
+ * WebSocket for editing a document
+ *
+ * Establish a WebSocket connection for real-time collaborative editing of a document.
+ */
+export const openapiWsEditsDocumentOptions = (options: Options<OpenapiWsEditsDocumentData>) => queryOptions<unknown, OpenapiWsEditsDocumentError, unknown, ReturnType<typeof openapiWsEditsDocumentQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await openapiWsEditsDocument({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: openapiWsEditsDocumentQueryKey(options)
+});
+
 export const openapiListNotesQueryKey = (options?: Options<OpenapiListNotesData>) => createQueryKey('openapiListNotes', options);
 
 /**
@@ -212,23 +232,3 @@ export const openapiUpdateNoteMutation = (options?: Partial<Options<OpenapiUpdat
     };
     return mutationOptions;
 };
-
-export const openapiWsEditsDocumentQueryKey = (options: Options<OpenapiWsEditsDocumentData>) => createQueryKey('openapiWsEditsDocument', options);
-
-/**
- * WebSocket for editing a document
- *
- * Establish a WebSocket connection for real-time collaborative editing of a document.
- */
-export const openapiWsEditsDocumentOptions = (options: Options<OpenapiWsEditsDocumentData>) => queryOptions<unknown, OpenapiWsEditsDocumentError, unknown, ReturnType<typeof openapiWsEditsDocumentQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await openapiWsEditsDocument({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: openapiWsEditsDocumentQueryKey(options)
-});

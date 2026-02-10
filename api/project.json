@@ -61,5 +61,5 @@
       "dependsOn": ["gen:hey-api", "gen:edit-nestjs-server", "^gen*"]
     }
   },
-  "implicitDependencies": ["api/note", "api/edit"]
+  "implicitDependencies": ["api/note", "api/edit", "api/event"]
 }

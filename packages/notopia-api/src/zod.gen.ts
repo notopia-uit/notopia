@@ -2,6 +2,33 @@
 
 import * as z from 'zod';
 
+export const zOpenapiError = z.object({
+    code: z.string(),
+    message: z.string(),
+    more_info: z.optional(z.string())
+});
+
+export const zOpenapiNoteMoved = z.object({
+    noteId: z.uuid(),
+    noteTitle: z.optional(z.string()),
+    fromFolderId: z.uuid(),
+    fromFolderName: z.optional(z.string()),
+    toFolderId: z.uuid(),
+    toFolderName: z.optional(z.string()),
+    actorId: z.uuid(),
+    actorName: z.optional(z.string()),
+    occurredAt: z.iso.datetime()
+});
+
+export const zOpenapiFolderMoved = z.object({
+    folderId: z.uuid(),
+    oldName: z.string(),
+    newName: z.string(),
+    actorId: z.uuid(),
+    actorName: z.optional(z.string()),
+    occurredAt: z.iso.datetime()
+});
+
 export const zOpenapiNote = z.object({
     id: z.optional(z.uuid().readonly()),
     title: z.optional(z.string().min(1).max(255)),
@@ -21,12 +48,6 @@ export const zOpenapiPagination = z.object({
     hasPrev: z.boolean()
 });
 
-export const zOpenapiError = z.object({
-    code: z.string(),
-    message: z.string(),
-    more_info: z.optional(z.string())
-});
-
 export const zOpenapiNoteRequired = zOpenapiNote;
 
 export const zOpenapiNoteWritable = z.object({
@@ -34,6 +55,11 @@ export const zOpenapiNoteWritable = z.object({
 });
 
 export const zOpenapiNoteRequiredWritable = zOpenapiNoteWritable;
+
+/**
+ * Unique identifier of the document (note)
+ */
+export const zOpenapiDocumentIdPath = z.uuid();
 
 /**
  * Page number for pagination
@@ -56,11 +82,6 @@ export const zOpenapiOrderQuery = z.enum(['asc', 'desc']);
 export const zOpenapiNoteIdPath = z.uuid();
 
 /**
- * Unique identifier of the document (note)
- */
-export const zOpenapiDocumentIdPath = z.uuid();
-
-/**
  * Create note request
  */
 export const zOpenapiCreateNoteRequest = zOpenapiNoteRequiredWritable.and(z.unknown());
@@ -74,6 +95,14 @@ export const zOpenapiPutNoteRequest = zOpenapiNoteRequiredWritable.and(z.unknown
  * Patch note request (partial update)
  */
 export const zOpenapiPatchNoteRequest = zOpenapiNoteWritable.and(z.unknown());
+
+export const zOpenapiWsEditsDocumentData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        documentId: z.uuid()
+    }),
+    query: z.optional(z.never())
+});
 
 export const zOpenapiListNotesData = z.object({
     body: z.optional(z.never()),
@@ -161,11 +190,3 @@ export const zOpenapiUpdateNoteData = z.object({
  * Note successfully updated
  */
 export const zOpenapiUpdateNoteResponse = zOpenapiNoteRequired.and(z.unknown());
-
-export const zOpenapiWsEditsDocumentData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        documentId: z.uuid()
-    }),
-    query: z.optional(z.never())
-});

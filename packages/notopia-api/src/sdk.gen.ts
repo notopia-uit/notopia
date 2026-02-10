@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { OpenapiCreateNoteData, OpenapiCreateNoteErrors, OpenapiCreateNoteResponses, OpenapiDeleteNoteData, OpenapiDeleteNoteErrors, OpenapiDeleteNoteResponses, OpenapiGetNoteData, OpenapiGetNoteErrors, OpenapiGetNoteResponses, OpenapiListNotesData, OpenapiListNotesErrors, OpenapiListNotesResponses, OpenapiPatchNoteData, OpenapiPatchNoteErrors, OpenapiPatchNoteResponses, OpenapiUpdateNoteData, OpenapiUpdateNoteErrors, OpenapiUpdateNoteResponses, OpenapiWsEditsDocumentData, OpenapiWsEditsDocumentErrors } from './types.gen';
+import type { OpenapiCreateNoteData, OpenapiCreateNoteErrors, OpenapiCreateNoteResponses, OpenapiDeleteNoteData, OpenapiDeleteNoteErrors, OpenapiDeleteNoteResponses, OpenapiGetNoteData, OpenapiGetNoteErrors, OpenapiGetNoteResponses, OpenapiListNotesData, OpenapiListNotesErrors, OpenapiListNotesResponses, OpenapiPatchNoteData, OpenapiPatchNoteErrors, OpenapiPatchNoteResponses, OpenapiUpdateNoteData, OpenapiUpdateNoteErrors, OpenapiUpdateNoteResponses, OpenapiWsEditsDocumentData, OpenapiWsEditsDocumentErrors, OpenapiWsEditsDocumentResponses } from './types.gen';
 import { zOpenapiCreateNoteData, zOpenapiCreateNoteResponse, zOpenapiDeleteNoteData, zOpenapiDeleteNoteResponse, zOpenapiGetNoteData, zOpenapiGetNoteResponse, zOpenapiListNotesData, zOpenapiListNotesResponse, zOpenapiPatchNoteData, zOpenapiPatchNoteResponse, zOpenapiUpdateNoteData, zOpenapiUpdateNoteResponse, zOpenapiWsEditsDocumentData } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
@@ -18,6 +18,17 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: Record<string, unknown>;
 };
+
+/**
+ * WebSocket for editing a document
+ *
+ * Establish a WebSocket connection for real-time collaborative editing of a document.
+ */
+export const openapiWsEditsDocument = <ThrowOnError extends boolean = false>(options: Options<OpenapiWsEditsDocumentData, ThrowOnError>) => (options.client ?? client).get<OpenapiWsEditsDocumentResponses, OpenapiWsEditsDocumentErrors, ThrowOnError>({
+    requestValidator: async (data) => await zOpenapiWsEditsDocumentData.parseAsync(data),
+    url: '/ws/edits/{documentId}',
+    ...options
+});
 
 /**
  * List notes
@@ -101,15 +112,4 @@ export const openapiUpdateNote = <ThrowOnError extends boolean = false>(options:
         'Content-Type': 'application/json',
         ...options.headers
     }
-});
-
-/**
- * WebSocket for editing a document
- *
- * Establish a WebSocket connection for real-time collaborative editing of a document.
- */
-export const openapiWsEditsDocument = <ThrowOnError extends boolean = false>(options: Options<OpenapiWsEditsDocumentData, ThrowOnError>) => (options.client ?? client).get<unknown, OpenapiWsEditsDocumentErrors, ThrowOnError>({
-    requestValidator: async (data) => await zOpenapiWsEditsDocumentData.parseAsync(data),
-    url: '/ws/edits/{documentId}',
-    ...options
 });
