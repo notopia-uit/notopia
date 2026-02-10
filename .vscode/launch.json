@@ -2,9 +2,30 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Debug Note",
+      "type": "go",
+      "request": "launch",
+      "program": "${workspaceFolder}/cmd/note",
+      "envFile": "${workspaceFolder}/cmd/note/.env"
+    },
+    {
+      "name": "Attach to Note",
+      "type": "go",
+      "request": "attach",
+      "mode": "remote",
+      "port": 23451,
+      "host": "127.0.0.1",
+      "substitutePath": [
+        {
+          "from": "${workspaceFolder}",
+          "to": "${workspaceFolder}"
+        }
+      ]
+    },
+    {
       "type": "node",
       "request": "launch",
-      "name": "Debug edit with Nx",
+      "name": "Debug Edit with Nx",
       "runtimeExecutable": "pnpm exec",
       "runtimeArgs": ["nx", "serve", "edit"],
       "env": {
