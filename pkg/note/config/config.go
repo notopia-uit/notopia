@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"log/slog"
+	"os"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -11,40 +12,50 @@ import (
 )
 
 type Server struct {
-	HTTP *config.ServerAddress `json:"http" mapstructure:"http" validate:"required" yaml:"http"`
-	GRPC *config.ServerAddress `json:"grpc" mapstructure:"grpc" validate:"required" yaml:"grpc"`
+	HTTP config.ServerAddress `json:"http" mapstructure:"http" validate:"required" yaml:"http"`
+	GRPC config.ServerAddress `json:"grpc" mapstructure:"grpc" validate:"required" yaml:"grpc"`
 }
 
 type Config struct {
-	Server   *Server      `json:"server"   mapstructure:"server"   validate:"required" yaml:"server"`
-	OTLP     *config.OTLP `json:"otlp"     mapstructure:"otlp"     validate:"omitnil"  yaml:"otlp"`
-	Database *config.SQL  `json:"database" mapstructure:"database" validate:"omitnil"  yaml:"database"`
+	Server   Server         `json:"server"   mapstructure:"server"   validate:"required"  yaml:"server"`
+	OTLP     config.OTLP    `json:"otlp"     mapstructure:"otlp"     validate:"omitempty" yaml:"otlp"`
+	Database config.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
+	General  config.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
 }
 
 func New(
 	validate *validator.Validate,
-	v *viper.Viper,
+	viper *viper.Viper,
 ) (*Config, error) {
-	v.SetEnvPrefix("NOTOPIA_NOTE")
-	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	slog.Info("env for NOTOPIA_NOTE_DATABASE_HOST: ", slog.String("value", os.Getenv("NOTOPIA_NOTE_DATABASE_HOST")))
+	viper.SetEnvPrefix("notopia_note")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	v.SetConfigName("note.notopia.config")
-	v.AddConfigPath(".")
+	viper.SetConfigName("note.notopia.config")
+	viper.AddConfigPath(".")
 
-	v.SetDefault("server.http.port", 8081)
-	v.SetDefault("server.grpc.port", 18081)
-	config.OTLPViperSetDefault(v, "otlp")
-	config.SQLViperSetDefault(v, "database")
+	viper.SetDefault("server.http.port", 8081)
+	viper.SetDefault("server.grpc.port", 18081)
+	config.OTLPViperSetDefault(viper, "otlp")
+	config.SQLViperSetDefault(viper, "database")
 
-	v.AutomaticEnv()
-	if err := v.ReadInConfig(); err == nil {
-		slog.Info("configuration loaded", slog.String("file", v.ConfigFileUsed()))
+	viper.AutomaticEnv()
+	if err := viper.ReadInConfig(); err == nil {
+		slog.Info("configuration loaded", slog.String("file", viper.ConfigFileUsed()))
 	}
 
 	var cfg Config
-	if err := v.Unmarshal(&cfg); err != nil {
+	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrUnmarshal, err)
 	}
+
+	slog.Info("configuration",
+		slog.Group("config",
+			slog.Any("Server", cfg.Server),
+			slog.Any("OTLP", cfg.OTLP),
+			slog.Any("Database", cfg.Database),
+		),
+	)
 
 	if err := validate.Struct(&cfg); err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrValidate, err)

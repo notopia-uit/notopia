@@ -48,10 +48,12 @@ func New(
 	httpHandler IHTTPHandler,
 	logger *slog.Logger,
 	cfg *config.Server,
-) (*Server, func()) {
+) (*Server, func(), error) {
 	slog.SetDefault(logger)
 
-	note.RegisterHandlers(ginEngine, httpHandler)
+	if err := RegisterRoutes(ginEngine, httpHandler); err != nil {
+		return nil, nil, err
+	}
 
 	server := &Server{
 		Server: &http.Server{
@@ -64,7 +66,7 @@ func New(
 			slog.Error("failed to shutdown http server", slog.String("error", err.Error()))
 		}
 	}
-	return server, cleanup
+	return server, cleanup, nil
 }
 
 func (s *Server) Run() error {

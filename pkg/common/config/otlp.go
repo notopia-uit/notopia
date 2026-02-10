@@ -10,14 +10,14 @@ import (
 
 type OTLPRemote struct {
 	Endpoint string `json:"endpoint" mapstructure:"endpoint" validate:"omitempty,hostname_port" yaml:"endpoint"`
-	Insecure bool   `json:"insecure" mapstructure:"insecure" validate:"required"                yaml:"insecure"` // Currently required, because we don't want to handle TLS
+	Insecure bool   `json:"insecure" mapstructure:"insecure" validate:""                        yaml:"insecure"`
 }
 
 type OTLPTrace struct {
-	Enabled    bool        `json:"enabled"     mapstructure:"enabled"     validate:""            yaml:"enabled"`
-	SampleRate float64     `json:"sample_rate" mapstructure:"sample_rate" validate:"gte=0,lte=1" yaml:"sample_rate"`
-	GRPC       *OTLPRemote `json:"grpc"        mapstructure:"grpc"        validate:"omitnil"     yaml:"grpc"`
-	Stdout     bool        `json:"stdout"      mapstructure:"stdout"      validate:""            yaml:"stdout"`
+	Enabled    bool       `json:"enabled"     mapstructure:"enabled"     validate:""            yaml:"enabled"`
+	SampleRate float64    `json:"sample_rate" mapstructure:"sample_rate" validate:"gte=0,lte=1" yaml:"sample_rate"`
+	GRPC       OTLPRemote `json:"grpc"        mapstructure:"grpc"        validate:""            yaml:"grpc"`
+	Stdout     bool       `json:"stdout"      mapstructure:"stdout"      validate:""            yaml:"stdout"`
 }
 
 var _ otel.TraceConfig = (*OTLPTrace)(nil)
@@ -42,10 +42,10 @@ func (o *OTLPTrace) GetSampleRate() float64 {
 }
 
 type OTLPLog struct {
-	Enabled bool        `json:"enabled" mapstructure:"enabled" validate:""                                      yaml:"enabled"`
-	Level   string      `json:"level"   mapstructure:"level"   validate:"omitempty,oneof=debug info warn error" yaml:"level"`
-	GRPC    *OTLPRemote `json:"grpc"    mapstructure:"grpc"    validate:"omitnil"                               yaml:"grpc"`
-	Stdout  bool        `json:"stdout"  mapstructure:"stdout"  validate:""                                      yaml:"stdout"`
+	Enabled bool       `json:"enabled" mapstructure:"enabled" validate:""                                      yaml:"enabled"`
+	Level   string     `json:"level"   mapstructure:"level"   validate:"omitempty,oneof=debug info warn error" yaml:"level"`
+	GRPC    OTLPRemote `json:"grpc"    mapstructure:"grpc"    validate:""                                      yaml:"grpc"`
+	Stdout  bool       `json:"stdout"  mapstructure:"stdout"  validate:""                                      yaml:"stdout"`
 }
 
 var _ otel.LogConfig = (*OTLPLog)(nil)
@@ -80,7 +80,7 @@ func (o *OTLPLog) GetMinSecurity() log.Severity {
 
 type OTLPMeter struct {
 	Enabled  bool          `json:"enabled"         mapstructure:"enabled"         validate:""                      yaml:"enabled"`
-	GRPC     *OTLPRemote   `json:"grpc"            mapstructure:"grpc"            validate:"omitnil"               yaml:"grpc"`
+	GRPC     OTLPRemote    `json:"grpc"            mapstructure:"grpc"            validate:""                      yaml:"grpc"`
 	Stdout   bool          `json:"stdout"          mapstructure:"stdout"          validate:""                      yaml:"stdout"`
 	Interval time.Duration `json:"export_interval" mapstructure:"export_interval" validate:"required_with=Enabled" yaml:"export_interval"`
 }
@@ -107,11 +107,11 @@ func (o *OTLPMeter) GetExportInterval() time.Duration {
 }
 
 type OTLP struct {
-	Enabled bool       `json:"enabled" mapstructure:"enabled" validate:""        yaml:"enabled"`
-	Stdout  bool       `json:"stdout"  mapstructure:"stdout"  validate:""        yaml:"stdout"`
-	Trace   *OTLPTrace `json:"trace"   mapstructure:"trace"   validate:"omitnil" yaml:"trace"`
-	Log     *OTLPLog   `json:"log"     mapstructure:"log"     validate:"omitnil" yaml:"log"`
-	Meter   *OTLPMeter `json:"meter"   mapstructure:"meter"   validate:"omitnil" yaml:"meter"`
+	Enabled bool      `json:"enabled" mapstructure:"enabled" validate:"" yaml:"enabled"`
+	Stdout  bool      `json:"stdout"  mapstructure:"stdout"  validate:"" yaml:"stdout"`
+	Trace   OTLPTrace `json:"trace"   mapstructure:"trace"   validate:"" yaml:"trace"`
+	Log     OTLPLog   `json:"log"     mapstructure:"log"     validate:"" yaml:"log"`
+	Meter   OTLPMeter `json:"meter"   mapstructure:"meter"   validate:"" yaml:"meter"`
 }
 
 func OTLPViperSetDefault(

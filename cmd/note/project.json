@@ -41,6 +41,7 @@
         "cwd": "{projectRoot}",
         "tty": true
       },
+      "dependsOn": ["gen:wire", "^gen*"],
       "continuous": true
     },
     "serve": {

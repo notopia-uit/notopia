@@ -8,7 +8,6 @@ package main
 
 import (
 	"context"
-
 	"github.com/notopia-uit/notopia/pkg/common/controller/http"
 	"github.com/notopia-uit/notopia/pkg/note"
 	"github.com/notopia-uit/notopia/pkg/note/app"
@@ -31,8 +30,8 @@ func InitializeServer(ctx context.Context) (*controller.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	otlp := configConfig.OTLP
-	otlpLog := otlp.Log
+	otlp := &configConfig.OTLP
+	otlpLog := &otlp.Log
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(serviceName, serviceVersion)
 	if err != nil {
@@ -44,13 +43,13 @@ func InitializeServer(ctx context.Context) (*controller.Server, func(), error) {
 	}
 	logger := otel.NewSlog(serviceName, loggerProvider)
 	ginSlogHandlerFunc := http.NewGinSlogHandler(logger)
-	otlpMeter := otlp.Meter
+	otlpMeter := &otlp.Meter
 	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, otlpMeter, resource)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	otlpTrace := otlp.Trace
+	otlpTrace := &otlp.Trace
 	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, otlpTrace, resource)
 	if err != nil {
 		cleanup2()
@@ -62,8 +61,14 @@ func InitializeServer(ctx context.Context) (*controller.Server, func(), error) {
 	appApp := app.NewApp()
 	strictHandler := http2.NewStrictHandler(appApp)
 	serverInterface := http2.NewHandler(strictHandler)
-	server := configConfig.Server
-	httpServer, cleanup4 := http2.New(ctx, engine, serverInterface, logger, server)
+	server := &configConfig.Server
+	httpServer, cleanup4, err := http2.New(ctx, engine, serverInterface, logger, server)
+	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	handler := grpc.NewHandler(appApp)
 	grpcServer, cleanup5, err := grpc.New(ctx, handler, server, tracerProvider, meterProvider)
 	if err != nil {

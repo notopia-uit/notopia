@@ -1,0 +1,22 @@
+server:
+  http:
+    host: localhost
+    port: 8081
+  grpc:
+    host: localhost
+    port: 18081
+
+database:
+  host: localhost
+  port: 5432
+  user: notopiauit
+  password: notopiauit
+  name: note
+  sslmode: disable
+
+otlp:
+  enabled: true
+  log:
+    enabled: true
+    stdout: true
+    level: info
