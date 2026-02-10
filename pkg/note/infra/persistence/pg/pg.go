@@ -14,19 +14,19 @@ func NewDBTXPool(
 	ctx context.Context,
 	tracerProvider *trace.TracerProvider,
 	cfg *config.SQL,
-) (pgsqlc.DBTX, error) {
+) (pgsqlc.DBTX, func(), error) {
 	pgxCfg, err := pgxpool.ParseConfig(cfg.URL)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	pgxCfg.ConnConfig.Tracer = otelpgx.NewTracer(
 		otelpgx.WithTracerProvider(tracerProvider),
 	)
 	pool, err := pgxpool.NewWithConfig(ctx, pgxCfg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return pool, nil
+	return pool, pool.Close, nil
 }
 
 var ProvideDBTXPool = NewDBTXPool
