@@ -17,7 +17,6 @@ import (
 	"github.com/notopia-uit/notopia/pkg/note/controller/grpc"
 	http2 "github.com/notopia-uit/notopia/pkg/note/controller/http"
 	"github.com/notopia-uit/notopia/pkg/otel"
-	"github.com/spf13/viper"
 )
 
 // Injectors from wire.go:
@@ -25,8 +24,8 @@ import (
 func InitializeServer(ctx context.Context) (*controller.Server, func(), error) {
 	serviceName := _wireServiceNameValue
 	validate := components.ProvideValidate()
-	viperViper := viper.New()
-	configConfig, err := config.New(validate, viperViper)
+	viper := config.NewViper()
+	configConfig, err := config.New(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}

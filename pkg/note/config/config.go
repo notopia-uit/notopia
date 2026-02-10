@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"log/slog"
-	"os"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -27,7 +26,6 @@ func New(
 	validate *validator.Validate,
 	viper *viper.Viper,
 ) (*Config, error) {
-	slog.Info("env for NOTOPIA_NOTE_DATABASE_HOST: ", slog.String("value", os.Getenv("NOTOPIA_NOTE_DATABASE_HOST")))
 	viper.SetEnvPrefix("notopia_note")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
@@ -49,13 +47,7 @@ func New(
 		return nil, fmt.Errorf("%w: %v", ErrUnmarshal, err)
 	}
 
-	slog.Info("configuration",
-		slog.Group("config",
-			slog.Any("Server", cfg.Server),
-			slog.Any("OTLP", cfg.OTLP),
-			slog.Any("Database", cfg.Database),
-		),
-	)
+	slog.Info("configuration", slog.Any("config", cfg))
 
 	if err := validate.Struct(&cfg); err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrValidate, err)
