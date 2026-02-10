@@ -9,14 +9,14 @@ import (
 func RegisterRoutes(
 	e *gin.Engine,
 	httpHandler IHTTPHandler,
+	healthManager *http.HealthManager,
 ) error {
 	valdateHandler, err := ValidateHandler()
 	if err != nil {
 		return err
 	}
-	// TODO: Implement health later here
+	http.RegisterHealthRoutes(e, healthManager)
 	// TODO: Those route with protected from gateway will have user context
-	http.RegisterHealthRoutes(e, nil)
 	api := e.Group("/")
 	{
 		api.Use(ErrorHandler())

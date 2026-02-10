@@ -12,7 +12,8 @@
     "goFiles": [
       "{workspaceRoot}/go.mod",
       "{workspaceRoot}/go.sum",
-      "{projectRoot}/**/*.{go}"
+      "{projectRoot}/**/*.{go}",
+      "!{projectRoot}/**/*_test.go"
     ],
     "protoFiles": [
       "{projectRoot}/**/*.proto",

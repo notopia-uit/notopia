@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/notopia-uit/notopia/pkg/api/note"
+	commonhttp "github.com/notopia-uit/notopia/pkg/common/controller/http"
 	"github.com/notopia-uit/notopia/pkg/note/app"
 	"github.com/notopia-uit/notopia/pkg/note/config"
 )
@@ -46,12 +47,13 @@ func New(
 	ctx context.Context,
 	ginEngine *gin.Engine,
 	httpHandler IHTTPHandler,
+	healthManager *commonhttp.HealthManager,
 	logger *slog.Logger,
 	cfg *config.Server,
 ) (*Server, func(), error) {
 	slog.SetDefault(logger)
 
-	if err := RegisterRoutes(ginEngine, httpHandler); err != nil {
+	if err := RegisterRoutes(ginEngine, httpHandler, healthManager); err != nil {
 		return nil, nil, err
 	}
 

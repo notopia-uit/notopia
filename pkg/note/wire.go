@@ -6,6 +6,7 @@ import (
 	"github.com/notopia-uit/notopia/pkg/note/component"
 	"github.com/notopia-uit/notopia/pkg/note/config"
 	"github.com/notopia-uit/notopia/pkg/note/controller"
+	"github.com/notopia-uit/notopia/pkg/note/infra"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
 
@@ -14,6 +15,7 @@ var ProviderSet = wire.NewSet(
 	components.ProviderSet,
 	config.ProviderSet,
 	controller.ProviderSet,
+	infra.ProviderSet,
 	otel.ProviderSet,
 	wire.Value(ServiceName),
 	wire.Value(ServiceVersion),

@@ -10,11 +10,11 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 
-func NewDBTXPool(
+func NewPgPool(
 	ctx context.Context,
 	tracerProvider *trace.TracerProvider,
 	cfg *config.SQL,
-) (pgsqlc.DBTX, func(), error) {
+) (*pgxpool.Pool, func(), error) {
 	pgxCfg, err := pgxpool.ParseConfig(cfg.URL)
 	if err != nil {
 		return nil, nil, err
@@ -29,7 +29,7 @@ func NewDBTXPool(
 	return pool, pool.Close, nil
 }
 
-var ProvideDBTXPool = NewDBTXPool
+var ProvidePgPool = NewPgPool
 
 func NewQueries(db pgsqlc.DBTX) *pgsqlc.Queries {
 	return pgsqlc.New(db)

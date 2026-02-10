@@ -2,6 +2,7 @@ package http
 
 import (
 	"log/slog"
+	"net/http"
 
 	ginslog "github.com/gin-contrib/slog"
 	"github.com/gin-gonic/gin"
@@ -68,26 +69,28 @@ var ProvideGin = NewGin
 
 func RegisterHealthRoutes(
 	r *gin.Engine,
-	health Health,
+	healthManager *HealthManager,
 ) {
 	g := r.Group("/health")
 	g.GET("/startup", func(c *gin.Context) {
-		healthResponse := health.StartupCheck()
-		statusCode := 200
+		ctx := c.Request.Context()
+		healthResponse := healthManager.StartupHTTPHandler(ctx)
+		statusCode := http.StatusOK
 		if healthResponse.Status != StartupStatusStarted {
-			statusCode = 503
+			statusCode = http.StatusServiceUnavailable
 		}
 		c.JSON(statusCode, healthResponse)
 	})
 	g.GET("/readiness", func(c *gin.Context) {
-		healthResponse := health.ReadinessCheck()
-		statusCode := 200
+		ctx := c.Request.Context()
+		healthResponse := healthManager.ReadinessHTTPHandler(ctx)
+		statusCode := http.StatusOK
 		if healthResponse.Status != ReadinessStatusReady {
-			statusCode = 503
+			statusCode = http.StatusServiceUnavailable
 		}
 		c.JSON(statusCode, healthResponse)
 	})
 	g.GET("/live", func(c *gin.Context) {
-		c.Status(200)
+		c.Status(http.StatusOK)
 	})
 }
