@@ -24,10 +24,9 @@ func NewGinSlogHandler(
 			},
 		),
 		ginslog.WithSkipPath([]string{
-			"/healthz",
-			"/readyz",
-			"/metrics",
-			"/livez",
+			"/health/startup",
+			"/health/readiness",
+			"/health/live",
 		}),
 	))
 }
@@ -66,7 +65,7 @@ func NewGin(
 
 var ProvideGin = NewGin
 
-func SetupHealthRoutes(
+func RegisterHealthRoutes(
 	r *gin.Engine,
 	health Health,
 ) {
