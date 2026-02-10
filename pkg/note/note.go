@@ -2,10 +2,10 @@ package note
 
 import (
 	"github.com/notopia-uit/notopia/pkg/common/metadata"
-	"github.com/notopia-uit/notopia/pkg/note/controller/http"
+	"github.com/notopia-uit/notopia/pkg/note/controller"
 )
 
-type Server = http.Server
+type Server = controller.Server
 
 const (
 	// TODO: Let something track this version?

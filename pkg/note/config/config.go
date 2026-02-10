@@ -11,12 +11,8 @@ import (
 )
 
 type Server struct {
-	Host string `json:"host" mapstructure:"host" validate:"omitempty,hostname" yaml:"host"`
-	Port uint16 `json:"port" mapstructure:"port" validate:"required,port"      yaml:"port"`
-}
-
-func (s *Server) Address() string {
-	return fmt.Sprintf("%s:%d", s.Host, s.Port)
+	HTTP *config.ServerAddress `json:"http" mapstructure:"http" validate:"required" yaml:"http"`
+	GRPC *config.ServerAddress `json:"grpc" mapstructure:"grpc" validate:"required" yaml:"grpc"`
 }
 
 type Config struct {
@@ -35,7 +31,8 @@ func NewConfig(
 	v.SetConfigName("note.notopia.config")
 	v.AddConfigPath(".")
 
-	v.SetDefault("server.port", 8081)
+	v.SetDefault("server.http.port", 8081)
+	v.SetDefault("server.grpc.port", 18081)
 	config.OTLPViperSetDefault(v, "otlp")
 	config.SQLViperSetDefault(v, "database")
 

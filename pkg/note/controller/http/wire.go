@@ -6,12 +6,9 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
-	ProvideHTTPHandler,
-	ProvideRPCHTTPHandlerRegister,
-	ProvideRPCHandler,
-	ProvideServer,
-	ProvideStrictHTTPHandler,
+	ProvideHandler,
+	Provide,
+	ProvideStrictHandler,
 	http.ProviderSet,
-	wire.Bind(new(IRCPHandler), new(*RPCHandler)),
-	wire.Bind(new(IStrictHTTPHandler), new(*StrictHTTPHandler)),
+	wire.Bind(new(IStrictHandler), new(*StrictHandler)),
 )

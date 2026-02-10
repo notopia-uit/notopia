@@ -14,7 +14,7 @@ func main() {
 		slog.Error("failed to initialize server", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
-	if err := server.Run(); err != nil {
+	if err := server.Run(ctx); err != nil {
 		slog.Error("server encountered an error", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
