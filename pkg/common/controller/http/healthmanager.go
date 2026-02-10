@@ -134,11 +134,15 @@ func (hm *HealthManager) checkReadiness(parentCtx context.Context) {
 			defer wg.Done()
 			err := check(ctx)
 			heathy := err == nil
+			errMsg := ""
+			if err != nil {
+				errMsg = err.Error()
+			}
 
 			componentsMu.Lock()
 			components[componentName] = HealthComponent{
 				Healthy: heathy,
-				Message: err.Error(),
+				Message: errMsg,
 			}
 			if !heathy {
 				allHealthy = false

@@ -17,7 +17,7 @@ func NewPgPool(
 	tracerProvider *trace.TracerProvider,
 	cfg *config.SQL,
 ) (*pgxpool.Pool, func(), error) {
-	pgxCfg, err := pgxpool.ParseConfig(cfg.URL)
+	pgxCfg, err := pgxpool.ParseConfig(cfg.GetURL())
 	if err != nil {
 		return nil, nil, err
 	}

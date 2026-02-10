@@ -49,7 +49,7 @@
       "executor": "nx:run-commands",
       "inputs": ["goFiles"],
       "options": {
-        "command": "dlv debug . --headless --listen=127.0.0.1:23451 --accept-multiclient --output ./dist/",
+        "command": "dlv debug . --headless --listen=127.0.0.1:23451 --accept-multiclient",
         "cwd": "{projectRoot}",
         "tty": true
       },
