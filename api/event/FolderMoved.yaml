@@ -1,36 +1,30 @@
 # vim: ft=yaml.openapi
 type: object
 properties:
-  folder:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174004
-      name:
-        type: string
-        example: Work
-      newName:
-        type: string
-        example: Projects
-    required:
-      - id
-      - name
-      - newName
-  actor:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174003
-      name:
-        type: string
-        example: johndoe
-    required:
-      - id
-      - name
+  folderId:
+    type: string
+    format: uuid
+    example: 123e4567-e89b-12d3-a456-426614174004
+  oldName:
+    type: string
+    example: Work
+  newName:
+    type: string
+    example: Projects
+  actorId:
+    type: string
+    format: uuid
+    example: 123e4567-e89b-12d3-a456-426614174003
+  actorName:
+    type: string
+    example: johndoe
+  occurredAt:
+    type: string
+    format: date-time
+    example: 2024-06-15T10:20:30Z
 required:
-  - folder
-  - actor
+  - folderId
+  - oldName
+  - newName
+  - actorId
+  - occurredAt

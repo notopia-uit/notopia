@@ -1,59 +1,41 @@
 # vim: ft=yaml.openapi
 type: object
 properties:
-  note:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174000
-      title:
-        type: string
-        example: Meeting Notes
-    required:
-      - id
-      - title
-  oldFolder:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174001
-      name:
-        type: string
-        example: Job
-    required:
-      - id
-      - name
-  newFolder:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174002
-      name:
-        type: string
-        example: Personal
-    required:
-      - id
-      - name
-  actor:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174003
-      name:
-        type: string
-        example: johndoe
-    required:
-      - id
-      - name
+  noteId:
+    type: string
+    format: uuid
+    example: 123e4567-e89b-12d3-a456-426614174000
+  noteTitle:
+    type: string
+    example: Meeting Notes
+  fromFolderId:
+    type: string
+    format: uuid
+    example: 123e4567-e89b-12d3-a456-426614174001
+  fromFolderName:
+    type: string
+    example: Job
+  toFolderId:
+    type: string
+    format: uuid
+    example: 123e4567-e89b-12d3-a456-426614174002
+  toFolderName:
+    type: string
+    example: Personal
+  actorId:
+    type: string
+    format: uuid
+    example: 123e4567-e89b-12d3-a456-426614174003
+  actorName:
+    type: string
+    example: johndoe
+  occurredAt:
+    type: string
+    format: date-time
+    example: 2024-06-15T13:45:30Z
 required:
-  - note
-  - oldFolder
-  - newFolder
+  - noteId
+  - fromFolderId
+  - toFolderId
+  - actorId
+  - occurredAt
