@@ -6,9 +6,6 @@ settings:
 
 catalogs:
   default:
-    '@bufbuild/protobuf':
-      specifier: ^2.11.0
-      version: 2.11.0
     '@nestjs/common':
       specifier: ^11.1.13
       version: 11.1.13
@@ -296,7 +293,7 @@ importers:
         version: 0.92.3(typescript@5.9.3)
       '@openapitools/openapi-generator-cli':
         specifier: ^2.28.2
-        version: 2.28.2(@nestjs/platform-express@11.1.13)(@types/node@25.2.2)(encoding@0.1.13)
+        version: 2.28.3(@nestjs/platform-express@11.1.13)(@types/node@25.2.2)(encoding@0.1.13)
       '@redocly/cli':
         specifier: ^2.14.5
         version: 2.15.2(@opentelemetry/api@1.9.0)(core-js@3.48.0)(encoding@0.1.13)
@@ -363,17 +360,17 @@ importers:
         version: 1.4.0
       vitepress-openapi:
         specifier: ^0.1.13
-        version: 0.1.13(typescript@5.9.3)(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))(vue@3.5.27(typescript@5.9.3))
+        version: 0.1.13(typescript@5.9.3)(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))(vue@3.5.27(typescript@5.9.3))
       vitepress-plugin-pagefind:
         specifier: ^0.4.18
-        version: 0.4.18(pagefind@1.4.0)(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))(vue@3.5.27(typescript@5.9.3))
+        version: 0.4.18(pagefind@1.4.0)(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))(vue@3.5.27(typescript@5.9.3))
     devDependencies:
       vitepress:
         specifier: 2.0.0-alpha.16
-        version: 2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)
+        version: 2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)
       vitepress-plugin-diagrams:
         specifier: ^1.1.2
-        version: 1.1.2(vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 1.1.2(vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))
       vitepress-sidebar:
         specifier: ^1.33.1
         version: 1.33.1
@@ -403,7 +400,7 @@ importers:
         version: link:../../api/note
       '@scalar/api-reference-react':
         specifier: ^0.8.20
-        version: 0.8.52(axios@1.13.4)(change-case@5.4.4)(react@19.2.4)(tailwindcss@4.1.18)(typescript@5.9.3)
+        version: 0.8.52(axios@1.13.5)(change-case@5.4.4)(react@19.2.4)(tailwindcss@4.1.18)(typescript@5.9.3)
 
   packages/notopia-pb:
     dependencies:
@@ -2761,8 +2758,8 @@ packages:
   '@nx/workspace@22.4.5':
     resolution: {integrity: sha512-QGapABrqBnRpEWbnd5UpbVCBzsYD+RlC1lWShXPpCM+dosR3qkGb+pSmxeSCsKbNVtCwYyyuRW+PvlF5Q5sU9A==}
 
-  '@openapitools/openapi-generator-cli@2.28.2':
-    resolution: {integrity: sha512-iUBOVBbABSc+ygVJ1/xhdpZrH2Aj5ymGyN0QojoLG8RsQFJ9IUHR/i6bih4H2lOPdqzKeIO2PhPsgCvXYqLJFA==}
+  '@openapitools/openapi-generator-cli@2.28.3':
+    resolution: {integrity: sha512-ZLJwijwRcbxlCW+vzQ4mufgux80aFo07xQBHNiSbaOQFVGtI566xY1cYf1kmld+BksJiGwRVEbnkYSQnsMGrMQ==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -5004,6 +5001,9 @@ packages:
   axios@1.13.4:
     resolution: {integrity: sha512-1wVkUaAO6WyaYtCkcYCOx12ZgpGf9Zif+qXa4n+oYzK558YryKqiL6UWwd5DqiH3VRW0GYhTZQ/vlgJrCoNQlg==}
 
+  axios@1.13.5:
+    resolution: {integrity: sha512-cz4ur7Vb0xS4/KUN0tPWe44eqxrIu31me+fbang3ijiNscE129POzipJJA6zniq2C/Z6sJCjMimjS8Lc/GAs8Q==}
+
   axobject-query@4.1.0:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
     engines: {node: '>= 0.4'}
@@ -5364,6 +5364,10 @@ packages:
 
   cli-spinners@2.6.1:
     resolution: {integrity: sha512-x/5fWmGMnbKQAaNwN+UZlV79qBLM9JFnJuJ03gIi5whrob0xV0ofNVHy9DhwGdsMJQc2OKv0oGmLzvaqvAVv+g==}
+    engines: {node: '>=6'}
+
+  cli-spinners@2.9.2:
+    resolution: {integrity: sha512-ywqV+5MmyL4E7ybXgKys4DugZbX0FC6LnwrhjuykIjnK9k8OQacQ7axGKnjDXWNhns0xot3bZI5h55H8yo9cJg==}
     engines: {node: '>=6'}
 
   cli-width@3.0.0:
@@ -7835,6 +7839,10 @@ packages:
 
   lru-cache@11.2.5:
     resolution: {integrity: sha512-vFrFJkWtJvJnD5hg+hJvVE8Lh/TcMzKnTgCWmtBipwI5yLX/iX+5UB2tfuyODF5E7k9xEzMdYgGqaSb1c0c5Yw==}
+    engines: {node: 20 || >=22}
+
+  lru-cache@11.2.6:
+    resolution: {integrity: sha512-ESL2CrkS/2wTPfuend7Zhkzo2u0daGJ/A2VucJOgQ/C48S/zB8MMeMHSGKYpXhIjbPxfuezITkaBH1wqv00DDQ==}
     engines: {node: 20 || >=22}
 
   lru-cache@5.1.1:
@@ -13287,10 +13295,10 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
-  '@nestjs/axios@4.0.1(@nestjs/common@11.1.13(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.13.4)(rxjs@7.8.2)':
+  '@nestjs/axios@4.0.1(@nestjs/common@11.1.13(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.13.5)(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 11.1.13(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      axios: 1.13.4
+      axios: 1.13.5
       rxjs: 7.8.2
 
   '@nestjs/common@11.1.13(reflect-metadata@0.1.14)(rxjs@7.8.2)':
@@ -13977,13 +13985,13 @@ snapshots:
       - '@swc/core'
       - debug
 
-  '@openapitools/openapi-generator-cli@2.28.2(@nestjs/platform-express@11.1.13)(@types/node@25.2.2)(encoding@0.1.13)':
+  '@openapitools/openapi-generator-cli@2.28.3(@nestjs/platform-express@11.1.13)(@types/node@25.2.2)(encoding@0.1.13)':
     dependencies:
-      '@nestjs/axios': 4.0.1(@nestjs/common@11.1.13(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.13.4)(rxjs@7.8.2)
+      '@nestjs/axios': 4.0.1(@nestjs/common@11.1.13(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.13.5)(rxjs@7.8.2)
       '@nestjs/common': 11.1.13(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.13(@nestjs/common@11.1.13(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nuxtjs/opencollective': 0.3.2(encoding@0.1.13)
-      axios: 1.13.4
+      axios: 1.13.5
       chalk: 4.1.2
       commander: 8.3.0
       compare-versions: 6.1.1
@@ -14669,10 +14677,10 @@ snapshots:
 
   '@rtsao/scc@1.1.0': {}
 
-  '@scalar/agent-chat@0.5.6(axios@1.13.4)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)':
+  '@scalar/agent-chat@0.5.6(axios@1.13.5)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)':
     dependencies:
       '@ai-sdk/vue': 3.0.33(vue@3.5.27(typescript@5.9.3))(zod@4.3.6)
-      '@scalar/api-client': 2.25.0(axios@1.13.4)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)
+      '@scalar/api-client': 2.25.0(axios@1.13.5)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)
       '@scalar/components': 0.18.0(typescript@5.9.3)
       '@scalar/helpers': 0.2.11
       '@scalar/icons': 0.5.2(typescript@5.9.3)
@@ -14708,7 +14716,7 @@ snapshots:
     dependencies:
       zod: 4.3.6
 
-  '@scalar/api-client@2.25.0(axios@1.13.4)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)':
+  '@scalar/api-client@2.25.0(axios@1.13.5)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)':
     dependencies:
       '@headlessui/tailwindcss': 0.2.2(tailwindcss@4.1.18)
       '@headlessui/vue': 1.7.23(vue@3.5.27(typescript@5.9.3))
@@ -14734,7 +14742,7 @@ snapshots:
       '@scalar/workspace-store': 0.30.0(typescript@5.9.3)
       '@types/har-format': 1.2.16
       '@vueuse/core': 13.9.0(vue@3.5.27(typescript@5.9.3))
-      '@vueuse/integrations': 13.9.0(axios@1.13.4)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(vue@3.5.27(typescript@5.9.3))
+      '@vueuse/integrations': 13.9.0(axios@1.13.5)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(vue@3.5.27(typescript@5.9.3))
       focus-trap: 7.8.0
       fuse.js: 7.1.0
       js-base64: 3.7.8
@@ -14765,9 +14773,9 @@ snapshots:
       - typescript
       - universal-cookie
 
-  '@scalar/api-reference-react@0.8.52(axios@1.13.4)(change-case@5.4.4)(react@19.2.4)(tailwindcss@4.1.18)(typescript@5.9.3)':
+  '@scalar/api-reference-react@0.8.52(axios@1.13.5)(change-case@5.4.4)(react@19.2.4)(tailwindcss@4.1.18)(typescript@5.9.3)':
     dependencies:
-      '@scalar/api-reference': 1.44.15(axios@1.13.4)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)
+      '@scalar/api-reference': 1.44.15(axios@1.13.5)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)
       '@scalar/types': 0.6.2
       react: 19.2.4
     transitivePeerDependencies:
@@ -14786,11 +14794,11 @@ snapshots:
       - typescript
       - universal-cookie
 
-  '@scalar/api-reference@1.44.15(axios@1.13.4)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)':
+  '@scalar/api-reference@1.44.15(axios@1.13.5)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)':
     dependencies:
       '@headlessui/vue': 1.7.23(vue@3.5.27(typescript@5.9.3))
-      '@scalar/agent-chat': 0.5.6(axios@1.13.4)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)
-      '@scalar/api-client': 2.25.0(axios@1.13.4)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)
+      '@scalar/agent-chat': 0.5.6(axios@1.13.5)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)
+      '@scalar/api-client': 2.25.0(axios@1.13.5)(change-case@5.4.4)(tailwindcss@4.1.18)(typescript@5.9.3)
       '@scalar/code-highlight': 0.2.2
       '@scalar/components': 0.18.0(typescript@5.9.3)
       '@scalar/helpers': 0.2.11
@@ -16152,24 +16160,24 @@ snapshots:
       '@vueuse/shared': 14.1.0(vue@3.5.27(typescript@5.9.3))
       vue: 3.5.27(typescript@5.9.3)
 
-  '@vueuse/integrations@13.9.0(axios@1.13.4)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(vue@3.5.27(typescript@5.9.3))':
+  '@vueuse/integrations@13.9.0(axios@1.13.5)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(vue@3.5.27(typescript@5.9.3))':
     dependencies:
       '@vueuse/core': 13.9.0(vue@3.5.27(typescript@5.9.3))
       '@vueuse/shared': 13.9.0(vue@3.5.27(typescript@5.9.3))
       vue: 3.5.27(typescript@5.9.3)
     optionalDependencies:
-      axios: 1.13.4
+      axios: 1.13.5
       change-case: 5.4.4
       focus-trap: 7.8.0
       fuse.js: 7.1.0
 
-  '@vueuse/integrations@14.1.0(axios@1.13.4)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(vue@3.5.27(typescript@5.9.3))':
+  '@vueuse/integrations@14.1.0(axios@1.13.5)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(vue@3.5.27(typescript@5.9.3))':
     dependencies:
       '@vueuse/core': 14.1.0(vue@3.5.27(typescript@5.9.3))
       '@vueuse/shared': 14.1.0(vue@3.5.27(typescript@5.9.3))
       vue: 3.5.27(typescript@5.9.3)
     optionalDependencies:
-      axios: 1.13.4
+      axios: 1.13.5
       change-case: 5.4.4
       focus-trap: 7.8.0
       fuse.js: 7.1.0
@@ -16667,6 +16675,14 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
+  axios@1.13.5:
+    dependencies:
+      follow-redirects: 1.15.11(debug@4.4.3)
+      form-data: 4.0.5
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
   axobject-query@4.1.0: {}
 
   b4a@1.7.3: {}
@@ -16872,7 +16888,7 @@ snapshots:
     dependencies:
       ansi-align: 3.0.1
       camelcase: 7.0.1
-      chalk: 5.6.2
+      chalk: 5.0.1
       cli-boxes: 3.0.0
       string-width: 5.1.2
       type-fest: 2.19.0
@@ -17076,6 +17092,8 @@ snapshots:
       restore-cursor: 3.1.0
 
   cli-spinners@2.6.1: {}
+
+  cli-spinners@2.9.2: {}
 
   cli-width@3.0.0: {}
 
@@ -20046,6 +20064,8 @@ snapshots:
 
   lru-cache@11.2.5: {}
 
+  lru-cache@11.2.6: {}
+
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
@@ -20781,7 +20801,7 @@ snapshots:
       oas-kit-common: 1.0.8
       reftools: 1.1.9
       yaml: 1.10.2
-      yargs: 17.7.2
+      yargs: 17.0.1
 
   oas-schema-walker@1.1.5: {}
 
@@ -20921,7 +20941,7 @@ snapshots:
       bl: 4.1.0
       chalk: 4.1.2
       cli-cursor: 3.1.0
-      cli-spinners: 2.6.1
+      cli-spinners: 2.9.2
       is-interactive: 1.0.0
       is-unicode-supported: 0.1.0
       log-symbols: 4.1.0
@@ -21080,7 +21100,7 @@ snapshots:
 
   path-scurry@2.0.1:
     dependencies:
-      lru-cache: 11.2.5
+      lru-cache: 11.2.6
       minipass: 7.1.2
 
   path-to-regexp@0.1.12: {}
@@ -22691,7 +22711,7 @@ snapshots:
       oas-validator: 5.0.8
       reftools: 1.1.9
       yaml: 1.10.2
-      yargs: 17.7.2
+      yargs: 17.0.1
     transitivePeerDependencies:
       - encoding
 
@@ -23200,7 +23220,7 @@ snapshots:
       terser: 5.46.0
       yaml: 2.8.2
 
-  vitepress-openapi@0.1.13(typescript@5.9.3)(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))(vue@3.5.27(typescript@5.9.3)):
+  vitepress-openapi@0.1.13(typescript@5.9.3)(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))(vue@3.5.27(typescript@5.9.3)):
     dependencies:
       '@vueuse/core': 13.9.0(vue@3.5.27(typescript@5.9.3))
       class-variance-authority: 0.7.1
@@ -23208,26 +23228,26 @@ snapshots:
       lucide-vue-next: 0.503.0(vue@3.5.27(typescript@5.9.3))
       markdown-it-link-attributes: 4.0.1
       reka-ui: 2.7.0(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3))
-      vitepress: 2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)
+      vitepress: 2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)
       vue: 3.5.27(typescript@5.9.3)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - typescript
 
-  vitepress-plugin-diagrams@1.1.2(vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)):
+  vitepress-plugin-diagrams@1.1.2(vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2))(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
       commander: 14.0.3
       markdown-it: 14.1.0
       vite: 7.3.1(@types/node@25.2.2)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.2)
-      vitepress: 2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)
+      vitepress: 2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)
 
-  vitepress-plugin-pagefind@0.4.18(pagefind@1.4.0)(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))(vue@3.5.27(typescript@5.9.3)):
+  vitepress-plugin-pagefind@0.4.18(pagefind@1.4.0)(vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2))(vue@3.5.27(typescript@5.9.3)):
     dependencies:
       '@sugarat/theme-shared': 0.0.7
       '@vueuse/core': 14.1.0(vue@3.5.27(typescript@5.9.3))
       javascript-stringify: 2.1.0
       pagefind: 1.4.0
-      vitepress: 2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)
+      vitepress: 2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2)
       vue-command-palette: 0.1.4
     transitivePeerDependencies:
       - vue
@@ -23238,7 +23258,7 @@ snapshots:
       gray-matter: 4.0.3
       qsu: 1.11.1
 
-  vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.4)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2):
+  vitepress@2.0.0-alpha.16(@types/node@25.2.2)(axios@1.13.5)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.30.2)(postcss@8.5.6)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(typescript@5.9.3)(yaml@2.8.2):
     dependencies:
       '@docsearch/css': 4.5.3
       '@docsearch/js': 4.5.3
@@ -23252,7 +23272,7 @@ snapshots:
       '@vue/devtools-api': 8.0.5
       '@vue/shared': 3.5.27
       '@vueuse/core': 14.1.0(vue@3.5.27(typescript@5.9.3))
-      '@vueuse/integrations': 14.1.0(axios@1.13.4)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(vue@3.5.27(typescript@5.9.3))
+      '@vueuse/integrations': 14.1.0(axios@1.13.5)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(vue@3.5.27(typescript@5.9.3))
       focus-trap: 7.8.0
       mark.js: 8.11.1
       minisearch: 7.2.0
