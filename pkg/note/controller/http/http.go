@@ -48,11 +48,8 @@ func New(
 	ginEngine *gin.Engine,
 	httpHandler IHTTPHandler,
 	healthManager *commonhttp.HealthManager,
-	logger *slog.Logger,
 	cfg *config.Server,
 ) (*Server, func(), error) {
-	slog.SetDefault(logger)
-
 	if err := RegisterRoutes(ginEngine, httpHandler, healthManager); err != nil {
 		return nil, nil, err
 	}

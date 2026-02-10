@@ -16,6 +16,6 @@ func main() {
 	}
 	if err := server.Run(ctx); err != nil {
 		slog.Error("server encountered an error", slog.String("error", err.Error()))
-		os.Exit(1)
+		os.Exit(2)
 	}
 }

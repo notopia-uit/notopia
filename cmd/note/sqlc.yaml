@@ -3,7 +3,7 @@ version: '2'
 
 sql:
   - engine: postgresql
-    schema: ../../pkg/note/migration/
+    schema: ../../pkg/note/infra/persistence/pgmigration/
     queries: ../../pkg/note/infra/persistence/pgsqlc/
     gen:
       go:

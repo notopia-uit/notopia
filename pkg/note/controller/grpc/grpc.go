@@ -41,6 +41,7 @@ func New(
 	cfg *config.Server,
 	traceProvider *trace.TracerProvider,
 	meterProvider *metric.MeterProvider,
+	logger *slog.Logger,
 ) (*Server, func(), error) {
 	interceptor, err := otelconnect.NewInterceptor(
 		otelconnect.WithTracerProvider(traceProvider),
@@ -68,7 +69,7 @@ func New(
 	}
 	cleanup := func() {
 		if err := server.Shutdown(ctx); err != nil {
-			slog.Error("failed to shutdown grpc server", slog.String("error", err.Error()))
+			logger.Error("failed to shutdown grpc server", slog.String("error", err.Error()))
 		}
 	}
 	return server, cleanup, nil

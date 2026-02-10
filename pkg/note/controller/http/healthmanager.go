@@ -3,15 +3,15 @@ package http
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/notopia-uit/notopia/pkg/common/controller/http"
+	"github.com/notopia-uit/notopia/pkg/note/infra/persistence"
 )
 
 func NewHealthManager(
-	pg *pgxpool.Pool,
+	persistence persistence.Persistence,
 ) *http.HealthManager {
 	postgresCheck := func(ctx context.Context) error {
-		return pg.Ping(ctx)
+		return persistence.CheckReadiness(ctx)
 	}
 	healthToCheck := map[string]http.HealthToCheckFunc{
 		"postgres": postgresCheck,

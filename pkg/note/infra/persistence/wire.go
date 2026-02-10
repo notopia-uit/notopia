@@ -8,7 +8,10 @@ import (
 )
 
 var PostgresProviderSet = wire.NewSet(
+	ProvidePg,
 	pg.ProvidePgPool,
 	pg.ProvideQueries,
+	pg.ProvideStdlib,
 	wire.Bind(new(pgsqlc.DBTX), new(*pgxpool.Pool)),
+	wire.Bind(new(Persistence), new(*Pg)),
 )
