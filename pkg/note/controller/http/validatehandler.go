@@ -11,10 +11,6 @@ func ValidateHandler() (gin.HandlerFunc, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ginmiddleware.OapiRequestValidatorWithOptions(
-		spec,
-		&ginmiddleware.Options{
-			SilenceServersWarning: true,
-		},
-	), nil
+	spec.Servers = nil
+	return ginmiddleware.OapiRequestValidator(spec), nil
 }
