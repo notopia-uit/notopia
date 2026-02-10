@@ -26,8 +26,6 @@ func noteToDomain(note *pgsqlc.Note) *domain.Note {
 	return domain.UnmarshalNote(
 		note.ID,
 		note.Title,
-		note.CreatedAt,
-		note.UpdatedAt,
 		note.DeletedAt,
 	)
 }

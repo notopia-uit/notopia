@@ -1,0 +1,59 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  note:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+      title:
+        type: string
+        example: Meeting Notes
+    required:
+      - id
+      - title
+  oldFolder:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174001
+      name:
+        type: string
+        example: Job
+    required:
+      - id
+      - name
+  newFolder:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174002
+      name:
+        type: string
+        example: Personal
+    required:
+      - id
+      - name
+  actor:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174003
+      name:
+        type: string
+        example: johndoe
+    required:
+      - id
+      - name
+required:
+  - note
+  - oldFolder
+  - newFolder

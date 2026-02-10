@@ -12,6 +12,8 @@ get:
   responses:
     101:
       description: Switching Protocols - WebSocket connection established.
+    200:
+      description: OK
     400:
       $ref: ../../shared/components/responses/BadRequestError.yaml
     401:
