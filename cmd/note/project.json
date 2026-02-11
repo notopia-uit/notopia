@@ -3,10 +3,14 @@
   "name": "note",
   "projectType": "application",
   "namedInputs": {
-    "default": ["goPkgFiles", "goFiles"],
+    "default": [
+      "goPkgFiles",
+      "goFiles",
+      "{workspaceRoot}/internal/note/**/*.go"
+    ],
     "sqlc": [
-      "{projectRoot}/../../internal/note/infra/persistence/pgsqlc/*.sql",
-      "{projectRoot}/../../internal/note/infra/persistence/pgmigration/",
+      "{workspaceRoot}/internal/note/infra/persistence/pgsqlc/*.sql",
+      "{workspaceRoot}/internal/note/infra/persistence/pgmigration/*.{sql,go}",
       "{projectRoot}/sqlc.yaml"
     ]
   },
@@ -46,7 +50,7 @@
       "executor": "nx:run-commands",
       "inputs": ["default"],
       "options": {
-        "command": "go run -gcflags='all=-N -l' ./cmd/",
+        "command": "go run -gcflags='all=-N -l' .",
         "cwd": "{projectRoot}",
         "tty": true
       },
@@ -57,7 +61,7 @@
       "executor": "nx:run-commands",
       "inputs": ["default"],
       "options": {
-        "command": "dlv debug ./cmd/ --headless --listen=127.0.0.1:23451 --accept-multiclient",
+        "command": "dlv debug --headless --listen=127.0.0.1:23451 --accept-multiclient",
         "cwd": "{projectRoot}",
         "tty": true
       },
@@ -128,7 +132,9 @@
     },
     "gen:sqlc": {
       "inputs": ["sqlc"],
-      "outputs": ["{projectRoot}/infra/persistence/pgsqlc/*.go"],
+      "outputs": [
+        "{workspaceRoot}/internal/note/infra/persistence/pgsqlc/*.go"
+      ],
       "executor": "nx:run-commands",
       "options": {
         "command": "sqlc generate",
