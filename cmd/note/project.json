@@ -142,5 +142,6 @@
       },
       "cache": true
     }
-  }
+  },
+  "implicitDependencies": ["pkg"]
 }
