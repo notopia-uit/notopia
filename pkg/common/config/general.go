@@ -1,9 +1,9 @@
-package config
+package commonconfig
 
 import (
 	"log/slog"
 
-	"github.com/notopia-uit/notopia/pkg/common/helper"
+	"github.com/notopia-uit/notopia/pkg/helper"
 	"github.com/spf13/viper"
 )
 

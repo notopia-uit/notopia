@@ -3,7 +3,7 @@ package otel
 import (
 	"os"
 
-	"github.com/notopia-uit/notopia/pkg/common/metadata"
+	"github.com/notopia-uit/notopia/pkg/metadata"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"

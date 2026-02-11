@@ -9,21 +9,14 @@ import (
 	sdk "go.opentelemetry.io/otel/sdk/trace"
 )
 
-type TraceConfig interface {
-	ShouldExportStdout() bool
-	ShouldExportGRPC() bool
-	GetGRPCRemote() *Remote
-	GetSampleRate() float64
-}
-
 func NewTracerProvider(
 	ctx context.Context,
-	cfg TraceConfig,
+	cfg *TraceConfig,
 	res *resource.Resource,
 ) (*sdk.TracerProvider, func(), error) {
 	var exporters []sdk.SpanExporter
 
-	if cfg.ShouldExportStdout() {
+	if cfg.Stdout {
 		stdoutExp, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
 		if err != nil {
 			return nil, nil, err
@@ -31,12 +24,11 @@ func NewTracerProvider(
 		exporters = append(exporters, stdoutExp)
 	}
 
-	if cfg.ShouldExportGRPC() {
-		remote := cfg.GetGRPCRemote()
+	if cfg.GRPC.Endpoint != "" {
 		opts := []otlptracegrpc.Option{
-			otlptracegrpc.WithEndpoint(remote.Endpoint),
+			otlptracegrpc.WithEndpoint(cfg.GRPC.Endpoint),
 		}
-		if !remote.Insecure {
+		if cfg.GRPC.Insecure {
 			opts = append(opts, otlptracegrpc.WithInsecure())
 		}
 		exporter, err := otlptracegrpc.New(ctx, opts...)
@@ -46,7 +38,7 @@ func NewTracerProvider(
 		exporters = append(exporters, exporter)
 	}
 
-	sampler := sdk.ParentBased(sdk.TraceIDRatioBased(cfg.GetSampleRate()))
+	sampler := sdk.ParentBased(sdk.TraceIDRatioBased(cfg.SampleRate))
 
 	options := []sdk.TracerProviderOption{
 		sdk.WithResource(res),

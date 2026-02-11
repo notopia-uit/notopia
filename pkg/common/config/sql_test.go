@@ -1,10 +1,10 @@
-package config_test
+package commonconfig_test
 
 import (
 	"testing"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/notopia-uit/notopia/pkg/common/config"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
 func TestPostGresConfigValidation(t *testing.T) {
@@ -12,33 +12,33 @@ func TestPostGresConfigValidation(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		cfg     config.SQL
+		cfg     commonconfig.SQL
 		wantErr bool
 	}{
 		{
 			name: "valid URL with postgres prefix",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				URL: "postgres://user:password@localhost:5432/dbname",
 			},
 			wantErr: false,
 		},
 		{
 			name: "invalid URL - missing postgres prefix",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				URL: "mysql://user:password@localhost:5432/dbname",
 			},
 			wantErr: true,
 		},
 		{
 			name: "invalid URL - empty string requires Host",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				URL: "",
 			},
 			wantErr: true,
 		},
 		{
 			name: "valid individual fields with valid SSLMode",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host:     "localhost",
 				Port:     5432,
 				User:     "testuser",
@@ -50,7 +50,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid individual fields with SSLMode disable",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "disable",
@@ -59,7 +59,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid individual fields with empty SSLMode",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host: "localhost",
 				Port: 5432,
 			},
@@ -67,7 +67,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid with URL and empty Host/Port",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				URL:  "postgres://user:password@localhost:5432/dbname",
 				Host: "",
 				Port: 0,
@@ -76,7 +76,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "invalid SSLMode - not in allowed values",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "invalid",
@@ -85,7 +85,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid SSLMode allow",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "allow",
@@ -94,7 +94,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid SSLMode prefer",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "prefer",
@@ -103,7 +103,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid SSLMode verify-ca",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "verify-ca",
@@ -112,7 +112,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid SSLMode verify-full",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host:    "localhost",
 				Port:    5432,
 				SSLMode: "verify-full",
@@ -121,7 +121,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid port omitted (zero value skipped by omitempty)",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host: "localhost",
 				Port: 0,
 			},
@@ -129,7 +129,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid port at minimum boundary",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host: "localhost",
 				Port: 1,
 			},
@@ -137,7 +137,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid port at maximum boundary",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host: "localhost",
 				Port: 65535,
 			},
@@ -145,7 +145,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "invalid hostname format - underscore not allowed",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host: "invalid_host_with_underscore",
 				Port: 5432,
 			},
@@ -153,19 +153,19 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name:    "missing required fields - neither URL nor Host",
-			cfg:     config.SQL{},
+			cfg:     commonconfig.SQL{},
 			wantErr: true,
 		},
 		{
 			name: "missing Host when URL not provided",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Port: 5432,
 			},
 			wantErr: true,
 		},
 		{
 			name: "valid FQDN hostname",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host: "db.example.com",
 				Port: 5432,
 			},
@@ -173,7 +173,7 @@ func TestPostGresConfigValidation(t *testing.T) {
 		},
 		{
 			name: "valid IP address hostname",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host: "192.168.1.1",
 				Port: 5432,
 			},
@@ -194,19 +194,19 @@ func TestPostGresConfigValidation(t *testing.T) {
 func TestGetURL(t *testing.T) {
 	tests := []struct {
 		name     string
-		cfg      config.SQL
+		cfg      commonconfig.SQL
 		expected string
 	}{
 		{
 			name: "returns provided URL",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				URL: "postgres://user:password@localhost:5432/dbname",
 			},
 			expected: "postgres://user:password@localhost:5432/dbname",
 		},
 		{
 			name: "constructs URL from fields",
-			cfg: config.SQL{
+			cfg: commonconfig.SQL{
 				Host:     "localhost",
 				Port:     5432,
 				User:     "testuser",

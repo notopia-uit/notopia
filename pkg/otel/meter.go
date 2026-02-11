@@ -3,7 +3,6 @@ package otel
 import (
 	"context"
 	"log/slog"
-	"time"
 
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
@@ -11,21 +10,14 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
-type MeterConfig interface {
-	ShouldExportStdout() bool
-	ShouldExportGRPC() bool
-	GetGRPCRemote() *Remote
-	GetExportInterval() time.Duration
-}
-
 func NewMeterProvider(
 	ctx context.Context,
-	cfg MeterConfig,
+	cfg *MeterConfig,
 	res *resource.Resource,
 ) (*sdk.MeterProvider, func(), error) {
 	var exporters []sdk.Exporter
 
-	if cfg.ShouldExportStdout() {
+	if cfg.Stdout {
 		stdoutExp, err := stdoutmetric.New(stdoutmetric.WithPrettyPrint())
 		if err != nil {
 			return nil, nil, err
@@ -33,12 +25,11 @@ func NewMeterProvider(
 		exporters = append(exporters, stdoutExp)
 	}
 
-	if cfg.ShouldExportGRPC() {
-		remote := cfg.GetGRPCRemote()
+	if cfg.GRPC.Endpoint != "" {
 		opts := []otlpmetricgrpc.Option{
-			otlpmetricgrpc.WithEndpoint(remote.Endpoint),
+			otlpmetricgrpc.WithEndpoint(cfg.GRPC.Endpoint),
 		}
-		if !remote.Insecure {
+		if !cfg.GRPC.Insecure {
 			opts = append(opts, otlpmetricgrpc.WithInsecure())
 		}
 		exporter, err := otlpmetricgrpc.New(ctx, opts...)
@@ -58,7 +49,7 @@ func NewMeterProvider(
 			sdk.WithReader(
 				sdk.NewPeriodicReader(
 					exporter,
-					sdk.WithInterval(cfg.GetExportInterval()),
+					sdk.WithInterval(cfg.Interval),
 				),
 			),
 		)

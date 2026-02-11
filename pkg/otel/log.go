@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/notopia-uit/notopia/pkg/common/metadata"
+	"github.com/notopia-uit/notopia/pkg/metadata"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
@@ -30,21 +30,14 @@ func (f *severityFilter) OnEmit(ctx context.Context, record *sdk.Record) error {
 	return f.Processor.OnEmit(ctx, record)
 }
 
-type LogConfig interface {
-	ShouldExportStdout() bool
-	ShouldExportGRPC() bool
-	GetGRPCRemote() *Remote
-	GetMinSecurity() log.Severity
-}
-
 func NewLoggerProvider(
 	ctx context.Context,
-	cfg LogConfig,
+	cfg *LogConfig,
 	res *resource.Resource,
 ) (*sdk.LoggerProvider, func(), error) {
 	var exporters []sdk.Exporter
 
-	if cfg.ShouldExportStdout() {
+	if cfg.Stdout {
 		stdoutExp, err := stdoutlog.New(stdoutlog.WithPrettyPrint())
 		if err != nil {
 			return nil, nil, err
@@ -52,12 +45,11 @@ func NewLoggerProvider(
 		exporters = append(exporters, stdoutExp)
 	}
 
-	if cfg.ShouldExportGRPC() {
-		remote := cfg.GetGRPCRemote()
+	if cfg.GRPC.Endpoint != "" {
 		opts := []otlploggrpc.Option{
-			otlploggrpc.WithEndpoint(remote.Endpoint),
+			otlploggrpc.WithEndpoint(cfg.GRPC.Endpoint),
 		}
-		if !remote.Insecure {
+		if !cfg.GRPC.Insecure {
 			opts = append(opts, otlploggrpc.WithInsecure())
 		}
 		exporter, err := otlploggrpc.New(ctx, opts...)
