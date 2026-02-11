@@ -9,8 +9,8 @@ import (
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
-	"github.com/notopia-uit/notopia/services/note/app"
-	"github.com/notopia-uit/notopia/services/note/config"
+	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/config"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
 )

@@ -2,10 +2,18 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "note",
   "projectType": "application",
+  "namedInputs": {
+    "default": ["goPkgFiles", "goFiles"],
+    "sqlc": [
+      "{projectRoot}/../../internal/note/infra/persistence/pgsqlc/*.sql",
+      "{projectRoot}/../../internal/note/infra/persistence/pgmigration/",
+      "{projectRoot}/sqlc.yaml"
+    ]
+  },
   "targets": {
     "gen:wire": {
       "executor": "nx:run-commands",
-      "inputs": ["goPkgFiles", "goFiles"],
+      "inputs": ["default"],
       "outputs": ["{projectRoot}/wire_gen.go"],
       "options": {
         "command": "wire",
@@ -15,7 +23,7 @@
     },
     "build": {
       "executor": "nx:run-commands",
-      "inputs": ["goPkgFiles", "goFiles"],
+      "inputs": ["default"],
       "outputs": ["{projectRoot}/dist/note"],
       "options": {
         "command": "go build -o ./dist/note .",
@@ -25,7 +33,7 @@
     },
     "preview": {
       "executor": "nx:run-commands",
-      "inputs": ["goPkgFiles", "goFiles"],
+      "inputs": ["default"],
       "options": {
         "command": "./dist/note",
         "cwd": "{projectRoot}",
@@ -36,7 +44,7 @@
     },
     "run": {
       "executor": "nx:run-commands",
-      "inputs": ["goPkgFiles", "goFiles"],
+      "inputs": ["default"],
       "options": {
         "command": "go run -gcflags='all=-N -l' ./cmd/",
         "cwd": "{projectRoot}",
@@ -47,7 +55,7 @@
     },
     "debug": {
       "executor": "nx:run-commands",
-      "inputs": ["goPkgFiles", "goFiles"],
+      "inputs": ["default"],
       "options": {
         "command": "dlv debug ./cmd/ --headless --listen=127.0.0.1:23451 --accept-multiclient",
         "cwd": "{projectRoot}",
@@ -75,10 +83,10 @@
       }
     },
     "docker:build": {
-      "inputs": ["goPkgFiles", "goFiles"]
+      "inputs": ["default"]
     },
     "docker:run": {
-      "inputs": ["goPkgFiles", "goFiles"]
+      "inputs": ["default"]
     },
     "goose": {
       "executor": "nx:run-commands",
@@ -119,11 +127,7 @@
       "dependsOn": ["migration:validate"]
     },
     "gen:sqlc": {
-      "inputs": [
-        "{projectRoot}/infra/persistence/pgsqlc/*.sql",
-        "{projectRoot}/infra/persistence/pgmigration/",
-        "{projectRoot}/sqlc.yaml"
-      ],
+      "inputs": ["sqlc"],
       "outputs": ["{projectRoot}/infra/persistence/pgsqlc/*.go"],
       "executor": "nx:run-commands",
       "options": {

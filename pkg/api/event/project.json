@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pkg/api/event",
+  "projectType": "library",
+  "targets": {
+    "gen": {
+      "dependsOn": [{ "projects": ["api/event"], "target": "gen:go" }]
+    }
+  }
+}

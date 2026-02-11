@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/notopia-uit/notopia/services/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/domain"
 )
 
 func toDomainError(err error) error {

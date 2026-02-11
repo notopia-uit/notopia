@@ -1,13 +1,13 @@
-package main
+package note
 
 import (
 	"context"
 	"log/slog"
 
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/note/transport/grpc"
+	"github.com/notopia-uit/notopia/internal/note/transport/http"
 	"github.com/notopia-uit/notopia/pkg/healthmanager"
-	"github.com/notopia-uit/notopia/services/note/infra/persistence"
-	"github.com/notopia-uit/notopia/services/note/transport/grpc"
-	"github.com/notopia-uit/notopia/services/note/transport/http"
 	"golang.org/x/sync/errgroup"
 )
 

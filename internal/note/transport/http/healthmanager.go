@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/notopia-uit/notopia/pkg/healthmanager"
-	"github.com/notopia-uit/notopia/services/note/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 )
 
 func NewHealthManager(

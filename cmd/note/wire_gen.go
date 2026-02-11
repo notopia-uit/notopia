@@ -9,23 +9,22 @@ package main
 import (
 	"context"
 	"github.com/goforj/wire"
+	"github.com/notopia-uit/notopia/internal/note"
+	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/component"
+	"github.com/notopia-uit/notopia/internal/note/config"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
+	"github.com/notopia-uit/notopia/internal/note/transport/grpc"
+	"github.com/notopia-uit/notopia/internal/note/transport/http"
 	"github.com/notopia-uit/notopia/pkg/common/http"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
-	"github.com/notopia-uit/notopia/services/note/app"
-	"github.com/notopia-uit/notopia/services/note/component"
-	"github.com/notopia-uit/notopia/services/note/config"
-	"github.com/notopia-uit/notopia/services/note/infra"
-	"github.com/notopia-uit/notopia/services/note/infra/persistence"
-	"github.com/notopia-uit/notopia/services/note/infra/persistence/pg"
-	"github.com/notopia-uit/notopia/services/note/transport"
-	"github.com/notopia-uit/notopia/services/note/transport/grpc"
-	"github.com/notopia-uit/notopia/services/note/transport/http"
 )
 
 // Injectors from wire.go:
 
-func InitializeServer(ctx context.Context) (*Server, func(), error) {
+func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	validate := components.ProvideValidate()
 	viper := config.NewViper()
 	configConfig, err := config.New(validate, viper)
@@ -104,8 +103,8 @@ func InitializeServer(ctx context.Context) (*Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	mainServer := NewServer(httpServer, grpcServer, healthManager, persistencePg, logger)
-	return mainServer, func() {
+	noteServer := note.NewServer(httpServer, grpcServer, healthManager, persistencePg, logger)
+	return noteServer, func() {
 		cleanup6()
 		cleanup5()
 		cleanup4()
@@ -122,6 +121,4 @@ var (
 
 // wire.go:
 
-var ProviderSet = wire.NewSet(
-	ProvideServer, app.ProviderSet, components.ProviderSet, config.ProviderSet, controller.ProviderSet, infra.ProviderSet, logging.ProviderSet, otel.ProviderSet, wire.Value(ServiceName), wire.Value(ServiceVersion),
-)
+var ProviderSet = wire.NewSet(note.ProviderSet, wire.Value(ServiceName), wire.Value(ServiceVersion))
