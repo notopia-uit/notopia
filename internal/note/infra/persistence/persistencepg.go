@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+	"io/fs"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -16,9 +17,9 @@ import (
 var PgMigrations embed.FS
 
 type PersistencePg struct {
-	db     *sql.DB
-	pgpool *pgxpool.Pool
-	goose  *goose.Provider
+	db            *sql.DB
+	pgpool        *pgxpool.Pool
+	gooseProvider *goose.Provider
 }
 
 var _ Persistence = (*PersistencePg)(nil)
@@ -28,10 +29,14 @@ func NewGooseProvider(db *sql.DB, logger *slog.Logger) (*goose.Provider, error) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create postgres session locker: %w", err)
 	}
+	migrationFiles, err := fs.Sub(PgMigrations, "pgmigration")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get migration files: %w", err)
+	}
 	gooseProvider, err := goose.NewProvider(
 		"postgres",
 		db,
-		PgMigrations,
+		migrationFiles,
 		goose.WithSlog(logger),
 		goose.WithSessionLocker(locker),
 	)
@@ -49,14 +54,14 @@ func NewPg(
 	gooseProvider *goose.Provider,
 ) (*PersistencePg, error) {
 	return &PersistencePg{
-		db:     db,
-		pgpool: pgxpool,
-		goose:  gooseProvider,
+		db:            db,
+		pgpool:        pgxpool,
+		gooseProvider: gooseProvider,
 	}, nil
 }
 
 func (p *PersistencePg) RunMigrations(ctx context.Context) error {
-	_, err := p.goose.Up(ctx)
+	_, err := p.gooseProvider.Up(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
