@@ -5,7 +5,7 @@
     "dev": {
       "dependsOn": [
         {
-          "projects": ["api/note"],
+          "projects": ["api/note", "api/edit", "api/event"],
           "target": "watch-bundle:json"
         }
       ]

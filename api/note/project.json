@@ -6,19 +6,19 @@
     "bundle:yaml": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle note --config ../redocly.yaml -o ./dist/openapi.yaml",
+        "command": "redocly bundle note --config ../redocly.yaml -o ./note.bundled.yaml",
         "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/dist/openapi.yaml"],
+      "outputs": ["{projectRoot}/note.bundled.yaml"],
       "inputs": ["openapiFiles"]
     },
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle note --config ../redocly.yaml -o ./dist/openapi.json",
+        "command": "redocly bundle note --config ../redocly.yaml -o ./note.bundled.json",
         "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/dist/openapi.json"],
+      "outputs": ["{projectRoot}/note.bundled.json"],
       "inputs": ["openapiFiles"]
     },
     "build": {
@@ -36,7 +36,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve -w ./dist/openapi.json --port 9081",
+        "command": "scalar document serve -w ./note.bundled.json --port 9081",
         "forwardAllArgs": false,
         "cwd": "{projectRoot}"
       },
@@ -46,7 +46,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve ./dist/openapi.json --port 9081",
+        "command": "scalar document serve ./note.bundled.json --port 9081",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
@@ -55,7 +55,7 @@
     "mock": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document mock -w ./dist/openapi.json --port 8081",
+        "command": "scalar document mock -w ./note.bundled.json --port 8081",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
@@ -74,7 +74,7 @@
       "outputs": ["{workspaceRoot}/pkg/api/gen/note.gen.go"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "oapi-codegen --config ./oapi-codegen.yaml ./dist/openapi.yaml",
+        "command": "oapi-codegen --config ./oapi-codegen.yaml ./note.bundled.yaml",
         "cwd": "{projectRoot}"
       },
       "dependsOn": ["bundle:yaml"]

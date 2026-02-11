@@ -2,6 +2,6 @@
   "name": "@notopia/note-api",
   "private": true,
   "exports": {
-    ".": "./dist/openapi.json"
+    ".": "./note.bundled.json"
   }
 }

@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@bufbuild/protobuf':
+      specifier: ^2.11.0
+      version: 2.11.0
     '@nestjs/common':
       specifier: ^11.1.13
       version: 11.1.13
@@ -24,6 +27,9 @@ catalogs:
     '@tailwindcss/postcss':
       specifier: ^4.1.18
       version: 4.1.18
+    '@tanstack/react-query':
+      specifier: ^5.90.20
+      version: 5.90.21
     '@types/node':
       specifier: ^24.10.9
       version: 24.10.13
@@ -300,6 +306,8 @@ importers:
 
   api/edit: {}
 
+  api/event: {}
+
   api/note: {}
 
   apps/edit:
@@ -347,6 +355,12 @@ importers:
       '@catppuccin/vitepress':
         specifier: ^0.1.2
         version: 0.1.2(typescript@5.9.3)
+      '@notopia/edit-api':
+        specifier: workspace:^
+        version: link:../api/edit
+      '@notopia/event-api':
+        specifier: workspace:^
+        version: link:../api/event
       '@notopia/note-api':
         specifier: workspace:^
         version: link:../api/note
@@ -390,6 +404,12 @@ importers:
 
   packages/notopia-api-web:
     dependencies:
+      '@notopia/edit-api':
+        specifier: workspace:^
+        version: link:../../api/edit
+      '@notopia/event-api':
+        specifier: workspace:^
+        version: link:../../api/event
       '@notopia/note-api':
         specifier: workspace:^
         version: link:../../api/note

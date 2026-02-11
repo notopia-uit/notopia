@@ -6,19 +6,19 @@
     "bundle:yaml": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle event --config ../redocly.yaml -o ./dist/openapi.yaml",
+        "command": "redocly bundle event --config ../redocly.yaml -o ./event.bundled.yaml",
         "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/dist/openapi.yaml"],
+      "outputs": ["{projectRoot}/event.bundled.yaml"],
       "inputs": ["openapiFiles"]
     },
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle event --config ../redocly.yaml -o ./dist/openapi.json",
+        "command": "redocly bundle event --config ../redocly.yaml -o ./event.bundled.json",
         "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/dist/openapi.json"],
+      "outputs": ["{projectRoot}/event.bundled.json"],
       "inputs": ["openapiFiles"]
     },
     "build": {
@@ -46,7 +46,7 @@
       "outputs": ["{workspaceRoot}/pkg/api/gen/event.gen.go"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "oapi-codegen --config ./oapi-codegen.yaml ./dist/openapi.yaml",
+        "command": "oapi-codegen --config ./oapi-codegen.yaml ./event.bundled.yaml",
         "cwd": "{projectRoot}"
       },
       "dependsOn": ["bundle:yaml"]

@@ -2,13 +2,13 @@
 
 import * as z from 'zod';
 
-export const zOpenapiError = z.object({
+export const zEditBundledError = z.object({
     code: z.string(),
     message: z.string(),
     more_info: z.optional(z.string())
 });
 
-export const zOpenapiNote = z.object({
+export const zNoteBundledNote = z.object({
     id: z.optional(z.uuid().readonly()),
     title: z.optional(z.string().min(1).max(255)),
     createdAt: z.optional(z.iso.datetime().readonly()),
@@ -18,7 +18,7 @@ export const zOpenapiNote = z.object({
     ]).readonly())
 });
 
-export const zOpenapiPagination = z.object({
+export const zNoteBundledPagination = z.object({
     page: z.int().gte(1),
     limit: z.int().gte(1).lte(100),
     total: z.int().gte(0),
@@ -27,9 +27,15 @@ export const zOpenapiPagination = z.object({
     hasPrev: z.boolean()
 });
 
-export const zOpenapiNoteRequired = zOpenapiNote;
+export const zNoteBundledError = z.object({
+    code: z.string(),
+    message: z.string(),
+    more_info: z.optional(z.string())
+});
 
-export const zOpenapiNoteMovedEvent = z.object({
+export const zNoteBundledNoteRequired = zNoteBundledNote;
+
+export const zNoteBundledNoteMovedEvent = z.object({
     type: z.enum(['NoteMovedEvent']),
     data: z.object({
         noteId: z.uuid(),
@@ -38,7 +44,7 @@ export const zOpenapiNoteMovedEvent = z.object({
     })
 });
 
-export const zOpenapiFolderMovedEvent = z.object({
+export const zNoteBundledFolderMovedEvent = z.object({
     type: z.enum(['FolderRenamedEvent']),
     data: z.object({
         folderId: z.uuid(),
@@ -47,7 +53,7 @@ export const zOpenapiFolderMovedEvent = z.object({
     })
 });
 
-export const zOpenapiFolderRenamedEvent = z.object({
+export const zNoteBundledFolderRenamedEvent = z.object({
     type: z.enum(['FolderRenamedEvent']),
     data: z.object({
         folderId: z.uuid(),
@@ -56,7 +62,7 @@ export const zOpenapiFolderRenamedEvent = z.object({
     })
 });
 
-export const zOpenapiWorkspaceRenamedEvent = z.object({
+export const zNoteBundledWorkspaceRenamedEvent = z.object({
     type: z.enum(['WorkspaceRenamedEvent']),
     data: z.object({
         workspaceId: z.uuid(),
@@ -65,58 +71,58 @@ export const zOpenapiWorkspaceRenamedEvent = z.object({
     })
 });
 
-export const zOpenapiNoteWritable = z.object({
+export const zNoteBundledNoteWritable = z.object({
     title: z.optional(z.string().min(1).max(255))
 });
 
-export const zOpenapiNoteRequiredWritable = zOpenapiNoteWritable;
+export const zNoteBundledNoteRequiredWritable = zNoteBundledNoteWritable;
 
 /**
  * Unique identifier of the document (note)
  */
-export const zOpenapiDocumentIdPath = z.uuid();
+export const zEditBundledDocumentIdPath = z.uuid();
 
 /**
  * Page number for pagination
  */
-export const zOpenapiPageQuery = z.int().gte(1).default(1);
+export const zNoteBundledPageQuery = z.int().gte(1).default(1);
 
 /**
  * Number of items per page
  */
-export const zOpenapiLimitQuery = z.int().gte(1).lte(100).default(20);
+export const zNoteBundledLimitQuery = z.int().gte(1).lte(100).default(20);
 
 /**
  * Sort order
  */
-export const zOpenapiOrderQuery = z.enum(['asc', 'desc']);
+export const zNoteBundledOrderQuery = z.enum(['asc', 'desc']);
 
 /**
  * Unique identifier of the note
  */
-export const zOpenapiNoteIdPath = z.uuid();
+export const zNoteBundledNoteIdPath = z.uuid();
 
 /**
  * The unique identifier of the workspace.
  */
-export const zOpenapiWorkspaceIdPath = z.uuid();
+export const zNoteBundledWorkspaceIdPath = z.uuid();
 
 /**
  * Create note request
  */
-export const zOpenapiCreateNoteRequest = zOpenapiNoteRequiredWritable.and(z.unknown());
+export const zNoteBundledCreateNoteRequest = zNoteBundledNoteRequiredWritable.and(z.unknown());
 
 /**
  * Put note request (replace entire note)
  */
-export const zOpenapiPutNoteRequest = zOpenapiNoteRequiredWritable.and(z.unknown());
+export const zNoteBundledPutNoteRequest = zNoteBundledNoteRequiredWritable.and(z.unknown());
 
 /**
  * Patch note request (partial update)
  */
-export const zOpenapiPatchNoteRequest = zOpenapiNoteWritable.and(z.unknown());
+export const zNoteBundledPatchNoteRequest = zNoteBundledNoteWritable.and(z.unknown());
 
-export const zOpenapiWsEditsDocumentData = z.object({
+export const zEditBundledWsEditsDocumentData = z.object({
     body: z.optional(z.never()),
     path: z.object({
         documentId: z.uuid()
@@ -124,7 +130,7 @@ export const zOpenapiWsEditsDocumentData = z.object({
     query: z.optional(z.never())
 });
 
-export const zOpenapiListNotesData = z.object({
+export const zNoteBundledListNotesData = z.object({
     body: z.optional(z.never()),
     path: z.optional(z.never()),
     query: z.optional(z.object({
@@ -143,13 +149,13 @@ export const zOpenapiListNotesData = z.object({
 /**
  * Successful response
  */
-export const zOpenapiListNotesResponse = z.object({
-    data: z.array(zOpenapiNote),
-    pagination: zOpenapiPagination.and(z.unknown())
+export const zNoteBundledListNotesResponse = z.object({
+    data: z.array(zNoteBundledNote),
+    pagination: zNoteBundledPagination.and(z.unknown())
 });
 
-export const zOpenapiCreateNoteData = z.object({
-    body: zOpenapiCreateNoteRequest,
+export const zNoteBundledCreateNoteData = z.object({
+    body: zNoteBundledCreateNoteRequest,
     path: z.optional(z.never()),
     query: z.optional(z.never())
 });
@@ -157,9 +163,9 @@ export const zOpenapiCreateNoteData = z.object({
 /**
  * Note successfully created
  */
-export const zOpenapiCreateNoteResponse = zOpenapiNote.and(z.unknown());
+export const zNoteBundledCreateNoteResponse = zNoteBundledNote.and(z.unknown());
 
-export const zOpenapiDeleteNoteData = z.object({
+export const zNoteBundledDeleteNoteData = z.object({
     body: z.optional(z.never()),
     path: z.object({
         noteId: z.uuid()
@@ -170,9 +176,9 @@ export const zOpenapiDeleteNoteData = z.object({
 /**
  * Note successfully deleted
  */
-export const zOpenapiDeleteNoteResponse = z.void();
+export const zNoteBundledDeleteNoteResponse = z.void();
 
-export const zOpenapiGetNoteData = z.object({
+export const zNoteBundledGetNoteData = z.object({
     body: z.optional(z.never()),
     path: z.object({
         noteId: z.uuid()
@@ -183,10 +189,10 @@ export const zOpenapiGetNoteData = z.object({
 /**
  * Successful response
  */
-export const zOpenapiGetNoteResponse = zOpenapiNoteRequired.and(z.unknown());
+export const zNoteBundledGetNoteResponse = zNoteBundledNoteRequired.and(z.unknown());
 
-export const zOpenapiPatchNoteData = z.object({
-    body: zOpenapiPatchNoteRequest,
+export const zNoteBundledPatchNoteData = z.object({
+    body: zNoteBundledPatchNoteRequest,
     path: z.object({
         noteId: z.uuid()
     }),
@@ -196,10 +202,10 @@ export const zOpenapiPatchNoteData = z.object({
 /**
  * Note successfully patched
  */
-export const zOpenapiPatchNoteResponse = zOpenapiNote.and(z.unknown());
+export const zNoteBundledPatchNoteResponse = zNoteBundledNote.and(z.unknown());
 
-export const zOpenapiUpdateNoteData = z.object({
-    body: zOpenapiPutNoteRequest,
+export const zNoteBundledUpdateNoteData = z.object({
+    body: zNoteBundledPutNoteRequest,
     path: z.object({
         noteId: z.uuid()
     }),
@@ -209,9 +215,9 @@ export const zOpenapiUpdateNoteData = z.object({
 /**
  * Note successfully updated
  */
-export const zOpenapiUpdateNoteResponse = zOpenapiNoteRequired.and(z.unknown());
+export const zNoteBundledUpdateNoteResponse = zNoteBundledNoteRequired.and(z.unknown());
 
-export const zOpenapiGetWorkspaceEventsData = z.object({
+export const zNoteBundledGetWorkspaceEventsData = z.object({
     body: z.optional(z.never()),
     path: z.object({
         workspaceId: z.uuid()
@@ -222,17 +228,17 @@ export const zOpenapiGetWorkspaceEventsData = z.object({
 /**
  * A persistent stream of events
  */
-export const zOpenapiGetWorkspaceEventsResponse = z.union([
+export const zNoteBundledGetWorkspaceEventsResponse = z.union([
     z.object({
-        type: z.literal('openapi_NoteMovedEvent')
-    }).and(zOpenapiNoteMovedEvent),
+        type: z.literal('note_bundled_NoteMovedEvent')
+    }).and(zNoteBundledNoteMovedEvent),
     z.object({
-        type: z.literal('openapi_FolderMovedEvent')
-    }).and(zOpenapiFolderMovedEvent),
+        type: z.literal('note_bundled_FolderMovedEvent')
+    }).and(zNoteBundledFolderMovedEvent),
     z.object({
-        type: z.literal('openapi_FolderRenamedEvent')
-    }).and(zOpenapiFolderRenamedEvent),
+        type: z.literal('note_bundled_FolderRenamedEvent')
+    }).and(zNoteBundledFolderRenamedEvent),
     z.object({
-        type: z.literal('openapi_WorkspaceRenamedEvent')
-    }).and(zOpenapiWorkspaceRenamedEvent)
+        type: z.literal('note_bundled_WorkspaceRenamedEvent')
+    }).and(zNoteBundledWorkspaceRenamedEvent)
 ]);

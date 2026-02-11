@@ -28,8 +28,9 @@
     "gen:hey-api": {
       "outputs": ["{workspaceRoot}/packages/notopia-api/src/"],
       "inputs": [
-        "{projectRoot}/edit/dist/openapi.json",
-        "{projectRoot}/note/dist/openapi.json",
+        "{projectRoot}/edit/edit.bundled.json",
+        "{projectRoot}/note/note.bundled.json",
+        "{projectRoot}/event/event.bundled.json",
         "{projectRoot}/openapi-ts.config.ts",
         "{projectRoot}/redocly.yaml"
       ],
@@ -43,7 +44,7 @@
     "gen:edit-nestjs-server": {
       "outputs": ["{workspaceRoot}/packages/notopia-api-edit-nestjs-server/"],
       "inputs": [
-        "{projectRoot}/edit/dist/openapi.json",
+        "{projectRoot}/edit/edit.bundled.json",
         "{projectRoot}/openapitools.json"
       ],
       "executor": "nx:run-commands",

@@ -2,6 +2,8 @@
   "name": "@notopia-uit/docs",
   "dependencies": {
     "@catppuccin/vitepress": "^0.1.2",
+    "@notopia/edit-api": "workspace:^",
+    "@notopia/event-api": "workspace:^",
     "@notopia/note-api": "workspace:^",
     "pagefind": "^1.4.0",
     "vitepress-openapi": "^0.1.13",

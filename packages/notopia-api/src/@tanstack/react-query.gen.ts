@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { openapiCreateNote, openapiDeleteNote, openapiGetNote, openapiListNotes, openapiPatchNote, openapiUpdateNote, openapiWsEditsDocument, type Options } from '../sdk.gen';
-import type { OpenapiCreateNoteData, OpenapiCreateNoteError, OpenapiCreateNoteResponse, OpenapiDeleteNoteData, OpenapiDeleteNoteError, OpenapiDeleteNoteResponse, OpenapiGetNoteData, OpenapiGetNoteError, OpenapiGetNoteResponse, OpenapiListNotesData, OpenapiListNotesError, OpenapiListNotesResponse, OpenapiPatchNoteData, OpenapiPatchNoteError, OpenapiPatchNoteResponse, OpenapiUpdateNoteData, OpenapiUpdateNoteError, OpenapiUpdateNoteResponse, OpenapiWsEditsDocumentData, OpenapiWsEditsDocumentError } from '../types.gen';
+import { editBundledWsEditsDocument, noteBundledCreateNote, noteBundledDeleteNote, noteBundledGetNote, noteBundledListNotes, noteBundledPatchNote, noteBundledUpdateNote, type Options } from '../sdk.gen';
+import type { EditBundledWsEditsDocumentData, EditBundledWsEditsDocumentError, NoteBundledCreateNoteData, NoteBundledCreateNoteError, NoteBundledCreateNoteResponse, NoteBundledDeleteNoteData, NoteBundledDeleteNoteError, NoteBundledDeleteNoteResponse, NoteBundledGetNoteData, NoteBundledGetNoteError, NoteBundledGetNoteResponse, NoteBundledListNotesData, NoteBundledListNotesError, NoteBundledListNotesResponse, NoteBundledPatchNoteData, NoteBundledPatchNoteError, NoteBundledPatchNoteResponse, NoteBundledUpdateNoteData, NoteBundledUpdateNoteError, NoteBundledUpdateNoteResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -39,16 +39,16 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
     return [params];
 };
 
-export const openapiWsEditsDocumentQueryKey = (options: Options<OpenapiWsEditsDocumentData>) => createQueryKey('openapiWsEditsDocument', options);
+export const editBundledWsEditsDocumentQueryKey = (options: Options<EditBundledWsEditsDocumentData>) => createQueryKey('editBundledWsEditsDocument', options);
 
 /**
  * WebSocket for editing a document
  *
  * Establish a WebSocket connection for real-time collaborative editing of a document.
  */
-export const openapiWsEditsDocumentOptions = (options: Options<OpenapiWsEditsDocumentData>) => queryOptions<unknown, OpenapiWsEditsDocumentError, unknown, ReturnType<typeof openapiWsEditsDocumentQueryKey>>({
+export const editBundledWsEditsDocumentOptions = (options: Options<EditBundledWsEditsDocumentData>) => queryOptions<unknown, EditBundledWsEditsDocumentError, unknown, ReturnType<typeof editBundledWsEditsDocumentQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await openapiWsEditsDocument({
+        const { data } = await editBundledWsEditsDocument({
             ...options,
             ...queryKey[0],
             signal,
@@ -56,19 +56,19 @@ export const openapiWsEditsDocumentOptions = (options: Options<OpenapiWsEditsDoc
         });
         return data;
     },
-    queryKey: openapiWsEditsDocumentQueryKey(options)
+    queryKey: editBundledWsEditsDocumentQueryKey(options)
 });
 
-export const openapiListNotesQueryKey = (options?: Options<OpenapiListNotesData>) => createQueryKey('openapiListNotes', options);
+export const noteBundledListNotesQueryKey = (options?: Options<NoteBundledListNotesData>) => createQueryKey('noteBundledListNotes', options);
 
 /**
  * List notes
  *
  * Retrieve a paginated list of all notes with optional filtering and sorting
  */
-export const openapiListNotesOptions = (options?: Options<OpenapiListNotesData>) => queryOptions<OpenapiListNotesResponse, OpenapiListNotesError, OpenapiListNotesResponse, ReturnType<typeof openapiListNotesQueryKey>>({
+export const noteBundledListNotesOptions = (options?: Options<NoteBundledListNotesData>) => queryOptions<NoteBundledListNotesResponse, NoteBundledListNotesError, NoteBundledListNotesResponse, ReturnType<typeof noteBundledListNotesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await openapiListNotes({
+        const { data } = await noteBundledListNotes({
             ...options,
             ...queryKey[0],
             signal,
@@ -76,7 +76,7 @@ export const openapiListNotesOptions = (options?: Options<OpenapiListNotesData>)
         });
         return data;
     },
-    queryKey: openapiListNotesQueryKey(options)
+    queryKey: noteBundledListNotesQueryKey(options)
 });
 
 const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
@@ -108,25 +108,25 @@ const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'hea
     return params as unknown as typeof page;
 };
 
-export const openapiListNotesInfiniteQueryKey = (options?: Options<OpenapiListNotesData>): QueryKey<Options<OpenapiListNotesData>> => createQueryKey('openapiListNotes', options, true);
+export const noteBundledListNotesInfiniteQueryKey = (options?: Options<NoteBundledListNotesData>): QueryKey<Options<NoteBundledListNotesData>> => createQueryKey('noteBundledListNotes', options, true);
 
 /**
  * List notes
  *
  * Retrieve a paginated list of all notes with optional filtering and sorting
  */
-export const openapiListNotesInfiniteOptions = (options?: Options<OpenapiListNotesData>) => infiniteQueryOptions<OpenapiListNotesResponse, OpenapiListNotesError, InfiniteData<OpenapiListNotesResponse>, QueryKey<Options<OpenapiListNotesData>>, number | Pick<QueryKey<Options<OpenapiListNotesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+export const noteBundledListNotesInfiniteOptions = (options?: Options<NoteBundledListNotesData>) => infiniteQueryOptions<NoteBundledListNotesResponse, NoteBundledListNotesError, InfiniteData<NoteBundledListNotesResponse>, QueryKey<Options<NoteBundledListNotesData>>, number | Pick<QueryKey<Options<NoteBundledListNotesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
 // @ts-ignore
 {
     queryFn: async ({ pageParam, queryKey, signal }) => {
         // @ts-ignore
-        const page: Pick<QueryKey<Options<OpenapiListNotesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+        const page: Pick<QueryKey<Options<NoteBundledListNotesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
             query: {
                 page: pageParam
             }
         };
         const params = createInfiniteParams(queryKey, page);
-        const { data } = await openapiListNotes({
+        const { data } = await noteBundledListNotes({
             ...options,
             ...params,
             signal,
@@ -134,7 +134,7 @@ export const openapiListNotesInfiniteOptions = (options?: Options<OpenapiListNot
         });
         return data;
     },
-    queryKey: openapiListNotesInfiniteQueryKey(options)
+    queryKey: noteBundledListNotesInfiniteQueryKey(options)
 });
 
 /**
@@ -142,10 +142,10 @@ export const openapiListNotesInfiniteOptions = (options?: Options<OpenapiListNot
  *
  * Create a new note
  */
-export const openapiCreateNoteMutation = (options?: Partial<Options<OpenapiCreateNoteData>>): UseMutationOptions<OpenapiCreateNoteResponse, OpenapiCreateNoteError, Options<OpenapiCreateNoteData>> => {
-    const mutationOptions: UseMutationOptions<OpenapiCreateNoteResponse, OpenapiCreateNoteError, Options<OpenapiCreateNoteData>> = {
+export const noteBundledCreateNoteMutation = (options?: Partial<Options<NoteBundledCreateNoteData>>): UseMutationOptions<NoteBundledCreateNoteResponse, NoteBundledCreateNoteError, Options<NoteBundledCreateNoteData>> => {
+    const mutationOptions: UseMutationOptions<NoteBundledCreateNoteResponse, NoteBundledCreateNoteError, Options<NoteBundledCreateNoteData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await openapiCreateNote({
+            const { data } = await noteBundledCreateNote({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -161,10 +161,10 @@ export const openapiCreateNoteMutation = (options?: Partial<Options<OpenapiCreat
  *
  * Delete a note by its unique identifier
  */
-export const openapiDeleteNoteMutation = (options?: Partial<Options<OpenapiDeleteNoteData>>): UseMutationOptions<OpenapiDeleteNoteResponse, OpenapiDeleteNoteError, Options<OpenapiDeleteNoteData>> => {
-    const mutationOptions: UseMutationOptions<OpenapiDeleteNoteResponse, OpenapiDeleteNoteError, Options<OpenapiDeleteNoteData>> = {
+export const noteBundledDeleteNoteMutation = (options?: Partial<Options<NoteBundledDeleteNoteData>>): UseMutationOptions<NoteBundledDeleteNoteResponse, NoteBundledDeleteNoteError, Options<NoteBundledDeleteNoteData>> => {
+    const mutationOptions: UseMutationOptions<NoteBundledDeleteNoteResponse, NoteBundledDeleteNoteError, Options<NoteBundledDeleteNoteData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await openapiDeleteNote({
+            const { data } = await noteBundledDeleteNote({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -175,16 +175,16 @@ export const openapiDeleteNoteMutation = (options?: Partial<Options<OpenapiDelet
     return mutationOptions;
 };
 
-export const openapiGetNoteQueryKey = (options: Options<OpenapiGetNoteData>) => createQueryKey('openapiGetNote', options);
+export const noteBundledGetNoteQueryKey = (options: Options<NoteBundledGetNoteData>) => createQueryKey('noteBundledGetNote', options);
 
 /**
  * Get note
  *
  * Retrieve a single note by its unique identifier
  */
-export const openapiGetNoteOptions = (options: Options<OpenapiGetNoteData>) => queryOptions<OpenapiGetNoteResponse, OpenapiGetNoteError, OpenapiGetNoteResponse, ReturnType<typeof openapiGetNoteQueryKey>>({
+export const noteBundledGetNoteOptions = (options: Options<NoteBundledGetNoteData>) => queryOptions<NoteBundledGetNoteResponse, NoteBundledGetNoteError, NoteBundledGetNoteResponse, ReturnType<typeof noteBundledGetNoteQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await openapiGetNote({
+        const { data } = await noteBundledGetNote({
             ...options,
             ...queryKey[0],
             signal,
@@ -192,7 +192,7 @@ export const openapiGetNoteOptions = (options: Options<OpenapiGetNoteData>) => q
         });
         return data;
     },
-    queryKey: openapiGetNoteQueryKey(options)
+    queryKey: noteBundledGetNoteQueryKey(options)
 });
 
 /**
@@ -200,10 +200,10 @@ export const openapiGetNoteOptions = (options: Options<OpenapiGetNoteData>) => q
  *
  * Update specific fields of a note (only provided fields will be updated)
  */
-export const openapiPatchNoteMutation = (options?: Partial<Options<OpenapiPatchNoteData>>): UseMutationOptions<OpenapiPatchNoteResponse, OpenapiPatchNoteError, Options<OpenapiPatchNoteData>> => {
-    const mutationOptions: UseMutationOptions<OpenapiPatchNoteResponse, OpenapiPatchNoteError, Options<OpenapiPatchNoteData>> = {
+export const noteBundledPatchNoteMutation = (options?: Partial<Options<NoteBundledPatchNoteData>>): UseMutationOptions<NoteBundledPatchNoteResponse, NoteBundledPatchNoteError, Options<NoteBundledPatchNoteData>> => {
+    const mutationOptions: UseMutationOptions<NoteBundledPatchNoteResponse, NoteBundledPatchNoteError, Options<NoteBundledPatchNoteData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await openapiPatchNote({
+            const { data } = await noteBundledPatchNote({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -219,10 +219,10 @@ export const openapiPatchNoteMutation = (options?: Partial<Options<OpenapiPatchN
  *
  * Replace an existing note with new data (all fields are required)
  */
-export const openapiUpdateNoteMutation = (options?: Partial<Options<OpenapiUpdateNoteData>>): UseMutationOptions<OpenapiUpdateNoteResponse, OpenapiUpdateNoteError, Options<OpenapiUpdateNoteData>> => {
-    const mutationOptions: UseMutationOptions<OpenapiUpdateNoteResponse, OpenapiUpdateNoteError, Options<OpenapiUpdateNoteData>> = {
+export const noteBundledUpdateNoteMutation = (options?: Partial<Options<NoteBundledUpdateNoteData>>): UseMutationOptions<NoteBundledUpdateNoteResponse, NoteBundledUpdateNoteError, Options<NoteBundledUpdateNoteData>> => {
+    const mutationOptions: UseMutationOptions<NoteBundledUpdateNoteResponse, NoteBundledUpdateNoteError, Options<NoteBundledUpdateNoteData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await openapiUpdateNote({
+            const { data } = await noteBundledUpdateNote({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

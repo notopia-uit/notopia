@@ -2,6 +2,8 @@
 // import styles from './app.module.css';
 import '@scalar/api-reference-react/style.css';
 
+import editApiSpec from '@notopia/edit-api' with { type: 'json' };
+import eventApiSpec from '@notopia/event-api' with { type: 'json' };
 import noteApiSpec from '@notopia/note-api' with { type: 'json' };
 import { ApiReferenceReact } from '@scalar/api-reference-react';
 
@@ -15,6 +17,14 @@ export function App() {
               content: noteApiSpec,
               default: true,
               title: 'Note API',
+            },
+            {
+              content: editApiSpec,
+              title: 'Edit API',
+            },
+            {
+              content: eventApiSpec,
+              title: 'Event API',
             },
           ],
           persistAuth: true,

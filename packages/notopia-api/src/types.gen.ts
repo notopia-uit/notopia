@@ -4,7 +4,7 @@ export type ClientOptions = {
     baseUrl: 'http://api.notopia.localhost' | 'http://localhost:8082' | 'http://localhost:8081' | (string & {});
 };
 
-export type OpenapiError = {
+export type EditBundledError = {
     /**
      * Error code
      */
@@ -19,7 +19,7 @@ export type OpenapiError = {
     more_info?: string;
 };
 
-export type OpenapiNote = {
+export type NoteBundledNote = {
     readonly id?: string;
     /**
      * Title of the note
@@ -35,7 +35,7 @@ export type OpenapiNote = {
     readonly updatedAt?: string | null;
 };
 
-export type OpenapiPagination = {
+export type NoteBundledPagination = {
     /**
      * Current page number
      */
@@ -62,9 +62,24 @@ export type OpenapiPagination = {
     hasPrev: boolean;
 };
 
-export type OpenapiNoteRequired = OpenapiNote;
+export type NoteBundledError = {
+    /**
+     * Error code
+     */
+    code: string;
+    /**
+     * Human-readable error message
+     */
+    message: string;
+    /**
+     * URL with more information about the error
+     */
+    more_info?: string;
+};
 
-export type OpenapiNoteMovedEvent = {
+export type NoteBundledNoteRequired = NoteBundledNote;
+
+export type NoteBundledNoteMovedEvent = {
     type: 'NoteMovedEvent';
     data: {
         noteId: string;
@@ -73,7 +88,7 @@ export type OpenapiNoteMovedEvent = {
     };
 };
 
-export type OpenapiFolderMovedEvent = {
+export type NoteBundledFolderMovedEvent = {
     type: 'FolderRenamedEvent';
     data: {
         folderId: string;
@@ -82,7 +97,7 @@ export type OpenapiFolderMovedEvent = {
     };
 };
 
-export type OpenapiFolderRenamedEvent = {
+export type NoteBundledFolderRenamedEvent = {
     type: 'FolderRenamedEvent';
     data: {
         folderId: string;
@@ -91,7 +106,7 @@ export type OpenapiFolderRenamedEvent = {
     };
 };
 
-export type OpenapiWorkspaceRenamedEvent = {
+export type NoteBundledWorkspaceRenamedEvent = {
     type: 'WorkspaceRenamedEvent';
     data: {
         workspaceId: string;
@@ -100,66 +115,66 @@ export type OpenapiWorkspaceRenamedEvent = {
     };
 };
 
-export type OpenapiNoteWritable = {
+export type NoteBundledNoteWritable = {
     /**
      * Title of the note
      */
     title?: string;
 };
 
-export type OpenapiNoteRequiredWritable = OpenapiNoteWritable;
+export type NoteBundledNoteRequiredWritable = NoteBundledNoteWritable;
 
 /**
  * Unique identifier of the document (note)
  */
-export type OpenapiDocumentIdPath = string;
+export type EditBundledDocumentIdPath = string;
 
 /**
  * Page number for pagination
  */
-export type OpenapiPageQuery = number;
+export type NoteBundledPageQuery = number;
 
 /**
  * Number of items per page
  */
-export type OpenapiLimitQuery = number;
+export type NoteBundledLimitQuery = number;
 
 /**
  * Sort order
  */
-export const OpenapiOrderQuery = { ASC: 'asc', DESC: 'desc' } as const;
+export const NoteBundledOrderQuery = { ASC: 'asc', DESC: 'desc' } as const;
 
 /**
  * Sort order
  */
-export type OpenapiOrderQuery = typeof OpenapiOrderQuery[keyof typeof OpenapiOrderQuery];
+export type NoteBundledOrderQuery = typeof NoteBundledOrderQuery[keyof typeof NoteBundledOrderQuery];
 
 /**
  * Unique identifier of the note
  */
-export type OpenapiNoteIdPath = string;
+export type NoteBundledNoteIdPath = string;
 
 /**
  * The unique identifier of the workspace.
  */
-export type OpenapiWorkspaceIdPath = string;
+export type NoteBundledWorkspaceIdPath = string;
 
 /**
  * Create note request
  */
-export type OpenapiCreateNoteRequest = OpenapiNoteRequiredWritable & unknown;
+export type NoteBundledCreateNoteRequest = NoteBundledNoteRequiredWritable & unknown;
 
 /**
  * Put note request (replace entire note)
  */
-export type OpenapiPutNoteRequest = OpenapiNoteRequiredWritable & unknown;
+export type NoteBundledPutNoteRequest = NoteBundledNoteRequiredWritable & unknown;
 
 /**
  * Patch note request (partial update)
  */
-export type OpenapiPatchNoteRequest = OpenapiNoteWritable & unknown;
+export type NoteBundledPatchNoteRequest = NoteBundledNoteWritable & unknown;
 
-export type OpenapiWsEditsDocumentData = {
+export type EditBundledWsEditsDocumentData = {
     body?: never;
     path: {
         /**
@@ -171,35 +186,35 @@ export type OpenapiWsEditsDocumentData = {
     url: '/ws/edits/{documentId}';
 };
 
-export type OpenapiWsEditsDocumentErrors = {
+export type EditBundledWsEditsDocumentErrors = {
     /**
      * Bad Request Error response
      */
-    400: OpenapiError;
+    400: EditBundledError;
     /**
      * Unauthorized Error response
      */
-    401: OpenapiError;
+    401: EditBundledError;
     /**
      * Not Found Error response
      */
-    404: OpenapiError;
+    404: EditBundledError;
     /**
      * Internal Server Error response
      */
-    500: OpenapiError;
+    500: EditBundledError;
 };
 
-export type OpenapiWsEditsDocumentError = OpenapiWsEditsDocumentErrors[keyof OpenapiWsEditsDocumentErrors];
+export type EditBundledWsEditsDocumentError = EditBundledWsEditsDocumentErrors[keyof EditBundledWsEditsDocumentErrors];
 
-export type OpenapiWsEditsDocumentResponses = {
+export type EditBundledWsEditsDocumentResponses = {
     /**
      * OK
      */
     200: unknown;
 };
 
-export type OpenapiListNotesData = {
+export type NoteBundledListNotesData = {
     body?: never;
     path?: never;
     query?: {
@@ -227,72 +242,72 @@ export type OpenapiListNotesData = {
     url: '/note/notes';
 };
 
-export type OpenapiListNotesErrors = {
+export type NoteBundledListNotesErrors = {
     /**
      * Bad Request Error response
      */
-    400: OpenapiError;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: OpenapiError;
+    401: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: OpenapiError;
+    500: NoteBundledError;
 };
 
-export type OpenapiListNotesError = OpenapiListNotesErrors[keyof OpenapiListNotesErrors];
+export type NoteBundledListNotesError = NoteBundledListNotesErrors[keyof NoteBundledListNotesErrors];
 
-export type OpenapiListNotesResponses = {
+export type NoteBundledListNotesResponses = {
     /**
      * Successful response
      */
     200: {
-        data: Array<OpenapiNote>;
-        pagination: OpenapiPagination & unknown;
+        data: Array<NoteBundledNote>;
+        pagination: NoteBundledPagination & unknown;
     };
 };
 
-export type OpenapiListNotesResponse = OpenapiListNotesResponses[keyof OpenapiListNotesResponses];
+export type NoteBundledListNotesResponse = NoteBundledListNotesResponses[keyof NoteBundledListNotesResponses];
 
-export type OpenapiCreateNoteData = {
+export type NoteBundledCreateNoteData = {
     /**
      * Create note request
      */
-    body: OpenapiCreateNoteRequest;
+    body: NoteBundledCreateNoteRequest;
     path?: never;
     query?: never;
     url: '/note/notes';
 };
 
-export type OpenapiCreateNoteErrors = {
+export type NoteBundledCreateNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: OpenapiError;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: OpenapiError;
+    401: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: OpenapiError;
+    500: NoteBundledError;
 };
 
-export type OpenapiCreateNoteError = OpenapiCreateNoteErrors[keyof OpenapiCreateNoteErrors];
+export type NoteBundledCreateNoteError = NoteBundledCreateNoteErrors[keyof NoteBundledCreateNoteErrors];
 
-export type OpenapiCreateNoteResponses = {
+export type NoteBundledCreateNoteResponses = {
     /**
      * Note successfully created
      */
-    201: OpenapiNote & unknown;
+    201: NoteBundledNote & unknown;
 };
 
-export type OpenapiCreateNoteResponse = OpenapiCreateNoteResponses[keyof OpenapiCreateNoteResponses];
+export type NoteBundledCreateNoteResponse = NoteBundledCreateNoteResponses[keyof NoteBundledCreateNoteResponses];
 
-export type OpenapiDeleteNoteData = {
+export type NoteBundledDeleteNoteData = {
     body?: never;
     path: {
         /**
@@ -304,41 +319,41 @@ export type OpenapiDeleteNoteData = {
     url: '/note/notes/{noteId}';
 };
 
-export type OpenapiDeleteNoteErrors = {
+export type NoteBundledDeleteNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: OpenapiError;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: OpenapiError;
+    401: NoteBundledError;
     /**
      * Forbidden Error response
      */
-    403: OpenapiError;
+    403: NoteBundledError;
     /**
      * Not Found Error response
      */
-    404: OpenapiError;
+    404: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: OpenapiError;
+    500: NoteBundledError;
 };
 
-export type OpenapiDeleteNoteError = OpenapiDeleteNoteErrors[keyof OpenapiDeleteNoteErrors];
+export type NoteBundledDeleteNoteError = NoteBundledDeleteNoteErrors[keyof NoteBundledDeleteNoteErrors];
 
-export type OpenapiDeleteNoteResponses = {
+export type NoteBundledDeleteNoteResponses = {
     /**
      * Note successfully deleted
      */
     204: void;
 };
 
-export type OpenapiDeleteNoteResponse = OpenapiDeleteNoteResponses[keyof OpenapiDeleteNoteResponses];
+export type NoteBundledDeleteNoteResponse = NoteBundledDeleteNoteResponses[keyof NoteBundledDeleteNoteResponses];
 
-export type OpenapiGetNoteData = {
+export type NoteBundledGetNoteData = {
     body?: never;
     path: {
         /**
@@ -350,45 +365,45 @@ export type OpenapiGetNoteData = {
     url: '/note/notes/{noteId}';
 };
 
-export type OpenapiGetNoteErrors = {
+export type NoteBundledGetNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: OpenapiError;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: OpenapiError;
+    401: NoteBundledError;
     /**
      * Forbidden Error response
      */
-    403: OpenapiError;
+    403: NoteBundledError;
     /**
      * Not Found Error response
      */
-    404: OpenapiError;
+    404: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: OpenapiError;
+    500: NoteBundledError;
 };
 
-export type OpenapiGetNoteError = OpenapiGetNoteErrors[keyof OpenapiGetNoteErrors];
+export type NoteBundledGetNoteError = NoteBundledGetNoteErrors[keyof NoteBundledGetNoteErrors];
 
-export type OpenapiGetNoteResponses = {
+export type NoteBundledGetNoteResponses = {
     /**
      * Successful response
      */
-    200: OpenapiNoteRequired & unknown;
+    200: NoteBundledNoteRequired & unknown;
 };
 
-export type OpenapiGetNoteResponse = OpenapiGetNoteResponses[keyof OpenapiGetNoteResponses];
+export type NoteBundledGetNoteResponse = NoteBundledGetNoteResponses[keyof NoteBundledGetNoteResponses];
 
-export type OpenapiPatchNoteData = {
+export type NoteBundledPatchNoteData = {
     /**
      * Patch note request (partial update)
      */
-    body: OpenapiPatchNoteRequest;
+    body: NoteBundledPatchNoteRequest;
     path: {
         /**
          * Unique identifier of the note
@@ -399,45 +414,45 @@ export type OpenapiPatchNoteData = {
     url: '/note/notes/{noteId}';
 };
 
-export type OpenapiPatchNoteErrors = {
+export type NoteBundledPatchNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: OpenapiError;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: OpenapiError;
+    401: NoteBundledError;
     /**
      * Forbidden Error response
      */
-    403: OpenapiError;
+    403: NoteBundledError;
     /**
      * Not Found Error response
      */
-    404: OpenapiError;
+    404: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: OpenapiError;
+    500: NoteBundledError;
 };
 
-export type OpenapiPatchNoteError = OpenapiPatchNoteErrors[keyof OpenapiPatchNoteErrors];
+export type NoteBundledPatchNoteError = NoteBundledPatchNoteErrors[keyof NoteBundledPatchNoteErrors];
 
-export type OpenapiPatchNoteResponses = {
+export type NoteBundledPatchNoteResponses = {
     /**
      * Note successfully patched
      */
-    200: OpenapiNote & unknown;
+    200: NoteBundledNote & unknown;
 };
 
-export type OpenapiPatchNoteResponse = OpenapiPatchNoteResponses[keyof OpenapiPatchNoteResponses];
+export type NoteBundledPatchNoteResponse = NoteBundledPatchNoteResponses[keyof NoteBundledPatchNoteResponses];
 
-export type OpenapiUpdateNoteData = {
+export type NoteBundledUpdateNoteData = {
     /**
      * Put note request (replace entire note)
      */
-    body: OpenapiPutNoteRequest;
+    body: NoteBundledPutNoteRequest;
     path: {
         /**
          * Unique identifier of the note
@@ -448,41 +463,41 @@ export type OpenapiUpdateNoteData = {
     url: '/note/notes/{noteId}';
 };
 
-export type OpenapiUpdateNoteErrors = {
+export type NoteBundledUpdateNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: OpenapiError;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: OpenapiError;
+    401: NoteBundledError;
     /**
      * Forbidden Error response
      */
-    403: OpenapiError;
+    403: NoteBundledError;
     /**
      * Not Found Error response
      */
-    404: OpenapiError;
+    404: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: OpenapiError;
+    500: NoteBundledError;
 };
 
-export type OpenapiUpdateNoteError = OpenapiUpdateNoteErrors[keyof OpenapiUpdateNoteErrors];
+export type NoteBundledUpdateNoteError = NoteBundledUpdateNoteErrors[keyof NoteBundledUpdateNoteErrors];
 
-export type OpenapiUpdateNoteResponses = {
+export type NoteBundledUpdateNoteResponses = {
     /**
      * Note successfully updated
      */
-    200: OpenapiNoteRequired & unknown;
+    200: NoteBundledNoteRequired & unknown;
 };
 
-export type OpenapiUpdateNoteResponse = OpenapiUpdateNoteResponses[keyof OpenapiUpdateNoteResponses];
+export type NoteBundledUpdateNoteResponse = NoteBundledUpdateNoteResponses[keyof NoteBundledUpdateNoteResponses];
 
-export type OpenapiGetWorkspaceEventsData = {
+export type NoteBundledGetWorkspaceEventsData = {
     body?: never;
     path: {
         /**
@@ -494,36 +509,36 @@ export type OpenapiGetWorkspaceEventsData = {
     url: '/note/workspaces/{workspaceId}/events';
 };
 
-export type OpenapiGetWorkspaceEventsErrors = {
+export type NoteBundledGetWorkspaceEventsErrors = {
     /**
      * Bad Request Error response
      */
-    400: OpenapiError;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: OpenapiError;
+    401: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: OpenapiError;
+    500: NoteBundledError;
 };
 
-export type OpenapiGetWorkspaceEventsError = OpenapiGetWorkspaceEventsErrors[keyof OpenapiGetWorkspaceEventsErrors];
+export type NoteBundledGetWorkspaceEventsError = NoteBundledGetWorkspaceEventsErrors[keyof NoteBundledGetWorkspaceEventsErrors];
 
-export type OpenapiGetWorkspaceEventsResponses = {
+export type NoteBundledGetWorkspaceEventsResponses = {
     /**
      * A persistent stream of events
      */
     200: ({
-        type: 'openapi_NoteMovedEvent';
-    } & OpenapiNoteMovedEvent) | ({
-        type: 'openapi_FolderMovedEvent';
-    } & OpenapiFolderMovedEvent) | ({
-        type: 'openapi_FolderRenamedEvent';
-    } & OpenapiFolderRenamedEvent) | ({
-        type: 'openapi_WorkspaceRenamedEvent';
-    } & OpenapiWorkspaceRenamedEvent);
+        type: 'note_bundled_NoteMovedEvent';
+    } & NoteBundledNoteMovedEvent) | ({
+        type: 'note_bundled_FolderMovedEvent';
+    } & NoteBundledFolderMovedEvent) | ({
+        type: 'note_bundled_FolderRenamedEvent';
+    } & NoteBundledFolderRenamedEvent) | ({
+        type: 'note_bundled_WorkspaceRenamedEvent';
+    } & NoteBundledWorkspaceRenamedEvent);
 };
 
-export type OpenapiGetWorkspaceEventsResponse = OpenapiGetWorkspaceEventsResponses[keyof OpenapiGetWorkspaceEventsResponses];
+export type NoteBundledGetWorkspaceEventsResponse = NoteBundledGetWorkspaceEventsResponses[keyof NoteBundledGetWorkspaceEventsResponses];

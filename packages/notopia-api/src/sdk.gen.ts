@@ -2,8 +2,8 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { OpenapiCreateNoteData, OpenapiCreateNoteErrors, OpenapiCreateNoteResponses, OpenapiDeleteNoteData, OpenapiDeleteNoteErrors, OpenapiDeleteNoteResponses, OpenapiGetNoteData, OpenapiGetNoteErrors, OpenapiGetNoteResponses, OpenapiGetWorkspaceEventsData, OpenapiGetWorkspaceEventsErrors, OpenapiGetWorkspaceEventsResponses, OpenapiListNotesData, OpenapiListNotesErrors, OpenapiListNotesResponses, OpenapiPatchNoteData, OpenapiPatchNoteErrors, OpenapiPatchNoteResponses, OpenapiUpdateNoteData, OpenapiUpdateNoteErrors, OpenapiUpdateNoteResponses, OpenapiWsEditsDocumentData, OpenapiWsEditsDocumentErrors, OpenapiWsEditsDocumentResponses } from './types.gen';
-import { zOpenapiCreateNoteData, zOpenapiCreateNoteResponse, zOpenapiDeleteNoteData, zOpenapiDeleteNoteResponse, zOpenapiGetNoteData, zOpenapiGetNoteResponse, zOpenapiGetWorkspaceEventsData, zOpenapiGetWorkspaceEventsResponse, zOpenapiListNotesData, zOpenapiListNotesResponse, zOpenapiPatchNoteData, zOpenapiPatchNoteResponse, zOpenapiUpdateNoteData, zOpenapiUpdateNoteResponse, zOpenapiWsEditsDocumentData } from './zod.gen';
+import type { EditBundledWsEditsDocumentData, EditBundledWsEditsDocumentErrors, EditBundledWsEditsDocumentResponses, NoteBundledCreateNoteData, NoteBundledCreateNoteErrors, NoteBundledCreateNoteResponses, NoteBundledDeleteNoteData, NoteBundledDeleteNoteErrors, NoteBundledDeleteNoteResponses, NoteBundledGetNoteData, NoteBundledGetNoteErrors, NoteBundledGetNoteResponses, NoteBundledGetWorkspaceEventsData, NoteBundledGetWorkspaceEventsErrors, NoteBundledGetWorkspaceEventsResponses, NoteBundledListNotesData, NoteBundledListNotesErrors, NoteBundledListNotesResponses, NoteBundledPatchNoteData, NoteBundledPatchNoteErrors, NoteBundledPatchNoteResponses, NoteBundledUpdateNoteData, NoteBundledUpdateNoteErrors, NoteBundledUpdateNoteResponses } from './types.gen';
+import { zEditBundledWsEditsDocumentData, zNoteBundledCreateNoteData, zNoteBundledCreateNoteResponse, zNoteBundledDeleteNoteData, zNoteBundledDeleteNoteResponse, zNoteBundledGetNoteData, zNoteBundledGetNoteResponse, zNoteBundledGetWorkspaceEventsData, zNoteBundledGetWorkspaceEventsResponse, zNoteBundledListNotesData, zNoteBundledListNotesResponse, zNoteBundledPatchNoteData, zNoteBundledPatchNoteResponse, zNoteBundledUpdateNoteData, zNoteBundledUpdateNoteResponse } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -24,8 +24,8 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  *
  * Establish a WebSocket connection for real-time collaborative editing of a document.
  */
-export const openapiWsEditsDocument = <ThrowOnError extends boolean = false>(options: Options<OpenapiWsEditsDocumentData, ThrowOnError>) => (options.client ?? client).get<OpenapiWsEditsDocumentResponses, OpenapiWsEditsDocumentErrors, ThrowOnError>({
-    requestValidator: async (data) => await zOpenapiWsEditsDocumentData.parseAsync(data),
+export const editBundledWsEditsDocument = <ThrowOnError extends boolean = false>(options: Options<EditBundledWsEditsDocumentData, ThrowOnError>) => (options.client ?? client).get<EditBundledWsEditsDocumentResponses, EditBundledWsEditsDocumentErrors, ThrowOnError>({
+    requestValidator: async (data) => await zEditBundledWsEditsDocumentData.parseAsync(data),
     url: '/ws/edits/{documentId}',
     ...options
 });
@@ -35,9 +35,9 @@ export const openapiWsEditsDocument = <ThrowOnError extends boolean = false>(opt
  *
  * Retrieve a paginated list of all notes with optional filtering and sorting
  */
-export const openapiListNotes = <ThrowOnError extends boolean = false>(options?: Options<OpenapiListNotesData, ThrowOnError>) => (options?.client ?? client).get<OpenapiListNotesResponses, OpenapiListNotesErrors, ThrowOnError>({
-    requestValidator: async (data) => await zOpenapiListNotesData.parseAsync(data),
-    responseValidator: async (data) => await zOpenapiListNotesResponse.parseAsync(data),
+export const noteBundledListNotes = <ThrowOnError extends boolean = false>(options?: Options<NoteBundledListNotesData, ThrowOnError>) => (options?.client ?? client).get<NoteBundledListNotesResponses, NoteBundledListNotesErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledListNotesData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledListNotesResponse.parseAsync(data),
     url: '/note/notes',
     ...options
 });
@@ -47,9 +47,9 @@ export const openapiListNotes = <ThrowOnError extends boolean = false>(options?:
  *
  * Create a new note
  */
-export const openapiCreateNote = <ThrowOnError extends boolean = false>(options: Options<OpenapiCreateNoteData, ThrowOnError>) => (options.client ?? client).post<OpenapiCreateNoteResponses, OpenapiCreateNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zOpenapiCreateNoteData.parseAsync(data),
-    responseValidator: async (data) => await zOpenapiCreateNoteResponse.parseAsync(data),
+export const noteBundledCreateNote = <ThrowOnError extends boolean = false>(options: Options<NoteBundledCreateNoteData, ThrowOnError>) => (options.client ?? client).post<NoteBundledCreateNoteResponses, NoteBundledCreateNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledCreateNoteData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledCreateNoteResponse.parseAsync(data),
     url: '/note/notes',
     ...options,
     headers: {
@@ -63,9 +63,9 @@ export const openapiCreateNote = <ThrowOnError extends boolean = false>(options:
  *
  * Delete a note by its unique identifier
  */
-export const openapiDeleteNote = <ThrowOnError extends boolean = false>(options: Options<OpenapiDeleteNoteData, ThrowOnError>) => (options.client ?? client).delete<OpenapiDeleteNoteResponses, OpenapiDeleteNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zOpenapiDeleteNoteData.parseAsync(data),
-    responseValidator: async (data) => await zOpenapiDeleteNoteResponse.parseAsync(data),
+export const noteBundledDeleteNote = <ThrowOnError extends boolean = false>(options: Options<NoteBundledDeleteNoteData, ThrowOnError>) => (options.client ?? client).delete<NoteBundledDeleteNoteResponses, NoteBundledDeleteNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledDeleteNoteData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledDeleteNoteResponse.parseAsync(data),
     url: '/note/notes/{noteId}',
     ...options
 });
@@ -75,9 +75,9 @@ export const openapiDeleteNote = <ThrowOnError extends boolean = false>(options:
  *
  * Retrieve a single note by its unique identifier
  */
-export const openapiGetNote = <ThrowOnError extends boolean = false>(options: Options<OpenapiGetNoteData, ThrowOnError>) => (options.client ?? client).get<OpenapiGetNoteResponses, OpenapiGetNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zOpenapiGetNoteData.parseAsync(data),
-    responseValidator: async (data) => await zOpenapiGetNoteResponse.parseAsync(data),
+export const noteBundledGetNote = <ThrowOnError extends boolean = false>(options: Options<NoteBundledGetNoteData, ThrowOnError>) => (options.client ?? client).get<NoteBundledGetNoteResponses, NoteBundledGetNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledGetNoteData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledGetNoteResponse.parseAsync(data),
     url: '/note/notes/{noteId}',
     ...options
 });
@@ -87,9 +87,9 @@ export const openapiGetNote = <ThrowOnError extends boolean = false>(options: Op
  *
  * Update specific fields of a note (only provided fields will be updated)
  */
-export const openapiPatchNote = <ThrowOnError extends boolean = false>(options: Options<OpenapiPatchNoteData, ThrowOnError>) => (options.client ?? client).patch<OpenapiPatchNoteResponses, OpenapiPatchNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zOpenapiPatchNoteData.parseAsync(data),
-    responseValidator: async (data) => await zOpenapiPatchNoteResponse.parseAsync(data),
+export const noteBundledPatchNote = <ThrowOnError extends boolean = false>(options: Options<NoteBundledPatchNoteData, ThrowOnError>) => (options.client ?? client).patch<NoteBundledPatchNoteResponses, NoteBundledPatchNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledPatchNoteData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledPatchNoteResponse.parseAsync(data),
     url: '/note/notes/{noteId}',
     ...options,
     headers: {
@@ -103,9 +103,9 @@ export const openapiPatchNote = <ThrowOnError extends boolean = false>(options: 
  *
  * Replace an existing note with new data (all fields are required)
  */
-export const openapiUpdateNote = <ThrowOnError extends boolean = false>(options: Options<OpenapiUpdateNoteData, ThrowOnError>) => (options.client ?? client).put<OpenapiUpdateNoteResponses, OpenapiUpdateNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zOpenapiUpdateNoteData.parseAsync(data),
-    responseValidator: async (data) => await zOpenapiUpdateNoteResponse.parseAsync(data),
+export const noteBundledUpdateNote = <ThrowOnError extends boolean = false>(options: Options<NoteBundledUpdateNoteData, ThrowOnError>) => (options.client ?? client).put<NoteBundledUpdateNoteResponses, NoteBundledUpdateNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledUpdateNoteData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledUpdateNoteResponse.parseAsync(data),
     url: '/note/notes/{noteId}',
     ...options,
     headers: {
@@ -117,9 +117,9 @@ export const openapiUpdateNote = <ThrowOnError extends boolean = false>(options:
 /**
  * Subscribe to real-time workspace updates
  */
-export const openapiGetWorkspaceEvents = <ThrowOnError extends boolean = false>(options: Options<OpenapiGetWorkspaceEventsData, ThrowOnError>) => (options.client ?? client).sse.get<OpenapiGetWorkspaceEventsResponses, OpenapiGetWorkspaceEventsErrors, ThrowOnError>({
-    requestValidator: async (data) => await zOpenapiGetWorkspaceEventsData.parseAsync(data),
-    responseValidator: async (data) => await zOpenapiGetWorkspaceEventsResponse.parseAsync(data),
+export const noteBundledGetWorkspaceEvents = <ThrowOnError extends boolean = false>(options: Options<NoteBundledGetWorkspaceEventsData, ThrowOnError>) => (options.client ?? client).sse.get<NoteBundledGetWorkspaceEventsResponses, NoteBundledGetWorkspaceEventsErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledGetWorkspaceEventsData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledGetWorkspaceEventsResponse.parseAsync(data),
     url: '/note/workspaces/{workspaceId}/events',
     ...options
 });
