@@ -1,13 +1,13 @@
-package internal
+package main
 
 import (
 	"context"
 	"log/slog"
 
 	"github.com/notopia-uit/notopia/pkg/healthmanager"
-	"github.com/notopia-uit/notopia/services/note/internal/infra/persistence"
-	"github.com/notopia-uit/notopia/services/note/internal/transport/grpc"
-	"github.com/notopia-uit/notopia/services/note/internal/transport/http"
+	"github.com/notopia-uit/notopia/services/note/infra/persistence"
+	"github.com/notopia-uit/notopia/services/note/transport/grpc"
+	"github.com/notopia-uit/notopia/services/note/transport/http"
 	"golang.org/x/sync/errgroup"
 )
 

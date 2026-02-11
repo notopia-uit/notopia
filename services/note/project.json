@@ -5,17 +5,17 @@
   "targets": {
     "gen:wire": {
       "executor": "nx:run-commands",
-      "inputs": ["goFiles"],
-      "outputs": ["{projectRoot}/wire_gen.go"],
+      "inputs": ["goPkgFiles", "goFiles"],
+      "outputs": ["{projectRoot}/cmd/wire_gen.go"],
       "options": {
-        "command": "wire",
+        "command": "wire ./cmd",
         "cwd": "{projectRoot}"
       },
       "cache": false
     },
     "build": {
       "executor": "nx:run-commands",
-      "inputs": ["goFiles"],
+      "inputs": ["goPkgFiles", "goFiles"],
       "outputs": ["{projectRoot}/dist/note"],
       "options": {
         "command": "go build -o ./dist/note .",
@@ -25,7 +25,7 @@
     },
     "preview": {
       "executor": "nx:run-commands",
-      "inputs": ["goFiles"],
+      "inputs": ["goPkgFiles", "goFiles"],
       "options": {
         "command": "./dist/note",
         "cwd": "{projectRoot}",
@@ -36,9 +36,9 @@
     },
     "run": {
       "executor": "nx:run-commands",
-      "inputs": ["goFiles"],
+      "inputs": ["goPkgFiles", "goFiles"],
       "options": {
-        "command": "go run -gcflags='all=-N -l' .",
+        "command": "go run -gcflags='all=-N -l' ./cmd/",
         "cwd": "{projectRoot}",
         "tty": true
       },
@@ -47,9 +47,9 @@
     },
     "debug": {
       "executor": "nx:run-commands",
-      "inputs": ["goFiles"],
+      "inputs": ["goPkgFiles", "goFiles"],
       "options": {
-        "command": "dlv debug . --headless --listen=127.0.0.1:23451 --accept-multiclient",
+        "command": "dlv debug ./cmd/ --headless --listen=127.0.0.1:23451 --accept-multiclient",
         "cwd": "{projectRoot}",
         "tty": true
       },
@@ -61,26 +61,24 @@
     },
     "lint": {
       "executor": "nx:run-commands",
-      "inputs": ["goFiles"],
       "options": {
         "command": "golangci-lint run .",
         "cwd": "{projectRoot}"
       },
+      "cache": false,
       "parallelism": false
     },
     "tidy": {
       "executor": "nx:run-commands",
-      "inputs": ["goFiles"],
       "options": {
-        "command": "go mod tidy",
-        "cwd": "{projectRoot}"
+        "command": "go mod tidy"
       }
     },
     "docker:build": {
-      "inputs": ["goFiles"]
+      "inputs": ["goPkgFiles", "goFiles"]
     },
     "docker:run": {
-      "inputs": ["goFiles"]
+      "inputs": ["goPkgFiles", "goFiles"]
     },
     "goose": {
       "executor": "nx:run-commands",
@@ -122,11 +120,11 @@
     },
     "gen:sqlc": {
       "inputs": [
-        "{workspaceRoot}/pkg/note/infra/persistence/pgsqlc/*.sql",
-        "{workspaceRoot}/pkg/note/migration/",
+        "{projectRoot}/infra/persistence/pgsqlc/*.sql",
+        "{projectRoot}/infra/persistence/pgmigration/",
         "{projectRoot}/sqlc.yaml"
       ],
-      "outputs": ["{workspaceRoot}/pkg/note/infra/persistence/pgsqlc/*.go"],
+      "outputs": ["{projectRoot}/infra/persistence/pgsqlc/*.go"],
       "executor": "nx:run-commands",
       "options": {
         "command": "sqlc generate",
@@ -134,6 +132,5 @@
       },
       "cache": true
     }
-  },
-  "implicitDependencies": ["pkg/noteopenapi", "pkg/pb"]
+  }
 }

@@ -3,8 +3,8 @@ package persistence
 import (
 	"github.com/goforj/wire"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/notopia-uit/notopia/services/note/internal/infra/persistence/pg"
-	"github.com/notopia-uit/notopia/services/note/internal/infra/persistence/pgsqlc"
+	"github.com/notopia-uit/notopia/services/note/infra/persistence/pg"
+	"github.com/notopia-uit/notopia/services/note/infra/persistence/pgsqlc"
 )
 
 var PostgresProviderSet = wire.NewSet(

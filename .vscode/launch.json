@@ -5,8 +5,8 @@
       "name": "Debug Note",
       "type": "go",
       "request": "launch",
-      "program": "${workspaceFolder}/cmd/note",
-      "envFile": "${workspaceFolder}/cmd/note/.env"
+      "program": "${workspaceFolder}/services/note/cmd",
+      "envFile": "${workspaceFolder}/services/note/.env"
     },
     {
       "name": "Attach to Note",

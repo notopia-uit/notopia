@@ -3,13 +3,12 @@ package main
 import (
 	"context"
 	"log/slog"
-	"os"
 
-	"github.com/notopia-uit/notopia/pkg/helper"
+	"github.com/notopia-uit/notopia/pkg/logging"
 )
 
 func main() {
-	if err := setupInitLogger(); err != nil {
+	if err := logging.FirstStart(); err != nil {
 		slog.Error("failed to set up logger", slog.String("error", err.Error()))
 		return
 	}
@@ -22,16 +21,4 @@ func main() {
 	if err := server.Run(ctx); err != nil {
 		slog.Error("server encountered an error", slog.String("error", err.Error()))
 	}
-}
-
-func setupInitLogger() error {
-	level, err := helper.GetLogLevelFromString(os.Getenv("LOG_LEVEL"))
-	if err != nil {
-		return err
-	}
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: level,
-	}))
-	slog.SetDefault(logger)
-	return nil
 }

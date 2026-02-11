@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/services/note/internal/domain"
-	"github.com/notopia-uit/notopia/services/note/internal/infra/persistence/pgsqlc"
+	"github.com/notopia-uit/notopia/services/note/domain"
+	"github.com/notopia-uit/notopia/services/note/infra/persistence/pgsqlc"
 )
 
 type Note struct {

@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/notopia-uit/notopia/pkg/api/note"
-	"github.com/notopia-uit/notopia/services/note/internal/app"
-	"github.com/notopia-uit/notopia/services/note/internal/config"
+	"github.com/notopia-uit/notopia/services/note/app"
+	"github.com/notopia-uit/notopia/services/note/config"
 )
 
 type (

@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/notopia-uit/notopia/pkg/api/note"
-	"github.com/notopia-uit/notopia/services/note/internal/domain"
+	"github.com/notopia-uit/notopia/services/note/domain"
 )
 
 func ErrorHandler() gin.HandlerFunc {
