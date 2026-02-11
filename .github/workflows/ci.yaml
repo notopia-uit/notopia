@@ -14,6 +14,7 @@ on:
       - opened
       - synchronize
       - reopened
+  workflow_dispatch:
 
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
