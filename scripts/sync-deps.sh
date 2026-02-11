@@ -31,14 +31,14 @@ fi
 echo "🔔 Dependency changes detected."
 
 # Ensure we have a TTY for the prompt
-if [ -t 0 ] || [ -c /dev/tty ]; then
-  read -p "Sync dependencies now? [Y/n] " -n 1 -r </dev/tty
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ && ! -z $REPLY ]]; then
-    echo "Aborted."
-    exit 0
-  fi
-fi
+# if [ -t 0 ] || [ -c /dev/tty ]; then
+#   read -p "Sync dependencies now? [Y/n] " -n 1 -r </dev/tty
+#   echo
+#   if [[ ! $REPLY =~ ^[Yy]$ && ! -z $REPLY ]]; then
+#     echo "Aborted."
+#     exit 0
+#   fi
+# fi
 
 # 1. Sync Mise first (tooling provider)
 if [ "$MISE_SYNC" = true ]; then

@@ -333,6 +333,18 @@ type ListNotesParams struct {
 
 	// Search Search notes by title or content
 	Search *string `form:"search,omitempty" json:"search,omitempty"`
+
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
 }
 
 // ListNotesParamsOrder defines parameters for ListNotes.
@@ -354,6 +366,51 @@ type CreateNoteJSONBody struct {
 	UpdatedAt nullable.Nullable[time.Time] `json:"updatedAt,omitempty"`
 }
 
+// CreateNoteParams defines parameters for CreateNote.
+type CreateNoteParams struct {
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
+}
+
+// DeleteNoteParams defines parameters for DeleteNote.
+type DeleteNoteParams struct {
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
+}
+
+// GetNoteParams defines parameters for GetNote.
+type GetNoteParams struct {
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
+}
+
 // PatchNoteJSONBody defines parameters for PatchNote.
 type PatchNoteJSONBody struct {
 	// CreatedAt Timestamp when the note was created
@@ -367,6 +424,21 @@ type PatchNoteJSONBody struct {
 	UpdatedAt nullable.Nullable[time.Time] `json:"updatedAt,omitempty"`
 }
 
+// PatchNoteParams defines parameters for PatchNote.
+type PatchNoteParams struct {
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
+}
+
 // UpdateNoteJSONBody defines parameters for UpdateNote.
 type UpdateNoteJSONBody struct {
 	// CreatedAt Timestamp when the note was created
@@ -378,6 +450,36 @@ type UpdateNoteJSONBody struct {
 
 	// UpdatedAt Timestamp when the note was last updated
 	UpdatedAt nullable.Nullable[time.Time] `json:"updatedAt,omitempty"`
+}
+
+// UpdateNoteParams defines parameters for UpdateNote.
+type UpdateNoteParams struct {
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
+}
+
+// GetWorkspaceEventsParams defines parameters for GetWorkspaceEvents.
+type GetWorkspaceEventsParams struct {
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
 }
 
 // CreateNoteJSONRequestBody defines body for CreateNote for application/json ContentType.
@@ -396,22 +498,22 @@ type ServerInterface interface {
 	ListNotes(c *gin.Context, params ListNotesParams)
 	// Create note
 	// (POST /note/notes)
-	CreateNote(c *gin.Context)
+	CreateNote(c *gin.Context, params CreateNoteParams)
 	// Delete note
 	// (DELETE /note/notes/{noteId})
-	DeleteNote(c *gin.Context, noteId NoteIdPath)
+	DeleteNote(c *gin.Context, noteId NoteIdPath, params DeleteNoteParams)
 	// Get note
 	// (GET /note/notes/{noteId})
-	GetNote(c *gin.Context, noteId NoteIdPath)
+	GetNote(c *gin.Context, noteId NoteIdPath, params GetNoteParams)
 	// Patch note
 	// (PATCH /note/notes/{noteId})
-	PatchNote(c *gin.Context, noteId NoteIdPath)
+	PatchNote(c *gin.Context, noteId NoteIdPath, params PatchNoteParams)
 	// Put note
 	// (PUT /note/notes/{noteId})
-	UpdateNote(c *gin.Context, noteId NoteIdPath)
+	UpdateNote(c *gin.Context, noteId NoteIdPath, params UpdateNoteParams)
 	// Subscribe to real-time workspace updates
 	// (GET /note/workspaces/{workspaceId}/events)
-	GetWorkspaceEvents(c *gin.Context, workspaceId WorkspaceIdPath)
+	GetWorkspaceEvents(c *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceEventsParams)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -473,6 +575,90 @@ func (siw *ServerInterfaceWrapper) ListNotes(c *gin.Context) {
 		return
 	}
 
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -486,7 +672,96 @@ func (siw *ServerInterfaceWrapper) ListNotes(c *gin.Context) {
 // CreateNote operation middleware
 func (siw *ServerInterfaceWrapper) CreateNote(c *gin.Context) {
 
+	var err error
+
 	c.Set(Oauth2Scopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateNoteParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -495,7 +770,7 @@ func (siw *ServerInterfaceWrapper) CreateNote(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.CreateNote(c)
+	siw.Handler.CreateNote(c, params)
 }
 
 // DeleteNote operation middleware
@@ -514,6 +789,93 @@ func (siw *ServerInterfaceWrapper) DeleteNote(c *gin.Context) {
 
 	c.Set(Oauth2Scopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteNoteParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -521,7 +883,7 @@ func (siw *ServerInterfaceWrapper) DeleteNote(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteNote(c, noteId)
+	siw.Handler.DeleteNote(c, noteId, params)
 }
 
 // GetNote operation middleware
@@ -540,6 +902,93 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 
 	c.Set(Oauth2Scopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetNoteParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -547,7 +996,7 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetNote(c, noteId)
+	siw.Handler.GetNote(c, noteId, params)
 }
 
 // PatchNote operation middleware
@@ -566,6 +1015,93 @@ func (siw *ServerInterfaceWrapper) PatchNote(c *gin.Context) {
 
 	c.Set(Oauth2Scopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PatchNoteParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -573,7 +1109,7 @@ func (siw *ServerInterfaceWrapper) PatchNote(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PatchNote(c, noteId)
+	siw.Handler.PatchNote(c, noteId, params)
 }
 
 // UpdateNote operation middleware
@@ -592,6 +1128,93 @@ func (siw *ServerInterfaceWrapper) UpdateNote(c *gin.Context) {
 
 	c.Set(Oauth2Scopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateNoteParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -599,7 +1222,7 @@ func (siw *ServerInterfaceWrapper) UpdateNote(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.UpdateNote(c, noteId)
+	siw.Handler.UpdateNote(c, noteId, params)
 }
 
 // GetWorkspaceEvents operation middleware
@@ -618,6 +1241,93 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 
 	c.Set(Oauth2Scopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetWorkspaceEventsParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -625,7 +1335,7 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetWorkspaceEvents(c, workspaceId)
+	siw.Handler.GetWorkspaceEvents(c, workspaceId, params)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -798,7 +1508,8 @@ func (response ListNotes500JSONResponse) VisitListNotesResponse(w http.ResponseW
 }
 
 type CreateNoteRequestObject struct {
-	Body *CreateNoteJSONRequestBody
+	Params CreateNoteParams
+	Body   *CreateNoteJSONRequestBody
 }
 
 type CreateNoteResponseObject interface {
@@ -845,6 +1556,7 @@ func (response CreateNote500JSONResponse) VisitCreateNoteResponse(w http.Respons
 
 type DeleteNoteRequestObject struct {
 	NoteId NoteIdPath `json:"noteId"`
+	Params DeleteNoteParams
 }
 
 type DeleteNoteResponseObject interface {
@@ -908,6 +1620,7 @@ func (response DeleteNote500JSONResponse) VisitDeleteNoteResponse(w http.Respons
 
 type GetNoteRequestObject struct {
 	NoteId NoteIdPath `json:"noteId"`
+	Params GetNoteParams
 }
 
 type GetNoteResponseObject interface {
@@ -972,6 +1685,7 @@ func (response GetNote500JSONResponse) VisitGetNoteResponse(w http.ResponseWrite
 
 type PatchNoteRequestObject struct {
 	NoteId NoteIdPath `json:"noteId"`
+	Params PatchNoteParams
 	Body   *PatchNoteJSONRequestBody
 }
 
@@ -1037,6 +1751,7 @@ func (response PatchNote500JSONResponse) VisitPatchNoteResponse(w http.ResponseW
 
 type UpdateNoteRequestObject struct {
 	NoteId NoteIdPath `json:"noteId"`
+	Params UpdateNoteParams
 	Body   *UpdateNoteJSONRequestBody
 }
 
@@ -1102,6 +1817,7 @@ func (response UpdateNote500JSONResponse) VisitUpdateNoteResponse(w http.Respons
 
 type GetWorkspaceEventsRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	Params      GetWorkspaceEventsParams
 }
 
 type GetWorkspaceEventsResponseObject interface {
@@ -1220,8 +1936,10 @@ func (sh *strictHandler) ListNotes(ctx *gin.Context, params ListNotesParams) {
 }
 
 // CreateNote operation middleware
-func (sh *strictHandler) CreateNote(ctx *gin.Context) {
+func (sh *strictHandler) CreateNote(ctx *gin.Context, params CreateNoteParams) {
 	var request CreateNoteRequestObject
+
+	request.Params = params
 
 	var body CreateNoteJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -1253,10 +1971,11 @@ func (sh *strictHandler) CreateNote(ctx *gin.Context) {
 }
 
 // DeleteNote operation middleware
-func (sh *strictHandler) DeleteNote(ctx *gin.Context, noteId NoteIdPath) {
+func (sh *strictHandler) DeleteNote(ctx *gin.Context, noteId NoteIdPath, params DeleteNoteParams) {
 	var request DeleteNoteRequestObject
 
 	request.NoteId = noteId
+	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.DeleteNote(ctx, request.(DeleteNoteRequestObject))
@@ -1280,10 +1999,11 @@ func (sh *strictHandler) DeleteNote(ctx *gin.Context, noteId NoteIdPath) {
 }
 
 // GetNote operation middleware
-func (sh *strictHandler) GetNote(ctx *gin.Context, noteId NoteIdPath) {
+func (sh *strictHandler) GetNote(ctx *gin.Context, noteId NoteIdPath, params GetNoteParams) {
 	var request GetNoteRequestObject
 
 	request.NoteId = noteId
+	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetNote(ctx, request.(GetNoteRequestObject))
@@ -1307,10 +2027,11 @@ func (sh *strictHandler) GetNote(ctx *gin.Context, noteId NoteIdPath) {
 }
 
 // PatchNote operation middleware
-func (sh *strictHandler) PatchNote(ctx *gin.Context, noteId NoteIdPath) {
+func (sh *strictHandler) PatchNote(ctx *gin.Context, noteId NoteIdPath, params PatchNoteParams) {
 	var request PatchNoteRequestObject
 
 	request.NoteId = noteId
+	request.Params = params
 
 	var body PatchNoteJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -1342,10 +2063,11 @@ func (sh *strictHandler) PatchNote(ctx *gin.Context, noteId NoteIdPath) {
 }
 
 // UpdateNote operation middleware
-func (sh *strictHandler) UpdateNote(ctx *gin.Context, noteId NoteIdPath) {
+func (sh *strictHandler) UpdateNote(ctx *gin.Context, noteId NoteIdPath, params UpdateNoteParams) {
 	var request UpdateNoteRequestObject
 
 	request.NoteId = noteId
+	request.Params = params
 
 	var body UpdateNoteJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -1377,10 +2099,11 @@ func (sh *strictHandler) UpdateNote(ctx *gin.Context, noteId NoteIdPath) {
 }
 
 // GetWorkspaceEvents operation middleware
-func (sh *strictHandler) GetWorkspaceEvents(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) GetWorkspaceEvents(ctx *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceEventsParams) {
 	var request GetWorkspaceEventsRequestObject
 
 	request.WorkspaceId = workspaceId
+	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetWorkspaceEvents(ctx, request.(GetWorkspaceEventsRequestObject))
