@@ -8,4 +8,5 @@ var ProviderSet = wire.NewSet(
 	ProvideResource,
 	ProvideSlogHandler,
 	ProvideTracerProvider,
+	wire.FieldsOf(new(*Config), "Trace", "Log", "Meter"),
 )

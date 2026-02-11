@@ -17,10 +17,10 @@ type Server struct {
 }
 
 type Config struct {
+	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
 	Server   Server               `json:"server"   mapstructure:"server"   validate:"required"  yaml:"server"`
 	OTLP     otel.Config          `json:"otlp"     mapstructure:"otlp"     validate:"omitempty" yaml:"otlp"`
 	Database commonconfig.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
-	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
 }
 
 func New(
@@ -46,7 +46,7 @@ func New(
 
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal config from env or config file: %w", err)
+		return nil, fmt.Errorf("cannot unmarshal config from env or config file: %w", err)
 	}
 
 	slog.Info("configuration", slog.Any("config", cfg))

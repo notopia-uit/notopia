@@ -6,9 +6,9 @@
     "gen:wire": {
       "executor": "nx:run-commands",
       "inputs": ["goPkgFiles", "goFiles"],
-      "outputs": ["{projectRoot}/cmd/wire_gen.go"],
+      "outputs": ["{projectRoot}/wire_gen.go"],
       "options": {
-        "command": "wire ./cmd",
+        "command": "wire",
         "cwd": "{projectRoot}"
       },
       "cache": false
