@@ -3,7 +3,7 @@ module github.com/notopia-uit/notopia
 go 1.25.6
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20251209175733-2a1774d88802.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260209202127-80ab13bee0bf.1
 	connectrpc.com/connect v1.19.1
 	connectrpc.com/otelconnect v0.9.0
 	github.com/exaring/otelpgx v0.10.0
@@ -18,6 +18,7 @@ require (
 	github.com/oapi-codegen/gin-middleware v1.0.2
 	github.com/oapi-codegen/nullable v1.1.0
 	github.com/oapi-codegen/runtime v1.1.2
+	github.com/pressly/goose/v3 v3.26.0
 	github.com/spf13/viper v1.21.0
 	go.opentelemetry.io/contrib/bridges/otelslog v0.15.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.65.0
@@ -75,7 +76,6 @@ require (
 	github.com/oasdiff/yaml3 v0.0.0-20250309153720-d2182401db90 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
-	github.com/pressly/goose/v3 v3.26.0 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/quic-go/quic-go v0.59.0 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
