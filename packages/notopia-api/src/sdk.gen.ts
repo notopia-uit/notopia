@@ -115,7 +115,7 @@ export const noteBundledUpdateNote = <ThrowOnError extends boolean = false>(opti
 });
 
 /**
- * Subscribe to real-time workspace updates
+ * SSE workspace updates
  */
 export const noteBundledGetWorkspaceEvents = <ThrowOnError extends boolean = false>(options: Options<NoteBundledGetWorkspaceEventsData, ThrowOnError>) => (options.client ?? client).sse.get<NoteBundledGetWorkspaceEventsResponses, NoteBundledGetWorkspaceEventsErrors, ThrowOnError>({
     requestValidator: async (data) => await zNoteBundledGetWorkspaceEventsData.parseAsync(data),
