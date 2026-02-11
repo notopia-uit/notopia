@@ -3,8 +3,7 @@
   "name": "pkg/pb",
   "projectType": "library",
   "targets": {
-    "gen": {
-      "dependsOn": [{ "projects": ["proto"], "target": "gen" }]
-    }
-  }
+    "gen": {}
+  },
+  "implicitDependencies": ["proto"]
 }
