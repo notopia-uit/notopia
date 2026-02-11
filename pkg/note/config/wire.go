@@ -10,9 +10,10 @@ var ProviderSet = wire.NewSet(
 	Provide,
 	wire.FieldsOf(
 		new(*Config),
-		"Server",
 		"Database",
+		"General",
 		"OTLP",
+		"Server",
 	),
 	config.ProvideSet,
 )

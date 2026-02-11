@@ -36,6 +36,7 @@ func New(
 	viper.SetDefault("server.grpc.port", 18081)
 	config.OTLPViperSetDefault(viper, "otlp")
 	config.SQLViperSetDefault(viper, "database")
+	config.GeneralViperSetDefault(viper, "general")
 
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err == nil {

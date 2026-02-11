@@ -118,8 +118,5 @@ func OTLPViperSetDefault(
 	viper *viper.Viper,
 	prefix string,
 ) {
-	viper.SetDefault(prefix+".enabled", true)
-	viper.SetDefault(prefix+".log.enabled", true)
 	viper.SetDefault(prefix+".log.level", "info")
-	viper.SetDefault(prefix+".log.stdout", true)
 }

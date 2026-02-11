@@ -95,15 +95,16 @@ func NewLoggerProvider(
 
 var ProvideLoggerProvider = NewLoggerProvider
 
-func NewSlog(
+type SlogHandler slog.Handler
+
+func NewSlogHandler(
 	serviceName metadata.ServiceName,
 	provider *sdk.LoggerProvider,
-) *slog.Logger {
-	logger := otelslog.NewLogger(
+) SlogHandler {
+	return otelslog.NewHandler(
 		serviceName.String(),
 		otelslog.WithLoggerProvider(provider),
 	)
-	return logger
 }
 
-var ProvideSlog = NewSlog
+var ProvideSlogHandler = NewSlogHandler

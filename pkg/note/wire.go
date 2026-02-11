@@ -2,6 +2,7 @@ package note
 
 import (
 	"github.com/goforj/wire"
+	"github.com/notopia-uit/notopia/pkg/common/log"
 	"github.com/notopia-uit/notopia/pkg/note/app"
 	"github.com/notopia-uit/notopia/pkg/note/component"
 	"github.com/notopia-uit/notopia/pkg/note/config"
@@ -16,6 +17,7 @@ var ProviderSet = wire.NewSet(
 	config.ProviderSet,
 	controller.ProviderSet,
 	infra.ProviderSet,
+	log.ProviderSet,
 	otel.ProviderSet,
 	wire.Value(ServiceName),
 	wire.Value(ServiceVersion),
