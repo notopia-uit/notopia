@@ -109,6 +109,8 @@ jobs:
         with:
           path: .nx
           key: ${{ runner.os }}-nx-${{ steps.set-shas.outputs.base }}
+          restore-keys: |
+            ${{ runner.os }}-nx-
 
       - name: Restore Docs diagrams Cache
         uses: actions/cache/restore@v5
