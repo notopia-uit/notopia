@@ -6,7 +6,7 @@
 "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.5.1"
 buf = "1.65.0"
 sqlc = "1.30.0"
-java = "25.0.1"
+java = "25.0.2+10.0.LTS"
 
 [settings]
 legacy_version_file = false
