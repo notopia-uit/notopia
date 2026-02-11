@@ -182,7 +182,7 @@ paths:
         - oauth2: []
       tags:
         - workspace
-      summary: Subscribe to real-time workspace updates
+      summary: SSE workspace updates
       operationId: getWorkspaceEvents
       parameters:
         - $ref: '#/components/parameters/workspaceIdPath'

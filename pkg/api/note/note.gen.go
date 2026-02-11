@@ -511,7 +511,7 @@ type ServerInterface interface {
 	// Put note
 	// (PUT /note/notes/{noteId})
 	UpdateNote(c *gin.Context, noteId NoteIdPath, params UpdateNoteParams)
-	// Subscribe to real-time workspace updates
+	// SSE workspace updates
 	// (GET /note/workspaces/{workspaceId}/events)
 	GetWorkspaceEvents(c *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceEventsParams)
 }
@@ -1891,7 +1891,7 @@ type StrictServerInterface interface {
 	// Put note
 	// (PUT /note/notes/{noteId})
 	UpdateNote(ctx context.Context, request UpdateNoteRequestObject) (UpdateNoteResponseObject, error)
-	// Subscribe to real-time workspace updates
+	// SSE workspace updates
 	// (GET /note/workspaces/{workspaceId}/events)
 	GetWorkspaceEvents(ctx context.Context, request GetWorkspaceEventsRequestObject) (GetWorkspaceEventsResponseObject, error)
 }
