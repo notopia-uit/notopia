@@ -2,6 +2,7 @@ package note
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
@@ -36,8 +37,8 @@ func NewServer(
 }
 
 func (s *Server) Run(ctx context.Context) error {
-	if err := s.persistence.RunMigrations(); err != nil {
-		return err
+	if err := s.persistence.RunMigrations(ctx); err != nil {
+		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
 	g, ctx := errgroup.WithContext(ctx)

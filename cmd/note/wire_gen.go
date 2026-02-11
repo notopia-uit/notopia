@@ -71,7 +71,15 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	db := pg.NewStdlib(pool)
-	persistencePg, err := persistence.NewPg(db, pool)
+	provider, err := persistence.NewGooseProvider(db, logger)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	persistencePg, err := persistence.NewPg(db, pool, provider)
 	if err != nil {
 		cleanup4()
 		cleanup3()

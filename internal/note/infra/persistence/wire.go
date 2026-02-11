@@ -9,6 +9,7 @@ import (
 
 var PostgresProviderSet = wire.NewSet(
 	ProvidePg,
+	ProvideGooseProvider,
 	pg.ProvidePgPool,
 	pg.ProvideQueries,
 	pg.ProvideStdlib,

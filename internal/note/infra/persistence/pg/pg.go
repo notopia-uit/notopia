@@ -7,8 +7,8 @@ import (
 	"github.com/exaring/otelpgx"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
-	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 

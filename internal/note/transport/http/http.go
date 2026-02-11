@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/notopia-uit/notopia/pkg/api/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
+	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
 type (

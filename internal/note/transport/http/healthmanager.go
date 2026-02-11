@@ -3,8 +3,8 @@ package http
 import (
 	"context"
 
-	"github.com/notopia-uit/notopia/pkg/healthmanager"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
+	"github.com/notopia-uit/notopia/pkg/healthmanager"
 )
 
 func NewHealthManager(
