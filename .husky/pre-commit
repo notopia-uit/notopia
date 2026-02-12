@@ -1,3 +1,5 @@
 # vim:ft=sh:
 
-pnpm nx run-many -targets=lint format:check
+pnpm nx run-many \
+  --target lint \
+  --target format:check
