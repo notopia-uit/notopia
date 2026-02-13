@@ -1,7 +1,0 @@
-{
-  "name": "@notopia/event-api",
-  "private": true,
-  "exports": {
-    ".": "./event.bundled.json"
-  }
-}

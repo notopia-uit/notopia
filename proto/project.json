@@ -2,6 +2,7 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "name": "proto",
   "projectType": "library",
+  "tags": ["scope:api", "type:proto"],
   "targets": {
     "gen": {
       "inputs": ["protoFiles"],

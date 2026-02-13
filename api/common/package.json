@@ -1,0 +1,7 @@
+{
+  "name": "@notopia/common-api",
+  "private": true,
+  "exports": {
+    ".": "./common.bundled.json"
+  }
+}

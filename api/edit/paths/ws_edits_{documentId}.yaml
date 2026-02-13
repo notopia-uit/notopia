@@ -15,10 +15,10 @@ get:
     200:
       description: OK
     400:
-      $ref: ../../shared/components/responses/BadRequestError.yaml
+      $ref: ../../common/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/UnauthorizedError.yaml
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
     404:
-      $ref: ../../shared/components/responses/NotFoundError.yaml
+      $ref: ../../common/components/responses/NotFoundError.yaml
     500:
-      $ref: ../../shared/components/responses/InternalServerError.yaml
+      $ref: ../../common/components/responses/InternalServerError.yaml

@@ -13,15 +13,15 @@ get:
     200:
       $ref: ../components/responses/GetNoteResponse.yaml
     400:
-      $ref: ../../shared/components/responses/BadRequestError.yaml
+      $ref: ../../common/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/UnauthorizedError.yaml
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
     403:
-      $ref: ../../shared/components/responses/ForbiddenError.yaml
+      $ref: ../../common/components/responses/ForbiddenError.yaml
     404:
-      $ref: ../../shared/components/responses/NotFoundError.yaml
+      $ref: ../../common/components/responses/NotFoundError.yaml
     500:
-      $ref: ../../shared/components/responses/InternalServerError.yaml
+      $ref: ../../common/components/responses/InternalServerError.yaml
 
 put:
   security:
@@ -39,15 +39,15 @@ put:
     200:
       $ref: ../components/responses/PutNoteResponse.yaml
     400:
-      $ref: ../../shared/components/responses/BadRequestError.yaml
+      $ref: ../../common/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/UnauthorizedError.yaml
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
     403:
-      $ref: ../../shared/components/responses/ForbiddenError.yaml
+      $ref: ../../common/components/responses/ForbiddenError.yaml
     404:
-      $ref: ../../shared/components/responses/NotFoundError.yaml
+      $ref: ../../common/components/responses/NotFoundError.yaml
     500:
-      $ref: ../../shared/components/responses/InternalServerError.yaml
+      $ref: ../../common/components/responses/InternalServerError.yaml
 
 patch:
   security:
@@ -65,15 +65,15 @@ patch:
     200:
       $ref: ../components/responses/PatchNoteResponse.yaml
     400:
-      $ref: ../../shared/components/responses/BadRequestError.yaml
+      $ref: ../../common/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/UnauthorizedError.yaml
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
     403:
-      $ref: ../../shared/components/responses/ForbiddenError.yaml
+      $ref: ../../common/components/responses/ForbiddenError.yaml
     404:
-      $ref: ../../shared/components/responses/NotFoundError.yaml
+      $ref: ../../common/components/responses/NotFoundError.yaml
     500:
-      $ref: ../../shared/components/responses/InternalServerError.yaml
+      $ref: ../../common/components/responses/InternalServerError.yaml
 
 delete:
   security:
@@ -89,12 +89,12 @@ delete:
     204:
       description: Note successfully deleted
     400:
-      $ref: ../../shared/components/responses/BadRequestError.yaml
+      $ref: ../../common/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/UnauthorizedError.yaml
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
     403:
-      $ref: ../../shared/components/responses/ForbiddenError.yaml
+      $ref: ../../common/components/responses/ForbiddenError.yaml
     404:
-      $ref: ../../shared/components/responses/NotFoundError.yaml
+      $ref: ../../common/components/responses/NotFoundError.yaml
     500:
-      $ref: ../../shared/components/responses/InternalServerError.yaml
+      $ref: ../../common/components/responses/InternalServerError.yaml

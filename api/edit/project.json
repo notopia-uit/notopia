@@ -2,6 +2,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "api/edit",
   "projectType": "application",
+  "tags": ["scope:api", "type:openapi"],
   "targets": {
     "bundle:yaml": {
       "executor": "nx:run-commands",
@@ -10,7 +11,7 @@
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/edit.bundled.yaml"],
-      "inputs": ["openapiFiles"]
+      "inputs": ["openapiFilesWithCommon"]
     },
     "bundle:json": {
       "executor": "nx:run-commands",
@@ -19,7 +20,7 @@
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/edit.bundled.json"],
-      "inputs": ["openapiFiles"]
+      "inputs": ["openapiFilesWithCommon"]
     },
     "build": {
       "dependsOn": ["bundle:yaml", "bundle:json"]
@@ -67,10 +68,11 @@
         "command": "redocly lint edit --config ../redocly.yaml",
         "cwd": "{projectRoot}"
       },
-      "inputs": ["openapiFiles"]
+      "inputs": ["openapiFilesWithCommon"]
     },
     "gen": {
       "dependsOn": ["gen:ts"]
     }
-  }
+  },
+  "implicitDependencies": ["api/common"]
 }

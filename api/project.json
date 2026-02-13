@@ -2,6 +2,7 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "name": "api",
   "projectType": "application",
+  "tags": ["scope:api", "type:openapi"],
   "targets": {
     "bundle:yaml": {
       "dependsOn": ["^bundle:yaml"]
@@ -28,18 +29,15 @@
     "gen:hey-api": {
       "outputs": ["{workspaceRoot}/packages/notopia-api/src/"],
       "inputs": [
-        "{projectRoot}/edit/edit.bundled.json",
-        "{projectRoot}/note/note.bundled.json",
-        "{projectRoot}/event/event.bundled.json",
-        "{projectRoot}/openapi-ts.config.ts",
-        "{projectRoot}/redocly.yaml"
+        "{projectRoot}/edit/edit.yaml",
+        "{projectRoot}/note/note.yaml",
+        "{projectRoot}/openapi-ts.config.ts"
       ],
       "executor": "nx:run-commands",
       "options": {
         "command": "pnpm exec openapi-ts",
         "cwd": "{projectRoot}"
-      },
-      "dependsOn": ["^bundle:json"]
+      }
     },
     "gen:edit-nestjs-server": {
       "outputs": ["{workspaceRoot}/packages/notopia-api-edit-nestjs-server/"],
@@ -54,7 +52,7 @@
       },
       "dependsOn": [
         {
-          "projects": "edit",
+          "projects": "api/edit",
           "target": "bundle:json"
         }
       ]
@@ -63,5 +61,5 @@
       "dependsOn": ["gen:hey-api", "gen:edit-nestjs-server", "^gen*"]
     }
   },
-  "implicitDependencies": ["api/note", "api/edit", "api/event"]
+  "implicitDependencies": ["api/note", "api/edit", "api/common"]
 }

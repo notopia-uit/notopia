@@ -31,7 +31,7 @@ paths:
 components:
   securitySchemes:
     oauth2:
-      $ref: ../shared/components/securitySchemes/Oauth2.yaml
+      $ref: ../common/components/securitySchemes/Oauth2.yaml
 
 externalDocs:
   url: https://notopia-uit.github.io/notopia

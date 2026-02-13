@@ -2,13 +2,174 @@
 
 import * as z from 'zod';
 
-export const zEditBundledError = z.object({
+/**
+ * Number of items per page
+ */
+export const zLimitQueryRoot = z.unknown();
+
+/**
+ * Sort order
+ */
+export const zOrderQueryRoot = z.unknown();
+
+/**
+ * Page number for pagination
+ */
+export const zPageQueryRoot = z.unknown();
+
+/**
+ * Bad Request Error response
+ */
+export const zBadRequestErrorRoot = z.unknown();
+
+/**
+ * Forbidden Error response
+ */
+export const zForbiddenErrorRoot = z.unknown();
+
+/**
+ * Internal Server Error response
+ */
+export const zInternalServerErrorRoot = z.unknown();
+
+/**
+ * Not Found Error response
+ */
+export const zNotFoundErrorRoot = z.unknown();
+
+/**
+ * Unauthorized Error response
+ */
+export const zUnauthorizedErrorRoot = z.unknown();
+
+export const zErrorRoot = z.object({
     code: z.string(),
     message: z.string(),
     more_info: z.optional(z.string())
 });
 
-export const zNoteBundledNote = z.object({
+export const zPaginationRoot = z.object({
+    page: z.int().gte(1),
+    limit: z.int().gte(1).lte(100),
+    total: z.int().gte(0),
+    totalPages: z.int().gte(0),
+    hasNext: z.boolean(),
+    hasPrev: z.boolean()
+});
+
+/**
+ * OAuth2 Security Scheme
+ */
+export const zOauth2Root = z.unknown();
+
+/**
+ * Unique identifier of the document (note)
+ */
+export const zDocumentIdPathRoot = z.unknown();
+
+export const zWsEdits7BdocumentId7dRoot = z.unknown();
+
+export const zCreateNoteRequestRoot = z.unknown();
+
+/**
+ * Meeting Notes
+ */
+export const zCreateNoteResponseRoot = z.unknown();
+
+/**
+ * Meeting Notes
+ */
+export const zGetNoteResponseRoot = z.unknown();
+
+export const zListNoteResponseDataRoot = z.unknown();
+
+export const zListNoteResponsePaginationRoot = z.unknown();
+
+export const zPatchNoteRequestRoot = z.unknown();
+
+/**
+ * Partially Updated Meeting Notes
+ */
+export const zPatchNoteResponseRoot = z.unknown();
+
+export const zPutNoteRequestRoot = z.unknown();
+
+/**
+ * Updated Meeting Notes
+ */
+export const zPutNoteResponseRoot = z.unknown();
+
+/**
+ * Unique identifier of the note
+ */
+export const zNoteIdPathRoot = z.unknown();
+
+export const zWorkspaceIdPathRoot = z.unknown();
+
+/**
+ * Create note request
+ */
+export const zCreateNoteRequestRoot2 = z.unknown();
+
+/**
+ * Patch note request (partial update)
+ */
+export const zPatchNoteRequestRoot2 = z.unknown();
+
+/**
+ * Put note request (replace entire note)
+ */
+export const zPutNoteRequestRoot2 = z.unknown();
+
+/**
+ * Note successfully created
+ */
+export const zCreateNoteResponseRoot2 = z.unknown();
+
+/**
+ * Successful response
+ */
+export const zGetNoteResponseRoot2 = z.unknown();
+
+/**
+ * A persistent stream of events
+ */
+export const zGetWorkspaceEventsResponseRoot = z.unknown();
+
+/**
+ * Successful response
+ */
+export const zListNotesResponseRoot = z.unknown();
+
+/**
+ * Note successfully patched
+ */
+export const zPatchNoteResponseRoot2 = z.unknown();
+
+/**
+ * Note successfully updated
+ */
+export const zPutNoteResponseRoot2 = z.unknown();
+
+export const zFolderMovedEventRoot = z.object({
+    type: z.enum(['FolderRenamedEvent']),
+    data: z.object({
+        folderId: z.uuid(),
+        oldFolderId: z.uuid(),
+        newFolderId: z.uuid()
+    })
+});
+
+export const zFolderRenamedEventRoot = z.object({
+    type: z.enum(['FolderRenamedEvent']),
+    data: z.object({
+        folderId: z.uuid(),
+        oldName: z.string(),
+        newName: z.string()
+    })
+});
+
+export const zNoteRoot = z.object({
     id: z.optional(z.uuid().readonly()),
     title: z.optional(z.string().min(1).max(255)),
     createdAt: z.optional(z.iso.datetime().readonly()),
@@ -18,24 +179,7 @@ export const zNoteBundledNote = z.object({
     ]).readonly())
 });
 
-export const zNoteBundledPagination = z.object({
-    page: z.int().gte(1),
-    limit: z.int().gte(1).lte(100),
-    total: z.int().gte(0),
-    totalPages: z.int().gte(0),
-    hasNext: z.boolean(),
-    hasPrev: z.boolean()
-});
-
-export const zNoteBundledError = z.object({
-    code: z.string(),
-    message: z.string(),
-    more_info: z.optional(z.string())
-});
-
-export const zNoteBundledNoteRequired = zNoteBundledNote;
-
-export const zNoteBundledNoteMovedEvent = z.object({
+export const zNoteMovedEventRoot = z.object({
     type: z.enum(['NoteMovedEvent']),
     data: z.object({
         noteId: z.uuid(),
@@ -44,25 +188,9 @@ export const zNoteBundledNoteMovedEvent = z.object({
     })
 });
 
-export const zNoteBundledFolderMovedEvent = z.object({
-    type: z.enum(['FolderRenamedEvent']),
-    data: z.object({
-        folderId: z.uuid(),
-        oldFolderId: z.uuid(),
-        newFolderId: z.uuid()
-    })
-});
+export const zNoteRequiredRoot = zNoteRoot;
 
-export const zNoteBundledFolderRenamedEvent = z.object({
-    type: z.enum(['FolderRenamedEvent']),
-    data: z.object({
-        folderId: z.uuid(),
-        oldName: z.string(),
-        newName: z.string()
-    })
-});
-
-export const zNoteBundledWorkspaceRenamedEvent = z.object({
+export const zWorkspaceRenamedEventRoot = z.object({
     type: z.enum(['WorkspaceRenamedEvent']),
     data: z.object({
         workspaceId: z.uuid(),
@@ -71,58 +199,63 @@ export const zNoteBundledWorkspaceRenamedEvent = z.object({
     })
 });
 
-export const zNoteBundledNoteWritable = z.object({
-    title: z.optional(z.string().min(1).max(255))
-});
+export const zNotesRoot = z.unknown();
 
-export const zNoteBundledNoteRequiredWritable = zNoteBundledNoteWritable;
+export const zNotes7BnoteId7dRoot = z.unknown();
 
-/**
- * Unique identifier of the document (note)
- */
-export const zEditBundledDocumentIdPath = z.uuid();
-
-/**
- * Page number for pagination
- */
-export const zNoteBundledPageQuery = z.int().gte(1).default(1);
-
-/**
- * Number of items per page
- */
-export const zNoteBundledLimitQuery = z.int().gte(1).lte(100).default(20);
-
-/**
- * Sort order
- */
-export const zNoteBundledOrderQuery = z.enum(['asc', 'desc']);
-
-/**
- * Unique identifier of the note
- */
-export const zNoteBundledNoteIdPath = z.uuid();
-
-/**
- * The unique identifier of the workspace.
- */
-export const zNoteBundledWorkspaceIdPath = z.uuid();
+export const zWorkspaces7BworkspaceId7dEventsRoot = z.unknown();
 
 /**
  * Create note request
  */
-export const zNoteBundledCreateNoteRequest = zNoteBundledNoteRequiredWritable.and(z.unknown());
-
-/**
- * Put note request (replace entire note)
- */
-export const zNoteBundledPutNoteRequest = zNoteBundledNoteRequiredWritable.and(z.unknown());
+export const zCreateNoteRequestRoot2Writable = z.unknown();
 
 /**
  * Patch note request (partial update)
  */
-export const zNoteBundledPatchNoteRequest = zNoteBundledNoteWritable.and(z.unknown());
+export const zPatchNoteRequestRoot2Writable = z.unknown();
 
-export const zEditBundledWsEditsDocumentData = z.object({
+/**
+ * Put note request (replace entire note)
+ */
+export const zPutNoteRequestRoot2Writable = z.unknown();
+
+/**
+ * Note successfully created
+ */
+export const zCreateNoteResponseRoot2Writable = z.unknown();
+
+/**
+ * Successful response
+ */
+export const zGetNoteResponseRoot2Writable = z.unknown();
+
+/**
+ * Successful response
+ */
+export const zListNotesResponseRootWritable = z.unknown();
+
+/**
+ * Note successfully patched
+ */
+export const zPatchNoteResponseRoot2Writable = z.unknown();
+
+/**
+ * Note successfully updated
+ */
+export const zPutNoteResponseRoot2Writable = z.unknown();
+
+export const zNoteRootWritable = z.object({
+    title: z.optional(z.string().min(1).max(255))
+});
+
+export const zNoteRequiredRootWritable = zNoteRootWritable;
+
+export const zNotesRootWritable = z.unknown();
+
+export const zNotes7BnoteId7dRootWritable = z.unknown();
+
+export const zWsEditsDocumentData = z.object({
     body: z.optional(z.never()),
     path: z.object({
         documentId: z.uuid()
@@ -130,7 +263,7 @@ export const zEditBundledWsEditsDocumentData = z.object({
     query: z.optional(z.never())
 });
 
-export const zNoteBundledListNotesData = z.object({
+export const zListNotesData = z.object({
     body: z.optional(z.never()),
     path: z.optional(z.never()),
     query: z.optional(z.object({
@@ -149,13 +282,13 @@ export const zNoteBundledListNotesData = z.object({
 /**
  * Successful response
  */
-export const zNoteBundledListNotesResponse = z.object({
-    data: z.array(zNoteBundledNote),
-    pagination: zNoteBundledPagination.and(z.unknown())
+export const zListNotesResponse = z.object({
+    data: z.array(zNoteRoot),
+    pagination: zPaginationRoot.and(z.unknown())
 });
 
-export const zNoteBundledCreateNoteData = z.object({
-    body: zNoteBundledCreateNoteRequest,
+export const zCreateNoteData = z.object({
+    body: zCreateNoteRequestRoot2Writable,
     path: z.optional(z.never()),
     query: z.optional(z.never())
 });
@@ -163,9 +296,9 @@ export const zNoteBundledCreateNoteData = z.object({
 /**
  * Note successfully created
  */
-export const zNoteBundledCreateNoteResponse = zNoteBundledNote.and(z.unknown());
+export const zCreateNoteResponse = zNoteRoot.and(z.unknown());
 
-export const zNoteBundledDeleteNoteData = z.object({
+export const zDeleteNoteData = z.object({
     body: z.optional(z.never()),
     path: z.object({
         noteId: z.uuid()
@@ -176,9 +309,9 @@ export const zNoteBundledDeleteNoteData = z.object({
 /**
  * Note successfully deleted
  */
-export const zNoteBundledDeleteNoteResponse = z.void();
+export const zDeleteNoteResponse = z.void();
 
-export const zNoteBundledGetNoteData = z.object({
+export const zGetNoteData = z.object({
     body: z.optional(z.never()),
     path: z.object({
         noteId: z.uuid()
@@ -189,10 +322,10 @@ export const zNoteBundledGetNoteData = z.object({
 /**
  * Successful response
  */
-export const zNoteBundledGetNoteResponse = zNoteBundledNoteRequired.and(z.unknown());
+export const zGetNoteResponse = zNoteRequiredRoot.and(z.unknown());
 
-export const zNoteBundledPatchNoteData = z.object({
-    body: zNoteBundledPatchNoteRequest,
+export const zPatchNoteData = z.object({
+    body: zPatchNoteRequestRoot2Writable,
     path: z.object({
         noteId: z.uuid()
     }),
@@ -202,10 +335,10 @@ export const zNoteBundledPatchNoteData = z.object({
 /**
  * Note successfully patched
  */
-export const zNoteBundledPatchNoteResponse = zNoteBundledNote.and(z.unknown());
+export const zPatchNoteResponse = zNoteRoot.and(z.unknown());
 
-export const zNoteBundledUpdateNoteData = z.object({
-    body: zNoteBundledPutNoteRequest,
+export const zUpdateNoteData = z.object({
+    body: zPutNoteRequestRoot2Writable,
     path: z.object({
         noteId: z.uuid()
     }),
@@ -215,9 +348,9 @@ export const zNoteBundledUpdateNoteData = z.object({
 /**
  * Note successfully updated
  */
-export const zNoteBundledUpdateNoteResponse = zNoteBundledNoteRequired.and(z.unknown());
+export const zUpdateNoteResponse = zNoteRequiredRoot.and(z.unknown());
 
-export const zNoteBundledGetWorkspaceEventsData = z.object({
+export const zGetWorkspaceEventsData = z.object({
     body: z.optional(z.never()),
     path: z.object({
         workspaceId: z.uuid()
@@ -228,17 +361,17 @@ export const zNoteBundledGetWorkspaceEventsData = z.object({
 /**
  * A persistent stream of events
  */
-export const zNoteBundledGetWorkspaceEventsResponse = z.union([
+export const zGetWorkspaceEventsResponse = z.union([
     z.object({
-        type: z.literal('note_bundled_NoteMovedEvent')
-    }).and(zNoteBundledNoteMovedEvent),
+        type: z.literal('NoteMovedEvent_root')
+    }).and(zNoteMovedEventRoot),
     z.object({
-        type: z.literal('note_bundled_FolderMovedEvent')
-    }).and(zNoteBundledFolderMovedEvent),
+        type: z.literal('FolderMovedEvent_root')
+    }).and(zFolderMovedEventRoot),
     z.object({
-        type: z.literal('note_bundled_FolderRenamedEvent')
-    }).and(zNoteBundledFolderRenamedEvent),
+        type: z.literal('FolderRenamedEvent_root')
+    }).and(zFolderRenamedEventRoot),
     z.object({
-        type: z.literal('note_bundled_WorkspaceRenamedEvent')
-    }).and(zNoteBundledWorkspaceRenamedEvent)
+        type: z.literal('WorkspaceRenamedEvent_root')
+    }).and(zWorkspaceRenamedEventRoot)
 ]);

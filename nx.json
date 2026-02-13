@@ -4,10 +4,12 @@
     "openapiFiles": [
       "{projectRoot}/**/*.md",
       "{projectRoot}/**/*.yaml",
-      "{workspaceRoot}/api/shared/**/*.md",
-      "{workspaceRoot}/api/shared/**/*.yaml",
-      "!{projectRoot}/**/README.md",
-      "!{projectRoot}/dist"
+      "!{projectRoot}/**/README.md"
+    ],
+    "openapiFilesWithCommon": [
+      "openapiFiles",
+      "{workspaceRoot}/api/common/**/*.md",
+      "{workspaceRoot}/api/common/**/*.yaml"
     ],
     "goPkgFiles": [
       "{workspaceRoot}/go.mod",

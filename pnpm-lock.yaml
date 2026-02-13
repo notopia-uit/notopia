@@ -304,9 +304,9 @@ importers:
         specifier: ^1.4.2
         version: 1.5.9(encoding@0.1.13)
 
-  api/edit: {}
+  api/common: {}
 
-  api/event: {}
+  api/edit: {}
 
   api/note: {}
 
@@ -355,12 +355,12 @@ importers:
       '@catppuccin/vitepress':
         specifier: ^0.1.2
         version: 0.1.2(typescript@5.9.3)
+      '@notopia/common-api':
+        specifier: workspace:^
+        version: link:../api/common
       '@notopia/edit-api':
         specifier: workspace:^
         version: link:../api/edit
-      '@notopia/event-api':
-        specifier: workspace:^
-        version: link:../api/event
       '@notopia/note-api':
         specifier: workspace:^
         version: link:../api/note
@@ -404,12 +404,12 @@ importers:
 
   packages/notopia-api-web:
     dependencies:
+      '@notopia/common-api':
+        specifier: workspace:^
+        version: link:../../api/common
       '@notopia/edit-api':
         specifier: workspace:^
         version: link:../../api/edit
-      '@notopia/event-api':
-        specifier: workspace:^
-        version: link:../../api/event
       '@notopia/note-api':
         specifier: workspace:^
         version: link:../../api/note

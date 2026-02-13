@@ -12,8 +12,8 @@ get:
     200:
       $ref: ../components/responses/GetWorkspaceEventsResponse.yaml
     400:
-      $ref: ../../shared/components/responses/BadRequestError.yaml
+      $ref: ../../common/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/UnauthorizedError.yaml
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
     500:
-      $ref: ../../shared/components/responses/InternalServerError.yaml
+      $ref: ../../common/components/responses/InternalServerError.yaml

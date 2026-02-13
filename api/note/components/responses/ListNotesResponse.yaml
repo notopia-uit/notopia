@@ -16,7 +16,7 @@ content:
             $ref: ../examples/ListNoteResponseData.yaml
         pagination:
           allOf:
-            - $ref: ../../../shared/components/schemas/Pagination.yaml
+            - $ref: ../../../common/components/schemas/Pagination.yaml
             - description: Pagination details for the list of notes
               example:
                 $ref: ../examples/ListNoteResponsePagination.yaml

@@ -5,8 +5,8 @@ apis:
     root: ./note/note.yaml
   edit:
     root: ./edit/edit.yaml
-  event:
-    root: ./event/event.yaml
+  common:
+    root: ./common/common.yaml
     rules:
       struct: off
       no-empty-servers: off

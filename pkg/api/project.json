@@ -2,5 +2,5 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "pkg/api",
   "projectType": "library",
-  "implicitDependencies": ["pkg/api/event", "pkg/api/note"]
+  "implicitDependencies": [ "pkg/api/note"]
 }

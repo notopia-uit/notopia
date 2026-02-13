@@ -8,9 +8,9 @@ get:
   description: Retrieve a paginated list of all notes with optional filtering and sorting
   operationId: listNotes
   parameters:
-    - $ref: ../../shared/components/parameters/pageQuery.yaml
-    - $ref: ../../shared/components/parameters/limitQuery.yaml
-    - $ref: ../../shared/components/parameters/orderQuery.yaml
+    - $ref: ../../common/components/parameters/pageQuery.yaml
+    - $ref: ../../common/components/parameters/limitQuery.yaml
+    - $ref: ../../common/components/parameters/orderQuery.yaml
     - name: sortBy
       in: query
       description: Field to sort by
@@ -29,11 +29,11 @@ get:
     200:
       $ref: ../components/responses/ListNotesResponse.yaml
     400:
-      $ref: ../../shared/components/responses/BadRequestError.yaml
+      $ref: ../../common/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/UnauthorizedError.yaml
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
     500:
-      $ref: ../../shared/components/responses/InternalServerError.yaml
+      $ref: ../../common/components/responses/InternalServerError.yaml
 
 post:
   security:
@@ -49,8 +49,8 @@ post:
     201:
       $ref: ../components/responses/CreateNoteResponse.yaml
     400:
-      $ref: ../../shared/components/responses/BadRequestError.yaml
+      $ref: ../../common/components/responses/BadRequestError.yaml
     401:
-      $ref: ../../shared/components/responses/UnauthorizedError.yaml
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
     500:
-      $ref: ../../shared/components/responses/InternalServerError.yaml
+      $ref: ../../common/components/responses/InternalServerError.yaml

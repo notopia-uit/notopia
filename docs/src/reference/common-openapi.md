@@ -1,13 +1,13 @@
 ---
 aside: false
 outline: false
-title: Event OpenAPI
+title: Common OpenAPI
 ---
 
 <script setup>
 import { onBeforeMount, onBeforeUnmount } from 'vue'
 import { useTheme } from 'vitepress-openapi/client'
-import eventApiSpec from "@notopia/event-api" with { type: "json" };
+import commonApiSpec from "@notopia/common-api" with { type: "json" };
 
 onBeforeMount(() => {
     useTheme({
@@ -18,4 +18,4 @@ onBeforeMount(() => {
 })
 </script>
 
-<OASpec :spec="eventApiSpec" />
+<OASpec :spec="commonApiSpec" />
