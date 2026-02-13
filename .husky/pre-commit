@@ -2,4 +2,5 @@
 
 pnpm nx run-many \
   --target lint \
-  --target format:check
+  --target format:check \
+  --tui false
