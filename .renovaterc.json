@@ -8,8 +8,11 @@
   "packageRules": [
     {
       "groupName": "Nx Monorepo Toolkit",
-      "matchPackagePatterns": ["^@nx/", "^nx$"],
-      "matchPackageNames": ["nx"],
+      "matchPackageNames": [
+        "nx",
+        "/^@nx//",
+        "/^nx$/"
+      ],
       "automerge": false,
       "description": "Group all Nx packages to prevent version mismatch and allow manual migration. Note that renovate still create PRs for minor/major updates, but they will not be automerged."
     }
@@ -20,5 +23,7 @@
       "^deploy/compose/.+\\.yaml$"
     ]
   },
-  "schedule": ["* 1-18 * * 3,0"]
+  "schedule": [
+    "* 1-18 * * 3,0"
+  ]
 }
