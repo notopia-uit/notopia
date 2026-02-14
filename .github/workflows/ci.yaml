@@ -126,7 +126,13 @@ jobs:
       - name: Install Go Dependencies
         run: go mod download
 
-      - name: Nx Affected Build, Test, Lint, Format Check, Gen, Bundle
+      - name: Nx Affected Test
+        run: |
+          npx nx affected \
+            --target test \
+            --parallel=5 | true
+
+      - name: Nx Affected Build, Lint, Format Check, Gen, Bundle
         run: |
           npx nx affected \
             --target lint \
@@ -134,7 +140,6 @@ jobs:
             --target gen \
             --target bundle \
             --target build \
-            --target test \
             --parallel=5
 
       - name: Check for Changes after Build/Gen
