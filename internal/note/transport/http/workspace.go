@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/notopia-uit/notopia/pkg/api/note"
-	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 )
 
 func (h *StrictHandler) GetWorkspaceEvents(
@@ -13,12 +12,5 @@ func (h *StrictHandler) GetWorkspaceEvents(
 ) (note.GetWorkspaceEventsResponseObject, error) {
 	// eventChan := make(chan any)
 	// go s.streamFromRedis(request.WorkspaceId, eventChan, ctx)
-	return &note.GetWorkspaceEvents200TexteventStreamResponse{
-		GetWorkspaceEventsResponseTexteventStreamResponse: note.GetWorkspaceEventsResponseTexteventStreamResponse{
-			Body: commonhttp.SSEWrapper[any]{
-				Events: nil,
-				Ctx:    ctx,
-			},
-		},
-	}, nil
+	return &note.GetWorkspaceEvents200TexteventStreamResponse{}, nil
 }

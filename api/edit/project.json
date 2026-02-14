@@ -4,15 +4,6 @@
   "projectType": "application",
   "tags": ["scope:api", "type:openapi"],
   "targets": {
-    "bundle:yaml": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "redocly bundle edit --config ../redocly.yaml -o ./edit.bundled.yaml",
-        "cwd": "{projectRoot}"
-      },
-      "outputs": ["{projectRoot}/edit.bundled.yaml"],
-      "inputs": ["openapiFilesWithCommon"]
-    },
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {

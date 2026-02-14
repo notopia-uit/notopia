@@ -4,15 +4,6 @@
   "projectType": "application",
   "tags": ["scope:api", "type:openapi"],
   "targets": {
-    "bundle:yaml": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "redocly bundle note --config ../redocly.yaml -o ./note.bundled.yaml",
-        "cwd": "{projectRoot}"
-      },
-      "outputs": ["{projectRoot}/note.bundled.yaml"],
-      "inputs": ["openapiFilesWithCommon"]
-    },
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
@@ -75,9 +66,10 @@
       "outputs": ["{workspaceRoot}/pkg/api/note/note.gen.go"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "oapi-codegen --config ./oapi-codegen.yaml ./note.yaml",
+        "command": "oapi-codegen --config ./oapi-codegen.yaml ./note.bundled.json",
         "cwd": "{projectRoot}"
-      }
+      },
+      "dependsOn": ["bundle:json"]
     },
     "gen": {
       "dependsOn": ["gen:go"]

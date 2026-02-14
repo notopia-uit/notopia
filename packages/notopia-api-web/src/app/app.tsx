@@ -2,8 +2,8 @@
 // import styles from './app.module.css';
 import '@scalar/api-reference-react/style.css';
 
-import editApiSpec from '@notopia/edit-api' with { type: 'json' };
 import commonApiSpec from '@notopia/common-api' with { type: 'json' };
+import editApiSpec from '@notopia/edit-api' with { type: 'json' };
 import noteApiSpec from '@notopia/note-api' with { type: 'json' };
 import { ApiReferenceReact } from '@scalar/api-reference-react';
 

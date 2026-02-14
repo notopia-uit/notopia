@@ -7,18 +7,6 @@ generate:
 output: ../../pkg/api/note/note.gen.go
 output-options:
   nullable-type: true
-  skip-prune: true
   overlay:
     path: ./overlay.yaml
-    strict: false
-import-mapping:
-  ../common/common.yaml: github.com/notopia-uit/notopia/pkg/api/note/common
-  # ../../common/components/parameters/pageQuery.yaml: github.com/notopia-uit/notopia/pkg/api/common
-  # ../../common/components/parameters/limitQuery.yaml: github.com/notopia-uit/notopia/pkg/api/common
-  # ../../common/components/parameters/orderQuery.yaml: github.com/notopia-uit/notopia/pkg/api/common
-  # ../../common/components/responses/BadRequestError.yaml: github.com/notopia-uit/notopia/pkg/api/common
-  # ../../common/components/responses/UnauthorizedError.yaml: github.com/notopia-uit/notopia/pkg/api/common
-  # ../../common/components/responses/InternalServerError.yaml: github.com/notopia-uit/notopia/pkg/api/common
-  # ../../common/components/responses/ForbiddenError.yaml: github.com/notopia-uit/notopia/pkg/api/common
-  # ../../common/components/responses/NotFoundError.yaml: github.com/notopia-uit/notopia/pkg/api/common
-  # ../../../common/components/schemas/Pagination.yaml: github.com/notopia-uit/notopia/pkg/api/common
+    strict: true
