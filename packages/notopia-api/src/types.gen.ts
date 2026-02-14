@@ -4,47 +4,7 @@ export type ClientOptions = {
     baseUrl: 'http://api.notopia.localhost' | 'http://localhost:8082' | 'http://localhost:8081' | (string & {});
 };
 
-/**
- * Number of items per page
- */
-export type LimitQueryRoot = unknown;
-
-/**
- * Sort order
- */
-export type OrderQueryRoot = unknown;
-
-/**
- * Page number for pagination
- */
-export type PageQueryRoot = unknown;
-
-/**
- * Bad Request Error response
- */
-export type BadRequestErrorRoot = unknown;
-
-/**
- * Forbidden Error response
- */
-export type ForbiddenErrorRoot = unknown;
-
-/**
- * Internal Server Error response
- */
-export type InternalServerErrorRoot = unknown;
-
-/**
- * Not Found Error response
- */
-export type NotFoundErrorRoot = unknown;
-
-/**
- * Unauthorized Error response
- */
-export type UnauthorizedErrorRoot = unknown;
-
-export type ErrorRoot = {
+export type EditBundledError = {
     /**
      * Error code
      */
@@ -59,7 +19,23 @@ export type ErrorRoot = {
     more_info?: string;
 };
 
-export type PaginationRoot = {
+export type NoteBundledNote = {
+    readonly id?: string;
+    /**
+     * Title of the note
+     */
+    title?: string;
+    /**
+     * Timestamp when the note was created
+     */
+    readonly createdAt?: string;
+    /**
+     * Timestamp when the note was last updated
+     */
+    readonly updatedAt?: string | null;
+};
+
+export type NoteBundledPagination = {
     /**
      * Current page number
      */
@@ -86,135 +62,24 @@ export type PaginationRoot = {
     hasPrev: boolean;
 };
 
-/**
- * OAuth2 Security Scheme
- */
-export type Oauth2Root = unknown;
-
-/**
- * Unique identifier of the document (note)
- */
-export type DocumentIdPathRoot = unknown;
-
-export type WsEdits7BdocumentId7dRoot = unknown;
-
-export type CreateNoteRequestRoot = unknown;
-
-/**
- * Meeting Notes
- */
-export type CreateNoteResponseRoot = unknown;
-
-/**
- * Meeting Notes
- */
-export type GetNoteResponseRoot = unknown;
-
-export type ListNoteResponseDataRoot = unknown;
-
-export type ListNoteResponsePaginationRoot = unknown;
-
-export type PatchNoteRequestRoot = unknown;
-
-/**
- * Partially Updated Meeting Notes
- */
-export type PatchNoteResponseRoot = unknown;
-
-export type PutNoteRequestRoot = unknown;
-
-/**
- * Updated Meeting Notes
- */
-export type PutNoteResponseRoot = unknown;
-
-/**
- * Unique identifier of the note
- */
-export type NoteIdPathRoot = unknown;
-
-export type WorkspaceIdPathRoot = unknown;
-
-/**
- * Create note request
- */
-export type CreateNoteRequestRoot2 = unknown;
-
-/**
- * Patch note request (partial update)
- */
-export type PatchNoteRequestRoot2 = unknown;
-
-/**
- * Put note request (replace entire note)
- */
-export type PutNoteRequestRoot2 = unknown;
-
-/**
- * Note successfully created
- */
-export type CreateNoteResponseRoot2 = unknown;
-
-/**
- * Successful response
- */
-export type GetNoteResponseRoot2 = unknown;
-
-/**
- * A persistent stream of events
- */
-export type GetWorkspaceEventsResponseRoot = unknown;
-
-/**
- * Successful response
- */
-export type ListNotesResponseRoot = unknown;
-
-/**
- * Note successfully patched
- */
-export type PatchNoteResponseRoot2 = unknown;
-
-/**
- * Note successfully updated
- */
-export type PutNoteResponseRoot2 = unknown;
-
-export type FolderMovedEventRoot = {
-    type: 'FolderRenamedEvent';
-    data: {
-        folderId: string;
-        oldFolderId: string;
-        newFolderId: string;
-    };
+export type NoteBundledError = {
+    /**
+     * Error code
+     */
+    code: string;
+    /**
+     * Human-readable error message
+     */
+    message: string;
+    /**
+     * URL with more information about the error
+     */
+    more_info?: string;
 };
 
-export type FolderRenamedEventRoot = {
-    type: 'FolderRenamedEvent';
-    data: {
-        folderId: string;
-        oldName: string;
-        newName: string;
-    };
-};
+export type NoteBundledNoteRequired = NoteBundledNote;
 
-export type NoteRoot = {
-    readonly id?: string;
-    /**
-     * Title of the note
-     */
-    title?: string;
-    /**
-     * Timestamp when the note was created
-     */
-    readonly createdAt?: string;
-    /**
-     * Timestamp when the note was last updated
-     */
-    readonly updatedAt?: string | null;
-};
-
-export type NoteMovedEventRoot = {
+export type NoteBundledNoteMovedEvent = {
     type: 'NoteMovedEvent';
     data: {
         noteId: string;
@@ -223,9 +88,25 @@ export type NoteMovedEventRoot = {
     };
 };
 
-export type NoteRequiredRoot = NoteRoot;
+export type NoteBundledFolderMovedEvent = {
+    type: 'FolderRenamedEvent';
+    data: {
+        folderId: string;
+        oldFolderId: string;
+        newFolderId: string;
+    };
+};
 
-export type WorkspaceRenamedEventRoot = {
+export type NoteBundledFolderRenamedEvent = {
+    type: 'FolderRenamedEvent';
+    data: {
+        folderId: string;
+        oldName: string;
+        newName: string;
+    };
+};
+
+export type NoteBundledWorkspaceRenamedEvent = {
     type: 'WorkspaceRenamedEvent';
     data: {
         workspaceId: string;
@@ -234,66 +115,66 @@ export type WorkspaceRenamedEventRoot = {
     };
 };
 
-export type NotesRoot = unknown;
-
-export type Notes7BnoteId7dRoot = unknown;
-
-export type Workspaces7BworkspaceId7dEventsRoot = unknown;
-
-/**
- * Create note request
- */
-export type CreateNoteRequestRoot2Writable = unknown;
-
-/**
- * Patch note request (partial update)
- */
-export type PatchNoteRequestRoot2Writable = unknown;
-
-/**
- * Put note request (replace entire note)
- */
-export type PutNoteRequestRoot2Writable = unknown;
-
-/**
- * Note successfully created
- */
-export type CreateNoteResponseRoot2Writable = unknown;
-
-/**
- * Successful response
- */
-export type GetNoteResponseRoot2Writable = unknown;
-
-/**
- * Successful response
- */
-export type ListNotesResponseRootWritable = unknown;
-
-/**
- * Note successfully patched
- */
-export type PatchNoteResponseRoot2Writable = unknown;
-
-/**
- * Note successfully updated
- */
-export type PutNoteResponseRoot2Writable = unknown;
-
-export type NoteRootWritable = {
+export type NoteBundledNoteWritable = {
     /**
      * Title of the note
      */
     title?: string;
 };
 
-export type NoteRequiredRootWritable = NoteRootWritable;
+export type NoteBundledNoteRequiredWritable = NoteBundledNoteWritable;
 
-export type NotesRootWritable = unknown;
+/**
+ * Unique identifier of the document (note)
+ */
+export type EditBundledDocumentIdPath = string;
 
-export type Notes7BnoteId7dRootWritable = unknown;
+/**
+ * Page number for pagination
+ */
+export type NoteBundledPageQuery = number;
 
-export type WsEditsDocumentData = {
+/**
+ * Number of items per page
+ */
+export type NoteBundledLimitQuery = number;
+
+/**
+ * Sort order
+ */
+export const NoteBundledOrderQuery = { ASC: 'asc', DESC: 'desc' } as const;
+
+/**
+ * Sort order
+ */
+export type NoteBundledOrderQuery = typeof NoteBundledOrderQuery[keyof typeof NoteBundledOrderQuery];
+
+/**
+ * Unique identifier of the note
+ */
+export type NoteBundledNoteIdPath = string;
+
+/**
+ * The unique identifier of the workspace.
+ */
+export type NoteBundledWorkspaceIdPath = string;
+
+/**
+ * Create note request
+ */
+export type NoteBundledCreateNoteRequest = NoteBundledNoteRequiredWritable & unknown;
+
+/**
+ * Put note request (replace entire note)
+ */
+export type NoteBundledPutNoteRequest = NoteBundledNoteRequiredWritable & unknown;
+
+/**
+ * Patch note request (partial update)
+ */
+export type NoteBundledPatchNoteRequest = NoteBundledNoteWritable & unknown;
+
+export type EditBundledWsEditsDocumentData = {
     body?: never;
     path: {
         /**
@@ -305,35 +186,35 @@ export type WsEditsDocumentData = {
     url: '/ws/edits/{documentId}';
 };
 
-export type WsEditsDocumentErrors = {
+export type EditBundledWsEditsDocumentErrors = {
     /**
      * Bad Request Error response
      */
-    400: ErrorRoot;
+    400: EditBundledError;
     /**
      * Unauthorized Error response
      */
-    401: ErrorRoot;
+    401: EditBundledError;
     /**
      * Not Found Error response
      */
-    404: ErrorRoot;
+    404: EditBundledError;
     /**
      * Internal Server Error response
      */
-    500: ErrorRoot;
+    500: EditBundledError;
 };
 
-export type WsEditsDocumentError = WsEditsDocumentErrors[keyof WsEditsDocumentErrors];
+export type EditBundledWsEditsDocumentError = EditBundledWsEditsDocumentErrors[keyof EditBundledWsEditsDocumentErrors];
 
-export type WsEditsDocumentResponses = {
+export type EditBundledWsEditsDocumentResponses = {
     /**
      * OK
      */
     200: unknown;
 };
 
-export type ListNotesData = {
+export type NoteBundledListNotesData = {
     body?: never;
     path?: never;
     query?: {
@@ -361,72 +242,72 @@ export type ListNotesData = {
     url: '/note/notes';
 };
 
-export type ListNotesErrors = {
+export type NoteBundledListNotesErrors = {
     /**
      * Bad Request Error response
      */
-    400: ErrorRoot;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: ErrorRoot;
+    401: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: ErrorRoot;
+    500: NoteBundledError;
 };
 
-export type ListNotesError = ListNotesErrors[keyof ListNotesErrors];
+export type NoteBundledListNotesError = NoteBundledListNotesErrors[keyof NoteBundledListNotesErrors];
 
-export type ListNotesResponses = {
+export type NoteBundledListNotesResponses = {
     /**
      * Successful response
      */
     200: {
-        data: Array<NoteRoot>;
-        pagination: PaginationRoot & unknown;
+        data: Array<NoteBundledNote>;
+        pagination: NoteBundledPagination & unknown;
     };
 };
 
-export type ListNotesResponse = ListNotesResponses[keyof ListNotesResponses];
+export type NoteBundledListNotesResponse = NoteBundledListNotesResponses[keyof NoteBundledListNotesResponses];
 
-export type CreateNoteData = {
+export type NoteBundledCreateNoteData = {
     /**
      * Create note request
      */
-    body: CreateNoteRequestRoot2Writable;
+    body: NoteBundledCreateNoteRequest;
     path?: never;
     query?: never;
     url: '/note/notes';
 };
 
-export type CreateNoteErrors = {
+export type NoteBundledCreateNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: ErrorRoot;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: ErrorRoot;
+    401: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: ErrorRoot;
+    500: NoteBundledError;
 };
 
-export type CreateNoteError = CreateNoteErrors[keyof CreateNoteErrors];
+export type NoteBundledCreateNoteError = NoteBundledCreateNoteErrors[keyof NoteBundledCreateNoteErrors];
 
-export type CreateNoteResponses = {
+export type NoteBundledCreateNoteResponses = {
     /**
      * Note successfully created
      */
-    201: NoteRoot & unknown;
+    201: NoteBundledNote & unknown;
 };
 
-export type CreateNoteResponse = CreateNoteResponses[keyof CreateNoteResponses];
+export type NoteBundledCreateNoteResponse = NoteBundledCreateNoteResponses[keyof NoteBundledCreateNoteResponses];
 
-export type DeleteNoteData = {
+export type NoteBundledDeleteNoteData = {
     body?: never;
     path: {
         /**
@@ -438,41 +319,41 @@ export type DeleteNoteData = {
     url: '/note/notes/{noteId}';
 };
 
-export type DeleteNoteErrors = {
+export type NoteBundledDeleteNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: ErrorRoot;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: ErrorRoot;
+    401: NoteBundledError;
     /**
      * Forbidden Error response
      */
-    403: ErrorRoot;
+    403: NoteBundledError;
     /**
      * Not Found Error response
      */
-    404: ErrorRoot;
+    404: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: ErrorRoot;
+    500: NoteBundledError;
 };
 
-export type DeleteNoteError = DeleteNoteErrors[keyof DeleteNoteErrors];
+export type NoteBundledDeleteNoteError = NoteBundledDeleteNoteErrors[keyof NoteBundledDeleteNoteErrors];
 
-export type DeleteNoteResponses = {
+export type NoteBundledDeleteNoteResponses = {
     /**
      * Note successfully deleted
      */
     204: void;
 };
 
-export type DeleteNoteResponse = DeleteNoteResponses[keyof DeleteNoteResponses];
+export type NoteBundledDeleteNoteResponse = NoteBundledDeleteNoteResponses[keyof NoteBundledDeleteNoteResponses];
 
-export type GetNoteData = {
+export type NoteBundledGetNoteData = {
     body?: never;
     path: {
         /**
@@ -484,45 +365,45 @@ export type GetNoteData = {
     url: '/note/notes/{noteId}';
 };
 
-export type GetNoteErrors = {
+export type NoteBundledGetNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: ErrorRoot;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: ErrorRoot;
+    401: NoteBundledError;
     /**
      * Forbidden Error response
      */
-    403: ErrorRoot;
+    403: NoteBundledError;
     /**
      * Not Found Error response
      */
-    404: ErrorRoot;
+    404: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: ErrorRoot;
+    500: NoteBundledError;
 };
 
-export type GetNoteError = GetNoteErrors[keyof GetNoteErrors];
+export type NoteBundledGetNoteError = NoteBundledGetNoteErrors[keyof NoteBundledGetNoteErrors];
 
-export type GetNoteResponses = {
+export type NoteBundledGetNoteResponses = {
     /**
      * Successful response
      */
-    200: NoteRequiredRoot & unknown;
+    200: NoteBundledNoteRequired & unknown;
 };
 
-export type GetNoteResponse = GetNoteResponses[keyof GetNoteResponses];
+export type NoteBundledGetNoteResponse = NoteBundledGetNoteResponses[keyof NoteBundledGetNoteResponses];
 
-export type PatchNoteData = {
+export type NoteBundledPatchNoteData = {
     /**
      * Patch note request (partial update)
      */
-    body: PatchNoteRequestRoot2Writable;
+    body: NoteBundledPatchNoteRequest;
     path: {
         /**
          * Unique identifier of the note
@@ -533,45 +414,45 @@ export type PatchNoteData = {
     url: '/note/notes/{noteId}';
 };
 
-export type PatchNoteErrors = {
+export type NoteBundledPatchNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: ErrorRoot;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: ErrorRoot;
+    401: NoteBundledError;
     /**
      * Forbidden Error response
      */
-    403: ErrorRoot;
+    403: NoteBundledError;
     /**
      * Not Found Error response
      */
-    404: ErrorRoot;
+    404: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: ErrorRoot;
+    500: NoteBundledError;
 };
 
-export type PatchNoteError = PatchNoteErrors[keyof PatchNoteErrors];
+export type NoteBundledPatchNoteError = NoteBundledPatchNoteErrors[keyof NoteBundledPatchNoteErrors];
 
-export type PatchNoteResponses = {
+export type NoteBundledPatchNoteResponses = {
     /**
      * Note successfully patched
      */
-    200: NoteRoot & unknown;
+    200: NoteBundledNote & unknown;
 };
 
-export type PatchNoteResponse = PatchNoteResponses[keyof PatchNoteResponses];
+export type NoteBundledPatchNoteResponse = NoteBundledPatchNoteResponses[keyof NoteBundledPatchNoteResponses];
 
-export type UpdateNoteData = {
+export type NoteBundledUpdateNoteData = {
     /**
      * Put note request (replace entire note)
      */
-    body: PutNoteRequestRoot2Writable;
+    body: NoteBundledPutNoteRequest;
     path: {
         /**
          * Unique identifier of the note
@@ -582,41 +463,41 @@ export type UpdateNoteData = {
     url: '/note/notes/{noteId}';
 };
 
-export type UpdateNoteErrors = {
+export type NoteBundledUpdateNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: ErrorRoot;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: ErrorRoot;
+    401: NoteBundledError;
     /**
      * Forbidden Error response
      */
-    403: ErrorRoot;
+    403: NoteBundledError;
     /**
      * Not Found Error response
      */
-    404: ErrorRoot;
+    404: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: ErrorRoot;
+    500: NoteBundledError;
 };
 
-export type UpdateNoteError = UpdateNoteErrors[keyof UpdateNoteErrors];
+export type NoteBundledUpdateNoteError = NoteBundledUpdateNoteErrors[keyof NoteBundledUpdateNoteErrors];
 
-export type UpdateNoteResponses = {
+export type NoteBundledUpdateNoteResponses = {
     /**
      * Note successfully updated
      */
-    200: NoteRequiredRoot & unknown;
+    200: NoteBundledNoteRequired & unknown;
 };
 
-export type UpdateNoteResponse = UpdateNoteResponses[keyof UpdateNoteResponses];
+export type NoteBundledUpdateNoteResponse = NoteBundledUpdateNoteResponses[keyof NoteBundledUpdateNoteResponses];
 
-export type GetWorkspaceEventsData = {
+export type NoteBundledGetWorkspaceEventsData = {
     body?: never;
     path: {
         /**
@@ -628,36 +509,36 @@ export type GetWorkspaceEventsData = {
     url: '/note/workspaces/{workspaceId}/events';
 };
 
-export type GetWorkspaceEventsErrors = {
+export type NoteBundledGetWorkspaceEventsErrors = {
     /**
      * Bad Request Error response
      */
-    400: ErrorRoot;
+    400: NoteBundledError;
     /**
      * Unauthorized Error response
      */
-    401: ErrorRoot;
+    401: NoteBundledError;
     /**
      * Internal Server Error response
      */
-    500: ErrorRoot;
+    500: NoteBundledError;
 };
 
-export type GetWorkspaceEventsError = GetWorkspaceEventsErrors[keyof GetWorkspaceEventsErrors];
+export type NoteBundledGetWorkspaceEventsError = NoteBundledGetWorkspaceEventsErrors[keyof NoteBundledGetWorkspaceEventsErrors];
 
-export type GetWorkspaceEventsResponses = {
+export type NoteBundledGetWorkspaceEventsResponses = {
     /**
      * A persistent stream of events
      */
     200: ({
-        type: 'NoteMovedEvent_root';
-    } & NoteMovedEventRoot) | ({
-        type: 'FolderMovedEvent_root';
-    } & FolderMovedEventRoot) | ({
-        type: 'FolderRenamedEvent_root';
-    } & FolderRenamedEventRoot) | ({
-        type: 'WorkspaceRenamedEvent_root';
-    } & WorkspaceRenamedEventRoot);
+        type: 'note_bundled_NoteMovedEvent';
+    } & NoteBundledNoteMovedEvent) | ({
+        type: 'note_bundled_FolderMovedEvent';
+    } & NoteBundledFolderMovedEvent) | ({
+        type: 'note_bundled_FolderRenamedEvent';
+    } & NoteBundledFolderRenamedEvent) | ({
+        type: 'note_bundled_WorkspaceRenamedEvent';
+    } & NoteBundledWorkspaceRenamedEvent);
 };
 
-export type GetWorkspaceEventsResponse = GetWorkspaceEventsResponses[keyof GetWorkspaceEventsResponses];
+export type NoteBundledGetWorkspaceEventsResponse = NoteBundledGetWorkspaceEventsResponses[keyof NoteBundledGetWorkspaceEventsResponses];

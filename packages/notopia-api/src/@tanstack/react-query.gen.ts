@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { createNote, deleteNote, getNote, listNotes, type Options, patchNote, updateNote, wsEditsDocument } from '../sdk.gen';
-import type { CreateNoteData, CreateNoteError, CreateNoteResponse, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, GetNoteData, GetNoteError, GetNoteResponse, ListNotesData, ListNotesError, ListNotesResponse, PatchNoteData, PatchNoteError, PatchNoteResponse, UpdateNoteData, UpdateNoteError, UpdateNoteResponse, WsEditsDocumentData, WsEditsDocumentError } from '../types.gen';
+import { editBundledWsEditsDocument, noteBundledCreateNote, noteBundledDeleteNote, noteBundledGetNote, noteBundledListNotes, noteBundledPatchNote, noteBundledUpdateNote, type Options } from '../sdk.gen';
+import type { EditBundledWsEditsDocumentData, EditBundledWsEditsDocumentError, NoteBundledCreateNoteData, NoteBundledCreateNoteError, NoteBundledCreateNoteResponse, NoteBundledDeleteNoteData, NoteBundledDeleteNoteError, NoteBundledDeleteNoteResponse, NoteBundledGetNoteData, NoteBundledGetNoteError, NoteBundledGetNoteResponse, NoteBundledListNotesData, NoteBundledListNotesError, NoteBundledListNotesResponse, NoteBundledPatchNoteData, NoteBundledPatchNoteError, NoteBundledPatchNoteResponse, NoteBundledUpdateNoteData, NoteBundledUpdateNoteError, NoteBundledUpdateNoteResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -39,16 +39,16 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
     return [params];
 };
 
-export const wsEditsDocumentQueryKey = (options: Options<WsEditsDocumentData>) => createQueryKey('wsEditsDocument', options);
+export const editBundledWsEditsDocumentQueryKey = (options: Options<EditBundledWsEditsDocumentData>) => createQueryKey('editBundledWsEditsDocument', options);
 
 /**
  * WebSocket for editing a document
  *
  * Establish a WebSocket connection for real-time collaborative editing of a document.
  */
-export const wsEditsDocumentOptions = (options: Options<WsEditsDocumentData>) => queryOptions<unknown, WsEditsDocumentError, unknown, ReturnType<typeof wsEditsDocumentQueryKey>>({
+export const editBundledWsEditsDocumentOptions = (options: Options<EditBundledWsEditsDocumentData>) => queryOptions<unknown, EditBundledWsEditsDocumentError, unknown, ReturnType<typeof editBundledWsEditsDocumentQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await wsEditsDocument({
+        const { data } = await editBundledWsEditsDocument({
             ...options,
             ...queryKey[0],
             signal,
@@ -56,19 +56,19 @@ export const wsEditsDocumentOptions = (options: Options<WsEditsDocumentData>) =>
         });
         return data;
     },
-    queryKey: wsEditsDocumentQueryKey(options)
+    queryKey: editBundledWsEditsDocumentQueryKey(options)
 });
 
-export const listNotesQueryKey = (options?: Options<ListNotesData>) => createQueryKey('listNotes', options);
+export const noteBundledListNotesQueryKey = (options?: Options<NoteBundledListNotesData>) => createQueryKey('noteBundledListNotes', options);
 
 /**
  * List notes
  *
  * Retrieve a paginated list of all notes with optional filtering and sorting
  */
-export const listNotesOptions = (options?: Options<ListNotesData>) => queryOptions<ListNotesResponse, ListNotesError, ListNotesResponse, ReturnType<typeof listNotesQueryKey>>({
+export const noteBundledListNotesOptions = (options?: Options<NoteBundledListNotesData>) => queryOptions<NoteBundledListNotesResponse, NoteBundledListNotesError, NoteBundledListNotesResponse, ReturnType<typeof noteBundledListNotesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await listNotes({
+        const { data } = await noteBundledListNotes({
             ...options,
             ...queryKey[0],
             signal,
@@ -76,7 +76,7 @@ export const listNotesOptions = (options?: Options<ListNotesData>) => queryOptio
         });
         return data;
     },
-    queryKey: listNotesQueryKey(options)
+    queryKey: noteBundledListNotesQueryKey(options)
 });
 
 const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
@@ -108,25 +108,25 @@ const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'hea
     return params as unknown as typeof page;
 };
 
-export const listNotesInfiniteQueryKey = (options?: Options<ListNotesData>): QueryKey<Options<ListNotesData>> => createQueryKey('listNotes', options, true);
+export const noteBundledListNotesInfiniteQueryKey = (options?: Options<NoteBundledListNotesData>): QueryKey<Options<NoteBundledListNotesData>> => createQueryKey('noteBundledListNotes', options, true);
 
 /**
  * List notes
  *
  * Retrieve a paginated list of all notes with optional filtering and sorting
  */
-export const listNotesInfiniteOptions = (options?: Options<ListNotesData>) => infiniteQueryOptions<ListNotesResponse, ListNotesError, InfiniteData<ListNotesResponse>, QueryKey<Options<ListNotesData>>, number | Pick<QueryKey<Options<ListNotesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+export const noteBundledListNotesInfiniteOptions = (options?: Options<NoteBundledListNotesData>) => infiniteQueryOptions<NoteBundledListNotesResponse, NoteBundledListNotesError, InfiniteData<NoteBundledListNotesResponse>, QueryKey<Options<NoteBundledListNotesData>>, number | Pick<QueryKey<Options<NoteBundledListNotesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
 // @ts-ignore
 {
     queryFn: async ({ pageParam, queryKey, signal }) => {
         // @ts-ignore
-        const page: Pick<QueryKey<Options<ListNotesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+        const page: Pick<QueryKey<Options<NoteBundledListNotesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
             query: {
                 page: pageParam
             }
         };
         const params = createInfiniteParams(queryKey, page);
-        const { data } = await listNotes({
+        const { data } = await noteBundledListNotes({
             ...options,
             ...params,
             signal,
@@ -134,7 +134,7 @@ export const listNotesInfiniteOptions = (options?: Options<ListNotesData>) => in
         });
         return data;
     },
-    queryKey: listNotesInfiniteQueryKey(options)
+    queryKey: noteBundledListNotesInfiniteQueryKey(options)
 });
 
 /**
@@ -142,10 +142,10 @@ export const listNotesInfiniteOptions = (options?: Options<ListNotesData>) => in
  *
  * Create a new note
  */
-export const createNoteMutation = (options?: Partial<Options<CreateNoteData>>): UseMutationOptions<CreateNoteResponse, CreateNoteError, Options<CreateNoteData>> => {
-    const mutationOptions: UseMutationOptions<CreateNoteResponse, CreateNoteError, Options<CreateNoteData>> = {
+export const noteBundledCreateNoteMutation = (options?: Partial<Options<NoteBundledCreateNoteData>>): UseMutationOptions<NoteBundledCreateNoteResponse, NoteBundledCreateNoteError, Options<NoteBundledCreateNoteData>> => {
+    const mutationOptions: UseMutationOptions<NoteBundledCreateNoteResponse, NoteBundledCreateNoteError, Options<NoteBundledCreateNoteData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await createNote({
+            const { data } = await noteBundledCreateNote({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -161,10 +161,10 @@ export const createNoteMutation = (options?: Partial<Options<CreateNoteData>>): 
  *
  * Delete a note by its unique identifier
  */
-export const deleteNoteMutation = (options?: Partial<Options<DeleteNoteData>>): UseMutationOptions<DeleteNoteResponse, DeleteNoteError, Options<DeleteNoteData>> => {
-    const mutationOptions: UseMutationOptions<DeleteNoteResponse, DeleteNoteError, Options<DeleteNoteData>> = {
+export const noteBundledDeleteNoteMutation = (options?: Partial<Options<NoteBundledDeleteNoteData>>): UseMutationOptions<NoteBundledDeleteNoteResponse, NoteBundledDeleteNoteError, Options<NoteBundledDeleteNoteData>> => {
+    const mutationOptions: UseMutationOptions<NoteBundledDeleteNoteResponse, NoteBundledDeleteNoteError, Options<NoteBundledDeleteNoteData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await deleteNote({
+            const { data } = await noteBundledDeleteNote({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -175,16 +175,16 @@ export const deleteNoteMutation = (options?: Partial<Options<DeleteNoteData>>): 
     return mutationOptions;
 };
 
-export const getNoteQueryKey = (options: Options<GetNoteData>) => createQueryKey('getNote', options);
+export const noteBundledGetNoteQueryKey = (options: Options<NoteBundledGetNoteData>) => createQueryKey('noteBundledGetNote', options);
 
 /**
  * Get note
  *
  * Retrieve a single note by its unique identifier
  */
-export const getNoteOptions = (options: Options<GetNoteData>) => queryOptions<GetNoteResponse, GetNoteError, GetNoteResponse, ReturnType<typeof getNoteQueryKey>>({
+export const noteBundledGetNoteOptions = (options: Options<NoteBundledGetNoteData>) => queryOptions<NoteBundledGetNoteResponse, NoteBundledGetNoteError, NoteBundledGetNoteResponse, ReturnType<typeof noteBundledGetNoteQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getNote({
+        const { data } = await noteBundledGetNote({
             ...options,
             ...queryKey[0],
             signal,
@@ -192,7 +192,7 @@ export const getNoteOptions = (options: Options<GetNoteData>) => queryOptions<Ge
         });
         return data;
     },
-    queryKey: getNoteQueryKey(options)
+    queryKey: noteBundledGetNoteQueryKey(options)
 });
 
 /**
@@ -200,10 +200,10 @@ export const getNoteOptions = (options: Options<GetNoteData>) => queryOptions<Ge
  *
  * Update specific fields of a note (only provided fields will be updated)
  */
-export const patchNoteMutation = (options?: Partial<Options<PatchNoteData>>): UseMutationOptions<PatchNoteResponse, PatchNoteError, Options<PatchNoteData>> => {
-    const mutationOptions: UseMutationOptions<PatchNoteResponse, PatchNoteError, Options<PatchNoteData>> = {
+export const noteBundledPatchNoteMutation = (options?: Partial<Options<NoteBundledPatchNoteData>>): UseMutationOptions<NoteBundledPatchNoteResponse, NoteBundledPatchNoteError, Options<NoteBundledPatchNoteData>> => {
+    const mutationOptions: UseMutationOptions<NoteBundledPatchNoteResponse, NoteBundledPatchNoteError, Options<NoteBundledPatchNoteData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await patchNote({
+            const { data } = await noteBundledPatchNote({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -219,10 +219,10 @@ export const patchNoteMutation = (options?: Partial<Options<PatchNoteData>>): Us
  *
  * Replace an existing note with new data (all fields are required)
  */
-export const updateNoteMutation = (options?: Partial<Options<UpdateNoteData>>): UseMutationOptions<UpdateNoteResponse, UpdateNoteError, Options<UpdateNoteData>> => {
-    const mutationOptions: UseMutationOptions<UpdateNoteResponse, UpdateNoteError, Options<UpdateNoteData>> = {
+export const noteBundledUpdateNoteMutation = (options?: Partial<Options<NoteBundledUpdateNoteData>>): UseMutationOptions<NoteBundledUpdateNoteResponse, NoteBundledUpdateNoteError, Options<NoteBundledUpdateNoteData>> => {
+    const mutationOptions: UseMutationOptions<NoteBundledUpdateNoteResponse, NoteBundledUpdateNoteError, Options<NoteBundledUpdateNoteData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await updateNote({
+            const { data } = await noteBundledUpdateNote({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

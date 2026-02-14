@@ -12,19 +12,6 @@
       },
       "outputs": ["{projectRoot}/common.bundled.json"],
       "inputs": ["openapiFiles"]
-    },
-    "gen:go": {
-      "inputs": ["{projectRoot}/oapi-codegen.yaml", "openapiFiles"],
-      "outputs": ["{workspaceRoot}/pkg/api/common/common.gen.go"],
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "oapi-codegen --config ./oapi-codegen.yaml ./common.bundled.json",
-        "cwd": "{projectRoot}"
-      },
-      "dependsOn": ["bundle:json"]
-    },
-    "gen": {
-      "dependsOn": ["gen:go"]
     }
   }
 }

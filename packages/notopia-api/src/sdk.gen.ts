@@ -2,8 +2,8 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateNoteData, CreateNoteErrors, CreateNoteResponses, DeleteNoteData, DeleteNoteErrors, DeleteNoteResponses, GetNoteData, GetNoteErrors, GetNoteResponses, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponses, ListNotesData, ListNotesErrors, ListNotesResponses, PatchNoteData, PatchNoteErrors, PatchNoteResponses, UpdateNoteData, UpdateNoteErrors, UpdateNoteResponses, WsEditsDocumentData, WsEditsDocumentErrors, WsEditsDocumentResponses } from './types.gen';
-import { zCreateNoteData, zCreateNoteResponse, zDeleteNoteData, zDeleteNoteResponse, zGetNoteData, zGetNoteResponse, zGetWorkspaceEventsData, zGetWorkspaceEventsResponse, zListNotesData, zListNotesResponse, zPatchNoteData, zPatchNoteResponse, zUpdateNoteData, zUpdateNoteResponse, zWsEditsDocumentData } from './zod.gen';
+import type { EditBundledWsEditsDocumentData, EditBundledWsEditsDocumentErrors, EditBundledWsEditsDocumentResponses, NoteBundledCreateNoteData, NoteBundledCreateNoteErrors, NoteBundledCreateNoteResponses, NoteBundledDeleteNoteData, NoteBundledDeleteNoteErrors, NoteBundledDeleteNoteResponses, NoteBundledGetNoteData, NoteBundledGetNoteErrors, NoteBundledGetNoteResponses, NoteBundledGetWorkspaceEventsData, NoteBundledGetWorkspaceEventsErrors, NoteBundledGetWorkspaceEventsResponses, NoteBundledListNotesData, NoteBundledListNotesErrors, NoteBundledListNotesResponses, NoteBundledPatchNoteData, NoteBundledPatchNoteErrors, NoteBundledPatchNoteResponses, NoteBundledUpdateNoteData, NoteBundledUpdateNoteErrors, NoteBundledUpdateNoteResponses } from './types.gen';
+import { zEditBundledWsEditsDocumentData, zNoteBundledCreateNoteData, zNoteBundledCreateNoteResponse, zNoteBundledDeleteNoteData, zNoteBundledDeleteNoteResponse, zNoteBundledGetNoteData, zNoteBundledGetNoteResponse, zNoteBundledGetWorkspaceEventsData, zNoteBundledGetWorkspaceEventsResponse, zNoteBundledListNotesData, zNoteBundledListNotesResponse, zNoteBundledPatchNoteData, zNoteBundledPatchNoteResponse, zNoteBundledUpdateNoteData, zNoteBundledUpdateNoteResponse } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -24,8 +24,8 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  *
  * Establish a WebSocket connection for real-time collaborative editing of a document.
  */
-export const wsEditsDocument = <ThrowOnError extends boolean = false>(options: Options<WsEditsDocumentData, ThrowOnError>) => (options.client ?? client).get<WsEditsDocumentResponses, WsEditsDocumentErrors, ThrowOnError>({
-    requestValidator: async (data) => await zWsEditsDocumentData.parseAsync(data),
+export const editBundledWsEditsDocument = <ThrowOnError extends boolean = false>(options: Options<EditBundledWsEditsDocumentData, ThrowOnError>) => (options.client ?? client).get<EditBundledWsEditsDocumentResponses, EditBundledWsEditsDocumentErrors, ThrowOnError>({
+    requestValidator: async (data) => await zEditBundledWsEditsDocumentData.parseAsync(data),
     url: '/ws/edits/{documentId}',
     ...options
 });
@@ -35,9 +35,9 @@ export const wsEditsDocument = <ThrowOnError extends boolean = false>(options: O
  *
  * Retrieve a paginated list of all notes with optional filtering and sorting
  */
-export const listNotes = <ThrowOnError extends boolean = false>(options?: Options<ListNotesData, ThrowOnError>) => (options?.client ?? client).get<ListNotesResponses, ListNotesErrors, ThrowOnError>({
-    requestValidator: async (data) => await zListNotesData.parseAsync(data),
-    responseValidator: async (data) => await zListNotesResponse.parseAsync(data),
+export const noteBundledListNotes = <ThrowOnError extends boolean = false>(options?: Options<NoteBundledListNotesData, ThrowOnError>) => (options?.client ?? client).get<NoteBundledListNotesResponses, NoteBundledListNotesErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledListNotesData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledListNotesResponse.parseAsync(data),
     url: '/note/notes',
     ...options
 });
@@ -47,9 +47,9 @@ export const listNotes = <ThrowOnError extends boolean = false>(options?: Option
  *
  * Create a new note
  */
-export const createNote = <ThrowOnError extends boolean = false>(options: Options<CreateNoteData, ThrowOnError>) => (options.client ?? client).post<CreateNoteResponses, CreateNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zCreateNoteData.parseAsync(data),
-    responseValidator: async (data) => await zCreateNoteResponse.parseAsync(data),
+export const noteBundledCreateNote = <ThrowOnError extends boolean = false>(options: Options<NoteBundledCreateNoteData, ThrowOnError>) => (options.client ?? client).post<NoteBundledCreateNoteResponses, NoteBundledCreateNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledCreateNoteData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledCreateNoteResponse.parseAsync(data),
     url: '/note/notes',
     ...options,
     headers: {
@@ -63,9 +63,9 @@ export const createNote = <ThrowOnError extends boolean = false>(options: Option
  *
  * Delete a note by its unique identifier
  */
-export const deleteNote = <ThrowOnError extends boolean = false>(options: Options<DeleteNoteData, ThrowOnError>) => (options.client ?? client).delete<DeleteNoteResponses, DeleteNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zDeleteNoteData.parseAsync(data),
-    responseValidator: async (data) => await zDeleteNoteResponse.parseAsync(data),
+export const noteBundledDeleteNote = <ThrowOnError extends boolean = false>(options: Options<NoteBundledDeleteNoteData, ThrowOnError>) => (options.client ?? client).delete<NoteBundledDeleteNoteResponses, NoteBundledDeleteNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledDeleteNoteData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledDeleteNoteResponse.parseAsync(data),
     url: '/note/notes/{noteId}',
     ...options
 });
@@ -75,9 +75,9 @@ export const deleteNote = <ThrowOnError extends boolean = false>(options: Option
  *
  * Retrieve a single note by its unique identifier
  */
-export const getNote = <ThrowOnError extends boolean = false>(options: Options<GetNoteData, ThrowOnError>) => (options.client ?? client).get<GetNoteResponses, GetNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zGetNoteData.parseAsync(data),
-    responseValidator: async (data) => await zGetNoteResponse.parseAsync(data),
+export const noteBundledGetNote = <ThrowOnError extends boolean = false>(options: Options<NoteBundledGetNoteData, ThrowOnError>) => (options.client ?? client).get<NoteBundledGetNoteResponses, NoteBundledGetNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledGetNoteData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledGetNoteResponse.parseAsync(data),
     url: '/note/notes/{noteId}',
     ...options
 });
@@ -87,9 +87,9 @@ export const getNote = <ThrowOnError extends boolean = false>(options: Options<G
  *
  * Update specific fields of a note (only provided fields will be updated)
  */
-export const patchNote = <ThrowOnError extends boolean = false>(options: Options<PatchNoteData, ThrowOnError>) => (options.client ?? client).patch<PatchNoteResponses, PatchNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zPatchNoteData.parseAsync(data),
-    responseValidator: async (data) => await zPatchNoteResponse.parseAsync(data),
+export const noteBundledPatchNote = <ThrowOnError extends boolean = false>(options: Options<NoteBundledPatchNoteData, ThrowOnError>) => (options.client ?? client).patch<NoteBundledPatchNoteResponses, NoteBundledPatchNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledPatchNoteData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledPatchNoteResponse.parseAsync(data),
     url: '/note/notes/{noteId}',
     ...options,
     headers: {
@@ -103,9 +103,9 @@ export const patchNote = <ThrowOnError extends boolean = false>(options: Options
  *
  * Replace an existing note with new data (all fields are required)
  */
-export const updateNote = <ThrowOnError extends boolean = false>(options: Options<UpdateNoteData, ThrowOnError>) => (options.client ?? client).put<UpdateNoteResponses, UpdateNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zUpdateNoteData.parseAsync(data),
-    responseValidator: async (data) => await zUpdateNoteResponse.parseAsync(data),
+export const noteBundledUpdateNote = <ThrowOnError extends boolean = false>(options: Options<NoteBundledUpdateNoteData, ThrowOnError>) => (options.client ?? client).put<NoteBundledUpdateNoteResponses, NoteBundledUpdateNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledUpdateNoteData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledUpdateNoteResponse.parseAsync(data),
     url: '/note/notes/{noteId}',
     ...options,
     headers: {
@@ -117,9 +117,9 @@ export const updateNote = <ThrowOnError extends boolean = false>(options: Option
 /**
  * SSE workspace updates
  */
-export const getWorkspaceEvents = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceEventsData, ThrowOnError>) => (options.client ?? client).sse.get<GetWorkspaceEventsResponses, GetWorkspaceEventsErrors, ThrowOnError>({
-    requestValidator: async (data) => await zGetWorkspaceEventsData.parseAsync(data),
-    responseValidator: async (data) => await zGetWorkspaceEventsResponse.parseAsync(data),
+export const noteBundledGetWorkspaceEvents = <ThrowOnError extends boolean = false>(options: Options<NoteBundledGetWorkspaceEventsData, ThrowOnError>) => (options.client ?? client).sse.get<NoteBundledGetWorkspaceEventsResponses, NoteBundledGetWorkspaceEventsErrors, ThrowOnError>({
+    requestValidator: async (data) => await zNoteBundledGetWorkspaceEventsData.parseAsync(data),
+    responseValidator: async (data) => await zNoteBundledGetWorkspaceEventsResponse.parseAsync(data),
     url: '/note/workspaces/{workspaceId}/events',
     ...options
 });
