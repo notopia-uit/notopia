@@ -28,12 +28,11 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve -w ./note.bundled.json --port 9081",
+        "command": "scalar document serve -w ./note.yaml --port 9081",
         "forwardAllArgs": false,
         "cwd": "{projectRoot}"
       },
-      "continuous": true,
-      "dependsOn": ["bundle:json", "watch-bundle:json"]
+      "continuous": true
     },
     "preview": {
       "executor": "nx:run-commands",
