@@ -4,14 +4,20 @@
   "projectType": "application",
   "tags": ["scope:api", "type:openapi"],
   "targets": {
-    "bundle:yaml": {
-      "dependsOn": ["^bundle:yaml"]
-    },
     "bundle:json": {
       "dependsOn": ["^bundle:json"]
     },
     "bundle": {
-      "dependsOn": ["^bundle"]
+      "inputs": [
+        "{projectRoot}/bundled/*.json",
+        "!{projectRoot}/bundled/openapi.json"
+      ],
+      "outputs": ["{projectRoot}/bundled/openapi.json"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm run redocly:join",
+        "cwd": "{projectRoot}"
+      }
     },
     "watch-bundle:json": {
       "dependsOn": ["^watch-bundle:json"]
@@ -29,8 +35,7 @@
     "gen:hey-api": {
       "outputs": ["{workspaceRoot}/packages/notopia-api/src/"],
       "inputs": [
-        "{projectRoot}/edit/edit.bundled.json",
-        "{projectRoot}/note/note.bundled.json",
+        "{projectRoot}/bundled/openapi.json",
         "{projectRoot}/openapi-ts.config.ts"
       ],
       "executor": "nx:run-commands",
@@ -43,7 +48,7 @@
     "gen:edit-nestjs-server": {
       "outputs": ["{workspaceRoot}/packages/notopia-api-edit-nestjs-server/"],
       "inputs": [
-        "{projectRoot}/edit/edit.bundled.json",
+        "{projectRoot}/bundled/edit.json",
         "{projectRoot}/openapitools.json"
       ],
       "executor": "nx:run-commands",

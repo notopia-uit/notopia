@@ -2,10 +2,8 @@
 // import styles from './app.module.css';
 import '@scalar/api-reference-react/style.css';
 
-import commonApiSpec from '@notopia/common-api' with { type: 'json' };
-import editApiSpec from '@notopia/edit-api' with { type: 'json' };
-import noteApiSpec from '@notopia/note-api' with { type: 'json' };
 import { ApiReferenceReact } from '@scalar/api-reference-react';
+import openapi from 'api/openapi' with { type: 'json' };
 
 export function App() {
   return (
@@ -14,17 +12,9 @@ export function App() {
         configuration={{
           sources: [
             {
-              content: noteApiSpec,
+              content: openapi,
               default: true,
-              title: 'Note API',
-            },
-            {
-              content: editApiSpec,
-              title: 'Edit API',
-            },
-            {
-              content: commonApiSpec,
-              title: 'Common API',
+              title: 'Notopia API',
             },
           ],
           persistAuth: true,

@@ -2,11 +2,11 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Redocly/redocly-cli/refs/heads/main/docs/%40v1/configuration/schema.yaml
 apis:
   note:
-    root: ./note/note.yaml
+    root: ./note/openapi.yaml
   edit:
-    root: ./edit/edit.yaml
+    root: ./edit/openapi.yaml
   common:
-    root: ./common/common.yaml
+    root: ./common/openapi.yaml
     rules:
       struct: off
       no-empty-servers: off

@@ -7,14 +7,14 @@
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle note --config ../redocly.yaml -o ./note.bundled.json",
+        "command": "redocly bundle note --config ../redocly.yaml -o ../bundled/note.json",
         "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/note.bundled.json"],
+      "outputs": ["{projectRoot}/../bundled/note.json"],
       "inputs": ["openapiFilesWithCommon"]
     },
     "build": {
-      "dependsOn": ["bundle:yaml", "bundle:json"]
+      "dependsOn": ["bundle:json"]
     },
     "watch-bundle:json": {
       "executor": "nx:run-commands",
@@ -28,7 +28,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve -w ./note.yaml --port 9081",
+        "command": "scalar document serve -w ./openapi.yaml --port 9081",
         "forwardAllArgs": false,
         "cwd": "{projectRoot}"
       },
@@ -37,7 +37,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve ./note.bundled.json --port 9081",
+        "command": "scalar document serve ../bundled/note.json --port 9081",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
@@ -46,11 +46,10 @@
     "mock": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document mock -w ./note.bundled.json --port 8081",
+        "command": "scalar document mock -w ./openapi.yaml --port 8081",
         "cwd": "{projectRoot}"
       },
-      "continuous": true,
-      "dependsOn": ["bundle:json"]
+      "continuous": true
     },
     "lint": {
       "executor": "nx:run-commands",
@@ -65,7 +64,7 @@
       "outputs": ["{workspaceRoot}/pkg/api/note/note.gen.go"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "oapi-codegen --config ./oapi-codegen.yaml ./note.bundled.json",
+        "command": "oapi-codegen --config ./oapi-codegen.yaml ../bundled/note.json",
         "cwd": "{projectRoot}"
       },
       "dependsOn": ["bundle:json"]

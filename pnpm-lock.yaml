@@ -304,12 +304,6 @@ importers:
         specifier: ^1.4.2
         version: 1.5.9(encoding@0.1.13)
 
-  api/common: {}
-
-  api/edit: {}
-
-  api/note: {}
-
   apps/edit:
     dependencies:
       '@nestjs/common':
@@ -355,15 +349,9 @@ importers:
       '@catppuccin/vitepress':
         specifier: ^0.1.2
         version: 0.1.2(typescript@5.9.3)
-      '@notopia/common-api':
+      api:
         specifier: workspace:^
-        version: link:../api/common
-      '@notopia/edit-api':
-        specifier: workspace:^
-        version: link:../api/edit
-      '@notopia/note-api':
-        specifier: workspace:^
-        version: link:../api/note
+        version: link:../api
       pagefind:
         specifier: ^1.4.0
         version: 1.4.0
@@ -404,18 +392,12 @@ importers:
 
   packages/notopia-api-web:
     dependencies:
-      '@notopia/common-api':
-        specifier: workspace:^
-        version: link:../../api/common
-      '@notopia/edit-api':
-        specifier: workspace:^
-        version: link:../../api/edit
-      '@notopia/note-api':
-        specifier: workspace:^
-        version: link:../../api/note
       '@scalar/api-reference-react':
         specifier: ^0.8.20
         version: 0.8.63(axios@1.13.5)(change-case@5.4.4)(react@19.2.4)(tailwindcss@4.2.1)(typescript@5.9.3)
+      api:
+        specifier: workspace:^
+        version: link:../../api
 
   packages/notopia-pb:
     dependencies:

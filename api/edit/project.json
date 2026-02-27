@@ -7,14 +7,14 @@
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle edit --config ../redocly.yaml -o ./edit.bundled.json",
+        "command": "redocly bundle edit --config ../redocly.yaml -o ../bundled/edit.json",
         "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/edit.bundled.json"],
+      "outputs": ["{projectRoot}/../bundled/edit.json"],
       "inputs": ["openapiFilesWithCommon"]
     },
     "build": {
-      "dependsOn": ["bundle:yaml", "bundle:json"]
+      "dependsOn": ["bundle:json"]
     },
     "watch-bundle:json": {
       "executor": "nx:run-commands",
@@ -28,7 +28,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve -w ./edit.yaml --port 9082",
+        "command": "scalar document serve -w ./openapi.yaml --port 9082",
         "forwardAllArgs": false,
         "cwd": "{projectRoot}"
       },
@@ -37,7 +37,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve ./edit.bundled.json --port 9082",
+        "command": "scalar document serve ../../bundled/edit.json --port 9082",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
@@ -46,11 +46,10 @@
     "mock": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document mock -w ./edit.bundled.json --port 8082",
+        "command": "scalar document mock -w ./openapi.yaml --port 8082",
         "cwd": "{projectRoot}"
       },
-      "continuous": true,
-      "dependsOn": ["bundle:json"]
+      "continuous": true
     },
     "lint": {
       "executor": "nx:run-commands",

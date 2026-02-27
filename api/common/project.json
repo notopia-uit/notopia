@@ -7,10 +7,10 @@
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle common --config ../redocly.yaml -o ./common.bundled.json",
+        "command": "redocly bundle common --config ../redocly.yaml -o ../bundled/common.json",
         "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/common.bundled.json"],
+      "outputs": ["{projectRoot}/../bundled/common.json"],
       "inputs": ["openapiFiles"]
     }
   }

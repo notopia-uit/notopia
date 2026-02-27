@@ -1,10 +1,17 @@
 {
   "name": "api",
   "private": true,
+  "exports": {
+    "./common": "./bundled/common.json",
+    "./edit": "./bundled/edit.json",
+    "./note": "./bundled/note.json",
+    "./openapi": "./bundled/openapi.json"
+  },
   "scripts": {
     "openapi-generator-cli": "openapi-generator-cli",
     "openapi-ts": "openapi-ts",
     "redocly": "redocly",
+    "redocly:join": "redocly join ./openapi.yaml ./bundled/common.json ./bundled/edit.json ./bundled/note.json -o ./bundled/openapi.json",
     "scalar": "scalar"
   },
   "devDependencies": {

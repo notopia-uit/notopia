@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://www.schemastore.org/openapi-3.X.json
+openapi: 3.0.4
+
+info:
+  description: Notopia API
+  version: 0.0.0
+  title: Notopia API
+  license:
+    name: MIT
+    url: https://github.com/notopia-uit/notopia/blob/main/LICENSE
+  contact:
+    name: Notopia Support
+    email: kevinnitro@duck.com
+
+paths: {}

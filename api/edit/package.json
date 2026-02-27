@@ -1,7 +1,0 @@
-{
-  "name": "@notopia/edit-api",
-  "private": true,
-  "exports": {
-    ".": "./edit.bundled.json"
-  }
-}

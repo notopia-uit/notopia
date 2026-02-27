@@ -1,7 +1,0 @@
-{
-  "name": "@notopia/note-api",
-  "private": true,
-  "exports": {
-    ".": "./note.bundled.json"
-  }
-}
