@@ -17,7 +17,7 @@ require (
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/oapi-codegen/gin-middleware v1.0.2
 	github.com/oapi-codegen/nullable v1.1.0
-	github.com/oapi-codegen/runtime v1.1.2
+	github.com/oapi-codegen/runtime v1.2.0
 	github.com/pressly/goose/v3 v3.26.0
 	github.com/samber/slog-multi v1.7.1
 	github.com/spf13/viper v1.21.0
