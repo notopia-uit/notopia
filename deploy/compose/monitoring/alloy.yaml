@@ -14,7 +14,7 @@ services:
       - 4317:4317
       - 4318:4318
     volumes:
-      - ./monitoring/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       traefik.enable: 'true'

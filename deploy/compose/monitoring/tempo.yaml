@@ -5,11 +5,11 @@ services:
     container_name: notopia-tempo
     image: grafana/tempo:latest
     command:
-      - -config.file=/etc/tempo/tempo-config.yaml
+      - -config.file=/etc/tempo/config.yaml
     environment:
       TZ: Asia/Ho_Chi_Minh
     volumes:
-      - ./monitoring/tempo/tempo-config.yaml:/etc/tempo/tempo-config.yaml:ro
+      - ./tempo/config.yaml:/etc/tempo/config.yaml:ro
       - tempo_data:/var/tempo
     labels:
       traefik.enable: 'true'

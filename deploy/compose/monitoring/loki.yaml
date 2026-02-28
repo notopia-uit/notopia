@@ -5,12 +5,12 @@ services:
     container_name: notopia-loki
     image: grafana/loki:3.6.5
     command:
-      - -config.file=/etc/loki/local-config.yaml
+      - -config.file=/etc/loki/config.yaml
+      - -config.expand-env=true
     environment:
       TZ: Asia/Ho_Chi_Minh
     volumes:
-      - ./monitoring/loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
-      - loki_data:/loki
+      - ./loki/config.yaml:/etc/loki/config.yaml:ro
     labels:
       traefik.enable: 'true'
       traefik.http.routers.loki.rule: Host(`loki.notopia.localhost`)
@@ -19,6 +19,3 @@ services:
     profiles:
       - monitoring
     restart: unless-stopped
-
-volumes:
-  loki_data:
