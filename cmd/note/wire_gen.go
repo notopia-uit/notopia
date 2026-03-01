@@ -93,7 +93,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	strictHandler := http.NewStrictHandler(appApp)
 	serverInterface := http.NewHandler(strictHandler)
 	server := &configConfig.Server
-	httpServer, cleanup5, err := http.New(ctx, engine, serverInterface, server)
+	httpServer, cleanup5, err := http.New(ctx, engine, serverInterface, server, logger)
 	if err != nil {
 		cleanup4()
 		cleanup3()

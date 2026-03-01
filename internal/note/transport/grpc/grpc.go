@@ -69,7 +69,7 @@ func New(
 	}
 	cleanup := func() {
 		if err := server.Shutdown(ctx); err != nil {
-			logger.Error("failed to shutdown grpc server", slog.String("error", err.Error()))
+			logger.ErrorContext(ctx, "failed to shutdown grpc server", slog.String("error", err.Error()))
 		}
 	}
 	return server, cleanup, nil

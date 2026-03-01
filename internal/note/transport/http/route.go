@@ -16,9 +16,10 @@ func RegisterRoutes(
 	// TODO: Those route with protected from gateway will have user context
 	api := e.Group("/")
 	{
-		api.Use(ErrorHandler())
 		api.Use(validateHandler)
-		note.RegisterHandlers(api, httpHandler)
+		note.RegisterHandlersWithOptions(api, httpHandler, note.GinServerOptions{
+			ErrorHandler: StrictServerErrorHandler,
+		})
 	}
 	return nil
 }

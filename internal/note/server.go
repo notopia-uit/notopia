@@ -17,6 +17,7 @@ type Server struct {
 	grpc          *grpc.Server
 	healthManager *healthmanager.HealthManager
 	persistence   persistence.Persistence
+	logger        *slog.Logger
 }
 
 func NewServer(
@@ -33,6 +34,7 @@ func NewServer(
 		grpc:          grpcServer,
 		healthManager: healthManager,
 		persistence:   persistence,
+		logger:        logger,
 	}
 }
 
@@ -47,7 +49,7 @@ func (s *Server) Run(ctx context.Context) error {
 		go func() {
 			<-ctx.Done()
 			if err := s.http.Shutdown(context.Background()); err != nil {
-				slog.Error("failed to shutdown http server", slog.String("error", err.Error()))
+				s.logger.ErrorContext(ctx, "failed to shutdown http server", slog.String("error", err.Error()))
 			}
 		}()
 		return s.http.Run()
@@ -57,7 +59,7 @@ func (s *Server) Run(ctx context.Context) error {
 		go func() {
 			<-ctx.Done()
 			if err := s.grpc.Shutdown(context.Background()); err != nil {
-				slog.Error("failed to shutdown grpc server", slog.String("error", err.Error()))
+				s.logger.ErrorContext(ctx, "failed to shutdown grpc server", slog.String("error", err.Error()))
 			}
 		}()
 		return s.grpc.Run()

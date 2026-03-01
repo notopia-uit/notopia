@@ -10,7 +10,8 @@ services:
       - --providers.docker.exposedbydefault=false
       - --providers.docker.network=notopia_default
       - --providers.file.directory=/etc/traefik/dynamic
-      - --entryPoints.web.address=:80
+      - --api.dashboard=true
+      - --entrypoints.web.address=:80
       - --log.level=INFO
       - --experimental.plugins.jwt.moduleName=github.com/traefik-plugins/traefik-jwt-plugin
       - --experimental.plugins.jwt.version=v0.10.0
@@ -22,6 +23,11 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/:/etc/traefik/dynamic:ro
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.traefik.rule: Host(`traefik.notopia.localhost`)
+      traefik.http.routers.traefik.entrypoints: web
+      traefik.http.routers.traefik.service: api@internal
     profiles:
       - dev-api
     extra_hosts:

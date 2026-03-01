@@ -47,6 +47,7 @@ func New(
 	ginEngine *gin.Engine,
 	httpHandler IHTTPHandler,
 	cfg *config.Server,
+	logger *slog.Logger,
 ) (*Server, func(), error) {
 	if err := RegisterRoutes(ginEngine, httpHandler); err != nil {
 		return nil, nil, err
@@ -60,7 +61,7 @@ func New(
 	}
 	cleanup := func() {
 		if err := server.Shutdown(ctx); err != nil {
-			slog.Error("failed to shutdown http server", slog.String("error", err.Error()))
+			logger.ErrorContext(ctx, "failed to shutdown http server", slog.String("error", err.Error()))
 		}
 	}
 	return server, cleanup, nil
