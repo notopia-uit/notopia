@@ -6,9 +6,6 @@ settings:
 
 catalogs:
   default:
-    '@bufbuild/protobuf':
-      specifier: ^2.11.0
-      version: 2.11.0
     '@nestjs/common':
       specifier: ^11.1.13
       version: 11.1.14
@@ -302,7 +299,7 @@ importers:
         version: 2.15.2(@opentelemetry/api@1.9.0)(core-js@3.48.0)(encoding@0.1.13)
       '@scalar/cli':
         specifier: ^1.4.2
-        version: 1.5.9(encoding@0.1.13)
+        version: 1.7.0(encoding@0.1.13)
 
   apps/document:
     dependencies:
@@ -317,7 +314,7 @@ importers:
         version: 11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)
       '@notopia/api-document-nestjs-server':
         specifier: 'workspace:'
-        version: link:../../packages/notopia-api-edit-nestjs-server
+        version: link:../../packages/notopia-api-document-nestjs-server
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.1.14
@@ -381,7 +378,7 @@ importers:
         specifier: 'catalog:'
         version: 4.3.6
 
-  packages/notopia-api-edit-nestjs-server:
+  packages/notopia-api-document-nestjs-server:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -3526,8 +3523,8 @@ packages:
     resolution: {integrity: sha512-VvNppnIqU5f9yFRAjjRt4TAPyAvxikhkYOqd91JMAal2hPpdnggz0gM/d2CFF+mHYd9TqfOE4lKijMK4bEZWpg==}
     engines: {node: '>=20'}
 
-  '@scalar/cli@1.5.9':
-    resolution: {integrity: sha512-9ZEVQ3zTkcX701RngZvK1Y7NyL0pESYQXtPdXNihGJFve7Pf/92VxacqfL0kMd+VDaVOrAaN0byuVlknpwvgYg==}
+  '@scalar/cli@1.7.0':
+    resolution: {integrity: sha512-p0UjDrIP+E1ICQ1PcQmfUrnOevyaCQuYXAzEF4L1Ad9I0evCREHR5+DiANjYYsAmDMkgHlUNMuV7K5r+dkqNgA==}
     engines: {node: '>=24'}
     hasBin: true
 
@@ -7657,8 +7654,8 @@ packages:
   jsonfile@6.2.0:
     resolution: {integrity: sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==}
 
-  jsonpath-plus@10.3.0:
-    resolution: {integrity: sha512-8TNmfeTCk2Le33A3vRRwtuworG/L5RrgMvdjhKZxvyShO+mBu2fP50OWUjRLNtvw344DdDarFh9buFAZs5ujeA==}
+  jsonpath-plus@10.4.0:
+    resolution: {integrity: sha512-T92WWatJXmhBbKsgH/0hl+jxjdXrifi5IKeMY02DWggRxX0UElcbVzPlmgLTbvsPeW1PasQ6xE2Q75stkhGbsA==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -8235,8 +8232,15 @@ packages:
   minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
 
+  minimatch@3.1.5:
+    resolution: {integrity: sha512-VgjWUsnnT6n+NUk6eZq77zeFdpW2LWDzP6zFGrCbHXiYNul5Dzqk2HHQ5uFH2DNW5Xbp8+jVzaeNt94ssEEl4w==}
+
   minimatch@5.1.6:
     resolution: {integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==}
+    engines: {node: '>=10'}
+
+  minimatch@5.1.9:
+    resolution: {integrity: sha512-7o1wEA2RyMP7Iu7GNba9vc0RWWGACJOCZBJX2GJWip0ikV+wcOsgVuY9uE8CPiyQhkGFSlhuSkZPavN7u1c2Fw==}
     engines: {node: '>=10'}
 
   minimatch@9.0.3:
@@ -8245,6 +8249,10 @@ packages:
 
   minimatch@9.0.5:
     resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
+    engines: {node: '>=16 || 14 >=14.17'}
+
+  minimatch@9.0.9:
+    resolution: {integrity: sha512-OBwBN9AL4dqmETlpS2zasx+vTeWclWzkblfZk7KTA5j3jeOONz/tRCnZomUyvNg83wL5Zv9Ss6HMJXAgL8R2Yg==}
     engines: {node: '>=16 || 14 >=14.17'}
 
   minimist@1.2.8:
@@ -12593,7 +12601,7 @@ snapshots:
   '@jest/console@30.2.0':
     dependencies:
       '@jest/types': 30.2.0
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       chalk: 4.1.2
       jest-message-util: 30.2.0
       jest-util: 30.2.0
@@ -12605,7 +12613,7 @@ snapshots:
     dependencies:
       '@jest/fake-timers': 30.2.0
       '@jest/types': 30.2.0
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       jest-mock: 30.2.0
 
   '@jest/expect-utils@30.2.0':
@@ -12623,7 +12631,7 @@ snapshots:
     dependencies:
       '@jest/types': 30.2.0
       '@sinonjs/fake-timers': 13.0.5
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       jest-message-util: 30.2.0
       jest-mock: 30.2.0
       jest-util: 30.2.0
@@ -12641,7 +12649,7 @@ snapshots:
 
   '@jest/pattern@30.0.1':
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       jest-regex-util: 30.0.1
 
   '@jest/reporters@30.2.0':
@@ -12652,7 +12660,7 @@ snapshots:
       '@jest/transform': 30.2.0
       '@jest/types': 30.2.0
       '@jridgewell/trace-mapping': 0.3.31
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       chalk: 4.1.2
       collect-v8-coverage: 1.0.3
       exit-x: 0.2.2
@@ -12732,7 +12740,7 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       '@types/yargs': 17.0.35
       chalk: 4.1.2
 
@@ -12742,7 +12750,7 @@ snapshots:
       '@jest/schemas': 30.0.5
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       '@types/yargs': 17.0.35
       chalk: 4.1.2
 
@@ -14956,7 +14964,7 @@ snapshots:
       - typescript
       - universal-cookie
 
-  '@scalar/cli@1.5.9(encoding@0.1.13)':
+  '@scalar/cli@1.7.0(encoding@0.1.13)':
     dependencies:
       '@stoplight/spectral-rulesets': 1.21.4(encoding@0.1.13)
       esbuild: 0.25.6
@@ -15288,7 +15296,7 @@ snapshots:
       ajv-errors: 3.0.0(ajv@8.18.0)
       ajv-formats: 2.1.1(ajv@8.18.0)
       es-aggregate-error: 1.0.14
-      jsonpath-plus: 10.3.0
+      jsonpath-plus: 10.4.0
       lodash: 4.17.23
       lodash.topath: 4.5.2
       minimatch: 3.1.2
@@ -15741,11 +15749,11 @@ snapshots:
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
 
   '@types/bonjour@3.5.13':
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
 
   '@types/chai@5.2.3':
     dependencies:
@@ -15755,11 +15763,11 @@ snapshots:
   '@types/connect-history-api-fallback@1.5.4':
     dependencies:
       '@types/express-serve-static-core': 4.19.8
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
 
   '@types/debug@4.1.12':
     dependencies:
@@ -15789,7 +15797,7 @@ snapshots:
 
   '@types/express-serve-static-core@4.19.8':
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -15813,7 +15821,7 @@ snapshots:
 
   '@types/http-proxy@1.17.17':
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
@@ -15881,11 +15889,11 @@ snapshots:
   '@types/send@0.17.6':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
 
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
 
   '@types/serve-index@1.9.4':
     dependencies:
@@ -15894,12 +15902,12 @@ snapshots:
   '@types/serve-static@1.15.10':
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       '@types/send': 0.17.6
 
   '@types/sockjs@0.3.36':
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
 
   '@types/stack-utils@2.0.3': {}
 
@@ -15918,7 +15926,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
 
   '@types/yargs-parser@21.0.3': {}
 
@@ -18571,7 +18579,7 @@ snapshots:
 
   filelist@1.0.4:
     dependencies:
-      minimatch: 5.1.6
+      minimatch: 5.1.9
 
   filename-reserved-regex@3.0.0: {}
 
@@ -18847,7 +18855,7 @@ snapshots:
     dependencies:
       foreground-child: 3.3.1
       jackspeak: 3.4.3
-      minimatch: 9.0.5
+      minimatch: 9.0.9
       minipass: 7.1.2
       package-json-from-dist: 1.0.1
       path-scurry: 1.11.1
@@ -18872,7 +18880,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 3.1.2
+      minimatch: 3.1.5
       once: 1.4.0
       path-is-absolute: 1.0.1
 
@@ -18881,7 +18889,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 5.1.6
+      minimatch: 5.1.9
       once: 1.4.0
 
   global-modules@1.0.0:
@@ -19634,7 +19642,7 @@ snapshots:
       '@jest/expect': 30.2.0
       '@jest/test-result': 30.2.0
       '@jest/types': 30.2.0
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       chalk: 4.1.2
       co: 4.6.0
       dedent: 1.7.1(babel-plugin-macros@3.1.0)
@@ -19710,7 +19718,7 @@ snapshots:
       '@jest/environment': 30.2.0
       '@jest/fake-timers': 30.2.0
       '@jest/types': 30.2.0
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       jest-mock: 30.2.0
       jest-util: 30.2.0
       jest-validate: 30.2.0
@@ -19718,7 +19726,7 @@ snapshots:
   jest-haste-map@30.2.0:
     dependencies:
       '@jest/types': 30.2.0
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       anymatch: 3.1.3
       fb-watchman: 2.0.2
       graceful-fs: 4.2.11
@@ -19757,7 +19765,7 @@ snapshots:
   jest-mock@30.2.0:
     dependencies:
       '@jest/types': 30.2.0
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       jest-util: 30.2.0
 
   jest-pnp-resolver@1.2.3(jest-resolve@30.2.0):
@@ -19784,7 +19792,7 @@ snapshots:
       '@jest/test-result': 30.2.0
       '@jest/transform': 30.2.0
       '@jest/types': 30.2.0
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       chalk: 4.1.2
       emittery: 0.13.1
       exit-x: 0.2.2
@@ -19813,7 +19821,7 @@ snapshots:
       '@jest/test-result': 30.2.0
       '@jest/transform': 30.2.0
       '@jest/types': 30.2.0
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       chalk: 4.1.2
       cjs-module-lexer: 2.2.0
       collect-v8-coverage: 1.0.3
@@ -19860,7 +19868,7 @@ snapshots:
   jest-util@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -19869,7 +19877,7 @@ snapshots:
   jest-util@30.2.0:
     dependencies:
       '@jest/types': 30.2.0
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       chalk: 4.1.2
       ci-info: 4.4.0
       graceful-fs: 4.2.11
@@ -19888,7 +19896,7 @@ snapshots:
     dependencies:
       '@jest/test-result': 30.2.0
       '@jest/types': 30.2.0
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       emittery: 0.13.1
@@ -19897,20 +19905,20 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
   jest-worker@30.2.0:
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 24.10.15
       '@ungap/structured-clone': 1.3.0
       jest-util: 30.2.0
       merge-stream: 2.0.0
@@ -20018,7 +20026,7 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
-  jsonpath-plus@10.3.0:
+  jsonpath-plus@10.4.0:
     dependencies:
       '@jsep-plugin/assignment': 1.3.0(jsep@1.4.0)
       '@jsep-plugin/regex': 1.0.4(jsep@1.4.0)
@@ -20733,7 +20741,15 @@ snapshots:
     dependencies:
       brace-expansion: 1.1.12
 
+  minimatch@3.1.5:
+    dependencies:
+      brace-expansion: 1.1.12
+
   minimatch@5.1.6:
+    dependencies:
+      brace-expansion: 2.0.2
+
+  minimatch@5.1.9:
     dependencies:
       brace-expansion: 2.0.2
 
@@ -20742,6 +20758,10 @@ snapshots:
       brace-expansion: 2.0.2
 
   minimatch@9.0.5:
+    dependencies:
+      brace-expansion: 2.0.2
+
+  minimatch@9.0.9:
     dependencies:
       brace-expansion: 2.0.2
 
@@ -20863,7 +20883,7 @@ snapshots:
       astring: 1.9.0
       jsep: 1.4.0
     optionalDependencies:
-      jsonpath-plus: 10.3.0
+      jsonpath-plus: 10.4.0
       lodash.topath: 4.5.2
 
   no-case@3.0.4:
@@ -22991,7 +23011,7 @@ snapshots:
     dependencies:
       '@istanbuljs/schema': 0.1.3
       glob: 7.2.3
-      minimatch: 3.1.2
+      minimatch: 3.1.5
 
   text-decoder@1.2.3:
     dependencies:
