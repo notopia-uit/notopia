@@ -1,16 +1,18 @@
-# vim: ft=yaml.openapi
-get:
+# vim:ft=yaml.openapi
+post:
   security:
     - oauth2: []
   tags:
     - Workspace
-  summary: Get workspace
-  operationId: getWorkspace
+  summary: Rename a workspace
+  operationId: renameWorkspace
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
+  requestBody:
+    $ref: ../components/requestBodies/RenameWorkspace.yaml
   responses:
-    200:
-      $ref: ../components/responses/GetWorkspaceResponse.yaml
+    204:
+      description: No Content - Workspace renamed successfully.
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

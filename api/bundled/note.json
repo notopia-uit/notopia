@@ -138,7 +138,6 @@
           "Note"
         ],
         "summary": "Get note",
-        "description": "Retrieve a single note by its unique identifier",
         "operationId": "getNote",
         "parameters": [
           {
@@ -176,7 +175,6 @@
           "Note"
         ],
         "summary": "Delete note",
-        "description": "Delete a note by its unique identifier",
         "operationId": "deleteNote",
         "parameters": [
           {
@@ -248,8 +246,7 @@
         "tags": [
           "Workspace"
         ],
-        "summary": "Get workspace details",
-        "description": "Retrieve detailed information about a specific workspace, including its name, description, and creation date.",
+        "summary": "Get workspace",
         "operationId": "getWorkspace",
         "parameters": [
           {
@@ -259,6 +256,45 @@
         "responses": {
           "200": {
             "$ref": "#/components/responses/GetWorkspaceResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/rename-workspace": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Rename a workspace",
+        "operationId": "renameWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RenameWorkspace"
+        },
+        "responses": {
+          "204": {
+            "description": "No Content - Workspace renamed successfully."
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -339,7 +375,6 @@
         "name": "noteId",
         "in": "path",
         "required": true,
-        "description": "Unique identifier of the note",
         "schema": {
           "type": "string",
           "format": "uuid"
@@ -353,7 +388,6 @@
         "schema": {
           "type": "string",
           "format": "uuid",
-          "description": "The unique identifier of the workspace.",
           "example": "550e8400-e29b-41d4-a716-446655440000"
         }
       }
@@ -648,7 +682,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
             "readOnly": true
           },
           "name": {
@@ -669,9 +703,7 @@
             "type": "object",
             "required": [
               "id",
-              "name",
-              "createdAt",
-              "updatedAt"
+              "name"
             ]
           }
         ]
@@ -1029,6 +1061,16 @@
                   }
                 }
               ]
+            }
+          }
+        }
+      },
+      "RenameWorkspace": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/WorkspaceRequired"
             }
           }
         }

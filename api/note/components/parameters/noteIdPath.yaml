@@ -2,7 +2,6 @@
 name: noteId
 in: path
 required: true
-description: Unique identifier of the note
 schema:
   type: string
   format: uuid

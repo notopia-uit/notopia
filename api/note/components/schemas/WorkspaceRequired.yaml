@@ -8,5 +8,3 @@ allOf:
     required:
       - id
       - name
-      - createdAt
-      - updatedAt

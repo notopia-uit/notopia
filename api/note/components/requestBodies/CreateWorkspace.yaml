@@ -1,0 +1,6 @@
+# vim: ft=yaml.openapi
+required: true
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/WorkspaceRequired.yaml

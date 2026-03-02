@@ -5,7 +5,6 @@ get:
   tags:
     - Note
   summary: Get note
-  description: Retrieve a single note by its unique identifier
   operationId: getNote
   parameters:
     - $ref: ../components/parameters/noteIdPath.yaml
@@ -29,7 +28,6 @@ delete:
   tags:
     - Note
   summary: Delete note
-  description: Delete a note by its unique identifier
   operationId: deleteNote
   parameters:
     - $ref: ../components/parameters/noteIdPath.yaml

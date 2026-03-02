@@ -33,6 +33,8 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_events.yaml
   /note/workspaces/{workspaceId}:
     $ref: ./paths/workspaces_{workspaceId}.yaml
+  /note/workspaces/{workspaceId}/rename-workspace:
+    $ref: ./paths/workspaces_{workspaceId}_rename-workspace.yaml
 
 components:
   securitySchemes:
