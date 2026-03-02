@@ -141,7 +141,10 @@ jobs:
         run: |
           npx nx affected \
             --target test \
-            --parallel=5 | true
+            --parallel=5 \
+            --base=${{ steps.set-shas.outputs.base }} \
+            --head=${{ steps.set-shas.outputs.head }} \
+            | true
 
       - name: Nx Affected Build, Lint, Format Check, Gen, Bundle
         run: |
@@ -152,7 +155,9 @@ jobs:
             --target bundle \
             --target build \
             --target docker:build \
-            --parallel=4
+            --parallel=4 \
+            --base=${{ steps.set-shas.outputs.base }} \
+            --head=${{ steps.set-shas.outputs.head }}
 
       - name: Nx release
         env:
