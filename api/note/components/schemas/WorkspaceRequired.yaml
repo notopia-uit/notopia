@@ -1,11 +1,12 @@
 # vim: ft=yaml.openapi
+
 type: object
 
 allOf:
-  - $ref: ./Note.yaml
+  - $ref: ../schemas/Workspace.yaml
   - type: object
     required:
       - id
-      - title
-      - deletedBy
-      - deletedAt
+      - name
+      - createdAt
+      - updatedAt

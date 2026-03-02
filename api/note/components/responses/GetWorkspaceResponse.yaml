@@ -1,0 +1,13 @@
+# vim: ft=yaml.openapi
+description: OK
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: ../schemas/WorkspaceRequired.yaml
+        - type: object
+          properties:
+            rootFolder:
+              $ref: ../schemas/FolderWithRelations.yaml
+          required:
+            - rootFolder

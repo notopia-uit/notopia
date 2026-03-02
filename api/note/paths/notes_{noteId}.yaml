@@ -3,7 +3,7 @@ get:
   security:
     - oauth2: []
   tags:
-    - note
+    - Note
   summary: Get note
   description: Retrieve a single note by its unique identifier
   operationId: getNote
@@ -23,63 +23,11 @@ get:
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml
 
-put:
-  security:
-    - oauth2: []
-  tags:
-    - note
-  summary: Put note
-  description: Replace an existing note with new data (all fields are required)
-  operationId: updateNote
-  parameters:
-    - $ref: ../components/parameters/noteIdPath.yaml
-  requestBody:
-    $ref: ../components/requestBodies/PutNoteRequest.yaml
-  responses:
-    200:
-      $ref: ../components/responses/PutNoteResponse.yaml
-    400:
-      $ref: ../../common/components/responses/BadRequestError.yaml
-    401:
-      $ref: ../../common/components/responses/UnauthorizedError.yaml
-    403:
-      $ref: ../../common/components/responses/ForbiddenError.yaml
-    404:
-      $ref: ../../common/components/responses/NotFoundError.yaml
-    500:
-      $ref: ../../common/components/responses/InternalServerError.yaml
-
-patch:
-  security:
-    - oauth2: []
-  tags:
-    - note
-  summary: Patch note
-  description: Update specific fields of a note (only provided fields will be updated)
-  operationId: patchNote
-  parameters:
-    - $ref: ../components/parameters/noteIdPath.yaml
-  requestBody:
-    $ref: ../components/requestBodies/PatchNoteRequest.yaml
-  responses:
-    200:
-      $ref: ../components/responses/PatchNoteResponse.yaml
-    400:
-      $ref: ../../common/components/responses/BadRequestError.yaml
-    401:
-      $ref: ../../common/components/responses/UnauthorizedError.yaml
-    403:
-      $ref: ../../common/components/responses/ForbiddenError.yaml
-    404:
-      $ref: ../../common/components/responses/NotFoundError.yaml
-    500:
-      $ref: ../../common/components/responses/InternalServerError.yaml
-
 delete:
   security:
     - oauth2: []
   tags:
-    - note
+    - Note
   summary: Delete note
   description: Delete a note by its unique identifier
   operationId: deleteNote

@@ -3,7 +3,7 @@ get:
   security:
     - oauth2: []
   tags:
-    - note
+    - Note
   summary: List notes
   description: Retrieve a paginated list of all notes with optional filtering and sorting
   operationId: listNotes

@@ -28,11 +28,12 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve -w ./openapi.yaml --port 9081",
+        "command": "scalar document serve -w ../bundled/note.json --port 9081",
         "forwardAllArgs": false,
         "cwd": "{projectRoot}"
       },
-      "continuous": true
+      "continuous": true,
+      "dependsOn": ["watch-bundle:json", "bundle:json"]
     },
     "preview": {
       "executor": "nx:run-commands",

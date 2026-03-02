@@ -4,16 +4,19 @@ get:
     - oauth2: []
   tags:
     - Workspace
-  summary: SSE workspace updates
-  operationId: getWorkspaceEvents
+  summary: Get workspace details
+  description: Retrieve detailed information about a specific workspace, including its name, description, and creation date.
+  operationId: getWorkspace
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
   responses:
     200:
-      $ref: ../components/responses/GetWorkspaceEventsResponse.yaml
+      $ref: ../components/responses/GetWorkspaceResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml

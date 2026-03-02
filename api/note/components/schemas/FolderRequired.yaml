@@ -1,11 +1,12 @@
-# vim: ft=yaml.openapi
+# vim:ft=yaml.openapi
 type: object
 
 allOf:
-  - $ref: ./Note.yaml
+  - $ref: ./Folder.yaml
   - type: object
     required:
       - id
-      - title
+      - name
+      - parentId
       - deletedBy
       - deletedAt

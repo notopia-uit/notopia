@@ -62,7 +62,7 @@ package "NoteService" {
                 name: string
                 ownerID: UserID
                 collaborators: []*Collaborator
-                folders: []*Folder
+                rootFolder: *Folder
                 createdAt: time.Time
                 updatedAt: time.Time
                 deletedAt: *time.Time
@@ -93,7 +93,7 @@ package "NoteService" {
                   HasEditorPermissions(): bool
             }
 
-            NoteService.Domain.Workspace.Workspace "1" *--> "0..*" NoteService.Domain.Workspace.Folder : contains
+            NoteService.Domain.Workspace.Workspace "1" *--> "1" NoteService.Domain.Workspace.Folder : contains
             NoteService.Domain.Workspace.Workspace "1" *--> "0..*" NoteService.Domain.Workspace.Collaborator : includes
             NoteService.Domain.Workspace.Collaborator --> NoteService.Domain.Workspace.Role : has
         }

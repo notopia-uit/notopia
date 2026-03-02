@@ -41,7 +41,7 @@
           }
         ],
         "tags": [
-          "note"
+          "Note"
         ],
         "summary": "List notes",
         "description": "Retrieve a paginated list of all notes with optional filtering and sorting",
@@ -135,7 +135,7 @@
           }
         ],
         "tags": [
-          "note"
+          "Note"
         ],
         "summary": "Get note",
         "description": "Retrieve a single note by its unique identifier",
@@ -166,88 +166,6 @@
           }
         }
       },
-      "put": {
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
-        "tags": [
-          "note"
-        ],
-        "summary": "Put note",
-        "description": "Replace an existing note with new data (all fields are required)",
-        "operationId": "updateNote",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/noteIdPath"
-          }
-        ],
-        "requestBody": {
-          "$ref": "#/components/requestBodies/PutNoteRequest"
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/PutNoteResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      },
-      "patch": {
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
-        "tags": [
-          "note"
-        ],
-        "summary": "Patch note",
-        "description": "Update specific fields of a note (only provided fields will be updated)",
-        "operationId": "patchNote",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/noteIdPath"
-          }
-        ],
-        "requestBody": {
-          "$ref": "#/components/requestBodies/PatchNoteRequest"
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/PatchNoteResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      },
       "delete": {
         "security": [
           {
@@ -255,7 +173,7 @@
           }
         ],
         "tags": [
-          "note"
+          "Note"
         ],
         "summary": "Delete note",
         "description": "Delete a note by its unique identifier",
@@ -295,7 +213,7 @@
           }
         ],
         "tags": [
-          "workspace"
+          "Workspace"
         ],
         "summary": "SSE workspace updates",
         "operationId": "getWorkspaceEvents",
@@ -313,6 +231,43 @@
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}": {
+      "get": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Get workspace details",
+        "description": "Retrieve detailed information about a specific workspace, including its name, description, and creation date.",
+        "operationId": "getWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetWorkspaceResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -415,24 +370,25 @@
           },
           "title": {
             "type": "string",
-            "description": "Title of the note",
             "minLength": 1,
             "maxLength": 255,
             "example": "Meeting Notes"
           },
-          "createdAt": {
+          "deletedBy": {
             "type": "string",
-            "format": "date-time",
-            "description": "Timestamp when the note was created",
-            "example": "2026-01-11T10:30:00Z",
+            "enum": [
+              "purpose",
+              "parent"
+            ],
+            "nullable": true,
+            "example": null,
             "readOnly": true
           },
-          "updatedAt": {
+          "deletedAt": {
             "type": "string",
             "nullable": true,
             "format": "date-time",
-            "description": "Timestamp when the note was last updated",
-            "example": "2026-01-11T14:45:00Z",
+            "example": null,
             "readOnly": true
           }
         }
@@ -520,8 +476,8 @@
             "required": [
               "id",
               "title",
-              "createdAt",
-              "updatedAt"
+              "deletedBy",
+              "deletedAt"
             ]
           }
         ]
@@ -684,6 +640,134 @@
         "required": [
           "type",
           "data"
+        ]
+      },
+      "Workspace": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "My Workspace"
+          }
+        }
+      },
+      "WorkspaceRequired": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Workspace"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "createdAt",
+              "updatedAt"
+            ]
+          }
+        ]
+      },
+      "Folder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Work Notes"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": null
+          },
+          "deletedBy": {
+            "type": "string",
+            "enum": [
+              "purpose",
+              "parent"
+            ],
+            "nullable": true,
+            "example": null,
+            "readOnly": true
+          },
+          "deletedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": null,
+            "readOnly": true
+          }
+        }
+      },
+      "FolderRequired": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Folder"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "parentId",
+              "deletedBy",
+              "deletedAt"
+            ]
+          }
+        ]
+      },
+      "FolderWithRelations": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderRequired"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FolderWithRelations"
+                }
+              },
+              "parentId": {
+                "type": "string",
+                "format": "uuid",
+                "nullable": true,
+                "example": "123e4567-e89b-12d3-a456-426614174000"
+              },
+              "notes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/NoteRequired"
+                }
+              }
+            },
+            "required": [
+              "children",
+              "parentId",
+              "notes"
+            ]
+          }
         ]
       }
     },
@@ -867,50 +951,6 @@
           }
         }
       },
-      "PutNoteResponse": {
-        "description": "Note successfully updated",
-        "content": {
-          "application/json": {
-            "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/NoteRequired"
-                },
-                {
-                  "example": {
-                    "id": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-                    "title": "Updated Meeting Notes",
-                    "createdAt": "2026-01-11T10:30:00Z",
-                    "updatedAt": "2026-01-11T15:30:00Z"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "PatchNoteResponse": {
-        "description": "Note successfully patched",
-        "content": {
-          "application/json": {
-            "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Note"
-                },
-                {
-                  "example": {
-                    "id": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-                    "title": "Partially Updated Meeting Notes",
-                    "createdAt": "2026-01-11T10:30:00Z",
-                    "updatedAt": "2026-01-11T16:00:00Z"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
       "GetWorkspaceEventsResponse": {
         "description": "A persistent stream of events",
         "content": {
@@ -942,6 +982,31 @@
             }
           }
         }
+      },
+      "GetWorkspaceResponse": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/WorkspaceRequired"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "rootFolder": {
+                      "$ref": "#/components/schemas/FolderWithRelations"
+                    }
+                  },
+                  "required": [
+                    "rootFolder"
+                  ]
+                }
+              ]
+            }
+          }
+        }
       }
     },
     "requestBodies": {
@@ -960,52 +1025,6 @@
                     "summary": "Basic note",
                     "value": {
                       "title": "My First Note"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "PutNoteRequest": {
-        "description": "Put note request (replace entire note)",
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/NoteRequired"
-                },
-                {
-                  "example": {
-                    "summary": "Update complete note",
-                    "value": {
-                      "title": "Updated Meeting Notes"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "PatchNoteRequest": {
-        "description": "Patch note request (partial update)",
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Note"
-                },
-                {
-                  "example": {
-                    "summary": "Partial update of note",
-                    "value": {
-                      "title": "Partially Updated Meeting Notes"
                     }
                   }
                 }

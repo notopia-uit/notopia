@@ -1,0 +1,15 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  id:
+    type: string
+    format: uuid
+    example: 123e4567-e89b-12d3-a456-426614174000
+    readOnly: true
+
+  name:
+    type: string
+    minLength: 1
+    maxLength: 255
+    example: My Workspace
