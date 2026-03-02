@@ -1,0 +1,21 @@
+# vim: ft=yaml.openapi
+post:
+  security:
+    - oauth2: []
+  tags:
+    - Note
+  summary: Publish a note
+  operationId: publishNote
+  parameters:
+    - $ref: ../components/parameters/noteIdPath.yaml
+  responses:
+    204:
+      description: Note published successfully
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

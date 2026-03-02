@@ -5,7 +5,6 @@ get:
   tags:
     - Note
   summary: List notes
-  description: Retrieve a paginated list of all notes with optional filtering and sorting
   operationId: listNotes
   parameters:
     - $ref: ../../common/components/parameters/pageQuery.yaml
@@ -39,9 +38,8 @@ post:
   security:
     - oauth2: []
   tags:
-    - note
+    - Note
   summary: Create note
-  description: Create a new note
   operationId: createNote
   requestBody:
     $ref: ../components/requestBodies/CreateNoteRequest.yaml

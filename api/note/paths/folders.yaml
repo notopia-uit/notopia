@@ -1,0 +1,19 @@
+# vim: ft=yaml.openapi
+post:
+  security:
+    - oauth2: []
+  tags:
+    - Folder
+  summary: Create a folder
+  operationId: createFolder
+  requestBody:
+    $ref: ../components/requestBodies/CreateFolderRequest.yaml
+  responses:
+    201:
+      $ref: ../components/responses/CreateFolderResponse.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

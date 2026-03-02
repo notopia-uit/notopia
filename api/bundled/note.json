@@ -44,7 +44,6 @@
           "Note"
         ],
         "summary": "List notes",
-        "description": "Retrieve a paginated list of all notes with optional filtering and sorting",
         "operationId": "listNotes",
         "parameters": [
           {
@@ -103,10 +102,9 @@
           }
         ],
         "tags": [
-          "note"
+          "Note"
         ],
         "summary": "Create note",
-        "description": "Create a new note",
         "operationId": "createNote",
         "requestBody": {
           "$ref": "#/components/requestBodies/CreateNoteRequest"
@@ -203,8 +201,80 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/events": {
-      "get": {
+    "/note/notes/{noteId}/publish": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Publish a note",
+        "operationId": "publishNote",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/noteIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Note published successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/notes/{noteId}/unpublish": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Unpublish a note",
+        "operationId": "unpublishNote",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/noteIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Note unpublished successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces": {
+      "post": {
         "security": [
           {
             "oauth2": []
@@ -213,16 +283,14 @@
         "tags": [
           "Workspace"
         ],
-        "summary": "SSE workspace updates",
-        "operationId": "getWorkspaceEvents",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/workspaceIdPath"
-          }
-        ],
+        "summary": "Create a workspace",
+        "operationId": "createWorkspace",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateWorkspaceRequest"
+        },
         "responses": {
-          "200": {
-            "$ref": "#/components/responses/GetWorkspaceEventsResponse"
+          "201": {
+            "$ref": "#/components/responses/CreateWorkspaceResponse"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -270,9 +338,43 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
+      },
+      "delete": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Delete workspace",
+        "operationId": "deleteWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content - Workspace successfully deleted."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
       }
     },
-    "/note/workspaces/{workspaceId}/rename-workspace": {
+    "/note/workspaces/{workspaceId}/rename": {
       "post": {
         "security": [
           {
@@ -290,11 +392,186 @@
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/RenameWorkspace"
+          "$ref": "#/components/requestBodies/RenameWorkspaceRequest"
         },
         "responses": {
           "204": {
             "description": "No Content - Workspace renamed successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/publish": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Publish a workspace",
+        "operationId": "publishWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workspace published successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/unpublish": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Unpublish a workspace",
+        "operationId": "unpublishWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workspace unpublished successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/events": {
+      "get": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "SSE workspace updates",
+        "operationId": "getWorkspaceEvents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetWorkspaceEventsResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/folders": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Folder"
+        ],
+        "summary": "Create a folder",
+        "operationId": "createFolder",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateFolderRequest"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateFolderResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/folders/{folderId}/rename": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Folder"
+        ],
+        "summary": "Rename a folder",
+        "operationId": "renameFolder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/folderIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RenameFolderRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Folder renamed successfully"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -389,6 +666,16 @@
           "type": "string",
           "format": "uuid",
           "example": "550e8400-e29b-41d4-a716-446655440000"
+        }
+      },
+      "folderIdPath": {
+        "name": "folderId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "6306e1ce-c6d9-4fdd-b8e8-c3fbef22c0d9"
         }
       }
     },
@@ -512,6 +799,132 @@
               "title",
               "deletedBy",
               "deletedAt"
+            ]
+          }
+        ]
+      },
+      "Workspace": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "My Workspace"
+          }
+        }
+      },
+      "WorkspaceRequired": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Workspace"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        ]
+      },
+      "Folder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Work Notes"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": null
+          },
+          "deletedBy": {
+            "type": "string",
+            "enum": [
+              "purpose",
+              "parent"
+            ],
+            "nullable": true,
+            "example": null,
+            "readOnly": true
+          },
+          "deletedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": null,
+            "readOnly": true
+          }
+        }
+      },
+      "FolderRequired": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Folder"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "parentId",
+              "deletedBy",
+              "deletedAt"
+            ]
+          }
+        ]
+      },
+      "FolderWithRelations": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderRequired"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FolderWithRelations"
+                }
+              },
+              "parentId": {
+                "type": "string",
+                "format": "uuid",
+                "nullable": true,
+                "example": "123e4567-e89b-12d3-a456-426614174000"
+              },
+              "notes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/NoteRequired"
+                }
+              }
+            },
+            "required": [
+              "children",
+              "parentId",
+              "notes"
             ]
           }
         ]
@@ -674,132 +1087,6 @@
         "required": [
           "type",
           "data"
-        ]
-      },
-      "Workspace": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "550e8400-e29b-41d4-a716-446655440000",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "My Workspace"
-          }
-        }
-      },
-      "WorkspaceRequired": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Workspace"
-          },
-          {
-            "type": "object",
-            "required": [
-              "id",
-              "name"
-            ]
-          }
-        ]
-      },
-      "Folder": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "Work Notes"
-          },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "example": null
-          },
-          "deletedBy": {
-            "type": "string",
-            "enum": [
-              "purpose",
-              "parent"
-            ],
-            "nullable": true,
-            "example": null,
-            "readOnly": true
-          },
-          "deletedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time",
-            "example": null,
-            "readOnly": true
-          }
-        }
-      },
-      "FolderRequired": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Folder"
-          },
-          {
-            "type": "object",
-            "required": [
-              "id",
-              "name",
-              "parentId",
-              "deletedBy",
-              "deletedAt"
-            ]
-          }
-        ]
-      },
-      "FolderWithRelations": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/FolderRequired"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "children": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/FolderWithRelations"
-                }
-              },
-              "parentId": {
-                "type": "string",
-                "format": "uuid",
-                "nullable": true,
-                "example": "123e4567-e89b-12d3-a456-426614174000"
-              },
-              "notes": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/NoteRequired"
-                }
-              }
-            },
-            "required": [
-              "children",
-              "parentId",
-              "notes"
-            ]
-          }
         ]
       }
     },
@@ -983,6 +1270,42 @@
           }
         }
       },
+      "CreateWorkspaceResponse": {
+        "description": "Workspace successfully created",
+        "headers": {
+          "Content-Location": {
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "GetWorkspaceResponse": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/WorkspaceRequired"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "rootFolder": {
+                      "$ref": "#/components/schemas/FolderWithRelations"
+                    }
+                  },
+                  "required": [
+                    "rootFolder"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
       "GetWorkspaceEventsResponse": {
         "description": "A persistent stream of events",
         "content": {
@@ -1015,27 +1338,13 @@
           }
         }
       },
-      "GetWorkspaceResponse": {
-        "description": "OK",
-        "content": {
-          "application/json": {
+      "CreateFolderResponse": {
+        "description": "Folder successfully created",
+        "headers": {
+          "Content-Location": {
             "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/WorkspaceRequired"
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "rootFolder": {
-                      "$ref": "#/components/schemas/FolderWithRelations"
-                    }
-                  },
-                  "required": [
-                    "rootFolder"
-                  ]
-                }
-              ]
+              "type": "string",
+              "format": "uri"
             }
           }
         }
@@ -1043,7 +1352,6 @@
     },
     "requestBodies": {
       "CreateNoteRequest": {
-        "description": "Create note request",
         "required": true,
         "content": {
           "application/json": {
@@ -1065,12 +1373,50 @@
           }
         }
       },
-      "RenameWorkspace": {
+      "CreateWorkspaceRequest": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/WorkspaceRequired"
+            }
+          }
+        }
+      },
+      "RenameWorkspaceRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/WorkspaceRequired"
+            }
+          }
+        }
+      },
+      "CreateFolderRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/FolderRequired"
+            }
+          }
+        }
+      },
+      "RenameFolderRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "example": "Learning Notes"
+                }
+              }
             }
           }
         }

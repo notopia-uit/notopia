@@ -1,5 +1,4 @@
 # vim: ft=yaml.openapi
-description: Create note request
 required: true
 content:
   application/json:

@@ -29,12 +29,28 @@ paths:
     $ref: ./paths/notes.yaml
   /note/notes/{noteId}:
     $ref: ./paths/notes_{noteId}.yaml
-  /note/workspaces/{workspaceId}/events:
-    $ref: ./paths/workspaces_{workspaceId}_events.yaml
+  /note/notes/{noteId}/publish:
+    $ref: ./paths/notes_{noteId}_publish.yaml
+  /note/notes/{noteId}/unpublish:
+    $ref: ./paths/notes_{noteId}_unpublish.yaml
+
+  /note/workspaces:
+    $ref: ./paths/workspaces.yaml
   /note/workspaces/{workspaceId}:
     $ref: ./paths/workspaces_{workspaceId}.yaml
-  /note/workspaces/{workspaceId}/rename-workspace:
-    $ref: ./paths/workspaces_{workspaceId}_rename-workspace.yaml
+  /note/workspaces/{workspaceId}/rename:
+    $ref: ./paths/workspaces_{workspaceId}_rename.yaml
+  /note/workspaces/{workspaceId}/publish:
+    $ref: ./paths/workspaces_{workspaceId}_publish.yaml
+  /note/workspaces/{workspaceId}/unpublish:
+    $ref: ./paths/workspaces_{workspaceId}_unpublish.yaml
+  /note/workspaces/{workspaceId}/events:
+    $ref: ./paths/workspaces_{workspaceId}_events.yaml
+
+  /note/folders:
+    $ref: ./paths/folders.yaml
+  /note/folders/{folderId}/rename:
+    $ref: ./paths/folders_{folderId}_rename.yaml
 
 components:
   securitySchemes:

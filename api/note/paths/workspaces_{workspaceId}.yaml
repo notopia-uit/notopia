@@ -19,3 +19,24 @@ get:
       $ref: ../../common/components/responses/NotFoundError.yaml
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml
+
+delete:
+  security:
+    - oauth2: []
+  tags:
+    - Workspace
+  summary: Delete workspace
+  operationId: deleteWorkspace
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  responses:
+    204:
+      description: No Content - Workspace successfully deleted.
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

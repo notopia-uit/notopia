@@ -1,0 +1,7 @@
+# vim: ft=yaml.openapi
+description: Folder successfully created
+headers:
+  Content-Location:
+    schema:
+      type: string
+      format: uri

@@ -3,16 +3,16 @@ post:
   security:
     - oauth2: []
   tags:
-    - Workspace
-  summary: Rename a workspace
-  operationId: renameWorkspace
+    - Folder
+  summary: Rename a folder
+  operationId: renameFolder
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
+    - $ref: ../components/parameters/folderIdPath.yaml
   requestBody:
-    $ref: ../components/requestBodies/RenameWorkspace.yaml
+    $ref: ../components/requestBodies/RenameFolderRequest.yaml
   responses:
     204:
-      description: No Content - Workspace renamed successfully.
+      description: Folder renamed successfully
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
