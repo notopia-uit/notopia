@@ -1,0 +1,15 @@
+proto/
+deploy/
+docs/
+page/
+scripts/
+buf.*
+eslint.config.mjs
+.prettierignore
+.prettierrc.ts
+justfile
+mise.*
+.tool-versions
+nx.json
+openapitools.json
+README.md

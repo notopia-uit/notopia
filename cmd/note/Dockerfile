@@ -1,6 +1,4 @@
-FROM golang:1.26.0-alpine3.23 as base
-
-FROM base AS builder
+FROM golang:1.26.0-alpine3.23 AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
@@ -9,9 +7,9 @@ RUN CGO_ENABLED=0 \
   go build \
   -ldflags "-s -w -extldflags '-static'" \
   -o note \
-  ./cmd/note/main.go
+  cmd/note
 
-FROM base AS final
+FROM alpine:3.23 AS final
 WORKDIR /app
 COPY --from=builder /app/note .
 EXPOSE 8080
