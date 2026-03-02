@@ -26,7 +26,7 @@ services:
         - CMD
         - curl
         - -f
-        - http://localhost:9000/health
+        - http://localhost:9001/health
     restart: unless-stopped
 
   rustfs_bucket:
