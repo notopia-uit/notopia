@@ -135,7 +135,8 @@
       "workspaceChangelog": {
         "file": false,
         "createRelease": "github"
-      }
+      },
+      "automaticFromRef": true
     }
   },
   "generators": {
