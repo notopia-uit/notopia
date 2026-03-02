@@ -22,10 +22,13 @@ func (h *StrictHandler) GetNote(ctx context.Context, request note.GetNoteRequest
 	return &note.GetNote200JSONResponse{}, nil
 }
 
-func (h *StrictHandler) PatchNote(ctx context.Context, request note.PatchNoteRequestObject) (note.PatchNoteResponseObject, error) {
-	return &note.PatchNote200JSONResponse{}, nil
+func (h *StrictHandler) PublishNote(ctx context.Context, request note.PublishNoteRequestObject) (note.PublishNoteResponseObject, error) {
+	return &note.PublishNote204Response{}, nil
 }
 
-func (h *StrictHandler) UpdateNote(ctx context.Context, request note.UpdateNoteRequestObject) (note.UpdateNoteResponseObject, error) {
-	return &note.UpdateNote200JSONResponse{}, nil
+func (h *StrictHandler) UnpublishNote(
+	ctx context.Context,
+	request note.UnpublishNoteRequestObject,
+) (note.UnpublishNoteResponseObject, error) {
+	return &note.UnpublishNote204Response{}, nil
 }

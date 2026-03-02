@@ -1356,19 +1356,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/NoteRequired"
-                },
-                {
-                  "example": {
-                    "summary": "Basic note",
-                    "value": {
-                      "title": "My First Note"
-                    }
-                  }
-                }
-              ]
+              "$ref": "#/components/schemas/NoteRequired"
             }
           }
         }
