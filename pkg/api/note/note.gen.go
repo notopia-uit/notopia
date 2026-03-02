@@ -671,6 +671,7 @@ type MiddlewareFunc func(c *gin.Context)
 
 // CreateFolder operation middleware
 func (siw *ServerInterfaceWrapper) CreateFolder(c *gin.Context) {
+
 	var err error
 
 	c.Set(Oauth2Scopes, []string{})
@@ -774,6 +775,7 @@ func (siw *ServerInterfaceWrapper) CreateFolder(c *gin.Context) {
 
 // RenameFolder operation middleware
 func (siw *ServerInterfaceWrapper) RenameFolder(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "folderId" -------------
@@ -886,6 +888,7 @@ func (siw *ServerInterfaceWrapper) RenameFolder(c *gin.Context) {
 
 // ListNotes operation middleware
 func (siw *ServerInterfaceWrapper) ListNotes(c *gin.Context) {
+
 	var err error
 
 	c.Set(Oauth2Scopes, []string{})
@@ -1029,6 +1032,7 @@ func (siw *ServerInterfaceWrapper) ListNotes(c *gin.Context) {
 
 // CreateNote operation middleware
 func (siw *ServerInterfaceWrapper) CreateNote(c *gin.Context) {
+
 	var err error
 
 	c.Set(Oauth2Scopes, []string{})
@@ -1132,6 +1136,7 @@ func (siw *ServerInterfaceWrapper) CreateNote(c *gin.Context) {
 
 // DeleteNote operation middleware
 func (siw *ServerInterfaceWrapper) DeleteNote(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "noteId" -------------
@@ -1244,6 +1249,7 @@ func (siw *ServerInterfaceWrapper) DeleteNote(c *gin.Context) {
 
 // GetNote operation middleware
 func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "noteId" -------------
@@ -1356,6 +1362,7 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 
 // PublishNote operation middleware
 func (siw *ServerInterfaceWrapper) PublishNote(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "noteId" -------------
@@ -1468,6 +1475,7 @@ func (siw *ServerInterfaceWrapper) PublishNote(c *gin.Context) {
 
 // UnpublishNote operation middleware
 func (siw *ServerInterfaceWrapper) UnpublishNote(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "noteId" -------------
@@ -1580,6 +1588,7 @@ func (siw *ServerInterfaceWrapper) UnpublishNote(c *gin.Context) {
 
 // CreateWorkspace operation middleware
 func (siw *ServerInterfaceWrapper) CreateWorkspace(c *gin.Context) {
+
 	var err error
 
 	c.Set(Oauth2Scopes, []string{})
@@ -1683,6 +1692,7 @@ func (siw *ServerInterfaceWrapper) CreateWorkspace(c *gin.Context) {
 
 // DeleteWorkspace operation middleware
 func (siw *ServerInterfaceWrapper) DeleteWorkspace(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "workspaceId" -------------
@@ -1795,6 +1805,7 @@ func (siw *ServerInterfaceWrapper) DeleteWorkspace(c *gin.Context) {
 
 // GetWorkspace operation middleware
 func (siw *ServerInterfaceWrapper) GetWorkspace(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "workspaceId" -------------
@@ -1907,6 +1918,7 @@ func (siw *ServerInterfaceWrapper) GetWorkspace(c *gin.Context) {
 
 // GetWorkspaceEvents operation middleware
 func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "workspaceId" -------------
@@ -2019,6 +2031,7 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 
 // PublishWorkspace operation middleware
 func (siw *ServerInterfaceWrapper) PublishWorkspace(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "workspaceId" -------------
@@ -2131,6 +2144,7 @@ func (siw *ServerInterfaceWrapper) PublishWorkspace(c *gin.Context) {
 
 // RenameWorkspace operation middleware
 func (siw *ServerInterfaceWrapper) RenameWorkspace(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "workspaceId" -------------
@@ -2243,6 +2257,7 @@ func (siw *ServerInterfaceWrapper) RenameWorkspace(c *gin.Context) {
 
 // UnpublishWorkspace operation middleware
 func (siw *ServerInterfaceWrapper) UnpublishWorkspace(c *gin.Context) {
+
 	var err error
 
 	// ------------- Path parameter "workspaceId" -------------
@@ -2526,7 +2541,8 @@ type RenameFolderResponseObject interface {
 	VisitRenameFolderResponse(w http.ResponseWriter) error
 }
 
-type RenameFolder204Response struct{}
+type RenameFolder204Response struct {
+}
 
 func (response RenameFolder204Response) VisitRenameFolderResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
@@ -2673,7 +2689,8 @@ type DeleteNoteResponseObject interface {
 	VisitDeleteNoteResponse(w http.ResponseWriter) error
 }
 
-type DeleteNote204Response struct{}
+type DeleteNote204Response struct {
+}
 
 func (response DeleteNote204Response) VisitDeleteNoteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
@@ -2801,7 +2818,8 @@ type PublishNoteResponseObject interface {
 	VisitPublishNoteResponse(w http.ResponseWriter) error
 }
 
-type PublishNote204Response struct{}
+type PublishNote204Response struct {
+}
 
 func (response PublishNote204Response) VisitPublishNoteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
@@ -2855,7 +2873,8 @@ type UnpublishNoteResponseObject interface {
 	VisitUnpublishNoteResponse(w http.ResponseWriter) error
 }
 
-type UnpublishNote204Response struct{}
+type UnpublishNote204Response struct {
+}
 
 func (response UnpublishNote204Response) VisitUnpublishNoteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
@@ -2955,7 +2974,8 @@ type DeleteWorkspaceResponseObject interface {
 	VisitDeleteWorkspaceResponse(w http.ResponseWriter) error
 }
 
-type DeleteWorkspace204Response struct{}
+type DeleteWorkspace204Response struct {
+}
 
 func (response DeleteWorkspace204Response) VisitDeleteWorkspaceResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
@@ -3123,7 +3143,8 @@ type PublishWorkspaceResponseObject interface {
 	VisitPublishWorkspaceResponse(w http.ResponseWriter) error
 }
 
-type PublishWorkspace204Response struct{}
+type PublishWorkspace204Response struct {
+}
 
 func (response PublishWorkspace204Response) VisitPublishWorkspaceResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
@@ -3178,7 +3199,8 @@ type RenameWorkspaceResponseObject interface {
 	VisitRenameWorkspaceResponse(w http.ResponseWriter) error
 }
 
-type RenameWorkspace204Response struct{}
+type RenameWorkspace204Response struct {
+}
 
 func (response RenameWorkspace204Response) VisitRenameWorkspaceResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
@@ -3232,7 +3254,8 @@ type UnpublishWorkspaceResponseObject interface {
 	VisitUnpublishWorkspaceResponse(w http.ResponseWriter) error
 }
 
-type UnpublishWorkspace204Response struct{}
+type UnpublishWorkspace204Response struct {
+}
 
 func (response UnpublishWorkspace204Response) VisitUnpublishWorkspaceResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
@@ -3326,10 +3349,8 @@ type StrictServerInterface interface {
 	UnpublishWorkspace(ctx context.Context, request UnpublishWorkspaceRequestObject) (UnpublishWorkspaceResponseObject, error)
 }
 
-type (
-	StrictHandlerFunc    = strictgin.StrictGinHandlerFunc
-	StrictMiddlewareFunc = strictgin.StrictGinMiddlewareFunc
-)
+type StrictHandlerFunc = strictgin.StrictGinHandlerFunc
+type StrictMiddlewareFunc = strictgin.StrictGinMiddlewareFunc
 
 func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareFunc) ServerInterface {
 	return &strictHandler{ssi: ssi, middlewares: middlewares}
