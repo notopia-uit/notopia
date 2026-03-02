@@ -6,13 +6,13 @@ include:
   - ./infrastructure/casbin.yaml
   - ./infrastructure/dbgate.yaml
   - ./infrastructure/meilisearch.yaml
-  - ./infrastructure/minio.yaml
   - ./infrastructure/redis_pub_sub.yaml
   - ./infrastructure/redpanda.yaml
+  - ./infrastructure/rustfs.yaml
   - ./infrastructure/traefik.yaml
-  - ./services/note.yaml
-  - ./monitoring/grafana.yaml
-  - ./monitoring/prometheus.yaml
-  - ./monitoring/loki.yaml
-  - ./monitoring/tempo.yaml
   - ./monitoring/alloy.yaml
+  - ./monitoring/grafana.yaml
+  - ./monitoring/loki.yaml
+  - ./monitoring/prometheus.yaml
+  - ./monitoring/tempo.yaml
+  - ./services/note.yaml

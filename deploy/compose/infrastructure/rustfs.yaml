@@ -1,0 +1,48 @@
+# vim:ft=yaml.docker-compose:
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  rustfs:
+    container_name: notopia-rustfs
+    image: rustfs/rustfs1.0.0-alpha.84-glibc
+    command:
+      - /data
+    environment:
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:-notopiauit}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:-notopiauit}
+      RUSTFS_CONSOLE_ENABLE: 'true'
+      RUSTFS_SERVER_DOMAINS: rustfs.notopia.localhost
+    volumes:
+      - rustfs:/data
+    labels:
+      traefik.enable: 'true'
+      traefik.http.routers.rustfs.rule: Host(`rustfs-api.notopia.localhost`)
+      traefik.http.routers.rustfs.entrypoints: web
+      traefik.http.services.rustfs.loadbalancer.server.port: '9000'
+      traefik.http.routers.rustfs-console.rule: Host(`rustfs.notopia.localhost`)
+      traefik.http.routers.rustfs-console.entrypoints: web
+      traefik.http.services.rustfs-console.loadbalancer.server.port: '9001'
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:9000/health
+    restart: unless-stopped
+
+  rustfs_bucket:
+    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    container_name: notopia-rustfs_bucket
+    entrypoint: > # language: sh
+      /bin/sh -c '
+        until (/usr/bin/mc alias set rustfs http://rustfs:9000 ${RUSTFS_ACCESS_KEY:-notopiauit} ${RUSTFS_SECRET_KEY:-notopiauit}) do
+          sleep 1;
+        done
+        /usr/bin/mc mb rustfs/notopia;
+        /usr/bin/mc policy set public rustfs/notopia;
+      '
+    depends_on:
+      rustfs:
+        condition: service_healthy
+
+volumes:
+  rustfs:
