@@ -114,8 +114,23 @@
     }
   ],
   "release": {
+    "projectsRelationship": "independent",
+    "releaseTag": {
+      "pattern": "{projectName}@{version}",
+      "requireSemver": true
+    },
+    "docker": {
+      "repositoryName": "notopia-uit",
+      "registryUrl": "https://ghcr.io"
+    },
     "version": {
       "conventionalCommits": true
+    },
+    "changelog": {
+      "workspaceChangelog": {
+        "file": false,
+        "createRelease": "github"
+      }
     }
   },
   "generators": {
