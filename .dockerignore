@@ -1,15 +1,39 @@
+# Taken from gitignore, and should be synced
+**/node_modules
+**/.env.local
+
+.nx/cache/
+.nx/workspace-data/
+**/dist/
+vite.config.*.timestamp*
+
+# Next.js
+**/.next/
+**/out
+**/build/
+
+**/coverage.out
+
+# go bin, usually run with nx won't generate this, but if you accidentally run go build
+/note
+/note.exe
+
+# from dlv
+**/__debug_bin*
+
+**/.openapi-generator/
 proto/
 deploy/
 docs/
 page/
 scripts/
 buf.*
-eslint.config.mjs
-.prettierignore
-.prettierrc.ts
-justfile
+**/eslint.config.mjs
+**/.prettierignore
+**/.prettierrc.ts
+**/justfile
 mise.*
 .tool-versions
 nx.json
-openapitools.json
-README.md
+**/openapitools.json
+**/README.md
