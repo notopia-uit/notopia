@@ -13,9 +13,9 @@ var specs embed.FS
 type Spec string
 
 var (
-	NoteSpec    Spec = "note.json"
-	DocumentSpec    Spec = "document.json"
-	OpenapiSpec Spec = "openapi.json"
+	NoteSpec     Spec = "note.json"
+	DocumentSpec Spec = "document.json"
+	OpenapiSpec  Spec = "openapi.json"
 )
 
 func GetSpec(loader *openapi3.Loader, spec Spec) (*openapi3.T, error) {

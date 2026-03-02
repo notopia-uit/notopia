@@ -5,8 +5,8 @@ apis:
     root: ./note/openapi.yaml
   document:
     root: ./document/openapi.yaml
-  common:
-    root: ./common/openapi.yaml
+  event:
+    root: ./event/openapi.yaml
     rules:
       struct: off
       no-empty-servers: off
