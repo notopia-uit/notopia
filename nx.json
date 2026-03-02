@@ -124,7 +124,6 @@
       "requireSemver": true
     },
     "docker": {
-      "repositoryName": "notopia-uit",
       "registryUrl": "https://ghcr.io"
     },
     "version": {
