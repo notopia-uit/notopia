@@ -168,7 +168,7 @@ export type WsEditsDocumentData = {
         documentId: string;
     };
     query?: never;
-    url: '/ws/edits/{documentId}';
+    url: '/ws/documents/{documentId}';
 };
 
 export type WsEditsDocumentErrors = {

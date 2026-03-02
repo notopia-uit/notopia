@@ -42,9 +42,9 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
 export const wsEditsDocumentQueryKey = (options: Options<WsEditsDocumentData>) => createQueryKey('wsEditsDocument', options);
 
 /**
- * WebSocket for editing a document
+ * WebSocket for documenting a document
  *
- * Establish a WebSocket connection for real-time collaborative editing of a document.
+ * Establish a WebSocket connection for real-time collaborative documenting of a document.
  */
 export const wsEditsDocumentOptions = (options: Options<WsEditsDocumentData>) => queryOptions<unknown, WsEditsDocumentError, unknown, ReturnType<typeof wsEditsDocumentQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {

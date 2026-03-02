@@ -20,14 +20,14 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * WebSocket for editing a document
+ * WebSocket for documenting a document
  *
- * Establish a WebSocket connection for real-time collaborative editing of a document.
+ * Establish a WebSocket connection for real-time collaborative documenting of a document.
  */
 export const wsEditsDocument = <ThrowOnError extends boolean = false>(options: Options<WsEditsDocumentData, ThrowOnError>) => (options.client ?? client).get<WsEditsDocumentResponses, WsEditsDocumentErrors, ThrowOnError>({
     requestValidator: async (data) => await zWsEditsDocumentData.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/ws/edits/{documentId}',
+    url: '/ws/documents/{documentId}',
     ...options
 });
 

@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "packages/notopia-api-edit-nestjs-server",
+  "name": "packages/notopia-api-document-nestjs-server",
   "projectType": "library",
   "targets": {
     "lint": {

@@ -3,8 +3,8 @@
 apis:
   note:
     root: ./note/openapi.yaml
-  edit:
-    root: ./edit/openapi.yaml
+  document:
+    root: ./document/openapi.yaml
   common:
     root: ./common/openapi.yaml
     rules:

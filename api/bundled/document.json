@@ -25,15 +25,15 @@
   ],
   "tags": [
     {
-      "name": "edit",
-      "description": "Operations related to editing notes, collaboration."
+      "name": "document",
+      "description": "Operations related to documenting notes, collaboration."
     }
   ],
   "externalDocs": {
     "url": "https://notopia-uit.github.io/notopia"
   },
   "paths": {
-    "/ws/edits/{documentId}": {
+    "/ws/documents/{documentId}": {
       "get": {
         "security": [
           {
@@ -41,11 +41,11 @@
           }
         ],
         "tags": [
-          "edit"
+          "document"
         ],
         "summary": "WebSocket for editing a document",
         "description": "Establish a WebSocket connection for real-time collaborative editing of a document.",
-        "operationId": "wsEditsDocument",
+        "operationId": "wsDocument",
         "parameters": [
           {
             "$ref": "#/components/parameters/documentIdPath"

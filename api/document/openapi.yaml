@@ -21,12 +21,12 @@ info:
     email: kevinnitro@duck.com
 
 tags:
-  - name: edit
-    description: Operations related to editing notes, collaboration.
+  - name: document
+    description: Operations related to documenting notes, collaboration.
 
 paths:
-  /ws/edits/{documentId}:
-    $ref: ./paths/ws_edits_{documentId}.yaml
+  /ws/documents/{documentId}:
+    $ref: ./paths/ws_documents_{documentId}.yaml
 
 components:
   securitySchemes:

@@ -10,7 +10,7 @@
       "path": "./apps/web"
     },
     {
-      "path": "./apps/edit"
+      "path": "./apps/document"
     }
   ]
 }

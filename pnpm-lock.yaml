@@ -304,7 +304,7 @@ importers:
         specifier: ^1.4.2
         version: 1.5.9(encoding@0.1.13)
 
-  apps/edit:
+  apps/document:
     dependencies:
       '@nestjs/common':
         specifier: 'catalog:'
@@ -315,7 +315,7 @@ importers:
       '@nestjs/platform-express':
         specifier: 'catalog:'
         version: 11.1.14(@nestjs/common@11.1.14(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.14)
-      '@notopia/api-edit-nestjs-server':
+      '@notopia/api-document-nestjs-server':
         specifier: 'workspace:'
         version: link:../../packages/notopia-api-edit-nestjs-server
       reflect-metadata:

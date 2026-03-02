@@ -15,9 +15,9 @@
   },
   "tags": [
     {
-      "name": "edit",
-      "description": "Operations related to editing notes, collaboration.",
-      "x-displayName": "edit"
+      "name": "document",
+      "description": "Operations related to documenting notes, collaboration.",
+      "x-displayName": "document"
     },
     {
       "name": "note",
@@ -33,7 +33,7 @@
     "url": "https://notopia-uit.github.io/notopia"
   },
   "paths": {
-    "/ws/edits/{documentId}": {
+    "/ws/documents/{documentId}": {
       "servers": [
         {
           "url": "http://api.notopia.localhost",
@@ -51,10 +51,10 @@
           }
         ],
         "tags": [
-          "edit"
+          "document"
         ],
-        "summary": "WebSocket for editing a document",
-        "description": "Establish a WebSocket connection for real-time collaborative editing of a document.",
+        "summary": "WebSocket for documenting a document",
+        "description": "Establish a WebSocket connection for real-time collaborative documenting of a document.",
         "operationId": "wsEditsDocument",
         "parameters": [
           {
@@ -1111,7 +1111,7 @@
     {
       "name": "Notopia API",
       "tags": [
-        "edit",
+        "document",
         "note",
         "workspace"
       ]

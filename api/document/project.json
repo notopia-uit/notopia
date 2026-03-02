@@ -1,16 +1,16 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "api/edit",
+  "name": "api/document",
   "projectType": "application",
   "tags": ["scope:api", "type:openapi"],
   "targets": {
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle edit --config ../redocly.yaml -o ../bundled/edit.json",
+        "command": "redocly bundle document --config ../redocly.yaml -o ../bundled/document.json",
         "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/../bundled/edit.json"],
+      "outputs": ["{projectRoot}/../bundled/document.json"],
       "inputs": ["openapiFilesWithCommon"]
     },
     "build": {
@@ -19,7 +19,7 @@
     "watch-bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm nx watch --projects=api/edit -- pnpm nx bundle:json \\$NX_PROJECT_NAME",
+        "command": "pnpm nx watch --projects=api/document -- pnpm nx bundle:json \\$NX_PROJECT_NAME",
         "forwardAllArgs": false,
         "cwd": "{projectRoot}"
       },
@@ -37,7 +37,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve ../../bundled/edit.json --port 9082",
+        "command": "scalar document serve ../../bundled/document.json --port 9082",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
@@ -54,7 +54,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly lint edit --config ../redocly.yaml",
+        "command": "redocly lint document --config ../redocly.yaml",
         "cwd": "{projectRoot}"
       },
       "inputs": ["openapiFilesWithCommon"]

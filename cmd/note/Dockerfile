@@ -7,7 +7,7 @@ RUN CGO_ENABLED=0 \
   go build \
   # -ldflags "-s -w -extldflags '-static'" \
   -o note \
-  cmd/note
+  ./cmd/note
 
 FROM alpine:3.23 AS final
 WORKDIR /app

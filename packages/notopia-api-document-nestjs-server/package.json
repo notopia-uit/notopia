@@ -1,5 +1,5 @@
 {
-  "name": "@notopia/api-edit-nestjs-server",
+  "name": "@notopia/api-document-nestjs-server",
   "version": "0.0.0",
   "devDependencies": {
     "@types/node": "catalog:",

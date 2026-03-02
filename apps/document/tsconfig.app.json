@@ -15,7 +15,7 @@
   "exclude": ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"],
   "references": [
     {
-      "path": "../../packages/notopia-api-edit-nestjs-server"
+      "path": "../../packages/notopia-api-document-nestjs-server"
     }
   ]
 }

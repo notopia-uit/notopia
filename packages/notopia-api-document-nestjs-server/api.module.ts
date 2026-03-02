@@ -1,7 +1,7 @@
 import { DynamicModule, Module, Provider } from '@nestjs/common';
 import { ApiImplementations } from './api-implementations'
-import { EditApi } from './api';
-import { EditApiController } from './controllers';
+import { DocumentApi } from './api';
+import { DocumentApiController } from './controllers';
 
 export type ApiModuleConfiguration = {
   /**
@@ -19,8 +19,8 @@ export class ApiModule {
   static forRoot(configuration: ApiModuleConfiguration): DynamicModule {
       const providers: Provider[] = [
         {
-          provide: EditApi,
-          useClass: configuration.apiImplementations.editApi
+          provide: DocumentApi,
+          useClass: configuration.apiImplementations.documentApi
         },
         ...(configuration.providers || []),
       ];
@@ -28,7 +28,7 @@ export class ApiModule {
       return {
         module: ApiModule,
         controllers: [
-          EditApiController,
+          DocumentApiController,
         ],
         providers: [...providers],
         exports: [...providers]

@@ -4,10 +4,10 @@
   "generator-cli": {
     "version": "7.19.0",
     "generators": {
-      "edit-nestjs-server": {
+      "document-nestjs-server": {
         "generatorName": "typescript-nestjs-server",
-        "output": "#{cwd}/../packages/notopia-api-edit-nestjs-server",
-        "glob": "./bundled/edit.json",
+        "output": "#{cwd}/../packages/notopia-api-document-nestjs-server",
+        "glob": "./bundled/document.json",
         "additionalProperties": {
           "stringEnums": "true"
         }

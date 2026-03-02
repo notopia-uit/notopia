@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "edit",
+  "name": "document",
   "projectType": "application",
   "targets": {
     "build": {
@@ -47,15 +47,15 @@
       "defaultConfiguration": "development",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "edit:build",
+        "buildTarget": "document:build",
         "runBuildTargetDependencies": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "edit:build:development"
+          "buildTarget": "document:build:development"
         },
         "production": {
-          "buildTarget": "edit:build:production"
+          "buildTarget": "document:build:production"
         }
       }
     }

@@ -3,10 +3,10 @@ get:
   security:
     - oauth2: []
   tags:
-    - edit
+    - document
   summary: WebSocket for editing a document
   description: Establish a WebSocket connection for real-time collaborative editing of a document.
-  operationId: wsEditsDocument
+  operationId: wsDocument
   parameters:
     - $ref: ../components/parameters/documentIdPath.yaml
   responses:
