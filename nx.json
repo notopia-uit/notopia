@@ -94,10 +94,14 @@
       "plugin": "@nx/docker",
       "options": {
         "buildTarget": {
-          "name": "docker:build"
+          "name": "docker:build",
+          "cwd": "{workspaceRoot}",
+          "args": ["-f", "{projectRoot}/Dockerfile"]
         },
         "runTarget": {
-          "name": "docker:run"
+          "name": "docker:run",
+          "cwd": "{workspaceRoot}",
+          "args": ["-f", "{projectRoot}/Dockerfile"]
         }
       }
     },
