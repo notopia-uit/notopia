@@ -4,7 +4,7 @@ get:
     - oauth2: []
   tags:
     - Document
-  summary: Commit to save document revision
+  summary: Commit document
   operationId: commitDocument
   parameters:
     - $ref: ../components/parameters/documentIdPath.yaml

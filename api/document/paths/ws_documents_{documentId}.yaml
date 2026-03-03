@@ -4,7 +4,7 @@ get:
     - oauth2: []
   tags:
     - Document
-  summary: WebSocket for editing a document
+  summary: WebSocket hocuspocus
   operationId: wsDocument
   parameters:
     - $ref: ../components/parameters/documentIdPath.yaml

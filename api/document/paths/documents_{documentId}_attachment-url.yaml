@@ -4,13 +4,14 @@ get:
     - oauth2: []
   tags:
     - Document
-  summary: Get presigned URL for document attachment upload
-  operationId: getDocumentAttachmentUrl
+  summary: Get document attachment upload url
+  description: Get presigned URL for document attachment upload
+  operationId: getDocumentAttachmentUploadUrl
   parameters:
     - $ref: ../components/parameters/documentIdPath.yaml
   responses:
     200:
-      $ref: ../components/responses/GetDocumentAttachmentUrlResponse.yaml
+      $ref: ../components/responses/GetDocumentAttachmentUploadUrlResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
