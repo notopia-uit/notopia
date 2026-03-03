@@ -154,7 +154,6 @@ jobs:
             --target gen \
             --target bundle \
             --target build \
-            --target docker:build \
             --parallel=4 \
             --base=${{ steps.set-shas.outputs.base }} \
             --head=${{ steps.set-shas.outputs.head }}
@@ -173,6 +172,14 @@ jobs:
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions [Bot]"
+
+      # - name: Nx Docker build
+      #   run: |
+      #     npx nx affected \
+      #       --target docker-build \
+      #       --parallel=5 \
+      #       --base=${{ steps.set-shas.outputs.base }} \
+      #       --head=${{ steps.set-shas.outputs.head }}
 
       # - name: Nx release
       #   env:

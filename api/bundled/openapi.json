@@ -1766,13 +1766,6 @@
             "example": "Meeting Notes",
             "readOnly": true
           },
-          "type": {
-            "type": "string",
-            "enum": [
-              "note"
-            ],
-            "example": "note"
-          },
           "deletedBy": {
             "$ref": "#/components/schemas/TrashedDeletedBy"
           },
@@ -1787,7 +1780,6 @@
         "required": [
           "id",
           "name",
-          "type",
           "deletedBy",
           "deletedAt"
         ]
@@ -1807,13 +1799,6 @@
             "example": "Work Notes",
             "readOnly": true
           },
-          "type": {
-            "type": "string",
-            "enum": [
-              "folder"
-            ],
-            "example": "folder"
-          },
           "deletedBy": {
             "$ref": "#/components/schemas/TrashedDeletedBy"
           },
@@ -1828,7 +1813,6 @@
         "required": [
           "id",
           "name",
-          "type",
           "deletedBy",
           "deletedAt"
         ]
@@ -2013,21 +1997,18 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "array",
-              "items": {
-                "oneOf": [
-                  {
+              "type": "object",
+              "properties": {
+                "notes": {
+                  "type": "array",
+                  "items": {
                     "$ref": "#/components/schemas/TrashedNote"
-                  },
-                  {
-                    "$ref": "#/components/schemas/TrashedFolder"
                   }
-                ],
-                "discriminator": {
-                  "propertyName": "type",
-                  "mapping": {
-                    "note": "#/components/schemas/TrashedNote",
-                    "folder": "#/components/schemas/TrashedFolder"
+                },
+                "folders": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrashedFolder"
                   }
                 }
               }
@@ -2040,21 +2021,18 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "array",
-              "items": {
-                "oneOf": [
-                  {
+              "type": "object",
+              "properties": {
+                "notes": {
+                  "type": "array",
+                  "items": {
                     "$ref": "#/components/schemas/TrashedNote"
-                  },
-                  {
-                    "$ref": "#/components/schemas/TrashedFolder"
                   }
-                ],
-                "discriminator": {
-                  "propertyName": "type",
-                  "mapping": {
-                    "note": "#/components/schemas/TrashedNote",
-                    "folder": "#/components/schemas/TrashedFolder"
+                },
+                "folders": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrashedFolder"
                   }
                 }
               }
@@ -2365,21 +2343,18 @@
               "type": "object",
               "properties": {
                 "data": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
+                  "type": "object",
+                  "properties": {
+                    "notes": {
+                      "type": "array",
+                      "items": {
                         "$ref": "#/components/schemas/TrashedNote"
-                      },
-                      {
-                        "$ref": "#/components/schemas/TrashedFolder"
                       }
-                    ],
-                    "discriminator": {
-                      "propertyName": "type",
-                      "mapping": {
-                        "note": "#/components/schemas/TrashedNote",
-                        "folder": "#/components/schemas/TrashedFolder"
+                    },
+                    "folders": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TrashedFolder"
                       }
                     }
                   }
