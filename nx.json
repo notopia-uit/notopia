@@ -127,8 +127,7 @@
       "registryUrl": "https://ghcr.io"
     },
     "version": {
-      "conventionalCommits": true,
-      "fallbackCurrentVersionResolver": "disk"
+      "conventionalCommits": true
     },
     "changelog": {
       "workspaceChangelog": {
