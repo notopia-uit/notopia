@@ -1,39 +1,4 @@
 # vim: ft=yaml.openapi
-get:
-  security:
-    - oauth2: []
-  tags:
-    - Note
-  summary: List notes
-  operationId: listNotes
-  parameters:
-    - $ref: ../../common/components/parameters/pageQuery.yaml
-    - $ref: ../../common/components/parameters/limitQuery.yaml
-    - $ref: ../../common/components/parameters/orderQuery.yaml
-    - name: sortBy
-      in: query
-      description: Field to sort by
-      schema:
-        type: string
-        enum: [createdAt, updatedAt, title]
-        default: createdAt
-      example: createdAt
-    - name: search
-      in: query
-      description: Search notes by title or content
-      schema:
-        type: string
-      example: meeting notes
-  responses:
-    200:
-      $ref: ../components/responses/ListNotesResponse.yaml
-    400:
-      $ref: ../../common/components/responses/BadRequestError.yaml
-    401:
-      $ref: ../../common/components/responses/UnauthorizedError.yaml
-    500:
-      $ref: ../../common/components/responses/InternalServerError.yaml
-
 post:
   security:
     - oauth2: []

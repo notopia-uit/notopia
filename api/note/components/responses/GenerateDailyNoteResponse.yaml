@@ -1,0 +1,7 @@
+# vim: ft=yaml.openapi
+description: Daily note generated successfully
+headers:
+  Content-Location:
+    schema:
+      type: string
+      format: uri

@@ -4,7 +4,7 @@ post:
     - oauth2: []
   tags:
     - Folder
-  summary: Create a folder
+  summary: Create folder
   operationId: createFolder
   requestBody:
     $ref: ../components/requestBodies/CreateFolderRequest.yaml

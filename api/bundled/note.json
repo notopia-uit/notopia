@@ -25,8 +25,16 @@
   ],
   "tags": [
     {
-      "name": "note",
-      "description": "Operations related to notes management"
+      "name": "Workspace",
+      "description": "Workspace"
+    },
+    {
+      "name": "Folder",
+      "description": "Workspace -> Folder"
+    },
+    {
+      "name": "Note",
+      "description": "Workspace -> (Folder) -> Note"
     }
   ],
   "externalDocs": {
@@ -34,67 +42,6 @@
   },
   "paths": {
     "/note/notes": {
-      "get": {
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
-        "tags": [
-          "Note"
-        ],
-        "summary": "List notes",
-        "operationId": "listNotes",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/pageQuery"
-          },
-          {
-            "$ref": "#/components/parameters/limitQuery"
-          },
-          {
-            "$ref": "#/components/parameters/orderQuery"
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "description": "Field to sort by",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "createdAt",
-                "updatedAt",
-                "title"
-              ],
-              "default": "createdAt"
-            },
-            "example": "createdAt"
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "description": "Search notes by title or content",
-            "schema": {
-              "type": "string"
-            },
-            "example": "meeting notes"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/ListNotesResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      },
       "post": {
         "security": [
           {
@@ -118,6 +65,40 @@
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/notes/generate-daily": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Generate daily note",
+        "operationId": "generateDailyNote",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/GenerateDailyNoteRequest"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/GenerateDailyNoteResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -201,6 +182,45 @@
         }
       }
     },
+    "/note/notes/{noteId}/rename": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Rename note",
+        "operationId": "renameNote",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/noteIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RenameNoteRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Note renamed successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/notes/{noteId}/publish": {
       "post": {
         "security": [
@@ -211,7 +231,7 @@
         "tags": [
           "Note"
         ],
-        "summary": "Publish a note",
+        "summary": "Publish note",
         "operationId": "publishNote",
         "parameters": [
           {
@@ -247,7 +267,7 @@
         "tags": [
           "Note"
         ],
-        "summary": "Unpublish a note",
+        "summary": "Unpublish note",
         "operationId": "unpublishNote",
         "parameters": [
           {
@@ -283,7 +303,7 @@
         "tags": [
           "Workspace"
         ],
-        "summary": "Create a workspace",
+        "summary": "Create workspace",
         "operationId": "createWorkspace",
         "requestBody": {
           "$ref": "#/components/requestBodies/CreateWorkspaceRequest"
@@ -384,7 +404,7 @@
         "tags": [
           "Workspace"
         ],
-        "summary": "Rename a workspace",
+        "summary": "Rename workspace",
         "operationId": "renameWorkspace",
         "parameters": [
           {
@@ -396,7 +416,7 @@
         },
         "responses": {
           "204": {
-            "description": "No Content - Workspace renamed successfully."
+            "description": "Workspace renamed successfully"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -423,7 +443,7 @@
         "tags": [
           "Workspace"
         ],
-        "summary": "Publish a workspace",
+        "summary": "Publish workspace",
         "operationId": "publishWorkspace",
         "parameters": [
           {
@@ -459,7 +479,7 @@
         "tags": [
           "Workspace"
         ],
-        "summary": "Unpublish a workspace",
+        "summary": "Unpublish workspace",
         "operationId": "unpublishWorkspace",
         "parameters": [
           {
@@ -528,7 +548,7 @@
         "tags": [
           "Folder"
         ],
-        "summary": "Create a folder",
+        "summary": "Create folder",
         "operationId": "createFolder",
         "requestBody": {
           "$ref": "#/components/requestBodies/CreateFolderRequest"
@@ -559,7 +579,7 @@
         "tags": [
           "Folder"
         ],
-        "summary": "Rename a folder",
+        "summary": "Rename folder",
         "operationId": "renameFolder",
         "parameters": [
           {
@@ -610,76 +630,36 @@
         }
       }
     },
-    "parameters": {
-      "pageQuery": {
-        "name": "page",
-        "in": "query",
-        "description": "Page number for pagination",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 1
-        },
-        "example": 1
-      },
-      "limitQuery": {
-        "name": "limit",
-        "in": "query",
-        "description": "Number of items per page",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 100,
-          "default": 20
-        },
-        "example": 20
-      },
-      "orderQuery": {
-        "name": "order",
-        "in": "query",
-        "description": "Sort order",
-        "schema": {
-          "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ],
-          "default": "desc",
-          "example": "desc"
-        }
-      },
-      "noteIdPath": {
-        "name": "noteId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-      },
-      "workspaceIdPath": {
-        "name": "workspaceId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "550e8400-e29b-41d4-a716-446655440000"
-        }
-      },
-      "folderIdPath": {
-        "name": "folderId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "6306e1ce-c6d9-4fdd-b8e8-c3fbef22c0d9"
-        }
-      }
-    },
     "schemas": {
+      "Revision": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Initial Draft"
+          },
+          "blockNoteContent": {
+            "type": "string",
+            "nullable": true,
+            "example": "../examples/BlockNoteContent.json"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-01T12:00:00Z",
+            "readOnly": true
+          }
+        }
+      },
       "Note": {
         "type": "object",
         "properties": {
@@ -689,11 +669,27 @@
             "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
             "readOnly": true
           },
-          "title": {
+          "name": {
             "type": "string",
             "minLength": 1,
             "maxLength": 255,
             "example": "Meeting Notes"
+          },
+          "folderId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "currentRevision": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Revision"
+              },
+              {
+                "type": "object",
+                "readOnly": true
+              }
+            ]
           },
           "deletedBy": {
             "type": "string",
@@ -714,52 +710,54 @@
           }
         }
       },
-      "Pagination": {
+      "RevisionRequired": {
         "type": "object",
-        "properties": {
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "minimum": 1,
-            "example": 1
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Revision"
           },
-          "limit": {
-            "type": "integer",
-            "description": "Number of items per page",
-            "minimum": 1,
-            "maximum": 100,
-            "example": 20
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total number of items",
-            "minimum": 0,
-            "example": 100
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number of pages",
-            "minimum": 0,
-            "example": 5
-          },
-          "hasNext": {
-            "type": "boolean",
-            "description": "Whether there is a next page",
-            "example": true
-          },
-          "hasPrev": {
-            "type": "boolean",
-            "description": "Whether there is a previous page",
-            "example": false
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "content",
+              "createdAt"
+            ]
           }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total",
-          "totalPages",
-          "hasNext",
-          "hasPrev"
+        ]
+      },
+      "NoteRequired": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Note"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "currentRevision": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RevisionRequired"
+                  },
+                  {
+                    "type": "object",
+                    "readOnly": true
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "folderId",
+              "tags",
+              "currentRevision",
+              "deletedBy",
+              "deletedAt"
+            ]
+          }
         ]
       },
       "Error": {
@@ -786,22 +784,17 @@
           "message"
         ]
       },
-      "NoteRequired": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Note"
-          },
-          {
-            "type": "object",
-            "required": [
-              "id",
-              "title",
-              "deletedBy",
-              "deletedAt"
-            ]
-          }
-        ]
+      "id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "550e8400-e29b-41d4-a716-446655440000",
+        "readOnly": true
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Meeting Notes"
       },
       "Workspace": {
         "type": "object",
@@ -928,6 +921,12 @@
             ]
           }
         ]
+      },
+      "properties-name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "My Workspace"
       },
       "NoteMovedEvent": {
         "type": "object",
@@ -1088,65 +1087,125 @@
           "type",
           "data"
         ]
+      },
+      "Folder_properties-name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Work Notes"
       }
     },
-    "responses": {
-      "ListNotesResponse": {
-        "description": "Successful response",
+    "requestBodies": {
+      "CreateNoteRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/NoteRequired"
+            }
+          }
+        }
+      },
+      "GenerateDailyNoteRequest": {
+        "required": true,
         "content": {
           "application/json": {
             "schema": {
               "type": "object",
               "properties": {
-                "data": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Note"
-                  },
-                  "x-example": [
-                    {
-                      "id": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-                      "title": "Meeting Notes",
-                      "createdAt": "2026-01-11T10:30:00Z",
-                      "updatedAt": "2026-01-11T14:45:00Z"
-                    },
-                    {
-                      "id": "afe66e33-2cf0-43da-a9a7-a62fca939e87",
-                      "title": "Project Ideas",
-                      "createdAt": "2026-01-10T09:15:00Z",
-                      "updatedAt": "2026-01-10T09:15:00Z"
-                    },
-                    {
-                      "id": "d6942438-d381-4506-a984-5c28e20d9664",
-                      "title": "Shopping List",
-                      "createdAt": "2026-01-09T18:20:00Z",
-                      "updatedAt": "2026-01-11T08:00:00Z"
-                    }
-                  ]
-                },
-                "pagination": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Pagination"
-                    },
-                    {
-                      "description": "Pagination details for the list of notes",
-                      "example": {
-                        "page": 1,
-                        "limit": 20,
-                        "total": 3,
-                        "totalPages": 1,
-                        "hasNext": false,
-                        "hasPrev": false
-                      }
-                    }
-                  ]
+                "workspaceId": {
+                  "$ref": "#/components/schemas/id"
                 }
               },
               "required": [
-                "data",
-                "pagination"
+                "workspaceId"
               ]
+            }
+          }
+        }
+      },
+      "RenameNoteRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/name"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      },
+      "CreateWorkspaceRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/WorkspaceRequired"
+            }
+          }
+        }
+      },
+      "RenameWorkspaceRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/properties-name"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      },
+      "CreateFolderRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/FolderRequired"
+            }
+          }
+        }
+      },
+      "RenameFolderRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/Folder_properties-name"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "CreateNoteResponse": {
+        "description": "Note successfully created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Note"
             }
           }
         }
@@ -1196,61 +1255,13 @@
           }
         }
       },
-      "CreateNoteResponse": {
-        "description": "Note successfully created",
-        "content": {
-          "application/json": {
+      "GenerateDailyNoteResponse": {
+        "description": "Daily note generated successfully",
+        "headers": {
+          "Content-Location": {
             "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Note"
-                },
-                {
-                  "example": {
-                    "id": "123e4567-e89b-12d3-a456-426614174000",
-                    "title": "Meeting Notes",
-                    "createdAt": "2026-01-11T10:30:00Z",
-                    "updatedAt": "2026-01-11T10:30:00Z"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "GetNoteResponse": {
-        "description": "Successful response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/NoteRequired"
-                },
-                {
-                  "example": {
-                    "id": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-                    "title": "Meeting Notes",
-                    "createdAt": "2026-01-11T10:30:00Z",
-                    "updatedAt": "2026-01-11T14:45:00Z"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "ForbiddenError": {
-        "description": "Forbidden Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "FORBIDDEN",
-              "message": "You do not have permission to access this resource",
-              "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
+              "type": "string",
+              "format": "uri"
             }
           }
         }
@@ -1270,13 +1281,39 @@
           }
         }
       },
+      "GetNoteResponse": {
+        "description": "Successful response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/NoteRequired"
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Forbidden Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "FORBIDDEN",
+              "message": "You do not have permission to access this resource",
+              "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
+            }
+          }
+        }
+      },
       "CreateWorkspaceResponse": {
         "description": "Workspace successfully created",
         "headers": {
           "Content-Location": {
             "schema": {
               "type": "string",
-              "format": "uri"
+              "format": "uri",
+              "example": "http://api.notopia.localhost/workspaces/550e8400-e29b-41d4-a716-446655440000"
             }
           }
         }
@@ -1350,63 +1387,35 @@
         }
       }
     },
-    "requestBodies": {
-      "CreateNoteRequest": {
+    "parameters": {
+      "noteIdPath": {
+        "name": "noteId",
+        "in": "path",
         "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/NoteRequired"
-            }
-          }
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+      },
+      "workspaceIdPath": {
+        "name": "workspaceId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
         }
       },
-      "CreateWorkspaceRequest": {
+      "folderIdPath": {
+        "name": "folderId",
+        "in": "path",
         "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/WorkspaceRequired"
-            }
-          }
-        }
-      },
-      "RenameWorkspaceRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/WorkspaceRequired"
-            }
-          }
-        }
-      },
-      "CreateFolderRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/FolderRequired"
-            }
-          }
-        }
-      },
-      "RenameFolderRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 255,
-                  "example": "Learning Notes"
-                }
-              }
-            }
-          }
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "6306e1ce-c6d9-4fdd-b8e8-c3fbef22c0d9"
         }
       }
     }

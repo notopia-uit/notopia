@@ -4,7 +4,7 @@ post:
     - oauth2: []
   tags:
     - Workspace
-  summary: Rename a workspace
+  summary: Rename workspace
   operationId: renameWorkspace
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
@@ -12,7 +12,7 @@ post:
     $ref: ../components/requestBodies/RenameWorkspaceRequest.yaml
   responses:
     204:
-      description: No Content - Workspace renamed successfully.
+      description: Workspace renamed successfully
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

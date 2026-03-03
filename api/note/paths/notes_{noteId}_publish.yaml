@@ -4,7 +4,7 @@ post:
     - oauth2: []
   tags:
     - Note
-  summary: Publish a note
+  summary: Publish note
   operationId: publishNote
   parameters:
     - $ref: ../components/parameters/noteIdPath.yaml

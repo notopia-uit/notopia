@@ -1,0 +1,12 @@
+# vim: ft=yaml.openapi
+
+type: object
+
+allOf:
+  - $ref: ../schemas/Revision.yaml
+  - type: object
+    required:
+      - id
+      - name
+      - content
+      - createdAt

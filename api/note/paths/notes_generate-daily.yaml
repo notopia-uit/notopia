@@ -4,13 +4,13 @@ post:
     - oauth2: []
   tags:
     - Note
-  summary: Unpublish note
-  operationId: unpublishNote
-  parameters:
-    - $ref: ../components/parameters/noteIdPath.yaml
+  summary: Generate daily note
+  operationId: generateDailyNote
+  requestBody:
+    $ref: ../components/requestBodies/GenerateDailyNoteRequest.yaml
   responses:
-    204:
-      description: Note unpublished successfully
+    201:
+      $ref: ../components/responses/GenerateDailyNoteResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

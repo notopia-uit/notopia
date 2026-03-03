@@ -4,7 +4,7 @@ post:
     - oauth2: []
   tags:
     - Folder
-  summary: Rename a folder
+  summary: Rename folder
   operationId: renameFolder
   parameters:
     - $ref: ../components/parameters/folderIdPath.yaml

@@ -4,8 +4,17 @@ type: object
 allOf:
   - $ref: ./Note.yaml
   - type: object
+    properties:
+      currentRevision:
+        allOf:
+          - $ref: ./RevisionRequired.yaml
+          - type: object
+            readOnly: true
     required:
       - id
       - title
+      - folderId
+      - tags
+      - currentRevision
       - deletedBy
       - deletedAt

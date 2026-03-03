@@ -6,6 +6,6 @@ content:
       type: object
       properties:
         name:
-          $ref: ../schemas/Workspace.yaml#/properties/name
+          $ref: ../schemas/Note.yaml#/properties/name
       required:
         - name

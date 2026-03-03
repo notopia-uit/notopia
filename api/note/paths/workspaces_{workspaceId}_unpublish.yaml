@@ -4,7 +4,7 @@ post:
     - oauth2: []
   tags:
     - Workspace
-  summary: Unpublish a workspace
+  summary: Unpublish workspace
   operationId: unpublishWorkspace
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml

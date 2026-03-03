@@ -1,16 +1,18 @@
-# vim: ft=yaml.openapi
+# vim:ft=yaml.openapi
 post:
   security:
     - oauth2: []
   tags:
     - Note
-  summary: Unpublish note
-  operationId: unpublishNote
+  summary: Rename note
+  operationId: renameNote
   parameters:
     - $ref: ../components/parameters/noteIdPath.yaml
+  requestBody:
+    $ref: ../components/requestBodies/RenameNoteRequest.yaml
   responses:
     204:
-      description: Note unpublished successfully
+      description: Note renamed successfully
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

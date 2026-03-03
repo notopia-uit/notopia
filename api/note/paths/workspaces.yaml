@@ -4,7 +4,7 @@ post:
     - oauth2: []
   tags:
     - Workspace
-  summary: Create a workspace
+  summary: Create workspace
   operationId: createWorkspace
   requestBody:
     $ref: ../components/requestBodies/CreateWorkspaceRequest.yaml

@@ -1,0 +1,27 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  id:
+    type: string
+    format: uuid
+    example: ce5060da-b15c-4aee-898f-5449fafacfc4
+    readOnly: true
+
+  name:
+    type: string
+    nullable: true
+    minLength: 1
+    maxLength: 255
+    example: Initial Draft
+
+  blockNoteContent:
+    type: string
+    nullable: true
+    example: ../examples/BlockNoteContent.json
+
+  createdAt:
+    type: string
+    format: date-time
+    example: 2024-01-01T12:00:00Z
+    readOnly: true

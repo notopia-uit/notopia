@@ -21,14 +21,22 @@ info:
     email: kevinnitro@duck.com
 
 tags:
-  - name: note
-    description: Operations related to notes management
+  - name: Workspace
+    description: Workspace
+  - name: Folder
+    description: Workspace -> Folder
+  - name: Note
+    description: Workspace -> (Folder) -> Note
 
 paths:
   /note/notes:
     $ref: ./paths/notes.yaml
+  /note/notes/generate-daily:
+    $ref: ./paths/notes_generate-daily.yaml
   /note/notes/{noteId}:
     $ref: ./paths/notes_{noteId}.yaml
+  /note/notes/{noteId}/rename:
+    $ref: ./paths/notes_{noteId}_rename.yaml
   /note/notes/{noteId}/publish:
     $ref: ./paths/notes_{noteId}_publish.yaml
   /note/notes/{noteId}/unpublish:

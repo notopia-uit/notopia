@@ -8,11 +8,22 @@ properties:
     example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
     readOnly: true
 
-  title:
+  name:
     type: string
     minLength: 1
     maxLength: 255
     example: Meeting Notes
+
+  folderId:
+    type: string
+    format: uuid
+    example: 123e4567-e89b-12d3-a456-426614174000
+
+  currentRevision:
+    allOf:
+      - $ref: ./Revision.yaml
+      - type: object
+        readOnly: true
 
   deletedBy:
     type: string
