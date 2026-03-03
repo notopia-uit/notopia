@@ -196,6 +196,8 @@ export type DocumentIdPath = string;
 
 export type NoteIdPath = string;
 
+export type NoteIdQuery = string;
+
 /**
  * Page number for pagination
  */
@@ -235,7 +237,7 @@ export type RenameNoteRequest = {
     name: Name;
 };
 
-export type RenameNoteRevisionRequest = {
+export type RenameRevisionRequest = {
     name: PropertiesName;
 };
 
@@ -678,188 +680,6 @@ export type RenameNoteResponses = {
 
 export type RenameNoteResponse = RenameNoteResponses[keyof RenameNoteResponses];
 
-export type GetNoteRevisionsData = {
-    body?: never;
-    path: {
-        noteId: string;
-    };
-    query?: {
-        /**
-         * Page number for pagination
-         */
-        page?: number;
-        /**
-         * Number of items per page
-         */
-        limit?: number;
-    };
-    url: '/note/notes/{noteId}/revisions';
-};
-
-export type GetNoteRevisionsErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: Error;
-    /**
-     * Unauthorized Error response
-     */
-    401: Error;
-    /**
-     * Not Found Error response
-     */
-    404: Error;
-    /**
-     * Internal Server Error response
-     */
-    500: Error;
-};
-
-export type GetNoteRevisionsError = GetNoteRevisionsErrors[keyof GetNoteRevisionsErrors];
-
-export type GetNoteRevisionsResponses = {
-    /**
-     * Note revisions
-     */
-    200: {
-        data: Array<Revision>;
-        pagination: Pagination;
-    };
-};
-
-export type GetNoteRevisionsResponse = GetNoteRevisionsResponses[keyof GetNoteRevisionsResponses];
-
-export type RenameNoteRevisionData = {
-    body: RenameNoteRevisionRequest;
-    path: {
-        noteId: string;
-        revisionId: string;
-    };
-    query?: never;
-    url: '/note/notes/{noteId}/revisions/{revisionId}/rename';
-};
-
-export type RenameNoteRevisionErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: Error;
-    /**
-     * Unauthorized Error response
-     */
-    401: Error;
-    /**
-     * Not Found Error response
-     */
-    404: Error;
-    /**
-     * Internal Server Error response
-     */
-    500: Error;
-};
-
-export type RenameNoteRevisionError = RenameNoteRevisionErrors[keyof RenameNoteRevisionErrors];
-
-export type RenameNoteRevisionResponses = {
-    /**
-     * Note revisions
-     */
-    200: {
-        data: Array<Revision>;
-        pagination: Pagination;
-    };
-};
-
-export type RenameNoteRevisionResponse = RenameNoteRevisionResponses[keyof RenameNoteRevisionResponses];
-
-export type DeleteNoteRevisionData = {
-    body?: never;
-    path: {
-        noteId: string;
-        revisionId: string;
-    };
-    query?: never;
-    url: '/note/notes/{noteId}/revisions/{revisionId}';
-};
-
-export type DeleteNoteRevisionErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: Error;
-    /**
-     * Unauthorized Error response
-     */
-    401: Error;
-    /**
-     * Forbidden Error response
-     */
-    403: Error;
-    /**
-     * Not Found Error response
-     */
-    404: Error;
-    /**
-     * Internal Server Error response
-     */
-    500: Error;
-};
-
-export type DeleteNoteRevisionError = DeleteNoteRevisionErrors[keyof DeleteNoteRevisionErrors];
-
-export type DeleteNoteRevisionResponses = {
-    /**
-     * Revision deleted successfully
-     */
-    204: void;
-};
-
-export type DeleteNoteRevisionResponse = DeleteNoteRevisionResponses[keyof DeleteNoteRevisionResponses];
-
-export type GetNoteRevisionData = {
-    body?: never;
-    path: {
-        noteId: string;
-        revisionId: string;
-    };
-    query?: never;
-    url: '/note/notes/{noteId}/revisions/{revisionId}';
-};
-
-export type GetNoteRevisionErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: Error;
-    /**
-     * Unauthorized Error response
-     */
-    401: Error;
-    /**
-     * Forbidden Error response
-     */
-    403: Error;
-    /**
-     * Not Found Error response
-     */
-    404: Error;
-    /**
-     * Internal Server Error response
-     */
-    500: Error;
-};
-
-export type GetNoteRevisionError = GetNoteRevisionErrors[keyof GetNoteRevisionErrors];
-
-export type GetNoteRevisionResponses = {
-    /**
-     * Note revision detail
-     */
-    200: Revision;
-};
-
-export type GetNoteRevisionResponse = GetNoteRevisionResponses[keyof GetNoteRevisionResponses];
-
 export type UnpublishNoteData = {
     body?: never;
     path: {
@@ -898,6 +718,181 @@ export type UnpublishNoteResponses = {
 };
 
 export type UnpublishNoteResponse = UnpublishNoteResponses[keyof UnpublishNoteResponses];
+
+export type GetRevisionsData = {
+    body?: never;
+    path?: never;
+    query: {
+        noteId: string;
+        /**
+         * Page number for pagination
+         */
+        page?: number;
+        /**
+         * Number of items per page
+         */
+        limit?: number;
+    };
+    url: '/note/revisions';
+};
+
+export type GetRevisionsErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: Error;
+    /**
+     * Unauthorized Error response
+     */
+    401: Error;
+    /**
+     * Not Found Error response
+     */
+    404: Error;
+    /**
+     * Internal Server Error response
+     */
+    500: Error;
+};
+
+export type GetRevisionsError = GetRevisionsErrors[keyof GetRevisionsErrors];
+
+export type GetRevisionsResponses = {
+    /**
+     * Revisions
+     */
+    200: {
+        data: Array<Revision>;
+        pagination: Pagination;
+    };
+};
+
+export type GetRevisionsResponse = GetRevisionsResponses[keyof GetRevisionsResponses];
+
+export type RenameRevisionData = {
+    body: RenameRevisionRequest;
+    path: {
+        revisionId: string;
+    };
+    query?: never;
+    url: '/note/revisions/{revisionId}/rename';
+};
+
+export type RenameRevisionErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: Error;
+    /**
+     * Unauthorized Error response
+     */
+    401: Error;
+    /**
+     * Not Found Error response
+     */
+    404: Error;
+    /**
+     * Internal Server Error response
+     */
+    500: Error;
+};
+
+export type RenameRevisionError = RenameRevisionErrors[keyof RenameRevisionErrors];
+
+export type RenameRevisionResponses = {
+    /**
+     * Revision renamed successfully
+     */
+    204: void;
+};
+
+export type RenameRevisionResponse = RenameRevisionResponses[keyof RenameRevisionResponses];
+
+export type DeleteRevisionData = {
+    body?: never;
+    path: {
+        revisionId: string;
+    };
+    query?: never;
+    url: '/note/revisions/{revisionId}';
+};
+
+export type DeleteRevisionErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: Error;
+    /**
+     * Unauthorized Error response
+     */
+    401: Error;
+    /**
+     * Forbidden Error response
+     */
+    403: Error;
+    /**
+     * Not Found Error response
+     */
+    404: Error;
+    /**
+     * Internal Server Error response
+     */
+    500: Error;
+};
+
+export type DeleteRevisionError = DeleteRevisionErrors[keyof DeleteRevisionErrors];
+
+export type DeleteRevisionResponses = {
+    /**
+     * Revision deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteRevisionResponse = DeleteRevisionResponses[keyof DeleteRevisionResponses];
+
+export type GetRevisionData = {
+    body?: never;
+    path: {
+        revisionId: string;
+    };
+    query?: never;
+    url: '/note/revisions/{revisionId}';
+};
+
+export type GetRevisionErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: Error;
+    /**
+     * Unauthorized Error response
+     */
+    401: Error;
+    /**
+     * Forbidden Error response
+     */
+    403: Error;
+    /**
+     * Not Found Error response
+     */
+    404: Error;
+    /**
+     * Internal Server Error response
+     */
+    500: Error;
+};
+
+export type GetRevisionError = GetRevisionErrors[keyof GetRevisionErrors];
+
+export type GetRevisionResponses = {
+    /**
+     * Revision detail
+     */
+    200: Revision;
+};
+
+export type GetRevisionResponse = GetRevisionResponses[keyof GetRevisionResponses];
 
 export type CreateWorkspaceData = {
     body: CreateWorkspaceRequest;

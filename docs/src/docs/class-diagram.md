@@ -102,28 +102,16 @@ package "Note" <<Bounded Context>> {
                 Save(workspace *Workspace)
             }
 
-            package "Folder" as Note.Domain.Repos.Folder {
-                struct "Options" as Note.Domain.Repos.Folder.Options {
-                    OverDays: *int
-                }
-
-                interface "Folder" as Note.Domain.Repos.Folder.Folder {
-                    GetByID(folderID uuid.UUID) *Folder
-                    Save(folder *Folder)
-                    GetTrashedByWorkspaceID(workspaceID uuid.UUID, options *Options) []*Folder
-                }
+            interface "Folder" as Note.Domain.Repos.Folder {
+                GetByID(folderID uuid.UUID) *Folder
+                Save(folder *Folder)
+                GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []*Folder
             }
 
-            package "Note" as Note.Domain.Repos.Note {
-                struct "Options" as Note.Domain.Repos.Note.Options {
-                    OverDays: *int
-                }
-
-                interface "Note" as Note.Domain.Repos.Note.Note {
-                    GetByID(noteID uuid.UUID) *Note
-                    Save(note *Note)
-                    GetTrashedByWorkspaceID(workspaceID uuid.UUID, options *Options) []*Note
-                }
+            interface "Note" as Note.Domain.Repos.Note {
+                GetByID(noteID uuid.UUID) *Note
+                Save(note *Note)
+                GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []*Note
             }
 
             interface "Revision" as Note.Domain.Repos.Revision {

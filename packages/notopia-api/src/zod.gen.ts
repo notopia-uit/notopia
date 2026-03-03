@@ -202,6 +202,8 @@ export const zDocumentIdPath = z.uuid();
 
 export const zNoteIdPath = z.uuid();
 
+export const zNoteIdQuery = z.uuid();
+
 /**
  * Page number for pagination
  */
@@ -239,7 +241,7 @@ export const zRenameNoteRequest = z.object({
     name: zName
 });
 
-export const zRenameNoteRevisionRequest = z.object({
+export const zRenameRevisionRequest = z.object({
     name: zPropertiesName
 });
 
@@ -375,70 +377,6 @@ export const zRenameNoteData = z.object({
  */
 export const zRenameNoteResponse = z.void();
 
-export const zGetNoteRevisionsData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        noteId: z.uuid()
-    }),
-    query: z.optional(z.object({
-        page: z.optional(z.int().gte(1)).default(1),
-        limit: z.optional(z.int().gte(1).lte(100)).default(20)
-    }))
-});
-
-/**
- * Note revisions
- */
-export const zGetNoteRevisionsResponse = z.object({
-    data: z.array(zRevision),
-    pagination: zPagination
-});
-
-export const zRenameNoteRevisionData = z.object({
-    body: zRenameNoteRevisionRequest,
-    path: z.object({
-        noteId: z.uuid(),
-        revisionId: z.uuid()
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Note revisions
- */
-export const zRenameNoteRevisionResponse = z.object({
-    data: z.array(zRevision),
-    pagination: zPagination
-});
-
-export const zDeleteNoteRevisionData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        noteId: z.uuid(),
-        revisionId: z.uuid()
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Revision deleted successfully
- */
-export const zDeleteNoteRevisionResponse = z.void();
-
-export const zGetNoteRevisionData = z.object({
-    body: z.optional(z.never()),
-    path: z.object({
-        noteId: z.uuid(),
-        revisionId: z.uuid()
-    }),
-    query: z.optional(z.never())
-});
-
-/**
- * Note revision detail
- */
-export const zGetNoteRevisionResponse = zRevision;
-
 export const zUnpublishNoteData = z.object({
     body: z.optional(z.never()),
     path: z.object({
@@ -451,6 +389,63 @@ export const zUnpublishNoteData = z.object({
  * Note unpublished successfully
  */
 export const zUnpublishNoteResponse = z.void();
+
+export const zGetRevisionsData = z.object({
+    body: z.optional(z.never()),
+    path: z.optional(z.never()),
+    query: z.object({
+        noteId: z.uuid(),
+        page: z.optional(z.int().gte(1)).default(1),
+        limit: z.optional(z.int().gte(1).lte(100)).default(20)
+    })
+});
+
+/**
+ * Revisions
+ */
+export const zGetRevisionsResponse = z.object({
+    data: z.array(zRevision),
+    pagination: zPagination
+});
+
+export const zRenameRevisionData = z.object({
+    body: zRenameRevisionRequest,
+    path: z.object({
+        revisionId: z.uuid()
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Revision renamed successfully
+ */
+export const zRenameRevisionResponse = z.void();
+
+export const zDeleteRevisionData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        revisionId: z.uuid()
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Revision deleted successfully
+ */
+export const zDeleteRevisionResponse = z.void();
+
+export const zGetRevisionData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        revisionId: z.uuid()
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Revision detail
+ */
+export const zGetRevisionResponse = zRevision;
 
 export const zCreateWorkspaceData = z.object({
     body: zCreateWorkspaceRequest,
