@@ -68,7 +68,7 @@
         "command": "pnpm exec openapi-ts",
         "cwd": "{projectRoot}"
       },
-      "dependsOn": ["bundle"]
+      "dependsOn": ["join"]
     },
     "gen:document-nestjs-server": {
       "outputs": [

@@ -464,7 +464,15 @@ export type RenameFolderResponse = RenameFolderResponses[keyof RenameFolderRespo
 export type GetGraphData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        noteIds?: Array<string>;
+        folderIds?: Array<string>;
+        depth?: number;
+        /**
+         * Include node that are not connected to any other node
+         */
+        orphan?: boolean;
+    };
     url: '/note/graph';
 };
 

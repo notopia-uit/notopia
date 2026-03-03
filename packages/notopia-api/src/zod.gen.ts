@@ -329,7 +329,12 @@ export const zRenameFolderResponse = z.void();
 export const zGetGraphData = z.object({
     body: z.optional(z.never()),
     path: z.optional(z.never()),
-    query: z.optional(z.never())
+    query: z.optional(z.object({
+        noteIds: z.optional(z.array(z.uuid())),
+        folderIds: z.optional(z.array(z.uuid())),
+        depth: z.optional(z.int().gte(1).lte(500)).default(3),
+        orphan: z.optional(z.boolean()).default(false)
+    }))
 });
 
 /**
