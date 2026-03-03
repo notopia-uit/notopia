@@ -9,13 +9,30 @@ skinparam packageStyle rectangle
 /' skinparam linetype ortho '/
 /' skinparam linetype polyline '/
 
-package "Document" {
-    class "Document" as Document.Document {
-        name: string
-        data: []byte
+'Sytax of typescript'
+package "Document" <<Bounded Context>> {
+    entity "DocumentEntity" as Document.DocumentEntity {
+        name: String
+        data: Buffer
+    }
+
+    class "DocumentModel" as Document.DocumentModel {
+        name: String
+        data: BlockNoteSchema[]
+    }
+
+    interface "DocumentRepo" as Document.DocumentRepo {
+        Save(document Document)
+        GetByID(documentID string) Document
+    }
+
+    interface "DocumentService" as Document.DocumentService {
+        CreateDocument(name string, data Buffer) Document
+        GetDocument(documentID string) Document
     }
 }
 
+'Syntax of golang'
 package "Note" <<Bounded Context>> {
     package "Domain" as Note.Domain <<Frame>> {
         enum "WorkspaceRole" as Note.Domain.WorkspaceRole {
