@@ -9,153 +9,113 @@ skinparam packageStyle rectangle
 /' skinparam linetype ortho '/
 /' skinparam linetype polyline '/
 
-package "AuthorizationServer" {
-    class "User" as AuthorizationServer.User {
-        id: uuid
-        username: string
-        email: string
-    }
-}
-
-package "EditService" {
-    class "Document" as EditService.Document {
+package "Document" {
+    class "Document" as Document.Document {
         name: string
         data: []byte
     }
 }
 
-package "NoteService" {
-    package "Domain" as NoteService.Domain <<Frame>> {
-        struct "UserID" as NoteService.Domain.UserID <<Type>> {
-            uuid.UUID
+package "Note" <<Bounded Context>> {
+    package "Domain" as Note.Domain <<Frame>> {
+        enum "WorkspaceRole" as Note.Domain.WorkspaceRole {
+            OWNER
+            EDITOR
+            VIEWER
         }
 
-        struct "WorkspaceID" as NoteService.Domain.WorkspaceID <<Type>> {
-            uuid.UUID
+        enum "DeletedBy" as Note.Domain.DeletedBy {
+            PURPOSE
+            PARENT
         }
 
-        struct "FolderID" as NoteService.Domain.FolderID <<Type>> {
-            uuid.UUID
-        }
-
-        struct "NoteID" as NoteService.Domain.NoteID <<Type>> {
-            uuid.UUID
-        }
-
-        struct "TagID" as NoteService.Domain.TagID <<Type>> {
-            uuid.UUID
-        }
-
-        struct "NoteHistoryID" as NoteService.Domain.NoteHistoryID <<Type>> {
-            uuid.UUID
-        }
-
-        package "NoteService.Domain.Workspace" <<Frame>> {
-            enum "Role" as NoteService.Domain.Workspace.Role {
-                OWNER
-                EDITOR
-                VIEWER
-            }
-
-            struct "Workspace" as NoteService.Domain.Workspace.Workspace <<Aggregate Root>> {
-                id: WorkspaceID
+        package "Models" as Note.Domain.Models {
+            struct "Workspace" as Note.Domain.Models.Workspace <<Aggregate Root>> {
+                id: uuid.UUID
                 name: string
-                ownerID: UserID
-                collaborators: []*Collaborator
-                rootFolder: *Folder
-                createdAt: time.Time
-                updatedAt: time.Time
+                rootFolderID: uuid.UUID
                 deletedAt: *time.Time
 
-                AddCollaborators(userID...)
-                RemoveCollaborators(userID...)
-                DeleteFolder(folderID)
-                CreateFolder(name, parentID)
-                GetRootFolder(): *Folder
+                Rename(newName string)
+                Delete()
             }
 
-            struct "Folder" as NoteService.Domain.Workspace.Folder <<Entity>> {
-                id: FolderID
-                parentID: *FolderID
+            struct "Folder" as Note.Domain.Models.Folder <<Aggregate Root>> {
+                id: uuid.UUID
                 name: string
-                createdAt: time.Time
-                updatedAt: time.Time
+                parent: *Folder
+                deletedBy: *DeletedBy
                 deletedAt: *time.Time
 
-                IsRoot(): bool
+                Rename(newName string)
+                MoveToFolder(folderID uuid.UUID)
+                Trash()
             }
 
-            struct "Collaborator" as NoteService.Domain.Workspace.Collaborator <<Value Object>> {
-                  userID: UserID
-                  role: Role
-                  joinedAt: time.Time
-
-                  HasEditorPermissions(): bool
-            }
-
-            NoteService.Domain.Workspace.Workspace "1" *--> "1" NoteService.Domain.Workspace.Folder : contains
-            NoteService.Domain.Workspace.Workspace "1" *--> "0..*" NoteService.Domain.Workspace.Collaborator : includes
-            NoteService.Domain.Workspace.Collaborator --> NoteService.Domain.Workspace.Role : has
-        }
-
-        package "NoteService.Domain.Note" <<Frame>> {
-            struct "Note" as NoteService.Domain.Note.Note <<Aggregate Root>> {
-                id: NoteID
-                FolderID: FolderID
-                tagIDs: []*TagID
-                CurrentVersionID: *NoteHistoryID
-                title: string
-                createdAt: time.Time
-                updatedAt: time.Time
+            struct "Note" as Note.Domain.Models.Note <<Aggregate Root>> {
+                id: uuid.UUID
+                name: string
+                FolderID: uuid.UUID
+                tags: []string
+                currentRevisionID: uuid.UUID
+                deletedBy: *DeletedBy
                 deletedAt: *time.Time
 
-                MoveNoteToFolder(FolderID)
-                AddTag(TagID)
-                RemoveTag(TagID)
+                MoveNoteToFolder(folderID uuid.UUID)
+                ReplaceTags(tags []string)
+                Trash()
+                Restore()
             }
-        }
 
-        package "NoteService.Domain.NoteHistory" <<Frame>> {
-            struct "History" as NoteService.Domain.NoteHistory.History <<Aggregate Root>> {
-                id: NoteHistoryID
-                noteID: NoteID
+            struct "Revision" as Note.Domain.Models.Revision <<Aggregate Root>> {
+                id: uuid.UUID
+                noteID: uuid.UUID
                 name: string
-                blockNoteJsonData: string
-                createdAt: time.Time
-                updatedAt: time.Time
+                blockNoteContent: string
                 deletedAt: *time.Time
 
                 rename(newName)
             }
+
         }
 
-        package "NoteService.Domain.Tag" <<Frame>> {
-            struct "Tag" as NoteService.Domain.Tag.Tag <<Aggregate Root>> {
-                id: TagID
-                name: string
-                createdAt: time.Time
-                updatedAt: time.Time
-                deletedAt: *time.Time
+        package "Repos" as Note.Domain.Repos <<Frame>> {
+            interface "Workspace" as Note.Domain.Repos.Workspace {
+                GetByID(workspaceID uuid.UUID) *Workspace
+                Save(workspace *Workspace)
+            }
 
-                rename(newName)
+            package "Folder" as Note.Domain.Repos.Folder {
+                struct "Options" as Note.Domain.Repos.Folder.Options {
+                    OverDays: *int
+                }
+
+                interface "Folder" as Note.Domain.Repos.Folder.Folder {
+                    GetByID(folderID uuid.UUID) *Folder
+                    Save(folder *Folder)
+                    GetTrashedByWorkspaceID(workspaceID uuid.UUID, options *Options) []*Folder
+                }
+            }
+
+            package "Note" as Note.Domain.Repos.Note {
+                struct "Options" as Note.Domain.Repos.Note.Options {
+                    OverDays: *int
+                }
+
+                interface "Note" as Note.Domain.Repos.Note.Note {
+                    GetByID(noteID uuid.UUID) *Note
+                    Save(note *Note)
+                    GetTrashedByWorkspaceID(workspaceID uuid.UUID, options *Options) []*Note
+                }
+            }
+
+            interface "Revision" as Note.Domain.Repos.Revision {
+                GetByID(revisionID uuid.UUID) *Revision
+                Save(revision *Revision)
             }
         }
-
-        NoteService.Domain.Note.Note *...> "0..1" NoteService.Domain.NoteHistory.History : current version
-        NoteService.Domain.Note.Note ...> "0..*" NoteService.Domain.Tag.Tag : tagged with
-
-        NoteService.Domain.NoteHistory.History ... EditService.Document: ydoc stored in
-        NoteService.Domain.NoteHistory.History ...* "1" NoteService.Domain.Note.Note: version of
     }
 }
-
-NoteService.Domain.Workspace.Workspace "1..*" ....> "1" AuthorizationServer.User: owned by
-NoteService.Domain.Workspace.Collaborator "0..*" ....> "0..*" AuthorizationServer.User: has collaborators
-
-NoteService.Domain.Note.Note ...* "1" NoteService.Domain.Workspace.Folder: located in
-
-EditService.Document "1" .... "1" NoteService.Domain.Note.Note
-
 @enduml
 ```
 
