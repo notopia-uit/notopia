@@ -44,6 +44,50 @@
     "url": "https://notopia-uit.github.io/notopia"
   },
   "paths": {
+    "/document/documents/import": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8082",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Document"
+        ],
+        "summary": "Import documents",
+        "operationId": "importDocuments",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ImportDocumentsRequest"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ImportDocumentsResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/document/ws/documents/{documentId}": {
       "servers": [
         {
@@ -542,7 +586,7 @@
         }
       }
     },
-    "/note/notes/{noteId}/revisions/rename": {
+    "/note/notes/{noteId}/revisions/{revisionId}/rename": {
       "servers": [
         {
           "url": "http://api.notopia.localhost",
@@ -991,6 +1035,150 @@
         }
       }
     },
+    "/note/workspaces/{workspaceId}/restore-trashed-items": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Restore trashed workspace items",
+        "operationId": "restoreTrashedWorkspaceItems",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RestoreTrashedWorkspaceItemsRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Workspace items successfully restored"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/show-trash": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Show trash",
+        "operationId": "showTrash",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ShowTrashResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/trash-items": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Trash workspace's items",
+        "operationId": "trashWorkspaceItems",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/TrashWorkspaceItemsRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Workspace items successfully trashed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/unpublish": {
       "servers": [
         {
@@ -1213,23 +1401,6 @@
                 "readOnly": true
               }
             ]
-          },
-          "deletedBy": {
-            "type": "string",
-            "enum": [
-              "purpose",
-              "parent"
-            ],
-            "nullable": true,
-            "example": null,
-            "readOnly": true
-          },
-          "deletedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time",
-            "example": null,
-            "readOnly": true
           }
         }
       },
@@ -1275,9 +1446,7 @@
               "id",
               "name",
               "folderId",
-              "currentRevision",
-              "deletedBy",
-              "deletedAt"
+              "currentRevision"
             ]
           }
         ]
@@ -1401,23 +1570,6 @@
             "format": "uuid",
             "nullable": true,
             "example": null
-          },
-          "deletedBy": {
-            "type": "string",
-            "enum": [
-              "purpose",
-              "parent"
-            ],
-            "nullable": true,
-            "example": null,
-            "readOnly": true
-          },
-          "deletedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time",
-            "example": null,
-            "readOnly": true
           }
         }
       },
@@ -1432,9 +1584,7 @@
             "required": [
               "id",
               "name",
-              "parentId",
-              "deletedBy",
-              "deletedAt"
+              "parentId"
             ]
           }
         ]
@@ -1641,11 +1791,117 @@
         "maxLength": 255,
         "example": "My Workspace"
       },
+      "properties-id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
+        "readOnly": true
+      },
+      "TrashedDeletedBy": {
+        "type": "string",
+        "enum": [
+          "purpose",
+          "parent"
+        ],
+        "nullable": true,
+        "example": "purpose",
+        "readOnly": true
+      },
+      "TrashedNote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/properties-id"
+          },
+          "name": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/name"
+              },
+              {
+                "type": "object",
+                "readOnly": true
+              }
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "note"
+            ],
+            "example": "note"
+          },
+          "deletedBy": {
+            "$ref": "#/components/schemas/TrashedDeletedBy"
+          },
+          "deletedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": null,
+            "readOnly": true
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "deletedBy",
+          "deletedAt"
+        ]
+      },
+      "Folder_properties-id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000",
+        "readOnly": true
+      },
       "Folder_properties-name": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
         "example": "Work Notes"
+      },
+      "TrashedFolder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Folder_properties-id"
+          },
+          "name": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Folder_properties-name"
+              },
+              {
+                "type": "object",
+                "readOnly": true
+              }
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "folder"
+            ],
+            "example": "folder"
+          },
+          "deletedBy": {
+            "$ref": "#/components/schemas/TrashedDeletedBy"
+          },
+          "deletedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": null,
+            "readOnly": true
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "deletedBy",
+          "deletedAt"
+        ]
       }
     },
     "securitySchemes": {
@@ -1668,83 +1924,241 @@
         }
       }
     },
-    "parameters": {
-      "documentIdPath": {
-        "name": "documentId",
-        "in": "path",
+    "requestBodies": {
+      "ImportDocumentsRequest": {
         "required": true,
-        "description": "Unique identifier of the document (note)",
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-      },
-      "noteIdPath": {
-        "name": "noteId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-      },
-      "pageQuery": {
-        "name": "page",
-        "in": "query",
-        "description": "Page number for pagination",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 1
-        },
-        "example": 1
-      },
-      "limitQuery": {
-        "name": "limit",
-        "in": "query",
-        "description": "Number of items per page",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 100,
-          "default": 20
-        },
-        "example": 20
-      },
-      "revisionIdPath": {
-        "name": "revisionId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "ce5060da-b15c-4aee-898f-5449fafacfc4"
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
         }
       },
-      "workspaceIdPath": {
-        "name": "workspaceId",
-        "in": "path",
+      "CreateNoteRequest": {
         "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "550e8400-e29b-41d4-a716-446655440000"
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/NoteRequired"
+            }
+          }
         }
       },
-      "folderIdPath": {
-        "name": "folderId",
-        "in": "path",
+      "GenerateDailyNoteRequest": {
         "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "6306e1ce-c6d9-4fdd-b8e8-c3fbef22c0d9"
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "workspaceId": {
+                  "$ref": "#/components/schemas/id"
+                }
+              },
+              "required": [
+                "workspaceId"
+              ]
+            }
+          }
+        }
+      },
+      "OpenRandomNoteRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "workspaceId": {
+                  "$ref": "#/components/schemas/id"
+                }
+              },
+              "required": [
+                "workspaceId"
+              ]
+            }
+          }
+        }
+      },
+      "SearchTagsRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Work"
+                },
+                "limit": {
+                  "type": "integer",
+                  "default": 10,
+                  "example": 10
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      },
+      "RenameNoteRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/name"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      },
+      "RenameNoteRevisionRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/properties-name"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      },
+      "CreateWorkspaceRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/WorkspaceRequired"
+            }
+          }
+        }
+      },
+      "RenameWorkspaceRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/Workspace_properties-name"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      },
+      "RestoreTrashedWorkspaceItemsRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TrashedNote"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TrashedFolder"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "note": "#/components/schemas/TrashedNote",
+                    "folder": "#/components/schemas/TrashedFolder"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TrashWorkspaceItemsRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TrashedNote"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TrashedFolder"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "note": "#/components/schemas/TrashedNote",
+                    "folder": "#/components/schemas/TrashedFolder"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateFolderRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/FolderRequired"
+            }
+          }
+        }
+      },
+      "RenameFolderRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/Folder_properties-name"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
         }
       }
     },
     "responses": {
+      "ImportDocumentsResponse": {
+        "description": "Successfully imported documents"
+      },
       "BadRequestError": {
         "description": "Bad Request Error response",
         "content": {
@@ -2007,6 +2421,45 @@
           }
         }
       },
+      "ShowTrashResponse": {
+        "description": "Trash",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/TrashedNote"
+                      },
+                      {
+                        "$ref": "#/components/schemas/TrashedFolder"
+                      }
+                    ],
+                    "discriminator": {
+                      "propertyName": "type",
+                      "mapping": {
+                        "note": "#/components/schemas/TrashedNote",
+                        "folder": "#/components/schemas/TrashedFolder"
+                      }
+                    }
+                  }
+                },
+                "pagination": {
+                  "$ref": "#/components/schemas/Pagination"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            }
+          }
+        }
+      },
       "CreateFolderResponse": {
         "description": "Folder successfully created",
         "headers": {
@@ -2021,167 +2474,79 @@
         }
       }
     },
-    "requestBodies": {
-      "CreateNoteRequest": {
+    "parameters": {
+      "documentIdPath": {
+        "name": "documentId",
+        "in": "path",
         "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/NoteRequired"
-            }
-          }
+        "description": "Unique identifier of the document (note)",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+      },
+      "noteIdPath": {
+        "name": "noteId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+      },
+      "pageQuery": {
+        "name": "page",
+        "in": "query",
+        "description": "Page number for pagination",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        },
+        "example": 1
+      },
+      "limitQuery": {
+        "name": "limit",
+        "in": "query",
+        "description": "Number of items per page",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "example": 20
+      },
+      "revisionIdPath": {
+        "name": "revisionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "ce5060da-b15c-4aee-898f-5449fafacfc4"
         }
       },
-      "GenerateDailyNoteRequest": {
+      "workspaceIdPath": {
+        "name": "workspaceId",
+        "in": "path",
         "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "workspaceId": {
-                  "$ref": "#/components/schemas/id"
-                }
-              },
-              "required": [
-                "workspaceId"
-              ]
-            }
-          }
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
         }
       },
-      "OpenRandomNoteRequest": {
+      "folderIdPath": {
+        "name": "folderId",
+        "in": "path",
         "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "workspaceId": {
-                  "$ref": "#/components/schemas/id"
-                }
-              },
-              "required": [
-                "workspaceId"
-              ]
-            }
-          }
-        }
-      },
-      "SearchTagsRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "example": "Work"
-                },
-                "limit": {
-                  "type": "integer",
-                  "default": 10,
-                  "example": 10
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
-      "RenameNoteRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
-      "RenameNoteRevisionRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/properties-name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
-      "CreateWorkspaceRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/WorkspaceRequired"
-            }
-          }
-        }
-      },
-      "RenameWorkspaceRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/Workspace_properties-name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
-      "CreateFolderRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/FolderRequired"
-            }
-          }
-        }
-      },
-      "RenameFolderRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/Folder_properties-name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "6306e1ce-c6d9-4fdd-b8e8-c3fbef22c0d9"
         }
       }
     }

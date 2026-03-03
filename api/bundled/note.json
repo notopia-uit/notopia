@@ -368,7 +368,7 @@
         }
       }
     },
-    "/note/notes/{noteId}/revisions/rename": {
+    "/note/notes/{noteId}/revisions/{revisionId}/rename": {
       "post": {
         "security": [
           {
@@ -737,6 +737,120 @@
         }
       }
     },
+    "/note/workspaces/{workspaceId}/restore-trashed-items": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Restore trashed workspace items",
+        "operationId": "restoreTrashedWorkspaceItems",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RestoreTrashedWorkspaceItemsRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Workspace items successfully restored"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/show-trash": {
+      "get": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Show trash",
+        "operationId": "showTrash",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ShowTrashResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/trash-items": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Trash workspace's items",
+        "operationId": "trashWorkspaceItems",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/TrashWorkspaceItemsRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Workspace items successfully trashed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/unpublish": {
       "post": {
         "security": [
@@ -925,23 +1039,6 @@
                 "readOnly": true
               }
             ]
-          },
-          "deletedBy": {
-            "type": "string",
-            "enum": [
-              "purpose",
-              "parent"
-            ],
-            "nullable": true,
-            "example": null,
-            "readOnly": true
-          },
-          "deletedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time",
-            "example": null,
-            "readOnly": true
           }
         }
       },
@@ -987,9 +1084,7 @@
               "id",
               "name",
               "folderId",
-              "currentRevision",
-              "deletedBy",
-              "deletedAt"
+              "currentRevision"
             ]
           }
         ]
@@ -1137,23 +1232,6 @@
             "format": "uuid",
             "nullable": true,
             "example": null
-          },
-          "deletedBy": {
-            "type": "string",
-            "enum": [
-              "purpose",
-              "parent"
-            ],
-            "nullable": true,
-            "example": null,
-            "readOnly": true
-          },
-          "deletedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time",
-            "example": null,
-            "readOnly": true
           }
         }
       },
@@ -1168,9 +1246,7 @@
             "required": [
               "id",
               "name",
-              "parentId",
-              "deletedBy",
-              "deletedAt"
+              "parentId"
             ]
           }
         ]
@@ -1377,11 +1453,117 @@
         "maxLength": 255,
         "example": "My Workspace"
       },
+      "properties-id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
+        "readOnly": true
+      },
+      "TrashedDeletedBy": {
+        "type": "string",
+        "enum": [
+          "purpose",
+          "parent"
+        ],
+        "nullable": true,
+        "example": "purpose",
+        "readOnly": true
+      },
+      "TrashedNote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/properties-id"
+          },
+          "name": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/name"
+              },
+              {
+                "type": "object",
+                "readOnly": true
+              }
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "note"
+            ],
+            "example": "note"
+          },
+          "deletedBy": {
+            "$ref": "#/components/schemas/TrashedDeletedBy"
+          },
+          "deletedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": null,
+            "readOnly": true
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "deletedBy",
+          "deletedAt"
+        ]
+      },
+      "Folder_properties-id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000",
+        "readOnly": true
+      },
       "Folder_properties-name": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
         "example": "Work Notes"
+      },
+      "TrashedFolder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Folder_properties-id"
+          },
+          "name": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Folder_properties-name"
+              },
+              {
+                "type": "object",
+                "readOnly": true
+              }
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "folder"
+            ],
+            "example": "folder"
+          },
+          "deletedBy": {
+            "$ref": "#/components/schemas/TrashedDeletedBy"
+          },
+          "deletedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": null,
+            "readOnly": true
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "deletedBy",
+          "deletedAt"
+        ]
       }
     },
     "requestBodies": {
@@ -1515,6 +1697,60 @@
               "required": [
                 "name"
               ]
+            }
+          }
+        }
+      },
+      "RestoreTrashedWorkspaceItemsRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TrashedNote"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TrashedFolder"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "note": "#/components/schemas/TrashedNote",
+                    "folder": "#/components/schemas/TrashedFolder"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TrashWorkspaceItemsRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/TrashedNote"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TrashedFolder"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "note": "#/components/schemas/TrashedNote",
+                    "folder": "#/components/schemas/TrashedFolder"
+                  }
+                }
+              }
             }
           }
         }
@@ -1787,6 +2023,45 @@
                   "WorkspaceRenamedEvent": "#/components/schemas/WorkspaceRenamedEvent"
                 }
               }
+            }
+          }
+        }
+      },
+      "ShowTrashResponse": {
+        "description": "Trash",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/TrashedNote"
+                      },
+                      {
+                        "$ref": "#/components/schemas/TrashedFolder"
+                      }
+                    ],
+                    "discriminator": {
+                      "propertyName": "type",
+                      "mapping": {
+                        "note": "#/components/schemas/TrashedNote",
+                        "folder": "#/components/schemas/TrashedFolder"
+                      }
+                    }
+                  }
+                },
+                "pagination": {
+                  "$ref": "#/components/schemas/Pagination"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
             }
           }
         }

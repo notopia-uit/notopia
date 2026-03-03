@@ -1,0 +1,23 @@
+# vim: ft=yaml.openapi
+description: Trash
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            oneOf:
+              - $ref: ../schemas/TrashedNote.yaml
+              - $ref: ../schemas/TrashedFolder.yaml
+            discriminator:
+              propertyName: type
+              mapping:
+                note: ../schemas/TrashedNote.yaml
+                folder: ../schemas/TrashedFolder.yaml
+        pagination:
+          $ref: ../../../common/components/schemas/Pagination.yaml
+      required:
+        - data
+        - pagination

@@ -24,19 +24,3 @@ properties:
       - $ref: ./Revision.yaml
       - type: object
         readOnly: true
-
-  deletedBy:
-    type: string
-    enum:
-      - purpose
-      - parent
-    nullable: true
-    example: null
-    readOnly: true
-
-  deletedAt:
-    type: string
-    nullable: true
-    format: date-time
-    example: null
-    readOnly: true

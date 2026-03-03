@@ -15,5 +15,3 @@ allOf:
       - name
       - folderId
       - currentRevision
-      - deletedBy
-      - deletedAt

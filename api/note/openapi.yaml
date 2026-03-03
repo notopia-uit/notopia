@@ -64,6 +64,12 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_publish.yaml
   /note/workspaces/{workspaceId}/rename:
     $ref: ./paths/workspaces_{workspaceId}_rename.yaml
+  /note/workspaces/{workspaceId}/restore-trashed-items:
+    $ref: ./paths/workspaces_{workspaceId}_restore-trashed-items.yaml
+  /note/workspaces/{workspaceId}/show-trash:
+    $ref: ./paths/workspaces_{workspaceId}_show-trash.yaml
+  /note/workspaces/{workspaceId}/trash-items:
+    $ref: ./paths/workspaces_{workspaceId}_trash-items.yaml
   /note/workspaces/{workspaceId}/unpublish:
     $ref: ./paths/workspaces_{workspaceId}_unpublish.yaml
 

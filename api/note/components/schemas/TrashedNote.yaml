@@ -1,0 +1,33 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  id:
+    $ref: ./Note.yaml#/properties/id
+
+  name:
+    allOf:
+      - $ref: ./Note.yaml#/properties/name
+      - type: object
+        readOnly: true
+
+  type:
+    type: string
+    enum: [note]
+    example: note
+
+  deletedBy:
+    $ref: ./TrashedDeletedBy.yaml
+
+  deletedAt:
+    type: string
+    nullable: true
+    format: date-time
+    example: null
+    readOnly: true
+
+required:
+  - id
+  - type
+  - deletedBy
+  - deletedAt

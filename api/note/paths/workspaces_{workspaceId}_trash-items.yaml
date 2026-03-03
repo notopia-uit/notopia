@@ -1,0 +1,23 @@
+# vim: ft=yaml.openapi
+post:
+  security:
+    - oauth2: []
+  tags:
+    - Workspace
+  summary: Trash workspace's items
+  operationId: trashWorkspaceItems
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  requestBody:
+    $ref: ../components/requestBodies/TrashWorkspaceItemsRequest.yaml
+  responses:
+    204:
+      description: Workspace items successfully trashed
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

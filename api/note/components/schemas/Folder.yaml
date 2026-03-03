@@ -19,19 +19,3 @@ properties:
     format: uuid
     nullable: true
     example: null
-
-  deletedBy:
-    type: string
-    enum:
-      - purpose
-      - parent
-    nullable: true
-    example: null
-    readOnly: true
-
-  deletedAt:
-    type: string
-    nullable: true
-    format: date-time
-    example: null
-    readOnly: true

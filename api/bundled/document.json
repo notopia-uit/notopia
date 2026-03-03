@@ -33,6 +33,40 @@
     "url": "https://notopia-uit.github.io/notopia"
   },
   "paths": {
+    "/document/documents/import": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Document"
+        ],
+        "summary": "Import documents",
+        "operationId": "importDocuments",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ImportDocumentsRequest"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/ImportDocumentsResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/document/ws/documents/{documentId}": {
       "get": {
         "security": [
@@ -130,46 +164,25 @@
         }
       }
     },
-    "parameters": {
-      "documentIdPath": {
-        "name": "documentId",
-        "in": "path",
+    "requestBodies": {
+      "ImportDocumentsRequest": {
         "required": true,
-        "description": "Unique identifier of the document (note)",
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-      }
-    },
-    "schemas": {
-      "Error": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "description": "Error code",
-            "example": "EXAMPLE_CODE"
-          },
-          "message": {
-            "type": "string",
-            "description": "Human-readable error message",
-            "example": "Example error"
-          },
-          "more_info": {
-            "type": "string",
-            "description": "URL with more information about the error",
-            "example": "https://api.notopia.com/docs/errors/EXAMPLE_CODE"
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
           }
-        },
-        "required": [
-          "code",
-          "message"
-        ]
+        }
       }
     },
     "responses": {
+      "ImportDocumentsResponse": {
+        "description": "Successfully imported documents"
+      },
       "BadRequestError": {
         "description": "Bad Request Error response",
         "content": {
@@ -249,6 +262,45 @@
             }
           }
         }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error code",
+            "example": "EXAMPLE_CODE"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message",
+            "example": "Example error"
+          },
+          "more_info": {
+            "type": "string",
+            "description": "URL with more information about the error",
+            "example": "https://api.notopia.com/docs/errors/EXAMPLE_CODE"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      }
+    },
+    "parameters": {
+      "documentIdPath": {
+        "name": "documentId",
+        "in": "path",
+        "required": true,
+        "description": "Unique identifier of the document (note)",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
       }
     }
   }
