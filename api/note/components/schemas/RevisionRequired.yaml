@@ -8,5 +8,5 @@ allOf:
     required:
       - id
       - name
-      - content
+      - blockNoteContent
       - createdAt
