@@ -1,5 +1,6 @@
 {
   "name": "@notopia-uit/docs",
+  "private": true,
   "dependencies": {
     "@catppuccin/vitepress": "^0.1.2",
     "api": "workspace:^",

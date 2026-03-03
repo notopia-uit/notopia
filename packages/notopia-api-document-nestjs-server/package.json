@@ -1,6 +1,7 @@
 {
   "name": "@notopia/api-document-nestjs-server",
   "version": "0.0.0",
+  "private": true,
   "devDependencies": {
     "@types/node": "catalog:",
     "typescript": "catalog:"
