@@ -1,3 +1,0 @@
-package note
-
-type UpdateWorkspaceCollaboratorsRole = UpdateWorkspaceCollaboratorsJSONBodyRole
