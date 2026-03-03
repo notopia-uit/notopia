@@ -3,18 +3,16 @@ type: object
 
 properties:
   id:
-    $ref: ./Note.yaml#/properties/id
+    type: string
+    format: uuid
+    example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
 
   name:
-    allOf:
-      - $ref: ./Note.yaml#/properties/name
-      - type: object
-        readOnly: true
-
-  type:
     type: string
-    enum: [note]
-    example: note
+    minLength: 1
+    maxLength: 255
+    example: Meeting Notes
+    readOnly: true
 
   deletedBy:
     $ref: ./TrashedDeletedBy.yaml
@@ -28,6 +26,6 @@ properties:
 
 required:
   - id
-  - type
+  - name
   - deletedBy
   - deletedAt

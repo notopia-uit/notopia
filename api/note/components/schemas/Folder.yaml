@@ -19,3 +19,8 @@ properties:
     format: uuid
     nullable: true
     example: null
+
+required:
+  - id
+  - name
+  - parentId

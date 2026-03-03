@@ -2,7 +2,7 @@
 type: object
 
 allOf:
-  - $ref: ./FolderRequired.yaml
+  - $ref: ./Folder.yaml
   - type: object
     properties:
       children:
@@ -17,7 +17,7 @@ allOf:
       notes:
         type: array
         items:
-          $ref: ../schemas/NoteRequired.yaml
+          $ref: ../schemas/Note.yaml
     required:
       - children
       - parentId

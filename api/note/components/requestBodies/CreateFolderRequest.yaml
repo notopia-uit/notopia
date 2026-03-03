@@ -3,4 +3,4 @@ required: true
 content:
   application/json:
     schema:
-      $ref: ../schemas/FolderRequired.yaml
+      $ref: ../schemas/Folder.yaml

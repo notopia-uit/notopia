@@ -2,33 +2,95 @@ package http
 
 import (
 	"context"
+	"errors"
 
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-func (h *StrictHandler) ListNotes(ctx context.Context, request note.ListNotesRequestObject) (note.ListNotesResponseObject, error) {
-	return &note.ListNotes200JSONResponse{}, nil
-}
-
 func (h *StrictHandler) CreateNote(ctx context.Context, request note.CreateNoteRequestObject) (note.CreateNoteResponseObject, error) {
-	return &note.CreateNote201JSONResponse{}, nil
+	return nil, errors.New("not implemented")
 }
 
-func (h *StrictHandler) DeleteNote(ctx context.Context, request note.DeleteNoteRequestObject) (note.DeleteNoteResponseObject, error) {
-	return &note.DeleteNote204Response{}, nil
+func (h *StrictHandler) GenerateDailyNote(
+	ctx context.Context,
+	request note.GenerateDailyNoteRequestObject,
+) (note.GenerateDailyNoteResponseObject, error) {
+	return nil, errors.New("not implemented")
 }
 
-func (h *StrictHandler) GetNote(ctx context.Context, request note.GetNoteRequestObject) (note.GetNoteResponseObject, error) {
-	return &note.GetNote200JSONResponse{}, nil
+func (h *StrictHandler) OpenRandomNote(
+	ctx context.Context,
+	request note.OpenRandomNoteRequestObject,
+) (note.OpenRandomNoteResponseObject, error) {
+	return nil, errors.New("not implemented")
 }
 
-func (h *StrictHandler) PublishNote(ctx context.Context, request note.PublishNoteRequestObject) (note.PublishNoteResponseObject, error) {
-	return &note.PublishNote204Response{}, nil
+func (h *StrictHandler) SearchTags(
+	ctx context.Context,
+	request note.SearchTagsRequestObject,
+) (note.SearchTagsResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) DeleteNote(
+	ctx context.Context,
+	request note.DeleteNoteRequestObject,
+) (note.DeleteNoteResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) GetNote(
+	ctx context.Context,
+	request note.GetNoteRequestObject,
+) (note.GetNoteResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) PublishNote(
+	ctx context.Context,
+	request note.PublishNoteRequestObject,
+) (note.PublishNoteResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) RenameNote(
+	ctx context.Context,
+	request note.RenameNoteRequestObject,
+) (note.RenameNoteResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) GetNoteRevisions(
+	ctx context.Context,
+	request note.GetNoteRevisionsRequestObject,
+) (note.GetNoteRevisionsResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) DeleteNoteRevision(
+	ctx context.Context,
+	request note.DeleteNoteRevisionRequestObject,
+) (note.DeleteNoteRevisionResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) GetNoteRevision(
+	ctx context.Context,
+	request note.GetNoteRevisionRequestObject,
+) (note.GetNoteRevisionResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) RenameNoteRevision(
+	ctx context.Context,
+	request note.RenameNoteRevisionRequestObject,
+) (note.RenameNoteRevisionResponseObject, error) {
+	return nil, errors.New("not implemented")
 }
 
 func (h *StrictHandler) UnpublishNote(
 	ctx context.Context,
 	request note.UnpublishNoteRequestObject,
 ) (note.UnpublishNoteResponseObject, error) {
-	return &note.UnpublishNote204Response{}, nil
+	return nil, errors.New("not implemented")
 }

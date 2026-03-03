@@ -3,4 +3,4 @@ description: Note revision detail
 content:
   application/json:
     schema:
-      $ref: ../schemas/RevisionRequired.yaml
+      $ref: ../schemas/Revision.yaml

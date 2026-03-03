@@ -3,13 +3,13 @@ required: true
 content:
   application/json:
     schema:
-      type: array
-      items:
-        oneOf:
-          - $ref: ../schemas/TrashedNote.yaml
-          - $ref: ../schemas/TrashedFolder.yaml
-        discriminator:
-          propertyName: type
-          mapping:
-            note: ../schemas/TrashedNote.yaml
-            folder: ../schemas/TrashedFolder.yaml
+      type: object
+      properties:
+        notes:
+          type: array
+          items:
+            $ref: ../schemas/TrashedNote.yaml
+        folders:
+          type: array
+          items:
+            $ref: ../schemas/TrashedFolder.yaml

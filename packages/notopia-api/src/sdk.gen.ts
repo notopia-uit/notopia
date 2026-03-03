@@ -2,8 +2,8 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateNoteData, CreateNoteErrors, CreateNoteResponses, DeleteNoteData, DeleteNoteErrors, DeleteNoteResponses, GetNoteData, GetNoteErrors, GetNoteResponses, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponses, ListNotesData, ListNotesErrors, ListNotesResponses, PatchNoteData, PatchNoteErrors, PatchNoteResponses, UpdateNoteData, UpdateNoteErrors, UpdateNoteResponses, WsEditsDocumentData, WsEditsDocumentErrors, WsEditsDocumentResponses } from './types.gen';
-import { zCreateNoteData, zCreateNoteResponse, zDeleteNoteData, zDeleteNoteResponse, zGetNoteData, zGetNoteResponse, zGetWorkspaceEventsData, zGetWorkspaceEventsResponse, zListNotesData, zListNotesResponse, zPatchNoteData, zPatchNoteResponse, zUpdateNoteData, zUpdateNoteResponse, zWsEditsDocumentData } from './zod.gen';
+import type { CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateNoteData, CreateNoteErrors, CreateNoteResponses, CreateWorkspaceData, CreateWorkspaceErrors, CreateWorkspaceResponses, DeleteNoteData, DeleteNoteErrors, DeleteNoteResponses, DeleteNoteRevisionData, DeleteNoteRevisionErrors, DeleteNoteRevisionResponses, DeleteWorkspaceData, DeleteWorkspaceErrors, DeleteWorkspaceResponses, GenerateDailyNoteData, GenerateDailyNoteErrors, GenerateDailyNoteResponses, GetDocumentAttachmentUrlData, GetDocumentAttachmentUrlErrors, GetDocumentAttachmentUrlResponses, GetNoteData, GetNoteErrors, GetNoteResponses, GetNoteRevisionData, GetNoteRevisionErrors, GetNoteRevisionResponses, GetNoteRevisionsData, GetNoteRevisionsErrors, GetNoteRevisionsResponses, GetWorkspaceData, GetWorkspaceErrors, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponses, GetWorkspaceResponses, ImportDocumentsData, ImportDocumentsErrors, ImportDocumentsResponses, OpenRandomNoteData, OpenRandomNoteErrors, OpenRandomNoteResponses, PublishNoteData, PublishNoteErrors, PublishNoteResponses, PublishWorkspaceData, PublishWorkspaceErrors, PublishWorkspaceResponses, RenameFolderData, RenameFolderErrors, RenameFolderResponses, RenameNoteData, RenameNoteErrors, RenameNoteResponses, RenameNoteRevisionData, RenameNoteRevisionErrors, RenameNoteRevisionResponses, RenameWorkspaceData, RenameWorkspaceErrors, RenameWorkspaceResponses, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsErrors, RestoreTrashedWorkspaceItemsResponses, SearchTagsData, SearchTagsErrors, SearchTagsResponses, ShowTrashData, ShowTrashErrors, ShowTrashResponses, TrashWorkspaceItemsData, TrashWorkspaceItemsErrors, TrashWorkspaceItemsResponses, UnpublishNoteData, UnpublishNoteErrors, UnpublishNoteResponses, UnpublishWorkspaceData, UnpublishWorkspaceErrors, UnpublishWorkspaceResponses, WsDocumentData, WsDocumentErrors, WsDocumentResponses } from './types.gen';
+import { zCreateFolderData, zCreateNoteData, zCreateWorkspaceData, zDeleteNoteData, zDeleteNoteResponse, zDeleteNoteRevisionData, zDeleteNoteRevisionResponse, zDeleteWorkspaceData, zDeleteWorkspaceResponse, zGenerateDailyNoteData, zGetDocumentAttachmentUrlData, zGetDocumentAttachmentUrlResponse, zGetNoteData, zGetNoteResponse, zGetNoteRevisionData, zGetNoteRevisionResponse, zGetNoteRevisionsData, zGetNoteRevisionsResponse, zGetWorkspaceData, zGetWorkspaceEventsData, zGetWorkspaceEventsResponse, zGetWorkspaceResponse, zImportDocumentsData, zOpenRandomNoteData, zPublishNoteData, zPublishNoteResponse, zPublishWorkspaceData, zPublishWorkspaceResponse, zRenameFolderData, zRenameFolderResponse, zRenameNoteData, zRenameNoteResponse, zRenameNoteRevisionData, zRenameNoteRevisionResponse, zRenameWorkspaceData, zRenameWorkspaceResponse, zRestoreTrashedWorkspaceItemsData, zRestoreTrashedWorkspaceItemsResponse, zSearchTagsData, zSearchTagsResponse, zShowTrashData, zShowTrashResponse, zTrashWorkspaceItemsData, zTrashWorkspaceItemsResponse, zUnpublishNoteData, zUnpublishNoteResponse, zUnpublishWorkspaceData, zUnpublishWorkspaceResponse, zWsDocumentData } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -20,38 +20,45 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * WebSocket for documenting a document
- *
- * Establish a WebSocket connection for real-time collaborative documenting of a document.
+ * Import documents
  */
-export const wsEditsDocument = <ThrowOnError extends boolean = false>(options: Options<WsEditsDocumentData, ThrowOnError>) => (options.client ?? client).get<WsEditsDocumentResponses, WsEditsDocumentErrors, ThrowOnError>({
-    requestValidator: async (data) => await zWsEditsDocumentData.parseAsync(data),
+export const importDocuments = <ThrowOnError extends boolean = false>(options: Options<ImportDocumentsData, ThrowOnError>) => (options.client ?? client).post<ImportDocumentsResponses, ImportDocumentsErrors, ThrowOnError>({
+    requestValidator: async (data) => await zImportDocumentsData.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/ws/documents/{documentId}',
+    url: '/document/documents/import',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * WebSocket for editing a document
+ */
+export const wsDocument = <ThrowOnError extends boolean = false>(options: Options<WsDocumentData, ThrowOnError>) => (options.client ?? client).get<WsDocumentResponses, WsDocumentErrors, ThrowOnError>({
+    requestValidator: async (data) => await zWsDocumentData.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/document/ws/documents/{documentId}',
     ...options
 });
 
 /**
- * List notes
- *
- * Retrieve a paginated list of all notes with optional filtering and sorting
+ * Get presigned URL for document attachment upload
  */
-export const listNotes = <ThrowOnError extends boolean = false>(options?: Options<ListNotesData, ThrowOnError>) => (options?.client ?? client).get<ListNotesResponses, ListNotesErrors, ThrowOnError>({
-    requestValidator: async (data) => await zListNotesData.parseAsync(data),
-    responseValidator: async (data) => await zListNotesResponse.parseAsync(data),
+export const getDocumentAttachmentUrl = <ThrowOnError extends boolean = false>(options: Options<GetDocumentAttachmentUrlData, ThrowOnError>) => (options.client ?? client).get<GetDocumentAttachmentUrlResponses, GetDocumentAttachmentUrlErrors, ThrowOnError>({
+    requestValidator: async (data) => await zGetDocumentAttachmentUrlData.parseAsync(data),
+    responseValidator: async (data) => await zGetDocumentAttachmentUrlResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/notes',
+    url: '/document/documents/{documentId}/attachment-url',
     ...options
 });
 
 /**
  * Create note
- *
- * Create a new note
  */
 export const createNote = <ThrowOnError extends boolean = false>(options: Options<CreateNoteData, ThrowOnError>) => (options.client ?? client).post<CreateNoteResponses, CreateNoteErrors, ThrowOnError>({
     requestValidator: async (data) => await zCreateNoteData.parseAsync(data),
-    responseValidator: async (data) => await zCreateNoteResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/note/notes',
     ...options,
@@ -62,9 +69,50 @@ export const createNote = <ThrowOnError extends boolean = false>(options: Option
 });
 
 /**
+ * Generate daily note
+ */
+export const generateDailyNote = <ThrowOnError extends boolean = false>(options: Options<GenerateDailyNoteData, ThrowOnError>) => (options.client ?? client).post<GenerateDailyNoteResponses, GenerateDailyNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zGenerateDailyNoteData.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/notes/generate-daily',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Open random note
+ */
+export const openRandomNote = <ThrowOnError extends boolean = false>(options: Options<OpenRandomNoteData, ThrowOnError>) => (options.client ?? client).post<OpenRandomNoteResponses, OpenRandomNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zOpenRandomNoteData.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/notes/random',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Search tags
+ */
+export const searchTags = <ThrowOnError extends boolean = false>(options: Options<SearchTagsData, ThrowOnError>) => (options.client ?? client).post<SearchTagsResponses, SearchTagsErrors, ThrowOnError>({
+    requestValidator: async (data) => await zSearchTagsData.parseAsync(data),
+    responseValidator: async (data) => await zSearchTagsResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/notes/search-tags',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Delete note
- *
- * Delete a note by its unique identifier
  */
 export const deleteNote = <ThrowOnError extends boolean = false>(options: Options<DeleteNoteData, ThrowOnError>) => (options.client ?? client).delete<DeleteNoteResponses, DeleteNoteErrors, ThrowOnError>({
     requestValidator: async (data) => await zDeleteNoteData.parseAsync(data),
@@ -76,8 +124,6 @@ export const deleteNote = <ThrowOnError extends boolean = false>(options: Option
 
 /**
  * Get note
- *
- * Retrieve a single note by its unique identifier
  */
 export const getNote = <ThrowOnError extends boolean = false>(options: Options<GetNoteData, ThrowOnError>) => (options.client ?? client).get<GetNoteResponses, GetNoteErrors, ThrowOnError>({
     requestValidator: async (data) => await zGetNoteData.parseAsync(data),
@@ -88,15 +134,24 @@ export const getNote = <ThrowOnError extends boolean = false>(options: Options<G
 });
 
 /**
- * Patch note
- *
- * Update specific fields of a note (only provided fields will be updated)
+ * Publish note
  */
-export const patchNote = <ThrowOnError extends boolean = false>(options: Options<PatchNoteData, ThrowOnError>) => (options.client ?? client).patch<PatchNoteResponses, PatchNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zPatchNoteData.parseAsync(data),
-    responseValidator: async (data) => await zPatchNoteResponse.parseAsync(data),
+export const publishNote = <ThrowOnError extends boolean = false>(options: Options<PublishNoteData, ThrowOnError>) => (options.client ?? client).post<PublishNoteResponses, PublishNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zPublishNoteData.parseAsync(data),
+    responseValidator: async (data) => await zPublishNoteResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/notes/{noteId}',
+    url: '/note/notes/{noteId}/publish',
+    ...options
+});
+
+/**
+ * Rename note
+ */
+export const renameNote = <ThrowOnError extends boolean = false>(options: Options<RenameNoteData, ThrowOnError>) => (options.client ?? client).post<RenameNoteResponses, RenameNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zRenameNoteData.parseAsync(data),
+    responseValidator: async (data) => await zRenameNoteResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/notes/{noteId}/rename',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -105,20 +160,98 @@ export const patchNote = <ThrowOnError extends boolean = false>(options: Options
 });
 
 /**
- * Put note
- *
- * Replace an existing note with new data (all fields are required)
+ * Get note revisions
  */
-export const updateNote = <ThrowOnError extends boolean = false>(options: Options<UpdateNoteData, ThrowOnError>) => (options.client ?? client).put<UpdateNoteResponses, UpdateNoteErrors, ThrowOnError>({
-    requestValidator: async (data) => await zUpdateNoteData.parseAsync(data),
-    responseValidator: async (data) => await zUpdateNoteResponse.parseAsync(data),
+export const getNoteRevisions = <ThrowOnError extends boolean = false>(options: Options<GetNoteRevisionsData, ThrowOnError>) => (options.client ?? client).get<GetNoteRevisionsResponses, GetNoteRevisionsErrors, ThrowOnError>({
+    requestValidator: async (data) => await zGetNoteRevisionsData.parseAsync(data),
+    responseValidator: async (data) => await zGetNoteRevisionsResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/notes/{noteId}',
+    url: '/note/notes/{noteId}/revisions',
+    ...options
+});
+
+/**
+ * Rename note revision
+ */
+export const renameNoteRevision = <ThrowOnError extends boolean = false>(options: Options<RenameNoteRevisionData, ThrowOnError>) => (options.client ?? client).post<RenameNoteRevisionResponses, RenameNoteRevisionErrors, ThrowOnError>({
+    requestValidator: async (data) => await zRenameNoteRevisionData.parseAsync(data),
+    responseValidator: async (data) => await zRenameNoteRevisionResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/notes/{noteId}/revisions/{revisionId}/rename',
     ...options,
     headers: {
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Delete note revision
+ */
+export const deleteNoteRevision = <ThrowOnError extends boolean = false>(options: Options<DeleteNoteRevisionData, ThrowOnError>) => (options.client ?? client).delete<DeleteNoteRevisionResponses, DeleteNoteRevisionErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDeleteNoteRevisionData.parseAsync(data),
+    responseValidator: async (data) => await zDeleteNoteRevisionResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/notes/{noteId}/revisions/{revisionId}',
+    ...options
+});
+
+/**
+ * Get note revision details
+ */
+export const getNoteRevision = <ThrowOnError extends boolean = false>(options: Options<GetNoteRevisionData, ThrowOnError>) => (options.client ?? client).get<GetNoteRevisionResponses, GetNoteRevisionErrors, ThrowOnError>({
+    requestValidator: async (data) => await zGetNoteRevisionData.parseAsync(data),
+    responseValidator: async (data) => await zGetNoteRevisionResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/notes/{noteId}/revisions/{revisionId}',
+    ...options
+});
+
+/**
+ * Unpublish note
+ */
+export const unpublishNote = <ThrowOnError extends boolean = false>(options: Options<UnpublishNoteData, ThrowOnError>) => (options.client ?? client).post<UnpublishNoteResponses, UnpublishNoteErrors, ThrowOnError>({
+    requestValidator: async (data) => await zUnpublishNoteData.parseAsync(data),
+    responseValidator: async (data) => await zUnpublishNoteResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/notes/{noteId}/unpublish',
+    ...options
+});
+
+/**
+ * Create workspace
+ */
+export const createWorkspace = <ThrowOnError extends boolean = false>(options: Options<CreateWorkspaceData, ThrowOnError>) => (options.client ?? client).post<CreateWorkspaceResponses, CreateWorkspaceErrors, ThrowOnError>({
+    requestValidator: async (data) => await zCreateWorkspaceData.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete workspace
+ */
+export const deleteWorkspace = <ThrowOnError extends boolean = false>(options: Options<DeleteWorkspaceData, ThrowOnError>) => (options.client ?? client).delete<DeleteWorkspaceResponses, DeleteWorkspaceErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDeleteWorkspaceData.parseAsync(data),
+    responseValidator: async (data) => await zDeleteWorkspaceResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}',
+    ...options
+});
+
+/**
+ * Get workspace
+ */
+export const getWorkspace = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceData, ThrowOnError>) => (options.client ?? client).get<GetWorkspaceResponses, GetWorkspaceErrors, ThrowOnError>({
+    requestValidator: async (data) => await zGetWorkspaceData.parseAsync(data),
+    responseValidator: async (data) => await zGetWorkspaceResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}',
+    ...options
 });
 
 /**
@@ -130,4 +263,111 @@ export const getWorkspaceEvents = <ThrowOnError extends boolean = false>(options
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/events',
     ...options
+});
+
+/**
+ * Publish workspace
+ */
+export const publishWorkspace = <ThrowOnError extends boolean = false>(options: Options<PublishWorkspaceData, ThrowOnError>) => (options.client ?? client).post<PublishWorkspaceResponses, PublishWorkspaceErrors, ThrowOnError>({
+    requestValidator: async (data) => await zPublishWorkspaceData.parseAsync(data),
+    responseValidator: async (data) => await zPublishWorkspaceResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}/publish',
+    ...options
+});
+
+/**
+ * Rename workspace
+ */
+export const renameWorkspace = <ThrowOnError extends boolean = false>(options: Options<RenameWorkspaceData, ThrowOnError>) => (options.client ?? client).post<RenameWorkspaceResponses, RenameWorkspaceErrors, ThrowOnError>({
+    requestValidator: async (data) => await zRenameWorkspaceData.parseAsync(data),
+    responseValidator: async (data) => await zRenameWorkspaceResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}/rename',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Restore trashed workspace items
+ */
+export const restoreTrashedWorkspaceItems = <ThrowOnError extends boolean = false>(options: Options<RestoreTrashedWorkspaceItemsData, ThrowOnError>) => (options.client ?? client).post<RestoreTrashedWorkspaceItemsResponses, RestoreTrashedWorkspaceItemsErrors, ThrowOnError>({
+    requestValidator: async (data) => await zRestoreTrashedWorkspaceItemsData.parseAsync(data),
+    responseValidator: async (data) => await zRestoreTrashedWorkspaceItemsResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}/restore-trashed-items',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Show trash
+ */
+export const showTrash = <ThrowOnError extends boolean = false>(options: Options<ShowTrashData, ThrowOnError>) => (options.client ?? client).get<ShowTrashResponses, ShowTrashErrors, ThrowOnError>({
+    requestValidator: async (data) => await zShowTrashData.parseAsync(data),
+    responseValidator: async (data) => await zShowTrashResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}/show-trash',
+    ...options
+});
+
+/**
+ * Trash workspace's items
+ */
+export const trashWorkspaceItems = <ThrowOnError extends boolean = false>(options: Options<TrashWorkspaceItemsData, ThrowOnError>) => (options.client ?? client).post<TrashWorkspaceItemsResponses, TrashWorkspaceItemsErrors, ThrowOnError>({
+    requestValidator: async (data) => await zTrashWorkspaceItemsData.parseAsync(data),
+    responseValidator: async (data) => await zTrashWorkspaceItemsResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}/trash-items',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Unpublish workspace
+ */
+export const unpublishWorkspace = <ThrowOnError extends boolean = false>(options: Options<UnpublishWorkspaceData, ThrowOnError>) => (options.client ?? client).post<UnpublishWorkspaceResponses, UnpublishWorkspaceErrors, ThrowOnError>({
+    requestValidator: async (data) => await zUnpublishWorkspaceData.parseAsync(data),
+    responseValidator: async (data) => await zUnpublishWorkspaceResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}/unpublish',
+    ...options
+});
+
+/**
+ * Create folder
+ */
+export const createFolder = <ThrowOnError extends boolean = false>(options: Options<CreateFolderData, ThrowOnError>) => (options.client ?? client).post<CreateFolderResponses, CreateFolderErrors, ThrowOnError>({
+    requestValidator: async (data) => await zCreateFolderData.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/folders',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Rename folder
+ */
+export const renameFolder = <ThrowOnError extends boolean = false>(options: Options<RenameFolderData, ThrowOnError>) => (options.client ?? client).post<RenameFolderResponses, RenameFolderErrors, ThrowOnError>({
+    requestValidator: async (data) => await zRenameFolderData.parseAsync(data),
+    responseValidator: async (data) => await zRenameFolderResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/folders/{folderId}/rename',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });

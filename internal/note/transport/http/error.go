@@ -9,7 +9,7 @@ import (
 )
 
 func StrictServerErrorHandler(c *gin.Context, err error, statusCode int) {
-	message := "internal server error"
+	message := err.Error()
 	code := ""
 	if domainErr, ok := errors.AsType[*commonerror.Err](err); ok {
 		message, code, statusCode = commonerror.ToHTTP(domainErr)

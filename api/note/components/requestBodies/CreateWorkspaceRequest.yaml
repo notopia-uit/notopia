@@ -3,4 +3,4 @@ required: true
 content:
   application/json:
     schema:
-      $ref: ../schemas/WorkspaceRequired.yaml
+      $ref: ../schemas/Workspace.yaml

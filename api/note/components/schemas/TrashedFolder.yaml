@@ -3,18 +3,16 @@ type: object
 
 properties:
   id:
-    $ref: ./Folder.yaml#/properties/id
+    type: string
+    format: uuid
+    example: 123e4567-e89b-12d3-a456-426614174000
 
   name:
-    allOf:
-      - $ref: ./Folder.yaml#/properties/name
-      - type: object
-        readOnly: true
-
-  type:
     type: string
-    enum: [folder]
-    example: folder
+    minLength: 1
+    maxLength: 255
+    example: Work Notes
+    readOnly: true
 
   deletedBy:
     $ref: ./TrashedDeletedBy.yaml
@@ -28,6 +26,6 @@ properties:
 
 required:
   - id
-  - type
+  - name
   - deletedBy
   - deletedAt

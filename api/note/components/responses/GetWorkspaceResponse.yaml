@@ -4,7 +4,7 @@ content:
   application/json:
     schema:
       allOf:
-        - $ref: ../schemas/WorkspaceRequired.yaml
+        - $ref: ../schemas/Workspace.yaml
         - type: object
           properties:
             rootFolder:

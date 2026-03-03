@@ -980,6 +980,95 @@
       }
     },
     "schemas": {
+      "id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
+        "readOnly": true
+      },
+      "name": {
+        "type": "string",
+        "nullable": true,
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Initial Draft"
+      },
+      "Note": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Meeting Notes"
+          },
+          "folderId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "currentRevision": {
+            "readOnly": true,
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/id"
+              },
+              "name": {
+                "$ref": "#/components/schemas/name"
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "folderId",
+          "currentRevision"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error code",
+            "example": "EXAMPLE_CODE"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message",
+            "example": "Example error"
+          },
+          "more_info": {
+            "type": "string",
+            "description": "URL with more information about the error",
+            "example": "https://api.notopia.com/docs/errors/EXAMPLE_CODE"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "properties-id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "550e8400-e29b-41d4-a716-446655440000",
+        "readOnly": true
+      },
+      "properties-name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Meeting Notes"
+      },
       "Revision": {
         "type": "object",
         "properties": {
@@ -1007,123 +1096,13 @@
             "example": "2024-01-01T12:00:00Z",
             "readOnly": true
           }
-        }
-      },
-      "Note": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "Meeting Notes"
-          },
-          "folderId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "currentRevision": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Revision"
-              },
-              {
-                "type": "object",
-                "readOnly": true
-              }
-            ]
-          }
-        }
-      },
-      "RevisionRequired": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Revision"
-          },
-          {
-            "type": "object",
-            "required": [
-              "id",
-              "name",
-              "blockNoteContent",
-              "createdAt"
-            ]
-          }
-        ]
-      },
-      "NoteRequired": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Note"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "currentRevision": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/RevisionRequired"
-                  },
-                  {
-                    "type": "object",
-                    "readOnly": true
-                  }
-                ]
-              }
-            },
-            "required": [
-              "id",
-              "name",
-              "folderId",
-              "currentRevision"
-            ]
-          }
-        ]
-      },
-      "Error": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "description": "Error code",
-            "example": "EXAMPLE_CODE"
-          },
-          "message": {
-            "type": "string",
-            "description": "Human-readable error message",
-            "example": "Example error"
-          },
-          "more_info": {
-            "type": "string",
-            "description": "URL with more information about the error",
-            "example": "https://api.notopia.com/docs/errors/EXAMPLE_CODE"
-          }
         },
         "required": [
-          "code",
-          "message"
+          "id",
+          "name",
+          "blockNoteContent",
+          "createdAt"
         ]
-      },
-      "id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "550e8400-e29b-41d4-a716-446655440000",
-        "readOnly": true
-      },
-      "name": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "Meeting Notes"
       },
       "Pagination": {
         "type": "object",
@@ -1173,13 +1152,6 @@
           "hasPrev"
         ]
       },
-      "properties-name": {
-        "type": "string",
-        "nullable": true,
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "Initial Draft"
-      },
       "Workspace": {
         "type": "object",
         "properties": {
@@ -1195,21 +1167,10 @@
             "maxLength": 255,
             "example": "My Workspace"
           }
-        }
-      },
-      "WorkspaceRequired": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Workspace"
-          },
-          {
-            "type": "object",
-            "required": [
-              "id",
-              "name"
-            ]
-          }
+        },
+        "required": [
+          "id",
+          "name"
         ]
       },
       "Folder": {
@@ -1233,29 +1194,18 @@
             "nullable": true,
             "example": null
           }
-        }
-      },
-      "FolderRequired": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Folder"
-          },
-          {
-            "type": "object",
-            "required": [
-              "id",
-              "name",
-              "parentId"
-            ]
-          }
+        },
+        "required": [
+          "id",
+          "name",
+          "parentId"
         ]
       },
       "FolderWithRelations": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/FolderRequired"
+            "$ref": "#/components/schemas/Folder"
           },
           {
             "type": "object",
@@ -1275,7 +1225,7 @@
               "notes": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/NoteRequired"
+                  "$ref": "#/components/schemas/Note"
                 }
               }
             },
@@ -1453,12 +1403,6 @@
         "maxLength": 255,
         "example": "My Workspace"
       },
-      "properties-id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-        "readOnly": true
-      },
       "TrashedDeletedBy": {
         "type": "string",
         "enum": [
@@ -1473,25 +1417,16 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/properties-id"
+            "type": "string",
+            "format": "uuid",
+            "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
           },
           "name": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/name"
-              },
-              {
-                "type": "object",
-                "readOnly": true
-              }
-            ]
-          },
-          "type": {
             "type": "string",
-            "enum": [
-              "note"
-            ],
-            "example": "note"
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Meeting Notes",
+            "readOnly": true
           },
           "deletedBy": {
             "$ref": "#/components/schemas/TrashedDeletedBy"
@@ -1506,64 +1441,49 @@
         },
         "required": [
           "id",
-          "type",
+          "name",
           "deletedBy",
           "deletedAt"
         ]
       },
-      "Folder_properties-id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000",
-        "readOnly": true
+      "TrashedFolder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Work Notes",
+            "readOnly": true
+          },
+          "deletedBy": {
+            "$ref": "#/components/schemas/TrashedDeletedBy"
+          },
+          "deletedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": null,
+            "readOnly": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "deletedBy",
+          "deletedAt"
+        ]
       },
       "Folder_properties-name": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
         "example": "Work Notes"
-      },
-      "TrashedFolder": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "$ref": "#/components/schemas/Folder_properties-id"
-          },
-          "name": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Folder_properties-name"
-              },
-              {
-                "type": "object",
-                "readOnly": true
-              }
-            ]
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "folder"
-            ],
-            "example": "folder"
-          },
-          "deletedBy": {
-            "$ref": "#/components/schemas/TrashedDeletedBy"
-          },
-          "deletedAt": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time",
-            "example": null,
-            "readOnly": true
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "deletedBy",
-          "deletedAt"
-        ]
       }
     },
     "requestBodies": {
@@ -1572,7 +1492,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/NoteRequired"
+              "$ref": "#/components/schemas/Note"
             }
           }
         }
@@ -1585,7 +1505,7 @@
               "type": "object",
               "properties": {
                 "workspaceId": {
-                  "$ref": "#/components/schemas/id"
+                  "$ref": "#/components/schemas/properties-id"
                 }
               },
               "required": [
@@ -1603,7 +1523,7 @@
               "type": "object",
               "properties": {
                 "workspaceId": {
-                  "$ref": "#/components/schemas/id"
+                  "$ref": "#/components/schemas/properties-id"
                 }
               },
               "required": [
@@ -1645,7 +1565,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/name"
+                  "$ref": "#/components/schemas/properties-name"
                 }
               },
               "required": [
@@ -1663,7 +1583,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/properties-name"
+                  "$ref": "#/components/schemas/name"
                 }
               },
               "required": [
@@ -1678,7 +1598,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/WorkspaceRequired"
+              "$ref": "#/components/schemas/Workspace"
             }
           }
         }
@@ -1706,21 +1626,18 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "array",
-              "items": {
-                "oneOf": [
-                  {
+              "type": "object",
+              "properties": {
+                "notes": {
+                  "type": "array",
+                  "items": {
                     "$ref": "#/components/schemas/TrashedNote"
-                  },
-                  {
-                    "$ref": "#/components/schemas/TrashedFolder"
                   }
-                ],
-                "discriminator": {
-                  "propertyName": "type",
-                  "mapping": {
-                    "note": "#/components/schemas/TrashedNote",
-                    "folder": "#/components/schemas/TrashedFolder"
+                },
+                "folders": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrashedFolder"
                   }
                 }
               }
@@ -1733,21 +1650,18 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "array",
-              "items": {
-                "oneOf": [
-                  {
+              "type": "object",
+              "properties": {
+                "notes": {
+                  "type": "array",
+                  "items": {
                     "$ref": "#/components/schemas/TrashedNote"
-                  },
-                  {
-                    "$ref": "#/components/schemas/TrashedFolder"
                   }
-                ],
-                "discriminator": {
-                  "propertyName": "type",
-                  "mapping": {
-                    "note": "#/components/schemas/TrashedNote",
-                    "folder": "#/components/schemas/TrashedFolder"
+                },
+                "folders": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrashedFolder"
                   }
                 }
               }
@@ -1760,7 +1674,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/FolderRequired"
+              "$ref": "#/components/schemas/Folder"
             }
           }
         }
@@ -1902,7 +1816,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/NoteRequired"
+              "$ref": "#/components/schemas/Note"
             }
           }
         }
@@ -1932,7 +1846,7 @@
                 "data": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RevisionRequired"
+                    "$ref": "#/components/schemas/Revision"
                   }
                 },
                 "pagination": {
@@ -1952,7 +1866,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/RevisionRequired"
+              "$ref": "#/components/schemas/Revision"
             }
           }
         }
@@ -1977,7 +1891,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/components/schemas/WorkspaceRequired"
+                  "$ref": "#/components/schemas/Workspace"
                 },
                 {
                   "type": "object",
@@ -2035,21 +1949,18 @@
               "type": "object",
               "properties": {
                 "data": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
+                  "type": "object",
+                  "properties": {
+                    "notes": {
+                      "type": "array",
+                      "items": {
                         "$ref": "#/components/schemas/TrashedNote"
-                      },
-                      {
-                        "$ref": "#/components/schemas/TrashedFolder"
                       }
-                    ],
-                    "discriminator": {
-                      "propertyName": "type",
-                      "mapping": {
-                        "note": "#/components/schemas/TrashedNote",
-                        "folder": "#/components/schemas/TrashedFolder"
+                    },
+                    "folders": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TrashedFolder"
                       }
                     }
                   }

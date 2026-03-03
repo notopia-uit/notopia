@@ -8,7 +8,7 @@ content:
         data:
           type: array
           items:
-            $ref: ../schemas/RevisionRequired.yaml
+            $ref: ../schemas/Revision.yaml
         pagination:
           $ref: ../../../common/components/schemas/Pagination.yaml
       required:

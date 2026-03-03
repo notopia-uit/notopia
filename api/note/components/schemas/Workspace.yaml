@@ -13,3 +13,7 @@ properties:
     minLength: 1
     maxLength: 255
     example: My Workspace
+
+required:
+  - id
+  - name

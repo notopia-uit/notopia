@@ -6,7 +6,7 @@ generate:
   strict-server: true
 output: ../../pkg/api/note/note.gen.go
 output-options:
-  nullable-type: true
+  nullable-type: false
   overlay:
     path: ./overlay.yaml
     strict: true

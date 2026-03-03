@@ -8,5 +8,6 @@ controllers/DocumentApi.controller.ts
 controllers/index.ts
 index.ts
 models/error.ts
+models/get-document-attachment-url-200-response.ts
 models/index.ts
 tsconfig.json
