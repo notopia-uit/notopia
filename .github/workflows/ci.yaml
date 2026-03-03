@@ -14,10 +14,10 @@ on:
       - reopened
   workflow_dispatch:
     inputs:
-      dry-run-publish:
-        description: Perform a dry run of the publish process (without actually publishing)
+      dry-run-release:
+        description: Perform a Nx dry run release
         required: false
-        default: false
+        default: true
         type: boolean
 
 env:
@@ -180,11 +180,9 @@ jobs:
           github.ref != 'refs/heads/main'
           }}
         run: |
-          npx nx release version \
+          npx nx release \
             --dockerVersionScheme=production \
-            ${{ github.event.inputs.dry-run-publish == 'true' && '--dry-run' || '' }}
-          npx nx release publish \
-            ${{ github.event.inputs.dry-run-publish == 'true' && '--dry-run' || '' }}
+            ${{ github.event.inputs.dry-run-release == 'true' && '--dry-run' || '' }}
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'

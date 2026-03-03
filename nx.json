@@ -96,7 +96,18 @@
         "buildTarget": {
           "name": "docker:build",
           "cwd": "{workspaceRoot}",
-          "args": ["-f", "{projectRoot}/Dockerfile"]
+          "args": [
+            "-f",
+            "{projectRoot}/Dockerfile",
+            "--label",
+            "org.opencontainers.image.title={projectName}",
+            "--label",
+            "org.opencontainers.image.source=https://github.com/notopia-uit/notopia",
+            "--label",
+            "org.opencontainers.image.revision={commitSha}",
+            "--label",
+            "org.opencontainers.image.created={currentDate}"
+          ]
         },
         "runTarget": {
           "name": "docker:run",
@@ -132,7 +143,7 @@
       "conventionalCommits": true
     },
     "changelog": {
-      "workspaceChangelog": {
+      "projectChangelogs": {
         "file": false,
         "createRelease": "github"
       },
