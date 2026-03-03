@@ -39,6 +39,10 @@
     {
       "name": "Revision",
       "description": "Note revisions"
+    },
+    {
+      "name": "Graph",
+      "description": "Note graph"
     }
   ],
   "externalDocs": {
@@ -105,6 +109,40 @@
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/graph": {
+      "get": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Graph"
+        ],
+        "summary": "Get graph",
+        "operationId": "getGraph",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetGraphResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
@@ -1068,6 +1106,9 @@
         "maxLength": 255,
         "example": "Work Notes"
       },
+      "Graph": {
+        "type": "object"
+      },
       "Revision": {
         "type": "object",
         "properties": {
@@ -1850,6 +1891,31 @@
           }
         }
       },
+      "GetGraphResponse": {
+        "description": "Graph",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Graph"
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Forbidden Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "FORBIDDEN",
+              "message": "You do not have permission to access this resource",
+              "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
+            }
+          }
+        }
+      },
       "CreateNoteResponse": {
         "description": "Note successfully created",
         "headers": {
@@ -1908,21 +1974,6 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Note"
-            }
-          }
-        }
-      },
-      "ForbiddenError": {
-        "description": "Forbidden Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "FORBIDDEN",
-              "message": "You do not have permission to access this resource",
-              "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
             }
           }
         }

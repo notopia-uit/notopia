@@ -195,6 +195,9 @@ type FolderWithRelations struct {
 	ParentId *openapi_types.UUID   `json:"parentId"`
 }
 
+// Graph defines model for Graph.
+type Graph = map[string]interface{}
+
 // Note defines model for Note.
 type Note struct {
 	CurrentRevision Revision            `json:"currentRevision"`
@@ -338,6 +341,9 @@ type BadRequestError = Error
 // ForbiddenError defines model for ForbiddenError.
 type ForbiddenError = Error
 
+// GetGraphResponse defines model for GetGraphResponse.
+type GetGraphResponse = Graph
+
 // GetNoteResponse defines model for GetNoteResponse.
 type GetNoteResponse = Note
 
@@ -466,6 +472,21 @@ type RenameFolderJSONBody struct {
 
 // RenameFolderParams defines parameters for RenameFolder.
 type RenameFolderParams struct {
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
+}
+
+// GetGraphParams defines parameters for GetGraph.
+type GetGraphParams struct {
 	// UserID Injected by Gateway
 	UserID string `json:"X-Forwarded-ID"`
 
@@ -946,6 +967,9 @@ type ServerInterface interface {
 	// Rename folder
 	// (POST /note/folders/{folderId}/rename)
 	RenameFolder(c *gin.Context, folderId FolderIdPath, params RenameFolderParams)
+	// Get graph
+	// (GET /note/graph)
+	GetGraph(c *gin.Context, params GetGraphParams)
 	// Create note
 	// (POST /note/notes)
 	CreateNote(c *gin.Context, params CreateNoteParams)
@@ -1244,6 +1268,110 @@ func (siw *ServerInterfaceWrapper) RenameFolder(c *gin.Context) {
 	}
 
 	siw.Handler.RenameFolder(c, folderId, params)
+}
+
+// GetGraph operation middleware
+func (siw *ServerInterfaceWrapper) GetGraph(c *gin.Context) {
+
+	var err error
+
+	c.Set(Oauth2Scopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetGraphParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetGraph(c, params)
 }
 
 // CreateNote operation middleware
@@ -3964,6 +4092,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.POST(options.BaseURL+"/note/folders", wrapper.CreateFolder)
 	router.POST(options.BaseURL+"/note/folders/:folderId/rename", wrapper.RenameFolder)
+	router.GET(options.BaseURL+"/note/graph", wrapper.GetGraph)
 	router.POST(options.BaseURL+"/note/notes", wrapper.CreateNote)
 	router.POST(options.BaseURL+"/note/notes/generate-daily", wrapper.GenerateDailyNote)
 	router.POST(options.BaseURL+"/note/notes/random", wrapper.OpenRandomNote)
@@ -4021,6 +4150,8 @@ type GenerateDailyNoteResponseResponseHeaders struct {
 type GenerateDailyNoteResponseResponse struct {
 	Headers GenerateDailyNoteResponseResponseHeaders
 }
+
+type GetGraphResponseJSONResponse Graph
 
 type GetNoteResponseJSONResponse Note
 
@@ -4162,6 +4293,70 @@ type RenameFolder500JSONResponse struct {
 }
 
 func (response RenameFolder500JSONResponse) VisitRenameFolderResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetGraphRequestObject struct {
+	Params GetGraphParams
+}
+
+type GetGraphResponseObject interface {
+	VisitGetGraphResponse(w http.ResponseWriter) error
+}
+
+type GetGraph200JSONResponse struct{ GetGraphResponseJSONResponse }
+
+func (response GetGraph200JSONResponse) VisitGetGraphResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetGraph400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response GetGraph400JSONResponse) VisitGetGraphResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetGraph401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response GetGraph401JSONResponse) VisitGetGraphResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetGraph403JSONResponse struct{ ForbiddenErrorJSONResponse }
+
+func (response GetGraph403JSONResponse) VisitGetGraphResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetGraph404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response GetGraph404JSONResponse) VisitGetGraphResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetGraph500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetGraph500JSONResponse) VisitGetGraphResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -5523,6 +5718,9 @@ type StrictServerInterface interface {
 	// Rename folder
 	// (POST /note/folders/{folderId}/rename)
 	RenameFolder(ctx context.Context, request RenameFolderRequestObject) (RenameFolderResponseObject, error)
+	// Get graph
+	// (GET /note/graph)
+	GetGraph(ctx context.Context, request GetGraphRequestObject) (GetGraphResponseObject, error)
 	// Create note
 	// (POST /note/notes)
 	CreateNote(ctx context.Context, request CreateNoteRequestObject) (CreateNoteResponseObject, error)
@@ -5673,6 +5871,33 @@ func (sh *strictHandler) RenameFolder(ctx *gin.Context, folderId FolderIdPath, p
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(RenameFolderResponseObject); ok {
 		if err := validResponse.VisitRenameFolderResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetGraph operation middleware
+func (sh *strictHandler) GetGraph(ctx *gin.Context, params GetGraphParams) {
+	var request GetGraphRequestObject
+
+	request.Params = params
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetGraph(ctx, request.(GetGraphRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetGraph")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(GetGraphResponseObject); ok {
+		if err := validResponse.VisitGetGraphResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
