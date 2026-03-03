@@ -1,0 +1,17 @@
+# vim: ft=yaml.openapi
+description: Note revisions
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: ../schemas/RevisionRequired.yaml
+        pagination:
+          $ref: ../../../common/components/schemas/Pagination.yaml
+      required:
+        - data
+        - pagination
+      # example:

@@ -1,0 +1,8 @@
+# vim: ft=yaml.openapi
+name: revisionId
+in: path
+required: true
+schema:
+  type: string
+  format: uuid
+  example: ce5060da-b15c-4aee-898f-5449fafacfc4

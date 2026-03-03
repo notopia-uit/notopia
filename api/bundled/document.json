@@ -239,7 +239,8 @@
               "properties": {
                 "url": {
                   "type": "string",
-                  "format": "uri"
+                  "format": "uri",
+                  "example": "http://rustfs.notopia.localhost/attachments/d4c6b66a-03a8-486d-a139-ab72635c009b"
                 }
               },
               "required": [

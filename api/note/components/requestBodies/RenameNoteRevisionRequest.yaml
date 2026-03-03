@@ -1,0 +1,11 @@
+# vim: ft=yaml.openapi
+required: true
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        name:
+          $ref: ../schemas/Revision.yaml#/properties/name
+      required:
+        - name

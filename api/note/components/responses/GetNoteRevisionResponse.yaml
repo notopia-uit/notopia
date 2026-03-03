@@ -1,0 +1,6 @@
+# vim: ft=yaml.openapi
+description: Note revision detail
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/RevisionRequired.yaml

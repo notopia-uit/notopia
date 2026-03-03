@@ -24,9 +24,11 @@ tags:
   - name: Workspace
     description: Workspace
   - name: Folder
-    description: Workspace -> Folder
+    description: Folder in workspace
   - name: Note
-    description: Workspace -> (Folder) -> Note
+    description: Note in workspace's root folder or in a folder
+  - name: Revision
+    description: Note revisions
 
 paths:
   /note/notes:
@@ -43,6 +45,12 @@ paths:
     $ref: ./paths/notes_{noteId}_publish.yaml
   /note/notes/{noteId}/rename:
     $ref: ./paths/notes_{noteId}_rename.yaml
+  /note/notes/{noteId}/revisions:
+    $ref: ./paths/notes_{noteId}_revisions.yaml
+  /note/notes/{noteId}/revisions/{revisionId}/rename:
+    $ref: ./paths/notes_{noteId}_revisions_{revisionId}_rename.yaml
+  /note/notes/{noteId}/revisions/{revisionId}:
+    $ref: ./paths/notes_{noteId}_revisions_{revisionId}.yaml
   /note/notes/{noteId}/unpublish:
     $ref: ./paths/notes_{noteId}_unpublish.yaml
 

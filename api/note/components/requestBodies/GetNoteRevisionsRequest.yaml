@@ -1,0 +1,11 @@
+# vim: ft=yaml.openapi
+required: true
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        noteId:
+          $ref: ../schemas/Note.yaml#/properties/id
+      required:
+        - noteId
