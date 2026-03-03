@@ -1,0 +1,8 @@
+# vim: ft=yaml.openapi
+required: true
+content:
+  application/json:
+    schema:
+      type: array
+      items:
+        type: object

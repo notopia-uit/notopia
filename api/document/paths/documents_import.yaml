@@ -1,0 +1,21 @@
+# vim: ft=yaml.openapi
+post:
+  security:
+    - oauth2: []
+  tags:
+    - Document
+  summary: Import documents
+  operationId: importDocuments
+  requestBody:
+    $ref: ../components/requestBodies/ImportDocumentsRequest.yaml
+  responses:
+    201:
+      $ref: ../components/responses/ImportDocumentsResponse.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml
