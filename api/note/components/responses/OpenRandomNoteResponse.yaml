@@ -1,5 +1,5 @@
 # vim: ft=yaml.openapi
-description: Daily note generated successfully
+description: Random note
 headers:
   Content-Location:
     schema:

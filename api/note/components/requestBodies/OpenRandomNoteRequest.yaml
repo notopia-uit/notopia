@@ -1,0 +1,11 @@
+# vim: ft=yaml.openapi
+required: true
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        workspaceId:
+          $ref: ../schemas/Workspace.yaml#/properties/id
+      required:
+        - workspaceId
