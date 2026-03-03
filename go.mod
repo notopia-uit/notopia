@@ -17,7 +17,7 @@ require (
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/oapi-codegen/gin-middleware v1.0.2
 	github.com/oapi-codegen/runtime v1.2.0
-	github.com/pressly/goose/v3 v3.26.0
+	github.com/pressly/goose/v3 v3.27.0
 	github.com/samber/slog-multi v1.7.1
 	github.com/spf13/viper v1.21.0
 	go.opentelemetry.io/contrib/bridges/otelslog v0.15.0
@@ -97,12 +97,12 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/arch v0.23.0 // indirect
-	golang.org/x/crypto v0.47.0 // indirect
-	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
+	golang.org/x/net v0.50.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260128011058-8636f8732409 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260128011058-8636f8732409 // indirect
-	google.golang.org/grpc v1.78.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260217215200-42d3e9bedb6d // indirect
+	google.golang.org/grpc v1.79.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
