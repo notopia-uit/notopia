@@ -45,14 +45,14 @@ paths:
     $ref: ./paths/notes_{noteId}_publish.yaml
   /note/notes/{noteId}/rename:
     $ref: ./paths/notes_{noteId}_rename.yaml
-  /note/notes/{noteId}/revisions:
-    $ref: ./paths/notes_{noteId}_revisions.yaml
-  /note/notes/{noteId}/revisions/{revisionId}/rename:
-    $ref: ./paths/notes_{noteId}_revisions_{revisionId}_rename.yaml
-  /note/notes/{noteId}/revisions/{revisionId}:
-    $ref: ./paths/notes_{noteId}_revisions_{revisionId}.yaml
   /note/notes/{noteId}/unpublish:
     $ref: ./paths/notes_{noteId}_unpublish.yaml
+  /note/revisions:
+    $ref: ./paths/revisions.yaml
+  /note/revisions/{revisionId}/rename:
+    $ref: ./paths/revisions_{revisionId}_rename.yaml
+  /note/revisions/{revisionId}:
+    $ref: ./paths/revisions_{revisionId}.yaml
 
   /note/workspaces:
     $ref: ./paths/workspaces.yaml

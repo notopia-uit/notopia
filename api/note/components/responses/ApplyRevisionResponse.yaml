@@ -1,0 +1,9 @@
+# vim: ft=yaml.openapi
+description: Apply revision, mean create new with existing revision
+headers:
+  Content-Location:
+    schema:
+      type: string
+      format: uri
+      example: http://api.notopia.localhost/revisions/ce5060da-b15c-4aee-898f-5449fafacfc4
+    required: true

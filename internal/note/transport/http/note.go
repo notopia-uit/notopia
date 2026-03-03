@@ -60,34 +60,6 @@ func (h *StrictHandler) RenameNote(
 	return nil, errors.New("not implemented")
 }
 
-func (h *StrictHandler) GetNoteRevisions(
-	ctx context.Context,
-	request note.GetNoteRevisionsRequestObject,
-) (note.GetNoteRevisionsResponseObject, error) {
-	return nil, errors.New("not implemented")
-}
-
-func (h *StrictHandler) DeleteNoteRevision(
-	ctx context.Context,
-	request note.DeleteNoteRevisionRequestObject,
-) (note.DeleteNoteRevisionResponseObject, error) {
-	return nil, errors.New("not implemented")
-}
-
-func (h *StrictHandler) GetNoteRevision(
-	ctx context.Context,
-	request note.GetNoteRevisionRequestObject,
-) (note.GetNoteRevisionResponseObject, error) {
-	return nil, errors.New("not implemented")
-}
-
-func (h *StrictHandler) RenameNoteRevision(
-	ctx context.Context,
-	request note.RenameNoteRevisionRequestObject,
-) (note.RenameNoteRevisionResponseObject, error) {
-	return nil, errors.New("not implemented")
-}
-
 func (h *StrictHandler) UnpublishNote(
 	ctx context.Context,
 	request note.UnpublishNoteRequestObject,

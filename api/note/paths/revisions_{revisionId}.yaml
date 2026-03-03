@@ -4,14 +4,13 @@ get:
     - oauth2: []
   tags:
     - Revision
-  summary: Get note revision details
-  operationId: getNoteRevision
+  summary: Get revision details
+  operationId: getRevision
   parameters:
-    - $ref: ../components/parameters/noteIdPath.yaml
     - $ref: ../components/parameters/revisionIdPath.yaml
   responses:
     200:
-      $ref: ../components/responses/GetNoteRevisionResponse.yaml
+      $ref: ../components/responses/GetRevisionResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
@@ -28,10 +27,9 @@ delete:
     - oauth2: []
   tags:
     - Revision
-  summary: Delete note revision
-  operationId: deleteNoteRevision
+  summary: Delete revision
+  operationId: deleteRevision
   parameters:
-    - $ref: ../components/parameters/noteIdPath.yaml
     - $ref: ../components/parameters/revisionIdPath.yaml
   responses:
     204:

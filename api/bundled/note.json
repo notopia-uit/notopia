@@ -326,7 +326,43 @@
         }
       }
     },
-    "/note/notes/{noteId}/revisions": {
+    "/note/notes/{noteId}/unpublish": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Unpublish note",
+        "operationId": "unpublishNote",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/noteIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Note unpublished successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/revisions": {
       "get": {
         "security": [
           {
@@ -336,11 +372,11 @@
         "tags": [
           "Revision"
         ],
-        "summary": "Get note revisions",
-        "operationId": "getNoteRevisions",
+        "summary": "Get revisions",
+        "operationId": "getRevisions",
         "parameters": [
           {
-            "$ref": "#/components/parameters/noteIdPath"
+            "$ref": "#/components/parameters/noteIdQuery"
           },
           {
             "$ref": "#/components/parameters/pageQuery"
@@ -351,7 +387,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetNoteRevisionsResponse"
+            "$ref": "#/components/responses/GetRevisionsResponse"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -368,7 +404,7 @@
         }
       }
     },
-    "/note/notes/{noteId}/revisions/{revisionId}/rename": {
+    "/note/revisions/{revisionId}/rename": {
       "post": {
         "security": [
           {
@@ -378,22 +414,19 @@
         "tags": [
           "Revision"
         ],
-        "summary": "Rename note revision",
-        "operationId": "renameNoteRevision",
+        "summary": "Rename revision",
+        "operationId": "renameRevision",
         "parameters": [
-          {
-            "$ref": "#/components/parameters/noteIdPath"
-          },
           {
             "$ref": "#/components/parameters/revisionIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/RenameNoteRevisionRequest"
+          "$ref": "#/components/requestBodies/RenameRevisionRequest"
         },
         "responses": {
-          "200": {
-            "$ref": "#/components/responses/GetNoteRevisionsResponse"
+          "204": {
+            "description": "Revision renamed successfully"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -410,7 +443,7 @@
         }
       }
     },
-    "/note/notes/{noteId}/revisions/{revisionId}": {
+    "/note/revisions/{revisionId}": {
       "get": {
         "security": [
           {
@@ -420,19 +453,16 @@
         "tags": [
           "Revision"
         ],
-        "summary": "Get note revision details",
-        "operationId": "getNoteRevision",
+        "summary": "Get revision details",
+        "operationId": "getRevision",
         "parameters": [
-          {
-            "$ref": "#/components/parameters/noteIdPath"
-          },
           {
             "$ref": "#/components/parameters/revisionIdPath"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetNoteRevisionResponse"
+            "$ref": "#/components/responses/GetRevisionResponse"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -460,12 +490,9 @@
         "tags": [
           "Revision"
         ],
-        "summary": "Delete note revision",
-        "operationId": "deleteNoteRevision",
+        "summary": "Delete revision",
+        "operationId": "deleteRevision",
         "parameters": [
-          {
-            "$ref": "#/components/parameters/noteIdPath"
-          },
           {
             "$ref": "#/components/parameters/revisionIdPath"
           }
@@ -482,42 +509,6 @@
           },
           "403": {
             "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/notes/{noteId}/unpublish": {
-      "post": {
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
-        "tags": [
-          "Note"
-        ],
-        "summary": "Unpublish note",
-        "operationId": "unpublishNote",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/noteIdPath"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Note unpublished successfully"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
@@ -1591,7 +1582,7 @@
           }
         }
       },
-      "RenameNoteRevisionRequest": {
+      "RenameRevisionRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -1852,8 +1843,8 @@
           }
         }
       },
-      "GetNoteRevisionsResponse": {
-        "description": "Note revisions",
+      "GetRevisionsResponse": {
+        "description": "Revisions",
         "content": {
           "application/json": {
             "schema": {
@@ -1877,8 +1868,8 @@
           }
         }
       },
-      "GetNoteRevisionResponse": {
-        "description": "Note revision detail",
+      "GetRevisionResponse": {
+        "description": "Revision detail",
         "content": {
           "application/json": {
             "schema": {
@@ -2011,6 +2002,16 @@
       "noteIdPath": {
         "name": "noteId",
         "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+      },
+      "noteIdQuery": {
+        "name": "noteId",
+        "in": "query",
         "required": true,
         "schema": {
           "type": "string",

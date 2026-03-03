@@ -4,14 +4,13 @@ post:
     - oauth2: []
   tags:
     - Revision
-  summary: Apply note revision
-  operationId: applyNoteRevision
+  summary: Apply revision
+  operationId: applyRevision
   parameters:
-    - $ref: ../components/parameters/noteIdPath.yaml
     - $ref: ../components/parameters/revisionIdPath.yaml
   responses:
     204:
-      $ref: ../components/responses/ApplyNoteRevisionResponse.yaml
+      $ref: ../components/responses/ApplyRevisionResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

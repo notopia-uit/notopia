@@ -1,19 +1,18 @@
 # vim: ft=yaml.openapi
-post:
+get:
   security:
     - oauth2: []
   tags:
     - Revision
-  summary: Rename note revision
-  operationId: renameNoteRevision
+  summary: Get revisions
+  operationId: getRevisions
   parameters:
-    - $ref: ../components/parameters/noteIdPath.yaml
-    - $ref: ../components/parameters/revisionIdPath.yaml
-  requestBody:
-    $ref: ../components/requestBodies/RenameNoteRevisionRequest.yaml
+    - $ref: ../components/parameters/noteIdQuery.yaml
+    - $ref: ../../common/components/parameters/pageQuery.yaml
+    - $ref: ../../common/components/parameters/limitQuery.yaml
   responses:
     200:
-      $ref: ../components/responses/GetNoteRevisionsResponse.yaml
+      $ref: ../components/responses/GetRevisionsResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

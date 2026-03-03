@@ -1,5 +1,5 @@
 # vim: ft=yaml.openapi
-description: Note revisions
+description: Revisions
 content:
   application/json:
     schema:
