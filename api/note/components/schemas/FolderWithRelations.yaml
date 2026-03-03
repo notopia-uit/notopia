@@ -17,7 +17,7 @@ allOf:
       notes:
         type: array
         items:
-          $ref: ../schemas/Note.yaml
+          $ref: ../schemas/TreeNote.yaml
     required:
       - children
       - parentId

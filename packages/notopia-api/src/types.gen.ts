@@ -19,30 +19,23 @@ export type Error = {
     more_info?: string;
 };
 
-export type Id = string;
-
-export type Name = string | null;
-
-export type Note = {
-    readonly id: string;
-    name: string;
-    folderId: string;
-    readonly currentRevision: {
-        id?: Id;
-        name?: Name;
-    };
-};
-
-export type PropertiesId = string;
-
-export type PropertiesName = string;
-
 export type Revision = {
     readonly id: string;
     name: string | null;
     blockNoteContent: string | null;
     readonly createdAt: string;
 };
+
+export type Note = {
+    readonly id: string;
+    name: string;
+    folderId: string;
+    currentRevision: Revision;
+};
+
+export type Id = string;
+
+export type Name = string;
 
 export type Pagination = {
     /**
@@ -71,6 +64,8 @@ export type Pagination = {
     hasPrev: boolean;
 };
 
+export type PropertiesName = string | null;
+
 export type Workspace = {
     readonly id: string;
     name: string;
@@ -85,7 +80,17 @@ export type Folder = {
 export type FolderWithRelations = Folder & {
     children: Array<FolderWithRelations>;
     parentId: string | null;
-    notes: Array<Note>;
+    notes: Array<TreeNote>;
+};
+
+export type PropertiesId = string;
+
+export type FolderId = string;
+
+export type TreeNote = {
+    id: PropertiesId;
+    name: Name;
+    folderId: FolderId;
 };
 
 export type NoteMovedEvent = {
@@ -146,14 +151,14 @@ export type TrashedFolder = {
 
 export type FolderPropertiesName = string;
 
-export type NoteWritable = {
-    name: string;
-    folderId: string;
-};
-
 export type RevisionWritable = {
     name: string | null;
     blockNoteContent: string | null;
+};
+
+export type NoteWritable = {
+    name: string;
+    folderId: string;
 };
 
 export type WorkspaceWritable = {
@@ -168,7 +173,12 @@ export type FolderWritable = {
 export type FolderWithRelationsWritable = FolderWritable & {
     children: Array<FolderWithRelationsWritable>;
     parentId: string | null;
-    notes: Array<NoteWritable>;
+    notes: Array<TreeNoteWritable>;
+};
+
+export type TreeNoteWritable = {
+    name: Name;
+    folderId: FolderId;
 };
 
 export type TrashedNoteWritable = {
@@ -209,11 +219,11 @@ export type ImportDocumentsRequest = Array<{
 export type CreateNoteRequest = NoteWritable;
 
 export type GenerateDailyNoteRequest = {
-    workspaceId: PropertiesId;
+    workspaceId: Id;
 };
 
 export type OpenRandomNoteRequest = {
-    workspaceId: PropertiesId;
+    workspaceId: Id;
 };
 
 export type SearchTagsRequest = {
@@ -222,11 +232,11 @@ export type SearchTagsRequest = {
 };
 
 export type RenameNoteRequest = {
-    name: PropertiesName;
+    name: Name;
 };
 
 export type RenameNoteRevisionRequest = {
-    name: Name;
+    name: PropertiesName;
 };
 
 export type CreateWorkspaceRequest = WorkspaceWritable;
@@ -326,7 +336,7 @@ export type WsDocumentResponses = {
     200: unknown;
 };
 
-export type GetDocumentAttachmentUrlData = {
+export type GetDocumentAttachmentUploadUrlData = {
     body?: never;
     path: {
         /**
@@ -338,7 +348,7 @@ export type GetDocumentAttachmentUrlData = {
     url: '/document/documents/{documentId}/attachment-url';
 };
 
-export type GetDocumentAttachmentUrlErrors = {
+export type GetDocumentAttachmentUploadUrlErrors = {
     /**
      * Bad Request Error response
      */
@@ -357,9 +367,9 @@ export type GetDocumentAttachmentUrlErrors = {
     500: Error;
 };
 
-export type GetDocumentAttachmentUrlError = GetDocumentAttachmentUrlErrors[keyof GetDocumentAttachmentUrlErrors];
+export type GetDocumentAttachmentUploadUrlError = GetDocumentAttachmentUploadUrlErrors[keyof GetDocumentAttachmentUploadUrlErrors];
 
-export type GetDocumentAttachmentUrlResponses = {
+export type GetDocumentAttachmentUploadUrlResponses = {
     /**
      * Presigned URL
      */
@@ -368,7 +378,7 @@ export type GetDocumentAttachmentUrlResponses = {
     };
 };
 
-export type GetDocumentAttachmentUrlResponse = GetDocumentAttachmentUrlResponses[keyof GetDocumentAttachmentUrlResponses];
+export type GetDocumentAttachmentUploadUrlResponse = GetDocumentAttachmentUploadUrlResponses[keyof GetDocumentAttachmentUploadUrlResponses];
 
 export type CreateNoteData = {
     body: CreateNoteRequest;

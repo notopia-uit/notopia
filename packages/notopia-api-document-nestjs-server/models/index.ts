@@ -1,3 +1,3 @@
-export * from './get-document-attachment-url-200-response';
+export * from './get-document-attachment-upload-url-200-response';
 export * from './error';
  

@@ -8,27 +8,6 @@ export const zError = z.object({
     more_info: z.optional(z.string())
 });
 
-export const zId = z.uuid().readonly();
-
-export const zName = z.union([
-    z.string().min(1).max(255),
-    z.null()
-]);
-
-export const zNote = z.object({
-    id: z.uuid().readonly(),
-    name: z.string().min(1).max(255),
-    folderId: z.uuid(),
-    currentRevision: z.object({
-        id: z.optional(zId),
-        name: z.optional(zName)
-    }).readonly()
-});
-
-export const zPropertiesId = z.uuid().readonly();
-
-export const zPropertiesName = z.string().min(1).max(255);
-
 export const zRevision = z.object({
     id: z.uuid().readonly(),
     name: z.union([
@@ -42,6 +21,17 @@ export const zRevision = z.object({
     createdAt: z.iso.datetime().readonly()
 });
 
+export const zNote = z.object({
+    id: z.uuid().readonly(),
+    name: z.string().min(1).max(255),
+    folderId: z.uuid(),
+    currentRevision: zRevision
+});
+
+export const zId = z.uuid().readonly();
+
+export const zName = z.string().min(1).max(255);
+
 export const zPagination = z.object({
     page: z.int().gte(1),
     limit: z.int().gte(1).lte(100),
@@ -50,6 +40,11 @@ export const zPagination = z.object({
     hasNext: z.boolean(),
     hasPrev: z.boolean()
 });
+
+export const zPropertiesName = z.union([
+    z.string().min(1).max(255),
+    z.null()
+]);
 
 export const zWorkspace = z.object({
     id: z.uuid().readonly(),
@@ -65,6 +60,16 @@ export const zFolder = z.object({
     ])
 });
 
+export const zPropertiesId = z.uuid().readonly();
+
+export const zFolderId = z.uuid();
+
+export const zTreeNote = z.object({
+    id: zPropertiesId,
+    name: zName,
+    folderId: zFolderId
+});
+
 export const zFolderWithRelations = zFolder.and(z.lazy(() => z.object({
     get children() {
         return z.array(z.lazy((): any => zFolderWithRelations));
@@ -73,7 +78,7 @@ export const zFolderWithRelations = zFolder.and(z.lazy(() => z.object({
         z.uuid(),
         z.null()
     ]),
-    notes: z.array(zNote)
+    notes: z.array(zTreeNote)
 })));
 
 export const zNoteMovedEvent = z.object({
@@ -138,11 +143,6 @@ export const zTrashedFolder = z.object({
 
 export const zFolderPropertiesName = z.string().min(1).max(255);
 
-export const zNoteWritable = z.object({
-    name: z.string().min(1).max(255),
-    folderId: z.uuid()
-});
-
 export const zRevisionWritable = z.object({
     name: z.union([
         z.string().min(1).max(255),
@@ -152,6 +152,11 @@ export const zRevisionWritable = z.object({
         z.string(),
         z.null()
     ])
+});
+
+export const zNoteWritable = z.object({
+    name: z.string().min(1).max(255),
+    folderId: z.uuid()
 });
 
 export const zWorkspaceWritable = z.object({
@@ -166,6 +171,11 @@ export const zFolderWritable = z.object({
     ])
 });
 
+export const zTreeNoteWritable = z.object({
+    name: zName,
+    folderId: zFolderId
+});
+
 export const zFolderWithRelationsWritable = zFolderWritable.and(z.lazy(() => z.object({
     get children() {
         return z.array(z.lazy((): any => zFolderWithRelationsWritable));
@@ -174,7 +184,7 @@ export const zFolderWithRelationsWritable = zFolderWritable.and(z.lazy(() => z.o
         z.uuid(),
         z.null()
     ]),
-    notes: z.array(zNoteWritable)
+    notes: z.array(zTreeNoteWritable)
 })));
 
 export const zTrashedNoteWritable = z.object({
@@ -213,11 +223,11 @@ export const zImportDocumentsRequest = z.array(z.record(z.string(), z.unknown())
 export const zCreateNoteRequest = zNoteWritable;
 
 export const zGenerateDailyNoteRequest = z.object({
-    workspaceId: zPropertiesId
+    workspaceId: zId
 });
 
 export const zOpenRandomNoteRequest = z.object({
-    workspaceId: zPropertiesId
+    workspaceId: zId
 });
 
 export const zSearchTagsRequest = z.object({
@@ -226,11 +236,11 @@ export const zSearchTagsRequest = z.object({
 });
 
 export const zRenameNoteRequest = z.object({
-    name: zPropertiesName
+    name: zName
 });
 
 export const zRenameNoteRevisionRequest = z.object({
-    name: zName
+    name: zPropertiesName
 });
 
 export const zCreateWorkspaceRequest = zWorkspaceWritable;
@@ -269,7 +279,7 @@ export const zWsDocumentData = z.object({
     query: z.optional(z.never())
 });
 
-export const zGetDocumentAttachmentUrlData = z.object({
+export const zGetDocumentAttachmentUploadUrlData = z.object({
     body: z.optional(z.never()),
     path: z.object({
         documentId: z.uuid()
@@ -280,7 +290,7 @@ export const zGetDocumentAttachmentUrlData = z.object({
 /**
  * Presigned URL
  */
-export const zGetDocumentAttachmentUrlResponse = z.object({
+export const zGetDocumentAttachmentUploadUrlResponse = z.object({
     url: z.url()
 });
 

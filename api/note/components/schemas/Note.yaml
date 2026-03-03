@@ -20,13 +20,8 @@ properties:
     example: 123e4567-e89b-12d3-a456-426614174000
 
   currentRevision:
+    $ref: ./Revision.yaml
     readOnly: true
-    type: object
-    properties:
-      id:
-        $ref: ./Revision.yaml#/properties/id
-      name:
-        $ref: ./Revision.yaml#/properties/name
 
 required:
   - id

@@ -77,7 +77,7 @@
         "tags": [
           "Document"
         ],
-        "summary": "WebSocket for editing a document",
+        "summary": "WebSocket hocuspocus",
         "operationId": "wsDocument",
         "parameters": [
           {
@@ -116,8 +116,9 @@
         "tags": [
           "Document"
         ],
-        "summary": "Get presigned URL for document attachment upload",
-        "operationId": "getDocumentAttachmentUrl",
+        "summary": "Get document attachment upload url",
+        "description": "Get presigned URL for document attachment upload",
+        "operationId": "getDocumentAttachmentUploadUrl",
         "parameters": [
           {
             "$ref": "#/components/parameters/documentIdPath"
@@ -125,7 +126,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetDocumentAttachmentUrlResponse"
+            "$ref": "#/components/responses/GetDocumentAttachmentUploadUrlResponse"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -243,7 +244,7 @@
           }
         }
       },
-      "GetDocumentAttachmentUrlResponse": {
+      "GetDocumentAttachmentUploadUrlResponse": {
         "description": "Presigned URL",
         "content": {
           "application/json": {

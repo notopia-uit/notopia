@@ -1,15 +1,15 @@
 import { Body, Controller, Get, Post, Param, Query, Req } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { DocumentApi } from '../api';
-import { GetDocumentAttachmentUrl200Response,  } from '../models';
+import { GetDocumentAttachmentUploadUrl200Response,  } from '../models';
 
 @Controller()
 export class DocumentApiController {
   constructor(private readonly documentApi: DocumentApi) {}
 
   @Get('/document/documents/:documentId/attachment-url')
-  getDocumentAttachmentUrl(@Param('documentId') documentId: string, @Req() request: Request): GetDocumentAttachmentUrl200Response | Promise<GetDocumentAttachmentUrl200Response> | Observable<GetDocumentAttachmentUrl200Response> {
-    return this.documentApi.getDocumentAttachmentUrl(documentId, request);
+  getDocumentAttachmentUploadUrl(@Param('documentId') documentId: string, @Req() request: Request): GetDocumentAttachmentUploadUrl200Response | Promise<GetDocumentAttachmentUploadUrl200Response> | Observable<GetDocumentAttachmentUploadUrl200Response> {
+    return this.documentApi.getDocumentAttachmentUploadUrl(documentId, request);
   }
 
   @Post('/document/documents/import')

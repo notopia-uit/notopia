@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { createFolder, createNote, createWorkspace, deleteNote, deleteNoteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUrl, getNote, getNoteRevision, getNoteRevisions, getWorkspace, importDocuments, openRandomNote, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameNoteRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchTags, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, wsDocument } from '../sdk.gen';
-import type { CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteNoteRevisionData, DeleteNoteRevisionError, DeleteNoteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUrlData, GetDocumentAttachmentUrlError, GetDocumentAttachmentUrlResponse, GetNoteData, GetNoteError, GetNoteResponse, GetNoteRevisionData, GetNoteRevisionError, GetNoteRevisionResponse, GetNoteRevisionsData, GetNoteRevisionsError, GetNoteRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceResponse, ImportDocumentsData, ImportDocumentsError, OpenRandomNoteData, OpenRandomNoteError, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameNoteRevisionData, RenameNoteRevisionError, RenameNoteRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchTagsData, SearchTagsError, SearchTagsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, WsDocumentData, WsDocumentError } from '../types.gen';
+import { createFolder, createNote, createWorkspace, deleteNote, deleteNoteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getNote, getNoteRevision, getNoteRevisions, getWorkspace, importDocuments, openRandomNote, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameNoteRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchTags, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, wsDocument } from '../sdk.gen';
+import type { CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteNoteRevisionData, DeleteNoteRevisionError, DeleteNoteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetNoteData, GetNoteError, GetNoteResponse, GetNoteRevisionData, GetNoteRevisionError, GetNoteRevisionResponse, GetNoteRevisionsData, GetNoteRevisionsError, GetNoteRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceResponse, ImportDocumentsData, ImportDocumentsError, OpenRandomNoteData, OpenRandomNoteError, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameNoteRevisionData, RenameNoteRevisionError, RenameNoteRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchTagsData, SearchTagsError, SearchTagsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, WsDocumentData, WsDocumentError } from '../types.gen';
 
 /**
  * Import documents
@@ -59,7 +59,7 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
 export const wsDocumentQueryKey = (options: Options<WsDocumentData>) => createQueryKey('wsDocument', options);
 
 /**
- * WebSocket for editing a document
+ * WebSocket hocuspocus
  */
 export const wsDocumentOptions = (options: Options<WsDocumentData>) => queryOptions<unknown, WsDocumentError, unknown, ReturnType<typeof wsDocumentQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -74,14 +74,16 @@ export const wsDocumentOptions = (options: Options<WsDocumentData>) => queryOpti
     queryKey: wsDocumentQueryKey(options)
 });
 
-export const getDocumentAttachmentUrlQueryKey = (options: Options<GetDocumentAttachmentUrlData>) => createQueryKey('getDocumentAttachmentUrl', options);
+export const getDocumentAttachmentUploadUrlQueryKey = (options: Options<GetDocumentAttachmentUploadUrlData>) => createQueryKey('getDocumentAttachmentUploadUrl', options);
 
 /**
+ * Get document attachment upload url
+ *
  * Get presigned URL for document attachment upload
  */
-export const getDocumentAttachmentUrlOptions = (options: Options<GetDocumentAttachmentUrlData>) => queryOptions<GetDocumentAttachmentUrlResponse, GetDocumentAttachmentUrlError, GetDocumentAttachmentUrlResponse, ReturnType<typeof getDocumentAttachmentUrlQueryKey>>({
+export const getDocumentAttachmentUploadUrlOptions = (options: Options<GetDocumentAttachmentUploadUrlData>) => queryOptions<GetDocumentAttachmentUploadUrlResponse, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, ReturnType<typeof getDocumentAttachmentUploadUrlQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getDocumentAttachmentUrl({
+        const { data } = await getDocumentAttachmentUploadUrl({
             ...options,
             ...queryKey[0],
             signal,
@@ -89,7 +91,7 @@ export const getDocumentAttachmentUrlOptions = (options: Options<GetDocumentAtta
         });
         return data;
     },
-    queryKey: getDocumentAttachmentUrlQueryKey(options)
+    queryKey: getDocumentAttachmentUploadUrlQueryKey(options)
 });
 
 /**

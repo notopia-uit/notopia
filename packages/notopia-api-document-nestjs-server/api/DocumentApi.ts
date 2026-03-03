@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { GetDocumentAttachmentUrl200Response,  } from '../models';
+import { GetDocumentAttachmentUploadUrl200Response,  } from '../models';
 
 
 @Injectable()
 export abstract class DocumentApi {
 
-  abstract getDocumentAttachmentUrl(documentId: string,  request: Request): GetDocumentAttachmentUrl200Response | Promise<GetDocumentAttachmentUrl200Response> | Observable<GetDocumentAttachmentUrl200Response>;
+  abstract getDocumentAttachmentUploadUrl(documentId: string,  request: Request): GetDocumentAttachmentUploadUrl200Response | Promise<GetDocumentAttachmentUploadUrl200Response> | Observable<GetDocumentAttachmentUploadUrl200Response>;
 
 
   abstract importDocuments(requestBody: Array<object>,  request: Request): void | Promise<void> | Observable<void>;

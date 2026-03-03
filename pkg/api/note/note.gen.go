@@ -97,7 +97,7 @@ type FolderWithRelations struct {
 	Children []FolderWithRelations `json:"children"`
 	Id       *openapi_types.UUID   `json:"id,omitempty"`
 	Name     string                `json:"name"`
-	Notes    []Note                `json:"notes"`
+	Notes    []TreeNote            `json:"notes"`
 	ParentId *openapi_types.UUID   `json:"parentId"`
 }
 
@@ -106,13 +106,10 @@ type FolderPropertiesName = string
 
 // Note defines model for Note.
 type Note struct {
-	CurrentRevision *struct {
-		Id   *Id   `json:"id,omitempty"`
-		Name *Name `json:"name"`
-	} `json:"currentRevision,omitempty"`
-	FolderId openapi_types.UUID  `json:"folderId"`
-	Id       *openapi_types.UUID `json:"id,omitempty"`
-	Name     string              `json:"name"`
+	CurrentRevision Revision            `json:"currentRevision"`
+	FolderId        openapi_types.UUID  `json:"folderId"`
+	Id              *openapi_types.UUID `json:"id,omitempty"`
+	Name            string              `json:"name"`
 }
 
 // NoteMovedEvent defines model for NoteMovedEvent.
@@ -176,6 +173,13 @@ type TrashedNote struct {
 	Name      *string            `json:"name,omitempty"`
 }
 
+// TreeNote defines model for TreeNote.
+type TreeNote struct {
+	FolderId FolderId      `json:"folderId"`
+	Id       *PropertiesId `json:"id,omitempty"`
+	Name     Name          `json:"name"`
+}
+
 // Workspace defines model for Workspace.
 type Workspace struct {
 	Id   *openapi_types.UUID `json:"id,omitempty"`
@@ -197,6 +201,9 @@ type WorkspaceRenamedEventType string
 
 // WorkspacePropertiesName defines model for Workspace_properties-name.
 type WorkspacePropertiesName = string
+
+// FolderId defines model for folderId.
+type FolderId = openapi_types.UUID
 
 // Id defines model for id.
 type Id = openapi_types.UUID
@@ -285,12 +292,12 @@ type CreateWorkspaceRequest = Workspace
 
 // GenerateDailyNoteRequest defines model for GenerateDailyNoteRequest.
 type GenerateDailyNoteRequest struct {
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	WorkspaceId *Id `json:"workspaceId,omitempty"`
 }
 
 // OpenRandomNoteRequest defines model for OpenRandomNoteRequest.
 type OpenRandomNoteRequest struct {
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	WorkspaceId *Id `json:"workspaceId,omitempty"`
 }
 
 // RenameFolderRequest defines model for RenameFolderRequest.
@@ -300,12 +307,12 @@ type RenameFolderRequest struct {
 
 // RenameNoteRequest defines model for RenameNoteRequest.
 type RenameNoteRequest struct {
-	Name PropertiesName `json:"name"`
+	Name Name `json:"name"`
 }
 
 // RenameNoteRevisionRequest defines model for RenameNoteRevisionRequest.
 type RenameNoteRevisionRequest struct {
-	Name *Name `json:"name"`
+	Name *PropertiesName `json:"name"`
 }
 
 // RenameWorkspaceRequest defines model for RenameWorkspaceRequest.
@@ -383,7 +390,7 @@ type CreateNoteParams struct {
 
 // GenerateDailyNoteJSONBody defines parameters for GenerateDailyNote.
 type GenerateDailyNoteJSONBody struct {
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	WorkspaceId *Id `json:"workspaceId,omitempty"`
 }
 
 // GenerateDailyNoteParams defines parameters for GenerateDailyNote.
@@ -403,7 +410,7 @@ type GenerateDailyNoteParams struct {
 
 // OpenRandomNoteJSONBody defines parameters for OpenRandomNote.
 type OpenRandomNoteJSONBody struct {
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	WorkspaceId *Id `json:"workspaceId,omitempty"`
 }
 
 // OpenRandomNoteParams defines parameters for OpenRandomNote.
@@ -489,7 +496,7 @@ type PublishNoteParams struct {
 
 // RenameNoteJSONBody defines parameters for RenameNote.
 type RenameNoteJSONBody struct {
-	Name PropertiesName `json:"name"`
+	Name Name `json:"name"`
 }
 
 // RenameNoteParams defines parameters for RenameNote.
@@ -560,7 +567,7 @@ type GetNoteRevisionParams struct {
 
 // RenameNoteRevisionJSONBody defines parameters for RenameNoteRevision.
 type RenameNoteRevisionJSONBody struct {
-	Name *Name `json:"name"`
+	Name *PropertiesName `json:"name"`
 }
 
 // RenameNoteRevisionParams defines parameters for RenameNoteRevision.
