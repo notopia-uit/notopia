@@ -31,6 +31,11 @@ tags:
     description: Note revisions
 
 paths:
+  /note/folders:
+    $ref: ./paths/folders.yaml
+  /note/folders/{folderId}/rename:
+    $ref: ./paths/folders_{folderId}_rename.yaml
+
   /note/notes:
     $ref: ./paths/notes.yaml
   /note/notes/generate-daily:
@@ -72,11 +77,8 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_trash-items.yaml
   /note/workspaces/{workspaceId}/unpublish:
     $ref: ./paths/workspaces_{workspaceId}_unpublish.yaml
-
-  /note/folders:
-    $ref: ./paths/folders.yaml
-  /note/folders/{folderId}/rename:
-    $ref: ./paths/folders_{folderId}_rename.yaml
+  /note/workspaces/{workspaceId}/update-collaborators:
+    $ref: ./paths/workspaces_{workspaceId}_update-collaborators.yaml
 
 components:
   securitySchemes:

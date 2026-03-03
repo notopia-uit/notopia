@@ -1,0 +1,22 @@
+# vim: ft=yaml.openapi
+required: true
+content:
+  application/json:
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          userId:
+            type: string
+            example: c3788141-c297-45fa-8e9b-5c22f06f8b0f
+          role:
+            type: string
+            enum:
+              - owner
+              - editor
+              - viewer
+            example: owner
+        required:
+          - userId
+          - role
