@@ -1,0 +1,16 @@
+# vim: ft=yaml.openapi
+required: true
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Work
+        limit:
+          type: integer
+          default: 10
+          example: 10
+      required:
+        - name

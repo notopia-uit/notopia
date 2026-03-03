@@ -4,15 +4,13 @@ get:
     - oauth2: []
   tags:
     - Document
-  summary: WebSocket for editing a document
-  operationId: wsDocument
+  summary: Commit to save document revision
+  operationId: commitDocument
   parameters:
     - $ref: ../components/parameters/documentIdPath.yaml
   responses:
-    101:
-      description: Switching Protocols - WebSocket connection established
-    200:
-      description: OK
+    204:
+      description: Document revision committed successfully
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

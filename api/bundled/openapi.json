@@ -15,25 +15,31 @@
   },
   "tags": [
     {
-      "name": "document",
+      "name": "Document",
       "description": "Operations related to documenting notes, collaboration.",
-      "x-displayName": "document"
+      "x-displayName": "Document"
     },
     {
-      "name": "note",
-      "description": "Operations related to notes management",
-      "x-displayName": "note"
+      "name": "Workspace",
+      "description": "Workspace",
+      "x-displayName": "Workspace"
     },
     {
-      "name": "workspace",
-      "x-displayName": "workspace"
+      "name": "Folder",
+      "description": "Workspace -> Folder",
+      "x-displayName": "Folder"
+    },
+    {
+      "name": "Note",
+      "description": "Workspace -> (Folder) -> Note",
+      "x-displayName": "Note"
     }
   ],
   "externalDocs": {
     "url": "https://notopia-uit.github.io/notopia"
   },
   "paths": {
-    "/ws/documents/{documentId}": {
+    "/document/ws/documents/{documentId}": {
       "servers": [
         {
           "url": "http://api.notopia.localhost",
@@ -51,11 +57,10 @@
           }
         ],
         "tags": [
-          "document"
+          "Document"
         ],
-        "summary": "WebSocket for documenting a document",
-        "description": "Establish a WebSocket connection for real-time collaborative documenting of a document.",
-        "operationId": "wsEditsDocument",
+        "summary": "WebSocket for editing a document",
+        "operationId": "wsDocument",
         "parameters": [
           {
             "$ref": "#/components/parameters/documentIdPath"
@@ -63,10 +68,56 @@
         ],
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established."
+            "description": "Switching Protocols - WebSocket connection established"
           },
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/document/documents/{documentId}/attachment-url": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8082",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Document"
+        ],
+        "summary": "Get presigned URL for document attachment upload",
+        "operationId": "getDocumentAttachmentUrl",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/documentIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetDocumentAttachmentUrlResponse"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -94,56 +145,23 @@
           "description": "Local dev/mock server direct"
         }
       ],
-      "get": {
+      "post": {
         "security": [
           {
             "oauth2": []
           }
         ],
         "tags": [
-          "note"
+          "Note"
         ],
-        "summary": "List notes",
-        "description": "Retrieve a paginated list of all notes with optional filtering and sorting",
-        "operationId": "listNotes",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/pageQuery"
-          },
-          {
-            "$ref": "#/components/parameters/limitQuery"
-          },
-          {
-            "$ref": "#/components/parameters/orderQuery"
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "description": "Field to sort by",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "createdAt",
-                "updatedAt",
-                "title"
-              ],
-              "default": "createdAt"
-            },
-            "example": "createdAt"
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "description": "Search notes by title or content",
-            "schema": {
-              "type": "string"
-            },
-            "example": "meeting notes"
-          }
-        ],
+        "summary": "Create note",
+        "operationId": "createNote",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateNoteRequest"
+        },
         "responses": {
-          "200": {
-            "$ref": "#/components/responses/ListNotesResponse"
+          "201": {
+            "$ref": "#/components/responses/CreateNoteResponse"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -155,7 +173,19 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
-      },
+      }
+    },
+    "/note/notes/generate-daily": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
       "post": {
         "security": [
           {
@@ -163,17 +193,60 @@
           }
         ],
         "tags": [
-          "note"
+          "Note"
         ],
-        "summary": "Create note",
-        "description": "Create a new note",
-        "operationId": "createNote",
+        "summary": "Generate daily note",
+        "operationId": "generateDailyNote",
         "requestBody": {
-          "$ref": "#/components/requestBodies/CreateNoteRequest"
+          "$ref": "#/components/requestBodies/GenerateDailyNoteRequest"
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/CreateNoteResponse"
+            "$ref": "#/components/responses/GenerateDailyNoteResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/notes/search-tags": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Search tags",
+        "operationId": "searchTags",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/SearchTagsRequest"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SearchTagsResponse"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -205,10 +278,9 @@
           }
         ],
         "tags": [
-          "note"
+          "Note"
         ],
         "summary": "Get note",
-        "description": "Retrieve a single note by its unique identifier",
         "operationId": "getNote",
         "parameters": [
           {
@@ -236,88 +308,6 @@
           }
         }
       },
-      "put": {
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
-        "tags": [
-          "note"
-        ],
-        "summary": "Put note",
-        "description": "Replace an existing note with new data (all fields are required)",
-        "operationId": "updateNote",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/noteIdPath"
-          }
-        ],
-        "requestBody": {
-          "$ref": "#/components/requestBodies/PutNoteRequest"
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/PutNoteResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      },
-      "patch": {
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
-        "tags": [
-          "note"
-        ],
-        "summary": "Patch note",
-        "description": "Update specific fields of a note (only provided fields will be updated)",
-        "operationId": "patchNote",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/noteIdPath"
-          }
-        ],
-        "requestBody": {
-          "$ref": "#/components/requestBodies/PatchNoteRequest"
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/PatchNoteResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      },
       "delete": {
         "security": [
           {
@@ -325,10 +315,9 @@
           }
         ],
         "tags": [
-          "note"
+          "Note"
         ],
         "summary": "Delete note",
-        "description": "Delete a note by its unique identifier",
         "operationId": "deleteNote",
         "parameters": [
           {
@@ -357,6 +346,268 @@
         }
       }
     },
+    "/note/notes/{noteId}/publish": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Publish note",
+        "operationId": "publishNote",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/noteIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Note published successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/notes/{noteId}/rename": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Rename note",
+        "operationId": "renameNote",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/noteIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RenameNoteRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Note renamed successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/notes/{noteId}/unpublish": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Unpublish note",
+        "operationId": "unpublishNote",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/noteIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Note unpublished successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Create workspace",
+        "operationId": "createWorkspace",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateWorkspaceRequest"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateWorkspaceResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Get workspace",
+        "operationId": "getWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetWorkspaceResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Delete workspace",
+        "operationId": "deleteWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content - Workspace successfully deleted."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/events": {
       "servers": [
         {
@@ -375,7 +626,7 @@
           }
         ],
         "tags": [
-          "workspace"
+          "Workspace"
         ],
         "summary": "SSE workspace updates",
         "operationId": "getWorkspaceEvents",
@@ -399,338 +650,240 @@
           }
         }
       }
+    },
+    "/note/workspaces/{workspaceId}/publish": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Publish workspace",
+        "operationId": "publishWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workspace published successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/rename": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Rename workspace",
+        "operationId": "renameWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RenameWorkspaceRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Workspace renamed successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/unpublish": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Unpublish workspace",
+        "operationId": "unpublishWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workspace unpublished successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/folders": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Folder"
+        ],
+        "summary": "Create folder",
+        "operationId": "createFolder",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateFolderRequest"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateFolderResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/folders/{folderId}/rename": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Folder"
+        ],
+        "summary": "Rename folder",
+        "operationId": "renameFolder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/folderIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RenameFolderRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Folder renamed successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
     }
   },
   "components": {
-    "parameters": {
-      "limitQuery": {
-        "name": "limit",
-        "in": "query",
-        "description": "Number of items per page",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 100,
-          "default": 20
-        },
-        "example": 20
-      },
-      "orderQuery": {
-        "name": "order",
-        "in": "query",
-        "description": "Sort order",
-        "schema": {
-          "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ],
-          "default": "desc",
-          "example": "desc"
-        }
-      },
-      "pageQuery": {
-        "name": "page",
-        "in": "query",
-        "description": "Page number for pagination",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 1
-        },
-        "example": 1
-      },
-      "documentIdPath": {
-        "name": "documentId",
-        "in": "path",
-        "required": true,
-        "description": "Unique identifier of the document (note)",
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-      },
-      "noteIdPath": {
-        "name": "noteId",
-        "in": "path",
-        "required": true,
-        "description": "Unique identifier of the note",
-        "schema": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-      },
-      "workspaceIdPath": {
-        "name": "workspaceId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "description": "The unique identifier of the workspace.",
-          "example": "550e8400-e29b-41d4-a716-446655440000"
-        }
-      }
-    },
-    "responses": {
-      "BadRequestError": {
-        "description": "Bad Request Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "BAD_REQUEST",
-              "message": "The request could not be understood by the server due to malformed syntax",
-              "more_info": "https://api.notopia.com/docs/errors/BAD_REQUEST"
-            }
-          }
-        }
-      },
-      "ForbiddenError": {
-        "description": "Forbidden Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "FORBIDDEN",
-              "message": "You do not have permission to access this resource",
-              "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
-            }
-          }
-        }
-      },
-      "InternalServerError": {
-        "description": "Internal Server Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "INTERNAL_SERVER_ERROR",
-              "message": "An internal server error occurred. Please try again later",
-              "more_info": "https://api.notopia.com/docs/errors/INTERNAL_SERVER_ERROR"
-            }
-          }
-        }
-      },
-      "NotFoundError": {
-        "description": "Not Found Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "NOT_FOUND",
-              "message": "The requested resource was not found",
-              "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
-            }
-          }
-        }
-      },
-      "UnauthorizedError": {
-        "description": "Unauthorized Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "UNAUTHORIZED",
-              "message": "Authentication is required to access this resource",
-              "more_info": "https://api.notopia.com/docs/errors/UNAUTHORIZED"
-            }
-          }
-        }
-      },
-      "ListNotesResponse": {
-        "description": "Successful response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "data": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Note"
-                  },
-                  "x-example": [
-                    {
-                      "id": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-                      "title": "Meeting Notes",
-                      "createdAt": "2026-01-11T10:30:00Z",
-                      "updatedAt": "2026-01-11T14:45:00Z"
-                    },
-                    {
-                      "id": "afe66e33-2cf0-43da-a9a7-a62fca939e87",
-                      "title": "Project Ideas",
-                      "createdAt": "2026-01-10T09:15:00Z",
-                      "updatedAt": "2026-01-10T09:15:00Z"
-                    },
-                    {
-                      "id": "d6942438-d381-4506-a984-5c28e20d9664",
-                      "title": "Shopping List",
-                      "createdAt": "2026-01-09T18:20:00Z",
-                      "updatedAt": "2026-01-11T08:00:00Z"
-                    }
-                  ]
-                },
-                "pagination": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/Pagination"
-                    },
-                    {
-                      "description": "Pagination details for the list of notes",
-                      "example": {
-                        "page": 1,
-                        "limit": 20,
-                        "total": 3,
-                        "totalPages": 1,
-                        "hasNext": false,
-                        "hasPrev": false
-                      }
-                    }
-                  ]
-                }
-              },
-              "required": [
-                "data",
-                "pagination"
-              ]
-            }
-          }
-        }
-      },
-      "CreateNoteResponse": {
-        "description": "Note successfully created",
-        "content": {
-          "application/json": {
-            "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Note"
-                },
-                {
-                  "example": {
-                    "id": "123e4567-e89b-12d3-a456-426614174000",
-                    "title": "Meeting Notes",
-                    "createdAt": "2026-01-11T10:30:00Z",
-                    "updatedAt": "2026-01-11T10:30:00Z"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "GetNoteResponse": {
-        "description": "Successful response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/NoteRequired"
-                },
-                {
-                  "example": {
-                    "id": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-                    "title": "Meeting Notes",
-                    "createdAt": "2026-01-11T10:30:00Z",
-                    "updatedAt": "2026-01-11T14:45:00Z"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "PutNoteResponse": {
-        "description": "Note successfully updated",
-        "content": {
-          "application/json": {
-            "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/NoteRequired"
-                },
-                {
-                  "example": {
-                    "id": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-                    "title": "Updated Meeting Notes",
-                    "createdAt": "2026-01-11T10:30:00Z",
-                    "updatedAt": "2026-01-11T15:30:00Z"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "PatchNoteResponse": {
-        "description": "Note successfully patched",
-        "content": {
-          "application/json": {
-            "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Note"
-                },
-                {
-                  "example": {
-                    "id": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-                    "title": "Partially Updated Meeting Notes",
-                    "createdAt": "2026-01-11T10:30:00Z",
-                    "updatedAt": "2026-01-11T16:00:00Z"
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "GetWorkspaceEventsResponse": {
-        "description": "A persistent stream of events",
-        "content": {
-          "text/event-stream": {
-            "schema": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/NoteMovedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/FolderMovedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/FolderRenamedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/WorkspaceRenamedEvent"
-                }
-              ],
-              "discriminator": {
-                "propertyName": "type",
-                "mapping": {
-                  "NoteMovedEvent": "#/components/schemas/NoteMovedEvent",
-                  "FolderMovedEvent": "#/components/schemas/FolderMovedEvent",
-                  "FolderRenamedEvent": "#/components/schemas/FolderRenamedEvent",
-                  "WorkspaceRenamedEvent": "#/components/schemas/WorkspaceRenamedEvent"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "schemas": {
       "Error": {
         "type": "object",
@@ -756,53 +909,34 @@
           "message"
         ]
       },
-      "Pagination": {
+      "Revision": {
         "type": "object",
         "properties": {
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "minimum": 1,
-            "example": 1
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
+            "readOnly": true
           },
-          "limit": {
-            "type": "integer",
-            "description": "Number of items per page",
-            "minimum": 1,
-            "maximum": 100,
-            "example": 20
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Initial Draft"
           },
-          "total": {
-            "type": "integer",
-            "description": "Total number of items",
-            "minimum": 0,
-            "example": 100
+          "blockNoteContent": {
+            "type": "string",
+            "nullable": true,
+            "example": "[\n  {\n    \"type\": \"paragraph\",\n    \"content\": \"Welcome to this demo!\"\n  },\n  {\n    \"type\": \"paragraph\"\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Blocks:\",\n        \"styles\": { \"bold\": true }\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": \"Paragraph\"\n  },\n  {\n    \"type\": \"heading\",\n    \"content\": \"Heading\"\n  },\n  {\n    \"id\": \"toggle-heading\",\n    \"type\": \"heading\",\n    \"props\": { \"isToggleable\": true },\n    \"content\": \"Toggle Heading\"\n  },\n  {\n    \"type\": \"quote\",\n    \"content\": \"Quote\"\n  },\n  {\n    \"type\": \"bulletListItem\",\n    \"content\": \"Bullet List Item\"\n  },\n  {\n    \"type\": \"numberedListItem\",\n    \"content\": \"Numbered List Item\"\n  },\n  {\n    \"type\": \"checkListItem\",\n    \"content\": \"Check List Item\"\n  },\n  {\n    \"id\": \"toggle-list-item\",\n    \"type\": \"toggleListItem\",\n    \"content\": \"Toggle List Item\"\n  },\n  {\n    \"type\": \"codeBlock\",\n    \"props\": { \"language\": \"javascript\" },\n    \"content\": \"console.log('Hello, world!');\"\n  },\n  {\n    \"type\": \"table\",\n    \"content\": {\n      \"type\": \"tableContent\",\n      \"rows\": [\n        {\n          \"cells\": [\"Table Cell\", \"Table Cell\", \"Table Cell\"]\n        },\n        {\n          \"cells\": [\"Table Cell\", \"Table Cell\", \"Table Cell\"]\n        },\n        {\n          \"cells\": [\"Table Cell\", \"Table Cell\", \"Table Cell\"]\n        }\n      ]\n    }\n  },\n  {\n    \"type\": \"file\"\n  },\n  {\n    \"type\": \"image\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\"\n    }\n  },\n  {\n    \"type\": \"video\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\"\n    }\n  },\n  {\n    \"type\": \"audio\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\"\n    }\n  },\n  {\n    \"type\": \"paragraph\"\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Inline Content:\",\n        \"styles\": { \"bold\": true }\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Styled Text\",\n        \"styles\": {\n          \"bold\": true,\n          \"italic\": true,\n          \"textColor\": \"red\",\n          \"backgroundColor\": \"blue\"\n        }\n      },\n      {\n        \"type\": \"text\",\n        \"text\": \" \",\n        \"styles\": {}\n      },\n      {\n        \"type\": \"link\",\n        \"content\": \"Link\",\n        \"href\": \"https://www.blocknotejs.org\"\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\"\n  }\n]\n"
           },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number of pages",
-            "minimum": 0,
-            "example": 5
-          },
-          "hasNext": {
-            "type": "boolean",
-            "description": "Whether there is a next page",
-            "example": true
-          },
-          "hasPrev": {
-            "type": "boolean",
-            "description": "Whether there is a previous page",
-            "example": false
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-01T12:00:00Z",
+            "readOnly": true
           }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total",
-          "totalPages",
-          "hasNext",
-          "hasPrev"
-        ]
+        }
       },
       "Note": {
         "type": "object",
@@ -813,29 +947,63 @@
             "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
             "readOnly": true
           },
-          "title": {
+          "name": {
             "type": "string",
-            "description": "Title of the note",
             "minLength": 1,
             "maxLength": 255,
             "example": "Meeting Notes"
           },
-          "createdAt": {
+          "folderId": {
             "type": "string",
-            "format": "date-time",
-            "description": "Timestamp when the note was created",
-            "example": "2026-01-11T10:30:00Z",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "currentRevision": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Revision"
+              },
+              {
+                "type": "object",
+                "readOnly": true
+              }
+            ]
+          },
+          "deletedBy": {
+            "type": "string",
+            "enum": [
+              "purpose",
+              "parent"
+            ],
+            "nullable": true,
+            "example": null,
             "readOnly": true
           },
-          "updatedAt": {
+          "deletedAt": {
             "type": "string",
             "nullable": true,
             "format": "date-time",
-            "description": "Timestamp when the note was last updated",
-            "example": "2026-01-11T14:45:00Z",
+            "example": null,
             "readOnly": true
           }
         }
+      },
+      "RevisionRequired": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Revision"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "blockNoteContent",
+              "createdAt"
+            ]
+          }
+        ]
       },
       "NoteRequired": {
         "type": "object",
@@ -845,11 +1013,165 @@
           },
           {
             "type": "object",
+            "properties": {
+              "currentRevision": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RevisionRequired"
+                  },
+                  {
+                    "type": "object",
+                    "readOnly": true
+                  }
+                ]
+              }
+            },
             "required": [
               "id",
               "title",
-              "createdAt",
-              "updatedAt"
+              "folderId",
+              "tags",
+              "currentRevision",
+              "deletedBy",
+              "deletedAt"
+            ]
+          }
+        ]
+      },
+      "id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "550e8400-e29b-41d4-a716-446655440000",
+        "readOnly": true
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Meeting Notes"
+      },
+      "Workspace": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "My Workspace"
+          }
+        }
+      },
+      "WorkspaceRequired": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Workspace"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        ]
+      },
+      "Folder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Work Notes"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": null
+          },
+          "deletedBy": {
+            "type": "string",
+            "enum": [
+              "purpose",
+              "parent"
+            ],
+            "nullable": true,
+            "example": null,
+            "readOnly": true
+          },
+          "deletedAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "example": null,
+            "readOnly": true
+          }
+        }
+      },
+      "FolderRequired": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Folder"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "parentId",
+              "deletedBy",
+              "deletedAt"
+            ]
+          }
+        ]
+      },
+      "FolderWithRelations": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FolderRequired"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FolderWithRelations"
+                }
+              },
+              "parentId": {
+                "type": "string",
+                "format": "uuid",
+                "nullable": true,
+                "example": "123e4567-e89b-12d3-a456-426614174000"
+              },
+              "notes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/NoteRequired"
+                }
+              }
+            },
+            "required": [
+              "children",
+              "parentId",
+              "notes"
             ]
           }
         ]
@@ -1013,6 +1335,18 @@
           "type",
           "data"
         ]
+      },
+      "properties-name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "My Workspace"
+      },
+      "Folder_properties-name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Work Notes"
       }
     },
     "securitySchemes": {
@@ -1035,71 +1369,391 @@
         }
       }
     },
+    "parameters": {
+      "documentIdPath": {
+        "name": "documentId",
+        "in": "path",
+        "required": true,
+        "description": "Unique identifier of the document (note)",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+      },
+      "noteIdPath": {
+        "name": "noteId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+      },
+      "workspaceIdPath": {
+        "name": "workspaceId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        }
+      },
+      "folderIdPath": {
+        "name": "folderId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "6306e1ce-c6d9-4fdd-b8e8-c3fbef22c0d9"
+        }
+      }
+    },
+    "responses": {
+      "BadRequestError": {
+        "description": "Bad Request Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "BAD_REQUEST",
+              "message": "The request could not be understood by the server due to malformed syntax",
+              "more_info": "https://api.notopia.com/docs/errors/BAD_REQUEST"
+            }
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "description": "Unauthorized Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "UNAUTHORIZED",
+              "message": "Authentication is required to access this resource",
+              "more_info": "https://api.notopia.com/docs/errors/UNAUTHORIZED"
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "Not Found Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "NOT_FOUND",
+              "message": "The requested resource was not found",
+              "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal Server Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "INTERNAL_SERVER_ERROR",
+              "message": "An internal server error occurred. Please try again later",
+              "more_info": "https://api.notopia.com/docs/errors/INTERNAL_SERVER_ERROR"
+            }
+          }
+        }
+      },
+      "GetDocumentAttachmentUrlResponse": {
+        "description": "Presigned URL",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "url"
+              ]
+            }
+          }
+        }
+      },
+      "CreateNoteResponse": {
+        "description": "Note successfully created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Note"
+            }
+          }
+        }
+      },
+      "GenerateDailyNoteResponse": {
+        "description": "Daily note generated successfully",
+        "headers": {
+          "Content-Location": {
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "SearchTagsResponse": {
+        "description": "List of matching tags in the workspace",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "GetNoteResponse": {
+        "description": "Successful response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/NoteRequired"
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Forbidden Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "FORBIDDEN",
+              "message": "You do not have permission to access this resource",
+              "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
+            }
+          }
+        }
+      },
+      "CreateWorkspaceResponse": {
+        "description": "Workspace successfully created",
+        "headers": {
+          "Content-Location": {
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "example": "http://api.notopia.localhost/workspaces/550e8400-e29b-41d4-a716-446655440000"
+            }
+          }
+        }
+      },
+      "GetWorkspaceResponse": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/WorkspaceRequired"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "rootFolder": {
+                      "$ref": "#/components/schemas/FolderWithRelations"
+                    }
+                  },
+                  "required": [
+                    "rootFolder"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "GetWorkspaceEventsResponse": {
+        "description": "A persistent stream of events",
+        "content": {
+          "text/event-stream": {
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/NoteMovedEvent"
+                },
+                {
+                  "$ref": "#/components/schemas/FolderMovedEvent"
+                },
+                {
+                  "$ref": "#/components/schemas/FolderRenamedEvent"
+                },
+                {
+                  "$ref": "#/components/schemas/WorkspaceRenamedEvent"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "type",
+                "mapping": {
+                  "NoteMovedEvent": "#/components/schemas/NoteMovedEvent",
+                  "FolderMovedEvent": "#/components/schemas/FolderMovedEvent",
+                  "FolderRenamedEvent": "#/components/schemas/FolderRenamedEvent",
+                  "WorkspaceRenamedEvent": "#/components/schemas/WorkspaceRenamedEvent"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateFolderResponse": {
+        "description": "Folder successfully created",
+        "headers": {
+          "Content-Location": {
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      }
+    },
     "requestBodies": {
       "CreateNoteRequest": {
-        "description": "Create note request",
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/NoteRequired"
-                },
-                {
-                  "example": {
-                    "summary": "Basic note",
-                    "value": {
-                      "title": "My First Note"
-                    }
-                  }
+              "$ref": "#/components/schemas/NoteRequired"
+            }
+          }
+        }
+      },
+      "GenerateDailyNoteRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "workspaceId": {
+                  "$ref": "#/components/schemas/id"
                 }
+              },
+              "required": [
+                "workspaceId"
               ]
             }
           }
         }
       },
-      "PutNoteRequest": {
-        "description": "Put note request (replace entire note)",
+      "SearchTagsRequest": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/NoteRequired"
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Work"
                 },
-                {
-                  "example": {
-                    "summary": "Update complete note",
-                    "value": {
-                      "title": "Updated Meeting Notes"
-                    }
-                  }
+                "limit": {
+                  "type": "integer",
+                  "default": 10,
+                  "example": 10
                 }
+              },
+              "required": [
+                "name"
               ]
             }
           }
         }
       },
-      "PatchNoteRequest": {
-        "description": "Patch note request (partial update)",
+      "RenameNoteRequest": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Note"
-                },
-                {
-                  "example": {
-                    "summary": "Partial update of note",
-                    "value": {
-                      "title": "Partially Updated Meeting Notes"
-                    }
-                  }
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/name"
                 }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      },
+      "CreateWorkspaceRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/WorkspaceRequired"
+            }
+          }
+        }
+      },
+      "RenameWorkspaceRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/properties-name"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      },
+      "CreateFolderRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/FolderRequired"
+            }
+          }
+        }
+      },
+      "RenameFolderRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/Folder_properties-name"
+                }
+              },
+              "required": [
+                "name"
               ]
             }
           }
@@ -1111,9 +1765,10 @@
     {
       "name": "Notopia API",
       "tags": [
-        "document",
-        "note",
-        "workspace"
+        "Document",
+        "Workspace",
+        "Folder",
+        "Note"
       ]
     }
   ]

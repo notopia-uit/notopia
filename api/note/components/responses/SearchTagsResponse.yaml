@@ -1,0 +1,8 @@
+# vim: ft=yaml.openapi
+description: List of matching tags in the workspace
+content:
+  application/json:
+    schema:
+      type: array
+      items:
+        type: string

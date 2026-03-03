@@ -25,7 +25,7 @@
   ],
   "tags": [
     {
-      "name": "document",
+      "name": "Document",
       "description": "Operations related to documenting notes, collaboration."
     }
   ],
@@ -33,7 +33,7 @@
     "url": "https://notopia-uit.github.io/notopia"
   },
   "paths": {
-    "/ws/documents/{documentId}": {
+    "/document/ws/documents/{documentId}": {
       "get": {
         "security": [
           {
@@ -41,10 +41,9 @@
           }
         ],
         "tags": [
-          "document"
+          "Document"
         ],
         "summary": "WebSocket for editing a document",
-        "description": "Establish a WebSocket connection for real-time collaborative editing of a document.",
         "operationId": "wsDocument",
         "parameters": [
           {
@@ -53,10 +52,46 @@
         ],
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established."
+            "description": "Switching Protocols - WebSocket connection established"
           },
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/document/documents/{documentId}/attachment-url": {
+      "get": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Document"
+        ],
+        "summary": "Get presigned URL for document attachment upload",
+        "operationId": "getDocumentAttachmentUrl",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/documentIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetDocumentAttachmentUrlResponse"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -191,6 +226,25 @@
               "code": "INTERNAL_SERVER_ERROR",
               "message": "An internal server error occurred. Please try again later",
               "more_info": "https://api.notopia.com/docs/errors/INTERNAL_SERVER_ERROR"
+            }
+          }
+        }
+      },
+      "GetDocumentAttachmentUrlResponse": {
+        "description": "Presigned URL",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "url"
+              ]
             }
           }
         }

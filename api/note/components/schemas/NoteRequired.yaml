@@ -12,9 +12,8 @@ allOf:
             readOnly: true
     required:
       - id
-      - title
+      - name
       - folderId
-      - tags
       - currentRevision
       - deletedBy
       - deletedAt

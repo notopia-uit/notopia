@@ -1,0 +1,19 @@
+# vim: ft=yaml.openapi
+post:
+  security:
+    - oauth2: []
+  tags:
+    - Note
+  summary: Search tags
+  operationId: searchTags
+  requestBody:
+    $ref: ../components/requestBodies/SearchTagsRequest.yaml
+  responses:
+    200:
+      $ref: ../components/responses/SearchTagsResponse.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

@@ -7,10 +7,11 @@
     "bundle:json": {
       "dependsOn": ["^bundle:json"]
     },
-    "bundle": {
+    "join": {
       "inputs": [
-        "{projectRoot}/bundled/*.json",
-        "!{projectRoot}/bundled/openapi.json"
+        "{projectRoot}/bundled/event.json",
+        "{projectRoot}/bundled/note.json",
+        "{projectRoot}/bundled/document.json"
       ],
       "outputs": ["{projectRoot}/bundled/openapi.json"],
       "executor": "nx:run-commands",
@@ -18,10 +19,33 @@
         "command": "pnpm run redocly:join",
         "cwd": "{projectRoot}"
       },
-      "dependsOn": ["^bundle:join"]
+      "dependsOn": ["^bundle:join"],
+      "cache": true
+    },
+    "watch-join": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm nx watch --projects=api --includeDependentProjects -- pnpm nx run-many --target bundle:json --target join -p \\$NX_PROJECT_NAME",
+        "forwardAllArgs": false,
+        "cwd": "{projectRoot}"
+      },
+      "continuous": true
+    },
+    "bundle": {
+      "dependsOn": ["join"]
     },
     "watch-bundle:json": {
       "dependsOn": ["^watch-bundle:json"]
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "scalar document serve -w ./bundled/openapi.json --port 9080",
+        "forwardAllArgs": false,
+        "cwd": "{projectRoot}"
+      },
+      "continuous": true,
+      "dependsOn": ["join", "watch-join", "^bundle:json"]
     },
     "lint": {
       "executor": "nx:noop",

@@ -21,12 +21,14 @@ info:
     email: kevinnitro@duck.com
 
 tags:
-  - name: document
+  - name: Document
     description: Operations related to documenting notes, collaboration.
 
 paths:
-  /ws/documents/{documentId}:
+  /document/ws/documents/{documentId}:
     $ref: ./paths/ws_documents_{documentId}.yaml
+  /document/documents/{documentId}/attachment-url:
+    $ref: ./paths/documents_{documentId}_attachment-url.yaml
 
 components:
   securitySchemes:

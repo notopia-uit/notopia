@@ -4,15 +4,13 @@ get:
     - oauth2: []
   tags:
     - Document
-  summary: WebSocket for editing a document
-  operationId: wsDocument
+  summary: Get presigned URL for document attachment upload
+  operationId: getDocumentAttachmentUrl
   parameters:
     - $ref: ../components/parameters/documentIdPath.yaml
   responses:
-    101:
-      description: Switching Protocols - WebSocket connection established
     200:
-      description: OK
+      $ref: ../components/responses/GetDocumentAttachmentUrlResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

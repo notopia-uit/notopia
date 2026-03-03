@@ -106,6 +106,37 @@
         }
       }
     },
+    "/note/notes/search-tags": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Search tags",
+        "operationId": "searchTags",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/SearchTagsRequest"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SearchTagsResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/notes/{noteId}": {
       "get": {
         "security": [
@@ -182,6 +213,42 @@
         }
       }
     },
+    "/note/notes/{noteId}/publish": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Publish note",
+        "operationId": "publishNote",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/noteIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Note published successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/notes/{noteId}/rename": {
       "post": {
         "security": [
@@ -205,42 +272,6 @@
         "responses": {
           "204": {
             "description": "Note renamed successfully"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/notes/{noteId}/publish": {
-      "post": {
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
-        "tags": [
-          "Note"
-        ],
-        "summary": "Publish note",
-        "operationId": "publishNote",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/noteIdPath"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Note published successfully"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -394,8 +425,8 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/rename": {
-      "post": {
+    "/note/workspaces/{workspaceId}/events": {
+      "get": {
         "security": [
           {
             "oauth2": []
@@ -404,28 +435,22 @@
         "tags": [
           "Workspace"
         ],
-        "summary": "Rename workspace",
-        "operationId": "renameWorkspace",
+        "summary": "SSE workspace updates",
+        "operationId": "getWorkspaceEvents",
         "parameters": [
           {
             "$ref": "#/components/parameters/workspaceIdPath"
           }
         ],
-        "requestBody": {
-          "$ref": "#/components/requestBodies/RenameWorkspaceRequest"
-        },
         "responses": {
-          "204": {
-            "description": "Workspace renamed successfully"
+          "200": {
+            "$ref": "#/components/responses/GetWorkspaceEventsResponse"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -453,6 +478,45 @@
         "responses": {
           "204": {
             "description": "Workspace published successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/rename": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Rename workspace",
+        "operationId": "renameWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RenameWorkspaceRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Workspace renamed successfully"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -498,39 +562,6 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/workspaces/{workspaceId}/events": {
-      "get": {
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
-        "tags": [
-          "Workspace"
-        ],
-        "summary": "SSE workspace updates",
-        "operationId": "getWorkspaceEvents",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/workspaceIdPath"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/GetWorkspaceEventsResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -922,12 +953,6 @@
           }
         ]
       },
-      "properties-name": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "My Workspace"
-      },
       "NoteMovedEvent": {
         "type": "object",
         "properties": {
@@ -1088,6 +1113,12 @@
           "data"
         ]
       },
+      "properties-name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "My Workspace"
+      },
       "Folder_properties-name": {
         "type": "string",
         "minLength": 1,
@@ -1119,6 +1150,30 @@
               },
               "required": [
                 "workspaceId"
+              ]
+            }
+          }
+        }
+      },
+      "SearchTagsRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Work"
+                },
+                "limit": {
+                  "type": "integer",
+                  "default": 10,
+                  "example": 10
+                }
+              },
+              "required": [
+                "name"
               ]
             }
           }
@@ -1277,6 +1332,19 @@
               "code": "NOT_FOUND",
               "message": "The requested resource was not found",
               "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
+            }
+          }
+        }
+      },
+      "SearchTagsResponse": {
+        "description": "List of matching tags in the workspace",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           }
         }
