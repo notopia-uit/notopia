@@ -1,0 +1,22 @@
+# vim: ft=yaml.openapi
+post:
+  security:
+    - oauth2: []
+  tags:
+    - Revision
+  summary: Apply note revision
+  operationId: applyNoteRevision
+  parameters:
+    - $ref: ../components/parameters/noteIdPath.yaml
+    - $ref: ../components/parameters/revisionIdPath.yaml
+  responses:
+    204:
+      $ref: ../components/responses/ApplyNoteRevisionResponse.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml
