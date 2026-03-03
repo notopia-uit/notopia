@@ -118,6 +118,7 @@
     }
   ],
   "release": {
+    "projects": ["note", "document", "web"],
     "projectsRelationship": "independent",
     "releaseTag": {
       "pattern": "{projectName}@{version}",
