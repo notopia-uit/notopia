@@ -125,7 +125,7 @@
       "requireSemver": true
     },
     "docker": {
-      "registryUrl": "https://ghcr.io",
+      "registryUrl": "ghcr.io",
       "skipVersionActions": true
     },
     "version": {
