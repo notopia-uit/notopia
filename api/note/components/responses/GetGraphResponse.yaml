@@ -1,0 +1,6 @@
+# vim: ft=yaml.openapi
+description: Graph
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/Graph.yaml

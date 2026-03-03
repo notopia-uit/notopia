@@ -29,12 +29,17 @@ tags:
     description: Note in workspace's root folder or in a folder
   - name: Revision
     description: Note revisions
+  - name: Graph
+    description: Note graph
 
 paths:
   /note/folders:
     $ref: ./paths/folders.yaml
   /note/folders/{folderId}/rename:
     $ref: ./paths/folders_{folderId}_rename.yaml
+
+  /note/graph:
+    $ref: ./paths/graph.yaml
 
   /note/notes:
     $ref: ./paths/notes.yaml

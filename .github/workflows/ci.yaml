@@ -188,8 +188,7 @@ jobs:
           }}
         run: |
           npx nx release version \
-            ${{ github.event.inputs.dry-run-publish == 'true' && '--dry-run' || '' }} \
-            | true
+            ${{ github.event.inputs.dry-run-publish == 'true' && '--dry-run' || '' }}
           npx nx release publish \
             ${{ github.event.inputs.dry-run-publish == 'true' && '--dry-run' || '' }}
 
