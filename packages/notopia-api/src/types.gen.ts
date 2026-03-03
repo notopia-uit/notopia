@@ -133,7 +133,6 @@ export type TrashedDeletedBy = typeof TrashedDeletedBy[keyof typeof TrashedDelet
 export type TrashedNote = {
     id: string;
     readonly name: string;
-    type: 'note';
     deletedBy: TrashedDeletedBy;
     readonly deletedAt: string | null;
 };
@@ -141,7 +140,6 @@ export type TrashedNote = {
 export type TrashedFolder = {
     id: string;
     readonly name: string;
-    type: 'folder';
     deletedBy: TrashedDeletedBy;
     readonly deletedAt: string | null;
 };
@@ -175,12 +173,10 @@ export type FolderWithRelationsWritable = FolderWritable & {
 
 export type TrashedNoteWritable = {
     id: string;
-    type: 'note';
 };
 
 export type TrashedFolderWritable = {
     id: string;
-    type: 'folder';
 };
 
 /**
@@ -239,17 +235,15 @@ export type RenameWorkspaceRequest = {
     name: WorkspacePropertiesName;
 };
 
-export type RestoreTrashedWorkspaceItemsRequest = Array<({
-    type: 'note';
-} & TrashedNoteWritable) | ({
-    type: 'folder';
-} & TrashedFolderWritable)>;
+export type RestoreTrashedWorkspaceItemsRequest = {
+    notes?: Array<TrashedNoteWritable>;
+    folders?: Array<TrashedFolderWritable>;
+};
 
-export type TrashWorkspaceItemsRequest = Array<({
-    type: 'note';
-} & TrashedNoteWritable) | ({
-    type: 'folder';
-} & TrashedFolderWritable)>;
+export type TrashWorkspaceItemsRequest = {
+    notes?: Array<TrashedNoteWritable>;
+    folders?: Array<TrashedFolderWritable>;
+};
 
 export type CreateFolderRequest = FolderWritable;
 
@@ -1201,11 +1195,10 @@ export type ShowTrashResponses = {
      * Trash
      */
     200: {
-        data: Array<({
-            type: 'note';
-        } & TrashedNote) | ({
-            type: 'folder';
-        } & TrashedFolder)>;
+        data: {
+            notes?: Array<TrashedNote>;
+            folders?: Array<TrashedFolder>;
+        };
         pagination: Pagination;
     };
 };

@@ -119,7 +119,6 @@ export const zTrashedDeletedBy = z.enum(['purpose', 'parent']);
 export const zTrashedNote = z.object({
     id: z.uuid(),
     name: z.string().min(1).max(255).readonly(),
-    type: z.enum(['note']),
     deletedBy: zTrashedDeletedBy,
     deletedAt: z.union([
         z.iso.datetime().readonly(),
@@ -130,7 +129,6 @@ export const zTrashedNote = z.object({
 export const zTrashedFolder = z.object({
     id: z.uuid(),
     name: z.string().min(1).max(255).readonly(),
-    type: z.enum(['folder']),
     deletedBy: zTrashedDeletedBy,
     deletedAt: z.union([
         z.iso.datetime().readonly(),
@@ -180,13 +178,11 @@ export const zFolderWithRelationsWritable = zFolderWritable.and(z.lazy(() => z.o
 })));
 
 export const zTrashedNoteWritable = z.object({
-    id: z.uuid(),
-    type: z.enum(['note'])
+    id: z.uuid()
 });
 
 export const zTrashedFolderWritable = z.object({
-    id: z.uuid(),
-    type: z.enum(['folder'])
+    id: z.uuid()
 });
 
 /**
@@ -243,17 +239,15 @@ export const zRenameWorkspaceRequest = z.object({
     name: zWorkspacePropertiesName
 });
 
-export const zRestoreTrashedWorkspaceItemsRequest = z.array(z.union([z.object({
-        type: z.literal('note')
-    }).and(zTrashedNoteWritable), z.object({
-        type: z.literal('folder')
-    }).and(zTrashedFolderWritable)]));
+export const zRestoreTrashedWorkspaceItemsRequest = z.object({
+    notes: z.optional(z.array(zTrashedNoteWritable)),
+    folders: z.optional(z.array(zTrashedFolderWritable))
+});
 
-export const zTrashWorkspaceItemsRequest = z.array(z.union([z.object({
-        type: z.literal('note')
-    }).and(zTrashedNoteWritable), z.object({
-        type: z.literal('folder')
-    }).and(zTrashedFolderWritable)]));
+export const zTrashWorkspaceItemsRequest = z.object({
+    notes: z.optional(z.array(zTrashedNoteWritable)),
+    folders: z.optional(z.array(zTrashedFolderWritable))
+});
 
 export const zCreateFolderRequest = zFolderWritable;
 
@@ -559,11 +553,10 @@ export const zShowTrashData = z.object({
  * Trash
  */
 export const zShowTrashResponse = z.object({
-    data: z.array(z.union([z.object({
-            type: z.literal('note')
-        }).and(zTrashedNote), z.object({
-            type: z.literal('folder')
-        }).and(zTrashedFolder)])),
+    data: z.object({
+        notes: z.optional(z.array(zTrashedNote)),
+        folders: z.optional(z.array(zTrashedFolder))
+    }),
     pagination: zPagination
 });
 
