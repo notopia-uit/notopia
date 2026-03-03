@@ -186,11 +186,10 @@ jobs:
           (github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch') ||
           github.ref != 'refs/heads/main'
           }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npx nx release version \
-            ${{ github.event.inputs.dry-run-publish == 'true' && '--dry-run' || '' }}
+            ${{ github.event.inputs.dry-run-publish == 'true' && '--dry-run' || '' }} \
+            | true
           npx nx release publish \
             ${{ github.event.inputs.dry-run-publish == 'true' && '--dry-run' || '' }}
 
