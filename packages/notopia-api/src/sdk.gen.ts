@@ -2,8 +2,8 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateNoteData, CreateNoteErrors, CreateNoteResponses, CreateWorkspaceData, CreateWorkspaceErrors, CreateWorkspaceResponses, DeleteNoteData, DeleteNoteErrors, DeleteNoteResponses, DeleteRevisionData, DeleteRevisionErrors, DeleteRevisionResponses, DeleteWorkspaceData, DeleteWorkspaceErrors, DeleteWorkspaceResponses, GenerateDailyNoteData, GenerateDailyNoteErrors, GenerateDailyNoteResponses, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlErrors, GetDocumentAttachmentUploadUrlResponses, GetNoteData, GetNoteErrors, GetNoteResponses, GetRevisionData, GetRevisionErrors, GetRevisionResponses, GetRevisionsData, GetRevisionsErrors, GetRevisionsResponses, GetWorkspaceData, GetWorkspaceErrors, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponses, GetWorkspaceResponses, ImportDocumentsData, ImportDocumentsErrors, ImportDocumentsResponses, OpenRandomNoteData, OpenRandomNoteErrors, OpenRandomNoteResponses, PublishNoteData, PublishNoteErrors, PublishNoteResponses, PublishWorkspaceData, PublishWorkspaceErrors, PublishWorkspaceResponses, RenameFolderData, RenameFolderErrors, RenameFolderResponses, RenameNoteData, RenameNoteErrors, RenameNoteResponses, RenameRevisionData, RenameRevisionErrors, RenameRevisionResponses, RenameWorkspaceData, RenameWorkspaceErrors, RenameWorkspaceResponses, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsErrors, RestoreTrashedWorkspaceItemsResponses, SearchTagsData, SearchTagsErrors, SearchTagsResponses, ShowTrashData, ShowTrashErrors, ShowTrashResponses, TrashWorkspaceItemsData, TrashWorkspaceItemsErrors, TrashWorkspaceItemsResponses, UnpublishNoteData, UnpublishNoteErrors, UnpublishNoteResponses, UnpublishWorkspaceData, UnpublishWorkspaceErrors, UnpublishWorkspaceResponses, WsDocumentData, WsDocumentErrors, WsDocumentResponses } from './types.gen';
-import { zCreateFolderData, zCreateNoteData, zCreateWorkspaceData, zDeleteNoteData, zDeleteNoteResponse, zDeleteRevisionData, zDeleteRevisionResponse, zDeleteWorkspaceData, zDeleteWorkspaceResponse, zGenerateDailyNoteData, zGetDocumentAttachmentUploadUrlData, zGetDocumentAttachmentUploadUrlResponse, zGetNoteData, zGetNoteResponse, zGetRevisionData, zGetRevisionResponse, zGetRevisionsData, zGetRevisionsResponse, zGetWorkspaceData, zGetWorkspaceEventsData, zGetWorkspaceEventsResponse, zGetWorkspaceResponse, zImportDocumentsData, zOpenRandomNoteData, zPublishNoteData, zPublishNoteResponse, zPublishWorkspaceData, zPublishWorkspaceResponse, zRenameFolderData, zRenameFolderResponse, zRenameNoteData, zRenameNoteResponse, zRenameRevisionData, zRenameRevisionResponse, zRenameWorkspaceData, zRenameWorkspaceResponse, zRestoreTrashedWorkspaceItemsData, zRestoreTrashedWorkspaceItemsResponse, zSearchTagsData, zSearchTagsResponse, zShowTrashData, zShowTrashResponse, zTrashWorkspaceItemsData, zTrashWorkspaceItemsResponse, zUnpublishNoteData, zUnpublishNoteResponse, zUnpublishWorkspaceData, zUnpublishWorkspaceResponse, zWsDocumentData } from './zod.gen';
+import type { CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateNoteData, CreateNoteErrors, CreateNoteResponses, CreateWorkspaceData, CreateWorkspaceErrors, CreateWorkspaceResponses, DeleteNoteData, DeleteNoteErrors, DeleteNoteResponses, DeleteRevisionData, DeleteRevisionErrors, DeleteRevisionResponses, DeleteWorkspaceData, DeleteWorkspaceErrors, DeleteWorkspaceResponses, GenerateDailyNoteData, GenerateDailyNoteErrors, GenerateDailyNoteResponses, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlErrors, GetDocumentAttachmentUploadUrlResponses, GetNoteData, GetNoteErrors, GetNoteResponses, GetRevisionData, GetRevisionErrors, GetRevisionResponses, GetRevisionsData, GetRevisionsErrors, GetRevisionsResponses, GetWorkspaceData, GetWorkspaceErrors, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponses, GetWorkspaceResponses, ImportDocumentsData, ImportDocumentsErrors, ImportDocumentsResponses, OpenRandomNoteData, OpenRandomNoteErrors, OpenRandomNoteResponses, PublishNoteData, PublishNoteErrors, PublishNoteResponses, PublishWorkspaceData, PublishWorkspaceErrors, PublishWorkspaceResponses, RenameFolderData, RenameFolderErrors, RenameFolderResponses, RenameNoteData, RenameNoteErrors, RenameNoteResponses, RenameRevisionData, RenameRevisionErrors, RenameRevisionResponses, RenameWorkspaceData, RenameWorkspaceErrors, RenameWorkspaceResponses, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsErrors, RestoreTrashedWorkspaceItemsResponses, SearchTagsData, SearchTagsErrors, SearchTagsResponses, ShowTrashData, ShowTrashErrors, ShowTrashResponses, TrashWorkspaceItemsData, TrashWorkspaceItemsErrors, TrashWorkspaceItemsResponses, UnpublishNoteData, UnpublishNoteErrors, UnpublishNoteResponses, UnpublishWorkspaceData, UnpublishWorkspaceErrors, UnpublishWorkspaceResponses, UpdateWorkspaceCollaboratorsData, UpdateWorkspaceCollaboratorsErrors, UpdateWorkspaceCollaboratorsResponses, WsDocumentData, WsDocumentErrors, WsDocumentResponses } from './types.gen';
+import { zCreateFolderData, zCreateNoteData, zCreateWorkspaceData, zDeleteNoteData, zDeleteNoteResponse, zDeleteRevisionData, zDeleteRevisionResponse, zDeleteWorkspaceData, zDeleteWorkspaceResponse, zGenerateDailyNoteData, zGetDocumentAttachmentUploadUrlData, zGetDocumentAttachmentUploadUrlResponse, zGetNoteData, zGetNoteResponse, zGetRevisionData, zGetRevisionResponse, zGetRevisionsData, zGetRevisionsResponse, zGetWorkspaceData, zGetWorkspaceEventsData, zGetWorkspaceEventsResponse, zGetWorkspaceResponse, zImportDocumentsData, zOpenRandomNoteData, zPublishNoteData, zPublishNoteResponse, zPublishWorkspaceData, zPublishWorkspaceResponse, zRenameFolderData, zRenameFolderResponse, zRenameNoteData, zRenameNoteResponse, zRenameRevisionData, zRenameRevisionResponse, zRenameWorkspaceData, zRenameWorkspaceResponse, zRestoreTrashedWorkspaceItemsData, zRestoreTrashedWorkspaceItemsResponse, zSearchTagsData, zSearchTagsResponse, zShowTrashData, zShowTrashResponse, zTrashWorkspaceItemsData, zTrashWorkspaceItemsResponse, zUnpublishNoteData, zUnpublishNoteResponse, zUnpublishWorkspaceData, zUnpublishWorkspaceResponse, zUpdateWorkspaceCollaboratorsData, zUpdateWorkspaceCollaboratorsResponse, zWsDocumentData } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -54,6 +54,35 @@ export const getDocumentAttachmentUploadUrl = <ThrowOnError extends boolean = fa
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/document/documents/{documentId}/attachment-url',
     ...options
+});
+
+/**
+ * Create folder
+ */
+export const createFolder = <ThrowOnError extends boolean = false>(options: Options<CreateFolderData, ThrowOnError>) => (options.client ?? client).post<CreateFolderResponses, CreateFolderErrors, ThrowOnError>({
+    requestValidator: async (data) => await zCreateFolderData.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/folders',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Rename folder
+ */
+export const renameFolder = <ThrowOnError extends boolean = false>(options: Options<RenameFolderData, ThrowOnError>) => (options.client ?? client).post<RenameFolderResponses, RenameFolderErrors, ThrowOnError>({
+    requestValidator: async (data) => await zRenameFolderData.parseAsync(data),
+    responseValidator: async (data) => await zRenameFolderResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/folders/{folderId}/rename',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
@@ -346,27 +375,13 @@ export const unpublishWorkspace = <ThrowOnError extends boolean = false>(options
 });
 
 /**
- * Create folder
+ * Update workspace collaborators
  */
-export const createFolder = <ThrowOnError extends boolean = false>(options: Options<CreateFolderData, ThrowOnError>) => (options.client ?? client).post<CreateFolderResponses, CreateFolderErrors, ThrowOnError>({
-    requestValidator: async (data) => await zCreateFolderData.parseAsync(data),
+export const updateWorkspaceCollaborators = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceCollaboratorsData, ThrowOnError>) => (options.client ?? client).post<UpdateWorkspaceCollaboratorsResponses, UpdateWorkspaceCollaboratorsErrors, ThrowOnError>({
+    requestValidator: async (data) => await zUpdateWorkspaceCollaboratorsData.parseAsync(data),
+    responseValidator: async (data) => await zUpdateWorkspaceCollaboratorsResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/folders',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Rename folder
- */
-export const renameFolder = <ThrowOnError extends boolean = false>(options: Options<RenameFolderData, ThrowOnError>) => (options.client ?? client).post<RenameFolderResponses, RenameFolderErrors, ThrowOnError>({
-    requestValidator: async (data) => await zRenameFolderData.parseAsync(data),
-    responseValidator: async (data) => await zRenameFolderResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/folders/{folderId}/rename',
+    url: '/note/workspaces/{workspaceId}/update-collaborators',
     ...options,
     headers: {
         'Content-Type': 'application/json',

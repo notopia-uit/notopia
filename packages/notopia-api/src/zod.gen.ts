@@ -8,6 +8,17 @@ export const zError = z.object({
     more_info: z.optional(z.string())
 });
 
+export const zFolder = z.object({
+    id: z.uuid().readonly(),
+    name: z.string().min(1).max(255),
+    parentId: z.union([
+        z.uuid(),
+        z.null()
+    ])
+});
+
+export const zName = z.string().min(1).max(255);
+
 export const zRevision = z.object({
     id: z.uuid().readonly(),
     name: z.union([
@@ -30,7 +41,7 @@ export const zNote = z.object({
 
 export const zId = z.uuid().readonly();
 
-export const zName = z.string().min(1).max(255);
+export const zPropertiesName = z.string().min(1).max(255);
 
 export const zPagination = z.object({
     page: z.int().gte(1),
@@ -41,7 +52,7 @@ export const zPagination = z.object({
     hasPrev: z.boolean()
 });
 
-export const zPropertiesName = z.union([
+export const zRevisionPropertiesName = z.union([
     z.string().min(1).max(255),
     z.null()
 ]);
@@ -51,22 +62,13 @@ export const zWorkspace = z.object({
     name: z.string().min(1).max(255)
 });
 
-export const zFolder = z.object({
-    id: z.uuid().readonly(),
-    name: z.string().min(1).max(255),
-    parentId: z.union([
-        z.uuid(),
-        z.null()
-    ])
-});
-
 export const zPropertiesId = z.uuid().readonly();
 
 export const zFolderId = z.uuid();
 
 export const zTreeNote = z.object({
     id: zPropertiesId,
-    name: zName,
+    name: zPropertiesName,
     folderId: zFolderId
 });
 
@@ -141,7 +143,13 @@ export const zTrashedFolder = z.object({
     ]).readonly()
 });
 
-export const zFolderPropertiesName = z.string().min(1).max(255);
+export const zFolderWritable = z.object({
+    name: z.string().min(1).max(255),
+    parentId: z.union([
+        z.uuid(),
+        z.null()
+    ])
+});
 
 export const zRevisionWritable = z.object({
     name: z.union([
@@ -163,16 +171,8 @@ export const zWorkspaceWritable = z.object({
     name: z.string().min(1).max(255)
 });
 
-export const zFolderWritable = z.object({
-    name: z.string().min(1).max(255),
-    parentId: z.union([
-        z.uuid(),
-        z.null()
-    ])
-});
-
 export const zTreeNoteWritable = z.object({
-    name: zName,
+    name: zPropertiesName,
     folderId: zFolderId
 });
 
@@ -200,6 +200,8 @@ export const zTrashedFolderWritable = z.object({
  */
 export const zDocumentIdPath = z.uuid();
 
+export const zFolderIdPath = z.uuid();
+
 export const zNoteIdPath = z.uuid();
 
 export const zNoteIdQuery = z.uuid();
@@ -218,9 +220,13 @@ export const zRevisionIdPath = z.uuid();
 
 export const zWorkspaceIdPath = z.uuid();
 
-export const zFolderIdPath = z.uuid();
-
 export const zImportDocumentsRequest = z.array(z.record(z.string(), z.unknown()));
+
+export const zCreateFolderRequest = zFolderWritable;
+
+export const zRenameFolderRequest = z.object({
+    name: zName
+});
 
 export const zCreateNoteRequest = zNoteWritable;
 
@@ -238,11 +244,11 @@ export const zSearchTagsRequest = z.object({
 });
 
 export const zRenameNoteRequest = z.object({
-    name: zName
+    name: zPropertiesName
 });
 
 export const zRenameRevisionRequest = z.object({
-    name: zPropertiesName
+    name: zRevisionPropertiesName
 });
 
 export const zCreateWorkspaceRequest = zWorkspaceWritable;
@@ -261,11 +267,14 @@ export const zTrashWorkspaceItemsRequest = z.object({
     folders: z.optional(z.array(zTrashedFolderWritable))
 });
 
-export const zCreateFolderRequest = zFolderWritable;
-
-export const zRenameFolderRequest = z.object({
-    name: zFolderPropertiesName
-});
+export const zUpdateWorkspaceCollaborators = z.array(z.object({
+    userId: z.string(),
+    role: z.enum([
+        'owner',
+        'editor',
+        'viewer'
+    ])
+}));
 
 export const zImportDocumentsData = z.object({
     body: zImportDocumentsRequest,
@@ -295,6 +304,25 @@ export const zGetDocumentAttachmentUploadUrlData = z.object({
 export const zGetDocumentAttachmentUploadUrlResponse = z.object({
     url: z.url()
 });
+
+export const zCreateFolderData = z.object({
+    body: zCreateFolderRequest,
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+export const zRenameFolderData = z.object({
+    body: zRenameFolderRequest,
+    path: z.object({
+        folderId: z.uuid()
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Folder renamed successfully
+ */
+export const zRenameFolderResponse = z.void();
 
 export const zCreateNoteData = z.object({
     body: zCreateNoteRequest,
@@ -591,21 +619,15 @@ export const zUnpublishWorkspaceData = z.object({
  */
 export const zUnpublishWorkspaceResponse = z.void();
 
-export const zCreateFolderData = z.object({
-    body: zCreateFolderRequest,
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
-export const zRenameFolderData = z.object({
-    body: zRenameFolderRequest,
+export const zUpdateWorkspaceCollaboratorsData = z.object({
+    body: zUpdateWorkspaceCollaborators,
     path: z.object({
-        folderId: z.uuid()
+        workspaceId: z.uuid()
     }),
     query: z.optional(z.never())
 });
 
 /**
- * Folder renamed successfully
+ * Workspace collaborators updated successfully
  */
-export const zRenameFolderResponse = z.void();
+export const zUpdateWorkspaceCollaboratorsResponse = z.void();

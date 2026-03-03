@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { createFolder, createNote, createWorkspace, deleteNote, deleteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getNote, getRevision, getRevisions, getWorkspace, importDocuments, openRandomNote, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchTags, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, wsDocument } from '../sdk.gen';
-import type { CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetNoteData, GetNoteError, GetNoteResponse, GetRevisionData, GetRevisionError, GetRevisionResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceResponse, ImportDocumentsData, ImportDocumentsError, OpenRandomNoteData, OpenRandomNoteError, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchTagsData, SearchTagsError, SearchTagsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, WsDocumentData, WsDocumentError } from '../types.gen';
+import { createFolder, createNote, createWorkspace, deleteNote, deleteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getNote, getRevision, getRevisions, getWorkspace, importDocuments, openRandomNote, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchTags, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceCollaborators, wsDocument } from '../sdk.gen';
+import type { CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetNoteData, GetNoteError, GetNoteResponse, GetRevisionData, GetRevisionError, GetRevisionResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceResponse, ImportDocumentsData, ImportDocumentsError, OpenRandomNoteData, OpenRandomNoteError, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchTagsData, SearchTagsError, SearchTagsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceCollaboratorsData, UpdateWorkspaceCollaboratorsError, UpdateWorkspaceCollaboratorsResponse, WsDocumentData, WsDocumentError } from '../types.gen';
 
 /**
  * Import documents
@@ -93,6 +93,40 @@ export const getDocumentAttachmentUploadUrlOptions = (options: Options<GetDocume
     },
     queryKey: getDocumentAttachmentUploadUrlQueryKey(options)
 });
+
+/**
+ * Create folder
+ */
+export const createFolderMutation = (options?: Partial<Options<CreateFolderData>>): UseMutationOptions<unknown, CreateFolderError, Options<CreateFolderData>> => {
+    const mutationOptions: UseMutationOptions<unknown, CreateFolderError, Options<CreateFolderData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createFolder({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Rename folder
+ */
+export const renameFolderMutation = (options?: Partial<Options<RenameFolderData>>): UseMutationOptions<RenameFolderResponse, RenameFolderError, Options<RenameFolderData>> => {
+    const mutationOptions: UseMutationOptions<RenameFolderResponse, RenameFolderError, Options<RenameFolderData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await renameFolder({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
  * Create note
@@ -530,29 +564,12 @@ export const unpublishWorkspaceMutation = (options?: Partial<Options<UnpublishWo
 };
 
 /**
- * Create folder
+ * Update workspace collaborators
  */
-export const createFolderMutation = (options?: Partial<Options<CreateFolderData>>): UseMutationOptions<unknown, CreateFolderError, Options<CreateFolderData>> => {
-    const mutationOptions: UseMutationOptions<unknown, CreateFolderError, Options<CreateFolderData>> = {
+export const updateWorkspaceCollaboratorsMutation = (options?: Partial<Options<UpdateWorkspaceCollaboratorsData>>): UseMutationOptions<UpdateWorkspaceCollaboratorsResponse, UpdateWorkspaceCollaboratorsError, Options<UpdateWorkspaceCollaboratorsData>> => {
+    const mutationOptions: UseMutationOptions<UpdateWorkspaceCollaboratorsResponse, UpdateWorkspaceCollaboratorsError, Options<UpdateWorkspaceCollaboratorsData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await createFolder({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Rename folder
- */
-export const renameFolderMutation = (options?: Partial<Options<RenameFolderData>>): UseMutationOptions<RenameFolderResponse, RenameFolderError, Options<RenameFolderData>> => {
-    const mutationOptions: UseMutationOptions<RenameFolderResponse, RenameFolderError, Options<RenameFolderData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await renameFolder({
+            const { data } = await updateWorkspaceCollaborators({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

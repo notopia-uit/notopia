@@ -45,6 +45,76 @@
     "url": "https://notopia-uit.github.io/notopia"
   },
   "paths": {
+    "/note/folders": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Folder"
+        ],
+        "summary": "Create folder",
+        "operationId": "createFolder",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateFolderRequest"
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateFolderResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/folders/{folderId}/rename": {
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Folder"
+        ],
+        "summary": "Rename folder",
+        "operationId": "renameFolder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/folderIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RenameFolderRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Folder renamed successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/notes": {
       "post": {
         "security": [
@@ -878,7 +948,7 @@
         }
       }
     },
-    "/note/folders": {
+    "/note/workspaces/{workspaceId}/update-collaborators": {
       "post": {
         "security": [
           {
@@ -886,52 +956,21 @@
           }
         ],
         "tags": [
-          "Folder"
+          "Workspace"
         ],
-        "summary": "Create folder",
-        "operationId": "createFolder",
-        "requestBody": {
-          "$ref": "#/components/requestBodies/CreateFolderRequest"
-        },
-        "responses": {
-          "201": {
-            "$ref": "#/components/responses/CreateFolderResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/folders/{folderId}/rename": {
-      "post": {
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
-        "tags": [
-          "Folder"
-        ],
-        "summary": "Rename folder",
-        "operationId": "renameFolder",
+        "summary": "Update workspace collaborators",
+        "operationId": "updateWorkspaceCollaborators",
         "parameters": [
           {
-            "$ref": "#/components/parameters/folderIdPath"
+            "$ref": "#/components/parameters/workspaceIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/RenameFolderRequest"
+          "$ref": "#/components/requestBodies/UpdateWorkspaceCollaborators"
         },
         "responses": {
           "204": {
-            "description": "Folder renamed successfully"
+            "description": "Workspace collaborators updated successfully"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -971,6 +1010,64 @@
       }
     },
     "schemas": {
+      "Folder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Work Notes"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": null
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "parentId"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error code",
+            "example": "EXAMPLE_CODE"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message",
+            "example": "Example error"
+          },
+          "more_info": {
+            "type": "string",
+            "description": "URL with more information about the error",
+            "example": "https://api.notopia.com/docs/errors/EXAMPLE_CODE"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Work Notes"
+      },
       "Revision": {
         "type": "object",
         "properties": {
@@ -1038,37 +1135,13 @@
           "currentRevision"
         ]
       },
-      "Error": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "description": "Error code",
-            "example": "EXAMPLE_CODE"
-          },
-          "message": {
-            "type": "string",
-            "description": "Human-readable error message",
-            "example": "Example error"
-          },
-          "more_info": {
-            "type": "string",
-            "description": "URL with more information about the error",
-            "example": "https://api.notopia.com/docs/errors/EXAMPLE_CODE"
-          }
-        },
-        "required": [
-          "code",
-          "message"
-        ]
-      },
       "id": {
         "type": "string",
         "format": "uuid",
         "example": "550e8400-e29b-41d4-a716-446655440000",
         "readOnly": true
       },
-      "name": {
+      "properties-name": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
@@ -1122,7 +1195,7 @@
           "hasPrev"
         ]
       },
-      "properties-name": {
+      "Revision_properties-name": {
         "type": "string",
         "nullable": true,
         "minLength": 1,
@@ -1148,34 +1221,6 @@
         "required": [
           "id",
           "name"
-        ]
-      },
-      "Folder": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "Work Notes"
-          },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "example": null
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "parentId"
         ]
       },
       "FolderWithRelations": {
@@ -1232,7 +1277,7 @@
             "$ref": "#/components/schemas/properties-id"
           },
           "name": {
-            "$ref": "#/components/schemas/name"
+            "$ref": "#/components/schemas/properties-name"
           },
           "folderId": {
             "$ref": "#/components/schemas/folderId"
@@ -1485,15 +1530,37 @@
           "deletedBy",
           "deletedAt"
         ]
-      },
-      "Folder_properties-name": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "Work Notes"
       }
     },
     "requestBodies": {
+      "CreateFolderRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Folder"
+            }
+          }
+        }
+      },
+      "RenameFolderRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/name"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      },
       "CreateNoteRequest": {
         "required": true,
         "content": {
@@ -1572,7 +1639,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/name"
+                  "$ref": "#/components/schemas/properties-name"
                 }
               },
               "required": [
@@ -1590,7 +1657,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/properties-name"
+                  "$ref": "#/components/schemas/Revision_properties-name"
                 }
               },
               "required": [
@@ -1676,44 +1743,48 @@
           }
         }
       },
-      "CreateFolderRequest": {
+      "UpdateWorkspaceCollaborators": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Folder"
-            }
-          }
-        }
-      },
-      "RenameFolderRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/Folder_properties-name"
-                }
-              },
-              "required": [
-                "name"
-              ]
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "example": "c3788141-c297-45fa-8e9b-5c22f06f8b0f"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "owner",
+                      "editor",
+                      "viewer"
+                    ],
+                    "example": "owner"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "role"
+                ]
+              }
             }
           }
         }
       }
     },
     "responses": {
-      "CreateNoteResponse": {
-        "description": "Note successfully created",
+      "CreateFolderResponse": {
+        "description": "Folder successfully created",
         "headers": {
           "Content-Location": {
             "schema": {
               "type": "string",
               "format": "uri",
-              "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+              "example": "http://api.notopia.localhost/notes/folder/123e4567-e89b-12d3-a456-426614174000"
             },
             "required": true
           }
@@ -1764,19 +1835,6 @@
           }
         }
       },
-      "GenerateDailyNoteResponse": {
-        "description": "Daily note generated successfully",
-        "headers": {
-          "Content-Location": {
-            "schema": {
-              "type": "string",
-              "format": "uri",
-              "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-            },
-            "required": true
-          }
-        }
-      },
       "NotFoundError": {
         "description": "Not Found Error response",
         "content": {
@@ -1789,6 +1847,32 @@
               "message": "The requested resource was not found",
               "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
             }
+          }
+        }
+      },
+      "CreateNoteResponse": {
+        "description": "Note successfully created",
+        "headers": {
+          "Content-Location": {
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+            },
+            "required": true
+          }
+        }
+      },
+      "GenerateDailyNoteResponse": {
+        "description": "Daily note generated successfully",
+        "headers": {
+          "Content-Location": {
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+            },
+            "required": true
           }
         }
       },
@@ -1983,22 +2067,19 @@
             }
           }
         }
-      },
-      "CreateFolderResponse": {
-        "description": "Folder successfully created",
-        "headers": {
-          "Content-Location": {
-            "schema": {
-              "type": "string",
-              "format": "uri",
-              "example": "http://api.notopia.localhost/notes/folder/123e4567-e89b-12d3-a456-426614174000"
-            },
-            "required": true
-          }
-        }
       }
     },
     "parameters": {
+      "folderIdPath": {
+        "name": "folderId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "6306e1ce-c6d9-4fdd-b8e8-c3fbef22c0d9"
+        }
+      },
       "noteIdPath": {
         "name": "noteId",
         "in": "path",
@@ -2060,16 +2141,6 @@
           "type": "string",
           "format": "uuid",
           "example": "550e8400-e29b-41d4-a716-446655440000"
-        }
-      },
-      "folderIdPath": {
-        "name": "folderId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "6306e1ce-c6d9-4fdd-b8e8-c3fbef22c0d9"
         }
       }
     }

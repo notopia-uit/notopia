@@ -47,6 +47,13 @@ const (
 	WorkspaceRenamedEventTypeWorkspaceRenamedEvent WorkspaceRenamedEventType = "WorkspaceRenamedEvent"
 )
 
+// Defines values for UpdateWorkspaceCollaboratorsJSONBodyRole.
+const (
+	Editor UpdateWorkspaceCollaboratorsJSONBodyRole = "editor"
+	Owner  UpdateWorkspaceCollaboratorsJSONBodyRole = "owner"
+	Viewer UpdateWorkspaceCollaboratorsJSONBodyRole = "viewer"
+)
+
 // Error defines model for Error.
 type Error struct {
 	// Code Error code
@@ -101,9 +108,6 @@ type FolderWithRelations struct {
 	ParentId *openapi_types.UUID   `json:"parentId"`
 }
 
-// FolderPropertiesName defines model for Folder_properties-name.
-type FolderPropertiesName = string
-
 // Note defines model for Note.
 type Note struct {
 	CurrentRevision Revision            `json:"currentRevision"`
@@ -154,6 +158,9 @@ type Revision struct {
 	Name             *string             `json:"name"`
 }
 
+// RevisionPropertiesName defines model for Revision_properties-name.
+type RevisionPropertiesName = string
+
 // TrashedDeletedBy defines model for TrashedDeletedBy.
 type TrashedDeletedBy string
 
@@ -175,9 +182,9 @@ type TrashedNote struct {
 
 // TreeNote defines model for TreeNote.
 type TreeNote struct {
-	FolderId FolderId      `json:"folderId"`
-	Id       *PropertiesId `json:"id,omitempty"`
-	Name     Name          `json:"name"`
+	FolderId FolderId       `json:"folderId"`
+	Id       *PropertiesId  `json:"id,omitempty"`
+	Name     PropertiesName `json:"name"`
 }
 
 // Workspace defines model for Workspace.
@@ -305,17 +312,17 @@ type OpenRandomNoteRequest struct {
 
 // RenameFolderRequest defines model for RenameFolderRequest.
 type RenameFolderRequest struct {
-	Name FolderPropertiesName `json:"name"`
+	Name Name `json:"name"`
 }
 
 // RenameNoteRequest defines model for RenameNoteRequest.
 type RenameNoteRequest struct {
-	Name Name `json:"name"`
+	Name PropertiesName `json:"name"`
 }
 
 // RenameRevisionRequest defines model for RenameRevisionRequest.
 type RenameRevisionRequest struct {
-	Name *PropertiesName `json:"name"`
+	Name *RevisionPropertiesName `json:"name"`
 }
 
 // RenameWorkspaceRequest defines model for RenameWorkspaceRequest.
@@ -341,6 +348,12 @@ type TrashWorkspaceItemsRequest struct {
 	Notes   *[]TrashedNote   `json:"notes,omitempty"`
 }
 
+// UpdateWorkspaceCollaborators defines model for UpdateWorkspaceCollaborators.
+type UpdateWorkspaceCollaborators = []struct {
+	Role   UpdateWorkspaceCollaboratorsRole `json:"role"`
+	UserId string                           `json:"userId"`
+}
+
 // CreateFolderParams defines parameters for CreateFolder.
 type CreateFolderParams struct {
 	// UserID Injected by Gateway
@@ -358,7 +371,7 @@ type CreateFolderParams struct {
 
 // RenameFolderJSONBody defines parameters for RenameFolder.
 type RenameFolderJSONBody struct {
-	Name FolderPropertiesName `json:"name"`
+	Name Name `json:"name"`
 }
 
 // RenameFolderParams defines parameters for RenameFolder.
@@ -499,7 +512,7 @@ type PublishNoteParams struct {
 
 // RenameNoteJSONBody defines parameters for RenameNote.
 type RenameNoteJSONBody struct {
-	Name Name `json:"name"`
+	Name PropertiesName `json:"name"`
 }
 
 // RenameNoteParams defines parameters for RenameNote.
@@ -587,7 +600,7 @@ type GetRevisionParams struct {
 
 // RenameRevisionJSONBody defines parameters for RenameRevision.
 type RenameRevisionJSONBody struct {
-	Name *PropertiesName `json:"name"`
+	Name *RevisionPropertiesName `json:"name"`
 }
 
 // RenameRevisionParams defines parameters for RenameRevision.
@@ -772,6 +785,30 @@ type UnpublishWorkspaceParams struct {
 	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
 }
 
+// UpdateWorkspaceCollaboratorsJSONBody defines parameters for UpdateWorkspaceCollaborators.
+type UpdateWorkspaceCollaboratorsJSONBody = []struct {
+	Role   UpdateWorkspaceCollaboratorsJSONBodyRole `json:"role"`
+	UserId string                                   `json:"userId"`
+}
+
+// UpdateWorkspaceCollaboratorsParams defines parameters for UpdateWorkspaceCollaborators.
+type UpdateWorkspaceCollaboratorsParams struct {
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
+}
+
+// UpdateWorkspaceCollaboratorsJSONBodyRole defines parameters for UpdateWorkspaceCollaborators.
+type UpdateWorkspaceCollaboratorsJSONBodyRole string
+
 // CreateFolderJSONRequestBody defines body for CreateFolder for application/json ContentType.
 type CreateFolderJSONRequestBody = Folder
 
@@ -807,6 +844,9 @@ type RestoreTrashedWorkspaceItemsJSONRequestBody RestoreTrashedWorkspaceItemsJSO
 
 // TrashWorkspaceItemsJSONRequestBody defines body for TrashWorkspaceItems for application/json ContentType.
 type TrashWorkspaceItemsJSONRequestBody TrashWorkspaceItemsJSONBody
+
+// UpdateWorkspaceCollaboratorsJSONRequestBody defines body for UpdateWorkspaceCollaborators for application/json ContentType.
+type UpdateWorkspaceCollaboratorsJSONRequestBody = UpdateWorkspaceCollaboratorsJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -885,6 +925,9 @@ type ServerInterface interface {
 	// Unpublish workspace
 	// (POST /note/workspaces/{workspaceId}/unpublish)
 	UnpublishWorkspace(c *gin.Context, workspaceId WorkspaceIdPath, params UnpublishWorkspaceParams)
+	// Update workspace collaborators
+	// (POST /note/workspaces/{workspaceId}/update-collaborators)
+	UpdateWorkspaceCollaborators(c *gin.Context, workspaceId WorkspaceIdPath, params UpdateWorkspaceCollaboratorsParams)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -3689,6 +3732,119 @@ func (siw *ServerInterfaceWrapper) UnpublishWorkspace(c *gin.Context) {
 	siw.Handler.UnpublishWorkspace(c, workspaceId, params)
 }
 
+// UpdateWorkspaceCollaborators operation middleware
+func (siw *ServerInterfaceWrapper) UpdateWorkspaceCollaborators(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "workspaceId" -------------
+	var workspaceId WorkspaceIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateWorkspaceCollaboratorsParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.UpdateWorkspaceCollaborators(c, workspaceId, params)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -3741,6 +3897,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/show-trash", wrapper.ShowTrash)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/trash-items", wrapper.TrashWorkspaceItems)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/unpublish", wrapper.UnpublishWorkspace)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/update-collaborators", wrapper.UpdateWorkspaceCollaborators)
 }
 
 type BadRequestErrorJSONResponse Error
@@ -5212,6 +5369,62 @@ func (response UnpublishWorkspace500JSONResponse) VisitUnpublishWorkspaceRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type UpdateWorkspaceCollaboratorsRequestObject struct {
+	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	Params      UpdateWorkspaceCollaboratorsParams
+	Body        *UpdateWorkspaceCollaboratorsJSONRequestBody
+}
+
+type UpdateWorkspaceCollaboratorsResponseObject interface {
+	VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error
+}
+
+type UpdateWorkspaceCollaborators204Response struct {
+}
+
+func (response UpdateWorkspaceCollaborators204Response) VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type UpdateWorkspaceCollaborators400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response UpdateWorkspaceCollaborators400JSONResponse) VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateWorkspaceCollaborators401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response UpdateWorkspaceCollaborators401JSONResponse) VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateWorkspaceCollaborators404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response UpdateWorkspaceCollaborators404JSONResponse) VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateWorkspaceCollaborators500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response UpdateWorkspaceCollaborators500JSONResponse) VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 	// Create folder
@@ -5289,6 +5502,9 @@ type StrictServerInterface interface {
 	// Unpublish workspace
 	// (POST /note/workspaces/{workspaceId}/unpublish)
 	UnpublishWorkspace(ctx context.Context, request UnpublishWorkspaceRequestObject) (UnpublishWorkspaceResponseObject, error)
+	// Update workspace collaborators
+	// (POST /note/workspaces/{workspaceId}/update-collaborators)
+	UpdateWorkspaceCollaborators(ctx context.Context, request UpdateWorkspaceCollaboratorsRequestObject) (UpdateWorkspaceCollaboratorsResponseObject, error)
 }
 
 type StrictHandlerFunc = strictgin.StrictGinHandlerFunc
@@ -6085,6 +6301,42 @@ func (sh *strictHandler) UnpublishWorkspace(ctx *gin.Context, workspaceId Worksp
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(UnpublishWorkspaceResponseObject); ok {
 		if err := validResponse.VisitUnpublishWorkspaceResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateWorkspaceCollaborators operation middleware
+func (sh *strictHandler) UpdateWorkspaceCollaborators(ctx *gin.Context, workspaceId WorkspaceIdPath, params UpdateWorkspaceCollaboratorsParams) {
+	var request UpdateWorkspaceCollaboratorsRequestObject
+
+	request.WorkspaceId = workspaceId
+	request.Params = params
+
+	var body UpdateWorkspaceCollaboratorsJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateWorkspaceCollaborators(ctx, request.(UpdateWorkspaceCollaboratorsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateWorkspaceCollaborators")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(UpdateWorkspaceCollaboratorsResponseObject); ok {
+		if err := validResponse.VisitUpdateWorkspaceCollaboratorsResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

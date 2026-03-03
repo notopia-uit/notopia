@@ -57,3 +57,10 @@ func (h *StrictHandler) UnpublishWorkspace(
 ) (note.UnpublishWorkspaceResponseObject, error) {
 	return nil, errors.New("not implemented")
 }
+
+func (h *StrictHandler) UpdateWorkspaceCollaborators(
+	ctx context.Context,
+	request note.UpdateWorkspaceCollaboratorsRequestObject,
+) (note.UpdateWorkspaceCollaboratorsResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
