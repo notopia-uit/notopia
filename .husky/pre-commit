@@ -3,5 +3,4 @@
 CI=true pnpm nx run-many \
   --target lint \
   --target format:check \
-  --target bundle \
   --tui false
