@@ -19,6 +19,8 @@ export const zFolder = z.object({
 
 export const zName = z.string().min(1).max(255);
 
+export const zGraph = z.record(z.string(), z.unknown());
+
 export const zRevision = z.object({
     id: z.uuid().readonly(),
     name: z.union([
@@ -323,6 +325,17 @@ export const zRenameFolderData = z.object({
  * Folder renamed successfully
  */
 export const zRenameFolderResponse = z.void();
+
+export const zGetGraphData = z.object({
+    body: z.optional(z.never()),
+    path: z.optional(z.never()),
+    query: z.optional(z.never())
+});
+
+/**
+ * Graph
+ */
+export const zGetGraphResponse = zGraph;
 
 export const zCreateNoteData = z.object({
     body: zCreateNoteRequest,

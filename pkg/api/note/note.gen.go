@@ -487,6 +487,13 @@ type RenameFolderParams struct {
 
 // GetGraphParams defines parameters for GetGraph.
 type GetGraphParams struct {
+	NoteIds   *[]openapi_types.UUID `form:"noteIds,omitempty" json:"noteIds,omitempty"`
+	FolderIds *[]openapi_types.UUID `form:"folderIds,omitempty" json:"folderIds,omitempty"`
+	Depth     *int                  `form:"depth,omitempty" json:"depth,omitempty"`
+
+	// Orphan Include node that are not connected to any other node
+	Orphan *bool `form:"orphan,omitempty" json:"orphan,omitempty"`
+
 	// UserID Injected by Gateway
 	UserID string `json:"X-Forwarded-ID"`
 
@@ -1279,6 +1286,38 @@ func (siw *ServerInterfaceWrapper) GetGraph(c *gin.Context) {
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetGraphParams
+
+	// ------------- Optional query parameter "noteIds" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "noteIds", c.Request.URL.Query(), &params.NoteIds, runtime.BindQueryParameterOptions{Type: "array", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter noteIds: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "folderIds" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "folderIds", c.Request.URL.Query(), &params.FolderIds, runtime.BindQueryParameterOptions{Type: "array", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter folderIds: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "depth" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "depth", c.Request.URL.Query(), &params.Depth, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter depth: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "orphan" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "orphan", c.Request.URL.Query(), &params.Orphan, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter orphan: %w", err), http.StatusBadRequest)
+		return
+	}
 
 	headers := c.Request.Header
 

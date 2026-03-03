@@ -19,7 +19,7 @@
         "command": "pnpm run redocly:join",
         "cwd": "{projectRoot}"
       },
-      "dependsOn": ["^bundle:join"],
+      "dependsOn": ["^bundle:json"],
       "cache": true
     },
     "watch-join": {
