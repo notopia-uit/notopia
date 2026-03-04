@@ -17,8 +17,7 @@ properties:
   parentId:
     type: string
     format: uuid
-    nullable: true
-    example: null
+    example: cc7a2e47-6267-4c60-8d36-257f849777e4
 
 required:
   - id

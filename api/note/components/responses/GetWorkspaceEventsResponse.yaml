@@ -4,14 +4,16 @@ content:
   text/event-stream:
     schema:
       oneOf:
-        - $ref: ../schemas/NoteMovedEvent.yaml
         - $ref: ../schemas/FolderMovedEvent.yaml
         - $ref: ../schemas/FolderRenamedEvent.yaml
+        - $ref: ../schemas/NoteMovedEvent.yaml
+        - $ref: ../schemas/NoteRenamedEvent.yaml
         - $ref: ../schemas/WorkspaceRenamedEvent.yaml
       discriminator:
         propertyName: type
         mapping:
-          NoteMovedEvent: ../schemas/NoteMovedEvent.yaml
           FolderMovedEvent: ../schemas/FolderMovedEvent.yaml
           FolderRenamedEvent: ../schemas/FolderRenamedEvent.yaml
+          NoteMovedEvent: ../schemas/NoteMovedEvent.yaml
+          NoteRenamedEvent: ../schemas/NoteRenamedEvent.yaml
           WorkspaceRenamedEvent: ../schemas/WorkspaceRenamedEvent.yaml

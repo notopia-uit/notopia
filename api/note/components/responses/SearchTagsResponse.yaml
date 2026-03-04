@@ -5,4 +5,4 @@ content:
     schema:
       type: array
       items:
-        type: string
+        $ref: ../schemas/Tag.yaml

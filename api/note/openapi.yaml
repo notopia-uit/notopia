@@ -45,8 +45,6 @@ paths:
     $ref: ./paths/notes.yaml
   /note/notes/generate-daily:
     $ref: ./paths/notes_generate-daily.yaml
-  /note/notes/random:
-    $ref: ./paths/notes_random.yaml
   /note/notes/search-tags:
     $ref: ./paths/notes_search-tags.yaml
   /note/notes/{noteId}:
@@ -57,8 +55,11 @@ paths:
     $ref: ./paths/notes_{noteId}_rename.yaml
   /note/notes/{noteId}/unpublish:
     $ref: ./paths/notes_{noteId}_unpublish.yaml
+
   /note/revisions:
     $ref: ./paths/revisions.yaml
+  /note/revisions/{revisionId}/apply:
+    $ref: ./paths/revisions_{revisionId}_apply.yaml
   /note/revisions/{revisionId}/rename:
     $ref: ./paths/revisions_{revisionId}_rename.yaml
   /note/revisions/{revisionId}:

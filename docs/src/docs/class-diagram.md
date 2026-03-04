@@ -88,7 +88,7 @@ package "Note" <<Bounded Context>> {
                 id: uuid.UUID
                 noteID: uuid.UUID
                 name: string
-                blockNoteContent: string
+                blockNoteContent: *string
                 deletedAt: *time.Time
 
                 rename(newName)

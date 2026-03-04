@@ -819,6 +819,52 @@
         }
       }
     },
+    "/note/revisions/{revisionId}/apply": {
+      "servers": [
+        {
+          "url": "http://api.notopia.localhost",
+          "description": "Local dev server via gateway"
+        },
+        {
+          "url": "http://localhost:8081",
+          "description": "Local dev/mock server direct"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "tags": [
+          "Revision"
+        ],
+        "summary": "Apply revision",
+        "operationId": "applyRevision",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/revisionIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/ApplyRevisionResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/revisions/{revisionId}/rename": {
       "servers": [
         {
@@ -1497,8 +1543,7 @@
           "parentId": {
             "type": "string",
             "format": "uuid",
-            "nullable": true,
-            "example": null
+            "example": "cc7a2e47-6267-4c60-8d36-257f849777e4"
           }
         },
         "required": [
@@ -2463,6 +2508,19 @@
                 "pagination"
               ]
             }
+          }
+        }
+      },
+      "ApplyRevisionResponse": {
+        "description": "Apply revision, mean create new with existing revision",
+        "headers": {
+          "Content-Location": {
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "example": "http://api.notopia.localhost/revisions/ce5060da-b15c-4aee-898f-5449fafacfc4"
+            },
+            "required": true
           }
         }
       },
