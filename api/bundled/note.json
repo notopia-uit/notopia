@@ -15,12 +15,7 @@
   },
   "servers": [
     {
-      "url": "http://api.notopia.localhost",
-      "description": "Local dev server via gateway"
-    },
-    {
-      "url": "http://localhost:8081",
-      "description": "Local dev/mock server direct"
+      "url": "http://api.notopia.localhost"
     }
   ],
   "tags": [

@@ -52,7 +52,13 @@
       "dependsOn": ["^lint"]
     },
     "mock": {
-      "dependsOn": ["^mock"]
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "scalar document mock -w ./bundled/openapi.json --port 8080",
+        "cwd": "{projectRoot}"
+      },
+      "continuous": true,
+      "dependsOn": ["join"]
     },
     "gen:go": {
       "dependsOn": ["^gen:go"]

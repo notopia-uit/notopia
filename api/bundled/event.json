@@ -1,5 +1,10 @@
 {
   "openapi": "3.0.4",
+  "servers": [
+    {
+      "url": "http://api.notopia.localhost"
+    }
+  ],
   "components": {
     "schemas": {}
   }

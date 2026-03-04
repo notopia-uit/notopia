@@ -18,3 +18,5 @@ coverage.out
 
 # from dlv
 __debug_bin*
+
+# tmp, curently having .docker-version from nx

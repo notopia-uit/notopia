@@ -13,6 +13,11 @@
       "email": "kevinnitro@duck.com"
     }
   },
+  "servers": [
+    {
+      "url": "http://api.notopia.localhost"
+    }
+  ],
   "tags": [
     {
       "name": "Document",
@@ -50,16 +55,6 @@
   },
   "paths": {
     "/document/documents/import": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8082",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -94,16 +89,6 @@
       }
     },
     "/document/ws/documents/{documentId}": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8082",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -143,16 +128,6 @@
       }
     },
     "/document/documents/{documentId}/attachment-url": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8082",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -190,16 +165,6 @@
       }
     },
     "/note/folders": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -231,16 +196,6 @@
       }
     },
     "/note/folders/{folderId}/rename": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -280,16 +235,6 @@
       }
     },
     "/note/graph": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -371,16 +316,6 @@
       }
     },
     "/note/notes": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -412,16 +347,6 @@
       }
     },
     "/note/notes/generate-daily": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -456,16 +381,6 @@
       }
     },
     "/note/notes/search-tags": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -497,16 +412,6 @@
       }
     },
     "/note/notes/{noteId}": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -583,16 +488,6 @@
       }
     },
     "/note/notes/{noteId}/publish": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -629,16 +524,6 @@
       }
     },
     "/note/notes/{noteId}/rename": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -678,16 +563,6 @@
       }
     },
     "/note/notes/{noteId}/unpublish": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -724,16 +599,6 @@
       }
     },
     "/note/revisions": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -776,16 +641,6 @@
       }
     },
     "/note/revisions/{revisionId}/apply": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -822,16 +677,6 @@
       }
     },
     "/note/revisions/{revisionId}/rename": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -871,16 +716,6 @@
       }
     },
     "/note/revisions/{revisionId}": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -957,16 +792,6 @@
       }
     },
     "/note/workspaces": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -998,16 +823,6 @@
       }
     },
     "/note/workspaces/{workspaceId}": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -1078,16 +893,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/events": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -1121,16 +926,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/publish": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1167,16 +962,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/rename": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1216,16 +1001,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/restore-trashed-items": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1265,16 +1040,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/show-trash": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -1311,16 +1076,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/trash-items": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1360,16 +1115,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/unpublish": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1406,16 +1151,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/update-collaborators": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
       "post": {
         "security": [
           {
