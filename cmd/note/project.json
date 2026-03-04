@@ -148,7 +148,7 @@
   "implicitDependencies": ["pkg"],
   "release": {
     "docker": {
-      "repositoryName": "notopia-uit/note"
+      "preVersionCommand": ""
     }
   }
 }

@@ -129,15 +129,9 @@
     }
   ],
   "release": {
-    "projects": ["note", "document", "web"],
     "projectsRelationship": "independent",
     "releaseTag": {
-      "pattern": "{projectName}@{version}",
-      "requireSemver": true
-    },
-    "docker": {
-      "registryUrl": "ghcr.io",
-      "skipVersionActions": true
+      "pattern": "{projectName}@{version}"
     },
     "version": {
       "conventionalCommits": true
@@ -148,6 +142,38 @@
         "createRelease": "github"
       },
       "automaticFromRef": true
+    },
+    "groups": {
+      "note": {
+        "projects": ["note"],
+        "version": {
+          "conventionalCommits": false
+        },
+        "docker": {
+          "repositoryName": "notopia-uit/note",
+          "skipVersionActions": true
+        }
+      },
+      "document": {
+        "projects": ["document"],
+        "version": {
+          "conventionalCommits": false
+        },
+        "docker": {
+          "repositoryName": "notopia-uit/document",
+          "skipVersionActions": true
+        }
+      },
+      "web": {
+        "projects": ["web"],
+        "version": {
+          "conventionalCommits": false
+        },
+        "docker": {
+          "repositoryName": "notopia-uit/web",
+          "skipVersionActions": true
+        }
+      }
     }
   },
   "generators": {

@@ -20,3 +20,4 @@ coverage.out
 __debug_bin*
 
 # tmp, curently having .docker-version from nx
+tmp
