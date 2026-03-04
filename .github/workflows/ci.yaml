@@ -184,7 +184,8 @@ jobs:
         run: |
           npx nx release \
             --dockerVersionScheme=production \
-            ${{ (github.event.inputs.dry-run-release == 'true' || github.ref != 'refs/heads/main') && '--dry-run' || '' }}
+            ${{ (github.event.inputs.dry-run-release == 'true' || github.ref != 'refs/heads/main') && '--dry-run' || '' }} \
+            --yes
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
