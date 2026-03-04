@@ -3,11 +3,11 @@ name: CI
 on:
   push:
     branches:
-      - main
-      - dev
+      - '*'
   pull_request:
     branches:
       - main
+      - dev
     types:
       - opened
       - synchronize
@@ -19,7 +19,6 @@ on:
         required: false
         default: true
         type: boolean
-
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
   IS_PRIMARY_BRANCH: >-
@@ -30,6 +29,10 @@ env:
       github.base_ref == 'dev'
     }}
   IS_RENOVATE: ${{ startsWith(github.head_ref, 'renovate/') }}
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   main:
@@ -141,7 +144,7 @@ jobs:
         run: |
           npx nx affected \
             --target test \
-            --parallel=5 \
+            --parallel=2 \
             --base=${{ steps.set-shas.outputs.base }} \
             --head=${{ steps.set-shas.outputs.head }} \
             | true
@@ -155,7 +158,7 @@ jobs:
             --target bundle \
             --target build \
             ${{ github.ref == 'refs/heads/main' && '--target docker:build' || '' }} \
-            --parallel=4 \
+            --parallel=2 \
             --base=${{ steps.set-shas.outputs.base }} \
             --head=${{ steps.set-shas.outputs.head }}
 
@@ -175,21 +178,18 @@ jobs:
           git config --global user.name "GitHub Actions [Bot]"
 
       - name: Nx release
-        if: ${{
-          (github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch') ||
-          github.ref != 'refs/heads/main'
-          }}
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npx nx release \
             --dockerVersionScheme=production \
-            ${{ (github.event.inputs.dry-run-release == 'true' || github.ref != 'refs/heads/main') && '--dry-run' || '' }} \
+            ${{ github.ref != 'refs/heads/main' && '--dry-run' || '' }} \
             --yes
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
-        run: npx nx affected -t deploy --parallel=4
+        run: npx nx affected -t deploy --parallel=2
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
