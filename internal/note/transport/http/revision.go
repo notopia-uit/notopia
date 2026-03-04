@@ -28,6 +28,13 @@ func (h *StrictHandler) GetRevision(
 	return nil, errors.New("not implemented")
 }
 
+func (h *StrictHandler) ApplyRevision(
+	ctx context.Context,
+	request note.ApplyRevisionRequestObject,
+) (note.ApplyRevisionResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
 func (h *StrictHandler) RenameRevision(
 	ctx context.Context,
 	request note.RenameRevisionRequestObject,

@@ -21,6 +21,36 @@ const (
 	Oauth2Scopes = "oauth2.Scopes"
 )
 
+// Defines values for FolderCreatedEventType.
+const (
+	FolderCreatedEventTypeFolderCreatedEvent FolderCreatedEventType = "FolderCreatedEvent"
+)
+
+// Valid indicates whether the value is a known member of the FolderCreatedEventType enum.
+func (e FolderCreatedEventType) Valid() bool {
+	switch e {
+	case FolderCreatedEventTypeFolderCreatedEvent:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for FolderDeletedEventType.
+const (
+	FolderDeletedEventTypeFolderDeletedEvent FolderDeletedEventType = "FolderDeletedEvent"
+)
+
+// Valid indicates whether the value is a known member of the FolderDeletedEventType enum.
+func (e FolderDeletedEventType) Valid() bool {
+	switch e {
+	case FolderDeletedEventTypeFolderDeletedEvent:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for FolderMovedEventType.
 const (
 	FolderMovedEventTypeFolderRenamedEvent FolderMovedEventType = "FolderRenamedEvent"
@@ -51,6 +81,51 @@ func (e FolderRenamedEventType) Valid() bool {
 	}
 }
 
+// Defines values for NoteContentUpdatedEventType.
+const (
+	NoteContentUpdatedEventTypeNoteContentUpdatedEvent NoteContentUpdatedEventType = "NoteContentUpdatedEvent"
+)
+
+// Valid indicates whether the value is a known member of the NoteContentUpdatedEventType enum.
+func (e NoteContentUpdatedEventType) Valid() bool {
+	switch e {
+	case NoteContentUpdatedEventTypeNoteContentUpdatedEvent:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for NoteCreatedEventType.
+const (
+	NoteCreatedEventTypeNoteCreatedEvent NoteCreatedEventType = "NoteCreatedEvent"
+)
+
+// Valid indicates whether the value is a known member of the NoteCreatedEventType enum.
+func (e NoteCreatedEventType) Valid() bool {
+	switch e {
+	case NoteCreatedEventTypeNoteCreatedEvent:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for NoteDeletedEventType.
+const (
+	NoteDeletedEventTypeNoteDeletedEvent NoteDeletedEventType = "NoteDeletedEvent"
+)
+
+// Valid indicates whether the value is a known member of the NoteDeletedEventType enum.
+func (e NoteDeletedEventType) Valid() bool {
+	switch e {
+	case NoteDeletedEventTypeNoteDeletedEvent:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for NoteMovedEventType.
 const (
 	NoteMovedEventTypeNoteMovedEvent NoteMovedEventType = "NoteMovedEvent"
@@ -60,6 +135,21 @@ const (
 func (e NoteMovedEventType) Valid() bool {
 	switch e {
 	case NoteMovedEventTypeNoteMovedEvent:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for NoteRenamedEventType.
+const (
+	NoteRenamedEventTypeNoteRenamedEvent NoteRenamedEventType = "NoteRenamedEvent"
+)
+
+// Valid indicates whether the value is a known member of the NoteRenamedEventType enum.
+func (e NoteRenamedEventType) Valid() bool {
+	switch e {
+	case NoteRenamedEventTypeNoteRenamedEvent:
 		return true
 	default:
 		return false
@@ -157,15 +247,38 @@ type Error struct {
 type Folder struct {
 	Id       *openapi_types.UUID `json:"id,omitempty"`
 	Name     string              `json:"name"`
-	ParentId *openapi_types.UUID `json:"parentId"`
+	ParentId openapi_types.UUID  `json:"parentId"`
 }
+
+// FolderCreatedEvent defines model for FolderCreatedEvent.
+type FolderCreatedEvent struct {
+	Data struct {
+		Id   *FolderPropertiesId `json:"id,omitempty"`
+		Name Name                `json:"name"`
+	} `json:"data"`
+	Type FolderCreatedEventType `json:"type"`
+}
+
+// FolderCreatedEventType defines model for FolderCreatedEvent.Type.
+type FolderCreatedEventType string
+
+// FolderDeletedEvent defines model for FolderDeletedEvent.
+type FolderDeletedEvent struct {
+	Data struct {
+		Id *FolderPropertiesId `json:"id,omitempty"`
+	} `json:"data"`
+	Type FolderDeletedEventType `json:"type"`
+}
+
+// FolderDeletedEventType defines model for FolderDeletedEvent.Type.
+type FolderDeletedEventType string
 
 // FolderMovedEvent defines model for FolderMovedEvent.
 type FolderMovedEvent struct {
 	Data struct {
-		FolderId    openapi_types.UUID `json:"folderId"`
-		NewFolderId openapi_types.UUID `json:"newFolderId"`
-		OldFolderId openapi_types.UUID `json:"oldFolderId"`
+		FromFolderId ParentId            `json:"fromFolderId"`
+		Id           *FolderPropertiesId `json:"id,omitempty"`
+		ToFolderId   ParentId            `json:"toFolderId"`
 	} `json:"data"`
 	Type FolderMovedEventType `json:"type"`
 }
@@ -176,9 +289,9 @@ type FolderMovedEventType string
 // FolderRenamedEvent defines model for FolderRenamedEvent.
 type FolderRenamedEvent struct {
 	Data struct {
-		FolderId openapi_types.UUID `json:"folderId"`
-		NewName  string             `json:"newName"`
-		OldName  string             `json:"oldName"`
+		Id      *FolderPropertiesId `json:"id,omitempty"`
+		NewName Name                `json:"newName"`
+		OldName *Name               `json:"oldName,omitempty"`
 	} `json:"data"`
 	Type FolderRenamedEventType `json:"type"`
 }
@@ -195,6 +308,9 @@ type FolderWithRelations struct {
 	ParentId *openapi_types.UUID   `json:"parentId"`
 }
 
+// FolderPropertiesId defines model for Folder_properties-id.
+type FolderPropertiesId = openapi_types.UUID
+
 // Graph defines model for Graph.
 type Graph = map[string]interface{}
 
@@ -206,18 +322,65 @@ type Note struct {
 	Name            string              `json:"name"`
 }
 
+// NoteContentUpdatedEvent defines model for NoteContentUpdatedEvent.
+type NoteContentUpdatedEvent struct {
+	Data struct {
+		Id *PropertiesId `json:"id,omitempty"`
+	} `json:"data"`
+	Type NoteContentUpdatedEventType `json:"type"`
+}
+
+// NoteContentUpdatedEventType defines model for NoteContentUpdatedEvent.Type.
+type NoteContentUpdatedEventType string
+
+// NoteCreatedEvent defines model for NoteCreatedEvent.
+type NoteCreatedEvent struct {
+	Data struct {
+		Id   *PropertiesId  `json:"id,omitempty"`
+		Name PropertiesName `json:"name"`
+	} `json:"data"`
+	Type NoteCreatedEventType `json:"type"`
+}
+
+// NoteCreatedEventType defines model for NoteCreatedEvent.Type.
+type NoteCreatedEventType string
+
+// NoteDeletedEvent defines model for NoteDeletedEvent.
+type NoteDeletedEvent struct {
+	Data struct {
+		Id *PropertiesId `json:"id,omitempty"`
+	} `json:"data"`
+	Type NoteDeletedEventType `json:"type"`
+}
+
+// NoteDeletedEventType defines model for NoteDeletedEvent.Type.
+type NoteDeletedEventType string
+
 // NoteMovedEvent defines model for NoteMovedEvent.
 type NoteMovedEvent struct {
 	Data struct {
-		FromFolderId openapi_types.UUID `json:"fromFolderId"`
-		NoteId       openapi_types.UUID `json:"noteId"`
-		ToFolderId   openapi_types.UUID `json:"toFolderId"`
+		FromFolderId FolderId      `json:"fromFolderId"`
+		Id           *PropertiesId `json:"id,omitempty"`
+		ToFolderId   FolderId      `json:"toFolderId"`
 	} `json:"data"`
 	Type NoteMovedEventType `json:"type"`
 }
 
 // NoteMovedEventType defines model for NoteMovedEvent.Type.
 type NoteMovedEventType string
+
+// NoteRenamedEvent defines model for NoteRenamedEvent.
+type NoteRenamedEvent struct {
+	Data struct {
+		Id      *PropertiesId   `json:"id,omitempty"`
+		NewName PropertiesName  `json:"newName"`
+		OldName *PropertiesName `json:"oldName,omitempty"`
+	} `json:"data"`
+	Type NoteRenamedEventType `json:"type"`
+}
+
+// NoteRenamedEventType defines model for NoteRenamedEvent.Type.
+type NoteRenamedEventType string
 
 // Pagination defines model for Pagination.
 type Pagination struct {
@@ -250,6 +413,11 @@ type Revision struct {
 
 // RevisionPropertiesName defines model for Revision_properties-name.
 type RevisionPropertiesName = string
+
+// Tag defines model for Tag.
+type Tag struct {
+	Name string `json:"name"`
+}
 
 // TrashedDeletedBy defines model for TrashedDeletedBy.
 type TrashedDeletedBy string
@@ -286,9 +454,9 @@ type Workspace struct {
 // WorkspaceRenamedEvent defines model for WorkspaceRenamedEvent.
 type WorkspaceRenamedEvent struct {
 	Data struct {
-		NewName     string             `json:"newName"`
-		OldName     string             `json:"oldName"`
-		WorkspaceId openapi_types.UUID `json:"workspaceId"`
+		Id      *Id                     `json:"id,omitempty"`
+		NewName WorkspacePropertiesName `json:"newName"`
+		OldName WorkspacePropertiesName `json:"oldName"`
 	} `json:"data"`
 	Type WorkspaceRenamedEventType `json:"type"`
 }
@@ -307,6 +475,9 @@ type Id = openapi_types.UUID
 
 // Name defines model for name.
 type Name = string
+
+// ParentId defines model for parentId.
+type ParentId = openapi_types.UUID
 
 // PropertiesId defines model for properties-id.
 type PropertiesId = openapi_types.UUID
@@ -370,7 +541,7 @@ type InternalServerError = Error
 type NotFoundError = Error
 
 // SearchTagsResponse defines model for SearchTagsResponse.
-type SearchTagsResponse = []string
+type SearchTagsResponse = []Tag
 
 // ShowTrashResponse defines model for ShowTrashResponse.
 type ShowTrashResponse struct {
@@ -395,11 +566,6 @@ type CreateWorkspaceRequest = Workspace
 
 // GenerateDailyNoteRequest defines model for GenerateDailyNoteRequest.
 type GenerateDailyNoteRequest struct {
-	WorkspaceId *Id `json:"workspaceId,omitempty"`
-}
-
-// OpenRandomNoteRequest defines model for OpenRandomNoteRequest.
-type OpenRandomNoteRequest struct {
 	WorkspaceId *Id `json:"workspaceId,omitempty"`
 }
 
@@ -529,26 +695,6 @@ type GenerateDailyNoteJSONBody struct {
 
 // GenerateDailyNoteParams defines parameters for GenerateDailyNote.
 type GenerateDailyNoteParams struct {
-	// UserID Injected by Gateway
-	UserID string `json:"X-Forwarded-ID"`
-
-	// UserEmail Injected by Gateway
-	UserEmail string `json:"X-Forwarded-Email"`
-
-	// UserGroups Injected by Gateway
-	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
-
-	// UserRoles Injected by Gateway
-	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
-}
-
-// OpenRandomNoteJSONBody defines parameters for OpenRandomNote.
-type OpenRandomNoteJSONBody struct {
-	WorkspaceId *Id `json:"workspaceId,omitempty"`
-}
-
-// OpenRandomNoteParams defines parameters for OpenRandomNote.
-type OpenRandomNoteParams struct {
 	// UserID Injected by Gateway
 	UserID string `json:"X-Forwarded-ID"`
 
@@ -703,6 +849,21 @@ type DeleteRevisionParams struct {
 
 // GetRevisionParams defines parameters for GetRevision.
 type GetRevisionParams struct {
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
+}
+
+// ApplyRevisionParams defines parameters for ApplyRevision.
+type ApplyRevisionParams struct {
 	// UserID Injected by Gateway
 	UserID string `json:"X-Forwarded-ID"`
 
@@ -939,9 +1100,6 @@ type CreateNoteJSONRequestBody = Note
 // GenerateDailyNoteJSONRequestBody defines body for GenerateDailyNote for application/json ContentType.
 type GenerateDailyNoteJSONRequestBody GenerateDailyNoteJSONBody
 
-// OpenRandomNoteJSONRequestBody defines body for OpenRandomNote for application/json ContentType.
-type OpenRandomNoteJSONRequestBody OpenRandomNoteJSONBody
-
 // SearchTagsJSONRequestBody defines body for SearchTags for application/json ContentType.
 type SearchTagsJSONRequestBody SearchTagsJSONBody
 
@@ -983,9 +1141,6 @@ type ServerInterface interface {
 	// Generate daily note
 	// (POST /note/notes/generate-daily)
 	GenerateDailyNote(c *gin.Context, params GenerateDailyNoteParams)
-	// Open random note
-	// (POST /note/notes/random)
-	OpenRandomNote(c *gin.Context, params OpenRandomNoteParams)
 	// Search tags
 	// (POST /note/notes/search-tags)
 	SearchTags(c *gin.Context, params SearchTagsParams)
@@ -1013,6 +1168,9 @@ type ServerInterface interface {
 	// Get revision details
 	// (GET /note/revisions/{revisionId})
 	GetRevision(c *gin.Context, revisionId RevisionIdPath, params GetRevisionParams)
+	// Apply revision
+	// (POST /note/revisions/{revisionId}/apply)
+	ApplyRevision(c *gin.Context, revisionId RevisionIdPath, params ApplyRevisionParams)
 	// Rename revision
 	// (POST /note/revisions/{revisionId}/rename)
 	RenameRevision(c *gin.Context, revisionId RevisionIdPath, params RenameRevisionParams)
@@ -1619,110 +1777,6 @@ func (siw *ServerInterfaceWrapper) GenerateDailyNote(c *gin.Context) {
 	}
 
 	siw.Handler.GenerateDailyNote(c, params)
-}
-
-// OpenRandomNote operation middleware
-func (siw *ServerInterfaceWrapper) OpenRandomNote(c *gin.Context) {
-
-	var err error
-
-	c.Set(Oauth2Scopes, []string{})
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params OpenRandomNoteParams
-
-	headers := c.Request.Header
-
-	// ------------- Required header parameter "X-Forwarded-ID" -------------
-	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
-		var UserID string
-		n := len(valueList)
-		if n != 1 {
-			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
-			return
-		}
-
-		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
-		if err != nil {
-			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
-			return
-		}
-
-		params.UserID = UserID
-
-	} else {
-		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Required header parameter "X-Forwarded-Email" -------------
-	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
-		var UserEmail string
-		n := len(valueList)
-		if n != 1 {
-			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
-			return
-		}
-
-		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
-		if err != nil {
-			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
-			return
-		}
-
-		params.UserEmail = UserEmail
-
-	} else {
-		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
-	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
-		var UserGroups string
-		n := len(valueList)
-		if n != 1 {
-			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
-			return
-		}
-
-		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""})
-		if err != nil {
-			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
-			return
-		}
-
-		params.UserGroups = &UserGroups
-
-	}
-
-	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
-	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
-		var UserRoles string
-		n := len(valueList)
-		if n != 1 {
-			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
-			return
-		}
-
-		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""})
-		if err != nil {
-			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
-			return
-		}
-
-		params.UserRoles = &UserRoles
-
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.OpenRandomNote(c, params)
 }
 
 // SearchTags operation middleware
@@ -2753,6 +2807,119 @@ func (siw *ServerInterfaceWrapper) GetRevision(c *gin.Context) {
 	}
 
 	siw.Handler.GetRevision(c, revisionId, params)
+}
+
+// ApplyRevision operation middleware
+func (siw *ServerInterfaceWrapper) ApplyRevision(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "revisionId" -------------
+	var revisionId RevisionIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "revisionId", c.Param("revisionId"), &revisionId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter revisionId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ApplyRevisionParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.ApplyRevision(c, revisionId, params)
 }
 
 // RenameRevision operation middleware
@@ -4134,7 +4301,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/note/graph", wrapper.GetGraph)
 	router.POST(options.BaseURL+"/note/notes", wrapper.CreateNote)
 	router.POST(options.BaseURL+"/note/notes/generate-daily", wrapper.GenerateDailyNote)
-	router.POST(options.BaseURL+"/note/notes/random", wrapper.OpenRandomNote)
 	router.POST(options.BaseURL+"/note/notes/search-tags", wrapper.SearchTags)
 	router.DELETE(options.BaseURL+"/note/notes/:noteId", wrapper.DeleteNote)
 	router.GET(options.BaseURL+"/note/notes/:noteId", wrapper.GetNote)
@@ -4144,6 +4310,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/note/revisions", wrapper.GetRevisions)
 	router.DELETE(options.BaseURL+"/note/revisions/:revisionId", wrapper.DeleteRevision)
 	router.GET(options.BaseURL+"/note/revisions/:revisionId", wrapper.GetRevision)
+	router.POST(options.BaseURL+"/note/revisions/:revisionId/apply", wrapper.ApplyRevision)
 	router.POST(options.BaseURL+"/note/revisions/:revisionId/rename", wrapper.RenameRevision)
 	router.POST(options.BaseURL+"/note/workspaces", wrapper.CreateWorkspace)
 	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.DeleteWorkspace)
@@ -4156,6 +4323,13 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/trash-items", wrapper.TrashWorkspaceItems)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/unpublish", wrapper.UnpublishWorkspace)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/update-collaborators", wrapper.UpdateWorkspaceCollaborators)
+}
+
+type ApplyRevisionResponseResponseHeaders struct {
+	ContentLocation string
+}
+type ApplyRevisionResponseResponse struct {
+	Headers ApplyRevisionResponseResponseHeaders
 }
 
 type BadRequestErrorJSONResponse Error
@@ -4217,14 +4391,7 @@ type InternalServerErrorJSONResponse Error
 
 type NotFoundErrorJSONResponse Error
 
-type OpenRandomNoteResponseResponseHeaders struct {
-	ContentLocation string
-}
-type OpenRandomNoteResponseResponse struct {
-	Headers OpenRandomNoteResponseResponseHeaders
-}
-
-type SearchTagsResponseJSONResponse []string
+type SearchTagsResponseJSONResponse []Tag
 
 type ShowTrashResponseJSONResponse struct {
 	Data struct {
@@ -4497,61 +4664,6 @@ type GenerateDailyNote500JSONResponse struct {
 }
 
 func (response GenerateDailyNote500JSONResponse) VisitGenerateDailyNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type OpenRandomNoteRequestObject struct {
-	Params OpenRandomNoteParams
-	Body   *OpenRandomNoteJSONRequestBody
-}
-
-type OpenRandomNoteResponseObject interface {
-	VisitOpenRandomNoteResponse(w http.ResponseWriter) error
-}
-
-type OpenRandomNote201Response = OpenRandomNoteResponseResponse
-
-func (response OpenRandomNote201Response) VisitOpenRandomNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
-	w.WriteHeader(201)
-	return nil
-}
-
-type OpenRandomNote400JSONResponse struct{ BadRequestErrorJSONResponse }
-
-func (response OpenRandomNote400JSONResponse) VisitOpenRandomNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type OpenRandomNote401JSONResponse struct{ UnauthorizedErrorJSONResponse }
-
-func (response OpenRandomNote401JSONResponse) VisitOpenRandomNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type OpenRandomNote404JSONResponse struct{ NotFoundErrorJSONResponse }
-
-func (response OpenRandomNote404JSONResponse) VisitOpenRandomNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type OpenRandomNote500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response OpenRandomNote500JSONResponse) VisitOpenRandomNoteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -5082,6 +5194,61 @@ type GetRevision500JSONResponse struct {
 }
 
 func (response GetRevision500JSONResponse) VisitGetRevisionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ApplyRevisionRequestObject struct {
+	RevisionId RevisionIdPath `json:"revisionId"`
+	Params     ApplyRevisionParams
+}
+
+type ApplyRevisionResponseObject interface {
+	VisitApplyRevisionResponse(w http.ResponseWriter) error
+}
+
+type ApplyRevision204Response = ApplyRevisionResponseResponse
+
+func (response ApplyRevision204Response) VisitApplyRevisionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
+	w.WriteHeader(204)
+	return nil
+}
+
+type ApplyRevision400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response ApplyRevision400JSONResponse) VisitApplyRevisionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ApplyRevision401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response ApplyRevision401JSONResponse) VisitApplyRevisionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ApplyRevision404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response ApplyRevision404JSONResponse) VisitApplyRevisionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ApplyRevision500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response ApplyRevision500JSONResponse) VisitApplyRevisionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -5766,9 +5933,6 @@ type StrictServerInterface interface {
 	// Generate daily note
 	// (POST /note/notes/generate-daily)
 	GenerateDailyNote(ctx context.Context, request GenerateDailyNoteRequestObject) (GenerateDailyNoteResponseObject, error)
-	// Open random note
-	// (POST /note/notes/random)
-	OpenRandomNote(ctx context.Context, request OpenRandomNoteRequestObject) (OpenRandomNoteResponseObject, error)
 	// Search tags
 	// (POST /note/notes/search-tags)
 	SearchTags(ctx context.Context, request SearchTagsRequestObject) (SearchTagsResponseObject, error)
@@ -5796,6 +5960,9 @@ type StrictServerInterface interface {
 	// Get revision details
 	// (GET /note/revisions/{revisionId})
 	GetRevision(ctx context.Context, request GetRevisionRequestObject) (GetRevisionResponseObject, error)
+	// Apply revision
+	// (POST /note/revisions/{revisionId}/apply)
+	ApplyRevision(ctx context.Context, request ApplyRevisionRequestObject) (ApplyRevisionResponseObject, error)
 	// Rename revision
 	// (POST /note/revisions/{revisionId}/rename)
 	RenameRevision(ctx context.Context, request RenameRevisionRequestObject) (RenameRevisionResponseObject, error)
@@ -6007,41 +6174,6 @@ func (sh *strictHandler) GenerateDailyNote(ctx *gin.Context, params GenerateDail
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(GenerateDailyNoteResponseObject); ok {
 		if err := validResponse.VisitGenerateDailyNoteResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// OpenRandomNote operation middleware
-func (sh *strictHandler) OpenRandomNote(ctx *gin.Context, params OpenRandomNoteParams) {
-	var request OpenRandomNoteRequestObject
-
-	request.Params = params
-
-	var body OpenRandomNoteJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.OpenRandomNote(ctx, request.(OpenRandomNoteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "OpenRandomNote")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(OpenRandomNoteResponseObject); ok {
-		if err := validResponse.VisitOpenRandomNoteResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -6308,6 +6440,34 @@ func (sh *strictHandler) GetRevision(ctx *gin.Context, revisionId RevisionIdPath
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(GetRevisionResponseObject); ok {
 		if err := validResponse.VisitGetRevisionResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ApplyRevision operation middleware
+func (sh *strictHandler) ApplyRevision(ctx *gin.Context, revisionId RevisionIdPath, params ApplyRevisionParams) {
+	var request ApplyRevisionRequestObject
+
+	request.RevisionId = revisionId
+	request.Params = params
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ApplyRevision(ctx, request.(ApplyRevisionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ApplyRevision")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(ApplyRevisionResponseObject); ok {
+		if err := validResponse.VisitApplyRevisionResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

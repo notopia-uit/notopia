@@ -9,20 +9,15 @@ properties:
   data:
     type: object
     properties:
-      noteId:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174000
+      id:
+        $ref: ./Note.yaml#/properties/id
       fromFolderId:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174001
+        $ref: ./Note.yaml#/properties/folderId
       toFolderId:
-        type: string
-        format: uuid
+        $ref: ./Note.yaml#/properties/folderId
         example: 123e4567-e89b-12d3-a456-426614174002
     required:
-      - noteId
+      - id
       - fromFolderId
       - toFolderId
 required:

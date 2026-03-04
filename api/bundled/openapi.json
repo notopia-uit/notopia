@@ -455,50 +455,6 @@
         }
       }
     },
-    "/note/notes/random": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost",
-          "description": "Local dev server via gateway"
-        },
-        {
-          "url": "http://localhost:8081",
-          "description": "Local dev/mock server direct"
-        }
-      ],
-      "post": {
-        "security": [
-          {
-            "oauth2": []
-          }
-        ],
-        "tags": [
-          "Note"
-        ],
-        "summary": "Open random note",
-        "operationId": "openRandomNote",
-        "requestBody": {
-          "$ref": "#/components/requestBodies/OpenRandomNoteRequest"
-        },
-        "responses": {
-          "201": {
-            "$ref": "#/components/responses/OpenRandomNoteResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
     "/note/notes/search-tags": {
       "servers": [
         {
@@ -1634,6 +1590,18 @@
         "example": "550e8400-e29b-41d4-a716-446655440000",
         "readOnly": true
       },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "work"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
       "properties-name": {
         "type": "string",
         "minLength": 1,
@@ -1782,39 +1750,35 @@
           "folderId"
         ]
       },
-      "NoteMovedEvent": {
+      "Folder_properties-id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000",
+        "readOnly": true
+      },
+      "FolderCreatedEvent": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
             "enum": [
-              "NoteMovedEvent"
+              "FolderCreatedEvent"
             ],
-            "example": "NoteMovedEvent"
+            "example": "FolderCreatedEvent"
           },
           "data": {
             "type": "object",
             "properties": {
-              "noteId": {
-                "type": "string",
-                "format": "uuid",
-                "example": "123e4567-e89b-12d3-a456-426614174000"
+              "id": {
+                "$ref": "#/components/schemas/Folder_properties-id"
               },
-              "fromFolderId": {
-                "type": "string",
-                "format": "uuid",
-                "example": "123e4567-e89b-12d3-a456-426614174001"
-              },
-              "toFolderId": {
-                "type": "string",
-                "format": "uuid",
-                "example": "123e4567-e89b-12d3-a456-426614174002"
+              "name": {
+                "$ref": "#/components/schemas/name"
               }
             },
             "required": [
-              "noteId",
-              "fromFolderId",
-              "toFolderId"
+              "id",
+              "name"
             ]
           }
         },
@@ -1822,6 +1786,38 @@
           "type",
           "data"
         ]
+      },
+      "FolderDeletedEvent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "FolderDeletedEvent"
+            ],
+            "example": "FolderDeletedEvent"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/Folder_properties-id"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "data"
+        ]
+      },
+      "parentId": {
+        "type": "string",
+        "format": "uuid",
+        "example": "cc7a2e47-6267-4c60-8d36-257f849777e4"
       },
       "FolderMovedEvent": {
         "type": "object",
@@ -1836,26 +1832,21 @@
           "data": {
             "type": "object",
             "properties": {
-              "folderId": {
-                "type": "string",
-                "format": "uuid",
-                "example": "123e4567-e89b-12d3-a456-426614174004"
+              "id": {
+                "$ref": "#/components/schemas/Folder_properties-id"
               },
-              "oldFolderId": {
-                "type": "string",
-                "format": "uuid",
-                "example": "123e4567-e89b-12d3-a456-426614174001"
+              "fromFolderId": {
+                "$ref": "#/components/schemas/parentId"
               },
-              "newFolderId": {
-                "type": "string",
-                "format": "uuid",
+              "toFolderId": {
+                "$ref": "#/components/schemas/parentId",
                 "example": "123e4567-e89b-12d3-a456-426614174002"
               }
             },
             "required": [
-              "folderId",
-              "oldFolderId",
-              "newFolderId"
+              "id",
+              "fromFolderId",
+              "toFolderId"
             ]
           }
         },
@@ -1877,23 +1868,20 @@
           "data": {
             "type": "object",
             "properties": {
-              "folderId": {
-                "type": "string",
-                "format": "uuid",
-                "example": "123e4567-e89b-12d3-a456-426614174000"
+              "id": {
+                "$ref": "#/components/schemas/Folder_properties-id"
               },
               "oldName": {
-                "type": "string",
-                "example": "Job"
+                "$ref": "#/components/schemas/name",
+                "example": "Work"
               },
               "newName": {
-                "type": "string",
-                "example": "Work"
+                "$ref": "#/components/schemas/name",
+                "example": "Working"
               }
             },
             "required": [
-              "folderId",
-              "oldName",
+              "id",
               "newName"
             ]
           }
@@ -1903,36 +1891,154 @@
           "data"
         ]
       },
-      "WorkspaceRenamedEvent": {
+      "NoteContentUpdatedEvent": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
             "enum": [
-              "WorkspaceRenamedEvent"
+              "NoteContentUpdatedEvent"
             ],
-            "example": "WorkspaceRenamedEvent"
+            "example": "NoteContentUpdatedEvent"
           },
           "data": {
             "type": "object",
             "properties": {
-              "workspaceId": {
-                "type": "string",
-                "format": "uuid",
-                "example": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-              },
-              "oldName": {
-                "type": "string",
-                "example": "Old Workspace Name"
-              },
-              "newName": {
-                "type": "string",
-                "example": "New Workspace Name"
+              "id": {
+                "$ref": "#/components/schemas/properties-id"
               }
             },
             "required": [
-              "workspaceId",
-              "oldName",
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "data"
+        ]
+      },
+      "NoteCreatedEvent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "NoteCreatedEvent"
+            ],
+            "example": "NoteCreatedEvent"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/properties-id"
+              },
+              "name": {
+                "$ref": "#/components/schemas/properties-name"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "data"
+        ]
+      },
+      "NoteDeletedEvent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "NoteDeletedEvent"
+            ],
+            "example": "NoteDeletedEvent"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/properties-id"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "data"
+        ]
+      },
+      "NoteMovedEvent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "NoteMovedEvent"
+            ],
+            "example": "NoteMovedEvent"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/properties-id"
+              },
+              "fromFolderId": {
+                "$ref": "#/components/schemas/folderId"
+              },
+              "toFolderId": {
+                "$ref": "#/components/schemas/folderId",
+                "example": "123e4567-e89b-12d3-a456-426614174002"
+              }
+            },
+            "required": [
+              "id",
+              "fromFolderId",
+              "toFolderId"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "data"
+        ]
+      },
+      "NoteRenamedEvent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "NoteRenamedEvent"
+            ],
+            "example": "NoteRenamedEvent"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/properties-id"
+              },
+              "oldName": {
+                "$ref": "#/components/schemas/properties-name",
+                "example": "Meeting Notes"
+              },
+              "newName": {
+                "$ref": "#/components/schemas/properties-name",
+                "example": "Work"
+              }
+            },
+            "required": [
+              "id",
               "newName"
             ]
           }
@@ -1947,6 +2053,42 @@
         "minLength": 1,
         "maxLength": 255,
         "example": "My Workspace"
+      },
+      "WorkspaceRenamedEvent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "WorkspaceRenamedEvent"
+            ],
+            "example": "WorkspaceRenamedEvent"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/id"
+              },
+              "oldName": {
+                "$ref": "#/components/schemas/Workspace_properties-name"
+              },
+              "newName": {
+                "$ref": "#/components/schemas/Workspace_properties-name",
+                "example": "New Workspace Name"
+              }
+            },
+            "required": [
+              "id",
+              "oldName",
+              "newName"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "data"
+        ]
       },
       "TrashedDeletedBy": {
         "type": "string",
@@ -2098,24 +2240,6 @@
         }
       },
       "GenerateDailyNoteRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "workspaceId": {
-                  "$ref": "#/components/schemas/id"
-                }
-              },
-              "required": [
-                "workspaceId"
-              ]
-            }
-          }
-        }
-      },
-      "OpenRandomNoteRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2450,19 +2574,6 @@
           }
         }
       },
-      "OpenRandomNoteResponse": {
-        "description": "Random note",
-        "headers": {
-          "Content-Location": {
-            "schema": {
-              "type": "string",
-              "format": "uri",
-              "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-            },
-            "required": true
-          }
-        }
-      },
       "SearchTagsResponse": {
         "description": "List of matching tags in the workspace",
         "content": {
@@ -2470,7 +2581,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "$ref": "#/components/schemas/Tag"
               }
             }
           }
@@ -2579,7 +2690,10 @@
             "schema": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/NoteMovedEvent"
+                  "$ref": "#/components/schemas/FolderCreatedEvent"
+                },
+                {
+                  "$ref": "#/components/schemas/FolderDeletedEvent"
                 },
                 {
                   "$ref": "#/components/schemas/FolderMovedEvent"
@@ -2588,15 +2702,36 @@
                   "$ref": "#/components/schemas/FolderRenamedEvent"
                 },
                 {
+                  "$ref": "#/components/schemas/NoteContentUpdatedEvent"
+                },
+                {
+                  "$ref": "#/components/schemas/NoteCreatedEvent"
+                },
+                {
+                  "$ref": "#/components/schemas/NoteDeletedEvent"
+                },
+                {
+                  "$ref": "#/components/schemas/NoteMovedEvent"
+                },
+                {
+                  "$ref": "#/components/schemas/NoteRenamedEvent"
+                },
+                {
                   "$ref": "#/components/schemas/WorkspaceRenamedEvent"
                 }
               ],
               "discriminator": {
                 "propertyName": "type",
                 "mapping": {
-                  "NoteMovedEvent": "#/components/schemas/NoteMovedEvent",
+                  "FolderCreatedEvent": "#/components/schemas/FolderCreatedEvent",
+                  "FolderDeletedEvent": "#/components/schemas/FolderDeletedEvent",
                   "FolderMovedEvent": "#/components/schemas/FolderMovedEvent",
                   "FolderRenamedEvent": "#/components/schemas/FolderRenamedEvent",
+                  "NoteContentUpdatedEvent": "#/components/schemas/NoteContentUpdatedEvent",
+                  "NoteCreatedEvent": "#/components/schemas/NoteCreatedEvent",
+                  "NoteDeletedEvent": "#/components/schemas/NoteDeletedEvent",
+                  "NoteMovedEvent": "#/components/schemas/NoteMovedEvent",
+                  "NoteRenamedEvent": "#/components/schemas/NoteRenamedEvent",
                   "WorkspaceRenamedEvent": "#/components/schemas/WorkspaceRenamedEvent"
                 }
               }

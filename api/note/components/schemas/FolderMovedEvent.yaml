@@ -9,22 +9,17 @@ properties:
   data:
     type: object
     properties:
-      folderId:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174004
-      oldFolderId:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174001
-      newFolderId:
-        type: string
-        format: uuid
+      id:
+        $ref: ../schemas/Folder.yaml#/properties/id
+      fromFolderId:
+        $ref: ../schemas/Folder.yaml#/properties/parentId
+      toFolderId:
+        $ref: ../schemas/Folder.yaml#/properties/parentId
         example: 123e4567-e89b-12d3-a456-426614174002
     required:
-      - folderId
-      - oldFolderId
-      - newFolderId
+      - id
+      - fromFolderId
+      - toFolderId
 required:
   - type
   - data

@@ -1,0 +1,18 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  type:
+    type: string
+    enum:
+      - FolderDeletedEvent
+    example: FolderDeletedEvent
+  data:
+    type: object
+    properties:
+      id:
+        $ref: ../schemas/Folder.yaml#/properties/id
+    required:
+      - id
+required:
+  - type
+  - data

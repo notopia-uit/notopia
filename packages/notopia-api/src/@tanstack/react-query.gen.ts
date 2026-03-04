@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { createFolder, createNote, createWorkspace, deleteNote, deleteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getGraph, getNote, getRevision, getRevisions, getWorkspace, importDocuments, openRandomNote, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchTags, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceCollaborators, wsDocument } from '../sdk.gen';
-import type { CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetGraphData, GetGraphError, GetGraphResponse, GetNoteData, GetNoteError, GetNoteResponse, GetRevisionData, GetRevisionError, GetRevisionResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceResponse, ImportDocumentsData, ImportDocumentsError, OpenRandomNoteData, OpenRandomNoteError, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchTagsData, SearchTagsError, SearchTagsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceCollaboratorsData, UpdateWorkspaceCollaboratorsError, UpdateWorkspaceCollaboratorsResponse, WsDocumentData, WsDocumentError } from '../types.gen';
+import { applyRevision, createFolder, createNote, createWorkspace, deleteNote, deleteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getGraph, getNote, getRevision, getRevisions, getWorkspace, importDocuments, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchTags, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceCollaborators, wsDocument } from '../sdk.gen';
+import type { ApplyRevisionData, ApplyRevisionError, ApplyRevisionResponse, CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetGraphData, GetGraphError, GetGraphResponse, GetNoteData, GetNoteError, GetNoteResponse, GetRevisionData, GetRevisionError, GetRevisionResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceResponse, ImportDocumentsData, ImportDocumentsError, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchTagsData, SearchTagsError, SearchTagsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceCollaboratorsData, UpdateWorkspaceCollaboratorsError, UpdateWorkspaceCollaboratorsResponse, WsDocumentData, WsDocumentError } from '../types.gen';
 
 /**
  * Import documents
@@ -170,23 +170,6 @@ export const generateDailyNoteMutation = (options?: Partial<Options<GenerateDail
     const mutationOptions: UseMutationOptions<unknown, GenerateDailyNoteError, Options<GenerateDailyNoteData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await generateDailyNote({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Open random note
- */
-export const openRandomNoteMutation = (options?: Partial<Options<OpenRandomNoteData>>): UseMutationOptions<unknown, OpenRandomNoteError, Options<OpenRandomNoteData>> => {
-    const mutationOptions: UseMutationOptions<unknown, OpenRandomNoteError, Options<OpenRandomNoteData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await openRandomNote({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -373,6 +356,23 @@ export const getRevisionsInfiniteOptions = (options: Options<GetRevisionsData>) 
     },
     queryKey: getRevisionsInfiniteQueryKey(options)
 });
+
+/**
+ * Apply revision
+ */
+export const applyRevisionMutation = (options?: Partial<Options<ApplyRevisionData>>): UseMutationOptions<ApplyRevisionResponse, ApplyRevisionError, Options<ApplyRevisionData>> => {
+    const mutationOptions: UseMutationOptions<ApplyRevisionResponse, ApplyRevisionError, Options<ApplyRevisionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await applyRevision({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
  * Rename revision

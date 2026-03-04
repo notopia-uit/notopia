@@ -1,0 +1,18 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  type:
+    type: string
+    enum:
+      - NoteDeletedEvent
+    example: NoteDeletedEvent
+  data:
+    type: object
+    properties:
+      id:
+        $ref: ./Note.yaml#/properties/id
+    required:
+      - id
+required:
+  - type
+  - data

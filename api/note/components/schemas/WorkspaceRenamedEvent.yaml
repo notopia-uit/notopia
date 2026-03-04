@@ -9,18 +9,15 @@ properties:
   data:
     type: object
     properties:
-      workspaceId:
-        type: string
-        format: uuid
-        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      id:
+        $ref: ./Workspace.yaml#/properties/id
       oldName:
-        type: string
-        example: Old Workspace Name
+        $ref: ./Workspace.yaml#/properties/name
       newName:
-        type: string
+        $ref: ./Workspace.yaml#/properties/name
         example: New Workspace Name
     required:
-      - workspaceId
+      - id
       - oldName
       - newName
 required:

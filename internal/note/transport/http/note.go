@@ -18,13 +18,6 @@ func (h *StrictHandler) GenerateDailyNote(
 	return nil, errors.New("not implemented")
 }
 
-func (h *StrictHandler) OpenRandomNote(
-	ctx context.Context,
-	request note.OpenRandomNoteRequestObject,
-) (note.OpenRandomNoteResponseObject, error) {
-	return nil, errors.New("not implemented")
-}
-
 func (h *StrictHandler) SearchTags(
 	ctx context.Context,
 	request note.SearchTagsRequestObject,

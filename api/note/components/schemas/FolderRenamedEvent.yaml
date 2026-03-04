@@ -9,19 +9,16 @@ properties:
   data:
     type: object
     properties:
-      folderId:
-        type: string
-        format: uuid
-        example: 123e4567-e89b-12d3-a456-426614174000
+      id:
+        $ref: ./Folder.yaml#/properties/id
       oldName:
-        type: string
-        example: Job
-      newName:
-        type: string
+        $ref: ./Folder.yaml#/properties/name
         example: Work
+      newName:
+        $ref: ./Folder.yaml#/properties/name
+        example: Working
     required:
-      - folderId
-      - oldName
+      - id
       - newName
 required:
   - type

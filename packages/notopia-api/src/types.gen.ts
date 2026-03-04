@@ -22,7 +22,7 @@ export type Error = {
 export type Folder = {
     readonly id: string;
     name: string;
-    parentId: string | null;
+    parentId: string;
 };
 
 export type Name = string;
@@ -46,6 +46,10 @@ export type Note = {
 };
 
 export type Id = string;
+
+export type Tag = {
+    name: string;
+};
 
 export type PropertiesName = string;
 
@@ -99,43 +103,93 @@ export type TreeNote = {
     folderId: FolderId;
 };
 
-export type NoteMovedEvent = {
-    type: 'NoteMovedEvent';
+export type FolderPropertiesId = string;
+
+export type FolderCreatedEvent = {
+    type: 'FolderCreatedEvent';
     data: {
-        noteId: string;
-        fromFolderId: string;
-        toFolderId: string;
+        id: FolderPropertiesId;
+        name: Name;
     };
 };
+
+export type FolderDeletedEvent = {
+    type: 'FolderDeletedEvent';
+    data: {
+        id: FolderPropertiesId;
+    };
+};
+
+export type ParentId = string;
 
 export type FolderMovedEvent = {
     type: 'FolderRenamedEvent';
     data: {
-        folderId: string;
-        oldFolderId: string;
-        newFolderId: string;
+        id: FolderPropertiesId;
+        fromFolderId: ParentId;
+        toFolderId: ParentId;
     };
 };
 
 export type FolderRenamedEvent = {
     type: 'FolderRenamedEvent';
     data: {
-        folderId: string;
-        oldName: string;
-        newName: string;
+        id: FolderPropertiesId;
+        oldName?: Name;
+        newName: Name;
     };
 };
 
-export type WorkspaceRenamedEvent = {
-    type: 'WorkspaceRenamedEvent';
+export type NoteContentUpdatedEvent = {
+    type: 'NoteContentUpdatedEvent';
     data: {
-        workspaceId: string;
-        oldName: string;
-        newName: string;
+        id: PropertiesId;
+    };
+};
+
+export type NoteCreatedEvent = {
+    type: 'NoteCreatedEvent';
+    data: {
+        id: PropertiesId;
+        name: PropertiesName;
+    };
+};
+
+export type NoteDeletedEvent = {
+    type: 'NoteDeletedEvent';
+    data: {
+        id: PropertiesId;
+    };
+};
+
+export type NoteMovedEvent = {
+    type: 'NoteMovedEvent';
+    data: {
+        id: PropertiesId;
+        fromFolderId: FolderId;
+        toFolderId: FolderId;
+    };
+};
+
+export type NoteRenamedEvent = {
+    type: 'NoteRenamedEvent';
+    data: {
+        id: PropertiesId;
+        oldName?: PropertiesName;
+        newName: PropertiesName;
     };
 };
 
 export type WorkspacePropertiesName = string;
+
+export type WorkspaceRenamedEvent = {
+    type: 'WorkspaceRenamedEvent';
+    data: {
+        id: Id;
+        oldName: WorkspacePropertiesName;
+        newName: WorkspacePropertiesName;
+    };
+};
 
 export const TrashedDeletedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
 
@@ -157,7 +211,7 @@ export type TrashedFolder = {
 
 export type FolderWritable = {
     name: string;
-    parentId: string | null;
+    parentId: string;
 };
 
 export type RevisionWritable = {
@@ -183,6 +237,72 @@ export type FolderWithRelationsWritable = FolderWritable & {
 export type TreeNoteWritable = {
     name: PropertiesName;
     folderId: FolderId;
+};
+
+export type FolderCreatedEventWritable = {
+    type: 'FolderCreatedEvent';
+    data: {
+        name: Name;
+    };
+};
+
+export type FolderDeletedEventWritable = {
+    type: 'FolderDeletedEvent';
+};
+
+export type FolderMovedEventWritable = {
+    type: 'FolderRenamedEvent';
+    data: {
+        fromFolderId: ParentId;
+        toFolderId: ParentId;
+    };
+};
+
+export type FolderRenamedEventWritable = {
+    type: 'FolderRenamedEvent';
+    data: {
+        oldName?: Name;
+        newName: Name;
+    };
+};
+
+export type NoteContentUpdatedEventWritable = {
+    type: 'NoteContentUpdatedEvent';
+};
+
+export type NoteCreatedEventWritable = {
+    type: 'NoteCreatedEvent';
+    data: {
+        name: PropertiesName;
+    };
+};
+
+export type NoteDeletedEventWritable = {
+    type: 'NoteDeletedEvent';
+};
+
+export type NoteMovedEventWritable = {
+    type: 'NoteMovedEvent';
+    data: {
+        fromFolderId: FolderId;
+        toFolderId: FolderId;
+    };
+};
+
+export type NoteRenamedEventWritable = {
+    type: 'NoteRenamedEvent';
+    data: {
+        oldName?: PropertiesName;
+        newName: PropertiesName;
+    };
+};
+
+export type WorkspaceRenamedEventWritable = {
+    type: 'WorkspaceRenamedEvent';
+    data: {
+        oldName: WorkspacePropertiesName;
+        newName: WorkspacePropertiesName;
+    };
 };
 
 export type TrashedNoteWritable = {
@@ -231,10 +351,6 @@ export type RenameFolderRequest = {
 export type CreateNoteRequest = NoteWritable;
 
 export type GenerateDailyNoteRequest = {
-    workspaceId: Id;
-};
-
-export type OpenRandomNoteRequest = {
     workspaceId: Id;
 };
 
@@ -576,41 +692,6 @@ export type GenerateDailyNoteResponses = {
     201: unknown;
 };
 
-export type OpenRandomNoteData = {
-    body: OpenRandomNoteRequest;
-    path?: never;
-    query?: never;
-    url: '/note/notes/random';
-};
-
-export type OpenRandomNoteErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: Error;
-    /**
-     * Unauthorized Error response
-     */
-    401: Error;
-    /**
-     * Not Found Error response
-     */
-    404: Error;
-    /**
-     * Internal Server Error response
-     */
-    500: Error;
-};
-
-export type OpenRandomNoteError = OpenRandomNoteErrors[keyof OpenRandomNoteErrors];
-
-export type OpenRandomNoteResponses = {
-    /**
-     * Random note
-     */
-    201: unknown;
-};
-
 export type SearchTagsData = {
     body: SearchTagsRequest;
     path?: never;
@@ -639,7 +720,7 @@ export type SearchTagsResponses = {
     /**
      * List of matching tags in the workspace
      */
-    200: Array<string>;
+    200: Array<Tag>;
 };
 
 export type SearchTagsResponse = SearchTagsResponses[keyof SearchTagsResponses];
@@ -896,6 +977,45 @@ export type GetRevisionsResponses = {
 };
 
 export type GetRevisionsResponse = GetRevisionsResponses[keyof GetRevisionsResponses];
+
+export type ApplyRevisionData = {
+    body?: never;
+    path: {
+        revisionId: string;
+    };
+    query?: never;
+    url: '/note/revisions/{revisionId}/apply';
+};
+
+export type ApplyRevisionErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: Error;
+    /**
+     * Unauthorized Error response
+     */
+    401: Error;
+    /**
+     * Not Found Error response
+     */
+    404: Error;
+    /**
+     * Internal Server Error response
+     */
+    500: Error;
+};
+
+export type ApplyRevisionError = ApplyRevisionErrors[keyof ApplyRevisionErrors];
+
+export type ApplyRevisionResponses = {
+    /**
+     * Apply revision, mean create new with existing revision
+     */
+    204: void;
+};
+
+export type ApplyRevisionResponse = ApplyRevisionResponses[keyof ApplyRevisionResponses];
 
 export type RenameRevisionData = {
     body: RenameRevisionRequest;
@@ -1164,12 +1284,24 @@ export type GetWorkspaceEventsResponses = {
      * A persistent stream of events
      */
     200: ({
-        type: 'NoteMovedEvent';
-    } & NoteMovedEvent) | ({
+        type: 'FolderCreatedEvent';
+    } & FolderCreatedEvent) | ({
+        type: 'FolderDeletedEvent';
+    } & FolderDeletedEvent) | ({
         type: 'FolderMovedEvent';
     } & FolderMovedEvent) | ({
         type: 'FolderRenamedEvent';
     } & FolderRenamedEvent) | ({
+        type: 'NoteContentUpdatedEvent';
+    } & NoteContentUpdatedEvent) | ({
+        type: 'NoteCreatedEvent';
+    } & NoteCreatedEvent) | ({
+        type: 'NoteDeletedEvent';
+    } & NoteDeletedEvent) | ({
+        type: 'NoteMovedEvent';
+    } & NoteMovedEvent) | ({
+        type: 'NoteRenamedEvent';
+    } & NoteRenamedEvent) | ({
         type: 'WorkspaceRenamedEvent';
     } & WorkspaceRenamedEvent);
 };

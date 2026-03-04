@@ -11,10 +11,7 @@ export const zError = z.object({
 export const zFolder = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255),
-    parentId: z.union([
-        z.uuid(),
-        z.null()
-    ])
+    parentId: z.uuid()
 });
 
 export const zName = z.string().min(1).max(255);
@@ -42,6 +39,10 @@ export const zNote = z.object({
 });
 
 export const zId = z.uuid().readonly();
+
+export const zTag = z.object({
+    name: z.string()
+});
 
 export const zPropertiesName = z.string().min(1).max(255);
 
@@ -85,43 +86,93 @@ export const zFolderWithRelations = zFolder.and(z.lazy(() => z.object({
     notes: z.array(zTreeNote)
 })));
 
-export const zNoteMovedEvent = z.object({
-    type: z.enum(['NoteMovedEvent']),
+export const zFolderPropertiesId = z.uuid().readonly();
+
+export const zFolderCreatedEvent = z.object({
+    type: z.enum(['FolderCreatedEvent']),
     data: z.object({
-        noteId: z.uuid(),
-        fromFolderId: z.uuid(),
-        toFolderId: z.uuid()
+        id: zFolderPropertiesId,
+        name: zName
     })
 });
+
+export const zFolderDeletedEvent = z.object({
+    type: z.enum(['FolderDeletedEvent']),
+    data: z.object({
+        id: zFolderPropertiesId
+    })
+});
+
+export const zParentId = z.uuid();
 
 export const zFolderMovedEvent = z.object({
     type: z.enum(['FolderRenamedEvent']),
     data: z.object({
-        folderId: z.uuid(),
-        oldFolderId: z.uuid(),
-        newFolderId: z.uuid()
+        id: zFolderPropertiesId,
+        fromFolderId: zParentId,
+        toFolderId: zParentId
     })
 });
 
 export const zFolderRenamedEvent = z.object({
     type: z.enum(['FolderRenamedEvent']),
     data: z.object({
-        folderId: z.uuid(),
-        oldName: z.string(),
-        newName: z.string()
+        id: zFolderPropertiesId,
+        oldName: z.optional(zName),
+        newName: zName
     })
 });
 
-export const zWorkspaceRenamedEvent = z.object({
-    type: z.enum(['WorkspaceRenamedEvent']),
+export const zNoteContentUpdatedEvent = z.object({
+    type: z.enum(['NoteContentUpdatedEvent']),
     data: z.object({
-        workspaceId: z.uuid(),
-        oldName: z.string(),
-        newName: z.string()
+        id: zPropertiesId
+    })
+});
+
+export const zNoteCreatedEvent = z.object({
+    type: z.enum(['NoteCreatedEvent']),
+    data: z.object({
+        id: zPropertiesId,
+        name: zPropertiesName
+    })
+});
+
+export const zNoteDeletedEvent = z.object({
+    type: z.enum(['NoteDeletedEvent']),
+    data: z.object({
+        id: zPropertiesId
+    })
+});
+
+export const zNoteMovedEvent = z.object({
+    type: z.enum(['NoteMovedEvent']),
+    data: z.object({
+        id: zPropertiesId,
+        fromFolderId: zFolderId,
+        toFolderId: zFolderId
+    })
+});
+
+export const zNoteRenamedEvent = z.object({
+    type: z.enum(['NoteRenamedEvent']),
+    data: z.object({
+        id: zPropertiesId,
+        oldName: z.optional(zPropertiesName),
+        newName: zPropertiesName
     })
 });
 
 export const zWorkspacePropertiesName = z.string().min(1).max(255);
+
+export const zWorkspaceRenamedEvent = z.object({
+    type: z.enum(['WorkspaceRenamedEvent']),
+    data: z.object({
+        id: zId,
+        oldName: zWorkspacePropertiesName,
+        newName: zWorkspacePropertiesName
+    })
+});
 
 export const zTrashedDeletedBy = z.enum(['purpose', 'parent']);
 
@@ -147,10 +198,7 @@ export const zTrashedFolder = z.object({
 
 export const zFolderWritable = z.object({
     name: z.string().min(1).max(255),
-    parentId: z.union([
-        z.uuid(),
-        z.null()
-    ])
+    parentId: z.uuid()
 });
 
 export const zRevisionWritable = z.object({
@@ -188,6 +236,72 @@ export const zFolderWithRelationsWritable = zFolderWritable.and(z.lazy(() => z.o
     ]),
     notes: z.array(zTreeNoteWritable)
 })));
+
+export const zFolderCreatedEventWritable = z.object({
+    type: z.enum(['FolderCreatedEvent']),
+    data: z.object({
+        name: zName
+    })
+});
+
+export const zFolderDeletedEventWritable = z.object({
+    type: z.enum(['FolderDeletedEvent'])
+});
+
+export const zFolderMovedEventWritable = z.object({
+    type: z.enum(['FolderRenamedEvent']),
+    data: z.object({
+        fromFolderId: zParentId,
+        toFolderId: zParentId
+    })
+});
+
+export const zFolderRenamedEventWritable = z.object({
+    type: z.enum(['FolderRenamedEvent']),
+    data: z.object({
+        oldName: z.optional(zName),
+        newName: zName
+    })
+});
+
+export const zNoteContentUpdatedEventWritable = z.object({
+    type: z.enum(['NoteContentUpdatedEvent'])
+});
+
+export const zNoteCreatedEventWritable = z.object({
+    type: z.enum(['NoteCreatedEvent']),
+    data: z.object({
+        name: zPropertiesName
+    })
+});
+
+export const zNoteDeletedEventWritable = z.object({
+    type: z.enum(['NoteDeletedEvent'])
+});
+
+export const zNoteMovedEventWritable = z.object({
+    type: z.enum(['NoteMovedEvent']),
+    data: z.object({
+        fromFolderId: zFolderId,
+        toFolderId: zFolderId
+    })
+});
+
+export const zNoteRenamedEventWritable = z.object({
+    type: z.enum(['NoteRenamedEvent']),
+    data: z.object({
+        oldName: z.optional(zPropertiesName),
+        newName: zPropertiesName
+    })
+});
+
+export const zWorkspaceRenamedEventWritable = z.object({
+    type: z.enum(['WorkspaceRenamedEvent']),
+    data: z.object({
+        oldName: zWorkspacePropertiesName,
+        newName: zWorkspacePropertiesName
+    })
+});
 
 export const zTrashedNoteWritable = z.object({
     id: z.uuid()
@@ -233,10 +347,6 @@ export const zRenameFolderRequest = z.object({
 export const zCreateNoteRequest = zNoteWritable;
 
 export const zGenerateDailyNoteRequest = z.object({
-    workspaceId: zId
-});
-
-export const zOpenRandomNoteRequest = z.object({
     workspaceId: zId
 });
 
@@ -354,12 +464,6 @@ export const zGenerateDailyNoteData = z.object({
     query: z.optional(z.never())
 });
 
-export const zOpenRandomNoteData = z.object({
-    body: zOpenRandomNoteRequest,
-    path: z.optional(z.never()),
-    query: z.optional(z.never())
-});
-
 export const zSearchTagsData = z.object({
     body: zSearchTagsRequest,
     path: z.optional(z.never()),
@@ -369,7 +473,7 @@ export const zSearchTagsData = z.object({
 /**
  * List of matching tags in the workspace
  */
-export const zSearchTagsResponse = z.array(z.string());
+export const zSearchTagsResponse = z.array(zTag);
 
 export const zDeleteNoteData = z.object({
     body: z.optional(z.never()),
@@ -453,6 +557,19 @@ export const zGetRevisionsResponse = z.object({
     data: z.array(zRevision),
     pagination: zPagination
 });
+
+export const zApplyRevisionData = z.object({
+    body: z.optional(z.never()),
+    path: z.object({
+        revisionId: z.uuid()
+    }),
+    query: z.optional(z.never())
+});
+
+/**
+ * Apply revision, mean create new with existing revision
+ */
+export const zApplyRevisionResponse = z.void();
 
 export const zRenameRevisionData = z.object({
     body: zRenameRevisionRequest,
@@ -540,14 +657,32 @@ export const zGetWorkspaceEventsData = z.object({
  */
 export const zGetWorkspaceEventsResponse = z.union([
     z.object({
-        type: z.literal('NoteMovedEvent')
-    }).and(zNoteMovedEvent),
+        type: z.literal('FolderCreatedEvent')
+    }).and(zFolderCreatedEvent),
+    z.object({
+        type: z.literal('FolderDeletedEvent')
+    }).and(zFolderDeletedEvent),
     z.object({
         type: z.literal('FolderMovedEvent')
     }).and(zFolderMovedEvent),
     z.object({
         type: z.literal('FolderRenamedEvent')
     }).and(zFolderRenamedEvent),
+    z.object({
+        type: z.literal('NoteContentUpdatedEvent')
+    }).and(zNoteContentUpdatedEvent),
+    z.object({
+        type: z.literal('NoteCreatedEvent')
+    }).and(zNoteCreatedEvent),
+    z.object({
+        type: z.literal('NoteDeletedEvent')
+    }).and(zNoteDeletedEvent),
+    z.object({
+        type: z.literal('NoteMovedEvent')
+    }).and(zNoteMovedEvent),
+    z.object({
+        type: z.literal('NoteRenamedEvent')
+    }).and(zNoteRenamedEvent),
     z.object({
         type: z.literal('WorkspaceRenamedEvent')
     }).and(zWorkspaceRenamedEvent)

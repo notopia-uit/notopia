@@ -4,22 +4,18 @@ properties:
   type:
     type: string
     enum:
-      - NoteRenamedEvent
-    example: NoteRenamedEvent
+      - NoteCreatedEvent
+    example: NoteCreatedEvent
   data:
     type: object
     properties:
       id:
         $ref: ./Note.yaml#/properties/id
-      oldName:
+      name:
         $ref: ./Note.yaml#/properties/name
-        example: Meeting Notes
-      newName:
-        $ref: ./Note.yaml#/properties/name
-        example: Work
     required:
       - id
-      - newName
+      - name
 required:
   - type
   - data
