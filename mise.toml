@@ -5,7 +5,7 @@ REDOCLY_TELEMETRY = "off"
 REDOCLY_SUPPRESS_UPDATE_NOTICE = "true"
 
 [tools]
-"github:pressly/goose" = "3.26.0"
+"github:pressly/goose" = "3.27.0"
 "go:github.com/goforj/wire/cmd/wire" = "v1.1.0"
 "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.6.0"
 "npm:nx" = "22.5.3"
