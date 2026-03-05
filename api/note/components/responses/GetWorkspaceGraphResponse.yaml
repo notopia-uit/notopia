@@ -1,5 +1,5 @@
 # vim: ft=yaml.openapi
-description: Graph
+description: Workspace graph
 content:
   application/json:
     schema:

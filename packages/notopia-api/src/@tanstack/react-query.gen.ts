@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { applyRevision, createFolder, createNote, createWorkspace, deleteNote, deleteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getGraph, getNote, getRevision, getRevisions, getWorkspace, importDocuments, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchTags, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceCollaborators, wsDocument } from '../sdk.gen';
-import type { ApplyRevisionData, ApplyRevisionError, ApplyRevisionResponse, CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetGraphData, GetGraphError, GetGraphResponse, GetNoteData, GetNoteError, GetNoteResponse, GetRevisionData, GetRevisionError, GetRevisionResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceResponse, ImportDocumentsData, ImportDocumentsError, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchTagsData, SearchTagsError, SearchTagsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceCollaboratorsData, UpdateWorkspaceCollaboratorsError, UpdateWorkspaceCollaboratorsResponse, WsDocumentData, WsDocumentError } from '../types.gen';
+import { applyRevision, createFolder, createNote, createWorkspace, deleteNote, deleteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getNote, getNoteGraph, getRevision, getRevisions, getWorkspace, getWorkspaceGraph, importDocuments, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchTags, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceCollaborators, wsDocument } from '../sdk.gen';
+import type { ApplyRevisionData, ApplyRevisionError, ApplyRevisionResponse, CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteResponse, GetRevisionData, GetRevisionError, GetRevisionResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceResponse, ImportDocumentsData, ImportDocumentsError, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchTagsData, SearchTagsError, SearchTagsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceCollaboratorsData, UpdateWorkspaceCollaboratorsError, UpdateWorkspaceCollaboratorsResponse, WsDocumentData, WsDocumentError } from '../types.gen';
 
 /**
  * Import documents
@@ -128,24 +128,6 @@ export const renameFolderMutation = (options?: Partial<Options<RenameFolderData>
     return mutationOptions;
 };
 
-export const getGraphQueryKey = (options?: Options<GetGraphData>) => createQueryKey('getGraph', options);
-
-/**
- * Get graph
- */
-export const getGraphOptions = (options?: Options<GetGraphData>) => queryOptions<GetGraphResponse, GetGraphError, GetGraphResponse, ReturnType<typeof getGraphQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getGraph({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getGraphQueryKey(options)
-});
-
 /**
  * Create note
  */
@@ -230,6 +212,24 @@ export const getNoteOptions = (options: Options<GetNoteData>) => queryOptions<Ge
         return data;
     },
     queryKey: getNoteQueryKey(options)
+});
+
+export const getNoteGraphQueryKey = (options: Options<GetNoteGraphData>) => createQueryKey('getNoteGraph', options);
+
+/**
+ * Get note graph
+ */
+export const getNoteGraphOptions = (options: Options<GetNoteGraphData>) => queryOptions<GetNoteGraphResponse, GetNoteGraphError, GetNoteGraphResponse, ReturnType<typeof getNoteGraphQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getNoteGraph({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getNoteGraphQueryKey(options)
 });
 
 /**
@@ -476,6 +476,24 @@ export const getWorkspaceOptions = (options: Options<GetWorkspaceData>) => query
         return data;
     },
     queryKey: getWorkspaceQueryKey(options)
+});
+
+export const getWorkspaceGraphQueryKey = (options: Options<GetWorkspaceGraphData>) => createQueryKey('getWorkspaceGraph', options);
+
+/**
+ * Get workspace graph
+ */
+export const getWorkspaceGraphOptions = (options: Options<GetWorkspaceGraphData>) => queryOptions<GetWorkspaceGraphResponse, GetWorkspaceGraphError, GetWorkspaceGraphResponse, ReturnType<typeof getWorkspaceGraphQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getWorkspaceGraph({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getWorkspaceGraphQueryKey(options)
 });
 
 /**

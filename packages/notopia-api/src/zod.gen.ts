@@ -16,8 +16,6 @@ export const zFolder = z.object({
 
 export const zName = z.string().min(1).max(255);
 
-export const zGraph = z.record(z.string(), z.unknown());
-
 export const zRevision = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255).nullable(),
@@ -35,10 +33,43 @@ export const zNote = z.object({
 export const zId = z.uuid().readonly();
 
 export const zTag = z.object({
+    id: z.uuid().optional(),
     name: z.string()
 });
 
+export const zPropertiesId = z.uuid().readonly();
+
 export const zPropertiesName = z.string().min(1).max(255);
+
+export const zGraphNodeNote = z.object({
+    type: z.enum(['note']),
+    data: z.object({
+        id: zPropertiesId,
+        name: zPropertiesName,
+        weight: z.number().gte(0).lte(1)
+    })
+});
+
+export const zGraphNodeTag = z.object({
+    type: z.enum(['tag']),
+    data: zTag
+});
+
+export const zGraphNode = z.union([
+    z.object({
+        type: z.literal('GraphNodeNote')
+    }).and(zGraphNodeNote),
+    z.object({
+        type: z.literal('GraphNodeTag')
+    }).and(zGraphNodeTag)
+]);
+
+export const zGraphRelation = z.array(z.uuid());
+
+export const zGraph = z.object({
+    nodes: z.record(z.string(), zGraphNode).optional(),
+    relations: z.record(z.string(), zGraphRelation).optional()
+});
 
 export const zPagination = z.object({
     page: z.int().gte(1),
@@ -55,8 +86,6 @@ export const zWorkspace = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255)
 });
-
-export const zPropertiesId = z.uuid().readonly();
 
 export const zFolderId = z.uuid();
 
@@ -189,6 +218,28 @@ export const zRevisionWritable = z.object({
 export const zNoteWritable = z.object({
     name: z.string().min(1).max(255),
     folderId: z.uuid()
+});
+
+export const zGraphNodeNoteWritable = z.object({
+    type: z.enum(['note']),
+    data: z.object({
+        name: zPropertiesName,
+        weight: z.number().gte(0).lte(1)
+    })
+});
+
+export const zGraphNodeWritable = z.union([
+    z.object({
+        type: z.literal('GraphNodeNote')
+    }).and(zGraphNodeNoteWritable),
+    z.object({
+        type: z.literal('GraphNodeTag')
+    }).and(zGraphNodeTag)
+]);
+
+export const zGraphWritable = z.object({
+    nodes: z.record(z.string(), zGraphNodeWritable).optional(),
+    relations: z.record(z.string(), zGraphRelation).optional()
 });
 
 export const zWorkspaceWritable = z.object({
@@ -405,22 +456,6 @@ export const zRenameFolderData = z.object({
  */
 export const zRenameFolderResponse = z.void();
 
-export const zGetGraphData = z.object({
-    body: z.never().optional(),
-    path: z.never().optional(),
-    query: z.object({
-        noteIds: z.array(z.uuid()).optional(),
-        folderIds: z.array(z.uuid()).optional(),
-        depth: z.int().gte(1).lte(500).optional().default(3),
-        orphan: z.boolean().optional().default(false)
-    }).optional()
-});
-
-/**
- * Graph
- */
-export const zGetGraphResponse = zGraph;
-
 export const zCreateNoteData = z.object({
     body: zCreateNoteRequest,
     path: z.never().optional(),
@@ -469,6 +504,21 @@ export const zGetNoteData = z.object({
  * Successful response
  */
 export const zGetNoteResponse = zNote;
+
+export const zGetNoteGraphData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        noteId: z.uuid()
+    }),
+    query: z.object({
+        depth: z.int().gte(1).lte(500).optional().default(3)
+    }).optional()
+});
+
+/**
+ * Note graph
+ */
+export const zGetNoteGraphResponse = zGraph;
 
 export const zPublishNoteData = z.object({
     body: z.never().optional(),
@@ -656,6 +706,21 @@ export const zGetWorkspaceEventsResponse = z.union([
         type: z.literal('WorkspaceRenamedEvent')
     }).and(zWorkspaceRenamedEvent)
 ]);
+
+export const zGetWorkspaceGraphData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        workspaceId: z.uuid()
+    }),
+    query: z.object({
+        orphan: z.boolean().optional().default(false)
+    }).optional()
+});
+
+/**
+ * Workspace graph
+ */
+export const zGetWorkspaceGraphResponse = zGraph;
 
 export const zPublishWorkspaceData = z.object({
     body: z.never().optional(),

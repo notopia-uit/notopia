@@ -73,7 +73,7 @@ package "Note" <<Bounded Context>> {
                 id: uuid.UUID
                 name: string
                 FolderID: uuid.UUID
-                tags: []string
+                tagIDs: []uuid.UUID
                 currentRevisionID: uuid.UUID
                 deletedBy: *DeletedBy
                 deletedAt: *time.Time
@@ -82,6 +82,13 @@ package "Note" <<Bounded Context>> {
                 ReplaceTags(tags []string)
                 Trash()
                 Restore()
+            }
+
+            struct "Tag" as Note.Domain.Models.Tag <<Aggregate Root>> {
+                id: uuid.UUID
+                name: string
+
+                Rename(newName string)
             }
 
             struct "Revision" as Note.Domain.Models.Revision <<Aggregate Root>> {

@@ -3,34 +3,11 @@ get:
   security:
     - Oauth2: []
   tags:
-    - Graph
-  summary: Get graph
-  operationId: getGraph
+    - Workspace
+  summary: Get workspace graph
+  operationId: getWorkspaceGraph
   parameters:
-    - name: noteIds
-      in: query
-      schema:
-        type: array
-        items:
-          type: string
-          format: uuid
-          example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
-    - name: folderIds
-      in: query
-      schema:
-        type: array
-        items:
-          type: string
-          format: uuid
-          example: 123e4567-e89b-12d3-a456-426614174000
-    - name: depth
-      in: query
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 500
-        default: 3
-        example: 3
+    - $ref: ../components/parameters/workspaceIdPath.yaml
     - name: orphan
       in: query
       description: Include node that are not connected to any other node
@@ -40,7 +17,7 @@ get:
         example: true
   responses:
     200:
-      $ref: ../components/responses/GetGraphResponse.yaml
+      $ref: ../components/responses/GetWorkspaceGraphResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

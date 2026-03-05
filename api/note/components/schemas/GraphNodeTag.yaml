@@ -1,0 +1,15 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  type:
+    type: string
+    enum: [tag]
+    example: tag
+
+  data:
+    $ref: ./Tag.yaml
+
+required:
+  - type
+  - data

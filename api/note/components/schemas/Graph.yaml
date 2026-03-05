@@ -1,2 +1,12 @@
 # vim: ft=yaml.openapi
 type: object
+
+properties:
+  nodes:
+    type: object
+    additionalProperties:
+      $ref: ./GraphNode.yaml
+  relations:
+    type: object
+    additionalProperties:
+      $ref: ./GraphRelation.yaml

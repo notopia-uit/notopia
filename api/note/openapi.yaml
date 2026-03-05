@@ -26,17 +26,12 @@ tags:
     description: Note in workspace's root folder or in a folder
   - name: Revision
     description: Note revisions
-  - name: Graph
-    description: Note graph
 
 paths:
   /note/folders:
     $ref: ./paths/folders.yaml
   /note/folders/{folderId}/rename:
     $ref: ./paths/folders_{folderId}_rename.yaml
-
-  /note/graph:
-    $ref: ./paths/graph.yaml
 
   /note/notes:
     $ref: ./paths/notes.yaml
@@ -46,6 +41,8 @@ paths:
     $ref: ./paths/notes_search-tags.yaml
   /note/notes/{noteId}:
     $ref: ./paths/notes_{noteId}.yaml
+  /note/notes/{noteId}/graph:
+    $ref: ./paths/notes_{noteId}_graph.yaml
   /note/notes/{noteId}/publish:
     $ref: ./paths/notes_{noteId}_publish.yaml
   /note/notes/{noteId}/rename:
@@ -68,6 +65,8 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}.yaml
   /note/workspaces/{workspaceId}/events:
     $ref: ./paths/workspaces_{workspaceId}_events.yaml
+  /note/workspaces/{workspaceId}/graph:
+    $ref: ./paths/workspaces_{workspaceId}_graph.yaml
   /note/workspaces/{workspaceId}/publish:
     $ref: ./paths/workspaces_{workspaceId}_publish.yaml
   /note/workspaces/{workspaceId}/rename:

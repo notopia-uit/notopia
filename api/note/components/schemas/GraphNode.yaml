@@ -1,0 +1,9 @@
+# vim: ft=yaml.openapi
+oneOf:
+  - $ref: ./GraphNodeNote.yaml
+  - $ref: ./GraphNodeTag.yaml
+discriminator:
+  propertyName: type
+  mapping:
+    GraphNodeNote: ./GraphNodeNote.yaml
+    GraphNodeTag: ./GraphNodeTag.yaml

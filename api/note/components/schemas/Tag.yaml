@@ -2,6 +2,11 @@
 type: object
 
 properties:
+  id:
+    type: string
+    format: uuid
+    example: 3e31fdf4-18bf-450b-98ee-a14652d922a2
+
   name:
     type: string
     example: work

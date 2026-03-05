@@ -1,0 +1,31 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - Oauth2: []
+  tags:
+    - Note
+  summary: Get note graph
+  operationId: getNoteGraph
+  parameters:
+    - $ref: ../components/parameters/noteIdPath.yaml
+    - name: depth
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 500
+        default: 3
+        example: 3
+  responses:
+    200:
+      $ref: ../components/responses/GetNoteGraphResponse.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml
