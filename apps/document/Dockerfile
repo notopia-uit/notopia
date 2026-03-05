@@ -1,7 +1,9 @@
-FROM node:25.6.1-slim AS builder
+FROM node:25.6.1-alpine3.23 AS builder
 ENV NODE_ENV=production
-RUN corepack enable pnpm
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /notopia
+RUN npm install -g pnpm@10.28.2
 COPY package.json pnpm-lock.yaml .npmrc ./
 RUN pnpm install --frozen-lockfile --filter document && \
   pnpm build --filter document && \
