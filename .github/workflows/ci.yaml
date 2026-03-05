@@ -50,14 +50,16 @@ env:
         github.base_ref == 'main' ||
         github.base_ref == 'dev'
       ) && (
-        startsWith(github.head_ref || github.ref_name, 'renovate/')
+        !startsWith(github.head_ref || github.ref_name, 'renovate/')
       )
     }}
   WILL_RELEASE: >-
     ${{
       (
-        github.event.inputs.dry-run-release == 'false' &&
-        github.event_name == 'workflow_dispatch'
+        github.event_name == 'push' || (
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.dry-run-release == 'false'
+        )
       ) && (
         github.ref == 'refs/heads/main' ||
         github.ref == 'refs/heads/dev'
@@ -212,10 +214,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npx nx release publish \
-            ${{ github.event_name == 'push' || github.event.inputs.publish-web == 'true' && '--project web' || '' }} \
-            ${{ github.event_name == 'push' || github.event.inputs.publish-note == 'true' && '--project note' || '' }} \
-            ${{ github.event_name == 'push' || github.event.inputs.publish-document == 'true' && '--project document' || '' }} \
-            ${{ github.ref_name == 'main' && (github.event_name == 'push' || github.event.inputs.publish-npm-groups == 'true') && '--group npm' || '' }} \
+            ${{ (github.event_name == 'push' || github.event.inputs.publish-web == 'true') && '--project web' || '' }} \
+            ${{ (github.event_name == 'push' || github.event.inputs.publish-note == 'true') && '--project note' || '' }} \
+            ${{ (github.event_name == 'push' || github.event.inputs.publish-document == 'true') && '--project document' || '' }} \
+            ${{ (github.ref_name == 'main' && (github.event_name == 'push' || github.event.inputs.publish-npm-groups == 'true')) && '--group npm' || '' }} \
             ${{ env.WILL_RELEASE == 'true' && '' || '--dry-run' }}
 
       - name: Cache Nx
