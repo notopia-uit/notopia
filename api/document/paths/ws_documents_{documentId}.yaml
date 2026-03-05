@@ -1,7 +1,7 @@
 # vim: ft=yaml.openapi
 get:
   security:
-    - oauth2: []
+    - Oauth2: []
   tags:
     - Document
   summary: WebSocket hocuspocus

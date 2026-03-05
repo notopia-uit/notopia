@@ -85,7 +85,7 @@ paths:
 
 components:
   securitySchemes:
-    oauth2:
+    Oauth2:
       $ref: ../common/components/securitySchemes/Oauth2.yaml
 
 externalDocs:

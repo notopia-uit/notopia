@@ -1,7 +1,7 @@
 # vim: ft=yaml.openapi
 post:
   security:
-    - oauth2: []
+    - Oauth2: []
   tags:
     - Note
   summary: Generate daily note

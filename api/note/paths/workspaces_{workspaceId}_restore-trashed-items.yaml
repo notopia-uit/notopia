@@ -1,7 +1,7 @@
 # vim: ft=yaml.openapi
 post:
   security:
-    - oauth2: []
+    - Oauth2: []
   tags:
     - Workspace
   summary: Restore trashed workspace items
