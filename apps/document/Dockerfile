@@ -5,6 +5,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /notopia
 RUN npm install -g pnpm@10.28.2
 COPY . .
+RUN echo 'injectWorkspacePackages: true' >> pnpm-workspace.yaml
 RUN pnpm --filter @notopia-uit/document install --frozen-lockfile && \
   pnpm --filter @notopia-uit/document exec webpack-cli build && \
   pnpm --filter @notopia-uit/document deploy --prod /app
