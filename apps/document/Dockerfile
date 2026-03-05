@@ -6,12 +6,12 @@ WORKDIR /notopia
 RUN npm install -g pnpm@10.28.2
 COPY . .
 RUN pnpm --filter @notopia-uit/document... install --frozen-lockfile && \
-  pnpm --filter @notopia-uit/document exec webpack-cli build && \
-  pnpm --filter @notopia-uit/document deploy --prod /app
+  pnpm exec nx build document && \
+  pnpm --filter @notopia-uit/document deploy --prod /app --legacy
 
 FROM node:25.6.1-alpine3.23 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/ ./
 EXPOSE 8082
-CMD ["node", "main.js"]
+CMD ["node", "dist/main.js"]

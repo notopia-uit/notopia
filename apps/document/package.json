@@ -1,6 +1,5 @@
 {
   "name": "@notopia-uit/document",
-  "version": "0.0.0",
   "private": true,
   "dependencies": {
     "@nestjs/common": "catalog:",

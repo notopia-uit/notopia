@@ -22,7 +22,6 @@ vite.config.*.timestamp*
 **/__debug_bin*
 
 **/.openapi-generator/
-proto/
 deploy/
 docs/
 page/
