@@ -22,8 +22,6 @@ services:
     depends_on:
       authentik_postgresql:
         condition: service_healthy
-    profiles:
-      - dev-api
     restart: unless-stopped
 
   authentik_worker:
@@ -44,8 +42,6 @@ services:
       # - ./certs:/certs
       # - ./custom-templates:/templates
       - ./authentik-blueprints/:/blueprints/notopia:ro
-    profiles:
-      - dev-api
     depends_on:
       authentik_postgresql:
         condition: service_healthy
@@ -61,8 +57,6 @@ services:
       POSTGRES_USER: ${AUTHENTIK_POSTGRESQL__USER:-notopiauit}
     volumes:
       - authentik_postgresql_data:/var/lib/postgresql/data
-    profiles:
-      - dev-api
     healthcheck:
       test:
         - CMD-SHELL

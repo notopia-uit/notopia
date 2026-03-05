@@ -28,8 +28,6 @@ services:
       traefik.http.routers.traefik.rule: Host(`traefik.notopia.localhost`)
       traefik.http.routers.traefik.entrypoints: web
       traefik.http.routers.traefik.service: api@internal
-    profiles:
-      - dev-api
     extra_hosts:
       - host.docker.internal:host-gateway
       - authentik.notopia.localhost:host-gateway
