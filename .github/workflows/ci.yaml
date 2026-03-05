@@ -14,24 +14,59 @@ on:
       - reopened
   workflow_dispatch:
     inputs:
+      publish-web:
+        description: Publish "web" container image
+        required: true
+        default: false
+        type: boolean
+      publish-note:
+        description: Publish "note" container image
+        required: true
+        default: false
+        type: boolean
+      publish-document:
+        description: Publish "document" container image
+        required: true
+        default: false
+        type: boolean
+      publish-npm-groups:
+        description: Publish packages npm group
+        required: true
+        default: false
+        type: boolean
       dry-run-release:
         description: Perform a Nx dry run release
         required: false
-        default: true
+        default: false
         type: boolean
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
-  IS_PRIMARY_BRANCH: >-
+  IS_RENOVATE: ${{ startsWith(github.head_ref || github.ref_name, 'renovate/') }}
+  SHOULD_CACHE: >-
     ${{
-      github.ref == 'refs/heads/main' ||
-      github.ref == 'refs/heads/dev' ||
-      github.base_ref == 'main' ||
-      github.base_ref == 'dev'
+      (
+        github.ref_name == 'main' ||
+        github.ref_name == 'dev' ||
+        github.base_ref == 'main' ||
+        github.base_ref == 'dev'
+      ) && (
+        startsWith(github.head_ref || github.ref_name, 'renovate/')
+      )
     }}
-  IS_RENOVATE: ${{ startsWith(github.head_ref, 'renovate/') }}
+  WILL_RELEASE: >-
+    ${{
+      (
+        github.event.inputs.dry-run-release == 'false' &&
+        github.event_name == 'workflow_dispatch'
+      ) && (
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/dev'
+      )
+    }}
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
 
 jobs:
   main:
@@ -51,61 +86,32 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          cache: >-
-            ${{
-              env.IS_PRIMARY_BRANCH == 'true' &&
-              env.IS_RENOVATE == 'false'
-            }}
+          cache: ${{ env.SHOULD_CACHE == 'true' }}
 
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version-file: .tool-versions
-          cache: >-
-            ${{
-              (env.IS_PRIMARY_BRANCH == 'true' && env.IS_RENOVATE == 'false')
-              && 'pnpm'
-              || ''
-            }}
+          cache: ${{ env.SHOULD_CACHE == 'true' && 'pnpm' || '' }}
 
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
           go-version-file: .tool-versions
-          cache: >-
-            ${{
-              env.IS_PRIMARY_BRANCH == 'true' &&
-              env.IS_RENOVATE == 'false'
-            }}
+          cache: ${{ env.SHOULD_CACHE == 'true' }}
 
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
           install-only: true
           version-file: .tool-versions
-          skip-save-cache: >-
-            ${{
-              env.IS_PRIMARY_BRANCH == 'true' &&
-              env.IS_RENOVATE == 'false'
-            }}
+          skip-save-cache: ${{ env.SHOULD_CACHE != 'true' }}
 
       - name: Setup Mise
         uses: jdx/mise-action@v3
         with:
           experimental: true
-          cache: >-
-            ${{
-              env.IS_PRIMARY_BRANCH == 'true' &&
-              env.IS_RENOVATE == 'false'
-            }}
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
-        if: ${{ github.ref == 'refs/heads/main' }}
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ env.SHOULD_CACHE == 'true' }}
 
       - name: Cache Buf dependencies
         uses: actions/cache@v5
@@ -156,7 +162,7 @@ jobs:
             --target gen \
             --target bundle \
             --target build \
-            ${{ github.ref == 'refs/heads/main' && '--target docker:build' || '' }} \
+            ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && '--target docker:build' || '' }} \
             --parallel=2 \
             --base=${{ steps.set-shas.outputs.base }} \
             --head=${{ steps.set-shas.outputs.head }}
@@ -171,45 +177,57 @@ jobs:
           fi
 
       - name: Setup Git User
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: >-
+          ${{
+            github.ref == 'refs/heads/main' ||
+            github.ref == 'refs/heads/dev'
+          }}
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions [Bot]"
 
-      - name: Login github npm registry
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm config set '//npm.pkg.github.com/:_authToken' '${{ secrets.GITHUB_TOKEN }}'
-
-      - name: Nx release
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
+      - name: Nx release version
+        if: >-
+          ${{
+            github.ref == 'refs/heads/main' ||
+            github.ref == 'refs/heads/dev'
+          }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx nx release \
-            --dockerVersionScheme=production \
-            ${{ github.ref != 'refs/heads/main' && '--dry-run' || '' }} \
-            --yes
+          npx nx release --skip-publish \
+            --dockerVersionScheme=${{ github.ref == 'refs/heads/main' && 'production' || 'dev' }} \
+            --git-commit \
+            --git-tag \
+            --git-push \
+            ${{ env.WILL_RELEASE == 'true' && '' || '--dry-run' }}
+
+      - name: Nx release publish
+        if: >-
+          ${{
+            github.ref == 'refs/heads/main' ||
+            github.ref == 'refs/heads/dev'
+          }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx nx release publish \
+            ${{ github.event_name == 'push' || github.event.inputs.publish-web == 'true' && '--project web' || '' }} \
+            ${{ github.event_name == 'push' || github.event.inputs.publish-note == 'true' && '--project note' || '' }} \
+            ${{ github.event_name == 'push' || github.event.inputs.publish-document == 'true' && '--project document' || '' }} \
+            ${{ github.ref_name == 'main' && (github.event_name == 'push' || github.event.inputs.publish-npm-groups == 'true') && '--group npm' || '' }} \
+            ${{ env.WILL_RELEASE == 'true' && '' || '--dry-run' }}
 
       - name: Cache Nx
         uses: actions/cache/save@v5
-        if: >-
-          ${{
-            env.IS_PRIMARY_BRANCH == 'true' &&
-            env.IS_RENOVATE == 'false'
-          }}
+        if: ${{ env.SHOULD_CACHE == 'true' }}
         with:
           path: .nx
           key: ${{ runner.os }}-nx-${{ github.ref_name }}-${{ steps.set-shas.outputs.base }}
 
       - name: Cache Docs diagrams
         uses: actions/cache/save@v5
-        if: >-
-          ${{
-            env.IS_PRIMARY_BRANCH == 'true' &&
-            env.IS_RENOVATE == 'false'
-          }}
+        if: ${{ env.SHOULD_CACHE == 'true' }}
         with:
           path: docs/src/public/diagrams/
           key: docs-diagrams-${{ hashFiles('docs/src/public/diagrams/**') }}

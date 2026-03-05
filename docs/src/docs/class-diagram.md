@@ -72,14 +72,14 @@ package "Note" <<Bounded Context>> {
             struct "Note" as Note.Domain.Models.Note <<Aggregate Root>> {
                 id: uuid.UUID
                 name: string
-                FolderID: uuid.UUID
+                folderID: uuid.UUID
                 tagIDs: []uuid.UUID
                 currentRevisionID: uuid.UUID
                 deletedBy: *DeletedBy
                 deletedAt: *time.Time
 
                 MoveNoteToFolder(folderID uuid.UUID)
-                ReplaceTags(tags []string)
+                RemoveTag(tagID uuid.UUID)
                 Trash()
                 Restore()
             }
@@ -87,8 +87,9 @@ package "Note" <<Bounded Context>> {
             struct "Tag" as Note.Domain.Models.Tag <<Aggregate Root>> {
                 id: uuid.UUID
                 name: string
-
-                Rename(newName string)
+                noteReferenceIDs: []uuid.UUID
+                noteReferenceCount: int
+                deleted: bool
             }
 
             struct "Revision" as Note.Domain.Models.Revision <<Aggregate Root>> {
@@ -113,17 +114,35 @@ package "Note" <<Bounded Context>> {
                 GetByID(folderID uuid.UUID) *Folder
                 Save(folder *Folder)
                 GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []*Folder
+                PermanentlyDelete(folderIDs ...uuid.UUID)
             }
 
             interface "Note" as Note.Domain.Repos.Note {
                 GetByID(noteID uuid.UUID) *Note
                 Save(note *Note)
                 GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []*Note
+                PermanentlyDelete(noteIDs ...uuid.UUID)
+            }
+
+            interface "Tag" as Note.Domain.Repos.Tag {
+                GetByID(tagID uuid.UUID) *Tag
+                SearchByName(workspaceID uuid.UUID, name string) []*Tag
+                Save(tag *Tag)
+                Delete(tagID uuid.UUID)
             }
 
             interface "Revision" as Note.Domain.Repos.Revision {
                 GetByID(revisionID uuid.UUID) *Revision
                 Save(revision *Revision)
+            }
+        }
+
+        package "Services" as Note.Domain.Services {
+            struct "TagOrphan" as Note.Domain.Services.TagOrphan {
+                noteRepo: Repos.Note
+                tagRepo: Repos.Tag
+
+                RemoveTagsFromNote(noteID uuid.UUID, tagIDs ...uuid.UUID)
             }
         }
     }

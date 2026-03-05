@@ -134,10 +134,6 @@
     "changelog": {
       "automaticFromRef": true
     },
-    "docker": {
-      "registryUrl": "ghcr.io",
-      "skipVersionActions": true
-    },
     "groups": {
       "npm": {
         "releaseTag": {
@@ -158,6 +154,14 @@
         "projects": ["note", "document", "web"],
         "releaseTag": {
           "pattern": "{projectName}@{version}"
+        },
+        "docker": {
+          "registryUrl": "ghcr.io",
+          "skipVersionActions": true,
+          "versionSchemes": {
+            "production": "{currentDate|YYMM.DD.HHmm}",
+            "dev": "{currentDate|YYMM.DD.HHmm}.{shortCommitSha}"
+          }
         },
         "projectsRelationship": "independent",
         "version": {
