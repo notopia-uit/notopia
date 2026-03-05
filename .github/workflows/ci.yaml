@@ -186,12 +186,6 @@ jobs:
             ${{ github.ref != 'refs/heads/main' && '--dry-run' || '' }} \
             --yes
 
-      - name: Deploy
-        if: github.ref == 'refs/heads/main'
-        run: npx nx affected -t deploy --parallel=2
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Cache Nx
         uses: actions/cache/save@v5
         if: >-

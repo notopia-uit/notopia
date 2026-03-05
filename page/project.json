@@ -29,7 +29,7 @@
       "continuous": true,
       "dependsOn": ["build"]
     },
-    "deploy": {
+    "nx-release-publish": {
       "executor": "nx-github-pages:deploy",
       "dependsOn": ["build"],
       "cache": true
