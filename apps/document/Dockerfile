@@ -5,9 +5,9 @@ ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /notopia
 RUN npm install -g pnpm@10.28.2
 COPY . .
-RUN pnpm install --filter @notopia-uit/document --frozen-lockfile && \
-  pnpm exec --filter @notopia-uit/document webpack-cli build && \
-  pnpm deploy --filter @notopia-uit/document --prod /app
+RUN pnpm --filter @notopia-uit/document install --frozen-lockfile && \
+  pnpm --filter @notopia-uit/document exec webpack-cli build && \
+  pnpm --filter @notopia-uit/document deploy --prod /app
 
 FROM node:25.6.1-alpine3.23 AS runner
 WORKDIR /app
