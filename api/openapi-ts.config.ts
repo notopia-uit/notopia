@@ -2,7 +2,7 @@ import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
   input: ['./bundled/openapi.json'],
-  output: '../packages/api/src/',
+  output: '../packages/api-gen/src/',
   plugins: [
     '@hey-api/client-next',
     {
