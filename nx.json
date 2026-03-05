@@ -134,6 +134,10 @@
     "changelog": {
       "automaticFromRef": true
     },
+    "docker": {
+      "registryUrl": "ghcr.io",
+      "skipVersionActions": true
+    },
     "groups": {
       "npm": {
         "releaseTag": {
@@ -159,11 +163,7 @@
         "version": {
           "conventionalCommits": false
         },
-        "releaseTagPatternRequireSemver": false,
-        "docker": {
-          "registryUrl": "ghcr.io",
-          "skipVersionActions": true
-        }
+        "releaseTagPatternRequireSemver": false
       }
     }
   },
