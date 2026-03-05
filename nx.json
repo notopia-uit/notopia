@@ -142,7 +142,8 @@
         "projects": ["packages/*", "api"],
         "projectsRelationship": "fixed",
         "version": {
-          "conventionalCommits": true
+          "conventionalCommits": true,
+          "fallbackCurrentVersionResolver": "disk"
         },
         "releaseTagPatternRequireSemver": true,
         "changelog": {
