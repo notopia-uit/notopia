@@ -12,7 +12,7 @@
           "mkdir -p dist",
           "mkdir -p dist/api",
           "cp -a ../docs/.vitepress/dist/. dist/",
-          "cp -a ../packages/notopia-api-web/dist/. dist/api/"
+          "cp -a ../packages/api-web/dist/. dist/api/"
         ],
         "parallel": false,
         "cwd": "{projectRoot}"
@@ -35,5 +35,5 @@
       "cache": true
     }
   },
-  "implicitDependencies": ["docs", "packages/notopia-api-web"]
+  "implicitDependencies": ["docs", "packages/api-web"]
 }

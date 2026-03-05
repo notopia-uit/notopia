@@ -317,7 +317,7 @@ importers:
         version: 11.1.15(@nestjs/common@11.1.15(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.15)
       '@notopia-uit/api-document-nestjs-server':
         specifier: 'workspace:'
-        version: link:../../packages/notopia-api-document-nestjs-server
+        version: link:../../packages/api-document-nestjs-server
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.1.14
@@ -344,14 +344,12 @@ importers:
         specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
 
-  cmd/note: {}
-
   docs:
     dependencies:
       '@catppuccin/vitepress':
         specifier: ^0.1.2
         version: 0.1.2(typescript@5.9.3)
-      api:
+      '@notopia-uit/api':
         specifier: workspace:^
         version: link:../api
       pagefind:
@@ -374,16 +372,7 @@ importers:
         specifier: ^1.33.1
         version: 1.33.1
 
-  packages/notopia-api:
-    devDependencies:
-      '@tanstack/react-query':
-        specifier: 'catalog:'
-        version: 5.90.21(react@19.2.4)
-      zod:
-        specifier: 'catalog:'
-        version: 4.3.6
-
-  packages/notopia-api-document-nestjs-server:
+  packages/api-document-nestjs-server:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -392,16 +381,25 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/notopia-api-web:
+  packages/api-gen:
+    devDependencies:
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.90.21(react@19.2.4)
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
+
+  packages/api-web:
     dependencies:
+      '@notopia-uit/api':
+        specifier: workspace:^
+        version: link:../../api
       '@scalar/api-reference-react':
         specifier: ^0.9.0
         version: 0.9.0(axios@1.13.6)(change-case@5.4.4)(react@19.2.4)(tailwindcss@4.2.1)(typescript@5.9.3)
-      api:
-        specifier: workspace:^
-        version: link:../../api
 
-  packages/notopia-pb:
+  packages/pb:
     dependencies:
       '@bufbuild/protobuf':
         specifier: 'catalog:'

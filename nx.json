@@ -106,7 +106,9 @@
             "--label",
             "org.opencontainers.image.revision={commitSha}",
             "--label",
-            "org.opencontainers.image.created={currentDate}"
+            "org.opencontainers.image.created={currentDate}",
+            "--tag",
+            "{projectName}"
           ]
         },
         "runTarget": {
@@ -129,48 +131,34 @@
     }
   ],
   "release": {
-    "projectsRelationship": "independent",
     "releaseTag": {
       "pattern": "{projectName}@{version}"
     },
-    "version": {
-      "conventionalCommits": true
-    },
     "changelog": {
-      "projectChangelogs": {
-        "file": false,
-        "createRelease": "github"
-      },
       "automaticFromRef": true
     },
     "groups": {
-      "note": {
-        "projects": ["note"],
+      "npm": {
+        "projects": ["packages/*", "api"],
+        "projectsRelationship": "fixed",
         "version": {
-          "conventionalCommits": false
+          "conventionalCommits": true
         },
-        "docker": {
-          "repositoryName": "notopia-uit/note",
-          "skipVersionActions": true
+        "releaseTagPatternRequireSemver": true,
+        "changelog": {
+          "file": false,
+          "createRelease": "github"
         }
       },
-      "document": {
-        "projects": ["document"],
+      "docker": {
+        "projects": ["note", "document", "web"],
+        "projectsRelationship": "independent",
         "version": {
           "conventionalCommits": false
         },
+        "releaseTagPatternRequireSemver": false,
         "docker": {
-          "repositoryName": "notopia-uit/document",
-          "skipVersionActions": true
-        }
-      },
-      "web": {
-        "projects": ["web"],
-        "version": {
-          "conventionalCommits": false
-        },
-        "docker": {
-          "repositoryName": "notopia-uit/web",
+          "registryUrl": "ghcr.io",
           "skipVersionActions": true
         }
       }

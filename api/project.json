@@ -64,7 +64,7 @@
       "dependsOn": ["^gen:go"]
     },
     "gen:hey-api": {
-      "outputs": ["{workspaceRoot}/packages/notopia-api/src/"],
+      "outputs": ["{workspaceRoot}/packages/api/src/"],
       "inputs": [
         "{projectRoot}/bundled/openapi.json",
         "{projectRoot}/openapi-ts.config.ts"
@@ -77,9 +77,7 @@
       "dependsOn": ["join"]
     },
     "gen:document-nestjs-server": {
-      "outputs": [
-        "{workspaceRoot}/packages/notopia-api-document-nestjs-server/"
-      ],
+      "outputs": ["{workspaceRoot}/packages/api-document-nestjs-server/"],
       "inputs": [
         "{projectRoot}/bundled/document.json",
         "{projectRoot}/openapitools.json"

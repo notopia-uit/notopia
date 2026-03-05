@@ -4,7 +4,7 @@
   "files": [],
   "references": [
     {
-      "path": "./packages/notopia-api-web"
+      "path": "./packages/api-web"
     },
     {
       "path": "./apps/web"

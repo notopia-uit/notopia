@@ -59,5 +59,10 @@
         }
       }
     }
+  },
+  "release": {
+    "docker": {
+      "repositoryName": "notopia-uit/document"
+    }
   }
 }

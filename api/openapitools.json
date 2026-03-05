@@ -6,7 +6,7 @@
     "generators": {
       "document-nestjs-server": {
         "generatorName": "typescript-nestjs-server",
-        "output": "#{cwd}/../packages/notopia-api-document-nestjs-server",
+        "output": "#{cwd}/../packages/api-document-nestjs-server",
         "glob": "./bundled/document.json",
         "additionalProperties": {
           "stringEnums": "true"

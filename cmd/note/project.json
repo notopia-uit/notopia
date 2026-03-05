@@ -88,12 +88,6 @@
         "command": "go mod tidy"
       }
     },
-    "docker:build": {
-      "inputs": ["default"]
-    },
-    "docker:run": {
-      "inputs": ["default"]
-    },
     "goose": {
       "executor": "nx:run-commands",
       "options": {
@@ -145,5 +139,10 @@
       "cache": true
     }
   },
-  "implicitDependencies": ["pkg"]
+  "implicitDependencies": ["pkg"],
+  "release": {
+    "docker": {
+      "repositoryName": "notopia-uit/note"
+    }
+  }
 }

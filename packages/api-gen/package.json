@@ -1,6 +1,6 @@
 {
-  "name": "@notopia-uit/api",
-  "private": true,
+  "name": "@notopia-uit/api-gen",
+  "version": "0.0.0",
   "type": "module",
   "exports": {
     "./package.json": "./package.json",

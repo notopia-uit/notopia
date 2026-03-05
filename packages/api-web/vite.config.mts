@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../node_modules/.vite/packages/notopia-api-web',
+  cacheDir: '../../node_modules/.vite/packages/api-web',
   server: {
     port: 9080,
     host: true,

@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "packages/notopia-pb",
+  "name": "packages/pb",
   "projectType": "library",
   "targets": {
     "gen": {}

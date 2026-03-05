@@ -9,7 +9,7 @@
       "executor": "nx:run-commands",
       "outputs": [
         "{workspaceRoot}/pkg/pb",
-        "{workspaceRoot}/packages/notopia-pb"
+        "{workspaceRoot}/packages/pb"
       ],
       "options": {
         "command": "buf generate"

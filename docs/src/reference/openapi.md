@@ -7,7 +7,7 @@ title: Notopia OpenAPI
 <script setup>
 import { onBeforeMount, onBeforeUnmount } from 'vue'
 import { useTheme } from 'vitepress-openapi/client'
-import spec from "api/openapi" with { type: "json" };
+import spec from "@notopia-uit/api/openapi" with { type: "json" };
 
 onBeforeMount(() => {
     useTheme({
