@@ -1,4 +1,4 @@
-FROM node:25.6.1-alpine3.23 AS builder
+FROM node:25.6.1-slim AS builder
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN corepack enable pnpm
