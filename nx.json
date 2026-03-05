@@ -131,14 +131,14 @@
     }
   ],
   "release": {
-    "releaseTag": {
-      "pattern": "{projectName}@{version}"
-    },
     "changelog": {
       "automaticFromRef": true
     },
     "groups": {
       "npm": {
+        "releaseTag": {
+          "pattern": "notopia-packages@{version}"
+        },
         "projects": ["packages/*", "api"],
         "projectsRelationship": "fixed",
         "version": {
@@ -152,6 +152,9 @@
       },
       "docker": {
         "projects": ["note", "document", "web"],
+        "releaseTag": {
+          "pattern": "{projectName}@{version}"
+        },
         "projectsRelationship": "independent",
         "version": {
           "conventionalCommits": false
