@@ -113,7 +113,7 @@ jobs:
         uses: jdx/mise-action@v3
         with:
           experimental: true
-        if: ${{ env.SHOULD_CACHE == 'true' }}
+          cache: ${{ env.SHOULD_CACHE == 'true' }}
 
       - name: Cache Buf dependencies
         uses: actions/cache@v5
