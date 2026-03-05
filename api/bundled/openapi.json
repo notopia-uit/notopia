@@ -1391,6 +1391,12 @@
           "parentId"
         ]
       },
+      "id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000",
+        "readOnly": true
+      },
       "name": {
         "type": "string",
         "minLength": 1,
@@ -1464,11 +1470,15 @@
           "currentRevision"
         ]
       },
-      "id": {
+      "properties-id": {
         "type": "string",
         "format": "uuid",
         "example": "550e8400-e29b-41d4-a716-446655440000",
         "readOnly": true
+      },
+      "properties-name": {
+        "type": "string",
+        "example": "work"
       },
       "Tag": {
         "type": "object",
@@ -1487,13 +1497,13 @@
           "name"
         ]
       },
-      "properties-id": {
+      "Note_properties-id": {
         "type": "string",
         "format": "uuid",
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
         "readOnly": true
       },
-      "properties-name": {
+      "Note_properties-name": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
@@ -1513,10 +1523,10 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/Note_properties-id"
               },
               "name": {
-                "$ref": "#/components/schemas/properties-name"
+                "$ref": "#/components/schemas/Note_properties-name"
               },
               "weight": {
                 "type": "number",
@@ -1646,6 +1656,12 @@
           "hasPrev"
         ]
       },
+      "Revision_properties-id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
+        "readOnly": true
+      },
       "Revision_properties-name": {
         "type": "string",
         "nullable": true,
@@ -1719,10 +1735,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/Note_properties-id"
           },
           "name": {
-            "$ref": "#/components/schemas/properties-name"
+            "$ref": "#/components/schemas/Note_properties-name"
           },
           "folderId": {
             "$ref": "#/components/schemas/folderId"
@@ -1733,12 +1749,6 @@
           "name",
           "folderId"
         ]
-      },
-      "Folder_properties-id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000",
-        "readOnly": true
       },
       "FolderCreatedEvent": {
         "type": "object",
@@ -1754,7 +1764,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Folder_properties-id"
+                "$ref": "#/components/schemas/id"
               },
               "name": {
                 "$ref": "#/components/schemas/name"
@@ -1785,7 +1795,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Folder_properties-id"
+                "$ref": "#/components/schemas/id"
               }
             },
             "required": [
@@ -1817,7 +1827,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Folder_properties-id"
+                "$ref": "#/components/schemas/id"
               },
               "fromFolderId": {
                 "$ref": "#/components/schemas/parentId"
@@ -1853,7 +1863,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Folder_properties-id"
+                "$ref": "#/components/schemas/id"
               },
               "oldName": {
                 "$ref": "#/components/schemas/name",
@@ -1889,7 +1899,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/Note_properties-id"
               }
             },
             "required": [
@@ -1916,10 +1926,10 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/Note_properties-id"
               },
               "name": {
-                "$ref": "#/components/schemas/properties-name"
+                "$ref": "#/components/schemas/Note_properties-name"
               }
             },
             "required": [
@@ -1947,7 +1957,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/Note_properties-id"
               }
             },
             "required": [
@@ -1974,7 +1984,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/Note_properties-id"
               },
               "fromFolderId": {
                 "$ref": "#/components/schemas/folderId"
@@ -2010,14 +2020,14 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/Note_properties-id"
               },
               "oldName": {
-                "$ref": "#/components/schemas/properties-name",
+                "$ref": "#/components/schemas/Note_properties-name",
                 "example": "Meeting Notes"
               },
               "newName": {
-                "$ref": "#/components/schemas/properties-name",
+                "$ref": "#/components/schemas/Note_properties-name",
                 "example": "Work"
               }
             },
@@ -2052,7 +2062,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/id"
+                "$ref": "#/components/schemas/properties-id"
               },
               "oldName": {
                 "$ref": "#/components/schemas/Workspace_properties-name"
@@ -2149,6 +2159,20 @@
           "deletedBy",
           "deletedAt"
         ]
+      },
+      "User_properties-id": {
+        "type": "string",
+        "description": "User ID from Authentik",
+        "example": "04415622b0a267807d139a8266072f8098bdb605a7bfbadf2b0016c02572e514"
+      },
+      "WorkspaceRole": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "editor",
+          "viewer"
+        ],
+        "example": "owner"
       }
     },
     "securitySchemes": {
@@ -2231,7 +2255,7 @@
               "type": "object",
               "properties": {
                 "workspaceId": {
-                  "$ref": "#/components/schemas/id"
+                  "$ref": "#/components/schemas/properties-id"
                 }
               },
               "required": [
@@ -2249,8 +2273,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "type": "string",
-                  "example": "Work"
+                  "$ref": "#/components/schemas/properties-name"
                 },
                 "limit": {
                   "type": "integer",
@@ -2273,7 +2296,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/properties-name"
+                  "$ref": "#/components/schemas/Note_properties-name"
                 }
               },
               "required": [
@@ -2387,17 +2410,10 @@
                 "type": "object",
                 "properties": {
                   "userId": {
-                    "type": "string",
-                    "example": "c3788141-c297-45fa-8e9b-5c22f06f8b0f"
+                    "$ref": "#/components/schemas/User_properties-id"
                   },
                   "role": {
-                    "type": "string",
-                    "enum": [
-                      "owner",
-                      "editor",
-                      "viewer"
-                    ],
-                    "example": "owner"
+                    "$ref": "#/components/schemas/WorkspaceRole"
                   }
                 },
                 "required": [
@@ -2787,9 +2803,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "6306e1ce-c6d9-4fdd-b8e8-c3fbef22c0d9"
+          "$ref": "#/components/schemas/id"
         }
       },
       "noteIdPath": {
@@ -2797,20 +2811,16 @@
         "in": "path",
         "required": true,
         "schema": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+          "$ref": "#/components/schemas/Note_properties-id"
+        }
       },
       "noteIdQuery": {
         "name": "noteId",
         "in": "query",
         "required": true,
         "schema": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+          "$ref": "#/components/schemas/Note_properties-id"
+        }
       },
       "pageQuery": {
         "name": "page",
@@ -2840,9 +2850,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "ce5060da-b15c-4aee-898f-5449fafacfc4"
+          "$ref": "#/components/schemas/Revision_properties-id"
         }
       },
       "workspaceIdPath": {
@@ -2850,9 +2858,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "550e8400-e29b-41d4-a716-446655440000"
+          "$ref": "#/components/schemas/properties-id"
         }
       }
     }

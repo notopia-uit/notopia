@@ -6,8 +6,7 @@ content:
       type: object
       properties:
         name:
-          type: string
-          example: Work
+          $ref: ../schemas/Tag.yaml#/properties/name
         limit:
           type: integer
           default: 10

@@ -1,0 +1,11 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  id:
+    type: string
+    description: User ID from Authentik
+    example: 04415622b0a267807d139a8266072f8098bdb605a7bfbadf2b0016c02572e514
+
+required:
+  - id

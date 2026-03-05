@@ -3,6 +3,4 @@ name: folderId
 in: path
 required: true
 schema:
-  type: string
-  format: uuid
-  example: 6306e1ce-c6d9-4fdd-b8e8-c3fbef22c0d9
+  $ref: ../schemas/Folder.yaml#/properties/id

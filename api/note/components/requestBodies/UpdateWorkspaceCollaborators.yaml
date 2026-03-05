@@ -8,15 +8,9 @@ content:
         type: object
         properties:
           userId:
-            type: string
-            example: c3788141-c297-45fa-8e9b-5c22f06f8b0f
+            $ref: ../schemas/User.yaml#/properties/id
           role:
-            type: string
-            enum:
-              - owner
-              - editor
-              - viewer
-            example: owner
+            $ref: ../schemas/WorkspaceRole.yaml
         required:
           - userId
           - role

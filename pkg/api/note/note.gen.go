@@ -220,42 +220,21 @@ func (e WorkspaceRenamedEventType) Valid() bool {
 	}
 }
 
-// Defines values for UpdateWorkspaceCollaboratorsRole.
+// Defines values for WorkspaceRole.
 const (
-	UpdateWorkspaceCollaboratorsRoleEditor UpdateWorkspaceCollaboratorsRole = "editor"
-	UpdateWorkspaceCollaboratorsRoleOwner  UpdateWorkspaceCollaboratorsRole = "owner"
-	UpdateWorkspaceCollaboratorsRoleViewer UpdateWorkspaceCollaboratorsRole = "viewer"
+	Editor WorkspaceRole = "editor"
+	Owner  WorkspaceRole = "owner"
+	Viewer WorkspaceRole = "viewer"
 )
 
-// Valid indicates whether the value is a known member of the UpdateWorkspaceCollaboratorsRole enum.
-func (e UpdateWorkspaceCollaboratorsRole) Valid() bool {
+// Valid indicates whether the value is a known member of the WorkspaceRole enum.
+func (e WorkspaceRole) Valid() bool {
 	switch e {
-	case UpdateWorkspaceCollaboratorsRoleEditor:
+	case Editor:
 		return true
-	case UpdateWorkspaceCollaboratorsRoleOwner:
+	case Owner:
 		return true
-	case UpdateWorkspaceCollaboratorsRoleViewer:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for UpdateWorkspaceCollaboratorsJSONBodyRole.
-const (
-	UpdateWorkspaceCollaboratorsJSONBodyRoleEditor UpdateWorkspaceCollaboratorsJSONBodyRole = "editor"
-	UpdateWorkspaceCollaboratorsJSONBodyRoleOwner  UpdateWorkspaceCollaboratorsJSONBodyRole = "owner"
-	UpdateWorkspaceCollaboratorsJSONBodyRoleViewer UpdateWorkspaceCollaboratorsJSONBodyRole = "viewer"
-)
-
-// Valid indicates whether the value is a known member of the UpdateWorkspaceCollaboratorsJSONBodyRole enum.
-func (e UpdateWorkspaceCollaboratorsJSONBodyRole) Valid() bool {
-	switch e {
-	case UpdateWorkspaceCollaboratorsJSONBodyRoleEditor:
-		return true
-	case UpdateWorkspaceCollaboratorsJSONBodyRoleOwner:
-		return true
-	case UpdateWorkspaceCollaboratorsJSONBodyRoleViewer:
+	case Viewer:
 		return true
 	default:
 		return false
@@ -284,8 +263,8 @@ type Folder struct {
 // FolderCreatedEvent defines model for FolderCreatedEvent.
 type FolderCreatedEvent struct {
 	Data struct {
-		Id   *FolderPropertiesId `json:"id,omitempty"`
-		Name Name                `json:"name"`
+		Id   *Id  `json:"id,omitempty"`
+		Name Name `json:"name"`
 	} `json:"data"`
 	Type FolderCreatedEventType `json:"type"`
 }
@@ -296,7 +275,7 @@ type FolderCreatedEventType string
 // FolderDeletedEvent defines model for FolderDeletedEvent.
 type FolderDeletedEvent struct {
 	Data struct {
-		Id *FolderPropertiesId `json:"id,omitempty"`
+		Id *Id `json:"id,omitempty"`
 	} `json:"data"`
 	Type FolderDeletedEventType `json:"type"`
 }
@@ -307,9 +286,9 @@ type FolderDeletedEventType string
 // FolderMovedEvent defines model for FolderMovedEvent.
 type FolderMovedEvent struct {
 	Data struct {
-		FromFolderId ParentId            `json:"fromFolderId"`
-		Id           *FolderPropertiesId `json:"id,omitempty"`
-		ToFolderId   ParentId            `json:"toFolderId"`
+		FromFolderId ParentId `json:"fromFolderId"`
+		Id           *Id      `json:"id,omitempty"`
+		ToFolderId   ParentId `json:"toFolderId"`
 	} `json:"data"`
 	Type FolderMovedEventType `json:"type"`
 }
@@ -320,9 +299,9 @@ type FolderMovedEventType string
 // FolderRenamedEvent defines model for FolderRenamedEvent.
 type FolderRenamedEvent struct {
 	Data struct {
-		Id      *FolderPropertiesId `json:"id,omitempty"`
-		NewName Name                `json:"newName"`
-		OldName *Name               `json:"oldName,omitempty"`
+		Id      *Id   `json:"id,omitempty"`
+		NewName Name  `json:"newName"`
+		OldName *Name `json:"oldName,omitempty"`
 	} `json:"data"`
 	Type FolderRenamedEventType `json:"type"`
 }
@@ -339,9 +318,6 @@ type FolderWithRelations struct {
 	ParentId *openapi_types.UUID   `json:"parentId"`
 }
 
-// FolderPropertiesId defines model for Folder_properties-id.
-type FolderPropertiesId = openapi_types.UUID
-
 // Graph defines model for Graph.
 type Graph struct {
 	Nodes     *map[string]GraphNode     `json:"nodes,omitempty"`
@@ -356,9 +332,9 @@ type GraphNode struct {
 // GraphNodeNote defines model for GraphNodeNote.
 type GraphNodeNote struct {
 	Data struct {
-		Id     *PropertiesId  `json:"id,omitempty"`
-		Name   PropertiesName `json:"name"`
-		Weight float32        `json:"weight"`
+		Id     *NotePropertiesId  `json:"id,omitempty"`
+		Name   NotePropertiesName `json:"name"`
+		Weight float32            `json:"weight"`
 	} `json:"data"`
 	Type GraphNodeNoteType `json:"type"`
 }
@@ -389,7 +365,7 @@ type Note struct {
 // NoteContentUpdatedEvent defines model for NoteContentUpdatedEvent.
 type NoteContentUpdatedEvent struct {
 	Data struct {
-		Id *PropertiesId `json:"id,omitempty"`
+		Id *NotePropertiesId `json:"id,omitempty"`
 	} `json:"data"`
 	Type NoteContentUpdatedEventType `json:"type"`
 }
@@ -400,8 +376,8 @@ type NoteContentUpdatedEventType string
 // NoteCreatedEvent defines model for NoteCreatedEvent.
 type NoteCreatedEvent struct {
 	Data struct {
-		Id   *PropertiesId  `json:"id,omitempty"`
-		Name PropertiesName `json:"name"`
+		Id   *NotePropertiesId  `json:"id,omitempty"`
+		Name NotePropertiesName `json:"name"`
 	} `json:"data"`
 	Type NoteCreatedEventType `json:"type"`
 }
@@ -412,7 +388,7 @@ type NoteCreatedEventType string
 // NoteDeletedEvent defines model for NoteDeletedEvent.
 type NoteDeletedEvent struct {
 	Data struct {
-		Id *PropertiesId `json:"id,omitempty"`
+		Id *NotePropertiesId `json:"id,omitempty"`
 	} `json:"data"`
 	Type NoteDeletedEventType `json:"type"`
 }
@@ -423,9 +399,9 @@ type NoteDeletedEventType string
 // NoteMovedEvent defines model for NoteMovedEvent.
 type NoteMovedEvent struct {
 	Data struct {
-		FromFolderId FolderId      `json:"fromFolderId"`
-		Id           *PropertiesId `json:"id,omitempty"`
-		ToFolderId   FolderId      `json:"toFolderId"`
+		FromFolderId FolderId          `json:"fromFolderId"`
+		Id           *NotePropertiesId `json:"id,omitempty"`
+		ToFolderId   FolderId          `json:"toFolderId"`
 	} `json:"data"`
 	Type NoteMovedEventType `json:"type"`
 }
@@ -436,15 +412,21 @@ type NoteMovedEventType string
 // NoteRenamedEvent defines model for NoteRenamedEvent.
 type NoteRenamedEvent struct {
 	Data struct {
-		Id      *PropertiesId   `json:"id,omitempty"`
-		NewName PropertiesName  `json:"newName"`
-		OldName *PropertiesName `json:"oldName,omitempty"`
+		Id      *NotePropertiesId   `json:"id,omitempty"`
+		NewName NotePropertiesName  `json:"newName"`
+		OldName *NotePropertiesName `json:"oldName,omitempty"`
 	} `json:"data"`
 	Type NoteRenamedEventType `json:"type"`
 }
 
 // NoteRenamedEventType defines model for NoteRenamedEvent.Type.
 type NoteRenamedEventType string
+
+// NotePropertiesId defines model for Note_properties-id.
+type NotePropertiesId = openapi_types.UUID
+
+// NotePropertiesName defines model for Note_properties-name.
+type NotePropertiesName = string
 
 // Pagination defines model for Pagination.
 type Pagination struct {
@@ -474,6 +456,9 @@ type Revision struct {
 	Id               *openapi_types.UUID `json:"id,omitempty"`
 	Name             *string             `json:"name"`
 }
+
+// RevisionPropertiesId defines model for Revision_properties-id.
+type RevisionPropertiesId = openapi_types.UUID
 
 // RevisionPropertiesName defines model for Revision_properties-name.
 type RevisionPropertiesName = string
@@ -505,10 +490,13 @@ type TrashedNote struct {
 
 // TreeNote defines model for TreeNote.
 type TreeNote struct {
-	FolderId FolderId       `json:"folderId"`
-	Id       *PropertiesId  `json:"id,omitempty"`
-	Name     PropertiesName `json:"name"`
+	FolderId FolderId           `json:"folderId"`
+	Id       *NotePropertiesId  `json:"id,omitempty"`
+	Name     NotePropertiesName `json:"name"`
 }
+
+// UserPropertiesId User ID from Authentik
+type UserPropertiesId = string
 
 // Workspace defines model for Workspace.
 type Workspace struct {
@@ -519,7 +507,7 @@ type Workspace struct {
 // WorkspaceRenamedEvent defines model for WorkspaceRenamedEvent.
 type WorkspaceRenamedEvent struct {
 	Data struct {
-		Id      *Id                     `json:"id,omitempty"`
+		Id      *PropertiesId           `json:"id,omitempty"`
 		NewName WorkspacePropertiesName `json:"newName"`
 		OldName WorkspacePropertiesName `json:"oldName"`
 	} `json:"data"`
@@ -528,6 +516,9 @@ type WorkspaceRenamedEvent struct {
 
 // WorkspaceRenamedEventType defines model for WorkspaceRenamedEvent.Type.
 type WorkspaceRenamedEventType string
+
+// WorkspaceRole defines model for WorkspaceRole.
+type WorkspaceRole string
 
 // WorkspacePropertiesName defines model for Workspace_properties-name.
 type WorkspacePropertiesName = string
@@ -551,25 +542,25 @@ type PropertiesId = openapi_types.UUID
 type PropertiesName = string
 
 // FolderIdPath defines model for folderIdPath.
-type FolderIdPath = openapi_types.UUID
+type FolderIdPath = Id
 
 // LimitQuery defines model for limitQuery.
 type LimitQuery = int
 
 // NoteIdPath defines model for noteIdPath.
-type NoteIdPath = openapi_types.UUID
+type NoteIdPath = NotePropertiesId
 
 // NoteIdQuery defines model for noteIdQuery.
-type NoteIdQuery = openapi_types.UUID
+type NoteIdQuery = NotePropertiesId
 
 // PageQuery defines model for pageQuery.
 type PageQuery = int
 
 // RevisionIdPath defines model for revisionIdPath.
-type RevisionIdPath = openapi_types.UUID
+type RevisionIdPath = RevisionPropertiesId
 
 // WorkspaceIdPath defines model for workspaceIdPath.
-type WorkspaceIdPath = openapi_types.UUID
+type WorkspaceIdPath = PropertiesId
 
 // BadRequestError defines model for BadRequestError.
 type BadRequestError = Error
@@ -634,7 +625,7 @@ type CreateWorkspaceRequest = Workspace
 
 // GenerateDailyNoteRequest defines model for GenerateDailyNoteRequest.
 type GenerateDailyNoteRequest struct {
-	WorkspaceId *Id `json:"workspaceId,omitempty"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
 
 // RenameFolderRequest defines model for RenameFolderRequest.
@@ -644,7 +635,7 @@ type RenameFolderRequest struct {
 
 // RenameNoteRequest defines model for RenameNoteRequest.
 type RenameNoteRequest struct {
-	Name PropertiesName `json:"name"`
+	Name NotePropertiesName `json:"name"`
 }
 
 // RenameRevisionRequest defines model for RenameRevisionRequest.
@@ -665,8 +656,8 @@ type RestoreTrashedWorkspaceItemsRequest struct {
 
 // SearchTagsRequest defines model for SearchTagsRequest.
 type SearchTagsRequest struct {
-	Limit *int   `json:"limit,omitempty"`
-	Name  string `json:"name"`
+	Limit *int           `json:"limit,omitempty"`
+	Name  PropertiesName `json:"name"`
 }
 
 // TrashWorkspaceItemsRequest defines model for TrashWorkspaceItemsRequest.
@@ -677,12 +668,11 @@ type TrashWorkspaceItemsRequest struct {
 
 // UpdateWorkspaceCollaborators defines model for UpdateWorkspaceCollaborators.
 type UpdateWorkspaceCollaborators = []struct {
-	Role   UpdateWorkspaceCollaboratorsRole `json:"role"`
-	UserId string                           `json:"userId"`
-}
+	Role WorkspaceRole `json:"role"`
 
-// UpdateWorkspaceCollaboratorsRole defines model for UpdateWorkspaceCollaborators.Role.
-type UpdateWorkspaceCollaboratorsRole string
+	// UserId User ID from Authentik
+	UserId UserPropertiesId `json:"userId"`
+}
 
 // CreateFolderParams defines parameters for CreateFolder.
 type CreateFolderParams struct {
@@ -736,7 +726,7 @@ type CreateNoteParams struct {
 
 // GenerateDailyNoteJSONBody defines parameters for GenerateDailyNote.
 type GenerateDailyNoteJSONBody struct {
-	WorkspaceId *Id `json:"workspaceId,omitempty"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
 
 // GenerateDailyNoteParams defines parameters for GenerateDailyNote.
@@ -756,8 +746,8 @@ type GenerateDailyNoteParams struct {
 
 // SearchTagsJSONBody defines parameters for SearchTags.
 type SearchTagsJSONBody struct {
-	Limit *int   `json:"limit,omitempty"`
-	Name  string `json:"name"`
+	Limit *int           `json:"limit,omitempty"`
+	Name  PropertiesName `json:"name"`
 }
 
 // SearchTagsParams defines parameters for SearchTags.
@@ -839,7 +829,7 @@ type PublishNoteParams struct {
 
 // RenameNoteJSONBody defines parameters for RenameNote.
 type RenameNoteJSONBody struct {
-	Name PropertiesName `json:"name"`
+	Name NotePropertiesName `json:"name"`
 }
 
 // RenameNoteParams defines parameters for RenameNote.
@@ -1147,8 +1137,10 @@ type UnpublishWorkspaceParams struct {
 
 // UpdateWorkspaceCollaboratorsJSONBody defines parameters for UpdateWorkspaceCollaborators.
 type UpdateWorkspaceCollaboratorsJSONBody = []struct {
-	Role   UpdateWorkspaceCollaboratorsJSONBodyRole `json:"role"`
-	UserId string                                   `json:"userId"`
+	Role WorkspaceRole `json:"role"`
+
+	// UserId User ID from Authentik
+	UserId UserPropertiesId `json:"userId"`
 }
 
 // UpdateWorkspaceCollaboratorsParams defines parameters for UpdateWorkspaceCollaborators.
@@ -1165,9 +1157,6 @@ type UpdateWorkspaceCollaboratorsParams struct {
 	// UserRoles Injected by Gateway
 	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
 }
-
-// UpdateWorkspaceCollaboratorsJSONBodyRole defines parameters for UpdateWorkspaceCollaborators.
-type UpdateWorkspaceCollaboratorsJSONBodyRole string
 
 // CreateFolderJSONRequestBody defines body for CreateFolder for application/json ContentType.
 type CreateFolderJSONRequestBody = Folder

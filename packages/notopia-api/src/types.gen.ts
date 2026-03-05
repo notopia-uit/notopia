@@ -25,6 +25,8 @@ export type Folder = {
     parentId: string;
 };
 
+export type Id = string;
+
 export type Name = string;
 
 export type Revision = {
@@ -41,22 +43,24 @@ export type Note = {
     currentRevision: Revision;
 };
 
-export type Id = string;
+export type PropertiesId = string;
+
+export type PropertiesName = string;
 
 export type Tag = {
     id?: string;
     name: string;
 };
 
-export type PropertiesId = string;
+export type NotePropertiesId = string;
 
-export type PropertiesName = string;
+export type NotePropertiesName = string;
 
 export type GraphNodeNote = {
     type: 'note';
     data: {
-        id: PropertiesId;
-        name: PropertiesName;
+        id: NotePropertiesId;
+        name: NotePropertiesName;
         weight: number;
     };
 };
@@ -110,6 +114,8 @@ export type Pagination = {
     hasPrev: boolean;
 };
 
+export type RevisionPropertiesId = string;
+
 export type RevisionPropertiesName = string | null;
 
 export type Workspace = {
@@ -126,17 +132,15 @@ export type FolderWithRelations = Folder & {
 export type FolderId = string;
 
 export type TreeNote = {
-    id: PropertiesId;
-    name: PropertiesName;
+    id: NotePropertiesId;
+    name: NotePropertiesName;
     folderId: FolderId;
 };
-
-export type FolderPropertiesId = string;
 
 export type FolderCreatedEvent = {
     type: 'FolderCreatedEvent';
     data: {
-        id: FolderPropertiesId;
+        id: Id;
         name: Name;
     };
 };
@@ -144,7 +148,7 @@ export type FolderCreatedEvent = {
 export type FolderDeletedEvent = {
     type: 'FolderDeletedEvent';
     data: {
-        id: FolderPropertiesId;
+        id: Id;
     };
 };
 
@@ -153,7 +157,7 @@ export type ParentId = string;
 export type FolderMovedEvent = {
     type: 'FolderRenamedEvent';
     data: {
-        id: FolderPropertiesId;
+        id: Id;
         fromFolderId: ParentId;
         toFolderId: ParentId;
     };
@@ -162,7 +166,7 @@ export type FolderMovedEvent = {
 export type FolderRenamedEvent = {
     type: 'FolderRenamedEvent';
     data: {
-        id: FolderPropertiesId;
+        id: Id;
         oldName?: Name;
         newName: Name;
     };
@@ -171,29 +175,29 @@ export type FolderRenamedEvent = {
 export type NoteContentUpdatedEvent = {
     type: 'NoteContentUpdatedEvent';
     data: {
-        id: PropertiesId;
+        id: NotePropertiesId;
     };
 };
 
 export type NoteCreatedEvent = {
     type: 'NoteCreatedEvent';
     data: {
-        id: PropertiesId;
-        name: PropertiesName;
+        id: NotePropertiesId;
+        name: NotePropertiesName;
     };
 };
 
 export type NoteDeletedEvent = {
     type: 'NoteDeletedEvent';
     data: {
-        id: PropertiesId;
+        id: NotePropertiesId;
     };
 };
 
 export type NoteMovedEvent = {
     type: 'NoteMovedEvent';
     data: {
-        id: PropertiesId;
+        id: NotePropertiesId;
         fromFolderId: FolderId;
         toFolderId: FolderId;
     };
@@ -202,9 +206,9 @@ export type NoteMovedEvent = {
 export type NoteRenamedEvent = {
     type: 'NoteRenamedEvent';
     data: {
-        id: PropertiesId;
-        oldName?: PropertiesName;
-        newName: PropertiesName;
+        id: NotePropertiesId;
+        oldName?: NotePropertiesName;
+        newName: NotePropertiesName;
     };
 };
 
@@ -213,7 +217,7 @@ export type WorkspacePropertiesName = string;
 export type WorkspaceRenamedEvent = {
     type: 'WorkspaceRenamedEvent';
     data: {
-        id: Id;
+        id: PropertiesId;
         oldName: WorkspacePropertiesName;
         newName: WorkspacePropertiesName;
     };
@@ -237,6 +241,19 @@ export type TrashedFolder = {
     readonly deletedAt: string | null;
 };
 
+/**
+ * User ID from Authentik
+ */
+export type UserPropertiesId = string;
+
+export const WorkspaceRole = {
+    OWNER: 'owner',
+    EDITOR: 'editor',
+    VIEWER: 'viewer'
+} as const;
+
+export type WorkspaceRole = typeof WorkspaceRole[keyof typeof WorkspaceRole];
+
 export type FolderWritable = {
     name: string;
     parentId: string;
@@ -255,7 +272,7 @@ export type NoteWritable = {
 export type GraphNodeNoteWritable = {
     type: 'note';
     data: {
-        name: PropertiesName;
+        name: NotePropertiesName;
         weight: number;
     };
 };
@@ -286,7 +303,7 @@ export type FolderWithRelationsWritable = FolderWritable & {
 };
 
 export type TreeNoteWritable = {
-    name: PropertiesName;
+    name: NotePropertiesName;
     folderId: FolderId;
 };
 
@@ -324,7 +341,7 @@ export type NoteContentUpdatedEventWritable = {
 export type NoteCreatedEventWritable = {
     type: 'NoteCreatedEvent';
     data: {
-        name: PropertiesName;
+        name: NotePropertiesName;
     };
 };
 
@@ -343,8 +360,8 @@ export type NoteMovedEventWritable = {
 export type NoteRenamedEventWritable = {
     type: 'NoteRenamedEvent';
     data: {
-        oldName?: PropertiesName;
-        newName: PropertiesName;
+        oldName?: NotePropertiesName;
+        newName: NotePropertiesName;
     };
 };
 
@@ -369,11 +386,11 @@ export type TrashedFolderWritable = {
  */
 export type DocumentIdPath = string;
 
-export type FolderIdPath = string;
+export type FolderIdPath = Id;
 
-export type NoteIdPath = string;
+export type NoteIdPath = NotePropertiesId;
 
-export type NoteIdQuery = string;
+export type NoteIdQuery = NotePropertiesId;
 
 /**
  * Page number for pagination
@@ -385,9 +402,9 @@ export type PageQuery = number;
  */
 export type LimitQuery = number;
 
-export type RevisionIdPath = string;
+export type RevisionIdPath = RevisionPropertiesId;
 
-export type WorkspaceIdPath = string;
+export type WorkspaceIdPath = PropertiesId;
 
 export type ImportDocumentsRequest = Array<{
     [key: string]: unknown;
@@ -402,16 +419,16 @@ export type RenameFolderRequest = {
 export type CreateNoteRequest = NoteWritable;
 
 export type GenerateDailyNoteRequest = {
-    workspaceId: Id;
+    workspaceId: PropertiesId;
 };
 
 export type SearchTagsRequest = {
-    name: string;
+    name: PropertiesName;
     limit?: number;
 };
 
 export type RenameNoteRequest = {
-    name: PropertiesName;
+    name: NotePropertiesName;
 };
 
 export type RenameRevisionRequest = {
@@ -435,8 +452,8 @@ export type TrashWorkspaceItemsRequest = {
 };
 
 export type UpdateWorkspaceCollaborators = Array<{
-    userId: string;
-    role: 'owner' | 'editor' | 'viewer';
+    userId: UserPropertiesId;
+    role: WorkspaceRole;
 }>;
 
 export type ImportDocumentsData = {
@@ -592,7 +609,7 @@ export type CreateFolderResponses = {
 export type RenameFolderData = {
     body: RenameFolderRequest;
     path: {
-        folderId: string;
+        folderId: Id;
     };
     query?: never;
     url: '/note/folders/{folderId}/rename';
@@ -730,7 +747,7 @@ export type SearchTagsResponse = SearchTagsResponses[keyof SearchTagsResponses];
 export type DeleteNoteData = {
     body?: never;
     path: {
-        noteId: string;
+        noteId: NotePropertiesId;
     };
     query?: never;
     url: '/note/notes/{noteId}';
@@ -773,7 +790,7 @@ export type DeleteNoteResponse = DeleteNoteResponses[keyof DeleteNoteResponses];
 export type GetNoteData = {
     body?: never;
     path: {
-        noteId: string;
+        noteId: NotePropertiesId;
     };
     query?: never;
     url: '/note/notes/{noteId}';
@@ -816,7 +833,7 @@ export type GetNoteResponse = GetNoteResponses[keyof GetNoteResponses];
 export type GetNoteGraphData = {
     body?: never;
     path: {
-        noteId: string;
+        noteId: NotePropertiesId;
     };
     query?: {
         depth?: number;
@@ -861,7 +878,7 @@ export type GetNoteGraphResponse = GetNoteGraphResponses[keyof GetNoteGraphRespo
 export type PublishNoteData = {
     body?: never;
     path: {
-        noteId: string;
+        noteId: NotePropertiesId;
     };
     query?: never;
     url: '/note/notes/{noteId}/publish';
@@ -900,7 +917,7 @@ export type PublishNoteResponse = PublishNoteResponses[keyof PublishNoteResponse
 export type RenameNoteData = {
     body: RenameNoteRequest;
     path: {
-        noteId: string;
+        noteId: NotePropertiesId;
     };
     query?: never;
     url: '/note/notes/{noteId}/rename';
@@ -939,7 +956,7 @@ export type RenameNoteResponse = RenameNoteResponses[keyof RenameNoteResponses];
 export type UnpublishNoteData = {
     body?: never;
     path: {
-        noteId: string;
+        noteId: NotePropertiesId;
     };
     query?: never;
     url: '/note/notes/{noteId}/unpublish';
@@ -979,7 +996,7 @@ export type GetRevisionsData = {
     body?: never;
     path?: never;
     query: {
-        noteId: string;
+        noteId: NotePropertiesId;
         /**
          * Page number for pagination
          */
@@ -1028,7 +1045,7 @@ export type GetRevisionsResponse = GetRevisionsResponses[keyof GetRevisionsRespo
 export type ApplyRevisionData = {
     body?: never;
     path: {
-        revisionId: string;
+        revisionId: RevisionPropertiesId;
     };
     query?: never;
     url: '/note/revisions/{revisionId}/apply';
@@ -1067,7 +1084,7 @@ export type ApplyRevisionResponse = ApplyRevisionResponses[keyof ApplyRevisionRe
 export type RenameRevisionData = {
     body: RenameRevisionRequest;
     path: {
-        revisionId: string;
+        revisionId: RevisionPropertiesId;
     };
     query?: never;
     url: '/note/revisions/{revisionId}/rename';
@@ -1106,7 +1123,7 @@ export type RenameRevisionResponse = RenameRevisionResponses[keyof RenameRevisio
 export type DeleteRevisionData = {
     body?: never;
     path: {
-        revisionId: string;
+        revisionId: RevisionPropertiesId;
     };
     query?: never;
     url: '/note/revisions/{revisionId}';
@@ -1149,7 +1166,7 @@ export type DeleteRevisionResponse = DeleteRevisionResponses[keyof DeleteRevisio
 export type GetRevisionData = {
     body?: never;
     path: {
-        revisionId: string;
+        revisionId: RevisionPropertiesId;
     };
     query?: never;
     url: '/note/revisions/{revisionId}';
@@ -1223,7 +1240,7 @@ export type CreateWorkspaceResponses = {
 export type DeleteWorkspaceData = {
     body?: never;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}';
@@ -1262,7 +1279,7 @@ export type DeleteWorkspaceResponse = DeleteWorkspaceResponses[keyof DeleteWorks
 export type GetWorkspaceData = {
     body?: never;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}';
@@ -1303,7 +1320,7 @@ export type GetWorkspaceResponse = GetWorkspaceResponses[keyof GetWorkspaceRespo
 export type GetWorkspaceEventsData = {
     body?: never;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/events';
@@ -1358,7 +1375,7 @@ export type GetWorkspaceEventsResponse = GetWorkspaceEventsResponses[keyof GetWo
 export type GetWorkspaceGraphData = {
     body?: never;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: {
         /**
@@ -1406,7 +1423,7 @@ export type GetWorkspaceGraphResponse = GetWorkspaceGraphResponses[keyof GetWork
 export type PublishWorkspaceData = {
     body?: never;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/publish';
@@ -1445,7 +1462,7 @@ export type PublishWorkspaceResponse = PublishWorkspaceResponses[keyof PublishWo
 export type RenameWorkspaceData = {
     body: RenameWorkspaceRequest;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/rename';
@@ -1484,7 +1501,7 @@ export type RenameWorkspaceResponse = RenameWorkspaceResponses[keyof RenameWorks
 export type RestoreTrashedWorkspaceItemsData = {
     body: RestoreTrashedWorkspaceItemsRequest;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/restore-trashed-items';
@@ -1523,7 +1540,7 @@ export type RestoreTrashedWorkspaceItemsResponse = RestoreTrashedWorkspaceItemsR
 export type ShowTrashData = {
     body?: never;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/show-trash';
@@ -1568,7 +1585,7 @@ export type ShowTrashResponse = ShowTrashResponses[keyof ShowTrashResponses];
 export type TrashWorkspaceItemsData = {
     body: TrashWorkspaceItemsRequest;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/trash-items';
@@ -1607,7 +1624,7 @@ export type TrashWorkspaceItemsResponse = TrashWorkspaceItemsResponses[keyof Tra
 export type UnpublishWorkspaceData = {
     body?: never;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/unpublish';
@@ -1646,7 +1663,7 @@ export type UnpublishWorkspaceResponse = UnpublishWorkspaceResponses[keyof Unpub
 export type UpdateWorkspaceCollaboratorsData = {
     body: UpdateWorkspaceCollaborators;
     path: {
-        workspaceId: string;
+        workspaceId: PropertiesId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/update-collaborators';
