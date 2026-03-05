@@ -199,9 +199,6 @@ jobs:
         run: |
           npx nx release --skip-publish \
             --dockerVersionScheme=${{ github.ref == 'refs/heads/main' && 'production' || 'dev' }} \
-            --git-commit \
-            --git-tag \
-            --git-push \
             ${{ env.WILL_RELEASE == 'true' && '' || '--dry-run' }}
 
       - name: Nx release publish
