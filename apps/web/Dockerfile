@@ -6,10 +6,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /notopia
 RUN npm install -g pnpm@10.28.2
 COPY . .
-RUN echo 'injectWorkspacePackages: true' >> pnpm-workspace.yaml
-RUN pnpm --filter @notopia-uit/web install --frozen-lockfile && \
-  pnpm --filter @notopia-uit/web exec next build && \
-  pnpm --filter @notopia-uit/web deploy --prod /app
+RUN pnpm --filter @notopia-uit/web... install --frozen-lockfile && \
+  pnpm --filter @notopia-uit/web exec next build
 
 FROM node:25.6.1-alpine3.23 AS runner
 WORKDIR /app
