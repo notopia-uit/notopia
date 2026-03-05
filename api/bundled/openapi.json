@@ -58,7 +58,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -97,7 +97,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -141,7 +141,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -183,7 +183,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -219,7 +219,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -263,7 +263,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -349,7 +349,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -385,7 +385,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -424,7 +424,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -460,7 +460,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -497,7 +497,7 @@
       "delete": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -541,7 +541,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -582,7 +582,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -626,7 +626,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -667,7 +667,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -714,7 +714,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -755,7 +755,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -799,7 +799,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -836,7 +836,7 @@
       "delete": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -880,7 +880,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -916,7 +916,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -950,7 +950,7 @@
       "delete": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -991,7 +991,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -1029,7 +1029,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -1070,7 +1070,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -1114,7 +1114,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -1158,7 +1158,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -1199,7 +1199,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -1243,7 +1243,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -1284,7 +1284,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -2033,7 +2033,7 @@
       }
     },
     "securitySchemes": {
-      "oauth2": {
+      "Oauth2": {
         "type": "oauth2",
         "description": "OAuth2 Security Scheme",
         "flows": {

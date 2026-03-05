@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	Oauth2Scopes = "oauth2.Scopes"
+	Oauth2Scopes = "Oauth2.Scopes"
 )
 
 // Defines values for FolderCreatedEventType.

@@ -32,7 +32,7 @@
       "post": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -66,7 +66,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -105,7 +105,7 @@
       "get": {
         "security": [
           {
-            "oauth2": []
+            "Oauth2": []
           }
         ],
         "tags": [
@@ -141,7 +141,7 @@
   },
   "components": {
     "securitySchemes": {
-      "oauth2": {
+      "Oauth2": {
         "type": "oauth2",
         "description": "OAuth2 Security Scheme",
         "flows": {
