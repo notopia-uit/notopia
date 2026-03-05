@@ -5,9 +5,9 @@ ENV PATH="$PNPM_HOME:$PATH"
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /notopia
 RUN npm install -g pnpm@10.28.2
-COPY package.json pnpm-lock.yaml .npmrc ./
+COPY . .
 RUN pnpm install --frozen-lockfile --filter @notopia-uit/web && \
-  pnpm build --filter @notopia-uit/web && \
+  pnpm run build --filter @notopia-uit/web && \
   pnpm deploy --filter @notopia-uit/web --prod /app
 
 FROM node:25.6.1-alpine3.23 AS runner

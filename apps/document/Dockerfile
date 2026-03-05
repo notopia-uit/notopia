@@ -4,9 +4,9 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /notopia
 RUN npm install -g pnpm@10.28.2
-COPY package.json pnpm-lock.yaml .npmrc ./
+COPY . .
 RUN pnpm install --frozen-lockfile --filter @notopia-uit/document && \
-  pnpm build --filter @notopia-uit/document && \
+  pnpm run build --filter @notopia-uit/document && \
   pnpm deploy --filter @notopia-uit/document --prod /app
 
 FROM node:25.6.1-alpine3.23 AS runner
