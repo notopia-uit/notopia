@@ -3,5 +3,5 @@ import { defineConfig } from 'eslint/config';
 import baseConfig from '../../eslint.config.mjs';
 
 export default defineConfig(...baseConfig, {
-  ignores: ['**/*.ts'],
+  ignores: ['**/*.d.ts', '**/*.js'],
 });
