@@ -96,7 +96,7 @@ package "Note" <<Bounded Context>> {
 
         }
 
-        package "Repos" as Note.Domain.Repos <<Frame>> {
+        package "Repos" as Note.Domain.Repos {
             interface "Workspace" as Note.Domain.Repos.Workspace {
                 GetByID(workspaceID uuid.UUID) *Workspace
                 Save(workspace *Workspace)

@@ -315,7 +315,7 @@ importers:
       '@nestjs/platform-express':
         specifier: 'catalog:'
         version: 11.1.15(@nestjs/common@11.1.15(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.15)
-      '@notopia/api-document-nestjs-server':
+      '@notopia-uit/api-document-nestjs-server':
         specifier: 'workspace:'
         version: link:../../packages/notopia-api-document-nestjs-server
       reflect-metadata:
@@ -343,6 +343,8 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
+
+  cmd/note: {}
 
   docs:
     dependencies:

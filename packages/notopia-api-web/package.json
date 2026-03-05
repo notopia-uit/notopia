@@ -1,5 +1,5 @@
 {
-  "name": "@notopia/api-web",
+  "name": "@notopia-uit/api-web",
   "version": "0.0.0",
   "private": true,
   "dependencies": {

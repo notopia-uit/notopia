@@ -145,10 +145,5 @@
       "cache": true
     }
   },
-  "implicitDependencies": ["pkg"],
-  "release": {
-    "docker": {
-      "preVersionCommand": ""
-    }
-  }
+  "implicitDependencies": ["pkg"]
 }

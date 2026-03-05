@@ -5,6 +5,7 @@ packages:
   - api/*
   - packages/*
   - apps/*
+  - cmd/*
 
 catalog:
   '@bufbuild/buf': ^1.64.0
