@@ -1,7 +1,6 @@
 {
   "name": "@notopia-uit/web",
   "version": "0.0.1",
-  "private": true,
   "dependencies": {
     "next": "catalog:",
     "react": "catalog:",
