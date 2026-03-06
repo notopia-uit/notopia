@@ -190,7 +190,7 @@ jobs:
           git add .
           if ! git diff --staged --exit-code --color-words; then
             echo "ERROR: There are uncommitted changes after build/gen. Please commit the changes.";
-            git status --short --color=always
+            git status --short
             exit 1;
           fi
 
