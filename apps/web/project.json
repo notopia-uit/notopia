@@ -1,6 +1,11 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "web",
+  "targets": {
+    "nx-release-publish": {
+      "parallelism": false
+    }
+  },
   "release": {
     "docker": {
       "repositoryName": "notopia-uit/web"

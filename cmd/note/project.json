@@ -137,6 +137,9 @@
         "cwd": "{projectRoot}"
       },
       "cache": true
+    },
+    "nx-release-publish": {
+      "parallelism": false
     }
   },
   "implicitDependencies": ["pkg"],

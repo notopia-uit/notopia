@@ -156,6 +156,10 @@
         "releaseTag": {
           "pattern": "{projectName}@{version}"
         },
+        "changelog": {
+          "file": false,
+          "createRelease": "github"
+        },
         "docker": {
           "registryUrl": "ghcr.io",
           "skipVersionActions": true,

@@ -58,6 +58,9 @@
           "buildTarget": "document:build:production"
         }
       }
+    },
+    "nx-release-publish": {
+      "parallelism": false
     }
   },
   "release": {
