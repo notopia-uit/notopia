@@ -45,11 +45,6 @@ on:
         required: true
         default: false
         type: boolean
-      dryRunRelease:
-        description: Perform a Nx dry run release
-        required: false
-        default: false
-        type: boolean
 
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
@@ -205,13 +200,7 @@ jobs:
             ${{ (github.event_name == 'push' || github.event.inputs.publishWeb == 'true') && '--projects web' || '' }} \
             ${{ (github.event_name == 'push' || github.event.inputs.publishNote == 'true') && '--projects note' || '' }} \
             ${{ (github.event_name == 'push' || github.event.inputs.publishDocument == 'true') && '--projects document' || '' }} \
-            ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.publishNpmGroups == 'true') && '--group npm' || '' }} \
-            ${{ (
-              github.ref == 'refs/heads/main' && (
-                github.event_name == 'push' ||
-                (github.event_name == 'workflow_dispatch' && github.event.inputs.dryRunRelease == 'false')
-              )
-            ) && '' || '--dry-run' }}
+            ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.publishNpmGroups == 'true') && '--group npm' || '' }}
 
       - name: Cache Nx
         uses: actions/cache/save@v5
