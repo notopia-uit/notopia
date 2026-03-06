@@ -72,6 +72,7 @@ env:
         )
       ) && github.ref == 'refs/heads/main'
     }}
+  NX_PARALLEL: 2
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -158,7 +159,7 @@ jobs:
         run: |
           npx nx affected \
             --target test \
-            --parallel=2 \
+            --parallel=${{env.NX_PARALLEL }} \
             --base=${{ steps.set-shas.outputs.base }} \
             --head=${{ steps.set-shas.outputs.head }} \
             | true
@@ -181,7 +182,7 @@ jobs:
             --target build \
             ${{ github.ref == 'refs/heads/main' && '--target docker:build' || '' }} \
             ${{ github.ref == 'refs/heads/main' && '--target deploy' || '' }} \
-            --parallel=2 \
+            --parallel=${{env.NX_PARALLEL }} \
             --base=${{ steps.set-shas.outputs.base }} \
             --head=${{ steps.set-shas.outputs.head }}
 
@@ -195,7 +196,12 @@ jobs:
           fi
 
       - name: Github npm token
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.publishNpmGroups == 'true' }}
+        if: >-
+          ${{
+            github.ref == 'refs/heads/main' &&
+            github.event_name == 'workflow_dispatch' &&
+            github.event.inputs.publishNpmGroups == 'true'
+          }}
         run: npm config set //registry.npmjs.org/:_authToken=${{ github.token }} --global
 
       - name: Nx release
