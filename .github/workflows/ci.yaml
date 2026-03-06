@@ -194,16 +194,18 @@ jobs:
             exit 1;
           fi
 
-      - name: Github npm token
+      - name: Github NPM Token
         if: >-
           ${{
             github.ref == 'refs/heads/main' &&
             github.event_name == 'workflow_dispatch' &&
             github.event.inputs.publishNpmGroups == 'true'
           }}
-        run: npm config set '//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}' --global
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm config set '//npm.pkg.github.com/:_authToken=${{ secrets.TOKEN }}' --global
 
-      - name: Nx release
+      - name: Nx Release Version Docker Images
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           npx nx release \
@@ -212,12 +214,25 @@ jobs:
             ${{ (github.event_name == 'push' || github.event.inputs.publishNote == 'true') && '--projects note' || '' }} \
             ${{ (github.event_name == 'push' || github.event.inputs.publishDocument == 'true') && '--projects document' || '' }} \
             --skip-publish
+
+      - name: Nx Release Version NPM Packages Group
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
           npx nx release \
             ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.publishNpmGroups == 'true') && '--group npm' || '' }} \
             --skip-publish
+
+      - name: Nx Release Publish
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
           npx nx release publish \
             ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirmNxPublish == 'false') && '' || '--yes' }} \
             --parallel 1
+
+      - name: Git push all
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          git push && git push --tags
 
       - name: Cache Nx
         uses: actions/cache/save@v5
