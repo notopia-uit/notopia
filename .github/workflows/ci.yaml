@@ -89,6 +89,19 @@ jobs:
       pages: write
       id-token: write
     steps:
+      - name: Setup Git User
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          git config --global user.name github-actions[bot]
+          git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -156,12 +169,6 @@ jobs:
       - name: Install Go Dependencies
         run: go mod download
 
-      - name: Setup Git User
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: |
-          git config --global user.name github-actions[bot]
-          git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
-
       - name: Nx all
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -194,12 +201,10 @@ jobs:
             github.event_name == 'workflow_dispatch' &&
             github.event.inputs.publishNpmGroups == 'true'
           }}
-        run: npm config set //registry.npmjs.org/:_authToken=${{ github.token }} --global
+        run: npm config set '//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}' --global
 
       - name: Nx release
         if: ${{ github.ref == 'refs/heads/main' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npx nx release \
             --dockerVersionScheme=${{ github.event_name == 'push' && 'development' || 'production' }} \
