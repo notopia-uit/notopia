@@ -164,7 +164,7 @@ jobs:
             | true
 
       - name: Setup Git User
-        if: ${{ env.WILL_RELEASE == 'true' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         uses: fregante/setup-git-user@v2
 
       - name: Nx all
