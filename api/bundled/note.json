@@ -332,6 +332,60 @@
         }
       }
     },
+    "/note/notes/{noteId}/links": {
+      "get": {
+        "security": [
+          {
+            "Oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Get note links",
+        "operationId": "getNoteLinks",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/noteIdPath"
+          },
+          {
+            "name": "outgoingLinks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "backlinks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetNoteLinksResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/notes/{noteId}/publish": {
       "post": {
         "security": [
@@ -1121,6 +1175,11 @@
             "maxLength": 255,
             "example": "Work Notes"
           },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "example": "📁"
+          },
           "parentId": {
             "type": "string",
             "format": "uuid",
@@ -1130,6 +1189,7 @@
         "required": [
           "id",
           "name",
+          "icon",
           "parentId"
         ]
       },
@@ -1219,6 +1279,11 @@
             "maxLength": 255,
             "example": "Meeting Notes"
           },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "example": "📓"
+          },
           "folderId": {
             "type": "string",
             "format": "uuid",
@@ -1227,13 +1292,28 @@
           "currentRevision": {
             "$ref": "#/components/schemas/Revision",
             "readOnly": true
+          },
+          "backlinksCount": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 5,
+            "readOnly": true
+          },
+          "outgoingLinksCount": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 3,
+            "readOnly": true
           }
         },
         "required": [
           "id",
           "name",
+          "icon",
           "folderId",
-          "currentRevision"
+          "currentRevision",
+          "backlinksCount",
+          "outgoingLinksCount"
         ]
       },
       "properties-id": {
@@ -1373,6 +1453,30 @@
             }
           }
         }
+      },
+      "icon": {
+        "type": "string",
+        "nullable": true,
+        "example": "📓"
+      },
+      "NoteLink": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Note_properties-id"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Note_properties-name"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/icon"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "icon"
+        ]
       },
       "Pagination": {
         "type": "object",
@@ -2303,6 +2407,30 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Graph"
+            }
+          }
+        }
+      },
+      "GetNoteLinksResponse": {
+        "description": "Note links",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "outgoingLinks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoteLink"
+                  }
+                },
+                "backlinks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoteLink"
+                  }
+                }
+              }
             }
           }
         }

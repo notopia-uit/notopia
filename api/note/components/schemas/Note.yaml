@@ -14,6 +14,11 @@ properties:
     maxLength: 255
     example: Meeting Notes
 
+  icon:
+    type: string
+    nullable: true
+    example: 📓
+
   folderId:
     type: string
     format: uuid
@@ -23,8 +28,23 @@ properties:
     $ref: ./Revision.yaml
     readOnly: true
 
+  backlinksCount:
+    type: integer
+    minimum: 0
+    example: 5
+    readOnly: true
+
+  outgoingLinksCount:
+    type: integer
+    minimum: 0
+    example: 3
+    readOnly: true
+
 required:
   - id
   - name
+  - icon
   - folderId
   - currentRevision
+  - backlinksCount
+  - outgoingLinksCount

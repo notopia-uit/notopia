@@ -11,6 +11,7 @@ export const zError = z.object({
 export const zFolder = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255),
+    icon: z.string().nullable(),
     parentId: z.uuid()
 });
 
@@ -28,8 +29,11 @@ export const zRevision = z.object({
 export const zNote = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255),
+    icon: z.string().nullable(),
     folderId: z.uuid(),
-    currentRevision: zRevision
+    currentRevision: zRevision,
+    backlinksCount: z.int().gte(0).readonly(),
+    outgoingLinksCount: z.int().gte(0).readonly()
 });
 
 export const zPropertiesId = z.uuid().readonly();
@@ -73,6 +77,14 @@ export const zGraphRelation = z.array(z.uuid());
 export const zGraph = z.object({
     nodes: z.record(z.string(), zGraphNode).optional(),
     relations: z.record(z.string(), zGraphRelation).optional()
+});
+
+export const zIcon = z.string().nullable();
+
+export const zNoteLink = z.object({
+    id: zNotePropertiesId,
+    name: zNotePropertiesName,
+    icon: zIcon
 });
 
 export const zPagination = z.object({
@@ -222,6 +234,7 @@ export const zWorkspaceRole = z.enum([
 
 export const zFolderWritable = z.object({
     name: z.string().min(1).max(255),
+    icon: z.string().nullable(),
     parentId: z.uuid()
 });
 
@@ -232,6 +245,7 @@ export const zRevisionWritable = z.object({
 
 export const zNoteWritable = z.object({
     name: z.string().min(1).max(255),
+    icon: z.string().nullable(),
     folderId: z.uuid()
 });
 
@@ -255,6 +269,11 @@ export const zGraphNodeWritable = z.union([
 export const zGraphWritable = z.object({
     nodes: z.record(z.string(), zGraphNodeWritable).optional(),
     relations: z.record(z.string(), zGraphRelation).optional()
+});
+
+export const zNoteLinkWritable = z.object({
+    name: zNotePropertiesName,
+    icon: zIcon
 });
 
 export const zWorkspaceWritable = z.object({
@@ -530,6 +549,25 @@ export const zGetNoteGraphData = z.object({
  * Note graph
  */
 export const zGetNoteGraphResponse = zGraph;
+
+export const zGetNoteLinksData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        noteId: zNotePropertiesId
+    }),
+    query: z.object({
+        outgoingLinks: z.boolean().optional().default(true),
+        backlinks: z.boolean().optional().default(true)
+    }).optional()
+});
+
+/**
+ * Note links
+ */
+export const zGetNoteLinksResponse = z.object({
+    outgoingLinks: z.array(zNoteLink).optional(),
+    backlinks: z.array(zNoteLink).optional()
+});
 
 export const zPublishNoteData = z.object({
     body: z.never().optional(),

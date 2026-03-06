@@ -13,6 +13,11 @@
       "email": "kevinnitro@duck.com"
     }
   },
+  "servers": [
+    {
+      "url": "http://api.notopia.localhost"
+    }
+  ],
   "tags": [
     {
       "name": "Document",
@@ -45,11 +50,6 @@
   },
   "paths": {
     "/document/documents/import": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -84,11 +84,6 @@
       }
     },
     "/document/ws/documents/{documentId}": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -128,11 +123,6 @@
       }
     },
     "/document/documents/{documentId}/attachment-url": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -170,11 +160,6 @@
       }
     },
     "/note/folders": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -206,11 +191,6 @@
       }
     },
     "/note/folders/{folderId}/rename": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -250,11 +230,6 @@
       }
     },
     "/note/notes": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -286,11 +261,6 @@
       }
     },
     "/note/notes/generate-daily": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -325,11 +295,6 @@
       }
     },
     "/note/notes/search-tags": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -361,11 +326,6 @@
       }
     },
     "/note/notes/{noteId}": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -442,11 +402,6 @@
       }
     },
     "/note/notes/{noteId}/graph": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -496,12 +451,61 @@
         }
       }
     },
-    "/note/notes/{noteId}/publish": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
+    "/note/notes/{noteId}/links": {
+      "get": {
+        "security": [
+          {
+            "Oauth2": []
+          }
+        ],
+        "tags": [
+          "Note"
+        ],
+        "summary": "Get note links",
+        "operationId": "getNoteLinks",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/noteIdPath"
+          },
+          {
+            "name": "outgoingLinks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          {
+            "name": "backlinks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetNoteLinksResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         }
-      ],
+      }
+    },
+    "/note/notes/{noteId}/publish": {
       "post": {
         "security": [
           {
@@ -538,11 +542,6 @@
       }
     },
     "/note/notes/{noteId}/rename": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -582,11 +581,6 @@
       }
     },
     "/note/notes/{noteId}/unpublish": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -623,11 +617,6 @@
       }
     },
     "/note/revisions": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -670,11 +659,6 @@
       }
     },
     "/note/revisions/{revisionId}/apply": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -711,11 +695,6 @@
       }
     },
     "/note/revisions/{revisionId}/rename": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -755,11 +734,6 @@
       }
     },
     "/note/revisions/{revisionId}": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -836,11 +810,6 @@
       }
     },
     "/note/workspaces": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -872,11 +841,6 @@
       }
     },
     "/note/workspaces/{workspaceId}": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -947,11 +911,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/events": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -985,11 +944,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/graph": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -1039,11 +993,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/publish": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1080,11 +1029,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/rename": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1124,11 +1068,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/restore-trashed-items": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1168,11 +1107,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/show-trash": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "get": {
         "security": [
           {
@@ -1209,11 +1143,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/trash-items": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1253,11 +1182,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/unpublish": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1294,11 +1218,6 @@
       }
     },
     "/note/workspaces/{workspaceId}/update-collaborators": {
-      "servers": [
-        {
-          "url": "http://api.notopia.localhost"
-        }
-      ],
       "post": {
         "security": [
           {
@@ -1379,6 +1298,11 @@
             "maxLength": 255,
             "example": "Work Notes"
           },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "example": "📁"
+          },
           "parentId": {
             "type": "string",
             "format": "uuid",
@@ -1388,6 +1312,7 @@
         "required": [
           "id",
           "name",
+          "icon",
           "parentId"
         ]
       },
@@ -1453,6 +1378,11 @@
             "maxLength": 255,
             "example": "Meeting Notes"
           },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "example": "📓"
+          },
           "folderId": {
             "type": "string",
             "format": "uuid",
@@ -1461,13 +1391,28 @@
           "currentRevision": {
             "$ref": "#/components/schemas/Revision",
             "readOnly": true
+          },
+          "backlinksCount": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 5,
+            "readOnly": true
+          },
+          "outgoingLinksCount": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 3,
+            "readOnly": true
           }
         },
         "required": [
           "id",
           "name",
+          "icon",
           "folderId",
-          "currentRevision"
+          "currentRevision",
+          "backlinksCount",
+          "outgoingLinksCount"
         ]
       },
       "properties-id": {
@@ -1607,6 +1552,30 @@
             }
           }
         }
+      },
+      "icon": {
+        "type": "string",
+        "nullable": true,
+        "example": "📓"
+      },
+      "NoteLink": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Note_properties-id"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Note_properties-name"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/icon"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "icon"
+        ]
       },
       "Pagination": {
         "type": "object",
@@ -2593,6 +2562,30 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Graph"
+            }
+          }
+        }
+      },
+      "GetNoteLinksResponse": {
+        "description": "Note links",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "outgoingLinks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoteLink"
+                  }
+                },
+                "backlinks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoteLink"
+                  }
+                }
+              }
             }
           }
         }

@@ -1,0 +1,33 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - Oauth2: []
+  tags:
+    - Note
+  summary: Get note links
+  operationId: getNoteLinks
+  parameters:
+    - $ref: ../components/parameters/noteIdPath.yaml
+    - name: outgoingLinks
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: true
+    - name: backlinks
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: true
+  responses:
+    200:
+      $ref: ../components/responses/GetNoteLinksResponse.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

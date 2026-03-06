@@ -1,0 +1,15 @@
+# vim: ft=yaml.openapi
+description: Note links
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        outgoingLinks:
+          type: array
+          items:
+            $ref: ../schemas/NoteLink.yaml
+        backlinks:
+          type: array
+          items:
+            $ref: ../schemas/NoteLink.yaml

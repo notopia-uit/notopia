@@ -46,6 +46,13 @@ func (h *StrictHandler) GetNoteGraph(
 	return nil, errors.New("not implemented")
 }
 
+func (h *StrictHandler) GetNoteLinks(
+	ctx context.Context,
+	request note.GetNoteLinksRequestObject,
+) (note.GetNoteLinksResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
 func (h *StrictHandler) PublishNote(
 	ctx context.Context,
 	request note.PublishNoteRequestObject,

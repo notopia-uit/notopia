@@ -14,6 +14,11 @@ properties:
     maxLength: 255
     example: Work Notes
 
+  icon:
+    type: string
+    nullable: true
+    example: 📁
+
   parentId:
     type: string
     format: uuid
@@ -22,4 +27,5 @@ properties:
 required:
   - id
   - name
+  - icon
   - parentId

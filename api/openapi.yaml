@@ -12,4 +12,7 @@ info:
     name: Notopia Support
     email: kevinnitro@duck.com
 
+servers:
+  - url: http://api.notopia.localhost
+
 paths: {}

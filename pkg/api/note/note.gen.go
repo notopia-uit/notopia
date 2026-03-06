@@ -255,6 +255,7 @@ type Error struct {
 
 // Folder defines model for Folder.
 type Folder struct {
+	Icon     *string             `json:"icon"`
 	Id       *openapi_types.UUID `json:"id,omitempty"`
 	Name     string              `json:"name"`
 	ParentId openapi_types.UUID  `json:"parentId"`
@@ -312,6 +313,7 @@ type FolderRenamedEventType string
 // FolderWithRelations defines model for FolderWithRelations.
 type FolderWithRelations struct {
 	Children []FolderWithRelations `json:"children"`
+	Icon     *string               `json:"icon"`
 	Id       *openapi_types.UUID   `json:"id,omitempty"`
 	Name     string                `json:"name"`
 	Notes    []TreeNote            `json:"notes"`
@@ -356,10 +358,13 @@ type GraphRelation = []openapi_types.UUID
 
 // Note defines model for Note.
 type Note struct {
-	CurrentRevision Revision            `json:"currentRevision"`
-	FolderId        openapi_types.UUID  `json:"folderId"`
-	Id              *openapi_types.UUID `json:"id,omitempty"`
-	Name            string              `json:"name"`
+	BacklinksCount     *int                `json:"backlinksCount,omitempty"`
+	CurrentRevision    Revision            `json:"currentRevision"`
+	FolderId           openapi_types.UUID  `json:"folderId"`
+	Icon               *string             `json:"icon"`
+	Id                 *openapi_types.UUID `json:"id,omitempty"`
+	Name               string              `json:"name"`
+	OutgoingLinksCount *int                `json:"outgoingLinksCount,omitempty"`
 }
 
 // NoteContentUpdatedEvent defines model for NoteContentUpdatedEvent.
@@ -395,6 +400,13 @@ type NoteDeletedEvent struct {
 
 // NoteDeletedEventType defines model for NoteDeletedEvent.Type.
 type NoteDeletedEventType string
+
+// NoteLink defines model for NoteLink.
+type NoteLink struct {
+	Icon *Icon              `json:"icon"`
+	Id   *NotePropertiesId  `json:"id,omitempty"`
+	Name NotePropertiesName `json:"name"`
+}
 
 // NoteMovedEvent defines model for NoteMovedEvent.
 type NoteMovedEvent struct {
@@ -526,6 +538,9 @@ type WorkspacePropertiesName = string
 // FolderId defines model for folderId.
 type FolderId = openapi_types.UUID
 
+// Icon defines model for icon.
+type Icon = string
+
 // Id defines model for id.
 type Id = openapi_types.UUID
 
@@ -570,6 +585,12 @@ type ForbiddenError = Error
 
 // GetNoteGraphResponse defines model for GetNoteGraphResponse.
 type GetNoteGraphResponse = Graph
+
+// GetNoteLinksResponse defines model for GetNoteLinksResponse.
+type GetNoteLinksResponse struct {
+	Backlinks     *[]NoteLink `json:"backlinks,omitempty"`
+	OutgoingLinks *[]NoteLink `json:"outgoingLinks,omitempty"`
+}
 
 // GetNoteResponse defines model for GetNoteResponse.
 type GetNoteResponse = Note
@@ -798,6 +819,24 @@ type GetNoteParams struct {
 // GetNoteGraphParams defines parameters for GetNoteGraph.
 type GetNoteGraphParams struct {
 	Depth *int `form:"depth,omitempty" json:"depth,omitempty"`
+
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
+}
+
+// GetNoteLinksParams defines parameters for GetNoteLinks.
+type GetNoteLinksParams struct {
+	OutgoingLinks *bool `form:"outgoingLinks,omitempty" json:"outgoingLinks,omitempty"`
+	Backlinks     *bool `form:"backlinks,omitempty" json:"backlinks,omitempty"`
 
 	// UserID Injected by Gateway
 	UserID string `json:"X-Forwarded-ID"`
@@ -1309,6 +1348,9 @@ type ServerInterface interface {
 	// Get note graph
 	// (GET /note/notes/{noteId}/graph)
 	GetNoteGraph(c *gin.Context, noteId NoteIdPath, params GetNoteGraphParams)
+	// Get note links
+	// (GET /note/notes/{noteId}/links)
+	GetNoteLinks(c *gin.Context, noteId NoteIdPath, params GetNoteLinksParams)
 	// Publish note
 	// (POST /note/notes/{noteId}/publish)
 	PublishNote(c *gin.Context, noteId NoteIdPath, params PublishNoteParams)
@@ -2254,6 +2296,135 @@ func (siw *ServerInterfaceWrapper) GetNoteGraph(c *gin.Context) {
 	}
 
 	siw.Handler.GetNoteGraph(c, noteId, params)
+}
+
+// GetNoteLinks operation middleware
+func (siw *ServerInterfaceWrapper) GetNoteLinks(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "noteId" -------------
+	var noteId NoteIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "noteId", c.Param("noteId"), &noteId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter noteId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetNoteLinksParams
+
+	// ------------- Optional query parameter "outgoingLinks" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "outgoingLinks", c.Request.URL.Query(), &params.OutgoingLinks, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter outgoingLinks: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "backlinks" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "backlinks", c.Request.URL.Query(), &params.Backlinks, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter backlinks: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetNoteLinks(c, noteId, params)
 }
 
 // PublishNote operation middleware
@@ -4572,6 +4743,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/note/notes/:noteId", wrapper.DeleteNote)
 	router.GET(options.BaseURL+"/note/notes/:noteId", wrapper.GetNote)
 	router.GET(options.BaseURL+"/note/notes/:noteId/graph", wrapper.GetNoteGraph)
+	router.GET(options.BaseURL+"/note/notes/:noteId/links", wrapper.GetNoteLinks)
 	router.POST(options.BaseURL+"/note/notes/:noteId/publish", wrapper.PublishNote)
 	router.POST(options.BaseURL+"/note/notes/:noteId/rename", wrapper.RenameNote)
 	router.POST(options.BaseURL+"/note/notes/:noteId/unpublish", wrapper.UnpublishNote)
@@ -4634,6 +4806,11 @@ type GenerateDailyNoteResponseResponse struct {
 }
 
 type GetNoteGraphResponseJSONResponse Graph
+
+type GetNoteLinksResponseJSONResponse struct {
+	Backlinks     *[]NoteLink `json:"backlinks,omitempty"`
+	OutgoingLinks *[]NoteLink `json:"outgoingLinks,omitempty"`
+}
 
 type GetNoteResponseJSONResponse Note
 
@@ -5114,6 +5291,64 @@ type GetNoteGraph500JSONResponse struct {
 }
 
 func (response GetNoteGraph500JSONResponse) VisitGetNoteGraphResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNoteLinksRequestObject struct {
+	NoteId NoteIdPath `json:"noteId"`
+	Params GetNoteLinksParams
+}
+
+type GetNoteLinksResponseObject interface {
+	VisitGetNoteLinksResponse(w http.ResponseWriter) error
+}
+
+type GetNoteLinks200JSONResponse struct {
+	GetNoteLinksResponseJSONResponse
+}
+
+func (response GetNoteLinks200JSONResponse) VisitGetNoteLinksResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNoteLinks400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response GetNoteLinks400JSONResponse) VisitGetNoteLinksResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNoteLinks401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response GetNoteLinks401JSONResponse) VisitGetNoteLinksResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNoteLinks404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response GetNoteLinks404JSONResponse) VisitGetNoteLinksResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetNoteLinks500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetNoteLinks500JSONResponse) VisitGetNoteLinksResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -6283,6 +6518,9 @@ type StrictServerInterface interface {
 	// Get note graph
 	// (GET /note/notes/{noteId}/graph)
 	GetNoteGraph(ctx context.Context, request GetNoteGraphRequestObject) (GetNoteGraphResponseObject, error)
+	// Get note links
+	// (GET /note/notes/{noteId}/links)
+	GetNoteLinks(ctx context.Context, request GetNoteLinksRequestObject) (GetNoteLinksResponseObject, error)
 	// Publish note
 	// (POST /note/notes/{noteId}/publish)
 	PublishNote(ctx context.Context, request PublishNoteRequestObject) (PublishNoteResponseObject, error)
@@ -6610,6 +6848,34 @@ func (sh *strictHandler) GetNoteGraph(ctx *gin.Context, noteId NoteIdPath, param
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(GetNoteGraphResponseObject); ok {
 		if err := validResponse.VisitGetNoteGraphResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetNoteLinks operation middleware
+func (sh *strictHandler) GetNoteLinks(ctx *gin.Context, noteId NoteIdPath, params GetNoteLinksParams) {
+	var request GetNoteLinksRequestObject
+
+	request.NoteId = noteId
+	request.Params = params
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetNoteLinks(ctx, request.(GetNoteLinksRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetNoteLinks")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(GetNoteLinksResponseObject); ok {
+		if err := validResponse.VisitGetNoteLinksResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

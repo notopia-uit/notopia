@@ -43,6 +43,8 @@ paths:
     $ref: ./paths/notes_{noteId}.yaml
   /note/notes/{noteId}/graph:
     $ref: ./paths/notes_{noteId}_graph.yaml
+  /note/notes/{noteId}/links:
+    $ref: ./paths/notes_{noteId}_links.yaml
   /note/notes/{noteId}/publish:
     $ref: ./paths/notes_{noteId}_publish.yaml
   /note/notes/{noteId}/rename:

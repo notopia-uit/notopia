@@ -1,0 +1,17 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  id:
+    $ref: ./Note.yaml#/properties/id
+
+  name:
+    $ref: ./Note.yaml#/properties/name
+
+  icon:
+    $ref: ./Note.yaml#/properties/icon
+
+required:
+  - id
+  - name
+  - icon
