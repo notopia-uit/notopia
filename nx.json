@@ -147,7 +147,6 @@
         },
         "releaseTagPatternRequireSemver": true,
         "changelog": {
-          "file": false,
           "createRelease": "github"
         }
       },
@@ -157,7 +156,6 @@
           "pattern": "{projectName}@{version}"
         },
         "changelog": {
-          "file": false,
           "createRelease": "github"
         },
         "docker": {
