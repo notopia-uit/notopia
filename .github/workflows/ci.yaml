@@ -203,7 +203,7 @@ jobs:
           }}
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm config set '//npm.pkg.github.com/:_authToken=${{ secrets.TOKEN }}' --global
+        run: npm config set '//npm.pkg.github.com/:_authToken=${{ env.TOKEN }}' --global
 
       - name: Nx Release Version Docker Images
         if: ${{ github.ref == 'refs/heads/main' }}
