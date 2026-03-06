@@ -201,9 +201,7 @@ jobs:
             github.event_name == 'workflow_dispatch' &&
             github.event.inputs.publishNpmGroups == 'true'
           }}
-        env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm config set '//npm.pkg.github.com/:_authToken=${{ env.TOKEN }}' --global
+        run: npm config set '//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}' --global
 
       - name: Nx Release Version Docker Images
         if: ${{ github.ref == 'refs/heads/main' }}
