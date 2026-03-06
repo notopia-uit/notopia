@@ -55,6 +55,11 @@ on:
         required: true
         default: false
         type: boolean
+      resetNxCache:
+        description: Reset Nx cache (when CI keep warning cache unrecognized)
+        required: true
+        default: false
+        type: boolean
       confirmNxPublish:
         description: Confirm publishing Nx (<> --dry-run)
         required: true
@@ -169,6 +174,10 @@ jobs:
       - name: Install Go Dependencies
         run: go mod download
 
+      - name: Nx reset cache
+        if: ${{ github.event.inputs.resetNxCache == 'true' }}
+        run: npx nx reset
+
       - name: Nx all
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -205,6 +214,8 @@ jobs:
 
       - name: Nx Release Version Docker Images
         if: ${{ github.ref == 'refs/heads/main' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npx nx release \
             --dockerVersionScheme=${{ github.event_name == 'push' && 'development' || 'production' }} \
