@@ -200,7 +200,7 @@ jobs:
             --dockerVersionScheme=${{ github.event_name == 'push' && 'development' || 'production' }} \
             ${{ (github.event_name == 'push' || github.event.inputs.publishWeb == 'true') && '--projects web' || '' }} \
             ${{ (github.event_name == 'push' || github.event.inputs.publishNote == 'true') && '--projects note' || '' }} \
-            ${{ (github.event_name == 'push' || github.event.inputs.publishDocument == 'true') && '--projects document' || '' }} \
+            ${{ (github.event_name == 'push' || github.event.inputs.publishDocument == 'true') && '--projects document' || '' }}
           npx nx release \
             ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.publishNpmGroups == 'true') && '--group npm' || '' }}
 
