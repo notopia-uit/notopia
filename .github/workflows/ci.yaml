@@ -4,9 +4,21 @@ on:
   push:
     branches:
       - '*'
+    paths-ignore: &pushPathsIgnore
+      - README.md
+      - .dockerignore
+      - .editorconfig
+      - .gitattributes
+      - .gitignore
+      - .harper-dictionary.txt
+      - .lazy.lua
+      - .wakatime-project
+      - .nvim.lua
+      - justfile
   pull_request:
     branches:
       - '*'
+    paths-ignore: *pushPathsIgnore
     types:
       - opened
       - synchronize

@@ -17,3 +17,5 @@ pkg/api/**/*.go linguist-generated
 pkg/pb/**/*.go linguist-generated
 
 **/*sqlc/*.go linguist-generated
+
+docs/src/** linguist-detectable
