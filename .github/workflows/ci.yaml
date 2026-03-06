@@ -88,6 +88,12 @@ jobs:
   main:
     name: Main
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+      packages: write
+      pages: write
+      id-token: write
     steps:
       - name: Setup Git User
         if: ${{ github.ref == 'refs/heads/main' }}
