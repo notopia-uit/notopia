@@ -45,6 +45,11 @@ on:
         required: true
         default: false
         type: boolean
+      skipNxCacheOnRun:
+        description: Skip Nx cache when running affected commands (when need to force run)
+        required: false
+        default: false
+        type: boolean
 
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
@@ -141,15 +146,6 @@ jobs:
       - name: Install Go Dependencies
         run: go mod download
 
-      - name: Nx Affected Test
-        run: |
-          npx nx affected \
-            --target test \
-            --parallel=${{env.NX_PARALLEL }} \
-            --base=${{ steps.set-shas.outputs.base }} \
-            --head=${{ steps.set-shas.outputs.head }} \
-            | true
-
       - name: Setup Git User
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
@@ -166,9 +162,11 @@ jobs:
             --target gen \
             --target bundle \
             --target build \
+            --target test \
             ${{ github.ref == 'refs/heads/main' && '--target docker:build' || '' }} \
             ${{ github.ref == 'refs/heads/main' && '--target deploy' || '' }} \
             --parallel=${{env.NX_PARALLEL }} \
+            ${{ github.event.inputs.skipNxCacheOnRun == 'true' && '--skip-nx-cache' || '' }} \
             --base=${{ steps.set-shas.outputs.base }} \
             --head=${{ steps.set-shas.outputs.head }}
 
