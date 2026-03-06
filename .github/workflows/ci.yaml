@@ -40,10 +40,10 @@ on:
         required: true
         default: false
         type: boolean
-      confirmNxPublish:
-        description: Confirm publishing Nx (<> --dry-run)
+      release:
+        description: Publish release if on main branch
         required: true
-        default: true
+        default: false
         type: boolean
 
 env:
@@ -195,7 +195,11 @@ jobs:
         run: npm config set '//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}' --global
 
       - name: Nx Release
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: >-
+          ${{
+            github.ref == 'refs/heads/main' &&
+            github.event.inputs.release == 'true'
+          }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -204,7 +208,7 @@ jobs:
             ${{ github.event_name == 'push' && '--projects web' || '' }} \
             ${{ github.event_name == 'push' && '--projects note' || '' }} \
             ${{ github.event_name == 'push' && '--projects document' || '' }} \
-            ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirmNxPublish == 'false') && '' || '--yes' }}
+            --yes
 
       - name: Cache Nx
         uses: actions/cache/save@v5
