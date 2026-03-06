@@ -35,5 +35,5 @@
       "cache": true
     }
   },
-  "implicitDependencies": ["docs", "packages/api-web"]
+  "implicitDependencies": ["docs", "apps/api-web"]
 }

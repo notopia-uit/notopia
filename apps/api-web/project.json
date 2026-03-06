@@ -1,6 +1,7 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "packages/api-web",
+  "name": "api-web",
+  "projectType": "application",
   "targets": {
     "dev": {
       "dependsOn": [

@@ -4,13 +4,22 @@
   "files": [],
   "references": [
     {
-      "path": "./packages/api-web"
+      "path": "./apps/api-web"
     },
     {
       "path": "./apps/web"
     },
     {
       "path": "./apps/document"
+    },
+    {
+      "path": "./packages/pb"
+    },
+    {
+      "path": "./packages/api-gen"
+    },
+    {
+      "path": "./packages/api-document-nestjs-server"
     }
   ]
 }

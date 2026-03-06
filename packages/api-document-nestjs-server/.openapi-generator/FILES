@@ -10,4 +10,3 @@ index.ts
 models/error.ts
 models/get-document-attachment-upload-url-200-response.ts
 models/index.ts
-tsconfig.json

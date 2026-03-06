@@ -16,5 +16,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "extends": "../../tsconfig.base.json"
 }

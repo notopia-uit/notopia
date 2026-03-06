@@ -307,6 +307,15 @@ importers:
         specifier: 1.7.3
         version: 1.7.3(encoding@0.1.13)
 
+  apps/api-web:
+    dependencies:
+      '@notopia-uit/api':
+        specifier: 'workspace:'
+        version: link:../../api
+      '@scalar/api-reference-react':
+        specifier: 0.9.1
+        version: 0.9.1(axios@1.13.6)(change-case@5.4.4)(react@19.2.4)(tailwindcss@4.2.1)(typescript@5.9.3)
+
   apps/document:
     dependencies:
       '@nestjs/common':
@@ -392,15 +401,6 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 4.3.6
-
-  packages/api-web:
-    dependencies:
-      '@notopia-uit/api':
-        specifier: 'workspace:'
-        version: link:../../api
-      '@scalar/api-reference-react':
-        specifier: 0.9.1
-        version: 0.9.1(axios@1.13.6)(change-case@5.4.4)(react@19.2.4)(tailwindcss@4.2.1)(typescript@5.9.3)
 
   packages/pb:
     dependencies:
