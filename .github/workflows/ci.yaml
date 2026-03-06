@@ -194,6 +194,10 @@ jobs:
             exit 1;
           fi
 
+      - name: Github npm token
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.publishNpmGroups == 'true' }}
+        run: npm config set //registry.npmjs.org/:_authToken=${{ github.token }} --global
+
       - name: Nx release
         if: ${{ github.ref == 'refs/heads/main' }}
         env:
@@ -201,9 +205,9 @@ jobs:
         run: |
           npx nx release \
             --dockerVersionScheme=${{ github.event_name == 'push' && 'development' || 'production' }} \
-            ${{ (github.event_name == 'push' || github.event.inputs.publishWeb == 'true') && '--project web' || '' }} \
-            ${{ (github.event_name == 'push' || github.event.inputs.publishNote == 'true') && '--project note' || '' }} \
-            ${{ (github.event_name == 'push' || github.event.inputs.publishDocument == 'true') && '--project document' || '' }} \
+            ${{ (github.event_name == 'push' || github.event.inputs.publishWeb == 'true') && '--projects web' || '' }} \
+            ${{ (github.event_name == 'push' || github.event.inputs.publishNote == 'true') && '--projects note' || '' }} \
+            ${{ (github.event_name == 'push' || github.event.inputs.publishDocument == 'true') && '--projects document' || '' }} \
             ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.publishNpmGroups == 'true') && '--group npm' || '' }} \
             ${{ env.WILL_RELEASE == 'true' && '' || '--dry-run' }}
 
