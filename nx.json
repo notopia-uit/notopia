@@ -139,7 +139,7 @@
         "releaseTag": {
           "pattern": "notopia-packages@{version}"
         },
-        "projects": ["packages/*", "api"],
+        "projects": ["packages/*"],
         "projectsRelationship": "fixed",
         "version": {
           "conventionalCommits": true,

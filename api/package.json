@@ -1,6 +1,7 @@
 {
   "name": "@notopia-uit/api",
   "version": "0.0.0",
+  "private": true,
   "exports": {
     "./event": "./bundled/event.json",
     "./document": "./bundled/document.json",
