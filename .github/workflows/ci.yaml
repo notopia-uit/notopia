@@ -25,23 +25,8 @@ on:
       - reopened
   workflow_dispatch:
     inputs:
-      publishWeb:
-        description: Publish "web" container image
-        required: true
-        default: false
-        type: boolean
-      publishNote:
-        description: Publish "note" container image
-        required: true
-        default: false
-        type: boolean
-      publishDocument:
-        description: Publish "document" container image
-        required: true
-        default: false
-        type: boolean
-      publishNpmGroups:
-        description: Publish packages npm group, mutually exclusive with above publish options
+      resetNxCache:
+        description: Reset Nx cache (when CI keep warning cache unrecognized)
         required: true
         default: false
         type: boolean
@@ -52,11 +37,6 @@ on:
         type: boolean
       skipNxCache:
         description: Skip Nx cache
-        required: true
-        default: false
-        type: boolean
-      resetNxCache:
-        description: Reset Nx cache (when CI keep warning cache unrecognized)
         required: true
         default: false
         type: boolean
@@ -73,7 +53,9 @@ env:
     ${{
       (
         github.ref_name == 'main' ||
-        github.base_ref == 'main'
+        github.ref_name == 'dev' ||
+        github.base_ref == 'main' ||
+        github.base_ref == 'dev'
       ) && (
         !startsWith(github.head_ref || github.ref_name, 'renovate/')
       )
@@ -82,7 +64,7 @@ env:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
 
 jobs:
   main:
@@ -96,7 +78,7 @@ jobs:
       id-token: write
     steps:
       - name: Setup Git User
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
         run: |
           git config --global user.name github-actions[bot]
           git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
@@ -191,7 +173,7 @@ jobs:
             --target build \
             --target test \
             ${{ github.ref == 'refs/heads/main' && '--target docker:build' || '' }} \
-            ${{ github.ref == 'refs/heads/main' && '--target deploy' || '' }} \
+            ${{ github.ref == 'refs/heads/dev' && '--target deploy' || '' }} \
             --parallel=${{env.NX_PARALLEL }} \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
 
@@ -208,8 +190,7 @@ jobs:
         if: >-
           ${{
             github.ref == 'refs/heads/main' &&
-            github.event_name == 'workflow_dispatch' &&
-            github.event.inputs.publishNpmGroups == 'true'
+            github.event_name == 'workflow_dispatch'
           }}
         run: npm config set '//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}' --global
 
@@ -220,10 +201,9 @@ jobs:
         run: |
           npx nx release \
             --dockerVersionScheme=${{ github.event_name == 'push' && 'development' || 'production' }} \
-            ${{ (github.event_name == 'push' || github.event.inputs.publishWeb == 'true') && '--projects web' || '' }} \
-            ${{ (github.event_name == 'push' || github.event.inputs.publishNote == 'true') && '--projects note' || '' }} \
-            ${{ (github.event_name == 'push' || github.event.inputs.publishDocument == 'true') && '--projects document' || '' }} \
-            ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.publishNpmGroups == 'true') && '--group npm' || '' }} \
+            ${{ github.event_name == 'push' && '--projects web' || '' }} \
+            ${{ github.event_name == 'push' && '--projects note' || '' }} \
+            ${{ github.event_name == 'push' && '--projects document' || '' }} \
             ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirmNxPublish == 'false') && '' || '--yes' }}
 
       - name: Cache Nx

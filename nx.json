@@ -147,7 +147,8 @@
         },
         "releaseTagPatternRequireSemver": true,
         "changelog": {
-          "createRelease": "github"
+          "createRelease": "github",
+          "file": false
         }
       },
       "docker": {
@@ -156,7 +157,8 @@
           "pattern": "{projectName}@{version}"
         },
         "changelog": {
-          "createRelease": "github"
+          "createRelease": "github",
+          "file": false
         },
         "docker": {
           "registryUrl": "ghcr.io",
