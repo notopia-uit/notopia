@@ -47,13 +47,18 @@ on:
         type: boolean
       forceNxRun:
         description: Force Nx to run many instead of affected
-        required: false
+        required: true
         default: false
         type: boolean
       skipNxCache:
         description: Skip Nx cache
-        required: false
+        required: true
         default: false
+        type: boolean
+      confirmNxPublish:
+        description: Confirm publishing Nx, just like opposite to dry run
+        required: true
+        default: true
         type: boolean
 
 env:
@@ -201,10 +206,10 @@ jobs:
             ${{ (github.event_name == 'push' || github.event.inputs.publishWeb == 'true') && '--projects web' || '' }} \
             ${{ (github.event_name == 'push' || github.event.inputs.publishNote == 'true') && '--projects note' || '' }} \
             ${{ (github.event_name == 'push' || github.event.inputs.publishDocument == 'true') && '--projects document' || '' }} \
-            --yes
+            ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirmNxPublish == 'false') && '' || '--yes' }}
           npx nx release \
             ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.publishNpmGroups == 'true') && '--group npm' || '' }} \
-            --yes
+            ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirmNxPublish == 'false') && '' || '--yes' }}
 
       - name: Cache Nx
         uses: actions/cache/save@v5
