@@ -1,0 +1,12 @@
+/api/ @notopia-uit/team-backend @notopia-uit/team-backend
+/proto/ @notopia-uit/team-backend @notopia-uit/team-backend
+/docs/ @notopia-uit/team-backend @notopia-uit/team-backend
+/packages/api-web/ @notopia-uit/team-frontend @notopia-uit/team-backend
+
+/apps/web/ @notopia-uit/team-frontend
+/packages/api-gen/ @notopia-uit/team-frontend
+
+/packages/api-document-nestjs-server/ @notopia-uit/team-backend
+/packages/api-pb/ @notopia-uit/team-backend
+/cmd/ @notopia-uit/team-backend
+/internal/ @notopia-uit/team-backend
