@@ -63,15 +63,6 @@ env:
         !startsWith(github.head_ref || github.ref_name, 'renovate/')
       )
     }}
-  WILL_RELEASE: >-
-    ${{
-      (
-        github.event_name == 'push' || (
-          github.event_name == 'workflow_dispatch' &&
-          github.event.inputs.dryRunRelease == 'false'
-        )
-      ) && github.ref == 'refs/heads/main'
-    }}
   NX_PARALLEL: 2
 
 concurrency:
@@ -215,7 +206,12 @@ jobs:
             ${{ (github.event_name == 'push' || github.event.inputs.publishNote == 'true') && '--projects note' || '' }} \
             ${{ (github.event_name == 'push' || github.event.inputs.publishDocument == 'true') && '--projects document' || '' }} \
             ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.publishNpmGroups == 'true') && '--group npm' || '' }} \
-            ${{ env.WILL_RELEASE == 'true' && '' || '--dry-run' }}
+            ${{ (
+              github.ref == 'refs/heads/main' && (
+                github.event_name == 'push' ||
+                (github.event_name == 'workflow_dispatch' && github.event.inputs.dryRunRelease == 'false')
+              )
+            ) && '' || '--dry-run' }}
 
       - name: Cache Nx
         uses: actions/cache/save@v5
