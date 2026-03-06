@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
-  cacheDir: '../../node_modules/.vite/packages/api-web',
+  cacheDir: './node_modules/.vite/apps/api-web',
   server: {
     port: 9080,
     host: true,
