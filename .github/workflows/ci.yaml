@@ -165,7 +165,9 @@ jobs:
 
       - name: Setup Git User
         if: ${{ github.ref == 'refs/heads/main' }}
-        uses: fregante/setup-git-user@v2
+        run: |
+          git config --global user.name github-actions[bot]
+          git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
 
       - name: Nx all
         run: |
