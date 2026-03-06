@@ -8,7 +8,7 @@ api/document/**/*.yaml linguist-language=OASv3-yaml linguist-detectable
 api/note/**/*.yaml linguist-language=OASv3-yaml linguist-detectable
 api/bundled/*.json linguist-language=OASv3-json linguist-generated
 
-packages/api-gen/src/ linguist-generated
+packages/api-gen/src/** linguist-generated
 packages/pb/**/*.js linguist-generated
 packages/pb/**/*.d.ts linguist-generated
 packages/api-document-nestjs-server/**/*.ts linguist-generated
