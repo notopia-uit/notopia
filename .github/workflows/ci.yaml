@@ -94,18 +94,29 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - name: Setup Git User
-        if: ${{ github.ref == 'refs/heads/main' }}
+      - uses: actions/create-github-app-token@v2
+        id: bot-token
+        with:
+          app-id: ${{ vars.ORG_BOT_APP_ID }}
+          private-key: ${{ secrets.ORG_BOT_PRIVATE_KEY }}
+
+      - name: Get Bot ID
+        id: bot-id
+        run: echo "bot-id=$(gh api "/users/${{ steps.bot-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ steps.bot-token.outputs.token }}
+
+      - name: Configure Git User
         run: |
-          git config --global user.name github-actions[bot]
-          git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git config --global user.name '${{ steps.bot-token.outputs.app-slug }}[bot]'
+          git config --global user.email '${{ steps.bot-id.outputs.bot-id }}+${{ steps.bot-token.outputs.app-slug }}[bot]@users.noreply.github.com'
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ steps.bot-token.outputs.app-slug }}
+          password: ${{ steps.bot-token.outputs.token }}
 
       - uses: actions/checkout@v6
         with:
@@ -180,7 +191,7 @@ jobs:
 
       - name: Nx all
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token }}
         run: |
           npx nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
             --target lint \
@@ -210,12 +221,12 @@ jobs:
             github.event_name == 'workflow_dispatch' &&
             github.event.inputs.publishNpmGroups == 'true'
           }}
-        run: npm config set '//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}' --global
+        run: npm config set '//npm.pkg.github.com/:_authToken=${{ steps.bot-token.outputs.token }}' --global
 
       - name: Nx Release Version Docker Images
         if: ${{ github.ref == 'refs/heads/main' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token }}
         run: |
           npx nx release \
             --dockerVersionScheme=${{ github.event_name == 'push' && 'development' || 'production' }} \
