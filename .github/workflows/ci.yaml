@@ -163,6 +163,10 @@ jobs:
             --head=${{ steps.set-shas.outputs.head }} \
             | true
 
+      - name: Setup Git User
+        if: ${{ env.WILL_RELEASE == 'true' }}
+        uses: fregante/setup-git-user@v2
+
       - name: Nx all
         run: |
           npx nx affected \
@@ -185,10 +189,6 @@ jobs:
             git status --short --color=always
             exit 1;
           fi
-
-      - name: Setup Git User
-        if: ${{ env.WILL_RELEASE == 'true' }}
-        uses: fregante/setup-git-user@v2
 
       - name: Nx release
         if: ${{ github.ref == 'refs/heads/main' }}
