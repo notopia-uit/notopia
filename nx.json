@@ -42,9 +42,6 @@
     },
     "lint*": {
       "cache": true
-    },
-    "docker:build": {
-      "dependsOn": []
     }
   },
   "plugins": [
@@ -112,7 +109,27 @@
             "org.opencontainers.image.created={currentDate}",
             "--tag",
             "{projectName}"
-          ]
+          ],
+          "configurations": {
+            "production": {
+              "args": [
+                "-f",
+                "{projectRoot}/Dockerfile",
+                "--label",
+                "org.opencontainers.image.title={projectName}",
+                "--label",
+                "org.opencontainers.image.source=https://github.com/notopia-uit/notopia",
+                "--label",
+                "org.opencontainers.image.revision={commitSha}",
+                "--label",
+                "org.opencontainers.image.created={currentDate}",
+                "--tag",
+                "{projectName}",
+                "--cache-from=type=gha",
+                "--cache-to=type=gha,mode=max"
+              ]
+            }
+          }
         },
         "runTarget": {
           "name": "docker:run",
