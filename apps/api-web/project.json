@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "api-web",
+  "projectType": "application",
+  "targets": {
+    "dev": {
+      "dependsOn": [
+        {
+          "projects": ["api/note", "api/document"],
+          "target": "watch-bundle:json"
+        }
+      ]
+    }
+  }
+}

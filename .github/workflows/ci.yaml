@@ -237,10 +237,10 @@ jobs:
           else
             npx nx release \
               --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
-              ${{ (github.event_name == 'push' || github.event.inputs.releaseWeb == 'true') && '--project web' || '' }} \
-              ${{ (github.event_name == 'push' || github.event.inputs.releaseNote == 'true') && '--project note' || '' }} \
-              ${{ (github.event_name == 'push' || github.event.inputs.releaseDocument == 'true') && '--project document' || '' }} \
-              ${{ github.event.inputs.releaseNpm == 'true' && '--group npm' || '' }} \
+              ${{ (github.event_name == 'push' || github.event.inputs.releaseWeb == 'true') && '--projects web' || '' }} \
+              ${{ (github.event_name == 'push' || github.event.inputs.releaseNote == 'true') && '--projects note' || '' }} \
+              ${{ (github.event_name == 'push' || github.event.inputs.releaseDocument == 'true') && '--projects document' || '' }} \
+              ${{ github.event.inputs.releaseNpm == 'true' && '--groups npm' || '' }} \
               --yes
           fi
 

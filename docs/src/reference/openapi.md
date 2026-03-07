@@ -1,8 +1,7 @@
 ---
-title: Notopia OpenAPI
 aside: false
 outline: false
-sidebar: true
+title: Notopia OpenAPI
 ---
 
 <script setup>

@@ -4,7 +4,6 @@
   "dependencies": {
     "@catppuccin/vitepress": "0.1.2",
     "@notopia-uit/api": "workspace:",
-    "@scalar/api-reference": "1.43.17",
     "pagefind": "1.4.0",
     "vitepress-openapi": "0.1.15",
     "vitepress-plugin-pagefind": "0.4.18"

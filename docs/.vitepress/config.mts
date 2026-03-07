@@ -4,14 +4,12 @@ import { configureDiagramsPlugin } from 'vitepress-plugin-diagrams';
 import { pagefindPlugin } from 'vitepress-plugin-pagefind';
 import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
 
-const { DOCS_BASE: base = '/' } = process.env;
-
 // https://vitepress.dev/reference/site-config
 const vitePressOptions = {
   title: 'Notopia',
   description: 'Utopia of Notes',
   lang: 'en-GB',
-  base,
+  base: '/notopia/',
   srcDir: 'src',
   markdown: {
     theme: {
@@ -37,6 +35,13 @@ const vitePressOptions = {
         target: '_self',
         rel: 'noopener',
       },
+      { text: 'Docs', link: '/docs' },
+      {
+        text: 'Scalar API',
+        link: '/api/index.html',
+        target: '_blank',
+        rel: 'noopener',
+      },
     ],
 
     socialLinks: [
@@ -49,6 +54,7 @@ const vitePressOptions = {
   vite: {
     plugins: [pagefindPlugin()],
   },
+  ignoreDeadLinks: ['/notopia/api/index.html'],
 } satisfies UserConfig<NoInfer<DefaultTheme.Config>>;
 
 const vitePressSidebarOptions = {
