@@ -1,216 +1,339 @@
 # Class Diagram
 
+## Note
+
 ```plantuml
-@startuml Notopia
+@startuml Note
 
+!$rosewater = "#dc8a78"
+!$flamingo  = "#dd7878"
+!$pink      = "#ea76cb"
+!$mauve     = "#8839ef"
+!$red       = "#d20f39"
+!$maroon    = "#e64553"
+!$peach     = "#fe640b"
+!$yellow    = "#df8e1d"
+!$green     = "#40a02b"
+!$teal      = "#179299"
+!$sky       = "#04a5e5"
+!$sapphire  = "#209fb5"
+!$lavender  = "#7287fd"
+!$blue      = "#1e66f5"
+!$text      = "#4c4f69"
+!$subtext1  = "#5c5f77"
+!$subtext0  = "#6c6f85"
+!$overlay2  = "#7c7f93"
+!$overlay1  = "#8c8fa1"
+!$overlay0  = "#9ca0b0"
+!$surface2  = "#acb0be"
+!$surface1  = "#bcc0cc"
+!$surface0  = "#ccd0da"
+!$base      = "#eff1f5"
+!$mantle    = "#e6e9ef"
+!$crust     = "#dce0e8"
+
+skinparam backgroundColor $base
+skinparam defaultFontColor $text
+skinparam roundcorner 16
 skinparam classFontStyle bold
-skinparam classAttributeIconSize 0
+
+skinparam ArrowColor $subtext0
 skinparam packageStyle rectangle
-/' skinparam linetype ortho '/
-/' skinparam linetype polyline '/
 
-'Sytax of typescript'
-package "Document" <<Bounded Context>> {
-    entity "DocumentEntity" as Document.DocumentEntity {
-        name: String
-        data: Buffer
-    }
-
-    record "TagModel" as Document.TagModel {
-        id: String
-        name: String
-    }
-
-    record "LinkModel" as Document.LinkModel {
-        documentId: String
-        type: Backlink | OutgoingLink
-    }
-
-    class "DocumentModel" as Document.DocumentModel {
-        name: String
-        data: BlockNoteSchema[]
-    }
-
-    interface "DocumentRepository" as Document.DocumentRepository {
-        Save(document Document)
-        GetByID(documentId string): Document
-    }
-
-    record "AttachmentUploadUrl" as Document.AttachmentUploadUrl {
-        id: string
-        url: string
-    }
-
-    class "DocumentService" as Document.DocumentService {
-        documentRepository: DocumentRepository
-        blockNoteEditor: BlockNoteEditor
-        atachmentService: AttachmentService
-
-        getTags(): TagModel[]
-        getLinks(): LinkModel[]
-        CreateDocument(name string, data Buffer): Document
-        GetDocument(documentId string): Document
-        GetAttachmentUploadUrl(): AttachmentUploadUrl
-    }
-
-    DocumentService ..> DocumentRepository
+skinparam package {
+    BackgroundColor $mantle
+    BorderColor $surface1
+    FontColor $mauve
 }
 
-'Syntax of golang'
-package "Note" <<Bounded Context>> {
-    package "Domain" as Note.Domain <<Frame>> {
-        enum "WorkspaceRole" as Note.Domain.WorkspaceRole {
-            OWNER
-            EDITOR
-            VIEWER
-        }
+skinparam class {
+    BackgroundColor $base
+    BorderColor $surface1
+    HeaderBackgroundColor $surface0
+    AttributeFontColor $text
+}
 
-        enum "DeletedBy" as Note.Domain.DeletedBy {
-            PURPOSE
-            PARENT
-        }
+!define RepoInterface(name) interface "name" as Domain.name <<(I, $pink) Repo Interface>>
+!define ServiceInterface(name) interface "name" as Domain.name <<(I, $rosewater) Service Interface>>
+!define Enum(name) enum "name" as Domain.name <<(E, $flamingo) Enum>>
+!define ValueObject(name) class "name" as Domain.name <<(S, $yellow) Value Object>>
+!define AggregateRoot(name) class "name" as Domain.name <<(S, $sky) Aggregate Root>>
 
-        struct "Workspace" as Note.Domain.Workspace <<Aggregate Root>> {
-            id: uuid.UUID
-            name: string
-            rootFolderID: uuid.UUID
-            deletedAt: *time.Time
+package "Domain" as Domain <<Frame>> {
+    Enum(WorkspaceLevel) {
+        OWNER
+        EDITOR
+        VIEWER
+    }
 
-            Rename(newName string)
-            Delete()
-        }
+    Enum(DeletedBy) {
+        PURPOSE
+        PARENT
+    }
 
-        struct "Folder" as Note.Domain.Folder <<Aggregate Root>> {
-            id: uuid.UUID
-            name: string
-            icon: *string
-            workspaceID: uuid.UUID
-            folderRelationship: FolderRelationship
-            deletedBy: *DeletedBy
-            deletedAt: *time.Time
+    AggregateRoot(Workspace) {
+        id: uuid.UUID
+        name: string
+        rootFolderID: uuid.UUID
+        deletedAt: *time.Time
 
-            Rename(newName string)
-            ParentID() *uuid.UUID, bool
-            IsRoot() bool
-            MoveToFolder(folderID uuid.UUID)
-            Trash()
-        }
+        Rename(newName string)
+        Delete()
+    }
 
-        struct "FolderRelationship" as Note.Domain.FolderRelationship <<Value Object>> {
-            parentID: *uuid.UUID
-            isRoot: bool
+    AggregateRoot(Folder) {
+        id: uuid.UUID
+        name: string
+        icon: *string
+        workspaceID: uuid.UUID
+        folderRelationship: FolderRelationship
+        deletedBy: *DeletedBy
+        deletedAt: *time.Time
 
-            ParentID() *uuid.UUID, bool
-            IsRoot() bool
-        }
+        Rename(newName string)
+        ParentID() *uuid.UUID, bool
+        IsRoot() bool
+        MoveToFolder(folderID uuid.UUID)
+        Trash()
+    }
 
-        struct "Note" as Note.Domain.Note <<Aggregate Root>> {
-            id: uuid.UUID
-            name: string
-            icon: *string
-            folderID: uuid.UUID
-            tagIDs: []uuid.UUID
-            outgoingLinks: []uuid.UUID
-            currentRevisionID: *uuid.UUID
-            deletedBy: *DeletedBy
-            deletedAt: *time.Time
+    ValueObject(FolderRelationship) {
+        parentID: *uuid.UUID
+        isRoot: bool
 
-            MoveNoteToFolder(folderID uuid.UUID)
-            RemoveTag(tagID uuid.UUID)
-            Trash()
-            Restore()
-        }
+        ParentID() *uuid.UUID, bool
+        IsRoot() bool
+    }
 
-        struct "Tag" as Note.Domain.Tag <<Aggregate Root>> {
-            id: uuid.UUID
-            name: string
-            workspaceID: uuid.UUID
-            stats: TagStats
+    AggregateRoot(Note) {
+        id: uuid.UUID
+        name: string
+        icon: *string
+        folderID: uuid.UUID
+        tagIDs: []uuid.UUID
+        outgoingLinks: []uuid.UUID
+        currentRevisionID: *uuid.UUID
+        deletedBy: *DeletedBy
+        deletedAt: *time.Time
 
-            IncrementReference(delta int)
-            DecrementReference(delta int)
-            IsOrphaned() bool
-        }
+        MoveNoteToFolder(folderID uuid.UUID)
+        RemoveTag(tagID uuid.UUID)
+        Trash()
+        Restore()
+    }
 
-        struct "TagStats" as Note.Domain.TagStats <<Value Object>> {
-            referenceCount: int
-            isExisting: bool
+    AggregateRoot(Tag) {
+        id: uuid.UUID
+        name: string
+        workspaceID: uuid.UUID
+        stats: TagStats
 
-            IncrementReference(delta int) TagStats
-            DecrementReference(delta int) TagStats
-            ReferenceCount() int
-            ShouldBePurged() bool
-        }
+        IncrementReference(delta int)
+        DecrementReference(delta int)
+        IsOrphaned() bool
+    }
 
-        struct "Revision" as Note.Domain.Revision <<Aggregate Root>> {
-            id: uuid.UUID
-            noteID: uuid.UUID
-            name: string
-            content: RevisionContent
-            deletedAt: *time.Time
+    ValueObject(TagStats) {
+        referenceCount: int
+        isExisting: bool
 
-            rename(newName string)
-        }
+        IncrementReference(delta int) TagStats
+        DecrementReference(delta int) TagStats
+        ReferenceCount() int
+        ShouldBePurged() bool
+    }
 
-        struct "RevisionContent" as Note.Domain.RevisionContent <<Value Object>> {
-            blockNoteContent: string
-            size: int
+    AggregateRoot(Revision) {
+        id: uuid.UUID
+        noteID: uuid.UUID
+        name: string
+        content: RevisionContent
+        deletedAt: *time.Time
 
-            BlockNoteContent() string
-            Size() int
-        }
+        rename(newName string)
+    }
 
-        Note.Domain.Workspace "1" *... "1..*" Note.Domain.Folder : contains
-        Note.Domain.Folder "1" *-- "1" Note.Domain.FolderRelationship : has
-        Note.Domain.Folder "1" *... "0..*" Note.Domain.Note : contains
-        Note.Domain.Note "0..*" .. "0..*" Note.Domain.Note : links
-        Note.Domain.Note "1..*" ...o "0..*" Note.Domain.Tag : contains
-        Note.Domain.Tag "1" *-- "1" Note.Domain.TagStats : has
-        Note.Domain.Note "1" *... "0..*" Note.Domain.Revision : has
-        Note.Domain.Revision "1" *-- "1" Note.Domain.RevisionContent : has
+    ValueObject(RevisionContent) {
+        blockNoteContent: string
+        size: int
 
-        interface "WorkspaceRepo" as Note.Domain.WorkspaceRepo {
-            GetByID(workspaceID uuid.UUID) *Workspace
-            Save(workspace *Workspace)
-        }
+        BlockNoteContent() string
+        Size() int
+    }
 
-        interface "FolderRepo" as Note.Domain.FolderRepo {
-            GetByID(folderID uuid.UUID) *Folder
-            Save(folder *Folder)
-            GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []*Folder
-            PermanentlyDelete(folderIDs ...uuid.UUID)
-        }
+    Domain.Workspace "1" *... "1..*" Domain.Folder : contains
+    Domain.Folder "1" *-- "1" Domain.FolderRelationship : has
+    Domain.Folder "1" *... "0..*" Domain.Note : contains
+    Domain.Note "0..*" .. "0..*" Domain.Note : links
+    Domain.Note "1..*" ...o "0..*" Domain.Tag : contains
+    Domain.Tag "1" *-- "1" Domain.TagStats : has
+    Domain.Note "1" *... "0..*" Domain.Revision : has
+    Domain.Revision "1" *-- "1" Domain.RevisionContent : has
 
-        interface "NoteRepo" as Note.Domain.NoteRepo {
-            GetByID(noteID uuid.UUID) *Note
-            Save(note *Note)
-            GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []*Note
-            PermanentlyDelete(noteIDs ...uuid.UUID)
-        }
+    RepoInterface(WorkspaceRepo) {
+        GetByID(workspaceID uuid.UUID) *Workspace
+        Save(workspace *Workspace)
+    }
 
-        interface "TagRepo" as Note.Domain.TagRepo {
-            GetByID(tagID uuid.UUID) *Tag
-            SearchByName(workspaceID uuid.UUID, name string) []*Tag
-            Save(tag *Tag)
-            Delete(tagID uuid.UUID)
-        }
+    RepoInterface(FolderRepo) {
+        GetByID(folderID uuid.UUID) *Folder
+        Save(folder *Folder)
+        GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []*Folder
+        PermanentlyDelete(folderIDs ...uuid.UUID)
+    }
 
-        interface "RevisionRepo" as Note.Domain.RevisionRepo {
-            GetByID(revisionID uuid.UUID) *Revision
-            Save(revision *Revision)
-        }
+    RepoInterface(NoteRepo) {
+        GetByID(noteID uuid.UUID) *Note
+        Save(note *Note)
+        GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []*Note
+        PermanentlyDelete(noteIDs ...uuid.UUID)
+    }
 
-        struct "TagOrphanService" as Note.Domain.TagOrphanService {
-            noteRepo: Repos.Note
-            tagRepo: Repos.Tag
+    RepoInterface(TagRepo) {
+        GetByID(tagID uuid.UUID) *Tag
+        SearchByName(workspaceID uuid.UUID, name string) []*Tag
+        Save(tag *Tag)
+        Delete(tagID uuid.UUID)
+    }
 
-            RemoveTagsFromNote(noteID uuid.UUID, tagIDs ...uuid.UUID)
-        }
+    RepoInterface(RevisionRepo) {
+        GetByID(revisionID uuid.UUID) *Revision
+        Save(revision *Revision)
+    }
+
+    ServiceInterface(NoteService) {
+        noteRepo: Repos.Note
+        tagRepo: Repos.Tag
+
+        RemoveTagsFromNote(noteID uuid.UUID, tagIDs ...uuid.UUID)
     }
 }
 @enduml
 ```
 
-<!-- diagram id="class-diagram" -->
+<!-- diagram id="class-diagram-note" -->
+
+:::info
+
+- Syntax written in Go
+
+:::
+
+## Document
+
+```plantuml
+@startuml Document
+
+!$rosewater = "#dc8a78"
+!$flamingo  = "#dd7878"
+!$pink      = "#ea76cb"
+!$mauve     = "#8839ef"
+!$red       = "#d20f39"
+!$maroon    = "#e64553"
+!$peach     = "#fe640b"
+!$yellow    = "#df8e1d"
+!$green     = "#40a02b"
+!$teal      = "#179299"
+!$sky       = "#04a5e5"
+!$sapphire  = "#209fb5"
+!$lavender  = "#7287fd"
+!$blue      = "#1e66f5"
+!$text      = "#4c4f69"
+!$subtext1  = "#5c5f77"
+!$subtext0  = "#6c6f85"
+!$overlay2  = "#7c7f93"
+!$overlay1  = "#8c8fa1"
+!$overlay0  = "#9ca0b0"
+!$surface2  = "#acb0be"
+!$surface1  = "#bcc0cc"
+!$surface0  = "#ccd0da"
+!$base      = "#eff1f5"
+!$mantle    = "#e6e9ef"
+!$crust     = "#dce0e8"
+
+skinparam backgroundColor $base
+skinparam defaultFontColor $text
+skinparam roundcorner 16
+skinparam classFontStyle bold
+ skinparam ArrowColor $subtext0
+skinparam packageStyle rectangle
+
+skinparam package {
+    BackgroundColor $mantle
+    BorderColor $surface1
+    FontColor $mauve
+}
+
+skinparam class {
+    BackgroundColor $base
+    BorderColor $surface1
+    HeaderBackgroundColor $surface0
+    AttributeFontColor $text
+}
+
+!define RepoInterface(name) interface "name" as Document.name <<(I, $pink) Repo Interface>>
+!define Service(name) interface "name" as Document.name <<(I, $rosewater) Service>>
+!define Entity(name) class "name" as Document.name <<(C, $sky) Entity>>
+!define Type(name) class "name" as Document.name <<(T, $flamingo) Type>>
+!define Model(name) class "name" as Document.name <<(C, $yellow) Model>>
+
+package "Document" as Document <<Frame>> {
+
+    Entity(DocumentEntity) {
+        name: string
+        data: Buffer
+    }
+
+    Type(TagModel) {
+        id: string
+        name: string
+    }
+
+    Type(LinkModel) {
+        documentId: string
+        type: Backlink | OutgoingLink
+    }
+
+    Model(DocumentModel) {
+        name: string
+        data: BlockNoteSchema[]
+    }
+
+    Type(AttachmentUploadUrl) {
+        id: string
+        url: string
+    }
+
+    RepoInterface(DocumentRepository) {
+        Save(document: DocumentEntity)
+        GetByID(documentId: string): DocumentEntity
+    }
+
+    Service(DocumentService) {
+        documentRepository: DocumentRepository
+        blockNoteEditor: BlockNoteEditor
+        attachmentService: AttachmentService
+
+        getTags(): TagModel[]
+        getLinks(): LinkModel[]
+        CreateDocument(name: string, data: Buffer): DocumentEntity
+        GetDocument(documentId: string): DocumentEntity
+        GetAttachmentUploadUrl(): AttachmentUploadUrl
+    }
+
+    Document.DocumentService ..> Document.DocumentRepository : uses
+    Document.DocumentService ..> Document.DocumentEntity : manages
+}
+
+@endum
+```
+
+<!-- diagram id="class-diagram-document" -->
+
+:::info
+
+- Syntax written in Typescript
+
+:::
 
 <!-- vim:set tabstop=4 shiftwidth=4: -->
