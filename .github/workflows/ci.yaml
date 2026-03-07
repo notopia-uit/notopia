@@ -237,9 +237,10 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILDX_BUILDER: ${{ steps.setup-buildx.outputs.name }}
+          DOCKER_BUILDKIT: 1
         run: |
           echo 'Build Docker images'
-          BUILDX_BUILDER=${{ steps.setup-buildx.outputs.name }} \
           npx nx run-many \
             --target docker:build \
             --parallel=${{env.NX_PARALLEL }} \

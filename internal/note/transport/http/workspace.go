@@ -44,6 +44,13 @@ func (h *StrictHandler) GetWorkspaceGraph(
 	return nil, errors.New("not implemented")
 }
 
+func (h *StrictHandler) MoveWorkspaceItems(
+	ctx context.Context,
+	request note.MoveWorkspaceItemsRequestObject,
+) (note.MoveWorkspaceItemsResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
 func (h *StrictHandler) PublishWorkspace(
 	ctx context.Context,
 	request note.PublishWorkspaceRequestObject,

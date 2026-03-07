@@ -101,7 +101,6 @@ package "Note" <<Bounded Context>> {
 
                 rename(newName)
             }
-
         }
 
         package "Repos" as Note.Domain.Repos {

@@ -1,0 +1,15 @@
+# vim: ft=yaml.openapi
+required: true
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        noteIds:
+          type: array
+          items:
+            $ref: ../schemas/Note.yaml#/properties/id
+        folderIds:
+          type: array
+          items:
+            $ref: ../schemas/Folder.yaml#/properties/id

@@ -127,11 +127,9 @@
                 "--tag",
                 "{projectName}",
                 "--cache-from=type=registry,ref=ghcr.io/notopia-uit/notopia/{projectName}:buildcache",
-                "--cache-to=type=registry,ref=ghcr.io/notopia-uit/notopia/{projectName}:buildcache,mode=max,image-manifest=true"
-              ],
-              "env": {
-                "DOCKER_BUILDKIT": "1"
-              }
+                "--cache-to=type=registry,ref=ghcr.io/notopia-uit/notopia/{projectName}:buildcache,mode=max,image-manifest=true",
+                "--load"
+              ]
             }
           }
         },

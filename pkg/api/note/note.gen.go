@@ -255,17 +255,18 @@ type Error struct {
 
 // Folder defines model for Folder.
 type Folder struct {
-	Icon     *string             `json:"icon"`
-	Id       *openapi_types.UUID `json:"id,omitempty"`
-	Name     string              `json:"name"`
-	ParentId openapi_types.UUID  `json:"parentId"`
+	Icon        *string             `json:"icon"`
+	Id          *openapi_types.UUID `json:"id,omitempty"`
+	Name        string              `json:"name"`
+	ParentId    openapi_types.UUID  `json:"parentId"`
+	WorkspaceId *Id                 `json:"workspaceId,omitempty"`
 }
 
 // FolderCreatedEvent defines model for FolderCreatedEvent.
 type FolderCreatedEvent struct {
 	Data struct {
-		Id   *Id  `json:"id,omitempty"`
-		Name Name `json:"name"`
+		Id   *PropertiesId `json:"id,omitempty"`
+		Name Name          `json:"name"`
 	} `json:"data"`
 	Type FolderCreatedEventType `json:"type"`
 }
@@ -276,7 +277,7 @@ type FolderCreatedEventType string
 // FolderDeletedEvent defines model for FolderDeletedEvent.
 type FolderDeletedEvent struct {
 	Data struct {
-		Id *Id `json:"id,omitempty"`
+		Id *PropertiesId `json:"id,omitempty"`
 	} `json:"data"`
 	Type FolderDeletedEventType `json:"type"`
 }
@@ -287,9 +288,9 @@ type FolderDeletedEventType string
 // FolderMovedEvent defines model for FolderMovedEvent.
 type FolderMovedEvent struct {
 	Data struct {
-		FromFolderId ParentId `json:"fromFolderId"`
-		Id           *Id      `json:"id,omitempty"`
-		ToFolderId   ParentId `json:"toFolderId"`
+		FromFolderId ParentId      `json:"fromFolderId"`
+		Id           *PropertiesId `json:"id,omitempty"`
+		ToFolderId   ParentId      `json:"toFolderId"`
 	} `json:"data"`
 	Type FolderMovedEventType `json:"type"`
 }
@@ -300,9 +301,9 @@ type FolderMovedEventType string
 // FolderRenamedEvent defines model for FolderRenamedEvent.
 type FolderRenamedEvent struct {
 	Data struct {
-		Id      *Id   `json:"id,omitempty"`
-		NewName Name  `json:"newName"`
-		OldName *Name `json:"oldName,omitempty"`
+		Id      *PropertiesId `json:"id,omitempty"`
+		NewName Name          `json:"newName"`
+		OldName *Name         `json:"oldName,omitempty"`
 	} `json:"data"`
 	Type FolderRenamedEventType `json:"type"`
 }
@@ -312,12 +313,13 @@ type FolderRenamedEventType string
 
 // FolderWithRelations defines model for FolderWithRelations.
 type FolderWithRelations struct {
-	Children []FolderWithRelations `json:"children"`
-	Icon     *string               `json:"icon"`
-	Id       *openapi_types.UUID   `json:"id,omitempty"`
-	Name     string                `json:"name"`
-	Notes    []TreeNote            `json:"notes"`
-	ParentId *openapi_types.UUID   `json:"parentId"`
+	Children    []FolderWithRelations `json:"children"`
+	Icon        *string               `json:"icon"`
+	Id          *openapi_types.UUID   `json:"id,omitempty"`
+	Name        string                `json:"name"`
+	Notes       []TreeNote            `json:"notes"`
+	ParentId    *openapi_types.UUID   `json:"parentId"`
+	WorkspaceId *Id                   `json:"workspaceId,omitempty"`
 }
 
 // Graph defines model for Graph.
@@ -519,7 +521,7 @@ type Workspace struct {
 // WorkspaceRenamedEvent defines model for WorkspaceRenamedEvent.
 type WorkspaceRenamedEvent struct {
 	Data struct {
-		Id      *PropertiesId           `json:"id,omitempty"`
+		Id      *Id                     `json:"id,omitempty"`
 		NewName WorkspacePropertiesName `json:"newName"`
 		OldName WorkspacePropertiesName `json:"oldName"`
 	} `json:"data"`
@@ -557,7 +559,7 @@ type PropertiesId = openapi_types.UUID
 type PropertiesName = string
 
 // FolderIdPath defines model for folderIdPath.
-type FolderIdPath = Id
+type FolderIdPath = PropertiesId
 
 // LimitQuery defines model for limitQuery.
 type LimitQuery = int
@@ -575,7 +577,7 @@ type PageQuery = int
 type RevisionIdPath = RevisionPropertiesId
 
 // WorkspaceIdPath defines model for workspaceIdPath.
-type WorkspaceIdPath = PropertiesId
+type WorkspaceIdPath = Id
 
 // BadRequestError defines model for BadRequestError.
 type BadRequestError = Error
@@ -646,7 +648,13 @@ type CreateWorkspaceRequest = Workspace
 
 // GenerateDailyNoteRequest defines model for GenerateDailyNoteRequest.
 type GenerateDailyNoteRequest struct {
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	WorkspaceId *Id `json:"workspaceId,omitempty"`
+}
+
+// MoveWorkspaceItemsRequest defines model for MoveWorkspaceItemsRequest.
+type MoveWorkspaceItemsRequest struct {
+	FolderIds *[]PropertiesId     `json:"folderIds,omitempty"`
+	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
 }
 
 // RenameFolderRequest defines model for RenameFolderRequest.
@@ -747,7 +755,7 @@ type CreateNoteParams struct {
 
 // GenerateDailyNoteJSONBody defines parameters for GenerateDailyNote.
 type GenerateDailyNoteJSONBody struct {
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	WorkspaceId *Id `json:"workspaceId,omitempty"`
 }
 
 // GenerateDailyNoteParams defines parameters for GenerateDailyNote.
@@ -1067,6 +1075,27 @@ type GetWorkspaceGraphParams struct {
 	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
 }
 
+// MoveWorkspaceItemsJSONBody defines parameters for MoveWorkspaceItems.
+type MoveWorkspaceItemsJSONBody struct {
+	FolderIds *[]PropertiesId     `json:"folderIds,omitempty"`
+	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
+}
+
+// MoveWorkspaceItemsParams defines parameters for MoveWorkspaceItems.
+type MoveWorkspaceItemsParams struct {
+	// UserID Injected by Gateway
+	UserID string `json:"X-Forwarded-ID"`
+
+	// UserEmail Injected by Gateway
+	UserEmail string `json:"X-Forwarded-Email"`
+
+	// UserGroups Injected by Gateway
+	UserGroups *string `json:"X-Forwarded-Groups,omitempty"`
+
+	// UserRoles Injected by Gateway
+	UserRoles *string `json:"X-Forwarded-Roles,omitempty"`
+}
+
 // PublishWorkspaceParams defines parameters for PublishWorkspace.
 type PublishWorkspaceParams struct {
 	// UserID Injected by Gateway
@@ -1220,6 +1249,9 @@ type RenameRevisionJSONRequestBody RenameRevisionJSONBody
 
 // CreateWorkspaceJSONRequestBody defines body for CreateWorkspace for application/json ContentType.
 type CreateWorkspaceJSONRequestBody = Workspace
+
+// MoveWorkspaceItemsJSONRequestBody defines body for MoveWorkspaceItems for application/json ContentType.
+type MoveWorkspaceItemsJSONRequestBody MoveWorkspaceItemsJSONBody
 
 // RenameWorkspaceJSONRequestBody defines body for RenameWorkspace for application/json ContentType.
 type RenameWorkspaceJSONRequestBody RenameWorkspaceJSONBody
@@ -1390,6 +1422,9 @@ type ServerInterface interface {
 	// Get workspace graph
 	// (GET /note/workspaces/{workspaceId}/graph)
 	GetWorkspaceGraph(c *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceGraphParams)
+	// Move workspace's items
+	// (POST /note/workspaces/{workspaceId}/move-items)
+	MoveWorkspaceItems(c *gin.Context, workspaceId WorkspaceIdPath, params MoveWorkspaceItemsParams)
 	// Publish workspace
 	// (POST /note/workspaces/{workspaceId}/publish)
 	PublishWorkspace(c *gin.Context, workspaceId WorkspaceIdPath, params PublishWorkspaceParams)
@@ -3917,6 +3952,119 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceGraph(c *gin.Context) {
 	siw.Handler.GetWorkspaceGraph(c, workspaceId, params)
 }
 
+// MoveWorkspaceItems operation middleware
+func (siw *ServerInterfaceWrapper) MoveWorkspaceItems(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "workspaceId" -------------
+	var workspaceId WorkspaceIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params MoveWorkspaceItemsParams
+
+	headers := c.Request.Header
+
+	// ------------- Required header parameter "X-Forwarded-ID" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-ID")]; found {
+		var UserID string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-ID, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-ID", valueList[0], &UserID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-ID: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserID = UserID
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-ID is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Required header parameter "X-Forwarded-Email" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Email")]; found {
+		var UserEmail string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Email, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Email", valueList[0], &UserEmail, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Email: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserEmail = UserEmail
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Header parameter X-Forwarded-Email is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Groups" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Groups")]; found {
+		var UserGroups string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Groups, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Groups", valueList[0], &UserGroups, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Groups: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserGroups = &UserGroups
+
+	}
+
+	// ------------- Optional header parameter "X-Forwarded-Roles" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-Forwarded-Roles")]; found {
+		var UserRoles string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandler(c, fmt.Errorf("Expected one value for X-Forwarded-Roles, got %d", n), http.StatusBadRequest)
+			return
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-Forwarded-Roles", valueList[0], &UserRoles, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false, Type: "string", Format: ""})
+		if err != nil {
+			siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter X-Forwarded-Roles: %w", err), http.StatusBadRequest)
+			return
+		}
+
+		params.UserRoles = &UserRoles
+
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.MoveWorkspaceItems(c, workspaceId, params)
+}
+
 // PublishWorkspace operation middleware
 func (siw *ServerInterfaceWrapper) PublishWorkspace(c *gin.Context) {
 
@@ -4757,6 +4905,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.GetWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/events", wrapper.GetWorkspaceEvents)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/graph", wrapper.GetWorkspaceGraph)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/move-items", wrapper.MoveWorkspaceItems)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/publish", wrapper.PublishWorkspace)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/rename", wrapper.RenameWorkspace)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/restore-trashed-items", wrapper.RestoreTrashedWorkspaceItems)
@@ -6102,6 +6251,62 @@ func (response GetWorkspaceGraph500JSONResponse) VisitGetWorkspaceGraphResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
+type MoveWorkspaceItemsRequestObject struct {
+	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	Params      MoveWorkspaceItemsParams
+	Body        *MoveWorkspaceItemsJSONRequestBody
+}
+
+type MoveWorkspaceItemsResponseObject interface {
+	VisitMoveWorkspaceItemsResponse(w http.ResponseWriter) error
+}
+
+type MoveWorkspaceItems204Response struct {
+}
+
+func (response MoveWorkspaceItems204Response) VisitMoveWorkspaceItemsResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type MoveWorkspaceItems400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response MoveWorkspaceItems400JSONResponse) VisitMoveWorkspaceItemsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type MoveWorkspaceItems401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response MoveWorkspaceItems401JSONResponse) VisitMoveWorkspaceItemsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type MoveWorkspaceItems404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response MoveWorkspaceItems404JSONResponse) VisitMoveWorkspaceItemsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type MoveWorkspaceItems500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response MoveWorkspaceItems500JSONResponse) VisitMoveWorkspaceItemsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PublishWorkspaceRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
 	Params      PublishWorkspaceParams
@@ -6560,6 +6765,9 @@ type StrictServerInterface interface {
 	// Get workspace graph
 	// (GET /note/workspaces/{workspaceId}/graph)
 	GetWorkspaceGraph(ctx context.Context, request GetWorkspaceGraphRequestObject) (GetWorkspaceGraphResponseObject, error)
+	// Move workspace's items
+	// (POST /note/workspaces/{workspaceId}/move-items)
+	MoveWorkspaceItems(ctx context.Context, request MoveWorkspaceItemsRequestObject) (MoveWorkspaceItemsResponseObject, error)
 	// Publish workspace
 	// (POST /note/workspaces/{workspaceId}/publish)
 	PublishWorkspace(ctx context.Context, request PublishWorkspaceRequestObject) (PublishWorkspaceResponseObject, error)
@@ -7262,6 +7470,42 @@ func (sh *strictHandler) GetWorkspaceGraph(ctx *gin.Context, workspaceId Workspa
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(GetWorkspaceGraphResponseObject); ok {
 		if err := validResponse.VisitGetWorkspaceGraphResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// MoveWorkspaceItems operation middleware
+func (sh *strictHandler) MoveWorkspaceItems(ctx *gin.Context, workspaceId WorkspaceIdPath, params MoveWorkspaceItemsParams) {
+	var request MoveWorkspaceItemsRequestObject
+
+	request.WorkspaceId = workspaceId
+	request.Params = params
+
+	var body MoveWorkspaceItemsJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.MoveWorkspaceItems(ctx, request.(MoveWorkspaceItemsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "MoveWorkspaceItems")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(MoveWorkspaceItemsResponseObject); ok {
+		if err := validResponse.VisitMoveWorkspaceItemsResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

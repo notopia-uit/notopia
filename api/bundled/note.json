@@ -873,6 +873,45 @@
         }
       }
     },
+    "/note/workspaces/{workspaceId}/move-items": {
+      "post": {
+        "security": [
+          {
+            "Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Move workspace's items",
+        "operationId": "moveWorkspaceItems",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/MoveWorkspaceItemsRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Workspace items successfully moved"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/publish": {
       "post": {
         "security": [
@@ -1160,6 +1199,12 @@
       }
     },
     "schemas": {
+      "id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "550e8400-e29b-41d4-a716-446655440000",
+        "readOnly": true
+      },
       "Folder": {
         "type": "object",
         "properties": {
@@ -1184,6 +1229,10 @@
             "type": "string",
             "format": "uuid",
             "example": "cc7a2e47-6267-4c60-8d36-257f849777e4"
+          },
+          "workspaceId": {
+            "$ref": "#/components/schemas/id",
+            "readOnly": false
           }
         },
         "required": [
@@ -1217,7 +1266,7 @@
           "message"
         ]
       },
-      "id": {
+      "properties-id": {
         "type": "string",
         "format": "uuid",
         "example": "123e4567-e89b-12d3-a456-426614174000",
@@ -1315,12 +1364,6 @@
           "backlinksCount",
           "outgoingLinksCount"
         ]
-      },
-      "properties-id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "550e8400-e29b-41d4-a716-446655440000",
-        "readOnly": true
       },
       "properties-name": {
         "type": "string",
@@ -1634,7 +1677,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/id"
+                "$ref": "#/components/schemas/properties-id"
               },
               "name": {
                 "$ref": "#/components/schemas/name"
@@ -1665,7 +1708,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/id"
+                "$ref": "#/components/schemas/properties-id"
               }
             },
             "required": [
@@ -1697,7 +1740,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/id"
+                "$ref": "#/components/schemas/properties-id"
               },
               "fromFolderId": {
                 "$ref": "#/components/schemas/parentId"
@@ -1733,7 +1776,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/id"
+                "$ref": "#/components/schemas/properties-id"
               },
               "oldName": {
                 "$ref": "#/components/schemas/name",
@@ -1932,7 +1975,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/id"
               },
               "oldName": {
                 "$ref": "#/components/schemas/Workspace_properties-name"
@@ -2092,7 +2135,7 @@
               "type": "object",
               "properties": {
                 "workspaceId": {
-                  "$ref": "#/components/schemas/properties-id"
+                  "$ref": "#/components/schemas/id"
                 }
               },
               "required": [
@@ -2167,6 +2210,30 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Workspace"
+            }
+          }
+        }
+      },
+      "MoveWorkspaceItemsRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "noteIds": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Note_properties-id"
+                  }
+                },
+                "folderIds": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/properties-id"
+                  }
+                }
+              }
             }
           }
         }
@@ -2630,7 +2697,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/id"
+          "$ref": "#/components/schemas/properties-id"
         }
       },
       "noteIdPath": {
@@ -2685,7 +2752,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/properties-id"
+          "$ref": "#/components/schemas/id"
         }
       }
     }

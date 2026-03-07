@@ -24,6 +24,10 @@ properties:
     format: uuid
     example: cc7a2e47-6267-4c60-8d36-257f849777e4
 
+  workspaceId:
+    $ref: ./Workspace.yaml#/properties/id
+    readOnly: false
+
 required:
   - id
   - name
