@@ -60,6 +60,13 @@ notes: {
   shape: sql_table
 }
 
+note_links: {
+  source_id: uuid {constraint: PK, FK}
+  target_id: uuid {constraint: PK, FK}
+
+  shape: sql_table
+}
+
 tags: {
   id: uuid {constraint: PK}
   name: text
@@ -69,7 +76,7 @@ tags: {
   shape: sql_table
 }
 
-note_tags: {
+notes_tags: {
   note_id: uuid {constraint: PK, FK}
   tag_id: uuid {constraint: PK, FK}
 
@@ -91,10 +98,12 @@ revisions: {
 folders.workspace_id -> workspaces.id
 folders.parent_id -> folders.id
 notes.folder_id -> folders.id
+note_links.source_id -> notes.id
+note_links.target_id -> notes.id
 notes.current_revision_id -> revisions.id
 tags.workspace_id -> workspaces.id
-note_tags.note_id -> notes.id
-note_tags.tag_id -> tags.id
+notes_tags.note_id -> notes.id
+notes_tags.tag_id -> tags.id
 revisions.note_id -> notes.id
 ```
 

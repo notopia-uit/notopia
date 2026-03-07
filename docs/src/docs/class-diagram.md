@@ -111,7 +111,6 @@ package "Note" <<Bounded Context>> {
             folderID: uuid.UUID
             tagIDs: []uuid.UUID
             outgoingLinks: []uuid.UUID
-            backlinks: []uuid.UUID
             currentRevisionID: *uuid.UUID
             deletedBy: *DeletedBy
             deletedAt: *time.Time
