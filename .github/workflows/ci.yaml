@@ -238,11 +238,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo 'Build Docker images'
           BUILDX_BUILDER=${{ steps.setup-buildx.outputs.name }} \
           npx nx run-many \
             --target docker:build \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production'
+
+          echo "Built Docker images:"
+          docker images -a
 
           RELEASE_CONTAINER_TYPE="${{ github.event.inputs.releaseContainerType || 'development' }}"
           if [ "${{ github.event.inputs.releaseAll }}" = "true" ]; then

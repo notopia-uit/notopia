@@ -96,7 +96,6 @@
         "buildTarget": {
           "name": "docker:build",
           "cwd": "{workspaceRoot}",
-          "skipDefaultTag": true,
           "args": [
             "-f",
             "{projectRoot}/Dockerfile",
@@ -114,7 +113,6 @@
           "configurations": {
             "production": {
               "cwd": "{workspaceRoot}",
-              "skipDefaultTag": true,
               "args": [
                 "-f",
                 "{projectRoot}/Dockerfile",
