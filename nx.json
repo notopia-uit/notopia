@@ -130,7 +130,8 @@
                 "--cache-to=type=registry,ref=ghcr.io/notopia-uit/notopia/{projectName}:buildcache,mode=max,image-manifest=true"
               ],
               "env": {
-                "DOCKER_BUILDKIT": "1"
+                "DOCKER_BUILDKIT": "1",
+                "BUILDX_BUILDER": "{env.BUILDX_BUILDER}"
               }
             }
           }
