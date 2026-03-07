@@ -24,7 +24,7 @@ catalog:
   '@types/react-dom': 19.2.3
   '@vitejs/plugin-react': 5.1.4
   axios: 1.13.6
-  eslint: 9.39.3
+  eslint: 9.39.4
   eslint-config-next: 16.1.6
   '@next/eslint-plugin-next': 16.1.6
   eslint-config-prettier: 10.1.8
