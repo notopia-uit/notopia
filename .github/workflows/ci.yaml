@@ -173,7 +173,7 @@ jobs:
             --target build \
             --target test \
             ${{ github.ref == 'refs/heads/main' && '--target docker:build' || '' }} \
-            ${{ github.ref == 'refs/heads/dev' && '--target deploy' || '' }} \
+            ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && '--target deployPage' || '' }} \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
@@ -196,19 +196,13 @@ jobs:
         run: npm config set '//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}' --global
 
       - name: Nx Release
-        if: >-
-          ${{
-            github.ref == 'refs/heads/main' &&
-            github.event.inputs.release == 'true'
-          }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npx nx release \
             --dockerVersionScheme=${{ github.event_name == 'push' && 'development' || 'production' }} \
-            ${{ github.event_name == 'push' && '--projects web' || '' }} \
-            ${{ github.event_name == 'push' && '--projects note' || '' }} \
-            ${{ github.event_name == 'push' && '--projects document' || '' }} \
+            ${{ github.event_name == 'push' && '--groups docker' || '' }} \
             --yes
 
       - name: Cache Nx
