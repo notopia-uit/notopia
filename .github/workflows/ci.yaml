@@ -95,7 +95,7 @@ concurrency:
       ( 
         github.ref == 'refs/heads/main' ||
         github.ref == 'refs/heads/dev'
-      ) && github.workflow + '-' + github.ref ||
+      ) && format('{0}-{1}', github.workflow, github.ref) ||
        github.run_id
      }}
 
