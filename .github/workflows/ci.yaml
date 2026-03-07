@@ -90,8 +90,14 @@ env:
   NX_PARALLEL: 3
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/dev' }}
+  group: >-
+    ${{
+      ( 
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/dev'
+      ) && github.workflow + '-' + github.ref ||
+       github.run_id
+     }}
 
 jobs:
   main:
