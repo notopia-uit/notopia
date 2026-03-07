@@ -4,6 +4,7 @@
 
 ```plantuml
 @startuml Note
+title Note
 
 !$rosewater = "#dc8a78"
 !$flamingo  = "#dd7878"
@@ -223,6 +224,7 @@ package "Domain" as Domain <<Frame>> {
 
 ```plantuml
 @startuml Document
+title Document
 
 !$rosewater = "#dc8a78"
 !$flamingo  = "#dd7878"
