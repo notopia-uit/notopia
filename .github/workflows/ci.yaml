@@ -203,7 +203,7 @@ jobs:
             --target bundle \
             --target build \
             --target test \
-            --target ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && 'target docker:build' || '' }} \
+            ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && '--target docker:build' || '' }} \
             ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && '--target deployPage' || '' }} \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
