@@ -170,6 +170,10 @@ jobs:
         uses: docker/setup-buildx-action@v4
         if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
 
+      - name: Use Docker Buildx builder
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
+        run: docker buildx use default
+
       - name: Derive SHAs for Nx Affected
         id: set-shas
         uses: nrwl/nx-set-shas@v4
