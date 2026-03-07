@@ -27,6 +27,13 @@
         "command": "vitepress build",
         "cwd": "{projectRoot}"
       },
+      "configurations": {
+        "production": {
+          "env": {
+            "DOCS_BASE": "/notopia"
+          }
+        }
+      },
       "outputs": ["{projectRoot}/.vitepress/dist"],
       "inputs": ["vitepressFiles"]
     },
@@ -35,6 +42,13 @@
       "options": {
         "command": "vitepress build",
         "cwd": "{projectRoot}"
+      },
+      "configurations": {
+        "production": {
+          "env": {
+            "DOCS_BASE": "/notopia"
+          }
+        }
       },
       "outputs": ["{projectRoot}/.vitepress/dist"],
       "inputs": ["vitepressFiles"],

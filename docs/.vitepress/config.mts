@@ -4,12 +4,14 @@ import { configureDiagramsPlugin } from 'vitepress-plugin-diagrams';
 import { pagefindPlugin } from 'vitepress-plugin-pagefind';
 import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
 
+const { DOCS_BASE: base = '/' } = process.env;
+
 // https://vitepress.dev/reference/site-config
 const vitePressOptions = {
   title: 'Notopia',
   description: 'Utopia of Notes',
   lang: 'en-GB',
-  base: '/notopia/',
+  base,
   srcDir: 'src',
   markdown: {
     theme: {
