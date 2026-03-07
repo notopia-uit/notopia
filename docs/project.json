@@ -51,6 +51,14 @@
         "cwd": "{projectRoot}"
       },
       "continuous": true
+    },
+    "deploy": {
+      "executor": "nx-github-pages:deploy",
+      "dependsOn": ["build"],
+      "options": {
+        "directory": "{projectRoot}/.vitepress/dist"
+      },
+      "cache": true
     }
   }
 }

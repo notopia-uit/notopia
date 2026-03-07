@@ -35,13 +35,6 @@ const vitePressOptions = {
         target: '_self',
         rel: 'noopener',
       },
-      { text: 'Docs', link: '/docs' },
-      {
-        text: 'Scalar API',
-        link: '/api/index.html',
-        target: '_blank',
-        rel: 'noopener',
-      },
     ],
 
     socialLinks: [
@@ -54,7 +47,6 @@ const vitePressOptions = {
   vite: {
     plugins: [pagefindPlugin()],
   },
-  ignoreDeadLinks: ['/notopia/api/index.html'],
 } satisfies UserConfig<NoInfer<DefaultTheme.Config>>;
 
 const vitePressSidebarOptions = {

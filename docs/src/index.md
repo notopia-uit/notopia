@@ -12,9 +12,4 @@ hero:
     - theme: alt
       text: Reference
       link: /reference
-    - theme: alt
-      text: Scalar API
-      link: /api/index.html
-      target: _self
-      rel: noopener
 ---
