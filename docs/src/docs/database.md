@@ -16,7 +16,7 @@ explanation.shape: rectangle
 
 <!-- diagram id="database-diagram-note" -->
 
-:::tip
+:::info
 
 - (FK) is `NOT NULL` by default
 - Column marked with `N` mean nullable

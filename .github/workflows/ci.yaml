@@ -40,11 +40,38 @@ on:
         required: true
         default: false
         type: boolean
-      release:
-        description: Publish release if on main branch
+      releaseWeb:
+        description: Release "web" container
         required: true
         default: false
         type: boolean
+      releaseNote:
+        description: Release "note" container
+        required: true
+        default: false
+        type: boolean
+      releaseDocument:
+        description: Release "document" container
+        required: true
+        default: false
+        type: boolean
+      releaseNpm:
+        description: Release npm packages
+        required: true
+        default: false
+        type: boolean
+      releaseAll:
+        description: Release all containers and npm packages (Use this or the above specific release options, not both)
+        required: true
+        default: false
+        type: boolean
+      releaseContainerType:
+        type: choice
+        options:
+          - production
+          - development
+        default: development
+        required: true
 
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
@@ -172,7 +199,6 @@ jobs:
             --target bundle \
             --target build \
             --target test \
-            ${{ github.ref == 'refs/heads/main' && '--target docker:build' || '' }} \
             ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && '--target deployPage' || '' }} \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
@@ -200,10 +226,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx nx release \
-            --dockerVersionScheme=${{ github.event_name == 'push' && 'development' || 'production' }} \
-            ${{ github.event_name == 'push' && '--groups docker' || '' }} \
-            --yes
+          npx nx run-many \
+            --target docker:build \
+            --parallel=${{env.NX_PARALLEL }} \
+            --skip-nx-cache
+          if [ "${{ github.event.inputs.releaseAll }}" = "true" ]; then
+            npx nx release \
+              --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
+              --yes
+          else
+            npx nx release \
+              --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
+              ${{ github.event.inputs.releaseWeb == 'true' && '--project web' || '' }} \
+              ${{ github.event.inputs.releaseNote == 'true' && '--project note' || '' }} \
+              ${{ github.event.inputs.releaseDocument == 'true' && '--project document' || '' }} \
+              ${{ github.event.inputs.releaseNpm == 'true' && '--group npm' || '' }} \
+              --yes
+          fi
 
       - name: Cache Nx
         uses: actions/cache/save@v5
