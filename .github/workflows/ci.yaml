@@ -67,6 +67,7 @@ on:
         type: boolean
       releaseContainerType:
         type: choice
+        description: Mark the container tag as production or development
         options:
           - production
           - development
@@ -92,7 +93,7 @@ env:
 concurrency:
   group: >-
     ${{
-      ( 
+      (
         github.ref == 'refs/heads/main' ||
         github.ref == 'refs/heads/dev'
       ) && format('{0}-{1}', github.workflow, github.ref) ||
