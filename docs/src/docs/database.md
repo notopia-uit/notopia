@@ -1,5 +1,12 @@
 # Database Diagram
 
+:::info
+
+- (FK) is `NOT NULL` by default
+- Column marked with `N` mean nullable
+
+:::
+
 ## Note
 
 ```d2
@@ -93,9 +100,20 @@ revisions.note_id -> notes.id
 
 <!-- diagram id="database-diagram-note" -->
 
-:::info
+## Document
 
-- (FK) is `NOT NULL` by default
-- Column marked with `N` mean nullable
+```d2
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 3
+  }
+}
 
-:::
+documents: {
+  id: uuid {constraint: PK}
+  data: bytea
+
+  shape: sql_table
+}
+```
