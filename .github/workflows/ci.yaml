@@ -99,7 +99,6 @@ concurrency:
       ) && format('{0}-{1}', github.workflow, github.ref) ||
        github.run_id
      }}
-  cancel-in-progress: false
 
 jobs:
   main:
@@ -203,7 +202,7 @@ jobs:
       - name: Nx all
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKER_BUILDKIT: 'T'
+          DOCKER_BUILDKIT: 1
         run: |
           npx nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
             --target lint \

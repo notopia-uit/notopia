@@ -114,7 +114,7 @@
             "{projectName}"
           ],
           "env": {
-            "DOCKER_BUILDKIT": "${env.DOCKER_BUILDKIT}"
+            "DOCKER_BUILDKIT": "{env.DOCKER_BUILDKIT}"
           },
           "configurations": {
             "production": {
