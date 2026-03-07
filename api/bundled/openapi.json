@@ -1482,6 +1482,7 @@
           }
         },
         "required": [
+          "id",
           "name"
         ]
       },
@@ -1497,101 +1498,85 @@
         "maxLength": 255,
         "example": "Meeting Notes"
       },
-      "GraphNodeNote": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "note"
-            ],
-            "example": "note"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
-              },
-              "name": {
-                "$ref": "#/components/schemas/Note_properties-name"
-              },
-              "weight": {
-                "type": "number",
-                "maximum": 1,
-                "minimum": 0,
-                "example": 0.5
-              }
-            },
-            "required": [
-              "id",
-              "name",
-              "weight"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "GraphNodeTag": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "tag"
-            ],
-            "example": "tag"
-          },
-          "data": {
-            "$ref": "#/components/schemas/Tag"
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "GraphNode": {
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/GraphNodeNote"
-          },
-          {
-            "$ref": "#/components/schemas/GraphNodeTag"
-          }
-        ],
-        "discriminator": {
-          "propertyName": "type",
-          "mapping": {
-            "GraphNodeNote": "#/components/schemas/GraphNodeNote",
-            "GraphNodeTag": "#/components/schemas/GraphNodeTag"
-          }
-        }
-      },
-      "GraphRelation": {
-        "type": "array",
-        "items": {
-          "type": "string",
-          "format": "uuid",
-          "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-        }
-      },
       "Graph": {
         "type": "object",
         "properties": {
           "nodes": {
             "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/GraphNode"
+            "properties": {
+              "notes": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "$ref": "#/components/schemas/Note_properties-name"
+                    },
+                    "weight": {
+                      "type": "number",
+                      "maximum": 1,
+                      "minimum": 0,
+                      "example": 0.5
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "weight"
+                  ]
+                },
+                "example": {
+                  "46f94d4d-41b5-4df6-bf8d-270fb9a49c97": {
+                    "name": "Meeting Notes",
+                    "weight": 0.5
+                  }
+                }
+              },
+              "tags": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "$ref": "#/components/schemas/properties-name"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                },
+                "example": {
+                  "3e31fdf4-18bf-450b-98ee-a14652d922a2": {
+                    "name": "work"
+                  }
+                }
+              }
             }
           },
           "relations": {
             "type": "object",
             "additionalProperties": {
-              "$ref": "#/components/schemas/GraphRelation"
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "note",
+                      "tag"
+                    ],
+                    "example": "note"
+                  }
+                },
+                "required": [
+                  "id",
+                  "type"
+                ]
+              }
             }
           }
         }

@@ -6,7 +6,6 @@ package note
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -82,30 +81,18 @@ func (e FolderRenamedEventType) Valid() bool {
 	}
 }
 
-// Defines values for GraphNodeNoteType.
+// Defines values for GraphRelationsType.
 const (
-	GraphNodeNoteTypeNote GraphNodeNoteType = "note"
+	GraphRelationsTypeNote GraphRelationsType = "note"
+	GraphRelationsTypeTag  GraphRelationsType = "tag"
 )
 
-// Valid indicates whether the value is a known member of the GraphNodeNoteType enum.
-func (e GraphNodeNoteType) Valid() bool {
+// Valid indicates whether the value is a known member of the GraphRelationsType enum.
+func (e GraphRelationsType) Valid() bool {
 	switch e {
-	case GraphNodeNoteTypeNote:
+	case GraphRelationsTypeNote:
 		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for GraphNodeTagType.
-const (
-	GraphNodeTagTypeTag GraphNodeTagType = "tag"
-)
-
-// Valid indicates whether the value is a known member of the GraphNodeTagType enum.
-func (e GraphNodeTagType) Valid() bool {
-	switch e {
-	case GraphNodeTagTypeTag:
+	case GraphRelationsTypeTag:
 		return true
 	default:
 		return false
@@ -324,39 +311,23 @@ type FolderWithRelations struct {
 
 // Graph defines model for Graph.
 type Graph struct {
-	Nodes     *map[string]GraphNode     `json:"nodes,omitempty"`
-	Relations *map[string]GraphRelation `json:"relations,omitempty"`
+	Nodes *struct {
+		Notes *map[string]struct {
+			Name   NotePropertiesName `json:"name"`
+			Weight float32            `json:"weight"`
+		} `json:"notes,omitempty"`
+		Tags *map[string]struct {
+			Name PropertiesName `json:"name"`
+		} `json:"tags,omitempty"`
+	} `json:"nodes,omitempty"`
+	Relations *map[string][]struct {
+		Id   interface{}        `json:"id"`
+		Type GraphRelationsType `json:"type"`
+	} `json:"relations,omitempty"`
 }
 
-// GraphNode defines model for GraphNode.
-type GraphNode struct {
-	union json.RawMessage
-}
-
-// GraphNodeNote defines model for GraphNodeNote.
-type GraphNodeNote struct {
-	Data struct {
-		Id     *NotePropertiesId  `json:"id,omitempty"`
-		Name   NotePropertiesName `json:"name"`
-		Weight float32            `json:"weight"`
-	} `json:"data"`
-	Type GraphNodeNoteType `json:"type"`
-}
-
-// GraphNodeNoteType defines model for GraphNodeNote.Type.
-type GraphNodeNoteType string
-
-// GraphNodeTag defines model for GraphNodeTag.
-type GraphNodeTag struct {
-	Data Tag              `json:"data"`
-	Type GraphNodeTagType `json:"type"`
-}
-
-// GraphNodeTagType defines model for GraphNodeTag.Type.
-type GraphNodeTagType string
-
-// GraphRelation defines model for GraphRelation.
-type GraphRelation = []openapi_types.UUID
+// GraphRelationsType defines model for Graph.Relations.Type.
+type GraphRelationsType string
 
 // Note defines model for Note.
 type Note struct {
@@ -479,8 +450,8 @@ type RevisionPropertiesName = string
 
 // Tag defines model for Tag.
 type Tag struct {
-	Id   *openapi_types.UUID `json:"id,omitempty"`
-	Name string              `json:"name"`
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
 }
 
 // TrashedDeletedBy defines model for TrashedDeletedBy.
@@ -1264,95 +1235,6 @@ type TrashWorkspaceItemsJSONRequestBody TrashWorkspaceItemsJSONBody
 
 // UpdateWorkspaceCollaboratorsJSONRequestBody defines body for UpdateWorkspaceCollaborators for application/json ContentType.
 type UpdateWorkspaceCollaboratorsJSONRequestBody = UpdateWorkspaceCollaboratorsJSONBody
-
-// AsGraphNodeNote returns the union data inside the GraphNode as a GraphNodeNote
-func (t GraphNode) AsGraphNodeNote() (GraphNodeNote, error) {
-	var body GraphNodeNote
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromGraphNodeNote overwrites any union data inside the GraphNode as the provided GraphNodeNote
-func (t *GraphNode) FromGraphNodeNote(v GraphNodeNote) error {
-	v.Type = "GraphNodeNote"
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeGraphNodeNote performs a merge with any union data inside the GraphNode, using the provided GraphNodeNote
-func (t *GraphNode) MergeGraphNodeNote(v GraphNodeNote) error {
-	v.Type = "GraphNodeNote"
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-// AsGraphNodeTag returns the union data inside the GraphNode as a GraphNodeTag
-func (t GraphNode) AsGraphNodeTag() (GraphNodeTag, error) {
-	var body GraphNodeTag
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromGraphNodeTag overwrites any union data inside the GraphNode as the provided GraphNodeTag
-func (t *GraphNode) FromGraphNodeTag(v GraphNodeTag) error {
-	v.Type = "GraphNodeTag"
-	b, err := json.Marshal(v)
-	t.union = b
-	return err
-}
-
-// MergeGraphNodeTag performs a merge with any union data inside the GraphNode, using the provided GraphNodeTag
-func (t *GraphNode) MergeGraphNodeTag(v GraphNodeTag) error {
-	v.Type = "GraphNodeTag"
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
-func (t GraphNode) Discriminator() (string, error) {
-	var discriminator struct {
-		Discriminator string `json:"type"`
-	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
-}
-
-func (t GraphNode) ValueByDiscriminator() (interface{}, error) {
-	discriminator, err := t.Discriminator()
-	if err != nil {
-		return nil, err
-	}
-	switch discriminator {
-	case "GraphNodeNote":
-		return t.AsGraphNodeNote()
-	case "GraphNodeTag":
-		return t.AsGraphNodeTag()
-	default:
-		return nil, errors.New("unknown discriminator value: " + discriminator)
-	}
-}
-
-func (t GraphNode) MarshalJSON() ([]byte, error) {
-	b, err := t.union.MarshalJSON()
-	return b, err
-}
-
-func (t *GraphNode) UnmarshalJSON(b []byte) error {
-	err := t.union.UnmarshalJSON(b)
-	return err
-}
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {

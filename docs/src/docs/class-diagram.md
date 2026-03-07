@@ -16,20 +16,46 @@ package "Document" <<Bounded Context>> {
         data: Buffer
     }
 
+    record "TagModel" as Document.TagModel {
+        id: String
+        name: String
+    }
+
+    record "LinkModel" as Document.LinkModel {
+        documentId: String
+        type: Backlink | OutgoingLink
+    }
+
     class "DocumentModel" as Document.DocumentModel {
         name: String
         data: BlockNoteSchema[]
     }
 
-    interface "DocumentRepo" as Document.DocumentRepo {
+    interface "DocumentRepository" as Document.DocumentRepository {
         Save(document Document)
-        GetByID(documentID string) Document
+        GetByID(documentId string): Document
+    }
+
+    record "AttachmentUploadUrl" as Document.AttachmentUploadUrl {
+        id: string
+        url: string
     }
 
     interface "DocumentService" as Document.DocumentService {
-        CreateDocument(name string, data Buffer) Document
-        GetDocument(documentID string) Document
+        getTags(): TagModel[]
+        getLinks(): LinkModel[]
+        CreateDocument(name string, data Buffer): Document
+        GetDocument(documentId string): Document
+        GetAttachmentUploadUrl(): AttachmentUploadUrl
     }
+
+    class "DocumentServiceImpl" as Document.DocumentServiceImpl {
+        documentRepository: DocumentRepository
+        blockNoteEditor: BlockNoteEditor
+    }
+
+    DocumentServiceImpl --|> DocumentService
+    DocumentServiceImpl ..> DocumentRepository
 }
 
 'Syntax of golang'
@@ -57,30 +83,39 @@ package "Note" <<Bounded Context>> {
                 Delete()
             }
 
-            struct "FolderRelationship" as Note.Domain.Models.FolderRelationship <<Value Object>> {
-                parentID: *uuid.UUID
-                isRoot: bool
-            }
-
             struct "Folder" as Note.Domain.Models.Folder <<Aggregate Root>> {
                 id: uuid.UUID
                 name: string
+                icon: *string
                 workspaceID: uuid.UUID
-                folderRelationship: *FolderRelationship
+                folderRelationship: FolderRelationship
                 deletedBy: *DeletedBy
                 deletedAt: *time.Time
 
                 Rename(newName string)
+                ParentID() *uuid.UUID, bool
+                IsRoot() bool
                 MoveToFolder(folderID uuid.UUID)
                 Trash()
+            }
+
+            struct "FolderRelationship" as Note.Domain.Models.FolderRelationship <<Value Object>> {
+                parentID: *uuid.UUID
+                isRoot: bool
+
+                ParentID() *uuid.UUID, bool
+                IsRoot() bool
             }
 
             struct "Note" as Note.Domain.Models.Note <<Aggregate Root>> {
                 id: uuid.UUID
                 name: string
+                icon: *string
                 folderID: uuid.UUID
                 tagIDs: []uuid.UUID
-                currentRevisionID: uuid.UUID
+                outgoingLinks: []uuid.UUID
+                backlinks: []uuid.UUID
+                currentRevisionID: *uuid.UUID
                 deletedBy: *DeletedBy
                 deletedAt: *time.Time
 
@@ -94,19 +129,49 @@ package "Note" <<Bounded Context>> {
                 id: uuid.UUID
                 name: string
                 workspaceID: uuid.UUID
-                noteReferenceCount: int
-                deleted: bool
+                stats: TagStats
+
+                IncrementReference(delta int)
+                DecrementReference(delta int)
+                IsOrphaned() bool
+            }
+
+            struct "TagStats" as Note.Domain.Models.TagStats <<Value Object>> {
+                referenceCount: int
+                isExisting: bool
+
+                IncrementReference(delta int) TagStats
+                DecrementReference(delta int) TagStats
+                ReferenceCount() int
+                ShouldBePurged() bool
             }
 
             struct "Revision" as Note.Domain.Models.Revision <<Aggregate Root>> {
                 id: uuid.UUID
                 noteID: uuid.UUID
                 name: string
-                blockNoteContent: *string
+                content: RevisionContent
                 deletedAt: *time.Time
 
-                rename(newName)
+                rename(newName string)
             }
+
+            struct "RevisionContent" as Note.Domain.Models.RevisionContent <<Value Object>> {
+                blockNoteContent: string
+                size: int
+
+                BlockNoteContent() string
+                Size() int
+            }
+
+            Note.Domain.Models.Workspace "1" *... "1..*" Note.Domain.Models.Folder : contains
+            Note.Domain.Models.Folder "1" *-- "1" Note.Domain.Models.FolderRelationship : has
+            Note.Domain.Models.Folder "1" *... "0..*" Note.Domain.Models.Note : contains
+            Note.Domain.Models.Note "0..*" .. "0..*" Note.Domain.Models.Note : links
+            Note.Domain.Models.Note "1..*" ...o "0..*" Note.Domain.Models.Tag : contains
+            Note.Domain.Models.Tag "1" *-- "1" Note.Domain.Models.TagStats : has
+            Note.Domain.Models.Note "1" *... "0..*" Note.Domain.Models.Revision : has
+            Note.Domain.Models.Revision "1" *-- "1" Note.Domain.Models.RevisionContent : has
         }
 
         package "Repos" as Note.Domain.Repos {

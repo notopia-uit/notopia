@@ -42,7 +42,7 @@ export const zNote = z.object({
 export const zPropertiesName = z.string();
 
 export const zTag = z.object({
-    id: z.uuid().optional(),
+    id: z.uuid(),
     name: z.string()
 });
 
@@ -50,34 +50,20 @@ export const zNotePropertiesId = z.uuid().readonly();
 
 export const zNotePropertiesName = z.string().min(1).max(255);
 
-export const zGraphNodeNote = z.object({
-    type: z.enum(['note']),
-    data: z.object({
-        id: zNotePropertiesId,
-        name: zNotePropertiesName,
-        weight: z.number().gte(0).lte(1)
-    })
-});
-
-export const zGraphNodeTag = z.object({
-    type: z.enum(['tag']),
-    data: zTag
-});
-
-export const zGraphNode = z.union([
-    z.object({
-        type: z.literal('GraphNodeNote')
-    }).and(zGraphNodeNote),
-    z.object({
-        type: z.literal('GraphNodeTag')
-    }).and(zGraphNodeTag)
-]);
-
-export const zGraphRelation = z.array(z.uuid());
-
 export const zGraph = z.object({
-    nodes: z.record(z.string(), zGraphNode).optional(),
-    relations: z.record(z.string(), zGraphRelation).optional()
+    nodes: z.object({
+        notes: z.record(z.string(), z.object({
+            name: zNotePropertiesName,
+            weight: z.number().gte(0).lte(1)
+        })).optional(),
+        tags: z.record(z.string(), z.object({
+            name: zPropertiesName
+        })).optional()
+    }).optional(),
+    relations: z.record(z.string(), z.array(z.object({
+        id: z.unknown(),
+        type: z.enum(['note', 'tag'])
+    }))).optional()
 });
 
 export const zIcon = z.string().nullable();
@@ -248,28 +234,6 @@ export const zNoteWritable = z.object({
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
     folderId: z.uuid()
-});
-
-export const zGraphNodeNoteWritable = z.object({
-    type: z.enum(['note']),
-    data: z.object({
-        name: zNotePropertiesName,
-        weight: z.number().gte(0).lte(1)
-    })
-});
-
-export const zGraphNodeWritable = z.union([
-    z.object({
-        type: z.literal('GraphNodeNote')
-    }).and(zGraphNodeNoteWritable),
-    z.object({
-        type: z.literal('GraphNodeTag')
-    }).and(zGraphNodeTag)
-]);
-
-export const zGraphWritable = z.object({
-    nodes: z.record(z.string(), zGraphNodeWritable).optional(),
-    relations: z.record(z.string(), zGraphRelation).optional()
 });
 
 export const zNoteLinkWritable = z.object({

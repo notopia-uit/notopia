@@ -111,7 +111,7 @@
             "{projectName}"
           ],
           "configurations": {
-            "ci": {
+            "production": {
               "cwd": "{workspaceRoot}",
               "args": [
                 "-f",
@@ -187,7 +187,7 @@
           "skipVersionActions": true,
           "versionSchemes": {
             "production": "{currentDate|YYMM.DD.HHmm}",
-            "development": "{currentDate|YYMM.DD.HHmm}.{shortCommitSha}"
+            "development": "dev-{currentDate|YYMM.DD.HHmm}"
           }
         },
         "projectsRelationship": "independent",

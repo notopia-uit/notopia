@@ -53,7 +53,7 @@ export type Note = {
 export type PropertiesName = string;
 
 export type Tag = {
-    id?: string;
+    id: string;
     name: string;
 };
 
@@ -61,34 +61,25 @@ export type NotePropertiesId = string;
 
 export type NotePropertiesName = string;
 
-export type GraphNodeNote = {
-    type: 'note';
-    data: {
-        id: NotePropertiesId;
-        name: NotePropertiesName;
-        weight: number;
-    };
-};
-
-export type GraphNodeTag = {
-    type: 'tag';
-    data: Tag;
-};
-
-export type GraphNode = ({
-    type: 'GraphNodeNote';
-} & GraphNodeNote) | ({
-    type: 'GraphNodeTag';
-} & GraphNodeTag);
-
-export type GraphRelation = Array<string>;
-
 export type Graph = {
     nodes?: {
-        [key: string]: GraphNode;
+        notes?: {
+            [key: string]: {
+                name: NotePropertiesName;
+                weight: number;
+            };
+        };
+        tags?: {
+            [key: string]: {
+                name: PropertiesName;
+            };
+        };
     };
     relations?: {
-        [key: string]: GraphRelation;
+        [key: string]: Array<{
+            id: unknown;
+            type: 'note' | 'tag';
+        }>;
     };
 };
 
@@ -282,29 +273,6 @@ export type NoteWritable = {
     name: string;
     icon: string | null;
     folderId: string;
-};
-
-export type GraphNodeNoteWritable = {
-    type: 'note';
-    data: {
-        name: NotePropertiesName;
-        weight: number;
-    };
-};
-
-export type GraphNodeWritable = ({
-    type: 'GraphNodeNote';
-} & GraphNodeNoteWritable) | ({
-    type: 'GraphNodeTag';
-} & GraphNodeTag);
-
-export type GraphWritable = {
-    nodes?: {
-        [key: string]: GraphNodeWritable;
-    };
-    relations?: {
-        [key: string]: GraphRelation;
-    };
 };
 
 export type NoteLinkWritable = {

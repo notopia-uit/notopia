@@ -4,9 +4,56 @@ type: object
 properties:
   nodes:
     type: object
-    additionalProperties:
-      $ref: ./GraphNode.yaml
+    properties:
+      notes:
+        type: object
+        additionalProperties:
+          type: object
+          properties:
+            name:
+              $ref: ./Note.yaml#/properties/name
+            weight:
+              type: number
+              maximum: 1
+              minimum: 0
+              example: 0.5
+          required:
+            - name
+            - weight
+        example:
+          46f94d4d-41b5-4df6-bf8d-270fb9a49c97:
+            name: Meeting Notes
+            weight: 0.5
+
+      tags:
+        type: object
+        additionalProperties:
+          type: object
+          properties:
+            name:
+              $ref: ./Tag.yaml#/properties/name
+          required:
+            - name
+        example:
+          3e31fdf4-18bf-450b-98ee-a14652d922a2:
+            name: work
+
   relations:
     type: object
     additionalProperties:
-      $ref: ./GraphRelation.yaml
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            format: uuid
+            example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+          type:
+            type: string
+            enum:
+              - note
+              - tag
+            example: note
+        required:
+          - id
+          - type
