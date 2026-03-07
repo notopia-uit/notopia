@@ -20,6 +20,7 @@ const vitePressOptions = {
       configureDiagramsPlugin(md, {
         diagramsDir: 'src/public/diagrams',
         publicPath: '/notopia/diagrams',
+        excludedDiagramTypes: ['mermaid'],
         krokiServerUrl: process.env.CI
           ? undefined
           : process.env.KROKI_SERVER_URL,

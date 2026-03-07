@@ -57,10 +57,16 @@ package "Note" <<Bounded Context>> {
                 Delete()
             }
 
+            struct "FolderRelationship" as Note.Domain.Models.FolderRelationship <<Value Object>> {
+                parentID: *uuid.UUID
+                isRoot: bool
+            }
+
             struct "Folder" as Note.Domain.Models.Folder <<Aggregate Root>> {
                 id: uuid.UUID
                 name: string
-                parent: *Folder
+                workspaceID: uuid.UUID
+                folderRelationship: *FolderRelationship
                 deletedBy: *DeletedBy
                 deletedAt: *time.Time
 
@@ -87,7 +93,7 @@ package "Note" <<Bounded Context>> {
             struct "Tag" as Note.Domain.Models.Tag <<Aggregate Root>> {
                 id: uuid.UUID
                 name: string
-                noteReferenceIDs: []uuid.UUID
+                workspaceID: uuid.UUID
                 noteReferenceCount: int
                 deleted: bool
             }
