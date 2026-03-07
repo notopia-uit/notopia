@@ -215,7 +215,6 @@ jobs:
             --target bundle \
             --target build \
             --target test \
-            ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && '--target docker:build' || '' }} \
             ${{ (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && '--target deployPage' || '' }} \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
@@ -243,6 +242,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          npx nx run-many \
+            --target docker:build \
+            --parallel=${{env.NX_PARALLEL }} \
+            --configuration 'production'
+
           RELEASE_CONTAINER_TYPE="${{ github.event.inputs.releaseContainerType || 'development' }}"
           if [ "${{ github.event.inputs.releaseAll }}" = "true" ]; then
             npx nx release \
