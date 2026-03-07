@@ -237,13 +237,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          RELEASE_CONTAINER_TYPE="${{ github.event.inputs.releaseContainerType || 'development' }}"
           if [ "${{ github.event.inputs.releaseAll }}" = "true" ]; then
             npx nx release \
-              --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
+              --dockerVersionScheme=${RELEASE_CONTAINER_TYPE} \
               --yes
           else
             npx nx release \
-              --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
+              --dockerVersionScheme=${RELEASE_CONTAINER_TYPE} \
               ${{ (github.event_name == 'push' || github.event.inputs.releaseWeb == 'true') && '--projects web' || '' }} \
               ${{ (github.event_name == 'push' || github.event.inputs.releaseNote == 'true') && '--projects note' || '' }} \
               ${{ (github.event_name == 'push' || github.event.inputs.releaseDocument == 'true') && '--projects document' || '' }} \
