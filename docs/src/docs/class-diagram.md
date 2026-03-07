@@ -41,7 +41,11 @@ package "Document" <<Bounded Context>> {
         url: string
     }
 
-    interface "DocumentService" as Document.DocumentService {
+    class "DocumentService" as Document.DocumentService {
+        documentRepository: DocumentRepository
+        blockNoteEditor: BlockNoteEditor
+        atachmentService: AttachmentService
+
         getTags(): TagModel[]
         getLinks(): LinkModel[]
         CreateDocument(name string, data Buffer): Document
@@ -49,13 +53,7 @@ package "Document" <<Bounded Context>> {
         GetAttachmentUploadUrl(): AttachmentUploadUrl
     }
 
-    class "DocumentServiceImpl" as Document.DocumentServiceImpl {
-        documentRepository: DocumentRepository
-        blockNoteEditor: BlockNoteEditor
-    }
-
-    DocumentServiceImpl --|> DocumentService
-    DocumentServiceImpl ..> DocumentRepository
+    DocumentService ..> DocumentRepository
 }
 
 'Syntax of golang'
