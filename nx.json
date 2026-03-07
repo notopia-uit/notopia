@@ -42,6 +42,9 @@
     },
     "lint*": {
       "cache": true
+    },
+    "docker:build": {
+      "dependsOn": []
     }
   },
   "plugins": [
