@@ -203,7 +203,7 @@ jobs:
       - name: Nx all
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKER_BUILDKIT: 'true'
+          DOCKER_BUILDKIT: 'T'
         run: |
           npx nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
             --target lint \
