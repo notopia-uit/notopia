@@ -169,10 +169,8 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
         if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
-
-      - name: Use Docker Buildx builder
-        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
-        run: docker buildx use default
+        with:
+          install: true
 
       - name: Derive SHAs for Nx Affected
         id: set-shas
@@ -206,7 +204,6 @@ jobs:
       - name: Nx all
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKER_BUILDKIT: 1
         run: |
           npx nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
             --target lint \
@@ -242,7 +239,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx nx run-many \
+          DOCKER_BUILDKIT=1 npx nx run-many \
             --target docker:build \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production'

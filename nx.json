@@ -42,9 +42,6 @@
     },
     "lint*": {
       "cache": true
-    },
-    "docker:build": {
-      "cache": false
     }
   },
   "plugins": [
