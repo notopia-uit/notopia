@@ -238,7 +238,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BUILDX_BUILDER=${{ steps.setup-buildx.outputs.name }} npx nx run-many \
+          BUILDX_BUILDER=${{ steps.setup-buildx.outputs.name }} \
+          DOCKER_BUILDKIT=1 \
+          npx nx run-many \
             --target docker:build \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production'
