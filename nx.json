@@ -96,6 +96,7 @@
         "buildTarget": {
           "name": "docker:build",
           "cwd": "{workspaceRoot}",
+          "skipDefaultTag": true,
           "args": [
             "-f",
             "{projectRoot}/Dockerfile",
@@ -110,9 +111,6 @@
             "--tag",
             "{projectName}"
           ],
-          "env": {
-            "DOCKER_BUILDKIT": "{env.DOCKER_BUILDKIT}"
-          },
           "configurations": {
             "production": {
               "args": [
@@ -130,7 +128,10 @@
                 "{projectName}",
                 "--cache-from=type=registry,ref=ghcr.io/notopia-uit/notopia/{projectName}:buildcache",
                 "--cache-to=type=registry,ref=ghcr.io/notopia-uit/notopia/{projectName}:buildcache,mode=max,image-manifest=true"
-              ]
+              ],
+              "env": {
+                "DOCKER_BUILDKIT": "1"
+              }
             }
           }
         },
