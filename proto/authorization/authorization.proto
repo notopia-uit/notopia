@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package authorization;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/empty.proto";
+
+service AuthorizationService {
+  rpc CreateWorkspaceWithOwner(CreateWorkspaceWithOwnerRequest) returns (CreateWorkspaceWithOwnerResponse);
+  rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns (GetWorkspaceMembersResponse);
+  rpc HasWorkspacePermission(HasWorkspacePermissionRequest) returns (HasWorkspacePermissionResponse);
+  rpc UpdateWorkspaceMembers(UpdateWorkspaceMembersRequest) returns (UpdateWorkspaceMembersResponse);
+  rpc HasNotePermission(HasNotePermissionRequest) returns (HasNotePermissionResponse);
+}
+
+message CreateWorkspaceWithOwnerRequest {
+  string workspace_id = 1 [(buf.validate.field).required = true];
+  string owner_id = 2 [(buf.validate.field).required = true];
+}
+
+message CreateWorkspaceWithOwnerResponse {
+  google.protobuf.Empty empty = 1;
+}
+
+message GetWorkspaceMembersRequest {
+  string workspace_id = 1 [(buf.validate.field).required = true];
+}
+
+message GetWorkspaceMembersResponse {
+  repeated WorkspaceMember members = 1 [(buf.validate.field).required = true];
+}
+
+message WorkspaceMember {
+  string id = 1 [(buf.validate.field).required = true];
+  string role = 2 [(buf.validate.field).required = true];
+}
+
+message HasWorkspacePermissionRequest {
+  string member_id = 1 [(buf.validate.field).required = true];
+  string workspace_id = 2 [(buf.validate.field).required = true];
+  string permission = 3 [(buf.validate.field).required = true];
+}
+
+message HasWorkspacePermissionResponse {
+  bool has_permission = 1 [(buf.validate.field).required = true];
+}
+
+message UpdateWorkspaceMembersRequest {
+  string workspace_id = 1 [(buf.validate.field).required = true];
+  repeated WorkspaceMember members = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateWorkspaceMembersResponse {
+  google.protobuf.Empty empty = 1;
+}
+
+message HasNotePermissionRequest {
+  string member_id = 1 [(buf.validate.field).required = true];
+  string note_id = 2 [(buf.validate.field).required = true];
+  string permission = 3 [(buf.validate.field).required = true];
+}
+
+message HasNotePermissionResponse {
+  bool has_permission = 1 [(buf.validate.field).required = true];
+}

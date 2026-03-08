@@ -36,7 +36,6 @@ const vitePressOptions = {
         target: '_self',
         rel: 'noopener',
       },
-      { text: 'Docs', link: '/docs' },
       {
         text: 'Scalar API',
         link: '/api/index.html',

@@ -1,5 +1,26 @@
 # vim: ft=yaml.openapi
-post:
+get:
+  security:
+    - Oauth2: []
+  tags:
+    - Workspace
+  summary: Get workspace members
+  operationId: getWorkspaceMembers
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  responses:
+    200:
+      $ref: ../components/responses/GetWorkspaceMembersResponse.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml
+
+put:
   security:
     - Oauth2: []
   tags:

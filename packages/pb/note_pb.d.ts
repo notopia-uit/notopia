@@ -4,7 +4,6 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
 
 /**
  * Describes the file note.proto.
@@ -12,9 +11,9 @@ import type { Timestamp } from "@bufbuild/protobuf/wkt";
 export declare const file_note: GenFile;
 
 /**
- * @generated from message note.GetNoteRequest
+ * @generated from message note.GetLatestNoteContentRequest
  */
-export declare type GetNoteRequest = Message<"note.GetNoteRequest"> & {
+export declare type GetLatestNoteContentRequest = Message<"note.GetLatestNoteContentRequest"> & {
   /**
    * @generated from field: string id = 1;
    */
@@ -22,69 +21,38 @@ export declare type GetNoteRequest = Message<"note.GetNoteRequest"> & {
 };
 
 /**
- * Describes the message note.GetNoteRequest.
- * Use `create(GetNoteRequestSchema)` to create a new message.
+ * Describes the message note.GetLatestNoteContentRequest.
+ * Use `create(GetLatestNoteContentRequestSchema)` to create a new message.
  */
-export declare const GetNoteRequestSchema: GenMessage<GetNoteRequest>;
+export declare const GetLatestNoteContentRequestSchema: GenMessage<GetLatestNoteContentRequest>;
 
 /**
- * @generated from message note.GetNoteResponse
+ * @generated from message note.GetLatestNoteContentResponse
  */
-export declare type GetNoteResponse = Message<"note.GetNoteResponse"> & {
+export declare type GetLatestNoteContentResponse = Message<"note.GetLatestNoteContentResponse"> & {
   /**
-   * @generated from field: note.Note note = 1;
+   * @generated from field: string content = 1;
    */
-  note?: Note;
+  content: string;
 };
 
 /**
- * Describes the message note.GetNoteResponse.
- * Use `create(GetNoteResponseSchema)` to create a new message.
+ * Describes the message note.GetLatestNoteContentResponse.
+ * Use `create(GetLatestNoteContentResponseSchema)` to create a new message.
  */
-export declare const GetNoteResponseSchema: GenMessage<GetNoteResponse>;
-
-/**
- * @generated from message note.Note
- */
-export declare type Note = Message<"note.Note"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
-   * @generated from field: string title = 2;
-   */
-  title: string;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 3;
-   */
-  createdAt?: Timestamp;
-
-  /**
-   * @generated from field: optional google.protobuf.Timestamp updated_at = 4;
-   */
-  updatedAt?: Timestamp;
-};
-
-/**
- * Describes the message note.Note.
- * Use `create(NoteSchema)` to create a new message.
- */
-export declare const NoteSchema: GenMessage<Note>;
+export declare const GetLatestNoteContentResponseSchema: GenMessage<GetLatestNoteContentResponse>;
 
 /**
  * @generated from service note.NoteService
  */
 export declare const NoteService: GenService<{
   /**
-   * @generated from rpc note.NoteService.GetNote
+   * @generated from rpc note.NoteService.GetLatestNoteContent
    */
-  getNote: {
+  getLatestNoteContent: {
     methodKind: "unary";
-    input: typeof GetNoteRequestSchema;
-    output: typeof GetNoteResponseSchema;
+    input: typeof GetLatestNoteContentRequestSchema;
+    output: typeof GetLatestNoteContentResponseSchema;
   },
 }>;
 

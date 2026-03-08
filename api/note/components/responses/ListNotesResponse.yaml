@@ -15,11 +15,10 @@ content:
           x-example:
             $ref: ../examples/ListNoteResponseData.yaml
         pagination:
-          allOf:
-            - $ref: ../../../common/components/schemas/Pagination.yaml
-            - description: Pagination details for the list of notes
-              example:
-                $ref: ../examples/ListNoteResponsePagination.yaml
+          $ref: ../../../common/components/schemas/Pagination.yaml
+          description: Pagination details for the list of notes
+          example:
+            $ref: ../examples/ListNoteResponsePagination.yaml
       required:
         - data
         - pagination

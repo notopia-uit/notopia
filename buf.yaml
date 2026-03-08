@@ -3,6 +3,8 @@ version: v2
 modules:
   - path: ./proto/note/
     name: notopia/notopia/note
+  - path: ./proto/authorization/
+    name: notopia/notopia/authorization
 lint:
   use:
     - STANDARD

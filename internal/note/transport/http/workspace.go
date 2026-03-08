@@ -44,6 +44,20 @@ func (h *StrictHandler) GetWorkspaceGraph(
 	return nil, errors.New("not implemented")
 }
 
+func (h *StrictHandler) GetWorkspaceMembers(
+	ctx context.Context,
+	request note.GetWorkspaceMembersRequestObject,
+) (note.GetWorkspaceMembersResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) UpdateWorkspaceMembers(
+	ctx context.Context,
+	request note.UpdateWorkspaceMembersRequestObject,
+) (note.UpdateWorkspaceMembersResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
 func (h *StrictHandler) MoveWorkspaceItems(
 	ctx context.Context,
 	request note.MoveWorkspaceItemsRequestObject,
@@ -76,12 +90,5 @@ func (h *StrictHandler) UnpublishWorkspace(
 	ctx context.Context,
 	request note.UnpublishWorkspaceRequestObject,
 ) (note.UnpublishWorkspaceResponseObject, error) {
-	return nil, errors.New("not implemented")
-}
-
-func (h *StrictHandler) UpdateWorkspaceMembers(
-	ctx context.Context,
-	request note.UpdateWorkspaceMembersRequestObject,
-) (note.UpdateWorkspaceMembersResponseObject, error) {
 	return nil, errors.New("not implemented")
 }

@@ -24,9 +24,9 @@ properties:
     format: uuid
     example: 123e4567-e89b-12d3-a456-426614174000
 
-  currentRevision:
-    $ref: ./Revision.yaml
-    readOnly: true
+  content:
+    $ref: ./NoteContent.yaml
+    nullable: true
 
   backlinksCount:
     type: integer
@@ -45,6 +45,5 @@ required:
   - name
   - icon
   - folderId
-  - currentRevision
   - backlinksCount
   - outgoingLinksCount

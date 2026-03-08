@@ -33,19 +33,14 @@ export type PropertiesId = string;
 
 export type Name = string;
 
-export type Revision = {
-    readonly id: string;
-    name: string | null;
-    blockNoteContent: string | null;
-    readonly createdAt: string;
-};
+export type NoteContent = string | null;
 
 export type Note = {
     readonly id: string;
     name: string;
     icon: string | null;
     folderId: string;
-    currentRevision: Revision;
+    content?: NoteContent;
     readonly backlinksCount: number;
     readonly outgoingLinksCount: number;
 };
@@ -94,6 +89,13 @@ export type NoteLink = {
     id: NotePropertiesId;
     name: NotePropertiesName;
     icon: Icon;
+};
+
+export type Revision = {
+    readonly id: string;
+    name: string | null;
+    content: NoteContent;
+    readonly createdAt: string;
 };
 
 export type Pagination = {
@@ -220,6 +222,24 @@ export type WorkspaceRenamedEvent = {
     };
 };
 
+/**
+ * User ID from Authentik
+ */
+export type UserPropertiesId = string;
+
+export const WorkspaceRole = {
+    OWNER: 'owner',
+    EDITOR: 'editor',
+    VIEWER: 'viewer'
+} as const;
+
+export type WorkspaceRole = typeof WorkspaceRole[keyof typeof WorkspaceRole];
+
+export type WorkspaceMember = {
+    id: UserPropertiesId;
+    role: WorkspaceRole;
+};
+
 export const TrashedDeletedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
 
 export type TrashedDeletedBy = typeof TrashedDeletedBy[keyof typeof TrashedDeletedBy];
@@ -254,39 +274,27 @@ export type WorkspaceTreeFolder = {
     children: Array<WorkspaceTreeFolder>;
 };
 
-/**
- * User ID from Authentik
- */
-export type UserPropertiesId = string;
-
-export const WorkspaceRole = {
-    OWNER: 'owner',
-    EDITOR: 'editor',
-    VIEWER: 'viewer'
-} as const;
-
-export type WorkspaceRole = typeof WorkspaceRole[keyof typeof WorkspaceRole];
-
 export type FolderWritable = {
     name: string;
     icon: string | null;
     parentId: string;
 };
 
-export type RevisionWritable = {
-    name: string | null;
-    blockNoteContent: string | null;
-};
-
 export type NoteWritable = {
     name: string;
     icon: string | null;
     folderId: string;
+    content?: NoteContent;
 };
 
 export type NoteLinkWritable = {
     name: NotePropertiesName;
     icon: Icon;
+};
+
+export type RevisionWritable = {
+    name: string | null;
+    content: NoteContent;
 };
 
 export type WorkspaceWritable = {
@@ -386,10 +394,6 @@ export type DocumentIdPath = string;
 
 export type FolderIdPath = PropertiesId;
 
-export type NoteIdPath = NotePropertiesId;
-
-export type NoteIdQuery = NotePropertiesId;
-
 /**
  * Page number for pagination
  */
@@ -399,6 +403,10 @@ export type PageQuery = number;
  * Number of items per page
  */
 export type LimitQuery = number;
+
+export type NoteIdPath = NotePropertiesId;
+
+export type NoteIdQuery = NotePropertiesId;
 
 export type RevisionIdPath = RevisionPropertiesId;
 
@@ -435,6 +443,8 @@ export type RenameRevisionRequest = {
 
 export type CreateWorkspaceRequest = WorkspaceWritable;
 
+export type UpdateWorkspaceMembers = Array<WorkspaceMember>;
+
 export type MoveWorkspaceItemsRequest = {
     noteIds?: Array<NotePropertiesId>;
     folderIds?: Array<PropertiesId>;
@@ -453,11 +463,6 @@ export type TrashWorkspaceItemsRequest = {
     notes?: Array<TrashedNoteWritable>;
     folders?: Array<TrashedFolderWritable>;
 };
-
-export type UpdateWorkspaceMembers = Array<{
-    userId: UserPropertiesId;
-    role: WorkspaceRole;
-}>;
 
 export type ImportDocumentsData = {
     body: ImportDocumentsRequest;
@@ -647,6 +652,49 @@ export type RenameFolderResponses = {
 };
 
 export type RenameFolderResponse = RenameFolderResponses[keyof RenameFolderResponses];
+
+export type GetNotesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Page number for pagination
+         */
+        page?: number;
+        /**
+         * Number of items per page
+         */
+        limit?: number;
+        tags?: Array<string>;
+    };
+    url: '/note/notes';
+};
+
+export type GetNotesErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: Error;
+    /**
+     * Unauthorized Error response
+     */
+    401: Error;
+    /**
+     * Internal Server Error response
+     */
+    500: Error;
+};
+
+export type GetNotesError = GetNotesErrors[keyof GetNotesErrors];
+
+export type GetNotesResponses = {
+    /**
+     * Successful response
+     */
+    200: Note;
+};
+
+export type GetNotesResponse = GetNotesResponses[keyof GetNotesResponses];
 
 export type CreateNoteData = {
     body: CreateNoteRequest;
@@ -1466,6 +1514,84 @@ export type GetWorkspaceGraphResponses = {
 
 export type GetWorkspaceGraphResponse = GetWorkspaceGraphResponses[keyof GetWorkspaceGraphResponses];
 
+export type GetWorkspaceMembersData = {
+    body?: never;
+    path: {
+        workspaceId: Id;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceId}/members';
+};
+
+export type GetWorkspaceMembersErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: Error;
+    /**
+     * Unauthorized Error response
+     */
+    401: Error;
+    /**
+     * Not Found Error response
+     */
+    404: Error;
+    /**
+     * Internal Server Error response
+     */
+    500: Error;
+};
+
+export type GetWorkspaceMembersError = GetWorkspaceMembersErrors[keyof GetWorkspaceMembersErrors];
+
+export type GetWorkspaceMembersResponses = {
+    /**
+     * A list of workspace members
+     */
+    200: Array<WorkspaceMember>;
+};
+
+export type GetWorkspaceMembersResponse = GetWorkspaceMembersResponses[keyof GetWorkspaceMembersResponses];
+
+export type UpdateWorkspaceMembersData = {
+    body: UpdateWorkspaceMembers;
+    path: {
+        workspaceId: Id;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceId}/members';
+};
+
+export type UpdateWorkspaceMembersErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: Error;
+    /**
+     * Unauthorized Error response
+     */
+    401: Error;
+    /**
+     * Not Found Error response
+     */
+    404: Error;
+    /**
+     * Internal Server Error response
+     */
+    500: Error;
+};
+
+export type UpdateWorkspaceMembersError = UpdateWorkspaceMembersErrors[keyof UpdateWorkspaceMembersErrors];
+
+export type UpdateWorkspaceMembersResponses = {
+    /**
+     * Workspace members updated successfully
+     */
+    204: void;
+};
+
+export type UpdateWorkspaceMembersResponse = UpdateWorkspaceMembersResponses[keyof UpdateWorkspaceMembersResponses];
+
 export type MoveWorkspaceItemsData = {
     body: MoveWorkspaceItemsRequest;
     path: {
@@ -1783,42 +1909,3 @@ export type UnpublishWorkspaceResponses = {
 };
 
 export type UnpublishWorkspaceResponse = UnpublishWorkspaceResponses[keyof UnpublishWorkspaceResponses];
-
-export type UpdateWorkspaceMembersData = {
-    body: UpdateWorkspaceMembers;
-    path: {
-        workspaceId: Id;
-    };
-    query?: never;
-    url: '/note/workspaces/{workspaceId}/update-members';
-};
-
-export type UpdateWorkspaceMembersErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: Error;
-    /**
-     * Unauthorized Error response
-     */
-    401: Error;
-    /**
-     * Not Found Error response
-     */
-    404: Error;
-    /**
-     * Internal Server Error response
-     */
-    500: Error;
-};
-
-export type UpdateWorkspaceMembersError = UpdateWorkspaceMembersErrors[keyof UpdateWorkspaceMembersErrors];
-
-export type UpdateWorkspaceMembersResponses = {
-    /**
-     * Workspace members updated successfully
-     */
-    204: void;
-};
-
-export type UpdateWorkspaceMembersResponse = UpdateWorkspaceMembersResponses[keyof UpdateWorkspaceMembersResponses];

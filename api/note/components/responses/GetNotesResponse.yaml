@@ -1,0 +1,6 @@
+# vim: ft=yaml.openapi
+description: Successful response
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/Note.yaml

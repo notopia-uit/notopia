@@ -2,8 +2,8 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ApplyRevisionData, ApplyRevisionErrors, ApplyRevisionResponses, CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateNoteData, CreateNoteErrors, CreateNoteResponses, CreateWorkspaceData, CreateWorkspaceErrors, CreateWorkspaceResponses, DeleteNoteData, DeleteNoteErrors, DeleteNoteResponses, DeleteRevisionData, DeleteRevisionErrors, DeleteRevisionResponses, DeleteWorkspaceData, DeleteWorkspaceErrors, DeleteWorkspaceResponses, GenerateDailyNoteData, GenerateDailyNoteErrors, GenerateDailyNoteResponses, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlErrors, GetDocumentAttachmentUploadUrlResponses, GetNoteData, GetNoteErrors, GetNoteGraphData, GetNoteGraphErrors, GetNoteGraphResponses, GetNoteLinksData, GetNoteLinksErrors, GetNoteLinksResponses, GetNoteResponses, GetRevisionData, GetRevisionErrors, GetRevisionResponses, GetRevisionsData, GetRevisionsErrors, GetRevisionsResponses, GetWorkspaceData, GetWorkspaceErrors, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponses, GetWorkspaceGraphData, GetWorkspaceGraphErrors, GetWorkspaceGraphResponses, GetWorkspaceResponses, GetWorkspaceTreeData, GetWorkspaceTreeErrors, GetWorkspaceTreeResponses, ImportDocumentsData, ImportDocumentsErrors, ImportDocumentsResponses, MoveWorkspaceItemsData, MoveWorkspaceItemsErrors, MoveWorkspaceItemsResponses, PublishNoteData, PublishNoteErrors, PublishNoteResponses, PublishWorkspaceData, PublishWorkspaceErrors, PublishWorkspaceResponses, RenameFolderData, RenameFolderErrors, RenameFolderResponses, RenameNoteData, RenameNoteErrors, RenameNoteResponses, RenameRevisionData, RenameRevisionErrors, RenameRevisionResponses, RenameWorkspaceData, RenameWorkspaceErrors, RenameWorkspaceResponses, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsErrors, RestoreTrashedWorkspaceItemsResponses, SearchTagsData, SearchTagsErrors, SearchTagsResponses, ShowTrashData, ShowTrashErrors, ShowTrashResponses, TrashWorkspaceItemsData, TrashWorkspaceItemsErrors, TrashWorkspaceItemsResponses, UnpublishNoteData, UnpublishNoteErrors, UnpublishNoteResponses, UnpublishWorkspaceData, UnpublishWorkspaceErrors, UnpublishWorkspaceResponses, UpdateWorkspaceMembersData, UpdateWorkspaceMembersErrors, UpdateWorkspaceMembersResponses, WsDocumentData, WsDocumentErrors, WsDocumentResponses } from './types.gen';
-import { zApplyRevisionData, zApplyRevisionResponse, zCreateFolderData, zCreateNoteData, zCreateWorkspaceData, zDeleteNoteData, zDeleteNoteResponse, zDeleteRevisionData, zDeleteRevisionResponse, zDeleteWorkspaceData, zDeleteWorkspaceResponse, zGenerateDailyNoteData, zGetDocumentAttachmentUploadUrlData, zGetDocumentAttachmentUploadUrlResponse, zGetNoteData, zGetNoteGraphData, zGetNoteGraphResponse, zGetNoteLinksData, zGetNoteLinksResponse, zGetNoteResponse, zGetRevisionData, zGetRevisionResponse, zGetRevisionsData, zGetRevisionsResponse, zGetWorkspaceData, zGetWorkspaceEventsData, zGetWorkspaceEventsResponse, zGetWorkspaceGraphData, zGetWorkspaceGraphResponse, zGetWorkspaceResponse, zGetWorkspaceTreeData, zGetWorkspaceTreeResponse, zImportDocumentsData, zMoveWorkspaceItemsData, zMoveWorkspaceItemsResponse, zPublishNoteData, zPublishNoteResponse, zPublishWorkspaceData, zPublishWorkspaceResponse, zRenameFolderData, zRenameFolderResponse, zRenameNoteData, zRenameNoteResponse, zRenameRevisionData, zRenameRevisionResponse, zRenameWorkspaceData, zRenameWorkspaceResponse, zRestoreTrashedWorkspaceItemsData, zRestoreTrashedWorkspaceItemsResponse, zSearchTagsData, zSearchTagsResponse, zShowTrashData, zShowTrashResponse, zTrashWorkspaceItemsData, zTrashWorkspaceItemsResponse, zUnpublishNoteData, zUnpublishNoteResponse, zUnpublishWorkspaceData, zUnpublishWorkspaceResponse, zUpdateWorkspaceMembersData, zUpdateWorkspaceMembersResponse, zWsDocumentData } from './zod.gen';
+import type { ApplyRevisionData, ApplyRevisionErrors, ApplyRevisionResponses, CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateNoteData, CreateNoteErrors, CreateNoteResponses, CreateWorkspaceData, CreateWorkspaceErrors, CreateWorkspaceResponses, DeleteNoteData, DeleteNoteErrors, DeleteNoteResponses, DeleteRevisionData, DeleteRevisionErrors, DeleteRevisionResponses, DeleteWorkspaceData, DeleteWorkspaceErrors, DeleteWorkspaceResponses, GenerateDailyNoteData, GenerateDailyNoteErrors, GenerateDailyNoteResponses, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlErrors, GetDocumentAttachmentUploadUrlResponses, GetNoteData, GetNoteErrors, GetNoteGraphData, GetNoteGraphErrors, GetNoteGraphResponses, GetNoteLinksData, GetNoteLinksErrors, GetNoteLinksResponses, GetNoteResponses, GetNotesData, GetNotesErrors, GetNotesResponses, GetRevisionData, GetRevisionErrors, GetRevisionResponses, GetRevisionsData, GetRevisionsErrors, GetRevisionsResponses, GetWorkspaceData, GetWorkspaceErrors, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponses, GetWorkspaceGraphData, GetWorkspaceGraphErrors, GetWorkspaceGraphResponses, GetWorkspaceMembersData, GetWorkspaceMembersErrors, GetWorkspaceMembersResponses, GetWorkspaceResponses, GetWorkspaceTreeData, GetWorkspaceTreeErrors, GetWorkspaceTreeResponses, ImportDocumentsData, ImportDocumentsErrors, ImportDocumentsResponses, MoveWorkspaceItemsData, MoveWorkspaceItemsErrors, MoveWorkspaceItemsResponses, PublishNoteData, PublishNoteErrors, PublishNoteResponses, PublishWorkspaceData, PublishWorkspaceErrors, PublishWorkspaceResponses, RenameFolderData, RenameFolderErrors, RenameFolderResponses, RenameNoteData, RenameNoteErrors, RenameNoteResponses, RenameRevisionData, RenameRevisionErrors, RenameRevisionResponses, RenameWorkspaceData, RenameWorkspaceErrors, RenameWorkspaceResponses, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsErrors, RestoreTrashedWorkspaceItemsResponses, SearchTagsData, SearchTagsErrors, SearchTagsResponses, ShowTrashData, ShowTrashErrors, ShowTrashResponses, TrashWorkspaceItemsData, TrashWorkspaceItemsErrors, TrashWorkspaceItemsResponses, UnpublishNoteData, UnpublishNoteErrors, UnpublishNoteResponses, UnpublishWorkspaceData, UnpublishWorkspaceErrors, UnpublishWorkspaceResponses, UpdateWorkspaceMembersData, UpdateWorkspaceMembersErrors, UpdateWorkspaceMembersResponses, WsDocumentData, WsDocumentErrors, WsDocumentResponses } from './types.gen';
+import { zApplyRevisionData, zApplyRevisionResponse, zCreateFolderData, zCreateNoteData, zCreateWorkspaceData, zDeleteNoteData, zDeleteNoteResponse, zDeleteRevisionData, zDeleteRevisionResponse, zDeleteWorkspaceData, zDeleteWorkspaceResponse, zGenerateDailyNoteData, zGetDocumentAttachmentUploadUrlData, zGetDocumentAttachmentUploadUrlResponse, zGetNoteData, zGetNoteGraphData, zGetNoteGraphResponse, zGetNoteLinksData, zGetNoteLinksResponse, zGetNoteResponse, zGetNotesData, zGetNotesResponse, zGetRevisionData, zGetRevisionResponse, zGetRevisionsData, zGetRevisionsResponse, zGetWorkspaceData, zGetWorkspaceEventsData, zGetWorkspaceEventsResponse, zGetWorkspaceGraphData, zGetWorkspaceGraphResponse, zGetWorkspaceMembersData, zGetWorkspaceMembersResponse, zGetWorkspaceResponse, zGetWorkspaceTreeData, zGetWorkspaceTreeResponse, zImportDocumentsData, zMoveWorkspaceItemsData, zMoveWorkspaceItemsResponse, zPublishNoteData, zPublishNoteResponse, zPublishWorkspaceData, zPublishWorkspaceResponse, zRenameFolderData, zRenameFolderResponse, zRenameNoteData, zRenameNoteResponse, zRenameRevisionData, zRenameRevisionResponse, zRenameWorkspaceData, zRenameWorkspaceResponse, zRestoreTrashedWorkspaceItemsData, zRestoreTrashedWorkspaceItemsResponse, zSearchTagsData, zSearchTagsResponse, zShowTrashData, zShowTrashResponse, zTrashWorkspaceItemsData, zTrashWorkspaceItemsResponse, zUnpublishNoteData, zUnpublishNoteResponse, zUnpublishWorkspaceData, zUnpublishWorkspaceResponse, zUpdateWorkspaceMembersData, zUpdateWorkspaceMembersResponse, zWsDocumentData } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -83,6 +83,17 @@ export const renameFolder = <ThrowOnError extends boolean = false>(options: Opti
         'Content-Type': 'application/json',
         ...options.headers
     }
+});
+
+/**
+ * Get notes
+ */
+export const getNotes = <ThrowOnError extends boolean = false>(options?: Options<GetNotesData, ThrowOnError>) => (options?.client ?? client).get<GetNotesResponses, GetNotesErrors, ThrowOnError>({
+    requestValidator: async (data) => await zGetNotesData.parseAsync(data),
+    responseValidator: async (data) => await zGetNotesResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/notes',
+    ...options
 });
 
 /**
@@ -327,6 +338,32 @@ export const getWorkspaceGraph = <ThrowOnError extends boolean = false>(options:
 });
 
 /**
+ * Get workspace members
+ */
+export const getWorkspaceMembers = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceMembersData, ThrowOnError>) => (options.client ?? client).get<GetWorkspaceMembersResponses, GetWorkspaceMembersErrors, ThrowOnError>({
+    requestValidator: async (data) => await zGetWorkspaceMembersData.parseAsync(data),
+    responseValidator: async (data) => await zGetWorkspaceMembersResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}/members',
+    ...options
+});
+
+/**
+ * Update workspace members
+ */
+export const updateWorkspaceMembers = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceMembersData, ThrowOnError>) => (options.client ?? client).put<UpdateWorkspaceMembersResponses, UpdateWorkspaceMembersErrors, ThrowOnError>({
+    requestValidator: async (data) => await zUpdateWorkspaceMembersData.parseAsync(data),
+    responseValidator: async (data) => await zUpdateWorkspaceMembersResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}/members',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Move workspace's items
  */
 export const moveWorkspaceItems = <ThrowOnError extends boolean = false>(options: Options<MoveWorkspaceItemsData, ThrowOnError>) => (options.client ?? client).post<MoveWorkspaceItemsResponses, MoveWorkspaceItemsErrors, ThrowOnError>({
@@ -428,19 +465,4 @@ export const unpublishWorkspace = <ThrowOnError extends boolean = false>(options
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/unpublish',
     ...options
-});
-
-/**
- * Update workspace members
- */
-export const updateWorkspaceMembers = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceMembersData, ThrowOnError>) => (options.client ?? client).post<UpdateWorkspaceMembersResponses, UpdateWorkspaceMembersErrors, ThrowOnError>({
-    requestValidator: async (data) => await zUpdateWorkspaceMembersData.parseAsync(data),
-    responseValidator: async (data) => await zUpdateWorkspaceMembersResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceId}/update-members',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
 });

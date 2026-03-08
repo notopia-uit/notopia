@@ -1,0 +1,8 @@
+# vim: ft=yaml.openapi
+name: withContent
+in: query
+required: false
+schema:
+  type: boolean
+  default: false
+  example: true

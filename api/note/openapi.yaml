@@ -69,6 +69,8 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_events.yaml
   /note/workspaces/{workspaceId}/graph:
     $ref: ./paths/workspaces_{workspaceId}_graph.yaml
+  /note/workspaces/{workspaceId}/members:
+    $ref: ./paths/workspaces_{workspaceId}_members.yaml
   /note/workspaces/{workspaceId}/move-items:
     $ref: ./paths/workspaces_{workspaceId}_move-items.yaml
   /note/workspaces/{workspaceId}/publish:
@@ -85,8 +87,6 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_tree.yaml
   /note/workspaces/{workspaceId}/unpublish:
     $ref: ./paths/workspaces_{workspaceId}_unpublish.yaml
-  /note/workspaces/{workspaceId}/update-members:
-    $ref: ./paths/workspaces_{workspaceId}_update-members.yaml
 
 components:
   securitySchemes:

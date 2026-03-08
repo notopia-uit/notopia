@@ -7,6 +7,13 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
+func (h *StrictHandler) GetNotes(
+	ctx context.Context,
+	request note.GetNotesRequestObject,
+) (note.GetNotesResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
 func (h *StrictHandler) CreateNote(ctx context.Context, request note.CreateNoteRequestObject) (note.CreateNoteResponseObject, error) {
 	return nil, errors.New("not implemented")
 }

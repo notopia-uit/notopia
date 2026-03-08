@@ -1,5 +1,5 @@
 # vim: ft=yaml.openapi
-required: true
+description: A list of workspace members
 content:
   application/json:
     schema:
