@@ -6,6 +6,7 @@ services:
     image: getmeili/meilisearch:v1.33
     environment:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-notopiauit}
+      MEILI_NO_ANALYTICS: 'true'
     volumes:
       - meilisearch_data:/meili_data
     labels:
