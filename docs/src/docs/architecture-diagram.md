@@ -51,28 +51,34 @@ services: Services {
     icon: https://simpleicons.org/icons/minio.svg
   }
 
-  edit: Edit Service Group {
-    edit_service: Edit Service {
+  document: Document Service Group {
+    document_service: Document Service {
       icon: https://simpleicons.org/icons/nodedotjs.svg
     }
-    edit_service_main_database: Main Database {
+    main_database: Main Database {
       icon: https://simpleicons.org/icons/postgresql.svg
     }
-    edit_service_sec_database: Secondary Database {
-      icon: https://simpleicons.org/icons/redis.svg
-    }
-    edit_service -> edit_service_main_database
-    edit_service -> edit_service_sec_database
+    document_service -> main_database
   }
 
   note: Note Service Group {
     note_service: Note Service {
       icon: https://simpleicons.org/icons/go.svg
     }
-    note_service_database: Database {
+    database: Database {
       icon: https://simpleicons.org/icons/postgresql.svg
     }
-    note_service -> note_service_database
+    note_service -> database
+  }
+
+  authorization: Authorization Service Group {
+    authorization_service: Authorization Service {
+      icon: https://simpleicons.org/icons/go.svg
+    }
+    database: Database {
+      icon: https://simpleicons.org/icons/postgresql.svg
+    }
+    authorization_service -> database
   }
 
   search: Search Service Group {
@@ -87,10 +93,6 @@ services: Services {
     }
     search_sync_service -> search_service
     search_sync_service -> search_sync_service_database
-  }
-
-  authorization_database: Authorization Database {
-    icon: https://simpleicons.org/icons/postgresql.svg
   }
 
   event_bus: Event Bus {
@@ -110,22 +112,24 @@ apps -> services.identity_provider
 apps -> services.object_storage
 
 gateway -> apps
-gateway -> services.edit
+gateway -> services.document
 gateway -> services.note
 gateway -> services.identity_provider
 gateway -> services.object_storage
 gateway -> services.search
 
-services.edit -> services.note
-services.edit <-> services.event_bus
-services.edit -> services.authorization_database
+services.document -> services.note
+services.document <-> services.event_bus
+services.document -> services.authorization
 
 services.note -> services.identity_provider
 services.note -> services.object_storage
 services.note <-> services.event_bus
-services.note -> services.authorization_database
+services.note -> services.authorization
 
-services.event_bus <- services.search
+services.authorization <- services.event_bus
+
+services.search <- services.event_bus
 
 style.border-radius: 15
 *.style.border-radius: 15
