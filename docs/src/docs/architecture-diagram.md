@@ -55,10 +55,10 @@ services: Services {
     document_service: Document Service {
       icon: https://simpleicons.org/icons/nodedotjs.svg
     }
-    main_database: Main Database {
+    database: Database {
       icon: https://simpleicons.org/icons/postgresql.svg
     }
-    document_service -> main_database
+    document_service -> database
   }
 
   note: Note Service Group {
@@ -121,8 +121,8 @@ gateway -> services.search
 services.document -> services.note
 services.document <-> services.event_bus
 services.document -> services.authorization
+services.document -> services.object_storage
 
-services.note -> services.object_storage
 services.note <-> services.event_bus
 services.note -> services.authorization
 
