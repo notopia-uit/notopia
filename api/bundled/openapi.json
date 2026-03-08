@@ -1220,6 +1220,42 @@
         }
       }
     },
+    "/note/workspaces/{workspaceId}/tree": {
+      "get": {
+        "security": [
+          {
+            "Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Get workspace tree",
+        "operationId": "getWorkspaceTree",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetWorkspaceTreeResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/unpublish": {
       "post": {
         "security": [
@@ -1256,7 +1292,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/update-collaborators": {
+    "/note/workspaces/{workspaceId}/update-members": {
       "post": {
         "security": [
           {
@@ -1266,19 +1302,19 @@
         "tags": [
           "Workspace"
         ],
-        "summary": "Update workspace collaborators",
-        "operationId": "updateWorkspaceCollaborators",
+        "summary": "Update workspace members",
+        "operationId": "updateWorkspaceMembers",
         "parameters": [
           {
             "$ref": "#/components/parameters/workspaceIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/UpdateWorkspaceCollaborators"
+          "$ref": "#/components/requestBodies/UpdateWorkspaceMembers"
         },
         "responses": {
           "204": {
-            "description": "Workspace collaborators updated successfully"
+            "description": "Workspace members updated successfully"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -1471,18 +1507,12 @@
       "Tag": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "3e31fdf4-18bf-450b-98ee-a14652d922a2"
-          },
           "name": {
             "type": "string",
             "example": "work"
           }
         },
         "required": [
-          "id",
           "name"
         ]
       },
@@ -1492,94 +1522,73 @@
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
         "readOnly": true
       },
+      "Graph": {
+        "type": "object",
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Can be either a note ID or a hashtag prefixed tag name",
+                  "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Can be either a note name or a hashtag prefixed tag name (duplicate with id)",
+                  "example": "Meeting Notes"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "note",
+                    "tag"
+                  ],
+                  "example": "note"
+                },
+                "weight": {
+                  "type": "number",
+                  "description": "Optional weight for the note node, rounded to 1 decimal place",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "example": 0.8
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "type"
+              ]
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string",
+                  "description": "The ID of the source node (note id or hashtag prefixed tag name)",
+                  "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+                },
+                "target": {
+                  "type": "string",
+                  "description": "The ID of the target node (note id or hashtag prefixed tag name)",
+                  "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+                }
+              }
+            }
+          }
+        }
+      },
       "Note_properties-name": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
         "example": "Meeting Notes"
-      },
-      "Graph": {
-        "type": "object",
-        "properties": {
-          "nodes": {
-            "type": "object",
-            "properties": {
-              "notes": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "$ref": "#/components/schemas/Note_properties-name"
-                    },
-                    "weight": {
-                      "type": "number",
-                      "maximum": 1,
-                      "minimum": 0,
-                      "example": 0.5
-                    }
-                  },
-                  "required": [
-                    "name",
-                    "weight"
-                  ]
-                },
-                "example": {
-                  "46f94d4d-41b5-4df6-bf8d-270fb9a49c97": {
-                    "name": "Meeting Notes",
-                    "weight": 0.5
-                  }
-                }
-              },
-              "tags": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "$ref": "#/components/schemas/properties-name"
-                    }
-                  },
-                  "required": [
-                    "name"
-                  ]
-                },
-                "example": {
-                  "3e31fdf4-18bf-450b-98ee-a14652d922a2": {
-                    "name": "work"
-                  }
-                }
-              }
-            }
-          },
-          "relations": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "format": "uuid",
-                    "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-                  },
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "note",
-                      "tag"
-                    ],
-                    "example": "note"
-                  }
-                },
-                "required": [
-                  "id",
-                  "type"
-                ]
-              }
-            }
-          }
-        }
       },
       "icon": {
         "type": "string",
@@ -1685,66 +1694,6 @@
         "required": [
           "id",
           "name"
-        ]
-      },
-      "FolderWithRelations": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Folder"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "children": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/FolderWithRelations"
-                }
-              },
-              "parentId": {
-                "type": "string",
-                "format": "uuid",
-                "nullable": true,
-                "example": "123e4567-e89b-12d3-a456-426614174000"
-              },
-              "notes": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/TreeNote"
-                }
-              }
-            },
-            "required": [
-              "children",
-              "parentId",
-              "notes"
-            ]
-          }
-        ]
-      },
-      "folderId": {
-        "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000"
-      },
-      "TreeNote": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "$ref": "#/components/schemas/Note_properties-id"
-          },
-          "name": {
-            "$ref": "#/components/schemas/Note_properties-name"
-          },
-          "folderId": {
-            "$ref": "#/components/schemas/folderId"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "folderId"
         ]
       },
       "FolderCreatedEvent": {
@@ -1967,6 +1916,11 @@
           "data"
         ]
       },
+      "folderId": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000"
+      },
       "NoteMovedEvent": {
         "type": "object",
         "properties": {
@@ -2155,6 +2109,63 @@
           "name",
           "deletedBy",
           "deletedAt"
+        ]
+      },
+      "properties-icon": {
+        "type": "string",
+        "nullable": true,
+        "example": "📁"
+      },
+      "WorkspaceTreeNote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/Note_properties-id"
+          },
+          "name": {
+            "$ref": "#/components/schemas/Note_properties-name"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/icon"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "icon"
+        ]
+      },
+      "WorkspaceTreeFolder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/properties-id"
+          },
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/properties-icon"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceTreeNote"
+            }
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceTreeFolder"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "icon",
+          "notes",
+          "children"
         ]
       },
       "User_properties-id": {
@@ -2421,7 +2432,7 @@
           }
         }
       },
-      "UpdateWorkspaceCollaborators": {
+      "UpdateWorkspaceMembers": {
         "required": true,
         "content": {
           "application/json": {
@@ -2708,22 +2719,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Workspace"
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "rootFolder": {
-                      "$ref": "#/components/schemas/FolderWithRelations"
-                    }
-                  },
-                  "required": [
-                    "rootFolder"
-                  ]
-                }
-              ]
+              "$ref": "#/components/schemas/Workspace"
             }
           }
         }
@@ -2826,6 +2822,16 @@
                 "data",
                 "pagination"
               ]
+            }
+          }
+        }
+      },
+      "GetWorkspaceTreeResponse": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/WorkspaceTreeFolder"
             }
           }
         }

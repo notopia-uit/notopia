@@ -81,10 +81,12 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_show-trash.yaml
   /note/workspaces/{workspaceId}/trash-items:
     $ref: ./paths/workspaces_{workspaceId}_trash-items.yaml
+  /note/workspaces/{workspaceId}/tree:
+    $ref: ./paths/workspaces_{workspaceId}_tree.yaml
   /note/workspaces/{workspaceId}/unpublish:
     $ref: ./paths/workspaces_{workspaceId}_unpublish.yaml
-  /note/workspaces/{workspaceId}/update-collaborators:
-    $ref: ./paths/workspaces_{workspaceId}_update-collaborators.yaml
+  /note/workspaces/{workspaceId}/update-members:
+    $ref: ./paths/workspaces_{workspaceId}_update-members.yaml
 
 components:
   securitySchemes:

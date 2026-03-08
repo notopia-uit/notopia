@@ -3,57 +3,46 @@ type: object
 
 properties:
   nodes:
-    type: object
-    properties:
-      notes:
-        type: object
-        additionalProperties:
-          type: object
-          properties:
-            name:
-              $ref: ./Note.yaml#/properties/name
-            weight:
-              type: number
-              maximum: 1
-              minimum: 0
-              example: 0.5
-          required:
-            - name
-            - weight
-        example:
-          46f94d4d-41b5-4df6-bf8d-270fb9a49c97:
-            name: Meeting Notes
-            weight: 0.5
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Can be either a note ID or a hashtag prefixed tag name
+          example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+        name:
+          type: string
+          description: Can be either a note name or a hashtag prefixed tag name (duplicate with id)
+          example: Meeting Notes
+        type:
+          type: string
+          enum:
+            - note
+            - tag
+          example: note
+        weight:
+          type: number
+          description: Optional weight for the note node, rounded to 1 decimal place
+          minimum: 0
+          maximum: 1
+          example: 0.8
+      required:
+        - id
+        - name
+        - type
 
-      tags:
-        type: object
-        additionalProperties:
-          type: object
-          properties:
-            name:
-              $ref: ./Tag.yaml#/properties/name
-          required:
-            - name
-        example:
-          3e31fdf4-18bf-450b-98ee-a14652d922a2:
-            name: work
-
-  relations:
-    type: object
-    additionalProperties:
-      type: array
-      items:
-        type: object
-        properties:
-          id:
-            format: uuid
-            example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
-          type:
-            type: string
-            enum:
-              - note
-              - tag
-            example: note
-        required:
-          - id
-          - type
+  links:
+    type: array
+    items:
+      type: object
+      properties:
+        source:
+          type: string
+          description: The ID of the source node (note id or hashtag prefixed tag name)
+          example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+        target:
+          type: string
+          description: The ID of the target node (note id or hashtag prefixed tag name)
+          example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97

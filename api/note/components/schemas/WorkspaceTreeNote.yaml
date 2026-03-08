@@ -8,10 +8,10 @@ properties:
   name:
     $ref: ./Note.yaml#/properties/name
 
-  folderId:
-    $ref: ./Note.yaml#/properties/folderId
+  icon:
+    $ref: ./Note.yaml#/properties/icon
 
 required:
   - id
   - name
-  - folderId
+  - icon

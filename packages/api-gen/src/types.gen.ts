@@ -53,35 +53,40 @@ export type Note = {
 export type PropertiesName = string;
 
 export type Tag = {
-    id: string;
     name: string;
 };
 
 export type NotePropertiesId = string;
 
-export type NotePropertiesName = string;
-
 export type Graph = {
-    nodes?: {
-        notes?: {
-            [key: string]: {
-                name: NotePropertiesName;
-                weight: number;
-            };
-        };
-        tags?: {
-            [key: string]: {
-                name: PropertiesName;
-            };
-        };
-    };
-    relations?: {
-        [key: string]: Array<{
-            id: unknown;
-            type: 'note' | 'tag';
-        }>;
-    };
+    nodes?: Array<{
+        /**
+         * Can be either a note ID or a hashtag prefixed tag name
+         */
+        id: string;
+        /**
+         * Can be either a note name or a hashtag prefixed tag name (duplicate with id)
+         */
+        name: string;
+        type: 'note' | 'tag';
+        /**
+         * Optional weight for the note node, rounded to 1 decimal place
+         */
+        weight?: number;
+    }>;
+    links?: Array<{
+        /**
+         * The ID of the source node (note id or hashtag prefixed tag name)
+         */
+        source?: string;
+        /**
+         * The ID of the target node (note id or hashtag prefixed tag name)
+         */
+        target?: string;
+    }>;
 };
+
+export type NotePropertiesName = string;
 
 export type Icon = string | null;
 
@@ -125,20 +130,6 @@ export type RevisionPropertiesName = string | null;
 export type Workspace = {
     readonly id: string;
     name: string;
-};
-
-export type FolderWithRelations = Folder & {
-    children: Array<FolderWithRelations>;
-    parentId: string | null;
-    notes: Array<TreeNote>;
-};
-
-export type FolderId = string;
-
-export type TreeNote = {
-    id: NotePropertiesId;
-    name: NotePropertiesName;
-    folderId: FolderId;
 };
 
 export type FolderCreatedEvent = {
@@ -198,6 +189,8 @@ export type NoteDeletedEvent = {
     };
 };
 
+export type FolderId = string;
+
 export type NoteMovedEvent = {
     type: 'NoteMovedEvent';
     data: {
@@ -245,6 +238,22 @@ export type TrashedFolder = {
     readonly deletedAt: string | null;
 };
 
+export type PropertiesIcon = string | null;
+
+export type WorkspaceTreeNote = {
+    id: NotePropertiesId;
+    name: NotePropertiesName;
+    icon: Icon;
+};
+
+export type WorkspaceTreeFolder = {
+    id: PropertiesId;
+    name: Name;
+    icon: PropertiesIcon;
+    notes: Array<WorkspaceTreeNote>;
+    children: Array<WorkspaceTreeFolder>;
+};
+
 /**
  * User ID from Authentik
  */
@@ -282,17 +291,6 @@ export type NoteLinkWritable = {
 
 export type WorkspaceWritable = {
     name: string;
-};
-
-export type FolderWithRelationsWritable = FolderWritable & {
-    children: Array<FolderWithRelationsWritable>;
-    parentId: string | null;
-    notes: Array<TreeNoteWritable>;
-};
-
-export type TreeNoteWritable = {
-    name: NotePropertiesName;
-    folderId: FolderId;
 };
 
 export type FolderCreatedEventWritable = {
@@ -367,6 +365,18 @@ export type TrashedNoteWritable = {
 
 export type TrashedFolderWritable = {
     id: string;
+};
+
+export type WorkspaceTreeNoteWritable = {
+    name: NotePropertiesName;
+    icon: Icon;
+};
+
+export type WorkspaceTreeFolderWritable = {
+    name: Name;
+    icon: PropertiesIcon;
+    notes: Array<WorkspaceTreeNoteWritable>;
+    children: Array<WorkspaceTreeFolderWritable>;
 };
 
 /**
@@ -444,7 +454,7 @@ export type TrashWorkspaceItemsRequest = {
     folders?: Array<TrashedFolderWritable>;
 };
 
-export type UpdateWorkspaceCollaborators = Array<{
+export type UpdateWorkspaceMembers = Array<{
     userId: UserPropertiesId;
     role: WorkspaceRole;
 }>;
@@ -1348,9 +1358,7 @@ export type GetWorkspaceResponses = {
     /**
      * OK
      */
-    200: Workspace & {
-        rootFolder: FolderWithRelations;
-    };
+    200: Workspace;
 };
 
 export type GetWorkspaceResponse = GetWorkspaceResponses[keyof GetWorkspaceResponses];
@@ -1698,6 +1706,45 @@ export type TrashWorkspaceItemsResponses = {
 
 export type TrashWorkspaceItemsResponse = TrashWorkspaceItemsResponses[keyof TrashWorkspaceItemsResponses];
 
+export type GetWorkspaceTreeData = {
+    body?: never;
+    path: {
+        workspaceId: Id;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceId}/tree';
+};
+
+export type GetWorkspaceTreeErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: Error;
+    /**
+     * Unauthorized Error response
+     */
+    401: Error;
+    /**
+     * Not Found Error response
+     */
+    404: Error;
+    /**
+     * Internal Server Error response
+     */
+    500: Error;
+};
+
+export type GetWorkspaceTreeError = GetWorkspaceTreeErrors[keyof GetWorkspaceTreeErrors];
+
+export type GetWorkspaceTreeResponses = {
+    /**
+     * OK
+     */
+    200: WorkspaceTreeFolder;
+};
+
+export type GetWorkspaceTreeResponse = GetWorkspaceTreeResponses[keyof GetWorkspaceTreeResponses];
+
 export type UnpublishWorkspaceData = {
     body?: never;
     path: {
@@ -1737,16 +1784,16 @@ export type UnpublishWorkspaceResponses = {
 
 export type UnpublishWorkspaceResponse = UnpublishWorkspaceResponses[keyof UnpublishWorkspaceResponses];
 
-export type UpdateWorkspaceCollaboratorsData = {
-    body: UpdateWorkspaceCollaborators;
+export type UpdateWorkspaceMembersData = {
+    body: UpdateWorkspaceMembers;
     path: {
         workspaceId: Id;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceId}/update-collaborators';
+    url: '/note/workspaces/{workspaceId}/update-members';
 };
 
-export type UpdateWorkspaceCollaboratorsErrors = {
+export type UpdateWorkspaceMembersErrors = {
     /**
      * Bad Request Error response
      */
@@ -1765,13 +1812,13 @@ export type UpdateWorkspaceCollaboratorsErrors = {
     500: Error;
 };
 
-export type UpdateWorkspaceCollaboratorsError = UpdateWorkspaceCollaboratorsErrors[keyof UpdateWorkspaceCollaboratorsErrors];
+export type UpdateWorkspaceMembersError = UpdateWorkspaceMembersErrors[keyof UpdateWorkspaceMembersErrors];
 
-export type UpdateWorkspaceCollaboratorsResponses = {
+export type UpdateWorkspaceMembersResponses = {
     /**
-     * Workspace collaborators updated successfully
+     * Workspace members updated successfully
      */
     204: void;
 };
 
-export type UpdateWorkspaceCollaboratorsResponse = UpdateWorkspaceCollaboratorsResponses[keyof UpdateWorkspaceCollaboratorsResponses];
+export type UpdateWorkspaceMembersResponse = UpdateWorkspaceMembersResponses[keyof UpdateWorkspaceMembersResponses];

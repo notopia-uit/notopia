@@ -190,23 +190,9 @@ package "Domain" as Domain <<Frame>> {
         PermanentlyDelete(noteIDs ...uuid.UUID)
     }
 
-    RepoInterface(TagRepo) {
-        GetByID(tagID uuid.UUID) *Tag
-        SearchByName(workspaceID uuid.UUID, name string) []*Tag
-        Save(tag *Tag)
-        Delete(tagID uuid.UUID)
-    }
-
     RepoInterface(RevisionRepo) {
         GetByID(revisionID uuid.UUID) *Revision
         Save(revision *Revision)
-    }
-
-    ServiceInterface(NoteService) {
-        noteRepo: Repos.Note
-        tagRepo: Repos.Tag
-
-        RemoveTagsFromNote(noteID uuid.UUID, tagIDs ...uuid.UUID)
     }
 }
 @enduml

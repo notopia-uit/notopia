@@ -81,18 +81,18 @@ func (e FolderRenamedEventType) Valid() bool {
 	}
 }
 
-// Defines values for GraphRelationsType.
+// Defines values for GraphNodesType.
 const (
-	GraphRelationsTypeNote GraphRelationsType = "note"
-	GraphRelationsTypeTag  GraphRelationsType = "tag"
+	GraphNodesTypeNote GraphNodesType = "note"
+	GraphNodesTypeTag  GraphNodesType = "tag"
 )
 
-// Valid indicates whether the value is a known member of the GraphRelationsType enum.
-func (e GraphRelationsType) Valid() bool {
+// Valid indicates whether the value is a known member of the GraphNodesType enum.
+func (e GraphNodesType) Valid() bool {
 	switch e {
-	case GraphRelationsTypeNote:
+	case GraphNodesTypeNote:
 		return true
-	case GraphRelationsTypeTag:
+	case GraphNodesTypeTag:
 		return true
 	default:
 		return false
@@ -298,36 +298,30 @@ type FolderRenamedEvent struct {
 // FolderRenamedEventType defines model for FolderRenamedEvent.Type.
 type FolderRenamedEventType string
 
-// FolderWithRelations defines model for FolderWithRelations.
-type FolderWithRelations struct {
-	Children    []FolderWithRelations `json:"children"`
-	Icon        *string               `json:"icon"`
-	Id          *openapi_types.UUID   `json:"id,omitempty"`
-	Name        string                `json:"name"`
-	Notes       []TreeNote            `json:"notes"`
-	ParentId    *openapi_types.UUID   `json:"parentId"`
-	WorkspaceId *Id                   `json:"workspaceId,omitempty"`
-}
-
 // Graph defines model for Graph.
 type Graph struct {
-	Nodes *struct {
-		Notes *map[string]struct {
-			Name   NotePropertiesName `json:"name"`
-			Weight float32            `json:"weight"`
-		} `json:"notes,omitempty"`
-		Tags *map[string]struct {
-			Name PropertiesName `json:"name"`
-		} `json:"tags,omitempty"`
+	Links *[]struct {
+		// Source The ID of the source node (note id or hashtag prefixed tag name)
+		Source *string `json:"source,omitempty"`
+
+		// Target The ID of the target node (note id or hashtag prefixed tag name)
+		Target *string `json:"target,omitempty"`
+	} `json:"links,omitempty"`
+	Nodes *[]struct {
+		// Id Can be either a note ID or a hashtag prefixed tag name
+		Id openapi_types.UUID `json:"id"`
+
+		// Name Can be either a note name or a hashtag prefixed tag name (duplicate with id)
+		Name string         `json:"name"`
+		Type GraphNodesType `json:"type"`
+
+		// Weight Optional weight for the note node, rounded to 1 decimal place
+		Weight *float32 `json:"weight,omitempty"`
 	} `json:"nodes,omitempty"`
-	Relations *map[string][]struct {
-		Id   interface{}        `json:"id"`
-		Type GraphRelationsType `json:"type"`
-	} `json:"relations,omitempty"`
 }
 
-// GraphRelationsType defines model for Graph.Relations.Type.
-type GraphRelationsType string
+// GraphNodesType defines model for Graph.Nodes.Type.
+type GraphNodesType string
 
 // Note defines model for Note.
 type Note struct {
@@ -450,8 +444,7 @@ type RevisionPropertiesName = string
 
 // Tag defines model for Tag.
 type Tag struct {
-	Id   openapi_types.UUID `json:"id"`
-	Name string             `json:"name"`
+	Name string `json:"name"`
 }
 
 // TrashedDeletedBy defines model for TrashedDeletedBy.
@@ -471,13 +464,6 @@ type TrashedNote struct {
 	DeletedBy *TrashedDeletedBy  `json:"deletedBy,omitempty"`
 	Id        openapi_types.UUID `json:"id"`
 	Name      *string            `json:"name,omitempty"`
-}
-
-// TreeNote defines model for TreeNote.
-type TreeNote struct {
-	FolderId FolderId           `json:"folderId"`
-	Id       *NotePropertiesId  `json:"id,omitempty"`
-	Name     NotePropertiesName `json:"name"`
 }
 
 // UserPropertiesId User ID from Authentik
@@ -505,6 +491,22 @@ type WorkspaceRenamedEventType string
 // WorkspaceRole defines model for WorkspaceRole.
 type WorkspaceRole string
 
+// WorkspaceTreeFolder defines model for WorkspaceTreeFolder.
+type WorkspaceTreeFolder struct {
+	Children []WorkspaceTreeFolder `json:"children"`
+	Icon     *PropertiesIcon       `json:"icon"`
+	Id       *PropertiesId         `json:"id,omitempty"`
+	Name     Name                  `json:"name"`
+	Notes    []WorkspaceTreeNote   `json:"notes"`
+}
+
+// WorkspaceTreeNote defines model for WorkspaceTreeNote.
+type WorkspaceTreeNote struct {
+	Icon *Icon              `json:"icon"`
+	Id   *NotePropertiesId  `json:"id,omitempty"`
+	Name NotePropertiesName `json:"name"`
+}
+
 // WorkspacePropertiesName defines model for Workspace_properties-name.
 type WorkspacePropertiesName = string
 
@@ -522,6 +524,9 @@ type Name = string
 
 // ParentId defines model for parentId.
 type ParentId = openapi_types.UUID
+
+// PropertiesIcon defines model for properties-icon.
+type PropertiesIcon = string
 
 // PropertiesId defines model for properties-id.
 type PropertiesId = openapi_types.UUID
@@ -581,11 +586,10 @@ type GetRevisionsResponse struct {
 type GetWorkspaceGraphResponse = Graph
 
 // GetWorkspaceResponse defines model for GetWorkspaceResponse.
-type GetWorkspaceResponse struct {
-	Id         *openapi_types.UUID `json:"id,omitempty"`
-	Name       string              `json:"name"`
-	RootFolder FolderWithRelations `json:"rootFolder"`
-}
+type GetWorkspaceResponse = Workspace
+
+// GetWorkspaceTreeResponse defines model for GetWorkspaceTreeResponse.
+type GetWorkspaceTreeResponse = WorkspaceTreeFolder
 
 // InternalServerError defines model for InternalServerError.
 type InternalServerError = Error
@@ -666,8 +670,8 @@ type TrashWorkspaceItemsRequest struct {
 	Notes   *[]TrashedNote   `json:"notes,omitempty"`
 }
 
-// UpdateWorkspaceCollaborators defines model for UpdateWorkspaceCollaborators.
-type UpdateWorkspaceCollaborators = []struct {
+// UpdateWorkspaceMembers defines model for UpdateWorkspaceMembers.
+type UpdateWorkspaceMembers = []struct {
 	Role WorkspaceRole `json:"role"`
 
 	// UserId User ID from Authentik
@@ -751,8 +755,8 @@ type TrashWorkspaceItemsJSONBody struct {
 	Notes   *[]TrashedNote   `json:"notes,omitempty"`
 }
 
-// UpdateWorkspaceCollaboratorsJSONBody defines parameters for UpdateWorkspaceCollaborators.
-type UpdateWorkspaceCollaboratorsJSONBody = []struct {
+// UpdateWorkspaceMembersJSONBody defines parameters for UpdateWorkspaceMembers.
+type UpdateWorkspaceMembersJSONBody = []struct {
 	Role WorkspaceRole `json:"role"`
 
 	// UserId User ID from Authentik
@@ -795,8 +799,8 @@ type RestoreTrashedWorkspaceItemsJSONRequestBody RestoreTrashedWorkspaceItemsJSO
 // TrashWorkspaceItemsJSONRequestBody defines body for TrashWorkspaceItems for application/json ContentType.
 type TrashWorkspaceItemsJSONRequestBody TrashWorkspaceItemsJSONBody
 
-// UpdateWorkspaceCollaboratorsJSONRequestBody defines body for UpdateWorkspaceCollaborators for application/json ContentType.
-type UpdateWorkspaceCollaboratorsJSONRequestBody = UpdateWorkspaceCollaboratorsJSONBody
+// UpdateWorkspaceMembersJSONRequestBody defines body for UpdateWorkspaceMembers for application/json ContentType.
+type UpdateWorkspaceMembersJSONRequestBody = UpdateWorkspaceMembersJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -884,12 +888,15 @@ type ServerInterface interface {
 	// Trash workspace's items
 	// (POST /note/workspaces/{workspaceId}/trash-items)
 	TrashWorkspaceItems(c *gin.Context, workspaceId WorkspaceIdPath)
+	// Get workspace tree
+	// (GET /note/workspaces/{workspaceId}/tree)
+	GetWorkspaceTree(c *gin.Context, workspaceId WorkspaceIdPath)
 	// Unpublish workspace
 	// (POST /note/workspaces/{workspaceId}/unpublish)
 	UnpublishWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
-	// Update workspace collaborators
-	// (POST /note/workspaces/{workspaceId}/update-collaborators)
-	UpdateWorkspaceCollaborators(c *gin.Context, workspaceId WorkspaceIdPath)
+	// Update workspace members
+	// (POST /note/workspaces/{workspaceId}/update-members)
+	UpdateWorkspaceMembers(c *gin.Context, workspaceId WorkspaceIdPath)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -1640,6 +1647,32 @@ func (siw *ServerInterfaceWrapper) TrashWorkspaceItems(c *gin.Context) {
 	siw.Handler.TrashWorkspaceItems(c, workspaceId)
 }
 
+// GetWorkspaceTree operation middleware
+func (siw *ServerInterfaceWrapper) GetWorkspaceTree(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "workspaceId" -------------
+	var workspaceId WorkspaceIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetWorkspaceTree(c, workspaceId)
+}
+
 // UnpublishWorkspace operation middleware
 func (siw *ServerInterfaceWrapper) UnpublishWorkspace(c *gin.Context) {
 
@@ -1666,8 +1699,8 @@ func (siw *ServerInterfaceWrapper) UnpublishWorkspace(c *gin.Context) {
 	siw.Handler.UnpublishWorkspace(c, workspaceId)
 }
 
-// UpdateWorkspaceCollaborators operation middleware
-func (siw *ServerInterfaceWrapper) UpdateWorkspaceCollaborators(c *gin.Context) {
+// UpdateWorkspaceMembers operation middleware
+func (siw *ServerInterfaceWrapper) UpdateWorkspaceMembers(c *gin.Context) {
 
 	var err error
 
@@ -1689,7 +1722,7 @@ func (siw *ServerInterfaceWrapper) UpdateWorkspaceCollaborators(c *gin.Context) 
 		}
 	}
 
-	siw.Handler.UpdateWorkspaceCollaborators(c, workspaceId)
+	siw.Handler.UpdateWorkspaceMembers(c, workspaceId)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -1747,8 +1780,9 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/restore-trashed-items", wrapper.RestoreTrashedWorkspaceItems)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/show-trash", wrapper.ShowTrash)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/trash-items", wrapper.TrashWorkspaceItems)
+	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/tree", wrapper.GetWorkspaceTree)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/unpublish", wrapper.UnpublishWorkspace)
-	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/update-collaborators", wrapper.UpdateWorkspaceCollaborators)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/update-members", wrapper.UpdateWorkspaceMembers)
 }
 
 type ApplyRevisionResponseResponseHeaders struct {
@@ -1814,11 +1848,9 @@ type GetWorkspaceEventsResponseTexteventStreamResponse struct {
 
 type GetWorkspaceGraphResponseJSONResponse Graph
 
-type GetWorkspaceResponseJSONResponse struct {
-	Id         *openapi_types.UUID `json:"id,omitempty"`
-	Name       string              `json:"name"`
-	RootFolder FolderWithRelations `json:"rootFolder"`
-}
+type GetWorkspaceResponseJSONResponse Workspace
+
+type GetWorkspaceTreeResponseJSONResponse WorkspaceTreeFolder
 
 type InternalServerErrorJSONResponse Error
 
@@ -3398,6 +3430,63 @@ func (response TrashWorkspaceItems500JSONResponse) VisitTrashWorkspaceItemsRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
+type GetWorkspaceTreeRequestObject struct {
+	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+}
+
+type GetWorkspaceTreeResponseObject interface {
+	VisitGetWorkspaceTreeResponse(w http.ResponseWriter) error
+}
+
+type GetWorkspaceTree200JSONResponse struct {
+	GetWorkspaceTreeResponseJSONResponse
+}
+
+func (response GetWorkspaceTree200JSONResponse) VisitGetWorkspaceTreeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceTree400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response GetWorkspaceTree400JSONResponse) VisitGetWorkspaceTreeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceTree401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response GetWorkspaceTree401JSONResponse) VisitGetWorkspaceTreeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceTree404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response GetWorkspaceTree404JSONResponse) VisitGetWorkspaceTreeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceTree500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetWorkspaceTree500JSONResponse) VisitGetWorkspaceTreeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type UnpublishWorkspaceRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
 }
@@ -3452,55 +3541,55 @@ func (response UnpublishWorkspace500JSONResponse) VisitUnpublishWorkspaceRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateWorkspaceCollaboratorsRequestObject struct {
+type UpdateWorkspaceMembersRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
-	Body        *UpdateWorkspaceCollaboratorsJSONRequestBody
+	Body        *UpdateWorkspaceMembersJSONRequestBody
 }
 
-type UpdateWorkspaceCollaboratorsResponseObject interface {
-	VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error
+type UpdateWorkspaceMembersResponseObject interface {
+	VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error
 }
 
-type UpdateWorkspaceCollaborators204Response struct {
+type UpdateWorkspaceMembers204Response struct {
 }
 
-func (response UpdateWorkspaceCollaborators204Response) VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error {
+func (response UpdateWorkspaceMembers204Response) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
-type UpdateWorkspaceCollaborators400JSONResponse struct{ BadRequestErrorJSONResponse }
+type UpdateWorkspaceMembers400JSONResponse struct{ BadRequestErrorJSONResponse }
 
-func (response UpdateWorkspaceCollaborators400JSONResponse) VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error {
+func (response UpdateWorkspaceMembers400JSONResponse) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateWorkspaceCollaborators401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+type UpdateWorkspaceMembers401JSONResponse struct{ UnauthorizedErrorJSONResponse }
 
-func (response UpdateWorkspaceCollaborators401JSONResponse) VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error {
+func (response UpdateWorkspaceMembers401JSONResponse) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateWorkspaceCollaborators404JSONResponse struct{ NotFoundErrorJSONResponse }
+type UpdateWorkspaceMembers404JSONResponse struct{ NotFoundErrorJSONResponse }
 
-func (response UpdateWorkspaceCollaborators404JSONResponse) VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error {
+func (response UpdateWorkspaceMembers404JSONResponse) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateWorkspaceCollaborators500JSONResponse struct {
+type UpdateWorkspaceMembers500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
 
-func (response UpdateWorkspaceCollaborators500JSONResponse) VisitUpdateWorkspaceCollaboratorsResponse(w http.ResponseWriter) error {
+func (response UpdateWorkspaceMembers500JSONResponse) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -3593,12 +3682,15 @@ type StrictServerInterface interface {
 	// Trash workspace's items
 	// (POST /note/workspaces/{workspaceId}/trash-items)
 	TrashWorkspaceItems(ctx context.Context, request TrashWorkspaceItemsRequestObject) (TrashWorkspaceItemsResponseObject, error)
+	// Get workspace tree
+	// (GET /note/workspaces/{workspaceId}/tree)
+	GetWorkspaceTree(ctx context.Context, request GetWorkspaceTreeRequestObject) (GetWorkspaceTreeResponseObject, error)
 	// Unpublish workspace
 	// (POST /note/workspaces/{workspaceId}/unpublish)
 	UnpublishWorkspace(ctx context.Context, request UnpublishWorkspaceRequestObject) (UnpublishWorkspaceResponseObject, error)
-	// Update workspace collaborators
-	// (POST /note/workspaces/{workspaceId}/update-collaborators)
-	UpdateWorkspaceCollaborators(ctx context.Context, request UpdateWorkspaceCollaboratorsRequestObject) (UpdateWorkspaceCollaboratorsResponseObject, error)
+	// Update workspace members
+	// (POST /note/workspaces/{workspaceId}/update-members)
+	UpdateWorkspaceMembers(ctx context.Context, request UpdateWorkspaceMembersRequestObject) (UpdateWorkspaceMembersResponseObject, error)
 }
 
 type StrictHandlerFunc = strictgin.StrictGinHandlerFunc
@@ -4458,6 +4550,33 @@ func (sh *strictHandler) TrashWorkspaceItems(ctx *gin.Context, workspaceId Works
 	}
 }
 
+// GetWorkspaceTree operation middleware
+func (sh *strictHandler) GetWorkspaceTree(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+	var request GetWorkspaceTreeRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetWorkspaceTree(ctx, request.(GetWorkspaceTreeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetWorkspaceTree")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(GetWorkspaceTreeResponseObject); ok {
+		if err := validResponse.VisitGetWorkspaceTreeResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // UnpublishWorkspace operation middleware
 func (sh *strictHandler) UnpublishWorkspace(ctx *gin.Context, workspaceId WorkspaceIdPath) {
 	var request UnpublishWorkspaceRequestObject
@@ -4485,13 +4604,13 @@ func (sh *strictHandler) UnpublishWorkspace(ctx *gin.Context, workspaceId Worksp
 	}
 }
 
-// UpdateWorkspaceCollaborators operation middleware
-func (sh *strictHandler) UpdateWorkspaceCollaborators(ctx *gin.Context, workspaceId WorkspaceIdPath) {
-	var request UpdateWorkspaceCollaboratorsRequestObject
+// UpdateWorkspaceMembers operation middleware
+func (sh *strictHandler) UpdateWorkspaceMembers(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+	var request UpdateWorkspaceMembersRequestObject
 
 	request.WorkspaceId = workspaceId
 
-	var body UpdateWorkspaceCollaboratorsJSONRequestBody
+	var body UpdateWorkspaceMembersJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.Status(http.StatusBadRequest)
 		ctx.Error(err)
@@ -4500,10 +4619,10 @@ func (sh *strictHandler) UpdateWorkspaceCollaborators(ctx *gin.Context, workspac
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.UpdateWorkspaceCollaborators(ctx, request.(UpdateWorkspaceCollaboratorsRequestObject))
+		return sh.ssi.UpdateWorkspaceMembers(ctx, request.(UpdateWorkspaceMembersRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "UpdateWorkspaceCollaborators")
+		handler = middleware(handler, "UpdateWorkspaceMembers")
 	}
 
 	response, err := handler(ctx, request)
@@ -4511,8 +4630,8 @@ func (sh *strictHandler) UpdateWorkspaceCollaborators(ctx *gin.Context, workspac
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(UpdateWorkspaceCollaboratorsResponseObject); ok {
-		if err := validResponse.VisitUpdateWorkspaceCollaboratorsResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(UpdateWorkspaceMembersResponseObject); ok {
+		if err := validResponse.VisitUpdateWorkspaceMembersResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

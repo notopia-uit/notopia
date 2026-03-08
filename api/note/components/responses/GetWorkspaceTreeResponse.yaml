@@ -3,4 +3,4 @@ description: OK
 content:
   application/json:
     schema:
-      $ref: ../schemas/Workspace.yaml
+      $ref: ../schemas/WorkspaceTreeFolder.yaml

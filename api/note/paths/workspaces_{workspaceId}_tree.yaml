@@ -1,18 +1,16 @@
 # vim: ft=yaml.openapi
-post:
+get:
   security:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Update workspace collaborators
-  operationId: updateWorkspaceCollaborators
+  summary: Get workspace tree
+  operationId: getWorkspaceTree
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
-  requestBody:
-    $ref: ../components/requestBodies/UpdateWorkspaceCollaborators.yaml
   responses:
-    204:
-      description: Workspace collaborators updated successfully
+    200:
+      $ref: ../components/responses/GetWorkspaceTreeResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
