@@ -68,7 +68,7 @@ notes: {
   name: text
   folder_id: uuid {constraint: FK}
   current_revision_id: uuid {constraint: FK}
-  tags: text[]
+  tags: 'text[]'
   created_at: timestamptz
   updated_at: timestamptz
   deleted_by: deleted_by
