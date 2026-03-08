@@ -202,7 +202,8 @@ package "Domain" as Domain <<Frame>> {
 
 :::info
 
-- Syntax written in Go
+- Golang syntax
+- Apply DDD, CQRS, repository pattern
 
 :::
 
@@ -320,7 +321,8 @@ package "Document" as Document <<Frame>> {
 
 :::info
 
-- Syntax written in Typescript
+- Typescript syntax
+- Apply layered architecture, repository pattern
 
 :::
 
