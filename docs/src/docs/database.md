@@ -68,6 +68,7 @@ notes: {
   name: text
   folder_id: uuid {constraint: FK}
   current_revision_id: uuid {constraint: FK}
+  tags: text[]
   created_at: timestamptz
   updated_at: timestamptz
   deleted_by: deleted_by
@@ -79,22 +80,6 @@ notes: {
 note_links: {
   source_id: uuid {constraint: PK, FK}
   target_id: uuid {constraint: PK, FK}
-
-  shape: sql_table
-}
-
-tags: {
-  id: uuid {constraint: PK}
-  name: text
-  workspace_id: uuid {constraint: FK}
-  created_at: timestamptz
-
-  shape: sql_table
-}
-
-notes_tags: {
-  note_id: uuid {constraint: PK, FK}
-  tag_id: uuid {constraint: PK, FK}
 
   shape: sql_table
 }
@@ -117,9 +102,6 @@ notes.folder_id -> folders.id
 note_links.source_id -> notes.id
 note_links.target_id -> notes.id
 notes.current_revision_id -> revisions.id
-tags.workspace_id -> workspaces.id
-notes_tags.note_id -> notes.id
-notes_tags.tag_id -> tags.id
 revisions.note_id -> notes.id
 ```
 

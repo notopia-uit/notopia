@@ -111,37 +111,16 @@ package "Domain" as Domain <<Frame>> {
         name: string
         icon: *string
         folderID: uuid.UUID
-        tagIDs: []uuid.UUID
+        tags: []string
         outgoingLinks: []uuid.UUID
         currentRevisionID: *uuid.UUID
         deletedBy: *DeletedBy
         deletedAt: *time.Time
 
         MoveNoteToFolder(folderID uuid.UUID)
-        RemoveTag(tagID uuid.UUID)
+        UpdateTags(tags []string)
         Trash()
         Restore()
-    }
-
-    AggregateRoot(Tag) {
-        id: uuid.UUID
-        name: string
-        workspaceID: uuid.UUID
-        stats: TagStats
-
-        IncrementReference(delta int)
-        DecrementReference(delta int)
-        IsOrphaned() bool
-    }
-
-    ValueObject(TagStats) {
-        referenceCount: int
-        isExisting: bool
-
-        IncrementReference(delta int) TagStats
-        DecrementReference(delta int) TagStats
-        ReferenceCount() int
-        ShouldBePurged() bool
     }
 
     AggregateRoot(Revision) {
@@ -166,8 +145,6 @@ package "Domain" as Domain <<Frame>> {
     Domain.Folder "1" *-- "1" Domain.FolderRelationship : has
     Domain.Folder "1" *... "0..*" Domain.Note : contains
     Domain.Note "0..*" .. "0..*" Domain.Note : links
-    Domain.Note "1..*" ...o "0..*" Domain.Tag : contains
-    Domain.Tag "1" *-- "1" Domain.TagStats : has
     Domain.Note "1" *... "0..*" Domain.Revision : has
     Domain.Revision "1" *-- "1" Domain.RevisionContent : has
 
