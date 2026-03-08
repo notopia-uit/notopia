@@ -122,7 +122,6 @@ services.document -> services.note
 services.document <-> services.event_bus
 services.document -> services.authorization
 
-services.note -> services.identity_provider
 services.note -> services.object_storage
 services.note <-> services.event_bus
 services.note -> services.authorization
