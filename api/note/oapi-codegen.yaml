@@ -7,6 +7,3 @@ generate:
 output: ../../pkg/api/note/note.gen.go
 output-options:
   nullable-type: false
-  overlay:
-    path: ./overlay.yaml
-    strict: true

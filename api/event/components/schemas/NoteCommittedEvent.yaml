@@ -1,0 +1,16 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  id:
+    $ref: ../../../note/components/schemas/Note.yaml#/properties/id
+  name:
+    $ref: ../../../note/components/schemas/Note.yaml#/properties/name
+  folderId:
+    $ref: ../../../note/components/schemas/Note.yaml#/properties/folderId
+  revision:
+    $ref: ../../../note/components/schemas/Revision.yaml
+  required:
+    - id
+    - name
+    - folderId
+    - revision

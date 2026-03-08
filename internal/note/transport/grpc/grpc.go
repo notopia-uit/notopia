@@ -37,7 +37,7 @@ type Server struct {
 
 func New(
 	ctx context.Context,
-	rpcHandler IHandler,
+	handler IHandler,
 	cfg *config.Server,
 	traceProvider *trace.TracerProvider,
 	meterProvider *metric.MeterProvider,
@@ -52,7 +52,7 @@ func New(
 		return nil, nil, fmt.Errorf("failed to create otel interceptor: %w", err)
 	}
 	Path, Handler := pbconnect.NewNoteServiceHandler(
-		rpcHandler,
+		handler,
 		connect.WithInterceptors(interceptor),
 	)
 	mux := http.NewServeMux()

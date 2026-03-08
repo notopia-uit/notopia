@@ -257,7 +257,7 @@ skinparam backgroundColor $base
 skinparam defaultFontColor $text
 skinparam roundcorner 16
 skinparam classFontStyle bold
- skinparam ArrowColor $subtext0
+skinparam ArrowColor $subtext0
 skinparam packageStyle rectangle
 
 skinparam package {
@@ -274,7 +274,7 @@ skinparam class {
 }
 
 !define RepoInterface(name) interface "name" as Document.name <<(I, $pink) Repo Interface>>
-!define Service(name) interface "name" as Document.name <<(I, $rosewater) Service>>
+!define ServiceImpl(name) interface "name" as Document.name <<(I, $rosewater) Service Implementation>>
 !define Entity(name) class "name" as Document.name <<(C, $sky) Entity>>
 !define Type(name) class "name" as Document.name <<(T, $flamingo) Type>>
 !define Model(name) class "name" as Document.name <<(C, $yellow) Model>>
@@ -311,7 +311,7 @@ package "Document" as Document <<Frame>> {
         GetByID(documentId: string): DocumentEntity
     }
 
-    Service(DocumentService) {
+    ServiceImpl(DocumentService) {
         documentRepository: DocumentRepository
         blockNoteEditor: BlockNoteEditor
         attachmentService: AttachmentService
