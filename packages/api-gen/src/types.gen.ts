@@ -99,20 +99,23 @@ export type NoteError = {
 
 export type NoteName = string;
 
-export type NoteNoteContent = string | null;
-
 export type NoteNote = {
     readonly id: string;
     name: string;
     icon: string | null;
     folderId: NoteId;
     tags: Array<string>;
-    content?: NoteNoteContent;
     readonly backlinksCount: number;
     readonly outgoingLinksCount: number;
 };
 
 export type NoteNotePropertiesId = string;
+
+export type NoteNoteContent = string | null;
+
+export type NoteNoteWithContent = NoteNote & {
+    content?: NoteNoteContent;
+};
 
 export type NoteGraph = {
     nodes: Array<{
@@ -210,24 +213,14 @@ export type NoteFolderDeletedEvent = {
     };
 };
 
-export type NoteFolderMovedEvent = {
-    type: 'FolderRenamedEvent';
-    data: {
-        id: NoteId;
-        fromFolderId: NoteId;
-        toFolderId: NoteId;
-    };
+export type NoteFolderUpdatedEvent = {
+    type: 'FolderInfoUpdatedEvent';
+    data: NoteFolder;
 };
 
-export type NoteFolderRenamedEvent = {
-    type: 'FolderRenamedEvent';
-    data: {
-        id: NoteId;
-        oldName?: NoteName;
-        newName: NoteName;
-    };
-};
-
+/**
+ * When user A is in read mode, user B commits changes, user A will receive this event
+ */
 export type NoteNoteContentUpdatedEvent = {
     type: 'NoteContentUpdatedEvent';
     data: {
@@ -250,33 +243,22 @@ export type NoteNoteDeletedEvent = {
     };
 };
 
-export type NoteNoteMovedEvent = {
-    type: 'NoteMovedEvent';
+export type NoteTags = Array<string>;
+
+export type NoteNoteInfoUpdatedEvent = {
+    type: 'NoteInfoUpdatedEvent';
     data: {
         id: NoteNotePropertiesId;
-        fromFolderId: NoteId;
-        toFolderId: NoteId;
+        name: NotePropertiesName;
+        icon: NoteIcon;
+        folderId?: NoteId;
+        tags?: NoteTags;
     };
 };
 
-export type NoteNoteRenamedEvent = {
-    type: 'NoteRenamedEvent';
-    data: {
-        id: NoteNotePropertiesId;
-        oldName?: NotePropertiesName;
-        newName: NotePropertiesName;
-    };
-};
-
-export type NoteWorkspacePropertiesName = string;
-
-export type NoteWorkspaceRenamedEvent = {
-    type: 'WorkspaceRenamedEvent';
-    data: {
-        id: NotePropertiesId;
-        oldName: NoteWorkspacePropertiesName;
-        newName: NoteWorkspacePropertiesName;
-    };
+export type NoteWorkspaceUpdatedEvent = {
+    type: 'WorkspaceUpdatedEvent';
+    data: NoteWorkspace;
 };
 
 /**
@@ -296,6 +278,8 @@ export type NoteWorkspaceMember = {
     id: NoteUserPropertiesId;
     role: NoteWorkspaceRole;
 };
+
+export type NoteWorkspacePropertiesName = string;
 
 export const NoteTrashedDeletedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
 
@@ -347,6 +331,9 @@ export type NoteNoteWritable = {
     name: string;
     icon: string | null;
     tags: Array<string>;
+};
+
+export type NoteNoteWithContentWritable = NoteNoteWritable & {
     content?: NoteNoteContent;
 };
 
@@ -375,18 +362,14 @@ export type NoteFolderDeletedEventWritable = {
     type: 'FolderDeletedEvent';
 };
 
-export type NoteFolderMovedEventWritable = {
-    type: 'FolderRenamedEvent';
+export type NoteFolderUpdatedEventWritable = {
+    type: 'FolderInfoUpdatedEvent';
+    data: NoteFolderWritable;
 };
 
-export type NoteFolderRenamedEventWritable = {
-    type: 'FolderRenamedEvent';
-    data: {
-        oldName?: NoteName;
-        newName: NoteName;
-    };
-};
-
+/**
+ * When user A is in read mode, user B commits changes, user A will receive this event
+ */
 export type NoteNoteContentUpdatedEventWritable = {
     type: 'NoteContentUpdatedEvent';
 };
@@ -402,24 +385,18 @@ export type NoteNoteDeletedEventWritable = {
     type: 'NoteDeletedEvent';
 };
 
-export type NoteNoteMovedEventWritable = {
-    type: 'NoteMovedEvent';
-};
-
-export type NoteNoteRenamedEventWritable = {
-    type: 'NoteRenamedEvent';
+export type NoteNoteInfoUpdatedEventWritable = {
+    type: 'NoteInfoUpdatedEvent';
     data: {
-        oldName?: NotePropertiesName;
-        newName: NotePropertiesName;
+        name: NotePropertiesName;
+        icon: NoteIcon;
+        tags?: NoteTags;
     };
 };
 
-export type NoteWorkspaceRenamedEventWritable = {
-    type: 'WorkspaceRenamedEvent';
-    data: {
-        oldName: NoteWorkspacePropertiesName;
-        newName: NoteWorkspacePropertiesName;
-    };
+export type NoteWorkspaceUpdatedEventWritable = {
+    type: 'WorkspaceUpdatedEvent';
+    data: NoteWorkspaceWritable;
 };
 
 export type NoteTrashedNoteWritable = {
@@ -859,7 +836,9 @@ export type GetNoteData = {
     path: {
         noteId: NoteNotePropertiesId;
     };
-    query?: never;
+    query?: {
+        includeContent?: boolean;
+    };
     url: '/note/notes/{noteId}';
 };
 
@@ -892,7 +871,7 @@ export type GetNoteResponses = {
     /**
      * Successful response
      */
-    200: NoteNote;
+    200: NoteNoteWithContent;
 };
 
 export type GetNoteResponse = GetNoteResponses[keyof GetNoteResponses];
@@ -1462,22 +1441,18 @@ export type GetWorkspaceEventsResponses = {
     } & NoteFolderCreatedEvent) | ({
         type: 'FolderDeletedEvent';
     } & NoteFolderDeletedEvent) | ({
-        type: 'FolderMovedEvent';
-    } & NoteFolderMovedEvent) | ({
-        type: 'FolderRenamedEvent';
-    } & NoteFolderRenamedEvent) | ({
+        type: 'FolderUpdatedEvent';
+    } & NoteFolderUpdatedEvent) | ({
         type: 'NoteContentUpdatedEvent';
     } & NoteNoteContentUpdatedEvent) | ({
         type: 'NoteCreatedEvent';
     } & NoteNoteCreatedEvent) | ({
         type: 'NoteDeletedEvent';
     } & NoteNoteDeletedEvent) | ({
-        type: 'NoteMovedEvent';
-    } & NoteNoteMovedEvent) | ({
-        type: 'NoteRenamedEvent';
-    } & NoteNoteRenamedEvent) | ({
-        type: 'WorkspaceRenamedEvent';
-    } & NoteWorkspaceRenamedEvent);
+        type: 'NoteInfoUpdatedEvent';
+    } & NoteNoteInfoUpdatedEvent) | ({
+        type: 'WorkspaceUpdatedEvent';
+    } & NoteWorkspaceUpdatedEvent);
 };
 
 export type GetWorkspaceEventsResponse = GetWorkspaceEventsResponses[keyof GetWorkspaceEventsResponses];

@@ -71,20 +71,23 @@ export const zNoteError = z.object({
 
 export const zNoteName = z.string().min(1).max(255);
 
-export const zNoteNoteContent = z.string().nullable();
-
 export const zNoteNote = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
     folderId: zNoteId,
     tags: z.array(z.string()),
-    content: zNoteNoteContent.optional(),
     backlinksCount: z.int().gte(0).readonly(),
     outgoingLinksCount: z.int().gte(0).readonly()
 });
 
 export const zNoteNotePropertiesId = z.uuid().readonly();
+
+export const zNoteNoteContent = z.string().nullable();
+
+export const zNoteNoteWithContent = zNoteNote.and(z.object({
+    content: zNoteNoteContent.optional()
+}));
 
 export const zNoteGraph = z.object({
     nodes: z.array(z.object({
@@ -149,24 +152,14 @@ export const zNoteFolderDeletedEvent = z.object({
     })
 });
 
-export const zNoteFolderMovedEvent = z.object({
-    type: z.enum(['FolderRenamedEvent']),
-    data: z.object({
-        id: zNoteId,
-        fromFolderId: zNoteId,
-        toFolderId: zNoteId
-    })
+export const zNoteFolderUpdatedEvent = z.object({
+    type: z.enum(['FolderInfoUpdatedEvent']),
+    data: zNoteFolder
 });
 
-export const zNoteFolderRenamedEvent = z.object({
-    type: z.enum(['FolderRenamedEvent']),
-    data: z.object({
-        id: zNoteId,
-        oldName: zNoteName.optional(),
-        newName: zNoteName
-    })
-});
-
+/**
+ * When user A is in read mode, user B commits changes, user A will receive this event
+ */
 export const zNoteNoteContentUpdatedEvent = z.object({
     type: z.enum(['NoteContentUpdatedEvent']),
     data: z.object({
@@ -189,33 +182,22 @@ export const zNoteNoteDeletedEvent = z.object({
     })
 });
 
-export const zNoteNoteMovedEvent = z.object({
-    type: z.enum(['NoteMovedEvent']),
+export const zNoteTags = z.array(z.string());
+
+export const zNoteNoteInfoUpdatedEvent = z.object({
+    type: z.enum(['NoteInfoUpdatedEvent']),
     data: z.object({
         id: zNoteNotePropertiesId,
-        fromFolderId: zNoteId,
-        toFolderId: zNoteId
+        name: zNotePropertiesName,
+        icon: zNoteIcon,
+        folderId: zNoteId.optional(),
+        tags: zNoteTags.optional()
     })
 });
 
-export const zNoteNoteRenamedEvent = z.object({
-    type: z.enum(['NoteRenamedEvent']),
-    data: z.object({
-        id: zNoteNotePropertiesId,
-        oldName: zNotePropertiesName.optional(),
-        newName: zNotePropertiesName
-    })
-});
-
-export const zNoteWorkspacePropertiesName = z.string().min(1).max(255);
-
-export const zNoteWorkspaceRenamedEvent = z.object({
-    type: z.enum(['WorkspaceRenamedEvent']),
-    data: z.object({
-        id: zNotePropertiesId,
-        oldName: zNoteWorkspacePropertiesName,
-        newName: zNoteWorkspacePropertiesName
-    })
+export const zNoteWorkspaceUpdatedEvent = z.object({
+    type: z.enum(['WorkspaceUpdatedEvent']),
+    data: zNoteWorkspace
 });
 
 /**
@@ -233,6 +215,8 @@ export const zNoteWorkspaceMember = z.object({
     id: zNoteUserPropertiesId,
     role: zNoteWorkspaceRole
 });
+
+export const zNoteWorkspacePropertiesName = z.string().min(1).max(255);
 
 export const zNoteTrashedDeletedBy = z.enum(['purpose', 'parent']);
 
@@ -281,9 +265,12 @@ export const zNoteFolderWritable = z.object({
 export const zNoteNoteWritable = z.object({
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
-    tags: z.array(z.string()),
-    content: zNoteNoteContent.optional()
+    tags: z.array(z.string())
 });
+
+export const zNoteNoteWithContentWritable = zNoteNoteWritable.and(z.object({
+    content: zNoteNoteContent.optional()
+}));
 
 export const zNoteNoteLinkWritable = z.object({
     name: zNotePropertiesName,
@@ -310,18 +297,14 @@ export const zNoteFolderDeletedEventWritable = z.object({
     type: z.enum(['FolderDeletedEvent'])
 });
 
-export const zNoteFolderMovedEventWritable = z.object({
-    type: z.enum(['FolderRenamedEvent'])
+export const zNoteFolderUpdatedEventWritable = z.object({
+    type: z.enum(['FolderInfoUpdatedEvent']),
+    data: zNoteFolderWritable
 });
 
-export const zNoteFolderRenamedEventWritable = z.object({
-    type: z.enum(['FolderRenamedEvent']),
-    data: z.object({
-        oldName: zNoteName.optional(),
-        newName: zNoteName
-    })
-});
-
+/**
+ * When user A is in read mode, user B commits changes, user A will receive this event
+ */
 export const zNoteNoteContentUpdatedEventWritable = z.object({
     type: z.enum(['NoteContentUpdatedEvent'])
 });
@@ -337,24 +320,18 @@ export const zNoteNoteDeletedEventWritable = z.object({
     type: z.enum(['NoteDeletedEvent'])
 });
 
-export const zNoteNoteMovedEventWritable = z.object({
-    type: z.enum(['NoteMovedEvent'])
-});
-
-export const zNoteNoteRenamedEventWritable = z.object({
-    type: z.enum(['NoteRenamedEvent']),
+export const zNoteNoteInfoUpdatedEventWritable = z.object({
+    type: z.enum(['NoteInfoUpdatedEvent']),
     data: z.object({
-        oldName: zNotePropertiesName.optional(),
-        newName: zNotePropertiesName
+        name: zNotePropertiesName,
+        icon: zNoteIcon,
+        tags: zNoteTags.optional()
     })
 });
 
-export const zNoteWorkspaceRenamedEventWritable = z.object({
-    type: z.enum(['WorkspaceRenamedEvent']),
-    data: z.object({
-        oldName: zNoteWorkspacePropertiesName,
-        newName: zNoteWorkspacePropertiesName
-    })
+export const zNoteWorkspaceUpdatedEventWritable = z.object({
+    type: z.enum(['WorkspaceUpdatedEvent']),
+    data: zNoteWorkspaceWritable
 });
 
 export const zNoteTrashedNoteWritable = z.object({
@@ -539,13 +516,15 @@ export const zGetNoteData = z.object({
     path: z.object({
         noteId: zNoteNotePropertiesId
     }),
-    query: z.never().optional()
+    query: z.object({
+        includeContent: z.boolean().optional().default(false)
+    }).optional()
 });
 
 /**
  * Successful response
  */
-export const zGetNoteResponse = zNoteNote;
+export const zGetNoteResponse = zNoteNoteWithContent;
 
 export const zGetNoteGraphData = z.object({
     body: z.never().optional(),
@@ -741,11 +720,8 @@ export const zGetWorkspaceEventsResponse = z.union([
         type: z.literal('FolderDeletedEvent')
     }).and(zNoteFolderDeletedEvent),
     z.object({
-        type: z.literal('FolderMovedEvent')
-    }).and(zNoteFolderMovedEvent),
-    z.object({
-        type: z.literal('FolderRenamedEvent')
-    }).and(zNoteFolderRenamedEvent),
+        type: z.literal('FolderUpdatedEvent')
+    }).and(zNoteFolderUpdatedEvent),
     z.object({
         type: z.literal('NoteContentUpdatedEvent')
     }).and(zNoteNoteContentUpdatedEvent),
@@ -756,14 +732,11 @@ export const zGetWorkspaceEventsResponse = z.union([
         type: z.literal('NoteDeletedEvent')
     }).and(zNoteNoteDeletedEvent),
     z.object({
-        type: z.literal('NoteMovedEvent')
-    }).and(zNoteNoteMovedEvent),
+        type: z.literal('NoteInfoUpdatedEvent')
+    }).and(zNoteNoteInfoUpdatedEvent),
     z.object({
-        type: z.literal('NoteRenamedEvent')
-    }).and(zNoteNoteRenamedEvent),
-    z.object({
-        type: z.literal('WorkspaceRenamedEvent')
-    }).and(zNoteWorkspaceRenamedEvent)
+        type: z.literal('WorkspaceUpdatedEvent')
+    }).and(zNoteWorkspaceUpdatedEvent)
 ]);
 
 export const zGetWorkspaceGraphData = z.object({
