@@ -10,12 +10,13 @@ export type ShareNoteSearch = {
      */
     id: string;
     noteId: string;
+    noteName: string;
     blockId: string;
-    name: string;
     /**
      * Plain text content of the note's block
      */
     content: string;
+    tags?: Array<string>;
 };
 
 export type ShareNoteCommittedEvent = {
@@ -100,15 +101,10 @@ export type NoteNote = {
     name: string;
     icon: string | null;
     folderId: string;
+    tags: Array<string>;
     content?: NoteNoteContent;
     readonly backlinksCount: number;
     readonly outgoingLinksCount: number;
-};
-
-export type NotePropertiesName = string;
-
-export type NoteTag = {
-    name: string;
 };
 
 export type NoteNotePropertiesId = string;
@@ -141,13 +137,13 @@ export type NoteGraph = {
     }>;
 };
 
-export type NoteNotePropertiesName = string;
+export type NotePropertiesName = string;
 
 export type NoteIcon = string | null;
 
 export type NoteNoteLink = {
     id: NoteNotePropertiesId;
-    name: NoteNotePropertiesName;
+    name: NotePropertiesName;
     icon: NoteIcon;
 };
 
@@ -240,7 +236,7 @@ export type NoteNoteCreatedEvent = {
     type: 'NoteCreatedEvent';
     data: {
         id: NoteNotePropertiesId;
-        name: NoteNotePropertiesName;
+        name: NotePropertiesName;
     };
 };
 
@@ -266,8 +262,8 @@ export type NoteNoteRenamedEvent = {
     type: 'NoteRenamedEvent';
     data: {
         id: NoteNotePropertiesId;
-        oldName?: NoteNotePropertiesName;
-        newName: NoteNotePropertiesName;
+        oldName?: NotePropertiesName;
+        newName: NotePropertiesName;
     };
 };
 
@@ -322,7 +318,7 @@ export type NotePropertiesIcon = string | null;
 
 export type NoteWorkspaceTreeNote = {
     id: NoteNotePropertiesId;
-    name: NoteNotePropertiesName;
+    name: NotePropertiesName;
     icon: NoteIcon;
 };
 
@@ -355,11 +351,12 @@ export type NoteNoteWritable = {
     name: string;
     icon: string | null;
     folderId: string;
+    tags: Array<string>;
     content?: NoteNoteContent;
 };
 
 export type NoteNoteLinkWritable = {
-    name: NoteNotePropertiesName;
+    name: NotePropertiesName;
     icon: NoteIcon;
 };
 
@@ -406,7 +403,7 @@ export type NoteNoteContentUpdatedEventWritable = {
 export type NoteNoteCreatedEventWritable = {
     type: 'NoteCreatedEvent';
     data: {
-        name: NoteNotePropertiesName;
+        name: NotePropertiesName;
     };
 };
 
@@ -425,8 +422,8 @@ export type NoteNoteMovedEventWritable = {
 export type NoteNoteRenamedEventWritable = {
     type: 'NoteRenamedEvent';
     data: {
-        oldName?: NoteNotePropertiesName;
-        newName: NoteNotePropertiesName;
+        oldName?: NotePropertiesName;
+        newName: NotePropertiesName;
     };
 };
 
@@ -447,7 +444,7 @@ export type NoteTrashedFolderWritable = {
 };
 
 export type NoteWorkspaceTreeNoteWritable = {
-    name: NoteNotePropertiesName;
+    name: NotePropertiesName;
     icon: NoteIcon;
 };
 
@@ -499,13 +496,8 @@ export type NoteGenerateDailyNoteRequest = {
     workspaceId: NoteId;
 };
 
-export type NoteSearchTagsRequest = {
-    name: NotePropertiesName;
-    limit?: number;
-};
-
 export type NoteRenameNoteRequest = {
-    name: NoteNotePropertiesName;
+    name: NotePropertiesName;
 };
 
 export type NoteRenameRevisionRequest = {
@@ -736,7 +728,6 @@ export type GetNotesData = {
          * Number of items per page
          */
         limit?: number;
-        tags?: Array<string>;
     };
     url: '/note/notes';
 };
@@ -832,39 +823,6 @@ export type GenerateDailyNoteResponses = {
      */
     201: unknown;
 };
-
-export type SearchTagsData = {
-    body: NoteSearchTagsRequest;
-    path?: never;
-    query?: never;
-    url: '/note/notes/search-tags';
-};
-
-export type SearchTagsErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * Unauthorized Error response
-     */
-    401: NoteError;
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type SearchTagsError = SearchTagsErrors[keyof SearchTagsErrors];
-
-export type SearchTagsResponses = {
-    /**
-     * List of matching tags in the workspace
-     */
-    200: Array<NoteTag>;
-};
-
-export type SearchTagsResponse = SearchTagsResponses[keyof SearchTagsResponses];
 
 export type DeleteNoteData = {
     body?: never;

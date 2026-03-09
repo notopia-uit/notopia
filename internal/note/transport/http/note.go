@@ -25,13 +25,6 @@ func (h *StrictHandler) GenerateDailyNote(
 	return nil, errors.New("not implemented")
 }
 
-func (h *StrictHandler) SearchTags(
-	ctx context.Context,
-	request note.SearchTagsRequestObject,
-) (note.SearchTagsResponseObject, error) {
-	return nil, errors.New("not implemented")
-}
-
 func (h *StrictHandler) DeleteNote(
 	ctx context.Context,
 	request note.DeleteNoteRequestObject,

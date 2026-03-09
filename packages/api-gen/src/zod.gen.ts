@@ -5,9 +5,10 @@ import * as z from 'zod';
 export const zShareNoteSearch = z.object({
     id: z.string(),
     noteId: z.uuid(),
+    noteName: z.string().min(1).max(255),
     blockId: z.string(),
-    name: z.string().min(1).max(255),
-    content: z.string()
+    content: z.string(),
+    tags: z.array(z.string()).optional()
 });
 
 export const zShareId = z.uuid().readonly();
@@ -74,15 +75,10 @@ export const zNoteNote = z.object({
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
     folderId: z.uuid(),
+    tags: z.array(z.string()),
     content: zNoteNoteContent.optional(),
     backlinksCount: z.int().gte(0).readonly(),
     outgoingLinksCount: z.int().gte(0).readonly()
-});
-
-export const zNotePropertiesName = z.string();
-
-export const zNoteTag = z.object({
-    name: z.string()
 });
 
 export const zNoteNotePropertiesId = z.uuid().readonly();
@@ -100,13 +96,13 @@ export const zNoteGraph = z.object({
     })).optional()
 });
 
-export const zNoteNotePropertiesName = z.string().min(1).max(255);
+export const zNotePropertiesName = z.string().min(1).max(255);
 
 export const zNoteIcon = z.string().nullable();
 
 export const zNoteNoteLink = z.object({
     id: zNoteNotePropertiesId,
-    name: zNoteNotePropertiesName,
+    name: zNotePropertiesName,
     icon: zNoteIcon
 });
 
@@ -181,7 +177,7 @@ export const zNoteNoteCreatedEvent = z.object({
     type: z.enum(['NoteCreatedEvent']),
     data: z.object({
         id: zNoteNotePropertiesId,
-        name: zNoteNotePropertiesName
+        name: zNotePropertiesName
     })
 });
 
@@ -207,8 +203,8 @@ export const zNoteNoteRenamedEvent = z.object({
     type: z.enum(['NoteRenamedEvent']),
     data: z.object({
         id: zNoteNotePropertiesId,
-        oldName: zNoteNotePropertiesName.optional(),
-        newName: zNoteNotePropertiesName
+        oldName: zNotePropertiesName.optional(),
+        newName: zNotePropertiesName
     })
 });
 
@@ -259,7 +255,7 @@ export const zNotePropertiesIcon = z.string().nullable();
 
 export const zNoteWorkspaceTreeNote = z.object({
     id: zNoteNotePropertiesId,
-    name: zNoteNotePropertiesName,
+    name: zNotePropertiesName,
     icon: zNoteIcon
 });
 
@@ -292,11 +288,12 @@ export const zNoteNoteWritable = z.object({
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
     folderId: z.uuid(),
+    tags: z.array(z.string()),
     content: zNoteNoteContent.optional()
 });
 
 export const zNoteNoteLinkWritable = z.object({
-    name: zNoteNotePropertiesName,
+    name: zNotePropertiesName,
     icon: zNoteIcon
 });
 
@@ -343,7 +340,7 @@ export const zNoteNoteContentUpdatedEventWritable = z.object({
 export const zNoteNoteCreatedEventWritable = z.object({
     type: z.enum(['NoteCreatedEvent']),
     data: z.object({
-        name: zNoteNotePropertiesName
+        name: zNotePropertiesName
     })
 });
 
@@ -362,8 +359,8 @@ export const zNoteNoteMovedEventWritable = z.object({
 export const zNoteNoteRenamedEventWritable = z.object({
     type: z.enum(['NoteRenamedEvent']),
     data: z.object({
-        oldName: zNoteNotePropertiesName.optional(),
-        newName: zNoteNotePropertiesName
+        oldName: zNotePropertiesName.optional(),
+        newName: zNotePropertiesName
     })
 });
 
@@ -384,7 +381,7 @@ export const zNoteTrashedFolderWritable = z.object({
 });
 
 export const zNoteWorkspaceTreeNoteWritable = z.object({
-    name: zNoteNotePropertiesName,
+    name: zNotePropertiesName,
     icon: zNoteIcon
 });
 
@@ -434,13 +431,8 @@ export const zNoteGenerateDailyNoteRequest = z.object({
     workspaceId: zNoteId
 });
 
-export const zNoteSearchTagsRequest = z.object({
-    name: zNotePropertiesName,
-    limit: z.int().optional().default(10)
-});
-
 export const zNoteRenameNoteRequest = z.object({
-    name: zNoteNotePropertiesName
+    name: zNotePropertiesName
 });
 
 export const zNoteRenameRevisionRequest = z.object({
@@ -523,8 +515,7 @@ export const zGetNotesData = z.object({
     path: z.never().optional(),
     query: z.object({
         page: z.int().gte(1).optional().default(1),
-        limit: z.int().gte(1).lte(100).optional().default(20),
-        tags: z.array(z.string()).optional()
+        limit: z.int().gte(1).lte(100).optional().default(20)
     }).optional()
 });
 
@@ -544,17 +535,6 @@ export const zGenerateDailyNoteData = z.object({
     path: z.never().optional(),
     query: z.never().optional()
 });
-
-export const zSearchTagsData = z.object({
-    body: zNoteSearchTagsRequest,
-    path: z.never().optional(),
-    query: z.never().optional()
-});
-
-/**
- * List of matching tags in the workspace
- */
-export const zSearchTagsResponse = z.array(zNoteTag);
 
 export const zDeleteNoteData = z.object({
     body: z.never().optional(),

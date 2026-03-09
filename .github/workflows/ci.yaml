@@ -218,7 +218,7 @@ jobs:
       - name: Check for changes after Build/Gen
         run: |
           git add .
-          if ! git diff --staged --exit-code --color-words; then
+          if ! git diff --staged --color=always --exit-code; then
             echo 'ERROR: There are uncommitted changes after build/gen. Please commit the changes.';
             git status --short
             exit 1;

@@ -24,6 +24,14 @@ properties:
     format: uuid
     example: 123e4567-e89b-12d3-a456-426614174000
 
+  tags:
+    type: array
+    items:
+      type: string
+    example:
+      - work
+      - meeting
+
   content:
     $ref: ./NoteContent.yaml
     nullable: true
@@ -45,5 +53,6 @@ required:
   - name
   - icon
   - folderId
+  - tags
   - backlinksCount
   - outgoingLinksCount

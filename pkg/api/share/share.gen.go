@@ -28,9 +28,10 @@ type NoteSearch struct {
 	Content string `json:"content"`
 
 	// Id note:{noteId}:block:{blockId}
-	Id     string             `json:"id"`
-	Name   string             `json:"name"`
-	NoteId openapi_types.UUID `json:"noteId"`
+	Id       string             `json:"id"`
+	NoteId   openapi_types.UUID `json:"noteId"`
+	NoteName string             `json:"noteName"`
+	Tags     *[]string          `json:"tags,omitempty"`
 }
 
 // Revision defines model for Revision.

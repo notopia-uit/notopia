@@ -332,6 +332,7 @@ type Note struct {
 	Id                 *openapi_types.UUID `json:"id,omitempty"`
 	Name               string              `json:"name"`
 	OutgoingLinksCount *int                `json:"outgoingLinksCount,omitempty"`
+	Tags               []string            `json:"tags"`
 }
 
 // NoteContent defines model for NoteContent.
@@ -351,8 +352,8 @@ type NoteContentUpdatedEventType string
 // NoteCreatedEvent defines model for NoteCreatedEvent.
 type NoteCreatedEvent struct {
 	Data struct {
-		Id   *NotePropertiesId  `json:"id,omitempty"`
-		Name NotePropertiesName `json:"name"`
+		Id   *NotePropertiesId `json:"id,omitempty"`
+		Name PropertiesName    `json:"name"`
 	} `json:"data"`
 	Type NoteCreatedEventType `json:"type"`
 }
@@ -373,9 +374,9 @@ type NoteDeletedEventType string
 
 // NoteLink defines model for NoteLink.
 type NoteLink struct {
-	Icon *Icon              `json:"icon"`
-	Id   *NotePropertiesId  `json:"id,omitempty"`
-	Name NotePropertiesName `json:"name"`
+	Icon *Icon             `json:"icon"`
+	Id   *NotePropertiesId `json:"id,omitempty"`
+	Name PropertiesName    `json:"name"`
 }
 
 // NoteMovedEvent defines model for NoteMovedEvent.
@@ -394,9 +395,9 @@ type NoteMovedEventType string
 // NoteRenamedEvent defines model for NoteRenamedEvent.
 type NoteRenamedEvent struct {
 	Data struct {
-		Id      *NotePropertiesId   `json:"id,omitempty"`
-		NewName NotePropertiesName  `json:"newName"`
-		OldName *NotePropertiesName `json:"oldName,omitempty"`
+		Id      *NotePropertiesId `json:"id,omitempty"`
+		NewName PropertiesName    `json:"newName"`
+		OldName *PropertiesName   `json:"oldName,omitempty"`
 	} `json:"data"`
 	Type NoteRenamedEventType `json:"type"`
 }
@@ -406,9 +407,6 @@ type NoteRenamedEventType string
 
 // NotePropertiesId defines model for Note_properties-id.
 type NotePropertiesId = openapi_types.UUID
-
-// NotePropertiesName defines model for Note_properties-name.
-type NotePropertiesName = string
 
 // Pagination defines model for Pagination.
 type Pagination struct {
@@ -444,11 +442,6 @@ type RevisionPropertiesId = openapi_types.UUID
 
 // RevisionPropertiesName defines model for Revision_properties-name.
 type RevisionPropertiesName = string
-
-// Tag defines model for Tag.
-type Tag struct {
-	Name string `json:"name"`
-}
 
 // TrashedDeletedBy defines model for TrashedDeletedBy.
 type TrashedDeletedBy string
@@ -512,9 +505,9 @@ type WorkspaceTreeFolder struct {
 
 // WorkspaceTreeNote defines model for WorkspaceTreeNote.
 type WorkspaceTreeNote struct {
-	Icon *Icon              `json:"icon"`
-	Id   *NotePropertiesId  `json:"id,omitempty"`
-	Name NotePropertiesName `json:"name"`
+	Icon *Icon             `json:"icon"`
+	Id   *NotePropertiesId `json:"id,omitempty"`
+	Name PropertiesName    `json:"name"`
 }
 
 // WorkspacePropertiesName defines model for Workspace_properties-name.
@@ -613,9 +606,6 @@ type InternalServerError = Error
 // NotFoundError defines model for NotFoundError.
 type NotFoundError = Error
 
-// SearchTagsResponse defines model for SearchTagsResponse.
-type SearchTagsResponse = []Tag
-
 // ShowTrashResponse defines model for ShowTrashResponse.
 type ShowTrashResponse struct {
 	Data struct {
@@ -655,7 +645,7 @@ type RenameFolderRequest struct {
 
 // RenameNoteRequest defines model for RenameNoteRequest.
 type RenameNoteRequest struct {
-	Name NotePropertiesName `json:"name"`
+	Name PropertiesName `json:"name"`
 }
 
 // RenameRevisionRequest defines model for RenameRevisionRequest.
@@ -672,12 +662,6 @@ type RenameWorkspaceRequest struct {
 type RestoreTrashedWorkspaceItemsRequest struct {
 	Folders *[]TrashedFolder `json:"folders,omitempty"`
 	Notes   *[]TrashedNote   `json:"notes,omitempty"`
-}
-
-// SearchTagsRequest defines model for SearchTagsRequest.
-type SearchTagsRequest struct {
-	Limit *int           `json:"limit,omitempty"`
-	Name  PropertiesName `json:"name"`
 }
 
 // TrashWorkspaceItemsRequest defines model for TrashWorkspaceItemsRequest.
@@ -701,18 +685,11 @@ type GetNotesParams struct {
 
 	// Limit Number of items per page
 	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
-	Tags  *[]string   `form:"tags,omitempty" json:"tags,omitempty"`
 }
 
 // GenerateDailyNoteJSONBody defines parameters for GenerateDailyNote.
 type GenerateDailyNoteJSONBody struct {
 	WorkspaceId *Id `json:"workspaceId,omitempty"`
-}
-
-// SearchTagsJSONBody defines parameters for SearchTags.
-type SearchTagsJSONBody struct {
-	Limit *int           `json:"limit,omitempty"`
-	Name  PropertiesName `json:"name"`
 }
 
 // GetNoteGraphParams defines parameters for GetNoteGraph.
@@ -728,7 +705,7 @@ type GetNoteLinksParams struct {
 
 // RenameNoteJSONBody defines parameters for RenameNote.
 type RenameNoteJSONBody struct {
-	Name NotePropertiesName `json:"name"`
+	Name PropertiesName `json:"name"`
 }
 
 // GetRevisionsParams defines parameters for GetRevisions.
@@ -791,9 +768,6 @@ type CreateNoteJSONRequestBody = Note
 // GenerateDailyNoteJSONRequestBody defines body for GenerateDailyNote for application/json ContentType.
 type GenerateDailyNoteJSONRequestBody GenerateDailyNoteJSONBody
 
-// SearchTagsJSONRequestBody defines body for SearchTags for application/json ContentType.
-type SearchTagsJSONRequestBody SearchTagsJSONBody
-
 // RenameNoteJSONRequestBody defines body for RenameNote for application/json ContentType.
 type RenameNoteJSONRequestBody RenameNoteJSONBody
 
@@ -835,9 +809,6 @@ type ServerInterface interface {
 	// Generate daily note
 	// (POST /note/notes/generate-daily)
 	GenerateDailyNote(c *gin.Context)
-	// Search tags
-	// (POST /note/notes/search-tags)
-	SearchTags(c *gin.Context)
 	// Delete note
 	// (DELETE /note/notes/{noteId})
 	DeleteNote(c *gin.Context, noteId NoteIdPath)
@@ -997,14 +968,6 @@ func (siw *ServerInterfaceWrapper) GetNotes(c *gin.Context) {
 		return
 	}
 
-	// ------------- Optional query parameter "tags" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "tags", c.Request.URL.Query(), &params.Tags, runtime.BindQueryParameterOptions{Type: "array", Format: ""})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter tags: %w", err), http.StatusBadRequest)
-		return
-	}
-
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -1043,21 +1006,6 @@ func (siw *ServerInterfaceWrapper) GenerateDailyNote(c *gin.Context) {
 	}
 
 	siw.Handler.GenerateDailyNote(c)
-}
-
-// SearchTags operation middleware
-func (siw *ServerInterfaceWrapper) SearchTags(c *gin.Context) {
-
-	c.Set(Oauth2Scopes, []string{})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.SearchTags(c)
 }
 
 // DeleteNote operation middleware
@@ -1849,7 +1797,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/note/notes", wrapper.GetNotes)
 	router.POST(options.BaseURL+"/note/notes", wrapper.CreateNote)
 	router.POST(options.BaseURL+"/note/notes/generate-daily", wrapper.GenerateDailyNote)
-	router.POST(options.BaseURL+"/note/notes/search-tags", wrapper.SearchTags)
 	router.DELETE(options.BaseURL+"/note/notes/:noteId", wrapper.DeleteNote)
 	router.GET(options.BaseURL+"/note/notes/:noteId", wrapper.GetNote)
 	router.GET(options.BaseURL+"/note/notes/:noteId/graph", wrapper.GetNoteGraph)
@@ -1953,8 +1900,6 @@ type GetWorkspaceTreeResponseJSONResponse WorkspaceTreeFolder
 type InternalServerErrorJSONResponse Error
 
 type NotFoundErrorJSONResponse Error
-
-type SearchTagsResponseJSONResponse []Tag
 
 type ShowTrashResponseJSONResponse struct {
 	Data struct {
@@ -2205,52 +2150,6 @@ type GenerateDailyNote500JSONResponse struct {
 }
 
 func (response GenerateDailyNote500JSONResponse) VisitGenerateDailyNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SearchTagsRequestObject struct {
-	Body *SearchTagsJSONRequestBody
-}
-
-type SearchTagsResponseObject interface {
-	VisitSearchTagsResponse(w http.ResponseWriter) error
-}
-
-type SearchTags200JSONResponse struct{ SearchTagsResponseJSONResponse }
-
-func (response SearchTags200JSONResponse) VisitSearchTagsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SearchTags400JSONResponse struct{ BadRequestErrorJSONResponse }
-
-func (response SearchTags400JSONResponse) VisitSearchTagsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SearchTags401JSONResponse struct{ UnauthorizedErrorJSONResponse }
-
-func (response SearchTags401JSONResponse) VisitSearchTagsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type SearchTags500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response SearchTags500JSONResponse) VisitSearchTagsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -3814,9 +3713,6 @@ type StrictServerInterface interface {
 	// Generate daily note
 	// (POST /note/notes/generate-daily)
 	GenerateDailyNote(ctx context.Context, request GenerateDailyNoteRequestObject) (GenerateDailyNoteResponseObject, error)
-	// Search tags
-	// (POST /note/notes/search-tags)
-	SearchTags(ctx context.Context, request SearchTagsRequestObject) (SearchTagsResponseObject, error)
 	// Delete note
 	// (DELETE /note/notes/{noteId})
 	DeleteNote(ctx context.Context, request DeleteNoteRequestObject) (DeleteNoteResponseObject, error)
@@ -4066,39 +3962,6 @@ func (sh *strictHandler) GenerateDailyNote(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(GenerateDailyNoteResponseObject); ok {
 		if err := validResponse.VisitGenerateDailyNoteResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// SearchTags operation middleware
-func (sh *strictHandler) SearchTags(ctx *gin.Context) {
-	var request SearchTagsRequestObject
-
-	var body SearchTagsJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SearchTags(ctx, request.(SearchTagsRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "SearchTags")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(SearchTagsResponseObject); ok {
-		if err := validResponse.VisitSearchTagsResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

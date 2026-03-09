@@ -28,14 +28,6 @@ get:
   parameters:
     - $ref: ../../common/components/parameters/pageQuery.yaml
     - $ref: ../../common/components/parameters/limitQuery.yaml
-    - name: tags
-      in: query
-      required: false
-      schema:
-        type: array
-        items:
-          type: string
-          example: work
   responses:
     200:
       $ref: ../components/responses/GetNotesResponse.yaml

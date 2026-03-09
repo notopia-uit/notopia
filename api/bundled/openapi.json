@@ -277,18 +277,6 @@
           },
           {
             "$ref": "#/components/parameters/note_limitQuery"
-          },
-          {
-            "name": "tags",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "example": "work"
-              }
-            }
           }
         ],
         "responses": {
@@ -334,37 +322,6 @@
           },
           "404": {
             "$ref": "#/components/responses/note_NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/note_InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/notes/search-tags": {
-      "post": {
-        "security": [
-          {
-            "note_Oauth2": []
-          }
-        ],
-        "tags": [
-          "Note"
-        ],
-        "summary": "Search tags",
-        "operationId": "searchTags",
-        "requestBody": {
-          "$ref": "#/components/requestBodies/note_SearchTagsRequest"
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/note_SearchTagsResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/note_BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "500": {
             "$ref": "#/components/responses/note_InternalServerError"
@@ -1421,34 +1378,44 @@
           "id": {
             "type": "string",
             "description": "note:{noteId}:block:{blockId}",
-            "example": "note:46f94d4d-41b5-4df6-bf8d-270fb9a49c97:block:a-random-idd"
+            "example": "note:46f94d4d-41b5-4df6-bf8d-270fb9a49c97:block:a-random-id"
           },
           "noteId": {
             "type": "string",
             "format": "uuid",
             "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
           },
-          "blockId": {
-            "type": "string",
-            "example": "a-random-id"
-          },
-          "name": {
+          "noteName": {
             "type": "string",
             "minLength": 1,
             "maxLength": 255,
             "example": "Meeting Notes"
           },
+          "blockId": {
+            "type": "string",
+            "example": "a-random-id"
+          },
           "content": {
             "type": "string",
             "description": "Plain text content of the note's block",
-            "example": "This is the content of the note."
+            "example": "This is the content of the note"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "tag1",
+              "tag2"
+            ]
           }
         },
         "required": [
           "id",
           "noteId",
+          "noteName",
           "blockId",
-          "name",
           "content"
         ]
       },
@@ -1679,6 +1646,16 @@
             "format": "uuid",
             "example": "123e4567-e89b-12d3-a456-426614174000"
           },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "work",
+              "meeting"
+            ]
+          },
           "content": {
             "$ref": "#/components/schemas/note_NoteContent",
             "nullable": true
@@ -1701,24 +1678,9 @@
           "name",
           "icon",
           "folderId",
+          "tags",
           "backlinksCount",
           "outgoingLinksCount"
-        ]
-      },
-      "note_properties-name": {
-        "type": "string",
-        "example": "work"
-      },
-      "note_Tag": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "work"
-          }
-        },
-        "required": [
-          "name"
         ]
       },
       "note_Note_properties-id": {
@@ -1789,7 +1751,7 @@
           }
         }
       },
-      "note_Note_properties-name": {
+      "note_properties-name": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
@@ -1807,7 +1769,7 @@
             "$ref": "#/components/schemas/note_Note_properties-id"
           },
           "name": {
-            "$ref": "#/components/schemas/note_Note_properties-name"
+            "$ref": "#/components/schemas/note_properties-name"
           },
           "icon": {
             "$ref": "#/components/schemas/note_icon"
@@ -2113,7 +2075,7 @@
                 "$ref": "#/components/schemas/note_Note_properties-id"
               },
               "name": {
-                "$ref": "#/components/schemas/note_Note_properties-name"
+                "$ref": "#/components/schemas/note_properties-name"
               }
             },
             "required": [
@@ -2212,11 +2174,11 @@
                 "$ref": "#/components/schemas/note_Note_properties-id"
               },
               "oldName": {
-                "$ref": "#/components/schemas/note_Note_properties-name",
+                "$ref": "#/components/schemas/note_properties-name",
                 "example": "Meeting Notes"
               },
               "newName": {
-                "$ref": "#/components/schemas/note_Note_properties-name",
+                "$ref": "#/components/schemas/note_properties-name",
                 "example": "Work"
               }
             },
@@ -2390,7 +2352,7 @@
             "$ref": "#/components/schemas/note_Note_properties-id"
           },
           "name": {
-            "$ref": "#/components/schemas/note_Note_properties-name"
+            "$ref": "#/components/schemas/note_properties-name"
           },
           "icon": {
             "$ref": "#/components/schemas/note_icon"
@@ -2544,29 +2506,6 @@
           }
         }
       },
-      "note_SearchTagsRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/note_properties-name"
-                },
-                "limit": {
-                  "type": "integer",
-                  "default": 10,
-                  "example": 10
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
       "note_RenameNoteRequest": {
         "required": true,
         "content": {
@@ -2575,7 +2514,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/note_Note_properties-name"
+                  "$ref": "#/components/schemas/note_properties-name"
                 }
               },
               "required": [
@@ -2907,19 +2846,6 @@
               "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
             },
             "required": true
-          }
-        }
-      },
-      "note_SearchTagsResponse": {
-        "description": "List of matching tags in the workspace",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/note_Tag"
-              }
-            }
           }
         }
       },
