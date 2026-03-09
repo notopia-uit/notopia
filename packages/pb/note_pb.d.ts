@@ -31,9 +31,9 @@ export declare const GetLatestNoteContentRequestSchema: GenMessage<GetLatestNote
  */
 export declare type GetLatestNoteContentResponse = Message<"note.GetLatestNoteContentResponse"> & {
   /**
-   * @generated from field: string content = 1;
+   * @generated from field: optional string content = 1;
    */
-  content: string;
+  content?: string;
 };
 
 /**

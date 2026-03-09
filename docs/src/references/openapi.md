@@ -2,6 +2,7 @@
 aside: false
 outline: false
 title: Notopia OpenAPI
+order: 1
 ---
 
 <script setup>

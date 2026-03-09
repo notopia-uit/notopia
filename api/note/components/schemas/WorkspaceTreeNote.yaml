@@ -11,7 +11,11 @@ properties:
   icon:
     $ref: ./Note.yaml#/properties/icon
 
+  updatedAt:
+    $ref: ./Note.yaml#/properties/updatedAt
+
 required:
   - id
   - name
   - icon
+  - updatedAt

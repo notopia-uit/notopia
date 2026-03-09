@@ -1,3 +1,7 @@
+---
+order: 1
+---
+
 # Architecture Diagram
 
 ```d2

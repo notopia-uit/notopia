@@ -68,7 +68,7 @@ func (x *GetLatestNoteContentRequest) GetId() string {
 
 type GetLatestNoteContentResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Content       string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+	Content       *string                `protobuf:"bytes,1,opt,name=content,proto3,oneof" json:"content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -104,8 +104,8 @@ func (*GetLatestNoteContentResponse) Descriptor() ([]byte, []int) {
 }
 
 func (x *GetLatestNoteContentResponse) GetContent() string {
-	if x != nil {
-		return x.Content
+	if x != nil && x.Content != nil {
+		return *x.Content
 	}
 	return ""
 }
@@ -117,9 +117,11 @@ const file_note_proto_rawDesc = "" +
 	"\n" +
 	"note.proto\x12\x04note\x1a\x1bbuf/validate/validate.proto\"5\n" +
 	"\x1bGetLatestNoteContentRequest\x12\x16\n" +
-	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\"@\n" +
-	"\x1cGetLatestNoteContentResponse\x12 \n" +
-	"\acontent\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\acontent2l\n" +
+	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\"I\n" +
+	"\x1cGetLatestNoteContentResponse\x12\x1d\n" +
+	"\acontent\x18\x01 \x01(\tH\x00R\acontent\x88\x01\x01B\n" +
+	"\n" +
+	"\b_content2l\n" +
 	"\vNoteService\x12]\n" +
 	"\x14GetLatestNoteContent\x12!.note.GetLatestNoteContentRequest\x1a\".note.GetLatestNoteContentResponseBl\n" +
 	"\bcom.noteB\tNoteProtoP\x01Z%github.com/notopia-uit/notopia/pkg/pb\xa2\x02\x03NXX\xaa\x02\x04Note\xca\x02\x04Note\xe2\x02\x10Note\\GPBMetadata\xea\x02\x04Noteb\x06proto3"
@@ -156,6 +158,7 @@ func file_note_proto_init() {
 	if File_note_proto != nil {
 		return
 	}
+	file_note_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

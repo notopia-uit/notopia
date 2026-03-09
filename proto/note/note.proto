@@ -13,5 +13,5 @@ message GetLatestNoteContentRequest {
 }
 
 message GetLatestNoteContentResponse {
-  string content = 1 [(buf.validate.field).required = true];
+  optional string content = 1;
 }

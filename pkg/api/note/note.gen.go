@@ -216,6 +216,7 @@ type Folder struct {
 	Id          *openapi_types.UUID `json:"id,omitempty"`
 	Name        string              `json:"name"`
 	ParentId    *Id                 `json:"parentId,omitempty"`
+	UpdatedAt   *time.Time          `json:"updatedAt,omitempty"`
 	WorkspaceId *PropertiesId       `json:"workspaceId,omitempty"`
 }
 
@@ -285,10 +286,11 @@ type Note struct {
 	Name               string              `json:"name"`
 	OutgoingLinksCount *int                `json:"outgoingLinksCount,omitempty"`
 	Tags               []string            `json:"tags"`
+	UpdatedAt          *time.Time          `json:"updatedAt,omitempty"`
 }
 
 // NoteContent defines model for NoteContent.
-type NoteContent = string
+type NoteContent = []map[string]interface{}
 
 // NoteContentUpdatedEvent When user A is in read mode, user B commits changes, user A will receive this event
 type NoteContentUpdatedEvent struct {
@@ -356,6 +358,7 @@ type NoteWithContent struct {
 	Name               string              `json:"name"`
 	OutgoingLinksCount *int                `json:"outgoingLinksCount,omitempty"`
 	Tags               []string            `json:"tags"`
+	UpdatedAt          *time.Time          `json:"updatedAt,omitempty"`
 }
 
 // NotePropertiesId defines model for Note_properties-id.
@@ -436,18 +439,20 @@ type WorkspaceRole string
 
 // WorkspaceTreeFolder defines model for WorkspaceTreeFolder.
 type WorkspaceTreeFolder struct {
-	Children []WorkspaceTreeFolder `json:"children"`
-	Icon     *PropertiesIcon       `json:"icon"`
-	Id       *Id                   `json:"id,omitempty"`
-	Name     Name                  `json:"name"`
-	Notes    []WorkspaceTreeNote   `json:"notes"`
+	Children  []WorkspaceTreeFolder `json:"children"`
+	Icon      *PropertiesIcon       `json:"icon"`
+	Id        *Id                   `json:"id,omitempty"`
+	Name      Name                  `json:"name"`
+	Notes     []WorkspaceTreeNote   `json:"notes"`
+	UpdatedAt *PropertiesUpdatedAt  `json:"updatedAt,omitempty"`
 }
 
 // WorkspaceTreeNote defines model for WorkspaceTreeNote.
 type WorkspaceTreeNote struct {
-	Icon *Icon             `json:"icon"`
-	Id   *NotePropertiesId `json:"id,omitempty"`
-	Name PropertiesName    `json:"name"`
+	Icon      *Icon             `json:"icon"`
+	Id        *NotePropertiesId `json:"id,omitempty"`
+	Name      PropertiesName    `json:"name"`
+	UpdatedAt *UpdatedAt        `json:"updatedAt,omitempty"`
 }
 
 // WorkspaceUpdatedEvent defines model for WorkspaceUpdatedEvent.
@@ -480,8 +485,14 @@ type PropertiesId = openapi_types.UUID
 // PropertiesName defines model for properties-name.
 type PropertiesName = string
 
+// PropertiesUpdatedAt defines model for properties-updatedAt.
+type PropertiesUpdatedAt = time.Time
+
 // Tags defines model for tags.
 type Tags = []string
+
+// UpdatedAt defines model for updatedAt.
+type UpdatedAt = time.Time
 
 // FolderIdPath defines model for folderIdPath.
 type FolderIdPath = Id

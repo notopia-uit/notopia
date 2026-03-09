@@ -4,18 +4,25 @@ type: object
 properties:
   id:
     $ref: ./Folder.yaml#/properties/id
+
   name:
     $ref: ./Folder.yaml#/properties/name
+
   icon:
     $ref: ./Folder.yaml#/properties/icon
+
   notes:
     type: array
     items:
       $ref: ../schemas/WorkspaceTreeNote.yaml
+
   children:
     type: array
     items:
       $ref: ./WorkspaceTreeFolder.yaml
+
+  updatedAt:
+    $ref: ./Folder.yaml#/properties/updatedAt
 
 required:
   - id
@@ -23,3 +30,4 @@ required:
   - icon
   - notes
   - children
+  - updatedAt

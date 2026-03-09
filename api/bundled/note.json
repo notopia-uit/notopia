@@ -1314,6 +1314,12 @@
             "nullable": true,
             "example": "📁"
           },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-01T12:00:00Z",
+            "readOnly": true
+          },
           "parentId": {
             "$ref": "#/components/schemas/id",
             "example": "cc7a2e47-6267-4c60-8d36-257f849777e4"
@@ -1327,6 +1333,7 @@
           "id",
           "name",
           "icon",
+          "updatedAt",
           "parentId",
           "workspaceId"
         ]
@@ -1394,6 +1401,12 @@
               "meeting"
             ]
           },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-01T12:34:56Z",
+            "readOnly": true
+          },
           "backlinksCount": {
             "type": "integer",
             "minimum": 0,
@@ -1413,6 +1426,7 @@
           "icon",
           "folderId",
           "tags",
+          "updatedAt",
           "backlinksCount",
           "outgoingLinksCount"
         ]
@@ -1424,9 +1438,172 @@
         "readOnly": true
       },
       "NoteContent": {
-        "type": "string",
+        "type": "array",
+        "items": {
+          "type": "object"
+        },
         "nullable": true,
-        "example": "[\n  {\n    \"type\": \"paragraph\",\n    \"content\": \"Welcome to this demo!\"\n  },\n  {\n    \"type\": \"paragraph\"\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Blocks:\",\n        \"styles\": {\n          \"bold\": true\n        }\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": \"Paragraph\"\n  },\n  {\n    \"type\": \"heading\",\n    \"content\": \"Heading\"\n  },\n  {\n    \"id\": \"toggle-heading\",\n    \"type\": \"heading\",\n    \"props\": {\n      \"isToggleable\": true\n    },\n    \"content\": \"Toggle Heading\"\n  },\n  {\n    \"type\": \"quote\",\n    \"content\": \"Quote\"\n  },\n  {\n    \"type\": \"bulletListItem\",\n    \"content\": \"Bullet List Item\"\n  },\n  {\n    \"type\": \"numberedListItem\",\n    \"content\": \"Numbered List Item\"\n  },\n  {\n    \"type\": \"checkListItem\",\n    \"content\": \"Check List Item\"\n  },\n  {\n    \"id\": \"toggle-list-item\",\n    \"type\": \"toggleListItem\",\n    \"content\": \"Toggle List Item\"\n  },\n  {\n    \"type\": \"codeBlock\",\n    \"props\": {\n      \"language\": \"javascript\"\n    },\n    \"content\": \"console.log('Hello, world!');\"\n  },\n  {\n    \"type\": \"table\",\n    \"content\": {\n      \"type\": \"tableContent\",\n      \"rows\": [\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        },\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        },\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        }\n      ]\n    }\n  },\n  {\n    \"type\": \"file\"\n  },\n  {\n    \"type\": \"image\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\"\n    }\n  },\n  {\n    \"type\": \"video\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\"\n    }\n  },\n  {\n    \"type\": \"audio\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\"\n    }\n  },\n  {\n    \"type\": \"paragraph\"\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Inline Content:\",\n        \"styles\": {\n          \"bold\": true\n        }\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Styled Text\",\n        \"styles\": {\n          \"bold\": true,\n          \"italic\": true,\n          \"textColor\": \"red\",\n          \"backgroundColor\": \"blue\"\n        }\n      },\n      {\n        \"type\": \"text\",\n        \"text\": \" \",\n        \"styles\": {}\n      },\n      {\n        \"type\": \"link\",\n        \"content\": \"Link\",\n        \"href\": \"https://www.blocknotejs.org\"\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\"\n  }\n]\n"
+        "example": [
+          {
+            "type": "paragraph",
+            "content": "Welcome to this demo!"
+          },
+          {
+            "type": "paragraph"
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Blocks:",
+                "styles": {
+                  "bold": true
+                }
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": "Paragraph"
+          },
+          {
+            "type": "heading",
+            "content": "Heading"
+          },
+          {
+            "id": "toggle-heading",
+            "type": "heading",
+            "props": {
+              "isToggleable": true
+            },
+            "content": "Toggle Heading"
+          },
+          {
+            "type": "quote",
+            "content": "Quote"
+          },
+          {
+            "type": "bulletListItem",
+            "content": "Bullet List Item"
+          },
+          {
+            "type": "numberedListItem",
+            "content": "Numbered List Item"
+          },
+          {
+            "type": "checkListItem",
+            "content": "Check List Item"
+          },
+          {
+            "id": "toggle-list-item",
+            "type": "toggleListItem",
+            "content": "Toggle List Item"
+          },
+          {
+            "type": "codeBlock",
+            "props": {
+              "language": "javascript"
+            },
+            "content": "console.log('Hello, world!');"
+          },
+          {
+            "type": "table",
+            "content": {
+              "type": "tableContent",
+              "rows": [
+                {
+                  "cells": [
+                    "Table Cell",
+                    "Table Cell",
+                    "Table Cell"
+                  ]
+                },
+                {
+                  "cells": [
+                    "Table Cell",
+                    "Table Cell",
+                    "Table Cell"
+                  ]
+                },
+                {
+                  "cells": [
+                    "Table Cell",
+                    "Table Cell",
+                    "Table Cell"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "type": "file"
+          },
+          {
+            "type": "image",
+            "props": {
+              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg",
+              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg"
+            }
+          },
+          {
+            "type": "video",
+            "props": {
+              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",
+              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+            }
+          },
+          {
+            "type": "audio",
+            "props": {
+              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3",
+              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
+            }
+          },
+          {
+            "type": "paragraph"
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Inline Content:",
+                "styles": {
+                  "bold": true
+                }
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Styled Text",
+                "styles": {
+                  "bold": true,
+                  "italic": true,
+                  "textColor": "red",
+                  "backgroundColor": "blue"
+                }
+              },
+              {
+                "type": "text",
+                "text": " ",
+                "styles": {}
+              },
+              {
+                "type": "link",
+                "content": "Link",
+                "href": "https://www.blocknotejs.org"
+              }
+            ]
+          },
+          {
+            "type": "paragraph"
+          }
+        ]
       },
       "NoteWithContent": {
         "allOf": [
@@ -2008,6 +2185,12 @@
         "nullable": true,
         "example": "📁"
       },
+      "updatedAt": {
+        "type": "string",
+        "format": "date-time",
+        "example": "2024-06-01T12:34:56Z",
+        "readOnly": true
+      },
       "WorkspaceTreeNote": {
         "type": "object",
         "properties": {
@@ -2019,12 +2202,16 @@
           },
           "icon": {
             "$ref": "#/components/schemas/icon"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/updatedAt"
           }
         },
         "required": [
           "id",
           "name",
-          "icon"
+          "icon",
+          "updatedAt"
         ]
       },
       "WorkspaceTreeFolder": {
@@ -2050,6 +2237,9 @@
             "items": {
               "$ref": "#/components/schemas/WorkspaceTreeFolder"
             }
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/properties-updatedAt"
           }
         },
         "required": [
@@ -2057,8 +2247,15 @@
           "name",
           "icon",
           "notes",
-          "children"
+          "children",
+          "updatedAt"
         ]
+      },
+      "properties-updatedAt": {
+        "type": "string",
+        "format": "date-time",
+        "example": "2024-06-01T12:00:00Z",
+        "readOnly": true
       }
     },
     "requestBodies": {

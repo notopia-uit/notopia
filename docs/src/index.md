@@ -7,14 +7,9 @@ hero:
   text: Utopia of Notes
   actions:
     - theme: brand
-      text: Docs
-      link: /docs
+      text: Basics
+      link: /basics
     - theme: alt
-      text: Reference
-      link: /reference
-    - theme: alt
-      text: Scalar API
-      link: /api/index.html
-      target: _self
-      rel: noopener
+      text: References
+      link: /references
 ---

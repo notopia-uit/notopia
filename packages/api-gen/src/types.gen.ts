@@ -78,6 +78,7 @@ export type NoteFolder = {
     readonly id: string;
     name: string;
     icon: string | null;
+    readonly updatedAt: string;
     parentId: NoteId;
     workspaceId: NotePropertiesId;
 };
@@ -105,13 +106,14 @@ export type NoteNote = {
     icon: string | null;
     folderId: NoteId;
     tags: Array<string>;
+    readonly updatedAt: string;
     readonly backlinksCount: number;
     readonly outgoingLinksCount: number;
 };
 
 export type NoteNotePropertiesId = string;
 
-export type NoteNoteContent = string | null;
+export type NoteNoteContent = Array<unknown> | null;
 
 export type NoteNoteWithContent = NoteNote & {
     content?: NoteNoteContent;
@@ -301,10 +303,13 @@ export type NoteTrashedFolder = {
 
 export type NotePropertiesIcon = string | null;
 
+export type NoteUpdatedAt = string;
+
 export type NoteWorkspaceTreeNote = {
     id: NoteNotePropertiesId;
     name: NotePropertiesName;
     icon: NoteIcon;
+    updatedAt: NoteUpdatedAt;
 };
 
 export type NoteWorkspaceTreeFolder = {
@@ -313,7 +318,10 @@ export type NoteWorkspaceTreeFolder = {
     icon: NotePropertiesIcon;
     notes: Array<NoteWorkspaceTreeNote>;
     children: Array<NoteWorkspaceTreeFolder>;
+    updatedAt: NotePropertiesUpdatedAt;
 };
+
+export type NotePropertiesUpdatedAt = string;
 
 export type ShareNoteCommittedEventWritable = ShareEventBase & {
     data?: {
@@ -333,8 +341,10 @@ export type NoteNoteWritable = {
     tags: Array<string>;
 };
 
+export type NoteNoteContentWritable = Array<unknown> | null;
+
 export type NoteNoteWithContentWritable = NoteNoteWritable & {
-    content?: NoteNoteContent;
+    content?: NoteNoteContentWritable;
 };
 
 export type NoteNoteLinkWritable = {
@@ -344,7 +354,7 @@ export type NoteNoteLinkWritable = {
 
 export type NoteRevisionWritable = {
     name: string | null;
-    content: NoteNoteContent;
+    content: NoteNoteContentWritable;
 };
 
 export type NoteWorkspaceWritable = {

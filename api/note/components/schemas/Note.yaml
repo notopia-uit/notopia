@@ -30,6 +30,12 @@ properties:
       - work
       - meeting
 
+  updatedAt:
+    type: string
+    format: date-time
+    example: 2024-06-01T12:34:56Z
+    readOnly: true
+
   backlinksCount:
     type: integer
     minimum: 0
@@ -48,5 +54,6 @@ required:
   - icon
   - folderId
   - tags
+  - updatedAt
   - backlinksCount
   - outgoingLinksCount

@@ -59,6 +59,7 @@ export const zNoteFolder = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
+    updatedAt: z.iso.datetime().readonly(),
     parentId: zNoteId,
     workspaceId: zNotePropertiesId
 });
@@ -77,13 +78,14 @@ export const zNoteNote = z.object({
     icon: z.string().nullable(),
     folderId: zNoteId,
     tags: z.array(z.string()),
+    updatedAt: z.iso.datetime().readonly(),
     backlinksCount: z.int().gte(0).readonly(),
     outgoingLinksCount: z.int().gte(0).readonly()
 });
 
 export const zNoteNotePropertiesId = z.uuid().readonly();
 
-export const zNoteNoteContent = z.string().nullable();
+export const zNoteNoteContent = z.array(z.unknown()).nullable();
 
 export const zNoteNoteWithContent = zNoteNote.and(z.object({
     content: zNoteNoteContent.optional()
@@ -236,18 +238,24 @@ export const zNoteTrashedFolder = z.object({
 
 export const zNotePropertiesIcon = z.string().nullable();
 
+export const zNoteUpdatedAt = z.iso.datetime().readonly();
+
 export const zNoteWorkspaceTreeNote = z.object({
     id: zNoteNotePropertiesId,
     name: zNotePropertiesName,
-    icon: zNoteIcon
+    icon: zNoteIcon,
+    updatedAt: zNoteUpdatedAt
 });
+
+export const zNotePropertiesUpdatedAt = z.iso.datetime().readonly();
 
 export const zNoteWorkspaceTreeFolder = z.object({
     id: zNoteId,
     name: zNoteName,
     icon: zNotePropertiesIcon,
     notes: z.array(zNoteWorkspaceTreeNote),
-    children: z.array(z.lazy((): any => zNoteWorkspaceTreeFolder))
+    children: z.array(z.lazy((): any => zNoteWorkspaceTreeFolder)),
+    updatedAt: zNotePropertiesUpdatedAt
 });
 
 export const zShareNoteCommittedEventWritable = zShareEventBase.and(z.object({
@@ -268,8 +276,10 @@ export const zNoteNoteWritable = z.object({
     tags: z.array(z.string())
 });
 
+export const zNoteNoteContentWritable = z.array(z.unknown()).nullable();
+
 export const zNoteNoteWithContentWritable = zNoteNoteWritable.and(z.object({
-    content: zNoteNoteContent.optional()
+    content: zNoteNoteContentWritable.optional()
 }));
 
 export const zNoteNoteLinkWritable = z.object({
@@ -279,7 +289,7 @@ export const zNoteNoteLinkWritable = z.object({
 
 export const zNoteRevisionWritable = z.object({
     name: z.string().min(1).max(255).nullable(),
-    content: zNoteNoteContent
+    content: zNoteNoteContentWritable
 });
 
 export const zNoteWorkspaceWritable = z.object({
