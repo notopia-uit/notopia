@@ -1,9 +1,0 @@
-## yaml-language-server: $schema=https://www.schemastore.org/openapi-3.X.json
-# vim: ft=yaml.openapi
-openapi: 3.0.4
-
-servers:
-  - url: http://api.notopia.localhost
-
-components:
-  schemas: {}

@@ -3,5 +3,5 @@ type: object
 properties:
   id:
     $ref: ../../../common/components/schemas/User.yaml#/properties/id
-  required:
-    - id
+required:
+  - id

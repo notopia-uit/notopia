@@ -1,0 +1,35 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  id:
+    type: string
+    description: note:{noteId}:block:{blockId}
+    example: note:46f94d4d-41b5-4df6-bf8d-270fb9a49c97:block:a-random-id
+
+  noteId:
+    type: string
+    format: uuid
+    example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+
+  blockId:
+    type: string
+    example: a-random-id
+
+  name:
+    type: string
+    minLength: 1
+    maxLength: 255
+    example: Meeting Notes
+
+  content:
+    type: string
+    description: Plain text content of the note's block
+    example: This is the content of the note.
+
+required:
+  - id
+  - noteId
+  - blockId
+  - name
+  - content

@@ -3,10 +3,13 @@
 apis:
   note:
     root: ./note/openapi.yaml
+    output: ./bundled/note.json
   document:
     root: ./document/openapi.yaml
-  event:
-    root: ./event/openapi.yaml
+    output: ./bundled/document.json
+  share:
+    root: ./share/openapi.yaml
+    output: ./bundled/share.json
     rules:
       struct: off
       no-empty-servers: off

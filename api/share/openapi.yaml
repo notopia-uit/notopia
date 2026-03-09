@@ -1,0 +1,21 @@
+## yaml-language-server: $schema=https://www.schemastore.org/openapi-3.X.json
+# vim: ft=yaml.openapi
+openapi: 3.0.4
+
+info:
+  version: 0.0.0
+  title: Notopia API
+  license:
+    name: MIT
+    url: https://github.com/notopia-uit/notopia/blob/main/LICENSE
+
+paths: {}
+
+components:
+  schemas:
+    NoteSearch:
+      $ref: ./components/schemas/NoteSearch.yaml
+    NoteCommittedEvent:
+      $ref: ./components/schemas/NoteCommittedEvent.yaml
+    UserDeletedEvent:
+      $ref: ./components/schemas/UserDeletedEvent.yaml

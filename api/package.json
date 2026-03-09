@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./event": "./bundled/event.json",
+    "./share": "./bundled/share.json",
     "./document": "./bundled/document.json",
     "./note": "./bundled/note.json",
     "./openapi": "./bundled/openapi.json"
@@ -12,7 +12,7 @@
     "openapi-generator-cli": "openapi-generator-cli",
     "openapi-ts": "openapi-ts",
     "redocly": "redocly",
-    "redocly:join": "redocly join ./openapi.yaml ./bundled/event.json ./bundled/document.json ./bundled/note.json -o ./bundled/openapi.json",
+    "redocly:join": "redocly join ./openapi.yaml ./bundled/share.json ./bundled/document.json ./bundled/note.json -o ./bundled/openapi.json",
     "scalar": "scalar"
   },
   "devDependencies": {

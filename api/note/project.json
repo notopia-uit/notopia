@@ -7,7 +7,7 @@
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle note --config ../redocly.yaml -o ../bundled/note.json",
+        "command": "redocly bundle note --config ../redocly.yaml",
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/../bundled/note.json"],

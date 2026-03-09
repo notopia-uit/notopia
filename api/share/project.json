@@ -1,17 +1,17 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "api/event",
+  "name": "api/share",
   "projectType": "application",
   "tags": ["scope:api", "type:openapi"],
   "targets": {
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle event --config ../redocly.yaml -o ../bundled/event.json",
+        "command": "redocly bundle share --config ../redocly.yaml",
         "cwd": "{projectRoot}"
       },
-      "outputs": ["{projectRoot}/../bundled/event.json"],
-      "inputs": ["openapiFiles"]
+      "outputs": ["{projectRoot}/../bundled/share.json"],
+      "inputs": ["openapiFilesWithCommon"]
     },
     "build": {
       "dependsOn": ["bundle:json"]
@@ -19,7 +19,7 @@
     "watch-bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm nx watch --projects=api/event -- pnpm nx bundle:json \\$NX_PROJECT_NAME",
+        "command": "pnpm nx watch --projects=api/share -- pnpm nx bundle:json \\$NX_PROJECT_NAME",
         "forwardAllArgs": false,
         "cwd": "{projectRoot}"
       },
@@ -28,7 +28,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve -w ../bundled/event.json --port 9083",
+        "command": "scalar document serve -w ../bundled/share.json --port 9089",
         "forwardAllArgs": false,
         "cwd": "{projectRoot}"
       },
@@ -38,7 +38,7 @@
     "preview": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document serve ../bundled/event.json --port 9083",
+        "command": "scalar document serve ../bundled/share.json --port 9089",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
@@ -47,7 +47,7 @@
     "mock": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document mock -w ../bundled/event.json --port 8083",
+        "command": "scalar document mock -w ../bundled/share.json --port 8089",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
@@ -56,17 +56,17 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly lint event --config ../redocly.yaml",
+        "command": "redocly lint share --config ../redocly.yaml",
         "cwd": "{projectRoot}"
       },
-      "inputs": ["openapiFiles"]
+      "inputs": ["openapiFilesWithCommon"]
     },
     "gen:go": {
       "inputs": ["{projectRoot}/oapi-codegen.yaml", "openapiFiles"],
-      "outputs": ["{workspaceRoot}/pkg/api/event/event.gen.go"],
+      "outputs": ["{workspaceRoot}/pkg/api/share/share.gen.go"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "oapi-codegen --config ./oapi-codegen.yaml ../bundled/event.json",
+        "command": "oapi-codegen --config ./oapi-codegen.yaml ../bundled/share.json",
         "cwd": "{projectRoot}"
       },
       "dependsOn": ["bundle:json"]

@@ -9,9 +9,9 @@
     },
     "join": {
       "inputs": [
-        "{projectRoot}/bundled/event.json",
         "{projectRoot}/bundled/note.json",
-        "{projectRoot}/bundled/document.json"
+        "{projectRoot}/bundled/document.json",
+        "{projectRoot}/bundled/share.json"
       ],
       "outputs": ["{projectRoot}/bundled/openapi.json"],
       "executor": "nx:run-commands",
@@ -98,5 +98,5 @@
       "dependsOn": ["gen:go", "gen:hey-api", "gen:document-nestjs-server"]
     }
   },
-  "implicitDependencies": ["api/note", "api/document", "api/event"]
+  "implicitDependencies": ["api/note", "api/document", "api/share"]
 }

@@ -9,8 +9,8 @@ properties:
     $ref: ../../../note/components/schemas/Note.yaml#/properties/folderId
   revision:
     $ref: ../../../note/components/schemas/Revision.yaml
-  required:
-    - id
-    - name
-    - folderId
-    - revision
+required:
+  - id
+  - name
+  - folderId
+  - revision

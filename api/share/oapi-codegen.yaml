@@ -1,5 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/oapi-codegen/oapi-codegen/HEAD/configuration-schema.json
-package: event
+package: note
 generate:
   models: true
-output: ../../pkg/api/event/event.gen.go
+output: ../../pkg/api/share/share.gen.go
+output-options:
+  skip-prune: true
