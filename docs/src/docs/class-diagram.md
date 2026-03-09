@@ -87,7 +87,7 @@ package "Domain" as Domain <<Frame>> {
         name: string
         icon: *string
         workspaceID: uuid.UUID
-        folderRelationship: FolderRelationship
+        folderRelationship: *FolderRelationship
         deletedBy: *DeletedBy
         deletedAt: *time.Time
 
@@ -126,8 +126,8 @@ package "Domain" as Domain <<Frame>> {
     AggregateRoot(Revision) {
         id: uuid.UUID
         noteID: uuid.UUID
-        name: string
-        content: RevisionContent
+        name: *string
+        content: *RevisionContent
         deletedAt: *time.Time
 
         rename(newName string)
@@ -246,33 +246,33 @@ skinparam class {
 package "Document" as Document <<Frame>> {
 
     Entity(DocumentEntity) {
-        name: string
-        data: Buffer
+        -name: String {readOnly}
+        -data: Buffer {readOnly}
     }
 
     Type(TagModel) {
-        id: string
-        name: string
+        -id: String {readOnly}
+        -name: String {readOnly}
     }
 
     Type(LinkModel) {
-        documentId: string
-        type: Backlink | OutgoingLink
+        -documentId: String {readOnly}
+        -type: Backlink | OutgoingLink {readOnly}
     }
 
     Model(DocumentModel) {
-        name: string
-        data: BlockNoteSchema[]
+        -name: String {readOnly}
+        -data: BlockNoteSchema[] {readOnly}
     }
 
     Type(AttachmentUploadUrl) {
-        id: string
-        url: string
+        -id: String {readOnly}
+        -url: String {readOnly}
     }
 
     RepoInterface(DocumentRepository) {
         Save(document: DocumentEntity)
-        GetByID(documentId: string): DocumentEntity
+        GetByID(documentId: String): DocumentEntity
     }
 
     ServiceImpl(DocumentService) {
@@ -282,8 +282,8 @@ package "Document" as Document <<Frame>> {
 
         getTags(): TagModel[]
         getLinks(): LinkModel[]
-        CreateDocument(name: string, data: Buffer): DocumentEntity
-        GetDocument(documentId: string): DocumentEntity
+        CreateDocument(name: String, data: Buffer): DocumentEntity
+        GetDocument(documentId: String): DocumentEntity
         GetAttachmentUploadUrl(): AttachmentUploadUrl
     }
 

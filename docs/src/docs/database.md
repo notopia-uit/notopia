@@ -2,8 +2,7 @@
 
 :::info
 
-- (FK) is `NOT NULL` by default
-- Column marked with `N` mean nullable
+- Only column marked with `N` mean nullable
 
 :::
 
@@ -42,7 +41,6 @@ deleted_by: {
 workspaces: {
   id: uuid {constraint: PK}
   name: text
-  root_folder_id: uuid
   created_at: timestamptz
   updated_at: timestamptz
   deleted_at: timestamptz {constraint: N}
@@ -53,11 +51,12 @@ workspaces: {
 folders: {
   id: uuid {constraint: PK}
   name: text
+  icon: text {constraint: N}
   workspace_id: uuid {constraint: FK}
-  parent_id: uuid
+  parent_id: uuid {constraint: FK, N}
   created_at: timestamptz
   updated_at: timestamptz
-  deleted_by: deleted_by
+  deleted_by: deleted_by {constraint: N}
   deleted_at: timestamptz {constraint: N}
 
   shape: sql_table
@@ -66,12 +65,13 @@ folders: {
 notes: {
   id: uuid {constraint: PK}
   name: text
+  icon: text {constraint: N}
   folder_id: uuid {constraint: FK}
   current_revision_id: uuid {constraint: FK}
   tags: 'text[]'
   created_at: timestamptz
   updated_at: timestamptz
-  deleted_by: deleted_by
+  deleted_by: deleted_by {constraint: N}
   deleted_at: timestamptz {constraint: N}
 
   shape: sql_table
@@ -140,3 +140,5 @@ documents: {
   shape: sql_table
 }
 ```
+
+<!-- diagram id="database-diagram-document" -->
