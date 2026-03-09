@@ -125,6 +125,25 @@ services: Services {
       icon: https://cdn.simpleicons.org/redis/d20f39
     }
   }
+
+  monotoring: Monitoring {
+    alloy: Alloy {
+      icon: https://raw.githubusercontent.com/grafana/alloy/refs/heads/main/docs/sources/assets/alloy_icon_orange.svg
+    }
+    prometheus: Prometheus {
+      icon: https://raw.githubusercontent.com/prometheus/prometheus/refs/heads/main/documentation/images/prometheus-logo.svg
+    }
+    loki: Loki {
+      icon: https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/app/plugins/datasource/loki/img/loki_icon.svg
+    }
+    tempo: Tempo {
+      icon: https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/app/plugins/datasource/tempo/img/tempo_logo.svg
+    }
+    grafana: Grafana {
+      icon: https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/img/grafana_icon.svg
+    }
+    alloy -> prometheus
+    prometheus -> grafana
 }
 
 user.browser -> gateway
@@ -138,6 +157,7 @@ gateway -> services.note
 gateway -> services.identity_provider
 gateway -> services.object_storage
 gateway -> services.search
+gateway -> services.monotoring
 
 services.document -> services.note
 services.document <-> services.event_bus
