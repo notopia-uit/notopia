@@ -24,7 +24,7 @@ export const zShareName = z.string().min(1).max(255);
 
 export const zShareId = z.uuid().readonly();
 
-export const zShareNoteContent = z.string().nullable();
+export const zShareNoteContent = z.array(z.unknown()).nullable();
 
 export const zShareNoteCommittedEvent = zShareEventBase.and(z.object({
     data: z.object({
@@ -258,10 +258,12 @@ export const zNoteWorkspaceTreeFolder = z.object({
     updatedAt: zNotePropertiesUpdatedAt
 });
 
+export const zShareNoteContentWritable = z.array(z.unknown()).nullable();
+
 export const zShareNoteCommittedEventWritable = zShareEventBase.and(z.object({
     data: z.object({
         name: zShareName,
-        blockNoteContent: zShareNoteContent
+        blockNoteContent: zShareNoteContentWritable
     }).optional()
 }));
 

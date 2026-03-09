@@ -34,7 +34,7 @@ type NoteCommittedEvent struct {
 }
 
 // NoteContent defines model for NoteContent.
-type NoteContent = string
+type NoteContent = []map[string]interface{}
 
 // NoteSearch defines model for NoteSearch.
 type NoteSearch struct {

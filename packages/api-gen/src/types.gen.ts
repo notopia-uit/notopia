@@ -48,7 +48,7 @@ export type ShareName = string;
 
 export type ShareId = string;
 
-export type ShareNoteContent = string | null;
+export type ShareNoteContent = Array<unknown> | null;
 
 /**
  * User ID from Authentik
@@ -326,9 +326,11 @@ export type NotePropertiesUpdatedAt = string;
 export type ShareNoteCommittedEventWritable = ShareEventBase & {
     data?: {
         name: ShareName;
-        blockNoteContent: ShareNoteContent;
+        blockNoteContent: ShareNoteContentWritable;
     };
 };
+
+export type ShareNoteContentWritable = Array<unknown> | null;
 
 export type NoteFolderWritable = {
     name: string;
