@@ -143,7 +143,12 @@ services: Services {
       icon: https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/img/grafana_icon.svg
     }
     alloy -> prometheus
-    prometheus -> grafana
+    alloy -> loki
+    alloy -> tempo
+    prometheus <- grafana
+    loki <- grafana
+    tempo <- grafana
+  }
 }
 
 user.browser -> gateway
