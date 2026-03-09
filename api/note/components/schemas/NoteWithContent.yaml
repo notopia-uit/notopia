@@ -1,0 +1,8 @@
+# vim: ft=yaml.openapi
+allOf:
+  - $ref: ./Note.yaml
+  - type: object
+    properties:
+      content:
+        $ref: ./NoteContent.yaml
+        nullable: true

@@ -1,0 +1,13 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  type:
+    type: string
+    enum:
+      - FolderInfoUpdatedEvent
+    example: FolderInfoUpdatedEvent
+  data:
+    $ref: ./Folder.yaml
+required:
+  - type
+  - data

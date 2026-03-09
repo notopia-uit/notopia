@@ -51,30 +51,15 @@ func (e FolderDeletedEventType) Valid() bool {
 	}
 }
 
-// Defines values for FolderMovedEventType.
+// Defines values for FolderUpdatedEventType.
 const (
-	FolderMovedEventTypeFolderRenamedEvent FolderMovedEventType = "FolderRenamedEvent"
+	FolderInfoUpdatedEvent FolderUpdatedEventType = "FolderInfoUpdatedEvent"
 )
 
-// Valid indicates whether the value is a known member of the FolderMovedEventType enum.
-func (e FolderMovedEventType) Valid() bool {
+// Valid indicates whether the value is a known member of the FolderUpdatedEventType enum.
+func (e FolderUpdatedEventType) Valid() bool {
 	switch e {
-	case FolderMovedEventTypeFolderRenamedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for FolderRenamedEventType.
-const (
-	FolderRenamedEventTypeFolderRenamedEvent FolderRenamedEventType = "FolderRenamedEvent"
-)
-
-// Valid indicates whether the value is a known member of the FolderRenamedEventType enum.
-func (e FolderRenamedEventType) Valid() bool {
-	switch e {
-	case FolderRenamedEventTypeFolderRenamedEvent:
+	case FolderInfoUpdatedEvent:
 		return true
 	default:
 		return false
@@ -144,30 +129,15 @@ func (e NoteDeletedEventType) Valid() bool {
 	}
 }
 
-// Defines values for NoteMovedEventType.
+// Defines values for NoteInfoUpdatedEventType.
 const (
-	NoteMovedEventTypeNoteMovedEvent NoteMovedEventType = "NoteMovedEvent"
+	NoteInfoUpdatedEventTypeNoteInfoUpdatedEvent NoteInfoUpdatedEventType = "NoteInfoUpdatedEvent"
 )
 
-// Valid indicates whether the value is a known member of the NoteMovedEventType enum.
-func (e NoteMovedEventType) Valid() bool {
+// Valid indicates whether the value is a known member of the NoteInfoUpdatedEventType enum.
+func (e NoteInfoUpdatedEventType) Valid() bool {
 	switch e {
-	case NoteMovedEventTypeNoteMovedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for NoteRenamedEventType.
-const (
-	NoteRenamedEventTypeNoteRenamedEvent NoteRenamedEventType = "NoteRenamedEvent"
-)
-
-// Valid indicates whether the value is a known member of the NoteRenamedEventType enum.
-func (e NoteRenamedEventType) Valid() bool {
-	switch e {
-	case NoteRenamedEventTypeNoteRenamedEvent:
+	case NoteInfoUpdatedEventTypeNoteInfoUpdatedEvent:
 		return true
 	default:
 		return false
@@ -192,21 +162,6 @@ func (e TrashedDeletedBy) Valid() bool {
 	}
 }
 
-// Defines values for WorkspaceRenamedEventType.
-const (
-	WorkspaceRenamedEventTypeWorkspaceRenamedEvent WorkspaceRenamedEventType = "WorkspaceRenamedEvent"
-)
-
-// Valid indicates whether the value is a known member of the WorkspaceRenamedEventType enum.
-func (e WorkspaceRenamedEventType) Valid() bool {
-	switch e {
-	case WorkspaceRenamedEventTypeWorkspaceRenamedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for WorkspaceRole.
 const (
 	Editor WorkspaceRole = "editor"
@@ -222,6 +177,21 @@ func (e WorkspaceRole) Valid() bool {
 	case Owner:
 		return true
 	case Viewer:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for WorkspaceUpdatedEventType.
+const (
+	WorkspaceUpdatedEventTypeWorkspaceUpdatedEvent WorkspaceUpdatedEventType = "WorkspaceUpdatedEvent"
+)
+
+// Valid indicates whether the value is a known member of the WorkspaceUpdatedEventType enum.
+func (e WorkspaceUpdatedEventType) Valid() bool {
+	switch e {
+	case WorkspaceUpdatedEventTypeWorkspaceUpdatedEvent:
 		return true
 	default:
 		return false
@@ -272,31 +242,14 @@ type FolderDeletedEvent struct {
 // FolderDeletedEventType defines model for FolderDeletedEvent.Type.
 type FolderDeletedEventType string
 
-// FolderMovedEvent defines model for FolderMovedEvent.
-type FolderMovedEvent struct {
-	Data struct {
-		FromFolderId *Id `json:"fromFolderId,omitempty"`
-		Id           *Id `json:"id,omitempty"`
-		ToFolderId   *Id `json:"toFolderId,omitempty"`
-	} `json:"data"`
-	Type FolderMovedEventType `json:"type"`
+// FolderUpdatedEvent defines model for FolderUpdatedEvent.
+type FolderUpdatedEvent struct {
+	Data Folder                 `json:"data"`
+	Type FolderUpdatedEventType `json:"type"`
 }
 
-// FolderMovedEventType defines model for FolderMovedEvent.Type.
-type FolderMovedEventType string
-
-// FolderRenamedEvent defines model for FolderRenamedEvent.
-type FolderRenamedEvent struct {
-	Data struct {
-		Id      *Id   `json:"id,omitempty"`
-		NewName Name  `json:"newName"`
-		OldName *Name `json:"oldName,omitempty"`
-	} `json:"data"`
-	Type FolderRenamedEventType `json:"type"`
-}
-
-// FolderRenamedEventType defines model for FolderRenamedEvent.Type.
-type FolderRenamedEventType string
+// FolderUpdatedEventType defines model for FolderUpdatedEvent.Type.
+type FolderUpdatedEventType string
 
 // Graph defines model for Graph.
 type Graph struct {
@@ -326,7 +279,6 @@ type GraphNodesType string
 // Note defines model for Note.
 type Note struct {
 	BacklinksCount     *int                `json:"backlinksCount,omitempty"`
-	Content            *NoteContent        `json:"content,omitempty"`
 	FolderId           *Id                 `json:"folderId,omitempty"`
 	Icon               *string             `json:"icon"`
 	Id                 *openapi_types.UUID `json:"id,omitempty"`
@@ -338,7 +290,7 @@ type Note struct {
 // NoteContent defines model for NoteContent.
 type NoteContent = string
 
-// NoteContentUpdatedEvent defines model for NoteContentUpdatedEvent.
+// NoteContentUpdatedEvent When user A is in read mode, user B commits changes, user A will receive this event
 type NoteContentUpdatedEvent struct {
 	Data struct {
 		Id *NotePropertiesId `json:"id,omitempty"`
@@ -372,6 +324,21 @@ type NoteDeletedEvent struct {
 // NoteDeletedEventType defines model for NoteDeletedEvent.Type.
 type NoteDeletedEventType string
 
+// NoteInfoUpdatedEvent defines model for NoteInfoUpdatedEvent.
+type NoteInfoUpdatedEvent struct {
+	Data struct {
+		FolderId *Id               `json:"folderId,omitempty"`
+		Icon     *Icon             `json:"icon"`
+		Id       *NotePropertiesId `json:"id,omitempty"`
+		Name     PropertiesName    `json:"name"`
+		Tags     *Tags             `json:"tags,omitempty"`
+	} `json:"data"`
+	Type NoteInfoUpdatedEventType `json:"type"`
+}
+
+// NoteInfoUpdatedEventType defines model for NoteInfoUpdatedEvent.Type.
+type NoteInfoUpdatedEventType string
+
 // NoteLink defines model for NoteLink.
 type NoteLink struct {
 	Icon *Icon             `json:"icon"`
@@ -379,31 +346,17 @@ type NoteLink struct {
 	Name PropertiesName    `json:"name"`
 }
 
-// NoteMovedEvent defines model for NoteMovedEvent.
-type NoteMovedEvent struct {
-	Data struct {
-		FromFolderId *Id               `json:"fromFolderId,omitempty"`
-		Id           *NotePropertiesId `json:"id,omitempty"`
-		ToFolderId   *Id               `json:"toFolderId,omitempty"`
-	} `json:"data"`
-	Type NoteMovedEventType `json:"type"`
+// NoteWithContent defines model for NoteWithContent.
+type NoteWithContent struct {
+	BacklinksCount     *int                `json:"backlinksCount,omitempty"`
+	Content            *NoteContent        `json:"content,omitempty"`
+	FolderId           *Id                 `json:"folderId,omitempty"`
+	Icon               *string             `json:"icon"`
+	Id                 *openapi_types.UUID `json:"id,omitempty"`
+	Name               string              `json:"name"`
+	OutgoingLinksCount *int                `json:"outgoingLinksCount,omitempty"`
+	Tags               []string            `json:"tags"`
 }
-
-// NoteMovedEventType defines model for NoteMovedEvent.Type.
-type NoteMovedEventType string
-
-// NoteRenamedEvent defines model for NoteRenamedEvent.
-type NoteRenamedEvent struct {
-	Data struct {
-		Id      *NotePropertiesId `json:"id,omitempty"`
-		NewName PropertiesName    `json:"newName"`
-		OldName *PropertiesName   `json:"oldName,omitempty"`
-	} `json:"data"`
-	Type NoteRenamedEventType `json:"type"`
-}
-
-// NoteRenamedEventType defines model for NoteRenamedEvent.Type.
-type NoteRenamedEventType string
 
 // NotePropertiesId defines model for Note_properties-id.
 type NotePropertiesId = openapi_types.UUID
@@ -478,19 +431,6 @@ type WorkspaceMember struct {
 	Role WorkspaceRole    `json:"role"`
 }
 
-// WorkspaceRenamedEvent defines model for WorkspaceRenamedEvent.
-type WorkspaceRenamedEvent struct {
-	Data struct {
-		Id      *PropertiesId           `json:"id,omitempty"`
-		NewName WorkspacePropertiesName `json:"newName"`
-		OldName WorkspacePropertiesName `json:"oldName"`
-	} `json:"data"`
-	Type WorkspaceRenamedEventType `json:"type"`
-}
-
-// WorkspaceRenamedEventType defines model for WorkspaceRenamedEvent.Type.
-type WorkspaceRenamedEventType string
-
 // WorkspaceRole defines model for WorkspaceRole.
 type WorkspaceRole string
 
@@ -509,6 +449,15 @@ type WorkspaceTreeNote struct {
 	Id   *NotePropertiesId `json:"id,omitempty"`
 	Name PropertiesName    `json:"name"`
 }
+
+// WorkspaceUpdatedEvent defines model for WorkspaceUpdatedEvent.
+type WorkspaceUpdatedEvent struct {
+	Data Workspace                 `json:"data"`
+	Type WorkspaceUpdatedEventType `json:"type"`
+}
+
+// WorkspaceUpdatedEventType defines model for WorkspaceUpdatedEvent.Type.
+type WorkspaceUpdatedEventType string
 
 // WorkspacePropertiesName defines model for Workspace_properties-name.
 type WorkspacePropertiesName = string
@@ -530,6 +479,9 @@ type PropertiesId = openapi_types.UUID
 
 // PropertiesName defines model for properties-name.
 type PropertiesName = string
+
+// Tags defines model for tags.
+type Tags = []string
 
 // FolderIdPath defines model for folderIdPath.
 type FolderIdPath = Id
@@ -568,7 +520,7 @@ type GetNoteLinksResponse struct {
 }
 
 // GetNoteResponse defines model for GetNoteResponse.
-type GetNoteResponse = Note
+type GetNoteResponse = NoteWithContent
 
 // GetNotesResponse defines model for GetNotesResponse.
 type GetNotesResponse = Note
@@ -684,6 +636,11 @@ type GetNotesParams struct {
 // GenerateDailyNoteJSONBody defines parameters for GenerateDailyNote.
 type GenerateDailyNoteJSONBody struct {
 	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+}
+
+// GetNoteParams defines parameters for GetNote.
+type GetNoteParams struct {
+	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
 }
 
 // GetNoteGraphParams defines parameters for GetNoteGraph.
@@ -808,7 +765,7 @@ type ServerInterface interface {
 	DeleteNote(c *gin.Context, noteId NoteIdPath)
 	// Get note
 	// (GET /note/notes/{noteId})
-	GetNote(c *gin.Context, noteId NoteIdPath)
+	GetNote(c *gin.Context, noteId NoteIdPath, params GetNoteParams)
 	// Get note graph
 	// (GET /note/notes/{noteId}/graph)
 	GetNoteGraph(c *gin.Context, noteId NoteIdPath, params GetNoteGraphParams)
@@ -1044,6 +1001,17 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 
 	c.Set(Oauth2Scopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetNoteParams
+
+	// ------------- Optional query parameter "includeContent" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "includeContent", c.Request.URL.Query(), &params.IncludeContent, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter includeContent: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -1051,7 +1019,7 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetNote(c, noteId)
+	siw.Handler.GetNote(c, noteId, params)
 }
 
 // GetNoteGraph operation middleware
@@ -1866,7 +1834,7 @@ type GetNoteLinksResponseJSONResponse struct {
 	OutgoingLinks *[]NoteLink `json:"outgoingLinks,omitempty"`
 }
 
-type GetNoteResponseJSONResponse Note
+type GetNoteResponseJSONResponse NoteWithContent
 
 type GetNotesResponseJSONResponse Note
 
@@ -2215,6 +2183,7 @@ func (response DeleteNote500JSONResponse) VisitDeleteNoteResponse(w http.Respons
 
 type GetNoteRequestObject struct {
 	NoteId NoteIdPath `json:"noteId"`
+	Params GetNoteParams
 }
 
 type GetNoteResponseObject interface {
@@ -3991,10 +3960,11 @@ func (sh *strictHandler) DeleteNote(ctx *gin.Context, noteId NoteIdPath) {
 }
 
 // GetNote operation middleware
-func (sh *strictHandler) GetNote(ctx *gin.Context, noteId NoteIdPath) {
+func (sh *strictHandler) GetNote(ctx *gin.Context, noteId NoteIdPath, params GetNoteParams) {
 	var request GetNoteRequestObject
 
 	request.NoteId = noteId
+	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetNote(ctx, request.(GetNoteRequestObject))

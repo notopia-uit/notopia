@@ -30,10 +30,6 @@ properties:
       - work
       - meeting
 
-  content:
-    $ref: ./NoteContent.yaml
-    nullable: true
-
   backlinksCount:
     type: integer
     minimum: 0

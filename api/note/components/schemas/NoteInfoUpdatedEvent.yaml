@@ -1,25 +1,32 @@
 # vim: ft=yaml.openapi
 type: object
+
 properties:
   type:
     type: string
     enum:
-      - NoteMovedEvent
-    example: NoteMovedEvent
+      - NoteInfoUpdatedEvent
+    example: NoteInfoUpdatedEvent
+
   data:
     type: object
     properties:
       id:
         $ref: ./Note.yaml#/properties/id
-      fromFolderId:
+      name:
+        $ref: ./Note.yaml#/properties/name
+      icon:
+        $ref: ./Note.yaml#/properties/icon
+      folderId:
         $ref: ./Note.yaml#/properties/folderId
-      toFolderId:
-        $ref: ./Note.yaml#/properties/folderId
-        example: 123e4567-e89b-12d3-a456-426614174002
+      tags:
+        $ref: ./Note.yaml#/properties/tags
+
     required:
       - id
-      - fromFolderId
-      - toFolderId
+      - name
+      - icon
+
 required:
   - type
   - data

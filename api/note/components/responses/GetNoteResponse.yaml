@@ -3,4 +3,4 @@ description: Successful response
 content:
   application/json:
     schema:
-      $ref: ../schemas/Note.yaml
+      $ref: ../schemas/NoteWithContent.yaml

@@ -344,6 +344,15 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/note_noteIdPath"
+          },
+          {
+            "name": "includeContent",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -1631,11 +1640,6 @@
         "maxLength": 255,
         "example": "Work Notes"
       },
-      "note_NoteContent": {
-        "type": "string",
-        "nullable": true,
-        "example": "[\n  {\n    \"type\": \"paragraph\",\n    \"content\": \"Welcome to this demo!\"\n  },\n  {\n    \"type\": \"paragraph\"\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Blocks:\",\n        \"styles\": {\n          \"bold\": true\n        }\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": \"Paragraph\"\n  },\n  {\n    \"type\": \"heading\",\n    \"content\": \"Heading\"\n  },\n  {\n    \"id\": \"toggle-heading\",\n    \"type\": \"heading\",\n    \"props\": {\n      \"isToggleable\": true\n    },\n    \"content\": \"Toggle Heading\"\n  },\n  {\n    \"type\": \"quote\",\n    \"content\": \"Quote\"\n  },\n  {\n    \"type\": \"bulletListItem\",\n    \"content\": \"Bullet List Item\"\n  },\n  {\n    \"type\": \"numberedListItem\",\n    \"content\": \"Numbered List Item\"\n  },\n  {\n    \"type\": \"checkListItem\",\n    \"content\": \"Check List Item\"\n  },\n  {\n    \"id\": \"toggle-list-item\",\n    \"type\": \"toggleListItem\",\n    \"content\": \"Toggle List Item\"\n  },\n  {\n    \"type\": \"codeBlock\",\n    \"props\": {\n      \"language\": \"javascript\"\n    },\n    \"content\": \"console.log('Hello, world!');\"\n  },\n  {\n    \"type\": \"table\",\n    \"content\": {\n      \"type\": \"tableContent\",\n      \"rows\": [\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        },\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        },\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        }\n      ]\n    }\n  },\n  {\n    \"type\": \"file\"\n  },\n  {\n    \"type\": \"image\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\"\n    }\n  },\n  {\n    \"type\": \"video\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\"\n    }\n  },\n  {\n    \"type\": \"audio\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\"\n    }\n  },\n  {\n    \"type\": \"paragraph\"\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Inline Content:\",\n        \"styles\": {\n          \"bold\": true\n        }\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Styled Text\",\n        \"styles\": {\n          \"bold\": true,\n          \"italic\": true,\n          \"textColor\": \"red\",\n          \"backgroundColor\": \"blue\"\n        }\n      },\n      {\n        \"type\": \"text\",\n        \"text\": \" \",\n        \"styles\": {}\n      },\n      {\n        \"type\": \"link\",\n        \"content\": \"Link\",\n        \"href\": \"https://www.blocknotejs.org\"\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\"\n  }\n]\n"
-      },
       "note_Note": {
         "type": "object",
         "properties": {
@@ -1669,10 +1673,6 @@
               "meeting"
             ]
           },
-          "content": {
-            "$ref": "#/components/schemas/note_NoteContent",
-            "nullable": true
-          },
           "backlinksCount": {
             "type": "integer",
             "minimum": 0,
@@ -1701,6 +1701,27 @@
         "format": "uuid",
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
         "readOnly": true
+      },
+      "note_NoteContent": {
+        "type": "string",
+        "nullable": true,
+        "example": "[\n  {\n    \"type\": \"paragraph\",\n    \"content\": \"Welcome to this demo!\"\n  },\n  {\n    \"type\": \"paragraph\"\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Blocks:\",\n        \"styles\": {\n          \"bold\": true\n        }\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": \"Paragraph\"\n  },\n  {\n    \"type\": \"heading\",\n    \"content\": \"Heading\"\n  },\n  {\n    \"id\": \"toggle-heading\",\n    \"type\": \"heading\",\n    \"props\": {\n      \"isToggleable\": true\n    },\n    \"content\": \"Toggle Heading\"\n  },\n  {\n    \"type\": \"quote\",\n    \"content\": \"Quote\"\n  },\n  {\n    \"type\": \"bulletListItem\",\n    \"content\": \"Bullet List Item\"\n  },\n  {\n    \"type\": \"numberedListItem\",\n    \"content\": \"Numbered List Item\"\n  },\n  {\n    \"type\": \"checkListItem\",\n    \"content\": \"Check List Item\"\n  },\n  {\n    \"id\": \"toggle-list-item\",\n    \"type\": \"toggleListItem\",\n    \"content\": \"Toggle List Item\"\n  },\n  {\n    \"type\": \"codeBlock\",\n    \"props\": {\n      \"language\": \"javascript\"\n    },\n    \"content\": \"console.log('Hello, world!');\"\n  },\n  {\n    \"type\": \"table\",\n    \"content\": {\n      \"type\": \"tableContent\",\n      \"rows\": [\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        },\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        },\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        }\n      ]\n    }\n  },\n  {\n    \"type\": \"file\"\n  },\n  {\n    \"type\": \"image\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\"\n    }\n  },\n  {\n    \"type\": \"video\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\"\n    }\n  },\n  {\n    \"type\": \"audio\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\"\n    }\n  },\n  {\n    \"type\": \"paragraph\"\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Inline Content:\",\n        \"styles\": {\n          \"bold\": true\n        }\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Styled Text\",\n        \"styles\": {\n          \"bold\": true,\n          \"italic\": true,\n          \"textColor\": \"red\",\n          \"backgroundColor\": \"blue\"\n        }\n      },\n      {\n        \"type\": \"text\",\n        \"text\": \" \",\n        \"styles\": {}\n      },\n      {\n        \"type\": \"link\",\n        \"content\": \"Link\",\n        \"href\": \"https://www.blocknotejs.org\"\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\"\n  }\n]\n"
+      },
+      "note_NoteWithContent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/note_Note"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "content": {
+                "$ref": "#/components/schemas/note_NoteContent",
+                "nullable": true
+              }
+            }
+          }
+        ]
       },
       "note_Graph": {
         "type": "object",
@@ -1975,71 +1996,18 @@
           "data"
         ]
       },
-      "note_FolderMovedEvent": {
+      "note_FolderUpdatedEvent": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
             "enum": [
-              "FolderRenamedEvent"
+              "FolderInfoUpdatedEvent"
             ],
-            "example": "FolderRenamedEvent"
+            "example": "FolderInfoUpdatedEvent"
           },
           "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/note_id"
-              },
-              "fromFolderId": {
-                "$ref": "#/components/schemas/note_id"
-              },
-              "toFolderId": {
-                "$ref": "#/components/schemas/note_id",
-                "example": "123e4567-e89b-12d3-a456-426614174002"
-              }
-            },
-            "required": [
-              "id",
-              "fromFolderId",
-              "toFolderId"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "note_FolderRenamedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "FolderRenamedEvent"
-            ],
-            "example": "FolderRenamedEvent"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/note_id"
-              },
-              "oldName": {
-                "$ref": "#/components/schemas/note_name",
-                "example": "Work"
-              },
-              "newName": {
-                "$ref": "#/components/schemas/note_name",
-                "example": "Working"
-              }
-            },
-            "required": [
-              "id",
-              "newName"
-            ]
+            "$ref": "#/components/schemas/note_Folder"
           }
         },
         "required": [
@@ -2049,6 +2017,7 @@
       },
       "note_NoteContentUpdatedEvent": {
         "type": "object",
+        "description": "When user A is in read mode, user B commits changes, user A will receive this event",
         "properties": {
           "type": {
             "type": "string",
@@ -2132,15 +2101,25 @@
           "data"
         ]
       },
-      "note_NoteMovedEvent": {
+      "note_tags": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "example": [
+          "work",
+          "meeting"
+        ]
+      },
+      "note_NoteInfoUpdatedEvent": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
             "enum": [
-              "NoteMovedEvent"
+              "NoteInfoUpdatedEvent"
             ],
-            "example": "NoteMovedEvent"
+            "example": "NoteInfoUpdatedEvent"
           },
           "data": {
             "type": "object",
@@ -2148,18 +2127,23 @@
               "id": {
                 "$ref": "#/components/schemas/note_Note_properties-id"
               },
-              "fromFolderId": {
+              "name": {
+                "$ref": "#/components/schemas/note_properties-name"
+              },
+              "icon": {
+                "$ref": "#/components/schemas/note_icon"
+              },
+              "folderId": {
                 "$ref": "#/components/schemas/note_id"
               },
-              "toFolderId": {
-                "$ref": "#/components/schemas/note_id",
-                "example": "123e4567-e89b-12d3-a456-426614174002"
+              "tags": {
+                "$ref": "#/components/schemas/note_tags"
               }
             },
             "required": [
               "id",
-              "fromFolderId",
-              "toFolderId"
+              "name",
+              "icon"
             ]
           }
         },
@@ -2168,77 +2152,18 @@
           "data"
         ]
       },
-      "note_NoteRenamedEvent": {
+      "note_WorkspaceUpdatedEvent": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
             "enum": [
-              "NoteRenamedEvent"
+              "WorkspaceUpdatedEvent"
             ],
-            "example": "NoteRenamedEvent"
+            "example": "WorkspaceUpdatedEvent"
           },
           "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/note_Note_properties-id"
-              },
-              "oldName": {
-                "$ref": "#/components/schemas/note_properties-name",
-                "example": "Meeting Notes"
-              },
-              "newName": {
-                "$ref": "#/components/schemas/note_properties-name",
-                "example": "Work"
-              }
-            },
-            "required": [
-              "id",
-              "newName"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "note_Workspace_properties-name": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "My Workspace"
-      },
-      "note_WorkspaceRenamedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "WorkspaceRenamedEvent"
-            ],
-            "example": "WorkspaceRenamedEvent"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/note_properties-id"
-              },
-              "oldName": {
-                "$ref": "#/components/schemas/note_Workspace_properties-name"
-              },
-              "newName": {
-                "$ref": "#/components/schemas/note_Workspace_properties-name",
-                "example": "New Workspace Name"
-              }
-            },
-            "required": [
-              "id",
-              "oldName",
-              "newName"
-            ]
+            "$ref": "#/components/schemas/note_Workspace"
           }
         },
         "required": [
@@ -2274,6 +2199,12 @@
           "id",
           "role"
         ]
+      },
+      "note_Workspace_properties-name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "My Workspace"
       },
       "note_TrashedDeletedBy": {
         "type": "string",
@@ -2865,7 +2796,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/note_Note"
+              "$ref": "#/components/schemas/note_NoteWithContent"
             }
           }
         }
@@ -3003,10 +2934,7 @@
                   "$ref": "#/components/schemas/note_FolderDeletedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/note_FolderMovedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/note_FolderRenamedEvent"
+                  "$ref": "#/components/schemas/note_FolderUpdatedEvent"
                 },
                 {
                   "$ref": "#/components/schemas/note_NoteContentUpdatedEvent"
@@ -3018,13 +2946,10 @@
                   "$ref": "#/components/schemas/note_NoteDeletedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/note_NoteMovedEvent"
+                  "$ref": "#/components/schemas/note_NoteInfoUpdatedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/note_NoteRenamedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/note_WorkspaceRenamedEvent"
+                  "$ref": "#/components/schemas/note_WorkspaceUpdatedEvent"
                 }
               ],
               "discriminator": {
@@ -3032,14 +2957,12 @@
                 "mapping": {
                   "FolderCreatedEvent": "#/components/schemas/note_FolderCreatedEvent",
                   "FolderDeletedEvent": "#/components/schemas/note_FolderDeletedEvent",
-                  "FolderMovedEvent": "#/components/schemas/note_FolderMovedEvent",
-                  "FolderRenamedEvent": "#/components/schemas/note_FolderRenamedEvent",
+                  "FolderUpdatedEvent": "#/components/schemas/note_FolderUpdatedEvent",
                   "NoteContentUpdatedEvent": "#/components/schemas/note_NoteContentUpdatedEvent",
                   "NoteCreatedEvent": "#/components/schemas/note_NoteCreatedEvent",
                   "NoteDeletedEvent": "#/components/schemas/note_NoteDeletedEvent",
-                  "NoteMovedEvent": "#/components/schemas/note_NoteMovedEvent",
-                  "NoteRenamedEvent": "#/components/schemas/note_NoteRenamedEvent",
-                  "WorkspaceRenamedEvent": "#/components/schemas/note_WorkspaceRenamedEvent"
+                  "NoteInfoUpdatedEvent": "#/components/schemas/note_NoteInfoUpdatedEvent",
+                  "WorkspaceUpdatedEvent": "#/components/schemas/note_WorkspaceUpdatedEvent"
                 }
               }
             }
