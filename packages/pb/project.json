@@ -3,7 +3,10 @@
   "name": "packages/pb",
   "projectType": "library",
   "targets": {
-    "gen": {}
+    "gen": {},
+    "lint": {
+      "executor": "nx:noop"
+    }
   },
   "implicitDependencies": ["proto"]
 }

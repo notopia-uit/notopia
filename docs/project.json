@@ -65,6 +65,9 @@
         "cwd": "{projectRoot}"
       },
       "continuous": true
+    },
+    "lint": {
+      "executor": "nx:noop"
     }
   }
 }
