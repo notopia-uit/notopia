@@ -26,82 +26,99 @@ vars: {
   }
 }
 
+classes: {
+  notUsed: {
+    style: {
+      opacity: 0.4
+      stroke-dash: 5
+      fill: "#9ca0b0"
+      stroke: "#4c4f69"
+    }
+  }
+}
+
 user: User {
   browser: Browser {
-    icon: https://simpleicons.org/icons/googlechrome.svg
+    icon: https://cdn.simpleicons.org/googlechrome/e64553
   }
 }
 
 gateway: Gateway {
-  icon: https://simpleicons.org/icons/traefikproxy.svg
+  icon: https://cdn.simpleicons.org/traefikproxy/04a5e5
 }
 
 apps: Apps {
   web: Web {
-    icon: https://simpleicons.org/icons/nextdotjs.svg
+    icon: https://cdn.simpleicons.org/nextdotjs/4c4f69
   }
 }
 
 services: Services {
   identity_provider: Identity Provider {
-    icon: https://simpleicons.org/icons/authentik.svg
+    icon: https://cdn.simpleicons.org/authentik/fe640b
   }
 
   object_storage: Object Storage {
-    icon: https://simpleicons.org/icons/minio.svg
+    icon: https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/rustfs.svg
   }
 
   document: Document Service Group {
     document_service: Document Service {
-      icon: https://simpleicons.org/icons/nodedotjs.svg
+      icon: https://cdn.simpleicons.org/nodedotjs/40a02b
     }
     database: Database {
-      icon: https://simpleicons.org/icons/postgresql.svg
+      icon: https://cdn.simpleicons.org/postgresql/7287fd
     }
     document_service -> database
   }
 
   note: Note Service Group {
     note_service: Note Service {
-      icon: https://simpleicons.org/icons/go.svg
+      icon: https://cdn.simpleicons.org/go/04a5e5
     }
     database: Database {
-      icon: https://simpleicons.org/icons/postgresql.svg
+      icon: https://cdn.simpleicons.org/postgresql/7287fd
+    }
+    pub_sub: Pub/Sub {
+      icon: https://cdn.simpleicons.org/redis/d20f39
+      class: notUsed
     }
     note_service -> database
+    note_service -> pub_sub
   }
 
   authorization: Authorization Service Group {
     authorization_service: Authorization Service {
-      icon: https://simpleicons.org/icons/go.svg
+      icon: https://cdn.simpleicons.org/go/04a5e5
     }
     database: Database {
-      icon: https://simpleicons.org/icons/postgresql.svg
+      icon: https://cdn.simpleicons.org/postgresql/7287fd
     }
     authorization_service -> database
   }
 
   search: Search Service Group {
     search_service: Meilisearch {
-      icon: https://simpleicons.org/icons/meilisearch.svg
+      icon: https://cdn.simpleicons.org/meilisearch/ea76cb
     }
-    search_sync_service: Sync Service {
-      icon: https://simpleicons.org/icons/go.svg
+    search_sync_worker: Sync Worker {
+      icon: https://cdn.simpleicons.org/nodedotjs/40a02b
     }
-    search_sync_service_database: Sync Database {
-      icon: https://simpleicons.org/icons/redis.svg
+    search_sync_worker_database: Sync Database {
+      icon: https://cdn.simpleicons.org/redis/d20f39
+      class: notUsed
     }
-    search_sync_service -> search_service
-    search_sync_service -> search_sync_service_database
+    search_sync_worker -> search_service
+    search_sync_worker -> search_sync_worker_database
   }
 
   event_bus: Event Bus {
     message_broker: Message Broker {
-      icon: https://simpleicons.org/icons/apachekafka.svg
+      icon: https://raw.githubusercontent.com/redpanda-data/redpanda/d17f36726370db7c7044cb12ecc1c46841e8bfa6/docs/icon-redpanda.svg
     }
 
     pub_sub: Pub/Sub {
-      icon: https://simpleicons.org/icons/redis.svg
+      icon: https://cdn.simpleicons.org/redis/d20f39
     }
   }
 }

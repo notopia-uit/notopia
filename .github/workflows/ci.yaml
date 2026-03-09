@@ -25,6 +25,11 @@ on:
       - reopened
   workflow_dispatch:
     inputs:
+      noRestoreDocsDiagramsCache:
+        description: No restore docs diagrams cache
+        required: true
+        default: false
+        type: boolean
       resetNxCache:
         description: Reset Nx cache (when CI keep warning cache unrecognized)
         required: true
@@ -185,6 +190,7 @@ jobs:
 
       - name: Restore Docs diagrams Cache
         uses: actions/cache/restore@v5
+        if: ${{ github.event.inputs.noRestoreDocsDiagramsCache != 'true' }}
         with:
           path: docs/src/public/diagrams/
           key: docs-diagrams-
