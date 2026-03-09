@@ -55,7 +55,7 @@ workspaces: {
 folders: {
   id: uuid {constraint: PK}
   name: text
-  icon: text {constraint: N}
+  "icon": text {constraint: N}
   workspace_id: uuid {constraint: FK}
   parent_id: uuid {constraint: FK, N}
   created_at: timestamptz
@@ -69,7 +69,7 @@ folders: {
 notes: {
   id: uuid {constraint: PK}
   name: text
-  icon: text {constraint: N}
+  "icon": text {constraint: N}
   folder_id: uuid {constraint: FK}
   current_revision_id: uuid {constraint: FK}
   tags: 'text[]'
