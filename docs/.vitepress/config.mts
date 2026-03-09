@@ -65,6 +65,7 @@ const vitePressSidebarOptions = {
   useFolderTitleFromIndexFile: true,
   sortMenusByFrontmatterOrder: true,
   collapsed: true,
+  collapseDepth: 2,
 } satisfies VitePressSidebarOptions;
 
 export default defineConfig(
