@@ -6,7 +6,8 @@
     "license": {
       "name": "MIT",
       "url": "https://github.com/notopia-uit/notopia/blob/main/LICENSE"
-    }
+    },
+    "x-apiName": "share"
   },
   "paths": {},
   "components": {

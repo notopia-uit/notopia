@@ -11,6 +11,7 @@ info:
   contact:
     name: Notopia Support
     email: kevinnitro@duck.com
+  x-apiName: api
 
 servers:
   - url: http://api.notopia.localhost

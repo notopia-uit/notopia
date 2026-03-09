@@ -11,7 +11,8 @@
     "contact": {
       "name": "Notopia Support",
       "email": "kevinnitro@duck.com"
-    }
+    },
+    "x-apiName": "document"
   },
   "servers": [
     {

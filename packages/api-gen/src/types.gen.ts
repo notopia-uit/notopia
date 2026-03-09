@@ -4,7 +4,52 @@ export type ClientOptions = {
     baseUrl: 'http://api.notopia.localhost' | (string & {});
 };
 
-export type Error = {
+export type ShareNoteSearch = {
+    /**
+     * note:{noteId}:block:{blockId}
+     */
+    id: string;
+    noteId: string;
+    blockId: string;
+    name: string;
+    /**
+     * Plain text content of the note's block
+     */
+    content: string;
+};
+
+export type ShareNoteCommittedEvent = {
+    id: ShareId;
+    name: ShareName;
+    folderId: ShareFolderId;
+    revision: ShareRevision;
+};
+
+export type ShareUserDeletedEvent = {
+    id: SharePropertiesId;
+};
+
+export type ShareId = string;
+
+export type ShareName = string;
+
+export type ShareFolderId = string;
+
+export type ShareNoteContent = string | null;
+
+export type ShareRevision = {
+    readonly id: string;
+    name: string | null;
+    content: ShareNoteContent;
+    readonly createdAt: string;
+};
+
+/**
+ * User ID from Authentik
+ */
+export type SharePropertiesId = string;
+
+export type DocumentError = {
     /**
      * Error code
      */
@@ -19,41 +64,56 @@ export type Error = {
     more_info?: string;
 };
 
-export type Id = string;
+export type NoteId = string;
 
-export type Folder = {
+export type NoteFolder = {
     readonly id: string;
     name: string;
     icon: string | null;
     parentId: string;
-    workspaceId?: Id;
+    workspaceId?: NoteId;
 };
 
-export type PropertiesId = string;
-
-export type Name = string;
-
-export type NoteContent = string | null;
-
-export type Note = {
-    readonly id: string;
-    name: string;
-    icon: string | null;
-    folderId: string;
-    content?: NoteContent;
-    readonly backlinksCount: number;
-    readonly outgoingLinksCount: number;
-};
-
-export type PropertiesName = string;
-
-export type Tag = {
-    name: string;
+export type NoteError = {
+    /**
+     * Error code
+     */
+    code: string;
+    /**
+     * Human-readable error message
+     */
+    message: string;
+    /**
+     * URL with more information about the error
+     */
+    more_info?: string;
 };
 
 export type NotePropertiesId = string;
 
-export type Graph = {
+export type NoteName = string;
+
+export type NoteNoteContent = string | null;
+
+export type NoteNote = {
+    readonly id: string;
+    name: string;
+    icon: string | null;
+    folderId: string;
+    content?: NoteNoteContent;
+    readonly backlinksCount: number;
+    readonly outgoingLinksCount: number;
+};
+
+export type NotePropertiesName = string;
+
+export type NoteTag = {
+    name: string;
+};
+
+export type NoteNotePropertiesId = string;
+
+export type NoteGraph = {
     nodes?: Array<{
         /**
          * Can be either a note ID or a hashtag prefixed tag name
@@ -81,24 +141,24 @@ export type Graph = {
     }>;
 };
 
-export type NotePropertiesName = string;
+export type NoteNotePropertiesName = string;
 
-export type Icon = string | null;
+export type NoteIcon = string | null;
 
-export type NoteLink = {
-    id: NotePropertiesId;
-    name: NotePropertiesName;
-    icon: Icon;
+export type NoteNoteLink = {
+    id: NoteNotePropertiesId;
+    name: NoteNotePropertiesName;
+    icon: NoteIcon;
 };
 
-export type Revision = {
+export type NoteRevision = {
     readonly id: string;
     name: string | null;
-    content: NoteContent;
+    content: NoteNoteContent;
     readonly createdAt: string;
 };
 
-export type Pagination = {
+export type NotePagination = {
     /**
      * Current page number
      */
@@ -125,347 +185,358 @@ export type Pagination = {
     hasPrev: boolean;
 };
 
-export type RevisionPropertiesId = string;
+export type NoteRevisionPropertiesId = string;
 
-export type RevisionPropertiesName = string | null;
+export type NoteRevisionPropertiesName = string | null;
 
-export type Workspace = {
+export type NoteWorkspace = {
     readonly id: string;
     name: string;
 };
 
-export type FolderCreatedEvent = {
+export type NoteFolderCreatedEvent = {
     type: 'FolderCreatedEvent';
     data: {
-        id: PropertiesId;
-        name: Name;
+        id: NotePropertiesId;
+        name: NoteName;
     };
 };
 
-export type FolderDeletedEvent = {
+export type NoteFolderDeletedEvent = {
     type: 'FolderDeletedEvent';
     data: {
-        id: PropertiesId;
+        id: NotePropertiesId;
     };
 };
 
-export type ParentId = string;
+export type NoteParentId = string;
 
-export type FolderMovedEvent = {
+export type NoteFolderMovedEvent = {
     type: 'FolderRenamedEvent';
     data: {
-        id: PropertiesId;
-        fromFolderId: ParentId;
-        toFolderId: ParentId;
+        id: NotePropertiesId;
+        fromFolderId: NoteParentId;
+        toFolderId: NoteParentId;
     };
 };
 
-export type FolderRenamedEvent = {
+export type NoteFolderRenamedEvent = {
     type: 'FolderRenamedEvent';
     data: {
-        id: PropertiesId;
-        oldName?: Name;
-        newName: Name;
+        id: NotePropertiesId;
+        oldName?: NoteName;
+        newName: NoteName;
     };
 };
 
-export type NoteContentUpdatedEvent = {
+export type NoteNoteContentUpdatedEvent = {
     type: 'NoteContentUpdatedEvent';
     data: {
-        id: NotePropertiesId;
+        id: NoteNotePropertiesId;
     };
 };
 
-export type NoteCreatedEvent = {
+export type NoteNoteCreatedEvent = {
     type: 'NoteCreatedEvent';
     data: {
-        id: NotePropertiesId;
-        name: NotePropertiesName;
+        id: NoteNotePropertiesId;
+        name: NoteNotePropertiesName;
     };
 };
 
-export type NoteDeletedEvent = {
+export type NoteNoteDeletedEvent = {
     type: 'NoteDeletedEvent';
     data: {
-        id: NotePropertiesId;
+        id: NoteNotePropertiesId;
     };
 };
 
-export type FolderId = string;
+export type NoteFolderId = string;
 
-export type NoteMovedEvent = {
+export type NoteNoteMovedEvent = {
     type: 'NoteMovedEvent';
     data: {
-        id: NotePropertiesId;
-        fromFolderId: FolderId;
-        toFolderId: FolderId;
+        id: NoteNotePropertiesId;
+        fromFolderId: NoteFolderId;
+        toFolderId: NoteFolderId;
     };
 };
 
-export type NoteRenamedEvent = {
+export type NoteNoteRenamedEvent = {
     type: 'NoteRenamedEvent';
     data: {
-        id: NotePropertiesId;
-        oldName?: NotePropertiesName;
-        newName: NotePropertiesName;
+        id: NoteNotePropertiesId;
+        oldName?: NoteNotePropertiesName;
+        newName: NoteNotePropertiesName;
     };
 };
 
-export type WorkspacePropertiesName = string;
+export type NoteWorkspacePropertiesName = string;
 
-export type WorkspaceRenamedEvent = {
+export type NoteWorkspaceRenamedEvent = {
     type: 'WorkspaceRenamedEvent';
     data: {
-        id: Id;
-        oldName: WorkspacePropertiesName;
-        newName: WorkspacePropertiesName;
+        id: NoteId;
+        oldName: NoteWorkspacePropertiesName;
+        newName: NoteWorkspacePropertiesName;
     };
 };
 
 /**
  * User ID from Authentik
  */
-export type UserPropertiesId = string;
+export type NoteUserPropertiesId = string;
 
-export const WorkspaceRole = {
+export const NoteWorkspaceRole = {
     OWNER: 'owner',
     EDITOR: 'editor',
     VIEWER: 'viewer'
 } as const;
 
-export type WorkspaceRole = typeof WorkspaceRole[keyof typeof WorkspaceRole];
+export type NoteWorkspaceRole = typeof NoteWorkspaceRole[keyof typeof NoteWorkspaceRole];
 
-export type WorkspaceMember = {
-    id: UserPropertiesId;
-    role: WorkspaceRole;
+export type NoteWorkspaceMember = {
+    id: NoteUserPropertiesId;
+    role: NoteWorkspaceRole;
 };
 
-export const TrashedDeletedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
+export const NoteTrashedDeletedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
 
-export type TrashedDeletedBy = typeof TrashedDeletedBy[keyof typeof TrashedDeletedBy];
+export type NoteTrashedDeletedBy = typeof NoteTrashedDeletedBy[keyof typeof NoteTrashedDeletedBy];
 
-export type TrashedNote = {
+export type NoteTrashedNote = {
     id: string;
     readonly name: string;
-    deletedBy: TrashedDeletedBy;
+    deletedBy: NoteTrashedDeletedBy;
     readonly deletedAt: string | null;
 };
 
-export type TrashedFolder = {
+export type NoteTrashedFolder = {
     id: string;
     readonly name: string;
-    deletedBy: TrashedDeletedBy;
+    deletedBy: NoteTrashedDeletedBy;
     readonly deletedAt: string | null;
 };
 
-export type PropertiesIcon = string | null;
+export type NotePropertiesIcon = string | null;
 
-export type WorkspaceTreeNote = {
+export type NoteWorkspaceTreeNote = {
+    id: NoteNotePropertiesId;
+    name: NoteNotePropertiesName;
+    icon: NoteIcon;
+};
+
+export type NoteWorkspaceTreeFolder = {
     id: NotePropertiesId;
-    name: NotePropertiesName;
-    icon: Icon;
+    name: NoteName;
+    icon: NotePropertiesIcon;
+    notes: Array<NoteWorkspaceTreeNote>;
+    children: Array<NoteWorkspaceTreeFolder>;
 };
 
-export type WorkspaceTreeFolder = {
-    id: PropertiesId;
-    name: Name;
-    icon: PropertiesIcon;
-    notes: Array<WorkspaceTreeNote>;
-    children: Array<WorkspaceTreeFolder>;
+export type ShareNoteCommittedEventWritable = {
+    name: ShareName;
+    folderId: ShareFolderId;
+    revision: ShareRevisionWritable;
 };
 
-export type FolderWritable = {
+export type ShareRevisionWritable = {
+    name: string | null;
+    content: ShareNoteContent;
+};
+
+export type NoteFolderWritable = {
     name: string;
     icon: string | null;
     parentId: string;
 };
 
-export type NoteWritable = {
+export type NoteNoteWritable = {
     name: string;
     icon: string | null;
     folderId: string;
-    content?: NoteContent;
+    content?: NoteNoteContent;
 };
 
-export type NoteLinkWritable = {
-    name: NotePropertiesName;
-    icon: Icon;
+export type NoteNoteLinkWritable = {
+    name: NoteNotePropertiesName;
+    icon: NoteIcon;
 };
 
-export type RevisionWritable = {
+export type NoteRevisionWritable = {
     name: string | null;
-    content: NoteContent;
+    content: NoteNoteContent;
 };
 
-export type WorkspaceWritable = {
+export type NoteWorkspaceWritable = {
     name: string;
 };
 
-export type FolderCreatedEventWritable = {
+export type NoteFolderCreatedEventWritable = {
     type: 'FolderCreatedEvent';
     data: {
-        name: Name;
+        name: NoteName;
     };
 };
 
-export type FolderDeletedEventWritable = {
+export type NoteFolderDeletedEventWritable = {
     type: 'FolderDeletedEvent';
 };
 
-export type FolderMovedEventWritable = {
+export type NoteFolderMovedEventWritable = {
     type: 'FolderRenamedEvent';
     data: {
-        fromFolderId: ParentId;
-        toFolderId: ParentId;
+        fromFolderId: NoteParentId;
+        toFolderId: NoteParentId;
     };
 };
 
-export type FolderRenamedEventWritable = {
+export type NoteFolderRenamedEventWritable = {
     type: 'FolderRenamedEvent';
     data: {
-        oldName?: Name;
-        newName: Name;
+        oldName?: NoteName;
+        newName: NoteName;
     };
 };
 
-export type NoteContentUpdatedEventWritable = {
+export type NoteNoteContentUpdatedEventWritable = {
     type: 'NoteContentUpdatedEvent';
 };
 
-export type NoteCreatedEventWritable = {
+export type NoteNoteCreatedEventWritable = {
     type: 'NoteCreatedEvent';
     data: {
-        name: NotePropertiesName;
+        name: NoteNotePropertiesName;
     };
 };
 
-export type NoteDeletedEventWritable = {
+export type NoteNoteDeletedEventWritable = {
     type: 'NoteDeletedEvent';
 };
 
-export type NoteMovedEventWritable = {
+export type NoteNoteMovedEventWritable = {
     type: 'NoteMovedEvent';
     data: {
-        fromFolderId: FolderId;
-        toFolderId: FolderId;
+        fromFolderId: NoteFolderId;
+        toFolderId: NoteFolderId;
     };
 };
 
-export type NoteRenamedEventWritable = {
+export type NoteNoteRenamedEventWritable = {
     type: 'NoteRenamedEvent';
     data: {
-        oldName?: NotePropertiesName;
-        newName: NotePropertiesName;
+        oldName?: NoteNotePropertiesName;
+        newName: NoteNotePropertiesName;
     };
 };
 
-export type WorkspaceRenamedEventWritable = {
+export type NoteWorkspaceRenamedEventWritable = {
     type: 'WorkspaceRenamedEvent';
     data: {
-        oldName: WorkspacePropertiesName;
-        newName: WorkspacePropertiesName;
+        oldName: NoteWorkspacePropertiesName;
+        newName: NoteWorkspacePropertiesName;
     };
 };
 
-export type TrashedNoteWritable = {
+export type NoteTrashedNoteWritable = {
     id: string;
 };
 
-export type TrashedFolderWritable = {
+export type NoteTrashedFolderWritable = {
     id: string;
 };
 
-export type WorkspaceTreeNoteWritable = {
-    name: NotePropertiesName;
-    icon: Icon;
+export type NoteWorkspaceTreeNoteWritable = {
+    name: NoteNotePropertiesName;
+    icon: NoteIcon;
 };
 
-export type WorkspaceTreeFolderWritable = {
-    name: Name;
-    icon: PropertiesIcon;
-    notes: Array<WorkspaceTreeNoteWritable>;
-    children: Array<WorkspaceTreeFolderWritable>;
+export type NoteWorkspaceTreeFolderWritable = {
+    name: NoteName;
+    icon: NotePropertiesIcon;
+    notes: Array<NoteWorkspaceTreeNoteWritable>;
+    children: Array<NoteWorkspaceTreeFolderWritable>;
 };
 
 /**
  * Unique identifier of the document (note)
  */
-export type DocumentIdPath = string;
+export type DocumentDocumentIdPath = string;
 
-export type FolderIdPath = PropertiesId;
+export type NoteFolderIdPath = NotePropertiesId;
 
 /**
  * Page number for pagination
  */
-export type PageQuery = number;
+export type NotePageQuery = number;
 
 /**
  * Number of items per page
  */
-export type LimitQuery = number;
+export type NoteLimitQuery = number;
 
-export type NoteIdPath = NotePropertiesId;
+export type NoteNoteIdPath = NoteNotePropertiesId;
 
-export type NoteIdQuery = NotePropertiesId;
+export type NoteNoteIdQuery = NoteNotePropertiesId;
 
-export type RevisionIdPath = RevisionPropertiesId;
+export type NoteRevisionIdPath = NoteRevisionPropertiesId;
 
-export type WorkspaceIdPath = Id;
+export type NoteWorkspaceIdPath = NoteId;
 
-export type ImportDocumentsRequest = Array<{
+export type DocumentImportDocumentsRequest = Array<{
     [key: string]: unknown;
 }>;
 
-export type CreateFolderRequest = FolderWritable;
+export type NoteCreateFolderRequest = NoteFolderWritable;
 
-export type RenameFolderRequest = {
-    name: Name;
+export type NoteRenameFolderRequest = {
+    name: NoteName;
 };
 
-export type CreateNoteRequest = NoteWritable;
+export type NoteCreateNoteRequest = NoteNoteWritable;
 
-export type GenerateDailyNoteRequest = {
-    workspaceId: Id;
+export type NoteGenerateDailyNoteRequest = {
+    workspaceId: NoteId;
 };
 
-export type SearchTagsRequest = {
-    name: PropertiesName;
+export type NoteSearchTagsRequest = {
+    name: NotePropertiesName;
     limit?: number;
 };
 
-export type RenameNoteRequest = {
-    name: NotePropertiesName;
+export type NoteRenameNoteRequest = {
+    name: NoteNotePropertiesName;
 };
 
-export type RenameRevisionRequest = {
-    name: RevisionPropertiesName;
+export type NoteRenameRevisionRequest = {
+    name: NoteRevisionPropertiesName;
 };
 
-export type CreateWorkspaceRequest = WorkspaceWritable;
+export type NoteCreateWorkspaceRequest = NoteWorkspaceWritable;
 
-export type UpdateWorkspaceMembers = Array<WorkspaceMember>;
+export type NoteUpdateWorkspaceMembers = Array<NoteWorkspaceMember>;
 
-export type MoveWorkspaceItemsRequest = {
-    noteIds?: Array<NotePropertiesId>;
-    folderIds?: Array<PropertiesId>;
+export type NoteMoveWorkspaceItemsRequest = {
+    noteIds?: Array<NoteNotePropertiesId>;
+    folderIds?: Array<NotePropertiesId>;
 };
 
-export type RenameWorkspaceRequest = {
-    name: WorkspacePropertiesName;
+export type NoteRenameWorkspaceRequest = {
+    name: NoteWorkspacePropertiesName;
 };
 
-export type RestoreTrashedWorkspaceItemsRequest = {
-    notes?: Array<TrashedNoteWritable>;
-    folders?: Array<TrashedFolderWritable>;
+export type NoteRestoreTrashedWorkspaceItemsRequest = {
+    notes?: Array<NoteTrashedNoteWritable>;
+    folders?: Array<NoteTrashedFolderWritable>;
 };
 
-export type TrashWorkspaceItemsRequest = {
-    notes?: Array<TrashedNoteWritable>;
-    folders?: Array<TrashedFolderWritable>;
+export type NoteTrashWorkspaceItemsRequest = {
+    notes?: Array<NoteTrashedNoteWritable>;
+    folders?: Array<NoteTrashedFolderWritable>;
 };
 
 export type ImportDocumentsData = {
-    body: ImportDocumentsRequest;
+    body: DocumentImportDocumentsRequest;
     path?: never;
     query?: never;
     url: '/document/documents/import';
@@ -475,19 +546,19 @@ export type ImportDocumentsErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: DocumentError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: DocumentError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: DocumentError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: DocumentError;
 };
 
 export type ImportDocumentsError = ImportDocumentsErrors[keyof ImportDocumentsErrors];
@@ -515,19 +586,19 @@ export type WsDocumentErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: DocumentError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: DocumentError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: DocumentError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: DocumentError;
 };
 
 export type WsDocumentError = WsDocumentErrors[keyof WsDocumentErrors];
@@ -555,19 +626,19 @@ export type GetDocumentAttachmentUploadUrlErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: DocumentError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: DocumentError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: DocumentError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: DocumentError;
 };
 
 export type GetDocumentAttachmentUploadUrlError = GetDocumentAttachmentUploadUrlErrors[keyof GetDocumentAttachmentUploadUrlErrors];
@@ -584,7 +655,7 @@ export type GetDocumentAttachmentUploadUrlResponses = {
 export type GetDocumentAttachmentUploadUrlResponse = GetDocumentAttachmentUploadUrlResponses[keyof GetDocumentAttachmentUploadUrlResponses];
 
 export type CreateFolderData = {
-    body: CreateFolderRequest;
+    body: NoteCreateFolderRequest;
     path?: never;
     query?: never;
     url: '/note/folders';
@@ -594,15 +665,15 @@ export type CreateFolderErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type CreateFolderError = CreateFolderErrors[keyof CreateFolderErrors];
@@ -615,9 +686,9 @@ export type CreateFolderResponses = {
 };
 
 export type RenameFolderData = {
-    body: RenameFolderRequest;
+    body: NoteRenameFolderRequest;
     path: {
-        folderId: PropertiesId;
+        folderId: NotePropertiesId;
     };
     query?: never;
     url: '/note/folders/{folderId}/rename';
@@ -627,19 +698,19 @@ export type RenameFolderErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type RenameFolderError = RenameFolderErrors[keyof RenameFolderErrors];
@@ -674,15 +745,15 @@ export type GetNotesErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetNotesError = GetNotesErrors[keyof GetNotesErrors];
@@ -691,13 +762,13 @@ export type GetNotesResponses = {
     /**
      * Successful response
      */
-    200: Note;
+    200: NoteNote;
 };
 
 export type GetNotesResponse = GetNotesResponses[keyof GetNotesResponses];
 
 export type CreateNoteData = {
-    body: CreateNoteRequest;
+    body: NoteCreateNoteRequest;
     path?: never;
     query?: never;
     url: '/note/notes';
@@ -707,15 +778,15 @@ export type CreateNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type CreateNoteError = CreateNoteErrors[keyof CreateNoteErrors];
@@ -728,7 +799,7 @@ export type CreateNoteResponses = {
 };
 
 export type GenerateDailyNoteData = {
-    body: GenerateDailyNoteRequest;
+    body: NoteGenerateDailyNoteRequest;
     path?: never;
     query?: never;
     url: '/note/notes/generate-daily';
@@ -738,19 +809,19 @@ export type GenerateDailyNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GenerateDailyNoteError = GenerateDailyNoteErrors[keyof GenerateDailyNoteErrors];
@@ -763,7 +834,7 @@ export type GenerateDailyNoteResponses = {
 };
 
 export type SearchTagsData = {
-    body: SearchTagsRequest;
+    body: NoteSearchTagsRequest;
     path?: never;
     query?: never;
     url: '/note/notes/search-tags';
@@ -773,15 +844,15 @@ export type SearchTagsErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type SearchTagsError = SearchTagsErrors[keyof SearchTagsErrors];
@@ -790,7 +861,7 @@ export type SearchTagsResponses = {
     /**
      * List of matching tags in the workspace
      */
-    200: Array<Tag>;
+    200: Array<NoteTag>;
 };
 
 export type SearchTagsResponse = SearchTagsResponses[keyof SearchTagsResponses];
@@ -798,7 +869,7 @@ export type SearchTagsResponse = SearchTagsResponses[keyof SearchTagsResponses];
 export type DeleteNoteData = {
     body?: never;
     path: {
-        noteId: NotePropertiesId;
+        noteId: NoteNotePropertiesId;
     };
     query?: never;
     url: '/note/notes/{noteId}';
@@ -808,23 +879,23 @@ export type DeleteNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Forbidden Error response
      */
-    403: Error;
+    403: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type DeleteNoteError = DeleteNoteErrors[keyof DeleteNoteErrors];
@@ -841,7 +912,7 @@ export type DeleteNoteResponse = DeleteNoteResponses[keyof DeleteNoteResponses];
 export type GetNoteData = {
     body?: never;
     path: {
-        noteId: NotePropertiesId;
+        noteId: NoteNotePropertiesId;
     };
     query?: never;
     url: '/note/notes/{noteId}';
@@ -851,23 +922,23 @@ export type GetNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Forbidden Error response
      */
-    403: Error;
+    403: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetNoteError = GetNoteErrors[keyof GetNoteErrors];
@@ -876,7 +947,7 @@ export type GetNoteResponses = {
     /**
      * Successful response
      */
-    200: Note;
+    200: NoteNote;
 };
 
 export type GetNoteResponse = GetNoteResponses[keyof GetNoteResponses];
@@ -884,7 +955,7 @@ export type GetNoteResponse = GetNoteResponses[keyof GetNoteResponses];
 export type GetNoteGraphData = {
     body?: never;
     path: {
-        noteId: NotePropertiesId;
+        noteId: NoteNotePropertiesId;
     };
     query?: {
         depth?: number;
@@ -896,23 +967,23 @@ export type GetNoteGraphErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Forbidden Error response
      */
-    403: Error;
+    403: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetNoteGraphError = GetNoteGraphErrors[keyof GetNoteGraphErrors];
@@ -921,7 +992,7 @@ export type GetNoteGraphResponses = {
     /**
      * Note graph
      */
-    200: Graph;
+    200: NoteGraph;
 };
 
 export type GetNoteGraphResponse = GetNoteGraphResponses[keyof GetNoteGraphResponses];
@@ -929,7 +1000,7 @@ export type GetNoteGraphResponse = GetNoteGraphResponses[keyof GetNoteGraphRespo
 export type GetNoteLinksData = {
     body?: never;
     path: {
-        noteId: NotePropertiesId;
+        noteId: NoteNotePropertiesId;
     };
     query?: {
         outgoingLinks?: boolean;
@@ -942,19 +1013,19 @@ export type GetNoteLinksErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetNoteLinksError = GetNoteLinksErrors[keyof GetNoteLinksErrors];
@@ -964,8 +1035,8 @@ export type GetNoteLinksResponses = {
      * Note links
      */
     200: {
-        outgoingLinks?: Array<NoteLink>;
-        backlinks?: Array<NoteLink>;
+        outgoingLinks?: Array<NoteNoteLink>;
+        backlinks?: Array<NoteNoteLink>;
     };
 };
 
@@ -974,7 +1045,7 @@ export type GetNoteLinksResponse = GetNoteLinksResponses[keyof GetNoteLinksRespo
 export type PublishNoteData = {
     body?: never;
     path: {
-        noteId: NotePropertiesId;
+        noteId: NoteNotePropertiesId;
     };
     query?: never;
     url: '/note/notes/{noteId}/publish';
@@ -984,19 +1055,19 @@ export type PublishNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type PublishNoteError = PublishNoteErrors[keyof PublishNoteErrors];
@@ -1011,9 +1082,9 @@ export type PublishNoteResponses = {
 export type PublishNoteResponse = PublishNoteResponses[keyof PublishNoteResponses];
 
 export type RenameNoteData = {
-    body: RenameNoteRequest;
+    body: NoteRenameNoteRequest;
     path: {
-        noteId: NotePropertiesId;
+        noteId: NoteNotePropertiesId;
     };
     query?: never;
     url: '/note/notes/{noteId}/rename';
@@ -1023,19 +1094,19 @@ export type RenameNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type RenameNoteError = RenameNoteErrors[keyof RenameNoteErrors];
@@ -1052,7 +1123,7 @@ export type RenameNoteResponse = RenameNoteResponses[keyof RenameNoteResponses];
 export type UnpublishNoteData = {
     body?: never;
     path: {
-        noteId: NotePropertiesId;
+        noteId: NoteNotePropertiesId;
     };
     query?: never;
     url: '/note/notes/{noteId}/unpublish';
@@ -1062,19 +1133,19 @@ export type UnpublishNoteErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type UnpublishNoteError = UnpublishNoteErrors[keyof UnpublishNoteErrors];
@@ -1092,7 +1163,7 @@ export type GetRevisionsData = {
     body?: never;
     path?: never;
     query: {
-        noteId: NotePropertiesId;
+        noteId: NoteNotePropertiesId;
         /**
          * Page number for pagination
          */
@@ -1109,19 +1180,19 @@ export type GetRevisionsErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetRevisionsError = GetRevisionsErrors[keyof GetRevisionsErrors];
@@ -1131,8 +1202,8 @@ export type GetRevisionsResponses = {
      * Revisions
      */
     200: {
-        data: Array<Revision>;
-        pagination: Pagination;
+        data: Array<NoteRevision>;
+        pagination: NotePagination;
     };
 };
 
@@ -1141,7 +1212,7 @@ export type GetRevisionsResponse = GetRevisionsResponses[keyof GetRevisionsRespo
 export type ApplyRevisionData = {
     body?: never;
     path: {
-        revisionId: RevisionPropertiesId;
+        revisionId: NoteRevisionPropertiesId;
     };
     query?: never;
     url: '/note/revisions/{revisionId}/apply';
@@ -1151,19 +1222,19 @@ export type ApplyRevisionErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type ApplyRevisionError = ApplyRevisionErrors[keyof ApplyRevisionErrors];
@@ -1178,9 +1249,9 @@ export type ApplyRevisionResponses = {
 export type ApplyRevisionResponse = ApplyRevisionResponses[keyof ApplyRevisionResponses];
 
 export type RenameRevisionData = {
-    body: RenameRevisionRequest;
+    body: NoteRenameRevisionRequest;
     path: {
-        revisionId: RevisionPropertiesId;
+        revisionId: NoteRevisionPropertiesId;
     };
     query?: never;
     url: '/note/revisions/{revisionId}/rename';
@@ -1190,19 +1261,19 @@ export type RenameRevisionErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type RenameRevisionError = RenameRevisionErrors[keyof RenameRevisionErrors];
@@ -1219,7 +1290,7 @@ export type RenameRevisionResponse = RenameRevisionResponses[keyof RenameRevisio
 export type DeleteRevisionData = {
     body?: never;
     path: {
-        revisionId: RevisionPropertiesId;
+        revisionId: NoteRevisionPropertiesId;
     };
     query?: never;
     url: '/note/revisions/{revisionId}';
@@ -1229,23 +1300,23 @@ export type DeleteRevisionErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Forbidden Error response
      */
-    403: Error;
+    403: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type DeleteRevisionError = DeleteRevisionErrors[keyof DeleteRevisionErrors];
@@ -1262,7 +1333,7 @@ export type DeleteRevisionResponse = DeleteRevisionResponses[keyof DeleteRevisio
 export type GetRevisionData = {
     body?: never;
     path: {
-        revisionId: RevisionPropertiesId;
+        revisionId: NoteRevisionPropertiesId;
     };
     query?: never;
     url: '/note/revisions/{revisionId}';
@@ -1272,23 +1343,23 @@ export type GetRevisionErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Forbidden Error response
      */
-    403: Error;
+    403: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetRevisionError = GetRevisionErrors[keyof GetRevisionErrors];
@@ -1297,13 +1368,13 @@ export type GetRevisionResponses = {
     /**
      * Revision detail
      */
-    200: Revision;
+    200: NoteRevision;
 };
 
 export type GetRevisionResponse = GetRevisionResponses[keyof GetRevisionResponses];
 
 export type CreateWorkspaceData = {
-    body: CreateWorkspaceRequest;
+    body: NoteCreateWorkspaceRequest;
     path?: never;
     query?: never;
     url: '/note/workspaces';
@@ -1313,15 +1384,15 @@ export type CreateWorkspaceErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type CreateWorkspaceError = CreateWorkspaceErrors[keyof CreateWorkspaceErrors];
@@ -1336,7 +1407,7 @@ export type CreateWorkspaceResponses = {
 export type DeleteWorkspaceData = {
     body?: never;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}';
@@ -1346,19 +1417,19 @@ export type DeleteWorkspaceErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type DeleteWorkspaceError = DeleteWorkspaceErrors[keyof DeleteWorkspaceErrors];
@@ -1375,7 +1446,7 @@ export type DeleteWorkspaceResponse = DeleteWorkspaceResponses[keyof DeleteWorks
 export type GetWorkspaceData = {
     body?: never;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}';
@@ -1385,19 +1456,19 @@ export type GetWorkspaceErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetWorkspaceError = GetWorkspaceErrors[keyof GetWorkspaceErrors];
@@ -1406,7 +1477,7 @@ export type GetWorkspaceResponses = {
     /**
      * OK
      */
-    200: Workspace;
+    200: NoteWorkspace;
 };
 
 export type GetWorkspaceResponse = GetWorkspaceResponses[keyof GetWorkspaceResponses];
@@ -1414,7 +1485,7 @@ export type GetWorkspaceResponse = GetWorkspaceResponses[keyof GetWorkspaceRespo
 export type GetWorkspaceEventsData = {
     body?: never;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/events';
@@ -1424,15 +1495,15 @@ export type GetWorkspaceEventsErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetWorkspaceEventsError = GetWorkspaceEventsErrors[keyof GetWorkspaceEventsErrors];
@@ -1443,25 +1514,25 @@ export type GetWorkspaceEventsResponses = {
      */
     200: ({
         type: 'FolderCreatedEvent';
-    } & FolderCreatedEvent) | ({
+    } & NoteFolderCreatedEvent) | ({
         type: 'FolderDeletedEvent';
-    } & FolderDeletedEvent) | ({
+    } & NoteFolderDeletedEvent) | ({
         type: 'FolderMovedEvent';
-    } & FolderMovedEvent) | ({
+    } & NoteFolderMovedEvent) | ({
         type: 'FolderRenamedEvent';
-    } & FolderRenamedEvent) | ({
+    } & NoteFolderRenamedEvent) | ({
         type: 'NoteContentUpdatedEvent';
-    } & NoteContentUpdatedEvent) | ({
+    } & NoteNoteContentUpdatedEvent) | ({
         type: 'NoteCreatedEvent';
-    } & NoteCreatedEvent) | ({
+    } & NoteNoteCreatedEvent) | ({
         type: 'NoteDeletedEvent';
-    } & NoteDeletedEvent) | ({
+    } & NoteNoteDeletedEvent) | ({
         type: 'NoteMovedEvent';
-    } & NoteMovedEvent) | ({
+    } & NoteNoteMovedEvent) | ({
         type: 'NoteRenamedEvent';
-    } & NoteRenamedEvent) | ({
+    } & NoteNoteRenamedEvent) | ({
         type: 'WorkspaceRenamedEvent';
-    } & WorkspaceRenamedEvent);
+    } & NoteWorkspaceRenamedEvent);
 };
 
 export type GetWorkspaceEventsResponse = GetWorkspaceEventsResponses[keyof GetWorkspaceEventsResponses];
@@ -1469,7 +1540,7 @@ export type GetWorkspaceEventsResponse = GetWorkspaceEventsResponses[keyof GetWo
 export type GetWorkspaceGraphData = {
     body?: never;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: {
         /**
@@ -1484,23 +1555,23 @@ export type GetWorkspaceGraphErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Forbidden Error response
      */
-    403: Error;
+    403: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetWorkspaceGraphError = GetWorkspaceGraphErrors[keyof GetWorkspaceGraphErrors];
@@ -1509,7 +1580,7 @@ export type GetWorkspaceGraphResponses = {
     /**
      * Workspace graph
      */
-    200: Graph;
+    200: NoteGraph;
 };
 
 export type GetWorkspaceGraphResponse = GetWorkspaceGraphResponses[keyof GetWorkspaceGraphResponses];
@@ -1517,7 +1588,7 @@ export type GetWorkspaceGraphResponse = GetWorkspaceGraphResponses[keyof GetWork
 export type GetWorkspaceMembersData = {
     body?: never;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/members';
@@ -1527,19 +1598,19 @@ export type GetWorkspaceMembersErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetWorkspaceMembersError = GetWorkspaceMembersErrors[keyof GetWorkspaceMembersErrors];
@@ -1548,15 +1619,15 @@ export type GetWorkspaceMembersResponses = {
     /**
      * A list of workspace members
      */
-    200: Array<WorkspaceMember>;
+    200: Array<NoteWorkspaceMember>;
 };
 
 export type GetWorkspaceMembersResponse = GetWorkspaceMembersResponses[keyof GetWorkspaceMembersResponses];
 
 export type UpdateWorkspaceMembersData = {
-    body: UpdateWorkspaceMembers;
+    body: NoteUpdateWorkspaceMembers;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/members';
@@ -1566,19 +1637,19 @@ export type UpdateWorkspaceMembersErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type UpdateWorkspaceMembersError = UpdateWorkspaceMembersErrors[keyof UpdateWorkspaceMembersErrors];
@@ -1593,9 +1664,9 @@ export type UpdateWorkspaceMembersResponses = {
 export type UpdateWorkspaceMembersResponse = UpdateWorkspaceMembersResponses[keyof UpdateWorkspaceMembersResponses];
 
 export type MoveWorkspaceItemsData = {
-    body: MoveWorkspaceItemsRequest;
+    body: NoteMoveWorkspaceItemsRequest;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/move-items';
@@ -1605,19 +1676,19 @@ export type MoveWorkspaceItemsErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type MoveWorkspaceItemsError = MoveWorkspaceItemsErrors[keyof MoveWorkspaceItemsErrors];
@@ -1634,7 +1705,7 @@ export type MoveWorkspaceItemsResponse = MoveWorkspaceItemsResponses[keyof MoveW
 export type PublishWorkspaceData = {
     body?: never;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/publish';
@@ -1644,19 +1715,19 @@ export type PublishWorkspaceErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type PublishWorkspaceError = PublishWorkspaceErrors[keyof PublishWorkspaceErrors];
@@ -1671,9 +1742,9 @@ export type PublishWorkspaceResponses = {
 export type PublishWorkspaceResponse = PublishWorkspaceResponses[keyof PublishWorkspaceResponses];
 
 export type RenameWorkspaceData = {
-    body: RenameWorkspaceRequest;
+    body: NoteRenameWorkspaceRequest;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/rename';
@@ -1683,19 +1754,19 @@ export type RenameWorkspaceErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type RenameWorkspaceError = RenameWorkspaceErrors[keyof RenameWorkspaceErrors];
@@ -1710,9 +1781,9 @@ export type RenameWorkspaceResponses = {
 export type RenameWorkspaceResponse = RenameWorkspaceResponses[keyof RenameWorkspaceResponses];
 
 export type RestoreTrashedWorkspaceItemsData = {
-    body: RestoreTrashedWorkspaceItemsRequest;
+    body: NoteRestoreTrashedWorkspaceItemsRequest;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/restore-trashed-items';
@@ -1722,19 +1793,19 @@ export type RestoreTrashedWorkspaceItemsErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type RestoreTrashedWorkspaceItemsError = RestoreTrashedWorkspaceItemsErrors[keyof RestoreTrashedWorkspaceItemsErrors];
@@ -1751,7 +1822,7 @@ export type RestoreTrashedWorkspaceItemsResponse = RestoreTrashedWorkspaceItemsR
 export type ShowTrashData = {
     body?: never;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/show-trash';
@@ -1761,19 +1832,19 @@ export type ShowTrashErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type ShowTrashError = ShowTrashErrors[keyof ShowTrashErrors];
@@ -1784,19 +1855,19 @@ export type ShowTrashResponses = {
      */
     200: {
         data: {
-            notes?: Array<TrashedNote>;
-            folders?: Array<TrashedFolder>;
+            notes?: Array<NoteTrashedNote>;
+            folders?: Array<NoteTrashedFolder>;
         };
-        pagination: Pagination;
+        pagination: NotePagination;
     };
 };
 
 export type ShowTrashResponse = ShowTrashResponses[keyof ShowTrashResponses];
 
 export type TrashWorkspaceItemsData = {
-    body: TrashWorkspaceItemsRequest;
+    body: NoteTrashWorkspaceItemsRequest;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/trash-items';
@@ -1806,19 +1877,19 @@ export type TrashWorkspaceItemsErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type TrashWorkspaceItemsError = TrashWorkspaceItemsErrors[keyof TrashWorkspaceItemsErrors];
@@ -1835,7 +1906,7 @@ export type TrashWorkspaceItemsResponse = TrashWorkspaceItemsResponses[keyof Tra
 export type GetWorkspaceTreeData = {
     body?: never;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/tree';
@@ -1845,19 +1916,19 @@ export type GetWorkspaceTreeErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type GetWorkspaceTreeError = GetWorkspaceTreeErrors[keyof GetWorkspaceTreeErrors];
@@ -1866,7 +1937,7 @@ export type GetWorkspaceTreeResponses = {
     /**
      * OK
      */
-    200: WorkspaceTreeFolder;
+    200: NoteWorkspaceTreeFolder;
 };
 
 export type GetWorkspaceTreeResponse = GetWorkspaceTreeResponses[keyof GetWorkspaceTreeResponses];
@@ -1874,7 +1945,7 @@ export type GetWorkspaceTreeResponse = GetWorkspaceTreeResponses[keyof GetWorksp
 export type UnpublishWorkspaceData = {
     body?: never;
     path: {
-        workspaceId: Id;
+        workspaceId: NoteId;
     };
     query?: never;
     url: '/note/workspaces/{workspaceId}/unpublish';
@@ -1884,19 +1955,19 @@ export type UnpublishWorkspaceErrors = {
     /**
      * Bad Request Error response
      */
-    400: Error;
+    400: NoteError;
     /**
      * Unauthorized Error response
      */
-    401: Error;
+    401: NoteError;
     /**
      * Not Found Error response
      */
-    404: Error;
+    404: NoteError;
     /**
      * Internal Server Error response
      */
-    500: Error;
+    500: NoteError;
 };
 
 export type UnpublishWorkspaceError = UnpublishWorkspaceErrors[keyof UnpublishWorkspaceErrors];

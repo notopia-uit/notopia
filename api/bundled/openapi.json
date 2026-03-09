@@ -11,7 +11,8 @@
     "contact": {
       "name": "Notopia Support",
       "email": "kevinnitro@duck.com"
-    }
+    },
+    "x-apiName": "api"
   },
   "servers": [
     {
@@ -53,7 +54,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "document_Oauth2": []
           }
         ],
         "tags": [
@@ -62,23 +63,23 @@
         "summary": "Import documents",
         "operationId": "importDocuments",
         "requestBody": {
-          "$ref": "#/components/requestBodies/ImportDocumentsRequest"
+          "$ref": "#/components/requestBodies/document_ImportDocumentsRequest"
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/ImportDocumentsResponse"
+            "$ref": "#/components/responses/document_ImportDocumentsResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/document_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/document_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/document_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/document_InternalServerError"
           }
         }
       }
@@ -87,7 +88,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "document_Oauth2": []
           }
         ],
         "tags": [
@@ -97,7 +98,7 @@
         "operationId": "wsDocument",
         "parameters": [
           {
-            "$ref": "#/components/parameters/documentIdPath"
+            "$ref": "#/components/parameters/document_documentIdPath"
           }
         ],
         "responses": {
@@ -108,16 +109,16 @@
             "description": "OK"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/document_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/document_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/document_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/document_InternalServerError"
           }
         }
       }
@@ -126,7 +127,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "document_Oauth2": []
           }
         ],
         "tags": [
@@ -137,24 +138,24 @@
         "operationId": "getDocumentAttachmentUploadUrl",
         "parameters": [
           {
-            "$ref": "#/components/parameters/documentIdPath"
+            "$ref": "#/components/parameters/document_documentIdPath"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetDocumentAttachmentUploadUrlResponse"
+            "$ref": "#/components/responses/document_GetDocumentAttachmentUploadUrlResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/document_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/document_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/document_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/document_InternalServerError"
           }
         }
       }
@@ -163,7 +164,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -172,20 +173,20 @@
         "summary": "Create folder",
         "operationId": "createFolder",
         "requestBody": {
-          "$ref": "#/components/requestBodies/CreateFolderRequest"
+          "$ref": "#/components/requestBodies/note_CreateFolderRequest"
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/CreateFolderResponse"
+            "$ref": "#/components/responses/note_CreateFolderResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -194,7 +195,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -204,27 +205,27 @@
         "operationId": "renameFolder",
         "parameters": [
           {
-            "$ref": "#/components/parameters/folderIdPath"
+            "$ref": "#/components/parameters/note_folderIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/RenameFolderRequest"
+          "$ref": "#/components/requestBodies/note_RenameFolderRequest"
         },
         "responses": {
           "204": {
             "description": "Folder renamed successfully"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -233,7 +234,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -242,27 +243,27 @@
         "summary": "Create note",
         "operationId": "createNote",
         "requestBody": {
-          "$ref": "#/components/requestBodies/CreateNoteRequest"
+          "$ref": "#/components/requestBodies/note_CreateNoteRequest"
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/CreateNoteResponse"
+            "$ref": "#/components/responses/note_CreateNoteResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       },
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -272,10 +273,10 @@
         "operationId": "getNotes",
         "parameters": [
           {
-            "$ref": "#/components/parameters/pageQuery"
+            "$ref": "#/components/parameters/note_pageQuery"
           },
           {
-            "$ref": "#/components/parameters/limitQuery"
+            "$ref": "#/components/parameters/note_limitQuery"
           },
           {
             "name": "tags",
@@ -292,16 +293,16 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetNotesResponse"
+            "$ref": "#/components/responses/note_GetNotesResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -310,7 +311,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -319,23 +320,23 @@
         "summary": "Generate daily note",
         "operationId": "generateDailyNote",
         "requestBody": {
-          "$ref": "#/components/requestBodies/GenerateDailyNoteRequest"
+          "$ref": "#/components/requestBodies/note_GenerateDailyNoteRequest"
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/GenerateDailyNoteResponse"
+            "$ref": "#/components/responses/note_GenerateDailyNoteResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -344,7 +345,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -353,20 +354,20 @@
         "summary": "Search tags",
         "operationId": "searchTags",
         "requestBody": {
-          "$ref": "#/components/requestBodies/SearchTagsRequest"
+          "$ref": "#/components/requestBodies/note_SearchTagsRequest"
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/SearchTagsResponse"
+            "$ref": "#/components/responses/note_SearchTagsResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -375,7 +376,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -385,34 +386,34 @@
         "operationId": "getNote",
         "parameters": [
           {
-            "$ref": "#/components/parameters/noteIdPath"
+            "$ref": "#/components/parameters/note_noteIdPath"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetNoteResponse"
+            "$ref": "#/components/responses/note_GetNoteResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError"
+            "$ref": "#/components/responses/note_ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       },
       "delete": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -422,7 +423,7 @@
         "operationId": "deleteNote",
         "parameters": [
           {
-            "$ref": "#/components/parameters/noteIdPath"
+            "$ref": "#/components/parameters/note_noteIdPath"
           }
         ],
         "responses": {
@@ -430,19 +431,19 @@
             "description": "Note successfully deleted"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError"
+            "$ref": "#/components/responses/note_ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -451,7 +452,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -461,7 +462,7 @@
         "operationId": "getNoteGraph",
         "parameters": [
           {
-            "$ref": "#/components/parameters/noteIdPath"
+            "$ref": "#/components/parameters/note_noteIdPath"
           },
           {
             "name": "depth",
@@ -477,22 +478,22 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetNoteGraphResponse"
+            "$ref": "#/components/responses/note_GetNoteGraphResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError"
+            "$ref": "#/components/responses/note_ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -501,7 +502,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -511,7 +512,7 @@
         "operationId": "getNoteLinks",
         "parameters": [
           {
-            "$ref": "#/components/parameters/noteIdPath"
+            "$ref": "#/components/parameters/note_noteIdPath"
           },
           {
             "name": "outgoingLinks",
@@ -534,19 +535,19 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetNoteLinksResponse"
+            "$ref": "#/components/responses/note_GetNoteLinksResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -555,7 +556,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -565,7 +566,7 @@
         "operationId": "publishNote",
         "parameters": [
           {
-            "$ref": "#/components/parameters/noteIdPath"
+            "$ref": "#/components/parameters/note_noteIdPath"
           }
         ],
         "responses": {
@@ -573,16 +574,16 @@
             "description": "Note published successfully"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -591,7 +592,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -601,27 +602,27 @@
         "operationId": "renameNote",
         "parameters": [
           {
-            "$ref": "#/components/parameters/noteIdPath"
+            "$ref": "#/components/parameters/note_noteIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/RenameNoteRequest"
+          "$ref": "#/components/requestBodies/note_RenameNoteRequest"
         },
         "responses": {
           "204": {
             "description": "Note renamed successfully"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -630,7 +631,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -640,7 +641,7 @@
         "operationId": "unpublishNote",
         "parameters": [
           {
-            "$ref": "#/components/parameters/noteIdPath"
+            "$ref": "#/components/parameters/note_noteIdPath"
           }
         ],
         "responses": {
@@ -648,16 +649,16 @@
             "description": "Note unpublished successfully"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -666,7 +667,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -676,30 +677,30 @@
         "operationId": "getRevisions",
         "parameters": [
           {
-            "$ref": "#/components/parameters/noteIdQuery"
+            "$ref": "#/components/parameters/note_noteIdQuery"
           },
           {
-            "$ref": "#/components/parameters/pageQuery"
+            "$ref": "#/components/parameters/note_pageQuery"
           },
           {
-            "$ref": "#/components/parameters/limitQuery"
+            "$ref": "#/components/parameters/note_limitQuery"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetRevisionsResponse"
+            "$ref": "#/components/responses/note_GetRevisionsResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -708,7 +709,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -718,24 +719,24 @@
         "operationId": "applyRevision",
         "parameters": [
           {
-            "$ref": "#/components/parameters/revisionIdPath"
+            "$ref": "#/components/parameters/note_revisionIdPath"
           }
         ],
         "responses": {
           "204": {
-            "$ref": "#/components/responses/ApplyRevisionResponse"
+            "$ref": "#/components/responses/note_ApplyRevisionResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -744,7 +745,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -754,27 +755,27 @@
         "operationId": "renameRevision",
         "parameters": [
           {
-            "$ref": "#/components/parameters/revisionIdPath"
+            "$ref": "#/components/parameters/note_revisionIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/RenameRevisionRequest"
+          "$ref": "#/components/requestBodies/note_RenameRevisionRequest"
         },
         "responses": {
           "204": {
             "description": "Revision renamed successfully"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -783,7 +784,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -793,34 +794,34 @@
         "operationId": "getRevision",
         "parameters": [
           {
-            "$ref": "#/components/parameters/revisionIdPath"
+            "$ref": "#/components/parameters/note_revisionIdPath"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetRevisionResponse"
+            "$ref": "#/components/responses/note_GetRevisionResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError"
+            "$ref": "#/components/responses/note_ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       },
       "delete": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -830,7 +831,7 @@
         "operationId": "deleteRevision",
         "parameters": [
           {
-            "$ref": "#/components/parameters/revisionIdPath"
+            "$ref": "#/components/parameters/note_revisionIdPath"
           }
         ],
         "responses": {
@@ -838,19 +839,19 @@
             "description": "Revision deleted successfully"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError"
+            "$ref": "#/components/responses/note_ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -859,7 +860,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -868,20 +869,20 @@
         "summary": "Create workspace",
         "operationId": "createWorkspace",
         "requestBody": {
-          "$ref": "#/components/requestBodies/CreateWorkspaceRequest"
+          "$ref": "#/components/requestBodies/note_CreateWorkspaceRequest"
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/CreateWorkspaceResponse"
+            "$ref": "#/components/responses/note_CreateWorkspaceResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -890,7 +891,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -900,31 +901,31 @@
         "operationId": "getWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetWorkspaceResponse"
+            "$ref": "#/components/responses/note_GetWorkspaceResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       },
       "delete": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -934,7 +935,7 @@
         "operationId": "deleteWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -942,16 +943,16 @@
             "description": "No Content - Workspace successfully deleted."
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -960,7 +961,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -970,21 +971,21 @@
         "operationId": "getWorkspaceEvents",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetWorkspaceEventsResponse"
+            "$ref": "#/components/responses/note_GetWorkspaceEventsResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -993,7 +994,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1003,7 +1004,7 @@
         "operationId": "getWorkspaceGraph",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           },
           {
             "name": "orphan",
@@ -1018,22 +1019,22 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetWorkspaceGraphResponse"
+            "$ref": "#/components/responses/note_GetWorkspaceGraphResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError"
+            "$ref": "#/components/responses/note_ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -1042,7 +1043,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1052,31 +1053,31 @@
         "operationId": "getWorkspaceMembers",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetWorkspaceMembersResponse"
+            "$ref": "#/components/responses/note_GetWorkspaceMembersResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       },
       "put": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1086,27 +1087,27 @@
         "operationId": "updateWorkspaceMembers",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/UpdateWorkspaceMembers"
+          "$ref": "#/components/requestBodies/note_UpdateWorkspaceMembers"
         },
         "responses": {
           "204": {
             "description": "Workspace members updated successfully"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -1115,7 +1116,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1125,27 +1126,27 @@
         "operationId": "moveWorkspaceItems",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/MoveWorkspaceItemsRequest"
+          "$ref": "#/components/requestBodies/note_MoveWorkspaceItemsRequest"
         },
         "responses": {
           "204": {
             "description": "Workspace items successfully moved"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -1154,7 +1155,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1164,7 +1165,7 @@
         "operationId": "publishWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -1172,16 +1173,16 @@
             "description": "Workspace published successfully"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -1190,7 +1191,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1200,27 +1201,27 @@
         "operationId": "renameWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/RenameWorkspaceRequest"
+          "$ref": "#/components/requestBodies/note_RenameWorkspaceRequest"
         },
         "responses": {
           "204": {
             "description": "Workspace renamed successfully"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -1229,7 +1230,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1239,27 +1240,27 @@
         "operationId": "restoreTrashedWorkspaceItems",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/RestoreTrashedWorkspaceItemsRequest"
+          "$ref": "#/components/requestBodies/note_RestoreTrashedWorkspaceItemsRequest"
         },
         "responses": {
           "204": {
             "description": "Workspace items successfully restored"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -1268,7 +1269,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1278,24 +1279,24 @@
         "operationId": "showTrash",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/ShowTrashResponse"
+            "$ref": "#/components/responses/note_ShowTrashResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -1304,7 +1305,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1314,27 +1315,27 @@
         "operationId": "trashWorkspaceItems",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/TrashWorkspaceItemsRequest"
+          "$ref": "#/components/requestBodies/note_TrashWorkspaceItemsRequest"
         },
         "responses": {
           "204": {
             "description": "Workspace items successfully trashed"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -1343,7 +1344,7 @@
       "get": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1353,24 +1354,24 @@
         "operationId": "getWorkspaceTree",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetWorkspaceTreeResponse"
+            "$ref": "#/components/responses/note_GetWorkspaceTreeResponse"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -1379,7 +1380,7 @@
       "post": {
         "security": [
           {
-            "Oauth2": []
+            "note_Oauth2": []
           }
         ],
         "tags": [
@@ -1389,7 +1390,7 @@
         "operationId": "unpublishWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -1397,16 +1398,16 @@
             "description": "Workspace unpublished successfully"
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError"
+            "$ref": "#/components/responses/note_BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/note_UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError"
+            "$ref": "#/components/responses/note_NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "$ref": "#/components/responses/note_InternalServerError"
           }
         }
       }
@@ -1414,7 +1415,138 @@
   },
   "components": {
     "schemas": {
-      "Error": {
+      "share_NoteSearch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "note:{noteId}:block:{blockId}",
+            "example": "note:46f94d4d-41b5-4df6-bf8d-270fb9a49c97:block:a-random-idd"
+          },
+          "noteId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+          },
+          "blockId": {
+            "type": "string",
+            "example": "a-random-id"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Meeting Notes"
+          },
+          "content": {
+            "type": "string",
+            "description": "Plain text content of the note's block",
+            "example": "This is the content of the note."
+          }
+        },
+        "required": [
+          "id",
+          "noteId",
+          "blockId",
+          "name",
+          "content"
+        ]
+      },
+      "share_NoteCommittedEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/share_id"
+          },
+          "name": {
+            "$ref": "#/components/schemas/share_name"
+          },
+          "folderId": {
+            "$ref": "#/components/schemas/share_folderId"
+          },
+          "revision": {
+            "$ref": "#/components/schemas/share_Revision"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "folderId",
+          "revision"
+        ]
+      },
+      "share_UserDeletedEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/share_properties-id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "share_id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
+        "readOnly": true
+      },
+      "share_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Meeting Notes"
+      },
+      "share_folderId": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "share_NoteContent": {
+        "type": "string",
+        "nullable": true,
+        "example": "[{\"type\":\"paragraph\",\"content\":\"Welcome to this demo!\"},{\"type\":\"paragraph\"},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Blocks:\",\"styles\":{\"bold\":true}}]},{\"type\":\"paragraph\",\"content\":\"Paragraph\"},{\"type\":\"heading\",\"content\":\"Heading\"},{\"id\":\"toggle-heading\",\"type\":\"heading\",\"props\":{\"isToggleable\":true},\"content\":\"Toggle Heading\"},{\"type\":\"quote\",\"content\":\"Quote\"},{\"type\":\"bulletListItem\",\"content\":\"Bullet List Item\"},{\"type\":\"numberedListItem\",\"content\":\"Numbered List Item\"},{\"type\":\"checkListItem\",\"content\":\"Check List Item\"},{\"id\":\"toggle-list-item\",\"type\":\"toggleListItem\",\"content\":\"Toggle List Item\"},{\"type\":\"codeBlock\",\"props\":{\"language\":\"javascript\"},\"content\":\"console.log('Hello, world!');\"},{\"type\":\"table\",\"content\":{\"type\":\"tableContent\",\"rows\":[{\"cells\":[\"Table Cell\",\"Table Cell\",\"Table Cell\"]},{\"cells\":[\"Table Cell\",\"Table Cell\",\"Table Cell\"]},{\"cells\":[\"Table Cell\",\"Table Cell\",\"Table Cell\"]}]}},{\"type\":\"file\"},{\"type\":\"image\",\"props\":{\"url\":\"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\",\"caption\":\"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\"}},{\"type\":\"video\",\"props\":{\"url\":\"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\",\"caption\":\"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\"}},{\"type\":\"audio\",\"props\":{\"url\":\"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\",\"caption\":\"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\"}},{\"type\":\"paragraph\"},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Inline Content:\",\"styles\":{\"bold\":true}}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Styled Text\",\"styles\":{\"bold\":true,\"italic\":true,\"textColor\":\"red\",\"backgroundColor\":\"blue\"}},{\"type\":\"text\",\"text\":\" \",\"styles\":{}},{\"type\":\"link\",\"content\":\"Link\",\"href\":\"https://www.blocknotejs.org\"}]},{\"type\":\"paragraph\"}]"
+      },
+      "share_Revision": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Initial Draft"
+          },
+          "content": {
+            "$ref": "#/components/schemas/share_NoteContent"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-01T12:00:00Z",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "content",
+          "createdAt"
+        ]
+      },
+      "share_properties-id": {
+        "type": "string",
+        "description": "User ID from Authentik",
+        "example": "04415622b0a267807d139a8266072f8098bdb605a7bfbadf2b0016c02572e514"
+      },
+      "document_Error": {
         "type": "object",
         "properties": {
           "code": {
@@ -1438,13 +1570,13 @@
           "message"
         ]
       },
-      "id": {
+      "note_id": {
         "type": "string",
         "format": "uuid",
         "example": "550e8400-e29b-41d4-a716-446655440000",
         "readOnly": true
       },
-      "Folder": {
+      "note_Folder": {
         "type": "object",
         "properties": {
           "id": {
@@ -1470,7 +1602,7 @@
             "example": "cc7a2e47-6267-4c60-8d36-257f849777e4"
           },
           "workspaceId": {
-            "$ref": "#/components/schemas/id",
+            "$ref": "#/components/schemas/note_id",
             "readOnly": false
           }
         },
@@ -1481,24 +1613,48 @@
           "parentId"
         ]
       },
-      "properties-id": {
+      "note_Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error code",
+            "example": "EXAMPLE_CODE"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message",
+            "example": "Example error"
+          },
+          "more_info": {
+            "type": "string",
+            "description": "URL with more information about the error",
+            "example": "https://api.notopia.com/docs/errors/EXAMPLE_CODE"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "note_properties-id": {
         "type": "string",
         "format": "uuid",
         "example": "123e4567-e89b-12d3-a456-426614174000",
         "readOnly": true
       },
-      "name": {
+      "note_name": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
         "example": "Work Notes"
       },
-      "NoteContent": {
+      "note_NoteContent": {
         "type": "string",
         "nullable": true,
         "example": "[{\"type\":\"paragraph\",\"content\":\"Welcome to this demo!\"},{\"type\":\"paragraph\"},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Blocks:\",\"styles\":{\"bold\":true}}]},{\"type\":\"paragraph\",\"content\":\"Paragraph\"},{\"type\":\"heading\",\"content\":\"Heading\"},{\"id\":\"toggle-heading\",\"type\":\"heading\",\"props\":{\"isToggleable\":true},\"content\":\"Toggle Heading\"},{\"type\":\"quote\",\"content\":\"Quote\"},{\"type\":\"bulletListItem\",\"content\":\"Bullet List Item\"},{\"type\":\"numberedListItem\",\"content\":\"Numbered List Item\"},{\"type\":\"checkListItem\",\"content\":\"Check List Item\"},{\"id\":\"toggle-list-item\",\"type\":\"toggleListItem\",\"content\":\"Toggle List Item\"},{\"type\":\"codeBlock\",\"props\":{\"language\":\"javascript\"},\"content\":\"console.log('Hello, world!');\"},{\"type\":\"table\",\"content\":{\"type\":\"tableContent\",\"rows\":[{\"cells\":[\"Table Cell\",\"Table Cell\",\"Table Cell\"]},{\"cells\":[\"Table Cell\",\"Table Cell\",\"Table Cell\"]},{\"cells\":[\"Table Cell\",\"Table Cell\",\"Table Cell\"]}]}},{\"type\":\"file\"},{\"type\":\"image\",\"props\":{\"url\":\"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\",\"caption\":\"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\"}},{\"type\":\"video\",\"props\":{\"url\":\"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\",\"caption\":\"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\"}},{\"type\":\"audio\",\"props\":{\"url\":\"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\",\"caption\":\"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\"}},{\"type\":\"paragraph\"},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Inline Content:\",\"styles\":{\"bold\":true}}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Styled Text\",\"styles\":{\"bold\":true,\"italic\":true,\"textColor\":\"red\",\"backgroundColor\":\"blue\"}},{\"type\":\"text\",\"text\":\" \",\"styles\":{}},{\"type\":\"link\",\"content\":\"Link\",\"href\":\"https://www.blocknotejs.org\"}]},{\"type\":\"paragraph\"}]"
       },
-      "Note": {
+      "note_Note": {
         "type": "object",
         "properties": {
           "id": {
@@ -1524,7 +1680,7 @@
             "example": "123e4567-e89b-12d3-a456-426614174000"
           },
           "content": {
-            "$ref": "#/components/schemas/NoteContent",
+            "$ref": "#/components/schemas/note_NoteContent",
             "nullable": true
           },
           "backlinksCount": {
@@ -1549,11 +1705,11 @@
           "outgoingLinksCount"
         ]
       },
-      "properties-name": {
+      "note_properties-name": {
         "type": "string",
         "example": "work"
       },
-      "Tag": {
+      "note_Tag": {
         "type": "object",
         "properties": {
           "name": {
@@ -1565,13 +1721,13 @@
           "name"
         ]
       },
-      "Note_properties-id": {
+      "note_Note_properties-id": {
         "type": "string",
         "format": "uuid",
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
         "readOnly": true
       },
-      "Graph": {
+      "note_Graph": {
         "type": "object",
         "properties": {
           "nodes": {
@@ -1633,28 +1789,28 @@
           }
         }
       },
-      "Note_properties-name": {
+      "note_Note_properties-name": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
         "example": "Meeting Notes"
       },
-      "icon": {
+      "note_icon": {
         "type": "string",
         "nullable": true,
         "example": "📓"
       },
-      "NoteLink": {
+      "note_NoteLink": {
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/Note_properties-id"
+            "$ref": "#/components/schemas/note_Note_properties-id"
           },
           "name": {
-            "$ref": "#/components/schemas/Note_properties-name"
+            "$ref": "#/components/schemas/note_Note_properties-name"
           },
           "icon": {
-            "$ref": "#/components/schemas/icon"
+            "$ref": "#/components/schemas/note_icon"
           }
         },
         "required": [
@@ -1663,7 +1819,7 @@
           "icon"
         ]
       },
-      "Revision": {
+      "note_Revision": {
         "type": "object",
         "properties": {
           "id": {
@@ -1680,7 +1836,7 @@
             "example": "Initial Draft"
           },
           "content": {
-            "$ref": "#/components/schemas/NoteContent"
+            "$ref": "#/components/schemas/note_NoteContent"
           },
           "createdAt": {
             "type": "string",
@@ -1696,7 +1852,7 @@
           "createdAt"
         ]
       },
-      "Pagination": {
+      "note_Pagination": {
         "type": "object",
         "properties": {
           "page": {
@@ -1744,20 +1900,20 @@
           "hasPrev"
         ]
       },
-      "Revision_properties-id": {
+      "note_Revision_properties-id": {
         "type": "string",
         "format": "uuid",
         "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
         "readOnly": true
       },
-      "Revision_properties-name": {
+      "note_Revision_properties-name": {
         "type": "string",
         "nullable": true,
         "minLength": 1,
         "maxLength": 255,
         "example": "Initial Draft"
       },
-      "Workspace": {
+      "note_Workspace": {
         "type": "object",
         "properties": {
           "id": {
@@ -1778,7 +1934,7 @@
           "name"
         ]
       },
-      "FolderCreatedEvent": {
+      "note_FolderCreatedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -1792,10 +1948,10 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/note_properties-id"
               },
               "name": {
-                "$ref": "#/components/schemas/name"
+                "$ref": "#/components/schemas/note_name"
               }
             },
             "required": [
@@ -1809,7 +1965,7 @@
           "data"
         ]
       },
-      "FolderDeletedEvent": {
+      "note_FolderDeletedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -1823,7 +1979,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/note_properties-id"
               }
             },
             "required": [
@@ -1836,12 +1992,12 @@
           "data"
         ]
       },
-      "parentId": {
+      "note_parentId": {
         "type": "string",
         "format": "uuid",
         "example": "cc7a2e47-6267-4c60-8d36-257f849777e4"
       },
-      "FolderMovedEvent": {
+      "note_FolderMovedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -1855,13 +2011,13 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/note_properties-id"
               },
               "fromFolderId": {
-                "$ref": "#/components/schemas/parentId"
+                "$ref": "#/components/schemas/note_parentId"
               },
               "toFolderId": {
-                "$ref": "#/components/schemas/parentId",
+                "$ref": "#/components/schemas/note_parentId",
                 "example": "123e4567-e89b-12d3-a456-426614174002"
               }
             },
@@ -1877,7 +2033,7 @@
           "data"
         ]
       },
-      "FolderRenamedEvent": {
+      "note_FolderRenamedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -1891,14 +2047,14 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/note_properties-id"
               },
               "oldName": {
-                "$ref": "#/components/schemas/name",
+                "$ref": "#/components/schemas/note_name",
                 "example": "Work"
               },
               "newName": {
-                "$ref": "#/components/schemas/name",
+                "$ref": "#/components/schemas/note_name",
                 "example": "Working"
               }
             },
@@ -1913,7 +2069,7 @@
           "data"
         ]
       },
-      "NoteContentUpdatedEvent": {
+      "note_NoteContentUpdatedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -1927,7 +2083,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
+                "$ref": "#/components/schemas/note_Note_properties-id"
               }
             },
             "required": [
@@ -1940,7 +2096,7 @@
           "data"
         ]
       },
-      "NoteCreatedEvent": {
+      "note_NoteCreatedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -1954,10 +2110,10 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
+                "$ref": "#/components/schemas/note_Note_properties-id"
               },
               "name": {
-                "$ref": "#/components/schemas/Note_properties-name"
+                "$ref": "#/components/schemas/note_Note_properties-name"
               }
             },
             "required": [
@@ -1971,7 +2127,7 @@
           "data"
         ]
       },
-      "NoteDeletedEvent": {
+      "note_NoteDeletedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -1985,7 +2141,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
+                "$ref": "#/components/schemas/note_Note_properties-id"
               }
             },
             "required": [
@@ -1998,12 +2154,12 @@
           "data"
         ]
       },
-      "folderId": {
+      "note_folderId": {
         "type": "string",
         "format": "uuid",
         "example": "123e4567-e89b-12d3-a456-426614174000"
       },
-      "NoteMovedEvent": {
+      "note_NoteMovedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -2017,13 +2173,13 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
+                "$ref": "#/components/schemas/note_Note_properties-id"
               },
               "fromFolderId": {
-                "$ref": "#/components/schemas/folderId"
+                "$ref": "#/components/schemas/note_folderId"
               },
               "toFolderId": {
-                "$ref": "#/components/schemas/folderId",
+                "$ref": "#/components/schemas/note_folderId",
                 "example": "123e4567-e89b-12d3-a456-426614174002"
               }
             },
@@ -2039,7 +2195,7 @@
           "data"
         ]
       },
-      "NoteRenamedEvent": {
+      "note_NoteRenamedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -2053,14 +2209,14 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
+                "$ref": "#/components/schemas/note_Note_properties-id"
               },
               "oldName": {
-                "$ref": "#/components/schemas/Note_properties-name",
+                "$ref": "#/components/schemas/note_Note_properties-name",
                 "example": "Meeting Notes"
               },
               "newName": {
-                "$ref": "#/components/schemas/Note_properties-name",
+                "$ref": "#/components/schemas/note_Note_properties-name",
                 "example": "Work"
               }
             },
@@ -2075,13 +2231,13 @@
           "data"
         ]
       },
-      "Workspace_properties-name": {
+      "note_Workspace_properties-name": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
         "example": "My Workspace"
       },
-      "WorkspaceRenamedEvent": {
+      "note_WorkspaceRenamedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -2095,13 +2251,13 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/id"
+                "$ref": "#/components/schemas/note_id"
               },
               "oldName": {
-                "$ref": "#/components/schemas/Workspace_properties-name"
+                "$ref": "#/components/schemas/note_Workspace_properties-name"
               },
               "newName": {
-                "$ref": "#/components/schemas/Workspace_properties-name",
+                "$ref": "#/components/schemas/note_Workspace_properties-name",
                 "example": "New Workspace Name"
               }
             },
@@ -2117,12 +2273,12 @@
           "data"
         ]
       },
-      "User_properties-id": {
+      "note_User_properties-id": {
         "type": "string",
         "description": "User ID from Authentik",
         "example": "04415622b0a267807d139a8266072f8098bdb605a7bfbadf2b0016c02572e514"
       },
-      "WorkspaceRole": {
+      "note_WorkspaceRole": {
         "type": "string",
         "enum": [
           "owner",
@@ -2131,14 +2287,14 @@
         ],
         "example": "owner"
       },
-      "WorkspaceMember": {
+      "note_WorkspaceMember": {
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/User_properties-id"
+            "$ref": "#/components/schemas/note_User_properties-id"
           },
           "role": {
-            "$ref": "#/components/schemas/WorkspaceRole"
+            "$ref": "#/components/schemas/note_WorkspaceRole"
           }
         },
         "required": [
@@ -2146,7 +2302,7 @@
           "role"
         ]
       },
-      "TrashedDeletedBy": {
+      "note_TrashedDeletedBy": {
         "type": "string",
         "enum": [
           "purpose",
@@ -2156,7 +2312,7 @@
         "example": "purpose",
         "readOnly": true
       },
-      "TrashedNote": {
+      "note_TrashedNote": {
         "type": "object",
         "properties": {
           "id": {
@@ -2172,7 +2328,7 @@
             "readOnly": true
           },
           "deletedBy": {
-            "$ref": "#/components/schemas/TrashedDeletedBy"
+            "$ref": "#/components/schemas/note_TrashedDeletedBy"
           },
           "deletedAt": {
             "type": "string",
@@ -2189,7 +2345,7 @@
           "deletedAt"
         ]
       },
-      "TrashedFolder": {
+      "note_TrashedFolder": {
         "type": "object",
         "properties": {
           "id": {
@@ -2205,7 +2361,7 @@
             "readOnly": true
           },
           "deletedBy": {
-            "$ref": "#/components/schemas/TrashedDeletedBy"
+            "$ref": "#/components/schemas/note_TrashedDeletedBy"
           },
           "deletedAt": {
             "type": "string",
@@ -2222,22 +2378,22 @@
           "deletedAt"
         ]
       },
-      "properties-icon": {
+      "note_properties-icon": {
         "type": "string",
         "nullable": true,
         "example": "📁"
       },
-      "WorkspaceTreeNote": {
+      "note_WorkspaceTreeNote": {
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/Note_properties-id"
+            "$ref": "#/components/schemas/note_Note_properties-id"
           },
           "name": {
-            "$ref": "#/components/schemas/Note_properties-name"
+            "$ref": "#/components/schemas/note_Note_properties-name"
           },
           "icon": {
-            "$ref": "#/components/schemas/icon"
+            "$ref": "#/components/schemas/note_icon"
           }
         },
         "required": [
@@ -2246,28 +2402,28 @@
           "icon"
         ]
       },
-      "WorkspaceTreeFolder": {
+      "note_WorkspaceTreeFolder": {
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/note_properties-id"
           },
           "name": {
-            "$ref": "#/components/schemas/name"
+            "$ref": "#/components/schemas/note_name"
           },
           "icon": {
-            "$ref": "#/components/schemas/properties-icon"
+            "$ref": "#/components/schemas/note_properties-icon"
           },
           "notes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/WorkspaceTreeNote"
+              "$ref": "#/components/schemas/note_WorkspaceTreeNote"
             }
           },
           "children": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/WorkspaceTreeFolder"
+              "$ref": "#/components/schemas/note_WorkspaceTreeFolder"
             }
           }
         },
@@ -2281,7 +2437,25 @@
       }
     },
     "securitySchemes": {
-      "Oauth2": {
+      "document_Oauth2": {
+        "type": "oauth2",
+        "description": "OAuth2 Security Scheme",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "http://authentik.notopia.localhost/application/o/authorize",
+            "tokenUrl": "http://authentik.notopia.localhost/application/o/token",
+            "scopes": {
+              "openid": "Required for OIDC",
+              "profile": "Access to user profile"
+            },
+            "x-defaultClientId": "api-web",
+            "x-scalar-client-id": "api-web",
+            "x-usePkce": "SHA-256",
+            "x-scalar-credentials-location": "header"
+          }
+        }
+      },
+      "note_Oauth2": {
         "type": "oauth2",
         "description": "OAuth2 Security Scheme",
         "flows": {
@@ -2301,7 +2475,7 @@
       }
     },
     "requestBodies": {
-      "ImportDocumentsRequest": {
+      "document_ImportDocumentsRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2314,17 +2488,17 @@
           }
         }
       },
-      "CreateFolderRequest": {
+      "note_CreateFolderRequest": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Folder"
+              "$ref": "#/components/schemas/note_Folder"
             }
           }
         }
       },
-      "RenameFolderRequest": {
+      "note_RenameFolderRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2332,7 +2506,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/name"
+                  "$ref": "#/components/schemas/note_name"
                 }
               },
               "required": [
@@ -2342,17 +2516,17 @@
           }
         }
       },
-      "CreateNoteRequest": {
+      "note_CreateNoteRequest": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Note"
+              "$ref": "#/components/schemas/note_Note"
             }
           }
         }
       },
-      "GenerateDailyNoteRequest": {
+      "note_GenerateDailyNoteRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2360,7 +2534,7 @@
               "type": "object",
               "properties": {
                 "workspaceId": {
-                  "$ref": "#/components/schemas/id"
+                  "$ref": "#/components/schemas/note_id"
                 }
               },
               "required": [
@@ -2370,7 +2544,7 @@
           }
         }
       },
-      "SearchTagsRequest": {
+      "note_SearchTagsRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2378,7 +2552,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/properties-name"
+                  "$ref": "#/components/schemas/note_properties-name"
                 },
                 "limit": {
                   "type": "integer",
@@ -2393,7 +2567,7 @@
           }
         }
       },
-      "RenameNoteRequest": {
+      "note_RenameNoteRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2401,7 +2575,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/Note_properties-name"
+                  "$ref": "#/components/schemas/note_Note_properties-name"
                 }
               },
               "required": [
@@ -2411,7 +2585,7 @@
           }
         }
       },
-      "RenameRevisionRequest": {
+      "note_RenameRevisionRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2419,7 +2593,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/Revision_properties-name"
+                  "$ref": "#/components/schemas/note_Revision_properties-name"
                 }
               },
               "required": [
@@ -2429,30 +2603,30 @@
           }
         }
       },
-      "CreateWorkspaceRequest": {
+      "note_CreateWorkspaceRequest": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Workspace"
+              "$ref": "#/components/schemas/note_Workspace"
             }
           }
         }
       },
-      "UpdateWorkspaceMembers": {
+      "note_UpdateWorkspaceMembers": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/components/schemas/WorkspaceMember"
+                "$ref": "#/components/schemas/note_WorkspaceMember"
               }
             }
           }
         }
       },
-      "MoveWorkspaceItemsRequest": {
+      "note_MoveWorkspaceItemsRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2462,13 +2636,13 @@
                 "noteIds": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Note_properties-id"
+                    "$ref": "#/components/schemas/note_Note_properties-id"
                   }
                 },
                 "folderIds": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/properties-id"
+                    "$ref": "#/components/schemas/note_properties-id"
                   }
                 }
               }
@@ -2476,7 +2650,7 @@
           }
         }
       },
-      "RenameWorkspaceRequest": {
+      "note_RenameWorkspaceRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2484,7 +2658,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "$ref": "#/components/schemas/Workspace_properties-name"
+                  "$ref": "#/components/schemas/note_Workspace_properties-name"
                 }
               },
               "required": [
@@ -2494,7 +2668,7 @@
           }
         }
       },
-      "RestoreTrashedWorkspaceItemsRequest": {
+      "note_RestoreTrashedWorkspaceItemsRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2504,13 +2678,13 @@
                 "notes": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TrashedNote"
+                    "$ref": "#/components/schemas/note_TrashedNote"
                   }
                 },
                 "folders": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TrashedFolder"
+                    "$ref": "#/components/schemas/note_TrashedFolder"
                   }
                 }
               }
@@ -2518,7 +2692,7 @@
           }
         }
       },
-      "TrashWorkspaceItemsRequest": {
+      "note_TrashWorkspaceItemsRequest": {
         "required": true,
         "content": {
           "application/json": {
@@ -2528,13 +2702,13 @@
                 "notes": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TrashedNote"
+                    "$ref": "#/components/schemas/note_TrashedNote"
                   }
                 },
                 "folders": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TrashedFolder"
+                    "$ref": "#/components/schemas/note_TrashedFolder"
                   }
                 }
               }
@@ -2544,15 +2718,15 @@
       }
     },
     "responses": {
-      "ImportDocumentsResponse": {
+      "document_ImportDocumentsResponse": {
         "description": "Successfully imported documents"
       },
-      "BadRequestError": {
+      "document_BadRequestError": {
         "description": "Bad Request Error response",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Error"
+              "$ref": "#/components/schemas/document_Error"
             },
             "example": {
               "code": "BAD_REQUEST",
@@ -2562,12 +2736,12 @@
           }
         }
       },
-      "UnauthorizedError": {
+      "document_UnauthorizedError": {
         "description": "Unauthorized Error response",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Error"
+              "$ref": "#/components/schemas/document_Error"
             },
             "example": {
               "code": "UNAUTHORIZED",
@@ -2577,12 +2751,12 @@
           }
         }
       },
-      "NotFoundError": {
+      "document_NotFoundError": {
         "description": "Not Found Error response",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Error"
+              "$ref": "#/components/schemas/document_Error"
             },
             "example": {
               "code": "NOT_FOUND",
@@ -2592,12 +2766,12 @@
           }
         }
       },
-      "InternalServerError": {
+      "document_InternalServerError": {
         "description": "Internal Server Error response",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Error"
+              "$ref": "#/components/schemas/document_Error"
             },
             "example": {
               "code": "INTERNAL_SERVER_ERROR",
@@ -2607,7 +2781,7 @@
           }
         }
       },
-      "GetDocumentAttachmentUploadUrlResponse": {
+      "document_GetDocumentAttachmentUploadUrlResponse": {
         "description": "Presigned URL",
         "content": {
           "application/json": {
@@ -2627,7 +2801,7 @@
           }
         }
       },
-      "CreateFolderResponse": {
+      "note_CreateFolderResponse": {
         "description": "Folder successfully created",
         "headers": {
           "Content-Location": {
@@ -2640,17 +2814,77 @@
           }
         }
       },
-      "GetNotesResponse": {
-        "description": "Successful response",
+      "note_BadRequestError": {
+        "description": "Bad Request Error response",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Note"
+              "$ref": "#/components/schemas/note_Error"
+            },
+            "example": {
+              "code": "BAD_REQUEST",
+              "message": "The request could not be understood by the server due to malformed syntax",
+              "more_info": "https://api.notopia.com/docs/errors/BAD_REQUEST"
             }
           }
         }
       },
-      "CreateNoteResponse": {
+      "note_UnauthorizedError": {
+        "description": "Unauthorized Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/note_Error"
+            },
+            "example": {
+              "code": "UNAUTHORIZED",
+              "message": "Authentication is required to access this resource",
+              "more_info": "https://api.notopia.com/docs/errors/UNAUTHORIZED"
+            }
+          }
+        }
+      },
+      "note_InternalServerError": {
+        "description": "Internal Server Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/note_Error"
+            },
+            "example": {
+              "code": "INTERNAL_SERVER_ERROR",
+              "message": "An internal server error occurred. Please try again later",
+              "more_info": "https://api.notopia.com/docs/errors/INTERNAL_SERVER_ERROR"
+            }
+          }
+        }
+      },
+      "note_NotFoundError": {
+        "description": "Not Found Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/note_Error"
+            },
+            "example": {
+              "code": "NOT_FOUND",
+              "message": "The requested resource was not found",
+              "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
+            }
+          }
+        }
+      },
+      "note_GetNotesResponse": {
+        "description": "Successful response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/note_Note"
+            }
+          }
+        }
+      },
+      "note_CreateNoteResponse": {
         "description": "Note successfully created",
         "headers": {
           "Content-Location": {
@@ -2663,7 +2897,7 @@
           }
         }
       },
-      "GenerateDailyNoteResponse": {
+      "note_GenerateDailyNoteResponse": {
         "description": "Daily note generated successfully",
         "headers": {
           "Content-Location": {
@@ -2676,35 +2910,35 @@
           }
         }
       },
-      "SearchTagsResponse": {
+      "note_SearchTagsResponse": {
         "description": "List of matching tags in the workspace",
         "content": {
           "application/json": {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/components/schemas/Tag"
+                "$ref": "#/components/schemas/note_Tag"
               }
             }
           }
         }
       },
-      "GetNoteResponse": {
+      "note_GetNoteResponse": {
         "description": "Successful response",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Note"
+              "$ref": "#/components/schemas/note_Note"
             }
           }
         }
       },
-      "ForbiddenError": {
+      "note_ForbiddenError": {
         "description": "Forbidden Error response",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Error"
+              "$ref": "#/components/schemas/note_Error"
             },
             "example": {
               "code": "FORBIDDEN",
@@ -2714,17 +2948,17 @@
           }
         }
       },
-      "GetNoteGraphResponse": {
+      "note_GetNoteGraphResponse": {
         "description": "Note graph",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Graph"
+              "$ref": "#/components/schemas/note_Graph"
             }
           }
         }
       },
-      "GetNoteLinksResponse": {
+      "note_GetNoteLinksResponse": {
         "description": "Note links",
         "content": {
           "application/json": {
@@ -2734,13 +2968,13 @@
                 "outgoingLinks": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/NoteLink"
+                    "$ref": "#/components/schemas/note_NoteLink"
                   }
                 },
                 "backlinks": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/NoteLink"
+                    "$ref": "#/components/schemas/note_NoteLink"
                   }
                 }
               }
@@ -2748,7 +2982,7 @@
           }
         }
       },
-      "GetRevisionsResponse": {
+      "note_GetRevisionsResponse": {
         "description": "Revisions",
         "content": {
           "application/json": {
@@ -2758,11 +2992,11 @@
                 "data": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Revision"
+                    "$ref": "#/components/schemas/note_Revision"
                   }
                 },
                 "pagination": {
-                  "$ref": "#/components/schemas/Pagination"
+                  "$ref": "#/components/schemas/note_Pagination"
                 }
               },
               "required": [
@@ -2773,7 +3007,7 @@
           }
         }
       },
-      "ApplyRevisionResponse": {
+      "note_ApplyRevisionResponse": {
         "description": "Apply revision, mean create new with existing revision",
         "headers": {
           "Content-Location": {
@@ -2786,17 +3020,17 @@
           }
         }
       },
-      "GetRevisionResponse": {
+      "note_GetRevisionResponse": {
         "description": "Revision detail",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Revision"
+              "$ref": "#/components/schemas/note_Revision"
             }
           }
         }
       },
-      "CreateWorkspaceResponse": {
+      "note_CreateWorkspaceResponse": {
         "description": "Workspace successfully created",
         "headers": {
           "Content-Location": {
@@ -2809,96 +3043,96 @@
           }
         }
       },
-      "GetWorkspaceResponse": {
+      "note_GetWorkspaceResponse": {
         "description": "OK",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Workspace"
+              "$ref": "#/components/schemas/note_Workspace"
             }
           }
         }
       },
-      "GetWorkspaceEventsResponse": {
+      "note_GetWorkspaceEventsResponse": {
         "description": "A persistent stream of events",
         "content": {
           "text/event-stream": {
             "schema": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/FolderCreatedEvent"
+                  "$ref": "#/components/schemas/note_FolderCreatedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/FolderDeletedEvent"
+                  "$ref": "#/components/schemas/note_FolderDeletedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/FolderMovedEvent"
+                  "$ref": "#/components/schemas/note_FolderMovedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/FolderRenamedEvent"
+                  "$ref": "#/components/schemas/note_FolderRenamedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/NoteContentUpdatedEvent"
+                  "$ref": "#/components/schemas/note_NoteContentUpdatedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/NoteCreatedEvent"
+                  "$ref": "#/components/schemas/note_NoteCreatedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/NoteDeletedEvent"
+                  "$ref": "#/components/schemas/note_NoteDeletedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/NoteMovedEvent"
+                  "$ref": "#/components/schemas/note_NoteMovedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/NoteRenamedEvent"
+                  "$ref": "#/components/schemas/note_NoteRenamedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/WorkspaceRenamedEvent"
+                  "$ref": "#/components/schemas/note_WorkspaceRenamedEvent"
                 }
               ],
               "discriminator": {
                 "propertyName": "type",
                 "mapping": {
-                  "FolderCreatedEvent": "#/components/schemas/FolderCreatedEvent",
-                  "FolderDeletedEvent": "#/components/schemas/FolderDeletedEvent",
-                  "FolderMovedEvent": "#/components/schemas/FolderMovedEvent",
-                  "FolderRenamedEvent": "#/components/schemas/FolderRenamedEvent",
-                  "NoteContentUpdatedEvent": "#/components/schemas/NoteContentUpdatedEvent",
-                  "NoteCreatedEvent": "#/components/schemas/NoteCreatedEvent",
-                  "NoteDeletedEvent": "#/components/schemas/NoteDeletedEvent",
-                  "NoteMovedEvent": "#/components/schemas/NoteMovedEvent",
-                  "NoteRenamedEvent": "#/components/schemas/NoteRenamedEvent",
-                  "WorkspaceRenamedEvent": "#/components/schemas/WorkspaceRenamedEvent"
+                  "FolderCreatedEvent": "#/components/schemas/note_FolderCreatedEvent",
+                  "FolderDeletedEvent": "#/components/schemas/note_FolderDeletedEvent",
+                  "FolderMovedEvent": "#/components/schemas/note_FolderMovedEvent",
+                  "FolderRenamedEvent": "#/components/schemas/note_FolderRenamedEvent",
+                  "NoteContentUpdatedEvent": "#/components/schemas/note_NoteContentUpdatedEvent",
+                  "NoteCreatedEvent": "#/components/schemas/note_NoteCreatedEvent",
+                  "NoteDeletedEvent": "#/components/schemas/note_NoteDeletedEvent",
+                  "NoteMovedEvent": "#/components/schemas/note_NoteMovedEvent",
+                  "NoteRenamedEvent": "#/components/schemas/note_NoteRenamedEvent",
+                  "WorkspaceRenamedEvent": "#/components/schemas/note_WorkspaceRenamedEvent"
                 }
               }
             }
           }
         }
       },
-      "GetWorkspaceGraphResponse": {
+      "note_GetWorkspaceGraphResponse": {
         "description": "Workspace graph",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Graph"
+              "$ref": "#/components/schemas/note_Graph"
             }
           }
         }
       },
-      "GetWorkspaceMembersResponse": {
+      "note_GetWorkspaceMembersResponse": {
         "description": "A list of workspace members",
         "content": {
           "application/json": {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/components/schemas/WorkspaceMember"
+                "$ref": "#/components/schemas/note_WorkspaceMember"
               }
             }
           }
         }
       },
-      "ShowTrashResponse": {
+      "note_ShowTrashResponse": {
         "description": "Trash",
         "content": {
           "application/json": {
@@ -2911,19 +3145,19 @@
                     "notes": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/TrashedNote"
+                        "$ref": "#/components/schemas/note_TrashedNote"
                       }
                     },
                     "folders": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/TrashedFolder"
+                        "$ref": "#/components/schemas/note_TrashedFolder"
                       }
                     }
                   }
                 },
                 "pagination": {
-                  "$ref": "#/components/schemas/Pagination"
+                  "$ref": "#/components/schemas/note_Pagination"
                 }
               },
               "required": [
@@ -2934,19 +3168,19 @@
           }
         }
       },
-      "GetWorkspaceTreeResponse": {
+      "note_GetWorkspaceTreeResponse": {
         "description": "OK",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/WorkspaceTreeFolder"
+              "$ref": "#/components/schemas/note_WorkspaceTreeFolder"
             }
           }
         }
       }
     },
     "parameters": {
-      "documentIdPath": {
+      "document_documentIdPath": {
         "name": "documentId",
         "in": "path",
         "required": true,
@@ -2957,15 +3191,15 @@
         },
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
       },
-      "folderIdPath": {
+      "note_folderIdPath": {
         "name": "folderId",
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/properties-id"
+          "$ref": "#/components/schemas/note_properties-id"
         }
       },
-      "pageQuery": {
+      "note_pageQuery": {
         "name": "page",
         "in": "query",
         "description": "Page number for pagination",
@@ -2976,7 +3210,7 @@
         },
         "example": 1
       },
-      "limitQuery": {
+      "note_limitQuery": {
         "name": "limit",
         "in": "query",
         "description": "Number of items per page",
@@ -2988,36 +3222,36 @@
         },
         "example": 20
       },
-      "noteIdPath": {
+      "note_noteIdPath": {
         "name": "noteId",
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/Note_properties-id"
+          "$ref": "#/components/schemas/note_Note_properties-id"
         }
       },
-      "noteIdQuery": {
+      "note_noteIdQuery": {
         "name": "noteId",
         "in": "query",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/Note_properties-id"
+          "$ref": "#/components/schemas/note_Note_properties-id"
         }
       },
-      "revisionIdPath": {
+      "note_revisionIdPath": {
         "name": "revisionId",
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/Revision_properties-id"
+          "$ref": "#/components/schemas/note_Revision_properties-id"
         }
       },
-      "workspaceIdPath": {
+      "note_workspaceIdPath": {
         "name": "workspaceId",
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/id"
+          "$ref": "#/components/schemas/note_id"
         }
       }
     }
