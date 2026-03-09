@@ -84,7 +84,9 @@ services: Services {
       class: notUsed
     }
     note_service -> database
-    note_service -> pub_sub
+    note_service -> pub_sub: {
+      class: notUsed
+    }
   }
 
   authorization: Authorization Service Group {
@@ -109,7 +111,9 @@ services: Services {
       class: notUsed
     }
     search_sync_worker -> search_service
-    search_sync_worker -> search_sync_worker_database
+    search_sync_worker -> search_sync_worker_database: {
+      class: notUsed
+    }
   }
 
   event_bus: Event Bus {
