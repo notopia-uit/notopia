@@ -238,7 +238,7 @@ skinparam class {
 }
 
 !define RepoInterface(name) interface "name" as Document.name <<(I, $pink) Repo Interface>>
-!define ServiceImpl(name) interface "name" as Document.name <<(I, $rosewater) Service Implementation>>
+!define Service(name) class "name" as Document.name <<(C, $rosewater) Service>>
 !define Entity(name) class "name" as Document.name <<(C, $sky) Entity>>
 !define Type(name) class "name" as Document.name <<(T, $flamingo) Type>>
 !define Model(name) class "name" as Document.name <<(C, $yellow) Model>>
@@ -275,10 +275,10 @@ package "Document" as Document <<Frame>> {
         GetByID(documentId: String): DocumentEntity
     }
 
-    ServiceImpl(DocumentService) {
-        documentRepository: DocumentRepository
-        blockNoteEditor: BlockNoteEditor
-        attachmentService: AttachmentService
+    Service(DocumentService) {
+        -documentRepository: DocumentRepository
+        -blockNoteEditor: BlockNoteEditor
+        -attachmentService: AttachmentService
 
         getTags(): TagModel[]
         getLinks(): LinkModel[]
