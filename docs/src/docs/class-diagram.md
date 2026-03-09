@@ -156,14 +156,14 @@ package "Domain" as Domain <<Frame>> {
     RepoInterface(FolderRepo) {
         GetByID(folderID uuid.UUID) *Folder
         Save(folder *Folder)
-        GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []*Folder
+        GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []Folder
         PermanentlyDelete(folderIDs ...uuid.UUID)
     }
 
     RepoInterface(NoteRepo) {
         GetByID(noteID uuid.UUID) *Note
         Save(note *Note)
-        GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []*Note
+        GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []Note
         PermanentlyDelete(noteIDs ...uuid.UUID)
     }
 
