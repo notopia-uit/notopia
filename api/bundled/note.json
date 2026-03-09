@@ -1276,6 +1276,12 @@
       "id": {
         "type": "string",
         "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000",
+        "readOnly": true
+      },
+      "properties-id": {
+        "type": "string",
+        "format": "uuid",
         "example": "550e8400-e29b-41d4-a716-446655440000",
         "readOnly": true
       },
@@ -1300,12 +1306,11 @@
             "example": "📁"
           },
           "parentId": {
-            "type": "string",
-            "format": "uuid",
+            "$ref": "#/components/schemas/id",
             "example": "cc7a2e47-6267-4c60-8d36-257f849777e4"
           },
           "workspaceId": {
-            "$ref": "#/components/schemas/id",
+            "$ref": "#/components/schemas/properties-id",
             "readOnly": false
           }
         },
@@ -1313,7 +1318,8 @@
           "id",
           "name",
           "icon",
-          "parentId"
+          "parentId",
+          "workspaceId"
         ]
       },
       "Error": {
@@ -1340,12 +1346,6 @@
           "message"
         ]
       },
-      "properties-id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000",
-        "readOnly": true
-      },
       "name": {
         "type": "string",
         "minLength": 1,
@@ -1355,7 +1355,7 @@
       "NoteContent": {
         "type": "string",
         "nullable": true,
-        "example": "[{\"type\":\"paragraph\",\"content\":\"Welcome to this demo!\"},{\"type\":\"paragraph\"},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Blocks:\",\"styles\":{\"bold\":true}}]},{\"type\":\"paragraph\",\"content\":\"Paragraph\"},{\"type\":\"heading\",\"content\":\"Heading\"},{\"id\":\"toggle-heading\",\"type\":\"heading\",\"props\":{\"isToggleable\":true},\"content\":\"Toggle Heading\"},{\"type\":\"quote\",\"content\":\"Quote\"},{\"type\":\"bulletListItem\",\"content\":\"Bullet List Item\"},{\"type\":\"numberedListItem\",\"content\":\"Numbered List Item\"},{\"type\":\"checkListItem\",\"content\":\"Check List Item\"},{\"id\":\"toggle-list-item\",\"type\":\"toggleListItem\",\"content\":\"Toggle List Item\"},{\"type\":\"codeBlock\",\"props\":{\"language\":\"javascript\"},\"content\":\"console.log('Hello, world!');\"},{\"type\":\"table\",\"content\":{\"type\":\"tableContent\",\"rows\":[{\"cells\":[\"Table Cell\",\"Table Cell\",\"Table Cell\"]},{\"cells\":[\"Table Cell\",\"Table Cell\",\"Table Cell\"]},{\"cells\":[\"Table Cell\",\"Table Cell\",\"Table Cell\"]}]}},{\"type\":\"file\"},{\"type\":\"image\",\"props\":{\"url\":\"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\",\"caption\":\"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\"}},{\"type\":\"video\",\"props\":{\"url\":\"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\",\"caption\":\"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\"}},{\"type\":\"audio\",\"props\":{\"url\":\"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\",\"caption\":\"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\"}},{\"type\":\"paragraph\"},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Inline Content:\",\"styles\":{\"bold\":true}}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Styled Text\",\"styles\":{\"bold\":true,\"italic\":true,\"textColor\":\"red\",\"backgroundColor\":\"blue\"}},{\"type\":\"text\",\"text\":\" \",\"styles\":{}},{\"type\":\"link\",\"content\":\"Link\",\"href\":\"https://www.blocknotejs.org\"}]},{\"type\":\"paragraph\"}]"
+        "example": "[\n  {\n    \"type\": \"paragraph\",\n    \"content\": \"Welcome to this demo!\"\n  },\n  {\n    \"type\": \"paragraph\"\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Blocks:\",\n        \"styles\": {\n          \"bold\": true\n        }\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": \"Paragraph\"\n  },\n  {\n    \"type\": \"heading\",\n    \"content\": \"Heading\"\n  },\n  {\n    \"id\": \"toggle-heading\",\n    \"type\": \"heading\",\n    \"props\": {\n      \"isToggleable\": true\n    },\n    \"content\": \"Toggle Heading\"\n  },\n  {\n    \"type\": \"quote\",\n    \"content\": \"Quote\"\n  },\n  {\n    \"type\": \"bulletListItem\",\n    \"content\": \"Bullet List Item\"\n  },\n  {\n    \"type\": \"numberedListItem\",\n    \"content\": \"Numbered List Item\"\n  },\n  {\n    \"type\": \"checkListItem\",\n    \"content\": \"Check List Item\"\n  },\n  {\n    \"id\": \"toggle-list-item\",\n    \"type\": \"toggleListItem\",\n    \"content\": \"Toggle List Item\"\n  },\n  {\n    \"type\": \"codeBlock\",\n    \"props\": {\n      \"language\": \"javascript\"\n    },\n    \"content\": \"console.log('Hello, world!');\"\n  },\n  {\n    \"type\": \"table\",\n    \"content\": {\n      \"type\": \"tableContent\",\n      \"rows\": [\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        },\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        },\n        {\n          \"cells\": [\n            \"Table Cell\",\n            \"Table Cell\",\n            \"Table Cell\"\n          ]\n        }\n      ]\n    }\n  },\n  {\n    \"type\": \"file\"\n  },\n  {\n    \"type\": \"image\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg\"\n    }\n  },\n  {\n    \"type\": \"video\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm\"\n    }\n  },\n  {\n    \"type\": \"audio\",\n    \"props\": {\n      \"url\": \"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\",\n      \"caption\": \"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\"\n    }\n  },\n  {\n    \"type\": \"paragraph\"\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Inline Content:\",\n        \"styles\": {\n          \"bold\": true\n        }\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\",\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"Styled Text\",\n        \"styles\": {\n          \"bold\": true,\n          \"italic\": true,\n          \"textColor\": \"red\",\n          \"backgroundColor\": \"blue\"\n        }\n      },\n      {\n        \"type\": \"text\",\n        \"text\": \" \",\n        \"styles\": {}\n      },\n      {\n        \"type\": \"link\",\n        \"content\": \"Link\",\n        \"href\": \"https://www.blocknotejs.org\"\n      }\n    ]\n  },\n  {\n    \"type\": \"paragraph\"\n  }\n]\n"
       },
       "Note": {
         "type": "object",
@@ -1378,9 +1378,7 @@
             "example": "📓"
           },
           "folderId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
+            "$ref": "#/components/schemas/id"
           },
           "tags": {
             "type": "array",
@@ -1482,10 +1480,18 @@
                   "description": "The ID of the target node (note id or hashtag prefixed tag name)",
                   "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
                 }
-              }
+              },
+              "required": [
+                "source",
+                "target"
+              ]
             }
           }
-        }
+        },
+        "required": [
+          "nodes",
+          "links"
+        ]
       },
       "properties-name": {
         "type": "string",
@@ -1646,7 +1652,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/id"
               },
               "name": {
                 "$ref": "#/components/schemas/name"
@@ -1677,7 +1683,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/id"
               }
             },
             "required": [
@@ -1689,11 +1695,6 @@
           "type",
           "data"
         ]
-      },
-      "parentId": {
-        "type": "string",
-        "format": "uuid",
-        "example": "cc7a2e47-6267-4c60-8d36-257f849777e4"
       },
       "FolderMovedEvent": {
         "type": "object",
@@ -1709,13 +1710,13 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/id"
               },
               "fromFolderId": {
-                "$ref": "#/components/schemas/parentId"
+                "$ref": "#/components/schemas/id"
               },
               "toFolderId": {
-                "$ref": "#/components/schemas/parentId",
+                "$ref": "#/components/schemas/id",
                 "example": "123e4567-e89b-12d3-a456-426614174002"
               }
             },
@@ -1745,7 +1746,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/properties-id"
+                "$ref": "#/components/schemas/id"
               },
               "oldName": {
                 "$ref": "#/components/schemas/name",
@@ -1852,11 +1853,6 @@
           "data"
         ]
       },
-      "folderId": {
-        "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000"
-      },
       "NoteMovedEvent": {
         "type": "object",
         "properties": {
@@ -1874,10 +1870,10 @@
                 "$ref": "#/components/schemas/Note_properties-id"
               },
               "fromFolderId": {
-                "$ref": "#/components/schemas/folderId"
+                "$ref": "#/components/schemas/id"
               },
               "toFolderId": {
-                "$ref": "#/components/schemas/folderId",
+                "$ref": "#/components/schemas/id",
                 "example": "123e4567-e89b-12d3-a456-426614174002"
               }
             },
@@ -1949,7 +1945,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/id"
+                "$ref": "#/components/schemas/properties-id"
               },
               "oldName": {
                 "$ref": "#/components/schemas/Workspace_properties-name"
@@ -2104,7 +2100,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/id"
           },
           "name": {
             "$ref": "#/components/schemas/name"
@@ -2181,7 +2177,7 @@
               "type": "object",
               "properties": {
                 "workspaceId": {
-                  "$ref": "#/components/schemas/id"
+                  "$ref": "#/components/schemas/properties-id"
                 }
               },
               "required": [
@@ -2266,7 +2262,7 @@
                 "folderIds": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/properties-id"
+                    "$ref": "#/components/schemas/id"
                   }
                 }
               }
@@ -2713,7 +2709,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/properties-id"
+          "$ref": "#/components/schemas/id"
         }
       },
       "pageQuery": {
@@ -2768,7 +2764,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/id"
+          "$ref": "#/components/schemas/properties-id"
         }
       }
     }

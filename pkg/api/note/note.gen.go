@@ -245,15 +245,15 @@ type Folder struct {
 	Icon        *string             `json:"icon"`
 	Id          *openapi_types.UUID `json:"id,omitempty"`
 	Name        string              `json:"name"`
-	ParentId    openapi_types.UUID  `json:"parentId"`
-	WorkspaceId *Id                 `json:"workspaceId,omitempty"`
+	ParentId    *Id                 `json:"parentId,omitempty"`
+	WorkspaceId *PropertiesId       `json:"workspaceId,omitempty"`
 }
 
 // FolderCreatedEvent defines model for FolderCreatedEvent.
 type FolderCreatedEvent struct {
 	Data struct {
-		Id   *PropertiesId `json:"id,omitempty"`
-		Name Name          `json:"name"`
+		Id   *Id  `json:"id,omitempty"`
+		Name Name `json:"name"`
 	} `json:"data"`
 	Type FolderCreatedEventType `json:"type"`
 }
@@ -264,7 +264,7 @@ type FolderCreatedEventType string
 // FolderDeletedEvent defines model for FolderDeletedEvent.
 type FolderDeletedEvent struct {
 	Data struct {
-		Id *PropertiesId `json:"id,omitempty"`
+		Id *Id `json:"id,omitempty"`
 	} `json:"data"`
 	Type FolderDeletedEventType `json:"type"`
 }
@@ -275,9 +275,9 @@ type FolderDeletedEventType string
 // FolderMovedEvent defines model for FolderMovedEvent.
 type FolderMovedEvent struct {
 	Data struct {
-		FromFolderId ParentId      `json:"fromFolderId"`
-		Id           *PropertiesId `json:"id,omitempty"`
-		ToFolderId   ParentId      `json:"toFolderId"`
+		FromFolderId *Id `json:"fromFolderId,omitempty"`
+		Id           *Id `json:"id,omitempty"`
+		ToFolderId   *Id `json:"toFolderId,omitempty"`
 	} `json:"data"`
 	Type FolderMovedEventType `json:"type"`
 }
@@ -288,9 +288,9 @@ type FolderMovedEventType string
 // FolderRenamedEvent defines model for FolderRenamedEvent.
 type FolderRenamedEvent struct {
 	Data struct {
-		Id      *PropertiesId `json:"id,omitempty"`
-		NewName Name          `json:"newName"`
-		OldName *Name         `json:"oldName,omitempty"`
+		Id      *Id   `json:"id,omitempty"`
+		NewName Name  `json:"newName"`
+		OldName *Name `json:"oldName,omitempty"`
 	} `json:"data"`
 	Type FolderRenamedEventType `json:"type"`
 }
@@ -300,14 +300,14 @@ type FolderRenamedEventType string
 
 // Graph defines model for Graph.
 type Graph struct {
-	Links *[]struct {
+	Links []struct {
 		// Source The ID of the source node (note id or hashtag prefixed tag name)
-		Source *string `json:"source,omitempty"`
+		Source string `json:"source"`
 
 		// Target The ID of the target node (note id or hashtag prefixed tag name)
-		Target *string `json:"target,omitempty"`
-	} `json:"links,omitempty"`
-	Nodes *[]struct {
+		Target string `json:"target"`
+	} `json:"links"`
+	Nodes []struct {
 		// Id Can be either a note ID or a hashtag prefixed tag name
 		Id openapi_types.UUID `json:"id"`
 
@@ -317,7 +317,7 @@ type Graph struct {
 
 		// Weight Optional weight for the note node, rounded to 1 decimal place
 		Weight *float32 `json:"weight,omitempty"`
-	} `json:"nodes,omitempty"`
+	} `json:"nodes"`
 }
 
 // GraphNodesType defines model for Graph.Nodes.Type.
@@ -327,7 +327,7 @@ type GraphNodesType string
 type Note struct {
 	BacklinksCount     *int                `json:"backlinksCount,omitempty"`
 	Content            *NoteContent        `json:"content,omitempty"`
-	FolderId           openapi_types.UUID  `json:"folderId"`
+	FolderId           *Id                 `json:"folderId,omitempty"`
 	Icon               *string             `json:"icon"`
 	Id                 *openapi_types.UUID `json:"id,omitempty"`
 	Name               string              `json:"name"`
@@ -382,9 +382,9 @@ type NoteLink struct {
 // NoteMovedEvent defines model for NoteMovedEvent.
 type NoteMovedEvent struct {
 	Data struct {
-		FromFolderId FolderId          `json:"fromFolderId"`
+		FromFolderId *Id               `json:"fromFolderId,omitempty"`
 		Id           *NotePropertiesId `json:"id,omitempty"`
-		ToFolderId   FolderId          `json:"toFolderId"`
+		ToFolderId   *Id               `json:"toFolderId,omitempty"`
 	} `json:"data"`
 	Type NoteMovedEventType `json:"type"`
 }
@@ -481,7 +481,7 @@ type WorkspaceMember struct {
 // WorkspaceRenamedEvent defines model for WorkspaceRenamedEvent.
 type WorkspaceRenamedEvent struct {
 	Data struct {
-		Id      *Id                     `json:"id,omitempty"`
+		Id      *PropertiesId           `json:"id,omitempty"`
 		NewName WorkspacePropertiesName `json:"newName"`
 		OldName WorkspacePropertiesName `json:"oldName"`
 	} `json:"data"`
@@ -498,7 +498,7 @@ type WorkspaceRole string
 type WorkspaceTreeFolder struct {
 	Children []WorkspaceTreeFolder `json:"children"`
 	Icon     *PropertiesIcon       `json:"icon"`
-	Id       *PropertiesId         `json:"id,omitempty"`
+	Id       *Id                   `json:"id,omitempty"`
 	Name     Name                  `json:"name"`
 	Notes    []WorkspaceTreeNote   `json:"notes"`
 }
@@ -513,9 +513,6 @@ type WorkspaceTreeNote struct {
 // WorkspacePropertiesName defines model for Workspace_properties-name.
 type WorkspacePropertiesName = string
 
-// FolderId defines model for folderId.
-type FolderId = openapi_types.UUID
-
 // Icon defines model for icon.
 type Icon = string
 
@@ -524,9 +521,6 @@ type Id = openapi_types.UUID
 
 // Name defines model for name.
 type Name = string
-
-// ParentId defines model for parentId.
-type ParentId = openapi_types.UUID
 
 // PropertiesIcon defines model for properties-icon.
 type PropertiesIcon = string
@@ -538,7 +532,7 @@ type PropertiesId = openapi_types.UUID
 type PropertiesName = string
 
 // FolderIdPath defines model for folderIdPath.
-type FolderIdPath = PropertiesId
+type FolderIdPath = Id
 
 // LimitQuery defines model for limitQuery.
 type LimitQuery = int
@@ -556,7 +550,7 @@ type PageQuery = int
 type RevisionIdPath = RevisionPropertiesId
 
 // WorkspaceIdPath defines model for workspaceIdPath.
-type WorkspaceIdPath = Id
+type WorkspaceIdPath = PropertiesId
 
 // BadRequestError defines model for BadRequestError.
 type BadRequestError = Error
@@ -629,12 +623,12 @@ type CreateWorkspaceRequest = Workspace
 
 // GenerateDailyNoteRequest defines model for GenerateDailyNoteRequest.
 type GenerateDailyNoteRequest struct {
-	WorkspaceId *Id `json:"workspaceId,omitempty"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
 
 // MoveWorkspaceItemsRequest defines model for MoveWorkspaceItemsRequest.
 type MoveWorkspaceItemsRequest struct {
-	FolderIds *[]PropertiesId     `json:"folderIds,omitempty"`
+	FolderIds *[]Id               `json:"folderIds,omitempty"`
 	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
 }
 
@@ -689,7 +683,7 @@ type GetNotesParams struct {
 
 // GenerateDailyNoteJSONBody defines parameters for GenerateDailyNote.
 type GenerateDailyNoteJSONBody struct {
-	WorkspaceId *Id `json:"workspaceId,omitempty"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
 
 // GetNoteGraphParams defines parameters for GetNoteGraph.
@@ -735,7 +729,7 @@ type UpdateWorkspaceMembersJSONBody = []WorkspaceMember
 
 // MoveWorkspaceItemsJSONBody defines parameters for MoveWorkspaceItems.
 type MoveWorkspaceItemsJSONBody struct {
-	FolderIds *[]PropertiesId     `json:"folderIds,omitempty"`
+	FolderIds *[]Id               `json:"folderIds,omitempty"`
 	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
 }
 

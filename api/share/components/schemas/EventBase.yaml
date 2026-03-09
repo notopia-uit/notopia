@@ -1,0 +1,29 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  id:
+    type: string
+    format: uuid
+    example: 3deadc5b-bde7-4b64-9c3b-1bc534378f36
+
+  metadata:
+    type: object
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+        example: 2024-01-01T12:00:00Z
+      correlationId:
+        type: string
+        example: ec601c67-209c-4e28-977b-30ea3e24a963
+    required:
+      - timestamp
+
+  data:
+    type: object
+
+required:
+  - id
+  - metadata
+  - data

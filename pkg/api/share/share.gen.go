@@ -9,12 +9,28 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// EventBase defines model for EventBase.
+type EventBase struct {
+	Data     map[string]interface{} `json:"data"`
+	Id       openapi_types.UUID     `json:"id"`
+	Metadata struct {
+		CorrelationId *string   `json:"correlationId,omitempty"`
+		Timestamp     time.Time `json:"timestamp"`
+	} `json:"metadata"`
+}
+
 // NoteCommittedEvent defines model for NoteCommittedEvent.
 type NoteCommittedEvent struct {
-	FolderId FolderId `json:"folderId"`
-	Id       *Id      `json:"id,omitempty"`
-	Name     Name     `json:"name"`
-	Revision Revision `json:"revision"`
+	Data struct {
+		BlockNoteContent *NoteContent `json:"blockNoteContent"`
+		FolderId         *Id          `json:"folderId,omitempty"`
+		Name             Name         `json:"name"`
+	} `json:"data"`
+	Id       openapi_types.UUID `json:"id"`
+	Metadata struct {
+		CorrelationId *string   `json:"correlationId,omitempty"`
+		Timestamp     time.Time `json:"timestamp"`
+	} `json:"metadata"`
 }
 
 // NoteContent defines model for NoteContent.
@@ -34,22 +50,18 @@ type NoteSearch struct {
 	Tags     *[]string          `json:"tags,omitempty"`
 }
 
-// Revision defines model for Revision.
-type Revision struct {
-	Content   *NoteContent        `json:"content"`
-	CreatedAt *time.Time          `json:"createdAt,omitempty"`
-	Id        *openapi_types.UUID `json:"id,omitempty"`
-	Name      *string             `json:"name"`
-}
-
 // UserDeletedEvent defines model for UserDeletedEvent.
 type UserDeletedEvent struct {
-	// Id User ID from Authentik
-	Id PropertiesId `json:"id"`
+	Data struct {
+		// UserId User ID from Authentik
+		UserId PropertiesId `json:"userId"`
+	} `json:"data"`
+	Id       openapi_types.UUID `json:"id"`
+	Metadata struct {
+		CorrelationId *string   `json:"correlationId,omitempty"`
+		Timestamp     time.Time `json:"timestamp"`
+	} `json:"metadata"`
 }
-
-// FolderId defines model for folderId.
-type FolderId = openapi_types.UUID
 
 // Id defines model for id.
 type Id = openapi_types.UUID
