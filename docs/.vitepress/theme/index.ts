@@ -14,7 +14,11 @@ export default {
     const { isDark } = useData();
     const initMermaid = () => {
       const mermaidRenderer = createMermaidRenderer({
-        theme: isDark.value ? 'dark' : 'forest',
+        theme: isDark.value ? 'dark' : 'null',
+        startOnLoad: false,
+        sequence: {
+          useMaxWidth: true,
+        },
       });
       mermaidRenderer.setToolbar({
         showLanguageLabel: false,
