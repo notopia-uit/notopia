@@ -281,7 +281,9 @@ package "Document" as Document <<Frame>> {
     }
 
     Document.DocumentService ..> Document.DocumentRepository : uses
-    Document.DocumentService ..> Document.DocumentEntity : manages
+    Document.RevisionService ..> Document.RevisionRepository : uses
+    Document.DocumentRepository ..> Document.DocumentEntity : manages
+    Document.RevisionRepository ..> Document.RevisionEntity : manages
 }
 
 @endum
