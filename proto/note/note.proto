@@ -2,4 +2,14 @@ syntax = "proto3";
 
 package note;
 
-service NoteService {}
+service NoteService {
+  rpc CheckNoteExistence(CheckNoteExistenceRequest) returns (CheckNoteExistenceResponse);
+}
+
+message CheckNoteExistenceRequest {
+  string note_id = 1;
+}
+
+message CheckNoteExistenceResponse {
+  bool exists = 1;
+}

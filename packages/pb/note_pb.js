@@ -2,13 +2,27 @@
 // @generated from file note.proto (package note, syntax proto3)
 /* eslint-disable */
 
-import { fileDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 
 /**
  * Describes the file note.proto.
  */
 export const file_note = /*@__PURE__*/
-  fileDesc("Cgpub3RlLnByb3RvEgRub3RlMg0KC05vdGVTZXJ2aWNlQmwKCGNvbS5ub3RlQglOb3RlUHJvdG9QAVolZ2l0aHViLmNvbS9ub3RvcGlhLXVpdC9ub3RvcGlhL3BrZy9wYqICA05YWKoCBE5vdGXKAgROb3Rl4gIQTm90ZVxHUEJNZXRhZGF0YeoCBE5vdGViBnByb3RvMw");
+  fileDesc("Cgpub3RlLnByb3RvEgRub3RlIiwKGUNoZWNrTm90ZUV4aXN0ZW5jZVJlcXVlc3QSDwoHbm90ZV9pZBgBIAEoCSIsChpDaGVja05vdGVFeGlzdGVuY2VSZXNwb25zZRIOCgZleGlzdHMYASABKAgyZgoLTm90ZVNlcnZpY2USVwoSQ2hlY2tOb3RlRXhpc3RlbmNlEh8ubm90ZS5DaGVja05vdGVFeGlzdGVuY2VSZXF1ZXN0GiAubm90ZS5DaGVja05vdGVFeGlzdGVuY2VSZXNwb25zZUJsCghjb20ubm90ZUIJTm90ZVByb3RvUAFaJWdpdGh1Yi5jb20vbm90b3BpYS11aXQvbm90b3BpYS9wa2cvcGKiAgNOWFiqAgROb3RlygIETm90ZeICEE5vdGVcR1BCTWV0YWRhdGHqAgROb3RlYgZwcm90bzM");
+
+/**
+ * Describes the message note.CheckNoteExistenceRequest.
+ * Use `create(CheckNoteExistenceRequestSchema)` to create a new message.
+ */
+export const CheckNoteExistenceRequestSchema = /*@__PURE__*/
+  messageDesc(file_note, 0);
+
+/**
+ * Describes the message note.CheckNoteExistenceResponse.
+ * Use `create(CheckNoteExistenceResponseSchema)` to create a new message.
+ */
+export const CheckNoteExistenceResponseSchema = /*@__PURE__*/
+  messageDesc(file_note, 1);
 
 /**
  * @generated from service note.NoteService

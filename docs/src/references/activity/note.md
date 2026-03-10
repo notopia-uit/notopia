@@ -51,8 +51,8 @@ sequenceDiagram
         alt Document exists
             DS-->>U: Connection
         else Document does not exist
-            DS->>+NS: GetNote
-            NS->>NS: Get Note
+            DS->>+NS: CheckNoteExistence
+            NS->>NS: Check Note existence
             alt Note exists
                 DS->>DS: Init document
                 DS-->>U: Document binary

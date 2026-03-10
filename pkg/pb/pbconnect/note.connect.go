@@ -6,8 +6,11 @@ package pbconnect
 
 import (
 	connect "connectrpc.com/connect"
-	_ "github.com/notopia-uit/notopia/pkg/pb"
+	context "context"
+	errors "errors"
+	pb "github.com/notopia-uit/notopia/pkg/pb"
 	http "net/http"
+	strings "strings"
 )
 
 // This is a compile-time assertion to ensure that this generated file and the connect package are
@@ -22,8 +25,22 @@ const (
 	NoteServiceName = "note.NoteService"
 )
 
+// These constants are the fully-qualified names of the RPCs defined in this package. They're
+// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+//
+// Note that these are different from the fully-qualified method names used by
+// google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
+// reflection-formatted method names, remove the leading slash and convert the remaining slash to a
+// period.
+const (
+	// NoteServiceCheckNoteExistenceProcedure is the fully-qualified name of the NoteService's
+	// CheckNoteExistence RPC.
+	NoteServiceCheckNoteExistenceProcedure = "/note.NoteService/CheckNoteExistence"
+)
+
 // NoteServiceClient is a client for the note.NoteService service.
 type NoteServiceClient interface {
+	CheckNoteExistence(context.Context, *connect.Request[pb.CheckNoteExistenceRequest]) (*connect.Response[pb.CheckNoteExistenceResponse], error)
 }
 
 // NewNoteServiceClient constructs a client for the note.NoteService service. By default, it uses
@@ -34,15 +51,31 @@ type NoteServiceClient interface {
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
 func NewNoteServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) NoteServiceClient {
-	return &noteServiceClient{}
+	baseURL = strings.TrimRight(baseURL, "/")
+	noteServiceMethods := pb.File_note_proto.Services().ByName("NoteService").Methods()
+	return &noteServiceClient{
+		checkNoteExistence: connect.NewClient[pb.CheckNoteExistenceRequest, pb.CheckNoteExistenceResponse](
+			httpClient,
+			baseURL+NoteServiceCheckNoteExistenceProcedure,
+			connect.WithSchema(noteServiceMethods.ByName("CheckNoteExistence")),
+			connect.WithClientOptions(opts...),
+		),
+	}
 }
 
 // noteServiceClient implements NoteServiceClient.
 type noteServiceClient struct {
+	checkNoteExistence *connect.Client[pb.CheckNoteExistenceRequest, pb.CheckNoteExistenceResponse]
+}
+
+// CheckNoteExistence calls note.NoteService.CheckNoteExistence.
+func (c *noteServiceClient) CheckNoteExistence(ctx context.Context, req *connect.Request[pb.CheckNoteExistenceRequest]) (*connect.Response[pb.CheckNoteExistenceResponse], error) {
+	return c.checkNoteExistence.CallUnary(ctx, req)
 }
 
 // NoteServiceHandler is an implementation of the note.NoteService service.
 type NoteServiceHandler interface {
+	CheckNoteExistence(context.Context, *connect.Request[pb.CheckNoteExistenceRequest]) (*connect.Response[pb.CheckNoteExistenceResponse], error)
 }
 
 // NewNoteServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -51,8 +84,17 @@ type NoteServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewNoteServiceHandler(svc NoteServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	noteServiceMethods := pb.File_note_proto.Services().ByName("NoteService").Methods()
+	noteServiceCheckNoteExistenceHandler := connect.NewUnaryHandler(
+		NoteServiceCheckNoteExistenceProcedure,
+		svc.CheckNoteExistence,
+		connect.WithSchema(noteServiceMethods.ByName("CheckNoteExistence")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/note.NoteService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case NoteServiceCheckNoteExistenceProcedure:
+			noteServiceCheckNoteExistenceHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -61,3 +103,7 @@ func NewNoteServiceHandler(svc NoteServiceHandler, opts ...connect.HandlerOption
 
 // UnimplementedNoteServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedNoteServiceHandler struct{}
+
+func (UnimplementedNoteServiceHandler) CheckNoteExistence(context.Context, *connect.Request[pb.CheckNoteExistenceRequest]) (*connect.Response[pb.CheckNoteExistenceResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("note.NoteService.CheckNoteExistence is not implemented"))
+}

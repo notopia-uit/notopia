@@ -2,7 +2,8 @@
 // @generated from file note.proto (package note, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenService } from "@bufbuild/protobuf/codegenv2";
+import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file note.proto.
@@ -10,8 +11,48 @@ import type { GenFile, GenService } from "@bufbuild/protobuf/codegenv2";
 export declare const file_note: GenFile;
 
 /**
+ * @generated from message note.CheckNoteExistenceRequest
+ */
+export declare type CheckNoteExistenceRequest = Message<"note.CheckNoteExistenceRequest"> & {
+  /**
+   * @generated from field: string note_id = 1;
+   */
+  noteId: string;
+};
+
+/**
+ * Describes the message note.CheckNoteExistenceRequest.
+ * Use `create(CheckNoteExistenceRequestSchema)` to create a new message.
+ */
+export declare const CheckNoteExistenceRequestSchema: GenMessage<CheckNoteExistenceRequest>;
+
+/**
+ * @generated from message note.CheckNoteExistenceResponse
+ */
+export declare type CheckNoteExistenceResponse = Message<"note.CheckNoteExistenceResponse"> & {
+  /**
+   * @generated from field: bool exists = 1;
+   */
+  exists: boolean;
+};
+
+/**
+ * Describes the message note.CheckNoteExistenceResponse.
+ * Use `create(CheckNoteExistenceResponseSchema)` to create a new message.
+ */
+export declare const CheckNoteExistenceResponseSchema: GenMessage<CheckNoteExistenceResponse>;
+
+/**
  * @generated from service note.NoteService
  */
 export declare const NoteService: GenService<{
+  /**
+   * @generated from rpc note.NoteService.CheckNoteExistence
+   */
+  checkNoteExistence: {
+    methodKind: "unary";
+    input: typeof CheckNoteExistenceRequestSchema;
+    output: typeof CheckNoteExistenceResponseSchema;
+  },
 }>;
 
