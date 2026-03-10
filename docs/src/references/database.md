@@ -71,7 +71,6 @@ notes: {
   name: text
   "icon": text {constraint: N}
   folder_id: uuid {constraint: FK}
-  current_revision_id: uuid {constraint: FK}
   tags: 'text[]'
   size: integer
   created_at: timestamptz
@@ -89,25 +88,11 @@ note_links: {
   shape: sql_table
 }
 
-revisions: {
-  id: uuid {constraint: PK}
-  note_id: uuid {constraint: FK}
-  name: text {constraint: N}
-  block_note_content: text
-  created_at: timestamptz
-  updated_at: timestamptz
-  deleted_at: timestamptz {constraint: N}
-
-  shape: sql_table
-}
-
 folders.workspace_id -> workspaces.id
 folders.parent_id -> folders.id
 notes.folder_id -> folders.id
 note_links.source_id -> notes.id
 note_links.target_id -> notes.id
-notes.current_revision_id -> revisions.id
-revisions.note_id -> notes.id
 ```
 
 <!-- diagram id="database-diagram-note" -->
@@ -144,6 +129,17 @@ documents: {
 
   shape: sql_table
 }
+
+revisions: {
+  id: uuid {constraint: PK}
+  name: text {constraint: N}
+  document_id: uuid {constraint: FK}
+  created_at: timestamptz
+
+  shape: sql_table
+}
+
+revisions.document_id -> documents.id
 ```
 
 <!-- diagram id="database-diagram-document" -->
