@@ -3,10 +3,16 @@ README.md
 api-implementations.ts
 api.module.ts
 api/DocumentApi.ts
+api/RevisionApi.ts
 api/index.ts
 controllers/DocumentApi.controller.ts
+controllers/RevisionApi.controller.ts
 controllers/index.ts
 index.ts
 models/error.ts
 models/get-document-attachment-upload-url-200-response.ts
+models/get-revisions-200-response.ts
 models/index.ts
+models/pagination.ts
+models/rename-revision-request.ts
+models/revision.ts

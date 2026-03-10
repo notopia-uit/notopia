@@ -2,7 +2,7 @@
 
 :::info
 
-- `Note` includes the tree structure content _(BlockNoteJS model)_, which is used for feeding data into the editing action
+- `Note` only store the info
 - `Document` is the `Note` content in binary format for editing and collaboration
 
 :::
@@ -19,32 +19,17 @@ sequenceDiagram
     participant SW as Search Worker
     participant SS as Search Service
 
-    U->>+NS: Create Note
+    U->>+NS: CreateNote
     NS->>NS: Create Note
     par Response
-        NS-->>-U: ID of created Note
-    and Create NoteCreated event
-        NS->>MB: Publish NoteCreated event
-        MB->>SW: NoteCreated event
-        SW->>SW: Process NoteCreated event
-        SW->>+SS: Index Note
-        SS--)-NS: Acknowledgement
+        NS-->>-U: Note ID
+    and NoteCreated event
+        NS-)MB: Publish NoteCreatedEvent
+        MB-)SW: Retrieve NoteCreatedEvent
+        SW->>SW: Process NoteCreatedEvent
+        SW->>+SS: Index Note info
         SS->>+SS: Index Note
     end
-```
-
-## Import Document
-
-```mermaid
-sequenceDiagram
-    autonumber
-
-    actor U as User
-    participant DS as Document Service
-    participant NS as Note Service
-    participant MB as Message Broker
-    participant SW as Search Worker
-    participant SS as Search Service
 ```
 
 ## Get Note
@@ -57,25 +42,28 @@ sequenceDiagram
     participant NS as Note Service
     participant DS as Document Service
 
-    U->>+NS: Get Note content
-    NS->>NS: Get Note content
-    NS-->>-U: Note content
+    U->>+NS: GetNote
+    NS->>NS: Get Note
+    NS-->>-U: Note
     opt Enter Edit Mode
-        U->>+DS: Get Document for editing
-        DS->>DS: Get Document
+        U->>+DS: WsDocument
+        DS->>DS: Establish Hocuspocus connection
         alt Document exists
-            DS-->>U: Document binary
+            DS-->>U: Connection
         else Document does not exist
-            DS->>+NS: Get Note content
-            NS->>NS: Get Note content
+            DS->>+NS: GetNote
+            NS->>NS: Get Note
             alt Note exists
-                NS-->>DS: Note content
-                DS->>DS: Create Document
+                DS->>DS: Init document
                 DS-->>U: Document binary
             else Note does not exist
                 NS-->>-DS: Not found
-                DS-->>-U: Not found
+                DS-->>U: Not found
             end
+        end
+        loop Edit Document
+            U->>DS: Edit Document
+            DS->>DS: Save Document changes, broadcast to other clients
         end
     end
 ```
@@ -88,25 +76,26 @@ sequenceDiagram
 
     actor U as User
     participant DS as Document Service
-    participant NS as Note Service
     participant MB as Message Broker
+    participant NS as Note Service
     participant SW as Search Worker
     participant SS as Search Service
 
-    U->>+DS: Commit Document changes
-    DS->>DS: Process Document changes
-    DS->>+NS: Apply Document changes to Note
-    NS->>NS: Update Note content, create new revision
+    U->>+DS: CommitDocument
+    DS->>DS: Create Document revision
     par Response
-        NS-->>-DS: Ok
         DS-->>-U: Ok
-    and Publish NoteUpdated event
-        NS->>MB: Publish NoteUpdated event
+    and Publish DocumentCommittedEvent
+        DS->>MB: Publish DocumentCommittedEvent
+    end
+    par Process DocumentCommittedEvent
+        MB->>SW: DocumentCommittedEvent
+        SW->>SW: Update note size, tags
+    and
         MB->>SW: NoteUpdated event
-        SW->>SW: Process NoteUpdated event
-        SW->>+SS: Update Note index
-        SS--)-NS: Acknowledgement
-        SS->>+SS: Update Note index
+        SW->>SW: Convert to markdownContent in form of NoteSearch
+        SW->>+SS: Update Note size, tags
+        SS->>SS: Update Note index
     end
 ```
 
@@ -114,7 +103,7 @@ sequenceDiagram
 
 :::info
 
-Update Note mean just update the Note metadata, like name, folderId (move), trashed, icon...
+- This also include the trash and restore note
 
 :::
 
@@ -128,16 +117,14 @@ sequenceDiagram
     participant SW as Search Worker
     participant SS as Search Service
 
-    U->>+NS: Update Note metadata
-    NS->>NS: Update Note metadata
+    U->>+NS: UpdateNote
+    NS->>NS: Update Note
     par Response
         NS-->>-U: Ok
-    and Publish NoteUpdated event
-        NS->>MB: Publish NoteUpdated event
-        MB->>SW: NoteUpdated event
-        SW->>SW: Process NoteUpdated event
-        SW->>+SS: Update Note index
-        SS--)-NS: Acknowledgement
+    and Publish NoteUpdatedEvent
+        NS->>MB: Publish NoteUpdatedEvent
+        MB->>SW: NoteUpdatedEvent
+        SW->>+SS: Update Note info
         SS->>+SS: Update Note index
     end
 ```
@@ -151,20 +138,24 @@ sequenceDiagram
     actor U as User
     participant NS as Note Service
     participant MB as Message Broker
+    participant DS as Document Service
     participant SW as Search Worker
     participant SS as Search Service
 
-    U->>+NS: Permanently delete Note
+    U->>+NS: PermanentlyDeleteWorkspaceItems (note)
     NS->>NS: Permanently delete Note
     par Response
         NS-->>-U: Ok
-    and Publish NoteDeleted event
-        NS->>MB: Publish NoteDeleted event
-        MB->>SW: NoteDeleted event
-        SW->>SW: Process NoteDeleted event
+    and Publish NoteDeletedEvent
+        NS->>MB: Publish NoteDeletedEvent
+    end
+    par Process NoteDeletedEvent
+        MB->>DS: NoteDeletedEvent
+        DS->>DS: Delete Document and Revisions
+    and Search
+        MB->>SW: NoteDeletedEvent
         SW->>+SS: Delete Note from index
-        SS--)-NS: Acknowledgement
-        SS->>+SS: Delete Note from index
+        SS->>+SS: Delete Note
     end
 ```
 

@@ -31,10 +31,6 @@
     {
       "name": "Note",
       "description": "Note in workspace's root folder or in a folder"
-    },
-    {
-      "name": "Revision",
-      "description": "Note revisions"
     }
   ],
   "externalDocs": {
@@ -225,15 +221,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/noteIdPath"
-          },
-          {
-            "name": "includeContent",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
           }
         ],
         "responses": {
@@ -500,199 +487,6 @@
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/revisions": {
-      "get": {
-        "security": [
-          {
-            "Oauth2": []
-          }
-        ],
-        "tags": [
-          "Revision"
-        ],
-        "summary": "Get revisions",
-        "operationId": "getRevisions",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/noteIdQuery"
-          },
-          {
-            "$ref": "#/components/parameters/pageQuery"
-          },
-          {
-            "$ref": "#/components/parameters/limitQuery"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/GetRevisionsResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/revisions/{revisionId}/apply": {
-      "post": {
-        "security": [
-          {
-            "Oauth2": []
-          }
-        ],
-        "tags": [
-          "Revision"
-        ],
-        "summary": "Apply revision",
-        "operationId": "applyRevision",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/revisionIdPath"
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/ApplyRevisionResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/revisions/{revisionId}/rename": {
-      "post": {
-        "security": [
-          {
-            "Oauth2": []
-          }
-        ],
-        "tags": [
-          "Revision"
-        ],
-        "summary": "Rename revision",
-        "operationId": "renameRevision",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/revisionIdPath"
-          }
-        ],
-        "requestBody": {
-          "$ref": "#/components/requestBodies/RenameRevisionRequest"
-        },
-        "responses": {
-          "204": {
-            "description": "Revision renamed successfully"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/revisions/{revisionId}": {
-      "get": {
-        "security": [
-          {
-            "Oauth2": []
-          }
-        ],
-        "tags": [
-          "Revision"
-        ],
-        "summary": "Get revision details",
-        "operationId": "getRevision",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/revisionIdPath"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/GetRevisionResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      },
-      "delete": {
-        "security": [
-          {
-            "Oauth2": []
-          }
-        ],
-        "tags": [
-          "Revision"
-        ],
-        "summary": "Delete revision",
-        "operationId": "deleteRevision",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/revisionIdPath"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Revision deleted successfully"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundError"
@@ -1437,190 +1231,6 @@
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
         "readOnly": true
       },
-      "NoteContent": {
-        "type": "array",
-        "items": {
-          "type": "object"
-        },
-        "nullable": true,
-        "example": [
-          {
-            "type": "paragraph",
-            "content": "Welcome to this demo!"
-          },
-          {
-            "type": "paragraph"
-          },
-          {
-            "type": "paragraph",
-            "content": [
-              {
-                "type": "text",
-                "text": "Blocks:",
-                "styles": {
-                  "bold": true
-                }
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "content": "Paragraph"
-          },
-          {
-            "type": "heading",
-            "content": "Heading"
-          },
-          {
-            "id": "toggle-heading",
-            "type": "heading",
-            "props": {
-              "isToggleable": true
-            },
-            "content": "Toggle Heading"
-          },
-          {
-            "type": "quote",
-            "content": "Quote"
-          },
-          {
-            "type": "bulletListItem",
-            "content": "Bullet List Item"
-          },
-          {
-            "type": "numberedListItem",
-            "content": "Numbered List Item"
-          },
-          {
-            "type": "checkListItem",
-            "content": "Check List Item"
-          },
-          {
-            "id": "toggle-list-item",
-            "type": "toggleListItem",
-            "content": "Toggle List Item"
-          },
-          {
-            "type": "codeBlock",
-            "props": {
-              "language": "javascript"
-            },
-            "content": "console.log('Hello, world!');"
-          },
-          {
-            "type": "table",
-            "content": {
-              "type": "tableContent",
-              "rows": [
-                {
-                  "cells": [
-                    "Table Cell",
-                    "Table Cell",
-                    "Table Cell"
-                  ]
-                },
-                {
-                  "cells": [
-                    "Table Cell",
-                    "Table Cell",
-                    "Table Cell"
-                  ]
-                },
-                {
-                  "cells": [
-                    "Table Cell",
-                    "Table Cell",
-                    "Table Cell"
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "type": "file"
-          },
-          {
-            "type": "image",
-            "props": {
-              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg",
-              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg"
-            }
-          },
-          {
-            "type": "video",
-            "props": {
-              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",
-              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
-            }
-          },
-          {
-            "type": "audio",
-            "props": {
-              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3",
-              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
-            }
-          },
-          {
-            "type": "paragraph"
-          },
-          {
-            "type": "paragraph",
-            "content": [
-              {
-                "type": "text",
-                "text": "Inline Content:",
-                "styles": {
-                  "bold": true
-                }
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "content": [
-              {
-                "type": "text",
-                "text": "Styled Text",
-                "styles": {
-                  "bold": true,
-                  "italic": true,
-                  "textColor": "red",
-                  "backgroundColor": "blue"
-                }
-              },
-              {
-                "type": "text",
-                "text": " ",
-                "styles": {}
-              },
-              {
-                "type": "link",
-                "content": "Link",
-                "href": "https://www.blocknotejs.org"
-              }
-            ]
-          },
-          {
-            "type": "paragraph"
-          }
-        ]
-      },
-      "NoteWithContent": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Note"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "content": {
-                "$ref": "#/components/schemas/NoteContent",
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
       "Graph": {
         "type": "object",
         "properties": {
@@ -1721,100 +1331,6 @@
           "icon"
         ]
       },
-      "Revision": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "Initial Draft"
-          },
-          "content": {
-            "$ref": "#/components/schemas/NoteContent"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-01-01T12:00:00Z",
-            "readOnly": true
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "content",
-          "createdAt"
-        ]
-      },
-      "Pagination": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "minimum": 1,
-            "example": 1
-          },
-          "limit": {
-            "type": "integer",
-            "description": "Number of items per page",
-            "minimum": 1,
-            "maximum": 100,
-            "example": 20
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total number of items",
-            "minimum": 0,
-            "example": 100
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number of pages",
-            "minimum": 0,
-            "example": 5
-          },
-          "hasNext": {
-            "type": "boolean",
-            "description": "Whether there is a next page",
-            "example": true
-          },
-          "hasPrev": {
-            "type": "boolean",
-            "description": "Whether there is a previous page",
-            "example": false
-          }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total",
-          "totalPages",
-          "hasNext",
-          "hasPrev"
-        ]
-      },
-      "Revision_properties-id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
-        "readOnly": true
-      },
-      "Revision_properties-name": {
-        "type": "string",
-        "nullable": true,
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "Initial Draft"
-      },
       "Workspace": {
         "type": "object",
         "properties": {
@@ -1913,27 +1429,18 @@
           "data"
         ]
       },
-      "NoteContentUpdatedEvent": {
+      "NoteUpdatedEvent": {
         "type": "object",
-        "description": "When user A is in read mode, user B commits changes, user A will receive this event",
         "properties": {
           "type": {
             "type": "string",
             "enum": [
-              "NoteContentUpdatedEvent"
+              "NoteUpdatedEvent"
             ],
-            "example": "NoteContentUpdatedEvent"
+            "example": "NoteUpdatedEvent"
           },
           "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
-              }
-            },
-            "required": [
-              "id"
-            ]
+            "$ref": "#/components/schemas/Note"
           }
         },
         "required": [
@@ -1999,57 +1506,6 @@
           "data"
         ]
       },
-      "tags": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "example": [
-          "work",
-          "meeting"
-        ]
-      },
-      "NoteInfoUpdatedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "NoteInfoUpdatedEvent"
-            ],
-            "example": "NoteInfoUpdatedEvent"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
-              },
-              "name": {
-                "$ref": "#/components/schemas/properties-name"
-              },
-              "icon": {
-                "$ref": "#/components/schemas/icon"
-              },
-              "folderId": {
-                "$ref": "#/components/schemas/id"
-              },
-              "tags": {
-                "$ref": "#/components/schemas/tags"
-              }
-            },
-            "required": [
-              "id",
-              "name",
-              "icon"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
       "WorkspaceUpdatedEvent": {
         "type": "object",
         "properties": {
@@ -2104,7 +1560,7 @@
         "maxLength": 255,
         "example": "My Workspace"
       },
-      "TrashedDeletedBy": {
+      "TrashedBy": {
         "type": "string",
         "enum": [
           "purpose",
@@ -2129,8 +1585,8 @@
             "example": "Meeting Notes",
             "readOnly": true
           },
-          "deletedBy": {
-            "$ref": "#/components/schemas/TrashedDeletedBy"
+          "trashedBy": {
+            "$ref": "#/components/schemas/TrashedBy"
           },
           "deletedAt": {
             "type": "string",
@@ -2143,7 +1599,7 @@
         "required": [
           "id",
           "name",
-          "deletedBy",
+          "trashedBy",
           "deletedAt"
         ]
       },
@@ -2162,8 +1618,8 @@
             "example": "Work Notes",
             "readOnly": true
           },
-          "deletedBy": {
-            "$ref": "#/components/schemas/TrashedDeletedBy"
+          "trashedBy": {
+            "$ref": "#/components/schemas/TrashedBy"
           },
           "deletedAt": {
             "type": "string",
@@ -2176,8 +1632,56 @@
         "required": [
           "id",
           "name",
-          "deletedBy",
+          "trashedBy",
           "deletedAt"
+        ]
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Current page number",
+            "minimum": 1,
+            "example": 1
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items per page",
+            "minimum": 1,
+            "maximum": 100,
+            "example": 20
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of items",
+            "minimum": 0,
+            "example": 100
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "minimum": 0,
+            "example": 5
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Whether there is a next page",
+            "example": true
+          },
+          "hasPrev": {
+            "type": "boolean",
+            "description": "Whether there is a previous page",
+            "example": false
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages",
+          "hasNext",
+          "hasPrev"
         ]
       },
       "properties-icon": {
@@ -2324,24 +1828,6 @@
               "properties": {
                 "name": {
                   "$ref": "#/components/schemas/properties-name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
-      "RenameRevisionRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/Revision_properties-name"
                 }
               },
               "required": [
@@ -2580,7 +2066,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/NoteWithContent"
+              "$ref": "#/components/schemas/Note"
             }
           }
         }
@@ -2634,54 +2120,6 @@
           }
         }
       },
-      "GetRevisionsResponse": {
-        "description": "Revisions",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "data": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Revision"
-                  }
-                },
-                "pagination": {
-                  "$ref": "#/components/schemas/Pagination"
-                }
-              },
-              "required": [
-                "data",
-                "pagination"
-              ]
-            }
-          }
-        }
-      },
-      "ApplyRevisionResponse": {
-        "description": "Apply revision, mean create new with existing revision",
-        "headers": {
-          "Content-Location": {
-            "schema": {
-              "type": "string",
-              "format": "uri",
-              "example": "http://api.notopia.localhost/revisions/ce5060da-b15c-4aee-898f-5449fafacfc4"
-            },
-            "required": true
-          }
-        }
-      },
-      "GetRevisionResponse": {
-        "description": "Revision detail",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Revision"
-            }
-          }
-        }
-      },
       "CreateWorkspaceResponse": {
         "description": "Workspace successfully created",
         "headers": {
@@ -2721,16 +2159,13 @@
                   "$ref": "#/components/schemas/FolderUpdatedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/NoteContentUpdatedEvent"
+                  "$ref": "#/components/schemas/NoteUpdatedEvent"
                 },
                 {
                   "$ref": "#/components/schemas/NoteCreatedEvent"
                 },
                 {
                   "$ref": "#/components/schemas/NoteDeletedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/NoteInfoUpdatedEvent"
                 },
                 {
                   "$ref": "#/components/schemas/WorkspaceUpdatedEvent"
@@ -2742,10 +2177,9 @@
                   "FolderCreatedEvent": "#/components/schemas/FolderCreatedEvent",
                   "FolderDeletedEvent": "#/components/schemas/FolderDeletedEvent",
                   "FolderUpdatedEvent": "#/components/schemas/FolderUpdatedEvent",
-                  "NoteContentUpdatedEvent": "#/components/schemas/NoteContentUpdatedEvent",
+                  "NoteUpdatedEvent": "#/components/schemas/NoteUpdatedEvent",
                   "NoteCreatedEvent": "#/components/schemas/NoteCreatedEvent",
                   "NoteDeletedEvent": "#/components/schemas/NoteDeletedEvent",
-                  "NoteInfoUpdatedEvent": "#/components/schemas/NoteInfoUpdatedEvent",
                   "WorkspaceUpdatedEvent": "#/components/schemas/WorkspaceUpdatedEvent"
                 }
               }
@@ -2861,22 +2295,6 @@
         "required": true,
         "schema": {
           "$ref": "#/components/schemas/Note_properties-id"
-        }
-      },
-      "noteIdQuery": {
-        "name": "noteId",
-        "in": "query",
-        "required": true,
-        "schema": {
-          "$ref": "#/components/schemas/Note_properties-id"
-        }
-      },
-      "revisionIdPath": {
-        "name": "revisionId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "$ref": "#/components/schemas/Revision_properties-id"
         }
       },
       "workspaceIdPath": {

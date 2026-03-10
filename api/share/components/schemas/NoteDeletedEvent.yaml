@@ -4,7 +4,7 @@ properties:
   data:
     type: object
     properties:
-      userId:
-        $ref: ../../../common/components/schemas/User.yaml#/properties/id
+      id:
+        $ref: ../../../note/components/schemas/Note.yaml#/properties/id
     required:
-      - userId
+      - id

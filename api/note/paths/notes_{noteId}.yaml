@@ -8,12 +8,6 @@ get:
   operationId: getNote
   parameters:
     - $ref: ../components/parameters/noteIdPath.yaml
-    - name: includeContent
-      in: query
-      required: false
-      schema:
-        type: boolean
-        default: false
   responses:
     200:
       $ref: ../components/responses/GetNoteResponse.yaml

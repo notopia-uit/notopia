@@ -17,27 +17,17 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "note:{noteId}:block:{blockId}",
-            "example": "note:46f94d4d-41b5-4df6-bf8d-270fb9a49c97:block:a-random-id"
-          },
-          "noteId": {
-            "type": "string",
-            "format": "uuid",
             "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
           },
-          "noteName": {
+          "name": {
             "type": "string",
             "minLength": 1,
             "maxLength": 255,
             "example": "Meeting Notes"
           },
-          "blockId": {
+          "plainTextContent": {
             "type": "string",
-            "example": "a-random-id"
-          },
-          "content": {
-            "type": "string",
-            "description": "Plain text content of the note's block",
+            "description": "Plain text content",
             "example": "This is the content of the note"
           },
           "tags": {
@@ -53,63 +43,18 @@
         },
         "required": [
           "id",
-          "noteId",
-          "noteName",
-          "blockId",
-          "content"
+          "name",
+          "plainTextContent"
         ]
       },
-      "NoteCommittedEvent": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EventBase"
-          },
-          {
-            "properties": {
-              "data": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "$ref": "#/components/schemas/name"
-                  },
-                  "folderId": {
-                    "$ref": "#/components/schemas/id"
-                  },
-                  "blockNoteContent": {
-                    "$ref": "#/components/schemas/NoteContent"
-                  }
-                },
-                "required": [
-                  "name",
-                  "folderId",
-                  "blockNoteContent"
-                ]
-              }
-            }
-          }
-        ]
+      "DocumentCommittedEvent": {
+        "$ref": "#/components/schemas/EventBase"
+      },
+      "NoteUpdatedEvent": {
+        "$ref": "#/components/schemas/EventBase"
       },
       "UserDeletedEvent": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EventBase"
-          },
-          {
-            "properties": {
-              "data": {
-                "type": "object",
-                "properties": {
-                  "userId": {
-                    "$ref": "#/components/schemas/properties-id"
-                  }
-                },
-                "required": [
-                  "userId"
-                ]
-              }
-            }
-          }
-        ]
+        "$ref": "#/components/schemas/EventBase"
       },
       "EventBase": {
         "type": "object",
@@ -145,191 +90,6 @@
           "metadata",
           "data"
         ]
-      },
-      "name": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "Meeting Notes"
-      },
-      "id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000",
-        "readOnly": true
-      },
-      "NoteContent": {
-        "type": "array",
-        "items": {
-          "type": "object"
-        },
-        "nullable": true,
-        "example": [
-          {
-            "type": "paragraph",
-            "content": "Welcome to this demo!"
-          },
-          {
-            "type": "paragraph"
-          },
-          {
-            "type": "paragraph",
-            "content": [
-              {
-                "type": "text",
-                "text": "Blocks:",
-                "styles": {
-                  "bold": true
-                }
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "content": "Paragraph"
-          },
-          {
-            "type": "heading",
-            "content": "Heading"
-          },
-          {
-            "id": "toggle-heading",
-            "type": "heading",
-            "props": {
-              "isToggleable": true
-            },
-            "content": "Toggle Heading"
-          },
-          {
-            "type": "quote",
-            "content": "Quote"
-          },
-          {
-            "type": "bulletListItem",
-            "content": "Bullet List Item"
-          },
-          {
-            "type": "numberedListItem",
-            "content": "Numbered List Item"
-          },
-          {
-            "type": "checkListItem",
-            "content": "Check List Item"
-          },
-          {
-            "id": "toggle-list-item",
-            "type": "toggleListItem",
-            "content": "Toggle List Item"
-          },
-          {
-            "type": "codeBlock",
-            "props": {
-              "language": "javascript"
-            },
-            "content": "console.log('Hello, world!');"
-          },
-          {
-            "type": "table",
-            "content": {
-              "type": "tableContent",
-              "rows": [
-                {
-                  "cells": [
-                    "Table Cell",
-                    "Table Cell",
-                    "Table Cell"
-                  ]
-                },
-                {
-                  "cells": [
-                    "Table Cell",
-                    "Table Cell",
-                    "Table Cell"
-                  ]
-                },
-                {
-                  "cells": [
-                    "Table Cell",
-                    "Table Cell",
-                    "Table Cell"
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "type": "file"
-          },
-          {
-            "type": "image",
-            "props": {
-              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg",
-              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg"
-            }
-          },
-          {
-            "type": "video",
-            "props": {
-              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",
-              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
-            }
-          },
-          {
-            "type": "audio",
-            "props": {
-              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3",
-              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
-            }
-          },
-          {
-            "type": "paragraph"
-          },
-          {
-            "type": "paragraph",
-            "content": [
-              {
-                "type": "text",
-                "text": "Inline Content:",
-                "styles": {
-                  "bold": true
-                }
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "content": [
-              {
-                "type": "text",
-                "text": "Styled Text",
-                "styles": {
-                  "bold": true,
-                  "italic": true,
-                  "textColor": "red",
-                  "backgroundColor": "blue"
-                }
-              },
-              {
-                "type": "text",
-                "text": " ",
-                "styles": {}
-              },
-              {
-                "type": "link",
-                "content": "Link",
-                "href": "https://www.blocknotejs.org"
-              }
-            ]
-          },
-          {
-            "type": "paragraph"
-          }
-        ]
-      },
-      "properties-id": {
-        "type": "string",
-        "description": "User ID from Authentik",
-        "example": "04415622b0a267807d139a8266072f8098bdb605a7bfbadf2b0016c02572e514"
       }
     }
   }

@@ -8,10 +8,9 @@ content:
         - $ref: ../schemas/FolderCreatedEvent.yaml
         - $ref: ../schemas/FolderDeletedEvent.yaml
         - $ref: ../schemas/FolderUpdatedEvent.yaml
-        - $ref: ../schemas/NoteContentUpdatedEvent.yaml
+        - $ref: ../schemas/NoteUpdatedEvent.yaml
         - $ref: ../schemas/NoteCreatedEvent.yaml
         - $ref: ../schemas/NoteDeletedEvent.yaml
-        - $ref: ../schemas/NoteInfoUpdatedEvent.yaml
         - $ref: ../schemas/WorkspaceUpdatedEvent.yaml
       discriminator:
         propertyName: type
@@ -19,8 +18,7 @@ content:
           FolderCreatedEvent: ../schemas/FolderCreatedEvent.yaml
           FolderDeletedEvent: ../schemas/FolderDeletedEvent.yaml
           FolderUpdatedEvent: ../schemas/FolderUpdatedEvent.yaml
-          NoteContentUpdatedEvent: ../schemas/NoteContentUpdatedEvent.yaml
+          NoteUpdatedEvent: ../schemas/NoteUpdatedEvent.yaml
           NoteCreatedEvent: ../schemas/NoteCreatedEvent.yaml
           NoteDeletedEvent: ../schemas/NoteDeletedEvent.yaml
-          NoteInfoUpdatedEvent: ../schemas/NoteInfoUpdatedEvent.yaml
           WorkspaceUpdatedEvent: ../schemas/WorkspaceUpdatedEvent.yaml

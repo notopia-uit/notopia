@@ -22,8 +22,13 @@
   "tags": [
     {
       "name": "Document",
-      "description": "Operations related to documenting notes, collaboration.",
+      "description": "Note content for editing, collaborating",
       "x-displayName": "Document"
+    },
+    {
+      "name": "Revision",
+      "description": "Document revisions",
+      "x-displayName": "Revision"
     },
     {
       "name": "Workspace",
@@ -39,11 +44,6 @@
       "name": "Note",
       "description": "Note in workspace's root folder or in a folder",
       "x-displayName": "Note"
-    },
-    {
-      "name": "Revision",
-      "description": "Note revisions",
-      "x-displayName": "Revision"
     }
   ],
   "externalDocs": {
@@ -144,6 +144,163 @@
         "responses": {
           "200": {
             "$ref": "#/components/responses/document_GetDocumentAttachmentUploadUrlResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/document_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/document_UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/document_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/document_InternalServerError"
+          }
+        }
+      }
+    },
+    "/document/revisions": {
+      "get": {
+        "security": [
+          {
+            "document_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Revision"
+        ],
+        "summary": "Get revisions",
+        "operationId": "getRevisions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/document_documentIdQuery"
+          },
+          {
+            "$ref": "#/components/parameters/document_pageQuery"
+          },
+          {
+            "$ref": "#/components/parameters/document_limitQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/document_GetRevisionsResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/document_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/document_UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/document_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/document_InternalServerError"
+          }
+        }
+      }
+    },
+    "/document/revisions/{revisionId}": {
+      "get": {
+        "security": [
+          {
+            "document_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Revision"
+        ],
+        "summary": "Get revision details",
+        "operationId": "getRevision",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/document_revisionIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/document_GetRevisionResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/document_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/document_UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/document_ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/document_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/document_InternalServerError"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "document_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Revision"
+        ],
+        "summary": "Delete revision",
+        "operationId": "deleteRevision",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/document_revisionIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Revision deleted successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/document_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/document_UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/document_ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/document_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/document_InternalServerError"
+          }
+        }
+      }
+    },
+    "/document/revisions/{revisionId}/rename": {
+      "post": {
+        "security": [
+          {
+            "document_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Revision"
+        ],
+        "summary": "Rename revision",
+        "operationId": "renameRevision",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/document_revisionIdPath"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/document_RenameRevisionRequest"
+        },
+        "responses": {
+          "204": {
+            "description": "Revision renamed successfully"
           },
           "400": {
             "$ref": "#/components/responses/document_BadRequestError"
@@ -344,15 +501,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/note_noteIdPath"
-          },
-          {
-            "name": "includeContent",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
           }
         ],
         "responses": {
@@ -619,199 +767,6 @@
           },
           "401": {
             "$ref": "#/components/responses/note_UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/note_NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/note_InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/revisions": {
-      "get": {
-        "security": [
-          {
-            "note_Oauth2": []
-          }
-        ],
-        "tags": [
-          "Revision"
-        ],
-        "summary": "Get revisions",
-        "operationId": "getRevisions",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/note_noteIdQuery"
-          },
-          {
-            "$ref": "#/components/parameters/note_pageQuery"
-          },
-          {
-            "$ref": "#/components/parameters/note_limitQuery"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/note_GetRevisionsResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/note_BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/note_UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/note_NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/note_InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/revisions/{revisionId}/apply": {
-      "post": {
-        "security": [
-          {
-            "note_Oauth2": []
-          }
-        ],
-        "tags": [
-          "Revision"
-        ],
-        "summary": "Apply revision",
-        "operationId": "applyRevision",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/note_revisionIdPath"
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/components/responses/note_ApplyRevisionResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/note_BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/note_UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/note_NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/note_InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/revisions/{revisionId}/rename": {
-      "post": {
-        "security": [
-          {
-            "note_Oauth2": []
-          }
-        ],
-        "tags": [
-          "Revision"
-        ],
-        "summary": "Rename revision",
-        "operationId": "renameRevision",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/note_revisionIdPath"
-          }
-        ],
-        "requestBody": {
-          "$ref": "#/components/requestBodies/note_RenameRevisionRequest"
-        },
-        "responses": {
-          "204": {
-            "description": "Revision renamed successfully"
-          },
-          "400": {
-            "$ref": "#/components/responses/note_BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/note_UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/note_NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/note_InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/revisions/{revisionId}": {
-      "get": {
-        "security": [
-          {
-            "note_Oauth2": []
-          }
-        ],
-        "tags": [
-          "Revision"
-        ],
-        "summary": "Get revision details",
-        "operationId": "getRevision",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/note_revisionIdPath"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/note_GetRevisionResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/note_BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/note_UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/note_ForbiddenError"
-          },
-          "404": {
-            "$ref": "#/components/responses/note_NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/note_InternalServerError"
-          }
-        }
-      },
-      "delete": {
-        "security": [
-          {
-            "note_Oauth2": []
-          }
-        ],
-        "tags": [
-          "Revision"
-        ],
-        "summary": "Delete revision",
-        "operationId": "deleteRevision",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/note_revisionIdPath"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Revision deleted successfully"
-          },
-          "400": {
-            "$ref": "#/components/responses/note_BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/note_UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/note_ForbiddenError"
           },
           "404": {
             "$ref": "#/components/responses/note_NotFoundError"
@@ -1386,27 +1341,17 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "note:{noteId}:block:{blockId}",
-            "example": "note:46f94d4d-41b5-4df6-bf8d-270fb9a49c97:block:a-random-id"
-          },
-          "noteId": {
-            "type": "string",
-            "format": "uuid",
             "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
           },
-          "noteName": {
+          "name": {
             "type": "string",
             "minLength": 1,
             "maxLength": 255,
             "example": "Meeting Notes"
           },
-          "blockId": {
+          "plainTextContent": {
             "type": "string",
-            "example": "a-random-id"
-          },
-          "content": {
-            "type": "string",
-            "description": "Plain text content of the note's block",
+            "description": "Plain text content",
             "example": "This is the content of the note"
           },
           "tags": {
@@ -1422,63 +1367,18 @@
         },
         "required": [
           "id",
-          "noteId",
-          "noteName",
-          "blockId",
-          "content"
+          "name",
+          "plainTextContent"
         ]
       },
-      "share_NoteCommittedEvent": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/share_EventBase"
-          },
-          {
-            "properties": {
-              "data": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "$ref": "#/components/schemas/share_name"
-                  },
-                  "folderId": {
-                    "$ref": "#/components/schemas/share_id"
-                  },
-                  "blockNoteContent": {
-                    "$ref": "#/components/schemas/share_NoteContent"
-                  }
-                },
-                "required": [
-                  "name",
-                  "folderId",
-                  "blockNoteContent"
-                ]
-              }
-            }
-          }
-        ]
+      "share_DocumentCommittedEvent": {
+        "$ref": "#/components/schemas/share_EventBase"
+      },
+      "share_NoteUpdatedEvent": {
+        "$ref": "#/components/schemas/share_EventBase"
       },
       "share_UserDeletedEvent": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/share_EventBase"
-          },
-          {
-            "properties": {
-              "data": {
-                "type": "object",
-                "properties": {
-                  "userId": {
-                    "$ref": "#/components/schemas/share_properties-id"
-                  }
-                },
-                "required": [
-                  "userId"
-                ]
-              }
-            }
-          }
-        ]
+        "$ref": "#/components/schemas/share_EventBase"
       },
       "share_EventBase": {
         "type": "object",
@@ -1515,24 +1415,37 @@
           "data"
         ]
       },
-      "share_name": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "Meeting Notes"
+      "document_Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error code",
+            "example": "EXAMPLE_CODE"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message",
+            "example": "Example error"
+          },
+          "more_info": {
+            "type": "string",
+            "description": "URL with more information about the error",
+            "example": "https://api.notopia.com/docs/errors/EXAMPLE_CODE"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
       },
-      "share_id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000",
-        "readOnly": true
-      },
-      "share_NoteContent": {
+      "document_DocumentContent": {
         "type": "array",
         "items": {
           "type": "object"
         },
         "nullable": true,
+        "description": "BlockNote model",
         "example": [
           {
             "type": "paragraph",
@@ -1695,34 +1608,93 @@
           }
         ]
       },
-      "share_properties-id": {
-        "type": "string",
-        "description": "User ID from Authentik",
-        "example": "04415622b0a267807d139a8266072f8098bdb605a7bfbadf2b0016c02572e514"
-      },
-      "document_Error": {
+      "document_Revision": {
         "type": "object",
         "properties": {
-          "code": {
+          "id": {
             "type": "string",
-            "description": "Error code",
-            "example": "EXAMPLE_CODE"
+            "format": "uuid",
+            "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
+            "readOnly": true
           },
-          "message": {
+          "name": {
             "type": "string",
-            "description": "Human-readable error message",
-            "example": "Example error"
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Initial Draft"
           },
-          "more_info": {
+          "content": {
+            "$ref": "#/components/schemas/document_DocumentContent"
+          },
+          "createdAt": {
             "type": "string",
-            "description": "URL with more information about the error",
-            "example": "https://api.notopia.com/docs/errors/EXAMPLE_CODE"
+            "format": "date-time",
+            "example": "2024-01-01T12:00:00Z",
+            "readOnly": true
           }
         },
         "required": [
-          "code",
-          "message"
+          "id",
+          "name",
+          "content",
+          "createdAt"
         ]
+      },
+      "document_Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Current page number",
+            "minimum": 1,
+            "example": 1
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items per page",
+            "minimum": 1,
+            "maximum": 100,
+            "example": 20
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of items",
+            "minimum": 0,
+            "example": 100
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "minimum": 0,
+            "example": 5
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Whether there is a next page",
+            "example": true
+          },
+          "hasPrev": {
+            "type": "boolean",
+            "description": "Whether there is a previous page",
+            "example": false
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages",
+          "hasNext",
+          "hasPrev"
+        ]
+      },
+      "document_name": {
+        "type": "string",
+        "nullable": true,
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Initial Draft"
       },
       "note_id": {
         "type": "string",
@@ -1879,190 +1851,6 @@
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
         "readOnly": true
       },
-      "note_NoteContent": {
-        "type": "array",
-        "items": {
-          "type": "object"
-        },
-        "nullable": true,
-        "example": [
-          {
-            "type": "paragraph",
-            "content": "Welcome to this demo!"
-          },
-          {
-            "type": "paragraph"
-          },
-          {
-            "type": "paragraph",
-            "content": [
-              {
-                "type": "text",
-                "text": "Blocks:",
-                "styles": {
-                  "bold": true
-                }
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "content": "Paragraph"
-          },
-          {
-            "type": "heading",
-            "content": "Heading"
-          },
-          {
-            "id": "toggle-heading",
-            "type": "heading",
-            "props": {
-              "isToggleable": true
-            },
-            "content": "Toggle Heading"
-          },
-          {
-            "type": "quote",
-            "content": "Quote"
-          },
-          {
-            "type": "bulletListItem",
-            "content": "Bullet List Item"
-          },
-          {
-            "type": "numberedListItem",
-            "content": "Numbered List Item"
-          },
-          {
-            "type": "checkListItem",
-            "content": "Check List Item"
-          },
-          {
-            "id": "toggle-list-item",
-            "type": "toggleListItem",
-            "content": "Toggle List Item"
-          },
-          {
-            "type": "codeBlock",
-            "props": {
-              "language": "javascript"
-            },
-            "content": "console.log('Hello, world!');"
-          },
-          {
-            "type": "table",
-            "content": {
-              "type": "tableContent",
-              "rows": [
-                {
-                  "cells": [
-                    "Table Cell",
-                    "Table Cell",
-                    "Table Cell"
-                  ]
-                },
-                {
-                  "cells": [
-                    "Table Cell",
-                    "Table Cell",
-                    "Table Cell"
-                  ]
-                },
-                {
-                  "cells": [
-                    "Table Cell",
-                    "Table Cell",
-                    "Table Cell"
-                  ]
-                }
-              ]
-            }
-          },
-          {
-            "type": "file"
-          },
-          {
-            "type": "image",
-            "props": {
-              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg",
-              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg"
-            }
-          },
-          {
-            "type": "video",
-            "props": {
-              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",
-              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
-            }
-          },
-          {
-            "type": "audio",
-            "props": {
-              "url": "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3",
-              "caption": "From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
-            }
-          },
-          {
-            "type": "paragraph"
-          },
-          {
-            "type": "paragraph",
-            "content": [
-              {
-                "type": "text",
-                "text": "Inline Content:",
-                "styles": {
-                  "bold": true
-                }
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "content": [
-              {
-                "type": "text",
-                "text": "Styled Text",
-                "styles": {
-                  "bold": true,
-                  "italic": true,
-                  "textColor": "red",
-                  "backgroundColor": "blue"
-                }
-              },
-              {
-                "type": "text",
-                "text": " ",
-                "styles": {}
-              },
-              {
-                "type": "link",
-                "content": "Link",
-                "href": "https://www.blocknotejs.org"
-              }
-            ]
-          },
-          {
-            "type": "paragraph"
-          }
-        ]
-      },
-      "note_NoteWithContent": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/note_Note"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "content": {
-                "$ref": "#/components/schemas/note_NoteContent",
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
       "note_Graph": {
         "type": "object",
         "properties": {
@@ -2163,100 +1951,6 @@
           "icon"
         ]
       },
-      "note_Revision": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "Initial Draft"
-          },
-          "content": {
-            "$ref": "#/components/schemas/note_NoteContent"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-01-01T12:00:00Z",
-            "readOnly": true
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "content",
-          "createdAt"
-        ]
-      },
-      "note_Pagination": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "minimum": 1,
-            "example": 1
-          },
-          "limit": {
-            "type": "integer",
-            "description": "Number of items per page",
-            "minimum": 1,
-            "maximum": 100,
-            "example": 20
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total number of items",
-            "minimum": 0,
-            "example": 100
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number of pages",
-            "minimum": 0,
-            "example": 5
-          },
-          "hasNext": {
-            "type": "boolean",
-            "description": "Whether there is a next page",
-            "example": true
-          },
-          "hasPrev": {
-            "type": "boolean",
-            "description": "Whether there is a previous page",
-            "example": false
-          }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total",
-          "totalPages",
-          "hasNext",
-          "hasPrev"
-        ]
-      },
-      "note_Revision_properties-id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
-        "readOnly": true
-      },
-      "note_Revision_properties-name": {
-        "type": "string",
-        "nullable": true,
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "Initial Draft"
-      },
       "note_Workspace": {
         "type": "object",
         "properties": {
@@ -2355,27 +2049,18 @@
           "data"
         ]
       },
-      "note_NoteContentUpdatedEvent": {
+      "note_NoteUpdatedEvent": {
         "type": "object",
-        "description": "When user A is in read mode, user B commits changes, user A will receive this event",
         "properties": {
           "type": {
             "type": "string",
             "enum": [
-              "NoteContentUpdatedEvent"
+              "NoteUpdatedEvent"
             ],
-            "example": "NoteContentUpdatedEvent"
+            "example": "NoteUpdatedEvent"
           },
           "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/note_Note_properties-id"
-              }
-            },
-            "required": [
-              "id"
-            ]
+            "$ref": "#/components/schemas/note_Note"
           }
         },
         "required": [
@@ -2441,57 +2126,6 @@
           "data"
         ]
       },
-      "note_tags": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "example": [
-          "work",
-          "meeting"
-        ]
-      },
-      "note_NoteInfoUpdatedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "NoteInfoUpdatedEvent"
-            ],
-            "example": "NoteInfoUpdatedEvent"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/note_Note_properties-id"
-              },
-              "name": {
-                "$ref": "#/components/schemas/note_properties-name"
-              },
-              "icon": {
-                "$ref": "#/components/schemas/note_icon"
-              },
-              "folderId": {
-                "$ref": "#/components/schemas/note_id"
-              },
-              "tags": {
-                "$ref": "#/components/schemas/note_tags"
-              }
-            },
-            "required": [
-              "id",
-              "name",
-              "icon"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
       "note_WorkspaceUpdatedEvent": {
         "type": "object",
         "properties": {
@@ -2546,7 +2180,7 @@
         "maxLength": 255,
         "example": "My Workspace"
       },
-      "note_TrashedDeletedBy": {
+      "note_TrashedBy": {
         "type": "string",
         "enum": [
           "purpose",
@@ -2571,8 +2205,8 @@
             "example": "Meeting Notes",
             "readOnly": true
           },
-          "deletedBy": {
-            "$ref": "#/components/schemas/note_TrashedDeletedBy"
+          "trashedBy": {
+            "$ref": "#/components/schemas/note_TrashedBy"
           },
           "deletedAt": {
             "type": "string",
@@ -2585,7 +2219,7 @@
         "required": [
           "id",
           "name",
-          "deletedBy",
+          "trashedBy",
           "deletedAt"
         ]
       },
@@ -2604,8 +2238,8 @@
             "example": "Work Notes",
             "readOnly": true
           },
-          "deletedBy": {
-            "$ref": "#/components/schemas/note_TrashedDeletedBy"
+          "trashedBy": {
+            "$ref": "#/components/schemas/note_TrashedBy"
           },
           "deletedAt": {
             "type": "string",
@@ -2618,8 +2252,56 @@
         "required": [
           "id",
           "name",
-          "deletedBy",
+          "trashedBy",
           "deletedAt"
+        ]
+      },
+      "note_Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Current page number",
+            "minimum": 1,
+            "example": 1
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items per page",
+            "minimum": 1,
+            "maximum": 100,
+            "example": 20
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of items",
+            "minimum": 0,
+            "example": 100
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "minimum": 0,
+            "example": 5
+          },
+          "hasNext": {
+            "type": "boolean",
+            "description": "Whether there is a next page",
+            "example": true
+          },
+          "hasPrev": {
+            "type": "boolean",
+            "description": "Whether there is a previous page",
+            "example": false
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages",
+          "hasNext",
+          "hasPrev"
         ]
       },
       "note_properties-icon": {
@@ -2752,6 +2434,24 @@
           }
         }
       },
+      "document_RenameRevisionRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "$ref": "#/components/schemas/document_name"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      },
       "note_CreateFolderRequest": {
         "required": true,
         "content": {
@@ -2817,24 +2517,6 @@
               "properties": {
                 "name": {
                   "$ref": "#/components/schemas/note_properties-name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
-      "note_RenameRevisionRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/note_Revision_properties-name"
                 }
               },
               "required": [
@@ -3042,6 +2724,56 @@
           }
         }
       },
+      "document_GetRevisionsResponse": {
+        "description": "Revisions",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/document_Revision"
+                  }
+                },
+                "pagination": {
+                  "$ref": "#/components/schemas/document_Pagination"
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            }
+          }
+        }
+      },
+      "document_GetRevisionResponse": {
+        "description": "Revision detail",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/document_Revision"
+            }
+          }
+        }
+      },
+      "document_ForbiddenError": {
+        "description": "Forbidden Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/document_Error"
+            },
+            "example": {
+              "code": "FORBIDDEN",
+              "message": "You do not have permission to access this resource",
+              "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
+            }
+          }
+        }
+      },
       "note_CreateFolderResponse": {
         "description": "Folder successfully created",
         "headers": {
@@ -3156,7 +2888,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/note_NoteWithContent"
+              "$ref": "#/components/schemas/note_Note"
             }
           }
         }
@@ -3210,54 +2942,6 @@
           }
         }
       },
-      "note_GetRevisionsResponse": {
-        "description": "Revisions",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "data": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/note_Revision"
-                  }
-                },
-                "pagination": {
-                  "$ref": "#/components/schemas/note_Pagination"
-                }
-              },
-              "required": [
-                "data",
-                "pagination"
-              ]
-            }
-          }
-        }
-      },
-      "note_ApplyRevisionResponse": {
-        "description": "Apply revision, mean create new with existing revision",
-        "headers": {
-          "Content-Location": {
-            "schema": {
-              "type": "string",
-              "format": "uri",
-              "example": "http://api.notopia.localhost/revisions/ce5060da-b15c-4aee-898f-5449fafacfc4"
-            },
-            "required": true
-          }
-        }
-      },
-      "note_GetRevisionResponse": {
-        "description": "Revision detail",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_Revision"
-            }
-          }
-        }
-      },
       "note_CreateWorkspaceResponse": {
         "description": "Workspace successfully created",
         "headers": {
@@ -3297,16 +2981,13 @@
                   "$ref": "#/components/schemas/note_FolderUpdatedEvent"
                 },
                 {
-                  "$ref": "#/components/schemas/note_NoteContentUpdatedEvent"
+                  "$ref": "#/components/schemas/note_NoteUpdatedEvent"
                 },
                 {
                   "$ref": "#/components/schemas/note_NoteCreatedEvent"
                 },
                 {
                   "$ref": "#/components/schemas/note_NoteDeletedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/note_NoteInfoUpdatedEvent"
                 },
                 {
                   "$ref": "#/components/schemas/note_WorkspaceUpdatedEvent"
@@ -3318,10 +2999,9 @@
                   "FolderCreatedEvent": "#/components/schemas/note_FolderCreatedEvent",
                   "FolderDeletedEvent": "#/components/schemas/note_FolderDeletedEvent",
                   "FolderUpdatedEvent": "#/components/schemas/note_FolderUpdatedEvent",
-                  "NoteContentUpdatedEvent": "#/components/schemas/note_NoteContentUpdatedEvent",
+                  "NoteUpdatedEvent": "#/components/schemas/note_NoteUpdatedEvent",
                   "NoteCreatedEvent": "#/components/schemas/note_NoteCreatedEvent",
                   "NoteDeletedEvent": "#/components/schemas/note_NoteDeletedEvent",
-                  "NoteInfoUpdatedEvent": "#/components/schemas/note_NoteInfoUpdatedEvent",
                   "WorkspaceUpdatedEvent": "#/components/schemas/note_WorkspaceUpdatedEvent"
                 }
               }
@@ -3411,6 +3091,49 @@
         },
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
       },
+      "document_documentIdQuery": {
+        "name": "documentId",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+      },
+      "document_pageQuery": {
+        "name": "page",
+        "in": "query",
+        "description": "Page number for pagination",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        },
+        "example": 1
+      },
+      "document_limitQuery": {
+        "name": "limit",
+        "in": "query",
+        "description": "Number of items per page",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        },
+        "example": 20
+      },
+      "document_revisionIdPath": {
+        "name": "revisionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+      },
       "note_folderIdPath": {
         "name": "folderId",
         "in": "path",
@@ -3450,22 +3173,6 @@
           "$ref": "#/components/schemas/note_Note_properties-id"
         }
       },
-      "note_noteIdQuery": {
-        "name": "noteId",
-        "in": "query",
-        "required": true,
-        "schema": {
-          "$ref": "#/components/schemas/note_Note_properties-id"
-        }
-      },
-      "note_revisionIdPath": {
-        "name": "revisionId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "$ref": "#/components/schemas/note_Revision_properties-id"
-        }
-      },
       "note_workspaceIdPath": {
         "name": "workspaceId",
         "in": "path",
@@ -3481,10 +3188,10 @@
       "name": "Notopia API",
       "tags": [
         "Document",
+        "Revision",
         "Workspace",
         "Folder",
-        "Note",
-        "Revision"
+        "Note"
       ]
     }
   ]

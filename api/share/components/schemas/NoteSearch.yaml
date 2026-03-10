@@ -4,27 +4,17 @@ type: object
 properties:
   id:
     type: string
-    description: note:{noteId}:block:{blockId}
-    example: note:46f94d4d-41b5-4df6-bf8d-270fb9a49c97:block:a-random-id
-
-  noteId:
-    type: string
-    format: uuid
     example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
 
-  noteName:
+  name:
     type: string
     minLength: 1
     maxLength: 255
     example: Meeting Notes
 
-  blockId:
+  plainTextContent:
     type: string
-    example: a-random-id
-
-  content:
-    type: string
-    description: Plain text content of the note's block
+    description: Plain text content
     example: This is the content of the note
 
   tags:
@@ -35,7 +25,5 @@ properties:
 
 required:
   - id
-  - noteId
-  - noteName
-  - blockId
-  - content
+  - name
+  - plainTextContent

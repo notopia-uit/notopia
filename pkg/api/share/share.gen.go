@@ -9,6 +9,9 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// DocumentCommittedEvent defines model for DocumentCommittedEvent.
+type DocumentCommittedEvent = EventBase
+
 // EventBase defines model for EventBase.
 type EventBase struct {
 	Data     map[string]interface{} `json:"data"`
@@ -19,55 +22,18 @@ type EventBase struct {
 	} `json:"metadata"`
 }
 
-// NoteCommittedEvent defines model for NoteCommittedEvent.
-type NoteCommittedEvent struct {
-	Data struct {
-		BlockNoteContent *NoteContent `json:"blockNoteContent"`
-		FolderId         *Id          `json:"folderId,omitempty"`
-		Name             Name         `json:"name"`
-	} `json:"data"`
-	Id       openapi_types.UUID `json:"id"`
-	Metadata struct {
-		CorrelationId *string   `json:"correlationId,omitempty"`
-		Timestamp     time.Time `json:"timestamp"`
-	} `json:"metadata"`
-}
-
-// NoteContent defines model for NoteContent.
-type NoteContent = []map[string]interface{}
-
 // NoteSearch defines model for NoteSearch.
 type NoteSearch struct {
-	BlockId string `json:"blockId"`
+	Id   string `json:"id"`
+	Name string `json:"name"`
 
-	// Content Plain text content of the note's block
-	Content string `json:"content"`
-
-	// Id note:{noteId}:block:{blockId}
-	Id       string             `json:"id"`
-	NoteId   openapi_types.UUID `json:"noteId"`
-	NoteName string             `json:"noteName"`
-	Tags     *[]string          `json:"tags,omitempty"`
+	// PlainTextContent Plain text content
+	PlainTextContent string    `json:"plainTextContent"`
+	Tags             *[]string `json:"tags,omitempty"`
 }
+
+// NoteUpdatedEvent defines model for NoteUpdatedEvent.
+type NoteUpdatedEvent = EventBase
 
 // UserDeletedEvent defines model for UserDeletedEvent.
-type UserDeletedEvent struct {
-	Data struct {
-		// UserId User ID from Authentik
-		UserId PropertiesId `json:"userId"`
-	} `json:"data"`
-	Id       openapi_types.UUID `json:"id"`
-	Metadata struct {
-		CorrelationId *string   `json:"correlationId,omitempty"`
-		Timestamp     time.Time `json:"timestamp"`
-	} `json:"metadata"`
-}
-
-// Id defines model for id.
-type Id = openapi_types.UUID
-
-// Name defines model for name.
-type Name = string
-
-// PropertiesId User ID from Authentik
-type PropertiesId = string
+type UserDeletedEvent = EventBase

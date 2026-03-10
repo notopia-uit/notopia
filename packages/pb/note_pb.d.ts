@@ -2,8 +2,7 @@
 // @generated from file note.proto (package note, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenFile, GenService } from "@bufbuild/protobuf/codegenv2";
 
 /**
  * Describes the file note.proto.
@@ -11,48 +10,8 @@ import type { Message } from "@bufbuild/protobuf";
 export declare const file_note: GenFile;
 
 /**
- * @generated from message note.GetLatestNoteContentRequest
- */
-export declare type GetLatestNoteContentRequest = Message<"note.GetLatestNoteContentRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-};
-
-/**
- * Describes the message note.GetLatestNoteContentRequest.
- * Use `create(GetLatestNoteContentRequestSchema)` to create a new message.
- */
-export declare const GetLatestNoteContentRequestSchema: GenMessage<GetLatestNoteContentRequest>;
-
-/**
- * @generated from message note.GetLatestNoteContentResponse
- */
-export declare type GetLatestNoteContentResponse = Message<"note.GetLatestNoteContentResponse"> & {
-  /**
-   * @generated from field: optional string content = 1;
-   */
-  content?: string;
-};
-
-/**
- * Describes the message note.GetLatestNoteContentResponse.
- * Use `create(GetLatestNoteContentResponseSchema)` to create a new message.
- */
-export declare const GetLatestNoteContentResponseSchema: GenMessage<GetLatestNoteContentResponse>;
-
-/**
  * @generated from service note.NoteService
  */
 export declare const NoteService: GenService<{
-  /**
-   * @generated from rpc note.NoteService.GetLatestNoteContent
-   */
-  getLatestNoteContent: {
-    methodKind: "unary";
-    input: typeof GetLatestNoteContentRequestSchema;
-    output: typeof GetLatestNoteContentResponseSchema;
-  },
 }>;
 

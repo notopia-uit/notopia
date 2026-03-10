@@ -2,6 +2,8 @@ import { DynamicModule, Module, Provider } from '@nestjs/common';
 import { ApiImplementations } from './api-implementations'
 import { DocumentApi } from './api';
 import { DocumentApiController } from './controllers';
+import { RevisionApi } from './api';
+import { RevisionApiController } from './controllers';
 
 export type ApiModuleConfiguration = {
   /**
@@ -22,6 +24,10 @@ export class ApiModule {
           provide: DocumentApi,
           useClass: configuration.apiImplementations.documentApi
         },
+        {
+          provide: RevisionApi,
+          useClass: configuration.apiImplementations.revisionApi
+        },
         ...(configuration.providers || []),
       ];
 
@@ -29,6 +35,7 @@ export class ApiModule {
         module: ApiModule,
         controllers: [
           DocumentApiController,
+          RevisionApiController,
         ],
         providers: [...providers],
         exports: [...providers]

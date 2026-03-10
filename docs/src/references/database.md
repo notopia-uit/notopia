@@ -73,6 +73,7 @@ notes: {
   folder_id: uuid {constraint: FK}
   current_revision_id: uuid {constraint: FK}
   tags: 'text[]'
+  size: integer
   created_at: timestamptz
   updated_at: timestamptz
   deleted_by: deleted_by {constraint: N}

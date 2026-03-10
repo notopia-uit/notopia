@@ -7,7 +7,7 @@ get:
   summary: Get revisions
   operationId: getRevisions
   parameters:
-    - $ref: ../components/parameters/noteIdQuery.yaml
+    - $ref: ../components/parameters/documentIdQuery.yaml
     - $ref: ../../common/components/parameters/pageQuery.yaml
     - $ref: ../../common/components/parameters/limitQuery.yaml
   responses:

@@ -65,13 +65,7 @@ skinparam class {
 !define AggregateRoot(name) class "name" as Domain.name <<(S, $sky) Aggregate Root>>
 
 package "Domain" as Domain <<Frame>> {
-    Enum(WorkspaceLevel) {
-        OWNER
-        EDITOR
-        VIEWER
-    }
-
-    Enum(DeletedBy) {
+    Enum(TrashedBy) {
         PURPOSE
         PARENT
     }
@@ -92,7 +86,7 @@ package "Domain" as Domain <<Frame>> {
         icon: *string
         workspaceID: uuid.UUID
         folderRelationship: *FolderRelationship
-        deletedBy: *DeletedBy
+        trashedBy: *TrashedBy
         deletedAt: *time.Time
 
         Rename(newName string)
@@ -114,43 +108,24 @@ package "Domain" as Domain <<Frame>> {
         id: uuid.UUID
         name: string
         icon: *string
-        folderID: uuid.UUID
         tags: []string
+        size: uint
+        folderID: uuid.UUID
         outgoingLinks: []uuid.UUID
-        currentRevisionID: *uuid.UUID
-        deletedBy: *DeletedBy
+        trashedBy: *TrashedBy
         deletedAt: *time.Time
 
         MoveNoteToFolder(folderID uuid.UUID)
         UpdateTags(tags []string)
+        UpdateSize(size uint)
         Trash()
         Restore()
-    }
-
-    AggregateRoot(Revision) {
-        id: uuid.UUID
-        noteID: uuid.UUID
-        name: *string
-        content: *RevisionContent
-        deletedAt: *time.Time
-
-        rename(newName string)
-    }
-
-    ValueObject(RevisionContent) {
-        blockNoteContent: string
-        size: int
-
-        BlockNoteContent() string
-        Size() int
     }
 
     Domain.Workspace "1" *... "1..*" Domain.Folder : contains
     Domain.Folder "1" *-- "1" Domain.FolderRelationship : has
     Domain.Folder "1" *... "0..*" Domain.Note : contains
     Domain.Note "0..*" .. "0..*" Domain.Note : links
-    Domain.Note "1" *... "0..*" Domain.Revision : has
-    Domain.Revision "1" *-- "1" Domain.RevisionContent : has
 
     RepoInterface(WorkspaceRepo) {
         GetByID(workspaceID uuid.UUID) *Workspace
@@ -169,11 +144,6 @@ package "Domain" as Domain <<Frame>> {
         Save(note *Note)
         GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []Note
         PermanentlyDelete(noteIDs ...uuid.UUID)
-    }
-
-    RepoInterface(RevisionRepo) {
-        GetByID(revisionID uuid.UUID) *Revision
-        Save(revision *Revision)
     }
 }
 @enduml
@@ -248,47 +218,66 @@ skinparam class {
 !define Model(name) class "name" as Document.name <<(C, $yellow) Model>>
 
 package "Document" as Document <<Frame>> {
-
     Entity(DocumentEntity) {
-        -name: String {readOnly}
-        -data: Buffer {readOnly}
+        id: string
+        data: Buffer
     }
 
-    Type(TagModel) {
-        -id: String {readOnly}
-        -name: String {readOnly}
-    }
-
-    Type(LinkModel) {
-        -documentId: String {readOnly}
-        -type: Backlink | OutgoingLink {readOnly}
+    Entity(RevisionEntity) {
+        id: string
+        documentId: string
+        data: Buffer
     }
 
     Model(DocumentModel) {
-        -name: String {readOnly}
-        -data: BlockNoteSchema[] {readOnly}
+        id: string
+        content: @blocknote/core.Block[]
+    }
+
+    Model(RevisionModel) {
+        id: string
+        documentId: string
+        content: @blocknote/core.Block[]
     }
 
     Type(AttachmentUploadUrl) {
-        -id: String {readOnly}
-        -url: String {readOnly}
+        id: string
+        url: string
+    }
+
+    Type(TagModel) {
+        id: string
+        name: string
     }
 
     RepoInterface(DocumentRepository) {
         Save(document: DocumentEntity)
-        GetByID(documentId: String): DocumentEntity
+        GetById(documentId: string): DocumentEntity
+    }
+
+    RepoInterface(RevisionRepository) {
+        Save(revision: RevisionEntity)
+        GetById(revisionId: string): RevisionEntity
+        GetByDocumentId(documentId: string): RevisionEntity[]
     }
 
     Service(DocumentService) {
-        -documentRepository: DocumentRepository
-        -blockNoteEditor: BlockNoteEditor
-        -attachmentService: AttachmentService
+        documentRepository: DocumentRepository
+        blockNoteEditor: BlockNoteEditor
+        attachmentService: AttachmentService
 
-        getTags(): TagModel[]
-        getLinks(): LinkModel[]
-        CreateDocument(name: String, data: Buffer): DocumentEntity
-        GetDocument(documentId: String): DocumentEntity
+        extractTags(): TagModel[]
+        extractOutgoingLinkIds(): string[]
+        CreateDocument(name: string, data: Buffer): DocumentEntity
+        GetDocument(documentId: string): DocumentEntity
         GetAttachmentUploadUrl(): AttachmentUploadUrl
+    }
+
+    Service(RevisionService) {
+        revisionRepository: RevisionRepository
+
+        GetRevision(revisionId: string): RevisionModel
+        GetRevisionsByDocumentId(documentId: string): RevisionModel[]
     }
 
     Document.DocumentService ..> Document.DocumentRepository : uses
@@ -304,6 +293,76 @@ package "Document" as Document <<Frame>> {
 
 - Typescript syntax
 - Apply layered architecture, repository pattern
+
+:::
+
+## Authorization
+
+```plantuml
+@startuml Document
+title Document
+
+!$rosewater = "#dc8a78"
+!$flamingo  = "#dd7878"
+!$pink      = "#ea76cb"
+!$mauve     = "#8839ef"
+!$red       = "#d20f39"
+!$maroon    = "#e64553"
+!$peach     = "#fe640b"
+!$yellow    = "#df8e1d"
+!$green     = "#40a02b"
+!$teal      = "#179299"
+!$sky       = "#04a5e5"
+!$sapphire  = "#209fb5"
+!$lavender  = "#7287fd"
+!$blue      = "#1e66f5"
+!$text      = "#4c4f69"
+!$subtext1  = "#5c5f77"
+!$subtext0  = "#6c6f85"
+!$overlay2  = "#7c7f93"
+!$overlay1  = "#8c8fa1"
+!$overlay0  = "#9ca0b0"
+!$surface2  = "#acb0be"
+!$surface1  = "#bcc0cc"
+!$surface0  = "#ccd0da"
+!$base      = "#eff1f5"
+!$mantle    = "#e6e9ef"
+!$crust     = "#dce0e8"
+
+skinparam backgroundColor $base
+skinparam defaultFontColor $text
+skinparam roundcorner 16
+skinparam classFontStyle bold
+skinparam ArrowColor $subtext0
+skinparam packageStyle rectangle
+
+skinparam package {
+    BackgroundColor $mantle
+    BorderColor $surface1
+    FontColor $mauve
+}
+
+skinparam class {
+    BackgroundColor $base
+    BorderColor $surface1
+    HeaderBackgroundColor $surface0
+    AttributeFontColor $text
+}
+
+!define Enum(name) enum "name" as name <<(E, $flamingo) Enum>>
+
+Enum(WorkspaceRole) {
+    OWNER
+    EDITOR
+    VIEWER
+}
+```
+
+<!-- diagram id="class-diagram-authorization" -->
+
+:::info
+
+- Golang syntax
 
 :::
 

@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { applyRevision, createFolder, createNote, createWorkspace, deleteNote, deleteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getNote, getNoteGraph, getNoteLinks, getNotes, getRevision, getRevisions, getWorkspace, getWorkspaceGraph, getWorkspaceMembers, getWorkspaceTree, importDocuments, moveWorkspaceItems, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceMembers, wsDocument } from '../sdk.gen';
-import type { ApplyRevisionData, ApplyRevisionError, ApplyRevisionResponse, CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetNotesData, GetNotesError, GetNotesResponse, GetRevisionData, GetRevisionError, GetRevisionResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, ImportDocumentsData, ImportDocumentsError, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse, WsDocumentData, WsDocumentError } from '../types.gen';
+import { createFolder, createNote, createWorkspace, deleteNote, deleteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getNote, getNoteGraph, getNoteLinks, getNotes, getRevision, getRevisions, getWorkspace, getWorkspaceGraph, getWorkspaceMembers, getWorkspaceTree, importDocuments, moveWorkspaceItems, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceMembers, wsDocument } from '../sdk.gen';
+import type { CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetNotesData, GetNotesError, GetNotesResponse, GetRevisionData, GetRevisionError, GetRevisionResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, ImportDocumentsData, ImportDocumentsError, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse, WsDocumentData, WsDocumentError } from '../types.gen';
 
 /**
  * Import documents
@@ -94,6 +94,132 @@ export const getDocumentAttachmentUploadUrlOptions = (options: Options<GetDocume
     queryKey: getDocumentAttachmentUploadUrlQueryKey(options)
 });
 
+export const getRevisionsQueryKey = (options: Options<GetRevisionsData>) => createQueryKey('getRevisions', options);
+
+/**
+ * Get revisions
+ */
+export const getRevisionsOptions = (options: Options<GetRevisionsData>) => queryOptions<GetRevisionsResponse, GetRevisionsError, GetRevisionsResponse, ReturnType<typeof getRevisionsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getRevisions({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getRevisionsQueryKey(options)
+});
+
+const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
+    const params = { ...queryKey[0] };
+    if (page.body) {
+        params.body = {
+            ...queryKey[0].body as any,
+            ...page.body as any
+        };
+    }
+    if (page.headers) {
+        params.headers = {
+            ...queryKey[0].headers,
+            ...page.headers
+        };
+    }
+    if (page.path) {
+        params.path = {
+            ...queryKey[0].path as any,
+            ...page.path as any
+        };
+    }
+    if (page.query) {
+        params.query = {
+            ...queryKey[0].query as any,
+            ...page.query as any
+        };
+    }
+    return params as unknown as typeof page;
+};
+
+export const getRevisionsInfiniteQueryKey = (options: Options<GetRevisionsData>): QueryKey<Options<GetRevisionsData>> => createQueryKey('getRevisions', options, true);
+
+/**
+ * Get revisions
+ */
+export const getRevisionsInfiniteOptions = (options: Options<GetRevisionsData>) => infiniteQueryOptions<GetRevisionsResponse, GetRevisionsError, InfiniteData<GetRevisionsResponse>, QueryKey<Options<GetRevisionsData>>, number | Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+// @ts-ignore
+{
+    queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+            query: {
+                page: pageParam
+            }
+        };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await getRevisions({
+            ...options,
+            ...params,
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getRevisionsInfiniteQueryKey(options)
+});
+
+/**
+ * Delete revision
+ */
+export const deleteRevisionMutation = (options?: Partial<Options<DeleteRevisionData>>): UseMutationOptions<DeleteRevisionResponse, DeleteRevisionError, Options<DeleteRevisionData>> => {
+    const mutationOptions: UseMutationOptions<DeleteRevisionResponse, DeleteRevisionError, Options<DeleteRevisionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteRevision({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getRevisionQueryKey = (options: Options<GetRevisionData>) => createQueryKey('getRevision', options);
+
+/**
+ * Get revision details
+ */
+export const getRevisionOptions = (options: Options<GetRevisionData>) => queryOptions<GetRevisionResponse, GetRevisionError, GetRevisionResponse, ReturnType<typeof getRevisionQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getRevision({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getRevisionQueryKey(options)
+});
+
+/**
+ * Rename revision
+ */
+export const renameRevisionMutation = (options?: Partial<Options<RenameRevisionData>>): UseMutationOptions<RenameRevisionResponse, RenameRevisionError, Options<RenameRevisionData>> => {
+    const mutationOptions: UseMutationOptions<RenameRevisionResponse, RenameRevisionError, Options<RenameRevisionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await renameRevision({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 /**
  * Create folder
  */
@@ -145,35 +271,6 @@ export const getNotesOptions = (options?: Options<GetNotesData>) => queryOptions
     },
     queryKey: getNotesQueryKey(options)
 });
-
-const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
-    const params = { ...queryKey[0] };
-    if (page.body) {
-        params.body = {
-            ...queryKey[0].body as any,
-            ...page.body as any
-        };
-    }
-    if (page.headers) {
-        params.headers = {
-            ...queryKey[0].headers,
-            ...page.headers
-        };
-    }
-    if (page.path) {
-        params.path = {
-            ...queryKey[0].path as any,
-            ...page.path as any
-        };
-    }
-    if (page.query) {
-        params.query = {
-            ...queryKey[0].query as any,
-            ...page.query as any
-        };
-    }
-    return params as unknown as typeof page;
-};
 
 export const getNotesInfiniteQueryKey = (options?: Options<GetNotesData>): QueryKey<Options<GetNotesData>> => createQueryKey('getNotes', options, true);
 
@@ -357,120 +454,6 @@ export const unpublishNoteMutation = (options?: Partial<Options<UnpublishNoteDat
     };
     return mutationOptions;
 };
-
-export const getRevisionsQueryKey = (options: Options<GetRevisionsData>) => createQueryKey('getRevisions', options);
-
-/**
- * Get revisions
- */
-export const getRevisionsOptions = (options: Options<GetRevisionsData>) => queryOptions<GetRevisionsResponse, GetRevisionsError, GetRevisionsResponse, ReturnType<typeof getRevisionsQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getRevisions({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getRevisionsQueryKey(options)
-});
-
-export const getRevisionsInfiniteQueryKey = (options: Options<GetRevisionsData>): QueryKey<Options<GetRevisionsData>> => createQueryKey('getRevisions', options, true);
-
-/**
- * Get revisions
- */
-export const getRevisionsInfiniteOptions = (options: Options<GetRevisionsData>) => infiniteQueryOptions<GetRevisionsResponse, GetRevisionsError, InfiniteData<GetRevisionsResponse>, QueryKey<Options<GetRevisionsData>>, number | Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
-// @ts-ignore
-{
-    queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
-            query: {
-                page: pageParam
-            }
-        };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getRevisions({
-            ...options,
-            ...params,
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getRevisionsInfiniteQueryKey(options)
-});
-
-/**
- * Apply revision
- */
-export const applyRevisionMutation = (options?: Partial<Options<ApplyRevisionData>>): UseMutationOptions<ApplyRevisionResponse, ApplyRevisionError, Options<ApplyRevisionData>> => {
-    const mutationOptions: UseMutationOptions<ApplyRevisionResponse, ApplyRevisionError, Options<ApplyRevisionData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await applyRevision({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Rename revision
- */
-export const renameRevisionMutation = (options?: Partial<Options<RenameRevisionData>>): UseMutationOptions<RenameRevisionResponse, RenameRevisionError, Options<RenameRevisionData>> => {
-    const mutationOptions: UseMutationOptions<RenameRevisionResponse, RenameRevisionError, Options<RenameRevisionData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await renameRevision({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Delete revision
- */
-export const deleteRevisionMutation = (options?: Partial<Options<DeleteRevisionData>>): UseMutationOptions<DeleteRevisionResponse, DeleteRevisionError, Options<DeleteRevisionData>> => {
-    const mutationOptions: UseMutationOptions<DeleteRevisionResponse, DeleteRevisionError, Options<DeleteRevisionData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteRevision({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const getRevisionQueryKey = (options: Options<GetRevisionData>) => createQueryKey('getRevision', options);
-
-/**
- * Get revision details
- */
-export const getRevisionOptions = (options: Options<GetRevisionData>) => queryOptions<GetRevisionResponse, GetRevisionError, GetRevisionResponse, ReturnType<typeof getRevisionQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getRevision({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getRevisionQueryKey(options)
-});
 
 /**
  * Create workspace

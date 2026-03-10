@@ -3,6 +3,7 @@ type: array
 items:
   type: object
 nullable: true
+description: BlockNote model
 example:
   [
     { 'type': 'paragraph', 'content': 'Welcome to this demo!' },

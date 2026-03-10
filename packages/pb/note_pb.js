@@ -2,28 +2,13 @@
 // @generated from file note.proto (package note, syntax proto3)
 /* eslint-disable */
 
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import { file_buf_validate_validate } from "./buf/validate/validate_pb";
+import { fileDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 
 /**
  * Describes the file note.proto.
  */
 export const file_note = /*@__PURE__*/
-  fileDesc("Cgpub3RlLnByb3RvEgRub3RlIjEKG0dldExhdGVzdE5vdGVDb250ZW50UmVxdWVzdBISCgJpZBgBIAEoCUIGukgDyAEBIkAKHEdldExhdGVzdE5vdGVDb250ZW50UmVzcG9uc2USFAoHY29udGVudBgBIAEoCUgAiAEBQgoKCF9jb250ZW50MmwKC05vdGVTZXJ2aWNlEl0KFEdldExhdGVzdE5vdGVDb250ZW50EiEubm90ZS5HZXRMYXRlc3ROb3RlQ29udGVudFJlcXVlc3QaIi5ub3RlLkdldExhdGVzdE5vdGVDb250ZW50UmVzcG9uc2VCbAoIY29tLm5vdGVCCU5vdGVQcm90b1ABWiVnaXRodWIuY29tL25vdG9waWEtdWl0L25vdG9waWEvcGtnL3BiogIDTlhYqgIETm90ZcoCBE5vdGXiAhBOb3RlXEdQQk1ldGFkYXRh6gIETm90ZWIGcHJvdG8z", [file_buf_validate_validate]);
-
-/**
- * Describes the message note.GetLatestNoteContentRequest.
- * Use `create(GetLatestNoteContentRequestSchema)` to create a new message.
- */
-export const GetLatestNoteContentRequestSchema = /*@__PURE__*/
-  messageDesc(file_note, 0);
-
-/**
- * Describes the message note.GetLatestNoteContentResponse.
- * Use `create(GetLatestNoteContentResponseSchema)` to create a new message.
- */
-export const GetLatestNoteContentResponseSchema = /*@__PURE__*/
-  messageDesc(file_note, 1);
+  fileDesc("Cgpub3RlLnByb3RvEgRub3RlMg0KC05vdGVTZXJ2aWNlQmwKCGNvbS5ub3RlQglOb3RlUHJvdG9QAVolZ2l0aHViLmNvbS9ub3RvcGlhLXVpdC9ub3RvcGlhL3BrZy9wYqICA05YWKoCBE5vdGXKAgROb3Rl4gIQTm90ZVxHUEJNZXRhZGF0YeoCBE5vdGViBnByb3RvMw");
 
 /**
  * @generated from service note.NoteService

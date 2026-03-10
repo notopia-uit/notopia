@@ -2,16 +2,4 @@ syntax = "proto3";
 
 package note;
 
-import "buf/validate/validate.proto";
-
-service NoteService {
-  rpc GetLatestNoteContent(GetLatestNoteContentRequest) returns (GetLatestNoteContentResponse);
-}
-
-message GetLatestNoteContentRequest {
-  string id = 1 [(buf.validate.field).required = true];
-}
-
-message GetLatestNoteContentResponse {
-  optional string content = 1;
-}
+service NoteService {}

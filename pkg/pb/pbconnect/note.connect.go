@@ -6,11 +6,8 @@ package pbconnect
 
 import (
 	connect "connectrpc.com/connect"
-	context "context"
-	errors "errors"
-	pb "github.com/notopia-uit/notopia/pkg/pb"
+	_ "github.com/notopia-uit/notopia/pkg/pb"
 	http "net/http"
-	strings "strings"
 )
 
 // This is a compile-time assertion to ensure that this generated file and the connect package are
@@ -25,22 +22,8 @@ const (
 	NoteServiceName = "note.NoteService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
-//
-// Note that these are different from the fully-qualified method names used by
-// google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
-// reflection-formatted method names, remove the leading slash and convert the remaining slash to a
-// period.
-const (
-	// NoteServiceGetLatestNoteContentProcedure is the fully-qualified name of the NoteService's
-	// GetLatestNoteContent RPC.
-	NoteServiceGetLatestNoteContentProcedure = "/note.NoteService/GetLatestNoteContent"
-)
-
 // NoteServiceClient is a client for the note.NoteService service.
 type NoteServiceClient interface {
-	GetLatestNoteContent(context.Context, *connect.Request[pb.GetLatestNoteContentRequest]) (*connect.Response[pb.GetLatestNoteContentResponse], error)
 }
 
 // NewNoteServiceClient constructs a client for the note.NoteService service. By default, it uses
@@ -51,31 +34,15 @@ type NoteServiceClient interface {
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
 func NewNoteServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) NoteServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	noteServiceMethods := pb.File_note_proto.Services().ByName("NoteService").Methods()
-	return &noteServiceClient{
-		getLatestNoteContent: connect.NewClient[pb.GetLatestNoteContentRequest, pb.GetLatestNoteContentResponse](
-			httpClient,
-			baseURL+NoteServiceGetLatestNoteContentProcedure,
-			connect.WithSchema(noteServiceMethods.ByName("GetLatestNoteContent")),
-			connect.WithClientOptions(opts...),
-		),
-	}
+	return &noteServiceClient{}
 }
 
 // noteServiceClient implements NoteServiceClient.
 type noteServiceClient struct {
-	getLatestNoteContent *connect.Client[pb.GetLatestNoteContentRequest, pb.GetLatestNoteContentResponse]
-}
-
-// GetLatestNoteContent calls note.NoteService.GetLatestNoteContent.
-func (c *noteServiceClient) GetLatestNoteContent(ctx context.Context, req *connect.Request[pb.GetLatestNoteContentRequest]) (*connect.Response[pb.GetLatestNoteContentResponse], error) {
-	return c.getLatestNoteContent.CallUnary(ctx, req)
 }
 
 // NoteServiceHandler is an implementation of the note.NoteService service.
 type NoteServiceHandler interface {
-	GetLatestNoteContent(context.Context, *connect.Request[pb.GetLatestNoteContentRequest]) (*connect.Response[pb.GetLatestNoteContentResponse], error)
 }
 
 // NewNoteServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -84,17 +51,8 @@ type NoteServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewNoteServiceHandler(svc NoteServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	noteServiceMethods := pb.File_note_proto.Services().ByName("NoteService").Methods()
-	noteServiceGetLatestNoteContentHandler := connect.NewUnaryHandler(
-		NoteServiceGetLatestNoteContentProcedure,
-		svc.GetLatestNoteContent,
-		connect.WithSchema(noteServiceMethods.ByName("GetLatestNoteContent")),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/note.NoteService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case NoteServiceGetLatestNoteContentProcedure:
-			noteServiceGetLatestNoteContentHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -103,7 +61,3 @@ func NewNoteServiceHandler(svc NoteServiceHandler, opts ...connect.HandlerOption
 
 // UnimplementedNoteServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedNoteServiceHandler struct{}
-
-func (UnimplementedNoteServiceHandler) GetLatestNoteContent(context.Context, *connect.Request[pb.GetLatestNoteContentRequest]) (*connect.Response[pb.GetLatestNoteContentResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("note.NoteService.GetLatestNoteContent is not implemented"))
-}

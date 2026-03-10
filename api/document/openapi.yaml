@@ -20,7 +20,9 @@ info:
 
 tags:
   - name: Document
-    description: Operations related to documenting notes, collaboration.
+    description: Note content for editing, collaborating
+  - name: Revision
+    description: Document revisions
 
 paths:
   /document/documents/import:
@@ -29,6 +31,13 @@ paths:
     $ref: ./paths/ws_documents_{documentId}.yaml
   /document/documents/{documentId}/attachment-url:
     $ref: ./paths/documents_{documentId}_attachment-url.yaml
+
+  /document/revisions:
+    $ref: ./paths/revisions.yaml
+  /document/revisions/{revisionId}:
+    $ref: ./paths/revisions_{revisionId}.yaml
+  /document/revisions/{revisionId}/rename:
+    $ref: ./paths/revisions_{revisionId}_rename.yaml
 
 components:
   securitySchemes:

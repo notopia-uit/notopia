@@ -14,8 +14,8 @@ properties:
     example: Meeting Notes
     readOnly: true
 
-  deletedBy:
-    $ref: ./TrashedDeletedBy.yaml
+  trashedBy:
+    $ref: ./TrashedBy.yaml
 
   deletedAt:
     type: string
@@ -27,5 +27,5 @@ properties:
 required:
   - id
   - name
-  - deletedBy
+  - trashedBy
   - deletedAt

@@ -84,21 +84,6 @@ func (e GraphNodesType) Valid() bool {
 	}
 }
 
-// Defines values for NoteContentUpdatedEventType.
-const (
-	NoteContentUpdatedEventTypeNoteContentUpdatedEvent NoteContentUpdatedEventType = "NoteContentUpdatedEvent"
-)
-
-// Valid indicates whether the value is a known member of the NoteContentUpdatedEventType enum.
-func (e NoteContentUpdatedEventType) Valid() bool {
-	switch e {
-	case NoteContentUpdatedEventTypeNoteContentUpdatedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for NoteCreatedEventType.
 const (
 	NoteCreatedEventTypeNoteCreatedEvent NoteCreatedEventType = "NoteCreatedEvent"
@@ -129,29 +114,29 @@ func (e NoteDeletedEventType) Valid() bool {
 	}
 }
 
-// Defines values for NoteInfoUpdatedEventType.
+// Defines values for NoteUpdatedEventType.
 const (
-	NoteInfoUpdatedEventTypeNoteInfoUpdatedEvent NoteInfoUpdatedEventType = "NoteInfoUpdatedEvent"
+	NoteUpdatedEventTypeNoteUpdatedEvent NoteUpdatedEventType = "NoteUpdatedEvent"
 )
 
-// Valid indicates whether the value is a known member of the NoteInfoUpdatedEventType enum.
-func (e NoteInfoUpdatedEventType) Valid() bool {
+// Valid indicates whether the value is a known member of the NoteUpdatedEventType enum.
+func (e NoteUpdatedEventType) Valid() bool {
 	switch e {
-	case NoteInfoUpdatedEventTypeNoteInfoUpdatedEvent:
+	case NoteUpdatedEventTypeNoteUpdatedEvent:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for TrashedDeletedBy.
+// Defines values for TrashedBy.
 const (
-	Parent  TrashedDeletedBy = "parent"
-	Purpose TrashedDeletedBy = "purpose"
+	Parent  TrashedBy = "parent"
+	Purpose TrashedBy = "purpose"
 )
 
-// Valid indicates whether the value is a known member of the TrashedDeletedBy enum.
-func (e TrashedDeletedBy) Valid() bool {
+// Valid indicates whether the value is a known member of the TrashedBy enum.
+func (e TrashedBy) Valid() bool {
 	switch e {
 	case Parent:
 		return true
@@ -289,20 +274,6 @@ type Note struct {
 	UpdatedAt          *time.Time          `json:"updatedAt,omitempty"`
 }
 
-// NoteContent defines model for NoteContent.
-type NoteContent = []map[string]interface{}
-
-// NoteContentUpdatedEvent When user A is in read mode, user B commits changes, user A will receive this event
-type NoteContentUpdatedEvent struct {
-	Data struct {
-		Id *NotePropertiesId `json:"id,omitempty"`
-	} `json:"data"`
-	Type NoteContentUpdatedEventType `json:"type"`
-}
-
-// NoteContentUpdatedEventType defines model for NoteContentUpdatedEvent.Type.
-type NoteContentUpdatedEventType string
-
 // NoteCreatedEvent defines model for NoteCreatedEvent.
 type NoteCreatedEvent struct {
 	Data struct {
@@ -326,21 +297,6 @@ type NoteDeletedEvent struct {
 // NoteDeletedEventType defines model for NoteDeletedEvent.Type.
 type NoteDeletedEventType string
 
-// NoteInfoUpdatedEvent defines model for NoteInfoUpdatedEvent.
-type NoteInfoUpdatedEvent struct {
-	Data struct {
-		FolderId *Id               `json:"folderId,omitempty"`
-		Icon     *Icon             `json:"icon"`
-		Id       *NotePropertiesId `json:"id,omitempty"`
-		Name     PropertiesName    `json:"name"`
-		Tags     *Tags             `json:"tags,omitempty"`
-	} `json:"data"`
-	Type NoteInfoUpdatedEventType `json:"type"`
-}
-
-// NoteInfoUpdatedEventType defines model for NoteInfoUpdatedEvent.Type.
-type NoteInfoUpdatedEventType string
-
 // NoteLink defines model for NoteLink.
 type NoteLink struct {
 	Icon *Icon             `json:"icon"`
@@ -348,18 +304,14 @@ type NoteLink struct {
 	Name PropertiesName    `json:"name"`
 }
 
-// NoteWithContent defines model for NoteWithContent.
-type NoteWithContent struct {
-	BacklinksCount     *int                `json:"backlinksCount,omitempty"`
-	Content            *NoteContent        `json:"content,omitempty"`
-	FolderId           *Id                 `json:"folderId,omitempty"`
-	Icon               *string             `json:"icon"`
-	Id                 *openapi_types.UUID `json:"id,omitempty"`
-	Name               string              `json:"name"`
-	OutgoingLinksCount *int                `json:"outgoingLinksCount,omitempty"`
-	Tags               []string            `json:"tags"`
-	UpdatedAt          *time.Time          `json:"updatedAt,omitempty"`
+// NoteUpdatedEvent defines model for NoteUpdatedEvent.
+type NoteUpdatedEvent struct {
+	Data Note                 `json:"data"`
+	Type NoteUpdatedEventType `json:"type"`
 }
+
+// NoteUpdatedEventType defines model for NoteUpdatedEvent.Type.
+type NoteUpdatedEventType string
 
 // NotePropertiesId defines model for Note_properties-id.
 type NotePropertiesId = openapi_types.UUID
@@ -385,37 +337,23 @@ type Pagination struct {
 	TotalPages int `json:"totalPages"`
 }
 
-// Revision defines model for Revision.
-type Revision struct {
-	Content   *NoteContent        `json:"content"`
-	CreatedAt *time.Time          `json:"createdAt,omitempty"`
-	Id        *openapi_types.UUID `json:"id,omitempty"`
-	Name      *string             `json:"name"`
-}
-
-// RevisionPropertiesId defines model for Revision_properties-id.
-type RevisionPropertiesId = openapi_types.UUID
-
-// RevisionPropertiesName defines model for Revision_properties-name.
-type RevisionPropertiesName = string
-
-// TrashedDeletedBy defines model for TrashedDeletedBy.
-type TrashedDeletedBy string
+// TrashedBy defines model for TrashedBy.
+type TrashedBy string
 
 // TrashedFolder defines model for TrashedFolder.
 type TrashedFolder struct {
 	DeletedAt *time.Time         `json:"deletedAt,omitempty"`
-	DeletedBy *TrashedDeletedBy  `json:"deletedBy,omitempty"`
 	Id        openapi_types.UUID `json:"id"`
 	Name      *string            `json:"name,omitempty"`
+	TrashedBy *TrashedBy         `json:"trashedBy,omitempty"`
 }
 
 // TrashedNote defines model for TrashedNote.
 type TrashedNote struct {
 	DeletedAt *time.Time         `json:"deletedAt,omitempty"`
-	DeletedBy *TrashedDeletedBy  `json:"deletedBy,omitempty"`
 	Id        openapi_types.UUID `json:"id"`
 	Name      *string            `json:"name,omitempty"`
+	TrashedBy *TrashedBy         `json:"trashedBy,omitempty"`
 }
 
 // UserPropertiesId User ID from Authentik
@@ -488,9 +426,6 @@ type PropertiesName = string
 // PropertiesUpdatedAt defines model for properties-updatedAt.
 type PropertiesUpdatedAt = time.Time
 
-// Tags defines model for tags.
-type Tags = []string
-
 // UpdatedAt defines model for updatedAt.
 type UpdatedAt = time.Time
 
@@ -503,14 +438,8 @@ type LimitQuery = int
 // NoteIdPath defines model for noteIdPath.
 type NoteIdPath = NotePropertiesId
 
-// NoteIdQuery defines model for noteIdQuery.
-type NoteIdQuery = NotePropertiesId
-
 // PageQuery defines model for pageQuery.
 type PageQuery = int
-
-// RevisionIdPath defines model for revisionIdPath.
-type RevisionIdPath = RevisionPropertiesId
 
 // WorkspaceIdPath defines model for workspaceIdPath.
 type WorkspaceIdPath = PropertiesId
@@ -531,19 +460,10 @@ type GetNoteLinksResponse struct {
 }
 
 // GetNoteResponse defines model for GetNoteResponse.
-type GetNoteResponse = NoteWithContent
+type GetNoteResponse = Note
 
 // GetNotesResponse defines model for GetNotesResponse.
 type GetNotesResponse = Note
-
-// GetRevisionResponse defines model for GetRevisionResponse.
-type GetRevisionResponse = Revision
-
-// GetRevisionsResponse defines model for GetRevisionsResponse.
-type GetRevisionsResponse struct {
-	Data       []Revision `json:"data"`
-	Pagination Pagination `json:"pagination"`
-}
 
 // GetWorkspaceGraphResponse defines model for GetWorkspaceGraphResponse.
 type GetWorkspaceGraphResponse = Graph
@@ -605,11 +525,6 @@ type RenameNoteRequest struct {
 	Name PropertiesName `json:"name"`
 }
 
-// RenameRevisionRequest defines model for RenameRevisionRequest.
-type RenameRevisionRequest struct {
-	Name *RevisionPropertiesName `json:"name"`
-}
-
 // RenameWorkspaceRequest defines model for RenameWorkspaceRequest.
 type RenameWorkspaceRequest struct {
 	Name WorkspacePropertiesName `json:"name"`
@@ -649,11 +564,6 @@ type GenerateDailyNoteJSONBody struct {
 	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
 
-// GetNoteParams defines parameters for GetNote.
-type GetNoteParams struct {
-	IncludeContent *bool `form:"includeContent,omitempty" json:"includeContent,omitempty"`
-}
-
 // GetNoteGraphParams defines parameters for GetNoteGraph.
 type GetNoteGraphParams struct {
 	Depth *int `form:"depth,omitempty" json:"depth,omitempty"`
@@ -668,22 +578,6 @@ type GetNoteLinksParams struct {
 // RenameNoteJSONBody defines parameters for RenameNote.
 type RenameNoteJSONBody struct {
 	Name PropertiesName `json:"name"`
-}
-
-// GetRevisionsParams defines parameters for GetRevisions.
-type GetRevisionsParams struct {
-	NoteId NoteIdQuery `form:"noteId" json:"noteId"`
-
-	// Page Page number for pagination
-	Page *PageQuery `form:"page,omitempty" json:"page,omitempty"`
-
-	// Limit Number of items per page
-	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
-}
-
-// RenameRevisionJSONBody defines parameters for RenameRevision.
-type RenameRevisionJSONBody struct {
-	Name *RevisionPropertiesName `json:"name"`
 }
 
 // GetWorkspaceGraphParams defines parameters for GetWorkspaceGraph.
@@ -733,9 +627,6 @@ type GenerateDailyNoteJSONRequestBody GenerateDailyNoteJSONBody
 // RenameNoteJSONRequestBody defines body for RenameNote for application/json ContentType.
 type RenameNoteJSONRequestBody RenameNoteJSONBody
 
-// RenameRevisionJSONRequestBody defines body for RenameRevision for application/json ContentType.
-type RenameRevisionJSONRequestBody RenameRevisionJSONBody
-
 // CreateWorkspaceJSONRequestBody defines body for CreateWorkspace for application/json ContentType.
 type CreateWorkspaceJSONRequestBody = Workspace
 
@@ -776,7 +667,7 @@ type ServerInterface interface {
 	DeleteNote(c *gin.Context, noteId NoteIdPath)
 	// Get note
 	// (GET /note/notes/{noteId})
-	GetNote(c *gin.Context, noteId NoteIdPath, params GetNoteParams)
+	GetNote(c *gin.Context, noteId NoteIdPath)
 	// Get note graph
 	// (GET /note/notes/{noteId}/graph)
 	GetNoteGraph(c *gin.Context, noteId NoteIdPath, params GetNoteGraphParams)
@@ -792,21 +683,6 @@ type ServerInterface interface {
 	// Unpublish note
 	// (POST /note/notes/{noteId}/unpublish)
 	UnpublishNote(c *gin.Context, noteId NoteIdPath)
-	// Get revisions
-	// (GET /note/revisions)
-	GetRevisions(c *gin.Context, params GetRevisionsParams)
-	// Delete revision
-	// (DELETE /note/revisions/{revisionId})
-	DeleteRevision(c *gin.Context, revisionId RevisionIdPath)
-	// Get revision details
-	// (GET /note/revisions/{revisionId})
-	GetRevision(c *gin.Context, revisionId RevisionIdPath)
-	// Apply revision
-	// (POST /note/revisions/{revisionId}/apply)
-	ApplyRevision(c *gin.Context, revisionId RevisionIdPath)
-	// Rename revision
-	// (POST /note/revisions/{revisionId}/rename)
-	RenameRevision(c *gin.Context, revisionId RevisionIdPath)
 	// Create workspace
 	// (POST /note/workspaces)
 	CreateWorkspace(c *gin.Context)
@@ -1012,17 +888,6 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 
 	c.Set(Oauth2Scopes, []string{})
 
-	// Parameter object where we will unmarshal all parameters from the context
-	var params GetNoteParams
-
-	// ------------- Optional query parameter "includeContent" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "includeContent", c.Request.URL.Query(), &params.IncludeContent, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter includeContent: %w", err), http.StatusBadRequest)
-		return
-	}
-
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -1030,7 +895,7 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetNote(c, noteId, params)
+	siw.Handler.GetNote(c, noteId)
 }
 
 // GetNoteGraph operation middleware
@@ -1191,161 +1056,6 @@ func (siw *ServerInterfaceWrapper) UnpublishNote(c *gin.Context) {
 	}
 
 	siw.Handler.UnpublishNote(c, noteId)
-}
-
-// GetRevisions operation middleware
-func (siw *ServerInterfaceWrapper) GetRevisions(c *gin.Context) {
-
-	var err error
-
-	c.Set(Oauth2Scopes, []string{})
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params GetRevisionsParams
-
-	// ------------- Required query parameter "noteId" -------------
-
-	if paramValue := c.Query("noteId"); paramValue != "" {
-
-	} else {
-		siw.ErrorHandler(c, fmt.Errorf("Query argument noteId is required, but not found"), http.StatusBadRequest)
-		return
-	}
-
-	err = runtime.BindQueryParameterWithOptions("form", true, true, "noteId", c.Request.URL.Query(), &params.NoteId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter noteId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Optional query parameter "page" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", c.Request.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", c.Request.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetRevisions(c, params)
-}
-
-// DeleteRevision operation middleware
-func (siw *ServerInterfaceWrapper) DeleteRevision(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "revisionId" -------------
-	var revisionId RevisionIdPath
-
-	err = runtime.BindStyledParameterWithOptions("simple", "revisionId", c.Param("revisionId"), &revisionId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter revisionId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	c.Set(Oauth2Scopes, []string{})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.DeleteRevision(c, revisionId)
-}
-
-// GetRevision operation middleware
-func (siw *ServerInterfaceWrapper) GetRevision(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "revisionId" -------------
-	var revisionId RevisionIdPath
-
-	err = runtime.BindStyledParameterWithOptions("simple", "revisionId", c.Param("revisionId"), &revisionId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter revisionId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	c.Set(Oauth2Scopes, []string{})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetRevision(c, revisionId)
-}
-
-// ApplyRevision operation middleware
-func (siw *ServerInterfaceWrapper) ApplyRevision(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "revisionId" -------------
-	var revisionId RevisionIdPath
-
-	err = runtime.BindStyledParameterWithOptions("simple", "revisionId", c.Param("revisionId"), &revisionId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter revisionId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	c.Set(Oauth2Scopes, []string{})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.ApplyRevision(c, revisionId)
-}
-
-// RenameRevision operation middleware
-func (siw *ServerInterfaceWrapper) RenameRevision(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "revisionId" -------------
-	var revisionId RevisionIdPath
-
-	err = runtime.BindStyledParameterWithOptions("simple", "revisionId", c.Param("revisionId"), &revisionId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter revisionId: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	c.Set(Oauth2Scopes, []string{})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.RenameRevision(c, revisionId)
 }
 
 // CreateWorkspace operation middleware
@@ -1777,11 +1487,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/notes/:noteId/publish", wrapper.PublishNote)
 	router.POST(options.BaseURL+"/note/notes/:noteId/rename", wrapper.RenameNote)
 	router.POST(options.BaseURL+"/note/notes/:noteId/unpublish", wrapper.UnpublishNote)
-	router.GET(options.BaseURL+"/note/revisions", wrapper.GetRevisions)
-	router.DELETE(options.BaseURL+"/note/revisions/:revisionId", wrapper.DeleteRevision)
-	router.GET(options.BaseURL+"/note/revisions/:revisionId", wrapper.GetRevision)
-	router.POST(options.BaseURL+"/note/revisions/:revisionId/apply", wrapper.ApplyRevision)
-	router.POST(options.BaseURL+"/note/revisions/:revisionId/rename", wrapper.RenameRevision)
 	router.POST(options.BaseURL+"/note/workspaces", wrapper.CreateWorkspace)
 	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.DeleteWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.GetWorkspace)
@@ -1797,13 +1502,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/trash-items", wrapper.TrashWorkspaceItems)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/tree", wrapper.GetWorkspaceTree)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/unpublish", wrapper.UnpublishWorkspace)
-}
-
-type ApplyRevisionResponseResponseHeaders struct {
-	ContentLocation string
-}
-type ApplyRevisionResponseResponse struct {
-	Headers ApplyRevisionResponseResponseHeaders
 }
 
 type BadRequestErrorJSONResponse Error
@@ -1845,16 +1543,9 @@ type GetNoteLinksResponseJSONResponse struct {
 	OutgoingLinks *[]NoteLink `json:"outgoingLinks,omitempty"`
 }
 
-type GetNoteResponseJSONResponse NoteWithContent
+type GetNoteResponseJSONResponse Note
 
 type GetNotesResponseJSONResponse Note
-
-type GetRevisionResponseJSONResponse Revision
-
-type GetRevisionsResponseJSONResponse struct {
-	Data       []Revision `json:"data"`
-	Pagination Pagination `json:"pagination"`
-}
 
 type GetWorkspaceEventsResponseTexteventStreamResponse struct {
 	Body io.Reader
@@ -2194,7 +1885,6 @@ func (response DeleteNote500JSONResponse) VisitDeleteNoteResponse(w http.Respons
 
 type GetNoteRequestObject struct {
 	NoteId NoteIdPath `json:"noteId"`
-	Params GetNoteParams
 }
 
 type GetNoteResponseObject interface {
@@ -2539,301 +2229,6 @@ type UnpublishNote500JSONResponse struct {
 }
 
 func (response UnpublishNote500JSONResponse) VisitUnpublishNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevisionsRequestObject struct {
-	Params GetRevisionsParams
-}
-
-type GetRevisionsResponseObject interface {
-	VisitGetRevisionsResponse(w http.ResponseWriter) error
-}
-
-type GetRevisions200JSONResponse struct {
-	GetRevisionsResponseJSONResponse
-}
-
-func (response GetRevisions200JSONResponse) VisitGetRevisionsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevisions400JSONResponse struct{ BadRequestErrorJSONResponse }
-
-func (response GetRevisions400JSONResponse) VisitGetRevisionsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevisions401JSONResponse struct{ UnauthorizedErrorJSONResponse }
-
-func (response GetRevisions401JSONResponse) VisitGetRevisionsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevisions404JSONResponse struct{ NotFoundErrorJSONResponse }
-
-func (response GetRevisions404JSONResponse) VisitGetRevisionsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevisions500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response GetRevisions500JSONResponse) VisitGetRevisionsResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DeleteRevisionRequestObject struct {
-	RevisionId RevisionIdPath `json:"revisionId"`
-}
-
-type DeleteRevisionResponseObject interface {
-	VisitDeleteRevisionResponse(w http.ResponseWriter) error
-}
-
-type DeleteRevision204Response struct {
-}
-
-func (response DeleteRevision204Response) VisitDeleteRevisionResponse(w http.ResponseWriter) error {
-	w.WriteHeader(204)
-	return nil
-}
-
-type DeleteRevision400JSONResponse struct{ BadRequestErrorJSONResponse }
-
-func (response DeleteRevision400JSONResponse) VisitDeleteRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DeleteRevision401JSONResponse struct{ UnauthorizedErrorJSONResponse }
-
-func (response DeleteRevision401JSONResponse) VisitDeleteRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DeleteRevision403JSONResponse struct{ ForbiddenErrorJSONResponse }
-
-func (response DeleteRevision403JSONResponse) VisitDeleteRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(403)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DeleteRevision404JSONResponse struct{ NotFoundErrorJSONResponse }
-
-func (response DeleteRevision404JSONResponse) VisitDeleteRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DeleteRevision500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response DeleteRevision500JSONResponse) VisitDeleteRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevisionRequestObject struct {
-	RevisionId RevisionIdPath `json:"revisionId"`
-}
-
-type GetRevisionResponseObject interface {
-	VisitGetRevisionResponse(w http.ResponseWriter) error
-}
-
-type GetRevision200JSONResponse struct {
-	GetRevisionResponseJSONResponse
-}
-
-func (response GetRevision200JSONResponse) VisitGetRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevision400JSONResponse struct{ BadRequestErrorJSONResponse }
-
-func (response GetRevision400JSONResponse) VisitGetRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevision401JSONResponse struct{ UnauthorizedErrorJSONResponse }
-
-func (response GetRevision401JSONResponse) VisitGetRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevision403JSONResponse struct{ ForbiddenErrorJSONResponse }
-
-func (response GetRevision403JSONResponse) VisitGetRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(403)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevision404JSONResponse struct{ NotFoundErrorJSONResponse }
-
-func (response GetRevision404JSONResponse) VisitGetRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetRevision500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response GetRevision500JSONResponse) VisitGetRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ApplyRevisionRequestObject struct {
-	RevisionId RevisionIdPath `json:"revisionId"`
-}
-
-type ApplyRevisionResponseObject interface {
-	VisitApplyRevisionResponse(w http.ResponseWriter) error
-}
-
-type ApplyRevision204Response = ApplyRevisionResponseResponse
-
-func (response ApplyRevision204Response) VisitApplyRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
-	w.WriteHeader(204)
-	return nil
-}
-
-type ApplyRevision400JSONResponse struct{ BadRequestErrorJSONResponse }
-
-func (response ApplyRevision400JSONResponse) VisitApplyRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ApplyRevision401JSONResponse struct{ UnauthorizedErrorJSONResponse }
-
-func (response ApplyRevision401JSONResponse) VisitApplyRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ApplyRevision404JSONResponse struct{ NotFoundErrorJSONResponse }
-
-func (response ApplyRevision404JSONResponse) VisitApplyRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type ApplyRevision500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response ApplyRevision500JSONResponse) VisitApplyRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type RenameRevisionRequestObject struct {
-	RevisionId RevisionIdPath `json:"revisionId"`
-	Body       *RenameRevisionJSONRequestBody
-}
-
-type RenameRevisionResponseObject interface {
-	VisitRenameRevisionResponse(w http.ResponseWriter) error
-}
-
-type RenameRevision204Response struct {
-}
-
-func (response RenameRevision204Response) VisitRenameRevisionResponse(w http.ResponseWriter) error {
-	w.WriteHeader(204)
-	return nil
-}
-
-type RenameRevision400JSONResponse struct{ BadRequestErrorJSONResponse }
-
-func (response RenameRevision400JSONResponse) VisitRenameRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type RenameRevision401JSONResponse struct{ UnauthorizedErrorJSONResponse }
-
-func (response RenameRevision401JSONResponse) VisitRenameRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type RenameRevision404JSONResponse struct{ NotFoundErrorJSONResponse }
-
-func (response RenameRevision404JSONResponse) VisitRenameRevisionResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type RenameRevision500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response RenameRevision500JSONResponse) VisitRenameRevisionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -3708,21 +3103,6 @@ type StrictServerInterface interface {
 	// Unpublish note
 	// (POST /note/notes/{noteId}/unpublish)
 	UnpublishNote(ctx context.Context, request UnpublishNoteRequestObject) (UnpublishNoteResponseObject, error)
-	// Get revisions
-	// (GET /note/revisions)
-	GetRevisions(ctx context.Context, request GetRevisionsRequestObject) (GetRevisionsResponseObject, error)
-	// Delete revision
-	// (DELETE /note/revisions/{revisionId})
-	DeleteRevision(ctx context.Context, request DeleteRevisionRequestObject) (DeleteRevisionResponseObject, error)
-	// Get revision details
-	// (GET /note/revisions/{revisionId})
-	GetRevision(ctx context.Context, request GetRevisionRequestObject) (GetRevisionResponseObject, error)
-	// Apply revision
-	// (POST /note/revisions/{revisionId}/apply)
-	ApplyRevision(ctx context.Context, request ApplyRevisionRequestObject) (ApplyRevisionResponseObject, error)
-	// Rename revision
-	// (POST /note/revisions/{revisionId}/rename)
-	RenameRevision(ctx context.Context, request RenameRevisionRequestObject) (RenameRevisionResponseObject, error)
 	// Create workspace
 	// (POST /note/workspaces)
 	CreateWorkspace(ctx context.Context, request CreateWorkspaceRequestObject) (CreateWorkspaceResponseObject, error)
@@ -3971,11 +3351,10 @@ func (sh *strictHandler) DeleteNote(ctx *gin.Context, noteId NoteIdPath) {
 }
 
 // GetNote operation middleware
-func (sh *strictHandler) GetNote(ctx *gin.Context, noteId NoteIdPath, params GetNoteParams) {
+func (sh *strictHandler) GetNote(ctx *gin.Context, noteId NoteIdPath) {
 	var request GetNoteRequestObject
 
 	request.NoteId = noteId
-	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetNote(ctx, request.(GetNoteRequestObject))
@@ -4136,149 +3515,6 @@ func (sh *strictHandler) UnpublishNote(ctx *gin.Context, noteId NoteIdPath) {
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(UnpublishNoteResponseObject); ok {
 		if err := validResponse.VisitUnpublishNoteResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// GetRevisions operation middleware
-func (sh *strictHandler) GetRevisions(ctx *gin.Context, params GetRevisionsParams) {
-	var request GetRevisionsRequestObject
-
-	request.Params = params
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetRevisions(ctx, request.(GetRevisionsRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetRevisions")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(GetRevisionsResponseObject); ok {
-		if err := validResponse.VisitGetRevisionsResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// DeleteRevision operation middleware
-func (sh *strictHandler) DeleteRevision(ctx *gin.Context, revisionId RevisionIdPath) {
-	var request DeleteRevisionRequestObject
-
-	request.RevisionId = revisionId
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DeleteRevision(ctx, request.(DeleteRevisionRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DeleteRevision")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(DeleteRevisionResponseObject); ok {
-		if err := validResponse.VisitDeleteRevisionResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// GetRevision operation middleware
-func (sh *strictHandler) GetRevision(ctx *gin.Context, revisionId RevisionIdPath) {
-	var request GetRevisionRequestObject
-
-	request.RevisionId = revisionId
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetRevision(ctx, request.(GetRevisionRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetRevision")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(GetRevisionResponseObject); ok {
-		if err := validResponse.VisitGetRevisionResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// ApplyRevision operation middleware
-func (sh *strictHandler) ApplyRevision(ctx *gin.Context, revisionId RevisionIdPath) {
-	var request ApplyRevisionRequestObject
-
-	request.RevisionId = revisionId
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ApplyRevision(ctx, request.(ApplyRevisionRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ApplyRevision")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(ApplyRevisionResponseObject); ok {
-		if err := validResponse.VisitApplyRevisionResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// RenameRevision operation middleware
-func (sh *strictHandler) RenameRevision(ctx *gin.Context, revisionId RevisionIdPath) {
-	var request RenameRevisionRequestObject
-
-	request.RevisionId = revisionId
-
-	var body RenameRevisionJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.RenameRevision(ctx, request.(RenameRevisionRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "RenameRevision")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(RenameRevisionResponseObject); ok {
-		if err := validResponse.VisitRenameRevisionResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

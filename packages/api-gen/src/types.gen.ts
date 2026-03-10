@@ -5,33 +5,20 @@ export type ClientOptions = {
 };
 
 export type ShareNoteSearch = {
-    /**
-     * note:{noteId}:block:{blockId}
-     */
     id: string;
-    noteId: string;
-    noteName: string;
-    blockId: string;
+    name: string;
     /**
-     * Plain text content of the note's block
+     * Plain text content
      */
-    content: string;
+    plainTextContent: string;
     tags?: Array<string>;
 };
 
-export type ShareNoteCommittedEvent = ShareEventBase & {
-    data?: {
-        name: ShareName;
-        folderId: ShareId;
-        blockNoteContent: ShareNoteContent;
-    };
-};
+export type ShareDocumentCommittedEvent = ShareEventBase;
 
-export type ShareUserDeletedEvent = ShareEventBase & {
-    data?: {
-        userId: SharePropertiesId;
-    };
-};
+export type ShareNoteUpdatedEvent = ShareEventBase;
+
+export type ShareUserDeletedEvent = ShareEventBase;
 
 export type ShareEventBase = {
     id: string;
@@ -43,17 +30,6 @@ export type ShareEventBase = {
         [key: string]: unknown;
     };
 };
-
-export type ShareName = string;
-
-export type ShareId = string;
-
-export type ShareNoteContent = Array<unknown> | null;
-
-/**
- * User ID from Authentik
- */
-export type SharePropertiesId = string;
 
 export type DocumentError = {
     /**
@@ -69,6 +45,47 @@ export type DocumentError = {
      */
     more_info?: string;
 };
+
+/**
+ * BlockNote model
+ */
+export type DocumentDocumentContent = Array<unknown> | null;
+
+export type DocumentRevision = {
+    readonly id: string;
+    name: string | null;
+    content: DocumentDocumentContent;
+    readonly createdAt: string;
+};
+
+export type DocumentPagination = {
+    /**
+     * Current page number
+     */
+    page: number;
+    /**
+     * Number of items per page
+     */
+    limit: number;
+    /**
+     * Total number of items
+     */
+    total: number;
+    /**
+     * Total number of pages
+     */
+    totalPages: number;
+    /**
+     * Whether there is a next page
+     */
+    hasNext: boolean;
+    /**
+     * Whether there is a previous page
+     */
+    hasPrev: boolean;
+};
+
+export type DocumentName = string | null;
 
 export type NoteId = string;
 
@@ -113,12 +130,6 @@ export type NoteNote = {
 
 export type NoteNotePropertiesId = string;
 
-export type NoteNoteContent = Array<unknown> | null;
-
-export type NoteNoteWithContent = NoteNote & {
-    content?: NoteNoteContent;
-};
-
 export type NoteGraph = {
     nodes: Array<{
         /**
@@ -157,11 +168,92 @@ export type NoteNoteLink = {
     icon: NoteIcon;
 };
 
-export type NoteRevision = {
+export type NoteWorkspace = {
     readonly id: string;
-    name: string | null;
-    content: NoteNoteContent;
-    readonly createdAt: string;
+    name: string;
+};
+
+export type NoteFolderCreatedEvent = {
+    type: 'FolderCreatedEvent';
+    data: {
+        id: NoteId;
+        name: NoteName;
+    };
+};
+
+export type NoteFolderDeletedEvent = {
+    type: 'FolderDeletedEvent';
+    data: {
+        id: NoteId;
+    };
+};
+
+export type NoteFolderUpdatedEvent = {
+    type: 'FolderInfoUpdatedEvent';
+    data: NoteFolder;
+};
+
+export type NoteNoteUpdatedEvent = {
+    type: 'NoteUpdatedEvent';
+    data: NoteNote;
+};
+
+export type NoteNoteCreatedEvent = {
+    type: 'NoteCreatedEvent';
+    data: {
+        id: NoteNotePropertiesId;
+        name: NotePropertiesName;
+    };
+};
+
+export type NoteNoteDeletedEvent = {
+    type: 'NoteDeletedEvent';
+    data: {
+        id: NoteNotePropertiesId;
+    };
+};
+
+export type NoteWorkspaceUpdatedEvent = {
+    type: 'WorkspaceUpdatedEvent';
+    data: NoteWorkspace;
+};
+
+/**
+ * User ID from Authentik
+ */
+export type NoteUserPropertiesId = string;
+
+export const NoteWorkspaceRole = {
+    OWNER: 'owner',
+    EDITOR: 'editor',
+    VIEWER: 'viewer'
+} as const;
+
+export type NoteWorkspaceRole = typeof NoteWorkspaceRole[keyof typeof NoteWorkspaceRole];
+
+export type NoteWorkspaceMember = {
+    id: NoteUserPropertiesId;
+    role: NoteWorkspaceRole;
+};
+
+export type NoteWorkspacePropertiesName = string;
+
+export const NoteTrashedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
+
+export type NoteTrashedBy = typeof NoteTrashedBy[keyof typeof NoteTrashedBy];
+
+export type NoteTrashedNote = {
+    id: string;
+    readonly name: string;
+    trashedBy: NoteTrashedBy;
+    readonly deletedAt: string | null;
+};
+
+export type NoteTrashedFolder = {
+    id: string;
+    readonly name: string;
+    trashedBy: NoteTrashedBy;
+    readonly deletedAt: string | null;
 };
 
 export type NotePagination = {
@@ -191,116 +283,6 @@ export type NotePagination = {
     hasPrev: boolean;
 };
 
-export type NoteRevisionPropertiesId = string;
-
-export type NoteRevisionPropertiesName = string | null;
-
-export type NoteWorkspace = {
-    readonly id: string;
-    name: string;
-};
-
-export type NoteFolderCreatedEvent = {
-    type: 'FolderCreatedEvent';
-    data: {
-        id: NoteId;
-        name: NoteName;
-    };
-};
-
-export type NoteFolderDeletedEvent = {
-    type: 'FolderDeletedEvent';
-    data: {
-        id: NoteId;
-    };
-};
-
-export type NoteFolderUpdatedEvent = {
-    type: 'FolderInfoUpdatedEvent';
-    data: NoteFolder;
-};
-
-/**
- * When user A is in read mode, user B commits changes, user A will receive this event
- */
-export type NoteNoteContentUpdatedEvent = {
-    type: 'NoteContentUpdatedEvent';
-    data: {
-        id: NoteNotePropertiesId;
-    };
-};
-
-export type NoteNoteCreatedEvent = {
-    type: 'NoteCreatedEvent';
-    data: {
-        id: NoteNotePropertiesId;
-        name: NotePropertiesName;
-    };
-};
-
-export type NoteNoteDeletedEvent = {
-    type: 'NoteDeletedEvent';
-    data: {
-        id: NoteNotePropertiesId;
-    };
-};
-
-export type NoteTags = Array<string>;
-
-export type NoteNoteInfoUpdatedEvent = {
-    type: 'NoteInfoUpdatedEvent';
-    data: {
-        id: NoteNotePropertiesId;
-        name: NotePropertiesName;
-        icon: NoteIcon;
-        folderId?: NoteId;
-        tags?: NoteTags;
-    };
-};
-
-export type NoteWorkspaceUpdatedEvent = {
-    type: 'WorkspaceUpdatedEvent';
-    data: NoteWorkspace;
-};
-
-/**
- * User ID from Authentik
- */
-export type NoteUserPropertiesId = string;
-
-export const NoteWorkspaceRole = {
-    OWNER: 'owner',
-    EDITOR: 'editor',
-    VIEWER: 'viewer'
-} as const;
-
-export type NoteWorkspaceRole = typeof NoteWorkspaceRole[keyof typeof NoteWorkspaceRole];
-
-export type NoteWorkspaceMember = {
-    id: NoteUserPropertiesId;
-    role: NoteWorkspaceRole;
-};
-
-export type NoteWorkspacePropertiesName = string;
-
-export const NoteTrashedDeletedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
-
-export type NoteTrashedDeletedBy = typeof NoteTrashedDeletedBy[keyof typeof NoteTrashedDeletedBy];
-
-export type NoteTrashedNote = {
-    id: string;
-    readonly name: string;
-    deletedBy: NoteTrashedDeletedBy;
-    readonly deletedAt: string | null;
-};
-
-export type NoteTrashedFolder = {
-    id: string;
-    readonly name: string;
-    deletedBy: NoteTrashedDeletedBy;
-    readonly deletedAt: string | null;
-};
-
 export type NotePropertiesIcon = string | null;
 
 export type NoteUpdatedAt = string;
@@ -323,14 +305,15 @@ export type NoteWorkspaceTreeFolder = {
 
 export type NotePropertiesUpdatedAt = string;
 
-export type ShareNoteCommittedEventWritable = ShareEventBase & {
-    data?: {
-        name: ShareName;
-        blockNoteContent: ShareNoteContentWritable;
-    };
-};
+/**
+ * BlockNote model
+ */
+export type DocumentDocumentContentWritable = Array<unknown> | null;
 
-export type ShareNoteContentWritable = Array<unknown> | null;
+export type DocumentRevisionWritable = {
+    name: string | null;
+    content: DocumentDocumentContentWritable;
+};
 
 export type NoteFolderWritable = {
     name: string;
@@ -343,20 +326,9 @@ export type NoteNoteWritable = {
     tags: Array<string>;
 };
 
-export type NoteNoteContentWritable = Array<unknown> | null;
-
-export type NoteNoteWithContentWritable = NoteNoteWritable & {
-    content?: NoteNoteContentWritable;
-};
-
 export type NoteNoteLinkWritable = {
     name: NotePropertiesName;
     icon: NoteIcon;
-};
-
-export type NoteRevisionWritable = {
-    name: string | null;
-    content: NoteNoteContentWritable;
 };
 
 export type NoteWorkspaceWritable = {
@@ -379,11 +351,9 @@ export type NoteFolderUpdatedEventWritable = {
     data: NoteFolderWritable;
 };
 
-/**
- * When user A is in read mode, user B commits changes, user A will receive this event
- */
-export type NoteNoteContentUpdatedEventWritable = {
-    type: 'NoteContentUpdatedEvent';
+export type NoteNoteUpdatedEventWritable = {
+    type: 'NoteUpdatedEvent';
+    data: NoteNoteWritable;
 };
 
 export type NoteNoteCreatedEventWritable = {
@@ -395,15 +365,6 @@ export type NoteNoteCreatedEventWritable = {
 
 export type NoteNoteDeletedEventWritable = {
     type: 'NoteDeletedEvent';
-};
-
-export type NoteNoteInfoUpdatedEventWritable = {
-    type: 'NoteInfoUpdatedEvent';
-    data: {
-        name: NotePropertiesName;
-        icon: NoteIcon;
-        tags?: NoteTags;
-    };
 };
 
 export type NoteWorkspaceUpdatedEventWritable = {
@@ -436,6 +397,20 @@ export type NoteWorkspaceTreeFolderWritable = {
  */
 export type DocumentDocumentIdPath = string;
 
+export type DocumentDocumentIdQuery = string;
+
+/**
+ * Page number for pagination
+ */
+export type DocumentPageQuery = number;
+
+/**
+ * Number of items per page
+ */
+export type DocumentLimitQuery = number;
+
+export type DocumentRevisionIdPath = string;
+
 export type NoteFolderIdPath = NoteId;
 
 /**
@@ -450,15 +425,15 @@ export type NoteLimitQuery = number;
 
 export type NoteNoteIdPath = NoteNotePropertiesId;
 
-export type NoteNoteIdQuery = NoteNotePropertiesId;
-
-export type NoteRevisionIdPath = NoteRevisionPropertiesId;
-
 export type NoteWorkspaceIdPath = NotePropertiesId;
 
 export type DocumentImportDocumentsRequest = Array<{
     [key: string]: unknown;
 }>;
+
+export type DocumentRenameRevisionRequest = {
+    name: DocumentName;
+};
 
 export type NoteCreateFolderRequest = NoteFolderWritable;
 
@@ -474,10 +449,6 @@ export type NoteGenerateDailyNoteRequest = {
 
 export type NoteRenameNoteRequest = {
     name: NotePropertiesName;
-};
-
-export type NoteRenameRevisionRequest = {
-    name: NoteRevisionPropertiesName;
 };
 
 export type NoteCreateWorkspaceRequest = NoteWorkspaceWritable;
@@ -621,6 +592,181 @@ export type GetDocumentAttachmentUploadUrlResponses = {
 };
 
 export type GetDocumentAttachmentUploadUrlResponse = GetDocumentAttachmentUploadUrlResponses[keyof GetDocumentAttachmentUploadUrlResponses];
+
+export type GetRevisionsData = {
+    body?: never;
+    path?: never;
+    query: {
+        documentId: string;
+        /**
+         * Page number for pagination
+         */
+        page?: number;
+        /**
+         * Number of items per page
+         */
+        limit?: number;
+    };
+    url: '/document/revisions';
+};
+
+export type GetRevisionsErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: DocumentError;
+    /**
+     * Unauthorized Error response
+     */
+    401: DocumentError;
+    /**
+     * Not Found Error response
+     */
+    404: DocumentError;
+    /**
+     * Internal Server Error response
+     */
+    500: DocumentError;
+};
+
+export type GetRevisionsError = GetRevisionsErrors[keyof GetRevisionsErrors];
+
+export type GetRevisionsResponses = {
+    /**
+     * Revisions
+     */
+    200: {
+        data: Array<DocumentRevision>;
+        pagination: DocumentPagination;
+    };
+};
+
+export type GetRevisionsResponse = GetRevisionsResponses[keyof GetRevisionsResponses];
+
+export type DeleteRevisionData = {
+    body?: never;
+    path: {
+        revisionId: string;
+    };
+    query?: never;
+    url: '/document/revisions/{revisionId}';
+};
+
+export type DeleteRevisionErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: DocumentError;
+    /**
+     * Unauthorized Error response
+     */
+    401: DocumentError;
+    /**
+     * Forbidden Error response
+     */
+    403: DocumentError;
+    /**
+     * Not Found Error response
+     */
+    404: DocumentError;
+    /**
+     * Internal Server Error response
+     */
+    500: DocumentError;
+};
+
+export type DeleteRevisionError = DeleteRevisionErrors[keyof DeleteRevisionErrors];
+
+export type DeleteRevisionResponses = {
+    /**
+     * Revision deleted successfully
+     */
+    204: void;
+};
+
+export type DeleteRevisionResponse = DeleteRevisionResponses[keyof DeleteRevisionResponses];
+
+export type GetRevisionData = {
+    body?: never;
+    path: {
+        revisionId: string;
+    };
+    query?: never;
+    url: '/document/revisions/{revisionId}';
+};
+
+export type GetRevisionErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: DocumentError;
+    /**
+     * Unauthorized Error response
+     */
+    401: DocumentError;
+    /**
+     * Forbidden Error response
+     */
+    403: DocumentError;
+    /**
+     * Not Found Error response
+     */
+    404: DocumentError;
+    /**
+     * Internal Server Error response
+     */
+    500: DocumentError;
+};
+
+export type GetRevisionError = GetRevisionErrors[keyof GetRevisionErrors];
+
+export type GetRevisionResponses = {
+    /**
+     * Revision detail
+     */
+    200: DocumentRevision;
+};
+
+export type GetRevisionResponse = GetRevisionResponses[keyof GetRevisionResponses];
+
+export type RenameRevisionData = {
+    body: DocumentRenameRevisionRequest;
+    path: {
+        revisionId: string;
+    };
+    query?: never;
+    url: '/document/revisions/{revisionId}/rename';
+};
+
+export type RenameRevisionErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: DocumentError;
+    /**
+     * Unauthorized Error response
+     */
+    401: DocumentError;
+    /**
+     * Not Found Error response
+     */
+    404: DocumentError;
+    /**
+     * Internal Server Error response
+     */
+    500: DocumentError;
+};
+
+export type RenameRevisionError = RenameRevisionErrors[keyof RenameRevisionErrors];
+
+export type RenameRevisionResponses = {
+    /**
+     * Revision renamed successfully
+     */
+    204: void;
+};
+
+export type RenameRevisionResponse = RenameRevisionResponses[keyof RenameRevisionResponses];
 
 export type CreateFolderData = {
     body: NoteCreateFolderRequest;
@@ -848,9 +994,7 @@ export type GetNoteData = {
     path: {
         noteId: NoteNotePropertiesId;
     };
-    query?: {
-        includeContent?: boolean;
-    };
+    query?: never;
     url: '/note/notes/{noteId}';
 };
 
@@ -883,7 +1027,7 @@ export type GetNoteResponses = {
     /**
      * Successful response
      */
-    200: NoteNoteWithContent;
+    200: NoteNote;
 };
 
 export type GetNoteResponse = GetNoteResponses[keyof GetNoteResponses];
@@ -1095,220 +1239,6 @@ export type UnpublishNoteResponses = {
 
 export type UnpublishNoteResponse = UnpublishNoteResponses[keyof UnpublishNoteResponses];
 
-export type GetRevisionsData = {
-    body?: never;
-    path?: never;
-    query: {
-        noteId: NoteNotePropertiesId;
-        /**
-         * Page number for pagination
-         */
-        page?: number;
-        /**
-         * Number of items per page
-         */
-        limit?: number;
-    };
-    url: '/note/revisions';
-};
-
-export type GetRevisionsErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * Unauthorized Error response
-     */
-    401: NoteError;
-    /**
-     * Not Found Error response
-     */
-    404: NoteError;
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type GetRevisionsError = GetRevisionsErrors[keyof GetRevisionsErrors];
-
-export type GetRevisionsResponses = {
-    /**
-     * Revisions
-     */
-    200: {
-        data: Array<NoteRevision>;
-        pagination: NotePagination;
-    };
-};
-
-export type GetRevisionsResponse = GetRevisionsResponses[keyof GetRevisionsResponses];
-
-export type ApplyRevisionData = {
-    body?: never;
-    path: {
-        revisionId: NoteRevisionPropertiesId;
-    };
-    query?: never;
-    url: '/note/revisions/{revisionId}/apply';
-};
-
-export type ApplyRevisionErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * Unauthorized Error response
-     */
-    401: NoteError;
-    /**
-     * Not Found Error response
-     */
-    404: NoteError;
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type ApplyRevisionError = ApplyRevisionErrors[keyof ApplyRevisionErrors];
-
-export type ApplyRevisionResponses = {
-    /**
-     * Apply revision, mean create new with existing revision
-     */
-    204: void;
-};
-
-export type ApplyRevisionResponse = ApplyRevisionResponses[keyof ApplyRevisionResponses];
-
-export type RenameRevisionData = {
-    body: NoteRenameRevisionRequest;
-    path: {
-        revisionId: NoteRevisionPropertiesId;
-    };
-    query?: never;
-    url: '/note/revisions/{revisionId}/rename';
-};
-
-export type RenameRevisionErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * Unauthorized Error response
-     */
-    401: NoteError;
-    /**
-     * Not Found Error response
-     */
-    404: NoteError;
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type RenameRevisionError = RenameRevisionErrors[keyof RenameRevisionErrors];
-
-export type RenameRevisionResponses = {
-    /**
-     * Revision renamed successfully
-     */
-    204: void;
-};
-
-export type RenameRevisionResponse = RenameRevisionResponses[keyof RenameRevisionResponses];
-
-export type DeleteRevisionData = {
-    body?: never;
-    path: {
-        revisionId: NoteRevisionPropertiesId;
-    };
-    query?: never;
-    url: '/note/revisions/{revisionId}';
-};
-
-export type DeleteRevisionErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * Unauthorized Error response
-     */
-    401: NoteError;
-    /**
-     * Forbidden Error response
-     */
-    403: NoteError;
-    /**
-     * Not Found Error response
-     */
-    404: NoteError;
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type DeleteRevisionError = DeleteRevisionErrors[keyof DeleteRevisionErrors];
-
-export type DeleteRevisionResponses = {
-    /**
-     * Revision deleted successfully
-     */
-    204: void;
-};
-
-export type DeleteRevisionResponse = DeleteRevisionResponses[keyof DeleteRevisionResponses];
-
-export type GetRevisionData = {
-    body?: never;
-    path: {
-        revisionId: NoteRevisionPropertiesId;
-    };
-    query?: never;
-    url: '/note/revisions/{revisionId}';
-};
-
-export type GetRevisionErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * Unauthorized Error response
-     */
-    401: NoteError;
-    /**
-     * Forbidden Error response
-     */
-    403: NoteError;
-    /**
-     * Not Found Error response
-     */
-    404: NoteError;
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type GetRevisionError = GetRevisionErrors[keyof GetRevisionErrors];
-
-export type GetRevisionResponses = {
-    /**
-     * Revision detail
-     */
-    200: NoteRevision;
-};
-
-export type GetRevisionResponse = GetRevisionResponses[keyof GetRevisionResponses];
-
 export type CreateWorkspaceData = {
     body: NoteCreateWorkspaceRequest;
     path?: never;
@@ -1455,14 +1385,12 @@ export type GetWorkspaceEventsResponses = {
     } & NoteFolderDeletedEvent) | ({
         type: 'FolderUpdatedEvent';
     } & NoteFolderUpdatedEvent) | ({
-        type: 'NoteContentUpdatedEvent';
-    } & NoteNoteContentUpdatedEvent) | ({
+        type: 'NoteUpdatedEvent';
+    } & NoteNoteUpdatedEvent) | ({
         type: 'NoteCreatedEvent';
     } & NoteNoteCreatedEvent) | ({
         type: 'NoteDeletedEvent';
     } & NoteNoteDeletedEvent) | ({
-        type: 'NoteInfoUpdatedEvent';
-    } & NoteNoteInfoUpdatedEvent) | ({
         type: 'WorkspaceUpdatedEvent';
     } & NoteWorkspaceUpdatedEvent);
 };
