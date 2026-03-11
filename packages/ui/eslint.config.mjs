@@ -7,8 +7,9 @@ export default [
   ...nx.configs['flat/react'],
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
-    // Override or add rules here
-    rules: {},
+    rules: {
+      'simple-import-sort/imports': 'off',
+    },
   },
   {
     ignores: ['**/out-tsc'],
