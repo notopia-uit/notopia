@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "paths": {
-      "@notopia-uit/ui/*": ["packages/ui/src/*"]
+      "@notopia-uit/ui/*": ["./packages/ui/src/*"]
     },
     "composite": true,
     "declarationMap": true,
