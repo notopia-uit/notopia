@@ -1,0 +1,131 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+@layer base {
+  :root {
+    --radius: 0.625rem;
+    --background: 220 23.08% 94.9%;
+    --foreground: 234 16.02% 35.49%;
+    --card: 220 23.08% 94.9%;
+    --card-foreground: 234 16.02% 35.49%;
+    --popover: 220 23.08% 94.9%;
+    --popover-foreground: 234 16.02% 35.49%;
+    --primary: 231 97.2% 71.96%;
+    --primary-foreground: 220 23.08% 94.9%;
+    --secondary: 223 15.91% 82.75%;
+    --secondary-foreground: 234 16.02% 35.49%;
+    --muted: 223 15.91% 82.75%;
+    --muted-foreground: 233 12.8% 41.37%;
+    --accent: 223 15.91% 82.75%;
+    --accent-foreground: 234 16.02% 35.49%;
+    --destructive: 347 86.67% 44.12%;
+    --border: 225 13.56% 76.86%;
+    --input: 225 13.56% 76.86%;
+    --ring: 234 16.02% 35.49%;
+    --chart-1: 345 57.65% 74.12%;
+    --chart-2: 185 37.25% 70.59%;
+    --chart-3: 219 81.96% 78.43%;
+    --chart-4: 35 61.18% 76.86%;
+    --chart-5: 113 32.94% 73.33%;
+    --sidebar: 218 25.1% 93.73%;
+    --sidebar-foreground: 234 16.02% 35.49%;
+    --sidebar-primary: 231 97.2% 71.96%;
+    --sidebar-primary-foreground: 220 23.08% 94.9%;
+    --sidebar-accent: 220 23.08% 94.9%;
+    --sidebar-accent-foreground: 234 16.02% 35.49%;
+    --sidebar-border: 225 13.56% 76.86%;
+    --sidebar-ring: 225 13.56% 76.86%;
+  }
+
+  .dark {
+    --background: 240 21.05% 14.9%;
+    --foreground: 226 63.93% 88.04%;
+    --card: 240 21.05% 14.9%;
+    --card-foreground: 226 63.93% 88.04%;
+    --popover: 240 21.05% 14.9%;
+    --popover-foreground: 226 63.93% 88.04%;
+    --primary: 232 97.37% 85.1%;
+    --primary-foreground: 240 21.05% 14.9%;
+    --secondary: 237 16.24% 22.94%;
+    --secondary-foreground: 226 63.93% 88.04%;
+    --muted: 237 16.24% 22.94%;
+    --muted-foreground: 227 35.29% 80%;
+    --accent: 237 16.24% 22.94%;
+    --accent-foreground: 226 63.93% 88.04%;
+    --destructive: 343 81.25% 74.9%;
+    --border: 234 13.21% 31.18%;
+    --input: 234 13.21% 31.18%;
+    --ring: 226 63.93% 88.04%;
+    --chart-1: 329 21.57% 37.25%;
+    --chart-2: 188 18.82% 37.25%;
+    --chart-3: 221 27.45% 39.61%;
+    --chart-4: 30 9.41% 42.35%;
+    --chart-5: 139 12.94% 38.04%;
+    --sidebar: 240 21.18% 14.12%;
+    --sidebar-foreground: 226 63.93% 88.04%;
+    --sidebar-primary: 232 97.37% 85.1%;
+    --sidebar-primary-foreground: 240 21.05% 14.9%;
+    --sidebar-accent: 240 21.05% 14.9%;
+    --sidebar-accent-foreground: 226 63.93% 88.04%;
+    --sidebar-border: 234 13.21% 31.18%;
+    --sidebar-ring: 234 13.21% 31.18%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}

@@ -44,6 +44,6 @@ export default defineConfig(
     },
   },
   {
-    ignores: ['.next/**/*', '**/out-tsc', './next.config.ts'],
+    ignores: ['.next/**/*', '**/out-tsc', './next.config.ts', "./tailwind.config.ts"],
   }
 );

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "radix-nova",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "packages/ui/tailwind.config.ts",
+    "css": "packages/ui/src/globals.css",
+    "baseColor": "slate",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "@notopia-uit/ui/components",
+    "ui": "@notopia-uit/ui/components/ui",
+    "utils": "@notopia-uit/ui/lib/utils",
+    "lib": "@notopia-uit/ui/lib",
+    "hooks": "@notopia-uit/ui/hooks"
+  }
+}

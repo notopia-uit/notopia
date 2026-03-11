@@ -1,0 +1,9 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "packages/ui",
+  "projectType": "library",
+  "exports": {
+    "./globals.css": "./src/globals.css",
+    ".": "./src/index.ts"
+  }
+}
