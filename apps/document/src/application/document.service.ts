@@ -1,5 +1,7 @@
+import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { applyUpdate, Doc as YDoc } from 'yjs';
 
 import { DocumentEntity } from '../domain/document.entity';
 import { DocumentRepository } from '../infrastructure/database/document.repository';
@@ -8,16 +10,24 @@ export interface AttachmentUploadUrl {
   url: string;
 }
 
-export interface TagModel {
-  id: string;
-  name: string;
-}
-
 @Injectable()
 export class DocumentService {
-  constructor(private readonly documentRepository: DocumentRepository) {}
+  constructor(
+    private readonly documentRepository: DocumentRepository,
+    private readonly editor: ServerBlockNoteEditor
+  ) {}
 
-  extractTags(content: object[]): TagModel[] {
+  private toYDoc(entity: DocumentEntity): YDoc {
+    const doc = new YDoc();
+    applyUpdate(doc, new Uint8Array(entity.data));
+    return doc;
+  }
+
+  yDocToBlockNote(yDoc: YDoc) {
+    return this.editor.yDocToBlocks(yDoc);
+  }
+
+  extractTags(content: object[]): string[] {
     return [];
   }
 

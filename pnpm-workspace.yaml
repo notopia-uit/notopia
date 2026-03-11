@@ -75,6 +75,10 @@ catalog:
   vite-plugin-dts: 4.5.4
   vitest: 4.0.18
   zod: 4.3.6
+  '@blocknote/core': 0.47.1
+  '@blocknote/react': 0.47.1
+  '@blocknote/shadcn': 0.47.1
+  '@blocknote/server-util': 0.47.1
 
 onlyBuiltDependencies:
   - '@bufbuild/buf'

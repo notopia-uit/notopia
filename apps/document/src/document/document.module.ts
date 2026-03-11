@@ -11,23 +11,34 @@ import { RevisionRepository } from '../infrastructure/database/revision.reposito
 import { DocumentApiImpl } from './document.api.impl';
 import { RevisionApiImpl } from './revision.api.impl';
 
-@Module({
-  imports: [
-    TypeOrmModule.forFeature([DocumentEntity, RevisionEntity]),
-    ApiModule.forRoot({
-      apiImplementations: {
-        documentApi: DocumentApiImpl,
-        revisionApi: RevisionApiImpl,
-      },
-    }),
-  ],
+const typeOrmFeature = TypeOrmModule.forFeature([
+  DocumentEntity,
+  RevisionEntity,
+]);
+
+const apiDynamicModule = ApiModule.forRoot({
+  apiImplementations: {
+    documentApi: DocumentApiImpl,
+    revisionApi: RevisionApiImpl,
+  },
   providers: [
     DocumentRepository,
     RevisionRepository,
     DocumentService,
     RevisionService,
-    DocumentApiImpl,
-    RevisionApiImpl,
   ],
+});
+
+// ApiModule.forRoot() doesn't expose an `imports` option, so we extend the
+// returned DynamicModule to inject TypeOrmModule.forFeature() into its scope.
+// This makes TypeORM entity repositories available to DocumentRepository /
+// RevisionRepository, which are both provided (and instantiated) inside ApiModule.
+const apiModuleWithTypeOrm = {
+  ...apiDynamicModule,
+  imports: [typeOrmFeature],
+};
+
+@Module({
+  imports: [apiModuleWithTypeOrm],
 })
 export class DocumentModule {}

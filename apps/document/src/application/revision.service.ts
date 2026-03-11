@@ -26,7 +26,7 @@ export class RevisionService {
   private entityToModel(entity: RevisionEntity): RevisionModel {
     let content: object[] = [];
     try {
-      content = JSON.parse(entity.data.toString('utf-8'));
+      content = JSON.parse(entity.data.toString());
     } catch {
       content = [];
     }

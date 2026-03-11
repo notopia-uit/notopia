@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import { Block } from '@blocknote/core';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryColumn,
+} from 'typeorm';
 
 @Entity('revisions')
 export class RevisionEntity {
@@ -8,12 +15,15 @@ export class RevisionEntity {
   @Column('uuid')
   documentId!: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'text', nullable: true })
   name!: string | null;
 
-  @Column({ type: 'bytea' })
-  data!: Buffer;
+  @Column({ type: 'simple-json' })
+  content!: Block[];
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @DeleteDateColumn()
+  deletedAt!: Date | null;
 }

@@ -137,6 +137,7 @@ revisions: {
   data: bytea
   document_id: uuid {constraint: FK}
   created_at: timestamptz
+  deleted_at: timestamptz {constraint: N}
 
   shape: sql_table
 }

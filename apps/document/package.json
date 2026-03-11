@@ -2,7 +2,10 @@
   "name": "@notopia-uit/document",
   "private": true,
   "dependencies": {
+    "@blocknote/server-util": "catalog:",
     "@grpc/grpc-js": "catalog:",
+    "@hocuspocus/extension-database": "3.4.4",
+    "@hocuspocus/server": "3.4.4",
     "@nestjs/common": "catalog:",
     "@nestjs/config": "catalog:",
     "@nestjs/core": "catalog:",
@@ -10,6 +13,7 @@
     "@nestjs/typeorm": "catalog:",
     "@notopia-uit/api-document-nestjs-server": "workspace:",
     "@opentelemetry/api": "catalog:",
+    "@opentelemetry/auto-instrumentations-node": "0.71.0",
     "@opentelemetry/exporter-metrics-otlp-grpc": "catalog:",
     "@opentelemetry/exporter-trace-otlp-grpc": "catalog:",
     "@opentelemetry/instrumentation-http": "catalog:",

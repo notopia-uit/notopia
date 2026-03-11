@@ -11,11 +11,15 @@ export class DocumentRepository {
     private readonly repo: Repository<DocumentEntity>
   ) {}
 
-  async save(document: DocumentEntity): Promise<void> {
+  async save(document: DocumentEntity) {
     await this.repo.save(document);
   }
 
-  async getById(documentId: string): Promise<DocumentEntity | null> {
-    return this.repo.findOneBy({ id: documentId });
+  async updateDataById(id: string, data: Buffer) {
+    await this.repo.update(id, { data });
+  }
+
+  async getById(id: string) {
+    return this.repo.findOneBy({ id });
   }
 }
