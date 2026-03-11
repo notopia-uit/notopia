@@ -9,7 +9,20 @@ post:
   parameters:
     - $ref: ../components/parameters/workspaceSlugPath.yaml
   requestBody:
-    $ref: ../components/requestBodies/MoveWorkspaceItemsRequest.yaml
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            noteIds:
+              type: array
+              items:
+                $ref: ../components/schemas/Note.yaml#/properties/id
+            folderIds:
+              type: array
+              items:
+                $ref: ../components/schemas/Folder.yaml#/properties/id
   responses:
     204:
       description: Workspace items successfully moved

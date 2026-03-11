@@ -128,7 +128,9 @@ package "Domain" as Domain <<Frame>> {
     Domain.Note "0..*" .. "0..*" Domain.Note : links
 
     RepoInterface(WorkspaceRepo) {
-        GetByID(workspaceID uuid.UUID) *Workspace
+        CheckSlugExists(slug string) bool
+        GetBySlug(slug string) *Workspace
+        GetIDBySlug(slug string) *uuid.UUID
         Save(workspace *Workspace)
     }
 

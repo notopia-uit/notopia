@@ -1,8 +1,0 @@
-# vim: ft=yaml.openapi
-description: A list of workspace members
-content:
-  application/json:
-    schema:
-      type: array
-      items:
-        $ref: ../schemas/WorkspaceMember.yaml

@@ -431,55 +431,10 @@ export type NoteNoteIdPath = NoteNotePropertiesId;
 
 export type NoteWorkspaceSlugPath = NoteSlug;
 
-export type DocumentImportDocumentsRequest = Array<{
-    [key: string]: unknown;
-}>;
-
-export type DocumentRenameRevisionRequest = {
-    name: DocumentName;
-};
-
-export type NoteCreateFolderRequest = NoteFolderWritable;
-
-export type NoteRenameFolderRequest = {
-    name: NoteName;
-};
-
-export type NoteCreateNoteRequest = NoteNoteWritable;
-
-export type NoteGenerateDailyNoteRequest = {
-    workspaceId: NotePropertiesId;
-};
-
-export type NoteRenameNoteRequest = {
-    name: NotePropertiesName;
-};
-
-export type NoteCreateWorkspaceRequest = NoteWorkspaceWritable;
-
-export type NoteUpdateWorkspaceMembers = Array<NoteWorkspaceMember>;
-
-export type NoteMoveWorkspaceItemsRequest = {
-    noteIds?: Array<NoteNotePropertiesId>;
-    folderIds?: Array<NoteId>;
-};
-
-export type NoteRenameWorkspaceRequest = {
-    name: NoteWorkspacePropertiesName;
-};
-
-export type NoteRestoreTrashedWorkspaceItemsRequest = {
-    notes?: Array<NoteTrashedNoteWritable>;
-    folders?: Array<NoteTrashedFolderWritable>;
-};
-
-export type NoteTrashWorkspaceItemsRequest = {
-    notes?: Array<NoteTrashedNoteWritable>;
-    folders?: Array<NoteTrashedFolderWritable>;
-};
-
 export type ImportDocumentsData = {
-    body: DocumentImportDocumentsRequest;
+    body: Array<{
+        [key: string]: unknown;
+    }>;
     path?: never;
     query?: never;
     url: '/document/documents/import';
@@ -734,7 +689,9 @@ export type GetRevisionResponses = {
 export type GetRevisionResponse = GetRevisionResponses[keyof GetRevisionResponses];
 
 export type RenameRevisionData = {
-    body: DocumentRenameRevisionRequest;
+    body: {
+        name: DocumentName;
+    };
     path: {
         revisionId: string;
     };
@@ -773,7 +730,7 @@ export type RenameRevisionResponses = {
 export type RenameRevisionResponse = RenameRevisionResponses[keyof RenameRevisionResponses];
 
 export type CreateFolderData = {
-    body: NoteCreateFolderRequest;
+    body: NoteFolderWritable;
     path?: never;
     query?: never;
     url: '/note/folders';
@@ -804,7 +761,9 @@ export type CreateFolderResponses = {
 };
 
 export type RenameFolderData = {
-    body: NoteRenameFolderRequest;
+    body: {
+        name: NoteName;
+    };
     path: {
         folderId: NoteId;
     };
@@ -885,7 +844,7 @@ export type GetNotesResponses = {
 export type GetNotesResponse = GetNotesResponses[keyof GetNotesResponses];
 
 export type CreateNoteData = {
-    body: NoteCreateNoteRequest;
+    body: NoteNoteWritable;
     path?: never;
     query?: never;
     url: '/note/notes';
@@ -916,7 +875,9 @@ export type CreateNoteResponses = {
 };
 
 export type GenerateDailyNoteData = {
-    body: NoteGenerateDailyNoteRequest;
+    body: {
+        workspaceId: NotePropertiesId;
+    };
     path?: never;
     query?: never;
     url: '/note/notes/generate-daily';
@@ -1166,7 +1127,9 @@ export type PublishNoteResponses = {
 export type PublishNoteResponse = PublishNoteResponses[keyof PublishNoteResponses];
 
 export type RenameNoteData = {
-    body: NoteRenameNoteRequest;
+    body: {
+        name: NotePropertiesName;
+    };
     path: {
         noteId: NoteNotePropertiesId;
     };
@@ -1244,7 +1207,7 @@ export type UnpublishNoteResponses = {
 export type UnpublishNoteResponse = UnpublishNoteResponses[keyof UnpublishNoteResponses];
 
 export type CreateWorkspaceData = {
-    body: NoteCreateWorkspaceRequest;
+    body: NoteWorkspaceWritable;
     path?: never;
     query?: never;
     url: '/note/workspaces';
@@ -1489,7 +1452,7 @@ export type GetWorkspaceMembersResponses = {
 export type GetWorkspaceMembersResponse = GetWorkspaceMembersResponses[keyof GetWorkspaceMembersResponses];
 
 export type UpdateWorkspaceMembersData = {
-    body: NoteUpdateWorkspaceMembers;
+    body: Array<NoteWorkspaceMember>;
     path: {
         workspaceSlug: NoteSlug;
     };
@@ -1528,7 +1491,10 @@ export type UpdateWorkspaceMembersResponses = {
 export type UpdateWorkspaceMembersResponse = UpdateWorkspaceMembersResponses[keyof UpdateWorkspaceMembersResponses];
 
 export type MoveWorkspaceItemsData = {
-    body: NoteMoveWorkspaceItemsRequest;
+    body: {
+        noteIds?: Array<NoteNotePropertiesId>;
+        folderIds?: Array<NoteId>;
+    };
     path: {
         workspaceSlug: NoteSlug;
     };
@@ -1606,7 +1572,9 @@ export type PublishWorkspaceResponses = {
 export type PublishWorkspaceResponse = PublishWorkspaceResponses[keyof PublishWorkspaceResponses];
 
 export type RenameWorkspaceData = {
-    body: NoteRenameWorkspaceRequest;
+    body: {
+        name: NoteWorkspacePropertiesName;
+    };
     path: {
         workspaceSlug: NoteSlug;
     };
@@ -1645,7 +1613,10 @@ export type RenameWorkspaceResponses = {
 export type RenameWorkspaceResponse = RenameWorkspaceResponses[keyof RenameWorkspaceResponses];
 
 export type RestoreTrashedWorkspaceItemsData = {
-    body: NoteRestoreTrashedWorkspaceItemsRequest;
+    body: {
+        notes?: Array<NoteTrashedNoteWritable>;
+        folders?: Array<NoteTrashedFolderWritable>;
+    };
     path: {
         workspaceSlug: NoteSlug;
     };
@@ -1729,7 +1700,10 @@ export type ShowTrashResponses = {
 export type ShowTrashResponse = ShowTrashResponses[keyof ShowTrashResponses];
 
 export type TrashWorkspaceItemsData = {
-    body: NoteTrashWorkspaceItemsRequest;
+    body: {
+        notes?: Array<NoteTrashedNoteWritable>;
+        folders?: Array<NoteTrashedFolderWritable>;
+    };
     path: {
         workspaceSlug: NoteSlug;
     };
@@ -1844,3 +1818,44 @@ export type UnpublishWorkspaceResponses = {
 };
 
 export type UnpublishWorkspaceResponse = UnpublishWorkspaceResponses[keyof UnpublishWorkspaceResponses];
+
+export type CheckWorkspaceExistsData = {
+    body?: never;
+    path: {
+        workspaceSlug: NoteSlug;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceSlug}/exists';
+};
+
+export type CheckWorkspaceExistsErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * Unauthorized Error response
+     */
+    401: NoteError;
+    /**
+     * Not Found Error response
+     */
+    404: NoteError;
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type CheckWorkspaceExistsError = CheckWorkspaceExistsErrors[keyof CheckWorkspaceExistsErrors];
+
+export type CheckWorkspaceExistsResponses = {
+    /**
+     * OK
+     */
+    200: {
+        exists?: boolean;
+    };
+};
+
+export type CheckWorkspaceExistsResponse = CheckWorkspaceExistsResponses[keyof CheckWorkspaceExistsResponses];

@@ -351,53 +351,8 @@ export const zNoteNoteIdPath = zNoteNotePropertiesId;
 
 export const zNoteWorkspaceSlugPath = zNoteSlug;
 
-export const zDocumentImportDocumentsRequest = z.array(z.record(z.string(), z.unknown()));
-
-export const zDocumentRenameRevisionRequest = z.object({
-    name: zDocumentName
-});
-
-export const zNoteCreateFolderRequest = zNoteFolderWritable;
-
-export const zNoteRenameFolderRequest = z.object({
-    name: zNoteName
-});
-
-export const zNoteCreateNoteRequest = zNoteNoteWritable;
-
-export const zNoteGenerateDailyNoteRequest = z.object({
-    workspaceId: zNotePropertiesId
-});
-
-export const zNoteRenameNoteRequest = z.object({
-    name: zNotePropertiesName
-});
-
-export const zNoteCreateWorkspaceRequest = zNoteWorkspaceWritable;
-
-export const zNoteUpdateWorkspaceMembers = z.array(zNoteWorkspaceMember);
-
-export const zNoteMoveWorkspaceItemsRequest = z.object({
-    noteIds: z.array(zNoteNotePropertiesId).optional(),
-    folderIds: z.array(zNoteId).optional()
-});
-
-export const zNoteRenameWorkspaceRequest = z.object({
-    name: zNoteWorkspacePropertiesName
-});
-
-export const zNoteRestoreTrashedWorkspaceItemsRequest = z.object({
-    notes: z.array(zNoteTrashedNoteWritable).optional(),
-    folders: z.array(zNoteTrashedFolderWritable).optional()
-});
-
-export const zNoteTrashWorkspaceItemsRequest = z.object({
-    notes: z.array(zNoteTrashedNoteWritable).optional(),
-    folders: z.array(zNoteTrashedFolderWritable).optional()
-});
-
 export const zImportDocumentsData = z.object({
-    body: zDocumentImportDocumentsRequest,
+    body: z.array(z.record(z.string(), z.unknown())),
     path: z.never().optional(),
     query: z.never().optional()
 });
@@ -470,7 +425,9 @@ export const zGetRevisionData = z.object({
 export const zGetRevisionResponse = zDocumentRevision;
 
 export const zRenameRevisionData = z.object({
-    body: zDocumentRenameRevisionRequest,
+    body: z.object({
+        name: zDocumentName
+    }),
     path: z.object({
         revisionId: z.uuid()
     }),
@@ -483,13 +440,15 @@ export const zRenameRevisionData = z.object({
 export const zRenameRevisionResponse = z.void();
 
 export const zCreateFolderData = z.object({
-    body: zNoteCreateFolderRequest,
+    body: zNoteFolderWritable,
     path: z.never().optional(),
     query: z.never().optional()
 });
 
 export const zRenameFolderData = z.object({
-    body: zNoteRenameFolderRequest,
+    body: z.object({
+        name: zNoteName
+    }),
     path: z.object({
         folderId: zNoteId
     }),
@@ -516,13 +475,15 @@ export const zGetNotesData = z.object({
 export const zGetNotesResponse = zNoteNote;
 
 export const zCreateNoteData = z.object({
-    body: zNoteCreateNoteRequest,
+    body: zNoteNoteWritable,
     path: z.never().optional(),
     query: z.never().optional()
 });
 
 export const zGenerateDailyNoteData = z.object({
-    body: zNoteGenerateDailyNoteRequest,
+    body: z.object({
+        workspaceId: zNotePropertiesId
+    }),
     path: z.never().optional(),
     query: z.never().optional()
 });
@@ -601,7 +562,9 @@ export const zPublishNoteData = z.object({
 export const zPublishNoteResponse = z.void();
 
 export const zRenameNoteData = z.object({
-    body: zNoteRenameNoteRequest,
+    body: z.object({
+        name: zNotePropertiesName
+    }),
     path: z.object({
         noteId: zNoteNotePropertiesId
     }),
@@ -627,7 +590,7 @@ export const zUnpublishNoteData = z.object({
 export const zUnpublishNoteResponse = z.void();
 
 export const zCreateWorkspaceData = z.object({
-    body: zNoteCreateWorkspaceRequest,
+    body: zNoteWorkspaceWritable,
     path: z.never().optional(),
     query: z.never().optional()
 });
@@ -722,7 +685,7 @@ export const zGetWorkspaceMembersData = z.object({
 export const zGetWorkspaceMembersResponse = z.array(zNoteWorkspaceMember);
 
 export const zUpdateWorkspaceMembersData = z.object({
-    body: zNoteUpdateWorkspaceMembers,
+    body: z.array(zNoteWorkspaceMember),
     path: z.object({
         workspaceSlug: zNoteSlug
     }),
@@ -735,7 +698,10 @@ export const zUpdateWorkspaceMembersData = z.object({
 export const zUpdateWorkspaceMembersResponse = z.void();
 
 export const zMoveWorkspaceItemsData = z.object({
-    body: zNoteMoveWorkspaceItemsRequest,
+    body: z.object({
+        noteIds: z.array(zNoteNotePropertiesId).optional(),
+        folderIds: z.array(zNoteId).optional()
+    }),
     path: z.object({
         workspaceSlug: zNoteSlug
     }),
@@ -761,7 +727,9 @@ export const zPublishWorkspaceData = z.object({
 export const zPublishWorkspaceResponse = z.void();
 
 export const zRenameWorkspaceData = z.object({
-    body: zNoteRenameWorkspaceRequest,
+    body: z.object({
+        name: zNoteWorkspacePropertiesName
+    }),
     path: z.object({
         workspaceSlug: zNoteSlug
     }),
@@ -774,7 +742,10 @@ export const zRenameWorkspaceData = z.object({
 export const zRenameWorkspaceResponse = z.void();
 
 export const zRestoreTrashedWorkspaceItemsData = z.object({
-    body: zNoteRestoreTrashedWorkspaceItemsRequest,
+    body: z.object({
+        notes: z.array(zNoteTrashedNoteWritable).optional(),
+        folders: z.array(zNoteTrashedFolderWritable).optional()
+    }),
     path: z.object({
         workspaceSlug: zNoteSlug
     }),
@@ -806,7 +777,10 @@ export const zShowTrashResponse = z.object({
 });
 
 export const zTrashWorkspaceItemsData = z.object({
-    body: zNoteTrashWorkspaceItemsRequest,
+    body: z.object({
+        notes: z.array(zNoteTrashedNoteWritable).optional(),
+        folders: z.array(zNoteTrashedFolderWritable).optional()
+    }),
     path: z.object({
         workspaceSlug: zNoteSlug
     }),
@@ -843,3 +817,18 @@ export const zUnpublishWorkspaceData = z.object({
  * Workspace unpublished successfully
  */
 export const zUnpublishWorkspaceResponse = z.void();
+
+export const zCheckWorkspaceExistsData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        workspaceSlug: zNoteSlug
+    }),
+    query: z.never().optional()
+});
+
+/**
+ * OK
+ */
+export const zCheckWorkspaceExistsResponse = z.object({
+    exists: z.boolean().optional()
+});

@@ -1,4 +1,4 @@
-# vim:ft=yaml.openapi
+# vim: ft=yaml.openapi
 post:
   security:
     - Oauth2: []
@@ -9,7 +9,16 @@ post:
   parameters:
     - $ref: ../components/parameters/workspaceSlugPath.yaml
   requestBody:
-    $ref: ../components/requestBodies/RenameWorkspaceRequest.yaml
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              $ref: ../components/schemas/Workspace.yaml#/properties/name
+          required:
+            - name
   responses:
     204:
       description: Workspace renamed successfully

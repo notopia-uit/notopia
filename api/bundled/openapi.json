@@ -63,11 +63,21 @@
         "summary": "Import documents",
         "operationId": "importDocuments",
         "requestBody": {
-          "$ref": "#/components/requestBodies/document_ImportDocumentsRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/document_ImportDocumentsResponse"
+            "description": "Successfully imported documents"
           },
           "400": {
             "$ref": "#/components/responses/document_BadRequestError"
@@ -143,7 +153,24 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/document_GetDocumentAttachmentUploadUrlResponse"
+            "description": "Presigned URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "example": "http://rustfs.notopia.localhost/attachments/d4c6b66a-03a8-486d-a139-ab72635c009b"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/document_BadRequestError"
@@ -185,7 +212,29 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/document_GetRevisionsResponse"
+            "description": "Revisions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/document_Revision"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/document_Pagination"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "pagination"
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/document_BadRequestError"
@@ -221,7 +270,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/document_GetRevisionResponse"
+            "description": "Revision detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/document_Revision"
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/document_BadRequestError"
@@ -296,7 +352,22 @@
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/document_RenameRevisionRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "$ref": "#/components/schemas/document_name"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
         },
         "responses": {
           "204": {
@@ -330,11 +401,28 @@
         "summary": "Create folder",
         "operationId": "createFolder",
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_CreateFolderRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/note_Folder"
+              }
+            }
+          }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/note_CreateFolderResponse"
+            "description": "Folder successfully created",
+            "headers": {
+              "Content-Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri",
+                  "example": "http://api.notopia.localhost/notes/folder/123e4567-e89b-12d3-a456-426614174000"
+                },
+                "required": true
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -366,7 +454,22 @@
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_RenameFolderRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "$ref": "#/components/schemas/note_name"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
         },
         "responses": {
           "204": {
@@ -400,11 +503,28 @@
         "summary": "Create note",
         "operationId": "createNote",
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_CreateNoteRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/note_Note"
+              }
+            }
+          }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/note_CreateNoteResponse"
+            "description": "Note successfully created",
+            "headers": {
+              "Content-Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri",
+                  "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+                },
+                "required": true
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -438,7 +558,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/note_GetNotesResponse"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/note_Note"
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -465,11 +592,36 @@
         "summary": "Generate daily note",
         "operationId": "generateDailyNote",
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_GenerateDailyNoteRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "workspaceId": {
+                    "$ref": "#/components/schemas/note_properties-id"
+                  }
+                },
+                "required": [
+                  "workspaceId"
+                ]
+              }
+            }
+          }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/note_GenerateDailyNoteResponse"
+            "description": "Daily note generated successfully",
+            "headers": {
+              "Content-Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri",
+                  "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+                },
+                "required": true
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -505,7 +657,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/note_GetNoteResponse"
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/note_Note"
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -592,7 +751,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/note_GetNoteGraphResponse"
+            "description": "Note graph",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/note_Graph"
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -649,7 +815,28 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/note_GetNoteLinksResponse"
+            "description": "Note links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "outgoingLinks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/note_NoteLink"
+                      }
+                    },
+                    "backlinks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/note_NoteLink"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -720,7 +907,22 @@
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_RenameNoteRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "$ref": "#/components/schemas/note_properties-name"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
         },
         "responses": {
           "204": {
@@ -790,11 +992,28 @@
         "summary": "Create workspace",
         "operationId": "createWorkspace",
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_CreateWorkspaceRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/note_Workspace"
+              }
+            }
+          }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/note_CreateWorkspaceResponse"
+            "description": "Workspace successfully created",
+            "headers": {
+              "Content-Location": {
+                "schema": {
+                  "type": "string",
+                  "format": "uri",
+                  "example": "http://api.notopia.localhost/workspaces/550e8400-e29b-41d4-a716-446655440000"
+                },
+                "required": true
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -827,7 +1046,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/note_GetWorkspaceResponse"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/note_Workspace"
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -897,7 +1123,48 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/note_GetWorkspaceEventsResponse"
+            "description": "A persistent stream of events",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/note_FolderCreatedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/note_FolderDeletedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/note_FolderUpdatedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/note_NoteUpdatedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/note_NoteCreatedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/note_NoteDeletedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/note_WorkspaceUpdatedEvent"
+                    }
+                  ],
+                  "discriminator": {
+                    "propertyName": "type",
+                    "mapping": {
+                      "FolderCreatedEvent": "#/components/schemas/note_FolderCreatedEvent",
+                      "FolderDeletedEvent": "#/components/schemas/note_FolderDeletedEvent",
+                      "FolderUpdatedEvent": "#/components/schemas/note_FolderUpdatedEvent",
+                      "NoteUpdatedEvent": "#/components/schemas/note_NoteUpdatedEvent",
+                      "NoteCreatedEvent": "#/components/schemas/note_NoteCreatedEvent",
+                      "NoteDeletedEvent": "#/components/schemas/note_NoteDeletedEvent",
+                      "WorkspaceUpdatedEvent": "#/components/schemas/note_WorkspaceUpdatedEvent"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -940,7 +1207,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/note_GetWorkspaceGraphResponse"
+            "description": "Workspace graph",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/note_Graph"
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -979,7 +1253,17 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/note_GetWorkspaceMembersResponse"
+            "description": "A list of workspace members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/note_WorkspaceMember"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -1012,7 +1296,17 @@
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_UpdateWorkspaceMembers"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/note_WorkspaceMember"
+                }
+              }
+            }
+          }
         },
         "responses": {
           "204": {
@@ -1051,7 +1345,28 @@
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_MoveWorkspaceItemsRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "noteIds": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/note_Note_properties-id"
+                    }
+                  },
+                  "folderIds": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/note_id"
+                    }
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "204": {
@@ -1126,7 +1441,22 @@
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_RenameWorkspaceRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "$ref": "#/components/schemas/note_Workspace_properties-name"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
         },
         "responses": {
           "204": {
@@ -1165,7 +1495,28 @@
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_RestoreTrashedWorkspaceItemsRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notes": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/note_TrashedNote"
+                    }
+                  },
+                  "folders": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/note_TrashedFolder"
+                    }
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "204": {
@@ -1205,7 +1556,40 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/note_ShowTrashResponse"
+            "description": "Trash",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "notes": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/note_TrashedNote"
+                          }
+                        },
+                        "folders": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/note_TrashedFolder"
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/note_Pagination"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "pagination"
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -1240,7 +1624,28 @@
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/note_TrashWorkspaceItemsRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notes": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/note_TrashedNote"
+                    }
+                  },
+                  "folders": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/note_TrashedFolder"
+                    }
+                  }
+                }
+              }
+            }
+          }
         },
         "responses": {
           "204": {
@@ -1280,7 +1685,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/note_GetWorkspaceTreeResponse"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/note_WorkspaceTreeFolder"
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -1317,6 +1729,55 @@
         "responses": {
           "204": {
             "description": "Workspace unpublished successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/note_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/note_UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/note_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/note_InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceSlug}/exists": {
+      "get": {
+        "security": [
+          {
+            "note_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Check workspace exists",
+        "operationId": "checkWorkspaceExists",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/note_workspaceSlugPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "exists": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -2429,230 +2890,7 @@
         }
       }
     },
-    "requestBodies": {
-      "document_ImportDocumentsRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object"
-              }
-            }
-          }
-        }
-      },
-      "document_RenameRevisionRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/document_name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
-      "note_CreateFolderRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_Folder"
-            }
-          }
-        }
-      },
-      "note_RenameFolderRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/note_name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
-      "note_CreateNoteRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_Note"
-            }
-          }
-        }
-      },
-      "note_GenerateDailyNoteRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "workspaceId": {
-                  "$ref": "#/components/schemas/note_properties-id"
-                }
-              },
-              "required": [
-                "workspaceId"
-              ]
-            }
-          }
-        }
-      },
-      "note_RenameNoteRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/note_properties-name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
-      "note_CreateWorkspaceRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_Workspace"
-            }
-          }
-        }
-      },
-      "note_UpdateWorkspaceMembers": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/note_WorkspaceMember"
-              }
-            }
-          }
-        }
-      },
-      "note_MoveWorkspaceItemsRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "noteIds": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/note_Note_properties-id"
-                  }
-                },
-                "folderIds": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/note_id"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "note_RenameWorkspaceRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/note_Workspace_properties-name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      },
-      "note_RestoreTrashedWorkspaceItemsRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "notes": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/note_TrashedNote"
-                  }
-                },
-                "folders": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/note_TrashedFolder"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "note_TrashWorkspaceItemsRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "notes": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/note_TrashedNote"
-                  }
-                },
-                "folders": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/note_TrashedFolder"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "responses": {
-      "document_ImportDocumentsResponse": {
-        "description": "Successfully imported documents"
-      },
       "document_BadRequestError": {
         "description": "Bad Request Error response",
         "content": {
@@ -2713,61 +2951,6 @@
           }
         }
       },
-      "document_GetDocumentAttachmentUploadUrlResponse": {
-        "description": "Presigned URL",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "string",
-                  "format": "uri",
-                  "example": "http://rustfs.notopia.localhost/attachments/d4c6b66a-03a8-486d-a139-ab72635c009b"
-                }
-              },
-              "required": [
-                "url"
-              ]
-            }
-          }
-        }
-      },
-      "document_GetRevisionsResponse": {
-        "description": "Revisions",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "data": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/document_Revision"
-                  }
-                },
-                "pagination": {
-                  "$ref": "#/components/schemas/document_Pagination"
-                }
-              },
-              "required": [
-                "data",
-                "pagination"
-              ]
-            }
-          }
-        }
-      },
-      "document_GetRevisionResponse": {
-        "description": "Revision detail",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/document_Revision"
-            }
-          }
-        }
-      },
       "document_ForbiddenError": {
         "description": "Forbidden Error response",
         "content": {
@@ -2780,19 +2963,6 @@
               "message": "You do not have permission to access this resource",
               "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
             }
-          }
-        }
-      },
-      "note_CreateFolderResponse": {
-        "description": "Folder successfully created",
-        "headers": {
-          "Content-Location": {
-            "schema": {
-              "type": "string",
-              "format": "uri",
-              "example": "http://api.notopia.localhost/notes/folder/123e4567-e89b-12d3-a456-426614174000"
-            },
-            "required": true
           }
         }
       },
@@ -2856,52 +3026,6 @@
           }
         }
       },
-      "note_GetNotesResponse": {
-        "description": "Successful response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_Note"
-            }
-          }
-        }
-      },
-      "note_CreateNoteResponse": {
-        "description": "Note successfully created",
-        "headers": {
-          "Content-Location": {
-            "schema": {
-              "type": "string",
-              "format": "uri",
-              "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-            },
-            "required": true
-          }
-        }
-      },
-      "note_GenerateDailyNoteResponse": {
-        "description": "Daily note generated successfully",
-        "headers": {
-          "Content-Location": {
-            "schema": {
-              "type": "string",
-              "format": "uri",
-              "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-            },
-            "required": true
-          }
-        }
-      },
-      "note_GetNoteResponse": {
-        "description": "Successful response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_Note"
-            }
-          }
-        }
-      },
       "note_ForbiddenError": {
         "description": "Forbidden Error response",
         "content": {
@@ -2913,176 +3037,6 @@
               "code": "FORBIDDEN",
               "message": "You do not have permission to access this resource",
               "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
-            }
-          }
-        }
-      },
-      "note_GetNoteGraphResponse": {
-        "description": "Note graph",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_Graph"
-            }
-          }
-        }
-      },
-      "note_GetNoteLinksResponse": {
-        "description": "Note links",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "outgoingLinks": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/note_NoteLink"
-                  }
-                },
-                "backlinks": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/note_NoteLink"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "note_CreateWorkspaceResponse": {
-        "description": "Workspace successfully created",
-        "headers": {
-          "Content-Location": {
-            "schema": {
-              "type": "string",
-              "format": "uri",
-              "example": "http://api.notopia.localhost/workspaces/550e8400-e29b-41d4-a716-446655440000"
-            },
-            "required": true
-          }
-        }
-      },
-      "note_GetWorkspaceResponse": {
-        "description": "OK",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_Workspace"
-            }
-          }
-        }
-      },
-      "note_GetWorkspaceEventsResponse": {
-        "description": "A persistent stream of events",
-        "content": {
-          "text/event-stream": {
-            "schema": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/note_FolderCreatedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/note_FolderDeletedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/note_FolderUpdatedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/note_NoteUpdatedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/note_NoteCreatedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/note_NoteDeletedEvent"
-                },
-                {
-                  "$ref": "#/components/schemas/note_WorkspaceUpdatedEvent"
-                }
-              ],
-              "discriminator": {
-                "propertyName": "type",
-                "mapping": {
-                  "FolderCreatedEvent": "#/components/schemas/note_FolderCreatedEvent",
-                  "FolderDeletedEvent": "#/components/schemas/note_FolderDeletedEvent",
-                  "FolderUpdatedEvent": "#/components/schemas/note_FolderUpdatedEvent",
-                  "NoteUpdatedEvent": "#/components/schemas/note_NoteUpdatedEvent",
-                  "NoteCreatedEvent": "#/components/schemas/note_NoteCreatedEvent",
-                  "NoteDeletedEvent": "#/components/schemas/note_NoteDeletedEvent",
-                  "WorkspaceUpdatedEvent": "#/components/schemas/note_WorkspaceUpdatedEvent"
-                }
-              }
-            }
-          }
-        }
-      },
-      "note_GetWorkspaceGraphResponse": {
-        "description": "Workspace graph",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_Graph"
-            }
-          }
-        }
-      },
-      "note_GetWorkspaceMembersResponse": {
-        "description": "A list of workspace members",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/note_WorkspaceMember"
-              }
-            }
-          }
-        }
-      },
-      "note_ShowTrashResponse": {
-        "description": "Trash",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "data": {
-                  "type": "object",
-                  "properties": {
-                    "notes": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/note_TrashedNote"
-                      }
-                    },
-                    "folders": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/note_TrashedFolder"
-                      }
-                    }
-                  }
-                },
-                "pagination": {
-                  "$ref": "#/components/schemas/note_Pagination"
-                }
-              },
-              "required": [
-                "data",
-                "pagination"
-              ]
-            }
-          }
-        }
-      },
-      "note_GetWorkspaceTreeResponse": {
-        "description": "OK",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_WorkspaceTreeFolder"
             }
           }
         }

@@ -18,7 +18,11 @@ get:
         example: 3
   responses:
     200:
-      $ref: ../components/responses/GetNoteGraphResponse.yaml
+      description: Note graph
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Graph.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

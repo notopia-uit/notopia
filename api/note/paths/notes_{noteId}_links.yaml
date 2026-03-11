@@ -22,7 +22,20 @@ get:
         default: true
   responses:
     200:
-      $ref: ../components/responses/GetNoteLinksResponse.yaml
+      description: Note links
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              outgoingLinks:
+                type: array
+                items:
+                  $ref: ../components/schemas/NoteLink.yaml
+              backlinks:
+                type: array
+                items:
+                  $ref: ../components/schemas/NoteLink.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

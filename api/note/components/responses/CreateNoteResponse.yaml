@@ -1,9 +1,0 @@
-# vim: ft=yaml.openapi
-description: Note successfully created
-headers:
-  Content-Location:
-    schema:
-      type: string
-      format: uri
-      example: http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97
-    required: true

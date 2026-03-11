@@ -10,7 +10,11 @@ get:
     - $ref: ../components/parameters/revisionIdPath.yaml
   responses:
     200:
-      $ref: ../components/responses/GetRevisionResponse.yaml
+      description: Revision detail
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Revision.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

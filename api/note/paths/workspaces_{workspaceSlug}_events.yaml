@@ -10,7 +10,29 @@ get:
     - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
     200:
-      $ref: ../components/responses/GetWorkspaceEventsResponse.yaml
+      description: A persistent stream of events
+      content:
+        text/event-stream:
+    # TODO: Note/Folder restore, permanent deletion
+          schema:
+            oneOf:
+              - $ref: ../components/schemas/FolderCreatedEvent.yaml
+              - $ref: ../components/schemas/FolderDeletedEvent.yaml
+              - $ref: ../components/schemas/FolderUpdatedEvent.yaml
+              - $ref: ../components/schemas/NoteUpdatedEvent.yaml
+              - $ref: ../components/schemas/NoteCreatedEvent.yaml
+              - $ref: ../components/schemas/NoteDeletedEvent.yaml
+              - $ref: ../components/schemas/WorkspaceUpdatedEvent.yaml
+            discriminator:
+              propertyName: type
+              mapping:
+                FolderCreatedEvent: ../components/schemas/FolderCreatedEvent.yaml
+                FolderDeletedEvent: ../components/schemas/FolderDeletedEvent.yaml
+                FolderUpdatedEvent: ../components/schemas/FolderUpdatedEvent.yaml
+                NoteUpdatedEvent: ../components/schemas/NoteUpdatedEvent.yaml
+                NoteCreatedEvent: ../components/schemas/NoteCreatedEvent.yaml
+                NoteDeletedEvent: ../components/schemas/NoteDeletedEvent.yaml
+                WorkspaceUpdatedEvent: ../components/schemas/WorkspaceUpdatedEvent.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

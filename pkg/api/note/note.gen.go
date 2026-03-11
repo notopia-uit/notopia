@@ -454,100 +454,14 @@ type BadRequestError = Error
 // ForbiddenError defines model for ForbiddenError.
 type ForbiddenError = Error
 
-// GetNoteGraphResponse defines model for GetNoteGraphResponse.
-type GetNoteGraphResponse = Graph
-
-// GetNoteLinksResponse defines model for GetNoteLinksResponse.
-type GetNoteLinksResponse struct {
-	Backlinks     *[]NoteLink `json:"backlinks,omitempty"`
-	OutgoingLinks *[]NoteLink `json:"outgoingLinks,omitempty"`
-}
-
-// GetNoteResponse defines model for GetNoteResponse.
-type GetNoteResponse = Note
-
-// GetNotesResponse defines model for GetNotesResponse.
-type GetNotesResponse = Note
-
-// GetWorkspaceGraphResponse defines model for GetWorkspaceGraphResponse.
-type GetWorkspaceGraphResponse = Graph
-
-// GetWorkspaceMembersResponse defines model for GetWorkspaceMembersResponse.
-type GetWorkspaceMembersResponse = []WorkspaceMember
-
-// GetWorkspaceResponse defines model for GetWorkspaceResponse.
-type GetWorkspaceResponse = Workspace
-
-// GetWorkspaceTreeResponse defines model for GetWorkspaceTreeResponse.
-type GetWorkspaceTreeResponse = WorkspaceTreeFolder
-
 // InternalServerError defines model for InternalServerError.
 type InternalServerError = Error
 
 // NotFoundError defines model for NotFoundError.
 type NotFoundError = Error
 
-// ShowTrashResponse defines model for ShowTrashResponse.
-type ShowTrashResponse struct {
-	Data struct {
-		Folders *[]TrashedFolder `json:"folders,omitempty"`
-		Notes   *[]TrashedNote   `json:"notes,omitempty"`
-	} `json:"data"`
-	Pagination Pagination `json:"pagination"`
-}
-
 // UnauthorizedError defines model for UnauthorizedError.
 type UnauthorizedError = Error
-
-// CreateFolderRequest defines model for CreateFolderRequest.
-type CreateFolderRequest = Folder
-
-// CreateNoteRequest defines model for CreateNoteRequest.
-type CreateNoteRequest = Note
-
-// CreateWorkspaceRequest defines model for CreateWorkspaceRequest.
-type CreateWorkspaceRequest = Workspace
-
-// GenerateDailyNoteRequest defines model for GenerateDailyNoteRequest.
-type GenerateDailyNoteRequest struct {
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
-}
-
-// MoveWorkspaceItemsRequest defines model for MoveWorkspaceItemsRequest.
-type MoveWorkspaceItemsRequest struct {
-	FolderIds *[]Id               `json:"folderIds,omitempty"`
-	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
-}
-
-// RenameFolderRequest defines model for RenameFolderRequest.
-type RenameFolderRequest struct {
-	Name Name `json:"name"`
-}
-
-// RenameNoteRequest defines model for RenameNoteRequest.
-type RenameNoteRequest struct {
-	Name PropertiesName `json:"name"`
-}
-
-// RenameWorkspaceRequest defines model for RenameWorkspaceRequest.
-type RenameWorkspaceRequest struct {
-	Name WorkspacePropertiesName `json:"name"`
-}
-
-// RestoreTrashedWorkspaceItemsRequest defines model for RestoreTrashedWorkspaceItemsRequest.
-type RestoreTrashedWorkspaceItemsRequest struct {
-	Folders *[]TrashedFolder `json:"folders,omitempty"`
-	Notes   *[]TrashedNote   `json:"notes,omitempty"`
-}
-
-// TrashWorkspaceItemsRequest defines model for TrashWorkspaceItemsRequest.
-type TrashWorkspaceItemsRequest struct {
-	Folders *[]TrashedFolder `json:"folders,omitempty"`
-	Notes   *[]TrashedNote   `json:"notes,omitempty"`
-}
-
-// UpdateWorkspaceMembers defines model for UpdateWorkspaceMembers.
-type UpdateWorkspaceMembers = []WorkspaceMember
 
 // RenameFolderJSONBody defines parameters for RenameFolder.
 type RenameFolderJSONBody struct {
@@ -699,6 +613,9 @@ type ServerInterface interface {
 	// SSE workspace updates
 	// (GET /note/workspaces/{workspaceSlug}/events)
 	GetWorkspaceEvents(c *gin.Context, workspaceSlug WorkspaceSlugPath)
+	// Check workspace exists
+	// (GET /note/workspaces/{workspaceSlug}/exists)
+	CheckWorkspaceExists(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Get workspace graph
 	// (GET /note/workspaces/{workspaceSlug}/graph)
 	GetWorkspaceGraph(c *gin.Context, workspaceSlug WorkspaceSlugPath, params GetWorkspaceGraphParams)
@@ -1155,6 +1072,32 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 	siw.Handler.GetWorkspaceEvents(c, workspaceSlug)
 }
 
+// CheckWorkspaceExists operation middleware
+func (siw *ServerInterfaceWrapper) CheckWorkspaceExists(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.CheckWorkspaceExists(c, workspaceSlug)
+}
+
 // GetWorkspaceGraph operation middleware
 func (siw *ServerInterfaceWrapper) GetWorkspaceGraph(c *gin.Context) {
 
@@ -1495,6 +1438,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceSlug", wrapper.DeleteWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug", wrapper.GetWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug/events", wrapper.GetWorkspaceEvents)
+	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug/exists", wrapper.CheckWorkspaceExists)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug/graph", wrapper.GetWorkspaceGraph)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug/members", wrapper.GetWorkspaceMembers)
 	router.PUT(options.BaseURL+"/note/workspaces/:workspaceSlug/members", wrapper.UpdateWorkspaceMembers)
@@ -1510,72 +1454,11 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 type BadRequestErrorJSONResponse Error
 
-type CreateFolderResponseResponseHeaders struct {
-	ContentLocation string
-}
-type CreateFolderResponseResponse struct {
-	Headers CreateFolderResponseResponseHeaders
-}
-
-type CreateNoteResponseResponseHeaders struct {
-	ContentLocation string
-}
-type CreateNoteResponseResponse struct {
-	Headers CreateNoteResponseResponseHeaders
-}
-
-type CreateWorkspaceResponseResponseHeaders struct {
-	ContentLocation string
-}
-type CreateWorkspaceResponseResponse struct {
-	Headers CreateWorkspaceResponseResponseHeaders
-}
-
 type ForbiddenErrorJSONResponse Error
-
-type GenerateDailyNoteResponseResponseHeaders struct {
-	ContentLocation string
-}
-type GenerateDailyNoteResponseResponse struct {
-	Headers GenerateDailyNoteResponseResponseHeaders
-}
-
-type GetNoteGraphResponseJSONResponse Graph
-
-type GetNoteLinksResponseJSONResponse struct {
-	Backlinks     *[]NoteLink `json:"backlinks,omitempty"`
-	OutgoingLinks *[]NoteLink `json:"outgoingLinks,omitempty"`
-}
-
-type GetNoteResponseJSONResponse Note
-
-type GetNotesResponseJSONResponse Note
-
-type GetWorkspaceEventsResponseTexteventStreamResponse struct {
-	Body io.Reader
-
-	ContentLength int64
-}
-
-type GetWorkspaceGraphResponseJSONResponse Graph
-
-type GetWorkspaceMembersResponseJSONResponse []WorkspaceMember
-
-type GetWorkspaceResponseJSONResponse Workspace
-
-type GetWorkspaceTreeResponseJSONResponse WorkspaceTreeFolder
 
 type InternalServerErrorJSONResponse Error
 
 type NotFoundErrorJSONResponse Error
-
-type ShowTrashResponseJSONResponse struct {
-	Data struct {
-		Folders *[]TrashedFolder `json:"folders,omitempty"`
-		Notes   *[]TrashedNote   `json:"notes,omitempty"`
-	} `json:"data"`
-	Pagination Pagination `json:"pagination"`
-}
 
 type UnauthorizedErrorJSONResponse Error
 
@@ -1587,7 +1470,13 @@ type CreateFolderResponseObject interface {
 	VisitCreateFolderResponse(w http.ResponseWriter) error
 }
 
-type CreateFolder201Response = CreateFolderResponseResponse
+type CreateFolder201ResponseHeaders struct {
+	ContentLocation string
+}
+
+type CreateFolder201Response struct {
+	Headers CreateFolder201ResponseHeaders
+}
 
 func (response CreateFolder201Response) VisitCreateFolderResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
@@ -1687,7 +1576,7 @@ type GetNotesResponseObject interface {
 	VisitGetNotesResponse(w http.ResponseWriter) error
 }
 
-type GetNotes200JSONResponse struct{ GetNotesResponseJSONResponse }
+type GetNotes200JSONResponse Note
 
 func (response GetNotes200JSONResponse) VisitGetNotesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -1733,7 +1622,13 @@ type CreateNoteResponseObject interface {
 	VisitCreateNoteResponse(w http.ResponseWriter) error
 }
 
-type CreateNote201Response = CreateNoteResponseResponse
+type CreateNote201ResponseHeaders struct {
+	ContentLocation string
+}
+
+type CreateNote201Response struct {
+	Headers CreateNote201ResponseHeaders
+}
 
 func (response CreateNote201Response) VisitCreateNoteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
@@ -1778,7 +1673,13 @@ type GenerateDailyNoteResponseObject interface {
 	VisitGenerateDailyNoteResponse(w http.ResponseWriter) error
 }
 
-type GenerateDailyNote201Response = GenerateDailyNoteResponseResponse
+type GenerateDailyNote201ResponseHeaders struct {
+	ContentLocation string
+}
+
+type GenerateDailyNote201Response struct {
+	Headers GenerateDailyNote201ResponseHeaders
+}
 
 func (response GenerateDailyNote201Response) VisitGenerateDailyNoteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
@@ -1895,7 +1796,7 @@ type GetNoteResponseObject interface {
 	VisitGetNoteResponse(w http.ResponseWriter) error
 }
 
-type GetNote200JSONResponse struct{ GetNoteResponseJSONResponse }
+type GetNote200JSONResponse Note
 
 func (response GetNote200JSONResponse) VisitGetNoteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -1960,9 +1861,7 @@ type GetNoteGraphResponseObject interface {
 	VisitGetNoteGraphResponse(w http.ResponseWriter) error
 }
 
-type GetNoteGraph200JSONResponse struct {
-	GetNoteGraphResponseJSONResponse
-}
+type GetNoteGraph200JSONResponse Graph
 
 func (response GetNoteGraph200JSONResponse) VisitGetNoteGraphResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2028,7 +1927,8 @@ type GetNoteLinksResponseObject interface {
 }
 
 type GetNoteLinks200JSONResponse struct {
-	GetNoteLinksResponseJSONResponse
+	Backlinks     *[]NoteLink `json:"backlinks,omitempty"`
+	OutgoingLinks *[]NoteLink `json:"outgoingLinks,omitempty"`
 }
 
 func (response GetNoteLinks200JSONResponse) VisitGetNoteLinksResponse(w http.ResponseWriter) error {
@@ -2247,7 +2147,13 @@ type CreateWorkspaceResponseObject interface {
 	VisitCreateWorkspaceResponse(w http.ResponseWriter) error
 }
 
-type CreateWorkspace201Response = CreateWorkspaceResponseResponse
+type CreateWorkspace201ResponseHeaders struct {
+	ContentLocation string
+}
+
+type CreateWorkspace201Response struct {
+	Headers CreateWorkspace201ResponseHeaders
+}
 
 func (response CreateWorkspace201Response) VisitCreateWorkspaceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
@@ -2346,9 +2252,7 @@ type GetWorkspaceResponseObject interface {
 	VisitGetWorkspaceResponse(w http.ResponseWriter) error
 }
 
-type GetWorkspace200JSONResponse struct {
-	GetWorkspaceResponseJSONResponse
-}
+type GetWorkspace200JSONResponse Workspace
 
 func (response GetWorkspace200JSONResponse) VisitGetWorkspaceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2404,7 +2308,8 @@ type GetWorkspaceEventsResponseObject interface {
 }
 
 type GetWorkspaceEvents200TexteventStreamResponse struct {
-	GetWorkspaceEventsResponseTexteventStreamResponse
+	Body          io.Reader
+	ContentLength int64
 }
 
 func (response GetWorkspaceEvents200TexteventStreamResponse) VisitGetWorkspaceEventsResponse(w http.ResponseWriter) error {
@@ -2450,6 +2355,63 @@ func (response GetWorkspaceEvents500JSONResponse) VisitGetWorkspaceEventsRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type CheckWorkspaceExistsRequestObject struct {
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
+}
+
+type CheckWorkspaceExistsResponseObject interface {
+	VisitCheckWorkspaceExistsResponse(w http.ResponseWriter) error
+}
+
+type CheckWorkspaceExists200JSONResponse struct {
+	Exists *bool `json:"exists,omitempty"`
+}
+
+func (response CheckWorkspaceExists200JSONResponse) VisitCheckWorkspaceExistsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CheckWorkspaceExists400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response CheckWorkspaceExists400JSONResponse) VisitCheckWorkspaceExistsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CheckWorkspaceExists401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response CheckWorkspaceExists401JSONResponse) VisitCheckWorkspaceExistsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CheckWorkspaceExists404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response CheckWorkspaceExists404JSONResponse) VisitCheckWorkspaceExistsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CheckWorkspaceExists500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response CheckWorkspaceExists500JSONResponse) VisitCheckWorkspaceExistsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type GetWorkspaceGraphRequestObject struct {
 	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
 	Params        GetWorkspaceGraphParams
@@ -2459,9 +2421,7 @@ type GetWorkspaceGraphResponseObject interface {
 	VisitGetWorkspaceGraphResponse(w http.ResponseWriter) error
 }
 
-type GetWorkspaceGraph200JSONResponse struct {
-	GetWorkspaceGraphResponseJSONResponse
-}
+type GetWorkspaceGraph200JSONResponse Graph
 
 func (response GetWorkspaceGraph200JSONResponse) VisitGetWorkspaceGraphResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2525,9 +2485,7 @@ type GetWorkspaceMembersResponseObject interface {
 	VisitGetWorkspaceMembersResponse(w http.ResponseWriter) error
 }
 
-type GetWorkspaceMembers200JSONResponse struct {
-	GetWorkspaceMembersResponseJSONResponse
-}
+type GetWorkspaceMembers200JSONResponse []WorkspaceMember
 
 func (response GetWorkspaceMembers200JSONResponse) VisitGetWorkspaceMembersResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2856,7 +2814,13 @@ type ShowTrashResponseObject interface {
 	VisitShowTrashResponse(w http.ResponseWriter) error
 }
 
-type ShowTrash200JSONResponse struct{ ShowTrashResponseJSONResponse }
+type ShowTrash200JSONResponse struct {
+	Data struct {
+		Folders *[]TrashedFolder `json:"folders,omitempty"`
+		Notes   *[]TrashedNote   `json:"notes,omitempty"`
+	} `json:"data"`
+	Pagination Pagination `json:"pagination"`
+}
 
 func (response ShowTrash200JSONResponse) VisitShowTrashResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2966,9 +2930,7 @@ type GetWorkspaceTreeResponseObject interface {
 	VisitGetWorkspaceTreeResponse(w http.ResponseWriter) error
 }
 
-type GetWorkspaceTree200JSONResponse struct {
-	GetWorkspaceTreeResponseJSONResponse
-}
+type GetWorkspaceTree200JSONResponse WorkspaceTreeFolder
 
 func (response GetWorkspaceTree200JSONResponse) VisitGetWorkspaceTreeResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3119,6 +3081,9 @@ type StrictServerInterface interface {
 	// SSE workspace updates
 	// (GET /note/workspaces/{workspaceSlug}/events)
 	GetWorkspaceEvents(ctx context.Context, request GetWorkspaceEventsRequestObject) (GetWorkspaceEventsResponseObject, error)
+	// Check workspace exists
+	// (GET /note/workspaces/{workspaceSlug}/exists)
+	CheckWorkspaceExists(ctx context.Context, request CheckWorkspaceExistsRequestObject) (CheckWorkspaceExistsResponseObject, error)
 	// Get workspace graph
 	// (GET /note/workspaces/{workspaceSlug}/graph)
 	GetWorkspaceGraph(ctx context.Context, request GetWorkspaceGraphRequestObject) (GetWorkspaceGraphResponseObject, error)
@@ -3633,6 +3598,33 @@ func (sh *strictHandler) GetWorkspaceEvents(ctx *gin.Context, workspaceSlug Work
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(GetWorkspaceEventsResponseObject); ok {
 		if err := validResponse.VisitGetWorkspaceEventsResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CheckWorkspaceExists operation middleware
+func (sh *strictHandler) CheckWorkspaceExists(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
+	var request CheckWorkspaceExistsRequestObject
+
+	request.WorkspaceSlug = workspaceSlug
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.CheckWorkspaceExists(ctx, request.(CheckWorkspaceExistsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CheckWorkspaceExists")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(CheckWorkspaceExistsResponseObject); ok {
+		if err := validResponse.VisitCheckWorkspaceExistsResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

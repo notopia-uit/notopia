@@ -7,10 +7,27 @@ post:
   summary: Generate daily note
   operationId: generateDailyNote
   requestBody:
-    $ref: ../components/requestBodies/GenerateDailyNoteRequest.yaml
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            workspaceId:
+              $ref: ../components/schemas/Workspace.yaml#/properties/id
+          required:
+            - workspaceId
   responses:
     201:
-      $ref: ../components/responses/GenerateDailyNoteResponse.yaml
+      description: Daily note generated successfully
+      headers:
+        Content-Location:
+          schema:
+            type: string
+            format: uri
+            example: 
+              http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+          required: true
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

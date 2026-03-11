@@ -17,7 +17,11 @@ get:
         example: true
   responses:
     200:
-      $ref: ../components/responses/GetWorkspaceGraphResponse.yaml
+      description: Workspace graph
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Graph.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

@@ -7,10 +7,16 @@ post:
   summary: Import documents
   operationId: importDocuments
   requestBody:
-    $ref: ../components/requestBodies/ImportDocumentsRequest.yaml
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
   responses:
     201:
-      $ref: ../components/responses/ImportDocumentsResponse.yaml
+      description: Successfully imported documents
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

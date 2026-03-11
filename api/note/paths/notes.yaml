@@ -7,10 +7,22 @@ post:
   summary: Create note
   operationId: createNote
   requestBody:
-    $ref: ../components/requestBodies/CreateNoteRequest.yaml
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/Note.yaml
   responses:
     201:
-      $ref: ../components/responses/CreateNoteResponse.yaml
+      description: Note successfully created
+      headers:
+        Content-Location:
+          schema:
+            type: string
+            format: uri
+            example: 
+              http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+          required: true
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
@@ -30,7 +42,11 @@ get:
     - $ref: ../../common/components/parameters/limitQuery.yaml
   responses:
     200:
-      $ref: ../components/responses/GetNotesResponse.yaml
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Note.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

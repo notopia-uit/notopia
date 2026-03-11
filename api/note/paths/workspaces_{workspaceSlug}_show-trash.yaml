@@ -10,7 +10,28 @@ get:
     - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
     200:
-      $ref: ../components/responses/ShowTrashResponse.yaml
+      description: Trash
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  notes:
+                    type: array
+                    items:
+                      $ref: ../components/schemas/TrashedNote.yaml
+                  folders:
+                    type: array
+                    items:
+                      $ref: ../components/schemas/TrashedFolder.yaml
+              pagination:
+                $ref: ../../common/components/schemas/Pagination.yaml
+            required:
+              - data
+              - pagination
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

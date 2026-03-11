@@ -7,10 +7,22 @@ post:
   summary: Create folder
   operationId: createFolder
   requestBody:
-    $ref: ../components/requestBodies/CreateFolderRequest.yaml
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/Folder.yaml
   responses:
     201:
-      $ref: ../components/responses/CreateFolderResponse.yaml
+      description: Folder successfully created
+      headers:
+        Content-Location:
+          schema:
+            type: string
+            format: uri
+            example: 
+              http://api.notopia.localhost/notes/folder/123e4567-e89b-12d3-a456-426614174000
+          required: true
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

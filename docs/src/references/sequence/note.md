@@ -123,11 +123,17 @@ sequenceDiagram
 
     actor U as User
     participant NS as Note Service
+    participant AS as Authorization Service
     participant MB as Message Broker
     participant SW as Search Worker
     participant SS as Search Service
 
     U->>+NS: UpdateNote
+    NS->>+AS: HasNotePermission
+    break Authorization Failed
+        AS-->>NS: No Permission
+        NS-->>U: No Permission
+    end
     NS->>NS: Update Note
     par Response
         NS-->>-U: Ok
@@ -147,12 +153,18 @@ sequenceDiagram
 
     actor U as User
     participant NS as Note Service
+    participant AS as Authorization Service
     participant MB as Message Broker
     participant DS as Document Service
     participant SW as Search Worker
     participant SS as Search Service
 
     U->>+NS: PermanentlyDeleteWorkspaceItems (note)
+    NS->>+AS: HasWorkspacePermission
+    break Authorization Failed
+        AS-->>NS: No Permission
+        NS-->>U: No Permission
+    end
     NS->>NS: Permanently delete Note
     par Response
         NS-->>-U: Ok

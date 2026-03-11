@@ -37,6 +37,13 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	return nil, errors.New("not implemented")
 }
 
+func (h *StrictHandler) CheckWorkspaceExists(
+	ctx context.Context,
+	request note.CheckWorkspaceExistsRequestObject,
+) (note.CheckWorkspaceExistsResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
 func (h *StrictHandler) GetWorkspaceGraph(
 	ctx context.Context,
 	request note.GetWorkspaceGraphRequestObject,

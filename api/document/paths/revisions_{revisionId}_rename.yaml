@@ -9,7 +9,16 @@ post:
   parameters:
     - $ref: ../components/parameters/revisionIdPath.yaml
   requestBody:
-    $ref: ../components/requestBodies/RenameRevisionRequest.yaml
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              $ref: ../components/schemas/Revision.yaml#/properties/name
+          required:
+            - name
   responses:
     204:
       description: Revision renamed successfully

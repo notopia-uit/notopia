@@ -46,11 +46,21 @@
         "summary": "Import documents",
         "operationId": "importDocuments",
         "requestBody": {
-          "$ref": "#/components/requestBodies/ImportDocumentsRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
         },
         "responses": {
           "201": {
-            "$ref": "#/components/responses/ImportDocumentsResponse"
+            "description": "Successfully imported documents"
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -126,7 +136,24 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetDocumentAttachmentUploadUrlResponse"
+            "description": "Presigned URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "example": "http://rustfs.notopia.localhost/attachments/d4c6b66a-03a8-486d-a139-ab72635c009b"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -168,7 +195,29 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetRevisionsResponse"
+            "description": "Revisions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Revision"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "pagination"
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -204,7 +253,14 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/GetRevisionResponse"
+            "description": "Revision detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Revision"
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -279,7 +335,22 @@
           }
         ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/RenameRevisionRequest"
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "$ref": "#/components/schemas/name"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
         },
         "responses": {
           "204": {
@@ -318,174 +389,6 @@
             "x-scalar-client-id": "api-web",
             "x-usePkce": "SHA-256",
             "x-scalar-credentials-location": "header"
-          }
-        }
-      }
-    },
-    "requestBodies": {
-      "ImportDocumentsRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object"
-              }
-            }
-          }
-        }
-      },
-      "RenameRevisionRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "$ref": "#/components/schemas/name"
-                }
-              },
-              "required": [
-                "name"
-              ]
-            }
-          }
-        }
-      }
-    },
-    "responses": {
-      "ImportDocumentsResponse": {
-        "description": "Successfully imported documents"
-      },
-      "BadRequestError": {
-        "description": "Bad Request Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "BAD_REQUEST",
-              "message": "The request could not be understood by the server due to malformed syntax",
-              "more_info": "https://api.notopia.com/docs/errors/BAD_REQUEST"
-            }
-          }
-        }
-      },
-      "UnauthorizedError": {
-        "description": "Unauthorized Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "UNAUTHORIZED",
-              "message": "Authentication is required to access this resource",
-              "more_info": "https://api.notopia.com/docs/errors/UNAUTHORIZED"
-            }
-          }
-        }
-      },
-      "NotFoundError": {
-        "description": "Not Found Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "NOT_FOUND",
-              "message": "The requested resource was not found",
-              "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
-            }
-          }
-        }
-      },
-      "InternalServerError": {
-        "description": "Internal Server Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "INTERNAL_SERVER_ERROR",
-              "message": "An internal server error occurred. Please try again later",
-              "more_info": "https://api.notopia.com/docs/errors/INTERNAL_SERVER_ERROR"
-            }
-          }
-        }
-      },
-      "GetDocumentAttachmentUploadUrlResponse": {
-        "description": "Presigned URL",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "string",
-                  "format": "uri",
-                  "example": "http://rustfs.notopia.localhost/attachments/d4c6b66a-03a8-486d-a139-ab72635c009b"
-                }
-              },
-              "required": [
-                "url"
-              ]
-            }
-          }
-        }
-      },
-      "GetRevisionsResponse": {
-        "description": "Revisions",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "data": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Revision"
-                  }
-                },
-                "pagination": {
-                  "$ref": "#/components/schemas/Pagination"
-                }
-              },
-              "required": [
-                "data",
-                "pagination"
-              ]
-            }
-          }
-        }
-      },
-      "GetRevisionResponse": {
-        "description": "Revision detail",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Revision"
-            }
-          }
-        }
-      },
-      "ForbiddenError": {
-        "description": "Forbidden Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "FORBIDDEN",
-              "message": "You do not have permission to access this resource",
-              "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
-            }
           }
         }
       }
@@ -771,6 +674,83 @@
         "minLength": 1,
         "maxLength": 255,
         "example": "Initial Draft"
+      }
+    },
+    "responses": {
+      "BadRequestError": {
+        "description": "Bad Request Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "BAD_REQUEST",
+              "message": "The request could not be understood by the server due to malformed syntax",
+              "more_info": "https://api.notopia.com/docs/errors/BAD_REQUEST"
+            }
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "description": "Unauthorized Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "UNAUTHORIZED",
+              "message": "Authentication is required to access this resource",
+              "more_info": "https://api.notopia.com/docs/errors/UNAUTHORIZED"
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "Not Found Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "NOT_FOUND",
+              "message": "The requested resource was not found",
+              "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal Server Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "INTERNAL_SERVER_ERROR",
+              "message": "An internal server error occurred. Please try again later",
+              "more_info": "https://api.notopia.com/docs/errors/INTERNAL_SERVER_ERROR"
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Forbidden Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "FORBIDDEN",
+              "message": "You do not have permission to access this resource",
+              "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
+            }
+          }
+        }
       }
     },
     "parameters": {

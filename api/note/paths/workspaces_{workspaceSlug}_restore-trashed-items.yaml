@@ -9,7 +9,20 @@ post:
   parameters:
     - $ref: ../components/parameters/workspaceSlugPath.yaml
   requestBody:
-    $ref: ../components/requestBodies/RestoreTrashedWorkspaceItemsRequest.yaml
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            notes:
+              type: array
+              items:
+                $ref: ../components/schemas/TrashedNote.yaml
+            folders:
+              type: array
+              items:
+                $ref: ../components/schemas/TrashedFolder.yaml
   responses:
     204:
       description: Workspace items successfully restored

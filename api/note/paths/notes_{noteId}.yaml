@@ -10,7 +10,11 @@ get:
     - $ref: ../components/parameters/noteIdPath.yaml
   responses:
     200:
-      $ref: ../components/responses/GetNoteResponse.yaml
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Note.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

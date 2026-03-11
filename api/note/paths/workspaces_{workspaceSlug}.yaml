@@ -10,7 +10,11 @@ get:
     - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
     200:
-      $ref: ../components/responses/GetWorkspaceResponse.yaml
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Workspace.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

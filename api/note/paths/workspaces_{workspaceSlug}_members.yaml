@@ -10,7 +10,13 @@ get:
     - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
     200:
-      $ref: ../components/responses/GetWorkspaceMembersResponse.yaml
+      description: A list of workspace members
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/WorkspaceMember.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
@@ -30,7 +36,13 @@ put:
   parameters:
     - $ref: ../components/parameters/workspaceSlugPath.yaml
   requestBody:
-    $ref: ../components/requestBodies/UpdateWorkspaceMembers.yaml
+    required: true
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: ../components/schemas/WorkspaceMember.yaml
   responses:
     204:
       description: Workspace members updated successfully
