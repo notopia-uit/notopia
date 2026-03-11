@@ -2,13 +2,30 @@
   "name": "@notopia-uit/document",
   "private": true,
   "dependencies": {
+    "@grpc/grpc-js": "catalog:",
     "@nestjs/common": "catalog:",
+    "@nestjs/config": "catalog:",
     "@nestjs/core": "catalog:",
     "@nestjs/platform-express": "catalog:",
+    "@nestjs/typeorm": "catalog:",
     "@notopia-uit/api-document-nestjs-server": "workspace:",
+    "@opentelemetry/api": "catalog:",
+    "@opentelemetry/exporter-metrics-otlp-grpc": "catalog:",
+    "@opentelemetry/exporter-trace-otlp-grpc": "catalog:",
+    "@opentelemetry/instrumentation-http": "catalog:",
+    "@opentelemetry/instrumentation-pino": "catalog:",
+    "@opentelemetry/resources": "catalog:",
+    "@opentelemetry/sdk-metrics": "catalog:",
+    "@opentelemetry/sdk-node": "catalog:",
+    "@opentelemetry/sdk-trace-node": "catalog:",
+    "@opentelemetry/semantic-conventions": "catalog:",
+    "nestjs-otel": "catalog:",
+    "nestjs-pino": "catalog:",
+    "pino-http": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
-    "tslib": "catalog:"
+    "tslib": "catalog:",
+    "typeorm": "catalog:"
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:"
