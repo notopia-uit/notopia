@@ -20,6 +20,9 @@
     },
     {
       "path": "./packages/api-document-nestjs-server"
+    },
+    {
+      "path": "./packages/lib"
     }
   ]
 }

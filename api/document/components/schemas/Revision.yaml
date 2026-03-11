@@ -27,5 +27,4 @@ properties:
 required:
   - id
   - name
-  - content
   - createdAt

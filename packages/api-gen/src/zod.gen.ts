@@ -520,7 +520,7 @@ export const zGetNoteGraphData = z.object({
         noteId: zNoteNotePropertiesId
     }),
     query: z.object({
-        depth: z.int().gte(1).lte(500).optional().default(3)
+        depth: z.int().gte(1).lte(500).optional().default(100)
     }).optional()
 });
 

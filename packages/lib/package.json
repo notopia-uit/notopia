@@ -1,0 +1,22 @@
+{
+  "name": "@notopia-uit/lib",
+  "version": "0.2.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@nx/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "!**/*.tsbuildinfo",
+    "dist"
+  ],
+  "dependencies": {},
+  "types": "./dist/index.d.ts"
+}

@@ -50,6 +50,7 @@
     "husky": "9.1.7",
     "jiti": "2.6.1",
     "jsdom": "~28.1.0",
+    "jsonc-eslint-parser": "catalog:",
     "nx": "22.5.4",
     "nx-github-pages": "1.2.0",
     "prettier": "catalog:",
@@ -59,7 +60,9 @@
     "tslib": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
+    "verdaccio": "^6.0.5",
     "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
     "vitest": "catalog:",
     "webpack-cli": "6.0.1"
   },
