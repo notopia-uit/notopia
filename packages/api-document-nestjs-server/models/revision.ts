@@ -6,7 +6,7 @@ export interface Revision {
   /**
    * BlockNote model
    */
-  content: Array<object> | null;
+  content?: Array<object>;
   readonly createdAt: string;
 }
 

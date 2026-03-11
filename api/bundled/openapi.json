@@ -1905,7 +1905,6 @@
         "items": {
           "type": "object"
         },
-        "nullable": true,
         "description": "BlockNote model",
         "example": [
           {
@@ -2098,7 +2097,6 @@
         "required": [
           "id",
           "name",
-          "content",
           "createdAt"
         ]
       },

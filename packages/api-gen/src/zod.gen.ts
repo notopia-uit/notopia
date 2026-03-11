@@ -33,12 +33,12 @@ export const zDocumentError = z.object({
 /**
  * BlockNote model
  */
-export const zDocumentDocumentContent = z.array(z.unknown()).nullable();
+export const zDocumentDocumentContent = z.array(z.unknown());
 
 export const zDocumentRevision = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255).nullable(),
-    content: zDocumentDocumentContent,
+    content: zDocumentDocumentContent.optional(),
     createdAt: z.iso.datetime().readonly()
 });
 
@@ -231,11 +231,11 @@ export const zNoteWorkspaceTreeFolder = z.object({
 /**
  * BlockNote model
  */
-export const zDocumentDocumentContentWritable = z.array(z.unknown()).nullable();
+export const zDocumentDocumentContentWritable = z.array(z.unknown());
 
 export const zDocumentRevisionWritable = z.object({
     name: z.string().min(1).max(255).nullable(),
-    content: zDocumentDocumentContentWritable
+    content: zDocumentDocumentContentWritable.optional()
 });
 
 export const zNoteFolderWritable = z.object({

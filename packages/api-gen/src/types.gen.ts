@@ -49,12 +49,12 @@ export type DocumentError = {
 /**
  * BlockNote model
  */
-export type DocumentDocumentContent = Array<unknown> | null;
+export type DocumentDocumentContent = Array<unknown>;
 
 export type DocumentRevision = {
     readonly id: string;
     name: string | null;
-    content: DocumentDocumentContent;
+    content?: DocumentDocumentContent;
     readonly createdAt: string;
 };
 
@@ -311,11 +311,11 @@ export type NotePropertiesUpdatedAt = string;
 /**
  * BlockNote model
  */
-export type DocumentDocumentContentWritable = Array<unknown> | null;
+export type DocumentDocumentContentWritable = Array<unknown>;
 
 export type DocumentRevisionWritable = {
     name: string | null;
-    content: DocumentDocumentContentWritable;
+    content?: DocumentDocumentContentWritable;
 };
 
 export type NoteFolderWritable = {

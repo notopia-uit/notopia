@@ -8,7 +8,6 @@ api/index.ts
 controllers/DocumentApi.controller.ts
 controllers/RevisionApi.controller.ts
 controllers/index.ts
-index.ts
 models/error.ts
 models/get-document-attachment-upload-url-200-response.ts
 models/get-revisions-200-response.ts

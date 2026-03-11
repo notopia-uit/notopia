@@ -1,6 +1,6 @@
 # Monorepo
 
-Manged with nx. Package manager: pnpm, go, mise, buf
+Manged with Nx. Package manager: pnpm, go, mise, buf
 
 ## Structure
 
@@ -30,3 +30,13 @@ internal/                       # Internal Go packages
   pb
 pkg/                            # Go packages
 ```
+
+## Technologies
+
+### API
+
+- Redocly to bundle and join yaml spec to json
+- Scalar render joined spec, mock server
+- openapi-generator generate NestJS server code
+- heyapi/openapi-ts generate frontend API client code (typescript, react-query, nextjs)
+- oapi-codegen generate Go server code (gin, strict server)
