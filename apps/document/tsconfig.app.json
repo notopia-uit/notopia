@@ -5,6 +5,7 @@
     "module": "nodenext",
     "types": ["node"],
     "rootDir": "src",
+    "baseUrl": "src",
     "moduleResolution": "nodenext",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
     "experimentalDecorators": true,
