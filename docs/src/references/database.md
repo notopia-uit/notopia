@@ -134,6 +134,7 @@ documents: {
 revisions: {
   id: uuid {constraint: PK}
   name: text {constraint: N}
+  data: bytea
   document_id: uuid {constraint: FK}
   created_at: timestamptz
 

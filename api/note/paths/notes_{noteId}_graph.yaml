@@ -14,7 +14,7 @@ get:
         type: integer
         minimum: 1
         maximum: 500
-        default: 3
+        default: 100
         example: 3
   responses:
     200:

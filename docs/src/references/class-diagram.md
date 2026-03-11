@@ -227,8 +227,10 @@ package "Document" as Document <<Frame>> {
 
     Entity(RevisionEntity) {
         id: string
-        documentId: string
+        name: string?
         data: Buffer
+        documentId: string
+        createdAt: Date
     }
 
     Model(DocumentModel) {
@@ -238,8 +240,10 @@ package "Document" as Document <<Frame>> {
 
     Model(RevisionModel) {
         id: string
-        documentId: string
+        name: string?
         content: @blocknote/core.Block[]
+        documentId: string
+        createdAt: Date
     }
 
     Type(AttachmentUploadUrl) {

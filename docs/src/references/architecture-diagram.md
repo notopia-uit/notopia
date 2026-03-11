@@ -73,7 +73,14 @@ services: Services {
     database: Database {
       icon: https://cdn.simpleicons.org/postgresql/7287fd
     }
+    pub_sub: Pub/Sub {
+      icon: https://cdn.simpleicons.org/redis/d20f39
+      class: notUsed
+    }
     document_service -> database
+    document_service -> pub_sub: {
+      class: notUsed
+    }
   }
 
   note: Note Service Group {
@@ -123,10 +130,6 @@ services: Services {
   event_bus: Event Bus {
     message_broker: Message Broker {
       icon: https://raw.githubusercontent.com/redpanda-data/redpanda/d17f36726370db7c7044cb12ecc1c46841e8bfa6/docs/icon-redpanda.svg
-    }
-
-    pub_sub: Pub/Sub {
-      icon: https://cdn.simpleicons.org/redis/d20f39
     }
   }
 
