@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { RevisionEntity } from '../../domain/revision.entity';
+import { RevisionEntity } from './revision.entity';
 
 @Injectable()
 export class RevisionRepository {

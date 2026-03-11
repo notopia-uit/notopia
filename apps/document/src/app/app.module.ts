@@ -5,25 +5,15 @@ import { LoggerModule } from 'nestjs-pino';
 
 import { AppConfig } from '../config/config';
 import { appConfig } from '../config/config.factory';
-import { DocumentModule } from '../document/document.module';
-import { DatabaseModule } from '../infrastructure/database/database.module';
+import { DatabaseModule } from '../database/database.module';
+import { HocuspocusModule } from '../hocuspocus/hocuspocus.module';
+import { ApiHttpModule } from './api.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig],
-    }),
-    LoggerModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService<AppConfig, true>) => {
-        const level =
-          configService.get('otel', { infer: true }).log.level ?? 'info';
-        return {
-          pinoHttp: { level },
-        };
-      },
     }),
     OpenTelemetryModule.forRoot({
       metrics: {
@@ -33,8 +23,20 @@ import { DatabaseModule } from '../infrastructure/database/database.module';
         },
       },
     }),
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const appCfg = configService.get<AppConfig>('app');
+        const level = appCfg?.otel.log.level ?? 'info';
+        return {
+          pinoHttp: { level },
+        };
+      },
+    }),
     DatabaseModule,
-    DocumentModule,
+    HocuspocusModule,
+    ApiHttpModule,
   ],
 })
 export class AppModule {}

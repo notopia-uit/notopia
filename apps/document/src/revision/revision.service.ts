@@ -1,14 +1,15 @@
+import { Block } from '@blocknote/core';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
-import { RevisionEntity } from '../domain/revision.entity';
-import { RevisionRepository } from '../infrastructure/database/revision.repository';
+import { RevisionEntity } from './revision.entity';
+import { RevisionRepository } from './revision.repository';
 
 export interface RevisionModel {
   id: string;
   documentId: string;
   name: string | null;
-  content: object[];
+  content: Block[];
   createdAt: string;
 }
 
@@ -24,17 +25,11 @@ export class RevisionService {
   constructor(private readonly revisionRepository: RevisionRepository) {}
 
   private entityToModel(entity: RevisionEntity): RevisionModel {
-    let content: object[] = [];
-    try {
-      content = JSON.parse(entity.data.toString());
-    } catch {
-      content = [];
-    }
     return {
       id: entity.id,
       documentId: entity.documentId,
       name: entity.name,
-      content,
+      content: entity.content,
       createdAt: entity.createdAt.toISOString(),
     };
   }
@@ -66,14 +61,13 @@ export class RevisionService {
 
   async createRevision(
     documentId: string,
-    content: object[]
+    content: Block[]
   ): Promise<RevisionModel> {
     const entity = new RevisionEntity();
     entity.id = randomUUID();
     entity.documentId = documentId;
     entity.name = null;
-    entity.data = Buffer.from(JSON.stringify(content), 'utf-8');
-    entity.createdAt = new Date();
+    entity.content = content;
     await this.revisionRepository.save(entity);
     return this.entityToModel(entity);
   }

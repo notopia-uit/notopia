@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { DocumentEntity } from '../../domain/document.entity';
+import { DocumentEntity } from './document.entity';
 
 @Injectable()
 export class DocumentRepository {
@@ -11,15 +11,15 @@ export class DocumentRepository {
     private readonly repo: Repository<DocumentEntity>
   ) {}
 
-  async save(document: DocumentEntity) {
+  async save(document: DocumentEntity): Promise<void> {
     await this.repo.save(document);
   }
 
-  async updateDataById(id: string, data: Buffer) {
+  async updateDataById(id: string, data: Buffer): Promise<void> {
     await this.repo.update(id, { data });
   }
 
-  async getById(id: string) {
+  async getById(id: string): Promise<DocumentEntity | null> {
     return this.repo.findOneBy({ id });
   }
 }

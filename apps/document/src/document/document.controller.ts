@@ -4,10 +4,10 @@ import {
   GetDocumentAttachmentUploadUrl200Response,
 } from '@notopia-uit/api-document-nestjs-server';
 
-import { DocumentService } from '../application/document.service';
+import { DocumentService } from './document.service';
 
 @Injectable()
-export class DocumentApiImpl extends DocumentApi {
+export class DocumentController extends DocumentApi {
   constructor(private readonly documentService: DocumentService) {
     super();
   }

@@ -1,11 +1,11 @@
 import { Server } from '@hocuspocus/server';
 import { Module } from '@nestjs/common';
 
-import { DatabaseModule } from '../database/database.module';
-import { HocuspocusProvider } from './server';
+import { DocumentModule } from '../document/document.module';
+import { HocuspocusProvider } from './hocuspocus.provider';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DocumentModule],
   providers: [HocuspocusProvider],
   exports: [Server],
 })

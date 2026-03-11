@@ -1,10 +1,6 @@
 import { credentials } from '@grpc/grpc-js';
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
-import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 import { PinoInstrumentation } from '@opentelemetry/instrumentation-pino';
 import { Resource } from '@opentelemetry/resources';
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
@@ -15,64 +11,58 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
-import type { AppConfig } from '../config/config';
+function buildSdk(): NodeSDK {
+  const resource = new Resource({
+    [ATTR_SERVICE_NAME]: 'document',
+  });
 
-@Injectable()
-export class OtelService {
-  public readonly sdk: NodeSDK;
+  const sdkOptions: ConstructorParameters<typeof NodeSDK>[0] = {
+    resource,
+    instrumentations: [new PinoInstrumentation()],
+  };
 
-  constructor(private configService: ConfigService) {
-    this.sdk = this.buildSdk();
+  const traceEnabled = process.env['OTEL_TRACE_ENABLED'] === 'true';
+  const traceEndpoint = process.env['OTEL_TRACE_GRPC_ENDPOINT'] ?? '';
+
+  if (traceEnabled && traceEndpoint) {
+    const insecure = process.env['OTEL_TRACE_GRPC_INSECURE'] === 'true';
+    const sampleRate = parseFloat(
+      process.env['OTEL_TRACE_SAMPLE_RATE'] ?? '1.0'
+    );
+
+    sdkOptions.traceExporter = new OTLPTraceExporter({
+      url: traceEndpoint,
+      credentials: insecure
+        ? credentials.createInsecure()
+        : credentials.createSsl(),
+    });
+    sdkOptions.sampler = new ParentBasedSampler({
+      root: new TraceIdRatioBasedSampler(sampleRate),
+    });
   }
 
-  private buildSdk(): NodeSDK {
-    const appConfig = this.configService.get<AppConfig>('app');
-    const otelConfig = appConfig?.otel;
+  const meterEnabled = process.env['OTEL_METER_ENABLED'] === 'true';
+  const meterEndpoint = process.env['OTEL_METER_GRPC_ENDPOINT'] ?? '';
 
-    const resource = new Resource({
-      [ATTR_SERVICE_NAME]: 'document',
-    });
+  if (meterEnabled && meterEndpoint) {
+    const insecure = process.env['OTEL_METER_GRPC_INSECURE'] === 'true';
+    const exportInterval = parseInt(
+      process.env['OTEL_METER_EXPORT_INTERVAL'] ?? '60000',
+      10
+    );
 
-    const sdkOptions: ConstructorParameters<typeof NodeSDK>[0] = {
-      resource,
-      instrumentations: [new HttpInstrumentation(), new PinoInstrumentation()],
-    };
-
-    if (otelConfig?.trace.enabled && otelConfig.trace.grpc.endpoint) {
-      sdkOptions.traceExporter = new OTLPTraceExporter({
-        url: otelConfig.trace.grpc.endpoint,
-        credentials: otelConfig.trace.grpc.insecure
+    sdkOptions.metricReader = new PeriodicExportingMetricReader({
+      exporter: new OTLPMetricExporter({
+        url: meterEndpoint,
+        credentials: insecure
           ? credentials.createInsecure()
           : credentials.createSsl(),
-      });
-      sdkOptions.sampler = new ParentBasedSampler({
-        root: new TraceIdRatioBasedSampler(otelConfig.trace.sampleRate),
-      });
-    }
-
-    if (otelConfig?.meter.enabled && otelConfig.meter.grpc.endpoint) {
-      sdkOptions.metricReader = new PeriodicExportingMetricReader({
-        exporter: new OTLPMetricExporter({
-          url: otelConfig.meter.grpc.endpoint,
-          credentials: otelConfig.meter.grpc.insecure
-            ? credentials.createInsecure()
-            : credentials.createSsl(),
-        }),
-        exportIntervalMillis: otelConfig.meter.exportInterval,
-      });
-    }
-
-    return new NodeSDK(sdkOptions);
+      }),
+      exportIntervalMillis: exportInterval,
+    });
   }
+
+  return new NodeSDK(sdkOptions);
 }
 
-export const otelSdk = new NodeSDK({
-  resource: new Resource({
-    [ATTR_SERVICE_NAME]: 'document',
-  }),
-  instrumentations: [
-    getNodeAutoInstrumentations(),
-    new HttpInstrumentation(),
-    new PinoInstrumentation(),
-  ],
-});
+export const otelSdk = buildSdk();

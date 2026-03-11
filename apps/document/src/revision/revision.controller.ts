@@ -6,10 +6,10 @@ import {
   RevisionApi,
 } from '@notopia-uit/api-document-nestjs-server';
 
-import { RevisionService } from '../application/revision.service';
+import { RevisionService } from './revision.service';
 
 @Injectable()
-export class RevisionApiImpl extends RevisionApi {
+export class RevisionController extends RevisionApi {
   constructor(private readonly revisionService: RevisionService) {
     super();
   }

@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AppConfig } from '../../config/config';
-import { DocumentEntity } from '../../domain/document.entity';
-import { RevisionEntity } from '../../domain/revision.entity';
+import { AppConfig } from '../config/config';
+import { DocumentEntity } from '../document/document.entity';
+import { RevisionEntity } from '../revision/revision.entity';
 
 @Module({
   imports: [

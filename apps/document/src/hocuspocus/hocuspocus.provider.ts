@@ -2,7 +2,7 @@ import { Database } from '@hocuspocus/extension-database';
 import { Server } from '@hocuspocus/server';
 import { Provider } from '@nestjs/common';
 
-import { DocumentRepository } from '../database/document.repository';
+import { DocumentRepository } from '../document/document.repository';
 
 export const HocuspocusProvider: Provider = {
   provide: Server,
