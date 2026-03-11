@@ -44,6 +44,7 @@ deleted_by: {
 
 workspaces: {
   id: uuid {constraint: PK}
+  slug: text {constraint: U}
   name: text
   created_at: timestamptz
   updated_at: timestamptz

@@ -1,16 +1,18 @@
 # vim: ft=yaml.openapi
-get:
+post:
   security:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Get workspace tree
-  operationId: getWorkspaceTree
+  summary: Move workspace's items
+  operationId: moveWorkspaceItems
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
+    - $ref: ../components/parameters/workspaceSlugPath.yaml
+  requestBody:
+    $ref: ../components/requestBodies/MoveWorkspaceItemsRequest.yaml
   responses:
-    200:
-      $ref: ../components/responses/GetWorkspaceTreeResponse.yaml
+    204:
+      description: Workspace items successfully moved
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

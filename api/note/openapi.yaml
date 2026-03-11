@@ -51,30 +51,32 @@ paths:
 
   /note/workspaces:
     $ref: ./paths/workspaces.yaml
-  /note/workspaces/{workspaceId}:
-    $ref: ./paths/workspaces_{workspaceId}.yaml
-  /note/workspaces/{workspaceId}/events:
-    $ref: ./paths/workspaces_{workspaceId}_events.yaml
-  /note/workspaces/{workspaceId}/graph:
-    $ref: ./paths/workspaces_{workspaceId}_graph.yaml
-  /note/workspaces/{workspaceId}/members:
-    $ref: ./paths/workspaces_{workspaceId}_members.yaml
-  /note/workspaces/{workspaceId}/move-items:
-    $ref: ./paths/workspaces_{workspaceId}_move-items.yaml
-  /note/workspaces/{workspaceId}/publish:
-    $ref: ./paths/workspaces_{workspaceId}_publish.yaml
-  /note/workspaces/{workspaceId}/rename:
-    $ref: ./paths/workspaces_{workspaceId}_rename.yaml
-  /note/workspaces/{workspaceId}/restore-trashed-items:
-    $ref: ./paths/workspaces_{workspaceId}_restore-trashed-items.yaml
-  /note/workspaces/{workspaceId}/show-trash:
-    $ref: ./paths/workspaces_{workspaceId}_show-trash.yaml
-  /note/workspaces/{workspaceId}/trash-items:
-    $ref: ./paths/workspaces_{workspaceId}_trash-items.yaml
-  /note/workspaces/{workspaceId}/tree:
-    $ref: ./paths/workspaces_{workspaceId}_tree.yaml
-  /note/workspaces/{workspaceId}/unpublish:
-    $ref: ./paths/workspaces_{workspaceId}_unpublish.yaml
+  /note/workspaces/{workspaceSlug}:
+    $ref: ./paths/workspaces_{workspaceSlug}.yaml
+  /note/workspaces/{workspaceSlug}/events:
+    $ref: ./paths/workspaces_{workspaceSlug}_events.yaml
+  /note/workspaces/{workspaceSlug}/graph:
+    $ref: ./paths/workspaces_{workspaceSlug}_graph.yaml
+  /note/workspaces/{workspaceSlug}/members:
+    $ref: ./paths/workspaces_{workspaceSlug}_members.yaml
+  /note/workspaces/{workspaceSlug}/move-items:
+    $ref: ./paths/workspaces_{workspaceSlug}_move-items.yaml
+  /note/workspaces/{workspaceSlug}/publish:
+    $ref: ./paths/workspaces_{workspaceSlug}_publish.yaml
+  /note/workspaces/{workspaceSlug}/rename:
+    $ref: ./paths/workspaces_{workspaceSlug}_rename.yaml
+  /note/workspaces/{workspaceSlug}/restore-trashed-items:
+    $ref: ./paths/workspaces_{workspaceSlug}_restore-trashed-items.yaml
+  /note/workspaces/{workspaceSlug}/show-trash:
+    $ref: ./paths/workspaces_{workspaceSlug}_show-trash.yaml
+  /note/workspaces/{workspaceSlug}/trash-items:
+    $ref: ./paths/workspaces_{workspaceSlug}_trash-items.yaml
+  /note/workspaces/{workspaceSlug}/tree:
+    $ref: ./paths/workspaces_{workspaceSlug}_tree.yaml
+  /note/workspaces/{workspaceSlug}/unpublish:
+    $ref: ./paths/workspaces_{workspaceSlug}_unpublish.yaml
+  /note/workspaces/{workspaceSlug}/exists:
+    $ref: ./paths/workspaces_{workspaceSlug}_exists.yaml
 
 components:
   securitySchemes:

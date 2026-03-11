@@ -112,8 +112,11 @@ export const zNoteNoteLink = z.object({
 
 export const zNoteWorkspace = z.object({
     id: z.uuid().readonly(),
+    slug: z.string(),
     name: z.string().min(1).max(255)
 });
+
+export const zNoteSlug = z.string();
 
 export const zNoteFolderCreatedEvent = z.object({
     type: z.enum(['FolderCreatedEvent']),
@@ -252,6 +255,7 @@ export const zNoteNoteLinkWritable = z.object({
 });
 
 export const zNoteWorkspaceWritable = z.object({
+    slug: z.string(),
     name: z.string().min(1).max(255)
 });
 
@@ -345,7 +349,7 @@ export const zNoteLimitQuery = z.int().gte(1).lte(100).default(20);
 
 export const zNoteNoteIdPath = zNoteNotePropertiesId;
 
-export const zNoteWorkspaceIdPath = zNotePropertiesId;
+export const zNoteWorkspaceSlugPath = zNoteSlug;
 
 export const zDocumentImportDocumentsRequest = z.array(z.record(z.string(), z.unknown()));
 
@@ -631,7 +635,7 @@ export const zCreateWorkspaceData = z.object({
 export const zDeleteWorkspaceData = z.object({
     body: z.never().optional(),
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -644,7 +648,7 @@ export const zDeleteWorkspaceResponse = z.void();
 export const zGetWorkspaceData = z.object({
     body: z.never().optional(),
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -657,7 +661,7 @@ export const zGetWorkspaceResponse = zNoteWorkspace;
 export const zGetWorkspaceEventsData = z.object({
     body: z.never().optional(),
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -692,7 +696,7 @@ export const zGetWorkspaceEventsResponse = z.union([
 export const zGetWorkspaceGraphData = z.object({
     body: z.never().optional(),
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.object({
         orphan: z.boolean().optional().default(false)
@@ -707,7 +711,7 @@ export const zGetWorkspaceGraphResponse = zNoteGraph;
 export const zGetWorkspaceMembersData = z.object({
     body: z.never().optional(),
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -720,7 +724,7 @@ export const zGetWorkspaceMembersResponse = z.array(zNoteWorkspaceMember);
 export const zUpdateWorkspaceMembersData = z.object({
     body: zNoteUpdateWorkspaceMembers,
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -733,7 +737,7 @@ export const zUpdateWorkspaceMembersResponse = z.void();
 export const zMoveWorkspaceItemsData = z.object({
     body: zNoteMoveWorkspaceItemsRequest,
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -746,7 +750,7 @@ export const zMoveWorkspaceItemsResponse = z.void();
 export const zPublishWorkspaceData = z.object({
     body: z.never().optional(),
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -759,7 +763,7 @@ export const zPublishWorkspaceResponse = z.void();
 export const zRenameWorkspaceData = z.object({
     body: zNoteRenameWorkspaceRequest,
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -772,7 +776,7 @@ export const zRenameWorkspaceResponse = z.void();
 export const zRestoreTrashedWorkspaceItemsData = z.object({
     body: zNoteRestoreTrashedWorkspaceItemsRequest,
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -785,7 +789,7 @@ export const zRestoreTrashedWorkspaceItemsResponse = z.void();
 export const zShowTrashData = z.object({
     body: z.never().optional(),
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -804,7 +808,7 @@ export const zShowTrashResponse = z.object({
 export const zTrashWorkspaceItemsData = z.object({
     body: zNoteTrashWorkspaceItemsRequest,
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -817,7 +821,7 @@ export const zTrashWorkspaceItemsResponse = z.void();
 export const zGetWorkspaceTreeData = z.object({
     body: z.never().optional(),
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });
@@ -830,7 +834,7 @@ export const zGetWorkspaceTreeResponse = zNoteWorkspaceTreeFolder;
 export const zUnpublishWorkspaceData = z.object({
     body: z.never().optional(),
     path: z.object({
-        workspaceId: zNotePropertiesId
+        workspaceSlug: zNoteSlug
     }),
     query: z.never().optional()
 });

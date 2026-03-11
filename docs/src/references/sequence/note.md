@@ -15,11 +15,18 @@ sequenceDiagram
 
     actor U as User
     participant NS as Note Service
+    participant AS as Authorization Service
     participant MB as Message Broker
     participant SW as Search Worker
     participant SS as Search Service
 
     U->>+NS: CreateNote
+    NS->>+AS: HasNotePermission
+    break Authorization Failed
+        AS-->>NS: No Permission
+        NS-->>U: No Permission
+    end
+    AS-->>-NS: Ok
     NS->>NS: Create Note
     par Response
         NS-->>-U: Note ID
@@ -41,26 +48,29 @@ sequenceDiagram
     actor U as User
     participant NS as Note Service
     participant DS as Document Service
+    participant AS as Authorization Service
 
     U->>+NS: GetNote
     NS->>NS: Get Note
+    NS->>+AS: HasNotePermission
+    break Authorization Failed
+        AS-->>NS: No Permission
+        NS-->>U: No Permission
+    end
     NS-->>-U: Note
     opt Enter Edit Mode
         U->>+DS: WsDocument
-        DS->>DS: Establish Hocuspocus connection
-        alt Document exists
-            DS-->>U: Connection
-        else Document does not exist
+        opt Document does not exists
             DS->>+NS: CheckNoteExistence
             NS->>NS: Check Note existence
-            alt Note exists
-                DS->>DS: Init document
-                DS-->>U: Document binary
-            else Note does not exist
+            alt Note does not exists
                 NS-->>-DS: Not found
                 DS-->>U: Not found
+            else Note exists
+                DS->>DS: Init document
             end
         end
+        DS-->>U: Hocuspocus Connection
         loop Edit Document
             U->>DS: Edit Document
             DS->>DS: Save Document changes, broadcast to other clients

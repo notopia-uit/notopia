@@ -4,16 +4,18 @@ get:
     - Oauth2: []
   tags:
     - Workspace
-  summary: SSE workspace updates
-  operationId: getWorkspaceEvents
+  summary: Get workspace tree
+  operationId: getWorkspaceTree
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
+    - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
     200:
-      $ref: ../components/responses/GetWorkspaceEventsResponse.yaml
+      $ref: ../components/responses/GetWorkspaceTreeResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml

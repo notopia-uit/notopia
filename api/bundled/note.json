@@ -528,7 +528,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}": {
+    "/note/workspaces/{workspaceSlug}": {
       "get": {
         "security": [
           {
@@ -542,7 +542,7 @@
         "operationId": "getWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "responses": {
@@ -576,7 +576,7 @@
         "operationId": "deleteWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "responses": {
@@ -598,7 +598,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/events": {
+    "/note/workspaces/{workspaceSlug}/events": {
       "get": {
         "security": [
           {
@@ -612,7 +612,7 @@
         "operationId": "getWorkspaceEvents",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "responses": {
@@ -631,7 +631,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/graph": {
+    "/note/workspaces/{workspaceSlug}/graph": {
       "get": {
         "security": [
           {
@@ -645,7 +645,7 @@
         "operationId": "getWorkspaceGraph",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           },
           {
             "name": "orphan",
@@ -680,7 +680,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/members": {
+    "/note/workspaces/{workspaceSlug}/members": {
       "get": {
         "security": [
           {
@@ -694,7 +694,7 @@
         "operationId": "getWorkspaceMembers",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "responses": {
@@ -728,7 +728,7 @@
         "operationId": "updateWorkspaceMembers",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "requestBody": {
@@ -753,7 +753,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/move-items": {
+    "/note/workspaces/{workspaceSlug}/move-items": {
       "post": {
         "security": [
           {
@@ -767,7 +767,7 @@
         "operationId": "moveWorkspaceItems",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "requestBody": {
@@ -792,7 +792,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/publish": {
+    "/note/workspaces/{workspaceSlug}/publish": {
       "post": {
         "security": [
           {
@@ -806,7 +806,7 @@
         "operationId": "publishWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "responses": {
@@ -828,7 +828,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/rename": {
+    "/note/workspaces/{workspaceSlug}/rename": {
       "post": {
         "security": [
           {
@@ -842,7 +842,7 @@
         "operationId": "renameWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "requestBody": {
@@ -867,7 +867,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/restore-trashed-items": {
+    "/note/workspaces/{workspaceSlug}/restore-trashed-items": {
       "post": {
         "security": [
           {
@@ -881,7 +881,7 @@
         "operationId": "restoreTrashedWorkspaceItems",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "requestBody": {
@@ -906,7 +906,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/show-trash": {
+    "/note/workspaces/{workspaceSlug}/show-trash": {
       "get": {
         "security": [
           {
@@ -920,7 +920,7 @@
         "operationId": "showTrash",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "responses": {
@@ -942,7 +942,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/trash-items": {
+    "/note/workspaces/{workspaceSlug}/trash-items": {
       "post": {
         "security": [
           {
@@ -956,7 +956,7 @@
         "operationId": "trashWorkspaceItems",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "requestBody": {
@@ -981,7 +981,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/tree": {
+    "/note/workspaces/{workspaceSlug}/tree": {
       "get": {
         "security": [
           {
@@ -995,7 +995,7 @@
         "operationId": "getWorkspaceTree",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "responses": {
@@ -1017,7 +1017,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceId}/unpublish": {
+    "/note/workspaces/{workspaceSlug}/unpublish": {
       "post": {
         "security": [
           {
@@ -1031,7 +1031,7 @@
         "operationId": "unpublishWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/workspaceIdPath"
+            "$ref": "#/components/parameters/workspaceSlugPath"
           }
         ],
         "responses": {
@@ -1340,17 +1340,26 @@
             "example": "550e8400-e29b-41d4-a716-446655440000",
             "readOnly": true
           },
+          "slug": {
+            "type": "string",
+            "example": "notopia"
+          },
           "name": {
             "type": "string",
             "minLength": 1,
             "maxLength": 255,
-            "example": "My Workspace"
+            "example": "Notopia"
           }
         },
         "required": [
           "id",
+          "slug",
           "name"
         ]
+      },
+      "slug": {
+        "type": "string",
+        "example": "notopia"
       },
       "FolderCreatedEvent": {
         "type": "object",
@@ -1558,7 +1567,7 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
-        "example": "My Workspace"
+        "example": "Notopia"
       },
       "TrashedBy": {
         "type": "string",
@@ -2297,12 +2306,12 @@
           "$ref": "#/components/schemas/Note_properties-id"
         }
       },
-      "workspaceIdPath": {
-        "name": "workspaceId",
+      "workspaceSlugPath": {
+        "name": "workspaceSlug",
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/properties-id"
+          "$ref": "#/components/schemas/slug"
         }
       }
     }

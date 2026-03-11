@@ -7,7 +7,7 @@ get:
   summary: Get workspace graph
   operationId: getWorkspaceGraph
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
+    - $ref: ../components/parameters/workspaceSlugPath.yaml
     - name: orphan
       in: query
       description: Include node that are not connected to any other node

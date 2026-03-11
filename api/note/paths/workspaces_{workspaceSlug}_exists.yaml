@@ -1,18 +1,24 @@
 # vim: ft=yaml.openapi
-post:
+get:
   security:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Trash workspace's items
-  operationId: trashWorkspaceItems
+  summary: Check workspace exists
+  operationId: checkWorkspaceExists
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
-  requestBody:
-    $ref: ../components/requestBodies/TrashWorkspaceItemsRequest.yaml
+    - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
-    204:
-      description: Workspace items successfully trashed
+    200:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              exists:
+                type: boolean
+                example: true
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

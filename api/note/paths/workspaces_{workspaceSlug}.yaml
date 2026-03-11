@@ -4,13 +4,13 @@ get:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Get workspace members
-  operationId: getWorkspaceMembers
+  summary: Get workspace
+  operationId: getWorkspace
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
+    - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
     200:
-      $ref: ../components/responses/GetWorkspaceMembersResponse.yaml
+      $ref: ../components/responses/GetWorkspaceResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
@@ -20,20 +20,18 @@ get:
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml
 
-put:
+delete:
   security:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Update workspace members
-  operationId: updateWorkspaceMembers
+  summary: Delete workspace
+  operationId: deleteWorkspace
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
-  requestBody:
-    $ref: ../components/requestBodies/UpdateWorkspaceMembers.yaml
+    - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
     204:
-      description: Workspace members updated successfully
+      description: No Content - Workspace successfully deleted.
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

@@ -4,13 +4,15 @@ post:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Publish workspace
-  operationId: publishWorkspace
+  summary: Trash workspace's items
+  operationId: trashWorkspaceItems
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
+    - $ref: ../components/parameters/workspaceSlugPath.yaml
+  requestBody:
+    $ref: ../components/requestBodies/TrashWorkspaceItemsRequest.yaml
   responses:
     204:
-      description: Workspace published successfully
+      description: Workspace items successfully trashed
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

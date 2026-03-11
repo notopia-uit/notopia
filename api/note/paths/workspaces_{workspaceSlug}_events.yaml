@@ -4,18 +4,16 @@ get:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Show trash
-  operationId: showTrash
+  summary: SSE workspace updates
+  operationId: getWorkspaceEvents
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
+    - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
     200:
-      $ref: ../components/responses/ShowTrashResponse.yaml
+      $ref: ../components/responses/GetWorkspaceEventsResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
-    404:
-      $ref: ../../common/components/responses/NotFoundError.yaml
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml

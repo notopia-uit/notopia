@@ -363,6 +363,7 @@ type UserPropertiesId = string
 type Workspace struct {
 	Id   *openapi_types.UUID `json:"id,omitempty"`
 	Name string              `json:"name"`
+	Slug string              `json:"slug"`
 }
 
 // WorkspaceMember defines model for WorkspaceMember.
@@ -426,6 +427,9 @@ type PropertiesName = string
 // PropertiesUpdatedAt defines model for properties-updatedAt.
 type PropertiesUpdatedAt = time.Time
 
+// Slug defines model for slug.
+type Slug = string
+
 // UpdatedAt defines model for updatedAt.
 type UpdatedAt = time.Time
 
@@ -441,8 +445,8 @@ type NoteIdPath = NotePropertiesId
 // PageQuery defines model for pageQuery.
 type PageQuery = int
 
-// WorkspaceIdPath defines model for workspaceIdPath.
-type WorkspaceIdPath = PropertiesId
+// WorkspaceSlugPath defines model for workspaceSlugPath.
+type WorkspaceSlugPath = Slug
 
 // BadRequestError defines model for BadRequestError.
 type BadRequestError = Error
@@ -687,47 +691,47 @@ type ServerInterface interface {
 	// (POST /note/workspaces)
 	CreateWorkspace(c *gin.Context)
 	// Delete workspace
-	// (DELETE /note/workspaces/{workspaceId})
-	DeleteWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (DELETE /note/workspaces/{workspaceSlug})
+	DeleteWorkspace(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Get workspace
-	// (GET /note/workspaces/{workspaceId})
-	GetWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (GET /note/workspaces/{workspaceSlug})
+	GetWorkspace(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// SSE workspace updates
-	// (GET /note/workspaces/{workspaceId}/events)
-	GetWorkspaceEvents(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (GET /note/workspaces/{workspaceSlug}/events)
+	GetWorkspaceEvents(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Get workspace graph
-	// (GET /note/workspaces/{workspaceId}/graph)
-	GetWorkspaceGraph(c *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceGraphParams)
+	// (GET /note/workspaces/{workspaceSlug}/graph)
+	GetWorkspaceGraph(c *gin.Context, workspaceSlug WorkspaceSlugPath, params GetWorkspaceGraphParams)
 	// Get workspace members
-	// (GET /note/workspaces/{workspaceId}/members)
-	GetWorkspaceMembers(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (GET /note/workspaces/{workspaceSlug}/members)
+	GetWorkspaceMembers(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Update workspace members
-	// (PUT /note/workspaces/{workspaceId}/members)
-	UpdateWorkspaceMembers(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (PUT /note/workspaces/{workspaceSlug}/members)
+	UpdateWorkspaceMembers(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Move workspace's items
-	// (POST /note/workspaces/{workspaceId}/move-items)
-	MoveWorkspaceItems(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (POST /note/workspaces/{workspaceSlug}/move-items)
+	MoveWorkspaceItems(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Publish workspace
-	// (POST /note/workspaces/{workspaceId}/publish)
-	PublishWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (POST /note/workspaces/{workspaceSlug}/publish)
+	PublishWorkspace(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Rename workspace
-	// (POST /note/workspaces/{workspaceId}/rename)
-	RenameWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (POST /note/workspaces/{workspaceSlug}/rename)
+	RenameWorkspace(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Restore trashed workspace items
-	// (POST /note/workspaces/{workspaceId}/restore-trashed-items)
-	RestoreTrashedWorkspaceItems(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (POST /note/workspaces/{workspaceSlug}/restore-trashed-items)
+	RestoreTrashedWorkspaceItems(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Show trash
-	// (GET /note/workspaces/{workspaceId}/show-trash)
-	ShowTrash(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (GET /note/workspaces/{workspaceSlug}/show-trash)
+	ShowTrash(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Trash workspace's items
-	// (POST /note/workspaces/{workspaceId}/trash-items)
-	TrashWorkspaceItems(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (POST /note/workspaces/{workspaceSlug}/trash-items)
+	TrashWorkspaceItems(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Get workspace tree
-	// (GET /note/workspaces/{workspaceId}/tree)
-	GetWorkspaceTree(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (GET /note/workspaces/{workspaceSlug}/tree)
+	GetWorkspaceTree(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Unpublish workspace
-	// (POST /note/workspaces/{workspaceId}/unpublish)
-	UnpublishWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
+	// (POST /note/workspaces/{workspaceSlug}/unpublish)
+	UnpublishWorkspace(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -1078,12 +1082,12 @@ func (siw *ServerInterfaceWrapper) DeleteWorkspace(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1096,7 +1100,7 @@ func (siw *ServerInterfaceWrapper) DeleteWorkspace(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteWorkspace(c, workspaceId)
+	siw.Handler.DeleteWorkspace(c, workspaceSlug)
 }
 
 // GetWorkspace operation middleware
@@ -1104,12 +1108,12 @@ func (siw *ServerInterfaceWrapper) GetWorkspace(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1122,7 +1126,7 @@ func (siw *ServerInterfaceWrapper) GetWorkspace(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetWorkspace(c, workspaceId)
+	siw.Handler.GetWorkspace(c, workspaceSlug)
 }
 
 // GetWorkspaceEvents operation middleware
@@ -1130,12 +1134,12 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1148,7 +1152,7 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetWorkspaceEvents(c, workspaceId)
+	siw.Handler.GetWorkspaceEvents(c, workspaceSlug)
 }
 
 // GetWorkspaceGraph operation middleware
@@ -1156,12 +1160,12 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceGraph(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1185,7 +1189,7 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceGraph(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetWorkspaceGraph(c, workspaceId, params)
+	siw.Handler.GetWorkspaceGraph(c, workspaceSlug, params)
 }
 
 // GetWorkspaceMembers operation middleware
@@ -1193,12 +1197,12 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceMembers(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1211,7 +1215,7 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceMembers(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetWorkspaceMembers(c, workspaceId)
+	siw.Handler.GetWorkspaceMembers(c, workspaceSlug)
 }
 
 // UpdateWorkspaceMembers operation middleware
@@ -1219,12 +1223,12 @@ func (siw *ServerInterfaceWrapper) UpdateWorkspaceMembers(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1237,7 +1241,7 @@ func (siw *ServerInterfaceWrapper) UpdateWorkspaceMembers(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.UpdateWorkspaceMembers(c, workspaceId)
+	siw.Handler.UpdateWorkspaceMembers(c, workspaceSlug)
 }
 
 // MoveWorkspaceItems operation middleware
@@ -1245,12 +1249,12 @@ func (siw *ServerInterfaceWrapper) MoveWorkspaceItems(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1263,7 +1267,7 @@ func (siw *ServerInterfaceWrapper) MoveWorkspaceItems(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.MoveWorkspaceItems(c, workspaceId)
+	siw.Handler.MoveWorkspaceItems(c, workspaceSlug)
 }
 
 // PublishWorkspace operation middleware
@@ -1271,12 +1275,12 @@ func (siw *ServerInterfaceWrapper) PublishWorkspace(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1289,7 +1293,7 @@ func (siw *ServerInterfaceWrapper) PublishWorkspace(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PublishWorkspace(c, workspaceId)
+	siw.Handler.PublishWorkspace(c, workspaceSlug)
 }
 
 // RenameWorkspace operation middleware
@@ -1297,12 +1301,12 @@ func (siw *ServerInterfaceWrapper) RenameWorkspace(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1315,7 +1319,7 @@ func (siw *ServerInterfaceWrapper) RenameWorkspace(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.RenameWorkspace(c, workspaceId)
+	siw.Handler.RenameWorkspace(c, workspaceSlug)
 }
 
 // RestoreTrashedWorkspaceItems operation middleware
@@ -1323,12 +1327,12 @@ func (siw *ServerInterfaceWrapper) RestoreTrashedWorkspaceItems(c *gin.Context) 
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1341,7 +1345,7 @@ func (siw *ServerInterfaceWrapper) RestoreTrashedWorkspaceItems(c *gin.Context) 
 		}
 	}
 
-	siw.Handler.RestoreTrashedWorkspaceItems(c, workspaceId)
+	siw.Handler.RestoreTrashedWorkspaceItems(c, workspaceSlug)
 }
 
 // ShowTrash operation middleware
@@ -1349,12 +1353,12 @@ func (siw *ServerInterfaceWrapper) ShowTrash(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1367,7 +1371,7 @@ func (siw *ServerInterfaceWrapper) ShowTrash(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.ShowTrash(c, workspaceId)
+	siw.Handler.ShowTrash(c, workspaceSlug)
 }
 
 // TrashWorkspaceItems operation middleware
@@ -1375,12 +1379,12 @@ func (siw *ServerInterfaceWrapper) TrashWorkspaceItems(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1393,7 +1397,7 @@ func (siw *ServerInterfaceWrapper) TrashWorkspaceItems(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.TrashWorkspaceItems(c, workspaceId)
+	siw.Handler.TrashWorkspaceItems(c, workspaceSlug)
 }
 
 // GetWorkspaceTree operation middleware
@@ -1401,12 +1405,12 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceTree(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1419,7 +1423,7 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceTree(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetWorkspaceTree(c, workspaceId)
+	siw.Handler.GetWorkspaceTree(c, workspaceSlug)
 }
 
 // UnpublishWorkspace operation middleware
@@ -1427,12 +1431,12 @@ func (siw *ServerInterfaceWrapper) UnpublishWorkspace(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "workspaceId" -------------
-	var workspaceId WorkspaceIdPath
+	// ------------- Path parameter "workspaceSlug" -------------
+	var workspaceSlug WorkspaceSlugPath
 
-	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceSlug", c.Param("workspaceSlug"), &workspaceSlug, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceSlug: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1445,7 +1449,7 @@ func (siw *ServerInterfaceWrapper) UnpublishWorkspace(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.UnpublishWorkspace(c, workspaceId)
+	siw.Handler.UnpublishWorkspace(c, workspaceSlug)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -1488,20 +1492,20 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/notes/:noteId/rename", wrapper.RenameNote)
 	router.POST(options.BaseURL+"/note/notes/:noteId/unpublish", wrapper.UnpublishNote)
 	router.POST(options.BaseURL+"/note/workspaces", wrapper.CreateWorkspace)
-	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.DeleteWorkspace)
-	router.GET(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.GetWorkspace)
-	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/events", wrapper.GetWorkspaceEvents)
-	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/graph", wrapper.GetWorkspaceGraph)
-	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/members", wrapper.GetWorkspaceMembers)
-	router.PUT(options.BaseURL+"/note/workspaces/:workspaceId/members", wrapper.UpdateWorkspaceMembers)
-	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/move-items", wrapper.MoveWorkspaceItems)
-	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/publish", wrapper.PublishWorkspace)
-	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/rename", wrapper.RenameWorkspace)
-	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/restore-trashed-items", wrapper.RestoreTrashedWorkspaceItems)
-	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/show-trash", wrapper.ShowTrash)
-	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/trash-items", wrapper.TrashWorkspaceItems)
-	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/tree", wrapper.GetWorkspaceTree)
-	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/unpublish", wrapper.UnpublishWorkspace)
+	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceSlug", wrapper.DeleteWorkspace)
+	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug", wrapper.GetWorkspace)
+	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug/events", wrapper.GetWorkspaceEvents)
+	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug/graph", wrapper.GetWorkspaceGraph)
+	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug/members", wrapper.GetWorkspaceMembers)
+	router.PUT(options.BaseURL+"/note/workspaces/:workspaceSlug/members", wrapper.UpdateWorkspaceMembers)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceSlug/move-items", wrapper.MoveWorkspaceItems)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceSlug/publish", wrapper.PublishWorkspace)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceSlug/rename", wrapper.RenameWorkspace)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceSlug/restore-trashed-items", wrapper.RestoreTrashedWorkspaceItems)
+	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug/show-trash", wrapper.ShowTrash)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceSlug/trash-items", wrapper.TrashWorkspaceItems)
+	router.GET(options.BaseURL+"/note/workspaces/:workspaceSlug/tree", wrapper.GetWorkspaceTree)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceSlug/unpublish", wrapper.UnpublishWorkspace)
 }
 
 type BadRequestErrorJSONResponse Error
@@ -2281,7 +2285,7 @@ func (response CreateWorkspace500JSONResponse) VisitCreateWorkspaceResponse(w ht
 }
 
 type DeleteWorkspaceRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
 }
 
 type DeleteWorkspaceResponseObject interface {
@@ -2335,7 +2339,7 @@ func (response DeleteWorkspace500JSONResponse) VisitDeleteWorkspaceResponse(w ht
 }
 
 type GetWorkspaceRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
 }
 
 type GetWorkspaceResponseObject interface {
@@ -2392,7 +2396,7 @@ func (response GetWorkspace500JSONResponse) VisitGetWorkspaceResponse(w http.Res
 }
 
 type GetWorkspaceEventsRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
 }
 
 type GetWorkspaceEventsResponseObject interface {
@@ -2447,8 +2451,8 @@ func (response GetWorkspaceEvents500JSONResponse) VisitGetWorkspaceEventsRespons
 }
 
 type GetWorkspaceGraphRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
-	Params      GetWorkspaceGraphParams
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
+	Params        GetWorkspaceGraphParams
 }
 
 type GetWorkspaceGraphResponseObject interface {
@@ -2514,7 +2518,7 @@ func (response GetWorkspaceGraph500JSONResponse) VisitGetWorkspaceGraphResponse(
 }
 
 type GetWorkspaceMembersRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
 }
 
 type GetWorkspaceMembersResponseObject interface {
@@ -2571,8 +2575,8 @@ func (response GetWorkspaceMembers500JSONResponse) VisitGetWorkspaceMembersRespo
 }
 
 type UpdateWorkspaceMembersRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
-	Body        *UpdateWorkspaceMembersJSONRequestBody
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
+	Body          *UpdateWorkspaceMembersJSONRequestBody
 }
 
 type UpdateWorkspaceMembersResponseObject interface {
@@ -2626,8 +2630,8 @@ func (response UpdateWorkspaceMembers500JSONResponse) VisitUpdateWorkspaceMember
 }
 
 type MoveWorkspaceItemsRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
-	Body        *MoveWorkspaceItemsJSONRequestBody
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
+	Body          *MoveWorkspaceItemsJSONRequestBody
 }
 
 type MoveWorkspaceItemsResponseObject interface {
@@ -2681,7 +2685,7 @@ func (response MoveWorkspaceItems500JSONResponse) VisitMoveWorkspaceItemsRespons
 }
 
 type PublishWorkspaceRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
 }
 
 type PublishWorkspaceResponseObject interface {
@@ -2735,8 +2739,8 @@ func (response PublishWorkspace500JSONResponse) VisitPublishWorkspaceResponse(w 
 }
 
 type RenameWorkspaceRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
-	Body        *RenameWorkspaceJSONRequestBody
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
+	Body          *RenameWorkspaceJSONRequestBody
 }
 
 type RenameWorkspaceResponseObject interface {
@@ -2790,8 +2794,8 @@ func (response RenameWorkspace500JSONResponse) VisitRenameWorkspaceResponse(w ht
 }
 
 type RestoreTrashedWorkspaceItemsRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
-	Body        *RestoreTrashedWorkspaceItemsJSONRequestBody
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
+	Body          *RestoreTrashedWorkspaceItemsJSONRequestBody
 }
 
 type RestoreTrashedWorkspaceItemsResponseObject interface {
@@ -2845,7 +2849,7 @@ func (response RestoreTrashedWorkspaceItems500JSONResponse) VisitRestoreTrashedW
 }
 
 type ShowTrashRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
 }
 
 type ShowTrashResponseObject interface {
@@ -2900,8 +2904,8 @@ func (response ShowTrash500JSONResponse) VisitShowTrashResponse(w http.ResponseW
 }
 
 type TrashWorkspaceItemsRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
-	Body        *TrashWorkspaceItemsJSONRequestBody
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
+	Body          *TrashWorkspaceItemsJSONRequestBody
 }
 
 type TrashWorkspaceItemsResponseObject interface {
@@ -2955,7 +2959,7 @@ func (response TrashWorkspaceItems500JSONResponse) VisitTrashWorkspaceItemsRespo
 }
 
 type GetWorkspaceTreeRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
 }
 
 type GetWorkspaceTreeResponseObject interface {
@@ -3012,7 +3016,7 @@ func (response GetWorkspaceTree500JSONResponse) VisitGetWorkspaceTreeResponse(w 
 }
 
 type UnpublishWorkspaceRequestObject struct {
-	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	WorkspaceSlug WorkspaceSlugPath `json:"workspaceSlug"`
 }
 
 type UnpublishWorkspaceResponseObject interface {
@@ -3107,46 +3111,46 @@ type StrictServerInterface interface {
 	// (POST /note/workspaces)
 	CreateWorkspace(ctx context.Context, request CreateWorkspaceRequestObject) (CreateWorkspaceResponseObject, error)
 	// Delete workspace
-	// (DELETE /note/workspaces/{workspaceId})
+	// (DELETE /note/workspaces/{workspaceSlug})
 	DeleteWorkspace(ctx context.Context, request DeleteWorkspaceRequestObject) (DeleteWorkspaceResponseObject, error)
 	// Get workspace
-	// (GET /note/workspaces/{workspaceId})
+	// (GET /note/workspaces/{workspaceSlug})
 	GetWorkspace(ctx context.Context, request GetWorkspaceRequestObject) (GetWorkspaceResponseObject, error)
 	// SSE workspace updates
-	// (GET /note/workspaces/{workspaceId}/events)
+	// (GET /note/workspaces/{workspaceSlug}/events)
 	GetWorkspaceEvents(ctx context.Context, request GetWorkspaceEventsRequestObject) (GetWorkspaceEventsResponseObject, error)
 	// Get workspace graph
-	// (GET /note/workspaces/{workspaceId}/graph)
+	// (GET /note/workspaces/{workspaceSlug}/graph)
 	GetWorkspaceGraph(ctx context.Context, request GetWorkspaceGraphRequestObject) (GetWorkspaceGraphResponseObject, error)
 	// Get workspace members
-	// (GET /note/workspaces/{workspaceId}/members)
+	// (GET /note/workspaces/{workspaceSlug}/members)
 	GetWorkspaceMembers(ctx context.Context, request GetWorkspaceMembersRequestObject) (GetWorkspaceMembersResponseObject, error)
 	// Update workspace members
-	// (PUT /note/workspaces/{workspaceId}/members)
+	// (PUT /note/workspaces/{workspaceSlug}/members)
 	UpdateWorkspaceMembers(ctx context.Context, request UpdateWorkspaceMembersRequestObject) (UpdateWorkspaceMembersResponseObject, error)
 	// Move workspace's items
-	// (POST /note/workspaces/{workspaceId}/move-items)
+	// (POST /note/workspaces/{workspaceSlug}/move-items)
 	MoveWorkspaceItems(ctx context.Context, request MoveWorkspaceItemsRequestObject) (MoveWorkspaceItemsResponseObject, error)
 	// Publish workspace
-	// (POST /note/workspaces/{workspaceId}/publish)
+	// (POST /note/workspaces/{workspaceSlug}/publish)
 	PublishWorkspace(ctx context.Context, request PublishWorkspaceRequestObject) (PublishWorkspaceResponseObject, error)
 	// Rename workspace
-	// (POST /note/workspaces/{workspaceId}/rename)
+	// (POST /note/workspaces/{workspaceSlug}/rename)
 	RenameWorkspace(ctx context.Context, request RenameWorkspaceRequestObject) (RenameWorkspaceResponseObject, error)
 	// Restore trashed workspace items
-	// (POST /note/workspaces/{workspaceId}/restore-trashed-items)
+	// (POST /note/workspaces/{workspaceSlug}/restore-trashed-items)
 	RestoreTrashedWorkspaceItems(ctx context.Context, request RestoreTrashedWorkspaceItemsRequestObject) (RestoreTrashedWorkspaceItemsResponseObject, error)
 	// Show trash
-	// (GET /note/workspaces/{workspaceId}/show-trash)
+	// (GET /note/workspaces/{workspaceSlug}/show-trash)
 	ShowTrash(ctx context.Context, request ShowTrashRequestObject) (ShowTrashResponseObject, error)
 	// Trash workspace's items
-	// (POST /note/workspaces/{workspaceId}/trash-items)
+	// (POST /note/workspaces/{workspaceSlug}/trash-items)
 	TrashWorkspaceItems(ctx context.Context, request TrashWorkspaceItemsRequestObject) (TrashWorkspaceItemsResponseObject, error)
 	// Get workspace tree
-	// (GET /note/workspaces/{workspaceId}/tree)
+	// (GET /note/workspaces/{workspaceSlug}/tree)
 	GetWorkspaceTree(ctx context.Context, request GetWorkspaceTreeRequestObject) (GetWorkspaceTreeResponseObject, error)
 	// Unpublish workspace
-	// (POST /note/workspaces/{workspaceId}/unpublish)
+	// (POST /note/workspaces/{workspaceSlug}/unpublish)
 	UnpublishWorkspace(ctx context.Context, request UnpublishWorkspaceRequestObject) (UnpublishWorkspaceResponseObject, error)
 }
 
@@ -3556,10 +3560,10 @@ func (sh *strictHandler) CreateWorkspace(ctx *gin.Context) {
 }
 
 // DeleteWorkspace operation middleware
-func (sh *strictHandler) DeleteWorkspace(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) DeleteWorkspace(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request DeleteWorkspaceRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.DeleteWorkspace(ctx, request.(DeleteWorkspaceRequestObject))
@@ -3583,10 +3587,10 @@ func (sh *strictHandler) DeleteWorkspace(ctx *gin.Context, workspaceId Workspace
 }
 
 // GetWorkspace operation middleware
-func (sh *strictHandler) GetWorkspace(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) GetWorkspace(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request GetWorkspaceRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetWorkspace(ctx, request.(GetWorkspaceRequestObject))
@@ -3610,10 +3614,10 @@ func (sh *strictHandler) GetWorkspace(ctx *gin.Context, workspaceId WorkspaceIdP
 }
 
 // GetWorkspaceEvents operation middleware
-func (sh *strictHandler) GetWorkspaceEvents(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) GetWorkspaceEvents(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request GetWorkspaceEventsRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetWorkspaceEvents(ctx, request.(GetWorkspaceEventsRequestObject))
@@ -3637,10 +3641,10 @@ func (sh *strictHandler) GetWorkspaceEvents(ctx *gin.Context, workspaceId Worksp
 }
 
 // GetWorkspaceGraph operation middleware
-func (sh *strictHandler) GetWorkspaceGraph(ctx *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceGraphParams) {
+func (sh *strictHandler) GetWorkspaceGraph(ctx *gin.Context, workspaceSlug WorkspaceSlugPath, params GetWorkspaceGraphParams) {
 	var request GetWorkspaceGraphRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
@@ -3665,10 +3669,10 @@ func (sh *strictHandler) GetWorkspaceGraph(ctx *gin.Context, workspaceId Workspa
 }
 
 // GetWorkspaceMembers operation middleware
-func (sh *strictHandler) GetWorkspaceMembers(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) GetWorkspaceMembers(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request GetWorkspaceMembersRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetWorkspaceMembers(ctx, request.(GetWorkspaceMembersRequestObject))
@@ -3692,10 +3696,10 @@ func (sh *strictHandler) GetWorkspaceMembers(ctx *gin.Context, workspaceId Works
 }
 
 // UpdateWorkspaceMembers operation middleware
-func (sh *strictHandler) UpdateWorkspaceMembers(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) UpdateWorkspaceMembers(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request UpdateWorkspaceMembersRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	var body UpdateWorkspaceMembersJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -3727,10 +3731,10 @@ func (sh *strictHandler) UpdateWorkspaceMembers(ctx *gin.Context, workspaceId Wo
 }
 
 // MoveWorkspaceItems operation middleware
-func (sh *strictHandler) MoveWorkspaceItems(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) MoveWorkspaceItems(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request MoveWorkspaceItemsRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	var body MoveWorkspaceItemsJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -3762,10 +3766,10 @@ func (sh *strictHandler) MoveWorkspaceItems(ctx *gin.Context, workspaceId Worksp
 }
 
 // PublishWorkspace operation middleware
-func (sh *strictHandler) PublishWorkspace(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) PublishWorkspace(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request PublishWorkspaceRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.PublishWorkspace(ctx, request.(PublishWorkspaceRequestObject))
@@ -3789,10 +3793,10 @@ func (sh *strictHandler) PublishWorkspace(ctx *gin.Context, workspaceId Workspac
 }
 
 // RenameWorkspace operation middleware
-func (sh *strictHandler) RenameWorkspace(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) RenameWorkspace(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request RenameWorkspaceRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	var body RenameWorkspaceJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -3824,10 +3828,10 @@ func (sh *strictHandler) RenameWorkspace(ctx *gin.Context, workspaceId Workspace
 }
 
 // RestoreTrashedWorkspaceItems operation middleware
-func (sh *strictHandler) RestoreTrashedWorkspaceItems(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) RestoreTrashedWorkspaceItems(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request RestoreTrashedWorkspaceItemsRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	var body RestoreTrashedWorkspaceItemsJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -3859,10 +3863,10 @@ func (sh *strictHandler) RestoreTrashedWorkspaceItems(ctx *gin.Context, workspac
 }
 
 // ShowTrash operation middleware
-func (sh *strictHandler) ShowTrash(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) ShowTrash(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request ShowTrashRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.ShowTrash(ctx, request.(ShowTrashRequestObject))
@@ -3886,10 +3890,10 @@ func (sh *strictHandler) ShowTrash(ctx *gin.Context, workspaceId WorkspaceIdPath
 }
 
 // TrashWorkspaceItems operation middleware
-func (sh *strictHandler) TrashWorkspaceItems(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) TrashWorkspaceItems(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request TrashWorkspaceItemsRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	var body TrashWorkspaceItemsJSONRequestBody
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -3921,10 +3925,10 @@ func (sh *strictHandler) TrashWorkspaceItems(ctx *gin.Context, workspaceId Works
 }
 
 // GetWorkspaceTree operation middleware
-func (sh *strictHandler) GetWorkspaceTree(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) GetWorkspaceTree(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request GetWorkspaceTreeRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetWorkspaceTree(ctx, request.(GetWorkspaceTreeRequestObject))
@@ -3948,10 +3952,10 @@ func (sh *strictHandler) GetWorkspaceTree(ctx *gin.Context, workspaceId Workspac
 }
 
 // UnpublishWorkspace operation middleware
-func (sh *strictHandler) UnpublishWorkspace(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) UnpublishWorkspace(ctx *gin.Context, workspaceSlug WorkspaceSlugPath) {
 	var request UnpublishWorkspaceRequestObject
 
-	request.WorkspaceId = workspaceId
+	request.WorkspaceSlug = workspaceSlug
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.UnpublishWorkspace(ctx, request.(UnpublishWorkspaceRequestObject))

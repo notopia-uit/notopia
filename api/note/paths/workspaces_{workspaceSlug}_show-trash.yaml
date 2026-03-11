@@ -1,18 +1,16 @@
 # vim: ft=yaml.openapi
-post:
+get:
   security:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Restore trashed workspace items
-  operationId: restoreTrashedWorkspaceItems
+  summary: Show trash
+  operationId: showTrash
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
-  requestBody:
-    $ref: ../components/requestBodies/RestoreTrashedWorkspaceItemsRequest.yaml
+    - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
-    204:
-      description: Workspace items successfully restored
+    200:
+      $ref: ../components/responses/ShowTrashResponse.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
