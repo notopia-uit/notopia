@@ -27,7 +27,7 @@ catalog:
   '@opentelemetry/exporter-metrics-otlp-grpc': 0.213.0
   '@opentelemetry/exporter-trace-otlp-grpc': 0.213.0
   '@opentelemetry/instrumentation-http': 0.213.0
-  '@opentelemetry/instrumentation-pino': 0.46.1
+  '@opentelemetry/instrumentation-pino': 0.59.0
   '@opentelemetry/resources': 2.6.0
   '@opentelemetry/sdk-metrics': 2.6.0
   '@opentelemetry/sdk-node': 0.213.0
