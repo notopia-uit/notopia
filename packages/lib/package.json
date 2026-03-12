@@ -6,8 +6,30 @@
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
-    "./blocknote/*": "./dist/blocknote/*",
-    "./connectrpc/*": "./dist/connectrpc/*"
+    "./blocknote": {
+      "@nx/source": "./src/blocknote/index.ts",
+      "types": "./dist/blocknote/index.d.ts",
+      "import": "./dist/blocknote/index.js",
+      "default": "./dist/blocknote/index.js"
+    },
+    "./blocknote/*": {
+      "@nx/source": "./src/blocknote/*.ts",
+      "types": "./dist/blocknote/*.d.ts",
+      "import": "./dist/blocknote/*.js",
+      "default": "./dist/blocknote/*.js"
+    },
+    "./connectrpc": {
+      "@nx/source": "./src/connectrpc/index.ts",
+      "types": "./dist/connectrpc/index.d.ts",
+      "import": "./dist/connectrpc/index.js",
+      "default": "./dist/connectrpc/index.js"
+    },
+    "./connectrpc/*": {
+      "@nx/source": "./src/connectrpc/*.ts",
+      "types": "./dist/connectrpc/*.d.ts",
+      "import": "./dist/connectrpc/*.js",
+      "default": "./dist/connectrpc/*.js"
+    }
   },
   "files": [
     "!**/*.tsbuildinfo",

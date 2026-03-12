@@ -1,17 +1,5 @@
 {
   "compilerOptions": {
-    // "paths": {
-    //   "@notopia-uit/ui/*": ["./packages/ui/src/*"],
-    //   "@notopia-uit/ui": ["./packages/ui/src/index.ts"],
-    //   "@notopia-uit/lib/*": ["./packages/lib/src/*"],
-    //   "@notopia-uit/lib": ["./packages/lib/src/index.ts"],
-    //   "@notopia-uit/pb": ["./packages/pb/index.ts"],
-    //   "@notopia-uit/api-gen/*": ["./packages/api-gen/src/*"],
-    //   "@notopia-uit/api-gen": ["./packages/api-gen/src/index.ts"],
-    //   "@notopia-uit/api-document-nestjs-server": [
-    //     "./packages/api-document-nestjs-server/index.ts"
-    //   ]
-    // },
     "composite": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
