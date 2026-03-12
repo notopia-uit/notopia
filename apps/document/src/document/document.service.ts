@@ -1,6 +1,7 @@
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { Traceable } from 'nestjs-otel';
 import { applyUpdate, Doc as YDoc } from 'yjs';
 
 import { DocumentEntity } from './document.entity';
@@ -11,6 +12,7 @@ export interface AttachmentUploadUrl {
 }
 
 @Injectable()
+@Traceable()
 export class DocumentService {
   constructor(
     private readonly documentRepository: DocumentRepository,

@@ -4,10 +4,12 @@ import {
   DocumentApi,
   GetDocumentAttachmentUploadUrl200Response,
 } from '@notopia-uit/api-document-nestjs-server';
+import { Traceable } from 'nestjs-otel';
 
 import { DocumentService } from './document.service';
 
 @Injectable()
+@Traceable()
 export class DocumentController extends DocumentApi {
   constructor(
     private readonly documentService: DocumentService,

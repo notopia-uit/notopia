@@ -5,10 +5,12 @@ import {
   Revision,
   RevisionApi,
 } from '@notopia-uit/api-document-nestjs-server';
+import { Traceable } from 'nestjs-otel';
 
 import { RevisionService } from './revision.service';
 
 @Injectable()
+@Traceable()
 export class RevisionController extends RevisionApi {
   constructor(private readonly revisionService: RevisionService) {
     super();

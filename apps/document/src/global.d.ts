@@ -32,5 +32,6 @@ declare namespace NodeJS {
 
     NODE_ENV?: 'development' | 'production' | 'test';
     PORT?: string;
+    LOG_LEVEL?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
   }
 }

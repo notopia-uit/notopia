@@ -4,60 +4,60 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
-  Logger,
 } from '@nestjs/common';
-import { HttpAdapterHost } from '@nestjs/core';
-import { ModelError } from '@notopia-uit/api-document-nestjs-server';
+import { Request, Response } from 'express';
+import { Logger } from 'nestjs-pino';
 
-/**
- * Global exception filter that transforms any thrown exception into a
- * ModelError response body, conforming to the OpenAPI error schema.
- *
- * NestJS HttpExceptions are mapped with their status code and message.
- * Unexpected errors fall back to 500 Internal Server Error.
- */
+export interface ModelError {
+  code: string;
+  message: string;
+  more_info?: string;
+}
+
 @Catch()
-export class HttpExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(HttpExceptionFilter.name);
+export class GlobalExceptionFilter implements ExceptionFilter {
+  constructor(private readonly logger: Logger) {}
 
-  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
-
-  catch(exception: unknown, host: ArgumentsHost): void {
-    const { httpAdapter } = this.httpAdapterHost;
+  catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
 
-    let status: number;
-    let code: string;
-    let message: string;
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    let message = 'Internal server error';
+    let code = 'INTERNAL_SERVER_ERROR';
 
     if (exception instanceof HttpException) {
-      status = exception.getStatus();
       const res = exception.getResponse();
-      if (typeof res === 'string') {
-        message = res;
-      } else if (typeof res === 'object' && res !== null) {
-        const obj = res as Record<string, unknown>;
-        message = Array.isArray(obj['message'])
-          ? (obj['message'] as string[]).join(', ')
-          : String(obj['message'] ?? exception.message);
-      } else {
-        message = exception.message;
-      }
-      // reverse-lookup enum name: HttpStatus[404] => 'NOT_FOUND'
-      code =
-        (HttpStatus as unknown as Record<number, string>)[status] ??
-        'HTTP_ERROR';
-    } else {
-      status = HttpStatus.INTERNAL_SERVER_ERROR;
-      code = 'INTERNAL_SERVER_ERROR';
-      message = 'An unexpected error occurred';
-      this.logger.error(
-        `Unhandled exception`,
-        exception instanceof Error ? exception.stack : String(exception)
-      );
+      message =
+        typeof res === 'object'
+          ? (res as any).message || exception.message
+          : res;
+      code = exception.name || 'HTTP_EXCEPTION';
+    } else if (exception instanceof Error) {
+      message = exception.message;
+      code = exception.constructor.name;
     }
 
-    const body: ModelError = { code, message };
-    httpAdapter.reply(ctx.getResponse(), body, status);
+    this.logger.error(
+      {
+        err: exception,
+        path: request.url,
+        statusCode: status,
+      },
+      `Exception caught by filter: ${message}`
+    );
+
+    const errorResponse: ModelError = {
+      code: code,
+      message: message,
+      // more_info: 'https://api.docs.com/errors/' + code, // Optional: logic for more_info
+    };
+
+    response.status(status).json(errorResponse);
   }
 }

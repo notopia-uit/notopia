@@ -3,11 +3,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 
-import { AppConfig } from '../config/config';
-import { appConfig } from '../config/config.factory';
-import { DatabaseModule } from '../database/database.module';
-import { HocuspocusModule } from '../hocuspocus/hocuspocus.module';
 import { ApiHttpModule } from './api.module';
+import { AppConfig } from './config/config';
+import { appConfig } from './config/config.factory';
+import { DatabaseModule } from './database/database.module';
+import { HocuspocusModule } from './hocuspocus/hocuspocus.module';
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { ApiHttpModule } from './api.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const appCfg = configService.get<AppConfig>('app');
-        const level = appCfg?.otel.log.level ?? 'info';
+        const level = appCfg?.logLevel || 'warn';
         return {
           pinoHttp: { level },
         };

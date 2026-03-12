@@ -10,10 +10,10 @@ packages:
 autoInstallPeers: true
 
 catalog:
-  '@nestjs/platform-ws': 11.1.16
-  '@nestjs/websockets': 11.1.16
-  '@nestjs/platform-socket.io': 11.1.16
-  radix-ui: 1.4.3
+  '@blocknote/core': 0.47.1
+  '@blocknote/react': 0.47.1
+  '@blocknote/server-util': 0.47.1
+  '@blocknote/shadcn': 0.47.1
   '@bufbuild/buf': 1.64.0
   '@bufbuild/protobuf': 2.11.0
   '@connectrpc/connect': 2.1.1
@@ -23,9 +23,12 @@ catalog:
   '@nestjs/config': 4.0.3
   '@nestjs/core': 11.1.16
   '@nestjs/platform-express': 11.1.16
+  '@nestjs/platform-socket.io': 11.1.16
+  '@nestjs/platform-ws': 11.1.16
   '@nestjs/schematics': 11.0.9
   '@nestjs/testing': 11.1.16
   '@nestjs/typeorm': 11.0.0
+  '@nestjs/websockets': 11.1.16
   '@next/eslint-plugin-next': 16.1.6
   '@opentelemetry/api': 1.9.0
   '@opentelemetry/exporter-metrics-otlp-grpc': 0.213.0
@@ -63,6 +66,7 @@ catalog:
   pino-http: 11.0.0
   postcss: 8.4.38
   prettier: 3.8.1
+  radix-ui: 1.4.3
   react: 19.2.4
   react-dom: 19.2.4
   reflect-metadata: 0.2.2
@@ -78,11 +82,10 @@ catalog:
   vite: 7.3.1
   vite-plugin-dts: 4.5.4
   vitest: 4.0.18
+  ws: 8.19.0
   zod: 4.3.6
-  '@blocknote/core': 0.47.1
-  '@blocknote/react': 0.47.1
-  '@blocknote/shadcn': 0.47.1
-  '@blocknote/server-util': 0.47.1
+  express: 5.2.1
+  '@types/express': 5.0.6
 
 onlyBuiltDependencies:
   - '@bufbuild/buf'

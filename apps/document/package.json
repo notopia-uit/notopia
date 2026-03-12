@@ -25,15 +25,19 @@
     "@opentelemetry/sdk-node": "catalog:",
     "@opentelemetry/sdk-trace-node": "catalog:",
     "@opentelemetry/semantic-conventions": "catalog:",
+    "@types/express": "catalog:",
+    "express": "catalog:",
     "nestjs-otel": "catalog:",
     "nestjs-pino": "catalog:",
     "pino-http": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
     "tslib": "catalog:",
-    "typeorm": "catalog:"
+    "typeorm": "catalog:",
+    "ws": "catalog:"
   },
   "devDependencies": {
-    "@nestjs/testing": "catalog:"
+    "@nestjs/testing": "catalog:",
+    "@types/ws": "^8.18.1"
   }
 }

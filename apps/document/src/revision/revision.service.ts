@@ -1,6 +1,7 @@
 import { Block } from '@blocknote/core';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { Traceable } from 'nestjs-otel';
 
 import { RevisionEntity } from './revision.entity';
 import { RevisionRepository } from './revision.repository';
@@ -21,6 +22,7 @@ export interface PaginatedRevisions {
 }
 
 @Injectable()
+@Traceable()
 export class RevisionService {
   constructor(private readonly revisionRepository: RevisionRepository) {}
 

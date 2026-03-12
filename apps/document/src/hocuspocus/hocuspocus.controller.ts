@@ -1,16 +1,22 @@
+import { Hocuspocus } from '@hocuspocus/server';
 import {
   ConnectedSocket,
-  MessageBody,
-  SubscribeMessage,
+  OnGatewayConnection,
   WebSocketGateway,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { IncomingMessage } from 'http';
+import { Traceable } from 'nestjs-otel';
+import { WebSocket } from 'ws';
 
-@WebSocketGateway({ namespace: 'documents' })
-export class DocumentGateway {
-  @SubscribeMessage('watchDocument')
-  handleEvent(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-    // Your WebSocket logic here
-    return { event: 'watching', data: data.documentId };
+@WebSocketGateway({ path: '/document/ws/document' })
+@Traceable()
+export class HocuspocusGateway implements OnGatewayConnection {
+  constructor(private readonly hocuspocus: Hocuspocus) {}
+
+  handleConnection(
+    @ConnectedSocket() socket: WebSocket,
+    request: IncomingMessage
+  ) {
+    this.hocuspocus.handleConnection(socket, request);
   }
 }

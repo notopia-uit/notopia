@@ -8,7 +8,7 @@ export const HocuspocusProvider: Provider = {
   provide: Hocuspocus,
   useFactory: (documentRepository: DocumentRepository) => {
     return new Hocuspocus({
-      name: 'document', // # TODO: Inject host
+      name: 'document', // TODO: Inject host
       extensions: [
         new Database({
           fetch: async ({ documentName: id }) => {

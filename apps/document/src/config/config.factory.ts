@@ -6,6 +6,7 @@ export const appConfig = registerAs(
   'app',
   (): AppConfig => ({
     env: process.env.NODE_ENV ?? 'production',
+    logLevel: process.env.LOG_LEVEL ?? 'warn',
     database: {
       host: process.env.DB_HOST ?? 'localhost',
       port: parseInt(process.env.DB_PORT ?? '5434', 10),

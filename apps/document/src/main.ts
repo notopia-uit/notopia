@@ -1,7 +1,7 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
 
-import { AppModule } from './app/app.module';
+import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 import { otelSdk } from './otel/tracing';
 
