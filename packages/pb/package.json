@@ -3,9 +3,13 @@
   "version": "0.2.0",
   "type": "module",
   "exports": {
-    "./*": {
-      "types": "./*_pb.d.ts",
-      "import": "./*_pb.js"
+    "./note": {
+      "types": "./note_pb.d.ts",
+      "import": "./note_pb.js"
+    },
+    "./authorization": {
+      "types": "./authorization_pb.d.ts",
+      "import": "./authorization_pb.js"
     }
   },
   "peerDependencies": {

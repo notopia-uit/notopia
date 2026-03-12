@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import {
   DocumentApi,
   GetDocumentAttachmentUploadUrl200Response,
 } from '@notopia-uit/api-document-nestjs-server';
 import { Traceable } from 'nestjs-otel';
 
+import { HttpUserGuard } from '../common/user.guard';
 import { DocumentService } from './document.service';
 
 @Injectable()
+@UseGuards(HttpUserGuard)
 @Traceable()
 export class DocumentController extends DocumentApi {
   constructor(private readonly documentService: DocumentService) {
@@ -16,17 +18,14 @@ export class DocumentController extends DocumentApi {
 
   async getDocumentAttachmentUploadUrl(
     documentId: string,
-    _request: Request
+    req: Request
   ): Promise<GetDocumentAttachmentUploadUrl200Response> {
     const result =
       await this.documentService.getAttachmentUploadUrl(documentId);
     return { url: result.url };
   }
 
-  async importDocuments(
-    _requestBody: Array<object>,
-    _request: Request
-  ): Promise<void> {
+  async importDocuments(reqBody: Array<object>, req: Request): Promise<void> {
     return;
   }
 }

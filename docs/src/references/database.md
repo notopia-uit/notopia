@@ -127,6 +127,7 @@ vars: {
 documents: {
   id: uuid {constraint: PK}
   data: bytea
+  modified: boolean
 
   shape: sql_table
 }

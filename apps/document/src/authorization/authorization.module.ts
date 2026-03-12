@@ -1,4 +1,4 @@
-import { createClient } from '@connectrpc/connect';
+import { Client, createClient } from '@connectrpc/connect';
 import { createConnectTransport } from '@connectrpc/connect-node';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -12,7 +12,9 @@ export const AUTHORIZATION_SERVICE = Symbol('AUTHORIZATION_SERVICE');
   providers: [
     {
       provide: AUTHORIZATION_SERVICE,
-      useFactory: (configService: ConfigService) => {
+      useFactory: (
+        configService: ConfigService
+      ): Client<typeof AuthorizationService> => {
         const servicesCfg = configService.get<ServicesConfig>('services')!;
         const transport = createConnectTransport({
           baseUrl: servicesCfg.authorizationUrl,

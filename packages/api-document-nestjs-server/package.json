@@ -1,16 +1,25 @@
 {
   "name": "@notopia-uit/api-document-nestjs-server",
   "version": "0.2.0",
-  "main": "./index.ts",
-  "devDependencies": {
-    "@types/node": "catalog:",
-    "typescript": "catalog:"
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
   },
-  "peeerDependencies": {
+  "peerDependencies": {
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",
     "@nestjs/platform-express": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:"
-  }
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  },
+  "types": "./dist/index.d.ts"
 }

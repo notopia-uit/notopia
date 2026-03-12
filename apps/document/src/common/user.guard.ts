@@ -4,16 +4,29 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { WsException } from '@nestjs/websockets';
 
 import { User } from './user';
 
 @Injectable()
-export class UserGuard implements CanActivate {
+export abstract class UserGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
+    const type = context.getType();
+    let request: any;
+
+    switch (type) {
+      case 'http':
+        request = context.switchToHttp().getRequest();
+        break;
+      case 'ws':
+        request = context.switchToWs().getClient().handshake;
+        break;
+    }
+
     const id = request.headers['x-forwarded-id'] as string;
+
     if (!id) {
-      throw new UnauthorizedException('Missing Gateway Headers');
+      this.throwException('Missing Gateway Headers');
     }
 
     const parseHeaderList = (header?: string): string[] => {
@@ -29,8 +42,31 @@ export class UserGuard implements CanActivate {
       roles: parseHeaderList(request.headers['x-forwarded-roles'] as string),
     };
 
-    request['user'] = user;
+    switch (type) {
+      case 'http':
+        request.user = user;
+        break;
+      case 'ws':
+        context.switchToWs().getClient().user = user;
+        break;
+    }
 
     return true;
+  }
+
+  protected abstract throwException(message: string): void;
+}
+
+@Injectable()
+export class HttpUserGuard extends UserGuard {
+  protected throwException(message: string): void {
+    throw new UnauthorizedException(message);
+  }
+}
+
+@Injectable()
+export class WsUserGuard extends UserGuard {
+  protected throwException(message: string): void {
+    throw new WsException(message);
   }
 }

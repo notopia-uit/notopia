@@ -7,4 +7,7 @@ export class DocumentEntity {
 
   @Column({ type: 'bytea' })
   data!: Buffer;
+
+  @Column({ type: 'boolean', default: false })
+  modified!: boolean;
 }

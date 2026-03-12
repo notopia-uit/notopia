@@ -500,6 +500,9 @@ importers:
       '@notopia-uit/api-document-nestjs-server':
         specifier: 'workspace:'
         version: link:../../packages/api-document-nestjs-server
+      '@notopia-uit/lib':
+        specifier: 'workspace:'
+        version: link:../../packages/lib
       '@notopia-uit/pb':
         specifier: 'workspace:'
         version: link:../../packages/pb
@@ -666,7 +669,14 @@ importers:
         specifier: 'catalog:'
         version: 4.3.6
 
-  packages/lib: {}
+  packages/lib:
+    dependencies:
+      '@bufbuild/protobuf':
+        specifier: 'catalog:'
+        version: 2.11.0
+      '@connectrpc/connect':
+        specifier: 'catalog:'
+        version: 2.1.1(@bufbuild/protobuf@2.11.0)
 
   packages/pb:
     devDependencies:

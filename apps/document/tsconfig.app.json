@@ -16,7 +16,13 @@
   "exclude": ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"],
   "references": [
     {
-      "path": "../../packages/api-document-nestjs-server"
+      "path": "../../packages/pb/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/lib/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/api-document-nestjs-server/tsconfig.lib.json"
     }
   ]
 }

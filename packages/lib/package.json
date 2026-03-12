@@ -6,17 +6,16 @@
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "@nx/source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    }
+    "./blocknote/*": "./dist/blocknote/*",
+    "./connectrpc/*": "./dist/connectrpc/*"
   },
   "files": [
     "!**/*.tsbuildinfo",
     "dist"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "@bufbuild/protobuf": "catalog:",
+    "@connectrpc/connect": "catalog:"
+  },
   "types": "./dist/index.d.ts"
 }

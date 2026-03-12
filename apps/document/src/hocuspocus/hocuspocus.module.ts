@@ -1,11 +1,13 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
+import { AuthorizationModule } from '../authorization/authorization.module';
 import { DocumentModule } from '../document/document.module';
-import { HocuspocusGateway } from './hocuspocus.controller';
+import { NoteModule } from '../note/note.module';
+import { HocuspocusGateway } from './hocuspocus.gateway';
 import { HocuspocusProvider } from './hocuspocus.provider';
 
 @Module({
-  imports: [forwardRef(() => DocumentModule)],
+  imports: [DocumentModule, NoteModule, AuthorizationModule],
   providers: [HocuspocusGateway, HocuspocusProvider],
   exports: [HocuspocusProvider],
 })

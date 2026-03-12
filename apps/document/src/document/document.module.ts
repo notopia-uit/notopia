@@ -1,18 +1,14 @@
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { HocuspocusModule } from '../hocuspocus/hocuspocus.module';
 import { DocumentController } from './document.controller';
 import { DocumentEntity } from './document.entity';
 import { DocumentRepository } from './document.repository';
 import { DocumentService } from './document.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([DocumentEntity]),
-    forwardRef(() => HocuspocusModule),
-  ],
+  imports: [TypeOrmModule.forFeature([DocumentEntity])],
   providers: [
     DocumentRepository,
     DocumentService,

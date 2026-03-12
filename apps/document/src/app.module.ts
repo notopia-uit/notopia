@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
 
 import { ApiHttpModule } from './api.module';
 import { AuthorizationModule } from './authorization/authorization.module';
-import { UserGuard } from './common/user.guard';
 import { AppConfig } from './config/config';
 import { appConfig, databaseConfig } from './config/config.factory';
 import { DatabaseModule } from './database/database.module';
@@ -45,12 +43,6 @@ import { NoteModule } from './note/note.module';
     DatabaseModule,
     DocumentModule,
     ApiHttpModule,
-  ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: UserGuard,
-    },
   ],
 })
 export class AppModule {}

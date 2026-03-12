@@ -8,6 +8,7 @@ vite.config.*.timestamp*
 
 # Next.js
 .next
+next-env.d.ts
 out
 
 coverage.out
