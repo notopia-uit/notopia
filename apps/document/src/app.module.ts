@@ -3,14 +3,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
-import pretty, { PrettyStream } from 'pino-pretty';
+import pretty from 'pino-pretty';
 
 import { ApiHttpModule } from './api.module';
+import { AuthorizationModule } from './authorization/authorization.module';
 import { UserGuard } from './common/user.guard';
 import { AppConfig } from './config/config';
 import { appConfig, databaseConfig } from './config/config.factory';
 import { DatabaseModule } from './database/database.module';
 import { DocumentModule } from './document/document.module';
+import { NoteModule } from './note/note.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { DocumentModule } from './document/document.module';
         };
       },
     }),
+    AuthorizationModule,
+    NoteModule,
     DatabaseModule,
     DocumentModule,
     ApiHttpModule,

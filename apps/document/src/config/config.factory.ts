@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 
-import { AppConfig, DatabaseConfig } from './config';
+import { AppConfig, DatabaseConfig, ServicesConfig } from './config';
 
 export const appConfig = registerAs<AppConfig>(
   'app',
@@ -18,5 +18,14 @@ export const databaseConfig = registerAs(
     username: process.env.DB_USER ?? 'postgres',
     password: process.env.DB_PASSWORD ?? '',
     database: process.env.DB_NAME ?? 'document',
+  })
+);
+
+export const servicesConfig = registerAs(
+  'services',
+  (): ServicesConfig => ({
+    noteUrl: process.env.SERVICES_NOTE_URL ?? 'http://localhost:18081',
+    authorizationUrl:
+      process.env.SERVICES_AUTHORIZATION_URL ?? 'http://localhost:18089',
   })
 );

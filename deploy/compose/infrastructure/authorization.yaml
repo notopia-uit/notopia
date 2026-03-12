@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: ${AUTHORIZATION_POSTGRESQL_USER:-notopiauit}
       POSTGRES_PASSWORD: ${AUTHORIZATION_POSTGRESQL_PASSWORD:-notopiauit}
     ports:
-      - ${NOTE_POSTGRESQL_PORT:-5430}:5432
+      - ${AUTHORIZATION_POSTGRESQL_PORT:-5439}:5432
     volumes:
       - authorization_postgresql_data:/var/lib/postgresql/data
     healthcheck:

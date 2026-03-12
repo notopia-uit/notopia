@@ -33,5 +33,7 @@ declare namespace NodeJS {
     NODE_ENV?: 'development' | 'production' | 'test';
     PORT?: string;
     LOG_LEVEL?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+    SERVICES_NOTE_URL?: string;
+    SERVICES_AUTHORIZATION_URL?: string;
   }
 }

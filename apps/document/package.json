@@ -3,6 +3,8 @@
   "private": true,
   "dependencies": {
     "@blocknote/server-util": "catalog:",
+    "@connectrpc/connect": "catalog:",
+    "@connectrpc/connect-node": "catalog:",
     "@grpc/grpc-js": "catalog:",
     "@hocuspocus/extension-database": "3.4.4",
     "@hocuspocus/server": "3.4.4",
@@ -14,6 +16,7 @@
     "@nestjs/typeorm": "catalog:",
     "@nestjs/websockets": "catalog:",
     "@notopia-uit/api-document-nestjs-server": "workspace:",
+    "@notopia-uit/pb": "workspace:",
     "@opentelemetry/api": "catalog:",
     "@opentelemetry/auto-instrumentations-node": "0.71.0",
     "@opentelemetry/exporter-metrics-otlp-grpc": "catalog:",

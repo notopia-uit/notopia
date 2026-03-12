@@ -6,6 +6,11 @@ export interface DatabaseConfig {
   database: string;
 }
 
+export interface ServicesConfig {
+  noteUrl: string;
+  authorizationUrl: string;
+}
+
 export interface AppConfig {
   env: 'test' | 'production' | 'development';
   logLevel: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
