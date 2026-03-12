@@ -357,14 +357,6 @@ export const zImportDocumentsData = z.object({
     query: z.never().optional()
 });
 
-export const zWsDocumentData = z.object({
-    body: z.never().optional(),
-    path: z.object({
-        documentId: z.uuid()
-    }),
-    query: z.never().optional()
-});
-
 export const zGetDocumentAttachmentUploadUrlData = z.object({
     body: z.never().optional(),
     path: z.object({

@@ -27,8 +27,6 @@ tags:
 paths:
   /document/documents/import:
     $ref: ./paths/documents_import.yaml
-  /document/ws/documents/{documentId}:
-    $ref: ./paths/ws_documents_{documentId}.yaml
   /document/documents/{documentId}/attachment-url:
     $ref: ./paths/documents_{documentId}_attachment-url.yaml
 

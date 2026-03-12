@@ -1,7 +1,7 @@
 package otel
 
 import (
-	"os"
+	"context"
 
 	"github.com/notopia-uit/notopia/pkg/metadata"
 	"go.opentelemetry.io/otel/attribute"
@@ -10,6 +10,7 @@ import (
 )
 
 func NewResource(
+	ctx context.Context,
 	serviceName metadata.ServiceName,
 	serviceVersion metadata.ServiceVersion,
 ) (*resource.Resource, error) {
@@ -18,19 +19,12 @@ func NewResource(
 		semconv.ServiceVersion(serviceVersion.String()),
 	}
 
-	podName := os.Getenv("POD_NAME")
-	if podName != "" && podName != "unknown" && podName != "unknown_pod" {
-		attrs = append(attrs, semconv.K8SPodNameKey.String(podName))
-	}
-
-	podNamespace := os.Getenv("POD_NAMESPACE")
-	if podNamespace != "" && podNamespace != "unknown" {
-		attrs = append(attrs, semconv.K8SNamespaceNameKey.String(podNamespace))
-	}
-
-	return resource.Merge(
-		resource.Default(),
-		resource.NewWithAttributes(semconv.SchemaURL, attrs...),
+	return resource.New(ctx,
+		resource.WithAttributes(attrs...),
+		resource.WithFromEnv(),
+		resource.WithTelemetrySDK(),
+		resource.WithOS(),
+		resource.WithContainer(),
 	)
 }
 

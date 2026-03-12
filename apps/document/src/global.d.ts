@@ -1,25 +1,28 @@
 declare namespace NodeJS {
   interface ProcessEnv {
-    OTEL_ENABLED?: 'true' | 'false';
-    OTEL_STDOUT?: 'true' | 'false';
-
-    OTEL_TRACE_ENABLED?: 'true' | 'false';
-    OTEL_TRACE_SAMPLE_RATE?: string; // float, e.g., '1.0'
-    OTEL_TRACE_GRPC_ENDPOINT?: string;
-    OTEL_TRACE_GRPC_INSECURE?: 'true' | 'false';
-    OTEL_TRACE_STDOUT?: 'true' | 'false';
-
-    OTEL_LOG_ENABLED?: 'true' | 'false';
+    OTEL_SDK_DISABLED?: 'true' | 'false'; // Standard: Master switch
+    OTEL_SERVICE_NAME?: string;
+    OTEL_RESOURCE_ATTRIBUTES?: string; // 'env=prod,version=1.0.0'
+    OTEL_TRACES_EXPORTER?: 'otlp' | 'console' | 'none';
+    OTEL_TRACES_SAMPLER?:
+      | 'always_on'
+      | 'always_off'
+      | 'traceidratio'
+      | 'parentbased_traceidratio';
+    OTEL_TRACES_SAMPLER_ARG?: string; // (0.0 - 1.0)
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?: string; // Standard
+    OTEL_EXPORTER_OTLP_TRACES_PROTOCOL?: 'grpc' | 'http/protobuf' | 'http/json';
+    OTEL_METRICS_EXPORTER?: 'otlp' | 'console' | 'none';
+    OTEL_METRIC_EXPORT_INTERVAL?: string; // (ms)
+    OTEL_EXPORTER_OTLP_METRICS_ENDPOINT?: string; // Standard
+    OTEL_EXPORTER_OTLP_METRICS_PROTOCOL?: 'grpc' | 'http/protobuf';
+    OTEL_LOGS_EXPORTER?: 'otlp' | 'console' | 'none'; // Standard
     OTEL_LOG_LEVEL?: 'debug' | 'info' | 'warn' | 'error';
-    OTEL_LOG_GRPC_ENDPOINT?: string;
-    OTEL_LOG_GRPC_INSECURE?: 'true' | 'false';
-    OTEL_LOG_STDOUT?: 'true' | 'false';
-
-    OTEL_METER_ENABLED?: 'true' | 'false';
-    OTEL_METER_GRPC_ENDPOINT?: string;
-    OTEL_METER_GRPC_INSECURE?: 'true' | 'false';
-    OTEL_METER_STDOUT?: 'true' | 'false';
-    OTEL_METER_EXPORT_INTERVAL?: string; // integer, e.g., '60000'
+    OTEL_EXPORTER_OTLP_LOGS_ENDPOINT?: string;
+    OTEL_EXPORTER_OTLP_ENDPOINT?: string; // 'http://localhost:4317'
+    OTEL_EXPORTER_OTLP_PROTOCOL?: 'grpc' | 'http/protobuf';
+    OTEL_EXPORTER_OTLP_HEADERS?: string; // e.g., 'api-key=123,auth=xyz'
+    OTEL_EXPORTER_OTLP_TIMEOUT?: string; // (ms)
 
     DB_HOST?: string;
     DB_PORT?: string;

@@ -27,6 +27,17 @@
       },
       "cache": false
     },
+    "dev": {
+      "executor": "nx:run-commands",
+      "inputs": ["default"],
+      "options": {
+        "command": "go run .",
+        "cwd": "{projectRoot}",
+        "tty": true
+      },
+      "dependsOn": ["gen:wire", "^gen*"],
+      "continuous": true
+    },
     "build": {
       "executor": "nx:run-commands",
       "inputs": ["default"],
@@ -47,17 +58,6 @@
       "continuous": true,
       "dependsOn": ["build"]
     },
-    "run": {
-      "executor": "nx:run-commands",
-      "inputs": ["default"],
-      "options": {
-        "command": "go run -gcflags='all=-N -l' .",
-        "cwd": "{projectRoot}",
-        "tty": true
-      },
-      "dependsOn": ["gen:wire", "^gen*"],
-      "continuous": true
-    },
     "debug": {
       "executor": "nx:run-commands",
       "inputs": ["default"],
@@ -68,9 +68,6 @@
       },
       "dependsOn": ["gen:wire", "^gen*"],
       "continuous": true
-    },
-    "serve": {
-      "dependsOn": ["run"]
     },
     "lint": {
       "executor": "nx:run-commands",

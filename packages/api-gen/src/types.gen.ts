@@ -468,46 +468,6 @@ export type ImportDocumentsResponses = {
     201: unknown;
 };
 
-export type WsDocumentData = {
-    body?: never;
-    path: {
-        /**
-         * Unique identifier of the document (note)
-         */
-        documentId: string;
-    };
-    query?: never;
-    url: '/document/ws/documents/{documentId}';
-};
-
-export type WsDocumentErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: DocumentError;
-    /**
-     * Unauthorized Error response
-     */
-    401: DocumentError;
-    /**
-     * Not Found Error response
-     */
-    404: DocumentError;
-    /**
-     * Internal Server Error response
-     */
-    500: DocumentError;
-};
-
-export type WsDocumentError = WsDocumentErrors[keyof WsDocumentErrors];
-
-export type WsDocumentResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type GetDocumentAttachmentUploadUrlData = {
     body?: never;
     path: {

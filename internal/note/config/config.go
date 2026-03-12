@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
-	"github.com/notopia-uit/notopia/pkg/otel"
+	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/spf13/viper"
 )
 
@@ -18,8 +18,8 @@ type Server struct {
 
 type Config struct {
 	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
+	Log      logging.Config       `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
 	Server   Server               `json:"server"   mapstructure:"server"   validate:"required"  yaml:"server"`
-	OTLP     otel.Config          `json:"otlp"     mapstructure:"otlp"     validate:"omitempty" yaml:"otlp"`
 	Database commonconfig.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
 }
 
@@ -35,7 +35,7 @@ func New(
 
 	viper.SetDefault("server.http.port", 8081)
 	viper.SetDefault("server.grpc.port", 18081)
-	otel.ViperSetDefault(viper, "otlp")
+	logging.ViperSetDefault(viper, "log")
 	commonconfig.SQLViperSetDefault(viper, "database")
 	commonconfig.GeneralViperSetDefault(viper, "general")
 

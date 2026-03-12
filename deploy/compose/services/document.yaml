@@ -1,0 +1,22 @@
+# vim:ft=yaml.docker-compose:
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  document_postgresql:
+    container_name: notopia-document_postgresql
+    image: postgres:18.1-alpine3.23
+    environment:
+      POSTGRES_DB: ${DOCUMENT_POSTGRESQL_DB:-document}
+      POSTGRES_USER: ${DOCUMENT_POSTGRESQL_USER:-notopiauit}
+      POSTGRES_PASSWORD: ${DOCUMENT_POSTGRESQL_PASSWORD:-notopiauit}
+    ports:
+      - ${DOCUMENT_POSTGRESQL_PORT:-5434}:5432
+    volumes:
+      - document_postgresql_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+    restart: unless-stopped
+
+volumes:
+  document_postgresql_data:

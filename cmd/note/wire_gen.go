@@ -31,31 +31,27 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	general := &configConfig.General
-	stdoutHandler := logging.NewStdoutHandler(general)
+	loggingConfig := &configConfig.Log
+	stdoutHandler := logging.NewStdoutHandler(loggingConfig)
 	serviceName := _wireServiceNameValue
-	otelConfig := &configConfig.OTLP
-	logConfig := &otelConfig.Log
 	serviceVersion := _wireServiceVersionValue
-	resource, err := otel.NewResource(serviceName, serviceVersion)
+	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
 	if err != nil {
 		return nil, nil, err
 	}
-	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, logConfig, resource)
+	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, resource)
 	if err != nil {
 		return nil, nil, err
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.New(stdoutHandler, slogHandler)
+	logger := logging.New(stdoutHandler, slogHandler, loggingConfig)
 	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(logger)
-	meterConfig := &otelConfig.Meter
-	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, meterConfig, resource)
+	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	traceConfig := &otelConfig.Trace
-	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, traceConfig, resource)
+	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
 	if err != nil {
 		cleanup2()
 		cleanup()

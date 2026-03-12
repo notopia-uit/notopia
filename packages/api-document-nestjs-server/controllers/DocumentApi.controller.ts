@@ -17,9 +17,4 @@ export class DocumentApiController {
     return this.documentApi.importDocuments(requestBody, request);
   }
 
-  @Get('/document/ws/documents/:documentId')
-  wsDocument(@Param('documentId') documentId: string, @Req() request: Request): void | Promise<void> | Observable<void> {
-    return this.documentApi.wsDocument(documentId, request);
-  }
-
 } 

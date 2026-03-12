@@ -6,6 +6,10 @@
   </a>
 </div>
 
+## OTEL
+
+<https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/>
+
 ## Dev
 
 - Delete broken symlinks in the current directory and its subdirectories

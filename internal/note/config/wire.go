@@ -11,7 +11,7 @@ var ProviderSet = wire.NewSet(
 		new(*Config),
 		"Database",
 		"General",
-		"OTLP",
+		"Log",
 		"Server",
 	),
 )

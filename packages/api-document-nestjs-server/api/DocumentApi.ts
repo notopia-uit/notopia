@@ -11,7 +11,4 @@ export abstract class DocumentApi {
 
   abstract importDocuments(requestBody: Array<object>,  request: Request): void | Promise<void> | Observable<void>;
 
-
-  abstract wsDocument(documentId: string,  request: Request): void | Promise<void> | Observable<void>;
-
 } 

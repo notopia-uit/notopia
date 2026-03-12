@@ -77,45 +77,6 @@
         }
       }
     },
-    "/document/ws/documents/{documentId}": {
-      "get": {
-        "security": [
-          {
-            "Oauth2": []
-          }
-        ],
-        "tags": [
-          "Document"
-        ],
-        "summary": "WebSocket hocuspocus",
-        "operationId": "wsDocument",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/documentIdPath"
-          }
-        ],
-        "responses": {
-          "101": {
-            "description": "Switching Protocols - WebSocket connection established"
-          },
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
     "/document/documents/{documentId}/attachment-url": {
       "get": {
         "security": [

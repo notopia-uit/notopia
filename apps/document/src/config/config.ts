@@ -7,6 +7,6 @@ export interface DatabaseConfig {
 }
 
 export interface AppConfig {
-  env: string;
+  env: 'test' | 'production' | 'development';
   database: DatabaseConfig;
 }

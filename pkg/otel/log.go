@@ -6,82 +6,37 @@ import (
 
 	"github.com/notopia-uit/notopia/pkg/metadata"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
-	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
-	"go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
-	"go.opentelemetry.io/otel/log"
+	"go.opentelemetry.io/contrib/exporters/autoexport"
 	sdk "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
-// HACK: This struct created by AI
-type severityFilter struct {
-	sdk.Processor
-	minSeverity log.Severity
-}
-
-func (f *severityFilter) Enabled(_ context.Context, param sdk.EnabledParameters) bool {
-	return param.Severity >= f.minSeverity
-}
-
-func (f *severityFilter) OnEmit(ctx context.Context, record *sdk.Record) error {
-	if record.Severity() < f.minSeverity {
-		return nil
-	}
-	return f.Processor.OnEmit(ctx, record)
-}
-
 func NewLoggerProvider(
 	ctx context.Context,
-	cfg *LogConfig,
 	res *resource.Resource,
 ) (*sdk.LoggerProvider, func(), error) {
-	var exporters []sdk.Exporter
-
-	if cfg.Stdout {
-		stdoutExp, err := stdoutlog.New(stdoutlog.WithPrettyPrint())
-		if err != nil {
-			return nil, nil, err
-		}
-		exporters = append(exporters, stdoutExp)
+	exp, err := autoexport.NewLogExporter(ctx, autoexport.WithFallbackLogExporter(
+		func(ctx context.Context) (sdk.Exporter, error) {
+			return nil, nil
+		}),
+	)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	if cfg.GRPC.Endpoint != "" {
-		opts := []otlploggrpc.Option{
-			otlploggrpc.WithEndpoint(cfg.GRPC.Endpoint),
-		}
-		if !cfg.GRPC.Insecure {
-			opts = append(opts, otlploggrpc.WithInsecure())
-		}
-		exporter, err := otlploggrpc.New(ctx, opts...)
-		if err != nil {
-			return nil, nil, err
-		}
-		exporters = append(exporters, exporter)
-	}
-
-	options := []sdk.LoggerProviderOption{
+	lp := sdk.NewLoggerProvider(
+		sdk.WithProcessor(sdk.NewBatchProcessor(exp)),
 		sdk.WithResource(res),
-	}
-
-	for _, exporter := range exporters {
-		processor := sdk.NewBatchProcessor(exporter)
-		filter := &severityFilter{
-			minSeverity: cfg.GetMinSecurity(),
-			Processor:   processor,
-		}
-
-		options = append(
-			options,
-			sdk.WithProcessor(filter),
-		)
-	}
-
-	lp := sdk.NewLoggerProvider(options...)
+	)
 
 	cleanup := func() {
-		_ = lp.Shutdown(ctx)
+		if err := lp.Shutdown(context.Background()); err != nil {
+			slog.Error(
+				"Error shutting down LoggerProvider",
+				slog.String("error", err.Error()),
+			)
+		}
 	}
-
 	return lp, cleanup, nil
 }
 

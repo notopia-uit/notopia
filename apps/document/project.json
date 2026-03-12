@@ -41,6 +41,9 @@
         "development": {
           "buildTarget": "document:build:development"
         },
+        "development-mon": {
+          "buildTarget": "document:build:development"
+        },
         "production": {
           "buildTarget": "document:build:production"
         }

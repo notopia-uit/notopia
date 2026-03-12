@@ -1,13 +1,14 @@
 import { Database } from '@hocuspocus/extension-database';
-import { Server } from '@hocuspocus/server';
+import { Hocuspocus } from '@hocuspocus/server';
 import { Provider } from '@nestjs/common';
 
 import { DocumentRepository } from '../document/document.repository';
 
 export const HocuspocusProvider: Provider = {
-  provide: Server,
+  provide: Hocuspocus,
   useFactory: (documentRepository: DocumentRepository) => {
-    return new Server({
+    return new Hocuspocus({
+      name: 'document', // # TODO: Inject host
       extensions: [
         new Database({
           fetch: async ({ documentName: id }) => {

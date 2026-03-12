@@ -18,9 +18,6 @@ import { ApiHttpModule } from './api.module';
     OpenTelemetryModule.forRoot({
       metrics: {
         hostMetrics: true,
-        apiMetrics: {
-          enable: true,
-        },
       },
     }),
     LoggerModule.forRootAsync({

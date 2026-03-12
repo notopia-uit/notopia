@@ -1,3 +1,4 @@
+import { Hocuspocus } from '@hocuspocus/server';
 import { Injectable } from '@nestjs/common';
 import {
   DocumentApi,
@@ -8,7 +9,10 @@ import { DocumentService } from './document.service';
 
 @Injectable()
 export class DocumentController extends DocumentApi {
-  constructor(private readonly documentService: DocumentService) {
+  constructor(
+    private readonly documentService: DocumentService,
+    private readonly hocuspocus: Hocuspocus
+  ) {
     super();
   }
 
@@ -25,10 +29,6 @@ export class DocumentController extends DocumentApi {
     _requestBody: Array<object>,
     _request: Request
   ): Promise<void> {
-    return;
-  }
-
-  async wsDocument(_documentId: string, _request: Request): Promise<void> {
     return;
   }
 }
