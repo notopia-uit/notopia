@@ -1,18 +1,18 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
 
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/http-exception.filter';
+import { GlobalExceptionFilter } from './common/http-exception.filter';
 import { otelSdk } from './otel/tracing';
 
 otelSdk.start();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.useLogger(app.get(Logger));
+  const logger = app.get(Logger);
+  app.useLogger(logger);
 
-  const httpAdapterHost = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new HttpExceptionFilter(httpAdapterHost));
+  app.useGlobalFilters(new GlobalExceptionFilter(logger));
 
   const port = process.env.PORT ?? 8082;
   await app.listen(port);

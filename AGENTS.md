@@ -45,3 +45,11 @@ pkg/                            # Go packages
 
 - Ensure using shadcn component as much as possible
 - Use shadcn install directly from monorepo root
+
+## Nx
+
+- Targets:
+  - build
+  - dev: run in development mode, continuous
+  - start for nextjs style
+  - serve: run the built

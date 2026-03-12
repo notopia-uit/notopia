@@ -3,16 +3,19 @@ name: notopia
 
 include:
   - ./infrastructure/authentik.yaml
-  - ./infrastructure/casbin.yaml
+  - ./infrastructure/authorization.yaml
   - ./infrastructure/dbgate.yaml
   - ./infrastructure/meilisearch.yaml
   - ./infrastructure/redis_pub_sub.yaml
   - ./infrastructure/redpanda.yaml
   - ./infrastructure/rustfs.yaml
   - ./infrastructure/traefik.yaml
+
   - ./monitoring/alloy.yaml
   - ./monitoring/grafana.yaml
   - ./monitoring/loki.yaml
   - ./monitoring/prometheus.yaml
   - ./monitoring/tempo.yaml
+
   - ./services/note.yaml
+  - ./services/document.yaml

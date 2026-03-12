@@ -20,6 +20,9 @@ module.exports = () => ({
   ignoreWarnings: [
     // source-map-loader: missing .ts source files for packages that ship compiled output
     /Failed to parse source map/,
+    // ws optional native bindings (falls back to pure JS)
+    /Can't resolve 'bufferutil'/,
+    /Can't resolve 'utf-8-validate'/,
     // TypeORM optional drivers that are not installed
     /Can't resolve 'react-native-sqlite-storage'/,
     /Can't resolve '@google-cloud\/spanner'/,
@@ -63,14 +66,15 @@ module.exports = () => ({
   plugins: [
     new NxAppWebpackPlugin({
       target: 'node',
-      compiler: 'tsc',
+      compiler: 'swc',
       main: './src/main.ts',
       tsConfig: './tsconfig.app.json',
       assets: ['./src/assets'],
-      optimization: false,
-      outputHashing: 'none',
+      outputHashing: process.env['NODE_ENV'] === 'production' ? 'all' : 'none',
+      optimization: process.env['NODE_ENV'] === 'production',
       generatePackageJson: false,
       sourceMap: true,
+      // externalDependencies: ['pino-pretty'],
     }),
   ],
 });

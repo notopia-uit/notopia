@@ -7,3 +7,6 @@ up-api configuration="development":
       --projects=document,note,authorization,searchworker \
       --configuration={{ configuration }} \
       --parallel=99
+
+lazydocker COMPOSE_PROFILES="*":
+    COMPOSE_PROFILES={{ COMPOSE_PROFILES }} lazydocker

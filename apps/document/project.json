@@ -3,6 +3,17 @@
   "name": "document",
   "projectType": "application",
   "targets": {
+    "build": {
+      "defaultConfiguration": "development",
+      "configurations": {
+        "development": {
+          "args": ["--node-env=development"]
+        },
+        "production": {
+          "args": ["--node-env=production"]
+        }
+      }
+    },
     "prune-lockfile": {
       "dependsOn": ["build"],
       "cache": true,
@@ -31,10 +42,9 @@
     "dev": {
       "continuous": true,
       "executor": "@nx/js:node",
-      "defaultConfiguration": "development",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "document:build",
+        "buildTarget": "document:build:development",
         "runBuildTargetDependencies": false
       },
       "configurations": {

@@ -1,13 +1,12 @@
-import { Server } from '@hocuspocus/server';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 import { DocumentModule } from '../document/document.module';
 import { HocuspocusGateway } from './hocuspocus.controller';
 import { HocuspocusProvider } from './hocuspocus.provider';
 
 @Module({
-  imports: [DocumentModule],
+  imports: [forwardRef(() => DocumentModule)],
   providers: [HocuspocusGateway, HocuspocusProvider],
-  exports: [Server],
+  exports: [HocuspocusProvider],
 })
 export class HocuspocusModule {}

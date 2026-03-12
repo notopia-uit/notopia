@@ -6,16 +6,20 @@ services:
     container_name: dbgate
     environment:
       SKIP_ALL_AUTH: true
-      CONNECTIONS: note_postgresql,casbin_postgresql,redis_pub_sub
+
+      CONNECTIONS: note_postgresql,document_postgresql,authorization_postgresql
+
       LABEL_note_postgresql: Note PostgreSQL
       ENGINE_note_postgresql: postgres@dbgate-plugin-postgres
-      URL_note_postgresql: postgres://${NOTE_POSTGRESQL_USER:-notopiauit}:${NOTE_POSTGRESQL_PASSWORD:-notopiauit}@note_postgresql:5432/${CASBIN_POSTGRESQL_DB:-note}
-      LABEL_casbin_postgresql: Casbin PostgreSQL
-      ENGINE_casbin_postgresql: postgres@dbgate-plugin-postgres
-      URL_casbin_postgresql: postgres://${CASBIN_POSTGRESQL_USER:-notopiauit}:${CASBIN_POSTGRESQL_PASSWORD:-notopiauit}@casbin_postgresql:5432/${CASBIN_POSTGRESQL_DB:-casbin}
-      LABEL_redis_pub_sub: Redis Pub/Sub
-      ENGINE_redis_pub_sub: redis@dbgate-plugin-redis
-      URL_redis_pub_sub: redis://redis_pubsub:6379
+      URL_note_postgresql: postgres://${NOTE_POSTGRESQL_USER:-notopiauit}:${NOTE_POSTGRESQL_PASSWORD:-notopiauit}@note_postgresql:5432/${NOTE_POSTGRESQL_DB:-note}
+
+      LABEL_document_postgresql: Document PostgreSQL
+      ENGINE_document_postgresql: postgres@dbgate-plugin-postgres
+      URL_document_postgresql: postgres://${DOCUMENT_POSTGRESQL_USER:-notopiauit}:${DOCUMENT_POSTGRESQL_PASSWORD:-notopiauit}@document_postgresql:5432/${DOCUMENT_POSTGRESQL_DB:-document}
+
+      LABEL_authorization_postgresql: Authorization PostgreSQL
+      ENGINE_authorization_postgresql: postgres@dbgate-plugin-postgres
+      URL_authorization_postgresql: postgres://${AUTHORIZATION_POSTGRESQL_USER:-notopiauit}:${AUTHORIZATION_POSTGRESQL_PASSWORD:-notopiauit}@authorization_postgresql:5432/${AUTHORIZATION_POSTGRESQL_DB:-authorization}
     volumes:
       - dbgate_data:/root/.dbgate
     labels:

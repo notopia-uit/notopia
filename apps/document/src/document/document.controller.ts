@@ -1,4 +1,3 @@
-import { Hocuspocus } from '@hocuspocus/server';
 import { Injectable } from '@nestjs/common';
 import {
   DocumentApi,
@@ -11,10 +10,7 @@ import { DocumentService } from './document.service';
 @Injectable()
 @Traceable()
 export class DocumentController extends DocumentApi {
-  constructor(
-    private readonly documentService: DocumentService,
-    private readonly hocuspocus: Hocuspocus
-  ) {
+  constructor(private readonly documentService: DocumentService) {
     super();
   }
 

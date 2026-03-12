@@ -1,19 +1,22 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
+import pretty, { PrettyStream } from 'pino-pretty';
 
 import { ApiHttpModule } from './api.module';
+import { UserGuard } from './common/user.guard';
 import { AppConfig } from './config/config';
-import { appConfig } from './config/config.factory';
+import { appConfig, databaseConfig } from './config/config.factory';
 import { DatabaseModule } from './database/database.module';
-import { HocuspocusModule } from './hocuspocus/hocuspocus.module';
+import { DocumentModule } from './document/document.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig],
+      load: [appConfig, databaseConfig],
     }),
     OpenTelemetryModule.forRoot({
       metrics: {
@@ -24,16 +27,26 @@ import { HocuspocusModule } from './hocuspocus/hocuspocus.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const appCfg = configService.get<AppConfig>('app');
-        const level = appCfg?.logLevel || 'warn';
+        const appCfg = configService.get<AppConfig>('app')!;
+        const level = appCfg.logLevel;
+        const stream = pretty({ colorize: true, ignore: 'pid,hostname' });
         return {
-          pinoHttp: { level },
+          pinoHttp: {
+            level,
+            stream,
+          },
         };
       },
     }),
     DatabaseModule,
-    HocuspocusModule,
+    DocumentModule,
     ApiHttpModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: UserGuard,
+    },
   ],
 })
 export class AppModule {}

@@ -42,6 +42,7 @@ catalog:
   '@opentelemetry/semantic-conventions': 1.40.0
   '@tailwindcss/postcss': 4.2.1
   '@tanstack/react-query': 5.90.21
+  '@types/express': 5.0.6
   '@types/node': 25.3.5
   '@types/react': 19.2.14
   '@types/react-dom': 19.2.3
@@ -58,6 +59,7 @@ catalog:
   eslint-plugin-jsx-a11y: 6.10.2
   eslint-plugin-react: 7.37.5
   eslint-plugin-react-hooks: 7.0.1
+  express: 5.2.1
   jsonc-eslint-parser: 2.1.0
   lucide-react: 0.577.0
   nestjs-otel: 8.0.2
@@ -84,8 +86,6 @@ catalog:
   vitest: 4.0.18
   ws: 8.19.0
   zod: 4.3.6
-  express: 5.2.1
-  '@types/express': 5.0.6
 
 onlyBuiltDependencies:
   - '@bufbuild/buf'

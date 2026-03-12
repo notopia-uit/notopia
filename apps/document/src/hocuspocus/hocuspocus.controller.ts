@@ -8,6 +8,9 @@ import { IncomingMessage } from 'http';
 import { Traceable } from 'nestjs-otel';
 import { WebSocket } from 'ws';
 
+import type { User } from '../common/user';
+import { ReqUser } from '../common/user.decorator';
+
 @WebSocketGateway({ path: '/document/ws/document' })
 @Traceable()
 export class HocuspocusGateway implements OnGatewayConnection {
@@ -15,8 +18,9 @@ export class HocuspocusGateway implements OnGatewayConnection {
 
   handleConnection(
     @ConnectedSocket() socket: WebSocket,
-    request: IncomingMessage
+    @ReqUser() user: User,
+    req: IncomingMessage
   ) {
-    this.hocuspocus.handleConnection(socket, request);
+    this.hocuspocus.handleConnection(socket, req, user);
   }
 }

@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import {
+import type {
   GetRevisions200Response,
   RenameRevisionRequest,
-  Revision,
-  RevisionApi,
 } from '@notopia-uit/api-document-nestjs-server';
+import { Revision, RevisionApi } from '@notopia-uit/api-document-nestjs-server';
 import { Traceable } from 'nestjs-otel';
 
 import { RevisionService } from './revision.service';
@@ -16,11 +15,11 @@ export class RevisionController extends RevisionApi {
     super();
   }
 
-  async deleteRevision(revisionId: string, _request: Request): Promise<void> {
+  async deleteRevision(revisionId: string, req: Request): Promise<void> {
     await this.revisionService.deleteRevision(revisionId);
   }
 
-  async getRevision(revisionId: string, _request: Request): Promise<Revision> {
+  async getRevision(revisionId: string, req: Request): Promise<Revision> {
     const revision = await this.revisionService.getRevision(revisionId);
     return {
       id: revision.id,
@@ -34,7 +33,7 @@ export class RevisionController extends RevisionApi {
     documentId: string,
     page: number,
     limit: number,
-    _request: Request
+    req: Request
   ): Promise<GetRevisions200Response> {
     const result = await this.revisionService.getRevisionsByDocumentId(
       documentId,
@@ -63,7 +62,7 @@ export class RevisionController extends RevisionApi {
   async renameRevision(
     revisionId: string,
     renameRevisionRequest: RenameRevisionRequest,
-    _request: Request
+    req: Request
   ): Promise<void> {
     await this.revisionService.renameRevision(
       revisionId,

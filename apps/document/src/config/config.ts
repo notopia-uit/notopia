@@ -8,6 +8,5 @@ export interface DatabaseConfig {
 
 export interface AppConfig {
   env: 'test' | 'production' | 'development';
-  database: DatabaseConfig;
   logLevel: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 }
