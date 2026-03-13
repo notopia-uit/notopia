@@ -92,6 +92,10 @@ func (n *Note) Size() uint {
 	return n.size
 }
 
+func (n *Note) SetSize(size uint) {
+	n.size = size
+}
+
 func (n *Note) FolderID() uuid.UUID {
 	return n.folderID
 }

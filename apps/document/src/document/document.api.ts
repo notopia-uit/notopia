@@ -1,8 +1,5 @@
 import { Injectable, UseGuards } from '@nestjs/common';
-import {
-  DocumentApi as _DocumentApi,
-  GetDocumentAttachmentUploadUrl200Response,
-} from '@notopia-uit/api-document-nestjs-server';
+import { DocumentApi as _DocumentApi } from '@notopia-uit/api-document-nestjs-server';
 import { Traceable } from 'nestjs-otel';
 
 import { User } from '../common/user';

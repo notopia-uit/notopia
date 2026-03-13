@@ -100,10 +100,6 @@ func (n *Note) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
 }
 
 func noteToDomain(note *pgsqlc.Note, outgoingLinks uuid.UUIDs) *domain.Note {
-	var trashedBy *domain.TrashedBy
-	if note.TrashedBy != nil {
-		trashedBy = new(domain.TrashedBy(*note.TrashedBy))
-	}
 	return domain.UnmarshalNote(
 		note.ID,
 		note.Name,
@@ -112,7 +108,7 @@ func noteToDomain(note *pgsqlc.Note, outgoingLinks uuid.UUIDs) *domain.Note {
 		uint(note.Size),
 		note.FolderID,
 		outgoingLinks,
-		trashedBy,
+		(*domain.TrashedBy)(note.TrashedBy),
 		note.TrashedAt,
 	)
 }
