@@ -103,13 +103,19 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "uploadUrl": {
+                      "type": "string",
+                      "format": "uri",
+                      "example": "http://rustfs-api.notopia.localhost/document/upload-url"
+                    },
                     "url": {
                       "type": "string",
                       "format": "uri",
-                      "example": "http://rustfs.notopia.localhost/attachments/d4c6b66a-03a8-486d-a139-ab72635c009b"
+                      "example": "http://rustfs-api.notopia.localhost/document/document-attachments/d4c6b66a-03a8-486d-a139-ab72635c009b/a64cb105-4924-4441-8611-bbc91bbaa1b9"
                     }
                   },
                   "required": [
+                    "uploadUrl",
                     "url"
                   ]
                 }

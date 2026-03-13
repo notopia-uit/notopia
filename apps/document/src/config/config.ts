@@ -1,3 +1,8 @@
+export interface AppConfig {
+  env: 'test' | 'production' | 'development';
+  logLevel: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+}
+
 export interface DatabaseConfig {
   host: string;
   port: number;
@@ -11,7 +16,10 @@ export interface ServicesConfig {
   authorizationUrl: string;
 }
 
-export interface AppConfig {
-  env: 'test' | 'production' | 'development';
-  logLevel: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+export interface S3Config {
+  endpoint: string;
+  region: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  bucketName: string;
 }

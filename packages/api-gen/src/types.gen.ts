@@ -527,6 +527,7 @@ export type GetDocumentAttachmentUploadUrlResponses = {
      * Presigned URL
      */
     200: {
+        uploadUrl: string;
         url: string;
     };
 };

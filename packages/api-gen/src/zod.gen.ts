@@ -390,6 +390,7 @@ export const zGetDocumentAttachmentUploadUrlData = z.object({
  * Presigned URL
  */
 export const zGetDocumentAttachmentUploadUrlResponse = z.object({
+    uploadUrl: z.url(),
     url: z.url()
 });
 

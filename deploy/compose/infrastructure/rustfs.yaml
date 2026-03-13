@@ -37,8 +37,8 @@ services:
         until (/usr/bin/mc alias set rustfs http://rustfs:9000 ${RUSTFS_ACCESS_KEY:-notopiauit} ${RUSTFS_SECRET_KEY:-notopiauit}) do
           sleep 1;
         done
-        /usr/bin/mc mb rustfs/notopia;
-        /usr/bin/mc policy set public rustfs/notopia;
+        /usr/bin/mc mb rustfs/document;
+        /usr/bin/mc policy set public rustfs/document;
       '
     depends_on:
       rustfs:
