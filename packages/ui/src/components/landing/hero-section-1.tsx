@@ -15,7 +15,7 @@ export function LandingHeroSection1({
 }: LandingHeroSection1Props) {
   return (
     <section className="flex w-full justify-center bg-white px-4 py-12">
-      <div className="flex w-full max-w-[1440px] flex-row items-stretch gap-8">
+      <div className="flex w-full max-w-360 flex-row items-stretch gap-8">
         {/* Left content */}
         <div className="flex flex-1 flex-col justify-start gap-6">
           <div className="flex flex-col gap-3">
@@ -30,7 +30,7 @@ export function LandingHeroSection1({
           </div>
 
           {/* Contact pill input */}
-          <div className="relative flex w-full max-w-[340px] items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <div className="relative flex w-full max-w-85 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 shadow-sm">
             <CircleDashed className="h-5 w-5 shrink-0 text-slate-500" />
             <Input
               placeholder="Contact us"
@@ -57,7 +57,7 @@ export function LandingHeroSection1({
         </div>
 
         {/* Right content */}
-        <div className="flex flex-1 flex-col items-center justify-center gap-6 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 p-10">
+        <div className="flex flex-1 flex-col items-center justify-center gap-6 rounded-2xl bg-linear-to-br from-slate-50 to-slate-100 p-10">
           <div className="flex flex-col gap-4 text-center">
             <h2 className="text-3xl font-semibold text-slate-900">
               Visualize Your Knowledge

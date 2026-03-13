@@ -7,7 +7,7 @@ import {
   NavigationMenuTrigger,
 } from '../ui/navigation-menu';
 import { Button } from '../ui/button';
-import { Github, Facebook, Twitch } from 'lucide-react';
+import { Github } from 'lucide-react';
 
 const NAV_ITEMS = [
   { label: 'Features' },
@@ -41,11 +41,11 @@ export function LandingNavbar(_props: LandingNavbarProps) {
   return (
     <header className="flex w-full justify-center bg-white px-4 py-4">
       <nav
-        className="flex w-full max-w-[1440px] items-center justify-between gap-8 rounded-xl border border-slate-200 bg-white px-4 py-3"
+        className="flex w-full max-w-360 items-center justify-between gap-8 rounded-xl border border-slate-200 bg-white px-4 py-3"
         aria-label="Main navigation"
       >
         {/* Logo */}
-        <div className="flex flex-shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <NotopiaSvgLogo />
           <span className="text-[24px] leading-none font-semibold tracking-tight text-slate-950">
             Notopia
@@ -68,7 +68,7 @@ export function LandingNavbar(_props: LandingNavbarProps) {
         </div>
 
         {/* Social links */}
-        <div className="flex flex-shrink-0 items-center justify-end gap-2">
+        <div className="flex shrink-0 items-center justify-end gap-2">
           <Button
             variant="outline"
             size="icon"
@@ -76,22 +76,6 @@ export function LandingNavbar(_props: LandingNavbarProps) {
             aria-label="GitHub"
           >
             <Github className="h-5 w-5 text-slate-950" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-lg border-slate-200"
-            aria-label="Facebook"
-          >
-            <Facebook className="h-5 w-5 text-slate-950" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-lg border-slate-200"
-            aria-label="Twitch"
-          >
-            <Twitch className="h-5 w-5 text-slate-950" />
           </Button>
         </div>
       </nav>

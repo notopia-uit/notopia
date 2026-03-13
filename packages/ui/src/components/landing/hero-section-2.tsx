@@ -14,10 +14,10 @@ export function LandingHeroSection2({
   onHugMe,
 }: LandingHeroSection2Props) {
   return (
-    <section className="w-full bg-gradient-to-b from-white via-slate-50 to-white">
-      <div className="mx-auto flex min-h-[500px] max-w-[1440px] flex-col items-center justify-center gap-8 px-6 py-20">
+    <section className="w-full bg-linear-to-b from-white via-slate-50 to-white">
+      <div className="mx-auto flex min-h-125 max-w-360 flex-col items-center justify-center gap-8 px-6 py-20">
         {/* Contact pill input */}
-        <div className="relative flex w-full max-w-[340px] items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 shadow-sm transition-shadow hover:shadow-md">
+        <div className="relative flex w-full max-w-85 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 shadow-sm transition-shadow hover:shadow-md">
           <Input
             placeholder="Contact us"
             className="h-auto border-0 bg-transparent p-0 text-sm text-slate-700 shadow-none placeholder:text-slate-400 focus-visible:ring-0"
