@@ -7,7 +7,11 @@ import pretty from 'pino-pretty';
 import { ApiHttpModule } from './api.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { AppConfig } from './config/config';
-import { appConfig, databaseConfig } from './config/config.factory';
+import {
+  appConfig,
+  databaseConfig,
+  servicesConfig,
+} from './config/config.factory';
 import { DatabaseModule } from './database/database.module';
 import { DocumentModule } from './document/document.module';
 import { NoteModule } from './note/note.module';
@@ -16,7 +20,7 @@ import { NoteModule } from './note/note.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig],
+      load: [appConfig, databaseConfig, servicesConfig],
     }),
     OpenTelemetryModule.forRoot({
       metrics: {

@@ -44,9 +44,7 @@
       "executor": "@nx/js:node",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "document:build:development",
-        "outputPath": "dist/apps/document",
-        "runBuildTargetDependencies": false
+        "buildTarget": "document:build:development"
       },
       "configurations": {
         "development": {

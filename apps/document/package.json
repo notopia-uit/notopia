@@ -1,7 +1,6 @@
 {
   "name": "@notopia-uit/document",
   "private": true,
-  "type": "module",
   "dependencies": {
     "@blocknote/server-util": "catalog:",
     "@bufbuild/protobuf": "catalog:",
