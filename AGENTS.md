@@ -54,6 +54,7 @@ pkg/                            # Go packages
   - dev: run in development mode, continuous
   - start for nextjs style
   - serve: run the built
+- Run `nx lint {projectName} --fix` to apply eslint fix for those typescript projects
 
 ## General Rules
 
