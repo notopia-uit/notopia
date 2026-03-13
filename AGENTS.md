@@ -44,7 +44,8 @@ pkg/                            # Go packages
 ### Frontend
 
 - Ensure using shadcn component as much as possible
-- Use shadcn install directly from monorepo root
+- Use shadcn install in packages/ui
+- Use Tailwind CSS
 
 ## Nx
 

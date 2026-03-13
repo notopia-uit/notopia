@@ -15,7 +15,8 @@
         "--",
         "shadcn",
         "mcp",
-        "--cwd ./packages/ui/"
+        "--cwd",
+        "packages/ui"
       ],
       "enabled": false
     }

@@ -14,24 +14,24 @@ export function LandingHeroSection2({
   onHugMe,
 }: LandingHeroSection2Props) {
   return (
-    <section className="w-full bg-linear-to-b from-white via-slate-50 to-white">
+    <section className="from-background via-muted/30 to-background w-full bg-gradient-to-b">
       <div className="mx-auto flex min-h-125 max-w-360 flex-col items-center justify-center gap-8 px-6 py-20">
         {/* Contact pill input */}
-        <div className="relative flex w-full max-w-85 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 shadow-sm transition-shadow hover:shadow-md">
+        <div className="border-border bg-background relative flex w-full max-w-85 items-center gap-2 rounded-full border px-4 py-3 shadow-sm transition-shadow hover:shadow-md">
           <Input
             placeholder="Contact us"
-            className="h-auto border-0 bg-transparent p-0 text-sm text-slate-700 shadow-none placeholder:text-slate-400 focus-visible:ring-0"
+            className="text-foreground placeholder:text-muted-foreground h-auto border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
           />
-          <Inbox className="h-5 w-5 shrink-0 text-slate-500" />
+          <Inbox className="text-muted-foreground h-5 w-5 shrink-0" />
         </div>
 
         {/* Heading */}
-        <h1 className="max-w-4xl text-center text-[56px] leading-tight font-bold tracking-[-0.02em] text-slate-900">
+        <h1 className="text-foreground max-w-4xl text-center text-[56px] leading-tight font-bold tracking-[-0.02em]">
           Stop letting your best ideas get lost in the noise
         </h1>
 
         {/* Subtext */}
-        <p className="max-w-2xl text-center text-lg leading-relaxed font-normal text-slate-600">
+        <p className="text-muted-foreground max-w-2xl text-center text-lg leading-relaxed font-normal">
           Turn scattered notes into a shared universe. Visualize your
           team&apos;s knowledge graph and collaborate in real-time with Notopia.
         </p>
@@ -39,13 +39,13 @@ export function LandingHeroSection2({
         {/* CTA buttons */}
         <div className="flex items-center gap-4 pt-4">
           <Button
-            className="h-auto rounded-lg bg-slate-900 px-8 py-3 text-base font-semibold text-white transition-colors hover:bg-slate-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 h-auto rounded-lg px-8 py-3 text-base font-semibold transition-colors"
             onClick={onStartNow}
           >
             Start Now
           </Button>
           <Button
-            className="h-auto rounded-lg border-0 bg-slate-100 px-8 py-3 text-base font-semibold text-slate-900 shadow-none transition-colors hover:bg-slate-200"
+            className="bg-secondary text-secondary-foreground hover:bg-secondary/90 h-auto rounded-lg border-0 px-8 py-3 text-base font-semibold shadow-none transition-colors"
             onClick={onHugMe}
           >
             Hug Me

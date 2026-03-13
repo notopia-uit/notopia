@@ -39,15 +39,15 @@ export interface LandingNavbarProps {
 
 export function LandingNavbar(_props: LandingNavbarProps) {
   return (
-    <header className="flex w-full justify-center bg-white px-4 py-4">
+    <header className="flex w-full justify-center bg-transparent px-4 py-4">
       <nav
-        className="flex w-full max-w-360 items-center justify-between gap-8 rounded-xl border border-slate-200 bg-white px-4 py-3"
+        className="flex w-full max-w-360 items-center justify-between gap-8"
         aria-label="Main navigation"
       >
         {/* Logo */}
         <div className="flex shrink-0 items-center gap-2">
           <NotopiaSvgLogo />
-          <span className="text-[24px] leading-none font-semibold tracking-tight text-slate-950">
+          <span className="text-foreground text-[24px] leading-none font-semibold tracking-tight">
             Notopia
           </span>
         </div>
@@ -58,7 +58,7 @@ export function LandingNavbar(_props: LandingNavbarProps) {
             <NavigationMenuList className="gap-2">
               {NAV_ITEMS.map((item) => (
                 <NavigationMenuItem key={item.label}>
-                  <NavigationMenuTrigger className="h-auto rounded-lg bg-transparent px-4 py-[7.5px] text-sm font-semibold text-slate-700 hover:bg-slate-100">
+                  <NavigationMenuTrigger className="text-foreground hover:bg-muted h-auto rounded-lg bg-transparent px-4 py-[7.5px] text-sm font-semibold">
                     {item.label}
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
@@ -72,10 +72,10 @@ export function LandingNavbar(_props: LandingNavbarProps) {
           <Button
             variant="outline"
             size="icon"
-            className="rounded-lg border-slate-200"
+            className="border-border rounded-lg"
             aria-label="GitHub"
           >
-            <Github className="h-5 w-5 text-slate-950" />
+            <Github className="text-foreground h-5 w-5" />
           </Button>
         </div>
       </nav>
