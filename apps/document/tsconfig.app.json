@@ -6,11 +6,12 @@
     "types": ["node"],
     "rootDir": "src",
     "baseUrl": "src",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "es2021"
+    "target": "es2021",
+    "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "src/global.d.ts"],
   "exclude": ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"],

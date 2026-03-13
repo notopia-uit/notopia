@@ -45,6 +45,7 @@
       "dependsOn": ["build"],
       "options": {
         "buildTarget": "document:build:development",
+        "outputPath": "dist/apps/document",
         "runBuildTargetDependencies": false
       },
       "configurations": {

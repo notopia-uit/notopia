@@ -1,8 +1,11 @@
 import { Client } from '@connectrpc/connect';
 import { Database } from '@hocuspocus/extension-database';
-import { Hocuspocus, onAuthenticatePayload } from '@hocuspocus/server';
+import { Hocuspocus } from '@hocuspocus/server';
 import { Provider } from '@nestjs/common';
-import { AuthorizationService } from '@notopia-uit/pb/authorization';
+import {
+  AuthorizationService,
+  NotePermission,
+} from '@notopia-uit/pb/authorization';
 import { NoteService } from '@notopia-uit/pb/note';
 
 import { AUTHORIZATION_SERVICE } from '../authorization/authorization.module';
@@ -30,10 +33,17 @@ export const HocuspocusProvider: Provider = {
           },
         }),
       ],
-      onAuthenticate(data) {
+      async onAuthenticate(data) {
         const documentId = data.documentName;
-        authorizationService.hasNotePermission();
         const context = data.context as HocuspocusContext;
+        const response = await authorizationService.hasNotePermission({
+          memberId: context.user.id,
+          noteId: documentId,
+          permission: NotePermission.READ,
+        });
+        if (!response.hasPermission) {
+          throw new Error('Unauthorized');
+        }
       },
     });
   },

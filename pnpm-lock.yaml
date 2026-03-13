@@ -229,8 +229,6 @@ catalogs:
       specifier: 4.3.6
       version: 4.3.6
 
-pnpmfileChecksum: sha256-+n2Q1mq3H8T9tHlod23v7tYwBIZY6ZuDfh2TTH/8ujU=
-
 importers:
 
   .:
@@ -461,6 +459,9 @@ importers:
       '@blocknote/server-util':
         specifier: 'catalog:'
         version: 0.47.1(@floating-ui/dom@1.7.6)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(prosemirror-model@1.25.4)(prosemirror-state@1.4.4)(prosemirror-view@1.41.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@bufbuild/protobuf':
+        specifier: 'catalog:'
+        version: 2.11.0
       '@connectrpc/connect':
         specifier: 'catalog:'
         version: 2.1.1(@bufbuild/protobuf@2.11.0)
@@ -579,6 +580,9 @@ importers:
       '@types/ws':
         specifier: 8.18.1
         version: 8.18.1
+      webpack-node-externals:
+        specifier: ^3.0.0
+        version: 3.0.0
 
   apps/web:
     dependencies:
@@ -685,14 +689,7 @@ importers:
         specifier: 'catalog:'
         version: 4.3.6
 
-  packages/lib:
-    dependencies:
-      '@bufbuild/protobuf':
-        specifier: 'catalog:'
-        version: 2.11.0
-      '@connectrpc/connect':
-        specifier: 'catalog:'
-        version: 2.1.1(@bufbuild/protobuf@2.11.0)
+  packages/lib: {}
 
   packages/pb:
     devDependencies:

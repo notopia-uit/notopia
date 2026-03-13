@@ -1,8 +1,10 @@
 {
   "name": "@notopia-uit/document",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@blocknote/server-util": "catalog:",
+    "@bufbuild/protobuf": "catalog:",
     "@connectrpc/connect": "catalog:",
     "@connectrpc/connect-node": "catalog:",
     "@grpc/grpc-js": "catalog:",
@@ -43,6 +45,7 @@
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",
-    "@types/ws": "8.18.1"
+    "@types/ws": "8.18.1",
+    "webpack-node-externals": "^3.0.0"
   }
 }

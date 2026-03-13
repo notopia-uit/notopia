@@ -17,27 +17,11 @@
       "types": "./dist/blocknote/*.d.ts",
       "import": "./dist/blocknote/*.js",
       "default": "./dist/blocknote/*.js"
-    },
-    "./connectrpc": {
-      "@nx/source": "./src/connectrpc/index.ts",
-      "types": "./dist/connectrpc/index.d.ts",
-      "import": "./dist/connectrpc/index.js",
-      "default": "./dist/connectrpc/index.js"
-    },
-    "./connectrpc/*": {
-      "@nx/source": "./src/connectrpc/*.ts",
-      "types": "./dist/connectrpc/*.d.ts",
-      "import": "./dist/connectrpc/*.js",
-      "default": "./dist/connectrpc/*.js"
     }
   },
   "files": [
     "!**/*.tsbuildinfo",
     "dist"
   ],
-  "dependencies": {
-    "@bufbuild/protobuf": "catalog:",
-    "@connectrpc/connect": "catalog:"
-  },
   "types": "./dist/index.d.ts"
 }

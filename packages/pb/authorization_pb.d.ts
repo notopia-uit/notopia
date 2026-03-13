@@ -2,7 +2,7 @@
 // @generated from file authorization.proto (package authorization, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 import type { Empty } from "@bufbuild/protobuf/wkt";
 
@@ -90,9 +90,9 @@ export declare type WorkspaceMember = Message<"authorization.WorkspaceMember"> &
   id: string;
 
   /**
-   * @generated from field: string role = 2;
+   * @generated from field: authorization.WorkspaceRole role = 2;
    */
-  role: string;
+  role: WorkspaceRole;
 };
 
 /**
@@ -116,9 +116,9 @@ export declare type HasWorkspacePermissionRequest = Message<"authorization.HasWo
   workspaceId: string;
 
   /**
-   * @generated from field: string permission = 3;
+   * @generated from field: authorization.WorkspacePermission permission = 3;
    */
-  permission: string;
+  permission: WorkspacePermission;
 };
 
 /**
@@ -195,9 +195,9 @@ export declare type HasNotePermissionRequest = Message<"authorization.HasNotePer
   noteId: string;
 
   /**
-   * @generated from field: string permission = 3;
+   * @generated from field: authorization.NotePermission permission = 3;
    */
-  permission: string;
+  permission: NotePermission;
 };
 
 /**
@@ -221,6 +221,96 @@ export declare type HasNotePermissionResponse = Message<"authorization.HasNotePe
  * Use `create(HasNotePermissionResponseSchema)` to create a new message.
  */
 export declare const HasNotePermissionResponseSchema: GenMessage<HasNotePermissionResponse>;
+
+/**
+ * @generated from enum authorization.WorkspaceRole
+ */
+export enum WorkspaceRole {
+  /**
+   * @generated from enum value: WORKSPACE_ROLE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: WORKSPACE_ROLE_OWNER = 1;
+   */
+  OWNER = 1,
+
+  /**
+   * @generated from enum value: WORKSPACE_ROLE_EDITOR = 2;
+   */
+  EDITOR = 2,
+
+  /**
+   * @generated from enum value: WORKSPACE_ROLE_VIEWER = 3;
+   */
+  VIEWER = 3,
+}
+
+/**
+ * Describes the enum authorization.WorkspaceRole.
+ */
+export declare const WorkspaceRoleSchema: GenEnum<WorkspaceRole>;
+
+/**
+ * @generated from enum authorization.WorkspacePermission
+ */
+export enum WorkspacePermission {
+  /**
+   * @generated from enum value: WORKSPACE_PERMISSION_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: WORKSPACE_PERMISSION_READ = 1;
+   */
+  READ = 1,
+
+  /**
+   * @generated from enum value: WORKSPACE_PERMISSION_WRITE = 2;
+   */
+  WRITE = 2,
+
+  /**
+   * @generated from enum value: WORKSPACE_PERMISSION_DELETE = 3;
+   */
+  DELETE = 3,
+}
+
+/**
+ * Describes the enum authorization.WorkspacePermission.
+ */
+export declare const WorkspacePermissionSchema: GenEnum<WorkspacePermission>;
+
+/**
+ * @generated from enum authorization.NotePermission
+ */
+export enum NotePermission {
+  /**
+   * @generated from enum value: NOTE_PERMISSION_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: NOTE_PERMISSION_READ = 1;
+   */
+  READ = 1,
+
+  /**
+   * @generated from enum value: NOTE_PERMISSION_WRITE = 2;
+   */
+  WRITE = 2,
+
+  /**
+   * @generated from enum value: NOTE_PERMISSION_DELETE = 3;
+   */
+  DELETE = 3,
+}
+
+/**
+ * Describes the enum authorization.NotePermission.
+ */
+export declare const NotePermissionSchema: GenEnum<NotePermission>;
 
 /**
  * @generated from service authorization.AuthorizationService

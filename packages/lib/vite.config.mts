@@ -27,7 +27,7 @@ export default defineConfig(() => ({
     },
     lib: {
       // Could also be a dictionary or array of multiple entry points.
-      entry: ['./src/blocknote/', './src/connectrpc/'],
+      entry: ['./src/blocknote/'],
       name: 'lib',
       fileName: 'index',
       // Change this to the formats you want to support.

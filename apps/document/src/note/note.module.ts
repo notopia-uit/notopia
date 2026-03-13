@@ -1,8 +1,7 @@
 import { Client, createClient } from '@connectrpc/connect';
-import { createConnectTransport } from '@connectrpc/connect-node';
+import { createGrpcTransport } from '@connectrpc/connect-node';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createStrictClient } from '@notopia-uit/lib/connectrpc';
 import { NoteService } from '@notopia-uit/pb/note';
 
 import { ServicesConfig } from '../config/config';
@@ -17,12 +16,10 @@ export const NOTE_SERVICE = Symbol('NOTE_SERVICE');
         configService: ConfigService
       ): Client<typeof NoteService> => {
         const servicesCfg = configService.get<ServicesConfig>('services')!;
-        const transport = createConnectTransport({
+        const transport = createGrpcTransport({
           baseUrl: servicesCfg.noteUrl,
-          httpVersion: '1.1',
         });
-        const client = createStrictClient(NoteService, transport);
-        client.checkNoteExistence;
+        return createClient(NoteService, transport);
       },
       inject: [ConfigService],
     },
