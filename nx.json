@@ -111,7 +111,7 @@
             "{projectName}"
           ],
           "configurations": {
-            "prod": {
+            "production": {
               "cwd": "{workspaceRoot}",
               "args": [
                 "-f",
