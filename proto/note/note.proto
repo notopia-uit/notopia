@@ -2,14 +2,19 @@ syntax = "proto3";
 
 package note;
 
+import "buf/validate/validate.proto";
+
 service NoteService {
   rpc CheckNoteExistence(CheckNoteExistenceRequest) returns (CheckNoteExistenceResponse);
 }
 
 message CheckNoteExistenceRequest {
-  string note_id = 1;
+  string note_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
 }
 
 message CheckNoteExistenceResponse {
-  bool exists = 1;
+  bool exists = 1 [(buf.validate.field).required = true];
 }

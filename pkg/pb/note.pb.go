@@ -7,6 +7,7 @@
 package pb
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -114,11 +115,11 @@ var File_note_proto protoreflect.FileDescriptor
 const file_note_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"note.proto\x12\x04note\"4\n" +
-	"\x19CheckNoteExistenceRequest\x12\x17\n" +
-	"\anote_id\x18\x01 \x01(\tR\x06noteId\"4\n" +
-	"\x1aCheckNoteExistenceResponse\x12\x16\n" +
-	"\x06exists\x18\x01 \x01(\bR\x06exists2f\n" +
+	"note.proto\x12\x04note\x1a\x1bbuf/validate/validate.proto\"A\n" +
+	"\x19CheckNoteExistenceRequest\x12$\n" +
+	"\anote_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x06noteId\"<\n" +
+	"\x1aCheckNoteExistenceResponse\x12\x1e\n" +
+	"\x06exists\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\x06exists2f\n" +
 	"\vNoteService\x12W\n" +
 	"\x12CheckNoteExistence\x12\x1f.note.CheckNoteExistenceRequest\x1a .note.CheckNoteExistenceResponseBl\n" +
 	"\bcom.noteB\tNoteProtoP\x01Z%github.com/notopia-uit/notopia/pkg/pb\xa2\x02\x03NXX\xaa\x02\x04Note\xca\x02\x04Note\xe2\x02\x10Note\\GPBMetadata\xea\x02\x04Noteb\x06proto3"

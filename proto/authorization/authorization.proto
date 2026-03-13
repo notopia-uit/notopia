@@ -11,10 +11,14 @@ service AuthorizationService {
   rpc HasWorkspacePermission(HasWorkspacePermissionRequest) returns (HasWorkspacePermissionResponse);
   rpc UpdateWorkspaceMembers(UpdateWorkspaceMembersRequest) returns (UpdateWorkspaceMembersResponse);
   rpc HasNotePermission(HasNotePermissionRequest) returns (HasNotePermissionResponse);
+  rpc GetUserNotePermissions(GetUserNotePermissionsRequest) returns (GetUserNotePermissionsResponse);
 }
 
 message CreateWorkspaceWithOwnerRequest {
-  string workspace_id = 1 [(buf.validate.field).required = true];
+  string workspace_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
   string owner_id = 2 [(buf.validate.field).required = true];
 }
 
@@ -23,7 +27,10 @@ message CreateWorkspaceWithOwnerResponse {
 }
 
 message GetWorkspaceMembersRequest {
-  string workspace_id = 1 [(buf.validate.field).required = true];
+  string workspace_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
 }
 
 message GetWorkspaceMembersResponse {
@@ -51,7 +58,10 @@ enum WorkspacePermission {
 
 message HasWorkspacePermissionRequest {
   string member_id = 1 [(buf.validate.field).required = true];
-  string workspace_id = 2 [(buf.validate.field).required = true];
+  string workspace_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
   WorkspacePermission permission = 3 [(buf.validate.field).required = true];
 }
 
@@ -77,10 +87,27 @@ enum NotePermission {
 
 message HasNotePermissionRequest {
   string member_id = 1 [(buf.validate.field).required = true];
-  string note_id = 2 [(buf.validate.field).required = true];
+  string note_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
   NotePermission permission = 3 [(buf.validate.field).required = true];
 }
 
 message HasNotePermissionResponse {
   bool has_permission = 1 [(buf.validate.field).required = true];
+}
+
+message GetUserNotePermissionsRequest {
+  string member_id = 1 [(buf.validate.field).required = true];
+  string note_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+}
+
+message GetUserNotePermissionsResponse {
+  bool can_read = 1 [(buf.validate.field).required = true];
+  bool can_write = 2 [(buf.validate.field).required = true];
+  bool can_delete = 3 [(buf.validate.field).required = true];
 }

@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+
+import { RevisionEntity } from '../revision/revision.entity';
 
 @Entity('documents')
 export class DocumentEntity {
@@ -10,4 +12,9 @@ export class DocumentEntity {
 
   @Column({ type: 'boolean', default: false })
   modified!: boolean;
+
+  @OneToMany(() => RevisionEntity, (revision) => revision.document, {
+    cascade: true,
+  })
+  revisions!: RevisionEntity[];
 }

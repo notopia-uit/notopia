@@ -223,6 +223,53 @@ export declare type HasNotePermissionResponse = Message<"authorization.HasNotePe
 export declare const HasNotePermissionResponseSchema: GenMessage<HasNotePermissionResponse>;
 
 /**
+ * @generated from message authorization.GetUserNotePermissionsRequest
+ */
+export declare type GetUserNotePermissionsRequest = Message<"authorization.GetUserNotePermissionsRequest"> & {
+  /**
+   * @generated from field: string member_id = 1;
+   */
+  memberId: string;
+
+  /**
+   * @generated from field: string note_id = 2;
+   */
+  noteId: string;
+};
+
+/**
+ * Describes the message authorization.GetUserNotePermissionsRequest.
+ * Use `create(GetUserNotePermissionsRequestSchema)` to create a new message.
+ */
+export declare const GetUserNotePermissionsRequestSchema: GenMessage<GetUserNotePermissionsRequest>;
+
+/**
+ * @generated from message authorization.GetUserNotePermissionsResponse
+ */
+export declare type GetUserNotePermissionsResponse = Message<"authorization.GetUserNotePermissionsResponse"> & {
+  /**
+   * @generated from field: bool can_read = 1;
+   */
+  canRead: boolean;
+
+  /**
+   * @generated from field: bool can_write = 2;
+   */
+  canWrite: boolean;
+
+  /**
+   * @generated from field: bool can_delete = 3;
+   */
+  canDelete: boolean;
+};
+
+/**
+ * Describes the message authorization.GetUserNotePermissionsResponse.
+ * Use `create(GetUserNotePermissionsResponseSchema)` to create a new message.
+ */
+export declare const GetUserNotePermissionsResponseSchema: GenMessage<GetUserNotePermissionsResponse>;
+
+/**
  * @generated from enum authorization.WorkspaceRole
  */
 export enum WorkspaceRole {
@@ -355,6 +402,14 @@ export declare const AuthorizationService: GenService<{
     methodKind: "unary";
     input: typeof HasNotePermissionRequestSchema;
     output: typeof HasNotePermissionResponseSchema;
+  },
+  /**
+   * @generated from rpc authorization.AuthorizationService.GetUserNotePermissions
+   */
+  getUserNotePermissions: {
+    methodKind: "unary";
+    input: typeof GetUserNotePermissionsRequestSchema;
+    output: typeof GetUserNotePermissionsResponseSchema;
   },
 }>;
 

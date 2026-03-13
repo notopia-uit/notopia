@@ -10,16 +10,15 @@ export const appConfig = registerAs<AppConfig>(
   })
 );
 
-export const databaseConfig = registerAs(
-  'database',
-  (): DatabaseConfig => ({
-    host: process.env.DB_HOST ?? 'localhost',
-    port: parseInt(process.env.DB_PORT ?? '5434', 10),
-    username: process.env.DB_USER ?? 'postgres',
-    password: process.env.DB_PASSWORD ?? '',
-    database: process.env.DB_NAME ?? 'document',
-  })
-);
+export const getDatabaseConfig = (): DatabaseConfig => ({
+  host: process.env.DB_HOST ?? 'localhost',
+  port: parseInt(process.env.DB_PORT ?? '5434', 10),
+  username: process.env.DB_USER ?? 'postgres',
+  password: process.env.DB_PASSWORD ?? '',
+  database: process.env.DB_NAME ?? 'document',
+});
+
+export const databaseConfig = registerAs('database', getDatabaseConfig);
 
 export const servicesConfig = registerAs(
   'services',

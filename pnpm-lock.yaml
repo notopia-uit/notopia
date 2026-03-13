@@ -12,37 +12,16 @@ catalogs:
     '@blocknote/react':
       specifier: 0.47.1
       version: 0.47.1
-    '@blocknote/server-util':
-      specifier: 0.47.1
-      version: 0.47.1
     '@blocknote/shadcn':
       specifier: 0.47.1
       version: 0.47.1
-    '@bufbuild/protobuf':
-      specifier: 2.11.0
-      version: 2.11.0
-    '@connectrpc/connect':
-      specifier: 2.1.1
-      version: 2.1.1
-    '@connectrpc/connect-node':
-      specifier: 2.1.1
-      version: 2.1.1
-    '@grpc/grpc-js':
-      specifier: 1.14.3
-      version: 1.14.3
     '@nestjs/common':
       specifier: 11.1.16
       version: 11.1.16
-    '@nestjs/config':
-      specifier: 4.0.3
-      version: 4.0.3
     '@nestjs/core':
       specifier: 11.1.16
       version: 11.1.16
     '@nestjs/platform-express':
-      specifier: 11.1.16
-      version: 11.1.16
-    '@nestjs/platform-ws':
       specifier: 11.1.16
       version: 11.1.16
     '@nestjs/schematics':
@@ -51,54 +30,12 @@ catalogs:
     '@nestjs/testing':
       specifier: 11.1.16
       version: 11.1.16
-    '@nestjs/typeorm':
-      specifier: 11.0.0
-      version: 11.0.0
-    '@nestjs/websockets':
-      specifier: 11.1.16
-      version: 11.1.16
     '@next/eslint-plugin-next':
       specifier: 16.1.6
       version: 16.1.6
-    '@opentelemetry/api':
-      specifier: 1.9.0
-      version: 1.9.0
-    '@opentelemetry/exporter-metrics-otlp-grpc':
-      specifier: 0.213.0
-      version: 0.213.0
-    '@opentelemetry/exporter-trace-otlp-grpc':
-      specifier: 0.213.0
-      version: 0.213.0
-    '@opentelemetry/instrumentation-http':
-      specifier: 0.213.0
-      version: 0.213.0
-    '@opentelemetry/instrumentation-pino':
-      specifier: 0.59.0
-      version: 0.59.0
-    '@opentelemetry/resources':
-      specifier: 2.6.0
-      version: 2.6.0
-    '@opentelemetry/sdk-metrics':
-      specifier: 2.6.0
-      version: 2.6.0
-    '@opentelemetry/sdk-node':
-      specifier: 0.213.0
-      version: 0.213.0
-    '@opentelemetry/sdk-trace-node':
-      specifier: 2.6.0
-      version: 2.6.0
-    '@opentelemetry/semantic-conventions':
-      specifier: 1.40.0
-      version: 1.40.0
     '@tailwindcss/postcss':
       specifier: 4.2.1
       version: 4.2.1
-    '@tanstack/react-query':
-      specifier: 5.90.21
-      version: 5.90.21
-    '@types/express':
-      specifier: 5.0.6
-      version: 5.0.6
     '@types/node':
       specifier: 25.3.5
       version: 25.3.5
@@ -111,18 +48,9 @@ catalogs:
     '@vitejs/plugin-react':
       specifier: 5.1.4
       version: 5.1.4
-    autoprefixer:
-      specifier: 10.4.27
-      version: 10.4.27
     axios:
       specifier: 1.13.6
       version: 1.13.6
-    class-variance-authority:
-      specifier: 0.7.1
-      version: 0.7.1
-    clsx:
-      specifier: 2.1.1
-      version: 2.1.1
     eslint:
       specifier: 9.39.4
       version: 9.39.4
@@ -147,36 +75,18 @@ catalogs:
     eslint-plugin-react-hooks:
       specifier: 7.0.1
       version: 7.0.1
-    express:
-      specifier: 5.2.1
-      version: 5.2.1
     jsonc-eslint-parser:
       specifier: 2.1.0
       version: 2.1.0
-    lucide-react:
-      specifier: 0.577.0
-      version: 0.577.0
-    nestjs-otel:
-      specifier: 8.0.2
-      version: 8.0.2
-    nestjs-pino:
-      specifier: 4.6.0
-      version: 4.6.0
     next:
       specifier: 16.1.6
       version: 16.1.6
-    pino-http:
-      specifier: 11.0.0
-      version: 11.0.0
     postcss:
       specifier: 8.4.38
       version: 8.4.38
     prettier:
       specifier: 3.8.1
       version: 3.8.1
-    radix-ui:
-      specifier: 1.4.3
-      version: 1.4.3
     react:
       specifier: 19.2.4
       version: 19.2.4
@@ -189,24 +99,12 @@ catalogs:
     rxjs:
       specifier: 7.8.2
       version: 7.8.2
-    shadcn:
-      specifier: 4.0.5
-      version: 4.0.5
-    tailwind-merge:
-      specifier: 3.5.0
-      version: 3.5.0
     tailwindcss:
       specifier: 4.2.1
       version: 4.2.1
     tslib:
       specifier: 2.8.1
       version: 2.8.1
-    tw-animate-css:
-      specifier: 1.4.0
-      version: 1.4.0
-    typeorm:
-      specifier: 0.3.28
-      version: 0.3.28
     typescript:
       specifier: 5.9.3
       version: 5.9.3
@@ -222,12 +120,6 @@ catalogs:
     vitest:
       specifier: 4.0.18
       version: 4.0.18
-    ws:
-      specifier: 8.19.0
-      version: 8.19.0
-    zod:
-      specifier: 4.3.6
-      version: 4.3.6
 
 importers:
 
@@ -269,6 +161,9 @@ importers:
       rxjs:
         specifier: 'catalog:'
         version: 7.8.2
+      uuid:
+        specifier: 13.0.0
+        version: 13.0.0
       yjs:
         specifier: 13.6.29
         version: 13.6.29
@@ -14241,6 +14136,10 @@ packages:
 
   uuid@11.1.0:
     resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
+    hasBin: true
+
+  uuid@13.0.0:
+    resolution: {integrity: sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==}
     hasBin: true
 
   uuid@8.3.2:
@@ -31438,6 +31337,8 @@ snapshots:
   utils-merge@1.0.1: {}
 
   uuid@11.1.0: {}
+
+  uuid@13.0.0: {}
 
   uuid@8.3.2: {}
 

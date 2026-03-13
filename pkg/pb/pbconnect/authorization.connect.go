@@ -48,6 +48,9 @@ const (
 	// AuthorizationServiceHasNotePermissionProcedure is the fully-qualified name of the
 	// AuthorizationService's HasNotePermission RPC.
 	AuthorizationServiceHasNotePermissionProcedure = "/authorization.AuthorizationService/HasNotePermission"
+	// AuthorizationServiceGetUserNotePermissionsProcedure is the fully-qualified name of the
+	// AuthorizationService's GetUserNotePermissions RPC.
+	AuthorizationServiceGetUserNotePermissionsProcedure = "/authorization.AuthorizationService/GetUserNotePermissions"
 )
 
 // AuthorizationServiceClient is a client for the authorization.AuthorizationService service.
@@ -57,6 +60,7 @@ type AuthorizationServiceClient interface {
 	HasWorkspacePermission(context.Context, *connect.Request[pb.HasWorkspacePermissionRequest]) (*connect.Response[pb.HasWorkspacePermissionResponse], error)
 	UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error)
 	HasNotePermission(context.Context, *connect.Request[pb.HasNotePermissionRequest]) (*connect.Response[pb.HasNotePermissionResponse], error)
+	GetUserNotePermissions(context.Context, *connect.Request[pb.GetUserNotePermissionsRequest]) (*connect.Response[pb.GetUserNotePermissionsResponse], error)
 }
 
 // NewAuthorizationServiceClient constructs a client for the authorization.AuthorizationService
@@ -100,6 +104,12 @@ func NewAuthorizationServiceClient(httpClient connect.HTTPClient, baseURL string
 			connect.WithSchema(authorizationServiceMethods.ByName("HasNotePermission")),
 			connect.WithClientOptions(opts...),
 		),
+		getUserNotePermissions: connect.NewClient[pb.GetUserNotePermissionsRequest, pb.GetUserNotePermissionsResponse](
+			httpClient,
+			baseURL+AuthorizationServiceGetUserNotePermissionsProcedure,
+			connect.WithSchema(authorizationServiceMethods.ByName("GetUserNotePermissions")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -110,6 +120,7 @@ type authorizationServiceClient struct {
 	hasWorkspacePermission   *connect.Client[pb.HasWorkspacePermissionRequest, pb.HasWorkspacePermissionResponse]
 	updateWorkspaceMembers   *connect.Client[pb.UpdateWorkspaceMembersRequest, pb.UpdateWorkspaceMembersResponse]
 	hasNotePermission        *connect.Client[pb.HasNotePermissionRequest, pb.HasNotePermissionResponse]
+	getUserNotePermissions   *connect.Client[pb.GetUserNotePermissionsRequest, pb.GetUserNotePermissionsResponse]
 }
 
 // CreateWorkspaceWithOwner calls authorization.AuthorizationService.CreateWorkspaceWithOwner.
@@ -137,6 +148,11 @@ func (c *authorizationServiceClient) HasNotePermission(ctx context.Context, req 
 	return c.hasNotePermission.CallUnary(ctx, req)
 }
 
+// GetUserNotePermissions calls authorization.AuthorizationService.GetUserNotePermissions.
+func (c *authorizationServiceClient) GetUserNotePermissions(ctx context.Context, req *connect.Request[pb.GetUserNotePermissionsRequest]) (*connect.Response[pb.GetUserNotePermissionsResponse], error) {
+	return c.getUserNotePermissions.CallUnary(ctx, req)
+}
+
 // AuthorizationServiceHandler is an implementation of the authorization.AuthorizationService
 // service.
 type AuthorizationServiceHandler interface {
@@ -145,6 +161,7 @@ type AuthorizationServiceHandler interface {
 	HasWorkspacePermission(context.Context, *connect.Request[pb.HasWorkspacePermissionRequest]) (*connect.Response[pb.HasWorkspacePermissionResponse], error)
 	UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error)
 	HasNotePermission(context.Context, *connect.Request[pb.HasNotePermissionRequest]) (*connect.Response[pb.HasNotePermissionResponse], error)
+	GetUserNotePermissions(context.Context, *connect.Request[pb.GetUserNotePermissionsRequest]) (*connect.Response[pb.GetUserNotePermissionsResponse], error)
 }
 
 // NewAuthorizationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -184,6 +201,12 @@ func NewAuthorizationServiceHandler(svc AuthorizationServiceHandler, opts ...con
 		connect.WithSchema(authorizationServiceMethods.ByName("HasNotePermission")),
 		connect.WithHandlerOptions(opts...),
 	)
+	authorizationServiceGetUserNotePermissionsHandler := connect.NewUnaryHandler(
+		AuthorizationServiceGetUserNotePermissionsProcedure,
+		svc.GetUserNotePermissions,
+		connect.WithSchema(authorizationServiceMethods.ByName("GetUserNotePermissions")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/authorization.AuthorizationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AuthorizationServiceCreateWorkspaceWithOwnerProcedure:
@@ -196,6 +219,8 @@ func NewAuthorizationServiceHandler(svc AuthorizationServiceHandler, opts ...con
 			authorizationServiceUpdateWorkspaceMembersHandler.ServeHTTP(w, r)
 		case AuthorizationServiceHasNotePermissionProcedure:
 			authorizationServiceHasNotePermissionHandler.ServeHTTP(w, r)
+		case AuthorizationServiceGetUserNotePermissionsProcedure:
+			authorizationServiceGetUserNotePermissionsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -223,4 +248,8 @@ func (UnimplementedAuthorizationServiceHandler) UpdateWorkspaceMembers(context.C
 
 func (UnimplementedAuthorizationServiceHandler) HasNotePermission(context.Context, *connect.Request[pb.HasNotePermissionRequest]) (*connect.Response[pb.HasNotePermissionResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.HasNotePermission is not implemented"))
+}
+
+func (UnimplementedAuthorizationServiceHandler) GetUserNotePermissions(context.Context, *connect.Request[pb.GetUserNotePermissionsRequest]) (*connect.Response[pb.GetUserNotePermissionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.GetUserNotePermissions is not implemented"))
 }

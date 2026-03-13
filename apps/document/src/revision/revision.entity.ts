@@ -4,16 +4,21 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryColumn,
 } from 'typeorm';
+
+import { DocumentEntity } from '../document/document.entity';
 
 @Entity('revisions')
 export class RevisionEntity {
   @PrimaryColumn('uuid')
   id!: string;
 
-  @Column('uuid')
-  documentId!: string;
+  @ManyToOne(() => DocumentEntity, (document) => document.revisions, {
+    onDelete: 'CASCADE',
+  })
+  document!: DocumentEntity;
 
   @Column({ type: 'text', nullable: true })
   name!: string | null;

@@ -2,10 +2,7 @@ import { Client } from '@connectrpc/connect';
 import { Database } from '@hocuspocus/extension-database';
 import { Hocuspocus } from '@hocuspocus/server';
 import { Provider } from '@nestjs/common';
-import {
-  AuthorizationService,
-  NotePermission,
-} from '@notopia-uit/pb/authorization';
+import { AuthorizationService } from '@notopia-uit/pb/authorization';
 import { NoteService } from '@notopia-uit/pb/note';
 
 import { AUTHORIZATION_SERVICE } from '../authorization/authorization.module';
@@ -33,16 +30,49 @@ export const HocuspocusProvider: Provider = {
           },
         }),
       ],
+
       async onAuthenticate(data) {
         const documentId = data.documentName;
         const context = data.context as HocuspocusContext;
-        const response = await authorizationService.hasNotePermission({
-          memberId: context.user.id,
+        const noteExistenceRes = await noteService.checkNoteExistence({
           noteId: documentId,
-          permission: NotePermission.READ,
         });
-        if (!response.hasPermission) {
-          throw new Error('Unauthorized');
+        if (!noteExistenceRes.exists) {
+          throw new Error(`Document with ID ${documentId} does not exist`);
+        }
+        const userPermissionsRes =
+          await authorizationService.getUserNotePermissions({
+            memberId: context.user.id,
+            noteId: documentId,
+          });
+        if (!userPermissionsRes.canRead) {
+          throw new Error(
+            `User ${context.user.id} does not have permission to access document ${documentId}`
+          );
+        }
+        if (!userPermissionsRes.canWrite) {
+          data.connectionConfig.readOnly = true;
+        }
+      },
+
+      async beforeHandleMessage(data) {
+        const { context, connection } = data;
+
+        const response = await authorizationService.getUserNotePermissions({
+          memberId: context.userId,
+          noteId: data.documentName,
+        });
+
+        if (!response.canRead) {
+          connection.close();
+          throw new Error(
+            `User ${context.userId} does not have permission to access document ${data.documentName}`
+          );
+        }
+        if (response.canWrite) {
+          connection.readOnly = false;
+        } else {
+          connection.readOnly = true;
         }
       },
     });

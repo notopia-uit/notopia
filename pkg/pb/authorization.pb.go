@@ -719,26 +719,138 @@ func (x *HasNotePermissionResponse) GetHasPermission() bool {
 	return false
 }
 
+type GetUserNotePermissionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MemberId      string                 `protobuf:"bytes,1,opt,name=member_id,json=memberId,proto3" json:"member_id,omitempty"`
+	NoteId        string                 `protobuf:"bytes,2,opt,name=note_id,json=noteId,proto3" json:"note_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserNotePermissionsRequest) Reset() {
+	*x = GetUserNotePermissionsRequest{}
+	mi := &file_authorization_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserNotePermissionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserNotePermissionsRequest) ProtoMessage() {}
+
+func (x *GetUserNotePermissionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserNotePermissionsRequest.ProtoReflect.Descriptor instead.
+func (*GetUserNotePermissionsRequest) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetUserNotePermissionsRequest) GetMemberId() string {
+	if x != nil {
+		return x.MemberId
+	}
+	return ""
+}
+
+func (x *GetUserNotePermissionsRequest) GetNoteId() string {
+	if x != nil {
+		return x.NoteId
+	}
+	return ""
+}
+
+type GetUserNotePermissionsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CanRead       bool                   `protobuf:"varint,1,opt,name=can_read,json=canRead,proto3" json:"can_read,omitempty"`
+	CanWrite      bool                   `protobuf:"varint,2,opt,name=can_write,json=canWrite,proto3" json:"can_write,omitempty"`
+	CanDelete     bool                   `protobuf:"varint,3,opt,name=can_delete,json=canDelete,proto3" json:"can_delete,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserNotePermissionsResponse) Reset() {
+	*x = GetUserNotePermissionsResponse{}
+	mi := &file_authorization_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserNotePermissionsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserNotePermissionsResponse) ProtoMessage() {}
+
+func (x *GetUserNotePermissionsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserNotePermissionsResponse.ProtoReflect.Descriptor instead.
+func (*GetUserNotePermissionsResponse) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetUserNotePermissionsResponse) GetCanRead() bool {
+	if x != nil {
+		return x.CanRead
+	}
+	return false
+}
+
+func (x *GetUserNotePermissionsResponse) GetCanWrite() bool {
+	if x != nil {
+		return x.CanWrite
+	}
+	return false
+}
+
+func (x *GetUserNotePermissionsResponse) GetCanDelete() bool {
+	if x != nil {
+		return x.CanDelete
+	}
+	return false
+}
+
 var File_authorization_proto protoreflect.FileDescriptor
 
 const file_authorization_proto_rawDesc = "" +
 	"\n" +
-	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\x1a\x1bgoogle/protobuf/empty.proto\"o\n" +
-	"\x1fCreateWorkspaceWithOwnerRequest\x12)\n" +
-	"\fworkspace_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\x12!\n" +
+	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\x1a\x1bgoogle/protobuf/empty.proto\"t\n" +
+	"\x1fCreateWorkspaceWithOwnerRequest\x12.\n" +
+	"\fworkspace_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\x12!\n" +
 	"\bowner_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\aownerId\"P\n" +
 	" CreateWorkspaceWithOwnerResponse\x12,\n" +
-	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"G\n" +
-	"\x1aGetWorkspaceMembersRequest\x12)\n" +
-	"\fworkspace_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\"_\n" +
+	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"L\n" +
+	"\x1aGetWorkspaceMembersRequest\x12.\n" +
+	"\fworkspace_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"_\n" +
 	"\x1bGetWorkspaceMembersResponse\x12@\n" +
 	"\amembers\x18\x01 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\"c\n" +
 	"\x0fWorkspaceMember\x12\x16\n" +
 	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x128\n" +
-	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"\xbb\x01\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"\xc0\x01\n" +
 	"\x1dHasWorkspacePermissionRequest\x12#\n" +
-	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12)\n" +
-	"\fworkspace_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\x12J\n" +
+	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12.\n" +
+	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\x12J\n" +
 	"\n" +
 	"permission\x18\x03 \x01(\x0e2\".authorization.WorkspacePermissionB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"permission\"O\n" +
@@ -748,15 +860,23 @@ const file_authorization_proto_rawDesc = "" +
 	"\fworkspace_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\x12@\n" +
 	"\amembers\x18\x02 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\"N\n" +
 	"\x1eUpdateWorkspaceMembersResponse\x12,\n" +
-	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"\xa7\x01\n" +
+	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"\xac\x01\n" +
 	"\x18HasNotePermissionRequest\x12#\n" +
-	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12\x1f\n" +
-	"\anote_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06noteId\x12E\n" +
+	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12$\n" +
+	"\anote_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x06noteId\x12E\n" +
 	"\n" +
 	"permission\x18\x03 \x01(\x0e2\x1d.authorization.NotePermissionB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"permission\"J\n" +
 	"\x19HasNotePermissionResponse\x12-\n" +
-	"\x0ehas_permission\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\rhasPermission*\x7f\n" +
+	"\x0ehas_permission\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\rhasPermission\"j\n" +
+	"\x1dGetUserNotePermissionsRequest\x12#\n" +
+	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12$\n" +
+	"\anote_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x06noteId\"\x8f\x01\n" +
+	"\x1eGetUserNotePermissionsResponse\x12!\n" +
+	"\bcan_read\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\acanRead\x12#\n" +
+	"\tcan_write\x18\x02 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\bcanWrite\x12%\n" +
+	"\n" +
+	"can_delete\x18\x03 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\tcanDelete*\x7f\n" +
 	"\rWorkspaceRole\x12\x1e\n" +
 	"\x1aWORKSPACE_ROLE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14WORKSPACE_ROLE_OWNER\x10\x01\x12\x19\n" +
@@ -771,13 +891,14 @@ const file_authorization_proto_rawDesc = "" +
 	"\x1bNOTE_PERMISSION_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14NOTE_PERMISSION_READ\x10\x01\x12\x19\n" +
 	"\x15NOTE_PERMISSION_WRITE\x10\x02\x12\x1a\n" +
-	"\x16NOTE_PERMISSION_DELETE\x10\x032\xd7\x04\n" +
+	"\x16NOTE_PERMISSION_DELETE\x10\x032\xce\x05\n" +
 	"\x14AuthorizationService\x12{\n" +
 	"\x18CreateWorkspaceWithOwner\x12..authorization.CreateWorkspaceWithOwnerRequest\x1a/.authorization.CreateWorkspaceWithOwnerResponse\x12l\n" +
 	"\x13GetWorkspaceMembers\x12).authorization.GetWorkspaceMembersRequest\x1a*.authorization.GetWorkspaceMembersResponse\x12u\n" +
 	"\x16HasWorkspacePermission\x12,.authorization.HasWorkspacePermissionRequest\x1a-.authorization.HasWorkspacePermissionResponse\x12u\n" +
 	"\x16UpdateWorkspaceMembers\x12,.authorization.UpdateWorkspaceMembersRequest\x1a-.authorization.UpdateWorkspaceMembersResponse\x12f\n" +
-	"\x11HasNotePermission\x12'.authorization.HasNotePermissionRequest\x1a(.authorization.HasNotePermissionResponseB\xa2\x01\n" +
+	"\x11HasNotePermission\x12'.authorization.HasNotePermissionRequest\x1a(.authorization.HasNotePermissionResponse\x12u\n" +
+	"\x16GetUserNotePermissions\x12,.authorization.GetUserNotePermissionsRequest\x1a-.authorization.GetUserNotePermissionsResponseB\xa2\x01\n" +
 	"\x11com.authorizationB\x12AuthorizationProtoP\x01Z%github.com/notopia-uit/notopia/pkg/pb\xa2\x02\x03AXX\xaa\x02\rAuthorization\xca\x02\rAuthorization\xe2\x02\x19Authorization\\GPBMetadata\xea\x02\rAuthorizationb\x06proto3"
 
 var (
@@ -793,7 +914,7 @@ func file_authorization_proto_rawDescGZIP() []byte {
 }
 
 var file_authorization_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_authorization_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_authorization_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_authorization_proto_goTypes = []any{
 	(WorkspaceRole)(0),                       // 0: authorization.WorkspaceRole
 	(WorkspacePermission)(0),                 // 1: authorization.WorkspacePermission
@@ -809,28 +930,32 @@ var file_authorization_proto_goTypes = []any{
 	(*UpdateWorkspaceMembersResponse)(nil),   // 11: authorization.UpdateWorkspaceMembersResponse
 	(*HasNotePermissionRequest)(nil),         // 12: authorization.HasNotePermissionRequest
 	(*HasNotePermissionResponse)(nil),        // 13: authorization.HasNotePermissionResponse
-	(*emptypb.Empty)(nil),                    // 14: google.protobuf.Empty
+	(*GetUserNotePermissionsRequest)(nil),    // 14: authorization.GetUserNotePermissionsRequest
+	(*GetUserNotePermissionsResponse)(nil),   // 15: authorization.GetUserNotePermissionsResponse
+	(*emptypb.Empty)(nil),                    // 16: google.protobuf.Empty
 }
 var file_authorization_proto_depIdxs = []int32{
-	14, // 0: authorization.CreateWorkspaceWithOwnerResponse.empty:type_name -> google.protobuf.Empty
+	16, // 0: authorization.CreateWorkspaceWithOwnerResponse.empty:type_name -> google.protobuf.Empty
 	7,  // 1: authorization.GetWorkspaceMembersResponse.members:type_name -> authorization.WorkspaceMember
 	0,  // 2: authorization.WorkspaceMember.role:type_name -> authorization.WorkspaceRole
 	1,  // 3: authorization.HasWorkspacePermissionRequest.permission:type_name -> authorization.WorkspacePermission
 	7,  // 4: authorization.UpdateWorkspaceMembersRequest.members:type_name -> authorization.WorkspaceMember
-	14, // 5: authorization.UpdateWorkspaceMembersResponse.empty:type_name -> google.protobuf.Empty
+	16, // 5: authorization.UpdateWorkspaceMembersResponse.empty:type_name -> google.protobuf.Empty
 	2,  // 6: authorization.HasNotePermissionRequest.permission:type_name -> authorization.NotePermission
 	3,  // 7: authorization.AuthorizationService.CreateWorkspaceWithOwner:input_type -> authorization.CreateWorkspaceWithOwnerRequest
 	5,  // 8: authorization.AuthorizationService.GetWorkspaceMembers:input_type -> authorization.GetWorkspaceMembersRequest
 	8,  // 9: authorization.AuthorizationService.HasWorkspacePermission:input_type -> authorization.HasWorkspacePermissionRequest
 	10, // 10: authorization.AuthorizationService.UpdateWorkspaceMembers:input_type -> authorization.UpdateWorkspaceMembersRequest
 	12, // 11: authorization.AuthorizationService.HasNotePermission:input_type -> authorization.HasNotePermissionRequest
-	4,  // 12: authorization.AuthorizationService.CreateWorkspaceWithOwner:output_type -> authorization.CreateWorkspaceWithOwnerResponse
-	6,  // 13: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
-	9,  // 14: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse
-	11, // 15: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
-	13, // 16: authorization.AuthorizationService.HasNotePermission:output_type -> authorization.HasNotePermissionResponse
-	12, // [12:17] is the sub-list for method output_type
-	7,  // [7:12] is the sub-list for method input_type
+	14, // 12: authorization.AuthorizationService.GetUserNotePermissions:input_type -> authorization.GetUserNotePermissionsRequest
+	4,  // 13: authorization.AuthorizationService.CreateWorkspaceWithOwner:output_type -> authorization.CreateWorkspaceWithOwnerResponse
+	6,  // 14: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
+	9,  // 15: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse
+	11, // 16: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
+	13, // 17: authorization.AuthorizationService.HasNotePermission:output_type -> authorization.HasNotePermissionResponse
+	15, // 18: authorization.AuthorizationService.GetUserNotePermissions:output_type -> authorization.GetUserNotePermissionsResponse
+	13, // [13:19] is the sub-list for method output_type
+	7,  // [7:13] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name
@@ -847,7 +972,7 @@ func file_authorization_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_authorization_proto_rawDesc), len(file_authorization_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
