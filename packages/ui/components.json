@@ -1,6 +1,5 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "project": "packages/ui",
   "style": "radix-nova",
   "rsc": true,
   "tsx": true,
@@ -11,10 +10,10 @@
     "cssVariables": true
   },
   "aliases": {
-    "components": "@notopia-uit/ui/components",
-    "ui": "@notopia-uit/ui/components/ui",
-    "utils": "@notopia-uit/ui/lib/utils",
-    "lib": "@notopia-uit/ui/lib",
-    "hooks": "@notopia-uit/ui/hooks"
+    "components": "@/*",
+    "ui": "@/components/ui",
+    "utils": "@/lib/utils",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
   }
 }

@@ -41,7 +41,7 @@ pkg/                            # Go packages
 - heyapi/openapi-ts generate frontend API client code (typescript, react-query, nextjs)
 - oapi-codegen generate Go server code (gin, strict server)
 
-## Frontend
+### Frontend
 
 - Ensure using shadcn component as much as possible
 - Use shadcn install directly from monorepo root
@@ -53,3 +53,7 @@ pkg/                            # Go packages
   - dev: run in development mode, continuous
   - start for nextjs style
   - serve: run the built
+
+## General Rules
+
+- Temp file must be go into `./tmp/{projectName}`

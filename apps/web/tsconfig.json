@@ -11,13 +11,19 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "paths": {
+      "@notopia-uit/ui/*": ["../../packages/ui/src/*"],
+      "@notopia-uit/ui": ["../../packages/ui/src"],
+      "@/*": ["../../packages/ui/src/*"]
+    },
     "plugins": [
       {
         "name": "next"
       }
     ],
     "outDir": "dist",
-    "rootDir": "src",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
   "include": [
@@ -25,6 +31,8 @@
     "src/**/*.tsx",
     "src/**/*.js",
     "src/**/*.jsx",
+    "../../packages/ui/src/**/*.ts",
+    "../../packages/ui/src/**/*.tsx",
     "../../apps/web/.next/types/**/*.ts",
     "../../dist/apps/web/.next/types/**/*.ts",
     "next-env.d.ts",
