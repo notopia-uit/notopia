@@ -1,27 +1,15 @@
 {
   "name": "@notopia-uit/lib",
   "version": "0.2.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "private": true,
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
     "./blocknote": {
-      "@nx/source": "./src/blocknote/index.ts",
-      "types": "./dist/blocknote/index.d.ts",
-      "import": "./dist/blocknote/index.js",
-      "default": "./dist/blocknote/index.js"
+      "default": "./src/blocknote/index.ts"
     },
     "./blocknote/*": {
-      "@nx/source": "./src/blocknote/*.ts",
-      "types": "./dist/blocknote/*.d.ts",
-      "import": "./dist/blocknote/*.js",
-      "default": "./dist/blocknote/*.js"
+      "default": "./src/blocknote/*.ts"
     }
-  },
-  "files": [
-    "!**/*.tsbuildinfo",
-    "dist"
-  ],
-  "types": "./dist/index.d.ts"
+  }
 }

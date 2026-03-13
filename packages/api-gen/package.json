@@ -1,20 +1,13 @@
 {
   "name": "@notopia-uit/api-gen",
   "version": "0.2.0",
-  "main": "./dist/index.js",
+  "private": true,
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "default": "./src/index.ts"
     },
-    "./package.json": "./package.json",
-    "./*": {
-      "types": "./dist/*",
-      "import": "./dist/*",
-      "default": "./dist/*"
-    }
+    "./package.json": "./package.json"
   },
   "peerDependencies": {
     "@tanstack/react-query": "catalog:",
@@ -23,6 +16,5 @@
   "devDependencies": {
     "@tanstack/react-query": "catalog:",
     "zod": "catalog:"
-  },
-  "types": "./dist/index.d.ts"
+  }
 }
