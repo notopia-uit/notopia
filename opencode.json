@@ -3,8 +3,21 @@
   "mcp": {
     "nx-mcp": {
       "type": "local",
-      "command": ["npx", "nx", "mcp"],
+      "command": ["pnpm", "exec", "nx", "mcp"],
       "enabled": true
+    },
+    "shadcn": {
+      "type": "local",
+      "command": [
+        "mise",
+        "exec",
+        "npm:shadcn@latest",
+        "--",
+        "shadcn",
+        "mcp",
+        "--cwd ./packages/ui/"
+      ],
+      "enabled": false
     }
   }
 }
