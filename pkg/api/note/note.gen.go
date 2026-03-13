@@ -147,6 +147,21 @@ func (e TrashedBy) Valid() bool {
 	}
 }
 
+// Defines values for WorkspaceMemebersUpdatedEventType.
+const (
+	WorkspaceMembersUpdatedEvent WorkspaceMemebersUpdatedEventType = "WorkspaceMembersUpdatedEvent"
+)
+
+// Valid indicates whether the value is a known member of the WorkspaceMemebersUpdatedEventType enum.
+func (e WorkspaceMemebersUpdatedEventType) Valid() bool {
+	switch e {
+	case WorkspaceMembersUpdatedEvent:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for WorkspaceRole.
 const (
 	Editor WorkspaceRole = "editor"
@@ -356,8 +371,11 @@ type TrashedNote struct {
 	TrashedBy *TrashedBy         `json:"trashedBy,omitempty"`
 }
 
-// UserPropertiesId User ID from Authentik
-type UserPropertiesId = string
+// UserPropertiesId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+type UserPropertiesId = int
+
+// UserPropertiesName Full name from Authentik
+type UserPropertiesName = string
 
 // Workspace defines model for Workspace.
 type Workspace struct {
@@ -368,10 +386,25 @@ type Workspace struct {
 
 // WorkspaceMember defines model for WorkspaceMember.
 type WorkspaceMember struct {
-	// Id User ID from Authentik
+	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 	Id   UserPropertiesId `json:"id"`
 	Role WorkspaceRole    `json:"role"`
+
+	// Username Full name from Authentik
+	Username *UserPropertiesName `json:"username,omitempty"`
 }
+
+// WorkspaceMemebersUpdatedEvent defines model for WorkspaceMemebersUpdatedEvent.
+type WorkspaceMemebersUpdatedEvent struct {
+	Data struct {
+		Id      *PropertiesId      `json:"id,omitempty"`
+		Members *[]WorkspaceMember `json:"members,omitempty"`
+	} `json:"data"`
+	Type WorkspaceMemebersUpdatedEventType `json:"type"`
+}
+
+// WorkspaceMemebersUpdatedEventType defines model for WorkspaceMemebersUpdatedEvent.Type.
+type WorkspaceMemebersUpdatedEventType string
 
 // WorkspaceRole defines model for WorkspaceRole.
 type WorkspaceRole string

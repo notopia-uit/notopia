@@ -1,0 +1,23 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  type:
+    type: string
+    enum:
+      - WorkspaceMembersUpdatedEvent
+    example: WorkspaceMembersUpdatedEvent
+
+  data:
+    type: object
+    properties:
+      id:
+        $ref: ./Workspace.yaml#/properties/id
+      members:
+        type: array
+        items:
+          $ref: ./WorkspaceMember.yaml
+
+required:
+  - type
+  - data

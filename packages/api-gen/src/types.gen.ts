@@ -196,11 +196,6 @@ export type NoteFolderUpdatedEvent = {
     data: NoteFolder;
 };
 
-export type NoteNoteUpdatedEvent = {
-    type: 'NoteUpdatedEvent';
-    data: NoteNote;
-};
-
 export type NoteNoteCreatedEvent = {
     type: 'NoteCreatedEvent';
     data: {
@@ -216,15 +211,20 @@ export type NoteNoteDeletedEvent = {
     };
 };
 
-export type NoteWorkspaceUpdatedEvent = {
-    type: 'WorkspaceUpdatedEvent';
-    data: NoteWorkspace;
+export type NoteNoteUpdatedEvent = {
+    type: 'NoteUpdatedEvent';
+    data: NoteNote;
 };
 
 /**
- * User ID from Authentik
+ * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
-export type NoteUserPropertiesId = string;
+export type NoteUserPropertiesId = number;
+
+/**
+ * Full name from Authentik
+ */
+export type NoteUserPropertiesName = string | null;
 
 export const NoteWorkspaceRole = {
     OWNER: 'owner',
@@ -236,7 +236,21 @@ export type NoteWorkspaceRole = typeof NoteWorkspaceRole[keyof typeof NoteWorksp
 
 export type NoteWorkspaceMember = {
     id: NoteUserPropertiesId;
+    username?: NoteUserPropertiesName;
     role: NoteWorkspaceRole;
+};
+
+export type NoteWorkspaceMemebersUpdatedEvent = {
+    type: 'WorkspaceMembersUpdatedEvent';
+    data: {
+        id?: NotePropertiesId;
+        members?: Array<NoteWorkspaceMember>;
+    };
+};
+
+export type NoteWorkspaceUpdatedEvent = {
+    type: 'WorkspaceUpdatedEvent';
+    data: NoteWorkspace;
 };
 
 export type NoteWorkspacePropertiesName = string;
@@ -355,11 +369,6 @@ export type NoteFolderUpdatedEventWritable = {
     data: NoteFolderWritable;
 };
 
-export type NoteNoteUpdatedEventWritable = {
-    type: 'NoteUpdatedEvent';
-    data: NoteNoteWritable;
-};
-
 export type NoteNoteCreatedEventWritable = {
     type: 'NoteCreatedEvent';
     data: {
@@ -369,6 +378,18 @@ export type NoteNoteCreatedEventWritable = {
 
 export type NoteNoteDeletedEventWritable = {
     type: 'NoteDeletedEvent';
+};
+
+export type NoteNoteUpdatedEventWritable = {
+    type: 'NoteUpdatedEvent';
+    data: NoteNoteWritable;
+};
+
+export type NoteWorkspaceMemebersUpdatedEventWritable = {
+    type: 'WorkspaceMembersUpdatedEvent';
+    data: {
+        members?: Array<NoteWorkspaceMember>;
+    };
 };
 
 export type NoteWorkspaceUpdatedEventWritable = {
@@ -1312,12 +1333,14 @@ export type GetWorkspaceEventsResponses = {
     } & NoteFolderDeletedEvent) | ({
         type: 'FolderUpdatedEvent';
     } & NoteFolderUpdatedEvent) | ({
-        type: 'NoteUpdatedEvent';
-    } & NoteNoteUpdatedEvent) | ({
         type: 'NoteCreatedEvent';
     } & NoteNoteCreatedEvent) | ({
         type: 'NoteDeletedEvent';
     } & NoteNoteDeletedEvent) | ({
+        type: 'NoteUpdatedEvent';
+    } & NoteNoteUpdatedEvent) | ({
+        type: 'WorkspaceMemebersUpdatedEvent';
+    } & NoteWorkspaceMemebersUpdatedEvent) | ({
         type: 'WorkspaceUpdatedEvent';
     } & NoteWorkspaceUpdatedEvent);
 };

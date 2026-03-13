@@ -1099,13 +1099,16 @@
                       "$ref": "#/components/schemas/note_FolderUpdatedEvent"
                     },
                     {
-                      "$ref": "#/components/schemas/note_NoteUpdatedEvent"
-                    },
-                    {
                       "$ref": "#/components/schemas/note_NoteCreatedEvent"
                     },
                     {
                       "$ref": "#/components/schemas/note_NoteDeletedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/note_NoteUpdatedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/note_WorkspaceMemebersUpdatedEvent"
                     },
                     {
                       "$ref": "#/components/schemas/note_WorkspaceUpdatedEvent"
@@ -1117,9 +1120,10 @@
                       "FolderCreatedEvent": "#/components/schemas/note_FolderCreatedEvent",
                       "FolderDeletedEvent": "#/components/schemas/note_FolderDeletedEvent",
                       "FolderUpdatedEvent": "#/components/schemas/note_FolderUpdatedEvent",
-                      "NoteUpdatedEvent": "#/components/schemas/note_NoteUpdatedEvent",
                       "NoteCreatedEvent": "#/components/schemas/note_NoteCreatedEvent",
                       "NoteDeletedEvent": "#/components/schemas/note_NoteDeletedEvent",
+                      "NoteUpdatedEvent": "#/components/schemas/note_NoteUpdatedEvent",
+                      "WorkspaceMemebersUpdatedEvent": "#/components/schemas/note_WorkspaceMemebersUpdatedEvent",
                       "WorkspaceUpdatedEvent": "#/components/schemas/note_WorkspaceUpdatedEvent"
                     }
                   }
@@ -2478,25 +2482,6 @@
           "data"
         ]
       },
-      "note_NoteUpdatedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "NoteUpdatedEvent"
-            ],
-            "example": "NoteUpdatedEvent"
-          },
-          "data": {
-            "$ref": "#/components/schemas/note_Note"
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
       "note_NoteCreatedEvent": {
         "type": "object",
         "properties": {
@@ -2555,6 +2540,94 @@
           "data"
         ]
       },
+      "note_NoteUpdatedEvent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "NoteUpdatedEvent"
+            ],
+            "example": "NoteUpdatedEvent"
+          },
+          "data": {
+            "$ref": "#/components/schemas/note_Note"
+          }
+        },
+        "required": [
+          "type",
+          "data"
+        ]
+      },
+      "note_User_properties-id": {
+        "type": "integer",
+        "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
+        "minimum": 1,
+        "example": 10
+      },
+      "note_User_properties-name": {
+        "type": "string",
+        "description": "Full name from Authentik",
+        "example": "John Doe",
+        "nullable": true
+      },
+      "note_WorkspaceRole": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "editor",
+          "viewer"
+        ],
+        "example": "owner"
+      },
+      "note_WorkspaceMember": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/note_User_properties-id"
+          },
+          "username": {
+            "$ref": "#/components/schemas/note_User_properties-name"
+          },
+          "role": {
+            "$ref": "#/components/schemas/note_WorkspaceRole"
+          }
+        },
+        "required": [
+          "id",
+          "role"
+        ]
+      },
+      "note_WorkspaceMemebersUpdatedEvent": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "WorkspaceMembersUpdatedEvent"
+            ],
+            "example": "WorkspaceMembersUpdatedEvent"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/note_properties-id"
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/note_WorkspaceMember"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "type",
+          "data"
+        ]
+      },
       "note_WorkspaceUpdatedEvent": {
         "type": "object",
         "properties": {
@@ -2572,35 +2645,6 @@
         "required": [
           "type",
           "data"
-        ]
-      },
-      "note_User_properties-id": {
-        "type": "string",
-        "description": "User ID from Authentik",
-        "example": "04415622b0a267807d139a8266072f8098bdb605a7bfbadf2b0016c02572e514"
-      },
-      "note_WorkspaceRole": {
-        "type": "string",
-        "enum": [
-          "owner",
-          "editor",
-          "viewer"
-        ],
-        "example": "owner"
-      },
-      "note_WorkspaceMember": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "$ref": "#/components/schemas/note_User_properties-id"
-          },
-          "role": {
-            "$ref": "#/components/schemas/note_WorkspaceRole"
-          }
-        },
-        "required": [
-          "id",
-          "role"
         ]
       },
       "note_Workspace_properties-name": {

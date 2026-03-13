@@ -4,6 +4,8 @@ type: object
 properties:
   id:
     $ref: ../../../common/components/schemas/User.yaml#/properties/id
+  username:
+    $ref: ../../../common/components/schemas/User.yaml#/properties/name
   role:
     $ref: ./WorkspaceRole.yaml
 

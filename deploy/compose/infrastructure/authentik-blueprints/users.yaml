@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Notopia - Users
+  labels:
+    blueprint-group: notopia
+    blueprints.goauthentik.io/description: |
+      User list
+entries:
+  - model: authentik_core.user
+    identifiers:
+      username: notopiauit
+    attrs:
+      name: Notopia Admin
+      email: notopiauit@notopia.com
+      groups:
+        - !Find [authentik_core.group, [name, authentik Admins]]
+      password: notopiauit
+
+  - model: authentik_core.user
+    identifiers:
+      pk: 100
+    attrs:
+      username: user
+      name: User
+      email: user@notopia.com
+      password: user
+
+  - model: authentik_core.user
+    identifiers:
+      pk: 110
+    attrs:
+      username: ntgnguyen
+      name: Nguyen Thai Gia Nguyen
+      email: ntgnguyen563@gmail.com
+      password: ntgnguyen
+
+  - model: authentik_core.user
+    identifiers:
+      pk: 112
+    attrs:
+      username: kevinnitro
+      name: Kevin Nitro
+      email: tranguyenthaibinh46@gmail.com
+      password: kevinnitro
+
+  - model: authentik_core.user
+    identifiers:
+      pk: 101
+    attrs:
+      username: admin
+      name: Admin
+      email: admin@notopia.com
+      password: admin
