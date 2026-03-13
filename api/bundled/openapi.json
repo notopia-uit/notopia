@@ -154,6 +154,42 @@
         }
       }
     },
+    "/document/documents/{documentId}/commit": {
+      "get": {
+        "security": [
+          {
+            "document_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Document"
+        ],
+        "summary": "Commit document",
+        "operationId": "commitDocument",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/document_documentIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Document revision committed successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/document_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/document_UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/document_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/document_InternalServerError"
+          }
+        }
+      }
+    },
     "/document/revisions": {
       "get": {
         "security": [

@@ -2,6 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
+    "types": ["node"],
+    "lib": ["ESNext"],
     "rootDir": ".",
     "module": "nodenext",
     "moduleResolution": "nodenext",

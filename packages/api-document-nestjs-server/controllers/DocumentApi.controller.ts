@@ -7,6 +7,11 @@ import { GetDocumentAttachmentUploadUrl200Response,  } from '../models';
 export class DocumentApiController {
   constructor(private readonly documentApi: DocumentApi) {}
 
+  @Get('/document/documents/:documentId/commit')
+  commitDocument(@Param('documentId') documentId: string, @Req() request: Request): void | Promise<void> | Observable<void> {
+    return this.documentApi.commitDocument(documentId, request);
+  }
+
   @Get('/document/documents/:documentId/attachment-url')
   getDocumentAttachmentUploadUrl(@Param('documentId') documentId: string, @Req() request: Request): GetDocumentAttachmentUploadUrl200Response | Promise<GetDocumentAttachmentUploadUrl200Response> | Observable<GetDocumentAttachmentUploadUrl200Response> {
     return this.documentApi.getDocumentAttachmentUploadUrl(documentId, request);

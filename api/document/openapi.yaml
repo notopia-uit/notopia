@@ -29,6 +29,8 @@ paths:
     $ref: ./paths/documents_import.yaml
   /document/documents/{documentId}/attachment-url:
     $ref: ./paths/documents_{documentId}_attachment-url.yaml
+  /document/documents/{documentId}/commit:
+    $ref: ./paths/documents_{documentId}_commit.yaml
 
   /document/revisions:
     $ref: ./paths/revisions.yaml

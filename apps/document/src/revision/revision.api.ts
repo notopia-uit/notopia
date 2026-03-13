@@ -1,4 +1,4 @@
-import { Inject, Injectable, UseGuards } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import type {
   GetRevisions200Response,
   RenameRevisionRequest,
@@ -9,7 +9,6 @@ import {
 } from '@notopia-uit/api-document-nestjs-server';
 import { Traceable } from 'nestjs-otel';
 
-import { AUTHORIZATION_SERVICE } from '../authorization/authorization.module';
 import { HttpUserGuard } from '../common/user.guard';
 import { RevisionService } from './revision.service';
 
@@ -17,10 +16,7 @@ import { RevisionService } from './revision.service';
 @UseGuards(HttpUserGuard)
 @Traceable()
 export class RevisionApi extends _RevisionApi {
-  constructor(
-    @Inject(AUTHORIZATION_SERVICE)
-    private readonly revisionService: RevisionService
-  ) {
+  constructor(private readonly revisionService: RevisionService) {
     super();
   }
 
@@ -28,14 +24,8 @@ export class RevisionApi extends _RevisionApi {
     await this.revisionService.deleteRevision(revisionId);
   }
 
-  async getRevision(revisionId: string, req: Request): Promise<Revision> {
-    const revision = await this.revisionService.getRevision(revisionId);
-    return {
-      id: revision.id,
-      name: revision.name,
-      content: revision.content,
-      createdAt: revision.createdAt,
-    };
+  async getRevision(revisionId: string, _: Request): Promise<Revision> {
+    return await this.revisionService.getRevision(revisionId);
   }
 
   async getRevisions(

@@ -534,6 +534,48 @@ export type GetDocumentAttachmentUploadUrlResponses = {
 
 export type GetDocumentAttachmentUploadUrlResponse = GetDocumentAttachmentUploadUrlResponses[keyof GetDocumentAttachmentUploadUrlResponses];
 
+export type CommitDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * Unique identifier of the document (note)
+         */
+        documentId: string;
+    };
+    query?: never;
+    url: '/document/documents/{documentId}/commit';
+};
+
+export type CommitDocumentErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: DocumentError;
+    /**
+     * Unauthorized Error response
+     */
+    401: DocumentError;
+    /**
+     * Not Found Error response
+     */
+    404: DocumentError;
+    /**
+     * Internal Server Error response
+     */
+    500: DocumentError;
+};
+
+export type CommitDocumentError = CommitDocumentErrors[keyof CommitDocumentErrors];
+
+export type CommitDocumentResponses = {
+    /**
+     * Document revision committed successfully
+     */
+    204: void;
+};
+
+export type CommitDocumentResponse = CommitDocumentResponses[keyof CommitDocumentResponses];
+
 export type GetRevisionsData = {
     body?: never;
     path?: never;

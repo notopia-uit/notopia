@@ -13,19 +13,30 @@ export class RevisionRepository {
     private readonly repo: Repository<RevisionEntity>
   ) {}
 
-  async save(revision: RevisionEntity): Promise<void> {
+  async save(revision: RevisionEntity) {
     await this.repo.save(revision);
   }
 
-  async getById(revisionId: string): Promise<RevisionEntity | null> {
+  async getById(revisionId: string) {
     return this.repo.findOneBy({ id: revisionId });
   }
 
-  async getByDocumentId(documentId: string): Promise<RevisionEntity[]> {
-    return this.repo.findBy({ documentId });
+  async getByDocumentId(documentId: string, page: number, limit: number) {
+    return this.repo.findAndCount({
+      where: {
+        document: {
+          id: documentId,
+        },
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 
-  async delete(revisionId: string): Promise<void> {
+  async delete(revisionId: string) {
     await this.repo.delete({ id: revisionId });
   }
 }

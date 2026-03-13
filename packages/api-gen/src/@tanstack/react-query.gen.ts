@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { checkWorkspaceExists, createFolder, createNote, createWorkspace, deleteNote, deleteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getNote, getNoteGraph, getNoteLinks, getNotes, getRevision, getRevisions, getWorkspace, getWorkspaceGraph, getWorkspaceMembers, getWorkspaceTree, importDocuments, moveWorkspaceItems, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceMembers } from '../sdk.gen';
-import type { CheckWorkspaceExistsData, CheckWorkspaceExistsError, CheckWorkspaceExistsResponse, CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetNotesData, GetNotesError, GetNotesResponse, GetRevisionData, GetRevisionError, GetRevisionResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, ImportDocumentsData, ImportDocumentsError, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse } from '../types.gen';
+import { checkWorkspaceExists, commitDocument, createFolder, createNote, createWorkspace, deleteNote, deleteRevision, deleteWorkspace, generateDailyNote, getDocumentAttachmentUploadUrl, getNote, getNoteGraph, getNoteLinks, getNotes, getRevision, getRevisions, getWorkspace, getWorkspaceGraph, getWorkspaceMembers, getWorkspaceTree, importDocuments, moveWorkspaceItems, type Options, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceMembers } from '../sdk.gen';
+import type { CheckWorkspaceExistsData, CheckWorkspaceExistsError, CheckWorkspaceExistsResponse, CommitDocumentData, CommitDocumentError, CommitDocumentResponse, CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteNoteData, DeleteNoteError, DeleteNoteResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GenerateDailyNoteData, GenerateDailyNoteError, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetNotesData, GetNotesError, GetNotesResponse, GetRevisionData, GetRevisionError, GetRevisionResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, ImportDocumentsData, ImportDocumentsError, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse } from '../types.gen';
 
 /**
  * Import documents
@@ -74,6 +74,24 @@ export const getDocumentAttachmentUploadUrlOptions = (options: Options<GetDocume
         return data;
     },
     queryKey: getDocumentAttachmentUploadUrlQueryKey(options)
+});
+
+export const commitDocumentQueryKey = (options: Options<CommitDocumentData>) => createQueryKey('commitDocument', options);
+
+/**
+ * Commit document
+ */
+export const commitDocumentOptions = (options: Options<CommitDocumentData>) => queryOptions<CommitDocumentResponse, CommitDocumentError, CommitDocumentResponse, ReturnType<typeof commitDocumentQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await commitDocument({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: commitDocumentQueryKey(options)
 });
 
 export const getRevisionsQueryKey = (options: Options<GetRevisionsData>) => createQueryKey('getRevisions', options);

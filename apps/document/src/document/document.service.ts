@@ -1,15 +1,29 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import type { Client } from '@connectrpc/connect';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectDataSource } from '@nestjs/typeorm';
+import {
+  AuthorizationService,
+  NotePermission,
+} from '@notopia-uit/pb/authorization';
 import { randomUUID } from 'crypto';
 import { Traceable } from 'nestjs-otel';
+import { DataSource } from 'typeorm';
 import { applyUpdate, Doc as YDoc } from 'yjs';
 
+import { AUTHORIZATION_SERVICE } from '../authorization/authorization.module';
+import { User } from '../common/user';
 import { S3Config } from '../config/config';
+import { RevisionEntity } from '../revision/revision.entity';
 import { DocumentEntity } from './document.entity';
-import { DocumentRepository } from './document.repository';
 
 export interface AttachmentUploadUrl {
   url: string;
@@ -24,9 +38,11 @@ export class DocumentService {
   private static readonly s3UrlExpirationSeconds = 3600;
 
   constructor(
-    private readonly documentRepository: DocumentRepository,
     private readonly editor: ServerBlockNoteEditor,
     private readonly s3Client: S3Client,
+    @InjectDataSource() private readonly dataSource: DataSource,
+    @Inject(AUTHORIZATION_SERVICE)
+    private readonly authorizationService: Client<typeof AuthorizationService>,
     configService: ConfigService
   ) {
     const s3Config = configService.get<S3Config>('s3')!;
@@ -40,7 +56,9 @@ export class DocumentService {
     return doc;
   }
 
-  yDocToBlockNote(yDoc: YDoc) {
+  BufferToBlockNote(data: Buffer) {
+    const yDoc = new YDoc();
+    applyUpdate(yDoc, new Uint8Array(data));
     return this.editor.yDocToBlocks(yDoc);
   }
 
@@ -52,25 +70,43 @@ export class DocumentService {
     return [];
   }
 
-  async createDocument(data: Buffer): Promise<DocumentEntity> {
-    const document = new DocumentEntity();
-    document.id = randomUUID();
-    document.data = data;
-    await this.documentRepository.save(document);
-    return document;
-  }
-
-  async getDocument(documentId: string): Promise<DocumentEntity> {
-    const document = await this.documentRepository.getById(documentId);
-    if (!document) {
-      throw new NotFoundException(`Document ${documentId} not found`);
-    }
-    return document;
+  async commitDocument(documentId: string) {
+    await this.dataSource.transaction(async (manager) => {
+      const document = await manager.findOne(DocumentEntity, {
+        where: { id: documentId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!document) {
+        throw new NotFoundException(`Document ${documentId} not found`);
+      }
+      const revision = manager.create(RevisionEntity, {
+        id: randomUUID(),
+        document,
+        content: this.BufferToBlockNote(document.data),
+      });
+      await manager.save(revision);
+      await manager.update(
+        DocumentEntity,
+        { id: documentId },
+        { modified: false }
+      );
+    });
   }
 
   async getAttachmentUploadUrl(
-    documentId: string
+    documentId: string,
+    user: User
   ): Promise<AttachmentUploadUrl> {
+    const permissionRes = await this.authorizationService.hasNotePermission({
+      noteId: documentId,
+      permission: NotePermission.WRITE,
+      memberId: user.id,
+    });
+    if (!permissionRes.hasPermission) {
+      throw new UnauthorizedException(
+        `User ${user.id} does not have permission to upload attachment to ${documentId}`
+      );
+    }
     const key = `document-attachments/${documentId}/${randomUUID()}`;
     const command = new PutObjectCommand({
       Bucket: this.bucketName,

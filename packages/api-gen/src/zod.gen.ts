@@ -394,6 +394,19 @@ export const zGetDocumentAttachmentUploadUrlResponse = z.object({
     url: z.url()
 });
 
+export const zCommitDocumentData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        documentId: z.uuid()
+    }),
+    query: z.never().optional()
+});
+
+/**
+ * Document revision committed successfully
+ */
+export const zCommitDocumentResponse = z.void();
+
 export const zGetRevisionsData = z.object({
     body: z.never().optional(),
     path: z.never().optional(),

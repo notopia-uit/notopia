@@ -5,7 +5,7 @@ import { Provider } from '@nestjs/common';
 import { AuthorizationService } from '@notopia-uit/pb/authorization';
 import { NoteService } from '@notopia-uit/pb/note';
 
-import { AUTHORIZATION_SERVICE } from '../authorization/authorization.module';
+import { AUTHORIZATION_CLIENT } from '../authorization/authorization.module';
 import { DocumentRepository } from '../document/document.repository';
 import { NOTE_SERVICE } from '../note/note.module';
 import { HocuspocusContext } from './hocuspocus-context';
@@ -14,8 +14,8 @@ export const HocuspocusProvider: Provider = {
   provide: Hocuspocus,
   useFactory: (
     documentRepository: DocumentRepository,
-    noteService: Client<typeof NoteService>,
-    authorizationService: Client<typeof AuthorizationService>
+    noteClient: Client<typeof NoteService>,
+    authorizationClient: Client<typeof AuthorizationService>
   ) => {
     return new Hocuspocus({
       name: 'document', // TODO: Inject host
@@ -34,14 +34,14 @@ export const HocuspocusProvider: Provider = {
       async onAuthenticate(data) {
         const documentId = data.documentName;
         const context = data.context as HocuspocusContext;
-        const noteExistenceRes = await noteService.checkNoteExistence({
+        const noteExistenceRes = await noteClient.checkNoteExistence({
           noteId: documentId,
         });
         if (!noteExistenceRes.exists) {
           throw new Error(`Document with ID ${documentId} does not exist`);
         }
         const userPermissionsRes =
-          await authorizationService.getUserNotePermissions({
+          await authorizationClient.getUserNotePermissions({
             memberId: context.user.id,
             noteId: documentId,
           });
@@ -58,7 +58,7 @@ export const HocuspocusProvider: Provider = {
       async beforeHandleMessage(data) {
         const { context, connection } = data;
 
-        const response = await authorizationService.getUserNotePermissions({
+        const response = await authorizationClient.getUserNotePermissions({
           memberId: context.userId,
           noteId: data.documentName,
         });
@@ -77,5 +77,5 @@ export const HocuspocusProvider: Provider = {
       },
     });
   },
-  inject: [DocumentRepository, NOTE_SERVICE, AUTHORIZATION_SERVICE],
+  inject: [DocumentRepository, NOTE_SERVICE, AUTHORIZATION_CLIENT],
 };
