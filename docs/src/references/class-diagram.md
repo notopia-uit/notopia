@@ -66,86 +66,86 @@ skinparam class {
 
 package "Domain" as Domain <<Frame>> {
     Enum(TrashedBy) {
+        UNSPECIFIED
         PURPOSE
         PARENT
     }
 
     AggregateRoot(Workspace) {
-        id: uuid.UUID
-        name: string
-        rootFolderID: uuid.UUID
-        deletedAt: *time.Time
+        id uuid.UUID
+        name string
+        slug string
+        rootFolderID uuid.UUID
+        deletedAt *time.Time
 
         Rename(newName string)
         Delete()
     }
 
     AggregateRoot(Folder) {
-        id: uuid.UUID
-        name: string
-        icon: *string
-        workspaceID: uuid.UUID
-        folderRelationship: *FolderRelationship
-        trashedBy: *TrashedBy
-        deletedAt: *time.Time
+        id uuid.UUID
+        name string
+        icon *string
+        workspaceID uuid.UUID
+        folderHierarchy *FolderHierarchy
+        trashedBy *TrashedBy
+        trashedAt *time.Time
 
         Rename(newName string)
         ParentID() *uuid.UUID, bool
         IsRoot() bool
         MoveToFolder(folderID uuid.UUID)
-        Trash()
+        Trash(trashedBy TrashedBy)
     }
 
-    ValueObject(FolderRelationship) {
-        parentID: *uuid.UUID
-        isRoot: bool
-
-        ParentID() *uuid.UUID, bool
-        IsRoot() bool
+    ValueObject(FolderHierarchy) {
+        parentID *uuid.UUID
     }
 
     AggregateRoot(Note) {
-        id: uuid.UUID
-        name: string
-        icon: *string
-        tags: []string
-        size: uint
-        folderID: uuid.UUID
-        outgoingLinks: []uuid.UUID
-        trashedBy: *TrashedBy
-        deletedAt: *time.Time
+        id uuid.UUID
+        name string
+        icon *string
+        tags []string
+        size uint
+        folderID uuid.UUID
+        outgoingLinks []uuid.UUID
+        trashedBy *TrashedBy
+        trashedAt *time.Time
 
-        MoveNoteToFolder(folderID uuid.UUID)
-        UpdateTags(tags []string)
-        UpdateSize(size uint)
-        Trash()
-        Restore()
+        Rename(newName string)
+        MoveToFolder(folderID uuid.UUID)
+        SetTags(tags []string)
+        SetOutgoingLinks(outgoingLinks []uuid.UUID)
+        Trash(trashedBy TrashedBy)
     }
 
     Domain.Workspace "1" *... "1..*" Domain.Folder : contains
-    Domain.Folder "1" *-- "1" Domain.FolderRelationship : has
+    Domain.Folder "1" *-- "1" Domain.FolderHierarchy : has
     Domain.Folder "1" *... "0..*" Domain.Note : contains
     Domain.Note "0..*" .. "0..*" Domain.Note : links
 
     RepoInterface(WorkspaceRepo) {
-        CheckSlugExists(slug string) bool
-        GetBySlug(slug string) *Workspace
-        GetIDBySlug(slug string) *uuid.UUID
-        Save(workspace *Workspace)
+        GetBySlug(slug string) (*Workspace, error)
+        GetIDBySlug(slug string) (uuid.UUID, error)
+        CheckSlugExists(slug string) (bool, error)
+        Save(workspace *Workspace) error
     }
 
     RepoInterface(FolderRepo) {
-        GetByID(folderID uuid.UUID) *Folder
-        Save(folder *Folder)
-        GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []Folder
-        PermanentlyDelete(folderIDs ...uuid.UUID)
+        GetByID(ctx context.Context, id uuid.UUID) (*Folder, error)
+        Save(ctx context.Context, folder *Folder) error
+        GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]Folder, error)
+        PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error
+        PermanentlyDeleteByIDs(ctx context.Context, ids []uuid.UUID) error
     }
 
     RepoInterface(NoteRepo) {
-        GetByID(noteID uuid.UUID) *Note
-        Save(note *Note)
-        GetTrashedByWorkspaceID(workspaceID uuid.UUID, overDays *int) []Note
-        PermanentlyDelete(noteIDs ...uuid.UUID)
+        GetByID(ctx context.Context, id uuid.UUID) (*Note, error)
+        Save(ctx context.Context, note *Note) error
+        GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]Note, error)
+        PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error
+        PermanentlyDeleteByIDs(ctx context.Context, ids []uuid.UUID) error
     }
 }
 @enduml

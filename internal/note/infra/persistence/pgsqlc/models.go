@@ -8,12 +8,45 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type Folder struct {
+	ID          uuid.UUID
+	Name        string
+	Icon        *string
+	WorkspaceID uuid.UUID
+	ParentID    pgtype.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedBy   *string
+	DeletedAt   *time.Time
+}
 
 type Note struct {
 	ID        uuid.UUID
-	Title     string
+	Name      string
+	Icon      *string
+	FolderID  uuid.UUID
+	Tags      []string
+	Size      int32
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedBy *string
 	DeletedAt *time.Time
+}
+
+type NoteLink struct {
+	SourceID uuid.UUID
+	TargetID uuid.UUID
+}
+
+type Workspace struct {
+	ID           uuid.UUID
+	Slug         string
+	Name         string
+	RootFolderID pgtype.UUID
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    *time.Time
 }
