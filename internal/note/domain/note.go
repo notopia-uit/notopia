@@ -112,6 +112,13 @@ func (n *Note) TrashedBy() *TrashedBy {
 	return n.trashedBy
 }
 
+func (n *Note) TrashByString() *string {
+	if n.trashedBy == nil {
+		return nil
+	}
+	return new(n.trashedBy.String())
+}
+
 func (n *Note) TrashedAt() *time.Time {
 	return n.trashedAt
 }

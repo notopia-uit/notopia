@@ -12,39 +12,14 @@ import (
 	"github.com/google/uuid"
 )
 
-const addNoteLink = `-- name: AddNoteLink :exec
-INSERT INTO note_links (source_id, target_id)
-VALUES ($1, $2)
-ON CONFLICT DO NOTHING
-`
-
-type AddNoteLinkParams struct {
-	SourceID uuid.UUID
-	TargetID uuid.UUID
-}
-
-func (q *Queries) AddNoteLink(ctx context.Context, arg *AddNoteLinkParams) error {
-	_, err := q.db.Exec(ctx, addNoteLink, arg.SourceID, arg.TargetID)
-	return err
-}
-
-const deleteNoteOutgoingLinks = `-- name: DeleteNoteOutgoingLinks :exec
-DELETE FROM note_links WHERE source_id = $1
-`
-
-func (q *Queries) DeleteNoteOutgoingLinks(ctx context.Context, sourceID uuid.UUID) error {
-	_, err := q.db.Exec(ctx, deleteNoteOutgoingLinks, sourceID)
-	return err
-}
-
 const getNote = `-- name: GetNote :one
 SELECT
-  id, name, icon, folder_id, tags, size, created_at, updated_at, deleted_by, deleted_at
+  id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
 FROM
   notes
 WHERE
   id = $1
-  AND deleted_at IS NULL
+  AND trashed_at IS NULL
 `
 
 func (q *Queries) GetNote(ctx context.Context, id uuid.UUID) (*Note, error) {
@@ -59,44 +34,22 @@ func (q *Queries) GetNote(ctx context.Context, id uuid.UUID) (*Note, error) {
 		&i.Size,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.DeletedBy,
-		&i.DeletedAt,
+		&i.TrashedBy,
+		&i.TrashedAt,
 	)
 	return &i, err
 }
 
-const getNoteOutgoingLinks = `-- name: GetNoteOutgoingLinks :many
-SELECT target_id
-FROM note_links
-WHERE source_id = $1
-`
-
-func (q *Queries) GetNoteOutgoingLinks(ctx context.Context, sourceID uuid.UUID) ([]uuid.UUID, error) {
-	rows, err := q.db.Query(ctx, getNoteOutgoingLinks, sourceID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []uuid.UUID
-	for rows.Next() {
-		var target_id uuid.UUID
-		if err := rows.Scan(&target_id); err != nil {
-			return nil, err
-		}
-		items = append(items, target_id)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getNotesByFolderID = `-- name: GetNotesByFolderID :many
-SELECT id, name, icon, folder_id, tags, size, created_at, updated_at, deleted_by, deleted_at
-FROM notes
-WHERE folder_id = $1
-  AND deleted_at IS NULL
-ORDER BY created_at DESC
+SELECT
+  id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
+FROM
+  notes
+WHERE
+  folder_id = $1
+  AND trashed_at IS NULL
+ORDER BY
+  created_at DESC
 `
 
 func (q *Queries) GetNotesByFolderID(ctx context.Context, folderID uuid.UUID) ([]*Note, error) {
@@ -117,8 +70,8 @@ func (q *Queries) GetNotesByFolderID(ctx context.Context, folderID uuid.UUID) ([
 			&i.Size,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.DeletedBy,
-			&i.DeletedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -131,12 +84,18 @@ func (q *Queries) GetNotesByFolderID(ctx context.Context, folderID uuid.UUID) ([
 }
 
 const getTrashedNotesByWorkspaceID = `-- name: GetTrashedNotesByWorkspaceID :many
-SELECT n.id, n.name, n.icon, n.folder_id, n.tags, n.size, n.created_at, n.updated_at, n.deleted_by, n.deleted_at
-FROM notes n
-JOIN folders f ON n.folder_id = f.id
-WHERE f.workspace_id = $1
-  AND n.deleted_at IS NOT NULL
-ORDER BY n.deleted_at DESC
+SELECT
+  n.id, n.name, n.icon, n.folder_id, n.tags, n.size, n.created_at, n.updated_at, n.trashed_by, n.trashed_at
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  f.workspace_id = $1
+  AND n.trashed_at IS NOT NULL
+ORDER BY
+  n.trashed_at DESC
 `
 
 func (q *Queries) GetTrashedNotesByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]*Note, error) {
@@ -157,8 +116,8 @@ func (q *Queries) GetTrashedNotesByWorkspaceID(ctx context.Context, workspaceID 
 			&i.Size,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.DeletedBy,
-			&i.DeletedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -171,7 +130,10 @@ func (q *Queries) GetTrashedNotesByWorkspaceID(ctx context.Context, workspaceID 
 }
 
 const permanentlyDeleteNoteByID = `-- name: PermanentlyDeleteNoteByID :exec
-DELETE FROM notes WHERE id = $1
+DELETE FROM
+  notes
+WHERE
+  id = $1
 `
 
 func (q *Queries) PermanentlyDeleteNoteByID(ctx context.Context, id uuid.UUID) error {
@@ -180,7 +142,10 @@ func (q *Queries) PermanentlyDeleteNoteByID(ctx context.Context, id uuid.UUID) e
 }
 
 const permanentlyDeleteNotesByIDs = `-- name: PermanentlyDeleteNotesByIDs :exec
-DELETE FROM notes WHERE id = ANY($1::uuid[])
+DELETE FROM
+  notes
+WHERE
+  id = ANY($1::uuid[])
 `
 
 func (q *Queries) PermanentlyDeleteNotesByIDs(ctx context.Context, ids []uuid.UUID) error {
@@ -188,23 +153,31 @@ func (q *Queries) PermanentlyDeleteNotesByIDs(ctx context.Context, ids []uuid.UU
 	return err
 }
 
-const removeNoteLink = `-- name: RemoveNoteLink :exec
-DELETE FROM note_links WHERE source_id = $1 AND target_id = $2
-`
-
-type RemoveNoteLinkParams struct {
-	SourceID uuid.UUID
-	TargetID uuid.UUID
-}
-
-func (q *Queries) RemoveNoteLink(ctx context.Context, arg *RemoveNoteLinkParams) error {
-	_, err := q.db.Exec(ctx, removeNoteLink, arg.SourceID, arg.TargetID)
-	return err
-}
-
 const saveNote = `-- name: SaveNote :exec
-INSERT INTO notes (id, name, icon, folder_id, tags, size, created_at, updated_at, deleted_by, deleted_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+INSERT INTO notes (
+  id,
+  name,
+  icon,
+  folder_id,
+  tags,
+  size,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+)
+VALUES (
+  $1,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6,
+  $7,
+  $8,
+  $9,
+  $10
+)
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   icon = EXCLUDED.icon,
@@ -212,8 +185,8 @@ ON CONFLICT (id) DO UPDATE SET
   tags = EXCLUDED.tags,
   size = EXCLUDED.size,
   updated_at = EXCLUDED.updated_at,
-  deleted_by = EXCLUDED.deleted_by,
-  deleted_at = EXCLUDED.deleted_at
+  trashed_by = EXCLUDED.trashed_by,
+  trashed_at = EXCLUDED.trashed_at
 `
 
 type SaveNoteParams struct {
@@ -225,8 +198,8 @@ type SaveNoteParams struct {
 	Size      int32
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedBy *string
-	DeletedAt *time.Time
+	TrashedBy *string
+	TrashedAt *time.Time
 }
 
 func (q *Queries) SaveNote(ctx context.Context, arg *SaveNoteParams) error {
@@ -239,8 +212,8 @@ func (q *Queries) SaveNote(ctx context.Context, arg *SaveNoteParams) error {
 		arg.Size,
 		arg.CreatedAt,
 		arg.UpdatedAt,
-		arg.DeletedBy,
-		arg.DeletedAt,
+		arg.TrashedBy,
+		arg.TrashedAt,
 	)
 	return err
 }

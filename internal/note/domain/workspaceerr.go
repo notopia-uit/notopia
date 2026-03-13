@@ -3,16 +3,26 @@ package domain
 import (
 	"fmt"
 
-	"github.com/google/uuid"
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
-var ErrCodeWorkspaceNotFound = "Workspace_1"
+var (
+	ErrCodeWorkspaceNotFound           = "Workspace_1"
+	ErrCodeWorkspaceRootFolderNotFound = "Workspace_2"
+)
 
-func NewErrWorkspaceNotFound(id uuid.UUID) *commonerror.Err {
+func NewErrWorkspaceNotFound(slug string, err error) *commonerror.Err {
 	return commonerror.NewNotFound(
-		fmt.Sprintf("Workspace with id %q not found", id.String()),
+		fmt.Sprintf("Workspace with slug %q not found", slug),
 		ErrCodeWorkspaceNotFound,
-		nil,
+		err,
+	)
+}
+
+func NewErrWorkspaceRootFolderNotFound(slug string, err error) *commonerror.Err {
+	return commonerror.NewNotFound(
+		fmt.Sprintf("Root folder for workspace with slug %q not found", slug),
+		ErrCodeWorkspaceRootFolderNotFound,
+		err,
 	)
 }

@@ -10,14 +10,16 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const checkSlugExists = `-- name: CheckSlugExists :one
 SELECT EXISTS(
-  SELECT 1
-  FROM workspaces
-  WHERE slug = $1
+  SELECT
+    1
+  FROM
+    workspaces
+  WHERE
+    slug = $1
     AND deleted_at IS NULL
 ) AS exists
 `
@@ -30,7 +32,7 @@ func (q *Queries) CheckSlugExists(ctx context.Context, slug string) (bool, error
 }
 
 const getWorkspaceByID = `-- name: GetWorkspaceByID :one
-SELECT id, slug, name, root_folder_id, created_at, updated_at, deleted_at
+SELECT id, slug, name, created_at, updated_at, deleted_at
 FROM workspaces
 WHERE id = $1
   AND deleted_at IS NULL
@@ -43,7 +45,6 @@ func (q *Queries) GetWorkspaceByID(ctx context.Context, id uuid.UUID) (*Workspac
 		&i.ID,
 		&i.Slug,
 		&i.Name,
-		&i.RootFolderID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
@@ -52,9 +53,12 @@ func (q *Queries) GetWorkspaceByID(ctx context.Context, id uuid.UUID) (*Workspac
 }
 
 const getWorkspaceBySlug = `-- name: GetWorkspaceBySlug :one
-SELECT id, slug, name, root_folder_id, created_at, updated_at, deleted_at
-FROM workspaces
-WHERE slug = $1
+SELECT
+  id, slug, name, created_at, updated_at, deleted_at
+FROM
+  workspaces
+WHERE
+  slug = $1
   AND deleted_at IS NULL
 `
 
@@ -65,7 +69,6 @@ func (q *Queries) GetWorkspaceBySlug(ctx context.Context, slug string) (*Workspa
 		&i.ID,
 		&i.Slug,
 		&i.Name,
-		&i.RootFolderID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
@@ -74,9 +77,12 @@ func (q *Queries) GetWorkspaceBySlug(ctx context.Context, slug string) (*Workspa
 }
 
 const getWorkspaceIDBySlug = `-- name: GetWorkspaceIDBySlug :one
-SELECT id
-FROM workspaces
-WHERE slug = $1
+SELECT
+  id
+FROM
+  workspaces
+WHERE
+  slug = $1
   AND deleted_at IS NULL
 `
 
@@ -88,24 +94,36 @@ func (q *Queries) GetWorkspaceIDBySlug(ctx context.Context, slug string) (uuid.U
 }
 
 const saveWorkspace = `-- name: SaveWorkspace :exec
-INSERT INTO workspaces (id, slug, name, root_folder_id, created_at, updated_at, deleted_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO workspaces (
+  id,
+  slug,
+  name,
+  created_at,
+  updated_at,
+  deleted_at
+)
+VALUES (
+  $1,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6
+)
 ON CONFLICT (id) DO UPDATE SET
   slug = EXCLUDED.slug,
   name = EXCLUDED.name,
-  root_folder_id = EXCLUDED.root_folder_id,
   updated_at = EXCLUDED.updated_at,
   deleted_at = EXCLUDED.deleted_at
 `
 
 type SaveWorkspaceParams struct {
-	ID           uuid.UUID
-	Slug         string
-	Name         string
-	RootFolderID pgtype.UUID
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    *time.Time
+	ID        uuid.UUID
+	Slug      string
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
 }
 
 func (q *Queries) SaveWorkspace(ctx context.Context, arg *SaveWorkspaceParams) error {
@@ -113,7 +131,6 @@ func (q *Queries) SaveWorkspace(ctx context.Context, arg *SaveWorkspaceParams) e
 		arg.ID,
 		arg.Slug,
 		arg.Name,
-		arg.RootFolderID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.DeletedAt,

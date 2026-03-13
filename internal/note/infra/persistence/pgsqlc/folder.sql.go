@@ -10,14 +10,16 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getFolder = `-- name: GetFolder :one
-SELECT id, name, icon, workspace_id, parent_id, created_at, updated_at, deleted_by, deleted_at
-FROM folders
-WHERE id = $1
-  AND deleted_at IS NULL
+SELECT
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+FROM
+  folders
+WHERE
+  id = $1
+  AND trashed_at IS NULL
 `
 
 func (q *Queries) GetFolder(ctx context.Context, id uuid.UUID) (*Folder, error) {
@@ -31,21 +33,67 @@ func (q *Queries) GetFolder(ctx context.Context, id uuid.UUID) (*Folder, error) 
 		&i.ParentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.DeletedBy,
-		&i.DeletedAt,
+		&i.TrashedBy,
+		&i.TrashedAt,
 	)
 	return &i, err
 }
 
-const getFoldersByParentID = `-- name: GetFoldersByParentID :many
-SELECT id, name, icon, workspace_id, parent_id, created_at, updated_at, deleted_by, deleted_at
-FROM folders
-WHERE parent_id = $1
-  AND deleted_at IS NULL
-ORDER BY created_at DESC
+const getFoldersByID = `-- name: GetFoldersByID :many
+SELECT
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+FROM
+  folders
+WHERE
+  workspace_id = $1
+  AND trashed_at IS NULL
+ORDER BY
+  created_at DESC
 `
 
-func (q *Queries) GetFoldersByParentID(ctx context.Context, parentID pgtype.UUID) ([]*Folder, error) {
+func (q *Queries) GetFoldersByID(ctx context.Context, workspaceID uuid.UUID) ([]*Folder, error) {
+	rows, err := q.db.Query(ctx, getFoldersByID, workspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Folder
+	for rows.Next() {
+		var i Folder
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Icon,
+			&i.WorkspaceID,
+			&i.ParentID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getFoldersByParentID = `-- name: GetFoldersByParentID :many
+SELECT
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+FROM
+  folders
+WHERE
+  parent_id = $1
+  AND trashed_at IS NULL
+ORDER BY
+  created_at DESC
+`
+
+func (q *Queries) GetFoldersByParentID(ctx context.Context, parentID *uuid.UUID) ([]*Folder, error) {
 	rows, err := q.db.Query(ctx, getFoldersByParentID, parentID)
 	if err != nil {
 		return nil, err
@@ -62,46 +110,8 @@ func (q *Queries) GetFoldersByParentID(ctx context.Context, parentID pgtype.UUID
 			&i.ParentID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.DeletedBy,
-			&i.DeletedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, &i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getFoldersByWorkspaceID = `-- name: GetFoldersByWorkspaceID :many
-SELECT id, name, icon, workspace_id, parent_id, created_at, updated_at, deleted_by, deleted_at
-FROM folders
-WHERE workspace_id = $1
-  AND deleted_at IS NULL
-ORDER BY created_at DESC
-`
-
-func (q *Queries) GetFoldersByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]*Folder, error) {
-	rows, err := q.db.Query(ctx, getFoldersByWorkspaceID, workspaceID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []*Folder
-	for rows.Next() {
-		var i Folder
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Icon,
-			&i.WorkspaceID,
-			&i.ParentID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedBy,
-			&i.DeletedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -114,11 +124,14 @@ func (q *Queries) GetFoldersByWorkspaceID(ctx context.Context, workspaceID uuid.
 }
 
 const getRootFolder = `-- name: GetRootFolder :one
-SELECT id, name, icon, workspace_id, parent_id, created_at, updated_at, deleted_by, deleted_at
-FROM folders
-WHERE workspace_id = $1
+SELECT
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+FROM
+  folders
+WHERE
+  workspace_id = $1
   AND parent_id IS NULL
-  AND deleted_at IS NULL
+  AND trashed_at IS NULL
 `
 
 func (q *Queries) GetRootFolder(ctx context.Context, workspaceID uuid.UUID) (*Folder, error) {
@@ -132,22 +145,31 @@ func (q *Queries) GetRootFolder(ctx context.Context, workspaceID uuid.UUID) (*Fo
 		&i.ParentID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.DeletedBy,
-		&i.DeletedAt,
+		&i.TrashedBy,
+		&i.TrashedAt,
 	)
 	return &i, err
 }
 
 const getTrashedFoldersByWorkspaceID = `-- name: GetTrashedFoldersByWorkspaceID :many
-SELECT id, name, icon, workspace_id, parent_id, created_at, updated_at, deleted_by, deleted_at
-FROM folders
-WHERE workspace_id = $1
-  AND deleted_at IS NOT NULL
-ORDER BY deleted_at DESC
+SELECT
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+FROM
+  folders
+WHERE
+  workspace_id = $1
+  AND trashed_by = $2::string
+ORDER BY
+  trashed_at DESC
 `
 
-func (q *Queries) GetTrashedFoldersByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]*Folder, error) {
-	rows, err := q.db.Query(ctx, getTrashedFoldersByWorkspaceID, workspaceID)
+type GetTrashedFoldersByWorkspaceIDParams struct {
+	WorkspaceID uuid.UUID
+	TrashedBy   string
+}
+
+func (q *Queries) GetTrashedFoldersByWorkspaceID(ctx context.Context, arg *GetTrashedFoldersByWorkspaceIDParams) ([]*Folder, error) {
+	rows, err := q.db.Query(ctx, getTrashedFoldersByWorkspaceID, arg.WorkspaceID, arg.TrashedBy)
 	if err != nil {
 		return nil, err
 	}
@@ -163,8 +185,8 @@ func (q *Queries) GetTrashedFoldersByWorkspaceID(ctx context.Context, workspaceI
 			&i.ParentID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.DeletedBy,
-			&i.DeletedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -177,7 +199,10 @@ func (q *Queries) GetTrashedFoldersByWorkspaceID(ctx context.Context, workspaceI
 }
 
 const permanentlyDeleteFolderByID = `-- name: PermanentlyDeleteFolderByID :exec
-DELETE FROM folders WHERE id = $1
+DELETE FROM
+  folders
+WHERE
+  id = $1
 `
 
 func (q *Queries) PermanentlyDeleteFolderByID(ctx context.Context, id uuid.UUID) error {
@@ -186,7 +211,10 @@ func (q *Queries) PermanentlyDeleteFolderByID(ctx context.Context, id uuid.UUID)
 }
 
 const permanentlyDeleteFoldersByIDs = `-- name: PermanentlyDeleteFoldersByIDs :exec
-DELETE FROM folders WHERE id = ANY($1::uuid[])
+DELETE FROM
+  folders
+WHERE
+  id = ANY($1::uuid[])
 `
 
 func (q *Queries) PermanentlyDeleteFoldersByIDs(ctx context.Context, ids []uuid.UUID) error {
@@ -195,15 +223,35 @@ func (q *Queries) PermanentlyDeleteFoldersByIDs(ctx context.Context, ids []uuid.
 }
 
 const saveFolder = `-- name: SaveFolder :exec
-INSERT INTO folders (id, name, icon, workspace_id, parent_id, created_at, updated_at, deleted_by, deleted_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+INSERT INTO folders (
+  id,
+  name,
+  icon,
+  workspace_id,
+  parent_id,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+)
+VALUES (
+  $1,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6,
+  $7,
+  $8,
+  $9
+)
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   icon = EXCLUDED.icon,
   parent_id = EXCLUDED.parent_id,
   updated_at = EXCLUDED.updated_at,
-  deleted_by = EXCLUDED.deleted_by,
-  deleted_at = EXCLUDED.deleted_at
+  trashed_by = EXCLUDED.trashed_by,
+  trashed_at = EXCLUDED.trashed_at
 `
 
 type SaveFolderParams struct {
@@ -211,11 +259,11 @@ type SaveFolderParams struct {
 	Name        string
 	Icon        *string
 	WorkspaceID uuid.UUID
-	ParentID    pgtype.UUID
+	ParentID    *uuid.UUID
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	DeletedBy   *string
-	DeletedAt   *time.Time
+	TrashedBy   *string
+	TrashedAt   *time.Time
 }
 
 func (q *Queries) SaveFolder(ctx context.Context, arg *SaveFolderParams) error {
@@ -227,8 +275,8 @@ func (q *Queries) SaveFolder(ctx context.Context, arg *SaveFolderParams) error {
 		arg.ParentID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
-		arg.DeletedBy,
-		arg.DeletedAt,
+		arg.TrashedBy,
+		arg.TrashedAt,
 	)
 	return err
 }

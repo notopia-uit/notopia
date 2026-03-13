@@ -36,7 +36,7 @@ vars: {
   }
 }
 
-deleted_by: {
+trashed_by: {
   shape: rectangle
   purpose
   parent
@@ -61,8 +61,8 @@ folders: {
   parent_id: uuid {constraint: FK, N}
   created_at: timestamptz
   updated_at: timestamptz
-  deleted_by: deleted_by {constraint: N}
-  deleted_at: timestamptz {constraint: N}
+  trashed_by: trashed_by {constraint: N}
+  trashed_at: timestamptz {constraint: N}
 
   shape: sql_table
 }
@@ -76,8 +76,8 @@ notes: {
   size: integer
   created_at: timestamptz
   updated_at: timestamptz
-  deleted_by: deleted_by {constraint: N}
-  deleted_at: timestamptz {constraint: N}
+  trashed_by: trashed_by {constraint: N}
+  trashed_at: timestamptz {constraint: N}
 
   shape: sql_table
 }

@@ -17,30 +17,30 @@ type Note struct {
 
 var _ domain.NoteRepo = (*Note)(nil)
 
-func NewNoteRepo(queries *pgsqlc.Queries) domain.NoteRepo {
+func NewNote(queries *pgsqlc.Queries) *Note {
 	return &Note{
 		queries: queries,
 	}
 }
 
+var ProvideNote = NewNote
+
 func (n *Note) GetByID(ctx context.Context, id uuid.UUID) (*domain.Note, error) {
-	result, err := n.queries.GetNote(ctx, id)
+	noteResult, err := n.queries.GetNote(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.NewErrNoteNotFound(id, err)
 		}
 		return nil, toDomainError(err)
 	}
-	return noteToDomain(result), nil
+	outgoingLinksResult, err := n.queries.GetNoteOutgoingLinks(ctx, id)
+	if err != nil {
+		return nil, toDomainError(err)
+	}
+	return noteToDomain(noteResult, outgoingLinksResult), nil
 }
 
 func (n *Note) Save(ctx context.Context, note *domain.Note) error {
-	var trashedBy *string
-	if note.TrashedBy() != nil {
-		trashedByStr := string(*note.TrashedBy())
-		trashedBy = &trashedByStr
-	}
-
 	err := n.queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
 		ID:        note.ID(),
 		Name:      note.Name(),
@@ -50,8 +50,8 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 		Size:      int32(note.Size()),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		DeletedBy: trashedBy,
-		DeletedAt: note.TrashedAt(),
+		TrashedBy: note.TrashByString(),
+		TrashedAt: note.TrashedAt(),
 	})
 	if err != nil {
 		return toDomainError(err)
@@ -60,13 +60,25 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 }
 
 func (n *Note) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]domain.Note, error) {
-	results, err := n.queries.GetTrashedNotesByWorkspaceID(ctx, workspaceID)
+	noteResults, err := n.queries.GetTrashedNotesByWorkspaceID(ctx, workspaceID)
 	if err != nil {
 		return nil, toDomainError(err)
 	}
-	notes := make([]domain.Note, len(results))
-	for i, note := range results {
-		notes[i] = *noteToDomain(note)
+	noteIDs := make([]uuid.UUID, len(noteResults))
+	for i, note := range noteResults {
+		noteIDs[i] = note.ID
+	}
+	outgoingLinkResults, err := n.queries.GetNotesOutgoingLinks(ctx, noteIDs)
+	if err != nil {
+		return nil, toDomainError(err)
+	}
+	outgoingLinksMap := make(map[uuid.UUID]uuid.UUIDs)
+	for _, outgoingLink := range outgoingLinkResults {
+		outgoingLinksMap[outgoingLink.SourceID] = append(outgoingLinksMap[outgoingLink.SourceID], outgoingLink.TargetID)
+	}
+	notes := make([]domain.Note, len(noteResults))
+	for i, note := range noteResults {
+		notes[i] = *noteToDomain(note, outgoingLinksMap[note.ID])
 	}
 	return notes, nil
 }
@@ -87,13 +99,11 @@ func (n *Note) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
 	return nil
 }
 
-func noteToDomain(note *pgsqlc.Note) *domain.Note {
+func noteToDomain(note *pgsqlc.Note, outgoingLinks uuid.UUIDs) *domain.Note {
 	var trashedBy *domain.TrashedBy
-	if note.DeletedBy != nil {
-		trashedByVal := domain.TrashedBy(*note.DeletedBy)
-		trashedBy = &trashedByVal
+	if note.TrashedBy != nil {
+		trashedBy = new(domain.TrashedBy(*note.TrashedBy))
 	}
-
 	return domain.UnmarshalNote(
 		note.ID,
 		note.Name,
@@ -101,8 +111,8 @@ func noteToDomain(note *pgsqlc.Note) *domain.Note {
 		note.Tags,
 		uint(note.Size),
 		note.FolderID,
-		uuid.UUIDs([]uuid.UUID{}),
+		outgoingLinks,
 		trashedBy,
-		note.DeletedAt,
+		note.TrashedAt,
 	)
 }

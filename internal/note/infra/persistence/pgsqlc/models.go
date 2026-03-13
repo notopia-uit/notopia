@@ -5,22 +5,81 @@
 package pgsqlc
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type TrashedBy string
+
+const (
+	TrashedByPurpose TrashedBy = "purpose"
+	TrashedByParent  TrashedBy = "parent"
+)
+
+func (e *TrashedBy) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = TrashedBy(s)
+	case string:
+		*e = TrashedBy(s)
+	default:
+		return fmt.Errorf("unsupported scan type for TrashedBy: %T", src)
+	}
+	return nil
+}
+
+type NullTrashedBy struct {
+	TrashedBy TrashedBy
+	Valid     bool // Valid is true if TrashedBy is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTrashedBy) Scan(value interface{}) error {
+	if value == nil {
+		ns.TrashedBy, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.TrashedBy.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTrashedBy) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.TrashedBy), nil
+}
+
+func (e TrashedBy) Valid() bool {
+	switch e {
+	case TrashedByPurpose,
+		TrashedByParent:
+		return true
+	}
+	return false
+}
+
+func AllTrashedByValues() []TrashedBy {
+	return []TrashedBy{
+		TrashedByPurpose,
+		TrashedByParent,
+	}
+}
 
 type Folder struct {
 	ID          uuid.UUID
 	Name        string
 	Icon        *string
 	WorkspaceID uuid.UUID
-	ParentID    pgtype.UUID
+	ParentID    *uuid.UUID
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	DeletedBy   *string
-	DeletedAt   *time.Time
+	TrashedBy   *string
+	TrashedAt   *time.Time
 }
 
 type Note struct {
@@ -32,8 +91,8 @@ type Note struct {
 	Size      int32
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedBy *string
-	DeletedAt *time.Time
+	TrashedBy *string
+	TrashedAt *time.Time
 }
 
 type NoteLink struct {
@@ -42,11 +101,10 @@ type NoteLink struct {
 }
 
 type Workspace struct {
-	ID           uuid.UUID
-	Slug         string
-	Name         string
-	RootFolderID pgtype.UUID
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    *time.Time
+	ID        uuid.UUID
+	Slug      string
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
 }

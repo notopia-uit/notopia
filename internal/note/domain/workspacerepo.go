@@ -1,10 +1,14 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 type WorkspaceRepo interface {
-	GetBySlug(slug string) (*Workspace, error)
-	GetIDBySlug(slug string) (uuid.UUID, error)
-	CheckSlugExists(slug string) (bool, error)
-	Save(workspace *Workspace) error
+	GetBySlug(ctx context.Context, slug string) (*Workspace, error)
+	GetIDBySlug(ctx context.Context, slug string) (*uuid.UUID, error)
+	CheckSlugExists(ctx context.Context, slug string) (bool, error)
+	Save(ctx context.Context, workspace *Workspace) error
 }

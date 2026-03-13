@@ -80,7 +80,7 @@ func (f *Folder) FolderHierarchy() FolderHierarchy {
 	return f.folderHierarchy
 }
 
-func (f *Folder) ParentID() (*uuid.UUID, bool) {
+func (f *Folder) ParentID() *uuid.UUID {
 	return f.folderHierarchy.ParentID()
 }
 
@@ -95,6 +95,13 @@ func (f *Folder) MoveToFolder(folderID uuid.UUID) {
 
 func (f *Folder) TrashedBy() *TrashedBy {
 	return f.trashedBy
+}
+
+func (f *Folder) TrashedByString() *string {
+	if f.trashedBy == nil {
+		return nil
+	}
+	return new(f.trashedBy.String())
 }
 
 func (f *Folder) TrashedAt() *time.Time {
@@ -116,8 +123,8 @@ func NewFolderHierarchy(parentID *uuid.UUID) *FolderHierarchy {
 	}
 }
 
-func (fh *FolderHierarchy) ParentID() (*uuid.UUID, bool) {
-	return fh.parentID, fh.parentID != nil
+func (fh *FolderHierarchy) ParentID() *uuid.UUID {
+	return fh.parentID
 }
 
 func (fh *FolderHierarchy) IsRoot() bool {

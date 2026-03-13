@@ -11,28 +11,75 @@ import (
 	"github.com/google/uuid"
 )
 
-const deleteAllNoteLinks = `-- name: DeleteAllNoteLinks :exec
-DELETE FROM note_links WHERE source_id = $1 OR target_id = $2
+const createNoteLink = `-- name: CreateNoteLink :exec
+INSERT INTO note_links (
+  source_id,
+  target_id
+)
+VALUES (
+  $1,
+  $2
+)
+ON CONFLICT DO NOTHING
 `
 
-type DeleteAllNoteLinksParams struct {
+type CreateNoteLinkParams struct {
 	SourceID uuid.UUID
 	TargetID uuid.UUID
 }
 
-func (q *Queries) DeleteAllNoteLinks(ctx context.Context, arg *DeleteAllNoteLinksParams) error {
-	_, err := q.db.Exec(ctx, deleteAllNoteLinks, arg.SourceID, arg.TargetID)
+func (q *Queries) CreateNoteLink(ctx context.Context, arg *CreateNoteLinkParams) error {
+	_, err := q.db.Exec(ctx, createNoteLink, arg.SourceID, arg.TargetID)
 	return err
 }
 
-const getNoteIncomingLinks = `-- name: GetNoteIncomingLinks :many
-SELECT source_id
-FROM note_links
-WHERE target_id = $1
+const deleteAnyNoteLinks = `-- name: DeleteAnyNoteLinks :exec
+DELETE FROM
+  note_links
+WHERE
+  source_id = $1
+  OR target_id = $2
 `
 
-func (q *Queries) GetNoteIncomingLinks(ctx context.Context, targetID uuid.UUID) ([]uuid.UUID, error) {
-	rows, err := q.db.Query(ctx, getNoteIncomingLinks, targetID)
+type DeleteAnyNoteLinksParams struct {
+	SourceID uuid.UUID
+	TargetID uuid.UUID
+}
+
+func (q *Queries) DeleteAnyNoteLinks(ctx context.Context, arg *DeleteAnyNoteLinksParams) error {
+	_, err := q.db.Exec(ctx, deleteAnyNoteLinks, arg.SourceID, arg.TargetID)
+	return err
+}
+
+const deleteNoteLink = `-- name: DeleteNoteLink :exec
+DELETE FROM
+  note_links
+WHERE
+  source_id = $1
+  AND target_id = $2
+`
+
+type DeleteNoteLinkParams struct {
+	SourceID uuid.UUID
+	TargetID uuid.UUID
+}
+
+func (q *Queries) DeleteNoteLink(ctx context.Context, arg *DeleteNoteLinkParams) error {
+	_, err := q.db.Exec(ctx, deleteNoteLink, arg.SourceID, arg.TargetID)
+	return err
+}
+
+const getNoteBacklinks = `-- name: GetNoteBacklinks :many
+SELECT
+  source_id
+FROM
+  note_links
+WHERE
+  target_id = $1
+`
+
+func (q *Queries) GetNoteBacklinks(ctx context.Context, targetID uuid.UUID) ([]uuid.UUID, error) {
+	rows, err := q.db.Query(ctx, getNoteBacklinks, targetID)
 	if err != nil {
 		return nil, err
 	}
@@ -44,6 +91,65 @@ func (q *Queries) GetNoteIncomingLinks(ctx context.Context, targetID uuid.UUID) 
 			return nil, err
 		}
 		items = append(items, source_id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getNoteOutgoingLinks = `-- name: GetNoteOutgoingLinks :many
+SELECT
+  target_id
+FROM
+  note_links
+WHERE
+  source_id = $1
+`
+
+func (q *Queries) GetNoteOutgoingLinks(ctx context.Context, sourceID uuid.UUID) ([]uuid.UUID, error) {
+	rows, err := q.db.Query(ctx, getNoteOutgoingLinks, sourceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var target_id uuid.UUID
+		if err := rows.Scan(&target_id); err != nil {
+			return nil, err
+		}
+		items = append(items, target_id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getNotesOutgoingLinks = `-- name: GetNotesOutgoingLinks :many
+SELECT
+  source_id,
+  target_id
+FROM
+  note_links
+WHERE
+  source_id = ANY($1::uuid[])
+`
+
+func (q *Queries) GetNotesOutgoingLinks(ctx context.Context, sourceIds []uuid.UUID) ([]*NoteLink, error) {
+	rows, err := q.db.Query(ctx, getNotesOutgoingLinks, sourceIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*NoteLink
+	for rows.Next() {
+		var i NoteLink
+		if err := rows.Scan(&i.SourceID, &i.TargetID); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
