@@ -1,12 +1,14 @@
 package query
 
+import "context"
+
 type GetWorkspaceGraph struct {
 	Slug   string
 	Orphan *bool
 }
 
 type GetWorkspaceGraphReadModel interface {
-	GetWorkspaceGraph(*GetWorkspaceGraph) (Graph, error)
+	GetWorkspaceGraph(ctx context.Context, q *GetWorkspaceGraph) (Graph, error)
 }
 
 type GetWorkspaceGraphHandler struct {
@@ -17,6 +19,6 @@ func NewGetWorkspaceGraphHandler(readModel GetWorkspaceGraphReadModel) *GetWorks
 	return &GetWorkspaceGraphHandler{readModel: readModel}
 }
 
-func (h *GetWorkspaceGraphHandler) Handle(query *GetWorkspaceGraph) (Graph, error) {
-	return h.readModel.GetWorkspaceGraph(query)
+func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspaceGraph) (Graph, error) {
+	return h.readModel.GetWorkspaceGraph(ctx, query)
 }

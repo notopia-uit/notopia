@@ -1,6 +1,9 @@
 package query
 
-import "github.com/google/uuid"
+import (
+	"context"
+	"github.com/google/uuid"
+)
 
 type GetNotes struct {
 	ID         uuid.UUID
@@ -8,7 +11,7 @@ type GetNotes struct {
 }
 
 type GetNotesReadModel interface {
-	GetNotes(*GetNotes) (NotePaginated, error)
+	GetNotes(ctx context.Context, q *GetNotes) (NotePaginated, error)
 }
 
 type GetNotesHandler struct {
@@ -19,6 +22,6 @@ func NewGetNotesHandler(readModel GetNotesReadModel) *GetNotesHandler {
 	return &GetNotesHandler{readModel: readModel}
 }
 
-func (h *GetNotesHandler) Handle(query *GetNotes) (NotePaginated, error) {
-	return h.readModel.GetNotes(query)
+func (h *GetNotesHandler) Handle(ctx context.Context, query *GetNotes) (NotePaginated, error) {
+	return h.readModel.GetNotes(ctx, query)
 }

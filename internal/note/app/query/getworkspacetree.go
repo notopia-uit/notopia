@@ -1,11 +1,13 @@
 package query
 
+import "context"
+
 type GetWorkspaceTree struct {
 	Slug string
 }
 
 type GetWorkspaceTreeReadModel interface {
-	GetWorkspaceTree(*GetWorkspaceTree) (WorkspaceTreeFolder, error)
+	GetWorkspaceTree(ctx context.Context, q *GetWorkspaceTree) (WorkspaceTreeFolder, error)
 }
 
 type GetWorkspaceTreeHandler struct {
@@ -16,6 +18,6 @@ func NewGetWorkspaceTreeHandler(readModel GetWorkspaceTreeReadModel) *GetWorkspa
 	return &GetWorkspaceTreeHandler{readModel: readModel}
 }
 
-func (h *GetWorkspaceTreeHandler) Handle(query *GetWorkspaceTree) (WorkspaceTreeFolder, error) {
-	return h.readModel.GetWorkspaceTree(query)
+func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspaceTree) (WorkspaceTreeFolder, error) {
+	return h.readModel.GetWorkspaceTree(ctx, query)
 }

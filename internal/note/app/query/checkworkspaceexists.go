@@ -1,11 +1,13 @@
 package query
 
+import "context"
+
 type CheckWorkspaceExists struct {
 	Slug string
 }
 
 type CheckWorkspaceExistsReadModel interface {
-	CheckWorkspaceExists(*CheckWorkspaceExists) (CheckWorkspaceExistsResult, error)
+	CheckWorkspaceExists(ctx context.Context, q *CheckWorkspaceExists) (CheckWorkspaceExistsResult, error)
 }
 
 type CheckWorkspaceExistsHandler struct {
@@ -16,6 +18,6 @@ func NewCheckWorkspaceExistsHandler(readModel CheckWorkspaceExistsReadModel) *Ch
 	return &CheckWorkspaceExistsHandler{readModel: readModel}
 }
 
-func (h *CheckWorkspaceExistsHandler) Handle(query *CheckWorkspaceExists) (CheckWorkspaceExistsResult, error) {
-	return h.readModel.CheckWorkspaceExists(query)
+func (h *CheckWorkspaceExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceExists) (CheckWorkspaceExistsResult, error) {
+	return h.readModel.CheckWorkspaceExists(ctx, query)
 }

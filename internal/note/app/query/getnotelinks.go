@@ -1,6 +1,9 @@
 package query
 
-import "github.com/google/uuid"
+import (
+	"context"
+	"github.com/google/uuid"
+)
 
 type GetNoteLinks struct {
 	ID            uuid.UUID
@@ -9,7 +12,7 @@ type GetNoteLinks struct {
 }
 
 type GetNoteLinksReadModel interface {
-	GetNoteLinks(*GetNoteLinks) (NoteLinkResult, error)
+	GetNoteLinks(ctx context.Context, q *GetNoteLinks) (NoteLinkResult, error)
 }
 
 type GetNoteLinksHandler struct {
@@ -20,6 +23,6 @@ func NewGetNoteLinksHandler(readModel GetNoteLinksReadModel) *GetNoteLinksHandle
 	return &GetNoteLinksHandler{readModel: readModel}
 }
 
-func (h *GetNoteLinksHandler) Handle(query *GetNoteLinks) (NoteLinkResult, error) {
-	return h.readModel.GetNoteLinks(query)
+func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (NoteLinkResult, error) {
+	return h.readModel.GetNoteLinks(ctx, query)
 }

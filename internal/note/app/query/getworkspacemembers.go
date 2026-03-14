@@ -1,11 +1,13 @@
 package query
 
+import "context"
+
 type GetWorkspaceMembers struct {
 	Slug string
 }
 
 type GetWorkspaceMembersReadModel interface {
-	GetWorkspaceMembers(*GetWorkspaceMembers) ([]WorkspaceMember, error)
+	GetWorkspaceMembers(ctx context.Context, q *GetWorkspaceMembers) ([]WorkspaceMember, error)
 }
 
 type GetWorkspaceMembersHandler struct {
@@ -16,6 +18,6 @@ func NewGetWorkspaceMembersHandler(readModel GetWorkspaceMembersReadModel) *GetW
 	return &GetWorkspaceMembersHandler{readModel: readModel}
 }
 
-func (h *GetWorkspaceMembersHandler) Handle(query *GetWorkspaceMembers) ([]WorkspaceMember, error) {
-	return h.readModel.GetWorkspaceMembers(query)
+func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorkspaceMembers) ([]WorkspaceMember, error) {
+	return h.readModel.GetWorkspaceMembers(ctx, query)
 }
