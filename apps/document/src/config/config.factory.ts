@@ -2,8 +2,10 @@ import { registerAs } from '@nestjs/config';
 
 import { AppConfig, DatabaseConfig, S3Config, ServicesConfig } from './config';
 
+export const APP_CONFIG = Symbol('APP_CONFIG');
+
 export const appConfig = registerAs<AppConfig>(
-  'app',
+  APP_CONFIG,
   (): AppConfig => ({
     env: process.env.NODE_ENV ?? 'production',
     logLevel: process.env.LOG_LEVEL ?? 'warn',
@@ -18,10 +20,14 @@ export const getDatabaseConfig = (): DatabaseConfig => ({
   database: process.env.DB_NAME ?? 'document',
 });
 
-export const databaseConfig = registerAs('database', getDatabaseConfig);
+export const DATABASE_CONFIG = Symbol('DATABASE_CONFIG');
+
+export const databaseConfig = registerAs(DATABASE_CONFIG, getDatabaseConfig);
+
+export const SERVICE_CONFIG = Symbol('SERVICE_CONFIG');
 
 export const servicesConfig = registerAs(
-  'services',
+  SERVICE_CONFIG,
   (): ServicesConfig => ({
     noteUrl: process.env.SERVICES_NOTE_URL ?? 'http://localhost:18081',
     authorizationUrl:
@@ -29,8 +35,10 @@ export const servicesConfig = registerAs(
   })
 );
 
+export const S3_CONFIG = Symbol('S3_CONFIG');
+
 export const s3Config = registerAs(
-  's3',
+  S3_CONFIG,
   (): S3Config => ({
     endpoint: process.env.S3_ENDPOINT ?? '',
     region: process.env.S3_REGION ?? 'us-east-1',

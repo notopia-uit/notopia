@@ -1,29 +1,34 @@
-import { Client, createClient } from '@connectrpc/connect';
+import { createClient } from '@connectrpc/connect';
 import { createGrpcTransport } from '@connectrpc/connect-node';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NoteService } from '@notopia-uit/pb/note';
+import { NoteService as NoteServiceDefinition } from '@notopia-uit/pb/note';
 
 import { ServicesConfig } from '../config/config';
+import { SERVICE_CONFIG } from '../config/config.factory';
+import { NoteClient, NoteService } from './note.service';
 
-export const NOTE_SERVICE = Symbol('NOTE_SERVICE');
+const NOTE_CLIENT = Symbol('NOTE_SERVICE_CLIENT');
 
 @Module({
   providers: [
     {
-      provide: NOTE_SERVICE,
-      useFactory: (
-        configService: ConfigService
-      ): Client<typeof NoteService> => {
-        const servicesCfg = configService.get<ServicesConfig>('services')!;
+      provide: NOTE_CLIENT,
+      useFactory: (configService: ConfigService): NoteClient => {
+        const servicesCfg = configService.get<ServicesConfig>(SERVICE_CONFIG)!;
         const transport = createGrpcTransport({
           baseUrl: servicesCfg.noteUrl,
         });
-        return createClient(NoteService, transport);
+        return createClient(NoteServiceDefinition, transport);
       },
       inject: [ConfigService],
     },
+    {
+      provide: NoteService,
+      useFactory: (client: NoteClient) => new NoteService(client),
+      inject: [NOTE_CLIENT],
+    },
   ],
-  exports: [NOTE_SERVICE],
+  exports: [NoteService],
 })
 export class NoteModule {}

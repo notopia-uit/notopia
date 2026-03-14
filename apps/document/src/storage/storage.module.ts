@@ -3,13 +3,15 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { S3Config } from '../config/config';
+import { S3_CONFIG } from '../config/config.factory';
+import { StorageService } from './storage.service';
 
 @Module({
   providers: [
     {
       provide: S3Client,
       useFactory: (configService: ConfigService) => {
-        const s3Config = configService.get<S3Config>('s3')!;
+        const s3Config = configService.get<S3Config>(S3_CONFIG)!;
         return new S3Client({
           region: s3Config.region,
           forcePathStyle: true,
@@ -22,7 +24,8 @@ import { S3Config } from '../config/config';
       },
       inject: [ConfigService],
     },
+    StorageService,
   ],
-  exports: [S3Client],
+  exports: [StorageService],
 })
-export class S3Module {}
+export class StorageModule {}

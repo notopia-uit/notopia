@@ -1,54 +1,30 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import type { Client } from '@connectrpc/connect';
 import {
-  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectDataSource } from '@nestjs/typeorm';
-import {
-  AuthorizationService,
-  NotePermission,
-} from '@notopia-uit/pb/authorization';
 import { randomUUID } from 'crypto';
 import { Traceable } from 'nestjs-otel';
 import { DataSource } from 'typeorm';
 import { applyUpdate, Doc as YDoc } from 'yjs';
 
-import { AUTHORIZATION_SERVICE } from '../authorization/authorization.module';
+import { AuthorizationService } from '../authorization/authorization.service';
 import { User } from '../common/user';
-import { S3Config } from '../config/config';
 import { RevisionEntity } from '../revision/revision.entity';
+import { StorageService } from '../storage/storage.service';
 import { DocumentEntity } from './document.entity';
-
-export interface AttachmentUploadUrl {
-  url: string;
-  uploadUrl: string;
-}
 
 @Injectable()
 @Traceable()
 export class DocumentService {
-  private readonly bucketName: string;
-  private readonly s3Endpoint: string;
-  private static readonly s3UrlExpirationSeconds = 3600;
-
   constructor(
     private readonly editor: ServerBlockNoteEditor,
-    private readonly s3Client: S3Client,
+    private readonly storageService: StorageService,
     @InjectDataSource() private readonly dataSource: DataSource,
-    @Inject(AUTHORIZATION_SERVICE)
-    private readonly authorizationService: Client<typeof AuthorizationService>,
-    configService: ConfigService
-  ) {
-    const s3Config = configService.get<S3Config>('s3')!;
-    this.bucketName = s3Config.bucketName;
-    this.s3Endpoint = s3Config.endpoint;
-  }
+    private readonly authorizationService: AuthorizationService
+  ) {}
 
   toYDoc(entity: DocumentEntity): YDoc {
     const doc = new YDoc();
@@ -93,32 +69,23 @@ export class DocumentService {
     });
   }
 
-  async getAttachmentUploadUrl(
-    documentId: string,
-    user: User
-  ): Promise<AttachmentUploadUrl> {
-    const permissionRes = await this.authorizationService.hasNotePermission({
-      noteId: documentId,
-      permission: NotePermission.WRITE,
-      memberId: user.id,
-    });
-    if (!permissionRes.hasPermission) {
+  async getAttachmentUploadUrl(documentId: string, user: User) {
+    const hasPermission =
+      await this.authorizationService.hasWriteNotePermission(
+        documentId,
+        user.id
+      );
+    if (!hasPermission) {
       throw new UnauthorizedException(
         `User ${user.id} does not have permission to upload attachment to ${documentId}`
       );
     }
     const key = `document-attachments/${documentId}/${randomUUID()}`;
-    const command = new PutObjectCommand({
-      Bucket: this.bucketName,
-      Key: key,
-    });
-    const presignedUrl = await getSignedUrl(this.s3Client, command, {
-      expiresIn: DocumentService.s3UrlExpirationSeconds,
-    });
-    const attachmentUrl = `${this.s3Endpoint}/${this.bucketName}/${key}`;
+    const { uploadUrl, publicUrl } =
+      await this.storageService.generateAttachmentPresignedUploadUrl(key);
     return {
-      url: attachmentUrl,
-      uploadUrl: presignedUrl,
+      url: publicUrl,
+      uploadUrl: uploadUrl,
     };
   }
 }

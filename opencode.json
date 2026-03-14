@@ -4,7 +4,7 @@
     "nx-mcp": {
       "type": "local",
       "command": ["pnpm", "exec", "nx", "mcp"],
-      "enabled": true
+      "enabled": false
     },
     "shadcn": {
       "type": "local",

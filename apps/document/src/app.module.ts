@@ -10,6 +10,7 @@ import pretty from 'pino-pretty';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { AppConfig } from './config/config';
 import {
+  APP_CONFIG,
   appConfig,
   databaseConfig,
   s3Config,
@@ -25,7 +26,7 @@ import { RevisionApi } from './revision/revision.api';
 import { RevisionEntity } from './revision/revision.entity';
 import { RevisionRepository } from './revision/revision.repository';
 import { RevisionService } from './revision/revision.service';
-import { S3Module } from './s3/s3.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -42,7 +43,7 @@ import { S3Module } from './s3/s3.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const appCfg = configService.get<AppConfig>('app')!;
+        const appCfg = configService.get<AppConfig>(APP_CONFIG)!;
         const level = appCfg.logLevel;
         const stream = pretty({ colorize: true, ignore: 'pid,hostname' });
         return {
@@ -53,7 +54,7 @@ import { S3Module } from './s3/s3.module';
         };
       },
     }),
-    S3Module,
+    StorageModule,
     AuthorizationModule,
     NoteModule,
     DatabaseModule,
@@ -80,7 +81,7 @@ import { S3Module } from './s3/s3.module';
           DatabaseModule,
           AuthorizationModule,
           NoteModule,
-          S3Module,
+          StorageModule,
         ],
       }
     ),

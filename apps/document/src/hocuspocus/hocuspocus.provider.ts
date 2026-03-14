@@ -1,21 +1,18 @@
-import { Client } from '@connectrpc/connect';
 import { Database } from '@hocuspocus/extension-database';
 import { Hocuspocus } from '@hocuspocus/server';
 import { Provider } from '@nestjs/common';
-import { AuthorizationService } from '@notopia-uit/pb/authorization';
-import { NoteService } from '@notopia-uit/pb/note';
 
-import { AUTHORIZATION_CLIENT } from '../authorization/authorization.module';
+import { AuthorizationService } from '../authorization/authorization.service';
 import { DocumentRepository } from '../document/document.repository';
-import { NOTE_SERVICE } from '../note/note.module';
+import { NoteService } from '../note/note.service';
 import { HocuspocusContext } from './hocuspocus-context';
 
 export const HocuspocusProvider: Provider = {
   provide: Hocuspocus,
   useFactory: (
     documentRepository: DocumentRepository,
-    noteClient: Client<typeof NoteService>,
-    authorizationClient: Client<typeof AuthorizationService>
+    noteService: NoteService,
+    authorizationService: AuthorizationService
   ) => {
     return new Hocuspocus({
       name: 'document', // TODO: Inject host
@@ -34,17 +31,16 @@ export const HocuspocusProvider: Provider = {
       async onAuthenticate(data) {
         const documentId = data.documentName;
         const context = data.context as HocuspocusContext;
-        const noteExistenceRes = await noteClient.checkNoteExistence({
-          noteId: documentId,
-        });
+        const noteExistenceRes =
+          await noteService.checkNoteExistence(documentId);
         if (!noteExistenceRes.exists) {
           throw new Error(`Document with ID ${documentId} does not exist`);
         }
         const userPermissionsRes =
-          await authorizationClient.getUserNotePermissions({
-            memberId: context.user.id,
-            noteId: documentId,
-          });
+          await authorizationService.getUserNotePermissions(
+            context.user.id,
+            documentId
+          );
         if (!userPermissionsRes.canRead) {
           throw new Error(
             `User ${context.user.id} does not have permission to access document ${documentId}`
@@ -58,10 +54,10 @@ export const HocuspocusProvider: Provider = {
       async beforeHandleMessage(data) {
         const { context, connection } = data;
 
-        const response = await authorizationClient.getUserNotePermissions({
-          memberId: context.userId,
-          noteId: data.documentName,
-        });
+        const response = await authorizationService.getUserNotePermissions(
+          context.userId,
+          data.documentName
+        );
 
         if (!response.canRead) {
           connection.close();
@@ -77,5 +73,5 @@ export const HocuspocusProvider: Provider = {
       },
     });
   },
-  inject: [DocumentRepository, NOTE_SERVICE, AUTHORIZATION_CLIENT],
+  inject: [DocumentRepository, NoteService, AuthorizationService],
 };
