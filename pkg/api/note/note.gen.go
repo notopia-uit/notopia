@@ -357,17 +357,17 @@ type TrashedBy string
 
 // TrashedFolder defines model for TrashedFolder.
 type TrashedFolder struct {
-	DeletedAt *time.Time         `json:"deletedAt,omitempty"`
 	Id        openapi_types.UUID `json:"id"`
 	Name      *string            `json:"name,omitempty"`
+	TrashedAt *time.Time         `json:"trashedAt,omitempty"`
 	TrashedBy *TrashedBy         `json:"trashedBy,omitempty"`
 }
 
 // TrashedNote defines model for TrashedNote.
 type TrashedNote struct {
-	DeletedAt *time.Time         `json:"deletedAt,omitempty"`
 	Id        openapi_types.UUID `json:"id"`
 	Name      *string            `json:"name,omitempty"`
+	TrashedAt *time.Time         `json:"trashedAt,omitempty"`
 	TrashedBy *TrashedBy         `json:"trashedBy,omitempty"`
 }
 

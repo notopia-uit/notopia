@@ -42,6 +42,10 @@ entries:
           matching_mode: regex
         - url: http://api.notopia.localhost
           matching_mode: strict
+        - url: ^http://localhost:9080/.*$
+          matching_mode: regex
+        - url: http://localhost:9080
+          matching_mode: strict
 
   - model: authentik_core.application
     identifiers:

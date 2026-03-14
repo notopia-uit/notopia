@@ -2029,13 +2029,13 @@
             "readOnly": true
           },
           "trashedBy": {
-            "$ref": "#/components/schemas/TrashedBy"
+            "$ref": "#/components/schemas/TrashedBy",
+            "nullable": false
           },
-          "deletedAt": {
+          "trashedAt": {
             "type": "string",
-            "nullable": true,
             "format": "date-time",
-            "example": null,
+            "example": "2024-06-01T12:00:00Z",
             "readOnly": true
           }
         },
@@ -2043,7 +2043,7 @@
           "id",
           "name",
           "trashedBy",
-          "deletedAt"
+          "trashedAt"
         ]
       },
       "TrashedFolder": {
@@ -2062,13 +2062,13 @@
             "readOnly": true
           },
           "trashedBy": {
-            "$ref": "#/components/schemas/TrashedBy"
+            "$ref": "#/components/schemas/TrashedBy",
+            "nullable": false
           },
-          "deletedAt": {
+          "trashedAt": {
             "type": "string",
-            "nullable": true,
             "format": "date-time",
-            "example": null,
+            "example": "2024-06-01T12:00:00Z",
             "readOnly": true
           }
         },
@@ -2076,7 +2076,7 @@
           "id",
           "name",
           "trashedBy",
-          "deletedAt"
+          "trashedAt"
         ]
       },
       "Pagination": {

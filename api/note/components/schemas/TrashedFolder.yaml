@@ -16,16 +16,16 @@ properties:
 
   trashedBy:
     $ref: ./TrashedBy.yaml
+    nullable: false
 
-  deletedAt:
+  trashedAt:
     type: string
-    nullable: true
     format: date-time
-    example: null
+    example: 2024-06-01T12:00:00Z
     readOnly: true
 
 required:
   - id
   - name
   - trashedBy
-  - deletedAt
+  - trashedAt

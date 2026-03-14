@@ -228,14 +228,14 @@ export const zNoteTrashedNote = z.object({
     id: z.uuid(),
     name: z.string().min(1).max(255).readonly(),
     trashedBy: zNoteTrashedBy,
-    deletedAt: z.iso.datetime().readonly().nullable()
+    trashedAt: z.iso.datetime().readonly()
 });
 
 export const zNoteTrashedFolder = z.object({
     id: z.uuid(),
     name: z.string().min(1).max(255).readonly(),
     trashedBy: zNoteTrashedBy,
-    deletedAt: z.iso.datetime().readonly().nullable()
+    trashedAt: z.iso.datetime().readonly()
 });
 
 export const zNotePagination = z.object({

@@ -288,14 +288,14 @@ export type NoteTrashedNote = {
     id: string;
     readonly name: string;
     trashedBy: NoteTrashedBy;
-    readonly deletedAt: string | null;
+    readonly trashedAt: string;
 };
 
 export type NoteTrashedFolder = {
     id: string;
     readonly name: string;
     trashedBy: NoteTrashedBy;
-    readonly deletedAt: string | null;
+    readonly trashedAt: string;
 };
 
 export type NotePagination = {

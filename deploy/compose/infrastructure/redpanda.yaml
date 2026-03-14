@@ -18,6 +18,7 @@ services:
       - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
       - --rpc-addr 0.0.0.0:33145
       - --advertise-rpc-addr redpanda:33145
+      - --set auto_create_topics_enabled=true
     ports:
       - 18081:18081
       - 18082:18082

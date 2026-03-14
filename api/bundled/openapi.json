@@ -2971,13 +2971,13 @@
             "readOnly": true
           },
           "trashedBy": {
-            "$ref": "#/components/schemas/note_TrashedBy"
+            "$ref": "#/components/schemas/note_TrashedBy",
+            "nullable": false
           },
-          "deletedAt": {
+          "trashedAt": {
             "type": "string",
-            "nullable": true,
             "format": "date-time",
-            "example": null,
+            "example": "2024-06-01T12:00:00Z",
             "readOnly": true
           }
         },
@@ -2985,7 +2985,7 @@
           "id",
           "name",
           "trashedBy",
-          "deletedAt"
+          "trashedAt"
         ]
       },
       "note_TrashedFolder": {
@@ -3004,13 +3004,13 @@
             "readOnly": true
           },
           "trashedBy": {
-            "$ref": "#/components/schemas/note_TrashedBy"
+            "$ref": "#/components/schemas/note_TrashedBy",
+            "nullable": false
           },
-          "deletedAt": {
+          "trashedAt": {
             "type": "string",
-            "nullable": true,
             "format": "date-time",
-            "example": null,
+            "example": "2024-06-01T12:00:00Z",
             "readOnly": true
           }
         },
@@ -3018,7 +3018,7 @@
           "id",
           "name",
           "trashedBy",
-          "deletedAt"
+          "trashedAt"
         ]
       },
       "note_Pagination": {

@@ -13,5 +13,6 @@ var ProviderSet = wire.NewSet(
 		"General",
 		"Log",
 		"Server",
+		"Kafka",
 	),
 )
