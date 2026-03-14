@@ -32,6 +32,11 @@ type Note struct {
 	UpdatedAt          time.Time
 }
 
+type NotePaginated struct {
+	Data       []Note
+	Pagination Pagination
+}
+
 type Folder struct {
 	Id          uuid.UUID
 	Name        string
@@ -107,23 +112,14 @@ type NoteLink struct {
 	Icon *string
 }
 
+type NoteLinkResult struct {
+	OutgoingLinks []NoteLink
+	Backlinks     []NoteLink
+}
+
 type NoteUpdatedEvent struct {
 	Type string
 	Data Note
-}
-
-type TrashedFolder struct {
-	Id        uuid.UUID
-	Name      string
-	TrashedBy domain.TrashedBy
-	TrashedAt time.Time
-}
-
-type TrashedNote struct {
-	Id        uuid.UUID
-	Name      string
-	TrashedBy domain.TrashedBy
-	TrashedAt time.Time
 }
 
 type Workspace struct {
@@ -175,4 +171,32 @@ type WorkspaceTreeFolder struct {
 type WorkspaceUpdatedEvent struct {
 	Type string
 	Data Workspace
+}
+
+type TrashedFolder struct {
+	Id        uuid.UUID
+	Name      string
+	TrashedBy domain.TrashedBy
+	TrashedAt time.Time
+}
+
+type TrashedNote struct {
+	Id        uuid.UUID
+	Name      string
+	TrashedBy domain.TrashedBy
+	TrashedAt time.Time
+}
+
+type TrashData struct {
+	Notes   []TrashedNote
+	Folders []TrashedFolder
+}
+
+type Trash struct {
+	Data       TrashData
+	Pagination Pagination
+}
+
+type CheckWorkspaceExistsResult struct {
+	Exists bool
 }

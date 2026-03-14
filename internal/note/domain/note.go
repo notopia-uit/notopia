@@ -23,7 +23,6 @@ func NewNote(
 	name string,
 	icon *string,
 	tags []string,
-	size uint,
 	folderID uuid.UUID,
 ) *Note {
 	return &Note{
@@ -31,7 +30,6 @@ func NewNote(
 		name:     name,
 		icon:     icon,
 		tags:     tags,
-		size:     size,
 		folderID: folderID,
 	}
 }

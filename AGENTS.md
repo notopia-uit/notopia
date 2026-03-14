@@ -59,3 +59,4 @@ pkg/                            # Go packages
 ## General Rules
 
 - Temp file must be go into `./tmp/{projectName}`
+- While writing code, try to not write unnecessary comment into code

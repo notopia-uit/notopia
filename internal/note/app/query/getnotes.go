@@ -8,7 +8,7 @@ type GetNotes struct {
 }
 
 type GetNotesReadModel interface {
-	GetNotes(GetNotes) ([]Note, error)
+	GetNotes(*GetNotes) (NotePaginated, error)
 }
 
 type GetNotesHandler struct {
@@ -17,4 +17,8 @@ type GetNotesHandler struct {
 
 func NewGetNotesHandler(readModel GetNotesReadModel) *GetNotesHandler {
 	return &GetNotesHandler{readModel: readModel}
+}
+
+func (h *GetNotesHandler) Handle(query *GetNotes) (NotePaginated, error) {
+	return h.readModel.GetNotes(query)
 }
