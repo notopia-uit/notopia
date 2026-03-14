@@ -9,17 +9,34 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-// DocumentCommittedEvent defines model for DocumentCommittedEvent.
-type DocumentCommittedEvent = EventBase
+// Document defines model for Document.
+type Document struct {
+	// Content BlockNote model
+	Content DocumentContent    `json:"content"`
+	Id      openapi_types.UUID `json:"id"`
+}
 
-// EventBase defines model for EventBase.
-type EventBase struct {
-	Data     map[string]interface{} `json:"data"`
-	Id       openapi_types.UUID     `json:"id"`
-	Metadata struct {
-		CorrelationId *string   `json:"correlationId,omitempty"`
-		Timestamp     time.Time `json:"timestamp"`
-	} `json:"metadata"`
+// DocumentCommittedEvent defines model for DocumentCommittedEvent.
+type DocumentCommittedEvent = Document
+
+// DocumentContent BlockNote model
+type DocumentContent = []map[string]interface{}
+
+// Note defines model for Note.
+type Note struct {
+	BacklinksCount     *int                `json:"backlinksCount,omitempty"`
+	FolderId           *PropertiesId       `json:"folderId,omitempty"`
+	Icon               *string             `json:"icon"`
+	Id                 *openapi_types.UUID `json:"id,omitempty"`
+	Name               string              `json:"name"`
+	OutgoingLinksCount *int                `json:"outgoingLinksCount,omitempty"`
+	Tags               []string            `json:"tags"`
+	UpdatedAt          *time.Time          `json:"updatedAt,omitempty"`
+}
+
+// NoteDeletedEvent defines model for NoteDeletedEvent.
+type NoteDeletedEvent struct {
+	Id *Id `json:"id,omitempty"`
 }
 
 // NoteSearch defines model for NoteSearch.
@@ -33,7 +50,19 @@ type NoteSearch struct {
 }
 
 // NoteUpdatedEvent defines model for NoteUpdatedEvent.
-type NoteUpdatedEvent = EventBase
+type NoteUpdatedEvent = Note
 
 // UserDeletedEvent defines model for UserDeletedEvent.
-type UserDeletedEvent = EventBase
+type UserDeletedEvent struct {
+	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+	Id UserPropertiesId `json:"id"`
+}
+
+// UserPropertiesId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+type UserPropertiesId = int
+
+// Id defines model for id.
+type Id = openapi_types.UUID
+
+// PropertiesId defines model for properties-id.
+type PropertiesId = openapi_types.UUID

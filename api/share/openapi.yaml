@@ -18,6 +18,8 @@ components:
       $ref: ./components/schemas/NoteSearch.yaml
     DocumentCommittedEvent:
       $ref: ./components/schemas/DocumentCommittedEvent.yaml
+    NoteDeletedEvent:
+      $ref: ./components/schemas/NoteDeletedEvent.yaml
     NoteUpdatedEvent:
       $ref: ./components/schemas/NoteUpdatedEvent.yaml
     UserDeletedEvent:

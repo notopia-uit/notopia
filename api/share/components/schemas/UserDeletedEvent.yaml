@@ -1,10 +1,9 @@
 # vim: ft=yaml.openapi
-$ref: ./EventBase.yaml
+type: object
+
 properties:
-  data:
-    type: object
-    properties:
-      userId:
-        $ref: ../../../common/components/schemas/User.yaml#/properties/id
-    required:
-      - userId
+  id:
+    $ref: ../../../common/components/schemas/User.yaml#/properties/id
+
+required:
+  - id

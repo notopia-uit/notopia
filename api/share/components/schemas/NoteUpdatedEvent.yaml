@@ -1,5 +1,2 @@
 # vim: ft=yaml.openapi
-$ref: ./EventBase.yaml
-properties:
-  data:
-    $ref: ../../../note/components/schemas/Note.yaml
+$ref: ../../../note/components/schemas/Note.yaml

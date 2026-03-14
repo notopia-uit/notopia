@@ -14,22 +14,47 @@ export type ShareNoteSearch = {
     tags?: Array<string>;
 };
 
-export type ShareDocumentCommittedEvent = ShareEventBase;
+export type ShareDocumentCommittedEvent = ShareDocument;
 
-export type ShareNoteUpdatedEvent = ShareEventBase;
-
-export type ShareUserDeletedEvent = ShareEventBase;
-
-export type ShareEventBase = {
-    id: string;
-    metadata: {
-        timestamp: string;
-        correlationId?: string;
-    };
-    data: {
-        [key: string]: unknown;
-    };
+export type ShareNoteDeletedEvent = {
+    id: ShareId;
 };
+
+export type ShareNoteUpdatedEvent = ShareNote;
+
+export type ShareUserDeletedEvent = {
+    id: ShareUserPropertiesId;
+};
+
+/**
+ * BlockNote model
+ */
+export type ShareDocumentContent = Array<unknown>;
+
+export type ShareDocument = {
+    id: string;
+    content: ShareDocumentContent;
+};
+
+export type ShareId = string;
+
+export type SharePropertiesId = string;
+
+export type ShareNote = {
+    readonly id: string;
+    name: string;
+    icon: string | null;
+    folderId: SharePropertiesId;
+    tags: Array<string>;
+    readonly updatedAt: string;
+    readonly backlinksCount: number;
+    readonly outgoingLinksCount: number;
+};
+
+/**
+ * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+ */
+export type ShareUserPropertiesId = number;
 
 export type DocumentError = {
     /**
@@ -321,6 +346,23 @@ export type NoteWorkspaceTreeFolder = {
 };
 
 export type NotePropertiesUpdatedAt = string;
+
+export type ShareNoteDeletedEventWritable = {
+    [key: string]: unknown;
+};
+
+export type ShareNoteUpdatedEventWritable = ShareNoteWritable;
+
+/**
+ * BlockNote model
+ */
+export type ShareDocumentContentWritable = Array<unknown>;
+
+export type ShareNoteWritable = {
+    name: string;
+    icon: string | null;
+    tags: Array<string>;
+};
 
 /**
  * BlockNote model

@@ -9,20 +9,47 @@ export const zShareNoteSearch = z.object({
     tags: z.array(z.string()).optional()
 });
 
-export const zShareEventBase = z.object({
+/**
+ * BlockNote model
+ */
+export const zShareDocumentContent = z.array(z.unknown());
+
+export const zShareDocument = z.object({
     id: z.uuid(),
-    metadata: z.object({
-        timestamp: z.iso.datetime(),
-        correlationId: z.string().optional()
-    }),
-    data: z.record(z.string(), z.unknown())
+    content: zShareDocumentContent
 });
 
-export const zShareDocumentCommittedEvent = zShareEventBase;
+export const zShareDocumentCommittedEvent = zShareDocument;
 
-export const zShareNoteUpdatedEvent = zShareEventBase;
+export const zShareId = z.uuid().readonly();
 
-export const zShareUserDeletedEvent = zShareEventBase;
+export const zShareNoteDeletedEvent = z.object({
+    id: zShareId
+});
+
+export const zSharePropertiesId = z.uuid().readonly();
+
+export const zShareNote = z.object({
+    id: z.uuid().readonly(),
+    name: z.string().min(1).max(255),
+    icon: z.string().nullable(),
+    folderId: zSharePropertiesId,
+    tags: z.array(z.string()),
+    updatedAt: z.iso.datetime().readonly(),
+    backlinksCount: z.int().gte(0).readonly(),
+    outgoingLinksCount: z.int().gte(0).readonly()
+});
+
+export const zShareNoteUpdatedEvent = zShareNote;
+
+/**
+ * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+ */
+export const zShareUserPropertiesId = z.int().gte(1);
+
+export const zShareUserDeletedEvent = z.object({
+    id: zShareUserPropertiesId
+});
 
 export const zDocumentError = z.object({
     code: z.string(),
@@ -241,6 +268,21 @@ export const zNoteWorkspaceTreeFolder = z.object({
     children: z.array(z.lazy((): any => zNoteWorkspaceTreeFolder)),
     updatedAt: zNotePropertiesUpdatedAt
 });
+
+export const zShareNoteDeletedEventWritable = z.record(z.string(), z.unknown());
+
+/**
+ * BlockNote model
+ */
+export const zShareDocumentContentWritable = z.array(z.unknown());
+
+export const zShareNoteWritable = z.object({
+    name: z.string().min(1).max(255),
+    icon: z.string().nullable(),
+    tags: z.array(z.string())
+});
+
+export const zShareNoteUpdatedEventWritable = zShareNoteWritable;
 
 /**
  * BlockNote model
