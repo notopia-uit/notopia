@@ -7,6 +7,20 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/domain"
 )
 
+type PaginationParams struct {
+	Page  int
+	Limit int
+}
+
+type Pagination struct {
+	Page       int
+	Limit      int
+	Total      int
+	TotalPages int
+	hasNext    bool
+	hasPrev    bool
+}
+
 type Note struct {
 	Id                 uuid.UUID
 	Name               string
