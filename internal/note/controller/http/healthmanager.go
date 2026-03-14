@@ -3,12 +3,12 @@ package http
 import (
 	"context"
 
-	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/pkg/healthmanager"
 )
 
 func NewHealthManager(
-	persistence persistence.Persistence,
+	persistence app.Persistence,
 ) *healthmanager.HealthManager {
 	persistenceCheck := func(ctx context.Context) error {
 		return persistence.CheckReadiness(ctx)

@@ -9,6 +9,7 @@ import (
 	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/pressly/goose/v3"
 	"github.com/pressly/goose/v3/lock"
 )
@@ -16,13 +17,13 @@ import (
 //go:embed pgmigration/*
 var PgMigrations embed.FS
 
-type PersistencePg struct {
+type Pg struct {
 	db            *sql.DB
 	pgpool        *pgxpool.Pool
 	gooseProvider *goose.Provider
 }
 
-var _ Persistence = (*PersistencePg)(nil)
+var _ app.Persistence = (*Pg)(nil)
 
 func NewGooseProvider(db *sql.DB, logger *slog.Logger) (*goose.Provider, error) {
 	locker, err := lock.NewPostgresSessionLocker()
@@ -52,15 +53,15 @@ func NewPg(
 	db *sql.DB,
 	pgxpool *pgxpool.Pool,
 	gooseProvider *goose.Provider,
-) (*PersistencePg, error) {
-	return &PersistencePg{
+) (*Pg, error) {
+	return &Pg{
 		db:            db,
 		pgpool:        pgxpool,
 		gooseProvider: gooseProvider,
 	}, nil
 }
 
-func (p *PersistencePg) RunMigrations(ctx context.Context) error {
+func (p *Pg) RunMigrations(ctx context.Context) error {
 	_, err := p.gooseProvider.Up(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
@@ -68,7 +69,7 @@ func (p *PersistencePg) RunMigrations(ctx context.Context) error {
 	return nil
 }
 
-func (p *PersistencePg) CheckReadiness(ctx context.Context) error {
+func (p *Pg) CheckReadiness(ctx context.Context) error {
 	return p.pgpool.Ping(ctx)
 }
 

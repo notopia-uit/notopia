@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
-	"github.com/notopia-uit/notopia/internal/note/transport/grpc"
-	"github.com/notopia-uit/notopia/internal/note/transport/http"
+	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
+	"github.com/notopia-uit/notopia/internal/note/controller/http"
 	"github.com/notopia-uit/notopia/pkg/healthmanager"
 	"golang.org/x/sync/errgroup"
 )
@@ -16,7 +16,7 @@ type Server struct {
 	http          *http.Server
 	grpc          *grpc.Server
 	healthManager *healthmanager.HealthManager
-	persistence   persistence.Persistence
+	persistence   app.Persistence
 	logger        *slog.Logger
 }
 
@@ -24,7 +24,7 @@ func NewServer(
 	httpServer *http.Server,
 	grpcServer *grpc.Server,
 	healthManager *healthmanager.HealthManager,
-	persistence persistence.Persistence,
+	persistence app.Persistence,
 	logger *slog.Logger,
 ) *Server {
 	slog.SetDefault(logger)

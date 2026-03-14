@@ -6,7 +6,7 @@ import (
 	components "github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/infra"
-	controller "github.com/notopia-uit/notopia/internal/note/transport"
+	controller "github.com/notopia-uit/notopia/internal/note/controller"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
