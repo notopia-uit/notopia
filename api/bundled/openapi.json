@@ -1030,7 +1030,7 @@
         }
       }
     },
-    "/note/workspaces/slugs/{workspaceSlug}": {
+    "/note/workspaces-by-slug/{workspaceSlug}": {
       "get": {
         "security": [
           {

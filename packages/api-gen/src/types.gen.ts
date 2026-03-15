@@ -1287,7 +1287,7 @@ export type GetWorkspaceData = {
         workspaceSlug: NoteSlug;
     };
     query?: never;
-    url: '/note/workspaces/slugs/{workspaceSlug}';
+    url: '/note/workspaces-by-slug/{workspaceSlug}';
 };
 
 export type GetWorkspaceErrors = {

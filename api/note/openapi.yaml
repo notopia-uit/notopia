@@ -51,8 +51,8 @@ paths:
 
   /note/workspaces:
     $ref: ./paths/workspaces.yaml
-  /note/workspaces/slugs/{workspaceSlug}:
-    $ref: ./paths/workspaces_slugs_{workspaceSlug}.yaml
+  /note/workspaces-by-slug/{workspaceSlug}:
+    $ref: ./paths/workspaces-by-slug_{workspaceSlug}.yaml
   /note/workspaces/{workspaceId}:
     $ref: ./paths/workspaces_{workspaceId}.yaml
   /note/workspaces/{workspaceId}/events:

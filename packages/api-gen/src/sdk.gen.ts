@@ -275,7 +275,7 @@ export const getWorkspace = <ThrowOnError extends boolean = false>(options: Opti
     requestValidator: async (data) => await zGetWorkspaceData.parseAsync(data),
     responseValidator: async (data) => await zGetWorkspaceResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/slugs/{workspaceSlug}',
+    url: '/note/workspaces-by-slug/{workspaceSlug}',
     ...options
 });
 

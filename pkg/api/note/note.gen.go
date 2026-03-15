@@ -620,7 +620,7 @@ type ServerInterface interface {
 	// (POST /note/workspaces)
 	CreateWorkspace(c *gin.Context)
 	// Get workspace
-	// (GET /note/workspaces/slugs/{workspaceSlug})
+	// (GET /note/workspaces-by-slug/{workspaceSlug})
 	GetWorkspace(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Delete workspace
 	// (DELETE /note/workspaces/{workspaceId})
@@ -1450,7 +1450,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/notes/:noteId/rename", wrapper.RenameNote)
 	router.POST(options.BaseURL+"/note/notes/:noteId/unpublish", wrapper.UnpublishNote)
 	router.POST(options.BaseURL+"/note/workspaces", wrapper.CreateWorkspace)
-	router.GET(options.BaseURL+"/note/workspaces/slugs/:workspaceSlug", wrapper.GetWorkspace)
+	router.GET(options.BaseURL+"/note/workspaces-by-slug/:workspaceSlug", wrapper.GetWorkspace)
 	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.DeleteWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/events", wrapper.GetWorkspaceEvents)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/exists", wrapper.CheckWorkspaceExists)
@@ -3085,7 +3085,7 @@ type StrictServerInterface interface {
 	// (POST /note/workspaces)
 	CreateWorkspace(ctx context.Context, request CreateWorkspaceRequestObject) (CreateWorkspaceResponseObject, error)
 	// Get workspace
-	// (GET /note/workspaces/slugs/{workspaceSlug})
+	// (GET /note/workspaces-by-slug/{workspaceSlug})
 	GetWorkspace(ctx context.Context, request GetWorkspaceRequestObject) (GetWorkspaceResponseObject, error)
 	// Delete workspace
 	// (DELETE /note/workspaces/{workspaceId})
