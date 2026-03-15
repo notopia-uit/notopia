@@ -19,7 +19,10 @@ export const zShareDocument = z.object({
     content: zShareDocumentContent
 });
 
-export const zShareDocumentCommittedEvent = zShareDocument;
+export const zShareDocumentCommittedEvent = zShareDocument.and(z.object({
+    tags: z.array(z.string()),
+    outgoingLinkIds: z.array(z.string())
+}));
 
 export const zShareId = z.uuid().readonly();
 

@@ -21,7 +21,7 @@ sequenceDiagram
     participant SS as Search Service
 
     U->>+NS: CreateNote
-    NS->>+AS: HasNotePermission
+    NS->>+AS: HasWorkspacePermission
     break Authorization Failed
         AS-->>NS: No Permission
         NS-->>U: No Permission
@@ -99,8 +99,8 @@ sequenceDiagram
         DS->>MB: Publish DocumentCommittedEvent
     end
     par Process DocumentCommittedEvent
-        MB->>SW: DocumentCommittedEvent
-        SW->>SW: Update note size, tags
+        MB->>NS: DocumentCommittedEvent
+        SW->>NS: Update note size, tags
     and
         MB->>SW: NoteUpdated event
         SW->>SW: Convert to markdownContent in form of NoteSearch

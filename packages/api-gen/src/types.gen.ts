@@ -14,7 +14,10 @@ export type ShareNoteSearch = {
     tags?: Array<string>;
 };
 
-export type ShareDocumentCommittedEvent = ShareDocument;
+export type ShareDocumentCommittedEvent = ShareDocument & {
+    tags: Array<string>;
+    outgoingLinkIds: Array<string>;
+};
 
 export type ShareNoteDeletedEvent = {
     id: ShareId;

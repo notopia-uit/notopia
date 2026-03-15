@@ -1,6 +1,7 @@
 package event
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/ThreeDotsLabs/watermill"
@@ -9,13 +10,14 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/app/event"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
 type Integration struct {
-	EventBus       *cqrs.EventBus
-	EventProcessor *cqrs.EventProcessor
-	Router         *message.Router
+	eventBus       *cqrs.EventBus
+	eventProcessor *cqrs.EventProcessor
+	router         *message.Router
 	App            *app.App
 }
 
@@ -24,6 +26,7 @@ func NewIntegration(
 	cfg *commonconfig.Kafka,
 	logger watermill.LoggerAdapter,
 	marshaler cqrs.CommandEventMarshaler,
+	documentCommittedHandler *event.DocumentCommittedHandler,
 ) (*Integration, error) {
 	tracer := kafka.NewOTELSaramaTracer()
 
@@ -79,11 +82,25 @@ func NewIntegration(
 		return nil, fmt.Errorf("failed to create integration event processor: %w", err)
 	}
 
+	err = eventProcessor.AddHandlers(
+		cqrs.NewEventHandler(
+			"DocumentCommittedHandler",
+			documentCommittedHandler.Handle,
+		),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to add event handlers to integration event processor: %w", err)
+	}
+
 	return &Integration{
-		EventBus:       eventBus,
-		EventProcessor: eventProcessor,
-		Router:         router,
+		eventBus:       eventBus,
+		eventProcessor: eventProcessor,
+		router:         router,
 	}, nil
 }
 
 var ProvideIntegration = NewIntegration
+
+func (i *Integration) Run(ctx context.Context) error {
+	return i.router.Run(ctx)
+}

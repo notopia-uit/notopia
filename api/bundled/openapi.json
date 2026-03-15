@@ -1840,7 +1840,36 @@
         ]
       },
       "share_DocumentCommittedEvent": {
-        "$ref": "#/components/schemas/share_Document"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/share_Document"
+          },
+          {
+            "properties": {
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "work",
+                  "meeting"
+                ]
+              },
+              "outgoingLinkIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+                }
+              }
+            },
+            "required": [
+              "tags",
+              "outgoingLinkIds"
+            ]
+          }
+        ]
       },
       "share_NoteDeletedEvent": {
         "type": "object",
