@@ -472,23 +472,6 @@ export const createWorkspaceMutation = (options?: Partial<Options<CreateWorkspac
     return mutationOptions;
 };
 
-/**
- * Delete workspace
- */
-export const deleteWorkspaceMutation = (options?: Partial<Options<DeleteWorkspaceData>>): UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> => {
-    const mutationOptions: UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteWorkspace({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
 export const getWorkspaceQueryKey = (options: Options<GetWorkspaceData>) => createQueryKey('getWorkspace', options);
 
 /**
@@ -506,6 +489,23 @@ export const getWorkspaceOptions = (options: Options<GetWorkspaceData>) => query
     },
     queryKey: getWorkspaceQueryKey(options)
 });
+
+/**
+ * Delete workspace
+ */
+export const deleteWorkspaceMutation = (options?: Partial<Options<DeleteWorkspaceData>>): UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> => {
+    const mutationOptions: UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteWorkspace({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 export const getWorkspaceGraphQueryKey = (options: Options<GetWorkspaceGraphData>) => createQueryKey('getWorkspaceGraph', options);
 

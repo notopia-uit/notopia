@@ -1,0 +1,37 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - Oauth2: []
+  tags:
+    - Workspace
+  summary: Show trash
+  operationId: showTrash
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  responses:
+    200:
+      description: Trash
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              notes:
+                type: array
+                items:
+                  $ref: ../components/schemas/TrashedNote.yaml
+              folders:
+                type: array
+                items:
+                  $ref: ../components/schemas/TrashedFolder.yaml
+            required:
+              - notes
+              - folders
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

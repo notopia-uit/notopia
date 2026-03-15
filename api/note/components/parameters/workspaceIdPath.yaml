@@ -1,0 +1,6 @@
+# vim: ft=yaml.openapi
+name: workspaceId
+in: path
+required: true
+schema:
+  $ref: ../schemas/Workspace.yaml#/properties/id

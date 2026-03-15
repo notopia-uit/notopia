@@ -1,24 +1,16 @@
 # vim: ft=yaml.openapi
-get:
+post:
   security:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Check workspace exists
-  operationId: checkWorkspaceExists
+  summary: Unpublish workspace
+  operationId: unpublishWorkspace
   parameters:
-    - $ref: ../components/parameters/workspaceSlugPath.yaml
+    - $ref: ../components/parameters/workspaceIdPath.yaml
   responses:
-    200:
-      description: OK
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-                example: true
+    204:
+      description: Workspace unpublished successfully
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

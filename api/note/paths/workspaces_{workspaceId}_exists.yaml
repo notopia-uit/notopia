@@ -4,29 +4,21 @@ get:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Show trash
-  operationId: showTrash
+  summary: Check workspace exists
+  operationId: checkWorkspaceExists
   parameters:
-    - $ref: ../components/parameters/workspaceSlugPath.yaml
+    - $ref: ../components/parameters/workspaceIdPath.yaml
   responses:
     200:
-      description: Trash
+      description: OK
       content:
         application/json:
           schema:
             type: object
             properties:
-              notes:
-                type: array
-                items:
-                  $ref: ../components/schemas/TrashedNote.yaml
-              folders:
-                type: array
-                items:
-                  $ref: ../components/schemas/TrashedFolder.yaml
-            required:
-              - notes
-              - folders
+              exists:
+                type: boolean
+                example: true
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

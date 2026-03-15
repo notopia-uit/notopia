@@ -7,7 +7,7 @@ get:
   summary: SSE workspace updates
   operationId: getWorkspaceEvents
   parameters:
-    - $ref: ../components/parameters/workspaceSlugPath.yaml
+    - $ref: ../components/parameters/workspaceIdPath.yaml
   responses:
     200:
       description: A persistent stream of events

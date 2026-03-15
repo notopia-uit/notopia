@@ -7,7 +7,7 @@ post:
   summary: Restore trashed workspace items
   operationId: restoreTrashedWorkspaceItems
   parameters:
-    - $ref: ../components/parameters/workspaceSlugPath.yaml
+    - $ref: ../components/parameters/workspaceIdPath.yaml
   requestBody:
     required: true
     content:

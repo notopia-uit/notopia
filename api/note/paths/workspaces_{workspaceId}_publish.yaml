@@ -1,20 +1,16 @@
 # vim: ft=yaml.openapi
-get:
+post:
   security:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Get workspace tree
-  operationId: getWorkspaceTree
+  summary: Publish workspace
+  operationId: publishWorkspace
   parameters:
-    - $ref: ../components/parameters/workspaceSlugPath.yaml
+    - $ref: ../components/parameters/workspaceIdPath.yaml
   responses:
-    200:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: ../components/schemas/WorkspaceTreeFolder.yaml
+    204:
+      description: Workspace published successfully
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

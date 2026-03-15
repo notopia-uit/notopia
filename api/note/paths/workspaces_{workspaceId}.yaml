@@ -1,16 +1,16 @@
 # vim: ft=yaml.openapi
-post:
+delete:
   security:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Unpublish workspace
-  operationId: unpublishWorkspace
+  summary: Delete workspace
+  operationId: deleteWorkspace
   parameters:
-    - $ref: ../components/parameters/workspaceSlugPath.yaml
+    - $ref: ../components/parameters/workspaceIdPath.yaml
   responses:
     204:
-      description: Workspace unpublished successfully
+      description: No Content - Workspace successfully deleted.
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

@@ -269,24 +269,24 @@ export const createWorkspace = <ThrowOnError extends boolean = false>(options: O
 });
 
 /**
- * Delete workspace
- */
-export const deleteWorkspace = <ThrowOnError extends boolean = false>(options: Options<DeleteWorkspaceData, ThrowOnError>) => (options.client ?? client).delete<DeleteWorkspaceResponses, DeleteWorkspaceErrors, ThrowOnError>({
-    requestValidator: async (data) => await zDeleteWorkspaceData.parseAsync(data),
-    responseValidator: async (data) => await zDeleteWorkspaceResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}',
-    ...options
-});
-
-/**
  * Get workspace
  */
 export const getWorkspace = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceData, ThrowOnError>) => (options.client ?? client).get<GetWorkspaceResponses, GetWorkspaceErrors, ThrowOnError>({
     requestValidator: async (data) => await zGetWorkspaceData.parseAsync(data),
     responseValidator: async (data) => await zGetWorkspaceResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}',
+    url: '/note/workspaces/slugs/{workspaceSlug}',
+    ...options
+});
+
+/**
+ * Delete workspace
+ */
+export const deleteWorkspace = <ThrowOnError extends boolean = false>(options: Options<DeleteWorkspaceData, ThrowOnError>) => (options.client ?? client).delete<DeleteWorkspaceResponses, DeleteWorkspaceErrors, ThrowOnError>({
+    requestValidator: async (data) => await zDeleteWorkspaceData.parseAsync(data),
+    responseValidator: async (data) => await zDeleteWorkspaceResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}',
     ...options
 });
 
@@ -297,7 +297,7 @@ export const getWorkspaceEvents = <ThrowOnError extends boolean = false>(options
     requestValidator: async (data) => await zGetWorkspaceEventsData.parseAsync(data),
     responseValidator: async (data) => await zGetWorkspaceEventsResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/events',
+    url: '/note/workspaces/{workspaceId}/events',
     ...options
 });
 
@@ -308,7 +308,7 @@ export const getWorkspaceGraph = <ThrowOnError extends boolean = false>(options:
     requestValidator: async (data) => await zGetWorkspaceGraphData.parseAsync(data),
     responseValidator: async (data) => await zGetWorkspaceGraphResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/graph',
+    url: '/note/workspaces/{workspaceId}/graph',
     ...options
 });
 
@@ -319,7 +319,7 @@ export const getWorkspaceMembers = <ThrowOnError extends boolean = false>(option
     requestValidator: async (data) => await zGetWorkspaceMembersData.parseAsync(data),
     responseValidator: async (data) => await zGetWorkspaceMembersResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/members',
+    url: '/note/workspaces/{workspaceId}/members',
     ...options
 });
 
@@ -330,7 +330,7 @@ export const updateWorkspaceMembers = <ThrowOnError extends boolean = false>(opt
     requestValidator: async (data) => await zUpdateWorkspaceMembersData.parseAsync(data),
     responseValidator: async (data) => await zUpdateWorkspaceMembersResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/members',
+    url: '/note/workspaces/{workspaceId}/members',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -345,7 +345,7 @@ export const moveWorkspaceItems = <ThrowOnError extends boolean = false>(options
     requestValidator: async (data) => await zMoveWorkspaceItemsData.parseAsync(data),
     responseValidator: async (data) => await zMoveWorkspaceItemsResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/move-items',
+    url: '/note/workspaces/{workspaceId}/move-items',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -360,7 +360,7 @@ export const publishWorkspace = <ThrowOnError extends boolean = false>(options: 
     requestValidator: async (data) => await zPublishWorkspaceData.parseAsync(data),
     responseValidator: async (data) => await zPublishWorkspaceResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/publish',
+    url: '/note/workspaces/{workspaceId}/publish',
     ...options
 });
 
@@ -371,7 +371,7 @@ export const renameWorkspace = <ThrowOnError extends boolean = false>(options: O
     requestValidator: async (data) => await zRenameWorkspaceData.parseAsync(data),
     responseValidator: async (data) => await zRenameWorkspaceResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/rename',
+    url: '/note/workspaces/{workspaceId}/rename',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -386,7 +386,7 @@ export const restoreTrashedWorkspaceItems = <ThrowOnError extends boolean = fals
     requestValidator: async (data) => await zRestoreTrashedWorkspaceItemsData.parseAsync(data),
     responseValidator: async (data) => await zRestoreTrashedWorkspaceItemsResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/restore-trashed-items',
+    url: '/note/workspaces/{workspaceId}/restore-trashed-items',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -401,7 +401,7 @@ export const showTrash = <ThrowOnError extends boolean = false>(options: Options
     requestValidator: async (data) => await zShowTrashData.parseAsync(data),
     responseValidator: async (data) => await zShowTrashResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/show-trash',
+    url: '/note/workspaces/{workspaceId}/show-trash',
     ...options
 });
 
@@ -412,7 +412,7 @@ export const trashWorkspaceItems = <ThrowOnError extends boolean = false>(option
     requestValidator: async (data) => await zTrashWorkspaceItemsData.parseAsync(data),
     responseValidator: async (data) => await zTrashWorkspaceItemsResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/trash-items',
+    url: '/note/workspaces/{workspaceId}/trash-items',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -427,7 +427,7 @@ export const getWorkspaceTree = <ThrowOnError extends boolean = false>(options: 
     requestValidator: async (data) => await zGetWorkspaceTreeData.parseAsync(data),
     responseValidator: async (data) => await zGetWorkspaceTreeResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/tree',
+    url: '/note/workspaces/{workspaceId}/tree',
     ...options
 });
 
@@ -438,7 +438,7 @@ export const unpublishWorkspace = <ThrowOnError extends boolean = false>(options
     requestValidator: async (data) => await zUnpublishWorkspaceData.parseAsync(data),
     responseValidator: async (data) => await zUnpublishWorkspaceResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/unpublish',
+    url: '/note/workspaces/{workspaceId}/unpublish',
     ...options
 });
 
@@ -449,6 +449,6 @@ export const checkWorkspaceExists = <ThrowOnError extends boolean = false>(optio
     requestValidator: async (data) => await zCheckWorkspaceExistsData.parseAsync(data),
     responseValidator: async (data) => await zCheckWorkspaceExistsResponse.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces/{workspaceSlug}/exists',
+    url: '/note/workspaces/{workspaceId}/exists',
     ...options
 });

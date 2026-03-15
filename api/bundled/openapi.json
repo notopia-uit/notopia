@@ -1030,7 +1030,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}": {
+    "/note/workspaces/slugs/{workspaceSlug}": {
       "get": {
         "security": [
           {
@@ -1071,7 +1071,9 @@
             "$ref": "#/components/responses/note_InternalServerError"
           }
         }
-      },
+      }
+    },
+    "/note/workspaces/{workspaceId}": {
       "delete": {
         "security": [
           {
@@ -1085,7 +1087,7 @@
         "operationId": "deleteWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -1107,7 +1109,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/events": {
+    "/note/workspaces/{workspaceId}/events": {
       "get": {
         "security": [
           {
@@ -1121,7 +1123,7 @@
         "operationId": "getWorkspaceEvents",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -1185,7 +1187,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/graph": {
+    "/note/workspaces/{workspaceId}/graph": {
       "get": {
         "security": [
           {
@@ -1199,7 +1201,7 @@
         "operationId": "getWorkspaceGraph",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           },
           {
             "name": "orphan",
@@ -1241,7 +1243,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/members": {
+    "/note/workspaces/{workspaceId}/members": {
       "get": {
         "security": [
           {
@@ -1255,7 +1257,7 @@
         "operationId": "getWorkspaceMembers",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -1299,7 +1301,7 @@
         "operationId": "updateWorkspaceMembers",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "requestBody": {
@@ -1334,7 +1336,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/move-items": {
+    "/note/workspaces/{workspaceId}/move-items": {
       "post": {
         "security": [
           {
@@ -1348,7 +1350,7 @@
         "operationId": "moveWorkspaceItems",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "requestBody": {
@@ -1394,7 +1396,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/publish": {
+    "/note/workspaces/{workspaceId}/publish": {
       "post": {
         "security": [
           {
@@ -1408,7 +1410,7 @@
         "operationId": "publishWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -1430,7 +1432,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/rename": {
+    "/note/workspaces/{workspaceId}/rename": {
       "post": {
         "security": [
           {
@@ -1444,7 +1446,7 @@
         "operationId": "renameWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "requestBody": {
@@ -1484,7 +1486,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/restore-trashed-items": {
+    "/note/workspaces/{workspaceId}/restore-trashed-items": {
       "post": {
         "security": [
           {
@@ -1498,7 +1500,7 @@
         "operationId": "restoreTrashedWorkspaceItems",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "requestBody": {
@@ -1544,7 +1546,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/show-trash": {
+    "/note/workspaces/{workspaceId}/show-trash": {
       "get": {
         "security": [
           {
@@ -1558,7 +1560,7 @@
         "operationId": "showTrash",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -1605,7 +1607,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/trash-items": {
+    "/note/workspaces/{workspaceId}/trash-items": {
       "post": {
         "security": [
           {
@@ -1619,7 +1621,7 @@
         "operationId": "trashWorkspaceItems",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "requestBody": {
@@ -1665,7 +1667,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/tree": {
+    "/note/workspaces/{workspaceId}/tree": {
       "get": {
         "security": [
           {
@@ -1679,7 +1681,7 @@
         "operationId": "getWorkspaceTree",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -1708,7 +1710,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/unpublish": {
+    "/note/workspaces/{workspaceId}/unpublish": {
       "post": {
         "security": [
           {
@@ -1722,7 +1724,7 @@
         "operationId": "unpublishWorkspace",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -1744,7 +1746,7 @@
         }
       }
     },
-    "/note/workspaces/{workspaceSlug}/exists": {
+    "/note/workspaces/{workspaceId}/exists": {
       "get": {
         "security": [
           {
@@ -1758,7 +1760,7 @@
         "operationId": "checkWorkspaceExists",
         "parameters": [
           {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
+            "$ref": "#/components/parameters/note_workspaceIdPath"
           }
         ],
         "responses": {
@@ -3409,6 +3411,14 @@
         "required": true,
         "schema": {
           "$ref": "#/components/schemas/note_slug"
+        }
+      },
+      "note_workspaceIdPath": {
+        "name": "workspaceId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/note_properties-id"
         }
       }
     }

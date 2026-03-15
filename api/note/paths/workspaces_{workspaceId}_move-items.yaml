@@ -4,10 +4,10 @@ post:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Rename workspace
-  operationId: renameWorkspace
+  summary: Move workspace's items
+  operationId: moveWorkspaceItems
   parameters:
-    - $ref: ../components/parameters/workspaceSlugPath.yaml
+    - $ref: ../components/parameters/workspaceIdPath.yaml
   requestBody:
     required: true
     content:
@@ -15,13 +15,17 @@ post:
         schema:
           type: object
           properties:
-            name:
-              $ref: ../components/schemas/Workspace.yaml#/properties/name
-          required:
-            - name
+            noteIds:
+              type: array
+              items:
+                $ref: ../components/schemas/Note.yaml#/properties/id
+            folderIds:
+              type: array
+              items:
+                $ref: ../components/schemas/Folder.yaml#/properties/id
   responses:
     204:
-      description: Workspace renamed successfully
+      description: Workspace items successfully moved
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

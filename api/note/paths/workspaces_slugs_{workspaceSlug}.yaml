@@ -4,30 +4,21 @@ get:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Get workspace graph
-  operationId: getWorkspaceGraph
+  summary: Get workspace
+  operationId: getWorkspace
   parameters:
     - $ref: ../components/parameters/workspaceSlugPath.yaml
-    - name: orphan
-      in: query
-      description: Include node that are not connected to any other node
-      schema:
-        type: boolean
-        default: false
-        example: true
   responses:
     200:
-      description: Workspace graph
+      description: OK
       content:
         application/json:
           schema:
-            $ref: ../components/schemas/Graph.yaml
+            $ref: ../components/schemas/Workspace.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
-    403:
-      $ref: ../../common/components/responses/ForbiddenError.yaml
     404:
       $ref: ../../common/components/responses/NotFoundError.yaml
     500:

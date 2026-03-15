@@ -470,6 +470,8 @@ export type NoteNoteIdPath = NoteNotePropertiesId;
 
 export type NoteWorkspaceSlugPath = NoteSlug;
 
+export type NoteWorkspaceIdPath = NotePropertiesId;
+
 export type ImportDocumentsData = {
     body: Array<{
         [key: string]: unknown;
@@ -1279,52 +1281,13 @@ export type CreateWorkspaceResponses = {
     201: unknown;
 };
 
-export type DeleteWorkspaceData = {
-    body?: never;
-    path: {
-        workspaceSlug: NoteSlug;
-    };
-    query?: never;
-    url: '/note/workspaces/{workspaceSlug}';
-};
-
-export type DeleteWorkspaceErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * Unauthorized Error response
-     */
-    401: NoteError;
-    /**
-     * Not Found Error response
-     */
-    404: NoteError;
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type DeleteWorkspaceError = DeleteWorkspaceErrors[keyof DeleteWorkspaceErrors];
-
-export type DeleteWorkspaceResponses = {
-    /**
-     * No Content - Workspace successfully deleted.
-     */
-    204: void;
-};
-
-export type DeleteWorkspaceResponse = DeleteWorkspaceResponses[keyof DeleteWorkspaceResponses];
-
 export type GetWorkspaceData = {
     body?: never;
     path: {
         workspaceSlug: NoteSlug;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}';
+    url: '/note/workspaces/slugs/{workspaceSlug}';
 };
 
 export type GetWorkspaceErrors = {
@@ -1357,13 +1320,52 @@ export type GetWorkspaceResponses = {
 
 export type GetWorkspaceResponse = GetWorkspaceResponses[keyof GetWorkspaceResponses];
 
+export type DeleteWorkspaceData = {
+    body?: never;
+    path: {
+        workspaceId: NotePropertiesId;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceId}';
+};
+
+export type DeleteWorkspaceErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * Unauthorized Error response
+     */
+    401: NoteError;
+    /**
+     * Not Found Error response
+     */
+    404: NoteError;
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type DeleteWorkspaceError = DeleteWorkspaceErrors[keyof DeleteWorkspaceErrors];
+
+export type DeleteWorkspaceResponses = {
+    /**
+     * No Content - Workspace successfully deleted.
+     */
+    204: void;
+};
+
+export type DeleteWorkspaceResponse = DeleteWorkspaceResponses[keyof DeleteWorkspaceResponses];
+
 export type GetWorkspaceEventsData = {
     body?: never;
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/events';
+    url: '/note/workspaces/{workspaceId}/events';
 };
 
 export type GetWorkspaceEventsErrors = {
@@ -1411,7 +1413,7 @@ export type GetWorkspaceEventsResponse = GetWorkspaceEventsResponses[keyof GetWo
 export type GetWorkspaceGraphData = {
     body?: never;
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: {
         /**
@@ -1419,7 +1421,7 @@ export type GetWorkspaceGraphData = {
          */
         orphan?: boolean;
     };
-    url: '/note/workspaces/{workspaceSlug}/graph';
+    url: '/note/workspaces/{workspaceId}/graph';
 };
 
 export type GetWorkspaceGraphErrors = {
@@ -1459,10 +1461,10 @@ export type GetWorkspaceGraphResponse = GetWorkspaceGraphResponses[keyof GetWork
 export type GetWorkspaceMembersData = {
     body?: never;
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/members';
+    url: '/note/workspaces/{workspaceId}/members';
 };
 
 export type GetWorkspaceMembersErrors = {
@@ -1498,10 +1500,10 @@ export type GetWorkspaceMembersResponse = GetWorkspaceMembersResponses[keyof Get
 export type UpdateWorkspaceMembersData = {
     body: Array<NoteWorkspaceMember>;
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/members';
+    url: '/note/workspaces/{workspaceId}/members';
 };
 
 export type UpdateWorkspaceMembersErrors = {
@@ -1540,10 +1542,10 @@ export type MoveWorkspaceItemsData = {
         folderIds?: Array<NoteId>;
     };
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/move-items';
+    url: '/note/workspaces/{workspaceId}/move-items';
 };
 
 export type MoveWorkspaceItemsErrors = {
@@ -1579,10 +1581,10 @@ export type MoveWorkspaceItemsResponse = MoveWorkspaceItemsResponses[keyof MoveW
 export type PublishWorkspaceData = {
     body?: never;
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/publish';
+    url: '/note/workspaces/{workspaceId}/publish';
 };
 
 export type PublishWorkspaceErrors = {
@@ -1620,10 +1622,10 @@ export type RenameWorkspaceData = {
         name: NoteWorkspacePropertiesName;
     };
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/rename';
+    url: '/note/workspaces/{workspaceId}/rename';
 };
 
 export type RenameWorkspaceErrors = {
@@ -1662,10 +1664,10 @@ export type RestoreTrashedWorkspaceItemsData = {
         folders?: Array<NoteTrashedFolderWritable>;
     };
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/restore-trashed-items';
+    url: '/note/workspaces/{workspaceId}/restore-trashed-items';
 };
 
 export type RestoreTrashedWorkspaceItemsErrors = {
@@ -1701,10 +1703,10 @@ export type RestoreTrashedWorkspaceItemsResponse = RestoreTrashedWorkspaceItemsR
 export type ShowTrashData = {
     body?: never;
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/show-trash';
+    url: '/note/workspaces/{workspaceId}/show-trash';
 };
 
 export type ShowTrashErrors = {
@@ -1746,10 +1748,10 @@ export type TrashWorkspaceItemsData = {
         folders?: Array<NoteTrashedFolderWritable>;
     };
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/trash-items';
+    url: '/note/workspaces/{workspaceId}/trash-items';
 };
 
 export type TrashWorkspaceItemsErrors = {
@@ -1785,10 +1787,10 @@ export type TrashWorkspaceItemsResponse = TrashWorkspaceItemsResponses[keyof Tra
 export type GetWorkspaceTreeData = {
     body?: never;
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/tree';
+    url: '/note/workspaces/{workspaceId}/tree';
 };
 
 export type GetWorkspaceTreeErrors = {
@@ -1824,10 +1826,10 @@ export type GetWorkspaceTreeResponse = GetWorkspaceTreeResponses[keyof GetWorksp
 export type UnpublishWorkspaceData = {
     body?: never;
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/unpublish';
+    url: '/note/workspaces/{workspaceId}/unpublish';
 };
 
 export type UnpublishWorkspaceErrors = {
@@ -1863,10 +1865,10 @@ export type UnpublishWorkspaceResponse = UnpublishWorkspaceResponses[keyof Unpub
 export type CheckWorkspaceExistsData = {
     body?: never;
     path: {
-        workspaceSlug: NoteSlug;
+        workspaceId: NotePropertiesId;
     };
     query?: never;
-    url: '/note/workspaces/{workspaceSlug}/exists';
+    url: '/note/workspaces/{workspaceId}/exists';
 };
 
 export type CheckWorkspaceExistsErrors = {

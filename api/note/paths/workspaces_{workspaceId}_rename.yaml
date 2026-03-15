@@ -4,10 +4,10 @@ post:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Trash workspace's items
-  operationId: trashWorkspaceItems
+  summary: Rename workspace
+  operationId: renameWorkspace
   parameters:
-    - $ref: ../components/parameters/workspaceSlugPath.yaml
+    - $ref: ../components/parameters/workspaceIdPath.yaml
   requestBody:
     required: true
     content:
@@ -15,17 +15,13 @@ post:
         schema:
           type: object
           properties:
-            notes:
-              type: array
-              items:
-                $ref: ../components/schemas/TrashedNote.yaml
-            folders:
-              type: array
-              items:
-                $ref: ../components/schemas/TrashedFolder.yaml
+            name:
+              $ref: ../components/schemas/Workspace.yaml#/properties/name
+          required:
+            - name
   responses:
     204:
-      description: Workspace items successfully trashed
+      description: Workspace renamed successfully
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

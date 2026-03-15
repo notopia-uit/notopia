@@ -4,10 +4,10 @@ post:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Move workspace's items
-  operationId: moveWorkspaceItems
+  summary: Trash workspace's items
+  operationId: trashWorkspaceItems
   parameters:
-    - $ref: ../components/parameters/workspaceSlugPath.yaml
+    - $ref: ../components/parameters/workspaceIdPath.yaml
   requestBody:
     required: true
     content:
@@ -15,17 +15,17 @@ post:
         schema:
           type: object
           properties:
-            noteIds:
+            notes:
               type: array
               items:
-                $ref: ../components/schemas/Note.yaml#/properties/id
-            folderIds:
+                $ref: ../components/schemas/TrashedNote.yaml
+            folders:
               type: array
               items:
-                $ref: ../components/schemas/Folder.yaml#/properties/id
+                $ref: ../components/schemas/TrashedFolder.yaml
   responses:
     204:
-      description: Workspace items successfully moved
+      description: Workspace items successfully trashed
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

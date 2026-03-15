@@ -1,0 +1,34 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - Oauth2: []
+  tags:
+    - Workspace
+  summary: Get workspace graph
+  operationId: getWorkspaceGraph
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+    - name: orphan
+      in: query
+      description: Include node that are not connected to any other node
+      schema:
+        type: boolean
+        default: false
+        example: true
+  responses:
+    200:
+      description: Workspace graph
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Graph.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml
