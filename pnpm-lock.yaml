@@ -211,8 +211,8 @@ catalogs:
       specifier: 7.8.2
       version: 7.8.2
     shadcn:
-      specifier: 4.0.5
-      version: 4.0.5
+      specifier: 4.0.7
+      version: 4.0.7
     tailwind-merge:
       specifier: 3.5.0
       version: 3.5.0
@@ -642,7 +642,7 @@ importers:
         version: 19.2.4(react@19.2.4)
       shadcn:
         specifier: 'catalog:'
-        version: 4.0.5(@types/node@25.4.0)(babel-plugin-macros@3.1.0)(typescript@5.9.3)
+        version: 4.0.7(@types/node@25.4.0)(babel-plugin-macros@3.1.0)(typescript@5.9.3)
     devDependencies:
       autoprefixer:
         specifier: 'catalog:'
@@ -752,7 +752,7 @@ importers:
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       shadcn:
         specifier: 'catalog:'
-        version: 4.0.5(@types/node@25.4.0)(babel-plugin-macros@3.1.0)(typescript@5.9.3)
+        version: 4.0.7(@types/node@25.4.0)(babel-plugin-macros@3.1.0)(typescript@5.9.3)
     devDependencies:
       autoprefixer:
         specifier: 'catalog:'
@@ -13606,8 +13606,8 @@ packages:
     engines: {node: '>= 0.10'}
     hasBin: true
 
-  shadcn@4.0.5:
-    resolution: {integrity: sha512-z0SOHEU1+ADam1UJHrgxJhUsOb0/jBoYc+u9mhWs071KrnORq48X7uCwG3mD2ysQEBtOfeK/MxMGsmzL5Jt+Jg==}
+  shadcn@4.0.7:
+    resolution: {integrity: sha512-QwnD52EtnZo575yG/mk4fp6n0Qu8HZTVj10dsbg1O8DBLZPZG1V7AGOgTQSTjdsl8Jtye8GJfoKFz5npBkfExg==}
     hasBin: true
 
   shallow-clone@3.0.1:
@@ -31476,7 +31476,7 @@ snapshots:
       safe-buffer: 5.2.1
       to-buffer: 1.2.2
 
-  shadcn@4.0.5(@types/node@25.4.0)(babel-plugin-macros@3.1.0)(typescript@5.9.3):
+  shadcn@4.0.7(@types/node@25.4.0)(babel-plugin-macros@3.1.0)(typescript@5.9.3):
     dependencies:
       '@antfu/ni': 25.0.0
       '@babel/core': 7.29.0
