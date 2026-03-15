@@ -42,7 +42,7 @@ func NewWorkspaceEvent(
 
 	eventBus, err := cqrs.NewEventBusWithConfig(pubisher, cqrs.EventBusConfig{
 		GeneratePublishTopic: func(params cqrs.GenerateEventPublishTopicParams) (string, error) {
-			return "events:workspace" + params.EventName, nil
+			return "events:workspaces", nil
 		},
 		Marshaler: marshaler,
 		Logger:    logger,
@@ -55,7 +55,7 @@ func NewWorkspaceEvent(
 		router,
 		cqrs.EventProcessorConfig{
 			GenerateSubscribeTopic: func(params cqrs.EventProcessorGenerateSubscribeTopicParams) (string, error) {
-				return "events:workspace" + params.EventName, nil
+				return "events:workspaces", nil
 			},
 			SubscriberConstructor: func(params cqrs.EventProcessorSubscriberConstructorParams) (message.Subscriber, error) {
 				return subcriber, nil

@@ -48,6 +48,8 @@ func UnmarshalFolder(
 		workspaceID:     workspaceID,
 		folderHierarchy: folderHierarchy,
 		trashed:         trashed,
+
+		events: []Event{},
 	}
 }
 
@@ -125,12 +127,14 @@ func (f *Folder) Restore() {
 	f.trashed = nil
 }
 
-func (f *Folder) Events() []Event {
-	return f.events
-}
-
 func (f *Folder) AddEvent(event Event) {
 	f.events = append(f.events, event)
+}
+
+func (f *Folder) PopEvents() []Event {
+	events := f.events
+	f.events = []Event{}
+	return events
 }
 
 type FolderHierarchy struct {

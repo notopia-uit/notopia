@@ -54,6 +54,8 @@ func UnmarshalNote(
 		folderID:      folderID,
 		outgoingLinks: outgoingLinks,
 		trashed:       trashed,
+
+		events: []Event{},
 	}
 }
 
@@ -142,10 +144,12 @@ func (n *Note) Restore() {
 	n.trashed = nil
 }
 
-func (n *Note) Events() []Event {
-	return n.events
-}
-
 func (n *Note) AddEvent(event Event) {
 	n.events = append(n.events, event)
+}
+
+func (n *Note) PopEvents() []Event {
+	events := n.events
+	n.events = []Event{}
+	return events
 }

@@ -27,6 +27,8 @@ func NewWorkspace(
 		name:         name,
 		slug:         slug,
 		rootFolderID: rootFolderID,
+
+		event: []Event{},
 	}
 }
 
@@ -58,10 +60,12 @@ func (w *Workspace) Delete() {
 	w.deletedAt = new(time.Now())
 }
 
-func (w *Workspace) Events() []Event {
-	return w.event
-}
-
 func (w *Workspace) AddEvent(event Event) {
 	w.event = append(w.event, event)
+}
+
+func (w *Workspace) PopEvents() []Event {
+	events := w.event
+	w.event = []Event{}
+	return events
 }
