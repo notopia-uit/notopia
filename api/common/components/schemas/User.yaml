@@ -3,27 +3,27 @@ type: object
 
 properties:
   id:
-    type: integer
+    type: string
+    format: number
     description: User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-    minimum: 1
-    example: 10
+    example: '100'
 
   username:
     type: string
     description: Username from Authentik
-    example: johndoe
+    example: user
 
   name:
     type: string
     description: Full name from Authentik
-    example: John Doe
+    example: User
     nullable: true
 
   email:
     type: string
     format: email
     description: Email from Authentik
-    example: john.doe@example.com
+    example: user@notopia.com
     nullable: true
 
 required:

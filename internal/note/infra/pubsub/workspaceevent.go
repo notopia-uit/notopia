@@ -19,6 +19,7 @@ func NewWorkspaceEvent(
 	marshaler cqrs.CommandEventMarshaler,
 	redisClient *RedisClient,
 ) (*pubsub.WorkspaceEvent, error) {
+	topic := "events:workspaces"
 	pubisher, err := redisstream.NewPublisher(redisstream.PublisherConfig{
 		Client:        (*redis.Client)(redisClient),
 		DefaultMaxlen: 10000,
@@ -45,7 +46,7 @@ func NewWorkspaceEvent(
 
 	eventBus, err := cqrs.NewEventBusWithConfig(pubisher, cqrs.EventBusConfig{
 		GeneratePublishTopic: func(params cqrs.GenerateEventPublishTopicParams) (string, error) {
-			return "events:workspaces", nil
+			return topic, nil
 		},
 		Marshaler: marshaler,
 		Logger:    logger,
@@ -58,7 +59,7 @@ func NewWorkspaceEvent(
 		router,
 		cqrs.EventProcessorConfig{
 			GenerateSubscribeTopic: func(params cqrs.EventProcessorGenerateSubscribeTopicParams) (string, error) {
-				return "events:workspaces", nil
+				return topic, nil
 			},
 			SubscriberConstructor: func(params cqrs.EventProcessorSubscriberConstructorParams) (message.Subscriber, error) {
 				return subcriber, nil
@@ -77,6 +78,7 @@ func NewWorkspaceEvent(
 		router,
 		pubisher,
 		subcriber,
+		topic,
 	), nil
 }
 

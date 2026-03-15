@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
 type UserList []string
@@ -33,13 +34,29 @@ type userCtxKey int
 
 const UserCtxKey userCtxKey = iota
 
-func ToContext(ctx context.Context, user *User) context.Context {
+func userToContext(ctx context.Context, user *User) context.Context {
 	return context.WithValue(ctx, UserCtxKey, user)
 }
 
-func FromContext(ctx context.Context) (*User, bool) {
+func UserFromContext(ctx context.Context) (*User, bool) {
 	u, ok := ctx.Value(UserCtxKey).(*User)
 	return u, ok
+}
+
+func NewUserNotFoundInHeaderError() error {
+	return commonerror.NewUnauthorized(
+		"User not found in request headers",
+		"USER_NOT_FOUND_IN_HEADER",
+		nil,
+	)
+}
+
+func UserFromContextError(ctx context.Context) (*User, error) {
+	u, ok := UserFromContext(ctx)
+	if !ok {
+		return nil, NewUserNotFoundInHeaderError()
+	}
+	return u, nil
 }
 
 func GatewayUserAuth() gin.HandlerFunc {
@@ -60,7 +77,7 @@ func GatewayUserAuth() gin.HandlerFunc {
 		c.Set(UserCtxKey, user)
 
 		c.Request = c.Request.WithContext(
-			ToContext(c.Request.Context(), user),
+			userToContext(c.Request.Context(), user),
 		)
 
 		c.Next()

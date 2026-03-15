@@ -43,9 +43,9 @@ pkg/                            # Go packages
 
 ### Frontend
 
-- Ensure using shadcn component as much as possible
-- Use shadcn install in packages/ui
-- Use Tailwind CSS
+- Use shadcn component as much as possible, install in `packages/ui`, the package name is `@notopia-uit/ui`
+  - Example: `shadcn add button -c @notopia-uit/ui`
+- Use Tailwind CSS, try to avoid writing custom css and color
 
 ## Nx
 

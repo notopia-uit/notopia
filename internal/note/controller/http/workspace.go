@@ -3,8 +3,11 @@ package http
 import (
 	"context"
 	"errors"
+	"io"
+	"log/slog"
 
 	"github.com/notopia-uit/notopia/pkg/api/note"
+	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 )
 
 func (h *StrictHandler) CreateWorkspace(
@@ -32,10 +35,47 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	ctx context.Context,
 	request note.GetWorkspaceEventsRequestObject,
 ) (note.GetWorkspaceEventsResponseObject, error) {
-	// h.workspaceEventHub.Subscribe(request.WorkspaceId, request.UserId, nil)
-	// eventChan := make(chan any)
-	// go s.streamFromRedis(request.WorkspaceId, eventChan, ctx)
-	return nil, errors.New("not implemented")
+	user, err := commonhttp.UserFromContextError(ctx)
+	if err != nil {
+		return nil, err
+	}
+	eventCh := make(chan []byte)
+	h.workspaceEventHub.Subscribe(request.WorkspaceId, user.ID, eventCh)
+	r, w := io.Pipe()
+	go func() {
+		defer h.workspaceEventHub.Unsubscribe(request.WorkspaceId, user.ID)
+		defer func() {
+			if err := w.Close(); err != nil {
+				slog.ErrorContext(ctx, "failed to close pipe writer in workspace events stream", slog.String("error", err.Error()))
+			}
+		}()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case event, ok := <-eventCh:
+				if !ok {
+					slog.InfoContext(ctx, "workspace event channel closed")
+					return
+				}
+				if _, err := w.Write([]byte("data: ")); err != nil {
+					slog.ErrorContext(ctx, "failed to write event prefix in workspace events stream", slog.String("error", err.Error()))
+					return
+				}
+				if _, err := w.Write(event); err != nil {
+					slog.ErrorContext(ctx, "failed to write event data in workspace events stream", slog.String("error", err.Error()))
+					return
+				}
+				if _, err := w.Write([]byte("\n\n")); err != nil {
+					slog.ErrorContext(ctx, "failed to write event suffix in workspace events stream", slog.String("error", err.Error()))
+					return
+				}
+			}
+		}
+	}()
+	return note.GetWorkspaceEvents200TexteventStreamResponse{
+		Body: r,
+	}, nil
 }
 
 func (h *StrictHandler) CheckWorkspaceExists(

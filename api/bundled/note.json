@@ -1903,15 +1903,15 @@
         ]
       },
       "User_properties-id": {
-        "type": "integer",
+        "type": "string",
+        "format": "number",
         "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
-        "minimum": 1,
-        "example": 10
+        "example": "100"
       },
       "User_properties-name": {
         "type": "string",
         "description": "Full name from Authentik",
-        "example": "John Doe",
+        "example": "User",
         "nullable": true
       },
       "WorkspaceRole": {

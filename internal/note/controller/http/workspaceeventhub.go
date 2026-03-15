@@ -13,7 +13,7 @@ import (
 
 type (
 	WorkspaceID = uuid.UUID
-	UserID      = uuid.UUID
+	UserID      = string
 )
 
 type WorkspaceEventHub struct {
