@@ -21,7 +21,8 @@ type (
 )
 
 type StrictHandler struct {
-	app *app.App
+	app               *app.App
+	workspaceEventHub *WorkspaceEventHub
 }
 
 func NewStrictHandler(app *app.App) *StrictHandler {

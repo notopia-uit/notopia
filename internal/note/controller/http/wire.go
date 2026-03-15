@@ -6,10 +6,11 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
-	ProvideHandler,
 	Provide,
-	ProvideStrictHandler,
+	ProvideHandler,
 	ProvideHealthManager,
+	ProvideStrictHandler,
+	ProvideWorkspaceEventHub,
 	commonhttp.ProviderSet,
 	wire.Bind(new(IStrictHandler), new(*StrictHandler)),
 )

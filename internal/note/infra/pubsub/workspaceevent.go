@@ -2,6 +2,7 @@ package pubsub
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-redisstream/pkg/redisstream"
@@ -26,8 +27,10 @@ func NewWorkspaceEvent(
 		return nil, fmt.Errorf("failed to create Redis publisher: %w", err)
 	}
 	subcriber, err := redisstream.NewSubscriber(redisstream.SubscriberConfig{
-		Client:        (*redis.Client)(redisClient),
-		ConsumerGroup: "workspace-event-processor",
+		Client:                        (*redis.Client)(redisClient),
+		FanOutOldestId:                "$",
+		DisableIndefiniteInitialBlock: true,
+		BlockTime:                     2 * time.Second,
 	}, logger,
 	)
 	if err != nil {

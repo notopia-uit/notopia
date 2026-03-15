@@ -1,9 +1,13 @@
 package pubsub
 
 import (
+	"context"
+
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/ThreeDotsLabs/watermill/message"
 )
+
+const MetadataWorkspaceIDKey = "workspace_id"
 
 // NOTE: If need to provide these separately, need to create type definition for each
 type WorkspaceEvent struct {
@@ -12,6 +16,7 @@ type WorkspaceEvent struct {
 	router         *message.Router
 	publisher      message.Publisher
 	subcriber      message.Subscriber
+	topic          string
 }
 
 func NewWorkspaceEvent(
@@ -20,6 +25,7 @@ func NewWorkspaceEvent(
 	router *message.Router,
 	publisher message.Publisher,
 	subscriber message.Subscriber,
+	topic string,
 ) *WorkspaceEvent {
 	return &WorkspaceEvent{
 		eventBus:       eventBus,
@@ -27,6 +33,7 @@ func NewWorkspaceEvent(
 		router:         router,
 		publisher:      publisher,
 		subcriber:      subscriber,
+		topic:          topic,
 	}
 }
 
@@ -48,4 +55,8 @@ func (w *WorkspaceEvent) Publisher() message.Publisher {
 
 func (w *WorkspaceEvent) Subscriber() message.Subscriber {
 	return w.subcriber
+}
+
+func (w *WorkspaceEvent) Subcribe(ctx context.Context) (<-chan *message.Message, error) {
+	return w.subcriber.Subscribe(ctx, w.topic)
 }

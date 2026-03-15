@@ -32,6 +32,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	ctx context.Context,
 	request note.GetWorkspaceEventsRequestObject,
 ) (note.GetWorkspaceEventsResponseObject, error) {
+	// h.workspaceEventHub.Subscribe(request.WorkspaceId, request.UserId, nil)
 	// eventChan := make(chan any)
 	// go s.streamFromRedis(request.WorkspaceId, eventChan, ctx)
 	return nil, errors.New("not implemented")
