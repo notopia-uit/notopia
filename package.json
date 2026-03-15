@@ -15,7 +15,7 @@
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
     "uuid": "13.0.0",
-    "yjs": "13.6.29"
+    "yjs": "13.6.30"
   },
   "devDependencies": {
     "@nestjs/schematics": "catalog:",
