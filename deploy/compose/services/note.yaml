@@ -18,5 +18,11 @@ services:
         - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
     restart: unless-stopped
 
+  note_redis:
+    container_name: notopia-note_redis
+    image: redis:8.4.0-alpine3.22
+    ports:
+      - 6373:6379
+
 volumes:
   note_postgresql_data:

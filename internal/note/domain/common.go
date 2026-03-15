@@ -1,5 +1,9 @@
 package domain
 
+import "time"
+
+type Event any
+
 type TrashedBy string
 
 var (
@@ -10,4 +14,16 @@ var (
 
 func (t TrashedBy) String() string {
 	return string(t)
+}
+
+type Trashed struct {
+	by TrashedBy
+	at time.Time
+}
+
+func NewTrashed(by TrashedBy, at time.Time) *Trashed {
+	return &Trashed{
+		by: by,
+		at: at,
+	}
 }

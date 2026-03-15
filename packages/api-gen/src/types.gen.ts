@@ -165,7 +165,7 @@ export type NoteGraph = {
          */
         id: string;
         /**
-         * Can be either a note name or a hashtag prefixed tag name (duplicate with id)
+         * Can be either a note name or a tag name (no hashtag prefix)
          */
         name: string;
         type: 'note' | 'tag';
@@ -299,33 +299,6 @@ export type NoteTrashedFolder = {
     readonly name: string;
     trashedBy: NoteTrashedBy;
     readonly trashedAt: string;
-};
-
-export type NotePagination = {
-    /**
-     * Current page number
-     */
-    page: number;
-    /**
-     * Number of items per page
-     */
-    limit: number;
-    /**
-     * Total number of items
-     */
-    total: number;
-    /**
-     * Total number of pages
-     */
-    totalPages: number;
-    /**
-     * Whether there is a next page
-     */
-    hasNext: boolean;
-    /**
-     * Whether there is a previous page
-     */
-    hasPrev: boolean;
 };
 
 export type NotePropertiesIcon = string | null;
@@ -1760,11 +1733,8 @@ export type ShowTrashResponses = {
      * Trash
      */
     200: {
-        data: {
-            notes?: Array<NoteTrashedNote>;
-            folders?: Array<NoteTrashedFolder>;
-        };
-        pagination: NotePagination;
+        notes: Array<NoteTrashedNote>;
+        folders: Array<NoteTrashedFolder>;
     };
 };
 

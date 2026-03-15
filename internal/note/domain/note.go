@@ -14,8 +14,9 @@ type Note struct {
 	size          uint
 	folderID      uuid.UUID
 	outgoingLinks uuid.UUIDs
-	trashedBy     *TrashedBy
-	trashedAt     *time.Time
+	trashed       *Trashed
+
+	events []Event
 }
 
 func NewNote(
@@ -42,8 +43,7 @@ func UnmarshalNote(
 	size uint,
 	folderID uuid.UUID,
 	outgoingLinks uuid.UUIDs,
-	trashedBy *TrashedBy,
-	trashedAt *time.Time,
+	trashed *Trashed,
 ) *Note {
 	return &Note{
 		id:            id,
@@ -53,8 +53,7 @@ func UnmarshalNote(
 		size:          size,
 		folderID:      folderID,
 		outgoingLinks: outgoingLinks,
-		trashedBy:     trashedBy,
-		trashedAt:     trashedAt,
+		trashed:       trashed,
 	}
 }
 
@@ -110,22 +109,43 @@ func (n *Note) SetOutgoingLinks(outgoingLinks uuid.UUIDs) {
 	n.outgoingLinks = outgoingLinks
 }
 
-func (n *Note) TrashedBy() *TrashedBy {
-	return n.trashedBy
+func (n *Note) IsTrashed() bool {
+	return n.trashed != nil
 }
 
-func (n *Note) TrashByString() *string {
-	if n.trashedBy == nil {
+func (n *Note) TrashedBy() *TrashedBy {
+	if n.trashed == nil {
 		return nil
 	}
-	return new(n.trashedBy.String())
+	return &n.trashed.by
+}
+
+func (n *Note) TrashedByString() *string {
+	if n.trashed == nil {
+		return nil
+	}
+	return new(n.trashed.by.String())
 }
 
 func (n *Note) TrashedAt() *time.Time {
-	return n.trashedAt
+	if n.trashed == nil {
+		return nil
+	}
+	return &n.trashed.at
 }
 
 func (n *Note) Trash(trashedBy TrashedBy) {
-	n.trashedBy = &trashedBy
-	n.trashedAt = new(time.Now())
+	n.trashed = NewTrashed(trashedBy, time.Now())
+}
+
+func (n *Note) Restore() {
+	n.trashed = nil
+}
+
+func (n *Note) Events() []Event {
+	return n.events
+}
+
+func (n *Note) AddEvent(event Event) {
+	n.events = append(n.events, event)
 }

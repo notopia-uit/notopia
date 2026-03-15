@@ -16,22 +16,17 @@ get:
           schema:
             type: object
             properties:
-              data:
-                type: object
-                properties:
-                  notes:
-                    type: array
-                    items:
-                      $ref: ../components/schemas/TrashedNote.yaml
-                  folders:
-                    type: array
-                    items:
-                      $ref: ../components/schemas/TrashedFolder.yaml
-              pagination:
-                $ref: ../../common/components/schemas/Pagination.yaml
+              notes:
+                type: array
+                items:
+                  $ref: ../components/schemas/TrashedNote.yaml
+              folders:
+                type: array
+                items:
+                  $ref: ../components/schemas/TrashedFolder.yaml
             required:
-              - data
-              - pagination
+              - notes
+              - folders
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

@@ -12,6 +12,8 @@ type Workspace struct {
 	slug         string
 	rootFolderID uuid.UUID
 	deletedAt    *time.Time
+
+	event []Event
 }
 
 func NewWorkspace(
@@ -54,4 +56,12 @@ func (w *Workspace) DeletedAt() *time.Time {
 
 func (w *Workspace) Delete() {
 	w.deletedAt = new(time.Now())
+}
+
+func (w *Workspace) Events() []Event {
+	return w.event
+}
+
+func (w *Workspace) AddEvent(event Event) {
+	w.event = append(w.event, event)
 }

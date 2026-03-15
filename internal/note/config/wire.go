@@ -14,5 +14,6 @@ var ProviderSet = wire.NewSet(
 		"Log",
 		"Server",
 		"Kafka",
+		"Redis",
 	),
 )

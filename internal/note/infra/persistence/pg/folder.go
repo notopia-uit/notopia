@@ -86,13 +86,19 @@ func (f *Folder) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) err
 }
 
 func folderToDomain(folder *pgsqlc.Folder) *domain.Folder {
+	var trashed *domain.Trashed
+	if folder.TrashedBy != nil && folder.TrashedAt != nil {
+		trashed = domain.NewTrashed(
+			domain.TrashedBy(*folder.TrashedBy),
+			*folder.TrashedAt,
+		)
+	}
 	return domain.UnmarshalFolder(
 		folder.ID,
 		folder.Name,
 		folder.Icon,
 		folder.WorkspaceID,
 		*domain.NewFolderHierarchy(folder.ParentID),
-		(*domain.TrashedBy)(folder.TrashedBy),
-		folder.TrashedAt,
+		trashed,
 	)
 }

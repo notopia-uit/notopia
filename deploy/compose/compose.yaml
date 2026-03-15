@@ -6,7 +6,6 @@ include:
   - ./infrastructure/authorization.yaml
   - ./infrastructure/dbgate.yaml
   - ./infrastructure/meilisearch.yaml
-  - ./infrastructure/redis_pub_sub.yaml
   - ./infrastructure/redpanda.yaml
   - ./infrastructure/rustfs.yaml
   - ./infrastructure/traefik.yaml

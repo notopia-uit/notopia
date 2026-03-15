@@ -1215,30 +1215,22 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "notes": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/TrashedNote"
-                          }
-                        },
-                        "folders": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/TrashedFolder"
-                          }
-                        }
+                    "notes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TrashedNote"
                       }
                     },
-                    "pagination": {
-                      "$ref": "#/components/schemas/Pagination"
+                    "folders": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TrashedFolder"
+                      }
                     }
                   },
                   "required": [
-                    "data",
-                    "pagination"
+                    "notes",
+                    "folders"
                   ]
                 }
               }
@@ -1635,13 +1627,12 @@
               "properties": {
                 "id": {
                   "type": "string",
-                  "format": "uuid",
                   "description": "Can be either a note ID or a hashtag prefixed tag name",
                   "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
                 },
                 "name": {
                   "type": "string",
-                  "description": "Can be either a note name or a hashtag prefixed tag name (duplicate with id)",
+                  "description": "Can be either a note name or a tag name (no hashtag prefix)",
                   "example": "Meeting Notes"
                 },
                 "type": {
@@ -2077,54 +2068,6 @@
           "name",
           "trashedBy",
           "trashedAt"
-        ]
-      },
-      "Pagination": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "integer",
-            "description": "Current page number",
-            "minimum": 1,
-            "example": 1
-          },
-          "limit": {
-            "type": "integer",
-            "description": "Number of items per page",
-            "minimum": 1,
-            "maximum": 100,
-            "example": 20
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total number of items",
-            "minimum": 0,
-            "example": 100
-          },
-          "totalPages": {
-            "type": "integer",
-            "description": "Total number of pages",
-            "minimum": 0,
-            "example": 5
-          },
-          "hasNext": {
-            "type": "boolean",
-            "description": "Whether there is a next page",
-            "example": true
-          },
-          "hasPrev": {
-            "type": "boolean",
-            "description": "Whether there is a previous page",
-            "example": false
-          }
-        },
-        "required": [
-          "page",
-          "limit",
-          "total",
-          "totalPages",
-          "hasNext",
-          "hasPrev"
         ]
       },
       "properties-icon": {

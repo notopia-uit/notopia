@@ -9,12 +9,11 @@ properties:
       properties:
         id:
           type: string
-          format: uuid
           description: Can be either a note ID or a hashtag prefixed tag name
           example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
         name:
           type: string
-          description: Can be either a note name or a hashtag prefixed tag name (duplicate with id)
+          description: Can be either a note name or a tag name (no hashtag prefix)
           example: Meeting Notes
         type:
           type: string

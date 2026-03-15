@@ -12,8 +12,9 @@ type Folder struct {
 	icon            *string
 	workspaceID     uuid.UUID
 	folderHierarchy FolderHierarchy
-	trashedBy       *TrashedBy
-	trashedAt       *time.Time
+	trashed         *Trashed
+
+	events []Event
 }
 
 func NewFolder(
@@ -38,8 +39,7 @@ func UnmarshalFolder(
 	icon *string,
 	workspaceID uuid.UUID,
 	folderHierarchy FolderHierarchy,
-	trashedBy *TrashedBy,
-	trashedAt *time.Time,
+	trashed *Trashed,
 ) *Folder {
 	return &Folder{
 		id:              id,
@@ -47,8 +47,7 @@ func UnmarshalFolder(
 		icon:            icon,
 		workspaceID:     workspaceID,
 		folderHierarchy: folderHierarchy,
-		trashedBy:       trashedBy,
-		trashedAt:       trashedAt,
+		trashed:         trashed,
 	}
 }
 
@@ -93,24 +92,45 @@ func (f *Folder) MoveToFolder(folderID uuid.UUID) {
 	f.folderHierarchy = *hierarchy
 }
 
+func (f *Folder) IsTrashed() bool {
+	return f.trashed != nil
+}
+
 func (f *Folder) TrashedBy() *TrashedBy {
-	return f.trashedBy
+	if f.trashed == nil {
+		return nil
+	}
+	return &f.trashed.by
 }
 
 func (f *Folder) TrashedByString() *string {
-	if f.trashedBy == nil {
+	if f.trashed == nil {
 		return nil
 	}
-	return new(f.trashedBy.String())
+	return new(f.trashed.by.String())
 }
 
 func (f *Folder) TrashedAt() *time.Time {
-	return f.trashedAt
+	if f.trashed == nil {
+		return nil
+	}
+	return &f.trashed.at
 }
 
 func (f *Folder) Trash(trashedBy TrashedBy) {
-	f.trashedBy = &trashedBy
-	f.trashedAt = new(time.Now())
+	f.trashed = NewTrashed(trashedBy, time.Now())
+}
+
+func (f *Folder) Restore() {
+	f.trashed = nil
+}
+
+func (f *Folder) Events() []Event {
+	return f.events
+}
+
+func (f *Folder) AddEvent(event Event) {
+	f.events = append(f.events, event)
 }
 
 type FolderHierarchy struct {

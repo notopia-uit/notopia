@@ -119,7 +119,7 @@ export const zNoteNotePropertiesId = z.uuid().readonly();
 
 export const zNoteGraph = z.object({
     nodes: z.array(z.object({
-        id: z.uuid(),
+        id: z.string(),
         name: z.string(),
         type: z.enum(['note', 'tag']),
         weight: z.number().gte(0).lte(1).optional()
@@ -239,15 +239,6 @@ export const zNoteTrashedFolder = z.object({
     name: z.string().min(1).max(255).readonly(),
     trashedBy: zNoteTrashedBy,
     trashedAt: z.iso.datetime().readonly()
-});
-
-export const zNotePagination = z.object({
-    page: z.int().gte(1),
-    limit: z.int().gte(1).lte(100),
-    total: z.int().gte(0),
-    totalPages: z.int().gte(0),
-    hasNext: z.boolean(),
-    hasPrev: z.boolean()
 });
 
 export const zNotePropertiesIcon = z.string().nullable();
@@ -844,11 +835,8 @@ export const zShowTrashData = z.object({
  * Trash
  */
 export const zShowTrashResponse = z.object({
-    data: z.object({
-        notes: z.array(zNoteTrashedNote).optional(),
-        folders: z.array(zNoteTrashedFolder).optional()
-    }),
-    pagination: zNotePagination
+    notes: z.array(zNoteTrashedNote),
+    folders: z.array(zNoteTrashedFolder)
 });
 
 export const zTrashWorkspaceItemsData = z.object({

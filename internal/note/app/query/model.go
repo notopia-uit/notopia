@@ -21,6 +21,11 @@ type Pagination struct {
 	hasPrev    bool
 }
 
+type Paginated[T any] struct {
+	Data       []T
+	Pagination Pagination
+}
+
 type Note struct {
 	Id                 uuid.UUID
 	Name               string
@@ -32,11 +37,6 @@ type Note struct {
 	UpdatedAt          time.Time
 }
 
-type NotePaginated struct {
-	Data       []Note
-	Pagination Pagination
-}
-
 type Folder struct {
 	Id          uuid.UUID
 	Name        string
@@ -44,30 +44,6 @@ type Folder struct {
 	UpdatedAt   time.Time
 	ParentId    uuid.UUID
 	WorkspaceId uuid.UUID
-}
-
-type FolderCreatedEventData struct {
-	Id   uuid.UUID
-	Name string
-}
-
-type FolderCreatedEvent struct {
-	Type string
-	Data FolderCreatedEventData
-}
-
-type FolderDeletedEventData struct {
-	Id uuid.UUID
-}
-
-type FolderDeletedEvent struct {
-	Type string
-	Data FolderDeletedEventData
-}
-
-type FolderUpdatedEvent struct {
-	Type string
-	Data Folder
 }
 
 type GraphNode struct {
@@ -87,25 +63,6 @@ type Graph struct {
 	Links []GraphLink
 }
 
-type NoteCreatedEventData struct {
-	Id   uuid.UUID
-	Name string
-}
-
-type NoteCreatedEvent struct {
-	Type string
-	Data NoteCreatedEventData
-}
-
-type NoteDeletedEventData struct {
-	Id uuid.UUID
-}
-
-type NoteDeletedEvent struct {
-	Type string
-	Data NoteDeletedEventData
-}
-
 type NoteLink struct {
 	Id   uuid.UUID
 	Name string
@@ -115,11 +72,6 @@ type NoteLink struct {
 type NoteLinkResult struct {
 	OutgoingLinks []NoteLink
 	Backlinks     []NoteLink
-}
-
-type NoteUpdatedEvent struct {
-	Type string
-	Data Note
 }
 
 type Workspace struct {
@@ -142,16 +94,6 @@ type WorkspaceMember struct {
 	Role     WorkspaceRole
 }
 
-type WorkspaceMembersUpdatedEventData struct {
-	Id      uuid.UUID
-	Members []WorkspaceMember
-}
-
-type WorkspaceMembersUpdatedEvent struct {
-	Type string
-	Data WorkspaceMembersUpdatedEventData
-}
-
 type WorkspaceTreeNote struct {
 	Id        uuid.UUID
 	Name      string
@@ -168,11 +110,6 @@ type WorkspaceTreeFolder struct {
 	UpdatedAt time.Time
 }
 
-type WorkspaceUpdatedEvent struct {
-	Type string
-	Data Workspace
-}
-
 type TrashedFolder struct {
 	Id        uuid.UUID
 	Name      string
@@ -187,16 +124,16 @@ type TrashedNote struct {
 	TrashedAt time.Time
 }
 
-type TrashData struct {
+type Trash struct {
 	Notes   []TrashedNote
 	Folders []TrashedFolder
 }
 
-type Trash struct {
-	Data       TrashData
-	Pagination Pagination
-}
-
 type CheckWorkspaceExistsResult struct {
 	Exists bool
+}
+
+type WorkspaceMembersUpdatedEvent struct {
+	Id      uuid.UUID
+	Members []WorkspaceMember
 }

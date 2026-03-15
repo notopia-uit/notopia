@@ -263,9 +263,9 @@ type Graph struct {
 	} `json:"links"`
 	Nodes []struct {
 		// Id Can be either a note ID or a hashtag prefixed tag name
-		Id openapi_types.UUID `json:"id"`
+		Id string `json:"id"`
 
-		// Name Can be either a note name or a hashtag prefixed tag name (duplicate with id)
+		// Name Can be either a note name or a tag name (no hashtag prefix)
 		Name string         `json:"name"`
 		Type GraphNodesType `json:"type"`
 
@@ -330,27 +330,6 @@ type NoteUpdatedEventType string
 
 // NotePropertiesId defines model for Note_properties-id.
 type NotePropertiesId = openapi_types.UUID
-
-// Pagination defines model for Pagination.
-type Pagination struct {
-	// HasNext Whether there is a next page
-	HasNext bool `json:"hasNext"`
-
-	// HasPrev Whether there is a previous page
-	HasPrev bool `json:"hasPrev"`
-
-	// Limit Number of items per page
-	Limit int `json:"limit"`
-
-	// Page Current page number
-	Page int `json:"page"`
-
-	// Total Total number of items
-	Total int `json:"total"`
-
-	// TotalPages Total number of pages
-	TotalPages int `json:"totalPages"`
-}
 
 // TrashedBy defines model for TrashedBy.
 type TrashedBy string
@@ -2848,11 +2827,8 @@ type ShowTrashResponseObject interface {
 }
 
 type ShowTrash200JSONResponse struct {
-	Data struct {
-		Folders *[]TrashedFolder `json:"folders,omitempty"`
-		Notes   *[]TrashedNote   `json:"notes,omitempty"`
-	} `json:"data"`
-	Pagination Pagination `json:"pagination"`
+	Folders []TrashedFolder `json:"folders"`
+	Notes   []TrashedNote   `json:"notes"`
 }
 
 func (response ShowTrash200JSONResponse) VisitShowTrashResponse(w http.ResponseWriter) error {

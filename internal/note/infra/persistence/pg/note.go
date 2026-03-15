@@ -50,7 +50,7 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 		Size:      int32(note.Size()),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		TrashedBy: note.TrashByString(),
+		TrashedBy: note.TrashedByString(),
 		TrashedAt: note.TrashedAt(),
 	})
 	if err != nil {
@@ -100,6 +100,13 @@ func (n *Note) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
 }
 
 func noteToDomain(note *pgsqlc.Note, outgoingLinks uuid.UUIDs) *domain.Note {
+	var trashed *domain.Trashed
+	if note.TrashedBy != nil && note.TrashedAt != nil {
+		trashed = domain.NewTrashed(
+			domain.TrashedBy(*note.TrashedBy),
+			*note.TrashedAt,
+		)
+	}
 	return domain.UnmarshalNote(
 		note.ID,
 		note.Name,
@@ -108,7 +115,6 @@ func noteToDomain(note *pgsqlc.Note, outgoingLinks uuid.UUIDs) *domain.Note {
 		uint(note.Size),
 		note.FolderID,
 		outgoingLinks,
-		(*domain.TrashedBy)(note.TrashedBy),
-		note.TrashedAt,
+		trashed,
 	)
 }
