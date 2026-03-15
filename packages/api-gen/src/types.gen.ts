@@ -57,7 +57,7 @@ export type ShareNote = {
 /**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
-export type ShareUserPropertiesId = number;
+export type ShareUserPropertiesId = string;
 
 export type DocumentError = {
     /**
@@ -247,7 +247,7 @@ export type NoteNoteUpdatedEvent = {
 /**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
-export type NoteUserPropertiesId = number;
+export type NoteUserPropertiesId = string;
 
 /**
  * Full name from Authentik

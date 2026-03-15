@@ -48,7 +48,7 @@ export const zShareNoteUpdatedEvent = zShareNote;
 /**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
-export const zShareUserPropertiesId = z.int().gte(1);
+export const zShareUserPropertiesId = z.string();
 
 export const zShareUserDeletedEvent = z.object({
     id: zShareUserPropertiesId
@@ -191,7 +191,7 @@ export const zNoteNoteUpdatedEvent = z.object({
 /**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
-export const zNoteUserPropertiesId = z.int().gte(1);
+export const zNoteUserPropertiesId = z.string();
 
 /**
  * Full name from Authentik
