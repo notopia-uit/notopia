@@ -11,12 +11,14 @@ import (
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	pubsub2 "github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
+	"github.com/notopia-uit/notopia/internal/note/infra/pubsub"
 	"github.com/notopia-uit/notopia/pkg/common/http"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
@@ -85,12 +87,34 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	healthManager := http.NewHealthManager(persistencePg)
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, healthManager)
-	appApp := app.NewApp()
-	strictHandler := http.NewStrictHandler(appApp)
+	appApp := &app.App{}
+	loggerAdapter := pubsub.NewWatermillLogger(logger)
+	commandEventMarshaler := pubsub.NewIntegrationMarshaler()
+	redis := &configConfig.Redis
+	redisClient, cleanup5 := pubsub.NewRedisClient(ctx, redis, logger)
+	workspaceEventInternalPubSub, err := pubsub.NewWorkspaceEventInternalPubSub(loggerAdapter, commandEventMarshaler, redisClient)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	workspaceEventHubPubSub := pubsub.NewWorkspaceEventHubPubSub(loggerAdapter)
+	workspaceEvent := &pubsub2.WorkspaceEvent{
+		InternalPubSub: workspaceEventInternalPubSub,
+		HubPubSub:      workspaceEventHubPubSub,
+	}
+	strictHandler := &http.StrictHandler{
+		app:                  appApp,
+		workspaceEventPubSub: workspaceEvent,
+	}
 	serverInterface := http.NewHandler(strictHandler)
 	server := &configConfig.Server
-	httpServer, cleanup5, err := http.New(ctx, engine, serverInterface, server, logger)
+	httpServer, cleanup6, err := http.New(ctx, engine, serverInterface, server, logger)
 	if err != nil {
+		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
@@ -98,8 +122,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	handler := grpc.NewHandler(appApp)
-	grpcServer, cleanup6, err := grpc.New(ctx, handler, server, tracerProvider, meterProvider, logger)
+	grpcServer, cleanup7, err := grpc.New(ctx, handler, server, tracerProvider, meterProvider, logger)
 	if err != nil {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -109,6 +134,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	noteServer := note.NewServer(httpServer, grpcServer, healthManager, persistencePg, logger)
 	return noteServer, func() {
+		cleanup7()
 		cleanup6()
 		cleanup5()
 		cleanup4()

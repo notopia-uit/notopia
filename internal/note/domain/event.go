@@ -17,6 +17,10 @@ var (
 	WorkspaceEventTypeWorkspaceUpdated WorkspaceEventType = "WorkspaceUpdatedEvent"
 )
 
+func (t WorkspaceEventType) String() string {
+	return string(t)
+}
+
 type WorkspaceEvent interface {
 	EventType() WorkspaceEventType
 }

@@ -2,13 +2,13 @@ package http
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"log/slog"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
@@ -77,11 +77,21 @@ func (h *StrictHandler) GetWorkspaceEvents(
 					slog.InfoContext(c, "workspace event channel closed")
 					return
 				}
+				dto, ok := workspaceEventToDTO(event)
+				if !ok {
+					slog.WarnContext(c, "skipping unsupported workspace event type in workspace events stream", slog.String("event_type", event.EventType().String()))
+					continue
+				}
+				eventBytes, err := json.Marshal(dto)
+				if err != nil {
+					slog.ErrorContext(c, "failed to marshal event to JSON", slog.String("error", err.Error()))
+					continue
+				}
 				if _, err := w.Write([]byte("data: ")); err != nil {
 					slog.ErrorContext(c, "failed to write event prefix in workspace events stream", slog.String("error", err.Error()))
 					return
 				}
-				if _, err := w.Write(event); err != nil {
+				if _, err := w.Write(eventBytes); err != nil {
 					slog.ErrorContext(c, "failed to write event data in workspace events stream", slog.String("error", err.Error()))
 					return
 				}
@@ -96,11 +106,6 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	return note.GetWorkspaceEvents200TexteventStreamResponse{
 		Body: r,
 	}, nil
-}
-
-func workspaceEventToDTO(event domain.WorkspaceEvent) any {
-	switch event.(type) {
-	}
 }
 
 func (h *StrictHandler) CheckWorkspaceExists(

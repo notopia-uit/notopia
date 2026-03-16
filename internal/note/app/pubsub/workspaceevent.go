@@ -54,18 +54,18 @@ func NewWorkspaceEventHubPubSub(
 }
 
 type WorkspaceEvent struct {
-	internalPubSub *WorkspaceEventInternalPubSub
-	hubPubSub      *WorkspaceEventHubPubSub
+	InternalPubSub *WorkspaceEventInternalPubSub
+	HubPubSub      *WorkspaceEventHubPubSub
 }
 
 func (w *WorkspaceEvent) Setup() {
-	w.internalPubSub.Router.AddConsumerHandler(
+	w.InternalPubSub.Router.AddConsumerHandler(
 		"handler",
-		w.internalPubSub.Topic,
-		w.internalPubSub.Subcriber,
+		w.InternalPubSub.Topic,
+		w.InternalPubSub.Subcriber,
 		func(msg *message.Message) error {
 			workspaceID := msg.Metadata.Get(MetadataWorkspaceIDKey)
-			return w.hubPubSub.PubSub.Publish(workspaceID, msg)
+			return w.HubPubSub.PubSub.Publish(workspaceID, msg)
 		},
 	)
 }
@@ -80,7 +80,7 @@ func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, use
 	msg.Metadata.Set(MetadataUserIDKey, userID)
 	msg.Metadata.Set(MetadataEventTypeKey, string(event.EventType()))
 	msg.SetContext(ctx)
-	return w.internalPubSub.Publisher.Publish(w.internalPubSub.Topic, msg)
+	return w.InternalPubSub.Publisher.Publish(w.InternalPubSub.Topic, msg)
 }
 
 func (w *WorkspaceEvent) Subscribe(
@@ -90,7 +90,7 @@ func (w *WorkspaceEvent) Subscribe(
 ) (<-chan domain.WorkspaceEvent, error) {
 	eventCh := make(chan domain.WorkspaceEvent, 10)
 
-	msgCh, err := w.hubPubSub.PubSub.Subscribe(ctx, workspaceID.String())
+	msgCh, err := w.HubPubSub.PubSub.Subscribe(ctx, workspaceID.String())
 	if err != nil {
 		return nil, fmt.Errorf("failed to subscribe to workspace events: %w", err)
 	}
@@ -141,25 +141,25 @@ func (w *WorkspaceEvent) Subscribe(
 }
 
 func (w *WorkspaceEvent) Run(ctx context.Context) error {
-	return w.internalPubSub.Router.Run(ctx)
+	return w.InternalPubSub.Router.Run(ctx)
 }
 
 func (w *WorkspaceEvent) Close() error {
 	var errs []error
 
-	if err := w.internalPubSub.Router.Close(); err != nil {
+	if err := w.InternalPubSub.Router.Close(); err != nil {
 		errs = append(errs, err)
 	}
 
-	if err := w.internalPubSub.Publisher.Close(); err != nil {
+	if err := w.InternalPubSub.Publisher.Close(); err != nil {
 		errs = append(errs, err)
 	}
 
-	if err := w.internalPubSub.Subcriber.Close(); err != nil {
+	if err := w.InternalPubSub.Subcriber.Close(); err != nil {
 		errs = append(errs, err)
 	}
 
-	if err := w.hubPubSub.PubSub.Close(); err != nil {
+	if err := w.HubPubSub.PubSub.Close(); err != nil {
 		errs = append(errs, err)
 	}
 
