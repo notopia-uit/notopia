@@ -1,0 +1,130 @@
+@startuml Document
+title Document
+
+!$rosewater = "#dc8a78"
+!$flamingo  = "#dd7878"
+!$pink      = "#ea76cb"
+!$mauve     = "#8839ef"
+!$red       = "#d20f39"
+!$maroon    = "#e64553"
+!$peach     = "#fe640b"
+!$yellow    = "#df8e1d"
+!$green     = "#40a02b"
+!$teal      = "#179299"
+!$sky       = "#04a5e5"
+!$sapphire  = "#209fb5"
+!$lavender  = "#7287fd"
+!$blue      = "#1e66f5"
+!$text      = "#4c4f69"
+!$subtext1  = "#5c5f77"
+!$subtext0  = "#6c6f85"
+!$overlay2  = "#7c7f93"
+!$overlay1  = "#8c8fa1"
+!$overlay0  = "#9ca0b0"
+!$surface2  = "#acb0be"
+!$surface1  = "#bcc0cc"
+!$surface0  = "#ccd0da"
+!$base      = "#eff1f5"
+!$mantle    = "#e6e9ef"
+!$crust     = "#dce0e8"
+
+skinparam backgroundColor $base
+skinparam defaultFontColor $text
+skinparam roundcorner 16
+skinparam classFontStyle bold
+skinparam ArrowColor $subtext0
+skinparam packageStyle rectangle
+
+skinparam package {
+    BackgroundColor $mantle
+    BorderColor $surface1
+    FontColor $mauve
+}
+
+skinparam class {
+    BackgroundColor $base
+    BorderColor $surface1
+    HeaderBackgroundColor $surface0
+    AttributeFontColor $text
+}
+
+!define RepoInterface(name) interface "name" as Document.name <<(I, $pink) Repo Interface>>
+!define Service(name) class "name" as Document.name <<(C, $rosewater) Service>>
+!define Entity(name) class "name" as Document.name <<(C, $sky) Entity>>
+!define Type(name) class "name" as Document.name <<(T, $flamingo) Type>>
+!define Model(name) class "name" as Document.name <<(C, $yellow) Model>>
+
+package "Document" as Document <<Frame>> {
+    Entity(DocumentEntity) {
+        id: string
+        data: Buffer
+    }
+
+    Entity(RevisionEntity) {
+        id: string
+        name: string?
+        data: Buffer
+        documentId: string
+        createdAt: Date
+    }
+
+    Model(DocumentModel) {
+        id: string
+        content: @blocknote/core.Block[]
+    }
+
+    Model(RevisionModel) {
+        id: string
+        name: string?
+        content: @blocknote/core.Block[]
+        documentId: string
+        createdAt: Date
+    }
+
+    Type(AttachmentUploadUrl) {
+        id: string
+        url: string
+    }
+
+    Type(TagModel) {
+        id: string
+        name: string
+    }
+
+    RepoInterface(DocumentRepository) {
+        Save(document: DocumentEntity)
+        GetById(documentId: string): DocumentEntity
+    }
+
+    RepoInterface(RevisionRepository) {
+        Save(revision: RevisionEntity)
+        GetById(revisionId: string): RevisionEntity
+        GetByDocumentId(documentId: string): RevisionEntity[]
+    }
+
+    Service(DocumentService) {
+        documentRepository: DocumentRepository
+        blockNoteEditor: BlockNoteEditor
+        attachmentService: AttachmentService
+
+        extractTags(): TagModel[]
+        extractOutgoingLinkIds(): string[]
+        CreateDocument(name: string, data: Buffer): DocumentEntity
+        GetDocument(documentId: string): DocumentEntity
+        GetAttachmentUploadUrl(): AttachmentUploadUrl
+    }
+
+    Service(RevisionService) {
+        revisionRepository: RevisionRepository
+
+        GetRevision(revisionId: string): RevisionModel
+        GetRevisionsByDocumentId(documentId: string): RevisionModel[]
+    }
+
+    Document.DocumentService ..> Document.DocumentRepository : uses
+    Document.RevisionService ..> Document.RevisionRepository : uses
+    Document.DocumentRepository ..> Document.DocumentEntity : manages
+    Document.RevisionRepository ..> Document.RevisionEntity : manages
+}
+
+@enduml
