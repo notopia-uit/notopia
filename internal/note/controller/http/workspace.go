@@ -7,7 +7,9 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/notopia-uit/notopia/pkg/api/note"
+	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 )
 
@@ -36,7 +38,11 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	ctx context.Context,
 	request note.GetWorkspaceEventsRequestObject,
 ) (note.GetWorkspaceEventsResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
+	c, ok := ctx.(*gin.Context)
+	if !ok {
+		return nil, commonerror.NewInternal("failed to cast context to gin.Context", "", nil)
+	}
+	user, err := commonhttp.UserFromContextError(c)
 	if err != nil {
 		return nil, err
 	}
@@ -50,36 +56,38 @@ func (h *StrictHandler) GetWorkspaceEvents(
 		defer h.workspaceEventHub.Unsubscribe(request.WorkspaceId, user.ID)
 		defer func() {
 			if err := w.Close(); err != nil {
-				slog.ErrorContext(ctx, "failed to close pipe writer in workspace events stream", slog.String("error", err.Error()))
+				slog.ErrorContext(c, "failed to close pipe writer in workspace events stream", slog.String("error", err.Error()))
 			}
 		}()
 		for {
 			select {
-			case <-ctx.Done():
+			case <-c.Done():
 				return
 			case <-ticker.C:
 				if _, err := w.Write([]byte("heartbeat: keep-alive\n\n")); err != nil {
-					slog.ErrorContext(ctx, "failed to write keep-alive comment in workspace events stream", slog.String("error", err.Error()))
+					slog.ErrorContext(c, "failed to write keep-alive comment in workspace events stream", slog.String("error", err.Error()))
 					return
 				}
-				slog.DebugContext(ctx, "sent keep-alive comment in workspace events stream")
+				c.Writer.Flush()
+				slog.DebugContext(c, "sent keep-alive comment in workspace events stream")
 			case event, ok := <-eventCh:
 				if !ok {
-					slog.InfoContext(ctx, "workspace event channel closed")
+					slog.InfoContext(c, "workspace event channel closed")
 					return
 				}
 				if _, err := w.Write([]byte("data: ")); err != nil {
-					slog.ErrorContext(ctx, "failed to write event prefix in workspace events stream", slog.String("error", err.Error()))
+					slog.ErrorContext(c, "failed to write event prefix in workspace events stream", slog.String("error", err.Error()))
 					return
 				}
 				if _, err := w.Write(event); err != nil {
-					slog.ErrorContext(ctx, "failed to write event data in workspace events stream", slog.String("error", err.Error()))
+					slog.ErrorContext(c, "failed to write event data in workspace events stream", slog.String("error", err.Error()))
 					return
 				}
 				if _, err := w.Write([]byte("\n\n")); err != nil {
-					slog.ErrorContext(ctx, "failed to write event suffix in workspace events stream", slog.String("error", err.Error()))
+					slog.ErrorContext(c, "failed to write event suffix in workspace events stream", slog.String("error", err.Error()))
 					return
 				}
+				c.Writer.Flush()
 			}
 		}
 	}()
