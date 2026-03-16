@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
@@ -49,11 +50,12 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
 
-	eventCh := make(chan []byte)
-	h.workspaceEventHub.Subscribe(request.WorkspaceId, user.ID, eventCh)
+	eventCh, err := h.workspaceEventPubSub.Subscribe(ctx, request.WorkspaceId, user.ID)
+	if err != nil {
+		return nil, commonerror.NewInternal("failed to subscribe to workspace events", "", err)
+	}
 	r, w := io.Pipe()
 	go func() {
-		defer h.workspaceEventHub.Unsubscribe(request.WorkspaceId, user.ID)
 		defer func() {
 			if err := w.Close(); err != nil {
 				slog.ErrorContext(c, "failed to close pipe writer in workspace events stream", slog.String("error", err.Error()))
@@ -94,6 +96,11 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	return note.GetWorkspaceEvents200TexteventStreamResponse{
 		Body: r,
 	}, nil
+}
+
+func workspaceEventToDTO(event domain.WorkspaceEvent) any {
+	switch event.(type) {
+	}
 }
 
 func (h *StrictHandler) CheckWorkspaceExists(

@@ -7,7 +7,7 @@ import (
 
 var ProviderSet = wire.NewSet(
 	ProvideRedisClient,
-	ProvideWorkspaceEvent,
+	ProvideWorkspaceEventInternalPubSub,
 	ProvideWatermillLogger,
 	wire.Struct(new(cqrs.JSONMarshaler), "*"),
 	wire.Bind(new(cqrs.CommandEventMarshaler), new(*cqrs.JSONMarshaler)),

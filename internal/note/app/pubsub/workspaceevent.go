@@ -2,61 +2,166 @@ package pubsub
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log/slog"
 
-	"github.com/ThreeDotsLabs/watermill/components/cqrs"
+	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
+	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/domain"
 )
 
-const MetadataWorkspaceIDKey = "workspace_id"
+const (
+	MetadataWorkspaceIDKey = "workspace_id"
+	MetadataUserIDKey      = "user_id"
+	MetadataEventTypeKey   = "event_type"
+)
 
-// NOTE: If need to provide these separately, need to create type definition for each
-type WorkspaceEvent struct {
-	eventBus       *cqrs.EventBus
-	eventProcessor *cqrs.EventProcessor
-	router         *message.Router
-	publisher      message.Publisher
-	subcriber      message.Subscriber
-	topic          string
+type WorkspaceEventInternalPubSub struct {
+	Router    *message.Router
+	Publisher message.Publisher
+	Subcriber message.Subscriber
+	Topic     string
 }
 
-func NewWorkspaceEvent(
-	eventBus *cqrs.EventBus,
-	eventProcessor *cqrs.EventProcessor,
+func NewWorkspaceEventInternalPubSub(
 	router *message.Router,
 	publisher message.Publisher,
 	subscriber message.Subscriber,
 	topic string,
-) *WorkspaceEvent {
-	return &WorkspaceEvent{
-		eventBus:       eventBus,
-		eventProcessor: eventProcessor,
-		router:         router,
-		publisher:      publisher,
-		subcriber:      subscriber,
-		topic:          topic,
+) *WorkspaceEventInternalPubSub {
+	return &WorkspaceEventInternalPubSub{
+		Router:    router,
+		Publisher: publisher,
+		Subcriber: subscriber,
+		Topic:     topic,
 	}
 }
 
-func (w *WorkspaceEvent) EventBus() *cqrs.EventBus {
-	return w.eventBus
+type WorkspaceEventHubPubSub struct {
+	PubSub *gochannel.GoChannel
 }
 
-func (w *WorkspaceEvent) EventProcessor() *cqrs.EventProcessor {
-	return w.eventProcessor
+func NewWorkspaceEventHubPubSub(
+	pubSub *gochannel.GoChannel,
+) *WorkspaceEventHubPubSub {
+	return &WorkspaceEventHubPubSub{
+		PubSub: pubSub,
+	}
 }
 
-func (w *WorkspaceEvent) Router() *message.Router {
-	return w.router
+type WorkspaceEvent struct {
+	internalPubSub *WorkspaceEventInternalPubSub
+	hubPubSub      *WorkspaceEventHubPubSub
 }
 
-func (w *WorkspaceEvent) Publisher() message.Publisher {
-	return w.publisher
+func (w *WorkspaceEvent) Setup() {
+	w.internalPubSub.Router.AddConsumerHandler(
+		"handler",
+		w.internalPubSub.Topic,
+		w.internalPubSub.Subcriber,
+		func(msg *message.Message) error {
+			workspaceID := msg.Metadata.Get(MetadataWorkspaceIDKey)
+			return w.hubPubSub.PubSub.Publish(workspaceID, msg)
+		},
+	)
 }
 
-func (w *WorkspaceEvent) Subscriber() message.Subscriber {
-	return w.subcriber
+func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, event domain.WorkspaceEvent) error {
+	payload, err := json.Marshal(event)
+	if err != nil {
+		return fmt.Errorf("failed to marshal event: %w", err)
+	}
+	msg := message.NewMessage(watermill.NewUUID(), payload)
+	msg.Metadata.Set(MetadataWorkspaceIDKey, workspaceID.String())
+	msg.Metadata.Set(MetadataUserIDKey, userID)
+	msg.Metadata.Set(MetadataEventTypeKey, string(event.EventType()))
+	msg.SetContext(ctx)
+	return w.internalPubSub.Publisher.Publish(w.internalPubSub.Topic, msg)
 }
 
-func (w *WorkspaceEvent) Subcribe(ctx context.Context) (<-chan *message.Message, error) {
-	return w.subcriber.Subscribe(ctx, w.topic)
+func (w *WorkspaceEvent) Subscribe(
+	ctx context.Context,
+	workspaceID uuid.UUID,
+	userID string,
+) (<-chan domain.WorkspaceEvent, error) {
+	eventCh := make(chan domain.WorkspaceEvent, 10)
+
+	msgCh, err := w.hubPubSub.PubSub.Subscribe(ctx, workspaceID.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to subscribe to workspace events: %w", err)
+	}
+
+	go func() {
+		defer close(eventCh)
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case msg, ok := <-msgCh:
+				if !ok {
+					return
+				}
+				if msg.Metadata.Get(MetadataUserIDKey) != userID {
+					msg.Ack()
+					continue
+				}
+				eventType := msg.Metadata.Get(MetadataEventTypeKey)
+				if eventType == "" {
+					slog.ErrorContext(ctx, "missing event type in message metadata", slog.String("workspace_id", workspaceID.String()), slog.String("user_id", userID))
+					msg.Ack()
+					continue
+				}
+				event, ok := domain.NewFromEventType(eventType)
+				if !ok {
+					slog.ErrorContext(ctx, "unknown event type in message metadata", slog.String("event_type", eventType), slog.String("workspace_id", workspaceID.String()), slog.String("user_id", userID))
+					msg.Ack()
+					continue
+				}
+				if err := json.Unmarshal(msg.Payload, event); err != nil {
+					slog.ErrorContext(ctx, "failed to unmarshal event", slog.String("error", err.Error()))
+					msg.Ack()
+					continue
+				}
+				select {
+				case eventCh <- event:
+					msg.Ack()
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+
+	return eventCh, nil
+}
+
+func (w *WorkspaceEvent) Run(ctx context.Context) error {
+	return w.internalPubSub.Router.Run(ctx)
+}
+
+func (w *WorkspaceEvent) Close() error {
+	var errs []error
+
+	if err := w.internalPubSub.Router.Close(); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := w.internalPubSub.Publisher.Close(); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := w.internalPubSub.Subcriber.Close(); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := w.hubPubSub.PubSub.Close(); err != nil {
+		errs = append(errs, err)
+	}
+
+	return errors.Join(fmt.Errorf("failed to close workspace event pubsub"), errors.Join(errs...))
 }

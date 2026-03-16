@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
@@ -21,19 +22,11 @@ type (
 )
 
 type StrictHandler struct {
-	app               *app.App
-	workspaceEventHub *WorkspaceEventHub
-}
-
-func NewStrictHandler(app *app.App) *StrictHandler {
-	return &StrictHandler{
-		app: app,
-	}
+	app                  *app.App
+	workspaceEventPubSub *pubsub.WorkspaceEvent
 }
 
 var _ IStrictHandler = (*StrictHandler)(nil)
-
-var ProvideStrictHandler = NewStrictHandler
 
 func NewHandler(
 	strictServer IStrictHandler,

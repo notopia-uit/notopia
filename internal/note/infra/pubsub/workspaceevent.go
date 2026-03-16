@@ -9,18 +9,19 @@ import (
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
+	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/redis/go-redis/v9"
 )
 
 // TODO: If have time, try https://github.com/stong1994/watermill-rediszset, because we only need pubsub, not stream
-func NewWorkspaceEvent(
+func NewWorkspaceEventInternalPubSub(
 	logger watermill.LoggerAdapter,
 	marshaler cqrs.CommandEventMarshaler,
 	redisClient *RedisClient,
-) (*pubsub.WorkspaceEvent, error) {
+) (*pubsub.WorkspaceEventInternalPubSub, error) {
 	topic := "events:workspaces"
-	pubisher, err := redisstream.NewPublisher(redisstream.PublisherConfig{
+	publisher, err := redisstream.NewPublisher(redisstream.PublisherConfig{
 		Client:        (*redis.Client)(redisClient),
 		DefaultMaxlen: 10000,
 	}, logger)
@@ -44,42 +45,28 @@ func NewWorkspaceEvent(
 	}
 	router.AddMiddleware(middleware.CorrelationID, middleware.Recoverer)
 
-	eventBus, err := cqrs.NewEventBusWithConfig(pubisher, cqrs.EventBusConfig{
-		GeneratePublishTopic: func(params cqrs.GenerateEventPublishTopicParams) (string, error) {
-			return topic, nil
-		},
-		Marshaler: marshaler,
-		Logger:    logger,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to create internal event bus: %w", err)
-	}
-
-	eventProcessor, err := cqrs.NewEventProcessorWithConfig(
+	return pubsub.NewWorkspaceEventInternalPubSub(
 		router,
-		cqrs.EventProcessorConfig{
-			GenerateSubscribeTopic: func(params cqrs.EventProcessorGenerateSubscribeTopicParams) (string, error) {
-				return topic, nil
-			},
-			SubscriberConstructor: func(params cqrs.EventProcessorSubscriberConstructorParams) (message.Subscriber, error) {
-				return subcriber, nil
-			},
-			Marshaler: marshaler,
-			Logger:    logger,
-		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create internal event processor: %w", err)
-	}
-
-	return pubsub.NewWorkspaceEvent(
-		eventBus,
-		eventProcessor,
-		router,
-		pubisher,
+		publisher,
 		subcriber,
 		topic,
 	), nil
 }
 
-var ProvideWorkspaceEvent = NewWorkspaceEvent
+var ProvideWorkspaceEventInternalPubSub = NewWorkspaceEventInternalPubSub
+
+func NewWorkspaceEventHubPubSub(
+	logger watermill.LoggerAdapter,
+) *pubsub.WorkspaceEventHubPubSub {
+	pubSub := gochannel.NewGoChannel(
+		gochannel.Config{
+			OutputChannelBuffer: 100,
+		},
+		logger,
+	)
+	return pubsub.NewWorkspaceEventHubPubSub(
+		pubSub,
+	)
+}
+
+var ProvideWorkspaceEventHubPubSub = NewWorkspaceEventHubPubSub
