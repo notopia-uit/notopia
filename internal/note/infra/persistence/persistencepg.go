@@ -18,7 +18,6 @@ import (
 var PgMigrations embed.FS
 
 type Pg struct {
-	db            *sql.DB
 	pgpool        *pgxpool.Pool
 	gooseProvider *goose.Provider
 }
@@ -35,7 +34,7 @@ func NewGooseProvider(db *sql.DB, logger *slog.Logger) (*goose.Provider, error) 
 		return nil, fmt.Errorf("failed to get migration files: %w", err)
 	}
 	gooseProvider, err := goose.NewProvider(
-		"postgres",
+		goose.DialectPostgres,
 		db,
 		migrationFiles,
 		goose.WithSlog(logger),
@@ -50,12 +49,10 @@ func NewGooseProvider(db *sql.DB, logger *slog.Logger) (*goose.Provider, error) 
 var ProvideGooseProvider = NewGooseProvider
 
 func NewPg(
-	db *sql.DB,
 	pgxpool *pgxpool.Pool,
 	gooseProvider *goose.Provider,
 ) (*Pg, error) {
 	return &Pg{
-		db:            db,
 		pgpool:        pgxpool,
 		gooseProvider: gooseProvider,
 	}, nil

@@ -75,7 +75,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	persistencePg, err := persistence.NewPg(db, pool, provider)
+	persistencePg, err := persistence.NewPg(pool, provider)
 	if err != nil {
 		cleanup4()
 		cleanup3()

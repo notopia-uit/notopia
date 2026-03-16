@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"time"
 
 	"github.com/notopia-uit/notopia/pkg/api/note"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
@@ -39,6 +40,9 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	if err != nil {
 		return nil, err
 	}
+	ticker := time.NewTicker(15 * time.Second)
+	defer ticker.Stop()
+
 	eventCh := make(chan []byte)
 	h.workspaceEventHub.Subscribe(request.WorkspaceId, user.ID, eventCh)
 	r, w := io.Pipe()
@@ -53,6 +57,12 @@ func (h *StrictHandler) GetWorkspaceEvents(
 			select {
 			case <-ctx.Done():
 				return
+			case <-ticker.C:
+				if _, err := w.Write([]byte("heartbeat: keep-alive\n\n")); err != nil {
+					slog.ErrorContext(ctx, "failed to write keep-alive comment in workspace events stream", slog.String("error", err.Error()))
+					return
+				}
+				slog.DebugContext(ctx, "sent keep-alive comment in workspace events stream")
 			case event, ok := <-eventCh:
 				if !ok {
 					slog.InfoContext(ctx, "workspace event channel closed")
