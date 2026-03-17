@@ -5,16 +5,21 @@ on:
     branches:
       - '*'
     paths-ignore: &pushPathsIgnore
-      - README.md
       - .dockerignore
       - .editorconfig
       - .gitattributes
       - .gitignore
       - .harper-dictionary.txt
+      - .husky/**/*
       - .lazy.lua
-      - .wakatime-project
       - .nvim.lua
+      - .renovaterc.json
+      - .vscode/**/*
+      - .wakatime-project
+      - README.md
       - justfile
+      - mise.development.toml
+      - mise.toml
   pull_request:
     branches:
       - '*'
