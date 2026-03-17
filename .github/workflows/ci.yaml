@@ -101,7 +101,14 @@ env:
   SHOULD_RELEASE: >-
     ${{
       github.event_name == 'workflow_dispatch' &&
-      github.ref_name == 'main'
+      github.ref_name == 'main' &&
+      (
+        github.event.inputs.releaseWeb == 'true' ||
+        github.event.inputs.releaseNote == 'true' ||
+        github.event.inputs.releaseDocument == 'true' ||
+        github.event.inputs.releaseNpm == 'true' ||
+        github.event.inputs.releaseAll == 'true'
+      )
     }}
   NX_PARALLEL: 3
 
