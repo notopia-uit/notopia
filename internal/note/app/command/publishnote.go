@@ -22,7 +22,7 @@ func NewPublishNoteHandler(noterepo domain.NoteRepo) *PublishNoteHandler {
 func (h *PublishNoteHandler) Handle(ctx context.Context, cmd *PublishNote) error {
 	// TODO: domain.Note has no Publish() method. Add Publish() to domain.Note and a
 	// published field, then call note.Publish() here before Save.
-	_, err := h.noterepo.GetByID(ctx, cmd.ID)
+	_, err := h.noterepo.GetByID(ctx, cmd.ID, true)
 	if err != nil {
 		return domain.NewErrNoteNotFound(cmd.ID, err)
 	}

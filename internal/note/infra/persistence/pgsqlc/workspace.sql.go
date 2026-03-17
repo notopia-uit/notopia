@@ -76,6 +76,31 @@ func (q *Queries) GetWorkspaceBySlug(ctx context.Context, slug string) (*Workspa
 	return &i, err
 }
 
+const getWorkspaceBySlugForUpdate = `-- name: GetWorkspaceBySlugForUpdate :one
+SELECT
+  id, slug, name, created_at, updated_at, deleted_at
+FROM
+  workspaces
+WHERE
+  slug = $1
+  AND deleted_at IS NULL
+FOR UPDATE
+`
+
+func (q *Queries) GetWorkspaceBySlugForUpdate(ctx context.Context, slug string) (*Workspace, error) {
+	row := q.db.QueryRow(ctx, getWorkspaceBySlugForUpdate, slug)
+	var i Workspace
+	err := row.Scan(
+		&i.ID,
+		&i.Slug,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return &i, err
+}
+
 const getWorkspaceIDBySlug = `-- name: GetWorkspaceIDBySlug :one
 SELECT
   id

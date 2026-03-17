@@ -17,16 +17,14 @@ type Note struct {
 
 var _ domain.NoteRepo = (*Note)(nil)
 
-func NewNote(queries *pgsqlc.Queries) *Note {
-	return &Note{
-		queries: queries,
+func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Note, error) {
+	var noteResult *pgsqlc.Note
+	var err error
+	if forUpdate {
+		noteResult, err = n.queries.GetNoteForUpdate(ctx, id)
+	} else {
+		noteResult, err = n.queries.GetNote(ctx, id)
 	}
-}
-
-var ProvideNote = NewNote
-
-func (n *Note) GetByID(ctx context.Context, id uuid.UUID) (*domain.Note, error) {
-	noteResult, err := n.queries.GetNote(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.NewErrNoteNotFound(id, err)
@@ -40,8 +38,14 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID) (*domain.Note, error) 
 	return noteToDomain(noteResult, outgoingLinksResult), nil
 }
 
-func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs) ([]domain.Note, error) {
-	noteResults, err := n.queries.GetNotes(ctx, ids)
+func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]domain.Note, error) {
+	var noteResults []*pgsqlc.Note
+	var err error
+	if forUpdate {
+		noteResults, err = n.queries.GetNotesForUpdate(ctx, ids)
+	} else {
+		noteResults, err = n.queries.GetNotes(ctx, ids)
+	}
 	if err != nil {
 		return nil, toDomainError(err)
 	}

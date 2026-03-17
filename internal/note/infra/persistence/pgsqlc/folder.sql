@@ -1,12 +1,3 @@
--- name: GetFolder :one
-SELECT
-  *
-FROM
-  folders
-WHERE
-  id = sqlc.arg('id')
-  AND trashed_at IS NULL;
-
 -- name: SaveFolder :exec
 INSERT INTO folders (
   id,
@@ -93,14 +84,143 @@ ON CONFLICT (id) DO UPDATE SET
   trashed_by = EXCLUDED.trashed_by,
   trashed_at = EXCLUDED.trashed_at;
 
+-- name: GetFolder :one
+SELECT
+  *
+FROM
+  folders
+WHERE
+  CASE
+    WHEN sqlc.narg('id')::uuid IS NOT NULL
+    THEN id = sqlc.narg('id')::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.narg('workspace_id')::uuid IS NOT NULL
+    THEN workspace_id = sqlc.narg('workspace_id')::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.narg('parent_id')::uuid IS NOT NULL
+    THEN parent_id = sqlc.narg('parent_id')::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.arg('is_root_folder')::bool = TRUE
+    THEN parent_id IS NULL
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.arg('trashed_by')::text <> ''
+    THEN trashed_by = sqlc.arg('trashed_by')::text
+    ELSE TRUE
+  END
+ORDER BY
+  created_at DESC;
+
+-- name: GetFolderForUpdate :one
+SELECT
+  *
+FROM
+  folders
+WHERE
+  CASE
+    WHEN sqlc.narg('id')::uuid IS NOT NULL
+    THEN id = sqlc.narg('id')::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.narg('workspace_id')::uuid IS NOT NULL
+    THEN workspace_id = sqlc.narg('workspace_id')::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.narg('parent_id')::uuid IS NOT NULL
+    THEN parent_id = sqlc.narg('parent_id')::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.arg('is_root_folder')::bool = TRUE
+    THEN parent_id IS NULL
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.arg('trashed_by')::text <> ''
+    THEN trashed_by = sqlc.arg('trashed_by')::text
+    ELSE TRUE
+  END
+ORDER BY
+  created_at DESC
+FOR UPDATE;
+
 -- name: GetFolders :many
 SELECT
   *
 FROM
   folders
 WHERE
-  id = ANY(sqlc.arg('ids')::uuid[])
-  AND trashed_at IS NULL;
+  CASE
+    WHEN cardinality(sqlc.arg('ids')::uuid[]) > 0
+    THEN id = ANY(sqlc.arg('ids')::uuid[])
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.narg('workspace_id')::uuid IS NOT NULL
+    THEN workspace_id = sqlc.narg('workspace_id')::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.narg('parent_id')::uuid IS NOT NULL
+    THEN parent_id = sqlc.narg('parent_id')::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.arg('is_root_folder')::bool = TRUE
+    THEN parent_id IS NULL
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.arg('trashed_by')::text <> ''
+    THEN trashed_by = sqlc.arg('trashed_by')::text
+    ELSE TRUE
+  END
+ORDER BY
+  created_at DESC;
+
+-- name: GetFoldersForUpdate :many
+SELECT
+  *
+FROM
+  folders
+WHERE
+  CASE
+    WHEN cardinality(sqlc.arg('ids')::uuid[]) > 0
+    THEN id = ANY(sqlc.arg('ids')::uuid[])
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.narg('workspace_id')::uuid IS NOT NULL
+    THEN workspace_id = sqlc.narg('workspace_id')::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.narg('parent_id')::uuid IS NOT NULL
+    THEN parent_id = sqlc.narg('parent_id')::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.arg('is_root_folder')::bool = TRUE
+    THEN parent_id IS NULL
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN sqlc.arg('trashed_by')::text <> ''
+    THEN trashed_by = sqlc.arg('trashed_by')::text
+    ELSE TRUE
+  END
+ORDER BY
+  created_at DESC
+FOR UPDATE;
 
 -- name: CountFoldersInWorkspaceByIDs :one
 SELECT
@@ -110,17 +230,6 @@ FROM
 WHERE
   workspace_id = sqlc.arg('workspace_id')
   AND id = ANY(sqlc.arg('ids')::uuid[]);
-
--- name: GetTrashedFoldersByWorkspaceID :many
-SELECT
-  *
-FROM
-  folders
-WHERE
-  workspace_id = sqlc.arg('workspace_id')
-  AND trashed_by = sqlc.arg('trashed_by')::string
-ORDER BY
-  trashed_at DESC;
 
 -- name: PermanentlyDeleteFolderByID :exec
 DELETE FROM
@@ -133,35 +242,3 @@ DELETE FROM
   folders
 WHERE
   id = ANY(sqlc.arg('ids')::uuid[]);
-
--- name: GetFoldersByID :many
-SELECT
-  *
-FROM
-  folders
-WHERE
-  workspace_id = sqlc.arg('workspace_id')
-  AND trashed_at IS NULL
-ORDER BY
-  created_at DESC;
-
--- name: GetRootFolder :one
-SELECT
-  *
-FROM
-  folders
-WHERE
-  workspace_id = sqlc.arg('workspace_id')
-  AND parent_id IS NULL
-  AND trashed_at IS NULL;
-
--- name: GetFoldersByParentID :many
-SELECT
-  *
-FROM
-  folders
-WHERE
-  parent_id = sqlc.arg('parent_id')
-  AND trashed_at IS NULL
-ORDER BY
-  created_at DESC;

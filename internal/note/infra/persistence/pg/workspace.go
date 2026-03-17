@@ -17,23 +17,32 @@ type Workspace struct {
 
 var _ domain.WorkspaceRepo = (*Workspace)(nil)
 
-func NewWorkspace(queries *pgsqlc.Queries) *Workspace {
-	return &Workspace{
-		queries: queries,
+func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) (*domain.Workspace, error) {
+	var workspaceResult *pgsqlc.Workspace
+	var err error
+	if forUpdate {
+		workspaceResult, err = w.queries.GetWorkspaceBySlugForUpdate(ctx, slug)
+	} else {
+		workspaceResult, err = w.queries.GetWorkspaceBySlug(ctx, slug)
 	}
-}
-
-var ProvideWorkspace = NewWorkspace
-
-func (w *Workspace) GetBySlug(ctx context.Context, slug string) (*domain.Workspace, error) {
-	workspaceResult, err := w.queries.GetWorkspaceBySlug(ctx, slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.NewErrWorkspaceNotFound(slug, err)
 		}
 		return nil, toDomainError(err)
 	}
-	rootFolderResult, err := w.queries.GetRootFolder(ctx, workspaceResult.ID)
+	var rootFolderResult *pgsqlc.Folder
+	if forUpdate {
+		rootFolderResult, err = w.queries.GetFolderForUpdate(ctx, &pgsqlc.GetFolderForUpdateParams{
+			WorkspaceID:  &workspaceResult.ID,
+			IsRootFolder: true,
+		})
+	} else {
+		rootFolderResult, err = w.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
+			WorkspaceID:  &workspaceResult.ID,
+			IsRootFolder: true,
+		})
+	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.NewErrWorkspaceRootFolderNotFound(slug, err)

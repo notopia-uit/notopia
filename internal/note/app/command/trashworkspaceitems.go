@@ -30,7 +30,7 @@ func NewTrashWorkspaceItemsHandler(
 
 func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorkspaceItems) error {
 	for _, noteID := range cmd.NoteIDs {
-		note, err := h.noterepo.GetByID(ctx, noteID)
+		note, err := h.noterepo.GetByID(ctx, noteID, true)
 		if err != nil {
 			return domain.NewErrNoteNotFound(noteID, err)
 		}
@@ -41,7 +41,7 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 	}
 
 	for _, folderID := range cmd.FolderIDs {
-		folder, err := h.folderrepo.GetByID(ctx, folderID)
+		folder, err := h.folderrepo.GetByID(ctx, folderID, true)
 		if err != nil {
 			return domain.NewErrFolderNotFound(folderID, err)
 		}

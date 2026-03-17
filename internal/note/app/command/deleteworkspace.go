@@ -19,7 +19,7 @@ func NewDeleteWorkspaceHandler(workspacerepo domain.WorkspaceRepo) *DeleteWorksp
 }
 
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) error {
-	workspace, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug)
+	workspace, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug, true)
 	if err != nil {
 		return domain.NewErrWorkspaceNotFound(cmd.Slug, err)
 	}

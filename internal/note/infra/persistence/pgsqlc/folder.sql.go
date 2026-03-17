@@ -40,12 +40,118 @@ SELECT
 FROM
   folders
 WHERE
-  id = $1
-  AND trashed_at IS NULL
+  CASE
+    WHEN $1::uuid IS NOT NULL
+    THEN id = $1::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $2::uuid IS NOT NULL
+    THEN workspace_id = $2::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $3::uuid IS NOT NULL
+    THEN parent_id = $3::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $4::bool = TRUE
+    THEN parent_id IS NULL
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $5::text <> ''
+    THEN trashed_by = $5::text
+    ELSE TRUE
+  END
+ORDER BY
+  created_at DESC
 `
 
-func (q *Queries) GetFolder(ctx context.Context, id uuid.UUID) (*Folder, error) {
-	row := q.db.QueryRow(ctx, getFolder, id)
+type GetFolderParams struct {
+	ID           *uuid.UUID
+	WorkspaceID  *uuid.UUID
+	ParentID     *uuid.UUID
+	IsRootFolder bool
+	TrashedBy    string
+}
+
+func (q *Queries) GetFolder(ctx context.Context, arg *GetFolderParams) (*Folder, error) {
+	row := q.db.QueryRow(ctx, getFolder,
+		arg.ID,
+		arg.WorkspaceID,
+		arg.ParentID,
+		arg.IsRootFolder,
+		arg.TrashedBy,
+	)
+	var i Folder
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Icon,
+		&i.WorkspaceID,
+		&i.ParentID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.TrashedBy,
+		&i.TrashedAt,
+	)
+	return &i, err
+}
+
+const getFolderForUpdate = `-- name: GetFolderForUpdate :one
+SELECT
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+FROM
+  folders
+WHERE
+  CASE
+    WHEN $1::uuid IS NOT NULL
+    THEN id = $1::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $2::uuid IS NOT NULL
+    THEN workspace_id = $2::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $3::uuid IS NOT NULL
+    THEN parent_id = $3::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $4::bool = TRUE
+    THEN parent_id IS NULL
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $5::text <> ''
+    THEN trashed_by = $5::text
+    ELSE TRUE
+  END
+ORDER BY
+  created_at DESC
+FOR UPDATE
+`
+
+type GetFolderForUpdateParams struct {
+	ID           *uuid.UUID
+	WorkspaceID  *uuid.UUID
+	ParentID     *uuid.UUID
+	IsRootFolder bool
+	TrashedBy    string
+}
+
+func (q *Queries) GetFolderForUpdate(ctx context.Context, arg *GetFolderForUpdateParams) (*Folder, error) {
+	row := q.db.QueryRow(ctx, getFolderForUpdate,
+		arg.ID,
+		arg.WorkspaceID,
+		arg.ParentID,
+		arg.IsRootFolder,
+		arg.TrashedBy,
+	)
 	var i Folder
 	err := row.Scan(
 		&i.ID,
@@ -67,171 +173,131 @@ SELECT
 FROM
   folders
 WHERE
-  id = ANY($1::uuid[])
-  AND trashed_at IS NULL
-`
-
-func (q *Queries) GetFolders(ctx context.Context, ids []uuid.UUID) ([]*Folder, error) {
-	rows, err := q.db.Query(ctx, getFolders, ids)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []*Folder
-	for rows.Next() {
-		var i Folder
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Icon,
-			&i.WorkspaceID,
-			&i.ParentID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.TrashedBy,
-			&i.TrashedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, &i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getFoldersByID = `-- name: GetFoldersByID :many
-SELECT
-  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
-FROM
-  folders
-WHERE
-  workspace_id = $1
-  AND trashed_at IS NULL
+  CASE
+    WHEN cardinality($1::uuid[]) > 0
+    THEN id = ANY($1::uuid[])
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $2::uuid IS NOT NULL
+    THEN workspace_id = $2::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $3::uuid IS NOT NULL
+    THEN parent_id = $3::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $4::bool = TRUE
+    THEN parent_id IS NULL
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $5::text <> ''
+    THEN trashed_by = $5::text
+    ELSE TRUE
+  END
 ORDER BY
   created_at DESC
 `
 
-func (q *Queries) GetFoldersByID(ctx context.Context, workspaceID uuid.UUID) ([]*Folder, error) {
-	rows, err := q.db.Query(ctx, getFoldersByID, workspaceID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []*Folder
-	for rows.Next() {
-		var i Folder
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Icon,
-			&i.WorkspaceID,
-			&i.ParentID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.TrashedBy,
-			&i.TrashedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, &i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+type GetFoldersParams struct {
+	IDs          []uuid.UUID
+	WorkspaceID  *uuid.UUID
+	ParentID     *uuid.UUID
+	IsRootFolder bool
+	TrashedBy    string
 }
 
-const getFoldersByParentID = `-- name: GetFoldersByParentID :many
-SELECT
-  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
-FROM
-  folders
-WHERE
-  parent_id = $1
-  AND trashed_at IS NULL
-ORDER BY
-  created_at DESC
-`
-
-func (q *Queries) GetFoldersByParentID(ctx context.Context, parentID *uuid.UUID) ([]*Folder, error) {
-	rows, err := q.db.Query(ctx, getFoldersByParentID, parentID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []*Folder
-	for rows.Next() {
-		var i Folder
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Icon,
-			&i.WorkspaceID,
-			&i.ParentID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.TrashedBy,
-			&i.TrashedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, &i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getRootFolder = `-- name: GetRootFolder :one
-SELECT
-  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
-FROM
-  folders
-WHERE
-  workspace_id = $1
-  AND parent_id IS NULL
-  AND trashed_at IS NULL
-`
-
-func (q *Queries) GetRootFolder(ctx context.Context, workspaceID uuid.UUID) (*Folder, error) {
-	row := q.db.QueryRow(ctx, getRootFolder, workspaceID)
-	var i Folder
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Icon,
-		&i.WorkspaceID,
-		&i.ParentID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.TrashedBy,
-		&i.TrashedAt,
+func (q *Queries) GetFolders(ctx context.Context, arg *GetFoldersParams) ([]*Folder, error) {
+	rows, err := q.db.Query(ctx, getFolders,
+		arg.IDs,
+		arg.WorkspaceID,
+		arg.ParentID,
+		arg.IsRootFolder,
+		arg.TrashedBy,
 	)
-	return &i, err
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Folder
+	for rows.Next() {
+		var i Folder
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Icon,
+			&i.WorkspaceID,
+			&i.ParentID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
-const getTrashedFoldersByWorkspaceID = `-- name: GetTrashedFoldersByWorkspaceID :many
+const getFoldersForUpdate = `-- name: GetFoldersForUpdate :many
 SELECT
   id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
 FROM
   folders
 WHERE
-  workspace_id = $1
-  AND trashed_by = $2::string
+  CASE
+    WHEN cardinality($1::uuid[]) > 0
+    THEN id = ANY($1::uuid[])
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $2::uuid IS NOT NULL
+    THEN workspace_id = $2::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $3::uuid IS NOT NULL
+    THEN parent_id = $3::uuid
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $4::bool = TRUE
+    THEN parent_id IS NULL
+    ELSE TRUE
+  END
+  AND CASE
+    WHEN $5::text <> ''
+    THEN trashed_by = $5::text
+    ELSE TRUE
+  END
 ORDER BY
-  trashed_at DESC
+  created_at DESC
+FOR UPDATE
 `
 
-type GetTrashedFoldersByWorkspaceIDParams struct {
-	WorkspaceID uuid.UUID
-	TrashedBy   string
+type GetFoldersForUpdateParams struct {
+	IDs          []uuid.UUID
+	WorkspaceID  *uuid.UUID
+	ParentID     *uuid.UUID
+	IsRootFolder bool
+	TrashedBy    string
 }
 
-func (q *Queries) GetTrashedFoldersByWorkspaceID(ctx context.Context, arg *GetTrashedFoldersByWorkspaceIDParams) ([]*Folder, error) {
-	rows, err := q.db.Query(ctx, getTrashedFoldersByWorkspaceID, arg.WorkspaceID, arg.TrashedBy)
+func (q *Queries) GetFoldersForUpdate(ctx context.Context, arg *GetFoldersForUpdateParams) ([]*Folder, error) {
+	rows, err := q.db.Query(ctx, getFoldersForUpdate,
+		arg.IDs,
+		arg.WorkspaceID,
+		arg.ParentID,
+		arg.IsRootFolder,
+		arg.TrashedBy,
+	)
 	if err != nil {
 		return nil, err
 	}

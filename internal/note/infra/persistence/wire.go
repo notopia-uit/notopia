@@ -20,7 +20,8 @@ var PostgresProviderSet = wire.NewSet(
 	wire.Bind(new(domain.NoteRepo), new(*pg.Note)),
 	wire.Bind(new(domain.FolderRepo), new(*pg.Folder)),
 	wire.Bind(new(domain.WorkspaceRepo), new(*pg.Workspace)),
-	pg.ProvideNote,
-	pg.ProvideFolder,
-	pg.ProvideWorkspace,
+	wire.Struct(new(pg.Folder), "*"),
+	wire.Struct(new(pg.Workspace), "*"),
+	wire.Struct(new(pg.Note), "*"),
+	wire.Struct(new(pg.UnitOfWork), "*"),
 )

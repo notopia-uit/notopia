@@ -21,7 +21,7 @@ func NewRenameFolderHandler(folderrepo domain.FolderRepo) *RenameFolderHandler {
 }
 
 func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) error {
-	folder, err := h.folderrepo.GetByID(ctx, cmd.ID)
+	folder, err := h.folderrepo.GetByID(ctx, cmd.ID, true)
 	if err != nil {
 		return domain.NewErrFolderNotFound(cmd.ID, err)
 	}

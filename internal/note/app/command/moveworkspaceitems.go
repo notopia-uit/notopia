@@ -5,13 +5,14 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/app/service"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
 type MoveWorkspaceItems struct {
-	UserID              uuid.UUID
+	UserID              string
 	WorkspaceID         uuid.UUID
 	NoteIDs             []uuid.UUID
 	FolderIDs           []uuid.UUID
@@ -22,15 +23,11 @@ type MoveWorkspaceItemsHandler struct {
 	authorizationService service.Authorization
 	noteRepo             domain.NoteRepo
 	folderRepo           domain.FolderRepo
+	uow                  domain.UnitOfWork
+	workspaceEvent       pubsub.WorkspaceEvent
 }
 
 func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) error {
-	// TODO: The OpenAPI spec for move-items does not include a destination folder ID.
-	// Clarify the spec: does each item carry its own target folderId, or is there a
-	// single target? Once clarified, implement:
-	// 1. For each noteID: NoteRepo.GetByID + note.MoveToFolder(targetID) + NoteRepo.Save
-	// 2. For each folderID: FolderRepo.GetByID + folder.MoveToFolder(targetID) + FolderRepo.Save
-
 	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
 		ctx,
 		cmd.UserID,
@@ -61,7 +58,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		return newErrMoveWorkspaceItemsInvalidNote(cmd.WorkspaceID)
 	}
 
-	destinationFolder, err := h.folderRepo.GetByID(ctx, cmd.DestinationFolderID)
+	destinationFolder, err := h.folderRepo.GetByID(ctx, cmd.DestinationFolderID, false)
 	if err != nil {
 		return err
 	}
@@ -69,7 +66,48 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 	if destinationFolder.WorkspaceID() != cmd.WorkspaceID {
 		return newErrMoveWorkspaceItemsInvalidDestination(cmd.WorkspaceID)
 	}
-	// TODO: continue
+
+	var folders []domain.Folder
+	var notes []domain.Note
+
+	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		folderRepo := r.Folder()
+		noteRepo := r.Note()
+		folders, err = folderRepo.GetByIDs(ctx, cmd.FolderIDs, true)
+		if err != nil {
+			return err
+		}
+		for _, folder := range folders {
+			folder.MoveToFolder(cmd.DestinationFolderID)
+		}
+		if err := folderRepo.SaveMany(ctx, folders); err != nil {
+			return err
+		}
+		notes, err = noteRepo.GetByIDs(ctx, cmd.NoteIDs, true)
+		if err != nil {
+			return err
+		}
+		for _, note := range notes {
+			note.MoveToFolder(cmd.DestinationFolderID)
+		}
+		if err := noteRepo.SaveMany(ctx, notes); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	workspaceEvents := make([]domain.WorkspaceEvent, 0, len(cmd.FolderIDs)+len(cmd.NoteIDs))
+	for _, folder := range folders {
+		workspaceEvents = append(workspaceEvents, domain.FolderUpdatedEvent(folder))
+	}
+	for _, note := range notes {
+		workspaceEvents = append(workspaceEvents, domain.NoteUpdatedEvent(note))
+	}
+
+	h.workspaceEvent.Publish(ctx, cmd.WorkspaceID, cmd.UserID, workspaceEvents...)
 	return nil
 }
 
@@ -80,9 +118,9 @@ var (
 	ErrCodeMoveWorkspaceItemsInvalidDestination = "MoveWorkspaceItems_4"
 )
 
-func newErrMoveWorkspaceItemsForbidden(userID uuid.UUID, workspaceID uuid.UUID) *commonerror.Err {
+func newErrMoveWorkspaceItemsForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
 	return commonerror.NewForbidden(
-		fmt.Sprintf("User %q does not have permission to move items in workspace %q", userID.String(), workspaceID.String()),
+		fmt.Sprintf("User %q does not have permission to move items in workspace %q", userID, workspaceID.String()),
 		ErrCodeMoveWorkspaceItemsForbidden,
 		nil,
 	)

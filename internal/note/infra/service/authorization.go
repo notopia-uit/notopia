@@ -31,26 +31,26 @@ func NewAuthorization(
 
 var ProvideAuthorization = NewAuthorization
 
-func (a *Authorization) HasWorkspacePermission(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID, permission service.WorkspacePermission) (bool, error) {
+func (a *Authorization) HasWorkspacePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission service.WorkspacePermission) (bool, error) {
 	return false, commonerror.NewUnimplemented()
 }
 
-func (a *Authorization) HasWorkspaceItemPermission(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID, permission service.WorkspaceItemPermission) (bool, error) {
+func (a *Authorization) HasWorkspaceItemPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission service.WorkspaceItemPermission) (bool, error) {
 	return false, commonerror.NewUnimplemented()
 }
 
-func (a *Authorization) HasWorkspaceNotePermission(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID, permission service.WorkspaceItemPermission) (bool, error) {
+func (a *Authorization) HasWorkspaceNotePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission service.WorkspaceItemPermission) (bool, error) {
 	return false, commonerror.NewUnimplemented()
 }
 
-func (a *Authorization) HasWorkspaceFolderPermission(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID, permission service.WorkspaceItemPermission) (bool, error) {
+func (a *Authorization) HasWorkspaceFolderPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission service.WorkspaceItemPermission) (bool, error) {
 	return false, commonerror.NewUnimplemented()
 }
 
-func (a *Authorization) CreateWorkspaceWithOwnership(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID, ownerID uuid.UUID) error {
+func (a *Authorization) CreateWorkspaceWithOwnership(ctx context.Context, userID string, workspaceID uuid.UUID, ownerID uuid.UUID) error {
 	return commonerror.NewUnimplemented()
 }
 
-func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID) ([]service.WorkspaceMember, error) {
+func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]service.WorkspaceMember, error) {
 	return nil, commonerror.NewUnimplemented()
 }

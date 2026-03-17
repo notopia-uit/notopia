@@ -21,7 +21,7 @@ func NewPublishWorkspaceHandler(workspacerepo domain.WorkspaceRepo) *PublishWork
 func (h *PublishWorkspaceHandler) Handle(ctx context.Context, cmd *PublishWorkspace) error {
 	// TODO: domain.Workspace has no Publish() method. Add a published field and
 	// Publish() method to domain.Workspace, then call workspace.Publish() here before Save.
-	_, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug)
+	_, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug, true)
 	if err != nil {
 		return domain.NewErrWorkspaceNotFound(cmd.Slug, err)
 	}

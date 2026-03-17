@@ -21,7 +21,7 @@ func NewRenameNoteHandler(noterepo domain.NoteRepo) *RenameNoteHandler {
 }
 
 func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
-	note, err := h.noterepo.GetByID(ctx, cmd.ID)
+	note, err := h.noterepo.GetByID(ctx, cmd.ID, true)
 	if err != nil {
 		return domain.NewErrNoteNotFound(cmd.ID, err)
 	}

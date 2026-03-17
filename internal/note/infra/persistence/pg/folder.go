@@ -17,16 +17,18 @@ type Folder struct {
 
 var _ domain.FolderRepo = (*Folder)(nil)
 
-func NewFolder(queries *pgsqlc.Queries) *Folder {
-	return &Folder{
-		queries: queries,
+func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Folder, error) {
+	var result *pgsqlc.Folder
+	var err error
+	if forUpdate {
+		result, err = f.queries.GetFolderForUpdate(ctx, &pgsqlc.GetFolderForUpdateParams{
+			ID: &id,
+		})
+	} else {
+		result, err = f.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
+			ID: &id,
+		})
 	}
-}
-
-var ProvideFolder = NewFolder
-
-func (f *Folder) GetByID(ctx context.Context, id uuid.UUID) (*domain.Folder, error) {
-	result, err := f.queries.GetFolder(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.NewErrFolderNotFound(id, err)
@@ -34,6 +36,28 @@ func (f *Folder) GetByID(ctx context.Context, id uuid.UUID) (*domain.Folder, err
 		return nil, toDomainError(err)
 	}
 	return folderToDomain(result), nil
+}
+
+func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]domain.Folder, error) {
+	var folderResults []*pgsqlc.Folder
+	var err error
+	if forUpdate {
+		folderResults, err = f.queries.GetFoldersForUpdate(ctx, &pgsqlc.GetFoldersForUpdateParams{
+			IDs: ids,
+		})
+	} else {
+		folderResults, err = f.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
+			IDs: ids,
+		})
+	}
+	if err != nil {
+		return nil, toDomainError(err)
+	}
+	folders := make([]domain.Folder, len(folderResults))
+	for i, folder := range folderResults {
+		folders[i] = *folderToDomain(folder)
+	}
+	return folders, nil
 }
 
 func (f *Folder) Save(ctx context.Context, folder *domain.Folder) error {
@@ -52,18 +76,6 @@ func (f *Folder) Save(ctx context.Context, folder *domain.Folder) error {
 		return toDomainError(err)
 	}
 	return nil
-}
-
-func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs) ([]domain.Folder, error) {
-	folderResults, err := f.queries.GetFolders(ctx, ids)
-	if err != nil {
-		return nil, toDomainError(err)
-	}
-	folders := make([]domain.Folder, len(folderResults))
-	for i, folder := range folderResults {
-		folders[i] = *folderToDomain(folder)
-	}
-	return folders, nil
 }
 
 func (f *Folder) SaveMany(ctx context.Context, folders []domain.Folder) error {
@@ -111,8 +123,8 @@ func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspa
 }
 
 func (f *Folder) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID, trashedBy domain.TrashedBy) ([]domain.Folder, error) {
-	results, err := f.queries.GetTrashedFoldersByWorkspaceID(ctx, &pgsqlc.GetTrashedFoldersByWorkspaceIDParams{
-		WorkspaceID: workspaceID,
+	results, err := f.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
+		WorkspaceID: &workspaceID,
 		TrashedBy:   trashedBy.String(),
 	})
 	if err != nil {

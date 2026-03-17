@@ -14,6 +14,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
+	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/redis/go-redis/v9"
@@ -124,23 +125,26 @@ func (w *WorkspaceEvent) Setup() {
 	)
 }
 
-func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID any, userID string, event domain.WorkspaceEvent) error {
-	payload, err := json.Marshal(event)
-	if err != nil {
-		return fmt.Errorf("failed to marshal event: %w", err)
+func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...domain.WorkspaceEvent) error {
+	msgs := make([]*message.Message, len(events))
+	for _, event := range events {
+		payload, err := json.Marshal(event)
+		if err != nil {
+			return fmt.Errorf("failed to marshal event: %w", err)
+		}
+		msg := message.NewMessage(watermill.NewUUID(), payload)
+		msg.Metadata.Set(MetadataWorkspaceIDKey, fmt.Sprintf("%v", workspaceID))
+		msg.Metadata.Set(MetadataUserIDKey, userID)
+		msg.Metadata.Set(MetadataEventTypeKey, string(event.EventType()))
+		msg.SetContext(ctx)
+		msgs = append(msgs, msg)
 	}
-
-	msg := message.NewMessage(watermill.NewUUID(), payload)
-	msg.Metadata.Set(MetadataWorkspaceIDKey, fmt.Sprintf("%v", workspaceID))
-	msg.Metadata.Set(MetadataUserIDKey, userID)
-	msg.Metadata.Set(MetadataEventTypeKey, string(event.EventType()))
-	msg.SetContext(ctx)
-	return w.internalPubSub.publisher.Publish(w.internalPubSub.topic, msg)
+	return w.internalPubSub.publisher.Publish(w.internalPubSub.topic, msgs...)
 }
 
 func (w *WorkspaceEvent) Subscribe(
 	ctx context.Context,
-	workspaceID any,
+	workspaceID uuid.UUID,
 	userID string,
 ) (<-chan domain.WorkspaceEvent, error) {
 	eventCh := make(chan domain.WorkspaceEvent, 10)
@@ -167,13 +171,13 @@ func (w *WorkspaceEvent) Subscribe(
 				}
 				eventType := msg.Metadata.Get(MetadataEventTypeKey)
 				if eventType == "" {
-					slog.ErrorContext(ctx, "missing event type in message metadata", slog.String("workspace_id", fmt.Sprintf("%v", workspaceID)), slog.String("user_id", userID))
+					slog.ErrorContext(ctx, "missing event type in message metadata", slog.String("workspace_id", workspaceID.String()), slog.String("user_id", userID))
 					msg.Ack()
 					continue
 				}
 				event, ok := domain.NewFromEventType(eventType)
 				if !ok {
-					slog.ErrorContext(ctx, "unknown event type in message metadata", slog.String("event_type", eventType), slog.String("workspace_id", fmt.Sprintf("%v", workspaceID)), slog.String("user_id", userID))
+					slog.ErrorContext(ctx, "unknown event type in message metadata", slog.String("event_type", eventType), slog.String("workspace_id", workspaceID.String()), slog.String("user_id", userID))
 					msg.Ack()
 					continue
 				}

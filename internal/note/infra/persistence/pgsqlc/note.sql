@@ -103,6 +103,16 @@ WHERE
   id = sqlc.arg('id')
   AND trashed_at IS NULL;
 
+-- name: GetNoteForUpdate :one
+SELECT
+  *
+FROM
+  notes
+WHERE
+  id = sqlc.arg('id')
+  AND trashed_at IS NULL
+FOR UPDATE;
+
 -- name: GetNotes :many
 SELECT
   *
@@ -111,6 +121,16 @@ FROM
 WHERE
   id = ANY(sqlc.arg('ids')::uuid[])
   AND trashed_at IS NULL;
+
+-- name: GetNotesForUpdate :many
+SELECT
+  *
+FROM
+  notes
+WHERE
+  id = ANY(sqlc.arg('ids')::uuid[])
+  AND trashed_at IS NULL
+FOR UPDATE;
 
 -- name: CountNotesInWorkspaceByIDs :one
 SELECT

@@ -7,6 +7,16 @@ WHERE
   slug = sqlc.arg('slug')
   AND deleted_at IS NULL;
 
+-- name: GetWorkspaceBySlugForUpdate :one
+SELECT
+  *
+FROM
+  workspaces
+WHERE
+  slug = sqlc.arg('slug')
+  AND deleted_at IS NULL
+FOR UPDATE;
+
 -- name: GetWorkspaceIDBySlug :one
 SELECT
   id

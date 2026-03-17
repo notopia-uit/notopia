@@ -31,15 +31,15 @@ var (
 )
 
 type WorkspaceMember struct {
-	ID   uuid.UUID
+	ID   string
 	Role WorkspaceRole
 }
 
 type Authorization interface {
-	HasWorkspacePermission(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID, permission WorkspacePermission) (bool, error)
-	HasWorkspaceItemPermission(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID, permission WorkspaceItemPermission) (bool, error)
-	HasWorkspaceNotePermission(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID, permission WorkspaceItemPermission) (bool, error)
-	HasWorkspaceFolderPermission(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID, permission WorkspaceItemPermission) (bool, error)
-	CreateWorkspaceWithOwnership(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID, ownerID uuid.UUID) error
-	GetWorkspaceMembers(ctx context.Context, userID uuid.UUID, workspaceID uuid.UUID) ([]WorkspaceMember, error)
+	HasWorkspacePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission WorkspacePermission) (bool, error)
+	HasWorkspaceItemPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission WorkspaceItemPermission) (bool, error)
+	HasWorkspaceNotePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission WorkspaceItemPermission) (bool, error)
+	HasWorkspaceFolderPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission WorkspaceItemPermission) (bool, error)
+	CreateWorkspaceWithOwnership(ctx context.Context, userID string, workspaceID uuid.UUID, ownerID uuid.UUID) error
+	GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]WorkspaceMember, error)
 }

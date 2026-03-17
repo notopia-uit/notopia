@@ -20,7 +20,7 @@ func NewRenameWorkspaceHandler(workspacerepo domain.WorkspaceRepo) *RenameWorksp
 }
 
 func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspace) error {
-	workspace, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug)
+	workspace, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug, true)
 	if err != nil {
 		return domain.NewErrWorkspaceNotFound(cmd.Slug, err)
 	}

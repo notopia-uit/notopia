@@ -5,7 +5,11 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app/command"
 )
 
+var ProviderSetCommand = wire.NewSet(
+	wire.Struct(new(command.MoveWorkspaceItemsHandler), "*"),
+)
+
 var ProviderSet = wire.NewSet(
-	command.ProviderSet,
+	ProviderSetCommand,
 	wire.Struct(new(App), "*"),
 )
