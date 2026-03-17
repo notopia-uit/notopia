@@ -79,6 +79,6 @@ func NewUnauthorized(message string, code string, err error) *Err {
 	return New(TypeUnauthorized, message, code, err)
 }
 
-func NewUnimplemented(message string, code string, err error) *Err {
-	return New(TypeUnimplemented, message, code, err)
+func NewUnimplemented() *Err {
+	return New(TypeUnimplemented, "Unimplemented", "", nil)
 }

@@ -20,25 +20,25 @@ func NewGRPCHandler() *GRPCHandler {
 var ProvideGRPCHandler = NewGRPCHandler
 
 func (h *GRPCHandler) CreateWorkspaceWithOwner(context.Context, *connect.Request[pb.CreateWorkspaceWithOwnerRequest]) (*connect.Response[pb.CreateWorkspaceWithOwnerResponse], error) {
-	return nil, commonerror.NewUnimplemented("not implemented", "not_implemented", nil)
+	return nil, commonerror.NewUnimplemented()
 }
 
 func (h *GRPCHandler) GetWorkspaceMembers(context.Context, *connect.Request[pb.GetWorkspaceMembersRequest]) (*connect.Response[pb.GetWorkspaceMembersResponse], error) {
-	return nil, commonerror.NewUnimplemented("not implemented", "not_implemented", nil)
+	return nil, commonerror.NewUnimplemented()
 }
 
 func (h *GRPCHandler) HasWorkspacePermission(context.Context, *connect.Request[pb.HasWorkspacePermissionRequest]) (*connect.Response[pb.HasWorkspacePermissionResponse], error) {
-	return nil, commonerror.NewUnimplemented("not implemented", "not_implemented", nil)
+	return nil, commonerror.NewUnimplemented()
 }
 
 func (h *GRPCHandler) UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error) {
-	return nil, commonerror.NewUnimplemented("not implemented", "not_implemented", nil)
+	return nil, commonerror.NewUnimplemented()
 }
 
 func (h *GRPCHandler) HasNotePermission(context.Context, *connect.Request[pb.HasNotePermissionRequest]) (*connect.Response[pb.HasNotePermissionResponse], error) {
-	return nil, commonerror.NewUnimplemented("not implemented", "not_implemented", nil)
+	return nil, commonerror.NewUnimplemented()
 }
 
 func (h *GRPCHandler) GetUserNotePermissions(context.Context, *connect.Request[pb.GetUserNotePermissionsRequest]) (*connect.Response[pb.GetUserNotePermissionsResponse], error) {
-	return nil, commonerror.NewUnimplemented("not implemented", "not_implemented", nil)
+	return nil, commonerror.NewUnimplemented()
 }

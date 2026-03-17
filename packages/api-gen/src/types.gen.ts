@@ -1540,6 +1540,7 @@ export type MoveWorkspaceItemsData = {
     body: {
         noteIds?: Array<NoteNotePropertiesId>;
         folderIds?: Array<NoteId>;
+        destinationFolderId: NoteId;
     };
     path: {
         workspaceId: NotePropertiesId;

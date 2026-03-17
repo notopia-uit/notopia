@@ -768,7 +768,8 @@ export const zUpdateWorkspaceMembersResponse = z.void();
 export const zMoveWorkspaceItemsData = z.object({
     body: z.object({
         noteIds: z.array(zNoteNotePropertiesId).optional(),
-        folderIds: z.array(zNoteId).optional()
+        folderIds: z.array(zNoteId).optional(),
+        destinationFolderId: zNoteId
     }),
     path: z.object({
         workspaceId: zNotePropertiesId

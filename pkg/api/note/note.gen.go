@@ -524,8 +524,9 @@ type UpdateWorkspaceMembersJSONBody = []WorkspaceMember
 
 // MoveWorkspaceItemsJSONBody defines parameters for MoveWorkspaceItems.
 type MoveWorkspaceItemsJSONBody struct {
-	FolderIds *[]Id               `json:"folderIds,omitempty"`
-	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
+	DestinationFolderId *Id                 `json:"destinationFolderId,omitempty"`
+	FolderIds           *[]Id               `json:"folderIds,omitempty"`
+	NoteIds             *[]NotePropertiesId `json:"noteIds,omitempty"`
 }
 
 // RenameWorkspaceJSONBody defines parameters for RenameWorkspace.

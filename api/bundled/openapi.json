@@ -1371,8 +1371,14 @@
                     "items": {
                       "$ref": "#/components/schemas/note_id"
                     }
+                  },
+                  "destinationFolderId": {
+                    "$ref": "#/components/schemas/note_id"
                   }
-                }
+                },
+                "required": [
+                  "destinationFolderId"
+                ]
               }
             }
           }

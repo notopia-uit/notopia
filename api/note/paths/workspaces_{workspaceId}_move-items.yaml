@@ -23,6 +23,10 @@ post:
               type: array
               items:
                 $ref: ../components/schemas/Folder.yaml#/properties/id
+            destinationFolderId:
+              $ref: ../components/schemas/Folder.yaml#/properties/id
+          required:
+            - destinationFolderId
   responses:
     204:
       description: Workspace items successfully moved

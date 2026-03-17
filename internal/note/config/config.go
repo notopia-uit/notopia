@@ -16,6 +16,10 @@ type Server struct {
 	GRPC commonconfig.ServerAddress `json:"grpc" mapstructure:"grpc" validate:"required" yaml:"grpc"`
 }
 
+type Services struct {
+	Authorization commonconfig.Service `json:"authorization" mapstructure:"authorization" validate:"required" yaml:"authorization"`
+}
+
 type Config struct {
 	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
 	Log      logging.Config       `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
@@ -23,6 +27,7 @@ type Config struct {
 	Database commonconfig.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
 	Kafka    commonconfig.Kafka   `json:"kafka"    mapstructure:"kafka"    validate:"required"  yaml:"kafka"`
 	Redis    commonconfig.Redis   `json:"redis"    mapstructure:"redis"    validate:"required"  yaml:"redis"`
+	Services Services             `json:"services" mapstructure:"services" validate:"required"  yaml:"services"`
 }
 
 func New(
