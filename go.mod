@@ -11,6 +11,7 @@ require (
 	github.com/ThreeDotsLabs/watermill-redisstream v1.4.5
 	github.com/casbin/casbin/v3 v3.10.0
 	github.com/casbin/gorm-adapter v1.0.0
+	github.com/casbin/gorm-adapter/v3 v3.41.0
 	github.com/exaring/otelpgx v0.10.0
 	github.com/getkin/kin-openapi v0.133.0
 	github.com/gin-contrib/slog v1.2.0
