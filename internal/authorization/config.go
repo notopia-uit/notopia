@@ -27,7 +27,7 @@ func NewConfig(
 	validate *validator.Validate,
 	viper *viper.Viper,
 ) (*Config, error) {
-	viper.SetEnvPrefix("notopia_note")
+	viper.SetEnvPrefix("notopia_authorization")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	viper.SetConfigName("authorization.notopia.config")

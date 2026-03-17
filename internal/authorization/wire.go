@@ -30,11 +30,16 @@ var ProviderSetGRPCServer = wire.NewSet(
 	wire.Bind(new(pbconnect.AuthorizationServiceHandler), new(*GRPCHandler)),
 )
 
+var ProviderSetCasbin = wire.NewSet(
+	ProvideCasbinEnforcer,
+)
+
 var ProviderSet = wire.NewSet(
 	ProviderSetComponent,
 	ProvideServer,
 	ProviderSetConfig,
 	ProviderSetGRPCServer,
+	ProviderSetCasbin,
 	logging.ProviderSet,
 	otel.ProviderSet,
 )
