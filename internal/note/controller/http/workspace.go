@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +36,6 @@ func (h *StrictHandler) GetWorkspace(
 	return nil, errors.New("not implemented")
 }
 
-// FIX: Write a wrapper struct having mutex lock for ticker and response
 func (h *StrictHandler) GetWorkspaceEvents(
 	ctx context.Context,
 	request note.GetWorkspaceEventsRequestObject,
@@ -48,14 +48,14 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	if err != nil {
 		return nil, err
 	}
-	ticker := time.NewTicker(15 * time.Second)
-	defer ticker.Stop()
-
 	eventCh, err := h.WorkspaceEvent.Subscribe(ctx, request.WorkspaceId, user.ID)
 	if err != nil {
 		return nil, commonerror.NewInternal("failed to subscribe to workspace events", "", err)
 	}
+	ticker := time.NewTicker(15 * time.Second)
+	defer ticker.Stop()
 	r, w := io.Pipe()
+	mu := &sync.Mutex{}
 	go func() {
 		defer func() {
 			if err := w.Close(); err != nil {
@@ -67,11 +67,14 @@ func (h *StrictHandler) GetWorkspaceEvents(
 			case <-c.Done():
 				return
 			case <-ticker.C:
+				mu.Lock()
 				if _, err := w.Write([]byte("heartbeat: keep-alive\n\n")); err != nil {
 					slog.ErrorContext(c, "failed to write keep-alive comment in workspace events stream", slog.String("error", err.Error()))
+					mu.Unlock()
 					return
 				}
 				c.Writer.Flush()
+				mu.Unlock()
 				slog.DebugContext(c, "sent keep-alive comment in workspace events stream")
 			case event, ok := <-eventCh:
 				if !ok {
@@ -88,19 +91,24 @@ func (h *StrictHandler) GetWorkspaceEvents(
 					slog.ErrorContext(c, "failed to marshal event to JSON", slog.String("error", err.Error()))
 					continue
 				}
+				mu.Lock()
 				if _, err := w.Write([]byte("data: ")); err != nil {
 					slog.ErrorContext(c, "failed to write event prefix in workspace events stream", slog.String("error", err.Error()))
+					mu.Unlock()
 					return
 				}
 				if _, err := w.Write(eventBytes); err != nil {
 					slog.ErrorContext(c, "failed to write event data in workspace events stream", slog.String("error", err.Error()))
+					mu.Unlock()
 					return
 				}
 				if _, err := w.Write([]byte("\n\n")); err != nil {
 					slog.ErrorContext(c, "failed to write event suffix in workspace events stream", slog.String("error", err.Error()))
+					mu.Unlock()
 					return
 				}
 				c.Writer.Flush()
+				mu.Unlock()
 			}
 		}
 	}()
