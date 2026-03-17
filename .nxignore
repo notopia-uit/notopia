@@ -1,3 +1,8 @@
 .temp
 build
 dist
+
+cmd/note/note
+cmd/note/note.exe
+cmd/authorization/authorization
+cmd/authorization/authorization.exe

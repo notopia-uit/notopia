@@ -19,7 +19,7 @@ entries:
 
   - model: authentik_core.user
     identifiers:
-      pk: 100
+      pk: 110
     attrs:
       username: user
       name: User
@@ -28,7 +28,7 @@ entries:
 
   - model: authentik_core.user
     identifiers:
-      pk: 110
+      pk: 111
     attrs:
       username: ntgnguyen
       name: Nguyen Thai Gia Nguyen

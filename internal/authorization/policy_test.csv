@@ -1,0 +1,27 @@
+p, owner, note, read
+p, owner, note, write
+p, owner, note, delete
+p, owner, workspace, read
+p, owner, workspace, edit
+p, owner, workspace, delete
+
+p, editor, note, read
+p, editor, note, write
+p, editor, note, delete
+p, editor, workspace, read
+
+p, viewer, note, read
+p, viewer, workspace, read
+
+# user 110
+# ntgnguyen 111
+# kevinnitro 112
+
+g, user:111, owner, workspace:111
+g, user:112, editor, workspace:111
+g, user:110, viewer, workspace:111
+
+g, user:112, owner, workspace:112
+g, user:111, editor, workspace:112
+
+g, user:110, owner, workspace:110

@@ -174,7 +174,7 @@
         }
       },
       "docker": {
-        "projects": ["note", "document", "web"],
+        "projects": ["note", "authorization", "document", "web"],
         "releaseTag": {
           "pattern": "{projectName}@{version}"
         },
