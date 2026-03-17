@@ -14,6 +14,7 @@ func GetLocalEnforcer() (*casbin.Enforcer, error) {
 	return e, nil
 }
 
+// Shared at https://editor.casbin.org/#GURKL5ZXW
 func TestModels(t *testing.T) {
 	e, err := GetLocalEnforcer()
 	if err != nil {
@@ -28,18 +29,65 @@ func TestModels(t *testing.T) {
 		act   string
 		allow bool
 	}{
-		{"user:111 (owner) can edit workspace:111", "user:111", "workspace:111", "workspace", "edit", true},
-		{"user:111 (owner) can delete note in workspace:111", "user:111", "workspace:111", "note", "delete", true},
-		{"user:112 (editor) can write note in workspace:111", "user:112", "workspace:111", "note", "write", true},
-		{"user:112 (editor) CANNOT edit workspace:111", "user:112", "workspace:111", "workspace", "edit", false},
-		{"user:110 (viewer) can read note in workspace:111", "user:110", "workspace:111", "note", "read", true},
-		{"user:110 (viewer) CANNOT write note in workspace:111", "user:110", "workspace:111", "note", "write", false},
-		{"user:112 (owner) can delete workspace:112", "user:112", "workspace:112", "workspace", "delete", true},
-		{"user:111 (editor) can read workspace:112", "user:111", "workspace:112", "workspace", "read", true},
-		{"user:111 (editor) CANNOT delete workspace:112", "user:111", "workspace:112", "workspace", "delete", false},
-		{"user:110 (no role) CANNOT read note in workspace:112", "user:110", "workspace:112", "note", "read", false},
-		{"user:110 (owner) can edit workspace:110", "user:110", "workspace:110", "workspace", "edit", true},
-		{"user:112 (no role) CANNOT read note in workspace:110", "user:112", "workspace:110", "note", "read", false},
+		// =====================================================================
+		// WORKSPACE 111: Owner(111), Editor(112), Viewer(110)
+		// =====================================================================
+
+		// Owner: user:111
+		{"W111-Owner: Read Workspace", "user:111", "workspace:111", "workspace", "read", true},
+		{"W111-Owner: Edit Workspace", "user:111", "workspace:111", "workspace", "edit", true},
+		{"W111-Owner: Delete Workspace", "user:111", "workspace:111", "workspace", "delete", true},
+		{"W111-Owner: Read Note", "user:111", "workspace:111", "note", "read", true},
+		{"W111-Owner: Write Note", "user:111", "workspace:111", "note", "write", true},
+		{"W111-Owner: Delete Folder", "user:111", "workspace:111", "folder", "delete", true},
+
+		// Editor: user:112
+		{"W111-Editor: Read Workspace", "user:112", "workspace:111", "workspace", "read", true},
+		{"W111-Editor: CANNOT Edit Workspace", "user:112", "workspace:111", "workspace", "edit", false},
+		{"W111-Editor: CANNOT Delete Workspace", "user:112", "workspace:111", "workspace", "delete", false},
+		{"W111-Editor: Read Note", "user:112", "workspace:111", "note", "read", true},
+		{"W111-Editor: Write Note", "user:112", "workspace:111", "note", "write", true},
+		{"W111-Editor: Delete Note", "user:112", "workspace:111", "note", "delete", true},
+		{"W111-Editor: Write Folder", "user:112", "workspace:111", "folder", "write", true},
+
+		// Viewer: user:110
+		{"W111-Viewer: Read Workspace", "user:110", "workspace:111", "workspace", "read", true},
+		{"W111-Viewer: CANNOT Edit Workspace", "user:110", "workspace:111", "workspace", "edit", false},
+		{"W111-Viewer: Read Note", "user:110", "workspace:111", "note", "read", true},
+		{"W111-Viewer: CANNOT Write Note", "user:110", "workspace:111", "note", "write", false},
+		{"W111-Viewer: CANNOT Delete Folder", "user:110", "workspace:111", "folder", "delete", false},
+
+		// =====================================================================
+		// WORKSPACE 112: Owner(112), Editor(111), No Role(110)
+		// =====================================================================
+
+		// Owner: user:112
+		{"W112-Owner: Delete Workspace", "user:112", "workspace:112", "workspace", "delete", true},
+		{"W112-Owner: Write Note", "user:112", "workspace:112", "note", "write", true},
+
+		// Editor: user:111
+		{"W112-Editor: Read Workspace", "user:111", "workspace:112", "workspace", "read", true},
+		{"W112-Editor: CANNOT Delete Workspace", "user:111", "workspace:112", "workspace", "delete", false},
+		{"W112-Editor: Write Note", "user:111", "workspace:112", "note", "write", true},
+
+		// No Role: user:110
+		{"W112-Stranger: CANNOT Read Note", "user:110", "workspace:112", "note", "read", false},
+		{"W112-Stranger: CANNOT Read Workspace", "user:110", "workspace:112", "workspace", "read", false},
+
+		// =====================================================================
+		// WORKSPACE 110: Owner(110)
+		// =====================================================================
+
+		{"W110-Owner: Edit Workspace", "user:110", "workspace:110", "workspace", "edit", true},
+		{"W110-Stranger: User 111 CANNOT Read W110", "user:111", "workspace:110", "note", "read", false},
+		{"W110-Stranger: User 112 CANNOT Read W110", "user:112", "workspace:110", "workspace", "read", false},
+
+		// =====================================================================
+		// CROSS-TENANT ATTACK (The "Leaking" Test)
+		// =====================================================================
+
+		{"Security: user:111 (Owner of W111) cannot edit W112", "user:111", "workspace:112", "workspace", "edit", false},
+		{"Security: user:112 (Owner of W112) cannot delete W111", "user:112", "workspace:111", "workspace", "delete", false},
 	}
 
 	for _, tc := range tests {

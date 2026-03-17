@@ -1,17 +1,20 @@
-p, owner, note, read
-p, owner, note, write
-p, owner, note, delete
 p, owner, workspace, read
 p, owner, workspace, edit
 p, owner, workspace, delete
+p, owner, workspace_item, read
+p, owner, workspace_item, write
+p, owner, workspace_item, delete
 
-p, editor, note, read
-p, editor, note, write
-p, editor, note, delete
 p, editor, workspace, read
+p, editor, workspace_item, read
+p, editor, workspace_item, write
+p, editor, workspace_item, delete
 
-p, viewer, note, read
 p, viewer, workspace, read
+p, viewer, workspace_item, read
+
+g2, note, workspace_item
+g2, folder, workspace_item
 
 # user 110
 # ntgnguyen 111
