@@ -3,7 +3,6 @@ name: notopia
 
 include:
   - ./infrastructure/authentik.yaml
-  - ./infrastructure/authorization.yaml
   - ./infrastructure/dbgate.yaml
   - ./infrastructure/meilisearch.yaml
   - ./infrastructure/redpanda.yaml
@@ -18,3 +17,4 @@ include:
 
   - ./services/note.yaml
   - ./services/document.yaml
+  - ./services/authorization.yaml

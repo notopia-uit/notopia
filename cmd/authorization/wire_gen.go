@@ -10,15 +10,66 @@ import (
 	"context"
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/authorization"
+	"github.com/notopia-uit/notopia/pkg/logging"
+	"github.com/notopia-uit/notopia/pkg/otel"
 )
 
 // Injectors from wire.go:
 
 func InitializeServer(ctx context.Context) (*authorization.Server, func(), error) {
-	server := &authorization.Server{}
+	grpcHandler := authorization.NewGRPCHandler()
+	validate := authorization.NewValidate()
+	viper := authorization.NewViper()
+	config, err := authorization.NewConfig(validate, viper)
+	if err != nil {
+		return nil, nil, err
+	}
+	serverConfig := &config.Server
+	serviceName := _wireServiceNameValue
+	serviceVersion := _wireServiceVersionValue
+	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
+	if err != nil {
+		return nil, nil, err
+	}
+	tracerProvider, cleanup, err := otel.NewTracerProvider(ctx, resource)
+	if err != nil {
+		return nil, nil, err
+	}
+	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, resource)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	loggingConfig := &config.Log
+	stdoutHandler := logging.NewStdoutHandler(loggingConfig)
+	loggerProvider, cleanup3, err := otel.NewLoggerProvider(ctx, resource)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
+	logger := logging.New(stdoutHandler, slogHandler, loggingConfig)
+	grpcServer, cleanup4, err := authorization.NewGRPCServer(ctx, grpcHandler, serverConfig, tracerProvider, meterProvider, logger)
+	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	server := authorization.NewServer(grpcServer, logger)
 	return server, func() {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
 	}, nil
 }
+
+var (
+	_wireServiceNameValue    = ServiceName
+	_wireServiceVersionValue = ServiceVersion
+)
 
 // wire.go:
 

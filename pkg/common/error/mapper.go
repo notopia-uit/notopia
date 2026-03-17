@@ -26,7 +26,7 @@ func ToHTTP(domainErr *Err) (
 		statusCode = http.StatusForbidden
 	case TypeUnauthorized:
 		statusCode = http.StatusUnauthorized
-	case TypeInternal:
+	case TypeInternal, TypeUnimplemented:
 		statusCode = http.StatusInternalServerError
 	}
 	return
@@ -49,6 +49,8 @@ func ToConnectRPC(err error) error {
 			code = connect.CodeUnauthenticated
 		case TypeInternal:
 			code = connect.CodeInternal
+		case TypeUnimplemented:
+			code = connect.CodeUnimplemented
 		default:
 			code = connect.CodeUnknown
 		}

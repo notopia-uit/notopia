@@ -1,4 +1,4 @@
-package grpc
+package authorization
 
 import (
 	"context"
@@ -8,42 +8,24 @@ import (
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
-	"github.com/notopia-uit/notopia/internal/note/app"
-	"github.com/notopia-uit/notopia/internal/note/config"
 	commongrpc "github.com/notopia-uit/notopia/pkg/common/grpc"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 
-type IHandler = pbconnect.NoteServiceHandler
-
-type Handler struct {
-	app app.App
-}
-
-var _ IHandler = (*Handler)(nil)
-
-func NewHandler(app *app.App) *Handler {
-	return &Handler{
-		app: *app,
-	}
-}
-
-var ProvideHandler = NewHandler
-
-type Server struct {
+type GRPCServer struct {
 	*http.Server
 }
 
-func New(
+func NewGRPCServer(
 	ctx context.Context,
-	handler IHandler,
-	cfg *config.Server,
+	handler pbconnect.AuthorizationServiceHandler,
+	cfg *ServerConfig,
 	traceProvider *trace.TracerProvider,
 	meterProvider *metric.MeterProvider,
 	logger *slog.Logger,
-) (*Server, func(), error) {
+) (*GRPCServer, func(), error) {
 	interceptor, err := otelconnect.NewInterceptor(
 		otelconnect.WithTracerProvider(traceProvider),
 		otelconnect.WithMeterProvider(meterProvider),
@@ -53,19 +35,16 @@ func New(
 		return nil, nil, fmt.Errorf("failed to create otel interceptor: %w", err)
 	}
 	errInterceptor := commongrpc.NewErrorInterceptor()
-	Path, Handler := pbconnect.NewNoteServiceHandler(
+	Path, Handler := pbconnect.NewAuthorizationServiceHandler(
 		handler,
-		connect.WithInterceptors(
-			interceptor,
-			errInterceptor,
-		),
+		connect.WithInterceptors(interceptor, errInterceptor),
 	)
 	mux := http.NewServeMux()
 	mux.Handle(Path, Handler)
 	protocol := new(http.Protocols)
 	protocol.SetHTTP1(true)
 	protocol.SetUnencryptedHTTP2(true)
-	server := &Server{
+	server := &GRPCServer{
 		Server: &http.Server{
 			Addr:      cfg.GRPC.Address(),
 			Handler:   mux,
@@ -80,8 +59,11 @@ func New(
 	return server, cleanup, nil
 }
 
-func (s *Server) Run() error {
-	return s.ListenAndServe()
-}
+var ProvideGRPCServer = NewGRPCServer
 
-var Provide = New
+func (s *GRPCServer) Run() error {
+	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		return fmt.Errorf("failed to start grpc server: %w", err)
+	}
+	return nil
+}

@@ -3,12 +3,13 @@ package commonerror
 type Type string
 
 var (
-	TypeInternal     Type = "internal error"
-	TypeInvalid      Type = "invalid error"
-	TypeNotFound     Type = "not found error"
-	TypeConflict     Type = "conflict error"
-	TypeForbidden    Type = "forbidden error"
-	TypeUnauthorized Type = "unauthorized error"
+	TypeInternal      Type = "internal error"
+	TypeInvalid       Type = "invalid error"
+	TypeNotFound      Type = "not found error"
+	TypeConflict      Type = "conflict error"
+	TypeForbidden     Type = "forbidden error"
+	TypeUnauthorized  Type = "unauthorized error"
+	TypeUnimplemented Type = "unimplemented error"
 )
 
 type Err struct {
@@ -76,4 +77,8 @@ func NewForbidden(message string, code string, err error) *Err {
 
 func NewUnauthorized(message string, code string, err error) *Err {
 	return New(TypeUnauthorized, message, code, err)
+}
+
+func NewUnimplemented(message string, code string, err error) *Err {
+	return New(TypeUnimplemented, message, code, err)
 }
