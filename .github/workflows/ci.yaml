@@ -163,7 +163,7 @@ jobs:
           skip-save-cache: ${{ env.SHOULD_CACHE != 'true' }}
 
       - name: Setup Mise
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v4
         with:
           experimental: true
           cache: ${{ env.SHOULD_CACHE == 'true' }}
