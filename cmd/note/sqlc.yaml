@@ -3,7 +3,9 @@ version: '2'
 
 sql:
   - engine: postgresql
-    schema: ../../internal/note/infra/persistence/pgmigration/
+    schema:
+      - ../../internal/note/infra/persistence/pgmigration/
+      - ../../internal/note/infra/persistence/pgsqlc/temp_tables.sql
     queries: ../../internal/note/infra/persistence/pgsqlc/
     gen:
       go:

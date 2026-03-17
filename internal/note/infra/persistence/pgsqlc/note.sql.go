@@ -12,6 +12,31 @@ import (
 	"github.com/google/uuid"
 )
 
+const countNotesInWorkspaceByIDs = `-- name: CountNotesInWorkspaceByIDs :one
+SELECT
+  COUNT(*)
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  f.workspace_id = $1
+  AND n.id = ANY($2::uuid[])
+`
+
+type CountNotesInWorkspaceByIDsParams struct {
+	WorkspaceID uuid.UUID
+	IDs         []uuid.UUID
+}
+
+func (q *Queries) CountNotesInWorkspaceByIDs(ctx context.Context, arg *CountNotesInWorkspaceByIDsParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countNotesInWorkspaceByIDs, arg.WorkspaceID, arg.IDs)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getNote = `-- name: GetNote :one
 SELECT
   id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
@@ -38,6 +63,47 @@ func (q *Queries) GetNote(ctx context.Context, id uuid.UUID) (*Note, error) {
 		&i.TrashedAt,
 	)
 	return &i, err
+}
+
+const getNotes = `-- name: GetNotes :many
+SELECT
+  id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
+FROM
+  notes
+WHERE
+  id = ANY($1::uuid[])
+  AND trashed_at IS NULL
+`
+
+func (q *Queries) GetNotes(ctx context.Context, ids []uuid.UUID) ([]*Note, error) {
+	rows, err := q.db.Query(ctx, getNotes, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Note
+	for rows.Next() {
+		var i Note
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Icon,
+			&i.FolderID,
+			&i.Tags,
+			&i.Size,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getNotesByFolderID = `-- name: GetNotesByFolderID :many
@@ -129,6 +195,19 @@ func (q *Queries) GetTrashedNotesByWorkspaceID(ctx context.Context, workspaceID 
 	return items, nil
 }
 
+type InsertTempNotesParams struct {
+	ID        uuid.UUID
+	Name      string
+	Icon      *string
+	FolderID  uuid.UUID
+	Tags      []string
+	Size      int32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	TrashedBy *string
+	TrashedAt *time.Time
+}
+
 const permanentlyDeleteNoteByID = `-- name: PermanentlyDeleteNoteByID :exec
 DELETE FROM
   notes
@@ -150,6 +229,48 @@ WHERE
 
 func (q *Queries) PermanentlyDeleteNotesByIDs(ctx context.Context, ids []uuid.UUID) error {
 	_, err := q.db.Exec(ctx, permanentlyDeleteNotesByIDs, ids)
+	return err
+}
+
+const saveFromTempNotes = `-- name: SaveFromTempNotes :exec
+INSERT INTO notes (
+  id,
+  name,
+  icon,
+  folder_id,
+  tags,
+  size,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+)
+SELECT
+  id,
+  name,
+  icon,
+  folder_id,
+  tags,
+  size,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+FROM
+  temp_notes
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  icon = EXCLUDED.icon,
+  folder_id = EXCLUDED.folder_id,
+  tags = EXCLUDED.tags,
+  size = EXCLUDED.size,
+  updated_at = EXCLUDED.updated_at,
+  trashed_by = EXCLUDED.trashed_by,
+  trashed_at = EXCLUDED.trashed_at
+`
+
+func (q *Queries) SaveFromTempNotes(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, saveFromTempNotes)
 	return err
 }
 

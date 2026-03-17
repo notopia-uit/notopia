@@ -38,6 +38,79 @@ ON CONFLICT (id) DO UPDATE SET
   trashed_by = EXCLUDED.trashed_by,
   trashed_at = EXCLUDED.trashed_at;
 
+-- name: InsertTempFolders :copyfrom
+INSERT INTO temp_folders (
+  id,
+  name,
+  icon,
+  workspace_id,
+  parent_id,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+) VALUES (
+  @id,
+  @name,
+  @icon,
+  @workspace_id,
+  @parent_id,
+  @created_at,
+  @updated_at,
+  @trashed_by,
+  @trashed_at
+);
+
+-- name: SaveFromTempFolders :exec
+INSERT INTO folders (
+  id,
+  name,
+  icon,
+  workspace_id,
+  parent_id,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+)
+SELECT
+  id,
+  name,
+  icon,
+  workspace_id,
+  parent_id,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+FROM
+  temp_folders
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  icon = EXCLUDED.icon,
+  parent_id = EXCLUDED.parent_id,
+  updated_at = EXCLUDED.updated_at,
+  trashed_by = EXCLUDED.trashed_by,
+  trashed_at = EXCLUDED.trashed_at;
+
+-- name: GetFolders :many
+SELECT
+  *
+FROM
+  folders
+WHERE
+  id = ANY(sqlc.arg('ids')::uuid[])
+  AND trashed_at IS NULL;
+
+-- name: CountFoldersInWorkspaceByIDs :one
+SELECT
+  COUNT(*)
+FROM
+  folders
+WHERE
+  workspace_id = sqlc.arg('workspace_id')
+  AND id = ANY(sqlc.arg('ids')::uuid[]);
+
 -- name: GetTrashedFoldersByWorkspaceID :many
 SELECT
   *

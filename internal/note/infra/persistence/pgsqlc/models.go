@@ -100,6 +100,31 @@ type NoteLink struct {
 	TargetID uuid.UUID
 }
 
+type TempFolder struct {
+	ID          uuid.UUID
+	Name        string
+	Icon        *string
+	WorkspaceID uuid.UUID
+	ParentID    *uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	TrashedBy   *string
+	TrashedAt   *time.Time
+}
+
+type TempNote struct {
+	ID        uuid.UUID
+	Name      string
+	Icon      *string
+	FolderID  uuid.UUID
+	Tags      []string
+	Size      int32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	TrashedBy *string
+	TrashedAt *time.Time
+}
+
 type Workspace struct {
 	ID        uuid.UUID
 	Slug      string

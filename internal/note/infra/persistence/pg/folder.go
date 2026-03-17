@@ -54,6 +54,62 @@ func (f *Folder) Save(ctx context.Context, folder *domain.Folder) error {
 	return nil
 }
 
+func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs) ([]domain.Folder, error) {
+	folderResults, err := f.queries.GetFolders(ctx, ids)
+	if err != nil {
+		return nil, toDomainError(err)
+	}
+	folders := make([]domain.Folder, len(folderResults))
+	for i, folder := range folderResults {
+		folders[i] = *folderToDomain(folder)
+	}
+	return folders, nil
+}
+
+func (f *Folder) SaveMany(ctx context.Context, folders []domain.Folder) error {
+	err := f.queries.CreateTempTableFolders(ctx)
+	if err != nil {
+		return toDomainError(err)
+	}
+	saveFolderParams := make([]*pgsqlc.InsertTempFoldersParams, len(folders))
+	for i, folder := range folders {
+		saveFolderParams[i] = &pgsqlc.InsertTempFoldersParams{
+			ID:          folder.ID(),
+			Name:        folder.Name(),
+			Icon:        folder.Icon(),
+			WorkspaceID: folder.WorkspaceID(),
+			ParentID:    folder.ParentID(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+			TrashedBy:   folder.TrashedByString(),
+			TrashedAt:   folder.TrashedAt(),
+		}
+	}
+	affected, err := f.queries.InsertTempFolders(ctx, saveFolderParams)
+	if err != nil {
+		return toDomainError(err)
+	}
+	if affected != int64(len(folders)) {
+		return toDomainError(errors.New("not all folders were inserted into temp table"))
+	}
+	err = f.queries.SaveFromTempFolders(ctx)
+	if err != nil {
+		return toDomainError(err)
+	}
+	return nil
+}
+
+func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error) {
+	count, err := f.queries.CountFoldersInWorkspaceByIDs(ctx, &pgsqlc.CountFoldersInWorkspaceByIDsParams{
+		IDs:         ids,
+		WorkspaceID: workspaceID,
+	})
+	if err != nil {
+		return false, toDomainError(err)
+	}
+	return count == int64(len(ids)), nil
+}
+
 func (f *Folder) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID, trashedBy domain.TrashedBy) ([]domain.Folder, error) {
 	results, err := f.queries.GetTrashedFoldersByWorkspaceID(ctx, &pgsqlc.GetTrashedFoldersByWorkspaceIDParams{
 		WorkspaceID: workspaceID,

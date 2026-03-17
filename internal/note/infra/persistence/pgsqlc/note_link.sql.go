@@ -129,8 +129,7 @@ func (q *Queries) GetNoteOutgoingLinks(ctx context.Context, sourceID uuid.UUID) 
 
 const getNotesOutgoingLinks = `-- name: GetNotesOutgoingLinks :many
 SELECT
-  source_id,
-  target_id
+  source_id, target_id
 FROM
   note_links
 WHERE

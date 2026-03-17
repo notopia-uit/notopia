@@ -12,6 +12,28 @@ import (
 	"github.com/google/uuid"
 )
 
+const countFoldersInWorkspaceByIDs = `-- name: CountFoldersInWorkspaceByIDs :one
+SELECT
+  COUNT(*)
+FROM
+  folders
+WHERE
+  workspace_id = $1
+  AND id = ANY($2::uuid[])
+`
+
+type CountFoldersInWorkspaceByIDsParams struct {
+	WorkspaceID uuid.UUID
+	IDs         []uuid.UUID
+}
+
+func (q *Queries) CountFoldersInWorkspaceByIDs(ctx context.Context, arg *CountFoldersInWorkspaceByIDsParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countFoldersInWorkspaceByIDs, arg.WorkspaceID, arg.IDs)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getFolder = `-- name: GetFolder :one
 SELECT
   id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
@@ -37,6 +59,46 @@ func (q *Queries) GetFolder(ctx context.Context, id uuid.UUID) (*Folder, error) 
 		&i.TrashedAt,
 	)
 	return &i, err
+}
+
+const getFolders = `-- name: GetFolders :many
+SELECT
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+FROM
+  folders
+WHERE
+  id = ANY($1::uuid[])
+  AND trashed_at IS NULL
+`
+
+func (q *Queries) GetFolders(ctx context.Context, ids []uuid.UUID) ([]*Folder, error) {
+	rows, err := q.db.Query(ctx, getFolders, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Folder
+	for rows.Next() {
+		var i Folder
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Icon,
+			&i.WorkspaceID,
+			&i.ParentID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getFoldersByID = `-- name: GetFoldersByID :many
@@ -198,6 +260,18 @@ func (q *Queries) GetTrashedFoldersByWorkspaceID(ctx context.Context, arg *GetTr
 	return items, nil
 }
 
+type InsertTempFoldersParams struct {
+	ID          uuid.UUID
+	Name        string
+	Icon        *string
+	WorkspaceID uuid.UUID
+	ParentID    *uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	TrashedBy   *string
+	TrashedAt   *time.Time
+}
+
 const permanentlyDeleteFolderByID = `-- name: PermanentlyDeleteFolderByID :exec
 DELETE FROM
   folders
@@ -278,5 +352,43 @@ func (q *Queries) SaveFolder(ctx context.Context, arg *SaveFolderParams) error {
 		arg.TrashedBy,
 		arg.TrashedAt,
 	)
+	return err
+}
+
+const saveFromTempFolders = `-- name: SaveFromTempFolders :exec
+INSERT INTO folders (
+  id,
+  name,
+  icon,
+  workspace_id,
+  parent_id,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+)
+SELECT
+  id,
+  name,
+  icon,
+  workspace_id,
+  parent_id,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+FROM
+  temp_folders
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  icon = EXCLUDED.icon,
+  parent_id = EXCLUDED.parent_id,
+  updated_at = EXCLUDED.updated_at,
+  trashed_by = EXCLUDED.trashed_by,
+  trashed_at = EXCLUDED.trashed_at
+`
+
+func (q *Queries) SaveFromTempFolders(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, saveFromTempFolders)
 	return err
 }

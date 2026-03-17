@@ -33,6 +33,67 @@ ON CONFLICT (id) DO UPDATE SET
   trashed_by = EXCLUDED.trashed_by,
   trashed_at = EXCLUDED.trashed_at;
 
+-- name: InsertTempNotes :copyfrom
+INSERT INTO temp_notes (
+  id,
+  name,
+  icon,
+  folder_id,
+  tags,
+  size,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+) VALUES (
+  @id,
+  @name,
+  @icon,
+  @folder_id,
+  @tags,
+  @size,
+  @created_at,
+  @updated_at,
+  @trashed_by,
+  @trashed_at
+);
+
+-- name: SaveFromTempNotes :exec
+INSERT INTO notes (
+  id,
+  name,
+  icon,
+  folder_id,
+  tags,
+  size,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+)
+SELECT
+  id,
+  name,
+  icon,
+  folder_id,
+  tags,
+  size,
+  created_at,
+  updated_at,
+  trashed_by,
+  trashed_at
+FROM
+  temp_notes
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  icon = EXCLUDED.icon,
+  folder_id = EXCLUDED.folder_id,
+  tags = EXCLUDED.tags,
+  size = EXCLUDED.size,
+  updated_at = EXCLUDED.updated_at,
+  trashed_by = EXCLUDED.trashed_by,
+  trashed_at = EXCLUDED.trashed_at;
+
 -- name: GetNote :one
 SELECT
   *
@@ -41,6 +102,27 @@ FROM
 WHERE
   id = sqlc.arg('id')
   AND trashed_at IS NULL;
+
+-- name: GetNotes :many
+SELECT
+  *
+FROM
+  notes
+WHERE
+  id = ANY(sqlc.arg('ids')::uuid[])
+  AND trashed_at IS NULL;
+
+-- name: CountNotesInWorkspaceByIDs :one
+SELECT
+  COUNT(*)
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  f.workspace_id = sqlc.arg('workspace_id')
+  AND n.id = ANY(sqlc.arg('ids')::uuid[]);
 
 -- name: GetNotesByFolderID :many
 SELECT

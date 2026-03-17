@@ -40,6 +40,26 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID) (*domain.Note, error) 
 	return noteToDomain(noteResult, outgoingLinksResult), nil
 }
 
+func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs) ([]domain.Note, error) {
+	noteResults, err := n.queries.GetNotes(ctx, ids)
+	if err != nil {
+		return nil, toDomainError(err)
+	}
+	outgoingLinkResults, err := n.queries.GetNotesOutgoingLinks(ctx, ids)
+	if err != nil {
+		return nil, toDomainError(err)
+	}
+	outgoingLinksMap := make(map[uuid.UUID]uuid.UUIDs)
+	for _, outgoingLink := range outgoingLinkResults {
+		outgoingLinksMap[outgoingLink.SourceID] = append(outgoingLinksMap[outgoingLink.SourceID], outgoingLink.TargetID)
+	}
+	notes := make([]domain.Note, len(noteResults))
+	for i, note := range noteResults {
+		notes[i] = *noteToDomain(note, outgoingLinksMap[note.ID])
+	}
+	return notes, nil
+}
+
 func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 	err := n.queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
 		ID:        note.ID(),
@@ -57,6 +77,51 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 		return toDomainError(err)
 	}
 	return nil
+}
+
+func (n *Note) SaveMany(ctx context.Context, notes []domain.Note) error {
+	err := n.queries.CreateTempTableNotes(ctx)
+	if err != nil {
+		return toDomainError(err)
+	}
+	saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(notes))
+	for i, note := range notes {
+		saveNoteParams[i] = &pgsqlc.InsertTempNotesParams{
+			ID:        note.ID(),
+			Name:      note.Name(),
+			Icon:      note.Icon(),
+			FolderID:  note.FolderID(),
+			Tags:      note.Tags(),
+			Size:      int32(note.Size()),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			TrashedBy: note.TrashedByString(),
+			TrashedAt: note.TrashedAt(),
+		}
+	}
+	affected, err := n.queries.InsertTempNotes(ctx, saveNoteParams)
+	if err != nil {
+		return toDomainError(err)
+	}
+	if affected != int64(len(notes)) {
+		return toDomainError(errors.New("not all notes were inserted into temp table"))
+	}
+	err = n.queries.SaveFromTempNotes(ctx)
+	if err != nil {
+		return toDomainError(err)
+	}
+	return nil
+}
+
+func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error) {
+	count, err := n.queries.CountNotesInWorkspaceByIDs(ctx, &pgsqlc.CountNotesInWorkspaceByIDsParams{
+		IDs:         ids,
+		WorkspaceID: workspaceID,
+	})
+	if err != nil {
+		return false, toDomainError(err)
+	}
+	return count == int64(len(ids)), nil
 }
 
 func (n *Note) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]domain.Note, error) {

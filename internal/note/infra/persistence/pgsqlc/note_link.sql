@@ -19,8 +19,7 @@ WHERE
 
 -- name: GetNotesOutgoingLinks :many
 SELECT
-  source_id,
-  target_id
+  *
 FROM
   note_links
 WHERE
