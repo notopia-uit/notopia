@@ -1,7 +1,0 @@
-package pubsub
-
-import "github.com/goforj/wire"
-
-var ProviderSet = wire.NewSet(
-	wire.Struct(new(WorkspaceEvent), "*"),
-)

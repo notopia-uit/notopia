@@ -12,11 +12,20 @@ import (
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
+type Integration struct {
+	eventBus       *cqrs.EventBus
+	eventProcessor *cqrs.EventProcessor
+	router         *message.Router
+	publisher      message.Publisher
+}
+
+var _ pubsub.Integration = (*Integration)(nil)
+
 func NewIntegration(
 	cfg *commonconfig.Kafka,
 	logger watermill.LoggerAdapter,
 	marshaler cqrs.CommandEventMarshaler,
-) (*pubsub.Integration, error) {
+) (*Integration, error) {
 	tracer := kafka.NewOTELSaramaTracer()
 
 	publisher, err := kafka.NewPublisher(
@@ -71,10 +80,12 @@ func NewIntegration(
 		return nil, fmt.Errorf("failed to create integration event processor: %w", err)
 	}
 
-	return pubsub.NewIntegration(
-		eventBus,
-		eventProcessor,
-		router,
-		publisher,
-	), nil
+	return &Integration{
+		eventBus:       eventBus,
+		eventProcessor: eventProcessor,
+		router:         router,
+		publisher:      publisher,
+	}, nil
 }
+
+var ProvideIntegration = NewIntegration

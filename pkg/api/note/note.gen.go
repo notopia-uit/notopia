@@ -351,7 +351,7 @@ type TrashedNote struct {
 }
 
 // UserPropertiesId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-type UserPropertiesId = int
+type UserPropertiesId = string
 
 // UserPropertiesName Full name from Authentik
 type UserPropertiesName = string

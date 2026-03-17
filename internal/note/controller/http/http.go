@@ -22,8 +22,8 @@ type (
 )
 
 type StrictHandler struct {
-	app                  *app.App
-	workspaceEventPubSub *pubsub.WorkspaceEvent
+	App            *app.App
+	WorkspaceEvent pubsub.WorkspaceEvent
 }
 
 var _ IStrictHandler = (*StrictHandler)(nil)

@@ -35,6 +35,7 @@ func (h *StrictHandler) GetWorkspace(
 	return nil, errors.New("not implemented")
 }
 
+// FIX: Write a wrapper struct having mutex lock for ticker and response
 func (h *StrictHandler) GetWorkspaceEvents(
 	ctx context.Context,
 	request note.GetWorkspaceEventsRequestObject,
@@ -50,7 +51,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
 
-	eventCh, err := h.workspaceEventPubSub.Subscribe(ctx, request.WorkspaceId, user.ID)
+	eventCh, err := h.WorkspaceEvent.Subscribe(ctx, request.WorkspaceId, user.ID)
 	if err != nil {
 		return nil, commonerror.NewInternal("failed to subscribe to workspace events", "", err)
 	}

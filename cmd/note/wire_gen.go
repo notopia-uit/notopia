@@ -11,7 +11,6 @@ import (
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
-	pubsub2 "github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
@@ -102,13 +101,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	workspaceEventHubPubSub := pubsub.NewWorkspaceEventHubPubSub(loggerAdapter)
-	workspaceEvent := &pubsub2.WorkspaceEvent{
-		InternalPubSub: workspaceEventInternalPubSub,
-		HubPubSub:      workspaceEventHubPubSub,
-	}
+	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalPubSub, workspaceEventHubPubSub)
 	strictHandler := &http.StrictHandler{
-		app:                  appApp,
-		workspaceEventPubSub: workspaceEvent,
+		App:            appApp,
+		WorkspaceEvent: workspaceEvent,
 	}
 	serverInterface := http.NewHandler(strictHandler)
 	server := &configConfig.Server

@@ -65,7 +65,7 @@ type UserDeletedEvent struct {
 }
 
 // UserPropertiesId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-type UserPropertiesId = int
+type UserPropertiesId = string
 
 // Id defines model for id.
 type Id = openapi_types.UUID
