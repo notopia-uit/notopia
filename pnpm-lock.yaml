@@ -469,8 +469,8 @@ importers:
         specifier: 2.22.1
         version: 2.22.1(@opentelemetry/api@1.9.0)(core-js@3.48.0)(encoding@0.1.13)
       '@scalar/cli':
-        specifier: 1.7.4
-        version: 1.7.4(encoding@0.1.13)
+        specifier: 1.7.5
+        version: 1.7.5(encoding@0.1.13)
 
   apps/api-web:
     dependencies:
@@ -5547,8 +5547,8 @@ packages:
     resolution: {integrity: sha512-hMjXzMNaQ3Hvmo/4kMtL5TNtm0moR0l5/oyXKNdTt7mafbscrazOePfhFJm2okQ5HnsX+BefRvIjaknOifXvbw==}
     engines: {node: '>=22'}
 
-  '@scalar/cli@1.7.4':
-    resolution: {integrity: sha512-WlYiJBV+q+lmKWKwCLy/5BzNhUjBvV+ZjGoCtViGUFvF6cwzf9Dso7zaWovnaZZUvpOIJeoIe4m9+ZHKt3JKSg==}
+  '@scalar/cli@1.7.5':
+    resolution: {integrity: sha512-aYMGz+OzwSjIlIocPqZPpQzco3rhS0Y0XfaVALEeGYKIx51s4l/w0m6dV8YS+jl5XbURSLxZXtq2oZgY8ynZxQ==}
     engines: {node: '>=24'}
     hasBin: true
 
@@ -21625,7 +21625,7 @@ snapshots:
       - typescript
       - universal-cookie
 
-  '@scalar/cli@1.7.4(encoding@0.1.13)':
+  '@scalar/cli@1.7.5(encoding@0.1.13)':
     dependencies:
       '@stoplight/spectral-rulesets': 1.21.4(encoding@0.1.13)
       esbuild: 0.25.6
