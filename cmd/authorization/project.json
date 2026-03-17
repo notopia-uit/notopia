@@ -80,9 +80,10 @@
     },
     "nx-release-publish": {
       "parallelism": false
-    }
+    },
+    "test": {}
   },
-  "implicitDependencies": ["pkg"],
+  "implicitDependencies": ["pkg", "internal/authorization"],
   "release": {
     "docker": {
       "repositoryName": "notopia-uit/authorization"

@@ -40,6 +40,10 @@
       "dependsOn": ["^build*", "^bundle*", "^gen"],
       "cache": true
     },
+    "test": {
+      "dependsOn": ["^test*"],
+      "cache": true
+    },
     "lint*": {
       "cache": true
     }
