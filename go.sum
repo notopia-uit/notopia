@@ -53,6 +53,7 @@ github.com/casbin/casbin/v3 v3.10.0 h1:039ORla55vCeIZWd0LfzWFt1yiEA5X4W41xBW2bQu
 github.com/casbin/casbin/v3 v3.10.0/go.mod h1:5rJbQr2e6AuuDDNxnPc5lQlC9nIgg6nS1zYwKXhpHC8=
 github.com/casbin/gorm-adapter v1.0.0 h1:s6U2gJQ4reenRde0L85YsrwNt8k0bv6iUAfRigi1/cM=
 github.com/casbin/gorm-adapter v1.0.0/go.mod h1:1E0t3/djAo+vIvDfNPGigJjLMyoh2XNesXMW69R3ykA=
+github.com/casbin/gorm-adapter/v3 v3.41.0/go.mod h1:BQZRJhwUnwMpI+pT2m7/cUJwXxrHfzpBpPcNTyMGeGA=
 github.com/casbin/govaluate v1.3.0/go.mod h1:G/UnbIjZk/0uMNaLwZZmFQrR72tYRZWQkO70si/iR7A=
 github.com/casbin/govaluate v1.10.0 h1:ffGw51/hYH3w3rZcxO/KcaUIDOLP84w7nsidMVgaDG0=
 github.com/casbin/govaluate v1.10.0/go.mod h1:G/UnbIjZk/0uMNaLwZZmFQrR72tYRZWQkO70si/iR7A=
