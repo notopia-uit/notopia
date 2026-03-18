@@ -8,6 +8,7 @@ import (
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
+	"connectrpc.com/validate"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	commongrpc "github.com/notopia-uit/notopia/pkg/common/grpc"
@@ -44,7 +45,7 @@ func New(
 	meterProvider *metric.MeterProvider,
 	logger *slog.Logger,
 ) (*Server, func(), error) {
-	interceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewInterceptor(
 		otelconnect.WithTracerProvider(traceProvider),
 		otelconnect.WithMeterProvider(meterProvider),
 		otelconnect.WithTrustRemote(),
@@ -52,11 +53,13 @@ func New(
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create otel interceptor: %w", err)
 	}
+	validateInterceptor := validate.NewInterceptor()
 	errInterceptor := commongrpc.NewErrorInterceptor()
 	Path, Handler := pbconnect.NewNoteServiceHandler(
 		handler,
 		connect.WithInterceptors(
-			interceptor,
+			otelInterceptor,
+			validateInterceptor,
 			errInterceptor,
 		),
 	)

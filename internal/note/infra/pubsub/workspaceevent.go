@@ -105,6 +105,15 @@ func NewWorkspaceEvent(
 	internalPubSub *WorkspaceEventInternalPubSub,
 	hubPubSub *WorkspaceEventHubPubSub,
 ) *WorkspaceEvent {
+	internalPubSub.router.AddConsumerHandler(
+		"handler",
+		internalPubSub.topic,
+		internalPubSub.subscriber,
+		func(msg *message.Message) error {
+			workspaceID := msg.Metadata.Get(MetadataWorkspaceIDKey)
+			return hubPubSub.pubSub.Publish(workspaceID, msg)
+		},
+	)
 	return &WorkspaceEvent{
 		internalPubSub: internalPubSub,
 		hubPubSub:      hubPubSub,
@@ -112,18 +121,6 @@ func NewWorkspaceEvent(
 }
 
 var ProvideWorkspaceEvent = NewWorkspaceEvent
-
-func (w *WorkspaceEvent) Setup() {
-	w.internalPubSub.router.AddConsumerHandler(
-		"handler",
-		w.internalPubSub.topic,
-		w.internalPubSub.subscriber,
-		func(msg *message.Message) error {
-			workspaceID := msg.Metadata.Get(MetadataWorkspaceIDKey)
-			return w.hubPubSub.pubSub.Publish(workspaceID, msg)
-		},
-	)
-}
 
 func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...domain.WorkspaceEvent) error {
 	msgs := make([]*message.Message, len(events))

@@ -8,6 +8,7 @@ import (
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
+	"connectrpc.com/validate"
 	commongrpc "github.com/notopia-uit/notopia/pkg/common/grpc"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
 	"go.opentelemetry.io/otel/sdk/metric"
@@ -26,7 +27,7 @@ func NewGRPCServer(
 	meterProvider *metric.MeterProvider,
 	logger *slog.Logger,
 ) (*GRPCServer, func(), error) {
-	interceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewInterceptor(
 		otelconnect.WithTracerProvider(traceProvider),
 		otelconnect.WithMeterProvider(meterProvider),
 		otelconnect.WithTrustRemote(),
@@ -35,9 +36,14 @@ func NewGRPCServer(
 		return nil, nil, fmt.Errorf("failed to create otel interceptor: %w", err)
 	}
 	errInterceptor := commongrpc.NewErrorInterceptor()
+	validateInterceptor := validate.NewInterceptor()
 	Path, Handler := pbconnect.NewAuthorizationServiceHandler(
 		handler,
-		connect.WithInterceptors(interceptor, errInterceptor),
+		connect.WithInterceptors(
+			otelInterceptor,
+			validateInterceptor,
+			errInterceptor,
+		),
 	)
 	mux := http.NewServeMux()
 	mux.Handle(Path, Handler)

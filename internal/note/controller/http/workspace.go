@@ -152,13 +152,6 @@ func (h *StrictHandler) MoveWorkspaceItems(
 	return nil, errors.New("not implemented")
 }
 
-func (h *StrictHandler) GetWorkspaceTree(
-	ctx context.Context,
-	request note.GetWorkspaceTreeRequestObject,
-) (note.GetWorkspaceTreeResponseObject, error) {
-	return nil, errors.New("not implemented")
-}
-
 func (h *StrictHandler) PublishWorkspace(
 	ctx context.Context,
 	request note.PublishWorkspaceRequestObject,
@@ -170,6 +163,34 @@ func (h *StrictHandler) RenameWorkspace(
 	ctx context.Context,
 	request note.RenameWorkspaceRequestObject,
 ) (note.RenameWorkspaceResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) RestoreTrashedWorkspaceItems(
+	ctx context.Context,
+	request note.RestoreTrashedWorkspaceItemsRequestObject,
+) (note.RestoreTrashedWorkspaceItemsResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) ShowTrash(
+	ctx context.Context,
+	request note.ShowTrashRequestObject,
+) (note.ShowTrashResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) TrashWorkspaceItems(
+	ctx context.Context,
+	request note.TrashWorkspaceItemsRequestObject,
+) (note.TrashWorkspaceItemsResponseObject, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (h *StrictHandler) GetWorkspaceTree(
+	ctx context.Context,
+	request note.GetWorkspaceTreeRequestObject,
+) (note.GetWorkspaceTreeResponseObject, error) {
 	return nil, errors.New("not implemented")
 }
 

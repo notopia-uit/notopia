@@ -89,7 +89,7 @@ func workspaceEventToDTO(event domain.WorkspaceEvent) (any, bool) {
 	return dto, dto != nil
 }
 
-func queryNoteToDTO(n query.Note) note.Note {
+func getNoteToDTO(n query.Note) note.Note {
 	id := n.Id
 	folderID := n.FolderId
 	backlinksCount := n.BacklinksCount
@@ -111,7 +111,7 @@ func queryNoteToDTO(n query.Note) note.Note {
 	}
 }
 
-func queryFolderToDTO(f query.Folder) note.Folder {
+func getFolderToDTO(f query.Folder) note.Folder {
 	id := f.Id
 	parentID := f.ParentId
 	workspaceID := f.WorkspaceId
@@ -126,7 +126,7 @@ func queryFolderToDTO(f query.Folder) note.Folder {
 	}
 }
 
-func queryWorkspaceToDTO(w query.Workspace) note.Workspace {
+func getWorkspaceToDTO(w query.Workspace) note.Workspace {
 	id := w.Id
 	return note.Workspace{
 		Id:   &id,
@@ -135,14 +135,14 @@ func queryWorkspaceToDTO(w query.Workspace) note.Workspace {
 	}
 }
 
-func queryWorkspaceMemberToDTO(m query.WorkspaceMember) note.WorkspaceMember {
+func getWorkspaceMemberToDTO(m query.WorkspaceMember) note.WorkspaceMember {
 	return note.WorkspaceMember{
 		Role:     note.WorkspaceRole(m.Role),
 		Username: m.Username,
 	}
 }
 
-func queryWorkspaceTreeNoteToDTO(n query.WorkspaceTreeNote) note.WorkspaceTreeNote {
+func getWorkspaceTreeNoteToDTO(n query.WorkspaceTreeNote) note.WorkspaceTreeNote {
 	id := n.Id
 	updatedAt := n.UpdatedAt
 	return note.WorkspaceTreeNote{
@@ -153,16 +153,16 @@ func queryWorkspaceTreeNoteToDTO(n query.WorkspaceTreeNote) note.WorkspaceTreeNo
 	}
 }
 
-func queryWorkspaceTreeFolderToDTO(f query.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
+func getWorkspaceTreeFolderToDTO(f query.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
 	id := f.Id
 	updatedAt := f.UpdatedAt
 	notes := make([]note.WorkspaceTreeNote, len(f.Notes))
 	for i, n := range f.Notes {
-		notes[i] = queryWorkspaceTreeNoteToDTO(n)
+		notes[i] = getWorkspaceTreeNoteToDTO(n)
 	}
 	children := make([]note.WorkspaceTreeFolder, len(f.Children))
 	for i, c := range f.Children {
-		children[i] = queryWorkspaceTreeFolderToDTO(c)
+		children[i] = getWorkspaceTreeFolderToDTO(c)
 	}
 	return note.WorkspaceTreeFolder{
 		Id:        &id,
@@ -174,7 +174,7 @@ func queryWorkspaceTreeFolderToDTO(f query.WorkspaceTreeFolder) note.WorkspaceTr
 	}
 }
 
-func queryTrashedFolderToDTO(f query.TrashedFolder) note.TrashedFolder {
+func getTrashedFolderToDTO(f query.TrashedFolder) note.TrashedFolder {
 	name := f.Name
 	trashedAt := f.TrashedAt
 	trashedBy := note.TrashedBy(f.TrashedBy)
@@ -186,7 +186,7 @@ func queryTrashedFolderToDTO(f query.TrashedFolder) note.TrashedFolder {
 	}
 }
 
-func queryTrashedNoteToDTO(n query.TrashedNote) note.TrashedNote {
+func getTrashedNoteToDTO(n query.TrashedNote) note.TrashedNote {
 	name := n.Name
 	trashedAt := n.TrashedAt
 	trashedBy := note.TrashedBy(n.TrashedBy)
@@ -198,7 +198,7 @@ func queryTrashedNoteToDTO(n query.TrashedNote) note.TrashedNote {
 	}
 }
 
-func queryNoteLinkToDTO(n query.NoteLink) note.NoteLink {
+func getNoteLinkToDTO(n query.NoteLink) note.NoteLink {
 	id := n.Id
 	return note.NoteLink{
 		Id:   &id,
@@ -207,7 +207,7 @@ func queryNoteLinkToDTO(n query.NoteLink) note.NoteLink {
 	}
 }
 
-func queryGraphToDTO(g query.Graph) note.Graph {
+func getGraphToDTO(g query.Graph) note.Graph {
 	dto := note.Graph{
 		Nodes: make([]struct {
 			Id     string              `json:"id"`
@@ -236,11 +236,11 @@ func queryGraphToDTO(g query.Graph) note.Graph {
 	return dto
 }
 
-func queryWorkspaceMembersUpdatedEventToDTO(e query.WorkspaceMembersUpdatedEvent) note.WorkspaceMemebersUpdatedEvent {
+func getWorkspaceMembersUpdatedEventToDTO(e query.WorkspaceMembersUpdatedEvent) note.WorkspaceMemebersUpdatedEvent {
 	id := e.Id
 	members := make([]note.WorkspaceMember, len(e.Members))
 	for i, m := range e.Members {
-		members[i] = queryWorkspaceMemberToDTO(m)
+		members[i] = getWorkspaceMemberToDTO(m)
 	}
 	return note.WorkspaceMemebersUpdatedEvent{
 		Data: struct {

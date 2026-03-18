@@ -14,7 +14,10 @@ func (h *StrictHandler) GetNotes(
 	return nil, errors.New("not implemented")
 }
 
-func (h *StrictHandler) CreateNote(ctx context.Context, request note.CreateNoteRequestObject) (note.CreateNoteResponseObject, error) {
+func (h *StrictHandler) CreateNote(
+	ctx context.Context,
+	request note.CreateNoteRequestObject,
+) (note.CreateNoteResponseObject, error) {
 	return nil, errors.New("not implemented")
 }
 

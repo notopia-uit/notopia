@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"net/http"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/pkg/api/note"
+	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 )
 
@@ -45,6 +47,21 @@ func ValidateHandler() (gin.HandlerFunc, error) {
 	return ginmiddleware.OapiRequestValidator(spec), nil
 }
 
+func strictServerErrorHandler(c *gin.Context, err error, statusCode int) {
+	message := err.Error()
+	code := ""
+	if domainErr, ok := errors.AsType[*commonerror.Err](err); ok {
+		message, code, statusCode = commonerror.ToHTTP(domainErr)
+	}
+
+	response := note.Error{
+		Code:    code,
+		Message: message,
+	}
+
+	c.JSON(statusCode, response)
+}
+
 type Server struct {
 	*http.Server
 }
@@ -62,7 +79,7 @@ func RegisterRoutes(
 		api.Use(commonhttp.GatewayUserAuth())
 		api.Use(validateHandler)
 		note.RegisterHandlersWithOptions(api, handler, note.GinServerOptions{
-			ErrorHandler: StrictServerErrorHandler,
+			ErrorHandler: strictServerErrorHandler,
 		})
 	}
 	return nil
