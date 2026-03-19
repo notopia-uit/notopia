@@ -9,7 +9,7 @@ import { file_buf_validate_validate } from "./buf/validate/validate_pb";
  * Describes the file note.proto.
  */
 export const file_note = /*@__PURE__*/
-  fileDesc("Cgpub3RlLnByb3RvEgRub3RlIjkKGUNoZWNrTm90ZUV4aXN0ZW5jZVJlcXVlc3QSHAoHbm90ZV9pZBgBIAEoCUILukgIyAEBcgOwAQEiNAoaQ2hlY2tOb3RlRXhpc3RlbmNlUmVzcG9uc2USFgoGZXhpc3RzGAEgASgIQga6SAPIAQEiOQoZR2V0Tm90ZVdvcmtzcGFjZUlkUmVxdWVzdBIcCgdub3RlX2lkGAEgASgJQgu6SAjIAQFyA7ABASI/ChpHZXROb3RlV29ya3NwYWNlSWRSZXNwb25zZRIhCgx3b3Jrc3BhY2VfaWQYASABKAlCC7pICMgBAXIDsAEBMr8BCgtOb3RlU2VydmljZRJXChJDaGVja05vdGVFeGlzdGVuY2USHy5ub3RlLkNoZWNrTm90ZUV4aXN0ZW5jZVJlcXVlc3QaIC5ub3RlLkNoZWNrTm90ZUV4aXN0ZW5jZVJlc3BvbnNlElcKEkdldE5vdGVXb3Jrc3BhY2VJZBIfLm5vdGUuR2V0Tm90ZVdvcmtzcGFjZUlkUmVxdWVzdBogLm5vdGUuR2V0Tm90ZVdvcmtzcGFjZUlkUmVzcG9uc2VCbAoIY29tLm5vdGVCCU5vdGVQcm90b1ABWiVnaXRodWIuY29tL25vdG9waWEtdWl0L25vdG9waWEvcGtnL3BiogIDTlhYqgIETm90ZcoCBE5vdGXiAhBOb3RlXEdQQk1ldGFkYXRh6gIETm90ZWIGcHJvdG8z", [file_buf_validate_validate]);
+  fileDesc("Cgpub3RlLnByb3RvEgRub3RlIjkKGUNoZWNrTm90ZUV4aXN0ZW5jZVJlcXVlc3QSHAoHbm90ZV9pZBgBIAEoCUILukgIyAEBcgOwAQEiNAoaQ2hlY2tOb3RlRXhpc3RlbmNlUmVzcG9uc2USFgoGZXhpc3RzGAEgASgIQga6SAPIAQEyZgoLTm90ZVNlcnZpY2USVwoSQ2hlY2tOb3RlRXhpc3RlbmNlEh8ubm90ZS5DaGVja05vdGVFeGlzdGVuY2VSZXF1ZXN0GiAubm90ZS5DaGVja05vdGVFeGlzdGVuY2VSZXNwb25zZUJsCghjb20ubm90ZUIJTm90ZVByb3RvUAFaJWdpdGh1Yi5jb20vbm90b3BpYS11aXQvbm90b3BpYS9wa2cvcGKiAgNOWFiqAgROb3RlygIETm90ZeICEE5vdGVcR1BCTWV0YWRhdGHqAgROb3RlYgZwcm90bzM", [file_buf_validate_validate]);
 
 /**
  * Describes the message note.CheckNoteExistenceRequest.
@@ -24,20 +24,6 @@ export const CheckNoteExistenceRequestSchema = /*@__PURE__*/
  */
 export const CheckNoteExistenceResponseSchema = /*@__PURE__*/
   messageDesc(file_note, 1);
-
-/**
- * Describes the message note.GetNoteWorkspaceIdRequest.
- * Use `create(GetNoteWorkspaceIdRequestSchema)` to create a new message.
- */
-export const GetNoteWorkspaceIdRequestSchema = /*@__PURE__*/
-  messageDesc(file_note, 2);
-
-/**
- * Describes the message note.GetNoteWorkspaceIdResponse.
- * Use `create(GetNoteWorkspaceIdResponseSchema)` to create a new message.
- */
-export const GetNoteWorkspaceIdResponseSchema = /*@__PURE__*/
-  messageDesc(file_note, 3);
 
 /**
  * @generated from service note.NoteService

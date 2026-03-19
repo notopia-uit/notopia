@@ -6,7 +6,6 @@ import "buf/validate/validate.proto";
 
 service NoteService {
   rpc CheckNoteExistence(CheckNoteExistenceRequest) returns (CheckNoteExistenceResponse);
-  rpc GetNoteWorkspaceId(GetNoteWorkspaceIdRequest) returns (GetNoteWorkspaceIdResponse);
 }
 
 message CheckNoteExistenceRequest {
@@ -18,18 +17,4 @@ message CheckNoteExistenceRequest {
 
 message CheckNoteExistenceResponse {
   bool exists = 1 [(buf.validate.field).required = true];
-}
-
-message GetNoteWorkspaceIdRequest {
-  string note_id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
-}
-
-message GetNoteWorkspaceIdResponse {
-  string workspace_id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
 }

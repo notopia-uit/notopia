@@ -69,12 +69,17 @@ export declare const WorkspaceMemberSchema: GenMessage<WorkspaceMember>;
  */
 export declare type UpdateWorkspaceMembersRequest = Message<"authorization.UpdateWorkspaceMembersRequest"> & {
   /**
-   * @generated from field: string workspace_id = 1;
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: string workspace_id = 2;
    */
   workspaceId: string;
 
   /**
-   * @generated from field: repeated authorization.WorkspaceMember members = 2;
+   * @generated from field: repeated authorization.WorkspaceMember members = 3;
    */
   members: WorkspaceMember[];
 };
@@ -106,7 +111,12 @@ export declare const UpdateWorkspaceMembersResponseSchema: GenMessage<UpdateWork
  */
 export declare type GetWorkspaceMembersRequest = Message<"authorization.GetWorkspaceMembersRequest"> & {
   /**
-   * @generated from field: string workspace_id = 1;
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: string workspace_id = 2;
    */
   workspaceId: string;
 };

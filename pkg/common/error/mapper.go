@@ -66,3 +66,36 @@ func ToConnectRPC(err error) error {
 
 	return connect.NewError(connect.CodeInternal, err)
 }
+
+func FromConnectRPC(err error) *Err {
+	if connectErr, ok := errors.AsType[*connect.Error](err); ok {
+		var domainErr *Err
+		switch connectErr.Code() {
+		case connect.CodeInvalidArgument,
+			connect.CodeFailedPrecondition,
+			connect.CodeOutOfRange:
+			domainErr = NewInvalid(connectErr.Error(), "", connectErr)
+		case connect.CodeNotFound:
+			domainErr = NewNotFound(connectErr.Error(), "", connectErr)
+		case connect.CodeAlreadyExists:
+			domainErr = NewConflict(connectErr.Error(), "", connectErr)
+		case connect.CodePermissionDenied, connect.CodeResourceExhausted:
+			domainErr = NewForbidden(connectErr.Error(), "", connectErr)
+		case connect.CodeUnauthenticated:
+			domainErr = NewUnauthorized(connectErr.Error(), "", connectErr)
+		case connect.CodeInternal:
+			domainErr = NewInternal(connectErr.Error(), "", connectErr)
+		case connect.CodeUnimplemented:
+			domainErr = NewUnimplemented()
+		case connect.CodeCanceled,
+			connect.CodeDeadlineExceeded,
+			connect.CodeAborted,
+			connect.CodeUnavailable,
+			connect.CodeDataLoss,
+			connect.CodeUnknown:
+			domainErr = NewInternal(connectErr.Error(), "", connectErr)
+		}
+		return domainErr
+	}
+	return NewInternal(err.Error(), "", err)
+}

@@ -321,8 +321,9 @@ func (x *WorkspaceMember) GetRole() WorkspaceRole {
 
 type UpdateWorkspaceMembersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
-	Members       []*WorkspaceMember     `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	WorkspaceId   string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	Members       []*WorkspaceMember     `protobuf:"bytes,3,rep,name=members,proto3" json:"members,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -355,6 +356,13 @@ func (x *UpdateWorkspaceMembersRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use UpdateWorkspaceMembersRequest.ProtoReflect.Descriptor instead.
 func (*UpdateWorkspaceMembersRequest) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *UpdateWorkspaceMembersRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
 }
 
 func (x *UpdateWorkspaceMembersRequest) GetWorkspaceId() string {
@@ -417,7 +425,8 @@ func (x *UpdateWorkspaceMembersResponse) GetEmpty() *emptypb.Empty {
 
 type GetWorkspaceMembersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	WorkspaceId   string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -450,6 +459,13 @@ func (x *GetWorkspaceMembersRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GetWorkspaceMembersRequest.ProtoReflect.Descriptor instead.
 func (*GetWorkspaceMembersRequest) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetWorkspaceMembersRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
 }
 
 func (x *GetWorkspaceMembersRequest) GetWorkspaceId() string {
@@ -826,14 +842,16 @@ const file_authorization_proto_rawDesc = "" +
 	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"c\n" +
 	"\x0fWorkspaceMember\x12\x16\n" +
 	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x128\n" +
-	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"\x8c\x01\n" +
-	"\x1dUpdateWorkspaceMembersRequest\x12)\n" +
-	"\fworkspace_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\x12@\n" +
-	"\amembers\x18\x02 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\"N\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"\xad\x01\n" +
+	"\x1dUpdateWorkspaceMembersRequest\x12\x1f\n" +
+	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12)\n" +
+	"\fworkspace_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\x12@\n" +
+	"\amembers\x18\x03 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\"N\n" +
 	"\x1eUpdateWorkspaceMembersResponse\x12,\n" +
-	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"L\n" +
-	"\x1aGetWorkspaceMembersRequest\x12.\n" +
-	"\fworkspace_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"_\n" +
+	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"m\n" +
+	"\x1aGetWorkspaceMembersRequest\x12\x1f\n" +
+	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12.\n" +
+	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"_\n" +
 	"\x1bGetWorkspaceMembersResponse\x12@\n" +
 	"\amembers\x18\x01 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\"\xc0\x01\n" +
 	"\x1dHasWorkspacePermissionRequest\x12#\n" +

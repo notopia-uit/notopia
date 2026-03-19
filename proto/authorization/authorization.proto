@@ -38,8 +38,9 @@ message WorkspaceMember {
 }
 
 message UpdateWorkspaceMembersRequest {
-  string workspace_id = 1 [(buf.validate.field).required = true];
-  repeated WorkspaceMember members = 2 [(buf.validate.field).required = true];
+  string user_id = 1 [(buf.validate.field).required = true];
+  string workspace_id = 2 [(buf.validate.field).required = true];
+  repeated WorkspaceMember members = 3 [(buf.validate.field).required = true];
 }
 
 message UpdateWorkspaceMembersResponse {
@@ -47,7 +48,8 @@ message UpdateWorkspaceMembersResponse {
 }
 
 message GetWorkspaceMembersRequest {
-  string workspace_id = 1 [
+  string user_id = 1 [(buf.validate.field).required = true];
+  string workspace_id = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
