@@ -8,14 +8,14 @@ import (
 	"connectrpc.com/connect"
 )
 
-func ToHTTP(domainErr *Err) (
+func ToHTTP(err *Err) (
 	message string,
 	code string,
 	statusCode int,
 ) {
-	message = domainErr.Message()
-	code = domainErr.Code()
-	switch domainErr.Type() {
+	message = err.Message()
+	code = err.Code()
+	switch err.Type() {
 	case TypeInvalid:
 		statusCode = http.StatusBadRequest
 	case TypeNotFound:
@@ -32,11 +32,17 @@ func ToHTTP(domainErr *Err) (
 	return
 }
 
+const (
+	ConnectRPCMetadataKeyType    = "x-error-type"
+	ConnectRPCMetadataKeyCode    = "x-error-code"
+	ConnectRPCMetadataKeyMessage = "x-error-message"
+)
+
 func ToConnectRPC(err error) error {
-	if domainErr, ok := errors.AsType[*Err](err); ok {
+	if err, ok := errors.AsType[*Err](err); ok {
 		var code connect.Code
 
-		switch domainErr.Type() {
+		switch err.Type() {
 		case TypeInvalid:
 			code = connect.CodeInvalidArgument
 		case TypeNotFound:
@@ -54,7 +60,17 @@ func ToConnectRPC(err error) error {
 		default:
 			code = connect.CodeUnknown
 		}
-		return connect.NewError(code, err)
+
+		connectErr := connect.NewError(code, err)
+
+		// Attach metadata to preserve full error information
+		connectErr.Meta().Set(ConnectRPCMetadataKeyType, string(err.Type()))
+		connectErr.Meta().Set(ConnectRPCMetadataKeyMessage, err.Message())
+		if err.Code() != "" {
+			connectErr.Meta().Set(ConnectRPCMetadataKeyCode, err.Code())
+		}
+
+		return connectErr
 	}
 
 	if errors.Is(err, context.Canceled) {
@@ -69,33 +85,48 @@ func ToConnectRPC(err error) error {
 
 func FromConnectRPC(err error) *Err {
 	if connectErr, ok := errors.AsType[*connect.Error](err); ok {
-		var domainErr *Err
+		// Try to extract metadata first for full error reconstruction
+		errorType := connectErr.Meta().Get(ConnectRPCMetadataKeyType)
+		errorMessage := connectErr.Meta().Get(ConnectRPCMetadataKeyMessage)
+		errorCode := connectErr.Meta().Get(ConnectRPCMetadataKeyCode)
+
+		// If metadata exists, reconstruct the original domain error
+		if errorType != "" && errorMessage != "" {
+			return New(Type(errorType), errorMessage, errorCode, connectErr)
+		}
+
+		// Fallback to code-based mapping if metadata is not available
+		var err *Err
+		message := connectErr.Error()
+
 		switch connectErr.Code() {
 		case connect.CodeInvalidArgument,
 			connect.CodeFailedPrecondition,
 			connect.CodeOutOfRange:
-			domainErr = NewInvalid(connectErr.Error(), "", connectErr)
+			err = NewInvalid(message, "", connectErr)
 		case connect.CodeNotFound:
-			domainErr = NewNotFound(connectErr.Error(), "", connectErr)
+			err = NewNotFound(message, "", connectErr)
 		case connect.CodeAlreadyExists:
-			domainErr = NewConflict(connectErr.Error(), "", connectErr)
+			err = NewConflict(message, "", connectErr)
 		case connect.CodePermissionDenied, connect.CodeResourceExhausted:
-			domainErr = NewForbidden(connectErr.Error(), "", connectErr)
+			err = NewForbidden(message, "", connectErr)
 		case connect.CodeUnauthenticated:
-			domainErr = NewUnauthorized(connectErr.Error(), "", connectErr)
+			err = NewUnauthorized(message, "", connectErr)
 		case connect.CodeInternal:
-			domainErr = NewInternal(connectErr.Error(), "", connectErr)
+			err = NewInternal(message, "", connectErr)
 		case connect.CodeUnimplemented:
-			domainErr = NewUnimplemented()
+			err = NewUnimplemented()
 		case connect.CodeCanceled,
 			connect.CodeDeadlineExceeded,
 			connect.CodeAborted,
 			connect.CodeUnavailable,
 			connect.CodeDataLoss,
 			connect.CodeUnknown:
-			domainErr = NewInternal(connectErr.Error(), "", connectErr)
+			err = NewInternal(message, "", connectErr)
+		default:
+			err = NewInternal(message, "", connectErr)
 		}
-		return domainErr
+		return err
 	}
 	return NewInternal(err.Error(), "", err)
 }

@@ -4,10 +4,12 @@ import (
 	"context"
 	"net/http"
 
+	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app/service"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	commongrpc "github.com/notopia-uit/notopia/pkg/common/grpc"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
 )
 
@@ -23,6 +25,9 @@ func NewAuthorization(
 	client := pbconnect.NewAuthorizationServiceClient(
 		http.DefaultClient,
 		servicesCfg.Authorization.URL,
+		connect.WithInterceptors(
+			commongrpc.NewClientErrorInterceptor(),
+		),
 	)
 	return &Authorization{
 		client: client,
