@@ -1,6 +1,6 @@
 # Monorepo
 
-Manged with Nx. Package manager: pnpm, go, mise, buf
+Manged with Nx. Package manager: pnpm (use ./pnpm-workspace.yaml), go (single go.mod for all packages), mise, buf
 
 ## Structure
 

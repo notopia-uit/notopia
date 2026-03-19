@@ -30,7 +30,10 @@ func (h *GRPCHandler) CreateWorkspace(ctx context.Context, req *connect.Request[
 		return nil, err
 	}
 
-	if err := h.app.CreateWorkspace.Handle(req.Msg.UserId, workspaceID); err != nil {
+	if err := h.app.CreateWorkspace.Handle(app.CreateWorkspace{
+		UserID:      req.Msg.UserId,
+		WorkspaceID: workspaceID,
+	}); err != nil {
 		return nil, err
 	}
 
@@ -53,7 +56,11 @@ func (h *GRPCHandler) UpdateWorkspaceMembers(ctx context.Context, req *connect.R
 		}
 	}
 
-	if err := h.app.UpdateWorkspaceMembers.Handle(ctx, req.Msg.UserId, workspaceID, members); err != nil {
+	if err := h.app.UpdateWorkspaceMembers.Handle(ctx, app.UpdateWorkspaceMembers{
+		UserID:      req.Msg.UserId,
+		WorkspaceID: workspaceID,
+		Members:     members,
+	}); err != nil {
 		return nil, err
 	}
 
@@ -68,7 +75,10 @@ func (h *GRPCHandler) GetWorkspaceMembers(ctx context.Context, req *connect.Requ
 		return nil, err
 	}
 
-	members, err := h.app.GetWorkspaceMembers.Handle(req.Msg.UserId, workspaceID)
+	members, err := h.app.GetWorkspaceMembers.Handle(app.GetWorkspaceMembers{
+		UserID:      req.Msg.UserId,
+		WorkspaceID: workspaceID,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -92,11 +102,11 @@ func (h *GRPCHandler) HasWorkspacePermission(ctx context.Context, req *connect.R
 		return nil, err
 	}
 
-	hasPermission, err := h.app.HasWorkspacePermission.Handle(
-		req.Msg.MemberId,
-		workspaceID,
-		pbWorkspacePermissionToApp(req.Msg.Permission),
-	)
+	hasPermission, err := h.app.HasWorkspacePermission.Handle(app.HasWorkspacePermission{
+		UserID:      req.Msg.MemberId,
+		WorkspaceID: workspaceID,
+		Permission:  pbWorkspacePermissionToApp(req.Msg.Permission),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -111,11 +121,11 @@ func (h *GRPCHandler) HasWorkspaceItemPermission(ctx context.Context, req *conne
 	if err != nil {
 		return nil, err
 	}
-	hasPermission, err := h.app.HasWorkspaceItemPermission.Handle(
-		req.Msg.MemberId,
-		workspaceID,
-		pbWorkspaceItemPermissionToApp(req.Msg.Permission),
-	)
+	hasPermission, err := h.app.HasWorkspaceItemPermission.Handle(app.HasWorkspaceItemPermission{
+		UserID:      req.Msg.MemberId,
+		WorkspaceID: workspaceID,
+		Permission:  pbWorkspaceItemPermissionToApp(req.Msg.Permission),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -130,10 +140,10 @@ func (h *GRPCHandler) GetUserWorkspaceItemPermissions(ctx context.Context, req *
 	if err != nil {
 		return nil, err
 	}
-	permissions, err := h.app.GetUserWorkspaceItemPermissions.Handle(
-		req.Msg.MemberId,
-		workspaceID,
-	)
+	permissions, err := h.app.GetUserWorkspaceItemPermissions.Handle(app.GetUserWorkspaceItemPermissions{
+		UserID:      req.Msg.MemberId,
+		WorkspaceID: workspaceID,
+	})
 	if err != nil {
 		return nil, err
 	}

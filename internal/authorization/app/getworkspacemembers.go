@@ -8,35 +8,43 @@ import (
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
-type GetWorkspaceMembersHandler struct {
-	Enforcer *casbin.TransactionalEnforcer
+type GetWorkspaceMembers struct {
+	UserID      string
+	WorkspaceID uuid.UUID
 }
 
-func (h *GetWorkspaceMembersHandler) Handle(
-	userID string,
-	workspaceID uuid.UUID,
-) ([]WorkspaceMember, error) {
-	viewAllowed, err := h.Enforcer.Enforce(formatUser(userID), formatWorkspace(workspaceID), "workspace", WorkspacePermissionRead.String())
+type GetWorkspaceMembersHandler struct {
+	enforcer *casbin.TransactionalEnforcer
+}
+
+func NewGetWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer) *GetWorkspaceMembersHandler {
+	return &GetWorkspaceMembersHandler{enforcer: enforcer}
+}
+
+var ProvideGetWorkspaceMembersHandler = NewGetWorkspaceMembersHandler
+
+func (h *GetWorkspaceMembersHandler) Handle(params GetWorkspaceMembers) ([]WorkspaceMember, error) {
+	viewAllowed, err := h.enforcer.Enforce(formatUser(params.UserID), formatWorkspace(params.WorkspaceID), "workspace", WorkspacePermissionRead.String())
 	if err != nil {
-		return nil, newErrGetWorkspaceMembersReadPermissionFailed(userID, workspaceID)
+		return nil, newErrGetWorkspaceMembersReadPermissionFailed(params.UserID, params.WorkspaceID)
 	}
 	if !viewAllowed {
-		return nil, newErrGetWorkspaceMembersNoPermission(userID, workspaceID)
+		return nil, newErrGetWorkspaceMembersNoPermission(params.UserID, params.WorkspaceID)
 	}
 
-	rules, err := h.Enforcer.GetFilteredGroupingPolicy(2, formatWorkspace(workspaceID))
+	rules, err := h.enforcer.GetFilteredGroupingPolicy(2, formatWorkspace(params.WorkspaceID))
 	if err != nil {
-		return nil, newErrGetWorkspaceMembersGetFailed(workspaceID)
+		return nil, newErrGetWorkspaceMembersGetFailed(params.WorkspaceID)
 	}
 
 	members := make([]WorkspaceMember, 0, len(rules))
 	for _, rule := range rules {
 		if len(rule) != 3 {
-			return nil, newErrGetWorkspaceMembersInvalidRule(workspaceID)
+			return nil, newErrGetWorkspaceMembersInvalidRule(params.WorkspaceID)
 		}
 		userID, err := userFromFormat(rule[0])
 		if err != nil {
-			return nil, newErrGetWorkspaceMembersInvalidUser(workspaceID)
+			return nil, newErrGetWorkspaceMembersInvalidUser(params.WorkspaceID)
 		}
 		members = append(members, WorkspaceMember{
 			ID:   userID,

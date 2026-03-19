@@ -20,11 +20,11 @@ g2, folder, workspace_item
 # ntgnguyen 111
 # kevinnitro 112
 
-g, user:111, owner, workspace:111
-g, user:112, editor, workspace:111
-g, user:110, viewer, workspace:111
+g, user:111, owner, workspace:00000000-0000-0000-0000-000000000111
+g, user:112, editor, workspace:00000000-0000-0000-0000-000000000111
+g, user:110, viewer, workspace:00000000-0000-0000-0000-000000000111
 
-g, user:112, owner, workspace:112
-g, user:111, editor, workspace:112
+g, user:112, owner, workspace:00000000-0000-0000-0000-000000000112
+g, user:111, editor, workspace:00000000-0000-0000-0000-000000000112
 
-g, user:110, owner, workspace:110
+g, user:110, owner, workspace:00000000-0000-0000-0000-000000000110

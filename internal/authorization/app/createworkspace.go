@@ -8,24 +8,32 @@ import (
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
-type CreateWorkspaceHandler struct {
-	Enforcer *casbin.TransactionalEnforcer
+type CreateWorkspace struct {
+	UserID      string
+	WorkspaceID uuid.UUID
 }
 
-func (h *CreateWorkspaceHandler) Handle(
-	userID string,
-	workspaceID uuid.UUID,
-) error {
-	ok, err := h.Enforcer.AddGroupingPolicy(
-		formatUser(userID),
+type CreateWorkspaceHandler struct {
+	enforcer *casbin.TransactionalEnforcer
+}
+
+func NewCreateWorkspaceHandler(enforcer *casbin.TransactionalEnforcer) *CreateWorkspaceHandler {
+	return &CreateWorkspaceHandler{enforcer: enforcer}
+}
+
+var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
+
+func (h *CreateWorkspaceHandler) Handle(params CreateWorkspace) error {
+	ok, err := h.enforcer.AddGroupingPolicy(
+		formatUser(params.UserID),
 		"owner",
-		formatWorkspace(workspaceID),
+		formatWorkspace(params.WorkspaceID),
 	)
 	if err != nil {
-		return newErrCreateWorkspaceFailed(userID, workspaceID)
+		return newErrCreateWorkspaceFailed(params.UserID, params.WorkspaceID)
 	}
 	if !ok {
-		return newErrCreateWorkspaceExists(userID, workspaceID)
+		return newErrCreateWorkspaceExists(params.UserID, params.WorkspaceID)
 	}
 	return nil
 }

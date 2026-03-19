@@ -8,23 +8,31 @@ import (
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
-type GetUserWorkspaceItemPermissionsHandler struct {
-	Enforcer *casbin.TransactionalEnforcer
+type GetUserWorkspaceItemPermissions struct {
+	UserID      string
+	WorkspaceID uuid.UUID
 }
 
-func (h *GetUserWorkspaceItemPermissionsHandler) Handle(
-	userID string,
-	workspaceID uuid.UUID,
-) (*WorkspaceItemPermissions, error) {
-	oks, err := h.Enforcer.BatchEnforce(
+type GetUserWorkspaceItemPermissionsHandler struct {
+	enforcer *casbin.TransactionalEnforcer
+}
+
+func NewGetUserWorkspaceItemPermissionsHandler(enforcer *casbin.TransactionalEnforcer) *GetUserWorkspaceItemPermissionsHandler {
+	return &GetUserWorkspaceItemPermissionsHandler{enforcer: enforcer}
+}
+
+var ProvideGetUserWorkspaceItemPermissionsHandler = NewGetUserWorkspaceItemPermissionsHandler
+
+func (h *GetUserWorkspaceItemPermissionsHandler) Handle(params GetUserWorkspaceItemPermissions) (*WorkspaceItemPermissions, error) {
+	oks, err := h.enforcer.BatchEnforce(
 		[][]any{
-			{formatUser(userID), formatWorkspace(workspaceID), "workspace_item", WorkspaceItemPermissionRead.String()},
-			{formatUser(userID), formatWorkspace(workspaceID), "workspace_item", WorkspaceItemPermissionWrite.String()},
-			{formatUser(userID), formatWorkspace(workspaceID), "workspace_item", WorkspaceItemPermissionDelete.String()},
+			{formatUser(params.UserID), formatWorkspace(params.WorkspaceID), "workspace_item", WorkspaceItemPermissionRead.String()},
+			{formatUser(params.UserID), formatWorkspace(params.WorkspaceID), "workspace_item", WorkspaceItemPermissionWrite.String()},
+			{formatUser(params.UserID), formatWorkspace(params.WorkspaceID), "workspace_item", WorkspaceItemPermissionDelete.String()},
 		},
 	)
 	if err != nil {
-		return nil, newErrGetUserWorkspaceItemPermissionsCheckFailed(userID, workspaceID)
+		return nil, newErrGetUserWorkspaceItemPermissionsCheckFailed(params.UserID, params.WorkspaceID)
 	}
 	wip := &WorkspaceItemPermissions{
 		Read:   oks[0],

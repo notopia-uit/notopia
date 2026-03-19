@@ -9,50 +9,57 @@ import (
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
-type UpdateWorkspaceMembersHandler struct {
-	Enforcer *casbin.TransactionalEnforcer
+type UpdateWorkspaceMembers struct {
+	UserID      string
+	WorkspaceID uuid.UUID
+	Members     []WorkspaceMember
 }
 
-func (h *UpdateWorkspaceMembersHandler) Handle(
-	ctx context.Context,
-	userID string,
-	workspaceID uuid.UUID,
-	members []WorkspaceMember,
-) error {
-	enforcer := h.Enforcer
+type UpdateWorkspaceMembersHandler struct {
+	enforcer *casbin.TransactionalEnforcer
+}
 
-	if allowed, err := hasWorkspacePermission(enforcer, userID, workspaceID, WorkspacePermissionEdit); err != nil || !allowed {
-		return newErrUpdateWorkspaceMembersNoPermission(userID, workspaceID)
+func NewUpdateWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer) *UpdateWorkspaceMembersHandler {
+	return &UpdateWorkspaceMembersHandler{enforcer: enforcer}
+}
+
+var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
+
+func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params UpdateWorkspaceMembers) error {
+	enforcer := h.enforcer
+
+	if allowed, err := hasWorkspacePermission(enforcer, params.UserID, params.WorkspaceID, WorkspacePermissionEdit); err != nil || !allowed {
+		return newErrUpdateWorkspaceMembersNoPermission(params.UserID, params.WorkspaceID)
 	}
 
 	err := enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
 		bufferedModel, err := tx.GetBufferedModel()
 		if err != nil {
-			return newErrUpdateWorkspaceMembersGetBufferedFail(workspaceID)
+			return newErrUpdateWorkspaceMembersGetBufferedFail(params.WorkspaceID)
 		}
-		currentRules, err := bufferedModel.GetFilteredPolicy("g", "g", 2, formatWorkspace(workspaceID))
+		currentRules, err := bufferedModel.GetFilteredPolicy("g", "g", 2, formatWorkspace(params.WorkspaceID))
 		if err != nil {
-			return newErrUpdateWorkspaceMembersGetRulesFail(workspaceID)
+			return newErrUpdateWorkspaceMembersGetRulesFail(params.WorkspaceID)
 		}
 
 		for _, rule := range currentRules {
 			_, err := tx.RemoveGroupingPolicy(rule[0], rule[1], rule[2])
 			if err != nil {
-				return newErrUpdateWorkspaceMembersRemoveFail(workspaceID)
+				return newErrUpdateWorkspaceMembersRemoveFail(params.WorkspaceID)
 			}
 		}
 
-		for _, member := range members {
-			_, err := tx.AddNamedGroupingPolicy("g", formatUser(member.ID), member.Role.String(), formatWorkspace(workspaceID))
+		for _, member := range params.Members {
+			_, err := tx.AddNamedGroupingPolicy("g", formatUser(member.ID), member.Role.String(), formatWorkspace(params.WorkspaceID))
 			if err != nil {
-				return newErrUpdateWorkspaceMembersAddFail(workspaceID)
+				return newErrUpdateWorkspaceMembersAddFail(params.WorkspaceID)
 			}
 		}
 
 		return nil
 	})
 	if err != nil {
-		return newErrUpdateWorkspaceMembersFail(workspaceID)
+		return newErrUpdateWorkspaceMembersFail(params.WorkspaceID)
 	}
 	return nil
 }

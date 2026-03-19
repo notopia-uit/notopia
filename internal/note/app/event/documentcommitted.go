@@ -26,7 +26,7 @@ func NewDocumentCommittedHandler(
 }
 
 func (h *DocumentCommittedHandler) Handle(ctx context.Context, event *DocumentCommitted) error {
-	note, err := h.noterepo.GetByID(ctx, event.Id)
+	note, err := h.noterepo.GetByID(ctx, event.Id, false)
 	if err != nil {
 		return err
 	}

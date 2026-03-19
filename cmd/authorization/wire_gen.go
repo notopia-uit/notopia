@@ -33,24 +33,12 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	if err != nil {
 		return nil, nil, err
 	}
-	createWorkspaceHandler := &app.CreateWorkspaceHandler{
-		Enforcer: transactionalEnforcer,
-	}
-	updateWorkspaceMembersHandler := &app.UpdateWorkspaceMembersHandler{
-		Enforcer: transactionalEnforcer,
-	}
-	getWorkspaceMembersHandler := &app.GetWorkspaceMembersHandler{
-		Enforcer: transactionalEnforcer,
-	}
-	hasWorkspacePermissionHandler := &app.HasWorkspacePermissionHandler{
-		Enforcer: transactionalEnforcer,
-	}
-	hasWorkspaceItemPermissionHandler := &app.HasWorkspaceItemPermissionHandler{
-		Enforcer: transactionalEnforcer,
-	}
-	getUserWorkspaceItemPermissionsHandler := &app.GetUserWorkspaceItemPermissionsHandler{
-		Enforcer: transactionalEnforcer,
-	}
+	createWorkspaceHandler := app.NewCreateWorkspaceHandler(transactionalEnforcer)
+	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer)
+	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
+	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
+	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
+	getUserWorkspaceItemPermissionsHandler := app.NewGetUserWorkspaceItemPermissionsHandler(transactionalEnforcer)
 	authorizationApp := &authorization.App{
 		CreateWorkspace:                 createWorkspaceHandler,
 		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,

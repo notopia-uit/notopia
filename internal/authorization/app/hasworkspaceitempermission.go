@@ -8,23 +8,31 @@ import (
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
-type HasWorkspaceItemPermissionHandler struct {
-	Enforcer *casbin.TransactionalEnforcer
+type HasWorkspaceItemPermission struct {
+	UserID      string
+	WorkspaceID uuid.UUID
+	Permission  WorkspaceItemPermission
 }
 
-func (h *HasWorkspaceItemPermissionHandler) Handle(
-	userID string,
-	workspaceID uuid.UUID,
-	permission WorkspaceItemPermission,
-) (bool, error) {
-	ok, err := h.Enforcer.Enforce(
-		formatUser(userID),
-		formatWorkspace(workspaceID),
+type HasWorkspaceItemPermissionHandler struct {
+	enforcer *casbin.TransactionalEnforcer
+}
+
+func NewHasWorkspaceItemPermissionHandler(enforcer *casbin.TransactionalEnforcer) *HasWorkspaceItemPermissionHandler {
+	return &HasWorkspaceItemPermissionHandler{enforcer: enforcer}
+}
+
+var ProvideHasWorkspaceItemPermissionHandler = NewHasWorkspaceItemPermissionHandler
+
+func (h *HasWorkspaceItemPermissionHandler) Handle(params HasWorkspaceItemPermission) (bool, error) {
+	ok, err := h.enforcer.Enforce(
+		formatUser(params.UserID),
+		formatWorkspace(params.WorkspaceID),
 		"workspace_item",
-		permission.String(),
+		params.Permission.String(),
 	)
 	if err != nil {
-		return false, newErrHasWorkspaceItemPermissionCheckFailed(userID, workspaceID)
+		return false, newErrHasWorkspaceItemPermissionCheckFailed(params.UserID, params.WorkspaceID)
 	}
 	return ok, nil
 }
