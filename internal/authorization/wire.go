@@ -2,12 +2,15 @@ package authorization
 
 import (
 	"github.com/goforj/wire"
+	"github.com/notopia-uit/notopia/internal/authorization/app"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
 )
 
 var ProviderSetComponent = wire.NewSet(
+	ProvideCasbinEnforcer,
+	ProvideGORMDB,
 	ProvideValidate,
 )
 
@@ -30,8 +33,9 @@ var ProviderSetGRPCServer = wire.NewSet(
 	wire.Bind(new(pbconnect.AuthorizationServiceHandler), new(*GRPCHandler)),
 )
 
-var ProviderSetCasbin = wire.NewSet(
-	ProvideCasbinEnforcer,
+var ProviderSetApp = wire.NewSet(
+	app.ProviderSet,
+	wire.Struct(new(App), "*"),
 )
 
 var ProviderSet = wire.NewSet(
@@ -39,7 +43,7 @@ var ProviderSet = wire.NewSet(
 	ProvideServer,
 	ProviderSetConfig,
 	ProviderSetGRPCServer,
-	ProviderSetCasbin,
+	ProviderSetApp,
 	logging.ProviderSet,
 	otel.ProviderSet,
 )

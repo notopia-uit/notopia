@@ -181,7 +181,8 @@ func (WorkspaceItemPermission) EnumDescriptor() ([]byte, []int) {
 
 type CreateWorkspaceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	WorkspaceId   string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -214,6 +215,13 @@ func (x *CreateWorkspaceRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateWorkspaceRequest.ProtoReflect.Descriptor instead.
 func (*CreateWorkspaceRequest) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *CreateWorkspaceRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
 }
 
 func (x *CreateWorkspaceRequest) GetWorkspaceId() string {
@@ -626,6 +634,7 @@ func (x *HasWorkspacePermissionResponse) GetHasPermission() bool {
 type HasWorkspaceItemPermissionRequest struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
 	MemberId      string                  `protobuf:"bytes,1,opt,name=member_id,json=memberId,proto3" json:"member_id,omitempty"`
+	WorkspaceId   string                  `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	Permission    WorkspaceItemPermission `protobuf:"varint,3,opt,name=permission,proto3,enum=authorization.WorkspaceItemPermission" json:"permission,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -664,6 +673,13 @@ func (*HasWorkspaceItemPermissionRequest) Descriptor() ([]byte, []int) {
 func (x *HasWorkspaceItemPermissionRequest) GetMemberId() string {
 	if x != nil {
 		return x.MemberId
+	}
+	return ""
+}
+
+func (x *HasWorkspaceItemPermissionRequest) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
 	}
 	return ""
 }
@@ -722,7 +738,7 @@ func (x *HasWorkspaceItemPermissionResponse) GetHasPermission() bool {
 type GetUserWorkspaceItemPermissionsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MemberId      string                 `protobuf:"bytes,1,opt,name=member_id,json=memberId,proto3" json:"member_id,omitempty"`
-	NoteId        string                 `protobuf:"bytes,2,opt,name=note_id,json=noteId,proto3" json:"note_id,omitempty"`
+	WorkspaceId   string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -764,9 +780,9 @@ func (x *GetUserWorkspaceItemPermissionsRequest) GetMemberId() string {
 	return ""
 }
 
-func (x *GetUserWorkspaceItemPermissionsRequest) GetNoteId() string {
+func (x *GetUserWorkspaceItemPermissionsRequest) GetWorkspaceId() string {
 	if x != nil {
-		return x.NoteId
+		return x.WorkspaceId
 	}
 	return ""
 }
@@ -835,9 +851,10 @@ var File_authorization_proto protoreflect.FileDescriptor
 
 const file_authorization_proto_rawDesc = "" +
 	"\n" +
-	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\x1a\x1bgoogle/protobuf/empty.proto\"H\n" +
-	"\x16CreateWorkspaceRequest\x12.\n" +
-	"\fworkspace_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"G\n" +
+	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\x1a\x1bgoogle/protobuf/empty.proto\"i\n" +
+	"\x16CreateWorkspaceRequest\x12\x1f\n" +
+	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12.\n" +
+	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"G\n" +
 	"\x17CreateWorkspaceResponse\x12,\n" +
 	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"c\n" +
 	"\x0fWorkspaceMember\x12\x16\n" +
@@ -861,17 +878,18 @@ const file_authorization_proto_rawDesc = "" +
 	"permission\x18\x03 \x01(\x0e2\".authorization.WorkspacePermissionB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"permission\"O\n" +
 	"\x1eHasWorkspacePermissionResponse\x12-\n" +
-	"\x0ehas_permission\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\rhasPermission\"\x98\x01\n" +
+	"\x0ehas_permission\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\rhasPermission\"\xc8\x01\n" +
 	"!HasWorkspaceItemPermissionRequest\x12#\n" +
-	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12N\n" +
+	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12.\n" +
+	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\x12N\n" +
 	"\n" +
 	"permission\x18\x03 \x01(\x0e2&.authorization.WorkspaceItemPermissionB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"permission\"S\n" +
 	"\"HasWorkspaceItemPermissionResponse\x12-\n" +
-	"\x0ehas_permission\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\rhasPermission\"s\n" +
+	"\x0ehas_permission\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\rhasPermission\"}\n" +
 	"&GetUserWorkspaceItemPermissionsRequest\x12#\n" +
-	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12$\n" +
-	"\anote_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x06noteId\"\x98\x01\n" +
+	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12.\n" +
+	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"\x98\x01\n" +
 	"'GetUserWorkspaceItemPermissionsResponse\x12!\n" +
 	"\bcan_read\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\acanRead\x12#\n" +
 	"\tcan_write\x18\x02 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\bcanWrite\x12%\n" +

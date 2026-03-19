@@ -19,13 +19,15 @@ func NewValidate() *validator.Validate {
 
 var ProvideValidate = NewValidate
 
-func ProvideGORMDB(databaseCfg *commonconfig.SQL) (*gorm.DB, error) {
+func NewGORMDB(databaseCfg *commonconfig.SQL) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(databaseCfg.GetDSN()))
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 	return db, nil
 }
+
+var ProvideGORMDB = NewGORMDB
 
 func NewCasbinEnforcer(
 	gormDB *gorm.DB,

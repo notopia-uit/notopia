@@ -10,6 +10,7 @@ import (
 	"context"
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/authorization"
+	"github.com/notopia-uit/notopia/internal/authorization/app"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -17,13 +18,48 @@ import (
 // Injectors from wire.go:
 
 func InitializeServer(ctx context.Context) (*authorization.Server, func(), error) {
-	grpcHandler := authorization.NewGRPCHandler()
 	validate := authorization.NewValidate()
 	viper := authorization.NewViper()
 	config, err := authorization.NewConfig(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
+	sql := &config.Database
+	db, err := authorization.NewGORMDB(sql)
+	if err != nil {
+		return nil, nil, err
+	}
+	transactionalEnforcer, err := authorization.NewCasbinEnforcer(db)
+	if err != nil {
+		return nil, nil, err
+	}
+	createWorkspaceHandler := &app.CreateWorkspaceHandler{
+		Enforcer: transactionalEnforcer,
+	}
+	updateWorkspaceMembersHandler := &app.UpdateWorkspaceMembersHandler{
+		Enforcer: transactionalEnforcer,
+	}
+	getWorkspaceMembersHandler := &app.GetWorkspaceMembersHandler{
+		Enforcer: transactionalEnforcer,
+	}
+	hasWorkspacePermissionHandler := &app.HasWorkspacePermissionHandler{
+		Enforcer: transactionalEnforcer,
+	}
+	hasWorkspaceItemPermissionHandler := &app.HasWorkspaceItemPermissionHandler{
+		Enforcer: transactionalEnforcer,
+	}
+	getUserWorkspaceItemPermissionsHandler := &app.GetUserWorkspaceItemPermissionsHandler{
+		Enforcer: transactionalEnforcer,
+	}
+	authorizationApp := &authorization.App{
+		CreateWorkspace:                 createWorkspaceHandler,
+		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
+		GetWorkspaceMembers:             getWorkspaceMembersHandler,
+		HasWorkspacePermission:          hasWorkspacePermissionHandler,
+		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
+		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
+	}
+	grpcHandler := authorization.NewGRPCHandler(authorizationApp)
 	serverConfig := &config.Server
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue

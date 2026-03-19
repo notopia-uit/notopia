@@ -16,7 +16,12 @@ export declare const file_authorization: GenFile;
  */
 export declare type CreateWorkspaceRequest = Message<"authorization.CreateWorkspaceRequest"> & {
   /**
-   * @generated from field: string workspace_id = 1;
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: string workspace_id = 2;
    */
   workspaceId: string;
 };
@@ -195,6 +200,11 @@ export declare type HasWorkspaceItemPermissionRequest = Message<"authorization.H
   memberId: string;
 
   /**
+   * @generated from field: string workspace_id = 2;
+   */
+  workspaceId: string;
+
+  /**
    * @generated from field: authorization.WorkspaceItemPermission permission = 3;
    */
   permission: WorkspaceItemPermission;
@@ -232,9 +242,9 @@ export declare type GetUserWorkspaceItemPermissionsRequest = Message<"authorizat
   memberId: string;
 
   /**
-   * @generated from field: string note_id = 2;
+   * @generated from field: string workspace_id = 2;
    */
-  noteId: string;
+  workspaceId: string;
 };
 
 /**

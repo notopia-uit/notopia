@@ -15,7 +15,8 @@ service AuthorizationService {
 }
 
 message CreateWorkspaceRequest {
-  string workspace_id = 1 [
+  string user_id = 1 [(buf.validate.field).required = true];
+  string workspace_id = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
@@ -88,6 +89,10 @@ enum WorkspaceItemPermission {
 
 message HasWorkspaceItemPermissionRequest {
   string member_id = 1 [(buf.validate.field).required = true];
+  string workspace_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
   WorkspaceItemPermission permission = 3 [(buf.validate.field).required = true];
 }
 
@@ -97,7 +102,7 @@ message HasWorkspaceItemPermissionResponse {
 
 message GetUserWorkspaceItemPermissionsRequest {
   string member_id = 1 [(buf.validate.field).required = true];
-  string note_id = 2 [
+  string workspace_id = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
