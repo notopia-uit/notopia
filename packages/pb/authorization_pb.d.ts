@@ -12,30 +12,25 @@ import type { Empty } from "@bufbuild/protobuf/wkt";
 export declare const file_authorization: GenFile;
 
 /**
- * @generated from message authorization.CreateWorkspaceWithOwnerRequest
+ * @generated from message authorization.CreateWorkspaceRequest
  */
-export declare type CreateWorkspaceWithOwnerRequest = Message<"authorization.CreateWorkspaceWithOwnerRequest"> & {
+export declare type CreateWorkspaceRequest = Message<"authorization.CreateWorkspaceRequest"> & {
   /**
    * @generated from field: string workspace_id = 1;
    */
   workspaceId: string;
-
-  /**
-   * @generated from field: string owner_id = 2;
-   */
-  ownerId: string;
 };
 
 /**
- * Describes the message authorization.CreateWorkspaceWithOwnerRequest.
- * Use `create(CreateWorkspaceWithOwnerRequestSchema)` to create a new message.
+ * Describes the message authorization.CreateWorkspaceRequest.
+ * Use `create(CreateWorkspaceRequestSchema)` to create a new message.
  */
-export declare const CreateWorkspaceWithOwnerRequestSchema: GenMessage<CreateWorkspaceWithOwnerRequest>;
+export declare const CreateWorkspaceRequestSchema: GenMessage<CreateWorkspaceRequest>;
 
 /**
- * @generated from message authorization.CreateWorkspaceWithOwnerResponse
+ * @generated from message authorization.CreateWorkspaceResponse
  */
-export declare type CreateWorkspaceWithOwnerResponse = Message<"authorization.CreateWorkspaceWithOwnerResponse"> & {
+export declare type CreateWorkspaceResponse = Message<"authorization.CreateWorkspaceResponse"> & {
   /**
    * @generated from field: google.protobuf.Empty empty = 1;
    */
@@ -43,10 +38,68 @@ export declare type CreateWorkspaceWithOwnerResponse = Message<"authorization.Cr
 };
 
 /**
- * Describes the message authorization.CreateWorkspaceWithOwnerResponse.
- * Use `create(CreateWorkspaceWithOwnerResponseSchema)` to create a new message.
+ * Describes the message authorization.CreateWorkspaceResponse.
+ * Use `create(CreateWorkspaceResponseSchema)` to create a new message.
  */
-export declare const CreateWorkspaceWithOwnerResponseSchema: GenMessage<CreateWorkspaceWithOwnerResponse>;
+export declare const CreateWorkspaceResponseSchema: GenMessage<CreateWorkspaceResponse>;
+
+/**
+ * @generated from message authorization.WorkspaceMember
+ */
+export declare type WorkspaceMember = Message<"authorization.WorkspaceMember"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: authorization.WorkspaceRole role = 2;
+   */
+  role: WorkspaceRole;
+};
+
+/**
+ * Describes the message authorization.WorkspaceMember.
+ * Use `create(WorkspaceMemberSchema)` to create a new message.
+ */
+export declare const WorkspaceMemberSchema: GenMessage<WorkspaceMember>;
+
+/**
+ * @generated from message authorization.UpdateWorkspaceMembersRequest
+ */
+export declare type UpdateWorkspaceMembersRequest = Message<"authorization.UpdateWorkspaceMembersRequest"> & {
+  /**
+   * @generated from field: string workspace_id = 1;
+   */
+  workspaceId: string;
+
+  /**
+   * @generated from field: repeated authorization.WorkspaceMember members = 2;
+   */
+  members: WorkspaceMember[];
+};
+
+/**
+ * Describes the message authorization.UpdateWorkspaceMembersRequest.
+ * Use `create(UpdateWorkspaceMembersRequestSchema)` to create a new message.
+ */
+export declare const UpdateWorkspaceMembersRequestSchema: GenMessage<UpdateWorkspaceMembersRequest>;
+
+/**
+ * @generated from message authorization.UpdateWorkspaceMembersResponse
+ */
+export declare type UpdateWorkspaceMembersResponse = Message<"authorization.UpdateWorkspaceMembersResponse"> & {
+  /**
+   * @generated from field: google.protobuf.Empty empty = 1;
+   */
+  empty?: Empty;
+};
+
+/**
+ * Describes the message authorization.UpdateWorkspaceMembersResponse.
+ * Use `create(UpdateWorkspaceMembersResponseSchema)` to create a new message.
+ */
+export declare const UpdateWorkspaceMembersResponseSchema: GenMessage<UpdateWorkspaceMembersResponse>;
 
 /**
  * @generated from message authorization.GetWorkspaceMembersRequest
@@ -79,27 +132,6 @@ export declare type GetWorkspaceMembersResponse = Message<"authorization.GetWork
  * Use `create(GetWorkspaceMembersResponseSchema)` to create a new message.
  */
 export declare const GetWorkspaceMembersResponseSchema: GenMessage<GetWorkspaceMembersResponse>;
-
-/**
- * @generated from message authorization.WorkspaceMember
- */
-export declare type WorkspaceMember = Message<"authorization.WorkspaceMember"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
-   * @generated from field: authorization.WorkspaceRole role = 2;
-   */
-  role: WorkspaceRole;
-};
-
-/**
- * Describes the message authorization.WorkspaceMember.
- * Use `create(WorkspaceMemberSchema)` to create a new message.
- */
-export declare const WorkspaceMemberSchema: GenMessage<WorkspaceMember>;
 
 /**
  * @generated from message authorization.HasWorkspacePermissionRequest
@@ -144,72 +176,30 @@ export declare type HasWorkspacePermissionResponse = Message<"authorization.HasW
 export declare const HasWorkspacePermissionResponseSchema: GenMessage<HasWorkspacePermissionResponse>;
 
 /**
- * @generated from message authorization.UpdateWorkspaceMembersRequest
+ * @generated from message authorization.HasWorkspaceItemPermissionRequest
  */
-export declare type UpdateWorkspaceMembersRequest = Message<"authorization.UpdateWorkspaceMembersRequest"> & {
-  /**
-   * @generated from field: string workspace_id = 1;
-   */
-  workspaceId: string;
-
-  /**
-   * @generated from field: repeated authorization.WorkspaceMember members = 2;
-   */
-  members: WorkspaceMember[];
-};
-
-/**
- * Describes the message authorization.UpdateWorkspaceMembersRequest.
- * Use `create(UpdateWorkspaceMembersRequestSchema)` to create a new message.
- */
-export declare const UpdateWorkspaceMembersRequestSchema: GenMessage<UpdateWorkspaceMembersRequest>;
-
-/**
- * @generated from message authorization.UpdateWorkspaceMembersResponse
- */
-export declare type UpdateWorkspaceMembersResponse = Message<"authorization.UpdateWorkspaceMembersResponse"> & {
-  /**
-   * @generated from field: google.protobuf.Empty empty = 1;
-   */
-  empty?: Empty;
-};
-
-/**
- * Describes the message authorization.UpdateWorkspaceMembersResponse.
- * Use `create(UpdateWorkspaceMembersResponseSchema)` to create a new message.
- */
-export declare const UpdateWorkspaceMembersResponseSchema: GenMessage<UpdateWorkspaceMembersResponse>;
-
-/**
- * @generated from message authorization.HasNotePermissionRequest
- */
-export declare type HasNotePermissionRequest = Message<"authorization.HasNotePermissionRequest"> & {
+export declare type HasWorkspaceItemPermissionRequest = Message<"authorization.HasWorkspaceItemPermissionRequest"> & {
   /**
    * @generated from field: string member_id = 1;
    */
   memberId: string;
 
   /**
-   * @generated from field: string note_id = 2;
+   * @generated from field: authorization.WorkspaceItemPermission permission = 3;
    */
-  noteId: string;
-
-  /**
-   * @generated from field: authorization.NotePermission permission = 3;
-   */
-  permission: NotePermission;
+  permission: WorkspaceItemPermission;
 };
 
 /**
- * Describes the message authorization.HasNotePermissionRequest.
- * Use `create(HasNotePermissionRequestSchema)` to create a new message.
+ * Describes the message authorization.HasWorkspaceItemPermissionRequest.
+ * Use `create(HasWorkspaceItemPermissionRequestSchema)` to create a new message.
  */
-export declare const HasNotePermissionRequestSchema: GenMessage<HasNotePermissionRequest>;
+export declare const HasWorkspaceItemPermissionRequestSchema: GenMessage<HasWorkspaceItemPermissionRequest>;
 
 /**
- * @generated from message authorization.HasNotePermissionResponse
+ * @generated from message authorization.HasWorkspaceItemPermissionResponse
  */
-export declare type HasNotePermissionResponse = Message<"authorization.HasNotePermissionResponse"> & {
+export declare type HasWorkspaceItemPermissionResponse = Message<"authorization.HasWorkspaceItemPermissionResponse"> & {
   /**
    * @generated from field: bool has_permission = 1;
    */
@@ -217,15 +207,15 @@ export declare type HasNotePermissionResponse = Message<"authorization.HasNotePe
 };
 
 /**
- * Describes the message authorization.HasNotePermissionResponse.
- * Use `create(HasNotePermissionResponseSchema)` to create a new message.
+ * Describes the message authorization.HasWorkspaceItemPermissionResponse.
+ * Use `create(HasWorkspaceItemPermissionResponseSchema)` to create a new message.
  */
-export declare const HasNotePermissionResponseSchema: GenMessage<HasNotePermissionResponse>;
+export declare const HasWorkspaceItemPermissionResponseSchema: GenMessage<HasWorkspaceItemPermissionResponse>;
 
 /**
- * @generated from message authorization.GetUserNotePermissionsRequest
+ * @generated from message authorization.GetUserWorkspaceItemPermissionsRequest
  */
-export declare type GetUserNotePermissionsRequest = Message<"authorization.GetUserNotePermissionsRequest"> & {
+export declare type GetUserWorkspaceItemPermissionsRequest = Message<"authorization.GetUserWorkspaceItemPermissionsRequest"> & {
   /**
    * @generated from field: string member_id = 1;
    */
@@ -238,15 +228,15 @@ export declare type GetUserNotePermissionsRequest = Message<"authorization.GetUs
 };
 
 /**
- * Describes the message authorization.GetUserNotePermissionsRequest.
- * Use `create(GetUserNotePermissionsRequestSchema)` to create a new message.
+ * Describes the message authorization.GetUserWorkspaceItemPermissionsRequest.
+ * Use `create(GetUserWorkspaceItemPermissionsRequestSchema)` to create a new message.
  */
-export declare const GetUserNotePermissionsRequestSchema: GenMessage<GetUserNotePermissionsRequest>;
+export declare const GetUserWorkspaceItemPermissionsRequestSchema: GenMessage<GetUserWorkspaceItemPermissionsRequest>;
 
 /**
- * @generated from message authorization.GetUserNotePermissionsResponse
+ * @generated from message authorization.GetUserWorkspaceItemPermissionsResponse
  */
-export declare type GetUserNotePermissionsResponse = Message<"authorization.GetUserNotePermissionsResponse"> & {
+export declare type GetUserWorkspaceItemPermissionsResponse = Message<"authorization.GetUserWorkspaceItemPermissionsResponse"> & {
   /**
    * @generated from field: bool can_read = 1;
    */
@@ -264,10 +254,10 @@ export declare type GetUserNotePermissionsResponse = Message<"authorization.GetU
 };
 
 /**
- * Describes the message authorization.GetUserNotePermissionsResponse.
- * Use `create(GetUserNotePermissionsResponseSchema)` to create a new message.
+ * Describes the message authorization.GetUserWorkspaceItemPermissionsResponse.
+ * Use `create(GetUserWorkspaceItemPermissionsResponseSchema)` to create a new message.
  */
-export declare const GetUserNotePermissionsResponseSchema: GenMessage<GetUserNotePermissionsResponse>;
+export declare const GetUserWorkspaceItemPermissionsResponseSchema: GenMessage<GetUserWorkspaceItemPermissionsResponse>;
 
 /**
  * @generated from enum authorization.WorkspaceRole
@@ -314,9 +304,9 @@ export enum WorkspacePermission {
   READ = 1,
 
   /**
-   * @generated from enum value: WORKSPACE_PERMISSION_WRITE = 2;
+   * @generated from enum value: WORKSPACE_PERMISSION_EDIT = 2;
    */
-  WRITE = 2,
+  EDIT = 2,
 
   /**
    * @generated from enum value: WORKSPACE_PERMISSION_DELETE = 3;
@@ -330,46 +320,54 @@ export enum WorkspacePermission {
 export declare const WorkspacePermissionSchema: GenEnum<WorkspacePermission>;
 
 /**
- * @generated from enum authorization.NotePermission
+ * @generated from enum authorization.WorkspaceItemPermission
  */
-export enum NotePermission {
+export enum WorkspaceItemPermission {
   /**
-   * @generated from enum value: NOTE_PERMISSION_UNSPECIFIED = 0;
+   * @generated from enum value: WORKSPACE_ITEM_PERMISSION_UNSPECIFIED = 0;
    */
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: NOTE_PERMISSION_READ = 1;
+   * @generated from enum value: WORKSPACE_ITEM_PERMISSION_READ = 1;
    */
   READ = 1,
 
   /**
-   * @generated from enum value: NOTE_PERMISSION_WRITE = 2;
+   * @generated from enum value: WORKSPACE_ITEM_PERMISSION_WRITE = 2;
    */
   WRITE = 2,
 
   /**
-   * @generated from enum value: NOTE_PERMISSION_DELETE = 3;
+   * @generated from enum value: WORKSPACE_ITEM_PERMISSION_DELETE = 3;
    */
   DELETE = 3,
 }
 
 /**
- * Describes the enum authorization.NotePermission.
+ * Describes the enum authorization.WorkspaceItemPermission.
  */
-export declare const NotePermissionSchema: GenEnum<NotePermission>;
+export declare const WorkspaceItemPermissionSchema: GenEnum<WorkspaceItemPermission>;
 
 /**
  * @generated from service authorization.AuthorizationService
  */
 export declare const AuthorizationService: GenService<{
   /**
-   * @generated from rpc authorization.AuthorizationService.CreateWorkspaceWithOwner
+   * @generated from rpc authorization.AuthorizationService.CreateWorkspace
    */
-  createWorkspaceWithOwner: {
+  createWorkspace: {
     methodKind: "unary";
-    input: typeof CreateWorkspaceWithOwnerRequestSchema;
-    output: typeof CreateWorkspaceWithOwnerResponseSchema;
+    input: typeof CreateWorkspaceRequestSchema;
+    output: typeof CreateWorkspaceResponseSchema;
+  },
+  /**
+   * @generated from rpc authorization.AuthorizationService.UpdateWorkspaceMembers
+   */
+  updateWorkspaceMembers: {
+    methodKind: "unary";
+    input: typeof UpdateWorkspaceMembersRequestSchema;
+    output: typeof UpdateWorkspaceMembersResponseSchema;
   },
   /**
    * @generated from rpc authorization.AuthorizationService.GetWorkspaceMembers
@@ -388,28 +386,20 @@ export declare const AuthorizationService: GenService<{
     output: typeof HasWorkspacePermissionResponseSchema;
   },
   /**
-   * @generated from rpc authorization.AuthorizationService.UpdateWorkspaceMembers
+   * @generated from rpc authorization.AuthorizationService.HasWorkspaceItemPermission
    */
-  updateWorkspaceMembers: {
+  hasWorkspaceItemPermission: {
     methodKind: "unary";
-    input: typeof UpdateWorkspaceMembersRequestSchema;
-    output: typeof UpdateWorkspaceMembersResponseSchema;
+    input: typeof HasWorkspaceItemPermissionRequestSchema;
+    output: typeof HasWorkspaceItemPermissionResponseSchema;
   },
   /**
-   * @generated from rpc authorization.AuthorizationService.HasNotePermission
+   * @generated from rpc authorization.AuthorizationService.GetUserWorkspaceItemPermissions
    */
-  hasNotePermission: {
+  getUserWorkspaceItemPermissions: {
     methodKind: "unary";
-    input: typeof HasNotePermissionRequestSchema;
-    output: typeof HasNotePermissionResponseSchema;
-  },
-  /**
-   * @generated from rpc authorization.AuthorizationService.GetUserNotePermissions
-   */
-  getUserNotePermissions: {
-    methodKind: "unary";
-    input: typeof GetUserNotePermissionsRequestSchema;
-    output: typeof GetUserNotePermissionsResponseSchema;
+    input: typeof GetUserWorkspaceItemPermissionsRequestSchema;
+    output: typeof GetUserWorkspaceItemPermissionsResponseSchema;
   },
 }>;
 

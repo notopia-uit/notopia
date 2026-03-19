@@ -33,34 +33,34 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// AuthorizationServiceCreateWorkspaceWithOwnerProcedure is the fully-qualified name of the
-	// AuthorizationService's CreateWorkspaceWithOwner RPC.
-	AuthorizationServiceCreateWorkspaceWithOwnerProcedure = "/authorization.AuthorizationService/CreateWorkspaceWithOwner"
+	// AuthorizationServiceCreateWorkspaceProcedure is the fully-qualified name of the
+	// AuthorizationService's CreateWorkspace RPC.
+	AuthorizationServiceCreateWorkspaceProcedure = "/authorization.AuthorizationService/CreateWorkspace"
+	// AuthorizationServiceUpdateWorkspaceMembersProcedure is the fully-qualified name of the
+	// AuthorizationService's UpdateWorkspaceMembers RPC.
+	AuthorizationServiceUpdateWorkspaceMembersProcedure = "/authorization.AuthorizationService/UpdateWorkspaceMembers"
 	// AuthorizationServiceGetWorkspaceMembersProcedure is the fully-qualified name of the
 	// AuthorizationService's GetWorkspaceMembers RPC.
 	AuthorizationServiceGetWorkspaceMembersProcedure = "/authorization.AuthorizationService/GetWorkspaceMembers"
 	// AuthorizationServiceHasWorkspacePermissionProcedure is the fully-qualified name of the
 	// AuthorizationService's HasWorkspacePermission RPC.
 	AuthorizationServiceHasWorkspacePermissionProcedure = "/authorization.AuthorizationService/HasWorkspacePermission"
-	// AuthorizationServiceUpdateWorkspaceMembersProcedure is the fully-qualified name of the
-	// AuthorizationService's UpdateWorkspaceMembers RPC.
-	AuthorizationServiceUpdateWorkspaceMembersProcedure = "/authorization.AuthorizationService/UpdateWorkspaceMembers"
-	// AuthorizationServiceHasNotePermissionProcedure is the fully-qualified name of the
-	// AuthorizationService's HasNotePermission RPC.
-	AuthorizationServiceHasNotePermissionProcedure = "/authorization.AuthorizationService/HasNotePermission"
-	// AuthorizationServiceGetUserNotePermissionsProcedure is the fully-qualified name of the
-	// AuthorizationService's GetUserNotePermissions RPC.
-	AuthorizationServiceGetUserNotePermissionsProcedure = "/authorization.AuthorizationService/GetUserNotePermissions"
+	// AuthorizationServiceHasWorkspaceItemPermissionProcedure is the fully-qualified name of the
+	// AuthorizationService's HasWorkspaceItemPermission RPC.
+	AuthorizationServiceHasWorkspaceItemPermissionProcedure = "/authorization.AuthorizationService/HasWorkspaceItemPermission"
+	// AuthorizationServiceGetUserWorkspaceItemPermissionsProcedure is the fully-qualified name of the
+	// AuthorizationService's GetUserWorkspaceItemPermissions RPC.
+	AuthorizationServiceGetUserWorkspaceItemPermissionsProcedure = "/authorization.AuthorizationService/GetUserWorkspaceItemPermissions"
 )
 
 // AuthorizationServiceClient is a client for the authorization.AuthorizationService service.
 type AuthorizationServiceClient interface {
-	CreateWorkspaceWithOwner(context.Context, *connect.Request[pb.CreateWorkspaceWithOwnerRequest]) (*connect.Response[pb.CreateWorkspaceWithOwnerResponse], error)
+	CreateWorkspace(context.Context, *connect.Request[pb.CreateWorkspaceRequest]) (*connect.Response[pb.CreateWorkspaceResponse], error)
+	UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error)
 	GetWorkspaceMembers(context.Context, *connect.Request[pb.GetWorkspaceMembersRequest]) (*connect.Response[pb.GetWorkspaceMembersResponse], error)
 	HasWorkspacePermission(context.Context, *connect.Request[pb.HasWorkspacePermissionRequest]) (*connect.Response[pb.HasWorkspacePermissionResponse], error)
-	UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error)
-	HasNotePermission(context.Context, *connect.Request[pb.HasNotePermissionRequest]) (*connect.Response[pb.HasNotePermissionResponse], error)
-	GetUserNotePermissions(context.Context, *connect.Request[pb.GetUserNotePermissionsRequest]) (*connect.Response[pb.GetUserNotePermissionsResponse], error)
+	HasWorkspaceItemPermission(context.Context, *connect.Request[pb.HasWorkspaceItemPermissionRequest]) (*connect.Response[pb.HasWorkspaceItemPermissionResponse], error)
+	GetUserWorkspaceItemPermissions(context.Context, *connect.Request[pb.GetUserWorkspaceItemPermissionsRequest]) (*connect.Response[pb.GetUserWorkspaceItemPermissionsResponse], error)
 }
 
 // NewAuthorizationServiceClient constructs a client for the authorization.AuthorizationService
@@ -74,10 +74,16 @@ func NewAuthorizationServiceClient(httpClient connect.HTTPClient, baseURL string
 	baseURL = strings.TrimRight(baseURL, "/")
 	authorizationServiceMethods := pb.File_authorization_proto.Services().ByName("AuthorizationService").Methods()
 	return &authorizationServiceClient{
-		createWorkspaceWithOwner: connect.NewClient[pb.CreateWorkspaceWithOwnerRequest, pb.CreateWorkspaceWithOwnerResponse](
+		createWorkspace: connect.NewClient[pb.CreateWorkspaceRequest, pb.CreateWorkspaceResponse](
 			httpClient,
-			baseURL+AuthorizationServiceCreateWorkspaceWithOwnerProcedure,
-			connect.WithSchema(authorizationServiceMethods.ByName("CreateWorkspaceWithOwner")),
+			baseURL+AuthorizationServiceCreateWorkspaceProcedure,
+			connect.WithSchema(authorizationServiceMethods.ByName("CreateWorkspace")),
+			connect.WithClientOptions(opts...),
+		),
+		updateWorkspaceMembers: connect.NewClient[pb.UpdateWorkspaceMembersRequest, pb.UpdateWorkspaceMembersResponse](
+			httpClient,
+			baseURL+AuthorizationServiceUpdateWorkspaceMembersProcedure,
+			connect.WithSchema(authorizationServiceMethods.ByName("UpdateWorkspaceMembers")),
 			connect.WithClientOptions(opts...),
 		),
 		getWorkspaceMembers: connect.NewClient[pb.GetWorkspaceMembersRequest, pb.GetWorkspaceMembersResponse](
@@ -92,22 +98,16 @@ func NewAuthorizationServiceClient(httpClient connect.HTTPClient, baseURL string
 			connect.WithSchema(authorizationServiceMethods.ByName("HasWorkspacePermission")),
 			connect.WithClientOptions(opts...),
 		),
-		updateWorkspaceMembers: connect.NewClient[pb.UpdateWorkspaceMembersRequest, pb.UpdateWorkspaceMembersResponse](
+		hasWorkspaceItemPermission: connect.NewClient[pb.HasWorkspaceItemPermissionRequest, pb.HasWorkspaceItemPermissionResponse](
 			httpClient,
-			baseURL+AuthorizationServiceUpdateWorkspaceMembersProcedure,
-			connect.WithSchema(authorizationServiceMethods.ByName("UpdateWorkspaceMembers")),
+			baseURL+AuthorizationServiceHasWorkspaceItemPermissionProcedure,
+			connect.WithSchema(authorizationServiceMethods.ByName("HasWorkspaceItemPermission")),
 			connect.WithClientOptions(opts...),
 		),
-		hasNotePermission: connect.NewClient[pb.HasNotePermissionRequest, pb.HasNotePermissionResponse](
+		getUserWorkspaceItemPermissions: connect.NewClient[pb.GetUserWorkspaceItemPermissionsRequest, pb.GetUserWorkspaceItemPermissionsResponse](
 			httpClient,
-			baseURL+AuthorizationServiceHasNotePermissionProcedure,
-			connect.WithSchema(authorizationServiceMethods.ByName("HasNotePermission")),
-			connect.WithClientOptions(opts...),
-		),
-		getUserNotePermissions: connect.NewClient[pb.GetUserNotePermissionsRequest, pb.GetUserNotePermissionsResponse](
-			httpClient,
-			baseURL+AuthorizationServiceGetUserNotePermissionsProcedure,
-			connect.WithSchema(authorizationServiceMethods.ByName("GetUserNotePermissions")),
+			baseURL+AuthorizationServiceGetUserWorkspaceItemPermissionsProcedure,
+			connect.WithSchema(authorizationServiceMethods.ByName("GetUserWorkspaceItemPermissions")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -115,17 +115,22 @@ func NewAuthorizationServiceClient(httpClient connect.HTTPClient, baseURL string
 
 // authorizationServiceClient implements AuthorizationServiceClient.
 type authorizationServiceClient struct {
-	createWorkspaceWithOwner *connect.Client[pb.CreateWorkspaceWithOwnerRequest, pb.CreateWorkspaceWithOwnerResponse]
-	getWorkspaceMembers      *connect.Client[pb.GetWorkspaceMembersRequest, pb.GetWorkspaceMembersResponse]
-	hasWorkspacePermission   *connect.Client[pb.HasWorkspacePermissionRequest, pb.HasWorkspacePermissionResponse]
-	updateWorkspaceMembers   *connect.Client[pb.UpdateWorkspaceMembersRequest, pb.UpdateWorkspaceMembersResponse]
-	hasNotePermission        *connect.Client[pb.HasNotePermissionRequest, pb.HasNotePermissionResponse]
-	getUserNotePermissions   *connect.Client[pb.GetUserNotePermissionsRequest, pb.GetUserNotePermissionsResponse]
+	createWorkspace                 *connect.Client[pb.CreateWorkspaceRequest, pb.CreateWorkspaceResponse]
+	updateWorkspaceMembers          *connect.Client[pb.UpdateWorkspaceMembersRequest, pb.UpdateWorkspaceMembersResponse]
+	getWorkspaceMembers             *connect.Client[pb.GetWorkspaceMembersRequest, pb.GetWorkspaceMembersResponse]
+	hasWorkspacePermission          *connect.Client[pb.HasWorkspacePermissionRequest, pb.HasWorkspacePermissionResponse]
+	hasWorkspaceItemPermission      *connect.Client[pb.HasWorkspaceItemPermissionRequest, pb.HasWorkspaceItemPermissionResponse]
+	getUserWorkspaceItemPermissions *connect.Client[pb.GetUserWorkspaceItemPermissionsRequest, pb.GetUserWorkspaceItemPermissionsResponse]
 }
 
-// CreateWorkspaceWithOwner calls authorization.AuthorizationService.CreateWorkspaceWithOwner.
-func (c *authorizationServiceClient) CreateWorkspaceWithOwner(ctx context.Context, req *connect.Request[pb.CreateWorkspaceWithOwnerRequest]) (*connect.Response[pb.CreateWorkspaceWithOwnerResponse], error) {
-	return c.createWorkspaceWithOwner.CallUnary(ctx, req)
+// CreateWorkspace calls authorization.AuthorizationService.CreateWorkspace.
+func (c *authorizationServiceClient) CreateWorkspace(ctx context.Context, req *connect.Request[pb.CreateWorkspaceRequest]) (*connect.Response[pb.CreateWorkspaceResponse], error) {
+	return c.createWorkspace.CallUnary(ctx, req)
+}
+
+// UpdateWorkspaceMembers calls authorization.AuthorizationService.UpdateWorkspaceMembers.
+func (c *authorizationServiceClient) UpdateWorkspaceMembers(ctx context.Context, req *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error) {
+	return c.updateWorkspaceMembers.CallUnary(ctx, req)
 }
 
 // GetWorkspaceMembers calls authorization.AuthorizationService.GetWorkspaceMembers.
@@ -138,30 +143,26 @@ func (c *authorizationServiceClient) HasWorkspacePermission(ctx context.Context,
 	return c.hasWorkspacePermission.CallUnary(ctx, req)
 }
 
-// UpdateWorkspaceMembers calls authorization.AuthorizationService.UpdateWorkspaceMembers.
-func (c *authorizationServiceClient) UpdateWorkspaceMembers(ctx context.Context, req *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error) {
-	return c.updateWorkspaceMembers.CallUnary(ctx, req)
+// HasWorkspaceItemPermission calls authorization.AuthorizationService.HasWorkspaceItemPermission.
+func (c *authorizationServiceClient) HasWorkspaceItemPermission(ctx context.Context, req *connect.Request[pb.HasWorkspaceItemPermissionRequest]) (*connect.Response[pb.HasWorkspaceItemPermissionResponse], error) {
+	return c.hasWorkspaceItemPermission.CallUnary(ctx, req)
 }
 
-// HasNotePermission calls authorization.AuthorizationService.HasNotePermission.
-func (c *authorizationServiceClient) HasNotePermission(ctx context.Context, req *connect.Request[pb.HasNotePermissionRequest]) (*connect.Response[pb.HasNotePermissionResponse], error) {
-	return c.hasNotePermission.CallUnary(ctx, req)
-}
-
-// GetUserNotePermissions calls authorization.AuthorizationService.GetUserNotePermissions.
-func (c *authorizationServiceClient) GetUserNotePermissions(ctx context.Context, req *connect.Request[pb.GetUserNotePermissionsRequest]) (*connect.Response[pb.GetUserNotePermissionsResponse], error) {
-	return c.getUserNotePermissions.CallUnary(ctx, req)
+// GetUserWorkspaceItemPermissions calls
+// authorization.AuthorizationService.GetUserWorkspaceItemPermissions.
+func (c *authorizationServiceClient) GetUserWorkspaceItemPermissions(ctx context.Context, req *connect.Request[pb.GetUserWorkspaceItemPermissionsRequest]) (*connect.Response[pb.GetUserWorkspaceItemPermissionsResponse], error) {
+	return c.getUserWorkspaceItemPermissions.CallUnary(ctx, req)
 }
 
 // AuthorizationServiceHandler is an implementation of the authorization.AuthorizationService
 // service.
 type AuthorizationServiceHandler interface {
-	CreateWorkspaceWithOwner(context.Context, *connect.Request[pb.CreateWorkspaceWithOwnerRequest]) (*connect.Response[pb.CreateWorkspaceWithOwnerResponse], error)
+	CreateWorkspace(context.Context, *connect.Request[pb.CreateWorkspaceRequest]) (*connect.Response[pb.CreateWorkspaceResponse], error)
+	UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error)
 	GetWorkspaceMembers(context.Context, *connect.Request[pb.GetWorkspaceMembersRequest]) (*connect.Response[pb.GetWorkspaceMembersResponse], error)
 	HasWorkspacePermission(context.Context, *connect.Request[pb.HasWorkspacePermissionRequest]) (*connect.Response[pb.HasWorkspacePermissionResponse], error)
-	UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error)
-	HasNotePermission(context.Context, *connect.Request[pb.HasNotePermissionRequest]) (*connect.Response[pb.HasNotePermissionResponse], error)
-	GetUserNotePermissions(context.Context, *connect.Request[pb.GetUserNotePermissionsRequest]) (*connect.Response[pb.GetUserNotePermissionsResponse], error)
+	HasWorkspaceItemPermission(context.Context, *connect.Request[pb.HasWorkspaceItemPermissionRequest]) (*connect.Response[pb.HasWorkspaceItemPermissionResponse], error)
+	GetUserWorkspaceItemPermissions(context.Context, *connect.Request[pb.GetUserWorkspaceItemPermissionsRequest]) (*connect.Response[pb.GetUserWorkspaceItemPermissionsResponse], error)
 }
 
 // NewAuthorizationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -171,10 +172,16 @@ type AuthorizationServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewAuthorizationServiceHandler(svc AuthorizationServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	authorizationServiceMethods := pb.File_authorization_proto.Services().ByName("AuthorizationService").Methods()
-	authorizationServiceCreateWorkspaceWithOwnerHandler := connect.NewUnaryHandler(
-		AuthorizationServiceCreateWorkspaceWithOwnerProcedure,
-		svc.CreateWorkspaceWithOwner,
-		connect.WithSchema(authorizationServiceMethods.ByName("CreateWorkspaceWithOwner")),
+	authorizationServiceCreateWorkspaceHandler := connect.NewUnaryHandler(
+		AuthorizationServiceCreateWorkspaceProcedure,
+		svc.CreateWorkspace,
+		connect.WithSchema(authorizationServiceMethods.ByName("CreateWorkspace")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authorizationServiceUpdateWorkspaceMembersHandler := connect.NewUnaryHandler(
+		AuthorizationServiceUpdateWorkspaceMembersProcedure,
+		svc.UpdateWorkspaceMembers,
+		connect.WithSchema(authorizationServiceMethods.ByName("UpdateWorkspaceMembers")),
 		connect.WithHandlerOptions(opts...),
 	)
 	authorizationServiceGetWorkspaceMembersHandler := connect.NewUnaryHandler(
@@ -189,38 +196,32 @@ func NewAuthorizationServiceHandler(svc AuthorizationServiceHandler, opts ...con
 		connect.WithSchema(authorizationServiceMethods.ByName("HasWorkspacePermission")),
 		connect.WithHandlerOptions(opts...),
 	)
-	authorizationServiceUpdateWorkspaceMembersHandler := connect.NewUnaryHandler(
-		AuthorizationServiceUpdateWorkspaceMembersProcedure,
-		svc.UpdateWorkspaceMembers,
-		connect.WithSchema(authorizationServiceMethods.ByName("UpdateWorkspaceMembers")),
+	authorizationServiceHasWorkspaceItemPermissionHandler := connect.NewUnaryHandler(
+		AuthorizationServiceHasWorkspaceItemPermissionProcedure,
+		svc.HasWorkspaceItemPermission,
+		connect.WithSchema(authorizationServiceMethods.ByName("HasWorkspaceItemPermission")),
 		connect.WithHandlerOptions(opts...),
 	)
-	authorizationServiceHasNotePermissionHandler := connect.NewUnaryHandler(
-		AuthorizationServiceHasNotePermissionProcedure,
-		svc.HasNotePermission,
-		connect.WithSchema(authorizationServiceMethods.ByName("HasNotePermission")),
-		connect.WithHandlerOptions(opts...),
-	)
-	authorizationServiceGetUserNotePermissionsHandler := connect.NewUnaryHandler(
-		AuthorizationServiceGetUserNotePermissionsProcedure,
-		svc.GetUserNotePermissions,
-		connect.WithSchema(authorizationServiceMethods.ByName("GetUserNotePermissions")),
+	authorizationServiceGetUserWorkspaceItemPermissionsHandler := connect.NewUnaryHandler(
+		AuthorizationServiceGetUserWorkspaceItemPermissionsProcedure,
+		svc.GetUserWorkspaceItemPermissions,
+		connect.WithSchema(authorizationServiceMethods.ByName("GetUserWorkspaceItemPermissions")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/authorization.AuthorizationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case AuthorizationServiceCreateWorkspaceWithOwnerProcedure:
-			authorizationServiceCreateWorkspaceWithOwnerHandler.ServeHTTP(w, r)
+		case AuthorizationServiceCreateWorkspaceProcedure:
+			authorizationServiceCreateWorkspaceHandler.ServeHTTP(w, r)
+		case AuthorizationServiceUpdateWorkspaceMembersProcedure:
+			authorizationServiceUpdateWorkspaceMembersHandler.ServeHTTP(w, r)
 		case AuthorizationServiceGetWorkspaceMembersProcedure:
 			authorizationServiceGetWorkspaceMembersHandler.ServeHTTP(w, r)
 		case AuthorizationServiceHasWorkspacePermissionProcedure:
 			authorizationServiceHasWorkspacePermissionHandler.ServeHTTP(w, r)
-		case AuthorizationServiceUpdateWorkspaceMembersProcedure:
-			authorizationServiceUpdateWorkspaceMembersHandler.ServeHTTP(w, r)
-		case AuthorizationServiceHasNotePermissionProcedure:
-			authorizationServiceHasNotePermissionHandler.ServeHTTP(w, r)
-		case AuthorizationServiceGetUserNotePermissionsProcedure:
-			authorizationServiceGetUserNotePermissionsHandler.ServeHTTP(w, r)
+		case AuthorizationServiceHasWorkspaceItemPermissionProcedure:
+			authorizationServiceHasWorkspaceItemPermissionHandler.ServeHTTP(w, r)
+		case AuthorizationServiceGetUserWorkspaceItemPermissionsProcedure:
+			authorizationServiceGetUserWorkspaceItemPermissionsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -230,8 +231,12 @@ func NewAuthorizationServiceHandler(svc AuthorizationServiceHandler, opts ...con
 // UnimplementedAuthorizationServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedAuthorizationServiceHandler struct{}
 
-func (UnimplementedAuthorizationServiceHandler) CreateWorkspaceWithOwner(context.Context, *connect.Request[pb.CreateWorkspaceWithOwnerRequest]) (*connect.Response[pb.CreateWorkspaceWithOwnerResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.CreateWorkspaceWithOwner is not implemented"))
+func (UnimplementedAuthorizationServiceHandler) CreateWorkspace(context.Context, *connect.Request[pb.CreateWorkspaceRequest]) (*connect.Response[pb.CreateWorkspaceResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.CreateWorkspace is not implemented"))
+}
+
+func (UnimplementedAuthorizationServiceHandler) UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.UpdateWorkspaceMembers is not implemented"))
 }
 
 func (UnimplementedAuthorizationServiceHandler) GetWorkspaceMembers(context.Context, *connect.Request[pb.GetWorkspaceMembersRequest]) (*connect.Response[pb.GetWorkspaceMembersResponse], error) {
@@ -242,14 +247,10 @@ func (UnimplementedAuthorizationServiceHandler) HasWorkspacePermission(context.C
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.HasWorkspacePermission is not implemented"))
 }
 
-func (UnimplementedAuthorizationServiceHandler) UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.UpdateWorkspaceMembers is not implemented"))
+func (UnimplementedAuthorizationServiceHandler) HasWorkspaceItemPermission(context.Context, *connect.Request[pb.HasWorkspaceItemPermissionRequest]) (*connect.Response[pb.HasWorkspaceItemPermissionResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.HasWorkspaceItemPermission is not implemented"))
 }
 
-func (UnimplementedAuthorizationServiceHandler) HasNotePermission(context.Context, *connect.Request[pb.HasNotePermissionRequest]) (*connect.Response[pb.HasNotePermissionResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.HasNotePermission is not implemented"))
-}
-
-func (UnimplementedAuthorizationServiceHandler) GetUserNotePermissions(context.Context, *connect.Request[pb.GetUserNotePermissionsRequest]) (*connect.Response[pb.GetUserNotePermissionsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.GetUserNotePermissions is not implemented"))
+func (UnimplementedAuthorizationServiceHandler) GetUserWorkspaceItemPermissions(context.Context, *connect.Request[pb.GetUserWorkspaceItemPermissionsRequest]) (*connect.Response[pb.GetUserWorkspaceItemPermissionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.GetUserWorkspaceItemPermissions is not implemented"))
 }

@@ -6,35 +6,23 @@ import "buf/validate/validate.proto";
 import "google/protobuf/empty.proto";
 
 service AuthorizationService {
-  rpc CreateWorkspaceWithOwner(CreateWorkspaceWithOwnerRequest) returns (CreateWorkspaceWithOwnerResponse);
+  rpc CreateWorkspace(CreateWorkspaceRequest) returns (CreateWorkspaceResponse);
+  rpc UpdateWorkspaceMembers(UpdateWorkspaceMembersRequest) returns (UpdateWorkspaceMembersResponse);
   rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns (GetWorkspaceMembersResponse);
   rpc HasWorkspacePermission(HasWorkspacePermissionRequest) returns (HasWorkspacePermissionResponse);
-  rpc UpdateWorkspaceMembers(UpdateWorkspaceMembersRequest) returns (UpdateWorkspaceMembersResponse);
-  rpc HasNotePermission(HasNotePermissionRequest) returns (HasNotePermissionResponse);
-  rpc GetUserNotePermissions(GetUserNotePermissionsRequest) returns (GetUserNotePermissionsResponse);
+  rpc HasWorkspaceItemPermission(HasWorkspaceItemPermissionRequest) returns (HasWorkspaceItemPermissionResponse);
+  rpc GetUserWorkspaceItemPermissions(GetUserWorkspaceItemPermissionsRequest) returns (GetUserWorkspaceItemPermissionsResponse);
 }
 
-message CreateWorkspaceWithOwnerRequest {
+message CreateWorkspaceRequest {
   string workspace_id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
-  string owner_id = 2 [(buf.validate.field).required = true];
 }
 
-message CreateWorkspaceWithOwnerResponse {
+message CreateWorkspaceResponse {
   google.protobuf.Empty empty = 1;
-}
-
-message GetWorkspaceMembersRequest {
-  string workspace_id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
-}
-
-message GetWorkspaceMembersResponse {
-  repeated WorkspaceMember members = 1 [(buf.validate.field).required = true];
 }
 
 enum WorkspaceRole {
@@ -49,10 +37,30 @@ message WorkspaceMember {
   WorkspaceRole role = 2 [(buf.validate.field).required = true];
 }
 
+message UpdateWorkspaceMembersRequest {
+  string workspace_id = 1 [(buf.validate.field).required = true];
+  repeated WorkspaceMember members = 2 [(buf.validate.field).required = true];
+}
+
+message UpdateWorkspaceMembersResponse {
+  google.protobuf.Empty empty = 1;
+}
+
+message GetWorkspaceMembersRequest {
+  string workspace_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+}
+
+message GetWorkspaceMembersResponse {
+  repeated WorkspaceMember members = 1 [(buf.validate.field).required = true];
+}
+
 enum WorkspacePermission {
   WORKSPACE_PERMISSION_UNSPECIFIED = 0;
   WORKSPACE_PERMISSION_READ = 1;
-  WORKSPACE_PERMISSION_WRITE = 2;
+  WORKSPACE_PERMISSION_EDIT = 2;
   WORKSPACE_PERMISSION_DELETE = 3;
 }
 
@@ -69,36 +77,23 @@ message HasWorkspacePermissionResponse {
   bool has_permission = 1 [(buf.validate.field).required = true];
 }
 
-message UpdateWorkspaceMembersRequest {
-  string workspace_id = 1 [(buf.validate.field).required = true];
-  repeated WorkspaceMember members = 2 [(buf.validate.field).required = true];
+enum WorkspaceItemPermission {
+  WORKSPACE_ITEM_PERMISSION_UNSPECIFIED = 0;
+  WORKSPACE_ITEM_PERMISSION_READ = 1;
+  WORKSPACE_ITEM_PERMISSION_WRITE = 2;
+  WORKSPACE_ITEM_PERMISSION_DELETE = 3;
 }
 
-message UpdateWorkspaceMembersResponse {
-  google.protobuf.Empty empty = 1;
-}
-
-enum NotePermission {
-  NOTE_PERMISSION_UNSPECIFIED = 0;
-  NOTE_PERMISSION_READ = 1;
-  NOTE_PERMISSION_WRITE = 2;
-  NOTE_PERMISSION_DELETE = 3;
-}
-
-message HasNotePermissionRequest {
+message HasWorkspaceItemPermissionRequest {
   string member_id = 1 [(buf.validate.field).required = true];
-  string note_id = 2 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
-  NotePermission permission = 3 [(buf.validate.field).required = true];
+  WorkspaceItemPermission permission = 3 [(buf.validate.field).required = true];
 }
 
-message HasNotePermissionResponse {
+message HasWorkspaceItemPermissionResponse {
   bool has_permission = 1 [(buf.validate.field).required = true];
 }
 
-message GetUserNotePermissionsRequest {
+message GetUserWorkspaceItemPermissionsRequest {
   string member_id = 1 [(buf.validate.field).required = true];
   string note_id = 2 [
     (buf.validate.field).required = true,
@@ -106,7 +101,7 @@ message GetUserNotePermissionsRequest {
   ];
 }
 
-message GetUserNotePermissionsResponse {
+message GetUserWorkspaceItemPermissionsResponse {
   bool can_read = 1 [(buf.validate.field).required = true];
   bool can_write = 2 [(buf.validate.field).required = true];
   bool can_delete = 3 [(buf.validate.field).required = true];

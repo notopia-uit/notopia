@@ -19,7 +19,11 @@ func NewGRPCHandler() *GRPCHandler {
 
 var ProvideGRPCHandler = NewGRPCHandler
 
-func (h *GRPCHandler) CreateWorkspaceWithOwner(context.Context, *connect.Request[pb.CreateWorkspaceWithOwnerRequest]) (*connect.Response[pb.CreateWorkspaceWithOwnerResponse], error) {
+func (h *GRPCHandler) CreateWorkspace(context.Context, *connect.Request[pb.CreateWorkspaceRequest]) (*connect.Response[pb.CreateWorkspaceResponse], error) {
+	return nil, commonerror.NewUnimplemented()
+}
+
+func (h *GRPCHandler) UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error) {
 	return nil, commonerror.NewUnimplemented()
 }
 
@@ -31,14 +35,10 @@ func (h *GRPCHandler) HasWorkspacePermission(context.Context, *connect.Request[p
 	return nil, commonerror.NewUnimplemented()
 }
 
-func (h *GRPCHandler) UpdateWorkspaceMembers(context.Context, *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error) {
+func (h *GRPCHandler) HasWorkspaceItemPermission(context.Context, *connect.Request[pb.HasWorkspaceItemPermissionRequest]) (*connect.Response[pb.HasWorkspaceItemPermissionResponse], error) {
 	return nil, commonerror.NewUnimplemented()
 }
 
-func (h *GRPCHandler) HasNotePermission(context.Context, *connect.Request[pb.HasNotePermissionRequest]) (*connect.Response[pb.HasNotePermissionResponse], error) {
-	return nil, commonerror.NewUnimplemented()
-}
-
-func (h *GRPCHandler) GetUserNotePermissions(context.Context, *connect.Request[pb.GetUserNotePermissionsRequest]) (*connect.Response[pb.GetUserNotePermissionsResponse], error) {
+func (h *GRPCHandler) GetUserWorkspaceItemPermissions(context.Context, *connect.Request[pb.GetUserWorkspaceItemPermissionsRequest]) (*connect.Response[pb.GetUserWorkspaceItemPermissionsResponse], error) {
 	return nil, commonerror.NewUnimplemented()
 }

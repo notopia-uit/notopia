@@ -43,6 +43,38 @@ export declare type CheckNoteExistenceResponse = Message<"note.CheckNoteExistenc
 export declare const CheckNoteExistenceResponseSchema: GenMessage<CheckNoteExistenceResponse>;
 
 /**
+ * @generated from message note.GetNoteWorkspaceIdRequest
+ */
+export declare type GetNoteWorkspaceIdRequest = Message<"note.GetNoteWorkspaceIdRequest"> & {
+  /**
+   * @generated from field: string note_id = 1;
+   */
+  noteId: string;
+};
+
+/**
+ * Describes the message note.GetNoteWorkspaceIdRequest.
+ * Use `create(GetNoteWorkspaceIdRequestSchema)` to create a new message.
+ */
+export declare const GetNoteWorkspaceIdRequestSchema: GenMessage<GetNoteWorkspaceIdRequest>;
+
+/**
+ * @generated from message note.GetNoteWorkspaceIdResponse
+ */
+export declare type GetNoteWorkspaceIdResponse = Message<"note.GetNoteWorkspaceIdResponse"> & {
+  /**
+   * @generated from field: string workspace_id = 1;
+   */
+  workspaceId: string;
+};
+
+/**
+ * Describes the message note.GetNoteWorkspaceIdResponse.
+ * Use `create(GetNoteWorkspaceIdResponseSchema)` to create a new message.
+ */
+export declare const GetNoteWorkspaceIdResponseSchema: GenMessage<GetNoteWorkspaceIdResponse>;
+
+/**
  * @generated from service note.NoteService
  */
 export declare const NoteService: GenService<{
@@ -53,6 +85,14 @@ export declare const NoteService: GenService<{
     methodKind: "unary";
     input: typeof CheckNoteExistenceRequestSchema;
     output: typeof CheckNoteExistenceResponseSchema;
+  },
+  /**
+   * @generated from rpc note.NoteService.GetNoteWorkspaceId
+   */
+  getNoteWorkspaceId: {
+    methodKind: "unary";
+    input: typeof GetNoteWorkspaceIdRequestSchema;
+    output: typeof GetNoteWorkspaceIdResponseSchema;
   },
 }>;
 

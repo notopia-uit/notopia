@@ -80,7 +80,7 @@ type WorkspacePermission int32
 const (
 	WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED WorkspacePermission = 0
 	WorkspacePermission_WORKSPACE_PERMISSION_READ        WorkspacePermission = 1
-	WorkspacePermission_WORKSPACE_PERMISSION_WRITE       WorkspacePermission = 2
+	WorkspacePermission_WORKSPACE_PERMISSION_EDIT        WorkspacePermission = 2
 	WorkspacePermission_WORKSPACE_PERMISSION_DELETE      WorkspacePermission = 3
 )
 
@@ -89,13 +89,13 @@ var (
 	WorkspacePermission_name = map[int32]string{
 		0: "WORKSPACE_PERMISSION_UNSPECIFIED",
 		1: "WORKSPACE_PERMISSION_READ",
-		2: "WORKSPACE_PERMISSION_WRITE",
+		2: "WORKSPACE_PERMISSION_EDIT",
 		3: "WORKSPACE_PERMISSION_DELETE",
 	}
 	WorkspacePermission_value = map[string]int32{
 		"WORKSPACE_PERMISSION_UNSPECIFIED": 0,
 		"WORKSPACE_PERMISSION_READ":        1,
-		"WORKSPACE_PERMISSION_WRITE":       2,
+		"WORKSPACE_PERMISSION_EDIT":        2,
 		"WORKSPACE_PERMISSION_DELETE":      3,
 	}
 )
@@ -127,80 +127,79 @@ func (WorkspacePermission) EnumDescriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{1}
 }
 
-type NotePermission int32
+type WorkspaceItemPermission int32
 
 const (
-	NotePermission_NOTE_PERMISSION_UNSPECIFIED NotePermission = 0
-	NotePermission_NOTE_PERMISSION_READ        NotePermission = 1
-	NotePermission_NOTE_PERMISSION_WRITE       NotePermission = 2
-	NotePermission_NOTE_PERMISSION_DELETE      NotePermission = 3
+	WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_UNSPECIFIED WorkspaceItemPermission = 0
+	WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_READ        WorkspaceItemPermission = 1
+	WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_WRITE       WorkspaceItemPermission = 2
+	WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_DELETE      WorkspaceItemPermission = 3
 )
 
-// Enum value maps for NotePermission.
+// Enum value maps for WorkspaceItemPermission.
 var (
-	NotePermission_name = map[int32]string{
-		0: "NOTE_PERMISSION_UNSPECIFIED",
-		1: "NOTE_PERMISSION_READ",
-		2: "NOTE_PERMISSION_WRITE",
-		3: "NOTE_PERMISSION_DELETE",
+	WorkspaceItemPermission_name = map[int32]string{
+		0: "WORKSPACE_ITEM_PERMISSION_UNSPECIFIED",
+		1: "WORKSPACE_ITEM_PERMISSION_READ",
+		2: "WORKSPACE_ITEM_PERMISSION_WRITE",
+		3: "WORKSPACE_ITEM_PERMISSION_DELETE",
 	}
-	NotePermission_value = map[string]int32{
-		"NOTE_PERMISSION_UNSPECIFIED": 0,
-		"NOTE_PERMISSION_READ":        1,
-		"NOTE_PERMISSION_WRITE":       2,
-		"NOTE_PERMISSION_DELETE":      3,
+	WorkspaceItemPermission_value = map[string]int32{
+		"WORKSPACE_ITEM_PERMISSION_UNSPECIFIED": 0,
+		"WORKSPACE_ITEM_PERMISSION_READ":        1,
+		"WORKSPACE_ITEM_PERMISSION_WRITE":       2,
+		"WORKSPACE_ITEM_PERMISSION_DELETE":      3,
 	}
 )
 
-func (x NotePermission) Enum() *NotePermission {
-	p := new(NotePermission)
+func (x WorkspaceItemPermission) Enum() *WorkspaceItemPermission {
+	p := new(WorkspaceItemPermission)
 	*p = x
 	return p
 }
 
-func (x NotePermission) String() string {
+func (x WorkspaceItemPermission) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (NotePermission) Descriptor() protoreflect.EnumDescriptor {
+func (WorkspaceItemPermission) Descriptor() protoreflect.EnumDescriptor {
 	return file_authorization_proto_enumTypes[2].Descriptor()
 }
 
-func (NotePermission) Type() protoreflect.EnumType {
+func (WorkspaceItemPermission) Type() protoreflect.EnumType {
 	return &file_authorization_proto_enumTypes[2]
 }
 
-func (x NotePermission) Number() protoreflect.EnumNumber {
+func (x WorkspaceItemPermission) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use NotePermission.Descriptor instead.
-func (NotePermission) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use WorkspaceItemPermission.Descriptor instead.
+func (WorkspaceItemPermission) EnumDescriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{2}
 }
 
-type CreateWorkspaceWithOwnerRequest struct {
+type CreateWorkspaceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
-	OwnerId       string                 `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateWorkspaceWithOwnerRequest) Reset() {
-	*x = CreateWorkspaceWithOwnerRequest{}
+func (x *CreateWorkspaceRequest) Reset() {
+	*x = CreateWorkspaceRequest{}
 	mi := &file_authorization_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateWorkspaceWithOwnerRequest) String() string {
+func (x *CreateWorkspaceRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateWorkspaceWithOwnerRequest) ProtoMessage() {}
+func (*CreateWorkspaceRequest) ProtoMessage() {}
 
-func (x *CreateWorkspaceWithOwnerRequest) ProtoReflect() protoreflect.Message {
+func (x *CreateWorkspaceRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_authorization_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -212,46 +211,39 @@ func (x *CreateWorkspaceWithOwnerRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateWorkspaceWithOwnerRequest.ProtoReflect.Descriptor instead.
-func (*CreateWorkspaceWithOwnerRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateWorkspaceRequest.ProtoReflect.Descriptor instead.
+func (*CreateWorkspaceRequest) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CreateWorkspaceWithOwnerRequest) GetWorkspaceId() string {
+func (x *CreateWorkspaceRequest) GetWorkspaceId() string {
 	if x != nil {
 		return x.WorkspaceId
 	}
 	return ""
 }
 
-func (x *CreateWorkspaceWithOwnerRequest) GetOwnerId() string {
-	if x != nil {
-		return x.OwnerId
-	}
-	return ""
-}
-
-type CreateWorkspaceWithOwnerResponse struct {
+type CreateWorkspaceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Empty         *emptypb.Empty         `protobuf:"bytes,1,opt,name=empty,proto3" json:"empty,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateWorkspaceWithOwnerResponse) Reset() {
-	*x = CreateWorkspaceWithOwnerResponse{}
+func (x *CreateWorkspaceResponse) Reset() {
+	*x = CreateWorkspaceResponse{}
 	mi := &file_authorization_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateWorkspaceWithOwnerResponse) String() string {
+func (x *CreateWorkspaceResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateWorkspaceWithOwnerResponse) ProtoMessage() {}
+func (*CreateWorkspaceResponse) ProtoMessage() {}
 
-func (x *CreateWorkspaceWithOwnerResponse) ProtoReflect() protoreflect.Message {
+func (x *CreateWorkspaceResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_authorization_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -263,12 +255,160 @@ func (x *CreateWorkspaceWithOwnerResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateWorkspaceWithOwnerResponse.ProtoReflect.Descriptor instead.
-func (*CreateWorkspaceWithOwnerResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateWorkspaceResponse.ProtoReflect.Descriptor instead.
+func (*CreateWorkspaceResponse) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateWorkspaceWithOwnerResponse) GetEmpty() *emptypb.Empty {
+func (x *CreateWorkspaceResponse) GetEmpty() *emptypb.Empty {
+	if x != nil {
+		return x.Empty
+	}
+	return nil
+}
+
+type WorkspaceMember struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Role          WorkspaceRole          `protobuf:"varint,2,opt,name=role,proto3,enum=authorization.WorkspaceRole" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WorkspaceMember) Reset() {
+	*x = WorkspaceMember{}
+	mi := &file_authorization_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WorkspaceMember) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorkspaceMember) ProtoMessage() {}
+
+func (x *WorkspaceMember) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorkspaceMember.ProtoReflect.Descriptor instead.
+func (*WorkspaceMember) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *WorkspaceMember) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *WorkspaceMember) GetRole() WorkspaceRole {
+	if x != nil {
+		return x.Role
+	}
+	return WorkspaceRole_WORKSPACE_ROLE_UNSPECIFIED
+}
+
+type UpdateWorkspaceMembersRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	Members       []*WorkspaceMember     `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateWorkspaceMembersRequest) Reset() {
+	*x = UpdateWorkspaceMembersRequest{}
+	mi := &file_authorization_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateWorkspaceMembersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateWorkspaceMembersRequest) ProtoMessage() {}
+
+func (x *UpdateWorkspaceMembersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateWorkspaceMembersRequest.ProtoReflect.Descriptor instead.
+func (*UpdateWorkspaceMembersRequest) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *UpdateWorkspaceMembersRequest) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
+}
+
+func (x *UpdateWorkspaceMembersRequest) GetMembers() []*WorkspaceMember {
+	if x != nil {
+		return x.Members
+	}
+	return nil
+}
+
+type UpdateWorkspaceMembersResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Empty         *emptypb.Empty         `protobuf:"bytes,1,opt,name=empty,proto3" json:"empty,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateWorkspaceMembersResponse) Reset() {
+	*x = UpdateWorkspaceMembersResponse{}
+	mi := &file_authorization_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateWorkspaceMembersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateWorkspaceMembersResponse) ProtoMessage() {}
+
+func (x *UpdateWorkspaceMembersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateWorkspaceMembersResponse.ProtoReflect.Descriptor instead.
+func (*UpdateWorkspaceMembersResponse) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UpdateWorkspaceMembersResponse) GetEmpty() *emptypb.Empty {
 	if x != nil {
 		return x.Empty
 	}
@@ -284,7 +424,7 @@ type GetWorkspaceMembersRequest struct {
 
 func (x *GetWorkspaceMembersRequest) Reset() {
 	*x = GetWorkspaceMembersRequest{}
-	mi := &file_authorization_proto_msgTypes[2]
+	mi := &file_authorization_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -296,7 +436,7 @@ func (x *GetWorkspaceMembersRequest) String() string {
 func (*GetWorkspaceMembersRequest) ProtoMessage() {}
 
 func (x *GetWorkspaceMembersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[2]
+	mi := &file_authorization_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -309,7 +449,7 @@ func (x *GetWorkspaceMembersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWorkspaceMembersRequest.ProtoReflect.Descriptor instead.
 func (*GetWorkspaceMembersRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{2}
+	return file_authorization_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetWorkspaceMembersRequest) GetWorkspaceId() string {
@@ -328,7 +468,7 @@ type GetWorkspaceMembersResponse struct {
 
 func (x *GetWorkspaceMembersResponse) Reset() {
 	*x = GetWorkspaceMembersResponse{}
-	mi := &file_authorization_proto_msgTypes[3]
+	mi := &file_authorization_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -340,7 +480,7 @@ func (x *GetWorkspaceMembersResponse) String() string {
 func (*GetWorkspaceMembersResponse) ProtoMessage() {}
 
 func (x *GetWorkspaceMembersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[3]
+	mi := &file_authorization_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -353,7 +493,7 @@ func (x *GetWorkspaceMembersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWorkspaceMembersResponse.ProtoReflect.Descriptor instead.
 func (*GetWorkspaceMembersResponse) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{3}
+	return file_authorization_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetWorkspaceMembersResponse) GetMembers() []*WorkspaceMember {
@@ -361,58 +501,6 @@ func (x *GetWorkspaceMembersResponse) GetMembers() []*WorkspaceMember {
 		return x.Members
 	}
 	return nil
-}
-
-type WorkspaceMember struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Role          WorkspaceRole          `protobuf:"varint,2,opt,name=role,proto3,enum=authorization.WorkspaceRole" json:"role,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *WorkspaceMember) Reset() {
-	*x = WorkspaceMember{}
-	mi := &file_authorization_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *WorkspaceMember) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*WorkspaceMember) ProtoMessage() {}
-
-func (x *WorkspaceMember) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use WorkspaceMember.ProtoReflect.Descriptor instead.
-func (*WorkspaceMember) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *WorkspaceMember) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *WorkspaceMember) GetRole() WorkspaceRole {
-	if x != nil {
-		return x.Role
-	}
-	return WorkspaceRole_WORKSPACE_ROLE_UNSPECIFIED
 }
 
 type HasWorkspacePermissionRequest struct {
@@ -426,7 +514,7 @@ type HasWorkspacePermissionRequest struct {
 
 func (x *HasWorkspacePermissionRequest) Reset() {
 	*x = HasWorkspacePermissionRequest{}
-	mi := &file_authorization_proto_msgTypes[5]
+	mi := &file_authorization_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -438,7 +526,7 @@ func (x *HasWorkspacePermissionRequest) String() string {
 func (*HasWorkspacePermissionRequest) ProtoMessage() {}
 
 func (x *HasWorkspacePermissionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[5]
+	mi := &file_authorization_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -451,7 +539,7 @@ func (x *HasWorkspacePermissionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HasWorkspacePermissionRequest.ProtoReflect.Descriptor instead.
 func (*HasWorkspacePermissionRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{5}
+	return file_authorization_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *HasWorkspacePermissionRequest) GetMemberId() string {
@@ -484,7 +572,7 @@ type HasWorkspacePermissionResponse struct {
 
 func (x *HasWorkspacePermissionResponse) Reset() {
 	*x = HasWorkspacePermissionResponse{}
-	mi := &file_authorization_proto_msgTypes[6]
+	mi := &file_authorization_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -496,7 +584,7 @@ func (x *HasWorkspacePermissionResponse) String() string {
 func (*HasWorkspacePermissionResponse) ProtoMessage() {}
 
 func (x *HasWorkspacePermissionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[6]
+	mi := &file_authorization_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -509,7 +597,7 @@ func (x *HasWorkspacePermissionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HasWorkspacePermissionResponse.ProtoReflect.Descriptor instead.
 func (*HasWorkspacePermissionResponse) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{6}
+	return file_authorization_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *HasWorkspacePermissionResponse) GetHasPermission() bool {
@@ -519,125 +607,28 @@ func (x *HasWorkspacePermissionResponse) GetHasPermission() bool {
 	return false
 }
 
-type UpdateWorkspaceMembersRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
-	Members       []*WorkspaceMember     `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
+type HasWorkspaceItemPermissionRequest struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	MemberId      string                  `protobuf:"bytes,1,opt,name=member_id,json=memberId,proto3" json:"member_id,omitempty"`
+	Permission    WorkspaceItemPermission `protobuf:"varint,3,opt,name=permission,proto3,enum=authorization.WorkspaceItemPermission" json:"permission,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpdateWorkspaceMembersRequest) Reset() {
-	*x = UpdateWorkspaceMembersRequest{}
-	mi := &file_authorization_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateWorkspaceMembersRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateWorkspaceMembersRequest) ProtoMessage() {}
-
-func (x *UpdateWorkspaceMembersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateWorkspaceMembersRequest.ProtoReflect.Descriptor instead.
-func (*UpdateWorkspaceMembersRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *UpdateWorkspaceMembersRequest) GetWorkspaceId() string {
-	if x != nil {
-		return x.WorkspaceId
-	}
-	return ""
-}
-
-func (x *UpdateWorkspaceMembersRequest) GetMembers() []*WorkspaceMember {
-	if x != nil {
-		return x.Members
-	}
-	return nil
-}
-
-type UpdateWorkspaceMembersResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Empty         *emptypb.Empty         `protobuf:"bytes,1,opt,name=empty,proto3" json:"empty,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateWorkspaceMembersResponse) Reset() {
-	*x = UpdateWorkspaceMembersResponse{}
-	mi := &file_authorization_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateWorkspaceMembersResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateWorkspaceMembersResponse) ProtoMessage() {}
-
-func (x *UpdateWorkspaceMembersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateWorkspaceMembersResponse.ProtoReflect.Descriptor instead.
-func (*UpdateWorkspaceMembersResponse) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *UpdateWorkspaceMembersResponse) GetEmpty() *emptypb.Empty {
-	if x != nil {
-		return x.Empty
-	}
-	return nil
-}
-
-type HasNotePermissionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	MemberId      string                 `protobuf:"bytes,1,opt,name=member_id,json=memberId,proto3" json:"member_id,omitempty"`
-	NoteId        string                 `protobuf:"bytes,2,opt,name=note_id,json=noteId,proto3" json:"note_id,omitempty"`
-	Permission    NotePermission         `protobuf:"varint,3,opt,name=permission,proto3,enum=authorization.NotePermission" json:"permission,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *HasNotePermissionRequest) Reset() {
-	*x = HasNotePermissionRequest{}
+func (x *HasWorkspaceItemPermissionRequest) Reset() {
+	*x = HasWorkspaceItemPermissionRequest{}
 	mi := &file_authorization_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *HasNotePermissionRequest) String() string {
+func (x *HasWorkspaceItemPermissionRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*HasNotePermissionRequest) ProtoMessage() {}
+func (*HasWorkspaceItemPermissionRequest) ProtoMessage() {}
 
-func (x *HasNotePermissionRequest) ProtoReflect() protoreflect.Message {
+func (x *HasWorkspaceItemPermissionRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_authorization_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -649,53 +640,46 @@ func (x *HasNotePermissionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use HasNotePermissionRequest.ProtoReflect.Descriptor instead.
-func (*HasNotePermissionRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use HasWorkspaceItemPermissionRequest.ProtoReflect.Descriptor instead.
+func (*HasWorkspaceItemPermissionRequest) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *HasNotePermissionRequest) GetMemberId() string {
+func (x *HasWorkspaceItemPermissionRequest) GetMemberId() string {
 	if x != nil {
 		return x.MemberId
 	}
 	return ""
 }
 
-func (x *HasNotePermissionRequest) GetNoteId() string {
-	if x != nil {
-		return x.NoteId
-	}
-	return ""
-}
-
-func (x *HasNotePermissionRequest) GetPermission() NotePermission {
+func (x *HasWorkspaceItemPermissionRequest) GetPermission() WorkspaceItemPermission {
 	if x != nil {
 		return x.Permission
 	}
-	return NotePermission_NOTE_PERMISSION_UNSPECIFIED
+	return WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_UNSPECIFIED
 }
 
-type HasNotePermissionResponse struct {
+type HasWorkspaceItemPermissionResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	HasPermission bool                   `protobuf:"varint,1,opt,name=has_permission,json=hasPermission,proto3" json:"has_permission,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *HasNotePermissionResponse) Reset() {
-	*x = HasNotePermissionResponse{}
+func (x *HasWorkspaceItemPermissionResponse) Reset() {
+	*x = HasWorkspaceItemPermissionResponse{}
 	mi := &file_authorization_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *HasNotePermissionResponse) String() string {
+func (x *HasWorkspaceItemPermissionResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*HasNotePermissionResponse) ProtoMessage() {}
+func (*HasWorkspaceItemPermissionResponse) ProtoMessage() {}
 
-func (x *HasNotePermissionResponse) ProtoReflect() protoreflect.Message {
+func (x *HasWorkspaceItemPermissionResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_authorization_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -707,19 +691,19 @@ func (x *HasNotePermissionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use HasNotePermissionResponse.ProtoReflect.Descriptor instead.
-func (*HasNotePermissionResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use HasWorkspaceItemPermissionResponse.ProtoReflect.Descriptor instead.
+func (*HasWorkspaceItemPermissionResponse) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *HasNotePermissionResponse) GetHasPermission() bool {
+func (x *HasWorkspaceItemPermissionResponse) GetHasPermission() bool {
 	if x != nil {
 		return x.HasPermission
 	}
 	return false
 }
 
-type GetUserNotePermissionsRequest struct {
+type GetUserWorkspaceItemPermissionsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MemberId      string                 `protobuf:"bytes,1,opt,name=member_id,json=memberId,proto3" json:"member_id,omitempty"`
 	NoteId        string                 `protobuf:"bytes,2,opt,name=note_id,json=noteId,proto3" json:"note_id,omitempty"`
@@ -727,20 +711,20 @@ type GetUserNotePermissionsRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetUserNotePermissionsRequest) Reset() {
-	*x = GetUserNotePermissionsRequest{}
+func (x *GetUserWorkspaceItemPermissionsRequest) Reset() {
+	*x = GetUserWorkspaceItemPermissionsRequest{}
 	mi := &file_authorization_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetUserNotePermissionsRequest) String() string {
+func (x *GetUserWorkspaceItemPermissionsRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetUserNotePermissionsRequest) ProtoMessage() {}
+func (*GetUserWorkspaceItemPermissionsRequest) ProtoMessage() {}
 
-func (x *GetUserNotePermissionsRequest) ProtoReflect() protoreflect.Message {
+func (x *GetUserWorkspaceItemPermissionsRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_authorization_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -752,26 +736,26 @@ func (x *GetUserNotePermissionsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetUserNotePermissionsRequest.ProtoReflect.Descriptor instead.
-func (*GetUserNotePermissionsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetUserWorkspaceItemPermissionsRequest.ProtoReflect.Descriptor instead.
+func (*GetUserWorkspaceItemPermissionsRequest) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *GetUserNotePermissionsRequest) GetMemberId() string {
+func (x *GetUserWorkspaceItemPermissionsRequest) GetMemberId() string {
 	if x != nil {
 		return x.MemberId
 	}
 	return ""
 }
 
-func (x *GetUserNotePermissionsRequest) GetNoteId() string {
+func (x *GetUserWorkspaceItemPermissionsRequest) GetNoteId() string {
 	if x != nil {
 		return x.NoteId
 	}
 	return ""
 }
 
-type GetUserNotePermissionsResponse struct {
+type GetUserWorkspaceItemPermissionsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CanRead       bool                   `protobuf:"varint,1,opt,name=can_read,json=canRead,proto3" json:"can_read,omitempty"`
 	CanWrite      bool                   `protobuf:"varint,2,opt,name=can_write,json=canWrite,proto3" json:"can_write,omitempty"`
@@ -780,20 +764,20 @@ type GetUserNotePermissionsResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetUserNotePermissionsResponse) Reset() {
-	*x = GetUserNotePermissionsResponse{}
+func (x *GetUserWorkspaceItemPermissionsResponse) Reset() {
+	*x = GetUserWorkspaceItemPermissionsResponse{}
 	mi := &file_authorization_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetUserNotePermissionsResponse) String() string {
+func (x *GetUserWorkspaceItemPermissionsResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetUserNotePermissionsResponse) ProtoMessage() {}
+func (*GetUserWorkspaceItemPermissionsResponse) ProtoMessage() {}
 
-func (x *GetUserNotePermissionsResponse) ProtoReflect() protoreflect.Message {
+func (x *GetUserWorkspaceItemPermissionsResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_authorization_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -805,26 +789,26 @@ func (x *GetUserNotePermissionsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetUserNotePermissionsResponse.ProtoReflect.Descriptor instead.
-func (*GetUserNotePermissionsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetUserWorkspaceItemPermissionsResponse.ProtoReflect.Descriptor instead.
+func (*GetUserWorkspaceItemPermissionsResponse) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *GetUserNotePermissionsResponse) GetCanRead() bool {
+func (x *GetUserWorkspaceItemPermissionsResponse) GetCanRead() bool {
 	if x != nil {
 		return x.CanRead
 	}
 	return false
 }
 
-func (x *GetUserNotePermissionsResponse) GetCanWrite() bool {
+func (x *GetUserWorkspaceItemPermissionsResponse) GetCanWrite() bool {
 	if x != nil {
 		return x.CanWrite
 	}
 	return false
 }
 
-func (x *GetUserNotePermissionsResponse) GetCanDelete() bool {
+func (x *GetUserWorkspaceItemPermissionsResponse) GetCanDelete() bool {
 	if x != nil {
 		return x.CanDelete
 	}
@@ -835,19 +819,23 @@ var File_authorization_proto protoreflect.FileDescriptor
 
 const file_authorization_proto_rawDesc = "" +
 	"\n" +
-	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\x1a\x1bgoogle/protobuf/empty.proto\"t\n" +
-	"\x1fCreateWorkspaceWithOwnerRequest\x12.\n" +
-	"\fworkspace_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\x12!\n" +
-	"\bowner_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\aownerId\"P\n" +
-	" CreateWorkspaceWithOwnerResponse\x12,\n" +
+	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\x1a\x1bgoogle/protobuf/empty.proto\"H\n" +
+	"\x16CreateWorkspaceRequest\x12.\n" +
+	"\fworkspace_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"G\n" +
+	"\x17CreateWorkspaceResponse\x12,\n" +
+	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"c\n" +
+	"\x0fWorkspaceMember\x12\x16\n" +
+	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x128\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"\x8c\x01\n" +
+	"\x1dUpdateWorkspaceMembersRequest\x12)\n" +
+	"\fworkspace_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\x12@\n" +
+	"\amembers\x18\x02 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\"N\n" +
+	"\x1eUpdateWorkspaceMembersResponse\x12,\n" +
 	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"L\n" +
 	"\x1aGetWorkspaceMembersRequest\x12.\n" +
 	"\fworkspace_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"_\n" +
 	"\x1bGetWorkspaceMembersResponse\x12@\n" +
-	"\amembers\x18\x01 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\"c\n" +
-	"\x0fWorkspaceMember\x12\x16\n" +
-	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x128\n" +
-	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"\xc0\x01\n" +
+	"\amembers\x18\x01 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\"\xc0\x01\n" +
 	"\x1dHasWorkspacePermissionRequest\x12#\n" +
 	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12.\n" +
 	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\x12J\n" +
@@ -855,24 +843,18 @@ const file_authorization_proto_rawDesc = "" +
 	"permission\x18\x03 \x01(\x0e2\".authorization.WorkspacePermissionB\x06\xbaH\x03\xc8\x01\x01R\n" +
 	"permission\"O\n" +
 	"\x1eHasWorkspacePermissionResponse\x12-\n" +
-	"\x0ehas_permission\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\rhasPermission\"\x8c\x01\n" +
-	"\x1dUpdateWorkspaceMembersRequest\x12)\n" +
-	"\fworkspace_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\x12@\n" +
-	"\amembers\x18\x02 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\"N\n" +
-	"\x1eUpdateWorkspaceMembersResponse\x12,\n" +
-	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"\xac\x01\n" +
-	"\x18HasNotePermissionRequest\x12#\n" +
-	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12$\n" +
-	"\anote_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x06noteId\x12E\n" +
+	"\x0ehas_permission\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\rhasPermission\"\x98\x01\n" +
+	"!HasWorkspaceItemPermissionRequest\x12#\n" +
+	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12N\n" +
 	"\n" +
-	"permission\x18\x03 \x01(\x0e2\x1d.authorization.NotePermissionB\x06\xbaH\x03\xc8\x01\x01R\n" +
-	"permission\"J\n" +
-	"\x19HasNotePermissionResponse\x12-\n" +
-	"\x0ehas_permission\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\rhasPermission\"j\n" +
-	"\x1dGetUserNotePermissionsRequest\x12#\n" +
+	"permission\x18\x03 \x01(\x0e2&.authorization.WorkspaceItemPermissionB\x06\xbaH\x03\xc8\x01\x01R\n" +
+	"permission\"S\n" +
+	"\"HasWorkspaceItemPermissionResponse\x12-\n" +
+	"\x0ehas_permission\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\rhasPermission\"s\n" +
+	"&GetUserWorkspaceItemPermissionsRequest\x12#\n" +
 	"\tmember_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\bmemberId\x12$\n" +
-	"\anote_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x06noteId\"\x8f\x01\n" +
-	"\x1eGetUserNotePermissionsResponse\x12!\n" +
+	"\anote_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x06noteId\"\x98\x01\n" +
+	"'GetUserWorkspaceItemPermissionsResponse\x12!\n" +
 	"\bcan_read\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\acanRead\x12#\n" +
 	"\tcan_write\x18\x02 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\bcanWrite\x12%\n" +
 	"\n" +
@@ -881,24 +863,24 @@ const file_authorization_proto_rawDesc = "" +
 	"\x1aWORKSPACE_ROLE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14WORKSPACE_ROLE_OWNER\x10\x01\x12\x19\n" +
 	"\x15WORKSPACE_ROLE_EDITOR\x10\x02\x12\x19\n" +
-	"\x15WORKSPACE_ROLE_VIEWER\x10\x03*\x9b\x01\n" +
+	"\x15WORKSPACE_ROLE_VIEWER\x10\x03*\x9a\x01\n" +
 	"\x13WorkspacePermission\x12$\n" +
 	" WORKSPACE_PERMISSION_UNSPECIFIED\x10\x00\x12\x1d\n" +
-	"\x19WORKSPACE_PERMISSION_READ\x10\x01\x12\x1e\n" +
-	"\x1aWORKSPACE_PERMISSION_WRITE\x10\x02\x12\x1f\n" +
-	"\x1bWORKSPACE_PERMISSION_DELETE\x10\x03*\x82\x01\n" +
-	"\x0eNotePermission\x12\x1f\n" +
-	"\x1bNOTE_PERMISSION_UNSPECIFIED\x10\x00\x12\x18\n" +
-	"\x14NOTE_PERMISSION_READ\x10\x01\x12\x19\n" +
-	"\x15NOTE_PERMISSION_WRITE\x10\x02\x12\x1a\n" +
-	"\x16NOTE_PERMISSION_DELETE\x10\x032\xce\x05\n" +
-	"\x14AuthorizationService\x12{\n" +
-	"\x18CreateWorkspaceWithOwner\x12..authorization.CreateWorkspaceWithOwnerRequest\x1a/.authorization.CreateWorkspaceWithOwnerResponse\x12l\n" +
+	"\x19WORKSPACE_PERMISSION_READ\x10\x01\x12\x1d\n" +
+	"\x19WORKSPACE_PERMISSION_EDIT\x10\x02\x12\x1f\n" +
+	"\x1bWORKSPACE_PERMISSION_DELETE\x10\x03*\xb3\x01\n" +
+	"\x17WorkspaceItemPermission\x12)\n" +
+	"%WORKSPACE_ITEM_PERMISSION_UNSPECIFIED\x10\x00\x12\"\n" +
+	"\x1eWORKSPACE_ITEM_PERMISSION_READ\x10\x01\x12#\n" +
+	"\x1fWORKSPACE_ITEM_PERMISSION_WRITE\x10\x02\x12$\n" +
+	" WORKSPACE_ITEM_PERMISSION_DELETE\x10\x032\xeb\x05\n" +
+	"\x14AuthorizationService\x12`\n" +
+	"\x0fCreateWorkspace\x12%.authorization.CreateWorkspaceRequest\x1a&.authorization.CreateWorkspaceResponse\x12u\n" +
+	"\x16UpdateWorkspaceMembers\x12,.authorization.UpdateWorkspaceMembersRequest\x1a-.authorization.UpdateWorkspaceMembersResponse\x12l\n" +
 	"\x13GetWorkspaceMembers\x12).authorization.GetWorkspaceMembersRequest\x1a*.authorization.GetWorkspaceMembersResponse\x12u\n" +
-	"\x16HasWorkspacePermission\x12,.authorization.HasWorkspacePermissionRequest\x1a-.authorization.HasWorkspacePermissionResponse\x12u\n" +
-	"\x16UpdateWorkspaceMembers\x12,.authorization.UpdateWorkspaceMembersRequest\x1a-.authorization.UpdateWorkspaceMembersResponse\x12f\n" +
-	"\x11HasNotePermission\x12'.authorization.HasNotePermissionRequest\x1a(.authorization.HasNotePermissionResponse\x12u\n" +
-	"\x16GetUserNotePermissions\x12,.authorization.GetUserNotePermissionsRequest\x1a-.authorization.GetUserNotePermissionsResponseB\xa2\x01\n" +
+	"\x16HasWorkspacePermission\x12,.authorization.HasWorkspacePermissionRequest\x1a-.authorization.HasWorkspacePermissionResponse\x12\x81\x01\n" +
+	"\x1aHasWorkspaceItemPermission\x120.authorization.HasWorkspaceItemPermissionRequest\x1a1.authorization.HasWorkspaceItemPermissionResponse\x12\x90\x01\n" +
+	"\x1fGetUserWorkspaceItemPermissions\x125.authorization.GetUserWorkspaceItemPermissionsRequest\x1a6.authorization.GetUserWorkspaceItemPermissionsResponseB\xa2\x01\n" +
 	"\x11com.authorizationB\x12AuthorizationProtoP\x01Z%github.com/notopia-uit/notopia/pkg/pb\xa2\x02\x03AXX\xaa\x02\rAuthorization\xca\x02\rAuthorization\xe2\x02\x19Authorization\\GPBMetadata\xea\x02\rAuthorizationb\x06proto3"
 
 var (
@@ -916,44 +898,44 @@ func file_authorization_proto_rawDescGZIP() []byte {
 var file_authorization_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_authorization_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_authorization_proto_goTypes = []any{
-	(WorkspaceRole)(0),                       // 0: authorization.WorkspaceRole
-	(WorkspacePermission)(0),                 // 1: authorization.WorkspacePermission
-	(NotePermission)(0),                      // 2: authorization.NotePermission
-	(*CreateWorkspaceWithOwnerRequest)(nil),  // 3: authorization.CreateWorkspaceWithOwnerRequest
-	(*CreateWorkspaceWithOwnerResponse)(nil), // 4: authorization.CreateWorkspaceWithOwnerResponse
-	(*GetWorkspaceMembersRequest)(nil),       // 5: authorization.GetWorkspaceMembersRequest
-	(*GetWorkspaceMembersResponse)(nil),      // 6: authorization.GetWorkspaceMembersResponse
-	(*WorkspaceMember)(nil),                  // 7: authorization.WorkspaceMember
-	(*HasWorkspacePermissionRequest)(nil),    // 8: authorization.HasWorkspacePermissionRequest
-	(*HasWorkspacePermissionResponse)(nil),   // 9: authorization.HasWorkspacePermissionResponse
-	(*UpdateWorkspaceMembersRequest)(nil),    // 10: authorization.UpdateWorkspaceMembersRequest
-	(*UpdateWorkspaceMembersResponse)(nil),   // 11: authorization.UpdateWorkspaceMembersResponse
-	(*HasNotePermissionRequest)(nil),         // 12: authorization.HasNotePermissionRequest
-	(*HasNotePermissionResponse)(nil),        // 13: authorization.HasNotePermissionResponse
-	(*GetUserNotePermissionsRequest)(nil),    // 14: authorization.GetUserNotePermissionsRequest
-	(*GetUserNotePermissionsResponse)(nil),   // 15: authorization.GetUserNotePermissionsResponse
-	(*emptypb.Empty)(nil),                    // 16: google.protobuf.Empty
+	(WorkspaceRole)(0),                              // 0: authorization.WorkspaceRole
+	(WorkspacePermission)(0),                        // 1: authorization.WorkspacePermission
+	(WorkspaceItemPermission)(0),                    // 2: authorization.WorkspaceItemPermission
+	(*CreateWorkspaceRequest)(nil),                  // 3: authorization.CreateWorkspaceRequest
+	(*CreateWorkspaceResponse)(nil),                 // 4: authorization.CreateWorkspaceResponse
+	(*WorkspaceMember)(nil),                         // 5: authorization.WorkspaceMember
+	(*UpdateWorkspaceMembersRequest)(nil),           // 6: authorization.UpdateWorkspaceMembersRequest
+	(*UpdateWorkspaceMembersResponse)(nil),          // 7: authorization.UpdateWorkspaceMembersResponse
+	(*GetWorkspaceMembersRequest)(nil),              // 8: authorization.GetWorkspaceMembersRequest
+	(*GetWorkspaceMembersResponse)(nil),             // 9: authorization.GetWorkspaceMembersResponse
+	(*HasWorkspacePermissionRequest)(nil),           // 10: authorization.HasWorkspacePermissionRequest
+	(*HasWorkspacePermissionResponse)(nil),          // 11: authorization.HasWorkspacePermissionResponse
+	(*HasWorkspaceItemPermissionRequest)(nil),       // 12: authorization.HasWorkspaceItemPermissionRequest
+	(*HasWorkspaceItemPermissionResponse)(nil),      // 13: authorization.HasWorkspaceItemPermissionResponse
+	(*GetUserWorkspaceItemPermissionsRequest)(nil),  // 14: authorization.GetUserWorkspaceItemPermissionsRequest
+	(*GetUserWorkspaceItemPermissionsResponse)(nil), // 15: authorization.GetUserWorkspaceItemPermissionsResponse
+	(*emptypb.Empty)(nil),                           // 16: google.protobuf.Empty
 }
 var file_authorization_proto_depIdxs = []int32{
-	16, // 0: authorization.CreateWorkspaceWithOwnerResponse.empty:type_name -> google.protobuf.Empty
-	7,  // 1: authorization.GetWorkspaceMembersResponse.members:type_name -> authorization.WorkspaceMember
-	0,  // 2: authorization.WorkspaceMember.role:type_name -> authorization.WorkspaceRole
-	1,  // 3: authorization.HasWorkspacePermissionRequest.permission:type_name -> authorization.WorkspacePermission
-	7,  // 4: authorization.UpdateWorkspaceMembersRequest.members:type_name -> authorization.WorkspaceMember
-	16, // 5: authorization.UpdateWorkspaceMembersResponse.empty:type_name -> google.protobuf.Empty
-	2,  // 6: authorization.HasNotePermissionRequest.permission:type_name -> authorization.NotePermission
-	3,  // 7: authorization.AuthorizationService.CreateWorkspaceWithOwner:input_type -> authorization.CreateWorkspaceWithOwnerRequest
-	5,  // 8: authorization.AuthorizationService.GetWorkspaceMembers:input_type -> authorization.GetWorkspaceMembersRequest
-	8,  // 9: authorization.AuthorizationService.HasWorkspacePermission:input_type -> authorization.HasWorkspacePermissionRequest
-	10, // 10: authorization.AuthorizationService.UpdateWorkspaceMembers:input_type -> authorization.UpdateWorkspaceMembersRequest
-	12, // 11: authorization.AuthorizationService.HasNotePermission:input_type -> authorization.HasNotePermissionRequest
-	14, // 12: authorization.AuthorizationService.GetUserNotePermissions:input_type -> authorization.GetUserNotePermissionsRequest
-	4,  // 13: authorization.AuthorizationService.CreateWorkspaceWithOwner:output_type -> authorization.CreateWorkspaceWithOwnerResponse
-	6,  // 14: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
-	9,  // 15: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse
-	11, // 16: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
-	13, // 17: authorization.AuthorizationService.HasNotePermission:output_type -> authorization.HasNotePermissionResponse
-	15, // 18: authorization.AuthorizationService.GetUserNotePermissions:output_type -> authorization.GetUserNotePermissionsResponse
+	16, // 0: authorization.CreateWorkspaceResponse.empty:type_name -> google.protobuf.Empty
+	0,  // 1: authorization.WorkspaceMember.role:type_name -> authorization.WorkspaceRole
+	5,  // 2: authorization.UpdateWorkspaceMembersRequest.members:type_name -> authorization.WorkspaceMember
+	16, // 3: authorization.UpdateWorkspaceMembersResponse.empty:type_name -> google.protobuf.Empty
+	5,  // 4: authorization.GetWorkspaceMembersResponse.members:type_name -> authorization.WorkspaceMember
+	1,  // 5: authorization.HasWorkspacePermissionRequest.permission:type_name -> authorization.WorkspacePermission
+	2,  // 6: authorization.HasWorkspaceItemPermissionRequest.permission:type_name -> authorization.WorkspaceItemPermission
+	3,  // 7: authorization.AuthorizationService.CreateWorkspace:input_type -> authorization.CreateWorkspaceRequest
+	6,  // 8: authorization.AuthorizationService.UpdateWorkspaceMembers:input_type -> authorization.UpdateWorkspaceMembersRequest
+	8,  // 9: authorization.AuthorizationService.GetWorkspaceMembers:input_type -> authorization.GetWorkspaceMembersRequest
+	10, // 10: authorization.AuthorizationService.HasWorkspacePermission:input_type -> authorization.HasWorkspacePermissionRequest
+	12, // 11: authorization.AuthorizationService.HasWorkspaceItemPermission:input_type -> authorization.HasWorkspaceItemPermissionRequest
+	14, // 12: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:input_type -> authorization.GetUserWorkspaceItemPermissionsRequest
+	4,  // 13: authorization.AuthorizationService.CreateWorkspace:output_type -> authorization.CreateWorkspaceResponse
+	7,  // 14: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
+	9,  // 15: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
+	11, // 16: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse
+	13, // 17: authorization.AuthorizationService.HasWorkspaceItemPermission:output_type -> authorization.HasWorkspaceItemPermissionResponse
+	15, // 18: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:output_type -> authorization.GetUserWorkspaceItemPermissionsResponse
 	13, // [13:19] is the sub-list for method output_type
 	7,  // [7:13] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name

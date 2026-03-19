@@ -10,97 +10,97 @@ import { file_google_protobuf_empty } from "@bufbuild/protobuf/wkt";
  * Describes the file authorization.proto.
  */
 export const file_authorization = /*@__PURE__*/
-  fileDesc("ChNhdXRob3JpemF0aW9uLnByb3RvEg1hdXRob3JpemF0aW9uIl4KH0NyZWF0ZVdvcmtzcGFjZVdpdGhPd25lclJlcXVlc3QSIQoMd29ya3NwYWNlX2lkGAEgASgJQgu6SAjIAQFyA7ABARIYCghvd25lcl9pZBgCIAEoCUIGukgDyAEBIkkKIENyZWF0ZVdvcmtzcGFjZVdpdGhPd25lclJlc3BvbnNlEiUKBWVtcHR5GAEgASgLMhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5Ij8KGkdldFdvcmtzcGFjZU1lbWJlcnNSZXF1ZXN0EiEKDHdvcmtzcGFjZV9pZBgBIAEoCUILukgIyAEBcgOwAQEiVgobR2V0V29ya3NwYWNlTWVtYmVyc1Jlc3BvbnNlEjcKB21lbWJlcnMYASADKAsyHi5hdXRob3JpemF0aW9uLldvcmtzcGFjZU1lbWJlckIGukgDyAEBIlkKD1dvcmtzcGFjZU1lbWJlchISCgJpZBgBIAEoCUIGukgDyAEBEjIKBHJvbGUYAiABKA4yHC5hdXRob3JpemF0aW9uLldvcmtzcGFjZVJvbGVCBrpIA8gBASKdAQodSGFzV29ya3NwYWNlUGVybWlzc2lvblJlcXVlc3QSGQoJbWVtYmVyX2lkGAEgASgJQga6SAPIAQESIQoMd29ya3NwYWNlX2lkGAIgASgJQgu6SAjIAQFyA7ABARI+CgpwZXJtaXNzaW9uGAMgASgOMiIuYXV0aG9yaXphdGlvbi5Xb3Jrc3BhY2VQZXJtaXNzaW9uQga6SAPIAQEiQAoeSGFzV29ya3NwYWNlUGVybWlzc2lvblJlc3BvbnNlEh4KDmhhc19wZXJtaXNzaW9uGAEgASgIQga6SAPIAQEidgodVXBkYXRlV29ya3NwYWNlTWVtYmVyc1JlcXVlc3QSHAoMd29ya3NwYWNlX2lkGAEgASgJQga6SAPIAQESNwoHbWVtYmVycxgCIAMoCzIeLmF1dGhvcml6YXRpb24uV29ya3NwYWNlTWVtYmVyQga6SAPIAQEiRwoeVXBkYXRlV29ya3NwYWNlTWVtYmVyc1Jlc3BvbnNlEiUKBWVtcHR5GAEgASgLMhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5Io4BChhIYXNOb3RlUGVybWlzc2lvblJlcXVlc3QSGQoJbWVtYmVyX2lkGAEgASgJQga6SAPIAQESHAoHbm90ZV9pZBgCIAEoCUILukgIyAEBcgOwAQESOQoKcGVybWlzc2lvbhgDIAEoDjIdLmF1dGhvcml6YXRpb24uTm90ZVBlcm1pc3Npb25CBrpIA8gBASI7ChlIYXNOb3RlUGVybWlzc2lvblJlc3BvbnNlEh4KDmhhc19wZXJtaXNzaW9uGAEgASgIQga6SAPIAQEiWAodR2V0VXNlck5vdGVQZXJtaXNzaW9uc1JlcXVlc3QSGQoJbWVtYmVyX2lkGAEgASgJQga6SAPIAQESHAoHbm90ZV9pZBgCIAEoCUILukgIyAEBcgOwAQEicQoeR2V0VXNlck5vdGVQZXJtaXNzaW9uc1Jlc3BvbnNlEhgKCGNhbl9yZWFkGAEgASgIQga6SAPIAQESGQoJY2FuX3dyaXRlGAIgASgIQga6SAPIAQESGgoKY2FuX2RlbGV0ZRgDIAEoCEIGukgDyAEBKn8KDVdvcmtzcGFjZVJvbGUSHgoaV09SS1NQQUNFX1JPTEVfVU5TUEVDSUZJRUQQABIYChRXT1JLU1BBQ0VfUk9MRV9PV05FUhABEhkKFVdPUktTUEFDRV9ST0xFX0VESVRPUhACEhkKFVdPUktTUEFDRV9ST0xFX1ZJRVdFUhADKpsBChNXb3Jrc3BhY2VQZXJtaXNzaW9uEiQKIFdPUktTUEFDRV9QRVJNSVNTSU9OX1VOU1BFQ0lGSUVEEAASHQoZV09SS1NQQUNFX1BFUk1JU1NJT05fUkVBRBABEh4KGldPUktTUEFDRV9QRVJNSVNTSU9OX1dSSVRFEAISHwobV09SS1NQQUNFX1BFUk1JU1NJT05fREVMRVRFEAMqggEKDk5vdGVQZXJtaXNzaW9uEh8KG05PVEVfUEVSTUlTU0lPTl9VTlNQRUNJRklFRBAAEhgKFE5PVEVfUEVSTUlTU0lPTl9SRUFEEAESGQoVTk9URV9QRVJNSVNTSU9OX1dSSVRFEAISGgoWTk9URV9QRVJNSVNTSU9OX0RFTEVURRADMs4FChRBdXRob3JpemF0aW9uU2VydmljZRJ7ChhDcmVhdGVXb3Jrc3BhY2VXaXRoT3duZXISLi5hdXRob3JpemF0aW9uLkNyZWF0ZVdvcmtzcGFjZVdpdGhPd25lclJlcXVlc3QaLy5hdXRob3JpemF0aW9uLkNyZWF0ZVdvcmtzcGFjZVdpdGhPd25lclJlc3BvbnNlEmwKE0dldFdvcmtzcGFjZU1lbWJlcnMSKS5hdXRob3JpemF0aW9uLkdldFdvcmtzcGFjZU1lbWJlcnNSZXF1ZXN0GiouYXV0aG9yaXphdGlvbi5HZXRXb3Jrc3BhY2VNZW1iZXJzUmVzcG9uc2USdQoWSGFzV29ya3NwYWNlUGVybWlzc2lvbhIsLmF1dGhvcml6YXRpb24uSGFzV29ya3NwYWNlUGVybWlzc2lvblJlcXVlc3QaLS5hdXRob3JpemF0aW9uLkhhc1dvcmtzcGFjZVBlcm1pc3Npb25SZXNwb25zZRJ1ChZVcGRhdGVXb3Jrc3BhY2VNZW1iZXJzEiwuYXV0aG9yaXphdGlvbi5VcGRhdGVXb3Jrc3BhY2VNZW1iZXJzUmVxdWVzdBotLmF1dGhvcml6YXRpb24uVXBkYXRlV29ya3NwYWNlTWVtYmVyc1Jlc3BvbnNlEmYKEUhhc05vdGVQZXJtaXNzaW9uEicuYXV0aG9yaXphdGlvbi5IYXNOb3RlUGVybWlzc2lvblJlcXVlc3QaKC5hdXRob3JpemF0aW9uLkhhc05vdGVQZXJtaXNzaW9uUmVzcG9uc2USdQoWR2V0VXNlck5vdGVQZXJtaXNzaW9ucxIsLmF1dGhvcml6YXRpb24uR2V0VXNlck5vdGVQZXJtaXNzaW9uc1JlcXVlc3QaLS5hdXRob3JpemF0aW9uLkdldFVzZXJOb3RlUGVybWlzc2lvbnNSZXNwb25zZUKiAQoRY29tLmF1dGhvcml6YXRpb25CEkF1dGhvcml6YXRpb25Qcm90b1ABWiVnaXRodWIuY29tL25vdG9waWEtdWl0L25vdG9waWEvcGtnL3BiogIDQVhYqgINQXV0aG9yaXphdGlvbsoCDUF1dGhvcml6YXRpb27iAhlBdXRob3JpemF0aW9uXEdQQk1ldGFkYXRh6gINQXV0aG9yaXphdGlvbmIGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_empty]);
+  fileDesc("ChNhdXRob3JpemF0aW9uLnByb3RvEg1hdXRob3JpemF0aW9uIjsKFkNyZWF0ZVdvcmtzcGFjZVJlcXVlc3QSIQoMd29ya3NwYWNlX2lkGAEgASgJQgu6SAjIAQFyA7ABASJAChdDcmVhdGVXb3Jrc3BhY2VSZXNwb25zZRIlCgVlbXB0eRgBIAEoCzIWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSJZCg9Xb3Jrc3BhY2VNZW1iZXISEgoCaWQYASABKAlCBrpIA8gBARIyCgRyb2xlGAIgASgOMhwuYXV0aG9yaXphdGlvbi5Xb3Jrc3BhY2VSb2xlQga6SAPIAQEidgodVXBkYXRlV29ya3NwYWNlTWVtYmVyc1JlcXVlc3QSHAoMd29ya3NwYWNlX2lkGAEgASgJQga6SAPIAQESNwoHbWVtYmVycxgCIAMoCzIeLmF1dGhvcml6YXRpb24uV29ya3NwYWNlTWVtYmVyQga6SAPIAQEiRwoeVXBkYXRlV29ya3NwYWNlTWVtYmVyc1Jlc3BvbnNlEiUKBWVtcHR5GAEgASgLMhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5Ij8KGkdldFdvcmtzcGFjZU1lbWJlcnNSZXF1ZXN0EiEKDHdvcmtzcGFjZV9pZBgBIAEoCUILukgIyAEBcgOwAQEiVgobR2V0V29ya3NwYWNlTWVtYmVyc1Jlc3BvbnNlEjcKB21lbWJlcnMYASADKAsyHi5hdXRob3JpemF0aW9uLldvcmtzcGFjZU1lbWJlckIGukgDyAEBIp0BCh1IYXNXb3Jrc3BhY2VQZXJtaXNzaW9uUmVxdWVzdBIZCgltZW1iZXJfaWQYASABKAlCBrpIA8gBARIhCgx3b3Jrc3BhY2VfaWQYAiABKAlCC7pICMgBAXIDsAEBEj4KCnBlcm1pc3Npb24YAyABKA4yIi5hdXRob3JpemF0aW9uLldvcmtzcGFjZVBlcm1pc3Npb25CBrpIA8gBASJACh5IYXNXb3Jrc3BhY2VQZXJtaXNzaW9uUmVzcG9uc2USHgoOaGFzX3Blcm1pc3Npb24YASABKAhCBrpIA8gBASKCAQohSGFzV29ya3NwYWNlSXRlbVBlcm1pc3Npb25SZXF1ZXN0EhkKCW1lbWJlcl9pZBgBIAEoCUIGukgDyAEBEkIKCnBlcm1pc3Npb24YAyABKA4yJi5hdXRob3JpemF0aW9uLldvcmtzcGFjZUl0ZW1QZXJtaXNzaW9uQga6SAPIAQEiRAoiSGFzV29ya3NwYWNlSXRlbVBlcm1pc3Npb25SZXNwb25zZRIeCg5oYXNfcGVybWlzc2lvbhgBIAEoCEIGukgDyAEBImEKJkdldFVzZXJXb3Jrc3BhY2VJdGVtUGVybWlzc2lvbnNSZXF1ZXN0EhkKCW1lbWJlcl9pZBgBIAEoCUIGukgDyAEBEhwKB25vdGVfaWQYAiABKAlCC7pICMgBAXIDsAEBInoKJ0dldFVzZXJXb3Jrc3BhY2VJdGVtUGVybWlzc2lvbnNSZXNwb25zZRIYCghjYW5fcmVhZBgBIAEoCEIGukgDyAEBEhkKCWNhbl93cml0ZRgCIAEoCEIGukgDyAEBEhoKCmNhbl9kZWxldGUYAyABKAhCBrpIA8gBASp/Cg1Xb3Jrc3BhY2VSb2xlEh4KGldPUktTUEFDRV9ST0xFX1VOU1BFQ0lGSUVEEAASGAoUV09SS1NQQUNFX1JPTEVfT1dORVIQARIZChVXT1JLU1BBQ0VfUk9MRV9FRElUT1IQAhIZChVXT1JLU1BBQ0VfUk9MRV9WSUVXRVIQAyqaAQoTV29ya3NwYWNlUGVybWlzc2lvbhIkCiBXT1JLU1BBQ0VfUEVSTUlTU0lPTl9VTlNQRUNJRklFRBAAEh0KGVdPUktTUEFDRV9QRVJNSVNTSU9OX1JFQUQQARIdChlXT1JLU1BBQ0VfUEVSTUlTU0lPTl9FRElUEAISHwobV09SS1NQQUNFX1BFUk1JU1NJT05fREVMRVRFEAMqswEKF1dvcmtzcGFjZUl0ZW1QZXJtaXNzaW9uEikKJVdPUktTUEFDRV9JVEVNX1BFUk1JU1NJT05fVU5TUEVDSUZJRUQQABIiCh5XT1JLU1BBQ0VfSVRFTV9QRVJNSVNTSU9OX1JFQUQQARIjCh9XT1JLU1BBQ0VfSVRFTV9QRVJNSVNTSU9OX1dSSVRFEAISJAogV09SS1NQQUNFX0lURU1fUEVSTUlTU0lPTl9ERUxFVEUQAzLrBQoUQXV0aG9yaXphdGlvblNlcnZpY2USYAoPQ3JlYXRlV29ya3NwYWNlEiUuYXV0aG9yaXphdGlvbi5DcmVhdGVXb3Jrc3BhY2VSZXF1ZXN0GiYuYXV0aG9yaXphdGlvbi5DcmVhdGVXb3Jrc3BhY2VSZXNwb25zZRJ1ChZVcGRhdGVXb3Jrc3BhY2VNZW1iZXJzEiwuYXV0aG9yaXphdGlvbi5VcGRhdGVXb3Jrc3BhY2VNZW1iZXJzUmVxdWVzdBotLmF1dGhvcml6YXRpb24uVXBkYXRlV29ya3NwYWNlTWVtYmVyc1Jlc3BvbnNlEmwKE0dldFdvcmtzcGFjZU1lbWJlcnMSKS5hdXRob3JpemF0aW9uLkdldFdvcmtzcGFjZU1lbWJlcnNSZXF1ZXN0GiouYXV0aG9yaXphdGlvbi5HZXRXb3Jrc3BhY2VNZW1iZXJzUmVzcG9uc2USdQoWSGFzV29ya3NwYWNlUGVybWlzc2lvbhIsLmF1dGhvcml6YXRpb24uSGFzV29ya3NwYWNlUGVybWlzc2lvblJlcXVlc3QaLS5hdXRob3JpemF0aW9uLkhhc1dvcmtzcGFjZVBlcm1pc3Npb25SZXNwb25zZRKBAQoaSGFzV29ya3NwYWNlSXRlbVBlcm1pc3Npb24SMC5hdXRob3JpemF0aW9uLkhhc1dvcmtzcGFjZUl0ZW1QZXJtaXNzaW9uUmVxdWVzdBoxLmF1dGhvcml6YXRpb24uSGFzV29ya3NwYWNlSXRlbVBlcm1pc3Npb25SZXNwb25zZRKQAQofR2V0VXNlcldvcmtzcGFjZUl0ZW1QZXJtaXNzaW9ucxI1LmF1dGhvcml6YXRpb24uR2V0VXNlcldvcmtzcGFjZUl0ZW1QZXJtaXNzaW9uc1JlcXVlc3QaNi5hdXRob3JpemF0aW9uLkdldFVzZXJXb3Jrc3BhY2VJdGVtUGVybWlzc2lvbnNSZXNwb25zZUKiAQoRY29tLmF1dGhvcml6YXRpb25CEkF1dGhvcml6YXRpb25Qcm90b1ABWiVnaXRodWIuY29tL25vdG9waWEtdWl0L25vdG9waWEvcGtnL3BiogIDQVhYqgINQXV0aG9yaXphdGlvbsoCDUF1dGhvcml6YXRpb27iAhlBdXRob3JpemF0aW9uXEdQQk1ldGFkYXRh6gINQXV0aG9yaXphdGlvbmIGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_empty]);
 
 /**
- * Describes the message authorization.CreateWorkspaceWithOwnerRequest.
- * Use `create(CreateWorkspaceWithOwnerRequestSchema)` to create a new message.
+ * Describes the message authorization.CreateWorkspaceRequest.
+ * Use `create(CreateWorkspaceRequestSchema)` to create a new message.
  */
-export const CreateWorkspaceWithOwnerRequestSchema = /*@__PURE__*/
+export const CreateWorkspaceRequestSchema = /*@__PURE__*/
   messageDesc(file_authorization, 0);
 
 /**
- * Describes the message authorization.CreateWorkspaceWithOwnerResponse.
- * Use `create(CreateWorkspaceWithOwnerResponseSchema)` to create a new message.
+ * Describes the message authorization.CreateWorkspaceResponse.
+ * Use `create(CreateWorkspaceResponseSchema)` to create a new message.
  */
-export const CreateWorkspaceWithOwnerResponseSchema = /*@__PURE__*/
+export const CreateWorkspaceResponseSchema = /*@__PURE__*/
   messageDesc(file_authorization, 1);
-
-/**
- * Describes the message authorization.GetWorkspaceMembersRequest.
- * Use `create(GetWorkspaceMembersRequestSchema)` to create a new message.
- */
-export const GetWorkspaceMembersRequestSchema = /*@__PURE__*/
-  messageDesc(file_authorization, 2);
-
-/**
- * Describes the message authorization.GetWorkspaceMembersResponse.
- * Use `create(GetWorkspaceMembersResponseSchema)` to create a new message.
- */
-export const GetWorkspaceMembersResponseSchema = /*@__PURE__*/
-  messageDesc(file_authorization, 3);
 
 /**
  * Describes the message authorization.WorkspaceMember.
  * Use `create(WorkspaceMemberSchema)` to create a new message.
  */
 export const WorkspaceMemberSchema = /*@__PURE__*/
-  messageDesc(file_authorization, 4);
-
-/**
- * Describes the message authorization.HasWorkspacePermissionRequest.
- * Use `create(HasWorkspacePermissionRequestSchema)` to create a new message.
- */
-export const HasWorkspacePermissionRequestSchema = /*@__PURE__*/
-  messageDesc(file_authorization, 5);
-
-/**
- * Describes the message authorization.HasWorkspacePermissionResponse.
- * Use `create(HasWorkspacePermissionResponseSchema)` to create a new message.
- */
-export const HasWorkspacePermissionResponseSchema = /*@__PURE__*/
-  messageDesc(file_authorization, 6);
+  messageDesc(file_authorization, 2);
 
 /**
  * Describes the message authorization.UpdateWorkspaceMembersRequest.
  * Use `create(UpdateWorkspaceMembersRequestSchema)` to create a new message.
  */
 export const UpdateWorkspaceMembersRequestSchema = /*@__PURE__*/
-  messageDesc(file_authorization, 7);
+  messageDesc(file_authorization, 3);
 
 /**
  * Describes the message authorization.UpdateWorkspaceMembersResponse.
  * Use `create(UpdateWorkspaceMembersResponseSchema)` to create a new message.
  */
 export const UpdateWorkspaceMembersResponseSchema = /*@__PURE__*/
+  messageDesc(file_authorization, 4);
+
+/**
+ * Describes the message authorization.GetWorkspaceMembersRequest.
+ * Use `create(GetWorkspaceMembersRequestSchema)` to create a new message.
+ */
+export const GetWorkspaceMembersRequestSchema = /*@__PURE__*/
+  messageDesc(file_authorization, 5);
+
+/**
+ * Describes the message authorization.GetWorkspaceMembersResponse.
+ * Use `create(GetWorkspaceMembersResponseSchema)` to create a new message.
+ */
+export const GetWorkspaceMembersResponseSchema = /*@__PURE__*/
+  messageDesc(file_authorization, 6);
+
+/**
+ * Describes the message authorization.HasWorkspacePermissionRequest.
+ * Use `create(HasWorkspacePermissionRequestSchema)` to create a new message.
+ */
+export const HasWorkspacePermissionRequestSchema = /*@__PURE__*/
+  messageDesc(file_authorization, 7);
+
+/**
+ * Describes the message authorization.HasWorkspacePermissionResponse.
+ * Use `create(HasWorkspacePermissionResponseSchema)` to create a new message.
+ */
+export const HasWorkspacePermissionResponseSchema = /*@__PURE__*/
   messageDesc(file_authorization, 8);
 
 /**
- * Describes the message authorization.HasNotePermissionRequest.
- * Use `create(HasNotePermissionRequestSchema)` to create a new message.
+ * Describes the message authorization.HasWorkspaceItemPermissionRequest.
+ * Use `create(HasWorkspaceItemPermissionRequestSchema)` to create a new message.
  */
-export const HasNotePermissionRequestSchema = /*@__PURE__*/
+export const HasWorkspaceItemPermissionRequestSchema = /*@__PURE__*/
   messageDesc(file_authorization, 9);
 
 /**
- * Describes the message authorization.HasNotePermissionResponse.
- * Use `create(HasNotePermissionResponseSchema)` to create a new message.
+ * Describes the message authorization.HasWorkspaceItemPermissionResponse.
+ * Use `create(HasWorkspaceItemPermissionResponseSchema)` to create a new message.
  */
-export const HasNotePermissionResponseSchema = /*@__PURE__*/
+export const HasWorkspaceItemPermissionResponseSchema = /*@__PURE__*/
   messageDesc(file_authorization, 10);
 
 /**
- * Describes the message authorization.GetUserNotePermissionsRequest.
- * Use `create(GetUserNotePermissionsRequestSchema)` to create a new message.
+ * Describes the message authorization.GetUserWorkspaceItemPermissionsRequest.
+ * Use `create(GetUserWorkspaceItemPermissionsRequestSchema)` to create a new message.
  */
-export const GetUserNotePermissionsRequestSchema = /*@__PURE__*/
+export const GetUserWorkspaceItemPermissionsRequestSchema = /*@__PURE__*/
   messageDesc(file_authorization, 11);
 
 /**
- * Describes the message authorization.GetUserNotePermissionsResponse.
- * Use `create(GetUserNotePermissionsResponseSchema)` to create a new message.
+ * Describes the message authorization.GetUserWorkspaceItemPermissionsResponse.
+ * Use `create(GetUserWorkspaceItemPermissionsResponseSchema)` to create a new message.
  */
-export const GetUserNotePermissionsResponseSchema = /*@__PURE__*/
+export const GetUserWorkspaceItemPermissionsResponseSchema = /*@__PURE__*/
   messageDesc(file_authorization, 12);
 
 /**
@@ -128,16 +128,16 @@ export const WorkspacePermission = /*@__PURE__*/
   tsEnum(WorkspacePermissionSchema);
 
 /**
- * Describes the enum authorization.NotePermission.
+ * Describes the enum authorization.WorkspaceItemPermission.
  */
-export const NotePermissionSchema = /*@__PURE__*/
+export const WorkspaceItemPermissionSchema = /*@__PURE__*/
   enumDesc(file_authorization, 2);
 
 /**
- * @generated from enum authorization.NotePermission
+ * @generated from enum authorization.WorkspaceItemPermission
  */
-export const NotePermission = /*@__PURE__*/
-  tsEnum(NotePermissionSchema);
+export const WorkspaceItemPermission = /*@__PURE__*/
+  tsEnum(WorkspaceItemPermissionSchema);
 
 /**
  * @generated from service authorization.AuthorizationService
