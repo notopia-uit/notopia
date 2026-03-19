@@ -1,25 +1,27 @@
 package app_test
 
 import (
+	_ "embed"
+
 	"github.com/casbin/casbin/v3"
-	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
+	stringadapter "github.com/casbin/casbin/v3/persist/string-adapter"
 )
 
+//go:embed policy.csv
+var policyCSV string
+
+//go:embed policy_test.csv
+var policyTestCSV string
+
 func GetLocalEnforcer(loadTestPolicies bool) (*casbin.TransactionalEnforcer, error) {
-	adapter := fileadapter.NewAdapter("../policy_test.csv")
-	e, err := casbin.NewTransactionalEnforcer("../model.conf", adapter)
+	policy := policyCSV
+	if loadTestPolicies {
+		policy += "\n" + policyTestCSV
+	}
+	adapter := stringadapter.NewAdapter(policy)
+	e, err := casbin.NewTransactionalEnforcer("model.conf", adapter)
 	if err != nil {
 		return nil, err
-	}
-	if loadTestPolicies {
-		err := adapter.LoadPolicy(e.GetModel())
-		if err != nil {
-			return nil, err
-		}
-		err = e.BuildRoleLinks()
-		if err != nil {
-			return nil, err
-		}
 	}
 	return e, nil
 }

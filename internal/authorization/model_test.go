@@ -3,26 +3,27 @@ package authorization_test
 import (
 	"testing"
 
+	_ "embed"
 	"github.com/casbin/casbin/v3"
-	fileadapter "github.com/casbin/casbin/v3/persist/file-adapter"
+	stringadapter "github.com/casbin/casbin/v3/persist/string-adapter"
 	"github.com/stretchr/testify/require"
 )
 
+//go:embed policy.csv
+var policyCSV string
+
+//go:embed policy_test.csv
+var policyTestCSV string
+
 func GetLocalEnforcer(loadTestPolicies bool) (*casbin.Enforcer, error) {
-	e, err := casbin.NewEnforcer("model.conf", "policy_test.csv")
+	policy := policyCSV
+	if loadTestPolicies {
+		policy += "\n" + policyTestCSV
+	}
+	adapter := stringadapter.NewAdapter(policy)
+	e, err := casbin.NewEnforcer("model.conf", adapter)
 	if err != nil {
 		return nil, err
-	}
-	if loadTestPolicies {
-		testAdapter := fileadapter.NewAdapter("policy_test.csv")
-		err := testAdapter.LoadPolicy(e.GetModel())
-		if err != nil {
-			return nil, err
-		}
-		err = e.BuildRoleLinks()
-		if err != nil {
-			return nil, err
-		}
 	}
 	return e, nil
 }
