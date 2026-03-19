@@ -104,31 +104,21 @@ func (a *App) UpdateWorkspaceMembers(
 	workspaceID uuid.UUID,
 	members []WorkspaceMember,
 ) error {
+	if allowed, err := a.HasWorkspacePermission(userID, workspaceID, WorkspacePermissionEdit); err != nil || !allowed {
+		return fmt.Errorf("user %s cannot edit workspace %s", userID, workspaceID)
+	}
 	err := a.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
 		bufferedModel, err := tx.GetBufferedModel()
 		if err != nil {
-			return fmt.Errorf("failed to get buffered model: %w", err)
+			return fmt.Errorf("failed to get buffered model for workspace %s: %w", workspaceID, err)
 		}
-
-		enforcer, err := casbin.NewEnforcer(bufferedModel, nil)
-		if err != nil {
-			return fmt.Errorf("failed to create enforcer with buffered model: %w", err)
-		}
-		allowedToEdit, err := enforcer.Enforce(formatUser(userID), formatWorkspace(workspaceID), "workspace", WorkspacePermissionEdit.String())
-		if err != nil {
-			return fmt.Errorf("failed to check edit permission for user %s on workspace %s: %w", userID, workspaceID, err)
-		}
-		if !allowedToEdit {
-			return fmt.Errorf("user %s does not have permission to edit workspace %s", userID, workspaceID)
-		}
-
 		currentRules, err := bufferedModel.GetFilteredPolicy("g", "g", 2, formatWorkspace(workspaceID))
 		if err != nil {
 			return fmt.Errorf("failed to get current workspace members: %w", err)
 		}
 
 		for _, rule := range currentRules {
-			_, err := tx.RemoveGroupingPolicy(rule)
+			_, err := tx.RemoveGroupingPolicy(rule[0], rule[1], rule[2])
 			if err != nil {
 				return fmt.Errorf("failed to remove existing workspace member rule %v: %w", rule, err)
 			}
@@ -168,7 +158,7 @@ func (a *App) GetWorkspaceMembers(
 
 	members := make([]WorkspaceMember, 0, len(rules))
 	for _, rule := range rules {
-		if len(rule) > 3 {
+		if len(rule) != 3 {
 			return nil, fmt.Errorf("invalid policy rule: %v", rule)
 		}
 		userID, err := userFromFormat(rule[0])
@@ -192,7 +182,7 @@ func (a *App) HasWorkspacePermission(
 		formatUser(userID),
 		formatWorkspace(workspaceID),
 		"workspace",
-		permission,
+		permission.String(),
 	)
 	if err != nil {
 		return false, fmt.Errorf("failed to check workspace permission for user %s on workspace %s: %w", userID, workspaceID, err)
@@ -209,7 +199,7 @@ func (a *App) HasWorkspaceItemPermission(
 		formatUser(userID),
 		formatWorkspace(workspaceID),
 		"workspace_item",
-		permission,
+		permission.String(),
 	)
 	if err != nil {
 		return false, fmt.Errorf("failed to check workspace item permission for user %s on workspace %s: %w", userID, workspaceID, err)
