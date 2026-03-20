@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 
 	"github.com/google/uuid"
@@ -32,7 +33,9 @@ var (
 )
 
 func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
-	workspace, err := r.queries.GetWorkspaceByID(ctx, q.ID)
+	workspace, err := r.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
+		ID: &q.ID,
+	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.NewErrWorkspaceByIDNotFound(q.ID, err)
@@ -51,11 +54,33 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 		return nil, toDomainError(err)
 	}
 
-	tree, err := r.buildFolderTree(ctx, *rootFolder)
-	return tree, err
+	allFolders, err := r.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
+		WorkspaceID: &workspace.ID,
+	})
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return nil, toDomainError(err)
+	}
+
+	allNotes, err := r.queries.GetNotesInWorkspace(ctx, workspace.ID)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return nil, toDomainError(err)
+	}
+
+	folderMap := make(map[uuid.UUID]*pgsqlc.Folder)
+	for _, folder := range allFolders {
+		folderMap[folder.ID] = folder
+	}
+
+	notesByFolder := make(map[uuid.UUID][]*pgsqlc.Note)
+	for _, note := range allNotes {
+		notesByFolder[note.FolderID] = append(notesByFolder[note.FolderID], note)
+	}
+
+	tree := r.buildFolderTreeFromMap(*rootFolder, folderMap, notesByFolder)
+	return tree, nil
 }
 
-func (r *ReadModel) buildFolderTree(ctx context.Context, folder pgsqlc.Folder) (*app.WorkspaceTreeFolder, error) {
+func (r *ReadModel) buildFolderTreeFromMap(folder pgsqlc.Folder, folderMap map[uuid.UUID]*pgsqlc.Folder, notesByFolder map[uuid.UUID][]*pgsqlc.Note) *app.WorkspaceTreeFolder {
 	result := app.WorkspaceTreeFolder{
 		Id:        folder.ID,
 		Name:      folder.Name,
@@ -65,36 +90,25 @@ func (r *ReadModel) buildFolderTree(ctx context.Context, folder pgsqlc.Folder) (
 		Children:  []app.WorkspaceTreeFolder{},
 	}
 
-	notes, err := r.queries.GetNotesByFolderID(ctx, folder.ID)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, toDomainError(err)
-	}
-
-	for _, note := range notes {
-		result.Notes = append(result.Notes, app.WorkspaceTreeNote{
-			Id:        note.ID,
-			Name:      note.Name,
-			Icon:      note.Icon,
-			UpdatedAt: note.UpdatedAt,
-		})
-	}
-
-	children, err := r.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		ParentID: &folder.ID,
-	})
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, toDomainError(err)
-	}
-
-	for _, child := range children {
-		childTree, err := r.buildFolderTree(ctx, *child)
-		if err != nil {
-			return nil, err
+	if notes, ok := notesByFolder[folder.ID]; ok {
+		for _, note := range notes {
+			result.Notes = append(result.Notes, app.WorkspaceTreeNote{
+				Id:        note.ID,
+				Name:      note.Name,
+				Icon:      note.Icon,
+				UpdatedAt: note.UpdatedAt,
+			})
 		}
-		result.Children = append(result.Children, *childTree)
 	}
 
-	return &result, nil
+	for _, childFolder := range folderMap {
+		if childFolder.ParentID != nil && *childFolder.ParentID == folder.ID {
+			childTree := r.buildFolderTreeFromMap(*childFolder, folderMap, notesByFolder)
+			result.Children = append(result.Children, *childTree)
+		}
+	}
+
+	return &result
 }
 
 func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash, error) {
@@ -138,7 +152,7 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 }
 
 func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app.Graph, error) {
-	note, err := r.queries.GetNote(ctx, q.ID)
+	workspaceID, err := r.queries.GetWorkspaceIDByNoteID(ctx, q.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.NewErrNoteNotFound(q.ID, err)
@@ -146,81 +160,65 @@ func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app
 		return nil, toDomainError(err)
 	}
 
-	nodeMap := make(map[string]bool)
-	linkMap := make(map[string]bool)
-	nodes := []app.GraphNode{}
-	links := []app.GraphLink{}
-
-	nodeID := q.ID.String()
-	if !nodeMap[nodeID] {
-		nodeMap[nodeID] = true
-		nodes = append(nodes, app.GraphNode{
-			Id:   nodeID,
-			Name: note.Name,
-			Type: "note",
-		})
-	}
-
-	outgoingLinks, err := r.queries.GetNoteOutgoingLinks(ctx, q.ID)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+	graphRow, err := r.queries.GetNoteGraph(ctx, &pgsqlc.GetNoteGraphParams{
+		WorkspaceID: workspaceID,
+		StartNodeID: q.ID.String(),
+		MaxDepth:    int32(q.Depth),
+	})
+	if err != nil {
 		return nil, toDomainError(err)
 	}
 
-	for _, targetID := range outgoingLinks {
-		targetIDStr := targetID.String()
-		if !nodeMap[targetIDStr] {
-			nodeMap[targetIDStr] = true
-			targetNote, err := r.queries.GetNote(ctx, targetID)
-			if err == nil {
-				nodes = append(nodes, app.GraphNode{
-					Id:   targetIDStr,
-					Name: targetNote.Name,
-					Type: "note",
-				})
+	type tempNode struct {
+		Id   string `json:"Id"`
+		Name string `json:"Name"`
+		Type string `json:"Type"`
+	}
+	type tempLink struct {
+		Source string `json:"Source"`
+		Target string `json:"Target"`
+	}
+
+	var nodes []tempNode
+	var links []tempLink
+
+	if graphRow.Nodes != nil {
+		if nodesBytes, ok := graphRow.Nodes.([]byte); ok {
+			if err := json.Unmarshal(nodesBytes, &nodes); err != nil {
+				return nil, toDomainError(err)
 			}
 		}
-		linkKey := nodeID + "->" + targetIDStr
-		if !linkMap[linkKey] {
-			linkMap[linkKey] = true
-			links = append(links, app.GraphLink{
-				Source: nodeID,
-				Target: targetIDStr,
-			})
-		}
 	}
 
-	backlinks, err := r.queries.GetNoteBacklinks(ctx, q.ID)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, toDomainError(err)
-	}
-
-	for _, sourceID := range backlinks {
-		sourceIDStr := sourceID.String()
-		if !nodeMap[sourceIDStr] {
-			nodeMap[sourceIDStr] = true
-			sourceNote, err := r.queries.GetNote(ctx, sourceID)
-			if err == nil {
-				nodes = append(nodes, app.GraphNode{
-					Id:   sourceIDStr,
-					Name: sourceNote.Name,
-					Type: "note",
-				})
+	if graphRow.Links != nil {
+		if linksBytes, ok := graphRow.Links.([]byte); ok {
+			if err := json.Unmarshal(linksBytes, &links); err != nil {
+				return nil, toDomainError(err)
 			}
 		}
-		linkKey := sourceIDStr + "->" + nodeID
-		if !linkMap[linkKey] {
-			linkMap[linkKey] = true
-			links = append(links, app.GraphLink{
-				Source: sourceIDStr,
-				Target: nodeID,
-			})
+	}
+
+	result := &app.Graph{
+		Nodes: make([]app.GraphNode, len(nodes)),
+		Links: make([]app.GraphLink, len(links)),
+	}
+
+	for i, node := range nodes {
+		result.Nodes[i] = app.GraphNode{
+			Id:   node.Id,
+			Name: node.Name,
+			Type: app.GraphNodeType(node.Type),
 		}
 	}
 
-	return &app.Graph{
-		Nodes: nodes,
-		Links: links,
-	}, nil
+	for i, link := range links {
+		result.Links[i] = app.GraphLink{
+			Source: link.Source,
+			Target: link.Target,
+		}
+	}
+
+	return result, nil
 }
 
 func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app.NoteLinkResult, error) {
@@ -237,10 +235,7 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 		Backlinks:     []app.NoteLink{},
 	}
 
-	shouldFetchOutgoing := q.OutgoingLinks == nil || *q.OutgoingLinks
-	shouldFetchBacklinks := q.Backlinks == nil || *q.Backlinks
-
-	if shouldFetchOutgoing {
+	if q.OutgoingLinks {
 		outgoingLinks, err := r.queries.GetNoteOutgoingLinks(ctx, q.ID)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 			return nil, toDomainError(err)
@@ -261,7 +256,7 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 		}
 	}
 
-	if shouldFetchBacklinks {
+	if q.Backlinks {
 		backlinks, err := r.queries.GetNoteBacklinks(ctx, q.ID)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 			return nil, toDomainError(err)
@@ -286,7 +281,9 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 }
 
 func (r *ReadModel) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceBySlug) (*app.Workspace, error) {
-	workspace, err := r.queries.GetWorkspaceBySlug(ctx, q.Slug)
+	workspace, err := r.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
+		Slug: &q.Slug,
+	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, domain.NewErrWorkspaceBySlugNotFound(q.Slug, err)
@@ -302,72 +299,61 @@ func (r *ReadModel) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceB
 }
 
 func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, error) {
-	folders, err := r.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		WorkspaceID: &q.ID,
-	})
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+	graphRow, err := r.queries.GetWorkspaceGraph(ctx, q.ID)
+	if err != nil {
 		return nil, toDomainError(err)
 	}
 
-	folderIDs := make([]uuid.UUID, len(folders))
-	for i, folder := range folders {
-		folderIDs[i] = folder.ID
+	type tempNode struct {
+		Id   string `json:"Id"`
+		Name string `json:"Name"`
+		Type string `json:"Type"`
+	}
+	type tempLink struct {
+		Source string `json:"Source"`
+		Target string `json:"Target"`
 	}
 
-	allNotes, err := r.queries.GetNotes(ctx, folderIDs)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, toDomainError(err)
-	}
+	var nodes []tempNode
+	var links []tempLink
 
-	noteIDs := make([]uuid.UUID, len(allNotes))
-	for i, note := range allNotes {
-		noteIDs[i] = note.ID
-	}
-
-	nodeMap := make(map[string]bool)
-	linkMap := make(map[string]bool)
-	nodes := []app.GraphNode{}
-	links := []app.GraphLink{}
-
-	for _, note := range allNotes {
-		nodeID := note.ID.String()
-		if !nodeMap[nodeID] {
-			nodeMap[nodeID] = true
-			nodes = append(nodes, app.GraphNode{
-				Id:   nodeID,
-				Name: note.Name,
-				Type: "note",
-			})
-		}
-	}
-
-	if len(noteIDs) > 0 {
-		allLinks, err := r.queries.GetNotesOutgoingLinks(ctx, noteIDs)
-		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return nil, toDomainError(err)
-		}
-
-		for _, link := range allLinks {
-			sourceID := link.SourceID.String()
-			targetID := link.TargetID.String()
-
-			if nodeMap[sourceID] && nodeMap[targetID] {
-				linkKey := sourceID + "->" + targetID
-				if !linkMap[linkKey] {
-					linkMap[linkKey] = true
-					links = append(links, app.GraphLink{
-						Source: sourceID,
-						Target: targetID,
-					})
-				}
+	if graphRow.Nodes != nil {
+		if nodesBytes, ok := graphRow.Nodes.([]byte); ok {
+			if err := json.Unmarshal(nodesBytes, &nodes); err != nil {
+				return nil, toDomainError(err)
 			}
 		}
 	}
 
-	return &app.Graph{
-		Nodes: nodes,
-		Links: links,
-	}, nil
+	if graphRow.Links != nil {
+		if linksBytes, ok := graphRow.Links.([]byte); ok {
+			if err := json.Unmarshal(linksBytes, &links); err != nil {
+				return nil, toDomainError(err)
+			}
+		}
+	}
+
+	result := &app.Graph{
+		Nodes: make([]app.GraphNode, len(nodes)),
+		Links: make([]app.GraphLink, len(links)),
+	}
+
+	for i, node := range nodes {
+		result.Nodes[i] = app.GraphNode{
+			Id:   node.Id,
+			Name: node.Name,
+			Type: app.GraphNodeType(node.Type),
+		}
+	}
+
+	for i, link := range links {
+		result.Links[i] = app.GraphLink{
+			Source: link.Source,
+			Target: link.Target,
+		}
+	}
+
+	return result, nil
 }
 
 func (r *ReadModel) CheckWorkspaceExists(ctx context.Context, q *app.CheckWorkspaceExists) (*app.CheckWorkspaceExistsResult, error) {

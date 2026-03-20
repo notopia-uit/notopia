@@ -103,10 +103,12 @@ func (h *StrictHandler) GetNoteLinks(
 	ctx context.Context,
 	request note.GetNoteLinksRequestObject,
 ) (note.GetNoteLinksResponseObject, error) {
+	outgoingLinks := request.Params.OutgoingLinks != nil && *request.Params.OutgoingLinks
+	backlinks := request.Params.Backlinks != nil && *request.Params.Backlinks
 	query := &app.GetNoteLinks{
 		ID:            request.NoteId,
-		OutgoingLinks: request.Params.OutgoingLinks,
-		Backlinks:     request.Params.Backlinks,
+		OutgoingLinks: outgoingLinks,
+		Backlinks:     backlinks,
 	}
 	result, err := h.App.GetNoteLinksHandler.Handle(ctx, query)
 	if err != nil {

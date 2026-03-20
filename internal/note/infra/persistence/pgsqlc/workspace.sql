@@ -1,11 +1,29 @@
--- name: GetWorkspaceBySlug :one
+-- name: GetWorkspace :one
 SELECT
   *
 FROM
   workspaces
 WHERE
-  slug = sqlc.arg('slug')
+  CASE
+    WHEN sqlc.arg('slug') IS NOT NULL THEN slug = sqlc.arg('slug')
+    WHEN sqlc.arg('id') IS NOT NULL THEN id = sqlc.arg('id')
+    ELSE FALSE
+  END
   AND deleted_at IS NULL;
+
+-- name: GetWorkspaceForUpdate :one
+SELECT
+  *
+FROM
+  workspaces
+WHERE
+  CASE
+    WHEN sqlc.arg('slug') IS NOT NULL THEN slug = sqlc.arg('slug')
+    WHEN sqlc.arg('id') IS NOT NULL THEN id = sqlc.arg('id')
+    ELSE FALSE
+  END
+  AND deleted_at IS NULL
+FOR UPDATE;
 
 -- name: GetWorkspaceBySlugForUpdate :one
 SELECT
@@ -59,16 +77,3 @@ ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   updated_at = EXCLUDED.updated_at,
   deleted_at = EXCLUDED.deleted_at;
-
--- name: GetWorkspaceByID :one
-SELECT *
-FROM workspaces
-WHERE id = sqlc.arg('id')
-  AND deleted_at IS NULL;
-
--- name: GetWorkspaceByIDForUpdate :one
-SELECT *
-FROM workspaces
-WHERE id = sqlc.arg('id')
-  AND deleted_at IS NULL
-FOR UPDATE;

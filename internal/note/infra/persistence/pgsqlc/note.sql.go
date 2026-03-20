@@ -220,6 +220,50 @@ func (q *Queries) GetNotesForUpdate(ctx context.Context, ids []uuid.UUID) ([]*No
 	return items, nil
 }
 
+const getNotesInWorkspace = `-- name: GetNotesInWorkspace :many
+SELECT
+  n.id, n.name, n.icon, n.folder_id, n.tags, n.size, n.created_at, n.updated_at, n.trashed_by, n.trashed_at
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  f.workspace_id = $1
+  AND n.trashed_at IS NULL
+`
+
+func (q *Queries) GetNotesInWorkspace(ctx context.Context, workspaceID uuid.UUID) ([]*Note, error) {
+	rows, err := q.db.Query(ctx, getNotesInWorkspace, workspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Note
+	for rows.Next() {
+		var i Note
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Icon,
+			&i.FolderID,
+			&i.Tags,
+			&i.Size,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTrashedNotesByWorkspaceID = `-- name: GetTrashedNotesByWorkspaceID :many
 SELECT
   n.id, n.name, n.icon, n.folder_id, n.tags, n.size, n.created_at, n.updated_at, n.trashed_by, n.trashed_at

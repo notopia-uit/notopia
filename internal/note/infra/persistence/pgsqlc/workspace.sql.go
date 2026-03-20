@@ -31,61 +31,27 @@ func (q *Queries) CheckSlugExists(ctx context.Context, slug string) (bool, error
 	return exists, err
 }
 
-const getWorkspaceByID = `-- name: GetWorkspaceByID :one
-SELECT id, slug, name, created_at, updated_at, deleted_at
-FROM workspaces
-WHERE id = $1
-  AND deleted_at IS NULL
-`
-
-func (q *Queries) GetWorkspaceByID(ctx context.Context, id uuid.UUID) (*Workspace, error) {
-	row := q.db.QueryRow(ctx, getWorkspaceByID, id)
-	var i Workspace
-	err := row.Scan(
-		&i.ID,
-		&i.Slug,
-		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-	)
-	return &i, err
-}
-
-const getWorkspaceByIDForUpdate = `-- name: GetWorkspaceByIDForUpdate :one
-SELECT id, slug, name, created_at, updated_at, deleted_at
-FROM workspaces
-WHERE id = $1
-  AND deleted_at IS NULL
-FOR UPDATE
-`
-
-func (q *Queries) GetWorkspaceByIDForUpdate(ctx context.Context, id uuid.UUID) (*Workspace, error) {
-	row := q.db.QueryRow(ctx, getWorkspaceByIDForUpdate, id)
-	var i Workspace
-	err := row.Scan(
-		&i.ID,
-		&i.Slug,
-		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-	)
-	return &i, err
-}
-
-const getWorkspaceBySlug = `-- name: GetWorkspaceBySlug :one
+const getWorkspace = `-- name: GetWorkspace :one
 SELECT
   id, slug, name, created_at, updated_at, deleted_at
 FROM
   workspaces
 WHERE
-  slug = $1
+  CASE
+    WHEN $1 IS NOT NULL THEN slug = $1
+    WHEN $2 IS NOT NULL THEN id = $2
+    ELSE FALSE
+  END
   AND deleted_at IS NULL
 `
 
-func (q *Queries) GetWorkspaceBySlug(ctx context.Context, slug string) (*Workspace, error) {
-	row := q.db.QueryRow(ctx, getWorkspaceBySlug, slug)
+type GetWorkspaceParams struct {
+	Slug interface{}
+	ID   interface{}
+}
+
+func (q *Queries) GetWorkspace(ctx context.Context, arg *GetWorkspaceParams) (*Workspace, error) {
+	row := q.db.QueryRow(ctx, getWorkspace, arg.Slug, arg.ID)
 	var i Workspace
 	err := row.Scan(
 		&i.ID,
@@ -111,6 +77,40 @@ FOR UPDATE
 
 func (q *Queries) GetWorkspaceBySlugForUpdate(ctx context.Context, slug string) (*Workspace, error) {
 	row := q.db.QueryRow(ctx, getWorkspaceBySlugForUpdate, slug)
+	var i Workspace
+	err := row.Scan(
+		&i.ID,
+		&i.Slug,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return &i, err
+}
+
+const getWorkspaceForUpdate = `-- name: GetWorkspaceForUpdate :one
+SELECT
+  id, slug, name, created_at, updated_at, deleted_at
+FROM
+  workspaces
+WHERE
+  CASE
+    WHEN $1 IS NOT NULL THEN slug = $1
+    WHEN $2 IS NOT NULL THEN id = $2
+    ELSE FALSE
+  END
+  AND deleted_at IS NULL
+FOR UPDATE
+`
+
+type GetWorkspaceForUpdateParams struct {
+	Slug interface{}
+	ID   interface{}
+}
+
+func (q *Queries) GetWorkspaceForUpdate(ctx context.Context, arg *GetWorkspaceForUpdateParams) (*Workspace, error) {
+	row := q.db.QueryRow(ctx, getWorkspaceForUpdate, arg.Slug, arg.ID)
 	var i Workspace
 	err := row.Scan(
 		&i.ID,

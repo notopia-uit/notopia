@@ -8,8 +8,8 @@ import (
 
 type GetNoteLinks struct {
 	ID            uuid.UUID
-	OutgoingLinks *bool
-	Backlinks     *bool
+	OutgoingLinks bool
+	Backlinks     bool
 }
 
 type GetNoteLinksReadModel interface {

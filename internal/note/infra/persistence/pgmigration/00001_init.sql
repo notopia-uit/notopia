@@ -1,6 +1,4 @@
 -- +goose Up
-CREATE EXTENSION pg_trgm;
-
 CREATE TYPE trashed_by AS ENUM ('purpose', 'parent');
 
 CREATE TABLE workspaces (
@@ -46,7 +44,6 @@ CREATE TABLE note_links (
 CREATE INDEX idx_folders_workspace_id ON folders(workspace_id);
 CREATE INDEX idx_folders_parent_id ON folders(parent_id);
 CREATE INDEX idx_notes_folder_id ON notes(folder_id);
-CREATE INDEX idx_notes_tags_trgm ON notes USING gin(tags gin_trgm_ops);
 CREATE INDEX idx_workspaces_slug ON workspaces(slug);
 CREATE INDEX idx_folders_trashed_at ON folders(trashed_at) WHERE trashed_at IS NOT NULL;
 CREATE INDEX idx_notes_trashed_at ON notes(trashed_at) WHERE trashed_at IS NOT NULL;
@@ -58,4 +55,3 @@ DROP TABLE IF EXISTS note_links CASCADE;
 DROP TABLE IF EXISTS notes CASCADE;
 DROP TABLE IF EXISTS folders CASCADE;
 DROP TABLE IF EXISTS workspaces CASCADE;
-DROP EXTENSION IF EXISTS pg_trgm;

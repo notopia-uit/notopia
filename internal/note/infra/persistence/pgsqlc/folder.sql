@@ -222,6 +222,14 @@ ORDER BY
   created_at DESC
 FOR UPDATE;
 
+-- name: GetWorkspaceIDByFolderID :one
+SELECT
+  workspace_id
+FROM
+  folders
+WHERE
+  id = sqlc.arg('id');
+
 -- name: CountFoldersInWorkspaceByIDs :one
 SELECT
   COUNT(*)
@@ -242,11 +250,3 @@ DELETE FROM
   folders
 WHERE
   id = ANY(sqlc.arg('ids')::uuid[]);
-
--- name: GetWorkspaceIDByFolderID :one
-SELECT
-  workspace_id
-FROM
-  folders
-WHERE
-  id = sqlc.arg('id');

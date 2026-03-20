@@ -29,7 +29,9 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 	if forUpdate {
 		workspaceResult, err = w.queries.GetWorkspaceBySlugForUpdate(ctx, slug)
 	} else {
-		workspaceResult, err = w.queries.GetWorkspaceBySlug(ctx, slug)
+		workspaceResult, err = w.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
+			Slug: slug,
+		})
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -62,9 +64,13 @@ func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 	var workspaceResult *pgsqlc.Workspace
 	var err error
 	if forUpdate {
-		workspaceResult, err = w.queries.GetWorkspaceByIDForUpdate(ctx, id)
+		workspaceResult, err = w.queries.GetWorkspaceForUpdate(ctx, &pgsqlc.GetWorkspaceForUpdateParams{
+			ID: id,
+		})
 	} else {
-		workspaceResult, err = w.queries.GetWorkspaceByID(ctx, id)
+		workspaceResult, err = w.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
+			ID: id,
+		})
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

@@ -132,18 +132,6 @@ WHERE
   AND trashed_at IS NULL
 FOR UPDATE;
 
--- name: CountNotesInWorkspaceByIDs :one
-SELECT
-  COUNT(*)
-FROM
-  notes AS n
-INNER JOIN
-  folders f
-  ON n.folder_id = f.id
-WHERE
-  f.workspace_id = sqlc.arg('workspace_id')
-  AND n.id = ANY(sqlc.arg('ids')::uuid[]);
-
 -- name: GetNotesByFolderID :many
 SELECT
   *
@@ -154,6 +142,29 @@ WHERE
   AND trashed_at IS NULL
 ORDER BY
   created_at DESC;
+
+-- name: GetWorkspaceIDByNoteID :one
+SELECT
+  f.workspace_id
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  n.id = sqlc.arg('id');
+
+-- name: GetNotesInWorkspace :many
+SELECT
+  n.*
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  f.workspace_id = sqlc.arg('workspace_id')
+  AND n.trashed_at IS NULL;
 
 -- name: GetTrashedNotesByWorkspaceID :many
 SELECT
@@ -169,6 +180,17 @@ WHERE
 ORDER BY
   n.trashed_at DESC;
 
+-- name: CountNotesInWorkspaceByIDs :one
+SELECT
+  COUNT(*)
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  f.workspace_id = sqlc.arg('workspace_id')
+  AND n.id = ANY(sqlc.arg('ids')::uuid[]);
 
 -- name: PermanentlyDeleteNoteByID :exec
 DELETE FROM
@@ -181,14 +203,3 @@ DELETE FROM
   notes
 WHERE
   id = ANY(sqlc.arg('ids')::uuid[]);
-
--- name: GetWorkspaceIDByNoteID :one
-SELECT
-  f.workspace_id
-FROM
-  notes AS n
-INNER JOIN
-  folders f
-  ON n.folder_id = f.id
-WHERE
-  n.id = sqlc.arg('id');

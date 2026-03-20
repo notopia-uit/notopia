@@ -8,8 +8,8 @@ Manged with Nx. Package manager: pnpm (use ./pnpm-workspace.yaml), go (single go
 api/                            # OpenAPI spec
 proto/                          # Protobuf definitions
 apps/                           # JS/TS applications
-  web/                          # NextJS
-  document/                     # Document service (NestJS)
+  web/                          # NextJS (nx: web)
+  document/                     # Document service (NestJS) (nx: document)
 packages/                       # JS packages
   api-document-nestjs-server    # NestJS server codegen from OpenAPI spec, using openapi-generator
   api-gen                       # Frontend API client codegen from OpenAPI spec, using heyapi/openapi-ts
@@ -18,7 +18,9 @@ packages/                       # JS packages
   ui                            # React UI components, using shadcn/ui
 docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.)
 cmd/                            # Go services
-  note/                         # Note service
+  note/                         # Note service (nx: note)
+  authorization/                # Authorization service (nx: authorization)
+  searchworker/                 # Search worker sync to meilisearch (nx: searchworker)
 internal/                       # Internal Go packages
   api                           # Code gen from oapi-codegen
   common
@@ -55,6 +57,7 @@ pkg/                            # Go packages
   - start for nextjs style
   - serve: run the built
 - Run `nx lint {projectName} --fix` to apply eslint fix for those typescript projects
+- Run `nx lint {projectsName}` for golangcilint for those go projects (especially in `cmd/` dir)
 
 ## General Rules
 
