@@ -97,11 +97,9 @@ func (e FolderDeletedEvent) EventType() EventType {
 }
 
 type FolderUpdatedEvent struct {
-	ID          uuid.UUID
-	Name        string
-	Icon        *string
-	WorkspaceID uuid.UUID
-	ParentID    *uuid.UUID
+	ID   uuid.UUID
+	Name string
+	Icon *string
 }
 
 var _ Event = (*FolderUpdatedEvent)(nil)
@@ -178,7 +176,7 @@ type NoteUpdatedEvent struct {
 	Name          string
 	Icon          *string
 	Tags          []string
-	Size          uint
+	Size          uint64
 	FolderID      uuid.UUID
 	OutgoingLinks uuid.UUIDs
 }

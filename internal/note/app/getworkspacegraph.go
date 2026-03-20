@@ -1,9 +1,13 @@
 package app
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 type GetWorkspaceGraph struct {
-	Slug   string
+	ID     uuid.UUID
 	Orphan *bool
 }
 

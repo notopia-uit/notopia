@@ -23,14 +23,25 @@ func NewFolder(
 	icon *string,
 	workspaceID uuid.UUID,
 	folderHierarchy FolderHierarchy,
-) *Folder {
-	return &Folder{
+) (*Folder, error) {
+	if name == "" {
+		return nil, NewErrEmptyFolderName()
+	}
+	folder := &Folder{
 		id:              id,
 		name:            name,
 		icon:            icon,
 		workspaceID:     workspaceID,
 		folderHierarchy: folderHierarchy,
 	}
+	folder.AddEvent(
+		&FolderCreatedEvent{
+			Id:   folder.id,
+			Name: folder.name,
+			Icon: folder.icon,
+		},
+	)
+	return folder, nil
 }
 
 func UnmarshalFolder(
@@ -64,11 +75,9 @@ func (f *Folder) Name() string {
 func (f *Folder) Rename(name string) {
 	f.name = name
 	f.AddEvent(&FolderUpdatedEvent{
-		ID:          f.id,
-		Name:        f.name,
-		Icon:        f.icon,
-		WorkspaceID: f.workspaceID,
-		ParentID:    f.folderHierarchy.ParentID(),
+		ID:   f.id,
+		Name: f.name,
+		Icon: f.icon,
 	})
 }
 
@@ -79,11 +88,9 @@ func (f *Folder) Icon() *string {
 func (f *Folder) SetIcon(icon string) {
 	f.icon = &icon
 	f.AddEvent(&FolderUpdatedEvent{
-		ID:          f.id,
-		Name:        f.name,
-		Icon:        f.icon,
-		WorkspaceID: f.workspaceID,
-		ParentID:    f.folderHierarchy.ParentID(),
+		ID:   f.id,
+		Name: f.name,
+		Icon: f.icon,
 	})
 }
 
@@ -106,10 +113,12 @@ func (f *Folder) IsRoot() bool {
 func (f *Folder) MoveToFolder(folderID uuid.UUID) {
 	hierarchy := NewFolderHierarchy(&folderID)
 	f.folderHierarchy = *hierarchy
-	f.AddEvent(&FolderMovedEvent{
-		Id:       f.id,
-		ParentId: folderID,
-	})
+	f.AddEvent(
+		&FolderMovedEvent{
+			Id:       f.id,
+			ParentId: folderID,
+		},
+	)
 }
 
 func (f *Folder) IsTrashed() bool {

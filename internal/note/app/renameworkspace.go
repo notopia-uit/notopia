@@ -24,7 +24,7 @@ var ProvideRenameWorkspaceHandler = NewRenameWorkspaceHandler
 func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspace) error {
 	workspace, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug, true)
 	if err != nil {
-		return domain.NewErrWorkspaceNotFound(cmd.Slug, err)
+		return domain.NewErrWorkspaceBySlugNotFound(cmd.Slug, err)
 	}
 	workspace.Rename(cmd.Name)
 	return h.workspacerepo.Save(ctx, workspace)

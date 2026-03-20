@@ -2,9 +2,11 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
 type CreateWorkspace struct {
@@ -14,34 +16,61 @@ type CreateWorkspace struct {
 }
 
 type CreateWorkspaceHandler struct {
-	workspacerepo domain.WorkspaceRepo
-	folderrepo    domain.FolderRepo
+	workspaceRepo domain.WorkspaceRepo
+	folderRepo    domain.FolderRepo
+	uow           domain.UnitOfWork
 }
 
 func NewCreateWorkspaceHandler(
-	workspacerepo domain.WorkspaceRepo,
-	folderrepo domain.FolderRepo,
+	workspaceRepo domain.WorkspaceRepo,
+	folderRepo domain.FolderRepo,
+	uow domain.UnitOfWork,
 ) *CreateWorkspaceHandler {
 	return &CreateWorkspaceHandler{
-		workspacerepo: workspacerepo,
-		folderrepo:    folderrepo,
+		workspaceRepo: workspaceRepo,
+		folderRepo:    folderRepo,
+		uow:           uow,
 	}
 }
 
 var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
 
 func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspace) error {
-	// TODO: Creating a workspace requires provisioning a root folder first.
-	// Suggested steps:
-	// 1. Generate a rootFolderID
-	// 2. Create the root Folder (with nil parentID) via FolderRepo.Save
-	// 3. Create the Workspace with that rootFolderID via WorkspaceRepo.Save
-	rootFolderID := uuid.New()
-	rootHierarchy := domain.NewFolderHierarchy(nil)
-	rootFolder := domain.NewFolder(rootFolderID, cmd.Name, nil, cmd.ID, *rootHierarchy)
-	if err := h.folderrepo.Save(ctx, rootFolder); err != nil {
+	slugExisted, err := h.workspaceRepo.CheckSlugExists(ctx, cmd.Slug)
+	if err != nil {
 		return err
 	}
-	workspace := domain.NewWorkspace(cmd.ID, cmd.Name, cmd.Slug, rootFolderID)
-	return h.workspacerepo.Save(ctx, workspace)
+	if slugExisted {
+		return newErrCreateWorkspaceSlugExisted(cmd.Slug)
+	}
+	rootFolderID := uuid.New()
+	rootHierarchy := domain.NewFolderHierarchy(nil)
+	rootFolder, err := domain.NewFolder(rootFolderID, cmd.Name, nil, cmd.ID, *rootHierarchy)
+	if err != nil {
+		return err
+	}
+	workspace, err := domain.NewWorkspace(cmd.ID, cmd.Name, cmd.Slug, rootFolderID)
+	if err != nil {
+		return err
+	}
+	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		if err := h.folderRepo.Save(ctx, rootFolder); err != nil {
+			return err
+		}
+		if err := h.workspaceRepo.Save(ctx, workspace); err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
+}
+
+var ErrCodeCreateWorkspaceSlugExisted = "ErrCodeCreateWorkspaceSlugExisted"
+
+func newErrCreateWorkspaceSlugExisted(slug string) *commonerror.Err {
+	return commonerror.NewInvalid(
+		fmt.Sprintf("workspace slug %q already exists", slug),
+		ErrCodeCreateWorkspaceSlugExisted,
+		nil,
+	)
 }

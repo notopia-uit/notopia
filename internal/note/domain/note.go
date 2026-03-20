@@ -11,7 +11,7 @@ type Note struct {
 	name          string
 	icon          *string
 	tags          []string
-	size          uint
+	size          uint64
 	folderID      uuid.UUID
 	outgoingLinks uuid.UUIDs
 	trashed       *Trashed
@@ -26,6 +26,9 @@ func NewNote(
 	tags []string,
 	folderID uuid.UUID,
 ) *Note {
+	if name == "" {
+		name = "Untitled Note"
+	}
 	return &Note{
 		id:       id,
 		name:     name,
@@ -40,7 +43,7 @@ func UnmarshalNote(
 	name string,
 	icon *string,
 	tags []string,
-	size uint,
+	size uint64,
 	folderID uuid.UUID,
 	outgoingLinks uuid.UUIDs,
 	trashed *Trashed,
@@ -111,11 +114,11 @@ func (n *Note) SetTags(tags []string) {
 	})
 }
 
-func (n *Note) Size() uint {
+func (n *Note) Size() uint64 {
 	return n.size
 }
 
-func (n *Note) SetSize(size uint) {
+func (n *Note) SetSize(size uint64) {
 	n.size = size
 	n.AddEvent(&NoteUpdatedEvent{
 		ID:       n.id,

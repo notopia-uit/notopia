@@ -65,7 +65,7 @@ func (h *StrictHandler) GetWorkspace(
 	ctx context.Context,
 	request note.GetWorkspaceRequestObject,
 ) (note.GetWorkspaceResponseObject, error) {
-	query := &app.GetWorkspace{
+	query := &app.GetWorkspaceBySlug{
 		Slug: request.WorkspaceSlug,
 	}
 	result, err := h.App.GetWorkspaceHandler.Handle(ctx, query)

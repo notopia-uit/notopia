@@ -32,7 +32,7 @@ func (h *PublishWorkspaceHandler) Handle(ctx context.Context, cmd *PublishWorksp
 	// 5. Implement this handler to call workspace.Publish(), add event, and save
 	_, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug, true)
 	if err != nil {
-		return domain.NewErrWorkspaceNotFound(cmd.Slug, err)
+		return domain.NewErrWorkspaceBySlugNotFound(cmd.Slug, err)
 	}
 	// TODO: workspace.Publish() not yet implemented
 	return nil

@@ -1,25 +1,24 @@
 package app
 
-import "context"
+import (
+	"context"
 
+	"github.com/google/uuid"
+)
+
+// TODO: Kev
 type GetWorkspaceMembers struct {
-	Slug string
+	ID uuid.UUID
 }
 
-type GetWorkspaceMembersReadModel interface {
-	GetWorkspaceMembers(ctx context.Context, q *GetWorkspaceMembers) (*[]WorkspaceMember, error)
-}
+type GetWorkspaceMembersHandler struct{}
 
-type GetWorkspaceMembersHandler struct {
-	readModel GetWorkspaceMembersReadModel
-}
-
-func NewGetWorkspaceMembersHandler(readModel GetWorkspaceMembersReadModel) *GetWorkspaceMembersHandler {
-	return &GetWorkspaceMembersHandler{readModel: readModel}
+func NewGetWorkspaceMembersHandler() *GetWorkspaceMembersHandler {
+	return &GetWorkspaceMembersHandler{}
 }
 
 var ProvideGetWorkspaceMembersHandler = NewGetWorkspaceMembersHandler
 
-func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorkspaceMembers) (*[]WorkspaceMember, error) {
-	return h.readModel.GetWorkspaceMembers(ctx, query)
+func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorkspaceMembers) ([]WorkspaceMember, error) {
+	return nil, nil
 }

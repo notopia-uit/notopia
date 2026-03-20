@@ -3,28 +3,29 @@ package app
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 )
 
 type DeleteWorkspace struct {
-	Slug string
+	ID uuid.UUID
 }
 
 type DeleteWorkspaceHandler struct {
-	workspacerepo domain.WorkspaceRepo
+	workspaceRepo domain.WorkspaceRepo
 }
 
-func NewDeleteWorkspaceHandler(workspacerepo domain.WorkspaceRepo) *DeleteWorkspaceHandler {
-	return &DeleteWorkspaceHandler{workspacerepo: workspacerepo}
+func NewDeleteWorkspaceHandler(workspaceRepo domain.WorkspaceRepo) *DeleteWorkspaceHandler {
+	return &DeleteWorkspaceHandler{workspaceRepo: workspaceRepo}
 }
 
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) error {
-	workspace, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug, true)
+	workspace, err := h.workspaceRepo.GetByID(ctx, cmd.ID, true)
 	if err != nil {
-		return domain.NewErrWorkspaceNotFound(cmd.Slug, err)
+		return err
 	}
 	workspace.Delete()
-	return h.workspacerepo.Save(ctx, workspace)
+	return h.workspaceRepo.Save(ctx, workspace)
 }

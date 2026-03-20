@@ -21,7 +21,13 @@ func NewWorkspace(
 	name string,
 	slug string,
 	rootFolderID uuid.UUID,
-) *Workspace {
+) (*Workspace, error) {
+	if name == "" {
+		return nil, NewErrEmptyWorkspaceName()
+	}
+	if slug == "" {
+		return nil, NewErrEmptyWorkspaceSlug()
+	}
 	return &Workspace{
 		id:           id,
 		name:         name,
@@ -29,7 +35,7 @@ func NewWorkspace(
 		rootFolderID: rootFolderID,
 
 		event: []Event{},
-	}
+	}, nil
 }
 
 func (w *Workspace) ID() uuid.UUID {

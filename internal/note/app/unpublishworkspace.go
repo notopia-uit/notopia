@@ -33,7 +33,7 @@ func (h *UnpublishWorkspaceHandler) Handle(ctx context.Context, cmd *UnpublishWo
 	// 5. Implement this handler to call workspace.Unpublish(), add event, and save
 	_, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug, false)
 	if err != nil {
-		return domain.NewErrWorkspaceNotFound(cmd.Slug, err)
+		return domain.NewErrWorkspaceBySlugNotFound(cmd.Slug, err)
 	}
 	// TODO: workspace.Unpublish() not yet implemented
 	return nil

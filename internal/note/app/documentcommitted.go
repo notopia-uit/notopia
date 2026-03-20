@@ -11,16 +11,16 @@ import (
 type DocumentCommitted share.DocumentCommittedEvent
 
 type DocumentCommittedHandler struct {
-	noterepo    domain.NoteRepo
+	noteRepo    domain.NoteRepo
 	noteService *domain.NoteService
 }
 
 func NewDocumentCommittedHandler(
-	noterepo domain.NoteRepo,
+	noteRepo domain.NoteRepo,
 	noteService *domain.NoteService,
 ) *DocumentCommittedHandler {
 	return &DocumentCommittedHandler{
-		noterepo:    noterepo,
+		noteRepo:    noteRepo,
 		noteService: noteService,
 	}
 }
@@ -28,7 +28,7 @@ func NewDocumentCommittedHandler(
 var ProvideDocumentCommittedHandler = NewDocumentCommittedHandler
 
 func (h *DocumentCommittedHandler) Handle(ctx context.Context, event *DocumentCommitted) error {
-	note, err := h.noterepo.GetByID(ctx, event.Id, false)
+	note, err := h.noteRepo.GetByID(ctx, event.Id, false)
 	if err != nil {
 		return err
 	}
@@ -36,6 +36,11 @@ func (h *DocumentCommittedHandler) Handle(ctx context.Context, event *DocumentCo
 	if err != nil {
 		return err
 	}
-	slog.InfoContext(ctx, "Document committed event handled", "note_id", note.ID, "new_size", note.Size)
-	return h.noterepo.Save(ctx, note)
+	slog.InfoContext(
+		ctx,
+		"Document committed event handled",
+		slog.String("note_id", note.ID().String()),
+		slog.Uint64("new_size", note.Size()),
+	)
+	return h.noteRepo.Save(ctx, note)
 }

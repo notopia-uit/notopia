@@ -15,6 +15,6 @@ func (s *NoteService) UpdateNoteSizeBasedOnContent(note *Note, content any) erro
 	if err != nil {
 		return NewErrNoteFailToMarshalContent(note.ID(), err)
 	}
-	note.SetSize(uint(len(b)))
+	note.SetSize(uint64(len(b)))
 	return nil
 }

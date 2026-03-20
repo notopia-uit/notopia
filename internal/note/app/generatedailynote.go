@@ -13,20 +13,20 @@ type GenerateDailyNote struct {
 }
 
 type GenerateDailyNoteHandler struct {
-	noterepo      domain.NoteRepo
-	folderrepo    domain.FolderRepo
-	workspacerepo domain.WorkspaceRepo
+	noteRepo      domain.NoteRepo
+	folderRepo    domain.FolderRepo
+	workspaceRepo domain.WorkspaceRepo
 }
 
 func NewGenerateDailyNoteHandler(
-	noterepo domain.NoteRepo,
-	folderrepo domain.FolderRepo,
-	workspacerepo domain.WorkspaceRepo,
+	noteRepo domain.NoteRepo,
+	folderRepo domain.FolderRepo,
+	workspaceRepo domain.WorkspaceRepo,
 ) *GenerateDailyNoteHandler {
 	return &GenerateDailyNoteHandler{
-		noterepo:      noterepo,
-		folderrepo:    folderrepo,
-		workspacerepo: workspacerepo,
+		noteRepo:      noteRepo,
+		folderRepo:    folderRepo,
+		workspaceRepo: workspaceRepo,
 	}
 }
 
@@ -36,7 +36,7 @@ func (h *GenerateDailyNoteHandler) Handle(ctx context.Context, cmd *GenerateDail
 	// WARN: Unimplemented stub - returns nil, nil without any logic.
 	// TODO: No domain method for generating a daily note. Implement logic to:
 	// 1. Find or create a "Daily Notes" folder in the workspace root
-	//    - Use folderrepo.GetByWorkspaceID() to find existing, or NewFolder if not found
+	//    - Use folderRepo.GetByWorkspaceID() to find existing, or NewFolder if not found
 	// 2. Find or create today's note in that folder (named e.g. "2026-03-20")
 	//    - Compare note names to find today's date, or use createdAt timestamp
 	// 3. Return the note ID for the Content-Location response header

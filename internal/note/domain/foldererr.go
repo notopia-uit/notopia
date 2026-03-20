@@ -7,12 +7,23 @@ import (
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
-var ErrCodeFolderNotFound = "folder_1"
+var (
+	ErrCodeFolderNotFound  = "folder_1"
+	ErrCodeEmptyFolderName = "folder_2"
+)
 
 func NewErrFolderNotFound(id uuid.UUID, err error) *commonerror.Err {
 	return commonerror.NewNotFound(
 		fmt.Sprintf("Folder with id %q not found", id.String()),
 		ErrCodeFolderNotFound,
 		err,
+	)
+}
+
+func NewErrEmptyFolderName() *commonerror.Err {
+	return commonerror.NewInvalid(
+		"Folder name cannot be empty",
+		ErrCodeEmptyFolderName,
+		nil,
 	)
 }

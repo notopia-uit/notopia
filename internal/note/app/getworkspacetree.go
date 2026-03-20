@@ -1,9 +1,13 @@
 package app
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 type GetWorkspaceTree struct {
-	Slug string
+	ID uuid.UUID
 }
 
 type GetWorkspaceTreeReadModel interface {

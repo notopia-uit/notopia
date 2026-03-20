@@ -12,15 +12,15 @@ type DeleteNote struct {
 }
 
 type DeleteNoteHandler struct {
-	noterepo domain.NoteRepo
+	noteRepo domain.NoteRepo
 }
 
-func NewDeleteNoteHandler(noterepo domain.NoteRepo) *DeleteNoteHandler {
-	return &DeleteNoteHandler{noterepo: noterepo}
+func NewDeleteNoteHandler(noteRepo domain.NoteRepo) *DeleteNoteHandler {
+	return &DeleteNoteHandler{noteRepo: noteRepo}
 }
 
 var ProvideDeleteNoteHandler = NewDeleteNoteHandler
 
 func (h *DeleteNoteHandler) Handle(ctx context.Context, cmd *DeleteNote) error {
-	return h.noterepo.PermanentlyDeleteByID(ctx, cmd.ID)
+	return h.noteRepo.PermanentlyDeleteByID(ctx, cmd.ID)
 }

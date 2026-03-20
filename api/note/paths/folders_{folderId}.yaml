@@ -1,0 +1,23 @@
+# vim: ft=yaml.openapi
+delete:
+  security:
+    - Oauth2: []
+  tags:
+    - Folder
+  summary: Delete folder
+  operationId: deleteFolder
+  parameters:
+    - $ref: ../components/parameters/folderIdPath.yaml
+  responses:
+    204:
+      description: Folder successfully deleted
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

@@ -33,7 +33,7 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceNotFound(slug, err)
+			return nil, domain.NewErrWorkspaceBySlugNotFound(slug, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -62,7 +62,7 @@ func (w *Workspace) GetIDBySlug(ctx context.Context, slug string) (*uuid.UUID, e
 	result, err := w.queries.GetWorkspaceIDBySlug(ctx, slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceNotFound(slug, err)
+			return nil, domain.NewErrWorkspaceBySlugNotFound(slug, err)
 		}
 		return nil, toDomainError(err)
 	}

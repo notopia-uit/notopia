@@ -28,9 +28,8 @@ var (
 	_ app.ShowTrashReadModel            = (*ReadModel)(nil)
 	_ app.GetNoteGraphReadModel         = (*ReadModel)(nil)
 	_ app.GetNoteLinksReadModel         = (*ReadModel)(nil)
-	_ app.GetWorkspaceReadModel         = (*ReadModel)(nil)
+	_ app.GetWorkspaceBySlugReadModel   = (*ReadModel)(nil)
 	_ app.GetWorkspaceGraphReadModel    = (*ReadModel)(nil)
-	_ app.GetWorkspaceMembersReadModel  = (*ReadModel)(nil)
 	_ app.CheckWorkspaceExistsReadModel = (*ReadModel)(nil)
 )
 
@@ -40,7 +39,7 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 	workspaceID, err := queries.GetWorkspaceIDBySlug(ctx, q.Slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceNotFound(q.Slug, err)
+			return nil, domain.NewErrWorkspaceBySlugNotFound(q.Slug, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -179,7 +178,7 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 	workspaceID, err := queries.GetWorkspaceIDBySlug(ctx, q.Slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceNotFound(q.Slug, err)
+			return nil, domain.NewErrWorkspaceBySlugNotFound(q.Slug, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -383,13 +382,13 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 	return &result, nil
 }
 
-func (r *ReadModel) GetWorkspace(ctx context.Context, q *app.GetWorkspace) (*app.Workspace, error) {
+func (r *ReadModel) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceBySlug) (*app.Workspace, error) {
 	queries := pgsqlc.New(r.pool)
 
 	workspace, err := queries.GetWorkspaceBySlug(ctx, q.Slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceNotFound(q.Slug, err)
+			return nil, domain.NewErrWorkspaceBySlugNotFound(q.Slug, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -404,16 +403,8 @@ func (r *ReadModel) GetWorkspace(ctx context.Context, q *app.GetWorkspace) (*app
 func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, error) {
 	queries := pgsqlc.New(r.pool)
 
-	workspaceID, err := queries.GetWorkspaceIDBySlug(ctx, q.Slug)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceNotFound(q.Slug, err)
-		}
-		return nil, toDomainError(err)
-	}
-
 	folders, err := queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		WorkspaceID: &workspaceID,
+		WorkspaceID: &q.ID,
 	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toDomainError(err)
@@ -478,21 +469,6 @@ func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGr
 		Nodes: nodes,
 		Links: links,
 	}, nil
-}
-
-func (r *ReadModel) GetWorkspaceMembers(ctx context.Context, q *app.GetWorkspaceMembers) (*[]app.WorkspaceMember, error) {
-	// WARN: Stub implementation returns nil, nil without implementing any logic.
-	// TODO: Implement workspace member list query:
-	// 1. Query workspace ID from slug: queries.GetWorkspaceIDBySlug(ctx, q.Slug)
-	// 2. Query members: queries.GetWorkspaceMembers(ctx, workspaceID)
-	//    Note: This SQL query may not exist yet - may need to create it or fetch from domain
-	// 3. Map to app.WorkspaceMember{Id, Username, Role}
-	// 4. Return pointer to slice
-	// Consider:
-	//   - Adding pagination support if needed
-	//   - Caching results if called frequently
-	//   - Handling permission checks (only return members visible to user)
-	return nil, nil
 }
 
 func (r *ReadModel) CheckWorkspaceExists(ctx context.Context, q *app.CheckWorkspaceExists) (*app.CheckWorkspaceExistsResult, error) {

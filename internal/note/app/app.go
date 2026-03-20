@@ -8,11 +8,11 @@ import (
 )
 
 type App struct {
-	// Command Handlers
 	CreateNoteHandler                   *CreateNoteHandler
 	CreateFolderHandler                 *CreateFolderHandler
 	CreateWorkspaceHandler              *CreateWorkspaceHandler
 	DeleteNoteHandler                   *DeleteNoteHandler
+	DeleteFolderHandler                 *DeleteFolderHandler
 	DeleteWorkspaceHandler              *DeleteWorkspaceHandler
 	GenerateDailyNoteHandler            *GenerateDailyNoteHandler
 	MoveWorkspaceItemsHandler           *MoveWorkspaceItemsHandler
@@ -27,7 +27,6 @@ type App struct {
 	UnpublishWorkspaceHandler           *UnpublishWorkspaceHandler
 	UpdateWorkspaceMembersHandler       *UpdateWorkspaceMembersHandler
 
-	// Query Handlers
 	CheckWorkspaceExistsHandler *CheckWorkspaceExistsHandler
 	GetNoteGraphHandler         *GetNoteGraphHandler
 	GetNoteLinksHandler         *GetNoteLinksHandler
@@ -38,10 +37,8 @@ type App struct {
 	GetWorkspaceTreeHandler     *GetWorkspaceTreeHandler
 	ShowTrashHandler            *ShowTrashHandler
 
-	// Event Handlers
 	DocumentCommittedHandler *DocumentCommittedHandler
 
-	// Dependencies
 	workspaceEventPubSub WorkspaceEventPubSub
 	persistence          Persistence
 }
@@ -51,6 +48,7 @@ func NewApp(
 	createFolderHandler *CreateFolderHandler,
 	createWorkspaceHandler *CreateWorkspaceHandler,
 	deleteNoteHandler *DeleteNoteHandler,
+	deleteFolderHandler *DeleteFolderHandler,
 	deleteWorkspaceHandler *DeleteWorkspaceHandler,
 	generateDailyNoteHandler *GenerateDailyNoteHandler,
 	moveWorkspaceItemsHandler *MoveWorkspaceItemsHandler,
@@ -82,6 +80,7 @@ func NewApp(
 		CreateFolderHandler:                 createFolderHandler,
 		CreateWorkspaceHandler:              createWorkspaceHandler,
 		DeleteNoteHandler:                   deleteNoteHandler,
+		DeleteFolderHandler:                 deleteFolderHandler,
 		DeleteWorkspaceHandler:              deleteWorkspaceHandler,
 		GenerateDailyNoteHandler:            generateDailyNoteHandler,
 		MoveWorkspaceItemsHandler:           moveWorkspaceItemsHandler,
@@ -124,11 +123,9 @@ func (a *App) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
-	if a.workspaceEventPubSub != nil {
-		g.Go(func() error {
-			return a.workspaceEventPubSub.Run(ctx)
-		})
-	}
+	g.Go(func() error {
+		return a.workspaceEventPubSub.Run(ctx)
+	})
 
 	// WARN: Integration event service (Kafka DocumentCommitted) is not started here.
 	// The integrationPubSub dependency exists but .Run() is never called.

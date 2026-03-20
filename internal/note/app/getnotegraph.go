@@ -2,12 +2,14 @@ package app
 
 import (
 	"context"
+	"math"
+
 	"github.com/google/uuid"
 )
 
 type GetNoteGraph struct {
 	ID    uuid.UUID
-	Depth *int
+	Depth int
 }
 
 type GetNoteGraphReadModel interface {
@@ -25,5 +27,8 @@ func NewGetNoteGraphHandler(readModel GetNoteGraphReadModel) *GetNoteGraphHandle
 var ProvideGetNoteGraphHandler = NewGetNoteGraphHandler
 
 func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (*Graph, error) {
+	if query.Depth <= 0 {
+		query.Depth = math.MaxInt
+	}
 	return h.readModel.GetNoteGraph(ctx, query)
 }

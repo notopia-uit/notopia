@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
@@ -132,7 +133,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	getNoteGraphHandler := app.NewGetNoteGraphHandler(readModel)
 	getNoteLinksHandler := app.NewGetNoteLinksHandler(readModel)
 	getNotesHandler := app.NewGetNotesHandler(readModel)
-	getWorkspaceHandler := app.NewGetWorkspaceHandler(readModel)
+	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(readModel)
 	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(readModel)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(readModel)
 	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(readModel)
