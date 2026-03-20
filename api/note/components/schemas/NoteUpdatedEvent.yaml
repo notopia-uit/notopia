@@ -9,7 +9,10 @@ properties:
     example: NoteUpdatedEvent
 
   data:
-    $ref: ./Note.yaml
+    type: object
+    x-go-type-name: NoteUpdatedEventData
+    allOf:
+      - $ref: ./Note.yaml
 
 required:
   - type

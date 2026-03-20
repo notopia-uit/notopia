@@ -63,6 +63,13 @@ func (f *Folder) Name() string {
 
 func (f *Folder) Rename(name string) {
 	f.name = name
+	f.AddEvent(&FolderUpdatedEvent{
+		ID:          f.id,
+		Name:        f.name,
+		Icon:        f.icon,
+		WorkspaceID: f.workspaceID,
+		ParentID:    f.folderHierarchy.ParentID(),
+	})
 }
 
 func (f *Folder) Icon() *string {
@@ -71,6 +78,13 @@ func (f *Folder) Icon() *string {
 
 func (f *Folder) SetIcon(icon string) {
 	f.icon = &icon
+	f.AddEvent(&FolderUpdatedEvent{
+		ID:          f.id,
+		Name:        f.name,
+		Icon:        f.icon,
+		WorkspaceID: f.workspaceID,
+		ParentID:    f.folderHierarchy.ParentID(),
+	})
 }
 
 func (f *Folder) WorkspaceID() uuid.UUID {
@@ -92,6 +106,10 @@ func (f *Folder) IsRoot() bool {
 func (f *Folder) MoveToFolder(folderID uuid.UUID) {
 	hierarchy := NewFolderHierarchy(&folderID)
 	f.folderHierarchy = *hierarchy
+	f.AddEvent(&FolderMovedEvent{
+		Id:       f.id,
+		ParentId: folderID,
+	})
 }
 
 func (f *Folder) IsTrashed() bool {
@@ -121,10 +139,16 @@ func (f *Folder) TrashedAt() *time.Time {
 
 func (f *Folder) Trash(trashedBy TrashedBy) {
 	f.trashed = NewTrashed(trashedBy, time.Now())
+	f.AddEvent(&FolderTrashedEvent{
+		Id: f.id,
+	})
 }
 
 func (f *Folder) Restore() {
 	f.trashed = nil
+	f.AddEvent(&FolderRestoredEvent{
+		Id: f.id,
+	})
 }
 
 func (f *Folder) AddEvent(event Event) {

@@ -1,0 +1,22 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  type:
+    type: string
+    enum:
+      - FolderMovedEvent
+    example: FolderMovedEvent
+  data:
+    type: object
+    x-go-type-name: FolderMovedEventData
+    properties:
+      id:
+        $ref: ./Folder.yaml#/properties/id
+      parentId:
+        $ref: ./Folder.yaml#/properties/parentId
+    required:
+      - id
+      - parentId
+required:
+  - type
+  - data

@@ -99,15 +99,18 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		return err
 	}
 
-	workspaceEvents := make([]domain.WorkspaceEvent, 0, len(cmd.FolderIDs)+len(cmd.NoteIDs))
+	workspaceEvents := make([]domain.Event, 0, len(cmd.FolderIDs)+len(cmd.NoteIDs))
 	for _, folder := range folders {
-		workspaceEvents = append(workspaceEvents, domain.FolderUpdatedEvent(folder))
+		workspaceEvents = append(workspaceEvents, folder.PopEvents()...)
 	}
 	for _, note := range notes {
-		workspaceEvents = append(workspaceEvents, domain.NoteUpdatedEvent(note))
+		workspaceEvents = append(workspaceEvents, note.PopEvents()...)
 	}
 
-	h.workspaceEvent.Publish(ctx, cmd.WorkspaceID, cmd.UserID, workspaceEvents...)
+	err = h.workspaceEvent.Publish(ctx, cmd.WorkspaceID, cmd.UserID, workspaceEvents...)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

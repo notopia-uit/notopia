@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -122,7 +123,7 @@ func NewWorkspaceEvent(
 
 var ProvideWorkspaceEvent = NewWorkspaceEvent
 
-func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...domain.WorkspaceEvent) error {
+func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...domain.Event) error {
 	msgs := make([]*message.Message, len(events))
 	for _, event := range events {
 		payload, err := json.Marshal(event)
@@ -136,19 +137,31 @@ func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, use
 		msg.SetContext(ctx)
 		msgs = append(msgs, msg)
 	}
-	return w.internalPubSub.publisher.Publish(w.internalPubSub.topic, msgs...)
+	err := w.internalPubSub.publisher.Publish(w.internalPubSub.topic, msgs...)
+	if err != nil {
+		return commonerror.NewInternal(
+			fmt.Sprintf("Failed to publish workspace events for workspace %q and user %q", workspaceID.String(), userID),
+			"PublishWorkspaceEventsFailed",
+			err,
+		)
+	}
+	return nil
 }
 
 func (w *WorkspaceEvent) Subscribe(
 	ctx context.Context,
 	workspaceID uuid.UUID,
 	userID string,
-) (<-chan domain.WorkspaceEvent, error) {
-	eventCh := make(chan domain.WorkspaceEvent, 10)
+) (<-chan domain.Event, error) {
+	eventCh := make(chan domain.Event, 10)
 
 	msgCh, err := w.hubPubSub.pubSub.Subscribe(ctx, fmt.Sprintf("%v", workspaceID))
 	if err != nil {
-		return nil, fmt.Errorf("failed to subscribe to workspace events: %w", err)
+		return nil, commonerror.NewInternal(
+			fmt.Sprintf("Failed to subscribe to workspace events for workspace %q and user %q", workspaceID.String(), userID),
+			"SubscribeWorkspaceEventsFailed",
+			err,
+		)
 	}
 
 	go func() {

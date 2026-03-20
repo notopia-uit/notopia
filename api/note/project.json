@@ -61,15 +61,28 @@
       },
       "inputs": ["openapiFilesWithCommon"]
     },
-    "gen:go": {
+    "gen:gomodel": {
       "inputs": ["{projectRoot}/oapi-codegen.yaml", "openapiFiles"],
-      "outputs": ["{workspaceRoot}/pkg/api/note/note.gen.go"],
+      "outputs": ["{workspaceRoot}/pkg/api/note/notemodel.gen.go"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "oapi-codegen --config ./oapi-codegen.yaml ../bundled/note.json",
+        "command": "oapi-codegen --config ./oapi-codegen-model.yaml ../bundled/note.json",
         "cwd": "{projectRoot}"
       },
       "dependsOn": ["bundle:json"]
+    },
+    "gen:goserver": {
+      "inputs": ["{projectRoot}/oapi-codegen.yaml", "openapiFiles"],
+      "outputs": ["{workspaceRoot}/pkg/api/note/noteserver.gen.go"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "oapi-codegen --config ./oapi-codegen-server.yaml ../bundled/note.json",
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": ["bundle:json"]
+    },
+    "gen:go": {
+      "dependsOn": ["gen:gomodel", "gen:goserver"]
     },
     "gen": {
       "dependsOn": ["gen:go"]

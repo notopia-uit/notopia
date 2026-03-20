@@ -8,11 +8,14 @@ properties:
     example: FolderCreatedEvent
   data:
     type: object
+    x-go-type-name: FolderCreatedEventData
     properties:
       id:
         $ref: ../schemas/Folder.yaml#/properties/id
       name:
         $ref: ../schemas/Folder.yaml#/properties/name
+      icon:
+        $ref: ../schemas/Folder.yaml#/properties/icon
     required:
       - id
       - name

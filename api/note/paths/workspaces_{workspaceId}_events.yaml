@@ -13,28 +13,45 @@ get:
       description: A persistent stream of events
       content:
         text/event-stream:
-          # TODO: Note/Folder restore, permanent deletion
           schema:
             oneOf:
               - $ref: ../components/schemas/FolderCreatedEvent.yaml
               - $ref: ../components/schemas/FolderDeletedEvent.yaml
               - $ref: ../components/schemas/FolderUpdatedEvent.yaml
+              - $ref: ../components/schemas/FolderMovedEvent.yaml
+              - $ref: ../components/schemas/FolderTrashedEvent.yaml
+              - $ref: ../components/schemas/FolderRestoredEvent.yaml
+              - $ref: ../components/schemas/FolderPermanentlyDeletedEvent.yaml
               - $ref: ../components/schemas/NoteCreatedEvent.yaml
               - $ref: ../components/schemas/NoteDeletedEvent.yaml
               - $ref: ../components/schemas/NoteUpdatedEvent.yaml
+              - $ref: ../components/schemas/NoteMovedEvent.yaml
+              - $ref: ../components/schemas/NoteTrashedEvent.yaml
+              - $ref: ../components/schemas/NoteRestoredEvent.yaml
+              - $ref: ../components/schemas/NotePermanentlyDeletedEvent.yaml
               - $ref: ../components/schemas/WorkspaceMemebersUpdatedEvent.yaml
               - $ref: ../components/schemas/WorkspaceUpdatedEvent.yaml
+              - $ref: ../components/schemas/WorkspaceDeletedEvent.yaml
             discriminator:
               propertyName: type
               mapping:
                 FolderCreatedEvent: ../components/schemas/FolderCreatedEvent.yaml
                 FolderDeletedEvent: ../components/schemas/FolderDeletedEvent.yaml
                 FolderUpdatedEvent: ../components/schemas/FolderUpdatedEvent.yaml
+                FolderMovedEvent: ../components/schemas/FolderMovedEvent.yaml
+                FolderTrashedEvent: ../components/schemas/FolderTrashedEvent.yaml
+                FolderRestoredEvent: ../components/schemas/FolderRestoredEvent.yaml
+                FolderPermanentlyDeletedEvent: ../components/schemas/FolderPermanentlyDeletedEvent.yaml
                 NoteCreatedEvent: ../components/schemas/NoteCreatedEvent.yaml
                 NoteDeletedEvent: ../components/schemas/NoteDeletedEvent.yaml
                 NoteUpdatedEvent: ../components/schemas/NoteUpdatedEvent.yaml
+                NoteMovedEvent: ../components/schemas/NoteMovedEvent.yaml
+                NoteTrashedEvent: ../components/schemas/NoteTrashedEvent.yaml
+                NoteRestoredEvent: ../components/schemas/NoteRestoredEvent.yaml
+                NotePermanentlyDeletedEvent: ../components/schemas/NotePermanentlyDeletedEvent.yaml
                 WorkspaceMemebersUpdatedEvent: ../components/schemas/WorkspaceMemebersUpdatedEvent.yaml
                 WorkspaceUpdatedEvent: ../components/schemas/WorkspaceUpdatedEvent.yaml
+                WorkspaceDeletedEvent: ../components/schemas/WorkspaceDeletedEvent.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

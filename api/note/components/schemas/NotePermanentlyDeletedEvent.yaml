@@ -4,21 +4,16 @@ properties:
   type:
     type: string
     enum:
-      - NoteCreatedEvent
-    example: NoteCreatedEvent
+      - NotePermanentlyDeletedEvent
+    example: NotePermanentlyDeletedEvent
   data:
     type: object
-    x-go-type-name: NoteCreatedEventData
+    x-go-type-name: NotePermanentlyDeletedEventData
     properties:
       id:
         $ref: ./Note.yaml#/properties/id
-      name:
-        $ref: ./Note.yaml#/properties/name
-      icon:
-        $ref: ./Note.yaml#/properties/icon
     required:
       - id
-      - name
 required:
   - type
   - data

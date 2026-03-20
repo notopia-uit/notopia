@@ -38,52 +38,36 @@ type Event interface {
 func NewFromEventType(eventType string) (Event, bool) {
 	var concreteEvent Event
 	switch EventType(eventType) {
-
 	case TypeFolderCreated:
 		concreteEvent = &FolderCreatedEvent{}
-
 	case TypeFolderDeleted:
 		concreteEvent = &FolderDeletedEvent{}
-
 	case TypeFolderUpdated:
 		concreteEvent = &FolderUpdatedEvent{}
-
 	case TypeFolderMoved:
 		concreteEvent = &FolderMovedEvent{}
-
 	case TypeFolderTrashed:
 		concreteEvent = &FolderTrashedEvent{}
-
 	case TypeFolderRestored:
 		concreteEvent = &FolderRestoredEvent{}
-
 	case TypeFolderPermanentlyDeleted:
 		concreteEvent = &FolderPermanentlyDeletedEvent{}
-
 	case TypeNoteCreated:
 		concreteEvent = &NoteCreatedEvent{}
-
 	case TypeNoteDeleted:
 		concreteEvent = &NoteDeletedEvent{}
-
 	case TypeNoteUpdated:
 		concreteEvent = &NoteUpdatedEvent{}
-
 	case TypeNoteMoved:
 		concreteEvent = &NoteMovedEvent{}
-
 	case TypeNoteTrashed:
 		concreteEvent = &NoteTrashedEvent{}
-
 	case TypeNoteRestored:
 		concreteEvent = &NoteRestoredEvent{}
-
 	case TypeNotePermanentlyDeleted:
 		concreteEvent = &NotePermanentlyDeletedEvent{}
-
 	case TypeWorkspaceUpdated:
 		concreteEvent = &WorkspaceUpdatedEvent{}
-
 	case TypeWorkspaceDeleted:
 		concreteEvent = &WorkspaceDeletedEvent{}
 	}
@@ -93,6 +77,7 @@ func NewFromEventType(eventType string) (Event, bool) {
 type FolderCreatedEvent struct {
 	Id   uuid.UUID
 	Name string
+	Icon *string
 }
 
 var _ Event = (*FolderCreatedEvent)(nil)
@@ -111,7 +96,13 @@ func (e FolderDeletedEvent) EventType() EventType {
 	return TypeFolderDeleted
 }
 
-type FolderUpdatedEvent Folder
+type FolderUpdatedEvent struct {
+	ID          uuid.UUID
+	Name        string
+	Icon        *string
+	WorkspaceID uuid.UUID
+	ParentID    *uuid.UUID
+}
 
 var _ Event = (*FolderUpdatedEvent)(nil)
 
@@ -182,7 +173,15 @@ func (e NoteDeletedEvent) EventType() EventType {
 	return TypeNoteDeleted
 }
 
-type NoteUpdatedEvent Note
+type NoteUpdatedEvent struct {
+	ID            uuid.UUID
+	Name          string
+	Icon          *string
+	Tags          []string
+	Size          uint
+	FolderID      uuid.UUID
+	OutgoingLinks uuid.UUIDs
+}
 
 var _ Event = (*NoteUpdatedEvent)(nil)
 
@@ -234,6 +233,7 @@ func (e NotePermanentlyDeletedEvent) EventType() EventType {
 type WorkspaceUpdatedEvent struct {
 	Id   uuid.UUID
 	Name string
+	Slug string
 }
 
 var _ Event = (*WorkspaceUpdatedEvent)(nil)

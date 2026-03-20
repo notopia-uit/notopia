@@ -8,6 +8,7 @@ properties:
     example: FolderDeletedEvent
   data:
     type: object
+    x-go-type-name: FolderDeletedEventData
     properties:
       id:
         $ref: ../schemas/Folder.yaml#/properties/id

@@ -4,10 +4,26 @@ properties:
   type:
     type: string
     enum:
-      - FolderInfoUpdatedEvent
-    example: FolderInfoUpdatedEvent
+      - FolderUpdatedEvent
+    example: FolderUpdatedEvent
   data:
-    $ref: ./Folder.yaml
+    type: object
+    x-go-type-name: FolderUpdatedEventData
+    properties:
+      id:
+        $ref: ./Folder.yaml#/properties/id
+      name:
+        $ref: ./Folder.yaml#/properties/name
+      icon:
+        $ref: ./Folder.yaml#/properties/icon
+      workspaceId:
+        $ref: ./Workspace.yaml#/properties/id
+      parentId:
+        $ref: ./Folder.yaml#/properties/parentId
+    required:
+      - id
+      - name
+      - workspaceId
 required:
   - type
   - data

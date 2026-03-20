@@ -4,14 +4,14 @@ properties:
   type:
     type: string
     enum:
-      - NoteDeletedEvent
-    example: NoteDeletedEvent
+      - WorkspaceDeletedEvent
+    example: WorkspaceDeletedEvent
   data:
     type: object
-    x-go-type-name: NoteDeletedEventData
+    x-go-type-name: WorkspaceDeletedEventData
     properties:
       id:
-        $ref: ./Note.yaml#/properties/id
+        $ref: ./Workspace.yaml#/properties/id
     required:
       - id
 required:

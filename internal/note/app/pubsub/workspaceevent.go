@@ -12,14 +12,14 @@ type WorkspaceEvent interface {
 		ctx context.Context,
 		workspaceID uuid.UUID,
 		userID string,
-		events ...domain.WorkspaceEvent,
+		events ...domain.Event,
 	) error
 
 	Subscribe(
 		ctx context.Context,
 		workspaceID uuid.UUID,
 		userID string,
-	) (<-chan domain.WorkspaceEvent, error)
+	) (<-chan domain.Event, error)
 
 	Run(ctx context.Context) error
 

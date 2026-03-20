@@ -219,9 +219,46 @@ export type NoteFolderDeletedEvent = {
     };
 };
 
+export type NotePropertiesIcon = string | null;
+
 export type NoteFolderUpdatedEvent = {
-    type: 'FolderInfoUpdatedEvent';
-    data: NoteFolder;
+    type: 'FolderUpdatedEvent';
+    data: {
+        id: NoteId;
+        name: NoteName;
+        icon?: NotePropertiesIcon;
+        workspaceId: NotePropertiesId;
+        parentId?: NoteId;
+    };
+};
+
+export type NoteFolderMovedEvent = {
+    type: 'FolderMovedEvent';
+    data: {
+        id: NoteId;
+        parentId: NoteId;
+    };
+};
+
+export type NoteFolderTrashedEvent = {
+    type: 'FolderTrashedEvent';
+    data: {
+        id: NoteId;
+    };
+};
+
+export type NoteFolderRestoredEvent = {
+    type: 'FolderRestoredEvent';
+    data: {
+        id: NoteId;
+    };
+};
+
+export type NoteFolderPermanentlyDeletedEvent = {
+    type: 'FolderPermanentlyDeletedEvent';
+    data: {
+        id: NoteId;
+    };
 };
 
 export type NoteNoteCreatedEvent = {
@@ -229,6 +266,7 @@ export type NoteNoteCreatedEvent = {
     data: {
         id: NoteNotePropertiesId;
         name: NotePropertiesName;
+        icon?: NoteIcon;
     };
 };
 
@@ -242,6 +280,35 @@ export type NoteNoteDeletedEvent = {
 export type NoteNoteUpdatedEvent = {
     type: 'NoteUpdatedEvent';
     data: NoteNote;
+};
+
+export type NoteNoteMovedEvent = {
+    type: 'NoteMovedEvent';
+    data: {
+        id: NoteNotePropertiesId;
+        folderId: NoteId;
+    };
+};
+
+export type NoteNoteTrashedEvent = {
+    type: 'NoteTrashedEvent';
+    data: {
+        id: NoteNotePropertiesId;
+    };
+};
+
+export type NoteNoteRestoredEvent = {
+    type: 'NoteRestoredEvent';
+    data: {
+        id: NoteNotePropertiesId;
+    };
+};
+
+export type NoteNotePermanentlyDeletedEvent = {
+    type: 'NotePermanentlyDeletedEvent';
+    data: {
+        id: NoteNotePropertiesId;
+    };
 };
 
 /**
@@ -281,6 +348,13 @@ export type NoteWorkspaceUpdatedEvent = {
     data: NoteWorkspace;
 };
 
+export type NoteWorkspaceDeletedEvent = {
+    type: 'WorkspaceDeletedEvent';
+    data: {
+        id: NotePropertiesId;
+    };
+};
+
 export type NoteWorkspacePropertiesName = string;
 
 export const NoteTrashedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
@@ -300,8 +374,6 @@ export type NoteTrashedFolder = {
     trashedBy: NoteTrashedBy;
     readonly trashedAt: string;
 };
-
-export type NotePropertiesIcon = string | null;
 
 export type NoteUpdatedAt = string;
 
@@ -383,14 +455,34 @@ export type NoteFolderDeletedEventWritable = {
 };
 
 export type NoteFolderUpdatedEventWritable = {
-    type: 'FolderInfoUpdatedEvent';
-    data: NoteFolderWritable;
+    type: 'FolderUpdatedEvent';
+    data: {
+        name: NoteName;
+        icon?: NotePropertiesIcon;
+    };
+};
+
+export type NoteFolderMovedEventWritable = {
+    type: 'FolderMovedEvent';
+};
+
+export type NoteFolderTrashedEventWritable = {
+    type: 'FolderTrashedEvent';
+};
+
+export type NoteFolderRestoredEventWritable = {
+    type: 'FolderRestoredEvent';
+};
+
+export type NoteFolderPermanentlyDeletedEventWritable = {
+    type: 'FolderPermanentlyDeletedEvent';
 };
 
 export type NoteNoteCreatedEventWritable = {
     type: 'NoteCreatedEvent';
     data: {
         name: NotePropertiesName;
+        icon?: NoteIcon;
     };
 };
 
@@ -403,6 +495,22 @@ export type NoteNoteUpdatedEventWritable = {
     data: NoteNoteWritable;
 };
 
+export type NoteNoteMovedEventWritable = {
+    type: 'NoteMovedEvent';
+};
+
+export type NoteNoteTrashedEventWritable = {
+    type: 'NoteTrashedEvent';
+};
+
+export type NoteNoteRestoredEventWritable = {
+    type: 'NoteRestoredEvent';
+};
+
+export type NoteNotePermanentlyDeletedEventWritable = {
+    type: 'NotePermanentlyDeletedEvent';
+};
+
 export type NoteWorkspaceMemebersUpdatedEventWritable = {
     type: 'WorkspaceMembersUpdatedEvent';
     data: {
@@ -413,6 +521,10 @@ export type NoteWorkspaceMemebersUpdatedEventWritable = {
 export type NoteWorkspaceUpdatedEventWritable = {
     type: 'WorkspaceUpdatedEvent';
     data: NoteWorkspaceWritable;
+};
+
+export type NoteWorkspaceDeletedEventWritable = {
+    type: 'WorkspaceDeletedEvent';
 };
 
 export type NoteTrashedNoteWritable = {
@@ -1396,16 +1508,34 @@ export type GetWorkspaceEventsResponses = {
     } & NoteFolderDeletedEvent) | ({
         type: 'FolderUpdatedEvent';
     } & NoteFolderUpdatedEvent) | ({
+        type: 'FolderMovedEvent';
+    } & NoteFolderMovedEvent) | ({
+        type: 'FolderTrashedEvent';
+    } & NoteFolderTrashedEvent) | ({
+        type: 'FolderRestoredEvent';
+    } & NoteFolderRestoredEvent) | ({
+        type: 'FolderPermanentlyDeletedEvent';
+    } & NoteFolderPermanentlyDeletedEvent) | ({
         type: 'NoteCreatedEvent';
     } & NoteNoteCreatedEvent) | ({
         type: 'NoteDeletedEvent';
     } & NoteNoteDeletedEvent) | ({
         type: 'NoteUpdatedEvent';
     } & NoteNoteUpdatedEvent) | ({
+        type: 'NoteMovedEvent';
+    } & NoteNoteMovedEvent) | ({
+        type: 'NoteTrashedEvent';
+    } & NoteNoteTrashedEvent) | ({
+        type: 'NoteRestoredEvent';
+    } & NoteNoteRestoredEvent) | ({
+        type: 'NotePermanentlyDeletedEvent';
+    } & NoteNotePermanentlyDeletedEvent) | ({
         type: 'WorkspaceMemebersUpdatedEvent';
     } & NoteWorkspaceMemebersUpdatedEvent) | ({
         type: 'WorkspaceUpdatedEvent';
-    } & NoteWorkspaceUpdatedEvent);
+    } & NoteWorkspaceUpdatedEvent) | ({
+        type: 'WorkspaceDeletedEvent';
+    } & NoteWorkspaceDeletedEvent);
 };
 
 export type GetWorkspaceEventsResponse = GetWorkspaceEventsResponses[keyof GetWorkspaceEventsResponses];

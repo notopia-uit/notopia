@@ -9,7 +9,10 @@ properties:
     example: WorkspaceUpdatedEvent
 
   data:
-    $ref: ./Workspace.yaml
+    type: object
+    x-go-type-name: WorkspaceUpdatedEventData
+    allOf:
+      - $ref: ./Workspace.yaml
 
 required:
   - type

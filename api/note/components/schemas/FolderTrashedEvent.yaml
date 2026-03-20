@@ -4,14 +4,14 @@ properties:
   type:
     type: string
     enum:
-      - NoteDeletedEvent
-    example: NoteDeletedEvent
+      - FolderTrashedEvent
+    example: FolderTrashedEvent
   data:
     type: object
-    x-go-type-name: NoteDeletedEventData
+    x-go-type-name: FolderTrashedEventData
     properties:
       id:
-        $ref: ./Note.yaml#/properties/id
+        $ref: ./Folder.yaml#/properties/id
     required:
       - id
 required:

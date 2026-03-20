@@ -6,15 +6,13 @@ import (
 	note "github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-func workspaceEventToDTO(event domain.WorkspaceEvent) (any, bool) {
+func workspaceEventToDTO(event domain.Event) (any, bool) {
 	var dto any
 	switch e := event.(type) {
 	case *domain.FolderCreatedEvent:
 		dto = &note.FolderCreatedEvent{
-			Data: struct {
-				Id   *note.Id  `json:"id,omitempty"`
-				Name note.Name `json:"name"`
-			}{
+			Data: note.FolderCreatedEventData{
+				Icon: e.Icon,
 				Id:   &e.Id,
 				Name: e.Name,
 			},
@@ -22,68 +20,122 @@ func workspaceEventToDTO(event domain.WorkspaceEvent) (any, bool) {
 		}
 	case *domain.FolderDeletedEvent:
 		dto = &note.FolderDeletedEvent{
-			Data: struct {
-				Id *note.Id `json:"id,omitempty"`
-			}{
+			Data: note.FolderDeletedEventData{
 				Id: &e.Id,
 			},
 			Type: note.FolderDeletedEventTypeFolderDeletedEvent,
 		}
 	case *domain.FolderUpdatedEvent:
-		folder := (*domain.Folder)(e)
-		id := folder.ID()
-		workspaceID := folder.WorkspaceID()
 		dto = &note.FolderUpdatedEvent{
-			Data: note.Folder{
-				Id:          &id,
-				Name:        folder.Name(),
-				Icon:        folder.Icon(),
-				ParentId:    folder.ParentID(),
-				WorkspaceId: &workspaceID,
+			Data: note.FolderUpdatedEventData{
+				Id:          &e.ID,
+				Name:        e.Name,
+				Icon:        e.Icon,
+				WorkspaceId: &e.WorkspaceID,
+				ParentId:    e.ParentID,
 			},
-			Type: note.FolderInfoUpdatedEvent,
+			Type: note.FolderUpdatedEventTypeFolderUpdatedEvent,
+		}
+	case *domain.FolderMovedEvent:
+		dto = &note.FolderMovedEvent{
+			Data: note.FolderMovedEventData{
+				Id:       &e.Id,
+				ParentId: &e.ParentId,
+			},
+			Type: note.FolderMovedEventTypeFolderMovedEvent,
+		}
+	case *domain.FolderTrashedEvent:
+		dto = &note.FolderTrashedEvent{
+			Data: note.FolderTrashedEventData{
+				Id: &e.Id,
+			},
+			Type: note.FolderTrashedEventTypeFolderTrashedEvent,
+		}
+	case *domain.FolderRestoredEvent:
+		dto = &note.FolderRestoredEvent{
+			Data: note.FolderRestoredEventData{
+				Id: &e.Id,
+			},
+			Type: note.FolderRestoredEventTypeFolderRestoredEvent,
+		}
+	case *domain.FolderPermanentlyDeletedEvent:
+		dto = &note.FolderPermanentlyDeletedEvent{
+			Data: note.FolderPermanentlyDeletedEventData{
+				Id: &e.Id,
+			},
+			Type: note.FolderPermanentlyDeletedEventTypeFolderPermanentlyDeletedEvent,
 		}
 	case *domain.NoteCreatedEvent:
 		dto = &note.NoteCreatedEvent{
-			Data: struct {
-				Id   *note.NotePropertiesId `json:"id,omitempty"`
-				Name note.PropertiesName    `json:"name"`
-			}{
+			Data: note.NoteCreatedEventData{
 				Id:   &e.Id,
 				Name: e.Name,
+				Icon: e.Icon,
 			},
 			Type: note.NoteCreatedEventTypeNoteCreatedEvent,
 		}
 	case *domain.NoteDeletedEvent:
 		dto = &note.NoteDeletedEvent{
-			Data: struct {
-				Id *note.NotePropertiesId `json:"id,omitempty"`
-			}{
+			Data: note.NoteDeletedEventData{
 				Id: &e.Id,
 			},
 			Type: note.NoteDeletedEventTypeNoteDeletedEvent,
 		}
 	case *domain.NoteUpdatedEvent:
-		n := (*domain.Note)(e)
 		dto = &note.NoteUpdatedEvent{
 			Data: note.Note{
-				Id:       new(n.ID()),
-				Name:     n.Name(),
-				Icon:     n.Icon(),
-				Tags:     n.Tags(),
-				FolderId: new(n.FolderID()),
+				Id:       &e.ID,
+				Name:     e.Name,
+				Icon:     e.Icon,
+				Tags:     e.Tags,
+				FolderId: &e.FolderID,
 			},
 			Type: note.NoteUpdatedEventTypeNoteUpdatedEvent,
 		}
+	case *domain.NoteMovedEvent:
+		dto = &note.NoteMovedEvent{
+			Data: note.NoteMovedEventData{
+				Id:       &e.Id,
+				FolderId: &e.FolderId,
+			},
+			Type: note.NoteMovedEventTypeNoteMovedEvent,
+		}
+	case *domain.NoteTrashedEvent:
+		dto = &note.NoteTrashedEvent{
+			Data: note.NoteTrashedEventData{
+				Id: &e.Id,
+			},
+			Type: note.NoteTrashedEventTypeNoteTrashedEvent,
+		}
+	case *domain.NoteRestoredEvent:
+		dto = &note.NoteRestoredEvent{
+			Data: note.NoteRestoredEventData{
+				Id: &e.Id,
+			},
+			Type: note.NoteRestoredEventTypeNoteRestoredEvent,
+		}
+	case *domain.NotePermanentlyDeletedEvent:
+		dto = &note.NotePermanentlyDeletedEvent{
+			Data: note.NotePermanentlyDeletedEventData{
+				Id: &e.Id,
+			},
+			Type: note.NotePermanentlyDeletedEventTypeNotePermanentlyDeletedEvent,
+		}
 	case *domain.WorkspaceUpdatedEvent:
-		w := (*domain.Workspace)(e)
 		dto = &note.WorkspaceUpdatedEvent{
 			Data: note.Workspace{
-				Id:   new(w.ID()),
-				Name: w.Name(),
-				Slug: w.Slug(),
+				Id:   &e.Id,
+				Name: e.Name,
+				Slug: e.Slug,
 			},
 			Type: note.WorkspaceUpdatedEventTypeWorkspaceUpdatedEvent,
+		}
+	case *domain.WorkspaceDeletedEvent:
+		dto = &note.WorkspaceDeletedEvent{
+			Data: note.WorkspaceDeletedEventData{
+				Id: &e.Id,
+			},
+			Type: note.WorkspaceDeletedEventTypeWorkspaceDeletedEvent,
 		}
 	}
 	return dto, dto != nil
