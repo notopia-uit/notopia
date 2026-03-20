@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/notopia-uit/notopia/api"
 	"github.com/oapi-codegen/gin-middleware"
@@ -103,7 +104,9 @@ func New(
 		},
 	}
 	cleanup := func() {
-		if err := server.Shutdown(ctx); err != nil {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := server.Shutdown(shutdownCtx); err != nil {
 			logger.ErrorContext(ctx, "failed to shutdown http server", slog.String("error", err.Error()))
 		}
 	}

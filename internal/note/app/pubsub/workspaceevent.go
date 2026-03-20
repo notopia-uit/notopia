@@ -14,6 +14,7 @@ type WorkspaceEvent interface {
 		userID string,
 		events ...domain.WorkspaceEvent,
 	) error
+
 	Subscribe(
 		ctx context.Context,
 		workspaceID uuid.UUID,

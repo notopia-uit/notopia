@@ -8,7 +8,7 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/share"
 )
 
-type DocumentCommitted = share.DocumentCommittedEvent
+type DocumentCommitted share.DocumentCommittedEvent
 
 type DocumentCommittedHandler struct {
 	noterepo    domain.NoteRepo
@@ -30,7 +30,7 @@ func (h *DocumentCommittedHandler) Handle(ctx context.Context, event *DocumentCo
 	if err != nil {
 		return err
 	}
-	err = h.noteService.UpdateNoteSizeBasedOnDocumentContent(note, event.Content)
+	err = h.noteService.UpdateNoteSizeBasedOnContent(note, event.Content)
 	if err != nil {
 		return err
 	}

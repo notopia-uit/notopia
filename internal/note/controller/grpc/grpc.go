@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
@@ -76,7 +77,9 @@ func New(
 		},
 	}
 	cleanup := func() {
-		if err := server.Shutdown(ctx); err != nil {
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := server.Shutdown(shutdownCtx); err != nil {
 			logger.ErrorContext(ctx, "failed to shutdown grpc server", slog.String("error", err.Error()))
 		}
 	}

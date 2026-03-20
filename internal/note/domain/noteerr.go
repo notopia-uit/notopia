@@ -20,7 +20,7 @@ func NewErrNoteNotFound(id uuid.UUID, err error) *commonerror.Err {
 	)
 }
 
-func NewErrNoteFailToMarshalDocumentContent(id uuid.UUID, err error) *commonerror.Err {
+func NewErrNoteFailToMarshalContent(id uuid.UUID, err error) *commonerror.Err {
 	return commonerror.NewInvalid(
 		fmt.Sprintf("Failed to marshal document content for note %q", id.String()),
 		ErrCodeNoteFailToMarshalDocumentContent,

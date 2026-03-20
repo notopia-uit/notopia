@@ -2,8 +2,6 @@ package domain
 
 import "time"
 
-type Event any
-
 type TrashedBy string
 
 var (
