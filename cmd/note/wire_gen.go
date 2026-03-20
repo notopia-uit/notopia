@@ -8,7 +8,6 @@ package main
 
 import (
 	"context"
-
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
@@ -130,7 +129,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler()
 	readModel := pg.NewReadModel(queries)
-	checkWorkspaceExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(readModel)
+	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(readModel)
 	getNoteGraphHandler := app.NewGetNoteGraphHandler(readModel)
 	getNoteLinksHandler := app.NewGetNoteLinksHandler(readModel)
 	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(readModel)
@@ -140,7 +139,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	showTrashHandler := app.NewShowTrashHandler(readModel)
 	noteService := domain.NewNoteService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgNote, noteService)
-	appApp := app.NewApp(createNoteHandler, createFolderHandler, createWorkspaceHandler, deleteNoteHandler, deleteFolderHandler, deleteWorkspaceHandler, generateDailyNoteHandler, moveWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler, checkWorkspaceExistsHandler, getNoteGraphHandler, getNoteLinksHandler, getWorkspaceHandler, getWorkspaceGraphHandler, getWorkspaceMembersHandler, getWorkspaceTreeHandler, showTrashHandler, documentCommittedHandler, workspaceEvent, persistencePg)
+	appApp := app.NewApp(createNoteHandler, createFolderHandler, createWorkspaceHandler, deleteNoteHandler, deleteFolderHandler, deleteWorkspaceHandler, generateDailyNoteHandler, moveWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler, checkWorkspaceSlugExistsHandler, getNoteGraphHandler, getNoteLinksHandler, getWorkspaceHandler, getWorkspaceGraphHandler, getWorkspaceMembersHandler, getWorkspaceTreeHandler, showTrashHandler, documentCommittedHandler, workspaceEvent, persistencePg)
 	strictHandler := &http.StrictHandler{
 		App:                  appApp,
 		WorkspaceEventPubSub: workspaceEvent,
