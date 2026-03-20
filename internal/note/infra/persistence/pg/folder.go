@@ -162,7 +162,7 @@ func (f *Folder) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) err
 func (f *Folder) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
 	workspaceID, err := f.queries.GetWorkspaceIDByFolderID(ctx, id)
 	if err != nil {
-		return uuid.UUID{}, toDomainError(err)
+		return uuid.Nil, toDomainError(err)
 	}
 	return workspaceID, nil
 }

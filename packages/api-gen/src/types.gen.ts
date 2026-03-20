@@ -227,9 +227,7 @@ export type NoteFolderUpdatedEvent = {
     data: {
         id: NoteId;
         name: NoteName;
-        icon?: NotePropertiesIcon;
-        workspaceId: NotePropertiesId;
-        parentId?: NoteId;
+        icon: NotePropertiesIcon;
     };
 };
 
@@ -460,7 +458,7 @@ export type NoteFolderUpdatedEventWritable = {
     type: 'FolderUpdatedEvent';
     data: {
         name: NoteName;
-        icon?: NotePropertiesIcon;
+        icon: NotePropertiesIcon;
     };
 };
 
@@ -917,6 +915,49 @@ export type CreateFolderResponses = {
      */
     201: unknown;
 };
+
+export type DeleteFolderData = {
+    body?: never;
+    path: {
+        folderId: NoteId;
+    };
+    query?: never;
+    url: '/note/folders/{folderId}';
+};
+
+export type DeleteFolderErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * Unauthorized Error response
+     */
+    401: NoteError;
+    /**
+     * Forbidden Error response
+     */
+    403: NoteError;
+    /**
+     * Not Found Error response
+     */
+    404: NoteError;
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type DeleteFolderError = DeleteFolderErrors[keyof DeleteFolderErrors];
+
+export type DeleteFolderResponses = {
+    /**
+     * Folder successfully deleted
+     */
+    204: void;
+};
+
+export type DeleteFolderResponse = DeleteFolderResponses[keyof DeleteFolderResponses];
 
 export type RenameFolderData = {
     body: {

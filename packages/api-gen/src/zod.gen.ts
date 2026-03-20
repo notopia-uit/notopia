@@ -171,9 +171,7 @@ export const zNoteFolderUpdatedEvent = z.object({
     data: z.object({
         id: zNoteId,
         name: zNoteName,
-        icon: zNotePropertiesIcon.optional(),
-        workspaceId: zNotePropertiesId,
-        parentId: zNoteId.optional()
+        icon: zNotePropertiesIcon
     })
 });
 
@@ -398,7 +396,7 @@ export const zNoteFolderUpdatedEventWritable = z.object({
     type: z.enum(['FolderUpdatedEvent']),
     data: z.object({
         name: zNoteName,
-        icon: zNotePropertiesIcon.optional()
+        icon: zNotePropertiesIcon
     })
 });
 
@@ -623,6 +621,19 @@ export const zCreateFolderData = z.object({
     path: z.never().optional(),
     query: z.never().optional()
 });
+
+export const zDeleteFolderData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        folderId: zNoteId
+    }),
+    query: z.never().optional()
+});
+
+/**
+ * Folder successfully deleted
+ */
+export const zDeleteFolderResponse = z.void();
 
 export const zRenameFolderData = z.object({
     body: z.object({

@@ -177,7 +177,7 @@ func (n *Note) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
 func (n *Note) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
 	workspaceID, err := n.queries.GetWorkspaceIDByNoteID(ctx, id)
 	if err != nil {
-		return uuid.UUID{}, toDomainError(err)
+		return uuid.Nil, toDomainError(err)
 	}
 	return workspaceID, nil
 }
