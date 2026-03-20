@@ -51,8 +51,14 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		if err := h.folderrepo.Save(ctx, folder); err != nil {
 			return err
 		}
+		// WARN: Incomplete cascade logic - only trashes direct items, not children.
 		// TODO: Cascade trash child notes and folders with TrashedByParent.
 		// Requires NoteRepo/FolderRepo methods to list items by parentFolderID.
+		// Steps:
+		// 1. Add FolderRepo.GetByParentID(ctx, parentFolderID) -> []Folder
+		// 2. Add NoteRepo.GetByFolderID(ctx, folderID) -> []Note (may exist)
+		// 3. Recursively trash all children with TrashedByParent, not TrashedByPurpose
+		// 4. Preserve original TrashedAt timestamp in parent for restore ordering
 	}
 
 	return nil

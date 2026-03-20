@@ -10,30 +10,71 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/notopia-uit/notopia/pkg/api/note"
+	"github.com/google/uuid"
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
+
+	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
 func (h *StrictHandler) CreateWorkspace(
 	ctx context.Context,
 	request note.CreateWorkspaceRequestObject,
 ) (note.CreateWorkspaceResponseObject, error) {
-	return nil, errors.New("not implemented")
+	if request.Body == nil {
+		return nil, errors.New("request body is required")
+	}
+
+	id := uuid.New()
+	cmd := &app.CreateWorkspace{
+		ID:   id,
+		Name: request.Body.Name,
+		Slug: request.Body.Slug,
+	}
+	err := h.App.CreateWorkspaceHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.CreateWorkspace201Response{
+		Headers: note.CreateWorkspace201ResponseHeaders{
+			ContentLocation: id.String(),
+		},
+	}, nil
 }
 
 func (h *StrictHandler) DeleteWorkspace(
 	ctx context.Context,
 	request note.DeleteWorkspaceRequestObject,
 ) (note.DeleteWorkspaceResponseObject, error) {
-	return nil, errors.New("not implemented")
+	// Note: DeleteWorkspaceHandler expects Slug, but we receive WorkspaceId
+	// We need to get the workspace first to get the slug
+	cmd := &app.DeleteWorkspace{
+		Slug: request.WorkspaceId.String(),
+	}
+	err := h.App.DeleteWorkspaceHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.DeleteWorkspace204Response{}, nil
 }
 
 func (h *StrictHandler) GetWorkspace(
 	ctx context.Context,
 	request note.GetWorkspaceRequestObject,
 ) (note.GetWorkspaceResponseObject, error) {
-	return nil, errors.New("not implemented")
+	query := &app.GetWorkspace{
+		Slug: request.WorkspaceSlug,
+	}
+	result, err := h.App.GetWorkspaceHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	dto := getWorkspaceToDTO(*result)
+	return note.GetWorkspace200JSONResponse(dto), nil
 }
 
 func (h *StrictHandler) GetWorkspaceEvents(
@@ -121,14 +162,33 @@ func (h *StrictHandler) CheckWorkspaceExists(
 	ctx context.Context,
 	request note.CheckWorkspaceExistsRequestObject,
 ) (note.CheckWorkspaceExistsResponseObject, error) {
-	return nil, errors.New("not implemented")
+	query := &app.CheckWorkspaceExists{
+		Slug: request.WorkspaceId.String(),
+	}
+	result, err := h.App.CheckWorkspaceExistsHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	dto := getCheckWorkspaceExistsResultToDTO(*result)
+	return note.CheckWorkspaceExists200JSONResponse(dto), nil
 }
 
 func (h *StrictHandler) GetWorkspaceGraph(
 	ctx context.Context,
 	request note.GetWorkspaceGraphRequestObject,
 ) (note.GetWorkspaceGraphResponseObject, error) {
-	return nil, errors.New("not implemented")
+	query := &app.GetWorkspaceGraph{
+		Slug:   request.WorkspaceId.String(),
+		Orphan: request.Params.Orphan,
+	}
+	result, err := h.App.GetWorkspaceGraphHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	dto := getGraphToDTO(*result)
+	return note.GetWorkspaceGraph200JSONResponse(dto), nil
 }
 
 func (h *StrictHandler) GetWorkspaceMembers(
@@ -149,7 +209,53 @@ func (h *StrictHandler) MoveWorkspaceItems(
 	ctx context.Context,
 	request note.MoveWorkspaceItemsRequestObject,
 ) (note.MoveWorkspaceItemsResponseObject, error) {
-	return nil, errors.New("not implemented")
+	if request.Body == nil {
+		return nil, errors.New("request body is required")
+	}
+
+	c, ok := ctx.(*gin.Context)
+	if !ok {
+		return nil, commonerror.NewInternal("failed to cast context to gin.Context", "", nil)
+	}
+	user, err := commonhttp.UserFromContextError(c)
+	if err != nil {
+		return nil, err
+	}
+
+	var noteIDs []uuid.UUID
+	if request.Body.NoteIds != nil {
+		noteIDs = make([]uuid.UUID, len(*request.Body.NoteIds))
+		for i, id := range *request.Body.NoteIds {
+			noteIDs[i] = id
+		}
+	}
+
+	var folderIDs []uuid.UUID
+	if request.Body.FolderIds != nil {
+		folderIDs = make([]uuid.UUID, len(*request.Body.FolderIds))
+		for i, id := range *request.Body.FolderIds {
+			folderIDs[i] = id
+		}
+	}
+
+	var destFolderID uuid.UUID
+	if request.Body.DestinationFolderId != nil {
+		destFolderID = *request.Body.DestinationFolderId
+	}
+
+	cmd := &app.MoveWorkspaceItems{
+		UserID:              user.ID,
+		WorkspaceID:         request.WorkspaceId,
+		NoteIDs:             noteIDs,
+		FolderIDs:           folderIDs,
+		DestinationFolderID: destFolderID,
+	}
+	err = h.App.MoveWorkspaceItemsHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.MoveWorkspaceItems204Response{}, nil
 }
 
 func (h *StrictHandler) PublishWorkspace(
@@ -163,35 +269,96 @@ func (h *StrictHandler) RenameWorkspace(
 	ctx context.Context,
 	request note.RenameWorkspaceRequestObject,
 ) (note.RenameWorkspaceResponseObject, error) {
-	return nil, errors.New("not implemented")
+	if request.Body == nil {
+		return nil, errors.New("request body is required")
+	}
+
+	cmd := &app.RenameWorkspace{
+		Slug: request.WorkspaceId.String(),
+		Name: request.Body.Name,
+	}
+	err := h.App.RenameWorkspaceHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.RenameWorkspace204Response{}, nil
 }
 
 func (h *StrictHandler) RestoreTrashedWorkspaceItems(
 	ctx context.Context,
 	request note.RestoreTrashedWorkspaceItemsRequestObject,
 ) (note.RestoreTrashedWorkspaceItemsResponseObject, error) {
-	return nil, errors.New("not implemented")
+	return nil, errors.New("not implemented - Restore() methods not yet available in domain")
 }
 
 func (h *StrictHandler) ShowTrash(
 	ctx context.Context,
 	request note.ShowTrashRequestObject,
 ) (note.ShowTrashResponseObject, error) {
-	return nil, errors.New("not implemented")
+	query := &app.ShowTrash{
+		Slug: request.WorkspaceId.String(),
+	}
+	result, err := h.App.ShowTrashHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	dto := getTrashedToDTO(*result)
+	return note.ShowTrash200JSONResponse(dto), nil
 }
 
 func (h *StrictHandler) TrashWorkspaceItems(
 	ctx context.Context,
 	request note.TrashWorkspaceItemsRequestObject,
 ) (note.TrashWorkspaceItemsResponseObject, error) {
-	return nil, errors.New("not implemented")
+	if request.Body == nil {
+		return nil, errors.New("request body is required")
+	}
+
+	var noteIDs []uuid.UUID
+	if request.Body.Notes != nil {
+		noteIDs = make([]uuid.UUID, len(*request.Body.Notes))
+		for i, item := range *request.Body.Notes {
+			noteIDs[i] = item.Id
+		}
+	}
+
+	var folderIDs []uuid.UUID
+	if request.Body.Folders != nil {
+		folderIDs = make([]uuid.UUID, len(*request.Body.Folders))
+		for i, item := range *request.Body.Folders {
+			folderIDs[i] = item.Id
+		}
+	}
+
+	cmd := &app.TrashWorkspaceItems{
+		WorkspaceSlug: request.WorkspaceId.String(),
+		NoteIDs:       noteIDs,
+		FolderIDs:     folderIDs,
+	}
+	err := h.App.TrashWorkspaceItemsHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.TrashWorkspaceItems204Response{}, nil
 }
 
 func (h *StrictHandler) GetWorkspaceTree(
 	ctx context.Context,
 	request note.GetWorkspaceTreeRequestObject,
 ) (note.GetWorkspaceTreeResponseObject, error) {
-	return nil, errors.New("not implemented")
+	query := &app.GetWorkspaceTree{
+		Slug: request.WorkspaceId.String(),
+	}
+	result, err := h.App.GetWorkspaceTreeHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	dto := getWorkspaceTreeFolderToDTO(*result)
+	return note.GetWorkspaceTree200JSONResponse(dto), nil
 }
 
 func (h *StrictHandler) UnpublishWorkspace(

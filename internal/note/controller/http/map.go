@@ -260,32 +260,25 @@ func getNoteLinkToDTO(n app.NoteLink) note.NoteLink {
 }
 
 func getGraphToDTO(g app.Graph) note.Graph {
-	dto := note.Graph{
-		Nodes: make([]struct {
-			Id     string              `json:"id"`
-			Name   string              `json:"name"`
-			Type   note.GraphNodesType `json:"type"`
-			Weight *float32            `json:"weight,omitempty"`
-		}, len(g.Nodes)),
-		Links: make([]struct {
-			Source string `json:"source"`
-			Target string `json:"target"`
-		}, len(g.Links)),
-	}
+	nodes := make([]note.GraphNode, len(g.Nodes))
 	for i, n := range g.Nodes {
-		dto.Nodes[i].Id = n.Id
-		dto.Nodes[i].Name = n.Name
-		dto.Nodes[i].Type = note.GraphNodesType(n.Type)
+		nodes[i].Id = n.Id
+		nodes[i].Name = n.Name
+		nodes[i].Type = note.GraphNodesType(n.Type)
 		if n.Weight != nil {
 			w := float32(*n.Weight)
-			dto.Nodes[i].Weight = &w
+			nodes[i].Weight = &w
 		}
 	}
+	links := make([]note.GraphLink, len(g.Links))
 	for i, l := range g.Links {
-		dto.Links[i].Source = l.Source
-		dto.Links[i].Target = l.Target
+		links[i].Source = l.Source
+		links[i].Target = l.Target
 	}
-	return dto
+	return note.Graph{
+		Nodes: nodes,
+		Links: links,
+	}
 }
 
 func getWorkspaceMembersUpdatedEventToDTO(e app.WorkspaceMembersUpdatedEvent) note.WorkspaceMemebersUpdatedEvent {
@@ -303,5 +296,41 @@ func getWorkspaceMembersUpdatedEventToDTO(e app.WorkspaceMembersUpdatedEvent) no
 			Members: &members,
 		},
 		Type: note.WorkspaceMembersUpdatedEvent,
+	}
+}
+
+func getTrashedToDTO(t app.Trash) note.ShowTrash200JSONResponse {
+	notes := make([]note.TrashedNote, len(t.Notes))
+	for i, n := range t.Notes {
+		notes[i] = getTrashedNoteToDTO(n)
+	}
+	folders := make([]note.TrashedFolder, len(t.Folders))
+	for i, f := range t.Folders {
+		folders[i] = getTrashedFolderToDTO(f)
+	}
+	return note.ShowTrash200JSONResponse{
+		Notes:   notes,
+		Folders: folders,
+	}
+}
+
+func getCheckWorkspaceExistsResultToDTO(r app.CheckWorkspaceExistsResult) note.CheckWorkspaceExists200JSONResponse {
+	return note.CheckWorkspaceExists200JSONResponse{
+		Exists: &r.Exists,
+	}
+}
+
+func getNoteLinkResultToDTO(r app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
+	outgoing := make([]note.NoteLink, len(r.OutgoingLinks))
+	for i, l := range r.OutgoingLinks {
+		outgoing[i] = getNoteLinkToDTO(l)
+	}
+	backlinks := make([]note.NoteLink, len(r.Backlinks))
+	for i, l := range r.Backlinks {
+		backlinks[i] = getNoteLinkToDTO(l)
+	}
+	return note.GetNoteLinks200JSONResponse{
+		OutgoingLinks: &outgoing,
+		Backlinks:     &backlinks,
 	}
 }

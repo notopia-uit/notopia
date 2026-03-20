@@ -481,6 +481,17 @@ func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGr
 }
 
 func (r *ReadModel) GetWorkspaceMembers(ctx context.Context, q *app.GetWorkspaceMembers) (*[]app.WorkspaceMember, error) {
+	// WARN: Stub implementation returns nil, nil without implementing any logic.
+	// TODO: Implement workspace member list query:
+	// 1. Query workspace ID from slug: queries.GetWorkspaceIDBySlug(ctx, q.Slug)
+	// 2. Query members: queries.GetWorkspaceMembers(ctx, workspaceID)
+	//    Note: This SQL query may not exist yet - may need to create it or fetch from domain
+	// 3. Map to app.WorkspaceMember{Id, Username, Role}
+	// 4. Return pointer to slice
+	// Consider:
+	//   - Adding pagination support if needed
+	//   - Caching results if called frequently
+	//   - Handling permission checks (only return members visible to user)
 	return nil, nil
 }
 

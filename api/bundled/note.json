@@ -1668,6 +1668,7 @@
             "type": "array",
             "items": {
               "type": "object",
+              "x-go-type-name": "GraphNode",
               "properties": {
                 "id": {
                   "type": "string",
@@ -1706,6 +1707,7 @@
             "type": "array",
             "items": {
               "type": "object",
+              "x-go-type-name": "GraphLink",
               "properties": {
                 "source": {
                   "type": "string",

@@ -34,7 +34,9 @@ type WorkspaceEventInternalPubSub struct {
 	topic      string
 }
 
+// NOTE: Using Redis streams for pubsub. This works but is over-engineered for pure pub/sub.
 // TODO: If have time, try https://github.com/stong1994/watermill-rediszset, because we only need pubsub, not stream
+// This would reduce memory overhead and be more efficient for ephemeral workspace events.
 func NewWorkspaceEventInternalPubSub(
 	logger watermill.LoggerAdapter,
 	marshaler cqrs.CommandEventMarshaler,

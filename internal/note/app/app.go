@@ -130,6 +130,12 @@ func (a *App) Start(ctx context.Context) error {
 		})
 	}
 
+	// WARN: Integration event service (Kafka DocumentCommitted) is not started here.
+	// The integrationPubSub dependency exists but .Run() is never called.
+	// This means domain events published to Kafka are not being consumed.
+	// TODO: Add integration event service startup: if a.integrationPubSub != nil { g.Go(...) }
+	// Also note: event.ProviderSet is currently disabled in controller/wire.go
+
 	return g.Wait()
 }
 

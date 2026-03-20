@@ -454,28 +454,34 @@ type FolderUpdatedEventType string
 
 // Graph defines model for Graph.
 type Graph struct {
-	Links []struct {
-		// Source The ID of the source node (note id or hashtag prefixed tag name)
-		Source string `json:"source"`
+	Links []GraphLink `json:"links"`
+	Nodes []GraphNode `json:"nodes"`
+}
 
-		// Target The ID of the target node (note id or hashtag prefixed tag name)
-		Target string `json:"target"`
-	} `json:"links"`
-	Nodes []struct {
-		// Id Can be either a note ID or a hashtag prefixed tag name
-		Id string `json:"id"`
+// GraphLink defines model for .
+type GraphLink struct {
+	// Source The ID of the source node (note id or hashtag prefixed tag name)
+	Source string `json:"source"`
 
-		// Name Can be either a note name or a tag name (no hashtag prefix)
-		Name string         `json:"name"`
-		Type GraphNodesType `json:"type"`
-
-		// Weight Optional weight for the note node, rounded to 1 decimal place
-		Weight *float32 `json:"weight,omitempty"`
-	} `json:"nodes"`
+	// Target The ID of the target node (note id or hashtag prefixed tag name)
+	Target string `json:"target"`
 }
 
 // GraphNodesType defines model for Graph.Nodes.Type.
 type GraphNodesType string
+
+// GraphNode defines model for .
+type GraphNode struct {
+	// Id Can be either a note ID or a hashtag prefixed tag name
+	Id string `json:"id"`
+
+	// Name Can be either a note name or a tag name (no hashtag prefix)
+	Name string         `json:"name"`
+	Type GraphNodesType `json:"type"`
+
+	// Weight Optional weight for the note node, rounded to 1 decimal place
+	Weight *float32 `json:"weight,omitempty"`
+}
 
 // Note defines model for Note.
 type Note struct {
