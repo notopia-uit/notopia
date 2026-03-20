@@ -204,11 +204,14 @@ export type NoteWorkspace = {
 
 export type NoteSlug = string;
 
+export type NotePropertiesIcon = string | null;
+
 export type NoteFolderCreatedEvent = {
     type: 'FolderCreatedEvent';
     data: {
         id: NoteId;
         name: NoteName;
+        icon?: NotePropertiesIcon;
     };
 };
 
@@ -218,8 +221,6 @@ export type NoteFolderDeletedEvent = {
         id: NoteId;
     };
 };
-
-export type NotePropertiesIcon = string | null;
 
 export type NoteFolderUpdatedEvent = {
     type: 'FolderUpdatedEvent';
@@ -447,6 +448,7 @@ export type NoteFolderCreatedEventWritable = {
     type: 'FolderCreatedEvent';
     data: {
         name: NoteName;
+        icon?: NotePropertiesIcon;
     };
 };
 

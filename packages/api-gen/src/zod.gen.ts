@@ -148,11 +148,14 @@ export const zNoteWorkspace = z.object({
 
 export const zNoteSlug = z.string();
 
+export const zNotePropertiesIcon = z.string().nullable();
+
 export const zNoteFolderCreatedEvent = z.object({
     type: z.enum(['FolderCreatedEvent']),
     data: z.object({
         id: zNoteId,
-        name: zNoteName
+        name: zNoteName,
+        icon: zNotePropertiesIcon.optional()
     })
 });
 
@@ -162,8 +165,6 @@ export const zNoteFolderDeletedEvent = z.object({
         id: zNoteId
     })
 });
-
-export const zNotePropertiesIcon = z.string().nullable();
 
 export const zNoteFolderUpdatedEvent = z.object({
     type: z.enum(['FolderUpdatedEvent']),
@@ -384,7 +385,8 @@ export const zNoteWorkspaceWritable = z.object({
 export const zNoteFolderCreatedEventWritable = z.object({
     type: z.enum(['FolderCreatedEvent']),
     data: z.object({
-        name: zNoteName
+        name: zNoteName,
+        icon: zNotePropertiesIcon.optional()
     })
 });
 
