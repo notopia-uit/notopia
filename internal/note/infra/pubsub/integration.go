@@ -8,7 +8,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
-	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
+	"github.com/notopia-uit/notopia/internal/note/app"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
@@ -19,7 +19,7 @@ type Integration struct {
 	publisher      message.Publisher
 }
 
-var _ pubsub.Integration = (*Integration)(nil)
+var _ app.Integration = (*Integration)(nil)
 
 func NewIntegration(
 	cfg *commonconfig.Kafka,

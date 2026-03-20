@@ -12,7 +12,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/notopia-uit/notopia/internal/note/app"
-	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
@@ -26,7 +25,7 @@ type (
 
 type StrictHandler struct {
 	App            *app.App
-	WorkspaceEvent pubsub.WorkspaceEvent
+	WorkspaceEvent app.WorkspaceEvent
 }
 
 var _ IStrictHandler = (*StrictHandler)(nil)

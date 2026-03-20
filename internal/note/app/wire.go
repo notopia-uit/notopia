@@ -2,14 +2,47 @@ package app
 
 import (
 	"github.com/goforj/wire"
-	"github.com/notopia-uit/notopia/internal/note/app/command"
 )
 
 var ProviderSetCommand = wire.NewSet(
-	wire.Struct(new(command.MoveWorkspaceItemsHandler), "*"),
+	ProvideCreateNoteHandler,
+	ProvideCreateFolderHandler,
+	ProvideCreateWorkspaceHandler,
+	ProvideDeleteNoteHandler,
+	ProvideDeleteWorkspaceHandler,
+	ProvideGenerateDailyNoteHandler,
+	ProvideMoveWorkspaceItemsHandler,
+	ProvidePublishNoteHandler,
+	ProvidePublishWorkspaceHandler,
+	ProvideRenameFolderHandler,
+	ProvideRenameNoteHandler,
+	ProvideRenameWorkspaceHandler,
+	ProvideRestoreTrashedWorkspaceItemsHandler,
+	ProvideTrashWorkspaceItemsHandler,
+	ProvideUnpublishNoteHandler,
+	ProvideUnpublishWorkspaceHandler,
+	ProvideUpdateWorkspaceMembersHandler,
+)
+
+var ProviderSetQuery = wire.NewSet(
+	ProvideCheckWorkspaceExistsHandler,
+	ProvideGetNoteGraphHandler,
+	ProvideGetNoteLinksHandler,
+	ProvideGetNotesHandler,
+	ProvideGetWorkspaceHandler,
+	ProvideGetWorkspaceGraphHandler,
+	ProvideGetWorkspaceMembersHandler,
+	ProvideGetWorkspaceTreeHandler,
+	ProvideShowTrashHandler,
+)
+
+var ProviderSetEvent = wire.NewSet(
+	ProvideDocumentCommittedHandler,
 )
 
 var ProviderSet = wire.NewSet(
 	ProviderSetCommand,
-	wire.Struct(new(App), "*"),
+	ProviderSetQuery,
+	ProviderSetEvent,
+	ProvideApp,
 )

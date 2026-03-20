@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/notopia-uit/notopia/internal/note/app/query"
+	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	note "github.com/notopia-uit/notopia/pkg/api/note"
 )
@@ -141,7 +141,7 @@ func workspaceEventToDTO(event domain.Event) (any, bool) {
 	return dto, dto != nil
 }
 
-func getNoteToDTO(n query.Note) note.Note {
+func getNoteToDTO(n app.Note) note.Note {
 	id := n.Id
 	folderID := n.FolderId
 	backlinksCount := n.BacklinksCount
@@ -163,7 +163,7 @@ func getNoteToDTO(n query.Note) note.Note {
 	}
 }
 
-func getFolderToDTO(f query.Folder) note.Folder {
+func getFolderToDTO(f app.Folder) note.Folder {
 	id := f.Id
 	parentID := f.ParentId
 	workspaceID := f.WorkspaceId
@@ -178,7 +178,7 @@ func getFolderToDTO(f query.Folder) note.Folder {
 	}
 }
 
-func getWorkspaceToDTO(w query.Workspace) note.Workspace {
+func getWorkspaceToDTO(w app.Workspace) note.Workspace {
 	id := w.Id
 	return note.Workspace{
 		Id:   &id,
@@ -187,14 +187,14 @@ func getWorkspaceToDTO(w query.Workspace) note.Workspace {
 	}
 }
 
-func getWorkspaceMemberToDTO(m query.WorkspaceMember) note.WorkspaceMember {
+func getWorkspaceMemberToDTO(m app.WorkspaceMember) note.WorkspaceMember {
 	return note.WorkspaceMember{
 		Role:     note.WorkspaceRole(m.Role),
 		Username: m.Username,
 	}
 }
 
-func getWorkspaceTreeNoteToDTO(n query.WorkspaceTreeNote) note.WorkspaceTreeNote {
+func getWorkspaceTreeNoteToDTO(n app.WorkspaceTreeNote) note.WorkspaceTreeNote {
 	id := n.Id
 	updatedAt := n.UpdatedAt
 	return note.WorkspaceTreeNote{
@@ -205,7 +205,7 @@ func getWorkspaceTreeNoteToDTO(n query.WorkspaceTreeNote) note.WorkspaceTreeNote
 	}
 }
 
-func getWorkspaceTreeFolderToDTO(f query.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
+func getWorkspaceTreeFolderToDTO(f app.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
 	id := f.Id
 	updatedAt := f.UpdatedAt
 	notes := make([]note.WorkspaceTreeNote, len(f.Notes))
@@ -226,7 +226,7 @@ func getWorkspaceTreeFolderToDTO(f query.WorkspaceTreeFolder) note.WorkspaceTree
 	}
 }
 
-func getTrashedFolderToDTO(f query.TrashedFolder) note.TrashedFolder {
+func getTrashedFolderToDTO(f app.TrashedFolder) note.TrashedFolder {
 	name := f.Name
 	trashedAt := f.TrashedAt
 	trashedBy := note.TrashedBy(f.TrashedBy)
@@ -238,7 +238,7 @@ func getTrashedFolderToDTO(f query.TrashedFolder) note.TrashedFolder {
 	}
 }
 
-func getTrashedNoteToDTO(n query.TrashedNote) note.TrashedNote {
+func getTrashedNoteToDTO(n app.TrashedNote) note.TrashedNote {
 	name := n.Name
 	trashedAt := n.TrashedAt
 	trashedBy := note.TrashedBy(n.TrashedBy)
@@ -250,7 +250,7 @@ func getTrashedNoteToDTO(n query.TrashedNote) note.TrashedNote {
 	}
 }
 
-func getNoteLinkToDTO(n query.NoteLink) note.NoteLink {
+func getNoteLinkToDTO(n app.NoteLink) note.NoteLink {
 	id := n.Id
 	return note.NoteLink{
 		Id:   &id,
@@ -259,7 +259,7 @@ func getNoteLinkToDTO(n query.NoteLink) note.NoteLink {
 	}
 }
 
-func getGraphToDTO(g query.Graph) note.Graph {
+func getGraphToDTO(g app.Graph) note.Graph {
 	dto := note.Graph{
 		Nodes: make([]struct {
 			Id     string              `json:"id"`
@@ -288,7 +288,7 @@ func getGraphToDTO(g query.Graph) note.Graph {
 	return dto
 }
 
-func getWorkspaceMembersUpdatedEventToDTO(e query.WorkspaceMembersUpdatedEvent) note.WorkspaceMemebersUpdatedEvent {
+func getWorkspaceMembersUpdatedEventToDTO(e app.WorkspaceMembersUpdatedEvent) note.WorkspaceMemebersUpdatedEvent {
 	id := e.Id
 	members := make([]note.WorkspaceMember, len(e.Members))
 	for i, m := range e.Members {

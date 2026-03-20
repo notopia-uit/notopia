@@ -17,6 +17,12 @@ type Note struct {
 
 var _ domain.NoteRepo = (*Note)(nil)
 
+func NewNote(queries *pgsqlc.Queries) *Note {
+	return &Note{queries: queries}
+}
+
+var ProvideNote = NewNote
+
 func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Note, error) {
 	var noteResult *pgsqlc.Note
 	var err error

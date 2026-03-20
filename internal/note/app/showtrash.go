@@ -1,0 +1,26 @@
+package app
+
+import "context"
+
+type ShowTrash struct {
+	Slug       string
+	Pagination *PaginationParams
+}
+
+type ShowTrashReadModel interface {
+	ShowTrash(ctx context.Context, q *ShowTrash) (Trash, error)
+}
+
+type ShowTrashHandler struct {
+	readModel ShowTrashReadModel
+}
+
+func NewShowTrashHandler(readModel ShowTrashReadModel) *ShowTrashHandler {
+	return &ShowTrashHandler{readModel: readModel}
+}
+
+var ProvideShowTrashHandler = NewShowTrashHandler
+
+func (h *ShowTrashHandler) Handle(ctx context.Context, query *ShowTrash) (Trash, error) {
+	return h.readModel.ShowTrash(ctx, query)
+}

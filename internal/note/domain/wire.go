@@ -5,5 +5,5 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
-	NewNoteService,
+	ProvideNoteService,
 )

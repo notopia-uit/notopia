@@ -36,6 +36,15 @@ type UnitOfWork struct {
 
 var _ domain.UnitOfWork = (*UnitOfWork)(nil)
 
+func NewUnitOfWork(queries *pgsqlc.Queries, pool *pgxpool.Pool) *UnitOfWork {
+	return &UnitOfWork{
+		queries: queries,
+		pool:    pool,
+	}
+}
+
+var ProvideUnitOfWork = NewUnitOfWork
+
 func (u *UnitOfWork) Execute(ctx context.Context, fn func(repoRegistry domain.RepoRegistry) error) error {
 	tx, err := u.pool.Begin(ctx)
 	if err != nil {

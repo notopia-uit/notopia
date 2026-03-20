@@ -8,6 +8,8 @@ func NewNoteService() *NoteService {
 	return &NoteService{}
 }
 
+var ProvideNoteService = NewNoteService
+
 func (s *NoteService) UpdateNoteSizeBasedOnContent(note *Note, content any) error {
 	b, err := json.Marshal(content)
 	if err != nil {

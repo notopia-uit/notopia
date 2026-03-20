@@ -17,6 +17,12 @@ type Folder struct {
 
 var _ domain.FolderRepo = (*Folder)(nil)
 
+func NewFolder(queries *pgsqlc.Queries) *Folder {
+	return &Folder{queries: queries}
+}
+
+var ProvideFolder = NewFolder
+
 func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Folder, error) {
 	var result *pgsqlc.Folder
 	var err error

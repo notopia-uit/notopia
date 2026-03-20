@@ -17,6 +17,12 @@ type Workspace struct {
 
 var _ domain.WorkspaceRepo = (*Workspace)(nil)
 
+func NewWorkspace(queries *pgsqlc.Queries) *Workspace {
+	return &Workspace{queries: queries}
+}
+
+var ProvideWorkspace = NewWorkspace
+
 func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) (*domain.Workspace, error) {
 	var workspaceResult *pgsqlc.Workspace
 	var err error

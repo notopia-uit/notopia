@@ -10,7 +10,6 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/notopia-uit/notopia/internal/note/app"
-	"github.com/notopia-uit/notopia/internal/note/app/event"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
@@ -26,7 +25,7 @@ func NewIntegration(
 	cfg *commonconfig.Kafka,
 	logger watermill.LoggerAdapter,
 	marshaler cqrs.CommandEventMarshaler,
-	documentCommittedHandler *event.DocumentCommittedHandler,
+	documentCommittedHandler *app.DocumentCommittedHandler,
 	app *app.App,
 ) (*Integration, error) {
 	tracer := kafka.NewOTELSaramaTracer()
