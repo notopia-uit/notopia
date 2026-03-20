@@ -76,6 +76,23 @@ func (h *StrictHandler) GetWorkspace(
 	return note.GetWorkspace200JSONResponse(dto), nil
 }
 
+func (h *StrictHandler) CheckWorkspaceSlugExists(
+	ctx context.Context,
+	request note.CheckWorkspaceSlugExistsRequestObject,
+) (note.CheckWorkspaceSlugExistsResponseObject, error) {
+	query := &app.CheckWorkspaceSlugExists{
+		Slug: request.WorkspaceSlug,
+	}
+	result, err := h.App.CheckWorkspaceSlugExistsHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	if result.Exists {
+		return note.CheckWorkspaceSlugExists409Response{}, nil
+	}
+	return note.CheckWorkspaceSlugExists200Response{}, nil
+}
+
 func (h *StrictHandler) GetWorkspaceEvents(
 	ctx context.Context,
 	request note.GetWorkspaceEventsRequestObject,
@@ -155,22 +172,6 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	return note.GetWorkspaceEvents200TexteventStreamResponse{
 		Body: r,
 	}, nil
-}
-
-func (h *StrictHandler) CheckWorkspaceExists(
-	ctx context.Context,
-	request note.CheckWorkspaceExistsRequestObject,
-) (note.CheckWorkspaceExistsResponseObject, error) {
-	query := &app.CheckWorkspaceExists{
-		Slug: request.WorkspaceId.String(),
-	}
-	result, err := h.App.CheckWorkspaceExistsHandler.Handle(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	dto := getCheckWorkspaceExistsResultToDTO(*result)
-	return note.CheckWorkspaceExists200JSONResponse(dto), nil
 }
 
 func (h *StrictHandler) GetWorkspaceGraph(

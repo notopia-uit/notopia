@@ -4,26 +4,20 @@ get:
     - Oauth2: []
   tags:
     - Workspace
-  summary: Check workspace exists
-  operationId: checkWorkspaceExists
+  summary: Check workspace slug exists
+  operationId: checkWorkspaceSlugExists
   parameters:
-    - $ref: ../components/parameters/workspaceIdPath.yaml
+    - $ref: ../components/parameters/workspaceSlugPath.yaml
   responses:
     200:
       description: OK
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              exists:
-                type: boolean
-                example: true
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
     404:
       $ref: ../../common/components/responses/NotFoundError.yaml
+    409:
+      description: The workspace slug already exists
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml

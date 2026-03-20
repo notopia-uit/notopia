@@ -312,12 +312,6 @@ func getTrashedToDTO(t app.Trash) note.ShowTrash200JSONResponse {
 	}
 }
 
-func getCheckWorkspaceExistsResultToDTO(r app.CheckWorkspaceExistsResult) note.CheckWorkspaceExists200JSONResponse {
-	return note.CheckWorkspaceExists200JSONResponse{
-		Exists: &r.Exists,
-	}
-}
-
 func getNoteLinkResultToDTO(r app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
 	outgoing := make([]note.NoteLink, len(r.OutgoingLinks))
 	for i, l := range r.OutgoingLinks {

@@ -2,24 +2,24 @@ package app
 
 import "context"
 
-type CheckWorkspaceExists struct {
+type CheckWorkspaceSlugExists struct {
 	Slug string
 }
 
-type CheckWorkspaceExistsReadModel interface {
-	CheckWorkspaceExists(ctx context.Context, q *CheckWorkspaceExists) (*CheckWorkspaceExistsResult, error)
+type CheckWorkspaceSlugExistsReadModel interface {
+	CheckWorkspaceSlugExists(ctx context.Context, q *CheckWorkspaceSlugExists) (*CheckWorkspaceSlugExistsResult, error)
 }
 
-type CheckWorkspaceExistsHandler struct {
-	readModel CheckWorkspaceExistsReadModel
+type CheckWorkspaceSlugExistsHandler struct {
+	readModel CheckWorkspaceSlugExistsReadModel
 }
 
-func NewCheckWorkspaceExistsHandler(readModel CheckWorkspaceExistsReadModel) *CheckWorkspaceExistsHandler {
-	return &CheckWorkspaceExistsHandler{readModel: readModel}
+func NewCheckWorkspaceSlugExistsHandler(readModel CheckWorkspaceSlugExistsReadModel) *CheckWorkspaceSlugExistsHandler {
+	return &CheckWorkspaceSlugExistsHandler{readModel: readModel}
 }
 
-var ProvideCheckWorkspaceExistsHandler = NewCheckWorkspaceExistsHandler
+var ProvideCheckWorkspaceSlugExistsHandler = NewCheckWorkspaceSlugExistsHandler
 
-func (h *CheckWorkspaceExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceExists) (*CheckWorkspaceExistsResult, error) {
-	return h.readModel.CheckWorkspaceExists(ctx, query)
+func (h *CheckWorkspaceSlugExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceSlugExists) (*CheckWorkspaceSlugExistsResult, error) {
+	return h.readModel.CheckWorkspaceSlugExists(ctx, query)
 }

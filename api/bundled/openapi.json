@@ -578,47 +578,6 @@
             "$ref": "#/components/responses/note_InternalServerError"
           }
         }
-      },
-      "get": {
-        "security": [
-          {
-            "note_Oauth2": []
-          }
-        ],
-        "tags": [
-          "Note"
-        ],
-        "summary": "Get notes",
-        "operationId": "getNotes",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/note_pageQuery"
-          },
-          {
-            "$ref": "#/components/parameters/note_limitQuery"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/note_Note"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/note_BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/note_UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/note_InternalServerError"
-          }
-        }
       }
     },
     "/note/notes/generate-daily": {
@@ -1105,6 +1064,45 @@
           },
           "404": {
             "$ref": "#/components/responses/note_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/note_InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces-by-slug/{workspaceSlug}_exists": {
+      "get": {
+        "security": [
+          {
+            "note_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Check workspace slug exists",
+        "operationId": "checkWorkspaceSlugExists",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/note_workspaceSlugPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/note_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/note_UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/note_NotFoundError"
+          },
+          "409": {
+            "description": "The workspace slug already exists"
           },
           "500": {
             "$ref": "#/components/responses/note_InternalServerError"
@@ -1811,55 +1809,6 @@
         "responses": {
           "204": {
             "description": "Workspace unpublished successfully"
-          },
-          "400": {
-            "$ref": "#/components/responses/note_BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/note_UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/note_NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/note_InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/workspaces/{workspaceId}/exists": {
-      "get": {
-        "security": [
-          {
-            "note_Oauth2": []
-          }
-        ],
-        "tags": [
-          "Workspace"
-        ],
-        "summary": "Check workspace exists",
-        "operationId": "checkWorkspaceExists",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/note_workspaceIdPath"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "exists": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
-                }
-              }
-            }
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -3756,29 +3705,6 @@
         "schema": {
           "$ref": "#/components/schemas/note_id"
         }
-      },
-      "note_pageQuery": {
-        "name": "page",
-        "in": "query",
-        "description": "Page number for pagination",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 1
-        },
-        "example": 1
-      },
-      "note_limitQuery": {
-        "name": "limit",
-        "in": "query",
-        "description": "Number of items per page",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 100,
-          "default": 20
-        },
-        "example": 20
       },
       "note_noteIdPath": {
         "name": "noteId",

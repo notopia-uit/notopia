@@ -27,14 +27,14 @@ type App struct {
 	UnpublishWorkspaceHandler           *UnpublishWorkspaceHandler
 	UpdateWorkspaceMembersHandler       *UpdateWorkspaceMembersHandler
 
-	CheckWorkspaceExistsHandler *CheckWorkspaceExistsHandler
-	GetNoteGraphHandler         *GetNoteGraphHandler
-	GetNoteLinksHandler         *GetNoteLinksHandler
-	GetWorkspaceHandler         *GetWorkspaceHandler
-	GetWorkspaceGraphHandler    *GetWorkspaceGraphHandler
-	GetWorkspaceMembersHandler  *GetWorkspaceMembersHandler
-	GetWorkspaceTreeHandler     *GetWorkspaceTreeHandler
-	ShowTrashHandler            *ShowTrashHandler
+	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler
+	GetNoteGraphHandler             *GetNoteGraphHandler
+	GetNoteLinksHandler             *GetNoteLinksHandler
+	GetWorkspaceHandler             *GetWorkspaceHandler
+	GetWorkspaceGraphHandler        *GetWorkspaceGraphHandler
+	GetWorkspaceMembersHandler      *GetWorkspaceMembersHandler
+	GetWorkspaceTreeHandler         *GetWorkspaceTreeHandler
+	ShowTrashHandler                *ShowTrashHandler
 
 	DocumentCommittedHandler *DocumentCommittedHandler
 
@@ -61,7 +61,7 @@ func NewApp(
 	unpublishNoteHandler *UnpublishNoteHandler,
 	unpublishWorkspaceHandler *UnpublishWorkspaceHandler,
 	updateWorkspaceMembersHandler *UpdateWorkspaceMembersHandler,
-	checkWorkspaceExistsHandler *CheckWorkspaceExistsHandler,
+	checkWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler,
 	getNoteGraphHandler *GetNoteGraphHandler,
 	getNoteLinksHandler *GetNoteLinksHandler,
 	getWorkspaceHandler *GetWorkspaceHandler,
@@ -92,7 +92,7 @@ func NewApp(
 		UnpublishNoteHandler:                unpublishNoteHandler,
 		UnpublishWorkspaceHandler:           unpublishWorkspaceHandler,
 		UpdateWorkspaceMembersHandler:       updateWorkspaceMembersHandler,
-		CheckWorkspaceExistsHandler:         checkWorkspaceExistsHandler,
+		CheckWorkspaceSlugExistsHandler:     checkWorkspaceSlugExistsHandler,
 		GetNoteGraphHandler:                 getNoteGraphHandler,
 		GetNoteLinksHandler:                 getNoteLinksHandler,
 		GetWorkspaceHandler:                 getWorkspaceHandler,

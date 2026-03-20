@@ -23,13 +23,13 @@ func NewReadModel(queries *pgsqlc.Queries) *ReadModel {
 var ProvideReadModel = NewReadModel
 
 var (
-	_ app.GetWorkspaceTreeReadModel     = (*ReadModel)(nil)
-	_ app.ShowTrashReadModel            = (*ReadModel)(nil)
-	_ app.GetNoteGraphReadModel         = (*ReadModel)(nil)
-	_ app.GetNoteLinksReadModel         = (*ReadModel)(nil)
-	_ app.GetWorkspaceBySlugReadModel   = (*ReadModel)(nil)
-	_ app.GetWorkspaceGraphReadModel    = (*ReadModel)(nil)
-	_ app.CheckWorkspaceExistsReadModel = (*ReadModel)(nil)
+	_ app.GetWorkspaceTreeReadModel         = (*ReadModel)(nil)
+	_ app.ShowTrashReadModel                = (*ReadModel)(nil)
+	_ app.GetNoteGraphReadModel             = (*ReadModel)(nil)
+	_ app.GetNoteLinksReadModel             = (*ReadModel)(nil)
+	_ app.GetWorkspaceBySlugReadModel       = (*ReadModel)(nil)
+	_ app.GetWorkspaceGraphReadModel        = (*ReadModel)(nil)
+	_ app.CheckWorkspaceSlugExistsReadModel = (*ReadModel)(nil)
 )
 
 func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
@@ -356,13 +356,13 @@ func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGr
 	return result, nil
 }
 
-func (r *ReadModel) CheckWorkspaceExists(ctx context.Context, q *app.CheckWorkspaceExists) (*app.CheckWorkspaceExistsResult, error) {
+func (r *ReadModel) CheckWorkspaceSlugExists(ctx context.Context, q *app.CheckWorkspaceSlugExists) (*app.CheckWorkspaceSlugExistsResult, error) {
 	exists, err := r.queries.CheckSlugExists(ctx, q.Slug)
 	if err != nil {
 		return nil, toDomainError(err)
 	}
 
-	return &app.CheckWorkspaceExistsResult{
+	return &app.CheckWorkspaceSlugExistsResult{
 		Exists: exists,
 	}, nil
 }

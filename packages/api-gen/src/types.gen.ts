@@ -568,16 +568,6 @@ export type DocumentRevisionIdPath = string;
 
 export type NoteFolderIdPath = NoteId;
 
-/**
- * Page number for pagination
- */
-export type NotePageQuery = number;
-
-/**
- * Number of items per page
- */
-export type NoteLimitQuery = number;
-
 export type NoteNoteIdPath = NoteNotePropertiesId;
 
 export type NoteWorkspaceSlugPath = NoteSlug;
@@ -999,48 +989,6 @@ export type RenameFolderResponses = {
 };
 
 export type RenameFolderResponse = RenameFolderResponses[keyof RenameFolderResponses];
-
-export type GetNotesData = {
-    body?: never;
-    path?: never;
-    query?: {
-        /**
-         * Page number for pagination
-         */
-        page?: number;
-        /**
-         * Number of items per page
-         */
-        limit?: number;
-    };
-    url: '/note/notes';
-};
-
-export type GetNotesErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * Unauthorized Error response
-     */
-    401: NoteError;
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type GetNotesError = GetNotesErrors[keyof GetNotesErrors];
-
-export type GetNotesResponses = {
-    /**
-     * Successful response
-     */
-    200: NoteNote;
-};
-
-export type GetNotesResponse = GetNotesResponses[keyof GetNotesResponses];
 
 export type CreateNoteData = {
     body: NoteNoteWritable;
@@ -1474,6 +1422,47 @@ export type GetWorkspaceResponses = {
 };
 
 export type GetWorkspaceResponse = GetWorkspaceResponses[keyof GetWorkspaceResponses];
+
+export type CheckWorkspaceSlugExistsData = {
+    body?: never;
+    path: {
+        workspaceSlug: NoteSlug;
+    };
+    query?: never;
+    url: '/note/workspaces-by-slug/{workspaceSlug}_exists';
+};
+
+export type CheckWorkspaceSlugExistsErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * Unauthorized Error response
+     */
+    401: NoteError;
+    /**
+     * Not Found Error response
+     */
+    404: NoteError;
+    /**
+     * The workspace slug already exists
+     */
+    409: unknown;
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type CheckWorkspaceSlugExistsError = CheckWorkspaceSlugExistsErrors[keyof CheckWorkspaceSlugExistsErrors];
+
+export type CheckWorkspaceSlugExistsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type DeleteWorkspaceData = {
     body?: never;
@@ -2035,44 +2024,3 @@ export type UnpublishWorkspaceResponses = {
 };
 
 export type UnpublishWorkspaceResponse = UnpublishWorkspaceResponses[keyof UnpublishWorkspaceResponses];
-
-export type CheckWorkspaceExistsData = {
-    body?: never;
-    path: {
-        workspaceId: NotePropertiesId;
-    };
-    query?: never;
-    url: '/note/workspaces/{workspaceId}/exists';
-};
-
-export type CheckWorkspaceExistsErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * Unauthorized Error response
-     */
-    401: NoteError;
-    /**
-     * Not Found Error response
-     */
-    404: NoteError;
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type CheckWorkspaceExistsError = CheckWorkspaceExistsErrors[keyof CheckWorkspaceExistsErrors];
-
-export type CheckWorkspaceExistsResponses = {
-    /**
-     * OK
-     */
-    200: {
-        exists?: boolean;
-    };
-};
-
-export type CheckWorkspaceExistsResponse = CheckWorkspaceExistsResponses[keyof CheckWorkspaceExistsResponses];

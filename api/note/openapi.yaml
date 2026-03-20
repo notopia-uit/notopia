@@ -55,6 +55,8 @@ paths:
     $ref: ./paths/workspaces.yaml
   /note/workspaces-by-slug/{workspaceSlug}:
     $ref: ./paths/workspaces-by-slug_{workspaceSlug}.yaml
+  /note/workspaces-by-slug/{workspaceSlug}_exists:
+    $ref: ./paths/workspaces-by-slug_{workspaceSlug}_exists.yaml
   /note/workspaces/{workspaceId}:
     $ref: ./paths/workspaces_{workspaceId}.yaml
   /note/workspaces/{workspaceId}/events:
@@ -79,8 +81,6 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_tree.yaml
   /note/workspaces/{workspaceId}/unpublish:
     $ref: ./paths/workspaces_{workspaceId}_unpublish.yaml
-  /note/workspaces/{workspaceId}/exists:
-    $ref: ./paths/workspaces_{workspaceId}_exists.yaml
 
 components:
   securitySchemes:

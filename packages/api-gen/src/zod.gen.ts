@@ -506,16 +506,6 @@ export const zDocumentRevisionIdPath = z.uuid();
 
 export const zNoteFolderIdPath = zNoteId;
 
-/**
- * Page number for pagination
- */
-export const zNotePageQuery = z.int().gte(1).default(1);
-
-/**
- * Number of items per page
- */
-export const zNoteLimitQuery = z.int().gte(1).lte(100).default(20);
-
 export const zNoteNoteIdPath = zNoteNotePropertiesId;
 
 export const zNoteWorkspaceSlugPath = zNoteSlug;
@@ -650,20 +640,6 @@ export const zRenameFolderData = z.object({
  */
 export const zRenameFolderResponse = z.void();
 
-export const zGetNotesData = z.object({
-    body: z.never().optional(),
-    path: z.never().optional(),
-    query: z.object({
-        page: z.int().gte(1).optional().default(1),
-        limit: z.int().gte(1).lte(100).optional().default(20)
-    }).optional()
-});
-
-/**
- * Successful response
- */
-export const zGetNotesResponse = zNoteNote;
-
 export const zCreateNoteData = z.object({
     body: zNoteNoteWritable,
     path: z.never().optional(),
@@ -797,6 +773,14 @@ export const zGetWorkspaceData = z.object({
  * OK
  */
 export const zGetWorkspaceResponse = zNoteWorkspace;
+
+export const zCheckWorkspaceSlugExistsData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        workspaceSlug: zNoteSlug
+    }),
+    query: z.never().optional()
+});
 
 export const zDeleteWorkspaceData = z.object({
     body: z.never().optional(),
@@ -1035,18 +1019,3 @@ export const zUnpublishWorkspaceData = z.object({
  * Workspace unpublished successfully
  */
 export const zUnpublishWorkspaceResponse = z.void();
-
-export const zCheckWorkspaceExistsData = z.object({
-    body: z.never().optional(),
-    path: z.object({
-        workspaceId: zNotePropertiesId
-    }),
-    query: z.never().optional()
-});
-
-/**
- * OK
- */
-export const zCheckWorkspaceExistsResponse = z.object({
-    exists: z.boolean().optional()
-});

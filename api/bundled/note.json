@@ -717,6 +717,45 @@
         }
       }
     },
+    "/note/workspaces-by-slug/{workspaceSlug}_exists": {
+      "get": {
+        "security": [
+          {
+            "Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Check workspace slug exists",
+        "operationId": "checkWorkspaceSlugExists",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceSlugPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "409": {
+            "description": "The workspace slug already exists"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}": {
       "delete": {
         "security": [
@@ -1416,55 +1455,6 @@
         "responses": {
           "204": {
             "description": "Workspace unpublished successfully"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/workspaces/{workspaceId}/exists": {
-      "get": {
-        "security": [
-          {
-            "Oauth2": []
-          }
-        ],
-        "tags": [
-          "Workspace"
-        ],
-        "summary": "Check workspace exists",
-        "operationId": "checkWorkspaceExists",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/workspaceIdPath"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "exists": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
-                }
-              }
-            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"

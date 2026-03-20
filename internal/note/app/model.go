@@ -136,7 +136,7 @@ type Trash struct {
 	Folders []TrashedFolder
 }
 
-type CheckWorkspaceExistsResult struct {
+type CheckWorkspaceSlugExistsResult struct {
 	Exists bool
 }
 
