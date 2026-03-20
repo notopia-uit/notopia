@@ -286,7 +286,7 @@ func (h *StrictHandler) ShowTrash(
 	request note.ShowTrashRequestObject,
 ) (note.ShowTrashResponseObject, error) {
 	query := &app.ShowTrash{
-		Slug: request.WorkspaceId.String(),
+		WorkspaceID: request.WorkspaceId,
 	}
 	result, err := h.App.ShowTrashHandler.Handle(ctx, query)
 	if err != nil {

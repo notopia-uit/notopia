@@ -46,10 +46,17 @@ type Folder struct {
 	WorkspaceId uuid.UUID
 }
 
+type GraphNodeType string
+
+var (
+	GraphNodeTypeNote GraphNodeType = "note"
+	GraphNodeTypeTag  GraphNodeType = "tag"
+)
+
 type GraphNode struct {
 	Id     string
 	Name   string
-	Type   string
+	Type   GraphNodeType
 	Weight *float64
 }
 

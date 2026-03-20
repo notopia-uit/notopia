@@ -23,10 +23,10 @@ func NewWorkspace(
 	rootFolderID uuid.UUID,
 ) (*Workspace, error) {
 	if name == "" {
-		return nil, NewErrEmptyWorkspaceName()
+		return nil, ErrEmptyWorkspaceName
 	}
 	if slug == "" {
-		return nil, NewErrEmptyWorkspaceSlug()
+		return nil, ErrEmptyWorkspaceSlug
 	}
 	return &Workspace{
 		id:           id,

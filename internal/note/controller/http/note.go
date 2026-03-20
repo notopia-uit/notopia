@@ -10,26 +10,6 @@ import (
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 )
 
-func (h *StrictHandler) GetNotes(
-	ctx context.Context,
-	request note.GetNotesRequestObject,
-) (note.GetNotesResponseObject, error) {
-	query := &app.GetNotes{
-		ID: uuid.Nil,
-	}
-	result, err := h.App.GetNotesHandler.Handle(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(result.Data) == 0 {
-		return note.GetNotes200JSONResponse{}, nil
-	}
-
-	dto := getNoteToDTO(result.Data[0])
-	return note.GetNotes200JSONResponse(dto), nil
-}
-
 func (h *StrictHandler) CreateNote(
 	ctx context.Context,
 	request note.CreateNoteRequestObject,

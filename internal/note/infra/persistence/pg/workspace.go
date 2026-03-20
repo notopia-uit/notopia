@@ -51,7 +51,7 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceRootFolderNotFound(slug, err)
+			return nil, domain.NewErrWorkspaceRootFolderNotFound(workspaceResult.ID, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -68,7 +68,7 @@ func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceByIDNotFound(id.String(), err)
+			return nil, domain.NewErrWorkspaceByIDNotFound(id, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -86,7 +86,7 @@ func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceRootFolderNotFound(id.String(), err)
+			return nil, domain.NewErrWorkspaceRootFolderNotFound(id, err)
 		}
 		return nil, toDomainError(err)
 	}

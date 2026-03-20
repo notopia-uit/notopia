@@ -1,10 +1,14 @@
 package app
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 type ShowTrash struct {
-	Slug       string
-	Pagination *PaginationParams
+	WorkspaceID uuid.UUID
+	Pagination  *PaginationParams
 }
 
 type ShowTrashReadModel interface {

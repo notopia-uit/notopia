@@ -30,7 +30,6 @@ type App struct {
 	CheckWorkspaceExistsHandler *CheckWorkspaceExistsHandler
 	GetNoteGraphHandler         *GetNoteGraphHandler
 	GetNoteLinksHandler         *GetNoteLinksHandler
-	GetNotesHandler             *GetNotesHandler
 	GetWorkspaceHandler         *GetWorkspaceHandler
 	GetWorkspaceGraphHandler    *GetWorkspaceGraphHandler
 	GetWorkspaceMembersHandler  *GetWorkspaceMembersHandler
@@ -65,7 +64,6 @@ func NewApp(
 	checkWorkspaceExistsHandler *CheckWorkspaceExistsHandler,
 	getNoteGraphHandler *GetNoteGraphHandler,
 	getNoteLinksHandler *GetNoteLinksHandler,
-	getNotesHandler *GetNotesHandler,
 	getWorkspaceHandler *GetWorkspaceHandler,
 	getWorkspaceGraphHandler *GetWorkspaceGraphHandler,
 	getWorkspaceMembersHandler *GetWorkspaceMembersHandler,
@@ -97,7 +95,6 @@ func NewApp(
 		CheckWorkspaceExistsHandler:         checkWorkspaceExistsHandler,
 		GetNoteGraphHandler:                 getNoteGraphHandler,
 		GetNoteLinksHandler:                 getNoteLinksHandler,
-		GetNotesHandler:                     getNotesHandler,
 		GetWorkspaceHandler:                 getWorkspaceHandler,
 		GetWorkspaceGraphHandler:            getWorkspaceGraphHandler,
 		GetWorkspaceMembersHandler:          getWorkspaceMembersHandler,

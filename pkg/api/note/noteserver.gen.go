@@ -26,9 +26,6 @@ type ServerInterface interface {
 	// Rename folder
 	// (POST /note/folders/{folderId}/rename)
 	RenameFolder(c *gin.Context, folderId FolderIdPath)
-	// Get notes
-	// (GET /note/notes)
-	GetNotes(c *gin.Context, params GetNotesParams)
 	// Create note
 	// (POST /note/notes)
 	CreateNote(c *gin.Context)
@@ -180,42 +177,6 @@ func (siw *ServerInterfaceWrapper) RenameFolder(c *gin.Context) {
 	}
 
 	siw.Handler.RenameFolder(c, folderId)
-}
-
-// GetNotes operation middleware
-func (siw *ServerInterfaceWrapper) GetNotes(c *gin.Context) {
-
-	var err error
-
-	c.Set(Oauth2Scopes, []string{})
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params GetNotesParams
-
-	// ------------- Optional query parameter "page" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", c.Request.URL.Query(), &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter page: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", c.Request.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetNotes(c, params)
 }
 
 // CreateNote operation middleware
@@ -906,7 +867,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/folders", wrapper.CreateFolder)
 	router.DELETE(options.BaseURL+"/note/folders/:folderId", wrapper.DeleteFolder)
 	router.POST(options.BaseURL+"/note/folders/:folderId/rename", wrapper.RenameFolder)
-	router.GET(options.BaseURL+"/note/notes", wrapper.GetNotes)
 	router.POST(options.BaseURL+"/note/notes", wrapper.CreateNote)
 	router.POST(options.BaseURL+"/note/notes/generate-daily", wrapper.GenerateDailyNote)
 	router.DELETE(options.BaseURL+"/note/notes/:noteId", wrapper.DeleteNote)
@@ -1107,52 +1067,6 @@ type RenameFolder500JSONResponse struct {
 }
 
 func (response RenameFolder500JSONResponse) VisitRenameFolderResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetNotesRequestObject struct {
-	Params GetNotesParams
-}
-
-type GetNotesResponseObject interface {
-	VisitGetNotesResponse(w http.ResponseWriter) error
-}
-
-type GetNotes200JSONResponse Note
-
-func (response GetNotes200JSONResponse) VisitGetNotesResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetNotes400JSONResponse struct{ BadRequestErrorJSONResponse }
-
-func (response GetNotes400JSONResponse) VisitGetNotesResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetNotes401JSONResponse struct{ UnauthorizedErrorJSONResponse }
-
-func (response GetNotes401JSONResponse) VisitGetNotesResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GetNotes500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response GetNotes500JSONResponse) VisitGetNotesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -2584,9 +2498,6 @@ type StrictServerInterface interface {
 	// Rename folder
 	// (POST /note/folders/{folderId}/rename)
 	RenameFolder(ctx context.Context, request RenameFolderRequestObject) (RenameFolderResponseObject, error)
-	// Get notes
-	// (GET /note/notes)
-	GetNotes(ctx context.Context, request GetNotesRequestObject) (GetNotesResponseObject, error)
 	// Create note
 	// (POST /note/notes)
 	CreateNote(ctx context.Context, request CreateNoteRequestObject) (CreateNoteResponseObject, error)
@@ -2764,33 +2675,6 @@ func (sh *strictHandler) RenameFolder(ctx *gin.Context, folderId FolderIdPath) {
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(RenameFolderResponseObject); ok {
 		if err := validResponse.VisitRenameFolderResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// GetNotes operation middleware
-func (sh *strictHandler) GetNotes(ctx *gin.Context, params GetNotesParams) {
-	var request GetNotesRequestObject
-
-	request.Params = params
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetNotes(ctx, request.(GetNotesRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetNotes")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(GetNotesResponseObject); ok {
-		if err := validResponse.VisitGetNotesResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

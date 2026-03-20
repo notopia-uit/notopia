@@ -20,10 +20,8 @@ func NewErrFolderNotFound(id uuid.UUID, err error) *commonerror.Err {
 	)
 }
 
-func NewErrEmptyFolderName() *commonerror.Err {
-	return commonerror.NewInvalid(
-		"Folder name cannot be empty",
-		ErrCodeEmptyFolderName,
-		nil,
-	)
-}
+var ErrEmptyFolderName = commonerror.NewInvalid(
+	"Folder name cannot be empty",
+	ErrCodeEmptyFolderName,
+	nil,
+)

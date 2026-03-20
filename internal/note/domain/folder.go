@@ -25,7 +25,7 @@ func NewFolder(
 	folderHierarchy FolderHierarchy,
 ) (*Folder, error) {
 	if name == "" {
-		return nil, NewErrEmptyFolderName()
+		return nil, ErrEmptyFolderName
 	}
 	folder := &Folder{
 		id:              id,

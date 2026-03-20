@@ -3,6 +3,7 @@ package domain
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
@@ -21,34 +22,30 @@ func NewErrWorkspaceBySlugNotFound(slug string, err error) *commonerror.Err {
 	)
 }
 
-func NewErrWorkspaceByIDNotFound(id string, err error) *commonerror.Err {
+func NewErrWorkspaceByIDNotFound(id uuid.UUID, err error) *commonerror.Err {
 	return commonerror.NewNotFound(
-		fmt.Sprintf("Workspace with id %q not found", id),
+		fmt.Sprintf("Workspace with id %q not found", id.String()),
 		ErrCodeWorkspaceNotFound,
 		err,
 	)
 }
 
-func NewErrWorkspaceRootFolderNotFound(slug string, err error) *commonerror.Err {
+func NewErrWorkspaceRootFolderNotFound(id uuid.UUID, err error) *commonerror.Err {
 	return commonerror.NewNotFound(
-		fmt.Sprintf("Root folder for workspace with slug %q not found", slug),
+		fmt.Sprintf("Root folder for workspace with id %q not found", id.String()),
 		ErrCodeWorkspaceRootFolderNotFound,
 		err,
 	)
 }
 
-func NewErrEmptyWorkspaceName() *commonerror.Err {
-	return commonerror.NewInvalid(
-		"Workspace name cannot be empty",
-		ErrCodeInvalidWorkspaceName,
-		nil,
-	)
-}
+var ErrEmptyWorkspaceName = commonerror.NewInvalid(
+	"Workspace name cannot be empty",
+	ErrCodeInvalidWorkspaceName,
+	nil,
+)
 
-func NewErrEmptyWorkspaceSlug() *commonerror.Err {
-	return commonerror.NewInvalid(
-		"Workspace slug cannot be empty",
-		ErrCodeInvalidWorkspaceSlug,
-		nil,
-	)
-}
+var ErrEmptyWorkspaceSlug = commonerror.NewInvalid(
+	"Workspace slug cannot be empty",
+	ErrCodeInvalidWorkspaceSlug,
+	nil,
+)

@@ -20,33 +20,8 @@ post:
           schema:
             type: string
             format: uri
-            example: 
-              http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+            example: http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97
           required: true
-    400:
-      $ref: ../../common/components/responses/BadRequestError.yaml
-    401:
-      $ref: ../../common/components/responses/UnauthorizedError.yaml
-    500:
-      $ref: ../../common/components/responses/InternalServerError.yaml
-
-get:
-  security:
-    - Oauth2: []
-  tags:
-    - Note
-  summary: Get notes
-  operationId: getNotes
-  parameters:
-    - $ref: ../../common/components/parameters/pageQuery.yaml
-    - $ref: ../../common/components/parameters/limitQuery.yaml
-  responses:
-    200:
-      description: Successful response
-      content:
-        application/json:
-          schema:
-            $ref: ../components/schemas/Note.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

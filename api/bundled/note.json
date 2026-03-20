@@ -224,47 +224,6 @@
             "$ref": "#/components/responses/InternalServerError"
           }
         }
-      },
-      "get": {
-        "security": [
-          {
-            "Oauth2": []
-          }
-        ],
-        "tags": [
-          "Note"
-        ],
-        "summary": "Get notes",
-        "operationId": "getNotes",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/pageQuery"
-          },
-          {
-            "$ref": "#/components/parameters/limitQuery"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Note"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
       }
     },
     "/note/notes/generate-daily": {
@@ -2618,29 +2577,6 @@
         "schema": {
           "$ref": "#/components/schemas/id"
         }
-      },
-      "pageQuery": {
-        "name": "page",
-        "in": "query",
-        "description": "Page number for pagination",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "default": 1
-        },
-        "example": 1
-      },
-      "limitQuery": {
-        "name": "limit",
-        "in": "query",
-        "description": "Number of items per page",
-        "schema": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 100,
-          "default": 20
-        },
-        "example": 20
       },
       "noteIdPath": {
         "name": "noteId",

@@ -733,14 +733,8 @@ type UpdatedAt = time.Time
 // FolderIdPath defines model for folderIdPath.
 type FolderIdPath = Id
 
-// LimitQuery defines model for limitQuery.
-type LimitQuery = int
-
 // NoteIdPath defines model for noteIdPath.
 type NoteIdPath = NotePropertiesId
-
-// PageQuery defines model for pageQuery.
-type PageQuery = int
 
 // WorkspaceIdPath defines model for workspaceIdPath.
 type WorkspaceIdPath = PropertiesId
@@ -766,15 +760,6 @@ type UnauthorizedError = Error
 // RenameFolderJSONBody defines parameters for RenameFolder.
 type RenameFolderJSONBody struct {
 	Name Name `json:"name"`
-}
-
-// GetNotesParams defines parameters for GetNotes.
-type GetNotesParams struct {
-	// Page Page number for pagination
-	Page *PageQuery `form:"page,omitempty" json:"page,omitempty"`
-
-	// Limit Number of items per page
-	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
 // GenerateDailyNoteJSONBody defines parameters for GenerateDailyNote.
