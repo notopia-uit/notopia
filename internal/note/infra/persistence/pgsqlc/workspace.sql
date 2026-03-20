@@ -65,3 +65,10 @@ SELECT *
 FROM workspaces
 WHERE id = sqlc.arg('id')
   AND deleted_at IS NULL;
+
+-- name: GetWorkspaceByIDForUpdate :one
+SELECT *
+FROM workspaces
+WHERE id = sqlc.arg('id')
+  AND deleted_at IS NULL
+FOR UPDATE;

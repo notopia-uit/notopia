@@ -266,6 +266,25 @@ func (q *Queries) GetTrashedNotesByWorkspaceID(ctx context.Context, workspaceID 
 	return items, nil
 }
 
+const getWorkspaceIDByNoteID = `-- name: GetWorkspaceIDByNoteID :one
+SELECT
+  f.workspace_id
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  n.id = $1
+`
+
+func (q *Queries) GetWorkspaceIDByNoteID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getWorkspaceIDByNoteID, id)
+	var workspace_id uuid.UUID
+	err := row.Scan(&workspace_id)
+	return workspace_id, err
+}
+
 type InsertTempNotesParams struct {
 	ID        uuid.UUID
 	Name      string

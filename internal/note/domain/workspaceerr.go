@@ -21,6 +21,14 @@ func NewErrWorkspaceBySlugNotFound(slug string, err error) *commonerror.Err {
 	)
 }
 
+func NewErrWorkspaceByIDNotFound(id string, err error) *commonerror.Err {
+	return commonerror.NewNotFound(
+		fmt.Sprintf("Workspace with id %q not found", id),
+		ErrCodeWorkspaceNotFound,
+		err,
+	)
+}
+
 func NewErrWorkspaceRootFolderNotFound(slug string, err error) *commonerror.Err {
 	return commonerror.NewNotFound(
 		fmt.Sprintf("Root folder for workspace with slug %q not found", slug),

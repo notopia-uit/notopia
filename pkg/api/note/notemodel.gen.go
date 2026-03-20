@@ -442,11 +442,9 @@ type FolderUpdatedEvent struct {
 
 // FolderUpdatedEventData defines model for .
 type FolderUpdatedEventData struct {
-	Icon        *PropertiesIcon `json:"icon,omitempty"`
-	Id          *Id             `json:"id,omitempty"`
-	Name        Name            `json:"name"`
-	ParentId    *Id             `json:"parentId,omitempty"`
-	WorkspaceId *PropertiesId   `json:"workspaceId,omitempty"`
+	Icon *PropertiesIcon `json:"icon"`
+	Id   *Id             `json:"id,omitempty"`
+	Name Name            `json:"name"`
 }
 
 // FolderUpdatedEventType defines model for FolderUpdatedEvent.Type.

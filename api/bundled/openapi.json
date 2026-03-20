@@ -439,6 +439,45 @@
         }
       }
     },
+    "/note/folders/{folderId}": {
+      "delete": {
+        "security": [
+          {
+            "note_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Folder"
+        ],
+        "summary": "Delete folder",
+        "operationId": "deleteFolder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/note_folderIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Folder successfully deleted"
+          },
+          "400": {
+            "$ref": "#/components/responses/note_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/note_UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/note_ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/note_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/note_InternalServerError"
+          }
+        }
+      }
+    },
     "/note/folders/{folderId}/rename": {
       "post": {
         "security": [
@@ -2639,6 +2678,7 @@
             "type": "array",
             "items": {
               "type": "object",
+              "x-go-type-name": "GraphNode",
               "properties": {
                 "id": {
                   "type": "string",
@@ -2677,6 +2717,7 @@
             "type": "array",
             "items": {
               "type": "object",
+              "x-go-type-name": "GraphLink",
               "properties": {
                 "source": {
                   "type": "string",
@@ -2851,18 +2892,12 @@
               },
               "icon": {
                 "$ref": "#/components/schemas/note_properties-icon"
-              },
-              "workspaceId": {
-                "$ref": "#/components/schemas/note_properties-id"
-              },
-              "parentId": {
-                "$ref": "#/components/schemas/note_id"
               }
             },
             "required": [
               "id",
               "name",
-              "workspaceId"
+              "icon"
             ]
           }
         },
@@ -3628,21 +3663,6 @@
           }
         }
       },
-      "note_NotFoundError": {
-        "description": "Not Found Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/note_Error"
-            },
-            "example": {
-              "code": "NOT_FOUND",
-              "message": "The requested resource was not found",
-              "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
-            }
-          }
-        }
-      },
       "note_ForbiddenError": {
         "description": "Forbidden Error response",
         "content": {
@@ -3654,6 +3674,21 @@
               "code": "FORBIDDEN",
               "message": "You do not have permission to access this resource",
               "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
+            }
+          }
+        }
+      },
+      "note_NotFoundError": {
+        "description": "Not Found Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/note_Error"
+            },
+            "example": {
+              "code": "NOT_FOUND",
+              "message": "The requested resource was not found",
+              "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
             }
           }
         }

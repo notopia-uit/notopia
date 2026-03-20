@@ -20,6 +20,9 @@ type ServerInterface interface {
 	// Create folder
 	// (POST /note/folders)
 	CreateFolder(c *gin.Context)
+	// Delete folder
+	// (DELETE /note/folders/{folderId})
+	DeleteFolder(c *gin.Context, folderId FolderIdPath)
 	// Rename folder
 	// (POST /note/folders/{folderId}/rename)
 	RenameFolder(c *gin.Context, folderId FolderIdPath)
@@ -125,6 +128,32 @@ func (siw *ServerInterfaceWrapper) CreateFolder(c *gin.Context) {
 	}
 
 	siw.Handler.CreateFolder(c)
+}
+
+// DeleteFolder operation middleware
+func (siw *ServerInterfaceWrapper) DeleteFolder(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "folderId" -------------
+	var folderId FolderIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "folderId", c.Param("folderId"), &folderId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter folderId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteFolder(c, folderId)
 }
 
 // RenameFolder operation middleware
@@ -875,6 +904,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.POST(options.BaseURL+"/note/folders", wrapper.CreateFolder)
+	router.DELETE(options.BaseURL+"/note/folders/:folderId", wrapper.DeleteFolder)
 	router.POST(options.BaseURL+"/note/folders/:folderId/rename", wrapper.RenameFolder)
 	router.GET(options.BaseURL+"/note/notes", wrapper.GetNotes)
 	router.POST(options.BaseURL+"/note/notes", wrapper.CreateNote)
@@ -959,6 +989,69 @@ type CreateFolder500JSONResponse struct {
 }
 
 func (response CreateFolder500JSONResponse) VisitCreateFolderResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteFolderRequestObject struct {
+	FolderId FolderIdPath `json:"folderId"`
+}
+
+type DeleteFolderResponseObject interface {
+	VisitDeleteFolderResponse(w http.ResponseWriter) error
+}
+
+type DeleteFolder204Response struct {
+}
+
+func (response DeleteFolder204Response) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteFolder400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response DeleteFolder400JSONResponse) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteFolder401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response DeleteFolder401JSONResponse) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteFolder403JSONResponse struct{ ForbiddenErrorJSONResponse }
+
+func (response DeleteFolder403JSONResponse) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteFolder404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response DeleteFolder404JSONResponse) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DeleteFolder500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response DeleteFolder500JSONResponse) VisitDeleteFolderResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -2485,6 +2578,9 @@ type StrictServerInterface interface {
 	// Create folder
 	// (POST /note/folders)
 	CreateFolder(ctx context.Context, request CreateFolderRequestObject) (CreateFolderResponseObject, error)
+	// Delete folder
+	// (DELETE /note/folders/{folderId})
+	DeleteFolder(ctx context.Context, request DeleteFolderRequestObject) (DeleteFolderResponseObject, error)
 	// Rename folder
 	// (POST /note/folders/{folderId}/rename)
 	RenameFolder(ctx context.Context, request RenameFolderRequestObject) (RenameFolderResponseObject, error)
@@ -2606,6 +2702,33 @@ func (sh *strictHandler) CreateFolder(ctx *gin.Context) {
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(CreateFolderResponseObject); ok {
 		if err := validResponse.VisitCreateFolderResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteFolder operation middleware
+func (sh *strictHandler) DeleteFolder(ctx *gin.Context, folderId FolderIdPath) {
+	var request DeleteFolderRequestObject
+
+	request.FolderId = folderId
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteFolder(ctx, request.(DeleteFolderRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteFolder")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(DeleteFolderResponseObject); ok {
+		if err := validResponse.VisitDeleteFolderResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

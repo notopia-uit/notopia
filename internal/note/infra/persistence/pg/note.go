@@ -174,6 +174,14 @@ func (n *Note) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
 	return nil
 }
 
+func (n *Note) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+	workspaceID, err := n.queries.GetWorkspaceIDByNoteID(ctx, id)
+	if err != nil {
+		return uuid.UUID{}, toDomainError(err)
+	}
+	return workspaceID, nil
+}
+
 func noteToDomain(note *pgsqlc.Note, outgoingLinks uuid.UUIDs) *domain.Note {
 	var trashed *domain.Trashed
 	if note.TrashedBy != nil && note.TrashedAt != nil {
@@ -187,7 +195,7 @@ func noteToDomain(note *pgsqlc.Note, outgoingLinks uuid.UUIDs) *domain.Note {
 		note.Name,
 		note.Icon,
 		note.Tags,
-		uint(note.Size),
+		uint64(note.Size),
 		note.FolderID,
 		outgoingLinks,
 		trashed,

@@ -9,6 +9,7 @@ var ProviderSetCommand = wire.NewSet(
 	ProvideCreateFolderHandler,
 	ProvideCreateWorkspaceHandler,
 	ProvideDeleteNoteHandler,
+	ProvideDeleteFolderHandler,
 	ProvideDeleteWorkspaceHandler,
 	ProvideGenerateDailyNoteHandler,
 	ProvideMoveWorkspaceItemsHandler,

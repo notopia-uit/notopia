@@ -28,11 +28,9 @@ func workspaceEventToDTO(event domain.Event) (any, bool) {
 	case *domain.FolderUpdatedEvent:
 		dto = &note.FolderUpdatedEvent{
 			Data: note.FolderUpdatedEventData{
-				Id:          &e.ID,
-				Name:        e.Name,
-				Icon:        e.Icon,
-				WorkspaceId: &e.WorkspaceID,
-				ParentId:    e.ParentID,
+				Id:   &e.ID,
+				Name: e.Name,
+				Icon: e.Icon,
 			},
 			Type: note.FolderUpdatedEventTypeFolderUpdatedEvent,
 		}

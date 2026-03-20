@@ -242,3 +242,11 @@ DELETE FROM
   folders
 WHERE
   id = ANY(sqlc.arg('ids')::uuid[]);
+
+-- name: GetWorkspaceIDByFolderID :one
+SELECT
+  workspace_id
+FROM
+  folders
+WHERE
+  id = sqlc.arg('id');

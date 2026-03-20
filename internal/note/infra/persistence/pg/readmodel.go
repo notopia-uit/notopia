@@ -36,21 +36,21 @@ var (
 func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
 	queries := pgsqlc.New(r.pool)
 
-	workspaceID, err := queries.GetWorkspaceIDBySlug(ctx, q.Slug)
+	workspace, err := queries.GetWorkspaceByID(ctx, q.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceBySlugNotFound(q.Slug, err)
+			return nil, domain.NewErrWorkspaceByIDNotFound(q.ID.String(), err)
 		}
 		return nil, toDomainError(err)
 	}
 
 	rootFolder, err := queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
-		WorkspaceID:  &workspaceID,
+		WorkspaceID:  &workspace.ID,
 		IsRootFolder: true,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceRootFolderNotFound(q.Slug, err)
+			return nil, domain.NewErrWorkspaceRootFolderNotFound(workspace.Slug, err)
 		}
 		return nil, toDomainError(err)
 	}

@@ -33,6 +33,5 @@ var PostgresProviderSet = wire.NewSet(
 	wire.Bind(new(app.GetNoteLinksReadModel), new(*pg.ReadModel)),
 	wire.Bind(new(app.GetWorkspaceBySlugReadModel), new(*pg.ReadModel)),
 	wire.Bind(new(app.GetWorkspaceGraphReadModel), new(*pg.ReadModel)),
-	wire.Bind(new(app.GetWorkspaceMembersReadModel), new(*pg.ReadModel)),
 	wire.Bind(new(app.CheckWorkspaceExistsReadModel), new(*pg.ReadModel)),
 )

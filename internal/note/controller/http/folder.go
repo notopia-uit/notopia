@@ -6,35 +6,32 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/pkg/api/note"
+	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 )
 
 func (h *StrictHandler) CreateFolder(
 	ctx context.Context,
 	request note.CreateFolderRequestObject,
 ) (note.CreateFolderResponseObject, error) {
-	body := request.Body
-	if body == nil {
-		return note.CreateFolder400JSONResponse{BadRequestErrorJSONResponse: note.BadRequestErrorJSONResponse{Message: "request body required"}}, nil
+	user, err := commonhttp.UserFromContextError(ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	if body.ParentId == nil {
-		return note.CreateFolder400JSONResponse{BadRequestErrorJSONResponse: note.BadRequestErrorJSONResponse{Message: "parentId is required"}}, nil
-	}
-	if body.WorkspaceId == nil {
-		return note.CreateFolder400JSONResponse{BadRequestErrorJSONResponse: note.BadRequestErrorJSONResponse{Message: "workspaceId is required"}}, nil
-	}
+	body := request.Body
 
 	id := uuid.New()
 	cmd := &app.CreateFolder{
 		ID:          id,
 		Name:        body.Name,
 		Icon:        body.Icon,
-		ParentID:    uuid.UUID(*body.ParentId),
-		WorkspaceID: uuid.UUID(*body.WorkspaceId),
+		ParentID:    *body.ParentId,
+		WorkspaceID: *body.WorkspaceId,
+		UserID:      user.ID,
 	}
 
 	if err := h.App.CreateFolderHandler.Handle(ctx, cmd); err != nil {
-		return mapCreateFolderErrorResponse(err), nil
+		return nil, err
 	}
 
 	return note.CreateFolder201Response{
@@ -44,39 +41,46 @@ func (h *StrictHandler) CreateFolder(
 	}, nil
 }
 
+func (h *StrictHandler) DeleteFolder(
+	ctx context.Context,
+	request note.DeleteFolderRequestObject,
+) (note.DeleteFolderResponseObject, error) {
+	user, err := commonhttp.UserFromContextError(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	cmd := &app.DeleteFolder{
+		ID:     request.FolderId,
+		UserID: user.ID,
+	}
+
+	if err := h.App.DeleteFolderHandler.Handle(ctx, cmd); err != nil {
+		return nil, err
+	}
+	return note.DeleteFolder204Response{}, nil
+}
+
 func (h *StrictHandler) RenameFolder(
 	ctx context.Context,
 	request note.RenameFolderRequestObject,
 ) (note.RenameFolderResponseObject, error) {
-	body := request.Body
-	if body == nil {
-		return note.RenameFolder400JSONResponse{BadRequestErrorJSONResponse: note.BadRequestErrorJSONResponse{Message: "request body required"}}, nil
+	user, err := commonhttp.UserFromContextError(ctx)
+	if err != nil {
+		return nil, err
 	}
 
+	body := request.Body
+
 	cmd := &app.RenameFolder{
-		ID:   uuid.UUID(request.FolderId),
-		Name: body.Name,
+		ID:     request.FolderId,
+		Name:   body.Name,
+		UserID: user.ID,
 	}
 
 	if err := h.App.RenameFolderHandler.Handle(ctx, cmd); err != nil {
-		return mapRenameFolderErrorResponse(err), nil
+		return nil, err
 	}
 
 	return note.RenameFolder204Response{}, nil
-}
-
-func mapCreateFolderErrorResponse(err error) note.CreateFolderResponseObject {
-	return note.CreateFolder400JSONResponse{
-		BadRequestErrorJSONResponse: note.BadRequestErrorJSONResponse{
-			Message: err.Error(),
-		},
-	}
-}
-
-func mapRenameFolderErrorResponse(err error) note.RenameFolderResponseObject {
-	return note.RenameFolder400JSONResponse{
-		BadRequestErrorJSONResponse: note.BadRequestErrorJSONResponse{
-			Message: err.Error(),
-		},
-	}
 }

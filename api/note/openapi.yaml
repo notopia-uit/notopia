@@ -29,6 +29,8 @@ tags:
 paths:
   /note/folders:
     $ref: ./paths/folders.yaml
+  /note/folders/{folderId}:
+    $ref: ./paths/folders_{folderId}.yaml
   /note/folders/{folderId}/rename:
     $ref: ./paths/folders_{folderId}_rename.yaml
 

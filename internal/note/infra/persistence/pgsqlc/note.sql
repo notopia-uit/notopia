@@ -181,3 +181,14 @@ DELETE FROM
   notes
 WHERE
   id = ANY(sqlc.arg('ids')::uuid[]);
+
+-- name: GetWorkspaceIDByNoteID :one
+SELECT
+  f.workspace_id
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  n.id = sqlc.arg('id');

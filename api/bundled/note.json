@@ -85,6 +85,45 @@
         }
       }
     },
+    "/note/folders/{folderId}": {
+      "delete": {
+        "security": [
+          {
+            "Oauth2": []
+          }
+        ],
+        "tags": [
+          "Folder"
+        ],
+        "summary": "Delete folder",
+        "operationId": "deleteFolder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/folderIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Folder successfully deleted"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/folders/{folderId}/rename": {
       "post": {
         "security": [
@@ -1882,18 +1921,12 @@
               },
               "icon": {
                 "$ref": "#/components/schemas/properties-icon"
-              },
-              "workspaceId": {
-                "$ref": "#/components/schemas/properties-id"
-              },
-              "parentId": {
-                "$ref": "#/components/schemas/id"
               }
             },
             "required": [
               "id",
               "name",
-              "workspaceId"
+              "icon"
             ]
           }
         },
@@ -2546,21 +2579,6 @@
           }
         }
       },
-      "NotFoundError": {
-        "description": "Not Found Error response",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "NOT_FOUND",
-              "message": "The requested resource was not found",
-              "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
-            }
-          }
-        }
-      },
       "ForbiddenError": {
         "description": "Forbidden Error response",
         "content": {
@@ -2572,6 +2590,21 @@
               "code": "FORBIDDEN",
               "message": "You do not have permission to access this resource",
               "more_info": "https://api.notopia.com/docs/errors/FORBIDDEN"
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "Not Found Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "code": "NOT_FOUND",
+              "message": "The requested resource was not found",
+              "more_info": "https://api.notopia.com/docs/errors/NOT_FOUND"
             }
           }
         }

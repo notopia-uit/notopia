@@ -55,7 +55,42 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 		}
 		return nil, toDomainError(err)
 	}
-	return workspaceToDomain(workspaceResult, rootFolderResult.ID), nil
+	return workspaceToDomain(workspaceResult, rootFolderResult.ID)
+}
+
+func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Workspace, error) {
+	var workspaceResult *pgsqlc.Workspace
+	var err error
+	if forUpdate {
+		workspaceResult, err = w.queries.GetWorkspaceByIDForUpdate(ctx, id)
+	} else {
+		workspaceResult, err = w.queries.GetWorkspaceByID(ctx, id)
+	}
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domain.NewErrWorkspaceByIDNotFound(id.String(), err)
+		}
+		return nil, toDomainError(err)
+	}
+	var rootFolderResult *pgsqlc.Folder
+	if forUpdate {
+		rootFolderResult, err = w.queries.GetFolderForUpdate(ctx, &pgsqlc.GetFolderForUpdateParams{
+			WorkspaceID:  &workspaceResult.ID,
+			IsRootFolder: true,
+		})
+	} else {
+		rootFolderResult, err = w.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
+			WorkspaceID:  &workspaceResult.ID,
+			IsRootFolder: true,
+		})
+	}
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domain.NewErrWorkspaceRootFolderNotFound(id.String(), err)
+		}
+		return nil, toDomainError(err)
+	}
+	return workspaceToDomain(workspaceResult, rootFolderResult.ID)
 }
 
 func (w *Workspace) GetIDBySlug(ctx context.Context, slug string) (*uuid.UUID, error) {
@@ -89,7 +124,7 @@ func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) error
 	return nil
 }
 
-func workspaceToDomain(workspace *pgsqlc.Workspace, rootFolderID uuid.UUID) *domain.Workspace {
+func workspaceToDomain(workspace *pgsqlc.Workspace, rootFolderID uuid.UUID) (*domain.Workspace, error) {
 	return domain.NewWorkspace(
 		workspace.ID,
 		workspace.Name,

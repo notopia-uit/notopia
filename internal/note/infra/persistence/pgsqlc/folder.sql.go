@@ -326,6 +326,22 @@ func (q *Queries) GetFoldersForUpdate(ctx context.Context, arg *GetFoldersForUpd
 	return items, nil
 }
 
+const getWorkspaceIDByFolderID = `-- name: GetWorkspaceIDByFolderID :one
+SELECT
+  workspace_id
+FROM
+  folders
+WHERE
+  id = $1
+`
+
+func (q *Queries) GetWorkspaceIDByFolderID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, getWorkspaceIDByFolderID, id)
+	var workspace_id uuid.UUID
+	err := row.Scan(&workspace_id)
+	return workspace_id, err
+}
+
 type InsertTempFoldersParams struct {
 	ID          uuid.UUID
 	Name        string

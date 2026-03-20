@@ -159,6 +159,14 @@ func (f *Folder) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) err
 	return nil
 }
 
+func (f *Folder) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+	workspaceID, err := f.queries.GetWorkspaceIDByFolderID(ctx, id)
+	if err != nil {
+		return uuid.UUID{}, toDomainError(err)
+	}
+	return workspaceID, nil
+}
+
 func folderToDomain(folder *pgsqlc.Folder) *domain.Folder {
 	var trashed *domain.Trashed
 	if folder.TrashedBy != nil && folder.TrashedAt != nil {

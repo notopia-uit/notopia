@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"log/slog"
 	"sync"
@@ -22,10 +21,6 @@ func (h *StrictHandler) CreateWorkspace(
 	ctx context.Context,
 	request note.CreateWorkspaceRequestObject,
 ) (note.CreateWorkspaceResponseObject, error) {
-	if request.Body == nil {
-		return nil, errors.New("request body is required")
-	}
-
 	id := uuid.New()
 	cmd := &app.CreateWorkspace{
 		ID:   id,
@@ -48,12 +43,16 @@ func (h *StrictHandler) DeleteWorkspace(
 	ctx context.Context,
 	request note.DeleteWorkspaceRequestObject,
 ) (note.DeleteWorkspaceResponseObject, error) {
-	// Note: DeleteWorkspaceHandler expects Slug, but we receive WorkspaceId
-	// We need to get the workspace first to get the slug
-	cmd := &app.DeleteWorkspace{
-		Slug: request.WorkspaceId.String(),
+	user, err := commonhttp.UserFromContextError(ctx)
+	if err != nil {
+		return nil, err
 	}
-	err := h.App.DeleteWorkspaceHandler.Handle(ctx, cmd)
+
+	cmd := &app.DeleteWorkspace{
+		ID:     request.WorkspaceId,
+		UserID: user.ID,
+	}
+	err = h.App.DeleteWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +178,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 	request note.GetWorkspaceGraphRequestObject,
 ) (note.GetWorkspaceGraphResponseObject, error) {
 	query := &app.GetWorkspaceGraph{
-		Slug:   request.WorkspaceId.String(),
+		ID:     request.WorkspaceId,
 		Orphan: request.Params.Orphan,
 	}
 	result, err := h.App.GetWorkspaceGraphHandler.Handle(ctx, query)
@@ -195,29 +194,21 @@ func (h *StrictHandler) GetWorkspaceMembers(
 	ctx context.Context,
 	request note.GetWorkspaceMembersRequestObject,
 ) (note.GetWorkspaceMembersResponseObject, error) {
-	return nil, errors.New("not implemented")
+	return nil, commonerror.NewUnimplemented()
 }
 
 func (h *StrictHandler) UpdateWorkspaceMembers(
 	ctx context.Context,
 	request note.UpdateWorkspaceMembersRequestObject,
 ) (note.UpdateWorkspaceMembersResponseObject, error) {
-	return nil, errors.New("not implemented")
+	return nil, commonerror.NewUnimplemented()
 }
 
 func (h *StrictHandler) MoveWorkspaceItems(
 	ctx context.Context,
 	request note.MoveWorkspaceItemsRequestObject,
 ) (note.MoveWorkspaceItemsResponseObject, error) {
-	if request.Body == nil {
-		return nil, errors.New("request body is required")
-	}
-
-	c, ok := ctx.(*gin.Context)
-	if !ok {
-		return nil, commonerror.NewInternal("failed to cast context to gin.Context", "", nil)
-	}
-	user, err := commonhttp.UserFromContextError(c)
+	user, err := commonhttp.UserFromContextError(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -225,17 +216,13 @@ func (h *StrictHandler) MoveWorkspaceItems(
 	var noteIDs []uuid.UUID
 	if request.Body.NoteIds != nil {
 		noteIDs = make([]uuid.UUID, len(*request.Body.NoteIds))
-		for i, id := range *request.Body.NoteIds {
-			noteIDs[i] = id
-		}
+		copy(noteIDs, *request.Body.NoteIds)
 	}
 
 	var folderIDs []uuid.UUID
 	if request.Body.FolderIds != nil {
 		folderIDs = make([]uuid.UUID, len(*request.Body.FolderIds))
-		for i, id := range *request.Body.FolderIds {
-			folderIDs[i] = id
-		}
+		copy(folderIDs, *request.Body.FolderIds)
 	}
 
 	var destFolderID uuid.UUID
@@ -262,22 +249,24 @@ func (h *StrictHandler) PublishWorkspace(
 	ctx context.Context,
 	request note.PublishWorkspaceRequestObject,
 ) (note.PublishWorkspaceResponseObject, error) {
-	return nil, errors.New("not implemented")
+	return nil, commonerror.NewUnimplemented()
 }
 
 func (h *StrictHandler) RenameWorkspace(
 	ctx context.Context,
 	request note.RenameWorkspaceRequestObject,
 ) (note.RenameWorkspaceResponseObject, error) {
-	if request.Body == nil {
-		return nil, errors.New("request body is required")
+	user, err := commonhttp.UserFromContextError(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	cmd := &app.RenameWorkspace{
-		Slug: request.WorkspaceId.String(),
-		Name: request.Body.Name,
+		ID:     request.WorkspaceId,
+		Name:   request.Body.Name,
+		UserID: user.ID,
 	}
-	err := h.App.RenameWorkspaceHandler.Handle(ctx, cmd)
+	err = h.App.RenameWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -289,7 +278,7 @@ func (h *StrictHandler) RestoreTrashedWorkspaceItems(
 	ctx context.Context,
 	request note.RestoreTrashedWorkspaceItemsRequestObject,
 ) (note.RestoreTrashedWorkspaceItemsResponseObject, error) {
-	return nil, errors.New("not implemented - Restore() methods not yet available in domain")
+	return nil, commonerror.NewUnimplemented()
 }
 
 func (h *StrictHandler) ShowTrash(
@@ -312,8 +301,9 @@ func (h *StrictHandler) TrashWorkspaceItems(
 	ctx context.Context,
 	request note.TrashWorkspaceItemsRequestObject,
 ) (note.TrashWorkspaceItemsResponseObject, error) {
-	if request.Body == nil {
-		return nil, errors.New("request body is required")
+	user, err := commonhttp.UserFromContextError(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	var noteIDs []uuid.UUID
@@ -333,11 +323,12 @@ func (h *StrictHandler) TrashWorkspaceItems(
 	}
 
 	cmd := &app.TrashWorkspaceItems{
-		WorkspaceSlug: request.WorkspaceId.String(),
-		NoteIDs:       noteIDs,
-		FolderIDs:     folderIDs,
+		WorkspaceID: request.WorkspaceId,
+		UserID:      user.ID,
+		NoteIDs:     noteIDs,
+		FolderIDs:   folderIDs,
 	}
-	err := h.App.TrashWorkspaceItemsHandler.Handle(ctx, cmd)
+	err = h.App.TrashWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -350,7 +341,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 	request note.GetWorkspaceTreeRequestObject,
 ) (note.GetWorkspaceTreeResponseObject, error) {
 	query := &app.GetWorkspaceTree{
-		Slug: request.WorkspaceId.String(),
+		ID: request.WorkspaceId,
 	}
 	result, err := h.App.GetWorkspaceTreeHandler.Handle(ctx, query)
 	if err != nil {
@@ -365,5 +356,5 @@ func (h *StrictHandler) UnpublishWorkspace(
 	ctx context.Context,
 	request note.UnpublishWorkspaceRequestObject,
 ) (note.UnpublishWorkspaceResponseObject, error) {
-	return nil, errors.New("not implemented")
+	return nil, commonerror.NewUnimplemented()
 }

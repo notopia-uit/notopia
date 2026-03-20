@@ -16,14 +16,10 @@ properties:
         $ref: ./Folder.yaml#/properties/name
       icon:
         $ref: ./Folder.yaml#/properties/icon
-      workspaceId:
-        $ref: ./Workspace.yaml#/properties/id
-      parentId:
-        $ref: ./Folder.yaml#/properties/parentId
     required:
       - id
       - name
-      - workspaceId
+      - icon
 required:
   - type
   - data
