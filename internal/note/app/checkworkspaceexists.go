@@ -7,7 +7,7 @@ type CheckWorkspaceExists struct {
 }
 
 type CheckWorkspaceExistsReadModel interface {
-	CheckWorkspaceExists(ctx context.Context, q *CheckWorkspaceExists) (CheckWorkspaceExistsResult, error)
+	CheckWorkspaceExists(ctx context.Context, q *CheckWorkspaceExists) (*CheckWorkspaceExistsResult, error)
 }
 
 type CheckWorkspaceExistsHandler struct {
@@ -20,6 +20,6 @@ func NewCheckWorkspaceExistsHandler(readModel CheckWorkspaceExistsReadModel) *Ch
 
 var ProvideCheckWorkspaceExistsHandler = NewCheckWorkspaceExistsHandler
 
-func (h *CheckWorkspaceExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceExists) (CheckWorkspaceExistsResult, error) {
+func (h *CheckWorkspaceExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceExists) (*CheckWorkspaceExistsResult, error) {
 	return h.readModel.CheckWorkspaceExists(ctx, query)
 }

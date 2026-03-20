@@ -2,7 +2,6 @@ package note
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/note/app"
@@ -16,7 +15,7 @@ type Server struct {
 	http          *http.Server
 	grpc          *grpc.Server
 	healthManager *healthmanager.HealthManager
-	persistence   app.Persistence
+	application   *app.App
 	logger        *slog.Logger
 }
 
@@ -24,7 +23,7 @@ func NewServer(
 	httpServer *http.Server,
 	grpcServer *grpc.Server,
 	healthManager *healthmanager.HealthManager,
-	persistence app.Persistence,
+	application *app.App,
 	logger *slog.Logger,
 ) *Server {
 	slog.SetDefault(logger)
@@ -33,14 +32,14 @@ func NewServer(
 		http:          httpServer,
 		grpc:          grpcServer,
 		healthManager: healthManager,
-		persistence:   persistence,
+		application:   application,
 		logger:        logger,
 	}
 }
 
 func (s *Server) Run(ctx context.Context) error {
-	if err := s.persistence.RunMigrations(ctx); err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
+	if err := s.application.Start(ctx); err != nil {
+		return err
 	}
 
 	g, ctx := errgroup.WithContext(ctx)
@@ -67,6 +66,11 @@ func (s *Server) Run(ctx context.Context) error {
 
 	s.healthManager.SetStartedUp()
 	go s.healthManager.StartMonitoring(ctx)
+
+	g.Go(func() error {
+		<-ctx.Done()
+		return s.application.Stop(context.Background())
+	})
 
 	return g.Wait()
 }

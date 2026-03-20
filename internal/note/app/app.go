@@ -1,5 +1,12 @@
 package app
 
+import (
+	"context"
+	"fmt"
+
+	"golang.org/x/sync/errgroup"
+)
+
 type App struct {
 	// Command Handlers
 	CreateNoteHandler                   *CreateNoteHandler
@@ -33,6 +40,10 @@ type App struct {
 
 	// Event Handlers
 	DocumentCommittedHandler *DocumentCommittedHandler
+
+	// Dependencies
+	workspaceEventPubSub WorkspaceEventPubSub
+	persistence          Persistence
 }
 
 func NewApp(
@@ -63,6 +74,8 @@ func NewApp(
 	getWorkspaceTreeHandler *GetWorkspaceTreeHandler,
 	showTrashHandler *ShowTrashHandler,
 	documentCommittedHandler *DocumentCommittedHandler,
+	workspaceEventPubSub WorkspaceEventPubSub,
+	persistence Persistence,
 ) *App {
 	return &App{
 		CreateNoteHandler:                   createNoteHandler,
@@ -92,7 +105,39 @@ func NewApp(
 		GetWorkspaceTreeHandler:             getWorkspaceTreeHandler,
 		ShowTrashHandler:                    showTrashHandler,
 		DocumentCommittedHandler:            documentCommittedHandler,
+		workspaceEventPubSub:                workspaceEventPubSub,
+		persistence:                         persistence,
 	}
+}
+
+func (a *App) RunMigration(ctx context.Context) error {
+	if a.persistence == nil {
+		return nil
+	}
+	return a.persistence.RunMigrations(ctx)
+}
+
+func (a *App) Start(ctx context.Context) error {
+	g, ctx := errgroup.WithContext(ctx)
+
+	if err := a.RunMigration(ctx); err != nil {
+		return fmt.Errorf("failed to run migrations: %w", err)
+	}
+
+	if a.workspaceEventPubSub != nil {
+		g.Go(func() error {
+			return a.workspaceEventPubSub.Run(ctx)
+		})
+	}
+
+	return g.Wait()
+}
+
+func (a *App) Stop(ctx context.Context) error {
+	if a.workspaceEventPubSub != nil {
+		return a.workspaceEventPubSub.Close()
+	}
+	return nil
 }
 
 var ProvideApp = NewApp

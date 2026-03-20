@@ -11,7 +11,7 @@ type GetNoteGraph struct {
 }
 
 type GetNoteGraphReadModel interface {
-	GetNoteGraph(ctx context.Context, q *GetNoteGraph) (Graph, error)
+	GetNoteGraph(ctx context.Context, q *GetNoteGraph) (*Graph, error)
 }
 
 type GetNoteGraphHandler struct {
@@ -24,6 +24,6 @@ func NewGetNoteGraphHandler(readModel GetNoteGraphReadModel) *GetNoteGraphHandle
 
 var ProvideGetNoteGraphHandler = NewGetNoteGraphHandler
 
-func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (Graph, error) {
+func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (*Graph, error) {
 	return h.readModel.GetNoteGraph(ctx, query)
 }

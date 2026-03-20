@@ -34,15 +34,15 @@ var (
 	_ app.CheckWorkspaceExistsReadModel = (*ReadModel)(nil)
 )
 
-func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (app.WorkspaceTreeFolder, error) {
+func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
 	queries := pgsqlc.New(r.pool)
 
 	workspaceID, err := queries.GetWorkspaceIDBySlug(ctx, q.Slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return app.WorkspaceTreeFolder{}, domain.NewErrWorkspaceNotFound(q.Slug, err)
+			return nil, domain.NewErrWorkspaceNotFound(q.Slug, err)
 		}
-		return app.WorkspaceTreeFolder{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	rootFolder, err := queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
@@ -51,16 +51,16 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return app.WorkspaceTreeFolder{}, domain.NewErrWorkspaceRootFolderNotFound(q.Slug, err)
+			return nil, domain.NewErrWorkspaceRootFolderNotFound(q.Slug, err)
 		}
-		return app.WorkspaceTreeFolder{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	tree, err := r.buildFolderTree(ctx, queries, *rootFolder)
 	return tree, err
 }
 
-func (r *ReadModel) buildFolderTree(ctx context.Context, queries *pgsqlc.Queries, folder pgsqlc.Folder) (app.WorkspaceTreeFolder, error) {
+func (r *ReadModel) buildFolderTree(ctx context.Context, queries *pgsqlc.Queries, folder pgsqlc.Folder) (*app.WorkspaceTreeFolder, error) {
 	result := app.WorkspaceTreeFolder{
 		Id:        folder.ID,
 		Name:      folder.Name,
@@ -72,7 +72,7 @@ func (r *ReadModel) buildFolderTree(ctx context.Context, queries *pgsqlc.Queries
 
 	notes, err := queries.GetNotesByFolderID(ctx, folder.ID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return app.WorkspaceTreeFolder{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	for _, note := range notes {
@@ -88,21 +88,21 @@ func (r *ReadModel) buildFolderTree(ctx context.Context, queries *pgsqlc.Queries
 		ParentID: &folder.ID,
 	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return app.WorkspaceTreeFolder{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	for _, child := range children {
 		childTree, err := r.buildFolderTree(ctx, queries, *child)
 		if err != nil {
-			return app.WorkspaceTreeFolder{}, err
+			return nil, err
 		}
-		result.Children = append(result.Children, childTree)
+		result.Children = append(result.Children, *childTree)
 	}
 
-	return result, nil
+	return &result, nil
 }
 
-func (r *ReadModel) GetNotes(ctx context.Context, q *app.GetNotes) (app.Paginated[app.Note], error) {
+func (r *ReadModel) GetNotes(ctx context.Context, q *app.GetNotes) (*app.Paginated[app.Note], error) {
 	queries := pgsqlc.New(r.pool)
 
 	folder, err := queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
@@ -110,14 +110,14 @@ func (r *ReadModel) GetNotes(ctx context.Context, q *app.GetNotes) (app.Paginate
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return app.Paginated[app.Note]{}, domain.NewErrFolderNotFound(q.ID, err)
+			return nil, domain.NewErrFolderNotFound(q.ID, err)
 		}
-		return app.Paginated[app.Note]{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	notes, err := queries.GetNotesByFolderID(ctx, folder.ID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return app.Paginated[app.Note]{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	noteIDs := make([]uuid.UUID, len(notes))
@@ -132,14 +132,14 @@ func (r *ReadModel) GetNotes(ctx context.Context, q *app.GetNotes) (app.Paginate
 		for _, noteID := range noteIDs {
 			backlinks, err := queries.GetNoteBacklinks(ctx, noteID)
 			if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-				return app.Paginated[app.Note]{}, toDomainError(err)
+				return nil, toDomainError(err)
 			}
 			backlinksMap[noteID] = len(backlinks)
 		}
 
 		outgoingLinks, err := queries.GetNotesOutgoingLinks(ctx, noteIDs)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return app.Paginated[app.Note]{}, toDomainError(err)
+			return nil, toDomainError(err)
 		}
 		for _, link := range outgoingLinks {
 			outgoingLinksMap[link.SourceID]++
@@ -167,26 +167,26 @@ func (r *ReadModel) GetNotes(ctx context.Context, q *app.GetNotes) (app.Paginate
 		TotalPages: 1,
 	}
 
-	return app.Paginated[app.Note]{
+	return &app.Paginated[app.Note]{
 		Data:       appNotes,
 		Pagination: pagination,
 	}, nil
 }
 
-func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (app.Trash, error) {
+func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash, error) {
 	queries := pgsqlc.New(r.pool)
 
 	workspaceID, err := queries.GetWorkspaceIDBySlug(ctx, q.Slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return app.Trash{}, domain.NewErrWorkspaceNotFound(q.Slug, err)
+			return nil, domain.NewErrWorkspaceNotFound(q.Slug, err)
 		}
-		return app.Trash{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	trashedNotes, err := queries.GetTrashedNotesByWorkspaceID(ctx, workspaceID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return app.Trash{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	trashedFolders, err := queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
@@ -194,7 +194,7 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (app.Trash,
 		TrashedBy:   "purpose",
 	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return app.Trash{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	notes := make([]app.TrashedNote, len(trashedNotes))
@@ -225,21 +225,21 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (app.Trash,
 		}
 	}
 
-	return app.Trash{
+	return &app.Trash{
 		Notes:   notes,
 		Folders: folders,
 	}, nil
 }
 
-func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (app.Graph, error) {
+func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app.Graph, error) {
 	queries := pgsqlc.New(r.pool)
 
 	note, err := queries.GetNote(ctx, q.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return app.Graph{}, domain.NewErrNoteNotFound(q.ID, err)
+			return nil, domain.NewErrNoteNotFound(q.ID, err)
 		}
-		return app.Graph{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	nodeMap := make(map[string]bool)
@@ -259,7 +259,7 @@ func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (app.
 
 	outgoingLinks, err := queries.GetNoteOutgoingLinks(ctx, q.ID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return app.Graph{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	for _, targetID := range outgoingLinks {
@@ -287,7 +287,7 @@ func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (app.
 
 	backlinks, err := queries.GetNoteBacklinks(ctx, q.ID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return app.Graph{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	for _, sourceID := range backlinks {
@@ -313,21 +313,21 @@ func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (app.
 		}
 	}
 
-	return app.Graph{
+	return &app.Graph{
 		Nodes: nodes,
 		Links: links,
 	}, nil
 }
 
-func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (app.NoteLinkResult, error) {
+func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app.NoteLinkResult, error) {
 	queries := pgsqlc.New(r.pool)
 
 	_, err := queries.GetNote(ctx, q.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return app.NoteLinkResult{}, domain.NewErrNoteNotFound(q.ID, err)
+			return nil, domain.NewErrNoteNotFound(q.ID, err)
 		}
-		return app.NoteLinkResult{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	result := app.NoteLinkResult{
@@ -341,13 +341,13 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (app.
 	if shouldFetchOutgoing {
 		outgoingLinks, err := queries.GetNoteOutgoingLinks(ctx, q.ID)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return app.NoteLinkResult{}, toDomainError(err)
+			return nil, toDomainError(err)
 		}
 
 		if len(outgoingLinks) > 0 {
 			outgoingNotes, err := queries.GetNotes(ctx, outgoingLinks)
 			if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-				return app.NoteLinkResult{}, toDomainError(err)
+				return nil, toDomainError(err)
 			}
 			for _, linkedNote := range outgoingNotes {
 				result.OutgoingLinks = append(result.OutgoingLinks, app.NoteLink{
@@ -362,13 +362,13 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (app.
 	if shouldFetchBacklinks {
 		backlinks, err := queries.GetNoteBacklinks(ctx, q.ID)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return app.NoteLinkResult{}, toDomainError(err)
+			return nil, toDomainError(err)
 		}
 
 		if len(backlinks) > 0 {
 			backlinkNotes, err := queries.GetNotes(ctx, backlinks)
 			if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-				return app.NoteLinkResult{}, toDomainError(err)
+				return nil, toDomainError(err)
 			}
 			for _, linkedNote := range backlinkNotes {
 				result.Backlinks = append(result.Backlinks, app.NoteLink{
@@ -380,43 +380,43 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (app.
 		}
 	}
 
-	return result, nil
+	return &result, nil
 }
 
-func (r *ReadModel) GetWorkspace(ctx context.Context, q *app.GetWorkspace) (app.Workspace, error) {
+func (r *ReadModel) GetWorkspace(ctx context.Context, q *app.GetWorkspace) (*app.Workspace, error) {
 	queries := pgsqlc.New(r.pool)
 
 	workspace, err := queries.GetWorkspaceBySlug(ctx, q.Slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return app.Workspace{}, domain.NewErrWorkspaceNotFound(q.Slug, err)
+			return nil, domain.NewErrWorkspaceNotFound(q.Slug, err)
 		}
-		return app.Workspace{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
-	return app.Workspace{
+	return &app.Workspace{
 		Id:   workspace.ID,
 		Slug: workspace.Slug,
 		Name: workspace.Name,
 	}, nil
 }
 
-func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (app.Graph, error) {
+func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, error) {
 	queries := pgsqlc.New(r.pool)
 
 	workspaceID, err := queries.GetWorkspaceIDBySlug(ctx, q.Slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return app.Graph{}, domain.NewErrWorkspaceNotFound(q.Slug, err)
+			return nil, domain.NewErrWorkspaceNotFound(q.Slug, err)
 		}
-		return app.Graph{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	folders, err := queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
 		WorkspaceID: &workspaceID,
 	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return app.Graph{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	folderIDs := make([]uuid.UUID, len(folders))
@@ -426,7 +426,7 @@ func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGr
 
 	allNotes, err := queries.GetNotes(ctx, folderIDs)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return app.Graph{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
 	noteIDs := make([]uuid.UUID, len(allNotes))
@@ -454,7 +454,7 @@ func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGr
 	if len(noteIDs) > 0 {
 		allLinks, err := queries.GetNotesOutgoingLinks(ctx, noteIDs)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-			return app.Graph{}, toDomainError(err)
+			return nil, toDomainError(err)
 		}
 
 		for _, link := range allLinks {
@@ -474,25 +474,25 @@ func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGr
 		}
 	}
 
-	return app.Graph{
+	return &app.Graph{
 		Nodes: nodes,
 		Links: links,
 	}, nil
 }
 
-func (r *ReadModel) GetWorkspaceMembers(ctx context.Context, q *app.GetWorkspaceMembers) ([]app.WorkspaceMember, error) {
-	return []app.WorkspaceMember{}, nil
+func (r *ReadModel) GetWorkspaceMembers(ctx context.Context, q *app.GetWorkspaceMembers) (*[]app.WorkspaceMember, error) {
+	return nil, nil
 }
 
-func (r *ReadModel) CheckWorkspaceExists(ctx context.Context, q *app.CheckWorkspaceExists) (app.CheckWorkspaceExistsResult, error) {
+func (r *ReadModel) CheckWorkspaceExists(ctx context.Context, q *app.CheckWorkspaceExists) (*app.CheckWorkspaceExistsResult, error) {
 	queries := pgsqlc.New(r.pool)
 
 	exists, err := queries.CheckSlugExists(ctx, q.Slug)
 	if err != nil {
-		return app.CheckWorkspaceExistsResult{}, toDomainError(err)
+		return nil, toDomainError(err)
 	}
 
-	return app.CheckWorkspaceExistsResult{
+	return &app.CheckWorkspaceExistsResult{
 		Exists: exists,
 	}, nil
 }

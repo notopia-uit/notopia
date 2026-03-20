@@ -7,7 +7,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/domain"
 )
 
-type WorkspaceEvent interface {
+type WorkspaceEventPubSub interface {
 	Publish(
 		ctx context.Context,
 		workspaceID uuid.UUID,

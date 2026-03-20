@@ -12,7 +12,7 @@ type GetNoteLinks struct {
 }
 
 type GetNoteLinksReadModel interface {
-	GetNoteLinks(ctx context.Context, q *GetNoteLinks) (NoteLinkResult, error)
+	GetNoteLinks(ctx context.Context, q *GetNoteLinks) (*NoteLinkResult, error)
 }
 
 type GetNoteLinksHandler struct {
@@ -25,6 +25,6 @@ func NewGetNoteLinksHandler(readModel GetNoteLinksReadModel) *GetNoteLinksHandle
 
 var ProvideGetNoteLinksHandler = NewGetNoteLinksHandler
 
-func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (NoteLinkResult, error) {
+func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (*NoteLinkResult, error) {
 	return h.readModel.GetNoteLinks(ctx, query)
 }

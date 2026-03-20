@@ -11,7 +11,7 @@ type GetNote struct {
 }
 
 type GetNoteReadModel interface {
-	GetNote(ctx context.Context, q *GetNote) (Note, error)
+	GetNote(ctx context.Context, q *GetNote) (*Note, error)
 }
 
 type GetNoteHandler struct {
@@ -22,6 +22,6 @@ func NewGetNoteHandler(readModel GetNoteReadModel) *GetNoteHandler {
 	return &GetNoteHandler{readModel: readModel}
 }
 
-func (h *GetNoteHandler) Handle(ctx context.Context, query *GetNote) (Note, error) {
+func (h *GetNoteHandler) Handle(ctx context.Context, query *GetNote) (*Note, error) {
 	return h.readModel.GetNote(ctx, query)
 }

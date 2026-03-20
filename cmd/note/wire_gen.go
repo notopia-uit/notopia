@@ -139,10 +139,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	showTrashHandler := app.NewShowTrashHandler(readModel)
 	noteService := domain.NewNoteService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgNote, noteService)
-	appApp := app.NewApp(createNoteHandler, createFolderHandler, createWorkspaceHandler, deleteNoteHandler, deleteWorkspaceHandler, generateDailyNoteHandler, moveWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler, checkWorkspaceExistsHandler, getNoteGraphHandler, getNoteLinksHandler, getNotesHandler, getWorkspaceHandler, getWorkspaceGraphHandler, getWorkspaceMembersHandler, getWorkspaceTreeHandler, showTrashHandler, documentCommittedHandler)
+	appApp := app.NewApp(createNoteHandler, createFolderHandler, createWorkspaceHandler, deleteNoteHandler, deleteWorkspaceHandler, generateDailyNoteHandler, moveWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler, checkWorkspaceExistsHandler, getNoteGraphHandler, getNoteLinksHandler, getNotesHandler, getWorkspaceHandler, getWorkspaceGraphHandler, getWorkspaceMembersHandler, getWorkspaceTreeHandler, showTrashHandler, documentCommittedHandler, workspaceEvent, persistencePg)
 	strictHandler := &http.StrictHandler{
-		App:            appApp,
-		WorkspaceEvent: workspaceEvent,
+		App:                  appApp,
+		WorkspaceEventPubSub: workspaceEvent,
 	}
 	serverInterface := http.NewHandler(strictHandler)
 	server := &configConfig.Server
@@ -166,7 +166,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	noteServer := note.NewServer(httpServer, grpcServer, healthManager, persistencePg, logger)
+	noteServer := note.NewServer(httpServer, grpcServer, healthManager, appApp, logger)
 	return noteServer, func() {
 		cleanup7()
 		cleanup6()

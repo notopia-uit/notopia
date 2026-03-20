@@ -17,7 +17,7 @@ type Authorization struct {
 	client pbconnect.AuthorizationServiceClient
 }
 
-var _ app.Authorization = (*Authorization)(nil)
+var _ app.AuthorizationService = (*Authorization)(nil)
 
 func NewAuthorization(
 	servicesCfg *config.Services,

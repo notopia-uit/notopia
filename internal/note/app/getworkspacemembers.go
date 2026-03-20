@@ -7,7 +7,7 @@ type GetWorkspaceMembers struct {
 }
 
 type GetWorkspaceMembersReadModel interface {
-	GetWorkspaceMembers(ctx context.Context, q *GetWorkspaceMembers) ([]WorkspaceMember, error)
+	GetWorkspaceMembers(ctx context.Context, q *GetWorkspaceMembers) (*[]WorkspaceMember, error)
 }
 
 type GetWorkspaceMembersHandler struct {
@@ -20,6 +20,6 @@ func NewGetWorkspaceMembersHandler(readModel GetWorkspaceMembersReadModel) *GetW
 
 var ProvideGetWorkspaceMembersHandler = NewGetWorkspaceMembersHandler
 
-func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorkspaceMembers) ([]WorkspaceMember, error) {
+func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorkspaceMembers) (*[]WorkspaceMember, error) {
 	return h.readModel.GetWorkspaceMembers(ctx, query)
 }

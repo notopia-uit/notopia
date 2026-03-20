@@ -8,7 +8,7 @@ type GetWorkspaceGraph struct {
 }
 
 type GetWorkspaceGraphReadModel interface {
-	GetWorkspaceGraph(ctx context.Context, q *GetWorkspaceGraph) (Graph, error)
+	GetWorkspaceGraph(ctx context.Context, q *GetWorkspaceGraph) (*Graph, error)
 }
 
 type GetWorkspaceGraphHandler struct {
@@ -21,6 +21,6 @@ func NewGetWorkspaceGraphHandler(readModel GetWorkspaceGraphReadModel) *GetWorks
 
 var ProvideGetWorkspaceGraphHandler = NewGetWorkspaceGraphHandler
 
-func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspaceGraph) (Graph, error) {
+func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspaceGraph) (*Graph, error) {
 	return h.readModel.GetWorkspaceGraph(ctx, query)
 }

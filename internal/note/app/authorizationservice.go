@@ -35,7 +35,7 @@ type WorkspaceMemberInfo struct {
 	Role WorkspaceRole
 }
 
-type Authorization interface {
+type AuthorizationService interface {
 	HasWorkspacePermission(
 		ctx context.Context,
 		userID string,

@@ -7,5 +7,5 @@ import (
 
 var ProviderSet = wire.NewSet(
 	ProvideAuthorization,
-	wire.Bind(new(app.Authorization), new(*Authorization)),
+	wire.Bind(new(app.AuthorizationService), new(*Authorization)),
 )

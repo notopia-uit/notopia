@@ -19,7 +19,7 @@ type Integration struct {
 	publisher      message.Publisher
 }
 
-var _ app.Integration = (*Integration)(nil)
+var _ app.IntegrationPubSub = (*Integration)(nil)
 
 func NewIntegration(
 	cfg *commonconfig.Kafka,

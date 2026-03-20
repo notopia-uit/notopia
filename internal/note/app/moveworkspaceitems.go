@@ -18,19 +18,19 @@ type MoveWorkspaceItems struct {
 }
 
 type MoveWorkspaceItemsHandler struct {
-	authorizationService Authorization
+	authorizationService AuthorizationService
 	noteRepo             domain.NoteRepo
 	folderRepo           domain.FolderRepo
 	uow                  domain.UnitOfWork
-	workspaceEvent       WorkspaceEvent
+	workspaceEvent       WorkspaceEventPubSub
 }
 
 func NewMoveWorkspaceItemsHandler(
-	authorizationService Authorization,
+	authorizationService AuthorizationService,
 	noteRepo domain.NoteRepo,
 	folderRepo domain.FolderRepo,
 	uow domain.UnitOfWork,
-	workspaceEvent WorkspaceEvent,
+	workspaceEvent WorkspaceEventPubSub,
 ) *MoveWorkspaceItemsHandler {
 	return &MoveWorkspaceItemsHandler{
 		authorizationService: authorizationService,

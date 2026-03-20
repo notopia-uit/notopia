@@ -12,7 +12,7 @@ type GetNotes struct {
 }
 
 type GetNotesReadModel interface {
-	GetNotes(ctx context.Context, q *GetNotes) (Paginated[Note], error)
+	GetNotes(ctx context.Context, q *GetNotes) (*Paginated[Note], error)
 }
 
 type GetNotesHandler struct {
@@ -25,6 +25,6 @@ func NewGetNotesHandler(readModel GetNotesReadModel) *GetNotesHandler {
 
 var ProvideGetNotesHandler = NewGetNotesHandler
 
-func (h *GetNotesHandler) Handle(ctx context.Context, query *GetNotes) (Paginated[Note], error) {
+func (h *GetNotesHandler) Handle(ctx context.Context, query *GetNotes) (*Paginated[Note], error) {
 	return h.readModel.GetNotes(ctx, query)
 }

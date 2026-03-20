@@ -7,7 +7,7 @@ type GetWorkspace struct {
 }
 
 type GetWorkspaceReadModel interface {
-	GetWorkspace(ctx context.Context, q *GetWorkspace) (Workspace, error)
+	GetWorkspace(ctx context.Context, q *GetWorkspace) (*Workspace, error)
 }
 
 type GetWorkspaceHandler struct {
@@ -20,6 +20,6 @@ func NewGetWorkspaceHandler(readModel GetWorkspaceReadModel) *GetWorkspaceHandle
 
 var ProvideGetWorkspaceHandler = NewGetWorkspaceHandler
 
-func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspace) (Workspace, error) {
+func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspace) (*Workspace, error) {
 	return h.readModel.GetWorkspace(ctx, query)
 }

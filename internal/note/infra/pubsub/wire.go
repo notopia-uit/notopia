@@ -13,6 +13,6 @@ var ProviderSet = wire.NewSet(
 	ProvideWorkspaceEvent,
 	ProvideWorkspaceEventHubPubSub,
 	ProvideWorkspaceEventInternalPubSub,
-	wire.Bind(new(app.Integration), new(*Integration)),
-	wire.Bind(new(app.WorkspaceEvent), new(*WorkspaceEvent)),
+	wire.Bind(new(app.IntegrationPubSub), new(*Integration)),
+	wire.Bind(new(app.WorkspaceEventPubSub), new(*WorkspaceEvent)),
 )

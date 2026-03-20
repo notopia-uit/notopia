@@ -100,7 +100,7 @@ type WorkspaceEvent struct {
 	hubPubSub      *WorkspaceEventHubPubSub
 }
 
-var _ app.WorkspaceEvent = (*WorkspaceEvent)(nil)
+var _ app.WorkspaceEventPubSub = (*WorkspaceEvent)(nil)
 
 func NewWorkspaceEvent(
 	internalPubSub *WorkspaceEventInternalPubSub,
