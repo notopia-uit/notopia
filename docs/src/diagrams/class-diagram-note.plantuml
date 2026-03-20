@@ -69,7 +69,7 @@ package "Domain" as Domain <<Frame>> {
         rootFolderID uuid.UUID
         deletedAt *time.Time
 
-        Rename(newName string)
+        Rename(name string)
         Delete()
     }
 
@@ -78,19 +78,23 @@ package "Domain" as Domain <<Frame>> {
         name string
         icon *string
         workspaceID uuid.UUID
-        folderHierarchy *FolderHierarchy
-        trashedBy *TrashedBy
-        trashedAt *time.Time
+        folderHierarchy FolderHierarchy
+        trashed *Trashed
 
-        Rename(newName string)
-        ParentID() *uuid.UUID, bool
+        Rename(name string)
+        SetIcon(icon string)
+        ParentID() *uuid.UUID
         IsRoot() bool
         MoveToFolder(folderID uuid.UUID)
         Trash(trashedBy TrashedBy)
+        Restore()
     }
 
     ValueObject(FolderHierarchy) {
         parentID *uuid.UUID
+
+        ParentID() *uuid.UUID
+        IsRoot() bool
     }
 
     AggregateRoot(Note) {
@@ -100,15 +104,26 @@ package "Domain" as Domain <<Frame>> {
         tags []string
         size uint
         folderID uuid.UUID
-        outgoingLinks []uuid.UUID
-        trashedBy *TrashedBy
-        trashedAt *time.Time
+        outgoingLinks uuid.UUIDs
+        trashed *Trashed
 
-        Rename(newName string)
-        MoveToFolder(folderID uuid.UUID)
+        Rename(name string)
+        SetIcon(icon string)
         SetTags(tags []string)
-        SetOutgoingLinks(outgoingLinks []uuid.UUID)
+        SetSize(size uint)
+        MoveToFolder(folderID uuid.UUID)
+        SetOutgoingLinks(outgoingLinks uuid.UUIDs)
         Trash(trashedBy TrashedBy)
+        Restore()
+    }
+
+    ValueObject(Trashed) {
+        by TrashedBy
+        at time.Time
+    }
+
+    class "NoteService" as Domain.NoteService {
+        UpdateNoteSizeBasedOnContent(note *Note, content any) error
     }
 
     Domain.Workspace "1" *... "1..*" Domain.Folder : contains
@@ -117,26 +132,32 @@ package "Domain" as Domain <<Frame>> {
     Domain.Note "0..*" .. "0..*" Domain.Note : links
 
     RepoInterface(WorkspaceRepo) {
-        GetBySlug(slug string) (*Workspace, error)
-        GetIDBySlug(slug string) (uuid.UUID, error)
-        CheckSlugExists(slug string) (bool, error)
-        Save(workspace *Workspace) error
+        GetBySlug(ctx context.Context, slug string, forUpdate bool) (*Workspace, error)
+        GetIDBySlug(ctx context.Context, slug string) (*uuid.UUID, error)
+        CheckSlugExists(ctx context.Context, slug string) (bool, error)
+        Save(ctx context.Context, workspace *Workspace) error
     }
 
     RepoInterface(FolderRepo) {
-        GetByID(ctx context.Context, id uuid.UUID) (*Folder, error)
+        GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*Folder, error)
+        GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]Folder, error)
         Save(ctx context.Context, folder *Folder) error
-        GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]Folder, error)
+        SaveMany(ctx context.Context, folders []Folder) error
+        AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error)
+        GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID, trashedBy TrashedBy) ([]Folder, error)
         PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error
-        PermanentlyDeleteByIDs(ctx context.Context, ids []uuid.UUID) error
+        PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
     }
 
     RepoInterface(NoteRepo) {
-        GetByID(ctx context.Context, id uuid.UUID) (*Note, error)
+        GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*Note, error)
+        GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]Note, error)
         Save(ctx context.Context, note *Note) error
+        SaveMany(ctx context.Context, notes []Note) error
+        AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error)
         GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]Note, error)
         PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error
-        PermanentlyDeleteByIDs(ctx context.Context, ids []uuid.UUID) error
+        PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
     }
 }
 @enduml

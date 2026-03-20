@@ -6,9 +6,17 @@ import (
 	"github.com/google/uuid"
 )
 
+type WorkspaceRole string
+
+var (
+	WorkspaceRoleOwner  WorkspaceRole = "owner"
+	WorkspaceRoleEditor WorkspaceRole = "editor"
+	WorkspaceRoleViewer WorkspaceRole = "viewer"
+)
+
 type WorkspaceMemberUpdate struct {
 	ID   uuid.UUID
-	Role string
+	Role WorkspaceRole
 }
 
 type UpdateWorkspaceMembers struct {
