@@ -19,10 +19,10 @@ type Document struct {
 // DocumentCommittedEvent defines model for DocumentCommittedEvent.
 type DocumentCommittedEvent struct {
 	// Content BlockNote model
-	Content         DocumentContent    `json:"content"`
-	Id              openapi_types.UUID `json:"id"`
-	OutgoingLinkIds []string           `json:"outgoingLinkIds"`
-	Tags            []string           `json:"tags"`
+	Content         DocumentContent      `json:"content"`
+	Id              openapi_types.UUID   `json:"id"`
+	OutgoingLinkIds []openapi_types.UUID `json:"outgoingLinkIds"`
+	Tags            []string             `json:"tags"`
 }
 
 // DocumentContent BlockNote model

@@ -5,20 +5,14 @@ import (
 
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
-var (
-	ErrCodePersistenceInternal = "Persistence_1"
-	ErrCodePersistenceInvalid  = "Persistence_2"
-)
-
-func toDomainError(err error) error {
+func toDomainError(err error) errs.Error {
 	var pgErr *pgconn.PgError
 	if !errors.As(err, &pgErr) {
-		return commonerror.NewInternal(
-			"An unexpected error occurred",
-			ErrCodePersistenceInvalid,
+		return errs.NewPersistenceInternal(
+			"an unexpected error occurred, not a pg error",
 			err,
 		)
 	}
@@ -31,16 +25,14 @@ func toDomainError(err error) error {
 		pgerrcode.InvalidTextRepresentation,
 		pgerrcode.InvalidBinaryRepresentation,
 		pgerrcode.SerializationFailure:
-		return commonerror.NewInvalid(
-			"Data integrity violation",
-			ErrCodePersistenceInvalid,
-			pgErr,
+		return errs.NewPersistenceInvalid(
+			"invalid data",
+			err,
 		)
 	default:
-		return commonerror.NewInternal(
-			"An unexpected error occurred",
-			ErrCodePersistenceInternal,
-			pgErr,
+		return errs.NewPersistenceInternal(
+			"an unexpected error occurred",
+			err,
 		)
 	}
 }

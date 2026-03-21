@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
@@ -23,7 +24,7 @@ func NewFolder(queries *pgsqlc.Queries) *Folder {
 
 var ProvideFolder = NewFolder
 
-func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Folder, error) {
+func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Folder, errs.Error) {
 	var result *pgsqlc.Folder
 	var err error
 	if forUpdate {
@@ -37,14 +38,14 @@ func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*do
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrFolderNotFound(id, err)
+			return nil, errs.NewFolderNotFound(id, err)
 		}
 		return nil, toDomainError(err)
 	}
 	return folderToDomain(result), nil
 }
 
-func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]domain.Folder, error) {
+func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]domain.Folder, errs.Error) {
 	var folderResults []*pgsqlc.Folder
 	var err error
 	if forUpdate {
@@ -66,7 +67,7 @@ func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) (
 	return folders, nil
 }
 
-func (f *Folder) Save(ctx context.Context, folder *domain.Folder) error {
+func (f *Folder) Save(ctx context.Context, folder *domain.Folder) errs.Error {
 	err := f.queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
 		ID:          folder.ID(),
 		Name:        folder.Name(),
@@ -84,7 +85,7 @@ func (f *Folder) Save(ctx context.Context, folder *domain.Folder) error {
 	return nil
 }
 
-func (f *Folder) SaveMany(ctx context.Context, folders []domain.Folder) error {
+func (f *Folder) SaveMany(ctx context.Context, folders []domain.Folder) errs.Error {
 	err := f.queries.CreateTempTableFolders(ctx)
 	if err != nil {
 		return toDomainError(err)
@@ -117,7 +118,7 @@ func (f *Folder) SaveMany(ctx context.Context, folders []domain.Folder) error {
 	return nil
 }
 
-func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error) {
+func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, errs.Error) {
 	count, err := f.queries.CountFoldersInWorkspaceByIDs(ctx, &pgsqlc.CountFoldersInWorkspaceByIDsParams{
 		IDs:         ids,
 		WorkspaceID: workspaceID,
@@ -128,7 +129,7 @@ func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspa
 	return count == int64(len(ids)), nil
 }
 
-func (f *Folder) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID, trashedBy domain.TrashedBy) ([]domain.Folder, error) {
+func (f *Folder) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID, trashedBy domain.TrashedBy) ([]domain.Folder, errs.Error) {
 	results, err := f.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
 		WorkspaceID: &workspaceID,
 		TrashedBy:   trashedBy.String(),
@@ -143,7 +144,7 @@ func (f *Folder) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.U
 	return folders, nil
 }
 
-func (f *Folder) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error {
+func (f *Folder) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) errs.Error {
 	err := f.queries.PermanentlyDeleteFolderByID(ctx, id)
 	if err != nil {
 		return toDomainError(err)
@@ -151,7 +152,7 @@ func (f *Folder) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error 
 	return nil
 }
 
-func (f *Folder) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error {
+func (f *Folder) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) errs.Error {
 	err := f.queries.PermanentlyDeleteFoldersByIDs(ctx, ids)
 	if err != nil {
 		return toDomainError(err)
@@ -159,7 +160,7 @@ func (f *Folder) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) err
 	return nil
 }
 
-func (f *Folder) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+func (f *Folder) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, errs.Error) {
 	workspaceID, err := f.queries.GetWorkspaceIDByFolderID(ctx, id)
 	if err != nil {
 		return uuid.Nil, toDomainError(err)

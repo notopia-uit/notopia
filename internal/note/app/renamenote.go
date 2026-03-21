@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type RenameNote struct {
@@ -32,7 +32,7 @@ func NewRenameNoteHandler(
 
 var ProvideRenameNoteHandler = NewRenameNoteHandler
 
-func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
+func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) errs.Error {
 	workspaceID, err := h.noterepo.GetWorkspaceIDByID(ctx, cmd.ID)
 	if err != nil {
 		return err
@@ -48,23 +48,15 @@ func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
 	}
 
 	if !hasPermission {
-		return newErrRenameNoteForbidden(cmd.UserID, workspaceID)
+		return errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to rename note %s", cmd.UserID, cmd.ID),
+		)
 	}
 
 	note, err := h.noterepo.GetByID(ctx, cmd.ID, true)
 	if err != nil {
-		return domain.NewErrNoteNotFound(cmd.ID, err)
+		return err
 	}
 	note.Rename(cmd.Name)
 	return h.noterepo.Save(ctx, note)
-}
-
-var ErrCodeRenameNoteForbidden = "RenameNote_1"
-
-func newErrRenameNoteForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("user %q does not have permission to rename note in workspace %q", userID, workspaceID.String()),
-		ErrCodeRenameNoteForbidden,
-		nil,
-	)
 }

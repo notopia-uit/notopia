@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type TrashWorkspaceItems struct {
@@ -18,19 +18,19 @@ type TrashWorkspaceItems struct {
 
 type TrashWorkspaceItemsHandler struct {
 	authorizationService AuthorizationService
-	noterepo             domain.NoteRepo
-	folderrepo           domain.FolderRepo
+	noteRepo             domain.NoteRepo
+	folderRepo           domain.FolderRepo
 }
 
 func NewTrashWorkspaceItemsHandler(
 	authorizationService AuthorizationService,
-	noterepo domain.NoteRepo,
-	folderrepo domain.FolderRepo,
+	noteRepo domain.NoteRepo,
+	folderRepo domain.FolderRepo,
 ) *TrashWorkspaceItemsHandler {
 	return &TrashWorkspaceItemsHandler{
 		authorizationService: authorizationService,
-		noterepo:             noterepo,
-		folderrepo:           folderrepo,
+		noteRepo:             noteRepo,
+		folderRepo:           folderRepo,
 	}
 }
 
@@ -48,27 +48,29 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 	}
 
 	if !hasPermission {
-		return newErrTrashWorkspaceItemsForbidden(cmd.UserID, cmd.WorkspaceID)
+		return errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to trash items in workspace %s", cmd.UserID, cmd.WorkspaceID),
+		)
 	}
 
 	for _, noteID := range cmd.NoteIDs {
-		note, err := h.noterepo.GetByID(ctx, noteID, true)
+		note, err := h.noteRepo.GetByID(ctx, noteID, true)
 		if err != nil {
-			return domain.NewErrNoteNotFound(noteID, err)
+			return err
 		}
 		note.Trash(domain.TrashedByPurpose)
-		if err := h.noterepo.Save(ctx, note); err != nil {
+		if err := h.noteRepo.Save(ctx, note); err != nil {
 			return err
 		}
 	}
 
 	for _, folderID := range cmd.FolderIDs {
-		folder, err := h.folderrepo.GetByID(ctx, folderID, true)
+		folder, err := h.folderRepo.GetByID(ctx, folderID, true)
 		if err != nil {
-			return domain.NewErrFolderNotFound(folderID, err)
+			return err
 		}
 		folder.Trash(domain.TrashedByPurpose)
-		if err := h.folderrepo.Save(ctx, folder); err != nil {
+		if err := h.folderRepo.Save(ctx, folder); err != nil {
 			return err
 		}
 		// WARN: Incomplete cascade logic - only trashes direct items, not children.
@@ -82,14 +84,4 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 	}
 
 	return nil
-}
-
-var ErrCodeTrashWorkspaceItemsForbidden = "TrashWorkspaceItems_1"
-
-func newErrTrashWorkspaceItemsForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("user %q does not have permission to trash items in workspace %q", userID, workspaceID.String()),
-		ErrCodeTrashWorkspaceItemsForbidden,
-		nil,
-	)
 }

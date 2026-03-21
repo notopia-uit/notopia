@@ -17,7 +17,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -125,12 +125,16 @@ func NewWorkspaceEvent(
 
 var ProvideWorkspaceEvent = NewWorkspaceEvent
 
-func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...domain.Event) error {
+func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...domain.Event) errs.Error {
 	msgs := make([]*message.Message, len(events))
 	for _, event := range events {
 		payload, err := json.Marshal(event)
 		if err != nil {
-			return fmt.Errorf("failed to marshal event: %w", err)
+			return errs.NewWorkspaceEventPubSubFailedToCreateMessage(
+				userID,
+				workspaceID,
+				err,
+			)
 		}
 		msg := message.NewMessage(watermill.NewUUID(), payload)
 		msg.Metadata.Set(MetadataWorkspaceIDKey, fmt.Sprintf("%v", workspaceID))
@@ -141,9 +145,9 @@ func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, use
 	}
 	err := w.internalPubSub.publisher.Publish(w.internalPubSub.topic, msgs...)
 	if err != nil {
-		return commonerror.NewInternal(
-			fmt.Sprintf("Failed to publish workspace events for workspace %q and user %q", workspaceID.String(), userID),
-			"PublishWorkspaceEventsFailed",
+		return errs.NewWorkspaceEventPubSubPublishFailed(
+			userID,
+			workspaceID,
 			err,
 		)
 	}
@@ -154,14 +158,14 @@ func (w *WorkspaceEvent) Subscribe(
 	ctx context.Context,
 	workspaceID uuid.UUID,
 	userID string,
-) (<-chan domain.Event, error) {
+) (<-chan domain.Event, errs.Error) {
 	eventCh := make(chan domain.Event, 10)
 
 	msgCh, err := w.hubPubSub.pubSub.Subscribe(ctx, fmt.Sprintf("%v", workspaceID))
 	if err != nil {
-		return nil, commonerror.NewInternal(
-			fmt.Sprintf("Failed to subscribe to workspace events for workspace %q and user %q", workspaceID.String(), userID),
-			"SubscribeWorkspaceEventsFailed",
+		return nil, errs.NewWorkspaceEventPubSubSubscribeFailed(
+			userID,
+			workspaceID,
 			err,
 		)
 	}

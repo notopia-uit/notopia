@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type GenerateDailyNote struct {
@@ -32,7 +33,7 @@ func NewGenerateDailyNoteHandler(
 
 var ProvideGenerateDailyNoteHandler = NewGenerateDailyNoteHandler
 
-func (h *GenerateDailyNoteHandler) Handle(ctx context.Context, cmd *GenerateDailyNote) (*uuid.UUID, error) {
+func (h *GenerateDailyNoteHandler) Handle(ctx context.Context, cmd *GenerateDailyNote) (*uuid.UUID, errs.Error) {
 	// WARN: Unimplemented stub - returns nil, nil without any logic.
 	// TODO: No domain method for generating a daily note. Implement logic to:
 	// 1. Find or create a "Daily Notes" folder in the workspace root

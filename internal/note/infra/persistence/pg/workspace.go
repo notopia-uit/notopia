@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
@@ -23,7 +24,7 @@ func NewWorkspace(queries *pgsqlc.Queries) *Workspace {
 
 var ProvideWorkspace = NewWorkspace
 
-func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) (*domain.Workspace, error) {
+func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) (*domain.Workspace, errs.Error) {
 	var workspaceResult *pgsqlc.Workspace
 	var err error
 	if forUpdate {
@@ -35,7 +36,7 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceBySlugNotFound(slug, err)
+			return nil, errs.NewWorkspaceBySlugNotFound(slug, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -53,14 +54,14 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceRootFolderNotFound(workspaceResult.ID, err)
+			return nil, errs.NewWorkspaceRootFolderNotFound(workspaceResult.ID, err)
 		}
 		return nil, toDomainError(err)
 	}
 	return workspaceToDomain(workspaceResult, rootFolderResult.ID)
 }
 
-func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Workspace, error) {
+func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Workspace, errs.Error) {
 	var workspaceResult *pgsqlc.Workspace
 	var err error
 	if forUpdate {
@@ -74,7 +75,7 @@ func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceByIDNotFound(id, err)
+			return nil, errs.NewWorkspaceNotFound(id, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -92,30 +93,30 @@ func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceRootFolderNotFound(id, err)
+			return nil, errs.NewWorkspaceRootFolderNotFound(id, err)
 		}
 		return nil, toDomainError(err)
 	}
 	return workspaceToDomain(workspaceResult, rootFolderResult.ID)
 }
 
-func (w *Workspace) GetIDBySlug(ctx context.Context, slug string) (*uuid.UUID, error) {
+func (w *Workspace) GetIDBySlug(ctx context.Context, slug string) (*uuid.UUID, errs.Error) {
 	result, err := w.queries.GetWorkspaceIDBySlug(ctx, slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceBySlugNotFound(slug, err)
+			return nil, errs.NewWorkspaceBySlugNotFound(slug, err)
 		}
 		return nil, toDomainError(err)
 	}
 	return &result, nil
 }
 
-func (w *Workspace) CheckSlugExists(ctx context.Context, slug string) (bool, error) {
+func (w *Workspace) CheckSlugExists(ctx context.Context, slug string) (bool, errs.Error) {
 	result, err := w.queries.CheckSlugExists(ctx, slug)
 	return result, toDomainError(err)
 }
 
-func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) error {
+func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) errs.Error {
 	err := w.queries.SaveWorkspace(ctx, &pgsqlc.SaveWorkspaceParams{
 		ID:        workspace.ID(),
 		Slug:      workspace.Slug(),
@@ -130,7 +131,7 @@ func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) error
 	return nil
 }
 
-func workspaceToDomain(workspace *pgsqlc.Workspace, rootFolderID uuid.UUID) (*domain.Workspace, error) {
+func workspaceToDomain(workspace *pgsqlc.Workspace, rootFolderID uuid.UUID) (*domain.Workspace, errs.Error) {
 	return domain.NewWorkspace(
 		workspace.ID,
 		workspace.Name,

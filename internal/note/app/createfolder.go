@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type CreateFolder struct {
@@ -39,7 +39,7 @@ func NewCreateFolderHandler(
 
 var ProvideCreateFolderHandler = NewCreateFolderHandler
 
-func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) error {
+func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) errs.Error {
 	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
 		ctx,
 		cmd.UserID,
@@ -51,7 +51,9 @@ func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) err
 	}
 
 	if !hasPermission {
-		return newErrCreateFolderForbidden(cmd.UserID, cmd.WorkspaceID)
+		return errs.NewForbidden(
+			fmt.Sprintf("user %q does not have permission to create folder in workspace %q", cmd.UserID, cmd.WorkspaceID.String()),
+		)
 	}
 	hierarchy := domain.NewFolderHierarchy(&cmd.ParentID)
 	folder, err := domain.NewFolder(cmd.ID, cmd.Name, cmd.Icon, cmd.WorkspaceID, *hierarchy)
@@ -62,14 +64,4 @@ func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) err
 		return err
 	}
 	return h.workspaceEventPubSub.Publish(ctx, cmd.WorkspaceID, cmd.UserID, folder.PopEvents()...)
-}
-
-var ErrCodeCreateFolderForbidden = "CreateFolder_1"
-
-func newErrCreateFolderForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("user %q does not have permission to create folder in workspace %q", userID, workspaceID.String()),
-		ErrCodeCreateFolderForbidden,
-		nil,
-	)
 }

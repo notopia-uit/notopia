@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type DeleteWorkspace struct {
@@ -31,7 +31,7 @@ func NewDeleteWorkspaceHandler(
 
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
-func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) error {
+func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) errs.Error {
 	hasPermission, err := h.authorizationService.HasWorkspacePermission(
 		ctx,
 		cmd.UserID,
@@ -43,7 +43,9 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspac
 	}
 
 	if !hasPermission {
-		return newErrDeleteWorkspaceForbidden(cmd.UserID, cmd.ID)
+		return errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to delete workspace %s", cmd.UserID, cmd.ID),
+		)
 	}
 
 	workspace, err := h.workspaceRepo.GetByID(ctx, cmd.ID, true)
@@ -52,14 +54,4 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspac
 	}
 	workspace.Delete()
 	return h.workspaceRepo.Save(ctx, workspace)
-}
-
-var ErrCodeDeleteWorkspaceForbidden = "DeleteWorkspace_1"
-
-func newErrDeleteWorkspaceForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("user %q does not have permission to delete workspace %q", userID, workspaceID.String()),
-		ErrCodeDeleteWorkspaceForbidden,
-		nil,
-	)
 }

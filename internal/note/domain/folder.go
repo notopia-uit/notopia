@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type Folder struct {
@@ -23,9 +24,9 @@ func NewFolder(
 	icon *string,
 	workspaceID uuid.UUID,
 	folderHierarchy FolderHierarchy,
-) (*Folder, error) {
+) (*Folder, errs.Error) {
 	if name == "" {
-		return nil, ErrEmptyFolderName
+		return nil, errs.EmptyFolderName
 	}
 	folder := &Folder{
 		id:              id,

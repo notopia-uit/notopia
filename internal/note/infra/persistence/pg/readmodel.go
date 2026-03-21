@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
@@ -32,13 +33,13 @@ var (
 	_ app.CheckWorkspaceSlugExistsReadModel = (*ReadModel)(nil)
 )
 
-func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
+func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, errs.Error) {
 	workspace, err := r.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
 		ID: &q.ID,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceByIDNotFound(q.ID, err)
+			return nil, errs.NewWorkspaceNotFound(q.ID, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -49,7 +50,7 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceRootFolderNotFound(workspace.ID, err)
+			return nil, errs.NewWorkspaceRootFolderNotFound(workspace.ID, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -111,7 +112,7 @@ func (r *ReadModel) buildFolderTreeFromMap(folder pgsqlc.Folder, folderMap map[u
 	return &result
 }
 
-func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash, error) {
+func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash, errs.Error) {
 	trashedNotes, err := r.queries.GetTrashedNotesByWorkspaceID(ctx, q.WorkspaceID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toDomainError(err)
@@ -151,11 +152,11 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 	}, nil
 }
 
-func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app.Graph, error) {
+func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app.Graph, errs.Error) {
 	workspaceID, err := r.queries.GetWorkspaceIDByNoteID(ctx, q.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrNoteNotFound(q.ID, err)
+			return nil, errs.NewNoteNotFound(q.ID, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -221,11 +222,11 @@ func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app
 	return result, nil
 }
 
-func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app.NoteLinkResult, error) {
+func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app.NoteLinkResult, errs.Error) {
 	_, err := r.queries.GetNote(ctx, q.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrNoteNotFound(q.ID, err)
+			return nil, errs.NewNoteNotFound(q.ID, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -280,13 +281,13 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 	return &result, nil
 }
 
-func (r *ReadModel) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceBySlug) (*app.Workspace, error) {
+func (r *ReadModel) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceBySlug) (*app.Workspace, errs.Error) {
 	workspace, err := r.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
 		Slug: &q.Slug,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrWorkspaceBySlugNotFound(q.Slug, err)
+			return nil, errs.NewWorkspaceBySlugNotFound(q.Slug, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -298,7 +299,7 @@ func (r *ReadModel) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceB
 	}, nil
 }
 
-func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, error) {
+func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, errs.Error) {
 	graphRow, err := r.queries.GetWorkspaceGraph(ctx, q.ID)
 	if err != nil {
 		return nil, toDomainError(err)
@@ -356,7 +357,7 @@ func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGr
 	return result, nil
 }
 
-func (r *ReadModel) CheckWorkspaceSlugExists(ctx context.Context, q *app.CheckWorkspaceSlugExists) (*app.CheckWorkspaceSlugExistsResult, error) {
+func (r *ReadModel) CheckWorkspaceSlugExists(ctx context.Context, q *app.CheckWorkspaceSlugExists) (*app.CheckWorkspaceSlugExistsResult, errs.Error) {
 	exists, err := r.queries.CheckSlugExists(ctx, q.Slug)
 	if err != nil {
 		return nil, toDomainError(err)

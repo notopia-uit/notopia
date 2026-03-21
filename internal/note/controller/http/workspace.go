@@ -10,10 +10,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
@@ -99,7 +99,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 ) (note.GetWorkspaceEventsResponseObject, error) {
 	c, ok := ctx.(*gin.Context)
 	if !ok {
-		return nil, commonerror.NewInternal("failed to cast context to gin.Context", "", nil)
+		return nil, errs.NewInternal("failed to cast context to gin.Context", nil)
 	}
 	user, err := commonhttp.UserFromContextError(c)
 	if err != nil {
@@ -107,7 +107,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	}
 	eventCh, err := h.WorkspaceEventPubSub.Subscribe(ctx, request.WorkspaceId, user.ID)
 	if err != nil {
-		return nil, commonerror.NewInternal("failed to subscribe to workspace events", "", err)
+		return nil, err
 	}
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
@@ -195,14 +195,14 @@ func (h *StrictHandler) GetWorkspaceMembers(
 	ctx context.Context,
 	request note.GetWorkspaceMembersRequestObject,
 ) (note.GetWorkspaceMembersResponseObject, error) {
-	return nil, commonerror.NewUnimplemented()
+	return nil, errs.NewUnimplemented()
 }
 
 func (h *StrictHandler) UpdateWorkspaceMembers(
 	ctx context.Context,
 	request note.UpdateWorkspaceMembersRequestObject,
 ) (note.UpdateWorkspaceMembersResponseObject, error) {
-	return nil, commonerror.NewUnimplemented()
+	return nil, errs.NewUnimplemented()
 }
 
 func (h *StrictHandler) MoveWorkspaceItems(
@@ -250,7 +250,7 @@ func (h *StrictHandler) PublishWorkspace(
 	ctx context.Context,
 	request note.PublishWorkspaceRequestObject,
 ) (note.PublishWorkspaceResponseObject, error) {
-	return nil, commonerror.NewUnimplemented()
+	return nil, errs.NewUnimplemented()
 }
 
 func (h *StrictHandler) RenameWorkspace(
@@ -279,7 +279,7 @@ func (h *StrictHandler) RestoreTrashedWorkspaceItems(
 	ctx context.Context,
 	request note.RestoreTrashedWorkspaceItemsRequestObject,
 ) (note.RestoreTrashedWorkspaceItemsResponseObject, error) {
-	return nil, commonerror.NewUnimplemented()
+	return nil, errs.NewUnimplemented()
 }
 
 func (h *StrictHandler) ShowTrash(
@@ -357,5 +357,5 @@ func (h *StrictHandler) UnpublishWorkspace(
 	ctx context.Context,
 	request note.UnpublishWorkspaceRequestObject,
 ) (note.UnpublishWorkspaceResponseObject, error) {
-	return nil, commonerror.NewUnimplemented()
+	return nil, errs.NewUnimplemented()
 }

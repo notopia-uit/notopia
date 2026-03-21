@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type Workspace struct {
@@ -21,12 +22,12 @@ func NewWorkspace(
 	name string,
 	slug string,
 	rootFolderID uuid.UUID,
-) (*Workspace, error) {
+) (*Workspace, errs.Error) {
 	if name == "" {
-		return nil, ErrEmptyWorkspaceName
+		return nil, errs.EmptyFolderName
 	}
 	if slug == "" {
-		return nil, ErrEmptyWorkspaceSlug
+		return nil, errs.InvalidWorkspaceSlug
 	}
 	return &Workspace{
 		id:           id,

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type GetNoteLinks struct {
@@ -13,7 +14,7 @@ type GetNoteLinks struct {
 }
 
 type GetNoteLinksReadModel interface {
-	GetNoteLinks(ctx context.Context, q *GetNoteLinks) (*NoteLinkResult, error)
+	GetNoteLinks(ctx context.Context, q *GetNoteLinks) (*NoteLinkResult, errs.Error)
 }
 
 type GetNoteLinksHandler struct {
@@ -26,6 +27,7 @@ func NewGetNoteLinksHandler(readModel GetNoteLinksReadModel) *GetNoteLinksHandle
 
 var ProvideGetNoteLinksHandler = NewGetNoteLinksHandler
 
-func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (*NoteLinkResult, error) {
+func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (*NoteLinkResult, errs.Error) {
+	// TODO: Authorize
 	return h.readModel.GetNoteLinks(ctx, query)
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type UnpublishNote struct {
@@ -12,16 +13,16 @@ type UnpublishNote struct {
 }
 
 type UnpublishNoteHandler struct {
-	noterepo domain.NoteRepo
+	noteRepo domain.NoteRepo
 }
 
-func NewUnpublishNoteHandler(noterepo domain.NoteRepo) *UnpublishNoteHandler {
-	return &UnpublishNoteHandler{noterepo: noterepo}
+func NewUnpublishNoteHandler(noteRepo domain.NoteRepo) *UnpublishNoteHandler {
+	return &UnpublishNoteHandler{noteRepo: noteRepo}
 }
 
 var ProvideUnpublishNoteHandler = NewUnpublishNoteHandler
 
-func (h *UnpublishNoteHandler) Handle(ctx context.Context, cmd *UnpublishNote) error {
+func (h *UnpublishNoteHandler) Handle(ctx context.Context, cmd *UnpublishNote) errs.Error {
 	// WARN: Handler is incomplete - domain.Note has no Unpublish() method.
 	// TODO: domain.Note has no Unpublish() method. Add Unpublish() to domain.Note and a
 	// published field, then call note.Unpublish() here before Save.
@@ -32,10 +33,6 @@ func (h *UnpublishNoteHandler) Handle(ctx context.Context, cmd *UnpublishNote) e
 	// 3. Update Note.Unmarshal() to accept published parameter (done with Publish handler)
 	// 4. Update persistence layer (done with Publish handler)
 	// 5. Implement this handler to call note.Unpublish(), add event, and save
-	_, err := h.noterepo.GetByID(ctx, cmd.ID, true)
-	if err != nil {
-		return domain.NewErrNoteNotFound(cmd.ID, err)
-	}
 	// TODO: note.Unpublish() not yet implemented
 	return nil
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type DeleteNote struct {
@@ -31,7 +31,7 @@ func NewDeleteNoteHandler(
 
 var ProvideDeleteNoteHandler = NewDeleteNoteHandler
 
-func (h *DeleteNoteHandler) Handle(ctx context.Context, cmd *DeleteNote) error {
+func (h *DeleteNoteHandler) Handle(ctx context.Context, cmd *DeleteNote) errs.Error {
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, cmd.ID)
 	if err != nil {
 		return err
@@ -47,18 +47,12 @@ func (h *DeleteNoteHandler) Handle(ctx context.Context, cmd *DeleteNote) error {
 	}
 
 	if !hasPermission {
-		return newErrDeleteNoteForbidden(cmd.UserID, workspaceID)
+		return errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to delete note %s", cmd.UserID, cmd.ID),
+		)
 	}
 
 	return h.noteRepo.PermanentlyDeleteByID(ctx, cmd.ID)
 }
 
 var ErrCodeDeleteNoteForbidden = "DeleteNote_1"
-
-func newErrDeleteNoteForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("user %q does not have permission to delete note in workspace %q", userID, workspaceID.String()),
-		ErrCodeDeleteNoteForbidden,
-		nil,
-	)
-}

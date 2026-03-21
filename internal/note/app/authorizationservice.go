@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type WorkspacePermission string
@@ -41,39 +42,39 @@ type AuthorizationService interface {
 		userID string,
 		workspaceID uuid.UUID,
 		permission WorkspacePermission,
-	) (bool, error)
+	) (bool, errs.Error)
 
 	HasWorkspaceItemPermission(
 		ctx context.Context,
 		userID string,
 		workspaceID uuid.UUID,
 		permission WorkspaceItemPermission,
-	) (bool, error)
+	) (bool, errs.Error)
 
 	HasWorkspaceNotePermission(
 		ctx context.Context,
 		userID string,
 		workspaceID uuid.UUID,
 		permission WorkspaceItemPermission,
-	) (bool, error)
+	) (bool, errs.Error)
 
 	HasWorkspaceFolderPermission(
 		ctx context.Context,
 		userID string,
 		workspaceID uuid.UUID,
 		permission WorkspaceItemPermission,
-	) (bool, error)
+	) (bool, errs.Error)
 
 	CreateWorkspaceWithOwnership(
 		ctx context.Context,
 		userID string,
 		workspaceID uuid.UUID,
 		ownerID uuid.UUID,
-	) error
+	) errs.Error
 
 	GetWorkspaceMembers(
 		ctx context.Context,
 		userID string,
 		workspaceID uuid.UUID,
-	) ([]WorkspaceMemberInfo, error)
+	) ([]WorkspaceMemberInfo, errs.Error)
 }

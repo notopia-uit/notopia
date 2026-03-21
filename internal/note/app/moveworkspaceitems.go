@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type MoveWorkspaceItems struct {
@@ -43,7 +43,7 @@ func NewMoveWorkspaceItemsHandler(
 
 var ProvideMoveWorkspaceItemsHandler = NewMoveWorkspaceItemsHandler
 
-func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) error {
+func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) errs.Error {
 	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
 		ctx,
 		cmd.UserID,
@@ -55,7 +55,9 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 	}
 
 	if !hasPermission {
-		return newErrMoveWorkspaceItemsForbidden(cmd.UserID, cmd.WorkspaceID)
+		return errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to move items in workspace %s", cmd.UserID, cmd.WorkspaceID),
+		)
 	}
 
 	folderValid, err := h.folderRepo.AreAllInWorkspace(ctx, cmd.FolderIDs, cmd.WorkspaceID)
@@ -63,7 +65,9 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		return err
 	}
 	if !folderValid {
-		return newErrMoveWorkspaceItemsInvalidFolder(cmd.WorkspaceID)
+		return errs.NewInvalid(
+			fmt.Sprintf("one or more folders do not belong to workspace %s", cmd.WorkspaceID),
+		)
 	}
 
 	noteValid, err := h.noteRepo.AreAllInWorkspace(ctx, cmd.NoteIDs, cmd.WorkspaceID)
@@ -71,7 +75,9 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		return err
 	}
 	if !noteValid {
-		return newErrMoveWorkspaceItemsInvalidNote(cmd.WorkspaceID)
+		return errs.NewInvalid(
+			fmt.Sprintf("one or more notes do not belong to workspace %s", cmd.WorkspaceID),
+		)
 	}
 
 	destinationFolder, err := h.folderRepo.GetByID(ctx, cmd.DestinationFolderID, false)
@@ -80,13 +86,15 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 	}
 
 	if destinationFolder.WorkspaceID() != cmd.WorkspaceID {
-		return newErrMoveWorkspaceItemsInvalidDestination(cmd.WorkspaceID)
+		return errs.NewInvalid(
+			fmt.Sprintf("destination folder %s does not belong to workspace %s", cmd.DestinationFolderID, cmd.WorkspaceID),
+		)
 	}
 
 	var folders []domain.Folder
 	var notes []domain.Note
 
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) errs.Error {
 		folderRepo := r.Folder()
 		noteRepo := r.Note()
 		folders, err = folderRepo.GetByIDs(ctx, cmd.FolderIDs, true)
@@ -124,43 +132,4 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 	}
 
 	return h.workspaceEventPubSub.Publish(ctx, cmd.WorkspaceID, cmd.UserID, workspaceEvents...)
-}
-
-var (
-	ErrCodeMoveWorkspaceItemsForbidden          = "MoveWorkspaceItems_1"
-	ErrCodeMoveWorkspaceItemsInvalidFolder      = "MoveWorkspaceItems_2"
-	ErrCodeMoveWorkspaceItemsInvalidNote        = "MoveWorkspaceItems_3"
-	ErrCodeMoveWorkspaceItemsInvalidDestination = "MoveWorkspaceItems_4"
-)
-
-func newErrMoveWorkspaceItemsForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("User %q does not have permission to move items in workspace %q", userID, workspaceID.String()),
-		ErrCodeMoveWorkspaceItemsForbidden,
-		nil,
-	)
-}
-
-func newErrMoveWorkspaceItemsInvalidFolder(workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewInvalid(
-		fmt.Sprintf("One or more folders are not in workspace %q", workspaceID.String()),
-		ErrCodeMoveWorkspaceItemsInvalidFolder,
-		nil,
-	)
-}
-
-func newErrMoveWorkspaceItemsInvalidNote(workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewInvalid(
-		fmt.Sprintf("One or more notes are not in workspace %q", workspaceID.String()),
-		ErrCodeMoveWorkspaceItemsInvalidNote,
-		nil,
-	)
-}
-
-func newErrMoveWorkspaceItemsInvalidDestination(workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewInvalid(
-		fmt.Sprintf("Destination folder is not in workspace %q", workspaceID.String()),
-		ErrCodeMoveWorkspaceItemsInvalidDestination,
-		nil,
-	)
 }

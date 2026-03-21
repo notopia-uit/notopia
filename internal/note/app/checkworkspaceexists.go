@@ -1,13 +1,17 @@
 package app
 
-import "context"
+import (
+	"context"
+
+	"github.com/notopia-uit/notopia/internal/note/errs"
+)
 
 type CheckWorkspaceSlugExists struct {
 	Slug string
 }
 
 type CheckWorkspaceSlugExistsReadModel interface {
-	CheckWorkspaceSlugExists(ctx context.Context, q *CheckWorkspaceSlugExists) (*CheckWorkspaceSlugExistsResult, error)
+	CheckWorkspaceSlugExists(ctx context.Context, q *CheckWorkspaceSlugExists) (*CheckWorkspaceSlugExistsResult, errs.Error)
 }
 
 type CheckWorkspaceSlugExistsHandler struct {
@@ -20,6 +24,6 @@ func NewCheckWorkspaceSlugExistsHandler(readModel CheckWorkspaceSlugExistsReadMo
 
 var ProvideCheckWorkspaceSlugExistsHandler = NewCheckWorkspaceSlugExistsHandler
 
-func (h *CheckWorkspaceSlugExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceSlugExists) (*CheckWorkspaceSlugExistsResult, error) {
+func (h *CheckWorkspaceSlugExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceSlugExists) (*CheckWorkspaceSlugExistsResult, errs.Error) {
 	return h.readModel.CheckWorkspaceSlugExists(ctx, query)
 }

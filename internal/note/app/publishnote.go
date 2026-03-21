@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type PublishNote struct {
@@ -12,16 +13,16 @@ type PublishNote struct {
 }
 
 type PublishNoteHandler struct {
-	noterepo domain.NoteRepo
+	noteRepo domain.NoteRepo
 }
 
-func NewPublishNoteHandler(noterepo domain.NoteRepo) *PublishNoteHandler {
-	return &PublishNoteHandler{noterepo: noterepo}
+func NewPublishNoteHandler(noteRepo domain.NoteRepo) *PublishNoteHandler {
+	return &PublishNoteHandler{noteRepo: noteRepo}
 }
 
 var ProvidePublishNoteHandler = NewPublishNoteHandler
 
-func (h *PublishNoteHandler) Handle(ctx context.Context, cmd *PublishNote) error {
+func (h *PublishNoteHandler) Handle(ctx context.Context, cmd *PublishNote) errs.Error {
 	// WARN: Handler is incomplete - domain.Note has no Publish() method.
 	// TODO: domain.Note has no Publish() method. Add Publish() to domain.Note and a
 	// published field, then call note.Publish() here before Save.
@@ -31,10 +32,6 @@ func (h *PublishNoteHandler) Handle(ctx context.Context, cmd *PublishNote) error
 	// 3. Update Note.Unmarshal() to accept published parameter
 	// 4. Update persistence layer to store/retrieve published field
 	// 5. Implement this handler to call note.Publish(), add event, and save
-	_, err := h.noterepo.GetByID(ctx, cmd.ID, true)
-	if err != nil {
-		return domain.NewErrNoteNotFound(cmd.ID, err)
-	}
 	// TODO: note.Publish() not yet implemented
 	return nil
 }

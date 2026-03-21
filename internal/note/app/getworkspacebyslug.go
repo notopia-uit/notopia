@@ -1,13 +1,17 @@
 package app
 
-import "context"
+import (
+	"context"
+
+	"github.com/notopia-uit/notopia/internal/note/errs"
+)
 
 type GetWorkspaceBySlug struct {
 	Slug string
 }
 
 type GetWorkspaceBySlugReadModel interface {
-	GetWorkspaceBySlug(ctx context.Context, q *GetWorkspaceBySlug) (*Workspace, error)
+	GetWorkspaceBySlug(ctx context.Context, q *GetWorkspaceBySlug) (*Workspace, errs.Error)
 }
 
 type GetWorkspaceHandler struct {
@@ -20,6 +24,7 @@ func NewGetWorkspaceBySlugHandler(readModel GetWorkspaceBySlugReadModel) *GetWor
 
 var ProvideGetWorkspaceBySlugHandler = NewGetWorkspaceBySlugHandler
 
-func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspaceBySlug) (*Workspace, error) {
+func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspaceBySlug) (*Workspace, errs.Error) {
+	// TODO: Authorize
 	return h.readModel.GetWorkspaceBySlug(ctx, query)
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type WorkspaceEventPubSub interface {
@@ -13,13 +14,13 @@ type WorkspaceEventPubSub interface {
 		workspaceID uuid.UUID,
 		userID string,
 		events ...domain.Event,
-	) error
+	) errs.Error
 
 	Subscribe(
 		ctx context.Context,
 		workspaceID uuid.UUID,
 		userID string,
-	) (<-chan domain.Event, error)
+	) (<-chan domain.Event, errs.Error)
 
 	Run(ctx context.Context) error
 

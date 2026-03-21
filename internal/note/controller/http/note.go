@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 )
 
@@ -45,7 +45,7 @@ func (h *StrictHandler) GenerateDailyNote(
 	ctx context.Context,
 	request note.GenerateDailyNoteRequestObject,
 ) (note.GenerateDailyNoteResponseObject, error) {
-	return nil, commonerror.NewUnimplemented()
+	return nil, errs.NewUnimplemented()
 }
 
 func (h *StrictHandler) DeleteNote(
@@ -73,7 +73,7 @@ func (h *StrictHandler) GetNote(
 	ctx context.Context,
 	request note.GetNoteRequestObject,
 ) (note.GetNoteResponseObject, error) {
-	return nil, commonerror.NewUnimplemented()
+	return nil, errs.NewUnimplemented()
 }
 
 func (h *StrictHandler) GetNoteGraph(
@@ -123,7 +123,7 @@ func (h *StrictHandler) PublishNote(
 	ctx context.Context,
 	request note.PublishNoteRequestObject,
 ) (note.PublishNoteResponseObject, error) {
-	return nil, commonerror.NewUnimplemented()
+	return nil, errs.NewUnimplemented()
 }
 
 func (h *StrictHandler) RenameNote(
@@ -152,5 +152,5 @@ func (h *StrictHandler) UnpublishNote(
 	ctx context.Context,
 	request note.UnpublishNoteRequestObject,
 ) (note.UnpublishNoteResponseObject, error) {
-	return nil, commonerror.NewUnimplemented()
+	return nil, errs.NewUnimplemented()
 }

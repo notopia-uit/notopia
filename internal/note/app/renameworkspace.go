@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type RenameWorkspace struct {
@@ -32,7 +32,7 @@ func NewRenameWorkspaceHandler(
 
 var ProvideRenameWorkspaceHandler = NewRenameWorkspaceHandler
 
-func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspace) error {
+func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspace) errs.Error {
 	hasPermission, err := h.authorizationService.HasWorkspacePermission(
 		ctx,
 		cmd.UserID,
@@ -44,7 +44,9 @@ func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspac
 	}
 
 	if !hasPermission {
-		return newErrRenameWorkspaceForbidden(cmd.UserID, cmd.ID)
+		return errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to rename workspace %s", cmd.UserID, cmd.ID),
+		)
 	}
 
 	workspace, err := h.workspacerepo.GetByID(ctx, cmd.ID, true)
@@ -53,14 +55,4 @@ func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspac
 	}
 	workspace.Rename(cmd.Name)
 	return h.workspacerepo.Save(ctx, workspace)
-}
-
-var ErrCodeRenameWorkspaceForbidden = "RenameWorkspace_1"
-
-func newErrRenameWorkspaceForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("user %q does not have permission to rename workspace %q", userID, workspaceID.String()),
-		ErrCodeRenameWorkspaceForbidden,
-		nil,
-	)
 }

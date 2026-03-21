@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	commongrpc "github.com/notopia-uit/notopia/pkg/common/grpc"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
 )
@@ -36,26 +36,26 @@ func NewAuthorization(
 
 var ProvideAuthorization = NewAuthorization
 
-func (a *Authorization) HasWorkspacePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspacePermission) (bool, error) {
-	return false, commonerror.NewUnimplemented()
+func (a *Authorization) HasWorkspacePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspacePermission) (bool, errs.Error) {
+	return false, errs.NewUnimplemented()
 }
 
-func (a *Authorization) HasWorkspaceItemPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, error) {
-	return false, commonerror.NewUnimplemented()
+func (a *Authorization) HasWorkspaceItemPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, errs.Error) {
+	return false, errs.NewUnimplemented()
 }
 
-func (a *Authorization) HasWorkspaceNotePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, error) {
-	return false, commonerror.NewUnimplemented()
+func (a *Authorization) HasWorkspaceNotePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, errs.Error) {
+	return false, errs.NewUnimplemented()
 }
 
-func (a *Authorization) HasWorkspaceFolderPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, error) {
-	return false, commonerror.NewUnimplemented()
+func (a *Authorization) HasWorkspaceFolderPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, errs.Error) {
+	return false, errs.NewUnimplemented()
 }
 
-func (a *Authorization) CreateWorkspaceWithOwnership(ctx context.Context, userID string, workspaceID uuid.UUID, ownerID uuid.UUID) error {
-	return commonerror.NewUnimplemented()
+func (a *Authorization) CreateWorkspaceWithOwnership(ctx context.Context, userID string, workspaceID uuid.UUID, ownerID uuid.UUID) errs.Error {
+	return errs.NewUnimplemented()
 }
 
-func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]app.WorkspaceMemberInfo, error) {
-	return nil, commonerror.NewUnimplemented()
+func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]app.WorkspaceMemberInfo, errs.Error) {
+	return nil, errs.NewUnimplemented()
 }

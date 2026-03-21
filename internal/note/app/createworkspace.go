@@ -2,11 +2,10 @@ package app
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type CreateWorkspace struct {
@@ -35,13 +34,13 @@ func NewCreateWorkspaceHandler(
 
 var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
 
-func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspace) error {
+func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspace) errs.Error {
 	slugExisted, err := h.workspaceRepo.CheckSlugExists(ctx, cmd.Slug)
 	if err != nil {
 		return err
 	}
 	if slugExisted {
-		return newErrCreateWorkspaceSlugExisted(cmd.Slug)
+		return errs.NewWorkspaceSlugAlreadyExists(cmd.Slug, nil)
 	}
 	rootFolderID := uuid.New()
 	rootHierarchy := domain.NewFolderHierarchy(nil)
@@ -53,7 +52,7 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 	if err != nil {
 		return err
 	}
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) errs.Error {
 		if err := h.folderRepo.Save(ctx, rootFolder); err != nil {
 			return err
 		}
@@ -63,14 +62,4 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 		return nil
 	})
 	return err
-}
-
-var ErrCodeCreateWorkspaceSlugExisted = "ErrCodeCreateWorkspaceSlugExisted"
-
-func newErrCreateWorkspaceSlugExisted(slug string) *commonerror.Err {
-	return commonerror.NewInvalid(
-		fmt.Sprintf("workspace slug %q already exists", slug),
-		ErrCodeCreateWorkspaceSlugExisted,
-		nil,
-	)
 }

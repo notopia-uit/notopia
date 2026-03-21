@@ -1,6 +1,10 @@
 package domain
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/notopia-uit/notopia/internal/note/errs"
+)
 
 type NoteService struct{}
 
@@ -10,10 +14,10 @@ func NewNoteService() *NoteService {
 
 var ProvideNoteService = NewNoteService
 
-func (s *NoteService) UpdateNoteSizeBasedOnContent(note *Note, content any) error {
+func (s *NoteService) UpdateNoteSizeBasedOnContent(note *Note, content any) errs.Error {
 	b, err := json.Marshal(content)
 	if err != nil {
-		return NewErrNoteFailToMarshalContent(note.ID(), err)
+		return errs.NewNoteFailToMarshalDocumentContent(note.ID(), content, err)
 	}
 	note.SetSize(uint64(len(b)))
 	return nil

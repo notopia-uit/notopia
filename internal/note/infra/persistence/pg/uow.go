@@ -6,6 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
@@ -17,17 +18,11 @@ type RepoRegistry struct {
 
 var _ domain.RepoRegistry = (*RepoRegistry)(nil)
 
-func (r *RepoRegistry) Workspace() domain.WorkspaceRepo {
-	return r.workspace
-}
+func (r *RepoRegistry) Workspace() domain.WorkspaceRepo { return r.workspace }
 
-func (r *RepoRegistry) Folder() domain.FolderRepo {
-	return r.folder
-}
+func (r *RepoRegistry) Folder() domain.FolderRepo { return r.folder }
 
-func (r *RepoRegistry) Note() domain.NoteRepo {
-	return r.note
-}
+func (r *RepoRegistry) Note() domain.NoteRepo { return r.note }
 
 type UnitOfWork struct {
 	queries *pgsqlc.Queries
@@ -45,10 +40,13 @@ func NewUnitOfWork(queries *pgsqlc.Queries, pool *pgxpool.Pool) *UnitOfWork {
 
 var ProvideUnitOfWork = NewUnitOfWork
 
-func (u *UnitOfWork) Execute(ctx context.Context, fn func(repoRegistry domain.RepoRegistry) error) error {
+func (u *UnitOfWork) Execute(ctx context.Context, fn func(repoRegistry domain.RepoRegistry) errs.Error) errs.Error {
 	tx, err := u.pool.Begin(ctx)
 	if err != nil {
-		return err
+		return errs.NewPersistenceInternal(
+			"failed to begin transaction",
+			err,
+		)
 	}
 	defer func() {
 		if err := tx.Rollback(ctx); err != nil {
@@ -66,5 +64,11 @@ func (u *UnitOfWork) Execute(ctx context.Context, fn func(repoRegistry domain.Re
 		return err
 	}
 
-	return tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return errs.NewPersistenceInternal(
+			"failed to commit transaction",
+			err,
+		)
+	}
+	return nil
 }

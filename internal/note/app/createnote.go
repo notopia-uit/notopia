@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type CreateNote struct {
@@ -42,7 +42,7 @@ func NewCreateNoteHandler(
 
 var ProvideCreateNoteHandler = NewCreateNoteHandler
 
-func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) error {
+func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) errs.Error {
 	workspaceID, err := h.folderRepo.GetWorkspaceIDByID(ctx, cmd.FolderID)
 	if err != nil {
 		return err
@@ -57,18 +57,10 @@ func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) error {
 		return err
 	}
 	if !hasPermission {
-		return newErrCreateNoteForbidden(cmd.UserID, workspaceID)
+		return errs.NewForbidden(
+			fmt.Sprintf("user %q does not have permission to create note in workspace %q", cmd.UserID, workspaceID.String()),
+		)
 	}
 	note := domain.NewNote(cmd.ID, cmd.Name, cmd.Icon, cmd.Tags, cmd.FolderID)
 	return h.noteRepo.Save(ctx, note)
-}
-
-var ErrCodeCreateNoteForbidden = "CreateNote_1"
-
-func newErrCreateNoteForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("user %q does not have permission to create note in workspace %q", userID, workspaceID.String()),
-		ErrCodeCreateNoteForbidden,
-		nil,
-	)
 }

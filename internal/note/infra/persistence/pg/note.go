@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
@@ -23,7 +24,7 @@ func NewNote(queries *pgsqlc.Queries) *Note {
 
 var ProvideNote = NewNote
 
-func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Note, error) {
+func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Note, errs.Error) {
 	var noteResult *pgsqlc.Note
 	var err error
 	if forUpdate {
@@ -33,7 +34,7 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 	}
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.NewErrNoteNotFound(id, err)
+			return nil, errs.NewNoteNotFound(id, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -44,7 +45,7 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 	return noteToDomain(noteResult, outgoingLinksResult), nil
 }
 
-func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]domain.Note, error) {
+func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]domain.Note, errs.Error) {
 	var noteResults []*pgsqlc.Note
 	var err error
 	if forUpdate {
@@ -70,7 +71,7 @@ func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]
 	return notes, nil
 }
 
-func (n *Note) Save(ctx context.Context, note *domain.Note) error {
+func (n *Note) Save(ctx context.Context, note *domain.Note) errs.Error {
 	err := n.queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
 		ID:        note.ID(),
 		Name:      note.Name(),
@@ -89,7 +90,7 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 	return nil
 }
 
-func (n *Note) SaveMany(ctx context.Context, notes []domain.Note) error {
+func (n *Note) SaveMany(ctx context.Context, notes []domain.Note) errs.Error {
 	err := n.queries.CreateTempTableNotes(ctx)
 	if err != nil {
 		return toDomainError(err)
@@ -123,7 +124,7 @@ func (n *Note) SaveMany(ctx context.Context, notes []domain.Note) error {
 	return nil
 }
 
-func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error) {
+func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, errs.Error) {
 	count, err := n.queries.CountNotesInWorkspaceByIDs(ctx, &pgsqlc.CountNotesInWorkspaceByIDsParams{
 		IDs:         ids,
 		WorkspaceID: workspaceID,
@@ -134,7 +135,7 @@ func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspace
 	return count == int64(len(ids)), nil
 }
 
-func (n *Note) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]domain.Note, error) {
+func (n *Note) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]domain.Note, errs.Error) {
 	noteResults, err := n.queries.GetTrashedNotesByWorkspaceID(ctx, workspaceID)
 	if err != nil {
 		return nil, toDomainError(err)
@@ -158,7 +159,7 @@ func (n *Note) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUI
 	return notes, nil
 }
 
-func (n *Note) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error {
+func (n *Note) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) errs.Error {
 	err := n.queries.PermanentlyDeleteNoteByID(ctx, id)
 	if err != nil {
 		return toDomainError(err)
@@ -166,7 +167,7 @@ func (n *Note) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (n *Note) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error {
+func (n *Note) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) errs.Error {
 	err := n.queries.PermanentlyDeleteNotesByIDs(ctx, ids)
 	if err != nil {
 		return toDomainError(err)
@@ -174,7 +175,7 @@ func (n *Note) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
 	return nil
 }
 
-func (n *Note) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+func (n *Note) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, errs.Error) {
 	workspaceID, err := n.queries.GetWorkspaceIDByNoteID(ctx, id)
 	if err != nil {
 		return uuid.Nil, toDomainError(err)

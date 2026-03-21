@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type GetNote struct {
@@ -16,7 +16,7 @@ type GetNote struct {
 }
 
 type GetNoteReadModel interface {
-	GetNote(ctx context.Context, q *GetNote) (*Note, error)
+	GetNote(ctx context.Context, q *GetNote) (*Note, errs.Error)
 }
 
 type GetNoteHandler struct {
@@ -39,7 +39,7 @@ func NewGetNoteHandler(
 
 var ProvideGetNoteHandler = NewGetNoteHandler
 
-func (h *GetNoteHandler) Handle(ctx context.Context, query *GetNote) (*Note, error) {
+func (h *GetNoteHandler) Handle(ctx context.Context, query *GetNote) (*Note, errs.Error) {
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)
 	if err != nil {
 		return nil, err
@@ -54,17 +54,9 @@ func (h *GetNoteHandler) Handle(ctx context.Context, query *GetNote) (*Note, err
 		return nil, err
 	}
 	if !hasPermission {
-		return nil, newErrGetNoteForbidden(query.UserID, workspaceID)
+		return nil, errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to read note %s", query.UserID, query.ID),
+		)
 	}
 	return h.readModel.GetNote(ctx, query)
-}
-
-var ErrCodeGetNoteForbidden = "GetNote_1"
-
-func newErrGetNoteForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("user %q does not have permission to access workspace %q", userID, workspaceID),
-		ErrCodeGetNoteForbidden,
-		nil,
-	)
 }

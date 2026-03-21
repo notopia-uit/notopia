@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type RestoreTrashedWorkspaceItems struct {
@@ -14,23 +15,23 @@ type RestoreTrashedWorkspaceItems struct {
 }
 
 type RestoreTrashedWorkspaceItemsHandler struct {
-	noterepo   domain.NoteRepo
-	folderrepo domain.FolderRepo
+	noteRepo   domain.NoteRepo
+	folderRepo domain.FolderRepo
 }
 
 func NewRestoreTrashedWorkspaceItemsHandler(
-	noterepo domain.NoteRepo,
-	folderrepo domain.FolderRepo,
+	noteRepo domain.NoteRepo,
+	folderRepo domain.FolderRepo,
 ) *RestoreTrashedWorkspaceItemsHandler {
 	return &RestoreTrashedWorkspaceItemsHandler{
-		noterepo:   noterepo,
-		folderrepo: folderrepo,
+		noteRepo:   noteRepo,
+		folderRepo: folderRepo,
 	}
 }
 
 var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItemsHandler
 
-func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) error {
+func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) errs.Error {
 	// WARN: Handler is completely stubbed - has no implementation.
 	// TODO: domain.Note and domain.Folder have no Restore() method.
 	// Add Restore() to both domain models (clears trashedBy and trashedAt fields),

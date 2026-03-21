@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type RenameFolder struct {
@@ -17,23 +17,23 @@ type RenameFolder struct {
 
 type RenameFolderHandler struct {
 	authorizationService AuthorizationService
-	folderrepo           domain.FolderRepo
+	folderRepo           domain.FolderRepo
 }
 
 func NewRenameFolderHandler(
 	authorizationService AuthorizationService,
-	folderrepo domain.FolderRepo,
+	folderRepo domain.FolderRepo,
 ) *RenameFolderHandler {
 	return &RenameFolderHandler{
 		authorizationService: authorizationService,
-		folderrepo:           folderrepo,
+		folderRepo:           folderRepo,
 	}
 }
 
 var ProvideRenameFolderHandler = NewRenameFolderHandler
 
-func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) error {
-	workspaceID, err := h.folderrepo.GetWorkspaceIDByID(ctx, cmd.ID)
+func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) errs.Error {
+	workspaceID, err := h.folderRepo.GetWorkspaceIDByID(ctx, cmd.ID)
 	if err != nil {
 		return err
 	}
@@ -48,23 +48,15 @@ func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) err
 	}
 
 	if !hasPermission {
-		return newErrRenameFolderForbidden(cmd.UserID, workspaceID)
+		return errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to rename folder %s", cmd.UserID, cmd.ID),
+		)
 	}
 
-	folder, err := h.folderrepo.GetByID(ctx, cmd.ID, true)
+	folder, err := h.folderRepo.GetByID(ctx, cmd.ID, true)
 	if err != nil {
-		return domain.NewErrFolderNotFound(cmd.ID, err)
+		return err
 	}
 	folder.Rename(cmd.Name)
-	return h.folderrepo.Save(ctx, folder)
-}
-
-var ErrCodeRenameFolderForbidden = "RenameFolder_1"
-
-func newErrRenameFolderForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("user %q does not have permission to rename folder in workspace %q", userID, workspaceID.String()),
-		ErrCodeRenameFolderForbidden,
-		nil,
-	)
+	return h.folderRepo.Save(ctx, folder)
 }

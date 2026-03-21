@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type DeleteFolder struct {
@@ -31,7 +31,7 @@ func NewDeleteFolderHandler(
 
 var ProvideDeleteFolderHandler = NewDeleteFolderHandler
 
-func (h *DeleteFolderHandler) Handle(ctx context.Context, cmd *DeleteFolder) error {
+func (h *DeleteFolderHandler) Handle(ctx context.Context, cmd *DeleteFolder) errs.Error {
 	workspaceID, err := h.folderRepo.GetWorkspaceIDByID(ctx, cmd.ID)
 	if err != nil {
 		return err
@@ -47,18 +47,10 @@ func (h *DeleteFolderHandler) Handle(ctx context.Context, cmd *DeleteFolder) err
 	}
 
 	if !hasPermission {
-		return newErrDeleteFolderForbidden(cmd.UserID, workspaceID)
+		return errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to delete folder %s", cmd.UserID, cmd.ID),
+		)
 	}
 
 	return h.folderRepo.PermanentlyDeleteByID(ctx, cmd.ID)
-}
-
-var ErrCodeDeleteFolderForbidden = "DeleteFolder_1"
-
-func newErrDeleteFolderForbidden(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("user %q does not have permission to delete folder in workspace %q", userID, workspaceID.String()),
-		ErrCodeDeleteFolderForbidden,
-		nil,
-	)
 }

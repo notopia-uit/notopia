@@ -11,11 +11,11 @@ type PublishWorkspace struct {
 }
 
 type PublishWorkspaceHandler struct {
-	workspacerepo domain.WorkspaceRepo
+	workspaceRepo domain.WorkspaceRepo
 }
 
-func NewPublishWorkspaceHandler(workspacerepo domain.WorkspaceRepo) *PublishWorkspaceHandler {
-	return &PublishWorkspaceHandler{workspacerepo: workspacerepo}
+func NewPublishWorkspaceHandler(workspaceRepo domain.WorkspaceRepo) *PublishWorkspaceHandler {
+	return &PublishWorkspaceHandler{workspaceRepo: workspaceRepo}
 }
 
 var ProvidePublishWorkspaceHandler = NewPublishWorkspaceHandler
@@ -30,10 +30,6 @@ func (h *PublishWorkspaceHandler) Handle(ctx context.Context, cmd *PublishWorksp
 	// 3. Update Workspace.Unmarshal() to accept published parameter
 	// 4. Update persistence layer to store/retrieve published field
 	// 5. Implement this handler to call workspace.Publish(), add event, and save
-	_, err := h.workspacerepo.GetBySlug(ctx, cmd.Slug, true)
-	if err != nil {
-		return domain.NewErrWorkspaceBySlugNotFound(cmd.Slug, err)
-	}
 	// TODO: workspace.Publish() not yet implemented
 	return nil
 }

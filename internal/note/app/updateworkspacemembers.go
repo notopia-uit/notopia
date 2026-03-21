@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type WorkspaceMemberUpdate struct {
@@ -24,7 +25,7 @@ func NewUpdateWorkspaceMembersHandler() *UpdateWorkspaceMembersHandler {
 
 var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
 
-func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateWorkspaceMembers) error {
+func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateWorkspaceMembers) errs.Error {
 	// WARN: Unimplemented stub - no domain model for WorkspaceMember exists.
 	// TODO: There is no domain model for WorkspaceMember. Implement a WorkspaceMember
 	// domain entity and corresponding repo (WorkspaceMemberRepo) to manage member roles.
