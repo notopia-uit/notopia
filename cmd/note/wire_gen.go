@@ -61,6 +61,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, meterProvider, tracerProvider)
+	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc)
+	services := &configConfig.Services
+	authorization := service.NewAuthorization(services)
 	sql := &configConfig.Database
 	pool, cleanup4, err := pg.NewPgPool(ctx, tracerProvider, sql)
 	if err != nil {
@@ -69,27 +72,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	db := pg.NewStdlib(pool)
-	provider, err := persistence.NewGooseProvider(db, logger)
-	if err != nil {
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	persistencePg, err := persistence.NewPg(pool, provider)
-	if err != nil {
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	healthManager := http.NewHealthManager(persistencePg)
-	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, healthManager)
-	services := &configConfig.Services
-	authorization := service.NewAuthorization(services)
 	queries := pg.NewQueries(pool)
 	pgNote := pg.NewNote(queries)
 	folder := pg.NewFolder(queries)
@@ -139,6 +121,25 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	showTrashHandler := app.NewShowTrashHandler(readModel)
 	noteService := domain.NewNoteService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgNote, noteService)
+	db := pg.NewStdlib(pool)
+	provider, err := persistence.NewGooseProvider(db, logger)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	persistencePg, err := persistence.NewPg(pool, provider)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	appApp := app.NewApp(createNoteHandler, createFolderHandler, createWorkspaceHandler, deleteNoteHandler, deleteFolderHandler, deleteWorkspaceHandler, generateDailyNoteHandler, moveWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler, checkWorkspaceSlugExistsHandler, getNoteGraphHandler, getNoteLinksHandler, getWorkspaceHandler, getWorkspaceGraphHandler, getWorkspaceMembersHandler, getWorkspaceTreeHandler, showTrashHandler, documentCommittedHandler, workspaceEvent, persistencePg)
 	server := &configConfig.Server
 	strictHandler := http.NewStrictHandler(appApp, server, workspaceEvent)
@@ -163,7 +164,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	noteServer := note.NewServer(httpServer, grpcServer, healthManager, appApp, logger)
+	noteServer := note.NewServer(httpServer, grpcServer, appApp, logger)
 	return noteServer, func() {
 		cleanup7()
 		cleanup6()

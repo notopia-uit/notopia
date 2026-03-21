@@ -2,11 +2,9 @@ package commonhttp
 
 import (
 	"log/slog"
-	"net/http"
 
 	ginslog "github.com/gin-contrib/slog"
 	"github.com/gin-gonic/gin"
-	"github.com/notopia-uit/notopia/pkg/healthmanager"
 	"github.com/notopia-uit/notopia/pkg/metadata"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel/propagation"
@@ -25,11 +23,6 @@ func NewGinSlogHandler(
 				return logger.With("user_id", c.GetString("X-Forwarded-ID"))
 			},
 		),
-		ginslog.WithSkipPath([]string{
-			"/health/startup",
-			"/health/readiness",
-			"/health/live",
-		}),
 	))
 }
 
@@ -55,44 +48,14 @@ func NewOtelGinHandler(
 
 var ProvideOtelGinHandler = NewOtelGinHandler
 
-func registerHealthRoutes(
-	r *gin.Engine,
-	hm *healthmanager.HealthManager,
-) {
-	g := r.Group("/health")
-	g.GET("/startup", func(c *gin.Context) {
-		ctx := c.Request.Context()
-		healthResponse := hm.StartupHTTPHandler(ctx)
-		statusCode := http.StatusOK
-		if healthResponse.Status != healthmanager.StartupStatusStarted {
-			statusCode = http.StatusServiceUnavailable
-		}
-		c.JSON(statusCode, healthResponse)
-	})
-	g.GET("/readiness", func(c *gin.Context) {
-		ctx := c.Request.Context()
-		healthResponse := hm.ReadinessHTTPHandler(ctx)
-		statusCode := http.StatusOK
-		if healthResponse.Status != healthmanager.ReadinessStatusReady {
-			statusCode = http.StatusServiceUnavailable
-		}
-		c.JSON(statusCode, healthResponse)
-	})
-	g.GET("/live", func(c *gin.Context) {
-		c.Status(http.StatusOK)
-	})
-}
-
 func NewGin(
 	slogHandler GinSlogHandlerFunc,
 	otelHandler OtelGinHandlerFunc,
-	hm *healthmanager.HealthManager,
 ) *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(gin.HandlerFunc(slogHandler))
 	r.Use(gin.HandlerFunc(otelHandler))
-	registerHealthRoutes(r, hm)
 	return r
 }
 

@@ -8,7 +8,6 @@ import (
 var ProviderSet = wire.NewSet(
 	Provide,
 	ProvideHandler,
-	ProvideHealthManager,
 	ProvideStrictHandler,
 	commonhttp.ProviderSet,
 	wire.Bind(new(IStrictHandler), new(*StrictHandler)),

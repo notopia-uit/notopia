@@ -47,6 +47,7 @@ require (
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/IBM/sarama v1.47.0 // indirect
 	github.com/Rican7/retry v0.3.1 // indirect
+	github.com/alexliesenfeld/health v0.8.1 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

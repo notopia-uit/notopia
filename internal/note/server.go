@@ -7,33 +7,29 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
-	"github.com/notopia-uit/notopia/pkg/healthmanager"
 	"golang.org/x/sync/errgroup"
 )
 
 type Server struct {
-	http          *http.Server
-	grpc          *grpc.Server
-	healthManager *healthmanager.HealthManager
-	application   *app.App
-	logger        *slog.Logger
+	http        *http.Server
+	grpc        *grpc.Server
+	application *app.App
+	logger      *slog.Logger
 }
 
 func NewServer(
 	httpServer *http.Server,
 	grpcServer *grpc.Server,
-	healthManager *healthmanager.HealthManager,
 	application *app.App,
 	logger *slog.Logger,
 ) *Server {
 	slog.SetDefault(logger)
 
 	return &Server{
-		http:          httpServer,
-		grpc:          grpcServer,
-		healthManager: healthManager,
-		application:   application,
-		logger:        logger,
+		http:        httpServer,
+		grpc:        grpcServer,
+		application: application,
+		logger:      logger,
 	}
 }
 
@@ -63,9 +59,6 @@ func (s *Server) Run(ctx context.Context) error {
 		}()
 		return s.grpc.Run()
 	})
-
-	s.healthManager.SetStartedUp()
-	go s.healthManager.StartMonitoring(ctx)
 
 	g.Go(func() error {
 		<-ctx.Done()

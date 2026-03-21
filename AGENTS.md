@@ -24,7 +24,6 @@ cmd/                            # Go services
 internal/                       # Internal Go packages
   api                           # Code gen from oapi-codegen
   common
-  healthmanager
   helper
   logging
   metadata
