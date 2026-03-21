@@ -2,6 +2,10 @@ package errs
 
 type Code string
 
+func (c Code) String() string {
+	return string(c)
+}
+
 var (
 	CodeForbidden     Code = "forbidden"
 	CodeInvalid       Code = "invalid"
@@ -22,9 +26,10 @@ type Err struct {
 
 var _ Error = (*Err)(nil)
 
-func (e Err) Error() string { return e.message }
-func (e Err) Unwrap() error { return e.err }
-func (e Err) Code() Code    { return e.code }
+func (e Err) Error() string   { return e.message }
+func (e Err) Unwrap() error   { return e.err }
+func (e Err) Code() Code      { return e.code }
+func (e Err) Message() string { return e.message }
 
 type Forbidden struct {
 	Err

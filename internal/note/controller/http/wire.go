@@ -9,7 +9,7 @@ var ProviderSet = wire.NewSet(
 	Provide,
 	ProvideHandler,
 	ProvideHealthManager,
-	wire.Struct(new(StrictHandler), "*"),
+	ProvideStrictHandler,
 	commonhttp.ProviderSet,
 	wire.Bind(new(IStrictHandler), new(*StrictHandler)),
 )

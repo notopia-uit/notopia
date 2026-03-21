@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"net/http"
 	"time"
@@ -14,7 +13,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/pkg/api/note"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 )
 
@@ -25,10 +23,25 @@ type (
 
 type StrictHandler struct {
 	App                  *app.App
+	ServerURL            string
 	WorkspaceEventPubSub app.WorkspaceEventPubSub
 }
 
 var _ IStrictHandler = (*StrictHandler)(nil)
+
+func NewStrictHandler(
+	app *app.App,
+	cfg *config.Server,
+	workspaceEventPubSub app.WorkspaceEventPubSub,
+) *StrictHandler {
+	return &StrictHandler{
+		App:                  app,
+		ServerURL:            cfg.URL,
+		WorkspaceEventPubSub: workspaceEventPubSub,
+	}
+}
+
+var ProvideStrictHandler = NewStrictHandler
 
 func NewHandler(
 	strictServer IStrictHandler,
@@ -45,21 +58,6 @@ func ValidateHandler() (gin.HandlerFunc, error) {
 	}
 	spec.Servers = nil
 	return ginmiddleware.OapiRequestValidator(spec), nil
-}
-
-func strictServerErrorHandler(c *gin.Context, err error, statusCode int) {
-	message := err.Error()
-	code := ""
-	if domainErr, ok := errors.AsType[*commonerror.Err](err); ok {
-		message, code, statusCode = commonerror.ToHTTP(domainErr)
-	}
-
-	response := note.Error{
-		Code:    code,
-		Message: message,
-	}
-
-	c.JSON(statusCode, response)
 }
 
 type Server struct {

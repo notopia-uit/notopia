@@ -140,12 +140,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	noteService := domain.NewNoteService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgNote, noteService)
 	appApp := app.NewApp(createNoteHandler, createFolderHandler, createWorkspaceHandler, deleteNoteHandler, deleteFolderHandler, deleteWorkspaceHandler, generateDailyNoteHandler, moveWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler, checkWorkspaceSlugExistsHandler, getNoteGraphHandler, getNoteLinksHandler, getWorkspaceHandler, getWorkspaceGraphHandler, getWorkspaceMembersHandler, getWorkspaceTreeHandler, showTrashHandler, documentCommittedHandler, workspaceEvent, persistencePg)
-	strictHandler := &http.StrictHandler{
-		App:                  appApp,
-		WorkspaceEventPubSub: workspaceEvent,
-	}
-	serverInterface := http.NewHandler(strictHandler)
 	server := &configConfig.Server
+	strictHandler := http.NewStrictHandler(appApp, server, workspaceEvent)
+	serverInterface := http.NewHandler(strictHandler)
 	httpServer, cleanup6, err := http.New(ctx, engine, serverInterface, server, logger)
 	if err != nil {
 		cleanup5()

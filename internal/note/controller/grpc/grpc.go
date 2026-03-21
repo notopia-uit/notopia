@@ -55,6 +55,8 @@ func New(
 		return nil, nil, fmt.Errorf("failed to create otel interceptor: %w", err)
 	}
 	validateInterceptor := validate.NewInterceptor()
+	// TODO: interceptor from authorization service
+	// When I refactor the authorization service later
 	errInterceptor := commongrpc.NewErrorInterceptor()
 	Path, Handler := pbconnect.NewNoteServiceHandler(
 		handler,

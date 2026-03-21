@@ -12,8 +12,9 @@ import (
 )
 
 type Server struct {
-	HTTP commonconfig.ServerAddress `json:"http" mapstructure:"http" validate:"required" yaml:"http"`
-	GRPC commonconfig.ServerAddress `json:"grpc" mapstructure:"grpc" validate:"required" yaml:"grpc"`
+	URL  string                     `json:"url"  mapstructure:"url"  validate:"required,url" yaml:"url"`
+	HTTP commonconfig.ServerAddress `json:"http" mapstructure:"http" validate:"required"     yaml:"http"`
+	GRPC commonconfig.ServerAddress `json:"grpc" mapstructure:"grpc" validate:"required"     yaml:"grpc"`
 }
 
 type Services struct {

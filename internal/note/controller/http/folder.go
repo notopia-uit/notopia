@@ -36,7 +36,7 @@ func (h *StrictHandler) CreateFolder(
 
 	return note.CreateFolder201Response{
 		Headers: note.CreateFolder201ResponseHeaders{
-			ContentLocation: id.String(),
+			ContentLocation: h.ServerURL + "/folders/" + id.String(),
 		},
 	}, nil
 }
