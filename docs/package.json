@@ -10,7 +10,7 @@
     "vitepress-plugin-pagefind": "0.4.19"
   },
   "devDependencies": {
-    "vitepress": "2.0.0-alpha.16",
+    "vitepress": "2.0.0-alpha.17",
     "vitepress-plugin-diagrams": "1.2.2",
     "vitepress-sidebar": "1.33.1"
   }
