@@ -11,6 +11,7 @@ controllers/index.ts
 models/error.ts
 models/get-document-attachment-upload-url-200-response.ts
 models/get-revisions-200-response.ts
+models/import-documents-401-response.ts
 models/index.ts
 models/pagination.ts
 models/rename-revision-request.ts

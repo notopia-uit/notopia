@@ -2503,12 +2503,44 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "example": {
-              "code": "UNAUTHORIZED",
-              "message": "Authentication is required to access this resource",
-              "more_info": "https://api.notopia.com/docs/errors/UNAUTHORIZED"
+              "type": "object",
+              "description": "The error response body returned when JWT validation or OPA authorization fails.",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "The category of the error encountered during the middleware lifecycle.",
+                  "enum": [
+                    "ExtractToken",
+                    "VerifyToken",
+                    "FetchJWKS",
+                    "OPA"
+                  ],
+                  "example": "ExtractToken"
+                },
+                "details": {
+                  "type": "string",
+                  "description": "A descriptive message providing technical context for the failure.",
+                  "x-examples": [
+                    "token not found",
+                    "Authorization header is empty",
+                    "token is expired",
+                    "failed to fetch JWKS",
+                    "opa policy denied"
+                  ],
+                  "example": "token not found"
+                },
+                "custom_message": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "An optional, developer-defined message, often populated by OPA policy violations.",
+                  "example": "User does not have the required 'admin' role."
+                }
+              },
+              "required": [
+                "type",
+                "details",
+                "custom_message"
+              ]
             }
           }
         }

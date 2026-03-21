@@ -1,0 +1,3 @@
+package note
+
+type UnauthorizedErrorJSONResponseType UnauthorizedErrorType

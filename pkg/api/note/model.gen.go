@@ -325,6 +325,30 @@ func (e WorkspaceUpdatedEventType) Valid() bool {
 	}
 }
 
+// Defines values for UnauthorizedErrorType.
+const (
+	ExtractToken UnauthorizedErrorType = "ExtractToken"
+	FetchJWKS    UnauthorizedErrorType = "FetchJWKS"
+	OPA          UnauthorizedErrorType = "OPA"
+	VerifyToken  UnauthorizedErrorType = "VerifyToken"
+)
+
+// Valid indicates whether the value is a known member of the UnauthorizedErrorType enum.
+func (e UnauthorizedErrorType) Valid() bool {
+	switch e {
+	case ExtractToken:
+		return true
+	case FetchJWKS:
+		return true
+	case OPA:
+		return true
+	case VerifyToken:
+		return true
+	default:
+		return false
+	}
+}
+
 // Error defines model for Error.
 type Error struct {
 	// Code Error code
@@ -754,8 +778,20 @@ type InternalServerError = Error
 // NotFoundError defines model for NotFoundError.
 type NotFoundError = Error
 
-// UnauthorizedError defines model for UnauthorizedError.
-type UnauthorizedError = Error
+// UnauthorizedError The error response body returned when JWT validation or OPA authorization fails.
+type UnauthorizedError struct {
+	// CustomMessage An optional, developer-defined message, often populated by OPA policy violations.
+	CustomMessage *string `json:"custom_message"`
+
+	// Details A descriptive message providing technical context for the failure.
+	Details string `json:"details"`
+
+	// Type The category of the error encountered during the middleware lifecycle.
+	Type UnauthorizedErrorType `json:"type"`
+}
+
+// UnauthorizedErrorType The category of the error encountered during the middleware lifecycle.
+type UnauthorizedErrorType string
 
 // RenameFolderJSONBody defines parameters for RenameFolder.
 type RenameFolderJSONBody struct {

@@ -902,7 +902,16 @@ type InternalServerErrorJSONResponse Error
 
 type NotFoundErrorJSONResponse Error
 
-type UnauthorizedErrorJSONResponse Error
+type UnauthorizedErrorJSONResponse struct {
+	// CustomMessage An optional, developer-defined message, often populated by OPA policy violations.
+	CustomMessage *string `json:"custom_message"`
+
+	// Details A descriptive message providing technical context for the failure.
+	Details string `json:"details"`
+
+	// Type The category of the error encountered during the middleware lifecycle.
+	Type UnauthorizedErrorJSONResponseType `json:"type"`
+}
 
 type CreateFolderRequestObject struct {
 	Body *CreateFolderJSONRequestBody
