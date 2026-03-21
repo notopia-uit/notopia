@@ -189,7 +189,7 @@ jobs:
 
       - name: Derive SHAs for Nx Affected
         id: set-shas
-        uses: nrwl/nx-set-shas@v4
+        uses: nrwl/nx-set-shas@v5
 
       - name: Restore Nx Cache
         uses: actions/cache/restore@v5
@@ -215,13 +215,13 @@ jobs:
 
       - name: Nx reset cache
         if: ${{ github.event.inputs.resetNxCache == 'true' }}
-        run: npx nx reset
+        run: pnpm exec nx reset
 
       - name: Nx all
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
+          pnpm exec nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
             --target lint \
             --target format:check \
             --target gen \
@@ -258,7 +258,7 @@ jobs:
           DOCKER_BUILDKIT: 1
         run: |
           echo 'Build Docker images'
-          npx nx run-many \
+          pnpm exec nx run-many \
             --target docker:build \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration production
@@ -267,11 +267,11 @@ jobs:
           docker images -a
 
           if [ "${{ github.event.inputs.releaseAll }}" = "true" ]; then
-            npx nx release \
+            pnpm exec nx release \
               --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
               --yes
           else
-            npx nx release \
+            pnpm exec nx release \
               --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
               ${{ (github.event_name == 'push' || github.event.inputs.releaseWeb == 'true') && '--projects web' || '' }} \
               ${{ (github.event_name == 'push' || github.event.inputs.releaseNote == 'true') && '--projects note' || '' }} \
