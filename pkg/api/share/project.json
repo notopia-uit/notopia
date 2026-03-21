@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pkg/api/share",
+  "projectType": "library",
+  "targets": {
+    "gen": {
+      "dependsOn": [{ "projects": ["api/share"], "target": "gen:go" }]
+    }
+  }
+}

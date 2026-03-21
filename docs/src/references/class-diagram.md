@@ -7,7 +7,7 @@ order: 3
 ## Note
 
 ```plantuml
-@file:../diagrams/class-diagram-note.plantuml
+@file:../diagrams/class-note.plantuml
 ```
 
 <!-- diagram id="class-diagram-note" -->
@@ -22,7 +22,7 @@ order: 3
 ## Document
 
 ```plantuml
-@file:../diagrams/class-diagram-document.plantuml
+@file:../diagrams/class-document.plantuml
 ```
 
 <!-- diagram id="class-diagram-document" -->
@@ -37,7 +37,7 @@ order: 3
 ## Authorization
 
 ```plantuml
-@file:../diagrams/class-diagram-authorization.plantuml
+@file:../diagrams/class-authorization.plantuml
 ```
 
 <!-- diagram id="class-diagram-authorization" -->
