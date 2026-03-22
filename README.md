@@ -1,84 +1,19 @@
 # Notopia
 
-<div align=center>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_backend">
-    <img alt="SonarQube Quality Gate - Note" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=alert_status"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_note">
-    <img alt="SonarQube Quality Bug - Note" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=bugs"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_note">
-    <img alt="SonarQube Quality Code Smells - Note" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=code_smells"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_note">
-    <img alt="SonarQube Quality Maintainability Rating - Note" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=sqale_rating"/>
-  </a>
+<div align="center">
 
-  <br/>
-
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_web">
-  <img alt="SonarQube Quality Gate - Web" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_web&metric=alert_status"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_web">
-    <img alt="SonarQube Quality Bug - Web" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_web&metric=bugs"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_web">
-    <img alt="SonarQube Quality Code Smells - Web" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_web&metric=code_smells"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_web">
-    <img alt="SonarQube Quality Maintainability Rating - Web" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_web&metric=sqale_rating"/>
-  </a>
-
-  <br/>
-
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_document">
-    <img alt="SonarQube Quality Gate - Document" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_document&metric=alert_status"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_document">
-    <img alt="SonarQube Quality Bug - Document" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_document&metric=bugs"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_document">
-    <img alt="SonarQube Quality Code Smells - Document" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_document&metric=code_smells"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_document">
-    <img alt="SonarQube Quality Maintainability Rating - Document" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_document&metric=sqale_rating"/>
-  </a>
-
-  <br/>
-
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_authorization">
-    <img alt="SonarQube Quality Gate - Authorization" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_authorization&metric=alert_status"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_authorization">
-    <img alt="SonarQube Quality Bug - Authorization" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_authorization&metric=bugs"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_authorization">
-    <img alt="SonarQube Quality Code Smells - Authorization" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_authorization&metric=code_smells"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_authorization">
-    <img alt="SonarQube Quality Maintainability Rating - Authorization" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_authorization&metric=sqale_rating"/>
-  </a>
-
-  <br/>
-
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_search-worker">
-    <img alt="SonarQube Quality Gate - Search-worker" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_search-worker&metric=alert_status"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_search-worker">
-    <img alt="SonarQube Quality Bug - Search-worker" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_search-worker&metric=bugs"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_search-worker">
-    <img alt="SonarQube Quality Code Smells - Search-worker" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_search-worker&metric=code_smells"/>
-  </a>
-  <a href="https://sonarcloud.io/summary/new_code?id=notopia-uit_search-worker">
-    <img alt="SonarQube Quality Maintainability Rating - Search-worker" src="https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_search-worker&metric=sqale_rating"/>
-  </a>
+| Service      |                                                                                          Quality Gate                                                                                          |                                                                                      Bugs                                                                                      |                                                                                         Code Smells                                                                                          |                                                                                          Maintainability                                                                                          |
+| :----------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| **Note**     |          [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=notopia-uit_note)          |          [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=bugs)](https://sonarcloud.io/summary/new_code?id=notopia-uit_note)          |          [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=notopia-uit_note)          |          [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=notopia-uit_note)          |
+| **Web**      |           [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_web&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=notopia-uit_web)           |           [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_web&metric=bugs)](https://sonarcloud.io/summary/new_code?id=notopia-uit_web)           |           [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_web&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=notopia-uit_web)           |           [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_web&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=notopia-uit_web)           |
+| **Document** |      [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_document&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=notopia-uit_document)      |      [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_document&metric=bugs)](https://sonarcloud.io/summary/new_code?id=notopia-uit_document)      |      [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_document&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=notopia-uit_document)      |      [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_document&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=notopia-uit_document)      |
+| **Auth**     | [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_authorization&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=notopia-uit_authorization) | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_authorization&metric=bugs)](https://sonarcloud.io/summary/new_code?id=notopia-uit_authorization) | [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_authorization&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=notopia-uit_authorization) | [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_authorization&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=notopia-uit_authorization) |
+| **Search**   | [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_search-worker&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=notopia-uit_search-worker) | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_search-worker&metric=bugs)](https://sonarcloud.io/summary/new_code?id=notopia-uit_search-worker) | [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_search-worker&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=notopia-uit_search-worker) | [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_search-worker&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=notopia-uit_search-worker) |
 
 <br/>
 
-  <a href="https://wakatime.com/badge/github/notopia-uit/notopia">
-    <img alt="Wakatime" src="https://wakatime.com/badge/github/notopia-uit/notopia.svg"/>
-  </a>
+[![Wakatime](https://wakatime.com/badge/github/notopia-uit/notopia.svg)](https://wakatime.com/badge/github/notopia-uit/notopia)
+
 </div>
 
 ## OTEL
