@@ -6,7 +6,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/app"
-	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/notopia-uit/notopia/pkg/pb"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
@@ -37,9 +36,7 @@ func (h *GRPCHandler) CreateWorkspace(ctx context.Context, req *connect.Request[
 		return nil, err
 	}
 
-	return connect.NewResponse(&pb.CreateWorkspaceResponse{
-		Empty: &emptypb.Empty{},
-	}), nil
+	return connect.NewResponse(&pb.CreateWorkspaceResponse{}), nil
 }
 
 func (h *GRPCHandler) UpdateWorkspaceMembers(ctx context.Context, req *connect.Request[pb.UpdateWorkspaceMembersRequest]) (*connect.Response[pb.UpdateWorkspaceMembersResponse], error) {
@@ -64,9 +61,7 @@ func (h *GRPCHandler) UpdateWorkspaceMembers(ctx context.Context, req *connect.R
 		return nil, err
 	}
 
-	return connect.NewResponse(&pb.UpdateWorkspaceMembersResponse{
-		Empty: &emptypb.Empty{},
-	}), nil
+	return connect.NewResponse(&pb.UpdateWorkspaceMembersResponse{}), nil
 }
 
 func (h *GRPCHandler) GetWorkspaceMembers(ctx context.Context, req *connect.Request[pb.GetWorkspaceMembersRequest]) (*connect.Response[pb.GetWorkspaceMembersResponse], error) {
