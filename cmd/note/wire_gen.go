@@ -14,6 +14,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
+	"github.com/notopia-uit/notopia/internal/note/controller/health"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
@@ -144,7 +145,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	server := &configConfig.Server
 	strictHandler := http.NewStrictHandler(appApp, server, workspaceEvent)
 	serverInterface := http.NewHandler(strictHandler)
-	httpServer, cleanup6, err := http.New(ctx, engine, serverInterface, server, logger)
+	httpHTTP, cleanup6, err := http.New(ctx, engine, serverInterface, server, logger)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -154,7 +155,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	handler := grpc.NewHandler(appApp)
-	grpcServer, cleanup7, err := grpc.New(ctx, handler, server, tracerProvider, meterProvider, logger)
+	grpcGRPC, cleanup7, err := grpc.New(ctx, handler, server, tracerProvider, meterProvider, logger)
 	if err != nil {
 		cleanup6()
 		cleanup5()
@@ -164,7 +165,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	noteServer := note.NewServer(httpServer, grpcServer, appApp, logger)
+	healthHealth := health.New(persistencePg, server, workspaceEvent)
+	noteServer := note.NewServer(httpHTTP, grpcGRPC, healthHealth, appApp, logger)
 	return noteServer, func() {
 		cleanup7()
 		cleanup6()

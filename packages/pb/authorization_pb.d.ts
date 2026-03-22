@@ -4,7 +4,6 @@
 
 import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
-import type { Empty } from "@bufbuild/protobuf/wkt";
 
 /**
  * Describes the file authorization.proto.
@@ -36,10 +35,6 @@ export declare const CreateWorkspaceRequestSchema: GenMessage<CreateWorkspaceReq
  * @generated from message authorization.CreateWorkspaceResponse
  */
 export declare type CreateWorkspaceResponse = Message<"authorization.CreateWorkspaceResponse"> & {
-  /**
-   * @generated from field: google.protobuf.Empty empty = 1;
-   */
-  empty?: Empty;
 };
 
 /**
@@ -99,10 +94,6 @@ export declare const UpdateWorkspaceMembersRequestSchema: GenMessage<UpdateWorks
  * @generated from message authorization.UpdateWorkspaceMembersResponse
  */
 export declare type UpdateWorkspaceMembersResponse = Message<"authorization.UpdateWorkspaceMembersResponse"> & {
-  /**
-   * @generated from field: google.protobuf.Empty empty = 1;
-   */
-  empty?: Empty;
 };
 
 /**

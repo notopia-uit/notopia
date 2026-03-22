@@ -107,9 +107,6 @@ func NewApp(
 }
 
 func (a *App) RunMigration(ctx context.Context) error {
-	if a.persistence == nil {
-		return nil
-	}
 	return a.persistence.RunMigrations(ctx)
 }
 
@@ -134,10 +131,7 @@ func (a *App) Start(ctx context.Context) error {
 }
 
 func (a *App) Stop(ctx context.Context) error {
-	if a.workspaceEventPubSub != nil {
-		return a.workspaceEventPubSub.Close()
-	}
-	return nil
+	return a.workspaceEventPubSub.Close()
 }
 
 var ProvideApp = NewApp

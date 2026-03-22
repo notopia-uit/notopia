@@ -60,10 +60,6 @@ func ValidateHandler() (gin.HandlerFunc, error) {
 	return ginmiddleware.OapiRequestValidator(spec), nil
 }
 
-type Server struct {
-	*http.Server
-}
-
 func RegisterRoutes(
 	e *gin.Engine,
 	handler IHandler,
@@ -80,7 +76,14 @@ func RegisterRoutes(
 			ErrorHandler: strictServerErrorHandler,
 		})
 	}
+	e.GET("/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, "pong")
+	})
 	return nil
+}
+
+type HTTP struct {
+	*http.Server
 }
 
 func New(
@@ -89,12 +92,12 @@ func New(
 	handler IHandler,
 	cfg *config.Server,
 	logger *slog.Logger,
-) (*Server, func(), error) {
+) (*HTTP, func(), error) {
 	if err := RegisterRoutes(ginEngine, handler); err != nil {
 		return nil, nil, err
 	}
 
-	server := &Server{
+	server := &HTTP{
 		Server: &http.Server{
 			Addr:    cfg.HTTP.Address(),
 			Handler: ginEngine,
@@ -110,8 +113,8 @@ func New(
 	return server, cleanup, nil
 }
 
-func (s *Server) Run() error {
-	return s.ListenAndServe()
+func (h *HTTP) Run() error {
+	return h.ListenAndServe()
 }
 
 var Provide = New

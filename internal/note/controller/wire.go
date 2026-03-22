@@ -6,6 +6,7 @@ import (
 	// TODO: Uncomment once event handler is stable and integrate with app.Start()
 	// "github.com/notopia-uit/notopia/internal/note/controller/event"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
+	"github.com/notopia-uit/notopia/internal/note/controller/health"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
 )
 
@@ -14,4 +15,5 @@ var ProviderSet = wire.NewSet(
 	// event.ProviderSet,
 	grpc.ProviderSet,
 	http.ProviderSet,
+	health.ProviderSet,
 )

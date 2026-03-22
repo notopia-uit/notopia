@@ -28,10 +28,11 @@ const (
 )
 
 type WorkspaceEventInternalPubSub struct {
-	router     *message.Router
-	publisher  message.Publisher
-	subscriber message.Subscriber
-	topic      string
+	router      *message.Router
+	publisher   message.Publisher
+	subscriber  message.Subscriber
+	topic       string
+	redisClient *RedisClient
 }
 
 // NOTE: Using Redis streams for pubsub. This works but is over-engineered for pure pub/sub.
@@ -68,10 +69,11 @@ func NewWorkspaceEventInternalPubSub(
 	router.AddMiddleware(middleware.CorrelationID, middleware.Recoverer)
 
 	return &WorkspaceEventInternalPubSub{
-		router:     router,
-		publisher:  publisher,
-		subscriber: subscriber,
-		topic:      topic,
+		router:      router,
+		publisher:   publisher,
+		subscriber:  subscriber,
+		redisClient: redisClient,
+		topic:       topic,
 	}, nil
 }
 
@@ -240,6 +242,13 @@ func (w *WorkspaceEvent) Close() error {
 
 	if len(errs) > 0 {
 		return errors.Join(append([]error{fmt.Errorf("failed to close workspace event pubsub")}, errs...)...)
+	}
+	return nil
+}
+
+func (w *WorkspaceEvent) Check(ctx context.Context) error {
+	if statusCmd := w.internalPubSub.redisClient.Ping(ctx); statusCmd.Err() != nil {
+		return fmt.Errorf("failed to ping Redis: %w", statusCmd.Err())
 	}
 	return nil
 }

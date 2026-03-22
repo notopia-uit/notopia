@@ -6,20 +6,23 @@ import (
 
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
+	"github.com/notopia-uit/notopia/internal/note/controller/health"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
 	"golang.org/x/sync/errgroup"
 )
 
 type Server struct {
-	http        *http.Server
-	grpc        *grpc.Server
+	http        *http.HTTP
+	grpc        *grpc.GRPC
+	health      *health.Health
 	application *app.App
 	logger      *slog.Logger
 }
 
 func NewServer(
-	httpServer *http.Server,
-	grpcServer *grpc.Server,
+	httpServer *http.HTTP,
+	grpcServer *grpc.GRPC,
+	health *health.Health,
 	application *app.App,
 	logger *slog.Logger,
 ) *Server {
@@ -28,6 +31,7 @@ func NewServer(
 	return &Server{
 		http:        httpServer,
 		grpc:        grpcServer,
+		health:      health,
 		application: application,
 		logger:      logger,
 	}
@@ -58,6 +62,16 @@ func (s *Server) Run(ctx context.Context) error {
 			}
 		}()
 		return s.grpc.Run()
+	})
+
+	g.Go(func() error {
+		go func() {
+			<-ctx.Done()
+			if err := s.health.Shutdown(context.Background()); err != nil {
+				s.logger.ErrorContext(ctx, "failed to shutdown health server", slog.String("error", err.Error()))
+			}
+		}()
+		return s.health.Run()
 	})
 
 	g.Go(func() error {

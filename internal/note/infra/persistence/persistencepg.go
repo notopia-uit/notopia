@@ -14,16 +14,6 @@ import (
 	"github.com/pressly/goose/v3/lock"
 )
 
-//go:embed pgmigration/*
-var PgMigrations embed.FS
-
-type Pg struct {
-	pgpool        *pgxpool.Pool
-	gooseProvider *goose.Provider
-}
-
-var _ app.Persistence = (*Pg)(nil)
-
 func NewGooseProvider(db *sql.DB, logger *slog.Logger) (*goose.Provider, error) {
 	locker, err := lock.NewPostgresSessionLocker()
 	if err != nil {
@@ -48,6 +38,16 @@ func NewGooseProvider(db *sql.DB, logger *slog.Logger) (*goose.Provider, error) 
 
 var ProvideGooseProvider = NewGooseProvider
 
+//go:embed pgmigration/*
+var PgMigrations embed.FS
+
+type Pg struct {
+	pgpool        *pgxpool.Pool
+	gooseProvider *goose.Provider
+}
+
+var _ app.Persistence = (*Pg)(nil)
+
 func NewPg(
 	pgxpool *pgxpool.Pool,
 	gooseProvider *goose.Provider,
@@ -56,6 +56,18 @@ func NewPg(
 		pgpool:        pgxpool,
 		gooseProvider: gooseProvider,
 	}, nil
+}
+
+func (p *Pg) IsMigrationDone(ctx context.Context) (bool, error) {
+	pending, err := p.gooseProvider.HasPending(ctx)
+	if err != nil {
+		return false, fmt.Errorf("failed to check migration status: %w", err)
+	}
+	return !pending, nil
+}
+
+func (p *Pg) Ping(ctx context.Context) error {
+	return p.pgpool.Ping(ctx)
 }
 
 func (p *Pg) RunMigrations(ctx context.Context) error {

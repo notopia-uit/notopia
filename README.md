@@ -17,7 +17,11 @@
   find . -type l ! -exec test -e {} \; -print -delete
   ```
 
-### Document
+## TO-DO
 
-- Currently only hocuspocus guard the document, other like create/update/delete revision not check, bcs I'm lazy
-  > If do, should create a guard outside of it
+- [ ] Document service
+  - [ ] Currently only hocuspocus guard the document, other like create/update/delete revision not check, bcs I'm lazy
+    > If do, should create a guard outside of it
+  - [ ] Health check
+- [ ] Authorization service
+  - [ ] Health check

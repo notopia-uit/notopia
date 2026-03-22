@@ -25,4 +25,6 @@ type WorkspaceEventPubSub interface {
 	Run(ctx context.Context) error
 
 	Close() error
+
+	Check(ctx context.Context) error
 }

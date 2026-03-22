@@ -3,7 +3,6 @@ syntax = "proto3";
 package authorization;
 
 import "buf/validate/validate.proto";
-import "google/protobuf/empty.proto";
 
 service AuthorizationService {
   rpc CreateWorkspace(CreateWorkspaceRequest) returns (CreateWorkspaceResponse);
@@ -22,9 +21,7 @@ message CreateWorkspaceRequest {
   ];
 }
 
-message CreateWorkspaceResponse {
-  google.protobuf.Empty empty = 1;
-}
+message CreateWorkspaceResponse {}
 
 enum WorkspaceRole {
   WORKSPACE_ROLE_UNSPECIFIED = 0;
@@ -44,9 +41,7 @@ message UpdateWorkspaceMembersRequest {
   repeated WorkspaceMember members = 3 [(buf.validate.field).required = true];
 }
 
-message UpdateWorkspaceMembersResponse {
-  google.protobuf.Empty empty = 1;
-}
+message UpdateWorkspaceMembersResponse {}
 
 message GetWorkspaceMembersRequest {
   string user_id = 1 [(buf.validate.field).required = true];

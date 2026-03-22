@@ -34,7 +34,7 @@ func NewHandler(app *app.App) *Handler {
 
 var ProvideHandler = NewHandler
 
-type Server struct {
+type GRPC struct {
 	*http.Server
 }
 
@@ -45,7 +45,7 @@ func New(
 	traceProvider *trace.TracerProvider,
 	meterProvider *metric.MeterProvider,
 	logger *slog.Logger,
-) (*Server, func(), error) {
+) (*GRPC, func(), error) {
 	otelInterceptor, err := otelconnect.NewInterceptor(
 		otelconnect.WithTracerProvider(traceProvider),
 		otelconnect.WithMeterProvider(meterProvider),
@@ -68,16 +68,23 @@ func New(
 	)
 	mux := http.NewServeMux()
 	mux.Handle(Path, Handler)
+
+	mux.Handle("/ping", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("pong"))
+	}))
+
 	protocol := new(http.Protocols)
 	protocol.SetHTTP1(true)
 	protocol.SetUnencryptedHTTP2(true)
-	server := &Server{
+	server := &GRPC{
 		Server: &http.Server{
 			Addr:      cfg.GRPC.Address(),
 			Handler:   mux,
 			Protocols: protocol,
 		},
 	}
+
 	cleanup := func() {
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
@@ -88,8 +95,8 @@ func New(
 	return server, cleanup, nil
 }
 
-func (s *Server) Run() error {
-	return s.ListenAndServe()
+func (g *GRPC) Run() error {
+	return g.ListenAndServe()
 }
 
 var Provide = New

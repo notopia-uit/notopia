@@ -10,7 +10,6 @@ import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -233,7 +232,6 @@ func (x *CreateWorkspaceRequest) GetWorkspaceId() string {
 
 type CreateWorkspaceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Empty         *emptypb.Empty         `protobuf:"bytes,1,opt,name=empty,proto3" json:"empty,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -266,13 +264,6 @@ func (x *CreateWorkspaceResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateWorkspaceResponse.ProtoReflect.Descriptor instead.
 func (*CreateWorkspaceResponse) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *CreateWorkspaceResponse) GetEmpty() *emptypb.Empty {
-	if x != nil {
-		return x.Empty
-	}
-	return nil
 }
 
 type WorkspaceMember struct {
@@ -389,7 +380,6 @@ func (x *UpdateWorkspaceMembersRequest) GetMembers() []*WorkspaceMember {
 
 type UpdateWorkspaceMembersResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Empty         *emptypb.Empty         `protobuf:"bytes,1,opt,name=empty,proto3" json:"empty,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -422,13 +412,6 @@ func (x *UpdateWorkspaceMembersResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use UpdateWorkspaceMembersResponse.ProtoReflect.Descriptor instead.
 func (*UpdateWorkspaceMembersResponse) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *UpdateWorkspaceMembersResponse) GetEmpty() *emptypb.Empty {
-	if x != nil {
-		return x.Empty
-	}
-	return nil
 }
 
 type GetWorkspaceMembersRequest struct {
@@ -851,21 +834,19 @@ var File_authorization_proto protoreflect.FileDescriptor
 
 const file_authorization_proto_rawDesc = "" +
 	"\n" +
-	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\x1a\x1bgoogle/protobuf/empty.proto\"i\n" +
+	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\"i\n" +
 	"\x16CreateWorkspaceRequest\x12\x1f\n" +
 	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12.\n" +
-	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"G\n" +
-	"\x17CreateWorkspaceResponse\x12,\n" +
-	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"c\n" +
+	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"\x19\n" +
+	"\x17CreateWorkspaceResponse\"c\n" +
 	"\x0fWorkspaceMember\x12\x16\n" +
 	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x128\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"\xad\x01\n" +
 	"\x1dUpdateWorkspaceMembersRequest\x12\x1f\n" +
 	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12)\n" +
 	"\fworkspace_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\x12@\n" +
-	"\amembers\x18\x03 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\"N\n" +
-	"\x1eUpdateWorkspaceMembersResponse\x12,\n" +
-	"\x05empty\x18\x01 \x01(\v2\x16.google.protobuf.EmptyR\x05empty\"m\n" +
+	"\amembers\x18\x03 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\" \n" +
+	"\x1eUpdateWorkspaceMembersResponse\"m\n" +
 	"\x1aGetWorkspaceMembersRequest\x12\x1f\n" +
 	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12.\n" +
 	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"_\n" +
@@ -950,33 +931,30 @@ var file_authorization_proto_goTypes = []any{
 	(*HasWorkspaceItemPermissionResponse)(nil),      // 13: authorization.HasWorkspaceItemPermissionResponse
 	(*GetUserWorkspaceItemPermissionsRequest)(nil),  // 14: authorization.GetUserWorkspaceItemPermissionsRequest
 	(*GetUserWorkspaceItemPermissionsResponse)(nil), // 15: authorization.GetUserWorkspaceItemPermissionsResponse
-	(*emptypb.Empty)(nil),                           // 16: google.protobuf.Empty
 }
 var file_authorization_proto_depIdxs = []int32{
-	16, // 0: authorization.CreateWorkspaceResponse.empty:type_name -> google.protobuf.Empty
-	0,  // 1: authorization.WorkspaceMember.role:type_name -> authorization.WorkspaceRole
-	5,  // 2: authorization.UpdateWorkspaceMembersRequest.members:type_name -> authorization.WorkspaceMember
-	16, // 3: authorization.UpdateWorkspaceMembersResponse.empty:type_name -> google.protobuf.Empty
-	5,  // 4: authorization.GetWorkspaceMembersResponse.members:type_name -> authorization.WorkspaceMember
-	1,  // 5: authorization.HasWorkspacePermissionRequest.permission:type_name -> authorization.WorkspacePermission
-	2,  // 6: authorization.HasWorkspaceItemPermissionRequest.permission:type_name -> authorization.WorkspaceItemPermission
-	3,  // 7: authorization.AuthorizationService.CreateWorkspace:input_type -> authorization.CreateWorkspaceRequest
-	6,  // 8: authorization.AuthorizationService.UpdateWorkspaceMembers:input_type -> authorization.UpdateWorkspaceMembersRequest
-	8,  // 9: authorization.AuthorizationService.GetWorkspaceMembers:input_type -> authorization.GetWorkspaceMembersRequest
-	10, // 10: authorization.AuthorizationService.HasWorkspacePermission:input_type -> authorization.HasWorkspacePermissionRequest
-	12, // 11: authorization.AuthorizationService.HasWorkspaceItemPermission:input_type -> authorization.HasWorkspaceItemPermissionRequest
-	14, // 12: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:input_type -> authorization.GetUserWorkspaceItemPermissionsRequest
-	4,  // 13: authorization.AuthorizationService.CreateWorkspace:output_type -> authorization.CreateWorkspaceResponse
-	7,  // 14: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
-	9,  // 15: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
-	11, // 16: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse
-	13, // 17: authorization.AuthorizationService.HasWorkspaceItemPermission:output_type -> authorization.HasWorkspaceItemPermissionResponse
-	15, // 18: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:output_type -> authorization.GetUserWorkspaceItemPermissionsResponse
-	13, // [13:19] is the sub-list for method output_type
-	7,  // [7:13] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	0,  // 0: authorization.WorkspaceMember.role:type_name -> authorization.WorkspaceRole
+	5,  // 1: authorization.UpdateWorkspaceMembersRequest.members:type_name -> authorization.WorkspaceMember
+	5,  // 2: authorization.GetWorkspaceMembersResponse.members:type_name -> authorization.WorkspaceMember
+	1,  // 3: authorization.HasWorkspacePermissionRequest.permission:type_name -> authorization.WorkspacePermission
+	2,  // 4: authorization.HasWorkspaceItemPermissionRequest.permission:type_name -> authorization.WorkspaceItemPermission
+	3,  // 5: authorization.AuthorizationService.CreateWorkspace:input_type -> authorization.CreateWorkspaceRequest
+	6,  // 6: authorization.AuthorizationService.UpdateWorkspaceMembers:input_type -> authorization.UpdateWorkspaceMembersRequest
+	8,  // 7: authorization.AuthorizationService.GetWorkspaceMembers:input_type -> authorization.GetWorkspaceMembersRequest
+	10, // 8: authorization.AuthorizationService.HasWorkspacePermission:input_type -> authorization.HasWorkspacePermissionRequest
+	12, // 9: authorization.AuthorizationService.HasWorkspaceItemPermission:input_type -> authorization.HasWorkspaceItemPermissionRequest
+	14, // 10: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:input_type -> authorization.GetUserWorkspaceItemPermissionsRequest
+	4,  // 11: authorization.AuthorizationService.CreateWorkspace:output_type -> authorization.CreateWorkspaceResponse
+	7,  // 12: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
+	9,  // 13: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
+	11, // 14: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse
+	13, // 15: authorization.AuthorizationService.HasWorkspaceItemPermission:output_type -> authorization.HasWorkspaceItemPermissionResponse
+	15, // 16: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:output_type -> authorization.GetUserWorkspaceItemPermissionsResponse
+	11, // [11:17] is the sub-list for method output_type
+	5,  // [5:11] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_authorization_proto_init() }
