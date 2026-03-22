@@ -1,0 +1,83 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - .dockerignore
+      - .editorconfig
+      - .gitattributes
+      - .gitignore
+      - .harper-dictionary.txt
+      - .husky/**/*
+      - .lazy.lua
+      - .nvim.lua
+      - .renovaterc.json
+      - .vscode/**/*
+      - .wakatime-project
+      - README.md
+      - justfile
+      - mise.development.toml
+      - mise.toml
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+jobs:
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    steps:
+      - &checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        with:
+          projectBaseDir: apps/web/
+
+  document:
+    name: Document
+    runs-on: ubuntu-latest
+    steps:
+      - *checkout
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        with:
+          projectBaseDir: apps/document/
+
+  note:
+    name: Note
+    runs-on: ubuntu-latest
+    steps:
+      - *checkout
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        with:
+          projectBaseDir: cmd/note/
+
+  authorization:
+    name: Authorization
+    runs-on: ubuntu-latest
+    steps:
+      - *checkout
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        with:
+          projectBaseDir: cmd/authorization/
+
+  searchWorker:
+    name: Search Worker
+    runs-on: ubuntu-latest
+    steps:
+      - *checkout
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        with:
+          projectBaseDir: apps/search-worker/
