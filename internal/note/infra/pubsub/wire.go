@@ -6,13 +6,13 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
-	ProvideIntegration,
 	ProvideIntegrationMarshaler,
+	ProvideIntegrationPubSub,
+	ProvideKafkaTracer,
 	ProvideRedisClient,
 	ProvideWatermillLogger,
 	ProvideWorkspaceEvent,
 	ProvideWorkspaceEventHubPubSub,
 	ProvideWorkspaceEventInternalPubSub,
-	wire.Bind(new(app.IntegrationPubSub), new(*Integration)),
 	wire.Bind(new(app.WorkspaceEventPubSub), new(*WorkspaceEvent)),
 )

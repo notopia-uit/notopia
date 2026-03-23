@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var (
+const (
 	CodeFolderNotFound  Code = "folder_1"
 	CodeEmptyFolderName Code = "folder_2"
 )

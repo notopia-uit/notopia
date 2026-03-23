@@ -8,25 +8,27 @@ import (
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
-	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/controller/integrationevent"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
-type Integration struct {
-	eventBus       *cqrs.EventBus
-	eventProcessor *cqrs.EventProcessor
-	router         *message.Router
-	publisher      message.Publisher
+func NewKafkaTracer() kafka.SaramaTracer {
+	return kafka.NewOTELSaramaTracer()
 }
 
-var _ app.IntegrationPubSub = (*Integration)(nil)
+var ProvideKafkaTracer = NewKafkaTracer
 
-func NewIntegration(
+func NewIntegrationPubSub(
 	cfg *commonconfig.Kafka,
 	logger watermill.LoggerAdapter,
+	tracer kafka.SaramaTracer,
 	marshaler cqrs.CommandEventMarshaler,
-) (*Integration, error) {
-	tracer := kafka.NewOTELSaramaTracer()
+) (*integrationevent.IntegrationPubSub, error) {
+	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create router: %w", err)
+	}
+	router.AddMiddleware(middleware.CorrelationID, middleware.Recoverer)
 
 	publisher, err := kafka.NewPublisher(
 		kafka.PublisherConfig{
@@ -38,12 +40,9 @@ func NewIntegration(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create integration event publisher: %w", err)
 	}
-
-	router, err := message.NewRouter(message.RouterConfig{}, logger)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create integration event router: %w", err)
+		return nil, err
 	}
-	router.AddMiddleware(middleware.CorrelationID, middleware.Recoverer)
 
 	eventBus, err := cqrs.NewEventBusWithConfig(publisher, cqrs.EventBusConfig{
 		GeneratePublishTopic: func(params cqrs.GenerateEventPublishTopicParams) (string, error) {
@@ -53,7 +52,7 @@ func NewIntegration(
 		Logger:    logger,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create integration event bus: %w", err)
+		return nil, fmt.Errorf("failed to create event bus: %w", err)
 	}
 
 	eventProcessor, err := cqrs.NewEventProcessorWithConfig(
@@ -77,15 +76,14 @@ func NewIntegration(
 		},
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create integration event processor: %w", err)
+		return nil, fmt.Errorf("failed to create event processor: %w", err)
 	}
 
-	return &Integration{
-		eventBus:       eventBus,
-		eventProcessor: eventProcessor,
-		router:         router,
-		publisher:      publisher,
-	}, nil
+	return integrationevent.NewIntegrationPubSub(
+		eventBus,
+		eventProcessor,
+		router,
+	), nil
 }
 
-var ProvideIntegration = NewIntegration
+var ProvideIntegrationPubSub = NewIntegrationPubSub

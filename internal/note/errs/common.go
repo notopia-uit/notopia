@@ -6,7 +6,7 @@ func (c Code) String() string {
 	return string(c)
 }
 
-var (
+const (
 	CodeForbidden     Code = "forbidden"
 	CodeInvalid       Code = "invalid"
 	CodeUnimplemented Code = "unimplemented"

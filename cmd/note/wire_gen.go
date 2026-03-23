@@ -16,6 +16,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/health"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
+	"github.com/notopia-uit/notopia/internal/note/controller/integrationevent"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
@@ -165,8 +166,32 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
+	kafka := &configConfig.Kafka
+	saramaTracer := pubsub.NewKafkaTracer()
+	integrationPubSub, err := pubsub.NewIntegrationPubSub(kafka, loggerAdapter, saramaTracer, commandEventMarshaler)
+	if err != nil {
+		cleanup7()
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	integrationEvent, err := integrationevent.NewIntegrationEvent(integrationPubSub, appApp)
+	if err != nil {
+		cleanup7()
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	healthHealth := health.New(persistencePg, server, workspaceEvent)
-	noteServer := note.NewServer(httpHTTP, grpcGRPC, healthHealth, appApp, logger)
+	noteServer := note.NewServer(httpHTTP, grpcGRPC, integrationEvent, healthHealth, appApp, logger)
 	return noteServer, func() {
 		cleanup7()
 		cleanup6()

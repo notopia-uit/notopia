@@ -1,6 +1,6 @@
 package errs
 
-var CodeAuthorizationUnavailable Code = "authorization_1"
+const CodeAuthorizationUnavailable Code = "authorization_1"
 
 type ErrorAuthorizationUnavailable struct {
 	Err

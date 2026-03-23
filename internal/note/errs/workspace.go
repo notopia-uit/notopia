@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var (
+const (
 	CodeWorkspaceNotFound           Code = "workspace_1"
 	CodeWorkspaceBySlugNotFound     Code = "workspace_2"
 	CodeWorkspaceRootFolderNotFound Code = "workspace_3"

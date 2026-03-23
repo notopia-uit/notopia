@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 )
 
@@ -28,7 +27,7 @@ func NewDocumentCommittedHandler(
 
 var ProvideDocumentCommittedHandler = NewDocumentCommittedHandler
 
-func (h *DocumentCommittedHandler) Handle(ctx context.Context, event *DocumentCommitted) errs.Error {
+func (h *DocumentCommittedHandler) Handle(ctx context.Context, event *DocumentCommitted) error {
 	note, err := h.noteRepo.GetByID(ctx, event.Id, false)
 	if err != nil {
 		return err

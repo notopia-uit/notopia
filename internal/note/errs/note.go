@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var (
+const (
 	CodeNoteNotFound                     Code = "note_1"
 	CodeNoteFailToMarshalDocumentContent Code = "note_2"
 )

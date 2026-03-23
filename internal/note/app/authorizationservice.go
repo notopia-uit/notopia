@@ -9,7 +9,7 @@ import (
 
 type WorkspacePermission string
 
-var (
+const (
 	WorkspacePermissionRead   WorkspacePermission = "read"
 	WorkspacePermissionEdit   WorkspacePermission = "edit"
 	WorkspacePermissionDelete WorkspacePermission = "delete"
@@ -21,7 +21,7 @@ func (p WorkspacePermission) String() string {
 
 type WorkspaceItemPermission string
 
-var (
+const (
 	WorkspaceItemPermissionRead   WorkspaceItemPermission = "read"
 	WorkspaceItemPermissionWrite  WorkspaceItemPermission = "write"
 	WorkspaceItemPermissionDelete WorkspaceItemPermission = "delete"

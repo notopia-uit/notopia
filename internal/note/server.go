@@ -8,20 +8,23 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/health"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
+	"github.com/notopia-uit/notopia/internal/note/controller/integrationevent"
 	"golang.org/x/sync/errgroup"
 )
 
 type Server struct {
-	http        *http.HTTP
-	grpc        *grpc.GRPC
-	health      *health.Health
-	application *app.App
-	logger      *slog.Logger
+	http             *http.HTTP
+	grpc             *grpc.GRPC
+	integrationevent *integrationevent.IntegrationEvent
+	health           *health.Health
+	application      *app.App
+	logger           *slog.Logger
 }
 
 func NewServer(
-	httpServer *http.HTTP,
-	grpcServer *grpc.GRPC,
+	http *http.HTTP,
+	grpc *grpc.GRPC,
+	integrationevent *integrationevent.IntegrationEvent,
 	health *health.Health,
 	application *app.App,
 	logger *slog.Logger,
@@ -29,11 +32,12 @@ func NewServer(
 	slog.SetDefault(logger)
 
 	return &Server{
-		http:        httpServer,
-		grpc:        grpcServer,
-		health:      health,
-		application: application,
-		logger:      logger,
+		http:             http,
+		grpc:             grpc,
+		integrationevent: integrationevent,
+		health:           health,
+		application:      application,
+		logger:           logger,
 	}
 }
 
@@ -72,6 +76,16 @@ func (s *Server) Run(ctx context.Context) error {
 			}
 		}()
 		return s.health.Run()
+	})
+
+	g.Go(func() error {
+		go func() {
+			<-ctx.Done()
+			if err := s.integrationevent.Close(); err != nil {
+				s.logger.ErrorContext(ctx, "failed to close integration event processor", slog.String("error", err.Error()))
+			}
+		}()
+		return s.integrationevent.Run(ctx)
 	})
 
 	g.Go(func() error {

@@ -1,6 +1,6 @@
 package errs
 
-var (
+const (
 	CodePersistenceInvalid  Code = "persistence_1"
 	CodePersistenceInternal Code = "persistence_2"
 )
