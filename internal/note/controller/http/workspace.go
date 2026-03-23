@@ -21,13 +21,16 @@ func (h *StrictHandler) CreateWorkspace(
 	ctx context.Context,
 	request note.CreateWorkspaceRequestObject,
 ) (note.CreateWorkspaceResponseObject, error) {
-	id := uuid.New()
+	id, err := uuid.NewV7()
+	if err != nil {
+		return nil, errs.NewInternal("failed to generate UUIDv7 for new workspace", err)
+	}
 	cmd := &app.CreateWorkspace{
 		ID:   id,
 		Name: request.Body.Name,
 		Slug: request.Body.Slug,
 	}
-	err := h.App.CreateWorkspaceHandler.Handle(ctx, cmd)
+	err = h.App.CreateWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}

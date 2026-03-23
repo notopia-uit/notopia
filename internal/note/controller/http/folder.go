@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 )
@@ -20,7 +21,10 @@ func (h *StrictHandler) CreateFolder(
 
 	body := request.Body
 
-	id := uuid.New()
+	id, err := uuid.NewV7()
+	if err != nil {
+		return nil, errs.NewInternal("failed to generate UUIDv7 for new folder", err)
+	}
 	cmd := &app.CreateFolder{
 		ID:          id,
 		Name:        body.Name,

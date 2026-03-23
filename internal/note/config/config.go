@@ -12,9 +12,10 @@ import (
 )
 
 type Server struct {
-	URL  string                     `json:"url"  mapstructure:"url"  validate:"required,url" yaml:"url"`
-	HTTP commonconfig.ServerAddress `json:"http" mapstructure:"http" validate:"required"     yaml:"http"`
-	GRPC commonconfig.ServerAddress `json:"grpc" mapstructure:"grpc" validate:"required"     yaml:"grpc"`
+	URL    string                     `json:"url"    mapstructure:"url"    validate:"required,url" yaml:"url"`
+	Health commonconfig.ServerAddress `json:"health" mapstructure:"health" validate:"required"     yaml:"health"`
+	HTTP   commonconfig.ServerAddress `json:"http"   mapstructure:"http"   validate:"required"     yaml:"http"`
+	GRPC   commonconfig.ServerAddress `json:"grpc"   mapstructure:"grpc"   validate:"required"     yaml:"grpc"`
 }
 
 type Services struct {
@@ -43,6 +44,7 @@ func New(
 
 	viper.SetDefault("server.http.port", 8081)
 	viper.SetDefault("server.grpc.port", 18081)
+	viper.SetDefault("server.health.port", 28081)
 	logging.ViperSetDefault(viper, "log")
 	commonconfig.SQLViperSetDefault(viper, "database")
 	commonconfig.GeneralViperSetDefault(viper, "general")

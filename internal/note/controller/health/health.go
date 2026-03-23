@@ -91,6 +91,7 @@ func New(
 	return &Health{
 		&http.Server{
 			Handler: mux,
+			Addr:    serverCfg.Health.Address(),
 		},
 	}
 }

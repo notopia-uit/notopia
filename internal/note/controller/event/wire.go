@@ -6,5 +6,4 @@ import (
 
 var ProviderSet = wire.NewSet(
 	ProvideIntegration,
-	ProvideWatermillMarshaler,
 )
