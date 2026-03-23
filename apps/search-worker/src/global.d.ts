@@ -26,21 +26,17 @@ declare namespace NodeJS {
 
     NODE_ENV?: 'development' | 'production' | 'test';
 
-    NOTOPIA_DOCUMENT_DB_HOST?: string;
-    NOTOPIA_DOCUMENT_DB_PORT?: string;
-    NOTOPIA_DOCUMENT_DB_USER?: string;
-    NOTOPIA_DOCUMENT_DB_PASSWORD?: string;
-    NOTOPIA_DOCUMENT_DB_NAME?: string;
-
-    NOTOPIA_DOCUMENT_PORT?: string;
-    NOTOPIA_DOCUMENT_LOG_LEVEL?:
+    NOTOPIA_SEARCH_WORKER_PORT?: string;
+    NOTOPIA_SEARCH_WORKER_LOG_LEVEL?:
       | 'trace'
       | 'debug'
       | 'info'
       | 'warn'
       | 'error'
       | 'fatal';
-    NOTOPIA_DOCUMENT_SERVICES_NOTE_URL?: string;
-    NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_URL?: string;
+
+    NOTOPIA_SEARCH_WORKER_KAFKA_CLIENT_ID?: string;
+    NOTOPIA_SEARCH_WORKER_KAFKA_BROKERS?: string; // Comma-separated list
+    NOTOPIA_SEARCH_WORKER_KAFKA_GROUP_ID?: string;
   }
 }

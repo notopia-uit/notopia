@@ -1,0 +1,70 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "search-worker",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "defaultConfiguration": "development",
+      "configurations": {
+        "development": {
+          "args": ["--node-env=development"]
+        },
+        "production": {
+          "args": ["--node-env=production"]
+        }
+      }
+    },
+    "prune-lockfile": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "executor": "@nx/js:prune-lockfile",
+      "outputs": [
+        "{projectRoot}/dist/package.json",
+        "{projectRoot}/dist/pnpm-lock.yaml"
+      ],
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "copy-workspace-modules": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "outputs": ["{projectRoot}/dist/workspace_modules"],
+      "executor": "@nx/js:copy-workspace-modules",
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "prune": {
+      "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
+      "executor": "nx:noop"
+    },
+    "dev": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "search-worker:build:development"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "search-worker:build:development"
+        },
+        "development-mon": {
+          "buildTarget": "search-worker:build:development"
+        },
+        "production": {
+          "buildTarget": "search-worker:build:production"
+        }
+      }
+    },
+    "nx-release-publish": {
+      "parallelism": false
+    }
+  },
+  "release": {
+    "docker": {
+      "repositoryName": "notopia-uit/search-worker"
+    }
+  }
+}

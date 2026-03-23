@@ -2,13 +2,6 @@
 
 import * as z from 'zod';
 
-export const zShareNoteSearch = z.object({
-    id: z.string(),
-    name: z.string().min(1).max(255),
-    plainTextContent: z.string(),
-    tags: z.array(z.string()).optional()
-});
-
 /**
  * BlockNote model
  */
@@ -28,6 +21,23 @@ export const zShareId = z.uuid().readonly();
 
 export const zShareNoteDeletedEvent = z.object({
     id: zShareId
+});
+
+export const zShareName = z.string().min(1).max(255);
+
+export const zShareNoteSearch = z.object({
+    id: zShareId,
+    name: zShareName,
+    plainTextContent: z.string().optional(),
+    tags: z.array(z.string()).optional()
+});
+
+export const zShareIcon = z.string().nullable();
+
+export const zShareNoteCreatedEvent = z.object({
+    id: zShareId,
+    name: zShareName,
+    icon: zShareIcon.optional()
 });
 
 export const zSharePropertiesId = z.uuid().readonly();
@@ -334,7 +344,18 @@ export const zNoteWorkspaceTreeFolder = z.object({
     updatedAt: zNotePropertiesUpdatedAt
 });
 
+export const zShareNoteCreatedEventWritable = z.object({
+    name: zShareName,
+    icon: zShareIcon.optional()
+});
+
 export const zShareNoteDeletedEventWritable = z.record(z.string(), z.unknown());
+
+export const zShareNoteSearchWritable = z.object({
+    name: zShareName,
+    plainTextContent: z.string().optional(),
+    tags: z.array(z.string()).optional()
+});
 
 /**
  * BlockNote model

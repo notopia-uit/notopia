@@ -12,41 +12,6 @@
   "paths": {},
   "components": {
     "schemas": {
-      "NoteSearch": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "Meeting Notes"
-          },
-          "plainTextContent": {
-            "type": "string",
-            "description": "Plain text content",
-            "example": "This is the content of the note"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "example": [
-              "tag1",
-              "tag2"
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "plainTextContent"
-        ]
-      },
       "DocumentCommittedEvent": {
         "allOf": [
           {
@@ -80,15 +45,66 @@
           }
         ]
       },
+      "NoteCreatedEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id",
+            "readOnly": false
+          },
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/icon"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
       "NoteDeletedEvent": {
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/id"
+            "$ref": "#/components/schemas/id",
+            "readOnly": false
           }
         },
         "required": [
           "id"
+        ]
+      },
+      "NoteSearch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/id",
+            "readOnly": false
+          },
+          "name": {
+            "$ref": "#/components/schemas/name"
+          },
+          "plainTextContent": {
+            "type": "string",
+            "description": "Plain text content",
+            "example": "This is the content of the note"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "tag1",
+              "tag2"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name"
         ]
       },
       "NoteUpdatedEvent": {
@@ -98,7 +114,8 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/User_properties-id"
+            "$ref": "#/components/schemas/User_properties-id",
+            "readOnly": false
           }
         },
         "required": [
@@ -295,6 +312,17 @@
         "format": "uuid",
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
         "readOnly": true
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Meeting Notes"
+      },
+      "icon": {
+        "type": "string",
+        "nullable": true,
+        "example": "📓"
       },
       "properties-id": {
         "type": "string",

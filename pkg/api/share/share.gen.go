@@ -40,6 +40,13 @@ type Note struct {
 	UpdatedAt          *time.Time          `json:"updatedAt,omitempty"`
 }
 
+// NoteCreatedEvent defines model for NoteCreatedEvent.
+type NoteCreatedEvent struct {
+	Icon *Icon `json:"icon,omitempty"`
+	Id   *Id   `json:"id,omitempty"`
+	Name Name  `json:"name"`
+}
+
 // NoteDeletedEvent defines model for NoteDeletedEvent.
 type NoteDeletedEvent struct {
 	Id *Id `json:"id,omitempty"`
@@ -47,11 +54,11 @@ type NoteDeletedEvent struct {
 
 // NoteSearch defines model for NoteSearch.
 type NoteSearch struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Id   *Id  `json:"id,omitempty"`
+	Name Name `json:"name"`
 
 	// PlainTextContent Plain text content
-	PlainTextContent string    `json:"plainTextContent"`
+	PlainTextContent *string   `json:"plainTextContent,omitempty"`
 	Tags             *[]string `json:"tags,omitempty"`
 }
 
@@ -67,8 +74,14 @@ type UserDeletedEvent struct {
 // UserPropertiesId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 type UserPropertiesId = string
 
+// Icon defines model for icon.
+type Icon = string
+
 // Id defines model for id.
 type Id = openapi_types.UUID
+
+// Name defines model for name.
+type Name = string
 
 // PropertiesId defines model for properties-id.
 type PropertiesId = openapi_types.UUID

@@ -5,20 +5,10 @@ properties:
   id:
     $ref: ../../../note/components/schemas/Note.yaml#/properties/id
     readOnly: false
-
   name:
     $ref: ../../../note/components/schemas/Note.yaml#/properties/name
-
-  plainTextContent:
-    type: string
-    description: Plain text content
-    example: This is the content of the note
-
-  tags:
-    type: array
-    items:
-      type: string
-    example: ['tag1', 'tag2']
+  icon:
+    $ref: ../../../note/components/schemas/Note.yaml#/properties/icon
 
 required:
   - id

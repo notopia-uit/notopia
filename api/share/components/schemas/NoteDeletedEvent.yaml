@@ -4,6 +4,7 @@ type: object
 properties:
   id:
     $ref: ../../../note/components/schemas/Note.yaml#/properties/id
+    readOnly: false
 
 required:
   - id

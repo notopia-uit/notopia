@@ -4,23 +4,29 @@ export type ClientOptions = {
     baseUrl: 'http://api.notopia.localhost' | (string & {});
 };
 
-export type ShareNoteSearch = {
-    id: string;
-    name: string;
-    /**
-     * Plain text content
-     */
-    plainTextContent: string;
-    tags?: Array<string>;
-};
-
 export type ShareDocumentCommittedEvent = ShareDocument & {
     tags: Array<string>;
     outgoingLinkIds: Array<string>;
 };
 
+export type ShareNoteCreatedEvent = {
+    id: ShareId;
+    name: ShareName;
+    icon?: ShareIcon;
+};
+
 export type ShareNoteDeletedEvent = {
     id: ShareId;
+};
+
+export type ShareNoteSearch = {
+    id: ShareId;
+    name: ShareName;
+    /**
+     * Plain text content
+     */
+    plainTextContent?: string;
+    tags?: Array<string>;
 };
 
 export type ShareNoteUpdatedEvent = ShareNote;
@@ -40,6 +46,10 @@ export type ShareDocument = {
 };
 
 export type ShareId = string;
+
+export type ShareName = string;
+
+export type ShareIcon = string | null;
 
 export type SharePropertiesId = string;
 
@@ -394,8 +404,22 @@ export type NoteWorkspaceTreeFolder = {
 
 export type NotePropertiesUpdatedAt = string;
 
+export type ShareNoteCreatedEventWritable = {
+    name: ShareName;
+    icon?: ShareIcon;
+};
+
 export type ShareNoteDeletedEventWritable = {
     [key: string]: unknown;
+};
+
+export type ShareNoteSearchWritable = {
+    name: ShareName;
+    /**
+     * Plain text content
+     */
+    plainTextContent?: string;
+    tags?: Array<string>;
 };
 
 export type ShareNoteUpdatedEventWritable = ShareNoteWritable;

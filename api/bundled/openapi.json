@@ -1828,41 +1828,6 @@
   },
   "components": {
     "schemas": {
-      "share_NoteSearch": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "Meeting Notes"
-          },
-          "plainTextContent": {
-            "type": "string",
-            "description": "Plain text content",
-            "example": "This is the content of the note"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "example": [
-              "tag1",
-              "tag2"
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "plainTextContent"
-        ]
-      },
       "share_DocumentCommittedEvent": {
         "allOf": [
           {
@@ -1896,15 +1861,66 @@
           }
         ]
       },
+      "share_NoteCreatedEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/share_id",
+            "readOnly": false
+          },
+          "name": {
+            "$ref": "#/components/schemas/share_name"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/share_icon"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
       "share_NoteDeletedEvent": {
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/share_id"
+            "$ref": "#/components/schemas/share_id",
+            "readOnly": false
           }
         },
         "required": [
           "id"
+        ]
+      },
+      "share_NoteSearch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/share_id",
+            "readOnly": false
+          },
+          "name": {
+            "$ref": "#/components/schemas/share_name"
+          },
+          "plainTextContent": {
+            "type": "string",
+            "description": "Plain text content",
+            "example": "This is the content of the note"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "tag1",
+              "tag2"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name"
         ]
       },
       "share_NoteUpdatedEvent": {
@@ -1914,7 +1930,8 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/share_User_properties-id"
+            "$ref": "#/components/schemas/share_User_properties-id",
+            "readOnly": false
           }
         },
         "required": [
@@ -2111,6 +2128,17 @@
         "format": "uuid",
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
         "readOnly": true
+      },
+      "share_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Meeting Notes"
+      },
+      "share_icon": {
+        "type": "string",
+        "nullable": true,
+        "example": "📓"
       },
       "share_properties-id": {
         "type": "string",

@@ -1,0 +1,41 @@
+{
+  "name": "@notopia-uit/search-worker",
+  "private": true,
+  "dependencies": {
+    "@blocknote/server-util": "catalog:",
+    "@nestjs/common": "catalog:",
+    "@nestjs/config": "catalog:",
+    "@nestjs/core": "catalog:",
+    "@nestjs/microservices": "catalog:",
+    "@nestjs/platform-express": "catalog:",
+    "@nestjs/websockets": "catalog:",
+    "@notopia-uit/api-gen": "workspace:",
+    "@notopia-uit/lib": "workspace:",
+    "@opentelemetry/api": "catalog:",
+    "@opentelemetry/auto-instrumentations-node": "catalog:",
+    "@opentelemetry/exporter-metrics-otlp-grpc": "catalog:",
+    "@opentelemetry/exporter-trace-otlp-grpc": "catalog:",
+    "@opentelemetry/instrumentation-http": "catalog:",
+    "@opentelemetry/instrumentation-pino": "catalog:",
+    "@opentelemetry/resources": "catalog:",
+    "@opentelemetry/sdk-metrics": "catalog:",
+    "@opentelemetry/sdk-node": "catalog:",
+    "@opentelemetry/sdk-trace-node": "catalog:",
+    "@opentelemetry/semantic-conventions": "catalog:",
+    "@types/express": "catalog:",
+    "express": "catalog:",
+    "kafkajs": "catalog:",
+    "meilisearch": "catalog:",
+    "nestjs-otel": "catalog:",
+    "nestjs-pino": "catalog:",
+    "pino-http": "catalog:",
+    "pino-pretty": "catalog:",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:",
+    "tslib": "catalog:"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "catalog:",
+    "webpack-node-externals": "catalog:"
+  }
+}

@@ -1,6 +1,7 @@
 export interface AppConfig {
   env: 'test' | 'production' | 'development';
   logLevel: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+  port: number;
 }
 
 export interface DatabaseConfig {

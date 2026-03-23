@@ -14,12 +14,14 @@ paths: {}
 
 components:
   schemas:
-    NoteSearch:
-      $ref: ./components/schemas/NoteSearch.yaml
     DocumentCommittedEvent:
       $ref: ./components/schemas/DocumentCommittedEvent.yaml
+    NoteCreatedEvent:
+      $ref: ./components/schemas/NoteCreatedEvent.yaml
     NoteDeletedEvent:
       $ref: ./components/schemas/NoteDeletedEvent.yaml
+    NoteSearch:
+      $ref: ./components/schemas/NoteSearch.yaml
     NoteUpdatedEvent:
       $ref: ./components/schemas/NoteUpdatedEvent.yaml
     UserDeletedEvent:
