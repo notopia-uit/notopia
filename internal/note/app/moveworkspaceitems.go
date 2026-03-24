@@ -91,8 +91,8 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		)
 	}
 
-	var folders []domain.Folder
-	var notes []domain.Note
+	var folders []*domain.Folder
+	var notes []*domain.Note
 
 	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) errs.Error {
 		folderRepo := r.Folder()

@@ -72,15 +72,8 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		return err
 	}
 
-	workspaceNotePtrs := make([]*domain.Note, len(workspaceNotes))
-	for i := range workspaceNotes {
-		workspaceNotePtrs[i] = &workspaceNotes[i]
-	}
-
-	workspaceFolderPtrs := make([]*domain.Folder, len(workspaceFolders))
-	for i := range workspaceFolders {
-		workspaceFolderPtrs[i] = &workspaceFolders[i]
-	}
+	workspaceNotePtrs := workspaceNotes
+	workspaceFolderPtrs := workspaceFolders
 
 	if len(cmd.NoteIDs) > 0 {
 		notes, err := h.noteRepo.GetByIDs(ctx, cmd.NoteIDs, true)
@@ -88,16 +81,11 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			return err
 		}
 
-		notePtrs := make([]*domain.Note, len(notes))
-		for i := range notes {
-			notePtrs[i] = &notes[i]
-		}
-
-		if err := h.trashService.TrashNotes(notePtrs); err != nil {
+		if err := h.trashService.TrashNotes(notes); err != nil {
 			return err
 		}
 
-		for _, note := range notePtrs {
+		for _, note := range notes {
 			if err := h.noteRepo.Save(ctx, note); err != nil {
 				return err
 			}
@@ -110,12 +98,7 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			return err
 		}
 
-		folderPtrs := make([]*domain.Folder, len(folders))
-		for i := range folders {
-			folderPtrs[i] = &folders[i]
-		}
-
-		if err := h.trashService.TrashFolders(&workspaceNotePtrs, &workspaceFolderPtrs, folderPtrs); err != nil {
+		if err := h.trashService.TrashFolders(&workspaceNotePtrs, &workspaceFolderPtrs, folders); err != nil {
 			return err
 		}
 

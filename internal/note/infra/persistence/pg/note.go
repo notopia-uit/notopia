@@ -45,7 +45,7 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 	return noteToDomain(noteResult, outgoingLinksResult), nil
 }
 
-func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]domain.Note, errs.Error) {
+func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]*domain.Note, errs.Error) {
 	var noteResults []*pgsqlc.Note
 	var err error
 	if forUpdate {
@@ -64,14 +64,14 @@ func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]
 	for _, outgoingLink := range outgoingLinkResults {
 		outgoingLinksMap[outgoingLink.SourceID] = append(outgoingLinksMap[outgoingLink.SourceID], outgoingLink.TargetID)
 	}
-	notes := make([]domain.Note, len(noteResults))
+	notes := make([]*domain.Note, len(noteResults))
 	for i, note := range noteResults {
-		notes[i] = *noteToDomain(note, outgoingLinksMap[note.ID])
+		notes[i] = noteToDomain(note, outgoingLinksMap[note.ID])
 	}
 	return notes, nil
 }
 
-func (n *Note) GetByWorkspaceID(ctx context.Context, params domain.NoteRepoGetByWorkspaceIDParams) ([]domain.Note, errs.Error) {
+func (n *Note) GetByWorkspaceID(ctx context.Context, params domain.NoteRepoGetByWorkspaceIDParams) ([]*domain.Note, errs.Error) {
 	var trashedBy *string
 	if params.TrashedBy != nil {
 		trashedBy = new(params.TrashedBy.String())
@@ -96,9 +96,9 @@ func (n *Note) GetByWorkspaceID(ctx context.Context, params domain.NoteRepoGetBy
 	for _, outgoingLink := range outgoingLinkResults {
 		outgoingLinksMap[outgoingLink.SourceID] = append(outgoingLinksMap[outgoingLink.SourceID], outgoingLink.TargetID)
 	}
-	notes := make([]domain.Note, len(noteResults))
+	notes := make([]*domain.Note, len(noteResults))
 	for i, note := range noteResults {
-		notes[i] = *noteToDomain(note, outgoingLinksMap[note.ID])
+		notes[i] = noteToDomain(note, outgoingLinksMap[note.ID])
 	}
 	return notes, nil
 }
@@ -122,7 +122,7 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) errs.Error {
 	return nil
 }
 
-func (n *Note) SaveMany(ctx context.Context, notes []domain.Note) errs.Error {
+func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) errs.Error {
 	err := n.queries.CreateTempTableNotes(ctx)
 	if err != nil {
 		return toDomainError(err)
@@ -167,7 +167,7 @@ func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspace
 	return count == int64(len(ids)), nil
 }
 
-func (n *Note) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]domain.Note, errs.Error) {
+func (n *Note) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]*domain.Note, errs.Error) {
 	return n.GetByWorkspaceID(ctx, domain.NoteRepoGetByWorkspaceIDParams{
 		WorkspaceID: workspaceID,
 		TrashedBy:   &domain.TrashedByPurpose,

@@ -67,8 +67,8 @@ type GraphLink struct {
 }
 
 type Graph struct {
-	Nodes []GraphNode
-	Links []GraphLink
+	Nodes []*GraphNode
+	Links []*GraphLink
 }
 
 type NoteLink struct {
@@ -78,8 +78,8 @@ type NoteLink struct {
 }
 
 type NoteLinkResult struct {
-	OutgoingLinks []NoteLink
-	Backlinks     []NoteLink
+	OutgoingLinks []*NoteLink
+	Backlinks     []*NoteLink
 }
 
 type Workspace struct {
@@ -113,8 +113,8 @@ type WorkspaceTreeFolder struct {
 	ID        uuid.UUID
 	Name      string
 	Icon      *string
-	Notes     []WorkspaceTreeNote
-	Children  []WorkspaceTreeFolder
+	Notes     []*WorkspaceTreeNote
+	Children  []*WorkspaceTreeFolder
 	UpdatedAt time.Time
 }
 
@@ -133,8 +133,8 @@ type TrashedNote struct {
 }
 
 type Trash struct {
-	Notes   []TrashedNote
-	Folders []TrashedFolder
+	Notes   []*TrashedNote
+	Folders []*TrashedFolder
 }
 
 type CheckWorkspaceSlugExistsResult struct {
@@ -143,5 +143,5 @@ type CheckWorkspaceSlugExistsResult struct {
 
 type WorkspaceMembersUpdatedEvent struct {
 	ID      uuid.UUID
-	Members []WorkspaceMember
+	Members []*WorkspaceMember
 }

@@ -45,7 +45,7 @@ func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*do
 	return folderToDomain(result), nil
 }
 
-func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]domain.Folder, errs.Error) {
+func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]*domain.Folder, errs.Error) {
 	var folderResults []*pgsqlc.Folder
 	var err error
 	if forUpdate {
@@ -60,14 +60,14 @@ func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) (
 	if err != nil {
 		return nil, toDomainError(err)
 	}
-	folders := make([]domain.Folder, len(folderResults))
+	folders := make([]*domain.Folder, len(folderResults))
 	for i, folder := range folderResults {
-		folders[i] = *folderToDomain(folder)
+		folders[i] = folderToDomain(folder)
 	}
 	return folders, nil
 }
 
-func (f *Folder) GetByWorkspaceID(ctx context.Context, params domain.FolderRepoGetByWorkspaceIDParams) ([]domain.Folder, errs.Error) {
+func (f *Folder) GetByWorkspaceID(ctx context.Context, params domain.FolderRepoGetByWorkspaceIDParams) ([]*domain.Folder, errs.Error) {
 	var trashedBy *string
 	if params.TrashedBy != nil {
 		trashedBy = new(params.TrashedBy.String())
@@ -80,9 +80,9 @@ func (f *Folder) GetByWorkspaceID(ctx context.Context, params domain.FolderRepoG
 	if err != nil {
 		return nil, toDomainError(err)
 	}
-	folders := make([]domain.Folder, len(results))
+	folders := make([]*domain.Folder, len(results))
 	for i, folder := range results {
-		folders[i] = *folderToDomain(folder)
+		folders[i] = folderToDomain(folder)
 	}
 	return folders, nil
 }
@@ -105,7 +105,7 @@ func (f *Folder) Save(ctx context.Context, folder *domain.Folder) errs.Error {
 	return nil
 }
 
-func (f *Folder) SaveMany(ctx context.Context, folders []domain.Folder) errs.Error {
+func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) errs.Error {
 	err := f.queries.CreateTempTableFolders(ctx)
 	if err != nil {
 		return toDomainError(err)
@@ -149,7 +149,7 @@ func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspa
 	return count == int64(len(ids)), nil
 }
 
-func (f *Folder) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID, trashedBy domain.TrashedBy) ([]domain.Folder, errs.Error) {
+func (f *Folder) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID, trashedBy domain.TrashedBy) ([]*domain.Folder, errs.Error) {
 	return f.GetByWorkspaceID(ctx, domain.FolderRepoGetByWorkspaceIDParams{
 		WorkspaceID: workspaceID,
 		TrashedBy:   &trashedBy,

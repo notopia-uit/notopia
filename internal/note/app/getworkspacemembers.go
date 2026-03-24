@@ -20,6 +20,6 @@ func NewGetWorkspaceMembersHandler() *GetWorkspaceMembersHandler {
 
 var ProvideGetWorkspaceMembersHandler = NewGetWorkspaceMembersHandler
 
-func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorkspaceMembers) ([]WorkspaceMember, errs.Error) {
+func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorkspaceMembers) ([]*WorkspaceMember, errs.Error) {
 	return nil, nil
 }

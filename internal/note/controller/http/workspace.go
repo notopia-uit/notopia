@@ -190,7 +190,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 		return nil, err
 	}
 
-	dto := getGraphToDTO(*result)
+	dto := getGraphToDTO(result)
 	return note.GetWorkspaceGraph200JSONResponse(dto), nil
 }
 
@@ -297,7 +297,7 @@ func (h *StrictHandler) ShowTrash(
 		return nil, err
 	}
 
-	dto := getTrashedToDTO(*result)
+	dto := getTrashedToDTO(result)
 	return note.ShowTrash200JSONResponse(dto), nil
 }
 
@@ -352,7 +352,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 		return nil, err
 	}
 
-	dto := getWorkspaceTreeFolderToDTO(*result)
+	dto := getWorkspaceTreeFolderToDTO(result)
 	return note.GetWorkspaceTree200JSONResponse(dto), nil
 }
 

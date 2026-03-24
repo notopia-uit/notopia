@@ -98,7 +98,7 @@ func (h *StrictHandler) GetNoteGraph(
 		return nil, err
 	}
 
-	dto := getGraphToDTO(*result)
+	dto := getGraphToDTO(result)
 	return note.GetNoteGraph200JSONResponse(dto), nil
 }
 
@@ -118,7 +118,7 @@ func (h *StrictHandler) GetNoteLinks(
 		return nil, err
 	}
 
-	dto := getNoteLinkResultToDTO(*result)
+	dto := getNoteLinkResultToDTO(result)
 	return note.GetNoteLinks200JSONResponse(dto), nil
 }
 

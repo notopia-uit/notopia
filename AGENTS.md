@@ -57,6 +57,7 @@ pkg/                            # Go packages
   - serve: run the built
 - Run `nx lint {projectName} --fix` to apply eslint fix for those typescript projects
 - Run `nx lint {projectsName}` for golangcilint for those go projects (especially in `cmd/` dir)
+- Should run lint whenever changing code
 
 ## General Rules
 

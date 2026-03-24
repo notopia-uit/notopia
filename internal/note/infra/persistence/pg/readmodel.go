@@ -89,13 +89,13 @@ func (r *ReadModel) buildFolderTreeFromMap(folder pgsqlc.Folder, folderMap map[u
 		Name:      folder.Name,
 		Icon:      folder.Icon,
 		UpdatedAt: folder.UpdatedAt,
-		Notes:     []app.WorkspaceTreeNote{},
-		Children:  []app.WorkspaceTreeFolder{},
+		Notes:     []*app.WorkspaceTreeNote{},
+		Children:  []*app.WorkspaceTreeFolder{},
 	}
 
 	if notes, ok := notesByFolder[folder.ID]; ok {
 		for _, note := range notes {
-			result.Notes = append(result.Notes, app.WorkspaceTreeNote{
+			result.Notes = append(result.Notes, &app.WorkspaceTreeNote{
 				ID:        note.ID,
 				Name:      note.Name,
 				Icon:      note.Icon,
@@ -107,7 +107,7 @@ func (r *ReadModel) buildFolderTreeFromMap(folder pgsqlc.Folder, folderMap map[u
 	for _, childFolder := range folderMap {
 		if childFolder.ParentID != nil && *childFolder.ParentID == folder.ID {
 			childTree := r.buildFolderTreeFromMap(*childFolder, folderMap, notesByFolder)
-			result.Children = append(result.Children, *childTree)
+			result.Children = append(result.Children, childTree)
 		}
 	}
 
@@ -128,9 +128,9 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 		return nil, toDomainError(err)
 	}
 
-	notes := make([]app.TrashedNote, len(trashedNotes))
+	notes := make([]*app.TrashedNote, len(trashedNotes))
 	for i, note := range trashedNotes {
-		notes[i] = app.TrashedNote{
+		notes[i] = &app.TrashedNote{
 			ID:        note.ID,
 			Name:      note.Name,
 			TrashedBy: domain.TrashedByPurpose,
@@ -138,9 +138,9 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 		}
 	}
 
-	folders := make([]app.TrashedFolder, len(trashedFolders))
+	folders := make([]*app.TrashedFolder, len(trashedFolders))
 	for i, folder := range trashedFolders {
-		folders[i] = app.TrashedFolder{
+		folders[i] = &app.TrashedFolder{
 			ID:        folder.ID,
 			Name:      folder.Name,
 			TrashedBy: domain.TrashedByPurpose,
@@ -164,8 +164,8 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 	}
 
 	result := app.NoteLinkResult{
-		OutgoingLinks: []app.NoteLink{},
-		Backlinks:     []app.NoteLink{},
+		OutgoingLinks: []*app.NoteLink{},
+		Backlinks:     []*app.NoteLink{},
 	}
 
 	if q.OutgoingLinks {
@@ -180,7 +180,7 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 				return nil, toDomainError(err)
 			}
 			for _, linkedNote := range outgoingNotes {
-				result.OutgoingLinks = append(result.OutgoingLinks, app.NoteLink{
+				result.OutgoingLinks = append(result.OutgoingLinks, &app.NoteLink{
 					ID:   linkedNote.ID,
 					Name: linkedNote.Name,
 					Icon: linkedNote.Icon,
@@ -201,7 +201,7 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 				return nil, toDomainError(err)
 			}
 			for _, linkedNote := range backlinkNotes {
-				result.Backlinks = append(result.Backlinks, app.NoteLink{
+				result.Backlinks = append(result.Backlinks, &app.NoteLink{
 					ID:   linkedNote.ID,
 					Name: linkedNote.Name,
 					Icon: linkedNote.Icon,
@@ -353,14 +353,14 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 		}
 	}
 
-	var graphNodes []app.GraphNode
-	var graphLinks []app.GraphLink
+	var graphNodes []*app.GraphNode
+	var graphLinks []*app.GraphLink
 	tagsAdded := make(map[string]bool)
 
 	// 2. Build Nodes (Notes and Tags)
 	for _, n := range reachableNotesMap {
 		// Add Note Node
-		graphNodes = append(graphNodes, app.GraphNode{
+		graphNodes = append(graphNodes, &app.GraphNode{
 			ID:     n.ID.String(),
 			Name:   n.Name,
 			Type:   app.GraphNodeTypeNote,
@@ -372,7 +372,7 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 
 			if reachableIDs[tagID] {
 				if !tagsAdded[tagID] {
-					graphNodes = append(graphNodes, app.GraphNode{
+					graphNodes = append(graphNodes, &app.GraphNode{
 						ID:     tagID,
 						Name:   tag,
 						Type:   app.GraphNodeTypeTag,
@@ -382,7 +382,7 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 				}
 
 				// Add structural link for Note -> Tag
-				graphLinks = append(graphLinks, app.GraphLink{
+				graphLinks = append(graphLinks, &app.GraphLink{
 					Source: n.ID.String(),
 					Target: tagID,
 				})
@@ -393,7 +393,7 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 	// 3. Build Note -> Note Links (filtering out unreachable ones)
 	for _, l := range links {
 		if reachableIDs[l.SourceID.String()] && reachableIDs[l.TargetID.String()] {
-			graphLinks = append(graphLinks, app.GraphLink{
+			graphLinks = append(graphLinks, &app.GraphLink{
 				Source: l.SourceID.String(),
 				Target: l.TargetID.String(),
 			})
