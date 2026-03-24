@@ -5,8 +5,8 @@
     "types": ["node"],
     "lib": ["ESNext"],
     "rootDir": ".",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -14,7 +14,7 @@
     "emitDecoratorMetadata": false,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2023",
+    "target": "esnext",
     "skipLibCheck": true,
     "strictNullChecks": true,
     "noImplicitAny": false,
@@ -22,7 +22,8 @@
     "noFallthroughCasesInSwitch": false,
     "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "emitDeclarationOnly": false
   },
   "include": ["**/*.ts"],
   "exclude": [

@@ -26,6 +26,9 @@
     },
     {
       "path": "./apps/api-web"
+    },
+    {
+      "path": "./apps/search-worker"
     }
   ]
 }

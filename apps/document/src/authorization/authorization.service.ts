@@ -2,7 +2,7 @@ import { Client, Code, ConnectError } from '@connectrpc/connect';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import {
   AuthorizationService as AuthorizationServiceDefinition,
-  NotePermission,
+  WorkspaceItemPermission,
 } from '@notopia-uit/pb/authorization';
 
 export type AuthorizationClient = Client<typeof AuthorizationServiceDefinition>;
@@ -12,16 +12,15 @@ export class AuthorizationService {
   constructor(private readonly authorizationClient: AuthorizationClient) {}
 
   async hasNotePermission(
-    noteId: string,
-    permission: NotePermission,
+    permission: WorkspaceItemPermission,
     memberId: string
   ): Promise<{ hasPermission: boolean }> {
     try {
-      const response = await this.authorizationClient.hasNotePermission({
-        noteId,
-        permission,
-        memberId,
-      });
+      const response =
+        await this.authorizationClient.hasWorkspaceItemPermission({
+          permission,
+          memberId,
+        });
       return { hasPermission: response.hasPermission };
     } catch (error) {
       if (error instanceof ConnectError) {
@@ -36,38 +35,29 @@ export class AuthorizationService {
     }
   }
 
-  async hasWriteNotePermission(
-    noteId: string,
-    memberId: string
-  ): Promise<boolean> {
+  async hasWriteNotePermission(memberId: string): Promise<boolean> {
     const { hasPermission } = await this.hasNotePermission(
-      noteId,
-      NotePermission.WRITE,
+      WorkspaceItemPermission.WRITE,
       memberId
     );
     return hasPermission;
   }
 
-  async hasReadNotePermission(
-    noteId: string,
-    memberId: string
-  ): Promise<boolean> {
+  async hasReadNotePermission(memberId: string): Promise<boolean> {
     const { hasPermission } = await this.hasNotePermission(
-      noteId,
-      NotePermission.READ,
+      WorkspaceItemPermission.READ,
       memberId
     );
     return hasPermission;
   }
 
   async getUserNotePermissions(
-    memberId: string,
-    noteId: string
+    memberId: string
   ): Promise<{ canRead: boolean; canWrite: boolean; canDelete: boolean }> {
     try {
-      return await this.authorizationClient.getUserNotePermissions({
+      return await this.authorizationClient.getUserWorkspaceItemPermissions({
         memberId,
-        noteId,
+        workspaceId: '', // TODO: it need workspace
       });
     } catch (error) {
       if (error instanceof ConnectError) {

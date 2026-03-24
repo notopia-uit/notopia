@@ -2,13 +2,12 @@
   "name": "@notopia-uit/api-document-nestjs-server",
   "version": "0.2.0",
   "private": true,
-  "main": "./dist/index.js",
+  "type": "module",
   "exports": {
     ".": {
       "@nx/source": "./index.ts",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
