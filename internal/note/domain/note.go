@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type Note struct {
@@ -183,11 +184,15 @@ func (n *Note) TrashedAt() *time.Time {
 	return &n.trashed.at
 }
 
-func (n *Note) Trash(trashedBy TrashedBy) {
+func (n *Note) Trash(trashedBy TrashedBy) errs.Error {
+	if n.trashed != nil {
+		return errs.NewNoteAlreadyTrashed(n.id)
+	}
 	n.trashed = NewTrashed(trashedBy, time.Now())
 	n.AddEvent(&NoteTrashedEvent{
 		Id: n.id,
 	})
+	return nil
 }
 
 func (n *Note) Restore() {

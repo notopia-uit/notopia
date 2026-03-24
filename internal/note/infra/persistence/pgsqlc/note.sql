@@ -164,7 +164,11 @@ INNER JOIN
   ON n.folder_id = f.id
 WHERE
   f.workspace_id = sqlc.arg('workspace_id')
-  AND n.trashed_at IS NULL
+  AND CASE
+    WHEN sqlc.narg('trashed_by')::text IS NOT NULL
+    THEN n.trashed_by = sqlc.narg('trashed_by')::text
+    ELSE n.trashed_at IS NULL
+  END
   AND f.trashed_at IS NULL;
 
 -- name: GetTrashedNotesByWorkspaceID :many

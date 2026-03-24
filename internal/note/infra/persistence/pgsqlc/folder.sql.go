@@ -194,7 +194,7 @@ WHERE
     ELSE TRUE
   END
   AND CASE
-    WHEN $5::text <> ''
+    WHEN $5::text IS NOT NULL
     THEN trashed_by = $5::text
     ELSE TRUE
   END
@@ -207,7 +207,7 @@ type GetFoldersParams struct {
 	WorkspaceID  *uuid.UUID
 	ParentID     *uuid.UUID
 	IsRootFolder bool
-	TrashedBy    string
+	TrashedBy    *string
 }
 
 func (q *Queries) GetFolders(ctx context.Context, arg *GetFoldersParams) ([]*Folder, error) {
@@ -273,7 +273,7 @@ WHERE
     ELSE TRUE
   END
   AND CASE
-    WHEN $5::text <> ''
+    WHEN $5::text IS NOT NULL
     THEN trashed_by = $5::text
     ELSE TRUE
   END
@@ -287,7 +287,7 @@ type GetFoldersForUpdateParams struct {
 	WorkspaceID  *uuid.UUID
 	ParentID     *uuid.UUID
 	IsRootFolder bool
-	TrashedBy    string
+	TrashedBy    *string
 }
 
 func (q *Queries) GetFoldersForUpdate(ctx context.Context, arg *GetFoldersForUpdateParams) ([]*Folder, error) {

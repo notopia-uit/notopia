@@ -147,11 +147,15 @@ func (f *Folder) TrashedAt() *time.Time {
 	return &f.trashed.at
 }
 
-func (f *Folder) Trash(trashedBy TrashedBy) {
+func (f *Folder) Trash(trashedBy TrashedBy) errs.Error {
+	if f.trashed != nil {
+		return errs.NewFolderAlreadyTrashed(f.id)
+	}
 	f.trashed = NewTrashed(trashedBy, time.Now())
 	f.AddEvent(&FolderTrashedEvent{
 		Id: f.id,
 	})
+	return nil
 }
 
 func (f *Folder) Restore() {

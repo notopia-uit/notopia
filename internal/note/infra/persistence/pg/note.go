@@ -71,6 +71,38 @@ func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]
 	return notes, nil
 }
 
+func (n *Note) GetByWorkspaceID(ctx context.Context, params domain.NoteRepoGetByWorkspaceIDParams) ([]domain.Note, errs.Error) {
+	var trashedBy *string
+	if params.TrashedBy != nil {
+		trashedBy = new(params.TrashedBy.String())
+	}
+
+	noteResults, err := n.queries.GetNotesInWorkspace(ctx, &pgsqlc.GetNotesInWorkspaceParams{
+		WorkspaceID: params.WorkspaceID,
+		TrashedBy:   trashedBy,
+	})
+	if err != nil {
+		return nil, toDomainError(err)
+	}
+	noteIDs := make([]uuid.UUID, len(noteResults))
+	for i, note := range noteResults {
+		noteIDs[i] = note.ID
+	}
+	outgoingLinkResults, err := n.queries.GetNotesOutgoingLinks(ctx, noteIDs)
+	if err != nil {
+		return nil, toDomainError(err)
+	}
+	outgoingLinksMap := make(map[uuid.UUID]uuid.UUIDs)
+	for _, outgoingLink := range outgoingLinkResults {
+		outgoingLinksMap[outgoingLink.SourceID] = append(outgoingLinksMap[outgoingLink.SourceID], outgoingLink.TargetID)
+	}
+	notes := make([]domain.Note, len(noteResults))
+	for i, note := range noteResults {
+		notes[i] = *noteToDomain(note, outgoingLinksMap[note.ID])
+	}
+	return notes, nil
+}
+
 func (n *Note) Save(ctx context.Context, note *domain.Note) errs.Error {
 	err := n.queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
 		ID:        note.ID(),
@@ -136,27 +168,10 @@ func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspace
 }
 
 func (n *Note) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]domain.Note, errs.Error) {
-	noteResults, err := n.queries.GetTrashedNotesByWorkspaceID(ctx, workspaceID)
-	if err != nil {
-		return nil, toDomainError(err)
-	}
-	noteIDs := make([]uuid.UUID, len(noteResults))
-	for i, note := range noteResults {
-		noteIDs[i] = note.ID
-	}
-	outgoingLinkResults, err := n.queries.GetNotesOutgoingLinks(ctx, noteIDs)
-	if err != nil {
-		return nil, toDomainError(err)
-	}
-	outgoingLinksMap := make(map[uuid.UUID]uuid.UUIDs)
-	for _, outgoingLink := range outgoingLinkResults {
-		outgoingLinksMap[outgoingLink.SourceID] = append(outgoingLinksMap[outgoingLink.SourceID], outgoingLink.TargetID)
-	}
-	notes := make([]domain.Note, len(noteResults))
-	for i, note := range noteResults {
-		notes[i] = *noteToDomain(note, outgoingLinksMap[note.ID])
-	}
-	return notes, nil
+	return n.GetByWorkspaceID(ctx, domain.NoteRepoGetByWorkspaceIDParams{
+		WorkspaceID: workspaceID,
+		TrashedBy:   &domain.TrashedByPurpose,
+	})
 }
 
 func (n *Note) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) errs.Error {

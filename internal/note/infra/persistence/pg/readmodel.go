@@ -62,7 +62,9 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 		return nil, toDomainError(err)
 	}
 
-	allNotes, err := r.queries.GetNotesInWorkspace(ctx, workspace.ID)
+	allNotes, err := r.queries.GetNotesInWorkspace(ctx, &pgsqlc.GetNotesInWorkspaceParams{
+		WorkspaceID: workspace.ID,
+	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toDomainError(err)
 	}
@@ -120,7 +122,7 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 
 	trashedFolders, err := r.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
 		WorkspaceID: &q.WorkspaceID,
-		TrashedBy:   domain.TrashedByPurpose.String(),
+		TrashedBy:   new(domain.TrashedByPurpose.String()),
 	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toDomainError(err)
@@ -241,7 +243,9 @@ func (r *ReadModel) CheckWorkspaceSlugExists(ctx context.Context, q *app.CheckWo
 }
 
 func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, errs.Error) {
-	notes, err := r.queries.GetNotesInWorkspace(ctx, q.ID)
+	notes, err := r.queries.GetNotesInWorkspace(ctx, &pgsqlc.GetNotesInWorkspaceParams{
+		WorkspaceID: q.ID,
+	})
 	if err != nil {
 		return nil, toDomainError(err)
 	}
@@ -265,7 +269,9 @@ func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app
 		return nil, toDomainError(err)
 	}
 
-	notes, err := r.queries.GetNotesInWorkspace(ctx, workspaceID)
+	notes, err := r.queries.GetNotesInWorkspace(ctx, &pgsqlc.GetNotesInWorkspaceParams{
+		WorkspaceID: workspaceID,
+	})
 	if err != nil {
 		return nil, toDomainError(err)
 	}

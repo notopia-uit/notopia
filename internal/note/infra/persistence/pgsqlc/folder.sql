@@ -180,8 +180,8 @@ WHERE
     ELSE TRUE
   END
   AND CASE
-    WHEN sqlc.arg('trashed_by')::text <> ''
-    THEN trashed_by = sqlc.arg('trashed_by')::text
+    WHEN sqlc.narg('trashed_by')::text IS NOT NULL
+    THEN trashed_by = sqlc.narg('trashed_by')::text
     ELSE TRUE
   END
 ORDER BY
@@ -214,8 +214,8 @@ WHERE
     ELSE TRUE
   END
   AND CASE
-    WHEN sqlc.arg('trashed_by')::text <> ''
-    THEN trashed_by = sqlc.arg('trashed_by')::text
+    WHEN sqlc.narg('trashed_by')::text IS NOT NULL
+    THEN trashed_by = sqlc.narg('trashed_by')::text
     ELSE TRUE
   END
 ORDER BY

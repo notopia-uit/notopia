@@ -20,17 +20,20 @@ type TrashWorkspaceItemsHandler struct {
 	authorizationService AuthorizationService
 	noteRepo             domain.NoteRepo
 	folderRepo           domain.FolderRepo
+	trashService         *domain.TrashService
 }
 
 func NewTrashWorkspaceItemsHandler(
 	authorizationService AuthorizationService,
 	noteRepo domain.NoteRepo,
 	folderRepo domain.FolderRepo,
+	trashService *domain.TrashService,
 ) *TrashWorkspaceItemsHandler {
 	return &TrashWorkspaceItemsHandler{
 		authorizationService: authorizationService,
 		noteRepo:             noteRepo,
 		folderRepo:           folderRepo,
+		trashService:         trashService,
 	}
 }
 
@@ -53,34 +56,80 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		)
 	}
 
-	for _, noteID := range cmd.NoteIDs {
-		note, err := h.noteRepo.GetByID(ctx, noteID, true)
+	workspaceNotes, err := h.noteRepo.GetByWorkspaceID(ctx, domain.NoteRepoGetByWorkspaceIDParams{
+		WorkspaceID: cmd.WorkspaceID,
+		TrashedBy:   nil,
+	})
+	if err != nil {
+		return err
+	}
+
+	workspaceFolders, err := h.folderRepo.GetByWorkspaceID(ctx, domain.FolderRepoGetByWorkspaceIDParams{
+		WorkspaceID: cmd.WorkspaceID,
+		TrashedBy:   nil,
+	})
+	if err != nil {
+		return err
+	}
+
+	workspaceNotePtrs := make([]*domain.Note, len(workspaceNotes))
+	for i := range workspaceNotes {
+		workspaceNotePtrs[i] = &workspaceNotes[i]
+	}
+
+	workspaceFolderPtrs := make([]*domain.Folder, len(workspaceFolders))
+	for i := range workspaceFolders {
+		workspaceFolderPtrs[i] = &workspaceFolders[i]
+	}
+
+	if len(cmd.NoteIDs) > 0 {
+		notes, err := h.noteRepo.GetByIDs(ctx, cmd.NoteIDs, true)
 		if err != nil {
 			return err
 		}
-		note.Trash(domain.TrashedByPurpose)
-		if err := h.noteRepo.Save(ctx, note); err != nil {
+
+		notePtrs := make([]*domain.Note, len(notes))
+		for i := range notes {
+			notePtrs[i] = &notes[i]
+		}
+
+		if err := h.trashService.TrashNotes(notePtrs); err != nil {
 			return err
+		}
+
+		for _, note := range notePtrs {
+			if err := h.noteRepo.Save(ctx, note); err != nil {
+				return err
+			}
 		}
 	}
 
-	for _, folderID := range cmd.FolderIDs {
-		folder, err := h.folderRepo.GetByID(ctx, folderID, true)
+	if len(cmd.FolderIDs) > 0 {
+		folders, err := h.folderRepo.GetByIDs(ctx, cmd.FolderIDs, true)
 		if err != nil {
 			return err
 		}
-		folder.Trash(domain.TrashedByPurpose)
-		if err := h.folderRepo.Save(ctx, folder); err != nil {
+
+		folderPtrs := make([]*domain.Folder, len(folders))
+		for i := range folders {
+			folderPtrs[i] = &folders[i]
+		}
+
+		if err := h.trashService.TrashFolders(&workspaceNotePtrs, &workspaceFolderPtrs, folderPtrs); err != nil {
 			return err
 		}
-		// WARN: Incomplete cascade logic - only trashes direct items, not children.
-		// TODO: Cascade trash child notes and folders with TrashedByParent.
-		// Requires NoteRepo/FolderRepo methods to list items by parentFolderID.
-		// Steps:
-		// 1. Add FolderRepo.GetByParentID(ctx, parentFolderID) -> []Folder
-		// 2. Add NoteRepo.GetByFolderID(ctx, folderID) -> []Note (may exist)
-		// 3. Recursively trash all children with TrashedByParent, not TrashedByPurpose
-		// 4. Preserve original TrashedAt timestamp in parent for restore ordering
+
+		for _, folder := range workspaceFolderPtrs {
+			if err := h.folderRepo.Save(ctx, folder); err != nil {
+				return err
+			}
+		}
+
+		for _, note := range workspaceNotePtrs {
+			if err := h.noteRepo.Save(ctx, note); err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil

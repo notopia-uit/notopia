@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	CodeFolderNotFound  Code = "folder_1"
-	CodeEmptyFolderName Code = "folder_2"
+	CodeFolderNotFound       Code = "folder_1"
+	CodeEmptyFolderName      Code = "folder_2"
+	CodeFolderAlreadyTrashed Code = "folder_3"
 )
 
 type FolderNotFound struct {
@@ -30,4 +31,20 @@ func NewFolderNotFound(id uuid.UUID, err error) *FolderNotFound {
 var EmptyFolderName = &Err{
 	message: "folder name cannot be empty",
 	code:    CodeEmptyFolderName,
+}
+
+type FolderAlreadyTrashed struct {
+	Err
+	FolderID uuid.UUID
+}
+
+func NewFolderAlreadyTrashed(id uuid.UUID) *FolderAlreadyTrashed {
+	return &FolderAlreadyTrashed{
+		FolderID: id,
+		Err: Err{
+			message: fmt.Sprintf("folder with id %q is already trashed", id.String()),
+			code:    CodeFolderAlreadyTrashed,
+			err:     nil,
+		},
+	}
 }

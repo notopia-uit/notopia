@@ -67,6 +67,26 @@ func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) (
 	return folders, nil
 }
 
+func (f *Folder) GetByWorkspaceID(ctx context.Context, params domain.FolderRepoGetByWorkspaceIDParams) ([]domain.Folder, errs.Error) {
+	var trashedBy *string
+	if params.TrashedBy != nil {
+		trashedBy = new(params.TrashedBy.String())
+	}
+
+	results, err := f.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
+		WorkspaceID: &params.WorkspaceID,
+		TrashedBy:   trashedBy,
+	})
+	if err != nil {
+		return nil, toDomainError(err)
+	}
+	folders := make([]domain.Folder, len(results))
+	for i, folder := range results {
+		folders[i] = *folderToDomain(folder)
+	}
+	return folders, nil
+}
+
 func (f *Folder) Save(ctx context.Context, folder *domain.Folder) errs.Error {
 	err := f.queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
 		ID:          folder.ID(),
@@ -130,18 +150,10 @@ func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspa
 }
 
 func (f *Folder) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID, trashedBy domain.TrashedBy) ([]domain.Folder, errs.Error) {
-	results, err := f.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		WorkspaceID: &workspaceID,
-		TrashedBy:   trashedBy.String(),
+	return f.GetByWorkspaceID(ctx, domain.FolderRepoGetByWorkspaceIDParams{
+		WorkspaceID: workspaceID,
+		TrashedBy:   &trashedBy,
 	})
-	if err != nil {
-		return nil, toDomainError(err)
-	}
-	folders := make([]domain.Folder, len(results))
-	for i, folder := range results {
-		folders[i] = *folderToDomain(folder)
-	}
-	return folders, nil
 }
 
 func (f *Folder) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) errs.Error {

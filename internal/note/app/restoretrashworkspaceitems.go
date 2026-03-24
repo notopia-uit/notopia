@@ -9,52 +9,127 @@ import (
 )
 
 type RestoreTrashedWorkspaceItems struct {
-	WorkspaceSlug string
-	NoteIDs       []uuid.UUID
-	FolderIDs     []uuid.UUID
+	WorkspaceID uuid.UUID
+	NoteIDs     []uuid.UUID
+	FolderIDs   []uuid.UUID
 }
 
 type RestoreTrashedWorkspaceItemsHandler struct {
-	noteRepo   domain.NoteRepo
-	folderRepo domain.FolderRepo
+	noteRepo     domain.NoteRepo
+	folderRepo   domain.FolderRepo
+	trashService *domain.TrashService
 }
 
 func NewRestoreTrashedWorkspaceItemsHandler(
 	noteRepo domain.NoteRepo,
 	folderRepo domain.FolderRepo,
+	trashService *domain.TrashService,
 ) *RestoreTrashedWorkspaceItemsHandler {
 	return &RestoreTrashedWorkspaceItemsHandler{
-		noteRepo:   noteRepo,
-		folderRepo: folderRepo,
+		noteRepo:     noteRepo,
+		folderRepo:   folderRepo,
+		trashService: trashService,
 	}
 }
 
 var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItemsHandler
 
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) errs.Error {
-	// WARN: Handler is completely stubbed - has no implementation.
-	// TODO: domain.Note and domain.Folder have no Restore() method.
-	// Add Restore() to both domain models (clears trashedBy and trashedAt fields),
-	// then call note.Restore() / folder.Restore() before Save.
-	// Also need to handle cascade restore for items trashed with TrashedByParent.
-	// Steps:
-	// 1. Add Restore() method to domain.Note: func (n *Note) Restore() { n.trashed = nil }
-	// 2. Add Restore() method to domain.Folder: func (f *Folder) Restore() { f.trashed = nil }
-	// 3. For each noteID in cmd.NoteIDs:
-	//    - Get the note (with trashed=true to include trashed notes)
-	//    - Call note.Restore()
-	//    - If trashed.By == TrashedByParent, restore was automatic (parent restored first)
-	//    - Save the note
-	// 4. For each folderID in cmd.FolderIDs:
-	//    - Similar logic to notes
-	//    - Also restore all child items that were trashed with TrashedByParent
-	// 5. Publish RestoreEvent for each restored item
-	// 6. Consider cascade restore: when parent restores, children should too
-	for range cmd.NoteIDs {
-		// # WARN: Implement after Restore() is added to domain.Note
+	trashedNotesPurpose, err := h.noteRepo.GetByWorkspaceID(ctx, domain.NoteRepoGetByWorkspaceIDParams{
+		WorkspaceID: cmd.WorkspaceID,
+		TrashedBy:   &domain.TrashedByPurpose,
+	})
+	if err != nil {
+		return err
 	}
-	for range cmd.FolderIDs {
-		// # WARN: Implement after Restore() is added to domain.Folder
+
+	trashedNotesParent, err := h.noteRepo.GetByWorkspaceID(ctx, domain.NoteRepoGetByWorkspaceIDParams{
+		WorkspaceID: cmd.WorkspaceID,
+		TrashedBy:   &domain.TrashedByParent,
+	})
+	if err != nil {
+		return err
 	}
+
+	trashedNotes := append(trashedNotesPurpose, trashedNotesParent...)
+
+	trashedFoldersPurpose, err := h.folderRepo.GetByWorkspaceID(ctx, domain.FolderRepoGetByWorkspaceIDParams{
+		WorkspaceID: cmd.WorkspaceID,
+		TrashedBy:   &domain.TrashedByPurpose,
+	})
+	if err != nil {
+		return err
+	}
+
+	trashedFoldersParent, err := h.folderRepo.GetByWorkspaceID(ctx, domain.FolderRepoGetByWorkspaceIDParams{
+		WorkspaceID: cmd.WorkspaceID,
+		TrashedBy:   &domain.TrashedByParent,
+	})
+	if err != nil {
+		return err
+	}
+
+	trashedFolders := append(trashedFoldersPurpose, trashedFoldersParent...)
+
+	trashedNotePtrs := make([]*domain.Note, len(trashedNotes))
+	for i := range trashedNotes {
+		trashedNotePtrs[i] = &trashedNotes[i]
+	}
+
+	trashedFolderPtrs := make([]*domain.Folder, len(trashedFolders))
+	for i := range trashedFolders {
+		trashedFolderPtrs[i] = &trashedFolders[i]
+	}
+
+	if len(cmd.NoteIDs) > 0 {
+		notes, err := h.noteRepo.GetByIDs(ctx, cmd.NoteIDs, true)
+		if err != nil {
+			return err
+		}
+
+		notePtrs := make([]*domain.Note, len(notes))
+		for i := range notes {
+			notePtrs[i] = &notes[i]
+		}
+
+		if err := h.trashService.RestoreNotes(notePtrs); err != nil {
+			return err
+		}
+
+		for _, note := range notePtrs {
+			if err := h.noteRepo.Save(ctx, note); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(cmd.FolderIDs) > 0 {
+		folders, err := h.folderRepo.GetByIDs(ctx, cmd.FolderIDs, true)
+		if err != nil {
+			return err
+		}
+
+		folderPtrs := make([]*domain.Folder, len(folders))
+		for i := range folders {
+			folderPtrs[i] = &folders[i]
+		}
+
+		if err := h.trashService.RestoreFolders(&trashedNotePtrs, &trashedFolderPtrs, folderPtrs); err != nil {
+			return err
+		}
+
+		for _, folder := range trashedFolderPtrs {
+			if err := h.folderRepo.Save(ctx, folder); err != nil {
+				return err
+			}
+		}
+
+		for _, note := range trashedNotePtrs {
+			if err := h.noteRepo.Save(ctx, note); err != nil {
+				return err
+			}
+		}
+	}
+
 	return nil
 }

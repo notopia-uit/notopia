@@ -9,6 +9,7 @@ import (
 const (
 	CodeNoteNotFound                     Code = "note_1"
 	CodeNoteFailToMarshalDocumentContent Code = "note_2"
+	CodeNoteAlreadyTrashed               Code = "note_3"
 )
 
 type NoteNotFound struct {
@@ -41,6 +42,22 @@ func NewNoteFailToMarshalDocumentContent(id uuid.UUID, content any, err error) *
 			message: fmt.Sprintf("failed to marshal document content for note with id %q", id.String()),
 			code:    CodeNoteFailToMarshalDocumentContent,
 			err:     err,
+		},
+	}
+}
+
+type NoteAlreadyTrashed struct {
+	Err
+	NoteID uuid.UUID
+}
+
+func NewNoteAlreadyTrashed(id uuid.UUID) *NoteAlreadyTrashed {
+	return &NoteAlreadyTrashed{
+		NoteID: id,
+		Err: Err{
+			message: fmt.Sprintf("note with id %q is already trashed", id.String()),
+			code:    CodeNoteAlreadyTrashed,
+			err:     nil,
 		},
 	}
 }

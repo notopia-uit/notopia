@@ -230,12 +230,21 @@ INNER JOIN
   ON n.folder_id = f.id
 WHERE
   f.workspace_id = $1
-  AND n.trashed_at IS NULL
+  AND CASE
+    WHEN $2::text IS NOT NULL
+    THEN n.trashed_by = $2::text
+    ELSE n.trashed_at IS NULL
+  END
   AND f.trashed_at IS NULL
 `
 
-func (q *Queries) GetNotesInWorkspace(ctx context.Context, workspaceID uuid.UUID) ([]*Note, error) {
-	rows, err := q.db.Query(ctx, getNotesInWorkspace, workspaceID)
+type GetNotesInWorkspaceParams struct {
+	WorkspaceID uuid.UUID
+	TrashedBy   *string
+}
+
+func (q *Queries) GetNotesInWorkspace(ctx context.Context, arg *GetNotesInWorkspaceParams) ([]*Note, error) {
+	rows, err := q.db.Query(ctx, getNotesInWorkspace, arg.WorkspaceID, arg.TrashedBy)
 	if err != nil {
 		return nil, err
 	}
