@@ -2129,6 +2129,61 @@ export type MoveWorkspaceItemsResponses = {
 
 export type MoveWorkspaceItemsResponse = MoveWorkspaceItemsResponses[keyof MoveWorkspaceItemsResponses];
 
+export type PermanentlyDeleteWorkspaceItemsData = {
+    body: {
+        noteIds?: Array<NoteNotePropertiesId>;
+        folderIds?: Array<NoteId>;
+    };
+    path: {
+        workspaceId: NotePropertiesId;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceId}/permanently-delete-items';
+};
+
+export type PermanentlyDeleteWorkspaceItemsErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * The error response body returned when JWT validation or OPA authorization fails.
+     */
+    401: {
+        /**
+         * The category of the error encountered during the middleware lifecycle.
+         */
+        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
+        /**
+         * A descriptive message providing technical context for the failure.
+         */
+        details: string;
+        /**
+         * An optional, developer-defined message, often populated by OPA policy violations.
+         */
+        custom_message: string | null;
+    };
+    /**
+     * Not Found Error response
+     */
+    404: NoteError;
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type PermanentlyDeleteWorkspaceItemsError = PermanentlyDeleteWorkspaceItemsErrors[keyof PermanentlyDeleteWorkspaceItemsErrors];
+
+export type PermanentlyDeleteWorkspaceItemsResponses = {
+    /**
+     * Workspace items permanently deleted
+     */
+    204: void;
+};
+
+export type PermanentlyDeleteWorkspaceItemsResponse = PermanentlyDeleteWorkspaceItemsResponses[keyof PermanentlyDeleteWorkspaceItemsResponses];
+
 export type PublishWorkspaceData = {
     body?: never;
     path: {

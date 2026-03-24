@@ -1,0 +1,36 @@
+# vim: ft=yaml.openapi
+post:
+  security:
+    - Oauth2: []
+  tags:
+    - Workspace
+  summary: Permanently delete workspace items
+  operationId: permanentlyDeleteWorkspaceItems
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            noteIds:
+              type: array
+              items:
+                $ref: ../components/schemas/Note.yaml#/properties/id
+            folderIds:
+              type: array
+              items:
+                $ref: ../components/schemas/Folder.yaml#/properties/id
+  responses:
+    204:
+      description: Workspace items permanently deleted
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

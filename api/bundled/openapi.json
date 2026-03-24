@@ -1475,6 +1475,66 @@
         }
       }
     },
+    "/note/workspaces/{workspaceId}/permanently-delete-items": {
+      "post": {
+        "security": [
+          {
+            "note_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Permanently delete workspace items",
+        "operationId": "permanentlyDeleteWorkspaceItems",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/note_workspaceIdPath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "noteIds": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/note_Note_properties-id"
+                    }
+                  },
+                  "folderIds": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/note_id"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Workspace items permanently deleted"
+          },
+          "400": {
+            "$ref": "#/components/responses/note_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/note_UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/note_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/note_InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/publish": {
       "post": {
         "security": [

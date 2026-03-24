@@ -835,6 +835,12 @@ type MoveWorkspaceItemsJSONBody struct {
 	NoteIds             *[]NotePropertiesId `json:"noteIds,omitempty"`
 }
 
+// PermanentlyDeleteWorkspaceItemsJSONBody defines parameters for PermanentlyDeleteWorkspaceItems.
+type PermanentlyDeleteWorkspaceItemsJSONBody struct {
+	FolderIds *[]Id               `json:"folderIds,omitempty"`
+	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
+}
+
 // RenameWorkspaceJSONBody defines parameters for RenameWorkspace.
 type RenameWorkspaceJSONBody struct {
 	Name WorkspacePropertiesName `json:"name"`
@@ -875,6 +881,9 @@ type UpdateWorkspaceMembersJSONRequestBody = UpdateWorkspaceMembersJSONBody
 
 // MoveWorkspaceItemsJSONRequestBody defines body for MoveWorkspaceItems for application/json ContentType.
 type MoveWorkspaceItemsJSONRequestBody MoveWorkspaceItemsJSONBody
+
+// PermanentlyDeleteWorkspaceItemsJSONRequestBody defines body for PermanentlyDeleteWorkspaceItems for application/json ContentType.
+type PermanentlyDeleteWorkspaceItemsJSONRequestBody PermanentlyDeleteWorkspaceItemsJSONBody
 
 // RenameWorkspaceJSONRequestBody defines body for RenameWorkspace for application/json ContentType.
 type RenameWorkspaceJSONRequestBody RenameWorkspaceJSONBody

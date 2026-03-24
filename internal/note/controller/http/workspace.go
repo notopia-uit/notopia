@@ -362,3 +362,36 @@ func (h *StrictHandler) UnpublishWorkspace(
 ) (note.UnpublishWorkspaceResponseObject, error) {
 	return nil, errs.NewUnimplemented()
 }
+
+func (h *StrictHandler) PermanentlyDeleteWorkspaceItems(
+	ctx context.Context,
+	request note.PermanentlyDeleteWorkspaceItemsRequestObject,
+) (note.PermanentlyDeleteWorkspaceItemsResponseObject, error) {
+	user, err := commonhttp.UserFromContextError(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var noteIDs []uuid.UUID
+	if request.Body.NoteIds != nil {
+		noteIDs = *request.Body.NoteIds
+	}
+
+	var folderIDs []uuid.UUID
+	if request.Body.FolderIds != nil {
+		folderIDs = *request.Body.FolderIds
+	}
+
+	cmd := &app.PermanentlyDeleteWorkspaceItems{
+		WorkspaceID: request.WorkspaceId,
+		UserID:      user.ID,
+		NoteIDs:     noteIDs,
+		FolderIDs:   folderIDs,
+	}
+	err = h.App.PermanentlyDeleteWorkspaceItemsHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.PermanentlyDeleteWorkspaceItems204Response{}, nil
+}

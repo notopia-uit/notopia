@@ -80,6 +80,9 @@ type ServerInterface interface {
 	// Move workspace's items
 	// (POST /note/workspaces/{workspaceId}/move-items)
 	MoveWorkspaceItems(c *gin.Context, workspaceId WorkspaceIdPath)
+	// Permanently delete workspace items
+	// (POST /note/workspaces/{workspaceId}/permanently-delete-items)
+	PermanentlyDeleteWorkspaceItems(c *gin.Context, workspaceId WorkspaceIdPath)
 	// Publish workspace
 	// (POST /note/workspaces/{workspaceId}/publish)
 	PublishWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
@@ -655,6 +658,32 @@ func (siw *ServerInterfaceWrapper) MoveWorkspaceItems(c *gin.Context) {
 	siw.Handler.MoveWorkspaceItems(c, workspaceId)
 }
 
+// PermanentlyDeleteWorkspaceItems operation middleware
+func (siw *ServerInterfaceWrapper) PermanentlyDeleteWorkspaceItems(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "workspaceId" -------------
+	var workspaceId WorkspaceIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PermanentlyDeleteWorkspaceItems(c, workspaceId)
+}
+
 // PublishWorkspace operation middleware
 func (siw *ServerInterfaceWrapper) PublishWorkspace(c *gin.Context) {
 
@@ -885,6 +914,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/members", wrapper.GetWorkspaceMembers)
 	router.PUT(options.BaseURL+"/note/workspaces/:workspaceId/members", wrapper.UpdateWorkspaceMembers)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/move-items", wrapper.MoveWorkspaceItems)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/permanently-delete-items", wrapper.PermanentlyDeleteWorkspaceItems)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/publish", wrapper.PublishWorkspace)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/rename", wrapper.RenameWorkspace)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/restore-trashed-items", wrapper.RestoreTrashedWorkspaceItems)
@@ -2115,6 +2145,61 @@ func (response MoveWorkspaceItems500JSONResponse) VisitMoveWorkspaceItemsRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PermanentlyDeleteWorkspaceItemsRequestObject struct {
+	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	Body        *PermanentlyDeleteWorkspaceItemsJSONRequestBody
+}
+
+type PermanentlyDeleteWorkspaceItemsResponseObject interface {
+	VisitPermanentlyDeleteWorkspaceItemsResponse(w http.ResponseWriter) error
+}
+
+type PermanentlyDeleteWorkspaceItems204Response struct {
+}
+
+func (response PermanentlyDeleteWorkspaceItems204Response) VisitPermanentlyDeleteWorkspaceItemsResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type PermanentlyDeleteWorkspaceItems400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response PermanentlyDeleteWorkspaceItems400JSONResponse) VisitPermanentlyDeleteWorkspaceItemsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PermanentlyDeleteWorkspaceItems401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response PermanentlyDeleteWorkspaceItems401JSONResponse) VisitPermanentlyDeleteWorkspaceItemsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PermanentlyDeleteWorkspaceItems404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response PermanentlyDeleteWorkspaceItems404JSONResponse) VisitPermanentlyDeleteWorkspaceItemsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PermanentlyDeleteWorkspaceItems500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response PermanentlyDeleteWorkspaceItems500JSONResponse) VisitPermanentlyDeleteWorkspaceItemsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PublishWorkspaceRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
 }
@@ -2566,6 +2651,9 @@ type StrictServerInterface interface {
 	// Move workspace's items
 	// (POST /note/workspaces/{workspaceId}/move-items)
 	MoveWorkspaceItems(ctx context.Context, request MoveWorkspaceItemsRequestObject) (MoveWorkspaceItemsResponseObject, error)
+	// Permanently delete workspace items
+	// (POST /note/workspaces/{workspaceId}/permanently-delete-items)
+	PermanentlyDeleteWorkspaceItems(ctx context.Context, request PermanentlyDeleteWorkspaceItemsRequestObject) (PermanentlyDeleteWorkspaceItemsResponseObject, error)
 	// Publish workspace
 	// (POST /note/workspaces/{workspaceId}/publish)
 	PublishWorkspace(ctx context.Context, request PublishWorkspaceRequestObject) (PublishWorkspaceResponseObject, error)
@@ -3220,6 +3308,41 @@ func (sh *strictHandler) MoveWorkspaceItems(ctx *gin.Context, workspaceId Worksp
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(MoveWorkspaceItemsResponseObject); ok {
 		if err := validResponse.VisitMoveWorkspaceItemsResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PermanentlyDeleteWorkspaceItems operation middleware
+func (sh *strictHandler) PermanentlyDeleteWorkspaceItems(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+	var request PermanentlyDeleteWorkspaceItemsRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	var body PermanentlyDeleteWorkspaceItemsJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.PermanentlyDeleteWorkspaceItems(ctx, request.(PermanentlyDeleteWorkspaceItemsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PermanentlyDeleteWorkspaceItems")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(PermanentlyDeleteWorkspaceItemsResponseObject); ok {
+		if err := validResponse.VisitPermanentlyDeleteWorkspaceItemsResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

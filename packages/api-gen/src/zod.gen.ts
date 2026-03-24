@@ -939,6 +939,22 @@ export const zMoveWorkspaceItemsData = z.object({
  */
 export const zMoveWorkspaceItemsResponse = z.void();
 
+export const zPermanentlyDeleteWorkspaceItemsData = z.object({
+    body: z.object({
+        noteIds: z.array(zNoteNotePropertiesId).optional(),
+        folderIds: z.array(zNoteId).optional()
+    }),
+    path: z.object({
+        workspaceId: zNotePropertiesId
+    }),
+    query: z.never().optional()
+});
+
+/**
+ * Workspace items permanently deleted
+ */
+export const zPermanentlyDeleteWorkspaceItemsResponse = z.void();
+
 export const zPublishWorkspaceData = z.object({
     body: z.never().optional(),
     path: z.object({

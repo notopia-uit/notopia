@@ -13,6 +13,7 @@ var ProviderSetCommand = wire.NewSet(
 	ProvideDeleteWorkspaceHandler,
 	ProvideGenerateDailyNoteHandler,
 	ProvideMoveWorkspaceItemsHandler,
+	ProvidePermanentlyDeleteWorkspaceItemsHandler,
 	ProvidePublishNoteHandler,
 	ProvidePublishWorkspaceHandler,
 	ProvideRenameFolderHandler,

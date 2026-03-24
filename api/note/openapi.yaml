@@ -67,6 +67,8 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_members.yaml
   /note/workspaces/{workspaceId}/move-items:
     $ref: ./paths/workspaces_{workspaceId}_move-items.yaml
+  /note/workspaces/{workspaceId}/permanently-delete-items:
+    $ref: ./paths/workspaces_{workspaceId}_permanently-delete-items.yaml
   /note/workspaces/{workspaceId}/publish:
     $ref: ./paths/workspaces_{workspaceId}_publish.yaml
   /note/workspaces/{workspaceId}/rename:

@@ -8,24 +8,25 @@ import (
 )
 
 type App struct {
-	CreateNoteHandler                   *CreateNoteHandler
-	CreateFolderHandler                 *CreateFolderHandler
-	CreateWorkspaceHandler              *CreateWorkspaceHandler
-	DeleteNoteHandler                   *DeleteNoteHandler
-	DeleteFolderHandler                 *DeleteFolderHandler
-	DeleteWorkspaceHandler              *DeleteWorkspaceHandler
-	GenerateDailyNoteHandler            *GenerateDailyNoteHandler
-	MoveWorkspaceItemsHandler           *MoveWorkspaceItemsHandler
-	PublishNoteHandler                  *PublishNoteHandler
-	PublishWorkspaceHandler             *PublishWorkspaceHandler
-	RenameFolderHandler                 *RenameFolderHandler
-	RenameNoteHandler                   *RenameNoteHandler
-	RenameWorkspaceHandler              *RenameWorkspaceHandler
-	RestoreTrashedWorkspaceItemsHandler *RestoreTrashedWorkspaceItemsHandler
-	TrashWorkspaceItemsHandler          *TrashWorkspaceItemsHandler
-	UnpublishNoteHandler                *UnpublishNoteHandler
-	UnpublishWorkspaceHandler           *UnpublishWorkspaceHandler
-	UpdateWorkspaceMembersHandler       *UpdateWorkspaceMembersHandler
+	CreateNoteHandler                      *CreateNoteHandler
+	CreateFolderHandler                    *CreateFolderHandler
+	CreateWorkspaceHandler                 *CreateWorkspaceHandler
+	DeleteNoteHandler                      *DeleteNoteHandler
+	DeleteFolderHandler                    *DeleteFolderHandler
+	DeleteWorkspaceHandler                 *DeleteWorkspaceHandler
+	GenerateDailyNoteHandler               *GenerateDailyNoteHandler
+	MoveWorkspaceItemsHandler              *MoveWorkspaceItemsHandler
+	PermanentlyDeleteWorkspaceItemsHandler *PermanentlyDeleteWorkspaceItemsHandler
+	PublishNoteHandler                     *PublishNoteHandler
+	PublishWorkspaceHandler                *PublishWorkspaceHandler
+	RenameFolderHandler                    *RenameFolderHandler
+	RenameNoteHandler                      *RenameNoteHandler
+	RenameWorkspaceHandler                 *RenameWorkspaceHandler
+	RestoreTrashedWorkspaceItemsHandler    *RestoreTrashedWorkspaceItemsHandler
+	TrashWorkspaceItemsHandler             *TrashWorkspaceItemsHandler
+	UnpublishNoteHandler                   *UnpublishNoteHandler
+	UnpublishWorkspaceHandler              *UnpublishWorkspaceHandler
+	UpdateWorkspaceMembersHandler          *UpdateWorkspaceMembersHandler
 
 	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler
 	GetNoteGraphHandler             *GetNoteGraphHandler
@@ -51,6 +52,7 @@ func NewApp(
 	deleteWorkspaceHandler *DeleteWorkspaceHandler,
 	generateDailyNoteHandler *GenerateDailyNoteHandler,
 	moveWorkspaceItemsHandler *MoveWorkspaceItemsHandler,
+	permanentlyDeleteWorkspaceItemsHandler *PermanentlyDeleteWorkspaceItemsHandler,
 	publishNoteHandler *PublishNoteHandler,
 	publishWorkspaceHandler *PublishWorkspaceHandler,
 	renameFolderHandler *RenameFolderHandler,
@@ -74,35 +76,36 @@ func NewApp(
 	persistence Persistence,
 ) *App {
 	return &App{
-		CreateNoteHandler:                   createNoteHandler,
-		CreateFolderHandler:                 createFolderHandler,
-		CreateWorkspaceHandler:              createWorkspaceHandler,
-		DeleteNoteHandler:                   deleteNoteHandler,
-		DeleteFolderHandler:                 deleteFolderHandler,
-		DeleteWorkspaceHandler:              deleteWorkspaceHandler,
-		GenerateDailyNoteHandler:            generateDailyNoteHandler,
-		MoveWorkspaceItemsHandler:           moveWorkspaceItemsHandler,
-		PublishNoteHandler:                  publishNoteHandler,
-		PublishWorkspaceHandler:             publishWorkspaceHandler,
-		RenameFolderHandler:                 renameFolderHandler,
-		RenameNoteHandler:                   renameNoteHandler,
-		RenameWorkspaceHandler:              renameWorkspaceHandler,
-		RestoreTrashedWorkspaceItemsHandler: restoreTrashedWorkspaceItemsHandler,
-		TrashWorkspaceItemsHandler:          trashWorkspaceItemsHandler,
-		UnpublishNoteHandler:                unpublishNoteHandler,
-		UnpublishWorkspaceHandler:           unpublishWorkspaceHandler,
-		UpdateWorkspaceMembersHandler:       updateWorkspaceMembersHandler,
-		CheckWorkspaceSlugExistsHandler:     checkWorkspaceSlugExistsHandler,
-		GetNoteGraphHandler:                 getNoteGraphHandler,
-		GetNoteLinksHandler:                 getNoteLinksHandler,
-		GetWorkspaceHandler:                 getWorkspaceHandler,
-		GetWorkspaceGraphHandler:            getWorkspaceGraphHandler,
-		GetWorkspaceMembersHandler:          getWorkspaceMembersHandler,
-		GetWorkspaceTreeHandler:             getWorkspaceTreeHandler,
-		ShowTrashHandler:                    showTrashHandler,
-		DocumentCommittedHandler:            documentCommittedHandler,
-		workspaceEventPubSub:                workspaceEventPubSub,
-		persistence:                         persistence,
+		CreateNoteHandler:                      createNoteHandler,
+		CreateFolderHandler:                    createFolderHandler,
+		CreateWorkspaceHandler:                 createWorkspaceHandler,
+		DeleteNoteHandler:                      deleteNoteHandler,
+		DeleteFolderHandler:                    deleteFolderHandler,
+		DeleteWorkspaceHandler:                 deleteWorkspaceHandler,
+		GenerateDailyNoteHandler:               generateDailyNoteHandler,
+		MoveWorkspaceItemsHandler:              moveWorkspaceItemsHandler,
+		PermanentlyDeleteWorkspaceItemsHandler: permanentlyDeleteWorkspaceItemsHandler,
+		PublishNoteHandler:                     publishNoteHandler,
+		PublishWorkspaceHandler:                publishWorkspaceHandler,
+		RenameFolderHandler:                    renameFolderHandler,
+		RenameNoteHandler:                      renameNoteHandler,
+		RenameWorkspaceHandler:                 renameWorkspaceHandler,
+		RestoreTrashedWorkspaceItemsHandler:    restoreTrashedWorkspaceItemsHandler,
+		TrashWorkspaceItemsHandler:             trashWorkspaceItemsHandler,
+		UnpublishNoteHandler:                   unpublishNoteHandler,
+		UnpublishWorkspaceHandler:              unpublishWorkspaceHandler,
+		UpdateWorkspaceMembersHandler:          updateWorkspaceMembersHandler,
+		CheckWorkspaceSlugExistsHandler:        checkWorkspaceSlugExistsHandler,
+		GetNoteGraphHandler:                    getNoteGraphHandler,
+		GetNoteLinksHandler:                    getNoteLinksHandler,
+		GetWorkspaceHandler:                    getWorkspaceHandler,
+		GetWorkspaceGraphHandler:               getWorkspaceGraphHandler,
+		GetWorkspaceMembersHandler:             getWorkspaceMembersHandler,
+		GetWorkspaceTreeHandler:                getWorkspaceTreeHandler,
+		ShowTrashHandler:                       showTrashHandler,
+		DocumentCommittedHandler:               documentCommittedHandler,
+		workspaceEventPubSub:                   workspaceEventPubSub,
+		persistence:                            persistence,
 	}
 }
 
