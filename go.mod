@@ -39,7 +39,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.42.0
 	go.opentelemetry.io/otel/sdk/log v0.18.0
 	go.opentelemetry.io/otel/sdk/metric v1.42.0
-	golang.org/x/sync v0.19.0
+	golang.org/x/sync v0.20.0
 	google.golang.org/protobuf v1.36.11
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
