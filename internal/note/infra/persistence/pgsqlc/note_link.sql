@@ -33,6 +33,16 @@ FROM
 WHERE
   target_id = sqlc.arg('target_id');
 
+-- name: GetNoteLinksInWorkspace :many
+SELECT
+    nl.*
+FROM note_links AS nl
+JOIN notes AS sn ON nl.source_id = sn.id
+JOIN folders AS sf ON sn.folder_id = sf.id
+WHERE sf.workspace_id = sqlc.arg('workspace_id')::uuid
+  AND sn.trashed_at IS NULL
+  AND sf.trashed_at IS NULL;
+
 -- name: DeleteAnyNoteLinks :exec
 DELETE FROM
   note_links

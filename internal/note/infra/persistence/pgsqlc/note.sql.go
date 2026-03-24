@@ -231,6 +231,7 @@ INNER JOIN
 WHERE
   f.workspace_id = $1
   AND n.trashed_at IS NULL
+  AND f.trashed_at IS NULL
 `
 
 func (q *Queries) GetNotesInWorkspace(ctx context.Context, workspaceID uuid.UUID) ([]*Note, error) {

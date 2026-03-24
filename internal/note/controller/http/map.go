@@ -140,8 +140,8 @@ func workspaceEventToDTO(event domain.Event) (any, bool) {
 }
 
 func getNoteToDTO(n app.Note) note.Note {
-	id := n.Id
-	folderID := n.FolderId
+	id := n.ID
+	folderID := n.FolderID
 	backlinksCount := n.BacklinksCount
 	outgoingLinksCount := n.OutgoingLinksCount
 	updatedAt := n.UpdatedAt
@@ -162,9 +162,9 @@ func getNoteToDTO(n app.Note) note.Note {
 }
 
 func getFolderToDTO(f app.Folder) note.Folder {
-	id := f.Id
-	parentID := f.ParentId
-	workspaceID := f.WorkspaceId
+	id := f.ID
+	parentID := f.ParentID
+	workspaceID := f.WorkspaceID
 	updatedAt := f.UpdatedAt
 	return note.Folder{
 		Id:          &id,
@@ -177,7 +177,7 @@ func getFolderToDTO(f app.Folder) note.Folder {
 }
 
 func getWorkspaceToDTO(w app.Workspace) note.Workspace {
-	id := w.Id
+	id := w.ID
 	return note.Workspace{
 		Id:   &id,
 		Name: w.Name,
@@ -193,7 +193,7 @@ func getWorkspaceMemberToDTO(m app.WorkspaceMember) note.WorkspaceMember {
 }
 
 func getWorkspaceTreeNoteToDTO(n app.WorkspaceTreeNote) note.WorkspaceTreeNote {
-	id := n.Id
+	id := n.ID
 	updatedAt := n.UpdatedAt
 	return note.WorkspaceTreeNote{
 		Id:        &id,
@@ -204,7 +204,7 @@ func getWorkspaceTreeNoteToDTO(n app.WorkspaceTreeNote) note.WorkspaceTreeNote {
 }
 
 func getWorkspaceTreeFolderToDTO(f app.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
-	id := f.Id
+	id := f.ID
 	updatedAt := f.UpdatedAt
 	notes := make([]note.WorkspaceTreeNote, len(f.Notes))
 	for i, n := range f.Notes {
@@ -229,7 +229,7 @@ func getTrashedFolderToDTO(f app.TrashedFolder) note.TrashedFolder {
 	trashedAt := f.TrashedAt
 	trashedBy := note.TrashedBy(f.TrashedBy)
 	return note.TrashedFolder{
-		Id:        f.Id,
+		Id:        f.ID,
 		Name:      &name,
 		TrashedAt: &trashedAt,
 		TrashedBy: &trashedBy,
@@ -241,7 +241,7 @@ func getTrashedNoteToDTO(n app.TrashedNote) note.TrashedNote {
 	trashedAt := n.TrashedAt
 	trashedBy := note.TrashedBy(n.TrashedBy)
 	return note.TrashedNote{
-		Id:        n.Id,
+		Id:        n.ID,
 		Name:      &name,
 		TrashedAt: &trashedAt,
 		TrashedBy: &trashedBy,
@@ -249,7 +249,7 @@ func getTrashedNoteToDTO(n app.TrashedNote) note.TrashedNote {
 }
 
 func getNoteLinkToDTO(n app.NoteLink) note.NoteLink {
-	id := n.Id
+	id := n.ID
 	return note.NoteLink{
 		Id:   &id,
 		Name: n.Name,
@@ -260,7 +260,7 @@ func getNoteLinkToDTO(n app.NoteLink) note.NoteLink {
 func getGraphToDTO(g app.Graph) note.Graph {
 	nodes := make([]note.GraphNode, len(g.Nodes))
 	for i, n := range g.Nodes {
-		nodes[i].Id = n.Id
+		nodes[i].Id = n.ID
 		nodes[i].Name = n.Name
 		nodes[i].Type = note.GraphNodesType(n.Type)
 		if n.Weight != nil {
@@ -280,7 +280,7 @@ func getGraphToDTO(g app.Graph) note.Graph {
 }
 
 func getWorkspaceMembersUpdatedEventToDTO(e app.WorkspaceMembersUpdatedEvent) note.WorkspaceMemebersUpdatedEvent {
-	id := e.Id
+	id := e.ID
 	members := make([]note.WorkspaceMember, len(e.Members))
 	for i, m := range e.Members {
 		members[i] = getWorkspaceMemberToDTO(m)

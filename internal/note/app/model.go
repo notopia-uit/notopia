@@ -27,23 +27,24 @@ type Paginated[T any] struct {
 }
 
 type Note struct {
-	Id                 uuid.UUID
+	ID                 uuid.UUID
 	Name               string
 	Icon               *string
 	Tags               []string
-	FolderId           uuid.UUID
+	Size               int32
+	FolderID           uuid.UUID
 	BacklinksCount     int
 	OutgoingLinksCount int
 	UpdatedAt          time.Time
 }
 
 type Folder struct {
-	Id          uuid.UUID
+	ID          uuid.UUID
 	Name        string
 	Icon        *string
 	UpdatedAt   time.Time
-	ParentId    uuid.UUID
-	WorkspaceId uuid.UUID
+	ParentID    uuid.UUID
+	WorkspaceID uuid.UUID
 }
 
 type GraphNodeType string
@@ -54,7 +55,7 @@ var (
 )
 
 type GraphNode struct {
-	Id     string
+	ID     string
 	Name   string
 	Type   GraphNodeType
 	Weight *float64
@@ -71,7 +72,7 @@ type Graph struct {
 }
 
 type NoteLink struct {
-	Id   uuid.UUID
+	ID   uuid.UUID
 	Name string
 	Icon *string
 }
@@ -82,7 +83,7 @@ type NoteLinkResult struct {
 }
 
 type Workspace struct {
-	Id   uuid.UUID
+	ID   uuid.UUID
 	Slug string
 	Name string
 }
@@ -96,20 +97,20 @@ var (
 )
 
 type WorkspaceMember struct {
-	Id       uuid.UUID
+	ID       uuid.UUID
 	Username *string
 	Role     WorkspaceRole
 }
 
 type WorkspaceTreeNote struct {
-	Id        uuid.UUID
+	ID        uuid.UUID
 	Name      string
 	Icon      *string
 	UpdatedAt time.Time
 }
 
 type WorkspaceTreeFolder struct {
-	Id        uuid.UUID
+	ID        uuid.UUID
 	Name      string
 	Icon      *string
 	Notes     []WorkspaceTreeNote
@@ -118,14 +119,14 @@ type WorkspaceTreeFolder struct {
 }
 
 type TrashedFolder struct {
-	Id        uuid.UUID
+	ID        uuid.UUID
 	Name      string
 	TrashedBy domain.TrashedBy
 	TrashedAt time.Time
 }
 
 type TrashedNote struct {
-	Id        uuid.UUID
+	ID        uuid.UUID
 	Name      string
 	TrashedBy domain.TrashedBy
 	TrashedAt time.Time
@@ -141,6 +142,6 @@ type CheckWorkspaceSlugExistsResult struct {
 }
 
 type WorkspaceMembersUpdatedEvent struct {
-	Id      uuid.UUID
+	ID      uuid.UUID
 	Members []WorkspaceMember
 }

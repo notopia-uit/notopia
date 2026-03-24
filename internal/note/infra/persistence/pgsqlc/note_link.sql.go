@@ -98,6 +98,37 @@ func (q *Queries) GetNoteBacklinks(ctx context.Context, targetID uuid.UUID) ([]u
 	return items, nil
 }
 
+const getNoteLinksInWorkspace = `-- name: GetNoteLinksInWorkspace :many
+SELECT
+    nl.source_id, nl.target_id
+FROM note_links AS nl
+JOIN notes AS sn ON nl.source_id = sn.id
+JOIN folders AS sf ON sn.folder_id = sf.id
+WHERE sf.workspace_id = $1::uuid
+  AND sn.trashed_at IS NULL
+  AND sf.trashed_at IS NULL
+`
+
+func (q *Queries) GetNoteLinksInWorkspace(ctx context.Context, workspaceID uuid.UUID) ([]*NoteLink, error) {
+	rows, err := q.db.Query(ctx, getNoteLinksInWorkspace, workspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*NoteLink
+	for rows.Next() {
+		var i NoteLink
+		if err := rows.Scan(&i.SourceID, &i.TargetID); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getNoteOutgoingLinks = `-- name: GetNoteOutgoingLinks :many
 SELECT
   target_id
