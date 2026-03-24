@@ -24,6 +24,8 @@ on:
       - opened
       - synchronize
       - reopened
+    branches-ignore:
+      - renovate/**/*
 
 jobs:
   web:
