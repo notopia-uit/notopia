@@ -10,36 +10,36 @@ import (
 )
 
 type TrashWorkspaceItems struct {
-	WorkspaceID uuid.UUID
 	UserID      string
+	WorkspaceID uuid.UUID
 	NoteIDs     []uuid.UUID
 	FolderIDs   []uuid.UUID
 }
 
 type TrashWorkspaceItemsHandler struct {
 	authorizationService AuthorizationService
-	noteRepo             domain.NoteRepo
-	folderRepo           domain.FolderRepo
+	uow                  domain.UnitOfWork
 	trashService         *domain.TrashService
+	workspaceEventPubSub WorkspaceEventPubSub
 }
 
 func NewTrashWorkspaceItemsHandler(
 	authorizationService AuthorizationService,
-	noteRepo domain.NoteRepo,
-	folderRepo domain.FolderRepo,
+	uow domain.UnitOfWork,
 	trashService *domain.TrashService,
+	workspaceEventPubSub WorkspaceEventPubSub,
 ) *TrashWorkspaceItemsHandler {
 	return &TrashWorkspaceItemsHandler{
 		authorizationService: authorizationService,
-		noteRepo:             noteRepo,
-		folderRepo:           folderRepo,
+		uow:                  uow,
 		trashService:         trashService,
+		workspaceEventPubSub: workspaceEventPubSub,
 	}
 }
 
 var ProvideTrashWorkspaceItemsHandler = NewTrashWorkspaceItemsHandler
 
-func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorkspaceItems) error {
+func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorkspaceItems) errs.Error {
 	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
 		ctx,
 		cmd.UserID,
@@ -56,63 +56,91 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		)
 	}
 
-	workspaceNotes, err := h.noteRepo.GetByWorkspaceID(ctx, domain.NoteRepoGetByWorkspaceIDParams{
-		WorkspaceID: cmd.WorkspaceID,
-		TrashedBy:   nil,
-	})
-	if err != nil {
-		return err
-	}
+	var workspaceEvents []domain.Event
 
-	workspaceFolders, err := h.folderRepo.GetByWorkspaceID(ctx, domain.FolderRepoGetByWorkspaceIDParams{
-		WorkspaceID: cmd.WorkspaceID,
-		TrashedBy:   nil,
-	})
-	if err != nil {
-		return err
-	}
+	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) errs.Error {
+		noteRepo := r.Note()
+		folderRepo := r.Folder()
 
-	workspaceNotePtrs := workspaceNotes
-	workspaceFolderPtrs := workspaceFolders
+		if len(cmd.NoteIDs) == 0 && len(cmd.FolderIDs) == 0 {
+			return nil
+		}
 
-	if len(cmd.NoteIDs) > 0 {
-		notes, err := h.noteRepo.GetByIDs(ctx, cmd.NoteIDs, true)
+		workspaceNotes, err := noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+			WorkspaceID: &cmd.WorkspaceID,
+		})
 		if err != nil {
 			return err
 		}
 
-		if err := h.trashService.TrashNotes(notes); err != nil {
-			return err
-		}
-
-		for _, note := range notes {
-			if err := h.noteRepo.Save(ctx, note); err != nil {
-				return err
-			}
-		}
-	}
-
-	if len(cmd.FolderIDs) > 0 {
-		folders, err := h.folderRepo.GetByIDs(ctx, cmd.FolderIDs, true)
+		workspaceFolders, err := folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
+			WorkspaceID: &cmd.WorkspaceID,
+		})
 		if err != nil {
 			return err
 		}
 
-		if err := h.trashService.TrashFolders(&workspaceNotePtrs, &workspaceFolderPtrs, folders); err != nil {
-			return err
-		}
+		workspaceNotePtrs := workspaceNotes
+		workspaceFolderPtrs := workspaceFolders
 
-		for _, folder := range workspaceFolderPtrs {
-			if err := h.folderRepo.Save(ctx, folder); err != nil {
+		var notes []*domain.Note
+		if len(cmd.NoteIDs) > 0 {
+			notes, err = noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+				IDs:       cmd.NoteIDs,
+				ForUpdate: true,
+			})
+			if err != nil {
+				return err
+			}
+
+			if err := h.trashService.TrashNotes(notes); err != nil {
 				return err
 			}
 		}
 
-		for _, note := range workspaceNotePtrs {
-			if err := h.noteRepo.Save(ctx, note); err != nil {
+		var folders []*domain.Folder
+		if len(cmd.FolderIDs) > 0 {
+			folders, err = folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
+				IDs:       cmd.FolderIDs,
+				ForUpdate: true,
+			})
+			if err != nil {
+				return err
+			}
+
+			if err := h.trashService.TrashFolders(&workspaceNotePtrs, &workspaceFolderPtrs, folders); err != nil {
 				return err
 			}
 		}
+
+		// Save items
+		if len(workspaceNotePtrs) > 0 {
+			if err := noteRepo.SaveMany(ctx, workspaceNotePtrs); err != nil {
+				return err
+			}
+			for _, note := range workspaceNotePtrs {
+				workspaceEvents = append(workspaceEvents, note.PopEvents()...)
+			}
+		}
+
+		if len(workspaceFolderPtrs) > 0 {
+			if err := folderRepo.SaveMany(ctx, workspaceFolderPtrs); err != nil {
+				return err
+			}
+			for _, folder := range workspaceFolderPtrs {
+				workspaceEvents = append(workspaceEvents, folder.PopEvents()...)
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if len(workspaceEvents) > 0 {
+		return h.workspaceEventPubSub.Publish(ctx, cmd.WorkspaceID, cmd.UserID, workspaceEvents...)
 	}
 
 	return nil

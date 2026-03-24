@@ -35,16 +35,16 @@ func NewRestoreTrashedWorkspaceItemsHandler(
 var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItemsHandler
 
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) errs.Error {
-	trashedNotesPurpose, err := h.noteRepo.GetByWorkspaceID(ctx, domain.NoteRepoGetByWorkspaceIDParams{
-		WorkspaceID: cmd.WorkspaceID,
+	trashedNotesPurpose, err := h.noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+		WorkspaceID: &cmd.WorkspaceID,
 		TrashedBy:   &domain.TrashedByPurpose,
 	})
 	if err != nil {
 		return err
 	}
 
-	trashedNotesParent, err := h.noteRepo.GetByWorkspaceID(ctx, domain.NoteRepoGetByWorkspaceIDParams{
-		WorkspaceID: cmd.WorkspaceID,
+	trashedNotesParent, err := h.noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+		WorkspaceID: &cmd.WorkspaceID,
 		TrashedBy:   &domain.TrashedByParent,
 	})
 	if err != nil {
@@ -53,16 +53,16 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 
 	trashedNotes := append(trashedNotesPurpose, trashedNotesParent...)
 
-	trashedFoldersPurpose, err := h.folderRepo.GetByWorkspaceID(ctx, domain.FolderRepoGetByWorkspaceIDParams{
-		WorkspaceID: cmd.WorkspaceID,
+	trashedFoldersPurpose, err := h.folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
+		WorkspaceID: &cmd.WorkspaceID,
 		TrashedBy:   &domain.TrashedByPurpose,
 	})
 	if err != nil {
 		return err
 	}
 
-	trashedFoldersParent, err := h.folderRepo.GetByWorkspaceID(ctx, domain.FolderRepoGetByWorkspaceIDParams{
-		WorkspaceID: cmd.WorkspaceID,
+	trashedFoldersParent, err := h.folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
+		WorkspaceID: &cmd.WorkspaceID,
 		TrashedBy:   &domain.TrashedByParent,
 	})
 	if err != nil {
@@ -75,7 +75,10 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 	trashedFolderPtrs := trashedFolders
 
 	if len(cmd.NoteIDs) > 0 {
-		notes, err := h.noteRepo.GetByIDs(ctx, cmd.NoteIDs, true)
+		notes, err := h.noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+			IDs:       cmd.NoteIDs,
+			ForUpdate: true,
+		})
 		if err != nil {
 			return err
 		}
@@ -89,7 +92,10 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 	}
 
 	if len(cmd.FolderIDs) > 0 {
-		folders, err := h.folderRepo.GetByIDs(ctx, cmd.FolderIDs, true)
+		folders, err := h.folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
+			IDs:       cmd.FolderIDs,
+			ForUpdate: true,
+		})
 		if err != nil {
 			return err
 		}

@@ -14,6 +14,9 @@
       "{workspaceRoot}/internal/note/infra/persistence/pgsqlc/*.sql",
       "{workspaceRoot}/internal/note/infra/persistence/pgmigration/*.{sql,go}",
       "{projectRoot}/sqlc.yaml"
+    ],
+    "migrations": [
+      "{workspaceRoot}/internal/note/infra/persistence/pgmigration/*.{sql,go}"
     ]
   },
   "targets": {
@@ -130,6 +133,16 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "sqlc generate",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
+    },
+    "gen:jet": {
+      "inputs": ["migrations"],
+      "outputs": ["{workspaceRoot}/internal/note/infra/persistence/pgjet/*.go"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./gen-jet.sh",
         "cwd": "{projectRoot}"
       },
       "cache": true

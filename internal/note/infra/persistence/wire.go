@@ -1,6 +1,9 @@
 package persistence
 
 import (
+	"database/sql"
+
+	"github.com/go-jet/jet/v2/qrm"
 	"github.com/goforj/wire"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/notopia-uit/notopia/internal/note/app"
@@ -21,6 +24,7 @@ var PostgresProviderSet = wire.NewSet(
 	pg.ProvideWorkspace,
 	pg.ProvideUnitOfWork,
 	wire.Bind(new(pgsqlc.DBTX), new(*pgxpool.Pool)),
+	wire.Bind(new(qrm.DB), new(*sql.DB)),
 	wire.Bind(new(app.Persistence), new(*Pg)),
 	wire.Bind(new(domain.NoteRepo), new(*pg.Note)),
 	wire.Bind(new(domain.FolderRepo), new(*pg.Folder)),

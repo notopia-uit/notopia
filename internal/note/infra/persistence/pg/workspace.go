@@ -5,98 +5,109 @@ import (
 	"errors"
 	"time"
 
+	. "github.com/go-jet/jet/v2/postgres"
+	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgjet/public/table"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
 type Workspace struct {
 	queries *pgsqlc.Queries
+	db      qrm.DB
 }
 
 var _ domain.WorkspaceRepo = (*Workspace)(nil)
 
-func NewWorkspace(queries *pgsqlc.Queries) *Workspace {
-	return &Workspace{queries: queries}
+func NewWorkspace(queries *pgsqlc.Queries, db qrm.DB) *Workspace {
+	return &Workspace{
+		queries: queries,
+		db:      db,
+	}
 }
 
 var ProvideWorkspace = NewWorkspace
 
 func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) (*domain.Workspace, errs.Error) {
-	var workspaceResult *pgsqlc.Workspace
-	var err error
+	stmt := SELECT(table.Workspaces.AllColumns).
+		FROM(table.Workspaces).
+		WHERE(table.Workspaces.Slug.EQ(String(slug)))
 	if forUpdate {
-		workspaceResult, err = w.queries.GetWorkspaceBySlugForUpdate(ctx, slug)
-	} else {
-		workspaceResult, err = w.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
-			Slug: slug,
-		})
+		stmt = stmt.FOR(UPDATE())
 	}
+
+	var dest []*pgsqlc.Workspace
+	err := stmt.QueryContext(ctx, w.db, &dest)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewWorkspaceBySlugNotFound(slug, err)
-		}
 		return nil, toDomainError(err)
 	}
-	var rootFolderResult *pgsqlc.Folder
-	if forUpdate {
-		rootFolderResult, err = w.queries.GetFolderForUpdate(ctx, &pgsqlc.GetFolderForUpdateParams{
-			WorkspaceID:  &workspaceResult.ID,
-			IsRootFolder: true,
-		})
-	} else {
-		rootFolderResult, err = w.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
-			WorkspaceID:  &workspaceResult.ID,
-			IsRootFolder: true,
-		})
+
+	if len(dest) == 0 {
+		return nil, errs.NewWorkspaceBySlugNotFound(slug, pgx.ErrNoRows)
 	}
+	workspaceResult := dest[0]
+
+	folderStmt := SELECT(table.Folders.AllColumns).
+		FROM(table.Folders).
+		WHERE(table.Folders.WorkspaceID.EQ(UUID(workspaceResult.ID)).AND(table.Folders.ParentID.IS_NULL()))
+	if forUpdate {
+		folderStmt = folderStmt.FOR(UPDATE())
+	}
+
+	var folderDest []*pgsqlc.Folder
+	err = folderStmt.QueryContext(ctx, w.db, &folderDest)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewWorkspaceRootFolderNotFound(workspaceResult.ID, err)
-		}
 		return nil, toDomainError(err)
 	}
+
+	if len(folderDest) == 0 {
+		return nil, errs.NewWorkspaceRootFolderNotFound(workspaceResult.ID, pgx.ErrNoRows)
+	}
+	rootFolderResult := folderDest[0]
+
 	return workspaceToDomain(workspaceResult, rootFolderResult.ID)
 }
 
 func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Workspace, errs.Error) {
-	var workspaceResult *pgsqlc.Workspace
-	var err error
+	stmt := SELECT(table.Workspaces.AllColumns).
+		FROM(table.Workspaces).
+		WHERE(table.Workspaces.ID.EQ(UUID(id)))
 	if forUpdate {
-		workspaceResult, err = w.queries.GetWorkspaceForUpdate(ctx, &pgsqlc.GetWorkspaceForUpdateParams{
-			ID: id,
-		})
-	} else {
-		workspaceResult, err = w.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
-			ID: id,
-		})
+		stmt = stmt.FOR(UPDATE())
 	}
+
+	var dest []*pgsqlc.Workspace
+	err := stmt.QueryContext(ctx, w.db, &dest)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewWorkspaceNotFound(id, err)
-		}
 		return nil, toDomainError(err)
 	}
-	var rootFolderResult *pgsqlc.Folder
-	if forUpdate {
-		rootFolderResult, err = w.queries.GetFolderForUpdate(ctx, &pgsqlc.GetFolderForUpdateParams{
-			WorkspaceID:  &workspaceResult.ID,
-			IsRootFolder: true,
-		})
-	} else {
-		rootFolderResult, err = w.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
-			WorkspaceID:  &workspaceResult.ID,
-			IsRootFolder: true,
-		})
+
+	if len(dest) == 0 {
+		return nil, errs.NewWorkspaceNotFound(id, pgx.ErrNoRows)
 	}
+	workspaceResult := dest[0]
+
+	folderStmt := SELECT(table.Folders.AllColumns).
+		FROM(table.Folders).
+		WHERE(table.Folders.WorkspaceID.EQ(UUID(workspaceResult.ID)).AND(table.Folders.ParentID.IS_NULL()))
+	if forUpdate {
+		folderStmt = folderStmt.FOR(UPDATE())
+	}
+
+	var folderDest []*pgsqlc.Folder
+	err = folderStmt.QueryContext(ctx, w.db, &folderDest)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewWorkspaceRootFolderNotFound(id, err)
-		}
 		return nil, toDomainError(err)
 	}
+
+	if len(folderDest) == 0 {
+		return nil, errs.NewWorkspaceRootFolderNotFound(id, pgx.ErrNoRows)
+	}
+	rootFolderResult := folderDest[0]
+
 	return workspaceToDomain(workspaceResult, rootFolderResult.ID)
 }
 

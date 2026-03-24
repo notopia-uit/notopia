@@ -5,81 +5,89 @@ import (
 	"errors"
 	"time"
 
+	. "github.com/go-jet/jet/v2/postgres"
+	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgjet/public/table"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
 type Folder struct {
 	queries *pgsqlc.Queries
+	db      qrm.DB
 }
 
 var _ domain.FolderRepo = (*Folder)(nil)
 
-func NewFolder(queries *pgsqlc.Queries) *Folder {
-	return &Folder{queries: queries}
+func NewFolder(queries *pgsqlc.Queries, db qrm.DB) *Folder {
+	return &Folder{
+		queries: queries,
+		db:      db,
+	}
 }
 
 var ProvideFolder = NewFolder
 
 func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Folder, errs.Error) {
-	var result *pgsqlc.Folder
-	var err error
+	stmt := SELECT(table.Folders.AllColumns).
+		FROM(table.Folders).
+		WHERE(table.Folders.ID.EQ(UUID(id)))
 	if forUpdate {
-		result, err = f.queries.GetFolderForUpdate(ctx, &pgsqlc.GetFolderForUpdateParams{
-			ID: &id,
-		})
-	} else {
-		result, err = f.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
-			ID: &id,
-		})
+		stmt = stmt.FOR(UPDATE())
 	}
+
+	var dest []*pgsqlc.Folder
+	err := stmt.QueryContext(ctx, f.db, &dest)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewFolderNotFound(id, err)
-		}
 		return nil, toDomainError(err)
 	}
+
+	if len(dest) == 0 {
+		return nil, errs.NewFolderNotFound(id, pgx.ErrNoRows)
+	}
+
+	result := dest[0]
 	return folderToDomain(result), nil
 }
 
-func (f *Folder) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]*domain.Folder, errs.Error) {
-	var folderResults []*pgsqlc.Folder
-	var err error
-	if forUpdate {
-		folderResults, err = f.queries.GetFoldersForUpdate(ctx, &pgsqlc.GetFoldersForUpdateParams{
-			IDs: ids,
-		})
-	} else {
-		folderResults, err = f.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-			IDs: ids,
-		})
+func (f *Folder) GetMany(ctx context.Context, params domain.FolderRepoGetManyParams) ([]*domain.Folder, errs.Error) {
+	condition := Bool(true)
+	if params.WorkspaceID != nil {
+		condition = condition.AND(table.Folders.WorkspaceID.EQ(UUID(params.WorkspaceID)))
 	}
-	if err != nil {
-		return nil, toDomainError(err)
+	if len(params.IDs) > 0 {
+		var idExprs []Expression
+		for _, id := range params.IDs {
+			idExprs = append(idExprs, UUID(id))
+		}
+		condition = condition.AND(table.Folders.ID.IN(idExprs...))
 	}
-	folders := make([]*domain.Folder, len(folderResults))
-	for i, folder := range folderResults {
-		folders[i] = folderToDomain(folder)
-	}
-	return folders, nil
-}
-
-func (f *Folder) GetByWorkspaceID(ctx context.Context, params domain.FolderRepoGetByWorkspaceIDParams) ([]*domain.Folder, errs.Error) {
-	var trashedBy *string
 	if params.TrashedBy != nil {
-		trashedBy = new(params.TrashedBy.String())
+		condition = condition.AND(table.Folders.TrashedBy.EQ(String(params.TrashedBy.String())))
+	}
+	if params.ParentID != nil {
+		condition = condition.AND(table.Folders.ParentID.EQ(UUID(params.ParentID)))
+	} else if params.IsRootFolder {
+		condition = condition.AND(table.Folders.ParentID.IS_NULL())
 	}
 
-	results, err := f.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		WorkspaceID: &params.WorkspaceID,
-		TrashedBy:   trashedBy,
-	})
+	stmt := SELECT(table.Folders.AllColumns).
+		FROM(table.Folders).
+		WHERE(condition)
+	if params.ForUpdate {
+		stmt = stmt.FOR(UPDATE())
+	}
+
+	var dest []*pgsqlc.Folder
+	err := stmt.QueryContext(ctx, f.db, &dest)
 	if err != nil {
 		return nil, toDomainError(err)
 	}
+	results := dest
+
 	folders := make([]*domain.Folder, len(results))
 	for i, folder := range results {
 		folders[i] = folderToDomain(folder)
@@ -147,13 +155,6 @@ func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspa
 		return false, toDomainError(err)
 	}
 	return count == int64(len(ids)), nil
-}
-
-func (f *Folder) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID, trashedBy domain.TrashedBy) ([]*domain.Folder, errs.Error) {
-	return f.GetByWorkspaceID(ctx, domain.FolderRepoGetByWorkspaceIDParams{
-		WorkspaceID: workspaceID,
-		TrashedBy:   &trashedBy,
-	})
 }
 
 func (f *Folder) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) errs.Error {

@@ -5,39 +5,51 @@ import (
 	"errors"
 	"time"
 
+	. "github.com/go-jet/jet/v2/postgres"
+	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgjet/public/table"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
 type Note struct {
 	queries *pgsqlc.Queries
+	db      qrm.DB
 }
 
 var _ domain.NoteRepo = (*Note)(nil)
 
-func NewNote(queries *pgsqlc.Queries) *Note {
-	return &Note{queries: queries}
+func NewNote(queries *pgsqlc.Queries, db qrm.DB) *Note {
+	return &Note{
+		queries: queries,
+		db:      db,
+	}
 }
 
 var ProvideNote = NewNote
 
 func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Note, errs.Error) {
-	var noteResult *pgsqlc.Note
-	var err error
+	stmt := SELECT(table.Notes.AllColumns).
+		FROM(table.Notes).
+		WHERE(table.Notes.ID.EQ(UUID(id)))
 	if forUpdate {
-		noteResult, err = n.queries.GetNoteForUpdate(ctx, id)
-	} else {
-		noteResult, err = n.queries.GetNote(ctx, id)
+		stmt = stmt.FOR(UPDATE())
 	}
+
+	var dest []*pgsqlc.Note
+	err := stmt.QueryContext(ctx, n.db, &dest)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewNoteNotFound(id, err)
-		}
 		return nil, toDomainError(err)
 	}
+
+	if len(dest) == 0 {
+		return nil, errs.NewNoteNotFound(id, pgx.ErrNoRows)
+	}
+	noteResult := dest[0]
+
 	outgoingLinksResult, err := n.queries.GetNoteOutgoingLinks(ctx, id)
 	if err != nil {
 		return nil, toDomainError(err)
@@ -45,49 +57,52 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 	return noteToDomain(noteResult, outgoingLinksResult), nil
 }
 
-func (n *Note) GetByIDs(ctx context.Context, ids uuid.UUIDs, forUpdate bool) ([]*domain.Note, errs.Error) {
-	var noteResults []*pgsqlc.Note
-	var err error
-	if forUpdate {
-		noteResults, err = n.queries.GetNotesForUpdate(ctx, ids)
-	} else {
-		noteResults, err = n.queries.GetNotes(ctx, ids)
+func (n *Note) GetMany(ctx context.Context, params domain.NoteRepoGetManyParams) ([]*domain.Note, errs.Error) {
+	condition := Bool(true)
+	if params.WorkspaceID != nil {
+		condition = condition.AND(
+			table.Notes.FolderID.IN(
+				SELECT(table.Folders.ID).
+					FROM(table.Folders).
+					WHERE(table.Folders.WorkspaceID.EQ(UUID(params.WorkspaceID))),
+			),
+		)
 	}
-	if err != nil {
-		return nil, toDomainError(err)
+	if len(params.IDs) > 0 {
+		var idExprs []Expression
+		for _, id := range params.IDs {
+			idExprs = append(idExprs, UUID(id))
+		}
+		condition = condition.AND(table.Notes.ID.IN(idExprs...))
 	}
-	outgoingLinkResults, err := n.queries.GetNotesOutgoingLinks(ctx, ids)
-	if err != nil {
-		return nil, toDomainError(err)
-	}
-	outgoingLinksMap := make(map[uuid.UUID]uuid.UUIDs)
-	for _, outgoingLink := range outgoingLinkResults {
-		outgoingLinksMap[outgoingLink.SourceID] = append(outgoingLinksMap[outgoingLink.SourceID], outgoingLink.TargetID)
-	}
-	notes := make([]*domain.Note, len(noteResults))
-	for i, note := range noteResults {
-		notes[i] = noteToDomain(note, outgoingLinksMap[note.ID])
-	}
-	return notes, nil
-}
-
-func (n *Note) GetByWorkspaceID(ctx context.Context, params domain.NoteRepoGetByWorkspaceIDParams) ([]*domain.Note, errs.Error) {
-	var trashedBy *string
 	if params.TrashedBy != nil {
-		trashedBy = new(params.TrashedBy.String())
+		condition = condition.AND(table.Notes.TrashedBy.EQ(String(params.TrashedBy.String())))
 	}
 
-	noteResults, err := n.queries.GetNotesInWorkspace(ctx, &pgsqlc.GetNotesInWorkspaceParams{
-		WorkspaceID: params.WorkspaceID,
-		TrashedBy:   trashedBy,
-	})
+	stmt := SELECT(table.Notes.AllColumns).
+		FROM(table.Notes).
+		WHERE(condition)
+	if params.ForUpdate {
+		stmt = stmt.FOR(UPDATE())
+	}
+
+	var dest []*pgsqlc.Note
+	err := stmt.QueryContext(ctx, n.db, &dest)
 	if err != nil {
 		return nil, toDomainError(err)
 	}
+
+	if len(dest) == 0 {
+		return []*domain.Note{}, nil
+	}
+
+	noteResults := dest
+
 	noteIDs := make([]uuid.UUID, len(noteResults))
 	for i, note := range noteResults {
 		noteIDs[i] = note.ID
 	}
+
 	outgoingLinkResults, err := n.queries.GetNotesOutgoingLinks(ctx, noteIDs)
 	if err != nil {
 		return nil, toDomainError(err)
@@ -165,13 +180,6 @@ func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspace
 		return false, toDomainError(err)
 	}
 	return count == int64(len(ids)), nil
-}
-
-func (n *Note) GetTrashedByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]*domain.Note, errs.Error) {
-	return n.GetByWorkspaceID(ctx, domain.NoteRepoGetByWorkspaceIDParams{
-		WorkspaceID: workspaceID,
-		TrashedBy:   &domain.TrashedByPurpose,
-	})
 }
 
 func (n *Note) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) errs.Error {

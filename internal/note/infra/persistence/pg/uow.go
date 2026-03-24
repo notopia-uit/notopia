@@ -2,9 +2,11 @@ package pg
 
 import (
 	"context"
-	"log/slog"
+	"database/sql"
+	"fmt"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
@@ -26,49 +28,63 @@ func (r *RepoRegistry) Note() domain.NoteRepo { return r.note }
 
 type UnitOfWork struct {
 	queries *pgsqlc.Queries
-	pool    *pgxpool.Pool
+	sdb     *sql.DB
 }
 
 var _ domain.UnitOfWork = (*UnitOfWork)(nil)
 
-func NewUnitOfWork(queries *pgsqlc.Queries, pool *pgxpool.Pool) *UnitOfWork {
+func NewUnitOfWork(queries *pgsqlc.Queries, sdb *sql.DB) *UnitOfWork {
 	return &UnitOfWork{
 		queries: queries,
-		pool:    pool,
+		sdb:     sdb,
 	}
 }
 
 var ProvideUnitOfWork = NewUnitOfWork
 
-func (u *UnitOfWork) Execute(ctx context.Context, fn func(repoRegistry domain.RepoRegistry) errs.Error) errs.Error {
-	tx, err := u.pool.Begin(ctx)
+func (u *UnitOfWork) Execute(ctx context.Context, fn func(repoRegistry domain.RepoRegistry) errs.Error) (cerr errs.Error) {
+	conn, err := u.sdb.Conn(ctx)
 	if err != nil {
-		return errs.NewPersistenceInternal(
-			"failed to begin transaction",
-			err,
-		)
+		return errs.NewPersistenceInternal("failed to get connection from pool", err)
 	}
 	defer func() {
-		if err := tx.Rollback(ctx); err != nil {
-			slog.WarnContext(ctx, "failed to rollback transaction", slog.String("error", err.Error()))
+		if err := conn.Close(); err != nil {
+			cerr = errs.NewPersistenceInternal("failed to close connection", fmt.Errorf("%w: %v", cerr, err))
 		}
 	}()
 
+	tx, err := conn.BeginTx(ctx, nil)
+	if err != nil {
+		return errs.NewPersistenceInternal("failed to begin transaction", err)
+	}
+	defer func() {
+		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
+			cerr = errs.NewPersistenceInternal("failed to rollback transaction", fmt.Errorf("%w: %v", cerr, err))
+		}
+	}()
+
+	var pgxConn *pgx.Conn
+	err = conn.Raw(func(driverConn any) error {
+		pgxConn = driverConn.(*stdlib.Conn).Conn()
+		return nil
+	})
+	if err != nil {
+		return errs.NewPersistenceInternal("failed to get raw connection", err)
+	}
+
+	txQueries := pgsqlc.New(pgxConn)
 	repoRegistry := &RepoRegistry{
-		workspace: &Workspace{queries: u.queries},
-		folder:    &Folder{queries: u.queries},
-		note:      &Note{queries: u.queries},
+		workspace: NewWorkspace(txQueries, tx),
+		folder:    NewFolder(txQueries, tx),
+		note:      NewNote(txQueries, tx),
 	}
 
 	if err := fn(repoRegistry); err != nil {
 		return err
 	}
 
-	if err := tx.Commit(ctx); err != nil {
-		return errs.NewPersistenceInternal(
-			"failed to commit transaction",
-			err,
-		)
+	if err := tx.Commit(); err != nil {
+		return errs.NewPersistenceInternal("failed to commit transaction", err)
 	}
 	return nil
 }

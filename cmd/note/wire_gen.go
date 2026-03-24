@@ -75,8 +75,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	queries := pg.NewQueries(pool)
-	pgNote := pg.NewNote(queries)
-	folder := pg.NewFolder(queries)
+	db := pg.NewStdlib(pool)
+	pgNote := pg.NewNote(queries, db)
+	folder := pg.NewFolder(queries, db)
 	loggerAdapter := pubsub.NewWatermillLogger(logger)
 	commandEventMarshaler := pubsub.NewIntegrationMarshaler()
 	redis := &configConfig.Redis
@@ -94,8 +95,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalPubSub, workspaceEventHubPubSub)
 	createNoteHandler := app.NewCreateNoteHandler(authorization, pgNote, folder, workspaceEvent)
 	createFolderHandler := app.NewCreateFolderHandler(authorization, folder, workspaceEvent)
-	workspace := pg.NewWorkspace(queries)
-	unitOfWork := pg.NewUnitOfWork(queries, pool)
+	workspace := pg.NewWorkspace(queries, db)
+	unitOfWork := pg.NewUnitOfWork(queries, db)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspace, folder, unitOfWork)
 	deleteNoteHandler := app.NewDeleteNoteHandler(authorization, pgNote)
 	deleteFolderHandler := app.NewDeleteFolderHandler(authorization, folder)
@@ -110,7 +111,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	renameWorkspaceHandler := app.NewRenameWorkspaceHandler(authorization, workspace)
 	trashService := domain.NewTrashService()
 	restoreTrashedWorkspaceItemsHandler := app.NewRestoreTrashedWorkspaceItemsHandler(pgNote, folder, trashService)
-	trashWorkspaceItemsHandler := app.NewTrashWorkspaceItemsHandler(authorization, pgNote, folder, trashService)
+	trashWorkspaceItemsHandler := app.NewTrashWorkspaceItemsHandler(authorization, unitOfWork, trashService, workspaceEvent)
 	unpublishNoteHandler := app.NewUnpublishNoteHandler(pgNote)
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler()
@@ -125,7 +126,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	showTrashHandler := app.NewShowTrashHandler(readModel)
 	noteService := domain.NewNoteService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgNote, noteService)
-	db := pg.NewStdlib(pool)
 	provider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
 		cleanup5()
