@@ -169,7 +169,9 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 	}
 
 	if q.OutgoingLinks {
-		outgoingLinks, err := r.queries.GetNoteOutgoingLinks(ctx, q.ID)
+		outgoingLinks, err := r.queries.GetNoteOutgoingLinks(ctx, &pgsqlc.GetNoteOutgoingLinksParams{
+			SourceID: &q.ID,
+		})
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 			return nil, toDomainError(err)
 		}

@@ -58,6 +58,7 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 
 	var workspaceEvents []domain.Event
 
+	// TODO: Why it getting 4 times??
 	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) errs.Error {
 		noteRepo := r.Note()
 		folderRepo := r.Folder()
@@ -66,14 +67,14 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			return nil
 		}
 
-		workspaceNotes, err := noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+		workspaceNotes, err := noteRepo.GetMany(ctx, &domain.NoteRepoGetManyParams{
 			WorkspaceID: &cmd.WorkspaceID,
 		})
 		if err != nil {
 			return err
 		}
 
-		workspaceFolders, err := folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
+		workspaceFolders, err := folderRepo.GetMany(ctx, &domain.FolderRepoGetManyParams{
 			WorkspaceID: &cmd.WorkspaceID,
 		})
 		if err != nil {
@@ -85,7 +86,7 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 
 		var notes []*domain.Note
 		if len(cmd.NoteIDs) > 0 {
-			notes, err = noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+			notes, err = noteRepo.GetMany(ctx, &domain.NoteRepoGetManyParams{
 				IDs:       cmd.NoteIDs,
 				ForUpdate: true,
 			})
@@ -100,7 +101,7 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 
 		var folders []*domain.Folder
 		if len(cmd.FolderIDs) > 0 {
-			folders, err = folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
+			folders, err = folderRepo.GetMany(ctx, &domain.FolderRepoGetManyParams{
 				IDs:       cmd.FolderIDs,
 				ForUpdate: true,
 			})
@@ -134,7 +135,6 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 
 		return nil
 	})
-
 	if err != nil {
 		return err
 	}

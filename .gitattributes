@@ -16,6 +16,7 @@ packages/api-document-nestjs-server/**/*.ts linguist-generated
 pkg/api/**/*.go linguist-generated
 pkg/pb/**/*.go linguist-generated
 
-**/*sqlc/*.go linguist-generated
+**/pgsqlc/*.go linguist-generated
+**/pgjet/*.go linguist-generated
 
 docs/src/** linguist-detectable

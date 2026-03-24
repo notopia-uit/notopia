@@ -35,47 +35,27 @@ func NewRestoreTrashedWorkspaceItemsHandler(
 var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItemsHandler
 
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) errs.Error {
-	trashedNotesPurpose, err := h.noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+	trashedNotes, err := h.noteRepo.GetMany(ctx, &domain.NoteRepoGetManyParams{
 		WorkspaceID: &cmd.WorkspaceID,
-		TrashedBy:   &domain.TrashedByPurpose,
+		IsTrashed:   new(true),
 	})
 	if err != nil {
 		return err
 	}
 
-	trashedNotesParent, err := h.noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+	trashedFolders, err := h.folderRepo.GetMany(ctx, &domain.FolderRepoGetManyParams{
 		WorkspaceID: &cmd.WorkspaceID,
-		TrashedBy:   &domain.TrashedByParent,
+		IsTrashed:   new(true),
 	})
 	if err != nil {
 		return err
 	}
-
-	trashedNotes := append(trashedNotesPurpose, trashedNotesParent...)
-
-	trashedFoldersPurpose, err := h.folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
-		WorkspaceID: &cmd.WorkspaceID,
-		TrashedBy:   &domain.TrashedByPurpose,
-	})
-	if err != nil {
-		return err
-	}
-
-	trashedFoldersParent, err := h.folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
-		WorkspaceID: &cmd.WorkspaceID,
-		TrashedBy:   &domain.TrashedByParent,
-	})
-	if err != nil {
-		return err
-	}
-
-	trashedFolders := append(trashedFoldersPurpose, trashedFoldersParent...)
 
 	trashedNotePtrs := trashedNotes
 	trashedFolderPtrs := trashedFolders
 
 	if len(cmd.NoteIDs) > 0 {
-		notes, err := h.noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+		notes, err := h.noteRepo.GetMany(ctx, &domain.NoteRepoGetManyParams{
 			IDs:       cmd.NoteIDs,
 			ForUpdate: true,
 		})
@@ -92,7 +72,7 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 	}
 
 	if len(cmd.FolderIDs) > 0 {
-		folders, err := h.folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
+		folders, err := h.folderRepo.GetMany(ctx, &domain.FolderRepoGetManyParams{
 			IDs:       cmd.FolderIDs,
 			ForUpdate: true,
 		})

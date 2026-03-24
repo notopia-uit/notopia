@@ -11,6 +11,7 @@ type FolderRepoGetManyParams struct {
 	WorkspaceID  *uuid.UUID
 	IDs          []uuid.UUID
 	TrashedBy    *TrashedBy
+	IsTrashed    *bool
 	ForUpdate    bool
 	ParentID     *uuid.UUID
 	IsRootFolder bool
@@ -18,7 +19,7 @@ type FolderRepoGetManyParams struct {
 
 type FolderRepo interface {
 	GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*Folder, errs.Error)
-	GetMany(ctx context.Context, params FolderRepoGetManyParams) ([]*Folder, errs.Error)
+	GetMany(ctx context.Context, params *FolderRepoGetManyParams) ([]*Folder, errs.Error)
 	GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, errs.Error)
 	Save(ctx context.Context, folder *Folder) errs.Error
 	SaveMany(ctx context.Context, folders []*Folder) errs.Error

@@ -28,6 +28,19 @@ func (q *Queries) CreateTempTableFolders(ctx context.Context) error {
 	return err
 }
 
+const createTempTableNoteLinks = `-- name: CreateTempTableNoteLinks :exec
+CREATE TEMP TABLE temp_note_links (
+  source_id UUID NOT NULL,
+  target_id UUID NOT NULL,
+  PRIMARY KEY (source_id, target_id)
+) ON COMMIT DROP
+`
+
+func (q *Queries) CreateTempTableNoteLinks(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, createTempTableNoteLinks)
+	return err
+}
+
 const createTempTableNotes = `-- name: CreateTempTableNotes :exec
 CREATE TEMP TABLE temp_notes (
   id UUID PRIMARY KEY,

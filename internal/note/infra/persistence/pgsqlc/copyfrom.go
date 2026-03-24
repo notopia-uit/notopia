@@ -49,6 +49,39 @@ func (q *Queries) InsertTempFolders(ctx context.Context, arg []*InsertTempFolder
 	return q.db.CopyFrom(ctx, []string{"temp_folders"}, []string{"id", "name", "icon", "workspace_id", "parent_id", "created_at", "updated_at", "trashed_by", "trashed_at"}, &iteratorForInsertTempFolders{rows: arg})
 }
 
+// iteratorForInsertTempNoteLinks implements pgx.CopyFromSource.
+type iteratorForInsertTempNoteLinks struct {
+	rows                 []*InsertTempNoteLinksParams
+	skippedFirstNextCall bool
+}
+
+func (r *iteratorForInsertTempNoteLinks) Next() bool {
+	if len(r.rows) == 0 {
+		return false
+	}
+	if !r.skippedFirstNextCall {
+		r.skippedFirstNextCall = true
+		return true
+	}
+	r.rows = r.rows[1:]
+	return len(r.rows) > 0
+}
+
+func (r iteratorForInsertTempNoteLinks) Values() ([]interface{}, error) {
+	return []interface{}{
+		r.rows[0].SourceID,
+		r.rows[0].TargetID,
+	}, nil
+}
+
+func (r iteratorForInsertTempNoteLinks) Err() error {
+	return nil
+}
+
+func (q *Queries) InsertTempNoteLinks(ctx context.Context, arg []*InsertTempNoteLinksParams) (int64, error) {
+	return q.db.CopyFrom(ctx, []string{"temp_note_links"}, []string{"source_id", "target_id"}, &iteratorForInsertTempNoteLinks{rows: arg})
+}
+
 // iteratorForInsertTempNotes implements pgx.CopyFromSource.
 type iteratorForInsertTempNotes struct {
 	rows                 []*InsertTempNotesParams

@@ -125,6 +125,11 @@ type TempNote struct {
 	TrashedAt *time.Time
 }
 
+type TempNoteLink struct {
+	SourceID uuid.UUID
+	TargetID uuid.UUID
+}
+
 type Workspace struct {
 	ID        uuid.UUID
 	Slug      string

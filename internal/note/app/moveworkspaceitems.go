@@ -97,7 +97,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) errs.Error {
 		folderRepo := r.Folder()
 		noteRepo := r.Note()
-		folders, err = folderRepo.GetMany(ctx, domain.FolderRepoGetManyParams{
+		folders, err = folderRepo.GetMany(ctx, &domain.FolderRepoGetManyParams{
 			IDs:       cmd.FolderIDs,
 			ForUpdate: true,
 		})
@@ -110,7 +110,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		if err := folderRepo.SaveMany(ctx, folders); err != nil {
 			return err
 		}
-		notes, err = noteRepo.GetMany(ctx, domain.NoteRepoGetManyParams{
+		notes, err = noteRepo.GetMany(ctx, &domain.NoteRepoGetManyParams{
 			IDs:       cmd.NoteIDs,
 			ForUpdate: true,
 		})

@@ -24,3 +24,10 @@ CREATE TEMP TABLE temp_folders (
   trashed_by trashed_by,
   trashed_at TIMESTAMPTZ
 ) ON COMMIT DROP;
+
+-- name: CreateTempTableNoteLinks :exec
+CREATE TEMP TABLE temp_note_links (
+  source_id UUID NOT NULL,
+  target_id UUID NOT NULL,
+  PRIMARY KEY (source_id, target_id)
+) ON COMMIT DROP;

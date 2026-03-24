@@ -20,6 +20,9 @@ sql:
         initialisms:
           - id
           - url
+        rename:
+          source_ids: SourceIDs
+          target_ids: TargetIDs
     rules:
       - sqlc/db-prepare
       - postgresql-query-too-costly

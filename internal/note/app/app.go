@@ -3,8 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-
-	"golang.org/x/sync/errgroup"
 )
 
 type App struct {
@@ -114,23 +112,11 @@ func (a *App) RunMigration(ctx context.Context) error {
 }
 
 func (a *App) Start(ctx context.Context) error {
-	g, ctx := errgroup.WithContext(ctx)
-
 	if err := a.RunMigration(ctx); err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
-	g.Go(func() error {
-		return a.workspaceEventPubSub.Run(ctx)
-	})
-
-	// WARN: Integration event service (Kafka DocumentCommitted) is not started here.
-	// The integrationPubSub dependency exists but .Run() is never called.
-	// This means domain events published to Kafka are not being consumed.
-	// TODO: Add integration event service startup: if a.integrationPubSub != nil { g.Go(...) }
-	// Also note: event.ProviderSet is currently disabled in controller/wire.go
-
-	return g.Wait()
+	return a.workspaceEventPubSub.Run(ctx)
 }
 
 func (a *App) Stop(ctx context.Context) error {

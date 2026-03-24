@@ -78,8 +78,4 @@ func (p *Pg) RunMigrations(ctx context.Context) error {
 	return nil
 }
 
-func (p *Pg) CheckReadiness(ctx context.Context) error {
-	return p.pgpool.Ping(ctx)
-}
-
 var ProvidePg = NewPg

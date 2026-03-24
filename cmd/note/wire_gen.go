@@ -76,8 +76,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	queries := pg.NewQueries(pool)
 	db := pg.NewStdlib(pool)
-	pgNote := pg.NewNote(queries, db)
-	folder := pg.NewFolder(queries, db)
+	pgNote := pg.NewNoTransactionNote(pool, queries, db)
+	folder := pg.NewNoTransactionFolder(pool, queries, db)
 	loggerAdapter := pubsub.NewWatermillLogger(logger)
 	commandEventMarshaler := pubsub.NewIntegrationMarshaler()
 	redis := &configConfig.Redis
@@ -95,7 +95,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalPubSub, workspaceEventHubPubSub)
 	createNoteHandler := app.NewCreateNoteHandler(authorization, pgNote, folder, workspaceEvent)
 	createFolderHandler := app.NewCreateFolderHandler(authorization, folder, workspaceEvent)
-	workspace := pg.NewWorkspace(queries, db)
+	workspace := pg.NewNoTransactionWorkspace(pool, queries, db)
 	unitOfWork := pg.NewUnitOfWork(queries, db)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspace, folder, unitOfWork)
 	deleteNoteHandler := app.NewDeleteNoteHandler(authorization, pgNote)

@@ -73,10 +73,12 @@ func (u *UnitOfWork) Execute(ctx context.Context, fn func(repoRegistry domain.Re
 	}
 
 	txQueries := pgsqlc.New(pgxConn)
+	// NOTE: passing nil to pgxpool because pgxpool in repo used for starting a transaction
+	// but in this case transaction is already started in unit of work
 	repoRegistry := &RepoRegistry{
-		workspace: NewWorkspace(txQueries, tx),
-		folder:    NewFolder(txQueries, tx),
-		note:      NewNote(txQueries, tx),
+		workspace: NewWorkspace(nil, txQueries, tx, true),
+		folder:    NewFolder(nil, txQueries, tx, true),
+		note:      NewNote(nil, txQueries, tx, true),
 	}
 
 	if err := fn(repoRegistry); err != nil {

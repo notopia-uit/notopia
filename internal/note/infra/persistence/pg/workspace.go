@@ -9,6 +9,7 @@ import (
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgjet/public/table"
@@ -16,20 +17,33 @@ import (
 )
 
 type Workspace struct {
-	queries *pgsqlc.Queries
-	db      qrm.DB
+	pgxPool       *pgxpool.Pool
+	queries       *pgsqlc.Queries
+	db            qrm.DB
+	inTransaction bool
 }
 
 var _ domain.WorkspaceRepo = (*Workspace)(nil)
 
-func NewWorkspace(queries *pgsqlc.Queries, db qrm.DB) *Workspace {
+func NewWorkspace(
+	pgxPool *pgxpool.Pool,
+	queries *pgsqlc.Queries,
+	db qrm.DB,
+	inTransaction bool,
+) *Workspace {
 	return &Workspace{
-		queries: queries,
-		db:      db,
+		pgxPool:       pgxPool,
+		queries:       queries,
+		db:            db,
+		inTransaction: inTransaction,
 	}
 }
 
-var ProvideWorkspace = NewWorkspace
+func NewNoTransactionWorkspace(pgxPool *pgxpool.Pool, queries *pgsqlc.Queries, db qrm.DB) *Workspace {
+	return NewWorkspace(pgxPool, queries, db, false)
+}
+
+var ProvideWorkspace = NewNoTransactionWorkspace
 
 func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) (*domain.Workspace, errs.Error) {
 	stmt := SELECT(table.Workspaces.AllColumns).
