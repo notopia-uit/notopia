@@ -1,13 +1,12 @@
-import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
-import { WsAdapter } from '@nestjs/platform-ws';
-import { Logger } from 'nestjs-pino';
-
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/http-exception.filter';
 import { AppConfig } from './config/config';
 import { APP_CONFIG } from './config/config.factory';
 import { otelSdk } from './otel';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { WsAdapter } from '@nestjs/platform-ws';
+import { Logger } from 'nestjs-pino';
 
 otelSdk.start();
 

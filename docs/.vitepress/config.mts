@@ -1,7 +1,7 @@
-import { DefaultTheme, defineConfig, UserConfig } from 'vitepress';
-import { withSidebar } from 'vitepress-sidebar';
+import { DefaultTheme, UserConfig, defineConfig } from 'vitepress';
 import { configureDiagramsPlugin } from 'vitepress-plugin-diagrams';
 import { pagefindPlugin } from 'vitepress-plugin-pagefind';
+import { withSidebar } from 'vitepress-sidebar';
 import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
 
 // https://vitepress.dev/reference/site-config

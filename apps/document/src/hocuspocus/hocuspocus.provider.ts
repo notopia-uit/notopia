@@ -1,11 +1,10 @@
-import { Database } from '@hocuspocus/extension-database';
-import { Hocuspocus } from '@hocuspocus/server';
-import { Provider } from '@nestjs/common';
-
 import { AuthorizationService } from '../authorization/authorization.service';
 import { DocumentRepository } from '../document/document.repository';
 import { NoteService } from '../note/note.service';
 import { HocuspocusContext } from './hocuspocus-context';
+import { Database } from '@hocuspocus/extension-database';
+import { Hocuspocus } from '@hocuspocus/server';
+import { Provider } from '@nestjs/common';
 
 export const HocuspocusProvider: Provider = {
   provide: Hocuspocus,

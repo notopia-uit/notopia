@@ -1,8 +1,8 @@
 'use client';
 
-import { Inbox } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { Inbox } from 'lucide-react';
 
 export interface LandingHeroSection2Props {
   onStartNow?: () => void;

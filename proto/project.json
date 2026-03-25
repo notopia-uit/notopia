@@ -7,10 +7,7 @@
     "gen": {
       "inputs": ["protoFiles"],
       "executor": "nx:run-commands",
-      "outputs": [
-        "{workspaceRoot}/pkg/pb",
-        "{workspaceRoot}/packages/pb"
-      ],
+      "outputs": ["{workspaceRoot}/pkg/pb", "{workspaceRoot}/packages/pb"],
       "options": {
         "command": "buf generate"
       }

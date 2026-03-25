@@ -1,5 +1,4 @@
 //@ts-check
-
 import { composePlugins, withNx } from '@nx/next';
 import { WithNxOptions } from '@nx/next/plugins/with-nx';
 

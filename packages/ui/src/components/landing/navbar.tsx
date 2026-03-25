@@ -1,12 +1,12 @@
 'use client';
 
+import { Button } from '../ui/button';
 import {
   NavigationMenu,
-  NavigationMenuList,
   NavigationMenuItem,
+  NavigationMenuList,
   NavigationMenuTrigger,
 } from '../ui/navigation-menu';
-import { Button } from '../ui/button';
 import { SiGithub } from '@icons-pack/react-simple-icons';
 
 const NAV_ITEMS = [

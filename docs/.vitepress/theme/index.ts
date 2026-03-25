@@ -1,12 +1,12 @@
 // https://vitepress.dev/guide/custom-theme
-import { h, nextTick, watch } from 'vue';
-import type { Theme } from 'vitepress';
-import DefaultTheme from 'vitepress/theme';
 import '@catppuccin/vitepress/theme/mocha/lavender.css';
+import type { Theme } from 'vitepress';
+import { useData } from 'vitepress';
+import { createMermaidRenderer } from 'vitepress-mermaid-renderer';
 import { theme } from 'vitepress-openapi/client';
 import 'vitepress-openapi/dist/style.css';
-import { createMermaidRenderer } from 'vitepress-mermaid-renderer';
-import { useData } from 'vitepress';
+import DefaultTheme from 'vitepress/theme';
+import { h, nextTick, watch } from 'vue';
 
 export default {
   extends: DefaultTheme,

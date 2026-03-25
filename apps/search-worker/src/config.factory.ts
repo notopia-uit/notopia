@@ -1,6 +1,5 @@
-import { registerAs } from '@nestjs/config';
-
 import { AppConfig, KafkaConfig, MeiliConfig } from './config';
+import { registerAs } from '@nestjs/config';
 
 export const APP_CONFIG = Symbol('APP_CONFIG');
 

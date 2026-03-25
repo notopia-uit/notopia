@@ -20,8 +20,7 @@ post:
           schema:
             type: string
             format: uri
-            example: 
-              http://api.notopia.localhost/workspaces/550e8400-e29b-41d4-a716-446655440000
+            example: http://api.notopia.localhost/workspaces/550e8400-e29b-41d4-a716-446655440000
           required: true
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
