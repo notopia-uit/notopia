@@ -14,7 +14,7 @@ export function LandingHeroSection2({
   onHugMe,
 }: LandingHeroSection2Props) {
   return (
-    <section className="from-background via-muted/30 to-background w-full bg-gradient-to-b">
+    <section className="from-background via-muted/30 to-background w-full bg-linear-to-b">
       <div className="mx-auto flex min-h-125 max-w-360 flex-col items-center justify-center gap-8 px-6 py-20">
         {/* Contact pill input */}
         <div className="border-border bg-background relative flex w-full max-w-85 items-center gap-2 rounded-full border px-4 py-3 shadow-sm transition-shadow hover:shadow-md">

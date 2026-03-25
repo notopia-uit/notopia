@@ -7,7 +7,7 @@ import {
   NavigationMenuTrigger,
 } from '../ui/navigation-menu';
 import { Button } from '../ui/button';
-import { Github } from 'lucide-react';
+import { SiGithub } from '@icons-pack/react-simple-icons';
 
 const NAV_ITEMS = [
   { label: 'Features' },
@@ -75,7 +75,7 @@ export function LandingNavbar(_props: LandingNavbarProps) {
             className="border-border rounded-lg"
             aria-label="GitHub"
           >
-            <Github className="text-foreground h-5 w-5" />
+            <SiGithub className="text-foreground h-5 w-5" />
           </Button>
         </div>
       </nav>

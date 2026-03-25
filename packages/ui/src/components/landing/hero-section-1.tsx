@@ -57,7 +57,7 @@ export function LandingHeroSection1({
         </div>
 
         {/* Right content */}
-        <div className="from-muted to-muted/50 flex flex-1 flex-col items-center justify-center gap-6 rounded-2xl bg-gradient-to-br p-10">
+        <div className="from-muted to-muted/50 flex flex-1 flex-col items-center justify-center gap-6 rounded-2xl bg-linear-to-br p-10">
           <div className="flex flex-col gap-4 text-center">
             <h2 className="text-foreground text-3xl font-semibold">
               Visualize Your Knowledge

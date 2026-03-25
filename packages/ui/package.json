@@ -20,6 +20,7 @@
     "./styles": "./src/globals.css"
   },
   "dependencies": {
+    "@icons-pack/react-simple-icons": "^13.13.0",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "lucide-react": "catalog:",
