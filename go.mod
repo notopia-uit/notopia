@@ -27,7 +27,7 @@ require (
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/lib/pq v1.10.9
 	github.com/oapi-codegen/gin-middleware v1.0.2
-	github.com/oapi-codegen/runtime v1.2.0
+	github.com/oapi-codegen/runtime v1.3.1
 	github.com/pressly/goose/v3 v3.27.0
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/samber/slog-multi v1.7.1
