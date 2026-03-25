@@ -85,12 +85,9 @@ services: Services {
     }
     pub_sub: Pub/Sub {
       icon: https://cdn.simpleicons.org/redis/d20f39
-      class: notUsed
     }
     note_service -> database
-    note_service -> pub_sub: {
-      class: notUsed
-    }
+    note_service -> pub_sub
   }
 
   authorization: Authorization Service Group {
