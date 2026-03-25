@@ -1,3 +1,4 @@
+import { AppService } from './app.service';
 import { Controller } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import type {
@@ -5,8 +6,6 @@ import type {
   ShareNoteCreatedEvent,
   ShareNoteUpdatedEvent,
 } from '@notopia-uit/api-gen';
-
-import { AppService } from './app.service';
 
 @Controller()
 export class AppController {

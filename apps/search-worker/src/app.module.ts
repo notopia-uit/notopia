@@ -1,12 +1,11 @@
+import { AppConfig, MeiliConfig } from './config';
+import { APP_CONFIG, MEILI_CONFIG, appConfig } from './config.factory';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MeiliSearch } from 'meilisearch';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
-
-import { AppConfig, MeiliConfig } from './config';
-import { APP_CONFIG, appConfig, MEILI_CONFIG } from './config.factory';
 
 @Module({
   imports: [

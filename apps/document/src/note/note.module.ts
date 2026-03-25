@@ -1,12 +1,11 @@
+import { ServicesConfig } from '../config/config';
+import { SERVICE_CONFIG } from '../config/config.factory';
+import { NoteClient, NoteService } from './note.service';
 import { createClient } from '@connectrpc/connect';
 import { createGrpcTransport } from '@connectrpc/connect-node';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NoteService as NoteServiceDefinition } from '@notopia-uit/pb/note';
-
-import { ServicesConfig } from '../config/config';
-import { SERVICE_CONFIG } from '../config/config.factory';
-import { NoteClient, NoteService } from './note.service';
 
 const NOTE_CLIENT = Symbol('NOTE_SERVICE_CLIENT');
 

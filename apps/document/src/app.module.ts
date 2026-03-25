@@ -1,12 +1,3 @@
-import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
-import { OpenTelemetryModule } from 'nestjs-otel';
-import { LoggerModule } from 'nestjs-pino';
-import pretty from 'pino-pretty';
-
 import { AuthorizationModule } from './authorization/authorization.module';
 import { AppConfig } from './config/config';
 import {
@@ -27,6 +18,14 @@ import { RevisionEntity } from './revision/revision.entity';
 import { RevisionRepository } from './revision/revision.repository';
 import { RevisionService } from './revision/revision.service';
 import { StorageModule } from './storage/storage.module';
+import { ServerBlockNoteEditor } from '@blocknote/server-util';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
+import { OpenTelemetryModule } from 'nestjs-otel';
+import { LoggerModule } from 'nestjs-pino';
+import pretty from 'pino-pretty';
 
 @Module({
   imports: [

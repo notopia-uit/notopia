@@ -1,9 +1,8 @@
+import { RevisionEntity } from './revision.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Traceable } from 'nestjs-otel';
 import { Repository } from 'typeorm';
-
-import { RevisionEntity } from './revision.entity';
 
 @Injectable()
 @Traceable()

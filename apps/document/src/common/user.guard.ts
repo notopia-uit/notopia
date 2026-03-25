@@ -1,3 +1,4 @@
+import { User } from './user';
 import {
   CanActivate,
   ExecutionContext,
@@ -5,8 +6,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-
-import { User } from './user';
 
 @Injectable()
 export abstract class UserGuard implements CanActivate {

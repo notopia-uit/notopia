@@ -1,3 +1,5 @@
+import { HttpUserGuard } from '../common/user.guard';
+import { RevisionService } from './revision.service';
 import { Injectable, UseGuards } from '@nestjs/common';
 import type {
   GetRevisions200Response,
@@ -8,9 +10,6 @@ import {
   RevisionApi as _RevisionApi,
 } from '@notopia-uit/api-document-nestjs-server';
 import { Traceable } from 'nestjs-otel';
-
-import { HttpUserGuard } from '../common/user.guard';
-import { RevisionService } from './revision.service';
 
 @Injectable()
 @UseGuards(HttpUserGuard)

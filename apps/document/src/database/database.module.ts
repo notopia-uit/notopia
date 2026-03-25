@@ -1,10 +1,9 @@
-import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { AppConfig, DatabaseConfig } from '../config/config';
 import { APP_CONFIG, DATABASE_CONFIG } from '../config/config.factory';
 import { createDatasourceOptions } from './database.provider';
+import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [

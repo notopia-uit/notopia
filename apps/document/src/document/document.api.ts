@@ -1,10 +1,9 @@
-import { Injectable, UseGuards } from '@nestjs/common';
-import { DocumentApi as _DocumentApi } from '@notopia-uit/api-document-nestjs-server';
-import { Traceable } from 'nestjs-otel';
-
 import { User } from '../common/user';
 import { HttpUserGuard } from '../common/user.guard';
 import { DocumentService } from './document.service';
+import { Injectable, UseGuards } from '@nestjs/common';
+import { DocumentApi as _DocumentApi } from '@notopia-uit/api-document-nestjs-server';
+import { Traceable } from 'nestjs-otel';
 
 @Injectable()
 @UseGuards(HttpUserGuard)

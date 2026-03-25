@@ -1,3 +1,8 @@
+import { AuthorizationService } from '../authorization/authorization.service';
+import { User } from '../common/user';
+import { RevisionEntity } from '../revision/revision.entity';
+import { StorageService } from '../storage/storage.service';
+import { DocumentEntity } from './document.entity';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import {
   Injectable,
@@ -8,13 +13,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { Traceable } from 'nestjs-otel';
 import { DataSource } from 'typeorm';
-import { applyUpdate, Doc as YDoc } from 'yjs';
-
-import { AuthorizationService } from '../authorization/authorization.service';
-import { User } from '../common/user';
-import { RevisionEntity } from '../revision/revision.entity';
-import { StorageService } from '../storage/storage.service';
-import { DocumentEntity } from './document.entity';
+import { Doc as YDoc, applyUpdate } from 'yjs';
 
 @Injectable()
 @Traceable()
