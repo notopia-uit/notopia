@@ -33,11 +33,15 @@ func toHTTPErr(err *errs.Err) (
 		statusCode = 404
 	case errs.CodeEmptyFolderName:
 		statusCode = 400
+	case errs.CodeFolderAlreadyTrashed:
+		statusCode = 409
 
 	case errs.CodeNoteNotFound:
 		statusCode = 404
 	case errs.CodeNoteFailToMarshalDocumentContent:
 		statusCode = 500
+	case errs.CodeNoteAlreadyTrashed:
+		statusCode = 409
 
 	case errs.CodePersistenceInvalid:
 		statusCode = 400

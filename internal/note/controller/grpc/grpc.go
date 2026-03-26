@@ -70,8 +70,9 @@ func New(
 	mux.Handle(Path, Handler)
 
 	mux.Handle("/ping", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("pong"))
+		if _, err := w.Write([]byte("pong")); err != nil {
+			logger.ErrorContext(ctx, "failed to write ping response", slog.String("error", err.Error()))
+		}
 	}))
 
 	protocol := new(http.Protocols)

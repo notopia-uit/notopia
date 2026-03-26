@@ -3,7 +3,7 @@ package http
 import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	note "github.com/notopia-uit/notopia/pkg/api/note"
+	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
 func workspaceEventToDTO(event domain.Event) (any, bool) {
