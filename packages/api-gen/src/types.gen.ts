@@ -59,7 +59,7 @@ export type ShareNote = {
     icon: string | null;
     folderId: SharePropertiesId;
     tags: Array<string>;
-    readonly updatedAt: string;
+    readonly updatedAt: Date;
     readonly backlinksCount: number;
     readonly outgoingLinksCount: number;
 };
@@ -93,7 +93,7 @@ export type DocumentRevision = {
     readonly id: string;
     name: string | null;
     content?: DocumentDocumentContent;
-    readonly createdAt: string;
+    readonly createdAt: Date;
 };
 
 export type DocumentPagination = {
@@ -133,7 +133,7 @@ export type NoteFolder = {
     readonly id: string;
     name: string;
     icon: string | null;
-    readonly updatedAt: string;
+    readonly updatedAt: Date;
     parentId: NoteId;
     workspaceId: NotePropertiesId;
 };
@@ -161,7 +161,7 @@ export type NoteNote = {
     icon: string | null;
     folderId: NoteId;
     tags: Array<string>;
-    readonly updatedAt: string;
+    readonly updatedAt: Date;
     readonly backlinksCount: number;
     readonly outgoingLinksCount: number;
 };
@@ -374,17 +374,17 @@ export type NoteTrashedNote = {
     id: string;
     readonly name: string;
     trashedBy: NoteTrashedBy;
-    readonly trashedAt: string;
+    readonly trashedAt: Date;
 };
 
 export type NoteTrashedFolder = {
     id: string;
     readonly name: string;
     trashedBy: NoteTrashedBy;
-    readonly trashedAt: string;
+    readonly trashedAt: Date;
 };
 
-export type NoteUpdatedAt = string;
+export type NoteUpdatedAt = Date;
 
 export type NoteWorkspaceTreeNote = {
     id: NoteNotePropertiesId;
@@ -402,7 +402,7 @@ export type NoteWorkspaceTreeFolder = {
     updatedAt: NotePropertiesUpdatedAt;
 };
 
-export type NotePropertiesUpdatedAt = string;
+export type NotePropertiesUpdatedAt = Date;
 
 export type ShareNoteCreatedEventWritable = {
     name: ShareName;

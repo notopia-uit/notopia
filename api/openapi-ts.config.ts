@@ -5,6 +5,7 @@ export default defineConfig({
   output: '../packages/api-gen/src/',
   plugins: [
     '@hey-api/client-next',
+    '@hey-api/transformers',
     {
       name: '@hey-api/typescript',
       enums: 'javascript',
@@ -13,6 +14,7 @@ export default defineConfig({
     {
       name: '@hey-api/sdk',
       validator: true,
+      transformer: true,
     },
     '@tanstack/react-query',
   ],
