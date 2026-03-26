@@ -187,6 +187,7 @@ func getWorkspaceToDTO(w app.Workspace) note.Workspace {
 
 func getWorkspaceMemberToDTO(m *app.WorkspaceMember) note.WorkspaceMember {
 	return note.WorkspaceMember{
+		Id:       m.ID,
 		Role:     note.WorkspaceRole(m.Role),
 		Username: m.Username,
 	}

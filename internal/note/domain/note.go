@@ -31,11 +31,16 @@ func NewNote(
 		name = "Untitled Note"
 	}
 	return &Note{
-		id:       id,
-		name:     name,
-		icon:     icon,
-		tags:     tags,
-		folderID: folderID,
+		id:            id,
+		name:          name,
+		icon:          icon,
+		tags:          tags,
+		folderID:      folderID,
+		size:          0,
+		outgoingLinks: []uuid.UUID{},
+		trashed:       nil,
+
+		events: []Event{},
 	}
 }
 

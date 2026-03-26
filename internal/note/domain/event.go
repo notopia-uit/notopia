@@ -35,41 +35,41 @@ type Event interface {
 	EventType() EventType
 }
 
-func NewFromEventType(eventType string) (Event, bool) {
+func NewEmptyFromEventType(eventType string) (Event, bool) {
 	var concreteEvent Event
 	switch EventType(eventType) {
 	case TypeFolderCreated:
-		concreteEvent = &FolderCreatedEvent{}
+		concreteEvent = *new(FolderCreatedEvent)
 	case TypeFolderDeleted:
-		concreteEvent = &FolderDeletedEvent{}
+		concreteEvent = *new(FolderDeletedEvent)
 	case TypeFolderUpdated:
-		concreteEvent = &FolderUpdatedEvent{}
+		concreteEvent = *new(FolderUpdatedEvent)
 	case TypeFolderMoved:
-		concreteEvent = &FolderMovedEvent{}
+		concreteEvent = *new(FolderMovedEvent)
 	case TypeFolderTrashed:
-		concreteEvent = &FolderTrashedEvent{}
+		concreteEvent = *new(FolderTrashedEvent)
 	case TypeFolderRestored:
-		concreteEvent = &FolderRestoredEvent{}
+		concreteEvent = *new(FolderRestoredEvent)
 	case TypeFolderPermanentlyDeleted:
-		concreteEvent = &FolderPermanentlyDeletedEvent{}
+		concreteEvent = *new(FolderPermanentlyDeletedEvent)
 	case TypeNoteCreated:
-		concreteEvent = &NoteCreatedEvent{}
+		concreteEvent = *new(NoteCreatedEvent)
 	case TypeNoteDeleted:
-		concreteEvent = &NoteDeletedEvent{}
+		concreteEvent = *new(NoteDeletedEvent)
 	case TypeNoteUpdated:
-		concreteEvent = &NoteUpdatedEvent{}
+		concreteEvent = *new(NoteUpdatedEvent)
 	case TypeNoteMoved:
-		concreteEvent = &NoteMovedEvent{}
+		concreteEvent = *new(NoteMovedEvent)
 	case TypeNoteTrashed:
-		concreteEvent = &NoteTrashedEvent{}
+		concreteEvent = *new(NoteTrashedEvent)
 	case TypeNoteRestored:
-		concreteEvent = &NoteRestoredEvent{}
+		concreteEvent = *new(NoteRestoredEvent)
 	case TypeNotePermanentlyDeleted:
-		concreteEvent = &NotePermanentlyDeletedEvent{}
+		concreteEvent = *new(NotePermanentlyDeletedEvent)
 	case TypeWorkspaceUpdated:
-		concreteEvent = &WorkspaceUpdatedEvent{}
+		concreteEvent = *new(WorkspaceUpdatedEvent)
 	case TypeWorkspaceDeleted:
-		concreteEvent = &WorkspaceDeletedEvent{}
+		concreteEvent = *new(WorkspaceDeletedEvent)
 	}
 	return concreteEvent, concreteEvent != nil
 }

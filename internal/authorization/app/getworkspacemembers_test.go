@@ -56,10 +56,11 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 			},
 		},
 		{
-			name:        "W112-Stranger CANNOT view members",
-			requesterID: "110",
-			workspaceID: "00000000-0000-0000-0000-000000000112",
-			expectErr:   true,
+			name:            "W112-Stranger CANNOT view members",
+			requesterID:     "110",
+			workspaceID:     "00000000-0000-0000-0000-000000000112",
+			expectErr:       true,
+			expectedMembers: nil,
 		},
 	}
 

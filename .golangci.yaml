@@ -5,14 +5,12 @@ version: '2'
 linters:
   enable:
     - exhaustive
-    # - exhaustruct
+    - exhaustruct
     - tagalign
     - unparam
     - testifylint
   disable:
     - unused
-  exclusions:
-    generated: strict
   settings:
     staticcheck:
       dot-import-whitelist:
@@ -21,6 +19,24 @@ linters:
       align: true
       sort: true
       strict: true
+    exhaustruct:
+      allow-empty: false
+      allow-empty-returns: false
+      allow-empty-declarations: true
+      include:
+        - github\.com/notopia-uit/notopia/.*\.*
+      exclude:
+        - github\.com/notopia-uit/notopia/.*/pgsqlc\..*
+        - github\.com/notopia-uit/notopia/.*/errs\.Err
+      #   - net/http\.Server
+      #   - github\.com/alexliesenfeld/health\.Check
+      #   - github.com/ThreeDotsLabs/watermill/components/cqrs
+  exclusions:
+    generated: strict
+    rules:
+      - linters:
+          - exhaustruct
+        path: _test\.go
 
 formatters:
   enable:

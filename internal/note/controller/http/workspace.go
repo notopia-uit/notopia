@@ -172,6 +172,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 			}
 		}
 	}()
+	//exhaustruct:ignore
 	return note.GetWorkspaceEvents200TexteventStreamResponse{
 		Body: r,
 	}, nil

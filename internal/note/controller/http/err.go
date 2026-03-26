@@ -78,6 +78,7 @@ func strictServerErrorHandler(c *gin.Context, err error, statusCode int) {
 		message, code, statusCode = toHTTPErr(domainErr)
 	}
 
+	//exhaustruct:ignore
 	response := note.Error{
 		Code:    code,
 		Message: message,

@@ -40,9 +40,6 @@ func NewIntegrationPubSub(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create integration event publisher: %w", err)
 	}
-	if err != nil {
-		return nil, err
-	}
 
 	eventBus, err := cqrs.NewEventBusWithConfig(publisher, cqrs.EventBusConfig{
 		GeneratePublishTopic: func(params cqrs.GenerateEventPublishTopicParams) (string, error) {

@@ -97,7 +97,7 @@ var (
 )
 
 type WorkspaceMember struct {
-	ID       uuid.UUID
+	ID       string
 	Username *string
 	Role     WorkspaceRole
 }

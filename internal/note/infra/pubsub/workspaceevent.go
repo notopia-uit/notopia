@@ -193,7 +193,7 @@ func (w *WorkspaceEvent) Subscribe(
 					msg.Ack()
 					continue
 				}
-				event, ok := domain.NewFromEventType(eventType)
+				event, ok := domain.NewEmptyFromEventType(eventType)
 				if !ok {
 					slog.ErrorContext(ctx, "unknown event type in message metadata", slog.String("event_type", eventType), slog.String("workspace_id", workspaceID.String()), slog.String("user_id", userID))
 					msg.Ack()

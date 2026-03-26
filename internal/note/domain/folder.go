@@ -34,6 +34,9 @@ func NewFolder(
 		icon:            icon,
 		workspaceID:     workspaceID,
 		folderHierarchy: folderHierarchy,
+		trashed:         nil,
+
+		events: []Event{},
 	}
 	folder.AddEvent(
 		&FolderCreatedEvent{

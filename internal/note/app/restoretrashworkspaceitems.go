@@ -35,18 +35,22 @@ func NewRestoreTrashedWorkspaceItemsHandler(
 var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItemsHandler
 
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) errs.Error {
-	trashedNotes, err := h.noteRepo.GetMany(ctx, &domain.NoteRepoGetManyParams{
-		WorkspaceID: &cmd.WorkspaceID,
-		IsTrashed:   new(true),
-	})
+	trashedNotes, err := h.noteRepo.GetMany(ctx,
+		//exhaustruct:ignore
+		&domain.NoteRepoGetManyParams{
+			WorkspaceID: &cmd.WorkspaceID,
+			IsTrashed:   new(true),
+		})
 	if err != nil {
 		return err
 	}
 
-	trashedFolders, err := h.folderRepo.GetMany(ctx, &domain.FolderRepoGetManyParams{
-		WorkspaceID: &cmd.WorkspaceID,
-		IsTrashed:   new(true),
-	})
+	trashedFolders, err := h.folderRepo.GetMany(ctx,
+		//exhaustruct:ignore
+		&domain.FolderRepoGetManyParams{
+			WorkspaceID: &cmd.WorkspaceID,
+			IsTrashed:   new(true),
+		})
 	if err != nil {
 		return err
 	}
@@ -55,10 +59,12 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 	trashedFolderPtrs := trashedFolders
 
 	if len(cmd.NoteIDs) > 0 {
-		notes, err := h.noteRepo.GetMany(ctx, &domain.NoteRepoGetManyParams{
-			IDs:       cmd.NoteIDs,
-			ForUpdate: true,
-		})
+		notes, err := h.noteRepo.GetMany(ctx,
+			//exhaustruct:ignore
+			&domain.NoteRepoGetManyParams{
+				IDs:       cmd.NoteIDs,
+				ForUpdate: true,
+			})
 		if err != nil {
 			return err
 		}
@@ -72,10 +78,12 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 	}
 
 	if len(cmd.FolderIDs) > 0 {
-		folders, err := h.folderRepo.GetMany(ctx, &domain.FolderRepoGetManyParams{
-			IDs:       cmd.FolderIDs,
-			ForUpdate: true,
-		})
+		folders, err := h.folderRepo.GetMany(ctx,
+			//exhaustruct:ignore
+			&domain.FolderRepoGetManyParams{
+				IDs:       cmd.FolderIDs,
+				ForUpdate: true,
+			})
 		if err != nil {
 			return err
 		}

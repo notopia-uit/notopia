@@ -34,6 +34,7 @@ func NewWorkspace(
 		name:         name,
 		slug:         slug,
 		rootFolderID: rootFolderID,
+		deletedAt:    nil,
 
 		event: []Event{},
 	}, nil
