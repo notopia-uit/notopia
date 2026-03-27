@@ -26,7 +26,7 @@ func toHTTPErr(err *errs.Err) (
 	case errs.CodeInternal:
 		statusCode = 500
 
-	case errs.CodeAuthorizationUnavailable:
+	case errs.CodeAuthorizationServiceInternalError:
 		statusCode = 503
 
 	case errs.CodeFolderNotFound:

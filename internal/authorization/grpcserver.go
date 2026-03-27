@@ -17,24 +17,24 @@ import (
 )
 
 func toConectRPCError(err error) error {
-	if cerr, ok := errors.AsType[*errs.Err](err); ok {
-		switch cerr.Code() {
+	if err, ok := errors.AsType[*errs.Err](err); ok {
+		switch err.Code() {
 		case errs.CodeCasbinInternalError,
 			errs.CodeCasbinEnforcerError,
 			errs.CodeGetWorkspaceMembersGetFailed,
 			errs.CodeInternal:
-			return connect.NewError(connect.CodeInternal, cerr)
+			return connect.NewError(connect.CodeInternal, err)
 		case errs.CodeCasbinPolicySignatureInvalid,
 			errs.CodeErrInvalidUserFormat,
 			errs.CodeInvalid:
-			return connect.NewError(connect.CodeInvalidArgument, cerr)
+			return connect.NewError(connect.CodeInvalidArgument, err)
 		case errs.CodeMemberHasNoPermission,
 			errs.CodeForbidden:
-			return connect.NewError(connect.CodePermissionDenied, cerr)
+			return connect.NewError(connect.CodePermissionDenied, err)
 		case errs.CodeCreateWorkspaceExists:
-			return connect.NewError(connect.CodeAlreadyExists, cerr)
+			return connect.NewError(connect.CodeAlreadyExists, err)
 		case errs.CodeUnimplemented:
-			return connect.NewError(connect.CodeUnimplemented, cerr)
+			return connect.NewError(connect.CodeUnimplemented, err)
 		}
 	}
 	return err

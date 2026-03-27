@@ -1,16 +1,18 @@
 package errs
 
-const CodeAuthorizationUnavailable Code = "authorization_1"
+const (
+	CodeAuthorizationServiceInternalError Code = "authorizationServiceInternalError"
+)
 
-type ErrorAuthorizationUnavailable struct {
+type errorAuthorizationServiceInternal struct {
 	Err
 }
 
-func NewErrorAuthorizationUnavailable(err error) *ErrorAuthorizationUnavailable {
-	return &ErrorAuthorizationUnavailable{
+func NewAuthorizationInternal(err error) *errorAuthorizationServiceInternal {
+	return &errorAuthorizationServiceInternal{
 		Err: Err{
-			code:    CodeAuthorizationUnavailable,
-			message: "authorization service is unavailable",
+			code:    CodeAuthorizationServiceInternalError,
+			message: "authorization service internal error",
 			err:     err,
 		},
 	}

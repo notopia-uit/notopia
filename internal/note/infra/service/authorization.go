@@ -9,9 +9,26 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
-	commongrpc "github.com/notopia-uit/notopia/pkg/common/grpc"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
 )
+
+func toAuthorizationServiceError(err error) errs.Error {
+	// NOTE: Lazy to convert all possible errors
+	return errs.NewAuthorizationInternal(err)
+}
+
+func NewClientErrorInterceptor() connect.UnaryInterceptorFunc {
+	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
+		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+			resp, err := next(ctx, req)
+			if err != nil {
+				return nil, toAuthorizationServiceError(err)
+			}
+			return resp, nil
+		}
+	}
+	return connect.UnaryInterceptorFunc(interceptor)
+}
 
 type Authorization struct {
 	client pbconnect.AuthorizationServiceClient
@@ -26,7 +43,7 @@ func NewAuthorization(
 		http.DefaultClient,
 		servicesCfg.Authorization.URL,
 		connect.WithInterceptors(
-			commongrpc.NewClientErrorInterceptor(),
+			NewClientErrorInterceptor(),
 		),
 	)
 	return &Authorization{

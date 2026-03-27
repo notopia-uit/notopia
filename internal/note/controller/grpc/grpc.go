@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -12,11 +13,63 @@ import (
 	"connectrpc.com/validate"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
-	commongrpc "github.com/notopia-uit/notopia/pkg/common/grpc"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
+
+func toConnectRPCError(err error) error {
+	if cerr, ok := errors.AsType[*errs.Err](err); ok {
+		switch cerr.Code() {
+		case errs.CodeForbidden:
+			return connect.NewError(connect.CodePermissionDenied, cerr)
+		case errs.CodeInvalid,
+			errs.CodeEmptyFolderName,
+			errs.CodePersistenceInvalid,
+			errs.CodeInvalidWorkspaceName,
+			errs.CodeInvalidWorkspaceSlug:
+			return connect.NewError(connect.CodeInvalidArgument, cerr)
+		case errs.CodeUnimplemented:
+			return connect.NewError(connect.CodeUnimplemented, cerr)
+		case errs.CodeInternal,
+			errs.CodeNoteFailToMarshalDocumentContent,
+			errs.CodePersistenceInternal,
+			errs.CodeWorkspaceEventPubSubFailedToCreateMessage,
+			errs.CodeWorkspaceEventPubSubPublishFailed,
+			errs.CodeWorkspaceEventPubSubSubscribeFailed:
+			return connect.NewError(connect.CodeInternal, cerr)
+		case errs.CodeFolderNotFound,
+			errs.CodeNoteNotFound,
+			errs.CodeWorkspaceNotFound,
+			errs.CodeWorkspaceBySlugNotFound,
+			errs.CodeWorkspaceRootFolderNotFound:
+			return connect.NewError(connect.CodeNotFound, cerr)
+		case errs.CodeFolderAlreadyTrashed,
+			errs.CodeNoteAlreadyTrashed,
+			errs.CodeWorkspaceSlugAlreadyExists:
+			return connect.NewError(connect.CodeAlreadyExists, cerr)
+		case errs.CodeAuthorizationServiceInternalError:
+			return connect.NewError(connect.CodeInternal, cerr)
+		default:
+			return connect.NewError(connect.CodeUnknown, cerr)
+		}
+	}
+	return err
+}
+
+func newErrorInterceptor() connect.UnaryInterceptorFunc {
+	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
+		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+			resp, err := next(ctx, req)
+			if err != nil {
+				return nil, toConnectRPCError(err)
+			}
+			return resp, nil
+		}
+	}
+	return connect.UnaryInterceptorFunc(interceptor)
+}
 
 type IHandler = pbconnect.NoteServiceHandler
 
@@ -55,9 +108,7 @@ func New(
 		return nil, nil, fmt.Errorf("failed to create otel interceptor: %w", err)
 	}
 	validateInterceptor := validate.NewInterceptor()
-	// TODO: interceptor from authorization service
-	// When I refactor the authorization service later
-	errInterceptor := commongrpc.NewErrorInterceptor()
+	errInterceptor := newErrorInterceptor()
 	Path, Handler := pbconnect.NewNoteServiceHandler(
 		handler,
 		connect.WithInterceptors(

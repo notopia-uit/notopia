@@ -16,12 +16,12 @@ const (
 	CodeCreateWorkspaceExists        Code = "createWorkspaceExists"
 )
 
-type casbinInternalError struct {
+type CasbinInternalError struct {
 	Err
 }
 
-func NewCasbinInternalError(err error) *casbinInternalError {
-	return &casbinInternalError{
+func NewCasbinInternalError(err error) *CasbinInternalError {
+	return &CasbinInternalError{
 		Err: Err{
 			message: "casbin internal error",
 			code:    CodeCasbinInternalError,
@@ -30,12 +30,12 @@ func NewCasbinInternalError(err error) *casbinInternalError {
 	}
 }
 
-type casbinEnforcerError struct {
+type CasbinEnforcerError struct {
 	Err
 }
 
-func NewCasbinEnforcerError(err error) *casbinEnforcerError {
-	return &casbinEnforcerError{
+func NewCasbinEnforcerError(err error) *CasbinEnforcerError {
+	return &CasbinEnforcerError{
 		Err: Err{
 			message: "casbin enforcer error",
 			code:    CodeCasbinEnforcerError,
@@ -44,12 +44,12 @@ func NewCasbinEnforcerError(err error) *casbinEnforcerError {
 	}
 }
 
-type casbinPolicySignatureInvalid struct {
+type CasbinPolicySignatureInvalid struct {
 	Err
 }
 
-func NewCasbinPolicySignatureInvalid(message ...string) *casbinPolicySignatureInvalid {
-	return &casbinPolicySignatureInvalid{
+func NewCasbinPolicySignatureInvalid(message ...string) *CasbinPolicySignatureInvalid {
+	return &CasbinPolicySignatureInvalid{
 		Err: Err{
 			message: "casbin policy signature is invalid" + func() string {
 				if len(message) > 0 {
@@ -62,13 +62,13 @@ func NewCasbinPolicySignatureInvalid(message ...string) *casbinPolicySignatureIn
 	}
 }
 
-type invalidUserFormat struct {
+type InvalidUserFormat struct {
 	Err
 	userID string
 }
 
-func NewInvalidUserFormat(userID string, err error) *invalidUserFormat {
-	return &invalidUserFormat{
+func NewInvalidUserFormat(userID string, err error) *InvalidUserFormat {
+	return &InvalidUserFormat{
 		userID: userID,
 		Err: Err{
 			message: "invalid user format: " + userID,
@@ -78,15 +78,15 @@ func NewInvalidUserFormat(userID string, err error) *invalidUserFormat {
 	}
 }
 
-type memberHasNoPermission struct {
+type MemberHasNoPermission struct {
 	Err
 	UserID      string
 	WorkspaceID uuid.UUID
 	Permission  string
 }
 
-func NewMemberHasNoPermission(userID string, workspaceID uuid.UUID, permission string) *memberHasNoPermission {
-	return &memberHasNoPermission{
+func NewMemberHasNoPermission(userID string, workspaceID uuid.UUID, permission string) *MemberHasNoPermission {
+	return &MemberHasNoPermission{
 		UserID:      userID,
 		WorkspaceID: workspaceID,
 		Permission:  permission,
@@ -97,13 +97,13 @@ func NewMemberHasNoPermission(userID string, workspaceID uuid.UUID, permission s
 	}
 }
 
-type getWorkspaceMembersGetFailed struct {
+type GetWorkspaceMembersGetFailed struct {
 	Err
 	WorkspaceID uuid.UUID
 }
 
-func NewGetWorkspaceMembersGetFailed(workspaceID uuid.UUID, err error) *getWorkspaceMembersGetFailed {
-	return &getWorkspaceMembersGetFailed{
+func NewGetWorkspaceMembersGetFailed(workspaceID uuid.UUID, err error) *GetWorkspaceMembersGetFailed {
+	return &GetWorkspaceMembersGetFailed{
 		WorkspaceID: workspaceID,
 		Err: Err{
 			message: fmt.Sprintf("failed to get workspace members for workspace %q", workspaceID.String()),
@@ -113,14 +113,14 @@ func NewGetWorkspaceMembersGetFailed(workspaceID uuid.UUID, err error) *getWorks
 	}
 }
 
-type createWorkspaceExists struct {
+type CreateWorkspaceExists struct {
 	Err
 	UserID      string
 	WorkspaceID uuid.UUID
 }
 
-func NewCreateWorkspaceExists(userID string, workspaceID uuid.UUID) *createWorkspaceExists {
-	return &createWorkspaceExists{
+func NewCreateWorkspaceExists(userID string, workspaceID uuid.UUID) *CreateWorkspaceExists {
+	return &CreateWorkspaceExists{
 		UserID:      userID,
 		WorkspaceID: workspaceID,
 		Err: Err{
