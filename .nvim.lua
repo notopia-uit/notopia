@@ -36,6 +36,10 @@ lsp.config("gopls", {
   },
 })
 
+if vim.fn.executable("harper-ls") == 1 then
+  lsp.enable("harper_ls")
+end
+
 map("n", "<localleader>b", function()
   vim.ui.select({
     "none",
@@ -66,28 +70,32 @@ map("n", "<localleader>b", function()
   end)
 end, { desc = "LSP | Switch buildFlags", silent = true })
 
-map("n", "<localleader>lrt", function()
-  local clients = lsp.get_clients({ name = "tsgo" })
+local function restart_lsp_client(client_name)
+  local clients = lsp.get_clients({ name = client_name })
   for client in vim.iter(clients) do ---@cast client vim.lsp.Client
     client:stop()
   end
-  lsp.start(lsp.config["gopls"])
+  lsp.start(lsp.config[client_name])
+end
+
+map("n", "<localleader>lrt", function()
+  restart_lsp_client("tsgo")
 end, { desc = "LSP | Restart TSGO", silent = true })
 
+map("n", "<localleader>lre", function()
+  restart_lsp_client("eslint")
+end, { desc = "LSP | Restart eslint", silent = true })
+
 map("n", "<localleader>lrg", function()
-  local clients = lsp.get_clients({ name = "gopls" })
-  for client in vim.iter(clients) do ---@cast client vim.lsp.Client
-    client:stop()
-  end
-  lsp.start(lsp.config["gopls"])
+  restart_lsp_client("gopls")
 end, { desc = "LSP | Restart gopls", silent = true })
 
+map("n", "<localleader>lrG", function()
+  restart_lsp_client("golangci_lint_ls")
+end, { desc = "LSP | Restart golangci_lint_ls", silent = true })
+
 map("n", "<localleader>lrr", function()
-  local clients = lsp.get_clients({ name = "redocly_ls" })
-  for client in vim.iter(clients) do ---@cast client vim.lsp.Client
-    client:stop()
-  end
-  lsp.start(lsp.config["redocly_ls"])
+  restart_lsp_client("redocly_ls")
 end, { desc = "LSP | Restart redocly_ls", silent = true })
 
 vim.o.backupcopy = "yes" -- https://github.com/nrwl/nx/issues/20622
