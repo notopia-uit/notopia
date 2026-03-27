@@ -2,6 +2,7 @@ package authorization
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -9,11 +10,48 @@ import (
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
 	"connectrpc.com/validate"
-	commongrpc "github.com/notopia-uit/notopia/pkg/common/grpc"
+	"github.com/notopia-uit/notopia/internal/authorization/errs"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
+
+func toConectRPCError(err error) error {
+	if cerr, ok := errors.AsType[*errs.Err](err); ok {
+		switch cerr.Code() {
+		case errs.CodeCasbinInternalError,
+			errs.CodeCasbinEnforcerError,
+			errs.CodeGetWorkspaceMembersGetFailed,
+			errs.CodeInternal:
+			return connect.NewError(connect.CodeInternal, cerr)
+		case errs.CodeCasbinPolicySignatureInvalid,
+			errs.CodeErrInvalidUserFormat,
+			errs.CodeInvalid:
+			return connect.NewError(connect.CodeInvalidArgument, cerr)
+		case errs.CodeMemberHasNoPermission,
+			errs.CodeForbidden:
+			return connect.NewError(connect.CodePermissionDenied, cerr)
+		case errs.CodeCreateWorkspaceExists:
+			return connect.NewError(connect.CodeAlreadyExists, cerr)
+		case errs.CodeUnimplemented:
+			return connect.NewError(connect.CodeUnimplemented, cerr)
+		}
+	}
+	return err
+}
+
+func newErrorInterceptor() connect.UnaryInterceptorFunc {
+	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
+		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+			resp, err := next(ctx, req)
+			if err != nil {
+				return nil, toConectRPCError(err)
+			}
+			return resp, nil
+		}
+	}
+	return connect.UnaryInterceptorFunc(interceptor)
+}
 
 type GRPCServer struct {
 	*http.Server
@@ -35,7 +73,7 @@ func NewGRPCServer(
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create otel interceptor: %w", err)
 	}
-	errInterceptor := commongrpc.NewErrorInterceptor()
+	errInterceptor := newErrorInterceptor()
 	validateInterceptor := validate.NewInterceptor()
 	Path, Handler := pbconnect.NewAuthorizationServiceHandler(
 		handler,

@@ -1,11 +1,9 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/authorization/errs"
 )
 
 type HasWorkspaceItemPermission struct {
@@ -32,17 +30,7 @@ func (h *HasWorkspaceItemPermissionHandler) Handle(params HasWorkspaceItemPermis
 		params.Permission.String(),
 	)
 	if err != nil {
-		return false, newErrHasWorkspaceItemPermissionCheckFailed(params.UserID, params.WorkspaceID)
+		return false, errs.NewCasbinEnforcerError(err)
 	}
 	return ok, nil
-}
-
-var ErrCodeHasWorkspaceItemPermissionCheckFailed = "HasWorkspaceItemPermission_1"
-
-func newErrHasWorkspaceItemPermissionCheckFailed(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewInternal(
-		fmt.Sprintf("Failed to check workspace item permission for user %q on workspace %q", userID, workspaceID.String()),
-		ErrCodeHasWorkspaceItemPermissionCheckFailed,
-		nil,
-	)
 }

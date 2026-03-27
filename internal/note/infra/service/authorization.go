@@ -56,6 +56,6 @@ func (a *Authorization) CreateWorkspaceWithOwnership(ctx context.Context, userID
 	return errs.NewUnimplemented()
 }
 
-func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]app.WorkspaceMemberInfo, errs.Error) {
+func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]*app.WorkspaceMemberInfo, errs.Error) {
 	return nil, errs.NewUnimplemented()
 }

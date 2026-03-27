@@ -74,14 +74,14 @@ func toHTTPErr(err *errs.Err) (
 func strictServerErrorHandler(c *gin.Context, err error, statusCode int) {
 	message := err.Error()
 	code := ""
-	if domainErr, ok := errors.AsType[*errs.Err](err); ok {
-		message, code, statusCode = toHTTPErr(domainErr)
+	if cerr, ok := errors.AsType[*errs.Err](err); ok {
+		message, code, statusCode = toHTTPErr(cerr)
 	}
 
-	//exhaustruct:ignore
 	response := note.Error{
-		Code:    code,
-		Message: message,
+		Code:     code,
+		Message:  message,
+		MoreInfo: nil,
 	}
 
 	c.JSON(statusCode, response)

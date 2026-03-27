@@ -5,7 +5,7 @@ import (
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
+	"github.com/notopia-uit/notopia/internal/authorization/errs"
 )
 
 type GetWorkspaceMembers struct {
@@ -23,81 +23,33 @@ func NewGetWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer) *GetW
 
 var ProvideGetWorkspaceMembersHandler = NewGetWorkspaceMembersHandler
 
-func (h *GetWorkspaceMembersHandler) Handle(params GetWorkspaceMembers) ([]WorkspaceMember, error) {
-	viewAllowed, err := h.enforcer.Enforce(formatUser(params.UserID), formatWorkspace(params.WorkspaceID), "workspace", WorkspacePermissionRead.String())
+func (h *GetWorkspaceMembersHandler) Handle(params GetWorkspaceMembers) ([]*WorkspaceMember, error) {
+	readAllowed, err := h.enforcer.Enforce(formatUser(params.UserID), formatWorkspace(params.WorkspaceID), "workspace", WorkspacePermissionRead.String())
 	if err != nil {
-		return nil, newErrGetWorkspaceMembersReadPermissionFailed(params.UserID, params.WorkspaceID)
+		return nil, errs.NewCasbinEnforcerError(err)
 	}
-	if !viewAllowed {
-		return nil, newErrGetWorkspaceMembersNoPermission(params.UserID, params.WorkspaceID)
+	if !readAllowed {
+		return nil, errs.NewMemberHasNoPermission(params.UserID, params.WorkspaceID, WorkspacePermissionRead.String())
 	}
 
 	rules, err := h.enforcer.GetFilteredGroupingPolicy(2, formatWorkspace(params.WorkspaceID))
 	if err != nil {
-		return nil, newErrGetWorkspaceMembersGetFailed(params.WorkspaceID)
+		return nil, errs.NewCasbinInternalError(err)
 	}
 
-	members := make([]WorkspaceMember, 0, len(rules))
+	members := make([]*WorkspaceMember, 0, len(rules))
 	for _, rule := range rules {
 		if len(rule) != 3 {
-			return nil, newErrGetWorkspaceMembersInvalidRule(params.WorkspaceID)
+			return nil, errs.NewCasbinPolicySignatureInvalid(fmt.Sprintf("expected 3 elements in grouping policy rule, got %d", len(rule)))
 		}
 		userID, err := userFromFormat(rule[0])
 		if err != nil {
-			return nil, newErrGetWorkspaceMembersInvalidUser(params.WorkspaceID)
+			return nil, errs.NewInvalidUserFormat(rule[0], err)
 		}
-		members = append(members, WorkspaceMember{
+		members = append(members, &WorkspaceMember{
 			ID:   userID,
 			Role: WorkspaceRole(rule[1]),
 		})
 	}
 	return members, nil
-}
-
-var (
-	ErrCodeGetWorkspaceMembersReadPermissionFailed = "GetWorkspaceMembers_1"
-	ErrCodeGetWorkspaceMembersNoPermission         = "GetWorkspaceMembers_2"
-	ErrCodeGetWorkspaceMembersGetFailed            = "GetWorkspaceMembers_3"
-	ErrCodeGetWorkspaceMembersInvalidRule          = "GetWorkspaceMembers_4"
-	ErrCodeGetWorkspaceMembersInvalidUser          = "GetWorkspaceMembers_5"
-)
-
-func newErrGetWorkspaceMembersReadPermissionFailed(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewInternal(
-		fmt.Sprintf("Failed to check read permission for user %q on workspace %q", userID, workspaceID.String()),
-		ErrCodeGetWorkspaceMembersReadPermissionFailed,
-		nil,
-	)
-}
-
-func newErrGetWorkspaceMembersNoPermission(userID string, workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewForbidden(
-		fmt.Sprintf("User %q does not have permission to view workspace %q members", userID, workspaceID.String()),
-		ErrCodeGetWorkspaceMembersNoPermission,
-		nil,
-	)
-}
-
-func newErrGetWorkspaceMembersGetFailed(workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewInternal(
-		fmt.Sprintf("Failed to get workspace members for workspace %q", workspaceID.String()),
-		ErrCodeGetWorkspaceMembersGetFailed,
-		nil,
-	)
-}
-
-func newErrGetWorkspaceMembersInvalidRule(workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewInternal(
-		fmt.Sprintf("Invalid policy rule found for workspace %q", workspaceID.String()),
-		ErrCodeGetWorkspaceMembersInvalidRule,
-		nil,
-	)
-}
-
-func newErrGetWorkspaceMembersInvalidUser(workspaceID uuid.UUID) *commonerror.Err {
-	return commonerror.NewInternal(
-		fmt.Sprintf("Invalid user format in policy rule for workspace %q", workspaceID.String()),
-		ErrCodeGetWorkspaceMembersInvalidUser,
-		nil,
-	)
 }

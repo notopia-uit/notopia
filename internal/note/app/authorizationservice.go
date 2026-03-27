@@ -76,5 +76,5 @@ type AuthorizationService interface {
 		ctx context.Context,
 		userID string,
 		workspaceID uuid.UUID,
-	) ([]WorkspaceMemberInfo, errs.Error)
+	) ([]*WorkspaceMemberInfo, errs.Error)
 }

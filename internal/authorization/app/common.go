@@ -5,6 +5,7 @@ import (
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/authorization/errs"
 )
 
 type WorkspacePermission string
@@ -82,7 +83,7 @@ func hasWorkspacePermission(
 		permission.String(),
 	)
 	if err != nil {
-		return false, fmt.Errorf("failed to check workspace permission for user %s on workspace %s: %w", userID, workspaceID, err)
+		return false, errs.NewCasbinEnforcerError(err)
 	}
 	return ok, nil
 }
