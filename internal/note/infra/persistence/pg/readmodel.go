@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/app/query"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
@@ -24,22 +24,23 @@ func NewReadModel(queries *pgsqlc.Queries) *ReadModel {
 var ProvideReadModel = NewReadModel
 
 var (
-	_ app.GetWorkspaceTreeReadModel         = (*ReadModel)(nil)
-	_ app.ShowTrashReadModel                = (*ReadModel)(nil)
-	_ app.GetNoteGraphReadModel             = (*ReadModel)(nil)
-	_ app.GetNoteLinksReadModel             = (*ReadModel)(nil)
-	_ app.GetWorkspaceBySlugReadModel       = (*ReadModel)(nil)
-	_ app.GetWorkspaceGraphReadModel        = (*ReadModel)(nil)
-	_ app.CheckWorkspaceSlugExistsReadModel = (*ReadModel)(nil)
+	_ query.GetWorkspaceTreeReadModel         = (*ReadModel)(nil)
+	_ query.ShowTrashReadModel                = (*ReadModel)(nil)
+	_ query.GetNoteGraphReadModel             = (*ReadModel)(nil)
+	_ query.GetNoteLinksReadModel             = (*ReadModel)(nil)
+	_ query.GetWorkspaceBySlugReadModel       = (*ReadModel)(nil)
+	_ query.GetWorkspaceGraphReadModel        = (*ReadModel)(nil)
+	_ query.CheckWorkspaceSlugExistsReadModel = (*ReadModel)(nil)
+	_ query.GetNoteReadModel                  = (*ReadModel)(nil)
 )
 
-func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, errs.Error) {
+func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *query.GetWorkspaceTree) (*query.WorkspaceTreeFolder, errs.Error) {
 	workspace, err := r.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
-		ID: &q.ID,
+		ID: &q.WorkspaceID,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewWorkspaceNotFound(q.ID, err)
+			return nil, errs.NewWorkspaceNotFound(q.WorkspaceID, err)
 		}
 		return nil, toDomainError(err)
 	}
@@ -83,19 +84,19 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 	return tree, nil
 }
 
-func (r *ReadModel) buildFolderTreeFromMap(folder pgsqlc.Folder, folderMap map[uuid.UUID]*pgsqlc.Folder, notesByFolder map[uuid.UUID][]*pgsqlc.Note) *app.WorkspaceTreeFolder {
-	result := app.WorkspaceTreeFolder{
+func (r *ReadModel) buildFolderTreeFromMap(folder pgsqlc.Folder, folderMap map[uuid.UUID]*pgsqlc.Folder, notesByFolder map[uuid.UUID][]*pgsqlc.Note) *query.WorkspaceTreeFolder {
+	result := query.WorkspaceTreeFolder{
 		ID:        folder.ID,
 		Name:      folder.Name,
 		Icon:      folder.Icon,
 		UpdatedAt: folder.UpdatedAt,
-		Notes:     []*app.WorkspaceTreeNote{},
-		Children:  []*app.WorkspaceTreeFolder{},
+		Notes:     []*query.WorkspaceTreeNote{},
+		Children:  []*query.WorkspaceTreeFolder{},
 	}
 
 	if notes, ok := notesByFolder[folder.ID]; ok {
 		for _, note := range notes {
-			result.Notes = append(result.Notes, &app.WorkspaceTreeNote{
+			result.Notes = append(result.Notes, &query.WorkspaceTreeNote{
 				ID:        note.ID,
 				Name:      note.Name,
 				Icon:      note.Icon,
@@ -114,7 +115,7 @@ func (r *ReadModel) buildFolderTreeFromMap(folder pgsqlc.Folder, folderMap map[u
 	return &result
 }
 
-func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash, errs.Error) {
+func (r *ReadModel) ShowTrash(ctx context.Context, q *query.ShowTrash) (*query.Trash, errs.Error) {
 	trashedNotes, err := r.queries.GetTrashedNotesByWorkspaceID(ctx, q.WorkspaceID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toDomainError(err)
@@ -128,9 +129,9 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 		return nil, toDomainError(err)
 	}
 
-	notes := make([]*app.TrashedNote, len(trashedNotes))
+	notes := make([]*query.TrashedNote, len(trashedNotes))
 	for i, note := range trashedNotes {
-		notes[i] = &app.TrashedNote{
+		notes[i] = &query.TrashedNote{
 			ID:        note.ID,
 			Name:      note.Name,
 			TrashedBy: domain.TrashedByPurpose,
@@ -138,9 +139,9 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 		}
 	}
 
-	folders := make([]*app.TrashedFolder, len(trashedFolders))
+	folders := make([]*query.TrashedFolder, len(trashedFolders))
 	for i, folder := range trashedFolders {
-		folders[i] = &app.TrashedFolder{
+		folders[i] = &query.TrashedFolder{
 			ID:        folder.ID,
 			Name:      folder.Name,
 			TrashedBy: domain.TrashedByPurpose,
@@ -148,13 +149,13 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 		}
 	}
 
-	return &app.Trash{
+	return &query.Trash{
 		Notes:   notes,
 		Folders: folders,
 	}, nil
 }
 
-func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app.NoteLinkResult, errs.Error) {
+func (r *ReadModel) GetNoteLinks(ctx context.Context, q *query.GetNoteLinks) (*query.NoteLinkResult, errs.Error) {
 	_, err := r.queries.GetNote(ctx, q.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -163,9 +164,9 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 		return nil, toDomainError(err)
 	}
 
-	result := app.NoteLinkResult{
-		OutgoingLinks: []*app.NoteLink{},
-		Backlinks:     []*app.NoteLink{},
+	result := query.NoteLinkResult{
+		OutgoingLinks: []*query.NoteLink{},
+		Backlinks:     []*query.NoteLink{},
 	}
 
 	if q.OutgoingLinks {
@@ -182,7 +183,7 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 				return nil, toDomainError(err)
 			}
 			for _, linkedNote := range outgoingNotes {
-				result.OutgoingLinks = append(result.OutgoingLinks, &app.NoteLink{
+				result.OutgoingLinks = append(result.OutgoingLinks, &query.NoteLink{
 					ID:   linkedNote.ID,
 					Name: linkedNote.Name,
 					Icon: linkedNote.Icon,
@@ -203,7 +204,7 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 				return nil, toDomainError(err)
 			}
 			for _, linkedNote := range backlinkNotes {
-				result.Backlinks = append(result.Backlinks, &app.NoteLink{
+				result.Backlinks = append(result.Backlinks, &query.NoteLink{
 					ID:   linkedNote.ID,
 					Name: linkedNote.Name,
 					Icon: linkedNote.Icon,
@@ -215,7 +216,7 @@ func (r *ReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app
 	return &result, nil
 }
 
-func (r *ReadModel) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceBySlug) (*app.Workspace, errs.Error) {
+func (r *ReadModel) GetWorkspaceBySlug(ctx context.Context, q *query.GetWorkspaceBySlug) (*query.Workspace, errs.Error) {
 	workspace, err := r.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
 		Slug: &q.Slug,
 	})
@@ -226,25 +227,25 @@ func (r *ReadModel) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceB
 		return nil, toDomainError(err)
 	}
 
-	return &app.Workspace{
+	return &query.Workspace{
 		ID:   workspace.ID,
 		Slug: workspace.Slug,
 		Name: workspace.Name,
 	}, nil
 }
 
-func (r *ReadModel) CheckWorkspaceSlugExists(ctx context.Context, q *app.CheckWorkspaceSlugExists) (*app.CheckWorkspaceSlugExistsResult, errs.Error) {
+func (r *ReadModel) CheckWorkspaceSlugExists(ctx context.Context, q *query.CheckWorkspaceSlugExists) (*query.CheckWorkspaceSlugExistsResult, errs.Error) {
 	exists, err := r.queries.CheckSlugExists(ctx, q.Slug)
 	if err != nil {
 		return nil, toDomainError(err)
 	}
 
-	return &app.CheckWorkspaceSlugExistsResult{
+	return &query.CheckWorkspaceSlugExistsResult{
 		Exists: exists,
 	}, nil
 }
 
-func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, errs.Error) {
+func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *query.GetWorkspaceGraph) (*query.Graph, errs.Error) {
 	notes, err := r.queries.GetNotesInWorkspace(ctx, &pgsqlc.GetNotesInWorkspaceParams{
 		WorkspaceID: q.ID,
 	})
@@ -265,7 +266,7 @@ func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGr
 	return buildGraph(notes, links, reachableIDs), nil
 }
 
-func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app.Graph, errs.Error) {
+func (r *ReadModel) GetNoteGraph(ctx context.Context, q *query.GetNoteGraph) (*query.Graph, errs.Error) {
 	workspaceID, err := r.queries.GetWorkspaceIDByNoteID(ctx, q.ID)
 	if err != nil {
 		return nil, toDomainError(err)
@@ -338,7 +339,7 @@ func calculateGraphWeight(size, minSize, maxSize int32) *float64 {
 	return &w
 }
 
-func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map[string]bool) *app.Graph {
+func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map[string]bool) *query.Graph {
 	var minSize int32 = math.MaxInt32
 	var maxSize int32 = -1
 	reachableNotesMap := make(map[uuid.UUID]*pgsqlc.Note)
@@ -355,17 +356,17 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 		}
 	}
 
-	var graphNodes []*app.GraphNode
-	var graphLinks []*app.GraphLink
+	var graphNodes []*query.GraphNode
+	var graphLinks []*query.GraphLink
 	tagsAdded := make(map[string]bool)
 
 	// 2. Build Nodes (Notes and Tags)
 	for _, n := range reachableNotesMap {
 		// Add Note Node
-		graphNodes = append(graphNodes, &app.GraphNode{
+		graphNodes = append(graphNodes, &query.GraphNode{
 			ID:     n.ID.String(),
 			Name:   n.Name,
-			Type:   app.GraphNodeTypeNote,
+			Type:   query.GraphNodeTypeNote,
 			Weight: calculateGraphWeight(n.Size, minSize, maxSize),
 		})
 
@@ -374,17 +375,17 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 
 			if reachableIDs[tagID] {
 				if !tagsAdded[tagID] {
-					graphNodes = append(graphNodes, &app.GraphNode{
+					graphNodes = append(graphNodes, &query.GraphNode{
 						ID:     tagID,
 						Name:   tag,
-						Type:   app.GraphNodeTypeTag,
+						Type:   query.GraphNodeTypeTag,
 						Weight: nil,
 					})
 					tagsAdded[tagID] = true
 				}
 
 				// Add structural link for Note -> Tag
-				graphLinks = append(graphLinks, &app.GraphLink{
+				graphLinks = append(graphLinks, &query.GraphLink{
 					Source: n.ID.String(),
 					Target: tagID,
 				})
@@ -395,15 +396,19 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 	// 3. Build Note -> Note Links (filtering out unreachable ones)
 	for _, l := range links {
 		if reachableIDs[l.SourceID.String()] && reachableIDs[l.TargetID.String()] {
-			graphLinks = append(graphLinks, &app.GraphLink{
+			graphLinks = append(graphLinks, &query.GraphLink{
 				Source: l.SourceID.String(),
 				Target: l.TargetID.String(),
 			})
 		}
 	}
 
-	return &app.Graph{
+	return &query.Graph{
 		Nodes: graphNodes,
 		Links: graphLinks,
 	}
+}
+
+func (r *ReadModel) GetNote(ctx context.Context, q *query.GetNote) (*query.Note, errs.Error) {
+	return nil, nil
 }

@@ -2,10 +2,10 @@ package service
 
 import (
 	"github.com/goforj/wire"
-	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/app/service"
 )
 
 var ProviderSet = wire.NewSet(
 	ProvideAuthorization,
-	wire.Bind(new(app.AuthorizationService), new(*Authorization)),
+	wire.Bind(new(service.Authorization), new(*Authorization)),
 )

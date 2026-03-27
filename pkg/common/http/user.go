@@ -67,8 +67,10 @@ func GatewayUserAuth() gin.HandlerFunc {
 		rawRoles := c.GetHeader("X-Forwarded-Roles")
 
 		user := &User{
-			ID:    id,
-			Email: email,
+			ID:     id,
+			Email:  email,
+			Groups: nil,
+			Roles:  nil,
 		}
 
 		user.Groups.UnmarshalHeader(rawGroups)

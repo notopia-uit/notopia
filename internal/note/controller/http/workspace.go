@@ -10,11 +10,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
-
-	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/app/command"
+	"github.com/notopia-uit/notopia/internal/note/app/query"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
+	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 )
 
 func (h *StrictHandler) CreateWorkspace(
@@ -25,7 +25,7 @@ func (h *StrictHandler) CreateWorkspace(
 	if err != nil {
 		return nil, errs.NewInternal("failed to generate UUIDv7 for new workspace", err)
 	}
-	cmd := &app.CreateWorkspace{
+	cmd := &command.CreateWorkspace{
 		ID:   id,
 		Name: request.Body.Name,
 		Slug: request.Body.Slug,
@@ -51,7 +51,7 @@ func (h *StrictHandler) DeleteWorkspace(
 		return nil, err
 	}
 
-	cmd := &app.DeleteWorkspace{
+	cmd := &command.DeleteWorkspace{
 		ID:     request.WorkspaceId,
 		UserID: user.ID,
 	}
@@ -67,7 +67,7 @@ func (h *StrictHandler) GetWorkspace(
 	ctx context.Context,
 	request note.GetWorkspaceRequestObject,
 ) (note.GetWorkspaceResponseObject, error) {
-	query := &app.GetWorkspaceBySlug{
+	query := &query.GetWorkspaceBySlug{
 		Slug: request.WorkspaceSlug,
 	}
 	result, err := h.App.GetWorkspaceHandler.Handle(ctx, query)
@@ -83,7 +83,7 @@ func (h *StrictHandler) CheckWorkspaceSlugExists(
 	ctx context.Context,
 	request note.CheckWorkspaceSlugExistsRequestObject,
 ) (note.CheckWorkspaceSlugExistsResponseObject, error) {
-	query := &app.CheckWorkspaceSlugExists{
+	query := &query.CheckWorkspaceSlugExists{
 		Slug: request.WorkspaceSlug,
 	}
 	result, err := h.App.CheckWorkspaceSlugExistsHandler.Handle(ctx, query)
@@ -182,7 +182,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 	ctx context.Context,
 	request note.GetWorkspaceGraphRequestObject,
 ) (note.GetWorkspaceGraphResponseObject, error) {
-	query := &app.GetWorkspaceGraph{
+	query := &query.GetWorkspaceGraph{
 		ID:     request.WorkspaceId,
 		Orphan: request.Params.Orphan,
 	}
@@ -235,7 +235,7 @@ func (h *StrictHandler) MoveWorkspaceItems(
 		destFolderID = *request.Body.DestinationFolderId
 	}
 
-	cmd := &app.MoveWorkspaceItems{
+	cmd := &command.MoveWorkspaceItems{
 		UserID:              user.ID,
 		WorkspaceID:         request.WorkspaceId,
 		NoteIDs:             noteIDs,
@@ -266,7 +266,7 @@ func (h *StrictHandler) RenameWorkspace(
 		return nil, err
 	}
 
-	cmd := &app.RenameWorkspace{
+	cmd := &command.RenameWorkspace{
 		ID:     request.WorkspaceId,
 		Name:   request.Body.Name,
 		UserID: user.ID,
@@ -290,7 +290,7 @@ func (h *StrictHandler) ShowTrash(
 	ctx context.Context,
 	request note.ShowTrashRequestObject,
 ) (note.ShowTrashResponseObject, error) {
-	query := &app.ShowTrash{
+	query := &query.ShowTrash{
 		WorkspaceID: request.WorkspaceId,
 	}
 	result, err := h.App.ShowTrashHandler.Handle(ctx, query)
@@ -327,7 +327,7 @@ func (h *StrictHandler) TrashWorkspaceItems(
 		}
 	}
 
-	cmd := &app.TrashWorkspaceItems{
+	cmd := &command.TrashWorkspaceItems{
 		WorkspaceID: request.WorkspaceId,
 		UserID:      user.ID,
 		NoteIDs:     noteIDs,
@@ -345,8 +345,8 @@ func (h *StrictHandler) GetWorkspaceTree(
 	ctx context.Context,
 	request note.GetWorkspaceTreeRequestObject,
 ) (note.GetWorkspaceTreeResponseObject, error) {
-	query := &app.GetWorkspaceTree{
-		ID: request.WorkspaceId,
+	query := &query.GetWorkspaceTree{
+		WorkspaceID: request.WorkspaceId,
 	}
 	result, err := h.App.GetWorkspaceTreeHandler.Handle(ctx, query)
 	if err != nil {
@@ -383,7 +383,7 @@ func (h *StrictHandler) PermanentlyDeleteWorkspaceItems(
 		folderIDs = *request.Body.FolderIds
 	}
 
-	cmd := &app.PermanentlyDeleteWorkspaceItems{
+	cmd := &command.PermanentlyDeleteWorkspaceItems{
 		WorkspaceID: request.WorkspaceId,
 		UserID:      user.ID,
 		NoteIDs:     noteIDs,
