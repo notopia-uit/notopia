@@ -9,7 +9,6 @@ import (
 	"github.com/alexliesenfeld/health"
 	httpCheck "github.com/hellofresh/health-go/v4/checks/http"
 	"github.com/notopia-uit/notopia/internal/note/app"
-	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/config"
 )
 
@@ -20,7 +19,7 @@ type Health struct {
 func New(
 	persistence app.Persistence,
 	serverCfg *config.Server,
-	workspaceEventPubSub pubsub.WorkspaceEvent,
+	workspaceEventPubSub app.WorkspaceEventPubSub,
 ) *Health {
 	startupChecker := health.NewChecker(
 		health.WithCheck(

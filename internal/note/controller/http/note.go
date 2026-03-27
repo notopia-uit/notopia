@@ -4,8 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/app/command"
-	"github.com/notopia-uit/notopia/internal/note/app/query"
+	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
@@ -25,7 +24,7 @@ func (h *StrictHandler) CreateNote(
 		return nil, errs.NewInternal("failed to generate UUIDv7 for new note", err)
 	}
 
-	cmd := &command.CreateNote{
+	cmd := &app.CreateNote{
 		ID:       id,
 		Name:     request.Body.Name,
 		Icon:     request.Body.Icon,
@@ -61,7 +60,7 @@ func (h *StrictHandler) DeleteNote(
 		return nil, err
 	}
 
-	cmd := &command.DeleteNote{
+	cmd := &app.DeleteNote{
 		ID:     request.NoteId,
 		UserID: user.ID,
 	}
@@ -89,7 +88,7 @@ func (h *StrictHandler) GetNoteGraph(
 		depth = *request.Params.Depth
 	}
 
-	query := &query.GetNoteGraph{
+	query := &app.GetNoteGraph{
 		ID:    request.NoteId,
 		Depth: depth,
 	}
@@ -109,7 +108,7 @@ func (h *StrictHandler) GetNoteLinks(
 ) (note.GetNoteLinksResponseObject, error) {
 	outgoingLinks := request.Params.OutgoingLinks != nil && *request.Params.OutgoingLinks
 	backlinks := request.Params.Backlinks != nil && *request.Params.Backlinks
-	query := &query.GetNoteLinks{
+	query := &app.GetNoteLinks{
 		ID:            request.NoteId,
 		OutgoingLinks: outgoingLinks,
 		Backlinks:     backlinks,
@@ -139,7 +138,7 @@ func (h *StrictHandler) RenameNote(
 		return nil, err
 	}
 
-	cmd := &command.RenameNote{
+	cmd := &app.RenameNote{
 		ID:     request.NoteId,
 		Name:   request.Body.Name,
 		UserID: user.ID,

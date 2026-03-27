@@ -3,81 +3,74 @@ package app
 import (
 	"context"
 	"fmt"
-
-	"github.com/notopia-uit/notopia/internal/note/app/command"
-	"github.com/notopia-uit/notopia/internal/note/app/event"
-	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
-	"github.com/notopia-uit/notopia/internal/note/app/query"
 )
 
 type App struct {
-	CreateNoteHandler                      *command.CreateNoteHandler
-	CreateFolderHandler                    *command.CreateFolderHandler
-	CreateWorkspaceHandler                 *command.CreateWorkspaceHandler
-	DeleteNoteHandler                      *command.DeleteNoteHandler
-	DeleteFolderHandler                    *command.DeleteFolderHandler
-	DeleteWorkspaceHandler                 *command.DeleteWorkspaceHandler
-	GenerateDailyNoteHandler               *command.GenerateDailyNoteHandler
-	MoveWorkspaceItemsHandler              *command.MoveWorkspaceItemsHandler
-	PermanentlyDeleteWorkspaceItemsHandler *command.PermanentlyDeleteWorkspaceItemsHandler
-	PublishNoteHandler                     *command.PublishNoteHandler
-	PublishWorkspaceHandler                *command.PublishWorkspaceHandler
-	RenameFolderHandler                    *command.RenameFolderHandler
-	RenameNoteHandler                      *command.RenameNoteHandler
-	RenameWorkspaceHandler                 *command.RenameWorkspaceHandler
-	RestoreTrashedWorkspaceItemsHandler    *command.RestoreTrashedWorkspaceItemsHandler
-	TrashWorkspaceItemsHandler             *command.TrashWorkspaceItemsHandler
-	UnpublishNoteHandler                   *command.UnpublishNoteHandler
-	UnpublishWorkspaceHandler              *command.UnpublishWorkspaceHandler
-	UpdateWorkspaceMembersHandler          *command.UpdateWorkspaceMembersHandler
+	CreateNoteHandler                      *CreateNoteHandler
+	CreateFolderHandler                    *CreateFolderHandler
+	CreateWorkspaceHandler                 *CreateWorkspaceHandler
+	DeleteNoteHandler                      *DeleteNoteHandler
+	DeleteFolderHandler                    *DeleteFolderHandler
+	DeleteWorkspaceHandler                 *DeleteWorkspaceHandler
+	GenerateDailyNoteHandler               *GenerateDailyNoteHandler
+	MoveWorkspaceItemsHandler              *MoveWorkspaceItemsHandler
+	PermanentlyDeleteWorkspaceItemsHandler *PermanentlyDeleteWorkspaceItemsHandler
+	PublishNoteHandler                     *PublishNoteHandler
+	PublishWorkspaceHandler                *PublishWorkspaceHandler
+	RenameFolderHandler                    *RenameFolderHandler
+	RenameNoteHandler                      *RenameNoteHandler
+	RenameWorkspaceHandler                 *RenameWorkspaceHandler
+	RestoreTrashedWorkspaceItemsHandler    *RestoreTrashedWorkspaceItemsHandler
+	TrashWorkspaceItemsHandler             *TrashWorkspaceItemsHandler
+	UnpublishNoteHandler                   *UnpublishNoteHandler
+	UnpublishWorkspaceHandler              *UnpublishWorkspaceHandler
+	UpdateWorkspaceMembersHandler          *UpdateWorkspaceMembersHandler
 
-	CheckWorkspaceSlugExistsHandler *query.CheckWorkspaceSlugExistsHandler
-	GetNoteHandler                  *query.GetNoteHandler
-	GetNoteGraphHandler             *query.GetNoteGraphHandler
-	GetNoteLinksHandler             *query.GetNoteLinksHandler
-	GetWorkspaceHandler             *query.GetWorkspaceHandler
-	GetWorkspaceGraphHandler        *query.GetWorkspaceGraphHandler
-	GetWorkspaceMembersHandler      *query.GetWorkspaceMembersHandler
-	GetWorkspaceTreeHandler         *query.GetWorkspaceTreeHandler
-	ShowTrashHandler                *query.ShowTrashHandler
+	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler
+	GetNoteGraphHandler             *GetNoteGraphHandler
+	GetNoteLinksHandler             *GetNoteLinksHandler
+	GetWorkspaceHandler             *GetWorkspaceHandler
+	GetWorkspaceGraphHandler        *GetWorkspaceGraphHandler
+	GetWorkspaceMembersHandler      *GetWorkspaceMembersHandler
+	GetWorkspaceTreeHandler         *GetWorkspaceTreeHandler
+	ShowTrashHandler                *ShowTrashHandler
 
-	DocumentCommittedHandler *event.DocumentCommittedHandler
+	DocumentCommittedHandler *DocumentCommittedHandler
 
-	workspaceEventPubSub pubsub.WorkspaceEvent
+	workspaceEventPubSub WorkspaceEventPubSub
 	persistence          Persistence
 }
 
 func NewApp(
-	createNoteHandler *command.CreateNoteHandler,
-	createFolderHandler *command.CreateFolderHandler,
-	createWorkspaceHandler *command.CreateWorkspaceHandler,
-	deleteNoteHandler *command.DeleteNoteHandler,
-	deleteFolderHandler *command.DeleteFolderHandler,
-	deleteWorkspaceHandler *command.DeleteWorkspaceHandler,
-	generateDailyNoteHandler *command.GenerateDailyNoteHandler,
-	moveWorkspaceItemsHandler *command.MoveWorkspaceItemsHandler,
-	permanentlyDeleteWorkspaceItemsHandler *command.PermanentlyDeleteWorkspaceItemsHandler,
-	publishNoteHandler *command.PublishNoteHandler,
-	publishWorkspaceHandler *command.PublishWorkspaceHandler,
-	renameFolderHandler *command.RenameFolderHandler,
-	renameNoteHandler *command.RenameNoteHandler,
-	renameWorkspaceHandler *command.RenameWorkspaceHandler,
-	restoreTrashedWorkspaceItemsHandler *command.RestoreTrashedWorkspaceItemsHandler,
-	trashWorkspaceItemsHandler *command.TrashWorkspaceItemsHandler,
-	unpublishNoteHandler *command.UnpublishNoteHandler,
-	unpublishWorkspaceHandler *command.UnpublishWorkspaceHandler,
-	updateWorkspaceMembersHandler *command.UpdateWorkspaceMembersHandler,
-	checkWorkspaceSlugExistsHandler *query.CheckWorkspaceSlugExistsHandler,
-	getNoteHandler *query.GetNoteHandler,
-	getNoteGraphHandler *query.GetNoteGraphHandler,
-	getNoteLinksHandler *query.GetNoteLinksHandler,
-	getWorkspaceHandler *query.GetWorkspaceHandler,
-	getWorkspaceGraphHandler *query.GetWorkspaceGraphHandler,
-	getWorkspaceMembersHandler *query.GetWorkspaceMembersHandler,
-	getWorkspaceTreeHandler *query.GetWorkspaceTreeHandler,
-	showTrashHandler *query.ShowTrashHandler,
-	documentCommittedHandler *event.DocumentCommittedHandler,
-	workspaceEventPubSub pubsub.WorkspaceEvent,
+	createNoteHandler *CreateNoteHandler,
+	createFolderHandler *CreateFolderHandler,
+	createWorkspaceHandler *CreateWorkspaceHandler,
+	deleteNoteHandler *DeleteNoteHandler,
+	deleteFolderHandler *DeleteFolderHandler,
+	deleteWorkspaceHandler *DeleteWorkspaceHandler,
+	generateDailyNoteHandler *GenerateDailyNoteHandler,
+	moveWorkspaceItemsHandler *MoveWorkspaceItemsHandler,
+	permanentlyDeleteWorkspaceItemsHandler *PermanentlyDeleteWorkspaceItemsHandler,
+	publishNoteHandler *PublishNoteHandler,
+	publishWorkspaceHandler *PublishWorkspaceHandler,
+	renameFolderHandler *RenameFolderHandler,
+	renameNoteHandler *RenameNoteHandler,
+	renameWorkspaceHandler *RenameWorkspaceHandler,
+	restoreTrashedWorkspaceItemsHandler *RestoreTrashedWorkspaceItemsHandler,
+	trashWorkspaceItemsHandler *TrashWorkspaceItemsHandler,
+	unpublishNoteHandler *UnpublishNoteHandler,
+	unpublishWorkspaceHandler *UnpublishWorkspaceHandler,
+	updateWorkspaceMembersHandler *UpdateWorkspaceMembersHandler,
+	checkWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler,
+	getNoteGraphHandler *GetNoteGraphHandler,
+	getNoteLinksHandler *GetNoteLinksHandler,
+	getWorkspaceHandler *GetWorkspaceHandler,
+	getWorkspaceGraphHandler *GetWorkspaceGraphHandler,
+	getWorkspaceMembersHandler *GetWorkspaceMembersHandler,
+	getWorkspaceTreeHandler *GetWorkspaceTreeHandler,
+	showTrashHandler *ShowTrashHandler,
+	documentCommittedHandler *DocumentCommittedHandler,
+	workspaceEventPubSub WorkspaceEventPubSub,
 	persistence Persistence,
 ) *App {
 	return &App{
@@ -101,7 +94,6 @@ func NewApp(
 		UnpublishWorkspaceHandler:              unpublishWorkspaceHandler,
 		UpdateWorkspaceMembersHandler:          updateWorkspaceMembersHandler,
 		CheckWorkspaceSlugExistsHandler:        checkWorkspaceSlugExistsHandler,
-		GetNoteHandler:                         getNoteHandler,
 		GetNoteGraphHandler:                    getNoteGraphHandler,
 		GetNoteLinksHandler:                    getNoteLinksHandler,
 		GetWorkspaceHandler:                    getWorkspaceHandler,

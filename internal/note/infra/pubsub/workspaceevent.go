@@ -15,7 +15,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
+	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/redis/go-redis/v9"
@@ -104,7 +104,7 @@ type WorkspaceEvent struct {
 	hubPubSub      *WorkspaceEventHubPubSub
 }
 
-var _ pubsub.WorkspaceEvent = (*WorkspaceEvent)(nil)
+var _ app.WorkspaceEventPubSub = (*WorkspaceEvent)(nil)
 
 func NewWorkspaceEvent(
 	internalPubSub *WorkspaceEventInternalPubSub,

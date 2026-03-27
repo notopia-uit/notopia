@@ -11,9 +11,6 @@ import (
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
-	"github.com/notopia-uit/notopia/internal/note/app/command"
-	"github.com/notopia-uit/notopia/internal/note/app/event"
-	"github.com/notopia-uit/notopia/internal/note/app/query"
 	"github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
@@ -96,40 +93,39 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	workspaceEventHubPubSub := pubsub.NewWorkspaceEventHubPubSub(loggerAdapter)
 	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalPubSub, workspaceEventHubPubSub)
-	createNoteHandler := command.NewCreateNoteHandler(authorization, pgNote, folder, workspaceEvent)
-	createFolderHandler := command.NewCreateFolderHandler(authorization, folder, workspaceEvent)
+	createNoteHandler := app.NewCreateNoteHandler(authorization, pgNote, folder, workspaceEvent)
+	createFolderHandler := app.NewCreateFolderHandler(authorization, folder, workspaceEvent)
 	workspace := pg.NewNoTransactionWorkspace(pool, queries, db)
 	unitOfWork := pg.NewUnitOfWork(queries, db)
-	createWorkspaceHandler := command.NewCreateWorkspaceHandler(workspace, folder, unitOfWork)
-	deleteNoteHandler := command.NewDeleteNoteHandler(authorization, pgNote)
-	deleteFolderHandler := command.NewDeleteFolderHandler(authorization, folder)
-	deleteWorkspaceHandler := command.NewDeleteWorkspaceHandler(authorization, workspace)
-	generateDailyNoteHandler := command.NewGenerateDailyNoteHandler(pgNote, folder, workspace)
-	moveWorkspaceItemsHandler := command.NewMoveWorkspaceItemsHandler(authorization, pgNote, folder, unitOfWork, workspaceEvent)
-	permanentlyDeleteWorkspaceItemsHandler := command.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, pgNote, folder)
-	publishNoteHandler := command.NewPublishNoteHandler(pgNote)
-	publishWorkspaceHandler := command.NewPublishWorkspaceHandler(workspace)
-	renameFolderHandler := command.NewRenameFolderHandler(authorization, folder)
-	renameNoteHandler := command.NewRenameNoteHandler(authorization, pgNote)
-	renameWorkspaceHandler := command.NewRenameWorkspaceHandler(authorization, workspace)
+	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspace, folder, unitOfWork)
+	deleteNoteHandler := app.NewDeleteNoteHandler(authorization, pgNote)
+	deleteFolderHandler := app.NewDeleteFolderHandler(authorization, folder)
+	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, workspace)
+	generateDailyNoteHandler := app.NewGenerateDailyNoteHandler(pgNote, folder, workspace)
+	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, pgNote, folder, unitOfWork, workspaceEvent)
+	permanentlyDeleteWorkspaceItemsHandler := app.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, pgNote, folder)
+	publishNoteHandler := app.NewPublishNoteHandler(pgNote)
+	publishWorkspaceHandler := app.NewPublishWorkspaceHandler(workspace)
+	renameFolderHandler := app.NewRenameFolderHandler(authorization, folder)
+	renameNoteHandler := app.NewRenameNoteHandler(authorization, pgNote)
+	renameWorkspaceHandler := app.NewRenameWorkspaceHandler(authorization, workspace)
 	trashService := domain.NewTrashService()
-	restoreTrashedWorkspaceItemsHandler := command.NewRestoreTrashedWorkspaceItemsHandler(pgNote, folder, trashService)
-	trashWorkspaceItemsHandler := command.NewTrashWorkspaceItemsHandler(authorization, unitOfWork, trashService, workspaceEvent)
-	unpublishNoteHandler := command.NewUnpublishNoteHandler(pgNote)
-	unpublishWorkspaceHandler := command.NewUnpublishWorkspaceHandler(workspace)
-	updateWorkspaceMembersHandler := command.NewUpdateWorkspaceMembersHandler()
+	restoreTrashedWorkspaceItemsHandler := app.NewRestoreTrashedWorkspaceItemsHandler(pgNote, folder, trashService)
+	trashWorkspaceItemsHandler := app.NewTrashWorkspaceItemsHandler(authorization, unitOfWork, trashService, workspaceEvent)
+	unpublishNoteHandler := app.NewUnpublishNoteHandler(pgNote)
+	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
+	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler()
 	readModel := pg.NewReadModel(queries)
-	checkWorkspaceSlugExistsHandler := query.NewCheckWorkspaceSlugExistsHandler(readModel)
-	getNoteHandler := query.NewGetNoteHandler(authorization, pgNote, readModel)
-	getNoteGraphHandler := query.NewGetNoteGraphHandler(readModel)
-	getNoteLinksHandler := query.NewGetNoteLinksHandler(readModel)
-	getWorkspaceHandler := query.NewGetWorkspaceBySlugHandler(readModel)
-	getWorkspaceGraphHandler := query.NewGetWorkspaceGraphHandler(readModel)
-	getWorkspaceMembersHandler := query.NewGetWorkspaceMembersHandler()
-	getWorkspaceTreeHandler := query.NewGetWorkspaceTreeHandler(readModel)
-	showTrashHandler := query.NewShowTrashHandler(readModel)
+	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(readModel)
+	getNoteGraphHandler := app.NewGetNoteGraphHandler(readModel)
+	getNoteLinksHandler := app.NewGetNoteLinksHandler(readModel)
+	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(readModel)
+	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(readModel)
+	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler()
+	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(readModel)
+	showTrashHandler := app.NewShowTrashHandler(readModel)
 	noteService := domain.NewNoteService()
-	documentCommittedHandler := event.NewDocumentCommittedHandler(pgNote, noteService)
+	documentCommittedHandler := app.NewDocumentCommittedHandler(pgNote, noteService)
 	provider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
 		cleanup5()
@@ -148,7 +144,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	appApp := app.NewApp(createNoteHandler, createFolderHandler, createWorkspaceHandler, deleteNoteHandler, deleteFolderHandler, deleteWorkspaceHandler, generateDailyNoteHandler, moveWorkspaceItemsHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler, checkWorkspaceSlugExistsHandler, getNoteHandler, getNoteGraphHandler, getNoteLinksHandler, getWorkspaceHandler, getWorkspaceGraphHandler, getWorkspaceMembersHandler, getWorkspaceTreeHandler, showTrashHandler, documentCommittedHandler, workspaceEvent, persistencePg)
+	appApp := app.NewApp(createNoteHandler, createFolderHandler, createWorkspaceHandler, deleteNoteHandler, deleteFolderHandler, deleteWorkspaceHandler, generateDailyNoteHandler, moveWorkspaceItemsHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler, checkWorkspaceSlugExistsHandler, getNoteGraphHandler, getNoteLinksHandler, getWorkspaceHandler, getWorkspaceGraphHandler, getWorkspaceMembersHandler, getWorkspaceTreeHandler, showTrashHandler, documentCommittedHandler, workspaceEvent, persistencePg)
 	server := &configConfig.Server
 	strictHandler := http.NewStrictHandler(appApp, server, workspaceEvent)
 	serverInterface := http.NewHandler(strictHandler)

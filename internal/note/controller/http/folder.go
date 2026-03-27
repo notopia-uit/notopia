@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/app/command"
+	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
@@ -25,7 +25,7 @@ func (h *StrictHandler) CreateFolder(
 	if err != nil {
 		return nil, errs.NewInternal("failed to generate UUIDv7 for new folder", err)
 	}
-	cmd := &command.CreateFolder{
+	cmd := &app.CreateFolder{
 		ID:          id,
 		Name:        body.Name,
 		Icon:        body.Icon,
@@ -54,7 +54,7 @@ func (h *StrictHandler) DeleteFolder(
 		return nil, err
 	}
 
-	cmd := &command.DeleteFolder{
+	cmd := &app.DeleteFolder{
 		ID:     request.FolderId,
 		UserID: user.ID,
 	}
@@ -76,7 +76,7 @@ func (h *StrictHandler) RenameFolder(
 
 	body := request.Body
 
-	cmd := &command.RenameFolder{
+	cmd := &app.RenameFolder{
 		ID:     request.FolderId,
 		Name:   body.Name,
 		UserID: user.ID,

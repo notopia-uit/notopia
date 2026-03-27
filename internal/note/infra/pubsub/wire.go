@@ -2,7 +2,7 @@ package pubsub
 
 import (
 	"github.com/goforj/wire"
-	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
+	"github.com/notopia-uit/notopia/internal/note/app"
 )
 
 var ProviderSet = wire.NewSet(
@@ -14,5 +14,5 @@ var ProviderSet = wire.NewSet(
 	ProvideWorkspaceEvent,
 	ProvideWorkspaceEventHubPubSub,
 	ProvideWorkspaceEventInternalPubSub,
-	wire.Bind(new(pubsub.WorkspaceEvent), new(*WorkspaceEvent)),
+	wire.Bind(new(app.WorkspaceEventPubSub), new(*WorkspaceEvent)),
 )

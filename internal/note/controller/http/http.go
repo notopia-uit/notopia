@@ -11,7 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/notopia-uit/notopia/internal/note/app"
-	"github.com/notopia-uit/notopia/internal/note/app/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
@@ -25,7 +24,7 @@ type (
 type StrictHandler struct {
 	App                  *app.App
 	ServerURL            string
-	WorkspaceEventPubSub pubsub.WorkspaceEvent
+	WorkspaceEventPubSub app.WorkspaceEventPubSub
 }
 
 var _ IStrictHandler = (*StrictHandler)(nil)
@@ -33,7 +32,7 @@ var _ IStrictHandler = (*StrictHandler)(nil)
 func NewStrictHandler(
 	app *app.App,
 	cfg *config.Server,
-	workspaceEventPubSub pubsub.WorkspaceEvent,
+	workspaceEventPubSub app.WorkspaceEventPubSub,
 ) *StrictHandler {
 	return &StrictHandler{
 		App:                  app,
