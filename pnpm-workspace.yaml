@@ -14,7 +14,7 @@ catalog:
   '@aws-sdk/s3-request-presigner': 3.1008.0
   '@blocknote/core': 0.47.3
   '@blocknote/react': 0.47.3
-  '@blocknote/server-util': 0.47.2
+  '@blocknote/server-util': 0.47.3
   '@blocknote/shadcn': 0.47.2
   '@bufbuild/buf': 1.64.0
   '@bufbuild/protobuf': 2.11.0
