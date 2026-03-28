@@ -7,10 +7,11 @@ func (c Code) String() string {
 }
 
 const (
-	CodeForbidden     Code = "forbidden"
-	CodeInvalid       Code = "invalid"
-	CodeUnimplemented Code = "unimplemented"
-	CodeInternal      Code = "internal"
+	CodeForbidden          Code = "forbidden"
+	CodeInvalid            Code = "invalid"
+	CodeUnimplemented      Code = "unimplemented"
+	CodeInternal           Code = "internal"
+	CodeInternalGenerateID Code = "internalGenerateId"
 )
 
 type Error interface {
@@ -79,6 +80,16 @@ func NewInternal(message string, err error) *Internal {
 		Err: Err{
 			message: message,
 			code:    CodeInternal,
+			err:     err,
+		},
+	}
+}
+
+func NewInternalGenerateID(err error) *Internal {
+	return &Internal{
+		Err: Err{
+			message: "failed to generate ID",
+			code:    CodeInternalGenerateID,
 			err:     err,
 		},
 	}

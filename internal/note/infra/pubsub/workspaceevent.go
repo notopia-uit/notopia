@@ -22,9 +22,9 @@ import (
 )
 
 const (
-	MetadataWorkspaceIDKey = "workspace_id"
-	MetadataUserIDKey      = "user_id"
-	MetadataEventTypeKey   = "event_type"
+	MetadataWorkspaceIDKey = "workspaceId"
+	metadataUserIDKey      = "userId"
+	metadataEventTypeKey   = "eventType"
 )
 
 type WorkspaceEventInternalPubSub struct {
@@ -140,8 +140,8 @@ func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, use
 		}
 		msg := message.NewMessage(watermill.NewUUID(), payload)
 		msg.Metadata.Set(MetadataWorkspaceIDKey, fmt.Sprintf("%v", workspaceID))
-		msg.Metadata.Set(MetadataUserIDKey, userID)
-		msg.Metadata.Set(MetadataEventTypeKey, string(event.EventType()))
+		msg.Metadata.Set(metadataUserIDKey, userID)
+		msg.Metadata.Set(metadataEventTypeKey, domain.GetEventType(event).String())
 		msg.SetContext(ctx)
 		msgs = append(msgs, msg)
 	}
@@ -183,19 +183,28 @@ func (w *WorkspaceEvent) Subscribe(
 				if !ok {
 					return
 				}
-				if msg.Metadata.Get(MetadataUserIDKey) != userID {
+				if msg.Metadata.Get(metadataUserIDKey) != userID {
 					msg.Ack()
 					continue
 				}
-				eventType := msg.Metadata.Get(MetadataEventTypeKey)
+				eventType := msg.Metadata.Get(metadataEventTypeKey)
 				if eventType == "" {
-					slog.ErrorContext(ctx, "missing event type in message metadata", slog.String("workspace_id", workspaceID.String()), slog.String("user_id", userID))
+					slog.ErrorContext(
+						ctx, "missing event type in message metadata",
+						slog.String("workspace_id", workspaceID.String()),
+						slog.String("user_id", userID),
+					)
 					msg.Ack()
 					continue
 				}
 				event, ok := domain.NewEmptyFromEventType(eventType)
 				if !ok {
-					slog.ErrorContext(ctx, "unknown event type in message metadata", slog.String("event_type", eventType), slog.String("workspace_id", workspaceID.String()), slog.String("user_id", userID))
+					slog.ErrorContext(
+						ctx, "unknown event type in message metadata",
+						slog.String("event_type", eventType),
+						slog.String("workspace_id", workspaceID.String()),
+						slog.String("user_id", userID),
+					)
 					msg.Ack()
 					continue
 				}

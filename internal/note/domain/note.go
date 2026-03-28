@@ -79,12 +79,14 @@ func (n *Note) Name() string {
 func (n *Note) Rename(name string) {
 	n.name = name
 	n.AddEvent(&NoteUpdatedEvent{
-		ID:       n.id,
-		Name:     n.name,
-		Icon:     n.icon,
-		Tags:     n.tags,
-		Size:     n.size,
-		FolderID: n.folderID,
+		BaseEvent:     *NewBaseEvent(),
+		AggregateID:   n.id,
+		Name:          n.name,
+		Icon:          n.icon,
+		Tags:          n.tags,
+		Size:          n.size,
+		FolderID:      n.folderID,
+		OutgoingLinks: n.outgoingLinks,
 	})
 }
 
@@ -95,12 +97,14 @@ func (n *Note) Icon() *string {
 func (n *Note) SetIcon(icon string) {
 	n.icon = &icon
 	n.AddEvent(&NoteUpdatedEvent{
-		ID:       n.id,
-		Name:     n.name,
-		Icon:     n.icon,
-		Tags:     n.tags,
-		Size:     n.size,
-		FolderID: n.folderID,
+		BaseEvent:     *NewBaseEvent(),
+		AggregateID:   n.id,
+		Name:          n.name,
+		Icon:          n.icon,
+		Tags:          n.tags,
+		Size:          n.size,
+		FolderID:      n.folderID,
+		OutgoingLinks: n.outgoingLinks,
 	})
 }
 
@@ -111,12 +115,14 @@ func (n *Note) Tags() []string {
 func (n *Note) SetTags(tags []string) {
 	n.tags = tags
 	n.AddEvent(&NoteUpdatedEvent{
-		ID:       n.id,
-		Name:     n.name,
-		Icon:     n.icon,
-		Tags:     n.tags,
-		Size:     n.size,
-		FolderID: n.folderID,
+		BaseEvent:     *NewBaseEvent(),
+		AggregateID:   n.id,
+		Name:          n.name,
+		Icon:          n.icon,
+		Tags:          n.tags,
+		Size:          n.size,
+		FolderID:      n.folderID,
+		OutgoingLinks: n.outgoingLinks,
 	})
 }
 
@@ -127,12 +133,14 @@ func (n *Note) Size() uint64 {
 func (n *Note) SetSize(size uint64) {
 	n.size = size
 	n.AddEvent(&NoteUpdatedEvent{
-		ID:       n.id,
-		Name:     n.name,
-		Icon:     n.icon,
-		Tags:     n.tags,
-		Size:     n.size,
-		FolderID: n.folderID,
+		BaseEvent:     *NewBaseEvent(),
+		AggregateID:   n.id,
+		Name:          n.name,
+		Icon:          n.icon,
+		Tags:          n.tags,
+		Size:          n.size,
+		FolderID:      n.folderID,
+		OutgoingLinks: n.outgoingLinks,
 	})
 }
 
@@ -143,8 +151,9 @@ func (n *Note) FolderID() uuid.UUID {
 func (n *Note) MoveToFolder(folderID uuid.UUID) {
 	n.folderID = folderID
 	n.AddEvent(&NoteMovedEvent{
-		Id:       n.id,
-		FolderId: n.folderID,
+		BaseEvent:   *NewBaseEvent(),
+		AggregateID: n.id,
+		FolderID:    n.folderID,
 	})
 }
 
@@ -155,12 +164,14 @@ func (n *Note) OutgoingLinks() uuid.UUIDs {
 func (n *Note) SetOutgoingLinks(outgoingLinks uuid.UUIDs) {
 	n.outgoingLinks = outgoingLinks
 	n.AddEvent(&NoteUpdatedEvent{
-		ID:       n.id,
-		Name:     n.name,
-		Icon:     n.icon,
-		Tags:     n.tags,
-		Size:     n.size,
-		FolderID: n.folderID,
+		BaseEvent:     *NewBaseEvent(),
+		AggregateID:   n.id,
+		Name:          n.name,
+		Icon:          n.icon,
+		Tags:          n.tags,
+		Size:          n.size,
+		FolderID:      n.folderID,
+		OutgoingLinks: n.outgoingLinks,
 	})
 }
 
@@ -195,7 +206,8 @@ func (n *Note) Trash(trashedBy TrashedBy) errs.Error {
 	}
 	n.trashed = NewTrashed(trashedBy, time.Now())
 	n.AddEvent(&NoteTrashedEvent{
-		Id: n.id,
+		BaseEvent:   *NewBaseEvent(),
+		AggregateID: n.id,
 	})
 	return nil
 }
@@ -203,7 +215,8 @@ func (n *Note) Trash(trashedBy TrashedBy) errs.Error {
 func (n *Note) Restore() {
 	n.trashed = nil
 	n.AddEvent(&NoteRestoredEvent{
-		Id: n.id,
+		BaseEvent:   *NewBaseEvent(),
+		AggregateID: n.id,
 	})
 }
 

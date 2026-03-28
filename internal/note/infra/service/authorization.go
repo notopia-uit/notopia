@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"connectrpc.com/connect"
+	"connectrpc.com/otelconnect"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
@@ -38,17 +40,22 @@ var _ app.AuthorizationService = (*Authorization)(nil)
 
 func NewAuthorization(
 	servicesCfg *config.Services,
-) *Authorization {
+) (*Authorization, error) {
+	otelInterceptor, err := otelconnect.NewInterceptor()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create OpenTelemetry interceptor: %w", err)
+	}
 	client := pbconnect.NewAuthorizationServiceClient(
 		http.DefaultClient,
 		servicesCfg.Authorization.URL,
 		connect.WithInterceptors(
 			NewClientErrorInterceptor(),
+			otelInterceptor,
 		),
 	)
 	return &Authorization{
 		client: client,
-	}
+	}, nil
 }
 
 var ProvideAuthorization = NewAuthorization

@@ -13,7 +13,7 @@ func workspaceEventToDTO(event domain.Event) (any, bool) {
 		dto = &note.FolderCreatedEvent{
 			Data: note.FolderCreatedEventData{
 				Icon: e.Icon,
-				Id:   &e.Id,
+				Id:   &e.AggregateID,
 				Name: e.Name,
 			},
 			Type: note.FolderCreatedEventTypeFolderCreatedEvent,
@@ -21,14 +21,14 @@ func workspaceEventToDTO(event domain.Event) (any, bool) {
 	case *domain.FolderDeletedEvent:
 		dto = &note.FolderDeletedEvent{
 			Data: note.FolderDeletedEventData{
-				Id: &e.Id,
+				Id: &e.AggregateID,
 			},
 			Type: note.FolderDeletedEventTypeFolderDeletedEvent,
 		}
 	case *domain.FolderUpdatedEvent:
 		dto = &note.FolderUpdatedEvent{
 			Data: note.FolderUpdatedEventData{
-				Id:   &e.ID,
+				Id:   &e.AggregateID,
 				Name: e.Name,
 				Icon: e.Icon,
 			},
@@ -37,36 +37,36 @@ func workspaceEventToDTO(event domain.Event) (any, bool) {
 	case *domain.FolderMovedEvent:
 		dto = &note.FolderMovedEvent{
 			Data: note.FolderMovedEventData{
-				Id:       &e.Id,
-				ParentId: &e.ParentId,
+				Id:       &e.AggregateID,
+				ParentId: &e.ParentID,
 			},
 			Type: note.FolderMovedEventTypeFolderMovedEvent,
 		}
 	case *domain.FolderTrashedEvent:
 		dto = &note.FolderTrashedEvent{
 			Data: note.FolderTrashedEventData{
-				Id: &e.Id,
+				Id: &e.AggregateID,
 			},
 			Type: note.FolderTrashedEventTypeFolderTrashedEvent,
 		}
 	case *domain.FolderRestoredEvent:
 		dto = &note.FolderRestoredEvent{
 			Data: note.FolderRestoredEventData{
-				Id: &e.Id,
+				Id: &e.AggregateID,
 			},
 			Type: note.FolderRestoredEventTypeFolderRestoredEvent,
 		}
 	case *domain.FolderPermanentlyDeletedEvent:
 		dto = &note.FolderPermanentlyDeletedEvent{
 			Data: note.FolderPermanentlyDeletedEventData{
-				Id: &e.Id,
+				Id: &e.AggregateID,
 			},
 			Type: note.FolderPermanentlyDeletedEventTypeFolderPermanentlyDeletedEvent,
 		}
 	case *domain.NoteCreatedEvent:
 		dto = &note.NoteCreatedEvent{
 			Data: note.NoteCreatedEventData{
-				Id:   &e.Id,
+				Id:   &e.AggregateID,
 				Name: e.Name,
 				Icon: e.Icon,
 			},
@@ -75,14 +75,14 @@ func workspaceEventToDTO(event domain.Event) (any, bool) {
 	case *domain.NoteDeletedEvent:
 		dto = &note.NoteDeletedEvent{
 			Data: note.NoteDeletedEventData{
-				Id: &e.Id,
+				Id: &e.AggregateID,
 			},
 			Type: note.NoteDeletedEventTypeNoteDeletedEvent,
 		}
 	case *domain.NoteUpdatedEvent:
 		dto = &note.NoteUpdatedEvent{
 			Data: note.Note{
-				Id:       &e.ID,
+				Id:       &e.AggregateID,
 				Name:     e.Name,
 				Icon:     e.Icon,
 				Tags:     e.Tags,
@@ -93,36 +93,36 @@ func workspaceEventToDTO(event domain.Event) (any, bool) {
 	case *domain.NoteMovedEvent:
 		dto = &note.NoteMovedEvent{
 			Data: note.NoteMovedEventData{
-				Id:       &e.Id,
-				FolderId: &e.FolderId,
+				Id:       &e.AggregateID,
+				FolderId: &e.FolderID,
 			},
 			Type: note.NoteMovedEventTypeNoteMovedEvent,
 		}
 	case *domain.NoteTrashedEvent:
 		dto = &note.NoteTrashedEvent{
 			Data: note.NoteTrashedEventData{
-				Id: &e.Id,
+				Id: &e.AggregateID,
 			},
 			Type: note.NoteTrashedEventTypeNoteTrashedEvent,
 		}
 	case *domain.NoteRestoredEvent:
 		dto = &note.NoteRestoredEvent{
 			Data: note.NoteRestoredEventData{
-				Id: &e.Id,
+				Id: &e.AggregateID,
 			},
 			Type: note.NoteRestoredEventTypeNoteRestoredEvent,
 		}
 	case *domain.NotePermanentlyDeletedEvent:
 		dto = &note.NotePermanentlyDeletedEvent{
 			Data: note.NotePermanentlyDeletedEventData{
-				Id: &e.Id,
+				Id: &e.AggregateID,
 			},
 			Type: note.NotePermanentlyDeletedEventTypeNotePermanentlyDeletedEvent,
 		}
 	case *domain.WorkspaceUpdatedEvent:
 		dto = &note.WorkspaceUpdatedEvent{
 			Data: note.Workspace{
-				Id:   &e.Id,
+				Id:   &e.AggregateID,
 				Name: e.Name,
 				Slug: e.Slug,
 			},
@@ -131,7 +131,7 @@ func workspaceEventToDTO(event domain.Event) (any, bool) {
 	case *domain.WorkspaceDeletedEvent:
 		dto = &note.WorkspaceDeletedEvent{
 			Data: note.WorkspaceDeletedEventData{
-				Id: &e.Id,
+				Id: &e.AggregateID,
 			},
 			Type: note.WorkspaceDeletedEventTypeWorkspaceDeletedEvent,
 		}

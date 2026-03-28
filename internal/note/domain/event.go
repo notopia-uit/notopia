@@ -1,178 +1,205 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type EventType string
 
 var (
-	TypeUnspecified EventType = "UnspecifiedEvent"
+	EventTypeUnspecified EventType = "UnspecifiedEvent"
 
-	TypeFolderCreated            EventType = "FolderCreatedEvent"
-	TypeFolderDeleted            EventType = "FolderDeletedEvent"
-	TypeFolderUpdated            EventType = "FolderUpdatedEvent"
-	TypeFolderMoved              EventType = "FolderMovedEvent"
-	TypeFolderTrashed            EventType = "FolderTrashedEvent"
-	TypeFolderRestored           EventType = "FolderRestoredEvent"
-	TypeFolderPermanentlyDeleted EventType = "FolderPermanentlyDeletedEvent"
+	EventTypeFolderCreated            EventType = "FolderCreatedEvent"
+	EventTypeFolderDeleted            EventType = "FolderDeletedEvent"
+	EventTypeFolderUpdated            EventType = "FolderUpdatedEvent"
+	EventTypeFolderMoved              EventType = "FolderMovedEvent"
+	EventTypeFolderTrashed            EventType = "FolderTrashedEvent"
+	EventTypeFolderRestored           EventType = "FolderRestoredEvent"
+	EventTypeFolderPermanentlyDeleted EventType = "FolderPermanentlyDeletedEvent"
 
-	TypeNoteCreated            EventType = "NoteCreatedEvent"
-	TypeNoteDeleted            EventType = "NoteDeletedEvent"
-	TypeNoteUpdated            EventType = "NoteUpdatedEvent"
-	TypeNoteMoved              EventType = "NoteMovedEvent"
-	TypeNoteTrashed            EventType = "NoteTrashedEvent"
-	TypeNoteRestored           EventType = "NoteRestoredEvent"
-	TypeNotePermanentlyDeleted EventType = "NotePermanentlyDeletedEvent"
+	EventTypeNoteCreated            EventType = "NoteCreatedEvent"
+	EventTypeNoteDeleted            EventType = "NoteDeletedEvent"
+	EventTypeNoteUpdated            EventType = "NoteUpdatedEvent"
+	EventTypeNoteMoved              EventType = "NoteMovedEvent"
+	EventTypeNoteTrashed            EventType = "NoteTrashedEvent"
+	EventTypeNoteRestored           EventType = "NoteRestoredEvent"
+	EventTypeNotePermanentlyDeleted EventType = "NotePermanentlyDeletedEvent"
 
-	TypeWorkspaceUpdated EventType = "WorkspaceUpdatedEvent"
-	TypeWorkspaceDeleted EventType = "WorkspaceDeletedEvent"
+	EventTypeWorkspaceUpdated EventType = "WorkspaceUpdatedEvent"
+	EventTypeWorkspaceDeleted EventType = "WorkspaceDeletedEvent"
 )
 
 func (t EventType) String() string {
 	return string(t)
 }
 
-type Event interface {
-	EventType() EventType
+type Event any
+
+type BaseEvent struct {
+	ID         uuid.UUID
+	OccurredAt time.Time
+}
+
+func NewBaseEvent() *BaseEvent {
+	return &BaseEvent{
+		ID:         uuid.New(),
+		OccurredAt: time.Now(),
+	}
+}
+
+func GetEventType(e Event) EventType {
+	if e == nil {
+		return EventTypeUnspecified
+	}
+	switch e.(type) {
+	case *FolderCreatedEvent:
+		return EventTypeFolderCreated
+	case *FolderDeletedEvent:
+		return EventTypeFolderDeleted
+	case *FolderUpdatedEvent:
+		return EventTypeFolderUpdated
+	case *FolderMovedEvent:
+		return EventTypeFolderMoved
+	case *FolderTrashedEvent:
+		return EventTypeFolderTrashed
+	case *FolderRestoredEvent:
+		return EventTypeFolderRestored
+	case *FolderPermanentlyDeletedEvent:
+		return EventTypeFolderPermanentlyDeleted
+	case *NoteCreatedEvent:
+		return EventTypeNoteCreated
+	case *NoteDeletedEvent:
+		return EventTypeNoteDeleted
+	case *NoteUpdatedEvent:
+		return EventTypeNoteUpdated
+	case *NoteMovedEvent:
+		return EventTypeNoteMoved
+	case *NoteTrashedEvent:
+		return EventTypeNoteTrashed
+	case *NoteRestoredEvent:
+		return EventTypeNoteRestored
+	case *NotePermanentlyDeletedEvent:
+		return EventTypeNotePermanentlyDeleted
+	case *WorkspaceUpdatedEvent:
+		return EventTypeWorkspaceUpdated
+	case *WorkspaceDeletedEvent:
+		return EventTypeWorkspaceDeleted
+	default:
+		return EventTypeUnspecified
+	}
 }
 
 func NewEmptyFromEventType(eventType string) (Event, bool) {
 	var concreteEvent Event
 	switch EventType(eventType) {
-	case TypeFolderCreated:
-		concreteEvent = *new(FolderCreatedEvent)
-	case TypeFolderDeleted:
-		concreteEvent = *new(FolderDeletedEvent)
-	case TypeFolderUpdated:
-		concreteEvent = *new(FolderUpdatedEvent)
-	case TypeFolderMoved:
-		concreteEvent = *new(FolderMovedEvent)
-	case TypeFolderTrashed:
-		concreteEvent = *new(FolderTrashedEvent)
-	case TypeFolderRestored:
-		concreteEvent = *new(FolderRestoredEvent)
-	case TypeFolderPermanentlyDeleted:
-		concreteEvent = *new(FolderPermanentlyDeletedEvent)
-	case TypeNoteCreated:
-		concreteEvent = *new(NoteCreatedEvent)
-	case TypeNoteDeleted:
-		concreteEvent = *new(NoteDeletedEvent)
-	case TypeNoteUpdated:
-		concreteEvent = *new(NoteUpdatedEvent)
-	case TypeNoteMoved:
-		concreteEvent = *new(NoteMovedEvent)
-	case TypeNoteTrashed:
-		concreteEvent = *new(NoteTrashedEvent)
-	case TypeNoteRestored:
-		concreteEvent = *new(NoteRestoredEvent)
-	case TypeNotePermanentlyDeleted:
-		concreteEvent = *new(NotePermanentlyDeletedEvent)
-	case TypeWorkspaceUpdated:
-		concreteEvent = *new(WorkspaceUpdatedEvent)
-	case TypeWorkspaceDeleted:
-		concreteEvent = *new(WorkspaceDeletedEvent)
+	case EventTypeFolderCreated:
+		//exhaustruct:ignore
+		concreteEvent = &FolderCreatedEvent{}
+	case EventTypeFolderDeleted:
+		//exhaustruct:ignore
+		concreteEvent = &FolderDeletedEvent{}
+	case EventTypeFolderUpdated:
+		//exhaustruct:ignore
+		concreteEvent = &FolderUpdatedEvent{}
+	case EventTypeFolderMoved:
+		//exhaustruct:ignore
+		concreteEvent = &FolderMovedEvent{}
+	case EventTypeFolderTrashed:
+		//exhaustruct:ignore
+		concreteEvent = &FolderTrashedEvent{}
+	case EventTypeFolderRestored:
+		//exhaustruct:ignore
+		concreteEvent = &FolderRestoredEvent{}
+	case EventTypeFolderPermanentlyDeleted:
+		//exhaustruct:ignore
+		concreteEvent = &FolderPermanentlyDeletedEvent{}
+	case EventTypeNoteCreated:
+		//exhaustruct:ignore
+		concreteEvent = &NoteCreatedEvent{}
+	case EventTypeNoteDeleted:
+		//exhaustruct:ignore
+		concreteEvent = &NoteDeletedEvent{}
+	case EventTypeNoteUpdated:
+		//exhaustruct:ignore
+		concreteEvent = &NoteUpdatedEvent{}
+	case EventTypeNoteMoved:
+		//exhaustruct:ignore
+		concreteEvent = &NoteMovedEvent{}
+	case EventTypeNoteTrashed:
+		//exhaustruct:ignore
+		concreteEvent = &NoteTrashedEvent{}
+	case EventTypeNoteRestored:
+		//exhaustruct:ignore
+		concreteEvent = &NoteRestoredEvent{}
+	case EventTypeNotePermanentlyDeleted:
+		//exhaustruct:ignore
+		concreteEvent = &NotePermanentlyDeletedEvent{}
+	case EventTypeWorkspaceUpdated:
+		//exhaustruct:ignore
+		concreteEvent = &WorkspaceUpdatedEvent{}
+	case EventTypeWorkspaceDeleted:
+		//exhaustruct:ignore
+		concreteEvent = &WorkspaceDeletedEvent{}
 	}
 	return concreteEvent, concreteEvent != nil
 }
 
 type FolderCreatedEvent struct {
-	Id   uuid.UUID
-	Name string
-	Icon *string
-}
-
-var _ Event = (*FolderCreatedEvent)(nil)
-
-func (e FolderCreatedEvent) EventType() EventType {
-	return TypeFolderCreated
+	BaseEvent
+	AggregateID uuid.UUID
+	Name        string
+	Icon        *string
 }
 
 type FolderDeletedEvent struct {
-	Id uuid.UUID
-}
-
-var _ Event = (*FolderDeletedEvent)(nil)
-
-func (e FolderDeletedEvent) EventType() EventType {
-	return TypeFolderDeleted
+	BaseEvent
+	AggregateID uuid.UUID
 }
 
 type FolderUpdatedEvent struct {
-	ID   uuid.UUID
-	Name string
-	Icon *string
-}
-
-var _ Event = (*FolderUpdatedEvent)(nil)
-
-func (e FolderUpdatedEvent) EventType() EventType {
-	return TypeFolderUpdated
+	BaseEvent
+	AggregateID uuid.UUID
+	Name        string
+	Icon        *string
 }
 
 type NoteCreatedEvent struct {
-	Id   uuid.UUID
-	Name string
-	Icon *string
+	BaseEvent
+	AggregateID uuid.UUID
+	Name        string
+	Icon        *string
 }
 
 type FolderMovedEvent struct {
-	Id       uuid.UUID
-	ParentId uuid.UUID
-}
-
-var _ Event = (*FolderMovedEvent)(nil)
-
-func (e FolderMovedEvent) EventType() EventType {
-	return TypeFolderMoved
+	BaseEvent
+	AggregateID uuid.UUID
+	ParentID    uuid.UUID
 }
 
 type FolderTrashedEvent struct {
-	Id uuid.UUID
-}
-
-var _ Event = (*FolderTrashedEvent)(nil)
-
-func (e FolderTrashedEvent) EventType() EventType {
-	return TypeFolderTrashed
+	BaseEvent
+	AggregateID uuid.UUID
 }
 
 type FolderRestoredEvent struct {
-	Id uuid.UUID
-}
-
-var _ Event = (*FolderRestoredEvent)(nil)
-
-func (e FolderRestoredEvent) EventType() EventType {
-	return TypeFolderRestored
+	BaseEvent
+	AggregateID uuid.UUID
 }
 
 type FolderPermanentlyDeletedEvent struct {
-	Id uuid.UUID
-}
-
-var _ Event = (*FolderPermanentlyDeletedEvent)(nil)
-
-func (e FolderPermanentlyDeletedEvent) EventType() EventType {
-	return TypeFolderPermanentlyDeleted
-}
-
-var _ Event = (*NoteCreatedEvent)(nil)
-
-func (e NoteCreatedEvent) EventType() EventType {
-	return TypeNoteCreated
+	BaseEvent
+	AggregateID uuid.UUID
 }
 
 type NoteDeletedEvent struct {
-	Id uuid.UUID
+	BaseEvent
+	AggregateID uuid.UUID
 }
-
-var _ Event = (*NoteDeletedEvent)(nil)
-
-func (e NoteDeletedEvent) EventType() EventType {
-	return TypeNoteDeleted
-}
-
 type NoteUpdatedEvent struct {
-	ID            uuid.UUID
+	BaseEvent
+	AggregateID   uuid.UUID
 	Name          string
 	Icon          *string
 	Tags          []string
@@ -181,71 +208,35 @@ type NoteUpdatedEvent struct {
 	OutgoingLinks uuid.UUIDs
 }
 
-var _ Event = (*NoteUpdatedEvent)(nil)
-
-func (e NoteUpdatedEvent) EventType() EventType {
-	return TypeNoteUpdated
-}
-
 type NoteMovedEvent struct {
-	Id       uuid.UUID
-	FolderId uuid.UUID
-}
-
-var _ Event = (*NoteMovedEvent)(nil)
-
-func (e NoteMovedEvent) EventType() EventType {
-	return TypeNoteMoved
+	BaseEvent
+	AggregateID uuid.UUID
+	FolderID    uuid.UUID
 }
 
 type NoteTrashedEvent struct {
-	Id uuid.UUID
-}
-
-var _ Event = (*NoteTrashedEvent)(nil)
-
-func (e NoteTrashedEvent) EventType() EventType {
-	return TypeNoteTrashed
+	BaseEvent
+	AggregateID uuid.UUID
 }
 
 type NoteRestoredEvent struct {
-	Id uuid.UUID
-}
-
-var _ Event = (*NoteRestoredEvent)(nil)
-
-func (e NoteRestoredEvent) EventType() EventType {
-	return TypeNoteRestored
+	BaseEvent
+	AggregateID uuid.UUID
 }
 
 type NotePermanentlyDeletedEvent struct {
-	Id uuid.UUID
-}
-
-var _ Event = (*NotePermanentlyDeletedEvent)(nil)
-
-func (e NotePermanentlyDeletedEvent) EventType() EventType {
-	return TypeNotePermanentlyDeleted
+	BaseEvent
+	AggregateID uuid.UUID
 }
 
 type WorkspaceUpdatedEvent struct {
-	Id   uuid.UUID
-	Name string
-	Slug string
-}
-
-var _ Event = (*WorkspaceUpdatedEvent)(nil)
-
-func (e WorkspaceUpdatedEvent) EventType() EventType {
-	return TypeWorkspaceUpdated
+	BaseEvent
+	AggregateID uuid.UUID
+	Name        string
+	Slug        string
 }
 
 type WorkspaceDeletedEvent struct {
-	Id uuid.UUID
-}
-
-var _ Event = (*WorkspaceDeletedEvent)(nil)
-
-func (e WorkspaceDeletedEvent) EventType() EventType {
-	return TypeWorkspaceDeleted
+	BaseEvent
+	AggregateID uuid.UUID
 }

@@ -143,7 +143,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 				}
 				dto, ok := workspaceEventToDTO(event)
 				if !ok {
-					slog.WarnContext(c, "skipping unsupported workspace event type in workspace events stream", slog.String("event_type", event.EventType().String()))
+					slog.WarnContext(c, "skipping unsupported workspace event type in workspace events stream")
 					continue
 				}
 				eventBytes, err := json.Marshal(dto)

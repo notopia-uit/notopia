@@ -65,7 +65,13 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, meterProvider, tracerProvider)
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc)
 	services := &configConfig.Services
-	authorization := service.NewAuthorization(services)
+	authorization, err := service.NewAuthorization(services)
+	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	sql := &configConfig.Database
 	pool, cleanup4, err := pg.NewPgPool(ctx, tracerProvider, sql)
 	if err != nil {
