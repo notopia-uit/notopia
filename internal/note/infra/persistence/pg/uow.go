@@ -42,7 +42,10 @@ func NewUnitOfWork(queries *pgsqlc.Queries, sdb *sql.DB) *UnitOfWork {
 
 var ProvideUnitOfWork = NewUnitOfWork
 
-func (u *UnitOfWork) Execute(ctx context.Context, fn func(repoRegistry domain.RepoRegistry) errs.Error) (cerr errs.Error) {
+func (u *UnitOfWork) Execute(
+	ctx context.Context,
+	fn func(repoRegistry domain.RepoRegistry) errs.Error,
+) (cerr errs.Error) {
 	conn, err := u.sdb.Conn(ctx)
 	if err != nil {
 		return errs.NewPersistenceInternal("failed to get connection from pool", err)

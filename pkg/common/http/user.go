@@ -2,10 +2,10 @@ package commonhttp
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	commonerror "github.com/notopia-uit/notopia/pkg/common/error"
 )
 
 type UserList []string
@@ -43,18 +43,10 @@ func UserFromContext(ctx context.Context) (*User, bool) {
 	return u, ok
 }
 
-func NewUserNotFoundInHeaderError() error {
-	return commonerror.NewUnauthorized(
-		"User not found in request headers",
-		"USER_NOT_FOUND_IN_HEADER",
-		nil,
-	)
-}
-
 func UserFromContextError(ctx context.Context) (*User, error) {
 	u, ok := UserFromContext(ctx)
 	if !ok {
-		return nil, NewUserNotFoundInHeaderError()
+		return nil, fmt.Errorf("user not found in context")
 	}
 	return u, nil
 }
