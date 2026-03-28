@@ -23,7 +23,7 @@ func (h *StrictHandler) CreateFolder(
 
 	id, err := uuid.NewV7()
 	if err != nil {
-		return nil, errs.NewInternal("failed to generate UUIDv7 for new folder", err)
+		return nil, errs.NewInternalGenerateID(err)
 	}
 	cmd := &app.CreateFolder{
 		ID:          id,

@@ -23,7 +23,7 @@ func (h *StrictHandler) CreateWorkspace(
 ) (note.CreateWorkspaceResponseObject, error) {
 	id, err := uuid.NewV7()
 	if err != nil {
-		return nil, errs.NewInternal("failed to generate UUIDv7 for new workspace", err)
+		return nil, errs.NewInternalGenerateID(err)
 	}
 	cmd := &app.CreateWorkspace{
 		ID:   id,

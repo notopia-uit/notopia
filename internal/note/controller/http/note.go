@@ -21,7 +21,7 @@ func (h *StrictHandler) CreateNote(
 
 	id, err := uuid.NewV7()
 	if err != nil {
-		return nil, errs.NewInternal("failed to generate UUIDv7 for new note", err)
+		return nil, errs.NewInternalGenerateID(err)
 	}
 
 	cmd := &app.CreateNote{
