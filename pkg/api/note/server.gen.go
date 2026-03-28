@@ -100,7 +100,7 @@ type ServerInterface interface {
 	TrashWorkspaceItems(c *gin.Context, workspaceId WorkspaceIdPath)
 	// Get workspace tree
 	// (GET /note/workspaces/{workspaceId}/tree)
-	GetWorkspaceTree(c *gin.Context, workspaceId WorkspaceIdPath)
+	GetWorkspaceTree(c *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceTreeParams)
 	// Unpublish workspace
 	// (POST /note/workspaces/{workspaceId}/unpublish)
 	UnpublishWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
@@ -830,6 +830,24 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceTree(c *gin.Context) {
 
 	c.Set(Oauth2Scopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetWorkspaceTreeParams
+
+	// ------------- Required query parameter "startFolderId" -------------
+
+	if paramValue := c.Query("startFolderId"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument startFolderId is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "startFolderId", c.Request.URL.Query(), &params.StartFolderId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter startFolderId: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -837,7 +855,7 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceTree(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetWorkspaceTree(c, workspaceId)
+	siw.Handler.GetWorkspaceTree(c, workspaceId, params)
 }
 
 // UnpublishWorkspace operation middleware
@@ -2479,6 +2497,7 @@ func (response TrashWorkspaceItems500JSONResponse) VisitTrashWorkspaceItemsRespo
 
 type GetWorkspaceTreeRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	Params      GetWorkspaceTreeParams
 }
 
 type GetWorkspaceTreeResponseObject interface {
@@ -3510,10 +3529,11 @@ func (sh *strictHandler) TrashWorkspaceItems(ctx *gin.Context, workspaceId Works
 }
 
 // GetWorkspaceTree operation middleware
-func (sh *strictHandler) GetWorkspaceTree(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) GetWorkspaceTree(ctx *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceTreeParams) {
 	var request GetWorkspaceTreeRequestObject
 
 	request.WorkspaceId = workspaceId
+	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetWorkspaceTree(ctx, request.(GetWorkspaceTreeRequestObject))

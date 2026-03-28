@@ -1036,7 +1036,9 @@ export const zGetWorkspaceTreeData = z.object({
     path: z.object({
         workspaceId: zNotePropertiesId
     }),
-    query: z.never().optional()
+    query: z.object({
+        startFolderId: zNoteId
+    })
 });
 
 /**

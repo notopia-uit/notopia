@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Post, Param, Query, Req } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, Post, Param, ParseIntPipe, ParseFloatPipe, Query, Req } from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { Cookies, Headers } from '../decorators';
 import { RevisionApi } from '../api';
 import { GetRevisions200Response, RenameRevisionRequest, Revision,  } from '../models';
 
@@ -18,7 +19,7 @@ export class RevisionApiController {
   }
 
   @Get('/document/revisions')
-  getRevisions(@Query('documentId') documentId: string, @Query('page') page: number, @Query('limit') limit: number, @Req() request: Request): GetRevisions200Response | Promise<GetRevisions200Response> | Observable<GetRevisions200Response> {
+  getRevisions(@Query('documentId') documentId: string, @Query('page', new DefaultValuePipe(1)) page: number | undefined, @Query('limit', new DefaultValuePipe(20)) limit: number | undefined, @Req() request: Request): GetRevisions200Response | Promise<GetRevisions200Response> | Observable<GetRevisions200Response> {
     return this.revisionApi.getRevisions(documentId, page, limit, request);
   }
 

@@ -858,6 +858,11 @@ type TrashWorkspaceItemsJSONBody struct {
 	Notes   *[]TrashedNote   `json:"notes,omitempty"`
 }
 
+// GetWorkspaceTreeParams defines parameters for GetWorkspaceTree.
+type GetWorkspaceTreeParams struct {
+	StartFolderId Id `form:"startFolderId" json:"startFolderId"`
+}
+
 // CreateFolderJSONRequestBody defines body for CreateFolder for application/json ContentType.
 type CreateFolderJSONRequestBody = Folder
 

@@ -1467,6 +1467,14 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/workspaceIdPath"
+          },
+          {
+            "name": "startFolderId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/id"
+            }
           }
         ],
         "responses": {

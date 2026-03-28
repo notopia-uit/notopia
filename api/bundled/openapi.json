@@ -1821,6 +1821,14 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/note_workspaceIdPath"
+          },
+          {
+            "name": "startFolderId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/note_id"
+            }
           }
         ],
         "responses": {

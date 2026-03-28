@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post, Param, Query, Req } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Post, Param, ParseIntPipe, ParseFloatPipe, Query, Req } from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { Cookies, Headers } from '../decorators';
 import { DocumentApi } from '../api';
 import { GetDocumentAttachmentUploadUrl200Response,  } from '../models';
 
