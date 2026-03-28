@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"math"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -46,37 +47,59 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 		return nil, toDomainError(err)
 	}
 
-	rootFolder, err := r.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
-		WorkspaceID:  &workspace.ID,
-		IsRootFolder: true,
-		ID:           nil,
-		ParentID:     nil,
-		TrashedBy:    "",
-	})
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewWorkspaceRootFolderNotFound(workspace.ID, err)
+	var rootFolder *pgsqlc.Folder
+	var rootFolderID uuid.UUID
+
+	if q.RootFolderID != nil {
+		rootFolderID = *q.RootFolderID
+		f, err := r.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
+			ID:           &rootFolderID,
+			WorkspaceID:  &workspace.ID,
+			IsRootFolder: false,
+			ParentID:     nil,
+			TrashedBy:    "",
+		})
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return nil, errs.NewFolderNotFound(rootFolderID, err)
+			}
+			return nil, toDomainError(err)
 		}
-		return nil, toDomainError(err)
+		rootFolder = f
+	} else {
+		f, err := r.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
+			WorkspaceID:  &workspace.ID,
+			IsRootFolder: true,
+			ID:           nil,
+			ParentID:     nil,
+			TrashedBy:    "",
+		})
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return nil, errs.NewWorkspaceRootFolderNotFound(workspace.ID, err)
+			}
+			return nil, toDomainError(err)
+		}
+		rootFolder = f
+		rootFolderID = f.ID
 	}
 
-	allFolders, err := r.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		WorkspaceID: &workspace.ID,
-	})
+	recursiveFolders, err := r.queries.GetRecursiveFolderByParentID(ctx, rootFolderID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toDomainError(err)
 	}
 
-	allNotes, err := r.queries.GetNotesInWorkspace(ctx, &pgsqlc.GetNotesInWorkspaceParams{
-		WorkspaceID: workspace.ID,
-	})
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, toDomainError(err)
-	}
-
-	folderMap := make(map[uuid.UUID]*pgsqlc.Folder)
-	for _, folder := range allFolders {
+	var folderIDs []uuid.UUID
+	folderIDs = append(folderIDs, rootFolderID)
+	folderMap := make(map[uuid.UUID]*pgsqlc.GetRecursiveFolderByParentIDRow)
+	for _, folder := range recursiveFolders {
+		folderIDs = append(folderIDs, folder.ID)
 		folderMap[folder.ID] = folder
+	}
+
+	allNotes, err := r.queries.GetNotesByFolderIDs(ctx, folderIDs)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return nil, toDomainError(err)
 	}
 
 	notesByFolder := make(map[uuid.UUID][]*pgsqlc.Note)
@@ -84,21 +107,35 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 		notesByFolder[note.FolderID] = append(notesByFolder[note.FolderID], note)
 	}
 
-	tree := r.buildFolderTreeFromMap(*rootFolder, folderMap, notesByFolder)
+	tree := r.buildFolderTree(
+		rootFolder.ID,
+		rootFolder.Name,
+		rootFolder.Icon,
+		rootFolder.UpdatedAt,
+		folderMap,
+		notesByFolder,
+	)
 	return tree, nil
 }
 
-func (r *ReadModel) buildFolderTreeFromMap(folder pgsqlc.Folder, folderMap map[uuid.UUID]*pgsqlc.Folder, notesByFolder map[uuid.UUID][]*pgsqlc.Note) *app.WorkspaceTreeFolder {
+func (r *ReadModel) buildFolderTree(
+	folderID uuid.UUID,
+	folderName string,
+	folderIcon *string,
+	updatedAt time.Time,
+	folderMap map[uuid.UUID]*pgsqlc.GetRecursiveFolderByParentIDRow,
+	notesByFolder map[uuid.UUID][]*pgsqlc.Note,
+) *app.WorkspaceTreeFolder {
 	result := app.WorkspaceTreeFolder{
-		ID:        folder.ID,
-		Name:      folder.Name,
-		Icon:      folder.Icon,
-		UpdatedAt: folder.UpdatedAt,
+		ID:        folderID,
+		Name:      folderName,
+		Icon:      folderIcon,
+		UpdatedAt: updatedAt,
 		Notes:     []*app.WorkspaceTreeNote{},
 		Children:  []*app.WorkspaceTreeFolder{},
 	}
 
-	if notes, ok := notesByFolder[folder.ID]; ok {
+	if notes, ok := notesByFolder[folderID]; ok {
 		for _, note := range notes {
 			result.Notes = append(result.Notes, &app.WorkspaceTreeNote{
 				ID:        note.ID,
@@ -110,8 +147,15 @@ func (r *ReadModel) buildFolderTreeFromMap(folder pgsqlc.Folder, folderMap map[u
 	}
 
 	for _, childFolder := range folderMap {
-		if childFolder.ParentID != nil && *childFolder.ParentID == folder.ID {
-			childTree := r.buildFolderTreeFromMap(*childFolder, folderMap, notesByFolder)
+		if childFolder.ParentID != nil && *childFolder.ParentID == folderID {
+			childTree := r.buildFolderTree(
+				childFolder.ID,
+				childFolder.Name,
+				childFolder.Icon,
+				childFolder.UpdatedAt,
+				folderMap,
+				notesByFolder,
+			)
 			result.Children = append(result.Children, childTree)
 		}
 	}
