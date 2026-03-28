@@ -562,11 +562,11 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceGraph(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetWorkspaceGraphParams
 
-	// ------------- Optional query parameter "orphan" -------------
+	// ------------- Optional query parameter "includeOrphans" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "orphan", c.Request.URL.Query(), &params.Orphan, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "includeOrphans", c.Request.URL.Query(), &params.IncludeOrphans, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter orphan: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter includeOrphans: %w", err), http.StatusBadRequest)
 		return
 	}
 

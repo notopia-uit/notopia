@@ -182,9 +182,13 @@ func (h *StrictHandler) GetWorkspaceGraph(
 	ctx context.Context,
 	request note.GetWorkspaceGraphRequestObject,
 ) (note.GetWorkspaceGraphResponseObject, error) {
+	ignoreOrphans := false
+	if request.Params.IncludeOrphans != nil {
+		ignoreOrphans = !*request.Params.IncludeOrphans
+	}
 	query := &app.GetWorkspaceGraph{
-		ID:     request.WorkspaceId,
-		Orphan: request.Params.Orphan,
+		ID:            request.WorkspaceId,
+		IgnoreOrphans: ignoreOrphans,
 	}
 	result, err := h.App.QueryHandlers.GetWorkspaceGraphHandler.Handle(ctx, query)
 	if err != nil {
@@ -346,7 +350,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 	request note.GetWorkspaceTreeRequestObject,
 ) (note.GetWorkspaceTreeResponseObject, error) {
 	query := &app.GetWorkspaceTree{
-		ID:           request.WorkspaceId,
+		WorkspaceID:  request.WorkspaceId,
 		RootFolderID: request.Params.RootFolderId,
 	}
 	result, err := h.App.QueryHandlers.GetWorkspaceTreeHandler.Handle(ctx, query)

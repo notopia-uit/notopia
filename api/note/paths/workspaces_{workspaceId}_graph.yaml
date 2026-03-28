@@ -8,7 +8,7 @@ get:
   operationId: getWorkspaceGraph
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
-    - name: orphan
+    - name: includeOrphans
       in: query
       description: Include node that are not connected to any other node
       schema:

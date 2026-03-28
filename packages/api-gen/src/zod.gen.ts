@@ -887,7 +887,7 @@ export const zGetWorkspaceGraphData = z.object({
         workspaceId: zNotePropertiesId
     }),
     query: z.object({
-        orphan: z.boolean().optional().default(false)
+        includeOrphans: z.boolean().optional().default(false)
     }).optional()
 });
 

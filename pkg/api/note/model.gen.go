@@ -821,8 +821,8 @@ type RenameNoteJSONBody struct {
 
 // GetWorkspaceGraphParams defines parameters for GetWorkspaceGraph.
 type GetWorkspaceGraphParams struct {
-	// Orphan Include node that are not connected to any other node
-	Orphan *bool `form:"orphan,omitempty" json:"orphan,omitempty"`
+	// IncludeOrphans Include node that are not connected to any other node
+	IncludeOrphans *bool `form:"includeOrphans,omitempty" json:"includeOrphans,omitempty"`
 }
 
 // UpdateWorkspaceMembersJSONBody defines parameters for UpdateWorkspaceMembers.

@@ -923,7 +923,7 @@
             "$ref": "#/components/parameters/workspaceIdPath"
           },
           {
-            "name": "orphan",
+            "name": "includeOrphans",
             "in": "query",
             "description": "Include node that are not connected to any other node",
             "schema": {

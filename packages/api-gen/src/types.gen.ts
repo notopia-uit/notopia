@@ -1917,7 +1917,7 @@ export type GetWorkspaceGraphData = {
         /**
          * Include node that are not connected to any other node
          */
-        orphan?: boolean;
+        includeOrphans?: boolean;
     };
     url: '/note/workspaces/{workspaceId}/graph';
 };

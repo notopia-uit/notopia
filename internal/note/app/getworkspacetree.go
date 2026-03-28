@@ -8,7 +8,7 @@ import (
 )
 
 type GetWorkspaceTree struct {
-	ID           uuid.UUID
+	WorkspaceID  uuid.UUID
 	RootFolderID *uuid.UUID
 }
 

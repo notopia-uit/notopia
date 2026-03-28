@@ -8,8 +8,8 @@ import (
 )
 
 type GetWorkspaceGraph struct {
-	ID     uuid.UUID
-	Orphan *bool
+	ID            uuid.UUID
+	IgnoreOrphans bool
 }
 
 type GetWorkspaceGraphReadModel interface {

@@ -293,9 +293,32 @@ func (r *ReadModel) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGr
 		return nil, toDomainError(err)
 	}
 
-	reachableIDs := make(map[string]bool, len(notes))
-	for _, n := range notes {
-		reachableIDs[n.ID.String()] = true
+	reachableIDs := make(map[string]bool)
+
+	if q.IgnoreOrphans {
+		// Build adjacency to identify connected notes
+		adj := make(map[string]bool)
+		for _, l := range links {
+			adj[l.SourceID.String()] = true
+			adj[l.TargetID.String()] = true
+		}
+		for _, n := range notes {
+			if len(n.Tags) > 0 || adj[n.ID.String()] {
+				reachableIDs[n.ID.String()] = true
+				// Add tags for this note
+				for _, tag := range n.Tags {
+					reachableIDs["#"+tag] = true
+				}
+			}
+		}
+	} else {
+		// Include all notes and their tags
+		for _, n := range notes {
+			reachableIDs[n.ID.String()] = true
+			for _, tag := range n.Tags {
+				reachableIDs["#"+tag] = true
+			}
+		}
 	}
 
 	return buildGraph(notes, links, reachableIDs), nil
@@ -320,7 +343,7 @@ func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app
 		return nil, toDomainError(err)
 	}
 
-	// 2. Build Adjacency List for Traversal (Bidirectional for backlinks and tags)
+	// Build Adjacency List for Traversal (Bidirectional for backlinks and tags)
 	adj := make(map[string][]string)
 	for _, n := range notes {
 		for _, tag := range n.Tags {
@@ -334,7 +357,7 @@ func (r *ReadModel) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app
 		adj[l.TargetID.String()] = append(adj[l.TargetID.String()], l.SourceID.String()) // Backlink: Note <- Note
 	}
 
-	// 3. BFS Traversal to find reachable nodes within maxDepth
+	// BFS Traversal to find reachable nodes within maxDepth
 	reachableIDs := make(map[string]bool)
 	type queueItem struct {
 		id    string
