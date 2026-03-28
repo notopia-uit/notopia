@@ -179,6 +179,99 @@ func (q *Queries) GetFolders(ctx context.Context, arg *GetFoldersParams) ([]*Fol
 	return items, nil
 }
 
+const getRecursiveFolderByParentID = `-- name: GetRecursiveFolderByParentID :many
+WITH RECURSIVE subfolders AS (
+  SELECT
+    id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+  FROM
+    folders
+  WHERE
+    parent_id = $1::uuid
+  UNION ALL
+  SELECT
+    f.id, f.name, f.icon, f.workspace_id, f.parent_id, f.created_at, f.updated_at, f.trashed_by, f.trashed_at
+  FROM
+    folders f
+    INNER JOIN subfolders s ON f.parent_id = s.id
+)
+SELECT
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+FROM
+  subfolders
+`
+
+type GetRecursiveFolderByParentIDRow struct {
+	ID          uuid.UUID
+	Name        string
+	Icon        *string
+	WorkspaceID uuid.UUID
+	ParentID    *uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	TrashedBy   *string
+	TrashedAt   *time.Time
+}
+
+func (q *Queries) GetRecursiveFolderByParentID(ctx context.Context, parentID uuid.UUID) ([]*GetRecursiveFolderByParentIDRow, error) {
+	rows, err := q.db.Query(ctx, getRecursiveFolderByParentID, parentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetRecursiveFolderByParentIDRow
+	for rows.Next() {
+		var i GetRecursiveFolderByParentIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Icon,
+			&i.WorkspaceID,
+			&i.ParentID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRootFolderIDsByWorkspaceID = `-- name: GetRootFolderIDsByWorkspaceID :many
+SELECT
+  id
+FROM
+  folders
+WHERE
+  workspace_id = $1
+  AND parent_id IS NULL
+`
+
+func (q *Queries) GetRootFolderIDsByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]uuid.UUID, error) {
+	rows, err := q.db.Query(ctx, getRootFolderIDsByWorkspaceID, workspaceID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getWorkspaceIDByFolderID = `-- name: GetWorkspaceIDByFolderID :one
 SELECT
   workspace_id

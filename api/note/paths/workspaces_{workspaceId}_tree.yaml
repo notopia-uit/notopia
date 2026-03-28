@@ -8,9 +8,9 @@ get:
   operationId: getWorkspaceTree
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
-    - name: startFolderId
+    - name: rootFolderId
       in: query
-      required: true
+      required: false
       schema:
         $ref: ../components/schemas/Folder.yaml#/properties/id
   responses:

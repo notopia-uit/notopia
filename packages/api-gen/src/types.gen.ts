@@ -2460,8 +2460,8 @@ export type GetWorkspaceTreeData = {
     path: {
         workspaceId: NotePropertiesId;
     };
-    query: {
-        startFolderId: NoteId;
+    query?: {
+        rootFolderId?: NoteId;
     };
     url: '/note/workspaces/{workspaceId}/tree';
 };

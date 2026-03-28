@@ -1469,9 +1469,9 @@
             "$ref": "#/components/parameters/workspaceIdPath"
           },
           {
-            "name": "startFolderId",
+            "name": "rootFolderId",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/id"
             }

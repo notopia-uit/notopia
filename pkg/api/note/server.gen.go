@@ -833,18 +833,11 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceTree(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetWorkspaceTreeParams
 
-	// ------------- Required query parameter "startFolderId" -------------
+	// ------------- Optional query parameter "rootFolderId" -------------
 
-	if paramValue := c.Query("startFolderId"); paramValue != "" {
-
-	} else {
-		siw.ErrorHandler(c, fmt.Errorf("Query argument startFolderId is required, but not found"), http.StatusBadRequest)
-		return
-	}
-
-	err = runtime.BindQueryParameterWithOptions("form", true, true, "startFolderId", c.Request.URL.Query(), &params.StartFolderId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "rootFolderId", c.Request.URL.Query(), &params.RootFolderId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter startFolderId: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter rootFolderId: %w", err), http.StatusBadRequest)
 		return
 	}
 

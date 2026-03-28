@@ -160,6 +160,35 @@ FROM
 WHERE
   id = sqlc.arg('id');
 
+-- name: GetRootFolderIDsByWorkspaceID :many
+SELECT
+  id
+FROM
+  folders
+WHERE
+  workspace_id = sqlc.arg('workspace_id')
+  AND parent_id IS NULL;
+
+-- name: GetRecursiveFolderByParentID :many
+WITH RECURSIVE subfolders AS (
+  SELECT
+    *
+  FROM
+    folders
+  WHERE
+    parent_id = sqlc.arg('parent_id')::uuid
+  UNION ALL
+  SELECT
+    f.*
+  FROM
+    folders f
+    INNER JOIN subfolders s ON f.parent_id = s.id
+)
+SELECT
+  *
+FROM
+  subfolders;
+
 -- name: CountFoldersInWorkspaceByIDs :one
 SELECT
   COUNT(*)

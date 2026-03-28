@@ -9,7 +9,6 @@ import (
 
 type ShowTrash struct {
 	WorkspaceID uuid.UUID
-	Pagination  *PaginationParams
 }
 
 type ShowTrashReadModel interface {

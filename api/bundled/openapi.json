@@ -1823,9 +1823,9 @@
             "$ref": "#/components/parameters/note_workspaceIdPath"
           },
           {
-            "name": "startFolderId",
+            "name": "rootFolderId",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/note_id"
             }

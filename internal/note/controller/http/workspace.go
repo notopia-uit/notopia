@@ -346,7 +346,8 @@ func (h *StrictHandler) GetWorkspaceTree(
 	request note.GetWorkspaceTreeRequestObject,
 ) (note.GetWorkspaceTreeResponseObject, error) {
 	query := &app.GetWorkspaceTree{
-		ID: request.WorkspaceId,
+		ID:           request.WorkspaceId,
+		RootFolderID: request.Params.RootFolderId,
 	}
 	result, err := h.App.QueryHandlers.GetWorkspaceTreeHandler.Handle(ctx, query)
 	if err != nil {

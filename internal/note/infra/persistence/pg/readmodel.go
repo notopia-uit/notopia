@@ -36,52 +36,33 @@ var (
 )
 
 func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, errs.Error) {
-	workspace, err := r.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
-		ID:   &q.ID,
-		Slug: nil,
-	})
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewWorkspaceNotFound(q.ID, err)
-		}
-		return nil, toDomainError(err)
-	}
-
-	var rootFolder *pgsqlc.Folder
 	var rootFolderID uuid.UUID
 
 	if q.RootFolderID != nil {
 		rootFolderID = *q.RootFolderID
-		f, err := r.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
-			ID:           &rootFolderID,
-			WorkspaceID:  &workspace.ID,
-			IsRootFolder: false,
-			ParentID:     nil,
-			TrashedBy:    "",
-		})
-		if err != nil {
-			if errors.Is(err, pgx.ErrNoRows) {
-				return nil, errs.NewFolderNotFound(rootFolderID, err)
-			}
-			return nil, toDomainError(err)
-		}
-		rootFolder = f
 	} else {
-		f, err := r.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
-			WorkspaceID:  &workspace.ID,
-			IsRootFolder: true,
-			ID:           nil,
-			ParentID:     nil,
-			TrashedBy:    "",
-		})
+		rootFolderIDs, err := r.queries.GetRootFolderIDsByWorkspaceID(ctx, q.WorkspaceID)
 		if err != nil {
-			if errors.Is(err, pgx.ErrNoRows) {
-				return nil, errs.NewWorkspaceRootFolderNotFound(workspace.ID, err)
-			}
 			return nil, toDomainError(err)
 		}
-		rootFolder = f
-		rootFolderID = f.ID
+		if len(rootFolderIDs) == 0 {
+			return nil, errs.NewWorkspaceRootFolderNotFound(q.WorkspaceID, pgx.ErrNoRows)
+		}
+		rootFolderID = rootFolderIDs[0]
+	}
+
+	rootFolder, err := r.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
+		ID:           &rootFolderID,
+		WorkspaceID:  &q.WorkspaceID,
+		IsRootFolder: false,
+		ParentID:     nil,
+		TrashedBy:    "",
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, errs.NewFolderNotFound(rootFolderID, err)
+		}
+		return nil, toDomainError(err)
 	}
 
 	recursiveFolders, err := r.queries.GetRecursiveFolderByParentID(ctx, rootFolderID)

@@ -65,35 +65,6 @@ func (q *Queries) GetNote(ctx context.Context, id uuid.UUID) (*Note, error) {
 	return &i, err
 }
 
-const getNoteForUpdate = `-- name: GetNoteForUpdate :one
-SELECT
-  id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
-FROM
-  notes
-WHERE
-  id = $1
-  AND trashed_at IS NULL
-FOR UPDATE
-`
-
-func (q *Queries) GetNoteForUpdate(ctx context.Context, id uuid.UUID) (*Note, error) {
-	row := q.db.QueryRow(ctx, getNoteForUpdate, id)
-	var i Note
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Icon,
-		&i.FolderID,
-		&i.Tags,
-		&i.Size,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.TrashedBy,
-		&i.TrashedAt,
-	)
-	return &i, err
-}
-
 const getNotes = `-- name: GetNotes :many
 SELECT
   id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
@@ -135,62 +106,24 @@ func (q *Queries) GetNotes(ctx context.Context, ids []uuid.UUID) ([]*Note, error
 	return items, nil
 }
 
-const getNotesByFolderID = `-- name: GetNotesByFolderID :many
+const getNotesByFolderIDs = `-- name: GetNotesByFolderIDs :many
 SELECT
   id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
 FROM
   notes
 WHERE
-  folder_id = $1
+  CASE
+    WHEN CARDINALITY($1::uuid[]) > 0
+    THEN folder_id = ANY($1::uuid[])
+    ELSE FALSE
+  END
   AND trashed_at IS NULL
 ORDER BY
   created_at DESC
 `
 
-func (q *Queries) GetNotesByFolderID(ctx context.Context, folderID uuid.UUID) ([]*Note, error) {
-	rows, err := q.db.Query(ctx, getNotesByFolderID, folderID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []*Note
-	for rows.Next() {
-		var i Note
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Icon,
-			&i.FolderID,
-			&i.Tags,
-			&i.Size,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.TrashedBy,
-			&i.TrashedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, &i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getNotesForUpdate = `-- name: GetNotesForUpdate :many
-SELECT
-  id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
-FROM
-  notes
-WHERE
-  id = ANY($1::uuid[])
-  AND trashed_at IS NULL
-FOR UPDATE
-`
-
-func (q *Queries) GetNotesForUpdate(ctx context.Context, ids []uuid.UUID) ([]*Note, error) {
-	rows, err := q.db.Query(ctx, getNotesForUpdate, ids)
+func (q *Queries) GetNotesByFolderIDs(ctx context.Context, folderIds []uuid.UUID) ([]*Note, error) {
+	rows, err := q.db.Query(ctx, getNotesByFolderIDs, folderIds)
 	if err != nil {
 		return nil, err
 	}

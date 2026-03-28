@@ -103,16 +103,6 @@ WHERE
   id = sqlc.arg('id')
   AND trashed_at IS NULL;
 
--- name: GetNoteForUpdate :one
-SELECT
-  *
-FROM
-  notes
-WHERE
-  id = sqlc.arg('id')
-  AND trashed_at IS NULL
-FOR UPDATE;
-
 -- name: GetNotes :many
 SELECT
   *
@@ -122,23 +112,17 @@ WHERE
   id = ANY(sqlc.arg('ids')::uuid[])
   AND trashed_at IS NULL;
 
--- name: GetNotesForUpdate :many
+-- name: GetNotesByFolderIDs :many
 SELECT
   *
 FROM
   notes
 WHERE
-  id = ANY(sqlc.arg('ids')::uuid[])
-  AND trashed_at IS NULL
-FOR UPDATE;
-
--- name: GetNotesByFolderID :many
-SELECT
-  *
-FROM
-  notes
-WHERE
-  folder_id = sqlc.arg('folder_id')
+  CASE
+    WHEN CARDINALITY(sqlc.arg('folder_ids')::uuid[]) > 0
+    THEN folder_id = ANY(sqlc.arg('folder_ids')::uuid[])
+    ELSE FALSE
+  END
   AND trashed_at IS NULL
 ORDER BY
   created_at DESC;
