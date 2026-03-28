@@ -39,7 +39,7 @@ func (h *StrictHandler) CreateNote(
 
 	return note.CreateNote201Response{
 		Headers: note.CreateNote201ResponseHeaders{
-			ContentLocation: h.ServerURL + "/notes/" + id.String(),
+			ContentLocation: h.BaseURL.JoinPath("notes", id.String()).String(),
 		},
 	}, nil
 }

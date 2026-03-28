@@ -35,7 +35,6 @@ type WorkspaceEventInternalPubSub struct {
 	redisClient *RedisClient
 }
 
-// NOTE: Using Redis streams for pubsub. This works but is over-engineered for pure pub/sub.
 // TODO: If have time, try https://github.com/stong1994/watermill-rediszset, because we only need pubsub, not stream
 // This would reduce memory overhead and be more efficient for ephemeral workspace events.
 func NewWorkspaceEventInternalPubSub(
@@ -116,7 +115,7 @@ func NewWorkspaceEvent(
 		internalPubSub.subscriber,
 		func(msg *message.Message) error {
 			workspaceID := msg.Metadata.Get(MetadataWorkspaceIDKey)
-			return hubPubSub.pubSub.Publish(workspaceID, msg)
+			return hubPubSub.pubSub.Publish(workspaceID, msg.Copy())
 		},
 	)
 	return &WorkspaceEvent{
@@ -183,7 +182,7 @@ func (w *WorkspaceEvent) Subscribe(
 				if !ok {
 					return
 				}
-				if msg.Metadata.Get(metadataUserIDKey) != userID {
+				if msg.Metadata.Get(metadataUserIDKey) == userID {
 					msg.Ack()
 					continue
 				}
@@ -218,6 +217,9 @@ func (w *WorkspaceEvent) Subscribe(
 					msg.Ack()
 				case <-ctx.Done():
 					return
+				default:
+					slog.WarnContext(ctx, "dropping event", slog.String("workspace_id", workspaceID.String()), slog.String("user_id", userID))
+					msg.Ack()
 				}
 			}
 		}

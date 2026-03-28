@@ -40,7 +40,7 @@ func (h *StrictHandler) CreateFolder(
 
 	return note.CreateFolder201Response{
 		Headers: note.CreateFolder201ResponseHeaders{
-			ContentLocation: h.ServerURL + "/folders/" + id.String(),
+			ContentLocation: h.BaseURL.JoinPath("folders", id.String()).String(),
 		},
 	}, nil
 }

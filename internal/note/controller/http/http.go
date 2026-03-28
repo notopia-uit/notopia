@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/notopia-uit/notopia/api"
@@ -23,7 +24,7 @@ type (
 
 type StrictHandler struct {
 	App                  *app.Server
-	ServerURL            string
+	BaseURL              *url.URL
 	WorkspaceEventPubSub app.WorkspaceEventPubSub
 }
 
@@ -35,8 +36,11 @@ func NewStrictHandler(
 	workspaceEventPubSub app.WorkspaceEventPubSub,
 ) *StrictHandler {
 	return &StrictHandler{
-		App:                  app,
-		ServerURL:            cfg.URL,
+		App: app,
+		BaseURL: &url.URL{
+			Scheme: "http",
+			Host:   cfg.HTTP.Address(),
+		},
 		WorkspaceEventPubSub: workspaceEventPubSub,
 	}
 }

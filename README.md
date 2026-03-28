@@ -35,3 +35,4 @@
   - [ ] Health check
 - [ ] Authorization service
   - [ ] Health check
+- [ ] Cannot deal with `domain.com:8080/api/v1` base path
