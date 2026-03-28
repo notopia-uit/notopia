@@ -128,7 +128,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 				return
 			case <-ticker.C:
 				mu.Lock()
-				if _, err := w.Write([]byte("heartbeat: keep-alive\n\n")); err != nil {
+				if _, err := w.Write([]byte(": keep-alive\n\n")); err != nil {
 					slog.ErrorContext(c, "failed to write keep-alive comment in workspace events stream", slog.String("error", err.Error()))
 					mu.Unlock()
 					return
