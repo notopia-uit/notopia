@@ -68,10 +68,8 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		}
 
 		workspaceNotes, err := noteRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.NoteRepoGetManyParams{
-				WorkspaceID: &cmd.WorkspaceID,
-			})
+			domain.NewNoteRepoGetManyParamsByWorkspaceID(cmd.WorkspaceID),
+		)
 		if err != nil {
 			return err
 		}
@@ -89,11 +87,9 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		var notes []*domain.Note
 		if len(cmd.NoteIDs) > 0 {
 			notes, err = noteRepo.GetMany(ctx,
-				//exhaustruct:ignore
-				&domain.NoteRepoGetManyParams{
-					IDs:       cmd.NoteIDs,
-					ForUpdate: true,
-				})
+				domain.NewNoteRepoGetManyParamsByIDs(cmd.NoteIDs).
+					WithForUpdate(),
+			)
 			if err != nil {
 				return err
 			}

@@ -22,7 +22,7 @@ type (
 )
 
 type StrictHandler struct {
-	App                  *app.App
+	App                  *app.Server
 	ServerURL            string
 	WorkspaceEventPubSub app.WorkspaceEventPubSub
 }
@@ -30,7 +30,7 @@ type StrictHandler struct {
 var _ IStrictHandler = (*StrictHandler)(nil)
 
 func NewStrictHandler(
-	app *app.App,
+	app *app.Server,
 	cfg *config.Server,
 	workspaceEventPubSub app.WorkspaceEventPubSub,
 ) *StrictHandler {

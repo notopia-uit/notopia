@@ -1,45 +1,25 @@
 package integrationevent
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
-	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/notopia-uit/notopia/internal/note/app"
 )
 
-type IntegrationPubSub struct {
-	eventBus       *cqrs.EventBus
-	eventProcessor *cqrs.EventProcessor
-	router         *message.Router
-}
-
-func NewIntegrationPubSub(
-	eventBus *cqrs.EventBus,
-	eventProcessor *cqrs.EventProcessor,
-	router *message.Router,
-) *IntegrationPubSub {
-	return &IntegrationPubSub{
-		eventBus:       eventBus,
-		eventProcessor: eventProcessor,
-		router:         router,
-	}
-}
-
 type IntegrationEvent struct {
-	IntegrationPubSub
-	app *app.App
+	pubSub *app.IntegrationPubSub
+	app    *app.Server
 }
 
 func NewIntegrationEvent(
-	integrationPubSub *IntegrationPubSub,
-	app *app.App,
+	integrationPubSub *app.IntegrationPubSub,
+	app *app.Server,
 ) (*IntegrationEvent, error) {
-	err := integrationPubSub.eventProcessor.AddHandlers(
+	err := integrationPubSub.EventProcessor().AddHandlers(
 		cqrs.NewEventHandler(
 			"DocumentCommittedHandler",
-			app.DocumentCommittedHandler.Handle,
+			app.IntegrationEventHandlers.DocumentCommittedHandler.Handle,
 		),
 	)
 	if err != nil {
@@ -47,17 +27,9 @@ func NewIntegrationEvent(
 	}
 
 	return &IntegrationEvent{
-		IntegrationPubSub: *integrationPubSub,
-		app:               app,
+		pubSub: integrationPubSub,
+		app:    app,
 	}, nil
 }
 
 var ProvideIntegrationEvent = NewIntegrationEvent
-
-func (i *IntegrationEvent) Run(ctx context.Context) error {
-	return i.router.Run(ctx)
-}
-
-func (i *IntegrationEvent) Close() error {
-	return i.router.Close()
-}

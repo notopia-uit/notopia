@@ -36,11 +36,9 @@ var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItems
 
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) errs.Error {
 	trashedNotes, err := h.noteRepo.GetMany(ctx,
-		//exhaustruct:ignore
-		&domain.NoteRepoGetManyParams{
-			WorkspaceID: &cmd.WorkspaceID,
-			IsTrashed:   new(true),
-		})
+		domain.NewNoteRepoGetManyParamsByWorkspaceID(cmd.WorkspaceID).
+			WithIsTrashed(true),
+	)
 	if err != nil {
 		return err
 	}
@@ -58,11 +56,9 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 
 	if len(cmd.NoteIDs) > 0 {
 		notes, err := h.noteRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.NoteRepoGetManyParams{
-				IDs:       cmd.NoteIDs,
-				ForUpdate: true,
-			})
+			domain.NewNoteRepoGetManyParamsByIDs(cmd.NoteIDs).
+				WithForUpdate(),
+		)
 		if err != nil {
 			return err
 		}

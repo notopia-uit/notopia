@@ -82,12 +82,11 @@ func workspaceEventToDTO(event domain.Event) (any, bool) {
 	case *domain.NoteUpdatedEvent:
 		dto = &note.NoteUpdatedEvent{
 			Data: note.Note{
-				Id:             &e.AggregateID,
-				Name:           e.Name,
-				Icon:           e.Icon,
-				Tags:           e.Tags,
-				FolderId:       &e.FolderID,
-				BacklinksCount: &e.BacklinksCount,
+				Id:       &e.AggregateID,
+				Name:     e.Name,
+				Icon:     e.Icon,
+				Tags:     e.Tags,
+				FolderId: &e.FolderID,
 			},
 			Type: note.NoteUpdatedEventTypeNoteUpdatedEvent,
 		}

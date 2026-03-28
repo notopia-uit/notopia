@@ -22,6 +22,10 @@ type Services struct {
 	Authorization commonconfig.Service `json:"authorization" mapstructure:"authorization" validate:"required" yaml:"authorization"`
 }
 
+type Advanced struct {
+	OutboxTableName string `json:"outboxTableName" mapstructure:"outbox_table_name" validate:"required" yaml:"outbox_table_name"`
+}
+
 type Config struct {
 	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
 	Log      logging.Config       `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
@@ -30,6 +34,7 @@ type Config struct {
 	Kafka    commonconfig.Kafka   `json:"kafka"    mapstructure:"kafka"    validate:"required"  yaml:"kafka"`
 	Redis    commonconfig.Redis   `json:"redis"    mapstructure:"redis"    validate:"required"  yaml:"redis"`
 	Services Services             `json:"services" mapstructure:"services" validate:"required"  yaml:"services"`
+	Advanced Advanced             `json:"advanced" mapstructure:"advanced" validate:"omitempty" yaml:"advanced"`
 }
 
 func New(
@@ -45,6 +50,8 @@ func New(
 	viper.SetDefault("server.http.port", 8081)
 	viper.SetDefault("server.grpc.port", 18081)
 	viper.SetDefault("server.health.port", 28081)
+	viper.SetDefault("advanced.outbox_table_name", "eventsToForward")
+	commonconfig.KafkaViperSetDefault(viper, "kafka", "note-service")
 	logging.ViperSetDefault(viper, "log")
 	commonconfig.SQLViperSetDefault(viper, "database")
 	commonconfig.GeneralViperSetDefault(viper, "general")

@@ -111,11 +111,9 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			return err
 		}
 		notes, err = noteRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.NoteRepoGetManyParams{
-				IDs:       cmd.NoteIDs,
-				ForUpdate: true,
-			})
+			domain.NewNoteRepoGetManyParamsByIDs(cmd.NoteIDs).
+				WithForUpdate(),
+		)
 		if err != nil {
 			return err
 		}

@@ -75,12 +75,12 @@ func newErrorInterceptor() connect.UnaryInterceptorFunc {
 type IHandler = pbconnect.NoteServiceHandler
 
 type Handler struct {
-	app app.App
+	app app.Server
 }
 
 var _ IHandler = (*Handler)(nil)
 
-func NewHandler(app *app.App) *Handler {
+func NewHandler(app *app.Server) *Handler {
 	return &Handler{
 		app: *app,
 	}

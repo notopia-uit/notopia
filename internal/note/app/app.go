@@ -3,9 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
+
+	"golang.org/x/sync/errgroup"
 )
 
-type App struct {
+type CommandHandlers struct {
 	CreateNoteHandler                      *CreateNoteHandler
 	CreateFolderHandler                    *CreateFolderHandler
 	CreateWorkspaceHandler                 *CreateWorkspaceHandler
@@ -25,7 +27,9 @@ type App struct {
 	UnpublishNoteHandler                   *UnpublishNoteHandler
 	UnpublishWorkspaceHandler              *UnpublishWorkspaceHandler
 	UpdateWorkspaceMembersHandler          *UpdateWorkspaceMembersHandler
+}
 
+type QueryHandlers struct {
 	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler
 	GetNoteGraphHandler             *GetNoteGraphHandler
 	GetNoteLinksHandler             *GetNoteLinksHandler
@@ -34,93 +38,48 @@ type App struct {
 	GetWorkspaceMembersHandler      *GetWorkspaceMembersHandler
 	GetWorkspaceTreeHandler         *GetWorkspaceTreeHandler
 	ShowTrashHandler                *ShowTrashHandler
+}
 
+type IntegrationEventHandlers struct {
 	DocumentCommittedHandler *DocumentCommittedHandler
-
-	workspaceEventPubSub WorkspaceEventPubSub
-	persistence          Persistence
 }
 
-func NewApp(
-	createNoteHandler *CreateNoteHandler,
-	createFolderHandler *CreateFolderHandler,
-	createWorkspaceHandler *CreateWorkspaceHandler,
-	deleteNoteHandler *DeleteNoteHandler,
-	deleteFolderHandler *DeleteFolderHandler,
-	deleteWorkspaceHandler *DeleteWorkspaceHandler,
-	generateDailyNoteHandler *GenerateDailyNoteHandler,
-	moveWorkspaceItemsHandler *MoveWorkspaceItemsHandler,
-	permanentlyDeleteWorkspaceItemsHandler *PermanentlyDeleteWorkspaceItemsHandler,
-	publishNoteHandler *PublishNoteHandler,
-	publishWorkspaceHandler *PublishWorkspaceHandler,
-	renameFolderHandler *RenameFolderHandler,
-	renameNoteHandler *RenameNoteHandler,
-	renameWorkspaceHandler *RenameWorkspaceHandler,
-	restoreTrashedWorkspaceItemsHandler *RestoreTrashedWorkspaceItemsHandler,
-	trashWorkspaceItemsHandler *TrashWorkspaceItemsHandler,
-	unpublishNoteHandler *UnpublishNoteHandler,
-	unpublishWorkspaceHandler *UnpublishWorkspaceHandler,
-	updateWorkspaceMembersHandler *UpdateWorkspaceMembersHandler,
-	checkWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler,
-	getNoteGraphHandler *GetNoteGraphHandler,
-	getNoteLinksHandler *GetNoteLinksHandler,
-	getWorkspaceHandler *GetWorkspaceHandler,
-	getWorkspaceGraphHandler *GetWorkspaceGraphHandler,
-	getWorkspaceMembersHandler *GetWorkspaceMembersHandler,
-	getWorkspaceTreeHandler *GetWorkspaceTreeHandler,
-	showTrashHandler *ShowTrashHandler,
-	documentCommittedHandler *DocumentCommittedHandler,
-	workspaceEventPubSub WorkspaceEventPubSub,
-	persistence Persistence,
-) *App {
-	return &App{
-		CreateNoteHandler:                      createNoteHandler,
-		CreateFolderHandler:                    createFolderHandler,
-		CreateWorkspaceHandler:                 createWorkspaceHandler,
-		DeleteNoteHandler:                      deleteNoteHandler,
-		DeleteFolderHandler:                    deleteFolderHandler,
-		DeleteWorkspaceHandler:                 deleteWorkspaceHandler,
-		GenerateDailyNoteHandler:               generateDailyNoteHandler,
-		MoveWorkspaceItemsHandler:              moveWorkspaceItemsHandler,
-		PermanentlyDeleteWorkspaceItemsHandler: permanentlyDeleteWorkspaceItemsHandler,
-		PublishNoteHandler:                     publishNoteHandler,
-		PublishWorkspaceHandler:                publishWorkspaceHandler,
-		RenameFolderHandler:                    renameFolderHandler,
-		RenameNoteHandler:                      renameNoteHandler,
-		RenameWorkspaceHandler:                 renameWorkspaceHandler,
-		RestoreTrashedWorkspaceItemsHandler:    restoreTrashedWorkspaceItemsHandler,
-		TrashWorkspaceItemsHandler:             trashWorkspaceItemsHandler,
-		UnpublishNoteHandler:                   unpublishNoteHandler,
-		UnpublishWorkspaceHandler:              unpublishWorkspaceHandler,
-		UpdateWorkspaceMembersHandler:          updateWorkspaceMembersHandler,
-		CheckWorkspaceSlugExistsHandler:        checkWorkspaceSlugExistsHandler,
-		GetNoteGraphHandler:                    getNoteGraphHandler,
-		GetNoteLinksHandler:                    getNoteLinksHandler,
-		GetWorkspaceHandler:                    getWorkspaceHandler,
-		GetWorkspaceGraphHandler:               getWorkspaceGraphHandler,
-		GetWorkspaceMembersHandler:             getWorkspaceMembersHandler,
-		GetWorkspaceTreeHandler:                getWorkspaceTreeHandler,
-		ShowTrashHandler:                       showTrashHandler,
-		DocumentCommittedHandler:               documentCommittedHandler,
-		workspaceEventPubSub:                   workspaceEventPubSub,
-		persistence:                            persistence,
-	}
+type Server struct {
+	CommandHandlers          *CommandHandlers
+	QueryHandlers            *QueryHandlers
+	IntegrationEventHandlers *IntegrationEventHandlers
+
+	IntegrationPubSub    *IntegrationPubSub
+	WorkspaceEventPubSub WorkspaceEventPubSub
+	Persistence          Persistence
 }
 
-func (a *App) RunMigration(ctx context.Context) error {
-	return a.persistence.RunMigrations(ctx)
+func (s *Server) RunMigration(ctx context.Context) error {
+	return s.Persistence.RunMigrations(ctx)
 }
 
-func (a *App) Start(ctx context.Context) error {
-	if err := a.RunMigration(ctx); err != nil {
+func (s *Server) Start(ctx context.Context) error {
+	if err := s.RunMigration(ctx); err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
-	return a.workspaceEventPubSub.Run(ctx)
+	g, ctx := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		return s.WorkspaceEventPubSub.Run(ctx)
+	})
+	g.Go(func() error {
+		return s.IntegrationPubSub.Run(ctx)
+	})
+	return g.Wait()
 }
 
-func (a *App) Stop(ctx context.Context) error {
-	return a.workspaceEventPubSub.Close()
+func (s *Server) Stop(ctx context.Context) error {
+	g, _ := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		return s.WorkspaceEventPubSub.Close()
+	})
+	g.Go(func() error {
+		return s.IntegrationPubSub.Close()
+	})
+	return g.Wait()
 }
-
-var ProvideApp = NewApp

@@ -121,6 +121,27 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	unpublishNoteHandler := app.NewUnpublishNoteHandler(pgNote)
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler()
+	commandHandlers := &app.CommandHandlers{
+		CreateNoteHandler:                      createNoteHandler,
+		CreateFolderHandler:                    createFolderHandler,
+		CreateWorkspaceHandler:                 createWorkspaceHandler,
+		DeleteNoteHandler:                      deleteNoteHandler,
+		DeleteFolderHandler:                    deleteFolderHandler,
+		DeleteWorkspaceHandler:                 deleteWorkspaceHandler,
+		GenerateDailyNoteHandler:               generateDailyNoteHandler,
+		MoveWorkspaceItemsHandler:              moveWorkspaceItemsHandler,
+		PermanentlyDeleteWorkspaceItemsHandler: permanentlyDeleteWorkspaceItemsHandler,
+		PublishNoteHandler:                     publishNoteHandler,
+		PublishWorkspaceHandler:                publishWorkspaceHandler,
+		RenameFolderHandler:                    renameFolderHandler,
+		RenameNoteHandler:                      renameNoteHandler,
+		RenameWorkspaceHandler:                 renameWorkspaceHandler,
+		RestoreTrashedWorkspaceItemsHandler:    restoreTrashedWorkspaceItemsHandler,
+		TrashWorkspaceItemsHandler:             trashWorkspaceItemsHandler,
+		UnpublishNoteHandler:                   unpublishNoteHandler,
+		UnpublishWorkspaceHandler:              unpublishWorkspaceHandler,
+		UpdateWorkspaceMembersHandler:          updateWorkspaceMembersHandler,
+	}
 	readModel := pg.NewReadModel(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(readModel)
 	getNoteGraphHandler := app.NewGetNoteGraphHandler(readModel)
@@ -130,8 +151,42 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler()
 	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(readModel)
 	showTrashHandler := app.NewShowTrashHandler(readModel)
+	queryHandlers := &app.QueryHandlers{
+		CheckWorkspaceSlugExistsHandler: checkWorkspaceSlugExistsHandler,
+		GetNoteGraphHandler:             getNoteGraphHandler,
+		GetNoteLinksHandler:             getNoteLinksHandler,
+		GetWorkspaceHandler:             getWorkspaceHandler,
+		GetWorkspaceGraphHandler:        getWorkspaceGraphHandler,
+		GetWorkspaceMembersHandler:      getWorkspaceMembersHandler,
+		GetWorkspaceTreeHandler:         getWorkspaceTreeHandler,
+		ShowTrashHandler:                showTrashHandler,
+	}
 	noteService := domain.NewNoteService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgNote, noteService)
+	integrationEventHandlers := &app.IntegrationEventHandlers{
+		DocumentCommittedHandler: documentCommittedHandler,
+	}
+	kafka := &configConfig.Kafka
+	commonconfigKafka := configConfig.Kafka
+	saramaTracer := pubsub.NewKafkaTracer()
+	kafkaPublisher, err := pubsub.NewKafkaPublisher(commonconfigKafka, loggerAdapter, saramaTracer)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	integrationPubSub, err := pubsub.NewIntegrationPubSub(kafka, loggerAdapter, kafkaPublisher, saramaTracer, commandEventMarshaler)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	provider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
 		cleanup5()
@@ -150,11 +205,18 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	appApp := app.NewApp(createNoteHandler, createFolderHandler, createWorkspaceHandler, deleteNoteHandler, deleteFolderHandler, deleteWorkspaceHandler, generateDailyNoteHandler, moveWorkspaceItemsHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler, checkWorkspaceSlugExistsHandler, getNoteGraphHandler, getNoteLinksHandler, getWorkspaceHandler, getWorkspaceGraphHandler, getWorkspaceMembersHandler, getWorkspaceTreeHandler, showTrashHandler, documentCommittedHandler, workspaceEvent, persistencePg)
-	server := &configConfig.Server
-	strictHandler := http.NewStrictHandler(appApp, server, workspaceEvent)
+	server := &app.Server{
+		CommandHandlers:          commandHandlers,
+		QueryHandlers:            queryHandlers,
+		IntegrationEventHandlers: integrationEventHandlers,
+		IntegrationPubSub:        integrationPubSub,
+		WorkspaceEventPubSub:     workspaceEvent,
+		Persistence:              persistencePg,
+	}
+	configServer := &configConfig.Server
+	strictHandler := http.NewStrictHandler(server, configServer, workspaceEvent)
 	serverInterface := http.NewHandler(strictHandler)
-	httpHTTP, cleanup6, err := http.New(ctx, engine, serverInterface, server, logger)
+	httpHTTP, cleanup6, err := http.New(ctx, engine, serverInterface, configServer, logger)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -163,8 +225,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	handler := grpc.NewHandler(appApp)
-	grpcGRPC, cleanup7, err := grpc.New(ctx, handler, server, tracerProvider, meterProvider, logger)
+	handler := grpc.NewHandler(server)
+	grpcGRPC, cleanup7, err := grpc.New(ctx, handler, configServer, tracerProvider, meterProvider, logger)
 	if err != nil {
 		cleanup6()
 		cleanup5()
@@ -174,9 +236,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	kafka := &configConfig.Kafka
-	saramaTracer := pubsub.NewKafkaTracer()
-	integrationPubSub, err := pubsub.NewIntegrationPubSub(kafka, loggerAdapter, saramaTracer, commandEventMarshaler)
+	integrationEvent, err := integrationevent.NewIntegrationEvent(integrationPubSub, server)
 	if err != nil {
 		cleanup7()
 		cleanup6()
@@ -187,19 +247,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	integrationEvent, err := integrationevent.NewIntegrationEvent(integrationPubSub, appApp)
-	if err != nil {
-		cleanup7()
-		cleanup6()
-		cleanup5()
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	healthHealth := health.New(persistencePg, server, workspaceEvent)
-	noteServer := note.NewServer(httpHTTP, grpcGRPC, integrationEvent, healthHealth, appApp, logger)
+	healthHealth := health.New(persistencePg, configServer, workspaceEvent)
+	noteServer := note.NewServer(httpHTTP, grpcGRPC, integrationEvent, healthHealth, server, logger)
 	return noteServer, func() {
 		cleanup7()
 		cleanup6()

@@ -17,7 +17,7 @@ type Server struct {
 	grpc             *grpc.GRPC
 	integrationevent *integrationevent.IntegrationEvent
 	health           *health.Health
-	application      *app.App
+	app              *app.Server
 	logger           *slog.Logger
 }
 
@@ -26,7 +26,7 @@ func NewServer(
 	grpc *grpc.GRPC,
 	integrationevent *integrationevent.IntegrationEvent,
 	health *health.Health,
-	application *app.App,
+	app *app.Server,
 	logger *slog.Logger,
 ) *Server {
 	slog.SetDefault(logger)
@@ -36,13 +36,13 @@ func NewServer(
 		grpc:             grpc,
 		integrationevent: integrationevent,
 		health:           health,
-		application:      application,
+		app:              app,
 		logger:           logger,
 	}
 }
 
 func (s *Server) Run(ctx context.Context) error {
-	if err := s.application.Start(ctx); err != nil {
+	if err := s.app.Start(ctx); err != nil {
 		return err
 	}
 
@@ -79,18 +79,8 @@ func (s *Server) Run(ctx context.Context) error {
 	})
 
 	g.Go(func() error {
-		go func() {
-			<-ctx.Done()
-			if err := s.integrationevent.Close(); err != nil {
-				s.logger.ErrorContext(ctx, "failed to close integration event processor", slog.String("error", err.Error()))
-			}
-		}()
-		return s.integrationevent.Run(ctx)
-	})
-
-	g.Go(func() error {
 		<-ctx.Done()
-		return s.application.Stop(context.Background())
+		return s.app.Stop(context.Background())
 	})
 
 	return g.Wait()

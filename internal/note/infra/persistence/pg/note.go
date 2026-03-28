@@ -79,26 +79,26 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 
 func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams) ([]*domain.Note, errs.Error) {
 	condition := Bool(true)
-	if params.WorkspaceID != nil {
+	if params.WorkspaceID() != nil {
 		condition = condition.AND(
 			table.Notes.FolderID.IN(
 				SELECT(table.Folders.ID).
 					FROM(table.Folders).
-					WHERE(table.Folders.WorkspaceID.EQ(UUID(params.WorkspaceID))),
+					WHERE(table.Folders.WorkspaceID.EQ(UUID(*params.WorkspaceID()))),
 			),
 		)
 	}
-	if len(params.IDs) > 0 {
+	if len(params.IDs()) > 0 {
 		var idExprs []Expression
-		for _, id := range params.IDs {
+		for _, id := range params.IDs() {
 			idExprs = append(idExprs, UUID(id))
 		}
 		condition = condition.AND(table.Notes.ID.IN(idExprs...))
 	}
-	if params.TrashedBy != nil {
-		condition = condition.AND(table.Notes.TrashedBy.EQ(String(params.TrashedBy.String())))
+	if params.TrashedBy() != nil {
+		condition = condition.AND(table.Notes.TrashedBy.EQ(String(params.TrashedBy().String())))
 	}
-	if params.IsTrashed != nil {
+	if params.IsTrashed() != nil {
 		condition = condition.AND(table.Notes.TrashedAt.IS_NULL())
 	}
 
@@ -108,7 +108,7 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 				LEFT_JOIN(table.NoteLinks, table.NoteLinks.SourceID.EQ(table.Notes.ID)),
 		).
 		WHERE(condition)
-	if params.ForUpdate {
+	if params.ForUpdate() {
 		stmt = stmt.FOR(UPDATE())
 	}
 

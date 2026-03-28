@@ -5,6 +5,7 @@ import (
 )
 
 var ProviderSetCommand = wire.NewSet(
+	wire.Struct(new(CommandHandlers), "*"),
 	ProvideCreateNoteHandler,
 	ProvideCreateFolderHandler,
 	ProvideCreateWorkspaceHandler,
@@ -27,6 +28,7 @@ var ProviderSetCommand = wire.NewSet(
 )
 
 var ProviderSetQuery = wire.NewSet(
+	wire.Struct(new(QueryHandlers), "*"),
 	ProvideCheckWorkspaceSlugExistsHandler,
 	ProvideGetNoteGraphHandler,
 	ProvideGetNoteLinksHandler,
@@ -37,13 +39,14 @@ var ProviderSetQuery = wire.NewSet(
 	ProvideShowTrashHandler,
 )
 
-var ProviderSetEvent = wire.NewSet(
+var ProviderSetIntegrationEvent = wire.NewSet(
+	wire.Struct(new(IntegrationEventHandlers), "*"),
 	ProvideDocumentCommittedHandler,
 )
 
 var ProviderSet = wire.NewSet(
 	ProviderSetCommand,
 	ProviderSetQuery,
-	ProviderSetEvent,
-	ProvideApp,
+	ProviderSetIntegrationEvent,
+	wire.Struct(new(Server), "*"),
 )

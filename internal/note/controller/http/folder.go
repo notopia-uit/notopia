@@ -34,7 +34,7 @@ func (h *StrictHandler) CreateFolder(
 		UserID:      user.ID,
 	}
 
-	if err := h.App.CreateFolderHandler.Handle(ctx, cmd); err != nil {
+	if err := h.App.CommandHandlers.CreateFolderHandler.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
 
@@ -59,7 +59,7 @@ func (h *StrictHandler) DeleteFolder(
 		UserID: user.ID,
 	}
 
-	if err := h.App.DeleteFolderHandler.Handle(ctx, cmd); err != nil {
+	if err := h.App.CommandHandlers.DeleteFolderHandler.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
 	return note.DeleteFolder204Response{}, nil
@@ -82,7 +82,7 @@ func (h *StrictHandler) RenameFolder(
 		UserID: user.ID,
 	}
 
-	if err := h.App.RenameFolderHandler.Handle(ctx, cmd); err != nil {
+	if err := h.App.CommandHandlers.RenameFolderHandler.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
 
