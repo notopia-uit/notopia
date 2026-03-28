@@ -26,11 +26,7 @@ linters:
       include:
         - github\.com/notopia-uit/notopia/.*\.*
       exclude:
-        - github\.com/notopia-uit/notopia/.*/pgsqlc\..*
         - github\.com/notopia-uit/notopia/.*/errs\.Err
-      #   - net/http\.Server
-      #   - github\.com/alexliesenfeld/health\.Check
-      #   - github.com/ThreeDotsLabs/watermill/components/cqrs
   exclusions:
     generated: strict
     rules:

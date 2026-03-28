@@ -5,35 +5,11 @@ FROM
   workspaces
 WHERE
   CASE
-    WHEN sqlc.arg('slug') IS NOT NULL THEN slug = sqlc.arg('slug')
-    WHEN sqlc.arg('id') IS NOT NULL THEN id = sqlc.arg('id')
+    WHEN sqlc.narg('slug')::text IS NOT NULL THEN slug = sqlc.narg('slug')
+    WHEN sqlc.narg('id')::uuid IS NOT NULL THEN id = sqlc.narg('id')
     ELSE FALSE
   END
   AND deleted_at IS NULL;
-
--- name: GetWorkspaceForUpdate :one
-SELECT
-  *
-FROM
-  workspaces
-WHERE
-  CASE
-    WHEN sqlc.arg('slug') IS NOT NULL THEN slug = sqlc.arg('slug')
-    WHEN sqlc.arg('id') IS NOT NULL THEN id = sqlc.arg('id')
-    ELSE FALSE
-  END
-  AND deleted_at IS NULL
-FOR UPDATE;
-
--- name: GetWorkspaceBySlugForUpdate :one
-SELECT
-  *
-FROM
-  workspaces
-WHERE
-  slug = sqlc.arg('slug')
-  AND deleted_at IS NULL
-FOR UPDATE;
 
 -- name: GetWorkspaceIDBySlug :one
 SELECT
@@ -41,7 +17,7 @@ SELECT
 FROM
   workspaces
 WHERE
-  slug = sqlc.arg('slug')
+  slug = sqlc.arg('slug')::text
   AND deleted_at IS NULL;
 
 -- name: CheckSlugExists :one
@@ -51,7 +27,7 @@ SELECT EXISTS(
   FROM
     workspaces
   WHERE
-    slug = sqlc.arg('slug')
+    slug = sqlc.arg('slug')::text
     AND deleted_at IS NULL
 ) AS exists;
 

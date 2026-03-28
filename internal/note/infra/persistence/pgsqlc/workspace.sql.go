@@ -19,7 +19,7 @@ SELECT EXISTS(
   FROM
     workspaces
   WHERE
-    slug = $1
+    slug = $1::text
     AND deleted_at IS NULL
 ) AS exists
 `
@@ -38,79 +38,20 @@ FROM
   workspaces
 WHERE
   CASE
-    WHEN $1 IS NOT NULL THEN slug = $1
-    WHEN $2 IS NOT NULL THEN id = $2
+    WHEN $1::text IS NOT NULL THEN slug = $1
+    WHEN $2::uuid IS NOT NULL THEN id = $2
     ELSE FALSE
   END
   AND deleted_at IS NULL
 `
 
 type GetWorkspaceParams struct {
-	Slug interface{}
-	ID   interface{}
+	Slug *string
+	ID   *uuid.UUID
 }
 
 func (q *Queries) GetWorkspace(ctx context.Context, arg *GetWorkspaceParams) (*Workspace, error) {
 	row := q.db.QueryRow(ctx, getWorkspace, arg.Slug, arg.ID)
-	var i Workspace
-	err := row.Scan(
-		&i.ID,
-		&i.Slug,
-		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-	)
-	return &i, err
-}
-
-const getWorkspaceBySlugForUpdate = `-- name: GetWorkspaceBySlugForUpdate :one
-SELECT
-  id, slug, name, created_at, updated_at, deleted_at
-FROM
-  workspaces
-WHERE
-  slug = $1
-  AND deleted_at IS NULL
-FOR UPDATE
-`
-
-func (q *Queries) GetWorkspaceBySlugForUpdate(ctx context.Context, slug string) (*Workspace, error) {
-	row := q.db.QueryRow(ctx, getWorkspaceBySlugForUpdate, slug)
-	var i Workspace
-	err := row.Scan(
-		&i.ID,
-		&i.Slug,
-		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-	)
-	return &i, err
-}
-
-const getWorkspaceForUpdate = `-- name: GetWorkspaceForUpdate :one
-SELECT
-  id, slug, name, created_at, updated_at, deleted_at
-FROM
-  workspaces
-WHERE
-  CASE
-    WHEN $1 IS NOT NULL THEN slug = $1
-    WHEN $2 IS NOT NULL THEN id = $2
-    ELSE FALSE
-  END
-  AND deleted_at IS NULL
-FOR UPDATE
-`
-
-type GetWorkspaceForUpdateParams struct {
-	Slug interface{}
-	ID   interface{}
-}
-
-func (q *Queries) GetWorkspaceForUpdate(ctx context.Context, arg *GetWorkspaceForUpdateParams) (*Workspace, error) {
-	row := q.db.QueryRow(ctx, getWorkspaceForUpdate, arg.Slug, arg.ID)
 	var i Workspace
 	err := row.Scan(
 		&i.ID,
@@ -129,7 +70,7 @@ SELECT
 FROM
   workspaces
 WHERE
-  slug = $1
+  slug = $1::text
   AND deleted_at IS NULL
 `
 

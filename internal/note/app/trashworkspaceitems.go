@@ -77,10 +77,8 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		}
 
 		workspaceFolders, err := folderRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.FolderRepoGetManyParams{
-				WorkspaceID: &cmd.WorkspaceID,
-			})
+			domain.NewFolderRepoGetManyParamsByWorkspaceID(cmd.WorkspaceID),
+		)
 		if err != nil {
 			return err
 		}
@@ -108,11 +106,9 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		var folders []*domain.Folder
 		if len(cmd.FolderIDs) > 0 {
 			folders, err = folderRepo.GetMany(ctx,
-				//exhaustruct:ignore
-				&domain.FolderRepoGetManyParams{
-					IDs:       cmd.FolderIDs,
-					ForUpdate: true,
-				})
+				domain.NewFolderRepoGetManyParamsByIDs(cmd.FolderIDs).
+					WithForUpdate(),
+			)
 			if err != nil {
 				return err
 			}

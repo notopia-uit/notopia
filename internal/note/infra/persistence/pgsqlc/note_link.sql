@@ -41,11 +41,11 @@ FROM
   note_links
 WHERE
   CASE
-    WHEN sqlc.narg('source_id')::uuid IS NOT NULL THEN source_id = sqlc.arg('source_id')::uuid
+    WHEN sqlc.narg('source_id')::uuid IS NOT NULL THEN source_id = sqlc.narg('source_id')::uuid
     ELSE TRUE
   END
   AND CASE
-    WHEN sqlc.narg('source_ids')::uuid[] IS NOT NULL THEN source_id = ANY(sqlc.arg('source_ids')::uuid[])
+    WHEN CARDINALITY(sqlc.arg('source_ids')::uuid[]) > 0 THEN source_id = ANY(sqlc.arg('source_ids')::uuid[])
     ELSE TRUE
   END;
 

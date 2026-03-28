@@ -37,7 +37,8 @@ func toConnectRPCError(err error) error {
 			errs.CodePersistenceInternal,
 			errs.CodeWorkspaceEventPubSubFailedToCreateMessage,
 			errs.CodeWorkspaceEventPubSubPublishFailed,
-			errs.CodeWorkspaceEventPubSubSubscribeFailed:
+			errs.CodeWorkspaceEventPubSubSubscribeFailed,
+			errs.CodeInternalGenerateID:
 			return connect.NewError(connect.CodeInternal, cerr)
 		case errs.CodeFolderNotFound,
 			errs.CodeNoteNotFound,

@@ -23,7 +23,8 @@ func toHTTPErr(err *errs.Err) (
 		statusCode = 400
 	case errs.CodeUnimplemented:
 		statusCode = 501
-	case errs.CodeInternal:
+	case errs.CodeInternal,
+		errs.CodeInternalGenerateID:
 		statusCode = 500
 
 	case errs.CodeAuthorizationServiceInternalError:

@@ -46,11 +46,9 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 	}
 
 	trashedFolders, err := h.folderRepo.GetMany(ctx,
-		//exhaustruct:ignore
-		&domain.FolderRepoGetManyParams{
-			WorkspaceID: &cmd.WorkspaceID,
-			IsTrashed:   new(true),
-		})
+		domain.NewFolderRepoGetManyParamsByWorkspaceID(cmd.WorkspaceID).
+			WithTrashed(),
+	)
 	if err != nil {
 		return err
 	}
@@ -79,11 +77,9 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 
 	if len(cmd.FolderIDs) > 0 {
 		folders, err := h.folderRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.FolderRepoGetManyParams{
-				IDs:       cmd.FolderIDs,
-				ForUpdate: true,
-			})
+			domain.NewFolderRepoGetManyParamsByIDs(cmd.FolderIDs).
+				WithForUpdate(),
+		)
 		if err != nil {
 			return err
 		}

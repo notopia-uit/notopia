@@ -103,7 +103,7 @@ WHERE
     ELSE TRUE
   END
   AND CASE
-    WHEN $2::uuid[] IS NOT NULL THEN source_id = ANY($2::uuid[])
+    WHEN CARDINALITY($2::uuid[]) > 0 THEN source_id = ANY($2::uuid[])
     ELSE TRUE
   END
 `

@@ -98,11 +98,9 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		folderRepo := r.Folder()
 		noteRepo := r.Note()
 		folders, err = folderRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.FolderRepoGetManyParams{
-				IDs:       cmd.FolderIDs,
-				ForUpdate: true,
-			})
+			domain.NewFolderRepoGetManyParamsByIDs(cmd.FolderIDs).
+				WithWorkspaceID(cmd.WorkspaceID).
+				WithForUpdate())
 		if err != nil {
 			return err
 		}

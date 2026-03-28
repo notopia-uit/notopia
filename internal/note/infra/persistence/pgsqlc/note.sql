@@ -168,8 +168,7 @@ WHERE
     WHEN sqlc.narg('trashed_by')::text IS NOT NULL
     THEN n.trashed_by = sqlc.narg('trashed_by')::text
     ELSE n.trashed_at IS NULL
-  END
-  AND f.trashed_at IS NULL;
+  END;
 
 -- name: GetTrashedNotesByWorkspaceID :many
 SELECT

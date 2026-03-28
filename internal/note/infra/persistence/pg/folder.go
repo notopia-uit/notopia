@@ -72,32 +72,27 @@ func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*do
 
 func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyParams) ([]*domain.Folder, errs.Error) {
 	condition := Bool(true)
-	if params.WorkspaceID != nil {
-		condition = condition.AND(table.Folders.WorkspaceID.EQ(UUID(params.WorkspaceID)))
+	if params.WorkspaceID() != nil {
+		condition = condition.AND(table.Folders.WorkspaceID.EQ(UUID(params.WorkspaceID())))
 	}
-	if len(params.IDs) > 0 {
+	if len(params.IDs()) > 0 {
 		var idExprs []Expression
-		for _, id := range params.IDs {
+		for _, id := range params.IDs() {
 			idExprs = append(idExprs, UUID(id))
 		}
 		condition = condition.AND(table.Folders.ID.IN(idExprs...))
 	}
-	if params.TrashedBy != nil {
-		condition = condition.AND(table.Folders.TrashedBy.EQ(String(params.TrashedBy.String())))
+	if params.TrashedBy() != nil {
+		condition = condition.AND(table.Folders.TrashedBy.EQ(String(params.TrashedBy().String())))
 	}
-	if params.IsTrashed != nil {
+	if params.IsTrashed() {
 		condition = condition.AND(table.Folders.TrashedAt.IS_NULL())
-	}
-	if params.ParentID != nil {
-		condition = condition.AND(table.Folders.ParentID.EQ(UUID(params.ParentID)))
-	} else if params.IsRootFolder {
-		condition = condition.AND(table.Folders.ParentID.IS_NULL())
 	}
 
 	stmt := SELECT(table.Folders.AllColumns).
 		FROM(table.Folders).
 		WHERE(condition)
-	if params.ForUpdate {
+	if params.ForUpdate() {
 		stmt = stmt.FOR(UPDATE())
 	}
 

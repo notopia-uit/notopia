@@ -8,6 +8,11 @@ get:
   operationId: getWorkspaceTree
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
+    - name: startFolderId
+      in: query
+      required: true
+      schema:
+        $ref: ../components/schemas/Folder.yaml#/properties/id
   responses:
     200:
       description: OK

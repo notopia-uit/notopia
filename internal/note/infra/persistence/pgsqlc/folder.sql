@@ -118,41 +118,6 @@ WHERE
 ORDER BY
   created_at DESC;
 
--- name: GetFolderForUpdate :one
-SELECT
-  *
-FROM
-  folders
-WHERE
-  CASE
-    WHEN sqlc.narg('id')::uuid IS NOT NULL
-    THEN id = sqlc.narg('id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.narg('workspace_id')::uuid IS NOT NULL
-    THEN workspace_id = sqlc.narg('workspace_id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.narg('parent_id')::uuid IS NOT NULL
-    THEN parent_id = sqlc.narg('parent_id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.arg('is_root_folder')::bool = TRUE
-    THEN parent_id IS NULL
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.arg('trashed_by')::text <> ''
-    THEN trashed_by = sqlc.arg('trashed_by')::text
-    ELSE TRUE
-  END
-ORDER BY
-  created_at DESC
-FOR UPDATE;
-
 -- name: GetFolders :many
 SELECT
   *
@@ -160,8 +125,8 @@ FROM
   folders
 WHERE
   CASE
-    WHEN cardinality(sqlc.arg('ids')::uuid[]) > 0
-    THEN id = ANY(sqlc.arg('ids')::uuid[])
+    WHEN sqlc.narg('ids')::uuid[] IS NOT NULL
+    THEN id = ANY(sqlc.narg('ids')::uuid[])
     ELSE TRUE
   END
   AND CASE
@@ -186,41 +151,6 @@ WHERE
   END
 ORDER BY
   created_at DESC;
-
--- name: GetFoldersForUpdate :many
-SELECT
-  *
-FROM
-  folders
-WHERE
-  CASE
-    WHEN cardinality(sqlc.arg('ids')::uuid[]) > 0
-    THEN id = ANY(sqlc.arg('ids')::uuid[])
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.narg('workspace_id')::uuid IS NOT NULL
-    THEN workspace_id = sqlc.narg('workspace_id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.narg('parent_id')::uuid IS NOT NULL
-    THEN parent_id = sqlc.narg('parent_id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.arg('is_root_folder')::bool = TRUE
-    THEN parent_id IS NULL
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.narg('trashed_by')::text IS NOT NULL
-    THEN trashed_by = sqlc.narg('trashed_by')::text
-    ELSE TRUE
-  END
-ORDER BY
-  created_at DESC
-FOR UPDATE;
 
 -- name: GetWorkspaceIDByFolderID :one
 SELECT

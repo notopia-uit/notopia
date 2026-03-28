@@ -235,7 +235,6 @@ WHERE
     THEN n.trashed_by = $2::text
     ELSE n.trashed_at IS NULL
   END
-  AND f.trashed_at IS NULL
 `
 
 type GetNotesInWorkspaceParams struct {
