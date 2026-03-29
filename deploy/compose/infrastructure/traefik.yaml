@@ -13,10 +13,15 @@ services:
       - --api.dashboard=true
       - --entrypoints.web.address=:80
       - --log.level=INFO
+      - --tracing=true
+      - --tracing.samplerate=1.0
+      - --tracing.otlp.http=true
+      - --tracing.otlp.http.endpoint=http://alloy:4318/v1/traces
       - --experimental.plugins.jwt.moduleName=github.com/traefik-plugins/traefik-jwt-plugin
       - --experimental.plugins.jwt.version=v0.10.0
     environment:
       TZ: Asia/Ho_Chi_Minh
+      OTEL_PROPAGATORS: tracecontext,baggage
     ports:
       - 80:80
       - 8080:8080
