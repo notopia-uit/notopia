@@ -1,4 +1,5 @@
 import { AuthorizationModule } from './authorization/authorization.module';
+import { BlockNoteModule } from './blocknote/blocknote.module';
 import { AppConfig } from './config/config';
 import {
   APP_CONFIG,
@@ -18,7 +19,6 @@ import { RevisionEntity } from './revision/revision.entity';
 import { RevisionRepository } from './revision/revision.repository';
 import { RevisionService } from './revision/revision.service';
 import { StorageModule } from './storage/storage.module';
-import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -57,6 +57,7 @@ import pretty from 'pino-pretty';
     AuthorizationModule,
     NoteModule,
     DatabaseModule,
+    BlockNoteModule,
     Object.assign(
       ApiModule.forRoot({
         apiImplementations: {
@@ -68,10 +69,6 @@ import pretty from 'pino-pretty';
           DocumentService,
           RevisionRepository,
           RevisionService,
-          {
-            provide: ServerBlockNoteEditor,
-            useFactory: () => ServerBlockNoteEditor.create(),
-          },
         ],
       }),
       {
@@ -81,6 +78,7 @@ import pretty from 'pino-pretty';
           AuthorizationModule,
           NoteModule,
           StorageModule,
+          BlockNoteModule,
         ],
       }
     ),

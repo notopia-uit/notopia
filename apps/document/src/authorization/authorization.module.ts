@@ -12,7 +12,6 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthorizationService as AuthorizationServiceDefinition } from '@notopia-uit/pb/authorization';
 
-export const AUTHORIZATION_SERVICE = Symbol('AUTHORIZATION_SERVICE');
 const AUTHORIZATION_CLIENT = Symbol('AUTHORIZATION_CLIENT');
 
 @Module({

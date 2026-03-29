@@ -3,7 +3,7 @@ import { getNote } from '@notopia-uit/api-gen';
 import type { Client } from '@notopia-uit/api-gen/client';
 import { useEffect, useState } from 'react';
 
-export const BlocknoteReferenceConfig = {
+export const BlockNoteReferenceConfig = {
   type: 'reference',
   propSchema: {
     noteId: { default: 'unknown' },
@@ -53,8 +53,8 @@ const ReferenceLink = ({
   );
 };
 
-export const CreateBlocknoteReferenceSpec = (apiClient?: Client) =>
-  createReactInlineContentSpec(BlocknoteReferenceConfig, {
+export const createBlockNoteReferenceSpec = (apiClient?: Client) =>
+  createReactInlineContentSpec(BlockNoteReferenceConfig, {
     render: (props) => {
       if (!apiClient) {
         return;

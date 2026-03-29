@@ -1,5 +1,5 @@
+import { type Block } from '../blocknote/bn-schema.provider';
 import { DocumentEntity } from '../document/document.entity';
-import { Block } from '@blocknote/core';
 import {
   Column,
   CreateDateColumn,

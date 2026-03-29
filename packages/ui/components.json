@@ -10,10 +10,10 @@
     "cssVariables": true
   },
   "aliases": {
-    "components": "@/*",
-    "ui": "@/components/ui",
-    "utils": "@/lib/utils",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "components": "@notopia-uit/ui",
+    "ui": "@notopia-uit/ui/components/ui",
+    "utils": "@notopia-uit/ui/lib/utils",
+    "lib": "@notopia-uit/ui/lib",
+    "hooks": "@notopia-uit/ui/hooks"
   }
 }

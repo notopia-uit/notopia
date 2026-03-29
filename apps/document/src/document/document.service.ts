@@ -1,10 +1,17 @@
 import { AuthorizationService } from '../authorization/authorization.service';
+import {
+  BLOCKNOTE_SCHEMA,
+  type Block,
+  type BlockNoteEditor,
+  type BlockNoteSchema,
+} from '../blocknote/bn-schema.provider';
 import { User } from '../common/user';
 import { RevisionEntity } from '../revision/revision.entity';
 import { StorageService } from '../storage/storage.service';
 import { DocumentEntity } from './document.entity';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import {
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -19,10 +26,10 @@ import { Doc as YDoc, applyUpdate } from 'yjs';
 @Traceable()
 export class DocumentService {
   constructor(
-    private readonly editor: ServerBlockNoteEditor,
     private readonly storageService: StorageService,
     @InjectDataSource() private readonly dataSource: DataSource,
-    private readonly authorizationService: AuthorizationService
+    private readonly authorizationService: AuthorizationService,
+    @Inject(BLOCKNOTE_SCHEMA) private readonly blocknoteSchema: BlockNoteSchema
   ) {}
 
   toYDoc(entity: DocumentEntity): YDoc {
@@ -31,21 +38,51 @@ export class DocumentService {
     return doc;
   }
 
-  BufferToBlockNote(data: Buffer) {
+  private bufferToBlockNote(data: Buffer, editor: BlockNoteEditor): Block[] {
     const yDoc = new YDoc();
     applyUpdate(yDoc, new Uint8Array(data));
-    return this.editor.yDocToBlocks(yDoc);
+    return editor.yDocToBlocks(yDoc);
   }
 
-  extractTags(_content: object[]): string[] {
-    return [];
+  extractTags(editor: BlockNoteEditor): string[] {
+    const tags = new Set<string>();
+    editor.editor.forEachBlock((block) => {
+      if (Array.isArray(block.content)) {
+        for (const inlineNode of block.content) {
+          if (inlineNode.type === 'tag') {
+            tags.add(inlineNode.props.tag);
+          }
+        }
+      }
+
+      return true;
+    });
+
+    return Array.from(tags);
   }
 
-  extractOutgoingLinkIds(_content: object[]): string[] {
-    return [];
+  extractOutgoingLinkIds(editor: BlockNoteEditor): string[] {
+    const linkIds = new Set<string>();
+    editor.editor.forEachBlock((block) => {
+      if (Array.isArray(block.content)) {
+        for (const inlineNode of block.content) {
+          if (inlineNode.type === 'reference') {
+            linkIds.add(inlineNode.props.noteId);
+          }
+        }
+      }
+
+      return true;
+    });
+
+    return Array.from(linkIds);
   }
 
   async commitDocument(documentId: string) {
+    // TODO: instantiate editor here
+    const editor = ServerBlockNoteEditor.create({
+      schema: this.blocknoteSchema,
+    });
     await this.dataSource.transaction(async (manager) => {
       const document = await manager.findOne(DocumentEntity, {
         where: { id: documentId },
@@ -54,17 +91,17 @@ export class DocumentService {
       if (!document) {
         throw new NotFoundException(`Document ${documentId} not found`);
       }
-      const revision = manager.create(RevisionEntity, {
+      manager.save(RevisionEntity, {
         id: randomUUID(),
         document,
-        content: this.BufferToBlockNote(document.data),
+        content: this.bufferToBlockNote(document.data, editor),
       });
-      await manager.save(revision);
       await manager.update(
         DocumentEntity,
         { id: documentId },
         { modified: false }
       );
+      // TODO: Inject kafka client to publish document committed event
     });
   }
 

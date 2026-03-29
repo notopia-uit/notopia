@@ -4,6 +4,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "module": "esnext",
+    "jsx": "react-jsx",
     "types": ["node"],
     "rootDir": "src",
     "baseUrl": "src",
@@ -16,6 +17,9 @@
   "include": ["src/**/*.ts", "src/global.d.ts"],
   "exclude": ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"],
   "references": [
+    {
+      "path": "../../packages/ui/tsconfig.lib.json"
+    },
     {
       "path": "../../packages/pb/tsconfig.lib.json"
     },

@@ -1,6 +1,6 @@
 import { createReactInlineContentSpec } from '@blocknote/react';
 
-export const BlocknoteTagConfig = {
+export const BlockNoteTagConfig = {
   type: 'tag',
   propSchema: {
     tag: { default: '' },
@@ -8,8 +8,8 @@ export const BlocknoteTagConfig = {
   content: 'none',
 } as const;
 
-export const blocknoteTagSpec = createReactInlineContentSpec(
-  BlocknoteTagConfig,
+export const blockNoteTagSpec = createReactInlineContentSpec(
+  BlockNoteTagConfig,
   {
     render: (props) => (
       <span
