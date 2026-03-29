@@ -19,19 +19,22 @@ export class RevisionApi extends _RevisionApi {
     super();
   }
 
-  async deleteRevision(revisionId: string, req: Request): Promise<void> {
+  async deleteRevision(revisionId: string): Promise<void> {
     await this.revisionService.deleteRevision(revisionId);
   }
 
-  async getRevision(revisionId: string, _: Request): Promise<Revision> {
-    return await this.revisionService.getRevision(revisionId);
+  async getRevision(revisionId: string): Promise<Revision> {
+    const revisionEntity = await this.revisionService.getRevision(revisionId);
+    return {
+      ...revisionEntity,
+      createdAt: revisionEntity.createdAt.toISOString(),
+    };
   }
 
   async getRevisions(
     documentId: string,
     page: number,
-    limit: number,
-    req: Request
+    limit: number
   ): Promise<GetRevisions200Response> {
     const result = await this.revisionService.getRevisionsByDocumentId(
       documentId,
@@ -41,10 +44,8 @@ export class RevisionApi extends _RevisionApi {
     const totalPages = Math.ceil(result.total / result.limit);
     return {
       data: result.data.map((r) => ({
-        id: r.id,
-        name: r.name,
-        content: r.content,
-        createdAt: r.createdAt,
+        ...r,
+        createdAt: r.createdAt.toISOString(),
       })),
       pagination: {
         page: result.page,
@@ -59,8 +60,7 @@ export class RevisionApi extends _RevisionApi {
 
   async renameRevision(
     revisionId: string,
-    renameRevisionRequest: RenameRevisionRequest,
-    req: Request
+    renameRevisionRequest: RenameRevisionRequest
   ): Promise<void> {
     await this.revisionService.renameRevision(
       revisionId,

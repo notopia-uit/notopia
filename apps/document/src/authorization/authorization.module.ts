@@ -1,5 +1,7 @@
 import { ServicesConfig } from '../config/config';
 import { SERVICE_CONFIG } from '../config/config.factory';
+import { NoteModule } from '../note/note.module';
+import { NoteService } from '../note/note.service';
 import {
   AuthorizationClient,
   AuthorizationService,
@@ -14,6 +16,7 @@ export const AUTHORIZATION_SERVICE = Symbol('AUTHORIZATION_SERVICE');
 const AUTHORIZATION_CLIENT = Symbol('AUTHORIZATION_CLIENT');
 
 @Module({
+  imports: [NoteModule],
   providers: [
     {
       provide: AUTHORIZATION_CLIENT,
@@ -29,9 +32,9 @@ const AUTHORIZATION_CLIENT = Symbol('AUTHORIZATION_CLIENT');
     },
     {
       provide: AuthorizationService,
-      useFactory: (client: AuthorizationClient) =>
-        new AuthorizationService(client),
-      inject: [AUTHORIZATION_CLIENT],
+      useFactory: (client: AuthorizationClient, noteService: NoteService) =>
+        new AuthorizationService(client, noteService),
+      inject: [AUTHORIZATION_CLIENT, NoteService],
     },
   ],
   exports: [AuthorizationService],

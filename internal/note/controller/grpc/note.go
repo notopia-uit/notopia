@@ -17,3 +17,13 @@ func (h *Handler) CheckNoteExistence(
 	// Response model: &pb.CheckNoteExistenceResponse{Exists: bool}
 	return nil, errs.NewUnimplemented()
 }
+
+func (h *Handler) GetWorkspaceIdByNoteId(
+	ctx context.Context,
+	req *connect.Request[pb.GetWorkspaceIdByNoteIdRequest],
+) (*connect.Response[pb.GetWorkspaceIdByNoteIdResponse], error) {
+	// TODO: Implement gRPC endpoint for getting workspace ID by note ID
+	// Consider delegating to a handler similar to HTTP controllers or direct repo access
+	// Response model: &pb.GetWorkspaceIdByNoteIdResponse{WorkspaceId: string}
+	return nil, errs.NewUnimplemented()
+}

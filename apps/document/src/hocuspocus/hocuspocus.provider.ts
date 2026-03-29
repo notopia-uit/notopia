@@ -32,7 +32,7 @@ export const HocuspocusProvider: Provider = {
         const context = data.context as HocuspocusContext;
         const noteExistenceRes =
           await noteService.checkNoteExistence(documentId);
-        if (!noteExistenceRes.exists) {
+        if (!noteExistenceRes) {
           throw new Error(`Document with ID ${documentId} does not exist`);
         }
         const userPermissionsRes =

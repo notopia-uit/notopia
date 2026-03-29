@@ -69,11 +69,11 @@ export class DocumentService {
   }
 
   async getAttachmentUploadUrl(documentId: string, user: User) {
-    const hasPermission =
-      await this.authorizationService.hasWriteNotePermission(
-        documentId,
-        user.id
-      );
+    const hasPermission = await this.authorizationService.hasNotePermission({
+      documentId,
+      memberId: user.id,
+      permission: 'write',
+    });
     if (!hasPermission) {
       throw new UnauthorizedException(
         `User ${user.id} does not have permission to upload attachment to ${documentId}`

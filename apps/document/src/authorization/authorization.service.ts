@@ -1,5 +1,10 @@
+import { NoteService } from '../note/note.service';
 import { Client, Code, ConnectError } from '@connectrpc/connect';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import {
   AuthorizationService as AuthorizationServiceDefinition,
   WorkspaceItemPermission,
@@ -7,25 +12,55 @@ import {
 
 export type AuthorizationClient = Client<typeof AuthorizationServiceDefinition>;
 
+export type UserNotePermissions = 'read' | 'write' | 'delete';
+
 @Injectable()
 export class AuthorizationService {
-  constructor(private readonly authorizationClient: AuthorizationClient) {}
+  constructor(
+    private readonly authorizationClient: AuthorizationClient,
+    private readonly noteService: NoteService
+  ) {}
 
-  async hasNotePermission(
-    permission: WorkspaceItemPermission,
-    memberId: string
-  ): Promise<{ hasPermission: boolean }> {
+  private toWorkspaceItemPermission(
+    permission: UserNotePermissions
+  ): WorkspaceItemPermission {
+    switch (permission) {
+      case 'read':
+        return WorkspaceItemPermission.READ;
+      case 'write':
+        return WorkspaceItemPermission.WRITE;
+      case 'delete':
+        return WorkspaceItemPermission.DELETE;
+      default:
+        throw new UnprocessableEntityException(
+          `Invalid permission: ${permission}`
+        );
+    }
+  }
+
+  async hasNotePermission({
+    memberId,
+    documentId,
+    permission,
+  }: {
+    memberId: string;
+    documentId: string;
+    permission: UserNotePermissions;
+  }): Promise<boolean> {
     try {
+      const workspaceId =
+        await this.noteService.getWorkspaceIdByNoteId(documentId);
       const response =
         await this.authorizationClient.hasWorkspaceItemPermission({
-          permission,
+          permission: this.toWorkspaceItemPermission(permission),
           memberId,
+          workspaceId,
         });
-      return { hasPermission: response.hasPermission };
+      return response.hasPermission;
     } catch (error) {
       if (error instanceof ConnectError) {
         if (error.code === Code.NotFound) {
-          return { hasPermission: false };
+          return false;
         }
         throw new InternalServerErrorException(
           `Failed to check note permission: ${error.message}`
@@ -35,29 +70,16 @@ export class AuthorizationService {
     }
   }
 
-  async hasWriteNotePermission(memberId: string): Promise<boolean> {
-    const { hasPermission } = await this.hasNotePermission(
-      WorkspaceItemPermission.WRITE,
-      memberId
-    );
-    return hasPermission;
-  }
-
-  async hasReadNotePermission(memberId: string): Promise<boolean> {
-    const { hasPermission } = await this.hasNotePermission(
-      WorkspaceItemPermission.READ,
-      memberId
-    );
-    return hasPermission;
-  }
-
   async getUserNotePermissions(
-    memberId: string
+    memberId: string,
+    documentId: string
   ): Promise<{ canRead: boolean; canWrite: boolean; canDelete: boolean }> {
     try {
+      const workspaceId =
+        await this.noteService.getWorkspaceIdByNoteId(documentId);
       return await this.authorizationClient.getUserWorkspaceItemPermissions({
         memberId,
-        workspaceId: '', // TODO: it need workspace
+        workspaceId,
       });
     } catch (error) {
       if (error instanceof ConnectError) {

@@ -8,16 +8,36 @@ export type NoteClient = Client<typeof NoteServiceDefinition>;
 export class NoteService {
   constructor(private readonly noteClient: NoteClient) {}
 
-  async checkNoteExistence(noteId: string): Promise<{ exists: boolean }> {
+  async checkNoteExistence(noteId: string): Promise<boolean> {
     try {
-      return await this.noteClient.checkNoteExistence({ noteId });
+      const response = await this.noteClient.checkNoteExistence({ noteId });
+      return response.exists;
     } catch (error) {
       if (error instanceof ConnectError) {
         if (error.code === Code.NotFound) {
-          return { exists: false };
+          return false;
         }
         throw new InternalServerErrorException(
           `Failed to check note existence: ${error.message}`
+        );
+      }
+      throw error;
+    }
+  }
+
+  async getWorkspaceIdByNoteId(noteId: string): Promise<string> {
+    try {
+      const response = await this.noteClient.getWorkspaceIdByNoteId({ noteId });
+      return response.workspaceId;
+    } catch (error) {
+      if (error instanceof ConnectError) {
+        if (error.code === Code.NotFound) {
+          throw new InternalServerErrorException(
+            `Note with ID ${noteId} not found`
+          );
+        }
+        throw new InternalServerErrorException(
+          `Failed to get workspace ID by note ID: ${error.message}`
         );
       }
       throw error;

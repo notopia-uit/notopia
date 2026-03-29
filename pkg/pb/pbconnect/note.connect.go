@@ -36,11 +36,15 @@ const (
 	// NoteServiceCheckNoteExistenceProcedure is the fully-qualified name of the NoteService's
 	// CheckNoteExistence RPC.
 	NoteServiceCheckNoteExistenceProcedure = "/note.NoteService/CheckNoteExistence"
+	// NoteServiceGetWorkspaceIdByNoteIdProcedure is the fully-qualified name of the NoteService's
+	// GetWorkspaceIdByNoteId RPC.
+	NoteServiceGetWorkspaceIdByNoteIdProcedure = "/note.NoteService/GetWorkspaceIdByNoteId"
 )
 
 // NoteServiceClient is a client for the note.NoteService service.
 type NoteServiceClient interface {
 	CheckNoteExistence(context.Context, *connect.Request[pb.CheckNoteExistenceRequest]) (*connect.Response[pb.CheckNoteExistenceResponse], error)
+	GetWorkspaceIdByNoteId(context.Context, *connect.Request[pb.GetWorkspaceIdByNoteIdRequest]) (*connect.Response[pb.GetWorkspaceIdByNoteIdResponse], error)
 }
 
 // NewNoteServiceClient constructs a client for the note.NoteService service. By default, it uses
@@ -60,12 +64,19 @@ func NewNoteServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(noteServiceMethods.ByName("CheckNoteExistence")),
 			connect.WithClientOptions(opts...),
 		),
+		getWorkspaceIdByNoteId: connect.NewClient[pb.GetWorkspaceIdByNoteIdRequest, pb.GetWorkspaceIdByNoteIdResponse](
+			httpClient,
+			baseURL+NoteServiceGetWorkspaceIdByNoteIdProcedure,
+			connect.WithSchema(noteServiceMethods.ByName("GetWorkspaceIdByNoteId")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // noteServiceClient implements NoteServiceClient.
 type noteServiceClient struct {
-	checkNoteExistence *connect.Client[pb.CheckNoteExistenceRequest, pb.CheckNoteExistenceResponse]
+	checkNoteExistence     *connect.Client[pb.CheckNoteExistenceRequest, pb.CheckNoteExistenceResponse]
+	getWorkspaceIdByNoteId *connect.Client[pb.GetWorkspaceIdByNoteIdRequest, pb.GetWorkspaceIdByNoteIdResponse]
 }
 
 // CheckNoteExistence calls note.NoteService.CheckNoteExistence.
@@ -73,9 +84,15 @@ func (c *noteServiceClient) CheckNoteExistence(ctx context.Context, req *connect
 	return c.checkNoteExistence.CallUnary(ctx, req)
 }
 
+// GetWorkspaceIdByNoteId calls note.NoteService.GetWorkspaceIdByNoteId.
+func (c *noteServiceClient) GetWorkspaceIdByNoteId(ctx context.Context, req *connect.Request[pb.GetWorkspaceIdByNoteIdRequest]) (*connect.Response[pb.GetWorkspaceIdByNoteIdResponse], error) {
+	return c.getWorkspaceIdByNoteId.CallUnary(ctx, req)
+}
+
 // NoteServiceHandler is an implementation of the note.NoteService service.
 type NoteServiceHandler interface {
 	CheckNoteExistence(context.Context, *connect.Request[pb.CheckNoteExistenceRequest]) (*connect.Response[pb.CheckNoteExistenceResponse], error)
+	GetWorkspaceIdByNoteId(context.Context, *connect.Request[pb.GetWorkspaceIdByNoteIdRequest]) (*connect.Response[pb.GetWorkspaceIdByNoteIdResponse], error)
 }
 
 // NewNoteServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -91,10 +108,18 @@ func NewNoteServiceHandler(svc NoteServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(noteServiceMethods.ByName("CheckNoteExistence")),
 		connect.WithHandlerOptions(opts...),
 	)
+	noteServiceGetWorkspaceIdByNoteIdHandler := connect.NewUnaryHandler(
+		NoteServiceGetWorkspaceIdByNoteIdProcedure,
+		svc.GetWorkspaceIdByNoteId,
+		connect.WithSchema(noteServiceMethods.ByName("GetWorkspaceIdByNoteId")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/note.NoteService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case NoteServiceCheckNoteExistenceProcedure:
 			noteServiceCheckNoteExistenceHandler.ServeHTTP(w, r)
+		case NoteServiceGetWorkspaceIdByNoteIdProcedure:
+			noteServiceGetWorkspaceIdByNoteIdHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -106,4 +131,8 @@ type UnimplementedNoteServiceHandler struct{}
 
 func (UnimplementedNoteServiceHandler) CheckNoteExistence(context.Context, *connect.Request[pb.CheckNoteExistenceRequest]) (*connect.Response[pb.CheckNoteExistenceResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("note.NoteService.CheckNoteExistence is not implemented"))
+}
+
+func (UnimplementedNoteServiceHandler) GetWorkspaceIdByNoteId(context.Context, *connect.Request[pb.GetWorkspaceIdByNoteIdRequest]) (*connect.Response[pb.GetWorkspaceIdByNoteIdResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("note.NoteService.GetWorkspaceIdByNoteId is not implemented"))
 }
