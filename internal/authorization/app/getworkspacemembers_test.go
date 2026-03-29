@@ -20,14 +20,14 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 		requesterID     string
 		workspaceID     string
 		expectErr       bool
-		expectedMembers []app.WorkspaceMember
+		expectedMembers []*app.WorkspaceMember
 	}{
 		{
 			name:        "W111-Owner can view members",
 			requesterID: "111",
 			workspaceID: "00000000-0000-0000-0000-000000000111",
 			expectErr:   false,
-			expectedMembers: []app.WorkspaceMember{
+			expectedMembers: []*app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 				{ID: "112", Role: app.WorkspaceRoleEditor},
 				{ID: "110", Role: app.WorkspaceRoleViewer},
@@ -38,7 +38,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 			requesterID: "112",
 			workspaceID: "00000000-0000-0000-0000-000000000111",
 			expectErr:   false,
-			expectedMembers: []app.WorkspaceMember{
+			expectedMembers: []*app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 				{ID: "112", Role: app.WorkspaceRoleEditor},
 				{ID: "110", Role: app.WorkspaceRoleViewer},
@@ -49,7 +49,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 			requesterID: "110",
 			workspaceID: "00000000-0000-0000-0000-000000000111",
 			expectErr:   false,
-			expectedMembers: []app.WorkspaceMember{
+			expectedMembers: []*app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 				{ID: "112", Role: app.WorkspaceRoleEditor},
 				{ID: "110", Role: app.WorkspaceRoleViewer},
