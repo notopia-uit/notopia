@@ -1,0 +1,19 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  type:
+    type: string
+    enum:
+      - WorkspaceItemsUpdatedEvent
+    example: WorkspaceItemsUpdatedEvent
+  data:
+    type: object
+    x-go-type-name: WorkspaceItemsUpdatedEventData
+    properties:
+      workspaceId:
+        $ref: ./Workspace.yaml#/properties/id
+    required:
+      - workspaceId
+required:
+  - type
+  - data

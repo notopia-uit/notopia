@@ -40,10 +40,9 @@ func NewFolder(
 	}
 	folder.AddEvent(
 		&FolderCreatedEvent{
-			BaseEvent:   *NewBaseEvent(),
-			AggregateID: folder.id,
-			Name:        folder.name,
-			Icon:        folder.icon,
+			BaseEvent: *NewBaseEvent(folder.id),
+			Name:      folder.name,
+			Icon:      folder.icon,
 		},
 	)
 	return folder, nil
@@ -80,10 +79,9 @@ func (f *Folder) Name() string {
 func (f *Folder) Rename(name string) {
 	f.name = name
 	f.AddEvent(&FolderUpdatedEvent{
-		BaseEvent:   *NewBaseEvent(),
-		AggregateID: f.id,
-		Name:        f.name,
-		Icon:        f.icon,
+		BaseEvent: *NewBaseEvent(f.id),
+		Name:      f.name,
+		Icon:      f.icon,
 	})
 }
 
@@ -94,10 +92,9 @@ func (f *Folder) Icon() *string {
 func (f *Folder) SetIcon(icon string) {
 	f.icon = &icon
 	f.AddEvent(&FolderUpdatedEvent{
-		BaseEvent:   *NewBaseEvent(),
-		AggregateID: f.id,
-		Name:        f.name,
-		Icon:        f.icon,
+		BaseEvent: *NewBaseEvent(f.id),
+		Name:      f.name,
+		Icon:      f.icon,
 	})
 }
 
@@ -122,9 +119,8 @@ func (f *Folder) MoveToFolder(folderID uuid.UUID) {
 	f.folderHierarchy = *hierarchy
 	f.AddEvent(
 		&FolderMovedEvent{
-			BaseEvent:   *NewBaseEvent(),
-			AggregateID: f.id,
-			ParentID:    folderID,
+			BaseEvent: *NewBaseEvent(f.id),
+			ParentID:  folderID,
 		},
 	)
 }
@@ -160,8 +156,7 @@ func (f *Folder) Trash(trashedBy TrashedBy) errs.Error {
 	}
 	f.trashed = NewTrashed(trashedBy, time.Now())
 	f.AddEvent(&FolderTrashedEvent{
-		BaseEvent:   *NewBaseEvent(),
-		AggregateID: f.id,
+		BaseEvent: *NewBaseEvent(f.id),
 	})
 	return nil
 }
@@ -169,8 +164,7 @@ func (f *Folder) Trash(trashedBy TrashedBy) errs.Error {
 func (f *Folder) Restore() {
 	f.trashed = nil
 	f.AddEvent(&FolderRestoredEvent{
-		BaseEvent:   *NewBaseEvent(),
-		AggregateID: f.id,
+		BaseEvent: *NewBaseEvent(f.id),
 	})
 }
 

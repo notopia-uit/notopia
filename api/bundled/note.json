@@ -300,6 +300,15 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/noteIdPath"
+          },
+          {
+            "name": "excludeTrashed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -717,7 +726,7 @@
         }
       }
     },
-    "/note/workspaces-by-slug/{workspaceSlug}_exists": {
+    "/note/workspaces-by-slug/{workspaceSlug}/exists": {
       "get": {
         "security": [
           {
@@ -817,49 +826,10 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/FolderCreatedEvent"
+                      "$ref": "#/components/schemas/WorkspaceItemsUpdatedEvent"
                     },
                     {
-                      "$ref": "#/components/schemas/FolderDeletedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/FolderUpdatedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/FolderMovedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/FolderTrashedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/FolderRestoredEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/FolderPermanentlyDeletedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/NoteCreatedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/NoteDeletedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/NoteUpdatedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/NoteMovedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/NoteTrashedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/NoteRestoredEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/NotePermanentlyDeletedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/WorkspaceMemebersUpdatedEvent"
+                      "$ref": "#/components/schemas/WorkspaceMembersUpdatedEvent"
                     },
                     {
                       "$ref": "#/components/schemas/WorkspaceUpdatedEvent"
@@ -871,21 +841,8 @@
                   "discriminator": {
                     "propertyName": "type",
                     "mapping": {
-                      "FolderCreatedEvent": "#/components/schemas/FolderCreatedEvent",
-                      "FolderDeletedEvent": "#/components/schemas/FolderDeletedEvent",
-                      "FolderUpdatedEvent": "#/components/schemas/FolderUpdatedEvent",
-                      "FolderMovedEvent": "#/components/schemas/FolderMovedEvent",
-                      "FolderTrashedEvent": "#/components/schemas/FolderTrashedEvent",
-                      "FolderRestoredEvent": "#/components/schemas/FolderRestoredEvent",
-                      "FolderPermanentlyDeletedEvent": "#/components/schemas/FolderPermanentlyDeletedEvent",
-                      "NoteCreatedEvent": "#/components/schemas/NoteCreatedEvent",
-                      "NoteDeletedEvent": "#/components/schemas/NoteDeletedEvent",
-                      "NoteUpdatedEvent": "#/components/schemas/NoteUpdatedEvent",
-                      "NoteMovedEvent": "#/components/schemas/NoteMovedEvent",
-                      "NoteTrashedEvent": "#/components/schemas/NoteTrashedEvent",
-                      "NoteRestoredEvent": "#/components/schemas/NoteRestoredEvent",
-                      "NotePermanentlyDeletedEvent": "#/components/schemas/NotePermanentlyDeletedEvent",
-                      "WorkspaceMemebersUpdatedEvent": "#/components/schemas/WorkspaceMemebersUpdatedEvent",
+                      "WorkspaceItemsUpdatedEvent": "#/components/schemas/WorkspaceItemsUpdatedEvent",
+                      "WorkspaceMembersUpdatedEvent": "#/components/schemas/WorkspaceMembersUpdatedEvent",
                       "WorkspaceUpdatedEvent": "#/components/schemas/WorkspaceUpdatedEvent",
                       "WorkspaceDeletedEvent": "#/components/schemas/WorkspaceDeletedEvent"
                     }
@@ -1295,16 +1252,16 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "notes": {
+                  "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/TrashedNote"
+                      "$ref": "#/components/schemas/Note_properties-id"
                     }
                   },
-                  "folders": {
+                  "folderIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/TrashedFolder"
+                      "$ref": "#/components/schemas/id"
                     }
                   }
                 }
@@ -1416,16 +1373,16 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "notes": {
+                  "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/TrashedNote"
+                      "$ref": "#/components/schemas/Note_properties-id"
                     }
                   },
-                  "folders": {
+                  "folderIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/TrashedFolder"
+                      "$ref": "#/components/schemas/id"
                     }
                   }
                 }
@@ -1574,6 +1531,14 @@
         "example": "550e8400-e29b-41d4-a716-446655440000",
         "readOnly": true
       },
+      "TrashedBy": {
+        "type": "string",
+        "enum": [
+          "purpose",
+          "parent"
+        ],
+        "example": "purpose"
+      },
       "Folder": {
         "type": "object",
         "properties": {
@@ -1594,12 +1559,6 @@
             "nullable": true,
             "example": "📁"
           },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-06-01T12:00:00Z",
-            "readOnly": true
-          },
           "parentId": {
             "$ref": "#/components/schemas/id",
             "example": "cc7a2e47-6267-4c60-8d36-257f849777e4"
@@ -1607,15 +1566,41 @@
           "workspaceId": {
             "$ref": "#/components/schemas/properties-id",
             "readOnly": false
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-01T12:00:00Z",
+            "readOnly": true
+          },
+          "trashed": {
+            "type": "object",
+            "nullable": true,
+            "readOnly": true,
+            "properties": {
+              "trashedBy": {
+                "$ref": "#/components/schemas/TrashedBy"
+              },
+              "trashedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-06-01T12:00:00Z"
+              }
+            },
+            "required": [
+              "trashedBy",
+              "trashedAt"
+            ]
           }
         },
         "required": [
           "id",
           "name",
           "icon",
-          "updatedAt",
           "parentId",
-          "workspaceId"
+          "workspaceId",
+          "updatedAt",
+          "trashed"
         ]
       },
       "Error": {
@@ -1687,17 +1672,24 @@
             "example": "2024-06-01T12:34:56Z",
             "readOnly": true
           },
-          "backlinksCount": {
-            "type": "integer",
-            "minimum": 0,
-            "example": 5,
-            "readOnly": true
-          },
-          "outgoingLinksCount": {
-            "type": "integer",
-            "minimum": 0,
-            "example": 3,
-            "readOnly": true
+          "trashed": {
+            "type": "object",
+            "nullable": true,
+            "readOnly": true,
+            "properties": {
+              "trashedBy": {
+                "$ref": "#/components/schemas/TrashedBy"
+              },
+              "trashedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-06-01T12:00:00Z"
+              }
+            },
+            "required": [
+              "trashedBy",
+              "trashedAt"
+            ]
           }
         },
         "required": [
@@ -1707,8 +1699,7 @@
           "folderId",
           "tags",
           "updatedAt",
-          "backlinksCount",
-          "outgoingLinksCount"
+          "trashed"
         ]
       },
       "Note_properties-id": {
@@ -1848,422 +1839,26 @@
         "type": "string",
         "example": "notopia"
       },
-      "properties-icon": {
-        "type": "string",
-        "nullable": true,
-        "example": "📁"
-      },
-      "FolderCreatedEvent": {
+      "WorkspaceItemsUpdatedEvent": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
             "enum": [
-              "FolderCreatedEvent"
+              "WorkspaceItemsUpdatedEvent"
             ],
-            "example": "FolderCreatedEvent"
+            "example": "WorkspaceItemsUpdatedEvent"
           },
           "data": {
             "type": "object",
-            "x-go-type-name": "FolderCreatedEventData",
+            "x-go-type-name": "WorkspaceItemsUpdatedEventData",
             "properties": {
-              "id": {
-                "$ref": "#/components/schemas/id"
-              },
-              "name": {
-                "$ref": "#/components/schemas/name"
-              },
-              "icon": {
-                "$ref": "#/components/schemas/properties-icon"
+              "workspaceId": {
+                "$ref": "#/components/schemas/properties-id"
               }
             },
             "required": [
-              "id",
-              "name"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "FolderDeletedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "FolderDeletedEvent"
-            ],
-            "example": "FolderDeletedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "FolderDeletedEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/id"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "FolderUpdatedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "FolderUpdatedEvent"
-            ],
-            "example": "FolderUpdatedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "FolderUpdatedEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/id"
-              },
-              "name": {
-                "$ref": "#/components/schemas/name"
-              },
-              "icon": {
-                "$ref": "#/components/schemas/properties-icon"
-              }
-            },
-            "required": [
-              "id",
-              "name",
-              "icon"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "FolderMovedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "FolderMovedEvent"
-            ],
-            "example": "FolderMovedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "FolderMovedEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/id"
-              },
-              "parentId": {
-                "$ref": "#/components/schemas/id"
-              }
-            },
-            "required": [
-              "id",
-              "parentId"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "FolderTrashedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "FolderTrashedEvent"
-            ],
-            "example": "FolderTrashedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "FolderTrashedEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/id"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "FolderRestoredEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "FolderRestoredEvent"
-            ],
-            "example": "FolderRestoredEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "FolderRestoredEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/id"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "FolderPermanentlyDeletedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "FolderPermanentlyDeletedEvent"
-            ],
-            "example": "FolderPermanentlyDeletedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "FolderPermanentlyDeletedEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/id"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "NoteCreatedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "NoteCreatedEvent"
-            ],
-            "example": "NoteCreatedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "NoteCreatedEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
-              },
-              "name": {
-                "$ref": "#/components/schemas/properties-name"
-              },
-              "icon": {
-                "$ref": "#/components/schemas/icon"
-              }
-            },
-            "required": [
-              "id",
-              "name"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "NoteDeletedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "NoteDeletedEvent"
-            ],
-            "example": "NoteDeletedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "NoteDeletedEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "NoteUpdatedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "NoteUpdatedEvent"
-            ],
-            "example": "NoteUpdatedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "NoteUpdatedEventData",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Note"
-              }
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "NoteMovedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "NoteMovedEvent"
-            ],
-            "example": "NoteMovedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "NoteMovedEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
-              },
-              "folderId": {
-                "$ref": "#/components/schemas/id"
-              }
-            },
-            "required": [
-              "id",
-              "folderId"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "NoteTrashedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "NoteTrashedEvent"
-            ],
-            "example": "NoteTrashedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "NoteTrashedEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "NoteRestoredEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "NoteRestoredEvent"
-            ],
-            "example": "NoteRestoredEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "NoteRestoredEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
-              }
-            },
-            "required": [
-              "id"
-            ]
-          }
-        },
-        "required": [
-          "type",
-          "data"
-        ]
-      },
-      "NotePermanentlyDeletedEvent": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "NotePermanentlyDeletedEvent"
-            ],
-            "example": "NotePermanentlyDeletedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "NotePermanentlyDeletedEventData",
-            "properties": {
-              "id": {
-                "$ref": "#/components/schemas/Note_properties-id"
-              }
-            },
-            "required": [
-              "id"
+              "workspaceId"
             ]
           }
         },
@@ -2311,7 +1906,7 @@
           "role"
         ]
       },
-      "WorkspaceMemebersUpdatedEvent": {
+      "WorkspaceMembersUpdatedEvent": {
         "type": "object",
         "properties": {
           "type": {
@@ -2323,7 +1918,7 @@
           },
           "data": {
             "type": "object",
-            "x-go-type-name": "WorkspaceMemebersUpdatedEventData",
+            "x-go-type-name": "WorkspaceMembersUpdatedEventData",
             "properties": {
               "id": {
                 "$ref": "#/components/schemas/properties-id"
@@ -2334,7 +1929,11 @@
                   "$ref": "#/components/schemas/WorkspaceMember"
                 }
               }
-            }
+            },
+            "required": [
+              "id",
+              "members"
+            ]
           }
         },
         "required": [
@@ -2401,16 +2000,6 @@
         "maxLength": 255,
         "example": "Notopia"
       },
-      "TrashedBy": {
-        "type": "string",
-        "enum": [
-          "purpose",
-          "parent"
-        ],
-        "nullable": true,
-        "example": "purpose",
-        "readOnly": true
-      },
       "TrashedNote": {
         "type": "object",
         "properties": {
@@ -2476,6 +2065,11 @@
           "trashedBy",
           "trashedAt"
         ]
+      },
+      "properties-icon": {
+        "type": "string",
+        "nullable": true,
+        "example": "📁"
       },
       "updatedAt": {
         "type": "string",

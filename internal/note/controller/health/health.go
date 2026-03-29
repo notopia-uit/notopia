@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/alexliesenfeld/health"
-	httpCheck "github.com/hellofresh/health-go/v4/checks/http"
+	httpCheck "github.com/hellofresh/health-go/v5/checks/http"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 )

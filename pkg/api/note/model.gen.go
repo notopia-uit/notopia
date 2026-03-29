@@ -13,111 +13,6 @@ const (
 	Oauth2Scopes = "Oauth2.Scopes"
 )
 
-// Defines values for FolderCreatedEventType.
-const (
-	FolderCreatedEventTypeFolderCreatedEvent FolderCreatedEventType = "FolderCreatedEvent"
-)
-
-// Valid indicates whether the value is a known member of the FolderCreatedEventType enum.
-func (e FolderCreatedEventType) Valid() bool {
-	switch e {
-	case FolderCreatedEventTypeFolderCreatedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for FolderDeletedEventType.
-const (
-	FolderDeletedEventTypeFolderDeletedEvent FolderDeletedEventType = "FolderDeletedEvent"
-)
-
-// Valid indicates whether the value is a known member of the FolderDeletedEventType enum.
-func (e FolderDeletedEventType) Valid() bool {
-	switch e {
-	case FolderDeletedEventTypeFolderDeletedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for FolderMovedEventType.
-const (
-	FolderMovedEventTypeFolderMovedEvent FolderMovedEventType = "FolderMovedEvent"
-)
-
-// Valid indicates whether the value is a known member of the FolderMovedEventType enum.
-func (e FolderMovedEventType) Valid() bool {
-	switch e {
-	case FolderMovedEventTypeFolderMovedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for FolderPermanentlyDeletedEventType.
-const (
-	FolderPermanentlyDeletedEventTypeFolderPermanentlyDeletedEvent FolderPermanentlyDeletedEventType = "FolderPermanentlyDeletedEvent"
-)
-
-// Valid indicates whether the value is a known member of the FolderPermanentlyDeletedEventType enum.
-func (e FolderPermanentlyDeletedEventType) Valid() bool {
-	switch e {
-	case FolderPermanentlyDeletedEventTypeFolderPermanentlyDeletedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for FolderRestoredEventType.
-const (
-	FolderRestoredEventTypeFolderRestoredEvent FolderRestoredEventType = "FolderRestoredEvent"
-)
-
-// Valid indicates whether the value is a known member of the FolderRestoredEventType enum.
-func (e FolderRestoredEventType) Valid() bool {
-	switch e {
-	case FolderRestoredEventTypeFolderRestoredEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for FolderTrashedEventType.
-const (
-	FolderTrashedEventTypeFolderTrashedEvent FolderTrashedEventType = "FolderTrashedEvent"
-)
-
-// Valid indicates whether the value is a known member of the FolderTrashedEventType enum.
-func (e FolderTrashedEventType) Valid() bool {
-	switch e {
-	case FolderTrashedEventTypeFolderTrashedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for FolderUpdatedEventType.
-const (
-	FolderUpdatedEventTypeFolderUpdatedEvent FolderUpdatedEventType = "FolderUpdatedEvent"
-)
-
-// Valid indicates whether the value is a known member of the FolderUpdatedEventType enum.
-func (e FolderUpdatedEventType) Valid() bool {
-	switch e {
-	case FolderUpdatedEventTypeFolderUpdatedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for GraphNodesType.
 const (
 	GraphNodesTypeNote GraphNodesType = "note"
@@ -130,111 +25,6 @@ func (e GraphNodesType) Valid() bool {
 	case GraphNodesTypeNote:
 		return true
 	case GraphNodesTypeTag:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for NoteCreatedEventType.
-const (
-	NoteCreatedEventTypeNoteCreatedEvent NoteCreatedEventType = "NoteCreatedEvent"
-)
-
-// Valid indicates whether the value is a known member of the NoteCreatedEventType enum.
-func (e NoteCreatedEventType) Valid() bool {
-	switch e {
-	case NoteCreatedEventTypeNoteCreatedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for NoteDeletedEventType.
-const (
-	NoteDeletedEventTypeNoteDeletedEvent NoteDeletedEventType = "NoteDeletedEvent"
-)
-
-// Valid indicates whether the value is a known member of the NoteDeletedEventType enum.
-func (e NoteDeletedEventType) Valid() bool {
-	switch e {
-	case NoteDeletedEventTypeNoteDeletedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for NoteMovedEventType.
-const (
-	NoteMovedEventTypeNoteMovedEvent NoteMovedEventType = "NoteMovedEvent"
-)
-
-// Valid indicates whether the value is a known member of the NoteMovedEventType enum.
-func (e NoteMovedEventType) Valid() bool {
-	switch e {
-	case NoteMovedEventTypeNoteMovedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for NotePermanentlyDeletedEventType.
-const (
-	NotePermanentlyDeletedEventTypeNotePermanentlyDeletedEvent NotePermanentlyDeletedEventType = "NotePermanentlyDeletedEvent"
-)
-
-// Valid indicates whether the value is a known member of the NotePermanentlyDeletedEventType enum.
-func (e NotePermanentlyDeletedEventType) Valid() bool {
-	switch e {
-	case NotePermanentlyDeletedEventTypeNotePermanentlyDeletedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for NoteRestoredEventType.
-const (
-	NoteRestoredEventTypeNoteRestoredEvent NoteRestoredEventType = "NoteRestoredEvent"
-)
-
-// Valid indicates whether the value is a known member of the NoteRestoredEventType enum.
-func (e NoteRestoredEventType) Valid() bool {
-	switch e {
-	case NoteRestoredEventTypeNoteRestoredEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for NoteTrashedEventType.
-const (
-	NoteTrashedEventTypeNoteTrashedEvent NoteTrashedEventType = "NoteTrashedEvent"
-)
-
-// Valid indicates whether the value is a known member of the NoteTrashedEventType enum.
-func (e NoteTrashedEventType) Valid() bool {
-	switch e {
-	case NoteTrashedEventTypeNoteTrashedEvent:
-		return true
-	default:
-		return false
-	}
-}
-
-// Defines values for NoteUpdatedEventType.
-const (
-	NoteUpdatedEventTypeNoteUpdatedEvent NoteUpdatedEventType = "NoteUpdatedEvent"
-)
-
-// Valid indicates whether the value is a known member of the NoteUpdatedEventType enum.
-func (e NoteUpdatedEventType) Valid() bool {
-	switch e {
-	case NoteUpdatedEventTypeNoteUpdatedEvent:
 		return true
 	default:
 		return false
@@ -274,15 +64,30 @@ func (e WorkspaceDeletedEventType) Valid() bool {
 	}
 }
 
-// Defines values for WorkspaceMemebersUpdatedEventType.
+// Defines values for WorkspaceItemsUpdatedEventType.
 const (
-	WorkspaceMembersUpdatedEvent WorkspaceMemebersUpdatedEventType = "WorkspaceMembersUpdatedEvent"
+	WorkspaceItemsUpdatedEventTypeWorkspaceItemsUpdatedEvent WorkspaceItemsUpdatedEventType = "WorkspaceItemsUpdatedEvent"
 )
 
-// Valid indicates whether the value is a known member of the WorkspaceMemebersUpdatedEventType enum.
-func (e WorkspaceMemebersUpdatedEventType) Valid() bool {
+// Valid indicates whether the value is a known member of the WorkspaceItemsUpdatedEventType enum.
+func (e WorkspaceItemsUpdatedEventType) Valid() bool {
 	switch e {
-	case WorkspaceMembersUpdatedEvent:
+	case WorkspaceItemsUpdatedEventTypeWorkspaceItemsUpdatedEvent:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for WorkspaceMembersUpdatedEventType.
+const (
+	WorkspaceMembersUpdatedEventTypeWorkspaceMembersUpdatedEvent WorkspaceMembersUpdatedEventType = "WorkspaceMembersUpdatedEvent"
+)
+
+// Valid indicates whether the value is a known member of the WorkspaceMembersUpdatedEventType enum.
+func (e WorkspaceMembersUpdatedEventType) Valid() bool {
+	switch e {
+	case WorkspaceMembersUpdatedEventTypeWorkspaceMembersUpdatedEvent:
 		return true
 	default:
 		return false
@@ -363,116 +168,17 @@ type Error struct {
 
 // Folder defines model for Folder.
 type Folder struct {
-	Icon        *string             `json:"icon"`
-	Id          *openapi_types.UUID `json:"id,omitempty"`
-	Name        string              `json:"name"`
-	ParentId    *Id                 `json:"parentId,omitempty"`
-	UpdatedAt   *time.Time          `json:"updatedAt,omitempty"`
-	WorkspaceId *PropertiesId       `json:"workspaceId,omitempty"`
+	Icon     *string             `json:"icon"`
+	Id       *openapi_types.UUID `json:"id,omitempty"`
+	Name     string              `json:"name"`
+	ParentId *Id                 `json:"parentId,omitempty"`
+	Trashed  *struct {
+		TrashedAt time.Time `json:"trashedAt"`
+		TrashedBy TrashedBy `json:"trashedBy"`
+	} `json:"trashed,omitempty"`
+	UpdatedAt   *time.Time    `json:"updatedAt,omitempty"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
-
-// FolderCreatedEvent defines model for FolderCreatedEvent.
-type FolderCreatedEvent struct {
-	Data FolderCreatedEventData `json:"data"`
-	Type FolderCreatedEventType `json:"type"`
-}
-
-// FolderCreatedEventData defines model for .
-type FolderCreatedEventData struct {
-	Icon *PropertiesIcon `json:"icon,omitempty"`
-	Id   *Id             `json:"id,omitempty"`
-	Name Name            `json:"name"`
-}
-
-// FolderCreatedEventType defines model for FolderCreatedEvent.Type.
-type FolderCreatedEventType string
-
-// FolderDeletedEvent defines model for FolderDeletedEvent.
-type FolderDeletedEvent struct {
-	Data FolderDeletedEventData `json:"data"`
-	Type FolderDeletedEventType `json:"type"`
-}
-
-// FolderDeletedEventData defines model for .
-type FolderDeletedEventData struct {
-	Id *Id `json:"id,omitempty"`
-}
-
-// FolderDeletedEventType defines model for FolderDeletedEvent.Type.
-type FolderDeletedEventType string
-
-// FolderMovedEvent defines model for FolderMovedEvent.
-type FolderMovedEvent struct {
-	Data FolderMovedEventData `json:"data"`
-	Type FolderMovedEventType `json:"type"`
-}
-
-// FolderMovedEventData defines model for .
-type FolderMovedEventData struct {
-	Id       *Id `json:"id,omitempty"`
-	ParentId *Id `json:"parentId,omitempty"`
-}
-
-// FolderMovedEventType defines model for FolderMovedEvent.Type.
-type FolderMovedEventType string
-
-// FolderPermanentlyDeletedEvent defines model for FolderPermanentlyDeletedEvent.
-type FolderPermanentlyDeletedEvent struct {
-	Data FolderPermanentlyDeletedEventData `json:"data"`
-	Type FolderPermanentlyDeletedEventType `json:"type"`
-}
-
-// FolderPermanentlyDeletedEventData defines model for .
-type FolderPermanentlyDeletedEventData struct {
-	Id *Id `json:"id,omitempty"`
-}
-
-// FolderPermanentlyDeletedEventType defines model for FolderPermanentlyDeletedEvent.Type.
-type FolderPermanentlyDeletedEventType string
-
-// FolderRestoredEvent defines model for FolderRestoredEvent.
-type FolderRestoredEvent struct {
-	Data FolderRestoredEventData `json:"data"`
-	Type FolderRestoredEventType `json:"type"`
-}
-
-// FolderRestoredEventData defines model for .
-type FolderRestoredEventData struct {
-	Id *Id `json:"id,omitempty"`
-}
-
-// FolderRestoredEventType defines model for FolderRestoredEvent.Type.
-type FolderRestoredEventType string
-
-// FolderTrashedEvent defines model for FolderTrashedEvent.
-type FolderTrashedEvent struct {
-	Data FolderTrashedEventData `json:"data"`
-	Type FolderTrashedEventType `json:"type"`
-}
-
-// FolderTrashedEventData defines model for .
-type FolderTrashedEventData struct {
-	Id *Id `json:"id,omitempty"`
-}
-
-// FolderTrashedEventType defines model for FolderTrashedEvent.Type.
-type FolderTrashedEventType string
-
-// FolderUpdatedEvent defines model for FolderUpdatedEvent.
-type FolderUpdatedEvent struct {
-	Data FolderUpdatedEventData `json:"data"`
-	Type FolderUpdatedEventType `json:"type"`
-}
-
-// FolderUpdatedEventData defines model for .
-type FolderUpdatedEventData struct {
-	Icon *PropertiesIcon `json:"icon"`
-	Id   *Id             `json:"id,omitempty"`
-	Name Name            `json:"name"`
-}
-
-// FolderUpdatedEventType defines model for FolderUpdatedEvent.Type.
-type FolderUpdatedEventType string
 
 // Graph defines model for Graph.
 type Graph struct {
@@ -507,45 +213,17 @@ type GraphNode struct {
 
 // Note defines model for Note.
 type Note struct {
-	BacklinksCount     *int                `json:"backlinksCount,omitempty"`
-	FolderId           *Id                 `json:"folderId,omitempty"`
-	Icon               *string             `json:"icon"`
-	Id                 *openapi_types.UUID `json:"id,omitempty"`
-	Name               string              `json:"name"`
-	OutgoingLinksCount *int                `json:"outgoingLinksCount,omitempty"`
-	Tags               []string            `json:"tags"`
-	UpdatedAt          *time.Time          `json:"updatedAt,omitempty"`
+	FolderId *Id                 `json:"folderId,omitempty"`
+	Icon     *string             `json:"icon"`
+	Id       *openapi_types.UUID `json:"id,omitempty"`
+	Name     string              `json:"name"`
+	Tags     []string            `json:"tags"`
+	Trashed  *struct {
+		TrashedAt time.Time `json:"trashedAt"`
+		TrashedBy TrashedBy `json:"trashedBy"`
+	} `json:"trashed,omitempty"`
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 }
-
-// NoteCreatedEvent defines model for NoteCreatedEvent.
-type NoteCreatedEvent struct {
-	Data NoteCreatedEventData `json:"data"`
-	Type NoteCreatedEventType `json:"type"`
-}
-
-// NoteCreatedEventData defines model for .
-type NoteCreatedEventData struct {
-	Icon *Icon             `json:"icon,omitempty"`
-	Id   *NotePropertiesId `json:"id,omitempty"`
-	Name PropertiesName    `json:"name"`
-}
-
-// NoteCreatedEventType defines model for NoteCreatedEvent.Type.
-type NoteCreatedEventType string
-
-// NoteDeletedEvent defines model for NoteDeletedEvent.
-type NoteDeletedEvent struct {
-	Data NoteDeletedEventData `json:"data"`
-	Type NoteDeletedEventType `json:"type"`
-}
-
-// NoteDeletedEventData defines model for .
-type NoteDeletedEventData struct {
-	Id *NotePropertiesId `json:"id,omitempty"`
-}
-
-// NoteDeletedEventType defines model for NoteDeletedEvent.Type.
-type NoteDeletedEventType string
 
 // NoteLink defines model for NoteLink.
 type NoteLink struct {
@@ -553,72 +231,6 @@ type NoteLink struct {
 	Id   *NotePropertiesId `json:"id,omitempty"`
 	Name PropertiesName    `json:"name"`
 }
-
-// NoteMovedEvent defines model for NoteMovedEvent.
-type NoteMovedEvent struct {
-	Data NoteMovedEventData `json:"data"`
-	Type NoteMovedEventType `json:"type"`
-}
-
-// NoteMovedEventData defines model for .
-type NoteMovedEventData struct {
-	FolderId *Id               `json:"folderId,omitempty"`
-	Id       *NotePropertiesId `json:"id,omitempty"`
-}
-
-// NoteMovedEventType defines model for NoteMovedEvent.Type.
-type NoteMovedEventType string
-
-// NotePermanentlyDeletedEvent defines model for NotePermanentlyDeletedEvent.
-type NotePermanentlyDeletedEvent struct {
-	Data NotePermanentlyDeletedEventData `json:"data"`
-	Type NotePermanentlyDeletedEventType `json:"type"`
-}
-
-// NotePermanentlyDeletedEventData defines model for .
-type NotePermanentlyDeletedEventData struct {
-	Id *NotePropertiesId `json:"id,omitempty"`
-}
-
-// NotePermanentlyDeletedEventType defines model for NotePermanentlyDeletedEvent.Type.
-type NotePermanentlyDeletedEventType string
-
-// NoteRestoredEvent defines model for NoteRestoredEvent.
-type NoteRestoredEvent struct {
-	Data NoteRestoredEventData `json:"data"`
-	Type NoteRestoredEventType `json:"type"`
-}
-
-// NoteRestoredEventData defines model for .
-type NoteRestoredEventData struct {
-	Id *NotePropertiesId `json:"id,omitempty"`
-}
-
-// NoteRestoredEventType defines model for NoteRestoredEvent.Type.
-type NoteRestoredEventType string
-
-// NoteTrashedEvent defines model for NoteTrashedEvent.
-type NoteTrashedEvent struct {
-	Data NoteTrashedEventData `json:"data"`
-	Type NoteTrashedEventType `json:"type"`
-}
-
-// NoteTrashedEventData defines model for .
-type NoteTrashedEventData struct {
-	Id *NotePropertiesId `json:"id,omitempty"`
-}
-
-// NoteTrashedEventType defines model for NoteTrashedEvent.Type.
-type NoteTrashedEventType string
-
-// NoteUpdatedEvent defines model for NoteUpdatedEvent.
-type NoteUpdatedEvent struct {
-	Data Note                 `json:"data"`
-	Type NoteUpdatedEventType `json:"type"`
-}
-
-// NoteUpdatedEventType defines model for NoteUpdatedEvent.Type.
-type NoteUpdatedEventType string
 
 // NotePropertiesId defines model for Note_properties-id.
 type NotePropertiesId = openapi_types.UUID
@@ -631,7 +243,7 @@ type TrashedFolder struct {
 	Id        openapi_types.UUID `json:"id"`
 	Name      *string            `json:"name,omitempty"`
 	TrashedAt *time.Time         `json:"trashedAt,omitempty"`
-	TrashedBy *TrashedBy         `json:"trashedBy,omitempty"`
+	TrashedBy TrashedBy          `json:"trashedBy"`
 }
 
 // TrashedNote defines model for TrashedNote.
@@ -639,7 +251,7 @@ type TrashedNote struct {
 	Id        openapi_types.UUID `json:"id"`
 	Name      *string            `json:"name,omitempty"`
 	TrashedAt *time.Time         `json:"trashedAt,omitempty"`
-	TrashedBy *TrashedBy         `json:"trashedBy,omitempty"`
+	TrashedBy TrashedBy          `json:"trashedBy"`
 }
 
 // UserPropertiesId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
@@ -669,6 +281,20 @@ type WorkspaceDeletedEventData struct {
 // WorkspaceDeletedEventType defines model for WorkspaceDeletedEvent.Type.
 type WorkspaceDeletedEventType string
 
+// WorkspaceItemsUpdatedEvent defines model for WorkspaceItemsUpdatedEvent.
+type WorkspaceItemsUpdatedEvent struct {
+	Data WorkspaceItemsUpdatedEventData `json:"data"`
+	Type WorkspaceItemsUpdatedEventType `json:"type"`
+}
+
+// WorkspaceItemsUpdatedEventData defines model for .
+type WorkspaceItemsUpdatedEventData struct {
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+}
+
+// WorkspaceItemsUpdatedEventType defines model for WorkspaceItemsUpdatedEvent.Type.
+type WorkspaceItemsUpdatedEventType string
+
 // WorkspaceMember defines model for WorkspaceMember.
 type WorkspaceMember struct {
 	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
@@ -679,20 +305,20 @@ type WorkspaceMember struct {
 	Username *UserPropertiesName `json:"username,omitempty"`
 }
 
-// WorkspaceMemebersUpdatedEvent defines model for WorkspaceMemebersUpdatedEvent.
-type WorkspaceMemebersUpdatedEvent struct {
-	Data WorkspaceMemebersUpdatedEventData `json:"data"`
-	Type WorkspaceMemebersUpdatedEventType `json:"type"`
+// WorkspaceMembersUpdatedEvent defines model for WorkspaceMembersUpdatedEvent.
+type WorkspaceMembersUpdatedEvent struct {
+	Data WorkspaceMembersUpdatedEventData `json:"data"`
+	Type WorkspaceMembersUpdatedEventType `json:"type"`
 }
 
-// WorkspaceMemebersUpdatedEventData defines model for .
-type WorkspaceMemebersUpdatedEventData struct {
-	Id      *PropertiesId      `json:"id,omitempty"`
-	Members *[]WorkspaceMember `json:"members,omitempty"`
+// WorkspaceMembersUpdatedEventData defines model for .
+type WorkspaceMembersUpdatedEventData struct {
+	Id      *PropertiesId     `json:"id,omitempty"`
+	Members []WorkspaceMember `json:"members"`
 }
 
-// WorkspaceMemebersUpdatedEventType defines model for WorkspaceMemebersUpdatedEvent.Type.
-type WorkspaceMemebersUpdatedEventType string
+// WorkspaceMembersUpdatedEventType defines model for WorkspaceMembersUpdatedEvent.Type.
+type WorkspaceMembersUpdatedEventType string
 
 // WorkspaceRole defines model for WorkspaceRole.
 type WorkspaceRole string
@@ -803,6 +429,11 @@ type GenerateDailyNoteJSONBody struct {
 	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
 
+// GetNoteParams defines parameters for GetNote.
+type GetNoteParams struct {
+	ExcludeTrashed *bool `form:"excludeTrashed,omitempty" json:"excludeTrashed,omitempty"`
+}
+
 // GetNoteGraphParams defines parameters for GetNoteGraph.
 type GetNoteGraphParams struct {
 	Depth *int `form:"depth,omitempty" json:"depth,omitempty"`
@@ -848,14 +479,14 @@ type RenameWorkspaceJSONBody struct {
 
 // RestoreTrashedWorkspaceItemsJSONBody defines parameters for RestoreTrashedWorkspaceItems.
 type RestoreTrashedWorkspaceItemsJSONBody struct {
-	Folders *[]TrashedFolder `json:"folders,omitempty"`
-	Notes   *[]TrashedNote   `json:"notes,omitempty"`
+	FolderIds *[]Id               `json:"folderIds,omitempty"`
+	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
 }
 
 // TrashWorkspaceItemsJSONBody defines parameters for TrashWorkspaceItems.
 type TrashWorkspaceItemsJSONBody struct {
-	Folders *[]TrashedFolder `json:"folders,omitempty"`
-	Notes   *[]TrashedNote   `json:"notes,omitempty"`
+	FolderIds *[]Id               `json:"folderIds,omitempty"`
+	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
 }
 
 // GetWorkspaceTreeParams defines parameters for GetWorkspaceTree.

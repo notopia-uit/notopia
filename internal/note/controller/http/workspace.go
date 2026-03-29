@@ -75,7 +75,7 @@ func (h *StrictHandler) GetWorkspace(
 		return nil, err
 	}
 
-	dto := getWorkspaceToDTO(*result)
+	dto := toWorkspace(*result)
 	return note.GetWorkspace200JSONResponse(dto), nil
 }
 
@@ -141,12 +141,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 					slog.InfoContext(c, "workspace event channel closed")
 					return
 				}
-				dto, ok := workspaceEventToDTO(event)
-				if !ok {
-					slog.WarnContext(c, "skipping unsupported workspace event type in workspace events stream")
-					continue
-				}
-				eventBytes, err := json.Marshal(dto)
+				eventBytes, err := json.Marshal(event)
 				if err != nil {
 					slog.ErrorContext(c, "failed to marshal event to JSON", slog.String("error", err.Error()))
 					continue
@@ -195,7 +190,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 		return nil, err
 	}
 
-	dto := getGraphToDTO(result)
+	dto := toGraph(result)
 	return note.GetWorkspaceGraph200JSONResponse(dto), nil
 }
 
@@ -302,7 +297,7 @@ func (h *StrictHandler) ShowTrash(
 		return nil, err
 	}
 
-	dto := getTrashedToDTO(result)
+	dto := toShowTrash(result)
 	return note.ShowTrash200JSONResponse(dto), nil
 }
 
@@ -315,27 +310,11 @@ func (h *StrictHandler) TrashWorkspaceItems(
 		return nil, err
 	}
 
-	var noteIDs []uuid.UUID
-	if request.Body.Notes != nil {
-		noteIDs = make([]uuid.UUID, len(*request.Body.Notes))
-		for i, item := range *request.Body.Notes {
-			noteIDs[i] = item.Id
-		}
-	}
-
-	var folderIDs []uuid.UUID
-	if request.Body.Folders != nil {
-		folderIDs = make([]uuid.UUID, len(*request.Body.Folders))
-		for i, item := range *request.Body.Folders {
-			folderIDs[i] = item.Id
-		}
-	}
-
 	cmd := &app.TrashWorkspaceItems{
 		WorkspaceID: request.WorkspaceId,
 		UserID:      user.ID,
-		NoteIDs:     noteIDs,
-		FolderIDs:   folderIDs,
+		NoteIDs:     *request.Body.NoteIds,
+		FolderIDs:   *request.Body.FolderIds,
 	}
 	err = h.App.CommandHandlers.TrashWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
@@ -358,7 +337,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 		return nil, err
 	}
 
-	dto := getWorkspaceTreeFolderToDTO(result)
+	dto := toWorkspaceTreeFolder(result)
 	return note.GetWorkspaceTree200JSONResponse(dto), nil
 }
 

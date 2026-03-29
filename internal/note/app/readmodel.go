@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/domain"
 )
 
 type PaginationParams struct {
@@ -118,17 +117,24 @@ type WorkspaceTreeFolder struct {
 	UpdatedAt time.Time
 }
 
+type TrashedBy string
+
+const (
+	TrashedByPurpose TrashedBy = "purpose"
+	TrashedByParent  TrashedBy = "parent"
+)
+
 type TrashedFolder struct {
 	ID        uuid.UUID
 	Name      string
-	TrashedBy domain.TrashedBy
+	TrashedBy TrashedBy
 	TrashedAt time.Time
 }
 
 type TrashedNote struct {
 	ID        uuid.UUID
 	Name      string
-	TrashedBy domain.TrashedBy
+	TrashedBy TrashedBy
 	TrashedAt time.Time
 }
 
@@ -139,9 +145,4 @@ type Trash struct {
 
 type CheckWorkspaceSlugExistsResult struct {
 	Exists bool
-}
-
-type WorkspaceMembersUpdatedEvent struct {
-	ID      uuid.UUID
-	Members []*WorkspaceMember
 }

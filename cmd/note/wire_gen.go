@@ -84,23 +84,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	db := pg.NewStdlib(pool)
 	pgNote := pg.NewNoTransactionNote(pool, queries, db)
 	folder := pg.NewNoTransactionFolder(pool, queries, db)
-	loggerAdapter := pubsub.NewWatermillLogger(logger)
-	commandEventMarshaler := pubsub.NewIntegrationMarshaler()
-	redis := &configConfig.Redis
-	redisClient, cleanup5 := pubsub.NewRedisClient(ctx, redis, logger)
-	workspaceEventInternalPubSub, err := pubsub.NewWorkspaceEventInternalPubSub(loggerAdapter, commandEventMarshaler, redisClient)
-	if err != nil {
-		cleanup5()
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	workspaceEventHubPubSub := pubsub.NewWorkspaceEventHubPubSub(loggerAdapter)
-	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalPubSub, workspaceEventHubPubSub)
-	createNoteHandler := app.NewCreateNoteHandler(authorization, pgNote, folder, workspaceEvent)
-	createFolderHandler := app.NewCreateFolderHandler(authorization, folder, workspaceEvent)
+	createNoteHandler := app.NewCreateNoteHandler(authorization, pgNote, folder)
+	createFolderHandler := app.NewCreateFolderHandler(authorization, folder)
 	workspace := pg.NewNoTransactionWorkspace(pool, queries, db)
 	unitOfWork := pg.NewUnitOfWork(queries, db)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspace, folder, unitOfWork)
@@ -108,7 +93,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	deleteFolderHandler := app.NewDeleteFolderHandler(authorization, folder)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, workspace)
 	generateDailyNoteHandler := app.NewGenerateDailyNoteHandler(pgNote, folder, workspace)
-	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, pgNote, folder, unitOfWork, workspaceEvent)
+	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, pgNote, folder, unitOfWork)
 	permanentlyDeleteWorkspaceItemsHandler := app.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, pgNote, folder)
 	publishNoteHandler := app.NewPublishNoteHandler(pgNote)
 	publishWorkspaceHandler := app.NewPublishWorkspaceHandler(workspace)
@@ -117,7 +102,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	renameWorkspaceHandler := app.NewRenameWorkspaceHandler(authorization, workspace)
 	trashService := domain.NewTrashService()
 	restoreTrashedWorkspaceItemsHandler := app.NewRestoreTrashedWorkspaceItemsHandler(pgNote, folder, trashService)
-	trashWorkspaceItemsHandler := app.NewTrashWorkspaceItemsHandler(authorization, unitOfWork, trashService, workspaceEvent)
+	trashWorkspaceItemsHandler := app.NewTrashWorkspaceItemsHandler(authorization, unitOfWork, trashService)
 	unpublishNoteHandler := app.NewUnpublishNoteHandler(pgNote)
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler()
@@ -167,18 +152,29 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		DocumentCommittedHandler: documentCommittedHandler,
 	}
 	kafka := &configConfig.Kafka
+	loggerAdapter := pubsub.NewWatermillLogger(logger)
 	commonconfigKafka := configConfig.Kafka
 	saramaTracer := pubsub.NewKafkaTracer()
 	kafkaPublisher, err := pubsub.NewKafkaPublisher(commonconfigKafka, loggerAdapter, saramaTracer)
 	if err != nil {
-		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
+	commandEventMarshaler := pubsub.NewIntegrationMarshaler()
 	integrationPubSub, err := pubsub.NewIntegrationPubSub(kafka, loggerAdapter, kafkaPublisher, saramaTracer, commandEventMarshaler)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	redis := &configConfig.Redis
+	redisClient, cleanup5 := pubsub.NewRedisClient(ctx, redis, logger)
+	workspaceEventInternalPubSub, err := pubsub.NewWorkspaceEventInternalPubSub(loggerAdapter, commandEventMarshaler, redisClient)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -187,6 +183,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
+	workspaceEventHubPubSub := pubsub.NewWorkspaceEventHubPubSub(loggerAdapter)
+	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalPubSub, workspaceEventHubPubSub)
 	provider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
 		cleanup5()

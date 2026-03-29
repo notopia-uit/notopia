@@ -19,12 +19,6 @@ properties:
     nullable: true
     example: 📁
 
-  updatedAt:
-    type: string
-    format: date-time
-    example: 2024-06-01T12:00:00Z
-    readOnly: true
-
   parentId:
     $ref: ./Folder.yaml#/properties/id
     example: cc7a2e47-6267-4c60-8d36-257f849777e4
@@ -33,10 +27,34 @@ properties:
     $ref: ./Workspace.yaml#/properties/id
     readOnly: false
 
+  updatedAt:
+    type: string
+    format: date-time
+    example: 2024-06-01T12:00:00Z
+    readOnly: true
+
+  trashed:
+    type: object
+    nullable: true
+    readOnly: true
+    properties:
+      trashedBy:
+        $ref: ./TrashedBy.yaml
+
+      trashedAt:
+        type: string
+        format: date-time
+        example: 2024-06-01T12:00:00Z
+
+    required:
+      - trashedBy
+      - trashedAt
+
 required:
   - id
   - name
   - icon
-  - updatedAt
   - parentId
   - workspaceId
+  - updatedAt
+  - trashed

@@ -8,6 +8,12 @@ get:
   operationId: getNote
   parameters:
     - $ref: ../components/parameters/noteIdPath.yaml
+    - name: excludeTrashed
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: false
   responses:
     200:
       description: Successful response

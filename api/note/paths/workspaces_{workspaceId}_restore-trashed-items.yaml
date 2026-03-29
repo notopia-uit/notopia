@@ -15,14 +15,14 @@ post:
         schema:
           type: object
           properties:
-            notes:
+            noteIds:
               type: array
               items:
-                $ref: ../components/schemas/TrashedNote.yaml
-            folders:
+                $ref: ../components/schemas/Note.yaml#/properties/id
+            folderIds:
               type: array
               items:
-                $ref: ../components/schemas/TrashedFolder.yaml
+                $ref: ../components/schemas/Folder.yaml#/properties/id
   responses:
     204:
       description: Workspace items successfully restored

@@ -37,7 +37,7 @@ type ServerInterface interface {
 	DeleteNote(c *gin.Context, noteId NoteIdPath)
 	// Get note
 	// (GET /note/notes/{noteId})
-	GetNote(c *gin.Context, noteId NoteIdPath)
+	GetNote(c *gin.Context, noteId NoteIdPath, params GetNoteParams)
 	// Get note graph
 	// (GET /note/notes/{noteId}/graph)
 	GetNoteGraph(c *gin.Context, noteId NoteIdPath, params GetNoteGraphParams)
@@ -60,7 +60,7 @@ type ServerInterface interface {
 	// (GET /note/workspaces-by-slug/{workspaceSlug})
 	GetWorkspace(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Check workspace slug exists
-	// (GET /note/workspaces-by-slug/{workspaceSlug}_exists)
+	// (GET /note/workspaces-by-slug/{workspaceSlug}/exists)
 	CheckWorkspaceSlugExists(c *gin.Context, workspaceSlug WorkspaceSlugPath)
 	// Delete workspace
 	// (DELETE /note/workspaces/{workspaceId})
@@ -254,6 +254,17 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 
 	c.Set(Oauth2Scopes, []string{})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetNoteParams
+
+	// ------------- Optional query parameter "excludeTrashed" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "excludeTrashed", c.Request.URL.Query(), &params.ExcludeTrashed, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter excludeTrashed: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -261,7 +272,7 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetNote(c, noteId)
+	siw.Handler.GetNote(c, noteId, params)
 }
 
 // GetNoteGraph operation middleware
@@ -918,7 +929,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/notes/:noteId/unpublish", wrapper.UnpublishNote)
 	router.POST(options.BaseURL+"/note/workspaces", wrapper.CreateWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces-by-slug/:workspaceSlug", wrapper.GetWorkspace)
-	router.GET(options.BaseURL+"/note/workspaces-by-slug/:workspaceSlug_exists", wrapper.CheckWorkspaceSlugExists)
+	router.GET(options.BaseURL+"/note/workspaces-by-slug/:workspaceSlug/exists", wrapper.CheckWorkspaceSlugExists)
 	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.DeleteWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/events", wrapper.GetWorkspaceEvents)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/graph", wrapper.GetWorkspaceGraph)
@@ -1299,6 +1310,7 @@ func (response DeleteNote500JSONResponse) VisitDeleteNoteResponse(w http.Respons
 
 type GetNoteRequestObject struct {
 	NoteId NoteIdPath `json:"noteId"`
+	Params GetNoteParams
 }
 
 type GetNoteResponseObject interface {
@@ -2643,7 +2655,7 @@ type StrictServerInterface interface {
 	// (GET /note/workspaces-by-slug/{workspaceSlug})
 	GetWorkspace(ctx context.Context, request GetWorkspaceRequestObject) (GetWorkspaceResponseObject, error)
 	// Check workspace slug exists
-	// (GET /note/workspaces-by-slug/{workspaceSlug}_exists)
+	// (GET /note/workspaces-by-slug/{workspaceSlug}/exists)
 	CheckWorkspaceSlugExists(ctx context.Context, request CheckWorkspaceSlugExistsRequestObject) (CheckWorkspaceSlugExistsResponseObject, error)
 	// Delete workspace
 	// (DELETE /note/workspaces/{workspaceId})
@@ -2890,10 +2902,11 @@ func (sh *strictHandler) DeleteNote(ctx *gin.Context, noteId NoteIdPath) {
 }
 
 // GetNote operation middleware
-func (sh *strictHandler) GetNote(ctx *gin.Context, noteId NoteIdPath) {
+func (sh *strictHandler) GetNote(ctx *gin.Context, noteId NoteIdPath, params GetNoteParams) {
 	var request GetNoteRequestObject
 
 	request.NoteId = noteId
+	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetNote(ctx, request.(GetNoteRequestObject))

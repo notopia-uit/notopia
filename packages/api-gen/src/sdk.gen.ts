@@ -289,7 +289,7 @@ export const getWorkspace = <ThrowOnError extends boolean = false>(options: Opti
 export const checkWorkspaceSlugExists = <ThrowOnError extends boolean = false>(options: Options<CheckWorkspaceSlugExistsData, ThrowOnError>) => (options.client ?? client).get<CheckWorkspaceSlugExistsResponses, CheckWorkspaceSlugExistsErrors, ThrowOnError>({
     requestValidator: async (data) => await zCheckWorkspaceSlugExistsData.parseAsync(data),
     security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces-by-slug/{workspaceSlug}_exists',
+    url: '/note/workspaces-by-slug/{workspaceSlug}/exists',
     ...options
 });
 

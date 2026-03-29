@@ -79,8 +79,7 @@ func (n *Note) Name() string {
 func (n *Note) Rename(name string) {
 	n.name = name
 	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(),
-		AggregateID:   n.id,
+		BaseEvent:     *NewBaseEvent(n.id),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -97,8 +96,7 @@ func (n *Note) Icon() *string {
 func (n *Note) SetIcon(icon string) {
 	n.icon = &icon
 	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(),
-		AggregateID:   n.id,
+		BaseEvent:     *NewBaseEvent(n.id),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -115,8 +113,7 @@ func (n *Note) Tags() []string {
 func (n *Note) SetTags(tags []string) {
 	n.tags = tags
 	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(),
-		AggregateID:   n.id,
+		BaseEvent:     *NewBaseEvent(n.id),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -133,8 +130,7 @@ func (n *Note) Size() uint64 {
 func (n *Note) SetSize(size uint64) {
 	n.size = size
 	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(),
-		AggregateID:   n.id,
+		BaseEvent:     *NewBaseEvent(n.id),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -151,9 +147,8 @@ func (n *Note) FolderID() uuid.UUID {
 func (n *Note) MoveToFolder(folderID uuid.UUID) {
 	n.folderID = folderID
 	n.AddEvent(&NoteMovedEvent{
-		BaseEvent:   *NewBaseEvent(),
-		AggregateID: n.id,
-		FolderID:    n.folderID,
+		BaseEvent: *NewBaseEvent(n.id),
+		FolderID:  n.folderID,
 	})
 }
 
@@ -164,8 +159,7 @@ func (n *Note) OutgoingLinks() uuid.UUIDs {
 func (n *Note) SetOutgoingLinks(outgoingLinks uuid.UUIDs) {
 	n.outgoingLinks = outgoingLinks
 	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(),
-		AggregateID:   n.id,
+		BaseEvent:     *NewBaseEvent(n.id),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -206,8 +200,7 @@ func (n *Note) Trash(trashedBy TrashedBy) errs.Error {
 	}
 	n.trashed = NewTrashed(trashedBy, time.Now())
 	n.AddEvent(&NoteTrashedEvent{
-		BaseEvent:   *NewBaseEvent(),
-		AggregateID: n.id,
+		BaseEvent: *NewBaseEvent(n.id),
 	})
 	return nil
 }
@@ -215,8 +208,7 @@ func (n *Note) Trash(trashedBy TrashedBy) errs.Error {
 func (n *Note) Restore() {
 	n.trashed = nil
 	n.AddEvent(&NoteRestoredEvent{
-		BaseEvent:   *NewBaseEvent(),
-		AggregateID: n.id,
+		BaseEvent: *NewBaseEvent(n.id),
 	})
 }
 

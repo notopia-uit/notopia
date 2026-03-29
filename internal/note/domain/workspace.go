@@ -51,10 +51,9 @@ func (w *Workspace) Name() string {
 func (w *Workspace) Rename(name string) {
 	w.name = name
 	w.AddEvent(&WorkspaceUpdatedEvent{
-		BaseEvent:   *NewBaseEvent(),
-		AggregateID: w.id,
-		Name:        w.name,
-		Slug:        w.slug,
+		BaseEvent: *NewBaseEvent(w.id),
+		Name:      w.name,
+		Slug:      w.slug,
 	})
 }
 
@@ -73,8 +72,7 @@ func (w *Workspace) DeletedAt() *time.Time {
 func (w *Workspace) Delete() {
 	w.deletedAt = new(time.Now())
 	w.AddEvent(&WorkspaceDeletedEvent{
-		BaseEvent:   *NewBaseEvent(),
-		AggregateID: w.id,
+		BaseEvent: *NewBaseEvent(w.id),
 	})
 }
 

@@ -35,17 +35,31 @@ func (t EventType) String() string {
 	return string(t)
 }
 
-type Event any
-
-type BaseEvent struct {
-	ID         uuid.UUID `json:"id"`
-	OccurredAt time.Time `json:"occurredAt"`
+type Event interface {
+	GetID() uuid.UUID
+	GetOccurredAt() time.Time
+	GetAggregateID() uuid.UUID
 }
 
-func NewBaseEvent() *BaseEvent {
+type BaseEvent struct {
+	ID          uuid.UUID `json:"id"`
+	OccurredAt  time.Time `json:"occurredAt"`
+	AggregateID uuid.UUID `json:"aggregateId"`
+}
+
+var _ Event = (*BaseEvent)(nil)
+
+func (e *BaseEvent) GetID() uuid.UUID { return e.ID }
+
+func (e *BaseEvent) GetOccurredAt() time.Time { return e.OccurredAt }
+
+func (e *BaseEvent) GetAggregateID() uuid.UUID { return e.AggregateID }
+
+func NewBaseEvent(aggregateID uuid.UUID) *BaseEvent {
 	return &BaseEvent{
-		ID:         uuid.New(),
-		OccurredAt: time.Now(),
+		ID:          uuid.New(),
+		OccurredAt:  time.Now(),
+		AggregateID: aggregateID,
 	}
 }
 
@@ -148,58 +162,48 @@ func NewEmptyFromEventType(eventType string) (Event, bool) {
 
 type FolderCreatedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
-	Name        string    `json:"name"`
-	Icon        *string   `json:"icon"`
+	Name string  `json:"name"`
+	Icon *string `json:"icon"`
 }
 
 type FolderDeletedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
 }
 
 type FolderUpdatedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
-	Name        string    `json:"name"`
-	Icon        *string   `json:"icon"`
+	Name string  `json:"name"`
+	Icon *string `json:"icon"`
 }
 
 type NoteCreatedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
-	Name        string    `json:"name"`
-	Icon        *string   `json:"icon"`
+	Name string  `json:"name"`
+	Icon *string `json:"icon"`
 }
 
 type FolderMovedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
-	ParentID    uuid.UUID `json:"parentId"`
+	ParentID uuid.UUID `json:"parentId"`
 }
 
 type FolderTrashedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
 }
 
 type FolderRestoredEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
 }
 
 type FolderPermanentlyDeletedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
 }
 
 type NoteDeletedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
 }
 type NoteUpdatedEvent struct {
 	BaseEvent
-	AggregateID   uuid.UUID  `json:"aggregateId"`
 	Name          string     `json:"name"`
 	Icon          *string    `json:"icon"`
 	Tags          []string   `json:"tags"`
@@ -210,33 +214,27 @@ type NoteUpdatedEvent struct {
 
 type NoteMovedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
-	FolderID    uuid.UUID `json:"folderId"`
+	FolderID uuid.UUID `json:"folderId"`
 }
 
 type NoteTrashedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
 }
 
 type NoteRestoredEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
 }
 
 type NotePermanentlyDeletedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
 }
 
 type WorkspaceUpdatedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
-	Name        string    `json:"name"`
-	Slug        string    `json:"slug"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
 }
 
 type WorkspaceDeletedEvent struct {
 	BaseEvent
-	AggregateID uuid.UUID `json:"aggregateId"`
 }

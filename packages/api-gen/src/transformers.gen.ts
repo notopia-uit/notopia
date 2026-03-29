@@ -19,6 +19,9 @@ export const getRevisionResponseTransformer = async (data: any): Promise<GetRevi
 
 const noteNoteSchemaResponseTransformer = (data: any) => {
     data.updatedAt = new Date(data.updatedAt);
+    if (data.trashed) {
+        data.trashed.trashedAt = new Date(data.trashed.trashedAt);
+    }
     return data;
 };
 

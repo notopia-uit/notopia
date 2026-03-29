@@ -3,6 +3,4 @@ type: string
 enum:
   - purpose
   - parent
-nullable: true
 example: purpose
-readOnly: true

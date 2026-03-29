@@ -10,7 +10,7 @@ properties:
 
   data:
     type: object
-    x-go-type-name: WorkspaceMemebersUpdatedEventData
+    x-go-type-name: WorkspaceMembersUpdatedEventData
     properties:
       id:
         $ref: ./Workspace.yaml#/properties/id
@@ -18,6 +18,10 @@ properties:
         type: array
         items:
           $ref: ./WorkspaceMember.yaml
+
+    required:
+      - id
+      - members
 
 required:
   - type

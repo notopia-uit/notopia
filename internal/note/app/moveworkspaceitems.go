@@ -22,7 +22,6 @@ type MoveWorkspaceItemsHandler struct {
 	noteRepo             domain.NoteRepo
 	folderRepo           domain.FolderRepo
 	uow                  domain.UnitOfWork
-	workspaceEventPubSub WorkspaceEventPubSub
 }
 
 func NewMoveWorkspaceItemsHandler(
@@ -30,14 +29,12 @@ func NewMoveWorkspaceItemsHandler(
 	noteRepo domain.NoteRepo,
 	folderRepo domain.FolderRepo,
 	uow domain.UnitOfWork,
-	workspaceEventPubSub WorkspaceEventPubSub,
 ) *MoveWorkspaceItemsHandler {
 	return &MoveWorkspaceItemsHandler{
 		authorizationService: authorizationService,
 		noteRepo:             noteRepo,
 		folderRepo:           folderRepo,
 		uow:                  uow,
-		workspaceEventPubSub: workspaceEventPubSub,
 	}
 }
 
@@ -129,13 +126,5 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		return err
 	}
 
-	workspaceEvents := make([]domain.Event, 0, len(cmd.FolderIDs)+len(cmd.NoteIDs))
-	for _, folder := range folders {
-		workspaceEvents = append(workspaceEvents, folder.PopEvents()...)
-	}
-	for _, note := range notes {
-		workspaceEvents = append(workspaceEvents, note.PopEvents()...)
-	}
-
-	return h.workspaceEventPubSub.Publish(ctx, cmd.WorkspaceID, cmd.UserID, workspaceEvents...)
+	return nil
 }

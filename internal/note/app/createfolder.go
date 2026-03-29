@@ -22,18 +22,15 @@ type CreateFolder struct {
 type CreateFolderHandler struct {
 	authorizationService AuthorizationService
 	folderRepo           domain.FolderRepo
-	workspaceEventPubSub WorkspaceEventPubSub
 }
 
 func NewCreateFolderHandler(
 	authorizationService AuthorizationService,
 	folderRepo domain.FolderRepo,
-	workspaceEventPubSub WorkspaceEventPubSub,
 ) *CreateFolderHandler {
 	return &CreateFolderHandler{
 		authorizationService: authorizationService,
 		folderRepo:           folderRepo,
-		workspaceEventPubSub: workspaceEventPubSub,
 	}
 }
 
@@ -63,5 +60,5 @@ func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) err
 	if err := h.folderRepo.Save(ctx, folder); err != nil {
 		return err
 	}
-	return h.workspaceEventPubSub.Publish(ctx, cmd.WorkspaceID, cmd.UserID, folder.PopEvents()...)
+	return nil
 }

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"reflect"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
@@ -16,7 +17,6 @@ import (
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
-	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/redis/go-redis/v9"
 )
@@ -126,7 +126,7 @@ func NewWorkspaceEvent(
 
 var ProvideWorkspaceEvent = NewWorkspaceEvent
 
-func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...domain.Event) errs.Error {
+func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...app.WorkspaceEvent) errs.Error {
 	msgs := make([]*message.Message, len(events))
 	for _, event := range events {
 		payload, err := json.Marshal(event)
@@ -140,7 +140,7 @@ func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, use
 		msg := message.NewMessage(watermill.NewUUID(), payload)
 		msg.Metadata.Set(MetadataWorkspaceIDKey, fmt.Sprintf("%v", workspaceID))
 		msg.Metadata.Set(metadataUserIDKey, userID)
-		msg.Metadata.Set(metadataEventTypeKey, domain.GetEventType(event).String())
+		msg.Metadata.Set(metadataEventTypeKey, reflect.TypeOf(event).Elem().Name())
 		msg.SetContext(ctx)
 		msgs = append(msgs, msg)
 	}
@@ -159,8 +159,8 @@ func (w *WorkspaceEvent) Subscribe(
 	ctx context.Context,
 	workspaceID uuid.UUID,
 	userID string,
-) (<-chan domain.Event, errs.Error) {
-	eventCh := make(chan domain.Event, 10)
+) (<-chan app.WorkspaceEvent, errs.Error) {
+	eventCh := make(chan app.WorkspaceEvent, 10)
 
 	msgCh, err := w.hubPubSub.pubSub.Subscribe(ctx, fmt.Sprintf("%v", workspaceID))
 	if err != nil {
@@ -196,7 +196,7 @@ func (w *WorkspaceEvent) Subscribe(
 					msg.Ack()
 					continue
 				}
-				event, ok := domain.NewEmptyFromEventType(eventType)
+				event, ok := app.NewEmptyWorkspaceEventFromType(eventType)
 				if !ok {
 					slog.ErrorContext(
 						ctx, "unknown event type in message metadata",

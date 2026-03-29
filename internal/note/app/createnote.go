@@ -23,20 +23,17 @@ type CreateNoteHandler struct {
 	authorizationService AuthorizationService
 	noteRepo             domain.NoteRepo
 	folderRepo           domain.FolderRepo
-	workspaceEventPubSub WorkspaceEventPubSub
 }
 
 func NewCreateNoteHandler(
 	authorizationService AuthorizationService,
 	noteRepo domain.NoteRepo,
 	folderRepo domain.FolderRepo,
-	workspaceEventPubSub WorkspaceEventPubSub,
 ) *CreateNoteHandler {
 	return &CreateNoteHandler{
 		authorizationService: authorizationService,
 		noteRepo:             noteRepo,
 		folderRepo:           folderRepo,
-		workspaceEventPubSub: workspaceEventPubSub,
 	}
 }
 

@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/notopia-uit/notopia/internal/note/app"
-	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
@@ -166,7 +165,7 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 		notes[i] = &app.TrashedNote{
 			ID:        note.ID,
 			Name:      note.Name,
-			TrashedBy: domain.TrashedByPurpose,
+			TrashedBy: app.TrashedByPurpose,
 			TrashedAt: *note.TrashedAt,
 		}
 	}
@@ -176,7 +175,7 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 		folders[i] = &app.TrashedFolder{
 			ID:        folder.ID,
 			Name:      folder.Name,
-			TrashedBy: domain.TrashedByPurpose,
+			TrashedBy: app.TrashedByPurpose,
 			TrashedAt: *folder.TrashedAt,
 		}
 	}

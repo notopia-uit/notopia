@@ -20,20 +20,17 @@ type TrashWorkspaceItemsHandler struct {
 	authorizationService AuthorizationService
 	uow                  domain.UnitOfWork
 	trashService         *domain.TrashService
-	workspaceEventPubSub WorkspaceEventPubSub
 }
 
 func NewTrashWorkspaceItemsHandler(
 	authorizationService AuthorizationService,
 	uow domain.UnitOfWork,
 	trashService *domain.TrashService,
-	workspaceEventPubSub WorkspaceEventPubSub,
 ) *TrashWorkspaceItemsHandler {
 	return &TrashWorkspaceItemsHandler{
 		authorizationService: authorizationService,
 		uow:                  uow,
 		trashService:         trashService,
-		workspaceEventPubSub: workspaceEventPubSub,
 	}
 }
 
@@ -137,10 +134,6 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 	})
 	if err != nil {
 		return err
-	}
-
-	if len(workspaceEvents) > 0 {
-		return h.workspaceEventPubSub.Publish(ctx, cmd.WorkspaceID, cmd.UserID, workspaceEvents...)
 	}
 
 	return nil

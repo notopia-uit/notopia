@@ -30,14 +30,12 @@ type DocumentContent = []map[string]interface{}
 
 // Note defines model for Note.
 type Note struct {
-	BacklinksCount     *int                `json:"backlinksCount,omitempty"`
-	FolderId           *PropertiesId       `json:"folderId,omitempty"`
-	Icon               *string             `json:"icon"`
-	Id                 *openapi_types.UUID `json:"id,omitempty"`
-	Name               string              `json:"name"`
-	OutgoingLinksCount *int                `json:"outgoingLinksCount,omitempty"`
-	Tags               []string            `json:"tags"`
-	UpdatedAt          *time.Time          `json:"updatedAt,omitempty"`
+	FolderId  *PropertiesId       `json:"folderId,omitempty"`
+	Icon      *string             `json:"icon"`
+	Id        *openapi_types.UUID `json:"id,omitempty"`
+	Name      string              `json:"name"`
+	Tags      []string            `json:"tags"`
+	UpdatedAt *time.Time          `json:"updatedAt,omitempty"`
 }
 
 // NoteCreatedEvent defines model for NoteCreatedEvent.

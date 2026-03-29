@@ -368,18 +368,6 @@
             "format": "date-time",
             "example": "2024-06-01T12:34:56Z",
             "readOnly": true
-          },
-          "backlinksCount": {
-            "type": "integer",
-            "minimum": 0,
-            "example": 5,
-            "readOnly": true
-          },
-          "outgoingLinksCount": {
-            "type": "integer",
-            "minimum": 0,
-            "example": 3,
-            "readOnly": true
           }
         },
         "required": [
@@ -388,9 +376,7 @@
           "icon",
           "folderId",
           "tags",
-          "updatedAt",
-          "backlinksCount",
-          "outgoingLinksCount"
+          "updatedAt"
         ]
       },
       "User_properties-id": {
