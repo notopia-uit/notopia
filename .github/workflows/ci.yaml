@@ -228,6 +228,7 @@ jobs:
             --target bundle \
             --target build \
             --target test \
+            --target typecheck \
             ${{ github.ref == 'refs/heads/main' && '--target deployPage' || '' }} \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \

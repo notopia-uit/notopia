@@ -7,6 +7,12 @@
     ".": {
       "default": "./src/index.ts"
     },
+    "./client": {
+      "default": "./src/client/index.ts"
+    },
+    "./@tanstack": {
+      "default": "./src/@tanstack/index.ts"
+    },
     "./package.json": "./package.json"
   },
   "peerDependencies": {

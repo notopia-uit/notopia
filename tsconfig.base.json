@@ -2,6 +2,7 @@
   "compilerOptions": {
     "composite": true,
     "declarationMap": true,
+    "skipDefaultLibCheck": true,
     "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
@@ -15,7 +16,7 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2022",
+    "target": "esnext",
     "customConditions": ["@nx/source"]
   }
 }
