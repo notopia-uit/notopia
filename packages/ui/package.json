@@ -10,6 +10,12 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./*": {
+      "@nx/source": "./src/*.ts",
+      "types": "./src/*.ts",
+      "import": "./src/*.ts",
+      "default": "./src/*.ts"
+    },
     "./package.json": "./package.json",
     "./styles": "./src/globals.css"
   },
