@@ -555,9 +555,6 @@ importers:
       '@notopia-uit/pb':
         specifier: 'workspace:'
         version: link:../../packages/pb
-      '@notopia-uit/ui':
-        specifier: 'workspace:'
-        version: link:../../packages/ui
       '@opentelemetry/api':
         specifier: 'catalog:'
         version: 1.9.1
