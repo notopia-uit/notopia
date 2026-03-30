@@ -1,10 +1,5 @@
 import { AuthorizationService } from '../authorization/authorization.service';
-import {
-  BLOCKNOTE_SCHEMA,
-  type Block,
-  type BlockNoteEditor,
-  type BlockNoteSchema,
-} from '../blocknote/bn-schema.provider';
+import { BLOCKNOTE_SCHEMA } from '../blocknote/blocknote.module';
 import { User } from '../common/user';
 import { RevisionEntity } from '../revision/revision.entity';
 import { StorageService } from '../storage/storage.service';
@@ -17,6 +12,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
+import {
+  Block,
+  type BlockNoteSchema,
+  BlockNoteServerEditor,
+} from '@notopia-uit/ui';
 import { randomUUID } from 'crypto';
 import { Traceable } from 'nestjs-otel';
 import { DataSource } from 'typeorm';
@@ -38,13 +38,16 @@ export class DocumentService {
     return doc;
   }
 
-  private bufferToBlockNote(data: Buffer, editor: BlockNoteEditor): Block[] {
+  private bufferToBlockNote(
+    data: Buffer,
+    editor: BlockNoteServerEditor
+  ): Block[] {
     const yDoc = new YDoc();
     applyUpdate(yDoc, new Uint8Array(data));
     return editor.yDocToBlocks(yDoc);
   }
 
-  extractTags(editor: BlockNoteEditor): string[] {
+  extractTags(editor: BlockNoteServerEditor): string[] {
     const tags = new Set<string>();
     editor.editor.forEachBlock((block) => {
       if (Array.isArray(block.content)) {
@@ -61,7 +64,7 @@ export class DocumentService {
     return Array.from(tags);
   }
 
-  extractOutgoingLinkIds(editor: BlockNoteEditor): string[] {
+  extractOutgoingLinkIds(editor: BlockNoteServerEditor): string[] {
     const linkIds = new Set<string>();
     editor.editor.forEachBlock((block) => {
       if (Array.isArray(block.content)) {

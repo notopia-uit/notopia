@@ -11,9 +11,9 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
-    "baseUrl": ".",
     "skipLibCheck": true,
     "paths": {
+      "*": ["./src/*/*"],
       "@notopia-uit/ui/*": ["../../packages/ui/src/*"],
       "@notopia-uit/ui": ["../../packages/ui/src"],
       "@/*": ["../../packages/ui/src/*"]

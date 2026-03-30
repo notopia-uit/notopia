@@ -2,7 +2,7 @@ export * from './components/landing';
 export * from './components/ui/button';
 export * from './components/ui/input';
 export * from './components/ui/navigation-menu';
-export * from './components/ui/blocknote-editor';
+export * from './components/ui/blocknote';
 export * from './components/ui/blocknote-menu';
 export * from './components/ui/blocknote-reference';
 export * from './components/ui/blocknote-tag';

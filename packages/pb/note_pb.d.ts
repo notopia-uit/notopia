@@ -11,6 +11,38 @@ import type { Message } from "@bufbuild/protobuf";
 export declare const file_note: GenFile;
 
 /**
+ * @generated from message note.GetNoteNameRequest
+ */
+export declare type GetNoteNameRequest = Message<"note.GetNoteNameRequest"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+};
+
+/**
+ * Describes the message note.GetNoteNameRequest.
+ * Use `create(GetNoteNameRequestSchema)` to create a new message.
+ */
+export declare const GetNoteNameRequestSchema: GenMessage<GetNoteNameRequest>;
+
+/**
+ * @generated from message note.GetNoteNameResponse
+ */
+export declare type GetNoteNameResponse = Message<"note.GetNoteNameResponse"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+};
+
+/**
+ * Describes the message note.GetNoteNameResponse.
+ * Use `create(GetNoteNameResponseSchema)` to create a new message.
+ */
+export declare const GetNoteNameResponseSchema: GenMessage<GetNoteNameResponse>;
+
+/**
  * @generated from message note.CheckNoteExistenceRequest
  */
 export declare type CheckNoteExistenceRequest = Message<"note.CheckNoteExistenceRequest"> & {
@@ -78,6 +110,14 @@ export declare const GetWorkspaceIdByNoteIdResponseSchema: GenMessage<GetWorkspa
  * @generated from service note.NoteService
  */
 export declare const NoteService: GenService<{
+  /**
+   * @generated from rpc note.NoteService.GetNoteName
+   */
+  getNoteName: {
+    methodKind: "unary";
+    input: typeof GetNoteNameRequestSchema;
+    output: typeof GetNoteNameResponseSchema;
+  },
   /**
    * @generated from rpc note.NoteService.CheckNoteExistence
    */

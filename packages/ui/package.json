@@ -10,22 +10,33 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
-    "./*": {
-      "@nx/source": "./src/*.ts",
-      "types": "./src/*.ts",
-      "import": "./src/*.ts",
-      "default": "./src/*.ts"
-    },
     "./package.json": "./package.json",
     "./styles": "./src/globals.css"
   },
-  "dependencies": {
-    "@icons-pack/react-simple-icons": "^13.13.0",
+  "peerDependencies": {
+    "@blocknote/core": "catalog:",
+    "@blocknote/react": "catalog:",
+    "@blocknote/server-util": "catalog:",
+    "@icons-pack/react-simple-icons": "catalog:",
     "@notopia-uit/api-gen": "workspace:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "lucide-react": "catalog:",
     "radix-ui": "catalog:",
+    "react": "catalog:",
+    "shadcn": "catalog:"
+  },
+  "dependencies": {
+    "@blocknote/core": "catalog:",
+    "@blocknote/react": "catalog:",
+    "@blocknote/server-util": "catalog:",
+    "@icons-pack/react-simple-icons": "catalog:",
+    "@notopia-uit/api-gen": "workspace:",
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
+    "lucide-react": "catalog:",
+    "radix-ui": "catalog:",
+    "react": "catalog:",
     "shadcn": "catalog:"
   },
   "devDependencies": {

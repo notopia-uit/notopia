@@ -1,3 +1,7 @@
+import {
+  CustomInlineContentConfig,
+  type InlineContentSpec,
+} from '@blocknote/core';
 import { createReactInlineContentSpec } from '@blocknote/react';
 
 export const BlockNoteTagConfig = {
@@ -6,11 +10,14 @@ export const BlockNoteTagConfig = {
     tag: { default: '' },
   },
   content: 'none',
-} as const;
+} as const satisfies CustomInlineContentConfig;
 
-export const blockNoteTagSpec = createReactInlineContentSpec(
-  BlockNoteTagConfig,
-  {
+export type BlockNoteTagInlineContentSpec = InlineContentSpec<
+  typeof BlockNoteTagConfig
+>;
+
+export const blockNoteTagSpec: BlockNoteTagInlineContentSpec =
+  createReactInlineContentSpec(BlockNoteTagConfig, {
     render: (props) => (
       <span
         // TODO: tailwind shadcn
@@ -33,5 +40,4 @@ export const blockNoteTagSpec = createReactInlineContentSpec(
       }
       return undefined;
     },
-  }
-);
+  });

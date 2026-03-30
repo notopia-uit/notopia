@@ -1,13 +1,11 @@
-import { schema } from './blocknote-editor';
+import { type BlockNoteEditor } from './blocknote';
 import { filterSuggestionItems } from '@blocknote/core';
 import { DefaultReactSuggestionItem } from '@blocknote/react';
 import type { NoteNote } from '@notopia-uit/api-gen';
 
 // TODO: handle the note and tag fetch, this is triggered when the menu open only, not on query change
 
-const getLocalDocumentTags = (
-  editor: typeof schema.BlockNoteEditor
-): string[] => {
+const getLocalDocumentTags = (editor: BlockNoteEditor): string[] => {
   const tags = new Set<string>();
 
   editor.forEachBlock((block) => {
@@ -26,7 +24,7 @@ const getLocalDocumentTags = (
 };
 
 export const getNoteMenuItems = (
-  editor: typeof schema.BlockNoteEditor,
+  editor: BlockNoteEditor,
   query: string,
   notes: NoteNote[]
 ): DefaultReactSuggestionItem[] => {
@@ -44,7 +42,7 @@ export const getNoteMenuItems = (
 };
 
 export const getTagMenuItems = async (
-  editor: typeof schema.BlockNoteEditor,
+  editor: BlockNoteEditor,
   query: string,
   tags: string[]
 ) => {

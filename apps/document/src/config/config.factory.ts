@@ -9,6 +9,7 @@ export const appConfig = registerAs<AppConfig>(
     env: process.env.NODE_ENV ?? 'production',
     logLevel: process.env.NOTOPIA_DOCUMENT_LOG_LEVEL ?? 'warn',
     port: parseInt(process.env.NOTOPIA_DOCUMENT_PORT ?? '8082', 10),
+    apiUrl: process.env.NOTOPIA_DOCUMENT_API_URL ?? '',
   })
 );
 
@@ -29,12 +30,9 @@ export const SERVICE_CONFIG = Symbol('SERVICE_CONFIG');
 export const servicesConfig = registerAs(
   SERVICE_CONFIG,
   (): ServicesConfig => ({
-    noteUrl:
-      process.env.NOTOPIA_DOCUMENT_SERVICES_NOTE_URL ??
-      'http://localhost:18081',
+    noteUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_NOTE_CONNECTRPC_URL ?? '',
     authorizationUrl:
-      process.env.NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_URL ??
-      'http://localhost:18089',
+      process.env.NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_CONNECTRPC_URL ?? '',
   })
 );
 

@@ -27,3 +27,10 @@ func (h *Handler) GetWorkspaceIdByNoteId(
 	// Response model: &pb.GetWorkspaceIdByNoteIdResponse{WorkspaceId: string}
 	return nil, errs.NewUnimplemented()
 }
+
+func (h *Handler) GetNoteName(ctx context.Context, req *connect.Request[pb.GetNoteNameRequest]) (*connect.Response[pb.GetNoteNameResponse], error) {
+	// TODO: Implement gRPC endpoint for getting note name
+	// Consider delegating to a handler similar to HTTP controllers or direct repo access
+	// Response model: &pb.GetNoteNameResponse{NoteName: string}
+	return nil, errs.NewUnimplemented()
+}

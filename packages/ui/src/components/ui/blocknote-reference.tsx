@@ -1,6 +1,8 @@
+import {
+  CustomInlineContentConfig,
+  type InlineContentSpec,
+} from '@blocknote/core';
 import { createReactInlineContentSpec } from '@blocknote/react';
-import { getNote } from '@notopia-uit/api-gen';
-import type { Client } from '@notopia-uit/api-gen/client';
 import { useEffect, useState } from 'react';
 
 export const BlockNoteReferenceConfig = {
@@ -9,14 +11,20 @@ export const BlockNoteReferenceConfig = {
     noteId: { default: 'unknown' },
   },
   content: 'none',
-} as const;
+} as const satisfies CustomInlineContentConfig;
+
+export type BlockNoteReferenceInlineContentSpec = InlineContentSpec<
+  typeof BlockNoteReferenceConfig
+>;
+
+export type getNoteNameFn = (noteId: string) => Promise<string>;
 
 const ReferenceLink = ({
   noteId,
-  apiClient,
+  getNoteName,
 }: {
   noteId: string;
-  apiClient: Client;
+  getNoteName: getNoteNameFn;
 }) => {
   const [noteName, setNoteName] = useState('Loading...');
 
@@ -25,11 +33,8 @@ const ReferenceLink = ({
 
     const fetchNote = async () => {
       try {
-        const res = await getNote({
-          client: apiClient,
-          path: { noteId },
-        });
-        if (isMounted) setNoteName(res.data?.name || 'Untitled Note');
+        const name = await getNoteName(noteId);
+        if (isMounted) setNoteName(name || 'Untitled Note');
       } catch {
         if (isMounted) setNoteName('Unknown Note');
       }
@@ -39,7 +44,7 @@ const ReferenceLink = ({
     return () => {
       isMounted = false;
     };
-  }, [noteId, apiClient]);
+  }, [noteId, getNoteName]);
 
   return (
     <a
@@ -53,29 +58,34 @@ const ReferenceLink = ({
   );
 };
 
-export const createBlockNoteReferenceSpec = (apiClient?: Client) =>
+export const createBlockNoteReferenceSpec = ({
+  getNoteName,
+  baseUrl,
+}: {
+  getNoteName: getNoteNameFn;
+  baseUrl: string;
+}): BlockNoteReferenceInlineContentSpec =>
   createReactInlineContentSpec(BlockNoteReferenceConfig, {
     render: (props) => {
-      if (!apiClient) {
-        return;
-      }
       return (
         <ReferenceLink
           noteId={props.inlineContent.props.noteId}
-          apiClient={apiClient}
+          getNoteName={getNoteName}
         />
       );
     },
 
-    toExternalHTML: (props) => (
-      <a
-        // TODO: endpoint from backend here
-        href={`/note/${props.inlineContent.props.noteId}`}
-        data-notopia-ref={props.inlineContent.props.noteId}
-      >
-        @{props.inlineContent.props.noteId}
-      </a>
-    ),
+    toExternalHTML: (props) => {
+      const noteUrl = new URL(
+        `/note/${props.inlineContent.props.noteId}`,
+        baseUrl
+      ).href;
+      return (
+        <a href={noteUrl} data-notopia-ref={props.inlineContent.props.noteId}>
+          @{props.inlineContent.props.noteId}
+        </a>
+      );
+    },
 
     parse: (element) => {
       if (element.hasAttribute('data-notopia-ref')) {

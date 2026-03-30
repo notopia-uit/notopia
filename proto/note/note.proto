@@ -5,8 +5,20 @@ package note;
 import "buf/validate/validate.proto";
 
 service NoteService {
+  rpc GetNoteName(GetNoteNameRequest) returns (GetNoteNameResponse);
   rpc CheckNoteExistence(CheckNoteExistenceRequest) returns (CheckNoteExistenceResponse);
   rpc GetWorkspaceIdByNoteId(GetWorkspaceIdByNoteIdRequest) returns (GetWorkspaceIdByNoteIdResponse);
+}
+
+message GetNoteNameRequest {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+}
+
+message GetNoteNameResponse {
+  string name = 1 [(buf.validate.field).required = true];
 }
 
 message CheckNoteExistenceRequest {

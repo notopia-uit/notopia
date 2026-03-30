@@ -26,12 +26,6 @@ declare namespace NodeJS {
 
     NODE_ENV?: 'development' | 'production' | 'test';
 
-    NOTOPIA_DOCUMENT_DB_HOST?: string;
-    NOTOPIA_DOCUMENT_DB_PORT?: string;
-    NOTOPIA_DOCUMENT_DB_USER?: string;
-    NOTOPIA_DOCUMENT_DB_PASSWORD?: string;
-    NOTOPIA_DOCUMENT_DB_NAME?: string;
-
     NOTOPIA_DOCUMENT_PORT?: string;
     NOTOPIA_DOCUMENT_LOG_LEVEL?:
       | 'trace'
@@ -40,7 +34,15 @@ declare namespace NodeJS {
       | 'warn'
       | 'error'
       | 'fatal';
-    NOTOPIA_DOCUMENT_SERVICES_NOTE_URL?: string;
-    NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_URL?: string;
+    NOTOPIA_DOCUMENT_API_URL?: string; // public serve, for it own, and other services reference
+
+    NOTOPIA_DOCUMENT_DB_HOST?: string;
+    NOTOPIA_DOCUMENT_DB_PORT?: string;
+    NOTOPIA_DOCUMENT_DB_USER?: string;
+    NOTOPIA_DOCUMENT_DB_PASSWORD?: string;
+    NOTOPIA_DOCUMENT_DB_NAME?: string;
+
+    NOTOPIA_DOCUMENT_SERVICES_NOTE_CONNECTRPC_URL?: string;
+    NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_CONNECTRPC_URL?: string;
   }
 }
