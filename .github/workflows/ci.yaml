@@ -215,6 +215,7 @@ jobs:
 
       - name: Nx all
         run: |
+          NX_VERBOSE_LOGGING=true \
           pnpm exec nx-cache-action \
           pnpm exec nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
             --target lint \
