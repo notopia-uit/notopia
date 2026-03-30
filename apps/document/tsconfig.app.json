@@ -4,7 +4,6 @@
   "compilerOptions": {
     "outDir": "dist",
     "module": "esnext",
-    "jsx": "react-jsx",
     "types": ["node"],
     "rootDir": "src",
     "baseUrl": "src",

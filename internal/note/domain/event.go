@@ -105,61 +105,6 @@ func GetEventType(e Event) EventType {
 	}
 }
 
-func NewEmptyFromEventType(eventType string) (Event, bool) {
-	var concreteEvent Event
-	switch EventType(eventType) {
-	case EventTypeFolderCreated:
-		//exhaustruct:ignore
-		concreteEvent = &FolderCreatedEvent{}
-	case EventTypeFolderDeleted:
-		//exhaustruct:ignore
-		concreteEvent = &FolderDeletedEvent{}
-	case EventTypeFolderUpdated:
-		//exhaustruct:ignore
-		concreteEvent = &FolderUpdatedEvent{}
-	case EventTypeFolderMoved:
-		//exhaustruct:ignore
-		concreteEvent = &FolderMovedEvent{}
-	case EventTypeFolderTrashed:
-		//exhaustruct:ignore
-		concreteEvent = &FolderTrashedEvent{}
-	case EventTypeFolderRestored:
-		//exhaustruct:ignore
-		concreteEvent = &FolderRestoredEvent{}
-	case EventTypeFolderPermanentlyDeleted:
-		//exhaustruct:ignore
-		concreteEvent = &FolderPermanentlyDeletedEvent{}
-	case EventTypeNoteCreated:
-		//exhaustruct:ignore
-		concreteEvent = &NoteCreatedEvent{}
-	case EventTypeNoteDeleted:
-		//exhaustruct:ignore
-		concreteEvent = &NoteDeletedEvent{}
-	case EventTypeNoteUpdated:
-		//exhaustruct:ignore
-		concreteEvent = &NoteUpdatedEvent{}
-	case EventTypeNoteMoved:
-		//exhaustruct:ignore
-		concreteEvent = &NoteMovedEvent{}
-	case EventTypeNoteTrashed:
-		//exhaustruct:ignore
-		concreteEvent = &NoteTrashedEvent{}
-	case EventTypeNoteRestored:
-		//exhaustruct:ignore
-		concreteEvent = &NoteRestoredEvent{}
-	case EventTypeNotePermanentlyDeleted:
-		//exhaustruct:ignore
-		concreteEvent = &NotePermanentlyDeletedEvent{}
-	case EventTypeWorkspaceUpdated:
-		//exhaustruct:ignore
-		concreteEvent = &WorkspaceUpdatedEvent{}
-	case EventTypeWorkspaceDeleted:
-		//exhaustruct:ignore
-		concreteEvent = &WorkspaceDeletedEvent{}
-	}
-	return concreteEvent, concreteEvent != nil
-}
-
 type FolderCreatedEvent struct {
 	BaseEvent
 	Name string  `json:"name"`
@@ -202,6 +147,7 @@ type FolderPermanentlyDeletedEvent struct {
 type NoteDeletedEvent struct {
 	BaseEvent
 }
+
 type NoteUpdatedEvent struct {
 	BaseEvent
 	Name          string     `json:"name"`

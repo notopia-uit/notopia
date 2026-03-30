@@ -48,16 +48,19 @@ type DocumentContent = []map[string]interface{}
 
 // Note defines model for Note.
 type Note struct {
-	FolderId *PropertiesId       `json:"folderId,omitempty"`
-	Icon     *string             `json:"icon"`
-	Id       *openapi_types.UUID `json:"id,omitempty"`
-	Name     string              `json:"name"`
-	Tags     []string            `json:"tags"`
-	Trashed  *struct {
-		TrashedAt time.Time `json:"trashedAt"`
-		TrashedBy TrashedBy `json:"trashedBy"`
-	} `json:"trashed,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	FolderId  *PropertiesId       `json:"folderId,omitempty"`
+	Icon      *string             `json:"icon"`
+	Id        *openapi_types.UUID `json:"id,omitempty"`
+	Name      string              `json:"name"`
+	Tags      []string            `json:"tags"`
+	Trashed   *NoteTrashed        `json:"trashed,omitempty"`
+	UpdatedAt *time.Time          `json:"updatedAt,omitempty"`
+}
+
+// NoteTrashed defines model for .
+type NoteTrashed struct {
+	TrashedAt time.Time `json:"trashedAt"`
+	TrashedBy TrashedBy `json:"trashedBy"`
 }
 
 // NoteCreatedEvent defines model for NoteCreatedEvent.

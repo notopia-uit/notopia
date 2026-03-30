@@ -21,7 +21,6 @@
     "@notopia-uit/api-document-nestjs-server": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@notopia-uit/pb": "workspace:",
-    "@notopia-uit/ui": "workspace:",
     "@opentelemetry/api": "catalog:",
     "@opentelemetry/auto-instrumentations-node": "catalog:",
     "@opentelemetry/exporter-metrics-otlp-grpc": "catalog:",
