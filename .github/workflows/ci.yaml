@@ -127,6 +127,9 @@ jobs:
       pages: write
       id-token: write
     steps:
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v4
+
       - name: Setup Git User
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
