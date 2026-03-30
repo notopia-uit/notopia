@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "local>notopia-uit/renovate-config",
+    "github>notopia-uit/renovate-config",
     ":automergeBranch",
     ":automergePatch"
   ],
@@ -11,12 +11,20 @@
       "matchPackageNames": ["nx", "/^@nx//", "/^nx$/"],
       "automerge": false,
       "description": "Group all Nx packages to prevent version mismatch and allow manual migration. Note that renovate still create PRs for minor/major updates, but they will not be automerged."
+    },
+    {
+      "groupName": "Codegen",
+      "matchPackageNames": [
+        "@hey-api/openapi-ts",
+        "github.com/oapi-codegen/runtime",
+        "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen"
+      ],
+      "automerge": true,
+      "matchUpdateTypes": ["patch", "minor"]
     }
   ],
   "docker-compose": {
-    "managerFilePatterns": [
-      "^deploy/compose/(infrastructure|services)/.+\\.ya?ml$"
-    ]
+    "fileMatch": ["(^|/)deploy/compose/.+\\.ya?ml$"]
   },
   "schedule": ["* 1-18 * * 3,0"]
 }

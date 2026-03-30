@@ -16,6 +16,7 @@ on:
       - .vscode/**/*
       - .wakatime-project
       - README.md
+      - deploy/**/*
       - justfile
       - mise.development.toml
       - mise.toml

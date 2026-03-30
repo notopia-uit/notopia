@@ -1,5 +1,5 @@
 /api/ @notopia-uit/team-backend @notopia-uit/team-backend
-/proto/ @notopia-uit/team-backend @notopia-uit/team-backend
+/proto/ @notopia-uit/team-backend
 /docs/ @notopia-uit/team-backend @notopia-uit/team-backend
 /packages/api-web/ @notopia-uit/team-frontend @notopia-uit/team-backend
 

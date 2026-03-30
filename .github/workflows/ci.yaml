@@ -17,6 +17,7 @@ on:
       - .vscode/**/*
       - .wakatime-project
       - README.md
+      - deploy/**/*
       - justfile
       - mise.development.toml
       - mise.toml
@@ -218,8 +219,6 @@ jobs:
         run: pnpm exec nx reset
 
       - name: Nx all
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pnpm exec nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
             --target lint \
@@ -229,7 +228,6 @@ jobs:
             --target build \
             --target test \
             --target typecheck \
-            ${{ github.ref == 'refs/heads/main' && '--target deployPage' || '' }} \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
@@ -242,6 +240,16 @@ jobs:
             git status --short
             exit 1;
           fi
+
+      - name: Nx Deploy Page
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pnpm exec nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
+            ${{ github.ref == 'refs/heads/main' && '--target deployPage' || '' }} \
+            --parallel=${{env.NX_PARALLEL }} \
+            --configuration 'production' \
+            ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
 
       - name: Github NPM Token
         if: >-
