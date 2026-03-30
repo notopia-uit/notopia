@@ -37,6 +37,7 @@ catalog:
   '@nestjs/websockets': 11.1.17
   '@next/eslint-plugin-next': 16.2.1
   '@opentelemetry/api': 1.9.1
+  '@opentelemetry/instrumentation-kafkajs': 0.23.0
   '@opentelemetry/auto-instrumentations-node': 0.71.0
   '@opentelemetry/exporter-metrics-otlp-grpc': 0.213.0
   '@opentelemetry/exporter-trace-otlp-grpc': 0.213.0

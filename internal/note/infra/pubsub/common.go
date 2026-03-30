@@ -7,6 +7,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
+	"github.com/ThreeDotsLabs/watermill/message"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
@@ -23,7 +24,7 @@ func NewIntegrationMarshaler() cqrs.CommandEventMarshaler {
 var ProvideIntegrationMarshaler = NewIntegrationMarshaler
 
 type KafkaPublisher struct {
-	kafka.Publisher
+	message.Publisher
 }
 
 func NewKafkaPublisher(
@@ -41,7 +42,7 @@ func NewKafkaPublisher(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Kafka publisher: %w", err)
 	}
-	return &KafkaPublisher{Publisher: *publisher}, nil
+	return &KafkaPublisher{Publisher: publisher}, nil
 }
 
 var ProvideKafkaPublisher = NewKafkaPublisher

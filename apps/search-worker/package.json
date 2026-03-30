@@ -16,6 +16,7 @@
     "@opentelemetry/exporter-metrics-otlp-grpc": "catalog:",
     "@opentelemetry/exporter-trace-otlp-grpc": "catalog:",
     "@opentelemetry/instrumentation-http": "catalog:",
+    "@opentelemetry/instrumentation-kafkajs": "catalog:",
     "@opentelemetry/instrumentation-pino": "catalog:",
     "@opentelemetry/resources": "catalog:",
     "@opentelemetry/sdk-metrics": "catalog:",

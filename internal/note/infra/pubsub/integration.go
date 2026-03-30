@@ -23,7 +23,10 @@ func NewIntegrationPubSub(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create router: %w", err)
 	}
-	router.AddMiddleware(middleware.CorrelationID, middleware.Recoverer)
+	router.AddMiddleware(
+		middleware.CorrelationID,
+		middleware.Recoverer,
+	)
 
 	eventBus, err := cqrs.NewEventBusWithConfig(publisher, cqrs.EventBusConfig{
 		GeneratePublishTopic: func(params cqrs.GenerateEventPublishTopicParams) (string, error) {

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"go.opentelemetry.io/contrib/exporters/autoexport"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdk "go.opentelemetry.io/otel/sdk/trace"
 )
@@ -35,6 +36,8 @@ func NewTracerProvider(
 			)
 		}
 	}
+
+	otel.SetTracerProvider(tp)
 
 	return tp, cleanup, nil
 }

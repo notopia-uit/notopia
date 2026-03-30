@@ -7,6 +7,7 @@ import (
 	"github.com/notopia-uit/notopia/pkg/metadata"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/contrib/exporters/autoexport"
+	"go.opentelemetry.io/otel/log/global"
 	sdk "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
@@ -37,6 +38,9 @@ func NewLoggerProvider(
 			)
 		}
 	}
+
+	global.SetLoggerProvider(lp)
+
 	return lp, cleanup, nil
 }
 

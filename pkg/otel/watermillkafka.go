@@ -4,14 +4,20 @@ import (
 	"github.com/IBM/sarama"
 	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
 	"github.com/dnwe/otelsarama"
-	"go.opentelemetry.io/otel/sdk/trace"
+	wotel "github.com/nkonev/watermill-opentelemetry/pkg/opentelemetry"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
-type WatermillKafkaTracer struct {
-	tp *trace.TracerProvider
+func NewWatermillOTELOption(t trace.Tracer) wotel.Option {
+	return wotel.WithTracer(t)
 }
 
-func NewOTELSaramaTracer(tp *trace.TracerProvider) *WatermillKafkaTracer {
+type WatermillKafkaTracer struct {
+	tp *tracesdk.TracerProvider
+}
+
+func NewOTELSaramaTracer(tp *tracesdk.TracerProvider) *WatermillKafkaTracer {
 	return &WatermillKafkaTracer{tp: tp}
 }
 
