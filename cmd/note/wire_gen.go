@@ -82,15 +82,15 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	queries := pg.NewQueries(pool)
 	db := pg.NewStdlib(pool)
-	pgNote := pg.NewNoTransactionNote(pool, queries, db)
 	folder := pg.NewNoTransactionFolder(pool, queries, db)
-	createNoteHandler := app.NewCreateNoteHandler(authorization, pgNote, folder)
 	createFolderHandler := app.NewCreateFolderHandler(authorization, folder)
+	pgNote := pg.NewNoTransactionNote(pool, queries, db)
+	createNoteHandler := app.NewCreateNoteHandler(authorization, pgNote, folder)
 	workspace := pg.NewNoTransactionWorkspace(pool, queries, db)
 	unitOfWork := pg.NewUnitOfWork(queries, db)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspace, folder, unitOfWork)
-	deleteNoteHandler := app.NewDeleteNoteHandler(authorization, pgNote)
 	deleteFolderHandler := app.NewDeleteFolderHandler(authorization, folder)
+	deleteNoteHandler := app.NewDeleteNoteHandler(authorization, pgNote)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, workspace)
 	generateDailyNoteHandler := app.NewGenerateDailyNoteHandler(pgNote, folder, workspace)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, pgNote, folder, unitOfWork)
@@ -107,11 +107,11 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler()
 	commandHandlers := &app.CommandHandlers{
-		CreateNoteHandler:                      createNoteHandler,
 		CreateFolderHandler:                    createFolderHandler,
+		CreateNoteHandler:                      createNoteHandler,
 		CreateWorkspaceHandler:                 createWorkspaceHandler,
-		DeleteNoteHandler:                      deleteNoteHandler,
 		DeleteFolderHandler:                    deleteFolderHandler,
+		DeleteNoteHandler:                      deleteNoteHandler,
 		DeleteWorkspaceHandler:                 deleteWorkspaceHandler,
 		GenerateDailyNoteHandler:               generateDailyNoteHandler,
 		MoveWorkspaceItemsHandler:              moveWorkspaceItemsHandler,
@@ -127,35 +127,37 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		UnpublishWorkspaceHandler:              unpublishWorkspaceHandler,
 		UpdateWorkspaceMembersHandler:          updateWorkspaceMembersHandler,
 	}
+	noteService := domain.NewNoteService()
+	documentCommittedHandler := app.NewDocumentCommittedHandler(pgNote, noteService)
+	integrationEventHandlers := &app.IntegrationEventHandlers{
+		DocumentCommittedHandler: documentCommittedHandler,
+	}
 	readModel := pg.NewReadModel(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(readModel)
 	getNoteGraphHandler := app.NewGetNoteGraphHandler(readModel)
+	getNoteHandler := app.NewGetNoteHandler(authorization, pgNote, readModel)
 	getNoteLinksHandler := app.NewGetNoteLinksHandler(readModel)
-	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(readModel)
 	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(readModel)
+	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(readModel)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler()
 	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(readModel)
 	showTrashHandler := app.NewShowTrashHandler(readModel)
 	queryHandlers := &app.QueryHandlers{
 		CheckWorkspaceSlugExistsHandler: checkWorkspaceSlugExistsHandler,
 		GetNoteGraphHandler:             getNoteGraphHandler,
+		GetNoteHandler:                  getNoteHandler,
 		GetNoteLinksHandler:             getNoteLinksHandler,
-		GetWorkspaceHandler:             getWorkspaceHandler,
 		GetWorkspaceGraphHandler:        getWorkspaceGraphHandler,
+		GetWorkspaceHandler:             getWorkspaceHandler,
 		GetWorkspaceMembersHandler:      getWorkspaceMembersHandler,
 		GetWorkspaceTreeHandler:         getWorkspaceTreeHandler,
 		ShowTrashHandler:                showTrashHandler,
 	}
-	noteService := domain.NewNoteService()
-	documentCommittedHandler := app.NewDocumentCommittedHandler(pgNote, noteService)
-	integrationEventHandlers := &app.IntegrationEventHandlers{
-		DocumentCommittedHandler: documentCommittedHandler,
-	}
 	kafka := &configConfig.Kafka
 	loggerAdapter := pubsub.NewWatermillLogger(logger)
 	commonconfigKafka := configConfig.Kafka
-	saramaTracer := pubsub.NewKafkaTracer()
-	kafkaPublisher, err := pubsub.NewKafkaPublisher(commonconfigKafka, loggerAdapter, saramaTracer)
+	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
+	kafkaPublisher, err := pubsub.NewKafkaPublisher(commonconfigKafka, loggerAdapter, watermillKafkaTracer)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -164,7 +166,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	commandEventMarshaler := pubsub.NewIntegrationMarshaler()
-	integrationPubSub, err := pubsub.NewIntegrationPubSub(kafka, loggerAdapter, kafkaPublisher, saramaTracer, commandEventMarshaler)
+	integrationPubSub, err := pubsub.NewIntegrationPubSub(kafka, loggerAdapter, kafkaPublisher, watermillKafkaTracer, commandEventMarshaler)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -205,8 +207,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	server := &app.Server{
 		CommandHandlers:          commandHandlers,
-		QueryHandlers:            queryHandlers,
 		IntegrationEventHandlers: integrationEventHandlers,
+		QueryHandlers:            queryHandlers,
 		IntegrationPubSub:        integrationPubSub,
 		WorkspaceEventPubSub:     workspaceEvent,
 		Persistence:              persistencePg,

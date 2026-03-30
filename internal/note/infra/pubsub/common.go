@@ -22,12 +22,6 @@ func NewIntegrationMarshaler() cqrs.CommandEventMarshaler {
 
 var ProvideIntegrationMarshaler = NewIntegrationMarshaler
 
-func NewKafkaTracer() kafka.SaramaTracer {
-	return kafka.NewOTELSaramaTracer()
-}
-
-var ProvideKafkaTracer = NewKafkaTracer
-
 type KafkaPublisher struct {
 	kafka.Publisher
 }

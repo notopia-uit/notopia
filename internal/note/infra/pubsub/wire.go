@@ -9,7 +9,6 @@ var ProviderSet = wire.NewSet(
 	ProvideIntegrationMarshaler,
 	ProvideIntegrationPubSub,
 	ProvideKafkaPublisher,
-	ProvideKafkaTracer,
 	ProvideRedisClient,
 	ProvideWatermillLogger,
 	ProvideWorkspaceEvent,
