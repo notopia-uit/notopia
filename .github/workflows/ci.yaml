@@ -88,6 +88,7 @@ on:
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
   IS_RENOVATE: ${{ startsWith(github.head_ref || github.ref_name, 'renovate/') }}
+  SKIP_UPLOAD_CACHE: ${{ startsWith(github.head_ref || github.ref_name, 'renovate/') }}
   SHOULD_CACHE: >-
     ${{
       (

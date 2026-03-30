@@ -18,7 +18,7 @@
     "yjs": "13.6.30"
   },
   "devDependencies": {
-    "@kevinnitro/nx-cache-action": "0.0.1",
+    "@kevinnitro/nx-cache-action": "0.0.2",
     "@nestjs/schematics": "catalog:",
     "@nestjs/testing": "catalog:",
     "@next/eslint-plugin-next": "catalog:",
