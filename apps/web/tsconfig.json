@@ -13,7 +13,7 @@
     "incremental": true,
     "skipLibCheck": true,
     "paths": {
-      "*": ["./src/*/*"],
+      "*": ["./src/*"],
       "@notopia-uit/ui/*": ["../../packages/ui/src/*"],
       "@notopia-uit/ui": ["../../packages/ui/src"],
       "@/*": ["../../packages/ui/src/*"]
