@@ -2,7 +2,7 @@
 
 FILE_LIMIT_BYTES=1000000 # 1MB
 
-CI=true pnpm nx run-many \
+CI=true pnpm nx affected \
   --target lint \
   --target format:check \
   --tui false
