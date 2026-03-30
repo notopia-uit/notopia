@@ -1,11 +1,17 @@
 # vim: ft=yaml.openapi
 type: object
 properties:
-  type:
+  id:
+    type: string
+    format: uuid
+    example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+
+  event:
     type: string
     enum:
       - WorkspaceDeletedEvent
     example: WorkspaceDeletedEvent
+
   data:
     type: object
     x-go-type-name: WorkspaceDeletedEventData
@@ -15,5 +21,6 @@ properties:
     required:
       - id
 required:
-  - type
+  - id
+  - event
   - data

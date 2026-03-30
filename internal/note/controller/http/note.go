@@ -76,7 +76,24 @@ func (h *StrictHandler) GetNote(
 	ctx context.Context,
 	request note.GetNoteRequestObject,
 ) (note.GetNoteResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	user, err := commonhttp.UserFromContextError(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	query := &app.GetNote{
+		ID:             request.NoteId,
+		ExcludeTrashed: true,
+		UserID:         user.ID,
+	}
+
+	result, err := h.App.QueryHandlers.GetNoteHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	dto := toNote(*result)
+	return note.GetNote200JSONResponse(dto), nil
 }
 
 func (h *StrictHandler) GetNoteGraph(

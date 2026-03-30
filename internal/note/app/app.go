@@ -8,11 +8,11 @@ import (
 )
 
 type CommandHandlers struct {
-	CreateNoteHandler                      *CreateNoteHandler
 	CreateFolderHandler                    *CreateFolderHandler
+	CreateNoteHandler                      *CreateNoteHandler
 	CreateWorkspaceHandler                 *CreateWorkspaceHandler
-	DeleteNoteHandler                      *DeleteNoteHandler
 	DeleteFolderHandler                    *DeleteFolderHandler
+	DeleteNoteHandler                      *DeleteNoteHandler
 	DeleteWorkspaceHandler                 *DeleteWorkspaceHandler
 	GenerateDailyNoteHandler               *GenerateDailyNoteHandler
 	MoveWorkspaceItemsHandler              *MoveWorkspaceItemsHandler
@@ -32,9 +32,10 @@ type CommandHandlers struct {
 type QueryHandlers struct {
 	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler
 	GetNoteGraphHandler             *GetNoteGraphHandler
+	GetNoteHandler                  *GetNoteHandler
 	GetNoteLinksHandler             *GetNoteLinksHandler
-	GetWorkspaceHandler             *GetWorkspaceHandler
 	GetWorkspaceGraphHandler        *GetWorkspaceGraphHandler
+	GetWorkspaceHandler             *GetWorkspaceHandler
 	GetWorkspaceMembersHandler      *GetWorkspaceMembersHandler
 	GetWorkspaceTreeHandler         *GetWorkspaceTreeHandler
 	ShowTrashHandler                *ShowTrashHandler
@@ -46,8 +47,8 @@ type IntegrationEventHandlers struct {
 
 type Server struct {
 	CommandHandlers          *CommandHandlers
-	QueryHandlers            *QueryHandlers
 	IntegrationEventHandlers *IntegrationEventHandlers
+	QueryHandlers            *QueryHandlers
 
 	IntegrationPubSub    *IntegrationPubSub
 	WorkspaceEventPubSub WorkspaceEventPubSub

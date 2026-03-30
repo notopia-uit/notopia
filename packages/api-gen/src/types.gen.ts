@@ -53,6 +53,10 @@ export type ShareIcon = string | null;
 
 export type SharePropertiesId = string;
 
+export const ShareTrashedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
+
+export type ShareTrashedBy = typeof ShareTrashedBy[keyof typeof ShareTrashedBy];
+
 export type ShareNote = {
     readonly id: string;
     name: string;
@@ -60,6 +64,10 @@ export type ShareNote = {
     folderId: SharePropertiesId;
     tags: Array<string>;
     readonly updatedAt: Date;
+    readonly trashed: {
+        trashedBy: ShareTrashedBy;
+        trashedAt: Date;
+    } | null;
 };
 
 /**
@@ -223,7 +231,8 @@ export type NoteWorkspace = {
 export type NoteSlug = string;
 
 export type NoteWorkspaceItemsUpdatedEvent = {
-    type: 'WorkspaceItemsUpdatedEvent';
+    id: string;
+    event: 'WorkspaceItemsUpdatedEvent';
     data: {
         workspaceId: NotePropertiesId;
     };
@@ -254,7 +263,8 @@ export type NoteWorkspaceMember = {
 };
 
 export type NoteWorkspaceMembersUpdatedEvent = {
-    type: 'WorkspaceMembersUpdatedEvent';
+    id: string;
+    event: 'WorkspaceMembersUpdatedEvent';
     data: {
         id: NotePropertiesId;
         members: Array<NoteWorkspaceMember>;
@@ -262,31 +272,41 @@ export type NoteWorkspaceMembersUpdatedEvent = {
 };
 
 export type NoteWorkspaceUpdatedEvent = {
-    type: 'WorkspaceUpdatedEvent';
+    id: string;
+    event: 'WorkspaceUpdatedEvent';
     data: NoteWorkspace;
 };
 
 export type NoteWorkspaceDeletedEvent = {
-    type: 'WorkspaceDeletedEvent';
+    id: string;
+    event: 'WorkspaceDeletedEvent';
     data: {
         id: NotePropertiesId;
     };
 };
 
+export type NoteHeartBeatWorkspaceEvent = {
+    event: 'HeartBeatWorkspaceEvent';
+    timestamp: Date;
+};
+
 export type NoteWorkspacePropertiesName = string;
+
+export type NoteTrashed = {
+    trashedBy: NoteTrashedBy;
+    trashedAt: Date;
+};
 
 export type NoteTrashedNote = {
     id: string;
     readonly name: string;
-    trashedBy: NoteTrashedBy;
-    readonly trashedAt: Date;
+    trashed: NoteTrashed;
 };
 
 export type NoteTrashedFolder = {
     id: string;
     readonly name: string;
-    trashedBy: NoteTrashedBy;
-    readonly trashedAt: Date;
+    trashed: NoteTrashed;
 };
 
 export type NotePropertiesIcon = string | null;
@@ -374,33 +394,37 @@ export type NoteWorkspaceWritable = {
 };
 
 export type NoteWorkspaceItemsUpdatedEventWritable = {
-    type: 'WorkspaceItemsUpdatedEvent';
+    id: string;
+    event: 'WorkspaceItemsUpdatedEvent';
 };
 
 export type NoteWorkspaceMembersUpdatedEventWritable = {
-    type: 'WorkspaceMembersUpdatedEvent';
+    id: string;
+    event: 'WorkspaceMembersUpdatedEvent';
     data: {
         members: Array<NoteWorkspaceMember>;
     };
 };
 
 export type NoteWorkspaceUpdatedEventWritable = {
-    type: 'WorkspaceUpdatedEvent';
+    id: string;
+    event: 'WorkspaceUpdatedEvent';
     data: NoteWorkspaceWritable;
 };
 
 export type NoteWorkspaceDeletedEventWritable = {
-    type: 'WorkspaceDeletedEvent';
+    id: string;
+    event: 'WorkspaceDeletedEvent';
 };
 
 export type NoteTrashedNoteWritable = {
     id: string;
-    trashedBy: NoteTrashedBy;
+    trashed: NoteTrashed;
 };
 
 export type NoteTrashedFolderWritable = {
     id: string;
-    trashedBy: NoteTrashedBy;
+    trashed: NoteTrashed;
 };
 
 export type NoteWorkspaceTreeNoteWritable = {
@@ -1716,14 +1740,16 @@ export type GetWorkspaceEventsResponses = {
      * A persistent stream of events
      */
     200: ({
-        type: 'WorkspaceItemsUpdatedEvent';
+        event: 'WorkspaceItemsUpdatedEvent';
     } & NoteWorkspaceItemsUpdatedEvent) | ({
-        type: 'WorkspaceMembersUpdatedEvent';
+        event: 'WorkspaceMembersUpdatedEvent';
     } & NoteWorkspaceMembersUpdatedEvent) | ({
-        type: 'WorkspaceUpdatedEvent';
+        event: 'WorkspaceUpdatedEvent';
     } & NoteWorkspaceUpdatedEvent) | ({
-        type: 'WorkspaceDeletedEvent';
-    } & NoteWorkspaceDeletedEvent);
+        event: 'WorkspaceDeletedEvent';
+    } & NoteWorkspaceDeletedEvent) | ({
+        event: 'HeartBeatWorkspaceEvent';
+    } & NoteHeartBeatWorkspaceEvent);
 };
 
 export type GetWorkspaceEventsResponse = GetWorkspaceEventsResponses[keyof GetWorkspaceEventsResponses];
@@ -2282,6 +2308,8 @@ export type GetWorkspaceTreeData = {
     };
     query?: {
         rootFolderId?: NoteId;
+        includeTrashed?: boolean;
+        depth?: number;
     };
     url: '/note/workspaces/{workspaceId}/tree';
 };

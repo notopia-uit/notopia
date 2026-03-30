@@ -13,6 +13,13 @@ func toNote(n app.Note) note.Note {
 	if tags == nil {
 		tags = []string{}
 	}
+	var trashed *note.NoteTrashed
+	if n.Trashed != nil {
+		trashed = &note.NoteTrashed{
+			TrashedBy: toTrashedBy(n.Trashed.TrashedBy),
+			TrashedAt: n.Trashed.TrashedAt,
+		}
+	}
 	return note.Note{
 		Id:        &id,
 		Name:      n.Name,
@@ -20,6 +27,7 @@ func toNote(n app.Note) note.Note {
 		Tags:      tags,
 		FolderId:  &folderID,
 		UpdatedAt: &updatedAt,
+		Trashed:   trashed,
 	}
 }
 
@@ -28,6 +36,13 @@ func toFolder(f app.Folder) note.Folder {
 	parentID := f.ParentID
 	workspaceID := f.WorkspaceID
 	updatedAt := f.UpdatedAt
+	var trashed *note.FolderTrashed
+	if f.Trashed != nil {
+		trashed = &note.FolderTrashed{
+			TrashedBy: toTrashedBy(f.Trashed.TrashedBy),
+			TrashedAt: f.Trashed.TrashedAt,
+		}
+	}
 	return note.Folder{
 		Id:          &id,
 		Name:        f.Name,
@@ -35,6 +50,7 @@ func toFolder(f app.Folder) note.Folder {
 		ParentId:    &parentID,
 		WorkspaceId: &workspaceID,
 		UpdatedAt:   &updatedAt,
+		Trashed:     trashed,
 	}
 }
 
@@ -88,24 +104,24 @@ func toWorkspaceTreeFolder(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFolder 
 }
 
 func toTrashedFolder(f *app.TrashedFolder) note.TrashedFolder {
-	name := f.Name
-	trashedAt := f.TrashedAt
 	return note.TrashedFolder{
-		Id:        f.ID,
-		Name:      &name,
-		TrashedAt: &trashedAt,
-		TrashedBy: toTrashedBy(f.TrashedBy),
+		Id:   f.ID,
+		Name: new(f.Name),
+		Trashed: note.Trashed{
+			TrashedBy: toTrashedBy(f.Trashed.TrashedBy),
+			TrashedAt: f.Trashed.TrashedAt,
+		},
 	}
 }
 
 func toTrashedNote(n *app.TrashedNote) note.TrashedNote {
-	name := n.Name
-	trashedAt := n.TrashedAt
 	return note.TrashedNote{
-		Id:        n.ID,
-		Name:      &name,
-		TrashedAt: &trashedAt,
-		TrashedBy: toTrashedBy(n.TrashedBy),
+		Id:   n.ID,
+		Name: new(n.Name),
+		Trashed: note.Trashed{
+			TrashedBy: toTrashedBy(n.Trashed.TrashedBy),
+			TrashedAt: n.Trashed.TrashedAt,
+		},
 	}
 }
 
@@ -177,6 +193,6 @@ func toTrashedBy(t app.TrashedBy) note.TrashedBy {
 	case app.TrashedByPurpose:
 		return note.Purpose
 	default:
-		panic("unknown trashed by")
+		panic("invalid trashed by")
 	}
 }

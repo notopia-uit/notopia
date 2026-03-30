@@ -30,13 +30,18 @@ export const getNoteResponseTransformer = async (data: any): Promise<GetNoteResp
     return data;
 };
 
-const noteTrashedNoteSchemaResponseTransformer = (data: any) => {
+const noteTrashedSchemaResponseTransformer = (data: any) => {
     data.trashedAt = new Date(data.trashedAt);
     return data;
 };
 
+const noteTrashedNoteSchemaResponseTransformer = (data: any) => {
+    data.trashed = noteTrashedSchemaResponseTransformer(data.trashed);
+    return data;
+};
+
 const noteTrashedFolderSchemaResponseTransformer = (data: any) => {
-    data.trashedAt = new Date(data.trashedAt);
+    data.trashed = noteTrashedSchemaResponseTransformer(data.trashed);
     return data;
 };
 

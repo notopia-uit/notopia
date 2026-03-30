@@ -65,16 +65,22 @@ WHERE
     THEN trashed_by = $5::text
     ELSE TRUE
   END
+  AND CASE
+    WHEN $6::bool = FALSE
+    THEN trashed_by IS NULL
+    ELSE TRUE
+  END
 ORDER BY
   created_at DESC
 `
 
 type GetFolderParams struct {
-	ID           *uuid.UUID
-	WorkspaceID  *uuid.UUID
-	ParentID     *uuid.UUID
-	IsRootFolder bool
-	TrashedBy    string
+	ID             *uuid.UUID
+	WorkspaceID    *uuid.UUID
+	ParentID       *uuid.UUID
+	IsRootFolder   bool
+	TrashedBy      string
+	IncludeTrashed bool
 }
 
 func (q *Queries) GetFolder(ctx context.Context, arg *GetFolderParams) (*Folder, error) {
@@ -84,6 +90,7 @@ func (q *Queries) GetFolder(ctx context.Context, arg *GetFolderParams) (*Folder,
 		arg.ParentID,
 		arg.IsRootFolder,
 		arg.TrashedBy,
+		arg.IncludeTrashed,
 	)
 	var i Folder
 	err := row.Scan(
@@ -131,16 +138,22 @@ WHERE
     THEN trashed_by = $5::text
     ELSE TRUE
   END
+  AND CASE
+    WHEN $6::bool = FALSE
+    THEN trashed_by IS NULL
+    ELSE TRUE
+  END
 ORDER BY
   created_at DESC
 `
 
 type GetFoldersParams struct {
-	IDs          []uuid.UUID
-	WorkspaceID  *uuid.UUID
-	ParentID     *uuid.UUID
-	IsRootFolder bool
-	TrashedBy    *string
+	IDs            []uuid.UUID
+	WorkspaceID    *uuid.UUID
+	ParentID       *uuid.UUID
+	IsRootFolder   bool
+	TrashedBy      *string
+	IncludeTrashed bool
 }
 
 func (q *Queries) GetFolders(ctx context.Context, arg *GetFoldersParams) ([]*Folder, error) {
@@ -150,6 +163,7 @@ func (q *Queries) GetFolders(ctx context.Context, arg *GetFoldersParams) ([]*Fol
 		arg.ParentID,
 		arg.IsRootFolder,
 		arg.TrashedBy,
+		arg.IncludeTrashed,
 	)
 	if err != nil {
 		return nil, err
@@ -182,23 +196,43 @@ func (q *Queries) GetFolders(ctx context.Context, arg *GetFoldersParams) ([]*Fol
 const getRecursiveFolderByParentID = `-- name: GetRecursiveFolderByParentID :many
 WITH RECURSIVE subfolders AS (
   SELECT
-    id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+    id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at,
+    1 AS depth
   FROM
     folders
   WHERE
     parent_id = $1::uuid
+    AND CASE
+      WHEN $2::bool = FALSE
+      THEN trashed_by IS NULL
+      ELSE TRUE
+    END
   UNION ALL
   SELECT
-    f.id, f.name, f.icon, f.workspace_id, f.parent_id, f.created_at, f.updated_at, f.trashed_by, f.trashed_at
+    f.id, f.name, f.icon, f.workspace_id, f.parent_id, f.created_at, f.updated_at, f.trashed_by, f.trashed_at,
+    s.depth + 1 AS depth
   FROM
-    folders f
+    folders AS f
     INNER JOIN subfolders s ON f.parent_id = s.id
+  WHERE
+    s.depth < COALESCE($3::int, 9999)
+    AND CASE
+      WHEN $2::bool = FALSE
+      THEN f.trashed_by IS NULL
+      ELSE TRUE
+    END
 )
 SELECT
-  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at, depth
 FROM
   subfolders
 `
+
+type GetRecursiveFolderByParentIDParams struct {
+	ParentID       uuid.UUID
+	IncludeTrashed bool
+	Depth          *int32
+}
 
 type GetRecursiveFolderByParentIDRow struct {
 	ID          uuid.UUID
@@ -210,10 +244,11 @@ type GetRecursiveFolderByParentIDRow struct {
 	UpdatedAt   time.Time
 	TrashedBy   *string
 	TrashedAt   *time.Time
+	Depth       int32
 }
 
-func (q *Queries) GetRecursiveFolderByParentID(ctx context.Context, parentID uuid.UUID) ([]*GetRecursiveFolderByParentIDRow, error) {
-	rows, err := q.db.Query(ctx, getRecursiveFolderByParentID, parentID)
+func (q *Queries) GetRecursiveFolderByParentID(ctx context.Context, arg *GetRecursiveFolderByParentIDParams) ([]*GetRecursiveFolderByParentIDRow, error) {
+	rows, err := q.db.Query(ctx, getRecursiveFolderByParentID, arg.ParentID, arg.IncludeTrashed, arg.Depth)
 	if err != nil {
 		return nil, err
 	}
@@ -231,6 +266,7 @@ func (q *Queries) GetRecursiveFolderByParentID(ctx context.Context, parentID uui
 			&i.UpdatedAt,
 			&i.TrashedBy,
 			&i.TrashedAt,
+			&i.Depth,
 		); err != nil {
 			return nil, err
 		}

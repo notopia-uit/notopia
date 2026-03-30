@@ -1,0 +1,18 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  event:
+    type: string
+    enum:
+      - HeartBeatWorkspaceEvent
+    example: HeartBeatWorkspaceEvent
+
+  timestamp:
+    type: string
+    format: date-time
+    example: 2024-01-01T00:00:00Z
+
+required:
+  - event
+  - timestamp

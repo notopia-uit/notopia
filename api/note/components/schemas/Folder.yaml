@@ -37,6 +37,7 @@ properties:
     type: object
     nullable: true
     readOnly: true
+    x-go-type-name: FolderTrashed
     properties:
       trashedBy:
         $ref: ./TrashedBy.yaml

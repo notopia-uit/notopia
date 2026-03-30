@@ -127,8 +127,18 @@ func (h *StrictHandler) GetWorkspaceEvents(
 			case <-c.Done():
 				return
 			case <-ticker.C:
+				heartBeat := note.HeartBeatWorkspaceEvent{
+					Event:     note.HeartBeatWorkspaceEventEventHeartBeatWorkspaceEvent,
+					Timestamp: time.Now(),
+				}
+				heartBeatBytes, err := json.Marshal(heartBeat)
+				if err != nil {
+					slog.ErrorContext(c, "failed to marshal keep-alive comment to JSON in workspace events stream", slog.String("error", err.Error()))
+					continue
+				}
+				payload := append(heartBeatBytes, []byte("\n\n")...)
 				mu.Lock()
-				if _, err := w.Write([]byte(": keep-alive\n\n")); err != nil {
+				if _, err := w.Write(payload); err != nil {
 					slog.ErrorContext(c, "failed to write keep-alive comment in workspace events stream", slog.String("error", err.Error()))
 					mu.Unlock()
 					return
@@ -146,24 +156,16 @@ func (h *StrictHandler) GetWorkspaceEvents(
 					slog.ErrorContext(c, "failed to marshal event to JSON", slog.String("error", err.Error()))
 					continue
 				}
+				payload := append(eventBytes, []byte("\n\n")...)
 				mu.Lock()
-				if _, err := w.Write([]byte("data: ")); err != nil {
-					slog.ErrorContext(c, "failed to write event prefix in workspace events stream", slog.String("error", err.Error()))
-					mu.Unlock()
-					return
-				}
-				if _, err := w.Write(eventBytes); err != nil {
-					slog.ErrorContext(c, "failed to write event data in workspace events stream", slog.String("error", err.Error()))
-					mu.Unlock()
-					return
-				}
-				if _, err := w.Write([]byte("\n\n")); err != nil {
-					slog.ErrorContext(c, "failed to write event suffix in workspace events stream", slog.String("error", err.Error()))
+				if _, err := w.Write(payload); err != nil {
+					slog.ErrorContext(c, "failed to write event to stream", slog.String("error", err.Error()))
 					mu.Unlock()
 					return
 				}
 				c.Writer.Flush()
 				mu.Unlock()
+				slog.DebugContext(c, "sent event in workspace events stream", slog.Any("event", event))
 			}
 		}
 	}()
@@ -328,10 +330,18 @@ func (h *StrictHandler) GetWorkspaceTree(
 	ctx context.Context,
 	request note.GetWorkspaceTreeRequestObject,
 ) (note.GetWorkspaceTreeResponseObject, error) {
-	query := &app.GetWorkspaceTree{
-		WorkspaceID:  request.WorkspaceId,
-		RootFolderID: request.Params.RootFolderId,
+	var depth *uint
+	if request.Params.Depth != nil && *request.Params.Depth > 0 {
+		depth = new(uint(*request.Params.Depth))
 	}
+
+	query := &app.GetWorkspaceTree{
+		WorkspaceID:    request.WorkspaceId,
+		RootFolderID:   request.Params.RootFolderId,
+		IncludeTrashed: request.Params.IncludeTrashed != nil && *request.Params.IncludeTrashed,
+		Depth:          depth,
+	}
+
 	result, err := h.App.QueryHandlers.GetWorkspaceTreeHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err

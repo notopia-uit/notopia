@@ -51,11 +51,12 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 	}
 
 	rootFolder, err := r.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
-		ID:           &rootFolderID,
-		WorkspaceID:  &q.WorkspaceID,
-		IsRootFolder: false,
-		ParentID:     nil,
-		TrashedBy:    "",
+		ID:             &rootFolderID,
+		WorkspaceID:    &q.WorkspaceID,
+		IsRootFolder:   false,
+		ParentID:       nil,
+		TrashedBy:      "",
+		IncludeTrashed: q.IncludeTrashed,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -64,7 +65,15 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 		return nil, toDomainError(err)
 	}
 
-	recursiveFolders, err := r.queries.GetRecursiveFolderByParentID(ctx, rootFolderID)
+	var depth *int32
+	if q.Depth != nil {
+		depth = new(int32(*q.Depth))
+	}
+	recursiveFolders, err := r.queries.GetRecursiveFolderByParentID(ctx, &pgsqlc.GetRecursiveFolderByParentIDParams{
+		ParentID:       rootFolderID,
+		Depth:          depth,
+		IncludeTrashed: q.IncludeTrashed,
+	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toDomainError(err)
 	}
@@ -77,7 +86,10 @@ func (r *ReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTre
 		folderMap[folder.ID] = folder
 	}
 
-	allNotes, err := r.queries.GetNotesByFolderIDs(ctx, folderIDs)
+	allNotes, err := r.queries.GetNotesByFolderIDs(ctx, &pgsqlc.GetNotesByFolderIDsParams{
+		FolderIds:      folderIDs,
+		IncludeTrashed: q.IncludeTrashed,
+	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toDomainError(err)
 	}
@@ -150,11 +162,12 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 	}
 
 	trashedFolders, err := r.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		WorkspaceID:  &q.WorkspaceID,
-		TrashedBy:    new(string(pgsqlc.TrashedByPurpose)),
-		ParentID:     nil,
-		IDs:          nil,
-		IsRootFolder: false,
+		WorkspaceID:    &q.WorkspaceID,
+		TrashedBy:      new(string(pgsqlc.TrashedByPurpose)),
+		ParentID:       nil,
+		IDs:            nil,
+		IsRootFolder:   false,
+		IncludeTrashed: true,
 	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toDomainError(err)
@@ -163,20 +176,26 @@ func (r *ReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 	notes := make([]*app.TrashedNote, len(trashedNotes))
 	for i, note := range trashedNotes {
 		notes[i] = &app.TrashedNote{
-			ID:        note.ID,
-			Name:      note.Name,
-			TrashedBy: app.TrashedByPurpose,
-			TrashedAt: *note.TrashedAt,
+			ID:   note.ID,
+			Name: note.Name,
+			Icon: note.Icon,
+			Trashed: app.Trashed{
+				TrashedBy: app.TrashedByPurpose,
+				TrashedAt: *note.TrashedAt,
+			},
 		}
 	}
 
 	folders := make([]*app.TrashedFolder, len(trashedFolders))
 	for i, folder := range trashedFolders {
 		folders[i] = &app.TrashedFolder{
-			ID:        folder.ID,
-			Name:      folder.Name,
-			TrashedBy: app.TrashedByPurpose,
-			TrashedAt: *folder.TrashedAt,
+			ID:   folder.ID,
+			Name: folder.Name,
+			Icon: folder.Icon,
+			Trashed: app.Trashed{
+				TrashedBy: app.TrashedByPurpose,
+				TrashedAt: *folder.TrashedAt,
+			},
 		}
 	}
 

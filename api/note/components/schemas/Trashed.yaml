@@ -1,0 +1,16 @@
+# vim: ft=yaml.openapi
+
+type: object
+
+properties:
+  trashedBy:
+    $ref: ./TrashedBy.yaml
+
+  trashedAt:
+    type: string
+    format: date-time
+    example: 2024-06-01T12:00:00Z
+
+required:
+  - trashedBy
+  - trashedAt

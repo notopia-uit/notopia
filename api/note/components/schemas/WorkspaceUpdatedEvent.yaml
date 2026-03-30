@@ -2,7 +2,12 @@
 type: object
 
 properties:
-  type:
+  id:
+    type: string
+    format: uuid
+    example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+
+  event:
     type: string
     enum:
       - WorkspaceUpdatedEvent
@@ -15,5 +20,6 @@ properties:
       - $ref: ./Workspace.yaml
 
 required:
-  - type
+  - id
+  - event
   - data

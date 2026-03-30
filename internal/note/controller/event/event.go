@@ -12,7 +12,7 @@ type PubSub struct {
 	eventBus         *cqrs.EventBus
 	eventProcessor   *cqrs.EventProcessor
 	router           *message.Router
-	app              *app.App
+	app              *app.Server
 }
 
 func NewPubSub(
@@ -21,7 +21,7 @@ func NewPubSub(
 	eventBus *cqrs.EventBus,
 	eventProcessor *cqrs.EventProcessor,
 	router *message.Router,
-	app *app.App,
+	app *app.Server,
 ) *PubSub {
 	return &PubSub{
 		commandBus:       commandBus,

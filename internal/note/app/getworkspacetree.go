@@ -8,8 +8,10 @@ import (
 )
 
 type GetWorkspaceTree struct {
-	WorkspaceID  uuid.UUID
-	RootFolderID *uuid.UUID
+	WorkspaceID    uuid.UUID
+	RootFolderID   *uuid.UUID
+	IncludeTrashed bool
+	Depth          *uint
 }
 
 type GetWorkspaceTreeReadModel interface {

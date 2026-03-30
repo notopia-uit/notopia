@@ -10,7 +10,8 @@ import (
 )
 
 type GetNote struct {
-	ID uuid.UUID
+	ID             uuid.UUID
+	ExcludeTrashed bool
 
 	UserID string
 }

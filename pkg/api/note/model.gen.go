@@ -31,6 +31,21 @@ func (e GraphNodesType) Valid() bool {
 	}
 }
 
+// Defines values for HeartBeatWorkspaceEventEvent.
+const (
+	HeartBeatWorkspaceEventEventHeartBeatWorkspaceEvent HeartBeatWorkspaceEventEvent = "HeartBeatWorkspaceEvent"
+)
+
+// Valid indicates whether the value is a known member of the HeartBeatWorkspaceEventEvent enum.
+func (e HeartBeatWorkspaceEventEvent) Valid() bool {
+	switch e {
+	case HeartBeatWorkspaceEventEventHeartBeatWorkspaceEvent:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for TrashedBy.
 const (
 	Parent  TrashedBy = "parent"
@@ -49,45 +64,45 @@ func (e TrashedBy) Valid() bool {
 	}
 }
 
-// Defines values for WorkspaceDeletedEventType.
+// Defines values for WorkspaceDeletedEventEvent.
 const (
-	WorkspaceDeletedEventTypeWorkspaceDeletedEvent WorkspaceDeletedEventType = "WorkspaceDeletedEvent"
+	WorkspaceDeletedEventEventWorkspaceDeletedEvent WorkspaceDeletedEventEvent = "WorkspaceDeletedEvent"
 )
 
-// Valid indicates whether the value is a known member of the WorkspaceDeletedEventType enum.
-func (e WorkspaceDeletedEventType) Valid() bool {
+// Valid indicates whether the value is a known member of the WorkspaceDeletedEventEvent enum.
+func (e WorkspaceDeletedEventEvent) Valid() bool {
 	switch e {
-	case WorkspaceDeletedEventTypeWorkspaceDeletedEvent:
+	case WorkspaceDeletedEventEventWorkspaceDeletedEvent:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for WorkspaceItemsUpdatedEventType.
+// Defines values for WorkspaceItemsUpdatedEventEvent.
 const (
-	WorkspaceItemsUpdatedEventTypeWorkspaceItemsUpdatedEvent WorkspaceItemsUpdatedEventType = "WorkspaceItemsUpdatedEvent"
+	WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent WorkspaceItemsUpdatedEventEvent = "WorkspaceItemsUpdatedEvent"
 )
 
-// Valid indicates whether the value is a known member of the WorkspaceItemsUpdatedEventType enum.
-func (e WorkspaceItemsUpdatedEventType) Valid() bool {
+// Valid indicates whether the value is a known member of the WorkspaceItemsUpdatedEventEvent enum.
+func (e WorkspaceItemsUpdatedEventEvent) Valid() bool {
 	switch e {
-	case WorkspaceItemsUpdatedEventTypeWorkspaceItemsUpdatedEvent:
+	case WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent:
 		return true
 	default:
 		return false
 	}
 }
 
-// Defines values for WorkspaceMembersUpdatedEventType.
+// Defines values for WorkspaceMembersUpdatedEventEvent.
 const (
-	WorkspaceMembersUpdatedEventTypeWorkspaceMembersUpdatedEvent WorkspaceMembersUpdatedEventType = "WorkspaceMembersUpdatedEvent"
+	WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent WorkspaceMembersUpdatedEventEvent = "WorkspaceMembersUpdatedEvent"
 )
 
-// Valid indicates whether the value is a known member of the WorkspaceMembersUpdatedEventType enum.
-func (e WorkspaceMembersUpdatedEventType) Valid() bool {
+// Valid indicates whether the value is a known member of the WorkspaceMembersUpdatedEventEvent enum.
+func (e WorkspaceMembersUpdatedEventEvent) Valid() bool {
 	switch e {
-	case WorkspaceMembersUpdatedEventTypeWorkspaceMembersUpdatedEvent:
+	case WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent:
 		return true
 	default:
 		return false
@@ -115,15 +130,15 @@ func (e WorkspaceRole) Valid() bool {
 	}
 }
 
-// Defines values for WorkspaceUpdatedEventType.
+// Defines values for WorkspaceUpdatedEventEvent.
 const (
-	WorkspaceUpdatedEventTypeWorkspaceUpdatedEvent WorkspaceUpdatedEventType = "WorkspaceUpdatedEvent"
+	WorkspaceUpdatedEventEventWorkspaceUpdatedEvent WorkspaceUpdatedEventEvent = "WorkspaceUpdatedEvent"
 )
 
-// Valid indicates whether the value is a known member of the WorkspaceUpdatedEventType enum.
-func (e WorkspaceUpdatedEventType) Valid() bool {
+// Valid indicates whether the value is a known member of the WorkspaceUpdatedEventEvent enum.
+func (e WorkspaceUpdatedEventEvent) Valid() bool {
 	switch e {
-	case WorkspaceUpdatedEventTypeWorkspaceUpdatedEvent:
+	case WorkspaceUpdatedEventEventWorkspaceUpdatedEvent:
 		return true
 	default:
 		return false
@@ -168,16 +183,19 @@ type Error struct {
 
 // Folder defines model for Folder.
 type Folder struct {
-	Icon     *string             `json:"icon"`
-	Id       *openapi_types.UUID `json:"id,omitempty"`
-	Name     string              `json:"name"`
-	ParentId *Id                 `json:"parentId,omitempty"`
-	Trashed  *struct {
-		TrashedAt time.Time `json:"trashedAt"`
-		TrashedBy TrashedBy `json:"trashedBy"`
-	} `json:"trashed,omitempty"`
-	UpdatedAt   *time.Time    `json:"updatedAt,omitempty"`
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	Icon        *string             `json:"icon"`
+	Id          *openapi_types.UUID `json:"id,omitempty"`
+	Name        string              `json:"name"`
+	ParentId    *Id                 `json:"parentId,omitempty"`
+	Trashed     *FolderTrashed      `json:"trashed,omitempty"`
+	UpdatedAt   *time.Time          `json:"updatedAt,omitempty"`
+	WorkspaceId *PropertiesId       `json:"workspaceId,omitempty"`
+}
+
+// FolderTrashed defines model for .
+type FolderTrashed struct {
+	TrashedAt time.Time `json:"trashedAt"`
+	TrashedBy TrashedBy `json:"trashedBy"`
 }
 
 // Graph defines model for Graph.
@@ -211,18 +229,30 @@ type GraphNode struct {
 	Weight *float32 `json:"weight,omitempty"`
 }
 
+// HeartBeatWorkspaceEvent defines model for HeartBeatWorkspaceEvent.
+type HeartBeatWorkspaceEvent struct {
+	Event     HeartBeatWorkspaceEventEvent `json:"event"`
+	Timestamp time.Time                    `json:"timestamp"`
+}
+
+// HeartBeatWorkspaceEventEvent defines model for HeartBeatWorkspaceEvent.Event.
+type HeartBeatWorkspaceEventEvent string
+
 // Note defines model for Note.
 type Note struct {
-	FolderId *Id                 `json:"folderId,omitempty"`
-	Icon     *string             `json:"icon"`
-	Id       *openapi_types.UUID `json:"id,omitempty"`
-	Name     string              `json:"name"`
-	Tags     []string            `json:"tags"`
-	Trashed  *struct {
-		TrashedAt time.Time `json:"trashedAt"`
-		TrashedBy TrashedBy `json:"trashedBy"`
-	} `json:"trashed,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	FolderId  *Id                 `json:"folderId,omitempty"`
+	Icon      *string             `json:"icon"`
+	Id        *openapi_types.UUID `json:"id,omitempty"`
+	Name      string              `json:"name"`
+	Tags      []string            `json:"tags"`
+	Trashed   *NoteTrashed        `json:"trashed,omitempty"`
+	UpdatedAt *time.Time          `json:"updatedAt,omitempty"`
+}
+
+// NoteTrashed defines model for .
+type NoteTrashed struct {
+	TrashedAt time.Time `json:"trashedAt"`
+	TrashedBy TrashedBy `json:"trashedBy"`
 }
 
 // NoteLink defines model for NoteLink.
@@ -235,23 +265,27 @@ type NoteLink struct {
 // NotePropertiesId defines model for Note_properties-id.
 type NotePropertiesId = openapi_types.UUID
 
+// Trashed defines model for Trashed.
+type Trashed struct {
+	TrashedAt time.Time `json:"trashedAt"`
+	TrashedBy TrashedBy `json:"trashedBy"`
+}
+
 // TrashedBy defines model for TrashedBy.
 type TrashedBy string
 
 // TrashedFolder defines model for TrashedFolder.
 type TrashedFolder struct {
-	Id        openapi_types.UUID `json:"id"`
-	Name      *string            `json:"name,omitempty"`
-	TrashedAt *time.Time         `json:"trashedAt,omitempty"`
-	TrashedBy TrashedBy          `json:"trashedBy"`
+	Id      openapi_types.UUID `json:"id"`
+	Name    *string            `json:"name,omitempty"`
+	Trashed Trashed            `json:"trashed"`
 }
 
 // TrashedNote defines model for TrashedNote.
 type TrashedNote struct {
-	Id        openapi_types.UUID `json:"id"`
-	Name      *string            `json:"name,omitempty"`
-	TrashedAt *time.Time         `json:"trashedAt,omitempty"`
-	TrashedBy TrashedBy          `json:"trashedBy"`
+	Id      openapi_types.UUID `json:"id"`
+	Name    *string            `json:"name,omitempty"`
+	Trashed Trashed            `json:"trashed"`
 }
 
 // UserPropertiesId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
@@ -269,8 +303,9 @@ type Workspace struct {
 
 // WorkspaceDeletedEvent defines model for WorkspaceDeletedEvent.
 type WorkspaceDeletedEvent struct {
-	Data WorkspaceDeletedEventData `json:"data"`
-	Type WorkspaceDeletedEventType `json:"type"`
+	Data  WorkspaceDeletedEventData  `json:"data"`
+	Event WorkspaceDeletedEventEvent `json:"event"`
+	Id    openapi_types.UUID         `json:"id"`
 }
 
 // WorkspaceDeletedEventData defines model for .
@@ -278,13 +313,14 @@ type WorkspaceDeletedEventData struct {
 	Id *PropertiesId `json:"id,omitempty"`
 }
 
-// WorkspaceDeletedEventType defines model for WorkspaceDeletedEvent.Type.
-type WorkspaceDeletedEventType string
+// WorkspaceDeletedEventEvent defines model for WorkspaceDeletedEvent.Event.
+type WorkspaceDeletedEventEvent string
 
 // WorkspaceItemsUpdatedEvent defines model for WorkspaceItemsUpdatedEvent.
 type WorkspaceItemsUpdatedEvent struct {
-	Data WorkspaceItemsUpdatedEventData `json:"data"`
-	Type WorkspaceItemsUpdatedEventType `json:"type"`
+	Data  WorkspaceItemsUpdatedEventData  `json:"data"`
+	Event WorkspaceItemsUpdatedEventEvent `json:"event"`
+	Id    openapi_types.UUID              `json:"id"`
 }
 
 // WorkspaceItemsUpdatedEventData defines model for .
@@ -292,8 +328,8 @@ type WorkspaceItemsUpdatedEventData struct {
 	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
 
-// WorkspaceItemsUpdatedEventType defines model for WorkspaceItemsUpdatedEvent.Type.
-type WorkspaceItemsUpdatedEventType string
+// WorkspaceItemsUpdatedEventEvent defines model for WorkspaceItemsUpdatedEvent.Event.
+type WorkspaceItemsUpdatedEventEvent string
 
 // WorkspaceMember defines model for WorkspaceMember.
 type WorkspaceMember struct {
@@ -307,8 +343,9 @@ type WorkspaceMember struct {
 
 // WorkspaceMembersUpdatedEvent defines model for WorkspaceMembersUpdatedEvent.
 type WorkspaceMembersUpdatedEvent struct {
-	Data WorkspaceMembersUpdatedEventData `json:"data"`
-	Type WorkspaceMembersUpdatedEventType `json:"type"`
+	Data  WorkspaceMembersUpdatedEventData  `json:"data"`
+	Event WorkspaceMembersUpdatedEventEvent `json:"event"`
+	Id    openapi_types.UUID                `json:"id"`
 }
 
 // WorkspaceMembersUpdatedEventData defines model for .
@@ -317,8 +354,8 @@ type WorkspaceMembersUpdatedEventData struct {
 	Members []WorkspaceMember `json:"members"`
 }
 
-// WorkspaceMembersUpdatedEventType defines model for WorkspaceMembersUpdatedEvent.Type.
-type WorkspaceMembersUpdatedEventType string
+// WorkspaceMembersUpdatedEventEvent defines model for WorkspaceMembersUpdatedEvent.Event.
+type WorkspaceMembersUpdatedEventEvent string
 
 // WorkspaceRole defines model for WorkspaceRole.
 type WorkspaceRole string
@@ -343,12 +380,13 @@ type WorkspaceTreeNote struct {
 
 // WorkspaceUpdatedEvent defines model for WorkspaceUpdatedEvent.
 type WorkspaceUpdatedEvent struct {
-	Data Workspace                 `json:"data"`
-	Type WorkspaceUpdatedEventType `json:"type"`
+	Data  Workspace                  `json:"data"`
+	Event WorkspaceUpdatedEventEvent `json:"event"`
+	Id    openapi_types.UUID         `json:"id"`
 }
 
-// WorkspaceUpdatedEventType defines model for WorkspaceUpdatedEvent.Type.
-type WorkspaceUpdatedEventType string
+// WorkspaceUpdatedEventEvent defines model for WorkspaceUpdatedEvent.Event.
+type WorkspaceUpdatedEventEvent string
 
 // WorkspacePropertiesName defines model for Workspace_properties-name.
 type WorkspacePropertiesName = string
@@ -491,7 +529,9 @@ type TrashWorkspaceItemsJSONBody struct {
 
 // GetWorkspaceTreeParams defines parameters for GetWorkspaceTree.
 type GetWorkspaceTreeParams struct {
-	RootFolderId *Id `form:"rootFolderId,omitempty" json:"rootFolderId,omitempty"`
+	RootFolderId   *Id   `form:"rootFolderId,omitempty" json:"rootFolderId,omitempty"`
+	IncludeTrashed *bool `form:"includeTrashed,omitempty" json:"includeTrashed,omitempty"`
+	Depth          *int  `form:"depth,omitempty" json:"depth,omitempty"`
 }
 
 // CreateFolderJSONRequestBody defines body for CreateFolder for application/json ContentType.

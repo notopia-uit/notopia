@@ -9,6 +9,24 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for TrashedBy.
+const (
+	Parent  TrashedBy = "parent"
+	Purpose TrashedBy = "purpose"
+)
+
+// Valid indicates whether the value is a known member of the TrashedBy enum.
+func (e TrashedBy) Valid() bool {
+	switch e {
+	case Parent:
+		return true
+	case Purpose:
+		return true
+	default:
+		return false
+	}
+}
+
 // Document defines model for Document.
 type Document struct {
 	// Content BlockNote model
@@ -30,12 +48,16 @@ type DocumentContent = []map[string]interface{}
 
 // Note defines model for Note.
 type Note struct {
-	FolderId  *PropertiesId       `json:"folderId,omitempty"`
-	Icon      *string             `json:"icon"`
-	Id        *openapi_types.UUID `json:"id,omitempty"`
-	Name      string              `json:"name"`
-	Tags      []string            `json:"tags"`
-	UpdatedAt *time.Time          `json:"updatedAt,omitempty"`
+	FolderId *PropertiesId       `json:"folderId,omitempty"`
+	Icon     *string             `json:"icon"`
+	Id       *openapi_types.UUID `json:"id,omitempty"`
+	Name     string              `json:"name"`
+	Tags     []string            `json:"tags"`
+	Trashed  *struct {
+		TrashedAt time.Time `json:"trashedAt"`
+		TrashedBy TrashedBy `json:"trashedBy"`
+	} `json:"trashed,omitempty"`
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 }
 
 // NoteCreatedEvent defines model for NoteCreatedEvent.
@@ -62,6 +84,9 @@ type NoteSearch struct {
 
 // NoteUpdatedEvent defines model for NoteUpdatedEvent.
 type NoteUpdatedEvent = Note
+
+// TrashedBy defines model for TrashedBy.
+type TrashedBy string
 
 // UserDeletedEvent defines model for UserDeletedEvent.
 type UserDeletedEvent struct {

@@ -117,13 +117,22 @@ WHERE
     THEN folder_id = ANY($1::uuid[])
     ELSE FALSE
   END
-  AND trashed_at IS NULL
+  AND CASE
+    WHEN $2::bool = FALSE
+    THEN trashed_at IS NULL
+    ELSE TRUE
+  END
 ORDER BY
   created_at DESC
 `
 
-func (q *Queries) GetNotesByFolderIDs(ctx context.Context, folderIds []uuid.UUID) ([]*Note, error) {
-	rows, err := q.db.Query(ctx, getNotesByFolderIDs, folderIds)
+type GetNotesByFolderIDsParams struct {
+	FolderIds      []uuid.UUID
+	IncludeTrashed bool
+}
+
+func (q *Queries) GetNotesByFolderIDs(ctx context.Context, arg *GetNotesByFolderIDsParams) ([]*Note, error) {
+	rows, err := q.db.Query(ctx, getNotesByFolderIDs, arg.FolderIds, arg.IncludeTrashed)
 	if err != nil {
 		return nil, err
 	}

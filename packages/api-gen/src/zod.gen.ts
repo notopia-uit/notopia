@@ -42,13 +42,19 @@ export const zShareNoteCreatedEvent = z.object({
 
 export const zSharePropertiesId = z.uuid().readonly();
 
+export const zShareTrashedBy = z.enum(['purpose', 'parent']);
+
 export const zShareNote = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
     folderId: zSharePropertiesId,
     tags: z.array(z.string()),
-    updatedAt: z.iso.datetime().readonly()
+    updatedAt: z.iso.datetime().readonly(),
+    trashed: z.object({
+        trashedBy: zShareTrashedBy,
+        trashedAt: z.iso.datetime()
+    }).readonly().nullable()
 });
 
 export const zShareNoteUpdatedEvent = zShareNote;
@@ -165,7 +171,8 @@ export const zNoteWorkspace = z.object({
 export const zNoteSlug = z.string();
 
 export const zNoteWorkspaceItemsUpdatedEvent = z.object({
-    type: z.enum(['WorkspaceItemsUpdatedEvent']),
+    id: z.uuid(),
+    event: z.enum(['WorkspaceItemsUpdatedEvent']),
     data: z.object({
         workspaceId: zNotePropertiesId
     })
@@ -194,7 +201,8 @@ export const zNoteWorkspaceMember = z.object({
 });
 
 export const zNoteWorkspaceMembersUpdatedEvent = z.object({
-    type: z.enum(['WorkspaceMembersUpdatedEvent']),
+    id: z.uuid(),
+    event: z.enum(['WorkspaceMembersUpdatedEvent']),
     data: z.object({
         id: zNotePropertiesId,
         members: z.array(zNoteWorkspaceMember)
@@ -202,31 +210,41 @@ export const zNoteWorkspaceMembersUpdatedEvent = z.object({
 });
 
 export const zNoteWorkspaceUpdatedEvent = z.object({
-    type: z.enum(['WorkspaceUpdatedEvent']),
+    id: z.uuid(),
+    event: z.enum(['WorkspaceUpdatedEvent']),
     data: zNoteWorkspace
 });
 
 export const zNoteWorkspaceDeletedEvent = z.object({
-    type: z.enum(['WorkspaceDeletedEvent']),
+    id: z.uuid(),
+    event: z.enum(['WorkspaceDeletedEvent']),
     data: z.object({
         id: zNotePropertiesId
     })
 });
 
+export const zNoteHeartBeatWorkspaceEvent = z.object({
+    event: z.enum(['HeartBeatWorkspaceEvent']),
+    timestamp: z.iso.datetime()
+});
+
 export const zNoteWorkspacePropertiesName = z.string().min(1).max(255);
+
+export const zNoteTrashed = z.object({
+    trashedBy: zNoteTrashedBy,
+    trashedAt: z.iso.datetime()
+});
 
 export const zNoteTrashedNote = z.object({
     id: z.uuid(),
     name: z.string().min(1).max(255).readonly(),
-    trashedBy: zNoteTrashedBy,
-    trashedAt: z.iso.datetime().readonly()
+    trashed: zNoteTrashed
 });
 
 export const zNoteTrashedFolder = z.object({
     id: z.uuid(),
     name: z.string().min(1).max(255).readonly(),
-    trashedBy: zNoteTrashedBy,
-    trashedAt: z.iso.datetime().readonly()
+    trashed: zNoteTrashed
 });
 
 export const zNotePropertiesIcon = z.string().nullable();
@@ -309,33 +327,37 @@ export const zNoteWorkspaceWritable = z.object({
 });
 
 export const zNoteWorkspaceItemsUpdatedEventWritable = z.object({
-    type: z.enum(['WorkspaceItemsUpdatedEvent'])
+    id: z.uuid(),
+    event: z.enum(['WorkspaceItemsUpdatedEvent'])
 });
 
 export const zNoteWorkspaceMembersUpdatedEventWritable = z.object({
-    type: z.enum(['WorkspaceMembersUpdatedEvent']),
+    id: z.uuid(),
+    event: z.enum(['WorkspaceMembersUpdatedEvent']),
     data: z.object({
         members: z.array(zNoteWorkspaceMember)
     })
 });
 
 export const zNoteWorkspaceUpdatedEventWritable = z.object({
-    type: z.enum(['WorkspaceUpdatedEvent']),
+    id: z.uuid(),
+    event: z.enum(['WorkspaceUpdatedEvent']),
     data: zNoteWorkspaceWritable
 });
 
 export const zNoteWorkspaceDeletedEventWritable = z.object({
-    type: z.enum(['WorkspaceDeletedEvent'])
+    id: z.uuid(),
+    event: z.enum(['WorkspaceDeletedEvent'])
 });
 
 export const zNoteTrashedNoteWritable = z.object({
     id: z.uuid(),
-    trashedBy: zNoteTrashedBy
+    trashed: zNoteTrashed
 });
 
 export const zNoteTrashedFolderWritable = z.object({
     id: z.uuid(),
-    trashedBy: zNoteTrashedBy
+    trashed: zNoteTrashed
 });
 
 export const zNoteWorkspaceTreeNoteWritable = z.object({
@@ -675,17 +697,20 @@ export const zGetWorkspaceEventsData = z.object({
  */
 export const zGetWorkspaceEventsResponse = z.union([
     z.object({
-        type: z.literal('WorkspaceItemsUpdatedEvent')
+        event: z.literal('WorkspaceItemsUpdatedEvent')
     }).and(zNoteWorkspaceItemsUpdatedEvent),
     z.object({
-        type: z.literal('WorkspaceMembersUpdatedEvent')
+        event: z.literal('WorkspaceMembersUpdatedEvent')
     }).and(zNoteWorkspaceMembersUpdatedEvent),
     z.object({
-        type: z.literal('WorkspaceUpdatedEvent')
+        event: z.literal('WorkspaceUpdatedEvent')
     }).and(zNoteWorkspaceUpdatedEvent),
     z.object({
-        type: z.literal('WorkspaceDeletedEvent')
-    }).and(zNoteWorkspaceDeletedEvent)
+        event: z.literal('WorkspaceDeletedEvent')
+    }).and(zNoteWorkspaceDeletedEvent),
+    z.object({
+        event: z.literal('HeartBeatWorkspaceEvent')
+    }).and(zNoteHeartBeatWorkspaceEvent)
 ]);
 
 export const zGetWorkspaceGraphData = z.object({
@@ -844,7 +869,9 @@ export const zGetWorkspaceTreeData = z.object({
         workspaceId: zNotePropertiesId
     }),
     query: z.object({
-        rootFolderId: zNoteId.optional()
+        rootFolderId: zNoteId.optional(),
+        includeTrashed: z.boolean().optional().default(false),
+        depth: z.int().gte(1).optional()
     }).optional()
 });
 

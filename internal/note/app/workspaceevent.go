@@ -35,6 +35,14 @@ type WorkspaceEvent interface {
 	IsWorkspaceEvent()
 }
 
+type WorkspaceEventWorkspaceMembersUpdated struct {
+	note.WorkspaceMembersUpdatedEvent
+}
+
+var _ WorkspaceEvent = (*WorkspaceEventWorkspaceMembersUpdated)(nil)
+
+func (e *WorkspaceEventWorkspaceMembersUpdated) IsWorkspaceEvent() {}
+
 type WorkspaceEventWorkspaceItemsChanged struct {
 	note.WorkspaceItemsUpdatedEvent
 }
@@ -85,7 +93,8 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 		*domain.NotePermanentlyDeletedEvent:
 		return &WorkspaceEventWorkspaceItemsChanged{
 			WorkspaceItemsUpdatedEvent: note.WorkspaceItemsUpdatedEvent{
-				Type: note.WorkspaceItemsUpdatedEventTypeWorkspaceItemsUpdatedEvent,
+				Id:    e.GetID(),
+				Event: note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent,
 				Data: note.WorkspaceItemsUpdatedEventData{
 					WorkspaceId: (*note.PropertiesId)(new(e.GetAggregateID())),
 				},
@@ -94,7 +103,8 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 	case *domain.WorkspaceUpdatedEvent:
 		return &WorkspaceEventWorkspaceUpdated{
 			WorkspaceUpdatedEvent: note.WorkspaceUpdatedEvent{
-				Type: note.WorkspaceUpdatedEventTypeWorkspaceUpdatedEvent,
+				Id:    e.GetID(),
+				Event: note.WorkspaceUpdatedEventEventWorkspaceUpdatedEvent,
 				Data: note.Workspace{
 					Id:   (*note.PropertiesId)(new(e.GetAggregateID())),
 					Name: e.Name,
@@ -105,7 +115,8 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 	case *domain.WorkspaceDeletedEvent:
 		return &WorkspaceEventWorkspaceDeleted{
 			WorkspaceDeletedEvent: note.WorkspaceDeletedEvent{
-				Type: note.WorkspaceDeletedEventTypeWorkspaceDeletedEvent,
+				Id:    e.GetID(),
+				Event: note.WorkspaceDeletedEventEventWorkspaceDeletedEvent,
 				Data: note.WorkspaceDeletedEventData{
 					Id: (*note.PropertiesId)(new(e.GetAggregateID())),
 				},
@@ -119,10 +130,26 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 var workspaceEventTypeRegistry = make(map[string]reflect.Type)
 
 func init() {
-	registerWorkspaceEventType(&WorkspaceEventWorkspaceItemsChanged{})
-	registerWorkspaceEventType(&WorkspaceEventMembersUpdated{})
-	registerWorkspaceEventType(&WorkspaceEventWorkspaceUpdated{})
-	registerWorkspaceEventType(&WorkspaceEventWorkspaceDeleted{})
+	registerWorkspaceEventType(
+		//exhaustruct:ignore
+		&WorkspaceEventWorkspaceMembersUpdated{},
+	)
+	registerWorkspaceEventType(
+		//exhaustruct:ignore
+		&WorkspaceEventWorkspaceItemsChanged{},
+	)
+	registerWorkspaceEventType(
+		//exhaustruct:ignore
+		&WorkspaceEventMembersUpdated{},
+	)
+	registerWorkspaceEventType(
+		//exhaustruct:ignore
+		&WorkspaceEventWorkspaceUpdated{},
+	)
+	registerWorkspaceEventType(
+		//exhaustruct:ignore
+		&WorkspaceEventWorkspaceDeleted{},
+	)
 }
 
 func registerWorkspaceEventType(event WorkspaceEvent) {

@@ -115,6 +115,11 @@ WHERE
     THEN trashed_by = sqlc.arg('trashed_by')::text
     ELSE TRUE
   END
+  AND CASE
+    WHEN sqlc.arg('include_trashed')::bool = FALSE
+    THEN trashed_by IS NULL
+    ELSE TRUE
+  END
 ORDER BY
   created_at DESC;
 
@@ -149,6 +154,11 @@ WHERE
     THEN trashed_by = sqlc.narg('trashed_by')::text
     ELSE TRUE
   END
+  AND CASE
+    WHEN sqlc.arg('include_trashed')::bool = FALSE
+    THEN trashed_by IS NULL
+    ELSE TRUE
+  END
 ORDER BY
   created_at DESC;
 
@@ -172,17 +182,31 @@ WHERE
 -- name: GetRecursiveFolderByParentID :many
 WITH RECURSIVE subfolders AS (
   SELECT
-    *
+    *,
+    1 AS depth
   FROM
     folders
   WHERE
     parent_id = sqlc.arg('parent_id')::uuid
+    AND CASE
+      WHEN sqlc.arg('include_trashed')::bool = FALSE
+      THEN trashed_by IS NULL
+      ELSE TRUE
+    END
   UNION ALL
   SELECT
-    f.*
+    f.*,
+    s.depth + 1 AS depth
   FROM
-    folders f
+    folders AS f
     INNER JOIN subfolders s ON f.parent_id = s.id
+  WHERE
+    s.depth < COALESCE(sqlc.narg('depth')::int, 9999)
+    AND CASE
+      WHEN sqlc.arg('include_trashed')::bool = FALSE
+      THEN f.trashed_by IS NULL
+      ELSE TRUE
+    END
 )
 SELECT
   *

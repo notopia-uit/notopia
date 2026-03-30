@@ -1190,15 +1190,19 @@
                     },
                     {
                       "$ref": "#/components/schemas/note_WorkspaceDeletedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/note_HeartBeatWorkspaceEvent"
                     }
                   ],
                   "discriminator": {
-                    "propertyName": "type",
+                    "propertyName": "event",
                     "mapping": {
                       "WorkspaceItemsUpdatedEvent": "#/components/schemas/note_WorkspaceItemsUpdatedEvent",
                       "WorkspaceMembersUpdatedEvent": "#/components/schemas/note_WorkspaceMembersUpdatedEvent",
                       "WorkspaceUpdatedEvent": "#/components/schemas/note_WorkspaceUpdatedEvent",
-                      "WorkspaceDeletedEvent": "#/components/schemas/note_WorkspaceDeletedEvent"
+                      "WorkspaceDeletedEvent": "#/components/schemas/note_WorkspaceDeletedEvent",
+                      "HeartBeatWorkspaceEvent": "#/components/schemas/note_HeartBeatWorkspaceEvent"
                     }
                   }
                 }
@@ -1786,6 +1790,24 @@
             "schema": {
               "$ref": "#/components/schemas/note_id"
             }
+          },
+          {
+            "name": "includeTrashed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
           }
         ],
         "responses": {
@@ -2171,6 +2193,14 @@
         "example": "123e4567-e89b-12d3-a456-426614174000",
         "readOnly": true
       },
+      "share_TrashedBy": {
+        "type": "string",
+        "enum": [
+          "purpose",
+          "parent"
+        ],
+        "example": "purpose"
+      },
       "share_Note": {
         "type": "object",
         "properties": {
@@ -2209,6 +2239,25 @@
             "format": "date-time",
             "example": "2024-06-01T12:34:56Z",
             "readOnly": true
+          },
+          "trashed": {
+            "type": "object",
+            "nullable": true,
+            "readOnly": true,
+            "properties": {
+              "trashedBy": {
+                "$ref": "#/components/schemas/share_TrashedBy"
+              },
+              "trashedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-06-01T12:00:00Z"
+              }
+            },
+            "required": [
+              "trashedBy",
+              "trashedAt"
+            ]
           }
         },
         "required": [
@@ -2217,7 +2266,8 @@
           "icon",
           "folderId",
           "tags",
-          "updatedAt"
+          "updatedAt",
+          "trashed"
         ]
       },
       "share_User_properties-id": {
@@ -2563,6 +2613,7 @@
             "type": "object",
             "nullable": true,
             "readOnly": true,
+            "x-go-type-name": "FolderTrashed",
             "properties": {
               "trashedBy": {
                 "$ref": "#/components/schemas/note_TrashedBy"
@@ -2662,6 +2713,7 @@
             "type": "object",
             "nullable": true,
             "readOnly": true,
+            "x-go-type-name": "NoteTrashed",
             "properties": {
               "trashedBy": {
                 "$ref": "#/components/schemas/note_TrashedBy"
@@ -2828,7 +2880,12 @@
       "note_WorkspaceItemsUpdatedEvent": {
         "type": "object",
         "properties": {
-          "type": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "dd57d134-d23b-457f-88fc-a4d7d6b284e5"
+          },
+          "event": {
             "type": "string",
             "enum": [
               "WorkspaceItemsUpdatedEvent"
@@ -2849,7 +2906,8 @@
           }
         },
         "required": [
-          "type",
+          "id",
+          "event",
           "data"
         ]
       },
@@ -2895,7 +2953,12 @@
       "note_WorkspaceMembersUpdatedEvent": {
         "type": "object",
         "properties": {
-          "type": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "dd57d134-d23b-457f-88fc-a4d7d6b284e5"
+          },
+          "event": {
             "type": "string",
             "enum": [
               "WorkspaceMembersUpdatedEvent"
@@ -2923,14 +2986,20 @@
           }
         },
         "required": [
-          "type",
+          "id",
+          "event",
           "data"
         ]
       },
       "note_WorkspaceUpdatedEvent": {
         "type": "object",
         "properties": {
-          "type": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "dd57d134-d23b-457f-88fc-a4d7d6b284e5"
+          },
+          "event": {
             "type": "string",
             "enum": [
               "WorkspaceUpdatedEvent"
@@ -2948,14 +3017,20 @@
           }
         },
         "required": [
-          "type",
+          "id",
+          "event",
           "data"
         ]
       },
       "note_WorkspaceDeletedEvent": {
         "type": "object",
         "properties": {
-          "type": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "dd57d134-d23b-457f-88fc-a4d7d6b284e5"
+          },
+          "event": {
             "type": "string",
             "enum": [
               "WorkspaceDeletedEvent"
@@ -2976,8 +3051,30 @@
           }
         },
         "required": [
-          "type",
+          "id",
+          "event",
           "data"
+        ]
+      },
+      "note_HeartBeatWorkspaceEvent": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "enum": [
+              "HeartBeatWorkspaceEvent"
+            ],
+            "example": "HeartBeatWorkspaceEvent"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-01T00:00:00Z"
+          }
+        },
+        "required": [
+          "event",
+          "timestamp"
         ]
       },
       "note_Workspace_properties-name": {
@@ -2985,6 +3082,23 @@
         "minLength": 1,
         "maxLength": 255,
         "example": "Notopia"
+      },
+      "note_Trashed": {
+        "type": "object",
+        "properties": {
+          "trashedBy": {
+            "$ref": "#/components/schemas/note_TrashedBy"
+          },
+          "trashedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-01T12:00:00Z"
+          }
+        },
+        "required": [
+          "trashedBy",
+          "trashedAt"
+        ]
       },
       "note_TrashedNote": {
         "type": "object",
@@ -3001,22 +3115,14 @@
             "example": "Meeting Notes",
             "readOnly": true
           },
-          "trashedBy": {
-            "$ref": "#/components/schemas/note_TrashedBy",
-            "nullable": false
-          },
-          "trashedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-06-01T12:00:00Z",
-            "readOnly": true
+          "trashed": {
+            "$ref": "#/components/schemas/note_Trashed"
           }
         },
         "required": [
           "id",
           "name",
-          "trashedBy",
-          "trashedAt"
+          "trashed"
         ]
       },
       "note_TrashedFolder": {
@@ -3034,22 +3140,14 @@
             "example": "Work Notes",
             "readOnly": true
           },
-          "trashedBy": {
-            "$ref": "#/components/schemas/note_TrashedBy",
-            "nullable": false
-          },
-          "trashedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-06-01T12:00:00Z",
-            "readOnly": true
+          "trashed": {
+            "$ref": "#/components/schemas/note_Trashed"
           }
         },
         "required": [
           "id",
           "name",
-          "trashedBy",
-          "trashedAt"
+          "trashed"
         ]
       },
       "note_properties-icon": {

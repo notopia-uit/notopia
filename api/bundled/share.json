@@ -330,6 +330,14 @@
         "example": "123e4567-e89b-12d3-a456-426614174000",
         "readOnly": true
       },
+      "TrashedBy": {
+        "type": "string",
+        "enum": [
+          "purpose",
+          "parent"
+        ],
+        "example": "purpose"
+      },
       "Note": {
         "type": "object",
         "properties": {
@@ -368,6 +376,25 @@
             "format": "date-time",
             "example": "2024-06-01T12:34:56Z",
             "readOnly": true
+          },
+          "trashed": {
+            "type": "object",
+            "nullable": true,
+            "readOnly": true,
+            "properties": {
+              "trashedBy": {
+                "$ref": "#/components/schemas/TrashedBy"
+              },
+              "trashedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2024-06-01T12:00:00Z"
+              }
+            },
+            "required": [
+              "trashedBy",
+              "trashedAt"
+            ]
           }
         },
         "required": [
@@ -376,7 +403,8 @@
           "icon",
           "folderId",
           "tags",
-          "updatedAt"
+          "updatedAt",
+          "trashed"
         ]
       },
       "User_properties-id": {

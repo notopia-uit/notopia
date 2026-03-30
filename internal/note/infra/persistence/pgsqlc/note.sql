@@ -123,7 +123,11 @@ WHERE
     THEN folder_id = ANY(sqlc.arg('folder_ids')::uuid[])
     ELSE FALSE
   END
-  AND trashed_at IS NULL
+  AND CASE
+    WHEN sqlc.arg('include_trashed')::bool = FALSE
+    THEN trashed_at IS NULL
+    ELSE TRUE
+  END
 ORDER BY
   created_at DESC;
 

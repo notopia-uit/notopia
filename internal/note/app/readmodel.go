@@ -25,6 +25,11 @@ type Paginated[T any] struct {
 	Pagination Pagination
 }
 
+type Trashed struct {
+	TrashedBy TrashedBy
+	TrashedAt time.Time
+}
+
 type Note struct {
 	ID                 uuid.UUID
 	Name               string
@@ -34,6 +39,7 @@ type Note struct {
 	FolderID           uuid.UUID
 	BacklinksCount     int
 	OutgoingLinksCount int
+	Trashed            *Trashed
 	UpdatedAt          time.Time
 }
 
@@ -41,9 +47,10 @@ type Folder struct {
 	ID          uuid.UUID
 	Name        string
 	Icon        *string
-	UpdatedAt   time.Time
 	ParentID    uuid.UUID
 	WorkspaceID uuid.UUID
+	Trashed     *Trashed
+	UpdatedAt   time.Time
 }
 
 type GraphNodeType string
@@ -125,17 +132,17 @@ const (
 )
 
 type TrashedFolder struct {
-	ID        uuid.UUID
-	Name      string
-	TrashedBy TrashedBy
-	TrashedAt time.Time
+	ID      uuid.UUID
+	Name    string
+	Icon    *string
+	Trashed Trashed
 }
 
 type TrashedNote struct {
-	ID        uuid.UUID
-	Name      string
-	TrashedBy TrashedBy
-	TrashedAt time.Time
+	ID      uuid.UUID
+	Name    string
+	Icon    *string
+	Trashed Trashed
 }
 
 type Trash struct {

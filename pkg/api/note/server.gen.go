@@ -852,6 +852,22 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceTree(c *gin.Context) {
 		return
 	}
 
+	// ------------- Optional query parameter "includeTrashed" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "includeTrashed", c.Request.URL.Query(), &params.IncludeTrashed, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter includeTrashed: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "depth" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "depth", c.Request.URL.Query(), &params.Depth, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter depth: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {

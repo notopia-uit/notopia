@@ -19,13 +19,15 @@ get:
               - $ref: ../components/schemas/WorkspaceMembersUpdatedEvent.yaml
               - $ref: ../components/schemas/WorkspaceUpdatedEvent.yaml
               - $ref: ../components/schemas/WorkspaceDeletedEvent.yaml
+              - $ref: ../components/schemas/HeartBeatWorkspaceEvent.yaml
             discriminator:
-              propertyName: type
+              propertyName: event
               mapping:
                 WorkspaceItemsUpdatedEvent: ../components/schemas/WorkspaceItemsUpdatedEvent.yaml
                 WorkspaceMembersUpdatedEvent: ../components/schemas/WorkspaceMembersUpdatedEvent.yaml
                 WorkspaceUpdatedEvent: ../components/schemas/WorkspaceUpdatedEvent.yaml
                 WorkspaceDeletedEvent: ../components/schemas/WorkspaceDeletedEvent.yaml
+                HeartBeatWorkspaceEvent: ../components/schemas/HeartBeatWorkspaceEvent.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

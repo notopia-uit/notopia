@@ -13,6 +13,18 @@ get:
       required: false
       schema:
         $ref: ../components/schemas/Folder.yaml#/properties/id
+    - name: includeTrashed
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: false
+    - name: depth
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
   responses:
     200:
       description: OK

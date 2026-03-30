@@ -1,7 +1,13 @@
 # vim: ft=yaml.openapi
 type: object
+
 properties:
-  type:
+  id:
+    type: string
+    format: uuid
+    example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+
+  event:
     type: string
     enum:
       - WorkspaceItemsUpdatedEvent
@@ -14,6 +20,8 @@ properties:
         $ref: ./Workspace.yaml#/properties/id
     required:
       - workspaceId
+
 required:
-  - type
+  - id
+  - event
   - data
