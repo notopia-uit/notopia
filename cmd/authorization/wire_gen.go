@@ -64,8 +64,8 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		cleanup()
 		return nil, nil, err
 	}
-	loggingConfig := &config.Log
-	stdoutHandler := logging.NewStdoutHandler(loggingConfig)
+	log := &config.Log
+	stdoutHandler := logging.NewStdoutHandler(log)
 	loggerProvider, cleanup3, err := otel.NewLoggerProvider(ctx, resource)
 	if err != nil {
 		cleanup2()
@@ -73,7 +73,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.New(stdoutHandler, slogHandler, loggingConfig)
+	logger := logging.New(stdoutHandler, slogHandler, log)
 	grpcServer, cleanup4, err := authorization.NewGRPCServer(ctx, grpcHandler, serverConfig, tracerProvider, meterProvider, logger)
 	if err != nil {
 		cleanup3()

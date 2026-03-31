@@ -1,6 +1,7 @@
 package app_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -42,8 +43,9 @@ func TestHasWorkspaceItemPermissionHandler(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+			ctx := context.Background()
 			workspaceID := uuid.MustParse(tc.workspaceID)
-			ok, err := handler.Handle(app.HasWorkspaceItemPermission{
+			ok, err := handler.Handle(ctx, app.HasWorkspaceItemPermission{
 				UserID:      tc.userID,
 				WorkspaceID: workspaceID,
 				Permission:  tc.permission,

@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/app"
+	"github.com/notopia-uit/notopia/internal/authorization/errs"
 
 	"github.com/notopia-uit/notopia/pkg/pb"
 	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
@@ -29,7 +30,7 @@ func (h *GRPCHandler) CreateWorkspace(ctx context.Context, req *connect.Request[
 		return nil, err
 	}
 
-	if err := h.app.CreateWorkspace.Handle(app.CreateWorkspace{
+	if err := h.app.CreateWorkspace.Handle(ctx, app.CreateWorkspace{
 		UserID:      req.Msg.UserId,
 		WorkspaceID: workspaceID,
 	}); err != nil {
@@ -70,7 +71,7 @@ func (h *GRPCHandler) GetWorkspaceMembers(ctx context.Context, req *connect.Requ
 		return nil, err
 	}
 
-	members, err := h.app.GetWorkspaceMembers.Handle(app.GetWorkspaceMembers{
+	members, err := h.app.GetWorkspaceMembers.Handle(ctx, app.GetWorkspaceMembers{
 		UserID:      req.Msg.UserId,
 		WorkspaceID: workspaceID,
 	})
@@ -97,7 +98,7 @@ func (h *GRPCHandler) HasWorkspacePermission(ctx context.Context, req *connect.R
 		return nil, err
 	}
 
-	hasPermission, err := h.app.HasWorkspacePermission.Handle(app.HasWorkspacePermission{
+	hasPermission, err := h.app.HasWorkspacePermission.Handle(ctx, app.HasWorkspacePermission{
 		UserID:      req.Msg.MemberId,
 		WorkspaceID: workspaceID,
 		Permission:  pbWorkspacePermissionToApp(req.Msg.Permission),
@@ -116,7 +117,7 @@ func (h *GRPCHandler) HasWorkspaceItemPermission(ctx context.Context, req *conne
 	if err != nil {
 		return nil, err
 	}
-	hasPermission, err := h.app.HasWorkspaceItemPermission.Handle(app.HasWorkspaceItemPermission{
+	hasPermission, err := h.app.HasWorkspaceItemPermission.Handle(ctx, app.HasWorkspaceItemPermission{
 		UserID:      req.Msg.MemberId,
 		WorkspaceID: workspaceID,
 		Permission:  pbWorkspaceItemPermissionToApp(req.Msg.Permission),
@@ -135,7 +136,7 @@ func (h *GRPCHandler) GetUserWorkspaceItemPermissions(ctx context.Context, req *
 	if err != nil {
 		return nil, err
 	}
-	permissions, err := h.app.GetUserWorkspaceItemPermissions.Handle(app.GetUserWorkspaceItemPermissions{
+	permissions, err := h.app.GetUserWorkspaceItemPermissions.Handle(ctx, app.GetUserWorkspaceItemPermissions{
 		UserID:      req.Msg.MemberId,
 		WorkspaceID: workspaceID,
 	})
@@ -148,6 +149,23 @@ func (h *GRPCHandler) GetUserWorkspaceItemPermissions(ctx context.Context, req *
 		CanWrite:  permissions.Write,
 		CanDelete: permissions.Delete,
 	}), nil
+}
+
+func (h *GRPCHandler) DeleteWorkspace(ctx context.Context, req *connect.Request[pb.DeleteWorkspaceRequest]) (*connect.Response[pb.DeleteWorkspaceResponse], error) {
+	// workspaceID, err := uuid.Parse(req.Msg.WorkspaceId)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//
+	// if err := h.app.DeleteWorkspace.Handle(ctx, app.DeleteWorkspace{
+	// 	UserID:      req.Msg.UserId,
+	// 	WorkspaceID: workspaceID,
+	// }); err != nil {
+	// 	return nil, err
+	// }
+	//
+	// return connect.NewResponse(&pb.DeleteWorkspaceResponse{}), nil
+	return nil, errs.NewUnimplemented()
 }
 
 func pbWorkspaceRoleToApp(role pb.WorkspaceRole) app.WorkspaceRole {

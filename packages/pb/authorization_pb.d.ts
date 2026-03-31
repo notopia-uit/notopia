@@ -271,6 +271,39 @@ export declare type GetUserWorkspaceItemPermissionsResponse = Message<"authoriza
 export declare const GetUserWorkspaceItemPermissionsResponseSchema: GenMessage<GetUserWorkspaceItemPermissionsResponse>;
 
 /**
+ * @generated from message authorization.DeleteWorkspaceRequest
+ */
+export declare type DeleteWorkspaceRequest = Message<"authorization.DeleteWorkspaceRequest"> & {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId: string;
+
+  /**
+   * @generated from field: string workspace_id = 2;
+   */
+  workspaceId: string;
+};
+
+/**
+ * Describes the message authorization.DeleteWorkspaceRequest.
+ * Use `create(DeleteWorkspaceRequestSchema)` to create a new message.
+ */
+export declare const DeleteWorkspaceRequestSchema: GenMessage<DeleteWorkspaceRequest>;
+
+/**
+ * @generated from message authorization.DeleteWorkspaceResponse
+ */
+export declare type DeleteWorkspaceResponse = Message<"authorization.DeleteWorkspaceResponse"> & {
+};
+
+/**
+ * Describes the message authorization.DeleteWorkspaceResponse.
+ * Use `create(DeleteWorkspaceResponseSchema)` to create a new message.
+ */
+export declare const DeleteWorkspaceResponseSchema: GenMessage<DeleteWorkspaceResponse>;
+
+/**
  * @generated from enum authorization.WorkspaceRole
  */
 export enum WorkspaceRole {
@@ -411,6 +444,14 @@ export declare const AuthorizationService: GenService<{
     methodKind: "unary";
     input: typeof GetUserWorkspaceItemPermissionsRequestSchema;
     output: typeof GetUserWorkspaceItemPermissionsResponseSchema;
+  },
+  /**
+   * @generated from rpc authorization.AuthorizationService.DeleteWorkspace
+   */
+  deleteWorkspace: {
+    methodKind: "unary";
+    input: typeof DeleteWorkspaceRequestSchema;
+    output: typeof DeleteWorkspaceResponseSchema;
   },
 }>;
 

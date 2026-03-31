@@ -51,6 +51,9 @@ const (
 	// AuthorizationServiceGetUserWorkspaceItemPermissionsProcedure is the fully-qualified name of the
 	// AuthorizationService's GetUserWorkspaceItemPermissions RPC.
 	AuthorizationServiceGetUserWorkspaceItemPermissionsProcedure = "/authorization.AuthorizationService/GetUserWorkspaceItemPermissions"
+	// AuthorizationServiceDeleteWorkspaceProcedure is the fully-qualified name of the
+	// AuthorizationService's DeleteWorkspace RPC.
+	AuthorizationServiceDeleteWorkspaceProcedure = "/authorization.AuthorizationService/DeleteWorkspace"
 )
 
 // AuthorizationServiceClient is a client for the authorization.AuthorizationService service.
@@ -61,6 +64,7 @@ type AuthorizationServiceClient interface {
 	HasWorkspacePermission(context.Context, *connect.Request[pb.HasWorkspacePermissionRequest]) (*connect.Response[pb.HasWorkspacePermissionResponse], error)
 	HasWorkspaceItemPermission(context.Context, *connect.Request[pb.HasWorkspaceItemPermissionRequest]) (*connect.Response[pb.HasWorkspaceItemPermissionResponse], error)
 	GetUserWorkspaceItemPermissions(context.Context, *connect.Request[pb.GetUserWorkspaceItemPermissionsRequest]) (*connect.Response[pb.GetUserWorkspaceItemPermissionsResponse], error)
+	DeleteWorkspace(context.Context, *connect.Request[pb.DeleteWorkspaceRequest]) (*connect.Response[pb.DeleteWorkspaceResponse], error)
 }
 
 // NewAuthorizationServiceClient constructs a client for the authorization.AuthorizationService
@@ -110,6 +114,12 @@ func NewAuthorizationServiceClient(httpClient connect.HTTPClient, baseURL string
 			connect.WithSchema(authorizationServiceMethods.ByName("GetUserWorkspaceItemPermissions")),
 			connect.WithClientOptions(opts...),
 		),
+		deleteWorkspace: connect.NewClient[pb.DeleteWorkspaceRequest, pb.DeleteWorkspaceResponse](
+			httpClient,
+			baseURL+AuthorizationServiceDeleteWorkspaceProcedure,
+			connect.WithSchema(authorizationServiceMethods.ByName("DeleteWorkspace")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -121,6 +131,7 @@ type authorizationServiceClient struct {
 	hasWorkspacePermission          *connect.Client[pb.HasWorkspacePermissionRequest, pb.HasWorkspacePermissionResponse]
 	hasWorkspaceItemPermission      *connect.Client[pb.HasWorkspaceItemPermissionRequest, pb.HasWorkspaceItemPermissionResponse]
 	getUserWorkspaceItemPermissions *connect.Client[pb.GetUserWorkspaceItemPermissionsRequest, pb.GetUserWorkspaceItemPermissionsResponse]
+	deleteWorkspace                 *connect.Client[pb.DeleteWorkspaceRequest, pb.DeleteWorkspaceResponse]
 }
 
 // CreateWorkspace calls authorization.AuthorizationService.CreateWorkspace.
@@ -154,6 +165,11 @@ func (c *authorizationServiceClient) GetUserWorkspaceItemPermissions(ctx context
 	return c.getUserWorkspaceItemPermissions.CallUnary(ctx, req)
 }
 
+// DeleteWorkspace calls authorization.AuthorizationService.DeleteWorkspace.
+func (c *authorizationServiceClient) DeleteWorkspace(ctx context.Context, req *connect.Request[pb.DeleteWorkspaceRequest]) (*connect.Response[pb.DeleteWorkspaceResponse], error) {
+	return c.deleteWorkspace.CallUnary(ctx, req)
+}
+
 // AuthorizationServiceHandler is an implementation of the authorization.AuthorizationService
 // service.
 type AuthorizationServiceHandler interface {
@@ -163,6 +179,7 @@ type AuthorizationServiceHandler interface {
 	HasWorkspacePermission(context.Context, *connect.Request[pb.HasWorkspacePermissionRequest]) (*connect.Response[pb.HasWorkspacePermissionResponse], error)
 	HasWorkspaceItemPermission(context.Context, *connect.Request[pb.HasWorkspaceItemPermissionRequest]) (*connect.Response[pb.HasWorkspaceItemPermissionResponse], error)
 	GetUserWorkspaceItemPermissions(context.Context, *connect.Request[pb.GetUserWorkspaceItemPermissionsRequest]) (*connect.Response[pb.GetUserWorkspaceItemPermissionsResponse], error)
+	DeleteWorkspace(context.Context, *connect.Request[pb.DeleteWorkspaceRequest]) (*connect.Response[pb.DeleteWorkspaceResponse], error)
 }
 
 // NewAuthorizationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -208,6 +225,12 @@ func NewAuthorizationServiceHandler(svc AuthorizationServiceHandler, opts ...con
 		connect.WithSchema(authorizationServiceMethods.ByName("GetUserWorkspaceItemPermissions")),
 		connect.WithHandlerOptions(opts...),
 	)
+	authorizationServiceDeleteWorkspaceHandler := connect.NewUnaryHandler(
+		AuthorizationServiceDeleteWorkspaceProcedure,
+		svc.DeleteWorkspace,
+		connect.WithSchema(authorizationServiceMethods.ByName("DeleteWorkspace")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/authorization.AuthorizationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AuthorizationServiceCreateWorkspaceProcedure:
@@ -222,6 +245,8 @@ func NewAuthorizationServiceHandler(svc AuthorizationServiceHandler, opts ...con
 			authorizationServiceHasWorkspaceItemPermissionHandler.ServeHTTP(w, r)
 		case AuthorizationServiceGetUserWorkspaceItemPermissionsProcedure:
 			authorizationServiceGetUserWorkspaceItemPermissionsHandler.ServeHTTP(w, r)
+		case AuthorizationServiceDeleteWorkspaceProcedure:
+			authorizationServiceDeleteWorkspaceHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -253,4 +278,8 @@ func (UnimplementedAuthorizationServiceHandler) HasWorkspaceItemPermission(conte
 
 func (UnimplementedAuthorizationServiceHandler) GetUserWorkspaceItemPermissions(context.Context, *connect.Request[pb.GetUserWorkspaceItemPermissionsRequest]) (*connect.Response[pb.GetUserWorkspaceItemPermissionsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.GetUserWorkspaceItemPermissions is not implemented"))
+}
+
+func (UnimplementedAuthorizationServiceHandler) DeleteWorkspace(context.Context, *connect.Request[pb.DeleteWorkspaceRequest]) (*connect.Response[pb.DeleteWorkspaceResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("authorization.AuthorizationService.DeleteWorkspace is not implemented"))
 }

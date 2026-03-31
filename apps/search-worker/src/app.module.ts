@@ -1,3 +1,5 @@
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { AppConfig, MeiliConfig } from './config';
 import { APP_CONFIG, MEILI_CONFIG, appConfig } from './config.factory';
 import { Module } from '@nestjs/common';
@@ -46,6 +48,8 @@ import pretty from 'pino-pretty';
       },
       inject: [ConfigService],
     },
+    AppService,
+    AppController,
   ],
 })
 export class AppModule {}

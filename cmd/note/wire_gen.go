@@ -36,8 +36,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	loggingConfig := &configConfig.Log
-	stdoutHandler := logging.NewStdoutHandler(loggingConfig)
+	log := &configConfig.Log
+	stdoutHandler := logging.NewStdoutHandler(log)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
@@ -49,8 +49,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.New(stdoutHandler, slogHandler, loggingConfig)
-	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(logger)
+	logger := logging.New(stdoutHandler, slogHandler, log)
+	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger)
 	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup()

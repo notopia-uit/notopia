@@ -1,6 +1,7 @@
 package app_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -20,26 +21,32 @@ func TestGetUserWorkspaceItemPermissionsHandler(t *testing.T) {
 		userID      string
 		workspaceID string
 		expected    app.WorkspaceItemPermissions
+		expectErr   bool
 	}{
-		{"W111-Owner: All permissions", "111", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}},
-		{"W111-Editor: Read, Write, Delete", "112", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}},
-		{"W111-Viewer: Read only", "110", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissions{Read: true, Write: false, Delete: false}},
-		{"W112-Owner: All permissions", "112", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}},
-		{"W112-Editor: Read, Write, Delete", "111", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}},
-		{"W112-Stranger: No permissions", "110", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissions{Read: false, Write: false, Delete: false}},
-		{"W110-Owner: All permissions", "110", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}},
-		{"W110-Stranger user 111: No permissions", "111", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: false, Write: false, Delete: false}},
-		{"W110-Stranger user 112: No permissions", "112", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: false, Write: false, Delete: false}},
+		{"W111-Owner: All permissions", "111", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}, false},
+		{"W111-Editor: Read, Write, Delete", "112", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}, false},
+		{"W111-Viewer: Read only", "110", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissions{Read: true, Write: false, Delete: false}, false},
+		{"W112-Owner: All permissions", "112", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}, false},
+		{"W112-Editor: Read, Write, Delete", "111", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}, false},
+		{"W112-Stranger: No permissions", "110", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissions{Read: false, Write: false, Delete: false}, true},
+		{"W110-Owner: All permissions", "110", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}, false},
+		{"W110-Stranger user 111: No permissions", "111", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: false, Write: false, Delete: false}, true},
+		{"W110-Stranger user 112: No permissions", "112", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: false, Write: false, Delete: false}, true},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+			ctx := context.Background()
 			workspaceID := uuid.MustParse(tc.workspaceID)
-			perms, err := handler.Handle(app.GetUserWorkspaceItemPermissions{
+			perms, err := handler.Handle(ctx, app.GetUserWorkspaceItemPermissions{
 				UserID:      tc.userID,
 				WorkspaceID: workspaceID,
 			})
+			if tc.expectErr {
+				require.Error(t, err, "Expected error but got none")
+				return
+			}
 			require.NoError(t, err, "Handler threw an error")
 			assert.Equal(t, tc.expected, *perms)
 		})

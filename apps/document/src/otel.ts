@@ -1,5 +1,4 @@
-import { KafkaJsInstrumentation } from '@opentelemetry/instrumentation-kafkajs';
-import { PinoInstrumentation } from '@opentelemetry/instrumentation-pino';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 
 if (process.env.OTEL_SDK_DISABLED === undefined) {
@@ -7,7 +6,7 @@ if (process.env.OTEL_SDK_DISABLED === undefined) {
 }
 
 export const otelSdk = new NodeSDK({
-  instrumentations: [new PinoInstrumentation(), new KafkaJsInstrumentation()],
+  instrumentations: [getNodeAutoInstrumentations()],
 });
 
 process.on('SIGTERM', () => {

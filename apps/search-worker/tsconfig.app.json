@@ -6,7 +6,9 @@
     "module": "esnext",
     "types": ["node"],
     "rootDir": "src",
-    "baseUrl": "src",
+    "paths": {
+      "*": ["./src/*"]
+    },
     "moduleResolution": "bundler",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
     "experimentalDecorators": true,

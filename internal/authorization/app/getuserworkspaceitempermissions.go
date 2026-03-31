@@ -1,6 +1,9 @@
 package app
 
 import (
+	"context"
+	"log/slog"
+
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
@@ -21,7 +24,20 @@ func NewGetUserWorkspaceItemPermissionsHandler(enforcer *casbin.TransactionalEnf
 
 var ProvideGetUserWorkspaceItemPermissionsHandler = NewGetUserWorkspaceItemPermissionsHandler
 
-func (h *GetUserWorkspaceItemPermissionsHandler) Handle(params GetUserWorkspaceItemPermissions) (*WorkspaceItemPermissions, error) {
+func (h *GetUserWorkspaceItemPermissionsHandler) Handle(ctx context.Context, params GetUserWorkspaceItemPermissions) (*WorkspaceItemPermissions, error) {
+	readAllowed, err := h.enforcer.Enforce(
+		formatUser(params.UserID),
+		formatWorkspace(params.WorkspaceID),
+		"workspace",
+		WorkspacePermissionRead.String(),
+	)
+	if err != nil {
+		return nil, errs.NewCasbinEnforcerError(err)
+	}
+	if !readAllowed {
+		return nil, errs.NewMemberHasNoPermission(params.UserID, params.WorkspaceID, WorkspacePermissionRead.String())
+	}
+
 	oks, err := h.enforcer.BatchEnforce(
 		[][]any{
 			{formatUser(params.UserID), formatWorkspace(params.WorkspaceID), "workspace_item", WorkspaceItemPermissionRead.String()},
@@ -37,5 +53,9 @@ func (h *GetUserWorkspaceItemPermissionsHandler) Handle(params GetUserWorkspaceI
 		Write:  oks[1],
 		Delete: oks[2],
 	}
+	slog.DebugContext(ctx, "retrieved user workspace item permissions",
+		slog.String("user_id", params.UserID),
+		slog.String("workspace_id", params.WorkspaceID.String()),
+	)
 	return wip, nil
 }

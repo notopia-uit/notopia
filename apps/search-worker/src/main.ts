@@ -19,6 +19,7 @@ async function bootstrap() {
   const port = configService.get<AppConfig>(APP_CONFIG)!.port;
   const logger = app.get(Logger);
   app.useLogger(logger);
+  await app.startAllMicroservices();
   await app.listen(port);
 }
 

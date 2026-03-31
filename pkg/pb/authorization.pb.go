@@ -830,6 +830,94 @@ func (x *GetUserWorkspaceItemPermissionsResponse) GetCanDelete() bool {
 	return false
 }
 
+type DeleteWorkspaceRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	WorkspaceId   string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteWorkspaceRequest) Reset() {
+	*x = DeleteWorkspaceRequest{}
+	mi := &file_authorization_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteWorkspaceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteWorkspaceRequest) ProtoMessage() {}
+
+func (x *DeleteWorkspaceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteWorkspaceRequest.ProtoReflect.Descriptor instead.
+func (*DeleteWorkspaceRequest) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *DeleteWorkspaceRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *DeleteWorkspaceRequest) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
+}
+
+type DeleteWorkspaceResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteWorkspaceResponse) Reset() {
+	*x = DeleteWorkspaceResponse{}
+	mi := &file_authorization_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteWorkspaceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteWorkspaceResponse) ProtoMessage() {}
+
+func (x *DeleteWorkspaceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteWorkspaceResponse.ProtoReflect.Descriptor instead.
+func (*DeleteWorkspaceResponse) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{14}
+}
+
 var File_authorization_proto protoreflect.FileDescriptor
 
 const file_authorization_proto_rawDesc = "" +
@@ -841,11 +929,11 @@ const file_authorization_proto_rawDesc = "" +
 	"\x17CreateWorkspaceResponse\"c\n" +
 	"\x0fWorkspaceMember\x12\x16\n" +
 	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x128\n" +
-	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"\xad\x01\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"\xb2\x01\n" +
 	"\x1dUpdateWorkspaceMembersRequest\x12\x1f\n" +
 	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12)\n" +
-	"\fworkspace_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\x12@\n" +
-	"\amembers\x18\x03 \x03(\v2\x1e.authorization.WorkspaceMemberB\x06\xbaH\x03\xc8\x01\x01R\amembers\" \n" +
+	"\fworkspace_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\vworkspaceId\x12E\n" +
+	"\amembers\x18\x03 \x03(\v2\x1e.authorization.WorkspaceMemberB\v\xbaH\b\xc8\x01\x01\x92\x01\x02\b\x01R\amembers\" \n" +
 	"\x1eUpdateWorkspaceMembersResponse\"m\n" +
 	"\x1aGetWorkspaceMembersRequest\x12\x1f\n" +
 	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12.\n" +
@@ -875,7 +963,11 @@ const file_authorization_proto_rawDesc = "" +
 	"\bcan_read\x18\x01 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\acanRead\x12#\n" +
 	"\tcan_write\x18\x02 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\bcanWrite\x12%\n" +
 	"\n" +
-	"can_delete\x18\x03 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\tcanDelete*\x7f\n" +
+	"can_delete\x18\x03 \x01(\bB\x06\xbaH\x03\xc8\x01\x01R\tcanDelete\"i\n" +
+	"\x16DeleteWorkspaceRequest\x12\x1f\n" +
+	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12.\n" +
+	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"\x19\n" +
+	"\x17DeleteWorkspaceResponse*\x7f\n" +
 	"\rWorkspaceRole\x12\x1e\n" +
 	"\x1aWORKSPACE_ROLE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14WORKSPACE_ROLE_OWNER\x10\x01\x12\x19\n" +
@@ -890,14 +982,15 @@ const file_authorization_proto_rawDesc = "" +
 	"%WORKSPACE_ITEM_PERMISSION_UNSPECIFIED\x10\x00\x12\"\n" +
 	"\x1eWORKSPACE_ITEM_PERMISSION_READ\x10\x01\x12#\n" +
 	"\x1fWORKSPACE_ITEM_PERMISSION_WRITE\x10\x02\x12$\n" +
-	" WORKSPACE_ITEM_PERMISSION_DELETE\x10\x032\xeb\x05\n" +
+	" WORKSPACE_ITEM_PERMISSION_DELETE\x10\x032\xcd\x06\n" +
 	"\x14AuthorizationService\x12`\n" +
 	"\x0fCreateWorkspace\x12%.authorization.CreateWorkspaceRequest\x1a&.authorization.CreateWorkspaceResponse\x12u\n" +
 	"\x16UpdateWorkspaceMembers\x12,.authorization.UpdateWorkspaceMembersRequest\x1a-.authorization.UpdateWorkspaceMembersResponse\x12l\n" +
 	"\x13GetWorkspaceMembers\x12).authorization.GetWorkspaceMembersRequest\x1a*.authorization.GetWorkspaceMembersResponse\x12u\n" +
 	"\x16HasWorkspacePermission\x12,.authorization.HasWorkspacePermissionRequest\x1a-.authorization.HasWorkspacePermissionResponse\x12\x81\x01\n" +
 	"\x1aHasWorkspaceItemPermission\x120.authorization.HasWorkspaceItemPermissionRequest\x1a1.authorization.HasWorkspaceItemPermissionResponse\x12\x90\x01\n" +
-	"\x1fGetUserWorkspaceItemPermissions\x125.authorization.GetUserWorkspaceItemPermissionsRequest\x1a6.authorization.GetUserWorkspaceItemPermissionsResponseB\xa2\x01\n" +
+	"\x1fGetUserWorkspaceItemPermissions\x125.authorization.GetUserWorkspaceItemPermissionsRequest\x1a6.authorization.GetUserWorkspaceItemPermissionsResponse\x12`\n" +
+	"\x0fDeleteWorkspace\x12%.authorization.DeleteWorkspaceRequest\x1a&.authorization.DeleteWorkspaceResponseB\xa2\x01\n" +
 	"\x11com.authorizationB\x12AuthorizationProtoP\x01Z%github.com/notopia-uit/notopia/pkg/pb\xa2\x02\x03AXX\xaa\x02\rAuthorization\xca\x02\rAuthorization\xe2\x02\x19Authorization\\GPBMetadata\xea\x02\rAuthorizationb\x06proto3"
 
 var (
@@ -913,7 +1006,7 @@ func file_authorization_proto_rawDescGZIP() []byte {
 }
 
 var file_authorization_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_authorization_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_authorization_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_authorization_proto_goTypes = []any{
 	(WorkspaceRole)(0),                              // 0: authorization.WorkspaceRole
 	(WorkspacePermission)(0),                        // 1: authorization.WorkspacePermission
@@ -931,6 +1024,8 @@ var file_authorization_proto_goTypes = []any{
 	(*HasWorkspaceItemPermissionResponse)(nil),      // 13: authorization.HasWorkspaceItemPermissionResponse
 	(*GetUserWorkspaceItemPermissionsRequest)(nil),  // 14: authorization.GetUserWorkspaceItemPermissionsRequest
 	(*GetUserWorkspaceItemPermissionsResponse)(nil), // 15: authorization.GetUserWorkspaceItemPermissionsResponse
+	(*DeleteWorkspaceRequest)(nil),                  // 16: authorization.DeleteWorkspaceRequest
+	(*DeleteWorkspaceResponse)(nil),                 // 17: authorization.DeleteWorkspaceResponse
 }
 var file_authorization_proto_depIdxs = []int32{
 	0,  // 0: authorization.WorkspaceMember.role:type_name -> authorization.WorkspaceRole
@@ -944,14 +1039,16 @@ var file_authorization_proto_depIdxs = []int32{
 	10, // 8: authorization.AuthorizationService.HasWorkspacePermission:input_type -> authorization.HasWorkspacePermissionRequest
 	12, // 9: authorization.AuthorizationService.HasWorkspaceItemPermission:input_type -> authorization.HasWorkspaceItemPermissionRequest
 	14, // 10: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:input_type -> authorization.GetUserWorkspaceItemPermissionsRequest
-	4,  // 11: authorization.AuthorizationService.CreateWorkspace:output_type -> authorization.CreateWorkspaceResponse
-	7,  // 12: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
-	9,  // 13: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
-	11, // 14: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse
-	13, // 15: authorization.AuthorizationService.HasWorkspaceItemPermission:output_type -> authorization.HasWorkspaceItemPermissionResponse
-	15, // 16: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:output_type -> authorization.GetUserWorkspaceItemPermissionsResponse
-	11, // [11:17] is the sub-list for method output_type
-	5,  // [5:11] is the sub-list for method input_type
+	16, // 11: authorization.AuthorizationService.DeleteWorkspace:input_type -> authorization.DeleteWorkspaceRequest
+	4,  // 12: authorization.AuthorizationService.CreateWorkspace:output_type -> authorization.CreateWorkspaceResponse
+	7,  // 13: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
+	9,  // 14: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
+	11, // 15: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse
+	13, // 16: authorization.AuthorizationService.HasWorkspaceItemPermission:output_type -> authorization.HasWorkspaceItemPermissionResponse
+	15, // 17: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:output_type -> authorization.GetUserWorkspaceItemPermissionsResponse
+	17, // 18: authorization.AuthorizationService.DeleteWorkspace:output_type -> authorization.DeleteWorkspaceResponse
+	12, // [12:19] is the sub-list for method output_type
+	5,  // [5:12] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -968,7 +1065,7 @@ func file_authorization_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_authorization_proto_rawDesc), len(file_authorization_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

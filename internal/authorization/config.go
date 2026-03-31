@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
-	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/spf13/viper"
 )
 
@@ -17,7 +16,7 @@ type ServerConfig struct {
 
 type Config struct {
 	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
-	Log      logging.Config       `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
+	Log      commonconfig.Log     `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
 	Server   ServerConfig         `json:"server"   mapstructure:"server"   validate:"required"  yaml:"server"`
 	Database commonconfig.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
 	Kafka    commonconfig.Kafka   `json:"kafka"    mapstructure:"kafka"    validate:"required"  yaml:"kafka"`
@@ -34,7 +33,7 @@ func NewConfig(
 	viper.AddConfigPath(".")
 
 	viper.SetDefault("server.grpc.port", 18089)
-	logging.ViperSetDefault(viper, "log")
+	commonconfig.LogViperSetDefault(viper, "log")
 	commonconfig.SQLViperSetDefault(viper, "database")
 	commonconfig.GeneralViperSetDefault(viper, "general")
 

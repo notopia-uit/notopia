@@ -3,9 +3,7 @@ package app
 import (
 	"fmt"
 
-	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/authorization/errs"
 )
 
 type WorkspacePermission string
@@ -68,22 +66,4 @@ func userFromFormat(formatted string) (string, error) {
 
 func formatWorkspace(id uuid.UUID) string {
 	return fmt.Sprintf("workspace:%s", id.String())
-}
-
-func hasWorkspacePermission(
-	enforcer *casbin.TransactionalEnforcer,
-	userID string,
-	workspaceID uuid.UUID,
-	permission WorkspacePermission,
-) (bool, error) {
-	ok, err := enforcer.Enforce(
-		formatUser(userID),
-		formatWorkspace(workspaceID),
-		"workspace",
-		permission.String(),
-	)
-	if err != nil {
-		return false, errs.NewCasbinEnforcerError(err)
-	}
-	return ok, nil
 }

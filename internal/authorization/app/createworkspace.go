@@ -1,6 +1,9 @@
 package app
 
 import (
+	"context"
+	"log/slog"
+
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
@@ -21,7 +24,7 @@ func NewCreateWorkspaceHandler(enforcer *casbin.TransactionalEnforcer) *CreateWo
 
 var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
 
-func (h *CreateWorkspaceHandler) Handle(params CreateWorkspace) error {
+func (h *CreateWorkspaceHandler) Handle(ctx context.Context, params CreateWorkspace) error {
 	ok, err := h.enforcer.AddGroupingPolicy(
 		formatUser(params.UserID),
 		WorkspaceRoleOwner.String(),
@@ -33,5 +36,9 @@ func (h *CreateWorkspaceHandler) Handle(params CreateWorkspace) error {
 	if !ok {
 		return errs.NewCreateWorkspaceExists(params.UserID, params.WorkspaceID)
 	}
+	slog.InfoContext(ctx, "created workspace",
+		slog.String("user_id", params.UserID),
+		slog.String("workspace_id", params.WorkspaceID.String()),
+	)
 	return nil
 }

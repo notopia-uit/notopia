@@ -61,5 +61,5 @@ pkg/                            # Go packages
 
 ## General Rules
 
-- Temp file must be go into `./tmp/{projectName}`
+- Temp file must be go into `./tmp/{projectName}`, avoid writing to `/tmp/` when things need to be persisted
 - While writing code, try to not write unnecessary comment into code

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
@@ -25,17 +26,20 @@ func NewUpdateWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer) *U
 var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
 
 func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params UpdateWorkspaceMembers) error {
-	enforcer := h.enforcer
-
-	editAllowed, err := hasWorkspacePermission(enforcer, params.UserID, params.WorkspaceID, WorkspacePermissionEdit)
+	editAllowed, err := h.enforcer.Enforce(
+		formatUser(params.UserID),
+		formatWorkspace(params.WorkspaceID),
+		"workspace",
+		WorkspacePermissionEdit.String(),
+	)
 	if err != nil {
-		return err
+		return errs.NewCasbinEnforcerError(err)
 	}
 	if !editAllowed {
 		return errs.NewMemberHasNoPermission(params.UserID, params.WorkspaceID, WorkspacePermissionEdit.String())
 	}
 
-	err = enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
+	err = h.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
 		bufferedModel, err := tx.GetBufferedModel()
 		if err != nil {
 			return errs.NewCasbinInternalError(err)
@@ -64,5 +68,10 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params Updat
 	if err != nil {
 		return err
 	}
+	slog.InfoContext(ctx, "updated workspace members",
+		slog.String("user_id", params.UserID),
+		slog.String("workspace_id", params.WorkspaceID.String()),
+		slog.Int("member_count", len(params.Members)),
+	)
 	return nil
 }

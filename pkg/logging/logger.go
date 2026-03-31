@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	slogmulti "github.com/samber/slog-multi"
 )
@@ -11,7 +12,7 @@ import (
 func New(
 	stdoutHandler StdoutHandler,
 	otelHandler otel.SlogHandler,
-	cfg *Config,
+	cfg *commonconfig.Log,
 ) *slog.Logger {
 	minLevel := cfg.GetSlogLevel()
 	middleware := slogmulti.NewEnabledInlineMiddleware(func(ctx context.Context, level slog.Level, next func(context.Context, slog.Level) bool) bool {

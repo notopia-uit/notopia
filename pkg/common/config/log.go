@@ -1,4 +1,4 @@
-package logging
+package commonconfig
 
 import (
 	"log/slog"
@@ -7,12 +7,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
+type Log struct {
 	Enabled bool   `json:"enabled" mapstructure:"enabled" validate:""                                      yaml:"enabled"`
 	Level   string `json:"level"   mapstructure:"level"   validate:"omitempty,oneof=debug info warn error" yaml:"level"`
 }
 
-func (c *Config) GetSlogLevel() slog.Level {
+func (c *Log) GetSlogLevel() slog.Level {
 	level, err := helper.GetLogLevelFromString(c.Level)
 	if err != nil {
 		panic(err) // this should never happen due to validation, but we panic just in case
@@ -20,7 +20,7 @@ func (c *Config) GetSlogLevel() slog.Level {
 	return level
 }
 
-func ViperSetDefault(
+func LogViperSetDefault(
 	viper *viper.Viper,
 	prefix string,
 ) {

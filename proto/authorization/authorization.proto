@@ -11,6 +11,7 @@ service AuthorizationService {
   rpc HasWorkspacePermission(HasWorkspacePermissionRequest) returns (HasWorkspacePermissionResponse);
   rpc HasWorkspaceItemPermission(HasWorkspaceItemPermissionRequest) returns (HasWorkspaceItemPermissionResponse);
   rpc GetUserWorkspaceItemPermissions(GetUserWorkspaceItemPermissionsRequest) returns (GetUserWorkspaceItemPermissionsResponse);
+  rpc DeleteWorkspace(DeleteWorkspaceRequest) returns (DeleteWorkspaceResponse);
 }
 
 message CreateWorkspaceRequest {
@@ -38,7 +39,10 @@ message WorkspaceMember {
 message UpdateWorkspaceMembersRequest {
   string user_id = 1 [(buf.validate.field).required = true];
   string workspace_id = 2 [(buf.validate.field).required = true];
-  repeated WorkspaceMember members = 3 [(buf.validate.field).required = true];
+  repeated WorkspaceMember members = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).repeated.min_items = 1
+  ];
 }
 
 message UpdateWorkspaceMembersResponse {}
@@ -108,3 +112,13 @@ message GetUserWorkspaceItemPermissionsResponse {
   bool can_write = 2 [(buf.validate.field).required = true];
   bool can_delete = 3 [(buf.validate.field).required = true];
 }
+
+message DeleteWorkspaceRequest {
+  string user_id = 1 [(buf.validate.field).required = true];
+  string workspace_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+}
+
+message DeleteWorkspaceResponse {}

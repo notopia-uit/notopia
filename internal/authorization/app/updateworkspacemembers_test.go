@@ -82,7 +82,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 			require.NoError(t, err, "Handler threw an error")
 
 			getMembersHandler := app.NewGetWorkspaceMembersHandler(e)
-			members, err := getMembersHandler.Handle(app.GetWorkspaceMembers{
+			members, err := getMembersHandler.Handle(ctx, app.GetWorkspaceMembers{
 				UserID:      tc.requesterID,
 				WorkspaceID: workspaceID,
 			})

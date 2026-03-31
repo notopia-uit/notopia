@@ -14,6 +14,9 @@ export const getKafkaConfig = (configService: ConfigService): KafkaOptions => {
       },
       consumer: {
         groupId: config.groupId,
+        retry: {
+          retries: 3,
+        },
       },
     },
   };

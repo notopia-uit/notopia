@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
-	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/spf13/viper"
 )
 
@@ -28,7 +27,7 @@ type Advanced struct {
 
 type Config struct {
 	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
-	Log      logging.Config       `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
+	Log      commonconfig.Log     `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
 	Server   Server               `json:"server"   mapstructure:"server"   validate:"required"  yaml:"server"`
 	Database commonconfig.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
 	Kafka    commonconfig.Kafka   `json:"kafka"    mapstructure:"kafka"    validate:"required"  yaml:"kafka"`
@@ -51,8 +50,8 @@ func New(
 	viper.SetDefault("server.grpc.port", 18081)
 	viper.SetDefault("server.health.port", 28081)
 	viper.SetDefault("advanced.outbox_table_name", "eventsToForward")
+	commonconfig.LogViperSetDefault(viper, "log")
 	commonconfig.KafkaViperSetDefault(viper, "kafka", "note-service")
-	logging.ViperSetDefault(viper, "log")
 	commonconfig.SQLViperSetDefault(viper, "database")
 	commonconfig.GeneralViperSetDefault(viper, "general")
 

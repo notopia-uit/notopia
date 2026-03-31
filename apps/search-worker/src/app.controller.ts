@@ -7,6 +7,7 @@ import type {
   ShareNoteUpdatedEvent,
 } from '@notopia-uit/api-gen';
 
+// TODO: Suggest add a class implement the event (dto?) for validator
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -32,7 +33,7 @@ export class AppController {
     return this.appService.indexNote({
       id: data.id,
       tags: data.tags,
-      content: 'please add',
+      content: 'please add', // FIXME: addd!!!
     });
   }
 }

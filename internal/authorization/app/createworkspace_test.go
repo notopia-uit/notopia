@@ -1,6 +1,7 @@
 package app_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -11,6 +12,8 @@ import (
 func TestCreateWorkspaceHandler(t *testing.T) {
 	t.Parallel()
 
+	ctx := context.Background()
+
 	e, err := GetLocalEnforcer(false)
 	require.NoError(t, err, "Failed to create enforcer")
 
@@ -19,7 +22,7 @@ func TestCreateWorkspaceHandler(t *testing.T) {
 	workspaceID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	userID := "000"
 
-	err = handler.Handle(app.CreateWorkspace{
+	err = handler.Handle(ctx, app.CreateWorkspace{
 		UserID:      userID,
 		WorkspaceID: workspaceID,
 	})

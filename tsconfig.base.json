@@ -16,6 +16,7 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "strict": true,
+    "strictFunctionTypes": true,
     "target": "esnext",
     "customConditions": ["@nx/source"]
   }

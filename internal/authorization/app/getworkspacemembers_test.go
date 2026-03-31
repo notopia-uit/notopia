@@ -1,6 +1,7 @@
 package app_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -67,8 +68,9 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
+			ctx := context.Background()
 			workspaceID := uuid.MustParse(tc.workspaceID)
-			members, err := handler.Handle(app.GetWorkspaceMembers{
+			members, err := handler.Handle(ctx, app.GetWorkspaceMembers{
 				UserID:      tc.requesterID,
 				WorkspaceID: workspaceID,
 			})

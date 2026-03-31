@@ -16,6 +16,7 @@ export function App() {
               title: 'Notopia API',
             },
           ],
+          showOperationId: true,
           persistAuth: true,
           telemetry: false,
         }}
