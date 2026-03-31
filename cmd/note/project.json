@@ -38,7 +38,7 @@
         "cwd": "{projectRoot}",
         "tty": true
       },
-      "dependsOn": ["gen:wire", "^gen*"],
+      "dependsOn": ["gen", "^gen*"],
       "continuous": true
     },
     "build": {
@@ -48,7 +48,7 @@
         "command": "go build -o ./note .",
         "cwd": "{projectRoot}"
       },
-      "dependsOn": ["gen:wire", "^gen*", "^build*"]
+      "dependsOn": ["gen", "^gen*", "^build*"]
     },
     "preview": {
       "executor": "nx:run-commands",
@@ -69,7 +69,7 @@
         "cwd": "{projectRoot}",
         "tty": true
       },
-      "dependsOn": ["gen:wire", "^gen*"],
+      "dependsOn": ["gen", "^gen*"],
       "continuous": true
     },
     "lint": {
@@ -146,6 +146,9 @@
         "cwd": "{projectRoot}"
       },
       "cache": true
+    },
+    "gen": {
+      "dependsOn": ["gen:wire", "gen:sqlc", "gen:jet"]
     },
     "nx-release-publish": {
       "parallelism": false

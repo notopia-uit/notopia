@@ -9,7 +9,9 @@
     },
     "join": {
       "inputs": [
-        "{projectRoot}/bundled/*.json",
+        {
+          "dependentTasksOutputFiles": "api/bundled/*.json"
+        },
         "!{projectRoot}/bundled/openapi.json"
       ],
       "outputs": ["{projectRoot}/bundled/openapi.json"],
@@ -63,9 +65,12 @@
       "dependsOn": ["^gen:go"]
     },
     "gen:hey-api": {
-      "outputs": ["{workspaceRoot}/packages/api/src/"],
+      "outputs": ["{workspaceRoot}/packages/api-gen/src/"],
       "inputs": [
-        "{projectRoot}/bundled/openapi.json",
+        {
+          "dependentTasksOutputFiles": "api/bundled/openapi.json",
+          "transitive": true
+        },
         "{projectRoot}/openapi-ts.config.ts"
       ],
       "executor": "nx:run-commands",
@@ -78,7 +83,7 @@
     "gen:document-nestjs-server": {
       "outputs": ["{workspaceRoot}/packages/api-document-nestjs-server/"],
       "inputs": [
-        "{projectRoot}/bundled/document.json",
+        { "dependentTasksOutputFiles": "**/*.json", "transitive": true },
         "{projectRoot}/openapitools.json"
       ],
       "executor": "nx:run-commands",
@@ -94,7 +99,7 @@
       ]
     },
     "gen": {
-      "dependsOn": ["gen:go", "gen:hey-api", "gen:document-nestjs-server"]
+      "dependsOn": ["^gen:go", "gen:hey-api", "gen:document-nestjs-server"]
     }
   },
   "implicitDependencies": ["api/note", "api/document", "api/share"]
