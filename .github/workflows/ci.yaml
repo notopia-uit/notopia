@@ -88,7 +88,7 @@ on:
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
   IS_RENOVATE: ${{ startsWith(github.head_ref || github.ref_name, 'renovate/') }}
-  SKIP_UPLOAD_CACHE: ${{ startsWith(github.head_ref || github.ref_name, 'renovate/') }}
+  NX_CACHE_ACTION_SKIP_UPLOAD_CACHE: ${{ startsWith(github.head_ref || github.ref_name, 'renovate/') }}
   SHOULD_CACHE: >-
     ${{
       (
@@ -215,8 +215,7 @@ jobs:
 
       - name: Nx all
         run: |
-          NX_VERBOSE_LOGGING=true \
-          pnpm exec nx-cache-action \
+          nx-cache-action -- \
           pnpm exec nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
             --target lint \
             --target format:check \
@@ -242,7 +241,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pnpm exec nx-cache-action \
+          nx-cache-action -- \
           pnpm exec nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
             ${{ github.ref == 'refs/heads/main' && '--target deployPage' || '' }} \
             --parallel=${{env.NX_PARALLEL }} \
@@ -265,7 +264,7 @@ jobs:
           DOCKER_BUILDKIT: 1
         run: |
           echo 'Build Docker images'
-          pnpm exec nx-cache-action \
+          nx-cache-action -- \
           pnpm exec nx run-many \
             --target docker:build \
             --parallel=${{env.NX_PARALLEL }} \
@@ -275,12 +274,12 @@ jobs:
           docker images -a
 
           if [ "${{ github.event.inputs.releaseAll }}" = "true" ]; then
-            pnpm exec nx-cache-action \
+            nx-cache-action -- \
             pnpm exec nx release \
               --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
               --yes
           else
-            pnpm exec nx-cache-action \
+            nx-cache-action -- \
             pnpm exec nx release \
               --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
               ${{ (github.event_name == 'push' || github.event.inputs.releaseWeb == 'true') && '--projects web' || '' }} \

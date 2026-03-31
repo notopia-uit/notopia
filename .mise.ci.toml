@@ -7,6 +7,7 @@
 buf = "1.65.0"
 sqlc = "1.30.0"
 java = "latest"
+"npm:@kevinnitro/nx-cache-action" = "0.1.0"
 
 [settings]
 legacy_version_file = false
