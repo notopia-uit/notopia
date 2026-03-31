@@ -28,6 +28,10 @@ until docker exec "$CONTAINER_ID" pg_isready -U "$DB_USER" >/dev/null 2>&1; do
   sleep 1
 done
 
+until docker exec "$CONTAINER_ID" psql -U "$DB_USER" -d "$DB_NAME" -c "SELECT 1" >/dev/null 2>&1; do
+  sleep 1
+done
+
 echo "📦 Applying migrations..."
 export GOOSE_DRIVER=postgres
 export GOOSE_DBSTRING="host=127.0.0.1 port=$DB_PORT user=$DB_USER password=$DB_PASS dbname=$DB_NAME sslmode=disable"
