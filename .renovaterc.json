@@ -24,7 +24,7 @@
     }
   ],
   "docker-compose": {
-    "managerFilePatterns": ["(^|/)deploy/compose/.+\\.ya?ml$"]
+    "managerFilePatterns": ["(^|/)deploy/compose/.+/.+\\.ya?ml$"]
   },
   "schedule": ["* 1-18 * * 3,0"]
 }
