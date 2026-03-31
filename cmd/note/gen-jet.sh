@@ -30,13 +30,13 @@ done
 
 echo "📦 Applying migrations..."
 export GOOSE_DRIVER=postgres
-export GOOSE_DBSTRING="host=localhost port=$DB_PORT user=$DB_USER password=$DB_PASS dbname=$DB_NAME sslmode=disable"
+export GOOSE_DBSTRING="host=127.0.0.1 port=$DB_PORT user=$DB_USER password=$DB_PASS dbname=$DB_NAME sslmode=disable"
 export GOOSE_MIGRATION_DIR=../../internal/note/infra/persistence/pgmigration/
 goose up
 
 echo "✈️  Generating Jet code..."
 jet -source=postgres \
-  -host=localhost \
+  -host=127.0.0.1 \
   -port="$DB_PORT" \
   -user="$DB_USER" \
   -password="$DB_PASS" \
