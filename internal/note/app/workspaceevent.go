@@ -32,38 +32,45 @@ type WorkspaceEventPubSub interface {
 }
 
 type WorkspaceEvent interface {
-	IsWorkspaceEvent()
+	isWorkspaceEvent()
+	GetID() uuid.UUID
+	getEvent() string
+	getData() any
 }
 
-type workspaceEvent struct{}
+type workspaceEvent[T any] struct {
+	ID    uuid.UUID
+	Event string
+	Data  T
+}
 
-var _ WorkspaceEvent = (*workspaceEvent)(nil)
+var _ WorkspaceEvent = (*workspaceEvent[any])(nil)
 
-func (e *workspaceEvent) IsWorkspaceEvent() {}
+func (e workspaceEvent[T]) isWorkspaceEvent() {}
+func (e workspaceEvent[T]) GetID() uuid.UUID  { return e.ID }
+func (e workspaceEvent[T]) getEvent() string  { return e.Event }
+func (e workspaceEvent[T]) getData() any      { return e.Data }
 
 type WorkspaceEventWorkspaceMembersUpdated struct {
-	workspaceEvent
-	note.WorkspaceMembersUpdatedEvent
+	workspaceEvent[note.WorkspaceMembersUpdatedEventData]
 }
 
+var _ WorkspaceEvent = (*WorkspaceEventWorkspaceMembersUpdated)(nil)
+
 type WorkspaceEventWorkspaceItemsChanged struct {
-	workspaceEvent
-	note.WorkspaceItemsUpdatedEvent
+	workspaceEvent[note.WorkspaceItemsUpdatedEventData]
 }
 
 type WorkspaceEventMembersUpdated struct {
-	workspaceEvent
-	note.WorkspaceMembersUpdatedEvent
+	workspaceEvent[note.WorkspaceMembersUpdatedEventData]
 }
 
 type WorkspaceEventWorkspaceUpdated struct {
-	workspaceEvent
-	note.WorkspaceUpdatedEvent
+	workspaceEvent[note.Workspace]
 }
 
 type WorkspaceEventWorkspaceDeleted struct {
-	workspaceEvent
-	note.WorkspaceDeletedEvent
+	workspaceEvent[note.WorkspaceDeletedEventData]
 }
 
 func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) {
@@ -83,7 +90,7 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 		*domain.NoteRestoredEvent,
 		*domain.NotePermanentlyDeletedEvent:
 		return &WorkspaceEventWorkspaceItemsChanged{
-			WorkspaceItemsUpdatedEvent: note.WorkspaceItemsUpdatedEvent{
+			workspaceEvent: note.WorkspaceItemsUpdatedEvent{
 				Id:    e.GetID(),
 				Event: note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent,
 				Data: note.WorkspaceItemsUpdatedEventData{
