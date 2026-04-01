@@ -21,6 +21,7 @@
     "@nestjs/schematics": "catalog:",
     "@nestjs/testing": "catalog:",
     "@next/eslint-plugin-next": "catalog:",
+    "@notopia-uit/tsconfig": "workspace:",
     "@nx/docker": "22.6.3",
     "@nx/eslint": "22.6.3",
     "@nx/eslint-plugin": "22.6.3",

@@ -1,10 +1,10 @@
 {
+  "extends": "@notopia-uit/tsconfig/react.json",
   "files": [],
   "include": [],
   "references": [
     {
       "path": "./tsconfig.app.json"
     }
-  ],
-  "extends": "../../tsconfig.base.json"
+  ]
 }

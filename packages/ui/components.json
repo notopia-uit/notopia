@@ -9,6 +9,7 @@
     "baseColor": "slate",
     "cssVariables": true
   },
+  "iconLibrary": "lucide",
   "aliases": {
     "components": "@notopia-uit/ui",
     "ui": "@notopia-uit/ui/components/ui",

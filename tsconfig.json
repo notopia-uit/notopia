@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "@notopia-uit/tsconfig/base.json",
   "compileOnSave": false,
   "files": [],
   "references": [

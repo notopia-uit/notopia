@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.94.5",
+    "@notopia-uit/tsconfig": "workspace:",
     "@openapitools/openapi-generator-cli": "2.31.0",
     "@redocly/cli": "2.25.3",
     "@scalar/cli": "1.7.9"

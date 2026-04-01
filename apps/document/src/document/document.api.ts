@@ -2,13 +2,13 @@ import { User } from '../common/user';
 import { HttpUserGuard } from '../common/user.guard';
 import { DocumentService } from './document.service';
 import { Injectable, UseGuards } from '@nestjs/common';
-import { DocumentApi as _DocumentApi } from '@notopia-uit/api-document-nestjs-server';
+import { DocumentApi as DocumentApiDefinition } from '@notopia-uit/api-document-nestjs-server/api';
 import { Traceable } from 'nestjs-otel';
 
 @Injectable()
 @UseGuards(HttpUserGuard)
 @Traceable()
-export class DocumentApi extends _DocumentApi {
+export class DocumentApi extends DocumentApiDefinition {
   constructor(private readonly documentService: DocumentService) {
     super();
   }

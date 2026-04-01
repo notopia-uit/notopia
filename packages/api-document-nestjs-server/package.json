@@ -5,9 +5,29 @@
   "type": "module",
   "exports": {
     ".": {
-      "@nx/source": "./index.ts",
+      "@nx/source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./api": {
+      "@nx/source": "./src/api",
+      "types": "./dist/api/index.d.ts",
+      "import": "./dist/api/index.js"
+    },
+    "./controller": {
+      "@nx/source": "./src/controller",
+      "types": "./dist/controller/index.d.ts",
+      "import": "./dist/controller/index.js"
+    },
+    "./decorator": {
+      "@nx/source": "./src/decorator",
+      "types": "./dist/decorator/index.d.ts",
+      "import": "./dist/decorator/index.js"
+    },
+    "./models": {
+      "@nx/source": "./src/models",
+      "types": "./dist/models/index.d.ts",
+      "import": "./dist/models/index.js"
     },
     "./package.json": "./package.json"
   },

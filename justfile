@@ -13,3 +13,6 @@ lazydocker COMPOSE_PROFILES="*":
 
 export-authentik-blueprint:
     docker exec notopia-authentik_worker ak export_blueprint
+
+shadcnadd component:
+    shadcn add {{ component }} -c ./packages/ui/

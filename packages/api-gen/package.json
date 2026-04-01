@@ -5,13 +5,19 @@
   "type": "module",
   "exports": {
     ".": {
-      "default": "./src/index.ts"
+      "@nx/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
     "./client": {
-      "default": "./src/client/index.ts"
+      "@nx/source": "./src/client/index.ts",
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js"
     },
     "./@tanstack": {
-      "default": "./src/@tanstack/index.ts"
+      "@nx/source": "./src/@tanstack/index.ts",
+      "types": "./dist/@tanstack/index.d.ts",
+      "import": "./dist/@tanstack/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -20,6 +26,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@notopia-uit/tsconfig": "workspace:",
     "@tanstack/react-query": "catalog:",
     "zod": "catalog:"
   }
