@@ -4,110 +4,107 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
-	"net/http"
+	"net"
 
-	"connectrpc.com/connect"
-	"connectrpc.com/otelconnect"
-	"connectrpc.com/validate"
+	"buf.build/go/protovalidate"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
-	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
+	"github.com/notopia-uit/notopia/pkg/pb"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-func toConectRPCError(err error) error {
+func toGRPCError(err error) error {
 	if err, ok := errors.AsType[*errs.Err](err); ok {
 		switch err.Code() {
 		case errs.CodeCasbinInternalError,
 			errs.CodeCasbinEnforcerError,
 			errs.CodeGetWorkspaceMembersGetFailed,
 			errs.CodeInternal:
-			return connect.NewError(connect.CodeInternal, err)
+			return status.Error(codes.Internal, err.Message())
 		case errs.CodeCasbinPolicySignatureInvalid,
 			errs.CodeErrInvalidUserFormat,
 			errs.CodeInvalid:
-			return connect.NewError(connect.CodeInvalidArgument, err)
+			return status.Error(codes.InvalidArgument, err.Message())
 		case errs.CodeMemberHasNoPermission,
 			errs.CodeForbidden:
-			return connect.NewError(connect.CodePermissionDenied, err)
+			return status.Error(codes.PermissionDenied, err.Message())
 		case errs.CodeCreateWorkspaceExists:
-			return connect.NewError(connect.CodeAlreadyExists, err)
+			return status.Error(codes.AlreadyExists, err.Message())
 		case errs.CodeUnimplemented:
-			return connect.NewError(connect.CodeUnimplemented, err)
+			return status.Error(codes.Unimplemented, err.Message())
 		}
 	}
 	return err
 }
 
-func newErrorInterceptor() connect.UnaryInterceptorFunc {
-	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
-		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			resp, err := next(ctx, req)
-			if err != nil {
-				return nil, toConectRPCError(err)
-			}
-			return resp, nil
-		}
+func unaryErrorInterceptor(
+	ctx context.Context,
+	req any,
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (any, error) {
+	resp, err := handler(ctx, req)
+	if err != nil {
+		return nil, toGRPCError(err)
 	}
-	return connect.UnaryInterceptorFunc(interceptor)
+	return resp, nil
 }
 
 type GRPCServer struct {
-	*http.Server
+	server  *grpc.Server
+	address string
 }
 
 func NewGRPCServer(
 	ctx context.Context,
-	handler pbconnect.AuthorizationServiceHandler,
+	serviceServer pb.AuthorizationServiceServer,
 	cfg *ServerConfig,
 	traceProvider *trace.TracerProvider,
 	meterProvider *metric.MeterProvider,
-	logger *slog.Logger,
+	logger logging.Logger,
 ) (*GRPCServer, func(), error) {
-	otelInterceptor, err := otelconnect.NewInterceptor(
-		otelconnect.WithTracerProvider(traceProvider),
-		otelconnect.WithMeterProvider(meterProvider),
-		otelconnect.WithTrustRemote(),
-	)
+	validator, err := protovalidate.New()
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create otel interceptor: %w", err)
+		return nil, nil, fmt.Errorf("failed to create protovalidate validator: %w", err)
 	}
-	errInterceptor := newErrorInterceptor()
-	validateInterceptor := validate.NewInterceptor()
-	Path, Handler := pbconnect.NewAuthorizationServiceHandler(
-		handler,
-		connect.WithInterceptors(
-			otelInterceptor,
-			validateInterceptor,
-			errInterceptor,
+	server := grpc.NewServer(
+		grpc.StatsHandler(otelgrpc.NewServerHandler(
+			otelgrpc.WithTracerProvider(traceProvider),
+			otelgrpc.WithMeterProvider(meterProvider),
+		)),
+		grpc.ChainUnaryInterceptor(
+			logging.UnaryServerInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
+			protovalidate_middleware.UnaryServerInterceptor(validator),
+			unaryErrorInterceptor,
 		),
 	)
-	mux := http.NewServeMux()
-	mux.Handle(Path, Handler)
-	protocol := new(http.Protocols)
-	protocol.SetHTTP1(true)
-	protocol.SetUnencryptedHTTP2(true)
-	server := &GRPCServer{
-		Server: &http.Server{
-			Addr:      cfg.GRPC.Address(),
-			Handler:   mux,
-			Protocols: protocol,
-		},
+	grpcServer := &GRPCServer{
+		server:  server,
+		address: cfg.GRPC.Address(),
 	}
+	pb.RegisterAuthorizationServiceServer(server, serviceServer)
 	cleanup := func() {
-		if err := server.Shutdown(ctx); err != nil {
-			logger.ErrorContext(ctx, "failed to shutdown grpc server", slog.String("error", err.Error()))
-		}
+		server.GracefulStop()
 	}
-	return server, cleanup, nil
+	return grpcServer, cleanup, nil
 }
 
 var ProvideGRPCServer = NewGRPCServer
 
-func (s *GRPCServer) Run() error {
-	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("failed to start grpc server: %w", err)
+func (g *GRPCServer) Run() error {
+	lis, err := net.Listen("tcp", g.address)
+	if err != nil {
+		return fmt.Errorf("failed to listen on %s: %w", g.address, err)
 	}
-	return nil
+	return g.server.Serve(lis)
+}
+
+func (g *GRPCServer) Stop() {
+	g.server.GracefulStop()
 }

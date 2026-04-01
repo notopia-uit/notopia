@@ -61,9 +61,7 @@ func (s *Server) Run(ctx context.Context) error {
 	g.Go(func() error {
 		go func() {
 			<-ctx.Done()
-			if err := s.grpc.Shutdown(context.Background()); err != nil {
-				s.logger.ErrorContext(ctx, "failed to shutdown grpc server", slog.String("error", err.Error()))
-			}
+			s.grpc.Stop()
 		}()
 		return s.grpc.Run()
 	})

@@ -5,7 +5,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/authorization/app"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
-	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
+	"github.com/notopia-uit/notopia/pkg/pb"
 )
 
 var ProviderSetComponent = wire.NewSet(
@@ -28,9 +28,9 @@ var ProviderSetConfig = wire.NewSet(
 )
 
 var ProviderSetGRPCServer = wire.NewSet(
-	ProvideGRPCHandler,
+	ProvideGRPCServiceServer,
 	ProvideGRPCServer,
-	wire.Bind(new(pbconnect.AuthorizationServiceHandler), new(*GRPCHandler)),
+	wire.Bind(new(pb.AuthorizationServiceServer), new(*GRPCServiceServer)),
 )
 
 var ProviderSetApp = wire.NewSet(

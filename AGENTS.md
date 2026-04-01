@@ -14,7 +14,7 @@ packages/                       # JS packages
   api-document-nestjs-server    # NestJS server codegen from OpenAPI spec, using openapi-generator
   api-gen                       # Frontend API client codegen from OpenAPI spec, using heyapi/openapi-ts
   lib                           # Share code, blocknote model,...
-  pb                            # Protobuf generated code, use connectrpc
+  pb                            # Protobuf generated code, use grpc, protovalidate
   ui                            # React UI components, using shadcn/ui
 docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.)
 cmd/                            # Go services

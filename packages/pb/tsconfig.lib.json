@@ -5,7 +5,8 @@
     "rootDir": ".",
     "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
     "module": "esnext",
-    "target": "esnext"
+    "target": "esnext",
+    "types": ["node"]
   },
   "include": ["**/*.ts", "**/*.d.ts"],
   "exclude": [

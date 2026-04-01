@@ -8,15 +8,17 @@ plugins:
     include_imports: true
     opt:
       - paths=source_relative
-  - remote: buf.build/connectrpc/go:v1.19.1
+  - remote: buf.build/grpc/go:v1.6.1
     out: ./pkg/pb/
     opt:
       - paths=source_relative
-  - remote: buf.build/bufbuild/es:v2.11.0
-    out: packages/pb/
-    include_imports: true
+  - remote: buf.build/community/stephenh-ts-proto:v2.11.6
+    out: ./packages/pb/
     opt:
-      - target=js+dts
+      - outputServices=grpc-js
+      - esModuleInterop=true
+      - nestJs=true
+      - addGrpcMetadata=true
 managed:
   enabled: true
   override:

@@ -12,5 +12,6 @@ var ProviderSet = wire.NewSet(
 	ProvideSlogHandler,
 	ProvideTracerProvider,
 	ProvideOTELSaramaTracer,
+	MapSlogToGRPCMiddlewareLogger,
 	wire.Bind(new(kafka.SaramaTracer), new(*WatermillKafkaTracer)),
 )

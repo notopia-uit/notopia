@@ -65,7 +65,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, meterProvider, tracerProvider)
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc)
 	services := &configConfig.Services
-	authorization, err := service.NewAuthorization(services)
+	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
+	authorization, cleanup4, err := service.NewAuthorization(services, tracerProvider, meterProvider, loggingLogger)
 	if err != nil {
 		cleanup3()
 		cleanup2()
@@ -73,8 +74,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	sql := &configConfig.Database
-	pool, cleanup4, err := pg.NewPgPool(ctx, tracerProvider, sql)
+	pool, cleanup5, err := pg.NewPgPool(ctx, tracerProvider, sql)
 	if err != nil {
+		cleanup4()
 		cleanup3()
 		cleanup2()
 		cleanup()
@@ -159,6 +161,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
 	kafkaPublisher, err := pubsub.NewKafkaPublisher(commonconfigKafka, loggerAdapter, watermillKafkaTracer)
 	if err != nil {
+		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
@@ -168,6 +171,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	commandEventMarshaler := pubsub.NewIntegrationMarshaler()
 	integrationPubSub, err := pubsub.NewIntegrationPubSub(kafka, loggerAdapter, kafkaPublisher, watermillKafkaTracer, commandEventMarshaler)
 	if err != nil {
+		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
@@ -175,9 +179,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	redis := &configConfig.Redis
-	redisClient, cleanup5 := pubsub.NewRedisClient(ctx, redis, logger)
+	redisClient, cleanup6 := pubsub.NewRedisClient(ctx, redis, logger)
 	workspaceEventInternalPubSub, err := pubsub.NewWorkspaceEventInternalPubSub(loggerAdapter, commandEventMarshaler, redisClient)
 	if err != nil {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -189,6 +194,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalPubSub, workspaceEventHubPubSub)
 	provider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -198,6 +204,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	persistencePg, err := persistence.NewPg(pool, provider)
 	if err != nil {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -216,8 +223,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	configServer := &configConfig.Server
 	strictHandler := http.NewStrictHandler(server, configServer, workspaceEvent)
 	serverInterface := http.NewHandler(strictHandler)
-	httpHTTP, cleanup6, err := http.New(ctx, engine, serverInterface, configServer, logger)
+	httpHTTP, cleanup7, err := http.New(ctx, engine, serverInterface, configServer, logger)
 	if err != nil {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -225,9 +233,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	handler := grpc.NewHandler(server)
-	grpcGRPC, cleanup7, err := grpc.New(ctx, handler, configServer, tracerProvider, meterProvider, logger)
+	serviceServer := grpc.NewServiceServer(server)
+	grpcGRPC, cleanup8, err := grpc.New(ctx, serviceServer, configServer, tracerProvider, meterProvider, loggingLogger)
 	if err != nil {
+		cleanup7()
 		cleanup6()
 		cleanup5()
 		cleanup4()
@@ -238,6 +247,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	integrationEvent, err := integrationevent.NewIntegrationEvent(integrationPubSub, server)
 	if err != nil {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()
@@ -250,6 +260,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	healthHealth := health.New(persistencePg, configServer, workspaceEvent)
 	noteServer := note.NewServer(httpHTTP, grpcGRPC, integrationEvent, healthHealth, server, logger)
 	return noteServer, func() {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()

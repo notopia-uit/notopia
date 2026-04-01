@@ -3,34 +3,24 @@ package grpc
 import (
 	"context"
 
-	"connectrpc.com/connect"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/pb"
 )
 
-func (h *Handler) CheckNoteExistence(
-	ctx context.Context,
-	req *connect.Request[pb.CheckNoteExistenceRequest],
-) (*connect.Response[pb.CheckNoteExistenceResponse], error) {
-	// TODO: Implement gRPC endpoint for checking note existence
-	// Consider delegating to a handler similar to HTTP controllers or direct repo access
-	// Response model: &pb.CheckNoteExistenceResponse{Exists: bool}
+func (s *ServiceServer) GetNoteName(ctx context.Context, req *pb.GetNoteNameRequest) (*pb.GetNoteNameResponse, error) {
 	return nil, errs.NewUnimplemented()
 }
 
-func (h *Handler) GetWorkspaceIdByNoteId(
+func (s *ServiceServer) CheckNoteExistence(
 	ctx context.Context,
-	req *connect.Request[pb.GetWorkspaceIdByNoteIdRequest],
-) (*connect.Response[pb.GetWorkspaceIdByNoteIdResponse], error) {
-	// TODO: Implement gRPC endpoint for getting workspace ID by note ID
-	// Consider delegating to a handler similar to HTTP controllers or direct repo access
-	// Response model: &pb.GetWorkspaceIdByNoteIdResponse{WorkspaceId: string}
+	req *pb.CheckNoteExistenceRequest,
+) (*pb.CheckNoteExistenceResponse, error) {
 	return nil, errs.NewUnimplemented()
 }
 
-func (h *Handler) GetNoteName(ctx context.Context, req *connect.Request[pb.GetNoteNameRequest]) (*connect.Response[pb.GetNoteNameResponse], error) {
-	// TODO: Implement gRPC endpoint for getting note name
-	// Consider delegating to a handler similar to HTTP controllers or direct repo access
-	// Response model: &pb.GetNoteNameResponse{NoteName: string}
+func (s *ServiceServer) GetWorkspaceIdByNoteId(
+	ctx context.Context,
+	req *pb.GetWorkspaceIdByNoteIdRequest,
+) (*pb.GetWorkspaceIdByNoteIdResponse, error) {
 	return nil, errs.NewUnimplemented()
 }

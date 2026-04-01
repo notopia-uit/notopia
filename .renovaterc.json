@@ -8,7 +8,7 @@
   "packageRules": [
     {
       "groupName": "Nx Monorepo Toolkit",
-      "matchPackageNames": ["nx", "/^@nx//", "/^nx$/"],
+      "matchPackageNames": ["nx", "/^@nx//", "/^nx$/", "/^npm:nx$/"],
       "automerge": false,
       "description": "Group all Nx packages to prevent version mismatch and allow manual migration. Note that renovate still create PRs for minor/major updates, but they will not be automerged."
     },
@@ -19,6 +19,12 @@
         "github.com/oapi-codegen/runtime",
         "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen"
       ],
+      "automerge": true,
+      "matchUpdateTypes": ["patch", "minor"]
+    },
+    {
+      "matchPackageNames": ["npm:@typescript/native-preview"],
+      "prerelease": true,
       "automerge": true,
       "matchUpdateTypes": ["patch", "minor"]
     }

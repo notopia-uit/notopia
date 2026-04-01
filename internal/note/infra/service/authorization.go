@@ -3,15 +3,19 @@ package service
 import (
 	"context"
 	"fmt"
-	"net/http"
+	"log/slog"
 
-	"connectrpc.com/connect"
-	"connectrpc.com/otelconnect"
 	"github.com/google/uuid"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
-	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
+	"github.com/notopia-uit/notopia/pkg/pb"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/trace"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func toAuthorizationServiceError(err error) errs.Error {
@@ -19,43 +23,58 @@ func toAuthorizationServiceError(err error) errs.Error {
 	return errs.NewAuthorizationInternal(err)
 }
 
-func NewClientErrorInterceptor() connect.UnaryInterceptorFunc {
-	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
-		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			resp, err := next(ctx, req)
-			if err != nil {
-				return nil, toAuthorizationServiceError(err)
-			}
-			return resp, nil
-		}
+func authorizationUnaryClientErrorInterceptor() grpc.UnaryClientInterceptor {
+	return func(
+		ctx context.Context,
+		method string,
+		req, reply any,
+		cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker,
+		opts ...grpc.CallOption,
+	) error {
+		err := invoker(ctx, method, req, reply, cc, opts...)
+		return toAuthorizationServiceError(err)
 	}
-	return connect.UnaryInterceptorFunc(interceptor)
 }
 
 type Authorization struct {
-	client pbconnect.AuthorizationServiceClient
+	client pb.AuthorizationServiceClient
 }
 
 var _ app.AuthorizationService = (*Authorization)(nil)
 
 func NewAuthorization(
 	servicesCfg *config.Services,
-) (*Authorization, error) {
-	otelInterceptor, err := otelconnect.NewInterceptor()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create OpenTelemetry interceptor: %w", err)
-	}
-	client := pbconnect.NewAuthorizationServiceClient(
-		http.DefaultClient,
+	tp *trace.TracerProvider,
+	mp *metric.MeterProvider,
+	logger logging.Logger,
+) (*Authorization, func(), error) {
+	statsHandler := otelgrpc.NewClientHandler(
+		otelgrpc.WithTracerProvider(tp),
+		otelgrpc.WithMeterProvider(mp),
+	)
+	conn, err := grpc.NewClient(
 		servicesCfg.Authorization.URL,
-		connect.WithInterceptors(
-			NewClientErrorInterceptor(),
-			otelInterceptor,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithStatsHandler(statsHandler),
+		grpc.WithChainUnaryInterceptor(
+			logging.UnaryClientInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
+			authorizationUnaryClientErrorInterceptor(),
 		),
 	)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to dial authorization service: %w", err)
+	}
+	client := pb.NewAuthorizationServiceClient(conn)
+
+	cleanup := func() {
+		if err := conn.Close(); err != nil {
+			slog.Error("failed to close authorization service connection", "error", err)
+		}
+	}
 	return &Authorization{
 		client: client,
-	}, nil
+	}, cleanup, nil
 }
 
 var ProvideAuthorization = NewAuthorization

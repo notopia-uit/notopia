@@ -35,45 +35,36 @@ type WorkspaceEvent interface {
 	IsWorkspaceEvent()
 }
 
+type workspaceEvent struct{}
+
+var _ WorkspaceEvent = (*workspaceEvent)(nil)
+
+func (e *workspaceEvent) IsWorkspaceEvent() {}
+
 type WorkspaceEventWorkspaceMembersUpdated struct {
+	workspaceEvent
 	note.WorkspaceMembersUpdatedEvent
 }
 
-var _ WorkspaceEvent = (*WorkspaceEventWorkspaceMembersUpdated)(nil)
-
-func (e *WorkspaceEventWorkspaceMembersUpdated) IsWorkspaceEvent() {}
-
 type WorkspaceEventWorkspaceItemsChanged struct {
+	workspaceEvent
 	note.WorkspaceItemsUpdatedEvent
 }
 
-var _ WorkspaceEvent = (*WorkspaceEventWorkspaceItemsChanged)(nil)
-
-func (e *WorkspaceEventWorkspaceItemsChanged) IsWorkspaceEvent() {}
-
 type WorkspaceEventMembersUpdated struct {
+	workspaceEvent
 	note.WorkspaceMembersUpdatedEvent
 }
 
-var _ WorkspaceEvent = (*WorkspaceEventMembersUpdated)(nil)
-
-func (e *WorkspaceEventMembersUpdated) IsWorkspaceEvent() {}
-
 type WorkspaceEventWorkspaceUpdated struct {
+	workspaceEvent
 	note.WorkspaceUpdatedEvent
 }
 
-var _ WorkspaceEvent = (*WorkspaceEventWorkspaceUpdated)(nil)
-
-func (e *WorkspaceEventWorkspaceUpdated) IsWorkspaceEvent() {}
-
 type WorkspaceEventWorkspaceDeleted struct {
+	workspaceEvent
 	note.WorkspaceDeletedEvent
 }
-
-var _ WorkspaceEvent = (*WorkspaceEventWorkspaceDeleted)(nil)
-
-func (e *WorkspaceEventWorkspaceDeleted) IsWorkspaceEvent() {}
 
 func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) {
 	switch e := event.(type) {

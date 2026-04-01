@@ -4,34 +4,53 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
-	"net/http"
-	"time"
+	"net"
 
-	"connectrpc.com/connect"
-	"connectrpc.com/otelconnect"
-	"connectrpc.com/validate"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"buf.build/go/protovalidate"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
-	"github.com/notopia-uit/notopia/pkg/pb/pbconnect"
+	"github.com/notopia-uit/notopia/pkg/pb"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/trace"
 )
 
-func toConnectRPCError(err error) error {
+type ServiceServer struct {
+	pb.UnimplementedNoteServiceServer
+	app *app.Server
+}
+
+var _ pb.NoteServiceServer = (*ServiceServer)(nil)
+
+func NewServiceServer(app *app.Server) *ServiceServer {
+	return &ServiceServer{
+		app:                            app,
+		UnimplementedNoteServiceServer: pb.UnimplementedNoteServiceServer{},
+	}
+}
+
+var ProvideServiceServer = NewServiceServer
+
+func toGRPCError(err error) error {
 	if cerr, ok := errors.AsType[*errs.Err](err); ok {
 		switch cerr.Code() {
 		case errs.CodeForbidden:
-			return connect.NewError(connect.CodePermissionDenied, cerr)
+			return status.Error(codes.PermissionDenied, cerr.Error())
 		case errs.CodeInvalid,
 			errs.CodeEmptyFolderName,
 			errs.CodePersistenceInvalid,
 			errs.CodeInvalidWorkspaceName,
 			errs.CodeInvalidWorkspaceSlug:
-			return connect.NewError(connect.CodeInvalidArgument, cerr)
+			return status.Error(codes.InvalidArgument, cerr.Error())
 		case errs.CodeUnimplemented:
-			return connect.NewError(connect.CodeUnimplemented, cerr)
+			return status.Error(codes.Unimplemented, cerr.Error())
 		case errs.CodeInternal,
 			errs.CodeNoteFailToMarshalDocumentContent,
 			errs.CodePersistenceInternal,
@@ -39,117 +58,88 @@ func toConnectRPCError(err error) error {
 			errs.CodeWorkspaceEventPubSubPublishFailed,
 			errs.CodeWorkspaceEventPubSubSubscribeFailed,
 			errs.CodeInternalGenerateID:
-			return connect.NewError(connect.CodeInternal, cerr)
+			return status.Error(codes.Internal, cerr.Error())
 		case errs.CodeFolderNotFound,
 			errs.CodeNoteNotFound,
 			errs.CodeWorkspaceNotFound,
 			errs.CodeWorkspaceBySlugNotFound,
 			errs.CodeWorkspaceRootFolderNotFound:
-			return connect.NewError(connect.CodeNotFound, cerr)
+			return status.Error(codes.NotFound, cerr.Error())
 		case errs.CodeFolderAlreadyTrashed,
 			errs.CodeNoteAlreadyTrashed,
 			errs.CodeWorkspaceSlugAlreadyExists:
-			return connect.NewError(connect.CodeAlreadyExists, cerr)
+			return status.Error(codes.AlreadyExists, cerr.Error())
 		case errs.CodeAuthorizationServiceInternalError:
-			return connect.NewError(connect.CodeInternal, cerr)
+			return status.Error(codes.Internal, cerr.Error())
 		default:
-			return connect.NewError(connect.CodeUnknown, cerr)
+			return status.Error(codes.Unknown, cerr.Error())
 		}
 	}
 	return err
 }
 
-func newErrorInterceptor() connect.UnaryInterceptorFunc {
-	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
-		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			resp, err := next(ctx, req)
-			if err != nil {
-				return nil, toConnectRPCError(err)
-			}
-			return resp, nil
-		}
+func unaryErrorInterceptor(
+	ctx context.Context,
+	req any,
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (any, error) {
+	resp, err := handler(ctx, req)
+	if err != nil {
+		return nil, toGRPCError(err)
 	}
-	return connect.UnaryInterceptorFunc(interceptor)
+	return resp, nil
 }
-
-type IHandler = pbconnect.NoteServiceHandler
-
-type Handler struct {
-	app app.Server
-}
-
-var _ IHandler = (*Handler)(nil)
-
-func NewHandler(app *app.Server) *Handler {
-	return &Handler{
-		app: *app,
-	}
-}
-
-var ProvideHandler = NewHandler
 
 type GRPC struct {
-	*http.Server
+	server  *grpc.Server
+	address string
 }
 
 func New(
 	ctx context.Context,
-	handler IHandler,
+	serviceServer pb.NoteServiceServer,
 	cfg *config.Server,
 	traceProvider *trace.TracerProvider,
 	meterProvider *metric.MeterProvider,
-	logger *slog.Logger,
+	logger logging.Logger,
 ) (*GRPC, func(), error) {
-	otelInterceptor, err := otelconnect.NewInterceptor(
-		otelconnect.WithTracerProvider(traceProvider),
-		otelconnect.WithMeterProvider(meterProvider),
-		otelconnect.WithTrustRemote(),
-	)
+	validator, err := protovalidate.New()
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create otel interceptor: %w", err)
+		return nil, nil, fmt.Errorf("failed to create protovalidate validator: %w", err)
 	}
-	validateInterceptor := validate.NewInterceptor()
-	errInterceptor := newErrorInterceptor()
-	Path, Handler := pbconnect.NewNoteServiceHandler(
-		handler,
-		connect.WithInterceptors(
-			otelInterceptor,
-			validateInterceptor,
-			errInterceptor,
+	grpcServer := grpc.NewServer(
+		grpc.StatsHandler(otelgrpc.NewServerHandler(
+			otelgrpc.WithTracerProvider(traceProvider),
+			otelgrpc.WithMeterProvider(meterProvider),
+		)),
+		grpc.ChainUnaryInterceptor(
+			logging.UnaryServerInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
+			protovalidate_middleware.UnaryServerInterceptor(validator),
+			unaryErrorInterceptor,
 		),
 	)
-	mux := http.NewServeMux()
-	mux.Handle(Path, Handler)
-
-	mux.Handle("/ping", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if _, err := w.Write([]byte("pong")); err != nil {
-			logger.ErrorContext(ctx, "failed to write ping response", slog.String("error", err.Error()))
-		}
-	}))
-
-	protocol := new(http.Protocols)
-	protocol.SetHTTP1(true)
-	protocol.SetUnencryptedHTTP2(true)
-	server := &GRPC{
-		Server: &http.Server{
-			Addr:      cfg.GRPC.Address(),
-			Handler:   mux,
-			Protocols: protocol,
-		},
+	grpc := &GRPC{
+		server:  grpcServer,
+		address: cfg.GRPC.Address(),
 	}
-
+	pb.RegisterNoteServiceServer(grpcServer, serviceServer)
 	cleanup := func() {
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		if err := server.Shutdown(shutdownCtx); err != nil {
-			logger.ErrorContext(ctx, "failed to shutdown grpc server", slog.String("error", err.Error()))
-		}
+		grpcServer.GracefulStop()
 	}
-	return server, cleanup, nil
+	return grpc, cleanup, nil
 }
 
 func (g *GRPC) Run() error {
-	return g.ListenAndServe()
+	lis, err := net.Listen("tcp", g.address)
+	if err != nil {
+		return fmt.Errorf("failed to listen on %s: %w", g.address, err)
+	}
+	return g.server.Serve(lis)
+}
+
+func (g *GRPC) Stop() {
+	g.server.GracefulStop()
 }
 
 var Provide = New

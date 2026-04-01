@@ -1,33 +1,34 @@
 import { ServicesConfig } from '../config/config';
 import { SERVICE_CONFIG } from '../config/config.factory';
-import { NoteClient, NoteService } from './note.service';
-import { createClient } from '@connectrpc/connect';
-import { createGrpcTransport } from '@connectrpc/connect-node';
+import { NoteService } from './note.service';
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { NoteService as NoteServiceDefinition } from '@notopia-uit/pb/note';
-
-const NOTE_CLIENT = Symbol('NOTE_SERVICE_CLIENT');
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { NOTE_PACKAGE_NAME } from '@notopia-uit/pb/note';
+import { join } from 'node:path';
 
 @Module({
-  providers: [
-    {
-      provide: NOTE_CLIENT,
-      useFactory: (configService: ConfigService): NoteClient => {
-        const servicesCfg = configService.get<ServicesConfig>(SERVICE_CONFIG)!;
-        const transport = createGrpcTransport({
-          baseUrl: servicesCfg.noteUrl,
-        });
-        return createClient(NoteServiceDefinition, transport);
+  imports: [
+    ClientsModule.registerAsync([
+      {
+        name: NOTE_PACKAGE_NAME,
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => {
+          const servicesCfg =
+            configService.get<ServicesConfig>(SERVICE_CONFIG)!;
+          return {
+            transport: Transport.GRPC,
+            options: {
+              package: NOTE_PACKAGE_NAME,
+              protoPath: join(__dirname, '../../../../proto/note/note.proto'),
+              url: servicesCfg.noteUrl,
+            },
+          };
+        },
       },
-      inject: [ConfigService],
-    },
-    {
-      provide: NoteService,
-      useFactory: (client: NoteClient) => new NoteService(client),
-      inject: [NOTE_CLIENT],
-    },
+    ]),
   ],
+  providers: [NoteService],
   exports: [NoteService],
 })
 export class NoteModule {}

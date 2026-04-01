@@ -1,41 +1,39 @@
 import { ServicesConfig } from '../config/config';
 import { SERVICE_CONFIG } from '../config/config.factory';
 import { NoteModule } from '../note/note.module';
-import { NoteService } from '../note/note.service';
-import {
-  AuthorizationClient,
-  AuthorizationService,
-} from './authorization.service';
-import { createClient } from '@connectrpc/connect';
-import { createConnectTransport } from '@connectrpc/connect-node';
+import { AuthorizationService } from './authorization.service';
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { AuthorizationService as AuthorizationServiceDefinition } from '@notopia-uit/pb/authorization';
-
-const AUTHORIZATION_CLIENT = Symbol('AUTHORIZATION_CLIENT');
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AUTHORIZATION_PACKAGE_NAME } from '@notopia-uit/pb/authorization';
+import { join } from 'node:path';
 
 @Module({
-  imports: [NoteModule],
-  providers: [
-    {
-      provide: AUTHORIZATION_CLIENT,
-      useFactory: (configService: ConfigService): AuthorizationClient => {
-        const servicesCfg = configService.get<ServicesConfig>(SERVICE_CONFIG)!;
-        const transport = createConnectTransport({
-          baseUrl: servicesCfg.authorizationUrl,
-          httpVersion: '1.1',
-        });
-        return createClient(AuthorizationServiceDefinition, transport);
+  imports: [
+    ClientsModule.registerAsync([
+      {
+        name: AUTHORIZATION_PACKAGE_NAME,
+        imports: [ConfigModule],
+        useFactory: (configService: ConfigService) => {
+          const servicesCfg =
+            configService.get<ServicesConfig>(SERVICE_CONFIG)!;
+          return {
+            transport: Transport.GRPC,
+            options: {
+              package: AUTHORIZATION_PACKAGE_NAME,
+              protoPath: join(
+                __dirname,
+                '../../../../proto/authorization/authorization.proto'
+              ),
+              url: servicesCfg.authorizationUrl,
+            },
+          };
+        },
       },
-      inject: [ConfigService],
-    },
-    {
-      provide: AuthorizationService,
-      useFactory: (client: AuthorizationClient, noteService: NoteService) =>
-        new AuthorizationService(client, noteService),
-      inject: [AUTHORIZATION_CLIENT, NoteService],
-    },
+    ]),
+    NoteModule,
   ],
+  providers: [AuthorizationService],
   exports: [AuthorizationService],
 })
 export class AuthorizationModule {}

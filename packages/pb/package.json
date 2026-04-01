@@ -5,22 +5,19 @@
   "type": "module",
   "exports": {
     "./note": {
-      "types": "./note_pb.d.ts",
-      "import": "./note_pb.js"
+      "default": "./note.ts"
     },
     "./authorization": {
-      "types": "./authorization_pb.d.ts",
-      "import": "./authorization_pb.js"
+      "default": "./authorization.ts"
     }
   },
   "peerDependencies": {
     "@bufbuild/protobuf": "catalog:",
-    "@connectrpc/connect": "catalog:",
-    "@connectrpc/connect-node": "catalog:"
+    "@grpc/grpc-js": "catalog:",
+    "@nestjs/microservices": "catalog:",
+    "@types/node": "catalog:"
   },
-  "devDependencies": {
-    "@bufbuild/protobuf": "catalog:",
-    "@connectrpc/connect": "catalog:",
-    "@connectrpc/connect-node": "catalog:"
+  "dependencies": {
+    "@nestjs/microservices": "catalog:"
   }
 }

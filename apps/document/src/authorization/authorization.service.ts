@@ -1,36 +1,46 @@
 import { NoteService } from '../note/note.service';
-import { Client, Code, ConnectError } from '@connectrpc/connect';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import {
-  Injectable,
   InternalServerErrorException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { type ClientGrpc } from '@nestjs/microservices';
 import {
-  AuthorizationService as AuthorizationServiceDefinition,
+  AUTHORIZATION_PACKAGE_NAME,
+  AUTHORIZATION_SERVICE_NAME,
+  AuthorizationServiceClient,
   WorkspaceItemPermission,
 } from '@notopia-uit/pb/authorization';
-
-export type AuthorizationClient = Client<typeof AuthorizationServiceDefinition>;
+import { firstValueFrom } from 'rxjs';
 
 export type UserNotePermissions = 'read' | 'write' | 'delete';
 
 @Injectable()
-export class AuthorizationService {
+export class AuthorizationService implements OnModuleInit {
+  private authorizationServiceClient!: AuthorizationServiceClient;
+
   constructor(
-    private readonly authorizationClient: AuthorizationClient,
+    @Inject(AUTHORIZATION_PACKAGE_NAME) private client: ClientGrpc,
     private readonly noteService: NoteService
   ) {}
+
+  onModuleInit(): void {
+    this.authorizationServiceClient =
+      this.client.getService<AuthorizationServiceClient>(
+        AUTHORIZATION_SERVICE_NAME
+      );
+  }
 
   private toWorkspaceItemPermission(
     permission: UserNotePermissions
   ): WorkspaceItemPermission {
     switch (permission) {
       case 'read':
-        return WorkspaceItemPermission.READ;
+        return WorkspaceItemPermission.WORKSPACE_ITEM_PERMISSION_READ;
       case 'write':
-        return WorkspaceItemPermission.WRITE;
+        return WorkspaceItemPermission.WORKSPACE_ITEM_PERMISSION_WRITE;
       case 'delete':
-        return WorkspaceItemPermission.DELETE;
+        return WorkspaceItemPermission.WORKSPACE_ITEM_PERMISSION_DELETE;
       default:
         throw new UnprocessableEntityException(
           `Invalid permission: ${permission}`
@@ -50,23 +60,18 @@ export class AuthorizationService {
     try {
       const workspaceId =
         await this.noteService.getWorkspaceIdByNoteId(documentId);
-      const response =
-        await this.authorizationClient.hasWorkspaceItemPermission({
+      const response = await firstValueFrom(
+        this.authorizationServiceClient.hasWorkspaceItemPermission({
           permission: this.toWorkspaceItemPermission(permission),
           memberId,
           workspaceId,
-        });
+        })
+      );
       return response.hasPermission;
     } catch (error) {
-      if (error instanceof ConnectError) {
-        if (error.code === Code.NotFound) {
-          return false;
-        }
-        throw new InternalServerErrorException(
-          `Failed to check note permission: ${error.message}`
-        );
-      }
-      throw error;
+      throw new InternalServerErrorException(
+        `Failed to check note permission: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
@@ -77,20 +82,21 @@ export class AuthorizationService {
     try {
       const workspaceId =
         await this.noteService.getWorkspaceIdByNoteId(documentId);
-      return await this.authorizationClient.getUserWorkspaceItemPermissions({
-        memberId,
-        workspaceId,
-      });
+      const response = await firstValueFrom(
+        this.authorizationServiceClient.getUserWorkspaceItemPermissions({
+          memberId,
+          workspaceId,
+        })
+      );
+      return {
+        canRead: response.canRead,
+        canWrite: response.canWrite,
+        canDelete: response.canDelete,
+      };
     } catch (error) {
-      if (error instanceof ConnectError) {
-        if (error.code === Code.NotFound) {
-          return { canRead: false, canWrite: false, canDelete: false };
-        }
-        throw new InternalServerErrorException(
-          `Failed to get user note permissions: ${error.message}`
-        );
-      }
-      throw error;
+      throw new InternalServerErrorException(
+        `Failed to get user note permissions: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 }

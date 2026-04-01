@@ -1,65 +1,45 @@
-import { Client, Code, ConnectError } from '@connectrpc/connect';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { type ClientGrpc } from '@nestjs/microservices';
 import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import { NoteService as NoteServiceDefinition } from '@notopia-uit/pb/note';
-
-export type NoteClient = Client<typeof NoteServiceDefinition>;
+  NOTE_PACKAGE_NAME,
+  NOTE_SERVICE_NAME,
+  NoteServiceClient,
+} from '@notopia-uit/pb/note';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
-export class NoteService {
-  constructor(private readonly noteClient: NoteClient) {}
+export class NoteService implements OnModuleInit {
+  private noteServiceClient!: NoteServiceClient;
+
+  constructor(@Inject(NOTE_PACKAGE_NAME) private client: ClientGrpc) {}
+
+  onModuleInit(): void {
+    this.noteServiceClient =
+      this.client.getService<NoteServiceClient>(NOTE_SERVICE_NAME);
+  }
 
   async getNoteName(noteId: string): Promise<string> {
-    try {
-      const response = await this.noteClient.getNoteName({ id: noteId });
-      return response.name;
-    } catch (error) {
-      if (error instanceof ConnectError) {
-        if (error.code === Code.NotFound) {
-          throw new NotFoundException(`Note with ID ${noteId} not found`);
-        }
-        throw new InternalServerErrorException(
-          `Failed to get note name: ${error.message}`
-        );
-      }
-      throw error;
-    }
+    const response = await firstValueFrom(
+      this.noteServiceClient.getNoteName({ id: noteId })
+    );
+    return response.name;
   }
 
   async checkNoteExistence(noteId: string): Promise<boolean> {
-    try {
-      const response = await this.noteClient.checkNoteExistence({ noteId });
-      return response.exists;
-    } catch (error) {
-      if (error instanceof ConnectError) {
-        if (error.code === Code.NotFound) {
-          return false;
-        }
-        throw new InternalServerErrorException(
-          `Failed to check note existence: ${error.message}`
-        );
-      }
-      throw error;
-    }
+    const response = await firstValueFrom(
+      this.noteServiceClient.checkNoteExistence({
+        noteId,
+      })
+    );
+    return response.exists;
   }
 
   async getWorkspaceIdByNoteId(noteId: string): Promise<string> {
-    try {
-      const response = await this.noteClient.getWorkspaceIdByNoteId({ noteId });
-      return response.workspaceId;
-    } catch (error) {
-      if (error instanceof ConnectError) {
-        if (error.code === Code.NotFound) {
-          throw new NotFoundException(`Note with ID ${noteId} not found`);
-        }
-        throw new InternalServerErrorException(
-          `Failed to get workspace ID by note ID: ${error.message}`
-        );
-      }
-      throw error;
-    }
+    const response = await firstValueFrom(
+      this.noteServiceClient.getWorkspaceIdByNoteId({
+        noteId,
+      })
+    );
+    return response.workspaceId;
   }
 }

@@ -2,10 +2,11 @@ package grpc
 
 import (
 	"github.com/goforj/wire"
+	"github.com/notopia-uit/notopia/pkg/pb"
 )
 
 var ProviderSet = wire.NewSet(
+	ProvideServiceServer,
 	Provide,
-	ProvideHandler,
-	wire.Bind(new(IHandler), new(*Handler)),
+	wire.Bind(new(pb.NoteServiceServer), new(*ServiceServer)),
 )
