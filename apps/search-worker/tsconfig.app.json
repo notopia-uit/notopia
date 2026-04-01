@@ -1,7 +1,16 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@notopia-uit/tsconfig/nestjs.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "es2024",
+    "sourceMap": true,
+    "declaration": true,
+    "importHelpers": true,
     "rootDir": "src",
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",

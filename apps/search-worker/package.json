@@ -29,7 +29,6 @@
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",
-    "@notopia-uit/tsconfig": "workspace:",
     "webpack-node-externals": "catalog:"
   }
 }

@@ -5,8 +5,5 @@
   "dependencies": {
     "@notopia-uit/api": "workspace:",
     "@scalar/api-reference-react": "0.9.18"
-  },
-  "devDependencies": {
-    "@notopia-uit/tsconfig": "workspace:"
   }
 }

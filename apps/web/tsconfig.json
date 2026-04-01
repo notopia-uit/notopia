@@ -1,6 +1,16 @@
 {
-  "extends": "@notopia-uit/tsconfig/nextjs.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "lib": ["dom", "dom.iterable", "ES2024"],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
       ".*": ["./src/*"],

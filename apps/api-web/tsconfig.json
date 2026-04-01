@@ -1,5 +1,5 @@
 {
-  "extends": "@notopia-uit/tsconfig/react.json",
+  "extends": "../../tsconfig.base.json",
   "files": [],
   "include": [],
   "references": [

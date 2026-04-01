@@ -26,7 +26,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@notopia-uit/tsconfig": "workspace:",
     "@tanstack/react-query": "catalog:",
     "zod": "catalog:"
   }

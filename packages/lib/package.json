@@ -8,8 +8,5 @@
     ".": {
       "default": "./src/index.ts"
     }
-  },
-  "devDependencies": {
-    "@notopia-uit/tsconfig": "workspace:"
   }
 }

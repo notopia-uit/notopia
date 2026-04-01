@@ -12,7 +12,6 @@
     "shadcn": "catalog:"
   },
   "devDependencies": {
-    "@notopia-uit/tsconfig": "workspace:",
     "autoprefixer": "catalog:",
     "postcss": "catalog:",
     "tailwind-merge": "catalog:",
