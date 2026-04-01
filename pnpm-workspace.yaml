@@ -88,7 +88,7 @@ catalog:
   typeorm: 0.3.28
   typescript: 5.9.3
   typescript-eslint: 8.56.1
-  vite: 7.3.1
+  vite: 8.0.3
   vite-plugin-dts: 4.5.4
   vitest: 4.0.18
   webpack-node-externals: 3.0.0
