@@ -2,7 +2,7 @@ import { Body, Controller, DefaultValuePipe, Delete, Get, Post, Param, ParseIntP
 import { Observable } from 'rxjs';
 import { Cookies, Headers } from '../decorators';
 import { RevisionApi } from '../api';
-import { GetRevisions200Response, RenameRevisionRequest, Revision,  } from '../models';
+import { GetRevisions200Response, RenameRevisionRequest, RevisionWithContent,  } from '../models';
 
 @Controller()
 export class RevisionApiController {
@@ -14,8 +14,8 @@ export class RevisionApiController {
   }
 
   @Get('/document/revisions/:revisionId')
-  getRevision(@Param('revisionId') revisionId: string, @Req() request: Request): Revision | Promise<Revision> | Observable<Revision> {
-    return this.revisionApi.getRevision(revisionId, request);
+  getRevisionWithContent(@Param('revisionId') revisionId: string, @Req() request: Request): RevisionWithContent | Promise<RevisionWithContent> | Observable<RevisionWithContent> {
+    return this.revisionApi.getRevisionWithContent(revisionId, request);
   }
 
   @Get('/document/revisions')

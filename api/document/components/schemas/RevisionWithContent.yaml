@@ -1,0 +1,9 @@
+# vim: ft=yaml.openapi
+allOf:
+  - $ref: ./Revision.yaml
+  - type: object
+    properties:
+      content:
+        $ref: ./DocumentContent.yaml
+    required:
+      - content

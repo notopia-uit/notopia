@@ -6,6 +6,7 @@ properties:
     $ref: ../../../common/components/schemas/User.yaml#/properties/id
   username:
     $ref: ../../../common/components/schemas/User.yaml#/properties/name
+    readOnly: true
   role:
     $ref: ./WorkspaceRole.yaml
 

@@ -74,15 +74,9 @@ export const zDocumentError = z.object({
     more_info: z.string().optional()
 });
 
-/**
- * BlockNote model
- */
-export const zDocumentDocumentContent = z.array(z.unknown());
-
 export const zDocumentRevision = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255).nullable(),
-    content: zDocumentDocumentContent.optional(),
     createdAt: z.iso.datetime().readonly()
 });
 
@@ -94,6 +88,15 @@ export const zDocumentPagination = z.object({
     hasNext: z.boolean(),
     hasPrev: z.boolean()
 });
+
+/**
+ * BlockNote model
+ */
+export const zDocumentDocumentContent = z.array(z.unknown());
+
+export const zDocumentRevisionWithContent = zDocumentRevision.and(z.object({
+    content: zDocumentDocumentContent
+}));
 
 export const zDocumentName = z.string().min(1).max(255).nullable();
 
@@ -129,7 +132,7 @@ export const zNoteNote = z.object({
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
     folderId: zNoteId,
-    tags: z.array(z.string()),
+    tags: z.array(z.string()).readonly(),
     updatedAt: z.iso.datetime().readonly(),
     trashed: z.object({
         trashedBy: zNoteTrashedBy,
@@ -152,6 +155,9 @@ export const zNoteGraph = z.object({
     }))
 });
 
+/**
+ * Can be empty string when creating but will be set to "Untitled Note" internally
+ */
 export const zNotePropertiesName = z.string().min(1).max(255);
 
 export const zNoteIcon = z.string().nullable();
@@ -295,15 +301,18 @@ export const zShareNoteWritable = z.object({
 
 export const zShareNoteUpdatedEventWritable = zShareNoteWritable;
 
+export const zDocumentRevisionWritable = z.object({
+    name: z.string().min(1).max(255).nullable()
+});
+
 /**
  * BlockNote model
  */
 export const zDocumentDocumentContentWritable = z.array(z.unknown());
 
-export const zDocumentRevisionWritable = z.object({
-    name: z.string().min(1).max(255).nullable(),
-    content: zDocumentDocumentContentWritable.optional()
-});
+export const zDocumentRevisionWithContentWritable = zDocumentRevisionWritable.and(z.object({
+    content: zDocumentDocumentContentWritable
+}));
 
 export const zNoteFolderWritable = z.object({
     name: z.string().min(1).max(255),
@@ -312,8 +321,7 @@ export const zNoteFolderWritable = z.object({
 
 export const zNoteNoteWritable = z.object({
     name: z.string().min(1).max(255),
-    icon: z.string().nullable(),
-    tags: z.array(z.string())
+    icon: z.string().nullable()
 });
 
 export const zNoteNoteLinkWritable = z.object({
@@ -331,11 +339,16 @@ export const zNoteWorkspaceItemsUpdatedEventWritable = z.object({
     event: z.enum(['WorkspaceItemsUpdatedEvent'])
 });
 
+export const zNoteWorkspaceMemberWritable = z.object({
+    id: zNoteUserPropertiesId,
+    role: zNoteWorkspaceRole
+});
+
 export const zNoteWorkspaceMembersUpdatedEventWritable = z.object({
     id: z.uuid(),
     event: z.enum(['WorkspaceMembersUpdatedEvent']),
     data: z.object({
-        members: z.array(zNoteWorkspaceMember)
+        members: z.array(zNoteWorkspaceMemberWritable)
     })
 });
 
@@ -399,12 +412,6 @@ export const zNoteWorkspaceSlugPath = zNoteSlug;
 
 export const zNoteWorkspaceIdPath = zNotePropertiesId;
 
-export const zImportDocumentsData = z.object({
-    body: z.array(z.record(z.string(), z.unknown())),
-    path: z.never().optional(),
-    query: z.never().optional()
-});
-
 export const zGetDocumentAttachmentUploadUrlData = z.object({
     body: z.never().optional(),
     path: z.object({
@@ -465,7 +472,7 @@ export const zDeleteRevisionData = z.object({
  */
 export const zDeleteRevisionResponse = z.void();
 
-export const zGetRevisionData = z.object({
+export const zGetRevisionWithContentData = z.object({
     body: z.never().optional(),
     path: z.object({
         revisionId: z.uuid()
@@ -474,9 +481,9 @@ export const zGetRevisionData = z.object({
 });
 
 /**
- * Revision detail
+ * Revision retrieved successfully
  */
-export const zGetRevisionResponse = zDocumentRevision;
+export const zGetRevisionWithContentResponse = zDocumentRevisionWithContent;
 
 export const zRenameRevisionData = z.object({
     body: z.object({
@@ -499,7 +506,7 @@ export const zCreateFolderData = z.object({
     query: z.never().optional()
 });
 
-export const zDeleteFolderData = z.object({
+export const zPermanentlyDeleteFolderData = z.object({
     body: z.never().optional(),
     path: z.object({
         folderId: zNoteId
@@ -510,7 +517,7 @@ export const zDeleteFolderData = z.object({
 /**
  * Folder successfully deleted
  */
-export const zDeleteFolderResponse = z.void();
+export const zPermanentlyDeleteFolderResponse = z.void();
 
 export const zRenameFolderData = z.object({
     body: z.object({
@@ -533,15 +540,7 @@ export const zCreateNoteData = z.object({
     query: z.never().optional()
 });
 
-export const zGenerateDailyNoteData = z.object({
-    body: z.object({
-        workspaceId: zNotePropertiesId
-    }),
-    path: z.never().optional(),
-    query: z.never().optional()
-});
-
-export const zDeleteNoteData = z.object({
+export const zPermanentlyDeleteNoteData = z.object({
     body: z.never().optional(),
     path: z.object({
         noteId: zNoteNotePropertiesId
@@ -552,7 +551,7 @@ export const zDeleteNoteData = z.object({
 /**
  * Note successfully deleted
  */
-export const zDeleteNoteResponse = z.void();
+export const zPermanentlyDeleteNoteResponse = z.void();
 
 export const zGetNoteData = z.object({
     body: z.never().optional(),
@@ -560,7 +559,7 @@ export const zGetNoteData = z.object({
         noteId: zNoteNotePropertiesId
     }),
     query: z.object({
-        excludeTrashed: z.boolean().optional().default(false)
+        includeTrashed: z.boolean().optional().default(true)
     }).optional()
 });
 
@@ -742,7 +741,7 @@ export const zGetWorkspaceMembersData = z.object({
 export const zGetWorkspaceMembersResponse = z.array(zNoteWorkspaceMember);
 
 export const zUpdateWorkspaceMembersData = z.object({
-    body: z.array(zNoteWorkspaceMember),
+    body: z.array(zNoteWorkspaceMemberWritable),
     path: z.object({
         workspaceId: zNotePropertiesId
     }),

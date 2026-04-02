@@ -20,21 +20,18 @@ type ServerInterface interface {
 	// Create folder
 	// (POST /note/folders)
 	CreateFolder(c *gin.Context)
-	// Delete folder
+	// Permanently delete folder
 	// (DELETE /note/folders/{folderId})
-	DeleteFolder(c *gin.Context, folderId FolderIdPath)
+	PermanentlyDeleteFolder(c *gin.Context, folderId FolderIdPath)
 	// Rename folder
 	// (POST /note/folders/{folderId}/rename)
 	RenameFolder(c *gin.Context, folderId FolderIdPath)
 	// Create note
 	// (POST /note/notes)
 	CreateNote(c *gin.Context)
-	// Generate daily note
-	// (POST /note/notes/generate-daily)
-	GenerateDailyNote(c *gin.Context)
-	// Delete note
+	// Permanently delete note
 	// (DELETE /note/notes/{noteId})
-	DeleteNote(c *gin.Context, noteId NoteIdPath)
+	PermanentlyDeleteNote(c *gin.Context, noteId NoteIdPath)
 	// Get note
 	// (GET /note/notes/{noteId})
 	GetNote(c *gin.Context, noteId NoteIdPath, params GetNoteParams)
@@ -130,8 +127,8 @@ func (siw *ServerInterfaceWrapper) CreateFolder(c *gin.Context) {
 	siw.Handler.CreateFolder(c)
 }
 
-// DeleteFolder operation middleware
-func (siw *ServerInterfaceWrapper) DeleteFolder(c *gin.Context) {
+// PermanentlyDeleteFolder operation middleware
+func (siw *ServerInterfaceWrapper) PermanentlyDeleteFolder(c *gin.Context) {
 
 	var err error
 
@@ -153,7 +150,7 @@ func (siw *ServerInterfaceWrapper) DeleteFolder(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteFolder(c, folderId)
+	siw.Handler.PermanentlyDeleteFolder(c, folderId)
 }
 
 // RenameFolder operation middleware
@@ -197,23 +194,8 @@ func (siw *ServerInterfaceWrapper) CreateNote(c *gin.Context) {
 	siw.Handler.CreateNote(c)
 }
 
-// GenerateDailyNote operation middleware
-func (siw *ServerInterfaceWrapper) GenerateDailyNote(c *gin.Context) {
-
-	c.Set(Oauth2Scopes, []string{})
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GenerateDailyNote(c)
-}
-
-// DeleteNote operation middleware
-func (siw *ServerInterfaceWrapper) DeleteNote(c *gin.Context) {
+// PermanentlyDeleteNote operation middleware
+func (siw *ServerInterfaceWrapper) PermanentlyDeleteNote(c *gin.Context) {
 
 	var err error
 
@@ -235,7 +217,7 @@ func (siw *ServerInterfaceWrapper) DeleteNote(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteNote(c, noteId)
+	siw.Handler.PermanentlyDeleteNote(c, noteId)
 }
 
 // GetNote operation middleware
@@ -257,11 +239,11 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetNoteParams
 
-	// ------------- Optional query parameter "excludeTrashed" -------------
+	// ------------- Optional query parameter "includeTrashed" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "excludeTrashed", c.Request.URL.Query(), &params.ExcludeTrashed, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "includeTrashed", c.Request.URL.Query(), &params.IncludeTrashed, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter excludeTrashed: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter includeTrashed: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -932,11 +914,10 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	}
 
 	router.POST(options.BaseURL+"/note/folders", wrapper.CreateFolder)
-	router.DELETE(options.BaseURL+"/note/folders/:folderId", wrapper.DeleteFolder)
+	router.DELETE(options.BaseURL+"/note/folders/:folderId", wrapper.PermanentlyDeleteFolder)
 	router.POST(options.BaseURL+"/note/folders/:folderId/rename", wrapper.RenameFolder)
 	router.POST(options.BaseURL+"/note/notes", wrapper.CreateNote)
-	router.POST(options.BaseURL+"/note/notes/generate-daily", wrapper.GenerateDailyNote)
-	router.DELETE(options.BaseURL+"/note/notes/:noteId", wrapper.DeleteNote)
+	router.DELETE(options.BaseURL+"/note/notes/:noteId", wrapper.PermanentlyDeleteNote)
 	router.GET(options.BaseURL+"/note/notes/:noteId", wrapper.GetNote)
 	router.GET(options.BaseURL+"/note/notes/:noteId/graph", wrapper.GetNoteGraph)
 	router.GET(options.BaseURL+"/note/notes/:noteId/links", wrapper.GetNoteLinks)
@@ -1032,63 +1013,63 @@ func (response CreateFolder500JSONResponse) VisitCreateFolderResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFolderRequestObject struct {
+type PermanentlyDeleteFolderRequestObject struct {
 	FolderId FolderIdPath `json:"folderId"`
 }
 
-type DeleteFolderResponseObject interface {
-	VisitDeleteFolderResponse(w http.ResponseWriter) error
+type PermanentlyDeleteFolderResponseObject interface {
+	VisitPermanentlyDeleteFolderResponse(w http.ResponseWriter) error
 }
 
-type DeleteFolder204Response struct {
+type PermanentlyDeleteFolder204Response struct {
 }
 
-func (response DeleteFolder204Response) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteFolder204Response) VisitPermanentlyDeleteFolderResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
-type DeleteFolder400JSONResponse struct{ BadRequestErrorJSONResponse }
+type PermanentlyDeleteFolder400JSONResponse struct{ BadRequestErrorJSONResponse }
 
-func (response DeleteFolder400JSONResponse) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteFolder400JSONResponse) VisitPermanentlyDeleteFolderResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFolder401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+type PermanentlyDeleteFolder401JSONResponse struct{ UnauthorizedErrorJSONResponse }
 
-func (response DeleteFolder401JSONResponse) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteFolder401JSONResponse) VisitPermanentlyDeleteFolderResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFolder403JSONResponse struct{ ForbiddenErrorJSONResponse }
+type PermanentlyDeleteFolder403JSONResponse struct{ ForbiddenErrorJSONResponse }
 
-func (response DeleteFolder403JSONResponse) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteFolder403JSONResponse) VisitPermanentlyDeleteFolderResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(403)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFolder404JSONResponse struct{ NotFoundErrorJSONResponse }
+type PermanentlyDeleteFolder404JSONResponse struct{ NotFoundErrorJSONResponse }
 
-func (response DeleteFolder404JSONResponse) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteFolder404JSONResponse) VisitPermanentlyDeleteFolderResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFolder500JSONResponse struct {
+type PermanentlyDeleteFolder500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
 
-func (response DeleteFolder500JSONResponse) VisitDeleteFolderResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteFolder500JSONResponse) VisitPermanentlyDeleteFolderResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -1201,123 +1182,63 @@ func (response CreateNote500JSONResponse) VisitCreateNoteResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GenerateDailyNoteRequestObject struct {
-	Body *GenerateDailyNoteJSONRequestBody
-}
-
-type GenerateDailyNoteResponseObject interface {
-	VisitGenerateDailyNoteResponse(w http.ResponseWriter) error
-}
-
-type GenerateDailyNote201ResponseHeaders struct {
-	ContentLocation string
-}
-
-type GenerateDailyNote201Response struct {
-	Headers GenerateDailyNote201ResponseHeaders
-}
-
-func (response GenerateDailyNote201Response) VisitGenerateDailyNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
-	w.WriteHeader(201)
-	return nil
-}
-
-type GenerateDailyNote400JSONResponse struct{ BadRequestErrorJSONResponse }
-
-func (response GenerateDailyNote400JSONResponse) VisitGenerateDailyNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GenerateDailyNote401JSONResponse struct{ UnauthorizedErrorJSONResponse }
-
-func (response GenerateDailyNote401JSONResponse) VisitGenerateDailyNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GenerateDailyNote404JSONResponse struct{ NotFoundErrorJSONResponse }
-
-func (response GenerateDailyNote404JSONResponse) VisitGenerateDailyNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type GenerateDailyNote500JSONResponse struct {
-	InternalServerErrorJSONResponse
-}
-
-func (response GenerateDailyNote500JSONResponse) VisitGenerateDailyNoteResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(500)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DeleteNoteRequestObject struct {
+type PermanentlyDeleteNoteRequestObject struct {
 	NoteId NoteIdPath `json:"noteId"`
 }
 
-type DeleteNoteResponseObject interface {
-	VisitDeleteNoteResponse(w http.ResponseWriter) error
+type PermanentlyDeleteNoteResponseObject interface {
+	VisitPermanentlyDeleteNoteResponse(w http.ResponseWriter) error
 }
 
-type DeleteNote204Response struct {
+type PermanentlyDeleteNote204Response struct {
 }
 
-func (response DeleteNote204Response) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteNote204Response) VisitPermanentlyDeleteNoteResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
-type DeleteNote400JSONResponse struct{ BadRequestErrorJSONResponse }
+type PermanentlyDeleteNote400JSONResponse struct{ BadRequestErrorJSONResponse }
 
-func (response DeleteNote400JSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteNote400JSONResponse) VisitPermanentlyDeleteNoteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteNote401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+type PermanentlyDeleteNote401JSONResponse struct{ UnauthorizedErrorJSONResponse }
 
-func (response DeleteNote401JSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteNote401JSONResponse) VisitPermanentlyDeleteNoteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteNote403JSONResponse struct{ ForbiddenErrorJSONResponse }
+type PermanentlyDeleteNote403JSONResponse struct{ ForbiddenErrorJSONResponse }
 
-func (response DeleteNote403JSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteNote403JSONResponse) VisitPermanentlyDeleteNoteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(403)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteNote404JSONResponse struct{ NotFoundErrorJSONResponse }
+type PermanentlyDeleteNote404JSONResponse struct{ NotFoundErrorJSONResponse }
 
-func (response DeleteNote404JSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteNote404JSONResponse) VisitPermanentlyDeleteNoteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteNote500JSONResponse struct {
+type PermanentlyDeleteNote500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
 
-func (response DeleteNote500JSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+func (response PermanentlyDeleteNote500JSONResponse) VisitPermanentlyDeleteNoteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -2631,21 +2552,18 @@ type StrictServerInterface interface {
 	// Create folder
 	// (POST /note/folders)
 	CreateFolder(ctx context.Context, request CreateFolderRequestObject) (CreateFolderResponseObject, error)
-	// Delete folder
+	// Permanently delete folder
 	// (DELETE /note/folders/{folderId})
-	DeleteFolder(ctx context.Context, request DeleteFolderRequestObject) (DeleteFolderResponseObject, error)
+	PermanentlyDeleteFolder(ctx context.Context, request PermanentlyDeleteFolderRequestObject) (PermanentlyDeleteFolderResponseObject, error)
 	// Rename folder
 	// (POST /note/folders/{folderId}/rename)
 	RenameFolder(ctx context.Context, request RenameFolderRequestObject) (RenameFolderResponseObject, error)
 	// Create note
 	// (POST /note/notes)
 	CreateNote(ctx context.Context, request CreateNoteRequestObject) (CreateNoteResponseObject, error)
-	// Generate daily note
-	// (POST /note/notes/generate-daily)
-	GenerateDailyNote(ctx context.Context, request GenerateDailyNoteRequestObject) (GenerateDailyNoteResponseObject, error)
-	// Delete note
+	// Permanently delete note
 	// (DELETE /note/notes/{noteId})
-	DeleteNote(ctx context.Context, request DeleteNoteRequestObject) (DeleteNoteResponseObject, error)
+	PermanentlyDeleteNote(ctx context.Context, request PermanentlyDeleteNoteRequestObject) (PermanentlyDeleteNoteResponseObject, error)
 	// Get note
 	// (GET /note/notes/{noteId})
 	GetNote(ctx context.Context, request GetNoteRequestObject) (GetNoteResponseObject, error)
@@ -2762,17 +2680,17 @@ func (sh *strictHandler) CreateFolder(ctx *gin.Context) {
 	}
 }
 
-// DeleteFolder operation middleware
-func (sh *strictHandler) DeleteFolder(ctx *gin.Context, folderId FolderIdPath) {
-	var request DeleteFolderRequestObject
+// PermanentlyDeleteFolder operation middleware
+func (sh *strictHandler) PermanentlyDeleteFolder(ctx *gin.Context, folderId FolderIdPath) {
+	var request PermanentlyDeleteFolderRequestObject
 
 	request.FolderId = folderId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DeleteFolder(ctx, request.(DeleteFolderRequestObject))
+		return sh.ssi.PermanentlyDeleteFolder(ctx, request.(PermanentlyDeleteFolderRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DeleteFolder")
+		handler = middleware(handler, "PermanentlyDeleteFolder")
 	}
 
 	response, err := handler(ctx, request)
@@ -2780,8 +2698,8 @@ func (sh *strictHandler) DeleteFolder(ctx *gin.Context, folderId FolderIdPath) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(DeleteFolderResponseObject); ok {
-		if err := validResponse.VisitDeleteFolderResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(PermanentlyDeleteFolderResponseObject); ok {
+		if err := validResponse.VisitPermanentlyDeleteFolderResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {
@@ -2857,50 +2775,17 @@ func (sh *strictHandler) CreateNote(ctx *gin.Context) {
 	}
 }
 
-// GenerateDailyNote operation middleware
-func (sh *strictHandler) GenerateDailyNote(ctx *gin.Context) {
-	var request GenerateDailyNoteRequestObject
-
-	var body GenerateDailyNoteJSONRequestBody
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.Status(http.StatusBadRequest)
-		ctx.Error(err)
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GenerateDailyNote(ctx, request.(GenerateDailyNoteRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GenerateDailyNote")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		ctx.Error(err)
-		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(GenerateDailyNoteResponseObject); ok {
-		if err := validResponse.VisitGenerateDailyNoteResponse(ctx.Writer); err != nil {
-			ctx.Error(err)
-		}
-	} else if response != nil {
-		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// DeleteNote operation middleware
-func (sh *strictHandler) DeleteNote(ctx *gin.Context, noteId NoteIdPath) {
-	var request DeleteNoteRequestObject
+// PermanentlyDeleteNote operation middleware
+func (sh *strictHandler) PermanentlyDeleteNote(ctx *gin.Context, noteId NoteIdPath) {
+	var request PermanentlyDeleteNoteRequestObject
 
 	request.NoteId = noteId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DeleteNote(ctx, request.(DeleteNoteRequestObject))
+		return sh.ssi.PermanentlyDeleteNote(ctx, request.(PermanentlyDeleteNoteRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DeleteNote")
+		handler = middleware(handler, "PermanentlyDeleteNote")
 	}
 
 	response, err := handler(ctx, request)
@@ -2908,8 +2793,8 @@ func (sh *strictHandler) DeleteNote(ctx *gin.Context, noteId NoteIdPath) {
 	if err != nil {
 		ctx.Error(err)
 		ctx.Status(http.StatusInternalServerError)
-	} else if validResponse, ok := response.(DeleteNoteResponseObject); ok {
-		if err := validResponse.VisitDeleteNoteResponse(ctx.Writer); err != nil {
+	} else if validResponse, ok := response.(PermanentlyDeleteNoteResponseObject); ok {
+		if err := validResponse.VisitPermanentlyDeleteNoteResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

@@ -21,8 +21,4 @@ export class DocumentApi extends DocumentApiDefinition {
     const user = (req as any).user as User;
     return await this.documentService.getAttachmentUploadUrl(documentId, user);
   }
-
-  async importDocuments(_: Array<object>, __: Request) {
-    return;
-  }
 }

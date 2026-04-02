@@ -11,7 +11,4 @@ export abstract class DocumentApi {
 
   abstract getDocumentAttachmentUploadUrl(documentId: string,  request: Request): GetDocumentAttachmentUploadUrl200Response | Promise<GetDocumentAttachmentUploadUrl200Response> | Observable<GetDocumentAttachmentUploadUrl200Response>;
 
-
-  abstract importDocuments(requestBody: Array<object>,  request: Request): void | Promise<void> | Observable<void>;
-
 } 

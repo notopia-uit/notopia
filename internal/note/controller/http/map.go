@@ -24,7 +24,7 @@ func toNote(n app.Note) note.Note {
 		Id:        &id,
 		Name:      n.Name,
 		Icon:      n.Icon,
-		Tags:      tags,
+		Tags:      &tags,
 		FolderId:  &folderID,
 		UpdatedAt: &updatedAt,
 		Trashed:   trashed,

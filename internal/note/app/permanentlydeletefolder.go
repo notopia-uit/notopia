@@ -9,29 +9,29 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
-type DeleteFolder struct {
+type PermanentlyDeleteFolder struct {
 	ID     uuid.UUID
 	UserID string
 }
 
-type DeleteFolderHandler struct {
+type PermanentlyDeleteFolderHandler struct {
 	authorizationService AuthorizationService
 	folderRepo           domain.FolderRepo
 }
 
-func NewDeleteFolderHandler(
+func PermanentlyNewDeleteFolderHandler(
 	authorizationService AuthorizationService,
 	folderRepo domain.FolderRepo,
-) *DeleteFolderHandler {
-	return &DeleteFolderHandler{
+) *PermanentlyDeleteFolderHandler {
+	return &PermanentlyDeleteFolderHandler{
 		authorizationService: authorizationService,
 		folderRepo:           folderRepo,
 	}
 }
 
-var ProvideDeleteFolderHandler = NewDeleteFolderHandler
+var ProvidePermanentlyDeleteFolderHandler = PermanentlyNewDeleteFolderHandler
 
-func (h *DeleteFolderHandler) Handle(ctx context.Context, cmd *DeleteFolder) errs.Error {
+func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteFolder) errs.Error {
 	workspaceID, err := h.folderRepo.GetWorkspaceIDByID(ctx, cmd.ID)
 	if err != nil {
 		return err

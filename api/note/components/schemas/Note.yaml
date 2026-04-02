@@ -13,6 +13,7 @@ properties:
     minLength: 1
     maxLength: 255
     example: Meeting Notes
+    description: Can be empty string when creating but will be set to "Untitled Note" internally
 
   icon:
     type: string
@@ -29,6 +30,7 @@ properties:
     example:
       - work
       - meeting
+    readOnly: true
 
   updatedAt:
     type: string

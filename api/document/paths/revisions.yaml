@@ -27,7 +27,6 @@ get:
             required:
               - data
               - pagination
-      # example:
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

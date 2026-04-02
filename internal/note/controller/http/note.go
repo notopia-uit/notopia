@@ -28,7 +28,6 @@ func (h *StrictHandler) CreateNote(
 		ID:       id,
 		Name:     request.Body.Name,
 		Icon:     request.Body.Icon,
-		Tags:     request.Body.Tags,
 		FolderID: *request.Body.FolderId,
 		UserID:   user.ID,
 	}
@@ -44,23 +43,16 @@ func (h *StrictHandler) CreateNote(
 	}, nil
 }
 
-func (h *StrictHandler) GenerateDailyNote(
+func (h *StrictHandler) PermanentlyDeleteNote(
 	ctx context.Context,
-	request note.GenerateDailyNoteRequestObject,
-) (note.GenerateDailyNoteResponseObject, error) {
-	return nil, errs.NewUnimplemented()
-}
-
-func (h *StrictHandler) DeleteNote(
-	ctx context.Context,
-	request note.DeleteNoteRequestObject,
-) (note.DeleteNoteResponseObject, error) {
+	request note.PermanentlyDeleteNoteRequestObject,
+) (note.PermanentlyDeleteNoteResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
 		return nil, errs.NewUnauthorized()
 	}
 
-	cmd := &app.DeleteNote{
+	cmd := &app.PermanentlyDeleteNote{
 		ID:     request.NoteId,
 		UserID: user.ID,
 	}
@@ -69,7 +61,7 @@ func (h *StrictHandler) DeleteNote(
 		return nil, err
 	}
 
-	return note.DeleteNote204Response{}, nil
+	return note.PermanentlyDeleteNote204Response{}, nil
 }
 
 func (h *StrictHandler) GetNote(
@@ -80,10 +72,11 @@ func (h *StrictHandler) GetNote(
 	if !ok {
 		return nil, errs.NewUnauthorized()
 	}
+	excludeTrashed := request.Params.IncludeTrashed == nil || !*request.Params.IncludeTrashed
 
 	query := &app.GetNote{
 		ID:             request.NoteId,
-		ExcludeTrashed: true,
+		ExcludeTrashed: excludeTrashed,
 		UserID:         user.ID,
 	}
 

@@ -13,7 +13,6 @@ type CreateNote struct {
 	ID       uuid.UUID
 	Name     string
 	Icon     *string
-	Tags     []string
 	FolderID uuid.UUID
 
 	UserID string
@@ -58,6 +57,6 @@ func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) errs.Er
 			fmt.Sprintf("user %q does not have permission to create note in workspace %q", cmd.UserID, workspaceID.String()),
 		)
 	}
-	note := domain.NewNote(cmd.ID, cmd.Name, cmd.Icon, cmd.Tags, cmd.FolderID)
+	note := domain.NewNote(cmd.ID, cmd.Name, cmd.Icon, cmd.FolderID)
 	return h.noteRepo.Save(ctx, note)
 }

@@ -240,13 +240,15 @@ type HeartBeatWorkspaceEventEvent string
 
 // Note defines model for Note.
 type Note struct {
-	FolderId  *Id                 `json:"folderId,omitempty"`
-	Icon      *string             `json:"icon"`
-	Id        *openapi_types.UUID `json:"id,omitempty"`
-	Name      string              `json:"name"`
-	Tags      []string            `json:"tags"`
-	Trashed   *NoteTrashed        `json:"trashed,omitempty"`
-	UpdatedAt *time.Time          `json:"updatedAt,omitempty"`
+	FolderId *Id                 `json:"folderId,omitempty"`
+	Icon     *string             `json:"icon"`
+	Id       *openapi_types.UUID `json:"id,omitempty"`
+
+	// Name Can be empty string when creating but will be set to "Untitled Note" internally
+	Name      string       `json:"name"`
+	Tags      *[]string    `json:"tags,omitempty"`
+	Trashed   *NoteTrashed `json:"trashed,omitempty"`
+	UpdatedAt *time.Time   `json:"updatedAt,omitempty"`
 }
 
 // NoteTrashed defines model for .
@@ -259,7 +261,9 @@ type NoteTrashed struct {
 type NoteLink struct {
 	Icon *Icon             `json:"icon"`
 	Id   *NotePropertiesId `json:"id,omitempty"`
-	Name PropertiesName    `json:"name"`
+
+	// Name Can be empty string when creating but will be set to "Untitled Note" internally
+	Name PropertiesName `json:"name"`
 }
 
 // NotePropertiesId defines model for Note_properties-id.
@@ -372,10 +376,12 @@ type WorkspaceTreeFolder struct {
 
 // WorkspaceTreeNote defines model for WorkspaceTreeNote.
 type WorkspaceTreeNote struct {
-	Icon      *Icon             `json:"icon"`
-	Id        *NotePropertiesId `json:"id,omitempty"`
-	Name      PropertiesName    `json:"name"`
-	UpdatedAt *UpdatedAt        `json:"updatedAt,omitempty"`
+	Icon *Icon             `json:"icon"`
+	Id   *NotePropertiesId `json:"id,omitempty"`
+
+	// Name Can be empty string when creating but will be set to "Untitled Note" internally
+	Name      PropertiesName `json:"name"`
+	UpdatedAt *UpdatedAt     `json:"updatedAt,omitempty"`
 }
 
 // WorkspaceUpdatedEvent defines model for WorkspaceUpdatedEvent.
@@ -406,7 +412,7 @@ type PropertiesIcon = string
 // PropertiesId defines model for properties-id.
 type PropertiesId = openapi_types.UUID
 
-// PropertiesName defines model for properties-name.
+// PropertiesName Can be empty string when creating but will be set to "Untitled Note" internally
 type PropertiesName = string
 
 // PropertiesUpdatedAt defines model for properties-updatedAt.
@@ -462,14 +468,9 @@ type RenameFolderJSONBody struct {
 	Name Name `json:"name"`
 }
 
-// GenerateDailyNoteJSONBody defines parameters for GenerateDailyNote.
-type GenerateDailyNoteJSONBody struct {
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
-}
-
 // GetNoteParams defines parameters for GetNote.
 type GetNoteParams struct {
-	ExcludeTrashed *bool `form:"excludeTrashed,omitempty" json:"excludeTrashed,omitempty"`
+	IncludeTrashed *bool `form:"includeTrashed,omitempty" json:"includeTrashed,omitempty"`
 }
 
 // GetNoteGraphParams defines parameters for GetNoteGraph.
@@ -485,6 +486,7 @@ type GetNoteLinksParams struct {
 
 // RenameNoteJSONBody defines parameters for RenameNote.
 type RenameNoteJSONBody struct {
+	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name PropertiesName `json:"name"`
 }
 
@@ -542,9 +544,6 @@ type RenameFolderJSONRequestBody RenameFolderJSONBody
 
 // CreateNoteJSONRequestBody defines body for CreateNote for application/json ContentType.
 type CreateNoteJSONRequestBody = Note
-
-// GenerateDailyNoteJSONRequestBody defines body for GenerateDailyNote for application/json ContentType.
-type GenerateDailyNoteJSONRequestBody GenerateDailyNoteJSONBody
 
 // RenameNoteJSONRequestBody defines body for RenameNote for application/json ContentType.
 type RenameNoteJSONRequestBody RenameNoteJSONBody

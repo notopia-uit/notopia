@@ -36,8 +36,6 @@ paths:
 
   /note/notes:
     $ref: ./paths/notes.yaml
-  /note/notes/generate-daily:
-    $ref: ./paths/notes_generate-daily.yaml
   /note/notes/{noteId}:
     $ref: ./paths/notes_{noteId}.yaml
   /note/notes/{noteId}/graph:

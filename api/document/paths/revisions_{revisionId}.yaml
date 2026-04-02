@@ -4,17 +4,17 @@ get:
     - Oauth2: []
   tags:
     - Revision
-  summary: Get revision details
-  operationId: getRevision
+  summary: Get revision with content
+  operationId: getRevisionWithContent
   parameters:
     - $ref: ../components/parameters/revisionIdPath.yaml
   responses:
     200:
-      description: Revision detail
+      description: Revision retrieved successfully
       content:
         application/json:
           schema:
-            $ref: ../components/schemas/Revision.yaml
+            $ref: ../components/schemas/RevisionWithContent.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

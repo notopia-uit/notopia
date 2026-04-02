@@ -4,8 +4,8 @@ delete:
     - Oauth2: []
   tags:
     - Folder
-  summary: Delete folder
-  operationId: deleteFolder
+  summary: Permanently delete folder
+  operationId: permanentlyDeleteFolder
   parameters:
     - $ref: ../components/parameters/folderIdPath.yaml
   responses:

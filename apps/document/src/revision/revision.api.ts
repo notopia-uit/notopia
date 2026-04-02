@@ -5,7 +5,7 @@ import { RevisionApi as RevisionApiDefinition } from '@notopia-uit/api-document-
 import type {
   GetRevisions200Response,
   RenameRevisionRequest,
-  Revision,
+  RevisionWithContent,
 } from '@notopia-uit/api-document-nestjs-server/models';
 import { Traceable } from 'nestjs-otel';
 
@@ -21,10 +21,14 @@ export class RevisionApi extends RevisionApiDefinition {
     await this.revisionService.deleteRevision(revisionId);
   }
 
-  async getRevision(revisionId: string): Promise<Revision> {
+  async getRevisionWithContent(
+    revisionId: string
+  ): Promise<RevisionWithContent> {
     const revisionEntity = await this.revisionService.getRevision(revisionId);
     return {
-      ...revisionEntity,
+      id: revisionEntity.id,
+      name: revisionEntity.name,
+      content: revisionEntity.content,
       createdAt: revisionEntity.createdAt.toISOString(),
     };
   }
@@ -42,7 +46,8 @@ export class RevisionApi extends RevisionApiDefinition {
     const totalPages = Math.ceil(result.total / result.limit);
     return {
       data: result.data.map((r) => ({
-        ...r,
+        id: r.id,
+        name: r.name,
         createdAt: r.createdAt.toISOString(),
       })),
       pagination: {

@@ -8,12 +8,12 @@ get:
   operationId: getNote
   parameters:
     - $ref: ../components/parameters/noteIdPath.yaml
-    - name: excludeTrashed
+    - name: includeTrashed
       in: query
       required: false
       schema:
         type: boolean
-        default: false
+        default: true
   responses:
     200:
       description: Successful response
@@ -37,8 +37,8 @@ delete:
     - Oauth2: []
   tags:
     - Note
-  summary: Delete note
-  operationId: deleteNote
+  summary: Permanently delete note
+  operationId: permanentlyDeleteNote
   parameters:
     - $ref: ../components/parameters/noteIdPath.yaml
   responses:

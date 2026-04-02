@@ -11,8 +11,8 @@ type CommandHandlers struct {
 	CreateFolderHandler                    *CreateFolderHandler
 	CreateNoteHandler                      *CreateNoteHandler
 	CreateWorkspaceHandler                 *CreateWorkspaceHandler
-	DeleteFolderHandler                    *DeleteFolderHandler
-	DeleteNoteHandler                      *DeleteNoteHandler
+	DeleteFolderHandler                    *PermanentlyDeleteFolderHandler
+	DeleteNoteHandler                      *PermanentlyDeleteNoteHandler
 	DeleteWorkspaceHandler                 *DeleteWorkspaceHandler
 	GenerateDailyNoteHandler               *GenerateDailyNoteHandler
 	MoveWorkspaceItemsHandler              *MoveWorkspaceItemsHandler

@@ -90,15 +90,9 @@ export type DocumentError = {
     more_info?: string;
 };
 
-/**
- * BlockNote model
- */
-export type DocumentDocumentContent = Array<unknown>;
-
 export type DocumentRevision = {
     readonly id: string;
     name: string | null;
-    content?: DocumentDocumentContent;
     readonly createdAt: Date;
 };
 
@@ -127,6 +121,15 @@ export type DocumentPagination = {
      * Whether there is a previous page
      */
     hasPrev: boolean;
+};
+
+/**
+ * BlockNote model
+ */
+export type DocumentDocumentContent = Array<unknown>;
+
+export type DocumentRevisionWithContent = DocumentRevision & {
+    content: DocumentDocumentContent;
 };
 
 export type DocumentName = string | null;
@@ -171,10 +174,13 @@ export type NoteName = string;
 
 export type NoteNote = {
     readonly id: string;
+    /**
+     * Can be empty string when creating but will be set to "Untitled Note" internally
+     */
     name: string;
     icon: string | null;
     folderId: NoteId;
-    tags: Array<string>;
+    readonly tags: Array<string>;
     readonly updatedAt: Date;
     readonly trashed: {
         trashedBy: NoteTrashedBy;
@@ -212,6 +218,9 @@ export type NoteGraph = {
     }>;
 };
 
+/**
+ * Can be empty string when creating but will be set to "Untitled Note" internally
+ */
 export type NotePropertiesName = string;
 
 export type NoteIcon = string | null;
@@ -362,14 +371,17 @@ export type ShareNoteWritable = {
     tags: Array<string>;
 };
 
+export type DocumentRevisionWritable = {
+    name: string | null;
+};
+
 /**
  * BlockNote model
  */
 export type DocumentDocumentContentWritable = Array<unknown>;
 
-export type DocumentRevisionWritable = {
-    name: string | null;
-    content?: DocumentDocumentContentWritable;
+export type DocumentRevisionWithContentWritable = DocumentRevisionWritable & {
+    content: DocumentDocumentContentWritable;
 };
 
 export type NoteFolderWritable = {
@@ -378,9 +390,11 @@ export type NoteFolderWritable = {
 };
 
 export type NoteNoteWritable = {
+    /**
+     * Can be empty string when creating but will be set to "Untitled Note" internally
+     */
     name: string;
     icon: string | null;
-    tags: Array<string>;
 };
 
 export type NoteNoteLinkWritable = {
@@ -398,11 +412,16 @@ export type NoteWorkspaceItemsUpdatedEventWritable = {
     event: 'WorkspaceItemsUpdatedEvent';
 };
 
+export type NoteWorkspaceMemberWritable = {
+    id: NoteUserPropertiesId;
+    role: NoteWorkspaceRole;
+};
+
 export type NoteWorkspaceMembersUpdatedEventWritable = {
     id: string;
     event: 'WorkspaceMembersUpdatedEvent';
     data: {
-        members: Array<NoteWorkspaceMember>;
+        members: Array<NoteWorkspaceMemberWritable>;
     };
 };
 
@@ -465,56 +484,6 @@ export type NoteNoteIdPath = NoteNotePropertiesId;
 export type NoteWorkspaceSlugPath = NoteSlug;
 
 export type NoteWorkspaceIdPath = NotePropertiesId;
-
-export type ImportDocumentsData = {
-    body: Array<{
-        [key: string]: unknown;
-    }>;
-    path?: never;
-    query?: never;
-    url: '/document/documents/import';
-};
-
-export type ImportDocumentsErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: DocumentError;
-    /**
-     * The error response body returned when JWT validation or OPA authorization fails.
-     */
-    401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
-    };
-    /**
-     * Not Found Error response
-     */
-    404: DocumentError;
-    /**
-     * Internal Server Error response
-     */
-    500: DocumentError;
-};
-
-export type ImportDocumentsError = ImportDocumentsErrors[keyof ImportDocumentsErrors];
-
-export type ImportDocumentsResponses = {
-    /**
-     * Successfully imported documents
-     */
-    201: unknown;
-};
 
 export type GetDocumentAttachmentUploadUrlData = {
     body?: never;
@@ -748,7 +717,7 @@ export type DeleteRevisionResponses = {
 
 export type DeleteRevisionResponse = DeleteRevisionResponses[keyof DeleteRevisionResponses];
 
-export type GetRevisionData = {
+export type GetRevisionWithContentData = {
     body?: never;
     path: {
         revisionId: string;
@@ -757,7 +726,7 @@ export type GetRevisionData = {
     url: '/document/revisions/{revisionId}';
 };
 
-export type GetRevisionErrors = {
+export type GetRevisionWithContentErrors = {
     /**
      * Bad Request Error response
      */
@@ -793,16 +762,16 @@ export type GetRevisionErrors = {
     500: DocumentError;
 };
 
-export type GetRevisionError = GetRevisionErrors[keyof GetRevisionErrors];
+export type GetRevisionWithContentError = GetRevisionWithContentErrors[keyof GetRevisionWithContentErrors];
 
-export type GetRevisionResponses = {
+export type GetRevisionWithContentResponses = {
     /**
-     * Revision detail
+     * Revision retrieved successfully
      */
-    200: DocumentRevision;
+    200: DocumentRevisionWithContent;
 };
 
-export type GetRevisionResponse = GetRevisionResponses[keyof GetRevisionResponses];
+export type GetRevisionWithContentResponse = GetRevisionWithContentResponses[keyof GetRevisionWithContentResponses];
 
 export type RenameRevisionData = {
     body: {
@@ -902,7 +871,7 @@ export type CreateFolderResponses = {
     201: unknown;
 };
 
-export type DeleteFolderData = {
+export type PermanentlyDeleteFolderData = {
     body?: never;
     path: {
         folderId: NoteId;
@@ -911,7 +880,7 @@ export type DeleteFolderData = {
     url: '/note/folders/{folderId}';
 };
 
-export type DeleteFolderErrors = {
+export type PermanentlyDeleteFolderErrors = {
     /**
      * Bad Request Error response
      */
@@ -947,16 +916,16 @@ export type DeleteFolderErrors = {
     500: NoteError;
 };
 
-export type DeleteFolderError = DeleteFolderErrors[keyof DeleteFolderErrors];
+export type PermanentlyDeleteFolderError = PermanentlyDeleteFolderErrors[keyof PermanentlyDeleteFolderErrors];
 
-export type DeleteFolderResponses = {
+export type PermanentlyDeleteFolderResponses = {
     /**
      * Folder successfully deleted
      */
     204: void;
 };
 
-export type DeleteFolderResponse = DeleteFolderResponses[keyof DeleteFolderResponses];
+export type PermanentlyDeleteFolderResponse = PermanentlyDeleteFolderResponses[keyof PermanentlyDeleteFolderResponses];
 
 export type RenameFolderData = {
     body: {
@@ -1056,57 +1025,7 @@ export type CreateNoteResponses = {
     201: unknown;
 };
 
-export type GenerateDailyNoteData = {
-    body: {
-        workspaceId: NotePropertiesId;
-    };
-    path?: never;
-    query?: never;
-    url: '/note/notes/generate-daily';
-};
-
-export type GenerateDailyNoteErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * The error response body returned when JWT validation or OPA authorization fails.
-     */
-    401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
-    };
-    /**
-     * Not Found Error response
-     */
-    404: NoteError;
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type GenerateDailyNoteError = GenerateDailyNoteErrors[keyof GenerateDailyNoteErrors];
-
-export type GenerateDailyNoteResponses = {
-    /**
-     * Daily note generated successfully
-     */
-    201: unknown;
-};
-
-export type DeleteNoteData = {
+export type PermanentlyDeleteNoteData = {
     body?: never;
     path: {
         noteId: NoteNotePropertiesId;
@@ -1115,7 +1034,7 @@ export type DeleteNoteData = {
     url: '/note/notes/{noteId}';
 };
 
-export type DeleteNoteErrors = {
+export type PermanentlyDeleteNoteErrors = {
     /**
      * Bad Request Error response
      */
@@ -1151,16 +1070,16 @@ export type DeleteNoteErrors = {
     500: NoteError;
 };
 
-export type DeleteNoteError = DeleteNoteErrors[keyof DeleteNoteErrors];
+export type PermanentlyDeleteNoteError = PermanentlyDeleteNoteErrors[keyof PermanentlyDeleteNoteErrors];
 
-export type DeleteNoteResponses = {
+export type PermanentlyDeleteNoteResponses = {
     /**
      * Note successfully deleted
      */
     204: void;
 };
 
-export type DeleteNoteResponse = DeleteNoteResponses[keyof DeleteNoteResponses];
+export type PermanentlyDeleteNoteResponse = PermanentlyDeleteNoteResponses[keyof PermanentlyDeleteNoteResponses];
 
 export type GetNoteData = {
     body?: never;
@@ -1168,7 +1087,7 @@ export type GetNoteData = {
         noteId: NoteNotePropertiesId;
     };
     query?: {
-        excludeTrashed?: boolean;
+        includeTrashed?: boolean;
     };
     url: '/note/notes/{noteId}';
 };
@@ -1868,7 +1787,7 @@ export type GetWorkspaceMembersResponses = {
 export type GetWorkspaceMembersResponse = GetWorkspaceMembersResponses[keyof GetWorkspaceMembersResponses];
 
 export type UpdateWorkspaceMembersData = {
-    body: Array<NoteWorkspaceMember>;
+    body: Array<NoteWorkspaceMemberWritable>;
     path: {
         workspaceId: NotePropertiesId;
     };

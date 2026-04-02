@@ -9,29 +9,29 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
-type DeleteNote struct {
+type PermanentlyDeleteNote struct {
 	ID     uuid.UUID
 	UserID string
 }
 
-type DeleteNoteHandler struct {
+type PermanentlyDeleteNoteHandler struct {
 	authorizationService AuthorizationService
 	noteRepo             domain.NoteRepo
 }
 
-func NewDeleteNoteHandler(
+func PermanentlyNewDeleteNoteHandler(
 	authorizationService AuthorizationService,
 	noteRepo domain.NoteRepo,
-) *DeleteNoteHandler {
-	return &DeleteNoteHandler{
+) *PermanentlyDeleteNoteHandler {
+	return &PermanentlyDeleteNoteHandler{
 		authorizationService: authorizationService,
 		noteRepo:             noteRepo,
 	}
 }
 
-var ProvideDeleteNoteHandler = NewDeleteNoteHandler
+var ProvidePermanentlyDeleteNoteHandler = PermanentlyNewDeleteNoteHandler
 
-func (h *DeleteNoteHandler) Handle(ctx context.Context, cmd *DeleteNote) errs.Error {
+func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteNote) errs.Error {
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, cmd.ID)
 	if err != nil {
 		return err

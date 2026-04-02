@@ -15,9 +15,6 @@ properties:
     maxLength: 255
     example: Initial Draft
 
-  content:
-    $ref: ./DocumentContent.yaml
-
   createdAt:
     type: string
     format: date-time

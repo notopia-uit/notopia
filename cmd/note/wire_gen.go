@@ -91,8 +91,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspace := pg.NewNoTransactionWorkspace(pool, queries, db)
 	unitOfWork := pg.NewUnitOfWork(queries, db)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspace, folder, unitOfWork)
-	deleteFolderHandler := app.NewDeleteFolderHandler(authorization, folder)
-	deleteNoteHandler := app.NewDeleteNoteHandler(authorization, pgNote)
+	permanentlyDeleteFolderHandler := app.PermanentlyNewDeleteFolderHandler(authorization, folder)
+	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, pgNote)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, workspace)
 	generateDailyNoteHandler := app.NewGenerateDailyNoteHandler(pgNote, folder, workspace)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, pgNote, folder, unitOfWork)
@@ -112,8 +112,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		CreateFolderHandler:                    createFolderHandler,
 		CreateNoteHandler:                      createNoteHandler,
 		CreateWorkspaceHandler:                 createWorkspaceHandler,
-		DeleteFolderHandler:                    deleteFolderHandler,
-		DeleteNoteHandler:                      deleteNoteHandler,
+		DeleteFolderHandler:                    permanentlyDeleteFolderHandler,
+		DeleteNoteHandler:                      permanentlyDeleteNoteHandler,
 		DeleteWorkspaceHandler:                 deleteWorkspaceHandler,
 		GenerateDailyNoteHandler:               generateDailyNoteHandler,
 		MoveWorkspaceItemsHandler:              moveWorkspaceItemsHandler,

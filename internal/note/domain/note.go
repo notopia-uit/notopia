@@ -24,7 +24,6 @@ func NewNote(
 	id uuid.UUID,
 	name string,
 	icon *string,
-	tags []string,
 	folderID uuid.UUID,
 ) *Note {
 	if name == "" {
@@ -34,7 +33,7 @@ func NewNote(
 		id:            id,
 		name:          name,
 		icon:          icon,
-		tags:          tags,
+		tags:          []string{},
 		folderID:      folderID,
 		size:          0,
 		outgoingLinks: []uuid.UUID{},

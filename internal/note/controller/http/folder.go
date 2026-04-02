@@ -45,16 +45,16 @@ func (h *StrictHandler) CreateFolder(
 	}, nil
 }
 
-func (h *StrictHandler) DeleteFolder(
+func (h *StrictHandler) PermanentlyDeleteFolder(
 	ctx context.Context,
-	request note.DeleteFolderRequestObject,
-) (note.DeleteFolderResponseObject, error) {
+	request note.PermanentlyDeleteFolderRequestObject,
+) (note.PermanentlyDeleteFolderResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
 		return nil, errs.NewUnauthorized()
 	}
 
-	cmd := &app.DeleteFolder{
+	cmd := &app.PermanentlyDeleteFolder{
 		ID:     request.FolderId,
 		UserID: user.ID,
 	}
@@ -62,7 +62,7 @@ func (h *StrictHandler) DeleteFolder(
 	if err := h.App.CommandHandlers.DeleteFolderHandler.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
-	return note.DeleteFolder204Response{}, nil
+	return note.PermanentlyDeleteFolder204Response{}, nil
 }
 
 func (h *StrictHandler) RenameFolder(
