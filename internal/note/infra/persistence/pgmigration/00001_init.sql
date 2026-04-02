@@ -41,12 +41,23 @@ CREATE TABLE note_links (
   PRIMARY KEY (source_id, target_id)
 );
 
-CREATE INDEX idx_folders_workspace_id ON folders(workspace_id);
-CREATE INDEX idx_folders_parent_id ON folders(parent_id);
-CREATE INDEX idx_notes_folder_id ON notes(folder_id);
-CREATE INDEX idx_workspaces_slug ON workspaces(slug);
-CREATE INDEX idx_folders_trashed_at ON folders(trashed_at) WHERE trashed_at IS NOT NULL;
-CREATE INDEX idx_notes_trashed_at ON notes(trashed_at) WHERE trashed_at IS NOT NULL;
+CREATE INDEX idx_folders_workspace_id
+  ON folders(workspace_id);
+
+CREATE INDEX idx_folders_parent_id
+  ON folders(parent_id);
+
+CREATE INDEX idx_notes_folder_id
+  ON notes(folder_id);
+
+CREATE INDEX idx_workspaces_slug
+  ON workspaces(slug);
+
+CREATE INDEX idx_folders_trashed_at
+  ON folders(trashed_at) WHERE trashed_at IS NOT NULL;
+
+CREATE INDEX idx_notes_trashed_at
+  ON notes(trashed_at) WHERE trashed_at IS NOT NULL;
 
 -- +goose Down
 

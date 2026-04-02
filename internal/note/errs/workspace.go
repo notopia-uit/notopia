@@ -7,12 +7,12 @@ import (
 )
 
 const (
-	CodeWorkspaceNotFound           Code = "workspace_1"
-	CodeWorkspaceBySlugNotFound     Code = "workspace_2"
-	CodeWorkspaceRootFolderNotFound Code = "workspace_3"
-	CodeInvalidWorkspaceName        Code = "workspace_4"
-	CodeInvalidWorkspaceSlug        Code = "workspace_5"
-	CodeWorkspaceSlugAlreadyExists  Code = "workspace_6"
+	CodeWorkspaceNotFound           Code = "workspaceNotFound"
+	CodeWorkspaceBySlugNotFound     Code = "workspaceBySlugNotFound"
+	CodeWorkspaceRootFolderNotFound Code = "workspaceRootFolderNotFound"
+	CodeInvalidWorkspaceName        Code = "invalidWorkspaceName"
+	CodeInvalidWorkspaceSlug        Code = "invalidWorkspaceSlug"
+	CodeWorkspaceSlugAlreadyExists  Code = "workspaceSlugAlreadyExists"
 )
 
 type WorkspaceNotFound struct {

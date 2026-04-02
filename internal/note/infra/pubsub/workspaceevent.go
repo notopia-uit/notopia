@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"reflect"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
@@ -127,7 +126,7 @@ func NewWorkspaceEvent(
 var ProvideWorkspaceEvent = NewWorkspaceEvent
 
 func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...app.WorkspaceEvent) errs.Error {
-	msgs := make([]*message.Message, len(events))
+	msgs := make([]*message.Message, 0, len(events))
 	for _, event := range events {
 		payload, err := json.Marshal(event)
 		if err != nil {
@@ -140,7 +139,7 @@ func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, use
 		msg := message.NewMessage(watermill.NewUUID(), payload)
 		msg.Metadata.Set(MetadataWorkspaceIDKey, fmt.Sprintf("%v", workspaceID))
 		msg.Metadata.Set(metadataUserIDKey, userID)
-		msg.Metadata.Set(metadataEventTypeKey, reflect.TypeOf(event).Elem().Name())
+		msg.Metadata.Set(metadataEventTypeKey, event.GetEvent())
 		msg.SetContext(ctx)
 		msgs = append(msgs, msg)
 	}

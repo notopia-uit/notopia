@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	CodeFolderNotFound       Code = "folder_1"
-	CodeEmptyFolderName      Code = "folder_2"
-	CodeFolderAlreadyTrashed Code = "folder_3"
+	CodeFolderNotFound       Code = "folderNotFound"
+	CodeEmptyFolderName      Code = "folderEmptyName"
+	CodeFolderAlreadyTrashed Code = "folderAlreadyTrashed"
 )
 
 type FolderNotFound struct {

@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	CodeNoteNotFound                     Code = "note_1"
-	CodeNoteFailToMarshalDocumentContent Code = "note_2"
-	CodeNoteAlreadyTrashed               Code = "note_3"
+	CodeNoteNotFound                     Code = "noteNotFound"
+	CodeNoteFailToMarshalDocumentContent Code = "noteFailToMarshalDocumentContent"
+	CodeNoteAlreadyTrashed               Code = "noteAlreadyTrashed"
 )
 
 type NoteNotFound struct {

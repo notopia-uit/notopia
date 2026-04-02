@@ -37,3 +37,5 @@
   - [ ] Health check
 - [ ] Cannot deal with `domain.com:8080/api/v1` base path
 - [ ] no env validation for document, search-worker
+- [ ] Health check to other services (api service, meili, postgres...)
+- [ ] Connection pool max connections, idle, timeout for database, meili

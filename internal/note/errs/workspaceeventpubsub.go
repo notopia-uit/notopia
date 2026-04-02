@@ -3,9 +3,9 @@ package errs
 import "github.com/google/uuid"
 
 var (
-	CodeWorkspaceEventPubSubFailedToCreateMessage Code = "workspaceeventpubsub_1"
-	CodeWorkspaceEventPubSubPublishFailed         Code = "workspaceeventpubsub_2"
-	CodeWorkspaceEventPubSubSubscribeFailed       Code = "workspaceeventpubsub_3"
+	CodeWorkspaceEventPubSubFailedToCreateMessage Code = "workspaceEventPubSubFailedToCreateMessage"
+	CodeWorkspaceEventPubSubPublishFailed         Code = "workspaceEventPubSubPublishFailed"
+	CodeWorkspaceEventPubSubSubscribeFailed       Code = "workspaceEventPubSubSubscribeFailed"
 )
 
 type WorkspaceEventPubSubFailedToCreateMessage struct {

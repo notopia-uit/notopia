@@ -42,6 +42,7 @@ func NewUnitOfWork(queries *pgsqlc.Queries, sdb *sql.DB) *UnitOfWork {
 
 var ProvideUnitOfWork = NewUnitOfWork
 
+// NOTE: an AI said about chaining error is not a good idea?
 func (u *UnitOfWork) Execute(
 	ctx context.Context,
 	fn func(repoRegistry domain.RepoRegistry) errs.Error,
