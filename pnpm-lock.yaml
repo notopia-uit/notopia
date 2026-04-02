@@ -126,9 +126,6 @@ catalogs:
     autoprefixer:
       specifier: 10.4.27
       version: 10.4.27
-    axios:
-      specifier: 1.13.6
-      version: 1.13.6
     class-variance-authority:
       specifier: 0.7.1
       version: 0.7.1
@@ -275,9 +272,6 @@ importers:
       '@nestjs/platform-express':
         specifier: 'catalog:'
         version: 11.1.17(@nestjs/common@11.1.17(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.17)
-      axios:
-        specifier: 'catalog:'
-        version: 1.13.6
       next:
         specifier: 'catalog:'
         version: 16.2.2(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3)

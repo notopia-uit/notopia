@@ -8,7 +8,6 @@
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",
     "@nestjs/platform-express": "catalog:",
-    "axios": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
