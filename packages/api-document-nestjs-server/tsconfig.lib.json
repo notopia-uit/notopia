@@ -3,6 +3,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "module": "esnext",
+    "moduleResolution": "bundler",
     "types": ["node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
