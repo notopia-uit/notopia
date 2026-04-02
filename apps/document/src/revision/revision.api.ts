@@ -1,20 +1,18 @@
 import { HttpUserGuard } from '../common/user.guard';
 import { RevisionService } from './revision.service';
 import { Injectable, UseGuards } from '@nestjs/common';
+import { RevisionApi as RevisionApiDefinition } from '@notopia-uit/api-document-nestjs-server/api';
 import type {
   GetRevisions200Response,
   RenameRevisionRequest,
-} from '@notopia-uit/api-document-nestjs-server';
-import {
   Revision,
-  RevisionApi as _RevisionApi,
-} from '@notopia-uit/api-document-nestjs-server';
+} from '@notopia-uit/api-document-nestjs-server/models';
 import { Traceable } from 'nestjs-otel';
 
 @Injectable()
 @UseGuards(HttpUserGuard)
 @Traceable()
-export class RevisionApi extends _RevisionApi {
+export class RevisionApi extends RevisionApiDefinition {
   constructor(private readonly revisionService: RevisionService) {
     super();
   }

@@ -3,8 +3,10 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 export default defineConfig(() => ({
+  resolve: {
+    tsconfigPaths: true,
+  },
   root: import.meta.dirname,
-  cacheDir: './node_modules/.vite/apps/api-web',
   server: {
     port: 9080,
     host: true,

@@ -5,10 +5,14 @@
   "type": "module",
   "exports": {
     "./note": {
-      "default": "./note.ts"
+      "@nx/source": "./src/note.ts",
+      "types": "./dist/note.d.ts",
+      "import": "./dist/note.js"
     },
     "./authorization": {
-      "default": "./authorization.ts"
+      "@nx/source": "./src/authorization.ts",
+      "types": "./dist/authorization.d.ts",
+      "import": "./dist/authorization.js"
     }
   },
   "peerDependencies": {

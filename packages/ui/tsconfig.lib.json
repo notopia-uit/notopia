@@ -1,31 +1,27 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "moduleResolution": "bundler",
+    "rootDir": "src",
     "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "types": [
       "node",
       "@blocknote/core",
       "@nx/react/typings/cssmodule.d.ts",
-      "@nx/react/typings/image.d.ts"
+      "@nx/react/typings/image.d.ts",
+      "vite/client"
     ],
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "rootDir": "src",
     "jsx": "react-jsx",
-    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
     "paths": {
-      "@/*": ["./src/*"],
-      "@notopia-uit/ui/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/components/ui/*": ["./src/components/ui/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/hooks/*": ["./src/hooks/*"]
+      "@notopia-uit/ui/*": ["./src/*"]
     }
   },
   "exclude": [
     "out-tsc",
     "dist",
-    "jest.config.ts",
-    "jest.config.cts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
     "src/**/*.spec.tsx",
@@ -34,11 +30,9 @@
     "src/**/*.test.js",
     "src/**/*.spec.jsx",
     "src/**/*.test.jsx",
-    "eslint.config.js",
-    "eslint.config.cjs",
     "eslint.config.mjs"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
       "path": "../api-gen/tsconfig.lib.json"

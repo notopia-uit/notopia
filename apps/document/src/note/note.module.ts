@@ -5,7 +5,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NOTE_PACKAGE_NAME } from '@notopia-uit/pb/note';
-import { join } from 'node:path';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -13,6 +13,7 @@ import { join } from 'node:path';
       {
         name: NOTE_PACKAGE_NAME,
         imports: [ConfigModule],
+        inject: [ConfigService],
         useFactory: (configService: ConfigService) => {
           const servicesCfg =
             configService.get<ServicesConfig>(SERVICE_CONFIG)!;
@@ -20,7 +21,10 @@ import { join } from 'node:path';
             transport: Transport.GRPC,
             options: {
               package: NOTE_PACKAGE_NAME,
-              protoPath: join(__dirname, '../../../../proto/note/note.proto'),
+              protoPath: join(__dirname, '../../../proto/note/note.proto'),
+              loader: {
+                includeDirs: [join(__dirname, '../../../proto')],
+              },
               url: servicesCfg.noteUrl,
             },
           };

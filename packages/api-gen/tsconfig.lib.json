@@ -1,17 +1,23 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "noEmit": false,
+    "resolveJsonModule": true,
+    "lib": ["dom", "dom.iterable", "ES2024"],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "rootDir": "src",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "paths": {
+      ".*": ["./src/*"]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": [
-    "dist",
-    "node_modules",
-    "eslint.config.js",
-    "eslint.config.cjs",
-    "eslint.config.mjs"
-  ]
+  "include": ["src/**/*.ts"]
 }

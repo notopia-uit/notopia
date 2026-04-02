@@ -1,5 +1,3 @@
-.gitignore
-README.md
 api-implementations.ts
 api.module.ts
 api/DocumentApi.ts
@@ -11,6 +9,7 @@ controllers/index.ts
 decorators/cookies-decorator.ts
 decorators/headers-decorator.ts
 decorators/index.ts
+index.ts
 models/error.ts
 models/get-document-attachment-upload-url-200-response.ts
 models/get-revisions-200-response.ts

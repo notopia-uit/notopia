@@ -240,10 +240,11 @@ jobs:
       - name: Nx Deploy Page
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           nx-cache-action -- \
           pnpm exec nx ${{ github.event.inputs.forceNxRun == 'true' && 'run-many' || 'affected' }} \
-            ${{ github.ref == 'refs/heads/main' && '--target deployPage' || '' }} \
+            '--target deployPage' \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}

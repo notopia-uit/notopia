@@ -6,7 +6,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AUTHORIZATION_PACKAGE_NAME } from '@notopia-uit/pb/authorization';
-import { join } from 'node:path';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -14,6 +14,7 @@ import { join } from 'node:path';
       {
         name: AUTHORIZATION_PACKAGE_NAME,
         imports: [ConfigModule],
+        inject: [ConfigService],
         useFactory: (configService: ConfigService) => {
           const servicesCfg =
             configService.get<ServicesConfig>(SERVICE_CONFIG)!;
@@ -23,8 +24,11 @@ import { join } from 'node:path';
               package: AUTHORIZATION_PACKAGE_NAME,
               protoPath: join(
                 __dirname,
-                '../../../../proto/authorization/authorization.proto'
+                '../../../proto/authorization/authorization.proto'
               ),
+              loader: {
+                includeDirs: [join(__dirname, '../../../proto')],
+              },
               url: servicesCfg.authorizationUrl,
             },
           };

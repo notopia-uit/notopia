@@ -1,23 +1,29 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "composite": true,
-    "declarationMap": true,
-    "skipDefaultLibCheck": true,
-    "emitDeclarationOnly": true,
+    "strictBindCallApply": false,
+    "noImplicitAny": false,
+    "customConditions": ["@nx/source"],
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
+    "incremental": true,
     "isolatedModules": true,
-    "lib": ["ESNext"],
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "lib": ["es2024"],
+    "module": "preserve",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
+    "outDir": "dist",
+    "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "strict": true,
     "strictFunctionTypes": true,
-    "target": "esnext",
-    "customConditions": ["@nx/source"]
+    "target": "es2024"
   }
 }

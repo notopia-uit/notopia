@@ -1,10 +1,15 @@
 {
+  "extends": "../../tsconfig.base.json",
   "files": [],
   "include": [],
+  "compilerOptions": {
+    "paths": {
+      "@notopia-uit/ui/*": ["./src/*"]
+    }
+  },
   "references": [
     {
       "path": "./tsconfig.lib.json"
     }
-  ],
-  "extends": "../../tsconfig.base.json"
+  ]
 }

@@ -1,36 +1,24 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "types": ["node"],
-    "lib": ["ESNext"],
-    "rootDir": ".",
     "module": "esnext",
-    "moduleResolution": "bundler",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": false,
+    "types": ["node"],
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "esnext",
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false,
-    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
+    "emitDecoratorMetadata": true,
+    "target": "es2024",
+    "sourceMap": true,
+    "declaration": true,
+    "importHelpers": true,
+    "rootDir": "src",
+    "outDir": "dist",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "emitDeclarationOnly": false
+    "isolatedModules": false,
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "paths": {
+      ".*": ["./src/*"]
+    }
   },
-  "include": ["**/*.ts"],
-  "exclude": [
-    "dist",
-    "node_modules",
-    "eslint.config.js",
-    "eslint.config.cjs",
-    "eslint.config.mjs"
-  ]
+  "include": ["src/**/*.ts"]
 }

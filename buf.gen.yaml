@@ -13,7 +13,7 @@ plugins:
     opt:
       - paths=source_relative
   - remote: buf.build/community/stephenh-ts-proto:v2.11.6
-    out: ./packages/pb/
+    out: ./packages/pb/src
     opt:
       - outputServices=grpc-js
       - esModuleInterop=true

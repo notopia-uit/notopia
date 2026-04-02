@@ -1,19 +1,22 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": ".",
-    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
     "module": "esnext",
-    "target": "esnext",
-    "types": ["node"]
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "es2024",
+    "sourceMap": true,
+    "declaration": true,
+    "importHelpers": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "paths": {
+      ".*": ["./src/*"]
+    }
   },
-  "include": ["**/*.ts", "**/*.d.ts"],
-  "exclude": [
-    "dist",
-    "node_modules",
-    "eslint.config.js",
-    "eslint.config.cjs",
-    "eslint.config.mjs"
-  ]
+  "include": ["src/**/*.ts"]
 }
