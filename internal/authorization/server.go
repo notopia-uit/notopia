@@ -3,6 +3,8 @@ package authorization
 import (
 	"context"
 	"log/slog"
+
+	"github.com/notopia-uit/notopia/pkg/otel"
 )
 
 type Server struct {
@@ -13,6 +15,7 @@ type Server struct {
 func NewServer(
 	grpc *GRPCServer,
 	logger *slog.Logger,
+	globalOtel otel.Global,
 ) *Server {
 	slog.SetDefault(logger)
 

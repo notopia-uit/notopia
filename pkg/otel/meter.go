@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"go.opentelemetry.io/contrib/exporters/autoexport"
-	"go.opentelemetry.io/otel"
 	sdk "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
@@ -35,8 +34,6 @@ func NewMeterProvider(
 			)
 		}
 	}
-
-	otel.SetMeterProvider(mp)
 
 	return mp, cleanup, nil
 }

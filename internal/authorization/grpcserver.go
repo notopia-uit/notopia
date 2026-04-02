@@ -12,8 +12,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
 	"github.com/notopia-uit/notopia/pkg/pb"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/sdk/metric"
-	"go.opentelemetry.io/otel/sdk/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -65,8 +63,6 @@ func NewGRPCServer(
 	ctx context.Context,
 	serviceServer pb.AuthorizationServiceServer,
 	cfg *ServerConfig,
-	traceProvider *trace.TracerProvider,
-	meterProvider *metric.MeterProvider,
 	logger logging.Logger,
 ) (*GRPCServer, func(), error) {
 	validator, err := protovalidate.New()
@@ -74,10 +70,7 @@ func NewGRPCServer(
 		return nil, nil, fmt.Errorf("failed to create protovalidate validator: %w", err)
 	}
 	server := grpc.NewServer(
-		grpc.StatsHandler(otelgrpc.NewServerHandler(
-			otelgrpc.WithTracerProvider(traceProvider),
-			otelgrpc.WithMeterProvider(meterProvider),
-		)),
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
 			protovalidate_middleware.UnaryServerInterceptor(validator),

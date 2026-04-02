@@ -49,40 +49,41 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	}
 	grpcServiceServer := authorization.NewGRPCServiceServer(authorizationApp)
 	serverConfig := &config.Server
+	log := &config.Log
+	stdoutHandler := logging.NewStdoutHandler(log)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
 	if err != nil {
 		return nil, nil, err
 	}
-	tracerProvider, cleanup, err := otel.NewTracerProvider(ctx, resource)
+	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, resource)
 	if err != nil {
-		return nil, nil, err
-	}
-	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, resource)
-	if err != nil {
-		cleanup()
-		return nil, nil, err
-	}
-	log := &config.Log
-	stdoutHandler := logging.NewStdoutHandler(log)
-	loggerProvider, cleanup3, err := otel.NewLoggerProvider(ctx, resource)
-	if err != nil {
-		cleanup2()
-		cleanup()
 		return nil, nil, err
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.New(stdoutHandler, slogHandler, log)
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	grpcServer, cleanup4, err := authorization.NewGRPCServer(ctx, grpcServiceServer, serverConfig, tracerProvider, meterProvider, loggingLogger)
+	grpcServer, cleanup2, err := authorization.NewGRPCServer(ctx, grpcServiceServer, serverConfig, loggingLogger)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	meterProvider, cleanup3, err := otel.NewMeterProvider(ctx, resource)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	tracerProvider, cleanup4, err := otel.NewTracerProvider(ctx, resource)
 	if err != nil {
 		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	server := authorization.NewServer(grpcServer, logger)
+	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
+	server := authorization.NewServer(grpcServer, logger, global)
 	return server, func() {
 		cleanup4()
 		cleanup3()

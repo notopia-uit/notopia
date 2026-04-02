@@ -9,6 +9,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/controller/health"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
 	"github.com/notopia-uit/notopia/internal/note/controller/integrationevent"
+	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -28,6 +29,7 @@ func NewServer(
 	health *health.Health,
 	app *app.Server,
 	logger *slog.Logger,
+	globalOtel otel.Global,
 ) *Server {
 	slog.SetDefault(logger)
 

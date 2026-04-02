@@ -12,8 +12,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/pb"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/sdk/metric"
-	"go.opentelemetry.io/otel/sdk/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -45,14 +43,9 @@ var _ app.AuthorizationService = (*Authorization)(nil)
 
 func NewAuthorization(
 	servicesCfg *config.Services,
-	tp *trace.TracerProvider,
-	mp *metric.MeterProvider,
 	logger logging.Logger,
 ) (*Authorization, func(), error) {
-	statsHandler := otelgrpc.NewClientHandler(
-		otelgrpc.WithTracerProvider(tp),
-		otelgrpc.WithMeterProvider(mp),
-	)
+	statsHandler := otelgrpc.NewClientHandler()
 	conn, err := grpc.NewClient(
 		servicesCfg.Authorization.URL,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
