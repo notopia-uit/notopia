@@ -14,9 +14,9 @@ func (h *StrictHandler) CreateFolder(
 	ctx context.Context,
 	request note.CreateFolderRequestObject,
 ) (note.CreateFolderResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	body := request.Body
@@ -49,9 +49,9 @@ func (h *StrictHandler) DeleteFolder(
 	ctx context.Context,
 	request note.DeleteFolderRequestObject,
 ) (note.DeleteFolderResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	cmd := &app.DeleteFolder{
@@ -69,9 +69,9 @@ func (h *StrictHandler) RenameFolder(
 	ctx context.Context,
 	request note.RenameFolderRequestObject,
 ) (note.RenameFolderResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	body := request.Body

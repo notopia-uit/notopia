@@ -34,43 +34,39 @@ type WorkspaceEventPubSub interface {
 type WorkspaceEvent interface {
 	isWorkspaceEvent()
 	GetID() uuid.UUID
-	getEvent() string
-	getData() any
+	GetEvent() string
 }
 
-type workspaceEvent[T any] struct {
-	ID    uuid.UUID
-	Event string
-	Data  T
+type workspaceEvent[E ~string] struct {
+	Id    uuid.UUID
+	Event E
+	Data  any
 }
 
-var _ WorkspaceEvent = (*workspaceEvent[any])(nil)
+var _ WorkspaceEvent = (*workspaceEvent[string])(nil)
 
-func (e workspaceEvent[T]) isWorkspaceEvent() {}
-func (e workspaceEvent[T]) GetID() uuid.UUID  { return e.ID }
-func (e workspaceEvent[T]) getEvent() string  { return e.Event }
-func (e workspaceEvent[T]) getData() any      { return e.Data }
+func (e workspaceEvent[E]) isWorkspaceEvent() {}
+func (e workspaceEvent[E]) GetID() uuid.UUID  { return e.Id }
+func (e workspaceEvent[E]) GetEvent() string  { return string(e.Event) }
 
 type WorkspaceEventWorkspaceMembersUpdated struct {
-	workspaceEvent[note.WorkspaceMembersUpdatedEventData]
+	workspaceEvent[note.WorkspaceMembersUpdatedEventEvent]
 }
 
-var _ WorkspaceEvent = (*WorkspaceEventWorkspaceMembersUpdated)(nil)
-
 type WorkspaceEventWorkspaceItemsChanged struct {
-	workspaceEvent[note.WorkspaceItemsUpdatedEventData]
+	workspaceEvent[note.WorkspaceItemsUpdatedEventEvent]
 }
 
 type WorkspaceEventMembersUpdated struct {
-	workspaceEvent[note.WorkspaceMembersUpdatedEventData]
+	workspaceEvent[note.WorkspaceMembersUpdatedEventEvent]
 }
 
 type WorkspaceEventWorkspaceUpdated struct {
-	workspaceEvent[note.Workspace]
+	workspaceEvent[note.WorkspaceUpdatedEventEvent]
 }
 
 type WorkspaceEventWorkspaceDeleted struct {
-	workspaceEvent[note.WorkspaceDeletedEventData]
+	workspaceEvent[note.WorkspaceDeletedEventEvent]
 }
 
 func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) {
@@ -90,7 +86,7 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 		*domain.NoteRestoredEvent,
 		*domain.NotePermanentlyDeletedEvent:
 		return &WorkspaceEventWorkspaceItemsChanged{
-			workspaceEvent: note.WorkspaceItemsUpdatedEvent{
+			workspaceEvent: workspaceEvent[note.WorkspaceItemsUpdatedEventEvent]{
 				Id:    e.GetID(),
 				Event: note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent,
 				Data: note.WorkspaceItemsUpdatedEventData{
@@ -100,7 +96,7 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 		}, true
 	case *domain.WorkspaceUpdatedEvent:
 		return &WorkspaceEventWorkspaceUpdated{
-			WorkspaceUpdatedEvent: note.WorkspaceUpdatedEvent{
+			workspaceEvent: workspaceEvent[note.WorkspaceUpdatedEventEvent]{
 				Id:    e.GetID(),
 				Event: note.WorkspaceUpdatedEventEventWorkspaceUpdatedEvent,
 				Data: note.Workspace{
@@ -112,7 +108,7 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 		}, true
 	case *domain.WorkspaceDeletedEvent:
 		return &WorkspaceEventWorkspaceDeleted{
-			WorkspaceDeletedEvent: note.WorkspaceDeletedEvent{
+			workspaceEvent: workspaceEvent[note.WorkspaceDeletedEventEvent]{
 				Id:    e.GetID(),
 				Event: note.WorkspaceDeletedEventEventWorkspaceDeletedEvent,
 				Data: note.WorkspaceDeletedEventData{

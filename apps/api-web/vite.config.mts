@@ -28,5 +28,13 @@ export default defineConfig(() => ({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    rollupOptions: {
+      output: {
+        chunkFileNames: (chunkInfo) => {
+          const name = chunkInfo.name.replace(/^_/, '');
+          return `assets/${name}-[hash].js`;
+        },
+      },
+    },
   },
 }));
