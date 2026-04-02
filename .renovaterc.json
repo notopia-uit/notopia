@@ -24,9 +24,8 @@
     },
     {
       "matchPackageNames": ["npm:@typescript/native-preview"],
-      "prerelease": true,
       "automerge": true,
-      "matchUpdateTypes": ["patch", "minor"]
+      "versioning": "loose"
     }
   ],
   "docker-compose": {
