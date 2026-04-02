@@ -30,10 +30,8 @@ export default defineConfig(() => ({
     },
     rollupOptions: {
       output: {
-        chunkFileNames: (chunkInfo) => {
-          const name = chunkInfo.name.replace(/^_/, '');
-          return `assets/${name}-[hash].js`;
-        },
+        chunkFileNames: 'assets/c-[name]-[hash].js',
+        assetFileNames: 'assets/c-[hash][extname]',
       },
     },
   },
