@@ -57,6 +57,6 @@ func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) err
 	if err != nil {
 		return err
 	}
-	folder.Rename(cmd.Name)
+	folder.Rename(cmd.Name, cmd.UserID)
 	return h.folderRepo.Save(ctx, folder)
 }

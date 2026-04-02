@@ -52,6 +52,6 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspac
 	if err != nil {
 		return err
 	}
-	workspace.Delete()
+	workspace.Delete(cmd.UserID)
 	return h.workspaceRepo.Save(ctx, workspace)
 }

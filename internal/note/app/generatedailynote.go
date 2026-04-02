@@ -11,6 +11,7 @@ import (
 type GenerateDailyNote struct {
 	NoteID      uuid.UUID
 	WorkspaceID uuid.UUID
+	UserID      string
 }
 
 type GenerateDailyNoteHandler struct {

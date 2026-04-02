@@ -14,11 +14,11 @@ func NewNoteService() *NoteService {
 
 var ProvideNoteService = NewNoteService
 
-func (s *NoteService) UpdateNoteSizeBasedOnContent(note *Note, content any) errs.Error {
+func (s *NoteService) UpdateNoteSizeBasedOnContent(note *Note, content any, userID string) errs.Error {
 	b, err := json.Marshal(content)
 	if err != nil {
 		return errs.NewNoteFailToMarshalDocumentContent(note.ID(), content, err)
 	}
-	note.SetSize(uint64(len(b)))
+	note.SetSize(uint64(len(b)), userID)
 	return nil
 }

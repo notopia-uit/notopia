@@ -10,6 +10,7 @@ import (
 
 type RestoreTrashedWorkspaceItems struct {
 	WorkspaceID uuid.UUID
+	UserID      string
 	NoteIDs     []uuid.UUID
 	FolderIDs   []uuid.UUID
 }
@@ -64,6 +65,9 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 		}
 
 		notePtrs := notes
+		if err := h.trashService.RestoreNotes(notePtrs, cmd.UserID); err != nil {
+			return err
+		}
 		for _, note := range notePtrs {
 			if err := h.noteRepo.Save(ctx, note); err != nil {
 				return err
@@ -80,7 +84,7 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 			return err
 		}
 
-		if err := h.trashService.RestoreFolders(&trashedNotePtrs, &trashedFolderPtrs, folders); err != nil {
+		if err := h.trashService.RestoreFolders(&trashedNotePtrs, &trashedFolderPtrs, folders, cmd.UserID); err != nil {
 			return err
 		}
 

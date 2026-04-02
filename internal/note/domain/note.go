@@ -75,10 +75,10 @@ func (n *Note) Name() string {
 	return n.name
 }
 
-func (n *Note) Rename(name string) {
+func (n *Note) Rename(name string, userID string) {
 	n.name = name
 	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(n.id),
+		BaseEvent:     *NewBaseEvent(n.id, userID),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -92,10 +92,10 @@ func (n *Note) Icon() *string {
 	return n.icon
 }
 
-func (n *Note) SetIcon(icon string) {
+func (n *Note) SetIcon(icon string, userID string) {
 	n.icon = &icon
 	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(n.id),
+		BaseEvent:     *NewBaseEvent(n.id, userID),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -109,10 +109,10 @@ func (n *Note) Tags() []string {
 	return n.tags
 }
 
-func (n *Note) SetTags(tags []string) {
+func (n *Note) SetTags(tags []string, userID string) {
 	n.tags = tags
 	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(n.id),
+		BaseEvent:     *NewBaseEvent(n.id, userID),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -126,10 +126,10 @@ func (n *Note) Size() uint64 {
 	return n.size
 }
 
-func (n *Note) SetSize(size uint64) {
+func (n *Note) SetSize(size uint64, userID string) {
 	n.size = size
 	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(n.id),
+		BaseEvent:     *NewBaseEvent(n.id, userID),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -143,10 +143,10 @@ func (n *Note) FolderID() uuid.UUID {
 	return n.folderID
 }
 
-func (n *Note) MoveToFolder(folderID uuid.UUID) {
+func (n *Note) MoveToFolder(folderID uuid.UUID, userID string) {
 	n.folderID = folderID
 	n.AddEvent(&NoteMovedEvent{
-		BaseEvent: *NewBaseEvent(n.id),
+		BaseEvent: *NewBaseEvent(n.id, userID),
 		FolderID:  n.folderID,
 	})
 }
@@ -155,10 +155,10 @@ func (n *Note) OutgoingLinks() uuid.UUIDs {
 	return n.outgoingLinks
 }
 
-func (n *Note) SetOutgoingLinks(outgoingLinks uuid.UUIDs) {
+func (n *Note) SetOutgoingLinks(outgoingLinks uuid.UUIDs, userID string) {
 	n.outgoingLinks = outgoingLinks
 	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(n.id),
+		BaseEvent:     *NewBaseEvent(n.id, userID),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -193,21 +193,21 @@ func (n *Note) TrashedAt() *time.Time {
 	return &n.trashed.at
 }
 
-func (n *Note) Trash(trashedBy TrashedBy) errs.Error {
+func (n *Note) Trash(trashedBy TrashedBy, userID string) errs.Error {
 	if n.trashed != nil {
 		return errs.NewNoteAlreadyTrashed(n.id)
 	}
 	n.trashed = NewTrashed(trashedBy, time.Now())
 	n.AddEvent(&NoteTrashedEvent{
-		BaseEvent: *NewBaseEvent(n.id),
+		BaseEvent: *NewBaseEvent(n.id, userID),
 	})
 	return nil
 }
 
-func (n *Note) Restore() {
+func (n *Note) Restore(userID string) {
 	n.trashed = nil
 	n.AddEvent(&NoteRestoredEvent{
-		BaseEvent: *NewBaseEvent(n.id),
+		BaseEvent: *NewBaseEvent(n.id, userID),
 	})
 }
 

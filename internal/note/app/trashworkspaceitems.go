@@ -91,7 +91,7 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 				return err
 			}
 
-			if err := h.trashService.TrashNotes(notes); err != nil {
+			if err := h.trashService.TrashNotes(notes, cmd.UserID); err != nil {
 				return err
 			}
 		}
@@ -106,7 +106,7 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 				return err
 			}
 
-			if err := h.trashService.TrashFolders(&workspaceNotePtrs, &workspaceFolderPtrs, folders); err != nil {
+			if err := h.trashService.TrashFolders(&workspaceNotePtrs, &workspaceFolderPtrs, folders, cmd.UserID); err != nil {
 				return err
 			}
 		}

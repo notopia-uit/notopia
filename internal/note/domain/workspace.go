@@ -48,10 +48,10 @@ func (w *Workspace) Name() string {
 	return w.name
 }
 
-func (w *Workspace) Rename(name string) {
+func (w *Workspace) Rename(name string, userID string) {
 	w.name = name
 	w.AddEvent(&WorkspaceUpdatedEvent{
-		BaseEvent: *NewBaseEvent(w.id),
+		BaseEvent: *NewBaseEvent(w.id, userID),
 		Name:      w.name,
 		Slug:      w.slug,
 	})
@@ -69,10 +69,10 @@ func (w *Workspace) DeletedAt() *time.Time {
 	return w.deletedAt
 }
 
-func (w *Workspace) Delete() {
+func (w *Workspace) Delete(userID string) {
 	w.deletedAt = new(time.Now())
 	w.AddEvent(&WorkspaceDeletedEvent{
-		BaseEvent: *NewBaseEvent(w.id),
+		BaseEvent: *NewBaseEvent(w.id, userID),
 	})
 }
 

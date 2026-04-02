@@ -45,6 +45,7 @@ type BaseEvent struct {
 	ID          uuid.UUID `json:"id"`
 	OccurredAt  time.Time `json:"occurredAt"`
 	AggregateID uuid.UUID `json:"aggregateId"`
+	UserID      string    `json:"userId"`
 }
 
 var _ Event = (*BaseEvent)(nil)
@@ -55,11 +56,12 @@ func (e *BaseEvent) GetOccurredAt() time.Time { return e.OccurredAt }
 
 func (e *BaseEvent) GetAggregateID() uuid.UUID { return e.AggregateID }
 
-func NewBaseEvent(aggregateID uuid.UUID) *BaseEvent {
+func NewBaseEvent(aggregateID uuid.UUID, userID string) *BaseEvent {
 	return &BaseEvent{
 		ID:          uuid.New(),
 		OccurredAt:  time.Now(),
 		AggregateID: aggregateID,
+		UserID:      userID,
 	}
 }
 

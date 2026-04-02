@@ -57,6 +57,6 @@ func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) errs.Er
 	if err != nil {
 		return err
 	}
-	note.Rename(cmd.Name)
+	note.Rename(cmd.Name, cmd.UserID)
 	return h.noterepo.Save(ctx, note)
 }

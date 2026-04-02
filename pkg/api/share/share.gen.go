@@ -48,13 +48,15 @@ type DocumentContent = []map[string]interface{}
 
 // Note defines model for Note.
 type Note struct {
-	FolderId  *PropertiesId       `json:"folderId,omitempty"`
-	Icon      *string             `json:"icon"`
-	Id        *openapi_types.UUID `json:"id,omitempty"`
-	Name      string              `json:"name"`
-	Tags      []string            `json:"tags"`
-	Trashed   *NoteTrashed        `json:"trashed,omitempty"`
-	UpdatedAt *time.Time          `json:"updatedAt,omitempty"`
+	FolderId *PropertiesId       `json:"folderId,omitempty"`
+	Icon     *string             `json:"icon"`
+	Id       *openapi_types.UUID `json:"id,omitempty"`
+
+	// Name Can be empty string when creating but will be set to "Untitled Note" internally
+	Name      string       `json:"name"`
+	Tags      *[]string    `json:"tags,omitempty"`
+	Trashed   *NoteTrashed `json:"trashed,omitempty"`
+	UpdatedAt *time.Time   `json:"updatedAt,omitempty"`
 }
 
 // NoteTrashed defines model for .
@@ -67,7 +69,9 @@ type NoteTrashed struct {
 type NoteCreatedEvent struct {
 	Icon *Icon `json:"icon,omitempty"`
 	Id   *Id   `json:"id,omitempty"`
-	Name Name  `json:"name"`
+
+	// Name Can be empty string when creating but will be set to "Untitled Note" internally
+	Name Name `json:"name"`
 }
 
 // NoteDeletedEvent defines model for NoteDeletedEvent.
@@ -77,7 +81,9 @@ type NoteDeletedEvent struct {
 
 // NoteSearch defines model for NoteSearch.
 type NoteSearch struct {
-	Id   *Id  `json:"id,omitempty"`
+	Id *Id `json:"id,omitempty"`
+
+	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name Name `json:"name"`
 
 	// PlainTextContent Plain text content
@@ -106,7 +112,7 @@ type Icon = string
 // Id defines model for id.
 type Id = openapi_types.UUID
 
-// Name defines model for name.
+// Name Can be empty string when creating but will be set to "Untitled Note" internally
 type Name = string
 
 // PropertiesId defines model for properties-id.

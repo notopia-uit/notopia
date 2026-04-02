@@ -53,7 +53,7 @@ func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) err
 		)
 	}
 	hierarchy := domain.NewFolderHierarchy(&cmd.ParentID)
-	folder, err := domain.NewFolder(cmd.ID, cmd.Name, cmd.Icon, cmd.WorkspaceID, *hierarchy)
+	folder, err := domain.NewFolder(cmd.ID, cmd.Name, cmd.Icon, cmd.WorkspaceID, *hierarchy, cmd.UserID)
 	if err != nil {
 		return err
 	}

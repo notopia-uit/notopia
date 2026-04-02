@@ -94,18 +94,25 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) errs.Error {
 		folderRepo := r.Folder()
 		noteRepo := r.Note()
-		folders, err = folderRepo.GetMany(ctx,
-			domain.NewFolderRepoGetManyParamsByIDs(cmd.FolderIDs).
-				WithWorkspaceID(cmd.WorkspaceID).
-				WithForUpdate())
-		if err != nil {
-			return err
+
+		if len(cmd.FolderIDs) == 0 && len(cmd.NoteIDs) == 0 {
+			return nil
 		}
-		for _, folder := range folders {
-			folder.MoveToFolder(cmd.DestinationFolderID)
-		}
-		if err := folderRepo.SaveMany(ctx, folders); err != nil {
-			return err
+
+		if len(cmd.FolderIDs) > 0 {
+			folders, err = folderRepo.GetMany(ctx,
+				domain.NewFolderRepoGetManyParamsByIDs(cmd.FolderIDs).
+					WithWorkspaceID(cmd.WorkspaceID).
+					WithForUpdate())
+			if err != nil {
+				return err
+			}
+			for _, folder := range folders {
+				folder.MoveToFolder(cmd.DestinationFolderID, cmd.UserID)
+			}
+			if err := folderRepo.SaveMany(ctx, folders); err != nil {
+				return err
+			}
 		}
 		notes, err = noteRepo.GetMany(ctx,
 			domain.NewNoteRepoGetManyParamsByIDs(cmd.NoteIDs).
@@ -115,7 +122,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			return err
 		}
 		for _, note := range notes {
-			note.MoveToFolder(cmd.DestinationFolderID)
+			note.MoveToFolder(cmd.DestinationFolderID, cmd.UserID)
 		}
 		if err := noteRepo.SaveMany(ctx, notes); err != nil {
 			return err

@@ -9,9 +9,10 @@ import (
 )
 
 type CreateWorkspace struct {
-	ID   uuid.UUID
-	Name string
-	Slug string
+	ID     uuid.UUID
+	Name   string
+	Slug   string
+	UserID string
 }
 
 type CreateWorkspaceHandler struct {
@@ -44,7 +45,7 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 	}
 	rootFolderID := uuid.New()
 	rootHierarchy := domain.NewFolderHierarchy(nil)
-	rootFolder, err := domain.NewFolder(rootFolderID, cmd.Name, nil, cmd.ID, *rootHierarchy)
+	rootFolder, err := domain.NewFolder(rootFolderID, cmd.Name, nil, cmd.ID, *rootHierarchy, cmd.UserID)
 	if err != nil {
 		return err
 	}

@@ -24,6 +24,7 @@ func NewFolder(
 	icon *string,
 	workspaceID uuid.UUID,
 	folderHierarchy FolderHierarchy,
+	userID string,
 ) (*Folder, errs.Error) {
 	if name == "" {
 		return nil, errs.EmptyFolderName
@@ -40,7 +41,7 @@ func NewFolder(
 	}
 	folder.AddEvent(
 		&FolderCreatedEvent{
-			BaseEvent: *NewBaseEvent(folder.id),
+			BaseEvent: *NewBaseEvent(folder.id, userID),
 			Name:      folder.name,
 			Icon:      folder.icon,
 		},
@@ -76,10 +77,10 @@ func (f *Folder) Name() string {
 	return f.name
 }
 
-func (f *Folder) Rename(name string) {
+func (f *Folder) Rename(name string, userID string) {
 	f.name = name
 	f.AddEvent(&FolderUpdatedEvent{
-		BaseEvent: *NewBaseEvent(f.id),
+		BaseEvent: *NewBaseEvent(f.id, userID),
 		Name:      f.name,
 		Icon:      f.icon,
 	})
@@ -89,10 +90,10 @@ func (f *Folder) Icon() *string {
 	return f.icon
 }
 
-func (f *Folder) SetIcon(icon string) {
+func (f *Folder) SetIcon(icon string, userID string) {
 	f.icon = &icon
 	f.AddEvent(&FolderUpdatedEvent{
-		BaseEvent: *NewBaseEvent(f.id),
+		BaseEvent: *NewBaseEvent(f.id, userID),
 		Name:      f.name,
 		Icon:      f.icon,
 	})
@@ -114,12 +115,12 @@ func (f *Folder) IsRoot() bool {
 	return f.folderHierarchy.IsRoot()
 }
 
-func (f *Folder) MoveToFolder(folderID uuid.UUID) {
+func (f *Folder) MoveToFolder(folderID uuid.UUID, userID string) {
 	hierarchy := NewFolderHierarchy(&folderID)
 	f.folderHierarchy = *hierarchy
 	f.AddEvent(
 		&FolderMovedEvent{
-			BaseEvent: *NewBaseEvent(f.id),
+			BaseEvent: *NewBaseEvent(f.id, userID),
 			ParentID:  folderID,
 		},
 	)
@@ -150,21 +151,21 @@ func (f *Folder) TrashedAt() *time.Time {
 	return &f.trashed.at
 }
 
-func (f *Folder) Trash(trashedBy TrashedBy) errs.Error {
+func (f *Folder) Trash(trashedBy TrashedBy, userID string) errs.Error {
 	if f.trashed != nil {
 		return errs.NewFolderAlreadyTrashed(f.id)
 	}
 	f.trashed = NewTrashed(trashedBy, time.Now())
 	f.AddEvent(&FolderTrashedEvent{
-		BaseEvent: *NewBaseEvent(f.id),
+		BaseEvent: *NewBaseEvent(f.id, userID),
 	})
 	return nil
 }
 
-func (f *Folder) Restore() {
+func (f *Folder) Restore(userID string) {
 	f.trashed = nil
 	f.AddEvent(&FolderRestoredEvent{
-		BaseEvent: *NewBaseEvent(f.id),
+		BaseEvent: *NewBaseEvent(f.id, userID),
 	})
 }
 

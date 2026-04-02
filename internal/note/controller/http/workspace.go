@@ -17,14 +17,20 @@ func (h *StrictHandler) CreateWorkspace(
 	ctx context.Context,
 	request note.CreateWorkspaceRequestObject,
 ) (note.CreateWorkspaceResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
+
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, errs.NewInternalGenerateID(err)
 	}
 	cmd := &app.CreateWorkspace{
-		ID:   id,
-		Name: request.Body.Name,
-		Slug: request.Body.Slug,
+		ID:     id,
+		Name:   request.Body.Name,
+		Slug:   request.Body.Slug,
+		UserID: user.ID,
 	}
 	err = h.App.CommandHandlers.CreateWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
@@ -226,7 +232,33 @@ func (h *StrictHandler) RestoreTrashedWorkspaceItems(
 	ctx context.Context,
 	request note.RestoreTrashedWorkspaceItemsRequestObject,
 ) (note.RestoreTrashedWorkspaceItemsResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
+
+	var noteIDs []uuid.UUID
+	if request.Body.NoteIds != nil {
+		noteIDs = *request.Body.NoteIds
+	}
+
+	var folderIDs []uuid.UUID
+	if request.Body.FolderIds != nil {
+		folderIDs = *request.Body.FolderIds
+	}
+
+	cmd := &app.RestoreTrashedWorkspaceItems{
+		WorkspaceID: request.WorkspaceId,
+		UserID:      user.ID,
+		NoteIDs:     noteIDs,
+		FolderIDs:   folderIDs,
+	}
+	err := h.App.CommandHandlers.RestoreTrashedWorkspaceItemsHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.RestoreTrashedWorkspaceItems204Response{}, nil
 }
 
 func (h *StrictHandler) ShowTrash(

@@ -8,7 +8,10 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/share"
 )
 
-type DocumentCommitted share.DocumentCommittedEvent
+type DocumentCommitted struct {
+	share.DocumentCommittedEvent
+	UserID string
+}
 
 type DocumentCommittedHandler struct {
 	noteRepo    domain.NoteRepo
@@ -32,12 +35,12 @@ func (h *DocumentCommittedHandler) Handle(ctx context.Context, event *DocumentCo
 	if err != nil {
 		return err
 	}
-	err = h.noteService.UpdateNoteSizeBasedOnContent(note, event.Content)
+	err = h.noteService.UpdateNoteSizeBasedOnContent(note, event.Content, event.UserID)
 	if err != nil {
 		return err
 	}
-	note.SetTags(event.Tags)
-	note.SetOutgoingLinks(event.OutgoingLinkIds)
+	note.SetTags(event.Tags, event.UserID)
+	note.SetOutgoingLinks(event.OutgoingLinkIds, event.UserID)
 	slog.InfoContext(
 		ctx,
 		"Document committed event handled",

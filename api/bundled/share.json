@@ -317,7 +317,8 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
-        "example": "Meeting Notes"
+        "example": "Meeting Notes",
+        "description": "Can be empty string when creating but will be set to \"Untitled Note\" internally"
       },
       "icon": {
         "type": "string",
@@ -351,7 +352,8 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 255,
-            "example": "Meeting Notes"
+            "example": "Meeting Notes",
+            "description": "Can be empty string when creating but will be set to \"Untitled Note\" internally"
           },
           "icon": {
             "type": "string",
@@ -369,7 +371,8 @@
             "example": [
               "work",
               "meeting"
-            ]
+            ],
+            "readOnly": true
           },
           "updatedAt": {
             "type": "string",

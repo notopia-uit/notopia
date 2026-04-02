@@ -53,6 +53,6 @@ func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspac
 	if err != nil {
 		return err
 	}
-	workspace.Rename(cmd.Name)
+	workspace.Rename(cmd.Name, cmd.UserID)
 	return h.workspacerepo.Save(ctx, workspace)
 }
