@@ -193,6 +193,8 @@ func pbWorkspacePermissionToApp(perm pb.WorkspacePermission) app.WorkspacePermis
 		return app.WorkspacePermissionEdit
 	case pb.WorkspacePermission_WORKSPACE_PERMISSION_DELETE:
 		return app.WorkspacePermissionDelete
+	case pb.WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED:
+		panic("invalid workspace permission")
 	default:
 		panic("invalid workspace permission")
 	}
@@ -206,6 +208,8 @@ func pbWorkspaceItemPermissionToApp(perm pb.WorkspaceItemPermission) app.Workspa
 		return app.WorkspaceItemPermissionWrite
 	case pb.WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_DELETE:
 		return app.WorkspaceItemPermissionDelete
+	case pb.WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_UNSPECIFIED:
+		panic("invalid workspace item permission")
 	default:
 		panic("invalid workspace item permission")
 	}

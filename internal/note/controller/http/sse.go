@@ -21,7 +21,6 @@ type workspaceEventSSESender struct {
 	writer    io.Writer
 	flusher   http.Flusher
 	mu        sync.Mutex
-	closed    chan struct{}
 	closeOnce sync.Once
 }
 
@@ -37,23 +36,11 @@ func newWorworkspaceEventSSESender(
 		writer:    w,
 		flusher:   flusher,
 		mu:        sync.Mutex{},
-		closed:    make(chan struct{}),
 		closeOnce: sync.Once{},
 	}
 }
 
-func (s *workspaceEventSSESender) Close() error {
-	var err error
-	s.closeOnce.Do(func() {
-		close(s.closed)
-		if closer, ok := s.writer.(io.Closer); ok {
-			err = closer.Close()
-		}
-	})
-	return fmt.Errorf("failed to close SSE sender: %v", err)
-}
-
-func (s *workspaceEventSSESender) Send(event app.WorkspaceEvent) error {
+func (s *workspaceEventSSESender) send(event app.WorkspaceEvent) error {
 	payload, err := json.Marshal(event)
 	if err != nil {
 		return err
@@ -111,8 +98,6 @@ func (s *workspaceEventSSESender) Stream() {
 			select {
 			case <-s.ctx.Done():
 				return
-			case <-s.closed:
-				return
 			case <-ticker.C:
 				if err := s.sendHeartBeat(); err != nil {
 					slog.Warn("failed to send heartbeat", "error", err)
@@ -123,7 +108,7 @@ func (s *workspaceEventSSESender) Stream() {
 				if !ok {
 					return
 				}
-				_ = s.Send(evt)
+				_ = s.send(evt)
 			}
 		}
 	}()
