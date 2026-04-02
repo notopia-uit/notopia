@@ -4,7 +4,6 @@
   "compilerOptions": {
     "module": "esnext",
     "types": ["node"],
-    "moduleResolution": "bundler",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2024",
