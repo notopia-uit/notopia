@@ -7,6 +7,7 @@ func (c Code) String() string {
 }
 
 const (
+	CodeUnauthorized       Code = "unauthorized"
 	CodeForbidden          Code = "forbidden"
 	CodeInvalid            Code = "invalid"
 	CodeUnimplemented      Code = "unimplemented"
@@ -31,6 +32,19 @@ func (e Err) Error() string   { return e.message }
 func (e Err) Unwrap() error   { return e.err }
 func (e Err) Code() Code      { return e.code }
 func (e Err) Message() string { return e.message }
+
+type Unauthorized struct {
+	Err
+}
+
+func NewUnauthorized() *Unauthorized {
+	return &Unauthorized{
+		Err: Err{
+			message: "unauthorized",
+			code:    CodeUnauthorized,
+		},
+	}
+}
 
 type Forbidden struct {
 	Err

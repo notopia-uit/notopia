@@ -17,6 +17,8 @@ func toHTTPErr(err *errs.Err) (
 	code = err.Code().String()
 	statusCode = 500
 	switch err.Code() {
+	case errs.CodeUnauthorized:
+		statusCode = 401
 	case errs.CodeForbidden:
 		statusCode = 403
 	case errs.CodeInvalid:

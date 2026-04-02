@@ -2,11 +2,7 @@ package http
 
 import (
 	"context"
-	"encoding/json"
 	"io"
-	"log/slog"
-	"sync"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -46,16 +42,16 @@ func (h *StrictHandler) DeleteWorkspace(
 	ctx context.Context,
 	request note.DeleteWorkspaceRequestObject,
 ) (note.DeleteWorkspaceResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	cmd := &app.DeleteWorkspace{
 		ID:     request.WorkspaceId,
 		UserID: user.ID,
 	}
-	err = h.App.CommandHandlers.DeleteWorkspaceHandler.Handle(ctx, cmd)
+	err := h.App.CommandHandlers.DeleteWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -104,71 +100,19 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	if !ok {
 		return nil, errs.NewInternal("failed to cast context to gin.Context", nil)
 	}
-	user, err := commonhttp.UserFromContextError(c)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
+
 	eventCh, err := h.WorkspaceEventPubSub.Subscribe(ctx, request.WorkspaceId, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, errs.NewInternal("failed to subscribe to workspace events", err)
 	}
-	ticker := time.NewTicker(15 * time.Second)
-	defer ticker.Stop()
 	r, w := io.Pipe()
-	mu := &sync.Mutex{}
-	go func() {
-		defer func() {
-			if err := w.Close(); err != nil {
-				slog.ErrorContext(c, "failed to close pipe writer in workspace events stream", slog.String("error", err.Error()))
-			}
-		}()
-		for {
-			select {
-			case <-c.Done():
-				return
-			case <-ticker.C:
-				heartBeat := note.HeartBeatWorkspaceEvent{
-					Event:     note.HeartBeatWorkspaceEventEventHeartBeatWorkspaceEvent,
-					Timestamp: time.Now(),
-				}
-				heartBeatBytes, err := json.Marshal(heartBeat)
-				if err != nil {
-					slog.ErrorContext(c, "failed to marshal keep-alive comment to JSON in workspace events stream", slog.String("error", err.Error()))
-					continue
-				}
-				payload := append(heartBeatBytes, []byte("\n\n")...)
-				mu.Lock()
-				if _, err := w.Write(payload); err != nil {
-					slog.ErrorContext(c, "failed to write keep-alive comment in workspace events stream", slog.String("error", err.Error()))
-					mu.Unlock()
-					return
-				}
-				c.Writer.Flush()
-				mu.Unlock()
-				slog.DebugContext(c, "sent keep-alive comment in workspace events stream")
-			case event, ok := <-eventCh:
-				if !ok {
-					slog.InfoContext(c, "workspace event channel closed")
-					return
-				}
-				eventBytes, err := json.Marshal(event)
-				if err != nil {
-					slog.ErrorContext(c, "failed to marshal event to JSON", slog.String("error", err.Error()))
-					continue
-				}
-				payload := append(eventBytes, []byte("\n\n")...)
-				mu.Lock()
-				if _, err := w.Write(payload); err != nil {
-					slog.ErrorContext(c, "failed to write event to stream", slog.String("error", err.Error()))
-					mu.Unlock()
-					return
-				}
-				c.Writer.Flush()
-				mu.Unlock()
-				slog.DebugContext(c, "sent event in workspace events stream", slog.Any("event", event))
-			}
-		}
-	}()
+	sender := newWorkspaceEventSSESender(ctx, eventCh, w, c.Writer)
+	sender.Stream()
+
 	//exhaustruct:ignore
 	return note.GetWorkspaceEvents200TexteventStreamResponse{
 		Body: r,
@@ -214,21 +158,19 @@ func (h *StrictHandler) MoveWorkspaceItems(
 	ctx context.Context,
 	request note.MoveWorkspaceItemsRequestObject,
 ) (note.MoveWorkspaceItemsResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	var noteIDs []uuid.UUID
 	if request.Body.NoteIds != nil {
-		noteIDs = make([]uuid.UUID, len(*request.Body.NoteIds))
-		copy(noteIDs, *request.Body.NoteIds)
+		noteIDs = *request.Body.NoteIds
 	}
 
 	var folderIDs []uuid.UUID
 	if request.Body.FolderIds != nil {
-		folderIDs = make([]uuid.UUID, len(*request.Body.FolderIds))
-		copy(folderIDs, *request.Body.FolderIds)
+		folderIDs = *request.Body.FolderIds
 	}
 
 	var destFolderID uuid.UUID
@@ -243,7 +185,7 @@ func (h *StrictHandler) MoveWorkspaceItems(
 		FolderIDs:           folderIDs,
 		DestinationFolderID: destFolderID,
 	}
-	err = h.App.CommandHandlers.MoveWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.CommandHandlers.MoveWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -262,9 +204,9 @@ func (h *StrictHandler) RenameWorkspace(
 	ctx context.Context,
 	request note.RenameWorkspaceRequestObject,
 ) (note.RenameWorkspaceResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	cmd := &app.RenameWorkspace{
@@ -272,7 +214,7 @@ func (h *StrictHandler) RenameWorkspace(
 		Name:   request.Body.Name,
 		UserID: user.ID,
 	}
-	err = h.App.CommandHandlers.RenameWorkspaceHandler.Handle(ctx, cmd)
+	err := h.App.CommandHandlers.RenameWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -307,9 +249,9 @@ func (h *StrictHandler) TrashWorkspaceItems(
 	ctx context.Context,
 	request note.TrashWorkspaceItemsRequestObject,
 ) (note.TrashWorkspaceItemsResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	cmd := &app.TrashWorkspaceItems{
@@ -318,7 +260,7 @@ func (h *StrictHandler) TrashWorkspaceItems(
 		NoteIDs:     *request.Body.NoteIds,
 		FolderIDs:   *request.Body.FolderIds,
 	}
-	err = h.App.CommandHandlers.TrashWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.CommandHandlers.TrashWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -362,9 +304,9 @@ func (h *StrictHandler) PermanentlyDeleteWorkspaceItems(
 	ctx context.Context,
 	request note.PermanentlyDeleteWorkspaceItemsRequestObject,
 ) (note.PermanentlyDeleteWorkspaceItemsResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	var noteIDs []uuid.UUID
@@ -383,7 +325,7 @@ func (h *StrictHandler) PermanentlyDeleteWorkspaceItems(
 		NoteIDs:     noteIDs,
 		FolderIDs:   folderIDs,
 	}
-	err = h.App.CommandHandlers.PermanentlyDeleteWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.CommandHandlers.PermanentlyDeleteWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}

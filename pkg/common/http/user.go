@@ -2,7 +2,6 @@ package commonhttp
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -41,14 +40,6 @@ func userToContext(ctx context.Context, user *User) context.Context {
 func UserFromContext(ctx context.Context) (*User, bool) {
 	u, ok := ctx.Value(UserCtxKey).(*User)
 	return u, ok
-}
-
-func UserFromContextError(ctx context.Context) (*User, error) {
-	u, ok := UserFromContext(ctx)
-	if !ok {
-		return nil, fmt.Errorf("user not found in context")
-	}
-	return u, nil
 }
 
 func GatewayUserAuth() gin.HandlerFunc {

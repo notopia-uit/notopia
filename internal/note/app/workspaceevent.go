@@ -32,38 +32,41 @@ type WorkspaceEventPubSub interface {
 }
 
 type WorkspaceEvent interface {
-	IsWorkspaceEvent()
+	isWorkspaceEvent()
+	GetID() uuid.UUID
+	GetEvent() string
 }
 
-type workspaceEvent struct{}
+type workspaceEvent[E ~string] struct {
+	Id    uuid.UUID `json:"id"`
+	Event E         `json:"event"`
+	Data  any       `json:"data"`
+}
 
-var _ WorkspaceEvent = (*workspaceEvent)(nil)
+var _ WorkspaceEvent = (*workspaceEvent[string])(nil)
 
-func (e *workspaceEvent) IsWorkspaceEvent() {}
+func (e workspaceEvent[E]) isWorkspaceEvent() {}
+func (e workspaceEvent[E]) GetID() uuid.UUID  { return e.Id }
+func (e workspaceEvent[E]) GetEvent() string  { return string(e.Event) }
 
 type WorkspaceEventWorkspaceMembersUpdated struct {
-	workspaceEvent
-	note.WorkspaceMembersUpdatedEvent
+	workspaceEvent[note.WorkspaceMembersUpdatedEventEvent]
 }
 
 type WorkspaceEventWorkspaceItemsChanged struct {
-	workspaceEvent
-	note.WorkspaceItemsUpdatedEvent
+	workspaceEvent[note.WorkspaceItemsUpdatedEventEvent]
 }
 
 type WorkspaceEventMembersUpdated struct {
-	workspaceEvent
-	note.WorkspaceMembersUpdatedEvent
+	workspaceEvent[note.WorkspaceMembersUpdatedEventEvent]
 }
 
 type WorkspaceEventWorkspaceUpdated struct {
-	workspaceEvent
-	note.WorkspaceUpdatedEvent
+	workspaceEvent[note.WorkspaceUpdatedEventEvent]
 }
 
 type WorkspaceEventWorkspaceDeleted struct {
-	workspaceEvent
-	note.WorkspaceDeletedEvent
+	workspaceEvent[note.WorkspaceDeletedEventEvent]
 }
 
 func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) {
@@ -83,7 +86,7 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 		*domain.NoteRestoredEvent,
 		*domain.NotePermanentlyDeletedEvent:
 		return &WorkspaceEventWorkspaceItemsChanged{
-			WorkspaceItemsUpdatedEvent: note.WorkspaceItemsUpdatedEvent{
+			workspaceEvent: workspaceEvent[note.WorkspaceItemsUpdatedEventEvent]{
 				Id:    e.GetID(),
 				Event: note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent,
 				Data: note.WorkspaceItemsUpdatedEventData{
@@ -93,7 +96,7 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 		}, true
 	case *domain.WorkspaceUpdatedEvent:
 		return &WorkspaceEventWorkspaceUpdated{
-			WorkspaceUpdatedEvent: note.WorkspaceUpdatedEvent{
+			workspaceEvent: workspaceEvent[note.WorkspaceUpdatedEventEvent]{
 				Id:    e.GetID(),
 				Event: note.WorkspaceUpdatedEventEventWorkspaceUpdatedEvent,
 				Data: note.Workspace{
@@ -105,7 +108,7 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 		}, true
 	case *domain.WorkspaceDeletedEvent:
 		return &WorkspaceEventWorkspaceDeleted{
-			WorkspaceDeletedEvent: note.WorkspaceDeletedEvent{
+			workspaceEvent: workspaceEvent[note.WorkspaceDeletedEventEvent]{
 				Id:    e.GetID(),
 				Event: note.WorkspaceDeletedEventEventWorkspaceDeletedEvent,
 				Data: note.WorkspaceDeletedEventData{

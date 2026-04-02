@@ -14,9 +14,9 @@ func (h *StrictHandler) CreateNote(
 	ctx context.Context,
 	request note.CreateNoteRequestObject,
 ) (note.CreateNoteResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	id, err := uuid.NewV7()
@@ -55,16 +55,16 @@ func (h *StrictHandler) DeleteNote(
 	ctx context.Context,
 	request note.DeleteNoteRequestObject,
 ) (note.DeleteNoteResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	cmd := &app.DeleteNote{
 		ID:     request.NoteId,
 		UserID: user.ID,
 	}
-	err = h.App.CommandHandlers.DeleteNoteHandler.Handle(ctx, cmd)
+	err := h.App.CommandHandlers.DeleteNoteHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +76,9 @@ func (h *StrictHandler) GetNote(
 	ctx context.Context,
 	request note.GetNoteRequestObject,
 ) (note.GetNoteResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	query := &app.GetNote{
@@ -150,9 +150,9 @@ func (h *StrictHandler) RenameNote(
 	ctx context.Context,
 	request note.RenameNoteRequestObject,
 ) (note.RenameNoteResponseObject, error) {
-	user, err := commonhttp.UserFromContextError(ctx)
-	if err != nil {
-		return nil, err
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
 
 	cmd := &app.RenameNote{
@@ -160,7 +160,7 @@ func (h *StrictHandler) RenameNote(
 		Name:   request.Body.Name,
 		UserID: user.ID,
 	}
-	err = h.App.CommandHandlers.RenameNoteHandler.Handle(ctx, cmd)
+	err := h.App.CommandHandlers.RenameNoteHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
