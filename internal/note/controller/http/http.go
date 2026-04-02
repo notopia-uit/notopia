@@ -113,7 +113,7 @@ func New(
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		if err := server.Shutdown(shutdownCtx); err != nil {
-			logger.ErrorContext(ctx, "failed to shutdown http server", slog.String("error", err.Error()))
+			logger.ErrorContext(ctx, "failed to shutdown http server", slog.Any("error", err))
 		}
 	}
 	return server, cleanup, nil

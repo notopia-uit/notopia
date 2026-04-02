@@ -21,7 +21,7 @@ func NewRedisClient(
 	})
 	cleanup := func() {
 		if err := client.Close(); err != nil {
-			logger.Error("failed to shutdown Redis client", slog.String("error", err.Error()))
+			logger.Error("failed to shutdown Redis client", slog.Any("error", err))
 		}
 	}
 	return (*RedisClient)(client), cleanup

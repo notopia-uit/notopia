@@ -31,7 +31,7 @@ func NewMeterProvider(
 		if err := mp.Shutdown(ctx); err != nil {
 			slog.Error(
 				"Error shutting down MeterProvider",
-				slog.String("error", err.Error()),
+				slog.Any("error", err),
 			)
 		}
 	}

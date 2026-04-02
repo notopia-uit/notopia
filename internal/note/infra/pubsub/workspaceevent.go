@@ -208,7 +208,7 @@ func (w *WorkspaceEvent) Subscribe(
 					continue
 				}
 				if err := json.Unmarshal(msg.Payload, event); err != nil {
-					slog.ErrorContext(ctx, "failed to unmarshal event", slog.String("error", err.Error()))
+					slog.ErrorContext(ctx, "failed to unmarshal event", slog.Any("error", err))
 					msg.Ack()
 					continue
 				}

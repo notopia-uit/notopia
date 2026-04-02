@@ -32,7 +32,7 @@ func NewTracerProvider(
 		if err := tp.Shutdown(context.Background()); err != nil {
 			slog.Error(
 				"Error shutting down TracerProvider",
-				slog.String("error", err.Error()),
+				slog.Any("error", err),
 			)
 		}
 	}

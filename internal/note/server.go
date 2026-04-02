@@ -52,7 +52,7 @@ func (s *Server) Run(ctx context.Context) error {
 		go func() {
 			<-ctx.Done()
 			if err := s.http.Shutdown(context.Background()); err != nil {
-				s.logger.ErrorContext(ctx, "failed to shutdown http server", slog.String("error", err.Error()))
+				s.logger.ErrorContext(ctx, "failed to shutdown http server", slog.Any("error", err))
 			}
 		}()
 		return s.http.Run()
@@ -70,7 +70,7 @@ func (s *Server) Run(ctx context.Context) error {
 		go func() {
 			<-ctx.Done()
 			if err := s.health.Shutdown(context.Background()); err != nil {
-				s.logger.ErrorContext(ctx, "failed to shutdown health server", slog.String("error", err.Error()))
+				s.logger.ErrorContext(ctx, "failed to shutdown health server", slog.Any("error", err))
 			}
 		}()
 		return s.health.Run()

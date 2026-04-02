@@ -35,7 +35,7 @@ func NewLoggerProvider(
 		if err := lp.Shutdown(context.Background()); err != nil {
 			slog.Error(
 				"Error shutting down LoggerProvider",
-				slog.String("error", err.Error()),
+				slog.Any("error", err),
 			)
 		}
 	}
