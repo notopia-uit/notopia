@@ -1,5 +1,6 @@
 import { AuthorizationModule } from './authorization/authorization.module';
 import { BlockNoteModule } from './blocknote/blocknote.module';
+import { HttpUserGuard } from './common/user.guard';
 import { AppConfig } from './config/config';
 import {
   APP_CONFIG,
@@ -21,6 +22,7 @@ import { RevisionService } from './revision/revision.service';
 import { StorageModule } from './storage/storage.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
 import { OpenTelemetryModule } from 'nestjs-otel';
@@ -82,6 +84,12 @@ import pretty from 'pino-pretty';
         ],
       }
     ),
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: HttpUserGuard,
+    },
   ],
 })
 export class AppModule {}

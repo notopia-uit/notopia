@@ -16,7 +16,7 @@ export const createDatasourceOptions = async (
     database: databaseCfg.database,
     entities: [DocumentEntity, RevisionEntity],
     synchronize,
-  } as DataSourceOptions;
+  } satisfies DataSourceOptions;
 };
 
 export const createDatasource = async (

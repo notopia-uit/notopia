@@ -1,3 +1,5 @@
+import { User } from './common/user';
+
 declare namespace NodeJS {
   interface ProcessEnv {
     OTEL_SDK_DISABLED?: 'true' | 'false'; // Standard: Master switch
@@ -44,5 +46,13 @@ declare namespace NodeJS {
 
     NOTOPIA_DOCUMENT_SERVICES_NOTE_GPRC_URL?: string;
     NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_GRPC_URL?: string;
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
   }
 }

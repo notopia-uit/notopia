@@ -52,9 +52,12 @@ export class RevisionService {
 
   // No checking exist first
   async renameRevision(revisionId: string, name: string | null): Promise<void> {
-    await this.dataSource
+    const result = await this.dataSource
       .getRepository(RevisionEntity)
       .update(revisionId, { name });
+    if (result.affected === 0) {
+      throw new NotFoundException(`Revision ${revisionId} not found`);
+    }
   }
 
   async deleteRevision(revisionId: string): Promise<void> {

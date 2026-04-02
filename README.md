@@ -36,3 +36,4 @@
 - [ ] Authorization service
   - [ ] Health check
 - [ ] Cannot deal with `domain.com:8080/api/v1` base path
+- [ ] no env validation for document, search-worker

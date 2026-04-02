@@ -9,6 +9,7 @@
     "@grpc/grpc-js": "catalog:",
     "@grpc/proto-loader": "catalog:",
     "@hocuspocus/extension-database": "catalog:",
+    "@hocuspocus/extension-logger": "catalog:",
     "@hocuspocus/server": "catalog:",
     "@nestjs/common": "catalog:",
     "@nestjs/config": "catalog:",
@@ -41,7 +42,8 @@
     "rxjs": "catalog:",
     "tslib": "catalog:",
     "typeorm": "catalog:",
-    "ws": "catalog:"
+    "ws": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",

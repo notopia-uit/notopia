@@ -3,19 +3,24 @@ import { DocumentRepository } from '../document/document.repository';
 import { NoteService } from '../note/note.service';
 import { HocuspocusContext } from './hocuspocus-context';
 import { Database } from '@hocuspocus/extension-database';
+import { Logger as HocuspocusLogger } from '@hocuspocus/extension-logger';
 import { Hocuspocus } from '@hocuspocus/server';
-import { Provider } from '@nestjs/common';
+import { Logger, Provider } from '@nestjs/common';
 
 export const HocuspocusProvider: Provider = {
   provide: Hocuspocus,
   useFactory: (
     documentRepository: DocumentRepository,
     noteService: NoteService,
-    authorizationService: AuthorizationService
+    authorizationService: AuthorizationService,
+    logger: Logger
   ) => {
     return new Hocuspocus({
       name: 'document', // TODO: Inject host
       extensions: [
+        new HocuspocusLogger({
+          log: (message) => logger.log(message),
+        }),
         new Database({
           fetch: async ({ documentName: id }) => {
             const document = await documentRepository.getById(id);
@@ -52,9 +57,10 @@ export const HocuspocusProvider: Provider = {
 
       async beforeHandleMessage(data) {
         const { context, connection } = data;
+        const userId = (context as HocuspocusContext).user.id;
 
         const response = await authorizationService.getUserNotePermissions(
-          context.userId,
+          userId,
           data.documentName
         );
 
@@ -72,5 +78,5 @@ export const HocuspocusProvider: Provider = {
       },
     });
   },
-  inject: [DocumentRepository, NoteService, AuthorizationService],
+  inject: [DocumentRepository, NoteService, AuthorizationService, Logger],
 };

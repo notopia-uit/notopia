@@ -36,6 +36,9 @@ catalogs:
     '@hocuspocus/extension-database':
       specifier: 3.4.4
       version: 3.4.4
+    '@hocuspocus/extension-logger':
+      specifier: 3.4.4
+      version: 3.4.4
     '@hocuspocus/server':
       specifier: 3.4.4
       version: 3.4.4
@@ -498,6 +501,9 @@ importers:
       '@hocuspocus/extension-database':
         specifier: 'catalog:'
         version: 3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
+      '@hocuspocus/extension-logger':
+        specifier: 'catalog:'
+        version: 3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
       '@hocuspocus/server':
         specifier: 'catalog:'
         version: 3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
@@ -597,6 +603,9 @@ importers:
       ws:
         specifier: 'catalog:'
         version: 8.19.0
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       '@nestjs/testing':
         specifier: 'catalog:'
@@ -682,6 +691,9 @@ importers:
       tslib:
         specifier: 'catalog:'
         version: 2.8.1
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       '@nestjs/testing':
         specifier: 'catalog:'
@@ -2469,6 +2481,9 @@ packages:
     resolution: {integrity: sha512-z7iq2Dw+GOp4aQq7ys3PD0BA++7tQdXBsSHZ+8mkAbxfTDzjzQ576TphxPiXXC1WQ7yjeFXq03xp/KLIhg3Pyg==}
     peerDependencies:
       yjs: ^13.6.8
+
+  '@hocuspocus/extension-logger@3.4.4':
+    resolution: {integrity: sha512-GEnjmvQlrDlr5hoTQ8NHStZkzpL42wkwZ5XOBMkEX/TgqcnEtKCK1SOK0xj+px9tEHaflDLtCq6f5oy4gOCkPQ==}
 
   '@hocuspocus/server@3.4.4':
     resolution: {integrity: sha512-UV+oaONAejOzeYgUygNcgsc8RdZvSokVvAxluZJIisLACpRO/VsseQ5lWKDRwLd7Fn6+rHWDH3hGuQ1fdX1Ycg==}
@@ -18178,6 +18193,15 @@ snapshots:
       - bufferutil
       - utf-8-validate
       - y-protocols
+
+  '@hocuspocus/extension-logger@3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)':
+    dependencies:
+      '@hocuspocus/server': 3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - y-protocols
+      - yjs
 
   '@hocuspocus/server@3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)':
     dependencies:
