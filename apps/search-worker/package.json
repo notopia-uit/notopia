@@ -25,8 +25,7 @@
     "pino-pretty": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
-    "tslib": "catalog:",
-    "zod": "catalog:"
+    "tslib": "catalog:"
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",

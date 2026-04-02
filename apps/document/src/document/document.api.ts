@@ -1,6 +1,6 @@
 import { User } from '../common/user';
 import { DocumentService } from './document.service';
-import { UnauthorizedException  } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { DocumentApi as DocumentApiDefinition } from '@notopia-uit/api-document-nestjs-server/api';
 import { Traceable } from 'nestjs-otel';
 
