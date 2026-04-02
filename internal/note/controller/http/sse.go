@@ -16,27 +16,25 @@ import (
 )
 
 type workspaceEventSSESender struct {
-	ctx       context.Context
-	eventCh   <-chan app.WorkspaceEvent
-	writer    io.Writer
-	flusher   http.Flusher
-	mu        sync.Mutex
-	closeOnce sync.Once
+	ctx     context.Context
+	eventCh <-chan app.WorkspaceEvent
+	writer  *io.PipeWriter
+	flusher http.Flusher
+	mu      sync.Mutex
 }
 
 func newWorkspaceEventSSESender(
 	ctx context.Context,
 	eventCh <-chan app.WorkspaceEvent,
-	w io.Writer,
+	w *io.PipeWriter,
 	flusher http.Flusher,
 ) *workspaceEventSSESender {
 	return &workspaceEventSSESender{
-		ctx:       ctx,
-		eventCh:   eventCh,
-		writer:    w,
-		flusher:   flusher,
-		mu:        sync.Mutex{},
-		closeOnce: sync.Once{},
+		ctx:     ctx,
+		eventCh: eventCh,
+		writer:  w,
+		flusher: flusher,
+		mu:      sync.Mutex{},
 	}
 }
 
@@ -97,6 +95,9 @@ func (s *workspaceEventSSESender) Stream() {
 		for {
 			select {
 			case <-s.ctx.Done():
+				if err := s.writer.Close(); err != nil {
+					slog.Warn("failed to close SSE writer", "error", err)
+				}
 				return
 			case <-ticker.C:
 				if err := s.sendHeartBeat(); err != nil {
