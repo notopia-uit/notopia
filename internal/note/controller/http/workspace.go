@@ -110,7 +110,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 		return nil, errs.NewInternal("failed to subscribe to workspace events", err)
 	}
 	r, w := io.Pipe()
-	sender := newWorworkspaceEventSSESender(ctx, eventCh, w, c.Writer)
+	sender := newWorkspaceEventSSESender(ctx, eventCh, w, c.Writer)
 	sender.Stream()
 
 	//exhaustruct:ignore

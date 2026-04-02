@@ -38,9 +38,9 @@ type WorkspaceEvent interface {
 }
 
 type workspaceEvent[E ~string] struct {
-	Id    uuid.UUID
-	Event E
-	Data  any
+	Id    uuid.UUID `json:"id"`
+	Event E         `json:"event"`
+	Data  any       `json:"data"`
 }
 
 var _ WorkspaceEvent = (*workspaceEvent[string])(nil)

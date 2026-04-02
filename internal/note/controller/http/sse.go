@@ -24,7 +24,7 @@ type workspaceEventSSESender struct {
 	closeOnce sync.Once
 }
 
-func newWorworkspaceEventSSESender(
+func newWorkspaceEventSSESender(
 	ctx context.Context,
 	eventCh <-chan app.WorkspaceEvent,
 	w io.Writer,
