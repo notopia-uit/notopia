@@ -1,5 +1,5 @@
 import { DocumentEntity } from '../document/document.entity';
-import { Block } from '@notopia-uit/ui';
+import { Block } from '@blocknote/core';
 import {
   Column,
   CreateDateColumn,

@@ -7,6 +7,7 @@ import type {
   ShareNoteUpdatedEvent,
 } from '@notopia-uit/api-gen';
 
+// TODO: blocknote editor from schema, from the raw payload json. Then to html
 // TODO: Suggest add a class implement the event (dto?) for validator
 @Controller()
 export class AppController {

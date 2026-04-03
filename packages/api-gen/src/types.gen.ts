@@ -47,6 +47,9 @@ export type ShareDocument = {
 
 export type ShareId = string;
 
+/**
+ * Can be empty string when creating but will be set to "Untitled Note" internally
+ */
 export type ShareName = string;
 
 export type ShareIcon = string | null;
@@ -59,10 +62,13 @@ export type ShareTrashedBy = typeof ShareTrashedBy[keyof typeof ShareTrashedBy];
 
 export type ShareNote = {
     readonly id: string;
+    /**
+     * Can be empty string when creating but will be set to "Untitled Note" internally
+     */
     name: string;
     icon: string | null;
     folderId: SharePropertiesId;
-    tags: Array<string>;
+    readonly tags: Array<string>;
     readonly updatedAt: Date;
     readonly trashed: {
         trashedBy: ShareTrashedBy;
@@ -366,9 +372,11 @@ export type ShareNoteUpdatedEventWritable = ShareNoteWritable;
 export type ShareDocumentContentWritable = Array<unknown>;
 
 export type ShareNoteWritable = {
+    /**
+     * Can be empty string when creating but will be set to "Untitled Note" internally
+     */
     name: string;
     icon: string | null;
-    tags: Array<string>;
 };
 
 export type DocumentRevisionWritable = {

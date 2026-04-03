@@ -1,21 +1,20 @@
 {
+  "name": "packages/block-note",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "packages/api-document-nestjs-server",
+  "sourceRoot": "packages/block-note/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/js:swc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "{projectRoot}/dist",
-        "main": "{projectRoot}/src/index.ts",
-        "tsConfig": "{projectRoot}/tsconfig.lib.json",
+        "outputPath": "packages/block-note/dist",
+        "main": "packages/block-note/src/index.ts",
+        "tsConfig": "packages/block-note/tsconfig.lib.json",
         "skipTypeCheck": true,
         "stripLeadingPaths": true
       }
-    },
-    "lint": {
-      "executor": "nx:noop"
     }
   }
 }

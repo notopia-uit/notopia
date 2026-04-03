@@ -4,6 +4,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
     "@aws-sdk/s3-request-presigner": "catalog:",
+    "@blocknote/core": "catalog:",
     "@blocknote/server-util": "catalog:",
     "@bufbuild/protobuf": "catalog:",
     "@grpc/grpc-js": "catalog:",
@@ -20,9 +21,9 @@
     "@nestjs/typeorm": "catalog:",
     "@nestjs/websockets": "catalog:",
     "@notopia-uit/api-document-nestjs-server": "workspace:",
+    "@notopia-uit/block-note": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@notopia-uit/pb": "workspace:",
-    "@notopia-uit/ui": "workspace:",
     "@opentelemetry/api": "catalog:",
     "@opentelemetry/auto-instrumentations-node": "catalog:",
     "@opentelemetry/resources": "catalog:",

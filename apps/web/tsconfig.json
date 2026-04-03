@@ -13,8 +13,10 @@
     ],
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
-      "./*": ["./src/*"],
-      "@notopia-uit/ui/*": ["../../packages/ui/src/*"]
+      "@/*": ["./src/*"],
+      "@notopia-uit/ui/*": ["../../packages/ui/src/*"],
+      "@notopia-uit/api-gen/*": ["../../packages/api-gen/src/*"],
+      "@notopia-uit/block-note/*": ["../../packages/block-note/src/*"]
     }
   },
   "include": [
@@ -22,10 +24,9 @@
     "src/**/*.tsx",
     "src/**/*.js",
     "src/**/*.jsx",
-    "../../packages/ui/src/**/*.ts",
-    "../../packages/ui/src/**/*.tsx",
     "next-env.d.ts",
-    "index.d.ts"
+    "index.d.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "out-tsc",

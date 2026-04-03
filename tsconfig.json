@@ -2,6 +2,7 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
+  "include": [],
   "references": [
     {
       "path": "./apps/web"
@@ -29,6 +30,9 @@
     },
     {
       "path": "./apps/search-worker"
+    },
+    {
+      "path": "./packages/block-note"
     }
   ]
 }

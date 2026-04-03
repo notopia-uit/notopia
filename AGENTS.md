@@ -13,6 +13,7 @@ apps/                           # JS/TS applications
 packages/                       # JS packages
   api-document-nestjs-server    # NestJS server codegen from OpenAPI spec, using openapi-generator
   api-gen                       # Frontend API client codegen from OpenAPI spec, using heyapi/openapi-ts
+  block-note                    # BlockNote editor component, share between backend services, and packages/ui
   lib                           # Share code, blocknote model,...
   pb                            # Protobuf generated code, use grpc, protovalidate
   ui                            # React UI components, using shadcn/ui

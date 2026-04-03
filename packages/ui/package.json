@@ -5,36 +5,20 @@
   "main": "./dist/index.mjs",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.mjs"
+      "default": "./src/index.ts"
     },
     "./lib/utils": {
-      "types": "./src/lib/utils.ts",
-      "import": "./dist/lib/utils.mjs",
-      "default": "./dist/lib/utils.mjs"
+      "default": "./src/lib/utils.mjs"
     },
     "./styles": "./src/globals.css"
-  },
-  "peerDependencies": {
-    "@blocknote/core": "catalog:",
-    "@blocknote/react": "catalog:",
-    "@blocknote/server-util": "catalog:",
-    "@icons-pack/react-simple-icons": "catalog:",
-    "@notopia-uit/api-gen": "workspace:",
-    "class-variance-authority": "catalog:",
-    "clsx": "catalog:",
-    "lucide-react": "catalog:",
-    "radix-ui": "catalog:",
-    "react": "catalog:",
-    "shadcn": "catalog:"
   },
   "dependencies": {
     "@blocknote/core": "catalog:",
     "@blocknote/react": "catalog:",
-    "@blocknote/server-util": "catalog:",
+    "@blocknote/shadcn": "catalog:",
     "@icons-pack/react-simple-icons": "catalog:",
     "@notopia-uit/api-gen": "workspace:",
+    "@notopia-uit/block-note": "workspace:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "date-fns": "^4.1.0",
@@ -49,6 +33,5 @@
     "postcss": "catalog:",
     "tailwind-merge": "catalog:",
     "tw-animate-css": "catalog:"
-  },
-  "types": "./src/index.ts"
+  }
 }

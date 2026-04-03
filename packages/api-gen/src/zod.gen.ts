@@ -23,6 +23,9 @@ export const zShareNoteDeletedEvent = z.object({
     id: zShareId
 });
 
+/**
+ * Can be empty string when creating but will be set to "Untitled Note" internally
+ */
 export const zShareName = z.string().min(1).max(255);
 
 export const zShareNoteSearch = z.object({
@@ -49,7 +52,7 @@ export const zShareNote = z.object({
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
     folderId: zSharePropertiesId,
-    tags: z.array(z.string()),
+    tags: z.array(z.string()).readonly(),
     updatedAt: z.iso.datetime().readonly(),
     trashed: z.object({
         trashedBy: zShareTrashedBy,
@@ -295,8 +298,7 @@ export const zShareDocumentContentWritable = z.array(z.unknown());
 
 export const zShareNoteWritable = z.object({
     name: z.string().min(1).max(255),
-    icon: z.string().nullable(),
-    tags: z.array(z.string())
+    icon: z.string().nullable()
 });
 
 export const zShareNoteUpdatedEventWritable = zShareNoteWritable;

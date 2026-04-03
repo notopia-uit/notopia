@@ -4,7 +4,7 @@ import { NoteModule } from '../note/note.module';
 import { NoteService } from '../note/note.service';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createBlockNoteSchema } from '@notopia-uit/ui';
+import { createBlockNoteSchema } from '@notopia-uit/block-note';
 
 export const BLOCKNOTE_SCHEMA = Symbol('BLOCKNOTE_SCHEMA');
 

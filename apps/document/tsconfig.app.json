@@ -18,16 +18,16 @@
       "./*": ["./src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../../packages/block-note/src/global.d.ts"],
   "references": [
-    {
-      "path": "../../packages/ui/tsconfig.lib.json"
-    },
     {
       "path": "../../packages/pb/tsconfig.lib.json"
     },
     {
       "path": "../../packages/lib/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/block-note/tsconfig.lib.json"
     },
     {
       "path": "../../packages/api-document-nestjs-server/tsconfig.lib.json"

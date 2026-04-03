@@ -32,8 +32,11 @@
     "src/**/*.test.jsx",
     "eslint.config.mjs"
   ],
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "../block-note/src/global.d.ts"],
   "references": [
+    {
+      "path": "../block-note/tsconfig.lib.json"
+    },
     {
       "path": "../api-gen/tsconfig.lib.json"
     }
