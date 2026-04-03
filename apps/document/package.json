@@ -1,6 +1,11 @@
 {
   "name": "@notopia-uit/document",
   "private": true,
+  "scripts": {
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "typeorm:extension": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-extension/bin/cli.mjs",
+    "typeorm:extension:seed": "ts-node -r tsconfig-paths/register ./database/seed.ts"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
     "@aws-sdk/s3-request-presigner": "catalog:",
@@ -41,6 +46,7 @@
     "react-dom": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
+    "tsconfig-paths/register": "catalog:",
     "tslib": "catalog:",
     "typeorm": "catalog:",
     "ws": "catalog:"

@@ -36,6 +36,19 @@ lsp.config("gopls", {
   },
 })
 
+---@type lsp.vtsls
+local tsgo_setting = {
+  typescript = {
+    preferences = {
+      importModuleSpecifier = "non-relative",
+    },
+  },
+}
+
+lsp.config("tsgo", {
+  settings = tsgo_setting,
+})
+
 if vim.fn.executable("harper-ls") == 1 then
   lsp.enable("harper_ls")
 end

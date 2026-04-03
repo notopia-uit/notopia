@@ -7,7 +7,6 @@ import { blockNoteTagSpec } from './blocknote-tag';
 import { BlockNoteSchema as OriginalBlockNoteSchema } from '@blocknote/core';
 
 export function createBlockNoteSchema({
-  baseUrl,
   getNoteName,
 }: {
   baseUrl: string;
@@ -16,7 +15,6 @@ export function createBlockNoteSchema({
   return OriginalBlockNoteSchema.create().extend({
     inlineContentSpecs: {
       reference: createBlockNoteReferenceSpec({
-        baseUrl,
         getNoteName,
       }),
       tag: blockNoteTagSpec,

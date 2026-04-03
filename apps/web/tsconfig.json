@@ -13,7 +13,7 @@
     ],
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
-      "@/*": ["./src/*"],
+      "#/*": ["./src/*"],
       "@notopia-uit/ui/*": ["../../packages/ui/src/*"],
       "@notopia-uit/api-gen/*": ["../../packages/api-gen/src/*"],
       "@notopia-uit/block-note/*": ["../../packages/block-note/src/*"]

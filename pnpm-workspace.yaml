@@ -19,6 +19,7 @@ catalog:
   '@blocknote/shadcn': '0.47.3'
   '@bufbuild/buf': '1.64.0'
   typeorm-extension: '3.9.0'
+  tsconfig-paths/register: 4.2.0
   '@grpc/proto-loader': '0.8.0'
   ts-node: '10.9.2'
   '@bufbuild/protobuf': '2.11.0'

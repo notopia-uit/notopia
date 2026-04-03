@@ -13,7 +13,7 @@
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
-      "./*": ["./src/*"]
+      "*": ["./src/*"]
     }
   },
   "include": ["src/**/*"],

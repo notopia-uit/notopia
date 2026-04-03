@@ -15,7 +15,8 @@
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
-      "./*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@database/*": ["./database/*"]
     }
   },
   "include": ["src/**/*", "../../packages/block-note/src/global.d.ts"],

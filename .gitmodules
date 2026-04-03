@@ -1,0 +1,3 @@
+[submodule "trshpuppy-obsidian-notes"]
+	path = submodule/trshpuppy-obsidian-notes
+	url = https://github.com/TrshPuppy/obsidian-notes

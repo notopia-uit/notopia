@@ -14,7 +14,7 @@
     "isolatedModules": false,
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
-      "./*": ["./src/*"]
+      "*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts"]

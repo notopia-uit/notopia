@@ -28,11 +28,14 @@ export const blockNoteTagSpec: BlockNoteTagInlineContentSpec =
       </span>
     ),
 
-    toExternalHTML: (props) => (
-      <span data-notopia-tag={props.inlineContent.props.tag}>
-        #{props.inlineContent.props.tag}
-      </span>
-    ),
+    toExternalHTML: (props) => {
+      const tag = props.inlineContent.props.tag;
+      return (
+        <a href={`#${tag}`} data-notopia-tag={tag}>
+          #{tag}
+        </a>
+      );
+    },
 
     parse: (element) => {
       if (element.hasAttribute('data-notopia-tag')) {

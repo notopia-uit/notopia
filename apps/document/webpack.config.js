@@ -10,6 +10,12 @@ const { join } = require('path');
  * @returns {import('webpack').Configuration}
  */
 module.exports = () => ({
+  resolve: {
+    alias: {
+      '@': join(__dirname, 'src'),
+      '@database': join(__dirname, 'database'),
+    },
+  },
   externals: [
     nodeExternals({
       allowlist: [

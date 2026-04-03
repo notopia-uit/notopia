@@ -60,10 +60,8 @@ const ReferenceLink = ({
 
 export const createBlockNoteReferenceSpec = ({
   getNoteName,
-  baseUrl,
 }: {
   getNoteName: getNoteNameFn;
-  baseUrl: string;
 }): BlockNoteReferenceInlineContentSpec =>
   createReactInlineContentSpec(BlockNoteReferenceConfig, {
     render: (props) => {
@@ -76,12 +74,9 @@ export const createBlockNoteReferenceSpec = ({
     },
 
     toExternalHTML: (props) => {
-      const noteUrl = new URL(
-        `/note/${props.inlineContent.props.noteId}`,
-        baseUrl
-      ).href;
+      const id = props.inlineContent.props.noteId;
       return (
-        <a href={noteUrl} data-notopia-ref={props.inlineContent.props.noteId}>
+        <a href={`@${id}`} data-notopia-ref={id}>
           @{props.inlineContent.props.noteId}
         </a>
       );
@@ -90,7 +85,7 @@ export const createBlockNoteReferenceSpec = ({
     parse: (element) => {
       if (element.hasAttribute('data-notopia-ref')) {
         return {
-          noteId: element.getAttribute('data-notopia-ref') || 'unknown',
+          noteId: element.getAttribute('data-notopia-ref')!,
         };
       }
       return undefined;

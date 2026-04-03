@@ -1,0 +1,29 @@
+// database/seed.ts
+import AppDataSource from '#/database/datasource.typeorm';
+import { ServerBlockNoteEditor } from '@blocknote/server-util';
+import { createBlockNoteSchema } from '@notopia-uit/block-note';
+
+async function run() {
+  try {
+    console.log('🌱 Initializing DataSource...');
+    await AppDataSource.initialize();
+
+    const blockNoteSchema = createBlockNoteSchema({
+      baseUrl: '',
+      getNoteName: () => Promise.resolve(''),
+    });
+    // TODO: will do with editor later
+    ServerBlockNoteEditor.create({ schema: blockNoteSchema });
+
+    console.log('🏃 Running Seeders...');
+    // seed
+
+    console.log('✅ Seeding completed!');
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Seeding failed:', error);
+    process.exit(1);
+  }
+}
+
+void run();
