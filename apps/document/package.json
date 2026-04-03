@@ -47,6 +47,8 @@
   "devDependencies": {
     "@nestjs/testing": "catalog:",
     "@types/ws": "catalog:",
+    "ts-node": "catalog:",
+    "typeorm-extension": "catalog:",
     "webpack-node-externals": "catalog:"
   }
 }
