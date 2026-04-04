@@ -196,8 +196,8 @@ catalogs:
       specifier: 1.6.0
       version: 1.6.0
     meilisearch:
-      specifier: 0.56.0
-      version: 0.56.0
+      specifier: 0.57.0
+      version: 0.57.0
     nestjs-otel:
       specifier: 8.0.2
       version: 8.0.2
@@ -720,7 +720,7 @@ importers:
         version: 2.2.4
       meilisearch:
         specifier: 'catalog:'
-        version: 0.56.0
+        version: 0.57.0
       nestjs-otel:
         specifier: 'catalog:'
         version: 8.0.2(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)
@@ -12260,8 +12260,9 @@ packages:
     resolution: {integrity: sha512-aisnrDP4GNe06UcKFnV5bfMNPBUw4jsLGaWwWfnH3v02GnBuXX2MCVn5RbrWo0j3pczUilYblq7fQ7Nw2t5XKw==}
     engines: {node: '>= 0.8'}
 
-  meilisearch@0.56.0:
-    resolution: {integrity: sha512-kBXba8DcSrLWHYqopCm2JL90oBy97VdIfHkP1ii7/eHufeEEEk9Zu5Vv/IFQpNzmhEpWszVFVlGvZoI6QJeGzA==}
+  meilisearch@0.57.0:
+    resolution: {integrity: sha512-J3ZdX6MjguEIG9Yo+duRZeVsbMdRuwM2OFvJUs8wZSeBADYZ2qc1eajlClKLRqS/mAhGh2bLiU5SbmhKXKuWSw==}
+    engines: {node: ^20.19.0 || >=22.12.0}
 
   memfs@3.5.3:
     resolution: {integrity: sha512-UERzLsxzllchadvbPs5aolHh65ISpKpM+ccLbOJ8/vvpBKmAWf+la7dXFy7Mr0ySHbdHrFv5kGFCUHHe6GFEmw==}
@@ -31020,7 +31021,7 @@ snapshots:
 
   media-typer@1.1.0: {}
 
-  meilisearch@0.56.0: {}
+  meilisearch@0.57.0: {}
 
   memfs@3.5.3:
     dependencies:
