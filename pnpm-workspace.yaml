@@ -103,9 +103,9 @@ catalog:
   meilisearch: '0.56.0'
   kafkajs: '2.2.4'
   '@swc-node/register': '1.11.1'
-  '@swc/cli': '0.8.0'
-  '@swc/core': '1.15.21'
-  '@swc/helpers': '0.5.20'
+  '@swc/cli': '0.8.1'
+  '@swc/core': '1.15.24'
+  '@swc/helpers': '0.5.21'
 onlyBuiltDependencies:
   - '@bufbuild/buf'
   - '@nestjs/core'
