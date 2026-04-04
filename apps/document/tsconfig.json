@@ -12,5 +12,9 @@
     {
       "path": "./tsconfig.app.json"
     }
-  ]
+  ],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "loader": "ts-node/esm"
+  }
 }

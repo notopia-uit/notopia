@@ -1,0 +1,3 @@
+[shell_alias]
+typeorm = "pnpm typeorm"
+typeorm-extension = "pnpm typeorm-extension"
