@@ -1,10 +1,11 @@
 {
   "name": "@notopia-uit/document",
   "private": true,
+  "type": "module",
   "scripts": {
-    "typeorm": "ts-node ./node_modules/typeorm/cli.js -d ./src/database/datasource.typeorm.ts",
-    "typeorm-extension": "ts-node ./node_modules/typeorm-extension/bin/cli.mjs",
-    "typeorm-extension:seed": "ts-node ./database/seed.ts"
+    "typeorm": "tsx ./node_modules/typeorm/cli.js",
+    "typeorm-extension": "tsx ./node_modules/typeorm-extension/bin/cli.mjs",
+    "typeorm-extension:seed": "tsx ./database/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
@@ -53,10 +54,15 @@
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",
+    "@swc/core": "catalog:",
+    "@swc/helpers": "catalog:",
     "@types/ws": "catalog:",
-    "ts-node": "catalog:",
     "tsconfig-paths": "catalog:",
+    "tsx": "catalog:",
     "typeorm-extension": "catalog:",
     "webpack-node-externals": "catalog:"
+  },
+  "imports": {
+    "#/*": "./src/*.js"
   }
 }

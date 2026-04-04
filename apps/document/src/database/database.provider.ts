@@ -1,6 +1,6 @@
-import { DatabaseConfig } from '../config/config';
-import { DocumentEntity } from '../document/document.entity';
-import { RevisionEntity } from '../revision/revision.entity';
+import { DatabaseConfig } from '../config/config.ts';
+import { DocumentEntity } from '../document/document.entity.ts';
+import { RevisionEntity } from '../revision/revision.entity.ts';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 export const createDatasourceOptions = async (

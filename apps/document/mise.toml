@@ -1,3 +1,4 @@
 [shell_alias]
-typeorm = "pnpm typeorm"
-typeorm-extension = "pnpm typeorm-extension"
+typeorm = "pnpm run typeorm"
+typeorm-extension = "pnpm run typeorm-extension"
+ts-node = "pnpm exec ts-node"

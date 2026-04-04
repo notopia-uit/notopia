@@ -1,9 +1,13 @@
-import { NxAppRspackPlugin } from '@nx/rspack/app-plugin';
+import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
 import type { Configuration } from '@rspack/cli';
 import rspack from '@rspack/core';
 import { builtinModules } from 'module';
-import { join } from 'path';
+import { createRequire } from 'node:module';
+import { join } from 'node:path';
 import nodeExternals from 'webpack-node-externals';
+
+const require = createRequire(import.meta.url);
+const __dirname = import.meta.dirname;
 
 const isEsm = false;
 const tsConfigFile = join(__dirname, 'tsconfig.app.json');

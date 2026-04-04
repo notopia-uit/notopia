@@ -1,4 +1,9 @@
-import { AppConfig, DatabaseConfig, S3Config, ServicesConfig } from './config';
+import {
+  AppConfig,
+  DatabaseConfig,
+  S3Config,
+  ServicesConfig,
+} from './config.ts';
 import { registerAs } from '@nestjs/config';
 
 export const APP_CONFIG = Symbol('APP_CONFIG');

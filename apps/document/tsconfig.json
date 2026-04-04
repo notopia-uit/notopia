@@ -1,20 +1,34 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "moduleResolution": "bundler",
+    "types": ["node"],
     "paths": {
       "#/*": ["./src/*"]
     }
   },
   "files": [],
-  "include": [],
+  "include": ["src/**/*", "database/**/*"],
   "exclude": ["dist/**/*", "node_modules"],
   "references": [
     {
+      "path": "../../packages/pb"
+    },
+    {
+      "path": "../../packages/lib"
+    },
+    {
+      "path": "../../packages/api-document-nestjs-server"
+    },
+    {
+      "path": "../../packages/block-note"
+    },
+    {
       "path": "./tsconfig.app.json"
     }
-  ],
-  "ts-node": {
-    "require": ["tsconfig-paths/register"],
-    "loader": "ts-node/esm"
-  }
+  ]
 }
