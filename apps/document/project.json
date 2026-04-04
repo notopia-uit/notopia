@@ -2,11 +2,6 @@
   "name": "document",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "release": {
-    "docker": {
-      "repositoryName": "notopia-uit/document"
-    }
-  },
   "targets": {
     "prune-lockfile": {
       "dependsOn": ["build"],
@@ -52,19 +47,24 @@
       "executor": "@nx/js:node",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "document:build:development"
+        "buildTarget": "development"
       },
       "configurations": {
         "development": {
-          "buildTarget": "document:build:development"
+          "buildTarget": "development"
         },
         "development-mon": {
-          "buildTarget": "document:build:development"
+          "buildTarget": "development"
         },
         "production": {
-          "buildTarget": "document:build:production"
+          "buildTarget": "production"
         }
       }
+    }
+  },
+  "release": {
+    "docker": {
+      "repositoryName": "notopia-uit/document"
     }
   }
 }

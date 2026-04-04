@@ -45,12 +45,13 @@ import pretty from 'pino-pretty';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const appCfg = configService.get<AppConfig>(APP_CONFIG)!;
-        const level = appCfg.logLevel;
-        const stream = pretty({ colorize: true, ignore: 'pid,hostname' });
         return {
           pinoHttp: {
-            level,
-            stream,
+            level: appCfg.logLevel,
+            stream:
+              appCfg.env !== 'production'
+                ? pretty({ colorize: true, ignore: 'pid,hostname' })
+                : undefined,
           },
         };
       },

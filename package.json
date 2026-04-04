@@ -28,7 +28,6 @@
     "@nx/rspack": "22.6.4",
     "@nx/vite": "22.6.4",
     "@nx/web": "22.6.4",
-    "@nx/webpack": "22.6.4",
     "@rspack/cli": "catalog:",
     "@rspack/core": "catalog:",
     "@rspack/dev-server": "catalog:",
@@ -69,8 +68,7 @@
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",
-    "vitest": "catalog:",
-    "webpack-cli": "6.0.1"
+    "vitest": "catalog:"
   },
   "packageManager": "pnpm@10.28.2"
 }

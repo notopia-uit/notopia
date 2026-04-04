@@ -7,10 +7,10 @@
       "defaultConfiguration": "development",
       "configurations": {
         "development": {
-          "args": ["--node-env=development"]
+          "mode": "development"
         },
         "production": {
-          "args": ["--node-env=production"]
+          "mode": "production"
         }
       }
     },
@@ -44,17 +44,17 @@
       "executor": "@nx/js:node",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "search-worker:build:development"
+        "buildTarget": "development"
       },
       "configurations": {
         "development": {
-          "buildTarget": "search-worker:build:development"
+          "buildTarget": "development"
         },
         "development-mon": {
-          "buildTarget": "search-worker:build:development"
+          "buildTarget": "development"
         },
         "production": {
-          "buildTarget": "search-worker:build:production"
+          "buildTarget": "production"
         }
       }
     },
