@@ -19,7 +19,11 @@ catalog:
   '@blocknote/shadcn': '0.47.3'
   '@bufbuild/buf': '1.64.0'
   typeorm-extension: '3.9.0'
-  tsconfig-paths/register: 4.2.0
+  tsconfig-paths: '4.2.0'
+  '@rspack/cli': '1.7.11'
+  '@rspack/core': '1.7.11'
+  '@rspack/dev-server': '^1.1.4'
+  tsconfig-paths-webpack-plugin: 4.2.0
   '@grpc/proto-loader': '0.8.0'
   ts-node: '10.9.2'
   '@bufbuild/protobuf': '2.11.0'
@@ -99,10 +103,10 @@ catalog:
   '@hocuspocus/extension-logger': '3.4.4'
   meilisearch: '0.56.0'
   kafkajs: '2.2.4'
-  '@swc-node/register': 1.11.1
-  '@swc/cli': 0.8.0
-  '@swc/core': 1.15.21
-  '@swc/helpers': 0.5.20
+  '@swc-node/register': '1.11.1'
+  '@swc/cli': '0.8.0'
+  '@swc/core': '1.15.21'
+  '@swc/helpers': '0.5.20'
 onlyBuiltDependencies:
   - '@bufbuild/buf'
   - '@nestjs/core'

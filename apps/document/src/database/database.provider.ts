@@ -16,6 +16,8 @@ export const createDatasourceOptions = async (
     database: databaseCfg.database,
     entities: [DocumentEntity, RevisionEntity],
     synchronize,
+    logging: true,
+    logger: 'simple-console',
   } satisfies DataSourceOptions;
 };
 

@@ -6,7 +6,8 @@
     }
   },
   "files": [],
-  "include": ["database/**/*.ts", "src/**/*.ts"],
+  "include": [],
+  "exclude": ["dist/**/*", "node_modules"],
   "references": [
     {
       "path": "./tsconfig.app.json"

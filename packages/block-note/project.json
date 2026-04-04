@@ -12,7 +12,7 @@
         "outputPath": "packages/block-note/dist",
         "main": "packages/block-note/src/index.ts",
         "tsConfig": "packages/block-note/tsconfig.lib.json",
-        "skipTypeCheck": true,
+        "skipTypeCheck": false,
         "stripLeadingPaths": true
       }
     }

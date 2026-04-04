@@ -46,7 +46,7 @@
     "react-dom": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
-    "tsconfig-paths/register": "catalog:",
+    "tsconfig-paths": "catalog:",
     "tslib": "catalog:",
     "typeorm": "catalog:",
     "ws": "catalog:"
