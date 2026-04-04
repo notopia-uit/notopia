@@ -3,7 +3,7 @@
 services:
   document_postgresql:
     container_name: notopia-document_postgresql
-    image: postgres:18.1-alpine3.23
+    image: postgres:18.3-alpine3.23
     environment:
       POSTGRES_DB: ${DOCUMENT_POSTGRESQL_DB:-document}
       POSTGRES_USER: ${DOCUMENT_POSTGRESQL_USER:-notopiauit}
