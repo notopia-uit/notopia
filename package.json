@@ -70,7 +70,7 @@
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",
     "vitest": "catalog:",
-    "webpack-cli": "6.0.1"
+    "webpack-cli": "7.0.2"
   },
   "packageManager": "pnpm@10.28.2"
 }
