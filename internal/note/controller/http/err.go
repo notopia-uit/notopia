@@ -2,13 +2,38 @@ package http
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
+	ginmiddleware "github.com/oapi-codegen/gin-middleware"
 )
 
-func toHTTPErr(err *errs.Err) (
+func ginMiddlewareErrorHandler(c *gin.Context, message string, statusCode int) {
+	var code string
+	switch statusCode {
+	case 401:
+		code = errs.CodeUnauthorized.String()
+	case 404:
+		code = "pathOrMethodNotFound"
+	case 400:
+		code = errs.CodeInvalid.String()
+	default:
+		code = errs.CodeInternal.String()
+	}
+
+	response := note.Error{
+		Code:     code,
+		Message:  message,
+		MoreInfo: nil,
+	}
+	c.JSON(statusCode, response)
+}
+
+var _ ginmiddleware.ErrorHandler = ginMiddlewareErrorHandler
+
+func strictServerToHTTPErr(err *errs.Err) (
 	message string,
 	code string,
 	statusCode int,
@@ -74,18 +99,55 @@ func toHTTPErr(err *errs.Err) (
 	return
 }
 
-func strictServerErrorHandler(c *gin.Context, err error, statusCode int) {
-	message := err.Error()
-	code := ""
-	if cerr, ok := errors.AsType[*errs.Err](err); ok {
-		message, code, statusCode = toHTTPErr(cerr)
+// This is mostly for badRequest handling
+func serverErrorHandler(c *gin.Context, err error, statusCode int) {
+	if statusCode != http.StatusBadRequest {
+		return
 	}
-
 	response := note.Error{
-		Code:     code,
-		Message:  message,
+		Code:     errs.CodeInvalid.String(),
+		Message:  err.Error(),
 		MoreInfo: nil,
 	}
 
 	c.JSON(statusCode, response)
+}
+
+// Register after routing, handling business error
+func StrictHandlerErrorMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+
+		if len(c.Errors) == 0 {
+			return
+		}
+
+		err := c.Errors.Last().Err
+
+		statusCode := c.Writer.Status()
+		// The codegen already ensure setting this appropriately for err
+		// Just for ensure
+		if statusCode == http.StatusOK || statusCode == 0 {
+			statusCode = http.StatusInternalServerError
+		}
+
+		// This handle for if we already return strict struct already, then don't
+		if c.Writer.Written() {
+			return
+		}
+
+		message := err.Error()
+		code := ""
+		if cerr, ok := errors.AsType[*errs.Err](err); ok {
+			message, code, statusCode = strictServerToHTTPErr(cerr)
+		}
+
+		response := note.Error{
+			Code:     code,
+			Message:  message,
+			MoreInfo: nil,
+		}
+
+		c.JSON(statusCode, response)
+	}
 }

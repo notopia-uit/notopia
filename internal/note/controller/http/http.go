@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/notopia-uit/notopia/api"
 	"github.com/oapi-codegen/gin-middleware"
 
@@ -50,7 +51,7 @@ var ProvideStrictHandler = NewStrictHandler
 func NewHandler(
 	strictServer IStrictHandler,
 ) IHandler {
-	return note.NewStrictHandler(strictServer, []note.StrictMiddlewareFunc{})
+	return note.NewStrictHandler(strictServer, nil)
 }
 
 var ProvideHandler = NewHandler
@@ -61,7 +62,14 @@ func ValidateHandler() (gin.HandlerFunc, error) {
 		return nil, err
 	}
 	spec.Servers = nil
-	return ginmiddleware.OapiRequestValidator(spec), nil
+	spec.Security = nil
+	opts := &ginmiddleware.Options{
+		ErrorHandler: ginMiddlewareErrorHandler,
+		Options: openapi3filter.Options{
+			MultiError: true,
+		},
+	}
+	return ginmiddleware.OapiRequestValidatorWithOptions(spec, opts), nil
 }
 
 func RegisterRoutes(
@@ -78,9 +86,10 @@ func RegisterRoutes(
 		api.Use(validateHandler)
 		//exhaustruct:ignore
 		options := note.GinServerOptions{
-			ErrorHandler: strictServerErrorHandler,
+			ErrorHandler: serverErrorHandler,
 		}
 		note.RegisterHandlersWithOptions(api, handler, options)
+		api.Use(StrictHandlerErrorMiddleware())
 	}
 	e.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
