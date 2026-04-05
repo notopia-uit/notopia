@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"sync"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
@@ -13,18 +14,41 @@ import (
 )
 
 type RepoRegistry struct {
-	workspace *Workspace
-	folder    *Folder
-	note      *Note
+	uow       *UnitOfWork
+	txQueries *pgsqlc.Queries
+	tx        *sql.Tx
+
+	workspace domain.WorkspaceRepo
+	folder    domain.FolderRepo
+	note      domain.NoteRepo
+
+	wsOnce     sync.Once
+	folderOnce sync.Once
+	noteOnce   sync.Once
 }
 
 var _ domain.RepoRegistry = (*RepoRegistry)(nil)
 
-func (r *RepoRegistry) Workspace() domain.WorkspaceRepo { return r.workspace }
+func (r *RepoRegistry) Workspace() domain.WorkspaceRepo {
+	r.wsOnce.Do(func() {
+		r.workspace = NewWorkspace(nil, r.txQueries, r.tx, true)
+	})
+	return r.workspace
+}
 
-func (r *RepoRegistry) Folder() domain.FolderRepo { return r.folder }
+func (r *RepoRegistry) Folder() domain.FolderRepo {
+	r.folderOnce.Do(func() {
+		r.folder = NewFolder(nil, r.txQueries, r.tx, true)
+	})
+	return r.folder
+}
 
-func (r *RepoRegistry) Note() domain.NoteRepo { return r.note }
+func (r *RepoRegistry) Note() domain.NoteRepo {
+	r.noteOnce.Do(func() {
+		r.note = NewNote(nil, r.txQueries, r.tx, true)
+	})
+	return r.note
+}
 
 type UnitOfWork struct {
 	queries *pgsqlc.Queries
@@ -80,9 +104,15 @@ func (u *UnitOfWork) Execute(
 	// NOTE: passing nil to pgxpool because pgxpool in repo used for starting a transaction
 	// but in this case transaction is already started in unit of work
 	repoRegistry := &RepoRegistry{
-		workspace: NewWorkspace(nil, txQueries, tx, true),
-		folder:    NewFolder(nil, txQueries, tx, true),
-		note:      NewNote(nil, txQueries, tx, true),
+		uow:        u,
+		txQueries:  txQueries,
+		tx:         tx,
+		workspace:  nil,
+		folder:     nil,
+		note:       nil,
+		wsOnce:     sync.Once{},
+		folderOnce: sync.Once{},
+		noteOnce:   sync.Once{},
 	}
 
 	if err := fn(repoRegistry); err != nil {

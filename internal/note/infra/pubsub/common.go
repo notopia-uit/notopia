@@ -2,26 +2,12 @@ package pubsub
 
 import (
 	"fmt"
-	"log/slog"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
-	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/ThreeDotsLabs/watermill/message"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
-
-func NewWatermillLogger(logger *slog.Logger) watermill.LoggerAdapter {
-	return watermill.NewSlogLogger(logger)
-}
-
-var ProvideWatermillLogger = NewWatermillLogger
-
-func NewIntegrationMarshaler() cqrs.CommandEventMarshaler {
-	return cqrs.JSONMarshaler{}
-}
-
-var ProvideIntegrationMarshaler = NewIntegrationMarshaler
 
 type KafkaPublisher struct {
 	message.Publisher

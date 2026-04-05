@@ -8,12 +8,12 @@ import (
 )
 
 type IntegrationEvent struct {
-	pubSub *app.IntegrationPubSub
+	pubSub *app.IntegrationPub
 	app    *app.Server
 }
 
 func NewIntegrationEvent(
-	integrationPubSub *app.IntegrationPubSub,
+	integrationPubSub *app.IntegrationPub,
 	app *app.Server,
 ) (*IntegrationEvent, error) {
 	err := integrationPubSub.EventProcessor().AddHandlers(

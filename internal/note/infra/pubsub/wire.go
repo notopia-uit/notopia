@@ -7,7 +7,7 @@ import (
 
 var ProviderSet = wire.NewSet(
 	ProvideIntegrationMarshaler,
-	ProvideIntegrationPubSub,
+	ProvideIntegration,
 	ProvideKafkaPublisher,
 	ProvideRedisClient,
 	ProvideWatermillLogger,

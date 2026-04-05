@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
@@ -160,7 +161,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	commandEventMarshaler := pubsub.NewIntegrationMarshaler()
-	integrationPubSub, err := pubsub.NewIntegrationPubSub(kafka, loggerAdapter, kafkaPublisher, watermillKafkaTracer, commandEventMarshaler)
+	integrationPubSub, err := pubsub.NewIntegration(kafka, loggerAdapter, kafkaPublisher, watermillKafkaTracer, commandEventMarshaler)
 	if err != nil {
 		cleanup4()
 		cleanup3()

@@ -46,8 +46,8 @@ var ProviderSetIntegrationEvent = wire.NewSet(
 )
 
 var ProviderSet = wire.NewSet(
+	ProvideServer,
 	ProviderSetCommand,
 	ProviderSetIntegrationEvent,
 	ProviderSetQuery,
-	wire.Struct(new(Server), "*"),
 )

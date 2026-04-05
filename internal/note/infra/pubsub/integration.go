@@ -12,13 +12,21 @@ import (
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
-func NewIntegrationPubSub(
+type Integration struct {
+	eventBus       *cqrs.EventBus
+	eventProcessor *cqrs.EventProcessor
+	router         *message.Router
+}
+
+var _ app.IntegrationPub = (*Integration)(nil)
+
+func NewIntegration(
 	cfg *commonconfig.Kafka,
 	logger watermill.LoggerAdapter,
 	publisher *KafkaPublisher,
 	tracer kafka.SaramaTracer,
-	marshaler cqrs.CommandEventMarshaler,
-) (*app.IntegrationPubSub, error) {
+	marshaler *cqrs.JSONMarshaler,
+) (*app.IntegrationPub, error) {
 	router, err := message.NewRouter(message.RouterConfig{}, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create router: %w", err)
@@ -70,4 +78,4 @@ func NewIntegrationPubSub(
 	), nil
 }
 
-var ProvideIntegrationPubSub = NewIntegrationPubSub
+var ProvideIntegration = NewIntegration

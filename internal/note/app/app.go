@@ -41,6 +41,8 @@ type QueryHandlers struct {
 	ShowTrashHandler                *ShowTrashHandler
 }
 
+type DomainEventHandlers struct{}
+
 type IntegrationEventHandlers struct {
 	DocumentCommittedHandler *DocumentCommittedHandler
 }
@@ -50,10 +52,37 @@ type Server struct {
 	IntegrationEventHandlers *IntegrationEventHandlers
 	QueryHandlers            *QueryHandlers
 
-	IntegrationPubSub    *IntegrationPubSub
+	DomainEventBus       DomainEventProcessor
+	IntegrationPubSub    *IntegrationPub
 	WorkspaceEventPubSub WorkspaceEventPubSub
 	Persistence          Persistence
 }
+
+func NewServer(
+	commandHandlers *CommandHandlers,
+	integrationEventHandlers *IntegrationEventHandlers,
+	queryHandlers *QueryHandlers,
+	domainEventBus DomainEventProcessor,
+	integrationPubSub *IntegrationPub,
+	workspaceEventPubSub WorkspaceEventPubSub,
+	persistence Persistence,
+) (*Server, error) {
+	if err := domainEventBus.RegisterHandlers(); err != nil {
+		return nil, fmt.Errorf("failed to register domain event handlers: %w", err)
+	}
+
+	return &Server{
+		CommandHandlers:          commandHandlers,
+		IntegrationEventHandlers: integrationEventHandlers,
+		QueryHandlers:            queryHandlers,
+		DomainEventBus:           domainEventBus,
+		IntegrationPubSub:        integrationPubSub,
+		WorkspaceEventPubSub:     workspaceEventPubSub,
+		Persistence:              persistence,
+	}, nil
+}
+
+var ProvideServer = NewServer
 
 func (s *Server) RunMigration(ctx context.Context) error {
 	return s.Persistence.RunMigrations(ctx)
@@ -69,7 +98,7 @@ func (s *Server) Start(ctx context.Context) error {
 		return s.WorkspaceEventPubSub.Run(ctx)
 	})
 	g.Go(func() error {
-		return s.IntegrationPubSub.Run(ctx)
+		return s.DomainEventBus.Run(ctx)
 	})
 	return g.Wait()
 }
@@ -80,7 +109,7 @@ func (s *Server) Stop(ctx context.Context) error {
 		return s.WorkspaceEventPubSub.Close()
 	})
 	g.Go(func() error {
-		return s.IntegrationPubSub.Close()
+		return s.DomainEventBus.Close()
 	})
 	return g.Wait()
 }

@@ -9,6 +9,7 @@ require (
 	github.com/ThreeDotsLabs/watermill v1.5.1
 	github.com/ThreeDotsLabs/watermill-kafka/v3 v3.1.2
 	github.com/ThreeDotsLabs/watermill-redisstream v1.4.5
+	github.com/ThreeDotsLabs/watermill-sql/v4 v4.1.3
 	github.com/alexliesenfeld/health v0.8.1
 	github.com/casbin/casbin/v3 v3.10.0
 	github.com/casbin/gorm-adapter/v3 v3.41.0
