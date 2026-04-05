@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 )
 
 const countNotesInWorkspaceByIDs = `-- name: CountNotesInWorkspaceByIDs :one
@@ -31,24 +32,34 @@ type CountNotesInWorkspaceByIDsParams struct {
 }
 
 func (q *Queries) CountNotesInWorkspaceByIDs(ctx context.Context, arg *CountNotesInWorkspaceByIDsParams) (int64, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "CountNotesInWorkspaceByIDs")
+	defer span.End()
 	row := q.db.QueryRow(ctx, countNotesInWorkspaceByIDs, arg.WorkspaceID, arg.IDs)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
 }
 
-const getNote = `-- name: GetNote :one
+const getNoteByID = `-- name: GetNoteByID :one
 SELECT
   id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
 FROM
   notes
 WHERE
   id = $1
-  AND trashed_at IS NULL
+FOR UPDATE -- :if $2
 `
 
-func (q *Queries) GetNote(ctx context.Context, id uuid.UUID) (*Note, error) {
-	row := q.db.QueryRow(ctx, getNote, id)
+type GetNoteByIDParams struct {
+	ID        uuid.UUID
+	ForUpdate bool
+}
+
+func (q *Queries) GetNoteByID(ctx context.Context, arg GetNoteByIDParams) (*Note, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNoteByID")
+	defer span.End()
+	dynQuery, dynArgs := DynamicSQL(getNoteByID, []any{arg.ID, arg.ForUpdate})
+	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
 	var i Note
 	err := row.Scan(
 		&i.ID,
@@ -65,18 +76,30 @@ func (q *Queries) GetNote(ctx context.Context, id uuid.UUID) (*Note, error) {
 	return &i, err
 }
 
-const getNotes = `-- name: GetNotes :many
+const getNotesByFolderIDs = `-- name: GetNotesByFolderIDs :many
 SELECT
   id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
 FROM
   notes
 WHERE
-  id = ANY($1::uuid[])
-  AND trashed_at IS NULL
+  folder_id = ANY($1::uuid[])
+  AND trashed_at IS NULL -- :if $2
+ORDER BY
+  created_at DESC
+FOR UPDATE -- :if $3
 `
 
-func (q *Queries) GetNotes(ctx context.Context, ids []uuid.UUID) ([]*Note, error) {
-	rows, err := q.db.Query(ctx, getNotes, ids)
+type GetNotesByFolderIDsParams struct {
+	FolderIds      []uuid.UUID
+	IncludeTrashed bool
+	ForUpdate      bool
+}
+
+func (q *Queries) GetNotesByFolderIDs(ctx context.Context, arg GetNotesByFolderIDsParams) ([]*Note, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesByFolderIDs")
+	defer span.End()
+	dynQuery, dynArgs := DynamicSQL(getNotesByFolderIDs, []any{arg.FolderIds, arg.IncludeTrashed, arg.ForUpdate})
+	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -106,33 +129,34 @@ func (q *Queries) GetNotes(ctx context.Context, ids []uuid.UUID) ([]*Note, error
 	return items, nil
 }
 
-const getNotesByFolderIDs = `-- name: GetNotesByFolderIDs :many
+const getNotesByParams = `-- name: GetNotesByParams :many
 SELECT
   id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
 FROM
   notes
 WHERE
-  CASE
-    WHEN CARDINALITY($1::uuid[]) > 0
-    THEN folder_id = ANY($1::uuid[])
-    ELSE FALSE
-  END
-  AND CASE
-    WHEN $2::bool = FALSE
-    THEN trashed_at IS NULL
-    ELSE TRUE
-  END
-ORDER BY
-  created_at DESC
+  id = ANY($1::uuid[]) -- :if $1
+  AND folder_id IN (
+    SELECT id FROM folders WHERE workspace_id = $2::uuid
+  ) -- :if $2
+  AND trashed_by = $3::text -- :if $3
+  AND trashed_at IS NULL -- :if $4
+FOR UPDATE -- :if $5
 `
 
-type GetNotesByFolderIDsParams struct {
-	FolderIds      []uuid.UUID
-	IncludeTrashed bool
+type GetNotesByParamsParams struct {
+	IDs          *[]uuid.UUID
+	WorkspaceID  *uuid.UUID
+	TrashedBy    *string
+	IsNotTrashed bool
+	ForUpdate    bool
 }
 
-func (q *Queries) GetNotesByFolderIDs(ctx context.Context, arg *GetNotesByFolderIDsParams) ([]*Note, error) {
-	rows, err := q.db.Query(ctx, getNotesByFolderIDs, arg.FolderIds, arg.IncludeTrashed)
+func (q *Queries) GetNotesByParams(ctx context.Context, arg *GetNotesByParamsParams) ([]*Note, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesByParams")
+	defer span.End()
+	dynQuery, dynArgs := DynamicSQL(getNotesByParams, []any{arg.IDs, arg.WorkspaceID, arg.TrashedBy, arg.IsNotTrashed, arg.ForUpdate})
+	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -172,20 +196,21 @@ INNER JOIN
   ON n.folder_id = f.id
 WHERE
   f.workspace_id = $1
-  AND CASE
-    WHEN $2::text IS NOT NULL
-    THEN n.trashed_by = $2::text
-    ELSE n.trashed_at IS NULL
-  END
+  AND n.trashed_by = $2::text -- :if $2
+  AND n.trashed_at IS NULL -- :if $3
 `
 
 type GetNotesInWorkspaceParams struct {
-	WorkspaceID uuid.UUID
-	TrashedBy   *string
+	WorkspaceID  uuid.UUID
+	TrashedBy    *string
+	IsNotTrashed bool
 }
 
 func (q *Queries) GetNotesInWorkspace(ctx context.Context, arg *GetNotesInWorkspaceParams) ([]*Note, error) {
-	rows, err := q.db.Query(ctx, getNotesInWorkspace, arg.WorkspaceID, arg.TrashedBy)
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesInWorkspace")
+	defer span.End()
+	dynQuery, dynArgs := DynamicSQL(getNotesInWorkspace, []any{arg.WorkspaceID, arg.TrashedBy, arg.IsNotTrashed})
+	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -231,6 +256,8 @@ ORDER BY
 `
 
 func (q *Queries) GetTrashedNotesByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]*Note, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetTrashedNotesByWorkspaceID")
+	defer span.End()
 	rows, err := q.db.Query(ctx, getTrashedNotesByWorkspaceID, workspaceID)
 	if err != nil {
 		return nil, err
@@ -274,6 +301,8 @@ WHERE
 `
 
 func (q *Queries) GetWorkspaceIDByNoteID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspaceIDByNoteID")
+	defer span.End()
 	row := q.db.QueryRow(ctx, getWorkspaceIDByNoteID, id)
 	var workspace_id uuid.UUID
 	err := row.Scan(&workspace_id)
@@ -301,6 +330,8 @@ WHERE
 `
 
 func (q *Queries) PermanentlyDeleteNoteByID(ctx context.Context, id uuid.UUID) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "PermanentlyDeleteNoteByID")
+	defer span.End()
 	_, err := q.db.Exec(ctx, permanentlyDeleteNoteByID, id)
 	return err
 }
@@ -313,6 +344,8 @@ WHERE
 `
 
 func (q *Queries) PermanentlyDeleteNotesByIDs(ctx context.Context, ids []uuid.UUID) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "PermanentlyDeleteNotesByIDs")
+	defer span.End()
 	_, err := q.db.Exec(ctx, permanentlyDeleteNotesByIDs, ids)
 	return err
 }
@@ -355,6 +388,8 @@ ON CONFLICT (id) DO UPDATE SET
 `
 
 func (q *Queries) SaveFromTempNotes(ctx context.Context) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "SaveFromTempNotes")
+	defer span.End()
 	_, err := q.db.Exec(ctx, saveFromTempNotes)
 	return err
 }
@@ -409,6 +444,8 @@ type SaveNoteParams struct {
 }
 
 func (q *Queries) SaveNote(ctx context.Context, arg *SaveNoteParams) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "SaveNote")
+	defer span.End()
 	_, err := q.db.Exec(ctx, saveNote,
 		arg.ID,
 		arg.Name,

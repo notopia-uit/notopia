@@ -4,12 +4,12 @@ SELECT
 FROM
   workspaces
 WHERE
-  CASE
-    WHEN sqlc.narg('slug')::text IS NOT NULL THEN slug = sqlc.narg('slug')
-    WHEN sqlc.narg('id')::uuid IS NOT NULL THEN id = sqlc.narg('id')
-    ELSE FALSE
-  END
-  AND deleted_at IS NULL;
+  1 = 1
+  AND slug = sqlc.narg('slug')::text -- :if @slug
+  AND id = sqlc.narg('id')::uuid -- :if @id
+  AND deleted_at IS NULL
+FOR UPDATE -- :if @for_update
+;
 
 -- name: GetWorkspaceIDBySlug :one
 SELECT

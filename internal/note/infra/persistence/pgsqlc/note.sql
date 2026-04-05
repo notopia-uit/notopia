@@ -94,23 +94,30 @@ ON CONFLICT (id) DO UPDATE SET
   trashed_by = EXCLUDED.trashed_by,
   trashed_at = EXCLUDED.trashed_at;
 
--- name: GetNote :one
+-- name: GetNoteByID :one
 SELECT
   *
 FROM
   notes
 WHERE
   id = sqlc.arg('id')
-  AND trashed_at IS NULL;
+FOR UPDATE -- :if @for_update
+;
 
--- name: GetNotes :many
+-- name: GetNotesByParams :many
 SELECT
   *
 FROM
   notes
 WHERE
-  id = ANY(sqlc.arg('ids')::uuid[])
-  AND trashed_at IS NULL;
+  id = ANY(sqlc.narg('ids')::uuid[]) -- :if @ids
+  AND folder_id IN (
+    SELECT id FROM folders WHERE workspace_id = sqlc.narg('workspace_id')::uuid
+  ) -- :if @workspace_id
+  AND trashed_by = sqlc.narg('trashed_by')::text -- :if @trashed_by
+  AND trashed_at IS NULL -- :if @is_not_trashed
+FOR UPDATE -- :if @for_update
+;
 
 -- name: GetNotesByFolderIDs :many
 SELECT
@@ -118,18 +125,12 @@ SELECT
 FROM
   notes
 WHERE
-  CASE
-    WHEN CARDINALITY(sqlc.arg('folder_ids')::uuid[]) > 0
-    THEN folder_id = ANY(sqlc.arg('folder_ids')::uuid[])
-    ELSE FALSE
-  END
-  AND CASE
-    WHEN sqlc.arg('include_trashed')::bool = FALSE
-    THEN trashed_at IS NULL
-    ELSE TRUE
-  END
+  folder_id = ANY(sqlc.arg('folder_ids')::uuid[])
+  AND trashed_at IS NULL -- :if @include_trashed
 ORDER BY
-  created_at DESC;
+  created_at DESC
+FOR UPDATE -- :if @for_update
+;
 
 -- name: GetWorkspaceIDByNoteID :one
 SELECT
@@ -152,11 +153,9 @@ INNER JOIN
   ON n.folder_id = f.id
 WHERE
   f.workspace_id = sqlc.arg('workspace_id')
-  AND CASE
-    WHEN sqlc.narg('trashed_by')::text IS NOT NULL
-    THEN n.trashed_by = sqlc.narg('trashed_by')::text
-    ELSE n.trashed_at IS NULL
-  END;
+  AND n.trashed_by = sqlc.narg('trashed_by')::text -- :if @trashed_by
+  AND n.trashed_at IS NULL -- :if @is_not_trashed
+;
 
 -- name: GetTrashedNotesByWorkspaceID :many
 SELECT

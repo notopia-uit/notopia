@@ -18,7 +18,6 @@ require (
 	github.com/getkin/kin-openapi v0.133.0
 	github.com/gin-contrib/slog v1.2.1
 	github.com/gin-gonic/gin v1.12.0
-	github.com/go-jet/jet/v2 v2.14.1
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/goforj/wire v1.1.0
 	github.com/google/uuid v1.6.0
@@ -26,7 +25,6 @@ require (
 	github.com/hellofresh/health-go/v5 v5.5.5
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
 	github.com/jackc/pgx/v5 v5.8.0
-	github.com/lib/pq v1.10.9
 	github.com/nkonev/watermill-opentelemetry v0.1.11
 	github.com/oapi-codegen/gin-middleware v1.0.2
 	github.com/oapi-codegen/runtime v1.3.1
@@ -112,6 +110,7 @@ require (
 	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

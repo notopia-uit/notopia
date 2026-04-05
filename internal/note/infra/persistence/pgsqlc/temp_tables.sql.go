@@ -7,6 +7,8 @@ package pgsqlc
 
 import (
 	"context"
+
+	"go.opentelemetry.io/otel"
 )
 
 const createTempTableFolders = `-- name: CreateTempTableFolders :exec
@@ -24,6 +26,8 @@ CREATE TEMP TABLE temp_folders (
 `
 
 func (q *Queries) CreateTempTableFolders(ctx context.Context) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "CreateTempTableFolders")
+	defer span.End()
 	_, err := q.db.Exec(ctx, createTempTableFolders)
 	return err
 }
@@ -37,6 +41,8 @@ CREATE TEMP TABLE temp_note_links (
 `
 
 func (q *Queries) CreateTempTableNoteLinks(ctx context.Context) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "CreateTempTableNoteLinks")
+	defer span.End()
 	_, err := q.db.Exec(ctx, createTempTableNoteLinks)
 	return err
 }
@@ -57,6 +63,8 @@ CREATE TEMP TABLE temp_notes (
 `
 
 func (q *Queries) CreateTempTableNotes(ctx context.Context) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "CreateTempTableNotes")
+	defer span.End()
 	_, err := q.db.Exec(ctx, createTempTableNotes)
 	return err
 }

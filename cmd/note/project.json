@@ -137,18 +137,8 @@
       },
       "cache": true
     },
-    "gen:jet": {
-      "inputs": ["migrations"],
-      "outputs": ["{workspaceRoot}/internal/note/infra/persistence/pgjet/*.go"],
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "./gen-jet.sh",
-        "cwd": "{projectRoot}"
-      },
-      "cache": true
-    },
     "gen": {
-      "dependsOn": ["gen:wire", "gen:sqlc", "gen:jet"]
+      "dependsOn": ["gen:wire", "gen:sqlc"]
     },
     "nx-release-publish": {
       "parallelism": false

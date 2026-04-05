@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 )
 
 const deleteObsoleteNoteLinks = `-- name: DeleteObsoleteNoteLinks :exec
@@ -28,6 +29,8 @@ WHERE
 `
 
 func (q *Queries) DeleteObsoleteNoteLinks(ctx context.Context) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "DeleteObsoleteNoteLinks")
+	defer span.End()
 	_, err := q.db.Exec(ctx, deleteObsoleteNoteLinks)
 	return err
 }
@@ -42,6 +45,8 @@ WHERE
 `
 
 func (q *Queries) GetNoteBacklinks(ctx context.Context, targetID uuid.UUID) ([]uuid.UUID, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNoteBacklinks")
+	defer span.End()
 	rows, err := q.db.Query(ctx, getNoteBacklinks, targetID)
 	if err != nil {
 		return nil, err
@@ -73,6 +78,8 @@ WHERE sf.workspace_id = $1::uuid
 `
 
 func (q *Queries) GetNoteLinksInWorkspace(ctx context.Context, workspaceID uuid.UUID) ([]*NoteLink, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNoteLinksInWorkspace")
+	defer span.End()
 	rows, err := q.db.Query(ctx, getNoteLinksInWorkspace, workspaceID)
 	if err != nil {
 		return nil, err
@@ -98,23 +105,20 @@ SELECT
 FROM
   note_links
 WHERE
-  CASE
-    WHEN $1::uuid IS NOT NULL THEN source_id = $1::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN CARDINALITY($2::uuid[]) > 0 THEN source_id = ANY($2::uuid[])
-    ELSE TRUE
-  END
+  source_id = $1::uuid -- :if $1
+  AND source_id = ANY($2::uuid[]) -- :if $2
 `
 
 type GetNoteOutgoingLinksParams struct {
 	SourceID  *uuid.UUID
-	SourceIDs []uuid.UUID
+	SourceIDs *[]uuid.UUID
 }
 
 func (q *Queries) GetNoteOutgoingLinks(ctx context.Context, arg *GetNoteOutgoingLinksParams) ([]uuid.UUID, error) {
-	rows, err := q.db.Query(ctx, getNoteOutgoingLinks, arg.SourceID, arg.SourceIDs)
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNoteOutgoingLinks")
+	defer span.End()
+	dynQuery, dynArgs := DynamicSQL(getNoteOutgoingLinks, []any{arg.SourceID, arg.SourceIDs})
+	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -152,6 +156,8 @@ ON CONFLICT DO NOTHING
 `
 
 func (q *Queries) SaveFromTempNoteLinks(ctx context.Context) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "SaveFromTempNoteLinks")
+	defer span.End()
 	_, err := q.db.Exec(ctx, saveFromTempNoteLinks)
 	return err
 }

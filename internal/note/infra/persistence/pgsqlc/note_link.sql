@@ -40,14 +40,9 @@ SELECT
 FROM
   note_links
 WHERE
-  CASE
-    WHEN sqlc.narg('source_id')::uuid IS NOT NULL THEN source_id = sqlc.narg('source_id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN CARDINALITY(sqlc.arg('source_ids')::uuid[]) > 0 THEN source_id = ANY(sqlc.arg('source_ids')::uuid[])
-    ELSE TRUE
-  END;
+  source_id = sqlc.narg('source_id')::uuid -- :if @source_id
+  AND source_id = ANY(sqlc.narg('source_ids')::uuid[]) -- :if @source_ids
+;
 
 -- name: GetNoteBacklinks :many
 SELECT

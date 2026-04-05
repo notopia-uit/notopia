@@ -5,21 +5,17 @@ import (
 	"errors"
 	"time"
 
-	. "github.com/go-jet/jet/v2/postgres"
-	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
-	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgjet/public/model"
-	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgjet/public/table"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
 type Folder struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
-	db            qrm.DB
 	inTransaction bool
 }
 
@@ -28,13 +24,11 @@ var _ domain.FolderRepo = (*Folder)(nil)
 func NewFolder(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
-	db qrm.DB,
 	inTransaction bool,
 ) *Folder {
 	return &Folder{
 		pgxPool:       pgxPool,
 		queries:       queries,
-		db:            db,
 		inTransaction: inTransaction,
 	}
 }
@@ -42,74 +36,69 @@ func NewFolder(
 func NewNoTransactionFolder(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
-	db qrm.DB,
 ) *Folder {
-	return NewFolder(pgxPool, queries, db, false)
+	return NewFolder(pgxPool, queries, false)
 }
 
 var ProvideFolder = NewNoTransactionFolder
 
 func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Folder, errs.Error) {
-	stmt := SELECT(table.Folders.AllColumns).
-		FROM(table.Folders).
-		WHERE(table.Folders.ID.EQ(UUID(id)))
-	if forUpdate {
-		stmt = stmt.FOR(UPDATE())
-	}
-
-	var dest *model.Folders
-	err := stmt.QueryContext(ctx, f.db, dest)
+	folder, err := f.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
+		ID:        id,
+		ForUpdate: forUpdate,
+	})
 	if err != nil {
-		if errors.Is(err, qrm.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewFolderNotFound(id, err)
 		}
 		return nil, toDomainError(err)
 	}
-	return folderToDomain(dest), nil
+	return folderToDomain(folder), nil
 }
 
 func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyParams) ([]*domain.Folder, errs.Error) {
-	condition := Bool(true)
-	if params.WorkspaceID() != nil {
-		condition = condition.AND(table.Folders.WorkspaceID.EQ(UUID(params.WorkspaceID())))
-	}
+	var ids *[]uuid.UUID
 	if len(params.IDs()) > 0 {
-		var idExprs []Expression
-		for _, id := range params.IDs() {
-			idExprs = append(idExprs, UUID(id))
-		}
-		condition = condition.AND(table.Folders.ID.IN(idExprs...))
+		paramIDs := params.IDs()
+		ids = &paramIDs
 	}
+
+	var workspaceID *uuid.UUID
+	if params.WorkspaceID() != nil {
+		workspaceID = params.WorkspaceID()
+	}
+
+	var trashedBy *string
 	if params.TrashedBy() != nil {
-		condition = condition.AND(table.Folders.TrashedBy.EQ(String(params.TrashedBy().String())))
-	}
-	if params.IsTrashed() {
-		condition = condition.AND(table.Folders.TrashedAt.IS_NULL())
+		trashedByStr := params.TrashedBy().String()
+		trashedBy = &trashedByStr
 	}
 
-	stmt := SELECT(table.Folders.AllColumns).
-		FROM(table.Folders).
-		WHERE(condition)
-	if params.ForUpdate() {
-		stmt = stmt.FOR(UPDATE())
-	}
+	includeTrashed := params.IsTrashed()
 
-	var dest []*model.Folders
-	if err := stmt.QueryContext(ctx, f.db, &dest); err != nil {
+	folders, err := f.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
+		IDs:            ids,
+		WorkspaceID:    workspaceID,
+		TrashedBy:      trashedBy,
+		IncludeTrashed: !includeTrashed,
+		ForUpdate:      params.ForUpdate(),
+	})
+	if err != nil {
 		return nil, toDomainError(err)
 	}
-	folders := make([]*domain.Folder, len(dest))
-	for i, folder := range dest {
-		folders[i] = folderToDomain(folder)
+
+	result := make([]*domain.Folder, len(folders))
+	for i, folder := range folders {
+		result[i] = folderToDomain(folder)
 	}
-	return folders, nil
+	return result, nil
 }
 
-func folderToDomain(folder *model.Folders) *domain.Folder {
+func folderToDomain(folder *pgsqlc.Folder) *domain.Folder {
 	var trashed *domain.Trashed
 	if folder.TrashedBy != nil && folder.TrashedAt != nil {
 		trashed = domain.NewTrashed(
-			domain.TrashedBy(folder.TrashedBy.String()),
+			domain.TrashedBy(*folder.TrashedBy),
 			*folder.TrashedAt,
 		)
 	}

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 )
 
 const countFoldersInWorkspaceByIDs = `-- name: CountFoldersInWorkspaceByIDs :one
@@ -28,6 +29,8 @@ type CountFoldersInWorkspaceByIDsParams struct {
 }
 
 func (q *Queries) CountFoldersInWorkspaceByIDs(ctx context.Context, arg *CountFoldersInWorkspaceByIDsParams) (int64, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "CountFoldersInWorkspaceByIDs")
+	defer span.End()
 	row := q.db.QueryRow(ctx, countFoldersInWorkspaceByIDs, arg.WorkspaceID, arg.IDs)
 	var count int64
 	err := row.Scan(&count)
@@ -40,58 +43,30 @@ SELECT
 FROM
   folders
 WHERE
-  CASE
-    WHEN $1::uuid IS NOT NULL
-    THEN id = $1::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN $2::uuid IS NOT NULL
-    THEN workspace_id = $2::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN $3::uuid IS NOT NULL
-    THEN parent_id = $3::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN $4::bool = TRUE
-    THEN parent_id IS NULL
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN $5::text <> ''
-    THEN trashed_by = $5::text
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN $6::bool = FALSE
-    THEN trashed_by IS NULL
-    ELSE TRUE
-  END
-ORDER BY
-  created_at DESC
+  id = $1
+  AND workspace_id = $2::uuid -- :if $2
+  AND parent_id = $3::uuid -- :if $3
+  AND parent_id IS NULL -- :if $5
+  AND trashed_by = $4::text -- :if $4
+  AND trashed_by IS NULL -- :if $6
+FOR UPDATE -- :if $7
 `
 
 type GetFolderParams struct {
-	ID             *uuid.UUID
+	ID             uuid.UUID
 	WorkspaceID    *uuid.UUID
 	ParentID       *uuid.UUID
+	TrashedBy      *string
 	IsRootFolder   bool
-	TrashedBy      string
 	IncludeTrashed bool
+	ForUpdate      bool
 }
 
 func (q *Queries) GetFolder(ctx context.Context, arg *GetFolderParams) (*Folder, error) {
-	row := q.db.QueryRow(ctx, getFolder,
-		arg.ID,
-		arg.WorkspaceID,
-		arg.ParentID,
-		arg.IsRootFolder,
-		arg.TrashedBy,
-		arg.IncludeTrashed,
-	)
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetFolder")
+	defer span.End()
+	dynQuery, dynArgs := DynamicSQL(getFolder, []any{arg.ID, arg.WorkspaceID, arg.ParentID, arg.TrashedBy, arg.IsRootFolder, arg.IncludeTrashed, arg.ForUpdate})
+	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
 	var i Folder
 	err := row.Scan(
 		&i.ID,
@@ -113,58 +88,32 @@ SELECT
 FROM
   folders
 WHERE
-  CASE
-    WHEN $1::uuid[] IS NOT NULL
-    THEN id = ANY($1::uuid[])
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN $2::uuid IS NOT NULL
-    THEN workspace_id = $2::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN $3::uuid IS NOT NULL
-    THEN parent_id = $3::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN $4::bool = TRUE
-    THEN parent_id IS NULL
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN $5::text IS NOT NULL
-    THEN trashed_by = $5::text
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN $6::bool = FALSE
-    THEN trashed_by IS NULL
-    ELSE TRUE
-  END
+  id = ANY($1::uuid[]) -- :if $1
+  AND workspace_id = $2::uuid -- :if $2
+  AND parent_id = $3::uuid -- :if $3
+  AND parent_id IS NULL -- :if $5
+  AND trashed_by = $4::text -- :if $4
+  AND trashed_by IS NULL -- :if $6
 ORDER BY
   created_at DESC
+FOR UPDATE -- :if $7
 `
 
 type GetFoldersParams struct {
-	IDs            []uuid.UUID
+	IDs            *[]uuid.UUID
 	WorkspaceID    *uuid.UUID
 	ParentID       *uuid.UUID
-	IsRootFolder   bool
 	TrashedBy      *string
+	IsRootFolder   bool
 	IncludeTrashed bool
+	ForUpdate      bool
 }
 
 func (q *Queries) GetFolders(ctx context.Context, arg *GetFoldersParams) ([]*Folder, error) {
-	rows, err := q.db.Query(ctx, getFolders,
-		arg.IDs,
-		arg.WorkspaceID,
-		arg.ParentID,
-		arg.IsRootFolder,
-		arg.TrashedBy,
-		arg.IncludeTrashed,
-	)
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetFolders")
+	defer span.End()
+	dynQuery, dynArgs := DynamicSQL(getFolders, []any{arg.IDs, arg.WorkspaceID, arg.ParentID, arg.TrashedBy, arg.IsRootFolder, arg.IncludeTrashed, arg.ForUpdate})
+	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -248,6 +197,8 @@ type GetRecursiveFolderByParentIDRow struct {
 }
 
 func (q *Queries) GetRecursiveFolderByParentID(ctx context.Context, arg *GetRecursiveFolderByParentIDParams) ([]*GetRecursiveFolderByParentIDRow, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetRecursiveFolderByParentID")
+	defer span.End()
 	rows, err := q.db.Query(ctx, getRecursiveFolderByParentID, arg.ParentID, arg.IncludeTrashed, arg.Depth)
 	if err != nil {
 		return nil, err
@@ -289,6 +240,8 @@ WHERE
 `
 
 func (q *Queries) GetRootFolderIDsByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]uuid.UUID, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetRootFolderIDsByWorkspaceID")
+	defer span.End()
 	rows, err := q.db.Query(ctx, getRootFolderIDsByWorkspaceID, workspaceID)
 	if err != nil {
 		return nil, err
@@ -318,6 +271,8 @@ WHERE
 `
 
 func (q *Queries) GetWorkspaceIDByFolderID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspaceIDByFolderID")
+	defer span.End()
 	row := q.db.QueryRow(ctx, getWorkspaceIDByFolderID, id)
 	var workspace_id uuid.UUID
 	err := row.Scan(&workspace_id)
@@ -344,6 +299,8 @@ WHERE
 `
 
 func (q *Queries) PermanentlyDeleteFolderByID(ctx context.Context, id uuid.UUID) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "PermanentlyDeleteFolderByID")
+	defer span.End()
 	_, err := q.db.Exec(ctx, permanentlyDeleteFolderByID, id)
 	return err
 }
@@ -356,6 +313,8 @@ WHERE
 `
 
 func (q *Queries) PermanentlyDeleteFoldersByIDs(ctx context.Context, ids []uuid.UUID) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "PermanentlyDeleteFoldersByIDs")
+	defer span.End()
 	_, err := q.db.Exec(ctx, permanentlyDeleteFoldersByIDs, ids)
 	return err
 }
@@ -405,6 +364,8 @@ type SaveFolderParams struct {
 }
 
 func (q *Queries) SaveFolder(ctx context.Context, arg *SaveFolderParams) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "SaveFolder")
+	defer span.End()
 	_, err := q.db.Exec(ctx, saveFolder,
 		arg.ID,
 		arg.Name,
@@ -453,6 +414,8 @@ ON CONFLICT (id) DO UPDATE SET
 `
 
 func (q *Queries) SaveFromTempFolders(ctx context.Context) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "SaveFromTempFolders")
+	defer span.End()
 	_, err := q.db.Exec(ctx, saveFromTempFolders)
 	return err
 }

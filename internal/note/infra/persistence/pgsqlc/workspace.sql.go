@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 )
 
 const checkSlugExists = `-- name: CheckSlugExists :one
@@ -25,6 +26,8 @@ SELECT EXISTS(
 `
 
 func (q *Queries) CheckSlugExists(ctx context.Context, slug string) (bool, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "CheckSlugExists")
+	defer span.End()
 	row := q.db.QueryRow(ctx, checkSlugExists, slug)
 	var exists bool
 	err := row.Scan(&exists)
@@ -37,21 +40,24 @@ SELECT
 FROM
   workspaces
 WHERE
-  CASE
-    WHEN $1::text IS NOT NULL THEN slug = $1
-    WHEN $2::uuid IS NOT NULL THEN id = $2
-    ELSE FALSE
-  END
+  1 = 1
+  AND slug = $1::text -- :if $1
+  AND id = $2::uuid -- :if $2
   AND deleted_at IS NULL
+FOR UPDATE -- :if $3
 `
 
 type GetWorkspaceParams struct {
-	Slug *string
-	ID   *uuid.UUID
+	Slug      *string
+	ID        *uuid.UUID
+	ForUpdate bool
 }
 
 func (q *Queries) GetWorkspace(ctx context.Context, arg *GetWorkspaceParams) (*Workspace, error) {
-	row := q.db.QueryRow(ctx, getWorkspace, arg.Slug, arg.ID)
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspace")
+	defer span.End()
+	dynQuery, dynArgs := DynamicSQL(getWorkspace, []any{arg.Slug, arg.ID, arg.ForUpdate})
+	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
 	var i Workspace
 	err := row.Scan(
 		&i.ID,
@@ -75,6 +81,8 @@ WHERE
 `
 
 func (q *Queries) GetWorkspaceIDBySlug(ctx context.Context, slug string) (uuid.UUID, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspaceIDBySlug")
+	defer span.End()
 	row := q.db.QueryRow(ctx, getWorkspaceIDBySlug, slug)
 	var id uuid.UUID
 	err := row.Scan(&id)
@@ -115,6 +123,8 @@ type SaveWorkspaceParams struct {
 }
 
 func (q *Queries) SaveWorkspace(ctx context.Context, arg *SaveWorkspaceParams) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "SaveWorkspace")
+	defer span.End()
 	_, err := q.db.Exec(ctx, saveWorkspace,
 		arg.ID,
 		arg.Slug,
