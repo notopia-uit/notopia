@@ -3,7 +3,7 @@
 services:
   authorization_postgresql:
     container_name: notopia-authorization_postgresql
-    image: postgres:18.1-alpine3.23
+    image: postgres:18.3-alpine3.23
     environment:
       POSTGRES_DB: ${AUTHORIZATION_POSTGRESQL_DB:-authorization}
       POSTGRES_USER: ${AUTHORIZATION_POSTGRESQL_USER:-notopiauit}
