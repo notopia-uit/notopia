@@ -29,7 +29,7 @@ require (
 	github.com/nkonev/watermill-opentelemetry v0.1.11
 	github.com/oapi-codegen/gin-middleware v1.0.2
 	github.com/oapi-codegen/runtime v1.3.1
-	github.com/pressly/goose/v3 v3.26.0
+	github.com/pressly/goose/v3 v3.27.0
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/samber/slog-multi v1.8.0
 	github.com/spf13/viper v1.21.0
