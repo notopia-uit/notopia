@@ -7,6 +7,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryColumn,
+  type Relation
 } from 'typeorm';
 
 @Entity('revisions')
@@ -17,7 +18,7 @@ export class RevisionEntity {
   @ManyToOne(() => DocumentEntity, (document) => document.revisions, {
     onDelete: 'CASCADE',
   })
-  document!: DocumentEntity;
+  document!: Relation<DocumentEntity>;
 
   @Column({ type: 'text', nullable: true })
   name!: string | null;

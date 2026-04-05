@@ -1,9 +1,9 @@
-import { DatabaseConfig } from '../config/config.ts';
-import { DocumentEntity } from '../document/document.entity.ts';
-import { RevisionEntity } from '../revision/revision.entity.ts';
+import { DatabaseConfig } from '../config/config';
+import { DocumentEntity } from '../document/document.entity';
+import { RevisionEntity } from '../revision/revision.entity';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
-export const createDatasourceOptions = async (
+export const createDatasourceOptions =  (
   databaseCfg: DatabaseConfig,
   synchronize: boolean
 ) => {
@@ -21,12 +21,11 @@ export const createDatasourceOptions = async (
   } satisfies DataSourceOptions;
 };
 
-export const createDatasource = async (
+export const createDatasource = (
   databaseCfg: DatabaseConfig,
   synchronize: boolean
 ) => {
-  const options = await createDatasourceOptions(databaseCfg, synchronize);
+  const options = createDatasourceOptions(databaseCfg, synchronize);
   const dataSource = new DataSource(options);
-  await dataSource.initialize();
   return dataSource;
 };

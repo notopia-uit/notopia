@@ -47,7 +47,6 @@
     "react-dom": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
-    "tsconfig-paths": "catalog:",
     "tslib": "catalog:",
     "typeorm": "catalog:",
     "ws": "catalog:"
@@ -57,7 +56,6 @@
     "@swc/core": "catalog:",
     "@swc/helpers": "catalog:",
     "@types/ws": "catalog:",
-    "tsconfig-paths": "catalog:",
     "tsx": "catalog:",
     "typeorm-extension": "catalog:",
     "webpack-node-externals": "catalog:"

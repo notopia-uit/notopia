@@ -40,7 +40,7 @@ export const getNoteMenuItems = (
   return filterSuggestionItems(items, query);
 };
 
-export const getTagMenuItems = async (
+export const getTagMenuItems = (
   editor: MyEditor,
   query: string,
   tags: string[]

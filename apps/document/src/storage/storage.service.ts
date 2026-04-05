@@ -17,7 +17,10 @@ export class StorageService {
     configService: ConfigService,
     private readonly s3Client: S3Client
   ) {
-    const s3Config = configService.get<S3Config>(S3_CONFIG)!;
+    const s3Config = configService.get<S3Config>(S3_CONFIG);
+    if (!s3Config) {
+      throw new Error('S3_CONFIG not found');
+    }
     this.bucketName = s3Config.bucketName;
     this.s3Endpoint = s3Config.endpoint;
   }

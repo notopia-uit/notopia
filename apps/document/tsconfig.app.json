@@ -7,7 +7,6 @@
     "types": ["node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "allowImportingTsExtensions": true,
     "target": "es2024",
     "rootDir": "src",
     "outDir": "dist",

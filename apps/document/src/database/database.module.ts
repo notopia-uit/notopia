@@ -9,11 +9,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
-        const appConfig = configService.get<AppConfig>(APP_CONFIG)!;
+      useFactory: (configService: ConfigService) => {
+        const appConfig = configService.get<AppConfig>(APP_CONFIG);
+        if (!appConfig) {
+          throw new Error('APP_CONFIG not found');
+        }
         const databaseConfig =
-          configService.get<DatabaseConfig>(DATABASE_CONFIG)!;
-        return await createDatasourceOptions(
+          configService.get<DatabaseConfig>(DATABASE_CONFIG);
+        if (!databaseConfig) {
+          throw new Error('DATABASE_CONFIG not found');
+        }
+        return createDatasourceOptions(
           databaseConfig,
           appConfig.env !== 'production'
         );

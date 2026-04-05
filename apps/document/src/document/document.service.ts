@@ -90,7 +90,7 @@ export class DocumentService {
       if (!document) {
         throw new NotFoundException(`Document ${documentId} not found`);
       }
-      manager.save(RevisionEntity, {
+      await manager.save(RevisionEntity, {
         id: randomUUID(),
         document,
         content: this.bufferToBlockNote(document.data, editor),

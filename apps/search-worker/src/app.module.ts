@@ -4,7 +4,7 @@ import { AppConfig, MeiliConfig } from './config';
 import { APP_CONFIG, MEILI_CONFIG, appConfig } from './config.factory';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MeiliSearch } from 'meilisearch';
+import { Meilisearch } from 'meilisearch';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
@@ -24,7 +24,10 @@ import pretty from 'pino-pretty';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const appCfg = configService.get<AppConfig>(APP_CONFIG)!;
+        const appCfg = configService.get<AppConfig>(APP_CONFIG);
+        if (!appCfg) {
+          throw new Error('APP_CONFIG not found');
+        }
         const level = appCfg.logLevel;
         const stream = pretty({ colorize: true, ignore: 'pid,hostname' });
         return {
@@ -38,10 +41,13 @@ import pretty from 'pino-pretty';
   ],
   providers: [
     {
-      provide: MeiliSearch,
+      provide: Meilisearch,
       useFactory: (configService: ConfigService) => {
-        const config = configService.get<MeiliConfig>(MEILI_CONFIG)!;
-        return new MeiliSearch({
+        const config = configService.get<MeiliConfig>(MEILI_CONFIG);
+        if (!config) {
+          throw new Error('MEILI_CONFIG not found');
+        }
+        return new Meilisearch({
           host: config.host,
           apiKey: config.apiKey,
         });

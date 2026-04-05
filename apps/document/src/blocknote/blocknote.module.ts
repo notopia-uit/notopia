@@ -14,7 +14,10 @@ export const BLOCKNOTE_SCHEMA = Symbol('BLOCKNOTE_SCHEMA');
     {
       provide: BLOCKNOTE_SCHEMA,
       useFactory: (noteService: NoteService, configService: ConfigService) => {
-        const appCfg = configService.get<AppConfig>(APP_CONFIG)!;
+        const appCfg = configService.get<AppConfig>(APP_CONFIG);
+        if (!appCfg) {
+          throw new Error('APP_CONFIG not found');
+        }
         const getNoteName = async (noteId: string) => {
           const noteName = await noteService.getNoteName(noteId);
           return noteName;

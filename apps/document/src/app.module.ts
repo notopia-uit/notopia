@@ -44,7 +44,10 @@ import pretty from 'pino-pretty';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const appCfg = configService.get<AppConfig>(APP_CONFIG)!;
+        const appCfg = configService.get<AppConfig>(APP_CONFIG);
+        if (!appCfg) {
+          throw new Error('APP_CONFIG not found');
+        }
         return {
           pinoHttp: {
             level: appCfg.logLevel,

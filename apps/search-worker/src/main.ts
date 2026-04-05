@@ -16,11 +16,18 @@ async function bootstrap() {
     inject: [ConfigService],
   });
   const configService = app.get(ConfigService);
-  const port = configService.get<AppConfig>(APP_CONFIG)!.port;
+  const appConfig = configService.get<AppConfig>(APP_CONFIG);
+  if (!appConfig) {
+    throw new Error('APP_CONFIG not found');
+  }
+  const port = appConfig.port;
   const logger = app.get(Logger);
   app.useLogger(logger);
   await app.startAllMicroservices();
   await app.listen(port);
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Failed to start application', err);
+  process.exit(1);
+});

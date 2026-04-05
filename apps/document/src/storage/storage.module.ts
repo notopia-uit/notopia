@@ -10,7 +10,10 @@ import { ConfigService } from '@nestjs/config';
     {
       provide: S3Client,
       useFactory: (configService: ConfigService) => {
-        const s3Config = configService.get<S3Config>(S3_CONFIG)!;
+        const s3Config = configService.get<S3Config>(S3_CONFIG);
+        if (!s3Config) {
+          throw new Error('S3_CONFIG not found');
+        }
         return new S3Client({
           region: s3Config.region,
           forcePathStyle: true,

@@ -41,10 +41,12 @@ export class AuthorizationService implements OnModuleInit {
         return WorkspaceItemPermission.WORKSPACE_ITEM_PERMISSION_WRITE;
       case 'delete':
         return WorkspaceItemPermission.WORKSPACE_ITEM_PERMISSION_DELETE;
-      default:
+      default: {
+        const exhaustiveCheck: never = permission;
         throw new UnprocessableEntityException(
-          `Invalid permission: ${permission}`
+          `Invalid permission: ${String(exhaustiveCheck)}`
         );
+      }
     }
   }
 

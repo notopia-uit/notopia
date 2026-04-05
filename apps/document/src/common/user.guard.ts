@@ -11,21 +11,37 @@ import { WsException } from '@nestjs/websockets';
 export abstract class UserGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const type = context.getType();
-    let request: any;
+    let headers: Record<string, unknown> | undefined;
 
     switch (type) {
-      case 'http':
-        request = context.switchToHttp().getRequest();
+      case 'http': {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        headers = context.switchToHttp().getRequest().headers as Record<
+          string,
+          unknown
+        >;
         break;
-      case 'ws':
-        request = context.switchToWs().getClient().handshake;
+      }
+      case 'ws': {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        headers = context.switchToWs().getClient().handshake as Record<
+          string,
+          unknown
+        >;
         break;
+      }
     }
 
-    const id = request.headers['x-forwarded-id'] as string;
+    if (!headers) {
+      this.throwException('Invalid request context');
+      return false;
+    }
+
+    const id = headers['x-forwarded-id'] as string | undefined;
 
     if (!id) {
       this.throwException('Missing Gateway Headers');
+      return false;
     }
 
     const parseHeaderList = (header?: string): string[] => {
@@ -34,20 +50,31 @@ export abstract class UserGuard implements CanActivate {
       return cleaned === '' ? [] : cleaned.split(/\s+/);
     };
 
+    const groupsList = parseHeaderList(
+      headers['x-forwarded-groups'] as string | undefined
+    );
+    const rolesList = parseHeaderList(
+      headers['x-forwarded-roles'] as string | undefined
+    );
+
     const user: User = {
       id,
-      email: request.headers['x-forwarded-email'] as string,
-      groups: parseHeaderList(request.headers['x-forwarded-groups'] as string),
-      roles: parseHeaderList(request.headers['x-forwarded-roles'] as string),
+      email: (headers['x-forwarded-email'] as string | undefined) || '',
+      ...(groupsList.length > 0 && { groups: groupsList }),
+      ...(rolesList.length > 0 && { roles: rolesList }),
     };
 
     switch (type) {
-      case 'http':
-        request.user = user;
+      case 'http': {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        context.switchToHttp().getRequest().user = user;
         break;
-      case 'ws':
+      }
+      case 'ws': {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         context.switchToWs().getClient().user = user;
         break;
+      }
     }
 
     return true;

@@ -1,3 +1,6 @@
+// sort-imports-ignore
+import 'reflect-metadata';
+
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/http-exception.filter';
 import { AppConfig } from './config/config';
@@ -17,8 +20,15 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   app.useLogger(logger);
   app.useGlobalFilters(new GlobalExceptionFilter(logger));
-  const port = configService.get<AppConfig>(APP_CONFIG)!.port;
+  const appConfig = configService.get<AppConfig>(APP_CONFIG);
+  if (!appConfig) {
+    throw new Error('APP_CONFIG not found');
+  }
+  const port = appConfig.port;
   await app.listen(port);
 }
 
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Failed to start application', err);
+  process.exit(1);
+});

@@ -1,4 +1,4 @@
-import { MeiliSearchError } from 'meilisearch';
+import { MeilisearchError } from 'meilisearch';
 
 export class SearchWorkerError extends Error {
   override name = 'SearchWorkerError';
@@ -6,10 +6,10 @@ export class SearchWorkerError extends Error {
 
 export class MeiliError extends SearchWorkerError {
   override name = 'MeiliError';
-  override cause: MeiliSearchError;
+  override cause: MeilisearchError;
 
-  constructor(cause: MeiliSearchError) {
-    super(`MeiliSearch error occurred`);
+  constructor(cause: MeilisearchError) {
+    super(`Meilisearch error occurred`);
 
     this.cause = cause;
   }

@@ -1,5 +1,5 @@
 import { RevisionEntity } from '../revision/revision.entity';
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn, type Relation } from 'typeorm';
 
 @Entity('documents')
 export class DocumentEntity {
@@ -15,5 +15,5 @@ export class DocumentEntity {
   @OneToMany(() => RevisionEntity, (revision) => revision.document, {
     cascade: true,
   })
-  revisions!: RevisionEntity[];
+  revisions!: Relation<RevisionEntity[]>;
 }

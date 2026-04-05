@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ShareNoteSearch } from '@notopia-uit/api-gen';
-import { MeiliSearch, MeiliSearchError } from 'meilisearch';
+import { Meilisearch, MeilisearchError } from 'meilisearch';
 
 type IndexNote = {
   id: string;
@@ -23,7 +23,7 @@ type IndexNote = {
 
 @Injectable()
 export class AppService {
-  constructor(private readonly meili: MeiliSearch) {}
+  constructor(private readonly meili: Meilisearch) {}
 
   async indexNote(note: IndexNote) {
     const index = this.meili.index('notes');
@@ -38,7 +38,7 @@ export class AppService {
     try {
       await index.addDocuments([noteSearch]);
     } catch (e) {
-      if (e instanceof MeiliSearchError) {
+      if (e instanceof MeilisearchError) {
         // FIXME: ????? What, retry? not process anymore? how many time
         throw new Error(`Failed to index note ${note.id}: ${e.message}`);
       }

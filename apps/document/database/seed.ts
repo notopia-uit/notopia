@@ -1,16 +1,14 @@
 // sort-imports-ignore
 import 'reflect-metadata';
 
-import datasource from '../src/database/datasource.typeorm.ts';
+import datasource from '../src/database/datasource.typeorm';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { createBlockNoteSchema } from '@notopia-uit/block-note';
 
 async function run() {
   try {
-    if (!datasource.isInitialized) {
-      console.log('🌱 Initializing DataSource...');
-      await datasource.initialize();
-    }
+    console.log('🌱 Initializing DataSource...');
+    await datasource.initialize();
 
     const blockNoteSchema = createBlockNoteSchema({
       baseUrl: '',

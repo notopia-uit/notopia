@@ -97,25 +97,31 @@ const config: Configuration = {
     },
   },
   externals: [
+    // nodeExternals returns an untyped function that webpack expects
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     nodeExternals({
       importType: isEsm ? 'module' : 'commonjs',
-    }) as any,
+    }) as unknown as Configuration['externals'],
     ...(isEsm
       ? [
-          (data, callback: any) => {
-            const request = data.request;
-            if (!request) return callback();
+          ((data: any, callback: any) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            const request: string | undefined = data.request;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+            if (!request) return callback(null);
             const bare = request.startsWith('node:')
               ? request.slice(5)
               : request;
             if (builtinModules.includes(bare)) {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
               return callback(null, `node:${bare}`);
             }
-            callback();
-          },
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            callback(null);
+          }) as unknown as Configuration['externals'],
         ]
       : []),
-  ],
+  ] as Configuration['externals'],
   plugins: [
     new NxAppRspackPlugin({
       tsConfig: tsConfigFile,

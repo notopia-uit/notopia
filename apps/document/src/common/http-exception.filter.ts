@@ -18,7 +18,7 @@ export interface ModelError {
 export class GlobalExceptionFilter implements ExceptionFilter {
   constructor(private readonly logger: Logger) {}
 
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
@@ -34,9 +34,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       const res = exception.getResponse();
       message =
-        typeof res === 'object'
-          ? (res as any).message || exception.message
-          : res;
+        typeof res === 'object' && res !== null && 'message' in res
+          ? String((res as Record<string, unknown>).message)
+          : exception.message;
       code = exception.name || 'HTTP_EXCEPTION';
     } else if (exception instanceof Error) {
       message = exception.message;

@@ -14,7 +14,7 @@ export class KafkaMaxRetryExceptionFilter extends BaseExceptionFilter {
     super();
   }
 
-  override async catch(exception: unknown, host: ArgumentsHost) {
+  override catch(exception: unknown, host: ArgumentsHost) {
     const kafkaContext = host.switchToRpc().getContext<KafkaContext>();
     const message = kafkaContext.getMessage();
     const currentRetryCount = this.getRetryCountFromContext(kafkaContext);
@@ -27,18 +27,14 @@ export class KafkaMaxRetryExceptionFilter extends BaseExceptionFilter {
       );
 
       if (this.skipHandler) {
-        try {
-          await this.skipHandler(message);
-        } catch (err) {
+        this.skipHandler(message).catch((err) => {
           this.logger.error('Error in skipHandler:', err);
-        }
+        });
       }
 
-      try {
-        await this.commitOffset(kafkaContext);
-      } catch (commitError) {
+      this.commitOffset(kafkaContext).catch((commitError) => {
         this.logger.error('Failed to commit offset:', commitError);
-      }
+      });
       return;
     }
 

@@ -27,9 +27,6 @@ export default defineConfig(
     files: ['**/*.{ts,tsx,cts,mts}'],
     languageOptions: {
       parser: eslintParserTypeScript,
-      parserOptions: {
-        project: true,
-      },
     },
   },
   {

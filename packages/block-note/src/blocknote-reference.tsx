@@ -40,7 +40,7 @@ const ReferenceLink = ({
       }
     };
 
-    fetchNote();
+    void fetchNote();
     return () => {
       isMounted = false;
     };

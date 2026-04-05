@@ -15,8 +15,10 @@ import { join } from 'path';
         imports: [ConfigModule],
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => {
-          const servicesCfg =
-            configService.get<ServicesConfig>(SERVICE_CONFIG)!;
+          const servicesCfg = configService.get<ServicesConfig>(SERVICE_CONFIG);
+          if (!servicesCfg) {
+            throw new Error('SERVICE_CONFIG not found');
+          }
           return {
             transport: Transport.GRPC,
             options: {

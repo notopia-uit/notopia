@@ -15,7 +15,9 @@ export class DocumentApi extends DocumentApiDefinition {
   }
 
   async getDocumentAttachmentUploadUrl(documentId: string, req: Request) {
-    const user = (req as any).user as User | undefined;
+    const user = (req as unknown as Record<string, unknown>).user as
+      | User
+      | undefined;
     if (!user) {
       throw new UnauthorizedException('User not authenticated');
     }

@@ -56,8 +56,9 @@ export const HocuspocusProvider: Provider = {
       },
 
       async beforeHandleMessage(data) {
-        const { context, connection } = data;
-        const userId = (context as HocuspocusContext).user.id;
+        const context = data.context as HocuspocusContext;
+        const connection = data.connection;
+        const userId = context.user.id;
 
         const response = await authorizationService.getUserNotePermissions(
           userId,
@@ -67,7 +68,7 @@ export const HocuspocusProvider: Provider = {
         if (!response.canRead) {
           connection.close();
           throw new Error(
-            `User ${context.userId} does not have permission to access document ${data.documentName}`
+            `User ${userId} does not have permission to access document ${data.documentName}`
           );
         }
         if (response.canWrite) {
