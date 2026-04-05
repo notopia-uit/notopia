@@ -1,7 +1,13 @@
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppConfig, MeiliConfig } from './config';
-import { APP_CONFIG, MEILI_CONFIG, appConfig } from './config.factory';
+import {
+  APP_CONFIG,
+  MEILI_CONFIG,
+  appConfig,
+  kafkaConfig,
+  meiliConfig,
+} from './config.factory';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Meilisearch } from 'meilisearch';
@@ -13,7 +19,7 @@ import pretty from 'pino-pretty';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig],
+      load: [appConfig, kafkaConfig, meiliConfig],
     }),
     OpenTelemetryModule.forRoot({
       metrics: {
