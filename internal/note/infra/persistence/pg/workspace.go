@@ -141,19 +141,25 @@ func (w *Workspace) CheckSlugExists(ctx context.Context, slug string) (bool, err
 	return result, toDomainError(err)
 }
 
-func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) errs.Error {
-	err := w.queries.SaveWorkspace(ctx, &pgsqlc.SaveWorkspaceParams{
-		ID:        workspace.ID(),
-		Slug:      workspace.Slug(),
-		Name:      workspace.Name(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		DeletedAt: workspace.DeletedAt(),
+func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) (cerr errs.Error) {
+	return runInTx(ctx, &runInTxParams{
+		pgxPool:       w.pgxPool,
+		queries:       w.queries,
+		inTransaction: w.inTransaction,
+	}, func(queries *pgsqlc.Queries) errs.Error {
+		err := queries.SaveWorkspace(ctx, &pgsqlc.SaveWorkspaceParams{
+			ID:        workspace.ID(),
+			Slug:      workspace.Slug(),
+			Name:      workspace.Name(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			DeletedAt: workspace.DeletedAt(),
+		})
+		if err != nil {
+			return toDomainError(err)
+		}
+		return nil
 	})
-	if err != nil {
-		return toDomainError(err)
-	}
-	return nil
 }
 
 func workspaceToDomain(workspace *pgsqlc.Workspace, rootFolderID uuid.UUID) (*domain.Workspace, errs.Error) {

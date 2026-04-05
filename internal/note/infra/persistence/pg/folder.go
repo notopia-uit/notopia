@@ -3,13 +3,11 @@ package pg
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	. "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -125,47 +123,13 @@ func folderToDomain(folder *model.Folders) *domain.Folder {
 	)
 }
 
-func (f *Folder) Save(ctx context.Context, folder *domain.Folder) errs.Error {
-	if err := f.queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
-		ID:          folder.ID(),
-		Name:        folder.Name(),
-		Icon:        folder.Icon(),
-		WorkspaceID: folder.WorkspaceID(),
-		ParentID:    folder.ParentID(),
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-		TrashedBy:   folder.TrashedByString(),
-		TrashedAt:   folder.TrashedAt(),
-	}); err != nil {
-		return toDomainError(err)
-	}
-	return nil
-}
-
-func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr errs.Error) {
-	var queries *pgsqlc.Queries
-	var tx pgx.Tx
-	var err error
-	if !f.inTransaction {
-		tx, err = f.pgxPool.Begin(ctx)
-		if err != nil {
-			return toDomainError(err)
-		}
-		defer func() {
-			if err := tx.Rollback(ctx); err != nil {
-				cerr = errs.NewPersistenceInternal("failed to rollback transaction", fmt.Errorf("%w: %v", cerr, err))
-			}
-		}()
-		queries = f.queries.WithTx(tx)
-	} else {
-		queries = f.queries
-	}
-	if err := queries.CreateTempTableFolders(ctx); err != nil {
-		return toDomainError(err)
-	}
-	saveFolderParams := make([]*pgsqlc.InsertTempFoldersParams, len(folders))
-	for i, folder := range folders {
-		saveFolderParams[i] = &pgsqlc.InsertTempFoldersParams{
+func (f *Folder) Save(ctx context.Context, folder *domain.Folder) (cerr errs.Error) {
+	return runInTx(ctx, &runInTxParams{
+		pgxPool:       f.pgxPool,
+		queries:       f.queries,
+		inTransaction: f.inTransaction,
+	}, func(queries *pgsqlc.Queries) errs.Error {
+		if err := queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
 			ID:          folder.ID(),
 			Name:        folder.Name(),
 			Icon:        folder.Icon(),
@@ -175,24 +139,48 @@ func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr e
 			UpdatedAt:   time.Now(),
 			TrashedBy:   folder.TrashedByString(),
 			TrashedAt:   folder.TrashedAt(),
+		}); err != nil {
+			return toDomainError(err)
 		}
-	}
-	affected, err := queries.InsertTempFolders(ctx, saveFolderParams)
-	if err != nil {
-		return toDomainError(err)
-	}
-	if affected != int64(len(folders)) {
-		return toDomainError(errors.New("not all folders were inserted into temp table"))
-	}
-	if err = queries.SaveFromTempFolders(ctx); err != nil {
-		return toDomainError(err)
-	}
-	if !f.inTransaction {
-		if err := tx.Commit(ctx); err != nil {
-			return errs.NewPersistenceInternal("failed to commit transaction", err)
+		return nil
+	})
+}
+
+func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr errs.Error) {
+	return runInTx(ctx, &runInTxParams{
+		pgxPool:       f.pgxPool,
+		queries:       f.queries,
+		inTransaction: f.inTransaction,
+	}, func(queries *pgsqlc.Queries) errs.Error {
+		if err := queries.CreateTempTableFolders(ctx); err != nil {
+			return toDomainError(err)
 		}
-	}
-	return nil
+		saveFolderParams := make([]*pgsqlc.InsertTempFoldersParams, len(folders))
+		for i, folder := range folders {
+			saveFolderParams[i] = &pgsqlc.InsertTempFoldersParams{
+				ID:          folder.ID(),
+				Name:        folder.Name(),
+				Icon:        folder.Icon(),
+				WorkspaceID: folder.WorkspaceID(),
+				ParentID:    folder.ParentID(),
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+				TrashedBy:   folder.TrashedByString(),
+				TrashedAt:   folder.TrashedAt(),
+			}
+		}
+		affected, err := queries.InsertTempFolders(ctx, saveFolderParams)
+		if err != nil {
+			return toDomainError(err)
+		}
+		if affected != int64(len(folders)) {
+			return toDomainError(errors.New("not all folders were inserted into temp table"))
+		}
+		if err = queries.SaveFromTempFolders(ctx); err != nil {
+			return toDomainError(err)
+		}
+		return nil
+	})
 }
 
 func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, errs.Error) {

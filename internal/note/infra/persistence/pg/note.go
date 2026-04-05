@@ -3,13 +3,11 @@ package pg
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	. "github.com/go-jet/jet/v2/postgres"
 	"github.com/go-jet/jet/v2/qrm"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -155,94 +153,12 @@ func noteToDomain(note *GetNoteResult) *domain.Note {
 
 // TODO: It doesn't save the outgoing links
 func (n *Note) Save(ctx context.Context, note *domain.Note) (cerr errs.Error) {
-	var queries *pgsqlc.Queries
-	var tx pgx.Tx
-	var err error
-	if !n.inTransaction {
-		tx, err = n.pgxPool.Begin(ctx)
-		if err != nil {
-			return toDomainError(err)
-		}
-		queries = n.queries.WithTx(tx)
-		defer func() {
-			if err := tx.Rollback(ctx); err != nil {
-				cerr = errs.NewPersistenceInternal("failed to rollback transaction", fmt.Errorf("%w: %v", cerr, err))
-			}
-		}()
-	} else {
-		queries = n.queries
-	}
-	err = queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
-		ID:        note.ID(),
-		Name:      note.Name(),
-		Icon:      note.Icon(),
-		FolderID:  note.FolderID(),
-		Tags:      note.Tags(),
-		Size:      int32(note.Size()),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		TrashedBy: note.TrashedByString(),
-		TrashedAt: note.TrashedAt(),
-	})
-	if err != nil {
-		return toDomainError(err)
-	}
-	if err := queries.CreateTempTableNoteLinks(ctx); err != nil {
-		return toDomainError(err)
-	}
-	saveNoteLinkParams := make([]*pgsqlc.InsertTempNoteLinksParams, len(note.OutgoingLinks()))
-	for i, targetID := range note.OutgoingLinks() {
-		saveNoteLinkParams[i] = &pgsqlc.InsertTempNoteLinksParams{
-			SourceID: note.ID(),
-			TargetID: targetID,
-		}
-	}
-	affected, err := queries.InsertTempNoteLinks(ctx, saveNoteLinkParams)
-	if err != nil {
-		return toDomainError(err)
-	}
-	if affected != int64(len(note.OutgoingLinks())) {
-		return toDomainError(errors.New("not all note links were inserted into temp table"))
-	}
-	if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
-		return toDomainError(err)
-	}
-	if err := queries.SaveFromTempNoteLinks(ctx); err != nil {
-		return toDomainError(err)
-	}
-	if !n.inTransaction {
-		if err := tx.Commit(ctx); err != nil {
-			return errs.NewPersistenceInternal("failed to commit transaction", err)
-		}
-	}
-	return nil
-}
-
-// TODO: It doesn't save the outgoing links
-func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) (cerr errs.Error) {
-	var queries *pgsqlc.Queries
-	var tx pgx.Tx
-	var err error
-	if !n.inTransaction {
-		tx, err = n.pgxPool.Begin(ctx)
-		if err != nil {
-			return toDomainError(err)
-		}
-		defer func() {
-			if err := tx.Rollback(ctx); err != nil {
-				cerr = errs.NewPersistenceInternal("failed to rollback transaction", fmt.Errorf("%w: %v", cerr, err))
-			}
-		}()
-		queries = n.queries.WithTx(tx)
-	} else {
-		queries = n.queries
-	}
-	if err = queries.CreateTempTableNotes(ctx); err != nil {
-		return toDomainError(err)
-	}
-	saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(notes))
-	for i, note := range notes {
-		saveNoteParams[i] = &pgsqlc.InsertTempNotesParams{
+	return runInTx(ctx, &runInTxParams{
+		pgxPool:       n.pgxPool,
+		queries:       n.queries,
+		inTransaction: n.inTransaction,
+	}, func(queries *pgsqlc.Queries) errs.Error {
+		err := queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
 			ID:        note.ID(),
 			Name:      note.Name(),
 			Icon:      note.Icon(),
@@ -253,24 +169,74 @@ func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) (cerr errs.Er
 			UpdatedAt: time.Now(),
 			TrashedBy: note.TrashedByString(),
 			TrashedAt: note.TrashedAt(),
+		})
+		if err != nil {
+			return toDomainError(err)
 		}
-	}
-	affected, err := queries.InsertTempNotes(ctx, saveNoteParams)
-	if err != nil {
-		return toDomainError(err)
-	}
-	if affected != int64(len(notes)) {
-		return toDomainError(errors.New("not all notes were inserted into temp table"))
-	}
-	if err = queries.SaveFromTempNotes(ctx); err != nil {
-		return toDomainError(err)
-	}
-	if !n.inTransaction {
-		if err := tx.Commit(ctx); err != nil {
-			return errs.NewPersistenceInternal("failed to commit transaction", err)
+		if err := queries.CreateTempTableNoteLinks(ctx); err != nil {
+			return toDomainError(err)
 		}
-	}
-	return nil
+		saveNoteLinkParams := make([]*pgsqlc.InsertTempNoteLinksParams, len(note.OutgoingLinks()))
+		for i, targetID := range note.OutgoingLinks() {
+			saveNoteLinkParams[i] = &pgsqlc.InsertTempNoteLinksParams{
+				SourceID: note.ID(),
+				TargetID: targetID,
+			}
+		}
+		affected, err := queries.InsertTempNoteLinks(ctx, saveNoteLinkParams)
+		if err != nil {
+			return toDomainError(err)
+		}
+		if affected != int64(len(note.OutgoingLinks())) {
+			return toDomainError(errors.New("not all note links were inserted into temp table"))
+		}
+		if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
+			return toDomainError(err)
+		}
+		if err := queries.SaveFromTempNoteLinks(ctx); err != nil {
+			return toDomainError(err)
+		}
+		return nil
+	})
+}
+
+// TODO: It doesn't save the outgoing links
+func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) (cerr errs.Error) {
+	return runInTx(ctx, &runInTxParams{
+		pgxPool:       n.pgxPool,
+		queries:       n.queries,
+		inTransaction: n.inTransaction,
+	}, func(queries *pgsqlc.Queries) errs.Error {
+		if err := queries.CreateTempTableNotes(ctx); err != nil {
+			return toDomainError(err)
+		}
+		saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(notes))
+		for i, note := range notes {
+			saveNoteParams[i] = &pgsqlc.InsertTempNotesParams{
+				ID:        note.ID(),
+				Name:      note.Name(),
+				Icon:      note.Icon(),
+				FolderID:  note.FolderID(),
+				Tags:      note.Tags(),
+				Size:      int32(note.Size()),
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+				TrashedBy: note.TrashedByString(),
+				TrashedAt: note.TrashedAt(),
+			}
+		}
+		affected, err := queries.InsertTempNotes(ctx, saveNoteParams)
+		if err != nil {
+			return toDomainError(err)
+		}
+		if affected != int64(len(notes)) {
+			return toDomainError(errors.New("not all notes were inserted into temp table"))
+		}
+		if err = queries.SaveFromTempNotes(ctx); err != nil {
+			return toDomainError(err)
+		}
+		return nil
+	})
 }
 
 func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, errs.Error) {

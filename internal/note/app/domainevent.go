@@ -7,7 +7,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
-// NOTE: This has to be instantiate each time of handling, under persistence transaction
+// This has to be instantiate each time of handling, under persistence transaction
 // Mainly used by the unit of work
 type DomainEventPublisher interface {
 	Publish(ctx context.Context, events ...domain.Event) error
