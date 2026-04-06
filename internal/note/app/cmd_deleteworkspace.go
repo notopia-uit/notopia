@@ -31,7 +31,7 @@ func NewDeleteWorkspaceHandler(
 
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
-func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) errs.Error {
+func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) error {
 	hasPermission, err := h.authorizationService.HasWorkspacePermission(
 		ctx,
 		cmd.UserID,

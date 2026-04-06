@@ -17,7 +17,7 @@ type GetNote struct {
 }
 
 type GetNoteReadModel interface {
-	GetNote(ctx context.Context, q *GetNote) (*Note, errs.Error)
+	GetNote(ctx context.Context, q *GetNote) (*Note, error)
 }
 
 type GetNoteHandler struct {
@@ -40,7 +40,7 @@ func NewGetNoteHandler(
 
 var ProvideGetNoteHandler = NewGetNoteHandler
 
-func (h *GetNoteHandler) Handle(ctx context.Context, query *GetNote) (*Note, errs.Error) {
+func (h *GetNoteHandler) Handle(ctx context.Context, query *GetNote) (*Note, error) {
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)
 	if err != nil {
 		return nil, err

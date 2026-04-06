@@ -193,7 +193,7 @@ func (n *Note) TrashedAt() *time.Time {
 	return &n.trashed.at
 }
 
-func (n *Note) Trash(trashedBy TrashedBy, userID string) errs.Error {
+func (n *Note) Trash(trashedBy TrashedBy, userID string) error {
 	if n.trashed != nil {
 		return errs.NewNoteAlreadyTrashed(n.id)
 	}

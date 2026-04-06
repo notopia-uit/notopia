@@ -28,21 +28,21 @@ var _ domain.RepoRegistry = (*RepoRegistry)(nil)
 
 func (r *RepoRegistry) Workspace() domain.WorkspaceRepo {
 	r.wsOnce.Do(func() {
-		r.workspace = NewWorkspace(nil, r.txQueries, true)
+		r.workspace = NewWorkspaceRepo(nil, r.txQueries, true)
 	})
 	return r.workspace
 }
 
 func (r *RepoRegistry) Folder() domain.FolderRepo {
 	r.folderOnce.Do(func() {
-		r.folder = NewFolder(nil, r.txQueries, true)
+		r.folder = NewFolderRepo(nil, r.txQueries, true)
 	})
 	return r.folder
 }
 
 func (r *RepoRegistry) Note() domain.NoteRepo {
 	r.noteOnce.Do(func() {
-		r.note = NewNote(nil, r.txQueries, true)
+		r.note = NewNoteRepo(nil, r.txQueries, true)
 	})
 	return r.note
 }
@@ -64,15 +64,16 @@ var ProvideUnitOfWork = NewUnitOfWork
 // NOTE: an AI said about chaining error is not a good idea?
 func (u *UnitOfWork) Execute(
 	ctx context.Context,
-	fn func(repoRegistry domain.RepoRegistry) errs.Error,
-) (cerr errs.Error) {
+	fn func(repoRegistry domain.RepoRegistry) error,
+) error {
 	tx, err := u.pool.Begin(ctx)
 	if err != nil {
 		return errs.NewPersistenceInternal("failed to begin transaction", err)
 	}
 	defer func() {
-		if err := tx.Rollback(ctx); err != nil {
-			cerr = errs.NewPersistenceInternal("failed to rollback transaction", fmt.Errorf("%w: %v", cerr, err))
+		if rollbackErr := tx.Rollback(ctx); rollbackErr != nil {
+			// Log but don't override the original error if transaction failed
+			_ = errs.NewPersistenceInternal("failed to rollback transaction", fmt.Errorf("%w: %v", err, rollbackErr))
 		}
 	}()
 

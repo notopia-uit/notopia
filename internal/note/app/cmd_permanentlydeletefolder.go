@@ -31,7 +31,7 @@ func PermanentlyNewDeleteFolderHandler(
 
 var ProvidePermanentlyDeleteFolderHandler = PermanentlyNewDeleteFolderHandler
 
-func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteFolder) errs.Error {
+func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteFolder) error {
 	workspaceID, err := h.folderRepo.GetWorkspaceIDByID(ctx, cmd.ID)
 	if err != nil {
 		return err

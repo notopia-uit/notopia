@@ -32,7 +32,7 @@ func NewRenameNoteHandler(
 
 var ProvideRenameNoteHandler = NewRenameNoteHandler
 
-func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) errs.Error {
+func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
 	workspaceID, err := h.noterepo.GetWorkspaceIDByID(ctx, cmd.ID)
 	if err != nil {
 		return err

@@ -22,7 +22,7 @@ func NewWorkspace(
 	name string,
 	slug string,
 	rootFolderID uuid.UUID,
-) (*Workspace, errs.Error) {
+) (*Workspace, error) {
 	if name == "" {
 		return nil, errs.EmptyFolderName
 	}

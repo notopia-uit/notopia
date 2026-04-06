@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type GetWorkspaceTree struct {
@@ -15,7 +14,7 @@ type GetWorkspaceTree struct {
 }
 
 type GetWorkspaceTreeReadModel interface {
-	GetWorkspaceTree(ctx context.Context, q *GetWorkspaceTree) (*WorkspaceTreeFolder, errs.Error)
+	GetWorkspaceTree(ctx context.Context, q *GetWorkspaceTree) (*WorkspaceTreeFolder, error)
 }
 
 type GetWorkspaceTreeHandler struct {
@@ -28,7 +27,7 @@ func NewGetWorkspaceTreeHandler(readModel GetWorkspaceTreeReadModel) *GetWorkspa
 
 var ProvideGetWorkspaceTreeHandler = NewGetWorkspaceTreeHandler
 
-func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspaceTree) (*WorkspaceTreeFolder, errs.Error) {
+func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspaceTree) (*WorkspaceTreeFolder, error) {
 	// TODO: Authorize
 	return h.readModel.GetWorkspaceTree(ctx, query)
 }

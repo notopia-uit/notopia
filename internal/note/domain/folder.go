@@ -25,7 +25,7 @@ func NewFolder(
 	workspaceID uuid.UUID,
 	folderHierarchy FolderHierarchy,
 	userID string,
-) (*Folder, errs.Error) {
+) (*Folder, error) {
 	if name == "" {
 		return nil, errs.EmptyFolderName
 	}
@@ -151,7 +151,7 @@ func (f *Folder) TrashedAt() *time.Time {
 	return &f.trashed.at
 }
 
-func (f *Folder) Trash(trashedBy TrashedBy, userID string) errs.Error {
+func (f *Folder) Trash(trashedBy TrashedBy, userID string) error {
 	if f.trashed != nil {
 		return errs.NewFolderAlreadyTrashed(f.id)
 	}

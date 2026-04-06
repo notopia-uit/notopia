@@ -14,7 +14,7 @@ func NewNoteService() *NoteService {
 
 var ProvideNoteService = NewNoteService
 
-func (s *NoteService) UpdateNoteSizeBasedOnContent(note *Note, content any, userID string) errs.Error {
+func (s *NoteService) UpdateNoteSizeBasedOnContent(note *Note, content any, userID string) error {
 	b, err := json.Marshal(content)
 	if err != nil {
 		return errs.NewNoteFailToMarshalDocumentContent(note.ID(), content, err)

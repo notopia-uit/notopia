@@ -13,33 +13,33 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type Workspace struct {
+type WorkspaceRepo struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
 	inTransaction bool
 }
 
-var _ domain.WorkspaceRepo = (*Workspace)(nil)
+var _ domain.WorkspaceRepo = (*WorkspaceRepo)(nil)
 
-func NewWorkspace(
+func NewWorkspaceRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
 	inTransaction bool,
-) *Workspace {
-	return &Workspace{
+) *WorkspaceRepo {
+	return &WorkspaceRepo{
 		pgxPool:       pgxPool,
 		queries:       queries,
 		inTransaction: inTransaction,
 	}
 }
 
-func NewNoTransactionWorkspace(pgxPool *pgxpool.Pool, queries *pgsqlc.Queries) *Workspace {
-	return NewWorkspace(pgxPool, queries, false)
+func NewNoTransactionWorkspaceRepo(pgxPool *pgxpool.Pool, queries *pgsqlc.Queries) *WorkspaceRepo {
+	return NewWorkspaceRepo(pgxPool, queries, false)
 }
 
-var ProvideWorkspace = NewNoTransactionWorkspace
+var ProvideWorkspaceRepo = NewNoTransactionWorkspaceRepo
 
-func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) (*domain.Workspace, errs.Error) {
+func (w *WorkspaceRepo) GetBySlug(ctx context.Context, slug string, forUpdate bool) (*domain.Workspace, error) {
 	workspace, err := w.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
 		Slug:      &slug,
 		ID:        nil,
@@ -49,7 +49,7 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewWorkspaceBySlugNotFound(slug, err)
 		}
-		return nil, toDomainError(err)
+		return nil, toErr(err)
 	}
 
 	folders, err := w.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
@@ -58,17 +58,17 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 		ForUpdate:    forUpdate,
 	})
 	if err != nil {
-		return nil, toDomainError(err)
+		return nil, toErr(err)
 	}
 
 	if len(folders) == 0 {
 		return nil, errs.NewWorkspaceRootFolderNotFound(workspace.ID, pgx.ErrNoRows)
 	}
 
-	return workspaceToDomain(workspace, folders[0].ID)
+	return workspaceToDomainRepo(workspace, folders[0].ID)
 }
 
-func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Workspace, errs.Error) {
+func (w *WorkspaceRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Workspace, error) {
 	workspace, err := w.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
 		Slug:      nil,
 		ID:        &id,
@@ -78,7 +78,7 @@ func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewWorkspaceNotFound(id, err)
 		}
-		return nil, toDomainError(err)
+		return nil, toErr(err)
 	}
 
 	folders, err := w.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
@@ -87,38 +87,41 @@ func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 		ForUpdate:    forUpdate,
 	})
 	if err != nil {
-		return nil, toDomainError(err)
+		return nil, toErr(err)
 	}
 
 	if len(folders) == 0 {
 		return nil, errs.NewWorkspaceRootFolderNotFound(id, pgx.ErrNoRows)
 	}
 
-	return workspaceToDomain(workspace, folders[0].ID)
+	return workspaceToDomainRepo(workspace, folders[0].ID)
 }
 
-func (w *Workspace) GetIDBySlug(ctx context.Context, slug string) (*uuid.UUID, errs.Error) {
+func (w *WorkspaceRepo) GetIDBySlug(ctx context.Context, slug string) (*uuid.UUID, error) {
 	result, err := w.queries.GetWorkspaceIDBySlug(ctx, slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewWorkspaceBySlugNotFound(slug, err)
 		}
-		return nil, toDomainError(err)
+		return nil, toErr(err)
 	}
 	return &result, nil
 }
 
-func (w *Workspace) CheckSlugExists(ctx context.Context, slug string) (bool, errs.Error) {
+func (w *WorkspaceRepo) CheckSlugExists(ctx context.Context, slug string) (bool, error) {
 	result, err := w.queries.CheckSlugExists(ctx, slug)
-	return result, toDomainError(err)
+	if err != nil {
+		return false, toErr(err)
+	}
+	return result, nil
 }
 
-func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) (cerr errs.Error) {
+func (w *WorkspaceRepo) Save(ctx context.Context, workspace *domain.Workspace) (cerr error) {
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       w.pgxPool,
 		queries:       w.queries,
 		inTransaction: w.inTransaction,
-	}, func(queries *pgsqlc.Queries) errs.Error {
+	}, func(queries *pgsqlc.Queries) error {
 		err := queries.SaveWorkspace(ctx, &pgsqlc.SaveWorkspaceParams{
 			ID:        workspace.ID(),
 			Slug:      workspace.Slug(),
@@ -128,13 +131,13 @@ func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) (cerr
 			DeletedAt: workspace.DeletedAt(),
 		})
 		if err != nil {
-			return toDomainError(err)
+			return toErr(err)
 		}
 		return nil
 	})
 }
 
-func workspaceToDomain(workspace *pgsqlc.Workspace, rootFolderID uuid.UUID) (*domain.Workspace, errs.Error) {
+func workspaceToDomainRepo(workspace *pgsqlc.Workspace, rootFolderID uuid.UUID) (*domain.Workspace, error) {
 	return domain.NewWorkspace(
 		workspace.ID,
 		workspace.Name,

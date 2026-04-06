@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type RestoreTrashedWorkspaceItems struct {
@@ -35,7 +34,7 @@ func NewRestoreTrashedWorkspaceItemsHandler(
 
 var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItemsHandler
 
-func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) errs.Error {
+func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) error {
 	trashedNotes, err := h.noteRepo.GetMany(ctx,
 		domain.NewNoteRepoGetManyParamsByWorkspaceID(cmd.WorkspaceID).
 			WithIsTrashed(true),

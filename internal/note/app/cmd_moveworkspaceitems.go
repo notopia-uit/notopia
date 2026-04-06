@@ -40,7 +40,7 @@ func NewMoveWorkspaceItemsHandler(
 
 var ProvideMoveWorkspaceItemsHandler = NewMoveWorkspaceItemsHandler
 
-func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) errs.Error {
+func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) error {
 	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
 		ctx,
 		cmd.UserID,
@@ -91,7 +91,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 	var folders []*domain.Folder
 	var notes []*domain.Note
 
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) errs.Error {
+	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
 		noteRepo := r.Note()
 

@@ -7,21 +7,21 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/domain"
 )
 
-type DomainEventToIntegrationEventNoteCreatedHandler struct {
+type NoteCreatedDomainToIntegrationEventHandler struct {
 	integrationPublisher IntegrationPublisher
 }
 
-var _ DomainEventToIntegrationEventHandler[*domain.NoteCreatedEvent] = (*DomainEventToIntegrationEventNoteCreatedHandler)(nil)
+var _ DomainEventHandler[*domain.NoteCreatedEvent] = (*NoteCreatedDomainToIntegrationEventHandler)(nil)
 
-func NewDomainEventToIntegrationEventNoteCreatedHandler(
+func NewNoteCreatedDomainToIntegrationEventHandler(
 	integrationPublisher IntegrationPublisher,
-) *DomainEventToIntegrationEventNoteCreatedHandler {
-	return &DomainEventToIntegrationEventNoteCreatedHandler{
+) *NoteCreatedDomainToIntegrationEventHandler {
+	return &NoteCreatedDomainToIntegrationEventHandler{
 		integrationPublisher: integrationPublisher,
 	}
 }
 
-func (h *DomainEventToIntegrationEventNoteCreatedHandler) Handle(ctx context.Context, event *domain.NoteCreatedEvent) error {
+func (h *NoteCreatedDomainToIntegrationEventHandler) Handle(ctx context.Context, event *domain.NoteCreatedEvent) error {
 	integrationEvent := IntegrationEventNoteCreated{
 		Id:   &event.AggregateID,
 		Icon: event.Icon,

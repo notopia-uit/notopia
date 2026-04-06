@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type ShowTrash struct {
@@ -12,7 +11,7 @@ type ShowTrash struct {
 }
 
 type ShowTrashReadModel interface {
-	ShowTrash(ctx context.Context, q *ShowTrash) (*Trash, errs.Error)
+	ShowTrash(ctx context.Context, q *ShowTrash) (*Trash, error)
 }
 
 type ShowTrashHandler struct {
@@ -25,6 +24,6 @@ func NewShowTrashHandler(readModel ShowTrashReadModel) *ShowTrashHandler {
 
 var ProvideShowTrashHandler = NewShowTrashHandler
 
-func (h *ShowTrashHandler) Handle(ctx context.Context, query *ShowTrash) (*Trash, errs.Error) {
+func (h *ShowTrashHandler) Handle(ctx context.Context, query *ShowTrash) (*Trash, error) {
 	return h.readModel.ShowTrash(ctx, query)
 }

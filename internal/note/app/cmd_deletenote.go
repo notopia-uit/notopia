@@ -31,7 +31,7 @@ func PermanentlyNewDeleteNoteHandler(
 
 var ProvidePermanentlyDeleteNoteHandler = PermanentlyNewDeleteNoteHandler
 
-func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteNote) errs.Error {
+func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteNote) error {
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, cmd.ID)
 	if err != nil {
 		return err

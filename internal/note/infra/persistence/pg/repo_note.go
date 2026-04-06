@@ -3,6 +3,7 @@ package pg
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,36 +14,36 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type Note struct {
+type NoteRepo struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
 	inTransaction bool
 }
 
-var _ domain.NoteRepo = (*Note)(nil)
+var _ domain.NoteRepo = (*NoteRepo)(nil)
 
-func NewNote(
+func NewNoteRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
 	inTransaction bool,
-) *Note {
-	return &Note{
+) *NoteRepo {
+	return &NoteRepo{
 		pgxPool:       pgxPool,
 		queries:       queries,
 		inTransaction: inTransaction,
 	}
 }
 
-func NewNoTransactionNote(
+func NewNoTransactionNoteRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
-) *Note {
-	return NewNote(pgxPool, queries, false)
+) *NoteRepo {
+	return NewNoteRepo(pgxPool, queries, false)
 }
 
-var ProvideNote = NewNoTransactionNote
+var ProvideNoteRepo = NewNoTransactionNoteRepo
 
-func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Note, errs.Error) {
+func (n *NoteRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Note, error) {
 	note, err := n.queries.GetNoteByID(ctx, pgsqlc.GetNoteByIDParams{
 		ID:        id,
 		ForUpdate: forUpdate,
@@ -51,7 +52,7 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewNoteNotFound(id, err)
 		}
-		return nil, toDomainError(err)
+		return nil, toErr(err)
 	}
 
 	// Fetch outgoing links separately
@@ -60,13 +61,13 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 		SourceIDs: nil,
 	})
 	if err != nil {
-		return nil, toDomainError(err)
+		return nil, toErr(err)
 	}
 
-	return noteToDomain(note, links), nil
+	return noteToDomainRepo(note, links), nil
 }
 
-func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams) ([]*domain.Note, errs.Error) {
+func (n *NoteRepo) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams) ([]*domain.Note, error) {
 	var ids *[]uuid.UUID
 	if len(params.IDs()) > 0 {
 		paramIDs := params.IDs()
@@ -97,7 +98,7 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 		ForUpdate:    params.ForUpdate(),
 	})
 	if err != nil {
-		return nil, toDomainError(err)
+		return nil, toErr(err)
 	}
 
 	// Query links per note (type-safe approach)
@@ -109,14 +110,14 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 			SourceIDs: nil,
 		})
 		if err != nil {
-			return nil, toDomainError(err)
+			return nil, toErr(err)
 		}
-		result[i] = noteToDomain(note, links)
+		result[i] = noteToDomainRepo(note, links)
 	}
 	return result, nil
 }
 
-func noteToDomain(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
+func noteToDomainRepo(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
 	var trashed *domain.Trashed
 	if note.TrashedBy != nil && note.TrashedAt != nil {
 		trashed = domain.NewTrashed(
@@ -141,12 +142,12 @@ func noteToDomain(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
 }
 
 // TODO: It doesn't save the outgoing links
-func (n *Note) Save(ctx context.Context, note *domain.Note) (cerr errs.Error) {
+func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) (cerr error) {
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
 		inTransaction: n.inTransaction,
-	}, func(queries *pgsqlc.Queries) errs.Error {
+	}, func(queries *pgsqlc.Queries) error {
 		err := queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
 			ID:        note.ID(),
 			Name:      note.Name(),
@@ -160,10 +161,10 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) (cerr errs.Error) {
 			TrashedAt: note.TrashedAt(),
 		})
 		if err != nil {
-			return toDomainError(err)
+			return toErr(err)
 		}
 		if err := queries.CreateTempTableNoteLinks(ctx); err != nil {
-			return toDomainError(err)
+			return toErr(err)
 		}
 		saveNoteLinkParams := make([]*pgsqlc.InsertTempNoteLinksParams, len(note.OutgoingLinks()))
 		for i, targetID := range note.OutgoingLinks() {
@@ -174,30 +175,30 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) (cerr errs.Error) {
 		}
 		affected, err := queries.InsertTempNoteLinks(ctx, saveNoteLinkParams)
 		if err != nil {
-			return toDomainError(err)
+			return toErr(err)
 		}
 		if affected != int64(len(note.OutgoingLinks())) {
-			return toDomainError(errors.New("not all note links were inserted into temp table"))
+			return fmt.Errorf("not all note links were inserted into temp table")
 		}
 		if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
-			return toDomainError(err)
+			return toErr(err)
 		}
 		if err := queries.SaveFromTempNoteLinks(ctx); err != nil {
-			return toDomainError(err)
+			return toErr(err)
 		}
 		return nil
 	})
 }
 
 // TODO: It doesn't save the outgoing links
-func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) (cerr errs.Error) {
+func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) (cerr error) {
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
 		inTransaction: n.inTransaction,
-	}, func(queries *pgsqlc.Queries) errs.Error {
+	}, func(queries *pgsqlc.Queries) error {
 		if err := queries.CreateTempTableNotes(ctx); err != nil {
-			return toDomainError(err)
+			return fmt.Errorf("failed to create temp table for notes: %w", toErr(err))
 		}
 		saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(notes))
 		for i, note := range notes {
@@ -216,49 +217,49 @@ func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) (cerr errs.Er
 		}
 		affected, err := queries.InsertTempNotes(ctx, saveNoteParams)
 		if err != nil {
-			return toDomainError(err)
+			return fmt.Errorf("failed to insert notes into temp table: %w", toErr(err))
 		}
 		if affected != int64(len(notes)) {
-			return toDomainError(errors.New("not all notes were inserted into temp table"))
+			return fmt.Errorf("not all notes were inserted into temp table (expected %d, got %d)", len(notes), affected)
 		}
 		if err = queries.SaveFromTempNotes(ctx); err != nil {
-			return toDomainError(err)
+			return fmt.Errorf("failed to save notes from temp table: %w", toErr(err))
 		}
 		return nil
 	})
 }
 
-func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, errs.Error) {
+func (n *NoteRepo) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error) {
 	count, err := n.queries.CountNotesInWorkspaceByIDs(ctx, &pgsqlc.CountNotesInWorkspaceByIDsParams{
 		IDs:         ids,
 		WorkspaceID: workspaceID,
 	})
 	if err != nil {
-		return false, toDomainError(err)
+		return false, fmt.Errorf("failed to check if notes are in workspace: %w", toErr(err))
 	}
 	return count == int64(len(ids)), nil
 }
 
-func (n *Note) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) errs.Error {
+func (n *NoteRepo) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error {
 	err := n.queries.PermanentlyDeleteNoteByID(ctx, id)
 	if err != nil {
-		return toDomainError(err)
+		return fmt.Errorf("failed to permanently delete note: %w", toErr(err))
 	}
 	return nil
 }
 
-func (n *Note) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) errs.Error {
+func (n *NoteRepo) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error {
 	err := n.queries.PermanentlyDeleteNotesByIDs(ctx, ids)
 	if err != nil {
-		return toDomainError(err)
+		return fmt.Errorf("failed to permanently delete notes: %w", toErr(err))
 	}
 	return nil
 }
 
-func (n *Note) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, errs.Error) {
+func (n *NoteRepo) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
 	workspaceID, err := n.queries.GetWorkspaceIDByNoteID(ctx, id)
 	if err != nil {
-		return uuid.Nil, toDomainError(err)
+		return uuid.Nil, fmt.Errorf("failed to get workspace id for note: %w", toErr(err))
 	}
 	return workspaceID, nil
 }

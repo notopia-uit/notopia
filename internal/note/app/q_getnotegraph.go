@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type GetNoteGraph struct {
@@ -14,7 +13,7 @@ type GetNoteGraph struct {
 }
 
 type GetNoteGraphReadModel interface {
-	GetNoteGraph(ctx context.Context, q *GetNoteGraph) (*Graph, errs.Error)
+	GetNoteGraph(ctx context.Context, q *GetNoteGraph) (*Graph, error)
 }
 
 type GetNoteGraphHandler struct {
@@ -27,7 +26,7 @@ func NewGetNoteGraphHandler(readModel GetNoteGraphReadModel) *GetNoteGraphHandle
 
 var ProvideGetNoteGraphHandler = NewGetNoteGraphHandler
 
-func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (*Graph, errs.Error) {
+func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (*Graph, error) {
 	// TODO: Auth
 	if query.Depth <= 0 {
 		query.Depth = math.MaxInt

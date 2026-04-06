@@ -36,7 +36,7 @@ func NewCreateFolderHandler(
 
 var ProvideCreateFolderHandler = NewCreateFolderHandler
 
-func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) errs.Error {
+func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) error {
 	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
 		ctx,
 		cmd.UserID,

@@ -32,7 +32,7 @@ func NewRenameFolderHandler(
 
 var ProvideRenameFolderHandler = NewRenameFolderHandler
 
-func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) errs.Error {
+func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) error {
 	workspaceID, err := h.folderRepo.GetWorkspaceIDByID(ctx, cmd.ID)
 	if err != nil {
 		return err

@@ -18,8 +18,8 @@ type runInTxParams struct {
 func runInTx(
 	ctx context.Context,
 	params *runInTxParams,
-	fn func(queries *pgsqlc.Queries) errs.Error,
-) (cerr errs.Error) {
+	fn func(queries *pgsqlc.Queries) error,
+) (cerr error) {
 	if params.inTransaction {
 		return fn(params.queries)
 	}

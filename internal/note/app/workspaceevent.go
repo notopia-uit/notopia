@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
@@ -15,13 +14,13 @@ type WorkspaceEventHub interface {
 		workspaceID uuid.UUID,
 		userID string,
 		events ...WorkspaceEvent,
-	) errs.Error
+	) error
 
 	Subscribe(
 		ctx context.Context,
 		workspaceID uuid.UUID,
 		userID string,
-	) (<-chan WorkspaceEvent, errs.Error)
+	) (<-chan WorkspaceEvent, error)
 
 	Run(ctx context.Context) error
 

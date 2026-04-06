@@ -3,6 +3,7 @@ package pg
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,36 +14,36 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type Folder struct {
+type FolderRepo struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
 	inTransaction bool
 }
 
-var _ domain.FolderRepo = (*Folder)(nil)
+var _ domain.FolderRepo = (*FolderRepo)(nil)
 
-func NewFolder(
+func NewFolderRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
 	inTransaction bool,
-) *Folder {
-	return &Folder{
+) *FolderRepo {
+	return &FolderRepo{
 		pgxPool:       pgxPool,
 		queries:       queries,
 		inTransaction: inTransaction,
 	}
 }
 
-func NewNoTransactionFolder(
+func NewNoTransactionFolderRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
-) *Folder {
-	return NewFolder(pgxPool, queries, false)
+) *FolderRepo {
+	return NewFolderRepo(pgxPool, queries, false)
 }
 
-var ProvideFolder = NewNoTransactionFolder
+var ProvideFolderRepo = NewNoTransactionFolderRepo
 
-func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Folder, errs.Error) {
+func (f *FolderRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Folder, error) {
 	folder, err := f.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
 		ID:        id,
 		ForUpdate: forUpdate,
@@ -51,12 +52,12 @@ func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*do
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewFolderNotFound(id, err)
 		}
-		return nil, toDomainError(err)
+		return nil, toErr(err)
 	}
-	return folderToDomain(folder), nil
+	return folderToDomainRepo(folder), nil
 }
 
-func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyParams) ([]*domain.Folder, errs.Error) {
+func (f *FolderRepo) GetMany(ctx context.Context, params *domain.FolderRepoGetManyParams) ([]*domain.Folder, error) {
 	var ids *[]uuid.UUID
 	if len(params.IDs()) > 0 {
 		paramIDs := params.IDs()
@@ -84,17 +85,17 @@ func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyPa
 		ForUpdate:      params.ForUpdate(),
 	})
 	if err != nil {
-		return nil, toDomainError(err)
+		return nil, toErr(err)
 	}
 
 	result := make([]*domain.Folder, len(folders))
 	for i, folder := range folders {
-		result[i] = folderToDomain(folder)
+		result[i] = folderToDomainRepo(folder)
 	}
 	return result, nil
 }
 
-func folderToDomain(folder *pgsqlc.Folder) *domain.Folder {
+func folderToDomainRepo(folder *pgsqlc.Folder) *domain.Folder {
 	var trashed *domain.Trashed
 	if folder.TrashedBy != nil && folder.TrashedAt != nil {
 		trashed = domain.NewTrashed(
@@ -112,12 +113,12 @@ func folderToDomain(folder *pgsqlc.Folder) *domain.Folder {
 	)
 }
 
-func (f *Folder) Save(ctx context.Context, folder *domain.Folder) (cerr errs.Error) {
+func (f *FolderRepo) Save(ctx context.Context, folder *domain.Folder) (cerr error) {
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       f.pgxPool,
 		queries:       f.queries,
 		inTransaction: f.inTransaction,
-	}, func(queries *pgsqlc.Queries) errs.Error {
+	}, func(queries *pgsqlc.Queries) error {
 		if err := queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
 			ID:          folder.ID(),
 			Name:        folder.Name(),
@@ -129,20 +130,20 @@ func (f *Folder) Save(ctx context.Context, folder *domain.Folder) (cerr errs.Err
 			TrashedBy:   folder.TrashedByString(),
 			TrashedAt:   folder.TrashedAt(),
 		}); err != nil {
-			return toDomainError(err)
+			return toErr(err)
 		}
 		return nil
 	})
 }
 
-func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr errs.Error) {
+func (f *FolderRepo) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr error) {
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       f.pgxPool,
 		queries:       f.queries,
 		inTransaction: f.inTransaction,
-	}, func(queries *pgsqlc.Queries) errs.Error {
+	}, func(queries *pgsqlc.Queries) error {
 		if err := queries.CreateTempTableFolders(ctx); err != nil {
-			return toDomainError(err)
+			return fmt.Errorf("failed to create temp table for folders: %w", toErr(err))
 		}
 		saveFolderParams := make([]*pgsqlc.InsertTempFoldersParams, len(folders))
 		for i, folder := range folders {
@@ -160,47 +161,47 @@ func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr e
 		}
 		affected, err := queries.InsertTempFolders(ctx, saveFolderParams)
 		if err != nil {
-			return toDomainError(err)
+			return fmt.Errorf("failed to insert folders into temp table: %w", toErr(err))
 		}
 		if affected != int64(len(folders)) {
-			return toDomainError(errors.New("not all folders were inserted into temp table"))
+			return fmt.Errorf("not all folders were inserted into temp table (expected %d, got %d)", len(folders), affected)
 		}
 		if err = queries.SaveFromTempFolders(ctx); err != nil {
-			return toDomainError(err)
+			return fmt.Errorf("failed to save folders from temp table: %w", toErr(err))
 		}
 		return nil
 	})
 }
 
-func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, errs.Error) {
+func (f *FolderRepo) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error) {
 	count, err := f.queries.CountFoldersInWorkspaceByIDs(ctx, &pgsqlc.CountFoldersInWorkspaceByIDsParams{
 		IDs:         ids,
 		WorkspaceID: workspaceID,
 	})
 	if err != nil {
-		return false, toDomainError(err)
+		return false, fmt.Errorf("failed to check if folders are in workspace: %w", toErr(err))
 	}
 	return count == int64(len(ids)), nil
 }
 
-func (f *Folder) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) errs.Error {
+func (f *FolderRepo) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error {
 	if err := f.queries.PermanentlyDeleteFolderByID(ctx, id); err != nil {
-		return toDomainError(err)
+		return fmt.Errorf("failed to permanently delete folder: %w", toErr(err))
 	}
 	return nil
 }
 
-func (f *Folder) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) errs.Error {
+func (f *FolderRepo) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error {
 	if err := f.queries.PermanentlyDeleteFoldersByIDs(ctx, ids); err != nil {
-		return toDomainError(err)
+		return fmt.Errorf("failed to permanently delete folders: %w", toErr(err))
 	}
 	return nil
 }
 
-func (f *Folder) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, errs.Error) {
+func (f *FolderRepo) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
 	workspaceID, err := f.queries.GetWorkspaceIDByFolderID(ctx, id)
 	if err != nil {
-		return uuid.Nil, toDomainError(err)
+		return uuid.Nil, fmt.Errorf("failed to get workspace id for folder: %w", toErr(err))
 	}
 	return workspaceID, nil
 }

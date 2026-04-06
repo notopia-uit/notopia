@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type NoteRepoGetManyParams struct {
@@ -77,12 +76,12 @@ func (p *NoteRepoGetManyParams) ForUpdate() bool {
 }
 
 type NoteRepo interface {
-	GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*Note, errs.Error)
-	GetMany(ctx context.Context, params *NoteRepoGetManyParams) ([]*Note, errs.Error)
-	GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, errs.Error)
-	Save(ctx context.Context, note *Note) errs.Error
-	SaveMany(ctx context.Context, notes []*Note) errs.Error
-	AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, errs.Error)
-	PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) errs.Error
-	PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) errs.Error
+	GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*Note, error)
+	GetMany(ctx context.Context, params *NoteRepoGetManyParams) ([]*Note, error)
+	GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
+	Save(ctx context.Context, note *Note) error
+	SaveMany(ctx context.Context, notes []*Note) error
+	AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error)
+	PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error
+	PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
 }

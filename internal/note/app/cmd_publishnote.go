@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type PublishNote struct {
@@ -22,7 +21,7 @@ func NewPublishNoteHandler(noteRepo domain.NoteRepo) *PublishNoteHandler {
 
 var ProvidePublishNoteHandler = NewPublishNoteHandler
 
-func (h *PublishNoteHandler) Handle(ctx context.Context, cmd *PublishNote) errs.Error {
+func (h *PublishNoteHandler) Handle(ctx context.Context, cmd *PublishNote) error {
 	// WARN: Handler is incomplete - domain.Note has no Publish() method.
 	// TODO: domain.Note has no Publish() method. Add Publish() to domain.Note and a
 	// published field, then call note.Publish() here before Save.

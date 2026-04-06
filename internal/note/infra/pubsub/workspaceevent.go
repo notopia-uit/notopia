@@ -127,7 +127,7 @@ func NewWorkspaceEvent(
 
 var ProvideWorkspaceEvent = NewWorkspaceEvent
 
-func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...app.WorkspaceEvent) errs.Error {
+func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, userID string, events ...app.WorkspaceEvent) error {
 	msgs := make([]*message.Message, 0, len(events))
 	for _, event := range events {
 		payload, err := json.Marshal(event)
@@ -159,7 +159,7 @@ func (w *WorkspaceEvent) Subscribe(
 	ctx context.Context,
 	workspaceID uuid.UUID,
 	userID string,
-) (<-chan app.WorkspaceEvent, errs.Error) {
+) (<-chan app.WorkspaceEvent, error) {
 	eventCh := make(chan app.WorkspaceEvent, 10)
 
 	msgCh, err := w.hubPubSub.pubSub.Subscribe(ctx, fmt.Sprintf("%v", workspaceID))

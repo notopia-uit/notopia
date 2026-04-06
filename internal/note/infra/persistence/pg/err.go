@@ -8,7 +8,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
-func toDomainError(err error) errs.Error {
+func toErr(err error) error {
 	var pgErr *pgconn.PgError
 	if !errors.As(err, &pgErr) {
 		return errs.NewPersistenceInternal(

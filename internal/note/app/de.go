@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 // This has to be instantiate each time of handling, under persistence transaction
@@ -14,7 +13,7 @@ type DomainEventPublisher interface {
 }
 
 type DomainEventHandler[E domain.Event] interface {
-	Handle(ctx context.Context, event E) errs.Error
+	Handle(ctx context.Context, event E) error
 }
 
 type DomainEventProcessor interface {

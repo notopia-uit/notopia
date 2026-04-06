@@ -35,7 +35,7 @@ func NewCreateWorkspaceHandler(
 
 var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
 
-func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspace) errs.Error {
+func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspace) error {
 	slugExisted, err := h.workspaceRepo.CheckSlugExists(ctx, cmd.Slug)
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 	if err != nil {
 		return err
 	}
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) errs.Error {
+	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		if err := h.folderRepo.Save(ctx, rootFolder); err != nil {
 			return err
 		}

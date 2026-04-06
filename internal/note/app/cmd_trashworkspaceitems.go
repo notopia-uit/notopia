@@ -36,7 +36,7 @@ func NewTrashWorkspaceItemsHandler(
 
 var ProvideTrashWorkspaceItemsHandler = NewTrashWorkspaceItemsHandler
 
-func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorkspaceItems) errs.Error {
+func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorkspaceItems) error {
 	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
 		ctx,
 		cmd.UserID,
@@ -56,7 +56,7 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 	var workspaceEvents []domain.Event
 
 	// TODO: Why it getting 4 times??
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) errs.Error {
+	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		noteRepo := r.Note()
 		folderRepo := r.Folder()
 

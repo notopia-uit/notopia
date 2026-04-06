@@ -38,7 +38,7 @@ func NewCreateNoteHandler(
 
 var ProvideCreateNoteHandler = NewCreateNoteHandler
 
-func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) errs.Error {
+func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) error {
 	workspaceID, err := h.folderRepo.GetWorkspaceIDByID(ctx, cmd.FolderID)
 	if err != nil {
 		return err

@@ -32,7 +32,7 @@ func NewRenameWorkspaceHandler(
 
 var ProvideRenameWorkspaceHandler = NewRenameWorkspaceHandler
 
-func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspace) errs.Error {
+func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspace) error {
 	hasPermission, err := h.authorizationService.HasWorkspacePermission(
 		ctx,
 		cmd.UserID,
