@@ -25,7 +25,7 @@ var ProviderSetCommand = wire.NewSet(
 	ProvideUnpublishNoteHandler,
 	ProvideUnpublishWorkspaceHandler,
 	ProvideUpdateWorkspaceMembersHandler,
-	wire.Struct(new(CommandHandlers), "*"),
+	wire.Struct(new(Cmds), "*"),
 )
 
 var ProviderSetQuery = wire.NewSet(
@@ -37,17 +37,17 @@ var ProviderSetQuery = wire.NewSet(
 	ProvideGetWorkspaceMembersHandler,
 	ProvideGetWorkspaceTreeHandler,
 	ProvideShowTrashHandler,
-	wire.Struct(new(QueryHandlers), "*"),
+	wire.Struct(new(Queries), "*"),
 )
 
 var ProviderSetIntegrationEvent = wire.NewSet(
 	ProvideDocumentCommittedHandler,
-	wire.Struct(new(IntegrationEventHandlers), "*"),
+	wire.Struct(new(IntegrationEvents), "*"),
 )
 
 var ProviderSet = wire.NewSet(
-	ProvideServer,
 	ProviderSetCommand,
 	ProviderSetIntegrationEvent,
 	ProviderSetQuery,
+	wire.Struct(new(Server), "*"),
 )

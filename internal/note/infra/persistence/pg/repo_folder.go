@@ -140,6 +140,9 @@ func (f *FolderRepo) Save(ctx context.Context, folder *domain.Folder) (cerr erro
 		}); err != nil {
 			return toErr(err)
 		}
+		if err := params.publisher.Publish(ctx, folder.PopEvents()...); err != nil {
+			return fmt.Errorf("failed to publish events: %w", err)
+		}
 		return nil
 	})
 }
@@ -176,6 +179,13 @@ func (f *FolderRepo) SaveMany(ctx context.Context, folders []*domain.Folder) (ce
 		}
 		if err = params.queries.SaveFromTempFolders(ctx); err != nil {
 			return fmt.Errorf("failed to save folders from temp table: %w", toErr(err))
+		}
+		events := make([]domain.Event, 0)
+		for _, folder := range folders {
+			events = append(events, folder.PopEvents()...)
+		}
+		if err := params.publisher.Publish(ctx, events...); err != nil {
+			return fmt.Errorf("failed to publish events: %w", err)
 		}
 		return nil
 	})

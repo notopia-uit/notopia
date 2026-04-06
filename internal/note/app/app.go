@@ -1,13 +1,6 @@
 package app
 
-import (
-	"context"
-	"fmt"
-
-	"golang.org/x/sync/errgroup"
-)
-
-type CommandHandlers struct {
+type Cmds struct {
 	CreateFolderHandler                    *CreateFolderHandler
 	CreateNoteHandler                      *CreateNoteHandler
 	CreateWorkspaceHandler                 *CreateWorkspaceHandler
@@ -29,7 +22,7 @@ type CommandHandlers struct {
 	UpdateWorkspaceMembersHandler          *UpdateWorkspaceMembersHandler
 }
 
-type QueryHandlers struct {
+type Queries struct {
 	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler
 	GetNoteGraphHandler             *GetNoteGraphHandler
 	GetNoteHandler                  *GetNoteHandler
@@ -41,57 +34,14 @@ type QueryHandlers struct {
 	ShowTrashHandler                *ShowTrashHandler
 }
 
-type IntegrationEventHandlers struct {
+type IntegrationEvents struct {
 	DocumentCommittedHandler *DocumentCommittedHandler
 }
 
 type Server struct {
-	CommandHandlers          *CommandHandlers
-	IntegrationEventHandlers *IntegrationEventHandlers
-	QueryHandlers            *QueryHandlers
+	Cmds              *Cmds
+	IntegrationEvents *IntegrationEvents
+	Queries           *Queries
 
 	WorkspaceEventHub WorkspaceEventHub
-	Persistence       Persistence
-}
-
-func NewServer(
-	commandHandlers *CommandHandlers,
-	integrationEventHandlers *IntegrationEventHandlers,
-	queryHandlers *QueryHandlers,
-	workspaceEventHub WorkspaceEventHub,
-	persistence Persistence,
-) *Server {
-	return &Server{
-		CommandHandlers:          commandHandlers,
-		IntegrationEventHandlers: integrationEventHandlers,
-		QueryHandlers:            queryHandlers,
-		WorkspaceEventHub:        workspaceEventHub,
-		Persistence:              persistence,
-	}
-}
-
-var ProvideServer = NewServer
-
-func (s *Server) RunMigration(ctx context.Context) error {
-	return s.Persistence.RunMigrations(ctx)
-}
-
-func (s *Server) Start(ctx context.Context) error {
-	if err := s.RunMigration(ctx); err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
-	}
-
-	g, ctx := errgroup.WithContext(ctx)
-	g.Go(func() error {
-		return s.WorkspaceEventHub.Run(ctx)
-	})
-	return g.Wait()
-}
-
-func (s *Server) Stop(ctx context.Context) error {
-	g, _ := errgroup.WithContext(ctx)
-	g.Go(func() error {
-		return s.WorkspaceEventHub.Close()
-	})
-	return g.Wait()
 }

@@ -9,7 +9,6 @@ import (
 	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/pressly/goose/v3"
 	"github.com/pressly/goose/v3/lock"
 )
@@ -42,18 +41,16 @@ var ProvideGooseProvider = NewGooseProvider
 var PgMigrations embed.FS
 
 type Pg struct {
-	pgpool        *pgxpool.Pool
+	pgxPool       *pgxpool.Pool
 	gooseProvider *goose.Provider
 }
 
-var _ app.Persistence = (*Pg)(nil)
-
 func NewPg(
-	pgxpool *pgxpool.Pool,
+	pgxPool *pgxpool.Pool,
 	gooseProvider *goose.Provider,
 ) (*Pg, error) {
 	return &Pg{
-		pgpool:        pgxpool,
+		pgxPool:       pgxPool,
 		gooseProvider: gooseProvider,
 	}, nil
 }
@@ -67,7 +64,7 @@ func (p *Pg) IsMigrationDone(ctx context.Context) (bool, error) {
 }
 
 func (p *Pg) Ping(ctx context.Context) error {
-	return p.pgpool.Ping(ctx)
+	return p.pgxPool.Ping(ctx)
 }
 
 func (p *Pg) RunMigrations(ctx context.Context) error {

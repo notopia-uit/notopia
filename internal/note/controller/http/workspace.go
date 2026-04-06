@@ -32,7 +32,7 @@ func (h *StrictHandler) CreateWorkspace(
 		Slug:   request.Body.Slug,
 		UserID: user.ID,
 	}
-	err = h.App.CommandHandlers.CreateWorkspaceHandler.Handle(ctx, cmd)
+	err = h.App.Cmds.CreateWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (h *StrictHandler) DeleteWorkspace(
 		ID:     request.WorkspaceId,
 		UserID: user.ID,
 	}
-	err := h.App.CommandHandlers.DeleteWorkspaceHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.DeleteWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (h *StrictHandler) GetWorkspace(
 	query := &app.GetWorkspaceBySlug{
 		Slug: request.WorkspaceSlug,
 	}
-	result, err := h.App.QueryHandlers.GetWorkspaceHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetWorkspaceHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (h *StrictHandler) CheckWorkspaceSlugExists(
 	query := &app.CheckWorkspaceSlugExists{
 		Slug: request.WorkspaceSlug,
 	}
-	result, err := h.App.QueryHandlers.CheckWorkspaceSlugExistsHandler.Handle(ctx, query)
+	result, err := h.App.Queries.CheckWorkspaceSlugExistsHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 		ID:            request.WorkspaceId,
 		IgnoreOrphans: ignoreOrphans,
 	}
-	result, err := h.App.QueryHandlers.GetWorkspaceGraphHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetWorkspaceGraphHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +191,7 @@ func (h *StrictHandler) MoveWorkspaceItems(
 		FolderIDs:           folderIDs,
 		DestinationFolderID: destFolderID,
 	}
-	err := h.App.CommandHandlers.MoveWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.MoveWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +220,7 @@ func (h *StrictHandler) RenameWorkspace(
 		Name:   request.Body.Name,
 		UserID: user.ID,
 	}
-	err := h.App.CommandHandlers.RenameWorkspaceHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.RenameWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (h *StrictHandler) RestoreTrashedWorkspaceItems(
 		NoteIDs:     noteIDs,
 		FolderIDs:   folderIDs,
 	}
-	err := h.App.CommandHandlers.RestoreTrashedWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.RestoreTrashedWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -268,7 +268,7 @@ func (h *StrictHandler) ShowTrash(
 	query := &app.ShowTrash{
 		WorkspaceID: request.WorkspaceId,
 	}
-	result, err := h.App.QueryHandlers.ShowTrashHandler.Handle(ctx, query)
+	result, err := h.App.Queries.ShowTrashHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +292,7 @@ func (h *StrictHandler) TrashWorkspaceItems(
 		NoteIDs:     *request.Body.NoteIds,
 		FolderIDs:   *request.Body.FolderIds,
 	}
-	err := h.App.CommandHandlers.TrashWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.TrashWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -316,7 +316,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 		Depth:          depth,
 	}
 
-	result, err := h.App.QueryHandlers.GetWorkspaceTreeHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetWorkspaceTreeHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +357,7 @@ func (h *StrictHandler) PermanentlyDeleteWorkspaceItems(
 		NoteIDs:     noteIDs,
 		FolderIDs:   folderIDs,
 	}
-	err := h.App.CommandHandlers.PermanentlyDeleteWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.PermanentlyDeleteWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}

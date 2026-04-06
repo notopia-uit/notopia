@@ -10,6 +10,7 @@ import (
 	httpCheck "github.com/hellofresh/health-go/v5/checks/http"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 )
 
 type Health struct {
@@ -17,7 +18,7 @@ type Health struct {
 }
 
 func New(
-	persistence app.Persistence,
+	persistence *persistence.Pg,
 	serverCfg *config.Server,
 	workspaceEventHub app.WorkspaceEventHub,
 ) *Health {

@@ -30,44 +30,60 @@ import (
 // Injectors from wire.go:
 
 func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
-	validate := components.ProvideValidate()
-	viper := config.NewViper()
-	configConfig, err := config.New(validate, viper)
-	if err != nil {
-		return nil, nil, err
-	}
-	log := &configConfig.Log
-	stdoutHandler := logging.NewStdoutHandler(log)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
 	if err != nil {
 		return nil, nil, err
 	}
-	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, resource)
+	tracerProvider, cleanup, err := otel.NewTracerProvider(ctx, resource)
 	if err != nil {
 		return nil, nil, err
 	}
-	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.New(stdoutHandler, slogHandler, log)
-	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger)
-	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName)
-	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc)
-	services := &configConfig.Services
-	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	authorization, cleanup2, err := service.NewAuthorization(services, loggingLogger)
+	validate := components.ProvideValidate()
+	viper := config.NewViper()
+	configConfig, err := config.New(validate, viper)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
+	sql := &configConfig.Database
+	pool, cleanup2, err := pg.NewPgPool(ctx, tracerProvider, sql)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	db := pg.NewStdlib(pool)
+	log := &configConfig.Log
+	stdoutHandler := logging.NewStdoutHandler(log)
+	loggerProvider, cleanup3, err := otel.NewLoggerProvider(ctx, resource)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	sql := &configConfig.Database
-	pool, cleanup4, err := pg.NewPgPool(ctx, tracerProvider, sql)
+	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
+	logger := logging.New(stdoutHandler, slogHandler, log)
+	provider, err := persistence.NewGooseProvider(db, logger)
+	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	persistencePg, err := persistence.NewPg(pool, provider)
+	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger)
+	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName)
+	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc)
+	services := &configConfig.Services
+	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
+	authorization, cleanup4, err := service.NewAuthorization(services, loggingLogger)
 	if err != nil {
 		cleanup3()
 		cleanup2()
@@ -112,7 +128,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(integrationPublisher)
-	commandHandlers := &app.CommandHandlers{
+	cmds := &app.Cmds{
 		CreateFolderHandler:                    createFolderHandler,
 		CreateNoteHandler:                      createNoteHandler,
 		CreateWorkspaceHandler:                 createWorkspaceHandler,
@@ -135,7 +151,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	noteService := domain.NewNoteService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(noteRepo, noteService)
-	integrationEventHandlers := &app.IntegrationEventHandlers{
+	integrationEvents := &app.IntegrationEvents{
 		DocumentCommittedHandler: documentCommittedHandler,
 	}
 	checkWorkspaceSlugExistsReadModel := pg.NewCheckWorkspaceSlugExistsReadModel(queries)
@@ -155,7 +171,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(getWorkspaceTreeReadModel)
 	showTrashReadModel := pg.NewShowTrashReadModel(queries)
 	showTrashHandler := app.NewShowTrashHandler(showTrashReadModel)
-	queryHandlers := &app.QueryHandlers{
+	appQueries := &app.Queries{
 		CheckWorkspaceSlugExistsHandler: checkWorkspaceSlugExistsHandler,
 		GetNoteGraphHandler:             getNoteGraphHandler,
 		GetNoteHandler:                  getNoteHandler,
@@ -179,26 +195,12 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	workspaceEventHubPubSub := pubsub.NewWorkspaceEventHubPubSub(loggerAdapter)
 	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalHub, workspaceEventHubPubSub)
-	db := pg.NewStdlib(pool)
-	provider, err := persistence.NewGooseProvider(db, logger)
-	if err != nil {
-		cleanup5()
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
+	server := &app.Server{
+		Cmds:              cmds,
+		IntegrationEvents: integrationEvents,
+		Queries:           appQueries,
+		WorkspaceEventHub: workspaceEvent,
 	}
-	persistencePg, err := persistence.NewPg(pool, provider)
-	if err != nil {
-		cleanup5()
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	server := app.NewServer(commandHandlers, integrationEventHandlers, queryHandlers, workspaceEvent, persistencePg)
 	configServer := &configConfig.Server
 	strictHandler := http.NewStrictHandler(server, configServer, workspaceEvent)
 	serverInterface := http.NewHandler(strictHandler)
@@ -247,7 +249,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
-	noteServer := note.NewServer(httpHTTP, grpcGRPC, integrationEvent, healthHealth, server, logger, global)
+	noteServer := note.NewServer(persistencePg, httpHTTP, grpcGRPC, integrationEvent, healthHealth, server, logger, global)
 	return noteServer, func() {
 		cleanup8()
 		cleanup7()

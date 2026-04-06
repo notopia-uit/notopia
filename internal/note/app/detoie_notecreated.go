@@ -21,7 +21,7 @@ func NewNoteCreatedDomainToIntegrationEventHandler(
 
 func (h *NoteCreatedDomainToIntegrationEventHandler) Handle(ctx context.Context, event *domain.NoteCreatedEvent) error {
 	integrationEvent := IntegrationEventNoteCreated{
-		Id:   &event.AggregateID,
+		ID:   event.AggregateID,
 		Icon: event.Icon,
 		Name: event.Name,
 	}

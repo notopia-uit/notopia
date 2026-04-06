@@ -76,7 +76,7 @@ func (c *IntegrationEvent) registerHandlers() error {
 	if err := c.eventProcessor.AddHandlers(
 		cqrs.NewEventHandler(
 			"DocumentCommittedHandler",
-			c.app.IntegrationEventHandlers.DocumentCommittedHandler.Handle,
+			c.app.IntegrationEvents.DocumentCommittedHandler.Handle,
 		),
 	); err != nil {
 		return fmt.Errorf("failed to add event handlers to integration event processor: %w", err)

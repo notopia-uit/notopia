@@ -21,6 +21,7 @@ type RunInTxFnparams struct {
 	publisher *Publisher
 }
 
+// TODO: Can we just, avoid doing this cerr? common error tan` du
 func runInTx(
 	ctx context.Context,
 	params *runInTxParams,

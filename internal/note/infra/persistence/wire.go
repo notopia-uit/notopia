@@ -49,6 +49,5 @@ var PostgresProviderSet = wire.NewSet(
 	pg.ProvidePgPool,
 	pg.ProvideQueries,
 	pg.ProvideStdlib,
-	wire.Bind(new(app.Persistence), new(*Pg)),
 	wire.Bind(new(pgsqlc.DBTX), new(*pgxpool.Pool)),
 )

@@ -3,6 +3,7 @@ package pg
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -135,6 +136,9 @@ func (w *WorkspaceRepo) Save(ctx context.Context, workspace *domain.Workspace) (
 		})
 		if err != nil {
 			return toErr(err)
+		}
+		if err := params.publisher.Publish(ctx, workspace.PopEvents()...); err != nil {
+			return fmt.Errorf("failed to publish events: %w", err)
 		}
 		return nil
 	})

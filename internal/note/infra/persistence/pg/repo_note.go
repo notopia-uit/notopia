@@ -189,6 +189,9 @@ func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) (cerr error) {
 		if err := params.queries.SaveFromTempNoteLinks(ctx); err != nil {
 			return toErr(err)
 		}
+		if err := params.publisher.Publish(ctx, note.PopEvents()...); err != nil {
+			return fmt.Errorf("failed to publish events: %w", err)
+		}
 		return nil
 	})
 }
@@ -227,6 +230,13 @@ func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) (cerr err
 		}
 		if err = params.queries.SaveFromTempNotes(ctx); err != nil {
 			return fmt.Errorf("failed to save notes from temp table: %w", toErr(err))
+		}
+		events := make([]domain.Event, 0)
+		for _, note := range notes {
+			events = append(events, note.PopEvents()...)
+		}
+		if err := params.publisher.Publish(ctx, events...); err != nil {
+			return fmt.Errorf("failed to publish events: %w", err)
 		}
 		return nil
 	})
