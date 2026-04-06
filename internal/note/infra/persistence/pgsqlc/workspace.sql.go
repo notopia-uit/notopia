@@ -47,6 +47,8 @@ WHERE
 FOR UPDATE -- :if $3
 `
 
+var _getWorkspaceDynQ = dynCompile(getWorkspace)
+
 type GetWorkspaceParams struct {
 	Slug      *string
 	ID        *uuid.UUID
@@ -56,7 +58,7 @@ type GetWorkspaceParams struct {
 func (q *Queries) GetWorkspace(ctx context.Context, arg *GetWorkspaceParams) (*Workspace, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspace")
 	defer span.End()
-	dynQuery, dynArgs := DynamicSQL(getWorkspace, []any{arg.Slug, arg.ID, arg.ForUpdate})
+	dynQuery, dynArgs := _getWorkspaceDynQ.Build([]any{arg.Slug, arg.ID, arg.ForUpdate})
 	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
 	var i Workspace
 	err := row.Scan(

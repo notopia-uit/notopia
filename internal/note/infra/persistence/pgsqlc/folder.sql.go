@@ -52,6 +52,8 @@ WHERE
 FOR UPDATE -- :if $7
 `
 
+var _getFolderDynQ = dynCompile(getFolder)
+
 type GetFolderParams struct {
 	ID             uuid.UUID
 	WorkspaceID    *uuid.UUID
@@ -65,7 +67,7 @@ type GetFolderParams struct {
 func (q *Queries) GetFolder(ctx context.Context, arg *GetFolderParams) (*Folder, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetFolder")
 	defer span.End()
-	dynQuery, dynArgs := DynamicSQL(getFolder, []any{arg.ID, arg.WorkspaceID, arg.ParentID, arg.TrashedBy, arg.IsRootFolder, arg.IncludeTrashed, arg.ForUpdate})
+	dynQuery, dynArgs := _getFolderDynQ.Build([]any{arg.ID, arg.WorkspaceID, arg.ParentID, arg.TrashedBy, arg.IsRootFolder, arg.IncludeTrashed, arg.ForUpdate})
 	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
 	var i Folder
 	err := row.Scan(
@@ -99,6 +101,8 @@ ORDER BY
 FOR UPDATE -- :if $7
 `
 
+var _getFoldersDynQ = dynCompile(getFolders)
+
 type GetFoldersParams struct {
 	IDs            *[]uuid.UUID
 	WorkspaceID    *uuid.UUID
@@ -112,7 +116,7 @@ type GetFoldersParams struct {
 func (q *Queries) GetFolders(ctx context.Context, arg *GetFoldersParams) ([]*Folder, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetFolders")
 	defer span.End()
-	dynQuery, dynArgs := DynamicSQL(getFolders, []any{arg.IDs, arg.WorkspaceID, arg.ParentID, arg.TrashedBy, arg.IsRootFolder, arg.IncludeTrashed, arg.ForUpdate})
+	dynQuery, dynArgs := _getFoldersDynQ.Build([]any{arg.IDs, arg.WorkspaceID, arg.ParentID, arg.TrashedBy, arg.IsRootFolder, arg.IncludeTrashed, arg.ForUpdate})
 	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err

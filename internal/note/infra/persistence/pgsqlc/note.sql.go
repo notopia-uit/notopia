@@ -50,6 +50,8 @@ WHERE
 FOR UPDATE -- :if $2
 `
 
+var _getNoteByIDDynQ = dynCompile(getNoteByID)
+
 type GetNoteByIDParams struct {
 	ID        uuid.UUID
 	ForUpdate bool
@@ -58,7 +60,7 @@ type GetNoteByIDParams struct {
 func (q *Queries) GetNoteByID(ctx context.Context, arg GetNoteByIDParams) (*Note, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNoteByID")
 	defer span.End()
-	dynQuery, dynArgs := DynamicSQL(getNoteByID, []any{arg.ID, arg.ForUpdate})
+	dynQuery, dynArgs := _getNoteByIDDynQ.Build([]any{arg.ID, arg.ForUpdate})
 	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
 	var i Note
 	err := row.Scan(
@@ -89,6 +91,8 @@ ORDER BY
 FOR UPDATE -- :if $3
 `
 
+var _getNotesByFolderIDsDynQ = dynCompile(getNotesByFolderIDs)
+
 type GetNotesByFolderIDsParams struct {
 	FolderIds      []uuid.UUID
 	IncludeTrashed bool
@@ -98,7 +102,7 @@ type GetNotesByFolderIDsParams struct {
 func (q *Queries) GetNotesByFolderIDs(ctx context.Context, arg GetNotesByFolderIDsParams) ([]*Note, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesByFolderIDs")
 	defer span.End()
-	dynQuery, dynArgs := DynamicSQL(getNotesByFolderIDs, []any{arg.FolderIds, arg.IncludeTrashed, arg.ForUpdate})
+	dynQuery, dynArgs := _getNotesByFolderIDsDynQ.Build([]any{arg.FolderIds, arg.IncludeTrashed, arg.ForUpdate})
 	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
@@ -144,6 +148,8 @@ WHERE
 FOR UPDATE -- :if $5
 `
 
+var _getNotesByParamsDynQ = dynCompile(getNotesByParams)
+
 type GetNotesByParamsParams struct {
 	IDs          *[]uuid.UUID
 	WorkspaceID  *uuid.UUID
@@ -155,7 +161,7 @@ type GetNotesByParamsParams struct {
 func (q *Queries) GetNotesByParams(ctx context.Context, arg *GetNotesByParamsParams) ([]*Note, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesByParams")
 	defer span.End()
-	dynQuery, dynArgs := DynamicSQL(getNotesByParams, []any{arg.IDs, arg.WorkspaceID, arg.TrashedBy, arg.IsNotTrashed, arg.ForUpdate})
+	dynQuery, dynArgs := _getNotesByParamsDynQ.Build([]any{arg.IDs, arg.WorkspaceID, arg.TrashedBy, arg.IsNotTrashed, arg.ForUpdate})
 	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
@@ -200,6 +206,8 @@ WHERE
   AND n.trashed_at IS NULL -- :if $3
 `
 
+var _getNotesInWorkspaceDynQ = dynCompile(getNotesInWorkspace)
+
 type GetNotesInWorkspaceParams struct {
 	WorkspaceID  uuid.UUID
 	TrashedBy    *string
@@ -209,7 +217,7 @@ type GetNotesInWorkspaceParams struct {
 func (q *Queries) GetNotesInWorkspace(ctx context.Context, arg *GetNotesInWorkspaceParams) ([]*Note, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesInWorkspace")
 	defer span.End()
-	dynQuery, dynArgs := DynamicSQL(getNotesInWorkspace, []any{arg.WorkspaceID, arg.TrashedBy, arg.IsNotTrashed})
+	dynQuery, dynArgs := _getNotesInWorkspaceDynQ.Build([]any{arg.WorkspaceID, arg.TrashedBy, arg.IsNotTrashed})
 	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err

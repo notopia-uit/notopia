@@ -109,6 +109,8 @@ WHERE
   AND source_id = ANY($2::uuid[]) -- :if $2
 `
 
+var _getNoteOutgoingLinksDynQ = dynCompile(getNoteOutgoingLinks)
+
 type GetNoteOutgoingLinksParams struct {
 	SourceID  *uuid.UUID
 	SourceIDs *[]uuid.UUID
@@ -117,7 +119,7 @@ type GetNoteOutgoingLinksParams struct {
 func (q *Queries) GetNoteOutgoingLinks(ctx context.Context, arg *GetNoteOutgoingLinksParams) ([]uuid.UUID, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNoteOutgoingLinks")
 	defer span.End()
-	dynQuery, dynArgs := DynamicSQL(getNoteOutgoingLinks, []any{arg.SourceID, arg.SourceIDs})
+	dynQuery, dynArgs := _getNoteOutgoingLinksDynQ.Build([]any{arg.SourceID, arg.SourceIDs})
 	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
