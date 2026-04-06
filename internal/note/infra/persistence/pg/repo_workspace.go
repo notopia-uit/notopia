@@ -16,6 +16,7 @@ import (
 type WorkspaceRepo struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
+	publisher     *Publisher
 	inTransaction bool
 }
 
@@ -24,17 +25,19 @@ var _ domain.WorkspaceRepo = (*WorkspaceRepo)(nil)
 func NewWorkspaceRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
+	publisher *Publisher,
 	inTransaction bool,
 ) *WorkspaceRepo {
 	return &WorkspaceRepo{
 		pgxPool:       pgxPool,
 		queries:       queries,
+		publisher:     publisher,
 		inTransaction: inTransaction,
 	}
 }
 
 func NewNoTransactionWorkspaceRepo(pgxPool *pgxpool.Pool, queries *pgsqlc.Queries) *WorkspaceRepo {
-	return NewWorkspaceRepo(pgxPool, queries, false)
+	return NewWorkspaceRepo(pgxPool, queries, nil, false)
 }
 
 var ProvideWorkspaceRepo = NewNoTransactionWorkspaceRepo
@@ -121,8 +124,8 @@ func (w *WorkspaceRepo) Save(ctx context.Context, workspace *domain.Workspace) (
 		pgxPool:       w.pgxPool,
 		queries:       w.queries,
 		inTransaction: w.inTransaction,
-	}, func(queries *pgsqlc.Queries) error {
-		err := queries.SaveWorkspace(ctx, &pgsqlc.SaveWorkspaceParams{
+	}, func(params *RunInTxFnparams) error {
+		err := params.queries.SaveWorkspace(ctx, &pgsqlc.SaveWorkspaceParams{
 			ID:        workspace.ID(),
 			Slug:      workspace.Slug(),
 			Name:      workspace.Name(),

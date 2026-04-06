@@ -18,8 +18,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
 	"github.com/notopia-uit/notopia/internal/note/controller/integrationevent"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	"github.com/notopia-uit/notopia/internal/note/infra/common"
-	"github.com/notopia-uit/notopia/internal/note/infra/domainevent"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
 	"github.com/notopia-uit/notopia/internal/note/infra/pubsub"
@@ -82,7 +80,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	noteRepo := pg.NewNoTransactionNoteRepo(pool, queries)
 	createNoteHandler := app.NewCreateNoteHandler(authorization, noteRepo, folderRepo)
 	workspaceRepo := pg.NewNoTransactionWorkspaceRepo(pool, queries)
-	unitOfWork := pg.NewUnitOfWork(pool)
+	loggerAdapter := components.NewWatermillLogger(logger)
+	publisherFactory := pg.NewPublisherFactory(loggerAdapter)
+	unitOfWork := pg.NewUnitOfWork(pool, publisherFactory)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspaceRepo, folderRepo, unitOfWork)
 	permanentlyDeleteFolderHandler := app.PermanentlyNewDeleteFolderHandler(authorization, folderRepo)
 	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, noteRepo)
@@ -100,7 +100,18 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	trashWorkspaceItemsHandler := app.NewTrashWorkspaceItemsHandler(authorization, unitOfWork, trashService)
 	unpublishNoteHandler := app.NewUnpublishNoteHandler(noteRepo)
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspaceRepo)
-	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler()
+	kafka := configConfig.Kafka
+	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
+	jsonMarshaler := components.NewWatermillJsonMarshaler()
+	integrationPublisher, err := pubsub.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, jsonMarshaler)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(integrationPublisher)
 	commandHandlers := &app.CommandHandlers{
 		CreateFolderHandler:                    createFolderHandler,
 		CreateNoteHandler:                      createNoteHandler,
@@ -155,24 +166,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		GetWorkspaceTreeHandler:         getWorkspaceTreeHandler,
 		ShowTrashHandler:                showTrashHandler,
 	}
-	loggerAdapter := common.NewWatermillLogger(logger)
-	jsonMarshaler := common.NewWatermillJsonMarshaler()
-	processor, err := domainevent.NewProcessor(loggerAdapter, pool, jsonMarshaler)
-	if err != nil {
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	domainEventHandlers, err := app.NewDomainEventHandlers(processor)
-	if err != nil {
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
 	redis := &configConfig.Redis
 	redisClient, cleanup5 := pubsub.NewRedisClient(ctx, redis, logger)
 	workspaceEventInternalHub, err := pubsub.NewWorkspaceEventInternalHub(loggerAdapter, jsonMarshaler, redisClient)
@@ -205,7 +198,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	server := app.NewServer(commandHandlers, integrationEventHandlers, queryHandlers, domainEventHandlers, workspaceEvent, persistencePg)
+	server := app.NewServer(commandHandlers, integrationEventHandlers, queryHandlers, workspaceEvent, persistencePg)
 	configServer := &configConfig.Server
 	strictHandler := http.NewStrictHandler(server, configServer, workspaceEvent)
 	serverInterface := http.NewHandler(strictHandler)
@@ -229,9 +222,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	kafka := &configConfig.Kafka
-	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	integrationEvent, err := integrationevent.NewIntegrationEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler)
+	commonconfigKafka := &configConfig.Kafka
+	integrationEvent, err := integrationevent.NewIntegrationEvent(commonconfigKafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler)
 	if err != nil {
 		cleanup7()
 		cleanup6()

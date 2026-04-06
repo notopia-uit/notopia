@@ -28,22 +28,27 @@ var PostresReadModelProviderSet = wire.NewSet(
 	wire.Bind(new(app.ShowTrashReadModel), new(*pg.ShowTrashReadModel)),
 )
 
-var PostgresProviderSet = wire.NewSet(
-	PostresReadModelProviderSet,
-
-	ProvideGooseProvider,
-	ProvidePg,
+var PostgresRepoProviderSet = wire.NewSet(
 	pg.ProvideFolderRepo,
 	pg.ProvideNoteRepo,
-	pg.ProvidePgPool,
-	pg.ProvideQueries,
-	pg.ProvideStdlib,
 	pg.ProvideUnitOfWork,
 	pg.ProvideWorkspaceRepo,
-	wire.Bind(new(app.Persistence), new(*Pg)),
 	wire.Bind(new(domain.FolderRepo), new(*pg.FolderRepo)),
 	wire.Bind(new(domain.NoteRepo), new(*pg.NoteRepo)),
 	wire.Bind(new(domain.UnitOfWork), new(*pg.UnitOfWork)),
+	pg.ProvidePublisherFactory,
 	wire.Bind(new(domain.WorkspaceRepo), new(*pg.WorkspaceRepo)),
+)
+
+var PostgresProviderSet = wire.NewSet(
+	PostresReadModelProviderSet,
+	PostgresRepoProviderSet,
+
+	ProvideGooseProvider,
+	ProvidePg,
+	pg.ProvidePgPool,
+	pg.ProvideQueries,
+	pg.ProvideStdlib,
+	wire.Bind(new(app.Persistence), new(*Pg)),
 	wire.Bind(new(pgsqlc.DBTX), new(*pgxpool.Pool)),
 )

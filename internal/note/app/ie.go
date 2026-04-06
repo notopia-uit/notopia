@@ -2,56 +2,46 @@ package app
 
 import (
 	"context"
+	"time"
 
-	"github.com/notopia-uit/notopia/pkg/api/share"
+	"github.com/google/uuid"
 )
+
+// TODO: Hey quite miss the user ID right?, but it should need when other service need it ye...
 
 type IntegrationPublisher interface {
 	Publish(ctx context.Context, event ...IntegrationEvent) error
 }
 
-type IntegrationEventType string
-
-func (t IntegrationEventType) String() string {
-	return string(t)
-}
-
-var (
-	IntegrationEventTypeNoteCreated IntegrationEventType = "NoteCreated"
-	IntegrationEventTypeNoteDeleted IntegrationEventType = "NoteDeleted"
-	IntegrationEventTypeNoteUpdated IntegrationEventType = "NoteUpdated"
-)
-
 type IntegrationEvent interface {
 	isIntegrationEvent()
-	Type() IntegrationEventType
 }
-type IntegrationEventNoteCreated share.NoteCreatedEvent
 
-var _ IntegrationEvent = (*IntegrationEventNoteCreated)(nil)
+type IntegrationEventNoteCreated struct {
+	ID   uuid.UUID
+	Name string
+	Icon *string
+}
 
 func (e IntegrationEventNoteCreated) isIntegrationEvent() {}
 
-func (e IntegrationEventNoteCreated) Type() IntegrationEventType {
-	return IntegrationEventTypeNoteCreated
+type IntegrationEventNoteDeleted struct {
+	ID uuid.UUID
 }
-
-type IntegrationEventNoteDeleted share.NoteDeletedEvent
-
-var _ IntegrationEvent = (*IntegrationEventNoteDeleted)(nil)
 
 func (e IntegrationEventNoteDeleted) isIntegrationEvent() {}
 
-func (e IntegrationEventNoteDeleted) Type() IntegrationEventType {
-	return IntegrationEventTypeNoteDeleted
+type IntegrationEventNoteUpdated struct {
+	ID            uuid.UUID
+	Name          string
+	Icon          *string
+	Tags          []string
+	Size          uint64
+	FolderID      uuid.UUID
+	OutgoingLinks uuid.UUIDs
+	TrashedBy     *string
+	TrashedAt     *time.Time
+	UpdatedAt     time.Time
 }
-
-type IntegrationEventNoteUpdated share.NoteUpdatedEvent
-
-var _ IntegrationEvent = (*IntegrationEventNoteUpdated)(nil)
 
 func (e IntegrationEventNoteUpdated) isIntegrationEvent() {}
-
-func (e IntegrationEventNoteUpdated) Type() IntegrationEventType {
-	return IntegrationEventTypeNoteUpdated
-}

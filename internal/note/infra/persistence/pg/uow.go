@@ -14,6 +14,7 @@ import (
 type RepoRegistry struct {
 	uow       *UnitOfWork
 	txQueries *pgsqlc.Queries
+	publisher *Publisher
 
 	workspace domain.WorkspaceRepo
 	folder    domain.FolderRepo
@@ -28,34 +29,39 @@ var _ domain.RepoRegistry = (*RepoRegistry)(nil)
 
 func (r *RepoRegistry) Workspace() domain.WorkspaceRepo {
 	r.wsOnce.Do(func() {
-		r.workspace = NewWorkspaceRepo(nil, r.txQueries, true)
+		r.workspace = NewWorkspaceRepo(nil, r.txQueries, r.publisher, true)
 	})
 	return r.workspace
 }
 
 func (r *RepoRegistry) Folder() domain.FolderRepo {
 	r.folderOnce.Do(func() {
-		r.folder = NewFolderRepo(nil, r.txQueries, true)
+		r.folder = NewFolderRepo(nil, r.txQueries, r.publisher, true)
 	})
 	return r.folder
 }
 
 func (r *RepoRegistry) Note() domain.NoteRepo {
 	r.noteOnce.Do(func() {
-		r.note = NewNoteRepo(nil, r.txQueries, true)
+		r.note = NewNoteRepo(nil, r.txQueries, r.publisher, true)
 	})
 	return r.note
 }
 
 type UnitOfWork struct {
-	pool *pgxpool.Pool
+	pool             *pgxpool.Pool
+	publisherFactory *PublisherFactory
 }
 
 var _ domain.UnitOfWork = (*UnitOfWork)(nil)
 
-func NewUnitOfWork(pool *pgxpool.Pool) *UnitOfWork {
+func NewUnitOfWork(
+	pool *pgxpool.Pool,
+	publisherFactory *PublisherFactory,
+) *UnitOfWork {
 	return &UnitOfWork{
-		pool: pool,
+		pool:             pool,
+		publisherFactory: publisherFactory,
 	}
 }
 
@@ -78,9 +84,14 @@ func (u *UnitOfWork) Execute(
 	}()
 
 	txQueries := pgsqlc.New(tx)
+	publisher, err := u.publisherFactory.Create(tx)
+	if err != nil {
+		return errs.NewPersistenceInternal("failed to create publisher", err)
+	}
 	repoRegistry := &RepoRegistry{
 		uow:        u,
 		txQueries:  txQueries,
+		publisher:  publisher,
 		workspace:  nil,
 		folder:     nil,
 		note:       nil,

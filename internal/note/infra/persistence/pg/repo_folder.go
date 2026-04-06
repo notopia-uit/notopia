@@ -17,6 +17,7 @@ import (
 type FolderRepo struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
+	publisher     *Publisher // This is nil when not in transaction, because we will provide it inside a transaction
 	inTransaction bool
 }
 
@@ -25,11 +26,13 @@ var _ domain.FolderRepo = (*FolderRepo)(nil)
 func NewFolderRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
+	publisher *Publisher,
 	inTransaction bool,
 ) *FolderRepo {
 	return &FolderRepo{
 		pgxPool:       pgxPool,
 		queries:       queries,
+		publisher:     publisher,
 		inTransaction: inTransaction,
 	}
 }
@@ -38,7 +41,12 @@ func NewNoTransactionFolderRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
 ) *FolderRepo {
-	return NewFolderRepo(pgxPool, queries, false)
+	return NewFolderRepo(
+		pgxPool,
+		queries,
+		nil,
+		false,
+	)
 }
 
 var ProvideFolderRepo = NewNoTransactionFolderRepo
@@ -118,8 +126,8 @@ func (f *FolderRepo) Save(ctx context.Context, folder *domain.Folder) (cerr erro
 		pgxPool:       f.pgxPool,
 		queries:       f.queries,
 		inTransaction: f.inTransaction,
-	}, func(queries *pgsqlc.Queries) error {
-		if err := queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
+	}, func(params *RunInTxFnparams) error {
+		if err := params.queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
 			ID:          folder.ID(),
 			Name:        folder.Name(),
 			Icon:        folder.Icon(),
@@ -141,8 +149,8 @@ func (f *FolderRepo) SaveMany(ctx context.Context, folders []*domain.Folder) (ce
 		pgxPool:       f.pgxPool,
 		queries:       f.queries,
 		inTransaction: f.inTransaction,
-	}, func(queries *pgsqlc.Queries) error {
-		if err := queries.CreateTempTableFolders(ctx); err != nil {
+	}, func(params *RunInTxFnparams) error {
+		if err := params.queries.CreateTempTableFolders(ctx); err != nil {
 			return fmt.Errorf("failed to create temp table for folders: %w", toErr(err))
 		}
 		saveFolderParams := make([]*pgsqlc.InsertTempFoldersParams, len(folders))
@@ -159,14 +167,14 @@ func (f *FolderRepo) SaveMany(ctx context.Context, folders []*domain.Folder) (ce
 				TrashedAt:   folder.TrashedAt(),
 			}
 		}
-		affected, err := queries.InsertTempFolders(ctx, saveFolderParams)
+		affected, err := params.queries.InsertTempFolders(ctx, saveFolderParams)
 		if err != nil {
 			return fmt.Errorf("failed to insert folders into temp table: %w", toErr(err))
 		}
 		if affected != int64(len(folders)) {
 			return fmt.Errorf("not all folders were inserted into temp table (expected %d, got %d)", len(folders), affected)
 		}
-		if err = queries.SaveFromTempFolders(ctx); err != nil {
+		if err = params.queries.SaveFromTempFolders(ctx); err != nil {
 			return fmt.Errorf("failed to save folders from temp table: %w", toErr(err))
 		}
 		return nil

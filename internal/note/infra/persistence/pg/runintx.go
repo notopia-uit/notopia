@@ -12,16 +12,25 @@ import (
 type runInTxParams struct {
 	pgxPool       *pgxpool.Pool   // Required when not in transaction
 	queries       *pgsqlc.Queries // Required when in transaction (should be tx-backed)
+	publisher     *Publisher      // Required when in transaction (should be tx-backed)
 	inTransaction bool            // Indicates if we're already in a transaction
+}
+
+type RunInTxFnparams struct {
+	queries   *pgsqlc.Queries
+	publisher *Publisher
 }
 
 func runInTx(
 	ctx context.Context,
 	params *runInTxParams,
-	fn func(queries *pgsqlc.Queries) error,
+	fn func(params *RunInTxFnparams) error,
 ) (cerr error) {
 	if params.inTransaction {
-		return fn(params.queries)
+		return fn(&RunInTxFnparams{
+			queries:   params.queries,
+			publisher: params.publisher,
+		})
 	}
 
 	tx, err := params.pgxPool.Begin(ctx)
@@ -48,7 +57,12 @@ func runInTx(
 		}
 	}()
 
-	if err := fn(params.queries.WithTx(tx)); err != nil {
+	fnParams := &RunInTxFnparams{
+		queries:   params.queries,
+		publisher: params.publisher,
+	}
+
+	if err := fn(fnParams); err != nil {
 		cerr = err
 		return err
 	}

@@ -1,4 +1,4 @@
-package domainevent
+package pg
 
 import (
 	"context"
@@ -10,15 +10,12 @@ import (
 	"github.com/ThreeDotsLabs/watermill/components/forwarder"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/jackc/pgx/v5"
-	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 )
 
 type Publisher struct {
 	publisher message.Publisher
 }
-
-var _ app.DomainEventPublisher = (*Publisher)(nil)
 
 func NewPublisher(
 	pgxTx pgx.Tx,
@@ -53,4 +50,20 @@ func (p *Publisher) Publish(ctx context.Context, events ...domain.Event) error {
 		}
 	}
 	return nil
+}
+
+type PublisherFactory struct {
+	logger watermill.LoggerAdapter
+}
+
+func NewPublisherFactory(logger watermill.LoggerAdapter) *PublisherFactory {
+	return &PublisherFactory{
+		logger: logger,
+	}
+}
+
+var ProvidePublisherFactory = NewPublisherFactory
+
+func (f *PublisherFactory) Create(pgxTx pgx.Tx) (*Publisher, error) {
+	return NewPublisher(pgxTx, f.logger)
 }

@@ -17,6 +17,7 @@ import (
 type NoteRepo struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
+	publisher     *Publisher
 	inTransaction bool
 }
 
@@ -25,11 +26,13 @@ var _ domain.NoteRepo = (*NoteRepo)(nil)
 func NewNoteRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
+	publisher *Publisher,
 	inTransaction bool,
 ) *NoteRepo {
 	return &NoteRepo{
 		pgxPool:       pgxPool,
 		queries:       queries,
+		publisher:     publisher,
 		inTransaction: inTransaction,
 	}
 }
@@ -38,7 +41,7 @@ func NewNoTransactionNoteRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
 ) *NoteRepo {
-	return NewNoteRepo(pgxPool, queries, false)
+	return NewNoteRepo(pgxPool, queries, nil, false)
 }
 
 var ProvideNoteRepo = NewNoTransactionNoteRepo
@@ -147,8 +150,8 @@ func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) (cerr error) {
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
 		inTransaction: n.inTransaction,
-	}, func(queries *pgsqlc.Queries) error {
-		err := queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
+	}, func(params *RunInTxFnparams) error {
+		err := params.queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
 			ID:        note.ID(),
 			Name:      note.Name(),
 			Icon:      note.Icon(),
@@ -163,7 +166,7 @@ func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) (cerr error) {
 		if err != nil {
 			return toErr(err)
 		}
-		if err := queries.CreateTempTableNoteLinks(ctx); err != nil {
+		if err := params.queries.CreateTempTableNoteLinks(ctx); err != nil {
 			return toErr(err)
 		}
 		saveNoteLinkParams := make([]*pgsqlc.InsertTempNoteLinksParams, len(note.OutgoingLinks()))
@@ -173,17 +176,17 @@ func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) (cerr error) {
 				TargetID: targetID,
 			}
 		}
-		affected, err := queries.InsertTempNoteLinks(ctx, saveNoteLinkParams)
+		affected, err := params.queries.InsertTempNoteLinks(ctx, saveNoteLinkParams)
 		if err != nil {
 			return toErr(err)
 		}
 		if affected != int64(len(note.OutgoingLinks())) {
 			return fmt.Errorf("not all note links were inserted into temp table")
 		}
-		if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
+		if err := params.queries.DeleteObsoleteNoteLinks(ctx); err != nil {
 			return toErr(err)
 		}
-		if err := queries.SaveFromTempNoteLinks(ctx); err != nil {
+		if err := params.queries.SaveFromTempNoteLinks(ctx); err != nil {
 			return toErr(err)
 		}
 		return nil
@@ -196,8 +199,8 @@ func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) (cerr err
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
 		inTransaction: n.inTransaction,
-	}, func(queries *pgsqlc.Queries) error {
-		if err := queries.CreateTempTableNotes(ctx); err != nil {
+	}, func(params *RunInTxFnparams) error {
+		if err := params.queries.CreateTempTableNotes(ctx); err != nil {
 			return fmt.Errorf("failed to create temp table for notes: %w", toErr(err))
 		}
 		saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(notes))
@@ -215,14 +218,14 @@ func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) (cerr err
 				TrashedAt: note.TrashedAt(),
 			}
 		}
-		affected, err := queries.InsertTempNotes(ctx, saveNoteParams)
+		affected, err := params.queries.InsertTempNotes(ctx, saveNoteParams)
 		if err != nil {
 			return fmt.Errorf("failed to insert notes into temp table: %w", toErr(err))
 		}
 		if affected != int64(len(notes)) {
 			return fmt.Errorf("not all notes were inserted into temp table (expected %d, got %d)", len(notes), affected)
 		}
-		if err = queries.SaveFromTempNotes(ctx); err != nil {
+		if err = params.queries.SaveFromTempNotes(ctx); err != nil {
 			return fmt.Errorf("failed to save notes from temp table: %w", toErr(err))
 		}
 		return nil

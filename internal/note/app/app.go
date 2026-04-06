@@ -41,37 +41,6 @@ type QueryHandlers struct {
 	ShowTrashHandler                *ShowTrashHandler
 }
 
-type DomainEventHandlers struct {
-	bus DomainEventProcessor
-}
-
-func NewDomainEventHandlers(bus DomainEventProcessor) (*DomainEventHandlers, error) {
-	handlers := &DomainEventHandlers{
-		bus: bus,
-	}
-	if err := handlers.registerHandlers(); err != nil {
-		return nil, fmt.Errorf("failed to register domain event handlers: %w", err)
-	}
-	return handlers, nil
-}
-
-var ProvideDomainEventHandlers = NewDomainEventHandlers
-
-func (h *DomainEventHandlers) registerHandlers() error {
-	if err := h.bus.RegisterHandlers(); err != nil {
-		return fmt.Errorf("failed to register NoteCreatedHandler: %w", err)
-	}
-	return nil
-}
-
-func (h *DomainEventHandlers) Run(ctx context.Context) error {
-	return h.bus.Run(ctx)
-}
-
-func (h *DomainEventHandlers) Close() error {
-	return h.bus.Close()
-}
-
 type IntegrationEventHandlers struct {
 	DocumentCommittedHandler *DocumentCommittedHandler
 }
@@ -80,7 +49,6 @@ type Server struct {
 	CommandHandlers          *CommandHandlers
 	IntegrationEventHandlers *IntegrationEventHandlers
 	QueryHandlers            *QueryHandlers
-	DomainEventHandlers      *DomainEventHandlers
 
 	WorkspaceEventHub WorkspaceEventHub
 	Persistence       Persistence
@@ -90,7 +58,6 @@ func NewServer(
 	commandHandlers *CommandHandlers,
 	integrationEventHandlers *IntegrationEventHandlers,
 	queryHandlers *QueryHandlers,
-	DomainEventHandlers *DomainEventHandlers,
 	workspaceEventHub WorkspaceEventHub,
 	persistence Persistence,
 ) *Server {
@@ -98,7 +65,6 @@ func NewServer(
 		CommandHandlers:          commandHandlers,
 		IntegrationEventHandlers: integrationEventHandlers,
 		QueryHandlers:            queryHandlers,
-		DomainEventHandlers:      DomainEventHandlers,
 		WorkspaceEventHub:        workspaceEventHub,
 		Persistence:              persistence,
 	}
@@ -119,9 +85,6 @@ func (s *Server) Start(ctx context.Context) error {
 	g.Go(func() error {
 		return s.WorkspaceEventHub.Run(ctx)
 	})
-	g.Go(func() error {
-		return s.DomainEventHandlers.Run(ctx)
-	})
 	return g.Wait()
 }
 
@@ -129,9 +92,6 @@ func (s *Server) Stop(ctx context.Context) error {
 	g, _ := errgroup.WithContext(ctx)
 	g.Go(func() error {
 		return s.WorkspaceEventHub.Close()
-	})
-	g.Go(func() error {
-		return s.DomainEventHandlers.Close()
 	})
 	return g.Wait()
 }

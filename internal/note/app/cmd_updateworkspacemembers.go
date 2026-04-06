@@ -16,10 +16,16 @@ type UpdateWorkspaceMembers struct {
 	Members       []WorkspaceMemberUpdate
 }
 
-type UpdateWorkspaceMembersHandler struct{}
+type UpdateWorkspaceMembersHandler struct {
+	integrationPublisher IntegrationPublisher
+}
 
-func NewUpdateWorkspaceMembersHandler() *UpdateWorkspaceMembersHandler {
-	return &UpdateWorkspaceMembersHandler{}
+func NewUpdateWorkspaceMembersHandler(
+	integrationPublisher IntegrationPublisher,
+) *UpdateWorkspaceMembersHandler {
+	return &UpdateWorkspaceMembersHandler{
+		integrationPublisher: integrationPublisher,
+	}
 }
 
 var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler

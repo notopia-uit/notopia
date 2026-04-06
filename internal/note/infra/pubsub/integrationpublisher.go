@@ -8,8 +8,43 @@ import (
 	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/pkg/api/share"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
+
+func toIntegrationEvent(event app.IntegrationEvent) (any, bool) {
+	switch e := event.(type) {
+	case app.IntegrationEventNoteCreated:
+		return &share.NoteCreatedEvent{
+			Id:   &e.ID,
+			Icon: e.Icon,
+			Name: e.Name,
+		}, true
+	case app.IntegrationEventNoteDeleted:
+		return &share.NoteDeletedEvent{
+			Id: &e.ID,
+		}, true
+	case app.IntegrationEventNoteUpdated:
+		var trashed *share.NoteTrashed
+		if e.TrashedBy != nil && e.TrashedAt != nil {
+			// TODO: This should carefully cast to the right type
+			trashed = &share.NoteTrashed{
+				TrashedBy: share.TrashedBy(*e.TrashedBy),
+				TrashedAt: *e.TrashedAt,
+			}
+		}
+		return &share.NoteUpdatedEvent{
+			Id:        &e.ID,
+			Name:      e.Name,
+			Icon:      e.Icon,
+			Tags:      &e.Tags,
+			FolderId:  &e.FolderID,
+			Trashed:   trashed,
+			UpdatedAt: &e.UpdatedAt,
+		}, true
+	}
+	return nil, false
+}
 
 type IntegrationPublisher struct {
 	bus *cqrs.EventBus
@@ -35,11 +70,7 @@ func NewIntegrationPublisher(
 	}
 	bus, err := cqrs.NewEventBusWithConfig(publisher, cqrs.EventBusConfig{
 		GeneratePublishTopic: func(params cqrs.GenerateEventPublishTopicParams) (string, error) {
-			event, ok := params.Event.(app.IntegrationEvent)
-			if !ok {
-				return "", fmt.Errorf("not integration event: %T", params.Event)
-			}
-			return "events.integration." + event.Type().String(), nil
+			return "events.integration." + params.EventName, nil
 		},
 		Marshaler: marshaller,
 		Logger:    logger,
@@ -56,7 +87,11 @@ var ProvideIntegrationPublisher = NewIntegrationPublisher
 
 func (p *IntegrationPublisher) Publish(ctx context.Context, events ...app.IntegrationEvent) error {
 	for _, event := range events {
-		if err := p.bus.Publish(ctx, event); err != nil {
+		integrationEvent, ok := toIntegrationEvent(event)
+		if !ok {
+			return fmt.Errorf("unsupported integration event type: %T", event)
+		}
+		if err := p.bus.Publish(ctx, integrationEvent); err != nil {
 			return fmt.Errorf("failed to publish integration event: %w", err)
 		}
 	}

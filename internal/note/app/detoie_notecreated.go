@@ -11,8 +11,6 @@ type NoteCreatedDomainToIntegrationEventHandler struct {
 	integrationPublisher IntegrationPublisher
 }
 
-var _ DomainEventHandler[*domain.NoteCreatedEvent] = (*NoteCreatedDomainToIntegrationEventHandler)(nil)
-
 func NewNoteCreatedDomainToIntegrationEventHandler(
 	integrationPublisher IntegrationPublisher,
 ) *NoteCreatedDomainToIntegrationEventHandler {
