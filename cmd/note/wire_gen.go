@@ -161,7 +161,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	commandEventMarshaler := pubsub.NewIntegrationMarshaler()
-	integrationPubSub, err := pubsub.NewIntegration(kafka, loggerAdapter, kafkaPublisher, watermillKafkaTracer, commandEventMarshaler)
+	integrationPubSub, err := pubsub.NewIntegrationPublisher(kafka, loggerAdapter, kafkaPublisher, watermillKafkaTracer, commandEventMarshaler)
 	if err != nil {
 		cleanup4()
 		cleanup3()

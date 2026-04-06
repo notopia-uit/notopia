@@ -49,10 +49,6 @@ func (e workspaceEvent[E]) isWorkspaceEvent() {}
 func (e workspaceEvent[E]) GetID() uuid.UUID  { return e.Id }
 func (e workspaceEvent[E]) GetEvent() string  { return string(e.Event) }
 
-type WorkspaceEventWorkspaceMembersUpdated struct {
-	workspaceEvent[note.WorkspaceMembersUpdatedEventEvent]
-}
-
 type WorkspaceEventWorkspaceItemsChanged struct {
 	workspaceEvent[note.WorkspaceItemsUpdatedEventEvent]
 }
@@ -123,37 +119,17 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 
 var workspaceEventTypeRegistry = make(map[string]reflect.Type)
 
-func init() {
-	registerWorkspaceEventType(
-		//exhaustruct:ignore
-		&WorkspaceEventWorkspaceMembersUpdated{},
-	)
-	registerWorkspaceEventType(
-		//exhaustruct:ignore
-		&WorkspaceEventWorkspaceItemsChanged{},
-	)
-	registerWorkspaceEventType(
-		//exhaustruct:ignore
-		&WorkspaceEventMembersUpdated{},
-	)
-	registerWorkspaceEventType(
-		//exhaustruct:ignore
-		&WorkspaceEventWorkspaceUpdated{},
-	)
-	registerWorkspaceEventType(
-		//exhaustruct:ignore
-		&WorkspaceEventWorkspaceDeleted{},
-	)
-}
-
-func registerWorkspaceEventType(event WorkspaceEvent) {
-	eventType := reflect.TypeOf(event).Elem().Name()
-	workspaceEventTypeRegistry[eventType] = reflect.TypeOf(event).Elem()
-}
-
 func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
-	if t, ok := workspaceEventTypeRegistry[t]; ok {
-		return reflect.New(t).Interface().(WorkspaceEvent), true
+	switch t {
+	case string(note.WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent):
+		return &WorkspaceEventMembersUpdated{}, true
+	case string(note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent):
+		return &WorkspaceEventWorkspaceItemsChanged{}, true
+	case string(note.WorkspaceUpdatedEventEventWorkspaceUpdatedEvent):
+		return &WorkspaceEventWorkspaceUpdated{}, true
+	case string(note.WorkspaceDeletedEventEventWorkspaceDeletedEvent):
+		return &WorkspaceEventWorkspaceDeleted{}, true
+	default:
+		return nil, false
 	}
-	return nil, false
 }

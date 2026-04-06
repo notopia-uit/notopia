@@ -47,8 +47,8 @@ func (p *Publisher) Publish(ctx context.Context, events ...domain.Event) error {
 		if err != nil {
 			return fmt.Errorf("failed to marshal event: %w", err)
 		}
-		message := message.NewMessage(watermill.NewUUID(), payload)
-		if err := p.publisher.Publish(string(domain.GetEventType(event)), message); err != nil {
+		msg := message.NewMessage(watermill.NewUUID(), payload)
+		if err := p.publisher.Publish(string(domain.GetEventType(event)), msg); err != nil {
 			return fmt.Errorf("failed to publish event: %w", err)
 		}
 	}

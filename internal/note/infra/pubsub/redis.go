@@ -8,7 +8,9 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type RedisClient redis.Client
+type RedisClient struct {
+	*redis.Client
+}
 
 func NewRedisClient(
 	ctx context.Context,
@@ -24,7 +26,7 @@ func NewRedisClient(
 			logger.Error("failed to shutdown Redis client", slog.Any("error", err))
 		}
 	}
-	return (*RedisClient)(client), cleanup
+	return &RedisClient{client}, cleanup
 }
 
 var ProvideRedisClient = NewRedisClient

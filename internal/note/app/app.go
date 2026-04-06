@@ -41,7 +41,34 @@ type QueryHandlers struct {
 	ShowTrashHandler                *ShowTrashHandler
 }
 
-type DomainEventHandlers struct{}
+type DomainEventHandlers struct {
+	bus DomainEventProcessor
+}
+
+func NewDomainEventHandlers(bus DomainEventProcessor) (*DomainEventHandlers, error) {
+	handlers := &DomainEventHandlers{
+		bus: bus,
+	}
+	if err := handlers.registerHandlers(); err != nil {
+		return nil, fmt.Errorf("failed to register domain event handlers: %w", err)
+	}
+	return handlers, nil
+}
+
+func (h *DomainEventHandlers) registerHandlers() error {
+	if err := h.bus.RegisterHandlers(); err != nil {
+		return fmt.Errorf("failed to register NoteCreatedHandler: %w", err)
+	}
+	return nil
+}
+
+func (h *DomainEventHandlers) Run(ctx context.Context) error {
+	return h.bus.Run(ctx)
+}
+
+func (h *DomainEventHandlers) Close() error {
+	return h.bus.Close()
+}
 
 type IntegrationEventHandlers struct {
 	DocumentCommittedHandler *DocumentCommittedHandler
@@ -51,9 +78,8 @@ type Server struct {
 	CommandHandlers          *CommandHandlers
 	IntegrationEventHandlers *IntegrationEventHandlers
 	QueryHandlers            *QueryHandlers
+	DomainEventHandlers      *DomainEventHandlers
 
-	DomainEventBus       DomainEventProcessor
-	IntegrationPubSub    *IntegrationPub
 	WorkspaceEventPubSub WorkspaceEventPubSub
 	Persistence          Persistence
 }
@@ -62,24 +88,18 @@ func NewServer(
 	commandHandlers *CommandHandlers,
 	integrationEventHandlers *IntegrationEventHandlers,
 	queryHandlers *QueryHandlers,
-	domainEventBus DomainEventProcessor,
-	integrationPubSub *IntegrationPub,
+	DomainEventHandlers *DomainEventHandlers,
 	workspaceEventPubSub WorkspaceEventPubSub,
 	persistence Persistence,
-) (*Server, error) {
-	if err := domainEventBus.RegisterHandlers(); err != nil {
-		return nil, fmt.Errorf("failed to register domain event handlers: %w", err)
-	}
-
+) *Server {
 	return &Server{
 		CommandHandlers:          commandHandlers,
 		IntegrationEventHandlers: integrationEventHandlers,
 		QueryHandlers:            queryHandlers,
-		DomainEventBus:           domainEventBus,
-		IntegrationPubSub:        integrationPubSub,
+		DomainEventHandlers:      DomainEventHandlers,
 		WorkspaceEventPubSub:     workspaceEventPubSub,
 		Persistence:              persistence,
-	}, nil
+	}
 }
 
 var ProvideServer = NewServer
@@ -98,7 +118,7 @@ func (s *Server) Start(ctx context.Context) error {
 		return s.WorkspaceEventPubSub.Run(ctx)
 	})
 	g.Go(func() error {
-		return s.DomainEventBus.Run(ctx)
+		return s.DomainEventHandlers.Run(ctx)
 	})
 	return g.Wait()
 }
@@ -109,7 +129,7 @@ func (s *Server) Stop(ctx context.Context) error {
 		return s.WorkspaceEventPubSub.Close()
 	})
 	g.Go(func() error {
-		return s.DomainEventBus.Close()
+		return s.DomainEventHandlers.Close()
 	})
 	return g.Wait()
 }

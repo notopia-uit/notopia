@@ -24,7 +24,7 @@ func (a *adapter[E]) NewEvent() any {
 	var event E
 	eventType := reflect.TypeOf(event)
 
-	if eventType.Kind() == reflect.Ptr {
+	if eventType.Kind() == reflect.Pointer {
 		return reflect.New(eventType.Elem()).Interface()
 	}
 	return reflect.New(eventType).Interface()

@@ -17,9 +17,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/errs"
-	"github.com/redis/go-redis/v9"
 )
 
+// NOTE: This should be refactor into redis event bus (holding redis publisher), publish to one single topic
+// Then the redis subcriber ... idk, later
 const (
 	MetadataWorkspaceIDKey = "workspaceId"
 	metadataUserIDKey      = "userId"
@@ -43,14 +44,14 @@ func NewWorkspaceEventInternalPubSub(
 ) (*WorkspaceEventInternalPubSub, error) {
 	topic := "events:workspaces"
 	publisher, err := redisstream.NewPublisher(redisstream.PublisherConfig{
-		Client:        (*redis.Client)(redisClient),
+		Client:        redisClient,
 		DefaultMaxlen: 10000,
 	}, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Redis publisher: %w", err)
 	}
 	subscriber, err := redisstream.NewSubscriber(redisstream.SubscriberConfig{
-		Client:                        (*redis.Client)(redisClient),
+		Client:                        redisClient,
 		FanOutOldestId:                "$",
 		DisableIndefiniteInitialBlock: true,
 		BlockTime:                     2 * time.Second,
@@ -140,7 +141,6 @@ func (w *WorkspaceEvent) Publish(ctx context.Context, workspaceID uuid.UUID, use
 		msg.Metadata.Set(MetadataWorkspaceIDKey, fmt.Sprintf("%v", workspaceID))
 		msg.Metadata.Set(metadataUserIDKey, userID)
 		msg.Metadata.Set(metadataEventTypeKey, event.GetEvent())
-		msg.SetContext(ctx)
 		msgs = append(msgs, msg)
 	}
 	err := w.internalPubSub.publisher.Publish(w.internalPubSub.topic, msgs...)
