@@ -125,6 +125,7 @@ func (f *FolderRepo) Save(ctx context.Context, folder *domain.Folder) (cerr erro
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       f.pgxPool,
 		queries:       f.queries,
+		publisher:     f.publisher,
 		inTransaction: f.inTransaction,
 	}, func(params *RunInTxFnparams) error {
 		if err := params.queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
@@ -151,6 +152,7 @@ func (f *FolderRepo) SaveMany(ctx context.Context, folders []*domain.Folder) (ce
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       f.pgxPool,
 		queries:       f.queries,
+		publisher:     f.publisher,
 		inTransaction: f.inTransaction,
 	}, func(params *RunInTxFnparams) error {
 		if err := params.queries.CreateTempTableFolders(ctx); err != nil {

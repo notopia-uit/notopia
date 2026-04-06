@@ -11,6 +11,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/note/infra/pubsub"
 )
 
 type Health struct {
@@ -21,6 +22,7 @@ func New(
 	persistence *persistence.Pg,
 	serverCfg *config.Server,
 	workspaceEventHub app.WorkspaceEventHub,
+	redisClient *pubsub.RedisClient,
 ) *Health {
 	startupChecker := health.NewChecker(
 		health.WithCheck(
@@ -76,9 +78,9 @@ func New(
 			15*time.Second,
 			3*time.Second,
 			health.Check{
-				Name: "workspaceEventPubSub",
+				Name: "workspaceEventHub redis connection",
 				Check: func(ctx context.Context) error {
-					return workspaceEventHub.Check(ctx)
+					return redisClient.Ping(ctx).Err()
 				},
 			},
 		),

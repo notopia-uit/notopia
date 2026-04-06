@@ -124,6 +124,7 @@ func (w *WorkspaceRepo) Save(ctx context.Context, workspace *domain.Workspace) (
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       w.pgxPool,
 		queries:       w.queries,
+		publisher:     w.publisher,
 		inTransaction: w.inTransaction,
 	}, func(params *RunInTxFnparams) error {
 		err := params.queries.SaveWorkspace(ctx, &pgsqlc.SaveWorkspaceParams{

@@ -25,8 +25,6 @@ type WorkspaceEventHub interface {
 	Run(ctx context.Context) error
 
 	Close() error
-
-	Check(ctx context.Context) error
 }
 
 type WorkspaceEvent interface {

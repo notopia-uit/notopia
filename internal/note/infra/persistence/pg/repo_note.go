@@ -149,6 +149,7 @@ func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) (cerr error) {
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
+		publisher:     n.publisher,
 		inTransaction: n.inTransaction,
 	}, func(params *RunInTxFnparams) error {
 		err := params.queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
@@ -201,6 +202,7 @@ func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) (cerr err
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
+		publisher:     n.publisher,
 		inTransaction: n.inTransaction,
 	}, func(params *RunInTxFnparams) error {
 		if err := params.queries.CreateTempTableNotes(ctx); err != nil {

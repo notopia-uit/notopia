@@ -8,9 +8,7 @@ import (
 var ProviderSet = wire.NewSet(
 	ProvideIntegrationPublisher,
 	ProvideRedisClient,
-	ProvideWorkspaceEvent,
-	ProvideWorkspaceEventHubPubSub,
-	ProvideWorkspaceEventInternalHub,
+	ProvideWorkspaceEventHub,
 	wire.Bind(new(app.IntegrationPublisher), new(*IntegrationPublisher)),
-	wire.Bind(new(app.WorkspaceEventHub), new(*WorkspaceEvent)),
+	wire.Bind(new(app.WorkspaceEventHub), new(*WorkspaceEventHub)),
 )

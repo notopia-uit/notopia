@@ -184,7 +184,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	redis := &configConfig.Redis
 	redisClient, cleanup5 := pubsub.NewRedisClient(ctx, redis, logger)
-	workspaceEventInternalHub, err := pubsub.NewWorkspaceEventInternalHub(loggerAdapter, jsonMarshaler, redisClient)
+	workspaceEventHub, err := pubsub.NewWorkspaceEventHub(loggerAdapter, redisClient)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -193,16 +193,14 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	workspaceEventHubPubSub := pubsub.NewWorkspaceEventHubPubSub(loggerAdapter)
-	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalHub, workspaceEventHubPubSub)
 	server := &app.Server{
 		Cmds:              cmds,
 		IntegrationEvents: integrationEvents,
 		Queries:           appQueries,
-		WorkspaceEventHub: workspaceEvent,
+		WorkspaceEventHub: workspaceEventHub,
 	}
 	configServer := &configConfig.Server
-	strictHandler := http.NewStrictHandler(server, configServer, workspaceEvent)
+	strictHandler := http.NewStrictHandler(server, configServer, workspaceEventHub)
 	serverInterface := http.NewHandler(strictHandler)
 	httpHTTP, cleanup6, err := http.New(ctx, engine, serverInterface, configServer, logger)
 	if err != nil {
@@ -236,7 +234,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	healthHealth := health.New(persistencePg, configServer, workspaceEvent)
+	healthHealth := health.New(persistencePg, configServer, workspaceEventHub, redisClient)
 	meterProvider, cleanup8, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup7()
