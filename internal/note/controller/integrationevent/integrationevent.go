@@ -21,7 +21,6 @@ type IntegrationEvent struct {
 
 func NewIntegrationEvent(
 	cfg *commonconfig.Kafka,
-	integrationPubSub *app.IntegrationPub,
 	app *app.Server,
 	tracer kafka.SaramaTracer,
 	logger watermill.LoggerAdapter,

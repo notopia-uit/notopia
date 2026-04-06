@@ -21,13 +21,14 @@ import (
 
 // NOTE: This should be refactor into redis event bus (holding redis publisher), publish to one single topic
 // Then the redis subcriber ... idk, later
+// The hub and the pubsub, so confused
 const (
 	MetadataWorkspaceIDKey = "workspaceId"
 	metadataUserIDKey      = "userId"
 	metadataEventTypeKey   = "eventType"
 )
 
-type WorkspaceEventInternalPubSub struct {
+type WorkspaceEventInternalHub struct {
 	router      *message.Router
 	publisher   message.Publisher
 	subscriber  message.Subscriber
@@ -37,11 +38,11 @@ type WorkspaceEventInternalPubSub struct {
 
 // TODO: If have time, try https://github.com/stong1994/watermill-rediszset, because we only need pubsub, not stream
 // This would reduce memory overhead and be more efficient for ephemeral workspace events.
-func NewWorkspaceEventInternalPubSub(
+func NewWorkspaceEventInternalHub(
 	logger watermill.LoggerAdapter,
-	marshaler cqrs.CommandEventMarshaler,
+	marshaler *cqrs.JSONMarshaler,
 	redisClient *RedisClient,
-) (*WorkspaceEventInternalPubSub, error) {
+) (*WorkspaceEventInternalHub, error) {
 	topic := "events:workspaces"
 	publisher, err := redisstream.NewPublisher(redisstream.PublisherConfig{
 		Client:        redisClient,
@@ -67,7 +68,7 @@ func NewWorkspaceEventInternalPubSub(
 	}
 	router.AddMiddleware(middleware.CorrelationID, middleware.Recoverer)
 
-	return &WorkspaceEventInternalPubSub{
+	return &WorkspaceEventInternalHub{
 		router:      router,
 		publisher:   publisher,
 		subscriber:  subscriber,
@@ -76,7 +77,7 @@ func NewWorkspaceEventInternalPubSub(
 	}, nil
 }
 
-var ProvideWorkspaceEventInternalPubSub = NewWorkspaceEventInternalPubSub
+var ProvideWorkspaceEventInternalHub = NewWorkspaceEventInternalHub
 
 type WorkspaceEventHubPubSub struct {
 	pubSub *gochannel.GoChannel
@@ -99,14 +100,14 @@ func NewWorkspaceEventHubPubSub(
 var ProvideWorkspaceEventHubPubSub = NewWorkspaceEventHubPubSub
 
 type WorkspaceEvent struct {
-	internalPubSub *WorkspaceEventInternalPubSub
+	internalPubSub *WorkspaceEventInternalHub
 	hubPubSub      *WorkspaceEventHubPubSub
 }
 
-var _ app.WorkspaceEventPubSub = (*WorkspaceEvent)(nil)
+var _ app.WorkspaceEventHub = (*WorkspaceEvent)(nil)
 
 func NewWorkspaceEvent(
-	internalPubSub *WorkspaceEventInternalPubSub,
+	internalPubSub *WorkspaceEventInternalHub,
 	hubPubSub *WorkspaceEventHubPubSub,
 ) *WorkspaceEvent {
 	internalPubSub.router.AddConsumerHandler(

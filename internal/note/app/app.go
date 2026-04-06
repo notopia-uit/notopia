@@ -55,6 +55,8 @@ func NewDomainEventHandlers(bus DomainEventProcessor) (*DomainEventHandlers, err
 	return handlers, nil
 }
 
+var ProvideDomainEventHandlers = NewDomainEventHandlers
+
 func (h *DomainEventHandlers) registerHandlers() error {
 	if err := h.bus.RegisterHandlers(); err != nil {
 		return fmt.Errorf("failed to register NoteCreatedHandler: %w", err)
@@ -80,8 +82,8 @@ type Server struct {
 	QueryHandlers            *QueryHandlers
 	DomainEventHandlers      *DomainEventHandlers
 
-	WorkspaceEventPubSub WorkspaceEventPubSub
-	Persistence          Persistence
+	WorkspaceEventHub WorkspaceEventHub
+	Persistence       Persistence
 }
 
 func NewServer(
@@ -89,7 +91,7 @@ func NewServer(
 	integrationEventHandlers *IntegrationEventHandlers,
 	queryHandlers *QueryHandlers,
 	DomainEventHandlers *DomainEventHandlers,
-	workspaceEventPubSub WorkspaceEventPubSub,
+	workspaceEventHub WorkspaceEventHub,
 	persistence Persistence,
 ) *Server {
 	return &Server{
@@ -97,7 +99,7 @@ func NewServer(
 		IntegrationEventHandlers: integrationEventHandlers,
 		QueryHandlers:            queryHandlers,
 		DomainEventHandlers:      DomainEventHandlers,
-		WorkspaceEventPubSub:     workspaceEventPubSub,
+		WorkspaceEventHub:        workspaceEventHub,
 		Persistence:              persistence,
 	}
 }
@@ -115,7 +117,7 @@ func (s *Server) Start(ctx context.Context) error {
 
 	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
-		return s.WorkspaceEventPubSub.Run(ctx)
+		return s.WorkspaceEventHub.Run(ctx)
 	})
 	g.Go(func() error {
 		return s.DomainEventHandlers.Run(ctx)
@@ -126,7 +128,7 @@ func (s *Server) Start(ctx context.Context) error {
 func (s *Server) Stop(ctx context.Context) error {
 	g, _ := errgroup.WithContext(ctx)
 	g.Go(func() error {
-		return s.WorkspaceEventPubSub.Close()
+		return s.WorkspaceEventHub.Close()
 	})
 	g.Go(func() error {
 		return s.DomainEventHandlers.Close()

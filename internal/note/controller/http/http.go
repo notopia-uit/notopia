@@ -24,9 +24,9 @@ type (
 )
 
 type StrictHandler struct {
-	App                  *app.Server
-	BaseURL              *url.URL
-	WorkspaceEventPubSub app.WorkspaceEventPubSub
+	App               *app.Server
+	BaseURL           *url.URL
+	WorkspaceEventHub app.WorkspaceEventHub
 }
 
 var _ IStrictHandler = (*StrictHandler)(nil)
@@ -34,7 +34,7 @@ var _ IStrictHandler = (*StrictHandler)(nil)
 func NewStrictHandler(
 	app *app.Server,
 	cfg *config.Server,
-	workspaceEventPubSub app.WorkspaceEventPubSub,
+	workspaceEventHub app.WorkspaceEventHub,
 ) *StrictHandler {
 	return &StrictHandler{
 		App: app,
@@ -42,7 +42,7 @@ func NewStrictHandler(
 			Scheme: "http",
 			Host:   cfg.HTTP.Address(),
 		},
-		WorkspaceEventPubSub: workspaceEventPubSub,
+		WorkspaceEventHub: workspaceEventHub,
 	}
 }
 

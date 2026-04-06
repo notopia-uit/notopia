@@ -19,7 +19,7 @@ type Health struct {
 func New(
 	persistence app.Persistence,
 	serverCfg *config.Server,
-	workspaceEventPubSub app.WorkspaceEventPubSub,
+	workspaceEventHub app.WorkspaceEventHub,
 ) *Health {
 	startupChecker := health.NewChecker(
 		health.WithCheck(
@@ -70,13 +70,14 @@ func New(
 				}),
 			},
 		),
+		// TODO: this have to check kafka, not the pub sub
 		health.WithPeriodicCheck(
 			15*time.Second,
 			3*time.Second,
 			health.Check{
 				Name: "workspaceEventPubSub",
 				Check: func(ctx context.Context) error {
-					return workspaceEventPubSub.Check(ctx)
+					return workspaceEventHub.Check(ctx)
 				},
 			},
 		),

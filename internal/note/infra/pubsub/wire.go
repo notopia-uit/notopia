@@ -10,6 +10,7 @@ var ProviderSet = wire.NewSet(
 	ProvideRedisClient,
 	ProvideWorkspaceEvent,
 	ProvideWorkspaceEventHubPubSub,
-	ProvideWorkspaceEventInternalPubSub,
-	wire.Bind(new(app.WorkspaceEventPubSub), new(*WorkspaceEvent)),
+	ProvideWorkspaceEventInternalHub,
+	wire.Bind(new(app.IntegrationPublisher), new(*IntegrationPublisher)),
+	wire.Bind(new(app.WorkspaceEventHub), new(*WorkspaceEvent)),
 )

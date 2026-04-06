@@ -8,7 +8,6 @@ package main
 
 import (
 	"context"
-
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
@@ -19,6 +18,8 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
 	"github.com/notopia-uit/notopia/internal/note/controller/integrationevent"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/infra/common"
+	"github.com/notopia-uit/notopia/internal/note/infra/domainevent"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
 	"github.com/notopia-uit/notopia/internal/note/infra/pubsub"
@@ -76,13 +77,12 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	queries := pg.NewQueries(pool)
-	db := pg.NewStdlib(pool)
-	folder := pg.NewNoTransactionFolder(pool, queries, db)
+	folder := pg.NewNoTransactionFolder(pool, queries)
 	createFolderHandler := app.NewCreateFolderHandler(authorization, folder)
-	pgNote := pg.NewNoTransactionNote(pool, queries, db)
+	pgNote := pg.NewNoTransactionNote(pool, queries)
 	createNoteHandler := app.NewCreateNoteHandler(authorization, pgNote, folder)
-	workspace := pg.NewNoTransactionWorkspace(pool, queries, db)
-	unitOfWork := pg.NewUnitOfWork(queries, db)
+	workspace := pg.NewNoTransactionWorkspace(pool, queries)
+	unitOfWork := pg.NewUnitOfWork(pool)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspace, folder, unitOfWork)
 	permanentlyDeleteFolderHandler := app.PermanentlyNewDeleteFolderHandler(authorization, folder)
 	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, pgNote)
@@ -148,11 +148,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		GetWorkspaceTreeHandler:         getWorkspaceTreeHandler,
 		ShowTrashHandler:                showTrashHandler,
 	}
-	kafka := &configConfig.Kafka
-	loggerAdapter := pubsub.NewWatermillLogger(logger)
-	commonconfigKafka := configConfig.Kafka
-	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	kafkaPublisher, err := pubsub.NewKafkaPublisher(commonconfigKafka, loggerAdapter, watermillKafkaTracer)
+	loggerAdapter := common.NewWatermillLogger(logger)
+	jsonMarshaler := common.NewWatermillJsonMarshaler()
+	processor, err := domainevent.NewProcessor(loggerAdapter, pool, jsonMarshaler)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -160,8 +158,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	commandEventMarshaler := pubsub.NewIntegrationMarshaler()
-	integrationPubSub, err := pubsub.NewIntegrationPublisher(kafka, loggerAdapter, kafkaPublisher, watermillKafkaTracer, commandEventMarshaler)
+	domainEventHandlers, err := app.NewDomainEventHandlers(processor)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -171,7 +168,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	redis := &configConfig.Redis
 	redisClient, cleanup5 := pubsub.NewRedisClient(ctx, redis, logger)
-	workspaceEventInternalPubSub, err := pubsub.NewWorkspaceEventInternalPubSub(loggerAdapter, commandEventMarshaler, redisClient)
+	workspaceEventInternalHub, err := pubsub.NewWorkspaceEventInternalHub(loggerAdapter, jsonMarshaler, redisClient)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -181,7 +178,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	workspaceEventHubPubSub := pubsub.NewWorkspaceEventHubPubSub(loggerAdapter)
-	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalPubSub, workspaceEventHubPubSub)
+	workspaceEvent := pubsub.NewWorkspaceEvent(workspaceEventInternalHub, workspaceEventHubPubSub)
+	db := pg.NewStdlib(pool)
 	provider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
 		cleanup5()
@@ -200,14 +198,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	server := &app.Server{
-		CommandHandlers:          commandHandlers,
-		IntegrationEventHandlers: integrationEventHandlers,
-		QueryHandlers:            queryHandlers,
-		IntegrationPubSub:        integrationPubSub,
-		WorkspaceEventPubSub:     workspaceEvent,
-		Persistence:              persistencePg,
-	}
+	server := app.NewServer(commandHandlers, integrationEventHandlers, queryHandlers, domainEventHandlers, workspaceEvent, persistencePg)
 	configServer := &configConfig.Server
 	strictHandler := http.NewStrictHandler(server, configServer, workspaceEvent)
 	serverInterface := http.NewHandler(strictHandler)
@@ -231,7 +222,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	integrationEvent, err := integrationevent.NewIntegrationEvent(integrationPubSub, server)
+	kafka := &configConfig.Kafka
+	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
+	integrationEvent, err := integrationevent.NewIntegrationEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler)
 	if err != nil {
 		cleanup7()
 		cleanup6()

@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"reflect"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
@@ -10,7 +9,7 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-type WorkspaceEventPubSub interface {
+type WorkspaceEventHub interface {
 	Publish(
 		ctx context.Context,
 		workspaceID uuid.UUID,
@@ -117,17 +116,19 @@ func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) 
 	}
 }
 
-var workspaceEventTypeRegistry = make(map[string]reflect.Type)
-
 func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
 	switch t {
 	case string(note.WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent):
+		//exhaustruct:ignore
 		return &WorkspaceEventMembersUpdated{}, true
 	case string(note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent):
+		//exhaustruct:ignore
 		return &WorkspaceEventWorkspaceItemsChanged{}, true
 	case string(note.WorkspaceUpdatedEventEventWorkspaceUpdatedEvent):
+		//exhaustruct:ignore
 		return &WorkspaceEventWorkspaceUpdated{}, true
 	case string(note.WorkspaceDeletedEventEventWorkspaceDeletedEvent):
+		//exhaustruct:ignore
 		return &WorkspaceEventWorkspaceDeleted{}, true
 	default:
 		return nil, false

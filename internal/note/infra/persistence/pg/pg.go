@@ -2,9 +2,11 @@ package pg
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/exaring/otelpgx"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"go.opentelemetry.io/otel/sdk/trace"
@@ -36,3 +38,9 @@ func NewQueries(db pgsqlc.DBTX) *pgsqlc.Queries {
 }
 
 var ProvideQueries = NewQueries
+
+func NewStdlib(pool *pgxpool.Pool) *sql.DB {
+	return stdlib.OpenDBFromPool(pool)
+}
+
+var ProvideStdlib = NewStdlib

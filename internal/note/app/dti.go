@@ -1,7 +1,12 @@
 package app
 
-import "github.com/notopia-uit/notopia/internal/note/domain"
+import (
+	"context"
 
-type DomainEventToIntegrationEventHandler interface {
-	Handle(event domain.Event) ([]IntegrationEvent, error)
+	"github.com/notopia-uit/notopia/internal/note/domain"
+)
+
+// IF not need, remove this, if we don't need to holding slice or something, or we don't apply decorator
+type DomainEventToIntegrationEventHandler[E domain.Event] interface {
+	Handle(ctx context.Context, event E) error
 }

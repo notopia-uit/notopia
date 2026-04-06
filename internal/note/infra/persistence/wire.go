@@ -30,6 +30,7 @@ var PostgresProviderSet = wire.NewSet(
 	pg.ProvideNote,
 	pg.ProvidePgPool,
 	pg.ProvideQueries,
+	pg.ProvideStdlib,
 	pg.ProvideUnitOfWork,
 	pg.ProvideWorkspace,
 	wire.Bind(new(app.Persistence), new(*Pg)),
