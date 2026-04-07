@@ -5,22 +5,23 @@ export type ClientOptions = {
 };
 
 export type ShareDocumentCommittedEvent = ShareDocument & {
+    userId: ShareId;
     tags: Array<string>;
     outgoingLinkIds: Array<string>;
 };
 
 export type ShareNoteCreatedEvent = {
-    id: ShareId;
+    id: SharePropertiesId;
     name: ShareName;
     icon?: ShareIcon;
 };
 
 export type ShareNoteDeletedEvent = {
-    id: ShareId;
+    id: SharePropertiesId;
 };
 
 export type ShareNoteSearch = {
-    id: ShareId;
+    id: SharePropertiesId;
     name: ShareName;
     /**
      * Plain text content
@@ -32,7 +33,7 @@ export type ShareNoteSearch = {
 export type ShareNoteUpdatedEvent = ShareNote;
 
 export type ShareUserDeletedEvent = {
-    id: ShareUserPropertiesId;
+    id: ShareId;
 };
 
 /**
@@ -45,7 +46,12 @@ export type ShareDocument = {
     content: ShareDocumentContent;
 };
 
+/**
+ * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+ */
 export type ShareId = string;
+
+export type SharePropertiesId = string;
 
 /**
  * Can be empty string when creating but will be set to "Untitled Note" internally
@@ -54,7 +60,7 @@ export type ShareName = string;
 
 export type ShareIcon = string | null;
 
-export type SharePropertiesId = string;
+export type ShareFolderPropertiesId = string;
 
 export const ShareTrashedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
 
@@ -67,7 +73,7 @@ export type ShareNote = {
      */
     name: string;
     icon: string | null;
-    folderId: SharePropertiesId;
+    folderId: ShareFolderPropertiesId;
     readonly tags: Array<string>;
     readonly updatedAt: Date;
     readonly trashed: {
@@ -75,11 +81,6 @@ export type ShareNote = {
         trashedAt: Date;
     } | null;
 };
-
-/**
- * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
- */
-export type ShareUserPropertiesId = string;
 
 export type DocumentError = {
     /**

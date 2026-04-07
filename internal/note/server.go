@@ -25,6 +25,7 @@ type Server struct {
 	logger           *slog.Logger
 }
 
+// TODO: we have to start the workspace event also
 func NewServer(
 	persistence *persistence.Pg,
 	http *http.HTTP,

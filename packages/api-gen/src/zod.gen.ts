@@ -12,15 +12,25 @@ export const zShareDocument = z.object({
     content: zShareDocumentContent
 });
 
+/**
+ * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+ */
+export const zShareId = z.string();
+
 export const zShareDocumentCommittedEvent = zShareDocument.and(z.object({
+    userId: zShareId,
     tags: z.array(z.string()),
     outgoingLinkIds: z.array(z.uuid())
 }));
 
-export const zShareId = z.uuid().readonly();
+export const zShareUserDeletedEvent = z.object({
+    id: zShareId
+});
+
+export const zSharePropertiesId = z.uuid().readonly();
 
 export const zShareNoteDeletedEvent = z.object({
-    id: zShareId
+    id: zSharePropertiesId
 });
 
 /**
@@ -29,7 +39,7 @@ export const zShareNoteDeletedEvent = z.object({
 export const zShareName = z.string().min(1).max(255);
 
 export const zShareNoteSearch = z.object({
-    id: zShareId,
+    id: zSharePropertiesId,
     name: zShareName,
     plainTextContent: z.string().optional(),
     tags: z.array(z.string()).optional()
@@ -38,12 +48,12 @@ export const zShareNoteSearch = z.object({
 export const zShareIcon = z.string().nullable();
 
 export const zShareNoteCreatedEvent = z.object({
-    id: zShareId,
+    id: zSharePropertiesId,
     name: zShareName,
     icon: zShareIcon.optional()
 });
 
-export const zSharePropertiesId = z.uuid().readonly();
+export const zShareFolderPropertiesId = z.uuid().readonly();
 
 export const zShareTrashedBy = z.enum(['purpose', 'parent']);
 
@@ -51,7 +61,7 @@ export const zShareNote = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
-    folderId: zSharePropertiesId,
+    folderId: zShareFolderPropertiesId,
     tags: z.array(z.string()).readonly(),
     updatedAt: z.iso.datetime().readonly(),
     trashed: z.object({
@@ -61,15 +71,6 @@ export const zShareNote = z.object({
 });
 
 export const zShareNoteUpdatedEvent = zShareNote;
-
-/**
- * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
- */
-export const zShareUserPropertiesId = z.string();
-
-export const zShareUserDeletedEvent = z.object({
-    id: zShareUserPropertiesId
-});
 
 export const zDocumentError = z.object({
     code: z.string(),

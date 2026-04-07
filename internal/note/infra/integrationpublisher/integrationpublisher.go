@@ -1,4 +1,4 @@
-package pubsub
+package integrationpublisher
 
 import (
 	"context"
@@ -53,7 +53,7 @@ type IntegrationPublisher struct {
 var _ app.IntegrationPublisher = (*IntegrationPublisher)(nil)
 
 func NewIntegrationPublisher(
-	cfg commonconfig.Kafka,
+	cfg *commonconfig.Kafka,
 	logger watermill.LoggerAdapter,
 	tracer kafka.SaramaTracer,
 	marshaller *cqrs.JSONMarshaler,

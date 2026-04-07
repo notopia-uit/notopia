@@ -1779,6 +1779,9 @@
           },
           {
             "properties": {
+              "userId": {
+                "$ref": "#/components/schemas/share_id"
+              },
               "tags": {
                 "type": "array",
                 "items": {
@@ -1799,6 +1802,7 @@
               }
             },
             "required": [
+              "userId",
               "tags",
               "outgoingLinkIds"
             ]
@@ -1809,7 +1813,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/share_id",
+            "$ref": "#/components/schemas/share_properties-id",
             "readOnly": false
           },
           "name": {
@@ -1828,7 +1832,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/share_id",
+            "$ref": "#/components/schemas/share_properties-id",
             "readOnly": false
           }
         },
@@ -1840,7 +1844,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/share_id",
+            "$ref": "#/components/schemas/share_properties-id",
             "readOnly": false
           },
           "name": {
@@ -1874,7 +1878,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/share_User_properties-id",
+            "$ref": "#/components/schemas/share_id",
             "readOnly": false
           }
         },
@@ -2069,6 +2073,12 @@
       },
       "share_id": {
         "type": "string",
+        "format": "number",
+        "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
+        "example": "100"
+      },
+      "share_properties-id": {
+        "type": "string",
         "format": "uuid",
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
         "readOnly": true
@@ -2085,7 +2095,7 @@
         "nullable": true,
         "example": "📓"
       },
-      "share_properties-id": {
+      "share_Folder_properties-id": {
         "type": "string",
         "format": "uuid",
         "example": "123e4567-e89b-12d3-a456-426614174000",
@@ -2121,7 +2131,7 @@
             "example": "📓"
           },
           "folderId": {
-            "$ref": "#/components/schemas/share_properties-id"
+            "$ref": "#/components/schemas/share_Folder_properties-id"
           },
           "tags": {
             "type": "array",
@@ -2170,12 +2180,6 @@
           "updatedAt",
           "trashed"
         ]
-      },
-      "share_User_properties-id": {
-        "type": "string",
-        "format": "number",
-        "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
-        "example": "100"
       },
       "document_Error": {
         "type": "object",

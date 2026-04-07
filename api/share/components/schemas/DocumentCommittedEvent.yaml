@@ -2,6 +2,8 @@
 allOf:
   - $ref: ../../../document/components/schemas/Document.yaml
   - properties:
+      userId:
+        $ref: ../../../common/components/schemas/User.yaml#/properties/id
       tags:
         type: array
         items:
@@ -14,5 +16,6 @@ allOf:
           format: uuid
           example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
     required:
+      - userId
       - tags
       - outgoingLinkIds

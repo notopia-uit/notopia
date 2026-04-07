@@ -18,6 +18,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
 	"github.com/notopia-uit/notopia/internal/note/controller/integrationevent"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
 	"github.com/notopia-uit/notopia/internal/note/infra/pubsub"
@@ -116,10 +117,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	trashWorkspaceItemsHandler := app.NewTrashWorkspaceItemsHandler(authorization, unitOfWork, trashService)
 	unpublishNoteHandler := app.NewUnpublishNoteHandler(noteRepo)
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspaceRepo)
-	kafka := configConfig.Kafka
+	kafka := &configConfig.Kafka
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
 	jsonMarshaler := components.NewWatermillJsonMarshaler()
-	integrationPublisher, err := pubsub.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, jsonMarshaler)
+	integrationPublisher, err := integrationpublisher.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, jsonMarshaler)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -222,8 +223,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	commonconfigKafka := &configConfig.Kafka
-	integrationEvent, err := integrationevent.NewIntegrationEvent(commonconfigKafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler)
+	integrationEvent, err := integrationevent.NewIntegrationEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler)
 	if err != nil {
 		cleanup7()
 		cleanup6()

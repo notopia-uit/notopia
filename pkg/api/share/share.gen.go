@@ -41,14 +41,20 @@ type DocumentCommittedEvent struct {
 	Id              openapi_types.UUID   `json:"id"`
 	OutgoingLinkIds []openapi_types.UUID `json:"outgoingLinkIds"`
 	Tags            []string             `json:"tags"`
+
+	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+	UserId Id `json:"userId"`
 }
 
 // DocumentContent BlockNote model
 type DocumentContent = []map[string]interface{}
 
+// FolderPropertiesId defines model for Folder_properties-id.
+type FolderPropertiesId = openapi_types.UUID
+
 // Note defines model for Note.
 type Note struct {
-	FolderId *PropertiesId       `json:"folderId,omitempty"`
+	FolderId *FolderPropertiesId `json:"folderId,omitempty"`
 	Icon     *string             `json:"icon"`
 	Id       *openapi_types.UUID `json:"id,omitempty"`
 
@@ -67,8 +73,8 @@ type NoteTrashed struct {
 
 // NoteCreatedEvent defines model for NoteCreatedEvent.
 type NoteCreatedEvent struct {
-	Icon *Icon `json:"icon,omitempty"`
-	Id   *Id   `json:"id,omitempty"`
+	Icon *Icon         `json:"icon,omitempty"`
+	Id   *PropertiesId `json:"id,omitempty"`
 
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name Name `json:"name"`
@@ -76,12 +82,12 @@ type NoteCreatedEvent struct {
 
 // NoteDeletedEvent defines model for NoteDeletedEvent.
 type NoteDeletedEvent struct {
-	Id *Id `json:"id,omitempty"`
+	Id *PropertiesId `json:"id,omitempty"`
 }
 
 // NoteSearch defines model for NoteSearch.
 type NoteSearch struct {
-	Id *Id `json:"id,omitempty"`
+	Id *PropertiesId `json:"id,omitempty"`
 
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name Name `json:"name"`
@@ -100,17 +106,14 @@ type TrashedBy string
 // UserDeletedEvent defines model for UserDeletedEvent.
 type UserDeletedEvent struct {
 	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	Id UserPropertiesId `json:"id"`
+	Id Id `json:"id"`
 }
-
-// UserPropertiesId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-type UserPropertiesId = string
 
 // Icon defines model for icon.
 type Icon = string
 
-// Id defines model for id.
-type Id = openapi_types.UUID
+// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+type Id = string
 
 // Name Can be empty string when creating but will be set to "Untitled Note" internally
 type Name = string

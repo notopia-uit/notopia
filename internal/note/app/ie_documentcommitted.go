@@ -4,13 +4,16 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	"github.com/notopia-uit/notopia/pkg/api/share"
 )
 
 type DocumentCommitted struct {
-	share.DocumentCommittedEvent
-	UserID string
+	Content         []map[string]interface{}
+	Id              uuid.UUID
+	OutgoingLinkIds []uuid.UUID
+	Tags            []string
+	UserID          string
 }
 
 type DocumentCommittedHandler struct {

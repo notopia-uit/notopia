@@ -19,6 +19,9 @@
           },
           {
             "properties": {
+              "userId": {
+                "$ref": "#/components/schemas/id"
+              },
               "tags": {
                 "type": "array",
                 "items": {
@@ -39,6 +42,7 @@
               }
             },
             "required": [
+              "userId",
               "tags",
               "outgoingLinkIds"
             ]
@@ -49,7 +53,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/id",
+            "$ref": "#/components/schemas/properties-id",
             "readOnly": false
           },
           "name": {
@@ -68,7 +72,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/id",
+            "$ref": "#/components/schemas/properties-id",
             "readOnly": false
           }
         },
@@ -80,7 +84,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/id",
+            "$ref": "#/components/schemas/properties-id",
             "readOnly": false
           },
           "name": {
@@ -114,7 +118,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/User_properties-id",
+            "$ref": "#/components/schemas/id",
             "readOnly": false
           }
         },
@@ -309,6 +313,12 @@
       },
       "id": {
         "type": "string",
+        "format": "number",
+        "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
+        "example": "100"
+      },
+      "properties-id": {
+        "type": "string",
         "format": "uuid",
         "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
         "readOnly": true
@@ -325,7 +335,7 @@
         "nullable": true,
         "example": "📓"
       },
-      "properties-id": {
+      "Folder_properties-id": {
         "type": "string",
         "format": "uuid",
         "example": "123e4567-e89b-12d3-a456-426614174000",
@@ -361,7 +371,7 @@
             "example": "📓"
           },
           "folderId": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/Folder_properties-id"
           },
           "tags": {
             "type": "array",
@@ -410,12 +420,6 @@
           "updatedAt",
           "trashed"
         ]
-      },
-      "User_properties-id": {
-        "type": "string",
-        "format": "number",
-        "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
-        "example": "100"
       }
     }
   }
