@@ -104,6 +104,8 @@ WHERE
 FOR UPDATE -- :if @for_update
 ;
 
+-- TODO: rename it to get notes
+
 -- name: GetNotesByParams :many
 SELECT
   *
@@ -114,8 +116,12 @@ WHERE
   AND folder_id IN (
     SELECT id FROM folders WHERE workspace_id = sqlc.narg('workspace_id')::uuid
   ) -- :if @workspace_id
-  AND trashed_by = sqlc.narg('trashed_by')::text -- :if @trashed_by
-  AND trashed_at IS NULL -- :if @is_not_trashed
+  AND ( -- :if @trashed_by
+    trashed_by = sqlc.narg('trashed_by')::text
+    OR trashed_by IS NULL
+  )
+  AND trashed_by IS NULL -- :if @only_non_trashed
+  AND trashed_by IS NOT NULL -- :if @only_trashed
 FOR UPDATE -- :if @for_update
 ;
 
@@ -126,7 +132,12 @@ FROM
   notes
 WHERE
   folder_id = ANY(sqlc.arg('folder_ids')::uuid[])
-  AND trashed_at IS NULL -- :if @include_trashed
+  AND ( -- :if @trashed_by
+    trashed_by = sqlc.narg('trashed_by')::text
+    OR trashed_by IS NULL
+  )
+  AND trashed_by IS NULL -- :if @only_non_trashed
+  AND trashed_by IS NOT NULL -- :if @only_trashed
 ORDER BY
   created_at DESC
 FOR UPDATE -- :if @for_update
@@ -142,6 +153,19 @@ INNER JOIN
   ON n.folder_id = f.id
 WHERE
   n.id = sqlc.arg('id');
+
+-- name: GetWorkspaceIDsByNoteIDs :many
+SELECT
+  n.id,
+  f.workspace_id
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  n.id = ANY(sqlc.arg('ids')::uuid[]);
+
 
 -- name: GetNotesInWorkspace :many
 SELECT

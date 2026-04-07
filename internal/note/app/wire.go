@@ -40,14 +40,15 @@ var ProviderSetQuery = wire.NewSet(
 	wire.Struct(new(Queries), "*"),
 )
 
-var ProviderSetIntegrationEvent = wire.NewSet(
+var ProviderSetEvent = wire.NewSet(
 	ProvideDocumentCommittedHandler,
-	wire.Struct(new(IntegrationEvents), "*"),
+	ProvideNotifyWorkspaceItemsUpdatedHandler,
+	wire.Struct(new(Events), "*"),
 )
 
 var ProviderSet = wire.NewSet(
 	ProviderSetCommand,
-	ProviderSetIntegrationEvent,
+	ProviderSetEvent,
 	ProviderSetQuery,
 	wire.Struct(new(Server), "*"),
 )

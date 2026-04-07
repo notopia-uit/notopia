@@ -15,13 +15,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
-)
-
-const (
-	MetadataWorkspaceIDKey = "workspaceId"
-	metadataUserIDKey      = "userId"
-	metadataEventTypeKey   = "eventType"
 )
 
 type WorkspaceEventHub struct {
@@ -29,18 +24,20 @@ type WorkspaceEventHub struct {
 	redisSubscriber message.Subscriber
 	internalPubSub  *gochannel.GoChannel
 	router          *message.Router
-	topic           string
-	redisClient     *RedisClient
+
+	topic                  string
+	MetadataWorkspaceIDKey string
+	metadataUserIDKey      string
+	metadataEventTypeKey   string
 }
 
 var _ app.WorkspaceEventHub = (*WorkspaceEventHub)(nil)
 
 func NewWorkspaceEventHub(
+	workspaceEventCfg *config.WorkspaceEvent,
 	logger watermill.LoggerAdapter,
 	redisClient *RedisClient,
 ) (*WorkspaceEventHub, error) {
-	topic := "events:workspaces"
-
 	// TODO: If have time, try https://github.com/stong1994/watermill-rediszset, because we only need pubsub, not stream
 	// This would reduce memory overhead and be more efficient for ephemeral workspace events.
 	// Single Redis subscriber for ALL workspace events
@@ -79,8 +76,11 @@ func NewWorkspaceEventHub(
 		redisSubscriber: subscriber,
 		internalPubSub:  gochannel.NewGoChannel(gochannel.Config{OutputChannelBuffer: 100}, logger),
 		router:          router,
-		topic:           topic,
-		redisClient:     redisClient,
+
+		topic:                  workspaceEventCfg.MessageGeneralTopic,
+		metadataUserIDKey:      workspaceEventCfg.MessageMetadataUserIDKey,
+		metadataEventTypeKey:   workspaceEventCfg.MessageMetadataEventTypeKey,
+		MetadataWorkspaceIDKey: workspaceEventCfg.MessageMetadataWorkspaceIDKey,
 	}, nil
 }
 
@@ -94,7 +94,7 @@ func (h *WorkspaceEventHub) setupRouting() {
 		"",
 		h.internalPubSub,
 		func(msg *message.Message) ([]*message.Message, error) {
-			workspaceID := msg.Metadata.Get(MetadataWorkspaceIDKey)
+			workspaceID := msg.Metadata.Get(h.MetadataWorkspaceIDKey)
 			if workspaceID == "" {
 				slog.ErrorContext(msg.Context(), "missing workspace ID in message metadata")
 				return []*message.Message{}, nil
@@ -134,10 +134,9 @@ func (h *WorkspaceEventHub) Publish(
 
 		msg := message.NewMessage(watermill.NewUUID(), payload)
 		msg.SetContext(ctx)
-		msg.Metadata.Set(MetadataWorkspaceIDKey, workspaceID.String())
-		msg.Metadata.Set(metadataUserIDKey, userID)
-		msg.Metadata.Set(metadataEventTypeKey, event.GetEvent())
-
+		msg.Metadata.Set(h.MetadataWorkspaceIDKey, workspaceID.String())
+		msg.Metadata.Set(h.metadataUserIDKey, userID)
+		msg.Metadata.Set(h.metadataEventTypeKey, event.GetEvent())
 		msgs = append(msgs, msg)
 	}
 
@@ -191,12 +190,12 @@ func (h *WorkspaceEventHub) processMessage(
 	workspaceID uuid.UUID,
 ) {
 	// Skip own events
-	if msg.Metadata.Get(metadataUserIDKey) == userID {
+	if msg.Metadata.Get(h.metadataUserIDKey) == userID {
 		msg.Ack()
 		return
 	}
 
-	eventType := msg.Metadata.Get(metadataEventTypeKey)
+	eventType := msg.Metadata.Get(h.metadataEventTypeKey)
 	if eventType == "" {
 		slog.ErrorContext(ctx, "missing event type in message metadata",
 			slog.String("workspace_id", workspaceID.String()),

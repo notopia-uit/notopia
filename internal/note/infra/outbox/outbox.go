@@ -35,7 +35,12 @@ func NewOutbox(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create SQL subscriber: %w", err)
 	}
-	fwd, err := forwarder.NewForwarder(subcriber, publisher, logger, forwarder.Config{})
+	fwd, err := forwarder.NewForwarder(
+		subcriber,
+		publisher,
+		logger,
+		forwarder.Config{},
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create forwarder: %w", err)
 	}
@@ -44,7 +49,9 @@ func NewOutbox(
 	}, nil
 }
 
-func (o *Outbox) Start(ctx context.Context) error {
+var ProvideOutbox = NewOutbox
+
+func (o *Outbox) Run(ctx context.Context) error {
 	if err := o.fwd.Run(ctx); err != nil {
 		return fmt.Errorf("failed to run forwarder: %w", err)
 	}

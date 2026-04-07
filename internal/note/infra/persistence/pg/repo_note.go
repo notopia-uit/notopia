@@ -14,10 +14,11 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
+// TODO: what, it has so many fmt error? we have to map to toErr only
 type NoteRepo struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
-	publisher     *Publisher
+	publisher     Publisher
 	inTransaction bool
 }
 
@@ -26,7 +27,7 @@ var _ domain.NoteRepo = (*NoteRepo)(nil)
 func NewNoteRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
-	publisher *Publisher,
+	publisher Publisher,
 	inTransaction bool,
 ) *NoteRepo {
 	return &NoteRepo{
@@ -141,76 +142,25 @@ func noteToDomainRepo(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
 		note.FolderID,
 		links,
 		trashed,
+		false,
 	)
 }
 
 // TODO: It doesn't save the outgoing links
-func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) (cerr error) {
+func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) error {
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
 		publisher:     n.publisher,
 		inTransaction: n.inTransaction,
 	}, func(params *RunInTxFnparams) error {
-		err := params.queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
-			ID:        note.ID(),
-			Name:      note.Name(),
-			Icon:      note.Icon(),
-			FolderID:  note.FolderID(),
-			Tags:      note.Tags(),
-			Size:      int32(note.Size()),
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			TrashedBy: note.TrashedByString(),
-			TrashedAt: note.TrashedAt(),
-		})
-		if err != nil {
-			return toErr(err)
-		}
-		if err := params.queries.CreateTempTableNoteLinks(ctx); err != nil {
-			return toErr(err)
-		}
-		saveNoteLinkParams := make([]*pgsqlc.InsertTempNoteLinksParams, len(note.OutgoingLinks()))
-		for i, targetID := range note.OutgoingLinks() {
-			saveNoteLinkParams[i] = &pgsqlc.InsertTempNoteLinksParams{
-				SourceID: note.ID(),
-				TargetID: targetID,
+		queries := params.queries
+		if note.Deleted() {
+			if err := queries.PermanentlyDeleteNoteByID(ctx, note.ID()); err != nil {
+				return toErr(err)
 			}
-		}
-		affected, err := params.queries.InsertTempNoteLinks(ctx, saveNoteLinkParams)
-		if err != nil {
-			return toErr(err)
-		}
-		if affected != int64(len(note.OutgoingLinks())) {
-			return fmt.Errorf("not all note links were inserted into temp table")
-		}
-		if err := params.queries.DeleteObsoleteNoteLinks(ctx); err != nil {
-			return toErr(err)
-		}
-		if err := params.queries.SaveFromTempNoteLinks(ctx); err != nil {
-			return toErr(err)
-		}
-		if err := params.publisher.Publish(ctx, note.PopEvents()...); err != nil {
-			return fmt.Errorf("failed to publish events: %w", err)
-		}
-		return nil
-	})
-}
-
-// TODO: It doesn't save the outgoing links
-func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) (cerr error) {
-	return runInTx(ctx, &runInTxParams{
-		pgxPool:       n.pgxPool,
-		queries:       n.queries,
-		publisher:     n.publisher,
-		inTransaction: n.inTransaction,
-	}, func(params *RunInTxFnparams) error {
-		if err := params.queries.CreateTempTableNotes(ctx); err != nil {
-			return fmt.Errorf("failed to create temp table for notes: %w", toErr(err))
-		}
-		saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(notes))
-		for i, note := range notes {
-			saveNoteParams[i] = &pgsqlc.InsertTempNotesParams{
+		} else {
+			err := queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
 				ID:        note.ID(),
 				Name:      note.Name(),
 				Icon:      note.Icon(),
@@ -221,24 +171,159 @@ func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) (cerr err
 				UpdatedAt: time.Now(),
 				TrashedBy: note.TrashedByString(),
 				TrashedAt: note.TrashedAt(),
+			})
+			if err != nil {
+				return toErr(err)
+			}
+			if err := queries.CreateTempTableNoteLinks(ctx); err != nil {
+				return toErr(err)
+			}
+			saveNoteLinkParams := make([]*pgsqlc.InsertTempNoteLinksParams, len(note.OutgoingLinks()))
+			for i, targetID := range note.OutgoingLinks() {
+				saveNoteLinkParams[i] = &pgsqlc.InsertTempNoteLinksParams{
+					SourceID: note.ID(),
+					TargetID: targetID,
+				}
+			}
+			affected, err := queries.InsertTempNoteLinks(ctx, saveNoteLinkParams)
+			if err != nil {
+				return toErr(err)
+			}
+			if affected != int64(len(note.OutgoingLinks())) {
+				return fmt.Errorf("not all note links were inserted into temp table")
+			}
+			if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
+				return toErr(err)
+			}
+			if err := queries.SaveFromTempNoteLinks(ctx); err != nil {
+				return toErr(err)
 			}
 		}
-		affected, err := params.queries.InsertTempNotes(ctx, saveNoteParams)
+		workspaceID, err := queries.GetWorkspaceIDByNoteID(ctx, note.ID())
 		if err != nil {
-			return fmt.Errorf("failed to insert notes into temp table: %w", toErr(err))
+			return toErr(err)
 		}
-		if affected != int64(len(notes)) {
-			return fmt.Errorf("not all notes were inserted into temp table (expected %d, got %d)", len(notes), affected)
+		for _, event := range note.PopEvents() {
+			if err := params.publisher.PublishWorkspaceItem(
+				ctx,
+				event,
+				PublishWorkspaceItemParams{
+					WorkspaceID: workspaceID,
+					AggregateID: note.ID(),
+				},
+			); err != nil {
+				return fmt.Errorf("failed to publish events: %w", err)
+			}
 		}
-		if err = params.queries.SaveFromTempNotes(ctx); err != nil {
-			return fmt.Errorf("failed to save notes from temp table: %w", toErr(err))
-		}
-		events := make([]domain.Event, 0)
+		return nil
+	})
+}
+
+// TODO: It doesn't save the outgoing links
+func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) error {
+	return runInTx(ctx, &runInTxParams{
+		pgxPool:       n.pgxPool,
+		queries:       n.queries,
+		publisher:     n.publisher,
+		inTransaction: n.inTransaction,
+	}, func(params *RunInTxFnparams) error {
+		queries := params.queries
+		var deleteIDs []uuid.UUID
+		var upsertNotes []*domain.Note
+		var allOutgoingLinks []*pgsqlc.InsertTempNoteLinksParams
+
 		for _, note := range notes {
-			events = append(events, note.PopEvents()...)
+			if note.Deleted() {
+				deleteIDs = append(deleteIDs, note.ID())
+			} else {
+				upsertNotes = append(upsertNotes, note)
+				for _, targetID := range note.OutgoingLinks() {
+					allOutgoingLinks = append(allOutgoingLinks, &pgsqlc.InsertTempNoteLinksParams{
+						SourceID: note.ID(),
+						TargetID: targetID,
+					})
+				}
+			}
 		}
-		if err := params.publisher.Publish(ctx, events...); err != nil {
-			return fmt.Errorf("failed to publish events: %w", err)
+
+		if len(deleteIDs) > 0 {
+			if err := queries.PermanentlyDeleteNotesByIDs(ctx, deleteIDs); err != nil {
+				return fmt.Errorf("failed bulk delete: %w", toErr(err))
+			}
+		}
+
+		if len(upsertNotes) > 0 {
+			if err := queries.CreateTempTableNotes(ctx); err != nil {
+				return toErr(err)
+			}
+
+			saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(upsertNotes))
+			for i, note := range upsertNotes {
+				saveNoteParams[i] = &pgsqlc.InsertTempNotesParams{
+					ID:        note.ID(),
+					Name:      note.Name(),
+					Icon:      note.Icon(),
+					FolderID:  note.FolderID(),
+					Tags:      note.Tags(),
+					Size:      int32(note.Size()),
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+					TrashedBy: note.TrashedByString(),
+					TrashedAt: note.TrashedAt(),
+				}
+			}
+
+			if _, err := queries.InsertTempNotes(ctx, saveNoteParams); err != nil {
+				return toErr(err)
+			}
+			if err := queries.SaveFromTempNotes(ctx); err != nil {
+				return toErr(err)
+			}
+
+			if len(allOutgoingLinks) > 0 {
+				if err := queries.CreateTempTableNoteLinks(ctx); err != nil {
+					return toErr(err)
+				}
+				if _, err := queries.InsertTempNoteLinks(ctx, allOutgoingLinks); err != nil {
+					return toErr(err)
+				}
+				if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
+					return toErr(err)
+				}
+				if err := queries.SaveFromTempNoteLinks(ctx); err != nil {
+					return toErr(err)
+				}
+			}
+		}
+		noteIDs := make([]uuid.UUID, len(notes))
+		for i, note := range notes {
+			noteIDs[i] = note.ID()
+		}
+		noteIDworkspaceIDPairs, err := queries.GetWorkspaceIDsByNoteIDs(ctx, noteIDs)
+		noteIDWorkspaceIDMap := make(map[uuid.UUID]uuid.UUID, len(noteIDworkspaceIDPairs))
+		for _, pair := range noteIDworkspaceIDPairs {
+			noteIDWorkspaceIDMap[pair.ID] = pair.WorkspaceID
+		}
+		if err != nil {
+			return toErr(err)
+		}
+		for _, note := range notes {
+			workspaceID, ok := noteIDWorkspaceIDMap[note.ID()]
+			if !ok {
+				return fmt.Errorf("failed to find workspace id for note id %s", note.ID())
+			}
+			for _, event := range note.PopEvents() {
+				if err := params.publisher.PublishWorkspaceItem(
+					ctx,
+					event,
+					PublishWorkspaceItemParams{
+						WorkspaceID: workspaceID,
+						AggregateID: note.ID(),
+					},
+				); err != nil {
+					return fmt.Errorf("failed to publish events: %w", err)
+				}
+			}
 		}
 		return nil
 	})
@@ -253,22 +338,6 @@ func (n *NoteRepo) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, works
 		return false, fmt.Errorf("failed to check if notes are in workspace: %w", toErr(err))
 	}
 	return count == int64(len(ids)), nil
-}
-
-func (n *NoteRepo) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error {
-	err := n.queries.PermanentlyDeleteNoteByID(ctx, id)
-	if err != nil {
-		return fmt.Errorf("failed to permanently delete note: %w", toErr(err))
-	}
-	return nil
-}
-
-func (n *NoteRepo) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error {
-	err := n.queries.PermanentlyDeleteNotesByIDs(ctx, ids)
-	if err != nil {
-		return fmt.Errorf("failed to permanently delete notes: %w", toErr(err))
-	}
-	return nil
 }
 
 func (n *NoteRepo) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {

@@ -40,9 +40,11 @@ func (h *GetWorkspaceTreeReadModel) GetWorkspaceTree(ctx context.Context, q *app
 		rootFolderID = rootFolderIDs[0]
 	}
 
-	rootFolder, err := h.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
-		ID: rootFolderID,
-	})
+	rootFolder, err := h.queries.GetFolder(ctx,
+		//exhaustruct:ignore
+		&pgsqlc.GetFolderParams{
+			ID: rootFolderID,
+		})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewFolderNotFound(rootFolderID, err)
@@ -71,10 +73,12 @@ func (h *GetWorkspaceTreeReadModel) GetWorkspaceTree(ctx context.Context, q *app
 		folderMap[folder.ID] = folder
 	}
 
-	allNotes, err := h.queries.GetNotesByFolderIDs(ctx, pgsqlc.GetNotesByFolderIDsParams{
-		FolderIds:      folderIDs,
-		IncludeTrashed: q.IncludeTrashed,
-	})
+	allNotes, err := h.queries.GetNotesByFolderIDs(ctx,
+		//exhaustruct:ignore
+		pgsqlc.GetNotesByFolderIDsParams{
+			FolderIds:      folderIDs,
+			IncludeTrashed: q.IncludeTrashed,
+		})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
 	}

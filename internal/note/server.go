@@ -9,6 +9,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/health"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
+	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 	"github.com/notopia-uit/notopia/pkg/otel"
@@ -21,6 +22,7 @@ type Server struct {
 	grpc              *grpc.GRPC
 	event             *event.Event
 	workspaceEventHub *workspaceevent.WorkspaceEventHub
+	outbox            *outbox.Outbox
 	health            *health.Health
 	logger            *slog.Logger
 }
@@ -32,6 +34,7 @@ func NewServer(
 	grpc *grpc.GRPC,
 	event *event.Event,
 	workspaceEventHub *workspaceevent.WorkspaceEventHub,
+	outbox *outbox.Outbox,
 	health *health.Health,
 	logger *slog.Logger,
 	globalOtel otel.Global, // This have to be here for deps
@@ -44,6 +47,7 @@ func NewServer(
 		grpc:              grpc,
 		event:             event,
 		workspaceEventHub: workspaceEventHub,
+		outbox:            outbox,
 		health:            health,
 		logger:            logger,
 	}
@@ -103,6 +107,13 @@ func (s *Server) Run(ctx context.Context) error {
 	g.Go(func() error {
 		if err := s.workspaceEventHub.Run(ctx); err != nil {
 			return fmt.Errorf("failed to run workspace event hub: %w", err)
+		}
+		return nil
+	})
+	g.Go(func() error {
+		// This has context passed down, so we don't really to close/stop it
+		if err := s.outbox.Run(ctx); err != nil {
+			return fmt.Errorf("failed to run outbox forwarder: %w", err)
 		}
 		return nil
 	})

@@ -29,6 +29,8 @@
 
 ## TO-DO
 
+- [ ] Note service
+  - [ ] Routing kafka message based on metadata workspace id if partitioning or listening
 - [ ] Document service
   - [ ] Currently only hocuspocus guard the document, other like create/update/delete revision not check, bcs I'm lazy
     > If do, should create a guard outside of it

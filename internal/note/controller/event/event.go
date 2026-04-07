@@ -11,6 +11,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/component"
+	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
@@ -18,7 +20,9 @@ import (
 // This include integration (from share package) and domain event, setup for event processor
 // If not use with event processor but via subscriber directly, not need to declare this
 func eventToTopic(event any) (string, bool) {
-	switch event.(type) {
+	switch e := event.(type) {
+	case domain.Event:
+		return component.DomainEventToTopic(e)
 	case *share.DocumentCommittedEvent:
 		return "events.integration.document.document.committed", true
 	}
@@ -113,6 +117,9 @@ func (e *Event) setup() error {
 	)); err != nil {
 		return fmt.Errorf("failed to add event handler: %w", err)
 	}
+	// TODO: because watermill doesn't support kafka regex (IBM/sarama)
+	// So, we will need to for loop all topic we have, (for note, and folder)
+	// And handle for workspace item updated
 	return nil
 }
 

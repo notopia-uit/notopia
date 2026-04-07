@@ -53,6 +53,7 @@ func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
 		)
 	}
 
+	// TODO: transaction?
 	note, err := h.noterepo.GetByID(ctx, cmd.ID, true)
 	if err != nil {
 		return err

@@ -13,8 +13,6 @@ type FolderRepo interface {
 	Save(ctx context.Context, folder *Folder) error
 	SaveMany(ctx context.Context, folders []*Folder) error
 	AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error)
-	PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error
-	PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
 }
 
 type FolderRepoGetManyParams struct {
@@ -41,11 +39,6 @@ func NewFolderRepoGetManyParamsByWorkspaceID(workspaceID uuid.UUID) *FolderRepoG
 
 func (p *FolderRepoGetManyParams) WithWorkspaceID(workspaceID uuid.UUID) *FolderRepoGetManyParams {
 	p.workspaceID = &workspaceID
-	return p
-}
-
-func (p *FolderRepoGetManyParams) WithIDs(ids []uuid.UUID) *FolderRepoGetManyParams {
-	p.ids = ids
 	return p
 }
 

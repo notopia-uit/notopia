@@ -28,11 +28,13 @@ func (h *ShowTrashReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*
 	}
 
 	trashedByPurpose := string(app.TrashedByPurpose)
-	trashedFolders, err := h.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		WorkspaceID:    &q.WorkspaceID,
-		TrashedBy:      &trashedByPurpose,
-		IncludeTrashed: true,
-	})
+	trashedFolders, err := h.queries.GetFolders(ctx,
+		//exhaustruct:ignore
+		&pgsqlc.GetFoldersParams{
+			WorkspaceID:    &q.WorkspaceID,
+			TrashedBy:      &trashedByPurpose,
+			IncludeTrashed: true,
+		})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
 	}

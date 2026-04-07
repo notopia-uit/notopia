@@ -14,6 +14,7 @@ type Folder struct {
 	workspaceID     uuid.UUID
 	folderHierarchy FolderHierarchy
 	trashed         *Trashed
+	deleted         bool
 
 	events []Event
 }
@@ -36,10 +37,11 @@ func NewFolder(
 		workspaceID:     workspaceID,
 		folderHierarchy: folderHierarchy,
 		trashed:         nil,
+		deleted:         false,
 
 		events: []Event{},
 	}
-	folder.AddEvent(
+	folder.addEvent(
 		&FolderCreatedEvent{
 			BaseEvent: *NewBaseEvent(folder.id, userID),
 			Name:      folder.name,
@@ -56,6 +58,7 @@ func UnmarshalFolder(
 	workspaceID uuid.UUID,
 	folderHierarchy FolderHierarchy,
 	trashed *Trashed,
+	deleted bool,
 ) *Folder {
 	return &Folder{
 		id:              id,
@@ -64,6 +67,7 @@ func UnmarshalFolder(
 		workspaceID:     workspaceID,
 		folderHierarchy: folderHierarchy,
 		trashed:         trashed,
+		deleted:         deleted,
 
 		events: []Event{},
 	}
@@ -79,7 +83,7 @@ func (f *Folder) Name() string {
 
 func (f *Folder) Rename(name string, userID string) {
 	f.name = name
-	f.AddEvent(&FolderUpdatedEvent{
+	f.addEvent(&FolderUpdatedEvent{
 		BaseEvent: *NewBaseEvent(f.id, userID),
 		Name:      f.name,
 		Icon:      f.icon,
@@ -92,7 +96,7 @@ func (f *Folder) Icon() *string {
 
 func (f *Folder) SetIcon(icon string, userID string) {
 	f.icon = &icon
-	f.AddEvent(&FolderUpdatedEvent{
+	f.addEvent(&FolderUpdatedEvent{
 		BaseEvent: *NewBaseEvent(f.id, userID),
 		Name:      f.name,
 		Icon:      f.icon,
@@ -118,7 +122,7 @@ func (f *Folder) IsRoot() bool {
 func (f *Folder) MoveToFolder(folderID uuid.UUID, userID string) {
 	hierarchy := NewFolderHierarchy(&folderID)
 	f.folderHierarchy = *hierarchy
-	f.AddEvent(
+	f.addEvent(
 		&FolderMovedEvent{
 			BaseEvent: *NewBaseEvent(f.id, userID),
 			ParentID:  folderID,
@@ -156,7 +160,7 @@ func (f *Folder) Trash(trashedBy TrashedBy, userID string) error {
 		return errs.NewFolderAlreadyTrashed(f.id)
 	}
 	f.trashed = NewTrashed(trashedBy, time.Now())
-	f.AddEvent(&FolderTrashedEvent{
+	f.addEvent(&FolderTrashedEvent{
 		BaseEvent: *NewBaseEvent(f.id, userID),
 	})
 	return nil
@@ -164,12 +168,23 @@ func (f *Folder) Trash(trashedBy TrashedBy, userID string) error {
 
 func (f *Folder) Restore(userID string) {
 	f.trashed = nil
-	f.AddEvent(&FolderRestoredEvent{
+	f.addEvent(&FolderRestoredEvent{
 		BaseEvent: *NewBaseEvent(f.id, userID),
 	})
 }
 
-func (f *Folder) AddEvent(event Event) {
+func (f *Folder) Deleted() bool {
+	return f.deleted
+}
+
+func (f *Folder) PermanentlyDelete(userID string) {
+	f.deleted = true
+	f.addEvent(&FolderPermanentlyDeletedEvent{
+		BaseEvent: *NewBaseEvent(f.id, userID),
+	})
+}
+
+func (f *Folder) addEvent(event Event) {
 	f.events = append(f.events, event)
 }
 

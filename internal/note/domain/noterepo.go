@@ -6,6 +6,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type NoteRepo interface {
+	GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*Note, error)
+	GetMany(ctx context.Context, params *NoteRepoGetManyParams) ([]*Note, error)
+	GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
+	Save(ctx context.Context, note *Note) error
+	SaveMany(ctx context.Context, notes []*Note) error
+	AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error)
+}
+
 type NoteRepoGetManyParams struct {
 	workspaceID *uuid.UUID
 	ids         []uuid.UUID
@@ -26,16 +35,6 @@ func NewNoteRepoGetManyParamsByWorkspaceID(workspaceID uuid.UUID) *NoteRepoGetMa
 	return &NoteRepoGetManyParams{
 		workspaceID: &workspaceID,
 	}
-}
-
-func (p *NoteRepoGetManyParams) WithWorkspaceID(workspaceID uuid.UUID) *NoteRepoGetManyParams {
-	p.workspaceID = &workspaceID
-	return p
-}
-
-func (p *NoteRepoGetManyParams) WithIDs(ids []uuid.UUID) *NoteRepoGetManyParams {
-	p.ids = ids
-	return p
 }
 
 func (p *NoteRepoGetManyParams) WithTrashedBy(trashedBy TrashedBy) *NoteRepoGetManyParams {
@@ -73,15 +72,4 @@ func (p *NoteRepoGetManyParams) IsTrashed() *bool {
 
 func (p *NoteRepoGetManyParams) ForUpdate() bool {
 	return p.forUpdate
-}
-
-type NoteRepo interface {
-	GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*Note, error)
-	GetMany(ctx context.Context, params *NoteRepoGetManyParams) ([]*Note, error)
-	GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
-	Save(ctx context.Context, note *Note) error
-	SaveMany(ctx context.Context, notes []*Note) error
-	AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error)
-	PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error
-	PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error
 }

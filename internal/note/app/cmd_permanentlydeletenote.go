@@ -17,15 +17,18 @@ type PermanentlyDeleteNote struct {
 type PermanentlyDeleteNoteHandler struct {
 	authorizationService AuthorizationService
 	noteRepo             domain.NoteRepo
+	uow                  domain.UnitOfWork
 }
 
 func PermanentlyNewDeleteNoteHandler(
 	authorizationService AuthorizationService,
 	noteRepo domain.NoteRepo,
+	uow domain.UnitOfWork,
 ) *PermanentlyDeleteNoteHandler {
 	return &PermanentlyDeleteNoteHandler{
 		authorizationService: authorizationService,
 		noteRepo:             noteRepo,
+		uow:                  uow,
 	}
 }
 
@@ -52,7 +55,13 @@ func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *Permanen
 		)
 	}
 
-	return h.noteRepo.PermanentlyDeleteByID(ctx, cmd.ID)
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		noteRepo := r.Note()
+		note, err := noteRepo.GetByID(ctx, cmd.ID, true)
+		if err != nil {
+			return err
+		}
+		note.Deleted()
+		return noteRepo.Save(ctx, note)
+	})
 }
-
-var ErrCodeDeleteNoteForbidden = "DeleteNote_1"

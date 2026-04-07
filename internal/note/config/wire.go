@@ -9,12 +9,18 @@ var ProviderSet = wire.NewSet(
 	Provide,
 	wire.FieldsOf(
 		new(*Config),
+		"Advanced",
 		"Database",
 		"General",
-		"Log",
-		"Server",
 		"Kafka",
+		"Log",
 		"Redis",
+		"Server",
 		"Services",
+	),
+	wire.FieldsOf(
+		new(*Advanced),
+		"DomainEvent",
+		"WorkspaceEvent",
 	),
 )

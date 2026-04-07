@@ -36,7 +36,6 @@ var PostgresRepoProviderSet = wire.NewSet(
 	wire.Bind(new(domain.FolderRepo), new(*pg.FolderRepo)),
 	wire.Bind(new(domain.NoteRepo), new(*pg.NoteRepo)),
 	wire.Bind(new(domain.UnitOfWork), new(*pg.UnitOfWork)),
-	pg.ProvidePublisherFactory,
 	wire.Bind(new(domain.WorkspaceRepo), new(*pg.WorkspaceRepo)),
 )
 

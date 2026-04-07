@@ -17,7 +17,7 @@ import (
 type FolderRepo struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
-	publisher     *Publisher // This is nil when not in transaction, because we will provide it inside a transaction
+	publisher     Publisher // This is nil when not in transaction, because we will provide it inside a transaction
 	inTransaction bool
 }
 
@@ -26,7 +26,7 @@ var _ domain.FolderRepo = (*FolderRepo)(nil)
 func NewFolderRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
-	publisher *Publisher,
+	publisher Publisher,
 	inTransaction bool,
 ) *FolderRepo {
 	return &FolderRepo{
@@ -52,10 +52,12 @@ func NewNoTransactionFolderRepo(
 var ProvideFolderRepo = NewNoTransactionFolderRepo
 
 func (f *FolderRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Folder, error) {
-	folder, err := f.queries.GetFolder(ctx, &pgsqlc.GetFolderParams{
-		ID:        id,
-		ForUpdate: forUpdate,
-	})
+	folder, err := f.queries.GetFolder(ctx,
+		//exhaustruct:ignore
+		&pgsqlc.GetFolderParams{
+			ID:        id,
+			ForUpdate: forUpdate,
+		})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewFolderNotFound(id, err)
@@ -85,13 +87,15 @@ func (f *FolderRepo) GetMany(ctx context.Context, params *domain.FolderRepoGetMa
 
 	includeTrashed := params.IsTrashed()
 
-	folders, err := f.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		IDs:            ids,
-		WorkspaceID:    workspaceID,
-		TrashedBy:      trashedBy,
-		IncludeTrashed: !includeTrashed,
-		ForUpdate:      params.ForUpdate(),
-	})
+	folders, err := f.queries.GetFolders(ctx,
+		//exhaustruct:ignore
+		&pgsqlc.GetFoldersParams{
+			IDs:            ids,
+			WorkspaceID:    workspaceID,
+			TrashedBy:      trashedBy,
+			IncludeTrashed: !includeTrashed,
+			ForUpdate:      params.ForUpdate(),
+		})
 	if err != nil {
 		return nil, toErr(err)
 	}
@@ -118,6 +122,7 @@ func folderToDomainRepo(folder *pgsqlc.Folder) *domain.Folder {
 		folder.WorkspaceID,
 		*domain.NewFolderHierarchy(folder.ParentID),
 		trashed,
+		false,
 	)
 }
 
@@ -141,8 +146,17 @@ func (f *FolderRepo) Save(ctx context.Context, folder *domain.Folder) (cerr erro
 		}); err != nil {
 			return toErr(err)
 		}
-		if err := params.publisher.Publish(ctx, folder.PopEvents()...); err != nil {
-			return fmt.Errorf("failed to publish events: %w", err)
+		for _, event := range folder.PopEvents() {
+			if err := params.publisher.PublishWorkspaceItem(
+				ctx,
+				event,
+				PublishWorkspaceItemParams{
+					WorkspaceID: folder.WorkspaceID(),
+					AggregateID: folder.ID(),
+				},
+			); err != nil {
+				return fmt.Errorf("failed to publish events: %w", err)
+			}
 		}
 		return nil
 	})
@@ -182,12 +196,19 @@ func (f *FolderRepo) SaveMany(ctx context.Context, folders []*domain.Folder) (ce
 		if err = params.queries.SaveFromTempFolders(ctx); err != nil {
 			return fmt.Errorf("failed to save folders from temp table: %w", toErr(err))
 		}
-		events := make([]domain.Event, 0)
 		for _, folder := range folders {
-			events = append(events, folder.PopEvents()...)
-		}
-		if err := params.publisher.Publish(ctx, events...); err != nil {
-			return fmt.Errorf("failed to publish events: %w", err)
+			for _, event := range folder.PopEvents() {
+				if err := params.publisher.PublishWorkspaceItem(
+					ctx,
+					event,
+					PublishWorkspaceItemParams{
+						WorkspaceID: folder.WorkspaceID(),
+						AggregateID: folder.ID(),
+					},
+				); err != nil {
+					return fmt.Errorf("failed to publish events: %w", err)
+				}
+			}
 		}
 		return nil
 	})

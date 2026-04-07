@@ -18,19 +18,16 @@ type PermanentlyDeleteWorkspaceItems struct {
 
 type PermanentlyDeleteWorkspaceItemsHandler struct {
 	authorizationService AuthorizationService
-	noteRepo             domain.NoteRepo
-	folderRepo           domain.FolderRepo
+	uow                  domain.UnitOfWork
 }
 
 func NewPermanentlyDeleteWorkspaceItemsHandler(
 	authorizationService AuthorizationService,
-	noteRepo domain.NoteRepo,
-	folderRepo domain.FolderRepo,
+	uow domain.UnitOfWork,
 ) *PermanentlyDeleteWorkspaceItemsHandler {
 	return &PermanentlyDeleteWorkspaceItemsHandler{
 		authorizationService: authorizationService,
-		noteRepo:             noteRepo,
-		folderRepo:           folderRepo,
+		uow:                  uow,
 	}
 }
 
@@ -53,17 +50,29 @@ func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd
 		)
 	}
 
-	if len(cmd.NoteIDs) > 0 {
-		if err := h.noteRepo.PermanentlyDeleteByIDs(ctx, cmd.NoteIDs); err != nil {
-			return err
-		}
-	}
+	// TODO: first, need to fix the param back, awful
 
-	if len(cmd.FolderIDs) > 0 {
-		if err := h.folderRepo.PermanentlyDeleteByIDs(ctx, cmd.FolderIDs); err != nil {
-			return err
-		}
-	}
+	// return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	// 	folderRepo := r.Folder()
+	// 	folder, err := folderRepo.GetMany(ctx, domain.NewFolderRepoGetManyParamsByIDs(cmd.FolderIDs).WithTrashed())
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	folder.Deleted()
+	// 	return folderRepo.Save(ctx, folder)
+	// })
+
+	// if len(cmd.NoteIDs) > 0 {
+	// 	if err := h.noteRepo.PermanentlyDeleteByIDs(ctx, cmd.NoteIDs); err != nil {
+	// 		return err
+	// 	}
+	// }
+	//
+	// if len(cmd.FolderIDs) > 0 {
+	// 	if err := h.folderRepo.PermanentlyDeleteByIDs(ctx, cmd.FolderIDs); err != nil {
+	// 		return err
+	// 	}
+	// }
 
 	return nil
 }

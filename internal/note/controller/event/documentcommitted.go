@@ -15,5 +15,5 @@ func (e *Event) documentCommittedHandler(ctx context.Context, event *share.Docum
 		OutgoingLinkIDs: event.OutgoingLinkIds,
 		UserID:          event.UserId,
 	}
-	return e.app.IntegrationEvents.DocumentCommittedHandler.Handle(ctx, ev)
+	return e.app.Events.DocumentCommittedHandler.Handle(ctx, ev)
 }

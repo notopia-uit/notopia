@@ -14,7 +14,7 @@ import (
 type RepoRegistry struct {
 	uow       *UnitOfWork
 	txQueries *pgsqlc.Queries
-	publisher *Publisher
+	publisher Publisher
 
 	workspace domain.WorkspaceRepo
 	folder    domain.FolderRepo
@@ -50,14 +50,14 @@ func (r *RepoRegistry) Note() domain.NoteRepo {
 
 type UnitOfWork struct {
 	pool             *pgxpool.Pool
-	publisherFactory *PublisherFactory
+	publisherFactory PublisherFactory
 }
 
 var _ domain.UnitOfWork = (*UnitOfWork)(nil)
 
 func NewUnitOfWork(
 	pool *pgxpool.Pool,
-	publisherFactory *PublisherFactory,
+	publisherFactory PublisherFactory,
 ) *UnitOfWork {
 	return &UnitOfWork{
 		pool:             pool,

@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/notopia-uit/notopia/internal/note/infra/common"
 	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
+	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/service"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
@@ -16,7 +17,8 @@ var ProviderSet = wire.NewSet(
 
 	common.ProviderSet,
 	integrationpublisher.ProviderSet,
+	outbox.ProviderSet,
 	persistence.PostgresProviderSet,
-	workspaceevent.ProviderSet,
 	service.ProviderSet,
+	workspaceevent.ProviderSet,
 )

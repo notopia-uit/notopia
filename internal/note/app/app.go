@@ -34,14 +34,15 @@ type Queries struct {
 	ShowTrashHandler                *ShowTrashHandler
 }
 
-type IntegrationEvents struct {
-	DocumentCommittedHandler *DocumentCommittedHandler
+type Events struct {
+	DocumentCommittedHandler    *DocumentCommittedHandler
+	NotifyWorkspaceItemsUpdated *NotifyWorkspaceItemsUpdatedHandler
 }
 
 type Server struct {
-	Cmds              *Cmds
-	IntegrationEvents *IntegrationEvents
-	Queries           *Queries
+	Cmds    *Cmds
+	Events  *Events
+	Queries *Queries
 
 	WorkspaceEventHub WorkspaceEventHub
 }

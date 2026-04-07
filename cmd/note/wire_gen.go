@@ -20,6 +20,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/infra/common"
 	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
+	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
 	"github.com/notopia-uit/notopia/internal/note/infra/service"
@@ -42,7 +43,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	validate := components.ProvideValidate()
+	validate := component.ProvideValidate()
 	viper := config.NewViper()
 	configConfig, err := config.New(validate, viper)
 	if err != nil {
@@ -98,16 +99,18 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	noteRepo := pg.NewNoTransactionNoteRepo(pool, queries)
 	createNoteHandler := app.NewCreateNoteHandler(authorization, noteRepo, folderRepo)
 	workspaceRepo := pg.NewNoTransactionWorkspaceRepo(pool, queries)
-	loggerAdapter := components.NewWatermillLogger(logger)
-	publisherFactory := pg.NewPublisherFactory(loggerAdapter)
-	unitOfWork := pg.NewUnitOfWork(pool, publisherFactory)
+	advanced := &configConfig.Advanced
+	domainEvent := advanced.DomainEvent
+	loggerAdapter := component.NewWatermillLogger(logger)
+	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter)
+	unitOfWork := pg.NewUnitOfWork(pool, fromPersistenceToQSLForwarder)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspaceRepo, folderRepo, unitOfWork)
-	permanentlyDeleteFolderHandler := app.PermanentlyNewDeleteFolderHandler(authorization, folderRepo)
-	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, noteRepo)
+	permanentlyDeleteFolderHandler := app.PermanentlyNewDeleteFolderHandler(authorization, folderRepo, unitOfWork)
+	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, noteRepo, unitOfWork)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, workspaceRepo)
 	generateDailyNoteHandler := app.NewGenerateDailyNoteHandler(noteRepo, folderRepo, workspaceRepo)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, noteRepo, folderRepo, unitOfWork)
-	permanentlyDeleteWorkspaceItemsHandler := app.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, noteRepo, folderRepo)
+	permanentlyDeleteWorkspaceItemsHandler := app.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, unitOfWork)
 	publishNoteHandler := app.NewPublishNoteHandler(noteRepo)
 	publishWorkspaceHandler := app.NewPublishWorkspaceHandler(workspaceRepo)
 	renameFolderHandler := app.NewRenameFolderHandler(authorization, folderRepo)
@@ -160,8 +163,22 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	noteService := domain.NewNoteService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(noteRepo, noteService)
-	integrationEvents := &app.IntegrationEvents{
-		DocumentCommittedHandler: documentCommittedHandler,
+	workspaceEvent := &advanced.WorkspaceEvent
+	redis := &configConfig.Redis
+	redisClient, cleanup5 := workspaceevent.NewRedisClient(ctx, redis, logger)
+	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(workspaceEventHub, noteRepo, folderRepo)
+	events := &app.Events{
+		DocumentCommittedHandler:    documentCommittedHandler,
+		NotifyWorkspaceItemsUpdated: notifyWorkspaceItemsUpdatedHandler,
 	}
 	checkWorkspaceSlugExistsReadModel := pg.NewCheckWorkspaceSlugExistsReadModel(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExistsReadModel)
@@ -191,20 +208,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		GetWorkspaceTreeHandler:         getWorkspaceTreeHandler,
 		ShowTrashHandler:                showTrashHandler,
 	}
-	redis := &configConfig.Redis
-	redisClient, cleanup5 := workspaceevent.NewRedisClient(ctx, redis, logger)
-	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(loggerAdapter, redisClient)
-	if err != nil {
-		cleanup5()
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
 	server := &app.Server{
 		Cmds:              cmds,
-		IntegrationEvents: integrationEvents,
+		Events:            events,
 		Queries:           appQueries,
 		WorkspaceEventHub: workspaceEventHub,
 	}
@@ -231,8 +237,19 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	jsonMarshaler := components.NewWatermillJsonMarshaler()
+	jsonMarshaler := component.NewWatermillJsonMarshaler()
 	eventEvent, err := event.NewEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler)
+	if err != nil {
+		cleanup7()
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, pool)
 	if err != nil {
 		cleanup7()
 		cleanup6()
@@ -256,7 +273,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
-	noteServer := note.NewServer(persistencePg, httpHTTP, grpcGRPC, eventEvent, workspaceEventHub, healthHealth, logger, global)
+	noteServer := note.NewServer(persistencePg, httpHTTP, grpcGRPC, eventEvent, workspaceEventHub, outboxOutbox, healthHealth, logger, global)
 	return noteServer, func() {
 		cleanup8()
 		cleanup7()

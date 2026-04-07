@@ -8,6 +8,7 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
+// Or, we just marshall the event to a string json string, instead marshall and unmarshall
 type WorkspaceEventHub interface {
 	Publish(
 		ctx context.Context,

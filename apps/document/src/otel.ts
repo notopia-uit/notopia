@@ -4,6 +4,9 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
 if (process.env.OTEL_SDK_DISABLED === undefined) {
   process.env.OTEL_SDK_DISABLED = 'true';
   process.env.OTEL_NODE_DISABLED_INSTRUMENTATIONS = 'all';
+} else {
+  process.env.OTEL_NODE_ENABLED_INSTRUMENTATIONS =
+    'grpc,http,kafkajs,pino,pg,runtime-node';
 }
 
 export const otelSdk = new NodeSDK({

@@ -85,24 +85,31 @@ FROM
   notes
 WHERE
   folder_id = ANY($1::uuid[])
-  AND trashed_at IS NULL -- :if $2
+  AND ( -- :if $2
+    trashed_by = $2::text -- :if $2
+    OR trashed_by IS NULL -- :if $2
+  ) -- :if $2
+  AND trashed_by IS NULL -- :if $3
+  AND trashed_by IS NOT NULL -- :if $4
 ORDER BY
   created_at DESC
-FOR UPDATE -- :if $3
+FOR UPDATE -- :if $5
 `
 
 var _getNotesByFolderIDsDynQ = dynCompile(getNotesByFolderIDs)
 
 type GetNotesByFolderIDsParams struct {
 	FolderIds      []uuid.UUID
-	IncludeTrashed bool
+	TrashedBy      *string
+	OnlyNonTrashed bool
+	OnlyTrashed    bool
 	ForUpdate      bool
 }
 
-func (q *Queries) GetNotesByFolderIDs(ctx context.Context, arg GetNotesByFolderIDsParams) ([]*Note, error) {
+func (q *Queries) GetNotesByFolderIDs(ctx context.Context, arg *GetNotesByFolderIDsParams) ([]*Note, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesByFolderIDs")
 	defer span.End()
-	dynQuery, dynArgs := _getNotesByFolderIDsDynQ.Build([]any{arg.FolderIds, arg.IncludeTrashed, arg.ForUpdate})
+	dynQuery, dynArgs := _getNotesByFolderIDsDynQ.Build([]any{arg.FolderIds, arg.TrashedBy, arg.OnlyNonTrashed, arg.OnlyTrashed, arg.ForUpdate})
 	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
@@ -134,6 +141,7 @@ func (q *Queries) GetNotesByFolderIDs(ctx context.Context, arg GetNotesByFolderI
 }
 
 const getNotesByParams = `-- name: GetNotesByParams :many
+
 SELECT
   id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
 FROM
@@ -143,25 +151,31 @@ WHERE
   AND folder_id IN (
     SELECT id FROM folders WHERE workspace_id = $2::uuid
   ) -- :if $2
-  AND trashed_by = $3::text -- :if $3
-  AND trashed_at IS NULL -- :if $4
-FOR UPDATE -- :if $5
+  AND ( -- :if $3
+    trashed_by = $3::text -- :if $3
+    OR trashed_by IS NULL -- :if $3
+  ) -- :if $3
+  AND trashed_by IS NULL -- :if $4
+  AND trashed_by IS NOT NULL -- :if $5
+FOR UPDATE -- :if $6
 `
 
 var _getNotesByParamsDynQ = dynCompile(getNotesByParams)
 
 type GetNotesByParamsParams struct {
-	IDs          *[]uuid.UUID
-	WorkspaceID  *uuid.UUID
-	TrashedBy    *string
-	IsNotTrashed bool
-	ForUpdate    bool
+	IDs            *[]uuid.UUID
+	WorkspaceID    *uuid.UUID
+	TrashedBy      *string
+	OnlyNonTrashed bool
+	OnlyTrashed    bool
+	ForUpdate      bool
 }
 
+// TODO: rename it to get notes
 func (q *Queries) GetNotesByParams(ctx context.Context, arg *GetNotesByParamsParams) ([]*Note, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesByParams")
 	defer span.End()
-	dynQuery, dynArgs := _getNotesByParamsDynQ.Build([]any{arg.IDs, arg.WorkspaceID, arg.TrashedBy, arg.IsNotTrashed, arg.ForUpdate})
+	dynQuery, dynArgs := _getNotesByParamsDynQ.Build([]any{arg.IDs, arg.WorkspaceID, arg.TrashedBy, arg.OnlyNonTrashed, arg.OnlyTrashed, arg.ForUpdate})
 	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
@@ -315,6 +329,46 @@ func (q *Queries) GetWorkspaceIDByNoteID(ctx context.Context, id uuid.UUID) (uui
 	var workspace_id uuid.UUID
 	err := row.Scan(&workspace_id)
 	return workspace_id, err
+}
+
+const getWorkspaceIDsByNoteIDs = `-- name: GetWorkspaceIDsByNoteIDs :many
+SELECT
+  n.id,
+  f.workspace_id
+FROM
+  notes AS n
+INNER JOIN
+  folders f
+  ON n.folder_id = f.id
+WHERE
+  n.id = ANY($1::uuid[])
+`
+
+type GetWorkspaceIDsByNoteIDsRow struct {
+	ID          uuid.UUID
+	WorkspaceID uuid.UUID
+}
+
+func (q *Queries) GetWorkspaceIDsByNoteIDs(ctx context.Context, ids []uuid.UUID) ([]*GetWorkspaceIDsByNoteIDsRow, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspaceIDsByNoteIDs")
+	defer span.End()
+	rows, err := q.db.Query(ctx, getWorkspaceIDsByNoteIDs, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetWorkspaceIDsByNoteIDsRow
+	for rows.Next() {
+		var i GetWorkspaceIDsByNoteIDsRow
+		if err := rows.Scan(&i.ID, &i.WorkspaceID); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 type InsertTempNotesParams struct {

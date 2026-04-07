@@ -12,13 +12,13 @@ import (
 type runInTxParams struct {
 	pgxPool       *pgxpool.Pool   // Required when not in transaction
 	queries       *pgsqlc.Queries // Required when in transaction (should be tx-backed)
-	publisher     *Publisher      // Required when in transaction (should be tx-backed)
+	publisher     Publisher       // Required when in transaction (should be tx-backed)
 	inTransaction bool            // Indicates if we're already in a transaction
 }
 
 type RunInTxFnparams struct {
 	queries   *pgsqlc.Queries
-	publisher *Publisher
+	publisher Publisher
 }
 
 // TODO: Can we just, avoid doing this cerr? common error tan` du

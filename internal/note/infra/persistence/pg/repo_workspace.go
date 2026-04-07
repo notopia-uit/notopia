@@ -17,7 +17,7 @@ import (
 type WorkspaceRepo struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
-	publisher     *Publisher
+	publisher     Publisher
 	inTransaction bool
 }
 
@@ -26,7 +26,7 @@ var _ domain.WorkspaceRepo = (*WorkspaceRepo)(nil)
 func NewWorkspaceRepo(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
-	publisher *Publisher,
+	publisher Publisher,
 	inTransaction bool,
 ) *WorkspaceRepo {
 	return &WorkspaceRepo{
@@ -56,11 +56,13 @@ func (w *WorkspaceRepo) GetBySlug(ctx context.Context, slug string, forUpdate bo
 		return nil, toErr(err)
 	}
 
-	folders, err := w.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		WorkspaceID:  &workspace.ID,
-		IsRootFolder: true,
-		ForUpdate:    forUpdate,
-	})
+	folders, err := w.queries.GetFolders(ctx,
+		//exhaustruct:ignore
+		&pgsqlc.GetFoldersParams{
+			WorkspaceID:  &workspace.ID,
+			IsRootFolder: true,
+			ForUpdate:    forUpdate,
+		})
 	if err != nil {
 		return nil, toErr(err)
 	}
@@ -85,11 +87,13 @@ func (w *WorkspaceRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate boo
 		return nil, toErr(err)
 	}
 
-	folders, err := w.queries.GetFolders(ctx, &pgsqlc.GetFoldersParams{
-		WorkspaceID:  &workspace.ID,
-		IsRootFolder: true,
-		ForUpdate:    forUpdate,
-	})
+	folders, err := w.queries.GetFolders(ctx,
+		//exhaustruct:ignore
+		&pgsqlc.GetFoldersParams{
+			WorkspaceID:  &workspace.ID,
+			IsRootFolder: true,
+			ForUpdate:    forUpdate,
+		})
 	if err != nil {
 		return nil, toErr(err)
 	}
@@ -138,8 +142,10 @@ func (w *WorkspaceRepo) Save(ctx context.Context, workspace *domain.Workspace) (
 		if err != nil {
 			return toErr(err)
 		}
-		if err := params.publisher.Publish(ctx, workspace.PopEvents()...); err != nil {
-			return fmt.Errorf("failed to publish events: %w", err)
+		for _, event := range workspace.PopEvents() {
+			if err := params.publisher.Publish(ctx, event); err != nil {
+				return fmt.Errorf("failed to publish events: %w", err)
+			}
 		}
 		return nil
 	})

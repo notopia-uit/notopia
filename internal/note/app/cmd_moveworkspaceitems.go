@@ -40,6 +40,7 @@ func NewMoveWorkspaceItemsHandler(
 
 var ProvideMoveWorkspaceItemsHandler = NewMoveWorkspaceItemsHandler
 
+// NOTE: Partially transaction? is it right
 func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) error {
 	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
 		ctx,

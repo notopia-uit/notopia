@@ -49,9 +49,11 @@ func (h *GetNoteLinksReadModel) GetNoteLinks(ctx context.Context, q *app.GetNote
 		}
 
 		if len(outgoingLinks) > 0 {
-			outgoingNotes, err := h.queries.GetNotesByParams(ctx, &pgsqlc.GetNotesByParamsParams{
-				IDs: &outgoingLinks,
-			})
+			outgoingNotes, err := h.queries.GetNotesByParams(ctx,
+				//exhaustruct:ignore
+				&pgsqlc.GetNotesByParamsParams{
+					IDs: &outgoingLinks,
+				})
 			if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 				return nil, toErr(err)
 			}
@@ -72,9 +74,11 @@ func (h *GetNoteLinksReadModel) GetNoteLinks(ctx context.Context, q *app.GetNote
 		}
 
 		if len(backlinks) > 0 {
-			backlinkNotes, err := h.queries.GetNotesByParams(ctx, &pgsqlc.GetNotesByParamsParams{
-				IDs: &backlinks,
-			})
+			backlinkNotes, err := h.queries.GetNotesByParams(ctx,
+				//exhaustruct:ignore
+				&pgsqlc.GetNotesByParamsParams{
+					IDs: &backlinks,
+				})
 			if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 				return nil, toErr(err)
 			}

@@ -93,9 +93,12 @@ WHERE
   id = sqlc.arg('id')
   AND workspace_id = sqlc.narg('workspace_id')::uuid -- :if @workspace_id
   AND parent_id = sqlc.narg('parent_id')::uuid -- :if @parent_id
-  AND parent_id IS NULL -- :if @is_root_folder
-  AND trashed_by = sqlc.narg('trashed_by')::text -- :if @trashed_by
-  AND trashed_by IS NULL -- :if @include_trashed
+  AND ( -- :if @trashed_by
+    trashed_by = sqlc.narg('trashed_by')::text
+    OR trashed_by IS NULL
+  )
+  AND trashed_by IS NULL -- :if @only_non_trashed
+  AND trashed_by IS NOT NULL -- :if @only_trashed
 FOR UPDATE -- :if @for_update
 ;
 
@@ -108,9 +111,12 @@ WHERE
   id = ANY(sqlc.narg('ids')::uuid[]) -- :if @ids
   AND workspace_id = sqlc.narg('workspace_id')::uuid -- :if @workspace_id
   AND parent_id = sqlc.narg('parent_id')::uuid -- :if @parent_id
-  AND parent_id IS NULL -- :if @is_root_folder
-  AND trashed_by = sqlc.narg('trashed_by')::text -- :if @trashed_by
-  AND trashed_by IS NULL -- :if @include_trashed
+  AND ( -- :if @trashed_by
+    trashed_by = sqlc.narg('trashed_by')::text
+    OR trashed_by IS NULL
+  )
+  AND trashed_by IS NULL -- :if @only_non_trashed
+  AND trashed_by IS NOT NULL -- :if @only_trashed
 ORDER BY
   created_at DESC
 FOR UPDATE -- :if @for_update
@@ -132,6 +138,8 @@ FROM
 WHERE
   workspace_id = sqlc.arg('workspace_id')
   AND parent_id IS NULL;
+
+-- TODO: Should give sqlc dynamic a try, if it run nicely, then it would be more performant
 
 -- name: GetRecursiveFolderByParentID :many
 WITH RECURSIVE subfolders AS (

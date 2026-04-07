@@ -17,15 +17,18 @@ type PermanentlyDeleteFolder struct {
 type PermanentlyDeleteFolderHandler struct {
 	authorizationService AuthorizationService
 	folderRepo           domain.FolderRepo
+	uow                  domain.UnitOfWork
 }
 
 func PermanentlyNewDeleteFolderHandler(
 	authorizationService AuthorizationService,
 	folderRepo domain.FolderRepo,
+	uow domain.UnitOfWork,
 ) *PermanentlyDeleteFolderHandler {
 	return &PermanentlyDeleteFolderHandler{
 		authorizationService: authorizationService,
 		folderRepo:           folderRepo,
+		uow:                  uow,
 	}
 }
 
@@ -52,5 +55,13 @@ func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *Perman
 		)
 	}
 
-	return h.folderRepo.PermanentlyDeleteByID(ctx, cmd.ID)
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		folderRepo := r.Folder()
+		folder, err := folderRepo.GetByID(ctx, cmd.ID, true)
+		if err != nil {
+			return err
+		}
+		folder.Deleted()
+		return folderRepo.Save(ctx, folder)
+	})
 }
