@@ -33,7 +33,7 @@ type Trashed struct {
 type Note struct {
 	ID                 uuid.UUID
 	Name               string
-	Icon               *string
+	Icon               string
 	Tags               []string
 	Size               int32
 	FolderID           uuid.UUID
@@ -46,7 +46,7 @@ type Note struct {
 type Folder struct {
 	ID          uuid.UUID
 	Name        string
-	Icon        *string
+	Icon        string
 	ParentID    uuid.UUID
 	WorkspaceID uuid.UUID
 	Trashed     *Trashed
@@ -64,7 +64,7 @@ type GraphNode struct {
 	ID     string
 	Name   string
 	Type   GraphNodeType
-	Weight *float64
+	Weight float64
 }
 
 type GraphLink struct {
@@ -80,7 +80,7 @@ type Graph struct {
 type NoteLink struct {
 	ID   uuid.UUID
 	Name string
-	Icon *string
+	Icon string
 }
 
 type NoteLinkResult struct {
@@ -104,21 +104,21 @@ var (
 
 type WorkspaceMember struct {
 	ID       string
-	Username *string
+	Username string
 	Role     WorkspaceRole
 }
 
 type WorkspaceTreeNote struct {
 	ID        uuid.UUID
 	Name      string
-	Icon      *string
+	Icon      string
 	UpdatedAt time.Time
 }
 
 type WorkspaceTreeFolder struct {
 	ID        uuid.UUID
 	Name      string
-	Icon      *string
+	Icon      string
 	Notes     []*WorkspaceTreeNote
 	Children  []*WorkspaceTreeFolder
 	UpdatedAt time.Time
@@ -134,14 +134,14 @@ const (
 type TrashedFolder struct {
 	ID      uuid.UUID
 	Name    string
-	Icon    *string
+	Icon    string
 	Trashed Trashed
 }
 
 type TrashedNote struct {
 	ID      uuid.UUID
 	Name    string
-	Icon    *string
+	Icon    string
 	Trashed Trashed
 }
 

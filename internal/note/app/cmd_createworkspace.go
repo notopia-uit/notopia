@@ -43,9 +43,11 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 	if slugExisted {
 		return errs.NewWorkspaceSlugAlreadyExists(cmd.Slug, nil)
 	}
-	rootFolderID := uuid.New()
-	rootHierarchy := domain.NewFolderHierarchy(nil)
-	rootFolder, err := domain.NewFolder(rootFolderID, cmd.Name, nil, cmd.ID, *rootHierarchy, cmd.UserID)
+	rootFolderID, err := uuid.NewV7()
+	if err != nil {
+		return errs.NewInternalGenerateID(err)
+	}
+	rootFolder, err := domain.NewFolder(rootFolderID, cmd.Name, "", cmd.ID, domain.FolderHierarchy{}, cmd.UserID)
 	if err != nil {
 		return err
 	}

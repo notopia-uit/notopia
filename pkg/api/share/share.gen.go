@@ -9,24 +9,6 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-// Defines values for TrashedBy.
-const (
-	Parent  TrashedBy = "parent"
-	Purpose TrashedBy = "purpose"
-)
-
-// Valid indicates whether the value is a known member of the TrashedBy enum.
-func (e TrashedBy) Valid() bool {
-	switch e {
-	case Parent:
-		return true
-	case Purpose:
-		return true
-	default:
-		return false
-	}
-}
-
 // Document defines model for Document.
 type Document struct {
 	// Content BlockNote model
@@ -41,56 +23,28 @@ type DocumentCommittedEvent struct {
 	Id              openapi_types.UUID   `json:"id"`
 	OutgoingLinkIds []openapi_types.UUID `json:"outgoingLinkIds"`
 	Tags            []string             `json:"tags"`
-
-	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	UserId Id `json:"userId"`
+	UserId          string               `json:"userId"`
 }
 
 // DocumentContent BlockNote model
 type DocumentContent = []map[string]interface{}
 
-// FolderPropertiesId defines model for Folder_properties-id.
-type FolderPropertiesId = openapi_types.UUID
-
-// Note defines model for Note.
-type Note struct {
-	FolderId *FolderPropertiesId `json:"folderId,omitempty"`
-	Icon     *string             `json:"icon"`
-	Id       *openapi_types.UUID `json:"id,omitempty"`
-
-	// Name Can be empty string when creating but will be set to "Untitled Note" internally
-	Name      string       `json:"name"`
-	Tags      *[]string    `json:"tags,omitempty"`
-	Trashed   *NoteTrashed `json:"trashed,omitempty"`
-	UpdatedAt *time.Time   `json:"updatedAt,omitempty"`
-}
-
-// NoteTrashed defines model for .
-type NoteTrashed struct {
-	TrashedAt time.Time `json:"trashedAt"`
-	TrashedBy TrashedBy `json:"trashedBy"`
-}
-
 // NoteCreatedEvent defines model for NoteCreatedEvent.
 type NoteCreatedEvent struct {
-	Icon *Icon         `json:"icon,omitempty"`
-	Id   *PropertiesId `json:"id,omitempty"`
-
-	// Name Can be empty string when creating but will be set to "Untitled Note" internally
-	Name Name `json:"name"`
+	Icon *string            `json:"icon,omitempty"`
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
 }
 
 // NoteDeletedEvent defines model for NoteDeletedEvent.
 type NoteDeletedEvent struct {
-	Id *PropertiesId `json:"id,omitempty"`
+	Id openapi_types.UUID `json:"id"`
 }
 
 // NoteSearch defines model for NoteSearch.
 type NoteSearch struct {
-	Id *PropertiesId `json:"id,omitempty"`
-
-	// Name Can be empty string when creating but will be set to "Untitled Note" internally
-	Name Name `json:"name"`
+	Id   openapi_types.UUID `json:"id"`
+	Name string             `json:"name"`
 
 	// PlainTextContent Plain text content
 	PlainTextContent *string   `json:"plainTextContent,omitempty"`
@@ -98,10 +52,14 @@ type NoteSearch struct {
 }
 
 // NoteUpdatedEvent defines model for NoteUpdatedEvent.
-type NoteUpdatedEvent = Note
-
-// TrashedBy defines model for TrashedBy.
-type TrashedBy string
+type NoteUpdatedEvent struct {
+	FolderId  openapi_types.UUID `json:"folderId"`
+	Icon      *string            `json:"icon"`
+	Id        openapi_types.UUID `json:"id"`
+	Name      string             `json:"name"`
+	Tags      []string           `json:"tags"`
+	UpdatedAt time.Time          `json:"updatedAt"`
+}
 
 // UserDeletedEvent defines model for UserDeletedEvent.
 type UserDeletedEvent struct {
@@ -109,14 +67,5 @@ type UserDeletedEvent struct {
 	Id Id `json:"id"`
 }
 
-// Icon defines model for icon.
-type Icon = string
-
 // Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 type Id = string
-
-// Name Can be empty string when creating but will be set to "Untitled Note" internally
-type Name = string
-
-// PropertiesId defines model for properties-id.
-type PropertiesId = openapi_types.UUID

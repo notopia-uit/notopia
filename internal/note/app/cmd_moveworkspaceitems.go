@@ -102,9 +102,12 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 
 		if len(cmd.FolderIDs) > 0 {
 			folders, err = folderRepo.GetMany(ctx,
-				domain.NewFolderRepoGetManyParamsByIDs(cmd.FolderIDs).
-					WithWorkspaceID(cmd.WorkspaceID).
-					WithForUpdate())
+				//exhaustruct:ignore
+				&domain.FolderRepoGetManyParams{
+					WorkspaceID: cmd.WorkspaceID,
+					IDs:         cmd.FolderIDs,
+					ForUpdate:   true,
+				})
 			if err != nil {
 				return err
 			}
@@ -116,8 +119,12 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			}
 		}
 		notes, err = noteRepo.GetMany(ctx,
-			domain.NewNoteRepoGetManyParamsByIDs(cmd.NoteIDs).
-				WithForUpdate(),
+			//exhaustruct:ignore
+			&domain.NoteRepoGetManyParams{
+				IDs:         cmd.NoteIDs,
+				WorkspaceID: cmd.WorkspaceID,
+				ForUpdate:   true,
+			},
 		)
 		if err != nil {
 			return err

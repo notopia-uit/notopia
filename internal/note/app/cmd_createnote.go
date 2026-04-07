@@ -12,7 +12,7 @@ import (
 type CreateNote struct {
 	ID       uuid.UUID
 	Name     string
-	Icon     *string
+	Icon     string
 	FolderID uuid.UUID
 
 	UserID string

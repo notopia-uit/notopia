@@ -47,7 +47,7 @@ func (s *TrashService) cascadeTrashChildren(
 ) error {
 	for i := range *workspaceFolders {
 		folder := (*workspaceFolders)[i]
-		if folder.ParentID() != nil && *folder.ParentID() == folderID && !folder.IsTrashed() {
+		if folder.ParentID() != uuid.Nil && folder.ParentID() == folderID && !folder.IsTrashed() {
 			if err := folder.Trash(TrashedByParent, userID); err != nil {
 				return err
 			}
@@ -101,9 +101,9 @@ func (s *TrashService) cascadeRestoreChildrenByParent(
 ) error {
 	for i := range *trashedFolders {
 		folder := (*trashedFolders)[i]
-		if folder.ParentID() != nil && *folder.ParentID() == folderID && folder.IsTrashed() {
+		if folder.ParentID() != uuid.Nil && folder.ParentID() == folderID && folder.IsTrashed() {
 			trashedBy := folder.TrashedBy()
-			if trashedBy != nil && *trashedBy == TrashedByParent {
+			if trashedBy != TrashedByUnspecified && trashedBy == TrashedByParent {
 				folder.Restore(userID)
 
 				if err := s.cascadeRestoreChildrenByParent(trashedNotes, trashedFolders, folder.ID(), userID); err != nil {
@@ -117,7 +117,7 @@ func (s *TrashService) cascadeRestoreChildrenByParent(
 		note := (*trashedNotes)[i]
 		if note.FolderID() == folderID && note.IsTrashed() {
 			trashedBy := note.TrashedBy()
-			if trashedBy != nil && *trashedBy == TrashedByParent {
+			if trashedBy != TrashedByUnspecified && trashedBy == TrashedByParent {
 				note.Restore(userID)
 			}
 		}

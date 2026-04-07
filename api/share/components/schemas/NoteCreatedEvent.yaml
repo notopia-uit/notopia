@@ -3,12 +3,15 @@ type: object
 
 properties:
   id:
-    $ref: ../../../note/components/schemas/Note.yaml#/properties/id
-    readOnly: false
+    type: string
+    format: uuid
+
   name:
-    $ref: ../../../note/components/schemas/Note.yaml#/properties/name
+    type: string
+
   icon:
-    $ref: ../../../note/components/schemas/Note.yaml#/properties/icon
+    type: string
+    nullable: true
 
 required:
   - id

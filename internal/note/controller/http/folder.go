@@ -25,10 +25,14 @@ func (h *StrictHandler) CreateFolder(
 	if err != nil {
 		return nil, errs.NewInternalGenerateID(err)
 	}
+	var icon string
+	if body.Icon != nil {
+		icon = *body.Icon
+	}
 	cmd := &app.CreateFolder{
 		ID:          id,
 		Name:        body.Name,
-		Icon:        body.Icon,
+		Icon:        icon,
 		ParentID:    *body.ParentId,
 		WorkspaceID: *body.WorkspaceId,
 		UserID:      user.ID,

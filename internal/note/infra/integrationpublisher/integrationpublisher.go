@@ -14,32 +14,31 @@ import (
 func transformIntegrationEvent(event app.IntegrationEvent) (any, bool) {
 	switch e := event.(type) {
 	case app.IntegrationEventNoteCreated:
+		var icon *string
+		if e.Icon != "" {
+			icon = &e.Icon
+		}
 		return &share.NoteCreatedEvent{
-			Id:   &e.ID,
-			Icon: e.Icon,
+			Id:   e.ID,
+			Icon: icon,
 			Name: e.Name,
 		}, true
 	case app.IntegrationEventNoteDeleted:
 		return &share.NoteDeletedEvent{
-			Id: &e.ID,
+			Id: e.ID,
 		}, true
 	case app.IntegrationEventNoteUpdated:
-		var trashed *share.NoteTrashed
-		if e.TrashedBy != nil && e.TrashedAt != nil {
-			// TODO: This should carefully cast to the right type
-			trashed = &share.NoteTrashed{
-				TrashedBy: share.TrashedBy(*e.TrashedBy),
-				TrashedAt: *e.TrashedAt,
-			}
+		var icon *string
+		if e.Icon != "" {
+			icon = &e.Icon
 		}
 		return &share.NoteUpdatedEvent{
-			Id:        &e.ID,
+			Id:        e.ID,
 			Name:      e.Name,
-			Icon:      e.Icon,
-			Tags:      &e.Tags,
-			FolderId:  &e.FolderID,
-			Trashed:   trashed,
-			UpdatedAt: &e.UpdatedAt,
+			Icon:      icon,
+			Tags:      e.Tags,
+			FolderId:  e.FolderID,
+			UpdatedAt: e.UpdatedAt,
 		}, true
 	}
 	return nil, false

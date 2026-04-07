@@ -2,6 +2,32 @@
 
 import * as z from 'zod';
 
+export const zShareNoteCreatedEvent = z.object({
+    id: z.uuid(),
+    name: z.string(),
+    icon: z.string().nullish()
+});
+
+export const zShareNoteDeletedEvent = z.object({
+    id: z.uuid()
+});
+
+export const zShareNoteSearch = z.object({
+    id: z.uuid(),
+    name: z.string(),
+    plainTextContent: z.string().optional(),
+    tags: z.array(z.string()).optional()
+});
+
+export const zShareNoteUpdatedEvent = z.object({
+    id: z.uuid(),
+    name: z.string(),
+    icon: z.string().nullable(),
+    folderId: z.uuid(),
+    tags: z.array(z.string()),
+    updatedAt: z.iso.datetime()
+});
+
 /**
  * BlockNote model
  */
@@ -12,65 +38,20 @@ export const zShareDocument = z.object({
     content: zShareDocumentContent
 });
 
+export const zShareDocumentCommittedEvent = zShareDocument.and(z.object({
+    userId: z.string(),
+    tags: z.array(z.string()),
+    outgoingLinkIds: z.array(z.uuid())
+}));
+
 /**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
 export const zShareId = z.string();
 
-export const zShareDocumentCommittedEvent = zShareDocument.and(z.object({
-    userId: zShareId,
-    tags: z.array(z.string()),
-    outgoingLinkIds: z.array(z.uuid())
-}));
-
 export const zShareUserDeletedEvent = z.object({
     id: zShareId
 });
-
-export const zSharePropertiesId = z.uuid().readonly();
-
-export const zShareNoteDeletedEvent = z.object({
-    id: zSharePropertiesId
-});
-
-/**
- * Can be empty string when creating but will be set to "Untitled Note" internally
- */
-export const zShareName = z.string().min(1).max(255);
-
-export const zShareNoteSearch = z.object({
-    id: zSharePropertiesId,
-    name: zShareName,
-    plainTextContent: z.string().optional(),
-    tags: z.array(z.string()).optional()
-});
-
-export const zShareIcon = z.string().nullable();
-
-export const zShareNoteCreatedEvent = z.object({
-    id: zSharePropertiesId,
-    name: zShareName,
-    icon: zShareIcon.optional()
-});
-
-export const zShareFolderPropertiesId = z.uuid().readonly();
-
-export const zShareTrashedBy = z.enum(['purpose', 'parent']);
-
-export const zShareNote = z.object({
-    id: z.uuid().readonly(),
-    name: z.string().min(1).max(255),
-    icon: z.string().nullable(),
-    folderId: zShareFolderPropertiesId,
-    tags: z.array(z.string()).readonly(),
-    updatedAt: z.iso.datetime().readonly(),
-    trashed: z.object({
-        trashedBy: zShareTrashedBy,
-        trashedAt: z.iso.datetime()
-    }).readonly().nullable()
-});
-
-export const zShareNoteUpdatedEvent = zShareNote;
 
 export const zDocumentError = z.object({
     code: z.string(),
@@ -279,30 +260,10 @@ export const zNoteWorkspaceTreeFolder = z.object({
     updatedAt: zNotePropertiesUpdatedAt
 });
 
-export const zShareNoteCreatedEventWritable = z.object({
-    name: zShareName,
-    icon: zShareIcon.optional()
-});
-
-export const zShareNoteDeletedEventWritable = z.record(z.string(), z.unknown());
-
-export const zShareNoteSearchWritable = z.object({
-    name: zShareName,
-    plainTextContent: z.string().optional(),
-    tags: z.array(z.string()).optional()
-});
-
 /**
  * BlockNote model
  */
 export const zShareDocumentContentWritable = z.array(z.unknown());
-
-export const zShareNoteWritable = z.object({
-    name: z.string().min(1).max(255),
-    icon: z.string().nullable()
-});
-
-export const zShareNoteUpdatedEventWritable = zShareNoteWritable;
 
 export const zDocumentRevisionWritable = z.object({
     name: z.string().min(1).max(255).nullable()

@@ -20,7 +20,7 @@ type IntegrationEvent interface {
 type IntegrationEventNoteCreated struct {
 	ID   uuid.UUID
 	Name string
-	Icon *string
+	Icon string
 }
 
 func (e IntegrationEventNoteCreated) isIntegrationEvent() {}
@@ -34,13 +34,11 @@ func (e IntegrationEventNoteDeleted) isIntegrationEvent() {}
 type IntegrationEventNoteUpdated struct {
 	ID            uuid.UUID
 	Name          string
-	Icon          *string
+	Icon          string
 	Tags          []string
 	Size          uint64
 	FolderID      uuid.UUID
 	OutgoingLinks uuid.UUIDs
-	TrashedBy     *string
-	TrashedAt     *time.Time
 	UpdatedAt     time.Time
 }
 

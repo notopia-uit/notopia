@@ -1780,24 +1780,20 @@
           {
             "properties": {
               "userId": {
-                "$ref": "#/components/schemas/share_id"
+                "type": "string",
+                "format": "number"
               },
               "tags": {
                 "type": "array",
                 "items": {
                   "type": "string"
-                },
-                "example": [
-                  "work",
-                  "meeting"
-                ]
+                }
               },
               "outgoingLinkIds": {
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "format": "uuid",
-                  "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+                  "format": "uuid"
                 }
               }
             },
@@ -1813,14 +1809,15 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/share_properties-id",
-            "readOnly": false
+            "type": "string",
+            "format": "uuid"
           },
           "name": {
-            "$ref": "#/components/schemas/share_name"
+            "type": "string"
           },
           "icon": {
-            "$ref": "#/components/schemas/share_icon"
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -1832,8 +1829,8 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/share_properties-id",
-            "readOnly": false
+            "type": "string",
+            "format": "uuid"
           }
         },
         "required": [
@@ -1844,26 +1841,21 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/share_properties-id",
-            "readOnly": false
+            "type": "string",
+            "format": "uuid"
           },
           "name": {
-            "$ref": "#/components/schemas/share_name"
+            "type": "string"
           },
           "plainTextContent": {
             "type": "string",
-            "description": "Plain text content",
-            "example": "This is the content of the note"
+            "description": "Plain text content"
           },
           "tags": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "example": [
-              "tag1",
-              "tag2"
-            ]
+            }
           }
         },
         "required": [
@@ -1872,14 +1864,48 @@
         ]
       },
       "share_NoteUpdatedEvent": {
-        "$ref": "#/components/schemas/share_Note"
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "folderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "icon",
+          "folderId",
+          "tags",
+          "updatedAt"
+        ]
       },
       "share_UserDeletedEvent": {
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/share_id",
-            "readOnly": false
+            "$ref": "#/components/schemas/share_id"
           }
         },
         "required": [
@@ -2076,110 +2102,6 @@
         "format": "number",
         "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
         "example": "100"
-      },
-      "share_properties-id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-        "readOnly": true
-      },
-      "share_name": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "Meeting Notes",
-        "description": "Can be empty string when creating but will be set to \"Untitled Note\" internally"
-      },
-      "share_icon": {
-        "type": "string",
-        "nullable": true,
-        "example": "📓"
-      },
-      "share_Folder_properties-id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000",
-        "readOnly": true
-      },
-      "share_TrashedBy": {
-        "type": "string",
-        "enum": [
-          "purpose",
-          "parent"
-        ],
-        "example": "purpose"
-      },
-      "share_Note": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "Meeting Notes",
-            "description": "Can be empty string when creating but will be set to \"Untitled Note\" internally"
-          },
-          "icon": {
-            "type": "string",
-            "nullable": true,
-            "example": "📓"
-          },
-          "folderId": {
-            "$ref": "#/components/schemas/share_Folder_properties-id"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "example": [
-              "work",
-              "meeting"
-            ],
-            "readOnly": true
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-06-01T12:34:56Z",
-            "readOnly": true
-          },
-          "trashed": {
-            "type": "object",
-            "nullable": true,
-            "readOnly": true,
-            "x-go-type-name": "NoteTrashed",
-            "properties": {
-              "trashedBy": {
-                "$ref": "#/components/schemas/share_TrashedBy"
-              },
-              "trashedAt": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2024-06-01T12:00:00Z"
-              }
-            },
-            "required": [
-              "trashedBy",
-              "trashedAt"
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "icon",
-          "folderId",
-          "tags",
-          "updatedAt",
-          "trashed"
-        ]
       },
       "document_Error": {
         "type": "object",

@@ -65,14 +65,21 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		}
 
 		workspaceNotes, err := noteRepo.GetMany(ctx,
-			domain.NewNoteRepoGetManyParamsByWorkspaceID(cmd.WorkspaceID),
+			//exhaustruct:ignore
+			&domain.NoteRepoGetManyParams{
+				WorkspaceID: cmd.WorkspaceID,
+			},
 		)
 		if err != nil {
 			return err
 		}
 
 		workspaceFolders, err := folderRepo.GetMany(ctx,
-			domain.NewFolderRepoGetManyParamsByWorkspaceID(cmd.WorkspaceID),
+			//exhaustruct:ignore
+			&domain.FolderRepoGetManyParams{
+				WorkspaceID: cmd.WorkspaceID,
+				ForUpdate:   true,
+			},
 		)
 		if err != nil {
 			return err
@@ -84,8 +91,11 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		var notes []*domain.Note
 		if len(cmd.NoteIDs) > 0 {
 			notes, err = noteRepo.GetMany(ctx,
-				domain.NewNoteRepoGetManyParamsByIDs(cmd.NoteIDs).
-					WithForUpdate(),
+				//exhaustruct:ignore
+				&domain.NoteRepoGetManyParams{
+					IDs:       cmd.NoteIDs,
+					ForUpdate: true,
+				},
 			)
 			if err != nil {
 				return err
@@ -99,8 +109,11 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		var folders []*domain.Folder
 		if len(cmd.FolderIDs) > 0 {
 			folders, err = folderRepo.GetMany(ctx,
-				domain.NewFolderRepoGetManyParamsByIDs(cmd.FolderIDs).
-					WithForUpdate(),
+				//exhaustruct:ignore
+				&domain.FolderRepoGetManyParams{
+					IDs:       cmd.FolderIDs,
+					ForUpdate: true,
+				},
 			)
 			if err != nil {
 				return err

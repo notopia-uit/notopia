@@ -1,18 +1,22 @@
 package http
 
 import (
+	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
 func toNote(n app.Note) note.Note {
-	id := n.ID
-	folderID := n.FolderID
-	updatedAt := n.UpdatedAt
-	tags := n.Tags
-	if tags == nil {
-		tags = []string{}
+	var icon *string
+	if n.Icon != "" {
+		icon = &n.Icon
 	}
+
+	var tags *[]string
+	if len(n.Tags) > 0 {
+		tags = &n.Tags
+	}
+
 	var trashed *note.NoteTrashed
 	if n.Trashed != nil {
 		trashed = &note.NoteTrashed{
@@ -20,22 +24,29 @@ func toNote(n app.Note) note.Note {
 			TrashedAt: n.Trashed.TrashedAt,
 		}
 	}
+
 	return note.Note{
-		Id:        &id,
+		Id:        &n.ID,
 		Name:      n.Name,
-		Icon:      n.Icon,
-		Tags:      &tags,
-		FolderId:  &folderID,
-		UpdatedAt: &updatedAt,
+		Icon:      icon,
+		Tags:      tags,
+		FolderId:  &n.FolderID,
+		UpdatedAt: &n.UpdatedAt,
 		Trashed:   trashed,
 	}
 }
 
 func toFolder(f app.Folder) note.Folder {
-	id := f.ID
-	parentID := f.ParentID
-	workspaceID := f.WorkspaceID
-	updatedAt := f.UpdatedAt
+	var icon *string
+	if f.Icon != "" {
+		icon = &f.Icon
+	}
+
+	var parentID *uuid.UUID
+	if f.ParentID != uuid.Nil {
+		parentID = &f.ParentID
+	}
+
 	var trashed *note.FolderTrashed
 	if f.Trashed != nil {
 		trashed = &note.FolderTrashed{
@@ -43,48 +54,70 @@ func toFolder(f app.Folder) note.Folder {
 			TrashedAt: f.Trashed.TrashedAt,
 		}
 	}
+
 	return note.Folder{
-		Id:          &id,
+		Id:          &f.ID,
 		Name:        f.Name,
-		Icon:        f.Icon,
-		ParentId:    &parentID,
-		WorkspaceId: &workspaceID,
-		UpdatedAt:   &updatedAt,
+		Icon:        icon,
+		ParentId:    parentID,
+		WorkspaceId: &f.WorkspaceID,
+		UpdatedAt:   &f.UpdatedAt,
 		Trashed:     trashed,
 	}
 }
 
 func toWorkspace(w app.Workspace) note.Workspace {
-	id := w.ID
 	return note.Workspace{
-		Id:   &id,
+		Id:   &w.ID,
 		Name: w.Name,
 		Slug: w.Slug,
 	}
 }
 
+func toWorkspaceRole(r app.WorkspaceRole) note.WorkspaceRole {
+	switch r {
+	case app.WorkspaceRoleOwner:
+		return note.Owner
+	case app.WorkspaceRoleEditor:
+		return note.Editor
+	case app.WorkspaceRoleViewer:
+		return note.Viewer
+	default:
+		panic("invalid workspace role")
+	}
+}
+
 func toWorkspaceMember(m *app.WorkspaceMember) note.WorkspaceMember {
+	var username *string
+	if m.Username != "" {
+		username = &m.Username
+	}
+
 	return note.WorkspaceMember{
 		Id:       m.ID,
-		Role:     note.WorkspaceRole(m.Role),
-		Username: m.Username,
+		Role:     toWorkspaceRole(m.Role),
+		Username: username,
 	}
 }
 
 func toWorkspaceTreeNote(n *app.WorkspaceTreeNote) note.WorkspaceTreeNote {
-	id := n.ID
-	updatedAt := n.UpdatedAt
+	var icon *string
+	if n.Icon != "" {
+		icon = &n.Icon
+	}
 	return note.WorkspaceTreeNote{
-		Id:        &id,
+		Id:        &n.ID,
 		Name:      n.Name,
-		Icon:      n.Icon,
-		UpdatedAt: &updatedAt,
+		Icon:      icon,
+		UpdatedAt: &n.UpdatedAt,
 	}
 }
 
 func toWorkspaceTreeFolder(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
-	id := f.ID
-	updatedAt := f.UpdatedAt
+	var icon *string
+	if f.Icon != "" {
+		icon = &f.Icon
+	}
 	notes := make([]note.WorkspaceTreeNote, len(f.Notes))
 	for i, n := range f.Notes {
 		notes[i] = toWorkspaceTreeNote(n)
@@ -94,19 +127,19 @@ func toWorkspaceTreeFolder(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFolder 
 		children[i] = toWorkspaceTreeFolder(c)
 	}
 	return note.WorkspaceTreeFolder{
-		Id:        &id,
+		Id:        &f.ID,
 		Name:      f.Name,
-		Icon:      f.Icon,
+		Icon:      icon,
 		Notes:     notes,
 		Children:  children,
-		UpdatedAt: &updatedAt,
+		UpdatedAt: &f.UpdatedAt,
 	}
 }
 
 func toTrashedFolder(f *app.TrashedFolder) note.TrashedFolder {
 	return note.TrashedFolder{
 		Id:   f.ID,
-		Name: new(f.Name),
+		Name: &f.Name,
 		Trashed: note.Trashed{
 			TrashedBy: toTrashedBy(f.Trashed.TrashedBy),
 			TrashedAt: f.Trashed.TrashedAt,
@@ -117,7 +150,7 @@ func toTrashedFolder(f *app.TrashedFolder) note.TrashedFolder {
 func toTrashedNote(n *app.TrashedNote) note.TrashedNote {
 	return note.TrashedNote{
 		Id:   n.ID,
-		Name: new(n.Name),
+		Name: &n.Name,
 		Trashed: note.Trashed{
 			TrashedBy: toTrashedBy(n.Trashed.TrashedBy),
 			TrashedAt: n.Trashed.TrashedAt,
@@ -126,11 +159,10 @@ func toTrashedNote(n *app.TrashedNote) note.TrashedNote {
 }
 
 func toNoteLink(n *app.NoteLink) note.NoteLink {
-	id := n.ID
 	return note.NoteLink{
-		Id:   &id,
+		Id:   &n.ID,
 		Name: n.Name,
-		Icon: n.Icon,
+		Icon: &n.Icon,
 	}
 }
 
@@ -140,8 +172,8 @@ func toGraph(g *app.Graph) note.Graph {
 		nodes[i].Id = n.ID
 		nodes[i].Name = n.Name
 		nodes[i].Type = note.GraphNodesType(n.Type)
-		if n.Weight != nil {
-			w := float32(*n.Weight)
+		if n.Weight != 0 {
+			w := float32(n.Weight)
 			nodes[i].Weight = &w
 		}
 	}

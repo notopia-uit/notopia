@@ -13,6 +13,7 @@ apis:
     rules:
       struct: off
       no-empty-servers: off
+      scalar-property-missing-example: off
 extends:
   - recommended
 rules:
