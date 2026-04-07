@@ -170,14 +170,7 @@ func (f *Folder) Save(ctx context.Context, folder *domain.Folder) (cerr error) {
 			return toErr(err)
 		}
 		for _, event := range folder.PopEvents() {
-			if err := params.publisher.PublishWorkspaceItem(
-				ctx,
-				event,
-				PublishWorkspaceItemParams{
-					WorkspaceID: folder.WorkspaceID(),
-					AggregateID: folder.ID(),
-				},
-			); err != nil {
+			if err := params.publisher.PublishWorkspaceItem(ctx, event, folder.WorkspaceID()); err != nil {
 				return fmt.Errorf("failed to publish events: %w", err)
 			}
 		}
@@ -197,14 +190,7 @@ func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr e
 		}
 		for _, folder := range folders {
 			for _, event := range folder.PopEvents() {
-				if err := params.publisher.PublishWorkspaceItem(
-					ctx,
-					event,
-					PublishWorkspaceItemParams{
-						WorkspaceID: folder.WorkspaceID(),
-						AggregateID: folder.ID(),
-					},
-				); err != nil {
+				if err := params.publisher.PublishWorkspaceItem(ctx, event, folder.WorkspaceID()); err != nil {
 					return fmt.Errorf("failed to publish events: %w", err)
 				}
 			}

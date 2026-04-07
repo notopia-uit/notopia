@@ -1,4 +1,4 @@
-package pg
+package pgreadmodel
 
 import (
 	"context"
@@ -12,19 +12,19 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type GetWorkspaceTreeReadModel struct {
+type GetWorkspaceTree struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.GetWorkspaceTreeReadModel = (*GetWorkspaceTreeReadModel)(nil)
+var _ app.GetWorkspaceTreeReadModel = (*GetWorkspaceTree)(nil)
 
-func NewGetWorkspaceTreeReadModel(queries *pgsqlc.Queries) *GetWorkspaceTreeReadModel {
-	return &GetWorkspaceTreeReadModel{queries: queries}
+func NewGetWorkspaceTree(queries *pgsqlc.Queries) *GetWorkspaceTree {
+	return &GetWorkspaceTree{queries: queries}
 }
 
-var ProvideGetWorkspaceTreeReadModel = NewGetWorkspaceTreeReadModel
+var ProvideGetWorkspaceTree = NewGetWorkspaceTree
 
-func (h *GetWorkspaceTreeReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
+func (h *GetWorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
 	var rootFolderID uuid.UUID
 
 	if q.RootFolderID != uuid.Nil {
@@ -99,7 +99,7 @@ func (h *GetWorkspaceTreeReadModel) GetWorkspaceTree(ctx context.Context, q *app
 	return tree, nil
 }
 
-func (h *GetWorkspaceTreeReadModel) buildFolderTree(
+func (h *GetWorkspaceTree) buildFolderTree(
 	folderID uuid.UUID,
 	folderName string,
 	folderIcon *string,

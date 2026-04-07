@@ -1,4 +1,4 @@
-package pg
+package pgreadmodel
 
 import (
 	"context"
@@ -10,19 +10,19 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type GetWorkspaceBySlugReadModel struct {
+type GetWorkspaceBySlug struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.GetWorkspaceBySlugReadModel = (*GetWorkspaceBySlugReadModel)(nil)
+var _ app.GetWorkspaceBySlugReadModel = (*GetWorkspaceBySlug)(nil)
 
-func NewGetWorkspaceBySlugReadModel(queries *pgsqlc.Queries) *GetWorkspaceBySlugReadModel {
-	return &GetWorkspaceBySlugReadModel{queries: queries}
+func NewGetWorkspaceBySlug(queries *pgsqlc.Queries) *GetWorkspaceBySlug {
+	return &GetWorkspaceBySlug{queries: queries}
 }
 
-var ProvideGetWorkspaceBySlugReadModel = NewGetWorkspaceBySlugReadModel
+var ProvideGetWorkspaceBySlug = NewGetWorkspaceBySlug
 
-func (h *GetWorkspaceBySlugReadModel) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceBySlug) (*app.Workspace, error) {
+func (h *GetWorkspaceBySlug) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceBySlug) (*app.Workspace, error) {
 	workspace, err := h.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
 		Slug:      &q.Slug,
 		ID:        nil,

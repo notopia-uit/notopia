@@ -22,12 +22,14 @@ type Services struct {
 }
 
 type DomainEvent struct {
+	MessageMetadataUserIDKey      string `json:"messageMetadataUserIdKey"      mapstructure:"message_metadata_user_id_key"      validate:"required" yaml:"message_metadata_user_id_key"`
 	MessageWorkspaceIDKey         string `json:"messageMetadataWorkspaceIdKey" mapstructure:"message_metadata_workspace_id_key" validate:"required" yaml:"message_metadata_workspace_id_key"`
 	MessageMetadataAggregateIDKey string `json:"messageMetadataAggregateIdKey" mapstructure:"message_metadata_aggregate_id_key" validate:"required" yaml:"message_metadata_aggregate_id_key"`
 	OutboxTableName               string `json:"outboxTableName"               mapstructure:"outbox_table_name"                 validate:"required" yaml:"outbox_table_name"`
 }
 
 func setViperAdvancedDomainEventDefault(viper *viper.Viper) {
+	viper.SetDefault("advanced.domain_event.message_metadata_user_id_key", "user_id")
 	viper.SetDefault("advanced.domain_event.message_metadata_workspace_id_key", "workspace_id")
 	viper.SetDefault("advanced.domain_event.message_metadata_aggregate_id_key", "aggregate_id")
 	viper.SetDefault("advanced.domain_event.outbox_table_name", "eventsToForward")

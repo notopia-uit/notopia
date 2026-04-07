@@ -8,13 +8,8 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/domain"
 )
 
-type PublishWorkspaceItemParams struct {
-	WorkspaceID uuid.UUID
-	AggregateID uuid.UUID
-}
-
 type Publisher interface {
-	PublishWorkspaceItem(ctx context.Context, event domain.Event, params PublishWorkspaceItemParams) error
+	PublishWorkspaceItem(ctx context.Context, event domain.Event, workspaceID uuid.UUID) error
 	Publish(ctx context.Context, event domain.Event) error
 }
 

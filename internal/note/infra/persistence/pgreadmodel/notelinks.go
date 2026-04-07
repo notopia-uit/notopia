@@ -1,4 +1,4 @@
-package pg
+package pgreadmodel
 
 import (
 	"context"
@@ -11,19 +11,19 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type GetNoteLinksReadModel struct {
+type GetNoteLinks struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.GetNoteLinksReadModel = (*GetNoteLinksReadModel)(nil)
+var _ app.GetNoteLinksReadModel = (*GetNoteLinks)(nil)
 
-func NewGetNoteLinksReadModel(queries *pgsqlc.Queries) *GetNoteLinksReadModel {
-	return &GetNoteLinksReadModel{queries: queries}
+func NewGetNoteLinks(queries *pgsqlc.Queries) *GetNoteLinks {
+	return &GetNoteLinks{queries: queries}
 }
 
-var ProvideGetNoteLinksReadModel = NewGetNoteLinksReadModel
+var ProvideGetNoteLinks = NewGetNoteLinks
 
-func (h *GetNoteLinksReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app.NoteLinkResult, error) {
+func (h *GetNoteLinks) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app.NoteLinkResult, error) {
 	_, err := h.queries.GetNoteByID(ctx,
 		//exhaustruct:ignore
 		pgsqlc.GetNoteByIDParams{
@@ -61,7 +61,7 @@ func (h *GetNoteLinksReadModel) GetNoteLinks(ctx context.Context, q *app.GetNote
 	return &result, nil
 }
 
-func (h *GetNoteLinksReadModel) getOutgoingLinks(ctx context.Context, noteID uuid.UUID) ([]*app.NoteLink, error) {
+func (h *GetNoteLinks) getOutgoingLinks(ctx context.Context, noteID uuid.UUID) ([]*app.NoteLink, error) {
 	outgoingLinks, err := h.queries.GetNoteOutgoingLinks(ctx,
 		//exhaustruct:ignore
 		&pgsqlc.GetNoteOutgoingLinksParams{
@@ -101,7 +101,7 @@ func (h *GetNoteLinksReadModel) getOutgoingLinks(ctx context.Context, noteID uui
 	return result, nil
 }
 
-func (h *GetNoteLinksReadModel) getBacklinks(ctx context.Context, noteID uuid.UUID) ([]*app.NoteLink, error) {
+func (h *GetNoteLinks) getBacklinks(ctx context.Context, noteID uuid.UUID) ([]*app.NoteLink, error) {
 	backlinks, err := h.queries.GetNoteBacklinks(ctx, noteID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)

@@ -1,4 +1,4 @@
-package pg
+package pgreadmodel
 
 import (
 	"context"
@@ -7,18 +7,18 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type GetNoteReadModel struct {
+type GetNote struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.GetNoteReadModel = (*GetNoteReadModel)(nil)
+var _ app.GetNoteReadModel = (*GetNote)(nil)
 
-func NewGetNoteReadModel(queries *pgsqlc.Queries) *GetNoteReadModel {
-	return &GetNoteReadModel{queries: queries}
+func NewGetNote(queries *pgsqlc.Queries) *GetNote {
+	return &GetNote{queries: queries}
 }
 
-var ProvideGetNoteReadModel = NewGetNoteReadModel
+var ProvideGetNote = NewGetNote
 
-func (h *GetNoteReadModel) GetNote(ctx context.Context, q *app.GetNote) (*app.Note, error) {
+func (h *GetNote) GetNote(ctx context.Context, q *app.GetNote) (*app.Note, error) {
 	return nil, nil
 }

@@ -5,48 +5,49 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgreadmodel"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgrepo"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-var PostresReadModelProviderSet = wire.NewSet(
-	pg.ProvideGetWorkspaceTreeReadModel,
-	pg.ProvideShowTrashReadModel,
-	pg.ProvideGetNoteLinksReadModel,
-	pg.ProvideGetWorkspaceBySlugReadModel,
-	pg.ProvideCheckWorkspaceSlugExistsReadModel,
-	pg.ProvideGetWorkspaceGraphReadModel,
-	pg.ProvideGetNoteGraphReadModel,
-	pg.ProvideGetNoteReadModel,
-	wire.Bind(new(app.CheckWorkspaceSlugExistsReadModel), new(*pg.CheckWorkspaceSlugExistsReadModel)),
-	wire.Bind(new(app.GetNoteGraphReadModel), new(*pg.GetNoteGraphReadModel)),
-	wire.Bind(new(app.GetNoteLinksReadModel), new(*pg.GetNoteLinksReadModel)),
-	wire.Bind(new(app.GetNoteReadModel), new(*pg.GetNoteReadModel)),
-	wire.Bind(new(app.GetWorkspaceBySlugReadModel), new(*pg.GetWorkspaceBySlugReadModel)),
-	wire.Bind(new(app.GetWorkspaceGraphReadModel), new(*pg.GetWorkspaceGraphReadModel)),
-	wire.Bind(new(app.GetWorkspaceTreeReadModel), new(*pg.GetWorkspaceTreeReadModel)),
-	wire.Bind(new(app.ShowTrashReadModel), new(*pg.ShowTrashReadModel)),
+var PGReadModelProviderSet = wire.NewSet(
+	pgreadmodel.ProvideGetWorkspaceTree,
+	pgreadmodel.ProvideShowTrash,
+	pgreadmodel.ProvideGetNoteLinks,
+	pgreadmodel.ProvideGetWorkspaceBySlug,
+	pgreadmodel.ProvideCheckWorkspaceSlugExists,
+	pgreadmodel.ProvideGetWorkspaceGraph,
+	pgreadmodel.ProvideGetNoteGraph,
+	pgreadmodel.ProvideGetNote,
+	wire.Bind(new(app.CheckWorkspaceSlugExistsReadModel), new(*pgreadmodel.CheckWorkspaceSlugExists)),
+	wire.Bind(new(app.GetNoteGraphReadModel), new(*pgreadmodel.GetNoteGraph)),
+	wire.Bind(new(app.GetNoteLinksReadModel), new(*pgreadmodel.GetNoteLinks)),
+	wire.Bind(new(app.GetNoteReadModel), new(*pgreadmodel.GetNote)),
+	wire.Bind(new(app.GetWorkspaceBySlugReadModel), new(*pgreadmodel.GetWorkspaceBySlug)),
+	wire.Bind(new(app.GetWorkspaceGraphReadModel), new(*pgreadmodel.GetWorkspaceGraph)),
+	wire.Bind(new(app.GetWorkspaceTreeReadModel), new(*pgreadmodel.GetWorkspaceTree)),
+	wire.Bind(new(app.ShowTrashReadModel), new(*pgreadmodel.ShowTrash)),
 )
 
-var PostgresRepoProviderSet = wire.NewSet(
-	pg.ProvideFolder,
-	pg.ProvideNote,
-	pg.ProvideUnitOfWork,
-	pg.ProvideWorkspace,
-	wire.Bind(new(domain.FolderRepo), new(*pg.Folder)),
-	wire.Bind(new(domain.NoteRepo), new(*pg.Note)),
-	wire.Bind(new(domain.UnitOfWork), new(*pg.UnitOfWork)),
-	wire.Bind(new(domain.WorkspaceRepo), new(*pg.Workspace)),
+var PGRepoProviderSet = wire.NewSet(
+	pgrepo.ProvideFolder,
+	pgrepo.ProvideNote,
+	pgrepo.ProvideUnitOfWork,
+	pgrepo.ProvideWorkspace,
+	wire.Bind(new(domain.FolderRepo), new(*pgrepo.Folder)),
+	wire.Bind(new(domain.NoteRepo), new(*pgrepo.Note)),
+	wire.Bind(new(domain.UnitOfWork), new(*pgrepo.UnitOfWork)),
+	wire.Bind(new(domain.WorkspaceRepo), new(*pgrepo.Workspace)),
 )
 
 var PostgresProviderSet = wire.NewSet(
-	PostresReadModelProviderSet,
-	PostgresRepoProviderSet,
+	PGRepoProviderSet,
+	PGReadModelProviderSet,
 
 	ProvideGooseProvider,
 	ProvidePg,
-	pg.ProvidePgPool,
-	pg.ProvideQueries,
-	pg.ProvideStdlib,
+	ProvidePgPool,
+	ProvideSQLCQueries,
+	ProvidePgxPoolStdlib,
 	wire.Bind(new(pgsqlc.DBTX), new(*pgxpool.Pool)),
 )

@@ -39,6 +39,7 @@ type Event interface {
 	GetID() uuid.UUID
 	GetOccurredAt() time.Time
 	GetAggregateID() uuid.UUID
+	GetUserID() string
 }
 
 type BaseEvent struct {
@@ -55,6 +56,8 @@ func (e *BaseEvent) GetID() uuid.UUID { return e.ID }
 func (e *BaseEvent) GetOccurredAt() time.Time { return e.OccurredAt }
 
 func (e *BaseEvent) GetAggregateID() uuid.UUID { return e.AggregateID }
+
+func (e *BaseEvent) GetUserID() string { return e.UserID }
 
 func NewBaseEvent(aggregateID uuid.UUID, userID string) BaseEvent {
 	return BaseEvent{

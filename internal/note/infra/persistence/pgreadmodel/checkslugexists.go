@@ -1,4 +1,4 @@
-package pg
+package pgreadmodel
 
 import (
 	"context"
@@ -7,19 +7,19 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type CheckWorkspaceSlugExistsReadModel struct {
+type CheckWorkspaceSlugExists struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.CheckWorkspaceSlugExistsReadModel = (*CheckWorkspaceSlugExistsReadModel)(nil)
+var _ app.CheckWorkspaceSlugExistsReadModel = (*CheckWorkspaceSlugExists)(nil)
 
-func NewCheckWorkspaceSlugExistsReadModel(queries *pgsqlc.Queries) *CheckWorkspaceSlugExistsReadModel {
-	return &CheckWorkspaceSlugExistsReadModel{queries: queries}
+func NewCheckWorkspaceSlugExists(queries *pgsqlc.Queries) *CheckWorkspaceSlugExists {
+	return &CheckWorkspaceSlugExists{queries: queries}
 }
 
-var ProvideCheckWorkspaceSlugExistsReadModel = NewCheckWorkspaceSlugExistsReadModel
+var ProvideCheckWorkspaceSlugExists = NewCheckWorkspaceSlugExists
 
-func (h *CheckWorkspaceSlugExistsReadModel) CheckWorkspaceSlugExists(ctx context.Context, q *app.CheckWorkspaceSlugExists) (*app.CheckWorkspaceSlugExistsResult, error) {
+func (h *CheckWorkspaceSlugExists) CheckWorkspaceSlugExists(ctx context.Context, q *app.CheckWorkspaceSlugExists) (*app.CheckWorkspaceSlugExistsResult, error) {
 	exists, err := h.queries.CheckSlugExists(ctx, q.Slug)
 	if err != nil {
 		return nil, toErr(err)

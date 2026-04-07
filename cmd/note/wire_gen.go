@@ -8,7 +8,6 @@ package main
 
 import (
 	"context"
-
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
@@ -23,7 +22,8 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
 	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
-	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgreadmodel"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgrepo"
 	"github.com/notopia-uit/notopia/internal/note/infra/service"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 	"github.com/notopia-uit/notopia/pkg/common/http"
@@ -52,12 +52,12 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	sql := &configConfig.Database
-	pool, cleanup2, err := pg.NewPgPool(ctx, tracerProvider, sql)
+	pool, cleanup2, err := persistence.NewPgPool(ctx, tracerProvider, sql)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	db := pg.NewStdlib(pool)
+	db := persistence.NewPgxPoolStdlib(pool)
 	log := &configConfig.Log
 	stdoutHandler := logging.NewStdoutHandler(log)
 	loggerProvider, cleanup3, err := otel.NewLoggerProvider(ctx, resource)
@@ -75,7 +75,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	persistencePg, err := persistence.NewPg(pool, provider)
+	pg, err := persistence.NewPg(pool, provider)
 	if err != nil {
 		cleanup3()
 		cleanup2()
@@ -94,34 +94,34 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	queries := pg.NewQueries(pool)
-	folderRepo := pg.NewNoTransactionFolder(pool, queries)
-	createFolderHandler := app.NewCreateFolderHandler(authorization, folderRepo)
-	noteRepo := pg.NewNoTransactionNote(pool, queries)
-	createNoteHandler := app.NewCreateNoteHandler(authorization, noteRepo, folderRepo)
-	workspaceRepo := pg.NewNoTransactionWorkspace(pool, queries)
+	queries := persistence.NewSQLCQueries(pool)
+	folder := pgrepo.NewNoTransactionFolder(pool, queries)
+	createFolderHandler := app.NewCreateFolderHandler(authorization, folder)
+	pgrepoNote := pgrepo.NewNoTransactionNote(pool, queries)
+	createNoteHandler := app.NewCreateNoteHandler(authorization, pgrepoNote, folder)
+	workspace := pgrepo.NewNoTransactionWorkspace(pool, queries)
 	advanced := &configConfig.Advanced
 	domainEvent := advanced.DomainEvent
 	loggerAdapter := component.NewWatermillLogger(logger)
 	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter)
-	unitOfWork := pg.NewUnitOfWork(pool, fromPersistenceToQSLForwarder)
-	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspaceRepo, folderRepo, unitOfWork)
-	permanentlyDeleteFolderHandler := app.PermanentlyNewDeleteFolderHandler(authorization, folderRepo, unitOfWork)
-	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, noteRepo, unitOfWork)
-	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, workspaceRepo)
-	generateDailyNoteHandler := app.NewGenerateDailyNoteHandler(noteRepo, folderRepo, workspaceRepo)
-	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, noteRepo, folderRepo, unitOfWork)
+	unitOfWork := pgrepo.NewUnitOfWork(pool, fromPersistenceToQSLForwarder)
+	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspace, folder, unitOfWork)
+	permanentlyDeleteFolderHandler := app.PermanentlyNewDeleteFolderHandler(authorization, folder, unitOfWork)
+	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, pgrepoNote, unitOfWork)
+	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, workspace)
+	generateDailyNoteHandler := app.NewGenerateDailyNoteHandler(pgrepoNote, folder, workspace)
+	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, pgrepoNote, folder, unitOfWork)
 	permanentlyDeleteWorkspaceItemsHandler := app.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, unitOfWork)
-	publishNoteHandler := app.NewPublishNoteHandler(noteRepo)
-	publishWorkspaceHandler := app.NewPublishWorkspaceHandler(workspaceRepo)
-	renameFolderHandler := app.NewRenameFolderHandler(authorization, folderRepo)
-	renameNoteHandler := app.NewRenameNoteHandler(authorization, noteRepo)
-	renameWorkspaceHandler := app.NewRenameWorkspaceHandler(authorization, workspaceRepo)
+	publishNoteHandler := app.NewPublishNoteHandler(pgrepoNote)
+	publishWorkspaceHandler := app.NewPublishWorkspaceHandler(workspace)
+	renameFolderHandler := app.NewRenameFolderHandler(authorization, folder)
+	renameNoteHandler := app.NewRenameNoteHandler(authorization, pgrepoNote)
+	renameWorkspaceHandler := app.NewRenameWorkspaceHandler(authorization, workspace)
 	trashService := domain.NewTrashService()
-	restoreTrashedWorkspaceItemsHandler := app.NewRestoreTrashedWorkspaceItemsHandler(noteRepo, folderRepo, trashService)
+	restoreTrashedWorkspaceItemsHandler := app.NewRestoreTrashedWorkspaceItemsHandler(pgrepoNote, folder, trashService)
 	trashWorkspaceItemsHandler := app.NewTrashWorkspaceItemsHandler(authorization, unitOfWork, trashService)
-	unpublishNoteHandler := app.NewUnpublishNoteHandler(noteRepo)
-	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspaceRepo)
+	unpublishNoteHandler := app.NewUnpublishNoteHandler(pgrepoNote)
+	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	kafka := &configConfig.Kafka
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
 	kafkaPublisher, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
@@ -163,7 +163,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		UpdateWorkspaceMembersHandler:          updateWorkspaceMembersHandler,
 	}
 	noteService := domain.NewNoteService()
-	documentCommittedHandler := app.NewDocumentCommittedHandler(noteRepo, noteService)
+	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, noteService)
 	workspaceEvent := &advanced.WorkspaceEvent
 	redis := &configConfig.Redis
 	redisClient, cleanup5 := workspaceevent.NewRedisClient(ctx, redis, logger)
@@ -176,28 +176,28 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(workspaceEventHub, noteRepo, folderRepo)
+	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(pgrepoNote, folder, workspaceEventHub)
 	events := &app.Events{
 		DocumentCommittedHandler:    documentCommittedHandler,
 		NotifyWorkspaceItemsUpdated: notifyWorkspaceItemsUpdatedHandler,
 	}
-	checkWorkspaceSlugExistsReadModel := pg.NewCheckWorkspaceSlugExistsReadModel(queries)
-	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExistsReadModel)
-	getNoteGraphReadModel := pg.NewGetNoteGraphReadModel(queries)
-	getNoteGraphHandler := app.NewGetNoteGraphHandler(getNoteGraphReadModel)
-	getNoteReadModel := pg.NewGetNoteReadModel(queries)
-	getNoteHandler := app.NewGetNoteHandler(authorization, noteRepo, getNoteReadModel)
-	getNoteLinksReadModel := pg.NewGetNoteLinksReadModel(queries)
-	getNoteLinksHandler := app.NewGetNoteLinksHandler(getNoteLinksReadModel)
-	getWorkspaceGraphReadModel := pg.NewGetWorkspaceGraphReadModel(queries)
-	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(getWorkspaceGraphReadModel)
-	getWorkspaceBySlugReadModel := pg.NewGetWorkspaceBySlugReadModel(queries)
-	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(getWorkspaceBySlugReadModel)
+	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
+	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)
+	getNoteGraph := pgreadmodel.NewGetNoteGraph(queries)
+	getNoteGraphHandler := app.NewGetNoteGraphHandler(getNoteGraph)
+	getNote := pgreadmodel.NewGetNote(queries)
+	getNoteHandler := app.NewGetNoteHandler(authorization, pgrepoNote, getNote)
+	getNoteLinks := pgreadmodel.NewGetNoteLinks(queries)
+	getNoteLinksHandler := app.NewGetNoteLinksHandler(getNoteLinks)
+	getWorkspaceGraph := pgreadmodel.NewGetWorkspaceGraph(queries)
+	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(getWorkspaceGraph)
+	getWorkspaceBySlug := pgreadmodel.NewGetWorkspaceBySlug(queries)
+	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(getWorkspaceBySlug)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler()
-	getWorkspaceTreeReadModel := pg.NewGetWorkspaceTreeReadModel(queries)
-	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(getWorkspaceTreeReadModel)
-	showTrashReadModel := pg.NewShowTrashReadModel(queries)
-	showTrashHandler := app.NewShowTrashHandler(showTrashReadModel)
+	getWorkspaceTree := pgreadmodel.NewGetWorkspaceTree(queries)
+	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(getWorkspaceTree)
+	showTrash := pgreadmodel.NewShowTrash(queries)
+	showTrashHandler := app.NewShowTrashHandler(showTrash)
 	appQueries := &app.Queries{
 		CheckWorkspaceSlugExistsHandler: checkWorkspaceSlugExistsHandler,
 		GetNoteGraphHandler:             getNoteGraphHandler,
@@ -261,7 +261,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	healthHealth := health.New(persistencePg, configServer, workspaceEventHub, redisClient)
+	healthHealth := health.New(pg, configServer, workspaceEventHub, redisClient)
 	meterProvider, cleanup8, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup7()
@@ -274,7 +274,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
-	noteServer := note.NewServer(persistencePg, httpHTTP, grpcGRPC, eventEvent, workspaceEventHub, outboxOutbox, healthHealth, logger, global)
+	noteServer := note.NewServer(pg, httpHTTP, grpcGRPC, eventEvent, workspaceEventHub, outboxOutbox, healthHealth, logger, global)
 	return noteServer, func() {
 		cleanup8()
 		cleanup7()

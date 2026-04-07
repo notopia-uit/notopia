@@ -1,4 +1,4 @@
-package pg
+package pgreadmodel
 
 import (
 	"context"
@@ -9,19 +9,19 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type ShowTrashReadModel struct {
+type ShowTrash struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.ShowTrashReadModel = (*ShowTrashReadModel)(nil)
+var _ app.ShowTrashReadModel = (*ShowTrash)(nil)
 
-func NewShowTrashReadModel(queries *pgsqlc.Queries) *ShowTrashReadModel {
-	return &ShowTrashReadModel{queries: queries}
+func NewShowTrash(queries *pgsqlc.Queries) *ShowTrash {
+	return &ShowTrash{queries: queries}
 }
 
-var ProvideShowTrashReadModel = NewShowTrashReadModel
+var ProvideShowTrash = NewShowTrash
 
-func (h *ShowTrashReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash, error) {
+func (h *ShowTrash) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash, error) {
 	trashedNotes, err := h.queries.GetTrashedNotesByWorkspaceID(ctx, q.WorkspaceID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)

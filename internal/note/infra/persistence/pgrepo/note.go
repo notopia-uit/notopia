@@ -215,14 +215,7 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 			return toErr(err)
 		}
 		for _, event := range note.PopEvents() {
-			if err := params.publisher.PublishWorkspaceItem(
-				ctx,
-				event,
-				PublishWorkspaceItemParams{
-					WorkspaceID: workspaceID,
-					AggregateID: note.ID(),
-				},
-			); err != nil {
+			if err := params.publisher.PublishWorkspaceItem(ctx, event, workspaceID); err != nil {
 				return fmt.Errorf("failed to publish events: %w", err)
 			}
 		}
@@ -282,14 +275,7 @@ func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) error {
 				return fmt.Errorf("failed to find workspace id for note id %s", note.ID())
 			}
 			for _, event := range note.PopEvents() {
-				if err := params.publisher.PublishWorkspaceItem(
-					ctx,
-					event,
-					PublishWorkspaceItemParams{
-						WorkspaceID: workspaceID,
-						AggregateID: note.ID(),
-					},
-				); err != nil {
+				if err := params.publisher.PublishWorkspaceItem(ctx, event, workspaceID); err != nil {
 					return fmt.Errorf("failed to publish events: %w", err)
 				}
 			}
