@@ -20,16 +20,15 @@ func NewGetWorkspaceGraph(queries *pgsqlc.Queries) *GetWorkspaceGraph {
 var ProvideGetWorkspaceGraph = NewGetWorkspaceGraph
 
 func (h *GetWorkspaceGraph) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, error) {
-	notes, err := h.queries.GetNotesInWorkspace(ctx, &pgsqlc.GetNotesInWorkspaceParams{
+	notes, err := h.queries.ReadGetNotesInWorkspace(ctx, pgsqlc.ReadGetNotesInWorkspaceParams{
 		WorkspaceID:  q.ID,
-		TrashedBy:    nil,
-		IsNotTrashed: true,
+		ExcludeTrash: true,
 	})
 	if err != nil {
 		return nil, toErr(err)
 	}
 
-	links, err := h.queries.GetNoteLinksInWorkspace(ctx, q.ID)
+	links, err := h.queries.ReadGetNoteLinksInWorkspace(ctx, q.ID)
 	if err != nil {
 		return nil, toErr(err)
 	}

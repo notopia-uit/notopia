@@ -44,9 +44,8 @@ func NewNoTransactionWorkspace(pgxPool *pgxpool.Pool, queries *pgsqlc.Queries) *
 var ProvideWorkspace = NewNoTransactionWorkspace
 
 func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) (*domain.Workspace, error) {
-	workspace, err := w.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
-		Slug:      &slug,
-		ID:        nil,
+	workspace, err := w.queries.GetWorkspaceBySlug(ctx, pgsqlc.GetWorkspaceBySlugParams{
+		Slug:      slug,
 		ForUpdate: forUpdate,
 	})
 	if err != nil {
@@ -56,12 +55,10 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 		return nil, toErr(err)
 	}
 
-	folders, err := w.queries.GetFolders(ctx,
-		//exhaustruct:ignore
-		&pgsqlc.GetFoldersParams{
-			WorkspaceID: &workspace.ID,
-			ForUpdate:   forUpdate,
-		})
+	folders, err := w.queries.GetFoldersByWorkspaceID(ctx, pgsqlc.GetFoldersByWorkspaceIDParams{
+		WorkspaceID: workspace.ID,
+		ForUpdate:   forUpdate,
+	})
 	if err != nil {
 		return nil, toErr(err)
 	}
@@ -74,12 +71,10 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 }
 
 func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Workspace, error) {
-	workspace, err := w.queries.GetWorkspace(ctx,
-		//exhaustruct:ignore
-		&pgsqlc.GetWorkspaceParams{
-			ID:        &id,
-			ForUpdate: forUpdate,
-		},
+	workspace, err := w.queries.GetWorkspaceByID(ctx, pgsqlc.GetWorkspaceByIDParams{
+		ID:        id,
+		ForUpdate: forUpdate,
+	},
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -88,12 +83,10 @@ func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 		return nil, toErr(err)
 	}
 
-	folders, err := w.queries.GetFolders(ctx,
-		//exhaustruct:ignore
-		&pgsqlc.GetFoldersParams{
-			WorkspaceID: &workspace.ID,
-			ForUpdate:   forUpdate,
-		})
+	folders, err := w.queries.GetFoldersByWorkspaceID(ctx, pgsqlc.GetFoldersByWorkspaceIDParams{
+		WorkspaceID: workspace.ID,
+		ForUpdate:   forUpdate,
+	})
 	if err != nil {
 		return nil, toErr(err)
 	}

@@ -25,16 +25,15 @@ func (h *GetNoteGraph) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*
 		return nil, toErr(err)
 	}
 
-	notes, err := h.queries.GetNotesInWorkspace(ctx, &pgsqlc.GetNotesInWorkspaceParams{
+	notes, err := h.queries.ReadGetNotesInWorkspace(ctx, pgsqlc.ReadGetNotesInWorkspaceParams{
 		WorkspaceID:  workspaceID,
-		TrashedBy:    nil,
-		IsNotTrashed: true,
+		ExcludeTrash: true,
 	})
 	if err != nil {
 		return nil, toErr(err)
 	}
 
-	links, err := h.queries.GetNoteLinksInWorkspace(ctx, workspaceID)
+	links, err := h.queries.ReadGetNoteLinksInWorkspace(ctx, workspaceID)
 	if err != nil {
 		return nil, toErr(err)
 	}

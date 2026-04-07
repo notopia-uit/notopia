@@ -52,12 +52,10 @@ func NewNoTransactionFolder(
 var ProvideFolder = NewNoTransactionFolder
 
 func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Folder, error) {
-	folder, err := f.queries.GetFolder(ctx,
-		//exhaustruct:ignore
-		&pgsqlc.GetFolderParams{
-			ID:        id,
-			ForUpdate: forUpdate,
-		})
+	folder, err := f.queries.GetFolder(ctx, pgsqlc.GetFolderParams{
+		ID:        id,
+		ForUpdate: forUpdate,
+	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewFolderNotFound(id, err)
@@ -88,14 +86,12 @@ func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyPa
 	}
 
 	folders, err := f.queries.GetFolders(ctx,
-		//exhaustruct:ignore
 		&pgsqlc.GetFoldersParams{
-			IDs:            ids,
-			WorkspaceID:    workspaceID,
-			TrashedBy:      trashedBy,
-			OnlyNonTrashed: params.NotTrashedOnly,
-			OnlyTrashed:    params.TrashOnly,
-			ForUpdate:      params.ForUpdate,
+			IDs:         ids,
+			WorkspaceID: workspaceID,
+			TrashedBy:   trashedBy,
+			TrashedOnly: params.TrashOnly,
+			ForUpdate:   params.ForUpdate,
 		})
 	if err != nil {
 		return nil, toErr(err)
@@ -142,32 +138,39 @@ func (f *Folder) Save(ctx context.Context, folder *domain.Folder) (cerr error) {
 		publisher:     f.publisher,
 		inTransaction: f.inTransaction,
 	}, func(params *RunInTxFnparams) error {
-		var icon *string
-		if folder.Icon() != "" {
-			icon = new(folder.Icon())
-		}
-		var parentID *uuid.UUID
-		if folder.ParentID() != uuid.Nil {
-			parentID = new(folder.ParentID())
-		}
-		var trashedBy *string
-		var trashedAt *time.Time
-		if folder.IsTrashed() {
-			trashedBy = new(folder.TrashedBy().String())
-			trashedAt = new(folder.TrashedAt())
-		}
-		if err := params.queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
-			ID:          folder.ID(),
-			Name:        folder.Name(),
-			Icon:        icon,
-			WorkspaceID: folder.WorkspaceID(),
-			ParentID:    parentID,
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
-			TrashedBy:   trashedBy,
-			TrashedAt:   trashedAt,
-		}); err != nil {
-			return toErr(err)
+		queries := params.queries
+		if folder.Deleted() {
+			if err := queries.PermanentlyDeleteFolderByID(ctx, folder.ID()); err != nil {
+				return toErr(err)
+			}
+		} else {
+			var icon *string
+			if folder.Icon() != "" {
+				icon = new(folder.Icon())
+			}
+			var parentID *uuid.UUID
+			if folder.ParentID() != uuid.Nil {
+				parentID = new(folder.ParentID())
+			}
+			var trashedBy *string
+			var trashedAt *time.Time
+			if folder.IsTrashed() {
+				trashedBy = new(folder.TrashedBy().String())
+				trashedAt = new(folder.TrashedAt())
+			}
+			if err := queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
+				ID:          folder.ID(),
+				Name:        folder.Name(),
+				Icon:        icon,
+				WorkspaceID: folder.WorkspaceID(),
+				ParentID:    parentID,
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+				TrashedBy:   trashedBy,
+				TrashedAt:   trashedAt,
+			}); err != nil {
+				return toErr(err)
+			}
 		}
 		for _, event := range folder.PopEvents() {
 			if err := params.publisher.PublishWorkspaceItem(ctx, event, folder.WorkspaceID()); err != nil {
@@ -185,9 +188,25 @@ func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr e
 		publisher:     f.publisher,
 		inTransaction: f.inTransaction,
 	}, func(params *RunInTxFnparams) error {
-		if err := f.upsertMany(params.queries, ctx, folders); err != nil {
+		var deleteIDs []uuid.UUID
+		var upsertFolders []*domain.Folder
+
+		for _, folder := range folders {
+			if folder.Deleted() {
+				deleteIDs = append(deleteIDs, folder.ID())
+			} else {
+				upsertFolders = append(upsertFolders, folder)
+			}
+		}
+
+		if err := f.deleteMany(ctx, params.queries, deleteIDs); err != nil {
 			return err
 		}
+
+		if err := f.upsertMany(ctx, params.queries, upsertFolders); err != nil {
+			return err
+		}
+
 		for _, folder := range folders {
 			for _, event := range folder.PopEvents() {
 				if err := params.publisher.PublishWorkspaceItem(ctx, event, folder.WorkspaceID()); err != nil {
@@ -199,7 +218,17 @@ func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr e
 	})
 }
 
-func (f *Folder) upsertMany(queries *pgsqlc.Queries, ctx context.Context, folders []*domain.Folder) error {
+func (f *Folder) deleteMany(ctx context.Context, queries *pgsqlc.Queries, deleteIDs []uuid.UUID) error {
+	if len(deleteIDs) == 0 {
+		return nil
+	}
+	if err := queries.PermanentlyDeleteFoldersByIDs(ctx, deleteIDs); err != nil {
+		return fmt.Errorf("failed bulk delete: %w", toErr(err))
+	}
+	return nil
+}
+
+func (f *Folder) upsertMany(ctx context.Context, queries *pgsqlc.Queries, folders []*domain.Folder) error {
 	if err := queries.CreateTempTableFolders(ctx); err != nil {
 		return fmt.Errorf("failed to create temp table for folders: %w", toErr(err))
 	}

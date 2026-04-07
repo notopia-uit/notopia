@@ -16,10 +16,9 @@ type NoteRepo interface {
 }
 
 type NoteRepoGetManyParams struct {
-	WorkspaceID    uuid.UUID
-	IDs            []uuid.UUID
-	TrashedBy      TrashedBy
-	NotTrashedOnly bool
-	TrashOnly      bool
-	ForUpdate      bool
+	WorkspaceID uuid.UUID
+	IDs         []uuid.UUID
+	TrashedBy   TrashedBy
+	TrashOnly   bool
+	ForUpdate   bool
 }

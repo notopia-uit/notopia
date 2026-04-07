@@ -35,92 +35,19 @@ func (q *Queries) DeleteObsoleteNoteLinks(ctx context.Context) error {
 	return err
 }
 
-const getNoteBacklinks = `-- name: GetNoteBacklinks :many
-SELECT
-  source_id
-FROM
-  note_links
-WHERE
-  target_id = $1
-`
-
-func (q *Queries) GetNoteBacklinks(ctx context.Context, targetID uuid.UUID) ([]uuid.UUID, error) {
-	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNoteBacklinks")
-	defer span.End()
-	rows, err := q.db.Query(ctx, getNoteBacklinks, targetID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []uuid.UUID
-	for rows.Next() {
-		var source_id uuid.UUID
-		if err := rows.Scan(&source_id); err != nil {
-			return nil, err
-		}
-		items = append(items, source_id)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getNoteLinksInWorkspace = `-- name: GetNoteLinksInWorkspace :many
-SELECT
-    nl.source_id, nl.target_id
-FROM note_links AS nl
-JOIN notes AS sn ON nl.source_id = sn.id
-JOIN folders AS sf ON sn.folder_id = sf.id
-WHERE sf.workspace_id = $1::uuid
-  AND sn.trashed_at IS NULL
-  AND sf.trashed_at IS NULL
-`
-
-func (q *Queries) GetNoteLinksInWorkspace(ctx context.Context, workspaceID uuid.UUID) ([]*NoteLink, error) {
-	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNoteLinksInWorkspace")
-	defer span.End()
-	rows, err := q.db.Query(ctx, getNoteLinksInWorkspace, workspaceID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []*NoteLink
-	for rows.Next() {
-		var i NoteLink
-		if err := rows.Scan(&i.SourceID, &i.TargetID); err != nil {
-			return nil, err
-		}
-		items = append(items, &i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getNoteOutgoingLinks = `-- name: GetNoteOutgoingLinks :many
 SELECT
   target_id
 FROM
   note_links
 WHERE
-  source_id = $1::uuid -- :if $1
-  AND source_id = ANY($2::uuid[]) -- :if $2
+  source_id = $1::uuid
 `
 
-var _getNoteOutgoingLinksDynQ = dynCompile(getNoteOutgoingLinks)
-
-type GetNoteOutgoingLinksParams struct {
-	SourceID  *uuid.UUID
-	SourceIDs *[]uuid.UUID
-}
-
-func (q *Queries) GetNoteOutgoingLinks(ctx context.Context, arg *GetNoteOutgoingLinksParams) ([]uuid.UUID, error) {
+func (q *Queries) GetNoteOutgoingLinks(ctx context.Context, sourceID uuid.UUID) ([]uuid.UUID, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNoteOutgoingLinks")
 	defer span.End()
-	dynQuery, dynArgs := _getNoteOutgoingLinksDynQ.Build([]any{arg.SourceID, arg.SourceIDs})
-	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
+	rows, err := q.db.Query(ctx, getNoteOutgoingLinks, sourceID)
 	if err != nil {
 		return nil, err
 	}

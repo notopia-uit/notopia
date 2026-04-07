@@ -44,33 +44,20 @@ FROM
   folders
 WHERE
   id = $1
-  AND workspace_id = $2::uuid -- :if $2
-  AND parent_id = $3::uuid -- :if $3
-  AND ( -- :if $4
-    trashed_by = $4::text -- :if $4
-    OR trashed_by IS NULL -- :if $4
-  ) -- :if $4
-  AND trashed_by IS NULL -- :if $5
-  AND trashed_by IS NOT NULL -- :if $6
-FOR UPDATE -- :if $7
+FOR UPDATE -- :if $2
 `
 
 var _getFolderDynQ = dynCompile(getFolder)
 
 type GetFolderParams struct {
-	ID             uuid.UUID
-	WorkspaceID    *uuid.UUID
-	ParentID       *uuid.UUID
-	TrashedBy      *string
-	OnlyNonTrashed bool
-	OnlyTrashed    bool
-	ForUpdate      bool
+	ID        uuid.UUID
+	ForUpdate bool
 }
 
-func (q *Queries) GetFolder(ctx context.Context, arg *GetFolderParams) (*Folder, error) {
+func (q *Queries) GetFolder(ctx context.Context, arg GetFolderParams) (*Folder, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetFolder")
 	defer span.End()
-	dynQuery, dynArgs := _getFolderDynQ.Build([]any{arg.ID, arg.WorkspaceID, arg.ParentID, arg.TrashedBy, arg.OnlyNonTrashed, arg.OnlyTrashed, arg.ForUpdate})
+	dynQuery, dynArgs := _getFolderDynQ.Build([]any{arg.ID, arg.ForUpdate})
 	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
 	var i Folder
 	err := row.Scan(
@@ -95,34 +82,30 @@ FROM
 WHERE
   id = ANY($1::uuid[]) -- :if $1
   AND workspace_id = $2::uuid -- :if $2
-  AND parent_id = $3::uuid -- :if $3
-  AND ( -- :if $4
-    trashed_by = $4::text -- :if $4
-    OR trashed_by IS NULL -- :if $4
-  ) -- :if $4
-  AND trashed_by IS NULL -- :if $5
-  AND trashed_by IS NOT NULL -- :if $6
+  AND ( -- :if $3
+    trashed_by = $3::text -- :if $3
+    OR trashed_by IS NULL -- :if $3
+  ) -- :if $3
+  AND trashed_by IS NOT NULL -- :if $4
 ORDER BY
   created_at DESC
-FOR UPDATE -- :if $7
+FOR UPDATE -- :if $5
 `
 
 var _getFoldersDynQ = dynCompile(getFolders)
 
 type GetFoldersParams struct {
-	IDs            *[]uuid.UUID
-	WorkspaceID    *uuid.UUID
-	ParentID       *uuid.UUID
-	TrashedBy      *string
-	OnlyNonTrashed bool
-	OnlyTrashed    bool
-	ForUpdate      bool
+	IDs         *[]uuid.UUID
+	WorkspaceID *uuid.UUID
+	TrashedBy   *string
+	TrashedOnly bool
+	ForUpdate   bool
 }
 
 func (q *Queries) GetFolders(ctx context.Context, arg *GetFoldersParams) ([]*Folder, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetFolders")
 	defer span.End()
-	dynQuery, dynArgs := _getFoldersDynQ.Build([]any{arg.IDs, arg.WorkspaceID, arg.ParentID, arg.TrashedBy, arg.OnlyNonTrashed, arg.OnlyTrashed, arg.ForUpdate})
+	dynQuery, dynArgs := _getFoldersDynQ.Build([]any{arg.IDs, arg.WorkspaceID, arg.TrashedBy, arg.TrashedOnly, arg.ForUpdate})
 	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
@@ -152,73 +135,37 @@ func (q *Queries) GetFolders(ctx context.Context, arg *GetFoldersParams) ([]*Fol
 	return items, nil
 }
 
-const getRecursiveFolderByParentID = `-- name: GetRecursiveFolderByParentID :many
-
-WITH RECURSIVE subfolders AS (
-  SELECT
-    id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at,
-    1 AS depth
-  FROM
-    folders
-  WHERE
-    parent_id = $1::uuid
-    AND CASE
-      WHEN $2::bool = FALSE
-      THEN trashed_by IS NULL
-      ELSE TRUE
-    END
-  UNION ALL
-  SELECT
-    f.id, f.name, f.icon, f.workspace_id, f.parent_id, f.created_at, f.updated_at, f.trashed_by, f.trashed_at,
-    s.depth + 1 AS depth
-  FROM
-    folders AS f
-    INNER JOIN subfolders s ON f.parent_id = s.id
-  WHERE
-    s.depth < COALESCE($3::int, 9999)
-    AND CASE
-      WHEN $2::bool = FALSE
-      THEN f.trashed_by IS NULL
-      ELSE TRUE
-    END
-)
+const getFoldersByWorkspaceID = `-- name: GetFoldersByWorkspaceID :many
 SELECT
-  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at, depth
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
 FROM
-  subfolders
+  folders
+WHERE
+  workspace_id = $1
+ORDER BY
+  created_at DESC
+FOR UPDATE -- :if $2
 `
 
-type GetRecursiveFolderByParentIDParams struct {
-	ParentID       uuid.UUID
-	IncludeTrashed bool
-	Depth          *int32
-}
+var _getFoldersByWorkspaceIDDynQ = dynCompile(getFoldersByWorkspaceID)
 
-type GetRecursiveFolderByParentIDRow struct {
-	ID          uuid.UUID
-	Name        string
-	Icon        *string
+type GetFoldersByWorkspaceIDParams struct {
 	WorkspaceID uuid.UUID
-	ParentID    *uuid.UUID
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	TrashedBy   *string
-	TrashedAt   *time.Time
-	Depth       int32
+	ForUpdate   bool
 }
 
-// TODO: Should give sqlc dynamic a try, if it run nicely, then it would be more performant
-func (q *Queries) GetRecursiveFolderByParentID(ctx context.Context, arg *GetRecursiveFolderByParentIDParams) ([]*GetRecursiveFolderByParentIDRow, error) {
-	ctx, span := otel.Tracer("Queries").Start(ctx, "GetRecursiveFolderByParentID")
+func (q *Queries) GetFoldersByWorkspaceID(ctx context.Context, arg GetFoldersByWorkspaceIDParams) ([]*Folder, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetFoldersByWorkspaceID")
 	defer span.End()
-	rows, err := q.db.Query(ctx, getRecursiveFolderByParentID, arg.ParentID, arg.IncludeTrashed, arg.Depth)
+	dynQuery, dynArgs := _getFoldersByWorkspaceIDDynQ.Build([]any{arg.WorkspaceID, arg.ForUpdate})
+	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []*GetRecursiveFolderByParentIDRow
+	var items []*Folder
 	for rows.Next() {
-		var i GetRecursiveFolderByParentIDRow
+		var i Folder
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -229,43 +176,10 @@ func (q *Queries) GetRecursiveFolderByParentID(ctx context.Context, arg *GetRecu
 			&i.UpdatedAt,
 			&i.TrashedBy,
 			&i.TrashedAt,
-			&i.Depth,
 		); err != nil {
 			return nil, err
 		}
 		items = append(items, &i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getRootFolderIDsByWorkspaceID = `-- name: GetRootFolderIDsByWorkspaceID :many
-SELECT
-  id
-FROM
-  folders
-WHERE
-  workspace_id = $1
-  AND parent_id IS NULL
-`
-
-func (q *Queries) GetRootFolderIDsByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]uuid.UUID, error) {
-	ctx, span := otel.Tracer("Queries").Start(ctx, "GetRootFolderIDsByWorkspaceID")
-	defer span.End()
-	rows, err := q.db.Query(ctx, getRootFolderIDsByWorkspaceID, workspaceID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []uuid.UUID
-	for rows.Next() {
-		var id uuid.UUID
-		if err := rows.Scan(&id); err != nil {
-			return nil, err
-		}
-		items = append(items, id)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

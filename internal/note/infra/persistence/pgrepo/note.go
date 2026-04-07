@@ -60,10 +60,7 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 	}
 
 	// Fetch outgoing links separately
-	links, err := n.queries.GetNoteOutgoingLinks(ctx, &pgsqlc.GetNoteOutgoingLinksParams{
-		SourceID:  &id,
-		SourceIDs: nil,
-	})
+	links, err := n.queries.GetNoteOutgoingLinks(ctx, id)
 	if err != nil {
 		return nil, toErr(err)
 	}
@@ -91,13 +88,12 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 		}
 	}
 
-	notes, err := n.queries.GetNotesByParams(ctx, &pgsqlc.GetNotesByParamsParams{
-		IDs:            ids,
-		WorkspaceID:    workspaceID,
-		TrashedBy:      trashedBy,
-		OnlyNonTrashed: params.NotTrashedOnly,
-		OnlyTrashed:    params.TrashOnly,
-		ForUpdate:      params.ForUpdate,
+	notes, err := n.queries.GetNotes(ctx, &pgsqlc.GetNotesParams{
+		IDs:         ids,
+		WorkspaceID: workspaceID,
+		TrashedBy:   trashedBy,
+		TrashedOnly: params.TrashOnly,
+		ForUpdate:   params.ForUpdate,
 	})
 	if err != nil {
 		return nil, toErr(err)
@@ -107,11 +103,7 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 	// Query links per note (type-safe approach)
 	result := make([]*domain.Note, len(notes))
 	for i, note := range notes {
-		// Query links for this specific note
-		links, err := n.queries.GetNoteOutgoingLinks(ctx, &pgsqlc.GetNoteOutgoingLinksParams{
-			SourceID:  &note.ID,
-			SourceIDs: nil,
-		})
+		links, err := n.queries.GetNoteOutgoingLinks(ctx, note.ID)
 		if err != nil {
 			return nil, toErr(err)
 		}
@@ -249,11 +241,11 @@ func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) error {
 			}
 		}
 
-		if err := n.deleteMany(params.queries, ctx, deleteIDs); err != nil {
+		if err := n.deleteMany(ctx, params.queries, deleteIDs); err != nil {
 			return err
 		}
 
-		if err := n.upsertMany(params.queries, ctx, upsertNotes, allOutgoingLinks); err != nil {
+		if err := n.upsertMany(ctx, params.queries, upsertNotes, allOutgoingLinks); err != nil {
 			return err
 		}
 
@@ -284,67 +276,69 @@ func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) error {
 	})
 }
 
-func (n *Note) deleteMany(queries *pgsqlc.Queries, ctx context.Context, deleteIDs []uuid.UUID) error {
-	if len(deleteIDs) > 0 {
-		if err := queries.PermanentlyDeleteNotesByIDs(ctx, deleteIDs); err != nil {
-			return fmt.Errorf("failed bulk delete: %w", toErr(err))
-		}
+func (n *Note) deleteMany(ctx context.Context, queries *pgsqlc.Queries, deleteIDs []uuid.UUID) error {
+	if len(deleteIDs) == 0 {
+		return nil
+	}
+	if err := queries.PermanentlyDeleteNotesByIDs(ctx, deleteIDs); err != nil {
+		return fmt.Errorf("failed bulk delete: %w", toErr(err))
 	}
 	return nil
 }
 
-func (n *Note) upsertMany(queries *pgsqlc.Queries, ctx context.Context, upsertNotes []*domain.Note, allOutgoingLinks []*pgsqlc.InsertTempNoteLinksParams) error {
-	if len(upsertNotes) > 0 {
-		if err := queries.CreateTempTableNotes(ctx); err != nil {
+func (n *Note) upsertMany(ctx context.Context, queries *pgsqlc.Queries, upsertNotes []*domain.Note, allOutgoingLinks []*pgsqlc.InsertTempNoteLinksParams) error {
+	if len(upsertNotes) == 0 {
+		return nil
+	}
+	if err := queries.CreateTempTableNotes(ctx); err != nil {
+		return toErr(err)
+	}
+
+	saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(upsertNotes))
+	for i, note := range upsertNotes {
+		var icon *string
+		if note.Icon() != "" {
+			icon = new(note.Icon())
+		}
+		var trashedBy *string
+		var trashedAt *time.Time
+		if note.IsTrashed() {
+			trashedBy = new(note.TrashedBy().String())
+			trashedAt = new(note.TrashedAt())
+		}
+		saveNoteParams[i] = &pgsqlc.InsertTempNotesParams{
+			ID:        note.ID(),
+			Name:      note.Name(),
+			Icon:      icon,
+			FolderID:  note.FolderID(),
+			Tags:      note.Tags(),
+			Size:      int32(note.Size()),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			TrashedBy: trashedBy,
+			TrashedAt: trashedAt,
+		}
+	}
+
+	if _, err := queries.InsertTempNotes(ctx, saveNoteParams); err != nil {
+		return toErr(err)
+	}
+	if err := queries.SaveFromTempNotes(ctx); err != nil {
+		return toErr(err)
+	}
+
+	if len(allOutgoingLinks) > 0 {
+		if err := queries.CreateTempTableNoteLinks(ctx); err != nil {
 			return toErr(err)
 		}
-
-		saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(upsertNotes))
-		for i, note := range upsertNotes {
-			var icon *string
-			if note.Icon() != "" {
-				icon = new(note.Icon())
-			}
-			var trashedBy *string
-			var trashedAt *time.Time
-			if note.IsTrashed() {
-				trashedBy = new(note.TrashedBy().String())
-				trashedAt = new(note.TrashedAt())
-			}
-			saveNoteParams[i] = &pgsqlc.InsertTempNotesParams{
-				ID:        note.ID(),
-				Name:      note.Name(),
-				Icon:      icon,
-				FolderID:  note.FolderID(),
-				Tags:      note.Tags(),
-				Size:      int32(note.Size()),
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
-				TrashedBy: trashedBy,
-				TrashedAt: trashedAt,
-			}
-		}
-
-		if _, err := queries.InsertTempNotes(ctx, saveNoteParams); err != nil {
+		if _, err := queries.InsertTempNoteLinks(ctx, allOutgoingLinks); err != nil {
 			return toErr(err)
 		}
-		if err := queries.SaveFromTempNotes(ctx); err != nil {
+		if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
 			return toErr(err)
 		}
-
-		if len(allOutgoingLinks) > 0 {
-			if err := queries.CreateTempTableNoteLinks(ctx); err != nil {
-				return toErr(err)
-			}
-			if _, err := queries.InsertTempNoteLinks(ctx, allOutgoingLinks); err != nil {
-				return toErr(err)
-			}
-			if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
-				return toErr(err)
-			}
-			if err := queries.SaveFromTempNoteLinks(ctx); err != nil {
-				return toErr(err)
-			}
+		if err := queries.SaveFromTempNoteLinks(ctx); err != nil {
+			return toErr(err)
 		}
 	}
 	return nil

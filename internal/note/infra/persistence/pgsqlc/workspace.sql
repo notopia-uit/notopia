@@ -1,12 +1,21 @@
--- name: GetWorkspace :one
+-- name: GetWorkspaceByID :one
 SELECT
   *
 FROM
   workspaces
 WHERE
-  1 = 1
-  AND slug = sqlc.narg('slug')::text -- :if @slug
-  AND id = sqlc.narg('id')::uuid -- :if @id
+  id = sqlc.arg('id')::uuid
+  AND deleted_at IS NULL
+FOR UPDATE -- :if @for_update
+;
+
+-- name: GetWorkspaceBySlug :one
+SELECT
+  *
+FROM
+  workspaces
+WHERE
+  slug = sqlc.arg('slug')::text
   AND deleted_at IS NULL
 FOR UPDATE -- :if @for_update
 ;

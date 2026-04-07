@@ -78,70 +78,7 @@ func (q *Queries) GetNoteByID(ctx context.Context, arg GetNoteByIDParams) (*Note
 	return &i, err
 }
 
-const getNotesByFolderIDs = `-- name: GetNotesByFolderIDs :many
-SELECT
-  id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
-FROM
-  notes
-WHERE
-  folder_id = ANY($1::uuid[])
-  AND ( -- :if $2
-    trashed_by = $2::text -- :if $2
-    OR trashed_by IS NULL -- :if $2
-  ) -- :if $2
-  AND trashed_by IS NULL -- :if $3
-  AND trashed_by IS NOT NULL -- :if $4
-ORDER BY
-  created_at DESC
-FOR UPDATE -- :if $5
-`
-
-var _getNotesByFolderIDsDynQ = dynCompile(getNotesByFolderIDs)
-
-type GetNotesByFolderIDsParams struct {
-	FolderIds      []uuid.UUID
-	TrashedBy      *string
-	OnlyNonTrashed bool
-	OnlyTrashed    bool
-	ForUpdate      bool
-}
-
-func (q *Queries) GetNotesByFolderIDs(ctx context.Context, arg *GetNotesByFolderIDsParams) ([]*Note, error) {
-	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesByFolderIDs")
-	defer span.End()
-	dynQuery, dynArgs := _getNotesByFolderIDsDynQ.Build([]any{arg.FolderIds, arg.TrashedBy, arg.OnlyNonTrashed, arg.OnlyTrashed, arg.ForUpdate})
-	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []*Note
-	for rows.Next() {
-		var i Note
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Icon,
-			&i.FolderID,
-			&i.Tags,
-			&i.Size,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.TrashedBy,
-			&i.TrashedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, &i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getNotesByParams = `-- name: GetNotesByParams :many
-
+const getNotes = `-- name: GetNotes :many
 SELECT
   id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at
 FROM
@@ -155,132 +92,25 @@ WHERE
     trashed_by = $3::text -- :if $3
     OR trashed_by IS NULL -- :if $3
   ) -- :if $3
-  AND trashed_by IS NULL -- :if $4
-  AND trashed_by IS NOT NULL -- :if $5
-FOR UPDATE -- :if $6
+  AND trashed_by IS NOT NULL -- :if $4
+FOR UPDATE -- :if $5
 `
 
-var _getNotesByParamsDynQ = dynCompile(getNotesByParams)
+var _getNotesDynQ = dynCompile(getNotes)
 
-type GetNotesByParamsParams struct {
-	IDs            *[]uuid.UUID
-	WorkspaceID    *uuid.UUID
-	TrashedBy      *string
-	OnlyNonTrashed bool
-	OnlyTrashed    bool
-	ForUpdate      bool
+type GetNotesParams struct {
+	IDs         *[]uuid.UUID
+	WorkspaceID *uuid.UUID
+	TrashedBy   *string
+	TrashedOnly bool
+	ForUpdate   bool
 }
 
-// TODO: rename it to get notes
-func (q *Queries) GetNotesByParams(ctx context.Context, arg *GetNotesByParamsParams) ([]*Note, error) {
-	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesByParams")
+func (q *Queries) GetNotes(ctx context.Context, arg *GetNotesParams) ([]*Note, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotes")
 	defer span.End()
-	dynQuery, dynArgs := _getNotesByParamsDynQ.Build([]any{arg.IDs, arg.WorkspaceID, arg.TrashedBy, arg.OnlyNonTrashed, arg.OnlyTrashed, arg.ForUpdate})
+	dynQuery, dynArgs := _getNotesDynQ.Build([]any{arg.IDs, arg.WorkspaceID, arg.TrashedBy, arg.TrashedOnly, arg.ForUpdate})
 	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []*Note
-	for rows.Next() {
-		var i Note
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Icon,
-			&i.FolderID,
-			&i.Tags,
-			&i.Size,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.TrashedBy,
-			&i.TrashedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, &i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getNotesInWorkspace = `-- name: GetNotesInWorkspace :many
-SELECT
-  n.id, n.name, n.icon, n.folder_id, n.tags, n.size, n.created_at, n.updated_at, n.trashed_by, n.trashed_at
-FROM
-  notes AS n
-INNER JOIN
-  folders f
-  ON n.folder_id = f.id
-WHERE
-  f.workspace_id = $1
-  AND n.trashed_by = $2::text -- :if $2
-  AND n.trashed_at IS NULL -- :if $3
-`
-
-var _getNotesInWorkspaceDynQ = dynCompile(getNotesInWorkspace)
-
-type GetNotesInWorkspaceParams struct {
-	WorkspaceID  uuid.UUID
-	TrashedBy    *string
-	IsNotTrashed bool
-}
-
-func (q *Queries) GetNotesInWorkspace(ctx context.Context, arg *GetNotesInWorkspaceParams) ([]*Note, error) {
-	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesInWorkspace")
-	defer span.End()
-	dynQuery, dynArgs := _getNotesInWorkspaceDynQ.Build([]any{arg.WorkspaceID, arg.TrashedBy, arg.IsNotTrashed})
-	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []*Note
-	for rows.Next() {
-		var i Note
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Icon,
-			&i.FolderID,
-			&i.Tags,
-			&i.Size,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.TrashedBy,
-			&i.TrashedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, &i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getTrashedNotesByWorkspaceID = `-- name: GetTrashedNotesByWorkspaceID :many
-SELECT
-  n.id, n.name, n.icon, n.folder_id, n.tags, n.size, n.created_at, n.updated_at, n.trashed_by, n.trashed_at
-FROM
-  notes AS n
-INNER JOIN
-  folders f
-  ON n.folder_id = f.id
-WHERE
-  f.workspace_id = $1
-  AND n.trashed_at IS NOT NULL
-ORDER BY
-  n.trashed_at DESC
-`
-
-func (q *Queries) GetTrashedNotesByWorkspaceID(ctx context.Context, workspaceID uuid.UUID) ([]*Note, error) {
-	ctx, span := otel.Tracer("Queries").Start(ctx, "GetTrashedNotesByWorkspaceID")
-	defer span.End()
-	rows, err := q.db.Query(ctx, getTrashedNotesByWorkspaceID, workspaceID)
 	if err != nil {
 		return nil, err
 	}

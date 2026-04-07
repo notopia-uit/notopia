@@ -34,31 +34,63 @@ func (q *Queries) CheckSlugExists(ctx context.Context, slug string) (bool, error
 	return exists, err
 }
 
-const getWorkspace = `-- name: GetWorkspace :one
+const getWorkspaceByID = `-- name: GetWorkspaceByID :one
 SELECT
   id, slug, name, created_at, updated_at, deleted_at
 FROM
   workspaces
 WHERE
-  1 = 1
-  AND slug = $1::text -- :if $1
-  AND id = $2::uuid -- :if $2
+  id = $1::uuid
   AND deleted_at IS NULL
-FOR UPDATE -- :if $3
+FOR UPDATE -- :if $2
 `
 
-var _getWorkspaceDynQ = dynCompile(getWorkspace)
+var _getWorkspaceByIDDynQ = dynCompile(getWorkspaceByID)
 
-type GetWorkspaceParams struct {
-	Slug      *string
-	ID        *uuid.UUID
+type GetWorkspaceByIDParams struct {
+	ID        uuid.UUID
 	ForUpdate bool
 }
 
-func (q *Queries) GetWorkspace(ctx context.Context, arg *GetWorkspaceParams) (*Workspace, error) {
-	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspace")
+func (q *Queries) GetWorkspaceByID(ctx context.Context, arg GetWorkspaceByIDParams) (*Workspace, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspaceByID")
 	defer span.End()
-	dynQuery, dynArgs := _getWorkspaceDynQ.Build([]any{arg.Slug, arg.ID, arg.ForUpdate})
+	dynQuery, dynArgs := _getWorkspaceByIDDynQ.Build([]any{arg.ID, arg.ForUpdate})
+	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
+	var i Workspace
+	err := row.Scan(
+		&i.ID,
+		&i.Slug,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return &i, err
+}
+
+const getWorkspaceBySlug = `-- name: GetWorkspaceBySlug :one
+SELECT
+  id, slug, name, created_at, updated_at, deleted_at
+FROM
+  workspaces
+WHERE
+  slug = $1::text
+  AND deleted_at IS NULL
+FOR UPDATE -- :if $2
+`
+
+var _getWorkspaceBySlugDynQ = dynCompile(getWorkspaceBySlug)
+
+type GetWorkspaceBySlugParams struct {
+	Slug      string
+	ForUpdate bool
+}
+
+func (q *Queries) GetWorkspaceBySlug(ctx context.Context, arg GetWorkspaceBySlugParams) (*Workspace, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspaceBySlug")
+	defer span.End()
+	dynQuery, dynArgs := _getWorkspaceBySlugDynQ.Build([]any{arg.Slug, arg.ForUpdate})
 	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
 	var i Workspace
 	err := row.Scan(

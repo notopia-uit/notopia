@@ -30,7 +30,7 @@ func (h *GetWorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorks
 	if q.RootFolderID != uuid.Nil {
 		rootFolderID = q.RootFolderID
 	} else {
-		rootFolderIDs, err := h.queries.GetRootFolderIDsByWorkspaceID(ctx, q.WorkspaceID)
+		rootFolderIDs, err := h.queries.ReadGetRootFolderIDsByWorkspaceID(ctx, q.WorkspaceID)
 		if err != nil {
 			return nil, toErr(err)
 		}
@@ -40,11 +40,7 @@ func (h *GetWorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorks
 		rootFolderID = rootFolderIDs[0]
 	}
 
-	rootFolder, err := h.queries.GetFolder(ctx,
-		//exhaustruct:ignore
-		&pgsqlc.GetFolderParams{
-			ID: rootFolderID,
-		})
+	rootFolder, err := h.queries.ReadGetFolderByID(ctx, rootFolderID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewFolderNotFound(rootFolderID, err)
@@ -56,7 +52,7 @@ func (h *GetWorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorks
 	if q.Depth != 0 {
 		depth = new(int32(q.Depth))
 	}
-	recursiveFolders, err := h.queries.GetRecursiveFolderByParentID(ctx, &pgsqlc.GetRecursiveFolderByParentIDParams{
+	recursiveFolders, err := h.queries.ReadGetRecursiveFolderByParentID(ctx, &pgsqlc.ReadGetRecursiveFolderByParentIDParams{
 		ParentID:       rootFolderID,
 		Depth:          depth,
 		IncludeTrashed: q.IncludeTrashed,
@@ -67,18 +63,16 @@ func (h *GetWorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorks
 
 	var folderIDs []uuid.UUID
 	folderIDs = append(folderIDs, rootFolderID)
-	folderMap := make(map[uuid.UUID]*pgsqlc.GetRecursiveFolderByParentIDRow)
+	folderMap := make(map[uuid.UUID]*pgsqlc.ReadGetRecursiveFolderByParentIDRow)
 	for _, folder := range recursiveFolders {
 		folderIDs = append(folderIDs, folder.ID)
 		folderMap[folder.ID] = folder
 	}
 
-	allNotes, err := h.queries.GetNotesByFolderIDs(ctx,
-		//exhaustruct:ignore
-		&pgsqlc.GetNotesByFolderIDsParams{
-			FolderIds:      folderIDs,
-			OnlyNonTrashed: !q.IncludeTrashed,
-		})
+	allNotes, err := h.queries.ReadGetNotesByFolderIDs(ctx, pgsqlc.ReadGetNotesByFolderIDsParams{
+		FolderIds:    folderIDs,
+		ExcludeTrash: !q.IncludeTrashed,
+	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
 	}
@@ -104,7 +98,7 @@ func (h *GetWorkspaceTree) buildFolderTree(
 	folderName string,
 	folderIcon *string,
 	updatedAt time.Time,
-	folderMap map[uuid.UUID]*pgsqlc.GetRecursiveFolderByParentIDRow,
+	folderMap map[uuid.UUID]*pgsqlc.ReadGetRecursiveFolderByParentIDRow,
 	notesByFolder map[uuid.UUID][]*pgsqlc.Note,
 ) *app.WorkspaceTreeFolder {
 	var icon string

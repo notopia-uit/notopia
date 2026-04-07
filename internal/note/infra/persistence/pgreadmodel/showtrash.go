@@ -22,18 +22,12 @@ func NewShowTrash(queries *pgsqlc.Queries) *ShowTrash {
 var ProvideShowTrash = NewShowTrash
 
 func (h *ShowTrash) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash, error) {
-	trashedNotes, err := h.queries.GetTrashedNotesByWorkspaceID(ctx, q.WorkspaceID)
+	trashedNotes, err := h.queries.ReadGetTrashedNotesByWorkspaceID(ctx, q.WorkspaceID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
 	}
 
-	trashedFolders, err := h.queries.GetFolders(ctx,
-		//exhaustruct:ignore
-		&pgsqlc.GetFoldersParams{
-			WorkspaceID: &q.WorkspaceID,
-			TrashedBy:   new(string(pgsqlc.TrashedByPurpose)),
-			OnlyTrashed: true,
-		})
+	trashedFolders, err := h.queries.ReadGetTrashedFolderByWorkspaceID(ctx, q.WorkspaceID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
 	}

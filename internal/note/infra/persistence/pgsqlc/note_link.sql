@@ -40,24 +40,4 @@ SELECT
 FROM
   note_links
 WHERE
-  source_id = sqlc.narg('source_id')::uuid -- :if @source_id
-  AND source_id = ANY(sqlc.narg('source_ids')::uuid[]) -- :if @source_ids
-;
-
--- name: GetNoteBacklinks :many
-SELECT
-  source_id
-FROM
-  note_links
-WHERE
-  target_id = sqlc.arg('target_id');
-
--- name: GetNoteLinksInWorkspace :many
-SELECT
-    nl.*
-FROM note_links AS nl
-JOIN notes AS sn ON nl.source_id = sn.id
-JOIN folders AS sf ON sn.folder_id = sf.id
-WHERE sf.workspace_id = sqlc.arg('workspace_id')::uuid
-  AND sn.trashed_at IS NULL
-  AND sf.trashed_at IS NULL;
+  source_id = sqlc.arg('source_id')::uuid;

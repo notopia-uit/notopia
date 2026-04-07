@@ -62,12 +62,7 @@ func (h *GetNoteLinks) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*
 }
 
 func (h *GetNoteLinks) getOutgoingLinks(ctx context.Context, noteID uuid.UUID) ([]*app.NoteLink, error) {
-	outgoingLinks, err := h.queries.GetNoteOutgoingLinks(ctx,
-		//exhaustruct:ignore
-		&pgsqlc.GetNoteOutgoingLinksParams{
-			SourceID: &noteID,
-		},
-	)
+	outgoingLinks, err := h.queries.ReadGetNoteOutgoingLinks(ctx, noteID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
 	}
@@ -76,12 +71,7 @@ func (h *GetNoteLinks) getOutgoingLinks(ctx context.Context, noteID uuid.UUID) (
 		return []*app.NoteLink{}, nil
 	}
 
-	outgoingNotes, err := h.queries.GetNotesByParams(ctx,
-		//exhaustruct:ignore
-		&pgsqlc.GetNotesByParamsParams{
-			IDs: &outgoingLinks,
-		},
-	)
+	outgoingNotes, err := h.queries.ReadGetNotesByIDs(ctx, outgoingLinks)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
 	}
@@ -102,7 +92,7 @@ func (h *GetNoteLinks) getOutgoingLinks(ctx context.Context, noteID uuid.UUID) (
 }
 
 func (h *GetNoteLinks) getBacklinks(ctx context.Context, noteID uuid.UUID) ([]*app.NoteLink, error) {
-	backlinks, err := h.queries.GetNoteBacklinks(ctx, noteID)
+	backlinks, err := h.queries.ReadGetNoteBacklinks(ctx, noteID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
 	}
@@ -111,11 +101,7 @@ func (h *GetNoteLinks) getBacklinks(ctx context.Context, noteID uuid.UUID) ([]*a
 		return []*app.NoteLink{}, nil
 	}
 
-	backlinkNotes, err := h.queries.GetNotesByParams(ctx,
-		//exhaustruct:ignore
-		&pgsqlc.GetNotesByParamsParams{
-			IDs: &backlinks,
-		})
+	backlinkNotes, err := h.queries.ReadGetNotesByIDs(ctx, backlinks)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
 	}
