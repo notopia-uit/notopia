@@ -1,4 +1,4 @@
-package pg
+package pgrepo
 
 import (
 	"context"
@@ -29,21 +29,21 @@ var _ domain.RepoRegistry = (*RepoRegistry)(nil)
 
 func (r *RepoRegistry) Workspace() domain.WorkspaceRepo {
 	r.wsOnce.Do(func() {
-		r.workspace = NewWorkspaceRepo(nil, r.txQueries, r.publisher, true)
+		r.workspace = NewWorkspace(nil, r.txQueries, r.publisher, true)
 	})
 	return r.workspace
 }
 
 func (r *RepoRegistry) Folder() domain.FolderRepo {
 	r.folderOnce.Do(func() {
-		r.folder = NewFolderRepo(nil, r.txQueries, r.publisher, true)
+		r.folder = NewFolder(nil, r.txQueries, r.publisher, true)
 	})
 	return r.folder
 }
 
 func (r *RepoRegistry) Note() domain.NoteRepo {
 	r.noteOnce.Do(func() {
-		r.note = NewNoteRepo(nil, r.txQueries, r.publisher, true)
+		r.note = NewNote(nil, r.txQueries, r.publisher, true)
 	})
 	return r.note
 }

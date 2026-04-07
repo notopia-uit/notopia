@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
@@ -94,11 +95,11 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	queries := pg.NewQueries(pool)
-	folderRepo := pg.NewNoTransactionFolderRepo(pool, queries)
+	folderRepo := pg.NewNoTransactionFolder(pool, queries)
 	createFolderHandler := app.NewCreateFolderHandler(authorization, folderRepo)
-	noteRepo := pg.NewNoTransactionNoteRepo(pool, queries)
+	noteRepo := pg.NewNoTransactionNote(pool, queries)
 	createNoteHandler := app.NewCreateNoteHandler(authorization, noteRepo, folderRepo)
-	workspaceRepo := pg.NewNoTransactionWorkspaceRepo(pool, queries)
+	workspaceRepo := pg.NewNoTransactionWorkspace(pool, queries)
 	advanced := &configConfig.Advanced
 	domainEvent := advanced.DomainEvent
 	loggerAdapter := component.NewWatermillLogger(logger)

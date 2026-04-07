@@ -1,4 +1,4 @@
-package pg
+package pgrepo
 
 import (
 	"github.com/notopia-uit/notopia/internal/note/domain"

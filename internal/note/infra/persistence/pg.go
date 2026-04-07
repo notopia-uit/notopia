@@ -8,10 +8,48 @@ import (
 	"io/fs"
 	"log/slog"
 
+	"github.com/exaring/otelpgx"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/pressly/goose/v3"
 	"github.com/pressly/goose/v3/lock"
+	"go.opentelemetry.io/otel/sdk/trace"
 )
+
+func NewPgPool(
+	ctx context.Context,
+	tracerProvider *trace.TracerProvider,
+	cfg *commonconfig.SQL,
+) (*pgxpool.Pool, func(), error) {
+	pgxCfg, err := pgxpool.ParseConfig(cfg.GetURL())
+	if err != nil {
+		return nil, nil, err
+	}
+	pgxCfg.ConnConfig.Tracer = otelpgx.NewTracer(
+		otelpgx.WithTracerProvider(tracerProvider),
+	)
+	pool, err := pgxpool.NewWithConfig(ctx, pgxCfg)
+	if err != nil {
+		return nil, nil, err
+	}
+	return pool, pool.Close, nil
+}
+
+var ProvidePgPool = NewPgPool
+
+func NewSQLCQueries(db pgsqlc.DBTX) *pgsqlc.Queries {
+	return pgsqlc.New(db)
+}
+
+var ProvideSQLCQueries = NewSQLCQueries
+
+func NewPgxPoolStdlib(pool *pgxpool.Pool) *sql.DB {
+	return stdlib.OpenDBFromPool(pool)
+}
+
+var ProvidePgxPoolStdlib = NewPgxPoolStdlib
 
 func NewGooseProvider(db *sql.DB, logger *slog.Logger) (*goose.Provider, error) {
 	locker, err := lock.NewPostgresSessionLocker()

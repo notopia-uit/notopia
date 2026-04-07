@@ -29,14 +29,14 @@ var PostresReadModelProviderSet = wire.NewSet(
 )
 
 var PostgresRepoProviderSet = wire.NewSet(
-	pg.ProvideFolderRepo,
-	pg.ProvideNoteRepo,
+	pg.ProvideFolder,
+	pg.ProvideNote,
 	pg.ProvideUnitOfWork,
-	pg.ProvideWorkspaceRepo,
-	wire.Bind(new(domain.FolderRepo), new(*pg.FolderRepo)),
-	wire.Bind(new(domain.NoteRepo), new(*pg.NoteRepo)),
+	pg.ProvideWorkspace,
+	wire.Bind(new(domain.FolderRepo), new(*pg.Folder)),
+	wire.Bind(new(domain.NoteRepo), new(*pg.Note)),
 	wire.Bind(new(domain.UnitOfWork), new(*pg.UnitOfWork)),
-	wire.Bind(new(domain.WorkspaceRepo), new(*pg.WorkspaceRepo)),
+	wire.Bind(new(domain.WorkspaceRepo), new(*pg.Workspace)),
 )
 
 var PostgresProviderSet = wire.NewSet(

@@ -59,5 +59,5 @@ func (h *GetWorkspaceGraphReadModel) GetWorkspaceGraph(ctx context.Context, q *a
 		}
 	}
 
-	return buildGraphRM(notes, links, reachableIDs), nil
+	return buildGraph(notes, links, reachableIDs), nil
 }

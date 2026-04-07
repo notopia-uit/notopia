@@ -8,7 +8,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-func calculateGraphWeightRM(size, minSize, maxSize int32) float64 {
+func calculateGraphWeight(size, minSize, maxSize int32) float64 {
 	var w float64
 	if maxSize == minSize {
 		w = 1
@@ -18,7 +18,7 @@ func calculateGraphWeightRM(size, minSize, maxSize int32) float64 {
 	return w
 }
 
-func buildGraphRM(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map[string]bool) *app.Graph {
+func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map[string]bool) *app.Graph {
 	var minSize int32 = math.MaxInt32
 	var maxSize int32 = -1
 	reachableNotesMap := make(map[uuid.UUID]*pgsqlc.Note)
@@ -44,7 +44,7 @@ func buildGraphRM(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs m
 			ID:     n.ID.String(),
 			Name:   n.Name,
 			Type:   app.GraphNodeTypeNote,
-			Weight: calculateGraphWeightRM(n.Size, minSize, maxSize),
+			Weight: calculateGraphWeight(n.Size, minSize, maxSize),
 		})
 
 		for _, tag := range n.Tags {

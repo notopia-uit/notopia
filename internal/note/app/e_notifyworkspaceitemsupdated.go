@@ -11,12 +11,12 @@ import (
 
 // Because workspace items includes note and folder, so, we share the same debounce
 type NotifyWorkspaceItemsUpdatedHandler struct {
-	workspaceEventHub WorkspaceEventHub
-	debouncers        sync.Map // workspaceID -> func(func())
-	pendingEvents     sync.Map // workspaceID -> latest event
-	debounceDuration  time.Duration
-	noteRepo          domain.NoteRepo
-	folderRepo        domain.FolderRepo
+	workspaceEventHub       WorkspaceEventHub
+	debouncers              sync.Map
+	debounceDuration        time.Duration
+	noteRepo                domain.NoteRepo
+	folderRepo              domain.FolderRepo
+	workspaceEventPublisher WorkspaceEventPublisher
 }
 
 func NewNotifyWorkspaceItemsUpdatedHandler(
@@ -27,7 +27,6 @@ func NewNotifyWorkspaceItemsUpdatedHandler(
 	return &NotifyWorkspaceItemsUpdatedHandler{
 		workspaceEventHub: workspaceEventHub,
 		debouncers:        sync.Map{},
-		pendingEvents:     sync.Map{},
 		debounceDuration:  1 * time.Second,
 		noteRepo:          noteRepo,
 		folderRepo:        folderRepo,
@@ -39,6 +38,7 @@ var ProvideNotifyWorkspaceItemsUpdatedHandler = NewNotifyWorkspaceItemsUpdatedHa
 // register this to the topics of domain folder
 func (h *NotifyWorkspaceItemsUpdatedHandler) HandleFolder(
 	ctx context.Context,
+	workspaceID uuid.UUID,
 	folderID uuid.UUID,
 ) error {
 	return nil
@@ -47,6 +47,7 @@ func (h *NotifyWorkspaceItemsUpdatedHandler) HandleFolder(
 // register this to the topics of domain note
 func (h *NotifyWorkspaceItemsUpdatedHandler) HandleNote(
 	ctx context.Context,
+	workspaceID uuid.UUID,
 	noteID uuid.UUID,
 ) error {
 	return nil

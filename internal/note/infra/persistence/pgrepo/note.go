@@ -1,4 +1,4 @@
-package pg
+package pgrepo
 
 import (
 	"context"
@@ -15,22 +15,22 @@ import (
 )
 
 // TODO: what, it has so many fmt error? we have to map to toErr only
-type NoteRepo struct {
+type Note struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
 	publisher     Publisher
 	inTransaction bool
 }
 
-var _ domain.NoteRepo = (*NoteRepo)(nil)
+var _ domain.NoteRepo = (*Note)(nil)
 
-func NewNoteRepo(
+func NewNote(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
 	publisher Publisher,
 	inTransaction bool,
-) *NoteRepo {
-	return &NoteRepo{
+) *Note {
+	return &Note{
 		pgxPool:       pgxPool,
 		queries:       queries,
 		publisher:     publisher,
@@ -38,16 +38,16 @@ func NewNoteRepo(
 	}
 }
 
-func NewNoTransactionNoteRepo(
+func NewNoTransactionNote(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
-) *NoteRepo {
-	return NewNoteRepo(pgxPool, queries, nil, false)
+) *Note {
+	return NewNote(pgxPool, queries, nil, false)
 }
 
-var ProvideNoteRepo = NewNoTransactionNoteRepo
+var ProvideNote = NewNoTransactionNote
 
-func (n *NoteRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Note, error) {
+func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Note, error) {
 	note, err := n.queries.GetNoteByID(ctx, pgsqlc.GetNoteByIDParams{
 		ID:        id,
 		ForUpdate: forUpdate,
@@ -71,7 +71,7 @@ func (n *NoteRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*
 	return noteToDomainRepo(note, links), nil
 }
 
-func (n *NoteRepo) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams) ([]*domain.Note, error) {
+func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams) ([]*domain.Note, error) {
 	var ids *[]uuid.UUID
 	if len(params.IDs) > 0 {
 		ids = &params.IDs
@@ -146,7 +146,7 @@ func noteToDomainRepo(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
 }
 
 // TODO: It doesn't save the outgoing links
-func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) error {
+func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
@@ -231,14 +231,13 @@ func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) error {
 }
 
 // TODO: It doesn't save the outgoing links
-func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) error {
+func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) error {
 	return runInTx(ctx, &runInTxParams{
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
 		publisher:     n.publisher,
 		inTransaction: n.inTransaction,
 	}, func(params *RunInTxFnparams) error {
-		queries := params.queries
 		var deleteIDs []uuid.UUID
 		var upsertNotes []*domain.Note
 		var allOutgoingLinks []*pgsqlc.InsertTempNoteLinksParams
@@ -257,70 +256,19 @@ func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) error {
 			}
 		}
 
-		if len(deleteIDs) > 0 {
-			if err := queries.PermanentlyDeleteNotesByIDs(ctx, deleteIDs); err != nil {
-				return fmt.Errorf("failed bulk delete: %w", toErr(err))
-			}
+		if err := n.deleteMany(params.queries, ctx, deleteIDs); err != nil {
+			return err
 		}
 
-		if len(upsertNotes) > 0 {
-			if err := queries.CreateTempTableNotes(ctx); err != nil {
-				return toErr(err)
-			}
-
-			saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(upsertNotes))
-			for i, note := range upsertNotes {
-				var icon *string
-				if note.Icon() != "" {
-					icon = new(note.Icon())
-				}
-				var trashedBy *string
-				var trashedAt *time.Time
-				if note.IsTrashed() {
-					trashedBy = new(note.TrashedBy().String())
-					trashedAt = new(note.TrashedAt())
-				}
-				saveNoteParams[i] = &pgsqlc.InsertTempNotesParams{
-					ID:        note.ID(),
-					Name:      note.Name(),
-					Icon:      icon,
-					FolderID:  note.FolderID(),
-					Tags:      note.Tags(),
-					Size:      int32(note.Size()),
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
-					TrashedBy: trashedBy,
-					TrashedAt: trashedAt,
-				}
-			}
-
-			if _, err := queries.InsertTempNotes(ctx, saveNoteParams); err != nil {
-				return toErr(err)
-			}
-			if err := queries.SaveFromTempNotes(ctx); err != nil {
-				return toErr(err)
-			}
-
-			if len(allOutgoingLinks) > 0 {
-				if err := queries.CreateTempTableNoteLinks(ctx); err != nil {
-					return toErr(err)
-				}
-				if _, err := queries.InsertTempNoteLinks(ctx, allOutgoingLinks); err != nil {
-					return toErr(err)
-				}
-				if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
-					return toErr(err)
-				}
-				if err := queries.SaveFromTempNoteLinks(ctx); err != nil {
-					return toErr(err)
-				}
-			}
+		if err := n.upsertMany(params.queries, ctx, upsertNotes, allOutgoingLinks); err != nil {
+			return err
 		}
+
 		noteIDs := make([]uuid.UUID, len(notes))
 		for i, note := range notes {
 			noteIDs[i] = note.ID()
 		}
-		noteIDworkspaceIDPairs, err := queries.GetWorkspaceIDsByNoteIDs(ctx, noteIDs)
+		noteIDworkspaceIDPairs, err := params.queries.GetWorkspaceIDsByNoteIDs(ctx, noteIDs)
 		noteIDWorkspaceIDMap := make(map[uuid.UUID]uuid.UUID, len(noteIDworkspaceIDPairs))
 		for _, pair := range noteIDworkspaceIDPairs {
 			noteIDWorkspaceIDMap[pair.ID] = pair.WorkspaceID
@@ -350,7 +298,73 @@ func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) error {
 	})
 }
 
-func (n *NoteRepo) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error) {
+func (n *Note) deleteMany(queries *pgsqlc.Queries, ctx context.Context, deleteIDs []uuid.UUID) error {
+	if len(deleteIDs) > 0 {
+		if err := queries.PermanentlyDeleteNotesByIDs(ctx, deleteIDs); err != nil {
+			return fmt.Errorf("failed bulk delete: %w", toErr(err))
+		}
+	}
+	return nil
+}
+
+func (n *Note) upsertMany(queries *pgsqlc.Queries, ctx context.Context, upsertNotes []*domain.Note, allOutgoingLinks []*pgsqlc.InsertTempNoteLinksParams) error {
+	if len(upsertNotes) > 0 {
+		if err := queries.CreateTempTableNotes(ctx); err != nil {
+			return toErr(err)
+		}
+
+		saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(upsertNotes))
+		for i, note := range upsertNotes {
+			var icon *string
+			if note.Icon() != "" {
+				icon = new(note.Icon())
+			}
+			var trashedBy *string
+			var trashedAt *time.Time
+			if note.IsTrashed() {
+				trashedBy = new(note.TrashedBy().String())
+				trashedAt = new(note.TrashedAt())
+			}
+			saveNoteParams[i] = &pgsqlc.InsertTempNotesParams{
+				ID:        note.ID(),
+				Name:      note.Name(),
+				Icon:      icon,
+				FolderID:  note.FolderID(),
+				Tags:      note.Tags(),
+				Size:      int32(note.Size()),
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+				TrashedBy: trashedBy,
+				TrashedAt: trashedAt,
+			}
+		}
+
+		if _, err := queries.InsertTempNotes(ctx, saveNoteParams); err != nil {
+			return toErr(err)
+		}
+		if err := queries.SaveFromTempNotes(ctx); err != nil {
+			return toErr(err)
+		}
+
+		if len(allOutgoingLinks) > 0 {
+			if err := queries.CreateTempTableNoteLinks(ctx); err != nil {
+				return toErr(err)
+			}
+			if _, err := queries.InsertTempNoteLinks(ctx, allOutgoingLinks); err != nil {
+				return toErr(err)
+			}
+			if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
+				return toErr(err)
+			}
+			if err := queries.SaveFromTempNoteLinks(ctx); err != nil {
+				return toErr(err)
+			}
+		}
+	}
+	return nil
+}
+
+func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error) {
 	count, err := n.queries.CountNotesInWorkspaceByIDs(ctx, &pgsqlc.CountNotesInWorkspaceByIDsParams{
 		IDs:         ids,
 		WorkspaceID: workspaceID,
@@ -361,7 +375,7 @@ func (n *NoteRepo) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, works
 	return count == int64(len(ids)), nil
 }
 
-func (n *NoteRepo) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
+func (n *Note) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
 	workspaceID, err := n.queries.GetWorkspaceIDByNoteID(ctx, id)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("failed to get workspace id for note: %w", toErr(err))

@@ -4,24 +4,30 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-// Or, we just marshall the event to a string json string, instead marshall and unmarshall
-type WorkspaceEventHub interface {
+type WorkspaceEventPublisher interface {
 	Publish(
 		ctx context.Context,
 		workspaceID uuid.UUID,
 		userID string,
 		events ...WorkspaceEvent,
 	) error
+}
 
+type WorkspaceEventSubscriber interface {
 	Subscribe(
 		ctx context.Context,
 		workspaceID uuid.UUID,
 		userID string,
 	) (<-chan WorkspaceEvent, error)
+}
+
+// Or, we just marshall the event to a string json string, instead marshall and unmarshall
+type WorkspaceEventHub interface {
+	WorkspaceEventPublisher
+	WorkspaceEventSubscriber
 }
 
 type WorkspaceEvent interface {
@@ -42,7 +48,7 @@ func (e workspaceEvent[E]) isWorkspaceEvent() {}
 func (e workspaceEvent[E]) GetID() uuid.UUID  { return e.Id }
 func (e workspaceEvent[E]) GetEvent() string  { return string(e.Event) }
 
-type WorkspaceEventWorkspaceItemsChanged struct {
+type WorkspaceEventWorkspaceItemsUpdated struct {
 	workspaceEvent[note.WorkspaceItemsUpdatedEventEvent]
 }
 
@@ -58,58 +64,6 @@ type WorkspaceEventWorkspaceDeleted struct {
 	workspaceEvent[note.WorkspaceDeletedEventEvent]
 }
 
-func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) {
-	switch e := event.(type) {
-	case *domain.FolderCreatedEvent,
-		*domain.FolderDeletedEvent,
-		*domain.FolderUpdatedEvent,
-		*domain.FolderMovedEvent,
-		*domain.FolderTrashedEvent,
-		*domain.FolderRestoredEvent,
-		*domain.FolderPermanentlyDeletedEvent,
-		*domain.NoteCreatedEvent,
-		*domain.NoteDeletedEvent,
-		*domain.NoteUpdatedEvent,
-		*domain.NoteMovedEvent,
-		*domain.NoteTrashedEvent,
-		*domain.NoteRestoredEvent,
-		*domain.NotePermanentlyDeletedEvent:
-		return &WorkspaceEventWorkspaceItemsChanged{
-			workspaceEvent: workspaceEvent[note.WorkspaceItemsUpdatedEventEvent]{
-				Id:    e.GetID(),
-				Event: note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent,
-				Data: note.WorkspaceItemsUpdatedEventData{
-					WorkspaceId: (*note.PropertiesId)(new(e.GetAggregateID())),
-				},
-			},
-		}, true
-	case *domain.WorkspaceUpdatedEvent:
-		return &WorkspaceEventWorkspaceUpdated{
-			workspaceEvent: workspaceEvent[note.WorkspaceUpdatedEventEvent]{
-				Id:    e.GetID(),
-				Event: note.WorkspaceUpdatedEventEventWorkspaceUpdatedEvent,
-				Data: note.Workspace{
-					Id:   (*note.PropertiesId)(new(e.GetAggregateID())),
-					Name: e.Name,
-					Slug: e.Slug,
-				},
-			},
-		}, true
-	case *domain.WorkspaceDeletedEvent:
-		return &WorkspaceEventWorkspaceDeleted{
-			workspaceEvent: workspaceEvent[note.WorkspaceDeletedEventEvent]{
-				Id:    e.GetID(),
-				Event: note.WorkspaceDeletedEventEventWorkspaceDeletedEvent,
-				Data: note.WorkspaceDeletedEventData{
-					Id: (*note.PropertiesId)(new(e.GetAggregateID())),
-				},
-			},
-		}, true
-	default:
-		return nil, false
-	}
-}
-
 func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
 	switch t {
 	case string(note.WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent):
@@ -117,7 +71,7 @@ func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
 		return &WorkspaceEventMembersUpdated{}, true
 	case string(note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent):
 		//exhaustruct:ignore
-		return &WorkspaceEventWorkspaceItemsChanged{}, true
+		return &WorkspaceEventWorkspaceItemsUpdated{}, true
 	case string(note.WorkspaceUpdatedEventEventWorkspaceUpdatedEvent):
 		//exhaustruct:ignore
 		return &WorkspaceEventWorkspaceUpdated{}, true

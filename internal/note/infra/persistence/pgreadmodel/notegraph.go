@@ -79,5 +79,5 @@ func (h *GetNoteGraphReadModel) GetNoteGraph(ctx context.Context, q *app.GetNote
 		}
 	}
 
-	return buildGraphRM(notes, links, reachableIDs), nil
+	return buildGraph(notes, links, reachableIDs), nil
 }
