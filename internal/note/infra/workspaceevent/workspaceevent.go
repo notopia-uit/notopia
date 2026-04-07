@@ -1,4 +1,4 @@
-package pubsub
+package workspaceevent
 
 import (
 	"context"
@@ -257,6 +257,7 @@ func (h *WorkspaceEventHub) Close() error {
 		errs = append(errs, fmt.Errorf("publisher close: %w", err))
 	}
 
+	// NOTE: actually we don't need to close the Redis subscriber and the go pubsub because router already closed them
 	if err := h.redisSubscriber.Close(); err != nil {
 		errs = append(errs, fmt.Errorf("subscriber close: %w", err))
 	}

@@ -2,17 +2,16 @@ package integrationpublisher
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/ThreeDotsLabs/watermill"
-	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
-	"github.com/ThreeDotsLabs/watermill/components/cqrs"
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/pkg/api/share"
-	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
-func toIntegrationEvent(event app.IntegrationEvent) (any, bool) {
+func transformIntegrationEvent(event app.IntegrationEvent) (any, bool) {
 	switch e := event.(type) {
 	case app.IntegrationEventNoteCreated:
 		return &share.NoteCreatedEvent{
@@ -46,40 +45,31 @@ func toIntegrationEvent(event app.IntegrationEvent) (any, bool) {
 	return nil, false
 }
 
+func getIntegrationEventTopic(event app.IntegrationEvent) (string, bool) {
+	switch event.(type) {
+	case app.IntegrationEventNoteCreated:
+		return "events.integration.note.note.created", true
+	case app.IntegrationEventNoteDeleted:
+		return "events.integration.note.note.deleted", true
+	case app.IntegrationEventNoteUpdated:
+		return "events.integration.note.note.updated", true
+	}
+	return "", false
+}
+
+type Publisher message.Publisher
+
 type IntegrationPublisher struct {
-	bus *cqrs.EventBus
+	publisher message.Publisher
 }
 
 var _ app.IntegrationPublisher = (*IntegrationPublisher)(nil)
 
 func NewIntegrationPublisher(
-	cfg *commonconfig.Kafka,
-	logger watermill.LoggerAdapter,
-	tracer kafka.SaramaTracer,
-	marshaller *cqrs.JSONMarshaler,
+	publisher Publisher,
 ) (*IntegrationPublisher, error) {
-	publisher, err := kafka.NewPublisher(
-		kafka.PublisherConfig{
-			Brokers: cfg.Brokers,
-			Tracer:  tracer,
-		},
-		logger,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create Kafka publisher: %w", err)
-	}
-	bus, err := cqrs.NewEventBusWithConfig(publisher, cqrs.EventBusConfig{
-		GeneratePublishTopic: func(params cqrs.GenerateEventPublishTopicParams) (string, error) {
-			return "events.integration." + params.EventName, nil
-		},
-		Marshaler: marshaller,
-		Logger:    logger,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to create event bus: %w", err)
-	}
 	return &IntegrationPublisher{
-		bus: bus,
+		publisher: publisher,
 	}, nil
 }
 
@@ -87,11 +77,20 @@ var ProvideIntegrationPublisher = NewIntegrationPublisher
 
 func (p *IntegrationPublisher) Publish(ctx context.Context, events ...app.IntegrationEvent) error {
 	for _, event := range events {
-		integrationEvent, ok := toIntegrationEvent(event)
+		transformedEvent, ok := transformIntegrationEvent(event)
 		if !ok {
-			return fmt.Errorf("unsupported integration event type: %T", event)
+			return fmt.Errorf("cannot convert event to integration event: %T", event)
 		}
-		if err := p.bus.Publish(ctx, integrationEvent); err != nil {
+		topic, ok := getIntegrationEventTopic(event)
+		if !ok {
+			return fmt.Errorf("cannot get topic for integration event: %T", event)
+		}
+		payload, err := json.Marshal(transformedEvent)
+		if err != nil {
+			return fmt.Errorf("failed to marshal integration event: %w", err)
+		}
+		msg := message.NewMessage(watermill.NewUUID(), payload)
+		if err := p.publisher.Publish(topic, msg); err != nil {
 			return fmt.Errorf("failed to publish integration event: %w", err)
 		}
 	}

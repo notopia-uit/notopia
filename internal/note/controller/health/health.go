@@ -11,7 +11,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
-	"github.com/notopia-uit/notopia/internal/note/infra/pubsub"
+	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 )
 
 type Health struct {
@@ -22,7 +22,7 @@ func New(
 	persistence *persistence.Pg,
 	serverCfg *config.Server,
 	workspaceEventHub app.WorkspaceEventHub,
-	redisClient *pubsub.RedisClient,
+	redisClient *workspaceevent.RedisClient,
 ) *Health {
 	startupChecker := health.NewChecker(
 		health.WithCheck(

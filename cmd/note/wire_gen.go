@@ -13,16 +13,17 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/internal/note/config"
+	"github.com/notopia-uit/notopia/internal/note/controller/event"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/health"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
-	"github.com/notopia-uit/notopia/internal/note/controller/integrationevent"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/infra/common"
 	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
-	"github.com/notopia-uit/notopia/internal/note/infra/pubsub"
 	"github.com/notopia-uit/notopia/internal/note/infra/service"
+	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 	"github.com/notopia-uit/notopia/pkg/common/http"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
@@ -119,8 +120,15 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspaceRepo)
 	kafka := &configConfig.Kafka
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	jsonMarshaler := components.NewWatermillJsonMarshaler()
-	integrationPublisher, err := integrationpublisher.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, jsonMarshaler)
+	kafkaPublisher, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	integrationPublisher, err := integrationpublisher.NewIntegrationPublisher(kafkaPublisher)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -184,8 +192,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		ShowTrashHandler:                showTrashHandler,
 	}
 	redis := &configConfig.Redis
-	redisClient, cleanup5 := pubsub.NewRedisClient(ctx, redis, logger)
-	workspaceEventHub, err := pubsub.NewWorkspaceEventHub(loggerAdapter, redisClient)
+	redisClient, cleanup5 := workspaceevent.NewRedisClient(ctx, redis, logger)
+	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(loggerAdapter, redisClient)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -223,7 +231,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	integrationEvent, err := integrationevent.NewIntegrationEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler)
+	jsonMarshaler := components.NewWatermillJsonMarshaler()
+	eventEvent, err := event.NewEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler)
 	if err != nil {
 		cleanup7()
 		cleanup6()
@@ -247,7 +256,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
-	noteServer := note.NewServer(persistencePg, httpHTTP, grpcGRPC, integrationEvent, healthHealth, server, logger, global)
+	noteServer := note.NewServer(persistencePg, httpHTTP, grpcGRPC, eventEvent, workspaceEventHub, healthHealth, logger, global)
 	return noteServer, func() {
 		cleanup8()
 		cleanup7()

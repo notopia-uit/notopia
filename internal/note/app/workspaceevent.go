@@ -21,10 +21,6 @@ type WorkspaceEventHub interface {
 		workspaceID uuid.UUID,
 		userID string,
 	) (<-chan WorkspaceEvent, error)
-
-	Run(ctx context.Context) error
-
-	Close() error
 }
 
 type WorkspaceEvent interface {

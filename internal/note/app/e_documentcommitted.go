@@ -9,9 +9,9 @@ import (
 )
 
 type DocumentCommitted struct {
-	Content         []map[string]interface{}
-	Id              uuid.UUID
-	OutgoingLinkIds []uuid.UUID
+	Content         any
+	ID              uuid.UUID
+	OutgoingLinkIDs []uuid.UUID
 	Tags            []string
 	UserID          string
 }
@@ -34,7 +34,7 @@ func NewDocumentCommittedHandler(
 var ProvideDocumentCommittedHandler = NewDocumentCommittedHandler
 
 func (h *DocumentCommittedHandler) Handle(ctx context.Context, event *DocumentCommitted) error {
-	note, err := h.noteRepo.GetByID(ctx, event.Id, false)
+	note, err := h.noteRepo.GetByID(ctx, event.ID, false)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (h *DocumentCommittedHandler) Handle(ctx context.Context, event *DocumentCo
 		return err
 	}
 	note.SetTags(event.Tags, event.UserID)
-	note.SetOutgoingLinks(event.OutgoingLinkIds, event.UserID)
+	note.SetOutgoingLinks(event.OutgoingLinkIDs, event.UserID)
 	slog.InfoContext(
 		ctx,
 		"Document committed event handled",

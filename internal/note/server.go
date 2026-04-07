@@ -5,24 +5,24 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/controller/event"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/health"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
-	"github.com/notopia-uit/notopia/internal/note/controller/integrationevent"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
 )
 
 type Server struct {
-	persistence      *persistence.Pg
-	http             *http.HTTP
-	grpc             *grpc.GRPC
-	integrationEvent *integrationevent.IntegrationEvent
-	health           *health.Health
-	app              *app.Server
-	logger           *slog.Logger
+	persistence       *persistence.Pg
+	http              *http.HTTP
+	grpc              *grpc.GRPC
+	event             *event.Event
+	workspaceEventHub *workspaceevent.WorkspaceEventHub
+	health            *health.Health
+	logger            *slog.Logger
 }
 
 // TODO: we have to start the workspace event also
@@ -30,22 +30,22 @@ func NewServer(
 	persistence *persistence.Pg,
 	http *http.HTTP,
 	grpc *grpc.GRPC,
-	integrationEvent *integrationevent.IntegrationEvent,
+	event *event.Event,
+	workspaceEventHub *workspaceevent.WorkspaceEventHub,
 	health *health.Health,
-	app *app.Server,
 	logger *slog.Logger,
 	globalOtel otel.Global, // This have to be here for deps
 ) *Server {
 	slog.SetDefault(logger)
 
 	return &Server{
-		persistence:      persistence,
-		http:             http,
-		grpc:             grpc,
-		integrationEvent: integrationEvent,
-		health:           health,
-		app:              app,
-		logger:           logger,
+		persistence:       persistence,
+		http:              http,
+		grpc:              grpc,
+		event:             event,
+		workspaceEventHub: workspaceEventHub,
+		health:            health,
+		logger:            logger,
 	}
 }
 
@@ -94,8 +94,15 @@ func (s *Server) Run(ctx context.Context) error {
 	})
 
 	g.Go(func() error {
-		if err := s.integrationEvent.Run(ctx); err != nil {
+		// This has context passed down, so we don't really to close/stop it
+		if err := s.event.Run(ctx); err != nil {
 			return fmt.Errorf("failed to run integration event listener: %w", err)
+		}
+		return nil
+	})
+	g.Go(func() error {
+		if err := s.workspaceEventHub.Run(ctx); err != nil {
+			return fmt.Errorf("failed to run workspace event hub: %w", err)
 		}
 		return nil
 	})
