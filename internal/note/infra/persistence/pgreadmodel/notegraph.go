@@ -7,19 +7,19 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type GetNoteGraph struct {
+type NoteGraph struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.GetNoteGraphReadModel = (*GetNoteGraph)(nil)
+var _ app.GetNoteGraphReadModel = (*NoteGraph)(nil)
 
-func NewGetNoteGraph(queries *pgsqlc.Queries) *GetNoteGraph {
-	return &GetNoteGraph{queries: queries}
+func NewNoteGraph(queries *pgsqlc.Queries) *NoteGraph {
+	return &NoteGraph{queries: queries}
 }
 
-var ProvideGetNoteGraph = NewGetNoteGraph
+var ProvideNoteGraph = NewNoteGraph
 
-func (h *GetNoteGraph) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app.Graph, error) {
+func (h *NoteGraph) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app.Graph, error) {
 	workspaceID, err := h.queries.GetWorkspaceIDByNoteID(ctx, q.ID)
 	if err != nil {
 		return nil, toErr(err)

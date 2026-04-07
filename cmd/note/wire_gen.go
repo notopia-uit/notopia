@@ -176,26 +176,26 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(pgrepoNote, folder, workspaceEventHub)
+	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(workspaceEventHub)
 	events := &app.Events{
 		DocumentCommittedHandler:    documentCommittedHandler,
 		NotifyWorkspaceItemsUpdated: notifyWorkspaceItemsUpdatedHandler,
 	}
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)
-	getNoteGraph := pgreadmodel.NewGetNoteGraph(queries)
-	getNoteGraphHandler := app.NewGetNoteGraphHandler(getNoteGraph)
-	getNote := pgreadmodel.NewGetNote(queries)
-	getNoteHandler := app.NewGetNoteHandler(authorization, pgrepoNote, getNote)
-	getNoteLinks := pgreadmodel.NewGetNoteLinks(queries)
-	getNoteLinksHandler := app.NewGetNoteLinksHandler(getNoteLinks)
-	getWorkspaceGraph := pgreadmodel.NewGetWorkspaceGraph(queries)
-	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(getWorkspaceGraph)
-	getWorkspaceBySlug := pgreadmodel.NewGetWorkspaceBySlug(queries)
-	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(getWorkspaceBySlug)
+	noteGraph := pgreadmodel.NewNoteGraph(queries)
+	getNoteGraphHandler := app.NewGetNoteGraphHandler(noteGraph)
+	pgreadmodelNote := pgreadmodel.GetNote(queries)
+	getNoteHandler := app.NewGetNoteHandler(authorization, pgrepoNote, pgreadmodelNote)
+	noteLinks := pgreadmodel.GetNoteLinks(queries)
+	getNoteLinksHandler := app.NewGetNoteLinksHandler(noteLinks)
+	workspaceGraph := pgreadmodel.GetWorkspaceGraph(queries)
+	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(workspaceGraph)
+	workspaceBySlug := pgreadmodel.NewWorkspaceBySlug(queries)
+	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(workspaceBySlug)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler()
-	getWorkspaceTree := pgreadmodel.NewGetWorkspaceTree(queries)
-	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(getWorkspaceTree)
+	workspaceTree := pgreadmodel.NewWorkspaceTree(queries)
+	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(workspaceTree)
 	showTrash := pgreadmodel.NewShowTrash(queries)
 	showTrashHandler := app.NewShowTrashHandler(showTrash)
 	appQueries := &app.Queries{
@@ -239,7 +239,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	jsonMarshaler := component.NewWatermillJsonMarshaler()
-	eventEvent, err := event.NewEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler)
+	configDomainEvent := &advanced.DomainEvent
+	eventEvent, err := event.NewEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent)
 	if err != nil {
 		cleanup7()
 		cleanup6()

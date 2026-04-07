@@ -12,6 +12,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/component"
+	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
@@ -34,6 +35,8 @@ type Event struct {
 	eventProcessor *cqrs.EventProcessor
 	router         *message.Router
 	app            *app.Server
+
+	domainEventCfg *config.DomainEvent
 }
 
 func NewEvent(
@@ -42,6 +45,7 @@ func NewEvent(
 	tracer kafka.SaramaTracer,
 	logger watermill.LoggerAdapter,
 	marshaler *cqrs.JSONMarshaler,
+	domainEventCfg *config.DomainEvent,
 ) (*Event, error) {
 	subcriber, err := kafka.NewSubscriber(
 		kafka.SubscriberConfig{
@@ -101,6 +105,7 @@ func NewEvent(
 		eventProcessor: eventProcessor,
 		router:         router,
 		app:            app,
+		domainEventCfg: domainEventCfg,
 	}
 	if err := event.setup(); err != nil {
 		return nil, fmt.Errorf("failed to setup event controller: %w", err)
@@ -117,9 +122,43 @@ func (e *Event) setup() error {
 	)); err != nil {
 		return fmt.Errorf("failed to add event handler: %w", err)
 	}
-	// TODO: because watermill doesn't support kafka regex (IBM/sarama)
+
+	// NOTE: because watermill doesn't support kafka regex (IBM/sarama)
 	// So, we will need to for loop all topic we have, (for note, and folder)
-	// And handle for workspace item updated
+	workspaceItemUpdatedFolderTopics := []string{
+		component.DomainEventTopicPrefix + "folder.created",
+		component.DomainEventTopicPrefix + "folder.deleted",
+		component.DomainEventTopicPrefix + "folder.updated",
+		component.DomainEventTopicPrefix + "folder.moved",
+		component.DomainEventTopicPrefix + "folder.trashed",
+		component.DomainEventTopicPrefix + "folder.restored",
+		component.DomainEventTopicPrefix + "folder.permanently_deleted",
+	}
+	for _, topic := range workspaceItemUpdatedFolderTopics {
+		e.router.AddConsumerHandler(
+			fmt.Sprintf("WorkspaceItemsUpdatedHandler.%s", topic),
+			topic,
+			e.subcriber,
+			e.notifyWorkspaceItemsUpdatedFolderHandler,
+		)
+	}
+	workspaceItemUpdatedNoteTopics := []string{
+		component.DomainEventTopicPrefix + "note.created",
+		component.DomainEventTopicPrefix + "note.deleted",
+		component.DomainEventTopicPrefix + "note.updated",
+		component.DomainEventTopicPrefix + "note.moved",
+		component.DomainEventTopicPrefix + "note.trashed",
+		component.DomainEventTopicPrefix + "note.restored",
+		component.DomainEventTopicPrefix + "note.permanently_deleted",
+	}
+	for _, topic := range workspaceItemUpdatedNoteTopics {
+		e.router.AddConsumerHandler(
+			fmt.Sprintf("WorkspaceItemsUpdatedHandler.%s", topic),
+			topic,
+			e.subcriber,
+			e.notifyWorkspaceItemsUpdatedNoteHandler,
+		)
+	}
 	return nil
 }
 

@@ -12,19 +12,19 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type GetWorkspaceTree struct {
+type WorkspaceTree struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.GetWorkspaceTreeReadModel = (*GetWorkspaceTree)(nil)
+var _ app.GetWorkspaceTreeReadModel = (*WorkspaceTree)(nil)
 
-func NewGetWorkspaceTree(queries *pgsqlc.Queries) *GetWorkspaceTree {
-	return &GetWorkspaceTree{queries: queries}
+func NewWorkspaceTree(queries *pgsqlc.Queries) *WorkspaceTree {
+	return &WorkspaceTree{queries: queries}
 }
 
-var ProvideGetWorkspaceTree = NewGetWorkspaceTree
+var ProvideWorkspaceTree = NewWorkspaceTree
 
-func (h *GetWorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
+func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
 	var rootFolderID uuid.UUID
 
 	if q.RootFolderID != uuid.Nil {
@@ -93,7 +93,7 @@ func (h *GetWorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorks
 	return tree, nil
 }
 
-func (h *GetWorkspaceTree) buildFolderTree(
+func (h *WorkspaceTree) buildFolderTree(
 	folderID uuid.UUID,
 	folderName string,
 	folderIcon *string,

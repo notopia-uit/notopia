@@ -8,15 +8,15 @@ type GetWorkspaceBySlug struct {
 	Slug string
 }
 
-type GetWorkspaceBySlugReadModel interface {
+type WorkspaceBySlugReadModel interface {
 	GetWorkspaceBySlug(ctx context.Context, q *GetWorkspaceBySlug) (*Workspace, error)
 }
 
 type GetWorkspaceHandler struct {
-	readModel GetWorkspaceBySlugReadModel
+	readModel WorkspaceBySlugReadModel
 }
 
-func NewGetWorkspaceBySlugHandler(readModel GetWorkspaceBySlugReadModel) *GetWorkspaceHandler {
+func NewGetWorkspaceBySlugHandler(readModel WorkspaceBySlugReadModel) *GetWorkspaceHandler {
 	return &GetWorkspaceHandler{readModel: readModel}
 }
 

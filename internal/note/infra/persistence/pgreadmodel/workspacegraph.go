@@ -7,19 +7,19 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type GetWorkspaceGraph struct {
+type WorkspaceGraph struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.GetWorkspaceGraphReadModel = (*GetWorkspaceGraph)(nil)
+var _ app.GetWorkspaceGraphReadModel = (*WorkspaceGraph)(nil)
 
-func NewGetWorkspaceGraph(queries *pgsqlc.Queries) *GetWorkspaceGraph {
-	return &GetWorkspaceGraph{queries: queries}
+func GetWorkspaceGraph(queries *pgsqlc.Queries) *WorkspaceGraph {
+	return &WorkspaceGraph{queries: queries}
 }
 
-var ProvideGetWorkspaceGraph = NewGetWorkspaceGraph
+var ProvideWorkspaceGraph = GetWorkspaceGraph
 
-func (h *GetWorkspaceGraph) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, error) {
+func (h *WorkspaceGraph) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, error) {
 	notes, err := h.queries.ReadGetNotesInWorkspace(ctx, pgsqlc.ReadGetNotesInWorkspaceParams{
 		WorkspaceID:  q.ID,
 		ExcludeTrash: true,

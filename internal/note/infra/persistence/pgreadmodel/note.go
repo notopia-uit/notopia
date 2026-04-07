@@ -7,18 +7,18 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type GetNote struct {
+type Note struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.GetNoteReadModel = (*GetNote)(nil)
+var _ app.GetNoteReadModel = (*Note)(nil)
 
-func NewGetNote(queries *pgsqlc.Queries) *GetNote {
-	return &GetNote{queries: queries}
+func GetNote(queries *pgsqlc.Queries) *Note {
+	return &Note{queries: queries}
 }
 
-var ProvideGetNote = NewGetNote
+var ProvideNote = GetNote
 
-func (h *GetNote) GetNote(ctx context.Context, q *app.GetNote) (*app.Note, error) {
+func (h *Note) GetNote(ctx context.Context, q *app.GetNote) (*app.Note, error) {
 	return nil, nil
 }

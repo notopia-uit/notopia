@@ -43,17 +43,6 @@ WHERE
   AND trashed_at IS NULL -- :if @exclude_trash
 ;
 
--- name: ReadGetWorkspaceIDByNoteID :one
-SELECT
-  f.workspace_id
-FROM
-  notes AS n
-INNER JOIN
-  folders f
-  ON n.folder_id = f.id
-WHERE
-  n.id = sqlc.arg('id');
-
 -- name: ReadGetNotesInWorkspace :many
 SELECT
   n.*

@@ -298,24 +298,3 @@ func (q *Queries) ReadGetTrashedNotesByWorkspaceID(ctx context.Context, workspac
 	}
 	return items, nil
 }
-
-const readGetWorkspaceIDByNoteID = `-- name: ReadGetWorkspaceIDByNoteID :one
-SELECT
-  f.workspace_id
-FROM
-  notes AS n
-INNER JOIN
-  folders f
-  ON n.folder_id = f.id
-WHERE
-  n.id = $1
-`
-
-func (q *Queries) ReadGetWorkspaceIDByNoteID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
-	ctx, span := otel.Tracer("Queries").Start(ctx, "ReadGetWorkspaceIDByNoteID")
-	defer span.End()
-	row := q.db.QueryRow(ctx, readGetWorkspaceIDByNoteID, id)
-	var workspace_id uuid.UUID
-	err := row.Scan(&workspace_id)
-	return workspace_id, err
-}
