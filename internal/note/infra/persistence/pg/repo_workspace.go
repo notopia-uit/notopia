@@ -59,9 +59,8 @@ func (w *WorkspaceRepo) GetBySlug(ctx context.Context, slug string, forUpdate bo
 	folders, err := w.queries.GetFolders(ctx,
 		//exhaustruct:ignore
 		&pgsqlc.GetFoldersParams{
-			WorkspaceID:  &workspace.ID,
-			IsRootFolder: true,
-			ForUpdate:    forUpdate,
+			WorkspaceID: &workspace.ID,
+			ForUpdate:   forUpdate,
 		})
 	if err != nil {
 		return nil, toErr(err)
@@ -75,11 +74,13 @@ func (w *WorkspaceRepo) GetBySlug(ctx context.Context, slug string, forUpdate bo
 }
 
 func (w *WorkspaceRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Workspace, error) {
-	workspace, err := w.queries.GetWorkspace(ctx, &pgsqlc.GetWorkspaceParams{
-		Slug:      nil,
-		ID:        &id,
-		ForUpdate: forUpdate,
-	})
+	workspace, err := w.queries.GetWorkspace(ctx,
+		//exhaustruct:ignore
+		&pgsqlc.GetWorkspaceParams{
+			ID:        &id,
+			ForUpdate: forUpdate,
+		},
+	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewWorkspaceNotFound(id, err)
@@ -90,9 +91,8 @@ func (w *WorkspaceRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate boo
 	folders, err := w.queries.GetFolders(ctx,
 		//exhaustruct:ignore
 		&pgsqlc.GetFoldersParams{
-			WorkspaceID:  &workspace.ID,
-			IsRootFolder: true,
-			ForUpdate:    forUpdate,
+			WorkspaceID: &workspace.ID,
+			ForUpdate:   forUpdate,
 		})
 	if err != nil {
 		return nil, toErr(err)

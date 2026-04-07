@@ -27,13 +27,12 @@ func (h *ShowTrashReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*
 		return nil, toErr(err)
 	}
 
-	trashedByPurpose := string(app.TrashedByPurpose)
 	trashedFolders, err := h.queries.GetFolders(ctx,
 		//exhaustruct:ignore
 		&pgsqlc.GetFoldersParams{
-			WorkspaceID:    &q.WorkspaceID,
-			TrashedBy:      &trashedByPurpose,
-			IncludeTrashed: true,
+			WorkspaceID: &q.WorkspaceID,
+			TrashedBy:   new(string(pgsqlc.TrashedByPurpose)),
+			OnlyTrashed: true,
 		})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
@@ -41,10 +40,14 @@ func (h *ShowTrashReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*
 
 	notes := make([]*app.TrashedNote, len(trashedNotes))
 	for i, note := range trashedNotes {
+		var icon string
+		if note.Icon != nil {
+			icon = *note.Icon
+		}
 		notes[i] = &app.TrashedNote{
 			ID:   note.ID,
 			Name: note.Name,
-			Icon: note.Icon,
+			Icon: icon,
 			Trashed: app.Trashed{
 				TrashedBy: app.TrashedByPurpose,
 				TrashedAt: *note.TrashedAt,
@@ -54,10 +57,14 @@ func (h *ShowTrashReadModel) ShowTrash(ctx context.Context, q *app.ShowTrash) (*
 
 	folders := make([]*app.TrashedFolder, len(trashedFolders))
 	for i, folder := range trashedFolders {
+		var icon string
+		if folder.Icon != nil {
+			icon = *folder.Icon
+		}
 		folders[i] = &app.TrashedFolder{
 			ID:   folder.ID,
 			Name: folder.Name,
-			Icon: folder.Icon,
+			Icon: icon,
 			Trashed: app.Trashed{
 				TrashedBy: app.TrashedByPurpose,
 				TrashedAt: *folder.TrashedAt,

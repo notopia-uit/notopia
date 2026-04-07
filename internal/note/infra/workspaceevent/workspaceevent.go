@@ -87,17 +87,15 @@ func NewWorkspaceEventHub(
 var ProvideWorkspaceEventHub = NewWorkspaceEventHub
 
 func (h *WorkspaceEventHub) setupRouting() {
-	h.router.AddHandler(
+	h.router.AddConsumerHandler(
 		"workspace-router",
 		h.topic,
 		h.redisSubscriber,
-		"",
-		h.internalPubSub,
-		func(msg *message.Message) ([]*message.Message, error) {
+		func(msg *message.Message) error {
 			workspaceID := msg.Metadata.Get(h.MetadataWorkspaceIDKey)
 			if workspaceID == "" {
 				slog.ErrorContext(msg.Context(), "missing workspace ID in message metadata")
-				return []*message.Message{}, nil
+				return nil
 			}
 
 			internalTopic := fmt.Sprintf("workspace:%s", workspaceID)
@@ -105,7 +103,7 @@ func (h *WorkspaceEventHub) setupRouting() {
 				slog.ErrorContext(msg.Context(), "failed to publish to internal topic", slog.Any("error", err))
 			}
 
-			return []*message.Message{}, nil
+			return nil
 		},
 	)
 }

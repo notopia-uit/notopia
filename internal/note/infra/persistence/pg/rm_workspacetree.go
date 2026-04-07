@@ -27,8 +27,8 @@ var ProvideGetWorkspaceTreeReadModel = NewGetWorkspaceTreeReadModel
 func (h *GetWorkspaceTreeReadModel) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
 	var rootFolderID uuid.UUID
 
-	if q.RootFolderID != nil {
-		rootFolderID = *q.RootFolderID
+	if q.RootFolderID != uuid.Nil {
+		rootFolderID = q.RootFolderID
 	} else {
 		rootFolderIDs, err := h.queries.GetRootFolderIDsByWorkspaceID(ctx, q.WorkspaceID)
 		if err != nil {
@@ -53,8 +53,8 @@ func (h *GetWorkspaceTreeReadModel) GetWorkspaceTree(ctx context.Context, q *app
 	}
 
 	var depth *int32
-	if q.Depth != nil {
-		depth = new(int32(*q.Depth))
+	if q.Depth != 0 {
+		depth = new(int32(q.Depth))
 	}
 	recursiveFolders, err := h.queries.GetRecursiveFolderByParentID(ctx, &pgsqlc.GetRecursiveFolderByParentIDParams{
 		ParentID:       rootFolderID,
@@ -75,9 +75,9 @@ func (h *GetWorkspaceTreeReadModel) GetWorkspaceTree(ctx context.Context, q *app
 
 	allNotes, err := h.queries.GetNotesByFolderIDs(ctx,
 		//exhaustruct:ignore
-		pgsqlc.GetNotesByFolderIDsParams{
+		&pgsqlc.GetNotesByFolderIDsParams{
 			FolderIds:      folderIDs,
-			IncludeTrashed: q.IncludeTrashed,
+			OnlyNonTrashed: !q.IncludeTrashed,
 		})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, toErr(err)
@@ -107,10 +107,14 @@ func (h *GetWorkspaceTreeReadModel) buildFolderTree(
 	folderMap map[uuid.UUID]*pgsqlc.GetRecursiveFolderByParentIDRow,
 	notesByFolder map[uuid.UUID][]*pgsqlc.Note,
 ) *app.WorkspaceTreeFolder {
+	var icon string
+	if folderIcon != nil {
+		icon = *folderIcon
+	}
 	result := app.WorkspaceTreeFolder{
 		ID:        folderID,
 		Name:      folderName,
-		Icon:      folderIcon,
+		Icon:      icon,
 		UpdatedAt: updatedAt,
 		Notes:     []*app.WorkspaceTreeNote{},
 		Children:  []*app.WorkspaceTreeFolder{},
@@ -118,10 +122,14 @@ func (h *GetWorkspaceTreeReadModel) buildFolderTree(
 
 	if notes, ok := notesByFolder[folderID]; ok {
 		for _, note := range notes {
+			var noteIcon string
+			if note.Icon != nil {
+				noteIcon = *note.Icon
+			}
 			result.Notes = append(result.Notes, &app.WorkspaceTreeNote{
 				ID:        note.ID,
 				Name:      note.Name,
-				Icon:      note.Icon,
+				Icon:      noteIcon,
 				UpdatedAt: note.UpdatedAt,
 			})
 		}

@@ -69,23 +69,23 @@ func (f *FolderRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) 
 
 func (f *FolderRepo) GetMany(ctx context.Context, params *domain.FolderRepoGetManyParams) ([]*domain.Folder, error) {
 	var ids *[]uuid.UUID
-	if len(params.IDs()) > 0 {
-		paramIDs := params.IDs()
-		ids = &paramIDs
+	if len(params.IDs) > 0 {
+		ids = &params.IDs
 	}
 
 	var workspaceID *uuid.UUID
-	if params.WorkspaceID() != nil {
-		workspaceID = params.WorkspaceID()
+	if params.WorkspaceID != uuid.Nil {
+		workspaceID = &params.WorkspaceID
 	}
 
 	var trashedBy *string
-	if params.TrashedBy() != nil {
-		trashedByStr := params.TrashedBy().String()
-		trashedBy = &trashedByStr
+	if params.TrashedBy != domain.TrashedByUnspecified {
+		var ok bool
+		trashedBy, ok = fromDomainTrashedBy(params.TrashedBy)
+		if !ok {
+			return nil, fmt.Errorf("invalid trashed by value: %v", params.TrashedBy)
+		}
 	}
-
-	includeTrashed := params.IsTrashed()
 
 	folders, err := f.queries.GetFolders(ctx,
 		//exhaustruct:ignore
@@ -93,8 +93,9 @@ func (f *FolderRepo) GetMany(ctx context.Context, params *domain.FolderRepoGetMa
 			IDs:            ids,
 			WorkspaceID:    workspaceID,
 			TrashedBy:      trashedBy,
-			IncludeTrashed: !includeTrashed,
-			ForUpdate:      params.ForUpdate(),
+			OnlyNonTrashed: params.NotTrashedOnly,
+			OnlyTrashed:    params.TrashOnly,
+			ForUpdate:      params.ForUpdate,
 		})
 	if err != nil {
 		return nil, toErr(err)
@@ -108,19 +109,27 @@ func (f *FolderRepo) GetMany(ctx context.Context, params *domain.FolderRepoGetMa
 }
 
 func folderToDomainRepo(folder *pgsqlc.Folder) *domain.Folder {
+	var icon string
+	if folder.Icon != nil {
+		icon = *folder.Icon
+	}
 	var trashed *domain.Trashed
 	if folder.TrashedBy != nil && folder.TrashedAt != nil {
 		trashed = domain.NewTrashed(
-			domain.TrashedBy(*folder.TrashedBy),
+			toDomainTrashedBy(*folder.TrashedBy),
 			*folder.TrashedAt,
 		)
+	}
+	var parentID uuid.UUID
+	if folder.ParentID != nil {
+		parentID = *folder.ParentID
 	}
 	return domain.UnmarshalFolder(
 		folder.ID,
 		folder.Name,
-		folder.Icon,
+		icon,
 		folder.WorkspaceID,
-		*domain.NewFolderHierarchy(folder.ParentID),
+		domain.NewFolderHierarchy(parentID),
 		trashed,
 		false,
 	)
@@ -133,16 +142,30 @@ func (f *FolderRepo) Save(ctx context.Context, folder *domain.Folder) (cerr erro
 		publisher:     f.publisher,
 		inTransaction: f.inTransaction,
 	}, func(params *RunInTxFnparams) error {
+		var icon *string
+		if folder.Icon() != "" {
+			icon = new(folder.Icon())
+		}
+		var parentID *uuid.UUID
+		if folder.ParentID() != uuid.Nil {
+			parentID = new(folder.ParentID())
+		}
+		var trashedBy *string
+		var trashedAt *time.Time
+		if folder.IsTrashed() {
+			trashedBy = new(folder.TrashedBy().String())
+			trashedAt = new(folder.TrashedAt())
+		}
 		if err := params.queries.SaveFolder(ctx, &pgsqlc.SaveFolderParams{
 			ID:          folder.ID(),
 			Name:        folder.Name(),
-			Icon:        folder.Icon(),
+			Icon:        icon,
 			WorkspaceID: folder.WorkspaceID(),
-			ParentID:    folder.ParentID(),
+			ParentID:    parentID,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
-			TrashedBy:   folder.TrashedByString(),
-			TrashedAt:   folder.TrashedAt(),
+			TrashedBy:   trashedBy,
+			TrashedAt:   trashedAt,
 		}); err != nil {
 			return toErr(err)
 		}
@@ -174,16 +197,30 @@ func (f *FolderRepo) SaveMany(ctx context.Context, folders []*domain.Folder) (ce
 		}
 		saveFolderParams := make([]*pgsqlc.InsertTempFoldersParams, len(folders))
 		for i, folder := range folders {
+			var icon *string
+			if folder.Icon() != "" {
+				icon = new(folder.Icon())
+			}
+			var parentID *uuid.UUID
+			if folder.ParentID() != uuid.Nil {
+				parentID = new(folder.ParentID())
+			}
+			var trashedBy *string
+			var trashedAt *time.Time
+			if folder.IsTrashed() {
+				trashedBy = new(folder.TrashedBy().String())
+				trashedAt = new(folder.TrashedAt())
+			}
 			saveFolderParams[i] = &pgsqlc.InsertTempFoldersParams{
 				ID:          folder.ID(),
 				Name:        folder.Name(),
-				Icon:        folder.Icon(),
+				Icon:        icon,
 				WorkspaceID: folder.WorkspaceID(),
-				ParentID:    folder.ParentID(),
+				ParentID:    parentID,
 				CreatedAt:   time.Now(),
 				UpdatedAt:   time.Now(),
-				TrashedBy:   folder.TrashedByString(),
-				TrashedAt:   folder.TrashedAt(),
+				TrashedBy:   trashedBy,
+				TrashedAt:   trashedAt,
 			}
 		}
 		affected, err := params.queries.InsertTempFolders(ctx, saveFolderParams)
@@ -223,20 +260,6 @@ func (f *FolderRepo) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, wor
 		return false, fmt.Errorf("failed to check if folders are in workspace: %w", toErr(err))
 	}
 	return count == int64(len(ids)), nil
-}
-
-func (f *FolderRepo) PermanentlyDeleteByID(ctx context.Context, id uuid.UUID) error {
-	if err := f.queries.PermanentlyDeleteFolderByID(ctx, id); err != nil {
-		return fmt.Errorf("failed to permanently delete folder: %w", toErr(err))
-	}
-	return nil
-}
-
-func (f *FolderRepo) PermanentlyDeleteByIDs(ctx context.Context, ids uuid.UUIDs) error {
-	if err := f.queries.PermanentlyDeleteFoldersByIDs(ctx, ids); err != nil {
-		return fmt.Errorf("failed to permanently delete folders: %w", toErr(err))
-	}
-	return nil
 }
 
 func (f *FolderRepo) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {

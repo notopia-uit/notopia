@@ -124,6 +124,7 @@ type WorkspaceTreeFolder struct {
 	UpdatedAt time.Time
 }
 
+// if we have time, change to uint8 iota
 type TrashedBy string
 
 const (

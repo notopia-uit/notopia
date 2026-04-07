@@ -304,14 +304,19 @@ func (h *StrictHandler) GetWorkspaceTree(
 	ctx context.Context,
 	request note.GetWorkspaceTreeRequestObject,
 ) (note.GetWorkspaceTreeResponseObject, error) {
-	var depth *uint
+	var depth uint
 	if request.Params.Depth != nil && *request.Params.Depth > 0 {
-		depth = new(uint(*request.Params.Depth))
+		depth = uint(*request.Params.Depth)
+	}
+
+	var rootFolderID uuid.UUID
+	if request.Params.RootFolderId != nil {
+		rootFolderID = *request.Params.RootFolderId
 	}
 
 	query := &app.GetWorkspaceTree{
 		WorkspaceID:    request.WorkspaceId,
-		RootFolderID:   request.Params.RootFolderId,
+		RootFolderID:   rootFolderID,
 		IncludeTrashed: request.Params.IncludeTrashed != nil && *request.Params.IncludeTrashed,
 		Depth:          depth,
 	}

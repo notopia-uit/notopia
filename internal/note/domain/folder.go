@@ -10,7 +10,7 @@ import (
 type Folder struct {
 	id              uuid.UUID
 	name            string
-	icon            *string
+	icon            string
 	workspaceID     uuid.UUID
 	folderHierarchy FolderHierarchy
 	trashed         *Trashed
@@ -22,7 +22,7 @@ type Folder struct {
 func NewFolder(
 	id uuid.UUID,
 	name string,
-	icon *string,
+	icon string,
 	workspaceID uuid.UUID,
 	folderHierarchy FolderHierarchy,
 	userID string,
@@ -43,7 +43,7 @@ func NewFolder(
 	}
 	folder.addEvent(
 		&FolderCreatedEvent{
-			BaseEvent: *NewBaseEvent(folder.id, userID),
+			BaseEvent: NewBaseEvent(folder.id, userID),
 			Name:      folder.name,
 			Icon:      folder.icon,
 		},
@@ -54,7 +54,7 @@ func NewFolder(
 func UnmarshalFolder(
 	id uuid.UUID,
 	name string,
-	icon *string,
+	icon string,
 	workspaceID uuid.UUID,
 	folderHierarchy FolderHierarchy,
 	trashed *Trashed,
@@ -84,20 +84,20 @@ func (f *Folder) Name() string {
 func (f *Folder) Rename(name string, userID string) {
 	f.name = name
 	f.addEvent(&FolderUpdatedEvent{
-		BaseEvent: *NewBaseEvent(f.id, userID),
+		BaseEvent: NewBaseEvent(f.id, userID),
 		Name:      f.name,
 		Icon:      f.icon,
 	})
 }
 
-func (f *Folder) Icon() *string {
+func (f *Folder) Icon() string {
 	return f.icon
 }
 
 func (f *Folder) SetIcon(icon string, userID string) {
-	f.icon = &icon
+	f.icon = icon
 	f.addEvent(&FolderUpdatedEvent{
-		BaseEvent: *NewBaseEvent(f.id, userID),
+		BaseEvent: NewBaseEvent(f.id, userID),
 		Name:      f.name,
 		Icon:      f.icon,
 	})
@@ -111,7 +111,7 @@ func (f *Folder) FolderHierarchy() FolderHierarchy {
 	return f.folderHierarchy
 }
 
-func (f *Folder) ParentID() *uuid.UUID {
+func (f *Folder) ParentID() uuid.UUID {
 	return f.folderHierarchy.ParentID()
 }
 
@@ -120,11 +120,10 @@ func (f *Folder) IsRoot() bool {
 }
 
 func (f *Folder) MoveToFolder(folderID uuid.UUID, userID string) {
-	hierarchy := NewFolderHierarchy(&folderID)
-	f.folderHierarchy = *hierarchy
+	f.folderHierarchy = NewFolderHierarchy(folderID)
 	f.addEvent(
 		&FolderMovedEvent{
-			BaseEvent: *NewBaseEvent(f.id, userID),
+			BaseEvent: NewBaseEvent(f.id, userID),
 			ParentID:  folderID,
 		},
 	)
@@ -134,25 +133,12 @@ func (f *Folder) IsTrashed() bool {
 	return f.trashed != nil
 }
 
-func (f *Folder) TrashedBy() *TrashedBy {
-	if f.trashed == nil {
-		return nil
-	}
-	return &f.trashed.by
+func (f *Folder) TrashedBy() TrashedBy {
+	return f.trashed.By()
 }
 
-func (f *Folder) TrashedByString() *string {
-	if f.trashed == nil {
-		return nil
-	}
-	return new(f.trashed.by.String())
-}
-
-func (f *Folder) TrashedAt() *time.Time {
-	if f.trashed == nil {
-		return nil
-	}
-	return &f.trashed.at
+func (f *Folder) TrashedAt() time.Time {
+	return f.trashed.At()
 }
 
 func (f *Folder) Trash(trashedBy TrashedBy, userID string) error {
@@ -161,7 +147,7 @@ func (f *Folder) Trash(trashedBy TrashedBy, userID string) error {
 	}
 	f.trashed = NewTrashed(trashedBy, time.Now())
 	f.addEvent(&FolderTrashedEvent{
-		BaseEvent: *NewBaseEvent(f.id, userID),
+		BaseEvent: NewBaseEvent(f.id, userID),
 	})
 	return nil
 }
@@ -169,7 +155,7 @@ func (f *Folder) Trash(trashedBy TrashedBy, userID string) error {
 func (f *Folder) Restore(userID string) {
 	f.trashed = nil
 	f.addEvent(&FolderRestoredEvent{
-		BaseEvent: *NewBaseEvent(f.id, userID),
+		BaseEvent: NewBaseEvent(f.id, userID),
 	})
 }
 
@@ -180,7 +166,7 @@ func (f *Folder) Deleted() bool {
 func (f *Folder) PermanentlyDelete(userID string) {
 	f.deleted = true
 	f.addEvent(&FolderPermanentlyDeletedEvent{
-		BaseEvent: *NewBaseEvent(f.id, userID),
+		BaseEvent: NewBaseEvent(f.id, userID),
 	})
 }
 
@@ -195,19 +181,19 @@ func (f *Folder) PopEvents() []Event {
 }
 
 type FolderHierarchy struct {
-	parentID *uuid.UUID
+	parentID uuid.UUID
 }
 
-func NewFolderHierarchy(parentID *uuid.UUID) *FolderHierarchy {
-	return &FolderHierarchy{
+func NewFolderHierarchy(parentID uuid.UUID) FolderHierarchy {
+	return FolderHierarchy{
 		parentID: parentID,
 	}
 }
 
-func (fh *FolderHierarchy) ParentID() *uuid.UUID {
+func (fh *FolderHierarchy) ParentID() uuid.UUID {
 	return fh.parentID
 }
 
 func (fh *FolderHierarchy) IsRoot() bool {
-	return fh.parentID == nil
+	return fh.parentID == uuid.Nil
 }

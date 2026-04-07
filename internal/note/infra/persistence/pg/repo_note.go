@@ -73,38 +73,37 @@ func (n *NoteRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*
 
 func (n *NoteRepo) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams) ([]*domain.Note, error) {
 	var ids *[]uuid.UUID
-	if len(params.IDs()) > 0 {
-		paramIDs := params.IDs()
-		ids = &paramIDs
+	if len(params.IDs) > 0 {
+		ids = &params.IDs
 	}
 
 	var workspaceID *uuid.UUID
-	if params.WorkspaceID() != nil {
-		workspaceID = params.WorkspaceID()
+	if params.WorkspaceID != uuid.Nil {
+		workspaceID = &params.WorkspaceID
 	}
 
 	var trashedBy *string
-	if params.TrashedBy() != nil {
-		trashedByStr := params.TrashedBy().String()
-		trashedBy = &trashedByStr
-	}
-
-	isNotTrashed := true // Default: filter for non-trashed notes
-	if params.IsTrashed() != nil {
-		isNotTrashed = !*params.IsTrashed() // If IsTrashed=true, then IsNotTrashed=false
+	if params.TrashedBy != domain.TrashedByUnspecified {
+		var ok bool
+		trashedBy, ok = fromDomainTrashedBy(params.TrashedBy)
+		if !ok {
+			return nil, fmt.Errorf("invalid trashed by value: %v", params.TrashedBy)
+		}
 	}
 
 	notes, err := n.queries.GetNotesByParams(ctx, &pgsqlc.GetNotesByParamsParams{
-		IDs:          ids,
-		WorkspaceID:  workspaceID,
-		TrashedBy:    trashedBy,
-		IsNotTrashed: isNotTrashed,
-		ForUpdate:    params.ForUpdate(),
+		IDs:            ids,
+		WorkspaceID:    workspaceID,
+		TrashedBy:      trashedBy,
+		OnlyNonTrashed: params.NotTrashedOnly,
+		OnlyTrashed:    params.TrashOnly,
+		ForUpdate:      params.ForUpdate,
 	})
 	if err != nil {
 		return nil, toErr(err)
 	}
 
+	// FIXME: Hey, this is N+1 query
 	// Query links per note (type-safe approach)
 	result := make([]*domain.Note, len(notes))
 	for i, note := range notes {
@@ -122,22 +121,22 @@ func (n *NoteRepo) GetMany(ctx context.Context, params *domain.NoteRepoGetManyPa
 }
 
 func noteToDomainRepo(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
+	var icon string
+	if note.Icon != nil {
+		icon = *note.Icon
+	}
 	var trashed *domain.Trashed
 	if note.TrashedBy != nil && note.TrashedAt != nil {
 		trashed = domain.NewTrashed(
-			domain.TrashedBy(*note.TrashedBy),
+			toDomainTrashedBy(*note.TrashedBy),
 			*note.TrashedAt,
 		)
-	}
-	var tags []string
-	if note.Tags != nil {
-		tags = note.Tags
 	}
 	return domain.UnmarshalNote(
 		note.ID,
 		note.Name,
-		note.Icon,
-		tags,
+		icon,
+		note.Tags,
 		uint64(note.Size),
 		note.FolderID,
 		links,
@@ -160,17 +159,29 @@ func (n *NoteRepo) Save(ctx context.Context, note *domain.Note) error {
 				return toErr(err)
 			}
 		} else {
+			var icon *string
+			if note.Icon() != "" {
+				icon = new(note.Icon())
+			}
+			var trashedBy *string
+			var trashedAt *time.Time
+			if note.IsTrashed() {
+				by := note.TrashedBy().String()
+				trashedBy = &by
+				t := note.TrashedAt()
+				trashedAt = &t
+			}
 			err := queries.SaveNote(ctx, &pgsqlc.SaveNoteParams{
 				ID:        note.ID(),
 				Name:      note.Name(),
-				Icon:      note.Icon(),
+				Icon:      icon,
 				FolderID:  note.FolderID(),
 				Tags:      note.Tags(),
 				Size:      int32(note.Size()),
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),
-				TrashedBy: note.TrashedByString(),
-				TrashedAt: note.TrashedAt(),
+				TrashedBy: trashedBy,
+				TrashedAt: trashedAt,
 			})
 			if err != nil {
 				return toErr(err)
@@ -259,17 +270,27 @@ func (n *NoteRepo) SaveMany(ctx context.Context, notes []*domain.Note) error {
 
 			saveNoteParams := make([]*pgsqlc.InsertTempNotesParams, len(upsertNotes))
 			for i, note := range upsertNotes {
+				var icon *string
+				if note.Icon() != "" {
+					icon = new(note.Icon())
+				}
+				var trashedBy *string
+				var trashedAt *time.Time
+				if note.IsTrashed() {
+					trashedBy = new(note.TrashedBy().String())
+					trashedAt = new(note.TrashedAt())
+				}
 				saveNoteParams[i] = &pgsqlc.InsertTempNotesParams{
 					ID:        note.ID(),
 					Name:      note.Name(),
-					Icon:      note.Icon(),
+					Icon:      icon,
 					FolderID:  note.FolderID(),
 					Tags:      note.Tags(),
 					Size:      int32(note.Size()),
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
-					TrashedBy: note.TrashedByString(),
-					TrashedAt: note.TrashedAt(),
+					TrashedBy: trashedBy,
+					TrashedAt: trashedAt,
 				}
 			}
 

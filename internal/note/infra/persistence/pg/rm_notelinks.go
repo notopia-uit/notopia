@@ -23,10 +23,12 @@ func NewGetNoteLinksReadModel(queries *pgsqlc.Queries) *GetNoteLinksReadModel {
 var ProvideGetNoteLinksReadModel = NewGetNoteLinksReadModel
 
 func (h *GetNoteLinksReadModel) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (*app.NoteLinkResult, error) {
-	_, err := h.queries.GetNoteByID(ctx, pgsqlc.GetNoteByIDParams{
-		ID:        q.ID,
-		ForUpdate: false,
-	})
+	_, err := h.queries.GetNoteByID(ctx,
+		//exhaustruct:ignore
+		pgsqlc.GetNoteByIDParams{
+			ID: q.ID,
+		},
+	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errs.NewNoteNotFound(q.ID, err)
@@ -40,10 +42,12 @@ func (h *GetNoteLinksReadModel) GetNoteLinks(ctx context.Context, q *app.GetNote
 	}
 
 	if q.OutgoingLinks {
-		outgoingLinks, err := h.queries.GetNoteOutgoingLinks(ctx, &pgsqlc.GetNoteOutgoingLinksParams{
-			SourceID:  &q.ID,
-			SourceIDs: nil,
-		})
+		outgoingLinks, err := h.queries.GetNoteOutgoingLinks(ctx,
+			//exhaustruct:ignore
+			&pgsqlc.GetNoteOutgoingLinksParams{
+				SourceID: &q.ID,
+			},
+		)
 		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 			return nil, toErr(err)
 		}
@@ -53,15 +57,20 @@ func (h *GetNoteLinksReadModel) GetNoteLinks(ctx context.Context, q *app.GetNote
 				//exhaustruct:ignore
 				&pgsqlc.GetNotesByParamsParams{
 					IDs: &outgoingLinks,
-				})
+				},
+			)
 			if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 				return nil, toErr(err)
 			}
 			for _, linkedNote := range outgoingNotes {
+				var icon string
+				if linkedNote.Icon != nil {
+					icon = *linkedNote.Icon
+				}
 				result.OutgoingLinks = append(result.OutgoingLinks, &app.NoteLink{
 					ID:   linkedNote.ID,
 					Name: linkedNote.Name,
-					Icon: linkedNote.Icon,
+					Icon: icon,
 				})
 			}
 		}
@@ -83,10 +92,14 @@ func (h *GetNoteLinksReadModel) GetNoteLinks(ctx context.Context, q *app.GetNote
 				return nil, toErr(err)
 			}
 			for _, linkedNote := range backlinkNotes {
+				var icon string
+				if linkedNote.Icon != nil {
+					icon = *linkedNote.Icon
+				}
 				result.Backlinks = append(result.Backlinks, &app.NoteLink{
 					ID:   linkedNote.ID,
 					Name: linkedNote.Name,
-					Icon: linkedNote.Icon,
+					Icon: icon,
 				})
 			}
 		}

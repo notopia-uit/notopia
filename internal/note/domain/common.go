@@ -2,7 +2,7 @@ package domain
 
 import "time"
 
-type TrashedBy uint
+type TrashedBy uint8
 
 const (
 	TrashedByUnspecified TrashedBy = iota
