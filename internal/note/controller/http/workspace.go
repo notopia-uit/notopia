@@ -27,10 +27,10 @@ func (h *StrictHandler) CreateWorkspace(
 		return nil, errs.NewInternalGenerateID(err)
 	}
 	cmd := &app.CreateWorkspace{
-		ID:     id,
-		Name:   request.Body.Name,
-		Slug:   request.Body.Slug,
-		UserID: user.ID,
+		ID:      id,
+		Name:    request.Body.Name,
+		Slug:    request.Body.Slug,
+		OwnerID: user.ID,
 	}
 	err = h.App.Cmds.CreateWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
@@ -273,7 +273,10 @@ func (h *StrictHandler) ShowTrash(
 		return nil, err
 	}
 
-	dto := toShowTrash(result)
+	dto, err := toShowTrash(result)
+	if err != nil {
+		return nil, err
+	}
 	return note.ShowTrash200JSONResponse(dto), nil
 }
 

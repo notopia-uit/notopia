@@ -7,6 +7,9 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/domain"
 )
 
+// TODO: This should carefully recheck
+// Transaction?
+
 type RestoreTrashedWorkspaceItems struct {
 	WorkspaceID uuid.UUID
 	UserID      string

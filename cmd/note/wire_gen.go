@@ -95,21 +95,23 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	queries := persistence.NewSQLCQueries(pool)
-	folder := pgrepo.NewNoTransactionFolder(pool, queries)
-	createFolderHandler := app.NewCreateFolderHandler(authorization, folder)
-	pgrepoNote := pgrepo.NewNoTransactionNote(pool, queries)
-	createNoteHandler := app.NewCreateNoteHandler(authorization, pgrepoNote, folder)
-	workspace := pgrepo.NewNoTransactionWorkspace(pool, queries)
 	advanced := &configConfig.Advanced
 	domainEvent := advanced.DomainEvent
 	loggerAdapter := component.NewWatermillLogger(logger)
-	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter)
-	unitOfWork := pgrepo.NewUnitOfWork(pool, fromPersistenceToQSLForwarder)
-	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspace, folder, unitOfWork)
+	configDomainEvent := &advanced.DomainEvent
+	defaultPostgreSQLSchema := outbox.NewSchemaAdapter(configDomainEvent)
+	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema)
+	runInTx := pgrepo.NewRunInTx(fromPersistenceToQSLForwarder)
+	folder := pgrepo.NewNoTransactionFolder(pool, queries, runInTx)
+	createFolderHandler := app.NewCreateFolderHandler(authorization, folder)
+	pgrepoNote := pgrepo.NewNoTransactionNote(pool, queries, runInTx)
+	createNoteHandler := app.NewCreateNoteHandler(authorization, pgrepoNote, folder)
+	workspace := pgrepo.NewNoTransactionWorkspace(pool, queries, runInTx)
+	unitOfWork := pgrepo.NewUnitOfWork(pool, fromPersistenceToQSLForwarder, runInTx)
+	createWorkspaceHandler := app.NewCreateWorkspaceHandler(workspace, folder, unitOfWork, authorization)
 	permanentlyDeleteFolderHandler := app.PermanentlyNewDeleteFolderHandler(authorization, folder, unitOfWork)
 	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, pgrepoNote, unitOfWork)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, workspace)
-	generateDailyNoteHandler := app.NewGenerateDailyNoteHandler(pgrepoNote, folder, workspace)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, pgrepoNote, folder, unitOfWork)
 	permanentlyDeleteWorkspaceItemsHandler := app.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, unitOfWork)
 	publishNoteHandler := app.NewPublishNoteHandler(pgrepoNote)
@@ -148,7 +150,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		DeleteFolderHandler:                    permanentlyDeleteFolderHandler,
 		DeleteNoteHandler:                      permanentlyDeleteNoteHandler,
 		DeleteWorkspaceHandler:                 deleteWorkspaceHandler,
-		GenerateDailyNoteHandler:               generateDailyNoteHandler,
 		MoveWorkspaceItemsHandler:              moveWorkspaceItemsHandler,
 		PermanentlyDeleteWorkspaceItemsHandler: permanentlyDeleteWorkspaceItemsHandler,
 		PublishNoteHandler:                     publishNoteHandler,
@@ -239,7 +240,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	jsonMarshaler := component.NewWatermillJsonMarshaler()
-	configDomainEvent := &advanced.DomainEvent
 	eventEvent, err := event.NewEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent)
 	if err != nil {
 		cleanup7()
@@ -251,7 +251,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, pool)
+	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, defaultPostgreSQLSchema, pool)
 	if err != nil {
 		cleanup7()
 		cleanup6()

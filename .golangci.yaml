@@ -27,7 +27,6 @@ linters:
         - github\.com/notopia-uit/notopia/.*\.*
       exclude:
         - github\.com/notopia-uit/notopia/.*/errs\.Err
-        # - github\.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc\..*Params
   exclusions:
     generated: strict
     rules:

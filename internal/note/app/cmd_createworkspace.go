@@ -9,27 +9,30 @@ import (
 )
 
 type CreateWorkspace struct {
-	ID     uuid.UUID
-	Name   string
-	Slug   string
-	UserID string
+	ID      uuid.UUID
+	Name    string
+	Slug    string
+	OwnerID string
 }
 
 type CreateWorkspaceHandler struct {
-	workspaceRepo domain.WorkspaceRepo
-	folderRepo    domain.FolderRepo
-	uow           domain.UnitOfWork
+	workspaceRepo        domain.WorkspaceRepo
+	folderRepo           domain.FolderRepo
+	uow                  domain.UnitOfWork
+	authorizationService AuthorizationService
 }
 
 func NewCreateWorkspaceHandler(
 	workspaceRepo domain.WorkspaceRepo,
 	folderRepo domain.FolderRepo,
 	uow domain.UnitOfWork,
+	authorizationService AuthorizationService,
 ) *CreateWorkspaceHandler {
 	return &CreateWorkspaceHandler{
-		workspaceRepo: workspaceRepo,
-		folderRepo:    folderRepo,
-		uow:           uow,
+		workspaceRepo:        workspaceRepo,
+		folderRepo:           folderRepo,
+		uow:                  uow,
+		authorizationService: authorizationService,
 	}
 }
 
@@ -47,7 +50,7 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 	if err != nil {
 		return errs.NewInternalGenerateID(err)
 	}
-	rootFolder, err := domain.NewFolder(rootFolderID, cmd.Name, "", cmd.ID, domain.FolderHierarchy{}, cmd.UserID)
+	rootFolder, err := domain.NewFolder(rootFolderID, cmd.Name, "", cmd.ID, domain.FolderHierarchy{}, cmd.OwnerID)
 	if err != nil {
 		return err
 	}
@@ -55,7 +58,7 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 	if err != nil {
 		return err
 	}
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		if err := h.folderRepo.Save(ctx, rootFolder); err != nil {
 			return err
 		}
@@ -63,6 +66,11 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 			return err
 		}
 		return nil
-	})
+	}); err != nil {
+		return err
+	}
+	if err := h.authorizationService.CreateWorkspaceWithOwnership(ctx, cmd.OwnerID, workspace.ID()); err != nil {
+		return err
+	}
 	return err
 }

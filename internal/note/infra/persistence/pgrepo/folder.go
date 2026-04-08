@@ -18,6 +18,7 @@ type Folder struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
 	publisher     Publisher // This is nil when not in transaction, because we will provide it inside a transaction
+	runInTx       *RunInTx
 	inTransaction bool
 }
 
@@ -27,12 +28,14 @@ func NewFolder(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
 	publisher Publisher,
+	runInTx *RunInTx,
 	inTransaction bool,
 ) *Folder {
 	return &Folder{
 		pgxPool:       pgxPool,
 		queries:       queries,
 		publisher:     publisher,
+		runInTx:       runInTx,
 		inTransaction: inTransaction,
 	}
 }
@@ -40,13 +43,9 @@ func NewFolder(
 func NewNoTransactionFolder(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
+	runInTx *RunInTx,
 ) *Folder {
-	return NewFolder(
-		pgxPool,
-		queries,
-		nil,
-		false,
-	)
+	return NewFolder(pgxPool, queries, nil, runInTx, false)
 }
 
 var ProvideFolder = NewNoTransactionFolder
@@ -132,7 +131,7 @@ func folderToDomainRepo(folder *pgsqlc.Folder) *domain.Folder {
 }
 
 func (f *Folder) Save(ctx context.Context, folder *domain.Folder) (cerr error) {
-	return runInTx(ctx, &runInTxParams{
+	return f.runInTx.Execute(ctx, &runInTxParams{
 		pgxPool:       f.pgxPool,
 		queries:       f.queries,
 		publisher:     f.publisher,
@@ -182,7 +181,7 @@ func (f *Folder) Save(ctx context.Context, folder *domain.Folder) (cerr error) {
 }
 
 func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr error) {
-	return runInTx(ctx, &runInTxParams{
+	return f.runInTx.Execute(ctx, &runInTxParams{
 		pgxPool:       f.pgxPool,
 		queries:       f.queries,
 		publisher:     f.publisher,
@@ -290,4 +289,15 @@ func (f *Folder) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUI
 		return uuid.Nil, fmt.Errorf("failed to get workspace id for folder: %w", toErr(err))
 	}
 	return workspaceID, nil
+}
+
+func (f *Folder) GetParentIDs(ctx context.Context, id uuid.UUID, forUpdate bool) ([]uuid.UUID, error) {
+	parentIDs, err := f.queries.GetParentIDsByFolderID(ctx, pgsqlc.GetParentIDsByFolderIDParams{
+		ID:        id,
+		ForUpdate: forUpdate,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get parent ids for folder: %w", toErr(err))
+	}
+	return parentIDs, nil
 }

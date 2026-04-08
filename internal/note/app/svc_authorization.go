@@ -66,9 +66,8 @@ type AuthorizationService interface {
 
 	CreateWorkspaceWithOwnership(
 		ctx context.Context,
-		userID string,
+		ownerID string,
 		workspaceID uuid.UUID,
-		ownerID uuid.UUID,
 	) error
 
 	GetWorkspaceMembers(

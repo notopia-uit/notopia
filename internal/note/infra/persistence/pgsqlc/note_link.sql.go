@@ -66,6 +66,45 @@ func (q *Queries) GetNoteOutgoingLinks(ctx context.Context, sourceID uuid.UUID) 
 	return items, nil
 }
 
+const getNotesOutgoingLinks = `-- name: GetNotesOutgoingLinks :many
+SELECT
+  source_id,
+  ARRAY_AGG(target_id) AS target_ids
+FROM
+  note_links
+WHERE
+  source_id = ANY($1::uuid[])
+GROUP BY
+  source_id
+`
+
+type GetNotesOutgoingLinksRow struct {
+	SourceID  uuid.UUID
+	TargetIDs interface{}
+}
+
+func (q *Queries) GetNotesOutgoingLinks(ctx context.Context, sourceIds []uuid.UUID) ([]*GetNotesOutgoingLinksRow, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetNotesOutgoingLinks")
+	defer span.End()
+	rows, err := q.db.Query(ctx, getNotesOutgoingLinks, sourceIds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetNotesOutgoingLinksRow
+	for rows.Next() {
+		var i GetNotesOutgoingLinksRow
+		if err := rows.Scan(&i.SourceID, &i.TargetIDs); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 type InsertTempNoteLinksParams struct {
 	SourceID uuid.UUID
 	TargetID uuid.UUID

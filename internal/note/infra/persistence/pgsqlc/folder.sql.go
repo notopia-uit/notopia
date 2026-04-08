@@ -187,6 +187,62 @@ func (q *Queries) GetFoldersByWorkspaceID(ctx context.Context, arg GetFoldersByW
 	return items, nil
 }
 
+const getParentIDsByFolderID = `-- name: GetParentIDsByFolderID :many
+WITH RECURSIVE parent_folders(id, parent_id) AS (
+  SELECT
+    id,
+    parent_id
+  FROM
+    folders AS start
+  WHERE
+    id = $1::uuid
+  UNION ALL
+  SELECT
+    id,
+    parent_id
+  FROM
+    folders
+    INNER JOIN parent_folders AS pf ON id = pf.parent_id
+)
+SELECT
+  id
+FROM
+  parent_folders
+WHERE
+  id != $1::uuid
+FOR UPDATE -- :if $2
+`
+
+var _getParentIDsByFolderIDDynQ = dynCompile(getParentIDsByFolderID)
+
+type GetParentIDsByFolderIDParams struct {
+	ID        uuid.UUID
+	ForUpdate bool
+}
+
+func (q *Queries) GetParentIDsByFolderID(ctx context.Context, arg GetParentIDsByFolderIDParams) ([]uuid.UUID, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetParentIDsByFolderID")
+	defer span.End()
+	dynQuery, dynArgs := _getParentIDsByFolderIDDynQ.Build([]any{arg.ID, arg.ForUpdate})
+	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getWorkspaceIDByFolderID = `-- name: GetWorkspaceIDByFolderID :one
 SELECT
   workspace_id

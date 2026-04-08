@@ -13,6 +13,7 @@ type FolderRepo interface {
 	Save(ctx context.Context, folder *Folder) error
 	SaveMany(ctx context.Context, folders []*Folder) error
 	AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error)
+	GetParentIDs(ctx context.Context, id uuid.UUID, forUpdate bool) ([]uuid.UUID, error)
 }
 
 type FolderRepoGetManyParams struct {

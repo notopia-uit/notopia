@@ -21,12 +21,23 @@ type RunInTxFnparams struct {
 	publisher Publisher
 }
 
-// TODO: Can we just, avoid doing this cerr? common error tan` du
-func runInTx(
+type RunInTx struct {
+	publisherFactory PublisherFactory
+}
+
+func NewRunInTx(publisherFactory PublisherFactory) *RunInTx {
+	return &RunInTx{
+		publisherFactory: publisherFactory,
+	}
+}
+
+var ProvideRunInTx = NewRunInTx
+
+func (r *RunInTx) Execute(
 	ctx context.Context,
 	params *runInTxParams,
 	fn func(params *RunInTxFnparams) error,
-) (cerr error) {
+) error {
 	if params.inTransaction {
 		return fn(&RunInTxFnparams{
 			queries:   params.queries,
@@ -36,40 +47,44 @@ func runInTx(
 
 	tx, err := params.pgxPool.Begin(ctx)
 	if err != nil {
-		return errs.NewPersistenceInternal("failed to begin transaction", err)
+		return errs.NewPersistenceInternal("failed to begin transaction in RunInTx", err)
 	}
 
 	defer func() {
 		if p := recover(); p != nil {
 			if err = tx.Rollback(ctx); err != nil {
 				slog.ErrorContext(
-					ctx, "failed to rollback transaction after panic",
+					ctx, "failed to rollback transaction after panic in RunInTx",
 					slog.Any("error", err),
 				)
 			}
 			panic(p)
-		} else if cerr != nil {
-			if err = tx.Rollback(ctx); err != nil {
-				slog.ErrorContext(
-					ctx, "failed to rollback transaction after error",
-					slog.Any("error", err),
-				)
-			}
 		}
 	}()
 
+	queries := pgsqlc.New(tx)
+	publisher, err := r.publisherFactory.Create(tx)
+	if err != nil {
+		return errs.NewPersistenceInternal("failed to create publisher in RunInTx", err)
+	}
+
 	fnParams := &RunInTxFnparams{
-		queries:   params.queries,
-		publisher: params.publisher,
+		queries:   queries,
+		publisher: publisher,
 	}
 
 	if err := fn(fnParams); err != nil {
-		cerr = err
+		if err = tx.Rollback(ctx); err != nil {
+			slog.ErrorContext(
+				ctx, "failed to rollback transaction after error in fn inside RunInTx",
+				slog.Any("error", err),
+			)
+		}
 		return err
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return errs.NewPersistenceInternal("failed to commit transaction", err)
+		return errs.NewPersistenceInternal("failed to commit transaction in RunInTx", err)
 	}
 
 	return nil

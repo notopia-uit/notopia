@@ -18,6 +18,7 @@ type Workspace struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
 	publisher     Publisher
+	runInTx       *RunInTx
 	inTransaction bool
 }
 
@@ -27,18 +28,24 @@ func NewWorkspace(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
 	publisher Publisher,
+	runInTx *RunInTx,
 	inTransaction bool,
 ) *Workspace {
 	return &Workspace{
 		pgxPool:       pgxPool,
 		queries:       queries,
 		publisher:     publisher,
+		runInTx:       runInTx,
 		inTransaction: inTransaction,
 	}
 }
 
-func NewNoTransactionWorkspace(pgxPool *pgxpool.Pool, queries *pgsqlc.Queries) *Workspace {
-	return NewWorkspace(pgxPool, queries, nil, false)
+func NewNoTransactionWorkspace(
+	pgxPool *pgxpool.Pool,
+	queries *pgsqlc.Queries,
+	runInTx *RunInTx,
+) *Workspace {
+	return NewWorkspace(pgxPool, queries, nil, runInTx, false)
 }
 
 var ProvideWorkspace = NewNoTransactionWorkspace
@@ -118,7 +125,7 @@ func (w *Workspace) CheckSlugExists(ctx context.Context, slug string) (bool, err
 }
 
 func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) (cerr error) {
-	return runInTx(ctx, &runInTxParams{
+	return w.runInTx.Execute(ctx, &runInTxParams{
 		pgxPool:       w.pgxPool,
 		queries:       w.queries,
 		publisher:     w.publisher,

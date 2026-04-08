@@ -2,6 +2,7 @@ package event
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/google/uuid"
@@ -29,12 +30,14 @@ func (e *Event) notifyWorkspaceItemsUpdatedNoteHandler(msg *message.Message) err
 	if userID == "" {
 		return errors.New("missing user id in message metadata in notifyWorkspaceItemsUpdatedNoteHandler")
 	}
-	e.app.Events.NotifyWorkspaceItemsUpdated.Handle(&app.NotifyWorkspaceItemsUpdated{
+	if err := e.app.Events.NotifyWorkspaceItemsUpdated.Handle(&app.NotifyWorkspaceItemsUpdated{
 		WorkspaceItemID: noteID,
 		WorkspaceID:     workspaceID,
 		UserID:          userID,
 		Type:            app.NotifyWorkspaceItemsUpdatedTypeNote,
-	})
+	}); err != nil {
+		return fmt.Errorf("failed to handle NotifyWorkspaceItemsUpdated in notifyWorkspaceItemsUpdatedNoteHandler: %w", err)
+	}
 	return nil
 }
 
@@ -59,11 +62,13 @@ func (e *Event) notifyWorkspaceItemsUpdatedFolderHandler(msg *message.Message) e
 	if userID == "" {
 		return errors.New("missing user id in message metadata in notifyWorkspaceItemsUpdatedFolderHandler")
 	}
-	e.app.Events.NotifyWorkspaceItemsUpdated.Handle(&app.NotifyWorkspaceItemsUpdated{
+	if err := e.app.Events.NotifyWorkspaceItemsUpdated.Handle(&app.NotifyWorkspaceItemsUpdated{
 		WorkspaceItemID: folderID,
 		WorkspaceID:     workspaceID,
 		UserID:          userID,
 		Type:            app.NotifyWorkspaceItemsUpdatedTypeFolder,
-	})
+	}); err != nil {
+		return fmt.Errorf("failed to handle NotifyWorkspaceItemsUpdated in notifyWorkspaceItemsUpdatedFolderHandler: %w", err)
+	}
 	return nil
 }

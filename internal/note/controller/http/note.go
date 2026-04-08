@@ -89,7 +89,10 @@ func (h *StrictHandler) GetNote(
 		return nil, err
 	}
 
-	dto := toNote(*result)
+	dto, err := toNote(*result)
+	if err != nil {
+		return nil, err
+	}
 	return note.GetNote200JSONResponse(dto), nil
 }
 

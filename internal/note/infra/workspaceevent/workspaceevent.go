@@ -149,6 +149,8 @@ func (h *WorkspaceEventHub) Publish(
 	return nil
 }
 
+// FIXME: This should check if a user have permission to subcribe to
+// But, currently the logic is under infra, I will somehow bring partially up to app layer
 func (h *WorkspaceEventHub) Subscribe(
 	ctx context.Context,
 	workspaceID uuid.UUID,

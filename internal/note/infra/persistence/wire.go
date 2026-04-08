@@ -34,6 +34,7 @@ var PGRepoProviderSet = wire.NewSet(
 	pgrepo.ProvideNote,
 	pgrepo.ProvideUnitOfWork,
 	pgrepo.ProvideWorkspace,
+	pgrepo.ProvideRunInTx,
 	wire.Bind(new(domain.FolderRepo), new(*pgrepo.Folder)),
 	wire.Bind(new(domain.NoteRepo), new(*pgrepo.Note)),
 	wire.Bind(new(domain.UnitOfWork), new(*pgrepo.UnitOfWork)),

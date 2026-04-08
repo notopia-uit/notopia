@@ -46,9 +46,12 @@ func NewNotifyWorkspaceItemsUpdatedHandler(
 
 var ProvideNotifyWorkspaceItemsUpdatedHandler = NewNotifyWorkspaceItemsUpdatedHandler
 
-func (h *NotifyWorkspaceItemsUpdatedHandler) Handle(params *NotifyWorkspaceItemsUpdated) {
+func (h *NotifyWorkspaceItemsUpdatedHandler) Handle(params *NotifyWorkspaceItemsUpdated) error {
 	val, _ := h.debouncers.LoadOrStore(params.WorkspaceID, debounce.New(h.debounceDuration))
-	debouncer := val.(func(func()))
+	debouncer, ok := val.(func(func()))
+	if !ok {
+		return fmt.Errorf("failed to assert debouncer for workspaceID: %s", params.WorkspaceID.String())
+	}
 
 	debouncer(func() {
 		publishCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -65,6 +68,7 @@ func (h *NotifyWorkspaceItemsUpdatedHandler) Handle(params *NotifyWorkspaceItems
 
 		h.debouncers.Delete(params.WorkspaceID)
 	})
+	return nil
 }
 
 func (h *NotifyWorkspaceItemsUpdatedHandler) publishWorkspaceUpdate(

@@ -20,6 +20,7 @@ type Outbox struct {
 func NewOutbox(
 	publisher Publisher,
 	logger watermill.LoggerAdapter,
+	schemaAdapter sql.SchemaAdapter,
 	pgxConn sql.Conn,
 ) (*Outbox, error) {
 	subcriber, err := sql.NewSubscriber(
@@ -27,7 +28,7 @@ func NewOutbox(
 		sql.SubscriberConfig{
 			PollInterval:     time.Second,
 			InitializeSchema: true,
-			SchemaAdapter:    sql.DefaultPostgreSQLSchema{},
+			SchemaAdapter:    schemaAdapter,
 			ConsumerGroup:    "", // NOTE: If scale, we should care about this
 		},
 		logger,

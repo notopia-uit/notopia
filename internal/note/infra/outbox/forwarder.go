@@ -9,6 +9,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill-sql/v4/pkg/sql"
 	"github.com/ThreeDotsLabs/watermill/components/forwarder"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/notopia-uit/notopia/internal/note/component"
@@ -32,7 +33,9 @@ func (p *ForwarderPublisher) PublishWorkspaceItem(ctx context.Context, event dom
 	if err != nil {
 		return fmt.Errorf("failed to marshal event for forwarder publisher: %w", err)
 	}
-	msg := message.NewMessage(watermill.NewUUID(), payload)
+	msgID := watermill.NewUUID()
+	msg := message.NewMessage(msgID, payload)
+	middleware.SetCorrelationID(msgID, msg)
 	msg.Metadata.Set(p.workspaceIDKey, workspaceID.String())
 	msg.Metadata.Set(p.aggregateIDKey, event.GetAggregateID().String())
 	msg.Metadata.Set(p.userIDKey, event.GetUserID())
@@ -67,6 +70,7 @@ type FromPersistenceToQSLForwarder struct {
 	aggregateIDKey string
 	userIDKey      string
 	logger         watermill.LoggerAdapter
+	schemaAdapter  sql.SchemaAdapter
 }
 
 var _ pgrepo.PublisherFactory = (*FromPersistenceToQSLForwarder)(nil)
@@ -74,12 +78,14 @@ var _ pgrepo.PublisherFactory = (*FromPersistenceToQSLForwarder)(nil)
 func NewFromPersistenceToQSLForwarder(
 	domainEventCfg config.DomainEvent,
 	logger watermill.LoggerAdapter,
+	schemaAdapter sql.SchemaAdapter,
 ) *FromPersistenceToQSLForwarder {
 	return &FromPersistenceToQSLForwarder{
 		workspaceIDKey: domainEventCfg.MessageWorkspaceIDKey,
 		aggregateIDKey: domainEventCfg.MessageMetadataAggregateIDKey,
 		userIDKey:      domainEventCfg.MessageMetadataUserIDKey,
 		logger:         logger,
+		schemaAdapter:  schemaAdapter,
 	}
 }
 
@@ -91,7 +97,7 @@ func (f *FromPersistenceToQSLForwarder) Create(
 	sqlPublisher, err := sql.NewPublisher(
 		sql.TxFromPgx(pgxTx),
 		sql.PublisherConfig{
-			SchemaAdapter:        sql.DefaultPostgreSQLSchema{},
+			SchemaAdapter:        f.schemaAdapter,
 			AutoInitializeSchema: true,
 		},
 		watermill.NopLogger{},

@@ -9,6 +9,9 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
+// TODO: This should carefully recheck
+// Transaction?
+
 type TrashWorkspaceItems struct {
 	UserID      string
 	WorkspaceID uuid.UUID
@@ -52,8 +55,6 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			fmt.Sprintf("user %s does not have permission to trash items in workspace %s", cmd.UserID, cmd.WorkspaceID),
 		)
 	}
-
-	var workspaceEvents []domain.Event
 
 	// TODO: Why it getting 4 times??
 	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
@@ -129,17 +130,11 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			if err := noteRepo.SaveMany(ctx, workspaceNotePtrs); err != nil {
 				return err
 			}
-			for _, note := range workspaceNotePtrs {
-				workspaceEvents = append(workspaceEvents, note.PopEvents()...)
-			}
 		}
 
 		if len(workspaceFolderPtrs) > 0 {
 			if err := folderRepo.SaveMany(ctx, workspaceFolderPtrs); err != nil {
 				return err
-			}
-			for _, folder := range workspaceFolderPtrs {
-				workspaceEvents = append(workspaceEvents, folder.PopEvents()...)
 			}
 		}
 

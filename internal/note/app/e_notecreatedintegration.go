@@ -13,7 +13,6 @@ type NoteCreatedDomainToIntegrationEventHandler struct {
 
 func NewNoteCreatedDomainToIntegrationEventHandler(
 	integrationPublisher IntegrationPublisher,
-	noteRepo domain.NoteRepo,
 ) *NoteCreatedDomainToIntegrationEventHandler {
 	return &NoteCreatedDomainToIntegrationEventHandler{
 		integrationPublisher: integrationPublisher,

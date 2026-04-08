@@ -41,3 +41,14 @@ FROM
   note_links
 WHERE
   source_id = sqlc.arg('source_id')::uuid;
+
+-- name: GetNotesOutgoingLinks :many
+SELECT
+  source_id,
+  ARRAY_AGG(target_id) AS target_ids
+FROM
+  note_links
+WHERE
+  source_id = ANY(sqlc.arg('source_ids')::uuid[])
+GROUP BY
+  source_id;

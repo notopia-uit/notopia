@@ -124,6 +124,32 @@ ORDER BY
 FOR UPDATE -- :if @for_update
 ;
 
+-- name: GetParentIDsByFolderID :many
+WITH RECURSIVE parent_folders(id, parent_id) AS (
+  SELECT
+    id,
+    parent_id
+  FROM
+    folders AS start
+  WHERE
+    id = sqlc.arg('id')::uuid
+  UNION ALL
+  SELECT
+    id,
+    parent_id
+  FROM
+    folders
+    INNER JOIN parent_folders AS pf ON id = pf.parent_id
+)
+SELECT
+  id
+FROM
+  parent_folders
+WHERE
+  id != sqlc.arg('id')::uuid
+FOR UPDATE -- :if @for_update
+;
+
 -- name: GetWorkspaceIDByFolderID :one
 SELECT
   workspace_id

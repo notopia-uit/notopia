@@ -1,12 +1,15 @@
 package http
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/authorization/errs"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-func toNote(n app.Note) note.Note {
+func toNote(n app.Note) (note.Note, error) {
 	var icon *string
 	if n.Icon != "" {
 		icon = &n.Icon
@@ -19,8 +22,12 @@ func toNote(n app.Note) note.Note {
 
 	var trashed *note.NoteTrashed
 	if n.Trashed != nil {
+		trashedBy, err := toTrashedBy(n.Trashed.TrashedBy)
+		if err != nil {
+			return note.Note{}, fmt.Errorf("invalid trashed by: %v", err)
+		}
 		trashed = &note.NoteTrashed{
-			TrashedBy: toTrashedBy(n.Trashed.TrashedBy),
+			TrashedBy: trashedBy,
 			TrashedAt: n.Trashed.TrashedAt,
 		}
 	}
@@ -33,10 +40,10 @@ func toNote(n app.Note) note.Note {
 		FolderId:  &n.FolderID,
 		UpdatedAt: &n.UpdatedAt,
 		Trashed:   trashed,
-	}
+	}, nil
 }
 
-func toFolder(f app.Folder) note.Folder {
+func toFolder(f app.Folder) (note.Folder, error) {
 	var icon *string
 	if f.Icon != "" {
 		icon = &f.Icon
@@ -49,8 +56,12 @@ func toFolder(f app.Folder) note.Folder {
 
 	var trashed *note.FolderTrashed
 	if f.Trashed != nil {
+		trashedBy, err := toTrashedBy(f.Trashed.TrashedBy)
+		if err != nil {
+			return note.Folder{}, fmt.Errorf("invalid trashed by: %v", err)
+		}
 		trashed = &note.FolderTrashed{
-			TrashedBy: toTrashedBy(f.Trashed.TrashedBy),
+			TrashedBy: trashedBy,
 			TrashedAt: f.Trashed.TrashedAt,
 		}
 	}
@@ -63,7 +74,7 @@ func toFolder(f app.Folder) note.Folder {
 		WorkspaceId: &f.WorkspaceID,
 		UpdatedAt:   &f.UpdatedAt,
 		Trashed:     trashed,
-	}
+	}, nil
 }
 
 func toWorkspace(w app.Workspace) note.Workspace {
@@ -74,30 +85,34 @@ func toWorkspace(w app.Workspace) note.Workspace {
 	}
 }
 
-func toWorkspaceRole(r app.WorkspaceRole) note.WorkspaceRole {
+func toWorkspaceRole(r app.WorkspaceRole) (note.WorkspaceRole, error) {
 	switch r {
 	case app.WorkspaceRoleOwner:
-		return note.Owner
+		return note.Owner, nil
 	case app.WorkspaceRoleEditor:
-		return note.Editor
+		return note.Editor, nil
 	case app.WorkspaceRoleViewer:
-		return note.Viewer
+		return note.Viewer, nil
 	default:
-		panic("invalid workspace role")
+		return note.Viewer, errs.NewInternal(fmt.Sprintf("invalid workspace role: %v", r), nil)
 	}
 }
 
-func toWorkspaceMember(m *app.WorkspaceMember) note.WorkspaceMember {
+func toWorkspaceMember(m *app.WorkspaceMember) (note.WorkspaceMember, error) {
 	var username *string
 	if m.Username != "" {
 		username = &m.Username
 	}
+	role, err := toWorkspaceRole(m.Role)
+	if err != nil {
+		return note.WorkspaceMember{}, err
+	}
 
 	return note.WorkspaceMember{
 		Id:       m.ID,
-		Role:     toWorkspaceRole(m.Role),
+		Role:     role,
 		Username: username,
-	}
+	}, nil
 }
 
 func toWorkspaceTreeNote(n *app.WorkspaceTreeNote) note.WorkspaceTreeNote {
@@ -136,33 +151,45 @@ func toWorkspaceTreeFolder(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFolder 
 	}
 }
 
-func toTrashedFolder(f *app.TrashedFolder) note.TrashedFolder {
+func toTrashedFolder(f *app.TrashedFolder) (note.TrashedFolder, error) {
+	trashedBy, err := toTrashedBy(f.Trashed.TrashedBy)
+	if err != nil {
+		return note.TrashedFolder{}, err
+	}
 	return note.TrashedFolder{
 		Id:   f.ID,
 		Name: &f.Name,
 		Trashed: note.Trashed{
-			TrashedBy: toTrashedBy(f.Trashed.TrashedBy),
+			TrashedBy: trashedBy,
 			TrashedAt: f.Trashed.TrashedAt,
 		},
-	}
+	}, nil
 }
 
-func toTrashedNote(n *app.TrashedNote) note.TrashedNote {
+func toTrashedNote(n *app.TrashedNote) (note.TrashedNote, error) {
+	trashedBy, err := toTrashedBy(n.Trashed.TrashedBy)
+	if err != nil {
+		return note.TrashedNote{}, err
+	}
 	return note.TrashedNote{
 		Id:   n.ID,
 		Name: &n.Name,
 		Trashed: note.Trashed{
-			TrashedBy: toTrashedBy(n.Trashed.TrashedBy),
+			TrashedBy: trashedBy,
 			TrashedAt: n.Trashed.TrashedAt,
 		},
-	}
+	}, nil
 }
 
 func toNoteLink(n *app.NoteLink) note.NoteLink {
+	var icon *string
+	if n.Icon != "" {
+		icon = &n.Icon
+	}
 	return note.NoteLink{
 		Id:   &n.ID,
 		Name: n.Name,
-		Icon: &n.Icon,
+		Icon: icon,
 	}
 }
 
@@ -188,19 +215,27 @@ func toGraph(g *app.Graph) note.Graph {
 	}
 }
 
-func toShowTrash(t *app.Trash) note.ShowTrash200JSONResponse {
+func toShowTrash(t *app.Trash) (note.ShowTrash200JSONResponse, error) {
 	notes := make([]note.TrashedNote, len(t.Notes))
 	for i, n := range t.Notes {
-		notes[i] = toTrashedNote(n)
+		trashedNote, err := toTrashedNote(n)
+		if err != nil {
+			return note.ShowTrash200JSONResponse{}, fmt.Errorf("invalid trashed note: %v", err)
+		}
+		notes[i] = trashedNote
 	}
 	folders := make([]note.TrashedFolder, len(t.Folders))
 	for i, f := range t.Folders {
-		folders[i] = toTrashedFolder(f)
+		trashedFolder, err := toTrashedFolder(f)
+		if err != nil {
+			return note.ShowTrash200JSONResponse{}, fmt.Errorf("invalid trashed folder: %v", err)
+		}
+		folders[i] = trashedFolder
 	}
 	return note.ShowTrash200JSONResponse{
 		Notes:   notes,
 		Folders: folders,
-	}
+	}, nil
 }
 
 func toGetNoteLinks(r *app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
@@ -218,13 +253,13 @@ func toGetNoteLinks(r *app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
 	}
 }
 
-func toTrashedBy(t app.TrashedBy) note.TrashedBy {
+func toTrashedBy(t app.TrashedBy) (note.TrashedBy, error) {
 	switch t {
 	case app.TrashedByParent:
-		return note.Parent
+		return note.Parent, nil
 	case app.TrashedByPurpose:
-		return note.Purpose
+		return note.Purpose, nil
 	default:
-		panic("invalid trashed by")
+		return note.TrashedBy(""), errs.NewInternal(fmt.Sprintf("invalid trashed by: %v", t), nil)
 	}
 }

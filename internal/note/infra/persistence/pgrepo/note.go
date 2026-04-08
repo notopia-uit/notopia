@@ -19,6 +19,7 @@ type Note struct {
 	pgxPool       *pgxpool.Pool
 	queries       *pgsqlc.Queries
 	publisher     Publisher
+	runInTx       *RunInTx
 	inTransaction bool
 }
 
@@ -28,12 +29,14 @@ func NewNote(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
 	publisher Publisher,
+	runInTx *RunInTx,
 	inTransaction bool,
 ) *Note {
 	return &Note{
 		pgxPool:       pgxPool,
 		queries:       queries,
 		publisher:     publisher,
+		runInTx:       runInTx,
 		inTransaction: inTransaction,
 	}
 }
@@ -41,8 +44,9 @@ func NewNote(
 func NewNoTransactionNote(
 	pgxPool *pgxpool.Pool,
 	queries *pgsqlc.Queries,
+	runInTx *RunInTx,
 ) *Note {
-	return NewNote(pgxPool, queries, nil, false)
+	return NewNote(pgxPool, queries, nil, runInTx, false)
 }
 
 var ProvideNote = NewNoTransactionNote
@@ -59,7 +63,6 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 		return nil, toErr(err)
 	}
 
-	// Fetch outgoing links separately
 	links, err := n.queries.GetNoteOutgoingLinks(ctx, id)
 	if err != nil {
 		return nil, toErr(err)
@@ -101,12 +104,25 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 
 	// FIXME: Hey, this is N+1 query
 	// Query links per note (type-safe approach)
+	noteIDs := make([]uuid.UUID, len(notes))
+	for i, note := range notes {
+		noteIDs[i] = note.ID
+	}
+	noteIDOutgoingLinksPairs, err := n.queries.GetNotesOutgoingLinks(ctx, noteIDs)
+	if err != nil {
+		return nil, toErr(err)
+	}
+	noteIDOutgoingLinksMap := make(map[uuid.UUID][]uuid.UUID, len(noteIDOutgoingLinksPairs))
+	for _, pair := range noteIDOutgoingLinksPairs {
+		targetIDs, ok := pair.TargetIDs.([]uuid.UUID)
+		if !ok {
+			return nil, errs.NewPersistenceInvalid(fmt.Sprintf("invalid type for target ids: %T", pair.TargetIDs), nil)
+		}
+		noteIDOutgoingLinksMap[pair.SourceID] = targetIDs
+	}
 	result := make([]*domain.Note, len(notes))
 	for i, note := range notes {
-		links, err := n.queries.GetNoteOutgoingLinks(ctx, note.ID)
-		if err != nil {
-			return nil, toErr(err)
-		}
+		links := noteIDOutgoingLinksMap[note.ID]
 		result[i] = noteToDomainRepo(note, links)
 	}
 	return result, nil
@@ -139,7 +155,7 @@ func noteToDomainRepo(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
 
 // TODO: It doesn't save the outgoing links
 func (n *Note) Save(ctx context.Context, note *domain.Note) error {
-	return runInTx(ctx, &runInTxParams{
+	return n.runInTx.Execute(ctx, &runInTxParams{
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
 		publisher:     n.publisher,
@@ -217,7 +233,7 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 
 // TODO: It doesn't save the outgoing links
 func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) error {
-	return runInTx(ctx, &runInTxParams{
+	return n.runInTx.Execute(ctx, &runInTxParams{
 		pgxPool:       n.pgxPool,
 		queries:       n.queries,
 		publisher:     n.publisher,
