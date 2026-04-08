@@ -129,7 +129,7 @@ func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) (cerr
 		queries:       w.queries,
 		publisher:     w.publisher,
 		inTransaction: w.inTransaction,
-	}, func(params *RunInTxFnparams) error {
+	}, func(params *RunInTxFnParams) error {
 		err := params.queries.SaveWorkspace(ctx, &pgsqlc.SaveWorkspaceParams{
 			ID:        workspace.ID(),
 			Slug:      workspace.Slug(),

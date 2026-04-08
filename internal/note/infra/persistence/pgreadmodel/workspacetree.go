@@ -3,6 +3,7 @@ package pgreadmodel
 import (
 	"context"
 	"errors"
+	"sort"
 	"time"
 
 	"github.com/google/uuid"
@@ -64,9 +65,25 @@ func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspac
 	var folderIDs []uuid.UUID
 	folderIDs = append(folderIDs, rootFolderID)
 	folderMap := make(map[uuid.UUID]*pgsqlc.ReadGetRecursiveFolderByParentIDRow)
+	childrenByParentID := make(map[uuid.UUID][]*pgsqlc.ReadGetRecursiveFolderByParentIDRow)
+
 	for _, folder := range recursiveFolders {
 		folderIDs = append(folderIDs, folder.ID)
 		folderMap[folder.ID] = folder
+	}
+
+	// Precompute parent -> children mapping for O(1) access
+	for _, folder := range recursiveFolders {
+		if folder.ParentID != nil {
+			childrenByParentID[*folder.ParentID] = append(childrenByParentID[*folder.ParentID], folder)
+		}
+	}
+
+	// Sort children by name for deterministic ordering
+	for _, children := range childrenByParentID {
+		sort.Slice(children, func(i, j int) bool {
+			return children[i].Name < children[j].Name
+		})
 	}
 
 	allNotes, err := h.queries.ReadGetNotesByFolderIDs(ctx, pgsqlc.ReadGetNotesByFolderIDsParams{
@@ -87,7 +104,7 @@ func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspac
 		rootFolder.Name,
 		rootFolder.Icon,
 		rootFolder.UpdatedAt,
-		folderMap,
+		childrenByParentID,
 		notesByFolder,
 	)
 	return tree, nil
@@ -98,7 +115,7 @@ func (h *WorkspaceTree) buildFolderTree(
 	folderName string,
 	folderIcon *string,
 	updatedAt time.Time,
-	folderMap map[uuid.UUID]*pgsqlc.ReadGetRecursiveFolderByParentIDRow,
+	childrenByParentID map[uuid.UUID][]*pgsqlc.ReadGetRecursiveFolderByParentIDRow,
 	notesByFolder map[uuid.UUID][]*pgsqlc.Note,
 ) *app.WorkspaceTreeFolder {
 	var icon string
@@ -129,14 +146,15 @@ func (h *WorkspaceTree) buildFolderTree(
 		}
 	}
 
-	for _, childFolder := range folderMap {
-		if childFolder.ParentID != nil && *childFolder.ParentID == folderID {
+	// Only iterate through direct children, not the entire folderMap
+	if children, ok := childrenByParentID[folderID]; ok {
+		for _, childFolder := range children {
 			childTree := h.buildFolderTree(
 				childFolder.ID,
 				childFolder.Name,
 				childFolder.Icon,
 				childFolder.UpdatedAt,
-				folderMap,
+				childrenByParentID,
 				notesByFolder,
 			)
 			result.Children = append(result.Children, childTree)

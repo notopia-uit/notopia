@@ -16,7 +16,7 @@ type runInTxParams struct {
 	inTransaction bool            // Indicates if we're already in a transaction
 }
 
-type RunInTxFnparams struct {
+type RunInTxFnParams struct {
 	queries   *pgsqlc.Queries
 	publisher Publisher
 }
@@ -36,10 +36,10 @@ var ProvideRunInTx = NewRunInTx
 func (r *RunInTx) Execute(
 	ctx context.Context,
 	params *runInTxParams,
-	fn func(params *RunInTxFnparams) error,
+	fn func(params *RunInTxFnParams) error,
 ) error {
 	if params.inTransaction {
-		return fn(&RunInTxFnparams{
+		return fn(&RunInTxFnParams{
 			queries:   params.queries,
 			publisher: params.publisher,
 		})
@@ -59,6 +59,13 @@ func (r *RunInTx) Execute(
 				)
 			}
 			panic(p)
+		} else if err != nil {
+			if err = tx.Rollback(ctx); err != nil {
+				slog.ErrorContext(
+					ctx, "failed to rollback transaction after error in RunInTx",
+					slog.Any("error", err),
+				)
+			}
 		}
 	}()
 
@@ -68,18 +75,12 @@ func (r *RunInTx) Execute(
 		return errs.NewPersistenceInternal("failed to create publisher in RunInTx", err)
 	}
 
-	fnParams := &RunInTxFnparams{
+	fnParams := &RunInTxFnParams{
 		queries:   queries,
 		publisher: publisher,
 	}
 
 	if err := fn(fnParams); err != nil {
-		if err = tx.Rollback(ctx); err != nil {
-			slog.ErrorContext(
-				ctx, "failed to rollback transaction after error in fn inside RunInTx",
-				slog.Any("error", err),
-			)
-		}
 		return err
 	}
 

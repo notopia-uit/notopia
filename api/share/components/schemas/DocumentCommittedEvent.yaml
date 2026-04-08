@@ -4,7 +4,6 @@ allOf:
   - properties:
       userId:
         type: string
-        format: number
 
       tags:
         type: array

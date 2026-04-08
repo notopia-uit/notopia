@@ -160,7 +160,7 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 		queries:       n.queries,
 		publisher:     n.publisher,
 		inTransaction: n.inTransaction,
-	}, func(params *RunInTxFnparams) error {
+	}, func(params *RunInTxFnParams) error {
 		queries := params.queries
 		if note.Deleted() {
 			if err := queries.PermanentlyDeleteNoteByID(ctx, note.ID()); err != nil {
@@ -238,7 +238,7 @@ func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) error {
 		queries:       n.queries,
 		publisher:     n.publisher,
 		inTransaction: n.inTransaction,
-	}, func(params *RunInTxFnparams) error {
+	}, func(params *RunInTxFnParams) error {
 		var deleteIDs []uuid.UUID
 		var upsertNotes []*domain.Note
 		var allOutgoingLinks []*pgsqlc.InsertTempNoteLinksParams

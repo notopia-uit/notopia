@@ -136,7 +136,7 @@ func (f *Folder) Save(ctx context.Context, folder *domain.Folder) (cerr error) {
 		queries:       f.queries,
 		publisher:     f.publisher,
 		inTransaction: f.inTransaction,
-	}, func(params *RunInTxFnparams) error {
+	}, func(params *RunInTxFnParams) error {
 		queries := params.queries
 		if folder.Deleted() {
 			if err := queries.PermanentlyDeleteFolderByID(ctx, folder.ID()); err != nil {
@@ -186,7 +186,7 @@ func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr e
 		queries:       f.queries,
 		publisher:     f.publisher,
 		inTransaction: f.inTransaction,
-	}, func(params *RunInTxFnparams) error {
+	}, func(params *RunInTxFnParams) error {
 		var deleteIDs []uuid.UUID
 		var upsertFolders []*domain.Folder
 

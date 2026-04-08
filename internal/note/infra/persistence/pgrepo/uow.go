@@ -89,6 +89,13 @@ func (u *UnitOfWork) Execute(
 				)
 			}
 			panic(p)
+		} else if err != nil {
+			if err = tx.Rollback(ctx); err != nil {
+				slog.ErrorContext(
+					ctx, "failed to rollback transaction after error in unit of work",
+					slog.Any("error", err),
+				)
+			}
 		}
 	}()
 
@@ -111,12 +118,6 @@ func (u *UnitOfWork) Execute(
 	}
 
 	if err := fn(repoRegistry); err != nil {
-		if err = tx.Rollback(ctx); err != nil {
-			slog.ErrorContext(
-				ctx, "failed to rollback transaction after error in fn inside unit of work",
-				slog.Any("error", err),
-			)
-		}
 		return err
 	}
 
