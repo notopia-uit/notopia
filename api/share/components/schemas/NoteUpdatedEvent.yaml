@@ -1,2 +1,35 @@
 # vim: ft=yaml.openapi
-$ref: ../../../note/components/schemas/Note.yaml
+type: object
+
+properties:
+  id:
+    type: string
+    format: uuid
+
+  name:
+    type: string
+
+  icon:
+    type: string
+    nullable: true
+
+  folderId:
+    type: string
+    format: uuid
+
+  tags:
+    type: array
+    items:
+      type: string
+
+  updatedAt:
+    type: string
+    format: date-time
+
+required:
+  - id
+  - name
+  - icon
+  - folderId
+  - tags
+  - updatedAt

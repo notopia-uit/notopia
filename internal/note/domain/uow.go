@@ -2,8 +2,6 @@ package domain
 
 import (
 	"context"
-
-	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type RepoRegistry interface {
@@ -13,5 +11,5 @@ type RepoRegistry interface {
 }
 
 type UnitOfWork interface {
-	Execute(ctx context.Context, fn func(repoRegistry RepoRegistry) errs.Error) errs.Error
+	Execute(ctx context.Context, fn func(repoRegistry RepoRegistry) error) error
 }

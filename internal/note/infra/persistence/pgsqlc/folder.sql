@@ -90,38 +90,21 @@ SELECT
 FROM
   folders
 WHERE
-  CASE
-    WHEN sqlc.narg('id')::uuid IS NOT NULL
-    THEN id = sqlc.narg('id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.narg('workspace_id')::uuid IS NOT NULL
-    THEN workspace_id = sqlc.narg('workspace_id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.narg('parent_id')::uuid IS NOT NULL
-    THEN parent_id = sqlc.narg('parent_id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.arg('is_root_folder')::bool = TRUE
-    THEN parent_id IS NULL
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.arg('trashed_by')::text <> ''
-    THEN trashed_by = sqlc.arg('trashed_by')::text
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.arg('include_trashed')::bool = FALSE
-    THEN trashed_by IS NULL
-    ELSE TRUE
-  END
+  id = sqlc.arg('id')
+FOR UPDATE -- :if @for_update
+;
+
+-- name: GetFoldersByWorkspaceID :many
+SELECT
+  *
+FROM
+  folders
+WHERE
+  workspace_id = sqlc.arg('workspace_id')
 ORDER BY
-  created_at DESC;
+  created_at DESC
+FOR UPDATE -- :if @for_update
+;
 
 -- name: GetFolders :many
 SELECT
@@ -129,38 +112,43 @@ SELECT
 FROM
   folders
 WHERE
-  CASE
-    WHEN sqlc.narg('ids')::uuid[] IS NOT NULL
-    THEN id = ANY(sqlc.narg('ids')::uuid[])
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.narg('workspace_id')::uuid IS NOT NULL
-    THEN workspace_id = sqlc.narg('workspace_id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.narg('parent_id')::uuid IS NOT NULL
-    THEN parent_id = sqlc.narg('parent_id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.arg('is_root_folder')::bool = TRUE
-    THEN parent_id IS NULL
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.narg('trashed_by')::text IS NOT NULL
-    THEN trashed_by = sqlc.narg('trashed_by')::text
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN sqlc.arg('include_trashed')::bool = FALSE
-    THEN trashed_by IS NULL
-    ELSE TRUE
-  END
+  id = ANY(sqlc.narg('ids')::uuid[]) -- :if @ids
+  AND workspace_id = sqlc.narg('workspace_id')::uuid -- :if @workspace_id
+  AND ( -- :if @trashed_by
+    trashed_by = sqlc.narg('trashed_by')::text
+    OR trashed_by IS NULL
+  )
+  AND trashed_by IS NOT NULL -- :if @trashed_only
 ORDER BY
-  created_at DESC;
+  created_at DESC
+FOR UPDATE -- :if @for_update
+;
+
+-- name: GetParentIDsByFolderID :many
+WITH RECURSIVE parent_folders(id, parent_id) AS (
+  SELECT
+    id,
+    parent_id
+  FROM
+    folders AS start
+  WHERE
+    id = sqlc.arg('id')::uuid
+  UNION ALL
+  SELECT
+    id,
+    parent_id
+  FROM
+    folders
+    INNER JOIN parent_folders AS pf ON id = pf.parent_id
+)
+SELECT
+  id
+FROM
+  parent_folders
+WHERE
+  id != sqlc.arg('id')::uuid
+FOR UPDATE -- :if @for_update
+;
 
 -- name: GetWorkspaceIDByFolderID :one
 SELECT
@@ -169,49 +157,6 @@ FROM
   folders
 WHERE
   id = sqlc.arg('id');
-
--- name: GetRootFolderIDsByWorkspaceID :many
-SELECT
-  id
-FROM
-  folders
-WHERE
-  workspace_id = sqlc.arg('workspace_id')
-  AND parent_id IS NULL;
-
--- name: GetRecursiveFolderByParentID :many
-WITH RECURSIVE subfolders AS (
-  SELECT
-    *,
-    1 AS depth
-  FROM
-    folders
-  WHERE
-    parent_id = sqlc.arg('parent_id')::uuid
-    AND CASE
-      WHEN sqlc.arg('include_trashed')::bool = FALSE
-      THEN trashed_by IS NULL
-      ELSE TRUE
-    END
-  UNION ALL
-  SELECT
-    f.*,
-    s.depth + 1 AS depth
-  FROM
-    folders AS f
-    INNER JOIN subfolders s ON f.parent_id = s.id
-  WHERE
-    s.depth < COALESCE(sqlc.narg('depth')::int, 9999)
-    AND CASE
-      WHEN sqlc.arg('include_trashed')::bool = FALSE
-      THEN f.trashed_by IS NULL
-      ELSE TRUE
-    END
-)
-SELECT
-  *
-FROM
-  subfolders;
 
 -- name: CountFoldersInWorkspaceByIDs :one
 SELECT

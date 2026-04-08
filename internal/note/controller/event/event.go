@@ -1,34 +1,174 @@
 package event
 
 import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/component"
+	"github.com/notopia-uit/notopia/internal/note/config"
+	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/pkg/api/share"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
-type PubSub struct {
-	commandBus       *cqrs.CommandBus
-	commandProcessor *cqrs.CommandProcessor
-	eventBus         *cqrs.EventBus
-	eventProcessor   *cqrs.EventProcessor
-	router           *message.Router
-	app              *app.Server
+// This include integration (from share package) and domain event, setup for event processor
+// If not use with event processor but via subscriber directly, not need to declare this
+func eventToTopic(event any) (string, bool) {
+	switch e := event.(type) {
+	case domain.Event:
+		return component.DomainEventToTopic(e)
+	case *share.DocumentCommittedEvent:
+		return "events.integration.document.document.committed", true
+	}
+	return "", false
 }
 
-func NewPubSub(
-	commandBus *cqrs.CommandBus,
-	commandProcessor *cqrs.CommandProcessor,
-	eventBus *cqrs.EventBus,
-	eventProcessor *cqrs.EventProcessor,
-	router *message.Router,
+type Event struct {
+	subcriber      message.Subscriber
+	eventProcessor *cqrs.EventProcessor
+	router         *message.Router
+	app            *app.Server
+
+	domainEventCfg *config.DomainEvent
+}
+
+func NewEvent(
+	cfg *commonconfig.Kafka,
 	app *app.Server,
-) *PubSub {
-	return &PubSub{
-		commandBus:       commandBus,
-		commandProcessor: commandProcessor,
-		eventBus:         eventBus,
-		eventProcessor:   eventProcessor,
-		router:           router,
-		app:              app,
+	tracer kafka.SaramaTracer,
+	logger watermill.LoggerAdapter,
+	marshaler *cqrs.JSONMarshaler,
+	domainEventCfg *config.DomainEvent,
+) (*Event, error) {
+	subcriber, err := kafka.NewSubscriber(
+		kafka.SubscriberConfig{
+			Brokers:       cfg.Brokers,
+			ConsumerGroup: cfg.ConsumerGroup,
+			Tracer:        tracer,
+		},
+		logger,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create event controller subscriber: %w", err)
 	}
+	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create event controller router: %w", err)
+	}
+	retryMiddleware := middleware.Retry{
+		MaxRetries:      3,
+		InitialInterval: 500 * time.Millisecond,
+		MaxInterval:     10 * time.Second,
+		Multiplier:      2,
+		Logger:          logger,
+	}
+	router.AddMiddleware(
+		middleware.CorrelationID,
+		middleware.Recoverer,
+		retryMiddleware.Middleware,
+	)
+	eventProcessor, err := cqrs.NewEventProcessorWithConfig(
+		router,
+		cqrs.EventProcessorConfig{
+			GenerateSubscribeTopic: func(params cqrs.EventProcessorGenerateSubscribeTopicParams) (string, error) {
+				if topic, ok := eventToTopic(params.EventHandler.NewEvent()); ok { // Watermill doesn't pass the new event for me??, so I create a new event again
+					return topic, nil
+				}
+				return "", fmt.Errorf("unknown event name %s", params.EventName)
+			},
+			SubscriberConstructor: func(params cqrs.EventProcessorSubscriberConstructorParams) (message.Subscriber, error) {
+				return kafka.NewSubscriber(
+					kafka.SubscriberConfig{
+						Brokers:       cfg.Brokers,
+						ConsumerGroup: cfg.ConsumerGroup + "." + params.HandlerName,
+						Tracer:        tracer,
+					},
+					logger,
+				)
+			},
+			Marshaler: marshaler,
+			Logger:    logger,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create event controller event processor: %w", err)
+	}
+	event := &Event{
+		subcriber:      subcriber,
+		eventProcessor: eventProcessor,
+		router:         router,
+		app:            app,
+		domainEventCfg: domainEventCfg,
+	}
+	if err := event.setup(); err != nil {
+		return nil, fmt.Errorf("failed to setup event controller: %w", err)
+	}
+	return event, nil
+}
+
+var ProvideEvent = NewEvent
+
+func (e *Event) setup() error {
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"DocumentCommittedHandler",
+		e.documentCommittedHandler,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler: %w", err)
+	}
+
+	// NOTE: because watermill doesn't support kafka regex (IBM/sarama)
+	// So, we will need to for loop all topic we have, (for note, and folder)
+	workspaceItemUpdatedFolderTopics := []string{
+		component.DomainEventTopicPrefix + "folder.created",
+		component.DomainEventTopicPrefix + "folder.deleted",
+		component.DomainEventTopicPrefix + "folder.updated",
+		component.DomainEventTopicPrefix + "folder.moved",
+		component.DomainEventTopicPrefix + "folder.trashed",
+		component.DomainEventTopicPrefix + "folder.restored",
+		component.DomainEventTopicPrefix + "folder.permanently_deleted",
+	}
+	for _, topic := range workspaceItemUpdatedFolderTopics {
+		e.router.AddConsumerHandler(
+			fmt.Sprintf("WorkspaceItemsUpdatedHandler.%s", topic),
+			topic,
+			e.subcriber,
+			e.notifyWorkspaceItemsUpdatedFolderHandler,
+		)
+	}
+	workspaceItemUpdatedNoteTopics := []string{
+		component.DomainEventTopicPrefix + "note.created",
+		component.DomainEventTopicPrefix + "note.deleted",
+		component.DomainEventTopicPrefix + "note.updated",
+		component.DomainEventTopicPrefix + "note.moved",
+		component.DomainEventTopicPrefix + "note.trashed",
+		component.DomainEventTopicPrefix + "note.restored",
+		component.DomainEventTopicPrefix + "note.permanently_deleted",
+	}
+	for _, topic := range workspaceItemUpdatedNoteTopics {
+		e.router.AddConsumerHandler(
+			fmt.Sprintf("WorkspaceItemsUpdatedHandler.%s", topic),
+			topic,
+			e.subcriber,
+			e.notifyWorkspaceItemsUpdatedNoteHandler,
+		)
+	}
+	return nil
+}
+
+func (e *Event) Run(ctx context.Context) error {
+	if err := e.router.Run(ctx); err != nil {
+		return fmt.Errorf("failed to run event controller router: %w", err)
+	}
+	return nil
+}
+
+func (e *Event) IsRunning() bool {
+	return e.router.IsRunning()
 }

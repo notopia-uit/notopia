@@ -21,8 +21,42 @@ type Services struct {
 	Authorization commonconfig.Service `json:"authorization" mapstructure:"authorization" validate:"required" yaml:"authorization"`
 }
 
+type DomainEvent struct {
+	MessageMetadataUserIDKey      string `json:"messageMetadataUserIdKey"      mapstructure:"message_metadata_user_id_key"      validate:"required" yaml:"message_metadata_user_id_key"`
+	MessageWorkspaceIDKey         string `json:"messageMetadataWorkspaceIdKey" mapstructure:"message_metadata_workspace_id_key" validate:"required" yaml:"message_metadata_workspace_id_key"`
+	MessageMetadataAggregateIDKey string `json:"messageMetadataAggregateIdKey" mapstructure:"message_metadata_aggregate_id_key" validate:"required" yaml:"message_metadata_aggregate_id_key"`
+	OutboxTableName               string `json:"outboxTableName"               mapstructure:"outbox_table_name"                 validate:"required" yaml:"outbox_table_name"`
+}
+
+func setViperAdvancedDomainEventDefault(viper *viper.Viper) {
+	viper.SetDefault("advanced.domain_event.message_metadata_user_id_key", "user_id")
+	viper.SetDefault("advanced.domain_event.message_metadata_workspace_id_key", "workspace_id")
+	viper.SetDefault("advanced.domain_event.message_metadata_aggregate_id_key", "aggregate_id")
+	viper.SetDefault("advanced.domain_event.outbox_table_name", "eventsToForward")
+}
+
+type WorkspaceEvent struct {
+	MessageMetadataWorkspaceIDKey string `json:"messageMetadataWorkspaceIdKey" mapstructure:"message_metadata_workspace_id_key" validate:"required" yaml:"message_metadata_workspace_id_key"`
+	MessageMetadataUserIDKey      string `json:"messageMetadataUserIdKey"      mapstructure:"message_metadata_user_id_key"      validate:"required" yaml:"message_metadata_user_id_key"`
+	MessageMetadataEventTypeKey   string `json:"messageMetadataEventTypeKey"   mapstructure:"message_metadata_event_type_key"   validate:"required" yaml:"message_metadata_event_type_key"`
+	MessageGeneralTopic           string `json:"messageGeneralTopic"           mapstructure:"message_general_topic"             validate:"required" yaml:"message_general_topic"`
+}
+
+func setViperAdvancedWorkspaceEventDefault(viper *viper.Viper) {
+	viper.SetDefault("advanced.workspace_event.message_metadata_workspace_id_key", "workspace_id")
+	viper.SetDefault("advanced.workspace_event.message_metadata_user_id_key", "user_id")
+	viper.SetDefault("advanced.workspace_event.message_metadata_event_type_key", "event_type")
+	viper.SetDefault("advanced.workspace_event.message_general_topic", "events:workspaces")
+}
+
 type Advanced struct {
-	OutboxTableName string `json:"outboxTableName" mapstructure:"outbox_table_name" validate:"required" yaml:"outbox_table_name"`
+	DomainEvent    DomainEvent    `json:"domainEvent"    mapstructure:"domain_event"    validate:"omitempty" yaml:"domain_event"`
+	WorkspaceEvent WorkspaceEvent `json:"workspaceEvent" mapstructure:"workspace_event" validate:"omitempty" yaml:"workspace_event"`
+}
+
+func setViperAdvancedDefault(viper *viper.Viper) {
+	setViperAdvancedDomainEventDefault(viper)
+	setViperAdvancedWorkspaceEventDefault(viper)
 }
 
 type Config struct {
@@ -49,7 +83,7 @@ func New(
 	viper.SetDefault("server.http.port", 8081)
 	viper.SetDefault("server.grpc.port", 18081)
 	viper.SetDefault("server.health.port", 28081)
-	viper.SetDefault("advanced.outbox_table_name", "eventsToForward")
+	setViperAdvancedDefault(viper)
 	commonconfig.LogViperSetDefault(viper, "log")
 	commonconfig.KafkaViperSetDefault(viper, "kafka", "note-service")
 	commonconfig.SQLViperSetDefault(viper, "database")

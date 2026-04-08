@@ -39,6 +39,7 @@ type Event interface {
 	GetID() uuid.UUID
 	GetOccurredAt() time.Time
 	GetAggregateID() uuid.UUID
+	GetUserID() string
 }
 
 type BaseEvent struct {
@@ -56,8 +57,10 @@ func (e *BaseEvent) GetOccurredAt() time.Time { return e.OccurredAt }
 
 func (e *BaseEvent) GetAggregateID() uuid.UUID { return e.AggregateID }
 
-func NewBaseEvent(aggregateID uuid.UUID, userID string) *BaseEvent {
-	return &BaseEvent{
+func (e *BaseEvent) GetUserID() string { return e.UserID }
+
+func NewBaseEvent(aggregateID uuid.UUID, userID string) BaseEvent {
+	return BaseEvent{
 		ID:          uuid.New(),
 		OccurredAt:  time.Now(),
 		AggregateID: aggregateID,
@@ -109,8 +112,8 @@ func GetEventType(e Event) EventType {
 
 type FolderCreatedEvent struct {
 	BaseEvent
-	Name string  `json:"name"`
-	Icon *string `json:"icon"`
+	Name string `json:"name"`
+	Icon string `json:"icon"`
 }
 
 type FolderDeletedEvent struct {
@@ -119,14 +122,14 @@ type FolderDeletedEvent struct {
 
 type FolderUpdatedEvent struct {
 	BaseEvent
-	Name string  `json:"name"`
-	Icon *string `json:"icon"`
+	Name string `json:"name"`
+	Icon string `json:"icon"`
 }
 
 type NoteCreatedEvent struct {
 	BaseEvent
-	Name string  `json:"name"`
-	Icon *string `json:"icon"`
+	Name string `json:"name"`
+	Icon string `json:"icon"`
 }
 
 type FolderMovedEvent struct {
@@ -153,7 +156,7 @@ type NoteDeletedEvent struct {
 type NoteUpdatedEvent struct {
 	BaseEvent
 	Name          string     `json:"name"`
-	Icon          *string    `json:"icon"`
+	Icon          string     `json:"icon"`
 	Tags          []string   `json:"tags"`
 	Size          uint64     `json:"size"`
 	FolderID      uuid.UUID  `json:"folderId"`

@@ -23,15 +23,19 @@ func (h *StrictHandler) CreateNote(
 	if err != nil {
 		return nil, errs.NewInternalGenerateID(err)
 	}
+	var icon string
+	if request.Body.Icon != nil {
+		icon = *request.Body.Icon
+	}
 
 	cmd := &app.CreateNote{
 		ID:       id,
 		Name:     request.Body.Name,
-		Icon:     request.Body.Icon,
+		Icon:     icon,
 		FolderID: *request.Body.FolderId,
 		UserID:   user.ID,
 	}
-	err = h.App.CommandHandlers.CreateNoteHandler.Handle(ctx, cmd)
+	err = h.App.Cmds.CreateNoteHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +60,7 @@ func (h *StrictHandler) PermanentlyDeleteNote(
 		ID:     request.NoteId,
 		UserID: user.ID,
 	}
-	err := h.App.CommandHandlers.DeleteNoteHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.DeleteNoteHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -80,12 +84,15 @@ func (h *StrictHandler) GetNote(
 		UserID:         user.ID,
 	}
 
-	result, err := h.App.QueryHandlers.GetNoteHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetNoteHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
-	dto := toNote(*result)
+	dto, err := toNote(*result)
+	if err != nil {
+		return nil, err
+	}
 	return note.GetNote200JSONResponse(dto), nil
 }
 
@@ -93,17 +100,22 @@ func (h *StrictHandler) GetNoteGraph(
 	ctx context.Context,
 	request note.GetNoteGraphRequestObject,
 ) (note.GetNoteGraphResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
 	var depth int
 	if request.Params.Depth != nil {
 		depth = *request.Params.Depth
 	}
 
 	query := &app.GetNoteGraph{
-		ID:    request.NoteId,
-		Depth: depth,
+		ID:     request.NoteId,
+		Depth:  depth,
+		UserID: user.ID,
 	}
 
-	result, err := h.App.QueryHandlers.GetNoteGraphHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetNoteGraphHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -116,14 +128,19 @@ func (h *StrictHandler) GetNoteLinks(
 	ctx context.Context,
 	request note.GetNoteLinksRequestObject,
 ) (note.GetNoteLinksResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
 	outgoingLinks := request.Params.OutgoingLinks != nil && *request.Params.OutgoingLinks
 	backlinks := request.Params.Backlinks != nil && *request.Params.Backlinks
 	query := &app.GetNoteLinks{
 		ID:            request.NoteId,
 		OutgoingLinks: outgoingLinks,
 		Backlinks:     backlinks,
+		UserID:        user.ID,
 	}
-	result, err := h.App.QueryHandlers.GetNoteLinksHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetNoteLinksHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +170,7 @@ func (h *StrictHandler) RenameNote(
 		Name:   request.Body.Name,
 		UserID: user.ID,
 	}
-	err := h.App.CommandHandlers.RenameNoteHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.RenameNoteHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 )
 
 const checkSlugExists = `-- name: CheckSlugExists :one
@@ -25,33 +26,72 @@ SELECT EXISTS(
 `
 
 func (q *Queries) CheckSlugExists(ctx context.Context, slug string) (bool, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "CheckSlugExists")
+	defer span.End()
 	row := q.db.QueryRow(ctx, checkSlugExists, slug)
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
 }
 
-const getWorkspace = `-- name: GetWorkspace :one
+const getWorkspaceByID = `-- name: GetWorkspaceByID :one
 SELECT
   id, slug, name, created_at, updated_at, deleted_at
 FROM
   workspaces
 WHERE
-  CASE
-    WHEN $1::text IS NOT NULL THEN slug = $1
-    WHEN $2::uuid IS NOT NULL THEN id = $2
-    ELSE FALSE
-  END
+  id = $1::uuid
   AND deleted_at IS NULL
+FOR UPDATE -- :if $2
 `
 
-type GetWorkspaceParams struct {
-	Slug *string
-	ID   *uuid.UUID
+var _getWorkspaceByIDDynQ = dynCompile(getWorkspaceByID)
+
+type GetWorkspaceByIDParams struct {
+	ID        uuid.UUID
+	ForUpdate bool
 }
 
-func (q *Queries) GetWorkspace(ctx context.Context, arg *GetWorkspaceParams) (*Workspace, error) {
-	row := q.db.QueryRow(ctx, getWorkspace, arg.Slug, arg.ID)
+func (q *Queries) GetWorkspaceByID(ctx context.Context, arg GetWorkspaceByIDParams) (*Workspace, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspaceByID")
+	defer span.End()
+	dynQuery, dynArgs := _getWorkspaceByIDDynQ.Build([]any{arg.ID, arg.ForUpdate})
+	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
+	var i Workspace
+	err := row.Scan(
+		&i.ID,
+		&i.Slug,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return &i, err
+}
+
+const getWorkspaceBySlug = `-- name: GetWorkspaceBySlug :one
+SELECT
+  id, slug, name, created_at, updated_at, deleted_at
+FROM
+  workspaces
+WHERE
+  slug = $1::text
+  AND deleted_at IS NULL
+FOR UPDATE -- :if $2
+`
+
+var _getWorkspaceBySlugDynQ = dynCompile(getWorkspaceBySlug)
+
+type GetWorkspaceBySlugParams struct {
+	Slug      string
+	ForUpdate bool
+}
+
+func (q *Queries) GetWorkspaceBySlug(ctx context.Context, arg GetWorkspaceBySlugParams) (*Workspace, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspaceBySlug")
+	defer span.End()
+	dynQuery, dynArgs := _getWorkspaceBySlugDynQ.Build([]any{arg.Slug, arg.ForUpdate})
+	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
 	var i Workspace
 	err := row.Scan(
 		&i.ID,
@@ -75,6 +115,8 @@ WHERE
 `
 
 func (q *Queries) GetWorkspaceIDBySlug(ctx context.Context, slug string) (uuid.UUID, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetWorkspaceIDBySlug")
+	defer span.End()
 	row := q.db.QueryRow(ctx, getWorkspaceIDBySlug, slug)
 	var id uuid.UUID
 	err := row.Scan(&id)
@@ -115,6 +157,8 @@ type SaveWorkspaceParams struct {
 }
 
 func (q *Queries) SaveWorkspace(ctx context.Context, arg *SaveWorkspaceParams) error {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "SaveWorkspace")
+	defer span.End()
 	_, err := q.db.Exec(ctx, saveWorkspace,
 		arg.ID,
 		arg.Slug,

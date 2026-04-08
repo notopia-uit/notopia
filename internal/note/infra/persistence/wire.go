@@ -1,46 +1,54 @@
 package persistence
 
 import (
-	"database/sql"
-
-	"github.com/go-jet/jet/v2/qrm"
 	"github.com/goforj/wire"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/domain"
-	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pg"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgreadmodel"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgrepo"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-var PostresReadModelProviderSet = wire.NewSet(
-	pg.ProvideReadModel,
-	wire.Bind(new(app.CheckWorkspaceSlugExistsReadModel), new(*pg.ReadModel)),
-	wire.Bind(new(app.GetNoteGraphReadModel), new(*pg.ReadModel)),
-	wire.Bind(new(app.GetNoteLinksReadModel), new(*pg.ReadModel)),
-	wire.Bind(new(app.GetNoteReadModel), new(*pg.ReadModel)),
-	wire.Bind(new(app.GetWorkspaceBySlugReadModel), new(*pg.ReadModel)),
-	wire.Bind(new(app.GetWorkspaceGraphReadModel), new(*pg.ReadModel)),
-	wire.Bind(new(app.GetWorkspaceTreeReadModel), new(*pg.ReadModel)),
-	wire.Bind(new(app.ShowTrashReadModel), new(*pg.ReadModel)),
+var PGReadModelProviderSet = wire.NewSet(
+	pgreadmodel.ProvideCheckWorkspaceSlugExists,
+	pgreadmodel.ProvideNote,
+	pgreadmodel.ProvideNoteGraph,
+	pgreadmodel.ProvideNoteLinks,
+	pgreadmodel.ProvideShowTrash,
+	pgreadmodel.ProvideWorkspaceBySlug,
+	pgreadmodel.ProvideWorkspaceGraph,
+	pgreadmodel.ProvideWorkspaceTree,
+	wire.Bind(new(app.CheckWorkspaceSlugExistsReadModel), new(*pgreadmodel.CheckWorkspaceSlugExists)),
+	wire.Bind(new(app.GetNoteGraphReadModel), new(*pgreadmodel.NoteGraph)),
+	wire.Bind(new(app.GetNoteLinksReadModel), new(*pgreadmodel.NoteLinks)),
+	wire.Bind(new(app.GetNoteReadModel), new(*pgreadmodel.Note)),
+	wire.Bind(new(app.GetWorkspaceGraphReadModel), new(*pgreadmodel.WorkspaceGraph)),
+	wire.Bind(new(app.GetWorkspaceTreeReadModel), new(*pgreadmodel.WorkspaceTree)),
+	wire.Bind(new(app.ShowTrashReadModel), new(*pgreadmodel.ShowTrash)),
+	wire.Bind(new(app.WorkspaceBySlugReadModel), new(*pgreadmodel.WorkspaceBySlug)),
+)
+
+var PGRepoProviderSet = wire.NewSet(
+	pgrepo.ProvideFolder,
+	pgrepo.ProvideNote,
+	pgrepo.ProvideUnitOfWork,
+	pgrepo.ProvideWorkspace,
+	pgrepo.ProvideRunInTx,
+	wire.Bind(new(domain.FolderRepo), new(*pgrepo.Folder)),
+	wire.Bind(new(domain.NoteRepo), new(*pgrepo.Note)),
+	wire.Bind(new(domain.UnitOfWork), new(*pgrepo.UnitOfWork)),
+	wire.Bind(new(domain.WorkspaceRepo), new(*pgrepo.Workspace)),
 )
 
 var PostgresProviderSet = wire.NewSet(
-	PostresReadModelProviderSet,
+	PGRepoProviderSet,
+	PGReadModelProviderSet,
 
 	ProvideGooseProvider,
 	ProvidePg,
-	pg.ProvideFolder,
-	pg.ProvideNote,
-	pg.ProvidePgPool,
-	pg.ProvideQueries,
-	pg.ProvideStdlib,
-	pg.ProvideUnitOfWork,
-	pg.ProvideWorkspace,
-	wire.Bind(new(app.Persistence), new(*Pg)),
-	wire.Bind(new(domain.FolderRepo), new(*pg.Folder)),
-	wire.Bind(new(domain.NoteRepo), new(*pg.Note)),
-	wire.Bind(new(domain.UnitOfWork), new(*pg.UnitOfWork)),
-	wire.Bind(new(domain.WorkspaceRepo), new(*pg.Workspace)),
+	ProvidePgPool,
+	ProvideSQLCQueries,
+	ProvidePgxPoolStdlib,
 	wire.Bind(new(pgsqlc.DBTX), new(*pgxpool.Pool)),
-	wire.Bind(new(qrm.DB), new(*sql.DB)),
 )

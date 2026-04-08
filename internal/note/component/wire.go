@@ -1,4 +1,4 @@
-package components
+package component
 
 import (
 	"github.com/goforj/wire"
@@ -6,4 +6,6 @@ import (
 
 var ProviderSet = wire.NewSet(
 	ProvideValidate,
+	ProvideWatermillJsonMarshaler,
+	ProvideWatermillLogger,
 )

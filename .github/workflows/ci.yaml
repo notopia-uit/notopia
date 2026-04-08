@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - '*'
+      - '**'
     paths-ignore: &pushPathsIgnore
       - .dockerignore
       - .editorconfig
@@ -23,7 +23,7 @@ on:
       - mise.toml
   pull_request:
     branches:
-      - '*'
+      - '**'
     paths-ignore: *pushPathsIgnore
     types:
       - opened

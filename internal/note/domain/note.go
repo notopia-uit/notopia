@@ -10,12 +10,13 @@ import (
 type Note struct {
 	id            uuid.UUID
 	name          string
-	icon          *string
+	icon          string
 	tags          []string
 	size          uint64
 	folderID      uuid.UUID
 	outgoingLinks uuid.UUIDs
 	trashed       *Trashed
+	deleted       bool
 
 	events []Event
 }
@@ -23,7 +24,7 @@ type Note struct {
 func NewNote(
 	id uuid.UUID,
 	name string,
-	icon *string,
+	icon string,
 	folderID uuid.UUID,
 ) *Note {
 	if name == "" {
@@ -38,6 +39,7 @@ func NewNote(
 		size:          0,
 		outgoingLinks: []uuid.UUID{},
 		trashed:       nil,
+		deleted:       false,
 
 		events: []Event{},
 	}
@@ -46,12 +48,13 @@ func NewNote(
 func UnmarshalNote(
 	id uuid.UUID,
 	name string,
-	icon *string,
+	icon string,
 	tags []string,
 	size uint64,
 	folderID uuid.UUID,
 	outgoingLinks uuid.UUIDs,
 	trashed *Trashed,
+	deleted bool,
 ) *Note {
 	return &Note{
 		id:            id,
@@ -62,23 +65,20 @@ func UnmarshalNote(
 		folderID:      folderID,
 		outgoingLinks: outgoingLinks,
 		trashed:       trashed,
+		deleted:       deleted,
 
 		events: []Event{},
 	}
 }
 
-func (n *Note) ID() uuid.UUID {
-	return n.id
-}
+func (n *Note) ID() uuid.UUID { return n.id }
 
-func (n *Note) Name() string {
-	return n.name
-}
+func (n *Note) Name() string { return n.name }
 
 func (n *Note) Rename(name string, userID string) {
 	n.name = name
-	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(n.id, userID),
+	n.addEvent(&NoteUpdatedEvent{
+		BaseEvent:     NewBaseEvent(n.id, userID),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -88,14 +88,12 @@ func (n *Note) Rename(name string, userID string) {
 	})
 }
 
-func (n *Note) Icon() *string {
-	return n.icon
-}
+func (n *Note) Icon() string { return n.icon }
 
 func (n *Note) SetIcon(icon string, userID string) {
-	n.icon = &icon
-	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(n.id, userID),
+	n.icon = icon
+	n.addEvent(&NoteUpdatedEvent{
+		BaseEvent:     NewBaseEvent(n.id, userID),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -105,14 +103,12 @@ func (n *Note) SetIcon(icon string, userID string) {
 	})
 }
 
-func (n *Note) Tags() []string {
-	return n.tags
-}
+func (n *Note) Tags() []string { return n.tags }
 
 func (n *Note) SetTags(tags []string, userID string) {
 	n.tags = tags
-	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(n.id, userID),
+	n.addEvent(&NoteUpdatedEvent{
+		BaseEvent:     NewBaseEvent(n.id, userID),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -128,8 +124,8 @@ func (n *Note) Size() uint64 {
 
 func (n *Note) SetSize(size uint64, userID string) {
 	n.size = size
-	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(n.id, userID),
+	n.addEvent(&NoteUpdatedEvent{
+		BaseEvent:     NewBaseEvent(n.id, userID),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -139,26 +135,22 @@ func (n *Note) SetSize(size uint64, userID string) {
 	})
 }
 
-func (n *Note) FolderID() uuid.UUID {
-	return n.folderID
-}
+func (n *Note) FolderID() uuid.UUID { return n.folderID }
 
 func (n *Note) MoveToFolder(folderID uuid.UUID, userID string) {
 	n.folderID = folderID
-	n.AddEvent(&NoteMovedEvent{
-		BaseEvent: *NewBaseEvent(n.id, userID),
+	n.addEvent(&NoteMovedEvent{
+		BaseEvent: NewBaseEvent(n.id, userID),
 		FolderID:  n.folderID,
 	})
 }
 
-func (n *Note) OutgoingLinks() uuid.UUIDs {
-	return n.outgoingLinks
-}
+func (n *Note) OutgoingLinks() uuid.UUIDs { return n.outgoingLinks }
 
 func (n *Note) SetOutgoingLinks(outgoingLinks uuid.UUIDs, userID string) {
 	n.outgoingLinks = outgoingLinks
-	n.AddEvent(&NoteUpdatedEvent{
-		BaseEvent:     *NewBaseEvent(n.id, userID),
+	n.addEvent(&NoteUpdatedEvent{
+		BaseEvent:     NewBaseEvent(n.id, userID),
 		Name:          n.name,
 		Icon:          n.icon,
 		Tags:          n.tags,
@@ -172,46 +164,44 @@ func (n *Note) IsTrashed() bool {
 	return n.trashed != nil
 }
 
-func (n *Note) TrashedBy() *TrashedBy {
-	if n.trashed == nil {
-		return nil
-	}
-	return &n.trashed.by
+func (n *Note) TrashedBy() TrashedBy {
+	return n.trashed.By()
 }
 
-func (n *Note) TrashedByString() *string {
-	if n.trashed == nil {
-		return nil
-	}
-	return new(n.trashed.by.String())
+func (n *Note) TrashedAt() time.Time {
+	return n.trashed.At()
 }
 
-func (n *Note) TrashedAt() *time.Time {
-	if n.trashed == nil {
-		return nil
-	}
-	return &n.trashed.at
-}
-
-func (n *Note) Trash(trashedBy TrashedBy, userID string) errs.Error {
+func (n *Note) Trash(trashedBy TrashedBy, userID string) error {
 	if n.trashed != nil {
 		return errs.NewNoteAlreadyTrashed(n.id)
 	}
 	n.trashed = NewTrashed(trashedBy, time.Now())
-	n.AddEvent(&NoteTrashedEvent{
-		BaseEvent: *NewBaseEvent(n.id, userID),
+	n.addEvent(&NoteTrashedEvent{
+		BaseEvent: NewBaseEvent(n.id, userID),
 	})
 	return nil
 }
 
 func (n *Note) Restore(userID string) {
 	n.trashed = nil
-	n.AddEvent(&NoteRestoredEvent{
-		BaseEvent: *NewBaseEvent(n.id, userID),
+	n.addEvent(&NoteRestoredEvent{
+		BaseEvent: NewBaseEvent(n.id, userID),
 	})
 }
 
-func (n *Note) AddEvent(event Event) {
+func (n *Note) Deleted() bool {
+	return n.deleted
+}
+
+func (n *Note) Delete(userID string) {
+	n.deleted = true
+	n.addEvent(&NoteDeletedEvent{
+		BaseEvent: NewBaseEvent(n.id, userID),
+	})
+}
+
+func (n *Note) addEvent(event Event) {
 	n.events = append(n.events, event)
 }
 

@@ -2,50 +2,60 @@ package note
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
-	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/controller/event"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/health"
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
-	"github.com/notopia-uit/notopia/internal/note/controller/integrationevent"
+	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
 )
 
 type Server struct {
-	http             *http.HTTP
-	grpc             *grpc.GRPC
-	integrationevent *integrationevent.IntegrationEvent
-	health           *health.Health
-	app              *app.Server
-	logger           *slog.Logger
+	persistence       *persistence.Pg
+	http              *http.HTTP
+	grpc              *grpc.GRPC
+	event             *event.Event
+	workspaceEventHub *workspaceevent.WorkspaceEventHub
+	outbox            *outbox.Outbox
+	health            *health.Health
+	logger            *slog.Logger
 }
 
+// TODO: we have to start the workspace event also
 func NewServer(
+	persistence *persistence.Pg,
 	http *http.HTTP,
 	grpc *grpc.GRPC,
-	integrationevent *integrationevent.IntegrationEvent,
+	event *event.Event,
+	workspaceEventHub *workspaceevent.WorkspaceEventHub,
+	outbox *outbox.Outbox,
 	health *health.Health,
-	app *app.Server,
 	logger *slog.Logger,
-	globalOtel otel.Global,
+	globalOtel otel.Global, // This have to be here for deps
 ) *Server {
 	slog.SetDefault(logger)
 
 	return &Server{
-		http:             http,
-		grpc:             grpc,
-		integrationevent: integrationevent,
-		health:           health,
-		app:              app,
-		logger:           logger,
+		persistence:       persistence,
+		http:              http,
+		grpc:              grpc,
+		event:             event,
+		workspaceEventHub: workspaceEventHub,
+		outbox:            outbox,
+		health:            health,
+		logger:            logger,
 	}
 }
 
 func (s *Server) Run(ctx context.Context) error {
-	if err := s.app.Start(ctx); err != nil {
-		return err
+	if err := s.persistence.RunMigrations(ctx); err != nil {
+		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
 	g, ctx := errgroup.WithContext(ctx)
@@ -57,7 +67,10 @@ func (s *Server) Run(ctx context.Context) error {
 				s.logger.ErrorContext(ctx, "failed to shutdown http server", slog.Any("error", err))
 			}
 		}()
-		return s.http.Run()
+		if err := s.http.Run(); err != nil {
+			return fmt.Errorf("failed to run http server: %w", err)
+		}
+		return nil
 	})
 
 	g.Go(func() error {
@@ -65,7 +78,10 @@ func (s *Server) Run(ctx context.Context) error {
 			<-ctx.Done()
 			s.grpc.Stop()
 		}()
-		return s.grpc.Run()
+		if err := s.grpc.Run(); err != nil {
+			return fmt.Errorf("failed to run grpc server: %w", err)
+		}
+		return nil
 	})
 
 	g.Go(func() error {
@@ -75,12 +91,31 @@ func (s *Server) Run(ctx context.Context) error {
 				s.logger.ErrorContext(ctx, "failed to shutdown health server", slog.Any("error", err))
 			}
 		}()
-		return s.health.Run()
+		if err := s.health.Run(); err != nil {
+			return fmt.Errorf("failed to run health server: %w", err)
+		}
+		return nil
 	})
 
 	g.Go(func() error {
-		<-ctx.Done()
-		return s.app.Stop(context.Background())
+		// This has context passed down, so we don't really to close/stop it
+		if err := s.event.Run(ctx); err != nil {
+			return fmt.Errorf("failed to run integration event listener: %w", err)
+		}
+		return nil
+	})
+	g.Go(func() error {
+		if err := s.workspaceEventHub.Run(ctx); err != nil {
+			return fmt.Errorf("failed to run workspace event hub: %w", err)
+		}
+		return nil
+	})
+	g.Go(func() error {
+		// This has context passed down, so we don't really to close/stop it
+		if err := s.outbox.Run(ctx); err != nil {
+			return fmt.Errorf("failed to run outbox forwarder: %w", err)
+		}
+		return nil
 	})
 
 	return g.Wait()

@@ -1,90 +1,138 @@
 package http
 
 import (
+	"fmt"
+
+	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/authorization/errs"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-func toNote(n app.Note) note.Note {
-	id := n.ID
-	folderID := n.FolderID
-	updatedAt := n.UpdatedAt
-	tags := n.Tags
-	if tags == nil {
-		tags = []string{}
+func toNote(n app.Note) (note.Note, error) {
+	var icon *string
+	if n.Icon != "" {
+		icon = &n.Icon
 	}
+
+	var tags *[]string
+	if len(n.Tags) > 0 {
+		tags = &n.Tags
+	}
+
 	var trashed *note.NoteTrashed
 	if n.Trashed != nil {
+		trashedBy, err := toTrashedBy(n.Trashed.TrashedBy)
+		if err != nil {
+			return note.Note{}, fmt.Errorf("invalid trashed by: %v", err)
+		}
 		trashed = &note.NoteTrashed{
-			TrashedBy: toTrashedBy(n.Trashed.TrashedBy),
+			TrashedBy: trashedBy,
 			TrashedAt: n.Trashed.TrashedAt,
 		}
 	}
+
 	return note.Note{
-		Id:        &id,
+		Id:        &n.ID,
 		Name:      n.Name,
-		Icon:      n.Icon,
-		Tags:      &tags,
-		FolderId:  &folderID,
-		UpdatedAt: &updatedAt,
+		Icon:      icon,
+		Tags:      tags,
+		FolderId:  &n.FolderID,
+		UpdatedAt: &n.UpdatedAt,
 		Trashed:   trashed,
-	}
+	}, nil
 }
 
-func toFolder(f app.Folder) note.Folder {
-	id := f.ID
-	parentID := f.ParentID
-	workspaceID := f.WorkspaceID
-	updatedAt := f.UpdatedAt
+func toFolder(f app.Folder) (note.Folder, error) {
+	var icon *string
+	if f.Icon != "" {
+		icon = &f.Icon
+	}
+
+	var parentID *uuid.UUID
+	if f.ParentID != uuid.Nil {
+		parentID = &f.ParentID
+	}
+
 	var trashed *note.FolderTrashed
 	if f.Trashed != nil {
+		trashedBy, err := toTrashedBy(f.Trashed.TrashedBy)
+		if err != nil {
+			return note.Folder{}, fmt.Errorf("invalid trashed by: %v", err)
+		}
 		trashed = &note.FolderTrashed{
-			TrashedBy: toTrashedBy(f.Trashed.TrashedBy),
+			TrashedBy: trashedBy,
 			TrashedAt: f.Trashed.TrashedAt,
 		}
 	}
+
 	return note.Folder{
-		Id:          &id,
+		Id:          &f.ID,
 		Name:        f.Name,
-		Icon:        f.Icon,
-		ParentId:    &parentID,
-		WorkspaceId: &workspaceID,
-		UpdatedAt:   &updatedAt,
+		Icon:        icon,
+		ParentId:    parentID,
+		WorkspaceId: &f.WorkspaceID,
+		UpdatedAt:   &f.UpdatedAt,
 		Trashed:     trashed,
-	}
+	}, nil
 }
 
 func toWorkspace(w app.Workspace) note.Workspace {
-	id := w.ID
 	return note.Workspace{
-		Id:   &id,
+		Id:   &w.ID,
 		Name: w.Name,
 		Slug: w.Slug,
 	}
 }
 
-func toWorkspaceMember(m *app.WorkspaceMember) note.WorkspaceMember {
-	return note.WorkspaceMember{
-		Id:       m.ID,
-		Role:     note.WorkspaceRole(m.Role),
-		Username: m.Username,
+func toWorkspaceRole(r app.WorkspaceRole) (note.WorkspaceRole, error) {
+	switch r {
+	case app.WorkspaceRoleOwner:
+		return note.Owner, nil
+	case app.WorkspaceRoleEditor:
+		return note.Editor, nil
+	case app.WorkspaceRoleViewer:
+		return note.Viewer, nil
+	default:
+		return note.Viewer, errs.NewInternal(fmt.Sprintf("invalid workspace role: %v", r), nil)
 	}
 }
 
+func toWorkspaceMember(m *app.WorkspaceMember) (note.WorkspaceMember, error) {
+	var username *string
+	if m.Username != "" {
+		username = &m.Username
+	}
+	role, err := toWorkspaceRole(m.Role)
+	if err != nil {
+		return note.WorkspaceMember{}, err
+	}
+
+	return note.WorkspaceMember{
+		Id:       m.ID,
+		Role:     role,
+		Username: username,
+	}, nil
+}
+
 func toWorkspaceTreeNote(n *app.WorkspaceTreeNote) note.WorkspaceTreeNote {
-	id := n.ID
-	updatedAt := n.UpdatedAt
+	var icon *string
+	if n.Icon != "" {
+		icon = &n.Icon
+	}
 	return note.WorkspaceTreeNote{
-		Id:        &id,
+		Id:        &n.ID,
 		Name:      n.Name,
-		Icon:      n.Icon,
-		UpdatedAt: &updatedAt,
+		Icon:      icon,
+		UpdatedAt: &n.UpdatedAt,
 	}
 }
 
 func toWorkspaceTreeFolder(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
-	id := f.ID
-	updatedAt := f.UpdatedAt
+	var icon *string
+	if f.Icon != "" {
+		icon = &f.Icon
+	}
 	notes := make([]note.WorkspaceTreeNote, len(f.Notes))
 	for i, n := range f.Notes {
 		notes[i] = toWorkspaceTreeNote(n)
@@ -94,43 +142,54 @@ func toWorkspaceTreeFolder(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFolder 
 		children[i] = toWorkspaceTreeFolder(c)
 	}
 	return note.WorkspaceTreeFolder{
-		Id:        &id,
+		Id:        &f.ID,
 		Name:      f.Name,
-		Icon:      f.Icon,
+		Icon:      icon,
 		Notes:     notes,
 		Children:  children,
-		UpdatedAt: &updatedAt,
+		UpdatedAt: &f.UpdatedAt,
 	}
 }
 
-func toTrashedFolder(f *app.TrashedFolder) note.TrashedFolder {
+func toTrashedFolder(f *app.TrashedFolder) (note.TrashedFolder, error) {
+	trashedBy, err := toTrashedBy(f.Trashed.TrashedBy)
+	if err != nil {
+		return note.TrashedFolder{}, err
+	}
 	return note.TrashedFolder{
 		Id:   f.ID,
-		Name: new(f.Name),
+		Name: &f.Name,
 		Trashed: note.Trashed{
-			TrashedBy: toTrashedBy(f.Trashed.TrashedBy),
+			TrashedBy: trashedBy,
 			TrashedAt: f.Trashed.TrashedAt,
 		},
-	}
+	}, nil
 }
 
-func toTrashedNote(n *app.TrashedNote) note.TrashedNote {
+func toTrashedNote(n *app.TrashedNote) (note.TrashedNote, error) {
+	trashedBy, err := toTrashedBy(n.Trashed.TrashedBy)
+	if err != nil {
+		return note.TrashedNote{}, err
+	}
 	return note.TrashedNote{
 		Id:   n.ID,
-		Name: new(n.Name),
+		Name: &n.Name,
 		Trashed: note.Trashed{
-			TrashedBy: toTrashedBy(n.Trashed.TrashedBy),
+			TrashedBy: trashedBy,
 			TrashedAt: n.Trashed.TrashedAt,
 		},
-	}
+	}, nil
 }
 
 func toNoteLink(n *app.NoteLink) note.NoteLink {
-	id := n.ID
+	var icon *string
+	if n.Icon != "" {
+		icon = &n.Icon
+	}
 	return note.NoteLink{
-		Id:   &id,
+		Id:   &n.ID,
 		Name: n.Name,
-		Icon: n.Icon,
+		Icon: icon,
 	}
 }
 
@@ -140,8 +199,8 @@ func toGraph(g *app.Graph) note.Graph {
 		nodes[i].Id = n.ID
 		nodes[i].Name = n.Name
 		nodes[i].Type = note.GraphNodesType(n.Type)
-		if n.Weight != nil {
-			w := float32(*n.Weight)
+		if n.Weight != 0 {
+			w := float32(n.Weight)
 			nodes[i].Weight = &w
 		}
 	}
@@ -156,19 +215,27 @@ func toGraph(g *app.Graph) note.Graph {
 	}
 }
 
-func toShowTrash(t *app.Trash) note.ShowTrash200JSONResponse {
+func toShowTrash(t *app.Trash) (note.ShowTrash200JSONResponse, error) {
 	notes := make([]note.TrashedNote, len(t.Notes))
 	for i, n := range t.Notes {
-		notes[i] = toTrashedNote(n)
+		trashedNote, err := toTrashedNote(n)
+		if err != nil {
+			return note.ShowTrash200JSONResponse{}, fmt.Errorf("invalid trashed note: %v", err)
+		}
+		notes[i] = trashedNote
 	}
 	folders := make([]note.TrashedFolder, len(t.Folders))
 	for i, f := range t.Folders {
-		folders[i] = toTrashedFolder(f)
+		trashedFolder, err := toTrashedFolder(f)
+		if err != nil {
+			return note.ShowTrash200JSONResponse{}, fmt.Errorf("invalid trashed folder: %v", err)
+		}
+		folders[i] = trashedFolder
 	}
 	return note.ShowTrash200JSONResponse{
 		Notes:   notes,
 		Folders: folders,
-	}
+	}, nil
 }
 
 func toGetNoteLinks(r *app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
@@ -186,13 +253,13 @@ func toGetNoteLinks(r *app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
 	}
 }
 
-func toTrashedBy(t app.TrashedBy) note.TrashedBy {
+func toTrashedBy(t app.TrashedBy) (note.TrashedBy, error) {
 	switch t {
 	case app.TrashedByParent:
-		return note.Parent
+		return note.Parent, nil
 	case app.TrashedByPurpose:
-		return note.Purpose
+		return note.Purpose, nil
 	default:
-		panic("invalid trashed by")
+		return note.TrashedBy(""), errs.NewInternal(fmt.Sprintf("invalid trashed by: %v", t), nil)
 	}
 }

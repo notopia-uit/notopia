@@ -16,11 +16,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func toAuthorizationServiceError(err error) errs.Error {
-	// NOTE: Lazy to convert all possible errors
-	return errs.NewAuthorizationInternal(err)
-}
-
 func authorizationUnaryClientErrorInterceptor() grpc.UnaryClientInterceptor {
 	return func(
 		ctx context.Context,
@@ -31,7 +26,10 @@ func authorizationUnaryClientErrorInterceptor() grpc.UnaryClientInterceptor {
 		opts ...grpc.CallOption,
 	) error {
 		err := invoker(ctx, method, req, reply, cc, opts...)
-		return toAuthorizationServiceError(err)
+		if err != nil {
+			return errs.NewAuthorizationInternal(err)
+		}
+		return nil
 	}
 }
 
@@ -72,26 +70,26 @@ func NewAuthorization(
 
 var ProvideAuthorization = NewAuthorization
 
-func (a *Authorization) HasWorkspacePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspacePermission) (bool, errs.Error) {
+func (a *Authorization) HasWorkspacePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspacePermission) (bool, error) {
 	return false, errs.NewUnimplemented()
 }
 
-func (a *Authorization) HasWorkspaceItemPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, errs.Error) {
+func (a *Authorization) HasWorkspaceItemPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, error) {
 	return false, errs.NewUnimplemented()
 }
 
-func (a *Authorization) HasWorkspaceNotePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, errs.Error) {
+func (a *Authorization) HasWorkspaceNotePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, error) {
 	return false, errs.NewUnimplemented()
 }
 
-func (a *Authorization) HasWorkspaceFolderPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, errs.Error) {
+func (a *Authorization) HasWorkspaceFolderPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, error) {
 	return false, errs.NewUnimplemented()
 }
 
-func (a *Authorization) CreateWorkspaceWithOwnership(ctx context.Context, userID string, workspaceID uuid.UUID, ownerID uuid.UUID) errs.Error {
+func (a *Authorization) CreateWorkspaceWithOwnership(ctx context.Context, ownerID string, workspaceID uuid.UUID) error {
 	return errs.NewUnimplemented()
 }
 
-func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]*app.WorkspaceMemberInfo, errs.Error) {
+func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]*app.WorkspaceMemberInfo, error) {
 	return nil, errs.NewUnimplemented()
 }

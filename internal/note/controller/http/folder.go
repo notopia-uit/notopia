@@ -25,16 +25,20 @@ func (h *StrictHandler) CreateFolder(
 	if err != nil {
 		return nil, errs.NewInternalGenerateID(err)
 	}
+	var icon string
+	if body.Icon != nil {
+		icon = *body.Icon
+	}
 	cmd := &app.CreateFolder{
 		ID:          id,
 		Name:        body.Name,
-		Icon:        body.Icon,
+		Icon:        icon,
 		ParentID:    *body.ParentId,
 		WorkspaceID: *body.WorkspaceId,
 		UserID:      user.ID,
 	}
 
-	if err := h.App.CommandHandlers.CreateFolderHandler.Handle(ctx, cmd); err != nil {
+	if err := h.App.Cmds.CreateFolderHandler.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
 
@@ -59,7 +63,7 @@ func (h *StrictHandler) PermanentlyDeleteFolder(
 		UserID: user.ID,
 	}
 
-	if err := h.App.CommandHandlers.DeleteFolderHandler.Handle(ctx, cmd); err != nil {
+	if err := h.App.Cmds.DeleteFolderHandler.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
 	return note.PermanentlyDeleteFolder204Response{}, nil
@@ -82,7 +86,7 @@ func (h *StrictHandler) RenameFolder(
 		UserID: user.ID,
 	}
 
-	if err := h.App.CommandHandlers.RenameFolderHandler.Handle(ctx, cmd); err != nil {
+	if err := h.App.Cmds.RenameFolderHandler.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
 

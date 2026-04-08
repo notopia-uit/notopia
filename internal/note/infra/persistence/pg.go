@@ -1,0 +1,116 @@
+package persistence
+
+import (
+	"context"
+	"database/sql"
+	"embed"
+	"fmt"
+	"io/fs"
+	"log/slog"
+
+	"github.com/exaring/otelpgx"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	"github.com/pressly/goose/v3"
+	"github.com/pressly/goose/v3/lock"
+	"go.opentelemetry.io/otel/sdk/trace"
+)
+
+func NewPgPool(
+	ctx context.Context,
+	tracerProvider *trace.TracerProvider,
+	cfg *commonconfig.SQL,
+) (*pgxpool.Pool, func(), error) {
+	pgxCfg, err := pgxpool.ParseConfig(cfg.GetURL())
+	if err != nil {
+		return nil, nil, err
+	}
+	pgxCfg.ConnConfig.Tracer = otelpgx.NewTracer(
+		otelpgx.WithTracerProvider(tracerProvider),
+	)
+	pool, err := pgxpool.NewWithConfig(ctx, pgxCfg)
+	if err != nil {
+		return nil, nil, err
+	}
+	return pool, pool.Close, nil
+}
+
+var ProvidePgPool = NewPgPool
+
+func NewSQLCQueries(db pgsqlc.DBTX) *pgsqlc.Queries {
+	return pgsqlc.New(db)
+}
+
+var ProvideSQLCQueries = NewSQLCQueries
+
+func NewPgxPoolStdlib(pool *pgxpool.Pool) *sql.DB {
+	return stdlib.OpenDBFromPool(pool)
+}
+
+var ProvidePgxPoolStdlib = NewPgxPoolStdlib
+
+func NewGooseProvider(db *sql.DB, logger *slog.Logger) (*goose.Provider, error) {
+	locker, err := lock.NewPostgresSessionLocker()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create postgres session locker: %w", err)
+	}
+	migrationFiles, err := fs.Sub(PgMigrations, "pgmigration")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get migration files: %w", err)
+	}
+	gooseProvider, err := goose.NewProvider(
+		goose.DialectPostgres,
+		db,
+		migrationFiles,
+		goose.WithSlog(logger),
+		goose.WithSessionLocker(locker),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create goose provider: %w", err)
+	}
+	return gooseProvider, nil
+}
+
+var ProvideGooseProvider = NewGooseProvider
+
+//go:embed pgmigration/*
+var PgMigrations embed.FS
+
+type Pg struct {
+	pgxPool       *pgxpool.Pool
+	gooseProvider *goose.Provider
+}
+
+func NewPg(
+	pgxPool *pgxpool.Pool,
+	gooseProvider *goose.Provider,
+) (*Pg, error) {
+	return &Pg{
+		pgxPool:       pgxPool,
+		gooseProvider: gooseProvider,
+	}, nil
+}
+
+func (p *Pg) IsMigrationDone(ctx context.Context) (bool, error) {
+	pending, err := p.gooseProvider.HasPending(ctx)
+	if err != nil {
+		return false, fmt.Errorf("failed to check migration status: %w", err)
+	}
+	return !pending, nil
+}
+
+func (p *Pg) Ping(ctx context.Context) error {
+	return p.pgxPool.Ping(ctx)
+}
+
+func (p *Pg) RunMigrations(ctx context.Context) error {
+	_, err := p.gooseProvider.Up(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to run migrations: %w", err)
+	}
+	return nil
+}
+
+var ProvidePg = NewPg

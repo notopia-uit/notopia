@@ -2,7 +2,6 @@ package domain
 
 import (
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type TrashService struct{}
@@ -13,7 +12,7 @@ func NewTrashService() *TrashService {
 
 var ProvideTrashService = NewTrashService
 
-func (s *TrashService) TrashNotes(notes []*Note, userID string) errs.Error {
+func (s *TrashService) TrashNotes(notes []*Note, userID string) error {
 	for i := range notes {
 		if err := notes[i].Trash(TrashedByPurpose, userID); err != nil {
 			return err
@@ -27,7 +26,7 @@ func (s *TrashService) TrashFolders(
 	workspaceFolders *[]*Folder,
 	targetFolders []*Folder,
 	userID string,
-) errs.Error {
+) error {
 	for i := range targetFolders {
 		if err := targetFolders[i].Trash(TrashedByPurpose, userID); err != nil {
 			return err
@@ -45,10 +44,10 @@ func (s *TrashService) cascadeTrashChildren(
 	workspaceFolders *[]*Folder,
 	folderID uuid.UUID,
 	userID string,
-) errs.Error {
+) error {
 	for i := range *workspaceFolders {
 		folder := (*workspaceFolders)[i]
-		if folder.ParentID() != nil && *folder.ParentID() == folderID && !folder.IsTrashed() {
+		if folder.ParentID() != uuid.Nil && folder.ParentID() == folderID && !folder.IsTrashed() {
 			if err := folder.Trash(TrashedByParent, userID); err != nil {
 				return err
 			}
@@ -71,7 +70,7 @@ func (s *TrashService) cascadeTrashChildren(
 	return nil
 }
 
-func (s *TrashService) RestoreNotes(notes []*Note, userID string) errs.Error {
+func (s *TrashService) RestoreNotes(notes []*Note, userID string) error {
 	for i := range notes {
 		notes[i].Restore(userID)
 	}
@@ -83,7 +82,7 @@ func (s *TrashService) RestoreFolders(
 	trashedFolders *[]*Folder,
 	targetFolders []*Folder,
 	userID string,
-) errs.Error {
+) error {
 	for i := range targetFolders {
 		targetFolders[i].Restore(userID)
 
@@ -99,12 +98,12 @@ func (s *TrashService) cascadeRestoreChildrenByParent(
 	trashedFolders *[]*Folder,
 	folderID uuid.UUID,
 	userID string,
-) errs.Error {
+) error {
 	for i := range *trashedFolders {
 		folder := (*trashedFolders)[i]
-		if folder.ParentID() != nil && *folder.ParentID() == folderID && folder.IsTrashed() {
+		if folder.ParentID() != uuid.Nil && folder.ParentID() == folderID && folder.IsTrashed() {
 			trashedBy := folder.TrashedBy()
-			if trashedBy != nil && *trashedBy == TrashedByParent {
+			if trashedBy != TrashedByUnspecified && trashedBy == TrashedByParent {
 				folder.Restore(userID)
 
 				if err := s.cascadeRestoreChildrenByParent(trashedNotes, trashedFolders, folder.ID(), userID); err != nil {
@@ -118,7 +117,7 @@ func (s *TrashService) cascadeRestoreChildrenByParent(
 		note := (*trashedNotes)[i]
 		if note.FolderID() == folderID && note.IsTrashed() {
 			trashedBy := note.TrashedBy()
-			if trashedBy != nil && *trashedBy == TrashedByParent {
+			if trashedBy != TrashedByUnspecified && trashedBy == TrashedByParent {
 				note.Restore(userID)
 			}
 		}

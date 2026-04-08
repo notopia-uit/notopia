@@ -2,33 +2,32 @@ package app
 
 import (
 	"context"
-	"reflect"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/note/domain"
-	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-type WorkspaceEventPubSub interface {
+type WorkspaceEventPublisher interface {
 	Publish(
 		ctx context.Context,
 		workspaceID uuid.UUID,
 		userID string,
 		events ...WorkspaceEvent,
-	) errs.Error
+	) error
+}
 
+type WorkspaceEventSubscriber interface {
 	Subscribe(
 		ctx context.Context,
 		workspaceID uuid.UUID,
 		userID string,
-	) (<-chan WorkspaceEvent, errs.Error)
+	) (<-chan WorkspaceEvent, error)
+}
 
-	Run(ctx context.Context) error
-
-	Close() error
-
-	Check(ctx context.Context) error
+// Or, we just marshall the event to a string json string, instead marshall and unmarshall
+type WorkspaceEventHub interface {
+	WorkspaceEventPublisher
+	WorkspaceEventSubscriber
 }
 
 type WorkspaceEvent interface {
@@ -49,11 +48,7 @@ func (e workspaceEvent[E]) isWorkspaceEvent() {}
 func (e workspaceEvent[E]) GetID() uuid.UUID  { return e.Id }
 func (e workspaceEvent[E]) GetEvent() string  { return string(e.Event) }
 
-type WorkspaceEventWorkspaceMembersUpdated struct {
-	workspaceEvent[note.WorkspaceMembersUpdatedEventEvent]
-}
-
-type WorkspaceEventWorkspaceItemsChanged struct {
+type WorkspaceEventWorkspaceItemsUpdated struct {
 	workspaceEvent[note.WorkspaceItemsUpdatedEventEvent]
 }
 
@@ -69,91 +64,21 @@ type WorkspaceEventWorkspaceDeleted struct {
 	workspaceEvent[note.WorkspaceDeletedEventEvent]
 }
 
-func FromDomainEventToWorkspaceEvent(event domain.Event) (WorkspaceEvent, bool) {
-	switch e := event.(type) {
-	case *domain.FolderCreatedEvent,
-		*domain.FolderDeletedEvent,
-		*domain.FolderUpdatedEvent,
-		*domain.FolderMovedEvent,
-		*domain.FolderTrashedEvent,
-		*domain.FolderRestoredEvent,
-		*domain.FolderPermanentlyDeletedEvent,
-		*domain.NoteCreatedEvent,
-		*domain.NoteDeletedEvent,
-		*domain.NoteUpdatedEvent,
-		*domain.NoteMovedEvent,
-		*domain.NoteTrashedEvent,
-		*domain.NoteRestoredEvent,
-		*domain.NotePermanentlyDeletedEvent:
-		return &WorkspaceEventWorkspaceItemsChanged{
-			workspaceEvent: workspaceEvent[note.WorkspaceItemsUpdatedEventEvent]{
-				Id:    e.GetID(),
-				Event: note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent,
-				Data: note.WorkspaceItemsUpdatedEventData{
-					WorkspaceId: (*note.PropertiesId)(new(e.GetAggregateID())),
-				},
-			},
-		}, true
-	case *domain.WorkspaceUpdatedEvent:
-		return &WorkspaceEventWorkspaceUpdated{
-			workspaceEvent: workspaceEvent[note.WorkspaceUpdatedEventEvent]{
-				Id:    e.GetID(),
-				Event: note.WorkspaceUpdatedEventEventWorkspaceUpdatedEvent,
-				Data: note.Workspace{
-					Id:   (*note.PropertiesId)(new(e.GetAggregateID())),
-					Name: e.Name,
-					Slug: e.Slug,
-				},
-			},
-		}, true
-	case *domain.WorkspaceDeletedEvent:
-		return &WorkspaceEventWorkspaceDeleted{
-			workspaceEvent: workspaceEvent[note.WorkspaceDeletedEventEvent]{
-				Id:    e.GetID(),
-				Event: note.WorkspaceDeletedEventEventWorkspaceDeletedEvent,
-				Data: note.WorkspaceDeletedEventData{
-					Id: (*note.PropertiesId)(new(e.GetAggregateID())),
-				},
-			},
-		}, true
+func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
+	switch t {
+	case string(note.WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent):
+		//exhaustruct:ignore
+		return &WorkspaceEventMembersUpdated{}, true
+	case string(note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent):
+		//exhaustruct:ignore
+		return &WorkspaceEventWorkspaceItemsUpdated{}, true
+	case string(note.WorkspaceUpdatedEventEventWorkspaceUpdatedEvent):
+		//exhaustruct:ignore
+		return &WorkspaceEventWorkspaceUpdated{}, true
+	case string(note.WorkspaceDeletedEventEventWorkspaceDeletedEvent):
+		//exhaustruct:ignore
+		return &WorkspaceEventWorkspaceDeleted{}, true
 	default:
 		return nil, false
 	}
-}
-
-var workspaceEventTypeRegistry = make(map[string]reflect.Type)
-
-func init() {
-	registerWorkspaceEventType(
-		//exhaustruct:ignore
-		&WorkspaceEventWorkspaceMembersUpdated{},
-	)
-	registerWorkspaceEventType(
-		//exhaustruct:ignore
-		&WorkspaceEventWorkspaceItemsChanged{},
-	)
-	registerWorkspaceEventType(
-		//exhaustruct:ignore
-		&WorkspaceEventMembersUpdated{},
-	)
-	registerWorkspaceEventType(
-		//exhaustruct:ignore
-		&WorkspaceEventWorkspaceUpdated{},
-	)
-	registerWorkspaceEventType(
-		//exhaustruct:ignore
-		&WorkspaceEventWorkspaceDeleted{},
-	)
-}
-
-func registerWorkspaceEventType(event WorkspaceEvent) {
-	eventType := reflect.TypeOf(event).Elem().Name()
-	workspaceEventTypeRegistry[eventType] = reflect.TypeOf(event).Elem()
-}
-
-func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
-	if t, ok := workspaceEventTypeRegistry[t]; ok {
-		return reflect.New(t).Interface().(WorkspaceEvent), true
-	}
-	return nil, false
 }

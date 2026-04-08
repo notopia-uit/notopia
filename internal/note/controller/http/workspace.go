@@ -27,12 +27,12 @@ func (h *StrictHandler) CreateWorkspace(
 		return nil, errs.NewInternalGenerateID(err)
 	}
 	cmd := &app.CreateWorkspace{
-		ID:     id,
-		Name:   request.Body.Name,
-		Slug:   request.Body.Slug,
-		UserID: user.ID,
+		ID:      id,
+		Name:    request.Body.Name,
+		Slug:    request.Body.Slug,
+		OwnerID: user.ID,
 	}
-	err = h.App.CommandHandlers.CreateWorkspaceHandler.Handle(ctx, cmd)
+	err = h.App.Cmds.CreateWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (h *StrictHandler) DeleteWorkspace(
 		ID:     request.WorkspaceId,
 		UserID: user.ID,
 	}
-	err := h.App.CommandHandlers.DeleteWorkspaceHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.DeleteWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -69,10 +69,15 @@ func (h *StrictHandler) GetWorkspace(
 	ctx context.Context,
 	request note.GetWorkspaceRequestObject,
 ) (note.GetWorkspaceResponseObject, error) {
-	query := &app.GetWorkspaceBySlug{
-		Slug: request.WorkspaceSlug,
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
 	}
-	result, err := h.App.QueryHandlers.GetWorkspaceHandler.Handle(ctx, query)
+	query := &app.GetWorkspaceBySlug{
+		Slug:   request.WorkspaceSlug,
+		UserID: user.ID,
+	}
+	result, err := h.App.Queries.GetWorkspaceHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +93,7 @@ func (h *StrictHandler) CheckWorkspaceSlugExists(
 	query := &app.CheckWorkspaceSlugExists{
 		Slug: request.WorkspaceSlug,
 	}
-	result, err := h.App.QueryHandlers.CheckWorkspaceSlugExistsHandler.Handle(ctx, query)
+	result, err := h.App.Queries.CheckWorkspaceSlugExistsHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +116,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 		return nil, errs.NewUnauthorized()
 	}
 
-	eventCh, err := h.WorkspaceEventPubSub.Subscribe(ctx, request.WorkspaceId, user.ID)
+	eventCh, err := h.WorkspaceEventHub.Subscribe(ctx, request.WorkspaceId, user.ID)
 	if err != nil {
 		return nil, errs.NewInternal("failed to subscribe to workspace events", err)
 	}
@@ -129,6 +134,10 @@ func (h *StrictHandler) GetWorkspaceGraph(
 	ctx context.Context,
 	request note.GetWorkspaceGraphRequestObject,
 ) (note.GetWorkspaceGraphResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
 	ignoreOrphans := false
 	if request.Params.IncludeOrphans != nil {
 		ignoreOrphans = !*request.Params.IncludeOrphans
@@ -136,8 +145,9 @@ func (h *StrictHandler) GetWorkspaceGraph(
 	query := &app.GetWorkspaceGraph{
 		ID:            request.WorkspaceId,
 		IgnoreOrphans: ignoreOrphans,
+		UserID:        user.ID,
 	}
-	result, err := h.App.QueryHandlers.GetWorkspaceGraphHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetWorkspaceGraphHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +201,7 @@ func (h *StrictHandler) MoveWorkspaceItems(
 		FolderIDs:           folderIDs,
 		DestinationFolderID: destFolderID,
 	}
-	err := h.App.CommandHandlers.MoveWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.MoveWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +230,7 @@ func (h *StrictHandler) RenameWorkspace(
 		Name:   request.Body.Name,
 		UserID: user.ID,
 	}
-	err := h.App.CommandHandlers.RenameWorkspaceHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.RenameWorkspaceHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +263,7 @@ func (h *StrictHandler) RestoreTrashedWorkspaceItems(
 		NoteIDs:     noteIDs,
 		FolderIDs:   folderIDs,
 	}
-	err := h.App.CommandHandlers.RestoreTrashedWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.RestoreTrashedWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -265,15 +275,23 @@ func (h *StrictHandler) ShowTrash(
 	ctx context.Context,
 	request note.ShowTrashRequestObject,
 ) (note.ShowTrashResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
 	query := &app.ShowTrash{
 		WorkspaceID: request.WorkspaceId,
+		UserID:      user.ID,
 	}
-	result, err := h.App.QueryHandlers.ShowTrashHandler.Handle(ctx, query)
+	result, err := h.App.Queries.ShowTrashHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
-	dto := toShowTrash(result)
+	dto, err := toShowTrash(result)
+	if err != nil {
+		return nil, err
+	}
 	return note.ShowTrash200JSONResponse(dto), nil
 }
 
@@ -292,7 +310,7 @@ func (h *StrictHandler) TrashWorkspaceItems(
 		NoteIDs:     *request.Body.NoteIds,
 		FolderIDs:   *request.Body.FolderIds,
 	}
-	err := h.App.CommandHandlers.TrashWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.TrashWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -304,19 +322,29 @@ func (h *StrictHandler) GetWorkspaceTree(
 	ctx context.Context,
 	request note.GetWorkspaceTreeRequestObject,
 ) (note.GetWorkspaceTreeResponseObject, error) {
-	var depth *uint
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
+	var depth uint
 	if request.Params.Depth != nil && *request.Params.Depth > 0 {
-		depth = new(uint(*request.Params.Depth))
+		depth = uint(*request.Params.Depth)
+	}
+
+	var rootFolderID uuid.UUID
+	if request.Params.RootFolderId != nil {
+		rootFolderID = *request.Params.RootFolderId
 	}
 
 	query := &app.GetWorkspaceTree{
 		WorkspaceID:    request.WorkspaceId,
-		RootFolderID:   request.Params.RootFolderId,
+		RootFolderID:   rootFolderID,
 		IncludeTrashed: request.Params.IncludeTrashed != nil && *request.Params.IncludeTrashed,
 		Depth:          depth,
+		UserID:         user.ID,
 	}
 
-	result, err := h.App.QueryHandlers.GetWorkspaceTreeHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetWorkspaceTreeHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +385,7 @@ func (h *StrictHandler) PermanentlyDeleteWorkspaceItems(
 		NoteIDs:     noteIDs,
 		FolderIDs:   folderIDs,
 	}
-	err := h.App.CommandHandlers.PermanentlyDeleteWorkspaceItemsHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.PermanentlyDeleteWorkspaceItemsHandler.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}

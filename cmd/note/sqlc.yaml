@@ -1,35 +1,51 @@
 # yaml-language-server: $schema=https://www.schemastore.org/sqlc-2.0.json
 version: '2'
 
+plugins:
+  - name: golang
+    wasm:
+      url: https://github.com/vtuanjs/sqlc-gen-go/releases/download/v2.3.0-stable/sqlc-gen-go.wasm
+      sha256: 9b33820707e741e68ef49000189455ee4a3985a96a29e3e665d766709fdf5007
+
 sql:
   - engine: postgresql
     schema:
       - ../../internal/note/infra/persistence/pgmigration/
       - ../../internal/note/infra/persistence/pgsqlc/temp_tables.sql
     queries: ../../internal/note/infra/persistence/pgsqlc/
-    gen:
-      go:
-        emit_result_struct_pointers: true
-        emit_params_struct_pointers: true
-        emit_pointers_for_null_types: true
-        emit_enum_valid_method: true
-        emit_all_enum_values: true
+    codegen:
+      - plugin: golang
         out: ../../internal/note/infra/persistence/pgsqlc/
-        sql_driver: github.com/jackc/pgx/v5
-        sql_package: pgx/v5
-        initialisms:
-          - id
-          - url
-        rename:
-          source_ids: SourceIDs
-          target_ids: TargetIDs
+        options:
+          emit_result_struct_pointers: true
+          emit_params_struct_pointers: true
+          emit_pointers_for_null_types: true
+          emit_enum_valid_method: true
+          emit_all_enum_values: true
+          sql_driver: github.com/jackc/pgx/v5
+          sql_package: pgx/v5
+          initialisms:
+            - id
+            - url
+          rename:
+            source_ids: SourceIDs
+            target_ids: TargetIDs
+          package: pgsqlc
+          emit_dynamic_filter: true
+          emit_tracing:
+            import: go.opentelemetry.io/otel
+            package: otel
+            code:
+              - ctx, span := otel.Tracer("{{.StructName}}").Start(ctx, "{{.MethodName}}")
+              - defer span.End()
+
     rules:
       - sqlc/db-prepare
       - postgresql-query-too-costly
       - postgresql-no-seq-scan
 
 overrides:
-  go:
+  go: &golangOptions
     rename:
       ids: IDs
       urls: URLs
@@ -65,6 +81,9 @@ overrides:
         go_type:
           type: string
           pointer: true
+
+options:
+  golang: *golangOptions
 
 rules:
   - name: postgresql-query-too-costly

@@ -22,7 +22,7 @@ func NewWorkspace(
 	name string,
 	slug string,
 	rootFolderID uuid.UUID,
-) (*Workspace, errs.Error) {
+) (*Workspace, error) {
 	if name == "" {
 		return nil, errs.EmptyFolderName
 	}
@@ -50,8 +50,8 @@ func (w *Workspace) Name() string {
 
 func (w *Workspace) Rename(name string, userID string) {
 	w.name = name
-	w.AddEvent(&WorkspaceUpdatedEvent{
-		BaseEvent: *NewBaseEvent(w.id, userID),
+	w.addEvent(&WorkspaceUpdatedEvent{
+		BaseEvent: NewBaseEvent(w.id, userID),
 		Name:      w.name,
 		Slug:      w.slug,
 	})
@@ -71,12 +71,12 @@ func (w *Workspace) DeletedAt() *time.Time {
 
 func (w *Workspace) Delete(userID string) {
 	w.deletedAt = new(time.Now())
-	w.AddEvent(&WorkspaceDeletedEvent{
-		BaseEvent: *NewBaseEvent(w.id, userID),
+	w.addEvent(&WorkspaceDeletedEvent{
+		BaseEvent: NewBaseEvent(w.id, userID),
 	})
 }
 
-func (w *Workspace) AddEvent(event Event) {
+func (w *Workspace) addEvent(event Event) {
 	w.event = append(w.event, event)
 }
 

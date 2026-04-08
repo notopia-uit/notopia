@@ -2,17 +2,37 @@ package domain
 
 import "time"
 
-type TrashedBy string
+type TrashedBy uint8
 
-var (
-	TrashedByUnspecified TrashedBy = "unspecified"
-	TrashedByPurpose     TrashedBy = "purpose"
-	TrashedByParent      TrashedBy = "parent"
+const (
+	TrashedByUnspecified TrashedBy = iota
+	TrashedByPurpose
+	TrashedByParent
 )
 
-func (t TrashedBy) String() string {
-	return string(t)
+func (t TrashedBy) IsValid() bool {
+	switch t {
+	case TrashedByUnspecified, TrashedByPurpose, TrashedByParent:
+		return true
+	default:
+		return false
+	}
 }
+
+func (t TrashedBy) String() string {
+	switch t {
+	case TrashedByUnspecified:
+		return "unspecified"
+	case TrashedByPurpose:
+		return "purpose"
+	case TrashedByParent:
+		return "parent"
+	default:
+		return "unknown"
+	}
+}
+
+// NOTE: if need, we can have ParseTrashedBy, but for now mostly we map from outside into
 
 type Trashed struct {
 	by TrashedBy
@@ -25,3 +45,7 @@ func NewTrashed(by TrashedBy, at time.Time) *Trashed {
 		at: at,
 	}
 }
+
+func (t *Trashed) By() TrashedBy { return t.by }
+
+func (t *Trashed) At() time.Time { return t.at }

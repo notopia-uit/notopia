@@ -10,6 +10,8 @@ import (
 	httpCheck "github.com/hellofresh/health-go/v5/checks/http"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
+	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 )
 
 type Health struct {
@@ -17,9 +19,10 @@ type Health struct {
 }
 
 func New(
-	persistence app.Persistence,
+	persistence *persistence.Pg,
 	serverCfg *config.Server,
-	workspaceEventPubSub app.WorkspaceEventPubSub,
+	workspaceEventHub app.WorkspaceEventHub,
+	redisClient *workspaceevent.RedisClient,
 ) *Health {
 	startupChecker := health.NewChecker(
 		health.WithCheck(
@@ -70,13 +73,14 @@ func New(
 				}),
 			},
 		),
+		// TODO: this have to check kafka, not the pub sub
 		health.WithPeriodicCheck(
 			15*time.Second,
 			3*time.Second,
 			health.Check{
-				Name: "workspaceEventPubSub",
+				Name: "workspaceEventHub redis connection",
 				Check: func(ctx context.Context) error {
-					return workspaceEventPubSub.Check(ctx)
+					return redisClient.Ping(ctx).Err()
 				},
 			},
 		),

@@ -40,29 +40,15 @@ SELECT
 FROM
   note_links
 WHERE
-  CASE
-    WHEN sqlc.narg('source_id')::uuid IS NOT NULL THEN source_id = sqlc.narg('source_id')::uuid
-    ELSE TRUE
-  END
-  AND CASE
-    WHEN CARDINALITY(sqlc.arg('source_ids')::uuid[]) > 0 THEN source_id = ANY(sqlc.arg('source_ids')::uuid[])
-    ELSE TRUE
-  END;
+  source_id = sqlc.arg('source_id')::uuid;
 
--- name: GetNoteBacklinks :many
+-- name: GetNotesOutgoingLinks :many
 SELECT
-  source_id
+  source_id,
+  ARRAY_AGG(target_id) AS target_ids
 FROM
   note_links
 WHERE
-  target_id = sqlc.arg('target_id');
-
--- name: GetNoteLinksInWorkspace :many
-SELECT
-    nl.*
-FROM note_links AS nl
-JOIN notes AS sn ON nl.source_id = sn.id
-JOIN folders AS sf ON sn.folder_id = sf.id
-WHERE sf.workspace_id = sqlc.arg('workspace_id')::uuid
-  AND sn.trashed_at IS NULL
-  AND sf.trashed_at IS NULL;
+  source_id = ANY(sqlc.arg('source_ids')::uuid[])
+GROUP BY
+  source_id;

@@ -11,7 +11,6 @@ var ProviderSetCommand = wire.NewSet(
 	ProvidePermanentlyDeleteFolderHandler,
 	ProvidePermanentlyDeleteNoteHandler,
 	ProvideDeleteWorkspaceHandler,
-	ProvideGenerateDailyNoteHandler,
 	ProvideGetNoteHandler,
 	ProvideMoveWorkspaceItemsHandler,
 	ProvidePermanentlyDeleteWorkspaceItemsHandler,
@@ -25,7 +24,13 @@ var ProviderSetCommand = wire.NewSet(
 	ProvideUnpublishNoteHandler,
 	ProvideUnpublishWorkspaceHandler,
 	ProvideUpdateWorkspaceMembersHandler,
-	wire.Struct(new(CommandHandlers), "*"),
+	wire.Struct(new(Cmds), "*"),
+)
+
+var ProviderSetEvent = wire.NewSet(
+	ProvideDocumentCommittedHandler,
+	ProvideNotifyWorkspaceItemsUpdatedHandler,
+	wire.Struct(new(Events), "*"),
 )
 
 var ProviderSetQuery = wire.NewSet(
@@ -37,17 +42,12 @@ var ProviderSetQuery = wire.NewSet(
 	ProvideGetWorkspaceMembersHandler,
 	ProvideGetWorkspaceTreeHandler,
 	ProvideShowTrashHandler,
-	wire.Struct(new(QueryHandlers), "*"),
-)
-
-var ProviderSetIntegrationEvent = wire.NewSet(
-	ProvideDocumentCommittedHandler,
-	wire.Struct(new(IntegrationEventHandlers), "*"),
+	wire.Struct(new(Queries), "*"),
 )
 
 var ProviderSet = wire.NewSet(
 	ProviderSetCommand,
-	ProviderSetIntegrationEvent,
+	ProviderSetEvent,
 	ProviderSetQuery,
 	wire.Struct(new(Server), "*"),
 )

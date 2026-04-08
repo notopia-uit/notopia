@@ -1,20 +1,12 @@
 package app
 
-import (
-	"context"
-	"fmt"
-
-	"golang.org/x/sync/errgroup"
-)
-
-type CommandHandlers struct {
+type Cmds struct {
 	CreateFolderHandler                    *CreateFolderHandler
 	CreateNoteHandler                      *CreateNoteHandler
 	CreateWorkspaceHandler                 *CreateWorkspaceHandler
 	DeleteFolderHandler                    *PermanentlyDeleteFolderHandler
 	DeleteNoteHandler                      *PermanentlyDeleteNoteHandler
 	DeleteWorkspaceHandler                 *DeleteWorkspaceHandler
-	GenerateDailyNoteHandler               *GenerateDailyNoteHandler
 	MoveWorkspaceItemsHandler              *MoveWorkspaceItemsHandler
 	PermanentlyDeleteWorkspaceItemsHandler *PermanentlyDeleteWorkspaceItemsHandler
 	PublishNoteHandler                     *PublishNoteHandler
@@ -29,7 +21,7 @@ type CommandHandlers struct {
 	UpdateWorkspaceMembersHandler          *UpdateWorkspaceMembersHandler
 }
 
-type QueryHandlers struct {
+type Queries struct {
 	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler
 	GetNoteGraphHandler             *GetNoteGraphHandler
 	GetNoteHandler                  *GetNoteHandler
@@ -41,46 +33,15 @@ type QueryHandlers struct {
 	ShowTrashHandler                *ShowTrashHandler
 }
 
-type IntegrationEventHandlers struct {
-	DocumentCommittedHandler *DocumentCommittedHandler
+type Events struct {
+	DocumentCommittedHandler    *DocumentCommittedHandler
+	NotifyWorkspaceItemsUpdated *NotifyWorkspaceItemsUpdatedHandler
 }
 
 type Server struct {
-	CommandHandlers          *CommandHandlers
-	IntegrationEventHandlers *IntegrationEventHandlers
-	QueryHandlers            *QueryHandlers
+	Cmds    *Cmds
+	Events  *Events
+	Queries *Queries
 
-	IntegrationPubSub    *IntegrationPubSub
-	WorkspaceEventPubSub WorkspaceEventPubSub
-	Persistence          Persistence
-}
-
-func (s *Server) RunMigration(ctx context.Context) error {
-	return s.Persistence.RunMigrations(ctx)
-}
-
-func (s *Server) Start(ctx context.Context) error {
-	if err := s.RunMigration(ctx); err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
-	}
-
-	g, ctx := errgroup.WithContext(ctx)
-	g.Go(func() error {
-		return s.WorkspaceEventPubSub.Run(ctx)
-	})
-	g.Go(func() error {
-		return s.IntegrationPubSub.Run(ctx)
-	})
-	return g.Wait()
-}
-
-func (s *Server) Stop(ctx context.Context) error {
-	g, _ := errgroup.WithContext(ctx)
-	g.Go(func() error {
-		return s.WorkspaceEventPubSub.Close()
-	})
-	g.Go(func() error {
-		return s.IntegrationPubSub.Close()
-	})
-	return g.Wait()
+	WorkspaceEventHub WorkspaceEventHub
 }

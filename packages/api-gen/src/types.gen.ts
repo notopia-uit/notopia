@@ -5,23 +5,24 @@ export type ClientOptions = {
 };
 
 export type ShareDocumentCommittedEvent = ShareDocument & {
+    userId: string;
     tags: Array<string>;
     outgoingLinkIds: Array<string>;
 };
 
 export type ShareNoteCreatedEvent = {
-    id: ShareId;
-    name: ShareName;
-    icon?: ShareIcon;
+    id: string;
+    name: string;
+    icon?: string | null;
 };
 
 export type ShareNoteDeletedEvent = {
-    id: ShareId;
+    id: string;
 };
 
 export type ShareNoteSearch = {
-    id: ShareId;
-    name: ShareName;
+    id: string;
+    name: string;
     /**
      * Plain text content
      */
@@ -29,10 +30,17 @@ export type ShareNoteSearch = {
     tags?: Array<string>;
 };
 
-export type ShareNoteUpdatedEvent = ShareNote;
+export type ShareNoteUpdatedEvent = {
+    id: string;
+    name: string;
+    icon: string | null;
+    folderId: string;
+    tags: Array<string>;
+    updatedAt: Date;
+};
 
 export type ShareUserDeletedEvent = {
-    id: ShareUserPropertiesId;
+    id: ShareId;
 };
 
 /**
@@ -45,41 +53,10 @@ export type ShareDocument = {
     content: ShareDocumentContent;
 };
 
-export type ShareId = string;
-
-/**
- * Can be empty string when creating but will be set to "Untitled Note" internally
- */
-export type ShareName = string;
-
-export type ShareIcon = string | null;
-
-export type SharePropertiesId = string;
-
-export const ShareTrashedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
-
-export type ShareTrashedBy = typeof ShareTrashedBy[keyof typeof ShareTrashedBy];
-
-export type ShareNote = {
-    readonly id: string;
-    /**
-     * Can be empty string when creating but will be set to "Untitled Note" internally
-     */
-    name: string;
-    icon: string | null;
-    folderId: SharePropertiesId;
-    readonly tags: Array<string>;
-    readonly updatedAt: Date;
-    readonly trashed: {
-        trashedBy: ShareTrashedBy;
-        trashedAt: Date;
-    } | null;
-};
-
 /**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
-export type ShareUserPropertiesId = string;
+export type ShareId = string;
 
 export type DocumentError = {
     /**
@@ -346,38 +323,10 @@ export type NoteWorkspaceTreeFolder = {
 
 export type NotePropertiesUpdatedAt = Date;
 
-export type ShareNoteCreatedEventWritable = {
-    name: ShareName;
-    icon?: ShareIcon;
-};
-
-export type ShareNoteDeletedEventWritable = {
-    [key: string]: unknown;
-};
-
-export type ShareNoteSearchWritable = {
-    name: ShareName;
-    /**
-     * Plain text content
-     */
-    plainTextContent?: string;
-    tags?: Array<string>;
-};
-
-export type ShareNoteUpdatedEventWritable = ShareNoteWritable;
-
 /**
  * BlockNote model
  */
 export type ShareDocumentContentWritable = Array<unknown>;
-
-export type ShareNoteWritable = {
-    /**
-     * Can be empty string when creating but will be set to "Untitled Note" internally
-     */
-    name: string;
-    icon: string | null;
-};
 
 export type DocumentRevisionWritable = {
     name: string | null;
