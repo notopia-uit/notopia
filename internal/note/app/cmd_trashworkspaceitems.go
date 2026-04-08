@@ -9,9 +9,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
-// TODO: This should carefully recheck
-// Transaction?
-
 type TrashWorkspaceItems struct {
 	UserID      string
 	WorkspaceID uuid.UUID

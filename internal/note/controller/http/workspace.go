@@ -69,8 +69,13 @@ func (h *StrictHandler) GetWorkspace(
 	ctx context.Context,
 	request note.GetWorkspaceRequestObject,
 ) (note.GetWorkspaceResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
 	query := &app.GetWorkspaceBySlug{
-		Slug: request.WorkspaceSlug,
+		Slug:   request.WorkspaceSlug,
+		UserID: user.ID,
 	}
 	result, err := h.App.Queries.GetWorkspaceHandler.Handle(ctx, query)
 	if err != nil {
@@ -129,6 +134,10 @@ func (h *StrictHandler) GetWorkspaceGraph(
 	ctx context.Context,
 	request note.GetWorkspaceGraphRequestObject,
 ) (note.GetWorkspaceGraphResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
 	ignoreOrphans := false
 	if request.Params.IncludeOrphans != nil {
 		ignoreOrphans = !*request.Params.IncludeOrphans
@@ -136,6 +145,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 	query := &app.GetWorkspaceGraph{
 		ID:            request.WorkspaceId,
 		IgnoreOrphans: ignoreOrphans,
+		UserID:        user.ID,
 	}
 	result, err := h.App.Queries.GetWorkspaceGraphHandler.Handle(ctx, query)
 	if err != nil {
@@ -265,8 +275,13 @@ func (h *StrictHandler) ShowTrash(
 	ctx context.Context,
 	request note.ShowTrashRequestObject,
 ) (note.ShowTrashResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
 	query := &app.ShowTrash{
 		WorkspaceID: request.WorkspaceId,
+		UserID:      user.ID,
 	}
 	result, err := h.App.Queries.ShowTrashHandler.Handle(ctx, query)
 	if err != nil {
@@ -307,6 +322,10 @@ func (h *StrictHandler) GetWorkspaceTree(
 	ctx context.Context,
 	request note.GetWorkspaceTreeRequestObject,
 ) (note.GetWorkspaceTreeResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
 	var depth uint
 	if request.Params.Depth != nil && *request.Params.Depth > 0 {
 		depth = uint(*request.Params.Depth)
@@ -322,6 +341,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 		RootFolderID:   rootFolderID,
 		IncludeTrashed: request.Params.IncludeTrashed != nil && *request.Params.IncludeTrashed,
 		Depth:          depth,
+		UserID:         user.ID,
 	}
 
 	result, err := h.App.Queries.GetWorkspaceTreeHandler.Handle(ctx, query)

@@ -100,14 +100,19 @@ func (h *StrictHandler) GetNoteGraph(
 	ctx context.Context,
 	request note.GetNoteGraphRequestObject,
 ) (note.GetNoteGraphResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
 	var depth int
 	if request.Params.Depth != nil {
 		depth = *request.Params.Depth
 	}
 
 	query := &app.GetNoteGraph{
-		ID:    request.NoteId,
-		Depth: depth,
+		ID:     request.NoteId,
+		Depth:  depth,
+		UserID: user.ID,
 	}
 
 	result, err := h.App.Queries.GetNoteGraphHandler.Handle(ctx, query)
@@ -123,12 +128,17 @@ func (h *StrictHandler) GetNoteLinks(
 	ctx context.Context,
 	request note.GetNoteLinksRequestObject,
 ) (note.GetNoteLinksResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
 	outgoingLinks := request.Params.OutgoingLinks != nil && *request.Params.OutgoingLinks
 	backlinks := request.Params.Backlinks != nil && *request.Params.Backlinks
 	query := &app.GetNoteLinks{
 		ID:            request.NoteId,
 		OutgoingLinks: outgoingLinks,
 		Backlinks:     backlinks,
+		UserID:        user.ID,
 	}
 	result, err := h.App.Queries.GetNoteLinksHandler.Handle(ctx, query)
 	if err != nil {

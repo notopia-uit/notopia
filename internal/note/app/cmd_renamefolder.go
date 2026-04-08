@@ -18,15 +18,18 @@ type RenameFolder struct {
 type RenameFolderHandler struct {
 	authorizationService AuthorizationService
 	folderRepo           domain.FolderRepo
+	uow                  domain.UnitOfWork
 }
 
 func NewRenameFolderHandler(
 	authorizationService AuthorizationService,
 	folderRepo domain.FolderRepo,
+	uow domain.UnitOfWork,
 ) *RenameFolderHandler {
 	return &RenameFolderHandler{
 		authorizationService: authorizationService,
 		folderRepo:           folderRepo,
+		uow:                  uow,
 	}
 }
 
@@ -53,10 +56,13 @@ func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) err
 		)
 	}
 
-	folder, err := h.folderRepo.GetByID(ctx, cmd.ID, true)
-	if err != nil {
-		return err
-	}
-	folder.Rename(cmd.Name, cmd.UserID)
-	return h.folderRepo.Save(ctx, folder)
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		folderRepo := r.Folder()
+		folder, err := folderRepo.GetByID(ctx, cmd.ID, true)
+		if err != nil {
+			return err
+		}
+		folder.Rename(cmd.Name, cmd.UserID)
+		return folderRepo.Save(ctx, folder)
+	})
 }

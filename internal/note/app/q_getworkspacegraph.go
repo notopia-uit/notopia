@@ -2,13 +2,17 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type GetWorkspaceGraph struct {
 	ID            uuid.UUID
 	IgnoreOrphans bool
+
+	UserID string
 }
 
 type GetWorkspaceGraphReadModel interface {
@@ -16,16 +20,36 @@ type GetWorkspaceGraphReadModel interface {
 }
 
 type GetWorkspaceGraphHandler struct {
-	readModel GetWorkspaceGraphReadModel
+	authorizationService AuthorizationService
+	readModel            GetWorkspaceGraphReadModel
 }
 
-func NewGetWorkspaceGraphHandler(readModel GetWorkspaceGraphReadModel) *GetWorkspaceGraphHandler {
-	return &GetWorkspaceGraphHandler{readModel: readModel}
+func NewGetWorkspaceGraphHandler(
+	authorizationService AuthorizationService,
+	readModel GetWorkspaceGraphReadModel,
+) *GetWorkspaceGraphHandler {
+	return &GetWorkspaceGraphHandler{
+		authorizationService: authorizationService,
+		readModel:            readModel,
+	}
 }
 
 var ProvideGetWorkspaceGraphHandler = NewGetWorkspaceGraphHandler
 
 func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspaceGraph) (*Graph, error) {
-	// TODO: Authorize
+	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+		ctx,
+		query.UserID,
+		query.ID,
+		WorkspaceItemPermissionRead,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if !hasPermission {
+		return nil, errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to read workspace graph %s", query.UserID, query.ID),
+		)
+	}
 	return h.readModel.GetWorkspaceGraph(ctx, query)
 }

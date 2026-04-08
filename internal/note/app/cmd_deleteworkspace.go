@@ -17,15 +17,18 @@ type DeleteWorkspace struct {
 type DeleteWorkspaceHandler struct {
 	authorizationService AuthorizationService
 	workspaceRepo        domain.WorkspaceRepo
+	uow                  domain.UnitOfWork
 }
 
 func NewDeleteWorkspaceHandler(
 	authorizationService AuthorizationService,
 	workspaceRepo domain.WorkspaceRepo,
+	uow domain.UnitOfWork,
 ) *DeleteWorkspaceHandler {
 	return &DeleteWorkspaceHandler{
 		authorizationService: authorizationService,
 		workspaceRepo:        workspaceRepo,
+		uow:                  uow,
 	}
 }
 
@@ -48,10 +51,13 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspac
 		)
 	}
 
-	workspace, err := h.workspaceRepo.GetByID(ctx, cmd.ID, true)
-	if err != nil {
-		return err
-	}
-	workspace.Delete(cmd.UserID)
-	return h.workspaceRepo.Save(ctx, workspace)
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		workspaceRepo := r.Workspace()
+		workspace, err := workspaceRepo.GetByID(ctx, cmd.ID, true)
+		if err != nil {
+			return err
+		}
+		workspace.Delete(cmd.UserID)
+		return workspaceRepo.Save(ctx, workspace)
+	})
 }

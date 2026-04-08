@@ -18,15 +18,18 @@ type RenameNote struct {
 type RenameNoteHandler struct {
 	authorizationService AuthorizationService
 	noterepo             domain.NoteRepo
+	uow                  domain.UnitOfWork
 }
 
 func NewRenameNoteHandler(
 	authorizationService AuthorizationService,
 	noterepo domain.NoteRepo,
+	uow domain.UnitOfWork,
 ) *RenameNoteHandler {
 	return &RenameNoteHandler{
 		authorizationService: authorizationService,
 		noterepo:             noterepo,
+		uow:                  uow,
 	}
 }
 
@@ -53,11 +56,13 @@ func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
 		)
 	}
 
-	// TODO: transaction?
-	note, err := h.noterepo.GetByID(ctx, cmd.ID, true)
-	if err != nil {
-		return err
-	}
-	note.Rename(cmd.Name, cmd.UserID)
-	return h.noterepo.Save(ctx, note)
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		noteRepo := r.Note()
+		note, err := noteRepo.GetByID(ctx, cmd.ID, true)
+		if err != nil {
+			return err
+		}
+		note.Rename(cmd.Name, cmd.UserID)
+		return noteRepo.Save(ctx, note)
+	})
 }

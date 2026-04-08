@@ -2,9 +2,11 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 // TODO: This should carefully recheck
@@ -18,103 +20,130 @@ type RestoreTrashedWorkspaceItems struct {
 }
 
 type RestoreTrashedWorkspaceItemsHandler struct {
-	noteRepo     domain.NoteRepo
-	folderRepo   domain.FolderRepo
-	trashService *domain.TrashService
+	authorizationService AuthorizationService
+	noteRepo             domain.NoteRepo
+	folderRepo           domain.FolderRepo
+	trashService         *domain.TrashService
+	uow                  domain.UnitOfWork
 }
 
 func NewRestoreTrashedWorkspaceItemsHandler(
+	authorizationService AuthorizationService,
 	noteRepo domain.NoteRepo,
 	folderRepo domain.FolderRepo,
 	trashService *domain.TrashService,
+	uow domain.UnitOfWork,
 ) *RestoreTrashedWorkspaceItemsHandler {
 	return &RestoreTrashedWorkspaceItemsHandler{
-		noteRepo:     noteRepo,
-		folderRepo:   folderRepo,
-		trashService: trashService,
+		authorizationService: authorizationService,
+		noteRepo:             noteRepo,
+		folderRepo:           folderRepo,
+		trashService:         trashService,
+		uow:                  uow,
 	}
 }
 
 var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItemsHandler
 
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) error {
-	trashedNotes, err := h.noteRepo.GetMany(ctx,
-		//exhaustruct:ignore
-		&domain.NoteRepoGetManyParams{
-			WorkspaceID: cmd.WorkspaceID,
-			TrashOnly:   true,
-		},
+	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+		ctx,
+		cmd.UserID,
+		cmd.WorkspaceID,
+		WorkspaceItemPermissionDelete,
 	)
 	if err != nil {
 		return err
 	}
 
-	trashedFolders, err := h.folderRepo.GetMany(ctx,
-		//exhaustruct:ignore
-		&domain.FolderRepoGetManyParams{
-			WorkspaceID: cmd.WorkspaceID,
-			TrashOnly:   true,
-		},
-	)
-	if err != nil {
-		return err
+	if !hasPermission {
+		return errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to restore items in workspace %s", cmd.UserID, cmd.WorkspaceID),
+		)
 	}
 
-	trashedNotePtrs := trashedNotes
-	trashedFolderPtrs := trashedFolders
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		noteRepo := r.Note()
+		folderRepo := r.Folder()
 
-	if len(cmd.NoteIDs) > 0 {
-		notes, err := h.noteRepo.GetMany(ctx,
+		trashedNotes, err := noteRepo.GetMany(ctx,
 			//exhaustruct:ignore
 			&domain.NoteRepoGetManyParams{
-				IDs:       cmd.NoteIDs,
-				TrashOnly: true,
-				ForUpdate: true,
+				WorkspaceID: cmd.WorkspaceID,
+				TrashOnly:   true,
 			},
 		)
 		if err != nil {
 			return err
 		}
 
-		notePtrs := notes
-		if err := h.trashService.RestoreNotes(notePtrs, cmd.UserID); err != nil {
-			return err
-		}
-		for _, note := range notePtrs {
-			if err := h.noteRepo.Save(ctx, note); err != nil {
-				return err
-			}
-		}
-	}
-
-	if len(cmd.FolderIDs) > 0 {
-		folders, err := h.folderRepo.GetMany(ctx,
+		trashedFolders, err := folderRepo.GetMany(ctx,
 			//exhaustruct:ignore
 			&domain.FolderRepoGetManyParams{
-				IDs:       cmd.FolderIDs,
-				ForUpdate: true,
+				WorkspaceID: cmd.WorkspaceID,
+				TrashOnly:   true,
 			},
 		)
 		if err != nil {
 			return err
 		}
 
-		if err := h.trashService.RestoreFolders(&trashedNotePtrs, &trashedFolderPtrs, folders, cmd.UserID); err != nil {
-			return err
-		}
+		trashedNotePtrs := trashedNotes
+		trashedFolderPtrs := trashedFolders
 
-		for _, folder := range trashedFolderPtrs {
-			if err := h.folderRepo.Save(ctx, folder); err != nil {
+		if len(cmd.NoteIDs) > 0 {
+			notes, err := noteRepo.GetMany(ctx,
+				//exhaustruct:ignore
+				&domain.NoteRepoGetManyParams{
+					IDs:       cmd.NoteIDs,
+					TrashOnly: true,
+					ForUpdate: true,
+				},
+			)
+			if err != nil {
 				return err
+			}
+
+			notePtrs := notes
+			if err := h.trashService.RestoreNotes(notePtrs, cmd.UserID); err != nil {
+				return err
+			}
+			for _, note := range notePtrs {
+				if err := noteRepo.Save(ctx, note); err != nil {
+					return err
+				}
 			}
 		}
 
-		for _, note := range trashedNotePtrs {
-			if err := h.noteRepo.Save(ctx, note); err != nil {
+		if len(cmd.FolderIDs) > 0 {
+			folders, err := folderRepo.GetMany(ctx,
+				//exhaustruct:ignore
+				&domain.FolderRepoGetManyParams{
+					IDs:       cmd.FolderIDs,
+					ForUpdate: true,
+				},
+			)
+			if err != nil {
 				return err
 			}
-		}
-	}
 
-	return nil
+			if err := h.trashService.RestoreFolders(&trashedNotePtrs, &trashedFolderPtrs, folders, cmd.UserID); err != nil {
+				return err
+			}
+
+			for _, folder := range trashedFolderPtrs {
+				if err := folderRepo.Save(ctx, folder); err != nil {
+					return err
+				}
+			}
+
+			for _, note := range trashedNotePtrs {
+				if err := noteRepo.Save(ctx, note); err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
 }

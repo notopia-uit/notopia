@@ -2,8 +2,10 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type GetWorkspaceTree struct {
@@ -11,6 +13,8 @@ type GetWorkspaceTree struct {
 	RootFolderID   uuid.UUID
 	IncludeTrashed bool
 	Depth          uint
+
+	UserID string
 }
 
 type GetWorkspaceTreeReadModel interface {
@@ -18,16 +22,36 @@ type GetWorkspaceTreeReadModel interface {
 }
 
 type GetWorkspaceTreeHandler struct {
-	readModel GetWorkspaceTreeReadModel
+	authorizationService AuthorizationService
+	readModel            GetWorkspaceTreeReadModel
 }
 
-func NewGetWorkspaceTreeHandler(readModel GetWorkspaceTreeReadModel) *GetWorkspaceTreeHandler {
-	return &GetWorkspaceTreeHandler{readModel: readModel}
+func NewGetWorkspaceTreeHandler(
+	authorizationService AuthorizationService,
+	readModel GetWorkspaceTreeReadModel,
+) *GetWorkspaceTreeHandler {
+	return &GetWorkspaceTreeHandler{
+		authorizationService: authorizationService,
+		readModel:            readModel,
+	}
 }
 
 var ProvideGetWorkspaceTreeHandler = NewGetWorkspaceTreeHandler
 
 func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspaceTree) (*WorkspaceTreeFolder, error) {
-	// TODO: Authorize
+	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+		ctx,
+		query.UserID,
+		query.WorkspaceID,
+		WorkspaceItemPermissionRead,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if !hasPermission {
+		return nil, errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to read workspace tree %s", query.UserID, query.WorkspaceID),
+		)
+	}
 	return h.readModel.GetWorkspaceTree(ctx, query)
 }
