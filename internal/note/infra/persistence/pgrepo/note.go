@@ -87,7 +87,7 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 		var ok bool
 		trashedBy, ok = fromDomainTrashedBy(params.TrashedBy)
 		if !ok {
-			return nil, fmt.Errorf("invalid trashed by value: %v", params.TrashedBy)
+			return nil, errs.NewPersistenceInvalid(fmt.Sprintf("invalid trashed by value: %v", params.TrashedBy), nil)
 		}
 	}
 
@@ -209,7 +209,7 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 				return toErr(err)
 			}
 			if affected != int64(len(note.OutgoingLinks())) {
-				return fmt.Errorf("not all note links were inserted into temp table")
+				return errs.NewPersistenceInvalid("not all note links were inserted into temp table", nil)
 			}
 			if err := queries.DeleteObsoleteNoteLinks(ctx); err != nil {
 				return toErr(err)
@@ -224,7 +224,7 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 		}
 		for _, event := range note.PopEvents() {
 			if err := params.publisher.PublishWorkspaceItem(ctx, event, workspaceID); err != nil {
-				return fmt.Errorf("failed to publish events: %w", err)
+				return errs.NewPersistenceInternal("failed to publish events", err)
 			}
 		}
 		return nil
@@ -280,11 +280,11 @@ func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) error {
 		for _, note := range notes {
 			workspaceID, ok := noteIDWorkspaceIDMap[note.ID()]
 			if !ok {
-				return fmt.Errorf("failed to find workspace id for note id %s", note.ID())
+				return errs.NewPersistenceInvalid(fmt.Sprintf("failed to find workspace id for note id %s", note.ID()), nil)
 			}
 			for _, event := range note.PopEvents() {
 				if err := params.publisher.PublishWorkspaceItem(ctx, event, workspaceID); err != nil {
-					return fmt.Errorf("failed to publish events: %w", err)
+					return errs.NewPersistenceInternal("failed to publish events", err)
 				}
 			}
 		}
@@ -297,7 +297,7 @@ func (n *Note) deleteMany(ctx context.Context, queries *pgsqlc.Queries, deleteID
 		return nil
 	}
 	if err := queries.PermanentlyDeleteNotesByIDs(ctx, deleteIDs); err != nil {
-		return fmt.Errorf("failed bulk delete: %w", toErr(err))
+		return toErr(err)
 	}
 	return nil
 }
@@ -366,7 +366,7 @@ func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspace
 		WorkspaceID: workspaceID,
 	})
 	if err != nil {
-		return false, fmt.Errorf("failed to check if notes are in workspace: %w", toErr(err))
+		return false, toErr(err)
 	}
 	return count == int64(len(ids)), nil
 }
@@ -374,7 +374,7 @@ func (n *Note) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspace
 func (n *Note) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
 	workspaceID, err := n.queries.GetWorkspaceIDByNoteID(ctx, id)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("failed to get workspace id for note: %w", toErr(err))
+		return uuid.Nil, toErr(err)
 	}
 	return workspaceID, nil
 }

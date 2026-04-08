@@ -80,7 +80,7 @@ func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyPa
 		var ok bool
 		trashedBy, ok = fromDomainTrashedBy(params.TrashedBy)
 		if !ok {
-			return nil, fmt.Errorf("invalid trashed by value: %v", params.TrashedBy)
+			return nil, errs.NewPersistenceInvalid(fmt.Sprintf("invalid trashed by value: %v", params.TrashedBy), nil)
 		}
 	}
 
@@ -173,7 +173,7 @@ func (f *Folder) Save(ctx context.Context, folder *domain.Folder) (cerr error) {
 		}
 		for _, event := range folder.PopEvents() {
 			if err := params.publisher.PublishWorkspaceItem(ctx, event, folder.WorkspaceID()); err != nil {
-				return fmt.Errorf("failed to publish events: %w", err)
+				return errs.NewPersistenceInternal("failed to publish events", err)
 			}
 		}
 		return nil
@@ -209,7 +209,7 @@ func (f *Folder) SaveMany(ctx context.Context, folders []*domain.Folder) (cerr e
 		for _, folder := range folders {
 			for _, event := range folder.PopEvents() {
 				if err := params.publisher.PublishWorkspaceItem(ctx, event, folder.WorkspaceID()); err != nil {
-					return fmt.Errorf("failed to publish events: %w", err)
+					return errs.NewPersistenceInternal("failed to publish events", err)
 				}
 			}
 		}
@@ -222,14 +222,14 @@ func (f *Folder) deleteMany(ctx context.Context, queries *pgsqlc.Queries, delete
 		return nil
 	}
 	if err := queries.PermanentlyDeleteFoldersByIDs(ctx, deleteIDs); err != nil {
-		return fmt.Errorf("failed bulk delete: %w", toErr(err))
+		return toErr(err)
 	}
 	return nil
 }
 
 func (f *Folder) upsertMany(ctx context.Context, queries *pgsqlc.Queries, folders []*domain.Folder) error {
 	if err := queries.CreateTempTableFolders(ctx); err != nil {
-		return fmt.Errorf("failed to create temp table for folders: %w", toErr(err))
+		return toErr(err)
 	}
 	saveFolderParams := make([]*pgsqlc.InsertTempFoldersParams, len(folders))
 	for i, folder := range folders {
@@ -261,13 +261,13 @@ func (f *Folder) upsertMany(ctx context.Context, queries *pgsqlc.Queries, folder
 	}
 	affected, err := queries.InsertTempFolders(ctx, saveFolderParams)
 	if err != nil {
-		return fmt.Errorf("failed to insert folders into temp table: %w", toErr(err))
+		return toErr(err)
 	}
 	if affected != int64(len(folders)) {
-		return fmt.Errorf("not all folders were inserted into temp table (expected %d, got %d)", len(folders), affected)
+		return errs.NewPersistenceInvalid(fmt.Sprintf("not all folders were inserted into temp table (expected %d, got %d)", len(folders), affected), nil)
 	}
 	if err = queries.SaveFromTempFolders(ctx); err != nil {
-		return fmt.Errorf("failed to save folders from temp table: %w", toErr(err))
+		return toErr(err)
 	}
 	return nil
 }
@@ -278,7 +278,7 @@ func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspa
 		WorkspaceID: workspaceID,
 	})
 	if err != nil {
-		return false, fmt.Errorf("failed to check if folders are in workspace: %w", toErr(err))
+		return false, toErr(err)
 	}
 	return count == int64(len(ids)), nil
 }
@@ -286,7 +286,7 @@ func (f *Folder) AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspa
 func (f *Folder) GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error) {
 	workspaceID, err := f.queries.GetWorkspaceIDByFolderID(ctx, id)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("failed to get workspace id for folder: %w", toErr(err))
+		return uuid.Nil, toErr(err)
 	}
 	return workspaceID, nil
 }
@@ -297,7 +297,7 @@ func (f *Folder) GetParentIDs(ctx context.Context, id uuid.UUID, forUpdate bool)
 		ForUpdate: forUpdate,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get parent ids for folder: %w", toErr(err))
+		return nil, toErr(err)
 	}
 	return parentIDs, nil
 }

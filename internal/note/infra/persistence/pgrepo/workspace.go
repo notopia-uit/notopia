@@ -3,7 +3,6 @@ package pgrepo
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -144,7 +143,7 @@ func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) (cerr
 		}
 		for _, event := range workspace.PopEvents() {
 			if err := params.publisher.Publish(ctx, event); err != nil {
-				return fmt.Errorf("failed to publish events: %w", err)
+				return errs.NewPersistenceInternal("failed to publish events", err)
 			}
 		}
 		return nil
