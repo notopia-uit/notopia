@@ -23,6 +23,7 @@
     "clsx": "catalog:",
     "date-fns": "^4.1.0",
     "lucide-react": "catalog:",
+    "next-themes": "^0.4.6",
     "radix-ui": "catalog:",
     "react": "catalog:",
     "react-day-picker": "^9.14.0",
