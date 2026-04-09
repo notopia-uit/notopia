@@ -1,3 +1,16 @@
+---
+order: 3
+---
+
+# Authorization Class Diagram
+
+:::info
+
+- Golang syntax
+
+:::
+
+```plantuml
 @startuml Authorization
 title Authorization
 
@@ -57,3 +70,6 @@ Enum(WorkspaceRole) {
 }
 
 @enduml
+```
+
+<!-- diagram id="class-diagram-authorization" -->

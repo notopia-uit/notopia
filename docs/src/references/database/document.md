@@ -1,3 +1,16 @@
+---
+order: 2
+---
+
+# Document Database Diagram
+
+:::info
+
+- Only column marked with `N` mean nullable
+
+:::
+
+```d2
 vars: {
   d2-config: {
     layout-engine: elk
@@ -41,4 +54,6 @@ revisions: {
 }
 
 revisions.document_id -> documents.id
+```
 
+<!-- diagram id="database-diagram-document" -->

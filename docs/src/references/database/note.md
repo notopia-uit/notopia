@@ -1,3 +1,16 @@
+---
+order: 1
+---
+
+# Database Diagram
+
+:::info
+
+- Only column marked with `N` mean nullable
+
+:::
+
+```d2
 vars: {
   d2-config: {
     layout-engine: elk
@@ -79,3 +92,6 @@ folders.parent_id -> folders.id
 notes.folder_id -> folders.id
 note_links.source_id -> notes.id
 note_links.target_id -> notes.id
+```
+
+<!-- diagram id="database-diagram-note" -->

@@ -1,3 +1,17 @@
+---
+order: 1
+---
+
+# Document Class Diagram
+
+:::info
+
+- Typescript syntax
+- Apply layered architecture, use NestJS framework
+
+:::
+
+```plantuml
 @startuml Document
 title Document
 
@@ -126,5 +140,7 @@ package "Document" as Document <<Frame>> {
     Document.DocumentRepository ..> Document.DocumentEntity : manages
     Document.RevisionRepository ..> Document.RevisionEntity : manages
 }
-
 @enduml
+```
+
+<!-- diagram id="class-diagram-document" -->
