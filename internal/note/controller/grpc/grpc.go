@@ -47,7 +47,10 @@ func toGRPCError(err error) error {
 			errs.CodeEmptyFolderName,
 			errs.CodePersistenceInvalid,
 			errs.CodeInvalidWorkspaceName,
-			errs.CodeInvalidWorkspaceSlug:
+			errs.CodeInvalidWorkspaceSlug,
+			errs.CodeFoldersNotInWorkspace,
+			errs.CodeDestinationFolderNotInWorkspace,
+			errs.CodeNotesNotInWorkspace:
 			return status.Error(codes.InvalidArgument, cerr.Error())
 		case errs.CodeUnimplemented:
 			return status.Error(codes.Unimplemented, cerr.Error())
@@ -68,7 +71,8 @@ func toGRPCError(err error) error {
 		case errs.CodeFolderAlreadyExisted,
 			errs.CodeFolderAlreadyTrashed,
 			errs.CodeNoteAlreadyTrashed,
-			errs.CodeWorkspaceSlugAlreadyExists:
+			errs.CodeWorkspaceSlugAlreadyExists,
+			errs.CodeCannotMoveFolderToItOwnSubfolder:
 			return status.Error(codes.AlreadyExists, cerr.Error())
 		case errs.CodeAuthorizationServiceInternalError:
 			return status.Error(codes.Internal, cerr.Error())

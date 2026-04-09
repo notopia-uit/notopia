@@ -65,6 +65,12 @@ func strictServerToHTTPErr(err *errs.Err) (
 		statusCode = 400
 	case errs.CodeFolderAlreadyTrashed:
 		statusCode = 409
+	case errs.CodeFoldersNotInWorkspace:
+		statusCode = 400
+	case errs.CodeDestinationFolderNotInWorkspace:
+		statusCode = 400
+	case errs.CodeCannotMoveFolderToItOwnSubfolder:
+		statusCode = 400
 
 	case errs.CodeNoteNotFound:
 		statusCode = 404
@@ -72,6 +78,8 @@ func strictServerToHTTPErr(err *errs.Err) (
 		statusCode = 500
 	case errs.CodeNoteAlreadyTrashed:
 		statusCode = 409
+	case errs.CodeNotesNotInWorkspace:
+		statusCode = 400
 
 	case errs.CodePersistenceInvalid:
 		statusCode = 400
