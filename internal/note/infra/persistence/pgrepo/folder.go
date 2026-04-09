@@ -301,3 +301,11 @@ func (f *Folder) GetParentIDs(ctx context.Context, id uuid.UUID, forUpdate bool)
 	}
 	return parentIDs, nil
 }
+
+func (f *Folder) CheckExists(ctx context.Context, id uuid.UUID) (bool, error) {
+	exists, err := f.queries.CheckFolderExists(ctx, id)
+	if err != nil {
+		return false, toErr(err)
+	}
+	return exists, nil
+}

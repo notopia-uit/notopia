@@ -13,6 +13,27 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+const checkFolderExists = `-- name: CheckFolderExists :one
+SELECT
+  EXISTS (
+    SELECT
+      1
+    FROM
+      folders
+    WHERE
+      id = $1
+  )
+`
+
+func (q *Queries) CheckFolderExists(ctx context.Context, id uuid.UUID) (bool, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "CheckFolderExists")
+	defer span.End()
+	row := q.db.QueryRow(ctx, checkFolderExists, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const countFoldersInWorkspaceByIDs = `-- name: CountFoldersInWorkspaceByIDs :one
 SELECT
   COUNT(*)

@@ -65,7 +65,8 @@ func toGRPCError(err error) error {
 			errs.CodeWorkspaceBySlugNotFound,
 			errs.CodeWorkspaceRootFolderNotFound:
 			return status.Error(codes.NotFound, cerr.Error())
-		case errs.CodeFolderAlreadyTrashed,
+		case errs.CodeFolderAlreadyExisted,
+			errs.CodeFolderAlreadyTrashed,
 			errs.CodeNoteAlreadyTrashed,
 			errs.CodeWorkspaceSlugAlreadyExists:
 			return status.Error(codes.AlreadyExists, cerr.Error())

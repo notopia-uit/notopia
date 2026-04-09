@@ -167,6 +167,17 @@ WHERE
   workspace_id = sqlc.arg('workspace_id')
   AND id = ANY(sqlc.arg('ids')::uuid[]);
 
+-- name: CheckFolderExists :one
+SELECT
+  EXISTS (
+    SELECT
+      1
+    FROM
+      folders
+    WHERE
+      id = sqlc.arg('id')
+  );
+
 -- name: PermanentlyDeleteFolderByID :exec
 DELETE FROM
   folders

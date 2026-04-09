@@ -14,6 +14,7 @@ type FolderRepo interface {
 	SaveMany(ctx context.Context, folders []*Folder) error
 	AreAllInWorkspace(ctx context.Context, ids []uuid.UUID, workspaceID uuid.UUID) (bool, error)
 	GetParentIDs(ctx context.Context, id uuid.UUID, forUpdate bool) ([]uuid.UUID, error)
+	CheckExists(ctx context.Context, id uuid.UUID) (bool, error)
 }
 
 type FolderRepoGetManyParams struct {

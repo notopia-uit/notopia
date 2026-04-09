@@ -7,10 +7,26 @@ import (
 )
 
 const (
+	CodeFolderAlreadyExisted Code = "folderAlreadyExisted"
 	CodeFolderNotFound       Code = "folderNotFound"
 	CodeEmptyFolderName      Code = "folderEmptyName"
 	CodeFolderAlreadyTrashed Code = "folderAlreadyTrashed"
 )
+
+type FolderAlreadyExisted struct {
+	Err
+	FolderID uuid.UUID
+}
+
+func NewFolderAlreadyExisted(id uuid.UUID) *FolderAlreadyExisted {
+	return &FolderAlreadyExisted{
+		FolderID: id,
+		Err: Err{
+			message: fmt.Sprintf("folder with id %q already existed", id.String()),
+			code:    CodeFolderAlreadyExisted,
+		},
+	}
+}
 
 type FolderNotFound struct {
 	Err

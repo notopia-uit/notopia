@@ -57,6 +57,8 @@ func strictServerToHTTPErr(err *errs.Err) (
 	case errs.CodeAuthorizationServiceInternalError:
 		statusCode = 503
 
+	case errs.CodeFolderAlreadyExisted:
+		statusCode = 409
 	case errs.CodeFolderNotFound:
 		statusCode = 404
 	case errs.CodeEmptyFolderName:
