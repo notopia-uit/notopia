@@ -124,12 +124,6 @@ ORDER BY
 FOR UPDATE -- :if @for_update
 ;
 
-  -- folders, err := f.queries.GetRecursiveChildren(ctx, pgsqlc.GetRecursiveChildrenParams{
-  --   ID:          parms.ID,
-  --   IncludeRoot: parms.IncludeRoot,
-  --   ForUpdate:   parms.ForUpdate,
-  -- })
-
 -- name: GetRecursiveChildren :many
 WITH RECURSIVE child_folders AS (
   SELECT
@@ -150,7 +144,7 @@ SELECT
 FROM
   child_folders
 WHERE
-  id != sqlc.arg('id')::uuid -- :if @include_root
+  id != sqlc.arg('id')::uuid -- :if @exclude_root
 FOR UPDATE -- :if @for_update
 ;
 

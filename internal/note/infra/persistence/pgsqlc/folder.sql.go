@@ -265,11 +265,6 @@ func (q *Queries) GetParentIDsByFolderID(ctx context.Context, arg GetParentIDsBy
 }
 
 const getRecursiveChildren = `-- name: GetRecursiveChildren :many
-  --   ID:          parms.ID,
-  --   IncludeRoot: parms.IncludeRoot,
-  --   ForUpdate:   parms.ForUpdate,
-  -- })
-
 WITH RECURSIVE child_folders AS (
   SELECT
     id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
@@ -297,7 +292,7 @@ var _getRecursiveChildrenDynQ = dynCompile(getRecursiveChildren)
 
 type GetRecursiveChildrenParams struct {
 	ID          uuid.UUID
-	IncludeRoot bool
+	ExcludeRoot bool
 	ForUpdate   bool
 }
 
@@ -313,11 +308,10 @@ type GetRecursiveChildrenRow struct {
 	TrashedAt   *time.Time
 }
 
-// folders, err := f.queries.GetRecursiveChildren(ctx, pgsqlc.GetRecursiveChildrenParams{
 func (q *Queries) GetRecursiveChildren(ctx context.Context, arg GetRecursiveChildrenParams) ([]*GetRecursiveChildrenRow, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetRecursiveChildren")
 	defer span.End()
-	dynQuery, dynArgs := _getRecursiveChildrenDynQ.Build([]any{arg.ID, arg.IncludeRoot, arg.ForUpdate})
+	dynQuery, dynArgs := _getRecursiveChildrenDynQ.Build([]any{arg.ID, arg.ExcludeRoot, arg.ForUpdate})
 	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
 	if err != nil {
 		return nil, err

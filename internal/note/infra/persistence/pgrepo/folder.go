@@ -106,7 +106,7 @@ func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyPa
 func (f *Folder) GetRecursiveChildren(ctx context.Context, params *domain.FolderRepoGetRecursiveChildrenParams) ([]*domain.Folder, error) {
 	folders, err := f.queries.GetRecursiveChildren(ctx, pgsqlc.GetRecursiveChildrenParams{
 		ID:          params.ID,
-		IncludeRoot: params.IncludeRoot,
+		ExcludeRoot: !params.IncludeRoot,
 		ForUpdate:   params.ForUpdate,
 	})
 	if err != nil {
