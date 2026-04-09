@@ -68,7 +68,7 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 		return nil, toErr(err)
 	}
 
-	return noteToDomainRepo(note, links), nil
+	return noteToDomain(note, links), nil
 }
 
 func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams) ([]*domain.Note, error) {
@@ -123,12 +123,45 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 	result := make([]*domain.Note, len(notes))
 	for i, note := range notes {
 		links := noteIDOutgoingLinksMap[note.ID]
-		result[i] = noteToDomainRepo(note, links)
+		result[i] = noteToDomain(note, links)
 	}
 	return result, nil
 }
 
-func noteToDomainRepo(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
+func (n *Note) GetRecursiveChildrenFromFolder(ctx context.Context, folderID uuid.UUID, forUpdate bool) ([]*domain.Note, error) {
+	notes, err := n.queries.GetRecursiveChildrenFromFolder(ctx, pgsqlc.GetRecursiveChildrenFromFolderParams{
+		FolderID:  folderID,
+		ForUpdate: forUpdate,
+	})
+	if err != nil {
+		return nil, toErr(err)
+	}
+
+	noteIDs := make([]uuid.UUID, len(notes))
+	for i, note := range notes {
+		noteIDs[i] = note.ID
+	}
+	noteIDOutgoingLinksPairs, err := n.queries.GetNotesOutgoingLinks(ctx, noteIDs)
+	if err != nil {
+		return nil, toErr(err)
+	}
+	noteIDOutgoingLinksMap := make(map[uuid.UUID][]uuid.UUID, len(noteIDOutgoingLinksPairs))
+	for _, pair := range noteIDOutgoingLinksPairs {
+		targetIDs, ok := pair.TargetIDs.([]uuid.UUID)
+		if !ok {
+			return nil, errs.NewPersistenceInvalid(fmt.Sprintf("invalid type for target ids: %T", pair.TargetIDs), nil)
+		}
+		noteIDOutgoingLinksMap[pair.SourceID] = targetIDs
+	}
+	result := make([]*domain.Note, len(notes))
+	for i, note := range notes {
+		links := noteIDOutgoingLinksMap[note.ID]
+		result[i] = noteToDomain(note, links)
+	}
+	return result, nil
+}
+
+func noteToDomain(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
 	var icon string
 	if note.Icon != nil {
 		icon = *note.Icon

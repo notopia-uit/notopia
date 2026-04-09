@@ -32,12 +32,7 @@ func NewDeleteWorkspaceHandler(
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) error {
-	hasPermission, err := h.authorizationService.HasWorkspacePermission(
-		ctx,
-		cmd.UserID,
-		cmd.ID,
-		WorkspacePermissionDelete,
-	)
+	hasPermission, err := h.authorizationService.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionDelete)
 	if err != nil {
 		return err
 	}

@@ -214,7 +214,7 @@ WITH RECURSIVE parent_folders(id, parent_id) AS (
     id,
     parent_id
   FROM
-    folders AS start
+    folders
   WHERE
     id = $1::uuid
   UNION ALL
@@ -257,6 +257,89 @@ func (q *Queries) GetParentIDsByFolderID(ctx context.Context, arg GetParentIDsBy
 			return nil, err
 		}
 		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRecursiveChildren = `-- name: GetRecursiveChildren :many
+  --   ID:          parms.ID,
+  --   IncludeRoot: parms.IncludeRoot,
+  --   ForUpdate:   parms.ForUpdate,
+  -- })
+
+WITH RECURSIVE child_folders AS (
+  SELECT
+    id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+  FROM
+    folders
+  WHERE
+    id = $1::uuid
+  UNION ALL
+  SELECT
+    folders.id, folders.name, folders.icon, folders.workspace_id, folders.parent_id, folders.created_at, folders.updated_at, folders.trashed_by, folders.trashed_at, cf.id, cf.name, cf.icon, cf.workspace_id, cf.parent_id, cf.created_at, cf.updated_at, cf.trashed_by, cf.trashed_at
+  FROM
+    folders
+    INNER JOIN child_folders AS cf ON parent_id = cf.id
+)
+SELECT
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+FROM
+  child_folders
+WHERE
+  id != $1::uuid -- :if $2
+FOR UPDATE -- :if $3
+`
+
+var _getRecursiveChildrenDynQ = dynCompile(getRecursiveChildren)
+
+type GetRecursiveChildrenParams struct {
+	ID          uuid.UUID
+	IncludeRoot bool
+	ForUpdate   bool
+}
+
+type GetRecursiveChildrenRow struct {
+	ID          uuid.UUID
+	Name        string
+	Icon        *string
+	WorkspaceID uuid.UUID
+	ParentID    *uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	TrashedBy   *string
+	TrashedAt   *time.Time
+}
+
+// folders, err := f.queries.GetRecursiveChildren(ctx, pgsqlc.GetRecursiveChildrenParams{
+func (q *Queries) GetRecursiveChildren(ctx context.Context, arg GetRecursiveChildrenParams) ([]*GetRecursiveChildrenRow, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetRecursiveChildren")
+	defer span.End()
+	dynQuery, dynArgs := _getRecursiveChildrenDynQ.Build([]any{arg.ID, arg.IncludeRoot, arg.ForUpdate})
+	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetRecursiveChildrenRow
+	for rows.Next() {
+		var i GetRecursiveChildrenRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Icon,
+			&i.WorkspaceID,
+			&i.ParentID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

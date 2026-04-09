@@ -18,12 +18,12 @@ type DocumentCommitted struct {
 
 type DocumentCommittedHandler struct {
 	noteRepo    domain.NoteRepo
-	noteService *domain.NoteService
+	noteService *domain.UpdateNoteSizeService
 }
 
 func NewDocumentCommittedHandler(
 	noteRepo domain.NoteRepo,
-	noteService *domain.NoteService,
+	noteService *domain.UpdateNoteSizeService,
 ) *DocumentCommittedHandler {
 	return &DocumentCommittedHandler{
 		noteRepo:    noteRepo,
@@ -38,7 +38,7 @@ func (h *DocumentCommittedHandler) Handle(ctx context.Context, event *DocumentCo
 	if err != nil {
 		return err
 	}
-	err = h.noteService.UpdateNoteSizeBasedOnContent(note, event.Content, event.UserID)
+	err = h.noteService.Handle(note, event.Content, event.UserID)
 	if err != nil {
 		return err
 	}

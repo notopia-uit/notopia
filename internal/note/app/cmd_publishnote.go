@@ -8,7 +8,8 @@ import (
 )
 
 type PublishNote struct {
-	ID uuid.UUID
+	ID     uuid.UUID
+	UserID string
 }
 
 type PublishNoteHandler struct {

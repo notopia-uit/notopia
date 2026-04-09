@@ -1,9 +1,5 @@
 package domain
 
-import (
-	"github.com/google/uuid"
-)
-
 type TrashService struct{}
 
 func NewTrashService() *TrashService {
@@ -21,47 +17,32 @@ func (s *TrashService) TrashNotes(notes []*Note, userID string) error {
 	return nil
 }
 
-func (s *TrashService) TrashFolders(
-	workspaceNotes *[]*Note,
-	workspaceFolders *[]*Folder,
+func (s *TrashService) TrashFoldersWithChildren(
 	targetFolders []*Folder,
+	childFolders []*Folder,
+	childNotes []*Note,
 	userID string,
 ) error {
+	// Trash target folders first with purpose
 	for i := range targetFolders {
 		if err := targetFolders[i].Trash(TrashedByPurpose, userID); err != nil {
 			return err
 		}
-
-		if err := s.cascadeTrashChildren(workspaceNotes, workspaceFolders, targetFolders[i].ID(), userID); err != nil {
-			return err
-		}
 	}
-	return nil
-}
 
-func (s *TrashService) cascadeTrashChildren(
-	workspaceNotes *[]*Note,
-	workspaceFolders *[]*Folder,
-	folderID uuid.UUID,
-	userID string,
-) error {
-	for i := range *workspaceFolders {
-		folder := (*workspaceFolders)[i]
-		if folder.ParentID() != uuid.Nil && folder.ParentID() == folderID && !folder.IsTrashed() {
-			if err := folder.Trash(TrashedByParent, userID); err != nil {
-				return err
-			}
-
-			if err := s.cascadeTrashChildren(workspaceNotes, workspaceFolders, folder.ID(), userID); err != nil {
+	// Trash all child folders that aren't already trashed
+	for i := range childFolders {
+		if !childFolders[i].IsTrashed() {
+			if err := childFolders[i].Trash(TrashedByParent, userID); err != nil {
 				return err
 			}
 		}
 	}
 
-	for i := range *workspaceNotes {
-		note := (*workspaceNotes)[i]
-		if note.FolderID() == folderID && !note.IsTrashed() {
-			if err := note.Trash(TrashedByParent, userID); err != nil {
+	// Trash all child notes that aren't already trashed
+	for i := range childNotes {
+		if !childNotes[i].IsTrashed() {
+			if err := childNotes[i].Trash(TrashedByParent, userID); err != nil {
 				return err
 			}
 		}
@@ -77,49 +58,28 @@ func (s *TrashService) RestoreNotes(notes []*Note, userID string) error {
 	return nil
 }
 
-func (s *TrashService) RestoreFolders(
-	trashedNotes *[]*Note,
-	trashedFolders *[]*Folder,
+func (s *TrashService) RestoreFoldersWithChildren(
 	targetFolders []*Folder,
+	childFolders []*Folder,
+	childNotes []*Note,
 	userID string,
 ) error {
+	// Restore target folders first
 	for i := range targetFolders {
 		targetFolders[i].Restore(userID)
-
-		if err := s.cascadeRestoreChildrenByParent(trashedNotes, trashedFolders, targetFolders[i].ID(), userID); err != nil {
-			return err
-		}
 	}
-	return nil
-}
 
-func (s *TrashService) cascadeRestoreChildrenByParent(
-	trashedNotes *[]*Note,
-	trashedFolders *[]*Folder,
-	folderID uuid.UUID,
-	userID string,
-) error {
-	for i := range *trashedFolders {
-		folder := (*trashedFolders)[i]
-		if folder.ParentID() != uuid.Nil && folder.ParentID() == folderID && folder.IsTrashed() {
-			trashedBy := folder.TrashedBy()
-			if trashedBy != TrashedByUnspecified && trashedBy == TrashedByParent {
-				folder.Restore(userID)
-
-				if err := s.cascadeRestoreChildrenByParent(trashedNotes, trashedFolders, folder.ID(), userID); err != nil {
-					return err
-				}
-			}
+	// Restore child folders only if they were trashed by parent
+	for i := range childFolders {
+		if childFolders[i].IsTrashed() && childFolders[i].TrashedBy() == TrashedByParent {
+			childFolders[i].Restore(userID)
 		}
 	}
 
-	for i := range *trashedNotes {
-		note := (*trashedNotes)[i]
-		if note.FolderID() == folderID && note.IsTrashed() {
-			trashedBy := note.TrashedBy()
-			if trashedBy != TrashedByUnspecified && trashedBy == TrashedByParent {
-				note.Restore(userID)
-			}
+	// Restore child notes only if they were trashed by parent
+	for i := range childNotes {
+		if childNotes[i].IsTrashed() && childNotes[i].TrashedBy() == TrashedByParent {
+			childNotes[i].Restore(userID)
 		}
 	}
 

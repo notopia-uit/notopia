@@ -17,18 +17,15 @@ type RenameFolder struct {
 
 type RenameFolderHandler struct {
 	authorizationService AuthorizationService
-	folderRepo           domain.FolderRepo
 	uow                  domain.UnitOfWork
 }
 
 func NewRenameFolderHandler(
 	authorizationService AuthorizationService,
-	folderRepo domain.FolderRepo,
 	uow domain.UnitOfWork,
 ) *RenameFolderHandler {
 	return &RenameFolderHandler{
 		authorizationService: authorizationService,
-		folderRepo:           folderRepo,
 		uow:                  uow,
 	}
 }
@@ -36,28 +33,22 @@ func NewRenameFolderHandler(
 var ProvideRenameFolderHandler = NewRenameFolderHandler
 
 func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) error {
-	workspaceID, err := h.folderRepo.GetWorkspaceIDByID(ctx, cmd.ID)
-	if err != nil {
-		return err
-	}
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-		ctx,
-		cmd.UserID,
-		workspaceID,
-		WorkspaceItemPermissionWrite,
-	)
-	if err != nil {
-		return err
-	}
-
-	if !hasPermission {
-		return errs.NewForbidden(
-			fmt.Sprintf("user %s does not have permission to rename folder %s", cmd.UserID, cmd.ID),
-		)
-	}
-
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
+
+		workspaceID, err := folderRepo.GetWorkspaceIDByID(ctx, cmd.ID)
+		if err != nil {
+			return err
+		}
+		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionWrite)
+		if err != nil {
+			return err
+		}
+		if !hasPermission {
+			return errs.NewForbidden(
+				fmt.Sprintf("user %s does not have permission to rename folder %s", cmd.UserID, cmd.ID),
+			)
+		}
 		folder, err := folderRepo.GetByID(ctx, cmd.ID, true)
 		if err != nil {
 			return err

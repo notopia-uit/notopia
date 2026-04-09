@@ -35,12 +35,7 @@ func NewMoveWorkspaceItemsHandler(
 var ProvideMoveWorkspaceItemsHandler = NewMoveWorkspaceItemsHandler
 
 func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-		ctx,
-		cmd.UserID,
-		cmd.WorkspaceID,
-		WorkspaceItemPermissionWrite,
-	)
+	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
 	if err != nil {
 		return err
 	}
@@ -50,9 +45,6 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			fmt.Sprintf("user %s does not have permission to move items in workspace %s", cmd.UserID, cmd.WorkspaceID),
 		)
 	}
-
-	var folders []*domain.Folder
-	var notes []*domain.Note
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
@@ -110,7 +102,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		}
 
 		if len(cmd.FolderIDs) > 0 {
-			folders, err = folderRepo.GetMany(ctx,
+			folders, err := folderRepo.GetMany(ctx,
 				//exhaustruct:ignore
 				&domain.FolderRepoGetManyParams{
 					WorkspaceID: cmd.WorkspaceID,
@@ -128,7 +120,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			}
 		}
 		if len(cmd.NoteIDs) > 0 {
-			notes, err = noteRepo.GetMany(ctx,
+			notes, err := noteRepo.GetMany(ctx,
 				//exhaustruct:ignore
 				&domain.NoteRepoGetManyParams{
 					IDs:         cmd.NoteIDs,

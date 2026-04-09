@@ -124,13 +124,44 @@ ORDER BY
 FOR UPDATE -- :if @for_update
 ;
 
+  -- folders, err := f.queries.GetRecursiveChildren(ctx, pgsqlc.GetRecursiveChildrenParams{
+  --   ID:          parms.ID,
+  --   IncludeRoot: parms.IncludeRoot,
+  --   ForUpdate:   parms.ForUpdate,
+  -- })
+
+-- name: GetRecursiveChildren :many
+WITH RECURSIVE child_folders AS (
+  SELECT
+    *
+  FROM
+    folders
+  WHERE
+    id = sqlc.arg('id')::uuid
+  UNION ALL
+  SELECT
+    *
+  FROM
+    folders
+    INNER JOIN child_folders AS cf ON parent_id = cf.id
+)
+SELECT
+  *
+FROM
+  child_folders
+WHERE
+  id != sqlc.arg('id')::uuid -- :if @include_root
+FOR UPDATE -- :if @for_update
+;
+
+
 -- name: GetParentIDsByFolderID :many
 WITH RECURSIVE parent_folders(id, parent_id) AS (
   SELECT
     id,
     parent_id
   FROM
-    folders AS start
+    folders
   WHERE
     id = sqlc.arg('id')::uuid
   UNION ALL

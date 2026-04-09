@@ -140,6 +140,79 @@ func (q *Queries) GetNotes(ctx context.Context, arg *GetNotesParams) ([]*Note, e
 	return items, nil
 }
 
+const getRecursiveChildrenFromFolder = `-- name: GetRecursiveChildrenFromFolder :many
+	-- 	FolderID:  folderID,
+	-- 	ForUpdate: forUpdate,
+	-- })
+
+WITH RECURSIVE subfolders AS (
+  SELECT
+    id
+  FROM
+    folders
+  WHERE
+    id = $1::uuid
+  UNION ALL
+  SELECT
+    f.id
+  FROM
+    folders f
+  INNER JOIN
+    subfolders sf
+    ON f.parent_id = sf.id
+)
+SELECT
+  n.id, n.name, n.icon, n.folder_id, n.tags, n.size, n.created_at, n.updated_at, n.trashed_by, n.trashed_at
+FROM
+  notes n
+INNER JOIN
+  subfolders sf
+  ON n.folder_id = sf.id
+FOR UPDATE -- :if $2
+`
+
+var _getRecursiveChildrenFromFolderDynQ = dynCompile(getRecursiveChildrenFromFolder)
+
+type GetRecursiveChildrenFromFolderParams struct {
+	FolderID  uuid.UUID
+	ForUpdate bool
+}
+
+// notes, err := n.queries.GetRecursiveChildrenFromFolder(ctx, pgsqlc.GetRecursiveChildrenFromFolderParams{
+func (q *Queries) GetRecursiveChildrenFromFolder(ctx context.Context, arg GetRecursiveChildrenFromFolderParams) ([]*Note, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetRecursiveChildrenFromFolder")
+	defer span.End()
+	dynQuery, dynArgs := _getRecursiveChildrenFromFolderDynQ.Build([]any{arg.FolderID, arg.ForUpdate})
+	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Note
+	for rows.Next() {
+		var i Note
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Icon,
+			&i.FolderID,
+			&i.Tags,
+			&i.Size,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getWorkspaceIDByNoteID = `-- name: GetWorkspaceIDByNoteID :one
 SELECT
   f.workspace_id

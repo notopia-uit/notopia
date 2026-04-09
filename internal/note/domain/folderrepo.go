@@ -9,6 +9,7 @@ import (
 type FolderRepo interface {
 	GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*Folder, error)
 	GetMany(ctx context.Context, params *FolderRepoGetManyParams) ([]*Folder, error)
+	GetRecursiveChildren(ctx context.Context, parms *FolderRepoGetRecursiveChildrenParams) ([]*Folder, error)
 	GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
 	Save(ctx context.Context, folder *Folder) error
 	SaveMany(ctx context.Context, folders []*Folder) error
@@ -22,5 +23,11 @@ type FolderRepoGetManyParams struct {
 	IDs         []uuid.UUID
 	TrashedBy   TrashedBy
 	TrashOnly   bool
+	ForUpdate   bool
+}
+
+type FolderRepoGetRecursiveChildrenParams struct {
+	ID          uuid.UUID
+	IncludeRoot bool
 	ForUpdate   bool
 }

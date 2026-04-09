@@ -53,42 +53,19 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 		)
 	}
 
-	// TODO: Why it getting 4 times??
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	if len(cmd.NoteIDs) == 0 && len(cmd.FolderIDs) == 0 {
+		return nil
+	}
+
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		noteRepo := r.Note()
 		folderRepo := r.Folder()
 
-		if len(cmd.NoteIDs) == 0 && len(cmd.FolderIDs) == 0 {
-			return nil
-		}
+		var allModifiedNotes []*domain.Note
+		var allModifiedFolders []*domain.Folder
 
-		workspaceNotes, err := noteRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.NoteRepoGetManyParams{
-				WorkspaceID: cmd.WorkspaceID,
-			},
-		)
-		if err != nil {
-			return err
-		}
-
-		workspaceFolders, err := folderRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.FolderRepoGetManyParams{
-				WorkspaceID: cmd.WorkspaceID,
-				ForUpdate:   true,
-			},
-		)
-		if err != nil {
-			return err
-		}
-
-		workspaceNotePtrs := workspaceNotes
-		workspaceFolderPtrs := workspaceFolders
-
-		var notes []*domain.Note
 		if len(cmd.NoteIDs) > 0 {
-			notes, err = noteRepo.GetMany(ctx,
+			notes, err := noteRepo.GetMany(ctx,
 				//exhaustruct:ignore
 				&domain.NoteRepoGetManyParams{
 					IDs:       cmd.NoteIDs,
@@ -102,11 +79,12 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			if err := h.trashService.TrashNotes(notes, cmd.UserID); err != nil {
 				return err
 			}
+
+			allModifiedNotes = append(allModifiedNotes, notes...)
 		}
 
-		var folders []*domain.Folder
 		if len(cmd.FolderIDs) > 0 {
-			folders, err = folderRepo.GetMany(ctx,
+			folders, err := folderRepo.GetMany(ctx,
 				//exhaustruct:ignore
 				&domain.FolderRepoGetManyParams{
 					IDs:       cmd.FolderIDs,
@@ -117,29 +95,49 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 				return err
 			}
 
-			if err := h.trashService.TrashFolders(&workspaceNotePtrs, &workspaceFolderPtrs, folders, cmd.UserID); err != nil {
+			var childFolders []*domain.Folder
+			var childNotes []*domain.Note
+
+			for _, folder := range folders {
+				children, err := folderRepo.GetRecursiveChildren(ctx, &domain.FolderRepoGetRecursiveChildrenParams{
+					ID:          folder.ID(),
+					IncludeRoot: false,
+					ForUpdate:   true,
+				})
+				if err != nil {
+					return err
+				}
+
+				notes, err := noteRepo.GetRecursiveChildrenFromFolder(ctx, folder.ID(), true)
+				if err != nil {
+					return err
+				}
+
+				childFolders = append(childFolders, children...)
+				childNotes = append(childNotes, notes...)
+			}
+
+			if err := h.trashService.TrashFoldersWithChildren(folders, childFolders, childNotes, cmd.UserID); err != nil {
+				return err
+			}
+
+			allModifiedFolders = append(allModifiedFolders, folders...)
+			allModifiedFolders = append(allModifiedFolders, childFolders...)
+			allModifiedNotes = append(allModifiedNotes, childNotes...)
+		}
+
+		if len(allModifiedNotes) > 0 {
+			if err := noteRepo.SaveMany(ctx, allModifiedNotes); err != nil {
 				return err
 			}
 		}
 
-		// Save items
-		if len(workspaceNotePtrs) > 0 {
-			if err := noteRepo.SaveMany(ctx, workspaceNotePtrs); err != nil {
-				return err
-			}
-		}
-
-		if len(workspaceFolderPtrs) > 0 {
-			if err := folderRepo.SaveMany(ctx, workspaceFolderPtrs); err != nil {
+		if len(allModifiedFolders) > 0 {
+			if err := folderRepo.SaveMany(ctx, allModifiedFolders); err != nil {
 				return err
 			}
 		}
 
 		return nil
 	})
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

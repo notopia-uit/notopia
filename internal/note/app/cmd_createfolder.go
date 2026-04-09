@@ -37,16 +37,10 @@ func NewCreateFolderHandler(
 var ProvideCreateFolderHandler = NewCreateFolderHandler
 
 func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-		ctx,
-		cmd.UserID,
-		cmd.WorkspaceID,
-		WorkspaceItemPermissionWrite,
-	)
+	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
 	if err != nil {
 		return err
 	}
-
 	if !hasPermission {
 		return errs.NewForbidden(
 			fmt.Sprintf("user %q does not have permission to create folder in workspace %q", cmd.UserID, cmd.WorkspaceID.String()),

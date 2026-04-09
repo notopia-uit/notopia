@@ -17,18 +17,15 @@ type RenameNote struct {
 
 type RenameNoteHandler struct {
 	authorizationService AuthorizationService
-	noterepo             domain.NoteRepo
 	uow                  domain.UnitOfWork
 }
 
 func NewRenameNoteHandler(
 	authorizationService AuthorizationService,
-	noterepo domain.NoteRepo,
 	uow domain.UnitOfWork,
 ) *RenameNoteHandler {
 	return &RenameNoteHandler{
 		authorizationService: authorizationService,
-		noterepo:             noterepo,
 		uow:                  uow,
 	}
 }
@@ -36,28 +33,21 @@ func NewRenameNoteHandler(
 var ProvideRenameNoteHandler = NewRenameNoteHandler
 
 func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
-	workspaceID, err := h.noterepo.GetWorkspaceIDByID(ctx, cmd.ID)
-	if err != nil {
-		return err
-	}
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-		ctx,
-		cmd.UserID,
-		workspaceID,
-		WorkspaceItemPermissionWrite,
-	)
-	if err != nil {
-		return err
-	}
-
-	if !hasPermission {
-		return errs.NewForbidden(
-			fmt.Sprintf("user %s does not have permission to rename note %s", cmd.UserID, cmd.ID),
-		)
-	}
-
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		noteRepo := r.Note()
+		workspaceID, err := noteRepo.GetWorkspaceIDByID(ctx, cmd.ID)
+		if err != nil {
+			return err
+		}
+		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionWrite)
+		if err != nil {
+			return err
+		}
+		if !hasPermission {
+			return errs.NewForbidden(
+				fmt.Sprintf("user %s does not have permission to rename note %s", cmd.UserID, cmd.ID),
+			)
+		}
 		note, err := noteRepo.GetByID(ctx, cmd.ID, true)
 		if err != nil {
 			return err

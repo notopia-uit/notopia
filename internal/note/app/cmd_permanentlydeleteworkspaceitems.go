@@ -34,12 +34,7 @@ func NewPermanentlyDeleteWorkspaceItemsHandler(
 var ProvidePermanentlyDeleteWorkspaceItemsHandler = NewPermanentlyDeleteWorkspaceItemsHandler
 
 func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteWorkspaceItems) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-		ctx,
-		cmd.UserID,
-		cmd.WorkspaceID,
-		WorkspaceItemPermissionDelete,
-	)
+	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
 	if err != nil {
 		return err
 	}
@@ -50,29 +45,44 @@ func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd
 		)
 	}
 
-	// TODO: first, need to fix the param back, awful
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		if len(cmd.FolderIDs) > 0 {
+			folderRepo := r.Folder()
+			folders, err := folderRepo.GetMany(ctx,
+				//exhaustruct:ignore
+				&domain.FolderRepoGetManyParams{
+					IDs:       cmd.FolderIDs,
+					ForUpdate: true,
+				})
+			if err != nil {
+				return err
+			}
+			for _, folder := range folders {
+				folder.PermanentlyDelete(cmd.UserID)
+			}
+			if err := folderRepo.SaveMany(ctx, folders); err != nil {
+				return err
+			}
+		}
 
-	// return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-	// 	folderRepo := r.Folder()
-	// 	folder, err := folderRepo.GetMany(ctx, domain.NewFolderRepoGetManyParamsByIDs(cmd.FolderIDs).WithTrashed())
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	folder.Deleted()
-	// 	return folderRepo.Save(ctx, folder)
-	// })
-
-	// if len(cmd.NoteIDs) > 0 {
-	// 	if err := h.noteRepo.PermanentlyDeleteByIDs(ctx, cmd.NoteIDs); err != nil {
-	// 		return err
-	// 	}
-	// }
-	//
-	// if len(cmd.FolderIDs) > 0 {
-	// 	if err := h.folderRepo.PermanentlyDeleteByIDs(ctx, cmd.FolderIDs); err != nil {
-	// 		return err
-	// 	}
-	// }
-
-	return nil
+		if len(cmd.NoteIDs) > 0 {
+			noteRepo := r.Note()
+			notes, err := noteRepo.GetMany(ctx,
+				//exhaustruct:ignore
+				&domain.NoteRepoGetManyParams{
+					IDs:       cmd.NoteIDs,
+					ForUpdate: true,
+				})
+			if err != nil {
+				return err
+			}
+			for _, note := range notes {
+				note.PermanentlyDelete(cmd.UserID)
+			}
+			if err := noteRepo.SaveMany(ctx, notes); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }

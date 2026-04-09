@@ -73,7 +73,7 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 		return nil, errs.NewWorkspaceRootFolderNotFound(workspace.ID, pgx.ErrNoRows)
 	}
 
-	return workspaceToDomainRepo(workspace, folders[0].ID)
+	return workspaceToDomain(workspace, folders[0].ID)
 }
 
 func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Workspace, error) {
@@ -101,7 +101,7 @@ func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 		return nil, errs.NewWorkspaceRootFolderNotFound(id, pgx.ErrNoRows)
 	}
 
-	return workspaceToDomainRepo(workspace, folders[0].ID)
+	return workspaceToDomain(workspace, folders[0].ID)
 }
 
 func (w *Workspace) GetIDBySlug(ctx context.Context, slug string) (*uuid.UUID, error) {
@@ -150,7 +150,7 @@ func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) (cerr
 	})
 }
 
-func workspaceToDomainRepo(workspace *pgsqlc.Workspace, rootFolderID uuid.UUID) (*domain.Workspace, error) {
+func workspaceToDomain(workspace *pgsqlc.Workspace, rootFolderID uuid.UUID) (*domain.Workspace, error) {
 	return domain.NewWorkspace(
 		workspace.ID,
 		workspace.Name,

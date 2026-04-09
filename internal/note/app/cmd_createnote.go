@@ -50,12 +50,7 @@ func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) error {
 		if err != nil {
 			return err
 		}
-		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-			ctx,
-			cmd.UserID,
-			workspaceID,
-			WorkspaceItemPermissionWrite,
-		)
+		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionWrite)
 		if err != nil {
 			return err
 		}
