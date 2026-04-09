@@ -57,12 +57,20 @@ func strictServerToHTTPErr(err *errs.Err) (
 	case errs.CodeAuthorizationServiceInternalError:
 		statusCode = 503
 
+	case errs.CodeFolderAlreadyExisted:
+		statusCode = 409
 	case errs.CodeFolderNotFound:
 		statusCode = 404
 	case errs.CodeEmptyFolderName:
 		statusCode = 400
 	case errs.CodeFolderAlreadyTrashed:
 		statusCode = 409
+	case errs.CodeFoldersNotInWorkspace:
+		statusCode = 400
+	case errs.CodeDestinationFolderNotInWorkspace:
+		statusCode = 400
+	case errs.CodeCannotMoveFolderToItOwnSubfolder:
+		statusCode = 400
 
 	case errs.CodeNoteNotFound:
 		statusCode = 404
@@ -70,12 +78,17 @@ func strictServerToHTTPErr(err *errs.Err) (
 		statusCode = 500
 	case errs.CodeNoteAlreadyTrashed:
 		statusCode = 409
+	case errs.CodeNotesNotInWorkspace:
+		statusCode = 400
 
 	case errs.CodePersistenceInvalid:
 		statusCode = 400
 	case errs.CodePersistenceInternal:
 		statusCode = 500
-
+	case errs.CodeWorkspaceMembersCannotBeEmpty:
+		statusCode = 400
+	case errs.CodeWorkspaceMustHaveAtLeastOneOwner:
+		statusCode = 400
 	case errs.CodeWorkspaceNotFound:
 		statusCode = 404
 	case errs.CodeWorkspaceBySlugNotFound:

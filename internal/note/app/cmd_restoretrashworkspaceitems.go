@@ -9,35 +9,26 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
-// TODO: This should carefully recheck
-// Transaction?
-
 type RestoreTrashedWorkspaceItems struct {
 	WorkspaceID uuid.UUID
-	UserID      string
 	NoteIDs     []uuid.UUID
 	FolderIDs   []uuid.UUID
+	UserID      string
 }
 
 type RestoreTrashedWorkspaceItemsHandler struct {
 	authorizationService AuthorizationService
-	noteRepo             domain.NoteRepo
-	folderRepo           domain.FolderRepo
 	trashService         *domain.TrashService
 	uow                  domain.UnitOfWork
 }
 
 func NewRestoreTrashedWorkspaceItemsHandler(
 	authorizationService AuthorizationService,
-	noteRepo domain.NoteRepo,
-	folderRepo domain.FolderRepo,
 	trashService *domain.TrashService,
 	uow domain.UnitOfWork,
 ) *RestoreTrashedWorkspaceItemsHandler {
 	return &RestoreTrashedWorkspaceItemsHandler{
 		authorizationService: authorizationService,
-		noteRepo:             noteRepo,
-		folderRepo:           folderRepo,
 		trashService:         trashService,
 		uow:                  uow,
 	}
@@ -45,13 +36,13 @@ func NewRestoreTrashedWorkspaceItemsHandler(
 
 var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItemsHandler
 
+// spellcheck:ignore
+// NOTE: performance issue. If we follow strictly the DDD, this is right
+// But currently we are getting all recusive children not filtering any
+// Because if we filter, we will need to check no further down the tree has filtered trashed by "purpose" or "parent"
+
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-		ctx,
-		cmd.UserID,
-		cmd.WorkspaceID,
-		WorkspaceItemPermissionDelete,
-	)
+	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
 	if err != nil {
 		return err
 	}
@@ -66,30 +57,8 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 		noteRepo := r.Note()
 		folderRepo := r.Folder()
 
-		trashedNotes, err := noteRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.NoteRepoGetManyParams{
-				WorkspaceID: cmd.WorkspaceID,
-				TrashOnly:   true,
-			},
-		)
-		if err != nil {
-			return err
-		}
-
-		trashedFolders, err := folderRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.FolderRepoGetManyParams{
-				WorkspaceID: cmd.WorkspaceID,
-				TrashOnly:   true,
-			},
-		)
-		if err != nil {
-			return err
-		}
-
-		trashedNotePtrs := trashedNotes
-		trashedFolderPtrs := trashedFolders
+		var allModifiedNotes []*domain.Note
+		var allModifiedFolders []*domain.Folder
 
 		if len(cmd.NoteIDs) > 0 {
 			notes, err := noteRepo.GetMany(ctx,
@@ -104,15 +73,11 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 				return err
 			}
 
-			notePtrs := notes
-			if err := h.trashService.RestoreNotes(notePtrs, cmd.UserID); err != nil {
+			if err := h.trashService.RestoreNotes(notes, cmd.UserID); err != nil {
 				return err
 			}
-			for _, note := range notePtrs {
-				if err := noteRepo.Save(ctx, note); err != nil {
-					return err
-				}
-			}
+
+			allModifiedNotes = append(allModifiedNotes, notes...)
 		}
 
 		if len(cmd.FolderIDs) > 0 {
@@ -120,6 +85,7 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 				//exhaustruct:ignore
 				&domain.FolderRepoGetManyParams{
 					IDs:       cmd.FolderIDs,
+					TrashOnly: true,
 					ForUpdate: true,
 				},
 			)
@@ -127,20 +93,49 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 				return err
 			}
 
-			if err := h.trashService.RestoreFolders(&trashedNotePtrs, &trashedFolderPtrs, folders, cmd.UserID); err != nil {
+			var childFolders []*domain.Folder
+			var childNotes []*domain.Note
+
+			for _, folder := range folders {
+				children, err := folderRepo.GetRecursiveChildren(ctx, &domain.FolderRepoGetRecursiveChildrenParams{
+					ID:          folder.ID(),
+					IncludeRoot: false,
+					ForUpdate:   true,
+				})
+				if err != nil {
+					return err
+				}
+
+				notes, err := noteRepo.GetRecursiveChildrenFromFolder(ctx, folder.ID(), true)
+				if err != nil {
+					return err
+				}
+
+				childFolders = append(childFolders, children...)
+				childNotes = append(childNotes, notes...)
+			}
+
+			if err := h.trashService.RestoreFoldersWithChildren(folders, childFolders, childNotes, cmd.UserID); err != nil {
 				return err
 			}
 
-			for _, folder := range trashedFolderPtrs {
-				if err := folderRepo.Save(ctx, folder); err != nil {
-					return err
-				}
-			}
+			allModifiedFolders = append(allModifiedFolders, folders...)
+			allModifiedFolders = append(allModifiedFolders, childFolders...)
+			allModifiedNotes = append(allModifiedNotes, childNotes...)
+		}
 
-			for _, note := range trashedNotePtrs {
-				if err := noteRepo.Save(ctx, note); err != nil {
-					return err
-				}
+		allModifiedNotes = deduplicateNotes(allModifiedNotes)
+		allModifiedFolders = deduplicateFolders(allModifiedFolders)
+
+		if len(allModifiedNotes) > 0 {
+			if err := noteRepo.SaveMany(ctx, allModifiedNotes); err != nil {
+				return err
+			}
+		}
+
+		if len(allModifiedFolders) > 0 {
+			if err := folderRepo.SaveMany(ctx, allModifiedFolders); err != nil {
+				return err
 			}
 		}
 

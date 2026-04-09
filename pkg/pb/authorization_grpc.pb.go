@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthorizationService_CreateWorkspace_FullMethodName                 = "/authorization.AuthorizationService/CreateWorkspace"
+	AuthorizationService_CreateWorkspaceWithOwner_FullMethodName        = "/authorization.AuthorizationService/CreateWorkspaceWithOwner"
 	AuthorizationService_UpdateWorkspaceMembers_FullMethodName          = "/authorization.AuthorizationService/UpdateWorkspaceMembers"
 	AuthorizationService_GetWorkspaceMembers_FullMethodName             = "/authorization.AuthorizationService/GetWorkspaceMembers"
 	AuthorizationService_HasWorkspacePermission_FullMethodName          = "/authorization.AuthorizationService/HasWorkspacePermission"
@@ -32,7 +32,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthorizationServiceClient interface {
-	CreateWorkspace(ctx context.Context, in *CreateWorkspaceRequest, opts ...grpc.CallOption) (*CreateWorkspaceResponse, error)
+	CreateWorkspaceWithOwner(ctx context.Context, in *CreateWorkspaceWithOwnerRequest, opts ...grpc.CallOption) (*CreateWorkspaceWithOwnerResponse, error)
 	UpdateWorkspaceMembers(ctx context.Context, in *UpdateWorkspaceMembersRequest, opts ...grpc.CallOption) (*UpdateWorkspaceMembersResponse, error)
 	GetWorkspaceMembers(ctx context.Context, in *GetWorkspaceMembersRequest, opts ...grpc.CallOption) (*GetWorkspaceMembersResponse, error)
 	HasWorkspacePermission(ctx context.Context, in *HasWorkspacePermissionRequest, opts ...grpc.CallOption) (*HasWorkspacePermissionResponse, error)
@@ -49,10 +49,10 @@ func NewAuthorizationServiceClient(cc grpc.ClientConnInterface) AuthorizationSer
 	return &authorizationServiceClient{cc}
 }
 
-func (c *authorizationServiceClient) CreateWorkspace(ctx context.Context, in *CreateWorkspaceRequest, opts ...grpc.CallOption) (*CreateWorkspaceResponse, error) {
+func (c *authorizationServiceClient) CreateWorkspaceWithOwner(ctx context.Context, in *CreateWorkspaceWithOwnerRequest, opts ...grpc.CallOption) (*CreateWorkspaceWithOwnerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateWorkspaceResponse)
-	err := c.cc.Invoke(ctx, AuthorizationService_CreateWorkspace_FullMethodName, in, out, cOpts...)
+	out := new(CreateWorkspaceWithOwnerResponse)
+	err := c.cc.Invoke(ctx, AuthorizationService_CreateWorkspaceWithOwner_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (c *authorizationServiceClient) DeleteWorkspace(ctx context.Context, in *De
 // All implementations must embed UnimplementedAuthorizationServiceServer
 // for forward compatibility.
 type AuthorizationServiceServer interface {
-	CreateWorkspace(context.Context, *CreateWorkspaceRequest) (*CreateWorkspaceResponse, error)
+	CreateWorkspaceWithOwner(context.Context, *CreateWorkspaceWithOwnerRequest) (*CreateWorkspaceWithOwnerResponse, error)
 	UpdateWorkspaceMembers(context.Context, *UpdateWorkspaceMembersRequest) (*UpdateWorkspaceMembersResponse, error)
 	GetWorkspaceMembers(context.Context, *GetWorkspaceMembersRequest) (*GetWorkspaceMembersResponse, error)
 	HasWorkspacePermission(context.Context, *HasWorkspacePermissionRequest) (*HasWorkspacePermissionResponse, error)
@@ -140,8 +140,8 @@ type AuthorizationServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAuthorizationServiceServer struct{}
 
-func (UnimplementedAuthorizationServiceServer) CreateWorkspace(context.Context, *CreateWorkspaceRequest) (*CreateWorkspaceResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateWorkspace not implemented")
+func (UnimplementedAuthorizationServiceServer) CreateWorkspaceWithOwner(context.Context, *CreateWorkspaceWithOwnerRequest) (*CreateWorkspaceWithOwnerResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateWorkspaceWithOwner not implemented")
 }
 func (UnimplementedAuthorizationServiceServer) UpdateWorkspaceMembers(context.Context, *UpdateWorkspaceMembersRequest) (*UpdateWorkspaceMembersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateWorkspaceMembers not implemented")
@@ -182,20 +182,20 @@ func RegisterAuthorizationServiceServer(s grpc.ServiceRegistrar, srv Authorizati
 	s.RegisterService(&AuthorizationService_ServiceDesc, srv)
 }
 
-func _AuthorizationService_CreateWorkspace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateWorkspaceRequest)
+func _AuthorizationService_CreateWorkspaceWithOwner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateWorkspaceWithOwnerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthorizationServiceServer).CreateWorkspace(ctx, in)
+		return srv.(AuthorizationServiceServer).CreateWorkspaceWithOwner(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthorizationService_CreateWorkspace_FullMethodName,
+		FullMethod: AuthorizationService_CreateWorkspaceWithOwner_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthorizationServiceServer).CreateWorkspace(ctx, req.(*CreateWorkspaceRequest))
+		return srv.(AuthorizationServiceServer).CreateWorkspaceWithOwner(ctx, req.(*CreateWorkspaceWithOwnerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -316,8 +316,8 @@ var AuthorizationService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthorizationServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateWorkspace",
-			Handler:    _AuthorizationService_CreateWorkspace_Handler,
+			MethodName: "CreateWorkspaceWithOwner",
+			Handler:    _AuthorizationService_CreateWorkspaceWithOwner_Handler,
 		},
 		{
 			MethodName: "UpdateWorkspaceMembers",

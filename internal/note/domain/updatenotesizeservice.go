@@ -6,15 +6,15 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
-type NoteService struct{}
+type UpdateNoteSizeService struct{}
 
-func NewNoteService() *NoteService {
-	return &NoteService{}
+func NewUpdateNoteSizeService() *UpdateNoteSizeService {
+	return &UpdateNoteSizeService{}
 }
 
-var ProvideNoteService = NewNoteService
+var ProvideUpdateNoteSizeService = NewUpdateNoteSizeService
 
-func (s *NoteService) UpdateNoteSizeBasedOnContent(note *Note, content any, userID string) error {
+func (s *UpdateNoteSizeService) Handle(note *Note, content any, userID string) error {
 	b, err := json.Marshal(content)
 	if err != nil {
 		return errs.NewNoteFailToMarshalDocumentContent(note.ID(), content, err)

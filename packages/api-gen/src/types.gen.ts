@@ -230,6 +230,33 @@ export type NoteWorkspaceItemsUpdatedEvent = {
     };
 };
 
+export type NoteWorkspaceMembersUpdatedEvent = {
+    id: string;
+    event: 'WorkspaceMembersUpdatedEvent';
+    data: {
+        workspaceId: NotePropertiesId;
+    };
+};
+
+export type NoteWorkspaceUpdatedEvent = {
+    id: string;
+    event: 'WorkspaceUpdatedEvent';
+    data: NoteWorkspace;
+};
+
+export type NoteWorkspaceDeletedEvent = {
+    id: string;
+    event: 'WorkspaceDeletedEvent';
+    data: {
+        id: NotePropertiesId;
+    };
+};
+
+export type NoteHeartBeatWorkspaceEvent = {
+    event: 'HeartBeatWorkspaceEvent';
+    timestamp: Date;
+};
+
 /**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
@@ -252,34 +279,6 @@ export type NoteWorkspaceMember = {
     id: NoteUserPropertiesId;
     username?: NoteUserPropertiesName;
     role: NoteWorkspaceRole;
-};
-
-export type NoteWorkspaceMembersUpdatedEvent = {
-    id: string;
-    event: 'WorkspaceMembersUpdatedEvent';
-    data: {
-        id: NotePropertiesId;
-        members: Array<NoteWorkspaceMember>;
-    };
-};
-
-export type NoteWorkspaceUpdatedEvent = {
-    id: string;
-    event: 'WorkspaceUpdatedEvent';
-    data: NoteWorkspace;
-};
-
-export type NoteWorkspaceDeletedEvent = {
-    id: string;
-    event: 'WorkspaceDeletedEvent';
-    data: {
-        id: NotePropertiesId;
-    };
-};
-
-export type NoteHeartBeatWorkspaceEvent = {
-    event: 'HeartBeatWorkspaceEvent';
-    timestamp: Date;
 };
 
 export type NoteWorkspacePropertiesName = string;
@@ -369,17 +368,9 @@ export type NoteWorkspaceItemsUpdatedEventWritable = {
     event: 'WorkspaceItemsUpdatedEvent';
 };
 
-export type NoteWorkspaceMemberWritable = {
-    id: NoteUserPropertiesId;
-    role: NoteWorkspaceRole;
-};
-
 export type NoteWorkspaceMembersUpdatedEventWritable = {
     id: string;
     event: 'WorkspaceMembersUpdatedEvent';
-    data: {
-        members: Array<NoteWorkspaceMemberWritable>;
-    };
 };
 
 export type NoteWorkspaceUpdatedEventWritable = {
@@ -391,6 +382,11 @@ export type NoteWorkspaceUpdatedEventWritable = {
 export type NoteWorkspaceDeletedEventWritable = {
     id: string;
     event: 'WorkspaceDeletedEvent';
+};
+
+export type NoteWorkspaceMemberWritable = {
+    id: NoteUserPropertiesId;
+    role: NoteWorkspaceRole;
 };
 
 export type NoteTrashedNoteWritable = {

@@ -59,6 +59,9 @@ CREATE INDEX idx_folders_trashed_at
 CREATE INDEX idx_notes_trashed_at
   ON notes(trashed_at) WHERE trashed_at IS NOT NULL;
 
+CREATE INDEX idx_note_links_target_id
+  ON note_links(target_id);
+
 -- +goose Down
 
 DROP TYPE IF EXISTS trashed_by CASCADE;

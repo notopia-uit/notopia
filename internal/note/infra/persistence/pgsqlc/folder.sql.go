@@ -13,6 +13,27 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+const checkFolderExists = `-- name: CheckFolderExists :one
+SELECT
+  EXISTS (
+    SELECT
+      1
+    FROM
+      folders
+    WHERE
+      id = $1
+  )
+`
+
+func (q *Queries) CheckFolderExists(ctx context.Context, id uuid.UUID) (bool, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "CheckFolderExists")
+	defer span.End()
+	row := q.db.QueryRow(ctx, checkFolderExists, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const countFoldersInWorkspaceByIDs = `-- name: CountFoldersInWorkspaceByIDs :one
 SELECT
   COUNT(*)
@@ -193,7 +214,7 @@ WITH RECURSIVE parent_folders(id, parent_id) AS (
     id,
     parent_id
   FROM
-    folders AS start
+    folders
   WHERE
     id = $1::uuid
   UNION ALL
@@ -236,6 +257,83 @@ func (q *Queries) GetParentIDsByFolderID(ctx context.Context, arg GetParentIDsBy
 			return nil, err
 		}
 		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRecursiveChildren = `-- name: GetRecursiveChildren :many
+WITH RECURSIVE child_folders AS (
+  SELECT
+    f.id, f.name, f.icon, f.workspace_id, f.parent_id, f.created_at, f.updated_at, f.trashed_by, f.trashed_at
+  FROM
+    folders AS f
+  WHERE
+    id = $1::uuid
+  UNION ALL
+  SELECT
+    f.id, f.name, f.icon, f.workspace_id, f.parent_id, f.created_at, f.updated_at, f.trashed_by, f.trashed_at
+  FROM
+    folders AS f
+    INNER JOIN child_folders AS cf ON f.parent_id = cf.id
+)
+SELECT
+  id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+FROM
+  child_folders
+WHERE
+  id != $1::uuid -- :if $2
+FOR UPDATE -- :if $3
+`
+
+var _getRecursiveChildrenDynQ = dynCompile(getRecursiveChildren)
+
+type GetRecursiveChildrenParams struct {
+	ID          uuid.UUID
+	ExcludeRoot bool
+	ForUpdate   bool
+}
+
+type GetRecursiveChildrenRow struct {
+	ID          uuid.UUID
+	Name        string
+	Icon        *string
+	WorkspaceID uuid.UUID
+	ParentID    *uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	TrashedBy   *string
+	TrashedAt   *time.Time
+}
+
+func (q *Queries) GetRecursiveChildren(ctx context.Context, arg GetRecursiveChildrenParams) ([]*GetRecursiveChildrenRow, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "GetRecursiveChildren")
+	defer span.End()
+	dynQuery, dynArgs := _getRecursiveChildrenDynQ.Build([]any{arg.ID, arg.ExcludeRoot, arg.ForUpdate})
+	rows, err := q.db.Query(ctx, dynQuery, dynArgs...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetRecursiveChildrenRow
+	for rows.Next() {
+		var i GetRecursiveChildrenRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Icon,
+			&i.WorkspaceID,
+			&i.ParentID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.TrashedBy,
+			&i.TrashedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

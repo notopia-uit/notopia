@@ -194,7 +194,7 @@ func (n *Note) Deleted() bool {
 	return n.deleted
 }
 
-func (n *Note) Delete(userID string) {
+func (n *Note) PermanentlyDelete(userID string) {
 	n.deleted = true
 	n.addEvent(&NoteDeletedEvent{
 		BaseEvent: NewBaseEvent(n.id, userID),

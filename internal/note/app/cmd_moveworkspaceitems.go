@@ -19,36 +19,23 @@ type MoveWorkspaceItems struct {
 
 type MoveWorkspaceItemsHandler struct {
 	authorizationService AuthorizationService
-	noteRepo             domain.NoteRepo
-	folderRepo           domain.FolderRepo
 	uow                  domain.UnitOfWork
 }
 
 func NewMoveWorkspaceItemsHandler(
 	authorizationService AuthorizationService,
-	noteRepo domain.NoteRepo,
-	folderRepo domain.FolderRepo,
 	uow domain.UnitOfWork,
 ) *MoveWorkspaceItemsHandler {
 	return &MoveWorkspaceItemsHandler{
 		authorizationService: authorizationService,
-		noteRepo:             noteRepo,
-		folderRepo:           folderRepo,
 		uow:                  uow,
 	}
 }
 
 var ProvideMoveWorkspaceItemsHandler = NewMoveWorkspaceItemsHandler
 
-// NOTE: Partially transaction? is it right
-// Maybe we should in, side, a, tx...
 func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-		ctx,
-		cmd.UserID,
-		cmd.WorkspaceID,
-		WorkspaceItemPermissionWrite,
-	)
+	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
 	if err != nil {
 		return err
 	}
@@ -59,10 +46,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		)
 	}
 
-	var folders []*domain.Folder
-	var notes []*domain.Note
-
-	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
 		noteRepo := r.Note()
 
@@ -72,9 +56,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 				return err
 			}
 			if !folderValid {
-				return errs.NewInvalid(
-					fmt.Sprintf("one or more folders do not belong to workspace %s", cmd.WorkspaceID),
-				)
+				return errs.NewFoldersNotInWorkspace(cmd.WorkspaceID)
 			}
 		}
 
@@ -84,9 +66,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 				return err
 			}
 			if !noteValid {
-				return errs.NewInvalid(
-					fmt.Sprintf("one or more notes do not belong to workspace %s", cmd.WorkspaceID),
-				)
+				return errs.NewNotesNotInWorkspace(cmd.WorkspaceID)
 			}
 		}
 
@@ -97,9 +77,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			}
 
 			if destinationFolder.WorkspaceID() != cmd.WorkspaceID {
-				return errs.NewInvalid(
-					fmt.Sprintf("destination folder %s does not belong to workspace %s", cmd.DestinationFolderID, cmd.WorkspaceID),
-				)
+				return errs.NewDestinationFolderNotInWorkspace(cmd.DestinationFolderID, cmd.WorkspaceID)
 			}
 		}
 
@@ -114,9 +92,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			}
 			for _, folderID := range cmd.FolderIDs {
 				if _, exists := parentIDsSet[folderID]; exists {
-					return errs.NewInvalid(
-						fmt.Sprintf("cannot move folder %s into its own subfolder %s", folderID, cmd.DestinationFolderID),
-					)
+					return errs.NewCannotMoveFolderToItOwnSubfolder(folderID, cmd.DestinationFolderID)
 				}
 			}
 		}
@@ -126,7 +102,7 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 		}
 
 		if len(cmd.FolderIDs) > 0 {
-			folders, err = folderRepo.GetMany(ctx,
+			folders, err := folderRepo.GetMany(ctx,
 				//exhaustruct:ignore
 				&domain.FolderRepoGetManyParams{
 					WorkspaceID: cmd.WorkspaceID,
@@ -143,27 +119,25 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 				return err
 			}
 		}
-		notes, err = noteRepo.GetMany(ctx,
-			//exhaustruct:ignore
-			&domain.NoteRepoGetManyParams{
-				IDs:         cmd.NoteIDs,
-				WorkspaceID: cmd.WorkspaceID,
-				ForUpdate:   true,
-			},
-		)
-		if err != nil {
-			return err
-		}
-		for _, note := range notes {
-			note.MoveToFolder(cmd.DestinationFolderID, cmd.UserID)
-		}
-		if err := noteRepo.SaveMany(ctx, notes); err != nil {
-			return err
+		if len(cmd.NoteIDs) > 0 {
+			notes, err := noteRepo.GetMany(ctx,
+				//exhaustruct:ignore
+				&domain.NoteRepoGetManyParams{
+					IDs:         cmd.NoteIDs,
+					WorkspaceID: cmd.WorkspaceID,
+					ForUpdate:   true,
+				},
+			)
+			if err != nil {
+				return err
+			}
+			for _, note := range notes {
+				note.MoveToFolder(cmd.DestinationFolderID, cmd.UserID)
+			}
+			if err := noteRepo.SaveMany(ctx, notes); err != nil {
+				return err
+			}
 		}
 		return nil
 	})
-	if err != nil {
-		return err
-	}
-	return nil
 }

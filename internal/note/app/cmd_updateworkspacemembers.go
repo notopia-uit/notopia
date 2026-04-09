@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/note/errs"
+	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
 type WorkspaceMemberUpdate struct {
@@ -12,35 +14,64 @@ type WorkspaceMemberUpdate struct {
 }
 
 type UpdateWorkspaceMembers struct {
-	WorkspaceSlug string
-	Members       []WorkspaceMemberUpdate
+	WorkspaceID uuid.UUID
+	Members     []WorkspaceMemberUpdate
+	UserID      string
 }
 
 type UpdateWorkspaceMembersHandler struct {
-	integrationPublisher IntegrationPublisher
+	workspaceEventPublisher WorkspaceEventPublisher
+	authorizationService    AuthorizationService
 }
 
 func NewUpdateWorkspaceMembersHandler(
-	integrationPublisher IntegrationPublisher,
+	workspaceEventPublisher WorkspaceEventPublisher,
+	authorizationService AuthorizationService,
 ) *UpdateWorkspaceMembersHandler {
 	return &UpdateWorkspaceMembersHandler{
-		integrationPublisher: integrationPublisher,
+		workspaceEventPublisher: workspaceEventPublisher,
+		authorizationService:    authorizationService,
 	}
 }
 
 var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
 
+// FIXME: This maybe need saga? Because it involves 2 external things
+// Or we have to persist event and let another handler to consume
+// TODO:
+// 1. Check length >= 1
+// 2. Call auth service
+// 3. Fire workspace event
 func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateWorkspaceMembers) error {
-	// WARN: Unimplemented stub - no domain model for WorkspaceMember exists.
-	// TODO: There is no domain model for WorkspaceMember. Implement a WorkspaceMember
-	// domain entity and corresponding repo (WorkspaceMemberRepo) to manage member roles.
-	// The repo should support bulk upsert of member-role assignments for a workspace.
-	// Steps:
-	// 1. Create domain/workspacemember.go with WorkspaceMember entity
-	// 2. Create domain/workspacememberrepo.go with interface (Save, GetByWorkspaceID, etc.)
-	// 3. Implement infra/persistence/pg/workspacemember.go
-	// 4. Add repo to dependency injection
-	// 5. Implement this handler to call repo.SaveMany(ctx, members)
-	// 6. Consider publishing WorkspaceMembersUpdatedEvent for real-time updates
-	return nil
+	if len(cmd.Members) == 0 {
+		return errs.NewWorkspaceMembersCannotBeEmpty(cmd.WorkspaceID)
+	}
+	var anyOwner bool
+	for _, member := range cmd.Members {
+		if member.Role == WorkspaceRoleOwner {
+			anyOwner = true
+			break
+		}
+	}
+	if !anyOwner {
+		return errs.NewWorkspaceMustHaveAtLeastOneOwner(cmd.WorkspaceID)
+	}
+	// NOTE: We don't check if the user have permission to update workspace members
+	// Because the service has implemented it for us
+	if err := h.authorizationService.UpdateWorkspaceMembers(ctx, cmd.UserID, cmd.WorkspaceID, cmd.Members); err != nil {
+		return err
+	}
+	eventID, err := uuid.NewV7()
+	if err != nil {
+		return errs.NewInternalGenerateID(err)
+	}
+	return h.workspaceEventPublisher.Publish(ctx, cmd.WorkspaceID, cmd.UserID, &WorkspaceEventMembersUpdated{
+		workspaceEvent[note.WorkspaceMembersUpdatedEventEvent]{
+			Id:    eventID,
+			Event: note.WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent,
+			Data: note.WorkspaceMembersUpdatedEventData{
+				WorkspaceId: &cmd.WorkspaceID,
+			},
+		},
+	})
 }

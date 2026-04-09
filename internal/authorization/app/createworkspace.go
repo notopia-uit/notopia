@@ -10,7 +10,7 @@ import (
 )
 
 type CreateWorkspace struct {
-	UserID      string
+	OwnerID     string
 	WorkspaceID uuid.UUID
 }
 
@@ -26,7 +26,7 @@ var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
 
 func (h *CreateWorkspaceHandler) Handle(ctx context.Context, params CreateWorkspace) error {
 	ok, err := h.enforcer.AddGroupingPolicy(
-		formatUser(params.UserID),
+		formatUser(params.OwnerID),
 		WorkspaceRoleOwner.String(),
 		formatWorkspace(params.WorkspaceID),
 	)
@@ -34,10 +34,10 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, params CreateWorksp
 		return errs.NewCasbinInternalError(err)
 	}
 	if !ok {
-		return errs.NewCreateWorkspaceExists(params.UserID, params.WorkspaceID)
+		return errs.NewCreateWorkspaceExists(params.OwnerID, params.WorkspaceID)
 	}
 	slog.InfoContext(ctx, "created workspace",
-		slog.String("user_id", params.UserID),
+		slog.String("owner_id", params.OwnerID),
 		slog.String("workspace_id", params.WorkspaceID.String()),
 	)
 	return nil

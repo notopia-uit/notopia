@@ -61,7 +61,7 @@ func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*do
 		}
 		return nil, toErr(err)
 	}
-	return folderToDomainRepo(folder), nil
+	return folderToDomain(folder), nil
 }
 
 func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyParams) ([]*domain.Folder, error) {
@@ -98,12 +98,29 @@ func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyPa
 
 	result := make([]*domain.Folder, len(folders))
 	for i, folder := range folders {
-		result[i] = folderToDomainRepo(folder)
+		result[i] = folderToDomain(folder)
 	}
 	return result, nil
 }
 
-func folderToDomainRepo(folder *pgsqlc.Folder) *domain.Folder {
+func (f *Folder) GetRecursiveChildren(ctx context.Context, params *domain.FolderRepoGetRecursiveChildrenParams) ([]*domain.Folder, error) {
+	folders, err := f.queries.GetRecursiveChildren(ctx, pgsqlc.GetRecursiveChildrenParams{
+		ID:          params.ID,
+		ExcludeRoot: !params.IncludeRoot,
+		ForUpdate:   params.ForUpdate,
+	})
+	if err != nil {
+		return nil, toErr(err)
+	}
+
+	result := make([]*domain.Folder, len(folders))
+	for i, folder := range folders {
+		result[i] = folderToDomain(new(pgsqlc.Folder(*folder)))
+	}
+	return result, nil
+}
+
+func folderToDomain(folder *pgsqlc.Folder) *domain.Folder {
 	var icon string
 	if folder.Icon != nil {
 		icon = *folder.Icon
@@ -300,4 +317,12 @@ func (f *Folder) GetParentIDs(ctx context.Context, id uuid.UUID, forUpdate bool)
 		return nil, toErr(err)
 	}
 	return parentIDs, nil
+}
+
+func (f *Folder) CheckExists(ctx context.Context, id uuid.UUID) (bool, error) {
+	exists, err := f.queries.CheckFolderExists(ctx, id)
+	if err != nil {
+		return false, toErr(err)
+	}
+	return exists, nil
 }

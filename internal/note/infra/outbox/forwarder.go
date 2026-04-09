@@ -37,7 +37,7 @@ func (p *ForwarderPublisher) PublishWorkspaceItem(ctx context.Context, event dom
 		return fmt.Errorf("failed to marshal event for forwarder publisher: %w", err)
 	}
 	msgID := watermill.NewUUID()
-	msg := message.NewMessage(msgID, payload)
+	msg := message.NewMessageWithContext(ctx, msgID, payload)
 	middleware.SetCorrelationID(msgID, msg)
 	msg.Metadata.Set(p.workspaceIDKey, workspaceID.String())
 	msg.Metadata.Set(p.aggregateIDKey, event.GetAggregateID().String())

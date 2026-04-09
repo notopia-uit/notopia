@@ -7,12 +7,14 @@ import (
 )
 
 const (
-	CodeWorkspaceNotFound           Code = "workspaceNotFound"
-	CodeWorkspaceBySlugNotFound     Code = "workspaceBySlugNotFound"
-	CodeWorkspaceRootFolderNotFound Code = "workspaceRootFolderNotFound"
-	CodeInvalidWorkspaceName        Code = "invalidWorkspaceName"
-	CodeInvalidWorkspaceSlug        Code = "invalidWorkspaceSlug"
-	CodeWorkspaceSlugAlreadyExists  Code = "workspaceSlugAlreadyExists"
+	CodeWorkspaceNotFound                Code = "workspaceNotFound"
+	CodeWorkspaceBySlugNotFound          Code = "workspaceBySlugNotFound"
+	CodeWorkspaceRootFolderNotFound      Code = "workspaceRootFolderNotFound"
+	CodeInvalidWorkspaceName             Code = "invalidWorkspaceName"
+	CodeInvalidWorkspaceSlug             Code = "invalidWorkspaceSlug"
+	CodeWorkspaceSlugAlreadyExists       Code = "workspaceSlugAlreadyExists"
+	CodeWorkspaceMembersCannotBeEmpty    Code = "workspaceMembersCannotBeEmpty"
+	CodeWorkspaceMustHaveAtLeastOneOwner Code = "workspaceMustHaveAtLeastOneOwner"
 )
 
 type WorkspaceNotFound struct {
@@ -85,6 +87,36 @@ func NewWorkspaceSlugAlreadyExists(slug string, err error) *WorkspaceSlugAlready
 			message: fmt.Sprintf("workspace slug %q already exists", slug),
 			code:    CodeWorkspaceSlugAlreadyExists,
 			err:     err,
+		},
+	}
+}
+
+type WorkspaceMembersCannotBeEmpty struct {
+	Err
+	ID uuid.UUID
+}
+
+func NewWorkspaceMembersCannotBeEmpty(id uuid.UUID) *WorkspaceMembersCannotBeEmpty {
+	return &WorkspaceMembersCannotBeEmpty{
+		ID: id,
+		Err: Err{
+			message: fmt.Sprintf("workspace with id %q cannot have empty members", id.String()),
+			code:    CodeWorkspaceMembersCannotBeEmpty,
+		},
+	}
+}
+
+type WorkspaceMustHaveAtLeastOneOwner struct {
+	Err
+	ID uuid.UUID
+}
+
+func NewWorkspaceMustHaveAtLeastOneOwner(id uuid.UUID) *WorkspaceMustHaveAtLeastOneOwner {
+	return &WorkspaceMustHaveAtLeastOneOwner{
+		ID: id,
+		Err: Err{
+			message: fmt.Sprintf("workspace with id %q must have at least one owner", id.String()),
+			code:    CodeWorkspaceMustHaveAtLeastOneOwner,
 		},
 	}
 }

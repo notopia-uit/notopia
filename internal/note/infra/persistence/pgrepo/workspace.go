@@ -61,19 +61,7 @@ func (w *Workspace) GetBySlug(ctx context.Context, slug string, forUpdate bool) 
 		return nil, toErr(err)
 	}
 
-	folders, err := w.queries.GetFoldersByWorkspaceID(ctx, pgsqlc.GetFoldersByWorkspaceIDParams{
-		WorkspaceID: workspace.ID,
-		ForUpdate:   forUpdate,
-	})
-	if err != nil {
-		return nil, toErr(err)
-	}
-
-	if len(folders) == 0 {
-		return nil, errs.NewWorkspaceRootFolderNotFound(workspace.ID, pgx.ErrNoRows)
-	}
-
-	return workspaceToDomainRepo(workspace, folders[0].ID)
+	return workspaceToDomain(workspace), nil
 }
 
 func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Workspace, error) {
@@ -89,19 +77,7 @@ func (w *Workspace) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (
 		return nil, toErr(err)
 	}
 
-	folders, err := w.queries.GetFoldersByWorkspaceID(ctx, pgsqlc.GetFoldersByWorkspaceIDParams{
-		WorkspaceID: workspace.ID,
-		ForUpdate:   forUpdate,
-	})
-	if err != nil {
-		return nil, toErr(err)
-	}
-
-	if len(folders) == 0 {
-		return nil, errs.NewWorkspaceRootFolderNotFound(id, pgx.ErrNoRows)
-	}
-
-	return workspaceToDomainRepo(workspace, folders[0].ID)
+	return workspaceToDomain(workspace), nil
 }
 
 func (w *Workspace) GetIDBySlug(ctx context.Context, slug string) (*uuid.UUID, error) {
@@ -150,11 +126,11 @@ func (w *Workspace) Save(ctx context.Context, workspace *domain.Workspace) (cerr
 	})
 }
 
-func workspaceToDomainRepo(workspace *pgsqlc.Workspace, rootFolderID uuid.UUID) (*domain.Workspace, error) {
-	return domain.NewWorkspace(
+func workspaceToDomain(workspace *pgsqlc.Workspace) *domain.Workspace {
+	return domain.UnmarshalWorkspace(
 		workspace.ID,
 		workspace.Name,
 		workspace.Slug,
-		rootFolderID,
+		workspace.DeletedAt,
 	)
 }

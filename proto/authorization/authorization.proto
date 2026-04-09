@@ -5,7 +5,7 @@ package authorization;
 import "buf/validate/validate.proto";
 
 service AuthorizationService {
-  rpc CreateWorkspace(CreateWorkspaceRequest) returns (CreateWorkspaceResponse);
+  rpc CreateWorkspaceWithOwner(CreateWorkspaceWithOwnerRequest) returns (CreateWorkspaceWithOwnerResponse);
   rpc UpdateWorkspaceMembers(UpdateWorkspaceMembersRequest) returns (UpdateWorkspaceMembersResponse);
   rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns (GetWorkspaceMembersResponse);
   rpc HasWorkspacePermission(HasWorkspacePermissionRequest) returns (HasWorkspacePermissionResponse);
@@ -14,15 +14,15 @@ service AuthorizationService {
   rpc DeleteWorkspace(DeleteWorkspaceRequest) returns (DeleteWorkspaceResponse);
 }
 
-message CreateWorkspaceRequest {
-  string user_id = 1 [(buf.validate.field).required = true];
+message CreateWorkspaceWithOwnerRequest {
+  string owner_id = 1 [(buf.validate.field).required = true];
   string workspace_id = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
 }
 
-message CreateWorkspaceResponse {}
+message CreateWorkspaceWithOwnerResponse {}
 
 enum WorkspaceRole {
   WORKSPACE_ROLE_UNSPECIFIED = 0;

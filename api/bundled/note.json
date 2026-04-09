@@ -1841,45 +1841,6 @@
           "data"
         ]
       },
-      "User_properties-id": {
-        "type": "string",
-        "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
-        "example": "100"
-      },
-      "User_properties-name": {
-        "type": "string",
-        "description": "Full name from Authentik",
-        "example": "User",
-        "nullable": true
-      },
-      "WorkspaceRole": {
-        "type": "string",
-        "enum": [
-          "owner",
-          "editor",
-          "viewer"
-        ],
-        "example": "owner"
-      },
-      "WorkspaceMember": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "$ref": "#/components/schemas/User_properties-id"
-          },
-          "username": {
-            "$ref": "#/components/schemas/User_properties-name",
-            "readOnly": true
-          },
-          "role": {
-            "$ref": "#/components/schemas/WorkspaceRole"
-          }
-        },
-        "required": [
-          "id",
-          "role"
-        ]
-      },
       "WorkspaceMembersUpdatedEvent": {
         "type": "object",
         "properties": {
@@ -1899,19 +1860,12 @@
             "type": "object",
             "x-go-type-name": "WorkspaceMembersUpdatedEventData",
             "properties": {
-              "id": {
+              "workspaceId": {
                 "$ref": "#/components/schemas/properties-id"
-              },
-              "members": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/WorkspaceMember"
-                }
               }
             },
             "required": [
-              "id",
-              "members"
+              "workspaceId"
             ]
           }
         },
@@ -2005,6 +1959,45 @@
         "required": [
           "event",
           "timestamp"
+        ]
+      },
+      "User_properties-id": {
+        "type": "string",
+        "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
+        "example": "100"
+      },
+      "User_properties-name": {
+        "type": "string",
+        "description": "Full name from Authentik",
+        "example": "User",
+        "nullable": true
+      },
+      "WorkspaceRole": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "editor",
+          "viewer"
+        ],
+        "example": "owner"
+      },
+      "WorkspaceMember": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/User_properties-id"
+          },
+          "username": {
+            "$ref": "#/components/schemas/User_properties-name",
+            "readOnly": true
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "required": [
+          "id",
+          "role"
         ]
       },
       "Workspace_properties-name": {

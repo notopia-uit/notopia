@@ -16,52 +16,44 @@ type PermanentlyDeleteFolder struct {
 
 type PermanentlyDeleteFolderHandler struct {
 	authorizationService AuthorizationService
-	folderRepo           domain.FolderRepo
 	uow                  domain.UnitOfWork
 }
 
-func PermanentlyNewDeleteFolderHandler(
+func NewPermanentlyDeleteFolderHandler(
 	authorizationService AuthorizationService,
-	folderRepo domain.FolderRepo,
 	uow domain.UnitOfWork,
 ) *PermanentlyDeleteFolderHandler {
 	return &PermanentlyDeleteFolderHandler{
 		authorizationService: authorizationService,
-		folderRepo:           folderRepo,
 		uow:                  uow,
 	}
 }
 
-var ProvidePermanentlyDeleteFolderHandler = PermanentlyNewDeleteFolderHandler
+var ProvidePermanentlyDeleteFolderHandler = NewPermanentlyDeleteFolderHandler
 
+// NOTE: We delegate the infra persistence to cascading delete things
+// Fact, we should handle this in domain, not infra
 func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteFolder) error {
-	workspaceID, err := h.folderRepo.GetWorkspaceIDByID(ctx, cmd.ID)
-	if err != nil {
-		return err
-	}
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-		ctx,
-		cmd.UserID,
-		workspaceID,
-		WorkspaceItemPermissionDelete,
-	)
-	if err != nil {
-		return err
-	}
-
-	if !hasPermission {
-		return errs.NewForbidden(
-			fmt.Sprintf("user %s does not have permission to delete folder %s", cmd.UserID, cmd.ID),
-		)
-	}
-
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
+		workspaceID, err := folderRepo.GetWorkspaceIDByID(ctx, cmd.ID)
+		if err != nil {
+			return err
+		}
+		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionDelete)
+		if err != nil {
+			return err
+		}
+		if !hasPermission {
+			return errs.NewForbidden(
+				fmt.Sprintf("user %s does not have permission to delete folder %s", cmd.UserID, cmd.ID),
+			)
+		}
 		folder, err := folderRepo.GetByID(ctx, cmd.ID, true)
 		if err != nil {
 			return err
 		}
-		folder.Deleted()
+		folder.PermanentlyDelete(cmd.UserID)
 		return folderRepo.Save(ctx, folder)
 	})
 }

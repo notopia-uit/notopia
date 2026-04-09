@@ -10,6 +10,7 @@ const (
 	CodeNoteNotFound                     Code = "noteNotFound"
 	CodeNoteFailToMarshalDocumentContent Code = "noteFailToMarshalDocumentContent"
 	CodeNoteAlreadyTrashed               Code = "noteAlreadyTrashed"
+	CodeNotesNotInWorkspace              Code = "notesNotInWorkspace"
 )
 
 type NoteNotFound struct {
@@ -58,6 +59,21 @@ func NewNoteAlreadyTrashed(id uuid.UUID) *NoteAlreadyTrashed {
 			message: fmt.Sprintf("note with id %q is already trashed", id.String()),
 			code:    CodeNoteAlreadyTrashed,
 			err:     nil,
+		},
+	}
+}
+
+type NotesNotInWorkspace struct {
+	Err
+	WorkspaceID uuid.UUID
+}
+
+func NewNotesNotInWorkspace(workspaceID uuid.UUID) *NotesNotInWorkspace {
+	return &NotesNotInWorkspace{
+		WorkspaceID: workspaceID,
+		Err: Err{
+			message: fmt.Sprintf("one or more notes do not belong to workspace %s", workspaceID),
+			code:    CodeNotesNotInWorkspace,
 		},
 	}
 }

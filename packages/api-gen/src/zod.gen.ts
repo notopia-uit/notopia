@@ -169,34 +169,11 @@ export const zNoteWorkspaceItemsUpdatedEvent = z.object({
     })
 });
 
-/**
- * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
- */
-export const zNoteUserPropertiesId = z.string();
-
-/**
- * Full name from Authentik
- */
-export const zNoteUserPropertiesName = z.string().nullable();
-
-export const zNoteWorkspaceRole = z.enum([
-    'owner',
-    'editor',
-    'viewer'
-]);
-
-export const zNoteWorkspaceMember = z.object({
-    id: zNoteUserPropertiesId,
-    username: zNoteUserPropertiesName.optional(),
-    role: zNoteWorkspaceRole
-});
-
 export const zNoteWorkspaceMembersUpdatedEvent = z.object({
     id: z.uuid(),
     event: z.enum(['WorkspaceMembersUpdatedEvent']),
     data: z.object({
-        id: zNotePropertiesId,
-        members: z.array(zNoteWorkspaceMember)
+        workspaceId: zNotePropertiesId
     })
 });
 
@@ -217,6 +194,28 @@ export const zNoteWorkspaceDeletedEvent = z.object({
 export const zNoteHeartBeatWorkspaceEvent = z.object({
     event: z.enum(['HeartBeatWorkspaceEvent']),
     timestamp: z.iso.datetime()
+});
+
+/**
+ * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+ */
+export const zNoteUserPropertiesId = z.string();
+
+/**
+ * Full name from Authentik
+ */
+export const zNoteUserPropertiesName = z.string().nullable();
+
+export const zNoteWorkspaceRole = z.enum([
+    'owner',
+    'editor',
+    'viewer'
+]);
+
+export const zNoteWorkspaceMember = z.object({
+    id: zNoteUserPropertiesId,
+    username: zNoteUserPropertiesName.optional(),
+    role: zNoteWorkspaceRole
 });
 
 export const zNoteWorkspacePropertiesName = z.string().min(1).max(255);
@@ -303,17 +302,9 @@ export const zNoteWorkspaceItemsUpdatedEventWritable = z.object({
     event: z.enum(['WorkspaceItemsUpdatedEvent'])
 });
 
-export const zNoteWorkspaceMemberWritable = z.object({
-    id: zNoteUserPropertiesId,
-    role: zNoteWorkspaceRole
-});
-
 export const zNoteWorkspaceMembersUpdatedEventWritable = z.object({
     id: z.uuid(),
-    event: z.enum(['WorkspaceMembersUpdatedEvent']),
-    data: z.object({
-        members: z.array(zNoteWorkspaceMemberWritable)
-    })
+    event: z.enum(['WorkspaceMembersUpdatedEvent'])
 });
 
 export const zNoteWorkspaceUpdatedEventWritable = z.object({
@@ -325,6 +316,11 @@ export const zNoteWorkspaceUpdatedEventWritable = z.object({
 export const zNoteWorkspaceDeletedEventWritable = z.object({
     id: z.uuid(),
     event: z.enum(['WorkspaceDeletedEvent'])
+});
+
+export const zNoteWorkspaceMemberWritable = z.object({
+    id: zNoteUserPropertiesId,
+    role: zNoteWorkspaceRole
 });
 
 export const zNoteTrashedNoteWritable = z.object({

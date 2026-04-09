@@ -21,44 +21,48 @@ type CreateFolder struct {
 
 type CreateFolderHandler struct {
 	authorizationService AuthorizationService
-	folderRepo           domain.FolderRepo
+	uow                  domain.UnitOfWork
 }
 
 func NewCreateFolderHandler(
 	authorizationService AuthorizationService,
-	folderRepo domain.FolderRepo,
+	uow domain.UnitOfWork,
 ) *CreateFolderHandler {
 	return &CreateFolderHandler{
 		authorizationService: authorizationService,
-		folderRepo:           folderRepo,
+		uow:                  uow,
 	}
 }
 
 var ProvideCreateFolderHandler = NewCreateFolderHandler
 
 func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-		ctx,
-		cmd.UserID,
-		cmd.WorkspaceID,
-		WorkspaceItemPermissionWrite,
-	)
+	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
 	if err != nil {
 		return err
 	}
-
 	if !hasPermission {
 		return errs.NewForbidden(
 			fmt.Sprintf("user %q does not have permission to create folder in workspace %q", cmd.UserID, cmd.WorkspaceID.String()),
 		)
 	}
-	hierarchy := domain.NewFolderHierarchy(cmd.ParentID)
-	folder, err := domain.NewFolder(cmd.ID, cmd.Name, cmd.Icon, cmd.WorkspaceID, hierarchy, cmd.UserID)
-	if err != nil {
-		return err
-	}
-	if err := h.folderRepo.Save(ctx, folder); err != nil {
-		return err
-	}
-	return nil
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		folderRepo := r.Folder()
+		exist, err := folderRepo.CheckExists(ctx, cmd.ID)
+		if err != nil {
+			return err
+		}
+		if exist {
+			return errs.NewFolderAlreadyExisted(cmd.ID)
+		}
+		hierarchy := domain.NewFolderHierarchy(cmd.ParentID)
+		folder, err := domain.NewFolder(cmd.ID, cmd.Name, cmd.Icon, cmd.WorkspaceID, hierarchy, cmd.UserID)
+		if err != nil {
+			return err
+		}
+		if err := folderRepo.Save(ctx, folder); err != nil {
+			return err
+		}
+		return nil
+	})
 }

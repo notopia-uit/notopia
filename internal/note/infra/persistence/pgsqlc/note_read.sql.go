@@ -12,6 +12,42 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+const readCountNoteBacklinks = `-- name: ReadCountNoteBacklinks :one
+SELECT
+  COUNT(*)
+FROM
+  note_links
+WHERE
+  target_id = $1
+`
+
+func (q *Queries) ReadCountNoteBacklinks(ctx context.Context, noteID uuid.UUID) (int64, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "ReadCountNoteBacklinks")
+	defer span.End()
+	row := q.db.QueryRow(ctx, readCountNoteBacklinks, noteID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const readCountNoteOutgoingLinks = `-- name: ReadCountNoteOutgoingLinks :one
+SELECT
+  COUNT(*)
+FROM
+  note_links
+WHERE
+  source_id = $1
+`
+
+func (q *Queries) ReadCountNoteOutgoingLinks(ctx context.Context, noteID uuid.UUID) (int64, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "ReadCountNoteOutgoingLinks")
+	defer span.End()
+	row := q.db.QueryRow(ctx, readCountNoteOutgoingLinks, noteID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const readGetNoteByID = `-- name: ReadGetNoteByID :one
 SELECT
   id, name, icon, folder_id, tags, size, created_at, updated_at, trashed_by, trashed_at

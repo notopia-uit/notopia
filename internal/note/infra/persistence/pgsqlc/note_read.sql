@@ -69,3 +69,19 @@ WHERE
   AND n.trashed_at IS NOT NULL
 ORDER BY
   n.trashed_at DESC;
+
+-- name: ReadCountNoteBacklinks :one
+SELECT
+  COUNT(*)
+FROM
+  note_links
+WHERE
+  target_id = sqlc.arg('note_id');
+
+-- name: ReadCountNoteOutgoingLinks :one
+SELECT
+  COUNT(*)
+FROM
+  note_links
+WHERE
+  source_id = sqlc.arg('note_id');

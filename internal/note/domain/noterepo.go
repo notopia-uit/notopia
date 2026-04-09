@@ -9,6 +9,7 @@ import (
 type NoteRepo interface {
 	GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*Note, error)
 	GetMany(ctx context.Context, params *NoteRepoGetManyParams) ([]*Note, error)
+	GetRecursiveChildrenFromFolder(ctx context.Context, folderID uuid.UUID, forUpdate bool) ([]*Note, error)
 	GetWorkspaceIDByID(ctx context.Context, id uuid.UUID) (uuid.UUID, error)
 	Save(ctx context.Context, note *Note) error
 	SaveMany(ctx context.Context, notes []*Note) error

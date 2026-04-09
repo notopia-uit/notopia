@@ -122,6 +122,34 @@ WHERE
 FOR UPDATE -- :if @for_update
 ;
 
+-- name: GetRecursiveChildrenFromFolder :many
+WITH RECURSIVE subfolders AS (
+  SELECT
+    id
+  FROM
+    folders
+  WHERE
+    id = sqlc.arg('folder_id')::uuid
+  UNION ALL
+  SELECT
+    f.id
+  FROM
+    folders f
+  INNER JOIN
+    subfolders sf
+    ON f.parent_id = sf.id
+)
+SELECT
+  n.*
+FROM
+  notes n
+INNER JOIN
+  subfolders sf
+  ON n.folder_id = sf.id
+FOR UPDATE -- :if @for_update
+;
+
+
 -- name: GetWorkspaceIDByNoteID :one
 SELECT
   f.workspace_id

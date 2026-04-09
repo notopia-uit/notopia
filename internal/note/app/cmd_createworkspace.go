@@ -16,21 +16,15 @@ type CreateWorkspace struct {
 }
 
 type CreateWorkspaceHandler struct {
-	workspaceRepo        domain.WorkspaceRepo
-	folderRepo           domain.FolderRepo
 	uow                  domain.UnitOfWork
 	authorizationService AuthorizationService
 }
 
 func NewCreateWorkspaceHandler(
-	workspaceRepo domain.WorkspaceRepo,
-	folderRepo domain.FolderRepo,
 	uow domain.UnitOfWork,
 	authorizationService AuthorizationService,
 ) *CreateWorkspaceHandler {
 	return &CreateWorkspaceHandler{
-		workspaceRepo:        workspaceRepo,
-		folderRepo:           folderRepo,
 		uow:                  uow,
 		authorizationService: authorizationService,
 	}
@@ -39,38 +33,42 @@ func NewCreateWorkspaceHandler(
 var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
 
 func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspace) error {
-	slugExisted, err := h.workspaceRepo.CheckSlugExists(ctx, cmd.Slug)
-	if err != nil {
-		return err
-	}
-	if slugExisted {
-		return errs.NewWorkspaceSlugAlreadyExists(cmd.Slug, nil)
-	}
-	rootFolderID, err := uuid.NewV7()
-	if err != nil {
-		return errs.NewInternalGenerateID(err)
-	}
-	rootFolder, err := domain.NewFolder(rootFolderID, cmd.Name, "", cmd.ID, domain.FolderHierarchy{}, cmd.OwnerID)
-	if err != nil {
-		return err
-	}
-	workspace, err := domain.NewWorkspace(cmd.ID, cmd.Name, cmd.Slug, rootFolderID)
-	if err != nil {
-		return err
-	}
-	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		if err := h.folderRepo.Save(ctx, rootFolder); err != nil {
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		workspaceRepo := r.Workspace()
+		folderRepo := r.Folder()
+		slugExisted, err := workspaceRepo.CheckSlugExists(ctx, cmd.Slug)
+		if err != nil {
 			return err
 		}
-		if err := h.workspaceRepo.Save(ctx, workspace); err != nil {
+		if slugExisted {
+			return errs.NewWorkspaceSlugAlreadyExists(cmd.Slug, nil)
+		}
+		rootFolderID, err := uuid.NewV7()
+		if err != nil {
+			return errs.NewInternalGenerateID(err)
+		}
+		workspace, err := domain.NewWorkspace(cmd.ID, cmd.Name, cmd.Slug)
+		if err != nil {
+			return err
+		}
+		rootFolder, err := domain.NewFolder(rootFolderID, cmd.Name, "", cmd.ID, domain.FolderHierarchy{}, cmd.OwnerID)
+		if err != nil {
+			return err
+		}
+		if err := workspaceRepo.Save(ctx, workspace); err != nil {
+			return err
+		}
+		if err := folderRepo.Save(ctx, rootFolder); err != nil {
+			return err
+		}
+		// TODO: May use saga for better perf, no bottle neck
+		// TODO: from @coderabbitai:
+		//	This is a cross-service side effect inside uow.Execute.
+		//	If the auth call succeeds and the DB commit later fails, note and authorization will diverge.
+		//	Trigger it after commit or via an outbox/after-commit hook instead.
+		if err := h.authorizationService.CreateWorkspaceWithOwner(ctx, cmd.OwnerID, workspace.ID()); err != nil {
 			return err
 		}
 		return nil
-	}); err != nil {
-		return err
-	}
-	if err := h.authorizationService.CreateWorkspaceWithOwnership(ctx, cmd.OwnerID, workspace.ID()); err != nil {
-		return err
-	}
-	return err
+	})
 }

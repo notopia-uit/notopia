@@ -88,7 +88,7 @@ func (p *IntegrationPublisher) Publish(ctx context.Context, events ...app.Integr
 		if err != nil {
 			return fmt.Errorf("failed to marshal integration event: %w", err)
 		}
-		msg := message.NewMessage(watermill.NewUUID(), payload)
+		msg := message.NewMessageWithContext(ctx, watermill.NewUUID(), payload)
 		if err := p.publisher.Publish(topic, msg); err != nil {
 			return fmt.Errorf("failed to publish integration event: %w", err)
 		}

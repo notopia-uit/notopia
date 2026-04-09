@@ -124,13 +124,38 @@ ORDER BY
 FOR UPDATE -- :if @for_update
 ;
 
+-- name: GetRecursiveChildren :many
+WITH RECURSIVE child_folders AS (
+  SELECT
+    f.*
+  FROM
+    folders AS f
+  WHERE
+    id = sqlc.arg('id')::uuid
+  UNION ALL
+  SELECT
+    f.*
+  FROM
+    folders AS f
+    INNER JOIN child_folders AS cf ON f.parent_id = cf.id
+)
+SELECT
+  *
+FROM
+  child_folders
+WHERE
+  id != sqlc.arg('id')::uuid -- :if @exclude_root
+FOR UPDATE -- :if @for_update
+;
+
+
 -- name: GetParentIDsByFolderID :many
 WITH RECURSIVE parent_folders(id, parent_id) AS (
   SELECT
     id,
     parent_id
   FROM
-    folders AS start
+    folders
   WHERE
     id = sqlc.arg('id')::uuid
   UNION ALL
@@ -166,6 +191,17 @@ FROM
 WHERE
   workspace_id = sqlc.arg('workspace_id')
   AND id = ANY(sqlc.arg('ids')::uuid[]);
+
+-- name: CheckFolderExists :one
+SELECT
+  EXISTS (
+    SELECT
+      1
+    FROM
+      folders
+    WHERE
+      id = sqlc.arg('id')
+  );
 
 -- name: PermanentlyDeleteFolderByID :exec
 DELETE FROM

@@ -94,13 +94,29 @@ type Workspace struct {
 	Name string
 }
 
-type WorkspaceRole string
+type WorkspaceRole uint8
 
-var (
-	WorkspaceRoleOwner  WorkspaceRole = "owner"
-	WorkspaceRoleEditor WorkspaceRole = "editor"
-	WorkspaceRoleViewer WorkspaceRole = "viewer"
+const (
+	WorkspaceRoleUnspecified WorkspaceRole = iota
+	WorkspaceRoleOwner
+	WorkspaceRoleEditor
+	WorkspaceRoleViewer
 )
+
+func (r WorkspaceRole) String() string {
+	switch r {
+	case WorkspaceRoleOwner:
+		return "owner"
+	case WorkspaceRoleEditor:
+		return "editor"
+	case WorkspaceRoleViewer:
+		return "viewer"
+	case WorkspaceRoleUnspecified:
+		return "unspecified"
+	default:
+		return "unknown"
+	}
+}
 
 type WorkspaceMember struct {
 	ID       string
@@ -124,13 +140,26 @@ type WorkspaceTreeFolder struct {
 	UpdatedAt time.Time
 }
 
-// if we have time, change to uint8 iota
-type TrashedBy string
+type TrashedBy uint8
 
 const (
-	TrashedByPurpose TrashedBy = "purpose"
-	TrashedByParent  TrashedBy = "parent"
+	TrashedByUnspecified TrashedBy = iota
+	TrashedByPurpose
+	TrashedByParent
 )
+
+func (t TrashedBy) String() string {
+	switch t {
+	case TrashedByPurpose:
+		return "purpose"
+	case TrashedByParent:
+		return "parent"
+	case TrashedByUnspecified:
+		return "unspecified"
+	default:
+		return "unknown"
+	}
+}
 
 type TrashedFolder struct {
 	ID      uuid.UUID

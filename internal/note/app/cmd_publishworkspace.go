@@ -7,7 +7,8 @@ import (
 )
 
 type PublishWorkspace struct {
-	Slug string
+	Slug   string
+	UserID string
 }
 
 type PublishWorkspaceHandler struct {
