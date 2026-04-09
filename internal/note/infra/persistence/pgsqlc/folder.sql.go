@@ -267,17 +267,17 @@ func (q *Queries) GetParentIDsByFolderID(ctx context.Context, arg GetParentIDsBy
 const getRecursiveChildren = `-- name: GetRecursiveChildren :many
 WITH RECURSIVE child_folders AS (
   SELECT
-    id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at
+    f.id, f.name, f.icon, f.workspace_id, f.parent_id, f.created_at, f.updated_at, f.trashed_by, f.trashed_at
   FROM
-    folders
+    folders AS f
   WHERE
     id = $1::uuid
   UNION ALL
   SELECT
-    folders.id, folders.name, folders.icon, folders.workspace_id, folders.parent_id, folders.created_at, folders.updated_at, folders.trashed_by, folders.trashed_at, cf.id, cf.name, cf.icon, cf.workspace_id, cf.parent_id, cf.created_at, cf.updated_at, cf.trashed_by, cf.trashed_at
+    f.id, f.name, f.icon, f.workspace_id, f.parent_id, f.created_at, f.updated_at, f.trashed_by, f.trashed_at
   FROM
-    folders
-    INNER JOIN child_folders AS cf ON parent_id = cf.id
+    folders AS f
+    INNER JOIN child_folders AS cf ON f.parent_id = cf.id
 )
 SELECT
   id, name, icon, workspace_id, parent_id, created_at, updated_at, trashed_by, trashed_at

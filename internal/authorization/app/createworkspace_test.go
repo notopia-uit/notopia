@@ -23,7 +23,7 @@ func TestCreateWorkspaceHandler(t *testing.T) {
 	userID := "000"
 
 	err = handler.Handle(ctx, app.CreateWorkspace{
-		UserID:      userID,
+		OwnerID:     userID,
 		WorkspaceID: workspaceID,
 	})
 	require.NoError(t, err, "Failed to create workspace")

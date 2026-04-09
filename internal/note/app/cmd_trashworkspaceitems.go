@@ -126,6 +126,9 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			allModifiedNotes = append(allModifiedNotes, childNotes...)
 		}
 
+		allModifiedNotes = deduplicateNotes(allModifiedNotes)
+		allModifiedFolders = deduplicateFolders(allModifiedFolders)
+
 		if len(allModifiedNotes) > 0 {
 			if err := noteRepo.SaveMany(ctx, allModifiedNotes); err != nil {
 				return err

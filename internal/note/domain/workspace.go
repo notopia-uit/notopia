@@ -8,11 +8,10 @@ import (
 )
 
 type Workspace struct {
-	id           uuid.UUID
-	name         string
-	slug         string
-	rootFolderID uuid.UUID
-	deletedAt    *time.Time
+	id        uuid.UUID
+	name      string
+	slug      string
+	deletedAt *time.Time
 
 	event []Event
 }
@@ -21,7 +20,6 @@ func NewWorkspace(
 	id uuid.UUID,
 	name string,
 	slug string,
-	rootFolderID uuid.UUID,
 ) (*Workspace, error) {
 	if name == "" {
 		return nil, errs.EmptyFolderName
@@ -30,14 +28,29 @@ func NewWorkspace(
 		return nil, errs.InvalidWorkspaceSlug
 	}
 	return &Workspace{
-		id:           id,
-		name:         name,
-		slug:         slug,
-		rootFolderID: rootFolderID,
-		deletedAt:    nil,
+		id:        id,
+		name:      name,
+		slug:      slug,
+		deletedAt: nil,
 
 		event: []Event{},
 	}, nil
+}
+
+func UnmarshalWorkspace(
+	id uuid.UUID,
+	name string,
+	slug string,
+	deletedAt *time.Time,
+) *Workspace {
+	return &Workspace{
+		id:        id,
+		name:      name,
+		slug:      slug,
+		deletedAt: deletedAt,
+
+		event: []Event{},
+	}
 }
 
 func (w *Workspace) ID() uuid.UUID {
@@ -59,10 +72,6 @@ func (w *Workspace) Rename(name string, userID string) {
 
 func (w *Workspace) Slug() string {
 	return w.slug
-}
-
-func (w *Workspace) RootFolderID() uuid.UUID {
-	return w.rootFolderID
 }
 
 func (w *Workspace) DeletedAt() *time.Time {

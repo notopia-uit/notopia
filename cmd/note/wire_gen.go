@@ -8,6 +8,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/note"
 	"github.com/notopia-uit/notopia/internal/note/app"
@@ -104,7 +105,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	createFolderHandler := app.NewCreateFolderHandler(authorization, unitOfWork)
 	createNoteHandler := app.NewCreateNoteHandler(authorization, unitOfWork)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(unitOfWork, authorization)
-	permanentlyDeleteFolderHandler := app.PermanentlyNewDeleteFolderHandler(authorization, unitOfWork)
+	permanentlyDeleteFolderHandler := app.NewPermanentlyDeleteFolderHandler(authorization, unitOfWork)
 	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, unitOfWork)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, unitOfWork)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, unitOfWork)

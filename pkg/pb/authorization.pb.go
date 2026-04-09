@@ -180,7 +180,7 @@ func (WorkspaceItemPermission) EnumDescriptor() ([]byte, []int) {
 
 type CreateWorkspaceWithOwnerRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	OwnerId       string                 `protobuf:"bytes,1,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
 	WorkspaceId   string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -216,9 +216,9 @@ func (*CreateWorkspaceWithOwnerRequest) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CreateWorkspaceWithOwnerRequest) GetUserId() string {
+func (x *CreateWorkspaceWithOwnerRequest) GetOwnerId() string {
 	if x != nil {
-		return x.UserId
+		return x.OwnerId
 	}
 	return ""
 }
@@ -922,9 +922,9 @@ var File_authorization_proto protoreflect.FileDescriptor
 
 const file_authorization_proto_rawDesc = "" +
 	"\n" +
-	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\"r\n" +
-	"\x1fCreateWorkspaceWithOwnerRequest\x12\x1f\n" +
-	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12.\n" +
+	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\"t\n" +
+	"\x1fCreateWorkspaceWithOwnerRequest\x12!\n" +
+	"\bowner_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\aownerId\x12.\n" +
 	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"\"\n" +
 	" CreateWorkspaceWithOwnerResponse\"c\n" +
 	"\x0fWorkspaceMember\x12\x16\n" +

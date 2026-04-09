@@ -33,7 +33,7 @@ func (g *GRPCServiceServer) CreateWorkspaceWithOwner(ctx context.Context, req *p
 	}
 
 	if err := g.app.CreateWorkspace.Handle(ctx, app.CreateWorkspace{
-		UserID:      req.UserId,
+		OwnerID:     req.OwnerId,
 		WorkspaceID: workspaceID,
 	}); err != nil {
 		return nil, err

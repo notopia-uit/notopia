@@ -39,6 +39,10 @@ func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
 		if err != nil {
 			return err
 		}
+		// NOTE: @coderabbitai
+		//	uow.Execute(...) now wraps HasWorkspaceItemPermission(...).
+		//	If that check goes over gRPC/HTTP, the DB transaction stays open while waiting on another service, which extends lock time and turns transient auth latency into write-path contention.
+		//	Do the permission check before opening the write transaction, then load and rename the note inside the transaction.
 		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionWrite)
 		if err != nil {
 			return err

@@ -47,20 +47,25 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 		if err != nil {
 			return errs.NewInternalGenerateID(err)
 		}
+		workspace, err := domain.NewWorkspace(cmd.ID, cmd.Name, cmd.Slug)
+		if err != nil {
+			return err
+		}
 		rootFolder, err := domain.NewFolder(rootFolderID, cmd.Name, "", cmd.ID, domain.FolderHierarchy{}, cmd.OwnerID)
 		if err != nil {
-			return err
-		}
-		workspace, err := domain.NewWorkspace(cmd.ID, cmd.Name, cmd.Slug, rootFolderID)
-		if err != nil {
-			return err
-		}
-		if err := folderRepo.Save(ctx, rootFolder); err != nil {
 			return err
 		}
 		if err := workspaceRepo.Save(ctx, workspace); err != nil {
 			return err
 		}
+		if err := folderRepo.Save(ctx, rootFolder); err != nil {
+			return err
+		}
+		// TODO: May use saga for better perf, no bottle neck
+		// TODO: from @coderabbitai:
+		//	This is a cross-service side effect inside uow.Execute.
+		//	If the auth call succeeds and the DB commit later fails, note and authorization will diverge.
+		//	Trigger it after commit or via an outbox/after-commit hook instead.
 		if err := h.authorizationService.CreateWorkspaceWithOwner(ctx, cmd.OwnerID, workspace.ID()); err != nil {
 			return err
 		}

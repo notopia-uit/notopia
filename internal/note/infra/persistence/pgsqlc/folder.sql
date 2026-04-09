@@ -127,17 +127,17 @@ FOR UPDATE -- :if @for_update
 -- name: GetRecursiveChildren :many
 WITH RECURSIVE child_folders AS (
   SELECT
-    *
+    f.*
   FROM
-    folders
+    folders AS f
   WHERE
     id = sqlc.arg('id')::uuid
   UNION ALL
   SELECT
-    *
+    f.*
   FROM
-    folders
-    INNER JOIN child_folders AS cf ON parent_id = cf.id
+    folders AS f
+    INNER JOIN child_folders AS cf ON f.parent_id = cf.id
 )
 SELECT
   *

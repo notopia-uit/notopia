@@ -19,7 +19,7 @@ type PermanentlyDeleteFolderHandler struct {
 	uow                  domain.UnitOfWork
 }
 
-func PermanentlyNewDeleteFolderHandler(
+func NewPermanentlyDeleteFolderHandler(
 	authorizationService AuthorizationService,
 	uow domain.UnitOfWork,
 ) *PermanentlyDeleteFolderHandler {
@@ -29,7 +29,7 @@ func PermanentlyNewDeleteFolderHandler(
 	}
 }
 
-var ProvidePermanentlyDeleteFolderHandler = PermanentlyNewDeleteFolderHandler
+var ProvidePermanentlyDeleteFolderHandler = NewPermanentlyDeleteFolderHandler
 
 // NOTE: We delegate the infra persistence to cascading delete things
 // Fact, we should handle this in domain, not infra

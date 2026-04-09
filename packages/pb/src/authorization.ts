@@ -37,7 +37,7 @@ export enum WorkspaceItemPermission {
 }
 
 export interface CreateWorkspaceWithOwnerRequest {
-  userId: string;
+  ownerId: string;
   workspaceId: string;
 }
 
@@ -109,13 +109,13 @@ export interface DeleteWorkspaceResponse {
 export const AUTHORIZATION_PACKAGE_NAME = "authorization";
 
 function createBaseCreateWorkspaceWithOwnerRequest(): CreateWorkspaceWithOwnerRequest {
-  return { userId: "", workspaceId: "" };
+  return { ownerId: "", workspaceId: "" };
 }
 
 export const CreateWorkspaceWithOwnerRequest: MessageFns<CreateWorkspaceWithOwnerRequest> = {
   encode(message: CreateWorkspaceWithOwnerRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.userId !== "") {
-      writer.uint32(10).string(message.userId);
+    if (message.ownerId !== "") {
+      writer.uint32(10).string(message.ownerId);
     }
     if (message.workspaceId !== "") {
       writer.uint32(18).string(message.workspaceId);
@@ -135,7 +135,7 @@ export const CreateWorkspaceWithOwnerRequest: MessageFns<CreateWorkspaceWithOwne
             break;
           }
 
-          message.userId = reader.string();
+          message.ownerId = reader.string();
           continue;
         }
         case 2: {

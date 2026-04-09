@@ -36,6 +36,11 @@ func NewRestoreTrashedWorkspaceItemsHandler(
 
 var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItemsHandler
 
+// spellcheck:ignore
+// NOTE: performance issue. If we follow strictly the DDD, this is right
+// But currently we are getting all recusive children not filtering any
+// Because if we filter, we will need to check no further down the tree has filtered trashed by "purpose" or "parent"
+
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) error {
 	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
 	if err != nil {
@@ -118,6 +123,9 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 			allModifiedFolders = append(allModifiedFolders, childFolders...)
 			allModifiedNotes = append(allModifiedNotes, childNotes...)
 		}
+
+		allModifiedNotes = deduplicateNotes(allModifiedNotes)
+		allModifiedFolders = deduplicateFolders(allModifiedFolders)
 
 		if len(allModifiedNotes) > 0 {
 			if err := noteRepo.SaveMany(ctx, allModifiedNotes); err != nil {

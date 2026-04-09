@@ -93,8 +93,10 @@ func toWorkspaceRole(r app.WorkspaceRole) (note.WorkspaceRole, error) {
 		return note.Editor, nil
 	case app.WorkspaceRoleViewer:
 		return note.Viewer, nil
+	case app.WorkspaceRoleUnspecified:
+		return note.WorkspaceRole(""), errs.NewInternal("unspecified workspace role", nil)
 	default:
-		return note.Viewer, errs.NewInternal(fmt.Sprintf("invalid workspace role: %v", r), nil)
+		return note.WorkspaceRole(""), errs.NewInternal(fmt.Sprintf("invalid workspace role: %v", r), nil)
 	}
 }
 
@@ -259,6 +261,8 @@ func toTrashedBy(t app.TrashedBy) (note.TrashedBy, error) {
 		return note.Parent, nil
 	case app.TrashedByPurpose:
 		return note.Purpose, nil
+	case app.TrashedByUnspecified:
+		return note.TrashedBy(""), errs.NewInternal("unspecified trashed by", nil)
 	default:
 		return note.TrashedBy(""), errs.NewInternal(fmt.Sprintf("invalid trashed by: %v", t), nil)
 	}

@@ -141,10 +141,6 @@ func (q *Queries) GetNotes(ctx context.Context, arg *GetNotesParams) ([]*Note, e
 }
 
 const getRecursiveChildrenFromFolder = `-- name: GetRecursiveChildrenFromFolder :many
-	-- 	FolderID:  folderID,
-	-- 	ForUpdate: forUpdate,
-	-- })
-
 WITH RECURSIVE subfolders AS (
   SELECT
     id
@@ -178,7 +174,6 @@ type GetRecursiveChildrenFromFolderParams struct {
 	ForUpdate bool
 }
 
-// notes, err := n.queries.GetRecursiveChildrenFromFolder(ctx, pgsqlc.GetRecursiveChildrenFromFolderParams{
 func (q *Queries) GetRecursiveChildrenFromFolder(ctx context.Context, arg GetRecursiveChildrenFromFolderParams) ([]*Note, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "GetRecursiveChildrenFromFolder")
 	defer span.End()

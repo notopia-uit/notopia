@@ -38,6 +38,12 @@ func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *Permanen
 		if err != nil {
 			return err
 		}
+		// NOTE: @coderabbitai
+		//	Avoid holding the delete transaction open during authorization.
+		//	This refactor puts HasWorkspaceItemPermission(...) inside uow.Execute(...).
+		//	If the authorization check is remote, the delete transaction stays open while waiting on another service,
+		//	which increases lock time and failure blast radius for a simple permission lookup.
+		//	Keep the auth check outside the write transaction, then re-load/delete inside the transaction.
 		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionDelete)
 		if err != nil {
 			return err

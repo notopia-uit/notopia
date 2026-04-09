@@ -122,11 +122,6 @@ WHERE
 FOR UPDATE -- :if @for_update
 ;
 
-	-- notes, err := n.queries.GetRecursiveChildrenFromFolder(ctx, pgsqlc.GetRecursiveChildrenFromFolderParams{
-	-- 	FolderID:  folderID,
-	-- 	ForUpdate: forUpdate,
-	-- })
-
 -- name: GetRecursiveChildrenFromFolder :many
 WITH RECURSIVE subfolders AS (
   SELECT

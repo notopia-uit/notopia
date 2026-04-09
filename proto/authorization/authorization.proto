@@ -15,7 +15,7 @@ service AuthorizationService {
 }
 
 message CreateWorkspaceWithOwnerRequest {
-  string user_id = 1 [(buf.validate.field).required = true];
+  string owner_id = 1 [(buf.validate.field).required = true];
   string workspace_id = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
