@@ -16,18 +16,15 @@ type DeleteWorkspace struct {
 
 type DeleteWorkspaceHandler struct {
 	authorizationService AuthorizationService
-	workspaceRepo        domain.WorkspaceRepo
 	uow                  domain.UnitOfWork
 }
 
 func NewDeleteWorkspaceHandler(
 	authorizationService AuthorizationService,
-	workspaceRepo domain.WorkspaceRepo,
 	uow domain.UnitOfWork,
 ) *DeleteWorkspaceHandler {
 	return &DeleteWorkspaceHandler{
 		authorizationService: authorizationService,
-		workspaceRepo:        workspaceRepo,
 		uow:                  uow,
 	}
 }

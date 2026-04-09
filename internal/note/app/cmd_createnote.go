@@ -20,43 +20,51 @@ type CreateNote struct {
 
 type CreateNoteHandler struct {
 	authorizationService AuthorizationService
-	noteRepo             domain.NoteRepo
-	folderRepo           domain.FolderRepo
+	uow                  domain.UnitOfWork
 }
 
 func NewCreateNoteHandler(
 	authorizationService AuthorizationService,
-	noteRepo domain.NoteRepo,
-	folderRepo domain.FolderRepo,
+	uow domain.UnitOfWork,
 ) *CreateNoteHandler {
 	return &CreateNoteHandler{
 		authorizationService: authorizationService,
-		noteRepo:             noteRepo,
-		folderRepo:           folderRepo,
+		uow:                  uow,
 	}
 }
 
 var ProvideCreateNoteHandler = NewCreateNoteHandler
 
 func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) error {
-	workspaceID, err := h.folderRepo.GetWorkspaceIDByID(ctx, cmd.FolderID)
-	if err != nil {
-		return err
-	}
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
-		ctx,
-		cmd.UserID,
-		workspaceID,
-		WorkspaceItemPermissionWrite,
-	)
-	if err != nil {
-		return err
-	}
-	if !hasPermission {
-		return errs.NewForbidden(
-			fmt.Sprintf("user %q does not have permission to create note in workspace %q", cmd.UserID, workspaceID.String()),
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		folderRepo := r.Folder()
+		noteRepo := r.Note()
+		folderExists, err := folderRepo.CheckExists(ctx, cmd.FolderID)
+		if err != nil {
+			return err
+		}
+		if !folderExists {
+			return errs.NewFolderNotFound(cmd.FolderID, err)
+		}
+		workspaceID, err := folderRepo.GetWorkspaceIDByID(ctx, cmd.FolderID)
+		if err != nil {
+			return err
+		}
+		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+			ctx,
+			cmd.UserID,
+			workspaceID,
+			WorkspaceItemPermissionWrite,
 		)
-	}
-	note := domain.NewNote(cmd.ID, cmd.Name, cmd.Icon, cmd.FolderID)
-	return h.noteRepo.Save(ctx, note)
+		if err != nil {
+			return err
+		}
+		if !hasPermission {
+			return errs.NewForbidden(
+				fmt.Sprintf("user %q does not have permission to create note in workspace %q", cmd.UserID, workspaceID.String()),
+			)
+		}
+		note := domain.NewNote(cmd.ID, cmd.Name, cmd.Icon, cmd.FolderID)
+		return noteRepo.Save(ctx, note)
+	})
 }

@@ -21,18 +21,15 @@ type CreateFolder struct {
 
 type CreateFolderHandler struct {
 	authorizationService AuthorizationService
-	folderRepo           domain.FolderRepo
 	uow                  domain.UnitOfWork
 }
 
 func NewCreateFolderHandler(
 	authorizationService AuthorizationService,
-	folderRepo domain.FolderRepo,
 	uow domain.UnitOfWork,
 ) *CreateFolderHandler {
 	return &CreateFolderHandler{
 		authorizationService: authorizationService,
-		folderRepo:           folderRepo,
 		uow:                  uow,
 	}
 }
@@ -69,7 +66,7 @@ func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) err
 		if err != nil {
 			return err
 		}
-		if err := h.folderRepo.Save(ctx, folder); err != nil {
+		if err := folderRepo.Save(ctx, folder); err != nil {
 			return err
 		}
 		return nil
