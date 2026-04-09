@@ -23,7 +23,12 @@
       "matchUpdateTypes": ["patch", "minor"]
     },
     {
-      "matchPackageNames": ["npm:@typescript/native-preview"],
+      "matchPackageNames": ["/^.*@typescript/native-preview$/"],
+      "automerge": true,
+      "versioning": "loose"
+    },
+    {
+      "matchPackageNames": ["rustfs/rustfs"],
       "automerge": true,
       "versioning": "loose"
     }
