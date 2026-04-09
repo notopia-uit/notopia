@@ -8,8 +8,11 @@ buf = "1.65.0"
 sqlc = "1.30.0"
 java = "latest"
 "npm:@kevinnitro/nx-cache-action" = "0.1.0"
-"go:github.com/go-jet/jet/v2/cmd/jet" = "2.14.1"
-"npm:@typescript/native-preview" = "7.0.0-dev.20260408.1"
+
+[shell_alias]
+nx = "pnpm exec nx"
+shadcn = "pnpm exec shadcn"
+tsgo = "pnpm exec tsgo"
 
 [settings]
 legacy_version_file = false
