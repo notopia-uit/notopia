@@ -14,9 +14,11 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 	"github.com/google/uuid"
+	wotel "github.com/nkonev/watermill-opentelemetry/pkg/opentelemetry"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	"github.com/notopia-uit/notopia/pkg/metadata"
 )
 
 type WorkspaceEventHub struct {
@@ -37,6 +39,7 @@ func NewWorkspaceEventHub(
 	workspaceEventCfg *config.WorkspaceEvent,
 	logger watermill.LoggerAdapter,
 	redisClient *RedisClient,
+	serviceName metadata.ServiceName,
 ) (*WorkspaceEventHub, error) {
 	// TODO: If have time, try https://github.com/stong1994/watermill-rediszset, because we only need pubsub, not stream
 	// This would reduce memory overhead and be more efficient for ephemeral workspace events.
@@ -48,6 +51,7 @@ func NewWorkspaceEventHub(
 		},
 		logger,
 	)
+	otelPublisher := wotel.NewNamedPublisherDecorator(serviceName.String(), publisher)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create workspace event hub redis publisher: %w", err)
 	}
@@ -69,10 +73,10 @@ func NewWorkspaceEventHub(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create workspace event hub router: %w", err)
 	}
-	router.AddMiddleware(middleware.CorrelationID, middleware.Recoverer)
+	router.AddMiddleware(middleware.CorrelationID, middleware.Recoverer, wotel.Trace())
 
 	return &WorkspaceEventHub{
-		redisPublisher:  publisher,
+		redisPublisher:  otelPublisher,
 		redisSubscriber: subscriber,
 		internalPubSub:  gochannel.NewGoChannel(gochannel.Config{OutputChannelBuffer: 100}, logger),
 		router:          router,

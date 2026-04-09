@@ -10,6 +10,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
+	wotel "github.com/nkonev/watermill-opentelemetry/pkg/opentelemetry"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/internal/note/config"
@@ -73,6 +74,7 @@ func NewEvent(
 		middleware.CorrelationID,
 		middleware.Recoverer,
 		retryMiddleware.Middleware,
+		wotel.Trace(),
 	)
 	eventProcessor, err := cqrs.NewEventProcessorWithConfig(
 		router,

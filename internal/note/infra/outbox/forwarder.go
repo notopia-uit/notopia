@@ -12,10 +12,12 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	wotel "github.com/nkonev/watermill-opentelemetry/pkg/opentelemetry"
 	"github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgrepo"
+	"github.com/notopia-uit/notopia/pkg/metadata"
 )
 
 type ForwarderPublisher struct {
@@ -28,6 +30,7 @@ type ForwarderPublisher struct {
 var _ pgrepo.Publisher = (*ForwarderPublisher)(nil)
 
 // TODO: create topic, metadata...
+// TODO: If otel already, we can remove correlation ID
 func (p *ForwarderPublisher) PublishWorkspaceItem(ctx context.Context, event domain.Event, workspaceID uuid.UUID) error {
 	payload, err := json.Marshal(event)
 	if err != nil {
@@ -71,6 +74,7 @@ type FromPersistenceToQSLForwarder struct {
 	userIDKey      string
 	logger         watermill.LoggerAdapter
 	schemaAdapter  sql.SchemaAdapter
+	serviceName    string
 }
 
 var _ pgrepo.PublisherFactory = (*FromPersistenceToQSLForwarder)(nil)
@@ -79,6 +83,7 @@ func NewFromPersistenceToQSLForwarder(
 	domainEventCfg config.DomainEvent,
 	logger watermill.LoggerAdapter,
 	schemaAdapter sql.SchemaAdapter,
+	serviceName metadata.ServiceName,
 ) *FromPersistenceToQSLForwarder {
 	return &FromPersistenceToQSLForwarder{
 		workspaceIDKey: domainEventCfg.MessageWorkspaceIDKey,
@@ -86,6 +91,7 @@ func NewFromPersistenceToQSLForwarder(
 		userIDKey:      domainEventCfg.MessageMetadataUserIDKey,
 		logger:         logger,
 		schemaAdapter:  schemaAdapter,
+		serviceName:    serviceName.String(),
 	}
 }
 
@@ -106,10 +112,14 @@ func (f *FromPersistenceToQSLForwarder) Create(
 		return nil, fmt.Errorf("failed to create SQL publisher: %w", err)
 	}
 	publisher := forwarder.NewPublisher(sqlPublisher, forwarder.PublisherConfig{})
+	otelPublisher := wotel.NewNamedPublisherDecorator(
+		f.serviceName,
+		publisher,
+	)
 	return &ForwarderPublisher{
 		workspaceIDKey: f.workspaceIDKey,
 		aggregateIDKey: f.aggregateIDKey,
 		userIDKey:      f.userIDKey,
-		publisher:      publisher,
+		publisher:      otelPublisher,
 	}, nil
 }

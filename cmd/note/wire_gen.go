@@ -100,7 +100,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	loggerAdapter := component.NewWatermillLogger(logger)
 	configDomainEvent := &advanced.DomainEvent
 	defaultPostgreSQLSchema := outbox.NewSchemaAdapter(configDomainEvent)
-	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema)
+	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema, serviceName)
 	runInTx := pgrepo.NewRunInTx(fromPersistenceToQSLForwarder)
 	folder := pgrepo.NewNoTransactionFolder(pool, queries, runInTx)
 	createFolderHandler := app.NewCreateFolderHandler(authorization, folder)
@@ -168,7 +168,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspaceEvent := &advanced.WorkspaceEvent
 	redis := &configConfig.Redis
 	redisClient, cleanup5 := workspaceevent.NewRedisClient(ctx, redis, logger)
-	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient)
+	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName)
 	if err != nil {
 		cleanup5()
 		cleanup4()

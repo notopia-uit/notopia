@@ -9,6 +9,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill-sql/v4/pkg/sql"
 	"github.com/ThreeDotsLabs/watermill/components/forwarder"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
+	wotel "github.com/nkonev/watermill-opentelemetry/pkg/opentelemetry"
 )
 
 type Publisher message.Publisher
@@ -36,11 +38,18 @@ func NewOutbox(
 	if err != nil {
 		return nil, fmt.Errorf("failed to create SQL subscriber: %w", err)
 	}
+	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create SQL subcriber router: %w", err)
+	}
+	router.AddMiddleware(middleware.Recoverer, wotel.Trace())
 	fwd, err := forwarder.NewForwarder(
 		subcriber,
 		publisher,
 		logger,
-		forwarder.Config{},
+		forwarder.Config{
+			Router: router,
+		},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create forwarder: %w", err)
