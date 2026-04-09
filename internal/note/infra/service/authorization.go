@@ -86,7 +86,16 @@ func (a *Authorization) HasWorkspaceFolderPermission(ctx context.Context, userID
 	return false, errs.NewUnimplemented()
 }
 
-func (a *Authorization) CreateWorkspaceWithOwnership(ctx context.Context, ownerID string, workspaceID uuid.UUID) error {
+func (a *Authorization) CreateWorkspaceWithOwner(ctx context.Context, ownerID string, workspaceID uuid.UUID) error {
+	return errs.NewUnimplemented()
+}
+
+func (a *Authorization) UpdateWorkspaceMembers(
+	ctx context.Context,
+	userID string,
+	workspaceID uuid.UUID,
+	members []app.WorkspaceMemberUpdate,
+) error {
 	return errs.NewUnimplemented()
 }
 

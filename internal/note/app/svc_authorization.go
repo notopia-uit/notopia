@@ -64,10 +64,17 @@ type AuthorizationService interface {
 		permission WorkspaceItemPermission,
 	) (bool, error)
 
-	CreateWorkspaceWithOwnership(
+	CreateWorkspaceWithOwner(
 		ctx context.Context,
 		ownerID string,
 		workspaceID uuid.UUID,
+	) error
+
+	UpdateWorkspaceMembers(
+		ctx context.Context,
+		userID string,
+		workspaceID uuid.UUID,
+		members []WorkspaceMemberUpdate, // NOTE: Hey this struct is from the handler :v?
 	) error
 
 	GetWorkspaceMembers(

@@ -19,7 +19,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/infra/common"
-	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
 	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgreadmodel"
@@ -123,25 +122,19 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	trashWorkspaceItemsHandler := app.NewTrashWorkspaceItemsHandler(authorization, unitOfWork, trashService)
 	unpublishNoteHandler := app.NewUnpublishNoteHandler(pgrepoNote)
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
-	kafka := &configConfig.Kafka
-	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	kafkaPublisher, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
+	workspaceEvent := &advanced.WorkspaceEvent
+	redis := &configConfig.Redis
+	redisClient, cleanup5 := workspaceevent.NewRedisClient(ctx, redis, logger)
+	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName)
 	if err != nil {
+		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	integrationPublisher, err := integrationpublisher.NewIntegrationPublisher(kafkaPublisher)
-	if err != nil {
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(integrationPublisher)
+	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization)
 	cmds := &app.Cmds{
 		CreateFolderHandler:                    createFolderHandler,
 		CreateNoteHandler:                      createNoteHandler,
@@ -164,18 +157,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
-	workspaceEvent := &advanced.WorkspaceEvent
-	redis := &configConfig.Redis
-	redisClient, cleanup5 := workspaceevent.NewRedisClient(ctx, redis, logger)
-	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName)
-	if err != nil {
-		cleanup5()
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
 	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(workspaceEventHub)
 	events := &app.Events{
 		DocumentCommittedHandler:    documentCommittedHandler,
@@ -238,8 +219,21 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
+	kafka := &configConfig.Kafka
+	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
 	jsonMarshaler := component.NewWatermillJsonMarshaler()
 	eventEvent, err := event.NewEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent)
+	if err != nil {
+		cleanup7()
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	kafkaPublisher, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
 	if err != nil {
 		cleanup7()
 		cleanup6()

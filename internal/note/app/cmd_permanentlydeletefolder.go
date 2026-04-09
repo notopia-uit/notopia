@@ -31,6 +31,8 @@ func PermanentlyNewDeleteFolderHandler(
 
 var ProvidePermanentlyDeleteFolderHandler = PermanentlyNewDeleteFolderHandler
 
+// NOTE: We delegate the infra persistence to cascading delete things
+// Fact, we should handle this in domain, not infra
 func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteFolder) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()

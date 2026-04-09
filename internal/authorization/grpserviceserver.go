@@ -26,7 +26,7 @@ func NewGRPCServiceServer(app *App) *GRPCServiceServer {
 
 var ProvideGRPCServiceServer = NewGRPCServiceServer
 
-func (g *GRPCServiceServer) CreateWorkspace(ctx context.Context, req *pb.CreateWorkspaceRequest) (*pb.CreateWorkspaceResponse, error) {
+func (g *GRPCServiceServer) CreateWorkspaceWithOwner(ctx context.Context, req *pb.CreateWorkspaceWithOwnerRequest) (*pb.CreateWorkspaceWithOwnerResponse, error) {
 	workspaceID, err := uuid.Parse(req.WorkspaceId)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (g *GRPCServiceServer) CreateWorkspace(ctx context.Context, req *pb.CreateW
 		return nil, err
 	}
 
-	return &pb.CreateWorkspaceResponse{}, nil
+	return &pb.CreateWorkspaceWithOwnerResponse{}, nil
 }
 
 func (g *GRPCServiceServer) UpdateWorkspaceMembers(ctx context.Context, req *pb.UpdateWorkspaceMembersRequest) (*pb.UpdateWorkspaceMembersResponse, error) {

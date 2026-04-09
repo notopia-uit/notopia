@@ -36,12 +36,12 @@ export enum WorkspaceItemPermission {
   UNRECOGNIZED = -1,
 }
 
-export interface CreateWorkspaceRequest {
+export interface CreateWorkspaceWithOwnerRequest {
   userId: string;
   workspaceId: string;
 }
 
-export interface CreateWorkspaceResponse {
+export interface CreateWorkspaceWithOwnerResponse {
 }
 
 export interface WorkspaceMember {
@@ -108,12 +108,12 @@ export interface DeleteWorkspaceResponse {
 
 export const AUTHORIZATION_PACKAGE_NAME = "authorization";
 
-function createBaseCreateWorkspaceRequest(): CreateWorkspaceRequest {
+function createBaseCreateWorkspaceWithOwnerRequest(): CreateWorkspaceWithOwnerRequest {
   return { userId: "", workspaceId: "" };
 }
 
-export const CreateWorkspaceRequest: MessageFns<CreateWorkspaceRequest> = {
-  encode(message: CreateWorkspaceRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const CreateWorkspaceWithOwnerRequest: MessageFns<CreateWorkspaceWithOwnerRequest> = {
+  encode(message: CreateWorkspaceWithOwnerRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.userId !== "") {
       writer.uint32(10).string(message.userId);
     }
@@ -123,10 +123,10 @@ export const CreateWorkspaceRequest: MessageFns<CreateWorkspaceRequest> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CreateWorkspaceRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateWorkspaceWithOwnerRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateWorkspaceRequest();
+    const message = createBaseCreateWorkspaceWithOwnerRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -156,19 +156,19 @@ export const CreateWorkspaceRequest: MessageFns<CreateWorkspaceRequest> = {
   },
 };
 
-function createBaseCreateWorkspaceResponse(): CreateWorkspaceResponse {
+function createBaseCreateWorkspaceWithOwnerResponse(): CreateWorkspaceWithOwnerResponse {
   return {};
 }
 
-export const CreateWorkspaceResponse: MessageFns<CreateWorkspaceResponse> = {
-  encode(_: CreateWorkspaceResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const CreateWorkspaceWithOwnerResponse: MessageFns<CreateWorkspaceWithOwnerResponse> = {
+  encode(_: CreateWorkspaceWithOwnerResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CreateWorkspaceResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateWorkspaceWithOwnerResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateWorkspaceResponse();
+    const message = createBaseCreateWorkspaceWithOwnerResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -774,7 +774,10 @@ export const DeleteWorkspaceResponse: MessageFns<DeleteWorkspaceResponse> = {
 };
 
 export interface AuthorizationServiceClient {
-  createWorkspace(request: CreateWorkspaceRequest, metadata?: Metadata): Observable<CreateWorkspaceResponse>;
+  createWorkspaceWithOwner(
+    request: CreateWorkspaceWithOwnerRequest,
+    metadata?: Metadata,
+  ): Observable<CreateWorkspaceWithOwnerResponse>;
 
   updateWorkspaceMembers(
     request: UpdateWorkspaceMembersRequest,
@@ -805,10 +808,13 @@ export interface AuthorizationServiceClient {
 }
 
 export interface AuthorizationServiceController {
-  createWorkspace(
-    request: CreateWorkspaceRequest,
+  createWorkspaceWithOwner(
+    request: CreateWorkspaceWithOwnerRequest,
     metadata?: Metadata,
-  ): Promise<CreateWorkspaceResponse> | Observable<CreateWorkspaceResponse> | CreateWorkspaceResponse;
+  ):
+    | Promise<CreateWorkspaceWithOwnerResponse>
+    | Observable<CreateWorkspaceWithOwnerResponse>
+    | CreateWorkspaceWithOwnerResponse;
 
   updateWorkspaceMembers(
     request: UpdateWorkspaceMembersRequest,
@@ -856,7 +862,7 @@ export interface AuthorizationServiceController {
 export function AuthorizationServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      "createWorkspace",
+      "createWorkspaceWithOwner",
       "updateWorkspaceMembers",
       "getWorkspaceMembers",
       "hasWorkspacePermission",
@@ -880,16 +886,18 @@ export const AUTHORIZATION_SERVICE_NAME = "AuthorizationService";
 
 export type AuthorizationServiceService = typeof AuthorizationServiceService;
 export const AuthorizationServiceService = {
-  createWorkspace: {
-    path: "/authorization.AuthorizationService/CreateWorkspace" as const,
+  createWorkspaceWithOwner: {
+    path: "/authorization.AuthorizationService/CreateWorkspaceWithOwner" as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: CreateWorkspaceRequest): Buffer =>
-      Buffer.from(CreateWorkspaceRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): CreateWorkspaceRequest => CreateWorkspaceRequest.decode(value),
-    responseSerialize: (value: CreateWorkspaceResponse): Buffer =>
-      Buffer.from(CreateWorkspaceResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): CreateWorkspaceResponse => CreateWorkspaceResponse.decode(value),
+    requestSerialize: (value: CreateWorkspaceWithOwnerRequest): Buffer =>
+      Buffer.from(CreateWorkspaceWithOwnerRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): CreateWorkspaceWithOwnerRequest =>
+      CreateWorkspaceWithOwnerRequest.decode(value),
+    responseSerialize: (value: CreateWorkspaceWithOwnerResponse): Buffer =>
+      Buffer.from(CreateWorkspaceWithOwnerResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): CreateWorkspaceWithOwnerResponse =>
+      CreateWorkspaceWithOwnerResponse.decode(value),
   },
   updateWorkspaceMembers: {
     path: "/authorization.AuthorizationService/UpdateWorkspaceMembers" as const,
@@ -966,7 +974,7 @@ export const AuthorizationServiceService = {
 } as const;
 
 export interface AuthorizationServiceServer extends UntypedServiceImplementation {
-  createWorkspace: handleUnaryCall<CreateWorkspaceRequest, CreateWorkspaceResponse>;
+  createWorkspaceWithOwner: handleUnaryCall<CreateWorkspaceWithOwnerRequest, CreateWorkspaceWithOwnerResponse>;
   updateWorkspaceMembers: handleUnaryCall<UpdateWorkspaceMembersRequest, UpdateWorkspaceMembersResponse>;
   getWorkspaceMembers: handleUnaryCall<GetWorkspaceMembersRequest, GetWorkspaceMembersResponse>;
   hasWorkspacePermission: handleUnaryCall<HasWorkspacePermissionRequest, HasWorkspacePermissionResponse>;

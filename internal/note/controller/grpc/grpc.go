@@ -50,7 +50,9 @@ func toGRPCError(err error) error {
 			errs.CodeInvalidWorkspaceSlug,
 			errs.CodeFoldersNotInWorkspace,
 			errs.CodeDestinationFolderNotInWorkspace,
-			errs.CodeNotesNotInWorkspace:
+			errs.CodeNotesNotInWorkspace,
+			errs.CodeWorkspaceMembersCannotBeEmpty,
+			errs.CodeWorkspaceMustHaveAtLeastOneOwner:
 			return status.Error(codes.InvalidArgument, cerr.Error())
 		case errs.CodeUnimplemented:
 			return status.Error(codes.Unimplemented, cerr.Error())

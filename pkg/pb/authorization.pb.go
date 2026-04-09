@@ -178,7 +178,7 @@ func (WorkspaceItemPermission) EnumDescriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{2}
 }
 
-type CreateWorkspaceRequest struct {
+type CreateWorkspaceWithOwnerRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	WorkspaceId   string                 `protobuf:"bytes,2,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
@@ -186,20 +186,20 @@ type CreateWorkspaceRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateWorkspaceRequest) Reset() {
-	*x = CreateWorkspaceRequest{}
+func (x *CreateWorkspaceWithOwnerRequest) Reset() {
+	*x = CreateWorkspaceWithOwnerRequest{}
 	mi := &file_authorization_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateWorkspaceRequest) String() string {
+func (x *CreateWorkspaceWithOwnerRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateWorkspaceRequest) ProtoMessage() {}
+func (*CreateWorkspaceWithOwnerRequest) ProtoMessage() {}
 
-func (x *CreateWorkspaceRequest) ProtoReflect() protoreflect.Message {
+func (x *CreateWorkspaceWithOwnerRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_authorization_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -211,45 +211,45 @@ func (x *CreateWorkspaceRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateWorkspaceRequest.ProtoReflect.Descriptor instead.
-func (*CreateWorkspaceRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateWorkspaceWithOwnerRequest.ProtoReflect.Descriptor instead.
+func (*CreateWorkspaceWithOwnerRequest) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CreateWorkspaceRequest) GetUserId() string {
+func (x *CreateWorkspaceWithOwnerRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-func (x *CreateWorkspaceRequest) GetWorkspaceId() string {
+func (x *CreateWorkspaceWithOwnerRequest) GetWorkspaceId() string {
 	if x != nil {
 		return x.WorkspaceId
 	}
 	return ""
 }
 
-type CreateWorkspaceResponse struct {
+type CreateWorkspaceWithOwnerResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateWorkspaceResponse) Reset() {
-	*x = CreateWorkspaceResponse{}
+func (x *CreateWorkspaceWithOwnerResponse) Reset() {
+	*x = CreateWorkspaceWithOwnerResponse{}
 	mi := &file_authorization_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateWorkspaceResponse) String() string {
+func (x *CreateWorkspaceWithOwnerResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateWorkspaceResponse) ProtoMessage() {}
+func (*CreateWorkspaceWithOwnerResponse) ProtoMessage() {}
 
-func (x *CreateWorkspaceResponse) ProtoReflect() protoreflect.Message {
+func (x *CreateWorkspaceWithOwnerResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_authorization_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -261,8 +261,8 @@ func (x *CreateWorkspaceResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateWorkspaceResponse.ProtoReflect.Descriptor instead.
-func (*CreateWorkspaceResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateWorkspaceWithOwnerResponse.ProtoReflect.Descriptor instead.
+func (*CreateWorkspaceWithOwnerResponse) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{1}
 }
 
@@ -922,11 +922,11 @@ var File_authorization_proto protoreflect.FileDescriptor
 
 const file_authorization_proto_rawDesc = "" +
 	"\n" +
-	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\"i\n" +
-	"\x16CreateWorkspaceRequest\x12\x1f\n" +
+	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\"r\n" +
+	"\x1fCreateWorkspaceWithOwnerRequest\x12\x1f\n" +
 	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\x12.\n" +
-	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"\x19\n" +
-	"\x17CreateWorkspaceResponse\"c\n" +
+	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"\"\n" +
+	" CreateWorkspaceWithOwnerResponse\"c\n" +
 	"\x0fWorkspaceMember\x12\x16\n" +
 	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x128\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"\xb2\x01\n" +
@@ -982,9 +982,9 @@ const file_authorization_proto_rawDesc = "" +
 	"%WORKSPACE_ITEM_PERMISSION_UNSPECIFIED\x10\x00\x12\"\n" +
 	"\x1eWORKSPACE_ITEM_PERMISSION_READ\x10\x01\x12#\n" +
 	"\x1fWORKSPACE_ITEM_PERMISSION_WRITE\x10\x02\x12$\n" +
-	" WORKSPACE_ITEM_PERMISSION_DELETE\x10\x032\xcd\x06\n" +
-	"\x14AuthorizationService\x12`\n" +
-	"\x0fCreateWorkspace\x12%.authorization.CreateWorkspaceRequest\x1a&.authorization.CreateWorkspaceResponse\x12u\n" +
+	" WORKSPACE_ITEM_PERMISSION_DELETE\x10\x032\xe8\x06\n" +
+	"\x14AuthorizationService\x12{\n" +
+	"\x18CreateWorkspaceWithOwner\x12..authorization.CreateWorkspaceWithOwnerRequest\x1a/.authorization.CreateWorkspaceWithOwnerResponse\x12u\n" +
 	"\x16UpdateWorkspaceMembers\x12,.authorization.UpdateWorkspaceMembersRequest\x1a-.authorization.UpdateWorkspaceMembersResponse\x12l\n" +
 	"\x13GetWorkspaceMembers\x12).authorization.GetWorkspaceMembersRequest\x1a*.authorization.GetWorkspaceMembersResponse\x12u\n" +
 	"\x16HasWorkspacePermission\x12,.authorization.HasWorkspacePermissionRequest\x1a-.authorization.HasWorkspacePermissionResponse\x12\x81\x01\n" +
@@ -1011,8 +1011,8 @@ var file_authorization_proto_goTypes = []any{
 	(WorkspaceRole)(0),                              // 0: authorization.WorkspaceRole
 	(WorkspacePermission)(0),                        // 1: authorization.WorkspacePermission
 	(WorkspaceItemPermission)(0),                    // 2: authorization.WorkspaceItemPermission
-	(*CreateWorkspaceRequest)(nil),                  // 3: authorization.CreateWorkspaceRequest
-	(*CreateWorkspaceResponse)(nil),                 // 4: authorization.CreateWorkspaceResponse
+	(*CreateWorkspaceWithOwnerRequest)(nil),         // 3: authorization.CreateWorkspaceWithOwnerRequest
+	(*CreateWorkspaceWithOwnerResponse)(nil),        // 4: authorization.CreateWorkspaceWithOwnerResponse
 	(*WorkspaceMember)(nil),                         // 5: authorization.WorkspaceMember
 	(*UpdateWorkspaceMembersRequest)(nil),           // 6: authorization.UpdateWorkspaceMembersRequest
 	(*UpdateWorkspaceMembersResponse)(nil),          // 7: authorization.UpdateWorkspaceMembersResponse
@@ -1033,14 +1033,14 @@ var file_authorization_proto_depIdxs = []int32{
 	5,  // 2: authorization.GetWorkspaceMembersResponse.members:type_name -> authorization.WorkspaceMember
 	1,  // 3: authorization.HasWorkspacePermissionRequest.permission:type_name -> authorization.WorkspacePermission
 	2,  // 4: authorization.HasWorkspaceItemPermissionRequest.permission:type_name -> authorization.WorkspaceItemPermission
-	3,  // 5: authorization.AuthorizationService.CreateWorkspace:input_type -> authorization.CreateWorkspaceRequest
+	3,  // 5: authorization.AuthorizationService.CreateWorkspaceWithOwner:input_type -> authorization.CreateWorkspaceWithOwnerRequest
 	6,  // 6: authorization.AuthorizationService.UpdateWorkspaceMembers:input_type -> authorization.UpdateWorkspaceMembersRequest
 	8,  // 7: authorization.AuthorizationService.GetWorkspaceMembers:input_type -> authorization.GetWorkspaceMembersRequest
 	10, // 8: authorization.AuthorizationService.HasWorkspacePermission:input_type -> authorization.HasWorkspacePermissionRequest
 	12, // 9: authorization.AuthorizationService.HasWorkspaceItemPermission:input_type -> authorization.HasWorkspaceItemPermissionRequest
 	14, // 10: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:input_type -> authorization.GetUserWorkspaceItemPermissionsRequest
 	16, // 11: authorization.AuthorizationService.DeleteWorkspace:input_type -> authorization.DeleteWorkspaceRequest
-	4,  // 12: authorization.AuthorizationService.CreateWorkspace:output_type -> authorization.CreateWorkspaceResponse
+	4,  // 12: authorization.AuthorizationService.CreateWorkspaceWithOwner:output_type -> authorization.CreateWorkspaceWithOwnerResponse
 	7,  // 13: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
 	9,  // 14: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
 	11, // 15: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse

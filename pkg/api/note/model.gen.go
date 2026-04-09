@@ -354,8 +354,7 @@ type WorkspaceMembersUpdatedEvent struct {
 
 // WorkspaceMembersUpdatedEventData defines model for .
 type WorkspaceMembersUpdatedEventData struct {
-	Id      *PropertiesId     `json:"id,omitempty"`
-	Members []WorkspaceMember `json:"members"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
 
 // WorkspaceMembersUpdatedEventEvent defines model for WorkspaceMembersUpdatedEvent.Event.

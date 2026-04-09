@@ -61,7 +61,7 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 		if err := workspaceRepo.Save(ctx, workspace); err != nil {
 			return err
 		}
-		if err := h.authorizationService.CreateWorkspaceWithOwnership(ctx, cmd.OwnerID, workspace.ID()); err != nil {
+		if err := h.authorizationService.CreateWorkspaceWithOwner(ctx, cmd.OwnerID, workspace.ID()); err != nil {
 			return err
 		}
 		return nil

@@ -7,6 +7,9 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
+// NOTE: Struggling with generic, this package should have the constructor for each
+// Struggling with external struct also, maybe this should own the struct definition
+
 type WorkspaceEventPublisher interface {
 	Publish(
 		ctx context.Context,
