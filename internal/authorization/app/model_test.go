@@ -1,32 +1,11 @@
-package authorization_test
+package app_test
 
 import (
 	"testing"
 
 	_ "embed"
-	"github.com/casbin/casbin/v3"
-	stringadapter "github.com/casbin/casbin/v3/persist/string-adapter"
 	"github.com/stretchr/testify/require"
 )
-
-//go:embed policy.csv
-var policyCSV string
-
-//go:embed policy_test.csv
-var policyTestCSV string
-
-func GetLocalEnforcer(loadTestPolicies bool) (*casbin.Enforcer, error) {
-	policy := policyCSV
-	if loadTestPolicies {
-		policy += "\n" + policyTestCSV
-	}
-	adapter := stringadapter.NewAdapter(policy)
-	e, err := casbin.NewEnforcer("model.conf", adapter)
-	if err != nil {
-		return nil, err
-	}
-	return e, nil
-}
 
 // Shared at https://editor.casbin.org/#GURKL5ZXW
 func TestModels(t *testing.T) {

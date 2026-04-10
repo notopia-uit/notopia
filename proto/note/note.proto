@@ -3,11 +3,25 @@ syntax = "proto3";
 package note;
 
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
 
 service NoteService {
+  //NOTE: maybe this will be replaced with batch get
   rpc GetNoteName(GetNoteNameRequest) returns (GetNoteNameResponse);
-  rpc CheckNoteExistence(CheckNoteExistenceRequest) returns (CheckNoteExistenceResponse);
+  rpc GetNote(GetNoteRequest) returns (GetNoteResponse);
+  // NOTE: what, where is this used?
   rpc GetWorkspaceIdByNoteId(GetWorkspaceIdByNoteIdRequest) returns (GetWorkspaceIdByNoteIdResponse);
+}
+
+enum TrashedBy {
+  TRASHED_BY_UNSPECIFIED = 0;
+  TRASHED_BY_PURPOSE = 1;
+  TRASHED_BY_PARENT = 2;
+}
+
+message Trashed {
+  TrashedBy by = 1 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp at = 2 [(buf.validate.field).required = true];
 }
 
 message GetNoteNameRequest {
@@ -21,15 +35,29 @@ message GetNoteNameResponse {
   string name = 1 [(buf.validate.field).required = true];
 }
 
-message CheckNoteExistenceRequest {
-  string note_id = 1 [
+message GetNoteRequest {
+  string id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
+  bool exclude_trashed = 2;
+  string user_id = 3 [(buf.validate.field).required = true];
 }
 
-message CheckNoteExistenceResponse {
-  bool exists = 1 [(buf.validate.field).required = true];
+message GetNoteResponse {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  string name = 2 [(buf.validate.field).required = true];
+  optional string icon = 3;
+  string folder_id = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  repeated string tags = 5;
+  google.protobuf.Timestamp updated_at = 6 [(buf.validate.field).required = true];
+  optional Trashed trashed = 7;
 }
 
 message GetWorkspaceIdByNoteIdRequest {

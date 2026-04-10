@@ -52,3 +52,30 @@ entries:
       name: Admin
       email: admin@notopia.com
       password: admin
+
+  - model: authentik_core.user
+    id: note-service
+    identifiers:
+      pk: 1001
+    attrs:
+      username: note-service
+      name: Note Service
+      type: service_account
+      path: goauthentik.io/service-accounts
+      password: notopiauit
+      groups:
+        - !Find [authentik_core.group, [name, authentik Read-only]]
+      attributes:
+        goauthentik.io/user/token-expires: false
+
+  - model: authentik_core.token
+    identifiers:
+      identifier: service-account-note-service-password
+    attrs:
+      description: Token for Note Service
+      expires: 9999-12-31T23:59:59Z
+      expiring: false
+      key: notopiauit
+      managed: null
+      intent: api
+      user: !KeyOf note-service

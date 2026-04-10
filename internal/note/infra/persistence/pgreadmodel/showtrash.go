@@ -43,8 +43,8 @@ func (h *ShowTrash) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 			Name: note.Name,
 			Icon: icon,
 			Trashed: app.Trashed{
-				TrashedBy: app.TrashedByPurpose,
-				TrashedAt: *note.TrashedAt,
+				By: app.TrashedByPurpose,
+				At: *note.TrashedAt,
 			},
 		}
 	}
@@ -60,8 +60,8 @@ func (h *ShowTrash) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 			Name: folder.Name,
 			Icon: icon,
 			Trashed: app.Trashed{
-				TrashedBy: app.TrashedByPurpose,
-				TrashedAt: *folder.TrashedAt,
+				By: app.TrashedByPurpose,
+				At: *folder.TrashedAt,
 			},
 		}
 	}

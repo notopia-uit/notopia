@@ -6,6 +6,10 @@ import (
 	"github.com/google/uuid"
 )
 
+// NOTE: most of those enum value are strings
+// And it pass down to save to casbin directly
+// Consider uint8 and map to underlaying string to casbin
+
 type WorkspacePermission string
 
 var (
@@ -43,7 +47,12 @@ func (r WorkspaceRole) String() string {
 }
 
 type WorkspaceMember struct {
-	ID   string
+	ID   string // This is member ID
+	Role WorkspaceRole
+}
+
+type UserWorkspace struct {
+	ID   uuid.UUID // This is workspace ID
 	Role WorkspaceRole
 }
 

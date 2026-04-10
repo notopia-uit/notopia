@@ -194,8 +194,8 @@ type Folder struct {
 
 // FolderTrashed defines model for .
 type FolderTrashed struct {
-	TrashedAt time.Time `json:"trashedAt"`
-	TrashedBy TrashedBy `json:"trashedBy"`
+	At time.Time `json:"at"`
+	By TrashedBy `json:"by"`
 }
 
 // Graph defines model for Graph.
@@ -253,8 +253,8 @@ type Note struct {
 
 // NoteTrashed defines model for .
 type NoteTrashed struct {
-	TrashedAt time.Time `json:"trashedAt"`
-	TrashedBy TrashedBy `json:"trashedBy"`
+	At time.Time `json:"at"`
+	By TrashedBy `json:"by"`
 }
 
 // NoteLink defines model for NoteLink.
@@ -271,8 +271,8 @@ type NotePropertiesId = openapi_types.UUID
 
 // Trashed defines model for Trashed.
 type Trashed struct {
-	TrashedAt time.Time `json:"trashedAt"`
-	TrashedBy TrashedBy `json:"trashedBy"`
+	At time.Time `json:"at"`
+	By TrashedBy `json:"by"`
 }
 
 // TrashedBy defines model for TrashedBy.
@@ -294,10 +294,8 @@ type TrashedNote struct {
 
 // UserWorkspace defines model for UserWorkspace.
 type UserWorkspace struct {
-	Id   *openapi_types.UUID `json:"id,omitempty"`
-	Name string              `json:"name"`
-	Role WorkspaceRole       `json:"role"`
-	Slug string              `json:"slug"`
+	Role      WorkspaceRole `json:"role"`
+	Workspace Workspace     `json:"workspace"`
 }
 
 // UserPropertiesId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
@@ -346,11 +344,11 @@ type WorkspaceItemsUpdatedEventEvent string
 // WorkspaceMember defines model for WorkspaceMember.
 type WorkspaceMember struct {
 	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	Id   UserPropertiesId `json:"id"`
-	Role WorkspaceRole    `json:"role"`
+	Id UserPropertiesId `json:"id"`
 
-	// Username Full name from Authentik
-	Username *UserPropertiesName `json:"username,omitempty"`
+	// Name Full name from Authentik
+	Name *UserPropertiesName `json:"name,omitempty"`
+	Role WorkspaceRole       `json:"role"`
 }
 
 // WorkspaceMembersUpdatedEvent defines model for WorkspaceMembersUpdatedEvent.

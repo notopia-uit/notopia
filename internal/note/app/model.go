@@ -26,8 +26,8 @@ type Paginated[T any] struct {
 }
 
 type Trashed struct {
-	TrashedBy TrashedBy
-	TrashedAt time.Time
+	By TrashedBy
+	At time.Time
 }
 
 type Note struct {
@@ -119,9 +119,9 @@ func (r WorkspaceRole) String() string {
 }
 
 type WorkspaceMember struct {
-	ID       string
-	Username string
-	Role     WorkspaceRole
+	ID   string
+	Name string
+	Role WorkspaceRole
 }
 
 type WorkspaceTreeNote struct {
@@ -180,6 +180,20 @@ type Trash struct {
 	Folders []*TrashedFolder
 }
 
-type CheckWorkspaceSlugExistsResult struct {
-	Exists bool
+type WorkspaceMemberUpdate struct {
+	ID   string // User ID
+	Role WorkspaceRole
+}
+
+type UserWorkspace struct {
+	Workspace *Workspace
+	Role      WorkspaceRole
+}
+
+type User struct {
+	ID     string
+	Name   string
+	Email  string // Can be empty
+	Groups []string
+	Roles  []string
 }

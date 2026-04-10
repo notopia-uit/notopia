@@ -58,8 +58,8 @@ func (h *Note) GetNote(ctx context.Context, q *app.GetNote) (*app.Note, error) {
 			return nil, err
 		}
 		trashed = &app.Trashed{
-			TrashedBy: trashedBy,
-			TrashedAt: *note.TrashedAt,
+			By: trashedBy,
+			At: *note.TrashedAt,
 		}
 	}
 

@@ -82,7 +82,7 @@ func (h *StrictHandler) GetWorkspace(
 		return nil, err
 	}
 
-	dto := toWorkspace(*result)
+	dto := toWorkspaceDTO(result)
 	return note.GetWorkspace200JSONResponse(dto), nil
 }
 
@@ -93,14 +93,40 @@ func (h *StrictHandler) CheckWorkspaceSlugExists(
 	query := &app.CheckWorkspaceSlugExists{
 		Slug: request.WorkspaceSlug,
 	}
-	result, err := h.App.Queries.CheckWorkspaceSlugExistsHandler.Handle(ctx, query)
+	exists, err := h.App.Queries.CheckWorkspaceSlugExistsHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
-	if result.Exists {
+	if exists {
 		return note.CheckWorkspaceSlugExists409Response{}, nil
 	}
 	return note.CheckWorkspaceSlugExists200Response{}, nil
+}
+
+func (h *StrictHandler) GetMyWorkspaces(
+	ctx context.Context,
+	request note.GetMyWorkspacesRequestObject,
+) (note.GetMyWorkspacesResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
+	query := &app.GetMyWorkspaces{
+		UserID: user.ID,
+	}
+	myWorkspaces, err := h.App.Queries.GetMyWorkspacesHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	dtos := make([]note.UserWorkspace, 0, len(myWorkspaces))
+	for _, w := range myWorkspaces {
+		dto, err := toUserWorkspaceDTO(w)
+		if err != nil {
+			return nil, err
+		}
+		dtos = append(dtos, dto)
+	}
+	return note.GetMyWorkspaces200JSONResponse(dtos), nil
 }
 
 func (h *StrictHandler) GetWorkspaceEvents(
@@ -109,7 +135,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 ) (note.GetWorkspaceEventsResponseObject, error) {
 	c, ok := ctx.(*gin.Context)
 	if !ok {
-		return nil, errs.NewInternal("failed to cast context to gin.Context", nil)
+		return nil, errs.NewInternal("failed to cast context to gin.Context")
 	}
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
@@ -118,7 +144,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 
 	eventCh, err := h.WorkspaceEventHub.Subscribe(ctx, request.WorkspaceId, user.ID)
 	if err != nil {
-		return nil, errs.NewInternal("failed to subscribe to workspace events", err)
+		return nil, errs.NewInternalErr("failed to subscribe to workspace events", err)
 	}
 	r, w := io.Pipe()
 	sender := newWorkspaceEventSSESender(ctx, eventCh, w, c.Writer)
@@ -152,7 +178,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 		return nil, err
 	}
 
-	dto := toGraph(result)
+	dto := toGraphDTO(result)
 	return note.GetWorkspaceGraph200JSONResponse(dto), nil
 }
 
@@ -160,14 +186,48 @@ func (h *StrictHandler) GetWorkspaceMembers(
 	ctx context.Context,
 	request note.GetWorkspaceMembersRequestObject,
 ) (note.GetWorkspaceMembersResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
+	query := &app.GetWorkspaceMembers{
+		ID:     request.WorkspaceId,
+		UserID: user.ID,
+	}
+	result, err := h.App.Queries.GetWorkspaceMembersHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	dto, err := toWorkspaceMembersDTO(result)
+	if err != nil {
+		return nil, err
+	}
+	return note.GetWorkspaceMembers200JSONResponse(dto), nil
 }
 
 func (h *StrictHandler) UpdateWorkspaceMembers(
 	ctx context.Context,
 	request note.UpdateWorkspaceMembersRequestObject,
 ) (note.UpdateWorkspaceMembersResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
+
+	members, err := toWorkspaceMemberUpdates(*request.Body)
+	if err != nil {
+		return nil, err
+	}
+	cmd := &app.UpdateWorkspaceMembers{
+		WorkspaceID: request.WorkspaceId,
+		UserID:      user.ID,
+		Members:     members,
+	}
+	if err = h.App.Cmds.UpdateWorkspaceMembersHandler.Handle(ctx, cmd); err != nil {
+		return nil, err
+	}
+
+	return note.UpdateWorkspaceMembers204Response{}, nil
 }
 
 func (h *StrictHandler) MoveWorkspaceItems(
@@ -213,7 +273,7 @@ func (h *StrictHandler) PublishWorkspace(
 	ctx context.Context,
 	request note.PublishWorkspaceRequestObject,
 ) (note.PublishWorkspaceResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	return nil, errs.Unimplemented
 }
 
 func (h *StrictHandler) RenameWorkspace(
@@ -288,7 +348,7 @@ func (h *StrictHandler) ShowTrash(
 		return nil, err
 	}
 
-	dto, err := toShowTrash(result)
+	dto, err := toShowTrashDTO(result)
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +409,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 		return nil, err
 	}
 
-	dto := toWorkspaceTreeFolder(result)
+	dto := toWorkspaceTreeFolderDTO(result)
 	return note.GetWorkspaceTree200JSONResponse(dto), nil
 }
 
@@ -357,7 +417,7 @@ func (h *StrictHandler) UnpublishWorkspace(
 	ctx context.Context,
 	request note.UnpublishWorkspaceRequestObject,
 ) (note.UnpublishWorkspaceResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	return nil, errs.Unimplemented
 }
 
 func (h *StrictHandler) PermanentlyDeleteWorkspaceItems(

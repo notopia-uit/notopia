@@ -22,6 +22,8 @@ services:
     depends_on:
       authentik_postgresql:
         condition: service_healthy
+      authentik_worker:
+        condition: service_started
     restart: unless-stopped
 
   authentik_worker:

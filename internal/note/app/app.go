@@ -23,6 +23,7 @@ type Cmds struct {
 
 type Queries struct {
 	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler
+	GetMyWorkspacesHandler          *GetMyWorkspacesHandler
 	GetNoteGraphHandler             *GetNoteGraphHandler
 	GetNoteHandler                  *GetNoteHandler
 	GetNoteLinksHandler             *GetNoteLinksHandler

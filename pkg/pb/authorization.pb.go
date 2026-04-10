@@ -178,6 +178,58 @@ func (WorkspaceItemPermission) EnumDescriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{2}
 }
 
+type UserWorkspace struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Role          WorkspaceRole          `protobuf:"varint,2,opt,name=role,proto3,enum=authorization.WorkspaceRole" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserWorkspace) Reset() {
+	*x = UserWorkspace{}
+	mi := &file_authorization_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserWorkspace) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserWorkspace) ProtoMessage() {}
+
+func (x *UserWorkspace) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserWorkspace.ProtoReflect.Descriptor instead.
+func (*UserWorkspace) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *UserWorkspace) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UserWorkspace) GetRole() WorkspaceRole {
+	if x != nil {
+		return x.Role
+	}
+	return WorkspaceRole_WORKSPACE_ROLE_UNSPECIFIED
+}
+
 type GetUserWorkspacesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -187,7 +239,7 @@ type GetUserWorkspacesRequest struct {
 
 func (x *GetUserWorkspacesRequest) Reset() {
 	*x = GetUserWorkspacesRequest{}
-	mi := &file_authorization_proto_msgTypes[0]
+	mi := &file_authorization_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -199,7 +251,7 @@ func (x *GetUserWorkspacesRequest) String() string {
 func (*GetUserWorkspacesRequest) ProtoMessage() {}
 
 func (x *GetUserWorkspacesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[0]
+	mi := &file_authorization_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -212,7 +264,7 @@ func (x *GetUserWorkspacesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserWorkspacesRequest.ProtoReflect.Descriptor instead.
 func (*GetUserWorkspacesRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{0}
+	return file_authorization_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetUserWorkspacesRequest) GetUserId() string {
@@ -222,61 +274,9 @@ func (x *GetUserWorkspacesRequest) GetUserId() string {
 	return ""
 }
 
-type Workspace struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Role          WorkspaceRole          `protobuf:"varint,2,opt,name=role,proto3,enum=authorization.WorkspaceRole" json:"role,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Workspace) Reset() {
-	*x = Workspace{}
-	mi := &file_authorization_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Workspace) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Workspace) ProtoMessage() {}
-
-func (x *Workspace) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Workspace.ProtoReflect.Descriptor instead.
-func (*Workspace) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *Workspace) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *Workspace) GetRole() WorkspaceRole {
-	if x != nil {
-		return x.Role
-	}
-	return WorkspaceRole_WORKSPACE_ROLE_UNSPECIFIED
-}
-
 type GetUserWorkspacesResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Workspace     []*Workspace           `protobuf:"bytes,1,rep,name=workspace,proto3" json:"workspace,omitempty"`
+	Workspaces    []*UserWorkspace       `protobuf:"bytes,1,rep,name=workspaces,proto3" json:"workspaces,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -311,9 +311,9 @@ func (*GetUserWorkspacesResponse) Descriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *GetUserWorkspacesResponse) GetWorkspace() []*Workspace {
+func (x *GetUserWorkspacesResponse) GetWorkspaces() []*UserWorkspace {
 	if x != nil {
-		return x.Workspace
+		return x.Workspaces
 	}
 	return nil
 }
@@ -1062,14 +1062,16 @@ var File_authorization_proto protoreflect.FileDescriptor
 
 const file_authorization_proto_rawDesc = "" +
 	"\n" +
-	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\";\n" +
+	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\"f\n" +
+	"\rUserWorkspace\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x02id\x128\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\";\n" +
 	"\x18GetUserWorkspacesRequest\x12\x1f\n" +
-	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\"]\n" +
-	"\tWorkspace\x12\x16\n" +
-	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x128\n" +
-	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"[\n" +
-	"\x19GetUserWorkspacesResponse\x12>\n" +
-	"\tworkspace\x18\x01 \x03(\v2\x18.authorization.WorkspaceB\x06\xbaH\x03\xc8\x01\x01R\tworkspace\"t\n" +
+	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\"a\n" +
+	"\x19GetUserWorkspacesResponse\x12D\n" +
+	"\n" +
+	"workspaces\x18\x01 \x03(\v2\x1c.authorization.UserWorkspaceB\x06\xbaH\x03\xc8\x01\x01R\n" +
+	"workspaces\"t\n" +
 	"\x1fCreateWorkspaceWithOwnerRequest\x12!\n" +
 	"\bowner_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\aownerId\x12.\n" +
 	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"\"\n" +
@@ -1159,8 +1161,8 @@ var file_authorization_proto_goTypes = []any{
 	(WorkspaceRole)(0),                              // 0: authorization.WorkspaceRole
 	(WorkspacePermission)(0),                        // 1: authorization.WorkspacePermission
 	(WorkspaceItemPermission)(0),                    // 2: authorization.WorkspaceItemPermission
-	(*GetUserWorkspacesRequest)(nil),                // 3: authorization.GetUserWorkspacesRequest
-	(*Workspace)(nil),                               // 4: authorization.Workspace
+	(*UserWorkspace)(nil),                           // 3: authorization.UserWorkspace
+	(*GetUserWorkspacesRequest)(nil),                // 4: authorization.GetUserWorkspacesRequest
 	(*GetUserWorkspacesResponse)(nil),               // 5: authorization.GetUserWorkspacesResponse
 	(*CreateWorkspaceWithOwnerRequest)(nil),         // 6: authorization.CreateWorkspaceWithOwnerRequest
 	(*CreateWorkspaceWithOwnerResponse)(nil),        // 7: authorization.CreateWorkspaceWithOwnerResponse
@@ -1179,14 +1181,14 @@ var file_authorization_proto_goTypes = []any{
 	(*DeleteWorkspaceResponse)(nil),                 // 20: authorization.DeleteWorkspaceResponse
 }
 var file_authorization_proto_depIdxs = []int32{
-	0,  // 0: authorization.Workspace.role:type_name -> authorization.WorkspaceRole
-	4,  // 1: authorization.GetUserWorkspacesResponse.workspace:type_name -> authorization.Workspace
+	0,  // 0: authorization.UserWorkspace.role:type_name -> authorization.WorkspaceRole
+	3,  // 1: authorization.GetUserWorkspacesResponse.workspaces:type_name -> authorization.UserWorkspace
 	0,  // 2: authorization.WorkspaceMember.role:type_name -> authorization.WorkspaceRole
 	8,  // 3: authorization.UpdateWorkspaceMembersRequest.members:type_name -> authorization.WorkspaceMember
 	8,  // 4: authorization.GetWorkspaceMembersResponse.members:type_name -> authorization.WorkspaceMember
 	1,  // 5: authorization.HasWorkspacePermissionRequest.permission:type_name -> authorization.WorkspacePermission
 	2,  // 6: authorization.HasWorkspaceItemPermissionRequest.permission:type_name -> authorization.WorkspaceItemPermission
-	3,  // 7: authorization.AuthorizationService.GetUserWorkspaces:input_type -> authorization.GetUserWorkspacesRequest
+	4,  // 7: authorization.AuthorizationService.GetUserWorkspaces:input_type -> authorization.GetUserWorkspacesRequest
 	6,  // 8: authorization.AuthorizationService.CreateWorkspaceWithOwner:input_type -> authorization.CreateWorkspaceWithOwnerRequest
 	9,  // 9: authorization.AuthorizationService.UpdateWorkspaceMembers:input_type -> authorization.UpdateWorkspaceMembersRequest
 	11, // 10: authorization.AuthorizationService.GetWorkspaceMembers:input_type -> authorization.GetWorkspaceMembersRequest

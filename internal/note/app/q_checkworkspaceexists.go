@@ -9,7 +9,7 @@ type CheckWorkspaceSlugExists struct {
 }
 
 type CheckWorkspaceSlugExistsReadModel interface {
-	CheckWorkspaceSlugExists(ctx context.Context, q *CheckWorkspaceSlugExists) (*CheckWorkspaceSlugExistsResult, error)
+	CheckWorkspaceSlugExists(ctx context.Context, q *CheckWorkspaceSlugExists) (bool, error)
 }
 
 type CheckWorkspaceSlugExistsHandler struct {
@@ -22,6 +22,6 @@ func NewCheckWorkspaceSlugExistsHandler(readModel CheckWorkspaceSlugExistsReadMo
 
 var ProvideCheckWorkspaceSlugExistsHandler = NewCheckWorkspaceSlugExistsHandler
 
-func (h *CheckWorkspaceSlugExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceSlugExists) (*CheckWorkspaceSlugExistsResult, error) {
+func (h *CheckWorkspaceSlugExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceSlugExists) (bool, error) {
 	return h.readModel.CheckWorkspaceSlugExists(ctx, query)
 }

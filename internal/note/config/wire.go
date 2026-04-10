@@ -10,6 +10,7 @@ var ProviderSet = wire.NewSet(
 	wire.FieldsOf(
 		new(*Config),
 		"Advanced",
+		"Authentik",
 		"Database",
 		"General",
 		"Kafka",

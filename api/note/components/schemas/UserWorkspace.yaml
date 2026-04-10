@@ -1,9 +1,11 @@
 # vim: ft=yaml.openapi
-allOf:
-  - $ref: ../schemas/Workspace.yaml
-  - type: object
-    properties:
-      role:
-        $ref: ../schemas/WorkspaceRole.yaml
-    required:
-      - role
+type: object
+properties:
+  workspace:
+    $ref: ../schemas/Workspace.yaml
+  role:
+    $ref: ../schemas/WorkspaceRole.yaml
+
+required:
+  - workspace
+  - role

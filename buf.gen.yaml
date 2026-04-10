@@ -12,6 +12,7 @@ plugins:
     out: ./pkg/pb/
     opt:
       - paths=source_relative
+      - require_unimplemented_servers=true
   - remote: buf.build/community/stephenh-ts-proto:v2.11.6
     out: ./packages/pb/src
     opt:

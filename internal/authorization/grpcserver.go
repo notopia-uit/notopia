@@ -83,13 +83,7 @@ func NewGRPCServer(
 	}
 	pb.RegisterAuthorizationServiceServer(
 		server,
-		&struct {
-			*GRPCServiceServer
-			pb.UnimplementedAuthorizationServiceServer
-		}{
-			serviceServer,
-			pb.UnimplementedAuthorizationServiceServer,
-		},
+		serviceServer,
 	)
 	cleanup := func() {
 		server.GracefulStop()

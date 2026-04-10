@@ -1,0 +1,76 @@
+package identity
+
+import (
+	"context"
+	"strconv"
+
+	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	"goauthentik.io/api/v3"
+	"golang.org/x/sync/errgroup"
+)
+
+type Authentik struct {
+	client *api.APIClient
+	token  string
+}
+
+func NewAuthentik(
+	cfg *commonconfig.Authentik,
+) *Authentik {
+	authentikCfg := api.NewConfiguration()
+	authentikCfg.Host = cfg.Host
+	authentikCfg.Servers = api.ServerConfigurations{
+		{
+			URL: cfg.URL,
+		},
+	}
+	client := api.NewAPIClient(authentikCfg)
+	return &Authentik{
+		client: client,
+		token:  cfg.Token,
+	}
+}
+
+var ProvideAuthentik = NewAuthentik
+
+var _ app.IdentityService = (*Authentik)(nil)
+
+// Due to limitation of Authentik API, we have to retrieve users one by one
+func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]*app.User, error) {
+	ctx = context.WithValue(ctx, api.ContextAccessToken, a.token)
+	result := make([]*app.User, len(ids))
+
+	g, ctx := errgroup.WithContext(ctx)
+	g.SetLimit(10)
+
+	for i, id := range ids {
+		g.Go(func() error {
+			userID, err := strconv.Atoi(id)
+			if err != nil {
+				return errs.NewIdentityUserIDInvalid(id, err)
+			}
+
+			user, _, err := a.client.CoreApi.CoreUsersRetrieve(ctx, int32(userID)).Execute()
+			if err != nil {
+				return err
+			}
+
+			result[i] = &app.User{
+				ID:     id,
+				Name:   user.GetName(),
+				Email:  user.GetEmail(),
+				Groups: user.GetGroups(),
+				Roles:  user.GetRoles(),
+			}
+			return nil
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

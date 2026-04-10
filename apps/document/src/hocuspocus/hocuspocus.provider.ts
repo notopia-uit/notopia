@@ -37,9 +37,11 @@ export const HocuspocusProvider: Provider = {
       async onAuthenticate(data) {
         const documentId = data.documentName;
         const context = data.context as HocuspocusContext;
-        const noteExistenceRes =
-          await noteService.checkNoteExistence(documentId);
-        if (!noteExistenceRes) {
+        const note = await noteService.getNoteById({
+          noteId: documentId,
+          userId: context.user.id,
+        });
+        if (!note) {
           throw new Error(`Document with ID ${documentId} does not exist`);
         }
         const userPermissionsRes =
@@ -52,7 +54,7 @@ export const HocuspocusProvider: Provider = {
             `User ${context.user.id} does not have permission to access document ${documentId}`
           );
         }
-        if (!userPermissionsRes.canWrite) {
+        if (!userPermissionsRes.canWrite || note.trashed) {
           data.connectionConfig.readOnly = true;
         }
       },
@@ -62,6 +64,8 @@ export const HocuspocusProvider: Provider = {
         const connection = data.connection;
         const userId = context.user.id;
 
+        // TODO: Perf issue, this will call auth service for every saving
+        // Consider authorization service emit event, and let hocuspocus controller listen and mutate
         const response = await authorizationService.getUserNotePermissions(
           userId,
           data.documentName

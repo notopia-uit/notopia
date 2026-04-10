@@ -70,6 +70,31 @@ func NewAuthorization(
 
 var ProvideAuthorization = NewAuthorization
 
+func (a *Authorization) GetUserWorkspaces(ctx context.Context, userID string) ([]*app.AuthorizationUserWorkspace, error) {
+	response, err := a.client.GetUserWorkspaces(ctx, &pb.GetUserWorkspacesRequest{
+		UserId: userID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	workspaces := make([]*app.AuthorizationUserWorkspace, len(response.Workspaces))
+	for i, w := range response.Workspaces {
+		id, err := uuid.Parse(w.Id)
+		if err != nil {
+			return nil, errs.NewAuthorizationInternal(fmt.Errorf("invalid workspace ID: %w", err))
+		}
+		role, err := a.toAppWorkspaceRole(w.Role)
+		if err != nil {
+			return nil, err
+		}
+		workspaces[i] = &app.AuthorizationUserWorkspace{
+			ID:   id,
+			Role: role,
+		}
+	}
+	return workspaces, nil
+}
+
 func (a *Authorization) CreateWorkspaceWithOwner(ctx context.Context, ownerID string, workspaceID uuid.UUID) error {
 	_, err := a.client.CreateWorkspaceWithOwner(ctx, &pb.CreateWorkspaceWithOwnerRequest{
 		OwnerId:     ownerID,
@@ -79,7 +104,7 @@ func (a *Authorization) CreateWorkspaceWithOwner(ctx context.Context, ownerID st
 }
 
 func (a *Authorization) HasWorkspacePermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspacePermission) (bool, error) {
-	perm, err := a.toWorkspacePermissionProto(permission)
+	perm, err := a.toAppWorkspacePermission(permission)
 	if err != nil {
 		return false, err
 	}
@@ -95,7 +120,7 @@ func (a *Authorization) HasWorkspacePermission(ctx context.Context, userID strin
 }
 
 func (a *Authorization) HasWorkspaceItemPermission(ctx context.Context, userID string, workspaceID uuid.UUID, permission app.WorkspaceItemPermission) (bool, error) {
-	perm, err := a.toWorkspaceItemPermissionProto(permission)
+	perm, err := a.toAppWorkspaceItemPermission(permission)
 	if err != nil {
 		return false, err
 	}
@@ -114,16 +139,31 @@ func (a *Authorization) UpdateWorkspaceMembers(
 	ctx context.Context,
 	userID string,
 	workspaceID uuid.UUID,
-	members []app.WorkspaceMemberUpdate,
+	members []*app.WorkspaceMemberUpdate,
 ) error {
-	return errs.NewUnimplemented()
+	return errs.Unimplemented
 }
 
-func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]*app.WorkspaceMemberInfo, error) {
-	return nil, errs.NewUnimplemented()
+func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]*app.AuthorizationWorkspaceMember, error) {
+	return nil, errs.Unimplemented
 }
 
-func (a *Authorization) toWorkspacePermissionProto(permission app.WorkspacePermission) (pb.WorkspacePermission, error) {
+func (a *Authorization) toAppWorkspaceRole(role pb.WorkspaceRole) (app.WorkspaceRole, error) {
+	switch role {
+	case pb.WorkspaceRole_WORKSPACE_ROLE_OWNER:
+		return app.WorkspaceRoleOwner, nil
+	case pb.WorkspaceRole_WORKSPACE_ROLE_EDITOR:
+		return app.WorkspaceRoleEditor, nil
+	case pb.WorkspaceRole_WORKSPACE_ROLE_VIEWER:
+		return app.WorkspaceRoleViewer, nil
+	case pb.WorkspaceRole_WORKSPACE_ROLE_UNSPECIFIED:
+		return app.WorkspaceRoleUnspecified, nil
+	default:
+		return app.WorkspaceRoleUnspecified, errs.NewAuthorizationInternal(fmt.Errorf("invalid workspace role: %v", role))
+	}
+}
+
+func (a *Authorization) toAppWorkspacePermission(permission app.WorkspacePermission) (pb.WorkspacePermission, error) {
 	switch permission {
 	case app.WorkspacePermissionRead:
 		return pb.WorkspacePermission_WORKSPACE_PERMISSION_READ, nil
@@ -134,11 +174,11 @@ func (a *Authorization) toWorkspacePermissionProto(permission app.WorkspacePermi
 	case app.WorkspacePermissionUnspecified:
 		return pb.WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED, nil
 	default:
-		return pb.WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid workspace permission: %v", permission), nil)
+		return pb.WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid workspace permission: %v", permission))
 	}
 }
 
-func (a *Authorization) toWorkspaceItemPermissionProto(permission app.WorkspaceItemPermission) (pb.WorkspaceItemPermission, error) {
+func (a *Authorization) toAppWorkspaceItemPermission(permission app.WorkspaceItemPermission) (pb.WorkspaceItemPermission, error) {
 	switch permission {
 	case app.WorkspaceItemPermissionRead:
 		return pb.WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_READ, nil
@@ -149,6 +189,6 @@ func (a *Authorization) toWorkspaceItemPermissionProto(permission app.WorkspaceI
 	case app.WorkspaceItemPermissionUnspecified:
 		return pb.WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_UNSPECIFIED, nil
 	default:
-		return pb.WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid workspace item permission: %v", permission), nil)
+		return pb.WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid workspace item permission: %v", permission))
 	}
 }
