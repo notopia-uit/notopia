@@ -178,6 +178,146 @@ func (WorkspaceItemPermission) EnumDescriptor() ([]byte, []int) {
 	return file_authorization_proto_rawDescGZIP(), []int{2}
 }
 
+type GetUserWorkspacesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserWorkspacesRequest) Reset() {
+	*x = GetUserWorkspacesRequest{}
+	mi := &file_authorization_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserWorkspacesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserWorkspacesRequest) ProtoMessage() {}
+
+func (x *GetUserWorkspacesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserWorkspacesRequest.ProtoReflect.Descriptor instead.
+func (*GetUserWorkspacesRequest) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *GetUserWorkspacesRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type Workspace struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Role          WorkspaceRole          `protobuf:"varint,2,opt,name=role,proto3,enum=authorization.WorkspaceRole" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Workspace) Reset() {
+	*x = Workspace{}
+	mi := &file_authorization_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Workspace) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Workspace) ProtoMessage() {}
+
+func (x *Workspace) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Workspace.ProtoReflect.Descriptor instead.
+func (*Workspace) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Workspace) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Workspace) GetRole() WorkspaceRole {
+	if x != nil {
+		return x.Role
+	}
+	return WorkspaceRole_WORKSPACE_ROLE_UNSPECIFIED
+}
+
+type GetUserWorkspacesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Workspace     []*Workspace           `protobuf:"bytes,1,rep,name=workspace,proto3" json:"workspace,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserWorkspacesResponse) Reset() {
+	*x = GetUserWorkspacesResponse{}
+	mi := &file_authorization_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserWorkspacesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserWorkspacesResponse) ProtoMessage() {}
+
+func (x *GetUserWorkspacesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_authorization_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserWorkspacesResponse.ProtoReflect.Descriptor instead.
+func (*GetUserWorkspacesResponse) Descriptor() ([]byte, []int) {
+	return file_authorization_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetUserWorkspacesResponse) GetWorkspace() []*Workspace {
+	if x != nil {
+		return x.Workspace
+	}
+	return nil
+}
+
 type CreateWorkspaceWithOwnerRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	OwnerId       string                 `protobuf:"bytes,1,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
@@ -188,7 +328,7 @@ type CreateWorkspaceWithOwnerRequest struct {
 
 func (x *CreateWorkspaceWithOwnerRequest) Reset() {
 	*x = CreateWorkspaceWithOwnerRequest{}
-	mi := &file_authorization_proto_msgTypes[0]
+	mi := &file_authorization_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -200,7 +340,7 @@ func (x *CreateWorkspaceWithOwnerRequest) String() string {
 func (*CreateWorkspaceWithOwnerRequest) ProtoMessage() {}
 
 func (x *CreateWorkspaceWithOwnerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[0]
+	mi := &file_authorization_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -213,7 +353,7 @@ func (x *CreateWorkspaceWithOwnerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateWorkspaceWithOwnerRequest.ProtoReflect.Descriptor instead.
 func (*CreateWorkspaceWithOwnerRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{0}
+	return file_authorization_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CreateWorkspaceWithOwnerRequest) GetOwnerId() string {
@@ -238,7 +378,7 @@ type CreateWorkspaceWithOwnerResponse struct {
 
 func (x *CreateWorkspaceWithOwnerResponse) Reset() {
 	*x = CreateWorkspaceWithOwnerResponse{}
-	mi := &file_authorization_proto_msgTypes[1]
+	mi := &file_authorization_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -250,7 +390,7 @@ func (x *CreateWorkspaceWithOwnerResponse) String() string {
 func (*CreateWorkspaceWithOwnerResponse) ProtoMessage() {}
 
 func (x *CreateWorkspaceWithOwnerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[1]
+	mi := &file_authorization_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -263,7 +403,7 @@ func (x *CreateWorkspaceWithOwnerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateWorkspaceWithOwnerResponse.ProtoReflect.Descriptor instead.
 func (*CreateWorkspaceWithOwnerResponse) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{1}
+	return file_authorization_proto_rawDescGZIP(), []int{4}
 }
 
 type WorkspaceMember struct {
@@ -276,7 +416,7 @@ type WorkspaceMember struct {
 
 func (x *WorkspaceMember) Reset() {
 	*x = WorkspaceMember{}
-	mi := &file_authorization_proto_msgTypes[2]
+	mi := &file_authorization_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -288,7 +428,7 @@ func (x *WorkspaceMember) String() string {
 func (*WorkspaceMember) ProtoMessage() {}
 
 func (x *WorkspaceMember) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[2]
+	mi := &file_authorization_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -301,7 +441,7 @@ func (x *WorkspaceMember) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkspaceMember.ProtoReflect.Descriptor instead.
 func (*WorkspaceMember) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{2}
+	return file_authorization_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *WorkspaceMember) GetId() string {
@@ -329,7 +469,7 @@ type UpdateWorkspaceMembersRequest struct {
 
 func (x *UpdateWorkspaceMembersRequest) Reset() {
 	*x = UpdateWorkspaceMembersRequest{}
-	mi := &file_authorization_proto_msgTypes[3]
+	mi := &file_authorization_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -341,7 +481,7 @@ func (x *UpdateWorkspaceMembersRequest) String() string {
 func (*UpdateWorkspaceMembersRequest) ProtoMessage() {}
 
 func (x *UpdateWorkspaceMembersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[3]
+	mi := &file_authorization_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -354,7 +494,7 @@ func (x *UpdateWorkspaceMembersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateWorkspaceMembersRequest.ProtoReflect.Descriptor instead.
 func (*UpdateWorkspaceMembersRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{3}
+	return file_authorization_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UpdateWorkspaceMembersRequest) GetUserId() string {
@@ -386,7 +526,7 @@ type UpdateWorkspaceMembersResponse struct {
 
 func (x *UpdateWorkspaceMembersResponse) Reset() {
 	*x = UpdateWorkspaceMembersResponse{}
-	mi := &file_authorization_proto_msgTypes[4]
+	mi := &file_authorization_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -398,7 +538,7 @@ func (x *UpdateWorkspaceMembersResponse) String() string {
 func (*UpdateWorkspaceMembersResponse) ProtoMessage() {}
 
 func (x *UpdateWorkspaceMembersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[4]
+	mi := &file_authorization_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -411,7 +551,7 @@ func (x *UpdateWorkspaceMembersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateWorkspaceMembersResponse.ProtoReflect.Descriptor instead.
 func (*UpdateWorkspaceMembersResponse) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{4}
+	return file_authorization_proto_rawDescGZIP(), []int{7}
 }
 
 type GetWorkspaceMembersRequest struct {
@@ -424,7 +564,7 @@ type GetWorkspaceMembersRequest struct {
 
 func (x *GetWorkspaceMembersRequest) Reset() {
 	*x = GetWorkspaceMembersRequest{}
-	mi := &file_authorization_proto_msgTypes[5]
+	mi := &file_authorization_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -436,7 +576,7 @@ func (x *GetWorkspaceMembersRequest) String() string {
 func (*GetWorkspaceMembersRequest) ProtoMessage() {}
 
 func (x *GetWorkspaceMembersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[5]
+	mi := &file_authorization_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -449,7 +589,7 @@ func (x *GetWorkspaceMembersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWorkspaceMembersRequest.ProtoReflect.Descriptor instead.
 func (*GetWorkspaceMembersRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{5}
+	return file_authorization_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetWorkspaceMembersRequest) GetUserId() string {
@@ -475,7 +615,7 @@ type GetWorkspaceMembersResponse struct {
 
 func (x *GetWorkspaceMembersResponse) Reset() {
 	*x = GetWorkspaceMembersResponse{}
-	mi := &file_authorization_proto_msgTypes[6]
+	mi := &file_authorization_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -487,7 +627,7 @@ func (x *GetWorkspaceMembersResponse) String() string {
 func (*GetWorkspaceMembersResponse) ProtoMessage() {}
 
 func (x *GetWorkspaceMembersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[6]
+	mi := &file_authorization_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -500,7 +640,7 @@ func (x *GetWorkspaceMembersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWorkspaceMembersResponse.ProtoReflect.Descriptor instead.
 func (*GetWorkspaceMembersResponse) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{6}
+	return file_authorization_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetWorkspaceMembersResponse) GetMembers() []*WorkspaceMember {
@@ -521,7 +661,7 @@ type HasWorkspacePermissionRequest struct {
 
 func (x *HasWorkspacePermissionRequest) Reset() {
 	*x = HasWorkspacePermissionRequest{}
-	mi := &file_authorization_proto_msgTypes[7]
+	mi := &file_authorization_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -533,7 +673,7 @@ func (x *HasWorkspacePermissionRequest) String() string {
 func (*HasWorkspacePermissionRequest) ProtoMessage() {}
 
 func (x *HasWorkspacePermissionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[7]
+	mi := &file_authorization_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -546,7 +686,7 @@ func (x *HasWorkspacePermissionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HasWorkspacePermissionRequest.ProtoReflect.Descriptor instead.
 func (*HasWorkspacePermissionRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{7}
+	return file_authorization_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *HasWorkspacePermissionRequest) GetMemberId() string {
@@ -579,7 +719,7 @@ type HasWorkspacePermissionResponse struct {
 
 func (x *HasWorkspacePermissionResponse) Reset() {
 	*x = HasWorkspacePermissionResponse{}
-	mi := &file_authorization_proto_msgTypes[8]
+	mi := &file_authorization_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -591,7 +731,7 @@ func (x *HasWorkspacePermissionResponse) String() string {
 func (*HasWorkspacePermissionResponse) ProtoMessage() {}
 
 func (x *HasWorkspacePermissionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[8]
+	mi := &file_authorization_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -604,7 +744,7 @@ func (x *HasWorkspacePermissionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HasWorkspacePermissionResponse.ProtoReflect.Descriptor instead.
 func (*HasWorkspacePermissionResponse) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{8}
+	return file_authorization_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *HasWorkspacePermissionResponse) GetHasPermission() bool {
@@ -625,7 +765,7 @@ type HasWorkspaceItemPermissionRequest struct {
 
 func (x *HasWorkspaceItemPermissionRequest) Reset() {
 	*x = HasWorkspaceItemPermissionRequest{}
-	mi := &file_authorization_proto_msgTypes[9]
+	mi := &file_authorization_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -637,7 +777,7 @@ func (x *HasWorkspaceItemPermissionRequest) String() string {
 func (*HasWorkspaceItemPermissionRequest) ProtoMessage() {}
 
 func (x *HasWorkspaceItemPermissionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[9]
+	mi := &file_authorization_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -650,7 +790,7 @@ func (x *HasWorkspaceItemPermissionRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use HasWorkspaceItemPermissionRequest.ProtoReflect.Descriptor instead.
 func (*HasWorkspaceItemPermissionRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{9}
+	return file_authorization_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *HasWorkspaceItemPermissionRequest) GetMemberId() string {
@@ -683,7 +823,7 @@ type HasWorkspaceItemPermissionResponse struct {
 
 func (x *HasWorkspaceItemPermissionResponse) Reset() {
 	*x = HasWorkspaceItemPermissionResponse{}
-	mi := &file_authorization_proto_msgTypes[10]
+	mi := &file_authorization_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -695,7 +835,7 @@ func (x *HasWorkspaceItemPermissionResponse) String() string {
 func (*HasWorkspaceItemPermissionResponse) ProtoMessage() {}
 
 func (x *HasWorkspaceItemPermissionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[10]
+	mi := &file_authorization_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -708,7 +848,7 @@ func (x *HasWorkspaceItemPermissionResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use HasWorkspaceItemPermissionResponse.ProtoReflect.Descriptor instead.
 func (*HasWorkspaceItemPermissionResponse) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{10}
+	return file_authorization_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *HasWorkspaceItemPermissionResponse) GetHasPermission() bool {
@@ -728,7 +868,7 @@ type GetUserWorkspaceItemPermissionsRequest struct {
 
 func (x *GetUserWorkspaceItemPermissionsRequest) Reset() {
 	*x = GetUserWorkspaceItemPermissionsRequest{}
-	mi := &file_authorization_proto_msgTypes[11]
+	mi := &file_authorization_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -740,7 +880,7 @@ func (x *GetUserWorkspaceItemPermissionsRequest) String() string {
 func (*GetUserWorkspaceItemPermissionsRequest) ProtoMessage() {}
 
 func (x *GetUserWorkspaceItemPermissionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[11]
+	mi := &file_authorization_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -753,7 +893,7 @@ func (x *GetUserWorkspaceItemPermissionsRequest) ProtoReflect() protoreflect.Mes
 
 // Deprecated: Use GetUserWorkspaceItemPermissionsRequest.ProtoReflect.Descriptor instead.
 func (*GetUserWorkspaceItemPermissionsRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{11}
+	return file_authorization_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetUserWorkspaceItemPermissionsRequest) GetMemberId() string {
@@ -781,7 +921,7 @@ type GetUserWorkspaceItemPermissionsResponse struct {
 
 func (x *GetUserWorkspaceItemPermissionsResponse) Reset() {
 	*x = GetUserWorkspaceItemPermissionsResponse{}
-	mi := &file_authorization_proto_msgTypes[12]
+	mi := &file_authorization_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -793,7 +933,7 @@ func (x *GetUserWorkspaceItemPermissionsResponse) String() string {
 func (*GetUserWorkspaceItemPermissionsResponse) ProtoMessage() {}
 
 func (x *GetUserWorkspaceItemPermissionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[12]
+	mi := &file_authorization_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -806,7 +946,7 @@ func (x *GetUserWorkspaceItemPermissionsResponse) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use GetUserWorkspaceItemPermissionsResponse.ProtoReflect.Descriptor instead.
 func (*GetUserWorkspaceItemPermissionsResponse) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{12}
+	return file_authorization_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GetUserWorkspaceItemPermissionsResponse) GetCanRead() bool {
@@ -840,7 +980,7 @@ type DeleteWorkspaceRequest struct {
 
 func (x *DeleteWorkspaceRequest) Reset() {
 	*x = DeleteWorkspaceRequest{}
-	mi := &file_authorization_proto_msgTypes[13]
+	mi := &file_authorization_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -852,7 +992,7 @@ func (x *DeleteWorkspaceRequest) String() string {
 func (*DeleteWorkspaceRequest) ProtoMessage() {}
 
 func (x *DeleteWorkspaceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[13]
+	mi := &file_authorization_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -865,7 +1005,7 @@ func (x *DeleteWorkspaceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteWorkspaceRequest.ProtoReflect.Descriptor instead.
 func (*DeleteWorkspaceRequest) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{13}
+	return file_authorization_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *DeleteWorkspaceRequest) GetUserId() string {
@@ -890,7 +1030,7 @@ type DeleteWorkspaceResponse struct {
 
 func (x *DeleteWorkspaceResponse) Reset() {
 	*x = DeleteWorkspaceResponse{}
-	mi := &file_authorization_proto_msgTypes[14]
+	mi := &file_authorization_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -902,7 +1042,7 @@ func (x *DeleteWorkspaceResponse) String() string {
 func (*DeleteWorkspaceResponse) ProtoMessage() {}
 
 func (x *DeleteWorkspaceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_authorization_proto_msgTypes[14]
+	mi := &file_authorization_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -915,14 +1055,21 @@ func (x *DeleteWorkspaceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteWorkspaceResponse.ProtoReflect.Descriptor instead.
 func (*DeleteWorkspaceResponse) Descriptor() ([]byte, []int) {
-	return file_authorization_proto_rawDescGZIP(), []int{14}
+	return file_authorization_proto_rawDescGZIP(), []int{17}
 }
 
 var File_authorization_proto protoreflect.FileDescriptor
 
 const file_authorization_proto_rawDesc = "" +
 	"\n" +
-	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\"t\n" +
+	"\x13authorization.proto\x12\rauthorization\x1a\x1bbuf/validate/validate.proto\";\n" +
+	"\x18GetUserWorkspacesRequest\x12\x1f\n" +
+	"\auser_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\"]\n" +
+	"\tWorkspace\x12\x16\n" +
+	"\x02id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x02id\x128\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x1c.authorization.WorkspaceRoleB\x06\xbaH\x03\xc8\x01\x01R\x04role\"[\n" +
+	"\x19GetUserWorkspacesResponse\x12>\n" +
+	"\tworkspace\x18\x01 \x03(\v2\x18.authorization.WorkspaceB\x06\xbaH\x03\xc8\x01\x01R\tworkspace\"t\n" +
 	"\x1fCreateWorkspaceWithOwnerRequest\x12!\n" +
 	"\bowner_id\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\aownerId\x12.\n" +
 	"\fworkspace_id\x18\x02 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId\"\"\n" +
@@ -982,8 +1129,9 @@ const file_authorization_proto_rawDesc = "" +
 	"%WORKSPACE_ITEM_PERMISSION_UNSPECIFIED\x10\x00\x12\"\n" +
 	"\x1eWORKSPACE_ITEM_PERMISSION_READ\x10\x01\x12#\n" +
 	"\x1fWORKSPACE_ITEM_PERMISSION_WRITE\x10\x02\x12$\n" +
-	" WORKSPACE_ITEM_PERMISSION_DELETE\x10\x032\xe8\x06\n" +
-	"\x14AuthorizationService\x12{\n" +
+	" WORKSPACE_ITEM_PERMISSION_DELETE\x10\x032\xd0\a\n" +
+	"\x14AuthorizationService\x12f\n" +
+	"\x11GetUserWorkspaces\x12'.authorization.GetUserWorkspacesRequest\x1a(.authorization.GetUserWorkspacesResponse\x12{\n" +
 	"\x18CreateWorkspaceWithOwner\x12..authorization.CreateWorkspaceWithOwnerRequest\x1a/.authorization.CreateWorkspaceWithOwnerResponse\x12u\n" +
 	"\x16UpdateWorkspaceMembers\x12,.authorization.UpdateWorkspaceMembersRequest\x1a-.authorization.UpdateWorkspaceMembersResponse\x12l\n" +
 	"\x13GetWorkspaceMembers\x12).authorization.GetWorkspaceMembersRequest\x1a*.authorization.GetWorkspaceMembersResponse\x12u\n" +
@@ -1006,52 +1154,59 @@ func file_authorization_proto_rawDescGZIP() []byte {
 }
 
 var file_authorization_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_authorization_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_authorization_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_authorization_proto_goTypes = []any{
 	(WorkspaceRole)(0),                              // 0: authorization.WorkspaceRole
 	(WorkspacePermission)(0),                        // 1: authorization.WorkspacePermission
 	(WorkspaceItemPermission)(0),                    // 2: authorization.WorkspaceItemPermission
-	(*CreateWorkspaceWithOwnerRequest)(nil),         // 3: authorization.CreateWorkspaceWithOwnerRequest
-	(*CreateWorkspaceWithOwnerResponse)(nil),        // 4: authorization.CreateWorkspaceWithOwnerResponse
-	(*WorkspaceMember)(nil),                         // 5: authorization.WorkspaceMember
-	(*UpdateWorkspaceMembersRequest)(nil),           // 6: authorization.UpdateWorkspaceMembersRequest
-	(*UpdateWorkspaceMembersResponse)(nil),          // 7: authorization.UpdateWorkspaceMembersResponse
-	(*GetWorkspaceMembersRequest)(nil),              // 8: authorization.GetWorkspaceMembersRequest
-	(*GetWorkspaceMembersResponse)(nil),             // 9: authorization.GetWorkspaceMembersResponse
-	(*HasWorkspacePermissionRequest)(nil),           // 10: authorization.HasWorkspacePermissionRequest
-	(*HasWorkspacePermissionResponse)(nil),          // 11: authorization.HasWorkspacePermissionResponse
-	(*HasWorkspaceItemPermissionRequest)(nil),       // 12: authorization.HasWorkspaceItemPermissionRequest
-	(*HasWorkspaceItemPermissionResponse)(nil),      // 13: authorization.HasWorkspaceItemPermissionResponse
-	(*GetUserWorkspaceItemPermissionsRequest)(nil),  // 14: authorization.GetUserWorkspaceItemPermissionsRequest
-	(*GetUserWorkspaceItemPermissionsResponse)(nil), // 15: authorization.GetUserWorkspaceItemPermissionsResponse
-	(*DeleteWorkspaceRequest)(nil),                  // 16: authorization.DeleteWorkspaceRequest
-	(*DeleteWorkspaceResponse)(nil),                 // 17: authorization.DeleteWorkspaceResponse
+	(*GetUserWorkspacesRequest)(nil),                // 3: authorization.GetUserWorkspacesRequest
+	(*Workspace)(nil),                               // 4: authorization.Workspace
+	(*GetUserWorkspacesResponse)(nil),               // 5: authorization.GetUserWorkspacesResponse
+	(*CreateWorkspaceWithOwnerRequest)(nil),         // 6: authorization.CreateWorkspaceWithOwnerRequest
+	(*CreateWorkspaceWithOwnerResponse)(nil),        // 7: authorization.CreateWorkspaceWithOwnerResponse
+	(*WorkspaceMember)(nil),                         // 8: authorization.WorkspaceMember
+	(*UpdateWorkspaceMembersRequest)(nil),           // 9: authorization.UpdateWorkspaceMembersRequest
+	(*UpdateWorkspaceMembersResponse)(nil),          // 10: authorization.UpdateWorkspaceMembersResponse
+	(*GetWorkspaceMembersRequest)(nil),              // 11: authorization.GetWorkspaceMembersRequest
+	(*GetWorkspaceMembersResponse)(nil),             // 12: authorization.GetWorkspaceMembersResponse
+	(*HasWorkspacePermissionRequest)(nil),           // 13: authorization.HasWorkspacePermissionRequest
+	(*HasWorkspacePermissionResponse)(nil),          // 14: authorization.HasWorkspacePermissionResponse
+	(*HasWorkspaceItemPermissionRequest)(nil),       // 15: authorization.HasWorkspaceItemPermissionRequest
+	(*HasWorkspaceItemPermissionResponse)(nil),      // 16: authorization.HasWorkspaceItemPermissionResponse
+	(*GetUserWorkspaceItemPermissionsRequest)(nil),  // 17: authorization.GetUserWorkspaceItemPermissionsRequest
+	(*GetUserWorkspaceItemPermissionsResponse)(nil), // 18: authorization.GetUserWorkspaceItemPermissionsResponse
+	(*DeleteWorkspaceRequest)(nil),                  // 19: authorization.DeleteWorkspaceRequest
+	(*DeleteWorkspaceResponse)(nil),                 // 20: authorization.DeleteWorkspaceResponse
 }
 var file_authorization_proto_depIdxs = []int32{
-	0,  // 0: authorization.WorkspaceMember.role:type_name -> authorization.WorkspaceRole
-	5,  // 1: authorization.UpdateWorkspaceMembersRequest.members:type_name -> authorization.WorkspaceMember
-	5,  // 2: authorization.GetWorkspaceMembersResponse.members:type_name -> authorization.WorkspaceMember
-	1,  // 3: authorization.HasWorkspacePermissionRequest.permission:type_name -> authorization.WorkspacePermission
-	2,  // 4: authorization.HasWorkspaceItemPermissionRequest.permission:type_name -> authorization.WorkspaceItemPermission
-	3,  // 5: authorization.AuthorizationService.CreateWorkspaceWithOwner:input_type -> authorization.CreateWorkspaceWithOwnerRequest
-	6,  // 6: authorization.AuthorizationService.UpdateWorkspaceMembers:input_type -> authorization.UpdateWorkspaceMembersRequest
-	8,  // 7: authorization.AuthorizationService.GetWorkspaceMembers:input_type -> authorization.GetWorkspaceMembersRequest
-	10, // 8: authorization.AuthorizationService.HasWorkspacePermission:input_type -> authorization.HasWorkspacePermissionRequest
-	12, // 9: authorization.AuthorizationService.HasWorkspaceItemPermission:input_type -> authorization.HasWorkspaceItemPermissionRequest
-	14, // 10: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:input_type -> authorization.GetUserWorkspaceItemPermissionsRequest
-	16, // 11: authorization.AuthorizationService.DeleteWorkspace:input_type -> authorization.DeleteWorkspaceRequest
-	4,  // 12: authorization.AuthorizationService.CreateWorkspaceWithOwner:output_type -> authorization.CreateWorkspaceWithOwnerResponse
-	7,  // 13: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
-	9,  // 14: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
-	11, // 15: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse
-	13, // 16: authorization.AuthorizationService.HasWorkspaceItemPermission:output_type -> authorization.HasWorkspaceItemPermissionResponse
-	15, // 17: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:output_type -> authorization.GetUserWorkspaceItemPermissionsResponse
-	17, // 18: authorization.AuthorizationService.DeleteWorkspace:output_type -> authorization.DeleteWorkspaceResponse
-	12, // [12:19] is the sub-list for method output_type
-	5,  // [5:12] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	0,  // 0: authorization.Workspace.role:type_name -> authorization.WorkspaceRole
+	4,  // 1: authorization.GetUserWorkspacesResponse.workspace:type_name -> authorization.Workspace
+	0,  // 2: authorization.WorkspaceMember.role:type_name -> authorization.WorkspaceRole
+	8,  // 3: authorization.UpdateWorkspaceMembersRequest.members:type_name -> authorization.WorkspaceMember
+	8,  // 4: authorization.GetWorkspaceMembersResponse.members:type_name -> authorization.WorkspaceMember
+	1,  // 5: authorization.HasWorkspacePermissionRequest.permission:type_name -> authorization.WorkspacePermission
+	2,  // 6: authorization.HasWorkspaceItemPermissionRequest.permission:type_name -> authorization.WorkspaceItemPermission
+	3,  // 7: authorization.AuthorizationService.GetUserWorkspaces:input_type -> authorization.GetUserWorkspacesRequest
+	6,  // 8: authorization.AuthorizationService.CreateWorkspaceWithOwner:input_type -> authorization.CreateWorkspaceWithOwnerRequest
+	9,  // 9: authorization.AuthorizationService.UpdateWorkspaceMembers:input_type -> authorization.UpdateWorkspaceMembersRequest
+	11, // 10: authorization.AuthorizationService.GetWorkspaceMembers:input_type -> authorization.GetWorkspaceMembersRequest
+	13, // 11: authorization.AuthorizationService.HasWorkspacePermission:input_type -> authorization.HasWorkspacePermissionRequest
+	15, // 12: authorization.AuthorizationService.HasWorkspaceItemPermission:input_type -> authorization.HasWorkspaceItemPermissionRequest
+	17, // 13: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:input_type -> authorization.GetUserWorkspaceItemPermissionsRequest
+	19, // 14: authorization.AuthorizationService.DeleteWorkspace:input_type -> authorization.DeleteWorkspaceRequest
+	5,  // 15: authorization.AuthorizationService.GetUserWorkspaces:output_type -> authorization.GetUserWorkspacesResponse
+	7,  // 16: authorization.AuthorizationService.CreateWorkspaceWithOwner:output_type -> authorization.CreateWorkspaceWithOwnerResponse
+	10, // 17: authorization.AuthorizationService.UpdateWorkspaceMembers:output_type -> authorization.UpdateWorkspaceMembersResponse
+	12, // 18: authorization.AuthorizationService.GetWorkspaceMembers:output_type -> authorization.GetWorkspaceMembersResponse
+	14, // 19: authorization.AuthorizationService.HasWorkspacePermission:output_type -> authorization.HasWorkspacePermissionResponse
+	16, // 20: authorization.AuthorizationService.HasWorkspaceItemPermission:output_type -> authorization.HasWorkspaceItemPermissionResponse
+	18, // 21: authorization.AuthorizationService.GetUserWorkspaceItemPermissions:output_type -> authorization.GetUserWorkspaceItemPermissionsResponse
+	20, // 22: authorization.AuthorizationService.DeleteWorkspace:output_type -> authorization.DeleteWorkspaceResponse
+	15, // [15:23] is the sub-list for method output_type
+	7,  // [7:15] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_authorization_proto_init() }
@@ -1065,7 +1220,7 @@ func file_authorization_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_authorization_proto_rawDesc), len(file_authorization_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   15,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

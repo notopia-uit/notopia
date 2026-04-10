@@ -61,7 +61,7 @@ type GRPCServer struct {
 
 func NewGRPCServer(
 	ctx context.Context,
-	serviceServer pb.AuthorizationServiceServer,
+	serviceServer *GRPCServiceServer,
 	cfg *ServerConfig,
 	logger logging.Logger,
 ) (*GRPCServer, func(), error) {
@@ -81,7 +81,16 @@ func NewGRPCServer(
 		server:  server,
 		address: cfg.GRPC.Address(),
 	}
-	pb.RegisterAuthorizationServiceServer(server, serviceServer)
+	pb.RegisterAuthorizationServiceServer(
+		server,
+		&struct {
+			*GRPCServiceServer
+			pb.UnimplementedAuthorizationServiceServer
+		}{
+			serviceServer,
+			pb.UnimplementedAuthorizationServiceServer,
+		},
+	)
 	cleanup := func() {
 		server.GracefulStop()
 	}

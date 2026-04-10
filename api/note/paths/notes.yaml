@@ -17,11 +17,11 @@ post:
       description: Note successfully created
       headers:
         Content-Location:
+          required: true
           schema:
             type: string
             format: uri
             example: http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97
-          required: true
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

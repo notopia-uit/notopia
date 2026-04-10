@@ -51,6 +51,8 @@ paths:
 
   /note/workspaces:
     $ref: ./paths/workspaces.yaml
+  /note/workspaces/me:
+    $ref: ./paths/workspaces_me.yaml
   /note/workspaces-by-slug/{workspaceSlug}:
     $ref: ./paths/workspaces-by-slug_{workspaceSlug}.yaml
   /note/workspaces-by-slug/{workspaceSlug}/exists:

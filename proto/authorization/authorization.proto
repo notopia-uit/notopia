@@ -5,6 +5,7 @@ package authorization;
 import "buf/validate/validate.proto";
 
 service AuthorizationService {
+  rpc GetUserWorkspaces(GetUserWorkspacesRequest) returns (GetUserWorkspacesResponse);
   rpc CreateWorkspaceWithOwner(CreateWorkspaceWithOwnerRequest) returns (CreateWorkspaceWithOwnerResponse);
   rpc UpdateWorkspaceMembers(UpdateWorkspaceMembersRequest) returns (UpdateWorkspaceMembersResponse);
   rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns (GetWorkspaceMembersResponse);
@@ -12,6 +13,40 @@ service AuthorizationService {
   rpc HasWorkspaceItemPermission(HasWorkspaceItemPermissionRequest) returns (HasWorkspaceItemPermissionResponse);
   rpc GetUserWorkspaceItemPermissions(GetUserWorkspaceItemPermissionsRequest) returns (GetUserWorkspaceItemPermissionsResponse);
   rpc DeleteWorkspace(DeleteWorkspaceRequest) returns (DeleteWorkspaceResponse);
+}
+
+enum WorkspaceRole {
+  WORKSPACE_ROLE_UNSPECIFIED = 0;
+  WORKSPACE_ROLE_OWNER = 1;
+  WORKSPACE_ROLE_EDITOR = 2;
+  WORKSPACE_ROLE_VIEWER = 3;
+}
+
+enum WorkspacePermission {
+  WORKSPACE_PERMISSION_UNSPECIFIED = 0;
+  WORKSPACE_PERMISSION_READ = 1;
+  WORKSPACE_PERMISSION_EDIT = 2;
+  WORKSPACE_PERMISSION_DELETE = 3;
+}
+
+enum WorkspaceItemPermission {
+  WORKSPACE_ITEM_PERMISSION_UNSPECIFIED = 0;
+  WORKSPACE_ITEM_PERMISSION_READ = 1;
+  WORKSPACE_ITEM_PERMISSION_WRITE = 2;
+  WORKSPACE_ITEM_PERMISSION_DELETE = 3;
+}
+
+message GetUserWorkspacesRequest {
+  string user_id = 1 [(buf.validate.field).required = true];
+}
+
+message Workspace {
+  string id = 1 [(buf.validate.field).required = true];
+  WorkspaceRole role = 2 [(buf.validate.field).required = true];
+}
+
+message GetUserWorkspacesResponse {
+  repeated Workspace workspace = 1 [(buf.validate.field).required = true];
 }
 
 message CreateWorkspaceWithOwnerRequest {
@@ -23,13 +58,6 @@ message CreateWorkspaceWithOwnerRequest {
 }
 
 message CreateWorkspaceWithOwnerResponse {}
-
-enum WorkspaceRole {
-  WORKSPACE_ROLE_UNSPECIFIED = 0;
-  WORKSPACE_ROLE_OWNER = 1;
-  WORKSPACE_ROLE_EDITOR = 2;
-  WORKSPACE_ROLE_VIEWER = 3;
-}
 
 message WorkspaceMember {
   string id = 1 [(buf.validate.field).required = true];
@@ -59,13 +87,6 @@ message GetWorkspaceMembersResponse {
   repeated WorkspaceMember members = 1 [(buf.validate.field).required = true];
 }
 
-enum WorkspacePermission {
-  WORKSPACE_PERMISSION_UNSPECIFIED = 0;
-  WORKSPACE_PERMISSION_READ = 1;
-  WORKSPACE_PERMISSION_EDIT = 2;
-  WORKSPACE_PERMISSION_DELETE = 3;
-}
-
 message HasWorkspacePermissionRequest {
   string member_id = 1 [(buf.validate.field).required = true];
   string workspace_id = 2 [
@@ -77,13 +98,6 @@ message HasWorkspacePermissionRequest {
 
 message HasWorkspacePermissionResponse {
   bool has_permission = 1 [(buf.validate.field).required = true];
-}
-
-enum WorkspaceItemPermission {
-  WORKSPACE_ITEM_PERMISSION_UNSPECIFIED = 0;
-  WORKSPACE_ITEM_PERMISSION_READ = 1;
-  WORKSPACE_ITEM_PERMISSION_WRITE = 2;
-  WORKSPACE_ITEM_PERMISSION_DELETE = 3;
 }
 
 message HasWorkspaceItemPermissionRequest {

@@ -159,6 +159,16 @@ export const zNoteWorkspace = z.object({
     name: z.string().min(1).max(255)
 });
 
+export const zNoteWorkspaceRole = z.enum([
+    'owner',
+    'editor',
+    'viewer'
+]);
+
+export const zNoteUserWorkspace = zNoteWorkspace.and(z.object({
+    role: zNoteWorkspaceRole
+}));
+
 export const zNoteSlug = z.string();
 
 export const zNoteWorkspaceItemsUpdatedEvent = z.object({
@@ -205,12 +215,6 @@ export const zNoteUserPropertiesId = z.string();
  * Full name from Authentik
  */
 export const zNoteUserPropertiesName = z.string().nullable();
-
-export const zNoteWorkspaceRole = z.enum([
-    'owner',
-    'editor',
-    'viewer'
-]);
 
 export const zNoteWorkspaceMember = z.object({
     id: zNoteUserPropertiesId,
@@ -296,6 +300,10 @@ export const zNoteWorkspaceWritable = z.object({
     slug: z.string(),
     name: z.string().min(1).max(255)
 });
+
+export const zNoteUserWorkspaceWritable = zNoteWorkspaceWritable.and(z.object({
+    role: zNoteWorkspaceRole
+}));
 
 export const zNoteWorkspaceItemsUpdatedEventWritable = z.object({
     id: z.uuid(),
@@ -548,6 +556,11 @@ export const zUnpublishNotePath = z.object({
 export const zUnpublishNoteResponse = z.void();
 
 export const zCreateWorkspaceBody = zNoteWorkspaceWritable;
+
+/**
+ * A list of workspaces
+ */
+export const zGetMyWorkspacesResponse = z.array(zNoteUserWorkspace);
 
 export const zGetWorkspacePath = z.object({
     workspaceSlug: zNoteSlug

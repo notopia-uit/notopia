@@ -36,6 +36,19 @@ export enum WorkspaceItemPermission {
   UNRECOGNIZED = -1,
 }
 
+export interface GetUserWorkspacesRequest {
+  userId: string;
+}
+
+export interface Workspace {
+  id: string;
+  role: WorkspaceRole;
+}
+
+export interface GetUserWorkspacesResponse {
+  workspace: Workspace[];
+}
+
 export interface CreateWorkspaceWithOwnerRequest {
   ownerId: string;
   workspaceId: string;
@@ -107,6 +120,128 @@ export interface DeleteWorkspaceResponse {
 }
 
 export const AUTHORIZATION_PACKAGE_NAME = "authorization";
+
+function createBaseGetUserWorkspacesRequest(): GetUserWorkspacesRequest {
+  return { userId: "" };
+}
+
+export const GetUserWorkspacesRequest: MessageFns<GetUserWorkspacesRequest> = {
+  encode(message: GetUserWorkspacesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== "") {
+      writer.uint32(10).string(message.userId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetUserWorkspacesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetUserWorkspacesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
+
+function createBaseWorkspace(): Workspace {
+  return { id: "", role: 0 };
+}
+
+export const Workspace: MessageFns<Workspace> = {
+  encode(message: Workspace, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.role !== 0) {
+      writer.uint32(16).int32(message.role);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Workspace {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseWorkspace();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.role = reader.int32() as any;
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
+
+function createBaseGetUserWorkspacesResponse(): GetUserWorkspacesResponse {
+  return { workspace: [] };
+}
+
+export const GetUserWorkspacesResponse: MessageFns<GetUserWorkspacesResponse> = {
+  encode(message: GetUserWorkspacesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.workspace) {
+      Workspace.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetUserWorkspacesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetUserWorkspacesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.workspace.push(Workspace.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
 
 function createBaseCreateWorkspaceWithOwnerRequest(): CreateWorkspaceWithOwnerRequest {
   return { ownerId: "", workspaceId: "" };
@@ -774,6 +909,8 @@ export const DeleteWorkspaceResponse: MessageFns<DeleteWorkspaceResponse> = {
 };
 
 export interface AuthorizationServiceClient {
+  getUserWorkspaces(request: GetUserWorkspacesRequest, metadata?: Metadata): Observable<GetUserWorkspacesResponse>;
+
   createWorkspaceWithOwner(
     request: CreateWorkspaceWithOwnerRequest,
     metadata?: Metadata,
@@ -808,6 +945,11 @@ export interface AuthorizationServiceClient {
 }
 
 export interface AuthorizationServiceController {
+  getUserWorkspaces(
+    request: GetUserWorkspacesRequest,
+    metadata?: Metadata,
+  ): Promise<GetUserWorkspacesResponse> | Observable<GetUserWorkspacesResponse> | GetUserWorkspacesResponse;
+
   createWorkspaceWithOwner(
     request: CreateWorkspaceWithOwnerRequest,
     metadata?: Metadata,
@@ -862,6 +1004,7 @@ export interface AuthorizationServiceController {
 export function AuthorizationServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
+      "getUserWorkspaces",
       "createWorkspaceWithOwner",
       "updateWorkspaceMembers",
       "getWorkspaceMembers",
@@ -886,6 +1029,17 @@ export const AUTHORIZATION_SERVICE_NAME = "AuthorizationService";
 
 export type AuthorizationServiceService = typeof AuthorizationServiceService;
 export const AuthorizationServiceService = {
+  getUserWorkspaces: {
+    path: "/authorization.AuthorizationService/GetUserWorkspaces" as const,
+    requestStream: false as const,
+    responseStream: false as const,
+    requestSerialize: (value: GetUserWorkspacesRequest): Buffer =>
+      Buffer.from(GetUserWorkspacesRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetUserWorkspacesRequest => GetUserWorkspacesRequest.decode(value),
+    responseSerialize: (value: GetUserWorkspacesResponse): Buffer =>
+      Buffer.from(GetUserWorkspacesResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): GetUserWorkspacesResponse => GetUserWorkspacesResponse.decode(value),
+  },
   createWorkspaceWithOwner: {
     path: "/authorization.AuthorizationService/CreateWorkspaceWithOwner" as const,
     requestStream: false as const,
@@ -974,6 +1128,7 @@ export const AuthorizationServiceService = {
 } as const;
 
 export interface AuthorizationServiceServer extends UntypedServiceImplementation {
+  getUserWorkspaces: handleUnaryCall<GetUserWorkspacesRequest, GetUserWorkspacesResponse>;
   createWorkspaceWithOwner: handleUnaryCall<CreateWorkspaceWithOwnerRequest, CreateWorkspaceWithOwnerResponse>;
   updateWorkspaceMembers: handleUnaryCall<UpdateWorkspaceMembersRequest, UpdateWorkspaceMembersResponse>;
   getWorkspaceMembers: handleUnaryCall<GetWorkspaceMembersRequest, GetWorkspaceMembersResponse>;

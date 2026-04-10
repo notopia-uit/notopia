@@ -59,6 +59,9 @@ type ServerInterface interface {
 	// Check workspace slug exists
 	// (GET /note/workspaces-by-slug/{workspaceSlug}/exists)
 	CheckWorkspaceSlugExists(c *gin.Context, workspaceSlug WorkspaceSlugPath)
+	// Get my workspaces
+	// (GET /note/workspaces/me)
+	GetMyWorkspaces(c *gin.Context)
 	// Delete workspace
 	// (DELETE /note/workspaces/{workspaceId})
 	DeleteWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
@@ -482,6 +485,21 @@ func (siw *ServerInterfaceWrapper) CheckWorkspaceSlugExists(c *gin.Context) {
 	}
 
 	siw.Handler.CheckWorkspaceSlugExists(c, workspaceSlug)
+}
+
+// GetMyWorkspaces operation middleware
+func (siw *ServerInterfaceWrapper) GetMyWorkspaces(c *gin.Context) {
+
+	c.Set(Oauth2Scopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetMyWorkspaces(c)
 }
 
 // DeleteWorkspace operation middleware
@@ -927,6 +945,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/workspaces", wrapper.CreateWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces-by-slug/:workspaceSlug", wrapper.GetWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces-by-slug/:workspaceSlug/exists", wrapper.CheckWorkspaceSlugExists)
+	router.GET(options.BaseURL+"/note/workspaces/me", wrapper.GetMyWorkspaces)
 	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.DeleteWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/events", wrapper.GetWorkspaceEvents)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/graph", wrapper.GetWorkspaceGraph)
@@ -1765,6 +1784,51 @@ func (response CheckWorkspaceSlugExists500JSONResponse) VisitCheckWorkspaceSlugE
 	return json.NewEncoder(w).Encode(response)
 }
 
+type GetMyWorkspacesRequestObject struct {
+}
+
+type GetMyWorkspacesResponseObject interface {
+	VisitGetMyWorkspacesResponse(w http.ResponseWriter) error
+}
+
+type GetMyWorkspaces200JSONResponse []UserWorkspace
+
+func (response GetMyWorkspaces200JSONResponse) VisitGetMyWorkspacesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetMyWorkspaces400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response GetMyWorkspaces400JSONResponse) VisitGetMyWorkspacesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetMyWorkspaces401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response GetMyWorkspaces401JSONResponse) VisitGetMyWorkspacesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetMyWorkspaces500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetMyWorkspaces500JSONResponse) VisitGetMyWorkspacesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type DeleteWorkspaceRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
 }
@@ -2591,6 +2655,9 @@ type StrictServerInterface interface {
 	// Check workspace slug exists
 	// (GET /note/workspaces-by-slug/{workspaceSlug}/exists)
 	CheckWorkspaceSlugExists(ctx context.Context, request CheckWorkspaceSlugExistsRequestObject) (CheckWorkspaceSlugExistsResponseObject, error)
+	// Get my workspaces
+	// (GET /note/workspaces/me)
+	GetMyWorkspaces(ctx context.Context, request GetMyWorkspacesRequestObject) (GetMyWorkspacesResponseObject, error)
 	// Delete workspace
 	// (DELETE /note/workspaces/{workspaceId})
 	DeleteWorkspace(ctx context.Context, request DeleteWorkspaceRequestObject) (DeleteWorkspaceResponseObject, error)
@@ -3055,6 +3122,31 @@ func (sh *strictHandler) CheckWorkspaceSlugExists(ctx *gin.Context, workspaceSlu
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(CheckWorkspaceSlugExistsResponseObject); ok {
 		if err := validResponse.VisitCheckWorkspaceSlugExistsResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetMyWorkspaces operation middleware
+func (sh *strictHandler) GetMyWorkspaces(ctx *gin.Context) {
+	var request GetMyWorkspacesRequestObject
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetMyWorkspaces(ctx, request.(GetMyWorkspacesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetMyWorkspaces")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(GetMyWorkspacesResponseObject); ok {
+		if err := validResponse.VisitGetMyWorkspacesResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

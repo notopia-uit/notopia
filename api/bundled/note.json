@@ -64,12 +64,12 @@
             "description": "Folder successfully created",
             "headers": {
               "Content-Location": {
+                "required": true,
                 "schema": {
                   "type": "string",
                   "format": "uri",
                   "example": "http://api.notopia.localhost/notes/folder/123e4567-e89b-12d3-a456-426614174000"
-                },
-                "required": true
+                }
               }
             }
           },
@@ -205,12 +205,12 @@
             "description": "Note successfully created",
             "headers": {
               "Content-Location": {
+                "required": true,
                 "schema": {
                   "type": "string",
                   "format": "uri",
                   "example": "http://api.notopia.localhost/notes/note/46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
-                },
-                "required": true
+                }
               }
             }
           },
@@ -603,12 +603,50 @@
             "description": "Workspace successfully created",
             "headers": {
               "Content-Location": {
+                "required": true,
                 "schema": {
                   "type": "string",
                   "format": "uri",
                   "example": "http://api.notopia.localhost/workspaces/550e8400-e29b-41d4-a716-446655440000"
-                },
-                "required": true
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/me": {
+      "get": {
+        "security": [
+          {
+            "Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Get my workspaces",
+        "operationId": "getMyWorkspaces",
+        "responses": {
+          "200": {
+            "description": "A list of workspaces",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserWorkspace"
+                  }
+                }
               }
             }
           },
@@ -1803,6 +1841,33 @@
           "name"
         ]
       },
+      "WorkspaceRole": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "editor",
+          "viewer"
+        ],
+        "example": "owner"
+      },
+      "UserWorkspace": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Workspace"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "role": {
+                "$ref": "#/components/schemas/WorkspaceRole"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        ]
+      },
       "slug": {
         "type": "string",
         "example": "notopia"
@@ -1971,15 +2036,6 @@
         "description": "Full name from Authentik",
         "example": "User",
         "nullable": true
-      },
-      "WorkspaceRole": {
-        "type": "string",
-        "enum": [
-          "owner",
-          "editor",
-          "viewer"
-        ],
-        "example": "owner"
       },
       "WorkspaceMember": {
         "type": "object",

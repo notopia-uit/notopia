@@ -1,0 +1,23 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - Oauth2: []
+  tags:
+    - Workspace
+  summary: Get my workspaces
+  operationId: getMyWorkspaces
+  responses:
+    200:
+      description: A list of workspaces
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/UserWorkspace.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

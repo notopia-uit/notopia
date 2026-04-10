@@ -220,6 +220,18 @@ export type NoteWorkspace = {
     name: string;
 };
 
+export const NoteWorkspaceRole = {
+    OWNER: 'owner',
+    EDITOR: 'editor',
+    VIEWER: 'viewer'
+} as const;
+
+export type NoteWorkspaceRole = typeof NoteWorkspaceRole[keyof typeof NoteWorkspaceRole];
+
+export type NoteUserWorkspace = NoteWorkspace & {
+    role: NoteWorkspaceRole;
+};
+
 export type NoteSlug = string;
 
 export type NoteWorkspaceItemsUpdatedEvent = {
@@ -266,14 +278,6 @@ export type NoteUserPropertiesId = string;
  * Full name from Authentik
  */
 export type NoteUserPropertiesName = string | null;
-
-export const NoteWorkspaceRole = {
-    OWNER: 'owner',
-    EDITOR: 'editor',
-    VIEWER: 'viewer'
-} as const;
-
-export type NoteWorkspaceRole = typeof NoteWorkspaceRole[keyof typeof NoteWorkspaceRole];
 
 export type NoteWorkspaceMember = {
     id: NoteUserPropertiesId;
@@ -361,6 +365,10 @@ export type NoteNoteLinkWritable = {
 export type NoteWorkspaceWritable = {
     slug: string;
     name: string;
+};
+
+export type NoteUserWorkspaceWritable = NoteWorkspaceWritable & {
+    role: NoteWorkspaceRole;
 };
 
 export type NoteWorkspaceItemsUpdatedEventWritable = {
@@ -1409,6 +1417,52 @@ export type CreateWorkspaceResponses = {
      */
     201: unknown;
 };
+
+export type GetMyWorkspacesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/note/workspaces/me';
+};
+
+export type GetMyWorkspacesErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * The error response body returned when JWT validation or OPA authorization fails.
+     */
+    401: {
+        /**
+         * The category of the error encountered during the middleware lifecycle.
+         */
+        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
+        /**
+         * A descriptive message providing technical context for the failure.
+         */
+        details: string;
+        /**
+         * An optional, developer-defined message, often populated by OPA policy violations.
+         */
+        custom_message: string | null;
+    };
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type GetMyWorkspacesError = GetMyWorkspacesErrors[keyof GetMyWorkspacesErrors];
+
+export type GetMyWorkspacesResponses = {
+    /**
+     * A list of workspaces
+     */
+    200: Array<NoteUserWorkspace>;
+};
+
+export type GetMyWorkspacesResponse = GetMyWorkspacesResponses[keyof GetMyWorkspacesResponses];
 
 export type GetWorkspaceData = {
     body?: never;

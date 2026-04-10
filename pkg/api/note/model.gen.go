@@ -292,6 +292,14 @@ type TrashedNote struct {
 	Trashed Trashed            `json:"trashed"`
 }
 
+// UserWorkspace defines model for UserWorkspace.
+type UserWorkspace struct {
+	Id   *openapi_types.UUID `json:"id,omitempty"`
+	Name string              `json:"name"`
+	Role WorkspaceRole       `json:"role"`
+	Slug string              `json:"slug"`
+}
+
 // UserPropertiesId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 type UserPropertiesId = string
 
