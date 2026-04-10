@@ -121,7 +121,7 @@ const config: Configuration = {
   plugins: [
     new NxAppRspackPlugin({
       tsConfig: tsConfigFile,
-      main: 'apps/document/src/main.ts',
+      main: 'apps/search-worker/src/main.ts',
       sourceMap: process.env['NODE_ENV'] !== 'production',
       optimization: process.env['NODE_ENV'] === 'production',
       externalDependencies: 'none',
