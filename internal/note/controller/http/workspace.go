@@ -82,7 +82,7 @@ func (h *StrictHandler) GetWorkspace(
 		return nil, err
 	}
 
-	dto := toWorkspace(*result)
+	dto := toWorkspace(result)
 	return note.GetWorkspace200JSONResponse(dto), nil
 }
 
@@ -135,7 +135,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 ) (note.GetWorkspaceEventsResponseObject, error) {
 	c, ok := ctx.(*gin.Context)
 	if !ok {
-		return nil, errs.NewInternal("failed to cast context to gin.Context", nil)
+		return nil, errs.NewInternal("failed to cast context to gin.Context")
 	}
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
@@ -144,7 +144,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 
 	eventCh, err := h.WorkspaceEventHub.Subscribe(ctx, request.WorkspaceId, user.ID)
 	if err != nil {
-		return nil, errs.NewInternal("failed to subscribe to workspace events", err)
+		return nil, errs.NewInternalErr("failed to subscribe to workspace events", err)
 	}
 	r, w := io.Pipe()
 	sender := newWorkspaceEventSSESender(ctx, eventCh, w, c.Writer)
@@ -186,7 +186,23 @@ func (h *StrictHandler) GetWorkspaceMembers(
 	ctx context.Context,
 	request note.GetWorkspaceMembersRequestObject,
 ) (note.GetWorkspaceMembersResponseObject, error) {
-	return nil, errs.Unimplemented
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
+	query := &app.GetWorkspaceMembers{
+		ID:     request.WorkspaceId,
+		UserID: user.ID,
+	}
+	result, err := h.App.Queries.GetWorkspaceMembersHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	dto, err := toWorkspaceMembers(result)
+	if err != nil {
+		return nil, err
+	}
+	return note.GetWorkspaceMembers200JSONResponse(dto), nil
 }
 
 func (h *StrictHandler) UpdateWorkspaceMembers(

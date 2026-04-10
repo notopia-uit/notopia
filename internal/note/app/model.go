@@ -119,9 +119,9 @@ func (r WorkspaceRole) String() string {
 }
 
 type WorkspaceMember struct {
-	ID       string
-	Username string
-	Role     WorkspaceRole
+	ID   string
+	Name string
+	Role WorkspaceRole
 }
 
 type WorkspaceTreeNote struct {
@@ -186,6 +186,14 @@ type WorkspaceMemberUpdate struct {
 }
 
 type UserWorkspace struct {
-	Workspace Workspace
+	Workspace *Workspace
 	Role      WorkspaceRole
+}
+
+type User struct {
+	ID     string
+	Name   string
+	Email  string // Can be empty
+	Groups []string
+	Roles  []string
 }

@@ -60,14 +60,15 @@ func setViperAdvancedDefault(viper *viper.Viper) {
 }
 
 type Config struct {
-	General  commonconfig.General `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
-	Log      commonconfig.Log     `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
-	Server   Server               `json:"server"   mapstructure:"server"   validate:"required"  yaml:"server"`
-	Database commonconfig.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
-	Kafka    commonconfig.Kafka   `json:"kafka"    mapstructure:"kafka"    validate:"required"  yaml:"kafka"`
-	Redis    commonconfig.Redis   `json:"redis"    mapstructure:"redis"    validate:"required"  yaml:"redis"`
-	Services Services             `json:"services" mapstructure:"services" validate:"required"  yaml:"services"`
-	Advanced Advanced             `json:"advanced" mapstructure:"advanced" validate:"omitempty" yaml:"advanced"`
+	General   commonconfig.General   `json:"general"   mapstructure:"general"   validate:"omitempty" yaml:"general"`
+	Log       commonconfig.Log       `json:"log"       mapstructure:"log"       validate:"omitempty" yaml:"log"`
+	Server    Server                 `json:"server"    mapstructure:"server"    validate:"required"  yaml:"server"`
+	Database  commonconfig.SQL       `json:"database"  mapstructure:"database"  validate:"required"  yaml:"database"`
+	Kafka     commonconfig.Kafka     `json:"kafka"     mapstructure:"kafka"     validate:"required"  yaml:"kafka"`
+	Redis     commonconfig.Redis     `json:"redis"     mapstructure:"redis"     validate:"required"  yaml:"redis"`
+	Authentik commonconfig.Authentik `json:"authentik" mapstructure:"authentik" validate:"required"  yaml:"authentik"`
+	Services  Services               `json:"services"  mapstructure:"services"  validate:"required"  yaml:"services"`
+	Advanced  Advanced               `json:"advanced"  mapstructure:"advanced"  validate:"omitempty" yaml:"advanced"`
 }
 
 func New(

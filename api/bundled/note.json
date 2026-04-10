@@ -2040,7 +2040,7 @@
           "id": {
             "$ref": "#/components/schemas/User_properties-id"
           },
-          "username": {
+          "name": {
             "$ref": "#/components/schemas/User_properties-name",
             "readOnly": true
           },

@@ -282,7 +282,7 @@ export type NoteUserPropertiesName = string | null;
 
 export type NoteWorkspaceMember = {
     id: NoteUserPropertiesId;
-    username?: NoteUserPropertiesName;
+    name?: NoteUserPropertiesName;
     role: NoteWorkspaceRole;
 };
 

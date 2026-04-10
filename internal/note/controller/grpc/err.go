@@ -28,6 +28,7 @@ func toGRPCError(err error) error {
 			errs.CodeNotesNotInWorkspace,
 			errs.CodeWorkspaceMembersCannotBeEmpty,
 			errs.CodeWorkspaceMustHaveAtLeastOneOwner,
+			errs.CodeIdentityUserIDInvalid,
 			errs.CodeCannotMoveFolderToItOwnSubfolder:
 			return status.Error(codes.InvalidArgument, cerr.Error())
 		case errs.CodeUnimplemented:

@@ -19,6 +19,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/controller/http"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/infra/common"
+	"github.com/notopia-uit/notopia/internal/note/infra/identity"
 	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgreadmodel"
@@ -164,7 +165,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)
-	getMyWorkspacesHandler := app.NewGetMyWorkspacesHandler(authorization)
+	getWorkspacesByIDs := pgreadmodel.NewGetWorkspacesByIDs(queries)
+	getMyWorkspacesHandler := app.NewGetMyWorkspacesHandler(authorization, getWorkspacesByIDs)
 	noteGraph := pgreadmodel.NewNoteGraph(queries)
 	getNoteGraphHandler := app.NewGetNoteGraphHandler(authorization, pgrepoNote, noteGraph)
 	pgreadmodelNote := pgreadmodel.GetNote(queries)
@@ -175,7 +177,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(authorization, workspaceGraph)
 	workspaceBySlug := pgreadmodel.NewWorkspaceBySlug(queries)
 	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(authorization, workspaceBySlug)
-	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler()
+	authentik := &configConfig.Authentik
+	identityAuthentik := identity.NewAuthentik(authentik)
+	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(identityAuthentik, authorization)
 	workspaceTree := pgreadmodel.NewWorkspaceTree(queries)
 	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(authorization, workspaceTree)
 	showTrash := pgreadmodel.NewShowTrash(queries)

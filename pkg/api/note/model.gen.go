@@ -344,11 +344,11 @@ type WorkspaceItemsUpdatedEventEvent string
 // WorkspaceMember defines model for WorkspaceMember.
 type WorkspaceMember struct {
 	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	Id   UserPropertiesId `json:"id"`
-	Role WorkspaceRole    `json:"role"`
+	Id UserPropertiesId `json:"id"`
 
-	// Username Full name from Authentik
-	Username *UserPropertiesName `json:"username,omitempty"`
+	// Name Full name from Authentik
+	Name *UserPropertiesName `json:"name,omitempty"`
+	Role WorkspaceRole       `json:"role"`
 }
 
 // WorkspaceMembersUpdatedEvent defines model for WorkspaceMembersUpdatedEvent.

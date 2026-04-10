@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/authorization/errs"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
@@ -77,7 +77,7 @@ func toFolder(f app.Folder) (note.Folder, error) {
 	}, nil
 }
 
-func toWorkspace(w app.Workspace) note.Workspace {
+func toWorkspace(w *app.Workspace) note.Workspace {
 	return note.Workspace{
 		Id:   &w.ID,
 		Name: w.Name,
@@ -94,9 +94,9 @@ func toWorkspaceRole(r app.WorkspaceRole) (note.WorkspaceRole, error) {
 	case app.WorkspaceRoleViewer:
 		return note.Viewer, nil
 	case app.WorkspaceRoleUnspecified:
-		return note.WorkspaceRole(""), errs.NewInternal("unspecified workspace role", nil)
+		return note.WorkspaceRole(""), errs.NewInternal("unspecified workspace role")
 	default:
-		return note.WorkspaceRole(""), errs.NewInternal(fmt.Sprintf("invalid workspace role: %v", r), nil)
+		return note.WorkspaceRole(""), errs.NewInternal(fmt.Sprintf("invalid workspace role: %v", r))
 	}
 }
 
@@ -112,9 +112,9 @@ func toUserWorkspace(u *app.UserWorkspace) (note.UserWorkspace, error) {
 }
 
 func toWorkspaceMember(m *app.WorkspaceMember) (note.WorkspaceMember, error) {
-	var username *string
-	if m.Username != "" {
-		username = &m.Username
+	var name *string
+	if m.Name != "" {
+		name = &m.Name
 	}
 	role, err := toWorkspaceRole(m.Role)
 	if err != nil {
@@ -122,10 +122,22 @@ func toWorkspaceMember(m *app.WorkspaceMember) (note.WorkspaceMember, error) {
 	}
 
 	return note.WorkspaceMember{
-		Id:       m.ID,
-		Role:     role,
-		Username: username,
+		Id:   m.ID,
+		Role: role,
+		Name: name,
 	}, nil
+}
+
+func toWorkspaceMembers(members []*app.WorkspaceMember) ([]note.WorkspaceMember, error) {
+	out := make([]note.WorkspaceMember, 0, len(members))
+	for _, m := range members {
+		member, err := toWorkspaceMember(m)
+		if err != nil {
+			return nil, errs.NewInternal(fmt.Sprintf("invalid workspace member: %v", err))
+		}
+		out = append(out, member)
+	}
+	return out, nil
 }
 
 func toWorkspaceTreeNote(n *app.WorkspaceTreeNote) note.WorkspaceTreeNote {
@@ -273,8 +285,8 @@ func toTrashedBy(t app.TrashedBy) (note.TrashedBy, error) {
 	case app.TrashedByPurpose:
 		return note.Purpose, nil
 	case app.TrashedByUnspecified:
-		return note.TrashedBy(""), errs.NewInternal("unspecified trashed by", nil)
+		return note.TrashedBy(""), errs.NewInternal("unspecified trashed by")
 	default:
-		return note.TrashedBy(""), errs.NewInternal(fmt.Sprintf("invalid trashed by: %v", t), nil)
+		return note.TrashedBy(""), errs.NewInternal(fmt.Sprintf("invalid trashed by: %v", t))
 	}
 }

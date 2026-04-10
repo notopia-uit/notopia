@@ -66,7 +66,16 @@ type Internal struct {
 	Err
 }
 
-func NewInternal(message string, err error) *Internal {
+func NewInternal(message string) *Internal {
+	return &Internal{
+		Err: Err{
+			message: message,
+			code:    CodeInternal,
+		},
+	}
+}
+
+func NewInternalErr(message string, err error) *Internal {
 	return &Internal{
 		Err: Err{
 			message: message,

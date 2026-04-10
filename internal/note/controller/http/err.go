@@ -85,6 +85,9 @@ func strictServerToHTTPErr(err *errs.Err) (
 		statusCode = 400
 	case errs.CodePersistenceInternal:
 		statusCode = 500
+
+	case errs.CodeIdentityUserIDInvalid:
+		statusCode = 400
 	case errs.CodeWorkspaceMembersCannotBeEmpty:
 		statusCode = 400
 	case errs.CodeWorkspaceMustHaveAtLeastOneOwner:

@@ -174,7 +174,7 @@ func (a *Authorization) toAppWorkspacePermission(permission app.WorkspacePermiss
 	case app.WorkspacePermissionUnspecified:
 		return pb.WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED, nil
 	default:
-		return pb.WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid workspace permission: %v", permission), nil)
+		return pb.WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid workspace permission: %v", permission))
 	}
 }
 
@@ -189,6 +189,6 @@ func (a *Authorization) toAppWorkspaceItemPermission(permission app.WorkspaceIte
 	case app.WorkspaceItemPermissionUnspecified:
 		return pb.WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_UNSPECIFIED, nil
 	default:
-		return pb.WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid workspace item permission: %v", permission), nil)
+		return pb.WorkspaceItemPermission_WORKSPACE_ITEM_PERMISSION_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid workspace item permission: %v", permission))
 	}
 }

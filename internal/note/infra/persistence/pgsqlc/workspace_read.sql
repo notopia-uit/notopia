@@ -1,3 +1,12 @@
+-- name: ReadGetWorkspacesByIDs :many
+SELECT
+  *
+FROM
+  workspaces
+WHERE
+  id = ANY(sqlc.arg('ids')::uuid[])
+  AND deleted_at IS NULL;
+
 -- name: ReadGetWorkspaceBySlug :one
 SELECT
   *

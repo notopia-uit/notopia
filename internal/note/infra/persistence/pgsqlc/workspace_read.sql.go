@@ -8,6 +8,7 @@ package pgsqlc
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"go.opentelemetry.io/otel"
 )
 
@@ -56,4 +57,43 @@ func (q *Queries) ReadGetWorkspaceBySlug(ctx context.Context, slug string) (*Wor
 		&i.DeletedAt,
 	)
 	return &i, err
+}
+
+const readGetWorkspacesByIDs = `-- name: ReadGetWorkspacesByIDs :many
+SELECT
+  id, slug, name, created_at, updated_at, deleted_at
+FROM
+  workspaces
+WHERE
+  id = ANY($1::uuid[])
+  AND deleted_at IS NULL
+`
+
+func (q *Queries) ReadGetWorkspacesByIDs(ctx context.Context, ids []uuid.UUID) ([]*Workspace, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "ReadGetWorkspacesByIDs")
+	defer span.End()
+	rows, err := q.db.Query(ctx, readGetWorkspacesByIDs, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Workspace
+	for rows.Next() {
+		var i Workspace
+		if err := rows.Scan(
+			&i.ID,
+			&i.Slug,
+			&i.Name,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

@@ -19,6 +19,8 @@ var PGReadModelProviderSet = wire.NewSet(
 	pgreadmodel.ProvideWorkspaceBySlug,
 	pgreadmodel.ProvideWorkspaceGraph,
 	pgreadmodel.ProvideWorkspaceTree,
+	pgreadmodel.ProvideGetWorkspacesByIDs,
+	wire.Bind(new(app.GetMyWorkspacesReadModel), new(*pgreadmodel.GetWorkspacesByIDs)),
 	wire.Bind(new(app.CheckWorkspaceSlugExistsReadModel), new(*pgreadmodel.CheckWorkspaceSlugExists)),
 	wire.Bind(new(app.GetNoteGraphReadModel), new(*pgreadmodel.NoteGraph)),
 	wire.Bind(new(app.GetNoteLinksReadModel), new(*pgreadmodel.NoteLinks)),

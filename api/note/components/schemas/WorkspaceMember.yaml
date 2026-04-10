@@ -4,7 +4,7 @@ type: object
 properties:
   id:
     $ref: ../../../common/components/schemas/User.yaml#/properties/id
-  username:
+  name:
     $ref: ../../../common/components/schemas/User.yaml#/properties/name
     readOnly: true
   role:

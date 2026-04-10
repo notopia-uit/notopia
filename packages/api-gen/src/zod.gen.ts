@@ -219,7 +219,7 @@ export const zNoteUserPropertiesName = z.string().nullable();
 
 export const zNoteWorkspaceMember = z.object({
     id: zNoteUserPropertiesId,
-    username: zNoteUserPropertiesName.optional(),
+    name: zNoteUserPropertiesName.optional(),
     role: zNoteWorkspaceRole
 });
 
