@@ -6,11 +6,12 @@ import (
 
 type App struct {
 	CreateWorkspace                 *app.CreateWorkspaceHandler
-	UpdateWorkspaceMembers          *app.UpdateWorkspaceMembersHandler
+	GetUserWorkspaceItemPermissions *app.GetUserWorkspaceItemPermissionsHandler
 	GetWorkspaceMembers             *app.GetWorkspaceMembersHandler
+	GetUserWorkspaces               *app.GetUserWorkspacesHandler
+	UpdateWorkspaceMembers          *app.UpdateWorkspaceMembersHandler
 	HasWorkspacePermission          *app.HasWorkspacePermissionHandler
 	HasWorkspaceItemPermission      *app.HasWorkspaceItemPermissionHandler
-	GetUserWorkspaceItemPermissions *app.GetUserWorkspaceItemPermissionsHandler
 }
 
 func (a *App) BootStrapPolicies() {

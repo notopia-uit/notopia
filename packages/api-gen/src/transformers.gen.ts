@@ -25,7 +25,7 @@ export const getRevisionWithContentResponseTransformer = async (data: any): Prom
 const noteNoteSchemaResponseTransformer = (data: any) => {
     data.updatedAt = new Date(data.updatedAt);
     if (data.trashed) {
-        data.trashed.trashedAt = new Date(data.trashed.trashedAt);
+        data.trashed.at = new Date(data.trashed.at);
     }
     return data;
 };
@@ -36,7 +36,7 @@ export const getNoteResponseTransformer = async (data: any): Promise<GetNoteResp
 };
 
 const noteTrashedSchemaResponseTransformer = (data: any) => {
-    data.trashedAt = new Date(data.trashedAt);
+    data.at = new Date(data.at);
     return data;
 };
 

@@ -72,17 +72,9 @@ func NewInvalid(message string) *Invalid {
 	}
 }
 
-type Unimplemented struct {
-	Err
-}
-
-func NewUnimplemented() *Unimplemented {
-	return &Unimplemented{
-		Err: Err{
-			message: "unimplemented",
-			code:    CodeUnimplemented,
-		},
-	}
+var Unimplemented = Err{
+	message: "unimplemented",
+	code:    CodeUnimplemented,
 }
 
 type Internal struct {

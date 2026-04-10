@@ -93,14 +93,40 @@ func (h *StrictHandler) CheckWorkspaceSlugExists(
 	query := &app.CheckWorkspaceSlugExists{
 		Slug: request.WorkspaceSlug,
 	}
-	result, err := h.App.Queries.CheckWorkspaceSlugExistsHandler.Handle(ctx, query)
+	exists, err := h.App.Queries.CheckWorkspaceSlugExistsHandler.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
-	if result.Exists {
+	if exists {
 		return note.CheckWorkspaceSlugExists409Response{}, nil
 	}
 	return note.CheckWorkspaceSlugExists200Response{}, nil
+}
+
+func (h *StrictHandler) GetMyWorkspaces(
+	ctx context.Context,
+	request note.GetMyWorkspacesRequestObject,
+) (note.GetMyWorkspacesResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
+	query := &app.GetMyWorkspaces{
+		UserID: user.ID,
+	}
+	myWorkspaces, err := h.App.Queries.GetMyWorkspacesHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	dtos := make([]note.UserWorkspace, 0, len(myWorkspaces))
+	for _, w := range myWorkspaces {
+		dto, err := toUserWorkspace(w)
+		if err != nil {
+			return nil, err
+		}
+		dtos = append(dtos, dto)
+	}
+	return note.GetMyWorkspaces200JSONResponse(dtos), nil
 }
 
 func (h *StrictHandler) GetWorkspaceEvents(
@@ -160,14 +186,14 @@ func (h *StrictHandler) GetWorkspaceMembers(
 	ctx context.Context,
 	request note.GetWorkspaceMembersRequestObject,
 ) (note.GetWorkspaceMembersResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	return nil, errs.Unimplemented
 }
 
 func (h *StrictHandler) UpdateWorkspaceMembers(
 	ctx context.Context,
 	request note.UpdateWorkspaceMembersRequestObject,
 ) (note.UpdateWorkspaceMembersResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	return nil, errs.Unimplemented
 }
 
 func (h *StrictHandler) MoveWorkspaceItems(
@@ -213,7 +239,7 @@ func (h *StrictHandler) PublishWorkspace(
 	ctx context.Context,
 	request note.PublishWorkspaceRequestObject,
 ) (note.PublishWorkspaceResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	return nil, errs.Unimplemented
 }
 
 func (h *StrictHandler) RenameWorkspace(
@@ -357,7 +383,7 @@ func (h *StrictHandler) UnpublishWorkspace(
 	ctx context.Context,
 	request note.UnpublishWorkspaceRequestObject,
 ) (note.UnpublishWorkspaceResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	return nil, errs.Unimplemented
 }
 
 func (h *StrictHandler) PermanentlyDeleteWorkspaceItems(

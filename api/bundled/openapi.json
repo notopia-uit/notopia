@@ -2493,18 +2493,18 @@
             "readOnly": true,
             "x-go-type-name": "FolderTrashed",
             "properties": {
-              "trashedBy": {
+              "by": {
                 "$ref": "#/components/schemas/note_TrashedBy"
               },
-              "trashedAt": {
+              "at": {
                 "type": "string",
                 "format": "date-time",
                 "example": "2024-06-01T12:00:00Z"
               }
             },
             "required": [
-              "trashedBy",
-              "trashedAt"
+              "by",
+              "at"
             ]
           }
         },
@@ -2595,18 +2595,18 @@
             "readOnly": true,
             "x-go-type-name": "NoteTrashed",
             "properties": {
-              "trashedBy": {
+              "by": {
                 "$ref": "#/components/schemas/note_TrashedBy"
               },
-              "trashedAt": {
+              "at": {
                 "type": "string",
                 "format": "date-time",
                 "example": "2024-06-01T12:00:00Z"
               }
             },
             "required": [
-              "trashedBy",
-              "trashedAt"
+              "by",
+              "at"
             ]
           }
         },
@@ -2764,21 +2764,18 @@
         "example": "owner"
       },
       "note_UserWorkspace": {
-        "allOf": [
-          {
+        "type": "object",
+        "properties": {
+          "workspace": {
             "$ref": "#/components/schemas/note_Workspace"
           },
-          {
-            "type": "object",
-            "properties": {
-              "role": {
-                "$ref": "#/components/schemas/note_WorkspaceRole"
-              }
-            },
-            "required": [
-              "role"
-            ]
+          "role": {
+            "$ref": "#/components/schemas/note_WorkspaceRole"
           }
+        },
+        "required": [
+          "workspace",
+          "role"
         ]
       },
       "note_slug": {
@@ -2978,18 +2975,18 @@
       "note_Trashed": {
         "type": "object",
         "properties": {
-          "trashedBy": {
+          "by": {
             "$ref": "#/components/schemas/note_TrashedBy"
           },
-          "trashedAt": {
+          "at": {
             "type": "string",
             "format": "date-time",
             "example": "2024-06-01T12:00:00Z"
           }
         },
         "required": [
-          "trashedBy",
-          "trashedAt"
+          "by",
+          "at"
         ]
       },
       "note_TrashedNote": {

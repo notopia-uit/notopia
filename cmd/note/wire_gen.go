@@ -164,6 +164,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)
+	getMyWorkspacesHandler := app.NewGetMyWorkspacesHandler(authorization)
 	noteGraph := pgreadmodel.NewNoteGraph(queries)
 	getNoteGraphHandler := app.NewGetNoteGraphHandler(authorization, pgrepoNote, noteGraph)
 	pgreadmodelNote := pgreadmodel.GetNote(queries)
@@ -181,6 +182,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	showTrashHandler := app.NewShowTrashHandler(authorization, showTrash)
 	appQueries := &app.Queries{
 		CheckWorkspaceSlugExistsHandler: checkWorkspaceSlugExistsHandler,
+		GetMyWorkspacesHandler:          getMyWorkspacesHandler,
 		GetNoteGraphHandler:             getNoteGraphHandler,
 		GetNoteHandler:                  getNoteHandler,
 		GetNoteLinksHandler:             getNoteLinksHandler,
@@ -209,7 +211,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	serviceServer := grpc.NewServiceServer(server)
-	grpcGRPC, cleanup7, err := grpc.New(ctx, serviceServer, configServer, loggingLogger)
+	serviceServerAdapter := grpc.NewServiceServerAdapter(serviceServer)
+	grpcGRPC, cleanup7, err := grpc.New(ctx, serviceServerAdapter, configServer, loggingLogger)
 	if err != nil {
 		cleanup6()
 		cleanup5()

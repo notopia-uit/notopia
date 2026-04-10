@@ -26,8 +26,8 @@ type Paginated[T any] struct {
 }
 
 type Trashed struct {
-	TrashedBy TrashedBy
-	TrashedAt time.Time
+	By TrashedBy
+	At time.Time
 }
 
 type Note struct {
@@ -180,6 +180,12 @@ type Trash struct {
 	Folders []*TrashedFolder
 }
 
-type CheckWorkspaceSlugExistsResult struct {
-	Exists bool
+type WorkspaceMemberUpdate struct {
+	ID   uuid.UUID
+	Role WorkspaceRole
+}
+
+type UserWorkspace struct {
+	Workspace Workspace
+	Role      WorkspaceRole
 }

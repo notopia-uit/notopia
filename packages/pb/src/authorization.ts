@@ -36,17 +36,17 @@ export enum WorkspaceItemPermission {
   UNRECOGNIZED = -1,
 }
 
-export interface GetUserWorkspacesRequest {
-  userId: string;
-}
-
-export interface Workspace {
+export interface UserWorkspace {
   id: string;
   role: WorkspaceRole;
 }
 
+export interface GetUserWorkspacesRequest {
+  userId: string;
+}
+
 export interface GetUserWorkspacesResponse {
-  workspace: Workspace[];
+  workspaces: UserWorkspace[];
 }
 
 export interface CreateWorkspaceWithOwnerRequest {
@@ -121,6 +121,54 @@ export interface DeleteWorkspaceResponse {
 
 export const AUTHORIZATION_PACKAGE_NAME = "authorization";
 
+function createBaseUserWorkspace(): UserWorkspace {
+  return { id: "", role: 0 };
+}
+
+export const UserWorkspace: MessageFns<UserWorkspace> = {
+  encode(message: UserWorkspace, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.role !== 0) {
+      writer.uint32(16).int32(message.role);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UserWorkspace {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUserWorkspace();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.role = reader.int32() as any;
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
+
 function createBaseGetUserWorkspacesRequest(): GetUserWorkspacesRequest {
   return { userId: "" };
 }
@@ -158,62 +206,14 @@ export const GetUserWorkspacesRequest: MessageFns<GetUserWorkspacesRequest> = {
   },
 };
 
-function createBaseWorkspace(): Workspace {
-  return { id: "", role: 0 };
-}
-
-export const Workspace: MessageFns<Workspace> = {
-  encode(message: Workspace, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.role !== 0) {
-      writer.uint32(16).int32(message.role);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): Workspace {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseWorkspace();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.id = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 16) {
-            break;
-          }
-
-          message.role = reader.int32() as any;
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-};
-
 function createBaseGetUserWorkspacesResponse(): GetUserWorkspacesResponse {
-  return { workspace: [] };
+  return { workspaces: [] };
 }
 
 export const GetUserWorkspacesResponse: MessageFns<GetUserWorkspacesResponse> = {
   encode(message: GetUserWorkspacesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    for (const v of message.workspace) {
-      Workspace.encode(v!, writer.uint32(10).fork()).join();
+    for (const v of message.workspaces) {
+      UserWorkspace.encode(v!, writer.uint32(10).fork()).join();
     }
     return writer;
   },
@@ -230,7 +230,7 @@ export const GetUserWorkspacesResponse: MessageFns<GetUserWorkspacesResponse> = 
             break;
           }
 
-          message.workspace.push(Workspace.decode(reader, reader.uint32()));
+          message.workspaces.push(UserWorkspace.decode(reader, reader.uint32()));
           continue;
         }
       }

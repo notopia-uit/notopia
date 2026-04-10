@@ -54,12 +54,22 @@ func (p WorkspaceItemPermission) String() string {
 	}
 }
 
-type WorkspaceMemberInfo struct {
+type AuthorizationWorkspaceMember struct {
 	ID   string
 	Role WorkspaceRole
 }
 
+type AuthorizationUserWorkspace struct {
+	ID   uuid.UUID // Workspace ID
+	Role WorkspaceRole
+}
+
 type AuthorizationService interface {
+	GetUserWorkspaces(
+		ctx context.Context,
+		userID string,
+	) ([]*AuthorizationUserWorkspace, error)
+
 	HasWorkspacePermission(
 		ctx context.Context,
 		userID string,
@@ -84,12 +94,12 @@ type AuthorizationService interface {
 		ctx context.Context,
 		userID string,
 		workspaceID uuid.UUID,
-		members []WorkspaceMemberUpdate, // NOTE: Hey this struct is from the handler :v?
+		members []WorkspaceMemberUpdate,
 	) error
 
 	GetWorkspaceMembers(
 		ctx context.Context,
 		userID string,
 		workspaceID uuid.UUID,
-	) ([]*WorkspaceMemberInfo, error)
+	) ([]*AuthorizationWorkspaceMember, error)
 }

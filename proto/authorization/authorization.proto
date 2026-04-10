@@ -36,17 +36,20 @@ enum WorkspaceItemPermission {
   WORKSPACE_ITEM_PERMISSION_DELETE = 3;
 }
 
+message UserWorkspace {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  WorkspaceRole role = 2 [(buf.validate.field).required = true];
+}
+
 message GetUserWorkspacesRequest {
   string user_id = 1 [(buf.validate.field).required = true];
 }
 
-message Workspace {
-  string id = 1 [(buf.validate.field).required = true];
-  WorkspaceRole role = 2 [(buf.validate.field).required = true];
-}
-
 message GetUserWorkspacesResponse {
-  repeated Workspace workspace = 1 [(buf.validate.field).required = true];
+  repeated UserWorkspace workspaces = 1 [(buf.validate.field).required = true];
 }
 
 message CreateWorkspaceWithOwnerRequest {

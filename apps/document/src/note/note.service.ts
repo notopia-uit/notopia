@@ -26,14 +26,7 @@ export class NoteService implements OnModuleInit {
     return response.name;
   }
 
-  async checkNoteExistence(noteId: string): Promise<boolean> {
-    const response = await firstValueFrom(
-      this.noteServiceClient.checkNoteExistence({
-        noteId,
-      })
-    );
-    return response.exists;
-  }
+  // TODO: Get note hey
 
   async getWorkspaceIdByNoteId(noteId: string): Promise<string> {
     const response = await firstValueFrom(

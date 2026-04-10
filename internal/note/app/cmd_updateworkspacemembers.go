@@ -8,11 +8,6 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-type WorkspaceMemberUpdate struct {
-	ID   uuid.UUID
-	Role WorkspaceRole
-}
-
 type UpdateWorkspaceMembers struct {
 	WorkspaceID uuid.UUID
 	Members     []WorkspaceMemberUpdate

@@ -153,7 +153,7 @@ func (h *StrictHandler) PublishNote(
 	ctx context.Context,
 	request note.PublishNoteRequestObject,
 ) (note.PublishNoteResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	return nil, errs.Unimplemented
 }
 
 func (h *StrictHandler) RenameNote(
@@ -182,5 +182,5 @@ func (h *StrictHandler) UnpublishNote(
 	ctx context.Context,
 	request note.UnpublishNoteRequestObject,
 ) (note.UnpublishNoteResponseObject, error) {
-	return nil, errs.NewUnimplemented()
+	return nil, errs.Unimplemented
 }

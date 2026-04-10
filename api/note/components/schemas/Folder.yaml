@@ -39,17 +39,17 @@ properties:
     readOnly: true
     x-go-type-name: FolderTrashed
     properties:
-      trashedBy:
+      by:
         $ref: ./TrashedBy.yaml
 
-      trashedAt:
+      at:
         type: string
         format: date-time
         example: 2024-06-01T12:00:00Z
 
     required:
-      - trashedBy
-      - trashedAt
+      - by
+      - at
 
 required:
   - id

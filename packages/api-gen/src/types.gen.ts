@@ -133,8 +133,8 @@ export type NoteFolder = {
     workspaceId: NotePropertiesId;
     readonly updatedAt: Date;
     readonly trashed: {
-        trashedBy: NoteTrashedBy;
-        trashedAt: Date;
+        by: NoteTrashedBy;
+        at: Date;
     } | null;
 };
 
@@ -166,8 +166,8 @@ export type NoteNote = {
     readonly tags: Array<string>;
     readonly updatedAt: Date;
     readonly trashed: {
-        trashedBy: NoteTrashedBy;
-        trashedAt: Date;
+        by: NoteTrashedBy;
+        at: Date;
     } | null;
 };
 
@@ -228,7 +228,8 @@ export const NoteWorkspaceRole = {
 
 export type NoteWorkspaceRole = typeof NoteWorkspaceRole[keyof typeof NoteWorkspaceRole];
 
-export type NoteUserWorkspace = NoteWorkspace & {
+export type NoteUserWorkspace = {
+    workspace: NoteWorkspace;
     role: NoteWorkspaceRole;
 };
 
@@ -288,8 +289,8 @@ export type NoteWorkspaceMember = {
 export type NoteWorkspacePropertiesName = string;
 
 export type NoteTrashed = {
-    trashedBy: NoteTrashedBy;
-    trashedAt: Date;
+    by: NoteTrashedBy;
+    at: Date;
 };
 
 export type NoteTrashedNote = {
@@ -367,7 +368,8 @@ export type NoteWorkspaceWritable = {
     name: string;
 };
 
-export type NoteUserWorkspaceWritable = NoteWorkspaceWritable & {
+export type NoteUserWorkspaceWritable = {
+    workspace: NoteWorkspaceWritable;
     role: NoteWorkspaceRole;
 };
 

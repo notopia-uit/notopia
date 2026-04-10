@@ -34,20 +34,23 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(transactionalEnforcer)
-	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer)
+	getUserWorkspaceItemPermissionsHandler := app.NewGetUserWorkspaceItemPermissionsHandler(transactionalEnforcer)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
+	getUserWorkspacesHandler := app.NewGetUserWorkspacesHandler(transactionalEnforcer)
+	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer)
 	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
 	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
-	getUserWorkspaceItemPermissionsHandler := app.NewGetUserWorkspaceItemPermissionsHandler(transactionalEnforcer)
 	authorizationApp := &authorization.App{
 		CreateWorkspace:                 createWorkspaceHandler,
-		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
+		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
 		GetWorkspaceMembers:             getWorkspaceMembersHandler,
+		GetUserWorkspaces:               getUserWorkspacesHandler,
+		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
 		HasWorkspacePermission:          hasWorkspacePermissionHandler,
 		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
-		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
 	}
 	grpcServiceServer := authorization.NewGRPCServiceServer(authorizationApp)
+	grpcServiceServerAdapter := authorization.NewGRPCServiceServerAdapter(grpcServiceServer)
 	serverConfig := &config.Server
 	log := &config.Log
 	stdoutHandler := logging.NewStdoutHandler(log)
@@ -64,7 +67,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.New(stdoutHandler, slogHandler, log)
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	grpcServer, cleanup2, err := authorization.NewGRPCServer(ctx, grpcServiceServer, serverConfig, loggingLogger)
+	grpcServer, cleanup2, err := authorization.NewGRPCServer(ctx, grpcServiceServerAdapter, serverConfig, loggingLogger)
 	if err != nil {
 		cleanup()
 		return nil, nil, err

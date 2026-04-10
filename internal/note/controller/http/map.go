@@ -22,13 +22,13 @@ func toNote(n app.Note) (note.Note, error) {
 
 	var trashed *note.NoteTrashed
 	if n.Trashed != nil {
-		trashedBy, err := toTrashedBy(n.Trashed.TrashedBy)
+		trashedBy, err := toTrashedBy(n.Trashed.By)
 		if err != nil {
 			return note.Note{}, fmt.Errorf("invalid trashed by: %v", err)
 		}
 		trashed = &note.NoteTrashed{
-			TrashedBy: trashedBy,
-			TrashedAt: n.Trashed.TrashedAt,
+			By: trashedBy,
+			At: n.Trashed.At,
 		}
 	}
 
@@ -56,13 +56,13 @@ func toFolder(f app.Folder) (note.Folder, error) {
 
 	var trashed *note.FolderTrashed
 	if f.Trashed != nil {
-		trashedBy, err := toTrashedBy(f.Trashed.TrashedBy)
+		trashedBy, err := toTrashedBy(f.Trashed.By)
 		if err != nil {
 			return note.Folder{}, fmt.Errorf("invalid trashed by: %v", err)
 		}
 		trashed = &note.FolderTrashed{
-			TrashedBy: trashedBy,
-			TrashedAt: f.Trashed.TrashedAt,
+			By: trashedBy,
+			At: f.Trashed.At,
 		}
 	}
 
@@ -98,6 +98,17 @@ func toWorkspaceRole(r app.WorkspaceRole) (note.WorkspaceRole, error) {
 	default:
 		return note.WorkspaceRole(""), errs.NewInternal(fmt.Sprintf("invalid workspace role: %v", r), nil)
 	}
+}
+
+func toUserWorkspace(u *app.UserWorkspace) (note.UserWorkspace, error) {
+	role, err := toWorkspaceRole(u.Role)
+	if err != nil {
+		return note.UserWorkspace{}, err
+	}
+	return note.UserWorkspace{
+		Workspace: toWorkspace(u.Workspace),
+		Role:      role,
+	}, nil
 }
 
 func toWorkspaceMember(m *app.WorkspaceMember) (note.WorkspaceMember, error) {
@@ -154,7 +165,7 @@ func toWorkspaceTreeFolder(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFolder 
 }
 
 func toTrashedFolder(f *app.TrashedFolder) (note.TrashedFolder, error) {
-	trashedBy, err := toTrashedBy(f.Trashed.TrashedBy)
+	trashedBy, err := toTrashedBy(f.Trashed.By)
 	if err != nil {
 		return note.TrashedFolder{}, err
 	}
@@ -162,14 +173,14 @@ func toTrashedFolder(f *app.TrashedFolder) (note.TrashedFolder, error) {
 		Id:   f.ID,
 		Name: &f.Name,
 		Trashed: note.Trashed{
-			TrashedBy: trashedBy,
-			TrashedAt: f.Trashed.TrashedAt,
+			By: trashedBy,
+			At: f.Trashed.At,
 		},
 	}, nil
 }
 
 func toTrashedNote(n *app.TrashedNote) (note.TrashedNote, error) {
-	trashedBy, err := toTrashedBy(n.Trashed.TrashedBy)
+	trashedBy, err := toTrashedBy(n.Trashed.By)
 	if err != nil {
 		return note.TrashedNote{}, err
 	}
@@ -177,8 +188,8 @@ func toTrashedNote(n *app.TrashedNote) (note.TrashedNote, error) {
 		Id:   n.ID,
 		Name: &n.Name,
 		Trashed: note.Trashed{
-			TrashedBy: trashedBy,
-			TrashedAt: n.Trashed.TrashedAt,
+			By: trashedBy,
+			At: n.Trashed.At,
 		},
 	}, nil
 }

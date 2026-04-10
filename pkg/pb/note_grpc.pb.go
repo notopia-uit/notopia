@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	NoteService_GetNoteName_FullMethodName            = "/note.NoteService/GetNoteName"
-	NoteService_CheckNoteExistence_FullMethodName     = "/note.NoteService/CheckNoteExistence"
+	NoteService_GetNote_FullMethodName                = "/note.NoteService/GetNote"
 	NoteService_GetWorkspaceIdByNoteId_FullMethodName = "/note.NoteService/GetWorkspaceIdByNoteId"
 )
 
@@ -28,8 +28,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NoteServiceClient interface {
+	// NOTE: maybe this will be replaced with batch get
 	GetNoteName(ctx context.Context, in *GetNoteNameRequest, opts ...grpc.CallOption) (*GetNoteNameResponse, error)
-	CheckNoteExistence(ctx context.Context, in *CheckNoteExistenceRequest, opts ...grpc.CallOption) (*CheckNoteExistenceResponse, error)
+	GetNote(ctx context.Context, in *GetNoteRequest, opts ...grpc.CallOption) (*GetNoteResponse, error)
+	// NOTE: what, where is this used?
 	GetWorkspaceIdByNoteId(ctx context.Context, in *GetWorkspaceIdByNoteIdRequest, opts ...grpc.CallOption) (*GetWorkspaceIdByNoteIdResponse, error)
 }
 
@@ -51,10 +53,10 @@ func (c *noteServiceClient) GetNoteName(ctx context.Context, in *GetNoteNameRequ
 	return out, nil
 }
 
-func (c *noteServiceClient) CheckNoteExistence(ctx context.Context, in *CheckNoteExistenceRequest, opts ...grpc.CallOption) (*CheckNoteExistenceResponse, error) {
+func (c *noteServiceClient) GetNote(ctx context.Context, in *GetNoteRequest, opts ...grpc.CallOption) (*GetNoteResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CheckNoteExistenceResponse)
-	err := c.cc.Invoke(ctx, NoteService_CheckNoteExistence_FullMethodName, in, out, cOpts...)
+	out := new(GetNoteResponse)
+	err := c.cc.Invoke(ctx, NoteService_GetNote_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -72,16 +74,17 @@ func (c *noteServiceClient) GetWorkspaceIdByNoteId(ctx context.Context, in *GetW
 }
 
 // NoteServiceServer is the server API for NoteService service.
-// All implementations must embed UnimplementedNoteServiceServer
+// All implementations should embed UnimplementedNoteServiceServer
 // for forward compatibility.
 type NoteServiceServer interface {
+	// NOTE: maybe this will be replaced with batch get
 	GetNoteName(context.Context, *GetNoteNameRequest) (*GetNoteNameResponse, error)
-	CheckNoteExistence(context.Context, *CheckNoteExistenceRequest) (*CheckNoteExistenceResponse, error)
+	GetNote(context.Context, *GetNoteRequest) (*GetNoteResponse, error)
+	// NOTE: what, where is this used?
 	GetWorkspaceIdByNoteId(context.Context, *GetWorkspaceIdByNoteIdRequest) (*GetWorkspaceIdByNoteIdResponse, error)
-	mustEmbedUnimplementedNoteServiceServer()
 }
 
-// UnimplementedNoteServiceServer must be embedded to have
+// UnimplementedNoteServiceServer should be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
@@ -91,14 +94,13 @@ type UnimplementedNoteServiceServer struct{}
 func (UnimplementedNoteServiceServer) GetNoteName(context.Context, *GetNoteNameRequest) (*GetNoteNameResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetNoteName not implemented")
 }
-func (UnimplementedNoteServiceServer) CheckNoteExistence(context.Context, *CheckNoteExistenceRequest) (*CheckNoteExistenceResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CheckNoteExistence not implemented")
+func (UnimplementedNoteServiceServer) GetNote(context.Context, *GetNoteRequest) (*GetNoteResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetNote not implemented")
 }
 func (UnimplementedNoteServiceServer) GetWorkspaceIdByNoteId(context.Context, *GetWorkspaceIdByNoteIdRequest) (*GetWorkspaceIdByNoteIdResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetWorkspaceIdByNoteId not implemented")
 }
-func (UnimplementedNoteServiceServer) mustEmbedUnimplementedNoteServiceServer() {}
-func (UnimplementedNoteServiceServer) testEmbeddedByValue()                     {}
+func (UnimplementedNoteServiceServer) testEmbeddedByValue() {}
 
 // UnsafeNoteServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to NoteServiceServer will
@@ -136,20 +138,20 @@ func _NoteService_GetNoteName_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NoteService_CheckNoteExistence_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckNoteExistenceRequest)
+func _NoteService_GetNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNoteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NoteServiceServer).CheckNoteExistence(ctx, in)
+		return srv.(NoteServiceServer).GetNote(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: NoteService_CheckNoteExistence_FullMethodName,
+		FullMethod: NoteService_GetNote_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NoteServiceServer).CheckNoteExistence(ctx, req.(*CheckNoteExistenceRequest))
+		return srv.(NoteServiceServer).GetNote(ctx, req.(*GetNoteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -184,8 +186,8 @@ var NoteService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NoteService_GetNoteName_Handler,
 		},
 		{
-			MethodName: "CheckNoteExistence",
-			Handler:    _NoteService_CheckNoteExistence_Handler,
+			MethodName: "GetNote",
+			Handler:    _NoteService_GetNote_Handler,
 		},
 		{
 			MethodName: "GetWorkspaceIdByNoteId",

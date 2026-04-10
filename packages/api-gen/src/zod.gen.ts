@@ -99,8 +99,8 @@ export const zNoteFolder = z.object({
     workspaceId: zNotePropertiesId,
     updatedAt: z.iso.datetime().readonly(),
     trashed: z.object({
-        trashedBy: zNoteTrashedBy,
-        trashedAt: z.iso.datetime()
+        by: zNoteTrashedBy,
+        at: z.iso.datetime()
     }).readonly().nullable()
 });
 
@@ -120,8 +120,8 @@ export const zNoteNote = z.object({
     tags: z.array(z.string()).readonly(),
     updatedAt: z.iso.datetime().readonly(),
     trashed: z.object({
-        trashedBy: zNoteTrashedBy,
-        trashedAt: z.iso.datetime()
+        by: zNoteTrashedBy,
+        at: z.iso.datetime()
     }).readonly().nullable()
 });
 
@@ -165,9 +165,10 @@ export const zNoteWorkspaceRole = z.enum([
     'viewer'
 ]);
 
-export const zNoteUserWorkspace = zNoteWorkspace.and(z.object({
+export const zNoteUserWorkspace = z.object({
+    workspace: zNoteWorkspace,
     role: zNoteWorkspaceRole
-}));
+});
 
 export const zNoteSlug = z.string();
 
@@ -225,8 +226,8 @@ export const zNoteWorkspaceMember = z.object({
 export const zNoteWorkspacePropertiesName = z.string().min(1).max(255);
 
 export const zNoteTrashed = z.object({
-    trashedBy: zNoteTrashedBy,
-    trashedAt: z.iso.datetime()
+    by: zNoteTrashedBy,
+    at: z.iso.datetime()
 });
 
 export const zNoteTrashedNote = z.object({
@@ -301,9 +302,10 @@ export const zNoteWorkspaceWritable = z.object({
     name: z.string().min(1).max(255)
 });
 
-export const zNoteUserWorkspaceWritable = zNoteWorkspaceWritable.and(z.object({
+export const zNoteUserWorkspaceWritable = z.object({
+    workspace: zNoteWorkspaceWritable,
     role: zNoteWorkspaceRole
-}));
+});
 
 export const zNoteWorkspaceItemsUpdatedEventWritable = z.object({
     id: z.uuid(),

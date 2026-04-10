@@ -37,11 +37,13 @@ export const HocuspocusProvider: Provider = {
       async onAuthenticate(data) {
         const documentId = data.documentName;
         const context = data.context as HocuspocusContext;
-        const noteExistenceRes =
-          await noteService.checkNoteExistence(documentId);
-        if (!noteExistenceRes) {
-          throw new Error(`Document with ID ${documentId} does not exist`);
-        }
+        // TODO: replace with get note to check existence and trashed or what ever
+
+        // const noteExistenceRes =
+        //   await noteService.checkNoteExistence(documentId);
+        // if (!noteExistenceRes) {
+        //   throw new Error(`Document with ID ${documentId} does not exist`);
+        // }
         const userPermissionsRes =
           await authorizationService.getUserNotePermissions(
             context.user.id,

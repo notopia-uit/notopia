@@ -12,19 +12,35 @@ import (
 
 type GRPCServiceServer struct {
 	app *App
-	pb.UnimplementedAuthorizationServiceServer
 }
-
-var _ pb.AuthorizationServiceServer = (*GRPCServiceServer)(nil)
 
 func NewGRPCServiceServer(app *App) *GRPCServiceServer {
 	return &GRPCServiceServer{
-		app:                                     app,
-		UnimplementedAuthorizationServiceServer: pb.UnimplementedAuthorizationServiceServer{},
+		app: app,
 	}
 }
 
 var ProvideGRPCServiceServer = NewGRPCServiceServer
+
+var _ pb.AuthorizationServiceServer = (*GRPCServiceServer)(nil)
+
+func (g *GRPCServiceServer) GetUserWorkspaces(ctx context.Context, req *pb.GetUserWorkspacesRequest) (*pb.GetUserWorkspacesResponse, error) {
+	workspaces, err := g.app.GetUserWorkspaces.Handle(ctx, app.GetUserWorkspaces{
+		UserID: req.UserId,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	pbWorkspaces := make([]*pb.UserWorkspace, len(workspaces))
+	for i, w := range workspaces {
+		pbWorkspaces[i] = appUserWorkspaceToPb(w)
+	}
+
+	return &pb.GetUserWorkspacesResponse{
+		Workspaces: pbWorkspaces,
+	}, nil
+}
 
 func (g *GRPCServiceServer) CreateWorkspaceWithOwner(ctx context.Context, req *pb.CreateWorkspaceWithOwnerRequest) (*pb.CreateWorkspaceWithOwnerResponse, error) {
 	workspaceID, err := uuid.Parse(req.WorkspaceId)
@@ -83,10 +99,7 @@ func (g *GRPCServiceServer) GetWorkspaceMembers(ctx context.Context, req *pb.Get
 
 	pbMembers := make([]*pb.WorkspaceMember, len(members))
 	for i, m := range members {
-		pbMembers[i] = &pb.WorkspaceMember{
-			Id:   m.ID,
-			Role: appWorkspaceRoleToPb(m.Role),
-		}
+		pbMembers[i] = appWorkspaceMemberToPb(m)
 	}
 
 	return &pb.GetWorkspaceMembersResponse{
@@ -154,7 +167,7 @@ func (g *GRPCServiceServer) GetUserWorkspaceItemPermissions(ctx context.Context,
 }
 
 func (g *GRPCServiceServer) DeleteWorkspace(ctx context.Context, req *pb.DeleteWorkspaceRequest) (*pb.DeleteWorkspaceResponse, error) {
-	return nil, errs.NewUnimplemented()
+	return nil, errs.Unimplemented
 }
 
 func pbWorkspaceRoleToApp(role pb.WorkspaceRole) app.WorkspaceRole {
@@ -169,6 +182,20 @@ func pbWorkspaceRoleToApp(role pb.WorkspaceRole) app.WorkspaceRole {
 		return ""
 	default:
 		return ""
+	}
+}
+
+func appUserWorkspaceToPb(workspace *app.UserWorkspace) *pb.UserWorkspace {
+	return &pb.UserWorkspace{
+		Id:   workspace.ID.String(),
+		Role: appWorkspaceRoleToPb(workspace.Role),
+	}
+}
+
+func appWorkspaceMemberToPb(workspace *app.WorkspaceMember) *pb.WorkspaceMember {
+	return &pb.WorkspaceMember{
+		Id:   workspace.ID,
+		Role: appWorkspaceRoleToPb(workspace.Role),
 	}
 }
 

@@ -43,7 +43,12 @@ func (r WorkspaceRole) String() string {
 }
 
 type WorkspaceMember struct {
-	ID   string
+	ID   string // This is member ID
+	Role WorkspaceRole
+}
+
+type UserWorkspace struct {
+	ID   uuid.UUID // This is workspace ID
 	Role WorkspaceRole
 }
 

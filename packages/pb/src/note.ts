@@ -9,8 +9,21 @@ import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import type { handleUnaryCall, Metadata, UntypedServiceImplementation } from "@grpc/grpc-js";
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
+import { Timestamp } from "./google/protobuf/timestamp";
 
 export const protobufPackage = "note";
+
+export enum TrashedBy {
+  TRASHED_BY_UNSPECIFIED = 0,
+  TRASHED_BY_PURPOSE = 1,
+  TRASHED_BY_PARENT = 2,
+  UNRECOGNIZED = -1,
+}
+
+export interface Trashed {
+  by: TrashedBy;
+  at: Timestamp | undefined;
+}
 
 export interface GetNoteNameRequest {
   id: string;
@@ -20,12 +33,20 @@ export interface GetNoteNameResponse {
   name: string;
 }
 
-export interface CheckNoteExistenceRequest {
-  noteId: string;
+export interface GetNoteRequest {
+  id: string;
+  excludeTrashed: boolean;
+  userId: string;
 }
 
-export interface CheckNoteExistenceResponse {
-  exists: boolean;
+export interface GetNoteResponse {
+  id: string;
+  name: string;
+  icon?: string | undefined;
+  folderId: string;
+  tags: string[];
+  updatedAt: Timestamp | undefined;
+  trashed?: Trashed | undefined;
 }
 
 export interface GetWorkspaceIdByNoteIdRequest {
@@ -37,6 +58,54 @@ export interface GetWorkspaceIdByNoteIdResponse {
 }
 
 export const NOTE_PACKAGE_NAME = "note";
+
+function createBaseTrashed(): Trashed {
+  return { by: 0, at: undefined };
+}
+
+export const Trashed: MessageFns<Trashed> = {
+  encode(message: Trashed, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.by !== 0) {
+      writer.uint32(8).int32(message.by);
+    }
+    if (message.at !== undefined) {
+      Timestamp.encode(message.at, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Trashed {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTrashed();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.by = reader.int32() as any;
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.at = Timestamp.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
 
 function createBaseGetNoteNameRequest(): GetNoteNameRequest {
   return { id: "" };
@@ -112,22 +181,28 @@ export const GetNoteNameResponse: MessageFns<GetNoteNameResponse> = {
   },
 };
 
-function createBaseCheckNoteExistenceRequest(): CheckNoteExistenceRequest {
-  return { noteId: "" };
+function createBaseGetNoteRequest(): GetNoteRequest {
+  return { id: "", excludeTrashed: false, userId: "" };
 }
 
-export const CheckNoteExistenceRequest: MessageFns<CheckNoteExistenceRequest> = {
-  encode(message: CheckNoteExistenceRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.noteId !== "") {
-      writer.uint32(10).string(message.noteId);
+export const GetNoteRequest: MessageFns<GetNoteRequest> = {
+  encode(message: GetNoteRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.excludeTrashed !== false) {
+      writer.uint32(16).bool(message.excludeTrashed);
+    }
+    if (message.userId !== "") {
+      writer.uint32(26).string(message.userId);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CheckNoteExistenceRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): GetNoteRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCheckNoteExistenceRequest();
+    const message = createBaseGetNoteRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -136,7 +211,23 @@ export const CheckNoteExistenceRequest: MessageFns<CheckNoteExistenceRequest> = 
             break;
           }
 
-          message.noteId = reader.string();
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.excludeTrashed = reader.bool();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.userId = reader.string();
           continue;
         }
       }
@@ -149,31 +240,97 @@ export const CheckNoteExistenceRequest: MessageFns<CheckNoteExistenceRequest> = 
   },
 };
 
-function createBaseCheckNoteExistenceResponse(): CheckNoteExistenceResponse {
-  return { exists: false };
+function createBaseGetNoteResponse(): GetNoteResponse {
+  return { id: "", name: "", folderId: "", tags: [], updatedAt: undefined };
 }
 
-export const CheckNoteExistenceResponse: MessageFns<CheckNoteExistenceResponse> = {
-  encode(message: CheckNoteExistenceResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.exists !== false) {
-      writer.uint32(8).bool(message.exists);
+export const GetNoteResponse: MessageFns<GetNoteResponse> = {
+  encode(message: GetNoteResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.icon !== undefined) {
+      writer.uint32(26).string(message.icon);
+    }
+    if (message.folderId !== "") {
+      writer.uint32(34).string(message.folderId);
+    }
+    for (const v of message.tags) {
+      writer.uint32(42).string(v!);
+    }
+    if (message.updatedAt !== undefined) {
+      Timestamp.encode(message.updatedAt, writer.uint32(50).fork()).join();
+    }
+    if (message.trashed !== undefined) {
+      Trashed.encode(message.trashed, writer.uint32(58).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CheckNoteExistenceResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): GetNoteResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCheckNoteExistenceResponse();
+    const message = createBaseGetNoteResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1: {
-          if (tag !== 8) {
+          if (tag !== 10) {
             break;
           }
 
-          message.exists = reader.bool();
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.icon = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.folderId = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.tags.push(reader.string());
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.updatedAt = Timestamp.decode(reader, reader.uint32());
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.trashed = Trashed.decode(reader, reader.uint32());
           continue;
         }
       }
@@ -261,9 +418,13 @@ export const GetWorkspaceIdByNoteIdResponse: MessageFns<GetWorkspaceIdByNoteIdRe
 };
 
 export interface NoteServiceClient {
+  /** NOTE: maybe this will be replaced with batch get */
+
   getNoteName(request: GetNoteNameRequest, metadata?: Metadata): Observable<GetNoteNameResponse>;
 
-  checkNoteExistence(request: CheckNoteExistenceRequest, metadata?: Metadata): Observable<CheckNoteExistenceResponse>;
+  getNote(request: GetNoteRequest, metadata?: Metadata): Observable<GetNoteResponse>;
+
+  /** NOTE: what, where is this used? */
 
   getWorkspaceIdByNoteId(
     request: GetWorkspaceIdByNoteIdRequest,
@@ -272,15 +433,19 @@ export interface NoteServiceClient {
 }
 
 export interface NoteServiceController {
+  /** NOTE: maybe this will be replaced with batch get */
+
   getNoteName(
     request: GetNoteNameRequest,
     metadata?: Metadata,
   ): Promise<GetNoteNameResponse> | Observable<GetNoteNameResponse> | GetNoteNameResponse;
 
-  checkNoteExistence(
-    request: CheckNoteExistenceRequest,
+  getNote(
+    request: GetNoteRequest,
     metadata?: Metadata,
-  ): Promise<CheckNoteExistenceResponse> | Observable<CheckNoteExistenceResponse> | CheckNoteExistenceResponse;
+  ): Promise<GetNoteResponse> | Observable<GetNoteResponse> | GetNoteResponse;
+
+  /** NOTE: what, where is this used? */
 
   getWorkspaceIdByNoteId(
     request: GetWorkspaceIdByNoteIdRequest,
@@ -293,7 +458,7 @@ export interface NoteServiceController {
 
 export function NoteServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["getNoteName", "checkNoteExistence", "getWorkspaceIdByNoteId"];
+    const grpcMethods: string[] = ["getNoteName", "getNote", "getWorkspaceIdByNoteId"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("NoteService", method)(constructor.prototype[method], method, descriptor);
@@ -310,6 +475,7 @@ export const NOTE_SERVICE_NAME = "NoteService";
 
 export type NoteServiceService = typeof NoteServiceService;
 export const NoteServiceService = {
+  /** NOTE: maybe this will be replaced with batch get */
   getNoteName: {
     path: "/note.NoteService/GetNoteName" as const,
     requestStream: false as const,
@@ -319,17 +485,16 @@ export const NoteServiceService = {
     responseSerialize: (value: GetNoteNameResponse): Buffer => Buffer.from(GetNoteNameResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): GetNoteNameResponse => GetNoteNameResponse.decode(value),
   },
-  checkNoteExistence: {
-    path: "/note.NoteService/CheckNoteExistence" as const,
+  getNote: {
+    path: "/note.NoteService/GetNote" as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: CheckNoteExistenceRequest): Buffer =>
-      Buffer.from(CheckNoteExistenceRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): CheckNoteExistenceRequest => CheckNoteExistenceRequest.decode(value),
-    responseSerialize: (value: CheckNoteExistenceResponse): Buffer =>
-      Buffer.from(CheckNoteExistenceResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): CheckNoteExistenceResponse => CheckNoteExistenceResponse.decode(value),
+    requestSerialize: (value: GetNoteRequest): Buffer => Buffer.from(GetNoteRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetNoteRequest => GetNoteRequest.decode(value),
+    responseSerialize: (value: GetNoteResponse): Buffer => Buffer.from(GetNoteResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): GetNoteResponse => GetNoteResponse.decode(value),
   },
+  /** NOTE: what, where is this used? */
   getWorkspaceIdByNoteId: {
     path: "/note.NoteService/GetWorkspaceIdByNoteId" as const,
     requestStream: false as const,
@@ -345,8 +510,10 @@ export const NoteServiceService = {
 } as const;
 
 export interface NoteServiceServer extends UntypedServiceImplementation {
+  /** NOTE: maybe this will be replaced with batch get */
   getNoteName: handleUnaryCall<GetNoteNameRequest, GetNoteNameResponse>;
-  checkNoteExistence: handleUnaryCall<CheckNoteExistenceRequest, CheckNoteExistenceResponse>;
+  getNote: handleUnaryCall<GetNoteRequest, GetNoteResponse>;
+  /** NOTE: what, where is this used? */
   getWorkspaceIdByNoteId: handleUnaryCall<GetWorkspaceIdByNoteIdRequest, GetWorkspaceIdByNoteIdResponse>;
 }
 
