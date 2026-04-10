@@ -40,15 +40,16 @@ export class NoteService implements OnModuleInit {
         excludeTrashed: excludeTrashed,
       })
     );
+    if (!response.updatedAt) {
+      throw new Error('Note updatedAt timestamp is required');
+    }
     return {
       id: response.id,
       name: response.name,
       tags: response.tags,
       folderId: response.folderId,
       icon: response.icon,
-      updatedAt: response.updatedAt
-        ? protoTimestampToDate(response.updatedAt)
-        : undefined,
+      updatedAt: protoTimestampToDate(response.updatedAt),
       trashed: response.trashed
         ? this.toTrashedModel(response.trashed)
         : undefined,
