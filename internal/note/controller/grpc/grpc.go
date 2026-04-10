@@ -72,10 +72,7 @@ func New(
 		address: cfg.GRPC.Address(),
 	}
 	pb.RegisterNoteServiceServer(grpcServer, serviceServer)
-	cleanup := func() {
-		grpcServer.GracefulStop()
-	}
-	return grpc, cleanup, nil
+	return grpc, grpcServer.GracefulStop, nil
 }
 
 func (g *GRPC) Run() error {

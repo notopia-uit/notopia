@@ -9,7 +9,7 @@
       "{projectRoot}/model.conf",
       "!{projectRoot}/_test.go"
     ],
-    "test": ["{projectRoot}/**/*_test.go", "{projectRoot}/policy_test.csv"]
+    "test": ["{projectRoot}/**/*_test.go", "{projectRoot}/**/*.csv"]
   },
   "targets": {
     "test": {
