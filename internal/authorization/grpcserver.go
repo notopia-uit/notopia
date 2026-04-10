@@ -59,25 +59,9 @@ type GRPCServer struct {
 	address string
 }
 
-type GRPCServiceServerAdapter struct {
-	pb.UnimplementedAuthorizationServiceServer
-	AuthorizationServiceServer *GRPCServiceServer
-}
-
-func NewGRPCServiceServerAdapter(srv *GRPCServiceServer) *GRPCServiceServerAdapter {
-	return &GRPCServiceServerAdapter{
-		UnimplementedAuthorizationServiceServer: pb.UnimplementedAuthorizationServiceServer{},
-		AuthorizationServiceServer:              srv,
-	}
-}
-
-var _ pb.AuthorizationServiceServer = (*GRPCServiceServerAdapter)(nil)
-
-var ProvideGRPCServiceServerAdapter = NewGRPCServiceServerAdapter
-
 func NewGRPCServer(
 	ctx context.Context,
-	serviceServer *GRPCServiceServerAdapter,
+	serviceServer *GRPCServiceServer,
 	cfg *ServerConfig,
 	logger logging.Logger,
 ) (*GRPCServer, func(), error) {

@@ -10,7 +10,7 @@ import (
 
 type UpdateWorkspaceMembers struct {
 	WorkspaceID uuid.UUID
-	Members     []WorkspaceMemberUpdate
+	Members     []*WorkspaceMemberUpdate
 	UserID      string
 }
 
@@ -33,10 +33,6 @@ var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
 
 // FIXME: This maybe need saga? Because it involves 2 external things
 // Or we have to persist event and let another handler to consume
-// TODO:
-// 1. Check length >= 1
-// 2. Call auth service
-// 3. Fire workspace event
 func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateWorkspaceMembers) error {
 	if len(cmd.Members) == 0 {
 		return errs.NewWorkspaceMembersCannotBeEmpty(cmd.WorkspaceID)

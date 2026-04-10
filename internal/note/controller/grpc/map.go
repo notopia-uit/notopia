@@ -7,6 +7,9 @@ import (
 )
 
 func toTrashed(trash *app.Trashed) *pb.Trashed {
+	if trash == nil {
+		return nil
+	}
 	return &pb.Trashed{
 		By: toTrashedBy(trash.By),
 		At: timestamppb.New(trash.At),

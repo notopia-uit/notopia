@@ -139,7 +139,7 @@ func (a *Authorization) UpdateWorkspaceMembers(
 	ctx context.Context,
 	userID string,
 	workspaceID uuid.UUID,
-	members []app.WorkspaceMemberUpdate,
+	members []*app.WorkspaceMemberUpdate,
 ) error {
 	return errs.Unimplemented
 }

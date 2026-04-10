@@ -31,10 +31,14 @@ func (s *ServiceServer) GetNote(
 	if err != nil {
 		return nil, err
 	}
+	var icon *string
+	if note.Icon != "" {
+		icon = &note.Icon
+	}
 	return &pb.GetNoteResponse{
 		Id:        note.ID.String(),
 		Name:      note.Name,
-		Icon:      &note.Icon,
+		Icon:      icon,
 		FolderId:  note.FolderID.String(),
 		Tags:      note.Tags,
 		UpdatedAt: timestamppb.New(note.UpdatedAt),

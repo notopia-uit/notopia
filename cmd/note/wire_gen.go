@@ -215,8 +215,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	serviceServer := grpc.NewServiceServer(server)
-	serviceServerAdapter := grpc.NewServiceServerAdapter(serviceServer)
-	grpcGRPC, cleanup7, err := grpc.New(ctx, serviceServerAdapter, configServer, loggingLogger)
+	grpcGRPC, cleanup7, err := grpc.New(ctx, serviceServer, configServer, loggingLogger)
 	if err != nil {
 		cleanup6()
 		cleanup5()

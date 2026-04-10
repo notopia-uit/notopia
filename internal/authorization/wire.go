@@ -29,7 +29,6 @@ var ProviderSetConfig = wire.NewSet(
 var ProviderSetGRPCServer = wire.NewSet(
 	ProvideGRPCServiceServer,
 	ProvideGRPCServer,
-	ProvideGRPCServiceServerAdapter,
 )
 
 var ProviderSetApp = wire.NewSet(

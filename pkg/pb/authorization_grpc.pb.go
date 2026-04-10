@@ -132,7 +132,7 @@ func (c *authorizationServiceClient) DeleteWorkspace(ctx context.Context, in *De
 }
 
 // AuthorizationServiceServer is the server API for AuthorizationService service.
-// All implementations should embed UnimplementedAuthorizationServiceServer
+// All implementations must embed UnimplementedAuthorizationServiceServer
 // for forward compatibility.
 type AuthorizationServiceServer interface {
 	GetUserWorkspaces(context.Context, *GetUserWorkspacesRequest) (*GetUserWorkspacesResponse, error)
@@ -143,9 +143,10 @@ type AuthorizationServiceServer interface {
 	HasWorkspaceItemPermission(context.Context, *HasWorkspaceItemPermissionRequest) (*HasWorkspaceItemPermissionResponse, error)
 	GetUserWorkspaceItemPermissions(context.Context, *GetUserWorkspaceItemPermissionsRequest) (*GetUserWorkspaceItemPermissionsResponse, error)
 	DeleteWorkspace(context.Context, *DeleteWorkspaceRequest) (*DeleteWorkspaceResponse, error)
+	mustEmbedUnimplementedAuthorizationServiceServer()
 }
 
-// UnimplementedAuthorizationServiceServer should be embedded to have
+// UnimplementedAuthorizationServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
@@ -176,7 +177,8 @@ func (UnimplementedAuthorizationServiceServer) GetUserWorkspaceItemPermissions(c
 func (UnimplementedAuthorizationServiceServer) DeleteWorkspace(context.Context, *DeleteWorkspaceRequest) (*DeleteWorkspaceResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteWorkspace not implemented")
 }
-func (UnimplementedAuthorizationServiceServer) testEmbeddedByValue() {}
+func (UnimplementedAuthorizationServiceServer) mustEmbedUnimplementedAuthorizationServiceServer() {}
+func (UnimplementedAuthorizationServiceServer) testEmbeddedByValue()                              {}
 
 // UnsafeAuthorizationServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to AuthorizationServiceServer will

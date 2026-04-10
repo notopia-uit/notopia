@@ -37,6 +37,7 @@ var ProvideAuthentik = NewAuthentik
 
 var _ app.IdentityService = (*Authentik)(nil)
 
+// Due to limitation of Authentik API, we have to retrieve users one by one
 func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]*app.User, error) {
 	ctx = context.WithValue(ctx, api.ContextAccessToken, a.token)
 	result := make([]*app.User, len(ids))

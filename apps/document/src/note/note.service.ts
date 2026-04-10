@@ -4,8 +4,14 @@ import {
   NOTE_PACKAGE_NAME,
   NOTE_SERVICE_NAME,
   NoteServiceClient,
+  Trashed,
+  TrashedBy,
 } from '@notopia-uit/pb/note';
 import { firstValueFrom } from 'rxjs';
+
+import { protoTimestampToDate } from '#/common/proto-timestamp';
+
+import { NoteModel, TrashedModel } from './note.model';
 
 @Injectable()
 export class NoteService implements OnModuleInit {
@@ -16,6 +22,37 @@ export class NoteService implements OnModuleInit {
   onModuleInit(): void {
     this.noteServiceClient =
       this.client.getService<NoteServiceClient>(NOTE_SERVICE_NAME);
+  }
+
+  async getNoteById({
+    noteId,
+    userId,
+    excludeTrashed = false,
+  }: {
+    noteId: string;
+    userId: string;
+    excludeTrashed?: boolean;
+  }): Promise<NoteModel> {
+    const response = await firstValueFrom(
+      this.noteServiceClient.getNote({
+        id: noteId,
+        userId: userId,
+        excludeTrashed: excludeTrashed,
+      })
+    );
+    return {
+      id: response.id,
+      name: response.name,
+      tags: response.tags,
+      folderId: response.folderId,
+      icon: response.icon,
+      updatedAt: response.updatedAt
+        ? protoTimestampToDate(response.updatedAt)
+        : undefined,
+      trashed: response.trashed
+        ? this.toTrashedModel(response.trashed)
+        : undefined,
+    };
   }
 
   // TODO: previously used to fetch each, but we might going to change batch, maybe this will be removed
@@ -35,5 +72,40 @@ export class NoteService implements OnModuleInit {
       })
     );
     return response.workspaceId;
+  }
+
+  toTrashedModel(trashed: Trashed): TrashedModel {
+    // export enum TrashedBy {
+    //   TRASHED_BY_UNSPECIFIED = 0,
+    //   TRASHED_BY_PURPOSE = 1,
+    //   TRASHED_BY_PARENT = 2,
+    //   UNRECOGNIZED = -1,
+    // }
+    switch (trashed.by) {
+      case TrashedBy.TRASHED_BY_UNSPECIFIED:
+        throw new Error('Invalid trashed by value: TRASHED_BY_UNSPECIFIED');
+      case TrashedBy.TRASHED_BY_PURPOSE:
+        if (!trashed.at) {
+          throw new Error(
+            'Trashed at timestamp is required for TRASHED_BY_PURPOSE'
+          );
+        }
+        return {
+          by: 'purpose',
+          at: protoTimestampToDate(trashed.at),
+        };
+      case TrashedBy.TRASHED_BY_PARENT:
+        if (!trashed.at) {
+          throw new Error(
+            'Trashed at timestamp is required for TRASHED_BY_PARENT'
+          );
+        }
+        return {
+          by: 'parent',
+          at: protoTimestampToDate(trashed.at),
+        };
+      default:
+        throw new Error(`Invalid trashed by value: ${trashed.by}`);
+    }
   }
 }

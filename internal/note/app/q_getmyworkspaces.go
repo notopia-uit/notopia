@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/authorization/errs"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type GetMyWorkspaces struct {
@@ -49,16 +49,16 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 	for _, w := range workspaces {
 		workspaceIDWorkspaceMap[w.ID] = w
 	}
-	userWorkspaces := make([]*UserWorkspace, len(workspaces))
-	for i, auw := range authorizationUserWorkspaces {
+	userWorkspaces := make([]*UserWorkspace, 0, len(authorizationUserWorkspaces))
+	for _, auw := range authorizationUserWorkspaces {
 		w, ok := workspaceIDWorkspaceMap[auw.ID]
 		if !ok {
 			return nil, errs.NewInternal("workspace not found for user workspace")
 		}
-		userWorkspaces[i] = &UserWorkspace{
+		userWorkspaces = append(userWorkspaces, &UserWorkspace{
 			Workspace: w,
 			Role:      auw.Role,
-		}
+		})
 	}
 	return userWorkspaces, nil
 }

@@ -11,12 +11,14 @@ import (
 )
 
 type GRPCServiceServer struct {
+	pb.UnimplementedAuthorizationServiceServer
 	app *App
 }
 
 func NewGRPCServiceServer(app *App) *GRPCServiceServer {
 	return &GRPCServiceServer{
-		app: app,
+		UnimplementedAuthorizationServiceServer: pb.UnimplementedAuthorizationServiceServer{},
+		app:                                     app,
 	}
 }
 

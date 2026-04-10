@@ -35,6 +35,7 @@ func (h *GetUserWorkspacesHandler) Handle(ctx context.Context, params GetUserWor
 		if len(rule) != 3 {
 			return nil, errs.NewCasbinPolicySignatureInvalid(fmt.Sprintf("expected 3 elements in grouping policy rule, got %d", len(rule)))
 		}
+		// TODO: wtf is this? maybe another function to parse the workspace ID
 		workspaceID, err := uuid.Parse(rule[2][len("workspace:"):])
 		if err != nil {
 			return nil, errs.NewInvalid(fmt.Sprintf("invalid workspace ID in grouping policy rule: %s", rule[2]))

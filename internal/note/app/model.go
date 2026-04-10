@@ -181,7 +181,7 @@ type Trash struct {
 }
 
 type WorkspaceMemberUpdate struct {
-	ID   uuid.UUID
+	ID   string // User ID
 	Role WorkspaceRole
 }
 

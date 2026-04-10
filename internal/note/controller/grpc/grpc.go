@@ -17,6 +17,7 @@ import (
 )
 
 type ServiceServer struct {
+	pb.UnimplementedNoteServiceServer
 	app *app.Server
 }
 
@@ -24,25 +25,12 @@ var _ pb.NoteServiceServer = (*ServiceServer)(nil)
 
 func NewServiceServer(app *app.Server) *ServiceServer {
 	return &ServiceServer{
-		app: app,
+		UnimplementedNoteServiceServer: pb.UnimplementedNoteServiceServer{},
+		app:                            app,
 	}
 }
 
 var ProvideServiceServer = NewServiceServer
-
-type ServiceServerAdapter struct {
-	pb.UnimplementedNoteServiceServer
-	NoteServiceServer *ServiceServer
-}
-
-func NewServiceServerAdapter(serviceServer *ServiceServer) *ServiceServerAdapter {
-	return &ServiceServerAdapter{
-		UnimplementedNoteServiceServer: pb.UnimplementedNoteServiceServer{},
-		NoteServiceServer:              serviceServer,
-	}
-}
-
-var ProvideServiceServerAdapter = NewServiceServerAdapter
 
 type GRPC struct {
 	server  *grpc.Server
@@ -51,7 +39,7 @@ type GRPC struct {
 
 func New(
 	ctx context.Context,
-	serviceServer *ServiceServerAdapter,
+	serviceServer *ServiceServer,
 	cfg *config.Server,
 	logger logging.Logger,
 ) (*GRPC, func(), error) {

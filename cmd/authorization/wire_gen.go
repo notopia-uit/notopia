@@ -50,7 +50,6 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
 	}
 	grpcServiceServer := authorization.NewGRPCServiceServer(authorizationApp)
-	grpcServiceServerAdapter := authorization.NewGRPCServiceServerAdapter(grpcServiceServer)
 	serverConfig := &config.Server
 	log := &config.Log
 	stdoutHandler := logging.NewStdoutHandler(log)
@@ -67,7 +66,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.New(stdoutHandler, slogHandler, log)
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	grpcServer, cleanup2, err := authorization.NewGRPCServer(ctx, grpcServiceServerAdapter, serverConfig, loggingLogger)
+	grpcServer, cleanup2, err := authorization.NewGRPCServer(ctx, grpcServiceServer, serverConfig, loggingLogger)
 	if err != nil {
 		cleanup()
 		return nil, nil, err

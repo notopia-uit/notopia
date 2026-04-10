@@ -82,7 +82,7 @@ func (h *StrictHandler) GetWorkspace(
 		return nil, err
 	}
 
-	dto := toWorkspace(result)
+	dto := toWorkspaceDTO(result)
 	return note.GetWorkspace200JSONResponse(dto), nil
 }
 
@@ -120,7 +120,7 @@ func (h *StrictHandler) GetMyWorkspaces(
 	}
 	dtos := make([]note.UserWorkspace, 0, len(myWorkspaces))
 	for _, w := range myWorkspaces {
-		dto, err := toUserWorkspace(w)
+		dto, err := toUserWorkspaceDTO(w)
 		if err != nil {
 			return nil, err
 		}
@@ -178,7 +178,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 		return nil, err
 	}
 
-	dto := toGraph(result)
+	dto := toGraphDTO(result)
 	return note.GetWorkspaceGraph200JSONResponse(dto), nil
 }
 
@@ -198,7 +198,7 @@ func (h *StrictHandler) GetWorkspaceMembers(
 	if err != nil {
 		return nil, err
 	}
-	dto, err := toWorkspaceMembers(result)
+	dto, err := toWorkspaceMembersDTO(result)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,25 @@ func (h *StrictHandler) UpdateWorkspaceMembers(
 	ctx context.Context,
 	request note.UpdateWorkspaceMembersRequestObject,
 ) (note.UpdateWorkspaceMembersResponseObject, error) {
-	return nil, errs.Unimplemented
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
+
+	members, err := toWorkspaceMemberUpdates(*request.Body)
+	if err != nil {
+		return nil, err
+	}
+	cmd := &app.UpdateWorkspaceMembers{
+		WorkspaceID: request.WorkspaceId,
+		UserID:      user.ID,
+		Members:     members,
+	}
+	if err = h.App.Cmds.UpdateWorkspaceMembersHandler.Handle(ctx, cmd); err != nil {
+		return nil, err
+	}
+
+	return note.UpdateWorkspaceMembers204Response{}, nil
 }
 
 func (h *StrictHandler) MoveWorkspaceItems(
@@ -330,7 +348,7 @@ func (h *StrictHandler) ShowTrash(
 		return nil, err
 	}
 
-	dto, err := toShowTrash(result)
+	dto, err := toShowTrashDTO(result)
 	if err != nil {
 		return nil, err
 	}
@@ -391,7 +409,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 		return nil, err
 	}
 
-	dto := toWorkspaceTreeFolder(result)
+	dto := toWorkspaceTreeFolderDTO(result)
 	return note.GetWorkspaceTree200JSONResponse(dto), nil
 }
 
