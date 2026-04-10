@@ -8,8 +8,9 @@ Manged with Nx. Package manager: pnpm (use ./pnpm-workspace.yaml), go (single go
 api/                            # OpenAPI spec
 proto/                          # Protobuf definitions
 apps/                           # JS/TS applications
-  web/                          # NextJS (nx: web)
   document/                     # Document service (NestJS) (nx: document)
+  searchworker/                 # Search worker (NestJS) sync to meilisearch (nx: searchworker)
+  web/                          # NextJS (nx: web)
 packages/                       # JS packages
   api-document-nestjs-server    # NestJS server codegen from OpenAPI spec, using openapi-generator
   api-gen                       # Frontend API client codegen from OpenAPI spec, using heyapi/openapi-ts
@@ -21,7 +22,6 @@ docs/                           # Vitepress Documentation (class, sequence, arch
 cmd/                            # Go services
   note/                         # Note service (nx: note)
   authorization/                # Authorization service (nx: authorization)
-  searchworker/                 # Search worker sync to meilisearch (nx: searchworker)
 internal/                       # Internal Go packages
   api                           # Code gen from oapi-codegen
   common

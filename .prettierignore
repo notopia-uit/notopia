@@ -18,7 +18,8 @@ docs/godoc/**
 api/bundled/**/*.json
 submodule/**
 **/seed-data/**
-packages/ui/components/ui/**
-packages/ui/lib/**
-packages/ui/lib/utils.ts
-packages/ui/hooks/**
+packages/ui/src/components/ui/**
+packages/ui/src/lib/**
+packages/ui/src/lib/utils.ts
+packages/ui/src/hooks/**
+packages/pb/src/**
