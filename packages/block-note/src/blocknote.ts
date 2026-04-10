@@ -1,23 +1,14 @@
 // TODO: reconsider rename those block note file to block-note
-import {
-  createBlockNoteReferenceSpec,
-  getNoteNameFn,
-} from './blocknote-reference';
-import { blockNoteTagSpec } from './blocknote-tag';
 import { BlockNoteSchema as OriginalBlockNoteSchema } from '@blocknote/core';
 
-export function createBlockNoteSchema({
-  getNoteName,
-}: {
-  baseUrl: string;
-  getNoteName: getNoteNameFn;
-}) {
+import { createBlockNoteReferenceSpec } from './blocknote-reference';
+import { createBlockNoteTagSpec } from './blocknote-tag';
+
+export function createBlockNoteSchema(type: 'client' | 'server' = 'client') {
   return OriginalBlockNoteSchema.create().extend({
     inlineContentSpecs: {
-      reference: createBlockNoteReferenceSpec({
-        getNoteName,
-      }),
-      tag: blockNoteTagSpec,
+      reference: createBlockNoteReferenceSpec(type),
+      tag: createBlockNoteTagSpec(),
     },
   });
 }

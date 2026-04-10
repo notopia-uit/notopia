@@ -10,10 +10,7 @@ async function run() {
     console.log('🌱 Initializing DataSource...');
     await datasource.initialize();
 
-    const blockNoteSchema = createBlockNoteSchema({
-      baseUrl: '',
-      getNoteName: () => Promise.resolve(''),
-    });
+    const blockNoteSchema = createBlockNoteSchema('server');
     // TODO: will do with editor later
     ServerBlockNoteEditor.create({ schema: blockNoteSchema });
 

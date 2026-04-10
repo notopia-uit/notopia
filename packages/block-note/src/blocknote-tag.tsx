@@ -16,7 +16,7 @@ export type BlockNoteTagInlineContentSpec = InlineContentSpec<
   typeof BlockNoteTagConfig
 >;
 
-export const blockNoteTagSpec: BlockNoteTagInlineContentSpec =
+export const createBlockNoteTagSpec = () =>
   createReactInlineContentSpec(BlockNoteTagConfig, {
     render: (props) => (
       <span

@@ -1,5 +1,12 @@
-import { AppConfig, DatabaseConfig, S3Config, ServicesConfig } from './config';
 import { registerAs } from '@nestjs/config';
+
+import {
+  AppConfig,
+  DatabaseConfig,
+  KafkaConfig,
+  S3Config,
+  ServicesConfig,
+} from './config';
 
 export const APP_CONFIG = Symbol('APP_CONFIG');
 
@@ -46,5 +53,18 @@ export const s3Config = registerAs(
     accessKeyId: process.env.NOTOPIA_DOCUMENT_S3_ACCESS_KEY_ID ?? '',
     secretAccessKey: process.env.NOTOPIA_DOCUMENT_S3_SECRET_ACCESS_KEY ?? '',
     bucketName: process.env.NOTOPIA_DOCUMENT_S3_BUCKET_NAME ?? 'document',
+  })
+);
+
+export const KAFKA_CONFIG = Symbol('KAFKA_CONFIG');
+
+export const kafkaConfig = registerAs(
+  KAFKA_CONFIG,
+  (): KafkaConfig => ({
+    clientId: process.env.NOTOPIA_DOCUMENT_KAFKA_CLIENT_ID ?? 'document',
+    brokers: (
+      process.env.NOTOPIA_DOCUMENT_KAFKA_BROKERS ?? 'localhost:19092'
+    ).split(','),
+    groupId: process.env.NOTOPIA_DOCUMENT_KAFKA_GROUP_ID ?? 'document',
   })
 );

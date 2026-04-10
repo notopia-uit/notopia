@@ -5,7 +5,7 @@ import { Meilisearch, MeilisearchError } from 'meilisearch';
 type IndexNote = {
   id: string;
   name?: string;
-  content?: string;
+  content?: string; // FIXME: This should be the block from blocknote, we have to instantiate blocknote schema
   tags?: string[];
 };
 

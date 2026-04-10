@@ -3,7 +3,7 @@ import {
   type InlineContentSpec,
 } from '@blocknote/core';
 import { createReactInlineContentSpec } from '@blocknote/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export const BlockNoteReferenceConfig = {
   type: 'reference',
@@ -19,32 +19,28 @@ export type BlockNoteReferenceInlineContentSpec = InlineContentSpec<
 
 export type getNoteNameFn = (noteId: string) => Promise<string>;
 
-const ReferenceLink = ({
-  noteId,
-  getNoteName,
-}: {
-  noteId: string;
-  getNoteName: getNoteNameFn;
-}) => {
-  const [noteName, setNoteName] = useState('Loading...');
+const ReferenceLink = ({ noteId }: { noteId: string }) => {
+  const [noteName, _] = useState('Loading...');
 
-  useEffect(() => {
-    let isMounted = true;
+  // TODO: Inject whatever context provider, to get the client to render here
 
-    const fetchNote = async () => {
-      try {
-        const name = await getNoteName(noteId);
-        if (isMounted) setNoteName(name || 'Untitled Note');
-      } catch {
-        if (isMounted) setNoteName('Unknown Note');
-      }
-    };
-
-    void fetchNote();
-    return () => {
-      isMounted = false;
-    };
-  }, [noteId, getNoteName]);
+  // useEffect(() => {
+  //   let isMounted = true;
+  //
+  //   const fetchNote = async () => {
+  //     try {
+  //       const name = await getNoteName(noteId);
+  //       if (isMounted) setNoteName(name || 'Untitled Note');
+  //     } catch {
+  //       if (isMounted) setNoteName('Unknown Note');
+  //     }
+  //   };
+  //
+  //   void fetchNote();
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, [noteId, getNoteName]);
 
   return (
     <a
@@ -58,20 +54,26 @@ const ReferenceLink = ({
   );
 };
 
-export const createBlockNoteReferenceSpec = ({
-  getNoteName,
-}: {
-  getNoteName: getNoteNameFn;
-}): BlockNoteReferenceInlineContentSpec =>
+export const createBlockNoteReferenceSpec = (
+  type: 'client' | 'server'
+): BlockNoteReferenceInlineContentSpec =>
   createReactInlineContentSpec(BlockNoteReferenceConfig, {
-    render: (props) => {
-      return (
-        <ReferenceLink
-          noteId={props.inlineContent.props.noteId}
-          getNoteName={getNoteName}
-        />
-      );
-    },
+    render:
+      type === 'client'
+        ? (props) => {
+            return <ReferenceLink noteId={props.inlineContent.props.noteId} />;
+          }
+        : (props) => {
+            // Server side rendering, just render the noteId for now
+            return (
+              <a
+                href={`@${props.inlineContent.props.noteId}`}
+                data-notopia-ref={props.inlineContent.props.noteId}
+              >
+                @{props.inlineContent.props.noteId}
+              </a>
+            );
+          },
 
     toExternalHTML: (props) => {
       const id = props.inlineContent.props.noteId;

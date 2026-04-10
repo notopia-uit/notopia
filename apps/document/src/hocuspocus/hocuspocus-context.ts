@@ -1,4 +1,4 @@
-import { User } from '../common/user';
+import { User } from '#/common/user';
 
 export type HocuspocusContext = {
   user: User;

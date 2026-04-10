@@ -1,10 +1,11 @@
-import { AppConfig } from '../config/config';
-import { APP_CONFIG } from '../config/config.factory';
-import { NoteModule } from '../note/note.module';
-import { NoteService } from '../note/note.service';
+import { MySchema } from '@blocknote/core';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createBlockNoteSchema } from '@notopia-uit/block-note';
+
+import { AppConfig } from '#/config/config';
+import { APP_CONFIG } from '#/config/config.factory';
+import { NoteModule } from '#/note/note.module';
 
 export const BLOCKNOTE_SCHEMA = Symbol('BLOCKNOTE_SCHEMA');
 
@@ -13,19 +14,14 @@ export const BLOCKNOTE_SCHEMA = Symbol('BLOCKNOTE_SCHEMA');
   providers: [
     {
       provide: BLOCKNOTE_SCHEMA,
-      useFactory: (noteService: NoteService, configService: ConfigService) => {
+      useFactory: (configService: ConfigService): MySchema => {
         const appCfg = configService.get<AppConfig>(APP_CONFIG);
         if (!appCfg) {
           throw new Error('APP_CONFIG not found');
         }
-        const getNoteName = async (noteId: string) => {
-          const noteName = await noteService.getNoteName(noteId);
-          return noteName;
-        };
-
-        return createBlockNoteSchema({ baseUrl: appCfg.apiUrl, getNoteName });
+        return createBlockNoteSchema('server');
       },
-      inject: [NoteService, ConfigService],
+      inject: [ConfigService],
     },
   ],
   exports: [BLOCKNOTE_SCHEMA],

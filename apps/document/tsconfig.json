@@ -24,6 +24,9 @@
       "path": "../../packages/api-document-nestjs-server"
     },
     {
+      "path": "../../packages/api-gen"
+    },
+    {
       "path": "../../packages/block-note"
     },
     {

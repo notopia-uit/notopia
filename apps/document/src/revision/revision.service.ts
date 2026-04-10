@@ -1,8 +1,9 @@
-import { RevisionEntity } from './revision.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Traceable } from 'nestjs-otel';
 import { DataSource } from 'typeorm';
+
+import { RevisionEntity } from './revision.entity';
 
 export interface PaginatedRevisions {
   data: RevisionEntity[];

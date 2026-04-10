@@ -1,12 +1,14 @@
-import { ServicesConfig } from '../config/config';
-import { SERVICE_CONFIG } from '../config/config.factory';
-import { NoteModule } from '../note/note.module';
-import { AuthorizationService } from './authorization.service';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AUTHORIZATION_PACKAGE_NAME } from '@notopia-uit/pb/authorization';
 import { join } from 'path';
+
+import { ServicesConfig } from '#/config/config';
+import { SERVICE_CONFIG } from '#/config/config.factory';
+import { NoteModule } from '#/note/note.module';
+
+import { AuthorizationService } from './authorization.service';
 
 @Module({
   imports: [

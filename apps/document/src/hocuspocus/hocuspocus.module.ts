@@ -1,8 +1,10 @@
-import { AuthorizationModule } from '../authorization/authorization.module';
-import { NoteModule } from '../note/note.module';
+import { Module } from '@nestjs/common';
+
+import { AuthorizationModule } from '#/authorization/authorization.module';
+import { NoteModule } from '#/note/note.module';
+
 import { HocuspocusGateway } from './hocuspocus.gateway';
 import { HocuspocusProvider } from './hocuspocus.provider';
-import { Module } from '@nestjs/common';
 
 @Module({
   imports: [NoteModule, AuthorizationModule],

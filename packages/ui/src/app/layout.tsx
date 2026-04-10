@@ -1,8 +1,9 @@
-import './globals.css';
 import { ThemeProvider } from '@notopia-uit/ui/components/theme-provider';
 import { cn } from '@notopia-uit/ui/lib/utils';
 import { Inter as FontSans } from 'next/font/google';
 import localFont from 'next/font/local';
+
+import './globals.css';
 
 const fontSans = FontSans({
   subsets: ['latin'],

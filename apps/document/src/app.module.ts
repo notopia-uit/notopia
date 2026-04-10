@@ -1,9 +1,26 @@
+import { Inject, Module, OnModuleInit } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import {
+  ClientKafka,
+  ClientsModule,
+  KafkaOptions,
+  Transport,
+} from '@nestjs/microservices';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
+import { OpenTelemetryModule } from 'nestjs-otel';
+import { LoggerModule } from 'nestjs-pino';
+import pretty from 'pino-pretty';
+
 import { AuthorizationModule } from './authorization/authorization.module';
 import { BlockNoteModule } from './blocknote/blocknote.module';
+import { KAFKA_CLIENT } from './common/token';
 import { HttpUserGuard } from './common/user.guard';
-import { AppConfig } from './config/config';
+import { AppConfig, KafkaConfig } from './config/config';
 import {
   APP_CONFIG,
+  KAFKA_CONFIG,
   appConfig,
   databaseConfig,
   s3Config,
@@ -20,14 +37,6 @@ import { RevisionEntity } from './revision/revision.entity';
 import { RevisionRepository } from './revision/revision.repository';
 import { RevisionService } from './revision/revision.service';
 import { StorageModule } from './storage/storage.module';
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
-import { OpenTelemetryModule } from 'nestjs-otel';
-import { LoggerModule } from 'nestjs-pino';
-import pretty from 'pino-pretty';
 
 @Module({
   imports: [
@@ -59,6 +68,29 @@ import pretty from 'pino-pretty';
         };
       },
     }),
+    ClientsModule.registerAsync([
+      {
+        name: KAFKA_CLIENT,
+        useFactory: (configService: ConfigService): KafkaOptions => {
+          const servicesCfg = configService.get<KafkaConfig>(KAFKA_CONFIG);
+          if (!servicesCfg) {
+            throw new Error('KAFKA_CONFIG not found');
+          }
+          return {
+            transport: Transport.KAFKA,
+            options: {
+              client: {
+                brokers: servicesCfg.brokers,
+                clientId: servicesCfg.clientId,
+              },
+              consumer: {
+                groupId: servicesCfg.groupId,
+              },
+            },
+          };
+        },
+      },
+    ]),
     StorageModule,
     AuthorizationModule,
     NoteModule,
@@ -96,4 +128,13 @@ import pretty from 'pino-pretty';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  // We should refactor into bus or so, this is a mess for app module
+  constructor(
+    @Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka
+  ) {}
+
+  async onModuleInit() {
+    await this.kafkaClient.connect();
+  }
+}

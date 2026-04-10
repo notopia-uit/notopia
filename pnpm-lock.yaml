@@ -615,6 +615,9 @@ importers:
       express:
         specifier: 'catalog:'
         version: 5.2.1
+      kafkajs:
+        specifier: 'catalog:'
+        version: 2.2.4
       nestjs-otel:
         specifier: 'catalog:'
         version: 8.0.2(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)
@@ -652,6 +655,9 @@ importers:
       '@nestjs/testing':
         specifier: 'catalog:'
         version: 11.1.18(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)(@nestjs/microservices@11.1.18)(@nestjs/platform-express@11.1.18)
+      '@notopia-uit/api-gen':
+        specifier: 'workspace:'
+        version: link:../../packages/api-gen
       '@swc/core':
         specifier: 'catalog:'
         version: 1.15.24(@swc/helpers@0.5.21)

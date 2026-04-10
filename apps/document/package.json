@@ -39,6 +39,7 @@
     "@opentelemetry/semantic-conventions": "catalog:",
     "@types/express": "catalog:",
     "express": "catalog:",
+    "kafkajs": "catalog:",
     "nestjs-otel": "catalog:",
     "nestjs-pino": "catalog:",
     "pino-http": "catalog:",
@@ -53,6 +54,7 @@
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",
+    "@notopia-uit/api-gen": "workspace:",
     "@swc/core": "catalog:",
     "@swc/helpers": "catalog:",
     "@types/ws": "catalog:",

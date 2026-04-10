@@ -1,8 +1,9 @@
-import { DocumentEntity } from './document.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Traceable } from 'nestjs-otel';
 import { Repository } from 'typeorm';
+
+import { DocumentEntity } from './document.entity';
 
 @Injectable()
 @Traceable()

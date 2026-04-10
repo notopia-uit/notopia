@@ -1,4 +1,3 @@
-import { DocumentEntity } from '../document/document.entity';
 import { Block } from '@blocknote/core';
 import {
   Column,
@@ -7,8 +6,10 @@ import {
   Entity,
   ManyToOne,
   PrimaryColumn,
-  type Relation
+  type Relation,
 } from 'typeorm';
+
+import { DocumentEntity } from '#/document/document.entity';
 
 @Entity('revisions')
 export class RevisionEntity {

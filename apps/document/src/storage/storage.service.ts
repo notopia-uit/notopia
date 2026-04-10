@@ -1,10 +1,11 @@
-import { S3Config } from '../config/config';
-import { S3_CONFIG } from '../config/config.factory';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Traceable } from 'nestjs-otel';
+
+import { S3Config } from '../config/config';
+import { S3_CONFIG } from '../config/config.factory';
 
 @Injectable()
 @Traceable()

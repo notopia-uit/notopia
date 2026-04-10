@@ -1,5 +1,6 @@
-import { AppConfig, KafkaConfig, MeiliConfig } from './config';
 import { registerAs } from '@nestjs/config';
+
+import { AppConfig, KafkaConfig, MeiliConfig } from './config';
 
 export const APP_CONFIG = Symbol('APP_CONFIG');
 
@@ -23,7 +24,7 @@ export const kafkaConfig = registerAs(
       process.env.NOTOPIA_SEARCH_WORKER_KAFKA_BROKERS ?? 'localhost:19092'
     ).split(','),
     groupId:
-      process.env.NOTOPIA_SEARCH_WORKER_KAFKA_GROUP_ID ?? 'search-worker-group',
+      process.env.NOTOPIA_SEARCH_WORKER_KAFKA_GROUP_ID ?? 'search-worker',
   })
 );
 

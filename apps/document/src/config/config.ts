@@ -25,3 +25,9 @@ export interface S3Config {
   secretAccessKey: string;
   bucketName: string;
 }
+
+export interface KafkaConfig {
+  clientId: string;
+  brokers: string[];
+  groupId: string;
+}

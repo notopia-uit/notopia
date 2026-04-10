@@ -12,6 +12,7 @@ const config: Config = {
     'prettier-plugin-tailwindcss',
     '@trivago/prettier-plugin-sort-imports',
   ],
+  importOrder: ['<THIRD_PARTY_MODULES>', '^#/', '^\\.\\./', '^[./]'],
   importOrderParserPlugins: ['typescript', 'jsx', 'decorators'],
 };
 

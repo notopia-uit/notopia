@@ -12,9 +12,6 @@ linters:
   disable:
     - unused
   settings:
-    staticcheck:
-      dot-import-whitelist:
-        - github.com/go-jet/jet/v2/postgres
     tagalign:
       align: true
       sort: true

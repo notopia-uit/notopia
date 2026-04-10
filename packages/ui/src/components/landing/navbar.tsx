@@ -1,5 +1,7 @@
 'use client';
 
+import { SiGithub } from '@icons-pack/react-simple-icons';
+
 import { Button } from '../ui/button';
 import {
   NavigationMenu,
@@ -7,7 +9,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '../ui/navigation-menu';
-import { SiGithub } from '@icons-pack/react-simple-icons';
 
 const NAV_ITEMS = [
   { label: 'Features' },

@@ -1,5 +1,6 @@
-import { ModeToggle } from './theme-mode-toggle';
 import { Separator } from '@notopia-uit/ui/components/ui/separator';
+
+import { ModeToggle } from './theme-mode-toggle';
 
 export default function Footer() {
   return (

@@ -1,4 +1,3 @@
-import { AppService } from './app.service';
 import { Controller } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import type {
@@ -6,6 +5,8 @@ import type {
   ShareNoteCreatedEvent,
   ShareNoteUpdatedEvent,
 } from '@notopia-uit/api-gen';
+
+import { AppService } from './app.service';
 
 // TODO: blocknote editor from schema, from the raw payload json. Then to html
 // TODO: Suggest add a class implement the event (dto?) for validator

@@ -1,4 +1,3 @@
-import { RevisionService } from './revision.service';
 import { RevisionApi as RevisionApiDefinition } from '@notopia-uit/api-document-nestjs-server/api';
 import type {
   GetRevisions200Response,
@@ -6,6 +5,8 @@ import type {
   RevisionWithContent,
 } from '@notopia-uit/api-document-nestjs-server/models';
 import { Traceable } from 'nestjs-otel';
+
+import { RevisionService } from './revision.service';
 
 @Traceable()
 export class RevisionApi extends RevisionApiDefinition {

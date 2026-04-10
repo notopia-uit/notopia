@@ -18,6 +18,7 @@ export class NoteService implements OnModuleInit {
       this.client.getService<NoteServiceClient>(NOTE_SERVICE_NAME);
   }
 
+  // TODO: previously used to fetch each, but we might going to change batch, maybe this will be removed
   async getNoteName(noteId: string): Promise<string> {
     const response = await firstValueFrom(
       this.noteServiceClient.getNoteName({ id: noteId })

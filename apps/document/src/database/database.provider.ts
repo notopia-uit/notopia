@@ -1,9 +1,10 @@
+import { DataSource, DataSourceOptions } from 'typeorm';
+
 import { DatabaseConfig } from '../config/config';
 import { DocumentEntity } from '../document/document.entity';
 import { RevisionEntity } from '../revision/revision.entity';
-import { DataSource, DataSourceOptions } from 'typeorm';
 
-export const createDatasourceOptions =  (
+export const createDatasourceOptions = (
   databaseCfg: DatabaseConfig,
   synchronize: boolean
 ) => {

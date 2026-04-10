@@ -1,3 +1,10 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Meilisearch } from 'meilisearch';
+import { OpenTelemetryModule } from 'nestjs-otel';
+import { LoggerModule } from 'nestjs-pino';
+import pretty from 'pino-pretty';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppConfig, MeiliConfig } from './config';
@@ -8,12 +15,6 @@ import {
   kafkaConfig,
   meiliConfig,
 } from './config.factory';
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Meilisearch } from 'meilisearch';
-import { OpenTelemetryModule } from 'nestjs-otel';
-import { LoggerModule } from 'nestjs-pino';
-import pretty from 'pino-pretty';
 
 @Module({
   imports: [

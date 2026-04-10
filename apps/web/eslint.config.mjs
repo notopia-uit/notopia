@@ -1,10 +1,11 @@
-import baseConfig from '../../eslint.config.mjs';
 import nextEslintPluginNext from '@next/eslint-plugin-next';
 import nx from '@nx/eslint-plugin';
 import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss';
 import reactHooks from 'eslint-plugin-react-hooks';
 import { defineConfig } from 'eslint/config';
 import { parser as eslintParserTypeScript } from 'typescript-eslint';
+
+import baseConfig from '../../eslint.config.mjs';
 
 export default defineConfig(
   ...baseConfig,

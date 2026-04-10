@@ -16,3 +16,9 @@ packages/pb/**/*.js
 **/next-env.d.ts
 docs/godoc/**
 api/bundled/**/*.json
+submodule/**
+**/seed-data/**
+packages/ui/components/ui/**
+packages/ui/lib/**
+packages/ui/lib/utils.ts
+packages/ui/hooks/**

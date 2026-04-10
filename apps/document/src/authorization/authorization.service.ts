@@ -1,4 +1,3 @@
-import { NoteService } from '../note/note.service';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import {
   InternalServerErrorException,
@@ -12,6 +11,8 @@ import {
   WorkspaceItemPermission,
 } from '@notopia-uit/pb/authorization';
 import { firstValueFrom } from 'rxjs';
+
+import { NoteService } from '#/note/note.service';
 
 export type UserNotePermissions = 'read' | 'write' | 'delete';
 
