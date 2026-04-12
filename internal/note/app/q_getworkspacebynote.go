@@ -14,7 +14,7 @@ type GetWorkspaceByNote struct {
 }
 
 type GetWorkspaceByNoteReadModel interface {
-	GetWorkspaceByNote(ctx context.Context, noteID uuid.UUID) (*Workspace, error)
+	GetWorkspaceByNoteID(ctx context.Context, noteID uuid.UUID) (*Workspace, error)
 }
 
 type GetWorkspaceByNoteHandler struct {
@@ -35,7 +35,7 @@ func NewGetWorkspaceByNoteHandler(
 var ProvideGetWorkspaceByNoteHandler = NewGetWorkspaceByNoteHandler
 
 func (h *GetWorkspaceByNoteHandler) Handle(ctx context.Context, query *GetWorkspaceByNote) (*Workspace, error) {
-	workspace, err := h.readModel.GetWorkspaceByNote(ctx, query.NoteID)
+	workspace, err := h.readModel.GetWorkspaceByNoteID(ctx, query.NoteID)
 	if err != nil {
 		return nil, err
 	}
