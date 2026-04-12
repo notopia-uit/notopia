@@ -37,10 +37,6 @@ const getCustomSlashMenuItems = (
   insertHelloWorldItem(editor),
 ];
 
-interface EditorProps {
-  initialContent: Promise<PartialBlock[]>;
-}
-
 export default function Editor({ noteId }: { noteId: string }) {
   // const { data: note } = useSuspenseQuery(
   //   getNoteOptions({
@@ -84,4 +80,3 @@ export default function Editor({ noteId }: { noteId: string }) {
     </div>
   );
 }
-export type { EditorProps };
