@@ -1,6 +1,6 @@
 import '@blocknote/core';
 
-import { createBlockNoteSchema } from './blocknote';
+import { createBlockNoteSchema } from './block-note';
 
 declare module '@blocknote/core' {
   export type MySchema = ReturnType<typeof createBlockNoteSchema>;

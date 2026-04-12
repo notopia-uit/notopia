@@ -1,6 +1,6 @@
 import QueryClientProvider from '@notopia-uit/ui/components/client-query-provider';
 import { ThemeProvider } from '@notopia-uit/ui/components/theme-provider';
-import { cn } from '@notopia-uit/ui/lib/utils';
+import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { Inter as FontSans } from 'next/font/google';
 import localFont from 'next/font/local';
 

@@ -2,7 +2,7 @@ import * as React from "react"
 import { cva } from "class-variance-authority"
 import { NavigationMenu as NavigationMenuPrimitive } from "radix-ui"
 
-import { cn } from "@notopia-uit/ui/lib/utils"
+import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
 import { ChevronDownIcon } from "lucide-react"
 
 function NavigationMenu({

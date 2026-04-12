@@ -8,5 +8,8 @@
     ".": {
       "default": "./src/index.ts"
     }
+  },
+  "dependencies": {
+    "@blocknote/core": "catalog:"
   }
 }

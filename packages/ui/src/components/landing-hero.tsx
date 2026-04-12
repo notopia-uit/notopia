@@ -1,6 +1,8 @@
-import { buttonVariants } from '@notopia-uit/ui/components/ui/button';
-import { cn } from '@notopia-uit/ui/lib/utils';
 import Link from 'next/link';
+
+import { cn } from '../lib/shadcn/utils';
+
+import { buttonVariants } from './shadcn/button';
 
 export default function LandingHero() {
   return (

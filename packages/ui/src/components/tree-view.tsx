@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@notopia-uit/ui/components/ui/button';
-import { Input } from '@notopia-uit/ui/components/ui/input';
-import { cn } from '@notopia-uit/ui/lib/utils';
+import { Button } from '@notopia-uit/ui/components/shadcn/button';
+import { Input } from '@notopia-uit/ui/components/shadcn/input';
+import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { ChevronRight } from 'lucide-react';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
@@ -467,7 +467,7 @@ const TreeView: React.FC = () => {
   );
 
   const onSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
+    (e: React.SubmitEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (search) {
         getItemPath(search)

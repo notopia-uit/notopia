@@ -27,8 +27,8 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { Avatar, AvatarFallback, AvatarImage } from './shadcn/avatar';
 import TreeView from './tree-view';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,7 +38,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+} from './shadcn/dropdown-menu';
 import {
   Sidebar,
   SidebarContent,
@@ -51,7 +51,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from './ui/sidebar';
+} from './shadcn/sidebar';
 
 const data = {
   user: {

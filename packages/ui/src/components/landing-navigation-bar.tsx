@@ -1,13 +1,13 @@
 'use client';
 
 import { Icons } from '@notopia-uit/ui/components/icons';
-import { Button } from '@notopia-uit/ui/components/ui/button';
+import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from '@notopia-uit/ui/components/ui/navigation-menu';
+} from '@notopia-uit/ui/components/shadcn/navigation-menu';
 import useIsMobile from '@notopia-uit/ui/hooks/use-is-mobile';
 import Link from 'next/link';
 

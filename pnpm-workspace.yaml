@@ -86,7 +86,7 @@ catalog:
   react-dom: '19.2.5'
   reflect-metadata: '0.2.2'
   rxjs: '7.8.2'
-  shadcn: '4.0.8'
+  shadcn: '4.2.0'
   tailwind-merge: '3.5.0'
   tailwindcss: '4.2.2'
   tslib: '2.8.1'

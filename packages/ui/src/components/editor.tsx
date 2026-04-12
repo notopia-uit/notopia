@@ -15,7 +15,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { Icons } from './icons';
-import { Button } from './ui/button';
+import { Button } from './shadcn/button';
 
 const insertHelloWorldItem = (editor: BlockNoteEditor) => ({
   title: 'Insert Hello World',

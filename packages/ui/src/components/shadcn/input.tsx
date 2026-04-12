@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "@notopia-uit/ui/lib/utils"
+import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (

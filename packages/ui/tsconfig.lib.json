@@ -16,7 +16,8 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
     "paths": {
-      "@notopia-uit/ui/*": ["./src/*"]
+      "@notopia-uit/ui/*": ["./src/*"],
+      "*": ["./src/*"]
     }
   },
   "exclude": [
@@ -34,6 +35,9 @@
   ],
   "include": ["src/**/*.ts", "src/**/*.tsx", "../block-note/src/global.d.ts"],
   "references": [
+    {
+      "path": "../lib/tsconfig.lib.json"
+    },
     {
       "path": "../block-note/tsconfig.lib.json"
     },

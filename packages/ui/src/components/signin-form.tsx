@@ -1,18 +1,18 @@
 'use client';
-import { Button } from '@notopia-uit/ui/components/ui/button';
+import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@notopia-uit/ui/components/ui/card';
+} from '@notopia-uit/ui/components/shadcn/card';
 import {
   Field,
   FieldDescription,
   FieldGroup,
-} from '@notopia-uit/ui/components/ui/field';
-import { cn } from '@notopia-uit/ui/lib/utils';
+} from '@notopia-uit/ui/components/shadcn/field';
+import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 
 export function SignInForm({
   className,

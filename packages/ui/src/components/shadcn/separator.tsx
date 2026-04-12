@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Separator as SeparatorPrimitive } from "radix-ui"
 
-import { cn } from "@notopia-uit/ui/lib/utils"
+import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
 
 function Separator({
   className,

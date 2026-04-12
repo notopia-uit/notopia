@@ -4,24 +4,24 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
-import { useIsMobile } from "@notopia-uit/ui/hooks/use-mobile"
-import { cn } from "@notopia-uit/ui/lib/utils"
-import { Button } from "@notopia-uit/ui/components/ui/button"
-import { Input } from "@notopia-uit/ui/components/ui/input"
-import { Separator } from "@notopia-uit/ui/components/ui/separator"
+import { useIsMobile } from "@notopia-uit/ui/hooks/shadcn/use-mobile"
+import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
+import { Button } from "@notopia-uit/ui/components/shadcn/button"
+import { Input } from "@notopia-uit/ui/components/shadcn/input"
+import { Separator } from "@notopia-uit/ui/components/shadcn/separator"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@notopia-uit/ui/components/ui/sheet"
-import { Skeleton } from "@notopia-uit/ui/components/ui/skeleton"
+} from "@notopia-uit/ui/components/shadcn/sheet"
+import { Skeleton } from "@notopia-uit/ui/components/shadcn/skeleton"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@notopia-uit/ui/components/ui/tooltip"
+} from "@notopia-uit/ui/components/shadcn/tooltip"
 import { PanelLeftIcon } from "lucide-react"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"

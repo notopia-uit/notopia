@@ -3,9 +3,9 @@
 import { useMemo } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@notopia-uit/ui/lib/utils"
-import { Label } from "@notopia-uit/ui/components/ui/label"
-import { Separator } from "@notopia-uit/ui/components/ui/separator"
+import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
+import { Label } from "@notopia-uit/ui/components/shadcn/label"
+import { Separator } from "@notopia-uit/ui/components/shadcn/separator"
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
   return (

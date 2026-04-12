@@ -12,9 +12,9 @@
   "iconLibrary": "lucide",
   "aliases": {
     "components": "@notopia-uit/ui",
-    "ui": "@notopia-uit/ui/components/ui",
-    "utils": "@notopia-uit/ui/lib/utils",
-    "lib": "@notopia-uit/ui/lib",
-    "hooks": "@notopia-uit/ui/hooks"
+    "ui": "@notopia-uit/ui/components/shadcn",
+    "utils": "@notopia-uit/ui/lib/shadcn/utils",
+    "lib": "@notopia-uit/ui/lib/shadcn",
+    "hooks": "@notopia-uit/ui/hooks/shadcn"
   }
 }

@@ -3,8 +3,8 @@
 import * as React from "react"
 import { Dialog as SheetPrimitive } from "radix-ui"
 
-import { cn } from "@notopia-uit/ui/lib/utils"
-import { Button } from "@notopia-uit/ui/components/ui/button"
+import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
+import { Button } from "@notopia-uit/ui/components/shadcn/button"
 import { XIcon } from "lucide-react"
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {

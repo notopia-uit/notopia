@@ -1,12 +1,12 @@
 'use client';
 
-import { Button } from '@notopia-uit/ui/components/ui/button';
+import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@notopia-uit/ui/components/ui/dropdown-menu';
+} from '@notopia-uit/ui/components/shadcn/dropdown-menu';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 

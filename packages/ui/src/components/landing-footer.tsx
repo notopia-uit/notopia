@@ -1,4 +1,4 @@
-import { Separator } from '@notopia-uit/ui/components/ui/separator';
+import { Separator } from './shadcn/separator';
 
 import { ModeToggle } from './theme-mode-toggle';
 
