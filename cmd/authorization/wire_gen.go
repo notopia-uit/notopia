@@ -34,20 +34,22 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(transactionalEnforcer)
+	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(transactionalEnforcer)
 	getUserWorkspaceItemPermissionsHandler := app.NewGetUserWorkspaceItemPermissionsHandler(transactionalEnforcer)
-	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
 	getUserWorkspacesHandler := app.NewGetUserWorkspacesHandler(transactionalEnforcer)
-	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer)
-	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
+	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
 	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
+	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
+	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer)
 	authorizationApp := &authorization.App{
 		CreateWorkspace:                 createWorkspaceHandler,
+		DeleteWorkspace:                 deleteWorkspaceHandler,
 		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
-		GetWorkspaceMembers:             getWorkspaceMembersHandler,
 		GetUserWorkspaces:               getUserWorkspacesHandler,
-		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
-		HasWorkspacePermission:          hasWorkspacePermissionHandler,
+		GetWorkspaceMembers:             getWorkspaceMembersHandler,
 		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
+		HasWorkspacePermission:          hasWorkspacePermissionHandler,
+		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
 	}
 	grpcServiceServer := authorization.NewGRPCServiceServer(authorizationApp)
 	serverConfig := &config.Server

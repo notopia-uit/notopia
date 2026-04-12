@@ -6,17 +6,41 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func toTrashed(trash *app.Trashed) *pb.Trashed {
+func toNoteDTO(note *app.Note) *pb.Note {
+	var icon *string
+	if note.Icon != "" {
+		icon = &note.Icon
+	}
+	return &pb.Note{
+		Id:        note.ID.String(),
+		Name:      note.Name,
+		Icon:      icon,
+		FolderId:  note.FolderID.String(),
+		Tags:      note.Tags,
+		UpdatedAt: timestamppb.New(note.UpdatedAt),
+		Trashed:   toTrashedDTO(note.Trashed),
+	}
+}
+
+func toWorkspaceDTO(workspace *app.Workspace) *pb.Workspace {
+	return &pb.Workspace{
+		Id:   workspace.ID.String(),
+		Name: workspace.Name,
+		Slug: workspace.Slug,
+	}
+}
+
+func toTrashedDTO(trash *app.Trashed) *pb.Trashed {
 	if trash == nil {
 		return nil
 	}
 	return &pb.Trashed{
-		By: toTrashedBy(trash.By),
+		By: toTrashedByDTO(trash.By),
 		At: timestamppb.New(trash.At),
 	}
 }
 
-func toTrashedBy(trashedBy app.TrashedBy) pb.TrashedBy {
+func toTrashedByDTO(trashedBy app.TrashedBy) pb.TrashedBy {
 	switch trashedBy {
 	case app.TrashedByPurpose:
 		return pb.TrashedBy_TRASHED_BY_PURPOSE

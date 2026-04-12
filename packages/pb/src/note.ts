@@ -25,6 +25,22 @@ export interface Trashed {
   at: Timestamp | undefined;
 }
 
+export interface Note {
+  id: string;
+  name: string;
+  icon?: string | undefined;
+  folderId: string;
+  tags: string[];
+  updatedAt: Timestamp | undefined;
+  trashed?: Trashed | undefined;
+}
+
+export interface Workspace {
+  id: string;
+  slug: string;
+  name: string;
+}
+
 export interface GetNoteNameRequest {
   id: string;
 }
@@ -40,21 +56,16 @@ export interface GetNoteRequest {
 }
 
 export interface GetNoteResponse {
-  id: string;
-  name: string;
-  icon?: string | undefined;
-  folderId: string;
-  tags: string[];
-  updatedAt: Timestamp | undefined;
-  trashed?: Trashed | undefined;
+  note: Note | undefined;
 }
 
-export interface GetWorkspaceIdByNoteIdRequest {
+export interface GetWorkspaceByNoteRequest {
   noteId: string;
+  userId: string;
 }
 
-export interface GetWorkspaceIdByNoteIdResponse {
-  workspaceId: string;
+export interface GetWorkspaceByNoteResponse {
+  workspace: Workspace | undefined;
 }
 
 export const NOTE_PACKAGE_NAME = "note";
@@ -95,6 +106,168 @@ export const Trashed: MessageFns<Trashed> = {
           }
 
           message.at = Timestamp.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
+
+function createBaseNote(): Note {
+  return { id: "", name: "", folderId: "", tags: [], updatedAt: undefined };
+}
+
+export const Note: MessageFns<Note> = {
+  encode(message: Note, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.icon !== undefined) {
+      writer.uint32(26).string(message.icon);
+    }
+    if (message.folderId !== "") {
+      writer.uint32(34).string(message.folderId);
+    }
+    for (const v of message.tags) {
+      writer.uint32(42).string(v!);
+    }
+    if (message.updatedAt !== undefined) {
+      Timestamp.encode(message.updatedAt, writer.uint32(50).fork()).join();
+    }
+    if (message.trashed !== undefined) {
+      Trashed.encode(message.trashed, writer.uint32(58).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Note {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNote();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.icon = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.folderId = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.tags.push(reader.string());
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.updatedAt = Timestamp.decode(reader, reader.uint32());
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.trashed = Trashed.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
+
+function createBaseWorkspace(): Workspace {
+  return { id: "", slug: "", name: "" };
+}
+
+export const Workspace: MessageFns<Workspace> = {
+  encode(message: Workspace, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.slug !== "") {
+      writer.uint32(18).string(message.slug);
+    }
+    if (message.name !== "") {
+      writer.uint32(26).string(message.name);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Workspace {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseWorkspace();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.slug = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.name = reader.string();
           continue;
         }
       }
@@ -241,31 +414,13 @@ export const GetNoteRequest: MessageFns<GetNoteRequest> = {
 };
 
 function createBaseGetNoteResponse(): GetNoteResponse {
-  return { id: "", name: "", folderId: "", tags: [], updatedAt: undefined };
+  return { note: undefined };
 }
 
 export const GetNoteResponse: MessageFns<GetNoteResponse> = {
   encode(message: GetNoteResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.name !== "") {
-      writer.uint32(18).string(message.name);
-    }
-    if (message.icon !== undefined) {
-      writer.uint32(26).string(message.icon);
-    }
-    if (message.folderId !== "") {
-      writer.uint32(34).string(message.folderId);
-    }
-    for (const v of message.tags) {
-      writer.uint32(42).string(v!);
-    }
-    if (message.updatedAt !== undefined) {
-      Timestamp.encode(message.updatedAt, writer.uint32(50).fork()).join();
-    }
-    if (message.trashed !== undefined) {
-      Trashed.encode(message.trashed, writer.uint32(58).fork()).join();
+    if (message.note !== undefined) {
+      Note.encode(message.note, writer.uint32(10).fork()).join();
     }
     return writer;
   },
@@ -282,55 +437,7 @@ export const GetNoteResponse: MessageFns<GetNoteResponse> = {
             break;
           }
 
-          message.id = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.name = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
-
-          message.icon = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
-
-          message.folderId = reader.string();
-          continue;
-        }
-        case 5: {
-          if (tag !== 42) {
-            break;
-          }
-
-          message.tags.push(reader.string());
-          continue;
-        }
-        case 6: {
-          if (tag !== 50) {
-            break;
-          }
-
-          message.updatedAt = Timestamp.decode(reader, reader.uint32());
-          continue;
-        }
-        case 7: {
-          if (tag !== 58) {
-            break;
-          }
-
-          message.trashed = Trashed.decode(reader, reader.uint32());
+          message.note = Note.decode(reader, reader.uint32());
           continue;
         }
       }
@@ -343,22 +450,25 @@ export const GetNoteResponse: MessageFns<GetNoteResponse> = {
   },
 };
 
-function createBaseGetWorkspaceIdByNoteIdRequest(): GetWorkspaceIdByNoteIdRequest {
-  return { noteId: "" };
+function createBaseGetWorkspaceByNoteRequest(): GetWorkspaceByNoteRequest {
+  return { noteId: "", userId: "" };
 }
 
-export const GetWorkspaceIdByNoteIdRequest: MessageFns<GetWorkspaceIdByNoteIdRequest> = {
-  encode(message: GetWorkspaceIdByNoteIdRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const GetWorkspaceByNoteRequest: MessageFns<GetWorkspaceByNoteRequest> = {
+  encode(message: GetWorkspaceByNoteRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.noteId !== "") {
       writer.uint32(10).string(message.noteId);
+    }
+    if (message.userId !== "") {
+      writer.uint32(18).string(message.userId);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetWorkspaceIdByNoteIdRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): GetWorkspaceByNoteRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetWorkspaceIdByNoteIdRequest();
+    const message = createBaseGetWorkspaceByNoteRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -370,6 +480,14 @@ export const GetWorkspaceIdByNoteIdRequest: MessageFns<GetWorkspaceIdByNoteIdReq
           message.noteId = reader.string();
           continue;
         }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.userId = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -380,22 +498,22 @@ export const GetWorkspaceIdByNoteIdRequest: MessageFns<GetWorkspaceIdByNoteIdReq
   },
 };
 
-function createBaseGetWorkspaceIdByNoteIdResponse(): GetWorkspaceIdByNoteIdResponse {
-  return { workspaceId: "" };
+function createBaseGetWorkspaceByNoteResponse(): GetWorkspaceByNoteResponse {
+  return { workspace: undefined };
 }
 
-export const GetWorkspaceIdByNoteIdResponse: MessageFns<GetWorkspaceIdByNoteIdResponse> = {
-  encode(message: GetWorkspaceIdByNoteIdResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.workspaceId !== "") {
-      writer.uint32(10).string(message.workspaceId);
+export const GetWorkspaceByNoteResponse: MessageFns<GetWorkspaceByNoteResponse> = {
+  encode(message: GetWorkspaceByNoteResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.workspace !== undefined) {
+      Workspace.encode(message.workspace, writer.uint32(10).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetWorkspaceIdByNoteIdResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): GetWorkspaceByNoteResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetWorkspaceIdByNoteIdResponse();
+    const message = createBaseGetWorkspaceByNoteResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -404,7 +522,7 @@ export const GetWorkspaceIdByNoteIdResponse: MessageFns<GetWorkspaceIdByNoteIdRe
             break;
           }
 
-          message.workspaceId = reader.string();
+          message.workspace = Workspace.decode(reader, reader.uint32());
           continue;
         }
       }
@@ -426,10 +544,7 @@ export interface NoteServiceClient {
 
   /** NOTE: what, where is this used? */
 
-  getWorkspaceIdByNoteId(
-    request: GetWorkspaceIdByNoteIdRequest,
-    metadata?: Metadata,
-  ): Observable<GetWorkspaceIdByNoteIdResponse>;
+  getWorkspaceByNote(request: GetWorkspaceByNoteRequest, metadata?: Metadata): Observable<GetWorkspaceByNoteResponse>;
 }
 
 export interface NoteServiceController {
@@ -447,18 +562,15 @@ export interface NoteServiceController {
 
   /** NOTE: what, where is this used? */
 
-  getWorkspaceIdByNoteId(
-    request: GetWorkspaceIdByNoteIdRequest,
+  getWorkspaceByNote(
+    request: GetWorkspaceByNoteRequest,
     metadata?: Metadata,
-  ):
-    | Promise<GetWorkspaceIdByNoteIdResponse>
-    | Observable<GetWorkspaceIdByNoteIdResponse>
-    | GetWorkspaceIdByNoteIdResponse;
+  ): Promise<GetWorkspaceByNoteResponse> | Observable<GetWorkspaceByNoteResponse> | GetWorkspaceByNoteResponse;
 }
 
 export function NoteServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["getNoteName", "getNote", "getWorkspaceIdByNoteId"];
+    const grpcMethods: string[] = ["getNoteName", "getNote", "getWorkspaceByNote"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("NoteService", method)(constructor.prototype[method], method, descriptor);
@@ -495,17 +607,16 @@ export const NoteServiceService = {
     responseDeserialize: (value: Buffer): GetNoteResponse => GetNoteResponse.decode(value),
   },
   /** NOTE: what, where is this used? */
-  getWorkspaceIdByNoteId: {
-    path: "/note.NoteService/GetWorkspaceIdByNoteId" as const,
+  getWorkspaceByNote: {
+    path: "/note.NoteService/GetWorkspaceByNote" as const,
     requestStream: false as const,
     responseStream: false as const,
-    requestSerialize: (value: GetWorkspaceIdByNoteIdRequest): Buffer =>
-      Buffer.from(GetWorkspaceIdByNoteIdRequest.encode(value).finish()),
-    requestDeserialize: (value: Buffer): GetWorkspaceIdByNoteIdRequest => GetWorkspaceIdByNoteIdRequest.decode(value),
-    responseSerialize: (value: GetWorkspaceIdByNoteIdResponse): Buffer =>
-      Buffer.from(GetWorkspaceIdByNoteIdResponse.encode(value).finish()),
-    responseDeserialize: (value: Buffer): GetWorkspaceIdByNoteIdResponse =>
-      GetWorkspaceIdByNoteIdResponse.decode(value),
+    requestSerialize: (value: GetWorkspaceByNoteRequest): Buffer =>
+      Buffer.from(GetWorkspaceByNoteRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): GetWorkspaceByNoteRequest => GetWorkspaceByNoteRequest.decode(value),
+    responseSerialize: (value: GetWorkspaceByNoteResponse): Buffer =>
+      Buffer.from(GetWorkspaceByNoteResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): GetWorkspaceByNoteResponse => GetWorkspaceByNoteResponse.decode(value),
   },
 } as const;
 
@@ -514,7 +625,7 @@ export interface NoteServiceServer extends UntypedServiceImplementation {
   getNoteName: handleUnaryCall<GetNoteNameRequest, GetNoteNameResponse>;
   getNote: handleUnaryCall<GetNoteRequest, GetNoteResponse>;
   /** NOTE: what, where is this used? */
-  getWorkspaceIdByNoteId: handleUnaryCall<GetWorkspaceIdByNoteIdRequest, GetWorkspaceIdByNoteIdResponse>;
+  getWorkspaceByNote: handleUnaryCall<GetWorkspaceByNoteRequest, GetWorkspaceByNoteResponse>;
 }
 
 export interface MessageFns<T> {

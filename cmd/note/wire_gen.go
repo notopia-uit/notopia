@@ -171,6 +171,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	getNoteGraphHandler := app.NewGetNoteGraphHandler(authorization, pgrepoNote, noteGraph)
 	pgreadmodelNote := pgreadmodel.GetNote(queries)
 	getNoteHandler := app.NewGetNoteHandler(authorization, pgrepoNote, pgreadmodelNote)
+	getWorkspaceByNote := pgreadmodel.NewGetWorkspaceByNote(queries)
+	getWorkspaceByNoteHandler := app.NewGetWorkspaceByNoteHandler(authorization, getWorkspaceByNote)
 	noteLinks := pgreadmodel.GetNoteLinks(queries)
 	getNoteLinksHandler := app.NewGetNoteLinksHandler(authorization, pgrepoNote, noteLinks)
 	workspaceGraph := pgreadmodel.GetWorkspaceGraph(queries)
@@ -189,6 +191,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		GetMyWorkspacesHandler:          getMyWorkspacesHandler,
 		GetNoteGraphHandler:             getNoteGraphHandler,
 		GetNoteHandler:                  getNoteHandler,
+		GetWorkspaceByNoteHandler:       getWorkspaceByNoteHandler,
 		GetNoteLinksHandler:             getNoteLinksHandler,
 		GetWorkspaceGraphHandler:        getWorkspaceGraphHandler,
 		GetWorkspaceHandler:             getWorkspaceHandler,

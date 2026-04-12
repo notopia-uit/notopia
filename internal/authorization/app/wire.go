@@ -6,6 +6,7 @@ import (
 
 var ProviderSet = wire.NewSet(
 	ProvideCreateWorkspaceHandler,
+	ProvideDeleteWorkspaceHandler,
 	ProvideGetUserWorkspaceItemPermissionsHandler,
 	ProvideGetUserWorkspacesHandler,
 	ProvideGetWorkspaceMembersHandler,

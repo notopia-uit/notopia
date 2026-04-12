@@ -33,6 +33,38 @@ func (q *Queries) ReadCheckSlugExists(ctx context.Context, slug string) (bool, e
 	return exists, err
 }
 
+const readGetWorkspaceByNoteID = `-- name: ReadGetWorkspaceByNoteID :one
+SELECT
+  w.id, w.slug, w.name, w.created_at, w.updated_at, w.deleted_at
+FROM
+  workspaces w
+JOIN
+  folders f ON f.workspace_id = w.id
+JOIN
+  notes n ON n.folder_id = f.id
+WHERE
+  n.id = $1::uuid
+  AND w.deleted_at IS NULL
+  AND f.trashed_at IS NULL
+  AND n.trashed_at IS NULL
+`
+
+func (q *Queries) ReadGetWorkspaceByNoteID(ctx context.Context, noteID uuid.UUID) (*Workspace, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "ReadGetWorkspaceByNoteID")
+	defer span.End()
+	row := q.db.QueryRow(ctx, readGetWorkspaceByNoteID, noteID)
+	var i Workspace
+	err := row.Scan(
+		&i.ID,
+		&i.Slug,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return &i, err
+}
+
 const readGetWorkspaceBySlug = `-- name: ReadGetWorkspaceBySlug :one
 SELECT
   id, slug, name, created_at, updated_at, deleted_at

@@ -10,7 +10,7 @@ service NoteService {
   rpc GetNoteName(GetNoteNameRequest) returns (GetNoteNameResponse);
   rpc GetNote(GetNoteRequest) returns (GetNoteResponse);
   // NOTE: what, where is this used?
-  rpc GetWorkspaceIdByNoteId(GetWorkspaceIdByNoteIdRequest) returns (GetWorkspaceIdByNoteIdResponse);
+  rpc GetWorkspaceByNote(GetWorkspaceByNoteRequest) returns (GetWorkspaceByNoteResponse);
 }
 
 enum TrashedBy {
@@ -22,6 +22,31 @@ enum TrashedBy {
 message Trashed {
   TrashedBy by = 1 [(buf.validate.field).required = true];
   google.protobuf.Timestamp at = 2 [(buf.validate.field).required = true];
+}
+
+message Note {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  string name = 2 [(buf.validate.field).required = true];
+  optional string icon = 3;
+  string folder_id = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  repeated string tags = 5;
+  google.protobuf.Timestamp updated_at = 6 [(buf.validate.field).required = true];
+  optional Trashed trashed = 7;
+}
+
+message Workspace {
+  string id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+  string slug = 2 [(buf.validate.field).required = true];
+  string name = 3 [(buf.validate.field).required = true];
 }
 
 message GetNoteNameRequest {
@@ -45,31 +70,17 @@ message GetNoteRequest {
 }
 
 message GetNoteResponse {
-  string id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
-  string name = 2 [(buf.validate.field).required = true];
-  optional string icon = 3;
-  string folder_id = 4 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
-  repeated string tags = 5;
-  google.protobuf.Timestamp updated_at = 6 [(buf.validate.field).required = true];
-  optional Trashed trashed = 7;
+  Note note = 1 [(buf.validate.field).required = true];
 }
 
-message GetWorkspaceIdByNoteIdRequest {
+message GetWorkspaceByNoteRequest {
   string note_id = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uuid = true
   ];
+  string user_id = 2 [(buf.validate.field).required = true];
 }
 
-message GetWorkspaceIdByNoteIdResponse {
-  string workspace_id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).string.uuid = true
-  ];
+message GetWorkspaceByNoteResponse {
+  Workspace workspace = 1 [(buf.validate.field).required = true];
 }
