@@ -223,8 +223,8 @@ catalogs:
       specifier: 8.4.49
       version: 8.4.49
     prettier:
-      specifier: 3.8.1
-      version: 3.8.1
+      specifier: 3.8.2
+      version: 3.8.2
     radix-ui:
       specifier: 1.4.3
       version: 1.4.3
@@ -395,7 +395,7 @@ importers:
         version: 4.2.2
       '@trivago/prettier-plugin-sort-imports':
         specifier: 'catalog:'
-        version: 6.0.2(@vue/compiler-sfc@3.5.32)(prettier@3.8.1)
+        version: 6.0.2(@vue/compiler-sfc@3.5.32)(prettier@3.8.2)
       '@types/node':
         specifier: 'catalog:'
         version: 25.3.5
@@ -464,13 +464,13 @@ importers:
         version: 8.4.49
       prettier:
         specifier: 'catalog:'
-        version: 3.8.1
+        version: 3.8.2
       prettier-plugin-package:
         specifier: 2.0.0
-        version: 2.0.0(prettier@3.8.1)
+        version: 2.0.0(prettier@3.8.2)
       prettier-plugin-tailwindcss:
         specifier: 0.7.2
-        version: 0.7.2(@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.32)(prettier@3.8.1))(prettier@3.8.1)
+        version: 0.7.2(@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.32)(prettier@3.8.2))(prettier@3.8.2)
       swc-loader:
         specifier: ^0.2.7
         version: 0.2.7(@swc/core@1.15.24(@swc/helpers@0.5.21))(webpack@5.105.4(@swc/core@1.15.24(@swc/helpers@0.5.21))(esbuild@0.27.3))
@@ -13784,8 +13784,8 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.8.1:
-    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
+  prettier@3.8.2:
+    resolution: {integrity: sha512-8c3mgTe0ASwWAJK+78dpviD+A8EqhndQPUBpNUIPt6+xWlIigCwfN01lWr9MAede4uqXGTEKeQWTvzb3vjia0Q==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -25097,7 +25097,7 @@ snapshots:
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
 
-  '@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.32)(prettier@3.8.1)':
+  '@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.32)(prettier@3.8.2)':
     dependencies:
       '@babel/generator': 7.29.1
       '@babel/parser': 7.29.2
@@ -25107,7 +25107,7 @@ snapshots:
       lodash-es: 4.17.23
       minimatch: 9.0.9
       parse-imports-exports: 0.2.4
-      prettier: 3.8.1
+      prettier: 3.8.2
     optionalDependencies:
       '@vue/compiler-sfc': 3.5.32
     transitivePeerDependencies:
@@ -32998,19 +32998,19 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-package@2.0.0(prettier@3.8.1):
+  prettier-plugin-package@2.0.0(prettier@3.8.2):
     dependencies:
-      prettier: 3.8.1
+      prettier: 3.8.2
 
-  prettier-plugin-tailwindcss@0.7.2(@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.32)(prettier@3.8.1))(prettier@3.8.1):
+  prettier-plugin-tailwindcss@0.7.2(@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.32)(prettier@3.8.2))(prettier@3.8.2):
     dependencies:
-      prettier: 3.8.1
+      prettier: 3.8.2
     optionalDependencies:
-      '@trivago/prettier-plugin-sort-imports': 6.0.2(@vue/compiler-sfc@3.5.32)(prettier@3.8.1)
+      '@trivago/prettier-plugin-sort-imports': 6.0.2(@vue/compiler-sfc@3.5.32)(prettier@3.8.2)
 
   prettier@2.8.8: {}
 
-  prettier@3.8.1: {}
+  prettier@3.8.2: {}
 
   pretty-bytes@7.1.0: {}
 
