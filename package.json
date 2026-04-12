@@ -58,7 +58,7 @@
     "jsdom": "~28.1.0",
     "jsonc-eslint-parser": "catalog:",
     "nx": "22.6.4",
-    "nx-github-pages": "1.2.0",
+    "nx-github-pages": "1.2.1",
     "postcss": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-package": "2.0.0",
