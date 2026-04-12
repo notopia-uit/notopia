@@ -1,3 +1,4 @@
+import QueryClientProvider from '@notopia-uit/ui/components/client-query-provider';
 import { ThemeProvider } from '@notopia-uit/ui/components/theme-provider';
 import { cn } from '@notopia-uit/ui/lib/utils';
 import { Inter as FontSans } from 'next/font/google';
@@ -37,7 +38,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <QueryClientProvider>{children}</QueryClientProvider>
           </ThemeProvider>
         </body>
       </html>

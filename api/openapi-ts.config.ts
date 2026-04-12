@@ -16,6 +16,13 @@ export default defineConfig({
       validator: true,
       transformer: true,
     },
-    '@tanstack/react-query',
+    {
+      name: '@tanstack/react-query',
+      queryKeys: true,
+      useQuery: true,
+      useMutation: true,
+      exportFromIndex: true,
+      includeInEntry: true,
+    },
   ],
 });

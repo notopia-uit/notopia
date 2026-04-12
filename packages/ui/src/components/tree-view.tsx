@@ -480,6 +480,7 @@ const TreeView: React.FC = () => {
                 tree.current?.toggleItemSelectStatus(path.at(-1) ?? '');
               });
             }
+            return;
           })
           .catch((error) => {
             console.error('Error getting item:', error);

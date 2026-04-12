@@ -3,6 +3,7 @@
   "private": true,
   "dependencies": {
     "@notopia-uit/ui": "workspace:",
+    "@tanstack/react-query": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "lucide-react": "catalog:",

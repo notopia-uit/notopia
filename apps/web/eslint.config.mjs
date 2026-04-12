@@ -20,7 +20,7 @@ export default defineConfig(
     extends: [eslintPluginBetterTailwindcss.configs.recommended],
     settings: {
       'better-tailwindcss': {
-        entryPoint: './src/app/global.css',
+        entryPoint: './app/globals.css',
       },
     },
   },

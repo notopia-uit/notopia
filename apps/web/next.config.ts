@@ -9,9 +9,6 @@ const nextConfig: WithNxOptions = {
   output: 'standalone',
 };
 
-const plugins = [
-  // Add more Next.js plugins to this list if needed.
-  withNx,
-];
+const plugins = [withNx];
 
 export default composePlugins(...plugins)(nextConfig);
