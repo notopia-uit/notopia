@@ -817,8 +817,8 @@ importers:
         specifier: ^1.1.18
         version: 1.1.20(mermaid@11.13.0)(vue@3.5.32(typescript@6.0.2))
       vitepress-openapi:
-        specifier: 0.1.19
-        version: 0.1.19(vitepress@2.0.0-alpha.17(@types/node@25.5.0)(axios@1.14.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.32.0)(postcss@8.5.8)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))(vue@3.5.32(typescript@6.0.2))
+        specifier: 0.1.20
+        version: 0.1.20(vitepress@2.0.0-alpha.17(@types/node@25.5.0)(axios@1.14.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.32.0)(postcss@8.5.8)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))(vue@3.5.32(typescript@6.0.2))
       vitepress-plugin-pagefind:
         specifier: 0.4.19
         version: 0.4.19(pagefind@1.4.0)(vitepress@2.0.0-alpha.17(@types/node@25.5.0)(axios@1.14.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.32.0)(postcss@8.5.8)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))(vue@3.5.32(typescript@6.0.2))
@@ -16145,8 +16145,8 @@ packages:
       mermaid: ^11.0.0
       vue: ^3.0.0
 
-  vitepress-openapi@0.1.19:
-    resolution: {integrity: sha512-DvXzyXanB75tOK8DUNqAENvWSgFJ2EAXE59Zb1ejaYk05w2UplqmiYTcVDhLigV1dFeU+PhASMd1izY8+seVQA==}
+  vitepress-openapi@0.1.20:
+    resolution: {integrity: sha512-0BRwfMdsXmQx/mI0akoJgfhPhxzJ+T5jriIC/oavaPR6+Jg0TsriZZb3VGQYq3sryOYbWzqI4gfun+Tq2jP33w==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24.0.0}
     peerDependencies:
       vitepress: '>=1.0.0'
@@ -35922,7 +35922,7 @@ snapshots:
       mermaid: 11.13.0
       vue: 3.5.32(typescript@6.0.2)
 
-  vitepress-openapi@0.1.19(vitepress@2.0.0-alpha.17(@types/node@25.5.0)(axios@1.14.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.32.0)(postcss@8.5.8)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))(vue@3.5.32(typescript@6.0.2)):
+  vitepress-openapi@0.1.20(vitepress@2.0.0-alpha.17(@types/node@25.5.0)(axios@1.14.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.32.0)(postcss@8.5.8)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2))(vue@3.5.32(typescript@6.0.2)):
     dependencies:
       '@vueuse/core': 14.2.1(vue@3.5.32(typescript@6.0.2))
       class-variance-authority: 0.7.1
