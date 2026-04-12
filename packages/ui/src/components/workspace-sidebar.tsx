@@ -95,20 +95,6 @@ const data = {
   ],
 };
 
-export type FileNode = {
-  title: string;
-  url: string;
-  icon?: string;
-  isActive?: boolean;
-  items?: FileNode[];
-};
-
-export type Workspace = {
-  name: string;
-  plan: string;
-  Files?: FileNode[];
-};
-
 export default function WorkspaceSideBar({
   currentWorkspaceSlug,
 }: {
