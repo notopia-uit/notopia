@@ -3,7 +3,7 @@
 services:
   rustfs:
     container_name: notopia-rustfs
-    image: rustfs/rustfs:1.0.0-alpha.91-glibc
+    image: rustfs/rustfs:1.0.0-alpha.93-glibc
     command:
       - /data
     environment:
