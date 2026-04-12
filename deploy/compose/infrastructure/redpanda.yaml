@@ -28,7 +28,7 @@ services:
       - redpanda_data:/var/lib/redpanda/data
 
   redpanda_console:
-    image: redpandadata/console:v3.7.0
+    image: redpandadata/console:v3.7.1
     container_name: notopia-redpanda_console
     environment:
       CONFIG_FILEPATH: /etc/redpanda/config.yaml
