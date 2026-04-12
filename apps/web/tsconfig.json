@@ -27,9 +27,11 @@
     "app/**/*.jsx",
     "next-env.d.ts",
     "index.d.ts",
+    "global.d.ts",
     ".next/types/**/*.ts",
     "eslint.config.mjs",
-    "postcss.config.mjs"
+    "postcss.config.mjs",
+    "../../packages/ui/src/global.d.ts"
   ],
   "exclude": [
     "out-tsc",

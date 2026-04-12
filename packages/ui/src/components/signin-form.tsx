@@ -12,6 +12,7 @@ import {
   FieldDescription,
   FieldGroup,
 } from '@notopia-uit/ui/components/shadcn/field';
+import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 
 export function SignInForm({
@@ -33,10 +34,10 @@ export function SignInForm({
                   variant="outline"
                   type="button"
                   onClick={() => {
-                    // await authClient.signIn.social({
-                    //   provider: "authentik",
-                    //   callbackURL: "/workspace/0",
-                    // })
+                    void authClient.signIn.social({
+                      provider: 'authentik',
+                      callbackURL: '/',
+                    });
                   }}
                 >
                   <svg

@@ -1,11 +1,11 @@
 import { getMyWorkspacesOptions } from '@notopia-uit/api-gen/index';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-import { Separator } from '@ui/components/ui/separator';
+import { Separator } from '@ui/components/shadcn/separator';
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from '@ui/components/ui/sidebar';
+} from '@ui/components/shadcn/sidebar';
 import WorkspaceSideBar from '@ui/components/workspace-sidebar';
 
 import getQueryClient from '../../../get-query-client';

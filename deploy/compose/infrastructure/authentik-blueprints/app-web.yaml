@@ -14,7 +14,7 @@ entries:
       client_id: app-web
     attrs:
       name: App Web
-      client_secret: notopia-uit
+      client_secret: notopiauit
       client_type: confidential
       access_code_validity: minutes=10
       access_token_validity: days=30
@@ -38,8 +38,8 @@ entries:
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, profile]]
         - !Find [authentik_providers_oauth2.scopemapping, [scope_name, email]]
       redirect_uris:
-        - url: ^https:\/\/web.notopia.localhost\/api\/auth\/oauth2\/callback\/.*$
-          matching_mode: regex
+        - url: http://web.notopia.localhost/api/auth/oauth2/callback/authentik
+          matching_mode: strict
 
   - model: authentik_core.application
     identifiers:

@@ -1,16 +1,14 @@
 # yaml-language-server: $schema=https://www.schemastore.org/traefik-v3-file-provider.json
 http:
   routers:
-    note:
+    web:
       entryPoints:
         - web
       rule: Host(`web.notopia.localhost`)
-      service: note
-      middlewares:
-        - jwt
+      service: web
 
   services:
-    note:
+    web:
       loadBalancer:
         servers:
           - url: http://host.docker.internal:3000

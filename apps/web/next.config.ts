@@ -7,6 +7,7 @@ const nextConfig: WithNxOptions = {
   // See: https://nx.dev/recipes/next/next-config-setup
   nx: {},
   output: 'standalone',
+  allowedDevOrigins: ['web.notopia.localhost'],
 };
 
 const plugins = [withNx];

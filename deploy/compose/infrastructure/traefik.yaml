@@ -13,6 +13,7 @@ services:
       - --api.dashboard=true
       - --entrypoints.web.address=:80
       - --log.level=INFO
+      - --accesslog=true
       - --tracing=true
       # - --tracing.samplerate=1.0
       # - --tracing.otlp.http=true

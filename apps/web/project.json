@@ -4,6 +4,21 @@
   "targets": {
     "nx-release-publish": {
       "parallelism": false
+    },
+    "dev": {
+      "options": {
+        "hostname": "0.0.0.0"
+      }
+    },
+    "serve-static": {
+      "options": {
+        "hostname": "0.0.0.0"
+      }
+    },
+    "start": {
+      "options": {
+        "hostname": "0.0.0.0"
+      }
     }
   },
   "release": {

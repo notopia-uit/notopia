@@ -21,6 +21,7 @@
     "@notopia-uit/block-note": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@tanstack/react-query": "catalog:",
+    "better-auth": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "date-fns": "^4.1.0",

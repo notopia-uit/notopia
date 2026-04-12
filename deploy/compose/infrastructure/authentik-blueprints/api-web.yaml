@@ -14,7 +14,7 @@ entries:
       client_id: api-web
     attrs:
       name: API Web
-      client_secret: notopia-uit
+      client_secret: notopiauit
       client_type: public
       access_code_validity: minutes=10
       access_token_validity: days=30

@@ -18,8 +18,7 @@ docs/godoc/**
 api/bundled/**/*.json
 submodule/**
 **/seed-data/**
-packages/ui/src/components/ui/**
-packages/ui/src/lib/**
-packages/ui/src/lib/utils.ts
-packages/ui/src/hooks/**
+packages/ui/src/components/shadcn/**
+packages/ui/src/lib/shadcn/**
+packages/ui/src/hooks/shadcn/**
 packages/pb/src/**
