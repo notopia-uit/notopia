@@ -1,8 +1,15 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { status } from '@grpc/grpc-js';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { type ClientGrpc } from '@nestjs/microservices';
 import {
   NOTE_PACKAGE_NAME,
   NOTE_SERVICE_NAME,
+  Note,
   NoteServiceClient,
   Trashed,
   TrashedBy,
@@ -10,8 +17,14 @@ import {
 import { firstValueFrom } from 'rxjs';
 
 import { protoTimestampToDate } from '#/common/proto-timestamp';
+import { NoteNotFoundException } from '#/note/note-not-found.exception';
+import { WorkspaceNoteNotFoundException } from '#/note/workspace-note-not-found.exception';
 
-import { NoteModel, TrashedModel } from './note.model';
+import { NoteModel, TrashedModel, Workspace } from './models';
+
+const isGrpcError = (error: unknown): error is { code?: number } => {
+  return typeof error === 'object' && error !== null && 'code' in error;
+};
 
 @Injectable()
 export class NoteService implements OnModuleInit {
@@ -33,26 +46,39 @@ export class NoteService implements OnModuleInit {
     userId: string;
     excludeTrashed?: boolean;
   }): Promise<NoteModel> {
-    const response = await firstValueFrom(
-      this.noteServiceClient.getNote({
-        id: noteId,
-        userId: userId,
-        excludeTrashed: excludeTrashed,
-      })
-    );
-    if (!response.updatedAt) {
-      throw new Error('Note updatedAt timestamp is required');
+    let note: Note | undefined;
+    try {
+      const response = await firstValueFrom(
+        this.noteServiceClient.getNote({
+          id: noteId,
+          userId: userId,
+          excludeTrashed: excludeTrashed,
+        })
+      );
+      note = response.note;
+    } catch (error) {
+      if (isGrpcError(error) && error.code === status.NOT_FOUND) {
+        throw new NoteNotFoundException(noteId);
+      }
+      throw error;
+    }
+    if (!note) {
+      throw new NoteNotFoundException(noteId);
+    }
+
+    if (!note.updatedAt) {
+      throw new InternalServerErrorException(
+        `Note with id ${noteId} is missing updatedAt timestamp`
+      );
     }
     return {
-      id: response.id,
-      name: response.name,
-      tags: response.tags,
-      folderId: response.folderId,
-      icon: response.icon,
-      updatedAt: protoTimestampToDate(response.updatedAt),
-      trashed: response.trashed
-        ? this.toTrashedModel(response.trashed)
-        : undefined,
+      id: note.id,
+      name: note.name,
+      tags: note.tags,
+      folderId: note.folderId,
+      icon: note.icon,
+      updatedAt: protoTimestampToDate(note.updatedAt),
+      trashed: note.trashed ? this.toTrashedModel(note.trashed) : undefined,
     };
   }
 
@@ -64,30 +90,39 @@ export class NoteService implements OnModuleInit {
     return response.name;
   }
 
-  // TODO: Get note hey
-
-  async getWorkspaceIdByNoteId(noteId: string): Promise<string> {
+  async getWorkspaceByNote({
+    userId,
+    noteId,
+  }: {
+    userId: string;
+    noteId: string;
+  }): Promise<Workspace> {
     const response = await firstValueFrom(
-      this.noteServiceClient.getWorkspaceIdByNoteId({
-        noteId,
+      this.noteServiceClient.getWorkspaceByNote({
+        noteId: noteId,
+        userId: userId,
       })
     );
-    return response.workspaceId;
+    const workspace = response.workspace;
+    if (!workspace) {
+      throw new WorkspaceNoteNotFoundException(noteId);
+    }
+    return {
+      id: workspace.id,
+      name: workspace.name,
+      slug: workspace.slug,
+    };
   }
 
   toTrashedModel(trashed: Trashed): TrashedModel {
-    // export enum TrashedBy {
-    //   TRASHED_BY_UNSPECIFIED = 0,
-    //   TRASHED_BY_PURPOSE = 1,
-    //   TRASHED_BY_PARENT = 2,
-    //   UNRECOGNIZED = -1,
-    // }
     switch (trashed.by) {
       case TrashedBy.TRASHED_BY_UNSPECIFIED:
-        throw new Error('Invalid trashed by value: TRASHED_BY_UNSPECIFIED');
+        throw new InternalServerErrorException(
+          'Trashed by value is unspecified'
+        );
       case TrashedBy.TRASHED_BY_PURPOSE:
         if (!trashed.at) {
-          throw new Error(
+          throw new InternalServerErrorException(
             'Trashed at timestamp is required for TRASHED_BY_PURPOSE'
           );
         }
@@ -97,7 +132,7 @@ export class NoteService implements OnModuleInit {
         };
       case TrashedBy.TRASHED_BY_PARENT:
         if (!trashed.at) {
-          throw new Error(
+          throw new InternalServerErrorException(
             'Trashed at timestamp is required for TRASHED_BY_PARENT'
           );
         }
@@ -106,7 +141,7 @@ export class NoteService implements OnModuleInit {
           at: protoTimestampToDate(trashed.at),
         };
       default:
-        throw new Error(`Invalid trashed by value: ${trashed.by}`);
+        throw new InternalServerErrorException('Unknown trashed by value');
     }
   }
 }

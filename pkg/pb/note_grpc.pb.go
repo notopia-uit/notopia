@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NoteService_GetNoteName_FullMethodName            = "/note.NoteService/GetNoteName"
-	NoteService_GetNote_FullMethodName                = "/note.NoteService/GetNote"
-	NoteService_GetWorkspaceIdByNoteId_FullMethodName = "/note.NoteService/GetWorkspaceIdByNoteId"
+	NoteService_GetNoteName_FullMethodName        = "/note.NoteService/GetNoteName"
+	NoteService_GetNote_FullMethodName            = "/note.NoteService/GetNote"
+	NoteService_GetWorkspaceByNote_FullMethodName = "/note.NoteService/GetWorkspaceByNote"
 )
 
 // NoteServiceClient is the client API for NoteService service.
@@ -32,7 +32,7 @@ type NoteServiceClient interface {
 	GetNoteName(ctx context.Context, in *GetNoteNameRequest, opts ...grpc.CallOption) (*GetNoteNameResponse, error)
 	GetNote(ctx context.Context, in *GetNoteRequest, opts ...grpc.CallOption) (*GetNoteResponse, error)
 	// NOTE: what, where is this used?
-	GetWorkspaceIdByNoteId(ctx context.Context, in *GetWorkspaceIdByNoteIdRequest, opts ...grpc.CallOption) (*GetWorkspaceIdByNoteIdResponse, error)
+	GetWorkspaceByNote(ctx context.Context, in *GetWorkspaceByNoteRequest, opts ...grpc.CallOption) (*GetWorkspaceByNoteResponse, error)
 }
 
 type noteServiceClient struct {
@@ -63,10 +63,10 @@ func (c *noteServiceClient) GetNote(ctx context.Context, in *GetNoteRequest, opt
 	return out, nil
 }
 
-func (c *noteServiceClient) GetWorkspaceIdByNoteId(ctx context.Context, in *GetWorkspaceIdByNoteIdRequest, opts ...grpc.CallOption) (*GetWorkspaceIdByNoteIdResponse, error) {
+func (c *noteServiceClient) GetWorkspaceByNote(ctx context.Context, in *GetWorkspaceByNoteRequest, opts ...grpc.CallOption) (*GetWorkspaceByNoteResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetWorkspaceIdByNoteIdResponse)
-	err := c.cc.Invoke(ctx, NoteService_GetWorkspaceIdByNoteId_FullMethodName, in, out, cOpts...)
+	out := new(GetWorkspaceByNoteResponse)
+	err := c.cc.Invoke(ctx, NoteService_GetWorkspaceByNote_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ type NoteServiceServer interface {
 	GetNoteName(context.Context, *GetNoteNameRequest) (*GetNoteNameResponse, error)
 	GetNote(context.Context, *GetNoteRequest) (*GetNoteResponse, error)
 	// NOTE: what, where is this used?
-	GetWorkspaceIdByNoteId(context.Context, *GetWorkspaceIdByNoteIdRequest) (*GetWorkspaceIdByNoteIdResponse, error)
+	GetWorkspaceByNote(context.Context, *GetWorkspaceByNoteRequest) (*GetWorkspaceByNoteResponse, error)
 	mustEmbedUnimplementedNoteServiceServer()
 }
 
@@ -98,8 +98,8 @@ func (UnimplementedNoteServiceServer) GetNoteName(context.Context, *GetNoteNameR
 func (UnimplementedNoteServiceServer) GetNote(context.Context, *GetNoteRequest) (*GetNoteResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetNote not implemented")
 }
-func (UnimplementedNoteServiceServer) GetWorkspaceIdByNoteId(context.Context, *GetWorkspaceIdByNoteIdRequest) (*GetWorkspaceIdByNoteIdResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetWorkspaceIdByNoteId not implemented")
+func (UnimplementedNoteServiceServer) GetWorkspaceByNote(context.Context, *GetWorkspaceByNoteRequest) (*GetWorkspaceByNoteResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWorkspaceByNote not implemented")
 }
 func (UnimplementedNoteServiceServer) mustEmbedUnimplementedNoteServiceServer() {}
 func (UnimplementedNoteServiceServer) testEmbeddedByValue()                     {}
@@ -158,20 +158,20 @@ func _NoteService_GetNote_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NoteService_GetWorkspaceIdByNoteId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetWorkspaceIdByNoteIdRequest)
+func _NoteService_GetWorkspaceByNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkspaceByNoteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NoteServiceServer).GetWorkspaceIdByNoteId(ctx, in)
+		return srv.(NoteServiceServer).GetWorkspaceByNote(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: NoteService_GetWorkspaceIdByNoteId_FullMethodName,
+		FullMethod: NoteService_GetWorkspaceByNote_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NoteServiceServer).GetWorkspaceIdByNoteId(ctx, req.(*GetWorkspaceIdByNoteIdRequest))
+		return srv.(NoteServiceServer).GetWorkspaceByNote(ctx, req.(*GetWorkspaceByNoteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -192,8 +192,8 @@ var NoteService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NoteService_GetNote_Handler,
 		},
 		{
-			MethodName: "GetWorkspaceIdByNoteId",
-			Handler:    _NoteService_GetWorkspaceIdByNoteId_Handler,
+			MethodName: "GetWorkspaceByNote",
+			Handler:    _NoteService_GetWorkspaceByNote_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

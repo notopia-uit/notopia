@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { NoteService } from '#/note/note.service';
 
-export type UserNotePermissions = 'read' | 'write' | 'delete';
+import { UserNotePermissions } from './models';
 
 @Injectable()
 export class AuthorizationService implements OnModuleInit {
@@ -61,13 +61,15 @@ export class AuthorizationService implements OnModuleInit {
     permission: UserNotePermissions;
   }): Promise<boolean> {
     try {
-      const workspaceId =
-        await this.noteService.getWorkspaceIdByNoteId(documentId);
+      const workspace = await this.noteService.getWorkspaceByNote({
+        noteId: documentId,
+        userId: memberId,
+      });
       const response = await firstValueFrom(
         this.authorizationServiceClient.hasWorkspaceItemPermission({
           permission: this.toWorkspaceItemPermission(permission),
           memberId,
-          workspaceId,
+          workspaceId: workspace.id,
         })
       );
       return response.hasPermission;
@@ -83,12 +85,14 @@ export class AuthorizationService implements OnModuleInit {
     documentId: string
   ): Promise<{ canRead: boolean; canWrite: boolean; canDelete: boolean }> {
     try {
-      const workspaceId =
-        await this.noteService.getWorkspaceIdByNoteId(documentId);
+      const workspace = await this.noteService.getWorkspaceByNote({
+        noteId: documentId,
+        userId: memberId,
+      });
       const response = await firstValueFrom(
         this.authorizationServiceClient.getUserWorkspaceItemPermissions({
           memberId,
-          workspaceId,
+          workspaceId: workspace.id,
         })
       );
       return {
