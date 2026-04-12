@@ -21,9 +21,6 @@
       "path": "../../packages/lib/tsconfig.lib.json"
     },
     {
-      "path": "../../packages/block-note/tsconfig.lib.json"
-    },
-    {
       "path": "../../packages/api-gen/tsconfig.lib.json"
     }
   ]

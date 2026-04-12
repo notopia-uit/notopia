@@ -5,13 +5,9 @@
     "parser": {
       "syntax": "typescript",
       "decorators": true,
-      "dynamicImport": true,
-      "tsx": true
+      "dynamicImport": true
     },
     "transform": {
-      "react": {
-        "runtime": "automatic"
-      },
       "decoratorMetadata": true,
       "legacyDecorator": true
     },
@@ -23,5 +19,5 @@
     "type": "nodenext"
   },
   "sourceMaps": true,
-  "minify": false
+  "minify": true
 }

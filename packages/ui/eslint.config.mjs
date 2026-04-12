@@ -6,9 +6,9 @@ export default [
   ...baseConfig,
   ...nx.configs['flat/react'],
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+    files: ['./src/lib/auth.ts'],
     rules: {
-      'simple-import-sort/imports': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
     },
   },
   {

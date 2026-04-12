@@ -4,7 +4,7 @@
   "compilerOptions": {
     "module": "preserve",
     "moduleResolution": "bundler",
-    "types": ["node"],
+    "types": ["node", "../../packages/lib/src/server/types.d.ts"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2024",
@@ -29,9 +29,6 @@
     },
     {
       "path": "../../packages/api-gen/tsconfig.lib.json"
-    },
-    {
-      "path": "../../packages/block-note/tsconfig.lib.json"
     }
   ]
 }

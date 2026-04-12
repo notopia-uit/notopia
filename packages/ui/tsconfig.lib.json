@@ -5,6 +5,7 @@
     "moduleResolution": "bundler",
     "rootDir": "src",
     "outDir": "dist",
+    "exactOptionalPropertyTypes": false,
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "types": [
       "node",
@@ -14,7 +15,7 @@
       "vite/client"
     ],
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "paths": {
       "@notopia-uit/ui/*": ["./src/*"],
       "*": ["./src/*"]
@@ -37,9 +38,6 @@
   "references": [
     {
       "path": "../lib/tsconfig.lib.json"
-    },
-    {
-      "path": "../block-note/tsconfig.lib.json"
     },
     {
       "path": "../api-gen/tsconfig.lib.json"

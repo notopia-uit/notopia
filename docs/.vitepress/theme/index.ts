@@ -1,5 +1,4 @@
 // https://vitepress.dev/guide/custom-theme
-import '@catppuccin/vitepress/theme/mocha/lavender.css';
 import type { Theme } from 'vitepress';
 import { useData } from 'vitepress';
 import { createMermaidRenderer } from 'vitepress-mermaid-renderer';
@@ -7,6 +6,9 @@ import { theme } from 'vitepress-openapi/client';
 import 'vitepress-openapi/dist/style.css';
 import DefaultTheme from 'vitepress/theme';
 import { h, nextTick, watch } from 'vue';
+
+// sort-imports-ignore
+import '@catppuccin/vitepress/theme/mocha/lavender.css';
 
 export default {
   extends: DefaultTheme,

@@ -18,7 +18,6 @@
     "@blocknote/shadcn": "catalog:",
     "@icons-pack/react-simple-icons": "catalog:",
     "@notopia-uit/api-gen": "workspace:",
-    "@notopia-uit/block-note": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@tanstack/react-query": "catalog:",
     "better-auth": "catalog:",

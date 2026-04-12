@@ -1,12 +1,12 @@
 import { createReactInlineContentSpec } from '@blocknote/react';
-import { BlockNoteTagConfig } from '@notopia-uit/lib/block-note';
 
-export const createBlockNoteTagSpec = () =>
+import { BlockNoteTagConfig } from '../block-note';
+
+export const createServerBlockNoteTagSpec = () =>
   createReactInlineContentSpec(BlockNoteTagConfig, {
     render: (props) => (
       <span
-        // TODO: tailwind shadcn
-        className="notopia-tag bg-gray-200 text-gray-800 rounded px-1 font-semibold"
+        className="notopia-tag"
         data-notopia-tag={props.inlineContent.props.tag}
       >
         #{props.inlineContent.props.tag}

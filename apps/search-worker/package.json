@@ -9,7 +9,6 @@
     "@nestjs/microservices": "catalog:",
     "@nestjs/platform-express": "catalog:",
     "@notopia-uit/api-gen": "workspace:",
-    "@notopia-uit/block-note": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@opentelemetry/api": "catalog:",
     "@opentelemetry/auto-instrumentations-node": "catalog:",

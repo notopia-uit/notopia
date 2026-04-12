@@ -27,9 +27,6 @@
       "path": "../../packages/api-gen"
     },
     {
-      "path": "../../packages/block-note"
-    },
-    {
       "path": "./tsconfig.app.json"
     }
   ]

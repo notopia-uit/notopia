@@ -18,4 +18,4 @@ export const auth = betterAuth({
       ],
     }),
   ],
-});
+}) as any;

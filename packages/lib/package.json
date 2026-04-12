@@ -5,11 +5,19 @@
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "default": "./src/index.ts"
+    "./block-note": {
+      "@nx/source": "./src/block-note/index.ts",
+      "types": "./dist/block-note/index.d.ts",
+      "default": "./dist/block-note/index.js"
+    },
+    "./server": {
+      "@nx/source": "./src/server/index.ts",
+      "types": "./dist/server/index.d.ts",
+      "default": "./dist/server/index.js"
     }
   },
   "dependencies": {
-    "@blocknote/core": "catalog:"
+    "@blocknote/core": "catalog:",
+    "@blocknote/react": "catalog:"
   }
 }

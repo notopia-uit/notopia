@@ -2,7 +2,7 @@ import { createReactInlineContentSpec } from '@blocknote/react';
 import {
   BlockNoteReferenceConfig,
   BlockNoteReferenceInlineContentSpec,
-} from '@notopia-uit/lib';
+} from '@notopia-uit/lib/block-note';
 import { useState } from 'react';
 import { useEffect } from 'react';
 

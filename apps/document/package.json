@@ -27,7 +27,6 @@
     "@nestjs/typeorm": "catalog:",
     "@nestjs/websockets": "catalog:",
     "@notopia-uit/api-document-nestjs-server": "workspace:",
-    "@notopia-uit/block-note": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@notopia-uit/pb": "workspace:",
     "@opentelemetry/api": "catalog:",

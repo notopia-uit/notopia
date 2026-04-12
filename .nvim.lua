@@ -36,6 +36,33 @@ lsp.config("gopls", {
   },
 })
 
+lsp.config("tailwindcss", {
+  filetypes = {
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+  },
+  root_dir = function(bufnr, on_dir)
+    local fname = vim.api.nvim_buf_get_name(bufnr)
+    local allowed_paths = {
+      "apps/web",
+      "packages/ui",
+    }
+    local is_allowed = false
+    for _, path in ipairs(allowed_paths) do
+      if fname:match(path) then
+        is_allowed = true
+        break
+      end
+    end
+    if not is_allowed then
+      return
+    end
+    on_dir(require("lspconfig.util").root_pattern("package.json")(fname))
+  end,
+})
+
 ---@type lsp.vtsls
 local tsgo_setting = {
   typescript = {

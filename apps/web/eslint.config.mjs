@@ -3,7 +3,6 @@ import nx from '@nx/eslint-plugin';
 import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss';
 import reactHooks from 'eslint-plugin-react-hooks';
 import { defineConfig } from 'eslint/config';
-import { parser as eslintParserTypeScript } from 'typescript-eslint';
 
 import baseConfig from '../../eslint.config.mjs';
 
@@ -22,12 +21,6 @@ export default defineConfig(
       'better-tailwindcss': {
         entryPoint: './app/globals.css',
       },
-    },
-  },
-  {
-    files: ['**/*.{ts,tsx,cts,mts}'],
-    languageOptions: {
-      parser: eslintParserTypeScript,
     },
   },
   {
