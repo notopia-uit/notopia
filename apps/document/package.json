@@ -50,7 +50,8 @@
     "rxjs": "catalog:",
     "tslib": "catalog:",
     "typeorm": "catalog:",
-    "ws": "catalog:"
+    "ws": "catalog:",
+    "yjs": "catalog:"
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",

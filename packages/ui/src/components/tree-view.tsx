@@ -430,7 +430,6 @@ const TreeView: React.FC = () => {
     []
   );
 
-  //TODO: check this later
   const getItemPath = useCallback(
     async (
       search: string,
@@ -480,6 +479,7 @@ const TreeView: React.FC = () => {
                 tree.current?.toggleItemSelectStatus(path.at(-1) ?? '');
               });
             }
+            return;
           })
           .catch((error) => {
             console.error('Error getting item:', error);
@@ -575,7 +575,7 @@ const TreeView: React.FC = () => {
             return (
               <li
                 {...context.itemContainerWithChildrenProps}
-                className="my-[1px] [&>button>svg]:aria-[expanded=true]:rotate-90 [&>button]:aria-[selected=true]:bg-primary/50"
+                className="my-px [&>button>svg]:aria-expanded:rotate-90 [&>button]:aria-selected:bg-primary/50"
               >
                 <Button
                   {...context.itemContainerWithoutChildrenProps}
@@ -584,7 +584,7 @@ const TreeView: React.FC = () => {
                   variant="outline"
                   size="sm"
                   className={cn(
-                    'grid h-6 w-full grid-flow-col items-center justify-start gap-[2px] border-none text-xs shadow-none',
+                    'grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none',
                     'focus:bg-secondary/20'
                   )}
                   style={{
@@ -600,7 +600,7 @@ const TreeView: React.FC = () => {
           }}
           renderItemArrow={({ context }) => {
             return (
-              <ChevronRight {...context.arrowProps} className="!size-[14px]" />
+              <ChevronRight {...context.arrowProps} className="size-3.5!" />
             );
           }}
           renderItemTitle={({ title }) => <span>{title}</span>}

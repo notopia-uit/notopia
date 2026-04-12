@@ -52,7 +52,7 @@ function NavigationBarLogo() {
         href="/"
         className="hidden justify-start items-center sm:flex space-x-2 px-2 py-2"
       >
-        <Icons.logo />
+        <Icons.Logo />
         <span className="hidden font-bold sm:inline-block">Notopia</span>
       </Link>
     </div>
