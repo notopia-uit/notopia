@@ -24,6 +24,5 @@ func (h *CheckWorkspaceSlugExists) CheckWorkspaceSlugExists(ctx context.Context,
 	if err != nil {
 		return false, toErr(err)
 	}
-
 	return exists, nil
 }

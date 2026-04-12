@@ -8,6 +8,7 @@ import (
 
 const (
 	CodeWorkspaceNotFound                Code = "workspaceNotFound"
+	CodeWorkspaceByNoteNotFound          Code = "workspaceByNoteNotFound"
 	CodeWorkspaceBySlugNotFound          Code = "workspaceBySlugNotFound"
 	CodeWorkspaceRootFolderNotFound      Code = "workspaceRootFolderNotFound"
 	CodeInvalidWorkspaceName             Code = "invalidWorkspaceName"
@@ -28,6 +29,22 @@ func NewWorkspaceNotFound(id uuid.UUID, err error) *WorkspaceNotFound {
 		Err: Err{
 			message: fmt.Sprintf("workspace with id %q not found", id.String()),
 			code:    CodeWorkspaceNotFound,
+			err:     err,
+		},
+	}
+}
+
+type WorkspaceByNoteNotFound struct {
+	Err
+	NoteID uuid.UUID
+}
+
+func NewWorkspaceByNoteNotFound(noteID uuid.UUID, err error) *WorkspaceByNoteNotFound {
+	return &WorkspaceByNoteNotFound{
+		NoteID: noteID,
+		Err: Err{
+			message: fmt.Sprintf("workspace for note with id %q not found", noteID.String()),
+			code:    CodeWorkspaceByNoteNotFound,
 			err:     err,
 		},
 	}

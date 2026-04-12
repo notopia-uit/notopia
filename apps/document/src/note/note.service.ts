@@ -13,18 +13,15 @@ import {
   NoteServiceClient,
   Trashed,
   TrashedBy,
+  Workspace,
 } from '@notopia-uit/pb/note';
 import { firstValueFrom } from 'rxjs';
 
-import { protoTimestampToDate } from '#/common/proto-timestamp';
+import { isGrpcError, protoTimestampToDate } from '#/common/grpc';
 import { NoteNotFoundException } from '#/note/note-not-found.exception';
 import { WorkspaceNoteNotFoundException } from '#/note/workspace-note-not-found.exception';
 
-import { NoteModel, TrashedModel, Workspace } from './models';
-
-const isGrpcError = (error: unknown): error is { code?: number } => {
-  return typeof error === 'object' && error !== null && 'code' in error;
-};
+import { NoteModel, TrashedModel, WorkspaceModel } from './models';
 
 @Injectable()
 export class NoteService implements OnModuleInit {
@@ -96,14 +93,22 @@ export class NoteService implements OnModuleInit {
   }: {
     userId: string;
     noteId: string;
-  }): Promise<Workspace> {
-    const response = await firstValueFrom(
-      this.noteServiceClient.getWorkspaceByNote({
-        noteId: noteId,
-        userId: userId,
-      })
-    );
-    const workspace = response.workspace;
+  }): Promise<WorkspaceModel> {
+    let workspace: Workspace | undefined;
+    try {
+      const response = await firstValueFrom(
+        this.noteServiceClient.getWorkspaceByNote({
+          noteId: noteId,
+          userId: userId,
+        })
+      );
+      workspace = response.workspace;
+    } catch (error) {
+      if (isGrpcError(error) && error.code === status.NOT_FOUND) {
+        throw new WorkspaceNoteNotFoundException(noteId);
+      }
+      throw error;
+    }
     if (!workspace) {
       throw new WorkspaceNoteNotFoundException(noteId);
     }
