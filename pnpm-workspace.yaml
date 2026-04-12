@@ -94,7 +94,7 @@ catalog:
   typeorm: '0.3.28'
   typescript: '6.0.2'
   typescript-eslint: '8.58.1'
-  vite: '8.0.7'
+  vite: '8.0.8'
   vite-plugin-dts: '4.5.4'
   vitest: '4.0.18'
   webpack-node-externals: '3.0.0'
