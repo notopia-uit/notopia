@@ -7,3 +7,7 @@ export function protoTimestampToDate(timestamp: {
 }): Date {
   return new Date(timestamp.seconds * 1000 + timestamp.nanos / 1e6);
 }
+
+export function isGrpcError(error: unknown): error is { code?: number } {
+  return typeof error === 'object' && error !== null && 'code' in error;
+}

@@ -8,9 +8,9 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/pb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// NOTE: This might be deleted
 func (s *ServiceServer) GetNoteName(ctx context.Context, req *pb.GetNoteNameRequest) (*pb.GetNoteNameResponse, error) {
 	return nil, errs.Unimplemented
 }
@@ -31,24 +31,29 @@ func (s *ServiceServer) GetNote(
 	if err != nil {
 		return nil, err
 	}
-	var icon *string
-	if note.Icon != "" {
-		icon = &note.Icon
-	}
+	noteDTO := toNoteDTO(note)
 	return &pb.GetNoteResponse{
-		Id:        note.ID.String(),
-		Name:      note.Name,
-		Icon:      icon,
-		FolderId:  note.FolderID.String(),
-		Tags:      note.Tags,
-		UpdatedAt: timestamppb.New(note.UpdatedAt),
-		Trashed:   toTrashed(note.Trashed),
+		Note: noteDTO,
 	}, nil
 }
 
-func (s *ServiceServer) GetWorkspaceIdByNoteId(
+func (s *ServiceServer) GetWorkspaceByNote(
 	ctx context.Context,
-	req *pb.GetWorkspaceIdByNoteIdRequest,
-) (*pb.GetWorkspaceIdByNoteIdResponse, error) {
-	return nil, errs.Unimplemented
+	req *pb.GetWorkspaceByNoteRequest,
+) (*pb.GetWorkspaceByNoteResponse, error) {
+	noteID, err := uuid.Parse(req.NoteId)
+	if err != nil {
+		return nil, errs.NewInvalid(fmt.Sprintf("invalid note id: %v", err))
+	}
+	workspace, err := s.app.Queries.GetWorkspaceByNoteHandler.Handle(ctx, &app.GetWorkspaceByNote{
+		NoteID: noteID,
+		UserID: req.UserId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	workspaceDTO := toWorkspaceDTO(workspace)
+	return &pb.GetWorkspaceByNoteResponse{
+		Workspace: workspaceDTO,
+	}, nil
 }

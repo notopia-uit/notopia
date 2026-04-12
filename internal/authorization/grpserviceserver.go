@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/app"
-	"github.com/notopia-uit/notopia/internal/authorization/errs"
 
 	"github.com/notopia-uit/notopia/pkg/pb"
 )
@@ -169,7 +168,17 @@ func (g *GRPCServiceServer) GetUserWorkspaceItemPermissions(ctx context.Context,
 }
 
 func (g *GRPCServiceServer) DeleteWorkspace(ctx context.Context, req *pb.DeleteWorkspaceRequest) (*pb.DeleteWorkspaceResponse, error) {
-	return nil, errs.Unimplemented
+	workspaceID, err := uuid.Parse(req.WorkspaceId)
+	if err != nil {
+		return nil, err
+	}
+	if err := g.app.DeleteWorkspace.Handle(ctx, app.DeleteWorkspace{
+		UserID:      req.UserId,
+		WorkspaceID: workspaceID,
+	}); err != nil {
+		return nil, err
+	}
+	return &pb.DeleteWorkspaceResponse{}, nil
 }
 
 func pbWorkspaceRoleToApp(role pb.WorkspaceRole) app.WorkspaceRole {

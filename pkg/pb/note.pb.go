@@ -124,6 +124,158 @@ func (x *Trashed) GetAt() *timestamppb.Timestamp {
 	return nil
 }
 
+type Note struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Icon          *string                `protobuf:"bytes,3,opt,name=icon,proto3,oneof" json:"icon,omitempty"`
+	FolderId      string                 `protobuf:"bytes,4,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
+	Tags          []string               `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Trashed       *Trashed               `protobuf:"bytes,7,opt,name=trashed,proto3,oneof" json:"trashed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Note) Reset() {
+	*x = Note{}
+	mi := &file_note_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Note) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Note) ProtoMessage() {}
+
+func (x *Note) ProtoReflect() protoreflect.Message {
+	mi := &file_note_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Note.ProtoReflect.Descriptor instead.
+func (*Note) Descriptor() ([]byte, []int) {
+	return file_note_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Note) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Note) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Note) GetIcon() string {
+	if x != nil && x.Icon != nil {
+		return *x.Icon
+	}
+	return ""
+}
+
+func (x *Note) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
+}
+
+func (x *Note) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+func (x *Note) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+func (x *Note) GetTrashed() *Trashed {
+	if x != nil {
+		return x.Trashed
+	}
+	return nil
+}
+
+type Workspace struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Slug          string                 `protobuf:"bytes,2,opt,name=slug,proto3" json:"slug,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Workspace) Reset() {
+	*x = Workspace{}
+	mi := &file_note_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Workspace) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Workspace) ProtoMessage() {}
+
+func (x *Workspace) ProtoReflect() protoreflect.Message {
+	mi := &file_note_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Workspace.ProtoReflect.Descriptor instead.
+func (*Workspace) Descriptor() ([]byte, []int) {
+	return file_note_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Workspace) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Workspace) GetSlug() string {
+	if x != nil {
+		return x.Slug
+	}
+	return ""
+}
+
+func (x *Workspace) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 type GetNoteNameRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -133,7 +285,7 @@ type GetNoteNameRequest struct {
 
 func (x *GetNoteNameRequest) Reset() {
 	*x = GetNoteNameRequest{}
-	mi := &file_note_proto_msgTypes[1]
+	mi := &file_note_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -145,7 +297,7 @@ func (x *GetNoteNameRequest) String() string {
 func (*GetNoteNameRequest) ProtoMessage() {}
 
 func (x *GetNoteNameRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_note_proto_msgTypes[1]
+	mi := &file_note_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -158,7 +310,7 @@ func (x *GetNoteNameRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNoteNameRequest.ProtoReflect.Descriptor instead.
 func (*GetNoteNameRequest) Descriptor() ([]byte, []int) {
-	return file_note_proto_rawDescGZIP(), []int{1}
+	return file_note_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetNoteNameRequest) GetId() string {
@@ -177,7 +329,7 @@ type GetNoteNameResponse struct {
 
 func (x *GetNoteNameResponse) Reset() {
 	*x = GetNoteNameResponse{}
-	mi := &file_note_proto_msgTypes[2]
+	mi := &file_note_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -189,7 +341,7 @@ func (x *GetNoteNameResponse) String() string {
 func (*GetNoteNameResponse) ProtoMessage() {}
 
 func (x *GetNoteNameResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_note_proto_msgTypes[2]
+	mi := &file_note_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -202,7 +354,7 @@ func (x *GetNoteNameResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNoteNameResponse.ProtoReflect.Descriptor instead.
 func (*GetNoteNameResponse) Descriptor() ([]byte, []int) {
-	return file_note_proto_rawDescGZIP(), []int{2}
+	return file_note_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetNoteNameResponse) GetName() string {
@@ -223,7 +375,7 @@ type GetNoteRequest struct {
 
 func (x *GetNoteRequest) Reset() {
 	*x = GetNoteRequest{}
-	mi := &file_note_proto_msgTypes[3]
+	mi := &file_note_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -235,7 +387,7 @@ func (x *GetNoteRequest) String() string {
 func (*GetNoteRequest) ProtoMessage() {}
 
 func (x *GetNoteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_note_proto_msgTypes[3]
+	mi := &file_note_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -248,7 +400,7 @@ func (x *GetNoteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNoteRequest.ProtoReflect.Descriptor instead.
 func (*GetNoteRequest) Descriptor() ([]byte, []int) {
-	return file_note_proto_rawDescGZIP(), []int{3}
+	return file_note_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetNoteRequest) GetId() string {
@@ -274,20 +426,14 @@ func (x *GetNoteRequest) GetUserId() string {
 
 type GetNoteResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Icon          *string                `protobuf:"bytes,3,opt,name=icon,proto3,oneof" json:"icon,omitempty"`
-	FolderId      string                 `protobuf:"bytes,4,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
-	Tags          []string               `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Trashed       *Trashed               `protobuf:"bytes,7,opt,name=trashed,proto3,oneof" json:"trashed,omitempty"`
+	Note          *Note                  `protobuf:"bytes,1,opt,name=note,proto3" json:"note,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetNoteResponse) Reset() {
 	*x = GetNoteResponse{}
-	mi := &file_note_proto_msgTypes[4]
+	mi := &file_note_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -299,7 +445,7 @@ func (x *GetNoteResponse) String() string {
 func (*GetNoteResponse) ProtoMessage() {}
 
 func (x *GetNoteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_note_proto_msgTypes[4]
+	mi := &file_note_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -312,80 +458,39 @@ func (x *GetNoteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNoteResponse.ProtoReflect.Descriptor instead.
 func (*GetNoteResponse) Descriptor() ([]byte, []int) {
-	return file_note_proto_rawDescGZIP(), []int{4}
+	return file_note_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *GetNoteResponse) GetId() string {
+func (x *GetNoteResponse) GetNote() *Note {
 	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *GetNoteResponse) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *GetNoteResponse) GetIcon() string {
-	if x != nil && x.Icon != nil {
-		return *x.Icon
-	}
-	return ""
-}
-
-func (x *GetNoteResponse) GetFolderId() string {
-	if x != nil {
-		return x.FolderId
-	}
-	return ""
-}
-
-func (x *GetNoteResponse) GetTags() []string {
-	if x != nil {
-		return x.Tags
+		return x.Note
 	}
 	return nil
 }
 
-func (x *GetNoteResponse) GetUpdatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return nil
-}
-
-func (x *GetNoteResponse) GetTrashed() *Trashed {
-	if x != nil {
-		return x.Trashed
-	}
-	return nil
-}
-
-type GetWorkspaceIdByNoteIdRequest struct {
+type GetWorkspaceByNoteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	NoteId        string                 `protobuf:"bytes,1,opt,name=note_id,json=noteId,proto3" json:"note_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetWorkspaceIdByNoteIdRequest) Reset() {
-	*x = GetWorkspaceIdByNoteIdRequest{}
-	mi := &file_note_proto_msgTypes[5]
+func (x *GetWorkspaceByNoteRequest) Reset() {
+	*x = GetWorkspaceByNoteRequest{}
+	mi := &file_note_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetWorkspaceIdByNoteIdRequest) String() string {
+func (x *GetWorkspaceByNoteRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetWorkspaceIdByNoteIdRequest) ProtoMessage() {}
+func (*GetWorkspaceByNoteRequest) ProtoMessage() {}
 
-func (x *GetWorkspaceIdByNoteIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_note_proto_msgTypes[5]
+func (x *GetWorkspaceByNoteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_note_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -396,40 +501,47 @@ func (x *GetWorkspaceIdByNoteIdRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetWorkspaceIdByNoteIdRequest.ProtoReflect.Descriptor instead.
-func (*GetWorkspaceIdByNoteIdRequest) Descriptor() ([]byte, []int) {
-	return file_note_proto_rawDescGZIP(), []int{5}
+// Deprecated: Use GetWorkspaceByNoteRequest.ProtoReflect.Descriptor instead.
+func (*GetWorkspaceByNoteRequest) Descriptor() ([]byte, []int) {
+	return file_note_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *GetWorkspaceIdByNoteIdRequest) GetNoteId() string {
+func (x *GetWorkspaceByNoteRequest) GetNoteId() string {
 	if x != nil {
 		return x.NoteId
 	}
 	return ""
 }
 
-type GetWorkspaceIdByNoteIdResponse struct {
+func (x *GetWorkspaceByNoteRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetWorkspaceByNoteResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	WorkspaceId   string                 `protobuf:"bytes,1,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	Workspace     *Workspace             `protobuf:"bytes,1,opt,name=workspace,proto3" json:"workspace,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetWorkspaceIdByNoteIdResponse) Reset() {
-	*x = GetWorkspaceIdByNoteIdResponse{}
-	mi := &file_note_proto_msgTypes[6]
+func (x *GetWorkspaceByNoteResponse) Reset() {
+	*x = GetWorkspaceByNoteResponse{}
+	mi := &file_note_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetWorkspaceIdByNoteIdResponse) String() string {
+func (x *GetWorkspaceByNoteResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetWorkspaceIdByNoteIdResponse) ProtoMessage() {}
+func (*GetWorkspaceByNoteResponse) ProtoMessage() {}
 
-func (x *GetWorkspaceIdByNoteIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_note_proto_msgTypes[6]
+func (x *GetWorkspaceByNoteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_note_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -440,16 +552,16 @@ func (x *GetWorkspaceIdByNoteIdResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetWorkspaceIdByNoteIdResponse.ProtoReflect.Descriptor instead.
-func (*GetWorkspaceIdByNoteIdResponse) Descriptor() ([]byte, []int) {
-	return file_note_proto_rawDescGZIP(), []int{6}
+// Deprecated: Use GetWorkspaceByNoteResponse.ProtoReflect.Descriptor instead.
+func (*GetWorkspaceByNoteResponse) Descriptor() ([]byte, []int) {
+	return file_note_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *GetWorkspaceIdByNoteIdResponse) GetWorkspaceId() string {
+func (x *GetWorkspaceByNoteResponse) GetWorkspace() *Workspace {
 	if x != nil {
-		return x.WorkspaceId
+		return x.Workspace
 	}
-	return ""
+	return nil
 }
 
 var File_note_proto protoreflect.FileDescriptor
@@ -460,16 +572,8 @@ const file_note_proto_rawDesc = "" +
 	"note.proto\x12\x04note\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"f\n" +
 	"\aTrashed\x12'\n" +
 	"\x02by\x18\x01 \x01(\x0e2\x0f.note.TrashedByB\x06\xbaH\x03\xc8\x01\x01R\x02by\x122\n" +
-	"\x02at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\x02at\"1\n" +
-	"\x12GetNoteNameRequest\x12\x1b\n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x02id\"1\n" +
-	"\x13GetNoteNameResponse\x12\x1a\n" +
-	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"w\n" +
-	"\x0eGetNoteRequest\x12\x1b\n" +
-	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x02id\x12'\n" +
-	"\x0fexclude_trashed\x18\x02 \x01(\bR\x0eexcludeTrashed\x12\x1f\n" +
-	"\auser_id\x18\x03 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\"\xa7\x02\n" +
-	"\x0fGetNoteResponse\x12\x1b\n" +
+	"\x02at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x06\xbaH\x03\xc8\x01\x01R\x02at\"\x9c\x02\n" +
+	"\x04Note\x12\x1b\n" +
 	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x02id\x12\x1a\n" +
 	"\x04name\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x17\n" +
 	"\x04icon\x18\x03 \x01(\tH\x00R\x04icon\x88\x01\x01\x12(\n" +
@@ -480,19 +584,35 @@ const file_note_proto_rawDesc = "" +
 	"\atrashed\x18\a \x01(\v2\r.note.TrashedH\x01R\atrashed\x88\x01\x01B\a\n" +
 	"\x05_iconB\n" +
 	"\n" +
-	"\b_trashed\"E\n" +
-	"\x1dGetWorkspaceIdByNoteIdRequest\x12$\n" +
-	"\anote_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x06noteId\"P\n" +
-	"\x1eGetWorkspaceIdByNoteIdResponse\x12.\n" +
-	"\fworkspace_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\vworkspaceId*V\n" +
+	"\b_trashed\"`\n" +
+	"\tWorkspace\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x02id\x12\x1a\n" +
+	"\x04slug\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04slug\x12\x1a\n" +
+	"\x04name\x18\x03 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"1\n" +
+	"\x12GetNoteNameRequest\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x02id\"1\n" +
+	"\x13GetNoteNameResponse\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x04name\"w\n" +
+	"\x0eGetNoteRequest\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x02id\x12'\n" +
+	"\x0fexclude_trashed\x18\x02 \x01(\bR\x0eexcludeTrashed\x12\x1f\n" +
+	"\auser_id\x18\x03 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\"9\n" +
+	"\x0fGetNoteResponse\x12&\n" +
+	"\x04note\x18\x01 \x01(\v2\n" +
+	".note.NoteB\x06\xbaH\x03\xc8\x01\x01R\x04note\"b\n" +
+	"\x19GetWorkspaceByNoteRequest\x12$\n" +
+	"\anote_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x06noteId\x12\x1f\n" +
+	"\auser_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\"S\n" +
+	"\x1aGetWorkspaceByNoteResponse\x125\n" +
+	"\tworkspace\x18\x01 \x01(\v2\x0f.note.WorkspaceB\x06\xbaH\x03\xc8\x01\x01R\tworkspace*V\n" +
 	"\tTrashedBy\x12\x1a\n" +
 	"\x16TRASHED_BY_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12TRASHED_BY_PURPOSE\x10\x01\x12\x15\n" +
-	"\x11TRASHED_BY_PARENT\x10\x022\xee\x01\n" +
+	"\x11TRASHED_BY_PARENT\x10\x022\xe2\x01\n" +
 	"\vNoteService\x12B\n" +
 	"\vGetNoteName\x12\x18.note.GetNoteNameRequest\x1a\x19.note.GetNoteNameResponse\x126\n" +
-	"\aGetNote\x12\x14.note.GetNoteRequest\x1a\x15.note.GetNoteResponse\x12c\n" +
-	"\x16GetWorkspaceIdByNoteId\x12#.note.GetWorkspaceIdByNoteIdRequest\x1a$.note.GetWorkspaceIdByNoteIdResponseBl\n" +
+	"\aGetNote\x12\x14.note.GetNoteRequest\x1a\x15.note.GetNoteResponse\x12W\n" +
+	"\x12GetWorkspaceByNote\x12\x1f.note.GetWorkspaceByNoteRequest\x1a .note.GetWorkspaceByNoteResponseBl\n" +
 	"\bcom.noteB\tNoteProtoP\x01Z%github.com/notopia-uit/notopia/pkg/pb\xa2\x02\x03NXX\xaa\x02\x04Note\xca\x02\x04Note\xe2\x02\x10Note\\GPBMetadata\xea\x02\x04Noteb\x06proto3"
 
 var (
@@ -508,34 +628,38 @@ func file_note_proto_rawDescGZIP() []byte {
 }
 
 var file_note_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_note_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_note_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_note_proto_goTypes = []any{
-	(TrashedBy)(0),                         // 0: note.TrashedBy
-	(*Trashed)(nil),                        // 1: note.Trashed
-	(*GetNoteNameRequest)(nil),             // 2: note.GetNoteNameRequest
-	(*GetNoteNameResponse)(nil),            // 3: note.GetNoteNameResponse
-	(*GetNoteRequest)(nil),                 // 4: note.GetNoteRequest
-	(*GetNoteResponse)(nil),                // 5: note.GetNoteResponse
-	(*GetWorkspaceIdByNoteIdRequest)(nil),  // 6: note.GetWorkspaceIdByNoteIdRequest
-	(*GetWorkspaceIdByNoteIdResponse)(nil), // 7: note.GetWorkspaceIdByNoteIdResponse
-	(*timestamppb.Timestamp)(nil),          // 8: google.protobuf.Timestamp
+	(TrashedBy)(0),                     // 0: note.TrashedBy
+	(*Trashed)(nil),                    // 1: note.Trashed
+	(*Note)(nil),                       // 2: note.Note
+	(*Workspace)(nil),                  // 3: note.Workspace
+	(*GetNoteNameRequest)(nil),         // 4: note.GetNoteNameRequest
+	(*GetNoteNameResponse)(nil),        // 5: note.GetNoteNameResponse
+	(*GetNoteRequest)(nil),             // 6: note.GetNoteRequest
+	(*GetNoteResponse)(nil),            // 7: note.GetNoteResponse
+	(*GetWorkspaceByNoteRequest)(nil),  // 8: note.GetWorkspaceByNoteRequest
+	(*GetWorkspaceByNoteResponse)(nil), // 9: note.GetWorkspaceByNoteResponse
+	(*timestamppb.Timestamp)(nil),      // 10: google.protobuf.Timestamp
 }
 var file_note_proto_depIdxs = []int32{
-	0, // 0: note.Trashed.by:type_name -> note.TrashedBy
-	8, // 1: note.Trashed.at:type_name -> google.protobuf.Timestamp
-	8, // 2: note.GetNoteResponse.updated_at:type_name -> google.protobuf.Timestamp
-	1, // 3: note.GetNoteResponse.trashed:type_name -> note.Trashed
-	2, // 4: note.NoteService.GetNoteName:input_type -> note.GetNoteNameRequest
-	4, // 5: note.NoteService.GetNote:input_type -> note.GetNoteRequest
-	6, // 6: note.NoteService.GetWorkspaceIdByNoteId:input_type -> note.GetWorkspaceIdByNoteIdRequest
-	3, // 7: note.NoteService.GetNoteName:output_type -> note.GetNoteNameResponse
-	5, // 8: note.NoteService.GetNote:output_type -> note.GetNoteResponse
-	7, // 9: note.NoteService.GetWorkspaceIdByNoteId:output_type -> note.GetWorkspaceIdByNoteIdResponse
-	7, // [7:10] is the sub-list for method output_type
-	4, // [4:7] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	0,  // 0: note.Trashed.by:type_name -> note.TrashedBy
+	10, // 1: note.Trashed.at:type_name -> google.protobuf.Timestamp
+	10, // 2: note.Note.updated_at:type_name -> google.protobuf.Timestamp
+	1,  // 3: note.Note.trashed:type_name -> note.Trashed
+	2,  // 4: note.GetNoteResponse.note:type_name -> note.Note
+	3,  // 5: note.GetWorkspaceByNoteResponse.workspace:type_name -> note.Workspace
+	4,  // 6: note.NoteService.GetNoteName:input_type -> note.GetNoteNameRequest
+	6,  // 7: note.NoteService.GetNote:input_type -> note.GetNoteRequest
+	8,  // 8: note.NoteService.GetWorkspaceByNote:input_type -> note.GetWorkspaceByNoteRequest
+	5,  // 9: note.NoteService.GetNoteName:output_type -> note.GetNoteNameResponse
+	7,  // 10: note.NoteService.GetNote:output_type -> note.GetNoteResponse
+	9,  // 11: note.NoteService.GetWorkspaceByNote:output_type -> note.GetWorkspaceByNoteResponse
+	9,  // [9:12] is the sub-list for method output_type
+	6,  // [6:9] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_note_proto_init() }
@@ -543,14 +667,14 @@ func file_note_proto_init() {
 	if File_note_proto != nil {
 		return
 	}
-	file_note_proto_msgTypes[4].OneofWrappers = []any{}
+	file_note_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_note_proto_rawDesc), len(file_note_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -100,6 +100,8 @@ func strictServerToHTTPErr(err *errs.Err) (
 		statusCode = 404
 	case errs.CodeInvalidWorkspaceName:
 		statusCode = 400
+	case errs.CodeWorkspaceByNoteNotFound:
+		statusCode = 404
 	case errs.CodeInvalidWorkspaceSlug:
 		statusCode = 400
 	case errs.CodeWorkspaceSlugAlreadyExists:

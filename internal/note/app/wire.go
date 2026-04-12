@@ -38,6 +38,7 @@ var ProviderSetQuery = wire.NewSet(
 	ProvideGetMyWorkspacesHandler,
 	ProvideGetNoteGraphHandler,
 	ProvideGetNoteLinksHandler,
+	ProvideGetWorkspaceByNoteHandler,
 	ProvideGetWorkspaceBySlugHandler,
 	ProvideGetWorkspaceGraphHandler,
 	ProvideGetWorkspaceMembersHandler,

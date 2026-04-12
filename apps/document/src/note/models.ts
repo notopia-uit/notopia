@@ -14,3 +14,9 @@ export type TrashedModel = {
   by: TrashedByModel;
   at: Date;
 };
+
+export type WorkspaceModel = {
+  id: string;
+  name: string;
+  slug: string;
+};
