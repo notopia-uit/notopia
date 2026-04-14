@@ -514,8 +514,8 @@ importers:
         specifier: 2.25.4
         version: 2.25.4(@opentelemetry/api@1.9.1)(core-js@3.48.0)(encoding@0.1.13)
       '@scalar/cli':
-        specifier: 1.8.4
-        version: 1.8.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.0)(encoding@0.1.13)(jiti@2.6.1)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)
+        specifier: 1.8.6
+        version: 1.8.6(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.0)(encoding@0.1.13)(jiti@2.6.1)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)
 
   apps/api-web:
     dependencies:
@@ -578,7 +578,7 @@ importers:
         version: 11.1.18(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.18)(rxjs@7.8.2)
       '@nestjs/typeorm':
         specifier: 'catalog:'
-        version: 11.0.1(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2)))
+        version: 11.0.1(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2)))
       '@nestjs/websockets':
         specifier: 'catalog:'
         version: 11.1.18(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -650,7 +650,7 @@ importers:
         version: 2.8.1
       typeorm:
         specifier: 'catalog:'
-        version: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2))
+        version: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2))
       ws:
         specifier: 'catalog:'
         version: 8.19.0
@@ -678,7 +678,7 @@ importers:
         version: 4.21.0
       typeorm-extension:
         specifier: 'catalog:'
-        version: 3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2)))
+        version: 3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2)))
       webpack-node-externals:
         specifier: 'catalog:'
         version: 3.0.0
@@ -3525,12 +3525,6 @@ packages:
   '@napi-rs/wasm-runtime@1.1.1':
     resolution: {integrity: sha512-p64ah1M1ld8xjWv3qbvFwHiFVWrq1yFvV4f7w+mzaqiR4IlSgkqhcRdHwsGgomwzBH51sRY4NEowLxnaBjcW/A==}
 
-  '@napi-rs/wasm-runtime@1.1.2':
-    resolution: {integrity: sha512-sNXv5oLJ7ob93xkZ1XnxisYhGYXfaG9f65/ZgYuAu3qt7b3NadcOEhLvx28hv31PgX8SZJRYrAIPQilQmFpLVw==}
-    peerDependencies:
-      '@emnapi/core': ^1.7.1
-      '@emnapi/runtime': ^1.7.1
-
   '@napi-rs/wasm-runtime@1.1.3':
     resolution: {integrity: sha512-xK9sGVbJWYb08+mTJt3/YV24WxvxpXcXtP6B172paPZ+Ts69Re9dAr7lKwJoeIx8OoeuimEiRZ7umkiUVClmmQ==}
     peerDependencies:
@@ -6302,21 +6296,13 @@ packages:
     resolution: {integrity: sha512-6qIOW+X5ikhhI/NSFbU/yYZlK/EYIW69mvmTeTz187vd0NcgqVanhNYMret8FgOZ4sePv68Ne+zfzitYnN14Uw==}
     engines: {node: '>=22'}
 
-  '@scalar/cli@1.8.4':
-    resolution: {integrity: sha512-cmWu1uyzQ92qrPNji+mbJsH1/Rmhw9l+Ub/28NdTkiL5vgctmshzn+UPU9JzJgRs+YZF/d9G8qaV1Ekoh1uEuA==}
+  '@scalar/cli@1.8.6':
+    resolution: {integrity: sha512-12QNJH+PNnYf3DnLVwGsRvmJRZtew1WOyoFzBYUT3c4c/hckq99aeuDkheVz7yic9Wpc9FWYHwC2kiYSTjxsMQ==}
     engines: {node: '>=24'}
     hasBin: true
 
-  '@scalar/code-highlight@0.3.1':
-    resolution: {integrity: sha512-2nUHEssDMBJ52r5D9IhqcB+3cMuVmBP9s77pwRGd8Lj6Qa/R8Pzxqcv9jNbS7uYilNSNCZ5NbgR7Efh66qHLag==}
-    engines: {node: '>=22'}
-
   '@scalar/code-highlight@0.3.2':
     resolution: {integrity: sha512-K9Cr3uQ0Rga4MEwAd3Jd4qvWy/pL7LPzL+xjdrpKEfdPj3C96W9oFE9Ok9wnNxuvuGqlN6JEqTw8Kjy3LYo45w==}
-    engines: {node: '>=22'}
-
-  '@scalar/components@0.21.2':
-    resolution: {integrity: sha512-KDI2fBg+c3akUqYn8hU9a63+GVLyegeeI01oWGKWVMxIIQzs0LRPZc0CaMe8bRsLU+BO3xCQl+5AhXQAZUklLg==}
     engines: {node: '>=22'}
 
   '@scalar/components@0.21.4':
@@ -6327,16 +6313,8 @@ packages:
     resolution: {integrity: sha512-TvTiy0tB2ulfBL7jwrpnsf7Geqlq/tWaIopkyZLii9bZPxPX5y1o6fVJXMyjtsUo0FSzvB382kN4uPi1TK/Hww==}
     engines: {node: '>=22'}
 
-  '@scalar/helpers@0.4.2':
-    resolution: {integrity: sha512-IrgrGVSahCfYDNWITazz4Q1BOndp5eEzlimRkfxiYn++KqeWyLfALyym1omqcdKGYtiSx1KIbKaUJL9vkjaN7w==}
-    engines: {node: '>=22'}
-
   '@scalar/helpers@0.4.3':
     resolution: {integrity: sha512-Gv2V7SFreLx3DltzF2lKXdaJSH5cP1LOyt9PxON1cSWGxkrs3sg93c1taEJsW24E9ckfYXkL5hjCAVLfAN3wQw==}
-    engines: {node: '>=22'}
-
-  '@scalar/icons@0.7.1':
-    resolution: {integrity: sha512-z6ZlhZ6WOvUxQH6h28TblrWR1xP/AmKmg3nGnC8KbJf400MQY4q3ePDm4PGbPwua79I/4yAAH3QcMZQkg3GwTg==}
     engines: {node: '>=22'}
 
   '@scalar/icons@0.7.2':
@@ -6347,60 +6325,32 @@ packages:
     resolution: {integrity: sha512-EwqIC+cRzbGVg6w0P1tN0K/46hfb0rbHOTNwL4n7FmKxOH6zdbO5dCvlyh41rjOoc19keVGeq7oPg6o/6D6rBA==}
     engines: {node: '>=22'}
 
-  '@scalar/json-magic@0.12.4':
-    resolution: {integrity: sha512-ZsJM+y9SOVjRL+g9Tr/jFEodcYPfHSt5ZRrpbeGDK71yTvSZw41A3UJ7Bg+RXM8JJWRYcJkYVkzrmbb/ig7qlA==}
-    engines: {node: '>=22'}
-
   '@scalar/json-magic@0.12.5':
     resolution: {integrity: sha512-MkGOjodEeQ7V7M78W6Oq+t3q1LaUR+SRLZLqFbU6s26Gc+12T+v89JXcHvd+3ug0xFVMg/kdczZ3O6miBhyNsA==}
     engines: {node: '>=22'}
 
-  '@scalar/mock-server@0.9.17':
-    resolution: {integrity: sha512-dazVH2MUqaZgc893Bck56P87oWHtCuU3f2MZyrhErW8jr6lgHR/4bgT8Ni22FTfwJQ06VbA3LV4/+53N5kupbw==}
-    engines: {node: '>=22'}
-
-  '@scalar/oas-utils@0.10.14':
-    resolution: {integrity: sha512-A5sS/tTRvelMxnxwVAh5ZRflZ04118+GunquvG9ug8gpDukuW4p5WRUB9o+QZdMTi4NUKJ+fokITKNDuY9CfcA==}
-    engines: {node: '>=22'}
-
-  '@scalar/oas-utils@0.10.16':
-    resolution: {integrity: sha512-xez3QrGYjn4Dhl6blvcUUzbVR1IOQVQhDO54UuZJwKWbOT3brEyAeZBwzttWmWDe3uGazPF160mj7qBXlT6sDQ==}
+  '@scalar/mock-server@0.9.19':
+    resolution: {integrity: sha512-ze7RsFRsuQ8fKxvVCPT6aj0MBTydRXAQsyaYo6HblnLzG8alndcVcQsKorjrxgxLJ4kcw14n8EOM8L0C3fEYqQ==}
     engines: {node: '>=22'}
 
   '@scalar/oas-utils@0.11.1':
     resolution: {integrity: sha512-UrFo6d5/d8AL+RJl/Al3DBnZaunB4tWX4incWyeWMtJN69XHZ9XdLhhQkDBGprmKCxyH1olwKeR3AiqoHJfE7w==}
     engines: {node: '>=22'}
 
-  '@scalar/object-utils@1.3.3':
-    resolution: {integrity: sha512-8BvTy3d5CpF7nZjexgRDZ+TfAuv+biqvb9mJDV4UuWYMhLPZWKio0G+vcAB+8Rq3hrVrY+y9Yeha6OBz39NgVw==}
-    engines: {node: '>=22'}
-
   '@scalar/object-utils@1.3.4':
     resolution: {integrity: sha512-M3S6QgsMfSTgWgTQTS+m3+/pkpTlZmyWMFFUy/qWbQaD00qbR/OcftA7QIEPe6ToJgsNPHHS4+bOXzeLoJJBfQ==}
-    engines: {node: '>=22'}
-
-  '@scalar/openapi-parser@0.25.7':
-    resolution: {integrity: sha512-Zfagv2wEprukR3Y2zKS2qcepX1n4u1uan1jpnj3tROrWG4bFAT6TULo0cobuiPgs6YROd5sIhN64wTboA2llcg==}
     engines: {node: '>=22'}
 
   '@scalar/openapi-parser@0.25.8':
     resolution: {integrity: sha512-09yGXQSMYVlxJkLIn9Nz2q7Du7/olHKhR4oU0/JgkOdcKBiixSeLmhcAm7Hmj2Z82xOYpF+ZJUTCzsh8DQv5Fg==}
     engines: {node: '>=22'}
 
-  '@scalar/openapi-to-markdown@0.4.16':
-    resolution: {integrity: sha512-yNfRgceCHmeNJ8Ba0az0xSk/kNbC9yjRbD50smFKgjRkao5F6P5MjHrVNqQllJ1aNSyN3g67KRMHxeadqps+rw==}
-    engines: {node: '>=22'}
-
-  '@scalar/openapi-types@0.6.1':
-    resolution: {integrity: sha512-P1RvyTFN0vRSL136OqWjlZfSFjY9JoJfuD6LM1mIjoocfwmqX3WuzsFEFX6hAeeDlTh6gjbiy+OdhSee8GFfSA==}
+  '@scalar/openapi-to-markdown@0.5.3':
+    resolution: {integrity: sha512-uZ8BueRDMqbESTVVAVJKYqP46itjOgyHO5QKcflA8LlBsLfLS2oW3Nwy9/iV+PWELx+CCbUDeMOCi63/W936KQ==}
     engines: {node: '>=22'}
 
   '@scalar/openapi-types@0.7.0':
     resolution: {integrity: sha512-kN0PwlJW0de4bwQ4ib+mBHzKJUvBCyR/gwU4zLEq6SCbj+GfgYUh+2a0/yl1WYVUiSkkwFsHjfmQ8KjhR3HK0Q==}
-    engines: {node: '>=22'}
-
-  '@scalar/openapi-upgrader@0.2.3':
-    resolution: {integrity: sha512-h8Orhztvd4hivrxoj809nTw3TOKY0al8cB0wXWHR6fZvI9UtsQchkDgXw1FfGMZstgKcDD6W3PHg98frwpFezg==}
     engines: {node: '>=22'}
 
   '@scalar/openapi-upgrader@0.2.4':
@@ -6415,24 +6365,8 @@ packages:
     resolution: {integrity: sha512-ngfHhgm8X2tQvhxwWIjV9fnwJg96hKVxMtdIQZJn4AlnYsWX4HuAf+ZoiV6oCRUe1dTH2jH4w8qrTgHRtFIqaQ==}
     engines: {node: '>=22'}
 
-  '@scalar/snippetz@0.7.7':
-    resolution: {integrity: sha512-TCW900YpkscT0/sy4s8Zvakp9dqH27KPYWe/EC9rLu0h66tG3jHXELULehLJWI+M05g1nbtuJs0Z3pVvEX1IJg==}
-    engines: {node: '>=22'}
-
-  '@scalar/snippetz@0.7.8':
-    resolution: {integrity: sha512-1g037ajdeGepBKj6+At+6BGSW4OqwONq2NoonGDcpDkW01dInTJx9q8AatXT1qdVUwV1gAVOYjCHsmSxkZictw==}
-    engines: {node: '>=22'}
-
   '@scalar/snippetz@0.8.0':
     resolution: {integrity: sha512-pGr/DsWhxAJqjU7yc2ZZBI49eEUauAXl8v6ip9CBHgRP7X1i08asdRLhJghmAFwRsnKyTLt08Xr6mJkk+B3Q/Q==}
-    engines: {node: '>=22'}
-
-  '@scalar/themes@0.15.1':
-    resolution: {integrity: sha512-+UtMhokjshg+FJwOFIAIMlrn2/k6FC/Otd9QSL0unW7doP+vGY3nMXpyfQ18mNU4Tok8/nbLtfXHONxRIJgQHQ==}
-    engines: {node: '>=22'}
-
-  '@scalar/themes@0.15.2':
-    resolution: {integrity: sha512-GA+cM2Lojv2sqwfB6yTerBAnBTfVzIzUZ3C8T4PP9snaLyy7b0CMoHtnDEqERX/NZiRfnrIWeEYGy09cDi0w4g==}
     engines: {node: '>=22'}
 
   '@scalar/themes@0.15.3':
@@ -6442,24 +6376,12 @@ packages:
   '@scalar/typebox@0.1.3':
     resolution: {integrity: sha512-lU055AUccECZMIfGA0z/C1StYmboAYIPJLDFBzOO81yXBi35Pxdq+I4fWX6iUZ8qcoHneiLGk9jAUM1rA93iEg==}
 
-  '@scalar/types@0.7.5':
-    resolution: {integrity: sha512-LUR/+nNpHfMbGCqTnrzyRlgRTC4FMyyqwCYCFYVs57gkEWzmXnrx+r3+igrWtuZoK/Hsr+ffFMzbBvmxnTFH7g==}
-    engines: {node: '>=22'}
-
-  '@scalar/types@0.7.6':
-    resolution: {integrity: sha512-n5d7neeGTY/yS36AwAv3FAyCnJbbLjMPwyuEXBLgxHcb5i8DXnNfwy1nzz8jx/EJ88i1zmQ8BuMs+207saHgNA==}
-    engines: {node: '>=22'}
-
   '@scalar/types@0.8.0':
     resolution: {integrity: sha512-3GP0eqe+4XR8MyKOSCTly/VRobT3sKoFBX1ZSuuZAlcBROqzRkBSzQ+kloGWqTR60vP9GAwW7SnHo72MdCP0DQ==}
     engines: {node: '>=22'}
 
   '@scalar/use-codemirror@0.14.11':
     resolution: {integrity: sha512-5wtC4pUjzhy72j3aAueJg+fh9KflevJvXMn0YscsxiDTvqwIzeZcHe1N9VNtvzDXgLblEeBT6D0+Vs+boyExxg==}
-    engines: {node: '>=22'}
-
-  '@scalar/use-hooks@0.4.1':
-    resolution: {integrity: sha512-+lx57gPT9c5WT18MwgUQMxsYv8sqdcV1K/aaCRevD/SWMoFmG5rvUDsoApWtNpjjKsyR2G/QOLXIj7CN/RXOFQ==}
     engines: {node: '>=22'}
 
   '@scalar/use-hooks@0.4.2':
@@ -6470,24 +6392,12 @@ packages:
     resolution: {integrity: sha512-8fsDd4efEDF+EydA+1+np/ac2KsAXPR1LdTYtTUxpv8Uj1l7lUMT/T5A7xnR+wNKmyVREihb9KnGp3pSjO2kYg==}
     engines: {node: '>=22'}
 
-  '@scalar/validation@0.2.0':
-    resolution: {integrity: sha512-nWW319vw6hLDT0l+JD0Vw8e2WUE+uGuOTR3HavWsqXGAA9EyrO8dgsNL1QrLO/ccOpBZ/wapSK+1+V3vCC60gQ==}
-    engines: {node: '>=20'}
-
   '@scalar/validation@0.3.0':
     resolution: {integrity: sha512-4X/AP3JO23DuYxs1MMjn6IlT9gyrKPCuZj8ybTB9QIjC+3tSJLpQOwZg7HEyyz2HoVwOt9jdef2jO3RXW7DqTw==}
     engines: {node: '>=20'}
 
   '@scalar/void-server@2.4.4':
     resolution: {integrity: sha512-2Cnqu+62yp7Hf02dojNMYsdkLz1c0Gh22tVYEopbPnbATGPT5BlISEVcr7cWf3sGpHYX6m3RYT9spGbmsM+sAQ==}
-    engines: {node: '>=22'}
-
-  '@scalar/workspace-store@0.42.0':
-    resolution: {integrity: sha512-Iwwua2h+e1G6c+CTDfwVmPOgZpWGF6cnlaMqGtns1lOw7aT4zAfIsUM9MRBdfO9Lbw8nXmKb9Wvp4XM8UxNZoQ==}
-    engines: {node: '>=22'}
-
-  '@scalar/workspace-store@0.43.1':
-    resolution: {integrity: sha512-R0V2PXMhjbfELRtiRfn6vNaLPJalo1AKUs1AkCvJZyMaCNHrGUH14rdhwAz790ahVjebY66VKdn19Q4x1t60uA==}
     engines: {node: '>=22'}
 
   '@scalar/workspace-store@0.45.0':
@@ -13991,10 +13901,6 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
-  pretty-bytes@7.1.0:
-    resolution: {integrity: sha512-nODzvTiYVRGRqAOvE84Vk5JDPyyxsVk0/fbA/bq7RqlnhksGpset09XTxbpvLTIjoaF7K8Z8DG8yHtKGTPSYRw==}
-    engines: {node: '>=20'}
-
   pretty-format@30.2.0:
     resolution: {integrity: sha512-9uBdv/B4EefsuAL+pWqueZyZS2Ba+LxfFeQ9DN14HU4bN8bhaxKdkpjpB6fs9+pSjIBu+FXQHImEg8j/Lw0+vA==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
@@ -20238,13 +20144,6 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
-  '@napi-rs/wasm-runtime@1.1.2(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
-    dependencies:
-      '@emnapi/core': 1.9.2
-      '@emnapi/runtime': 1.9.2
-      '@tybys/wasm-util': 0.10.1
-    optional: true
-
   '@napi-rs/wasm-runtime@1.1.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
     dependencies:
       '@emnapi/core': 1.9.2
@@ -20431,13 +20330,13 @@ snapshots:
       '@nestjs/microservices': 11.1.18(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)(@nestjs/websockets@11.1.18)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express': 11.1.18(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)
 
-  '@nestjs/typeorm@11.0.1(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2)))':
+  '@nestjs/typeorm@11.0.1(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2)))':
     dependencies:
       '@nestjs/common': 11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.18(@nestjs/common@11.1.18(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.18)(@nestjs/platform-express@11.1.18)(@nestjs/websockets@11.1.18)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
-      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2))
+      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2))
 
   '@nestjs/websockets@11.1.18(@nestjs/common@11.1.17(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.18)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
@@ -23241,7 +23140,7 @@ snapshots:
 
   '@rolldown/binding-wasm32-wasi@1.0.0-rc.9(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.2(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
+      '@napi-rs/wasm-runtime': 1.1.3(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -23858,20 +23757,20 @@ snapshots:
       - typescript
       - universal-cookie
 
-  '@scalar/cli@1.8.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.0)(encoding@0.1.13)(jiti@2.6.1)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)':
+  '@scalar/cli@1.8.6(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.0)(encoding@0.1.13)(jiti@2.6.1)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.2)':
     dependencies:
       '@clack/prompts': 0.7.0
       '@fastify/static': 8.3.0
       '@hono/node-server': 1.19.10(hono@4.12.7)
       '@scalar/json-magic': 0.12.5
-      '@scalar/mock-server': 0.9.17(typescript@6.0.2)
-      '@scalar/oas-utils': 0.10.16(typescript@6.0.2)
+      '@scalar/mock-server': 0.9.19(typescript@6.0.2)
+      '@scalar/oas-utils': 0.11.1(typescript@6.0.2)
       '@scalar/openapi-parser': 0.25.8
-      '@scalar/openapi-to-markdown': 0.4.16(typescript@6.0.2)
+      '@scalar/openapi-to-markdown': 0.5.3(typescript@6.0.2)
       '@scalar/openapi-types': 0.7.0
-      '@scalar/themes': 0.15.2
+      '@scalar/themes': 0.15.3
       '@scalar/void-server': 2.4.4
-      '@scalar/workspace-store': 0.43.1(typescript@6.0.2)
+      '@scalar/workspace-store': 0.45.0(typescript@6.0.2)
       '@stoplight/spectral-core': 1.19.5(encoding@0.1.13)
       '@stoplight/spectral-ruleset-bundler': 1.6.2(encoding@0.1.13)
       '@stoplight/spectral-rulesets': 1.21.4(encoding@0.1.13)
@@ -23915,27 +23814,6 @@ snapshots:
       - typescript
       - yaml
 
-  '@scalar/code-highlight@0.3.1':
-    dependencies:
-      hast-util-to-text: 4.0.2
-      highlight.js: 11.11.1
-      highlightjs-curl: 1.3.0
-      lowlight: 3.3.0
-      rehype-external-links: 3.0.0
-      rehype-format: 5.0.1
-      rehype-parse: 9.0.1
-      rehype-raw: 7.0.0
-      rehype-sanitize: 6.0.0
-      rehype-stringify: 10.0.1
-      remark-gfm: 4.0.1
-      remark-parse: 11.0.0
-      remark-rehype: 11.1.2
-      remark-stringify: 11.0.0
-      unified: 11.0.5
-      unist-util-visit: 5.1.0
-    transitivePeerDependencies:
-      - supports-color
-
   '@scalar/code-highlight@0.3.2':
     dependencies:
       hast-util-to-text: 4.0.2
@@ -23956,28 +23834,6 @@ snapshots:
       unist-util-visit: 5.1.0
     transitivePeerDependencies:
       - supports-color
-
-  '@scalar/components@0.21.2(typescript@6.0.2)':
-    dependencies:
-      '@floating-ui/utils': 0.2.10
-      '@floating-ui/vue': 1.1.9(vue@3.5.32(typescript@6.0.2))
-      '@headlessui/vue': 1.7.23(vue@3.5.32(typescript@6.0.2))
-      '@scalar/code-highlight': 0.3.1
-      '@scalar/helpers': 0.4.2
-      '@scalar/icons': 0.7.1(typescript@6.0.2)
-      '@scalar/themes': 0.15.1
-      '@scalar/use-hooks': 0.4.1(typescript@6.0.2)
-      '@vueuse/core': 13.9.0(vue@3.5.32(typescript@6.0.2))
-      cva: 1.0.0-beta.4(typescript@6.0.2)
-      nanoid: 5.1.6
-      pretty-bytes: 7.1.0
-      radix-vue: 1.9.17(vue@3.5.32(typescript@6.0.2))
-      vue: 3.5.32(typescript@6.0.2)
-      vue-component-type-helpers: 3.2.5
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-      - supports-color
-      - typescript
 
   '@scalar/components@0.21.4(typescript@6.0.2)':
     dependencies:
@@ -24006,18 +23862,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@scalar/helpers@0.4.2': {}
-
   '@scalar/helpers@0.4.3': {}
-
-  '@scalar/icons@0.7.1(typescript@6.0.2)':
-    dependencies:
-      '@phosphor-icons/core': 2.1.1
-      '@types/node': 24.12.0
-      chalk: 5.6.2
-      vue: 3.5.32(typescript@6.0.2)
-    transitivePeerDependencies:
-      - typescript
 
   '@scalar/icons@0.7.2(typescript@6.0.2)':
     dependencies:
@@ -24033,67 +23878,22 @@ snapshots:
       '@scalar/helpers': 0.4.3
       yaml: 2.8.2
 
-  '@scalar/json-magic@0.12.4':
-    dependencies:
-      '@scalar/helpers': 0.4.2
-      pathe: 2.0.3
-      yaml: 2.8.2
-
   '@scalar/json-magic@0.12.5':
     dependencies:
       '@scalar/helpers': 0.4.3
       pathe: 2.0.3
       yaml: 2.8.2
 
-  '@scalar/mock-server@0.9.17(typescript@6.0.2)':
+  '@scalar/mock-server@0.9.19(typescript@6.0.2)':
     dependencies:
       '@faker-js/faker': 10.4.0
       '@scalar/helpers': 0.4.3
       '@scalar/json-magic': 0.12.5
-      '@scalar/oas-utils': 0.10.16(typescript@6.0.2)
+      '@scalar/oas-utils': 0.11.1(typescript@6.0.2)
       '@scalar/openapi-parser': 0.25.8
       '@scalar/openapi-types': 0.7.0
       '@scalar/openapi-upgrader': 0.2.4
       hono: 4.12.7
-    transitivePeerDependencies:
-      - typescript
-
-  '@scalar/oas-utils@0.10.14(typescript@6.0.2)':
-    dependencies:
-      '@scalar/helpers': 0.4.2
-      '@scalar/json-magic': 0.12.4
-      '@scalar/object-utils': 1.3.3
-      '@scalar/openapi-parser': 0.25.7
-      '@scalar/openapi-types': 0.6.1
-      '@scalar/themes': 0.15.1
-      '@scalar/types': 0.7.5
-      '@scalar/workspace-store': 0.42.0(typescript@6.0.2)
-      flatted: 3.4.2
-      github-slugger: 2.0.0
-      type-fest: 5.4.4
-      vue: 3.5.32(typescript@6.0.2)
-      yaml: 2.8.2
-      zod: 4.3.6
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
-
-  '@scalar/oas-utils@0.10.16(typescript@6.0.2)':
-    dependencies:
-      '@scalar/helpers': 0.4.3
-      '@scalar/json-magic': 0.12.5
-      '@scalar/object-utils': 1.3.4
-      '@scalar/openapi-parser': 0.25.8
-      '@scalar/openapi-types': 0.7.0
-      '@scalar/themes': 0.15.2
-      '@scalar/types': 0.7.6
-      '@scalar/workspace-store': 0.43.1(typescript@6.0.2)
-      flatted: 3.4.2
-      github-slugger: 2.0.0
-      type-fest: 5.4.4
-      vue: 3.5.32(typescript@6.0.2)
-      yaml: 2.8.2
-      zod: 4.3.6
     transitivePeerDependencies:
       - typescript
 
@@ -24116,32 +23916,12 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@scalar/object-utils@1.3.3':
-    dependencies:
-      '@scalar/helpers': 0.4.2
-      flatted: 3.4.2
-      just-clone: 6.2.0
-      ts-deepmerge: 7.0.3
-
   '@scalar/object-utils@1.3.4':
     dependencies:
       '@scalar/helpers': 0.4.3
       flatted: 3.4.2
       just-clone: 6.2.0
       ts-deepmerge: 7.0.3
-
-  '@scalar/openapi-parser@0.25.7':
-    dependencies:
-      '@scalar/helpers': 0.4.2
-      '@scalar/json-magic': 0.12.4
-      '@scalar/openapi-types': 0.6.1
-      '@scalar/openapi-upgrader': 0.2.3
-      ajv: 8.18.0
-      ajv-draft-04: 1.0.0(ajv@8.18.0)
-      ajv-formats: 3.0.1(ajv@8.18.0)
-      jsonpointer: 5.0.1
-      leven: 4.1.0
-      yaml: 2.8.2
 
   '@scalar/openapi-parser@0.25.8':
     dependencies:
@@ -24156,15 +23936,13 @@ snapshots:
       leven: 4.1.0
       yaml: 2.8.2
 
-  '@scalar/openapi-to-markdown@0.4.16(typescript@6.0.2)':
+  '@scalar/openapi-to-markdown@0.5.3(typescript@6.0.2)':
     dependencies:
-      '@scalar/components': 0.21.2(typescript@6.0.2)
-      '@scalar/helpers': 0.4.2
-      '@scalar/oas-utils': 0.10.14(typescript@6.0.2)
-      '@scalar/openapi-parser': 0.25.7
-      '@scalar/openapi-types': 0.6.1
-      '@scalar/openapi-upgrader': 0.2.3
-      '@scalar/types': 0.7.5
+      '@scalar/components': 0.21.4(typescript@6.0.2)
+      '@scalar/helpers': 0.4.3
+      '@scalar/json-magic': 0.12.5
+      '@scalar/oas-utils': 0.11.1(typescript@6.0.2)
+      '@scalar/workspace-store': 0.45.0(typescript@6.0.2)
       html-minifier-terser: 7.2.0
       rehype-parse: 9.0.1
       rehype-remark: 10.0.1
@@ -24178,15 +23956,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@scalar/openapi-types@0.6.1':
-    dependencies:
-      zod: 4.3.6
-
   '@scalar/openapi-types@0.7.0': {}
-
-  '@scalar/openapi-upgrader@0.2.3':
-    dependencies:
-      '@scalar/openapi-types': 0.6.1
 
   '@scalar/openapi-upgrader@0.2.4':
     dependencies:
@@ -24211,51 +23981,17 @@ snapshots:
       - supports-color
       - typescript
 
-  '@scalar/snippetz@0.7.7':
-    dependencies:
-      '@scalar/types': 0.7.5
-      js-base64: 3.7.8
-      stringify-object: 6.0.0
-
-  '@scalar/snippetz@0.7.8':
-    dependencies:
-      '@scalar/types': 0.7.6
-      js-base64: 3.7.8
-      stringify-object: 6.0.0
-
   '@scalar/snippetz@0.8.0':
     dependencies:
       '@scalar/types': 0.8.0
       js-base64: 3.7.8
       stringify-object: 6.0.0
 
-  '@scalar/themes@0.15.1':
-    dependencies:
-      nanoid: 5.1.6
-
-  '@scalar/themes@0.15.2':
-    dependencies:
-      nanoid: 5.1.6
-
   '@scalar/themes@0.15.3':
     dependencies:
       nanoid: 5.1.6
 
   '@scalar/typebox@0.1.3': {}
-
-  '@scalar/types@0.7.5':
-    dependencies:
-      '@scalar/helpers': 0.4.2
-      nanoid: 5.1.6
-      type-fest: 5.4.4
-      zod: 4.3.6
-
-  '@scalar/types@0.7.6':
-    dependencies:
-      '@scalar/helpers': 0.4.3
-      nanoid: 5.1.6
-      type-fest: 5.4.4
-      zod: 4.3.6
 
   '@scalar/types@0.8.0':
     dependencies:
@@ -24284,17 +24020,6 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@scalar/use-hooks@0.4.1(typescript@6.0.2)':
-    dependencies:
-      '@scalar/use-toasts': 0.10.1(typescript@6.0.2)
-      '@vueuse/core': 13.9.0(vue@3.5.32(typescript@6.0.2))
-      cva: 1.0.0-beta.2(typescript@6.0.2)
-      tailwind-merge: 3.4.0
-      vue: 3.5.32(typescript@6.0.2)
-      zod: 4.3.6
-    transitivePeerDependencies:
-      - typescript
-
   '@scalar/use-hooks@0.4.2(typescript@6.0.2)':
     dependencies:
       '@scalar/use-toasts': 0.10.1(typescript@6.0.2)
@@ -24313,8 +24038,6 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@scalar/validation@0.2.0': {}
-
   '@scalar/validation@0.3.0': {}
 
   '@scalar/void-server@2.4.4':
@@ -24323,41 +24046,6 @@ snapshots:
       '@scalar/helpers': 0.4.3
       hono: 4.12.7
       js-base64: 3.7.8
-
-  '@scalar/workspace-store@0.42.0(typescript@6.0.2)':
-    dependencies:
-      '@scalar/code-highlight': 0.3.1
-      '@scalar/helpers': 0.4.2
-      '@scalar/json-magic': 0.12.4
-      '@scalar/openapi-upgrader': 0.2.3
-      '@scalar/snippetz': 0.7.7
-      '@scalar/typebox': 0.1.3
-      '@scalar/types': 0.7.5
-      '@scalar/validation': 0.2.0
-      github-slugger: 2.0.0
-      type-fest: 5.4.4
-      vue: 3.5.32(typescript@6.0.2)
-      yaml: 2.8.2
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
-
-  '@scalar/workspace-store@0.43.1(typescript@6.0.2)':
-    dependencies:
-      '@scalar/helpers': 0.4.3
-      '@scalar/json-magic': 0.12.5
-      '@scalar/openapi-upgrader': 0.2.4
-      '@scalar/snippetz': 0.7.8
-      '@scalar/typebox': 0.1.3
-      '@scalar/types': 0.7.6
-      '@scalar/validation': 0.3.0
-      github-slugger: 2.0.0
-      js-base64: 3.7.8
-      type-fest: 5.4.4
-      vue: 3.5.32(typescript@6.0.2)
-      yaml: 2.8.2
-    transitivePeerDependencies:
-      - typescript
 
   '@scalar/workspace-store@0.45.0(typescript@6.0.2)':
     dependencies:
@@ -33402,8 +33090,6 @@ snapshots:
 
   prettier@3.8.2: {}
 
-  pretty-bytes@7.1.0: {}
-
   pretty-format@30.2.0:
     dependencies:
       '@jest/schemas': 30.0.5
@@ -35644,27 +35330,6 @@ snapshots:
       '@swc/core': 1.15.24(@swc/helpers@0.5.21)
     optional: true
 
-  ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2):
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.12
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 25.5.0
-      acorn: 8.16.0
-      acorn-walk: 8.3.5
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.4
-      make-error: 1.3.6
-      typescript: 6.0.2
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    optionalDependencies:
-      '@swc/core': 1.15.24(@swc/helpers@0.5.21)
-    optional: true
-
   tsconfig-paths-webpack-plugin@4.2.0:
     dependencies:
       chalk: 4.1.2
@@ -35777,7 +35442,7 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm-extension@3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2))):
+  typeorm-extension@3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2))):
     dependencies:
       '@faker-js/faker': 10.4.0
       consola: 3.4.2
@@ -35787,10 +35452,10 @@ snapshots:
       rapiq: 0.9.0
       reflect-metadata: 0.2.2
       smob: 1.6.1
-      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2))
+      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2))
       yargs: 18.0.0
 
-  typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2)):
+  typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 4.2.0
@@ -35809,7 +35474,7 @@ snapshots:
       yargs: 17.7.2
     optionalDependencies:
       pg: 8.20.0
-      ts-node: 10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2)
+      ts-node: 10.9.2(@swc/core@1.15.24(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2)
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
