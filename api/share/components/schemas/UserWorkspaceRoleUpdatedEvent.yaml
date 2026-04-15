@@ -1,0 +1,17 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  workspaceId:
+    $ref: ../../../note/components/schemas/Workspace.yaml#/properties/id
+
+  userId:
+    $ref: ../../../common/components/schemas/User.yaml#/properties/id
+
+  role:
+    $ref: ../../../note/components/schemas/WorkspaceRole.yaml
+
+required:
+  - workspaceId
+  - userId
+  - role

@@ -26,3 +26,5 @@ components:
       $ref: ./components/schemas/NoteUpdatedEvent.yaml
     UserDeletedEvent:
       $ref: ./components/schemas/UserDeletedEvent.yaml
+    UserWorkspaceRoleUpdatedEvent:
+      $ref: ./components/schemas/UserWorkspaceRoleUpdatedEvent.yaml

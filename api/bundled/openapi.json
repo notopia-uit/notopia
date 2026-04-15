@@ -31,9 +31,9 @@
       "x-displayName": "Revision"
     },
     {
-      "name": "Workspace",
+      "name": "Workspacee",
       "description": "Workspace",
-      "x-displayName": "Workspace"
+      "x-displayName": "Workspacee"
     },
     {
       "name": "Folder",
@@ -44,6 +44,10 @@
       "name": "Note",
       "description": "Note in workspace's root folder or in a folder",
       "x-displayName": "Note"
+    },
+    {
+      "name": "Workspace",
+      "x-displayName": "Workspace"
     }
   ],
   "externalDocs": {
@@ -1949,6 +1953,25 @@
           "id"
         ]
       },
+      "share_UserWorkspaceRoleUpdatedEvent": {
+        "type": "object",
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/share_properties-id"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/share_id"
+          },
+          "role": {
+            "$ref": "#/components/schemas/share_WorkspaceRole"
+          }
+        },
+        "required": [
+          "workspaceId",
+          "userId",
+          "role"
+        ]
+      },
       "share_DocumentContent": {
         "type": "array",
         "items": {
@@ -2138,6 +2161,21 @@
         "type": "string",
         "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
         "example": "100"
+      },
+      "share_properties-id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "550e8400-e29b-41d4-a716-446655440000",
+        "readOnly": true
+      },
+      "share_WorkspaceRole": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "editor",
+          "viewer"
+        ],
+        "example": "owner"
       },
       "document_Error": {
         "type": "object",
@@ -3466,9 +3504,10 @@
       "tags": [
         "Document",
         "Revision",
-        "Workspace",
+        "Workspacee",
         "Folder",
-        "Note"
+        "Note",
+        "Workspace"
       ]
     }
   ]

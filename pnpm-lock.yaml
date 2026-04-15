@@ -36,6 +36,9 @@ catalogs:
     '@grpc/proto-loader':
       specifier: 0.8.0
       version: 0.8.0
+    '@hey-api/openapi-ts':
+      specifier: 0.96.0
+      version: 0.96.0
     '@hocuspocus/extension-database':
       specifier: 3.4.4
       version: 3.4.4
@@ -81,6 +84,9 @@ catalogs:
     '@next/eslint-plugin-next':
       specifier: 16.2.3
       version: 16.2.3
+    '@openapitools/openapi-generator-cli':
+      specifier: 2.31.1
+      version: 2.31.1
     '@opentelemetry/api':
       specifier: 1.9.1
       version: 1.9.1
@@ -102,6 +108,9 @@ catalogs:
     '@opentelemetry/semantic-conventions':
       specifier: 1.40.0
       version: 1.40.0
+    '@redocly/cli':
+      specifier: 2.25.4
+      version: 2.25.4
     '@rspack/cli':
       specifier: 1.7.11
       version: 1.7.11
@@ -111,6 +120,9 @@ catalogs:
     '@rspack/dev-server':
       specifier: ^1.1.4
       version: 1.2.1
+    '@scalar/cli':
+      specifier: 1.8.6
+      version: 1.8.6
     '@swc-node/register':
       specifier: 1.11.1
       version: 1.11.1
@@ -505,16 +517,16 @@ importers:
   api:
     devDependencies:
       '@hey-api/openapi-ts':
-        specifier: 0.96.0
+        specifier: 'catalog:'
         version: 0.96.0(typescript@6.0.2)
       '@openapitools/openapi-generator-cli':
-        specifier: 2.31.1
+        specifier: 'catalog:'
         version: 2.31.1(@nestjs/microservices@11.1.19)(@nestjs/platform-express@11.1.19)(@nestjs/websockets@11.1.19)(encoding@0.1.13)
       '@redocly/cli':
-        specifier: 2.25.4
+        specifier: 'catalog:'
         version: 2.25.4(@opentelemetry/api@1.9.1)(core-js@3.48.0)(encoding@0.1.13)
       '@scalar/cli':
-        specifier: 1.8.6
+        specifier: 'catalog:'
         version: 1.8.6(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.0)(encoding@0.1.13)(jiti@2.6.1)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.3)
 
   apps/api-web:
@@ -578,7 +590,7 @@ importers:
         version: 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.19)(rxjs@7.8.2)
       '@nestjs/typeorm':
         specifier: 'catalog:'
-        version: 11.0.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2)))
+        version: 11.0.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2)))
       '@nestjs/websockets':
         specifier: 'catalog:'
         version: 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -650,7 +662,7 @@ importers:
         version: 2.8.1
       typeorm:
         specifier: 'catalog:'
-        version: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2))
+        version: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2))
       ws:
         specifier: 'catalog:'
         version: 8.19.0
@@ -678,7 +690,7 @@ importers:
         version: 4.21.0
       typeorm-extension:
         specifier: 'catalog:'
-        version: 3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2)))
+        version: 3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2)))
       webpack-node-externals:
         specifier: 'catalog:'
         version: 3.0.0
@@ -8657,9 +8669,6 @@ packages:
   axios@1.12.0:
     resolution: {integrity: sha512-oXTDccv8PcfjZmPGlWsPSwtOJCZ/b6W5jAMCNcfwJbCzDckwG0jrYJFaWH1yvivfCXjVzV/SPDEhMB3Q+DSurg==}
 
-  axios@1.13.6:
-    resolution: {integrity: sha512-ChTCHMouEe2kn713WHbQGcuYrr6fXTBiu460OTwWrWob16g1bXn4vtz07Ope7ewMozJAnEquLk5lWQWtBig9DQ==}
-
   axios@1.14.0:
     resolution: {integrity: sha512-3Y8yrqLSwjuzpXuZ0oIYZ/XGgLwUIBU3uLvbcpb0pidD9ctpShJd43KSlEEkVQg6DS0G9NKyzOvBfUtDKEyHvQ==}
 
@@ -14181,11 +14190,6 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
 
-  react-dom@19.2.4:
-    resolution: {integrity: sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==}
-    peerDependencies:
-      react: ^19.2.4
-
   react-dom@19.2.5:
     resolution: {integrity: sha512-J5bAZz+DXMMwW/wV3xzKke59Af6CHY7G4uYLN1OvBcKEsWOs4pQExj86BBKamxl/Ik5bx9whOrvBlSDfWzgSag==}
     peerDependencies:
@@ -14246,10 +14250,6 @@ packages:
     resolution: {integrity: sha512-6QtbTRDKM+jA/MZTTefvigNxo0zz+gnBTVFw2CFVvq+f2BuH0nF0vDLNClL045nuTAdOoK/IL1vTP0ZLX0DAyQ==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
-
-  react@19.2.4:
-    resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
-    engines: {node: '>=0.10.0'}
 
   react@19.2.5:
     resolution: {integrity: sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==}
@@ -19798,7 +19798,7 @@ snapshots:
       '@module-federation/third-party-dts-extractor': 2.1.0
       adm-zip: 0.5.16
       ansi-colors: 4.1.3
-      axios: 1.13.6
+      axios: 1.14.0
       chalk: 3.0.0
       fs-extra: 9.1.0
       isomorphic-ws: 5.0.0(ws@8.18.0)
@@ -20367,13 +20367,13 @@ snapshots:
       '@nestjs/microservices': 11.1.19(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(@nestjs/websockets@11.1.19)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express': 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)
 
-  '@nestjs/typeorm@11.0.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2)))':
+  '@nestjs/typeorm@11.0.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2)))':
     dependencies:
       '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.19)(@nestjs/platform-express@11.1.19)(@nestjs/websockets@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
-      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2))
+      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2))
 
   '@nestjs/websockets@11.1.19(@nestjs/common@11.1.17(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
@@ -23021,13 +23021,13 @@ snapshots:
       mobx: 6.15.0
       picomatch: 4.0.4
       pluralize: 8.0.0
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
-      redoc: 2.5.1(core-js@3.48.0)(encoding@0.1.13)(mobx@6.15.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      redoc: 2.5.1(core-js@3.48.0)(encoding@0.1.13)(mobx@6.15.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(styled-components@6.3.9(react-dom@19.2.5(react@19.2.5))(react@19.2.5))
       semver: 7.7.4
       set-cookie-parser: 2.7.2
       simple-websocket: 9.1.0
-      styled-components: 6.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      styled-components: 6.3.9(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       ulid: 3.0.2
       undici: 6.24.0
       yargs: 17.0.1
@@ -23913,13 +23913,13 @@ snapshots:
   '@scalar/import@0.5.4':
     dependencies:
       '@scalar/helpers': 0.4.3
-      yaml: 2.8.2
+      yaml: 2.8.3
 
   '@scalar/json-magic@0.12.5':
     dependencies:
       '@scalar/helpers': 0.4.3
       pathe: 2.0.3
-      yaml: 2.8.2
+      yaml: 2.8.3
 
   '@scalar/mock-server@0.9.19(typescript@6.0.2)':
     dependencies:
@@ -23948,7 +23948,7 @@ snapshots:
       github-slugger: 2.0.0
       type-fest: 5.4.4
       vue: 3.5.32(typescript@6.0.2)
-      yaml: 2.8.2
+      yaml: 2.8.3
       zod: 4.3.6
     transitivePeerDependencies:
       - typescript
@@ -23971,7 +23971,7 @@ snapshots:
       ajv-formats: 3.0.1(ajv@8.18.0)
       jsonpointer: 5.0.1
       leven: 4.1.0
-      yaml: 2.8.2
+      yaml: 2.8.3
 
   '@scalar/openapi-to-markdown@0.5.3(typescript@6.0.2)':
     dependencies:
@@ -24097,7 +24097,7 @@ snapshots:
       js-base64: 3.7.8
       type-fest: 5.4.4
       vue: 3.5.32(typescript@6.0.2)
-      yaml: 2.8.2
+      yaml: 2.8.3
     transitivePeerDependencies:
       - typescript
 
@@ -26910,14 +26910,6 @@ snapshots:
   axe-core@4.11.1: {}
 
   axios@1.12.0:
-    dependencies:
-      follow-redirects: 1.15.11(debug@4.4.3)
-      form-data: 4.0.5
-      proxy-from-env: 1.1.0
-    transitivePeerDependencies:
-      - debug
-
-  axios@1.13.6:
     dependencies:
       follow-redirects: 1.15.11(debug@4.4.3)
       form-data: 4.0.5
@@ -31863,21 +31855,21 @@ snapshots:
       pkg-types: 1.3.1
       ufo: 1.6.3
 
-  mobx-react-lite@4.1.1(mobx@6.15.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  mobx-react-lite@4.1.1(mobx@6.15.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
     dependencies:
       mobx: 6.15.0
-      react: 19.2.4
-      use-sync-external-store: 1.6.0(react@19.2.4)
+      react: 19.2.5
+      use-sync-external-store: 1.6.0(react@19.2.5)
     optionalDependencies:
-      react-dom: 19.2.4(react@19.2.4)
+      react-dom: 19.2.5(react@19.2.5)
 
-  mobx-react@9.2.0(mobx@6.15.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  mobx-react@9.2.0(mobx@6.15.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
     dependencies:
       mobx: 6.15.0
-      mobx-react-lite: 4.1.1(mobx@6.15.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react: 19.2.4
+      mobx-react-lite: 4.1.1(mobx@6.15.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      react: 19.2.5
     optionalDependencies:
-      react-dom: 19.2.4(react@19.2.4)
+      react-dom: 19.2.5(react@19.2.5)
 
   mobx@6.15.0: {}
 
@@ -31917,7 +31909,7 @@ snapshots:
       vscode-languageserver-textdocument: 1.0.12
       vscode-languageserver-types: 3.17.5
       vscode-uri: 3.1.0
-      yaml: 2.8.2
+      yaml: 2.8.3
 
   mrmime@2.0.1: {}
 
@@ -33486,11 +33478,6 @@ snapshots:
       date-fns-jalali: 4.1.0-0
       react: 19.2.5
 
-  react-dom@19.2.4(react@19.2.4):
-    dependencies:
-      react: 19.2.4
-      scheduler: 0.27.0
-
   react-dom@19.2.5(react@19.2.5):
     dependencies:
       react: 19.2.5
@@ -33537,13 +33524,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.14
 
-  react-tabs@6.1.0(react@19.2.4):
+  react-tabs@6.1.0(react@19.2.5):
     dependencies:
       clsx: 2.1.1
       prop-types: 15.8.1
-      react: 19.2.4
-
-  react@19.2.4: {}
+      react: 19.2.5
 
   react@19.2.5: {}
 
@@ -33594,7 +33579,7 @@ snapshots:
       tiny-invariant: 1.3.3
       tslib: 2.8.1
 
-  redoc@2.5.1(core-js@3.48.0)(encoding@0.1.13)(mobx@6.15.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)):
+  redoc@2.5.1(core-js@3.48.0)(encoding@0.1.13)(mobx@6.15.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(styled-components@6.3.9(react-dom@19.2.5(react@19.2.5))(react@19.2.5)):
     dependencies:
       '@redocly/openapi-core': 1.34.10
       classnames: 2.5.1
@@ -33607,19 +33592,19 @@ snapshots:
       mark.js: 8.11.1
       marked: 4.3.0
       mobx: 6.15.0
-      mobx-react: 9.2.0(mobx@6.15.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      mobx-react: 9.2.0(mobx@6.15.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       openapi-sampler: 1.7.1
       path-browserify: 1.0.1
       perfect-scrollbar: 1.5.6
       polished: 4.3.1
       prismjs: 1.30.0
       prop-types: 15.8.1
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
-      react-tabs: 6.1.0(react@19.2.4)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      react-tabs: 6.1.0(react@19.2.5)
       slugify: 1.4.7
       stickyfill: 1.1.1
-      styled-components: 6.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      styled-components: 6.3.9(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       swagger2openapi: 7.0.8(encoding@0.1.13)
       url-template: 2.0.8
     transitivePeerDependencies:
@@ -34959,7 +34944,7 @@ snapshots:
 
   style-mod@4.1.3: {}
 
-  styled-components@6.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  styled-components@6.3.9(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
     dependencies:
       '@emotion/is-prop-valid': 1.4.0
       '@emotion/unitless': 0.10.0
@@ -34967,12 +34952,12 @@ snapshots:
       css-to-react-native: 3.2.0
       csstype: 3.2.3
       postcss: 8.4.49
-      react: 19.2.4
+      react: 19.2.5
       shallowequal: 1.1.0
       stylis: 4.3.6
       tslib: 2.8.1
     optionalDependencies:
-      react-dom: 19.2.4(react@19.2.4)
+      react-dom: 19.2.5(react@19.2.5)
 
   styled-jsx@5.1.6(@babel/core@7.29.0)(babel-plugin-macros@3.1.0)(react@19.2.5):
     dependencies:
@@ -35348,6 +35333,27 @@ snapshots:
       '@swc/core': 1.15.26(@swc/helpers@0.5.21)
     optional: true
 
+  ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.12
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 25.5.0
+      acorn: 8.16.0
+      acorn-walk: 8.3.5
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.4
+      make-error: 1.3.6
+      typescript: 6.0.2
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+    optionalDependencies:
+      '@swc/core': 1.15.26(@swc/helpers@0.5.21)
+    optional: true
+
   tsconfig-paths-webpack-plugin@4.2.0:
     dependencies:
       chalk: 4.1.2
@@ -35460,7 +35466,7 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm-extension@3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2))):
+  typeorm-extension@3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2))):
     dependencies:
       '@faker-js/faker': 10.4.0
       consola: 3.4.2
@@ -35470,10 +35476,10 @@ snapshots:
       rapiq: 0.9.0
       reflect-metadata: 0.2.2
       smob: 1.6.1
-      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2))
+      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2))
       yargs: 18.0.0
 
-  typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2)):
+  typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 4.2.0
@@ -35492,7 +35498,7 @@ snapshots:
       yargs: 17.7.2
     optionalDependencies:
       pg: 8.20.0
-      ts-node: 10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.2)
+      ts-node: 10.9.2(@swc/core@1.15.26(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.2)
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -35688,10 +35694,6 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.2.14
-
-  use-sync-external-store@1.6.0(react@19.2.4):
-    dependencies:
-      react: 19.2.4
 
   use-sync-external-store@1.6.0(react@19.2.5):
     dependencies:

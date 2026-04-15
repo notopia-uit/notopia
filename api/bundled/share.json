@@ -151,6 +151,25 @@
           "id"
         ]
       },
+      "UserWorkspaceRoleUpdatedEvent": {
+        "type": "object",
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/properties-id"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/id"
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "required": [
+          "workspaceId",
+          "userId",
+          "role"
+        ]
+      },
       "DocumentContent": {
         "type": "array",
         "items": {
@@ -340,6 +359,21 @@
         "type": "string",
         "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
         "example": "100"
+      },
+      "properties-id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "550e8400-e29b-41d4-a716-446655440000",
+        "readOnly": true
+      },
+      "WorkspaceRole": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "editor",
+          "viewer"
+        ],
+        "example": "owner"
       }
     }
   }

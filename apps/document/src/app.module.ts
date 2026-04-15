@@ -1,26 +1,22 @@
 import { Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import {
-  ClientKafka,
-  ClientsModule,
-  KafkaOptions,
-  Transport,
-} from '@nestjs/microservices';
+import { ClientKafka, ClientsModule } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
 
+import { getKafkaConfig } from '#/config/kafka.config';
+
 import { AuthorizationModule } from './authorization/authorization.module';
 import { BlockNoteModule } from './blocknote/blocknote.module';
 import { KAFKA_CLIENT } from './common/token';
 import { HttpUserGuard } from './common/user.guard';
-import { AppConfig, KafkaConfig } from './config/config';
+import { AppConfig } from './config/config';
 import {
   APP_CONFIG,
-  KAFKA_CONFIG,
   appConfig,
   databaseConfig,
   s3Config,
@@ -71,24 +67,8 @@ import { StorageModule } from './storage/storage.module';
     ClientsModule.registerAsync([
       {
         name: KAFKA_CLIENT,
-        useFactory: (configService: ConfigService): KafkaOptions => {
-          const servicesCfg = configService.get<KafkaConfig>(KAFKA_CONFIG);
-          if (!servicesCfg) {
-            throw new Error('KAFKA_CONFIG not found');
-          }
-          return {
-            transport: Transport.KAFKA,
-            options: {
-              client: {
-                brokers: servicesCfg.brokers,
-                clientId: servicesCfg.clientId,
-              },
-              consumer: {
-                groupId: servicesCfg.groupId,
-              },
-            },
-          };
-        },
+        useFactory: getKafkaConfig,
+        inject: [ConfigService],
       },
     ]),
     StorageModule,
