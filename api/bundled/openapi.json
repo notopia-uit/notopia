@@ -31,9 +31,9 @@
       "x-displayName": "Revision"
     },
     {
-      "name": "Workspacee",
+      "name": "Workspace",
       "description": "Workspace",
-      "x-displayName": "Workspacee"
+      "x-displayName": "Workspace"
     },
     {
       "name": "Folder",
@@ -44,10 +44,6 @@
       "name": "Note",
       "description": "Note in workspace's root folder or in a folder",
       "x-displayName": "Note"
-    },
-    {
-      "name": "Workspace",
-      "x-displayName": "Workspace"
     }
   ],
   "externalDocs": {
@@ -1963,7 +1959,14 @@
             "$ref": "#/components/schemas/share_id"
           },
           "role": {
-            "$ref": "#/components/schemas/share_WorkspaceRole"
+            "type": "string",
+            "enum": [
+              "owner",
+              "editor",
+              "viewer"
+            ],
+            "example": "owner",
+            "nullable": true
           }
         },
         "required": [
@@ -2167,15 +2170,6 @@
         "format": "uuid",
         "example": "550e8400-e29b-41d4-a716-446655440000",
         "readOnly": true
-      },
-      "share_WorkspaceRole": {
-        "type": "string",
-        "enum": [
-          "owner",
-          "editor",
-          "viewer"
-        ],
-        "example": "owner"
       },
       "document_Error": {
         "type": "object",
@@ -3504,10 +3498,9 @@
       "tags": [
         "Document",
         "Revision",
-        "Workspacee",
+        "Workspace",
         "Folder",
-        "Note",
-        "Workspace"
+        "Note"
       ]
     }
   ]

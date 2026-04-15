@@ -55,16 +55,14 @@ export const zShareUserDeletedEvent = z.object({
 
 export const zSharePropertiesId = z.uuid().readonly();
 
-export const zShareWorkspaceRole = z.enum([
-    'owner',
-    'editor',
-    'viewer'
-]);
-
 export const zShareUserWorkspaceRoleUpdatedEvent = z.object({
     workspaceId: zSharePropertiesId,
     userId: zShareId,
-    role: zShareWorkspaceRole
+    role: z.enum([
+        'owner',
+        'editor',
+        'viewer'
+    ])
 });
 
 export const zDocumentError = z.object({
@@ -280,7 +278,11 @@ export const zNoteWorkspaceTreeFolder = z.object({
 
 export const zShareUserWorkspaceRoleUpdatedEventWritable = z.object({
     userId: zShareId,
-    role: zShareWorkspaceRole
+    role: z.enum([
+        'owner',
+        'editor',
+        'viewer'
+    ])
 });
 
 /**

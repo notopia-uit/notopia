@@ -43,3 +43,9 @@ type IntegrationEventNoteUpdated struct {
 }
 
 func (e IntegrationEventNoteUpdated) isIntegrationEvent() {}
+
+type UserWorkspaceRoleUpdated struct {
+	UserID      uuid.UUID
+	WorkspaceID uuid.UUID
+	Role        WorkspaceRole // unspecified will be role lost
+}

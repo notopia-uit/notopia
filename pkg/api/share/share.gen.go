@@ -9,15 +9,15 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-// Defines values for WorkspaceRole.
+// Defines values for UserWorkspaceRoleUpdatedEventRole.
 const (
-	Editor WorkspaceRole = "editor"
-	Owner  WorkspaceRole = "owner"
-	Viewer WorkspaceRole = "viewer"
+	Editor UserWorkspaceRoleUpdatedEventRole = "editor"
+	Owner  UserWorkspaceRoleUpdatedEventRole = "owner"
+	Viewer UserWorkspaceRoleUpdatedEventRole = "viewer"
 )
 
-// Valid indicates whether the value is a known member of the WorkspaceRole enum.
-func (e WorkspaceRole) Valid() bool {
+// Valid indicates whether the value is a known member of the UserWorkspaceRoleUpdatedEventRole enum.
+func (e UserWorkspaceRoleUpdatedEventRole) Valid() bool {
 	switch e {
 	case Editor:
 		return true
@@ -90,15 +90,15 @@ type UserDeletedEvent struct {
 
 // UserWorkspaceRoleUpdatedEvent defines model for UserWorkspaceRoleUpdatedEvent.
 type UserWorkspaceRoleUpdatedEvent struct {
-	Role WorkspaceRole `json:"role"`
+	Role *UserWorkspaceRoleUpdatedEventRole `json:"role"`
 
 	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 	UserId      Id            `json:"userId"`
 	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
 
-// WorkspaceRole defines model for WorkspaceRole.
-type WorkspaceRole string
+// UserWorkspaceRoleUpdatedEventRole defines model for UserWorkspaceRoleUpdatedEvent.Role.
+type UserWorkspaceRoleUpdatedEventRole string
 
 // Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 type Id = string

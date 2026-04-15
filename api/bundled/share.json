@@ -161,7 +161,14 @@
             "$ref": "#/components/schemas/id"
           },
           "role": {
-            "$ref": "#/components/schemas/WorkspaceRole"
+            "type": "string",
+            "enum": [
+              "owner",
+              "editor",
+              "viewer"
+            ],
+            "example": "owner",
+            "nullable": true
           }
         },
         "required": [
@@ -365,15 +372,6 @@
         "format": "uuid",
         "example": "550e8400-e29b-41d4-a716-446655440000",
         "readOnly": true
-      },
-      "WorkspaceRole": {
-        "type": "string",
-        "enum": [
-          "owner",
-          "editor",
-          "viewer"
-        ],
-        "example": "owner"
       }
     }
   }

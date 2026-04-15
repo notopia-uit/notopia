@@ -8,8 +8,15 @@ properties:
   userId:
     $ref: ../../../common/components/schemas/User.yaml#/properties/id
 
+  # This should ref, just because oapi-codegen doesn't merging nullable
   role:
-    $ref: ../../../note/components/schemas/WorkspaceRole.yaml
+    type: string
+    enum:
+      - owner
+      - editor
+      - viewer
+    example: owner
+    nullable: true
 
 required:
   - workspaceId

@@ -46,7 +46,7 @@ export type ShareUserDeletedEvent = {
 export type ShareUserWorkspaceRoleUpdatedEvent = {
     workspaceId: SharePropertiesId;
     userId: ShareId;
-    role: ShareWorkspaceRole;
+    role: 'owner' | 'editor' | 'viewer';
 };
 
 /**
@@ -65,14 +65,6 @@ export type ShareDocument = {
 export type ShareId = string;
 
 export type SharePropertiesId = string;
-
-export const ShareWorkspaceRole = {
-    OWNER: 'owner',
-    EDITOR: 'editor',
-    VIEWER: 'viewer'
-} as const;
-
-export type ShareWorkspaceRole = typeof ShareWorkspaceRole[keyof typeof ShareWorkspaceRole];
 
 export type DocumentError = {
     /**
@@ -345,7 +337,7 @@ export type NotePropertiesUpdatedAt = Date;
 
 export type ShareUserWorkspaceRoleUpdatedEventWritable = {
     userId: ShareId;
-    role: ShareWorkspaceRole;
+    role: 'owner' | 'editor' | 'viewer';
 };
 
 /**
