@@ -10,7 +10,7 @@
       "dependsOn": [
         {
           "projects": "api",
-          "target": "gen:ts"
+          "target": "gen:hey-api"
         }
       ]
     }
