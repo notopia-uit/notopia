@@ -1,8 +1,14 @@
 'use client';
 
+import {
+  NoteWorkspaceTreeFolder,
+  NoteWorkspaceTreeNote,
+  getWorkspaceTreeOptions,
+} from '@notopia-uit/api-gen';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
@@ -16,212 +22,48 @@ import {
 } from 'react-complex-tree';
 
 //TODO: fetch data from api and handle loading states, errors, etc.
-const treeData: Record<TreeItemIndex, TreeItem<string>> = {
-  root: {
-    index: 'root',
-    isFolder: true,
-    children: ['item1', 'item9', 'item32', 'item35'],
-    data: 'root',
-  },
-  item1: {
-    index: 'item1',
-    isFolder: true,
-    children: ['item2', 'item3', 'item4', 'item5', 'item8'],
-    data: 'Fruit',
-  },
-  item2: {
-    index: 'item2',
-    isFolder: false,
-    data: 'Apple',
-  },
-  item3: {
-    index: 'item3',
-    isFolder: false,
-    data: 'Orange',
-  },
-  item4: {
-    index: 'item4',
-    isFolder: false,
-    data: 'Lemon',
-  },
-  item5: {
-    index: 'item5',
-    isFolder: true,
-    children: ['item6', 'item7'],
-    data: 'Berries',
-  },
-  item6: {
-    index: 'item6',
-    isFolder: false,
-    data: 'Strawberry',
-  },
-  item7: {
-    index: 'item7',
-    isFolder: false,
-    data: 'Blueberry',
-  },
-  item8: {
-    index: 'item8',
-    isFolder: false,
-    data: 'Banana',
-  },
-  item9: {
-    index: 'item9',
-    isFolder: true,
-    children: ['item10', 'item16', 'item22', 'item27'],
-    data: 'Meals',
-  },
-  item10: {
-    index: 'item10',
-    isFolder: true,
-    children: ['item11', 'item12', 'item13', 'item14', 'item15'],
-    data: 'America',
-  },
-  item11: {
-    index: 'item11',
-    isFolder: false,
-    data: 'SmashBurger',
-  },
-  item12: {
-    index: 'item12',
-    isFolder: false,
-    data: 'Chowder',
-  },
-  item13: {
-    index: 'item13',
-    isFolder: false,
-    data: 'Ravioli',
-  },
-  item14: {
-    index: 'item14',
-    isFolder: false,
-    data: 'MacAndCheese',
-  },
-  item15: {
-    index: 'item15',
-    isFolder: false,
-    data: 'Brownies',
-  },
-  item16: {
-    index: 'item16',
-    isFolder: true,
-    children: ['item17', 'item18', 'item19', 'item20', 'item21'],
-    data: 'Europe',
-  },
-  item17: {
-    index: 'item17',
-    isFolder: false,
-    data: 'Risotto',
-  },
-  item18: {
-    index: 'item18',
-    isFolder: false,
-    data: 'Spaghetti',
-  },
-  item19: {
-    index: 'item19',
-    isFolder: false,
-    data: 'Pizza',
-  },
-  item20: {
-    index: 'item20',
-    isFolder: false,
-    data: 'Weisswurst',
-  },
-  item21: {
-    index: 'item21',
-    isFolder: false,
-    data: 'Spargel',
-  },
-  item22: {
-    index: 'item22',
-    isFolder: true,
-    children: ['item23', 'item24', 'item25', 'item26'],
-    data: 'Asia',
-  },
-  item23: {
-    index: 'item23',
-    isFolder: false,
-    data: 'Curry',
-  },
-  item24: {
-    index: 'item24',
-    isFolder: false,
-    data: 'PadThai',
-  },
-  item25: {
-    index: 'item25',
-    isFolder: false,
-    data: 'Jiaozi',
-  },
-  item26: {
-    index: 'item26',
-    isFolder: false,
-    data: 'Sushi',
-  },
-  item27: {
-    index: 'item27',
-    isFolder: true,
-    children: ['item28', 'item29', 'item30', 'item31'],
-    data: 'Australia',
-  },
-  item28: {
-    index: 'item28',
-    isFolder: false,
-    data: 'PotatoWedges',
-  },
-  item29: {
-    index: 'item29',
-    isFolder: false,
-    data: 'PokeBowl',
-  },
-  item30: {
-    index: 'item30',
-    isFolder: false,
-    data: 'Curd',
-  },
-  item31: {
-    index: 'item31',
-    isFolder: false,
-    data: 'KumaraFries',
-  },
-  item32: {
-    index: 'item32',
-    isFolder: true,
-    children: ['item33', 'item34'],
-    data: 'Desserts',
-  },
-  item33: {
-    index: 'item33',
-    isFolder: false,
-    data: 'Cookies',
-  },
-  item34: {
-    index: 'item34',
-    isFolder: false,
-    data: 'IceCream',
-  },
-  item35: {
-    index: 'item35',
-    isFolder: true,
-    children: ['item36', 'item37', 'item38'],
-    data: 'Drinks',
-  },
-  item36: {
-    index: 'item36',
-    isFolder: false,
-    data: 'PinaColada',
-  },
-  item37: {
-    index: 'item37',
-    isFolder: false,
-    data: 'Cola',
-  },
-  item38: {
-    index: 'item38',
-    isFolder: false,
-    data: 'Juice',
-  },
+type TreeData = Record<TreeItemIndex, TreeItem<string>>;
+
+const mapDtoTreeData = (rootFolder: NoteWorkspaceTreeFolder): TreeData => {
+  const tree: TreeData = {};
+
+  const traverse = (
+    node: NoteWorkspaceTreeFolder | NoteWorkspaceTreeNote,
+    isFolder: boolean
+  ) => {
+    const { id, name } = node;
+
+    const treeItem: TreeItem<string> = {
+      index: id,
+      data: name,
+      isFolder: isFolder,
+    };
+
+    if (isFolder) {
+      const folderNode = node as NoteWorkspaceTreeFolder;
+
+      const childrenIds: TreeItemIndex[] = [
+        ...(folderNode.children || []).map((f) => f.id),
+        ...(folderNode.notes || []).map((n) => n.id),
+      ];
+
+      if (childrenIds.length > 0) {
+        treeItem.children = childrenIds;
+      }
+
+      folderNode.children?.forEach((childFolder) =>
+        traverse(childFolder, true)
+      );
+
+      folderNode.notes?.forEach((note) => traverse(note, false));
+    }
+
+    tree[id] = treeItem;
+  };
+
+  traverse(rootFolder, true);
+
+  return tree;
 };
 
 type DisposableType = {
@@ -358,13 +200,20 @@ const viewStateInitial: TreeViewState = {
   'tree-sample': {},
 };
 
-const TreeView: React.FC = () => {
+const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
+  currentWorkspaceId,
+}) => {
+  const { data: workspaceTreeData } = useSuspenseQuery({
+    ...getWorkspaceTreeOptions({ path: { workspaceId: currentWorkspaceId } }),
+    select: (data) => mapDtoTreeData(data),
+  });
+
   const tree = useRef<TreeRef>(null);
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
 
   const [items, setItems] =
-    useState<Record<TreeItemIndex, TreeItem<string>>>(treeData);
+    useState<Record<TreeItemIndex, TreeItem<string>>>(workspaceTreeData);
   const dataProvider = useMemo(
     () => new TreeDataProvider<string>(items),
     [items]
