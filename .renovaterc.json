@@ -31,6 +31,10 @@
       "matchPackageNames": ["rustfs/rustfs"],
       "automerge": true,
       "versioning": "loose"
+    },
+    {
+      "groupName": "blocknote",
+      "matchPackageNames": ["/^@blocknote/"]
     }
   ],
   "docker-compose": {
