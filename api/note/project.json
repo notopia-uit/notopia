@@ -47,11 +47,20 @@
     "mock": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "scalar document mock -w ../bundled/note.json --port 8081",
+        "command": "scalar document mock ../bundled/note.json --port 8081",
         "cwd": "{projectRoot}"
       },
       "continuous": true,
       "dependsOn": ["bundle:json"]
+    },
+    "mock:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "scalar document mock -w ../bundled/note.json --port 8081",
+        "cwd": "{projectRoot}"
+      },
+      "continuous": true,
+      "dependsOn": ["watch-bundle:json", "bundle:json"]
     },
     "lint": {
       "executor": "nx:run-commands",

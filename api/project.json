@@ -54,12 +54,17 @@
     },
     "mock": {
       "executor": "nx:run-commands",
-      "options": {
-        "command": "scalar document mock -w ./bundled/openapi.json --port 8080",
-        "cwd": "{projectRoot}"
-      },
       "continuous": true,
-      "dependsOn": ["join"]
+      "options": {
+        "command": "nx run-many --target=mock --projects=api/* --parallel"
+      }
+    },
+    "mock:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "nx run-many --target=mock:watch --projects=api/* --parallel"
+      },
+      "continuous": true
     },
     "gen:go": {
       "dependsOn": ["^gen:go"]
