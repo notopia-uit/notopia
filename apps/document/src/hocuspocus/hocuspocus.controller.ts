@@ -5,7 +5,7 @@ import type {
   ShareWorkspaceMemberRemovedEvent,
 } from '@notopia-uit/api-gen';
 
-import { HocuspocusService } from '#/hocuspocus/hococuspocus.service';
+import { HocuspocusService } from '#/hocuspocus/hocuspocus.service';
 
 @Controller()
 export class HocuspocusController {

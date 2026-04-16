@@ -43,3 +43,4 @@
 - [ ] no env validation for document, search-worker
 - [ ] Health check to other services (api service, meili, postgres...)
 - [ ] Connection pool max connections, idle, timeout for database, meili
+- [ ] gin should be protected with `SetTrustedProxies`

@@ -43,13 +43,13 @@ var _ app.IntegrationPublisher = (*IntegrationPublisher)(nil)
 
 func (p *IntegrationPublisher) Publish(ctx context.Context, events ...app.IntegrationEvent) error {
 	for _, event := range events {
-		transformedEvent, ok := p.transformIntegrationEvent(event)
-		if !ok {
-			return fmt.Errorf("cannot convert event to integration event: %T", event)
+		transformedEvent, err := p.transformIntegrationEvent(event)
+		if err != nil {
+			return fmt.Errorf("cannot convert event to integration event: %w", err)
 		}
-		topic, ok := p.getIntegrationEventTopic(event)
-		if !ok {
-			return fmt.Errorf("cannot get topic for integration event: %T", event)
+		topic, err := p.getIntegrationEventTopic(event)
+		if err != nil {
+			return fmt.Errorf("cannot get topic for integration event: %w", err)
 		}
 		payload, err := json.Marshal(transformedEvent)
 		if err != nil {
@@ -63,50 +63,58 @@ func (p *IntegrationPublisher) Publish(ctx context.Context, events ...app.Integr
 	return nil
 }
 
-func (p *IntegrationPublisher) transformIntegrationEvent(event app.IntegrationEvent) (any, bool) {
+func (p *IntegrationPublisher) transformIntegrationEvent(event app.IntegrationEvent) (any, error) {
 	switch e := event.(type) {
 	case app.IntegrationEventUserWorkspaceRoleUpdated:
+		role, err := p.toWorkspaceRole(e.Role)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert workspace role within integration event: %w", err)
+		}
 		return &share.UserWorkspaceRoleUpdatedEvent{
 			WorkspaceId: &e.WorkspaceID,
 			UserId:      e.UserID,
-			Role:        p.toWorkspaceRole(e.Role),
-		}, true
+			Role:        role,
+		}, nil
 	case app.IntegrationEventWorkspaceMemberAdded:
+		role, err := p.toWorkspaceRole(e.Role)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert workspace role within integration event: %w", err)
+		}
 		return &share.WorkspaceMemberAddedEvent{
 			WorkspaceId: &e.WorkspaceID,
 			UserId:      e.UserID,
-			Role:        p.toWorkspaceRole(e.Role),
-		}, true
+			Role:        role,
+		}, nil
 	case app.IntegrationEventWorkspaceMemberRemoved:
 		return &share.WorkspaceMemberRemovedEvent{
 			WorkspaceId: &e.WorkspaceID,
 			UserId:      e.UserID,
-		}, true
+		}, nil
 	}
-	return nil, false
+	return nil, fmt.Errorf("unknown integration event type: %T", event)
 }
 
-func (p *IntegrationPublisher) toWorkspaceRole(role app.WorkspaceRole) share.WorkspaceRole {
+func (p *IntegrationPublisher) toWorkspaceRole(role app.WorkspaceRole) (share.WorkspaceRole, error) {
 	switch role {
 	case app.WorkspaceRoleOwner:
-		return share.Owner
+		return share.Owner, nil
 	case app.WorkspaceRoleEditor:
-		return share.Editor
+		return share.Editor, nil
 	case app.WorkspaceRoleViewer:
-		return share.Viewer
+		return share.Viewer, nil
 	default:
-		return share.Viewer
+		return share.WorkspaceRole(""), fmt.Errorf("unknown workspace role: %v", role)
 	}
 }
 
-func (p *IntegrationPublisher) getIntegrationEventTopic(event app.IntegrationEvent) (string, bool) {
+func (p *IntegrationPublisher) getIntegrationEventTopic(event app.IntegrationEvent) (string, error) {
 	switch event.(type) {
 	case app.IntegrationEventUserWorkspaceRoleUpdated:
-		return "events.integration.authorization.user_workspace_role_updated", true
+		return "events.integration.authorization.user_workspace_role_updated", nil
 	case app.IntegrationEventWorkspaceMemberAdded:
-		return "events.integration.authorization.workspace_member_added", true
+		return "events.integration.authorization.workspace_member_added", nil
 	case app.IntegrationEventWorkspaceMemberRemoved:
-		return "events.integration.authorization.workspace_member_removed", true
+		return "events.integration.authorization.workspace_member_removed", nil
 	}
-	return "", false
+	return "", fmt.Errorf("unknown integration event type: %T", event)
 }

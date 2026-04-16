@@ -1,7 +1,6 @@
 package app_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -113,7 +112,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 
 			if !tc.expectErr && len(tc.expectedEventType) > 0 {
 				mockPublisher.EXPECT().
-					Publish(context.Background(), mock.MatchedBy(func(events []app.IntegrationEvent) bool {
+					Publish(t.Context(), mock.MatchedBy(func(events []app.IntegrationEvent) bool {
 						return len(events) == len(tc.expectedEventType)
 					})).
 					Return(nil).
@@ -123,7 +122,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 			handler := app.NewUpdateWorkspaceMembersHandler(e, mockPublisher)
 
 			workspaceID := uuid.MustParse(tc.workspaceID)
-			ctx := context.Background()
+			ctx := t.Context()
 			err = handler.Handle(ctx, app.UpdateWorkspaceMembers{
 				UserID:      tc.requesterID,
 				WorkspaceID: workspaceID,

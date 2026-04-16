@@ -47,8 +47,8 @@ export class HocuspocusService {
             code: 4001,
             reason: 'Your access to this document has been revoked',
           });
-        } else if (!permissions.canWrite) {
-          connection.connection.readOnly = true;
+        } else {
+          connection.connection.readOnly = !permissions.canWrite;
         }
       }
     }

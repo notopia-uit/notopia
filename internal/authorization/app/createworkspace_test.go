@@ -1,7 +1,6 @@
 package app_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -12,7 +11,7 @@ import (
 func TestCreateWorkspaceHandler(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	e, err := GetLocalEnforcer(false)
 	require.NoError(t, err, "Failed to create enforcer")

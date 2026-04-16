@@ -80,21 +80,21 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params Updat
 			}
 		}
 
+		eventsToPublish = compareAndGenerateEvents(params.WorkspaceID, oldMembers, params.Members)
+
+		if len(eventsToPublish) > 0 {
+			if err := h.integrationPublisher.Publish(ctx, eventsToPublish...); err != nil {
+				slog.ErrorContext(ctx, "failed to publish integration events",
+					slog.String("workspace_id", params.WorkspaceID.String()),
+					slog.String("error", err.Error()),
+				)
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
 		return err
-	}
-
-	eventsToPublish = compareAndGenerateEvents(params.WorkspaceID, oldMembers, params.Members)
-
-	if len(eventsToPublish) > 0 {
-		if err := h.integrationPublisher.Publish(ctx, eventsToPublish...); err != nil {
-			slog.ErrorContext(ctx, "failed to publish integration events",
-				slog.String("workspace_id", params.WorkspaceID.String()),
-				slog.String("error", err.Error()),
-			)
-		}
 	}
 
 	slog.InfoContext(ctx, "updated workspace members",
