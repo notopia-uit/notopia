@@ -2,12 +2,11 @@
 // github.com/vektra/mockery
 // template: testify
 
-package app_test
+package app
 
 import (
 	"context"
 
-	"github.com/notopia-uit/notopia/internal/authorization/app"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -39,7 +38,7 @@ func (_m *MockIntegrationPublisher) EXPECT() *MockIntegrationPublisher_Expecter 
 }
 
 // Publish provides a mock function for the type MockIntegrationPublisher
-func (_mock *MockIntegrationPublisher) Publish(ctx context.Context, event ...app.IntegrationEvent) error {
+func (_mock *MockIntegrationPublisher) Publish(ctx context.Context, event ...IntegrationEvent) error {
 	var tmpRet mock.Arguments
 	if len(event) > 0 {
 		tmpRet = _mock.Called(ctx, event)
@@ -53,7 +52,7 @@ func (_mock *MockIntegrationPublisher) Publish(ctx context.Context, event ...app
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, ...app.IntegrationEvent) error); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, ...IntegrationEvent) error); ok {
 		r0 = returnFunc(ctx, event...)
 	} else {
 		r0 = ret.Error(0)
@@ -68,22 +67,22 @@ type MockIntegrationPublisher_Publish_Call struct {
 
 // Publish is a helper method to define mock.On call
 //   - ctx context.Context
-//   - event ...app.IntegrationEvent
+//   - event ...IntegrationEvent
 func (_e *MockIntegrationPublisher_Expecter) Publish(ctx interface{}, event ...interface{}) *MockIntegrationPublisher_Publish_Call {
 	return &MockIntegrationPublisher_Publish_Call{Call: _e.mock.On("Publish",
 		append([]interface{}{ctx}, event...)...)}
 }
 
-func (_c *MockIntegrationPublisher_Publish_Call) Run(run func(ctx context.Context, event ...app.IntegrationEvent)) *MockIntegrationPublisher_Publish_Call {
+func (_c *MockIntegrationPublisher_Publish_Call) Run(run func(ctx context.Context, event ...IntegrationEvent)) *MockIntegrationPublisher_Publish_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 []app.IntegrationEvent
-		var variadicArgs []app.IntegrationEvent
+		var arg1 []IntegrationEvent
+		var variadicArgs []IntegrationEvent
 		if len(args) > 1 {
-			variadicArgs = args[1].([]app.IntegrationEvent)
+			variadicArgs = args[1].([]IntegrationEvent)
 		}
 		arg1 = variadicArgs
 		run(
@@ -99,7 +98,7 @@ func (_c *MockIntegrationPublisher_Publish_Call) Return(err error) *MockIntegrat
 	return _c
 }
 
-func (_c *MockIntegrationPublisher_Publish_Call) RunAndReturn(run func(ctx context.Context, event ...app.IntegrationEvent) error) *MockIntegrationPublisher_Publish_Call {
+func (_c *MockIntegrationPublisher_Publish_Call) RunAndReturn(run func(ctx context.Context, event ...IntegrationEvent) error) *MockIntegrationPublisher_Publish_Call {
 	_c.Call.Return(run)
 	return _c
 }

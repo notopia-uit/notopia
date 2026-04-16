@@ -1,7 +1,7 @@
 template: testify
 dir: '{{ .InterfaceDir }}'
 filename: mock.go
-pkgname: '{{ .SrcPackageName }}_test'
+pkgname: '{{ .SrcPackageName }}'
 packages:
   github.com/notopia-uit/notopia/internal/authorization/app:
     config:

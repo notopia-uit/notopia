@@ -108,7 +108,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 			e, err := GetLocalEnforcer(t, false)
 			require.NoError(t, err, "Failed to create enforcer")
 
-			mockPublisher := NewMockIntegrationPublisher(t)
+			mockPublisher := app.NewMockIntegrationPublisher(t)
 
 			if !tc.expectErr && len(tc.expectedEventType) > 0 {
 				mockPublisher.EXPECT().
