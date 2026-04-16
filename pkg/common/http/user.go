@@ -33,12 +33,12 @@ type userCtxKey int
 
 const UserCtxKey userCtxKey = iota
 
-func userToContext(ctx context.Context, user *User) context.Context {
-	return context.WithValue(ctx, UserCtxKey, user)
-}
-
 func UserFromContext(ctx context.Context) (*User, bool) {
-	u, ok := ctx.Value(UserCtxKey).(*User)
+	c, ok := ctx.(*gin.Context)
+	if !ok {
+		return nil, false
+	}
+	u, ok := c.Value(UserCtxKey).(*User)
 	return u, ok
 }
 
@@ -60,10 +60,6 @@ func GatewayUserAuth() gin.HandlerFunc {
 		user.Roles.UnmarshalHeader(rawRoles)
 
 		c.Set(UserCtxKey, user)
-
-		c.Request = c.Request.WithContext(
-			userToContext(c.Request.Context(), user),
-		)
 
 		c.Next()
 	}
