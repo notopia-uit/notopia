@@ -14,13 +14,11 @@ import {
   CreditCard,
   Folder,
   Forward,
-  Frame,
   GalleryVerticalEnd,
   LogOut,
-  Map,
   MoreHorizontal,
-  PieChart,
   Plus,
+  Settings2,
   Sparkles,
   Trash2,
 } from 'lucide-react';
@@ -78,19 +76,14 @@ const data = {
   ],
   projects: [
     {
-      name: 'Design Engineering',
+      name: 'Settings',
       url: '#',
-      icon: Frame,
+      icon: Settings2,
     },
     {
-      name: 'Sales & Marketing',
+      name: 'Graph',
       url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
+      icon: Sparkles,
     },
   ],
 };

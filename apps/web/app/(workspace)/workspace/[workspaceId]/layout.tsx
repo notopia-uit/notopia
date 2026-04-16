@@ -48,7 +48,7 @@ async function WorkspaceSideBarServerComponents({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <WorkspaceSideBar currentWorkspaceSlug={workspaceId} />
+      <WorkspaceSideBar currentWorkspaceId={workspaceId} />
     </HydrationBoundary>
   );
 }
