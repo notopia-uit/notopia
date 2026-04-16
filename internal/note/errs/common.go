@@ -72,7 +72,7 @@ func NewInvalid(message string) *Invalid {
 	}
 }
 
-var Unimplemented = Err{
+var Unimplemented = &Err{
 	message: "unimplemented",
 	code:    CodeUnimplemented,
 }

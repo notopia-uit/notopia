@@ -24,6 +24,6 @@ func LogViperSetDefault(
 	viper *viper.Viper,
 	prefix string,
 ) {
-	viper.SetDefault(prefix+".level", true)
+	viper.SetDefault(prefix+".enabled", true)
 	viper.SetDefault(prefix+".level", "info")
 }
