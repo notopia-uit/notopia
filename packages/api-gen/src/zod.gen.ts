@@ -55,14 +55,27 @@ export const zShareUserDeletedEvent = z.object({
 
 export const zSharePropertiesId = z.uuid().readonly();
 
+export const zShareWorkspaceMemberRemovedEvent = z.object({
+    workspaceId: zSharePropertiesId,
+    userId: zShareId
+});
+
+export const zShareWorkspaceRole = z.enum([
+    'owner',
+    'editor',
+    'viewer'
+]);
+
 export const zShareUserWorkspaceRoleUpdatedEvent = z.object({
     workspaceId: zSharePropertiesId,
     userId: zShareId,
-    role: z.enum([
-        'owner',
-        'editor',
-        'viewer'
-    ])
+    role: zShareWorkspaceRole
+});
+
+export const zShareWorkspaceMemberAddedEvent = z.object({
+    workspaceId: zSharePropertiesId,
+    userId: zShareId,
+    role: zShareWorkspaceRole
 });
 
 export const zDocumentError = z.object({
@@ -278,11 +291,16 @@ export const zNoteWorkspaceTreeFolder = z.object({
 
 export const zShareUserWorkspaceRoleUpdatedEventWritable = z.object({
     userId: zShareId,
-    role: z.enum([
-        'owner',
-        'editor',
-        'viewer'
-    ])
+    role: zShareWorkspaceRole
+});
+
+export const zShareWorkspaceMemberAddedEventWritable = z.object({
+    userId: zShareId,
+    role: zShareWorkspaceRole
+});
+
+export const zShareWorkspaceMemberRemovedEventWritable = z.object({
+    userId: zShareId
 });
 
 /**

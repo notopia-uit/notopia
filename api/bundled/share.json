@@ -161,20 +161,47 @@
             "$ref": "#/components/schemas/id"
           },
           "role": {
-            "type": "string",
-            "enum": [
-              "owner",
-              "editor",
-              "viewer"
-            ],
-            "example": "owner",
-            "nullable": true
+            "$ref": "#/components/schemas/WorkspaceRole"
           }
         },
         "required": [
           "workspaceId",
           "userId",
           "role"
+        ]
+      },
+      "WorkspaceMemberAddedEvent": {
+        "type": "object",
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/properties-id"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/id"
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "required": [
+          "workspaceId",
+          "userId",
+          "role"
+        ]
+      },
+      "WorkspaceMemberRemovedEvent": {
+        "type": "object",
+        "properties": {
+          "workspaceId": {
+            "$ref": "#/components/schemas/properties-id"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/id"
+          }
+        },
+        "required": [
+          "workspaceId",
+          "userId"
         ]
       },
       "DocumentContent": {
@@ -372,6 +399,15 @@
         "format": "uuid",
         "example": "550e8400-e29b-41d4-a716-446655440000",
         "readOnly": true
+      },
+      "WorkspaceRole": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "editor",
+          "viewer"
+        ],
+        "example": "owner"
       }
     }
   }

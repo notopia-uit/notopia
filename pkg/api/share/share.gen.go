@@ -9,15 +9,15 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-// Defines values for UserWorkspaceRoleUpdatedEventRole.
+// Defines values for WorkspaceRole.
 const (
-	Editor UserWorkspaceRoleUpdatedEventRole = "editor"
-	Owner  UserWorkspaceRoleUpdatedEventRole = "owner"
-	Viewer UserWorkspaceRoleUpdatedEventRole = "viewer"
+	Editor WorkspaceRole = "editor"
+	Owner  WorkspaceRole = "owner"
+	Viewer WorkspaceRole = "viewer"
 )
 
-// Valid indicates whether the value is a known member of the UserWorkspaceRoleUpdatedEventRole enum.
-func (e UserWorkspaceRoleUpdatedEventRole) Valid() bool {
+// Valid indicates whether the value is a known member of the WorkspaceRole enum.
+func (e WorkspaceRole) Valid() bool {
 	switch e {
 	case Editor:
 		return true
@@ -90,15 +90,31 @@ type UserDeletedEvent struct {
 
 // UserWorkspaceRoleUpdatedEvent defines model for UserWorkspaceRoleUpdatedEvent.
 type UserWorkspaceRoleUpdatedEvent struct {
-	Role *UserWorkspaceRoleUpdatedEventRole `json:"role"`
+	Role WorkspaceRole `json:"role"`
 
 	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 	UserId      Id            `json:"userId"`
 	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
 }
 
-// UserWorkspaceRoleUpdatedEventRole defines model for UserWorkspaceRoleUpdatedEvent.Role.
-type UserWorkspaceRoleUpdatedEventRole string
+// WorkspaceMemberAddedEvent defines model for WorkspaceMemberAddedEvent.
+type WorkspaceMemberAddedEvent struct {
+	Role WorkspaceRole `json:"role"`
+
+	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+	UserId      Id            `json:"userId"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+}
+
+// WorkspaceMemberRemovedEvent defines model for WorkspaceMemberRemovedEvent.
+type WorkspaceMemberRemovedEvent struct {
+	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+	UserId      Id            `json:"userId"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+}
+
+// WorkspaceRole defines model for WorkspaceRole.
+type WorkspaceRole string
 
 // Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 type Id = string

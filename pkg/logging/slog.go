@@ -9,7 +9,7 @@ import (
 	slogmulti "github.com/samber/slog-multi"
 )
 
-func New(
+func NewSlog(
 	stdoutHandler StdoutHandler,
 	otelHandler otel.SlogHandler,
 	cfg *commonconfig.Log,
@@ -28,4 +28,4 @@ func New(
 	)
 }
 
-var Provide = New
+var ProvideSlog = NewSlog

@@ -11,6 +11,46 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/share"
 )
 
+type Publisher message.Publisher
+
+type IntegrationPublisher struct {
+	publisher Publisher
+}
+
+var _ app.IntegrationPublisher = (*IntegrationPublisher)(nil)
+
+func NewIntegrationPublisher(
+	publisher Publisher,
+) (*IntegrationPublisher, error) {
+	return &IntegrationPublisher{
+		publisher: publisher,
+	}, nil
+}
+
+var ProvideIntegrationPublisher = NewIntegrationPublisher
+
+func (p *IntegrationPublisher) Publish(ctx context.Context, events ...app.IntegrationEvent) error {
+	for _, event := range events {
+		transformedEvent, ok := transformIntegrationEvent(event)
+		if !ok {
+			return fmt.Errorf("cannot convert event to integration event: %T", event)
+		}
+		topic, ok := getIntegrationEventTopic(event)
+		if !ok {
+			return fmt.Errorf("cannot get topic for integration event: %T", event)
+		}
+		payload, err := json.Marshal(transformedEvent)
+		if err != nil {
+			return fmt.Errorf("failed to marshal integration event: %w", err)
+		}
+		msg := message.NewMessageWithContext(ctx, watermill.NewUUID(), payload)
+		if err := p.publisher.Publish(topic, msg); err != nil {
+			return fmt.Errorf("failed to publish integration event: %w", err)
+		}
+	}
+	return nil
+}
+
 func transformIntegrationEvent(event app.IntegrationEvent) (any, bool) {
 	switch e := event.(type) {
 	case app.IntegrationEventNoteCreated:
@@ -54,44 +94,4 @@ func getIntegrationEventTopic(event app.IntegrationEvent) (string, bool) {
 		return "events.integration.note.note.updated", true
 	}
 	return "", false
-}
-
-type Publisher message.Publisher
-
-type IntegrationPublisher struct {
-	publisher message.Publisher
-}
-
-var _ app.IntegrationPublisher = (*IntegrationPublisher)(nil)
-
-func NewIntegrationPublisher(
-	publisher Publisher,
-) (*IntegrationPublisher, error) {
-	return &IntegrationPublisher{
-		publisher: publisher,
-	}, nil
-}
-
-var ProvideIntegrationPublisher = NewIntegrationPublisher
-
-func (p *IntegrationPublisher) Publish(ctx context.Context, events ...app.IntegrationEvent) error {
-	for _, event := range events {
-		transformedEvent, ok := transformIntegrationEvent(event)
-		if !ok {
-			return fmt.Errorf("cannot convert event to integration event: %T", event)
-		}
-		topic, ok := getIntegrationEventTopic(event)
-		if !ok {
-			return fmt.Errorf("cannot get topic for integration event: %T", event)
-		}
-		payload, err := json.Marshal(transformedEvent)
-		if err != nil {
-			return fmt.Errorf("failed to marshal integration event: %w", err)
-		}
-		msg := message.NewMessageWithContext(ctx, watermill.NewUUID(), payload)
-		if err := p.publisher.Publish(topic, msg); err != nil {
-			return fmt.Errorf("failed to publish integration event: %w", err)
-		}
-	}
-	return nil
 }

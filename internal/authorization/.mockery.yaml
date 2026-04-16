@@ -1,0 +1,8 @@
+template: testify
+dir: '{{ .InterfaceDir }}'
+filename: mocks_test.go
+pkgname: '{{ .SrcPackageName }}_test'
+packages:
+  github.com/notopia-uit/notopia/internal/authorization/app:
+    config:
+      include-interface-regex: '^IntegrationPublisher$'

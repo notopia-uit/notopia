@@ -23,11 +23,15 @@ type IntegrationEventNoteCreated struct {
 	Icon string
 }
 
+var _ IntegrationEvent = (*IntegrationEventNoteCreated)(nil)
+
 func (e IntegrationEventNoteCreated) isIntegrationEvent() {}
 
 type IntegrationEventNoteDeleted struct {
 	ID uuid.UUID
 }
+
+var _ IntegrationEvent = (*IntegrationEventNoteDeleted)(nil)
 
 func (e IntegrationEventNoteDeleted) isIntegrationEvent() {}
 
@@ -42,10 +46,6 @@ type IntegrationEventNoteUpdated struct {
 	UpdatedAt     time.Time
 }
 
-func (e IntegrationEventNoteUpdated) isIntegrationEvent() {}
+var _ IntegrationEvent = (*IntegrationEventNoteUpdated)(nil)
 
-type UserWorkspaceRoleUpdated struct {
-	UserID      uuid.UUID
-	WorkspaceID uuid.UUID
-	Role        WorkspaceRole // unspecified will be role lost
-}
+func (e IntegrationEventNoteUpdated) isIntegrationEvent() {}

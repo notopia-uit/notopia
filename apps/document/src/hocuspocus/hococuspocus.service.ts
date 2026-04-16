@@ -15,6 +15,8 @@ export class HocuspocusService {
     private readonly authorizationService: AuthorizationService
   ) {}
 
+  // NOTE: We don't really need to check the permission canRead, because yeah
+  // Because based on the casbin rules, it will be always canRead when this event fired
   async onRoleChanged({
     workspaceId,
     userId,
@@ -48,6 +50,35 @@ export class HocuspocusService {
         } else if (!permissions.canWrite) {
           connection.connection.readOnly = true;
         }
+      }
+    }
+  }
+
+  // NOTE: If we handle the published, then this should be adjusted
+  async onMemberRemoved({
+    workspaceId,
+    userId,
+  }: {
+    workspaceId: string;
+    userId: string;
+  }) {
+    for (const [documentName, document] of this.hocuspocus.documents) {
+      for (const [_, connection] of document.connections) {
+        const context = connection.connection.context as HocuspocusContext;
+        if (context.user.id !== userId) {
+          continue;
+        }
+        const workspace = await this.noteService.getWorkspaceByNote({
+          noteId: documentName,
+          userId,
+        });
+        if (workspace.id !== workspaceId) {
+          continue;
+        }
+        connection.connection.close({
+          code: 4001,
+          reason: 'Your access to this document has been revoked',
+        });
       }
     }
   }

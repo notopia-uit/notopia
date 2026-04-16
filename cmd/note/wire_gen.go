@@ -67,7 +67,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.New(stdoutHandler, slogHandler, log)
+	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
 	provider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
 		cleanup3()
@@ -96,7 +96,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	advanced := &configConfig.Advanced
 	domainEvent := advanced.DomainEvent
-	loggerAdapter := component.NewWatermillLogger(logger)
+	loggerAdapter := logging.NewWatermill(logger)
 	configDomainEvent := &advanced.DomainEvent
 	defaultPostgreSQLSchema := outbox.NewSchemaAdapter(configDomainEvent)
 	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema, serviceName)

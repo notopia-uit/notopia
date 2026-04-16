@@ -1,6 +1,8 @@
 package common
 
 import (
+	"fmt"
+
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
 	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
@@ -25,7 +27,7 @@ func NewKafkaPublisher(
 		logger,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create Kafka publisher: %w", err)
 	}
 	return &KafkaPublisher{
 		Publisher: publisher,

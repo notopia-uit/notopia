@@ -76,3 +76,16 @@ func userFromFormat(formatted string) (string, error) {
 func formatWorkspace(id uuid.UUID) string {
 	return fmt.Sprintf("workspace:%s", id.String())
 }
+
+func parseRole(roleStr string) WorkspaceRole {
+	switch roleStr {
+	case WorkspaceRoleOwner.String():
+		return WorkspaceRoleOwner
+	case WorkspaceRoleEditor.String():
+		return WorkspaceRoleEditor
+	case WorkspaceRoleViewer.String():
+		return WorkspaceRoleViewer
+	default:
+		return WorkspaceRoleViewer
+	}
+}

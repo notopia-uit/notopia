@@ -7,5 +7,4 @@ import (
 var ProviderSet = wire.NewSet(
 	ProvideValidate,
 	ProvideWatermillJsonMarshaler,
-	ProvideWatermillLogger,
 )

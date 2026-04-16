@@ -43,19 +43,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
 	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
 	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
-	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer)
-	appApp := &app.App{
-		CreateWorkspace:                 createWorkspaceHandler,
-		DeleteWorkspace:                 deleteWorkspaceHandler,
-		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
-		GetUserWorkspaces:               getUserWorkspacesHandler,
-		GetWorkspaceMembers:             getWorkspaceMembersHandler,
-		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
-		HasWorkspacePermission:          hasWorkspacePermissionHandler,
-		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
-	}
-	service := grpc.NewService(appApp)
-	serverConfig := &configConfig.Server
+	kafka := &configConfig.Kafka
 	log := &configConfig.Log
 	stdoutHandler := logging.NewStdoutHandler(log)
 	serviceName := _wireServiceNameValue
@@ -69,20 +57,41 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.New(stdoutHandler, slogHandler, log)
-	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	server, cleanup2, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger)
+	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
+	loggerAdapter := logging.NewWatermill(logger)
+	tracerProvider, cleanup2, err := otel.NewTracerProvider(ctx, resource)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	meterProvider, cleanup3, err := otel.NewMeterProvider(ctx, resource)
+	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
+	integrationPublisher, err := infra.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	tracerProvider, cleanup4, err := otel.NewTracerProvider(ctx, resource)
+	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer, integrationPublisher)
+	appApp := &app.App{
+		CreateWorkspace:                 createWorkspaceHandler,
+		DeleteWorkspace:                 deleteWorkspaceHandler,
+		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
+		GetUserWorkspaces:               getUserWorkspacesHandler,
+		GetWorkspaceMembers:             getWorkspaceMembersHandler,
+		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
+		HasWorkspacePermission:          hasWorkspacePermissionHandler,
+		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
+	}
+	service := grpc.NewService(appApp)
+	serverConfig := &configConfig.Server
+	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
+	server, cleanup3, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	meterProvider, cleanup4, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup3()
 		cleanup2()

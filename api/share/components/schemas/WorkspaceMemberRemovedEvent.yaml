@@ -8,10 +8,6 @@ properties:
   userId:
     $ref: ../../../common/components/schemas/User.yaml#/properties/id
 
-  role:
-    $ref: ../../../note/components/schemas/WorkspaceRole.yaml
-
 required:
   - workspaceId
   - userId
-  - role

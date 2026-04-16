@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/app"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -14,26 +15,64 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 	t.Skip("UpdateWorkspaceMembersHandler requires a transactional adapter (e.g., GORM), FileAdapter does not support transactions")
 
 	tests := []struct {
-		name        string
-		requesterID string
-		workspaceID string
-		newMembers  []app.WorkspaceMember
-		expectErr   bool
+		name              string
+		requesterID       string
+		workspaceID       string
+		oldMembers        []app.WorkspaceMember
+		newMembers        []app.WorkspaceMember
+		expectErr         bool
+		expectedEventType []string
 	}{
 		{
-			name:        "W111-Owner can update members",
+			name:        "W111-Owner can update members - add new member",
 			requesterID: "111",
 			workspaceID: "00000000-0000-0000-0000-000000000111",
+			oldMembers: []app.WorkspaceMember{
+				{ID: "111", Role: app.WorkspaceRoleOwner},
+			},
 			newMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 				{ID: "112", Role: app.WorkspaceRoleViewer},
 			},
-			expectErr: false,
+			expectErr:         false,
+			expectedEventType: []string{"IntegrationEventWorkspaceMemberAdded"},
+		},
+		{
+			name:        "W111-Owner can update members - remove member",
+			requesterID: "111",
+			workspaceID: "00000000-0000-0000-0000-000000000111",
+			oldMembers: []app.WorkspaceMember{
+				{ID: "111", Role: app.WorkspaceRoleOwner},
+				{ID: "112", Role: app.WorkspaceRoleViewer},
+			},
+			newMembers: []app.WorkspaceMember{
+				{ID: "111", Role: app.WorkspaceRoleOwner},
+			},
+			expectErr:         false,
+			expectedEventType: []string{"IntegrationEventWorkspaceMemberRemoved"},
+		},
+		{
+			name:        "W111-Owner can update members - change role",
+			requesterID: "111",
+			workspaceID: "00000000-0000-0000-0000-000000000111",
+			oldMembers: []app.WorkspaceMember{
+				{ID: "111", Role: app.WorkspaceRoleOwner},
+				{ID: "112", Role: app.WorkspaceRoleViewer},
+			},
+			newMembers: []app.WorkspaceMember{
+				{ID: "111", Role: app.WorkspaceRoleOwner},
+				{ID: "112", Role: app.WorkspaceRoleEditor},
+			},
+			expectErr:         false,
+			expectedEventType: []string{"IntegrationEventUserWorkspaceRoleUpdated"},
 		},
 		{
 			name:        "W111-Editor CANNOT update members",
 			requesterID: "112",
 			workspaceID: "00000000-0000-0000-0000-000000000111",
+			oldMembers: []app.WorkspaceMember{
+				{ID: "111", Role: app.WorkspaceRoleOwner},
+			},
 			newMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 			},
@@ -43,6 +82,9 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 			name:        "W111-Viewer CANNOT update members",
 			requesterID: "110",
 			workspaceID: "00000000-0000-0000-0000-000000000111",
+			oldMembers: []app.WorkspaceMember{
+				{ID: "111", Role: app.WorkspaceRoleOwner},
+			},
 			newMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 			},
@@ -52,6 +94,9 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 			name:        "W112-Stranger CANNOT update members",
 			requesterID: "110",
 			workspaceID: "00000000-0000-0000-0000-000000000112",
+			oldMembers: []app.WorkspaceMember{
+				{ID: "112", Role: app.WorkspaceRoleOwner},
+			},
 			newMembers: []app.WorkspaceMember{
 				{ID: "112", Role: app.WorkspaceRoleOwner},
 			},
@@ -64,7 +109,18 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 			e, err := GetLocalEnforcer(true)
 			require.NoError(t, err, "Failed to create enforcer")
 
-			handler := app.NewUpdateWorkspaceMembersHandler(e)
+			mockPublisher := NewMockIntegrationPublisher(t)
+
+			if !tc.expectErr && len(tc.expectedEventType) > 0 {
+				mockPublisher.EXPECT().
+					Publish(context.Background(), mock.MatchedBy(func(events []app.IntegrationEvent) bool {
+						return len(events) == len(tc.expectedEventType)
+					})).
+					Return(nil).
+					Once()
+			}
+
+			handler := app.NewUpdateWorkspaceMembersHandler(e, mockPublisher)
 
 			workspaceID := uuid.MustParse(tc.workspaceID)
 			ctx := context.Background()
