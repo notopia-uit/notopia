@@ -1,4 +1,4 @@
-package authorization
+package grpc
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"buf.build/go/protovalidate"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
+	"github.com/notopia-uit/notopia/internal/authorization/config"
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
 	"github.com/notopia-uit/notopia/pkg/pb"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -54,17 +55,17 @@ func unaryErrorInterceptor(
 	return resp, nil
 }
 
-type GRPCServer struct {
+type Server struct {
 	server  *grpc.Server
 	address string
 }
 
-func NewGRPCServer(
+func NewServer(
 	ctx context.Context,
-	serviceServer *GRPCServiceServer,
-	cfg *ServerConfig,
+	serviceServer *Service,
+	cfg *config.ServerConfig,
 	logger logging.Logger,
-) (*GRPCServer, func(), error) {
+) (*Server, func(), error) {
 	validator, err := protovalidate.New()
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create protovalidate validator: %w", err)
@@ -77,7 +78,7 @@ func NewGRPCServer(
 			unaryErrorInterceptor,
 		),
 	)
-	grpcServer := &GRPCServer{
+	grpcServer := &Server{
 		server:  server,
 		address: cfg.GRPC.Address(),
 	}
@@ -91,9 +92,9 @@ func NewGRPCServer(
 	return grpcServer, cleanup, nil
 }
 
-var ProvideGRPCServer = NewGRPCServer
+var ProvideServer = NewServer
 
-func (g *GRPCServer) Run() error {
+func (g *Server) Run() error {
 	lis, err := net.Listen("tcp", g.address)
 	if err != nil {
 		return fmt.Errorf("failed to listen on %s: %w", g.address, err)
@@ -101,6 +102,6 @@ func (g *GRPCServer) Run() error {
 	return g.server.Serve(lis)
 }
 
-func (g *GRPCServer) Stop() {
+func (g *Server) Stop() {
 	g.server.GracefulStop()
 }

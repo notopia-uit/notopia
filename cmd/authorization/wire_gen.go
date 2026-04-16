@@ -11,6 +11,9 @@ import (
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/authorization"
 	"github.com/notopia-uit/notopia/internal/authorization/app"
+	"github.com/notopia-uit/notopia/internal/authorization/config"
+	"github.com/notopia-uit/notopia/internal/authorization/controller/grpc"
+	"github.com/notopia-uit/notopia/internal/authorization/infra"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -19,17 +22,17 @@ import (
 
 func InitializeServer(ctx context.Context) (*authorization.Server, func(), error) {
 	validate := authorization.NewValidate()
-	viper := authorization.NewViper()
-	config, err := authorization.NewConfig(validate, viper)
+	viper := config.NewViper()
+	configConfig, err := config.NewConfig(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
-	sql := &config.Database
-	db, err := authorization.NewGORMDB(sql)
+	sql := &configConfig.Database
+	db, err := infra.NewGORMDB(sql)
 	if err != nil {
 		return nil, nil, err
 	}
-	transactionalEnforcer, err := authorization.NewCasbinEnforcer(db)
+	transactionalEnforcer, err := infra.NewCasbinEnforcer(db)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -41,7 +44,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
 	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer)
-	authorizationApp := &authorization.App{
+	appApp := &app.App{
 		CreateWorkspace:                 createWorkspaceHandler,
 		DeleteWorkspace:                 deleteWorkspaceHandler,
 		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
@@ -51,9 +54,9 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		HasWorkspacePermission:          hasWorkspacePermissionHandler,
 		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
 	}
-	grpcServiceServer := authorization.NewGRPCServiceServer(authorizationApp)
-	serverConfig := &config.Server
-	log := &config.Log
+	service := grpc.NewService(appApp)
+	serverConfig := &configConfig.Server
+	log := &configConfig.Log
 	stdoutHandler := logging.NewStdoutHandler(log)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
@@ -68,7 +71,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.New(stdoutHandler, slogHandler, log)
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	grpcServer, cleanup2, err := authorization.NewGRPCServer(ctx, grpcServiceServer, serverConfig, loggingLogger)
+	server, cleanup2, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
@@ -87,8 +90,8 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
-	server := authorization.NewServer(grpcServer, logger, global)
-	return server, func() {
+	authorizationServer := authorization.NewServer(server, logger, global)
+	return authorizationServer, func() {
 		cleanup4()
 		cleanup3()
 		cleanup2()

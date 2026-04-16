@@ -13,4 +13,5 @@ var ProviderSet = wire.NewSet(
 	ProvideHasWorkspaceItemPermissionHandler,
 	ProvideHasWorkspacePermissionHandler,
 	ProvideUpdateWorkspaceMembersHandler,
+	wire.Struct(new(App), "*"),
 )
