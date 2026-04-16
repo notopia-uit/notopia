@@ -3,7 +3,6 @@ package infra
 import (
 	"fmt"
 
-	"github.com/casbin/casbin/v3"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"gorm.io/driver/postgres"
@@ -20,18 +19,14 @@ func NewGORMDB(databaseCfg *commonconfig.SQL) (*gorm.DB, error) {
 
 var ProvideGORMDB = NewGORMDB
 
-func NewCasbinEnforcer(
+func NewCasbinAdapter(
 	gormDB *gorm.DB,
-) (*casbin.TransactionalEnforcer, error) {
+) (*gormadapter.Adapter, error) {
 	adapter, err := gormadapter.NewTransactionalAdapterByDB(gormDB)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Casbin adapter: %w", err)
 	}
-	enforcer, err := casbin.NewTransactionalEnforcer("model.conf", adapter)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create Casbin enforcer: %w", err)
-	}
-	return enforcer, nil
+	return adapter, nil
 }
 
-var ProvideCasbinEnforcer = NewCasbinEnforcer
+var ProvideCasbinAdapter = NewCasbinAdapter

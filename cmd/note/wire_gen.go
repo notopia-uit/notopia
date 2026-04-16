@@ -242,7 +242,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	kafkaPublisher, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
+	kafkaPublisher, cleanup8, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
 	if err != nil {
 		cleanup7()
 		cleanup6()
@@ -255,6 +255,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, defaultPostgreSQLSchema, pool)
 	if err != nil {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()
@@ -265,8 +266,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	healthHealth := health.New(pg, configServer, workspaceEventHub, redisClient)
-	meterProvider, cleanup8, err := otel.NewMeterProvider(ctx, resource)
+	meterProvider, cleanup9, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()
@@ -279,6 +281,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
 	noteServer := note.NewServer(pg, httpHTTP, grpcGRPC, eventEvent, workspaceEventHub, outboxOutbox, healthHealth, logger, global)
 	return noteServer, func() {
+		cleanup9()
 		cleanup8()
 		cleanup7()
 		cleanup6()

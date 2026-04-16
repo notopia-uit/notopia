@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
@@ -21,7 +22,7 @@ func NewIntegrationPublisher(
 	cfg *commonconfig.Kafka,
 	logger watermill.LoggerAdapter,
 	tracer kafka.SaramaTracer,
-) (*IntegrationPublisher, error) {
+) (*IntegrationPublisher, func(), error) {
 	publisher, err := kafka.NewPublisher(
 		kafka.PublisherConfig{
 			Brokers: cfg.Brokers,
@@ -30,11 +31,16 @@ func NewIntegrationPublisher(
 		logger,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create Kafka publisher: %w", err)
+		return nil, nil, fmt.Errorf("failed to create Kafka publisher: %w", err)
+	}
+	cleanup := func() {
+		if err := publisher.Close(); err != nil {
+			slog.Error("failed to close Kafka publisher", slog.Any("error", err))
+		}
 	}
 	return &IntegrationPublisher{
 		publisher: publisher,
-	}, nil
+	}, cleanup, nil
 }
 
 var ProvideIntegrationPublisher = NewIntegrationPublisher

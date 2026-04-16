@@ -1,32 +1,21 @@
-package app_test
+package app
 
 import (
 	_ "embed"
 	"fmt"
-	"testing"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/casbin/casbin/v3/model"
-	stringadapter "github.com/casbin/casbin/v3/persist/string-adapter"
 )
 
 //go:embed model.conf
 var modelConf string
 
-//go:embed policy.csv
-var policyCSV string
+type CasbinAdapter any
 
-//go:embed policy_test.csv
-var policyTestCSV string
-
-func GetLocalEnforcer(t testing.TB, loadTestPolicies bool) (*casbin.TransactionalEnforcer, error) {
-	t.Helper()
-
-	policy := policyCSV
-	if loadTestPolicies {
-		policy += "\n" + policyTestCSV
-	}
-	adapter := stringadapter.NewAdapter(policy)
+func NewCasbinEnforcer(
+	adapter CasbinAdapter,
+) (*casbin.TransactionalEnforcer, error) {
 	model, err := model.NewModelFromString(modelConf)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load Casbin model: %w", err)
@@ -37,3 +26,5 @@ func GetLocalEnforcer(t testing.TB, loadTestPolicies bool) (*casbin.Transactiona
 	}
 	return enforcer, nil
 }
+
+var ProvideCasbinEnforcer = NewCasbinEnforcer

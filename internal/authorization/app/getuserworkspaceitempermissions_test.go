@@ -10,7 +10,7 @@ import (
 )
 
 func TestGetUserWorkspaceItemPermissionsHandler(t *testing.T) {
-	e, err := GetLocalEnforcer(true)
+	e, err := GetLocalEnforcer(t, true)
 	require.NoError(t, err, "Failed to create enforcer")
 
 	handler := app.NewGetUserWorkspaceItemPermissionsHandler(e)
