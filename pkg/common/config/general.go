@@ -5,7 +5,7 @@ import (
 )
 
 type General struct {
-	TZ string `json:"tz" mapstructure:"tz" validate:"" yaml:"tz"`
+	TZ string `json:"tz" mapstructure:"tz" validate:"timezone" yaml:"tz"`
 }
 
 func GeneralViperSetDefault(

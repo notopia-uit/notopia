@@ -16,24 +16,24 @@ type GetMyWorkspacesReadModel interface {
 }
 
 type GetMyWorkspacesHandler struct {
-	authorizationService AuthorizationService
-	readModel            GetMyWorkspacesReadModel
+	authorizationSvc AuthorizationSvc
+	readModel        GetMyWorkspacesReadModel
 }
 
 func NewGetMyWorkspacesHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	readModel GetMyWorkspacesReadModel,
 ) *GetMyWorkspacesHandler {
 	return &GetMyWorkspacesHandler{
-		authorizationService: authorizationService,
-		readModel:            readModel,
+		authorizationSvc: authorizationSvc,
+		readModel:        readModel,
 	}
 }
 
 var ProvideGetMyWorkspacesHandler = NewGetMyWorkspacesHandler
 
 func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspaces) ([]*UserWorkspace, error) {
-	authorizationUserWorkspaces, err := h.authorizationService.GetUserWorkspaces(ctx, query.UserID)
+	authorizationUserWorkspaces, err := h.authorizationSvc.GetUserWorkspaces(ctx, query.UserID)
 	if err != nil {
 		return nil, err
 	}

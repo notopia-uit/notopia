@@ -11,7 +11,9 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/note/infra/service"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
 type Health struct {
@@ -23,6 +25,8 @@ func New(
 	serverCfg *config.Server,
 	workspaceEventHub app.WorkspaceEventHub,
 	redisClient *workspaceevent.RedisClient,
+	authorizationSvc *service.Authorization,
+	authentikCfg *commonconfig.Authentik,
 ) *Health {
 	startupChecker := health.NewChecker(
 		health.WithCheck(
@@ -53,6 +57,7 @@ func New(
 				},
 			},
 		),
+
 		health.WithPeriodicCheck(
 			15*time.Second,
 			3*time.Second,
@@ -63,6 +68,7 @@ func New(
 				}),
 			},
 		),
+
 		health.WithPeriodicCheck(
 			15*time.Second,
 			3*time.Second,
@@ -73,6 +79,7 @@ func New(
 				}),
 			},
 		),
+
 		// TODO: this have to check kafka, not the pub sub
 		health.WithPeriodicCheck(
 			15*time.Second,
@@ -82,6 +89,28 @@ func New(
 				Check: func(ctx context.Context) error {
 					return redisClient.Ping(ctx).Err()
 				},
+			},
+		),
+
+		health.WithPeriodicCheck(
+			15*time.Second,
+			3*time.Second,
+			health.Check{
+				Name: "authorization service",
+				Check: func(ctx context.Context) error {
+					return authorizationSvc.CheckHealth(ctx)
+				},
+			},
+		),
+
+		health.WithPeriodicCheck(
+			15*time.Second,
+			3*time.Second,
+			health.Check{
+				Name: "authentik",
+				Check: httpCheck.New(httpCheck.Config{
+					URL: authentikCfg.HealthLiveURL(),
+				}),
 			},
 		),
 	)

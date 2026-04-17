@@ -22,20 +22,20 @@ type GetNoteGraphReadModel interface {
 }
 
 type GetNoteGraphHandler struct {
-	authorizationService AuthorizationService
-	noteRepo             domain.NoteRepo
-	readModel            GetNoteGraphReadModel
+	authorizationSvc AuthorizationSvc
+	noteRepo         domain.NoteRepo
+	readModel        GetNoteGraphReadModel
 }
 
 func NewGetNoteGraphHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	noteRepo domain.NoteRepo,
 	readModel GetNoteGraphReadModel,
 ) *GetNoteGraphHandler {
 	return &GetNoteGraphHandler{
-		authorizationService: authorizationService,
-		noteRepo:             noteRepo,
-		readModel:            readModel,
+		authorizationSvc: authorizationSvc,
+		noteRepo:         noteRepo,
+		readModel:        readModel,
 	}
 }
 
@@ -46,7 +46,7 @@ func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (
 	if err != nil {
 		return nil, err
 	}
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
 		workspaceID,

@@ -20,24 +20,24 @@ type GetWorkspaceGraphReadModel interface {
 }
 
 type GetWorkspaceGraphHandler struct {
-	authorizationService AuthorizationService
-	readModel            GetWorkspaceGraphReadModel
+	authorizationSvc AuthorizationSvc
+	readModel        GetWorkspaceGraphReadModel
 }
 
 func NewGetWorkspaceGraphHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	readModel GetWorkspaceGraphReadModel,
 ) *GetWorkspaceGraphHandler {
 	return &GetWorkspaceGraphHandler{
-		authorizationService: authorizationService,
-		readModel:            readModel,
+		authorizationSvc: authorizationSvc,
+		readModel:        readModel,
 	}
 }
 
 var ProvideGetWorkspaceGraphHandler = NewGetWorkspaceGraphHandler
 
 func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspaceGraph) (*Graph, error) {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
 		query.ID,

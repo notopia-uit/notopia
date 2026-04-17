@@ -102,6 +102,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema, serviceName)
 	runInTx := pgrepo.NewRunInTx(fromPersistenceToQSLForwarder)
 	unitOfWork := pgrepo.NewUnitOfWork(pool, fromPersistenceToQSLForwarder, runInTx)
+	changeWorkspaceSlugHandler := app.NewChangeWorkspaceSlugHandler(authorization, unitOfWork)
 	createFolderHandler := app.NewCreateFolderHandler(authorization, unitOfWork)
 	createNoteHandler := app.NewCreateNoteHandler(authorization, unitOfWork)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(unitOfWork, authorization)
@@ -137,6 +138,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization)
 	cmds := &app.Cmds{
+		ChangeWorkspaceSlugHandler:             changeWorkspaceSlugHandler,
 		CreateFolderHandler:                    createFolderHandler,
 		CreateNoteHandler:                      createNoteHandler,
 		CreateWorkspaceHandler:                 createWorkspaceHandler,
@@ -159,9 +161,13 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
 	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(workspaceEventHub)
+	notifyWorkspaceRenamedHandler := app.NewNotifyWorkspaceRenamedHandler(workspaceEventHub)
+	notifyWorkspaceSlugChangedHandler := app.NewNotifyWorkspaceSlugChangedHandler(workspaceEventHub)
 	events := &app.Events{
-		DocumentCommittedHandler:    documentCommittedHandler,
-		NotifyWorkspaceItemsUpdated: notifyWorkspaceItemsUpdatedHandler,
+		DocumentCommittedHandler:           documentCommittedHandler,
+		NotifyWorkspaceItemsUpdatedHandler: notifyWorkspaceItemsUpdatedHandler,
+		NotifyWorkspaceRenamedHandler:      notifyWorkspaceRenamedHandler,
+		NotifyWorkspaceSlugChangedHandler:  notifyWorkspaceSlugChangedHandler,
 	}
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)
@@ -265,7 +271,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	healthHealth := health.New(pg, configServer, workspaceEventHub, redisClient)
+	healthHealth := health.New(pg, configServer, workspaceEventHub, redisClient, authorization, authentik)
 	meterProvider, cleanup9, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup8()

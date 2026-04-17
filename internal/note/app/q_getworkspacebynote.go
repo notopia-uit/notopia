@@ -18,17 +18,17 @@ type GetWorkspaceByNoteReadModel interface {
 }
 
 type GetWorkspaceByNoteHandler struct {
-	authorizationService AuthorizationService
-	readModel            GetWorkspaceByNoteReadModel
+	authorizationSvc AuthorizationSvc
+	readModel        GetWorkspaceByNoteReadModel
 }
 
 func NewGetWorkspaceByNoteHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	readModel GetWorkspaceByNoteReadModel,
 ) *GetWorkspaceByNoteHandler {
 	return &GetWorkspaceByNoteHandler{
-		authorizationService: authorizationService,
-		readModel:            readModel,
+		authorizationSvc: authorizationSvc,
+		readModel:        readModel,
 	}
 }
 
@@ -39,7 +39,7 @@ func (h *GetWorkspaceByNoteHandler) Handle(ctx context.Context, query *GetWorksp
 	if err != nil {
 		return nil, err
 	}
-	hasPermission, err := h.authorizationService.HasWorkspacePermission(ctx, query.UserID, workspace.ID, WorkspacePermissionRead)
+	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, query.UserID, workspace.ID, WorkspacePermissionRead)
 	if err != nil {
 		return nil, err
 	}

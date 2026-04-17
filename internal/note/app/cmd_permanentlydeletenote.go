@@ -15,17 +15,17 @@ type PermanentlyDeleteNote struct {
 }
 
 type PermanentlyDeleteNoteHandler struct {
-	authorizationService AuthorizationService
-	uow                  domain.UnitOfWork
+	authorizationSvc AuthorizationSvc
+	uow              domain.UnitOfWork
 }
 
 func PermanentlyNewDeleteNoteHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *PermanentlyDeleteNoteHandler {
 	return &PermanentlyDeleteNoteHandler{
-		authorizationService: authorizationService,
-		uow:                  uow,
+		authorizationSvc: authorizationSvc,
+		uow:              uow,
 	}
 }
 
@@ -44,7 +44,7 @@ func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *Permanen
 		//	If the authorization check is remote, the delete transaction stays open while waiting on another service,
 		//	which increases lock time and failure blast radius for a simple permission lookup.
 		//	Keep the auth check outside the write transaction, then re-load/delete inside the transaction.
-		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionDelete)
+		hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionDelete)
 		if err != nil {
 			return err
 		}

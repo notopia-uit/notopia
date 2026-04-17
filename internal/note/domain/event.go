@@ -11,6 +11,7 @@ type Event interface {
 	GetOccurredAt() time.Time
 	GetAggregateID() uuid.UUID
 	GetUserID() string
+	isDomainEvent()
 }
 
 type BaseEvent struct {
@@ -30,9 +31,11 @@ func (e *BaseEvent) GetAggregateID() uuid.UUID { return e.AggregateID }
 
 func (e *BaseEvent) GetUserID() string { return e.UserID }
 
+func (e *BaseEvent) isDomainEvent() {}
+
 func NewBaseEvent(aggregateID uuid.UUID, userID string) BaseEvent {
 	return BaseEvent{
-		ID:          uuid.New(),
+		ID:          uuid.New(), // maybe uuid v7 isn't necessary here
 		OccurredAt:  time.Now(),
 		AggregateID: aggregateID,
 		UserID:      userID,

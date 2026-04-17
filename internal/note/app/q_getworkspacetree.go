@@ -22,24 +22,24 @@ type GetWorkspaceTreeReadModel interface {
 }
 
 type GetWorkspaceTreeHandler struct {
-	authorizationService AuthorizationService
-	readModel            GetWorkspaceTreeReadModel
+	authorizationSvc AuthorizationSvc
+	readModel        GetWorkspaceTreeReadModel
 }
 
 func NewGetWorkspaceTreeHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	readModel GetWorkspaceTreeReadModel,
 ) *GetWorkspaceTreeHandler {
 	return &GetWorkspaceTreeHandler{
-		authorizationService: authorizationService,
-		readModel:            readModel,
+		authorizationSvc: authorizationSvc,
+		readModel:        readModel,
 	}
 }
 
 var ProvideGetWorkspaceTreeHandler = NewGetWorkspaceTreeHandler
 
 func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspaceTree) (*WorkspaceTreeFolder, error) {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
 		query.WorkspaceID,

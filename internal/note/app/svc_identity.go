@@ -2,6 +2,6 @@ package app
 
 import "context"
 
-type IdentityService interface {
+type IdentitySvc interface {
 	GetUsersByIDs(ctx context.Context, ids []string) ([]*User, error)
 }

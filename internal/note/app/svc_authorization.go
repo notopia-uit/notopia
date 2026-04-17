@@ -64,7 +64,7 @@ type AuthorizationUserWorkspace struct {
 	Role WorkspaceRole
 }
 
-type AuthorizationService interface {
+type AuthorizationSvc interface {
 	GetUserWorkspaces(
 		ctx context.Context,
 		userID string,

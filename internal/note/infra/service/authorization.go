@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -14,6 +15,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func authorizationUnaryClientErrorInterceptor() grpc.UnaryClientInterceptor {
@@ -35,9 +37,10 @@ func authorizationUnaryClientErrorInterceptor() grpc.UnaryClientInterceptor {
 
 type Authorization struct {
 	client pb.AuthorizationServiceClient
+	conn   *grpc.ClientConn
 }
 
-var _ app.AuthorizationService = (*Authorization)(nil)
+var _ app.AuthorizationSvc = (*Authorization)(nil)
 
 func NewAuthorization(
 	servicesCfg *config.Services,
@@ -54,7 +57,7 @@ func NewAuthorization(
 		),
 	)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to dial authorization service: %w", err)
+		return nil, nil, fmt.Errorf("invalid authorization service client configuration: %w", err)
 	}
 	client := pb.NewAuthorizationServiceClient(conn)
 
@@ -65,6 +68,7 @@ func NewAuthorization(
 	}
 	return &Authorization{
 		client: client,
+		conn:   conn,
 	}, cleanup, nil
 }
 
@@ -166,6 +170,20 @@ func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, 
 		return nil, err
 	}
 	return members, nil
+}
+
+func (a *Authorization) CheckHealth(ctx context.Context) error {
+	client := grpc_health_v1.NewHealthClient(a.conn)
+	response, err := client.Check(ctx, &grpc_health_v1.HealthCheckRequest{
+		Service: "",
+	})
+	if err != nil {
+		return err
+	}
+	if response.Status != grpc_health_v1.HealthCheckResponse_SERVING {
+		return errors.New("authorization service is not healthy")
+	}
+	return nil
 }
 
 func (a *Authorization) toWorkspaceMembersPb(members []*app.WorkspaceMemberUpdate) ([]*pb.WorkspaceMember, error) {

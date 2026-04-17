@@ -124,7 +124,21 @@ func (e *Event) setup() error {
 		"DocumentCommittedHandler",
 		e.documentCommittedHandler,
 	)); err != nil {
-		return fmt.Errorf("failed to add event handler: %w", err)
+		return fmt.Errorf("failed to add event handler DocumentCommittedHandler: %w", err)
+	}
+
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"NotifyWorkspaceRenamedHandler",
+		e.app.Events.NotifyWorkspaceRenamedHandler.Handle,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler NotifyWorkspaceRenamedHandler: %w", err)
+	}
+
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"NotifyWorkspaceSlugChangedHandler",
+		e.app.Events.NotifyWorkspaceSlugChangedHandler.Handle,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler NotifyWorkspaceSlugChangedHandler: %w", err)
 	}
 
 	// NOTE: because watermill doesn't support kafka regex (IBM/sarama)

@@ -39,6 +39,9 @@ type WorkspaceEvent interface {
 	GetEvent() string
 }
 
+// NOTE: This is a shortcut, if we make it right, this
+// must be different from the struct from contract.
+// We only use the data struct from contract, not the whole
 type workspaceEvent[E ~string] struct {
 	Id    uuid.UUID `json:"id"`
 	Event E         `json:"event"`
@@ -71,6 +74,7 @@ type WorkspaceEventWorkspaceDeleted struct {
 	workspaceEvent[note.WorkspaceDeletedEventEvent]
 }
 
+// NOTE: This is just used under infra? Consider move it to infra
 func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
 	switch t {
 	case string(note.WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent):
