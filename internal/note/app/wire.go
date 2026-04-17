@@ -32,6 +32,7 @@ var ProviderSetEvent = wire.NewSet(
 	ProvideDocumentCommittedHandler,
 	ProvideNotifyWorkspaceItemsUpdatedHandler,
 	ProvideNotifyWorkspaceRenamedHandler,
+	ProvideNotifyWorkspaceSlugChangedHandler,
 	wire.Struct(new(Events), "*"),
 )
 

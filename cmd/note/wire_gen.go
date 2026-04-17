@@ -162,10 +162,12 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
 	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(workspaceEventHub)
 	notifyWorkspaceRenamedHandler := app.NewNotifyWorkspaceRenamedHandler(workspaceEventHub)
+	notifyWorkspaceSlugChangedHandler := app.NewNotifyWorkspaceSlugChangedHandler(workspaceEventHub)
 	events := &app.Events{
-		DocumentCommittedHandler:      documentCommittedHandler,
-		NotifyWorkspaceItemsUpdated:   notifyWorkspaceItemsUpdatedHandler,
-		NotifyWorkspaceRenamedHandler: notifyWorkspaceRenamedHandler,
+		DocumentCommittedHandler:          documentCommittedHandler,
+		NotifyWorkspaceItemsUpdated:       notifyWorkspaceItemsUpdatedHandler,
+		NotifyWorkspaceRenamedHandler:     notifyWorkspaceRenamedHandler,
+		NotifyWorkspaceSlugChangedHandler: notifyWorkspaceSlugChangedHandler,
 	}
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)

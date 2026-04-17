@@ -134,7 +134,12 @@ func (e *Event) setup() error {
 		return fmt.Errorf("failed to add event handler NotifyWorkspaceRenamedHandler: %w", err)
 	}
 
-	// TODO: add workspace slug changed here
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"NotifyWorkspaceSlugChangedHandler",
+		e.app.Events.NotifyWorkspaceSlugChangedHandler.Handle,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler NotifyWorkspaceSlugChangedHandler: %w", err)
+	}
 
 	// NOTE: because watermill doesn't support kafka regex (IBM/sarama)
 	// So, we will need to for loop all topic we have, (for note, and folder)
