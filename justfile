@@ -11,6 +11,17 @@ up-api configuration="development":
 lazydocker COMPOSE_PROFILES="*":
     COMPOSE_PROFILES={{ COMPOSE_PROFILES }} lazydocker
 
+docker-up:
+    docker compose \
+      up \
+      -d
+
+docker-up-monitoring:
+    docker compose \
+      --profile="monitoring" \
+      up \
+      -d
+
 export-authentik-blueprint:
     docker exec notopia-authentik_worker ak export_blueprint
 

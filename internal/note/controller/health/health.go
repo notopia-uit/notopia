@@ -3,6 +3,8 @@ package health
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -23,6 +25,7 @@ type Health struct {
 func New(
 	persistence *persistence.Pg,
 	serverCfg *config.Server,
+	kafkaCfg *commonconfig.Kafka,
 	workspaceEventHub app.WorkspaceEventHub,
 	redisClient *workspaceevent.RedisClient,
 	authorizationSvc *service.Authorization,
@@ -35,10 +38,10 @@ func New(
 				Check: func(ctx context.Context) error {
 					ok, err := persistence.IsMigrationDone(ctx)
 					if err != nil {
-						return err
+						return fmt.Errorf("failed to check migration status: %w", err)
 					}
 					if !ok {
-						return errors.New("migration not done")
+						return errors.New("database migration is not completed yet")
 					}
 					return nil
 				},
@@ -53,7 +56,10 @@ func New(
 			health.Check{
 				Name: "persistenceConnection",
 				Check: func(ctx context.Context) error {
-					return persistence.Ping(ctx)
+					if err := persistence.Ping(ctx); err != nil {
+						return fmt.Errorf("failed to ping persistence: %w", err)
+					}
+					return nil
 				},
 			},
 		),
@@ -64,7 +70,7 @@ func New(
 			health.Check{
 				Name: "http",
 				Check: httpCheck.New(httpCheck.Config{
-					URL: serverCfg.HTTP.Address(),
+					URL: "http://" + serverCfg.HTTP.Address(),
 				}),
 			},
 		),
@@ -74,9 +80,16 @@ func New(
 			3*time.Second,
 			health.Check{
 				Name: "grpc",
-				Check: httpCheck.New(httpCheck.Config{
-					URL: serverCfg.GRPC.Address(),
-				}),
+				Check: func(ctx context.Context) error {
+					conn, err := net.DialTimeout("tcp", serverCfg.GRPC.Address(), 5*time.Second)
+					if err != nil {
+						return fmt.Errorf("failed to connect to gRPC server: %w", err)
+					}
+					if err := conn.Close(); err != nil {
+						return fmt.Errorf("failed to close gRPC connection: %w", err)
+					}
+					return nil
+				},
 			},
 		),
 
@@ -85,9 +98,12 @@ func New(
 			15*time.Second,
 			3*time.Second,
 			health.Check{
-				Name: "workspaceEventHub redis connection",
+				Name: "workspaceEventHubRedisConnection",
 				Check: func(ctx context.Context) error {
-					return redisClient.Ping(ctx).Err()
+					if err := redisClient.Ping(ctx).Err(); err != nil {
+						return fmt.Errorf("failed to ping Redis: %w", err)
+					}
+					return nil
 				},
 			},
 		),
@@ -96,9 +112,12 @@ func New(
 			15*time.Second,
 			3*time.Second,
 			health.Check{
-				Name: "authorization service",
+				Name: "authorizationService",
 				Check: func(ctx context.Context) error {
-					return authorizationSvc.CheckHealth(ctx)
+					if err := authorizationSvc.CheckHealth(ctx); err != nil {
+						return fmt.Errorf("failed to check authorization service: %w", err)
+					}
+					return nil
 				},
 			},
 		),
@@ -113,14 +132,38 @@ func New(
 				}),
 			},
 		),
+
+		health.WithPeriodicCheck(
+			15*time.Second,
+			3*time.Second,
+			health.Check{
+				Name: "kafka",
+				Check: func(ctx context.Context) error {
+					if kafkaCfg == nil || len(kafkaCfg.Brokers) == 0 {
+						return errors.New("kafka not configured")
+					}
+					// Try to connect to each broker
+					for i, broker := range kafkaCfg.Brokers {
+						conn, err := net.DialTimeout("tcp", broker, 5*time.Second)
+						if err != nil {
+							return fmt.Errorf("failed to connect to kafka broker %d (%s): %w", i, broker, err)
+						}
+						if err := conn.Close(); err != nil {
+							return fmt.Errorf("failed to close kafka broker %d connection: %w", i, err)
+						}
+					}
+					return nil
+				},
+			},
+		),
 	)
 
 	liveCheck := health.NewChecker()
 
 	mux := http.NewServeMux()
-	mux.Handle("/startup", health.NewHandler(startupChecker))
-	mux.Handle("/ready", health.NewHandler(readyChecker))
-	mux.Handle("/live", health.NewHandler(liveCheck))
+	mux.Handle("/note/health/startup", health.NewHandler(startupChecker))
+	mux.Handle("/note/health/ready", health.NewHandler(readyChecker))
+	mux.Handle("/note/health/live", health.NewHandler(liveCheck))
 	return &Health{
 		&http.Server{
 			Handler: mux,

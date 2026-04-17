@@ -271,7 +271,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	healthHealth := health.New(pg, configServer, workspaceEventHub, redisClient, authorization, authentik)
+	healthHealth := health.New(pg, configServer, kafka, workspaceEventHub, redisClient, authorization, authentik)
 	meterProvider, cleanup9, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup8()

@@ -15,11 +15,13 @@ services:
       - rustfs:/data
     labels:
       traefik.enable: 'true'
-      traefik.http.routers.rustfs.rule: Host(`rustfs-api.notopia.localhost`)
-      traefik.http.routers.rustfs.entrypoints: web
-      traefik.http.services.rustfs.loadbalancer.server.port: '9000'
+      traefik.http.routers.rustfs-api.rule: Host(`rustfs-api.notopia.localhost`)
+      traefik.http.routers.rustfs-api.entrypoints: web
+      traefik.http.routers.rustfs-api.service: rustfs-api
+      traefik.http.services.rustfs-api.loadbalancer.server.port: '9000'
       traefik.http.routers.rustfs-console.rule: Host(`rustfs.notopia.localhost`)
       traefik.http.routers.rustfs-console.entrypoints: web
+      traefik.http.routers.rustfs-console.service: rustfs-console
       traefik.http.services.rustfs-console.loadbalancer.server.port: '9001'
     healthcheck:
       test:
@@ -27,6 +29,8 @@ services:
         - curl
         - -f
         - http://localhost:9001/health
+      start_period: 10s
+      start_interval: 1s
     restart: unless-stopped
 
   rustfs_bucket:

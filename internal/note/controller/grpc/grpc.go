@@ -6,6 +6,8 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 
 	"buf.build/go/protovalidate"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
@@ -47,7 +49,7 @@ func New(
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create protovalidate validator: %w", err)
 	}
-	grpcServer := grpc.NewServer(
+	server := grpc.NewServer(
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
@@ -56,11 +58,14 @@ func New(
 		),
 	)
 	grpc := &GRPC{
-		server:  grpcServer,
+		server:  server,
 		address: cfg.GRPC.Address(),
 	}
-	pb.RegisterNoteServiceServer(grpcServer, serviceServer)
-	return grpc, grpcServer.GracefulStop, nil
+	pb.RegisterNoteServiceServer(server, serviceServer)
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(server, healthServer)
+	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
+	return grpc, server.GracefulStop, nil
 }
 
 func (g *GRPC) Run() error {

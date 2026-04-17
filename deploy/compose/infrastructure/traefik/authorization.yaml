@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://www.schemastore.org/traefik-v3-file-provider.json
+http:
+  routers:
+    authorization:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/authorization`) && !PathPrefix(`/authorization/health`)
+      service: authorization
+      middlewares:
+        - jwt
+    authorization-health:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/authorization/health`)
+      service: authorization-health
+
+  services:
+    authorization:
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:18089
+    authorization-health:
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:28089

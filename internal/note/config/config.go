@@ -81,9 +81,9 @@ func New(
 	viper.SetConfigName("note.notopia.config")
 	viper.AddConfigPath(".")
 
-	viper.SetDefault("server.http.port", 8081)
-	viper.SetDefault("server.grpc.port", 18081)
-	viper.SetDefault("server.health.port", 28081)
+	commonconfig.ServerAddressViperSetDefault(viper, "server.http", 8081)
+	commonconfig.ServerAddressViperSetDefault(viper, "server.grpc", 18081)
+	commonconfig.ServerAddressViperSetDefault(viper, "server.health", 28081)
 	setViperAdvancedDefault(viper)
 	commonconfig.LogViperSetDefault(viper, "log")
 	commonconfig.KafkaViperSetDefault(viper, "kafka", "note-service")

@@ -5,8 +5,8 @@
       "name": "Debug Note",
       "type": "go",
       "request": "launch",
-      "program": "${workspaceFolder}/services/note/cmd",
-      "envFile": "${workspaceFolder}/services/note/.env"
+      "program": "${workspaceFolder}/cmd/note",
+      "envFile": "${workspaceFolder}/cmd/note/.env"
     },
     {
       "name": "Attach to Note",
@@ -14,6 +14,27 @@
       "request": "attach",
       "mode": "remote",
       "port": 23451,
+      "host": "127.0.0.1",
+      "substitutePath": [
+        {
+          "from": "${workspaceFolder}",
+          "to": "${workspaceFolder}"
+        }
+      ]
+    },
+    {
+      "name": "Debug Authorization",
+      "type": "go",
+      "request": "launch",
+      "program": "${workspaceFolder}/cmd/authorization",
+      "envFile": "${workspaceFolder}/cmd/authorization/.env"
+    },
+    {
+      "name": "Attach to Authorization",
+      "type": "go",
+      "request": "attach",
+      "mode": "remote",
+      "port": 23459,
       "host": "127.0.0.1",
       "substitutePath": [
         {

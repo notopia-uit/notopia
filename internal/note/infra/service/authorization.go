@@ -29,6 +29,9 @@ func authorizationUnaryClientErrorInterceptor() grpc.UnaryClientInterceptor {
 	) error {
 		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
+			if method == "/grpc.health.v1.Health/Check" {
+				return err
+			}
 			return errs.NewAuthorizationInternal(err)
 		}
 		return nil

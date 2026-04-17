@@ -4,13 +4,22 @@ http:
     note:
       entryPoints:
         - web
-      rule: Host(`api.notopia.localhost`) && PathPrefix(`/note`)
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/note`) && !PathPrefix(`/note/health`)
       service: note
       middlewares:
         - jwt
+    note-health:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/note/health`)
+      service: note-health
 
   services:
     note:
       loadBalancer:
         servers:
           - url: http://host.docker.internal:8081
+    note-health:
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:28081

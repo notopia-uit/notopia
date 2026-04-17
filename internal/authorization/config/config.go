@@ -11,7 +11,8 @@ import (
 )
 
 type ServerConfig struct {
-	GRPC commonconfig.ServerAddress `json:"grpc" mapstructure:"grpc" validate:"required" yaml:"grpc"`
+	GRPC   commonconfig.ServerAddress `json:"grpc"   mapstructure:"grpc"   validate:"required" yaml:"grpc"`
+	Health commonconfig.ServerAddress `json:"health" mapstructure:"health" validate:"required" yaml:"health"`
 }
 
 type Config struct {
@@ -32,7 +33,8 @@ func NewConfig(
 	viper.SetConfigName("authorization.notopia.config")
 	viper.AddConfigPath(".")
 
-	viper.SetDefault("server.grpc.port", 18089)
+	commonconfig.ServerAddressViperSetDefault(viper, "server.grpc", 18089)
+	commonconfig.ServerAddressViperSetDefault(viper, "server.health", 28089)
 	commonconfig.LogViperSetDefault(viper, "log")
 	commonconfig.SQLViperSetDefault(viper, "database")
 	commonconfig.GeneralViperSetDefault(viper, "general")

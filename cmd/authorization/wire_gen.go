@@ -13,6 +13,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/authorization/app"
 	"github.com/notopia-uit/notopia/internal/authorization/config"
 	"github.com/notopia-uit/notopia/internal/authorization/controller/grpc"
+	"github.com/notopia-uit/notopia/internal/authorization/controller/health"
 	"github.com/notopia-uit/notopia/internal/authorization/infra"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
@@ -96,6 +97,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		cleanup()
 		return nil, nil, err
 	}
+	healthHealth := health.New(db, serverConfig, kafka)
 	meterProvider, cleanup5, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup4()
@@ -105,7 +107,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
-	authorizationServer := authorization.NewServer(server, logger, global)
+	authorizationServer := authorization.NewServer(server, healthHealth, logger, global)
 	return authorizationServer, func() {
 		cleanup5()
 		cleanup4()
