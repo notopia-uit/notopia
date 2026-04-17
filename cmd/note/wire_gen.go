@@ -164,10 +164,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	notifyWorkspaceRenamedHandler := app.NewNotifyWorkspaceRenamedHandler(workspaceEventHub)
 	notifyWorkspaceSlugChangedHandler := app.NewNotifyWorkspaceSlugChangedHandler(workspaceEventHub)
 	events := &app.Events{
-		DocumentCommittedHandler:          documentCommittedHandler,
-		NotifyWorkspaceItemsUpdated:       notifyWorkspaceItemsUpdatedHandler,
-		NotifyWorkspaceRenamedHandler:     notifyWorkspaceRenamedHandler,
-		NotifyWorkspaceSlugChangedHandler: notifyWorkspaceSlugChangedHandler,
+		DocumentCommittedHandler:           documentCommittedHandler,
+		NotifyWorkspaceItemsUpdatedHandler: notifyWorkspaceItemsUpdatedHandler,
+		NotifyWorkspaceRenamedHandler:      notifyWorkspaceRenamedHandler,
+		NotifyWorkspaceSlugChangedHandler:  notifyWorkspaceSlugChangedHandler,
 	}
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)
@@ -271,7 +271,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	healthHealth := health.New(pg, configServer, workspaceEventHub, redisClient)
+	healthHealth := health.New(pg, configServer, workspaceEventHub, redisClient, authorization, authentik)
 	meterProvider, cleanup9, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup8()

@@ -10,10 +10,6 @@ import (
 )
 
 func (e *Event) notifyWorkspaceItemsUpdatedNoteHandler(msg *message.Message) error {
-	noteIDStr := msg.Metadata.Get(e.domainEventCfg.MessageMetadataAggregateIDKey)
-	if noteIDStr == "" {
-		return errors.New("missing note id in message metadata in notifyWorkspaceItemsUpdatedNoteHandler")
-	}
 	workspaceIDStr := msg.Metadata.Get(e.domainEventCfg.MessageWorkspaceIDKey)
 	if workspaceIDStr == "" {
 		return errors.New("missing workspace id in message metadata in notifyWorkspaceItemsUpdatedNoteHandler")
@@ -26,7 +22,7 @@ func (e *Event) notifyWorkspaceItemsUpdatedNoteHandler(msg *message.Message) err
 	if userID == "" {
 		return errors.New("missing user id in message metadata in notifyWorkspaceItemsUpdatedNoteHandler")
 	}
-	if err := e.app.Events.NotifyWorkspaceItemsUpdated.Handle(&app.NotifyWorkspaceItemsUpdated{
+	if err := e.app.Events.NotifyWorkspaceItemsUpdatedHandler.Handle(&app.NotifyWorkspaceItemsUpdated{
 		WorkspaceID: workspaceID,
 		UserID:      userID,
 	}); err != nil {
@@ -36,10 +32,6 @@ func (e *Event) notifyWorkspaceItemsUpdatedNoteHandler(msg *message.Message) err
 }
 
 func (e *Event) notifyWorkspaceItemsUpdatedFolderHandler(msg *message.Message) error {
-	folderIDStr := msg.Metadata.Get(e.domainEventCfg.MessageMetadataAggregateIDKey)
-	if folderIDStr == "" {
-		return errors.New("missing folder id in message metadata in notifyWorkspaceItemsUpdatedFolderHandler")
-	}
 	workspaceIDStr := msg.Metadata.Get(e.domainEventCfg.MessageWorkspaceIDKey)
 	if workspaceIDStr == "" {
 		return errors.New("missing workspace id in message metadata in notifyWorkspaceItemsUpdatedFolderHandler")
@@ -52,7 +44,7 @@ func (e *Event) notifyWorkspaceItemsUpdatedFolderHandler(msg *message.Message) e
 	if userID == "" {
 		return errors.New("missing user id in message metadata in notifyWorkspaceItemsUpdatedFolderHandler")
 	}
-	if err := e.app.Events.NotifyWorkspaceItemsUpdated.Handle(&app.NotifyWorkspaceItemsUpdated{
+	if err := e.app.Events.NotifyWorkspaceItemsUpdatedHandler.Handle(&app.NotifyWorkspaceItemsUpdated{
 		WorkspaceID: workspaceID,
 		UserID:      userID,
 	}); err != nil {
