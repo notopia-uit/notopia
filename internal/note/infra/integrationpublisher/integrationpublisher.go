@@ -8,6 +8,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/notopia-uit/notopia/internal/note/app"
+	"github.com/notopia-uit/notopia/internal/note/component"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 )
 
@@ -35,7 +36,7 @@ func (p *IntegrationPublisher) Publish(ctx context.Context, events ...app.Integr
 		if err != nil {
 			return fmt.Errorf("cannot convert event to integration event: %w", err)
 		}
-		topic, err := getIntegrationEventTopic(event)
+		topic, err := component.IntegrationEventToTopic(event)
 		if err != nil {
 			return fmt.Errorf("cannot get topic for integration event: %w", err)
 		}
@@ -82,16 +83,4 @@ func transformIntegrationEvent(event app.IntegrationEvent) (any, error) {
 		}, nil
 	}
 	return nil, fmt.Errorf("unknown integration event type: %T", event)
-}
-
-func getIntegrationEventTopic(event app.IntegrationEvent) (string, error) {
-	switch event.(type) {
-	case app.IntegrationEventNoteCreated:
-		return "events.integration.note.note.created", nil
-	case app.IntegrationEventNoteDeleted:
-		return "events.integration.note.note.deleted", nil
-	case app.IntegrationEventNoteUpdated:
-		return "events.integration.note.note.updated", nil
-	}
-	return "", fmt.Errorf("unknown integration event type: %T", event)
 }

@@ -41,6 +41,8 @@ func DomainEventToTopic(event domain.Event) (string, error) {
 		return DomainEventTopicPrefix + "note.size_changed", nil
 	case *domain.NoteMovedEvent:
 		return DomainEventTopicPrefix + "note.moved", nil
+	case *domain.NoteOutgoingLinksChangedEvent:
+		return DomainEventTopicPrefix + "note.outgoing_links_changed", nil
 	case *domain.NoteTrashedEvent:
 		return DomainEventTopicPrefix + "note.trashed", nil
 	case *domain.NoteRestoredEvent:
@@ -58,7 +60,7 @@ func DomainEventToTopic(event domain.Event) (string, error) {
 
 const IntegrationEventTopicPrefix = "events.integration.note."
 
-func getIntegrationEventTopic(event app.IntegrationEvent) (string, error) {
+func IntegrationEventToTopic(event app.IntegrationEvent) (string, error) {
 	switch event.(type) {
 	case app.IntegrationEventNoteCreated:
 		return IntegrationEventTopicPrefix + "note.created", nil
