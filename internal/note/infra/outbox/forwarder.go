@@ -42,9 +42,9 @@ func (p *ForwarderPublisher) PublishWorkspaceItem(ctx context.Context, event dom
 	msg.Metadata.Set(p.workspaceIDKey, workspaceID.String())
 	msg.Metadata.Set(p.aggregateIDKey, event.GetAggregateID().String())
 	msg.Metadata.Set(p.userIDKey, event.GetUserID())
-	topic, ok := component.DomainEventToTopic(event)
-	if !ok {
-		return fmt.Errorf("failed to get forwader event bus topic for event type: %T", event)
+	topic, err := component.DomainEventToTopic(event)
+	if err != nil {
+		return fmt.Errorf("failed to get forwarder event bus topic: %w", err)
 	}
 	if err := p.publisher.Publish(topic, msg); err != nil {
 		return fmt.Errorf("failed to publish forwarder SQL event to event bus: %w", err)
@@ -58,9 +58,9 @@ func (p *ForwarderPublisher) Publish(ctx context.Context, event domain.Event) er
 		return fmt.Errorf("failed to marshal event for forwarder publisher: %w", err)
 	}
 	msg := message.NewMessage(watermill.NewUUID(), payload)
-	topic, ok := component.DomainEventToTopic(event)
-	if !ok {
-		return fmt.Errorf("failed to get forwader event bus topic for event type: %T", event)
+	topic, err := component.DomainEventToTopic(event)
+	if err != nil {
+		return fmt.Errorf("failed to get forwarder event bus topic: %w", err)
 	}
 	if err := p.publisher.Publish(topic, msg); err != nil {
 		return fmt.Errorf("failed to publish forwarder SQL event to event bus: %w", err)

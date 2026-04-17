@@ -41,5 +41,5 @@ func toWorkspaceRole(r note.WorkspaceRole) (app.WorkspaceRole, error) {
 	case note.Viewer:
 		return app.WorkspaceRoleViewer, nil
 	}
-	return app.WorkspaceRoleViewer, errs.NewInvalid(fmt.Sprintf("invalid workspace role: %v", r))
+	return 0, errs.NewInvalid(fmt.Sprintf("invalid workspace role: %v", r))
 }

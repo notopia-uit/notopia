@@ -6,35 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type EventType string
-
-var (
-	EventTypeUnspecified EventType = "UnspecifiedEvent"
-
-	EventTypeFolderCreated            EventType = "FolderCreatedEvent"
-	EventTypeFolderDeleted            EventType = "FolderDeletedEvent"
-	EventTypeFolderUpdated            EventType = "FolderUpdatedEvent"
-	EventTypeFolderMoved              EventType = "FolderMovedEvent"
-	EventTypeFolderTrashed            EventType = "FolderTrashedEvent"
-	EventTypeFolderRestored           EventType = "FolderRestoredEvent"
-	EventTypeFolderPermanentlyDeleted EventType = "FolderPermanentlyDeletedEvent"
-
-	EventTypeNoteCreated            EventType = "NoteCreatedEvent"
-	EventTypeNoteDeleted            EventType = "NoteDeletedEvent"
-	EventTypeNoteUpdated            EventType = "NoteUpdatedEvent"
-	EventTypeNoteMoved              EventType = "NoteMovedEvent"
-	EventTypeNoteTrashed            EventType = "NoteTrashedEvent"
-	EventTypeNoteRestored           EventType = "NoteRestoredEvent"
-	EventTypeNotePermanentlyDeleted EventType = "NotePermanentlyDeletedEvent"
-
-	EventTypeWorkspaceUpdated EventType = "WorkspaceUpdatedEvent"
-	EventTypeWorkspaceDeleted EventType = "WorkspaceDeletedEvent"
-)
-
-func (t EventType) String() string {
-	return string(t)
-}
-
 type Event interface {
 	GetID() uuid.UUID
 	GetOccurredAt() time.Time
@@ -43,10 +14,10 @@ type Event interface {
 }
 
 type BaseEvent struct {
-	ID          uuid.UUID `json:"id"`
-	OccurredAt  time.Time `json:"occurredAt"`
-	AggregateID uuid.UUID `json:"aggregateId"`
-	UserID      string    `json:"userId"`
+	ID          uuid.UUID
+	OccurredAt  time.Time
+	AggregateID uuid.UUID
+	UserID      string
 }
 
 var _ Event = (*BaseEvent)(nil)
@@ -68,73 +39,35 @@ func NewBaseEvent(aggregateID uuid.UUID, userID string) BaseEvent {
 	}
 }
 
-func GetEventType(e Event) EventType {
-	if e == nil {
-		return EventTypeUnspecified
-	}
-	switch e.(type) {
-	case *FolderCreatedEvent:
-		return EventTypeFolderCreated
-	case *FolderDeletedEvent:
-		return EventTypeFolderDeleted
-	case *FolderUpdatedEvent:
-		return EventTypeFolderUpdated
-	case *FolderMovedEvent:
-		return EventTypeFolderMoved
-	case *FolderTrashedEvent:
-		return EventTypeFolderTrashed
-	case *FolderRestoredEvent:
-		return EventTypeFolderRestored
-	case *FolderPermanentlyDeletedEvent:
-		return EventTypeFolderPermanentlyDeleted
-	case *NoteCreatedEvent:
-		return EventTypeNoteCreated
-	case *NoteDeletedEvent:
-		return EventTypeNoteDeleted
-	case *NoteUpdatedEvent:
-		return EventTypeNoteUpdated
-	case *NoteMovedEvent:
-		return EventTypeNoteMoved
-	case *NoteTrashedEvent:
-		return EventTypeNoteTrashed
-	case *NoteRestoredEvent:
-		return EventTypeNoteRestored
-	case *NotePermanentlyDeletedEvent:
-		return EventTypeNotePermanentlyDeleted
-	case *WorkspaceUpdatedEvent:
-		return EventTypeWorkspaceUpdated
-	case *WorkspaceDeletedEvent:
-		return EventTypeWorkspaceDeleted
-	default:
-		return EventTypeUnspecified
-	}
-}
-
 type FolderCreatedEvent struct {
 	BaseEvent
-	Name string `json:"name"`
-	Icon string `json:"icon"`
+	Name string
+	Icon string
 }
 
 type FolderDeletedEvent struct {
 	BaseEvent
 }
 
-type FolderUpdatedEvent struct {
+type FolderRenamedEvent struct {
 	BaseEvent
-	Name string `json:"name"`
-	Icon string `json:"icon"`
+	Name string
+}
+
+type FolderIconChangedEvent struct {
+	BaseEvent
+	Icon string
 }
 
 type NoteCreatedEvent struct {
 	BaseEvent
-	Name string `json:"name"`
-	Icon string `json:"icon"`
+	Name string
+	Icon string
 }
 
 type FolderMovedEvent struct {
 	BaseEvent
-	ParentID uuid.UUID `json:"parentId"`
+	ParentID uuid.UUID
 }
 
 type FolderTrashedEvent struct {
@@ -153,19 +86,34 @@ type NoteDeletedEvent struct {
 	BaseEvent
 }
 
-type NoteUpdatedEvent struct {
+type NoteRenamedEvent struct {
 	BaseEvent
-	Name          string     `json:"name"`
-	Icon          string     `json:"icon"`
-	Tags          []string   `json:"tags"`
-	Size          uint64     `json:"size"`
-	FolderID      uuid.UUID  `json:"folderId"`
-	OutgoingLinks uuid.UUIDs `json:"outgoingLinks"`
+	Name string
+}
+
+type NoteIconChangedEvent struct {
+	BaseEvent
+	Icon string
+}
+
+type NoteTagsChangedEvent struct {
+	BaseEvent
+	Tags []string
+}
+
+type NoteSizeChangedEvent struct {
+	BaseEvent
+	Size uint64
+}
+
+type NoteOutgoingLinksChangedEvent struct {
+	BaseEvent
+	OutgoingLinks uuid.UUIDs
 }
 
 type NoteMovedEvent struct {
 	BaseEvent
-	FolderID uuid.UUID `json:"folderId"`
+	FolderID uuid.UUID
 }
 
 type NoteTrashedEvent struct {
@@ -182,8 +130,8 @@ type NotePermanentlyDeletedEvent struct {
 
 type WorkspaceUpdatedEvent struct {
 	BaseEvent
-	Name string `json:"name"`
-	Slug string `json:"slug"`
+	Name string
+	Slug string
 }
 
 type WorkspaceDeletedEvent struct {
