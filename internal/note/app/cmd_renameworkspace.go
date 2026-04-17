@@ -16,16 +16,16 @@ type RenameWorkspace struct {
 }
 
 type RenameWorkspaceHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	uow                  domain.UnitOfWork
 }
 
 func NewRenameWorkspaceHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *RenameWorkspaceHandler {
 	return &RenameWorkspaceHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		uow:                  uow,
 	}
 }
@@ -33,7 +33,7 @@ func NewRenameWorkspaceHandler(
 var ProvideRenameWorkspaceHandler = NewRenameWorkspaceHandler
 
 func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspace) error {
-	hasPermission, err := h.authorizationService.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionEdit)
+	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionEdit)
 	if err != nil {
 		return err
 	}

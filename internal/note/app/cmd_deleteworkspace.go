@@ -15,16 +15,16 @@ type DeleteWorkspace struct {
 }
 
 type DeleteWorkspaceHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	uow                  domain.UnitOfWork
 }
 
 func NewDeleteWorkspaceHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *DeleteWorkspaceHandler {
 	return &DeleteWorkspaceHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		uow:                  uow,
 	}
 }
@@ -32,7 +32,7 @@ func NewDeleteWorkspaceHandler(
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) error {
-	hasPermission, err := h.authorizationService.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionDelete)
+	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionDelete)
 	if err != nil {
 		return err
 	}

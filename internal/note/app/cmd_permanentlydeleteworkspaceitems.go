@@ -17,16 +17,16 @@ type PermanentlyDeleteWorkspaceItems struct {
 }
 
 type PermanentlyDeleteWorkspaceItemsHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	uow                  domain.UnitOfWork
 }
 
 func NewPermanentlyDeleteWorkspaceItemsHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *PermanentlyDeleteWorkspaceItemsHandler {
 	return &PermanentlyDeleteWorkspaceItemsHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		uow:                  uow,
 	}
 }
@@ -36,7 +36,7 @@ var ProvidePermanentlyDeleteWorkspaceItemsHandler = NewPermanentlyDeleteWorkspac
 // NOTE: We delegate the infra persistence to cascading delete things (folder)
 // Fact, we should handle this in domain, not infra
 func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteWorkspaceItems) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
 	if err != nil {
 		return err
 	}

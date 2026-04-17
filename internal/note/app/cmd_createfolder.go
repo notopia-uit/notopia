@@ -20,16 +20,16 @@ type CreateFolder struct {
 }
 
 type CreateFolderHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	uow                  domain.UnitOfWork
 }
 
 func NewCreateFolderHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *CreateFolderHandler {
 	return &CreateFolderHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		uow:                  uow,
 	}
 }
@@ -37,7 +37,7 @@ func NewCreateFolderHandler(
 var ProvideCreateFolderHandler = NewCreateFolderHandler
 
 func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
 	if err != nil {
 		return err
 	}

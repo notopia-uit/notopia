@@ -16,16 +16,16 @@ type RenameFolder struct {
 }
 
 type RenameFolderHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	uow                  domain.UnitOfWork
 }
 
 func NewRenameFolderHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *RenameFolderHandler {
 	return &RenameFolderHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		uow:                  uow,
 	}
 }
@@ -40,7 +40,7 @@ func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) err
 		if err != nil {
 			return err
 		}
-		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionWrite)
+		hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionWrite)
 		if err != nil {
 			return err
 		}

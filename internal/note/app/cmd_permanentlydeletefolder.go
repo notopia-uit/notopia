@@ -15,16 +15,16 @@ type PermanentlyDeleteFolder struct {
 }
 
 type PermanentlyDeleteFolderHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	uow                  domain.UnitOfWork
 }
 
 func NewPermanentlyDeleteFolderHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *PermanentlyDeleteFolderHandler {
 	return &PermanentlyDeleteFolderHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		uow:                  uow,
 	}
 }
@@ -40,7 +40,7 @@ func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *Perman
 		if err != nil {
 			return err
 		}
-		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionDelete)
+		hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionDelete)
 		if err != nil {
 			return err
 		}

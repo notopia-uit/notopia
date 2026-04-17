@@ -18,16 +18,16 @@ type WorkspaceBySlugReadModel interface {
 }
 
 type GetWorkspaceHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	readModel            WorkspaceBySlugReadModel
 }
 
 func NewGetWorkspaceBySlugHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	readModel WorkspaceBySlugReadModel,
 ) *GetWorkspaceHandler {
 	return &GetWorkspaceHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		readModel:            readModel,
 	}
 }
@@ -42,7 +42,7 @@ func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspaceByS
 	if workspace == nil {
 		return nil, nil
 	}
-	hasPermission, err := h.authorizationService.HasWorkspacePermission(
+	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(
 		ctx,
 		query.UserID,
 		workspace.ID,

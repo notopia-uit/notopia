@@ -18,16 +18,16 @@ type MoveWorkspaceItems struct {
 }
 
 type MoveWorkspaceItemsHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	uow                  domain.UnitOfWork
 }
 
 func NewMoveWorkspaceItemsHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *MoveWorkspaceItemsHandler {
 	return &MoveWorkspaceItemsHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		uow:                  uow,
 	}
 }
@@ -35,7 +35,7 @@ func NewMoveWorkspaceItemsHandler(
 var ProvideMoveWorkspaceItemsHandler = NewMoveWorkspaceItemsHandler
 
 func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
 	if err != nil {
 		return err
 	}

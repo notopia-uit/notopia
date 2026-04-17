@@ -17,18 +17,18 @@ type TrashWorkspaceItems struct {
 }
 
 type TrashWorkspaceItemsHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	uow                  domain.UnitOfWork
 	trashService         *domain.TrashService
 }
 
 func NewTrashWorkspaceItemsHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 	trashService *domain.TrashService,
 ) *TrashWorkspaceItemsHandler {
 	return &TrashWorkspaceItemsHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		uow:                  uow,
 		trashService:         trashService,
 	}
@@ -37,7 +37,7 @@ func NewTrashWorkspaceItemsHandler(
 var ProvideTrashWorkspaceItemsHandler = NewTrashWorkspaceItemsHandler
 
 func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorkspaceItems) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		cmd.UserID,
 		cmd.WorkspaceID,

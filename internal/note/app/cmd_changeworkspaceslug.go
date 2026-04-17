@@ -16,16 +16,16 @@ type ChangeWorkspaceSlug struct {
 }
 
 type ChangeWorkspaceSlugHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	uow                  domain.UnitOfWork
 }
 
 func NewChangeWorkspaceSlugHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *ChangeWorkspaceSlugHandler {
 	return &ChangeWorkspaceSlugHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		uow:                  uow,
 	}
 }
@@ -33,7 +33,7 @@ func NewChangeWorkspaceSlugHandler(
 var ProvideChangeWorkspaceSlugHandler = NewChangeWorkspaceSlugHandler
 
 func (h *ChangeWorkspaceSlugHandler) Handle(ctx context.Context, cmd *ChangeWorkspaceSlug) error {
-	hasPermission, err := h.authorizationService.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionEdit)
+	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionEdit)
 	if err != nil {
 		return err
 	}

@@ -17,16 +17,16 @@ type CreateWorkspace struct {
 
 type CreateWorkspaceHandler struct {
 	uow                  domain.UnitOfWork
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 }
 
 func NewCreateWorkspaceHandler(
 	uow domain.UnitOfWork,
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 ) *CreateWorkspaceHandler {
 	return &CreateWorkspaceHandler{
 		uow:                  uow,
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 	}
 }
 
@@ -66,7 +66,7 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 		//	This is a cross-service side effect inside uow.Execute.
 		//	If the auth call succeeds and the DB commit later fails, note and authorization will diverge.
 		//	Trigger it after commit or via an outbox/after-commit hook instead.
-		if err := h.authorizationService.CreateWorkspaceWithOwner(ctx, cmd.OwnerID, workspace.ID()); err != nil {
+		if err := h.authorizationSvc.CreateWorkspaceWithOwner(ctx, cmd.OwnerID, workspace.ID()); err != nil {
 			return err
 		}
 		return nil

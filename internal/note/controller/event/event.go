@@ -124,8 +124,17 @@ func (e *Event) setup() error {
 		"DocumentCommittedHandler",
 		e.documentCommittedHandler,
 	)); err != nil {
-		return fmt.Errorf("failed to add event handler: %w", err)
+		return fmt.Errorf("failed to add event handler DocumentCommittedHandler: %w", err)
 	}
+
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"NotifyWorkspaceRenamedHandler",
+		e.app.Events.NotifyWorkspaceRenamedHandler.Handle,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler NotifyWorkspaceRenamedHandler: %w", err)
+	}
+
+	// TODO: add workspace slug changed here
 
 	// NOTE: because watermill doesn't support kafka regex (IBM/sarama)
 	// So, we will need to for loop all topic we have, (for note, and folder)
@@ -161,7 +170,7 @@ func (e *Event) setup() error {
 		component.DomainEventTopicPrefix + "note.permanently_deleted",
 	}
 	for _, topic := range workspaceItemUpdatedNoteTopics {
-		e.router.AddConsumerHandler(
+		e.router.AddHandler(
 			fmt.Sprintf("WorkspaceItemsUpdatedHandler.%s", topic),
 			topic,
 			e.subcriber,

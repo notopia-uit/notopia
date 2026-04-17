@@ -16,16 +16,16 @@ type UpdateWorkspaceMembers struct {
 
 type UpdateWorkspaceMembersHandler struct {
 	workspaceEventPublisher WorkspaceEventPublisher
-	authorizationService    AuthorizationService
+	authorizationSvc    AuthorizationSvc
 }
 
 func NewUpdateWorkspaceMembersHandler(
 	workspaceEventPublisher WorkspaceEventPublisher,
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 ) *UpdateWorkspaceMembersHandler {
 	return &UpdateWorkspaceMembersHandler{
 		workspaceEventPublisher: workspaceEventPublisher,
-		authorizationService:    authorizationService,
+		authorizationSvc:    authorizationSvc,
 	}
 }
 
@@ -49,7 +49,7 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateW
 	}
 	// NOTE: We don't check if the user have permission to update workspace members
 	// Because the service has implemented it for us
-	if err := h.authorizationService.UpdateWorkspaceMembers(ctx, cmd.UserID, cmd.WorkspaceID, cmd.Members); err != nil {
+	if err := h.authorizationSvc.UpdateWorkspaceMembers(ctx, cmd.UserID, cmd.WorkspaceID, cmd.Members); err != nil {
 		return err
 	}
 	eventID, err := uuid.NewV7()

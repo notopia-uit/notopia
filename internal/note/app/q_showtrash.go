@@ -19,16 +19,16 @@ type ShowTrashReadModel interface {
 }
 
 type ShowTrashHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	readModel            ShowTrashReadModel
 }
 
 func NewShowTrashHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	readModel ShowTrashReadModel,
 ) *ShowTrashHandler {
 	return &ShowTrashHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		readModel:            readModel,
 	}
 }
@@ -36,7 +36,7 @@ func NewShowTrashHandler(
 var ProvideShowTrashHandler = NewShowTrashHandler
 
 func (h *ShowTrashHandler) Handle(ctx context.Context, query *ShowTrash) (*Trash, error) {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
 		query.WorkspaceID,

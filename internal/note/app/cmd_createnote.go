@@ -19,16 +19,16 @@ type CreateNote struct {
 }
 
 type CreateNoteHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	uow                  domain.UnitOfWork
 }
 
 func NewCreateNoteHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *CreateNoteHandler {
 	return &CreateNoteHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		uow:                  uow,
 	}
 }
@@ -50,7 +50,7 @@ func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) error {
 		if err != nil {
 			return err
 		}
-		hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionWrite)
+		hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionWrite)
 		if err != nil {
 			return err
 		}

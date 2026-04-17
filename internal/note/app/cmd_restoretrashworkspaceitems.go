@@ -17,18 +17,18 @@ type RestoreTrashedWorkspaceItems struct {
 }
 
 type RestoreTrashedWorkspaceItemsHandler struct {
-	authorizationService AuthorizationService
+	authorizationSvc AuthorizationSvc
 	trashService         *domain.TrashService
 	uow                  domain.UnitOfWork
 }
 
 func NewRestoreTrashedWorkspaceItemsHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	trashService *domain.TrashService,
 	uow domain.UnitOfWork,
 ) *RestoreTrashedWorkspaceItemsHandler {
 	return &RestoreTrashedWorkspaceItemsHandler{
-		authorizationService: authorizationService,
+		authorizationSvc: authorizationSvc,
 		trashService:         trashService,
 		uow:                  uow,
 	}
@@ -42,7 +42,7 @@ var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItems
 // Because if we filter, we will need to check no further down the tree has filtered trashed by "purpose" or "parent"
 
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) error {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
 	if err != nil {
 		return err
 	}
