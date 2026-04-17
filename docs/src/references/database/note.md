@@ -2,7 +2,7 @@
 order: 1
 ---
 
-# Database Diagram
+# Note Database Diagram
 
 :::info
 

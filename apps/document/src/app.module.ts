@@ -25,12 +25,10 @@ import {
 import { DatabaseModule } from './database/database.module';
 import { DocumentApi } from './document/document.api';
 import { DocumentEntity } from './document/document.entity';
-import { DocumentRepository } from './document/document.repository';
 import { DocumentService } from './document/document.service';
 import { NoteModule } from './note/note.module';
 import { RevisionApi } from './revision/revision.api';
 import { RevisionEntity } from './revision/revision.entity';
-import { RevisionRepository } from './revision/revision.repository';
 import { RevisionService } from './revision/revision.service';
 import { StorageModule } from './storage/storage.module';
 
@@ -82,12 +80,7 @@ import { StorageModule } from './storage/storage.module';
           documentApi: DocumentApi,
           revisionApi: RevisionApi,
         },
-        providers: [
-          DocumentRepository,
-          DocumentService,
-          RevisionRepository,
-          RevisionService,
-        ],
+        providers: [DocumentService, RevisionService],
       }),
       {
         imports: [

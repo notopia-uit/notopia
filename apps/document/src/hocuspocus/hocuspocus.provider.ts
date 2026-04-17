@@ -4,7 +4,7 @@ import { Hocuspocus } from '@hocuspocus/server';
 import { Logger, Provider } from '@nestjs/common';
 
 import { AuthorizationService } from '#/authorization/authorization.service';
-import { DocumentRepository } from '#/document/document.repository';
+import { DocumentService } from '#/document/document.service';
 import { NoteService } from '#/note/note.service';
 
 import { HocuspocusContext } from './hocuspocus-context';
@@ -12,7 +12,7 @@ import { HocuspocusContext } from './hocuspocus-context';
 export const HocuspocusProvider: Provider = {
   provide: Hocuspocus,
   useFactory: (
-    documentRepository: DocumentRepository,
+    documentService: DocumentService,
     noteService: NoteService,
     authorizationService: AuthorizationService,
     logger: Logger
@@ -25,11 +25,11 @@ export const HocuspocusProvider: Provider = {
         }),
         new Database({
           fetch: async ({ documentName: id }) => {
-            const document = await documentRepository.getById(id);
+            const document = await documentService.getById(id);
             return document?.data ?? null;
           },
           store: async ({ documentName: id, state }) => {
-            await documentRepository.updateDataById(id, state);
+            await documentService.updateDataById(id, state);
           },
         }),
       ],
@@ -45,7 +45,7 @@ export const HocuspocusProvider: Provider = {
           throw new Error(`Document with ID ${documentId} does not exist`);
         }
         const userPermissionsRes =
-          await authorizationService.getUserNotePermissions(
+          await authorizationService.getUserDocumentPermissions(
             context.user.id,
             documentId
           );
@@ -60,5 +60,5 @@ export const HocuspocusProvider: Provider = {
       },
     });
   },
-  inject: [DocumentRepository, NoteService, AuthorizationService, Logger],
+  inject: [DocumentService, NoteService, AuthorizationService, Logger],
 };
