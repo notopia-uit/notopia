@@ -23,7 +23,7 @@ type GetWorkspaceTreeReadModel interface {
 
 type GetWorkspaceTreeHandler struct {
 	authorizationSvc AuthorizationSvc
-	readModel            GetWorkspaceTreeReadModel
+	readModel        GetWorkspaceTreeReadModel
 }
 
 func NewGetWorkspaceTreeHandler(
@@ -32,7 +32,7 @@ func NewGetWorkspaceTreeHandler(
 ) *GetWorkspaceTreeHandler {
 	return &GetWorkspaceTreeHandler{
 		authorizationSvc: authorizationSvc,
-		readModel:            readModel,
+		readModel:        readModel,
 	}
 }
 

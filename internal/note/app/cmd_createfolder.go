@@ -21,7 +21,7 @@ type CreateFolder struct {
 
 type CreateFolderHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func NewCreateFolderHandler(
@@ -30,7 +30,7 @@ func NewCreateFolderHandler(
 ) *CreateFolderHandler {
 	return &CreateFolderHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

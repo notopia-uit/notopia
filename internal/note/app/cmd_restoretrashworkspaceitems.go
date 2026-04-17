@@ -18,8 +18,8 @@ type RestoreTrashedWorkspaceItems struct {
 
 type RestoreTrashedWorkspaceItemsHandler struct {
 	authorizationSvc AuthorizationSvc
-	trashService         *domain.TrashService
-	uow                  domain.UnitOfWork
+	trashService     *domain.TrashService
+	uow              domain.UnitOfWork
 }
 
 func NewRestoreTrashedWorkspaceItemsHandler(
@@ -29,8 +29,8 @@ func NewRestoreTrashedWorkspaceItemsHandler(
 ) *RestoreTrashedWorkspaceItemsHandler {
 	return &RestoreTrashedWorkspaceItemsHandler{
 		authorizationSvc: authorizationSvc,
-		trashService:         trashService,
-		uow:                  uow,
+		trashService:     trashService,
+		uow:              uow,
 	}
 }
 

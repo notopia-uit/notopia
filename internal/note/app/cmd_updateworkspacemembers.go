@@ -16,7 +16,7 @@ type UpdateWorkspaceMembers struct {
 
 type UpdateWorkspaceMembersHandler struct {
 	workspaceEventPublisher WorkspaceEventPublisher
-	authorizationSvc    AuthorizationSvc
+	authorizationSvc        AuthorizationSvc
 }
 
 func NewUpdateWorkspaceMembersHandler(
@@ -25,7 +25,7 @@ func NewUpdateWorkspaceMembersHandler(
 ) *UpdateWorkspaceMembersHandler {
 	return &UpdateWorkspaceMembersHandler{
 		workspaceEventPublisher: workspaceEventPublisher,
-		authorizationSvc:    authorizationSvc,
+		authorizationSvc:        authorizationSvc,
 	}
 }
 

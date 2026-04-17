@@ -170,7 +170,7 @@ func (e *Event) setup() error {
 		component.DomainEventTopicPrefix + "note.permanently_deleted",
 	}
 	for _, topic := range workspaceItemUpdatedNoteTopics {
-		e.router.AddHandler(
+		e.router.AddConsumerHandler(
 			fmt.Sprintf("WorkspaceItemsUpdatedHandler.%s", topic),
 			topic,
 			e.subcriber,

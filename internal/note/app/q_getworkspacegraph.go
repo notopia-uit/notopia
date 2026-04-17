@@ -21,7 +21,7 @@ type GetWorkspaceGraphReadModel interface {
 
 type GetWorkspaceGraphHandler struct {
 	authorizationSvc AuthorizationSvc
-	readModel            GetWorkspaceGraphReadModel
+	readModel        GetWorkspaceGraphReadModel
 }
 
 func NewGetWorkspaceGraphHandler(
@@ -30,7 +30,7 @@ func NewGetWorkspaceGraphHandler(
 ) *GetWorkspaceGraphHandler {
 	return &GetWorkspaceGraphHandler{
 		authorizationSvc: authorizationSvc,
-		readModel:            readModel,
+		readModel:        readModel,
 	}
 }
 

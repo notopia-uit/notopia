@@ -19,7 +19,7 @@ type MoveWorkspaceItems struct {
 
 type MoveWorkspaceItemsHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func NewMoveWorkspaceItemsHandler(
@@ -28,7 +28,7 @@ func NewMoveWorkspaceItemsHandler(
 ) *MoveWorkspaceItemsHandler {
 	return &MoveWorkspaceItemsHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

@@ -23,8 +23,8 @@ type GetNoteGraphReadModel interface {
 
 type GetNoteGraphHandler struct {
 	authorizationSvc AuthorizationSvc
-	noteRepo             domain.NoteRepo
-	readModel            GetNoteGraphReadModel
+	noteRepo         domain.NoteRepo
+	readModel        GetNoteGraphReadModel
 }
 
 func NewGetNoteGraphHandler(
@@ -34,8 +34,8 @@ func NewGetNoteGraphHandler(
 ) *GetNoteGraphHandler {
 	return &GetNoteGraphHandler{
 		authorizationSvc: authorizationSvc,
-		noteRepo:             noteRepo,
-		readModel:            readModel,
+		noteRepo:         noteRepo,
+		readModel:        readModel,
 	}
 }
 

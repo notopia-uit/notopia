@@ -19,7 +19,7 @@ type GetWorkspaceByNoteReadModel interface {
 
 type GetWorkspaceByNoteHandler struct {
 	authorizationSvc AuthorizationSvc
-	readModel            GetWorkspaceByNoteReadModel
+	readModel        GetWorkspaceByNoteReadModel
 }
 
 func NewGetWorkspaceByNoteHandler(
@@ -28,7 +28,7 @@ func NewGetWorkspaceByNoteHandler(
 ) *GetWorkspaceByNoteHandler {
 	return &GetWorkspaceByNoteHandler{
 		authorizationSvc: authorizationSvc,
-		readModel:            readModel,
+		readModel:        readModel,
 	}
 }
 

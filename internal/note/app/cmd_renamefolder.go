@@ -17,7 +17,7 @@ type RenameFolder struct {
 
 type RenameFolderHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func NewRenameFolderHandler(
@@ -26,7 +26,7 @@ func NewRenameFolderHandler(
 ) *RenameFolderHandler {
 	return &RenameFolderHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

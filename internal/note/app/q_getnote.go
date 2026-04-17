@@ -22,8 +22,8 @@ type GetNoteReadModel interface {
 
 type GetNoteHandler struct {
 	authorizationSvc AuthorizationSvc
-	noteRepo             domain.NoteRepo
-	readModel            GetNoteReadModel
+	noteRepo         domain.NoteRepo
+	readModel        GetNoteReadModel
 }
 
 func NewGetNoteHandler(
@@ -33,8 +33,8 @@ func NewGetNoteHandler(
 ) *GetNoteHandler {
 	return &GetNoteHandler{
 		authorizationSvc: authorizationSvc,
-		noteRepo:             noteRepo,
-		readModel:            readModel,
+		noteRepo:         noteRepo,
+		readModel:        readModel,
 	}
 }
 

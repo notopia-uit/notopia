@@ -19,7 +19,7 @@ type WorkspaceBySlugReadModel interface {
 
 type GetWorkspaceHandler struct {
 	authorizationSvc AuthorizationSvc
-	readModel            WorkspaceBySlugReadModel
+	readModel        WorkspaceBySlugReadModel
 }
 
 func NewGetWorkspaceBySlugHandler(
@@ -28,7 +28,7 @@ func NewGetWorkspaceBySlugHandler(
 ) *GetWorkspaceHandler {
 	return &GetWorkspaceHandler{
 		authorizationSvc: authorizationSvc,
-		readModel:            readModel,
+		readModel:        readModel,
 	}
 }
 

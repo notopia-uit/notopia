@@ -17,7 +17,7 @@ type RenameNote struct {
 
 type RenameNoteHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func NewRenameNoteHandler(
@@ -26,7 +26,7 @@ func NewRenameNoteHandler(
 ) *RenameNoteHandler {
 	return &RenameNoteHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

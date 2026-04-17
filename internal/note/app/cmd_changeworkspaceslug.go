@@ -17,7 +17,7 @@ type ChangeWorkspaceSlug struct {
 
 type ChangeWorkspaceSlugHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func NewChangeWorkspaceSlugHandler(
@@ -26,7 +26,7 @@ func NewChangeWorkspaceSlugHandler(
 ) *ChangeWorkspaceSlugHandler {
 	return &ChangeWorkspaceSlugHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

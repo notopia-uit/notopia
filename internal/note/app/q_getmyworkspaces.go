@@ -17,7 +17,7 @@ type GetMyWorkspacesReadModel interface {
 
 type GetMyWorkspacesHandler struct {
 	authorizationSvc AuthorizationSvc
-	readModel            GetMyWorkspacesReadModel
+	readModel        GetMyWorkspacesReadModel
 }
 
 func NewGetMyWorkspacesHandler(
@@ -26,7 +26,7 @@ func NewGetMyWorkspacesHandler(
 ) *GetMyWorkspacesHandler {
 	return &GetMyWorkspacesHandler{
 		authorizationSvc: authorizationSvc,
-		readModel:            readModel,
+		readModel:        readModel,
 	}
 }
 

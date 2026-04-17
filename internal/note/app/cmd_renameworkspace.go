@@ -17,7 +17,7 @@ type RenameWorkspace struct {
 
 type RenameWorkspaceHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func NewRenameWorkspaceHandler(
@@ -26,7 +26,7 @@ func NewRenameWorkspaceHandler(
 ) *RenameWorkspaceHandler {
 	return &RenameWorkspaceHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

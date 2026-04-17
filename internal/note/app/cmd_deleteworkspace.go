@@ -16,7 +16,7 @@ type DeleteWorkspace struct {
 
 type DeleteWorkspaceHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func NewDeleteWorkspaceHandler(
@@ -25,7 +25,7 @@ func NewDeleteWorkspaceHandler(
 ) *DeleteWorkspaceHandler {
 	return &DeleteWorkspaceHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

@@ -20,7 +20,7 @@ type CreateNote struct {
 
 type CreateNoteHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func NewCreateNoteHandler(
@@ -29,7 +29,7 @@ func NewCreateNoteHandler(
 ) *CreateNoteHandler {
 	return &CreateNoteHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

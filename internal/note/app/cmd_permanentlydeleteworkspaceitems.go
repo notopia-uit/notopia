@@ -18,7 +18,7 @@ type PermanentlyDeleteWorkspaceItems struct {
 
 type PermanentlyDeleteWorkspaceItemsHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func NewPermanentlyDeleteWorkspaceItemsHandler(
@@ -27,7 +27,7 @@ func NewPermanentlyDeleteWorkspaceItemsHandler(
 ) *PermanentlyDeleteWorkspaceItemsHandler {
 	return &PermanentlyDeleteWorkspaceItemsHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

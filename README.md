@@ -44,3 +44,4 @@
 - [ ] Health check to other services (api service, meili, postgres...)
 - [ ] Connection pool max connections, idle, timeout for database, meili
 - [ ] gin should be protected with `SetTrustedProxies`
+- [ ] Event is tracked by either otel or correlation id. But, currently use wotel + kafka tracer, and partially correlation id but not really connected.

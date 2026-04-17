@@ -20,7 +20,7 @@ type ShowTrashReadModel interface {
 
 type ShowTrashHandler struct {
 	authorizationSvc AuthorizationSvc
-	readModel            ShowTrashReadModel
+	readModel        ShowTrashReadModel
 }
 
 func NewShowTrashHandler(
@@ -29,7 +29,7 @@ func NewShowTrashHandler(
 ) *ShowTrashHandler {
 	return &ShowTrashHandler{
 		authorizationSvc: authorizationSvc,
-		readModel:            readModel,
+		readModel:        readModel,
 	}
 }
 

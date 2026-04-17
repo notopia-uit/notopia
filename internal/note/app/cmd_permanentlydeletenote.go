@@ -16,7 +16,7 @@ type PermanentlyDeleteNote struct {
 
 type PermanentlyDeleteNoteHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func PermanentlyNewDeleteNoteHandler(
@@ -25,7 +25,7 @@ func PermanentlyNewDeleteNoteHandler(
 ) *PermanentlyDeleteNoteHandler {
 	return &PermanentlyDeleteNoteHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

@@ -16,7 +16,7 @@ type PermanentlyDeleteFolder struct {
 
 type PermanentlyDeleteFolderHandler struct {
 	authorizationSvc AuthorizationSvc
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 }
 
 func NewPermanentlyDeleteFolderHandler(
@@ -25,7 +25,7 @@ func NewPermanentlyDeleteFolderHandler(
 ) *PermanentlyDeleteFolderHandler {
 	return &PermanentlyDeleteFolderHandler{
 		authorizationSvc: authorizationSvc,
-		uow:                  uow,
+		uow:              uow,
 	}
 }
 

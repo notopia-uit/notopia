@@ -16,7 +16,7 @@ type CreateWorkspace struct {
 }
 
 type CreateWorkspaceHandler struct {
-	uow                  domain.UnitOfWork
+	uow              domain.UnitOfWork
 	authorizationSvc AuthorizationSvc
 }
 
@@ -25,7 +25,7 @@ func NewCreateWorkspaceHandler(
 	authorizationSvc AuthorizationSvc,
 ) *CreateWorkspaceHandler {
 	return &CreateWorkspaceHandler{
-		uow:                  uow,
+		uow:              uow,
 		authorizationSvc: authorizationSvc,
 	}
 }
