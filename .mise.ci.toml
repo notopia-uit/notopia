@@ -8,6 +8,7 @@ buf = "1.65.0"
 sqlc = "1.30.0"
 java = "latest"
 "npm:@kevinnitro/nx-cache-action" = "0.1.0"
+mockery = "3.7.0"
 
 [shell_alias]
 nx = "pnpm exec nx"

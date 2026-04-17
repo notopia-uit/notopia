@@ -43,6 +43,23 @@ export type ShareUserDeletedEvent = {
     id: ShareId;
 };
 
+export type ShareUserWorkspaceRoleUpdatedEvent = {
+    workspaceId: SharePropertiesId;
+    userId: ShareId;
+    role: ShareWorkspaceRole;
+};
+
+export type ShareWorkspaceMemberAddedEvent = {
+    workspaceId: SharePropertiesId;
+    userId: ShareId;
+    role: ShareWorkspaceRole;
+};
+
+export type ShareWorkspaceMemberRemovedEvent = {
+    workspaceId: SharePropertiesId;
+    userId: ShareId;
+};
+
 /**
  * BlockNote model
  */
@@ -57,6 +74,16 @@ export type ShareDocument = {
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
 export type ShareId = string;
+
+export type SharePropertiesId = string;
+
+export const ShareWorkspaceRole = {
+    OWNER: 'owner',
+    EDITOR: 'editor',
+    VIEWER: 'viewer'
+} as const;
+
+export type ShareWorkspaceRole = typeof ShareWorkspaceRole[keyof typeof ShareWorkspaceRole];
 
 export type DocumentError = {
     /**
@@ -326,6 +353,20 @@ export type NoteWorkspaceTreeFolder = {
 };
 
 export type NotePropertiesUpdatedAt = Date;
+
+export type ShareUserWorkspaceRoleUpdatedEventWritable = {
+    userId: ShareId;
+    role: ShareWorkspaceRole;
+};
+
+export type ShareWorkspaceMemberAddedEventWritable = {
+    userId: ShareId;
+    role: ShareWorkspaceRole;
+};
+
+export type ShareWorkspaceMemberRemovedEventWritable = {
+    userId: ShareId;
+};
 
 /**
  * BlockNote model

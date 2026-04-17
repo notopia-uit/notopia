@@ -58,31 +58,6 @@ export const HocuspocusProvider: Provider = {
           data.connectionConfig.readOnly = true;
         }
       },
-
-      async beforeHandleMessage(data) {
-        const context = data.context as HocuspocusContext;
-        const connection = data.connection;
-        const userId = context.user.id;
-
-        // TODO: Perf issue, this will call auth service for every saving
-        // Consider authorization service emit event, and let hocuspocus controller listen and mutate
-        const response = await authorizationService.getUserNotePermissions(
-          userId,
-          data.documentName
-        );
-
-        if (!response.canRead) {
-          connection.close();
-          throw new Error(
-            `User ${userId} does not have permission to access document ${data.documentName}`
-          );
-        }
-        if (response.canWrite) {
-          connection.readOnly = false;
-        } else {
-          connection.readOnly = true;
-        }
-      },
     });
   },
   inject: [DocumentRepository, NoteService, AuthorizationService, Logger],

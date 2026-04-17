@@ -4,16 +4,17 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/notopia-uit/notopia/internal/authorization/controller/grpc"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
 
 type Server struct {
-	grpc   *GRPCServer
+	grpc   *grpc.Server
 	logger *slog.Logger
 }
 
 func NewServer(
-	grpc *GRPCServer,
+	grpc *grpc.Server,
 	logger *slog.Logger,
 	globalOtel otel.Global,
 ) *Server {

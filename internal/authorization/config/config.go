@@ -1,4 +1,4 @@
-package authorization
+package config
 
 import (
 	"fmt"

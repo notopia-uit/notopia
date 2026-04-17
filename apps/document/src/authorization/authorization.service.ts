@@ -80,6 +80,36 @@ export class AuthorizationService implements OnModuleInit {
     }
   }
 
+  async getWorkspaceItemPermissions({
+    memberId,
+    workspaceId,
+  }: {
+    memberId: string;
+    workspaceId: string;
+  }): Promise<{
+    canRead: boolean;
+    canWrite: boolean;
+    canDelete: boolean;
+  }> {
+    try {
+      const response = await firstValueFrom(
+        this.authorizationServiceClient.getUserWorkspaceItemPermissions({
+          memberId,
+          workspaceId,
+        })
+      );
+      return {
+        canRead: response.canRead,
+        canWrite: response.canWrite,
+        canDelete: response.canDelete,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to get workspace item permissions: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
   async getUserNotePermissions(
     memberId: string,
     documentId: string

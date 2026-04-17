@@ -1,4 +1,4 @@
-package authorization
+package grpc
 
 import (
 	"context"
@@ -9,23 +9,23 @@ import (
 	"github.com/notopia-uit/notopia/pkg/pb"
 )
 
-type GRPCServiceServer struct {
+type Service struct {
 	pb.UnimplementedAuthorizationServiceServer
-	app *App
+	app *app.App
 }
 
-func NewGRPCServiceServer(app *App) *GRPCServiceServer {
-	return &GRPCServiceServer{
+func NewService(app *app.App) *Service {
+	return &Service{
 		UnimplementedAuthorizationServiceServer: pb.UnimplementedAuthorizationServiceServer{},
 		app:                                     app,
 	}
 }
 
-var ProvideGRPCServiceServer = NewGRPCServiceServer
+var ProvideService = NewService
 
-var _ pb.AuthorizationServiceServer = (*GRPCServiceServer)(nil)
+var _ pb.AuthorizationServiceServer = (*Service)(nil)
 
-func (g *GRPCServiceServer) GetUserWorkspaces(ctx context.Context, req *pb.GetUserWorkspacesRequest) (*pb.GetUserWorkspacesResponse, error) {
+func (g *Service) GetUserWorkspaces(ctx context.Context, req *pb.GetUserWorkspacesRequest) (*pb.GetUserWorkspacesResponse, error) {
 	workspaces, err := g.app.GetUserWorkspaces.Handle(ctx, app.GetUserWorkspaces{
 		UserID: req.UserId,
 	})
@@ -43,7 +43,7 @@ func (g *GRPCServiceServer) GetUserWorkspaces(ctx context.Context, req *pb.GetUs
 	}, nil
 }
 
-func (g *GRPCServiceServer) CreateWorkspaceWithOwner(ctx context.Context, req *pb.CreateWorkspaceWithOwnerRequest) (*pb.CreateWorkspaceWithOwnerResponse, error) {
+func (g *Service) CreateWorkspaceWithOwner(ctx context.Context, req *pb.CreateWorkspaceWithOwnerRequest) (*pb.CreateWorkspaceWithOwnerResponse, error) {
 	workspaceID, err := uuid.Parse(req.WorkspaceId)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (g *GRPCServiceServer) CreateWorkspaceWithOwner(ctx context.Context, req *p
 	return &pb.CreateWorkspaceWithOwnerResponse{}, nil
 }
 
-func (g *GRPCServiceServer) UpdateWorkspaceMembers(ctx context.Context, req *pb.UpdateWorkspaceMembersRequest) (*pb.UpdateWorkspaceMembersResponse, error) {
+func (g *Service) UpdateWorkspaceMembers(ctx context.Context, req *pb.UpdateWorkspaceMembersRequest) (*pb.UpdateWorkspaceMembersResponse, error) {
 	workspaceID, err := uuid.Parse(req.WorkspaceId)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (g *GRPCServiceServer) UpdateWorkspaceMembers(ctx context.Context, req *pb.
 	return &pb.UpdateWorkspaceMembersResponse{}, nil
 }
 
-func (g *GRPCServiceServer) GetWorkspaceMembers(ctx context.Context, req *pb.GetWorkspaceMembersRequest) (*pb.GetWorkspaceMembersResponse, error) {
+func (g *Service) GetWorkspaceMembers(ctx context.Context, req *pb.GetWorkspaceMembersRequest) (*pb.GetWorkspaceMembersResponse, error) {
 	workspaceID, err := uuid.Parse(req.WorkspaceId)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (g *GRPCServiceServer) GetWorkspaceMembers(ctx context.Context, req *pb.Get
 	}, nil
 }
 
-func (g *GRPCServiceServer) HasWorkspacePermission(ctx context.Context, req *pb.HasWorkspacePermissionRequest) (*pb.HasWorkspacePermissionResponse, error) {
+func (g *Service) HasWorkspacePermission(ctx context.Context, req *pb.HasWorkspacePermissionRequest) (*pb.HasWorkspacePermissionResponse, error) {
 	workspaceID, err := uuid.Parse(req.WorkspaceId)
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func (g *GRPCServiceServer) HasWorkspacePermission(ctx context.Context, req *pb.
 	}, nil
 }
 
-func (g *GRPCServiceServer) HasWorkspaceItemPermission(ctx context.Context, req *pb.HasWorkspaceItemPermissionRequest) (*pb.HasWorkspaceItemPermissionResponse, error) {
+func (g *Service) HasWorkspaceItemPermission(ctx context.Context, req *pb.HasWorkspaceItemPermissionRequest) (*pb.HasWorkspaceItemPermissionResponse, error) {
 	workspaceID, err := uuid.Parse(req.WorkspaceId)
 	if err != nil {
 		return nil, err
@@ -147,7 +147,7 @@ func (g *GRPCServiceServer) HasWorkspaceItemPermission(ctx context.Context, req 
 	}, nil
 }
 
-func (g *GRPCServiceServer) GetUserWorkspaceItemPermissions(ctx context.Context, req *pb.GetUserWorkspaceItemPermissionsRequest) (*pb.GetUserWorkspaceItemPermissionsResponse, error) {
+func (g *Service) GetUserWorkspaceItemPermissions(ctx context.Context, req *pb.GetUserWorkspaceItemPermissionsRequest) (*pb.GetUserWorkspaceItemPermissionsResponse, error) {
 	workspaceID, err := uuid.Parse(req.WorkspaceId)
 	if err != nil {
 		return nil, err
@@ -167,7 +167,7 @@ func (g *GRPCServiceServer) GetUserWorkspaceItemPermissions(ctx context.Context,
 	}, nil
 }
 
-func (g *GRPCServiceServer) DeleteWorkspace(ctx context.Context, req *pb.DeleteWorkspaceRequest) (*pb.DeleteWorkspaceResponse, error) {
+func (g *Service) DeleteWorkspace(ctx context.Context, req *pb.DeleteWorkspaceRequest) (*pb.DeleteWorkspaceResponse, error) {
 	workspaceID, err := uuid.Parse(req.WorkspaceId)
 	if err != nil {
 		return nil, err

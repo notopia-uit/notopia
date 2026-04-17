@@ -12,6 +12,9 @@
     ]
   },
   "targets": {
+    "gen:mockery": {
+      "dependsOn": ["^gen:mockery"]
+    },
     "gen:wire": {
       "executor": "nx:run-commands",
       "inputs": ["default"],
@@ -39,7 +42,7 @@
         "command": "go build -o ./authorization .",
         "cwd": "{projectRoot}"
       },
-      "dependsOn": ["gen:wire", "^gen*", "^build*"]
+      "dependsOn": ["gen:wire", "gen:mockery", "^gen*", "^build*"]
     },
     "preview": {
       "executor": "nx:run-commands",
