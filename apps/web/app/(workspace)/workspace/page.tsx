@@ -4,7 +4,9 @@ import { WorkspaceSwitcher } from '@ui/components/workspace-switcher';
 
 import getQueryClient from '#/get-query-client';
 
-async function WorkspaceSwitcherServerComponent() {
+export const dynamic = 'force-dynamic';
+
+export default async function WorkspacePage() {
   const queryClient = getQueryClient();
   const { queryKey, queryFn } = getMyWorkspacesOptions();
   await queryClient.prefetchQuery({
@@ -14,22 +16,16 @@ async function WorkspaceSwitcherServerComponent() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <WorkspaceSwitcher />
+      <main
+        className="
+          flex min-h-screen flex-col items-center justify-center bg-muted/20 p-4
+          md:p-8
+        "
+      >
+        <div className="w-full max-w-3xl">
+          <WorkspaceSwitcher />
+        </div>
+      </main>
     </HydrationBoundary>
-  );
-}
-
-export default function WorkspacePage() {
-  return (
-    <main
-      className="
-        flex min-h-screen flex-col items-center justify-center bg-muted/20 p-4
-        md:p-8
-      "
-    >
-      <div className="w-full max-w-3xl">
-        <WorkspaceSwitcherServerComponent />
-      </div>
-    </main>
   );
 }
