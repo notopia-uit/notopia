@@ -77,14 +77,9 @@ func (n *Note) Name() string { return n.name }
 
 func (n *Note) Rename(name string, userID string) {
 	n.name = name
-	n.addEvent(&NoteUpdatedEvent{
-		BaseEvent:     NewBaseEvent(n.id, userID),
-		Name:          n.name,
-		Icon:          n.icon,
-		Tags:          n.tags,
-		Size:          n.size,
-		FolderID:      n.folderID,
-		OutgoingLinks: n.outgoingLinks,
+	n.addEvent(&NoteRenamedEvent{
+		BaseEvent: NewBaseEvent(n.id, userID),
+		Name:      n.name,
 	})
 }
 
@@ -92,14 +87,9 @@ func (n *Note) Icon() string { return n.icon }
 
 func (n *Note) SetIcon(icon string, userID string) {
 	n.icon = icon
-	n.addEvent(&NoteUpdatedEvent{
-		BaseEvent:     NewBaseEvent(n.id, userID),
-		Name:          n.name,
-		Icon:          n.icon,
-		Tags:          n.tags,
-		Size:          n.size,
-		FolderID:      n.folderID,
-		OutgoingLinks: n.outgoingLinks,
+	n.addEvent(&NoteIconChangedEvent{
+		BaseEvent: NewBaseEvent(n.id, userID),
+		Icon:      n.icon,
 	})
 }
 
@@ -107,14 +97,9 @@ func (n *Note) Tags() []string { return n.tags }
 
 func (n *Note) SetTags(tags []string, userID string) {
 	n.tags = tags
-	n.addEvent(&NoteUpdatedEvent{
-		BaseEvent:     NewBaseEvent(n.id, userID),
-		Name:          n.name,
-		Icon:          n.icon,
-		Tags:          n.tags,
-		Size:          n.size,
-		FolderID:      n.folderID,
-		OutgoingLinks: n.outgoingLinks,
+	n.addEvent(&NoteTagsChangedEvent{
+		BaseEvent: NewBaseEvent(n.id, userID),
+		Tags:      n.tags,
 	})
 }
 
@@ -124,14 +109,9 @@ func (n *Note) Size() uint64 {
 
 func (n *Note) SetSize(size uint64, userID string) {
 	n.size = size
-	n.addEvent(&NoteUpdatedEvent{
-		BaseEvent:     NewBaseEvent(n.id, userID),
-		Name:          n.name,
-		Icon:          n.icon,
-		Tags:          n.tags,
-		Size:          n.size,
-		FolderID:      n.folderID,
-		OutgoingLinks: n.outgoingLinks,
+	n.addEvent(&NoteSizeChangedEvent{
+		BaseEvent: NewBaseEvent(n.id, userID),
+		Size:      n.size,
 	})
 }
 
@@ -149,13 +129,8 @@ func (n *Note) OutgoingLinks() uuid.UUIDs { return n.outgoingLinks }
 
 func (n *Note) SetOutgoingLinks(outgoingLinks uuid.UUIDs, userID string) {
 	n.outgoingLinks = outgoingLinks
-	n.addEvent(&NoteUpdatedEvent{
+	n.addEvent(&NoteOutgoingLinksChangedEvent{
 		BaseEvent:     NewBaseEvent(n.id, userID),
-		Name:          n.name,
-		Icon:          n.icon,
-		Tags:          n.tags,
-		Size:          n.size,
-		FolderID:      n.folderID,
 		OutgoingLinks: n.outgoingLinks,
 	})
 }

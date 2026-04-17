@@ -83,10 +83,9 @@ func (f *Folder) Name() string {
 
 func (f *Folder) Rename(name string, userID string) {
 	f.name = name
-	f.addEvent(&FolderUpdatedEvent{
+	f.addEvent(&FolderRenamedEvent{
 		BaseEvent: NewBaseEvent(f.id, userID),
 		Name:      f.name,
-		Icon:      f.icon,
 	})
 }
 
@@ -96,9 +95,8 @@ func (f *Folder) Icon() string {
 
 func (f *Folder) SetIcon(icon string, userID string) {
 	f.icon = icon
-	f.addEvent(&FolderUpdatedEvent{
+	f.addEvent(&FolderIconChangedEvent{
 		BaseEvent: NewBaseEvent(f.id, userID),
-		Name:      f.name,
 		Icon:      f.icon,
 	})
 }

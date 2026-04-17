@@ -285,8 +285,8 @@ func toTrashedByDTO(t app.TrashedBy) (note.TrashedBy, error) {
 	case app.TrashedByPurpose:
 		return note.Purpose, nil
 	case app.TrashedByUnspecified:
-		return note.TrashedBy(""), errs.NewInternal("unspecified trashed by")
+		return "", errs.NewInternal("unspecified trashed by")
 	default:
-		return note.TrashedBy(""), errs.NewInternal(fmt.Sprintf("invalid trashed by: %v", t))
+		return "", errs.NewInternal(fmt.Sprintf("invalid trashed by: %v", t))
 	}
 }
