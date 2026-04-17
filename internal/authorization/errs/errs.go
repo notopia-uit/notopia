@@ -7,13 +7,15 @@ import (
 )
 
 const (
-	CodeCasbinInternalError          Code = "casbinInternalError"
-	CodeCasbinEnforcerError          Code = "casbinEnforcerFailed"
-	CodeCasbinPolicySignatureInvalid Code = "casbinPolicySignatureInvalid"
-	CodeErrInvalidUserFormat         Code = "invalidUserFormat"
-	CodeMemberHasNoPermission        Code = "memberHasNoPermission"
-	CodeGetWorkspaceMembersGetFailed Code = "getWorkspaceMembersGetFailed"
-	CodeCreateWorkspaceExists        Code = "createWorkspaceExists"
+	CodeCasbinInternalError            Code = "casbinInternalError"
+	CodeCasbinEnforcerError            Code = "casbinEnforcerFailed"
+	CodeCasbinPolicySignatureInvalid   Code = "casbinPolicySignatureInvalid"
+	CodeErrInvalidUserFormat           Code = "invalidUserFormat"
+	CodeMemberHasNoPermission          Code = "memberHasNoPermission"
+	CodeGetWorkspaceMembersGetFailed   Code = "getWorkspaceMembersGetFailed"
+	CodeCreateWorkspaceExists          Code = "createWorkspaceExists"
+	CodeInvalidWorkspaceRoleFormat     Code = "invalidWorkspaceRoleFormat"
+	CodePublishIntegrationEventsFailed Code = "publishIntegrationEventsFailed"
 )
 
 type CasbinInternalError struct {
@@ -127,6 +129,37 @@ func NewCreateWorkspaceExists(userID string, workspaceID uuid.UUID) *CreateWorks
 			message: fmt.Sprintf("workspace %q already exists with owner id %q", workspaceID.String(), userID),
 			code:    CodeCreateWorkspaceExists,
 			err:     nil,
+		},
+	}
+}
+
+type InvalidWorkspaceRoleFormat struct {
+	Err
+	roleStr string
+}
+
+func NewInvalidWorkspaceRoleFormat(roleStr string) *InvalidWorkspaceRoleFormat {
+	return &InvalidWorkspaceRoleFormat{
+		roleStr: roleStr,
+		Err: Err{
+			message: fmt.Sprintf("invalid workspace role format: %q", roleStr),
+			code:    CodeInvalidWorkspaceRoleFormat,
+		},
+	}
+}
+
+type PublishIntegrationEventsFailed struct {
+	Err
+	WorkspaceID uuid.UUID
+}
+
+func NewPublishIntegrationEventsFailed(workspaceID uuid.UUID, err error) *PublishIntegrationEventsFailed {
+	return &PublishIntegrationEventsFailed{
+		WorkspaceID: workspaceID,
+		Err: Err{
+			message: fmt.Sprintf("failed to publish integration events for workspace %q", workspaceID.String()),
+			code:    CodePublishIntegrationEventsFailed,
+			err:     err,
 		},
 	}
 }

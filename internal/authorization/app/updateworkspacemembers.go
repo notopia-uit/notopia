@@ -58,8 +58,14 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params Updat
 
 		oldMembers = make([]WorkspaceMember, 0, len(currentRules))
 		for _, rule := range currentRules {
-			userID := rule[0]
-			role := parseRole(rule[1])
+			userID, err := userFromFormat(rule[0])
+			if err != nil {
+				return errs.NewCasbinInternalError(err)
+			}
+			role, err := parseRole(rule[1])
+			if err != nil {
+				return errs.NewCasbinInternalError(err)
+			}
 			oldMembers = append(oldMembers, WorkspaceMember{
 				ID:   userID,
 				Role: role,
@@ -84,10 +90,7 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params Updat
 
 		if len(eventsToPublish) > 0 {
 			if err := h.integrationPublisher.Publish(ctx, eventsToPublish...); err != nil {
-				slog.ErrorContext(ctx, "failed to publish integration events",
-					slog.String("workspace_id", params.WorkspaceID.String()),
-					slog.String("error", err.Error()),
-				)
+				return errs.NewPublishIntegrationEventsFailed(params.WorkspaceID, err)
 			}
 		}
 

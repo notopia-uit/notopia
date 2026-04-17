@@ -89,6 +89,7 @@ func New(
 	commonconfig.KafkaViperSetDefault(viper, "kafka", "note-service")
 	commonconfig.SQLViperSetDefault(viper, "database")
 	commonconfig.GeneralViperSetDefault(viper, "general")
+	commonconfig.AuthentikViperSetDefault(viper, "authentik")
 
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err == nil {

@@ -4,7 +4,9 @@ import { Traceable } from 'nestjs-otel';
 
 import { AuthorizationService } from '#/authorization/authorization.service';
 import { HocuspocusContext } from '#/hocuspocus/hocuspocus-context';
+import { WorkspaceModel } from '#/note/models';
 import { NoteService } from '#/note/note.service';
+import { WorkspaceNoteNotFoundException } from '#/note/workspace-note-not-found.exception';
 
 @Injectable()
 @Traceable()
@@ -30,11 +32,22 @@ export class HocuspocusService {
         if (context.user.id !== userId) {
           continue;
         }
-        const workspace = await this.noteService.getWorkspaceByNote({
-          noteId: documentName,
-          userId,
-        });
-        if (workspace.id !== workspaceId) {
+        let workspace: WorkspaceModel | undefined;
+        try {
+          workspace = await this.noteService.getWorkspaceByNote({
+            noteId: documentName,
+            userId,
+          });
+        } catch (e) {
+          if (e instanceof WorkspaceNoteNotFoundException) {
+            connection.connection.close({
+              code: 4001,
+              reason: `Your access to document ${documentName} has been revoked due to workspace be found for this document.`,
+            });
+            continue;
+          }
+        }
+        if (workspace?.id !== workspaceId) {
           continue;
         }
         const permissions =
@@ -44,8 +57,9 @@ export class HocuspocusService {
           });
         if (!permissions.canRead) {
           connection.connection.close({
-            code: 4001,
-            reason: 'Your access to this document has been revoked',
+            code: 4002,
+            reason:
+              'Your access to this document has been revoked because you no longer have read permission.',
           });
         } else {
           connection.connection.readOnly = !permissions.canWrite;
@@ -68,16 +82,28 @@ export class HocuspocusService {
         if (context.user.id !== userId) {
           continue;
         }
-        const workspace = await this.noteService.getWorkspaceByNote({
-          noteId: documentName,
-          userId,
-        });
-        if (workspace.id !== workspaceId) {
+        let workspace: WorkspaceModel | undefined;
+        try {
+          workspace = await this.noteService.getWorkspaceByNote({
+            noteId: documentName,
+            userId,
+          });
+        } catch (e) {
+          if (e instanceof WorkspaceNoteNotFoundException) {
+            connection.connection.close({
+              code: 4001,
+              reason: `Your access to document ${documentName} has been revoked due to workspace be found for this document.`,
+            });
+            continue;
+          }
+        }
+        if (workspace?.id !== workspaceId) {
           continue;
         }
         connection.connection.close({
-          code: 4001,
-          reason: 'Your access to this document has been revoked',
+          code: 4002,
+          reason:
+            'Your access to this document has been revoked because you have been removed from the workspace.',
         });
       }
     }

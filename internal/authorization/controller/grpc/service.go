@@ -2,9 +2,11 @@ package grpc
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/app"
+	"github.com/notopia-uit/notopia/internal/authorization/errs"
 
 	"github.com/notopia-uit/notopia/pkg/pb"
 )
@@ -78,6 +80,15 @@ func (g *Service) UpdateWorkspaceMembers(ctx context.Context, req *pb.UpdateWork
 		WorkspaceID: workspaceID,
 		Members:     members,
 	}); err != nil {
+		// Log publish failures but don't fail the entire operation
+		// since the members have already been updated in Casbin
+		if pubErr, ok := err.(*errs.PublishIntegrationEventsFailed); ok {
+			slog.WarnContext(ctx, "failed to publish integration events after successful member update",
+				slog.String("workspace_id", pubErr.WorkspaceID.String()),
+				slog.String("error", pubErr.Error()),
+			)
+			return &pb.UpdateWorkspaceMembersResponse{}, nil
+		}
 		return nil, err
 	}
 

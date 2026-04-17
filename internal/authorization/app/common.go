@@ -77,15 +77,15 @@ func formatWorkspace(id uuid.UUID) string {
 	return fmt.Sprintf("workspace:%s", id.String())
 }
 
-func parseRole(roleStr string) WorkspaceRole {
+func parseRole(roleStr string) (WorkspaceRole, error) {
 	switch roleStr {
 	case WorkspaceRoleOwner.String():
-		return WorkspaceRoleOwner
+		return WorkspaceRoleOwner, nil
 	case WorkspaceRoleEditor.String():
-		return WorkspaceRoleEditor
+		return WorkspaceRoleEditor, nil
 	case WorkspaceRoleViewer.String():
-		return WorkspaceRoleViewer
+		return WorkspaceRoleViewer, nil
 	default:
-		return WorkspaceRoleViewer
+		return "", fmt.Errorf("invalid workspace role: %q", roleStr)
 	}
 }
