@@ -65,6 +65,9 @@ type ServerInterface interface {
 	// Delete workspace
 	// (DELETE /note/workspaces/{workspaceId})
 	DeleteWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
+	// Change workspace slug
+	// (POST /note/workspaces/{workspaceId}/change-slug)
+	ChangeWorkspaceSlug(c *gin.Context, workspaceId WorkspaceIdPath)
 	// SSE workspace updates
 	// (GET /note/workspaces/{workspaceId}/events)
 	GetWorkspaceEvents(c *gin.Context, workspaceId WorkspaceIdPath)
@@ -528,6 +531,32 @@ func (siw *ServerInterfaceWrapper) DeleteWorkspace(c *gin.Context) {
 	siw.Handler.DeleteWorkspace(c, workspaceId)
 }
 
+// ChangeWorkspaceSlug operation middleware
+func (siw *ServerInterfaceWrapper) ChangeWorkspaceSlug(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "workspaceId" -------------
+	var workspaceId WorkspaceIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.ChangeWorkspaceSlug(c, workspaceId)
+}
+
 // GetWorkspaceEvents operation middleware
 func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 
@@ -947,6 +976,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/note/workspaces-by-slug/:workspaceSlug/exists", wrapper.CheckWorkspaceSlugExists)
 	router.GET(options.BaseURL+"/note/workspaces/me", wrapper.GetMyWorkspaces)
 	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.DeleteWorkspace)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/change-slug", wrapper.ChangeWorkspaceSlug)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/events", wrapper.GetWorkspaceEvents)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/graph", wrapper.GetWorkspaceGraph)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/members", wrapper.GetWorkspaceMembers)
@@ -1883,6 +1913,61 @@ func (response DeleteWorkspace500JSONResponse) VisitDeleteWorkspaceResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
+type ChangeWorkspaceSlugRequestObject struct {
+	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	Body        *ChangeWorkspaceSlugJSONRequestBody
+}
+
+type ChangeWorkspaceSlugResponseObject interface {
+	VisitChangeWorkspaceSlugResponse(w http.ResponseWriter) error
+}
+
+type ChangeWorkspaceSlug204Response struct {
+}
+
+func (response ChangeWorkspaceSlug204Response) VisitChangeWorkspaceSlugResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type ChangeWorkspaceSlug400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response ChangeWorkspaceSlug400JSONResponse) VisitChangeWorkspaceSlugResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ChangeWorkspaceSlug401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response ChangeWorkspaceSlug401JSONResponse) VisitChangeWorkspaceSlugResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ChangeWorkspaceSlug404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response ChangeWorkspaceSlug404JSONResponse) VisitChangeWorkspaceSlugResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ChangeWorkspaceSlug500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response ChangeWorkspaceSlug500JSONResponse) VisitChangeWorkspaceSlugResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type GetWorkspaceEventsRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
 }
@@ -2661,6 +2746,9 @@ type StrictServerInterface interface {
 	// Delete workspace
 	// (DELETE /note/workspaces/{workspaceId})
 	DeleteWorkspace(ctx context.Context, request DeleteWorkspaceRequestObject) (DeleteWorkspaceResponseObject, error)
+	// Change workspace slug
+	// (POST /note/workspaces/{workspaceId}/change-slug)
+	ChangeWorkspaceSlug(ctx context.Context, request ChangeWorkspaceSlugRequestObject) (ChangeWorkspaceSlugResponseObject, error)
 	// SSE workspace updates
 	// (GET /note/workspaces/{workspaceId}/events)
 	GetWorkspaceEvents(ctx context.Context, request GetWorkspaceEventsRequestObject) (GetWorkspaceEventsResponseObject, error)
@@ -3174,6 +3262,41 @@ func (sh *strictHandler) DeleteWorkspace(ctx *gin.Context, workspaceId Workspace
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(DeleteWorkspaceResponseObject); ok {
 		if err := validResponse.VisitDeleteWorkspaceResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ChangeWorkspaceSlug operation middleware
+func (sh *strictHandler) ChangeWorkspaceSlug(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+	var request ChangeWorkspaceSlugRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	var body ChangeWorkspaceSlugJSONRequestBody
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		ctx.Error(err)
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.ChangeWorkspaceSlug(ctx, request.(ChangeWorkspaceSlugRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ChangeWorkspaceSlug")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(ChangeWorkspaceSlugResponseObject); ok {
+		if err := validResponse.VisitChangeWorkspaceSlugResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

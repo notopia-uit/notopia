@@ -65,6 +65,28 @@ func (h *StrictHandler) DeleteWorkspace(
 	return note.DeleteWorkspace204Response{}, nil
 }
 
+func (h *StrictHandler) ChangeWorkspaceSlug(
+	ctx context.Context,
+	request note.ChangeWorkspaceSlugRequestObject,
+) (note.ChangeWorkspaceSlugResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.NewUnauthorized()
+	}
+
+	cmd := &app.ChangeWorkspaceSlug{
+		ID:     request.WorkspaceId,
+		Slug:   request.Body.Slug,
+		UserID: user.ID,
+	}
+	err := h.App.Cmds.ChangeWorkspaceSlugHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.ChangeWorkspaceSlug204Response{}, nil
+}
+
 func (h *StrictHandler) GetWorkspace(
 	ctx context.Context,
 	request note.GetWorkspaceRequestObject,

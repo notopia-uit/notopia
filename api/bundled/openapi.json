@@ -886,6 +886,88 @@
         }
       }
     },
+    "/note/workspaces-by-slug/{workspaceSlug}": {
+      "get": {
+        "security": [
+          {
+            "note_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Get workspace",
+        "operationId": "getWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/note_workspaceSlugPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/note_Workspace"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/note_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/note_UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/note_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/note_InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces-by-slug/{workspaceSlug}/exists": {
+      "get": {
+        "security": [
+          {
+            "note_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Check workspace slug exists",
+        "operationId": "checkWorkspaceSlugExists",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/note_workspaceSlugPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "$ref": "#/components/responses/note_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/note_UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/note_NotFoundError"
+          },
+          "409": {
+            "description": "The workspace slug already exists"
+          },
+          "500": {
+            "$ref": "#/components/responses/note_InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces": {
       "post": {
         "security": [
@@ -972,88 +1054,6 @@
         }
       }
     },
-    "/note/workspaces-by-slug/{workspaceSlug}": {
-      "get": {
-        "security": [
-          {
-            "note_Oauth2": []
-          }
-        ],
-        "tags": [
-          "Workspace"
-        ],
-        "summary": "Get workspace",
-        "operationId": "getWorkspace",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/note_Workspace"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/note_BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/note_UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/note_NotFoundError"
-          },
-          "500": {
-            "$ref": "#/components/responses/note_InternalServerError"
-          }
-        }
-      }
-    },
-    "/note/workspaces-by-slug/{workspaceSlug}/exists": {
-      "get": {
-        "security": [
-          {
-            "note_Oauth2": []
-          }
-        ],
-        "tags": [
-          "Workspace"
-        ],
-        "summary": "Check workspace slug exists",
-        "operationId": "checkWorkspaceSlugExists",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/note_workspaceSlugPath"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "$ref": "#/components/responses/note_BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/note_UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/note_NotFoundError"
-          },
-          "409": {
-            "description": "The workspace slug already exists"
-          },
-          "500": {
-            "$ref": "#/components/responses/note_InternalServerError"
-          }
-        }
-      }
-    },
     "/note/workspaces/{workspaceId}": {
       "delete": {
         "security": [
@@ -1074,6 +1074,60 @@
         "responses": {
           "204": {
             "description": "No Content - Workspace successfully deleted."
+          },
+          "400": {
+            "$ref": "#/components/responses/note_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/note_UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/note_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/note_InternalServerError"
+          }
+        }
+      }
+    },
+    "/note/workspaces/{workspaceId}/change-slug": {
+      "post": {
+        "security": [
+          {
+            "note_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Change workspace slug",
+        "operationId": "changeWorkspaceSlug",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/note_workspaceIdPath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "$ref": "#/components/schemas/note_slug"
+                  }
+                },
+                "required": [
+                  "slug"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Workspace slug changed successfully"
           },
           "400": {
             "$ref": "#/components/responses/note_BadRequestError"
@@ -1115,29 +1169,33 @@
                 "schema": {
                   "oneOf": [
                     {
+                      "$ref": "#/components/schemas/note_HeartBeatWorkspaceEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/note_WorkspaceDeletedEvent"
+                    },
+                    {
                       "$ref": "#/components/schemas/note_WorkspaceItemsUpdatedEvent"
                     },
                     {
                       "$ref": "#/components/schemas/note_WorkspaceMembersUpdatedEvent"
                     },
                     {
-                      "$ref": "#/components/schemas/note_WorkspaceUpdatedEvent"
+                      "$ref": "#/components/schemas/note_WorkspaceRenamedEvent"
                     },
                     {
-                      "$ref": "#/components/schemas/note_WorkspaceDeletedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/note_HeartBeatWorkspaceEvent"
+                      "$ref": "#/components/schemas/note_WorkspaceSlugChangedEvent"
                     }
                   ],
                   "discriminator": {
                     "propertyName": "event",
                     "mapping": {
+                      "HeartBeatWorkspaceEvent": "#/components/schemas/note_HeartBeatWorkspaceEvent",
+                      "WorkspaceDeletedEvent": "#/components/schemas/note_WorkspaceDeletedEvent",
                       "WorkspaceItemsUpdatedEvent": "#/components/schemas/note_WorkspaceItemsUpdatedEvent",
                       "WorkspaceMembersUpdatedEvent": "#/components/schemas/note_WorkspaceMembersUpdatedEvent",
-                      "WorkspaceUpdatedEvent": "#/components/schemas/note_WorkspaceUpdatedEvent",
-                      "WorkspaceDeletedEvent": "#/components/schemas/note_WorkspaceDeletedEvent",
-                      "HeartBeatWorkspaceEvent": "#/components/schemas/note_HeartBeatWorkspaceEvent"
+                      "WorkspaceRenamedEvent": "#/components/schemas/note_WorkspaceRenamedEvent",
+                      "WorkspaceSlugChangedEvent": "#/components/schemas/note_WorkspaceSlugChangedEvent"
                     }
                   }
                 }
@@ -2796,6 +2854,10 @@
           "icon"
         ]
       },
+      "note_slug": {
+        "type": "string",
+        "example": "notopia"
+      },
       "note_Workspace": {
         "type": "object",
         "properties": {
@@ -2846,9 +2908,60 @@
           "role"
         ]
       },
-      "note_slug": {
-        "type": "string",
-        "example": "notopia"
+      "note_HeartBeatWorkspaceEvent": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "enum": [
+              "HeartBeatWorkspaceEvent"
+            ],
+            "example": "HeartBeatWorkspaceEvent"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-01T00:00:00Z"
+          }
+        },
+        "required": [
+          "event",
+          "timestamp"
+        ]
+      },
+      "note_WorkspaceDeletedEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "dd57d134-d23b-457f-88fc-a4d7d6b284e5"
+          },
+          "event": {
+            "type": "string",
+            "enum": [
+              "WorkspaceDeletedEvent"
+            ],
+            "example": "WorkspaceDeletedEvent"
+          },
+          "data": {
+            "type": "object",
+            "x-go-type-name": "WorkspaceDeletedEventData",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/note_properties-id"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "event",
+          "data"
+        ]
       },
       "note_WorkspaceItemsUpdatedEvent": {
         "type": "object",
@@ -2918,38 +3031,13 @@
           "data"
         ]
       },
-      "note_WorkspaceUpdatedEvent": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "example": "dd57d134-d23b-457f-88fc-a4d7d6b284e5"
-          },
-          "event": {
-            "type": "string",
-            "enum": [
-              "WorkspaceUpdatedEvent"
-            ],
-            "example": "WorkspaceUpdatedEvent"
-          },
-          "data": {
-            "type": "object",
-            "x-go-type-name": "WorkspaceUpdatedEventData",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/note_Workspace"
-              }
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "event",
-          "data"
-        ]
+      "note_Workspace_properties-name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "example": "Notopia"
       },
-      "note_WorkspaceDeletedEvent": {
+      "note_WorkspaceRenamedEvent": {
         "type": "object",
         "properties": {
           "id": {
@@ -2960,20 +3048,24 @@
           "event": {
             "type": "string",
             "enum": [
-              "WorkspaceDeletedEvent"
+              "WorkspaceRenamedEvent"
             ],
-            "example": "WorkspaceDeletedEvent"
+            "example": "WorkspaceRenamedEvent"
           },
           "data": {
             "type": "object",
-            "x-go-type-name": "WorkspaceDeletedEventData",
+            "x-go-type-name": "WorkspaceRenamedEventData",
             "properties": {
               "id": {
                 "$ref": "#/components/schemas/note_properties-id"
+              },
+              "name": {
+                "$ref": "#/components/schemas/note_Workspace_properties-name"
               }
             },
             "required": [
-              "id"
+              "id",
+              "name"
             ]
           }
         },
@@ -2983,25 +3075,42 @@
           "data"
         ]
       },
-      "note_HeartBeatWorkspaceEvent": {
+      "note_WorkspaceSlugChangedEvent": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "dd57d134-d23b-457f-88fc-a4d7d6b284e5"
+          },
           "event": {
             "type": "string",
             "enum": [
-              "HeartBeatWorkspaceEvent"
+              "WorkspaceSlugChangedEvent"
             ],
-            "example": "HeartBeatWorkspaceEvent"
+            "example": "WorkspaceSlugChangedEvent"
           },
-          "timestamp": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2024-01-01T00:00:00Z"
+          "data": {
+            "type": "object",
+            "x-go-type-name": "WorkspaceSlugChangedEventData",
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/note_properties-id"
+              },
+              "slug": {
+                "$ref": "#/components/schemas/note_slug"
+              }
+            },
+            "required": [
+              "id",
+              "slug"
+            ]
           }
         },
         "required": [
+          "id",
           "event",
-          "timestamp"
+          "data"
         ]
       },
       "note_User_properties-id": {
@@ -3033,12 +3142,6 @@
           "id",
           "role"
         ]
-      },
-      "note_Workspace_properties-name": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255,
-        "example": "Notopia"
       },
       "note_Trashed": {
         "type": "object",

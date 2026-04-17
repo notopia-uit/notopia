@@ -241,6 +241,8 @@ export type NoteNoteLink = {
     icon: NoteIcon;
 };
 
+export type NoteSlug = string;
+
 export type NoteWorkspace = {
     readonly id: string;
     slug: string;
@@ -260,7 +262,18 @@ export type NoteUserWorkspace = {
     role: NoteWorkspaceRole;
 };
 
-export type NoteSlug = string;
+export type NoteHeartBeatWorkspaceEvent = {
+    event: 'HeartBeatWorkspaceEvent';
+    timestamp: Date;
+};
+
+export type NoteWorkspaceDeletedEvent = {
+    id: string;
+    event: 'WorkspaceDeletedEvent';
+    data: {
+        id: NotePropertiesId;
+    };
+};
 
 export type NoteWorkspaceItemsUpdatedEvent = {
     id: string;
@@ -278,23 +291,24 @@ export type NoteWorkspaceMembersUpdatedEvent = {
     };
 };
 
-export type NoteWorkspaceUpdatedEvent = {
-    id: string;
-    event: 'WorkspaceUpdatedEvent';
-    data: NoteWorkspace;
-};
+export type NoteWorkspacePropertiesName = string;
 
-export type NoteWorkspaceDeletedEvent = {
+export type NoteWorkspaceRenamedEvent = {
     id: string;
-    event: 'WorkspaceDeletedEvent';
+    event: 'WorkspaceRenamedEvent';
     data: {
         id: NotePropertiesId;
+        name: NoteWorkspacePropertiesName;
     };
 };
 
-export type NoteHeartBeatWorkspaceEvent = {
-    event: 'HeartBeatWorkspaceEvent';
-    timestamp: Date;
+export type NoteWorkspaceSlugChangedEvent = {
+    id: string;
+    event: 'WorkspaceSlugChangedEvent';
+    data: {
+        id: NotePropertiesId;
+        slug: NoteSlug;
+    };
 };
 
 /**
@@ -312,8 +326,6 @@ export type NoteWorkspaceMember = {
     name?: NoteUserPropertiesName;
     role: NoteWorkspaceRole;
 };
-
-export type NoteWorkspacePropertiesName = string;
 
 export type NoteTrashed = {
     by: NoteTrashedBy;
@@ -414,6 +426,11 @@ export type NoteUserWorkspaceWritable = {
     role: NoteWorkspaceRole;
 };
 
+export type NoteWorkspaceDeletedEventWritable = {
+    id: string;
+    event: 'WorkspaceDeletedEvent';
+};
+
 export type NoteWorkspaceItemsUpdatedEventWritable = {
     id: string;
     event: 'WorkspaceItemsUpdatedEvent';
@@ -424,15 +441,20 @@ export type NoteWorkspaceMembersUpdatedEventWritable = {
     event: 'WorkspaceMembersUpdatedEvent';
 };
 
-export type NoteWorkspaceUpdatedEventWritable = {
+export type NoteWorkspaceRenamedEventWritable = {
     id: string;
-    event: 'WorkspaceUpdatedEvent';
-    data: NoteWorkspaceWritable;
+    event: 'WorkspaceRenamedEvent';
+    data: {
+        name: NoteWorkspacePropertiesName;
+    };
 };
 
-export type NoteWorkspaceDeletedEventWritable = {
+export type NoteWorkspaceSlugChangedEventWritable = {
     id: string;
-    event: 'WorkspaceDeletedEvent';
+    event: 'WorkspaceSlugChangedEvent';
+    data: {
+        slug: NoteSlug;
+    };
 };
 
 export type NoteWorkspaceMemberWritable = {
@@ -1417,96 +1439,6 @@ export type UnpublishNoteResponses = {
 
 export type UnpublishNoteResponse = UnpublishNoteResponses[keyof UnpublishNoteResponses];
 
-export type CreateWorkspaceData = {
-    body: NoteWorkspaceWritable;
-    path?: never;
-    query?: never;
-    url: '/note/workspaces';
-};
-
-export type CreateWorkspaceErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * The error response body returned when JWT validation or OPA authorization fails.
-     */
-    401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
-    };
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type CreateWorkspaceError = CreateWorkspaceErrors[keyof CreateWorkspaceErrors];
-
-export type CreateWorkspaceResponses = {
-    /**
-     * Workspace successfully created
-     */
-    201: unknown;
-};
-
-export type GetMyWorkspacesData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/note/workspaces/me';
-};
-
-export type GetMyWorkspacesErrors = {
-    /**
-     * Bad Request Error response
-     */
-    400: NoteError;
-    /**
-     * The error response body returned when JWT validation or OPA authorization fails.
-     */
-    401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
-    };
-    /**
-     * Internal Server Error response
-     */
-    500: NoteError;
-};
-
-export type GetMyWorkspacesError = GetMyWorkspacesErrors[keyof GetMyWorkspacesErrors];
-
-export type GetMyWorkspacesResponses = {
-    /**
-     * A list of workspaces
-     */
-    200: Array<NoteUserWorkspace>;
-};
-
-export type GetMyWorkspacesResponse = GetMyWorkspacesResponses[keyof GetMyWorkspacesResponses];
-
 export type GetWorkspaceData = {
     body?: never;
     path: {
@@ -1613,6 +1545,96 @@ export type CheckWorkspaceSlugExistsResponses = {
     200: unknown;
 };
 
+export type CreateWorkspaceData = {
+    body: NoteWorkspaceWritable;
+    path?: never;
+    query?: never;
+    url: '/note/workspaces';
+};
+
+export type CreateWorkspaceErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * The error response body returned when JWT validation or OPA authorization fails.
+     */
+    401: {
+        /**
+         * The category of the error encountered during the middleware lifecycle.
+         */
+        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
+        /**
+         * A descriptive message providing technical context for the failure.
+         */
+        details: string;
+        /**
+         * An optional, developer-defined message, often populated by OPA policy violations.
+         */
+        custom_message: string | null;
+    };
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type CreateWorkspaceError = CreateWorkspaceErrors[keyof CreateWorkspaceErrors];
+
+export type CreateWorkspaceResponses = {
+    /**
+     * Workspace successfully created
+     */
+    201: unknown;
+};
+
+export type GetMyWorkspacesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/note/workspaces/me';
+};
+
+export type GetMyWorkspacesErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * The error response body returned when JWT validation or OPA authorization fails.
+     */
+    401: {
+        /**
+         * The category of the error encountered during the middleware lifecycle.
+         */
+        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
+        /**
+         * A descriptive message providing technical context for the failure.
+         */
+        details: string;
+        /**
+         * An optional, developer-defined message, often populated by OPA policy violations.
+         */
+        custom_message: string | null;
+    };
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type GetMyWorkspacesError = GetMyWorkspacesErrors[keyof GetMyWorkspacesErrors];
+
+export type GetMyWorkspacesResponses = {
+    /**
+     * A list of workspaces
+     */
+    200: Array<NoteUserWorkspace>;
+};
+
+export type GetMyWorkspacesResponse = GetMyWorkspacesResponses[keyof GetMyWorkspacesResponses];
+
 export type DeleteWorkspaceData = {
     body?: never;
     path: {
@@ -1665,6 +1687,60 @@ export type DeleteWorkspaceResponses = {
 
 export type DeleteWorkspaceResponse = DeleteWorkspaceResponses[keyof DeleteWorkspaceResponses];
 
+export type ChangeWorkspaceSlugData = {
+    body: {
+        slug: NoteSlug;
+    };
+    path: {
+        workspaceId: NotePropertiesId;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceId}/change-slug';
+};
+
+export type ChangeWorkspaceSlugErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * The error response body returned when JWT validation or OPA authorization fails.
+     */
+    401: {
+        /**
+         * The category of the error encountered during the middleware lifecycle.
+         */
+        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
+        /**
+         * A descriptive message providing technical context for the failure.
+         */
+        details: string;
+        /**
+         * An optional, developer-defined message, often populated by OPA policy violations.
+         */
+        custom_message: string | null;
+    };
+    /**
+     * Not Found Error response
+     */
+    404: NoteError;
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type ChangeWorkspaceSlugError = ChangeWorkspaceSlugErrors[keyof ChangeWorkspaceSlugErrors];
+
+export type ChangeWorkspaceSlugResponses = {
+    /**
+     * Workspace slug changed successfully
+     */
+    204: void;
+};
+
+export type ChangeWorkspaceSlugResponse = ChangeWorkspaceSlugResponses[keyof ChangeWorkspaceSlugResponses];
+
 export type GetWorkspaceEventsData = {
     body?: never;
     path: {
@@ -1709,16 +1785,18 @@ export type GetWorkspaceEventsResponses = {
      * A persistent stream of events
      */
     200: ({
+        event: 'HeartBeatWorkspaceEvent';
+    } & NoteHeartBeatWorkspaceEvent) | ({
+        event: 'WorkspaceDeletedEvent';
+    } & NoteWorkspaceDeletedEvent) | ({
         event: 'WorkspaceItemsUpdatedEvent';
     } & NoteWorkspaceItemsUpdatedEvent) | ({
         event: 'WorkspaceMembersUpdatedEvent';
     } & NoteWorkspaceMembersUpdatedEvent) | ({
-        event: 'WorkspaceUpdatedEvent';
-    } & NoteWorkspaceUpdatedEvent) | ({
-        event: 'WorkspaceDeletedEvent';
-    } & NoteWorkspaceDeletedEvent) | ({
-        event: 'HeartBeatWorkspaceEvent';
-    } & NoteHeartBeatWorkspaceEvent);
+        event: 'WorkspaceRenamedEvent';
+    } & NoteWorkspaceRenamedEvent) | ({
+        event: 'WorkspaceSlugChangedEvent';
+    } & NoteWorkspaceSlugChangedEvent);
 };
 
 export type GetWorkspaceEventsResponse = GetWorkspaceEventsResponses[keyof GetWorkspaceEventsResponses];

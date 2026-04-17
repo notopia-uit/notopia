@@ -5,8 +5,8 @@ import * as z from 'zod';
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
 import { getNoteResponseTransformer, getRevisionsResponseTransformer, getRevisionWithContentResponseTransformer, getWorkspaceTreeResponseTransformer, showTrashResponseTransformer } from './transformers.gen';
-import type { CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsErrors, CheckWorkspaceSlugExistsResponses, CommitDocumentData, CommitDocumentErrors, CommitDocumentResponses, CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateNoteData, CreateNoteErrors, CreateNoteResponses, CreateWorkspaceData, CreateWorkspaceErrors, CreateWorkspaceResponses, DeleteRevisionData, DeleteRevisionErrors, DeleteRevisionResponses, DeleteWorkspaceData, DeleteWorkspaceErrors, DeleteWorkspaceResponses, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlErrors, GetDocumentAttachmentUploadUrlResponses, GetMyWorkspacesData, GetMyWorkspacesErrors, GetMyWorkspacesResponses, GetNoteData, GetNoteErrors, GetNoteGraphData, GetNoteGraphErrors, GetNoteGraphResponses, GetNoteLinksData, GetNoteLinksErrors, GetNoteLinksResponses, GetNoteResponses, GetRevisionsData, GetRevisionsErrors, GetRevisionsResponses, GetRevisionWithContentData, GetRevisionWithContentErrors, GetRevisionWithContentResponses, GetWorkspaceData, GetWorkspaceErrors, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponse, GetWorkspaceEventsResponses, GetWorkspaceGraphData, GetWorkspaceGraphErrors, GetWorkspaceGraphResponses, GetWorkspaceMembersData, GetWorkspaceMembersErrors, GetWorkspaceMembersResponses, GetWorkspaceResponses, GetWorkspaceTreeData, GetWorkspaceTreeErrors, GetWorkspaceTreeResponses, MoveWorkspaceItemsData, MoveWorkspaceItemsErrors, MoveWorkspaceItemsResponses, PermanentlyDeleteFolderData, PermanentlyDeleteFolderErrors, PermanentlyDeleteFolderResponses, PermanentlyDeleteNoteData, PermanentlyDeleteNoteErrors, PermanentlyDeleteNoteResponses, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsErrors, PermanentlyDeleteWorkspaceItemsResponses, PublishNoteData, PublishNoteErrors, PublishNoteResponses, PublishWorkspaceData, PublishWorkspaceErrors, PublishWorkspaceResponses, RenameFolderData, RenameFolderErrors, RenameFolderResponses, RenameNoteData, RenameNoteErrors, RenameNoteResponses, RenameRevisionData, RenameRevisionErrors, RenameRevisionResponses, RenameWorkspaceData, RenameWorkspaceErrors, RenameWorkspaceResponses, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsErrors, RestoreTrashedWorkspaceItemsResponses, ShowTrashData, ShowTrashErrors, ShowTrashResponses, TrashWorkspaceItemsData, TrashWorkspaceItemsErrors, TrashWorkspaceItemsResponses, UnpublishNoteData, UnpublishNoteErrors, UnpublishNoteResponses, UnpublishWorkspaceData, UnpublishWorkspaceErrors, UnpublishWorkspaceResponses, UpdateWorkspaceMembersData, UpdateWorkspaceMembersErrors, UpdateWorkspaceMembersResponses } from './types.gen';
-import { zCheckWorkspaceSlugExistsPath, zCommitDocumentPath, zCommitDocumentResponse, zCreateFolderBody, zCreateNoteBody, zCreateWorkspaceBody, zDeleteRevisionPath, zDeleteRevisionResponse, zDeleteWorkspacePath, zDeleteWorkspaceResponse, zGetDocumentAttachmentUploadUrlPath, zGetDocumentAttachmentUploadUrlResponse, zGetMyWorkspacesResponse, zGetNoteGraphPath, zGetNoteGraphQuery, zGetNoteGraphResponse, zGetNoteLinksPath, zGetNoteLinksQuery, zGetNoteLinksResponse, zGetNotePath, zGetNoteQuery, zGetNoteResponse, zGetRevisionsQuery, zGetRevisionsResponse, zGetRevisionWithContentPath, zGetRevisionWithContentResponse, zGetWorkspaceEventsPath, zGetWorkspaceEventsResponse, zGetWorkspaceGraphPath, zGetWorkspaceGraphQuery, zGetWorkspaceGraphResponse, zGetWorkspaceMembersPath, zGetWorkspaceMembersResponse, zGetWorkspacePath, zGetWorkspaceResponse, zGetWorkspaceTreePath, zGetWorkspaceTreeQuery, zGetWorkspaceTreeResponse, zMoveWorkspaceItemsBody, zMoveWorkspaceItemsPath, zMoveWorkspaceItemsResponse, zPermanentlyDeleteFolderPath, zPermanentlyDeleteFolderResponse, zPermanentlyDeleteNotePath, zPermanentlyDeleteNoteResponse, zPermanentlyDeleteWorkspaceItemsBody, zPermanentlyDeleteWorkspaceItemsPath, zPermanentlyDeleteWorkspaceItemsResponse, zPublishNotePath, zPublishNoteResponse, zPublishWorkspacePath, zPublishWorkspaceResponse, zRenameFolderBody, zRenameFolderPath, zRenameFolderResponse, zRenameNoteBody, zRenameNotePath, zRenameNoteResponse, zRenameRevisionBody, zRenameRevisionPath, zRenameRevisionResponse, zRenameWorkspaceBody, zRenameWorkspacePath, zRenameWorkspaceResponse, zRestoreTrashedWorkspaceItemsBody, zRestoreTrashedWorkspaceItemsPath, zRestoreTrashedWorkspaceItemsResponse, zShowTrashPath, zShowTrashResponse, zTrashWorkspaceItemsBody, zTrashWorkspaceItemsPath, zTrashWorkspaceItemsResponse, zUnpublishNotePath, zUnpublishNoteResponse, zUnpublishWorkspacePath, zUnpublishWorkspaceResponse, zUpdateWorkspaceMembersBody, zUpdateWorkspaceMembersPath, zUpdateWorkspaceMembersResponse } from './zod.gen';
+import type { ChangeWorkspaceSlugData, ChangeWorkspaceSlugErrors, ChangeWorkspaceSlugResponses, CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsErrors, CheckWorkspaceSlugExistsResponses, CommitDocumentData, CommitDocumentErrors, CommitDocumentResponses, CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateNoteData, CreateNoteErrors, CreateNoteResponses, CreateWorkspaceData, CreateWorkspaceErrors, CreateWorkspaceResponses, DeleteRevisionData, DeleteRevisionErrors, DeleteRevisionResponses, DeleteWorkspaceData, DeleteWorkspaceErrors, DeleteWorkspaceResponses, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlErrors, GetDocumentAttachmentUploadUrlResponses, GetMyWorkspacesData, GetMyWorkspacesErrors, GetMyWorkspacesResponses, GetNoteData, GetNoteErrors, GetNoteGraphData, GetNoteGraphErrors, GetNoteGraphResponses, GetNoteLinksData, GetNoteLinksErrors, GetNoteLinksResponses, GetNoteResponses, GetRevisionsData, GetRevisionsErrors, GetRevisionsResponses, GetRevisionWithContentData, GetRevisionWithContentErrors, GetRevisionWithContentResponses, GetWorkspaceData, GetWorkspaceErrors, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponse, GetWorkspaceEventsResponses, GetWorkspaceGraphData, GetWorkspaceGraphErrors, GetWorkspaceGraphResponses, GetWorkspaceMembersData, GetWorkspaceMembersErrors, GetWorkspaceMembersResponses, GetWorkspaceResponses, GetWorkspaceTreeData, GetWorkspaceTreeErrors, GetWorkspaceTreeResponses, MoveWorkspaceItemsData, MoveWorkspaceItemsErrors, MoveWorkspaceItemsResponses, PermanentlyDeleteFolderData, PermanentlyDeleteFolderErrors, PermanentlyDeleteFolderResponses, PermanentlyDeleteNoteData, PermanentlyDeleteNoteErrors, PermanentlyDeleteNoteResponses, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsErrors, PermanentlyDeleteWorkspaceItemsResponses, PublishNoteData, PublishNoteErrors, PublishNoteResponses, PublishWorkspaceData, PublishWorkspaceErrors, PublishWorkspaceResponses, RenameFolderData, RenameFolderErrors, RenameFolderResponses, RenameNoteData, RenameNoteErrors, RenameNoteResponses, RenameRevisionData, RenameRevisionErrors, RenameRevisionResponses, RenameWorkspaceData, RenameWorkspaceErrors, RenameWorkspaceResponses, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsErrors, RestoreTrashedWorkspaceItemsResponses, ShowTrashData, ShowTrashErrors, ShowTrashResponses, TrashWorkspaceItemsData, TrashWorkspaceItemsErrors, TrashWorkspaceItemsResponses, UnpublishNoteData, UnpublishNoteErrors, UnpublishNoteResponses, UnpublishWorkspaceData, UnpublishWorkspaceErrors, UnpublishWorkspaceResponses, UpdateWorkspaceMembersData, UpdateWorkspaceMembersErrors, UpdateWorkspaceMembersResponses } from './types.gen';
+import { zChangeWorkspaceSlugBody, zChangeWorkspaceSlugPath, zChangeWorkspaceSlugResponse, zCheckWorkspaceSlugExistsPath, zCommitDocumentPath, zCommitDocumentResponse, zCreateFolderBody, zCreateNoteBody, zCreateWorkspaceBody, zDeleteRevisionPath, zDeleteRevisionResponse, zDeleteWorkspacePath, zDeleteWorkspaceResponse, zGetDocumentAttachmentUploadUrlPath, zGetDocumentAttachmentUploadUrlResponse, zGetMyWorkspacesResponse, zGetNoteGraphPath, zGetNoteGraphQuery, zGetNoteGraphResponse, zGetNoteLinksPath, zGetNoteLinksQuery, zGetNoteLinksResponse, zGetNotePath, zGetNoteQuery, zGetNoteResponse, zGetRevisionsQuery, zGetRevisionsResponse, zGetRevisionWithContentPath, zGetRevisionWithContentResponse, zGetWorkspaceEventsPath, zGetWorkspaceEventsResponse, zGetWorkspaceGraphPath, zGetWorkspaceGraphQuery, zGetWorkspaceGraphResponse, zGetWorkspaceMembersPath, zGetWorkspaceMembersResponse, zGetWorkspacePath, zGetWorkspaceResponse, zGetWorkspaceTreePath, zGetWorkspaceTreeQuery, zGetWorkspaceTreeResponse, zMoveWorkspaceItemsBody, zMoveWorkspaceItemsPath, zMoveWorkspaceItemsResponse, zPermanentlyDeleteFolderPath, zPermanentlyDeleteFolderResponse, zPermanentlyDeleteNotePath, zPermanentlyDeleteNoteResponse, zPermanentlyDeleteWorkspaceItemsBody, zPermanentlyDeleteWorkspaceItemsPath, zPermanentlyDeleteWorkspaceItemsResponse, zPublishNotePath, zPublishNoteResponse, zPublishWorkspacePath, zPublishWorkspaceResponse, zRenameFolderBody, zRenameFolderPath, zRenameFolderResponse, zRenameNoteBody, zRenameNotePath, zRenameNoteResponse, zRenameRevisionBody, zRenameRevisionPath, zRenameRevisionResponse, zRenameWorkspaceBody, zRenameWorkspacePath, zRenameWorkspaceResponse, zRestoreTrashedWorkspaceItemsBody, zRestoreTrashedWorkspaceItemsPath, zRestoreTrashedWorkspaceItemsResponse, zShowTrashPath, zShowTrashResponse, zTrashWorkspaceItemsBody, zTrashWorkspaceItemsPath, zTrashWorkspaceItemsResponse, zUnpublishNotePath, zUnpublishNoteResponse, zUnpublishWorkspacePath, zUnpublishWorkspaceResponse, zUpdateWorkspaceMembersBody, zUpdateWorkspaceMembersPath, zUpdateWorkspaceMembersResponse } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -301,6 +301,35 @@ export const unpublishNote = <ThrowOnError extends boolean = false>(options: Opt
 });
 
 /**
+ * Get workspace
+ */
+export const getWorkspace = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceData, ThrowOnError>) => (options.client ?? client).get<GetWorkspaceResponses, GetWorkspaceErrors, ThrowOnError>({
+    requestValidator: async (data) => await z.object({
+        body: z.never().optional(),
+        path: zGetWorkspacePath,
+        query: z.never().optional()
+    }).parseAsync(data),
+    responseValidator: async (data) => await zGetWorkspaceResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces-by-slug/{workspaceSlug}',
+    ...options
+});
+
+/**
+ * Check workspace slug exists
+ */
+export const checkWorkspaceSlugExists = <ThrowOnError extends boolean = false>(options: Options<CheckWorkspaceSlugExistsData, ThrowOnError>) => (options.client ?? client).get<CheckWorkspaceSlugExistsResponses, CheckWorkspaceSlugExistsErrors, ThrowOnError>({
+    requestValidator: async (data) => await z.object({
+        body: z.never().optional(),
+        path: zCheckWorkspaceSlugExistsPath,
+        query: z.never().optional()
+    }).parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces-by-slug/{workspaceSlug}/exists',
+    ...options
+});
+
+/**
  * Create workspace
  */
 export const createWorkspace = <ThrowOnError extends boolean = false>(options: Options<CreateWorkspaceData, ThrowOnError>) => (options.client ?? client).post<CreateWorkspaceResponses, CreateWorkspaceErrors, ThrowOnError>({
@@ -334,35 +363,6 @@ export const getMyWorkspaces = <ThrowOnError extends boolean = false>(options?: 
 });
 
 /**
- * Get workspace
- */
-export const getWorkspace = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceData, ThrowOnError>) => (options.client ?? client).get<GetWorkspaceResponses, GetWorkspaceErrors, ThrowOnError>({
-    requestValidator: async (data) => await z.object({
-        body: z.never().optional(),
-        path: zGetWorkspacePath,
-        query: z.never().optional()
-    }).parseAsync(data),
-    responseValidator: async (data) => await zGetWorkspaceResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces-by-slug/{workspaceSlug}',
-    ...options
-});
-
-/**
- * Check workspace slug exists
- */
-export const checkWorkspaceSlugExists = <ThrowOnError extends boolean = false>(options: Options<CheckWorkspaceSlugExistsData, ThrowOnError>) => (options.client ?? client).get<CheckWorkspaceSlugExistsResponses, CheckWorkspaceSlugExistsErrors, ThrowOnError>({
-    requestValidator: async (data) => await z.object({
-        body: z.never().optional(),
-        path: zCheckWorkspaceSlugExistsPath,
-        query: z.never().optional()
-    }).parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/note/workspaces-by-slug/{workspaceSlug}/exists',
-    ...options
-});
-
-/**
  * Delete workspace
  */
 export const deleteWorkspace = <ThrowOnError extends boolean = false>(options: Options<DeleteWorkspaceData, ThrowOnError>) => (options.client ?? client).delete<DeleteWorkspaceResponses, DeleteWorkspaceErrors, ThrowOnError>({
@@ -375,6 +375,25 @@ export const deleteWorkspace = <ThrowOnError extends boolean = false>(options: O
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}',
     ...options
+});
+
+/**
+ * Change workspace slug
+ */
+export const changeWorkspaceSlug = <ThrowOnError extends boolean = false>(options: Options<ChangeWorkspaceSlugData, ThrowOnError>) => (options.client ?? client).post<ChangeWorkspaceSlugResponses, ChangeWorkspaceSlugErrors, ThrowOnError>({
+    requestValidator: async (data) => await z.object({
+        body: zChangeWorkspaceSlugBody,
+        path: zChangeWorkspaceSlugPath,
+        query: z.never().optional()
+    }).parseAsync(data),
+    responseValidator: async (data) => await zChangeWorkspaceSlugResponse.parseAsync(data),
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/note/workspaces/{workspaceId}/change-slug',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**

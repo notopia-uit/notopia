@@ -1,6 +1,7 @@
 package app
 
 type Cmds struct {
+	ChangeWorkspaceSlugHandler             *ChangeWorkspaceSlugHandler
 	CreateFolderHandler                    *CreateFolderHandler
 	CreateNoteHandler                      *CreateNoteHandler
 	CreateWorkspaceHandler                 *CreateWorkspaceHandler

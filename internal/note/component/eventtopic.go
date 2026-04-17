@@ -49,8 +49,10 @@ func DomainEventToTopic(event domain.Event) (string, error) {
 		return DomainEventTopicPrefix + "note.restored", nil
 	case *domain.NotePermanentlyDeletedEvent:
 		return DomainEventTopicPrefix + "note.permanently_deleted", nil
-	case *domain.WorkspaceUpdatedEvent:
-		return DomainEventTopicPrefix + "workspace.updated", nil
+	case *domain.WorkspaceRenamedEvent:
+		return DomainEventTopicPrefix + "workspace.renamed", nil
+	case *domain.WorkspaceSlugChangedEvent:
+		return DomainEventTopicPrefix + "workspace.slug_changed", nil
 	case *domain.WorkspaceDeletedEvent:
 		return DomainEventTopicPrefix + "workspace.deleted", nil
 	default:

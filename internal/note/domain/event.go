@@ -128,9 +128,13 @@ type NotePermanentlyDeletedEvent struct {
 	BaseEvent
 }
 
-type WorkspaceUpdatedEvent struct {
+type WorkspaceRenamedEvent struct {
 	BaseEvent
 	Name string
+}
+
+type WorkspaceSlugChangedEvent struct {
+	BaseEvent
 	Slug string
 }
 

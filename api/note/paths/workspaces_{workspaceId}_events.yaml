@@ -15,19 +15,21 @@ get:
         text/event-stream:
           schema:
             oneOf:
+              - $ref: ../components/schemas/HeartBeatWorkspaceEvent.yaml
+              - $ref: ../components/schemas/WorkspaceDeletedEvent.yaml
               - $ref: ../components/schemas/WorkspaceItemsUpdatedEvent.yaml
               - $ref: ../components/schemas/WorkspaceMembersUpdatedEvent.yaml
-              - $ref: ../components/schemas/WorkspaceUpdatedEvent.yaml
-              - $ref: ../components/schemas/WorkspaceDeletedEvent.yaml
-              - $ref: ../components/schemas/HeartBeatWorkspaceEvent.yaml
+              - $ref: ../components/schemas/WorkspaceRenamedEvent.yaml
+              - $ref: ../components/schemas/WorkspaceSlugChangedEvent.yaml
             discriminator:
               propertyName: event
               mapping:
+                HeartBeatWorkspaceEvent: ../components/schemas/HeartBeatWorkspaceEvent.yaml
+                WorkspaceDeletedEvent: ../components/schemas/WorkspaceDeletedEvent.yaml
                 WorkspaceItemsUpdatedEvent: ../components/schemas/WorkspaceItemsUpdatedEvent.yaml
                 WorkspaceMembersUpdatedEvent: ../components/schemas/WorkspaceMembersUpdatedEvent.yaml
-                WorkspaceUpdatedEvent: ../components/schemas/WorkspaceUpdatedEvent.yaml
-                WorkspaceDeletedEvent: ../components/schemas/WorkspaceDeletedEvent.yaml
-                HeartBeatWorkspaceEvent: ../components/schemas/HeartBeatWorkspaceEvent.yaml
+                WorkspaceRenamedEvent: ../components/schemas/WorkspaceRenamedEvent.yaml
+                WorkspaceSlugChangedEvent: ../components/schemas/WorkspaceSlugChangedEvent.yaml
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

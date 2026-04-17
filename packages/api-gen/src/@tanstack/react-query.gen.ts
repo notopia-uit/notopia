@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, useMutation, type UseMutationOptions, useQuery } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { checkWorkspaceSlugExists, commitDocument, createFolder, createNote, createWorkspace, deleteRevision, deleteWorkspace, getDocumentAttachmentUploadUrl, getMyWorkspaces, getNote, getNoteGraph, getNoteLinks, getRevisions, getRevisionWithContent, getWorkspace, getWorkspaceGraph, getWorkspaceMembers, getWorkspaceTree, moveWorkspaceItems, type Options, permanentlyDeleteFolder, permanentlyDeleteNote, permanentlyDeleteWorkspaceItems, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceMembers } from '../sdk.gen';
-import type { CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsError, CommitDocumentData, CommitDocumentError, CommitDocumentResponse, CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetMyWorkspacesData, GetMyWorkspacesError, GetMyWorkspacesResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetRevisionWithContentData, GetRevisionWithContentError, GetRevisionWithContentResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PermanentlyDeleteFolderData, PermanentlyDeleteFolderError, PermanentlyDeleteFolderResponse, PermanentlyDeleteNoteData, PermanentlyDeleteNoteError, PermanentlyDeleteNoteResponse, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsError, PermanentlyDeleteWorkspaceItemsResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse } from '../types.gen';
+import { changeWorkspaceSlug, checkWorkspaceSlugExists, commitDocument, createFolder, createNote, createWorkspace, deleteRevision, deleteWorkspace, getDocumentAttachmentUploadUrl, getMyWorkspaces, getNote, getNoteGraph, getNoteLinks, getRevisions, getRevisionWithContent, getWorkspace, getWorkspaceGraph, getWorkspaceMembers, getWorkspaceTree, moveWorkspaceItems, type Options, permanentlyDeleteFolder, permanentlyDeleteNote, permanentlyDeleteWorkspaceItems, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceMembers } from '../sdk.gen';
+import type { ChangeWorkspaceSlugData, ChangeWorkspaceSlugError, ChangeWorkspaceSlugResponse, CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsError, CommitDocumentData, CommitDocumentError, CommitDocumentResponse, CreateFolderData, CreateFolderError, CreateNoteData, CreateNoteError, CreateWorkspaceData, CreateWorkspaceError, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetMyWorkspacesData, GetMyWorkspacesError, GetMyWorkspacesResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetRevisionWithContentData, GetRevisionWithContentError, GetRevisionWithContentResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PermanentlyDeleteFolderData, PermanentlyDeleteFolderError, PermanentlyDeleteFolderResponse, PermanentlyDeleteNoteData, PermanentlyDeleteNoteError, PermanentlyDeleteNoteResponse, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsError, PermanentlyDeleteWorkspaceItemsResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -480,51 +480,6 @@ export const unpublishNoteMutation = (options?: Partial<Options<UnpublishNoteDat
  */
 export const useUnpublishNoteMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<UnpublishNoteResponse, UnpublishNoteError, Options<UnpublishNoteData>>, 'mutationFn'>>) => useMutation({ ...unpublishNoteMutation(), ...mutationOptions });
 
-/**
- * Create workspace
- */
-export const createWorkspaceMutation = (options?: Partial<Options<CreateWorkspaceData>>): UseMutationOptions<unknown, CreateWorkspaceError, Options<CreateWorkspaceData>> => {
-    const mutationOptions: UseMutationOptions<unknown, CreateWorkspaceError, Options<CreateWorkspaceData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createWorkspace({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * Create workspace
- */
-export const useCreateWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<unknown, CreateWorkspaceError, Options<CreateWorkspaceData>>, 'mutationFn'>>) => useMutation({ ...createWorkspaceMutation(), ...mutationOptions });
-
-export const getMyWorkspacesQueryKey = (options?: Options<GetMyWorkspacesData>) => createQueryKey('getMyWorkspaces', options);
-
-/**
- * Get my workspaces
- */
-export const getMyWorkspacesOptions = (options?: Options<GetMyWorkspacesData>) => queryOptions<GetMyWorkspacesResponse, GetMyWorkspacesError, GetMyWorkspacesResponse, ReturnType<typeof getMyWorkspacesQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getMyWorkspaces({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getMyWorkspacesQueryKey(options)
-});
-
-/**
- * Get my workspaces
- */
-export const useGetMyWorkspacesQuery = (options?: Options<GetMyWorkspacesData>) => useQuery(getMyWorkspacesOptions(options));
-
 export const getWorkspaceQueryKey = (options: Options<GetWorkspaceData>) => createQueryKey('getWorkspace', options);
 
 /**
@@ -572,6 +527,51 @@ export const checkWorkspaceSlugExistsOptions = (options: Options<CheckWorkspaceS
 export const useCheckWorkspaceSlugExistsQuery = (options: Options<CheckWorkspaceSlugExistsData>) => useQuery(checkWorkspaceSlugExistsOptions(options));
 
 /**
+ * Create workspace
+ */
+export const createWorkspaceMutation = (options?: Partial<Options<CreateWorkspaceData>>): UseMutationOptions<unknown, CreateWorkspaceError, Options<CreateWorkspaceData>> => {
+    const mutationOptions: UseMutationOptions<unknown, CreateWorkspaceError, Options<CreateWorkspaceData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createWorkspace({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Create workspace
+ */
+export const useCreateWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<unknown, CreateWorkspaceError, Options<CreateWorkspaceData>>, 'mutationFn'>>) => useMutation({ ...createWorkspaceMutation(), ...mutationOptions });
+
+export const getMyWorkspacesQueryKey = (options?: Options<GetMyWorkspacesData>) => createQueryKey('getMyWorkspaces', options);
+
+/**
+ * Get my workspaces
+ */
+export const getMyWorkspacesOptions = (options?: Options<GetMyWorkspacesData>) => queryOptions<GetMyWorkspacesResponse, GetMyWorkspacesError, GetMyWorkspacesResponse, ReturnType<typeof getMyWorkspacesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getMyWorkspaces({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getMyWorkspacesQueryKey(options)
+});
+
+/**
+ * Get my workspaces
+ */
+export const useGetMyWorkspacesQuery = (options?: Options<GetMyWorkspacesData>) => useQuery(getMyWorkspacesOptions(options));
+
+/**
  * Delete workspace
  */
 export const deleteWorkspaceMutation = (options?: Partial<Options<DeleteWorkspaceData>>): UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> => {
@@ -592,6 +592,28 @@ export const deleteWorkspaceMutation = (options?: Partial<Options<DeleteWorkspac
  * Delete workspace
  */
 export const useDeleteWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>>, 'mutationFn'>>) => useMutation({ ...deleteWorkspaceMutation(), ...mutationOptions });
+
+/**
+ * Change workspace slug
+ */
+export const changeWorkspaceSlugMutation = (options?: Partial<Options<ChangeWorkspaceSlugData>>): UseMutationOptions<ChangeWorkspaceSlugResponse, ChangeWorkspaceSlugError, Options<ChangeWorkspaceSlugData>> => {
+    const mutationOptions: UseMutationOptions<ChangeWorkspaceSlugResponse, ChangeWorkspaceSlugError, Options<ChangeWorkspaceSlugData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await changeWorkspaceSlug({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Change workspace slug
+ */
+export const useChangeWorkspaceSlugMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<ChangeWorkspaceSlugResponse, ChangeWorkspaceSlugError, Options<ChangeWorkspaceSlugData>>, 'mutationFn'>>) => useMutation({ ...changeWorkspaceSlugMutation(), ...mutationOptions });
 
 export const getWorkspaceGraphQueryKey = (options: Options<GetWorkspaceGraphData>) => createQueryKey('getWorkspaceGraph', options);
 
