@@ -1,6 +1,7 @@
 package commonconfig
 
 import (
+	"fmt"
 	"net/url"
 
 	"github.com/spf13/viper"
@@ -15,15 +16,17 @@ type Authentik struct {
 	healthLiveURL string
 }
 
-func (a *Authentik) HealthLiveURL() string {
-	if a.hostURL == nil {
-		var err error
-		a.hostURL, err = url.Parse(a.Host)
-		if err != nil {
-			panic("invalid authentik host URL: " + err.Error())
-		}
-		a.healthLiveURL = a.hostURL.ResolveReference(&url.URL{Path: "/-/health/live"}).String()
+func (a *Authentik) Init() error {
+	var err error
+	a.hostURL, err = url.Parse(a.Host)
+	if err != nil {
+		return fmt.Errorf("invalid authentik host URL: %w", err)
 	}
+	a.healthLiveURL = a.hostURL.ResolveReference(&url.URL{Path: "/-/health/live"}).String()
+	return nil
+}
+
+func (a *Authentik) HealthLiveURL() string {
 	return a.healthLiveURL
 }
 

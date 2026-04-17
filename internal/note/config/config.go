@@ -101,6 +101,10 @@ func New(
 		return nil, fmt.Errorf("cannot unmarshal config from env or config file: %w", err)
 	}
 
+	if err := cfg.Authentik.Init(); err != nil {
+		return nil, fmt.Errorf("failed to initialize Authentik config: %w", err)
+	}
+
 	slog.Info("configuration", slog.Any("config", cfg))
 
 	if err := validate.Struct(&cfg); err != nil {
