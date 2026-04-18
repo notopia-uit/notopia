@@ -132,24 +132,26 @@ func (h *WorkspaceTree) buildFolderTree(
 	}
 
 	if notes, ok := notesByFolder[folderID]; ok {
-		for _, note := range notes {
+		result.Notes = make([]app.WorkspaceTreeNote, len(notes))
+		for i, note := range notes {
 			var noteIcon string
 			if note.Icon != nil {
 				noteIcon = *note.Icon
 			}
-			result.Notes = append(result.Notes, app.WorkspaceTreeNote{
+			result.Notes[i] = app.WorkspaceTreeNote{
 				ID:        note.ID,
 				Name:      note.Name,
 				Icon:      noteIcon,
 				UpdatedAt: note.UpdatedAt,
-			})
+			}
 		}
 	}
 
 	// Only iterate through direct children, not the entire folderMap
 	if children, ok := childrenByParentID[folderID]; ok {
-		for _, childFolder := range children {
-			childTree := h.buildFolderTree(
+		result.Children = make([]app.WorkspaceTreeFolder, len(children))
+		for i, childFolder := range children {
+			result.Children[i] = h.buildFolderTree(
 				childFolder.ID,
 				childFolder.Name,
 				childFolder.Icon,
@@ -157,7 +159,6 @@ func (h *WorkspaceTree) buildFolderTree(
 				childrenByParentID,
 				notesByFolder,
 			)
-			result.Children = append(result.Children, childTree)
 		}
 	}
 
