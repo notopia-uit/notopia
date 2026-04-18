@@ -7,7 +7,9 @@ import (
 	"log/slog"
 
 	"github.com/google/uuid"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -50,14 +52,17 @@ func NewAuthorization(
 	logger logging.Logger,
 ) (*Authorization, func(), error) {
 	statsHandler := otelgrpc.NewClientHandler()
+	logInterceptor := selector.UnaryClientInterceptor(
+		logging.UnaryClientInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
+		selector.MatchFunc(func(ctx context.Context, callMeta interceptors.CallMeta) bool {
+			return callMeta.Service != "grpc.health.v1.Health"
+		}),
+	)
 	conn, err := grpc.NewClient(
 		servicesCfg.Authorization.URL,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithStatsHandler(statsHandler),
-		grpc.WithChainUnaryInterceptor(
-			logging.UnaryClientInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
-			authorizationUnaryClientErrorInterceptor(),
-		),
+		grpc.WithChainUnaryInterceptor(logInterceptor, authorizationUnaryClientErrorInterceptor()),
 	)
 	if err != nil {
 		return nil, nil, fmt.Errorf("invalid authorization service client configuration: %w", err)
