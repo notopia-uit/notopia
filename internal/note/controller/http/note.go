@@ -145,7 +145,7 @@ func (h *StrictHandler) GetNoteLinks(
 		return nil, err
 	}
 
-	dto := toGetNoteLinksDTO(result)
+	dto := toGetNoteLinksDTO(&result)
 	return note.GetNoteLinks200JSONResponse(dto), nil
 }
 

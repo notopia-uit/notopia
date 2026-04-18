@@ -36,8 +36,8 @@ func (g *Service) GetUserWorkspaces(ctx context.Context, req *pb.GetUserWorkspac
 	}
 
 	pbWorkspaces := make([]*pb.UserWorkspace, len(workspaces))
-	for i, w := range workspaces {
-		pbWorkspaces[i] = appUserWorkspaceToPb(w)
+	for i := range workspaces {
+		pbWorkspaces[i] = appUserWorkspaceToPb(&workspaces[i])
 	}
 
 	return &pb.GetUserWorkspacesResponse{
@@ -110,8 +110,8 @@ func (g *Service) GetWorkspaceMembers(ctx context.Context, req *pb.GetWorkspaceM
 	}
 
 	pbMembers := make([]*pb.WorkspaceMember, len(members))
-	for i, m := range members {
-		pbMembers[i] = appWorkspaceMemberToPb(m)
+	for i := range members {
+		pbMembers[i] = appWorkspaceMemberToPb(&members[i])
 	}
 
 	return &pb.GetWorkspaceMembersResponse{
@@ -207,14 +207,14 @@ func pbWorkspaceRoleToApp(role pb.WorkspaceRole) app.WorkspaceRole {
 	}
 }
 
-func appUserWorkspaceToPb(workspace app.UserWorkspace) *pb.UserWorkspace {
+func appUserWorkspaceToPb(workspace *app.UserWorkspace) *pb.UserWorkspace {
 	return &pb.UserWorkspace{
 		Id:   workspace.ID.String(),
 		Role: appWorkspaceRoleToPb(workspace.Role),
 	}
 }
 
-func appWorkspaceMemberToPb(workspace app.WorkspaceMember) *pb.WorkspaceMember {
+func appWorkspaceMemberToPb(workspace *app.WorkspaceMember) *pb.WorkspaceMember {
 	return &pb.WorkspaceMember{
 		Id:   workspace.ID,
 		Role: appWorkspaceRoleToPb(workspace.Role),

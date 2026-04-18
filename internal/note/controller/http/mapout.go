@@ -77,7 +77,7 @@ func toFolderDTO(f *app.Folder) (note.Folder, error) {
 	}, nil
 }
 
-func toWorkspaceDTO(w app.Workspace) note.Workspace {
+func toWorkspaceDTO(w *app.Workspace) note.Workspace {
 	return note.Workspace{
 		Id:   &w.ID,
 		Name: w.Name,
@@ -100,18 +100,18 @@ func toWorkspaceRoleDTO(r app.WorkspaceRole) (note.WorkspaceRole, error) {
 	}
 }
 
-func toUserWorkspaceDTO(u app.UserWorkspace) (note.UserWorkspace, error) {
+func toUserWorkspaceDTO(u *app.UserWorkspace) (note.UserWorkspace, error) {
 	role, err := toWorkspaceRoleDTO(u.Role)
 	if err != nil {
 		return note.UserWorkspace{}, err
 	}
 	return note.UserWorkspace{
-		Workspace: toWorkspaceDTO(*u.Workspace),
+		Workspace: toWorkspaceDTO(u.Workspace),
 		Role:      role,
 	}, nil
 }
 
-func toWorkspaceMemberDTO(m app.WorkspaceMember) (note.WorkspaceMember, error) {
+func toWorkspaceMemberDTO(m *app.WorkspaceMember) (note.WorkspaceMember, error) {
 	var name *string
 	if m.Name != "" {
 		name = &m.Name
@@ -130,8 +130,8 @@ func toWorkspaceMemberDTO(m app.WorkspaceMember) (note.WorkspaceMember, error) {
 
 func toWorkspaceMembersDTO(members []app.WorkspaceMember) ([]note.WorkspaceMember, error) {
 	out := make([]note.WorkspaceMember, 0, len(members))
-	for _, m := range members {
-		member, err := toWorkspaceMemberDTO(m)
+	for i := range members {
+		member, err := toWorkspaceMemberDTO(&members[i])
 		if err != nil {
 			return nil, errs.NewInternal(fmt.Sprintf("invalid workspace member: %v", err))
 		}
@@ -263,7 +263,7 @@ func toShowTrashDTO(t *app.Trash) (note.ShowTrash200JSONResponse, error) {
 	}, nil
 }
 
-func toGetNoteLinksDTO(r app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
+func toGetNoteLinksDTO(r *app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
 	outgoing := make([]note.NoteLink, len(r.OutgoingLinks))
 	for i, l := range r.OutgoingLinks {
 		outgoing[i] = toNoteLinkDTO(l)

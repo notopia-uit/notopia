@@ -104,7 +104,7 @@ func (h *StrictHandler) GetWorkspace(
 		return nil, err
 	}
 
-	dto := toWorkspaceDTO(result)
+	dto := toWorkspaceDTO(&result)
 	return note.GetWorkspace200JSONResponse(dto), nil
 }
 
@@ -141,8 +141,8 @@ func (h *StrictHandler) GetMyWorkspaces(
 		return nil, err
 	}
 	dtos := make([]note.UserWorkspace, 0, len(myWorkspaces))
-	for _, w := range myWorkspaces {
-		dto, err := toUserWorkspaceDTO(w)
+	for i := range myWorkspaces {
+		dto, err := toUserWorkspaceDTO(&myWorkspaces[i])
 		if err != nil {
 			return nil, err
 		}
