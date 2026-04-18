@@ -24,13 +24,13 @@ func NewGetUserWorkspacesHandler(enforcer *casbin.TransactionalEnforcer) *GetUse
 
 var ProvideGetUserWorkspacesHandler = NewGetUserWorkspacesHandler
 
-func (h *GetUserWorkspacesHandler) Handle(ctx context.Context, params GetUserWorkspaces) ([]*UserWorkspace, error) {
+func (h *GetUserWorkspacesHandler) Handle(ctx context.Context, params GetUserWorkspaces) ([]UserWorkspace, error) {
 	rules, err := h.enforcer.GetFilteredGroupingPolicy(0, formatUser(params.UserID))
 	if err != nil {
 		return nil, errs.NewCasbinInternalError(err)
 	}
 
-	workspaces := make([]*UserWorkspace, 0, len(rules))
+	workspaces := make([]UserWorkspace, 0, len(rules))
 	for _, rule := range rules {
 		if len(rule) != 3 {
 			return nil, errs.NewCasbinPolicySignatureInvalid(fmt.Sprintf("expected 3 elements in grouping policy rule, got %d", len(rule)))
@@ -40,7 +40,7 @@ func (h *GetUserWorkspacesHandler) Handle(ctx context.Context, params GetUserWor
 		if err != nil {
 			return nil, errs.NewInvalid(fmt.Sprintf("invalid workspace ID in grouping policy rule: %s", rule[2]))
 		}
-		workspaces = append(workspaces, &UserWorkspace{
+		workspaces = append(workspaces, UserWorkspace{
 			ID:   workspaceID,
 			Role: WorkspaceRole(rule[1]),
 		})

@@ -47,7 +47,7 @@ func TestGetUserWorkspaceItemPermissionsHandler(t *testing.T) {
 				return
 			}
 			require.NoError(t, err, "Handler threw an error")
-			assert.Equal(t, tc.expected, *perms)
+			assert.Equal(t, tc.expected, perms)
 		})
 	}
 }

@@ -207,14 +207,14 @@ func pbWorkspaceRoleToApp(role pb.WorkspaceRole) app.WorkspaceRole {
 	}
 }
 
-func appUserWorkspaceToPb(workspace *app.UserWorkspace) *pb.UserWorkspace {
+func appUserWorkspaceToPb(workspace app.UserWorkspace) *pb.UserWorkspace {
 	return &pb.UserWorkspace{
 		Id:   workspace.ID.String(),
 		Role: appWorkspaceRoleToPb(workspace.Role),
 	}
 }
 
-func appWorkspaceMemberToPb(workspace *app.WorkspaceMember) *pb.WorkspaceMember {
+func appWorkspaceMemberToPb(workspace app.WorkspaceMember) *pb.WorkspaceMember {
 	return &pb.WorkspaceMember{
 		Id:   workspace.ID,
 		Role: appWorkspaceRoleToPb(workspace.Role),
