@@ -43,17 +43,9 @@ func (e Err) Unwrap() error   { return e.err }
 func (e Err) Code() Code      { return e.code }
 func (e Err) Message() string { return e.message }
 
-type Unauthorized struct {
-	Err
-}
-
-func NewUnauthorized() *Unauthorized {
-	return &Unauthorized{
-		Err: Err{
-			message: "unauthorized",
-			code:    CodeUnauthorized,
-		},
-	}
+var Unauthorized = &Err{
+	message: "unauthorized",
+	code:    CodeUnauthorized,
 }
 
 type Forbidden struct {

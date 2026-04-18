@@ -19,7 +19,7 @@ func (h *StrictHandler) CreateWorkspace(
 ) (note.CreateWorkspaceResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	id, err := uuid.NewV7()
@@ -50,7 +50,7 @@ func (h *StrictHandler) DeleteWorkspace(
 ) (note.DeleteWorkspaceResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	cmd := &app.DeleteWorkspace{
@@ -71,7 +71,7 @@ func (h *StrictHandler) ChangeWorkspaceSlug(
 ) (note.ChangeWorkspaceSlugResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	cmd := &app.ChangeWorkspaceSlug{
@@ -93,7 +93,7 @@ func (h *StrictHandler) GetWorkspace(
 ) (note.GetWorkspaceResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 	query := &app.GetWorkspaceBySlug{
 		Slug:   request.WorkspaceSlug,
@@ -131,7 +131,7 @@ func (h *StrictHandler) GetMyWorkspaces(
 ) (note.GetMyWorkspacesResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 	query := &app.GetMyWorkspaces{
 		UserID: user.ID,
@@ -161,7 +161,7 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	}
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	eventCh, err := h.WorkspaceEventHub.Subscribe(ctx, request.WorkspaceId, user.ID)
@@ -184,7 +184,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 ) (note.GetWorkspaceGraphResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 	ignoreOrphans := false
 	if request.Params.IncludeOrphans != nil {
@@ -210,7 +210,7 @@ func (h *StrictHandler) GetWorkspaceMembers(
 ) (note.GetWorkspaceMembersResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 	query := &app.GetWorkspaceMembers{
 		ID:     request.WorkspaceId,
@@ -233,7 +233,7 @@ func (h *StrictHandler) UpdateWorkspaceMembers(
 ) (note.UpdateWorkspaceMembersResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	members, err := toWorkspaceMemberUpdates(*request.Body)
@@ -258,7 +258,7 @@ func (h *StrictHandler) MoveWorkspaceItems(
 ) (note.MoveWorkspaceItemsResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	var noteIDs []uuid.UUID
@@ -304,7 +304,7 @@ func (h *StrictHandler) RenameWorkspace(
 ) (note.RenameWorkspaceResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	cmd := &app.RenameWorkspace{
@@ -326,7 +326,7 @@ func (h *StrictHandler) RestoreTrashedWorkspaceItems(
 ) (note.RestoreTrashedWorkspaceItemsResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	var noteIDs []uuid.UUID
@@ -359,7 +359,7 @@ func (h *StrictHandler) ShowTrash(
 ) (note.ShowTrashResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 	query := &app.ShowTrash{
 		WorkspaceID: request.WorkspaceId,
@@ -383,7 +383,7 @@ func (h *StrictHandler) TrashWorkspaceItems(
 ) (note.TrashWorkspaceItemsResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	cmd := &app.TrashWorkspaceItems{
@@ -406,7 +406,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 ) (note.GetWorkspaceTreeResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 	var depth uint
 	if request.Params.Depth != nil && *request.Params.Depth > 0 {
@@ -448,7 +448,7 @@ func (h *StrictHandler) PermanentlyDeleteWorkspaceItems(
 ) (note.PermanentlyDeleteWorkspaceItemsResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	var noteIDs []uuid.UUID
