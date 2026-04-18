@@ -10,7 +10,7 @@ import (
 
 type UpdateWorkspaceMembers struct {
 	WorkspaceID uuid.UUID
-	Members     []*WorkspaceMemberUpdate
+	Members     []WorkspaceMemberUpdate
 	UserID      string
 }
 

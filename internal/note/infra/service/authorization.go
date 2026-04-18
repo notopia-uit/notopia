@@ -151,7 +151,7 @@ func (a *Authorization) UpdateWorkspaceMembers(
 	ctx context.Context,
 	userID string,
 	workspaceID uuid.UUID,
-	members []*app.WorkspaceMemberUpdate,
+	members []app.WorkspaceMemberUpdate,
 ) error {
 	pbMembers, err := a.toWorkspaceMembersPb(members)
 	if err != nil {
@@ -194,7 +194,7 @@ func (a *Authorization) CheckHealth(ctx context.Context) error {
 	return nil
 }
 
-func (a *Authorization) toWorkspaceMembersPb(members []*app.WorkspaceMemberUpdate) ([]*pb.WorkspaceMember, error) {
+func (a *Authorization) toWorkspaceMembersPb(members []app.WorkspaceMemberUpdate) ([]*pb.WorkspaceMember, error) {
 	pbMembers := make([]*pb.WorkspaceMember, 0, len(members))
 	for _, member := range members {
 		pbMember, err := a.toWorkspaceMemberPb(member)
@@ -206,7 +206,7 @@ func (a *Authorization) toWorkspaceMembersPb(members []*app.WorkspaceMemberUpdat
 	return pbMembers, nil
 }
 
-func (a *Authorization) toWorkspaceMemberPb(member *app.WorkspaceMemberUpdate) (*pb.WorkspaceMember, error) {
+func (a *Authorization) toWorkspaceMemberPb(member app.WorkspaceMemberUpdate) (*pb.WorkspaceMember, error) {
 	role, err := a.toWorkspaceRolePb(member.Role)
 	if err != nil {
 		return nil, err
