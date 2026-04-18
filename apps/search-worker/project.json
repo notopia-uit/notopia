@@ -50,7 +50,7 @@
         "development": {
           "buildTarget": "development"
         },
-        "development-mon": {
+        "mon": {
           "buildTarget": "development"
         },
         "production": {

@@ -13,11 +13,7 @@ func NewMeterProvider(
 	ctx context.Context,
 	res *resource.Resource,
 ) (*sdk.MeterProvider, func(), error) {
-	reader, err := autoexport.NewMetricReader(ctx, autoexport.WithFallbackMetricReader(
-		func(ctx context.Context) (sdk.Reader, error) {
-			return nil, nil
-		},
-	))
+	reader, err := autoexport.NewMetricReader(ctx)
 	if err != nil {
 		return nil, nil, err
 	}

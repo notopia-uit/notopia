@@ -49,6 +49,8 @@ func New(
 		),
 	)
 
+	httpPing := fmt.Sprintf("http://%s/note/ping", serverCfg.Health.Address())
+
 	readyChecker := health.NewChecker(
 		health.WithPeriodicCheck(
 			15*time.Second,
@@ -70,7 +72,7 @@ func New(
 			health.Check{
 				Name: "http",
 				Check: httpCheck.New(httpCheck.Config{
-					URL: "http://" + serverCfg.HTTP.Address(),
+					URL: httpPing,
 				}),
 			},
 		),

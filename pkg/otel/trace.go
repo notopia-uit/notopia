@@ -13,11 +13,7 @@ func NewTracerProvider(
 	ctx context.Context,
 	res *resource.Resource,
 ) (*sdk.TracerProvider, func(), error) {
-	exp, err := autoexport.NewSpanExporter(ctx,
-		autoexport.WithFallbackSpanExporter(func(ctx context.Context) (sdk.SpanExporter, error) {
-			return nil, nil
-		}),
-	)
+	exp, err := autoexport.NewSpanExporter(ctx)
 	if err != nil {
 		return nil, nil, err
 	}

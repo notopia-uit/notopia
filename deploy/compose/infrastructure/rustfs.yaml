@@ -3,9 +3,7 @@
 services:
   rustfs:
     container_name: notopia-rustfs
-    image: rustfs/rustfs:1.0.0-alpha.93-glibc
-    command:
-      - /data
+    image: rustfs/rustfs:1.0.0-alpha.94
     environment:
       RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:-notopiauit}
       RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:-notopiauit}
@@ -13,6 +11,7 @@ services:
       RUSTFS_SERVER_DOMAINS: rustfs.notopia.localhost
     volumes:
       - rustfs:/data
+      - rustfs_logs:/logs
     labels:
       traefik.enable: 'true'
       traefik.http.routers.rustfs-api.rule: Host(`rustfs-api.notopia.localhost`)
@@ -23,15 +22,33 @@ services:
       traefik.http.routers.rustfs-console.entrypoints: web
       traefik.http.routers.rustfs-console.service: rustfs-console
       traefik.http.services.rustfs-console.loadbalancer.server.port: '9001'
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test:
         - CMD
         - curl
         - -f
-        - http://localhost:9001/health
+        - http://localhost:9000/health
       start_period: 10s
       start_interval: 1s
     restart: unless-stopped
+    depends_on:
+      rustfs_volume_permission_helper:
+        condition: service_completed_successfully
+
+  rustfs_volume_permission_helper:
+    image: alpine
+    container_name: notopia-rustfs_volume_permission_helper
+    volumes:
+      - rustfs:/data
+      - rustfs_logs:/logs
+    command: > # language: sh
+      sh -c "
+        chown -R 10001:10001 /data /logs
+        echo 'Volume Permissions fixed'
+      "
+    restart: 'no'
 
   rustfs_bucket:
     image: minio/mc:RELEASE.2025-08-13T08-35-41Z
@@ -42,11 +59,13 @@ services:
           sleep 1;
         done
         /usr/bin/mc mb rustfs/document;
-        /usr/bin/mc policy set public rustfs/document;
+        /usr/bin/mc anonymous set public rustfs/document;
       '
+    restart: 'no'
     depends_on:
       rustfs:
         condition: service_healthy
 
 volumes:
   rustfs:
+  rustfs_logs:

@@ -33,7 +33,7 @@ func ginMiddlewareErrorHandler(c *gin.Context, message string, statusCode int) {
 
 var _ ginmiddleware.ErrorHandler = ginMiddlewareErrorHandler
 
-func strictServerToHTTPErr(err *errs.Err) (
+func strictServerToHTTPErr(err errs.Error) (
 	message string,
 	code string,
 	statusCode int,
@@ -156,7 +156,7 @@ func StrictHandlerErrorMiddleware() gin.HandlerFunc {
 
 		message := err.Error()
 		code := ""
-		if cerr, ok := errors.AsType[*errs.Err](err); ok {
+		if cerr, ok := errors.AsType[errs.Error](err); ok {
 			message, code, statusCode = strictServerToHTTPErr(cerr)
 		}
 

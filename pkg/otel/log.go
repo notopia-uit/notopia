@@ -16,11 +16,7 @@ func NewLoggerProvider(
 	ctx context.Context,
 	res *resource.Resource,
 ) (*sdk.LoggerProvider, func(), error) {
-	exp, err := autoexport.NewLogExporter(ctx, autoexport.WithFallbackLogExporter(
-		func(ctx context.Context) (sdk.Exporter, error) {
-			return nil, nil
-		}),
-	)
+	exp, err := autoexport.NewLogExporter(ctx)
 	if err != nil {
 		return nil, nil, err
 	}

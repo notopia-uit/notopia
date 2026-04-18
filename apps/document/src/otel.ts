@@ -1,7 +1,7 @@
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 
-if (process.env.OTEL_SDK_DISABLED === undefined) {
+if (process.env.OTEL_SDK_DISABLED !== 'false') {
   process.env.OTEL_SDK_DISABLED = 'true';
   process.env.OTEL_NODE_DISABLED_INSTRUMENTATIONS = 'all';
 } else {

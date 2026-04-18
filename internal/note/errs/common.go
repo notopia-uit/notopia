@@ -18,6 +18,8 @@ const (
 type Error interface {
 	error
 	Code() Code
+	Message() string
+	Unwrap() error
 }
 
 type Err struct {

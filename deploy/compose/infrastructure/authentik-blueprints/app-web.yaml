@@ -24,7 +24,7 @@ entries:
       authorization_flow:
         !Find [
           authentik_flows.flow,
-          [slug, default-provider-authorization-explicit-consent],
+          [slug, default-provider-authorization-implitcit-consent],
         ]
       invalidation_flow:
         !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]

@@ -38,8 +38,12 @@ func UserFromContext(ctx context.Context) (*User, bool) {
 	if !ok {
 		return nil, false
 	}
-	u, ok := c.Value(UserCtxKey).(*User)
-	return u, ok
+	u, ok := c.Get(UserCtxKey)
+	if !ok {
+		return nil, false
+	}
+	user, ok := u.(*User)
+	return user, ok
 }
 
 func GatewayUserAuth() gin.HandlerFunc {
