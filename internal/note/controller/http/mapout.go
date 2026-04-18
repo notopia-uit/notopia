@@ -21,7 +21,7 @@ func toNoteDTO(n *app.Note) (note.Note, error) {
 	}
 
 	var trashed *note.NoteTrashed
-	if n.Trashed.By != app.TrashedByUnspecified && !n.Trashed.At.IsZero() {
+	if n.Trashed.IsTrashed() {
 		trashedBy, err := toTrashedByDTO(n.Trashed.By)
 		if err != nil {
 			return note.Note{}, fmt.Errorf("invalid trashed by: %v", err)
@@ -55,7 +55,7 @@ func toFolderDTO(f *app.Folder) (note.Folder, error) {
 	}
 
 	var trashed *note.FolderTrashed
-	if f.Trashed.By != app.TrashedByUnspecified && !f.Trashed.At.IsZero() {
+	if f.Trashed.IsTrashed() {
 		trashedBy, err := toTrashedByDTO(f.Trashed.By)
 		if err != nil {
 			return note.Folder{}, fmt.Errorf("invalid trashed by: %v", err)
