@@ -19,7 +19,12 @@ func NewGinSlogHandler(
 	return GinSlogHandlerFunc(ginslog.SetLogger(
 		ginslog.WithLogger(
 			func(c *gin.Context, _ *slog.Logger) *slog.Logger {
-				return logger.With("user_id", c.GetHeader("X-Forwarded-ID"))
+				logger := logger
+				userId := c.GetHeader("X-Forwarded-ID")
+				if userId != "" {
+					logger = logger.With("user_id", userId)
+				}
+				return logger
 			},
 		), ginslog.WithSkipper(func(c *gin.Context) bool {
 			switch logCfg.GetSlogLevel() {

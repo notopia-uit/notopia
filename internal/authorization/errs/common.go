@@ -1,5 +1,7 @@
 package errs
 
+import "fmt"
+
 type Code string
 
 func (c Code) String() string {
@@ -26,7 +28,12 @@ type Err struct {
 
 var _ Error = (*Err)(nil)
 
-func (e Err) Error() string   { return e.message }
+func (e Err) Error() string {
+	if e.err != nil {
+		return fmt.Sprintf("%s: %v", e.message, e.err)
+	}
+	return e.message
+}
 func (e Err) Unwrap() error   { return e.err }
 func (e Err) Code() Code      { return e.code }
 func (e Err) Message() string { return e.message }
