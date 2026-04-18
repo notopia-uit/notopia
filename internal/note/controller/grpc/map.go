@@ -22,7 +22,7 @@ func toNoteDTO(note *app.Note) *pb.Note {
 	}
 }
 
-func toWorkspaceDTO(workspace app.Workspace) *pb.Workspace {
+func toWorkspaceDTO(workspace *app.Workspace) *pb.Workspace {
 	return &pb.Workspace{
 		Id:   workspace.ID.String(),
 		Name: workspace.Name,
