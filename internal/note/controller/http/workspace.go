@@ -431,7 +431,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 		return nil, err
 	}
 
-	dto := toWorkspaceTreeFolderDTO(result)
+	dto := toWorkspaceTreeFolderDTO(&result)
 	return note.GetWorkspaceTree200JSONResponse(dto), nil
 }
 

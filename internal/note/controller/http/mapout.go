@@ -140,7 +140,7 @@ func toWorkspaceMembersDTO(members []app.WorkspaceMember) ([]note.WorkspaceMembe
 	return out, nil
 }
 
-func toWorkspaceTreeNoteDTO(n app.WorkspaceTreeNote) note.WorkspaceTreeNote {
+func toWorkspaceTreeNoteDTO(n *app.WorkspaceTreeNote) note.WorkspaceTreeNote {
 	var icon *string
 	if n.Icon != "" {
 		icon = &n.Icon
@@ -153,18 +153,18 @@ func toWorkspaceTreeNoteDTO(n app.WorkspaceTreeNote) note.WorkspaceTreeNote {
 	}
 }
 
-func toWorkspaceTreeFolderDTO(f app.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
+func toWorkspaceTreeFolderDTO(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
 	var icon *string
 	if f.Icon != "" {
 		icon = &f.Icon
 	}
 	notes := make([]note.WorkspaceTreeNote, len(f.Notes))
-	for i, n := range f.Notes {
-		notes[i] = toWorkspaceTreeNoteDTO(n)
+	for i := range f.Notes {
+		notes[i] = toWorkspaceTreeNoteDTO(&f.Notes[i])
 	}
 	children := make([]note.WorkspaceTreeFolder, len(f.Children))
-	for i, c := range f.Children {
-		children[i] = toWorkspaceTreeFolderDTO(c)
+	for i := range f.Children {
+		children[i] = toWorkspaceTreeFolderDTO(&f.Children[i])
 	}
 	return note.WorkspaceTreeFolder{
 		Id:        &f.ID,
@@ -176,7 +176,7 @@ func toWorkspaceTreeFolderDTO(f app.WorkspaceTreeFolder) note.WorkspaceTreeFolde
 	}
 }
 
-func toTrashedFolderDTO(f app.TrashedFolder) (note.TrashedFolder, error) {
+func toTrashedFolderDTO(f *app.TrashedFolder) (note.TrashedFolder, error) {
 	trashedBy, err := toTrashedByDTO(f.Trashed.By)
 	if err != nil {
 		return note.TrashedFolder{}, err
@@ -191,7 +191,7 @@ func toTrashedFolderDTO(f app.TrashedFolder) (note.TrashedFolder, error) {
 	}, nil
 }
 
-func toTrashedNoteDTO(n app.TrashedNote) (note.TrashedNote, error) {
+func toTrashedNoteDTO(n *app.TrashedNote) (note.TrashedNote, error) {
 	trashedBy, err := toTrashedByDTO(n.Trashed.By)
 	if err != nil {
 		return note.TrashedNote{}, err
@@ -242,16 +242,16 @@ func toGraphDTO(g *app.Graph) note.Graph {
 
 func toShowTrashDTO(t *app.Trash) (note.ShowTrash200JSONResponse, error) {
 	notes := make([]note.TrashedNote, len(t.Notes))
-	for i, n := range t.Notes {
-		trashedNote, err := toTrashedNoteDTO(n)
+	for i := range t.Notes {
+		trashedNote, err := toTrashedNoteDTO(&t.Notes[i])
 		if err != nil {
 			return note.ShowTrash200JSONResponse{}, fmt.Errorf("invalid trashed note: %v", err)
 		}
 		notes[i] = trashedNote
 	}
 	folders := make([]note.TrashedFolder, len(t.Folders))
-	for i, f := range t.Folders {
-		trashedFolder, err := toTrashedFolderDTO(f)
+	for i := range t.Folders {
+		trashedFolder, err := toTrashedFolderDTO(&t.Folders[i])
 		if err != nil {
 			return note.ShowTrash200JSONResponse{}, fmt.Errorf("invalid trashed folder: %v", err)
 		}
