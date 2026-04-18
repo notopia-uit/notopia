@@ -106,7 +106,7 @@ func toUserWorkspaceDTO(u *app.UserWorkspace) (note.UserWorkspace, error) {
 		return note.UserWorkspace{}, err
 	}
 	return note.UserWorkspace{
-		Workspace: toWorkspaceDTO(u.Workspace),
+		Workspace: toWorkspaceDTO(&u.Workspace),
 		Role:      role,
 	}, nil
 }

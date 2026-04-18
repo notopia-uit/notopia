@@ -56,7 +56,7 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 			return nil, errs.NewInternal("workspace not found for user workspace")
 		}
 		userWorkspaces = append(userWorkspaces, UserWorkspace{
-			Workspace: &workspaces[wsIndex],
+			Workspace: workspaces[wsIndex],
 			Role:      auw.Role,
 		})
 	}

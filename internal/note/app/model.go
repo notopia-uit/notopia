@@ -186,7 +186,7 @@ type WorkspaceMemberUpdate struct {
 }
 
 type UserWorkspace struct {
-	Workspace *Workspace
+	Workspace Workspace
 	Role      WorkspaceRole
 }
 
