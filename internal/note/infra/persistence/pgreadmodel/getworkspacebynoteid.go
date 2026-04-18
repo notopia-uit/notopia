@@ -23,13 +23,13 @@ func NewGetWorkspaceByNote(queries *pgsqlc.Queries) *GetWorkspaceByNote {
 
 var ProvideGetWorkspaceByNote = NewGetWorkspaceByNote
 
-func (h *GetWorkspaceByNote) GetWorkspaceByNoteID(ctx context.Context, noteID uuid.UUID) (*app.Workspace, error) {
+func (h *GetWorkspaceByNote) GetWorkspaceByNoteID(ctx context.Context, noteID uuid.UUID) (app.Workspace, error) {
 	workspaces, err := h.queries.ReadGetWorkspaceByNoteID(ctx, noteID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewWorkspaceByNoteNotFound(noteID, err)
+			return app.Workspace{}, errs.NewWorkspaceByNoteNotFound(noteID, err)
 		}
-		return nil, toErr(err)
+		return app.Workspace{}, toErr(err)
 	}
 	result := toAppWorkspace(workspaces)
 	return result, nil

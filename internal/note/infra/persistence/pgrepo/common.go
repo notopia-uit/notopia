@@ -1,6 +1,8 @@
 package pgrepo
 
 import (
+	"time"
+
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
@@ -27,4 +29,11 @@ func toDomainTrashedBy(trashedBy string) domain.TrashedBy {
 	default:
 		return domain.TrashedByUnspecified
 	}
+}
+
+func toDomainTrashed(by *string, at *time.Time) domain.Trashed {
+	if by == nil || at == nil {
+		return domain.NewUntrashed()
+	}
+	return domain.NewTrashed(toDomainTrashedBy(*by), *at)
 }

@@ -52,7 +52,7 @@ func (s *ServiceServer) GetWorkspaceByNote(
 	if err != nil {
 		return nil, err
 	}
-	workspaceDTO := toWorkspaceDTO(workspace)
+	workspaceDTO := toWorkspaceDTO(&workspace)
 	return &pb.GetWorkspaceByNoteResponse{
 		Workspace: workspaceDTO,
 	}, nil

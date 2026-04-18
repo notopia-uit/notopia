@@ -20,13 +20,13 @@ func NewGetWorkspacesByIDs(queries *pgsqlc.Queries) *GetWorkspacesByIDs {
 
 var ProvideGetWorkspacesByIDs = NewGetWorkspacesByIDs
 
-func (h *GetWorkspacesByIDs) GetWorkspacesByIDs(ctx context.Context, ids []uuid.UUID) ([]*app.Workspace, error) {
+func (h *GetWorkspacesByIDs) GetWorkspacesByIDs(ctx context.Context, ids []uuid.UUID) ([]app.Workspace, error) {
 	workspaces, err := h.queries.ReadGetWorkspacesByIDs(ctx, ids)
 	if err != nil {
 		return nil, toErr(err)
 	}
 	if len(workspaces) == 0 {
-		return []*app.Workspace{}, nil
+		return []app.Workspace{}, nil
 	}
 	result := toAppWorkspaces(workspaces)
 	return result, nil

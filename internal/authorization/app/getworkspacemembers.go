@@ -25,7 +25,7 @@ func NewGetWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer) *GetW
 
 var ProvideGetWorkspaceMembersHandler = NewGetWorkspaceMembersHandler
 
-func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, params GetWorkspaceMembers) ([]*WorkspaceMember, error) {
+func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, params GetWorkspaceMembers) ([]WorkspaceMember, error) {
 	readAllowed, err := h.enforcer.Enforce(formatUser(params.UserID), formatWorkspace(params.WorkspaceID), "workspace", WorkspacePermissionRead.String())
 	if err != nil {
 		return nil, errs.NewCasbinEnforcerError(err)
@@ -39,7 +39,7 @@ func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, params GetWorks
 		return nil, errs.NewCasbinInternalError(err)
 	}
 
-	members := make([]*WorkspaceMember, 0, len(rules))
+	members := make([]WorkspaceMember, 0, len(rules))
 	for _, rule := range rules {
 		if len(rule) != 3 {
 			return nil, errs.NewCasbinPolicySignatureInvalid(fmt.Sprintf("expected 3 elements in grouping policy rule, got %d", len(rule)))
@@ -48,7 +48,7 @@ func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, params GetWorks
 		if err != nil {
 			return nil, errs.NewInvalidUserFormat(rule[0], err)
 		}
-		members = append(members, &WorkspaceMember{
+		members = append(members, WorkspaceMember{
 			ID:   userID,
 			Role: WorkspaceRole(rule[1]),
 		})

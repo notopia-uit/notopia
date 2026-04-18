@@ -39,13 +39,24 @@ type Trashed struct {
 	at time.Time
 }
 
-func NewTrashed(by TrashedBy, at time.Time) *Trashed {
-	return &Trashed{
+func NewTrashed(by TrashedBy, at time.Time) Trashed {
+	return Trashed{
 		by: by,
 		at: at,
 	}
 }
 
-func (t *Trashed) By() TrashedBy { return t.by }
+func NewUntrashed() Trashed {
+	return Trashed{
+		by: TrashedByUnspecified,
+		at: time.Time{},
+	}
+}
 
-func (t *Trashed) At() time.Time { return t.at }
+func (t Trashed) By() TrashedBy { return t.by }
+
+func (t Trashed) At() time.Time { return t.at }
+
+func (t Trashed) IsTrashed() bool {
+	return t.by != TrashedByUnspecified && !t.at.IsZero()
+}

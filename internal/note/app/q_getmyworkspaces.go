@@ -12,7 +12,7 @@ type GetMyWorkspaces struct {
 }
 
 type GetMyWorkspacesReadModel interface {
-	GetWorkspacesByIDs(ctx context.Context, ids []uuid.UUID) ([]*Workspace, error)
+	GetWorkspacesByIDs(ctx context.Context, ids []uuid.UUID) ([]Workspace, error)
 }
 
 type GetMyWorkspacesHandler struct {
@@ -32,7 +32,7 @@ func NewGetMyWorkspacesHandler(
 
 var ProvideGetMyWorkspacesHandler = NewGetMyWorkspacesHandler
 
-func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspaces) ([]*UserWorkspace, error) {
+func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspaces) ([]UserWorkspace, error) {
 	authorizationUserWorkspaces, err := h.authorizationSvc.GetUserWorkspaces(ctx, query.UserID)
 	if err != nil {
 		return nil, err
@@ -45,20 +45,20 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 	if err != nil {
 		return nil, err
 	}
-	workspaceIDWorkspaceMap := make(map[uuid.UUID]*Workspace)
-	for _, w := range workspaces {
-		workspaceIDWorkspaceMap[w.ID] = w
+	workspaceIDToIndex := make(map[uuid.UUID]int, len(workspaces))
+	for i := range workspaces {
+		workspaceIDToIndex[workspaces[i].ID] = i
 	}
-	userWorkspaces := make([]*UserWorkspace, 0, len(authorizationUserWorkspaces))
-	for _, auw := range authorizationUserWorkspaces {
-		w, ok := workspaceIDWorkspaceMap[auw.ID]
+	userWorkspaces := make([]UserWorkspace, len(authorizationUserWorkspaces))
+	for i, auw := range authorizationUserWorkspaces {
+		wsIndex, ok := workspaceIDToIndex[auw.ID]
 		if !ok {
 			return nil, errs.NewInternal("workspace not found for user workspace")
 		}
-		userWorkspaces = append(userWorkspaces, &UserWorkspace{
-			Workspace: w,
+		userWorkspaces[i] = UserWorkspace{
+			Workspace: workspaces[wsIndex],
 			Role:      auw.Role,
-		})
+		}
 	}
 	return userWorkspaces, nil
 }

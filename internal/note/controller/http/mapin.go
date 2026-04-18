@@ -9,25 +9,25 @@ import (
 )
 
 // This is partially, not have user name in
-func toWorkspaceMemberUpdate(wmu *note.WorkspaceMember) (*app.WorkspaceMemberUpdate, error) {
+func toWorkspaceMemberUpdate(wmu *note.WorkspaceMember) (app.WorkspaceMemberUpdate, error) {
 	role, err := toWorkspaceRole(wmu.Role)
 	if err != nil {
-		return nil, err
+		return app.WorkspaceMemberUpdate{}, err
 	}
-	return &app.WorkspaceMemberUpdate{
+	return app.WorkspaceMemberUpdate{
 		ID:   wmu.Id,
 		Role: role,
 	}, nil
 }
 
-func toWorkspaceMemberUpdates(wmus []note.WorkspaceMember) ([]*app.WorkspaceMemberUpdate, error) {
-	updates := make([]*app.WorkspaceMemberUpdate, 0, len(wmus))
-	for _, wmu := range wmus {
+func toWorkspaceMemberUpdates(wmus []note.WorkspaceMember) ([]app.WorkspaceMemberUpdate, error) {
+	updates := make([]app.WorkspaceMemberUpdate, len(wmus))
+	for i, wmu := range wmus {
 		update, err := toWorkspaceMemberUpdate(&wmu)
 		if err != nil {
 			return nil, err
 		}
-		updates = append(updates, update)
+		updates[i] = update
 	}
 	return updates, nil
 }

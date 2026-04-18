@@ -30,8 +30,8 @@ func toWorkspaceDTO(workspace *app.Workspace) *pb.Workspace {
 	}
 }
 
-func toTrashedDTO(trash *app.Trashed) *pb.Trashed {
-	if trash == nil {
+func toTrashedDTO(trash app.Trashed) *pb.Trashed {
+	if !trash.IsTrashed() {
 		return nil
 	}
 	return &pb.Trashed{

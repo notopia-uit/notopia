@@ -104,7 +104,7 @@ func (h *StrictHandler) GetWorkspace(
 		return nil, err
 	}
 
-	dto := toWorkspaceDTO(result)
+	dto := toWorkspaceDTO(&result)
 	return note.GetWorkspace200JSONResponse(dto), nil
 }
 
@@ -140,13 +140,13 @@ func (h *StrictHandler) GetMyWorkspaces(
 	if err != nil {
 		return nil, err
 	}
-	dtos := make([]note.UserWorkspace, 0, len(myWorkspaces))
-	for _, w := range myWorkspaces {
-		dto, err := toUserWorkspaceDTO(w)
+	dtos := make([]note.UserWorkspace, len(myWorkspaces))
+	for i := range myWorkspaces {
+		dto, err := toUserWorkspaceDTO(&myWorkspaces[i])
 		if err != nil {
 			return nil, err
 		}
-		dtos = append(dtos, dto)
+		dtos[i] = dto
 	}
 	return note.GetMyWorkspaces200JSONResponse(dtos), nil
 }
@@ -200,7 +200,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 		return nil, err
 	}
 
-	dto := toGraphDTO(result)
+	dto := toGraphDTO(&result)
 	return note.GetWorkspaceGraph200JSONResponse(dto), nil
 }
 
@@ -370,7 +370,7 @@ func (h *StrictHandler) ShowTrash(
 		return nil, err
 	}
 
-	dto, err := toShowTrashDTO(result)
+	dto, err := toShowTrashDTO(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -431,7 +431,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 		return nil, err
 	}
 
-	dto := toWorkspaceTreeFolderDTO(result)
+	dto := toWorkspaceTreeFolderDTO(&result)
 	return note.GetWorkspaceTree200JSONResponse(dto), nil
 }
 

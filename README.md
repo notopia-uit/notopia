@@ -23,7 +23,6 @@
 ## Dev
 
 - Do not source `.env`, because Nx will not override env that already exist. So, let Nx source itself
-
 - Delete broken symlinks in the current directory and its subdirectories
   ```bash
   find . -type l ! -exec test -e {} \; -print -delete

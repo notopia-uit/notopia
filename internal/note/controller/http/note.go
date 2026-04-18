@@ -89,7 +89,7 @@ func (h *StrictHandler) GetNote(
 		return nil, err
 	}
 
-	dto, err := toNoteDTO(*result)
+	dto, err := toNoteDTO(result)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (h *StrictHandler) GetNoteGraph(
 		return nil, err
 	}
 
-	dto := toGraphDTO(result)
+	dto := toGraphDTO(&result)
 	return note.GetNoteGraph200JSONResponse(dto), nil
 }
 
@@ -145,7 +145,7 @@ func (h *StrictHandler) GetNoteLinks(
 		return nil, err
 	}
 
-	dto := toGetNoteLinksDTO(result)
+	dto := toGetNoteLinksDTO(&result)
 	return note.GetNoteLinks200JSONResponse(dto), nil
 }
 

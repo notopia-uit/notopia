@@ -9,7 +9,7 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-func toNoteDTO(n app.Note) (note.Note, error) {
+func toNoteDTO(n *app.Note) (note.Note, error) {
 	var icon *string
 	if n.Icon != "" {
 		icon = &n.Icon
@@ -21,7 +21,7 @@ func toNoteDTO(n app.Note) (note.Note, error) {
 	}
 
 	var trashed *note.NoteTrashed
-	if n.Trashed != nil {
+	if n.Trashed.IsTrashed() {
 		trashedBy, err := toTrashedByDTO(n.Trashed.By)
 		if err != nil {
 			return note.Note{}, fmt.Errorf("invalid trashed by: %v", err)
@@ -43,7 +43,7 @@ func toNoteDTO(n app.Note) (note.Note, error) {
 	}, nil
 }
 
-func toFolderDTO(f app.Folder) (note.Folder, error) {
+func toFolderDTO(f *app.Folder) (note.Folder, error) {
 	var icon *string
 	if f.Icon != "" {
 		icon = &f.Icon
@@ -55,7 +55,7 @@ func toFolderDTO(f app.Folder) (note.Folder, error) {
 	}
 
 	var trashed *note.FolderTrashed
-	if f.Trashed != nil {
+	if f.Trashed.IsTrashed() {
 		trashedBy, err := toTrashedByDTO(f.Trashed.By)
 		if err != nil {
 			return note.Folder{}, fmt.Errorf("invalid trashed by: %v", err)
@@ -106,7 +106,7 @@ func toUserWorkspaceDTO(u *app.UserWorkspace) (note.UserWorkspace, error) {
 		return note.UserWorkspace{}, err
 	}
 	return note.UserWorkspace{
-		Workspace: toWorkspaceDTO(u.Workspace),
+		Workspace: toWorkspaceDTO(&u.Workspace),
 		Role:      role,
 	}, nil
 }
@@ -128,14 +128,14 @@ func toWorkspaceMemberDTO(m *app.WorkspaceMember) (note.WorkspaceMember, error) 
 	}, nil
 }
 
-func toWorkspaceMembersDTO(members []*app.WorkspaceMember) ([]note.WorkspaceMember, error) {
-	out := make([]note.WorkspaceMember, 0, len(members))
-	for _, m := range members {
-		member, err := toWorkspaceMemberDTO(m)
+func toWorkspaceMembersDTO(members []app.WorkspaceMember) ([]note.WorkspaceMember, error) {
+	out := make([]note.WorkspaceMember, len(members))
+	for i := range members {
+		member, err := toWorkspaceMemberDTO(&members[i])
 		if err != nil {
 			return nil, errs.NewInternal(fmt.Sprintf("invalid workspace member: %v", err))
 		}
-		out = append(out, member)
+		out[i] = member
 	}
 	return out, nil
 }
@@ -159,12 +159,12 @@ func toWorkspaceTreeFolderDTO(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFold
 		icon = &f.Icon
 	}
 	notes := make([]note.WorkspaceTreeNote, len(f.Notes))
-	for i, n := range f.Notes {
-		notes[i] = toWorkspaceTreeNoteDTO(n)
+	for i := range f.Notes {
+		notes[i] = toWorkspaceTreeNoteDTO(&f.Notes[i])
 	}
 	children := make([]note.WorkspaceTreeFolder, len(f.Children))
-	for i, c := range f.Children {
-		children[i] = toWorkspaceTreeFolderDTO(c)
+	for i := range f.Children {
+		children[i] = toWorkspaceTreeFolderDTO(&f.Children[i])
 	}
 	return note.WorkspaceTreeFolder{
 		Id:        &f.ID,
@@ -206,7 +206,7 @@ func toTrashedNoteDTO(n *app.TrashedNote) (note.TrashedNote, error) {
 	}, nil
 }
 
-func toNoteLinkDTO(n *app.NoteLink) note.NoteLink {
+func toNoteLinkDTO(n app.NoteLink) note.NoteLink {
 	var icon *string
 	if n.Icon != "" {
 		icon = &n.Icon
@@ -242,16 +242,16 @@ func toGraphDTO(g *app.Graph) note.Graph {
 
 func toShowTrashDTO(t *app.Trash) (note.ShowTrash200JSONResponse, error) {
 	notes := make([]note.TrashedNote, len(t.Notes))
-	for i, n := range t.Notes {
-		trashedNote, err := toTrashedNoteDTO(n)
+	for i := range t.Notes {
+		trashedNote, err := toTrashedNoteDTO(&t.Notes[i])
 		if err != nil {
 			return note.ShowTrash200JSONResponse{}, fmt.Errorf("invalid trashed note: %v", err)
 		}
 		notes[i] = trashedNote
 	}
 	folders := make([]note.TrashedFolder, len(t.Folders))
-	for i, f := range t.Folders {
-		trashedFolder, err := toTrashedFolderDTO(f)
+	for i := range t.Folders {
+		trashedFolder, err := toTrashedFolderDTO(&t.Folders[i])
 		if err != nil {
 			return note.ShowTrash200JSONResponse{}, fmt.Errorf("invalid trashed folder: %v", err)
 		}

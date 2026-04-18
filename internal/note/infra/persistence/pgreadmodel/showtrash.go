@@ -21,24 +21,24 @@ func NewShowTrash(queries *pgsqlc.Queries) *ShowTrash {
 
 var ProvideShowTrash = NewShowTrash
 
-func (h *ShowTrash) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash, error) {
+func (h *ShowTrash) ShowTrash(ctx context.Context, q *app.ShowTrash) (app.Trash, error) {
 	trashedNotes, err := h.queries.ReadGetTrashedNotesByWorkspaceID(ctx, q.WorkspaceID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, toErr(err)
+		return app.Trash{}, toErr(err)
 	}
 
 	trashedFolders, err := h.queries.ReadGetTrashedFolderByWorkspaceID(ctx, q.WorkspaceID)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, toErr(err)
+		return app.Trash{}, toErr(err)
 	}
 
-	notes := make([]*app.TrashedNote, len(trashedNotes))
+	notes := make([]app.TrashedNote, len(trashedNotes))
 	for i, note := range trashedNotes {
 		var icon string
 		if note.Icon != nil {
 			icon = *note.Icon
 		}
-		notes[i] = &app.TrashedNote{
+		notes[i] = app.TrashedNote{
 			ID:   note.ID,
 			Name: note.Name,
 			Icon: icon,
@@ -49,13 +49,13 @@ func (h *ShowTrash) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 		}
 	}
 
-	folders := make([]*app.TrashedFolder, len(trashedFolders))
+	folders := make([]app.TrashedFolder, len(trashedFolders))
 	for i, folder := range trashedFolders {
 		var icon string
 		if folder.Icon != nil {
 			icon = *folder.Icon
 		}
-		folders[i] = &app.TrashedFolder{
+		folders[i] = app.TrashedFolder{
 			ID:   folder.ID,
 			Name: folder.Name,
 			Icon: icon,
@@ -66,7 +66,7 @@ func (h *ShowTrash) ShowTrash(ctx context.Context, q *app.ShowTrash) (*app.Trash
 		}
 	}
 
-	return &app.Trash{
+	return app.Trash{
 		Notes:   notes,
 		Folders: folders,
 	}, nil
