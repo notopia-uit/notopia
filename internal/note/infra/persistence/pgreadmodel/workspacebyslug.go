@@ -22,16 +22,16 @@ func NewWorkspaceBySlug(queries *pgsqlc.Queries) *WorkspaceBySlug {
 
 var ProvideWorkspaceBySlug = NewWorkspaceBySlug
 
-func (h *WorkspaceBySlug) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceBySlug) (*app.Workspace, error) {
+func (h *WorkspaceBySlug) GetWorkspaceBySlug(ctx context.Context, q *app.GetWorkspaceBySlug) (app.Workspace, error) {
 	workspace, err := h.queries.ReadGetWorkspaceBySlug(ctx, q.Slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewWorkspaceBySlugNotFound(q.Slug, err)
+			return app.Workspace{}, errs.NewWorkspaceBySlugNotFound(q.Slug, err)
 		}
-		return nil, toErr(err)
+		return app.Workspace{}, toErr(err)
 	}
 
-	return &app.Workspace{
+	return app.Workspace{
 		ID:   workspace.ID,
 		Slug: workspace.Slug,
 		Name: workspace.Name,

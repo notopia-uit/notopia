@@ -30,7 +30,7 @@ func NewGetWorkspaceMembersHandler(
 
 var ProvideGetWorkspaceMembersHandler = NewGetWorkspaceMembersHandler
 
-func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorkspaceMembers) ([]*WorkspaceMember, error) {
+func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorkspaceMembers) ([]WorkspaceMember, error) {
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
@@ -58,16 +58,16 @@ func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorks
 		return nil, err
 	}
 	memberIDMemberMap := make(map[string]*User, len(members))
-	for _, member := range members {
-		memberIDMemberMap[member.ID] = member
+	for i := range members {
+		memberIDMemberMap[members[i].ID] = &members[i]
 	}
-	workspaceMembers := make([]*WorkspaceMember, len(authorizationWorkspaceMembers))
+	workspaceMembers := make([]WorkspaceMember, len(authorizationWorkspaceMembers))
 	for i, authorizationWorkspaceMember := range authorizationWorkspaceMembers {
 		member, ok := memberIDMemberMap[authorizationWorkspaceMember.ID]
 		if !ok {
 			return nil, errs.NewInternal(fmt.Sprintf("user with ID %s not found", authorizationWorkspaceMember.ID))
 		}
-		workspaceMembers[i] = &WorkspaceMember{
+		workspaceMembers[i] = WorkspaceMember{
 			ID:   member.ID,
 			Name: member.Name,
 			Role: authorizationWorkspaceMember.Role,

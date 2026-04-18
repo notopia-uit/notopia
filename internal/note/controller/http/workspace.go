@@ -200,7 +200,7 @@ func (h *StrictHandler) GetWorkspaceGraph(
 		return nil, err
 	}
 
-	dto := toGraphDTO(result)
+	dto := toGraphDTO(&result)
 	return note.GetWorkspaceGraph200JSONResponse(dto), nil
 }
 
@@ -370,7 +370,7 @@ func (h *StrictHandler) ShowTrash(
 		return nil, err
 	}
 
-	dto, err := toShowTrashDTO(result)
+	dto, err := toShowTrashDTO(&result)
 	if err != nil {
 		return nil, err
 	}

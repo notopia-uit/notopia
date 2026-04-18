@@ -15,7 +15,7 @@ type Note struct {
 	size          uint64
 	folderID      uuid.UUID
 	outgoingLinks uuid.UUIDs
-	trashed       *Trashed
+	trashed       Trashed
 	deleted       bool
 
 	events []Event
@@ -38,7 +38,7 @@ func NewNote(
 		folderID:      folderID,
 		size:          0,
 		outgoingLinks: []uuid.UUID{},
-		trashed:       nil,
+		trashed:       NewUntrashed(),
 		deleted:       false,
 
 		events: []Event{},
@@ -53,7 +53,7 @@ func UnmarshalNote(
 	size uint64,
 	folderID uuid.UUID,
 	outgoingLinks uuid.UUIDs,
-	trashed *Trashed,
+	trashed Trashed,
 	deleted bool,
 ) *Note {
 	return &Note{
@@ -136,7 +136,7 @@ func (n *Note) SetOutgoingLinks(outgoingLinks uuid.UUIDs, userID string) {
 }
 
 func (n *Note) IsTrashed() bool {
-	return n.trashed != nil
+	return n.trashed.IsTrashed()
 }
 
 func (n *Note) TrashedBy() TrashedBy {
@@ -148,7 +148,7 @@ func (n *Note) TrashedAt() time.Time {
 }
 
 func (n *Note) Trash(trashedBy TrashedBy, userID string) error {
-	if n.trashed != nil {
+	if n.trashed.IsTrashed() {
 		return errs.NewNoteAlreadyTrashed(n.id)
 	}
 	n.trashed = NewTrashed(trashedBy, time.Now())
@@ -159,7 +159,7 @@ func (n *Note) Trash(trashedBy TrashedBy, userID string) error {
 }
 
 func (n *Note) Restore(userID string) {
-	n.trashed = nil
+	n.trashed = NewUntrashed()
 	n.addEvent(&NoteRestoredEvent{
 		BaseEvent: NewBaseEvent(n.id, userID),
 	})

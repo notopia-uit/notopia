@@ -22,7 +22,7 @@ func toNoteDTO(note *app.Note) *pb.Note {
 	}
 }
 
-func toWorkspaceDTO(workspace *app.Workspace) *pb.Workspace {
+func toWorkspaceDTO(workspace app.Workspace) *pb.Workspace {
 	return &pb.Workspace{
 		Id:   workspace.ID.String(),
 		Name: workspace.Name,
@@ -30,8 +30,8 @@ func toWorkspaceDTO(workspace *app.Workspace) *pb.Workspace {
 	}
 }
 
-func toTrashedDTO(trash *app.Trashed) *pb.Trashed {
-	if trash == nil {
+func toTrashedDTO(trash app.Trashed) *pb.Trashed {
+	if trash.By == app.TrashedByUnspecified && trash.At.IsZero() {
 		return nil
 	}
 	return &pb.Trashed{

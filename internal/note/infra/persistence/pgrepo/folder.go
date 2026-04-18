@@ -125,13 +125,7 @@ func folderToDomain(folder *pgsqlc.Folder) *domain.Folder {
 	if folder.Icon != nil {
 		icon = *folder.Icon
 	}
-	var trashed *domain.Trashed
-	if folder.TrashedBy != nil && folder.TrashedAt != nil {
-		trashed = domain.NewTrashed(
-			toDomainTrashedBy(*folder.TrashedBy),
-			*folder.TrashedAt,
-		)
-	}
+	trashed := toDomainTrashed(folder.TrashedBy, folder.TrashedAt)
 	var parentID uuid.UUID
 	if folder.ParentID != nil {
 		parentID = *folder.ParentID

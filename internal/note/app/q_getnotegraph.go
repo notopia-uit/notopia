@@ -18,7 +18,7 @@ type GetNoteGraph struct {
 }
 
 type GetNoteGraphReadModel interface {
-	GetNoteGraph(ctx context.Context, q *GetNoteGraph) (*Graph, error)
+	GetNoteGraph(ctx context.Context, q *GetNoteGraph) (Graph, error)
 }
 
 type GetNoteGraphHandler struct {
@@ -41,10 +41,10 @@ func NewGetNoteGraphHandler(
 
 var ProvideGetNoteGraphHandler = NewGetNoteGraphHandler
 
-func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (*Graph, error) {
+func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (Graph, error) {
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)
 	if err != nil {
-		return nil, err
+		return Graph{}, err
 	}
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
@@ -53,10 +53,10 @@ func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
-		return nil, err
+		return Graph{}, err
 	}
 	if !hasPermission {
-		return nil, errs.NewForbidden(
+		return Graph{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read note graph %s", query.UserID, query.ID),
 		)
 	}

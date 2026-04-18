@@ -18,7 +18,7 @@ func calculateGraphWeight(size, minSize, maxSize int32) float64 {
 	return w
 }
 
-func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map[string]bool) *app.Graph {
+func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map[string]bool) app.Graph {
 	var minSize int32 = math.MaxInt32
 	var maxSize int32 = -1
 	reachableNotesMap := make(map[uuid.UUID]*pgsqlc.Note)
@@ -35,12 +35,12 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 		}
 	}
 
-	var graphNodes []*app.GraphNode
-	var graphLinks []*app.GraphLink
+	var graphNodes []app.GraphNode
+	var graphLinks []app.GraphLink
 	tagsAdded := make(map[string]bool)
 
 	for _, n := range reachableNotesMap {
-		graphNodes = append(graphNodes, &app.GraphNode{
+		graphNodes = append(graphNodes, app.GraphNode{
 			ID:     n.ID.String(),
 			Name:   n.Name,
 			Type:   app.GraphNodeTypeNote,
@@ -52,7 +52,7 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 
 			if reachableIDs[tagID] {
 				if !tagsAdded[tagID] {
-					graphNodes = append(graphNodes, &app.GraphNode{
+					graphNodes = append(graphNodes, app.GraphNode{
 						ID:     tagID,
 						Name:   tag,
 						Type:   app.GraphNodeTypeTag,
@@ -61,7 +61,7 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 					tagsAdded[tagID] = true
 				}
 
-				graphLinks = append(graphLinks, &app.GraphLink{
+				graphLinks = append(graphLinks, app.GraphLink{
 					Source: n.ID.String(),
 					Target: tagID,
 				})
@@ -71,14 +71,14 @@ func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map
 
 	for _, l := range links {
 		if reachableIDs[l.SourceID.String()] && reachableIDs[l.TargetID.String()] {
-			graphLinks = append(graphLinks, &app.GraphLink{
+			graphLinks = append(graphLinks, app.GraphLink{
 				Source: l.SourceID.String(),
 				Target: l.TargetID.String(),
 			})
 		}
 	}
 
-	return &app.Graph{
+	return app.Graph{
 		Nodes: graphNodes,
 		Links: graphLinks,
 	}

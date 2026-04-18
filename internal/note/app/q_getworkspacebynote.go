@@ -14,7 +14,7 @@ type GetWorkspaceByNote struct {
 }
 
 type GetWorkspaceByNoteReadModel interface {
-	GetWorkspaceByNoteID(ctx context.Context, noteID uuid.UUID) (*Workspace, error)
+	GetWorkspaceByNoteID(ctx context.Context, noteID uuid.UUID) (Workspace, error)
 }
 
 type GetWorkspaceByNoteHandler struct {
@@ -34,17 +34,17 @@ func NewGetWorkspaceByNoteHandler(
 
 var ProvideGetWorkspaceByNoteHandler = NewGetWorkspaceByNoteHandler
 
-func (h *GetWorkspaceByNoteHandler) Handle(ctx context.Context, query *GetWorkspaceByNote) (*Workspace, error) {
+func (h *GetWorkspaceByNoteHandler) Handle(ctx context.Context, query *GetWorkspaceByNote) (Workspace, error) {
 	workspace, err := h.readModel.GetWorkspaceByNoteID(ctx, query.NoteID)
 	if err != nil {
-		return nil, err
+		return Workspace{}, err
 	}
 	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, query.UserID, workspace.ID, WorkspacePermissionRead)
 	if err != nil {
-		return nil, err
+		return Workspace{}, err
 	}
 	if !hasPermission {
-		return nil, errs.NewForbidden(
+		return Workspace{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read workspace %s", query.UserID, workspace.ID),
 		)
 	}

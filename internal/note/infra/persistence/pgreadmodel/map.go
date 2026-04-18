@@ -8,16 +8,20 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-func toAppWorkspaces(workspaces []*pgsqlc.Workspace) []*app.Workspace {
-	appWorkspaces := make([]*app.Workspace, 0, len(workspaces))
+func toAppWorkspaces(workspaces []*pgsqlc.Workspace) []app.Workspace {
+	appWorkspaces := make([]app.Workspace, 0, len(workspaces))
 	for _, w := range workspaces {
-		appWorkspaces = append(appWorkspaces, toAppWorkspace(w))
+		appWorkspaces = append(appWorkspaces, app.Workspace{
+			ID:   w.ID,
+			Slug: w.Slug,
+			Name: w.Name,
+		})
 	}
 	return appWorkspaces
 }
 
-func toAppWorkspace(w *pgsqlc.Workspace) *app.Workspace {
-	return &app.Workspace{
+func toAppWorkspace(w *pgsqlc.Workspace) app.Workspace {
+	return app.Workspace{
 		ID:   w.ID,
 		Slug: w.Slug,
 		Name: w.Name,

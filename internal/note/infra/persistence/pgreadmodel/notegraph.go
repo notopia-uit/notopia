@@ -19,10 +19,10 @@ func NewNoteGraph(queries *pgsqlc.Queries) *NoteGraph {
 
 var ProvideNoteGraph = NewNoteGraph
 
-func (h *NoteGraph) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app.Graph, error) {
+func (h *NoteGraph) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (app.Graph, error) {
 	workspaceID, err := h.queries.GetWorkspaceIDByNoteID(ctx, q.ID)
 	if err != nil {
-		return nil, toErr(err)
+		return app.Graph{}, toErr(err)
 	}
 
 	notes, err := h.queries.ReadGetNotesInWorkspace(ctx, pgsqlc.ReadGetNotesInWorkspaceParams{
@@ -30,12 +30,12 @@ func (h *NoteGraph) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (*app
 		ExcludeTrash: true,
 	})
 	if err != nil {
-		return nil, toErr(err)
+		return app.Graph{}, toErr(err)
 	}
 
 	links, err := h.queries.ReadGetNoteLinksInWorkspace(ctx, workspaceID)
 	if err != nil {
-		return nil, toErr(err)
+		return app.Graph{}, toErr(err)
 	}
 
 	adj := make(map[string][]string)

@@ -68,7 +68,7 @@ type AuthorizationSvc interface {
 	GetUserWorkspaces(
 		ctx context.Context,
 		userID string,
-	) ([]*AuthorizationUserWorkspace, error)
+	) ([]AuthorizationUserWorkspace, error)
 
 	HasWorkspacePermission(
 		ctx context.Context,
@@ -101,5 +101,5 @@ type AuthorizationSvc interface {
 		ctx context.Context,
 		userID string,
 		workspaceID uuid.UUID,
-	) ([]*AuthorizationWorkspaceMember, error)
+	) ([]AuthorizationWorkspaceMember, error)
 }

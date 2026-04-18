@@ -18,7 +18,7 @@ linters:
       strict: true
     exhaustruct:
       allow-empty: false
-      allow-empty-returns: false
+      allow-empty-returns: true
       allow-empty-declarations: true
       include:
         - github\.com/notopia-uit/notopia/.*\.*

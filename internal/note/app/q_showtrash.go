@@ -15,7 +15,7 @@ type ShowTrash struct {
 }
 
 type ShowTrashReadModel interface {
-	ShowTrash(ctx context.Context, q *ShowTrash) (*Trash, error)
+	ShowTrash(ctx context.Context, q *ShowTrash) (Trash, error)
 }
 
 type ShowTrashHandler struct {
@@ -35,7 +35,7 @@ func NewShowTrashHandler(
 
 var ProvideShowTrashHandler = NewShowTrashHandler
 
-func (h *ShowTrashHandler) Handle(ctx context.Context, query *ShowTrash) (*Trash, error) {
+func (h *ShowTrashHandler) Handle(ctx context.Context, query *ShowTrash) (Trash, error) {
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
@@ -43,10 +43,10 @@ func (h *ShowTrashHandler) Handle(ctx context.Context, query *ShowTrash) (*Trash
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
-		return nil, err
+		return Trash{}, err
 	}
 	if !hasPermission {
-		return nil, errs.NewForbidden(
+		return Trash{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read trash in workspace %s", query.UserID, query.WorkspaceID),
 		)
 	}

@@ -13,7 +13,7 @@ type Folder struct {
 	icon            string
 	workspaceID     uuid.UUID
 	folderHierarchy FolderHierarchy
-	trashed         *Trashed
+	trashed         Trashed
 	deleted         bool
 
 	events []Event
@@ -36,7 +36,7 @@ func NewFolder(
 		icon:            icon,
 		workspaceID:     workspaceID,
 		folderHierarchy: folderHierarchy,
-		trashed:         nil,
+		trashed:         NewUntrashed(),
 		deleted:         false,
 
 		events: []Event{},
@@ -57,7 +57,7 @@ func UnmarshalFolder(
 	icon string,
 	workspaceID uuid.UUID,
 	folderHierarchy FolderHierarchy,
-	trashed *Trashed,
+	trashed Trashed,
 	deleted bool,
 ) *Folder {
 	return &Folder{
@@ -128,7 +128,7 @@ func (f *Folder) MoveToFolder(folderID uuid.UUID, userID string) {
 }
 
 func (f *Folder) IsTrashed() bool {
-	return f.trashed != nil
+	return f.trashed.IsTrashed()
 }
 
 func (f *Folder) TrashedBy() TrashedBy {
@@ -140,7 +140,7 @@ func (f *Folder) TrashedAt() time.Time {
 }
 
 func (f *Folder) Trash(trashedBy TrashedBy, userID string) error {
-	if f.trashed != nil {
+	if f.trashed.IsTrashed() {
 		return errs.NewFolderAlreadyTrashed(f.id)
 	}
 	f.trashed = NewTrashed(trashedBy, time.Now())
@@ -151,7 +151,7 @@ func (f *Folder) Trash(trashedBy TrashedBy, userID string) error {
 }
 
 func (f *Folder) Restore(userID string) {
-	f.trashed = nil
+	f.trashed = NewUntrashed()
 	f.addEvent(&FolderRestoredEvent{
 		BaseEvent: NewBaseEvent(f.id, userID),
 	})

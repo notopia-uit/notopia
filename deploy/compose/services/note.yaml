@@ -16,6 +16,8 @@ services:
       test:
         - CMD-SHELL
         - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      start_period: 10s
+      start_interval: 1s
     restart: unless-stopped
 
   note_redis:

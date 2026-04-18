@@ -166,13 +166,7 @@ func noteToDomain(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
 	if note.Icon != nil {
 		icon = *note.Icon
 	}
-	var trashed *domain.Trashed
-	if note.TrashedBy != nil && note.TrashedAt != nil {
-		trashed = domain.NewTrashed(
-			toDomainTrashedBy(*note.TrashedBy),
-			*note.TrashedAt,
-		)
-	}
+	trashed := toDomainTrashed(note.TrashedBy, note.TrashedAt)
 	return domain.UnmarshalNote(
 		note.ID,
 		note.Name,

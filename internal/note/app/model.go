@@ -39,7 +39,7 @@ type Note struct {
 	FolderID           uuid.UUID
 	BacklinksCount     int
 	OutgoingLinksCount int
-	Trashed            *Trashed
+	Trashed            Trashed
 	UpdatedAt          time.Time
 }
 
@@ -49,7 +49,7 @@ type Folder struct {
 	Icon        string
 	ParentID    uuid.UUID
 	WorkspaceID uuid.UUID
-	Trashed     *Trashed
+	Trashed     Trashed
 	UpdatedAt   time.Time
 }
 
@@ -73,8 +73,8 @@ type GraphLink struct {
 }
 
 type Graph struct {
-	Nodes []*GraphNode
-	Links []*GraphLink
+	Nodes []GraphNode
+	Links []GraphLink
 }
 
 type NoteLink struct {
@@ -84,8 +84,8 @@ type NoteLink struct {
 }
 
 type NoteLinkResult struct {
-	OutgoingLinks []*NoteLink
-	Backlinks     []*NoteLink
+	OutgoingLinks []NoteLink
+	Backlinks     []NoteLink
 }
 
 type Workspace struct {
@@ -135,8 +135,8 @@ type WorkspaceTreeFolder struct {
 	ID        uuid.UUID
 	Name      string
 	Icon      string
-	Notes     []*WorkspaceTreeNote
-	Children  []*WorkspaceTreeFolder
+	Notes     []WorkspaceTreeNote
+	Children  []WorkspaceTreeFolder
 	UpdatedAt time.Time
 }
 
@@ -176,8 +176,8 @@ type TrashedNote struct {
 }
 
 type Trash struct {
-	Notes   []*TrashedNote
-	Folders []*TrashedFolder
+	Notes   []TrashedNote
+	Folders []TrashedFolder
 }
 
 type WorkspaceMemberUpdate struct {

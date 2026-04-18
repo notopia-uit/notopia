@@ -9,7 +9,7 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-func toNoteDTO(n app.Note) (note.Note, error) {
+func toNoteDTO(n *app.Note) (note.Note, error) {
 	var icon *string
 	if n.Icon != "" {
 		icon = &n.Icon
@@ -21,7 +21,7 @@ func toNoteDTO(n app.Note) (note.Note, error) {
 	}
 
 	var trashed *note.NoteTrashed
-	if n.Trashed != nil {
+	if n.Trashed.By != app.TrashedByUnspecified && !n.Trashed.At.IsZero() {
 		trashedBy, err := toTrashedByDTO(n.Trashed.By)
 		if err != nil {
 			return note.Note{}, fmt.Errorf("invalid trashed by: %v", err)
@@ -43,7 +43,7 @@ func toNoteDTO(n app.Note) (note.Note, error) {
 	}, nil
 }
 
-func toFolderDTO(f app.Folder) (note.Folder, error) {
+func toFolderDTO(f *app.Folder) (note.Folder, error) {
 	var icon *string
 	if f.Icon != "" {
 		icon = &f.Icon
@@ -55,7 +55,7 @@ func toFolderDTO(f app.Folder) (note.Folder, error) {
 	}
 
 	var trashed *note.FolderTrashed
-	if f.Trashed != nil {
+	if f.Trashed.By != app.TrashedByUnspecified && !f.Trashed.At.IsZero() {
 		trashedBy, err := toTrashedByDTO(f.Trashed.By)
 		if err != nil {
 			return note.Folder{}, fmt.Errorf("invalid trashed by: %v", err)
@@ -77,7 +77,7 @@ func toFolderDTO(f app.Folder) (note.Folder, error) {
 	}, nil
 }
 
-func toWorkspaceDTO(w *app.Workspace) note.Workspace {
+func toWorkspaceDTO(w app.Workspace) note.Workspace {
 	return note.Workspace{
 		Id:   &w.ID,
 		Name: w.Name,
@@ -100,18 +100,18 @@ func toWorkspaceRoleDTO(r app.WorkspaceRole) (note.WorkspaceRole, error) {
 	}
 }
 
-func toUserWorkspaceDTO(u *app.UserWorkspace) (note.UserWorkspace, error) {
+func toUserWorkspaceDTO(u app.UserWorkspace) (note.UserWorkspace, error) {
 	role, err := toWorkspaceRoleDTO(u.Role)
 	if err != nil {
 		return note.UserWorkspace{}, err
 	}
 	return note.UserWorkspace{
-		Workspace: toWorkspaceDTO(u.Workspace),
+		Workspace: toWorkspaceDTO(*u.Workspace),
 		Role:      role,
 	}, nil
 }
 
-func toWorkspaceMemberDTO(m *app.WorkspaceMember) (note.WorkspaceMember, error) {
+func toWorkspaceMemberDTO(m app.WorkspaceMember) (note.WorkspaceMember, error) {
 	var name *string
 	if m.Name != "" {
 		name = &m.Name
@@ -128,7 +128,7 @@ func toWorkspaceMemberDTO(m *app.WorkspaceMember) (note.WorkspaceMember, error) 
 	}, nil
 }
 
-func toWorkspaceMembersDTO(members []*app.WorkspaceMember) ([]note.WorkspaceMember, error) {
+func toWorkspaceMembersDTO(members []app.WorkspaceMember) ([]note.WorkspaceMember, error) {
 	out := make([]note.WorkspaceMember, 0, len(members))
 	for _, m := range members {
 		member, err := toWorkspaceMemberDTO(m)
@@ -140,7 +140,7 @@ func toWorkspaceMembersDTO(members []*app.WorkspaceMember) ([]note.WorkspaceMemb
 	return out, nil
 }
 
-func toWorkspaceTreeNoteDTO(n *app.WorkspaceTreeNote) note.WorkspaceTreeNote {
+func toWorkspaceTreeNoteDTO(n app.WorkspaceTreeNote) note.WorkspaceTreeNote {
 	var icon *string
 	if n.Icon != "" {
 		icon = &n.Icon
@@ -153,7 +153,7 @@ func toWorkspaceTreeNoteDTO(n *app.WorkspaceTreeNote) note.WorkspaceTreeNote {
 	}
 }
 
-func toWorkspaceTreeFolderDTO(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
+func toWorkspaceTreeFolderDTO(f app.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
 	var icon *string
 	if f.Icon != "" {
 		icon = &f.Icon
@@ -176,7 +176,7 @@ func toWorkspaceTreeFolderDTO(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFold
 	}
 }
 
-func toTrashedFolderDTO(f *app.TrashedFolder) (note.TrashedFolder, error) {
+func toTrashedFolderDTO(f app.TrashedFolder) (note.TrashedFolder, error) {
 	trashedBy, err := toTrashedByDTO(f.Trashed.By)
 	if err != nil {
 		return note.TrashedFolder{}, err
@@ -191,7 +191,7 @@ func toTrashedFolderDTO(f *app.TrashedFolder) (note.TrashedFolder, error) {
 	}, nil
 }
 
-func toTrashedNoteDTO(n *app.TrashedNote) (note.TrashedNote, error) {
+func toTrashedNoteDTO(n app.TrashedNote) (note.TrashedNote, error) {
 	trashedBy, err := toTrashedByDTO(n.Trashed.By)
 	if err != nil {
 		return note.TrashedNote{}, err
@@ -206,7 +206,7 @@ func toTrashedNoteDTO(n *app.TrashedNote) (note.TrashedNote, error) {
 	}, nil
 }
 
-func toNoteLinkDTO(n *app.NoteLink) note.NoteLink {
+func toNoteLinkDTO(n app.NoteLink) note.NoteLink {
 	var icon *string
 	if n.Icon != "" {
 		icon = &n.Icon
@@ -263,7 +263,7 @@ func toShowTrashDTO(t *app.Trash) (note.ShowTrash200JSONResponse, error) {
 	}, nil
 }
 
-func toGetNoteLinksDTO(r *app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
+func toGetNoteLinksDTO(r app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
 	outgoing := make([]note.NoteLink, len(r.OutgoingLinks))
 	for i, l := range r.OutgoingLinks {
 		outgoing[i] = toNoteLinkDTO(l)

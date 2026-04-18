@@ -82,14 +82,14 @@ func NewAuthorization(
 
 var ProvideAuthorization = NewAuthorization
 
-func (a *Authorization) GetUserWorkspaces(ctx context.Context, userID string) ([]*app.AuthorizationUserWorkspace, error) {
+func (a *Authorization) GetUserWorkspaces(ctx context.Context, userID string) ([]app.AuthorizationUserWorkspace, error) {
 	response, err := a.client.GetUserWorkspaces(ctx, &pb.GetUserWorkspacesRequest{
 		UserId: userID,
 	})
 	if err != nil {
 		return nil, err
 	}
-	workspaces := make([]*app.AuthorizationUserWorkspace, 0, len(response.Workspaces))
+	workspaces := make([]app.AuthorizationUserWorkspace, 0, len(response.Workspaces))
 	for _, w := range response.Workspaces {
 		id, err := uuid.Parse(w.Id)
 		if err != nil {
@@ -99,7 +99,7 @@ func (a *Authorization) GetUserWorkspaces(ctx context.Context, userID string) ([
 		if err != nil {
 			return nil, err
 		}
-		workspaces = append(workspaces, &app.AuthorizationUserWorkspace{
+		workspaces = append(workspaces, app.AuthorizationUserWorkspace{
 			ID:   id,
 			Role: role,
 		})
@@ -165,7 +165,7 @@ func (a *Authorization) UpdateWorkspaceMembers(
 	return err
 }
 
-func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]*app.AuthorizationWorkspaceMember, error) {
+func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]app.AuthorizationWorkspaceMember, error) {
 	response, err := a.client.GetWorkspaceMembers(ctx, &pb.GetWorkspaceMembersRequest{
 		UserId:      userID,
 		WorkspaceId: workspaceID.String(),
@@ -217,8 +217,8 @@ func (a *Authorization) toWorkspaceMemberPb(member *app.WorkspaceMemberUpdate) (
 	}, nil
 }
 
-func (a *Authorization) toAppWorkspaceMembers(members []*pb.WorkspaceMember) ([]*app.AuthorizationWorkspaceMember, error) {
-	appMembers := make([]*app.AuthorizationWorkspaceMember, 0, len(members))
+func (a *Authorization) toAppWorkspaceMembers(members []*pb.WorkspaceMember) ([]app.AuthorizationWorkspaceMember, error) {
+	appMembers := make([]app.AuthorizationWorkspaceMember, 0, len(members))
 	for _, member := range members {
 		appMember, err := a.toAppWorkspaceMember(member)
 		if err != nil {
@@ -229,12 +229,12 @@ func (a *Authorization) toAppWorkspaceMembers(members []*pb.WorkspaceMember) ([]
 	return appMembers, nil
 }
 
-func (a *Authorization) toAppWorkspaceMember(members *pb.WorkspaceMember) (*app.AuthorizationWorkspaceMember, error) {
+func (a *Authorization) toAppWorkspaceMember(members *pb.WorkspaceMember) (app.AuthorizationWorkspaceMember, error) {
 	role, err := a.toAppWorkspaceRole(members.Role)
 	if err != nil {
-		return nil, err
+		return app.AuthorizationWorkspaceMember{}, err
 	}
-	return &app.AuthorizationWorkspaceMember{
+	return app.AuthorizationWorkspaceMember{
 		ID:   members.Id,
 		Role: role,
 	}, nil
