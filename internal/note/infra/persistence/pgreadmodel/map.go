@@ -11,11 +11,7 @@ import (
 func toAppWorkspaces(workspaces []*pgsqlc.Workspace) []app.Workspace {
 	appWorkspaces := make([]app.Workspace, len(workspaces))
 	for i, w := range workspaces {
-		appWorkspaces[i] = app.Workspace{
-			ID:   w.ID,
-			Slug: w.Slug,
-			Name: w.Name,
-		}
+		appWorkspaces[i] = toAppWorkspace(w)
 	}
 	return appWorkspaces
 }

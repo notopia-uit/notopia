@@ -30,6 +30,10 @@ type Trashed struct {
 	At time.Time
 }
 
+func (trashed Trashed) IsTrashed() bool {
+	return trashed.By != TrashedByUnspecified && !trashed.At.IsZero()
+}
+
 type Note struct {
 	ID                 uuid.UUID
 	Name               string
