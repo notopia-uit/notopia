@@ -21,13 +21,13 @@ func toWorkspaceMemberUpdate(wmu *note.WorkspaceMember) (app.WorkspaceMemberUpda
 }
 
 func toWorkspaceMemberUpdates(wmus []note.WorkspaceMember) ([]app.WorkspaceMemberUpdate, error) {
-	updates := make([]app.WorkspaceMemberUpdate, 0, len(wmus))
-	for _, wmu := range wmus {
+	updates := make([]app.WorkspaceMemberUpdate, len(wmus))
+	for i, wmu := range wmus {
 		update, err := toWorkspaceMemberUpdate(&wmu)
 		if err != nil {
 			return nil, err
 		}
-		updates = append(updates, update)
+		updates[i] = update
 	}
 	return updates, nil
 }

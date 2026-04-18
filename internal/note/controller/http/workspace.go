@@ -140,13 +140,13 @@ func (h *StrictHandler) GetMyWorkspaces(
 	if err != nil {
 		return nil, err
 	}
-	dtos := make([]note.UserWorkspace, 0, len(myWorkspaces))
+	dtos := make([]note.UserWorkspace, len(myWorkspaces))
 	for i := range myWorkspaces {
 		dto, err := toUserWorkspaceDTO(&myWorkspaces[i])
 		if err != nil {
 			return nil, err
 		}
-		dtos = append(dtos, dto)
+		dtos[i] = dto
 	}
 	return note.GetMyWorkspaces200JSONResponse(dtos), nil
 }

@@ -76,17 +76,17 @@ func (h *NoteLinks) getOutgoingLinks(ctx context.Context, noteID uuid.UUID) ([]a
 		return nil, toErr(err)
 	}
 
-	result := make([]app.NoteLink, 0, len(outgoingNotes))
-	for _, linkedNote := range outgoingNotes {
+	result := make([]app.NoteLink, len(outgoingNotes))
+	for i, linkedNote := range outgoingNotes {
 		var icon string
 		if linkedNote.Icon != nil {
 			icon = *linkedNote.Icon
 		}
-		result = append(result, app.NoteLink{
+		result[i] = app.NoteLink{
 			ID:   linkedNote.ID,
 			Name: linkedNote.Name,
 			Icon: icon,
-		})
+		}
 	}
 	return result, nil
 }
@@ -106,17 +106,17 @@ func (h *NoteLinks) getBacklinks(ctx context.Context, noteID uuid.UUID) ([]app.N
 		return nil, toErr(err)
 	}
 
-	result := make([]app.NoteLink, 0, len(backlinkNotes))
-	for _, linkedNote := range backlinkNotes {
+	result := make([]app.NoteLink, len(backlinkNotes))
+	for i, linkedNote := range backlinkNotes {
 		var icon string
 		if linkedNote.Icon != nil {
 			icon = *linkedNote.Icon
 		}
-		result = append(result, app.NoteLink{
+		result[i] = app.NoteLink{
 			ID:   linkedNote.ID,
 			Name: linkedNote.Name,
 			Icon: icon,
-		})
+		}
 	}
 	return result, nil
 }

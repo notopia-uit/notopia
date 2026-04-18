@@ -49,16 +49,16 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 	for i := range workspaces {
 		workspaceIDToIndex[workspaces[i].ID] = i
 	}
-	userWorkspaces := make([]UserWorkspace, 0, len(authorizationUserWorkspaces))
-	for _, auw := range authorizationUserWorkspaces {
+	userWorkspaces := make([]UserWorkspace, len(authorizationUserWorkspaces))
+	for i, auw := range authorizationUserWorkspaces {
 		wsIndex, ok := workspaceIDToIndex[auw.ID]
 		if !ok {
 			return nil, errs.NewInternal("workspace not found for user workspace")
 		}
-		userWorkspaces = append(userWorkspaces, UserWorkspace{
+		userWorkspaces[i] = UserWorkspace{
 			Workspace: workspaces[wsIndex],
 			Role:      auw.Role,
-		})
+		}
 	}
 	return userWorkspaces, nil
 }

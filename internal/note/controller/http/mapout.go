@@ -129,13 +129,13 @@ func toWorkspaceMemberDTO(m *app.WorkspaceMember) (note.WorkspaceMember, error) 
 }
 
 func toWorkspaceMembersDTO(members []app.WorkspaceMember) ([]note.WorkspaceMember, error) {
-	out := make([]note.WorkspaceMember, 0, len(members))
+	out := make([]note.WorkspaceMember, len(members))
 	for i := range members {
 		member, err := toWorkspaceMemberDTO(&members[i])
 		if err != nil {
 			return nil, errs.NewInternal(fmt.Sprintf("invalid workspace member: %v", err))
 		}
-		out = append(out, member)
+		out[i] = member
 	}
 	return out, nil
 }

@@ -89,8 +89,8 @@ func (a *Authorization) GetUserWorkspaces(ctx context.Context, userID string) ([
 	if err != nil {
 		return nil, err
 	}
-	workspaces := make([]app.AuthorizationUserWorkspace, 0, len(response.Workspaces))
-	for _, w := range response.Workspaces {
+	workspaces := make([]app.AuthorizationUserWorkspace, len(response.Workspaces))
+	for i, w := range response.Workspaces {
 		id, err := uuid.Parse(w.Id)
 		if err != nil {
 			return nil, errs.NewAuthorizationInternal(fmt.Errorf("invalid workspace ID: %w", err))
@@ -99,10 +99,10 @@ func (a *Authorization) GetUserWorkspaces(ctx context.Context, userID string) ([
 		if err != nil {
 			return nil, err
 		}
-		workspaces = append(workspaces, app.AuthorizationUserWorkspace{
+		workspaces[i] = app.AuthorizationUserWorkspace{
 			ID:   id,
 			Role: role,
-		})
+		}
 	}
 	return workspaces, nil
 }
@@ -195,13 +195,13 @@ func (a *Authorization) CheckHealth(ctx context.Context) error {
 }
 
 func (a *Authorization) toWorkspaceMembersPb(members []app.WorkspaceMemberUpdate) ([]*pb.WorkspaceMember, error) {
-	pbMembers := make([]*pb.WorkspaceMember, 0, len(members))
-	for _, member := range members {
+	pbMembers := make([]*pb.WorkspaceMember, len(members))
+	for i, member := range members {
 		pbMember, err := a.toWorkspaceMemberPb(member)
 		if err != nil {
 			return nil, err
 		}
-		pbMembers = append(pbMembers, pbMember)
+		pbMembers[i] = pbMember
 	}
 	return pbMembers, nil
 }
@@ -218,13 +218,13 @@ func (a *Authorization) toWorkspaceMemberPb(member app.WorkspaceMemberUpdate) (*
 }
 
 func (a *Authorization) toAppWorkspaceMembers(members []*pb.WorkspaceMember) ([]app.AuthorizationWorkspaceMember, error) {
-	appMembers := make([]app.AuthorizationWorkspaceMember, 0, len(members))
-	for _, member := range members {
+	appMembers := make([]app.AuthorizationWorkspaceMember, len(members))
+	for i, member := range members {
 		appMember, err := a.toAppWorkspaceMember(member)
 		if err != nil {
 			return nil, err
 		}
-		appMembers = append(appMembers, appMember)
+		appMembers[i] = appMember
 	}
 	return appMembers, nil
 }

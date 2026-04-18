@@ -9,13 +9,13 @@ import (
 )
 
 func toAppWorkspaces(workspaces []*pgsqlc.Workspace) []app.Workspace {
-	appWorkspaces := make([]app.Workspace, 0, len(workspaces))
-	for _, w := range workspaces {
-		appWorkspaces = append(appWorkspaces, app.Workspace{
+	appWorkspaces := make([]app.Workspace, len(workspaces))
+	for i, w := range workspaces {
+		appWorkspaces[i] = app.Workspace{
 			ID:   w.ID,
 			Slug: w.Slug,
 			Name: w.Name,
-		})
+		}
 	}
 	return appWorkspaces
 }
