@@ -19,6 +19,15 @@
         "packages/ui"
       ],
       "enabled": false
+    },
+    "grafana": {
+      "type": "local",
+      "command": ["mcp-grafana"],
+      "environment": {
+        "GRAFANA_URL": "http://grafana.notopia.localhost",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:GRAFANA_SERVICE_ACCOUNT_TOKEN}"
+      },
+      "enabled": false
     }
   }
 }

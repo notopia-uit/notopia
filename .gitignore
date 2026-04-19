@@ -28,3 +28,5 @@ tmp
 .nx/polygraph
 .claude/worktrees
 .claude/settings.local.json
+
+mise.local.toml

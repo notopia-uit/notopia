@@ -61,8 +61,8 @@ func NewGin(
 ) *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Recovery())
-	r.Use(gin.HandlerFunc(slogHandler))
 	r.Use(gin.HandlerFunc(otelHandler))
+	r.Use(gin.HandlerFunc(slogHandler))
 	return r
 }
 
