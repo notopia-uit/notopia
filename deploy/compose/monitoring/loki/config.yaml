@@ -8,7 +8,7 @@ common:
       rules_directory: /tmp/loki/rules
   ring:
     kvstore:
-      store: memberlist
+      store: inmemory
 
 auth_enabled: false
 
@@ -29,10 +29,10 @@ limits_config:
 
 storage_config:
   tsdb_shipper:
-    active_index_directory: ./tmp/loki/tsdb-index
-    cache_location: ./tmp/loki/tsdb-cache
+    active_index_directory: /tmp/loki/tsdb-index
+    cache_location: /tmp/loki/tsdb-cache
   filesystem:
-    directory: ./tmp/loki/chunks
+    directory: /tmp/loki/chunks
 
 schema_config:
   configs:
