@@ -206,7 +206,7 @@ func toTrashedNoteDTO(n *app.TrashedNote) (note.TrashedNote, error) {
 	}, nil
 }
 
-func toNoteLinkDTO(n app.NoteLink) note.NoteLink {
+func toNoteLinkDTO(n *app.NoteLink) note.NoteLink {
 	var icon *string
 	if n.Icon != "" {
 		icon = &n.Icon
@@ -265,12 +265,12 @@ func toShowTrashDTO(t *app.Trash) (note.ShowTrash200JSONResponse, error) {
 
 func toGetNoteLinksDTO(r *app.NoteLinkResult) note.GetNoteLinks200JSONResponse {
 	outgoing := make([]note.NoteLink, len(r.OutgoingLinks))
-	for i, l := range r.OutgoingLinks {
-		outgoing[i] = toNoteLinkDTO(l)
+	for i := range r.OutgoingLinks {
+		outgoing[i] = toNoteLinkDTO(&r.OutgoingLinks[i])
 	}
 	backlinks := make([]note.NoteLink, len(r.Backlinks))
-	for i, l := range r.Backlinks {
-		backlinks[i] = toNoteLinkDTO(l)
+	for i := range r.Backlinks {
+		backlinks[i] = toNoteLinkDTO(&r.Backlinks[i])
 	}
 	return note.GetNoteLinks200JSONResponse{
 		OutgoingLinks: &outgoing,
