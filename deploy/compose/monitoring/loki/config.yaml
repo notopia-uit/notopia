@@ -1,4 +1,11 @@
-# yaml-language-server: $schema=https://www.schemastore.org/loki.json
+auth_enabled: false
+
+analytics:
+  reporting_enabled: false
+
+server:
+  http_listen_port: 3100
+
 common:
   replication_factor: 1
   path_prefix: /tmp/loki
@@ -10,29 +17,13 @@ common:
     kvstore:
       store: inmemory
 
-auth_enabled: false
-
-analytics:
-  reporting_enabled: false
-
 ingester:
-  chunk_idle_period: 2m
-  chunk_retain_period: 30s
+  chunk_idle_period: 3m
   max_chunk_age: 1h
-  chunk_encoding: snappy
 
 limits_config:
-  volume_enabled: true
-  reject_old_samples: true
-  reject_old_samples_max_age: 168h
-  max_cache_freshness_per_query: 10m
-
-storage_config:
-  tsdb_shipper:
-    active_index_directory: /tmp/loki/tsdb-index
-    cache_location: /tmp/loki/tsdb-cache
-  filesystem:
-    directory: /tmp/loki/chunks
+  ingestion_rate_mb: 16
+  ingestion_burst_size_mb: 24
 
 schema_config:
   configs:
