@@ -8,10 +8,9 @@ services:
       RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:-notopiauit}
       RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:-notopiauit}
       RUSTFS_CONSOLE_ENABLE: 'true'
-      RUSTFS_SERVER_DOMAINS: rustfs.notopia.localhost
+      # RUSTFS_SERVER_DOMAINS: rustfs.notopia.localhost
     volumes:
       - rustfs:/data
-      - rustfs_logs:/logs
     labels:
       traefik.enable: 'true'
       traefik.http.routers.rustfs-api.rule: Host(`rustfs-api.notopia.localhost`)
@@ -33,22 +32,21 @@ services:
       start_period: 10s
       start_interval: 1s
     restart: unless-stopped
-    depends_on:
-      rustfs_volume_permission_helper:
-        condition: service_completed_successfully
+    # depends_on:
+    #   rustfs_volume_permission_helper:
+    #     condition: service_completed_successfully
 
-  rustfs_volume_permission_helper:
-    image: alpine
-    container_name: notopia-rustfs_volume_permission_helper
-    volumes:
-      - rustfs:/data
-      - rustfs_logs:/logs
-    command: > # language: sh
-      sh -c "
-        chown -R 10001:10001 /data /logs
-        echo 'Volume Permissions fixed'
-      "
-    restart: 'no'
+  # rustfs_volume_permission_helper:
+  #   image: alpine
+  #   container_name: notopia-rustfs_volume_permission_helper
+  #   volumes:
+  #     - rustfs:/data
+  #   command: > # language: sh
+  #     sh -c "
+  #       chown -R 10001:10001 /data
+  #       echo 'Volume Permissions fixed'
+  #     "
+  #   restart: 'no'
 
   rustfs_bucket:
     image: minio/mc:RELEASE.2025-08-13T08-35-41Z
@@ -68,4 +66,3 @@ services:
 
 volumes:
   rustfs:
-  rustfs_logs:

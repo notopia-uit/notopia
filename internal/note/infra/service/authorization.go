@@ -2,14 +2,11 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 
 	"github.com/google/uuid"
-	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -17,7 +14,6 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func authorizationUnaryClientErrorInterceptor() grpc.UnaryClientInterceptor {
@@ -31,9 +27,6 @@ func authorizationUnaryClientErrorInterceptor() grpc.UnaryClientInterceptor {
 	) error {
 		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
-			if method == "/grpc.health.v1.Health/Check" {
-				return err
-			}
 			return errs.NewAuthorizationInternal(err)
 		}
 		return nil
@@ -52,17 +45,11 @@ func NewAuthorization(
 	logger logging.Logger,
 ) (*Authorization, func(), error) {
 	statsHandler := otelgrpc.NewClientHandler()
-	logInterceptor := selector.UnaryClientInterceptor(
-		logging.UnaryClientInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
-		selector.MatchFunc(func(ctx context.Context, callMeta interceptors.CallMeta) bool {
-			return callMeta.Service != "grpc.health.v1.Health"
-		}),
-	)
 	conn, err := grpc.NewClient(
 		servicesCfg.Authorization.URL,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithStatsHandler(statsHandler),
-		grpc.WithChainUnaryInterceptor(logInterceptor, authorizationUnaryClientErrorInterceptor()),
+		grpc.WithChainUnaryInterceptor(logging.UnaryClientInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)), authorizationUnaryClientErrorInterceptor()),
 	)
 	if err != nil {
 		return nil, nil, fmt.Errorf("invalid authorization service client configuration: %w", err)
@@ -178,20 +165,6 @@ func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, 
 		return nil, err
 	}
 	return members, nil
-}
-
-func (a *Authorization) CheckHealth(ctx context.Context) error {
-	client := grpc_health_v1.NewHealthClient(a.conn)
-	response, err := client.Check(ctx, &grpc_health_v1.HealthCheckRequest{
-		Service: "",
-	})
-	if err != nil {
-		return err
-	}
-	if response.Status != grpc_health_v1.HealthCheckResponse_SERVING {
-		return errors.New("authorization service is not healthy")
-	}
-	return nil
 }
 
 func (a *Authorization) toWorkspaceMembersPb(members []app.WorkspaceMemberUpdate) ([]*pb.WorkspaceMember, error) {

@@ -10,9 +10,29 @@ distributor:
         http:
           endpoint: 0.0.0.0:4318
 
+memberlist:
+  abort_if_cluster_join_fails: false
+  bind_port: 7946
+  join_members:
+    - 127.0.0.1:7946
+
 ingester:
   trace_idle_period: 10s
   max_block_bytes: 268435456
+  lifecycler:
+    ring:
+      replication_factor: 1
+      kvstore:
+        store: memberlist
+
+metrics_generator:
+  ring:
+    kvstore:
+      store: memberlist
+  registry:
+    external_labels:
+      source: notopia-tempo
+      cluster: notopia
 
 storage:
   trace:

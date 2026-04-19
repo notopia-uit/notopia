@@ -6,8 +6,6 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/health"
-	"google.golang.org/grpc/health/grpc_health_v1"
 
 	"buf.build/go/protovalidate"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
@@ -62,9 +60,6 @@ func New(
 		address: cfg.GRPC.Address(),
 	}
 	pb.RegisterNoteServiceServer(server, serviceServer)
-	healthServer := health.NewServer()
-	grpc_health_v1.RegisterHealthServer(server, healthServer)
-	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
 	return grpc, server.GracefulStop, nil
 }
 

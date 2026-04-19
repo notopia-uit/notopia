@@ -13,7 +13,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
-	"github.com/notopia-uit/notopia/internal/note/infra/service"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
@@ -28,8 +27,8 @@ func New(
 	kafkaCfg *commonconfig.Kafka,
 	workspaceEventHub app.WorkspaceEventHub,
 	redisClient *workspaceevent.RedisClient,
-	authorizationSvc *service.Authorization,
 	authentikCfg *commonconfig.Authentik,
+	servicesCfg *config.Services,
 ) *Health {
 	startupChecker := health.NewChecker(
 		health.WithCheck(
@@ -115,12 +114,9 @@ func New(
 			3*time.Second,
 			health.Check{
 				Name: "authorizationService",
-				Check: func(ctx context.Context) error {
-					if err := authorizationSvc.CheckHealth(ctx); err != nil {
-						return fmt.Errorf("failed to check authorization service: %w", err)
-					}
-					return nil
-				},
+				Check: httpCheck.New(httpCheck.Config{
+					URL: servicesCfg.Authorization.LiveURL,
+				}),
 			},
 		),
 
