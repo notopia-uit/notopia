@@ -1,7 +1,12 @@
+target: all
+stream_over_http_enabled: true
+
+server:
+  http_listen_port: 3200
+
 distributor:
   log_received_spans:
-    enabled: false # enable this to see check if configured the app correctly sends spans to tempo
-
+    enabled: false
   receivers:
     otlp:
       protocols:
@@ -10,29 +15,11 @@ distributor:
         http:
           endpoint: 0.0.0.0:4318
 
-memberlist:
-  abort_if_cluster_join_fails: false
-  bind_port: 7946
-  join_members:
-    - 127.0.0.1:7946
-
-ingester:
-  trace_idle_period: 10s
-  max_block_bytes: 268435456
-  lifecycler:
-    ring:
-      replication_factor: 1
-      kvstore:
-        store: memberlist
-
 metrics_generator:
-  ring:
-    kvstore:
-      store: memberlist
-  registry:
-    external_labels:
-      source: notopia-tempo
-      cluster: notopia
+  storage:
+    path: /var/tempo/generator/wal
+    remote_write:
+      - url: http://prometheus:9090/api/v1/write
 
 storage:
   trace:
@@ -41,3 +28,6 @@ storage:
       path: /var/tempo/wal
     local:
       path: /var/tempo/blocks
+
+usage_report:
+  reporting_enabled: false
