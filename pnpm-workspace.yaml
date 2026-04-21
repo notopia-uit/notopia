@@ -9,7 +9,7 @@ packages:
   - 'libs/*'
 autoInstallPeers: true
 catalog:
-  '@hey-api/openapi-ts': '0.96.0'
+  '@hey-api/openapi-ts': '0.96.1'
   '@openapitools/openapi-generator-cli': '2.31.1'
   '@redocly/cli': '2.25.4'
   '@scalar/cli': '1.8.6'
