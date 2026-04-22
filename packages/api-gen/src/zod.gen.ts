@@ -667,25 +667,13 @@ export const zGetWorkspaceEventsPath = z.object({
 /**
  * A persistent stream of events
  */
-export const zGetWorkspaceEventsResponse = z.union([
-    z.object({
-        event: z.literal('HeartBeatWorkspaceEvent')
-    }).and(zNoteHeartBeatWorkspaceEvent),
-    z.object({
-        event: z.literal('WorkspaceDeletedEvent')
-    }).and(zNoteWorkspaceDeletedEvent),
-    z.object({
-        event: z.literal('WorkspaceItemsUpdatedEvent')
-    }).and(zNoteWorkspaceItemsUpdatedEvent),
-    z.object({
-        event: z.literal('WorkspaceMembersUpdatedEvent')
-    }).and(zNoteWorkspaceMembersUpdatedEvent),
-    z.object({
-        event: z.literal('WorkspaceRenamedEvent')
-    }).and(zNoteWorkspaceRenamedEvent),
-    z.object({
-        event: z.literal('WorkspaceSlugChangedEvent')
-    }).and(zNoteWorkspaceSlugChangedEvent)
+export const zGetWorkspaceEventsResponse = z.discriminatedUnion('event', [
+    zNoteHeartBeatWorkspaceEvent.extend({ event: z.literal('HeartBeatWorkspaceEvent') }),
+    zNoteWorkspaceDeletedEvent.extend({ event: z.literal('WorkspaceDeletedEvent') }),
+    zNoteWorkspaceItemsUpdatedEvent.extend({ event: z.literal('WorkspaceItemsUpdatedEvent') }),
+    zNoteWorkspaceMembersUpdatedEvent.extend({ event: z.literal('WorkspaceMembersUpdatedEvent') }),
+    zNoteWorkspaceRenamedEvent.extend({ event: z.literal('WorkspaceRenamedEvent') }),
+    zNoteWorkspaceSlugChangedEvent.extend({ event: z.literal('WorkspaceSlugChangedEvent') })
 ]);
 
 export const zGetWorkspaceGraphPath = z.object({
