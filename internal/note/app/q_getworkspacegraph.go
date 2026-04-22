@@ -16,38 +16,38 @@ type GetWorkspaceGraph struct {
 }
 
 type GetWorkspaceGraphReadModel interface {
-	GetWorkspaceGraph(ctx context.Context, q *GetWorkspaceGraph) (*Graph, error)
+	GetWorkspaceGraph(ctx context.Context, q *GetWorkspaceGraph) (Graph, error)
 }
 
 type GetWorkspaceGraphHandler struct {
-	authorizationService AuthorizationService
-	readModel            GetWorkspaceGraphReadModel
+	authorizationSvc AuthorizationSvc
+	readModel        GetWorkspaceGraphReadModel
 }
 
 func NewGetWorkspaceGraphHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	readModel GetWorkspaceGraphReadModel,
 ) *GetWorkspaceGraphHandler {
 	return &GetWorkspaceGraphHandler{
-		authorizationService: authorizationService,
-		readModel:            readModel,
+		authorizationSvc: authorizationSvc,
+		readModel:        readModel,
 	}
 }
 
 var ProvideGetWorkspaceGraphHandler = NewGetWorkspaceGraphHandler
 
-func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspaceGraph) (*Graph, error) {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspaceGraph) (Graph, error) {
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
 		query.ID,
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
-		return nil, err
+		return Graph{}, err
 	}
 	if !hasPermission {
-		return nil, errs.NewForbidden(
+		return Graph{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read workspace graph %s", query.UserID, query.ID),
 		)
 	}

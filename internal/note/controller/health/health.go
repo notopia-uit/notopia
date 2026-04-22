@@ -3,6 +3,8 @@ package health
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net"
 	"net/http"
 	"time"
 
@@ -12,6 +14,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
 type Health struct {
@@ -21,8 +24,11 @@ type Health struct {
 func New(
 	persistence *persistence.Pg,
 	serverCfg *config.Server,
+	kafkaCfg *commonconfig.Kafka,
 	workspaceEventHub app.WorkspaceEventHub,
 	redisClient *workspaceevent.RedisClient,
+	authentikCfg *commonconfig.Authentik,
+	servicesCfg *config.Services,
 ) *Health {
 	startupChecker := health.NewChecker(
 		health.WithCheck(
@@ -31,16 +37,18 @@ func New(
 				Check: func(ctx context.Context) error {
 					ok, err := persistence.IsMigrationDone(ctx)
 					if err != nil {
-						return err
+						return fmt.Errorf("failed to check migration status: %w", err)
 					}
 					if !ok {
-						return errors.New("migration not done")
+						return errors.New("database migration is not completed yet")
 					}
 					return nil
 				},
 			},
 		),
 	)
+
+	httpPing := fmt.Sprintf("http://%s/note/ping", serverCfg.Health.Address())
 
 	readyChecker := health.NewChecker(
 		health.WithPeriodicCheck(
@@ -49,38 +57,100 @@ func New(
 			health.Check{
 				Name: "persistenceConnection",
 				Check: func(ctx context.Context) error {
-					return persistence.Ping(ctx)
+					if err := persistence.Ping(ctx); err != nil {
+						return fmt.Errorf("failed to ping persistence: %w", err)
+					}
+					return nil
 				},
 			},
 		),
+
 		health.WithPeriodicCheck(
 			15*time.Second,
 			3*time.Second,
 			health.Check{
 				Name: "http",
 				Check: httpCheck.New(httpCheck.Config{
-					URL: serverCfg.HTTP.Address(),
+					URL: httpPing,
 				}),
 			},
 		),
+
 		health.WithPeriodicCheck(
 			15*time.Second,
 			3*time.Second,
 			health.Check{
 				Name: "grpc",
-				Check: httpCheck.New(httpCheck.Config{
-					URL: serverCfg.GRPC.Address(),
-				}),
+				Check: func(ctx context.Context) error {
+					conn, err := net.DialTimeout("tcp", serverCfg.GRPC.Address(), 5*time.Second)
+					if err != nil {
+						return fmt.Errorf("failed to connect to gRPC server: %w", err)
+					}
+					if err := conn.Close(); err != nil {
+						return fmt.Errorf("failed to close gRPC connection: %w", err)
+					}
+					return nil
+				},
 			},
 		),
+
 		// TODO: this have to check kafka, not the pub sub
 		health.WithPeriodicCheck(
 			15*time.Second,
 			3*time.Second,
 			health.Check{
-				Name: "workspaceEventHub redis connection",
+				Name: "workspaceEventHubRedisConnection",
 				Check: func(ctx context.Context) error {
-					return redisClient.Ping(ctx).Err()
+					if err := redisClient.Ping(ctx).Err(); err != nil {
+						return fmt.Errorf("failed to ping Redis: %w", err)
+					}
+					return nil
+				},
+			},
+		),
+
+		health.WithPeriodicCheck(
+			15*time.Second,
+			3*time.Second,
+			health.Check{
+				Name: "authorizationService",
+				Check: httpCheck.New(httpCheck.Config{
+					URL: servicesCfg.Authorization.LiveURL,
+				}),
+			},
+		),
+
+		health.WithPeriodicCheck(
+			15*time.Second,
+			3*time.Second,
+			health.Check{
+				Name: "authentik",
+				Check: httpCheck.New(httpCheck.Config{
+					URL: authentikCfg.HealthLiveURL(),
+				}),
+			},
+		),
+
+		health.WithPeriodicCheck(
+			15*time.Second,
+			3*time.Second,
+			health.Check{
+				Name: "kafka",
+				Check: func(ctx context.Context) error {
+					if kafkaCfg == nil || len(kafkaCfg.Brokers) == 0 {
+						return errors.New("kafka not configured")
+					}
+					// Try to connect to each broker
+					for i, broker := range kafkaCfg.Brokers {
+						conn, err := net.DialTimeout("tcp", broker, 5*time.Second)
+						if err != nil {
+							return fmt.Errorf("failed to connect to kafka broker %d (%s): %w", i, broker, err)
+						}
+						if err := conn.Close(); err != nil {
+							return fmt.Errorf("failed to close kafka broker %d connection: %w", i, err)
+						}
+					}
+					return nil
 				},
 			},
 		),
@@ -89,9 +159,9 @@ func New(
 	liveCheck := health.NewChecker()
 
 	mux := http.NewServeMux()
-	mux.Handle("/startup", health.NewHandler(startupChecker))
-	mux.Handle("/ready", health.NewHandler(readyChecker))
-	mux.Handle("/live", health.NewHandler(liveCheck))
+	mux.Handle("/note/health/startup", health.NewHandler(startupChecker))
+	mux.Handle("/note/health/ready", health.NewHandler(readyChecker))
+	mux.Handle("/note/health/live", health.NewHandler(liveCheck))
 	return &Health{
 		&http.Server{
 			Handler: mux,

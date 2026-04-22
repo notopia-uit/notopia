@@ -18,45 +18,45 @@ type GetNoteLinks struct {
 }
 
 type GetNoteLinksReadModel interface {
-	GetNoteLinks(ctx context.Context, q *GetNoteLinks) (*NoteLinkResult, error)
+	GetNoteLinks(ctx context.Context, q *GetNoteLinks) (NoteLinkResult, error)
 }
 
 type GetNoteLinksHandler struct {
-	authorizationService AuthorizationService
-	noteRepo             domain.NoteRepo
-	readModel            GetNoteLinksReadModel
+	authorizationSvc AuthorizationSvc
+	noteRepo         domain.NoteRepo
+	readModel        GetNoteLinksReadModel
 }
 
 func NewGetNoteLinksHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	noteRepo domain.NoteRepo,
 	readModel GetNoteLinksReadModel,
 ) *GetNoteLinksHandler {
 	return &GetNoteLinksHandler{
-		authorizationService: authorizationService,
-		noteRepo:             noteRepo,
-		readModel:            readModel,
+		authorizationSvc: authorizationSvc,
+		noteRepo:         noteRepo,
+		readModel:        readModel,
 	}
 }
 
 var ProvideGetNoteLinksHandler = NewGetNoteLinksHandler
 
-func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (*NoteLinkResult, error) {
+func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (NoteLinkResult, error) {
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)
 	if err != nil {
-		return nil, err
+		return NoteLinkResult{}, err
 	}
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
 		workspaceID,
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
-		return nil, err
+		return NoteLinkResult{}, err
 	}
 	if !hasPermission {
-		return nil, errs.NewForbidden(
+		return NoteLinkResult{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read note links %s", query.UserID, query.ID),
 		)
 	}

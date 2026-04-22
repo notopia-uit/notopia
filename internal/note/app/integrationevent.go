@@ -23,11 +23,15 @@ type IntegrationEventNoteCreated struct {
 	Icon string
 }
 
+var _ IntegrationEvent = (*IntegrationEventNoteCreated)(nil)
+
 func (e IntegrationEventNoteCreated) isIntegrationEvent() {}
 
 type IntegrationEventNoteDeleted struct {
 	ID uuid.UUID
 }
+
+var _ IntegrationEvent = (*IntegrationEventNoteDeleted)(nil)
 
 func (e IntegrationEventNoteDeleted) isIntegrationEvent() {}
 
@@ -41,5 +45,7 @@ type IntegrationEventNoteUpdated struct {
 	OutgoingLinks uuid.UUIDs
 	UpdatedAt     time.Time
 }
+
+var _ IntegrationEvent = (*IntegrationEventNoteUpdated)(nil)
 
 func (e IntegrationEventNoteUpdated) isIntegrationEvent() {}

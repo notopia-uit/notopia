@@ -1,0 +1,31 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  id:
+    type: string
+    format: uuid
+    example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+
+  event:
+    type: string
+    enum:
+      - WorkspaceRenamedEvent
+    example: WorkspaceRenamedEvent
+
+  data:
+    type: object
+    x-go-type-name: WorkspaceRenamedEventData
+    properties:
+      id:
+        $ref: ./Workspace.yaml#/properties/id
+      name:
+        $ref: ./Workspace.yaml#/properties/name
+    required:
+      - id
+      - name
+
+required:
+  - id
+  - event
+  - data

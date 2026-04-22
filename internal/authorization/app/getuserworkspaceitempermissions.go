@@ -24,7 +24,7 @@ func NewGetUserWorkspaceItemPermissionsHandler(enforcer *casbin.TransactionalEnf
 
 var ProvideGetUserWorkspaceItemPermissionsHandler = NewGetUserWorkspaceItemPermissionsHandler
 
-func (h *GetUserWorkspaceItemPermissionsHandler) Handle(ctx context.Context, params GetUserWorkspaceItemPermissions) (*WorkspaceItemPermissions, error) {
+func (h *GetUserWorkspaceItemPermissionsHandler) Handle(ctx context.Context, params GetUserWorkspaceItemPermissions) (WorkspaceItemPermissions, error) {
 	readAllowed, err := h.enforcer.Enforce(
 		formatUser(params.UserID),
 		formatWorkspace(params.WorkspaceID),
@@ -32,10 +32,10 @@ func (h *GetUserWorkspaceItemPermissionsHandler) Handle(ctx context.Context, par
 		WorkspacePermissionRead.String(),
 	)
 	if err != nil {
-		return nil, errs.NewCasbinEnforcerError(err)
+		return WorkspaceItemPermissions{}, errs.NewCasbinEnforcerError(err)
 	}
 	if !readAllowed {
-		return nil, errs.NewMemberHasNoPermission(params.UserID, params.WorkspaceID, WorkspacePermissionRead.String())
+		return WorkspaceItemPermissions{}, errs.NewMemberHasNoPermission(params.UserID, params.WorkspaceID, WorkspacePermissionRead.String())
 	}
 
 	oks, err := h.enforcer.BatchEnforce(
@@ -46,9 +46,9 @@ func (h *GetUserWorkspaceItemPermissionsHandler) Handle(ctx context.Context, par
 		},
 	)
 	if err != nil {
-		return nil, errs.NewCasbinEnforcerError(err)
+		return WorkspaceItemPermissions{}, errs.NewCasbinEnforcerError(err)
 	}
-	wip := &WorkspaceItemPermissions{
+	wip := WorkspaceItemPermissions{
 		Read:   oks[0],
 		Write:  oks[1],
 		Delete: oks[2],

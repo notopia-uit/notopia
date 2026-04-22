@@ -21,14 +21,15 @@ import (
 
 // This include integration (from share package) and domain event, setup for event processor
 // If not use with event processor but via subscriber directly, not need to declare this
-func eventToTopic(event any) (string, bool) {
+func eventToTopic(event any) (string, error) {
 	switch e := event.(type) {
 	case domain.Event:
 		return component.DomainEventToTopic(e)
 	case *share.DocumentCommittedEvent:
-		return "events.integration.document.document.committed", true
+		return "events.integration.document.document.committed", nil
+	default:
+		return "", fmt.Errorf("unknown event type: %T", event)
 	}
-	return "", false
 }
 
 type Event struct {
@@ -80,10 +81,11 @@ func NewEvent(
 		router,
 		cqrs.EventProcessorConfig{
 			GenerateSubscribeTopic: func(params cqrs.EventProcessorGenerateSubscribeTopicParams) (string, error) {
-				if topic, ok := eventToTopic(params.EventHandler.NewEvent()); ok { // Watermill doesn't pass the new event for me??, so I create a new event again
-					return topic, nil
+				topic, err := eventToTopic(params.EventHandler.NewEvent())
+				if err != nil {
+					return "", fmt.Errorf("failed to get event topic for %s: %w", params.EventName, err)
 				}
-				return "", fmt.Errorf("unknown event name %s", params.EventName)
+				return topic, nil
 			},
 			SubscriberConstructor: func(params cqrs.EventProcessorSubscriberConstructorParams) (message.Subscriber, error) {
 				return kafka.NewSubscriber(
@@ -122,7 +124,21 @@ func (e *Event) setup() error {
 		"DocumentCommittedHandler",
 		e.documentCommittedHandler,
 	)); err != nil {
-		return fmt.Errorf("failed to add event handler: %w", err)
+		return fmt.Errorf("failed to add event handler DocumentCommittedHandler: %w", err)
+	}
+
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"NotifyWorkspaceRenamedHandler",
+		e.app.Events.NotifyWorkspaceRenamedHandler.Handle,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler NotifyWorkspaceRenamedHandler: %w", err)
+	}
+
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"NotifyWorkspaceSlugChangedHandler",
+		e.app.Events.NotifyWorkspaceSlugChangedHandler.Handle,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler NotifyWorkspaceSlugChangedHandler: %w", err)
 	}
 
 	// NOTE: because watermill doesn't support kafka regex (IBM/sarama)
@@ -130,7 +146,8 @@ func (e *Event) setup() error {
 	workspaceItemUpdatedFolderTopics := []string{
 		component.DomainEventTopicPrefix + "folder.created",
 		component.DomainEventTopicPrefix + "folder.deleted",
-		component.DomainEventTopicPrefix + "folder.updated",
+		component.DomainEventTopicPrefix + "folder.renamed",
+		component.DomainEventTopicPrefix + "folder.icon_changed",
 		component.DomainEventTopicPrefix + "folder.moved",
 		component.DomainEventTopicPrefix + "folder.trashed",
 		component.DomainEventTopicPrefix + "folder.restored",
@@ -147,7 +164,11 @@ func (e *Event) setup() error {
 	workspaceItemUpdatedNoteTopics := []string{
 		component.DomainEventTopicPrefix + "note.created",
 		component.DomainEventTopicPrefix + "note.deleted",
-		component.DomainEventTopicPrefix + "note.updated",
+		component.DomainEventTopicPrefix + "note.renamed",
+		component.DomainEventTopicPrefix + "note.icon_changed",
+		component.DomainEventTopicPrefix + "note.tags_changed",
+		component.DomainEventTopicPrefix + "note.size_changed",
+		component.DomainEventTopicPrefix + "note.outgoing_links_changed",
 		component.DomainEventTopicPrefix + "note.moved",
 		component.DomainEventTopicPrefix + "note.trashed",
 		component.DomainEventTopicPrefix + "note.restored",

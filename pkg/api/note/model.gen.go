@@ -109,6 +109,21 @@ func (e WorkspaceMembersUpdatedEventEvent) Valid() bool {
 	}
 }
 
+// Defines values for WorkspaceRenamedEventEvent.
+const (
+	WorkspaceRenamedEventEventWorkspaceRenamedEvent WorkspaceRenamedEventEvent = "WorkspaceRenamedEvent"
+)
+
+// Valid indicates whether the value is a known member of the WorkspaceRenamedEventEvent enum.
+func (e WorkspaceRenamedEventEvent) Valid() bool {
+	switch e {
+	case WorkspaceRenamedEventEventWorkspaceRenamedEvent:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for WorkspaceRole.
 const (
 	Editor WorkspaceRole = "editor"
@@ -130,15 +145,15 @@ func (e WorkspaceRole) Valid() bool {
 	}
 }
 
-// Defines values for WorkspaceUpdatedEventEvent.
+// Defines values for WorkspaceSlugChangedEventEvent.
 const (
-	WorkspaceUpdatedEventEventWorkspaceUpdatedEvent WorkspaceUpdatedEventEvent = "WorkspaceUpdatedEvent"
+	WorkspaceSlugChangedEventEventWorkspaceSlugChangedEvent WorkspaceSlugChangedEventEvent = "WorkspaceSlugChangedEvent"
 )
 
-// Valid indicates whether the value is a known member of the WorkspaceUpdatedEventEvent enum.
-func (e WorkspaceUpdatedEventEvent) Valid() bool {
+// Valid indicates whether the value is a known member of the WorkspaceSlugChangedEventEvent enum.
+func (e WorkspaceSlugChangedEventEvent) Valid() bool {
 	switch e {
-	case WorkspaceUpdatedEventEventWorkspaceUpdatedEvent:
+	case WorkspaceSlugChangedEventEventWorkspaceSlugChangedEvent:
 		return true
 	default:
 		return false
@@ -366,8 +381,40 @@ type WorkspaceMembersUpdatedEventData struct {
 // WorkspaceMembersUpdatedEventEvent defines model for WorkspaceMembersUpdatedEvent.Event.
 type WorkspaceMembersUpdatedEventEvent string
 
+// WorkspaceRenamedEvent defines model for WorkspaceRenamedEvent.
+type WorkspaceRenamedEvent struct {
+	Data  WorkspaceRenamedEventData  `json:"data"`
+	Event WorkspaceRenamedEventEvent `json:"event"`
+	Id    openapi_types.UUID         `json:"id"`
+}
+
+// WorkspaceRenamedEventData defines model for .
+type WorkspaceRenamedEventData struct {
+	Id   *PropertiesId           `json:"id,omitempty"`
+	Name WorkspacePropertiesName `json:"name"`
+}
+
+// WorkspaceRenamedEventEvent defines model for WorkspaceRenamedEvent.Event.
+type WorkspaceRenamedEventEvent string
+
 // WorkspaceRole defines model for WorkspaceRole.
 type WorkspaceRole string
+
+// WorkspaceSlugChangedEvent defines model for WorkspaceSlugChangedEvent.
+type WorkspaceSlugChangedEvent struct {
+	Data  WorkspaceSlugChangedEventData  `json:"data"`
+	Event WorkspaceSlugChangedEventEvent `json:"event"`
+	Id    openapi_types.UUID             `json:"id"`
+}
+
+// WorkspaceSlugChangedEventData defines model for .
+type WorkspaceSlugChangedEventData struct {
+	Id   *PropertiesId `json:"id,omitempty"`
+	Slug Slug          `json:"slug"`
+}
+
+// WorkspaceSlugChangedEventEvent defines model for WorkspaceSlugChangedEvent.Event.
+type WorkspaceSlugChangedEventEvent string
 
 // WorkspaceTreeFolder defines model for WorkspaceTreeFolder.
 type WorkspaceTreeFolder struct {
@@ -388,16 +435,6 @@ type WorkspaceTreeNote struct {
 	Name      PropertiesName `json:"name"`
 	UpdatedAt *UpdatedAt     `json:"updatedAt,omitempty"`
 }
-
-// WorkspaceUpdatedEvent defines model for WorkspaceUpdatedEvent.
-type WorkspaceUpdatedEvent struct {
-	Data  Workspace                  `json:"data"`
-	Event WorkspaceUpdatedEventEvent `json:"event"`
-	Id    openapi_types.UUID         `json:"id"`
-}
-
-// WorkspaceUpdatedEventEvent defines model for WorkspaceUpdatedEvent.Event.
-type WorkspaceUpdatedEventEvent string
 
 // WorkspacePropertiesName defines model for Workspace_properties-name.
 type WorkspacePropertiesName = string
@@ -495,6 +532,11 @@ type RenameNoteJSONBody struct {
 	Name PropertiesName `json:"name"`
 }
 
+// ChangeWorkspaceSlugJSONBody defines parameters for ChangeWorkspaceSlug.
+type ChangeWorkspaceSlugJSONBody struct {
+	Slug Slug `json:"slug"`
+}
+
 // GetWorkspaceGraphParams defines parameters for GetWorkspaceGraph.
 type GetWorkspaceGraphParams struct {
 	// IncludeOrphans Include node that are not connected to any other node
@@ -555,6 +597,9 @@ type RenameNoteJSONRequestBody RenameNoteJSONBody
 
 // CreateWorkspaceJSONRequestBody defines body for CreateWorkspace for application/json ContentType.
 type CreateWorkspaceJSONRequestBody = Workspace
+
+// ChangeWorkspaceSlugJSONRequestBody defines body for ChangeWorkspaceSlug for application/json ContentType.
+type ChangeWorkspaceSlugJSONRequestBody ChangeWorkspaceSlugJSONBody
 
 // UpdateWorkspaceMembersJSONRequestBody defines body for UpdateWorkspaceMembers for application/json ContentType.
 type UpdateWorkspaceMembersJSONRequestBody = UpdateWorkspaceMembersJSONBody

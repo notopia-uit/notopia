@@ -26,17 +26,6 @@ export class StorageService {
     this.s3Endpoint = s3Config.endpoint;
   }
 
-  async generatePresignedUploadUrl(key: string) {
-    const command = new PutObjectCommand({
-      Bucket: this.bucketName,
-      Key: key,
-    });
-
-    return await getSignedUrl(this.s3Client, command, {
-      expiresIn: StorageService.s3UrlExpirationSeconds,
-    });
-  }
-
   async generateAttachmentPresignedUploadUrl(key: string) {
     const command = new PutObjectCommand({
       Bucket: this.bucketName,

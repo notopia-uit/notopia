@@ -1,5 +1,7 @@
 package errs
 
+import "fmt"
+
 type Code string
 
 func (c Code) String() string {
@@ -18,6 +20,8 @@ const (
 type Error interface {
 	error
 	Code() Code
+	Message() string
+	Unwrap() error
 }
 
 type Err struct {
@@ -28,22 +32,20 @@ type Err struct {
 
 var _ Error = (*Err)(nil)
 
-func (e Err) Error() string   { return e.message }
+func (e Err) Error() string {
+	if e.err != nil {
+		return fmt.Sprintf("%s: %v", e.message, e.err)
+	}
+	return e.message
+}
+
 func (e Err) Unwrap() error   { return e.err }
 func (e Err) Code() Code      { return e.code }
 func (e Err) Message() string { return e.message }
 
-type Unauthorized struct {
-	Err
-}
-
-func NewUnauthorized() *Unauthorized {
-	return &Unauthorized{
-		Err: Err{
-			message: "unauthorized",
-			code:    CodeUnauthorized,
-		},
-	}
+var Unauthorized = &Err{
+	message: "unauthorized",
+	code:    CodeUnauthorized,
 }
 
 type Forbidden struct {
@@ -72,7 +74,7 @@ func NewInvalid(message string) *Invalid {
 	}
 }
 
-var Unimplemented = Err{
+var Unimplemented = &Err{
 	message: "unimplemented",
 	code:    CodeUnimplemented,
 }

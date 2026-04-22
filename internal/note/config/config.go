@@ -81,14 +81,15 @@ func New(
 	viper.SetConfigName("note.notopia.config")
 	viper.AddConfigPath(".")
 
-	viper.SetDefault("server.http.port", 8081)
-	viper.SetDefault("server.grpc.port", 18081)
-	viper.SetDefault("server.health.port", 28081)
+	commonconfig.ServerAddressViperSetDefault(viper, "server.http", 8081)
+	commonconfig.ServerAddressViperSetDefault(viper, "server.grpc", 18081)
+	commonconfig.ServerAddressViperSetDefault(viper, "server.health", 28081)
 	setViperAdvancedDefault(viper)
 	commonconfig.LogViperSetDefault(viper, "log")
 	commonconfig.KafkaViperSetDefault(viper, "kafka", "note-service")
 	commonconfig.SQLViperSetDefault(viper, "database")
 	commonconfig.GeneralViperSetDefault(viper, "general")
+	commonconfig.AuthentikViperSetDefault(viper, "authentik")
 
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err == nil {
@@ -98,6 +99,10 @@ func New(
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal config from env or config file: %w", err)
+	}
+
+	if err := cfg.Authentik.Init(); err != nil {
+		return nil, fmt.Errorf("failed to initialize Authentik config: %w", err)
 	}
 
 	slog.Info("configuration", slog.Any("config", cfg))

@@ -25,7 +25,7 @@ func NewWorkspaceTree(queries *pgsqlc.Queries) *WorkspaceTree {
 
 var ProvideWorkspaceTree = NewWorkspaceTree
 
-func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (*app.WorkspaceTreeFolder, error) {
+func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (app.WorkspaceTreeFolder, error) {
 	var rootFolderID uuid.UUID
 
 	if q.RootFolderID != uuid.Nil {
@@ -33,10 +33,10 @@ func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspac
 	} else {
 		rootFolderIDs, err := h.queries.ReadGetRootFolderIDsByWorkspaceID(ctx, q.WorkspaceID)
 		if err != nil {
-			return nil, toErr(err)
+			return app.WorkspaceTreeFolder{}, toErr(err)
 		}
 		if len(rootFolderIDs) == 0 {
-			return nil, errs.NewWorkspaceRootFolderNotFound(q.WorkspaceID, pgx.ErrNoRows)
+			return app.WorkspaceTreeFolder{}, errs.NewWorkspaceRootFolderNotFound(q.WorkspaceID, pgx.ErrNoRows)
 		}
 		rootFolderID = rootFolderIDs[0]
 	}
@@ -44,9 +44,9 @@ func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspac
 	rootFolder, err := h.queries.ReadGetFolderByID(ctx, rootFolderID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewFolderNotFound(rootFolderID, err)
+			return app.WorkspaceTreeFolder{}, errs.NewFolderNotFound(rootFolderID, err)
 		}
-		return nil, toErr(err)
+		return app.WorkspaceTreeFolder{}, toErr(err)
 	}
 
 	var depth *int32
@@ -59,7 +59,7 @@ func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspac
 		IncludeTrashed: q.IncludeTrashed,
 	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, toErr(err)
+		return app.WorkspaceTreeFolder{}, toErr(err)
 	}
 
 	var folderIDs []uuid.UUID
@@ -91,7 +91,7 @@ func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspac
 		ExcludeTrash: !q.IncludeTrashed,
 	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, toErr(err)
+		return app.WorkspaceTreeFolder{}, toErr(err)
 	}
 
 	notesByFolder := make(map[uuid.UUID][]*pgsqlc.Note)
@@ -117,7 +117,7 @@ func (h *WorkspaceTree) buildFolderTree(
 	updatedAt time.Time,
 	childrenByParentID map[uuid.UUID][]*pgsqlc.ReadGetRecursiveFolderByParentIDRow,
 	notesByFolder map[uuid.UUID][]*pgsqlc.Note,
-) *app.WorkspaceTreeFolder {
+) app.WorkspaceTreeFolder {
 	var icon string
 	if folderIcon != nil {
 		icon = *folderIcon
@@ -127,29 +127,31 @@ func (h *WorkspaceTree) buildFolderTree(
 		Name:      folderName,
 		Icon:      icon,
 		UpdatedAt: updatedAt,
-		Notes:     []*app.WorkspaceTreeNote{},
-		Children:  []*app.WorkspaceTreeFolder{},
+		Notes:     []app.WorkspaceTreeNote{},
+		Children:  []app.WorkspaceTreeFolder{},
 	}
 
 	if notes, ok := notesByFolder[folderID]; ok {
-		for _, note := range notes {
+		result.Notes = make([]app.WorkspaceTreeNote, len(notes))
+		for i, note := range notes {
 			var noteIcon string
 			if note.Icon != nil {
 				noteIcon = *note.Icon
 			}
-			result.Notes = append(result.Notes, &app.WorkspaceTreeNote{
+			result.Notes[i] = app.WorkspaceTreeNote{
 				ID:        note.ID,
 				Name:      note.Name,
 				Icon:      noteIcon,
 				UpdatedAt: note.UpdatedAt,
-			})
+			}
 		}
 	}
 
 	// Only iterate through direct children, not the entire folderMap
 	if children, ok := childrenByParentID[folderID]; ok {
-		for _, childFolder := range children {
-			childTree := h.buildFolderTree(
+		result.Children = make([]app.WorkspaceTreeFolder, len(children))
+		for i, childFolder := range children {
+			result.Children[i] = h.buildFolderTree(
 				childFolder.ID,
 				childFolder.Name,
 				childFolder.Icon,
@@ -157,9 +159,8 @@ func (h *WorkspaceTree) buildFolderTree(
 				childrenByParentID,
 				notesByFolder,
 			)
-			result.Children = append(result.Children, childTree)
 		}
 	}
 
-	return &result
+	return result
 }

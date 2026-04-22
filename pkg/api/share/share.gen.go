@@ -9,6 +9,27 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for WorkspaceRole.
+const (
+	Editor WorkspaceRole = "editor"
+	Owner  WorkspaceRole = "owner"
+	Viewer WorkspaceRole = "viewer"
+)
+
+// Valid indicates whether the value is a known member of the WorkspaceRole enum.
+func (e WorkspaceRole) Valid() bool {
+	switch e {
+	case Editor:
+		return true
+	case Owner:
+		return true
+	case Viewer:
+		return true
+	default:
+		return false
+	}
+}
+
 // Document defines model for Document.
 type Document struct {
 	// Content BlockNote model
@@ -67,5 +88,36 @@ type UserDeletedEvent struct {
 	Id Id `json:"id"`
 }
 
+// UserWorkspaceRoleUpdatedEvent defines model for UserWorkspaceRoleUpdatedEvent.
+type UserWorkspaceRoleUpdatedEvent struct {
+	Role WorkspaceRole `json:"role"`
+
+	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+	UserId      Id            `json:"userId"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+}
+
+// WorkspaceMemberAddedEvent defines model for WorkspaceMemberAddedEvent.
+type WorkspaceMemberAddedEvent struct {
+	Role WorkspaceRole `json:"role"`
+
+	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+	UserId      Id            `json:"userId"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+}
+
+// WorkspaceMemberRemovedEvent defines model for WorkspaceMemberRemovedEvent.
+type WorkspaceMemberRemovedEvent struct {
+	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+	UserId      Id            `json:"userId"`
+	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+}
+
+// WorkspaceRole defines model for WorkspaceRole.
+type WorkspaceRole string
+
 // Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 type Id = string
+
+// PropertiesId defines model for properties-id.
+type PropertiesId = openapi_types.UUID

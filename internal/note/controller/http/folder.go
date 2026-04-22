@@ -16,7 +16,7 @@ func (h *StrictHandler) CreateFolder(
 ) (note.CreateFolderResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	body := request.Body
@@ -55,7 +55,7 @@ func (h *StrictHandler) PermanentlyDeleteFolder(
 ) (note.PermanentlyDeleteFolderResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	cmd := &app.PermanentlyDeleteFolder{
@@ -75,7 +75,7 @@ func (h *StrictHandler) RenameFolder(
 ) (note.RenameFolderResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	body := request.Body

@@ -63,15 +63,26 @@ func (w *Workspace) Name() string {
 
 func (w *Workspace) Rename(name string, userID string) {
 	w.name = name
-	w.addEvent(&WorkspaceUpdatedEvent{
+	w.addEvent(&WorkspaceRenamedEvent{
 		BaseEvent: NewBaseEvent(w.id, userID),
 		Name:      w.name,
-		Slug:      w.slug,
 	})
 }
 
 func (w *Workspace) Slug() string {
 	return w.slug
+}
+
+func (w *Workspace) ChangeSlug(slug string, userID string) error {
+	if slug == "" {
+		return errs.InvalidWorkspaceSlug
+	}
+	w.slug = slug
+	w.addEvent(&WorkspaceSlugChangedEvent{
+		BaseEvent: NewBaseEvent(w.id, userID),
+		Slug:      w.slug,
+	})
+	return nil
 }
 
 func (w *Workspace) DeletedAt() *time.Time {

@@ -12,6 +12,7 @@ properties:
     enum:
       - WorkspaceItemsUpdatedEvent
     example: WorkspaceItemsUpdatedEvent
+
   data:
     type: object
     x-go-type-name: WorkspaceItemsUpdatedEventData

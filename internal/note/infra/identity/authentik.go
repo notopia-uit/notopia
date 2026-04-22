@@ -35,17 +35,18 @@ func NewAuthentik(
 
 var ProvideAuthentik = NewAuthentik
 
-var _ app.IdentityService = (*Authentik)(nil)
+var _ app.IdentitySvc = (*Authentik)(nil)
 
 // Due to limitation of Authentik API, we have to retrieve users one by one
-func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]*app.User, error) {
+func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]app.User, error) {
 	ctx = context.WithValue(ctx, api.ContextAccessToken, a.token)
-	result := make([]*app.User, len(ids))
+	result := make([]app.User, len(ids))
 
 	g, ctx := errgroup.WithContext(ctx)
 	g.SetLimit(10)
 
 	for i, id := range ids {
+		i, id := i, id
 		g.Go(func() error {
 			userID, err := strconv.Atoi(id)
 			if err != nil {
@@ -57,7 +58,7 @@ func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]*app.Use
 				return err
 			}
 
-			result[i] = &app.User{
+			result[i] = app.User{
 				ID:     id,
 				Name:   user.GetName(),
 				Email:  user.GetEmail(),

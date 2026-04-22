@@ -8,13 +8,16 @@ import {
   AUTHORIZATION_PACKAGE_NAME,
   AUTHORIZATION_SERVICE_NAME,
   AuthorizationServiceClient,
-  WorkspaceItemPermission,
+  WorkspaceItemPermission as WorkspaceItemPermissionPb,
 } from '@notopia-uit/pb/authorization';
 import { firstValueFrom } from 'rxjs';
 
 import { NoteService } from '#/note/note.service';
 
-import { UserNotePermissions } from './models';
+import {
+  UserNotePermissions as UserNotePermission,
+  WorkspaceItemPermission,
+} from './models';
 
 @Injectable()
 export class AuthorizationService implements OnModuleInit {
@@ -32,16 +35,16 @@ export class AuthorizationService implements OnModuleInit {
       );
   }
 
-  private toWorkspaceItemPermission(
-    permission: UserNotePermissions
-  ): WorkspaceItemPermission {
+  private toWorkspaceItemPermissionPb(
+    permission: UserNotePermission
+  ): WorkspaceItemPermissionPb {
     switch (permission) {
       case 'read':
-        return WorkspaceItemPermission.WORKSPACE_ITEM_PERMISSION_READ;
+        return WorkspaceItemPermissionPb.WORKSPACE_ITEM_PERMISSION_READ;
       case 'write':
-        return WorkspaceItemPermission.WORKSPACE_ITEM_PERMISSION_WRITE;
+        return WorkspaceItemPermissionPb.WORKSPACE_ITEM_PERMISSION_WRITE;
       case 'delete':
-        return WorkspaceItemPermission.WORKSPACE_ITEM_PERMISSION_DELETE;
+        return WorkspaceItemPermissionPb.WORKSPACE_ITEM_PERMISSION_DELETE;
       default: {
         const exhaustiveCheck: never = permission;
         throw new UnprocessableEntityException(
@@ -58,7 +61,7 @@ export class AuthorizationService implements OnModuleInit {
   }: {
     memberId: string;
     documentId: string;
-    permission: UserNotePermissions;
+    permission: UserNotePermission;
   }): Promise<boolean> {
     try {
       const workspace = await this.noteService.getWorkspaceByNote({
@@ -67,7 +70,7 @@ export class AuthorizationService implements OnModuleInit {
       });
       const response = await firstValueFrom(
         this.authorizationServiceClient.hasWorkspaceItemPermission({
-          permission: this.toWorkspaceItemPermission(permission),
+          permission: this.toWorkspaceItemPermissionPb(permission),
           memberId,
           workspaceId: workspace.id,
         })
@@ -80,10 +83,36 @@ export class AuthorizationService implements OnModuleInit {
     }
   }
 
-  async getUserNotePermissions(
+  async getWorkspaceItemPermissions({
+    memberId,
+    workspaceId,
+  }: {
+    memberId: string;
+    workspaceId: string;
+  }): Promise<WorkspaceItemPermission> {
+    try {
+      const response = await firstValueFrom(
+        this.authorizationServiceClient.getUserWorkspaceItemPermissions({
+          memberId,
+          workspaceId,
+        })
+      );
+      return {
+        canRead: response.canRead,
+        canWrite: response.canWrite,
+        canDelete: response.canDelete,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to get workspace item permissions: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  async getUserDocumentPermissions(
     memberId: string,
     documentId: string
-  ): Promise<{ canRead: boolean; canWrite: boolean; canDelete: boolean }> {
+  ): Promise<WorkspaceItemPermission> {
     try {
       const workspace = await this.noteService.getWorkspaceByNote({
         noteId: documentId,

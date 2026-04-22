@@ -38,6 +38,15 @@
     "watch-bundle:json": {
       "dependsOn": ["^watch-bundle:json"]
     },
+    "preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "scalar document serve ./bundled/openapi.json --port 9080",
+        "forwardAllArgs": false,
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": ["join"]
+    },
     "dev": {
       "executor": "nx:run-commands",
       "options": {

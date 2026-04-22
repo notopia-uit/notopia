@@ -40,6 +40,16 @@
       "dependsOn": ["^build*", "^bundle*", "^gen"],
       "cache": true
     },
+    "dev": {
+      "configurations": {
+        "mon": {}
+      }
+    },
+    "debug": {
+      "configurations": {
+        "mon": {}
+      }
+    },
     "test": {
       "dependsOn": ["^test*"],
       "cache": true

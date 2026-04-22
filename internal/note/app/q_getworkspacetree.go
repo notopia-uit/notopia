@@ -18,38 +18,38 @@ type GetWorkspaceTree struct {
 }
 
 type GetWorkspaceTreeReadModel interface {
-	GetWorkspaceTree(ctx context.Context, q *GetWorkspaceTree) (*WorkspaceTreeFolder, error)
+	GetWorkspaceTree(ctx context.Context, q *GetWorkspaceTree) (WorkspaceTreeFolder, error)
 }
 
 type GetWorkspaceTreeHandler struct {
-	authorizationService AuthorizationService
-	readModel            GetWorkspaceTreeReadModel
+	authorizationSvc AuthorizationSvc
+	readModel        GetWorkspaceTreeReadModel
 }
 
 func NewGetWorkspaceTreeHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	readModel GetWorkspaceTreeReadModel,
 ) *GetWorkspaceTreeHandler {
 	return &GetWorkspaceTreeHandler{
-		authorizationService: authorizationService,
-		readModel:            readModel,
+		authorizationSvc: authorizationSvc,
+		readModel:        readModel,
 	}
 }
 
 var ProvideGetWorkspaceTreeHandler = NewGetWorkspaceTreeHandler
 
-func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspaceTree) (*WorkspaceTreeFolder, error) {
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspaceTree) (WorkspaceTreeFolder, error) {
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
 		query.WorkspaceID,
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
-		return nil, err
+		return WorkspaceTreeFolder{}, err
 	}
 	if !hasPermission {
-		return nil, errs.NewForbidden(
+		return WorkspaceTreeFolder{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read workspace tree %s", query.UserID, query.WorkspaceID),
 		)
 	}

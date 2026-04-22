@@ -35,6 +35,11 @@
     {
       "groupName": "blocknote",
       "matchPackageNames": ["/^@blocknote/"]
+    },
+    {
+      "groupName": "go",
+      "matchPackageNames": ["/^golang$/"],
+      "automerge": false
     }
   ],
   "docker-compose": {

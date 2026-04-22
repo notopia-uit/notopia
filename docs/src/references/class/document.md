@@ -62,85 +62,121 @@ skinparam class {
     AttributeFontColor $text
 }
 
-!define RepoInterface(name) interface "name" as Document.name <<(I, $pink) Repo Interface>>
 !define Service(name) class "name" as Document.name <<(C, $rosewater) Service>>
 !define Entity(name) class "name" as Document.name <<(C, $sky) Entity>>
 !define Type(name) class "name" as Document.name <<(T, $flamingo) Type>>
-!define Model(name) class "name" as Document.name <<(C, $yellow) Model>>
+!define Enum(name) enum "name" as Document.name <<(E, $peach) Enum>>
 
 package "Document" as Document <<Frame>> {
     Entity(DocumentEntity) {
         id: string
         data: Buffer
+        modified: boolean
+        revisions: RevisionEntity[]
     }
 
     Entity(RevisionEntity) {
         id: string
-        name: string?
-        data: Buffer
-        documentId: string
-        createdAt: Date
-    }
-
-    Model(DocumentModel) {
-        id: string
+        document: DocumentEntity
+        name: string | null
         content: @blocknote/core.Block[]
-    }
-
-    Model(RevisionModel) {
-        id: string
-        name: string?
-        content: @blocknote/core.Block[]
-        documentId: string
         createdAt: Date
+        deletedAt: Date | null
     }
 
     Type(AttachmentUploadUrl) {
-        id: string
-        url: string
+        uploadUrl: string
+        publicUrl: string
     }
 
-    Type(TagModel) {
-        id: string
-        name: string
+    Type(PaginatedRevisions) {
+        revisions: RevisionEntity[]
+        page: number
+        limit: number
+        total: number
     }
 
-    RepoInterface(DocumentRepository) {
-        Save(document: DocumentEntity)
-        GetById(documentId: string): DocumentEntity
-    }
-
-    RepoInterface(RevisionRepository) {
-        Save(revision: RevisionEntity)
-        GetById(revisionId: string): RevisionEntity
-        GetByDocumentId(documentId: string): RevisionEntity[]
+    Type(OutgoingLinksAndTags) {
+        tags: string[]
+        outgoingLinkIds: string[]
     }
 
     Service(DocumentService) {
-        documentRepository: DocumentRepository
-        blockNoteEditor: BlockNoteEditor
-        attachmentService: AttachmentService
-
-        extractTags(): TagModel[]
-        extractOutgoingLinkIds(): string[]
-        CreateDocument(name: string, data: Buffer): DocumentEntity
-        GetDocument(documentId: string): DocumentEntity
-        GetAttachmentUploadUrl(): AttachmentUploadUrl
+        - toYDoc(entity: DocumentEntity): yjs.Doc
+        - bufferToBlockNote(data: Buffer, editor: ServerBlockNoteEditor): @blocknote/core.Block[]
+        - extractTagsAndOutgoingLinkIds(editor: ServerBlockNoteEditor): OutgoingLinksAndTags
+        + commitDocument(documentId: string, userId: string)
+        + getAttachmentUploadUrl(documentId: string, userId: string): AttachmentUploadUrl
+        + updateDataById(id: string, data: Buffer)
+        + getById(id: string): DocumentEntity | null
     }
 
     Service(RevisionService) {
-        revisionRepository: RevisionRepository
-
-        GetRevision(revisionId: string): RevisionModel
-        GetRevisionsByDocumentId(documentId: string): RevisionModel[]
+        + getRevision(revisionId: string): RevisionEntity
+        + getRevisionsByDocumentId(documentId: string, page: number, limit: number): PaginatedRevisions[]
+        + renameRevision(revisionId: string, name: string | null)
+        + deleteRevision(revisionId: string)
     }
 
-    Document.DocumentService ..> Document.DocumentRepository : uses
-    Document.RevisionService ..> Document.RevisionRepository : uses
-    Document.DocumentRepository ..> Document.DocumentEntity : manages
-    Document.RevisionRepository ..> Document.RevisionEntity : manages
+    Enum(UserNotePermission) {
+        read
+        write
+        delete
+    }
+
+    Type(WorkspaceItemPermission) {
+        canRead: boolean
+        canWrite: boolean
+        canDelete: boolean
+    }
+
+    Service(AuthorizationService) {
+        - toWorkspaceItemPermissionPb(permissions: UserNotePermission): pb.WorkspaceItemPermission
+        + hasNotePermission(memberId: string, documentId: string, permission: UserNotePermission): boolean
+        + getWorkspaceItemPermission(memberId: string, workspaceId: string): WorkspaceItemPermission
+        + getUserNotePermissions(memberId: string, documentId: string): WorkspaceItemPermission
+    }
+
+    Type(NoteModel) {
+        id: string
+        name: string
+        icon?: string
+        folderId: string
+        tags: string[]
+        updatedAt?: Date
+        trashed?: TrashedModel
+    }
+
+    Type(TrashedModel) {
+        by: 'purpose' | 'parent'
+        at: Date
+    }
+
+    Type(WorkspaceModel) {
+        id: string
+        name: string
+        slug: string
+    }
+
+    Service(NoteService) {
+        + getNoteById(noteId: string, userId: string, excludeTrashed?: boolean): NoteModel
+        + getNoteName(noteId: string): string
+        + getWorkspaceByNote(userId: string, noteId: string): WorkspaceModel
+        - toTrashedModel(trashed: Trashed): TrashedModel
+    }
+
+    Service(HocuspocusService) {
+        + onRoleChanged(workspaceId: string, userId: string)
+        + onMemberRemoved(workspaceId: string, userId: string)
+    }
+
+    Service(StorageService) {
+        + generateAttachmentPresignedUploadUrl(key: string): AttachmentUploadUrl
+    }
 }
 @enduml
 ```
 
 <!-- diagram id="class-diagram-document" -->
+
+<!-- vim:set tabstop=4 softtabstop=4 shiftwidth=4: -->

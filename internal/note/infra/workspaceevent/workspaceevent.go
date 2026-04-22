@@ -122,9 +122,9 @@ func (h *WorkspaceEventHub) Publish(
 		return nil
 	}
 
-	msgs := make([]*message.Message, 0, len(events))
+	msgs := make([]*message.Message, len(events))
 
-	for _, event := range events {
+	for i, event := range events {
 		payload, err := json.Marshal(event)
 		if err != nil {
 			return errs.NewWorkspaceEventPubSubFailedToCreateMessage(
@@ -139,7 +139,7 @@ func (h *WorkspaceEventHub) Publish(
 		msg.Metadata.Set(h.MetadataWorkspaceIDKey, workspaceID.String())
 		msg.Metadata.Set(h.metadataUserIDKey, userID)
 		msg.Metadata.Set(h.metadataEventTypeKey, event.GetEvent())
-		msgs = append(msgs, msg)
+		msgs[i] = msg
 	}
 
 	if err := h.redisPublisher.Publish(h.topic, msgs...); err != nil {

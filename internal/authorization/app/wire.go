@@ -5,6 +5,7 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
+	ProvideCasbinEnforcer,
 	ProvideCreateWorkspaceHandler,
 	ProvideDeleteWorkspaceHandler,
 	ProvideGetUserWorkspaceItemPermissionsHandler,
@@ -13,4 +14,5 @@ var ProviderSet = wire.NewSet(
 	ProvideHasWorkspaceItemPermissionHandler,
 	ProvideHasWorkspacePermissionHandler,
 	ProvideUpdateWorkspaceMembersHandler,
+	wire.Struct(new(App), "*"),
 )

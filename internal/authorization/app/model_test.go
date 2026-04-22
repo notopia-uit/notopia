@@ -3,13 +3,12 @@ package app_test
 import (
 	"testing"
 
-	_ "embed"
 	"github.com/stretchr/testify/require"
 )
 
 // Shared at https://editor.casbin.org/#GURKL5ZXW
 func TestModels(t *testing.T) {
-	e, err := GetLocalEnforcer(true)
+	e, err := GetLocalEnforcer(t, true)
 	require.NoError(t, err, "Failed to create enforcer")
 
 	tests := []struct {

@@ -16,11 +16,15 @@ type UpdateWorkspaceMembers struct {
 }
 
 type UpdateWorkspaceMembersHandler struct {
-	enforcer *casbin.TransactionalEnforcer
+	enforcer             *casbin.TransactionalEnforcer
+	integrationPublisher IntegrationPublisher
 }
 
-func NewUpdateWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer) *UpdateWorkspaceMembersHandler {
-	return &UpdateWorkspaceMembersHandler{enforcer: enforcer}
+func NewUpdateWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer, publisher IntegrationPublisher) *UpdateWorkspaceMembersHandler {
+	return &UpdateWorkspaceMembersHandler{
+		enforcer:             enforcer,
+		integrationPublisher: publisher,
+	}
 }
 
 var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
@@ -39,6 +43,9 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params Updat
 		return errs.NewMemberHasNoPermission(params.UserID, params.WorkspaceID, WorkspacePermissionEdit.String())
 	}
 
+	var oldMembers []WorkspaceMember
+	var eventsToPublish []IntegrationEvent
+
 	err = h.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
 		bufferedModel, err := tx.GetBufferedModel()
 		if err != nil {
@@ -47,6 +54,22 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params Updat
 		currentRules, err := bufferedModel.GetFilteredPolicy("g", "g", 2, formatWorkspace(params.WorkspaceID))
 		if err != nil {
 			return errs.NewCasbinInternalError(err)
+		}
+
+		oldMembers = make([]WorkspaceMember, 0, len(currentRules))
+		for _, rule := range currentRules {
+			userID, err := userFromFormat(rule[0])
+			if err != nil {
+				return errs.NewCasbinInternalError(err)
+			}
+			role, err := parseRole(rule[1])
+			if err != nil {
+				return errs.NewCasbinInternalError(err)
+			}
+			oldMembers = append(oldMembers, WorkspaceMember{
+				ID:   userID,
+				Role: role,
+			})
 		}
 
 		for _, rule := range currentRules {
@@ -63,15 +86,65 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params Updat
 			}
 		}
 
+		eventsToPublish = compareAndGenerateEvents(params.WorkspaceID, oldMembers, params.Members)
+
+		if len(eventsToPublish) > 0 {
+			if err := h.integrationPublisher.Publish(ctx, eventsToPublish...); err != nil {
+				return errs.NewPublishIntegrationEventsFailed(params.WorkspaceID, err)
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
 		return err
 	}
+
 	slog.InfoContext(ctx, "updated workspace members",
 		slog.String("user_id", params.UserID),
 		slog.String("workspace_id", params.WorkspaceID.String()),
 		slog.Int("member_count", len(params.Members)),
 	)
 	return nil
+}
+
+func compareAndGenerateEvents(workspaceID uuid.UUID, oldMembers, newMembers []WorkspaceMember) []IntegrationEvent {
+	var events []IntegrationEvent
+
+	oldMemberMap := make(map[string]WorkspaceRole)
+	for _, member := range oldMembers {
+		oldMemberMap[member.ID] = member.Role
+	}
+
+	newMemberMap := make(map[string]WorkspaceRole)
+	for _, member := range newMembers {
+		newMemberMap[member.ID] = member.Role
+	}
+
+	for userID, newRole := range newMemberMap {
+		if oldRole, exists := oldMemberMap[userID]; !exists {
+			events = append(events, IntegrationEventWorkspaceMemberAdded{
+				WorkspaceID: workspaceID,
+				UserID:      userID,
+				Role:        newRole,
+			})
+		} else if oldRole != newRole {
+			events = append(events, IntegrationEventUserWorkspaceRoleUpdated{
+				WorkspaceID: workspaceID,
+				UserID:      userID,
+				Role:        newRole,
+			})
+		}
+	}
+
+	for userID := range oldMemberMap {
+		if _, exists := newMemberMap[userID]; !exists {
+			events = append(events, IntegrationEventWorkspaceMemberRemoved{
+				WorkspaceID: workspaceID,
+				UserID:      userID,
+			})
+		}
+	}
+
+	return events
 }

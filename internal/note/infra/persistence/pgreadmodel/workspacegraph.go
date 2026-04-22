@@ -19,18 +19,18 @@ func GetWorkspaceGraph(queries *pgsqlc.Queries) *WorkspaceGraph {
 
 var ProvideWorkspaceGraph = GetWorkspaceGraph
 
-func (h *WorkspaceGraph) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (*app.Graph, error) {
+func (h *WorkspaceGraph) GetWorkspaceGraph(ctx context.Context, q *app.GetWorkspaceGraph) (app.Graph, error) {
 	notes, err := h.queries.ReadGetNotesInWorkspace(ctx, pgsqlc.ReadGetNotesInWorkspaceParams{
 		WorkspaceID:  q.ID,
 		ExcludeTrash: true,
 	})
 	if err != nil {
-		return nil, toErr(err)
+		return app.Graph{}, toErr(err)
 	}
 
 	links, err := h.queries.ReadGetNoteLinksInWorkspace(ctx, q.ID)
 	if err != nil {
-		return nil, toErr(err)
+		return app.Graph{}, toErr(err)
 	}
 
 	reachableIDs := make(map[string]bool)

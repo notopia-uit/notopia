@@ -22,6 +22,7 @@
 
 ## Dev
 
+- Do not source `.env`, because Nx will not override env that already exist. So, let Nx source itself
 - Delete broken symlinks in the current directory and its subdirectories
   ```bash
   find . -type l ! -exec test -e {} \; -print -delete
@@ -43,3 +44,5 @@
 - [ ] no env validation for document, search-worker
 - [ ] Health check to other services (api service, meili, postgres...)
 - [ ] Connection pool max connections, idle, timeout for database, meili
+- [ ] gin should be protected with `SetTrustedProxies`
+- [ ] Event is tracked by either otel or correlation id. But, currently use wotel + kafka tracer, and partially correlation id but not really connected.

@@ -39,6 +39,9 @@ type WorkspaceEvent interface {
 	GetEvent() string
 }
 
+// NOTE: This is a shortcut, if we make it right, this
+// must be different from the struct from contract.
+// We only use the data struct from contract, not the whole
 type workspaceEvent[E ~string] struct {
 	Id    uuid.UUID `json:"id"`
 	Event E         `json:"event"`
@@ -59,14 +62,19 @@ type WorkspaceEventMembersUpdated struct {
 	workspaceEvent[note.WorkspaceMembersUpdatedEventEvent]
 }
 
-type WorkspaceEventWorkspaceUpdated struct {
-	workspaceEvent[note.WorkspaceUpdatedEventEvent]
+type WorkspaceEventWorkspaceRenamed struct {
+	workspaceEvent[note.WorkspaceRenamedEventEvent]
+}
+
+type WorkspaceEventWorkspaceSlugChanged struct {
+	workspaceEvent[note.WorkspaceSlugChangedEventEvent]
 }
 
 type WorkspaceEventWorkspaceDeleted struct {
 	workspaceEvent[note.WorkspaceDeletedEventEvent]
 }
 
+// NOTE: This is just used under infra? Consider move it to infra
 func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
 	switch t {
 	case string(note.WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent):
@@ -75,9 +83,12 @@ func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
 	case string(note.WorkspaceItemsUpdatedEventEventWorkspaceItemsUpdatedEvent):
 		//exhaustruct:ignore
 		return &WorkspaceEventWorkspaceItemsUpdated{}, true
-	case string(note.WorkspaceUpdatedEventEventWorkspaceUpdatedEvent):
+	case string(note.WorkspaceRenamedEventEventWorkspaceRenamedEvent):
 		//exhaustruct:ignore
-		return &WorkspaceEventWorkspaceUpdated{}, true
+		return &WorkspaceEventWorkspaceRenamed{}, true
+	case string(note.WorkspaceSlugChangedEventEventWorkspaceSlugChangedEvent):
+		//exhaustruct:ignore
+		return &WorkspaceEventWorkspaceSlugChanged{}, true
 	case string(note.WorkspaceDeletedEventEventWorkspaceDeletedEvent):
 		//exhaustruct:ignore
 		return &WorkspaceEventWorkspaceDeleted{}, true

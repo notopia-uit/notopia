@@ -67,7 +67,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.New(stdoutHandler, slogHandler, log)
+	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
 	provider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
 		cleanup3()
@@ -96,12 +96,13 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	advanced := &configConfig.Advanced
 	domainEvent := advanced.DomainEvent
-	loggerAdapter := component.NewWatermillLogger(logger)
+	loggerAdapter := logging.NewWatermill(logger)
 	configDomainEvent := &advanced.DomainEvent
 	defaultPostgreSQLSchema := outbox.NewSchemaAdapter(configDomainEvent)
 	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema, serviceName)
 	runInTx := pgrepo.NewRunInTx(fromPersistenceToQSLForwarder)
 	unitOfWork := pgrepo.NewUnitOfWork(pool, fromPersistenceToQSLForwarder, runInTx)
+	changeWorkspaceSlugHandler := app.NewChangeWorkspaceSlugHandler(authorization, unitOfWork)
 	createFolderHandler := app.NewCreateFolderHandler(authorization, unitOfWork)
 	createNoteHandler := app.NewCreateNoteHandler(authorization, unitOfWork)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(unitOfWork, authorization)
@@ -137,6 +138,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization)
 	cmds := &app.Cmds{
+		ChangeWorkspaceSlugHandler:             changeWorkspaceSlugHandler,
 		CreateFolderHandler:                    createFolderHandler,
 		CreateNoteHandler:                      createNoteHandler,
 		CreateWorkspaceHandler:                 createWorkspaceHandler,
@@ -159,9 +161,13 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
 	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(workspaceEventHub)
+	notifyWorkspaceRenamedHandler := app.NewNotifyWorkspaceRenamedHandler(workspaceEventHub)
+	notifyWorkspaceSlugChangedHandler := app.NewNotifyWorkspaceSlugChangedHandler(workspaceEventHub)
 	events := &app.Events{
-		DocumentCommittedHandler:    documentCommittedHandler,
-		NotifyWorkspaceItemsUpdated: notifyWorkspaceItemsUpdatedHandler,
+		DocumentCommittedHandler:           documentCommittedHandler,
+		NotifyWorkspaceItemsUpdatedHandler: notifyWorkspaceItemsUpdatedHandler,
+		NotifyWorkspaceRenamedHandler:      notifyWorkspaceRenamedHandler,
+		NotifyWorkspaceSlugChangedHandler:  notifyWorkspaceSlugChangedHandler,
 	}
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)
@@ -242,7 +248,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	kafkaPublisher, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
+	kafkaPublisher, cleanup8, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
 	if err != nil {
 		cleanup7()
 		cleanup6()
@@ -255,6 +261,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, defaultPostgreSQLSchema, pool)
 	if err != nil {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()
@@ -264,9 +271,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	healthHealth := health.New(pg, configServer, workspaceEventHub, redisClient)
-	meterProvider, cleanup8, err := otel.NewMeterProvider(ctx, resource)
+	healthHealth := health.New(pg, configServer, kafka, workspaceEventHub, redisClient, authentik, services)
+	meterProvider, cleanup9, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()
@@ -279,6 +287,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
 	noteServer := note.NewServer(pg, httpHTTP, grpcGRPC, eventEvent, workspaceEventHub, outboxOutbox, healthHealth, logger, global)
 	return noteServer, func() {
+		cleanup9()
 		cleanup8()
 		cleanup7()
 		cleanup6()

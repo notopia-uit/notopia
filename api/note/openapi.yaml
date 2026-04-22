@@ -49,16 +49,19 @@ paths:
   /note/notes/{noteId}/unpublish:
     $ref: ./paths/notes_{noteId}_unpublish.yaml
 
-  /note/workspaces:
-    $ref: ./paths/workspaces.yaml
-  /note/workspaces/me:
-    $ref: ./paths/workspaces_me.yaml
   /note/workspaces-by-slug/{workspaceSlug}:
     $ref: ./paths/workspaces-by-slug_{workspaceSlug}.yaml
   /note/workspaces-by-slug/{workspaceSlug}/exists:
     $ref: ./paths/workspaces-by-slug_{workspaceSlug}_exists.yaml
+
+  /note/workspaces:
+    $ref: ./paths/workspaces.yaml
+  /note/workspaces/me:
+    $ref: ./paths/workspaces_me.yaml
   /note/workspaces/{workspaceId}:
     $ref: ./paths/workspaces_{workspaceId}.yaml
+  /note/workspaces/{workspaceId}/change-slug:
+    $ref: ./paths/workspaces_{workspaceId}_change_slug.yaml
   /note/workspaces/{workspaceId}/events:
     $ref: ./paths/workspaces_{workspaceId}_events.yaml
   /note/workspaces/{workspaceId}/graph:

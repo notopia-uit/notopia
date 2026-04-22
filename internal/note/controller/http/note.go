@@ -16,7 +16,7 @@ func (h *StrictHandler) CreateNote(
 ) (note.CreateNoteResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	id, err := uuid.NewV7()
@@ -53,7 +53,7 @@ func (h *StrictHandler) PermanentlyDeleteNote(
 ) (note.PermanentlyDeleteNoteResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	cmd := &app.PermanentlyDeleteNote{
@@ -74,7 +74,7 @@ func (h *StrictHandler) GetNote(
 ) (note.GetNoteResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 	excludeTrashed := request.Params.IncludeTrashed == nil || !*request.Params.IncludeTrashed
 
@@ -89,7 +89,7 @@ func (h *StrictHandler) GetNote(
 		return nil, err
 	}
 
-	dto, err := toNoteDTO(*result)
+	dto, err := toNoteDTO(result)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (h *StrictHandler) GetNoteGraph(
 ) (note.GetNoteGraphResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 	var depth int
 	if request.Params.Depth != nil {
@@ -120,7 +120,7 @@ func (h *StrictHandler) GetNoteGraph(
 		return nil, err
 	}
 
-	dto := toGraphDTO(result)
+	dto := toGraphDTO(&result)
 	return note.GetNoteGraph200JSONResponse(dto), nil
 }
 
@@ -130,7 +130,7 @@ func (h *StrictHandler) GetNoteLinks(
 ) (note.GetNoteLinksResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 	outgoingLinks := request.Params.OutgoingLinks != nil && *request.Params.OutgoingLinks
 	backlinks := request.Params.Backlinks != nil && *request.Params.Backlinks
@@ -145,7 +145,7 @@ func (h *StrictHandler) GetNoteLinks(
 		return nil, err
 	}
 
-	dto := toGetNoteLinksDTO(result)
+	dto := toGetNoteLinksDTO(&result)
 	return note.GetNoteLinks200JSONResponse(dto), nil
 }
 
@@ -162,7 +162,7 @@ func (h *StrictHandler) RenameNote(
 ) (note.RenameNoteResponseObject, error) {
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
-		return nil, errs.NewUnauthorized()
+		return nil, errs.Unauthorized
 	}
 
 	cmd := &app.RenameNote{

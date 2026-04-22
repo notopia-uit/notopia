@@ -13,18 +13,9 @@ import (
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-type NotifyWorkspaceItemsUpdatedType uint8
-
-const (
-	NotifyWorkspaceItemsUpdatedTypeFolder NotifyWorkspaceItemsUpdatedType = iota
-	NotifyWorkspaceItemsUpdatedTypeNote
-)
-
 type NotifyWorkspaceItemsUpdated struct {
-	UserID          string
-	WorkspaceID     uuid.UUID
-	WorkspaceItemID uuid.UUID
-	Type            NotifyWorkspaceItemsUpdatedType
+	UserID      string
+	WorkspaceID uuid.UUID
 }
 
 // Because workspace items includes note and folder, so, we share the same debounce

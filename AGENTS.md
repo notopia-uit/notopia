@@ -11,26 +11,28 @@ apps/                           # JS/TS applications
   document/                     # Document service (NestJS) (nx: document)
   searchworker/                 # Search worker (NestJS) sync to meilisearch (nx: searchworker)
   web/                          # NextJS (nx: web)
+  api-web/                      # OpenAPI Spec rendered with Scalar React (nx: api-web)
 packages/                       # JS packages
-  api-document-nestjs-server    # NestJS server codegen from OpenAPI spec, using openapi-generator
-  api-gen                       # Frontend API client codegen from OpenAPI spec, using heyapi/openapi-ts
-  block-note                    # BlockNote editor component, share between backend services, and packages/ui
-  lib                           # Share code, blocknote model,...
-  pb                            # Protobuf generated code, use grpc, protovalidate
-  ui                            # React UI components, using shadcn/ui
+  api-document-nestjs-server/   # NestJS server codegen from OpenAPI spec, using openapi-generator
+  api-gen/                      # Frontend API client codegen from OpenAPI spec, using heyapi/openapi-ts
+  lib/                          # Share code, blocknote model,...
+  pb/                           # Protobuf generated code, use grpc, protovalidate
+  ui/                           # React UI components, using shadcn/ui
 docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.)
 cmd/                            # Go services
   note/                         # Note service (nx: note)
   authorization/                # Authorization service (nx: authorization)
 internal/                       # Internal Go packages
+  note/
+  authorization/
+pkg/                            # Go packages
   api                           # Code gen from oapi-codegen
-  common
+  common                        # Including commonhttp, commonconfig
   helper
   logging
   metadata
   otel
   pb
-pkg/                            # Go packages
 ```
 
 ## Technologies

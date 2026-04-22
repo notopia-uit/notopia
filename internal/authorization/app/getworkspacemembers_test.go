@@ -1,7 +1,6 @@
 package app_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -11,7 +10,7 @@ import (
 )
 
 func TestGetWorkspaceMembersHandler(t *testing.T) {
-	e, err := GetLocalEnforcer(true)
+	e, err := GetLocalEnforcer(t, true)
 	require.NoError(t, err, "Failed to create enforcer")
 
 	handler := app.NewGetWorkspaceMembersHandler(e)
@@ -21,14 +20,14 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 		requesterID     string
 		workspaceID     string
 		expectErr       bool
-		expectedMembers []*app.WorkspaceMember
+		expectedMembers []app.WorkspaceMember
 	}{
 		{
 			name:        "W111-Owner can view members",
 			requesterID: "111",
 			workspaceID: "00000000-0000-0000-0000-000000000111",
 			expectErr:   false,
-			expectedMembers: []*app.WorkspaceMember{
+			expectedMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 				{ID: "112", Role: app.WorkspaceRoleEditor},
 				{ID: "110", Role: app.WorkspaceRoleViewer},
@@ -39,7 +38,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 			requesterID: "112",
 			workspaceID: "00000000-0000-0000-0000-000000000111",
 			expectErr:   false,
-			expectedMembers: []*app.WorkspaceMember{
+			expectedMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 				{ID: "112", Role: app.WorkspaceRoleEditor},
 				{ID: "110", Role: app.WorkspaceRoleViewer},
@@ -50,7 +49,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 			requesterID: "110",
 			workspaceID: "00000000-0000-0000-0000-000000000111",
 			expectErr:   false,
-			expectedMembers: []*app.WorkspaceMember{
+			expectedMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 				{ID: "112", Role: app.WorkspaceRoleEditor},
 				{ID: "110", Role: app.WorkspaceRoleViewer},
@@ -68,7 +67,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			ctx := context.Background()
+			ctx := t.Context()
 			workspaceID := uuid.MustParse(tc.workspaceID)
 			members, err := handler.Handle(ctx, app.GetWorkspaceMembers{
 				UserID:      tc.requesterID,

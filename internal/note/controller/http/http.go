@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -9,7 +10,7 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/notopia-uit/notopia/api"
-	"github.com/oapi-codegen/gin-middleware"
+	ginmiddleware "github.com/oapi-codegen/gin-middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/notopia-uit/notopia/internal/note/app"
@@ -66,7 +67,8 @@ func ValidateHandler() (gin.HandlerFunc, error) {
 	opts := &ginmiddleware.Options{
 		ErrorHandler: ginMiddlewareErrorHandler,
 		Options: openapi3filter.Options{
-			MultiError: true,
+			MultiError:         true,
+			AuthenticationFunc: openapi3filter.NoopAuthenticationFunc,
 		},
 	}
 	return ginmiddleware.OapiRequestValidatorWithOptions(spec, opts), nil
@@ -78,20 +80,20 @@ func RegisterRoutes(
 ) error {
 	validateHandler, err := ValidateHandler()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create validate handler: %w", err)
 	}
 	api := e.Group("/")
 	{
 		api.Use(commonhttp.GatewayUserAuth())
 		api.Use(validateHandler)
+		api.Use(StrictHandlerErrorMiddleware())
 		//exhaustruct:ignore
 		options := note.GinServerOptions{
 			ErrorHandler: serverErrorHandler,
 		}
 		note.RegisterHandlersWithOptions(api, handler, options)
-		api.Use(StrictHandlerErrorMiddleware())
 	}
-	e.GET("/ping", func(c *gin.Context) {
+	e.GET("/note/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
 	return nil

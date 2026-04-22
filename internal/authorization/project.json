@@ -19,6 +19,14 @@
         "command": "go test -v -covermode=atomic ./...",
         "cwd": "{projectRoot}"
       }
+    },
+    "gen:mockery": {
+      "executor": "nx:run-commands",
+      "inputs": ["default"],
+      "options": {
+        "command": "mockery",
+        "cwd": "{projectRoot}"
+      }
     }
   },
   "implicitDependencies": ["pkg"]

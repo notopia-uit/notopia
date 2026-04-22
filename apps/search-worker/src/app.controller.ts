@@ -13,7 +13,7 @@ import { AppService } from './app.service';
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
-  @EventPattern('event.NoteCreated')
+  @EventPattern('events.integration.note.note.created')
   handleNoteCreated(@Payload() data: ShareNoteCreatedEvent) {
     return this.appService.indexNote({
       id: data.id,
@@ -21,7 +21,7 @@ export class AppController {
     });
   }
 
-  @EventPattern('event.NoteUpdated')
+  @EventPattern('events.integration.note.note.updated')
   handleNoteUpdated(@Payload() data: ShareNoteUpdatedEvent) {
     return this.appService.indexNote({
       id: data.id,
@@ -30,12 +30,13 @@ export class AppController {
     });
   }
 
-  @EventPattern('event.DocumentCommitted')
+  @EventPattern('events.integration.document.document.committed')
   handleDocumentCommitted(@Payload() data: ShareDocumentCommittedEvent) {
     return this.appService.indexNote({
       id: data.id,
       tags: data.tags,
-      content: 'please add', // FIXME: addd!!!
+      // FIXME: addd!!! currently it send blocknote model, we need to transform it using editor
+      content: 'please add',
     });
   }
 }

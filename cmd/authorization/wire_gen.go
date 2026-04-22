@@ -11,6 +11,10 @@ import (
 	"github.com/goforj/wire"
 	"github.com/notopia-uit/notopia/internal/authorization"
 	"github.com/notopia-uit/notopia/internal/authorization/app"
+	"github.com/notopia-uit/notopia/internal/authorization/config"
+	"github.com/notopia-uit/notopia/internal/authorization/controller/grpc"
+	"github.com/notopia-uit/notopia/internal/authorization/controller/health"
+	"github.com/notopia-uit/notopia/internal/authorization/infra"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -19,17 +23,21 @@ import (
 
 func InitializeServer(ctx context.Context) (*authorization.Server, func(), error) {
 	validate := authorization.NewValidate()
-	viper := authorization.NewViper()
-	config, err := authorization.NewConfig(validate, viper)
+	viper := config.NewViper()
+	configConfig, err := config.NewConfig(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
-	sql := &config.Database
-	db, err := authorization.NewGORMDB(sql)
+	sql := &configConfig.Database
+	db, err := infra.NewGORMDB(sql)
 	if err != nil {
 		return nil, nil, err
 	}
-	transactionalEnforcer, err := authorization.NewCasbinEnforcer(db)
+	adapter, err := infra.NewCasbinAdapter(db)
+	if err != nil {
+		return nil, nil, err
+	}
+	transactionalEnforcer, err := app.NewCasbinEnforcer(adapter)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -40,20 +48,8 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
 	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
 	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
-	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer)
-	authorizationApp := &authorization.App{
-		CreateWorkspace:                 createWorkspaceHandler,
-		DeleteWorkspace:                 deleteWorkspaceHandler,
-		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
-		GetUserWorkspaces:               getUserWorkspacesHandler,
-		GetWorkspaceMembers:             getWorkspaceMembersHandler,
-		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
-		HasWorkspacePermission:          hasWorkspacePermissionHandler,
-		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
-	}
-	grpcServiceServer := authorization.NewGRPCServiceServer(authorizationApp)
-	serverConfig := &config.Server
-	log := &config.Log
+	kafka := &configConfig.Kafka
+	log := &configConfig.Log
 	stdoutHandler := logging.NewStdoutHandler(log)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
@@ -66,29 +62,54 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.New(stdoutHandler, slogHandler, log)
-	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	grpcServer, cleanup2, err := authorization.NewGRPCServer(ctx, grpcServiceServer, serverConfig, loggingLogger)
+	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
+	loggerAdapter := logging.NewWatermill(logger)
+	tracerProvider, cleanup2, err := otel.NewTracerProvider(ctx, resource)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	meterProvider, cleanup3, err := otel.NewMeterProvider(ctx, resource)
+	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
+	integrationPublisher, cleanup3, err := infra.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	tracerProvider, cleanup4, err := otel.NewTracerProvider(ctx, resource)
+	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer, integrationPublisher)
+	appApp := &app.App{
+		CreateWorkspace:                 createWorkspaceHandler,
+		DeleteWorkspace:                 deleteWorkspaceHandler,
+		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
+		GetUserWorkspaces:               getUserWorkspacesHandler,
+		GetWorkspaceMembers:             getWorkspaceMembersHandler,
+		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
+		HasWorkspacePermission:          hasWorkspacePermissionHandler,
+		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
+	}
+	service := grpc.NewService(appApp)
+	serverConfig := &configConfig.Server
+	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
+	server, cleanup4, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger)
 	if err != nil {
 		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
+	healthHealth := health.New(db, serverConfig, kafka)
+	meterProvider, cleanup5, err := otel.NewMeterProvider(ctx, resource)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
-	server := authorization.NewServer(grpcServer, logger, global)
-	return server, func() {
+	authorizationServer := authorization.NewServer(server, healthHealth, logger, global)
+	return authorizationServer, func() {
+		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()

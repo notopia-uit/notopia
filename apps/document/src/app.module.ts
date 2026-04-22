@@ -1,26 +1,22 @@
 import { Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import {
-  ClientKafka,
-  ClientsModule,
-  KafkaOptions,
-  Transport,
-} from '@nestjs/microservices';
+import { ClientKafka, ClientsModule } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
 
+import { getKafkaConfig } from '#/config/kafka.config';
+
 import { AuthorizationModule } from './authorization/authorization.module';
 import { BlockNoteModule } from './blocknote/blocknote.module';
 import { KAFKA_CLIENT } from './common/token';
 import { HttpUserGuard } from './common/user.guard';
-import { AppConfig, KafkaConfig } from './config/config';
+import { AppConfig } from './config/config';
 import {
   APP_CONFIG,
-  KAFKA_CONFIG,
   appConfig,
   databaseConfig,
   s3Config,
@@ -29,12 +25,10 @@ import {
 import { DatabaseModule } from './database/database.module';
 import { DocumentApi } from './document/document.api';
 import { DocumentEntity } from './document/document.entity';
-import { DocumentRepository } from './document/document.repository';
 import { DocumentService } from './document/document.service';
 import { NoteModule } from './note/note.module';
 import { RevisionApi } from './revision/revision.api';
 import { RevisionEntity } from './revision/revision.entity';
-import { RevisionRepository } from './revision/revision.repository';
 import { RevisionService } from './revision/revision.service';
 import { StorageModule } from './storage/storage.module';
 
@@ -71,24 +65,8 @@ import { StorageModule } from './storage/storage.module';
     ClientsModule.registerAsync([
       {
         name: KAFKA_CLIENT,
-        useFactory: (configService: ConfigService): KafkaOptions => {
-          const servicesCfg = configService.get<KafkaConfig>(KAFKA_CONFIG);
-          if (!servicesCfg) {
-            throw new Error('KAFKA_CONFIG not found');
-          }
-          return {
-            transport: Transport.KAFKA,
-            options: {
-              client: {
-                brokers: servicesCfg.brokers,
-                clientId: servicesCfg.clientId,
-              },
-              consumer: {
-                groupId: servicesCfg.groupId,
-              },
-            },
-          };
-        },
+        useFactory: getKafkaConfig,
+        inject: [ConfigService],
       },
     ]),
     StorageModule,
@@ -102,12 +80,7 @@ import { StorageModule } from './storage/storage.module';
           documentApi: DocumentApi,
           revisionApi: RevisionApi,
         },
-        providers: [
-          DocumentRepository,
-          DocumentService,
-          RevisionRepository,
-          RevisionService,
-        ],
+        providers: [DocumentService, RevisionService],
       }),
       {
         imports: [

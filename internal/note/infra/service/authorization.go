@@ -35,9 +35,10 @@ func authorizationUnaryClientErrorInterceptor() grpc.UnaryClientInterceptor {
 
 type Authorization struct {
 	client pb.AuthorizationServiceClient
+	conn   *grpc.ClientConn
 }
 
-var _ app.AuthorizationService = (*Authorization)(nil)
+var _ app.AuthorizationSvc = (*Authorization)(nil)
 
 func NewAuthorization(
 	servicesCfg *config.Services,
@@ -48,13 +49,10 @@ func NewAuthorization(
 		servicesCfg.Authorization.URL,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithStatsHandler(statsHandler),
-		grpc.WithChainUnaryInterceptor(
-			logging.UnaryClientInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
-			authorizationUnaryClientErrorInterceptor(),
-		),
+		grpc.WithChainUnaryInterceptor(logging.UnaryClientInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)), authorizationUnaryClientErrorInterceptor()),
 	)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to dial authorization service: %w", err)
+		return nil, nil, fmt.Errorf("invalid authorization service client configuration: %w", err)
 	}
 	client := pb.NewAuthorizationServiceClient(conn)
 
@@ -65,20 +63,21 @@ func NewAuthorization(
 	}
 	return &Authorization{
 		client: client,
+		conn:   conn,
 	}, cleanup, nil
 }
 
 var ProvideAuthorization = NewAuthorization
 
-func (a *Authorization) GetUserWorkspaces(ctx context.Context, userID string) ([]*app.AuthorizationUserWorkspace, error) {
+func (a *Authorization) GetUserWorkspaces(ctx context.Context, userID string) ([]app.AuthorizationUserWorkspace, error) {
 	response, err := a.client.GetUserWorkspaces(ctx, &pb.GetUserWorkspacesRequest{
 		UserId: userID,
 	})
 	if err != nil {
 		return nil, err
 	}
-	workspaces := make([]*app.AuthorizationUserWorkspace, 0, len(response.Workspaces))
-	for _, w := range response.Workspaces {
+	workspaces := make([]app.AuthorizationUserWorkspace, len(response.Workspaces))
+	for i, w := range response.Workspaces {
 		id, err := uuid.Parse(w.Id)
 		if err != nil {
 			return nil, errs.NewAuthorizationInternal(fmt.Errorf("invalid workspace ID: %w", err))
@@ -87,10 +86,10 @@ func (a *Authorization) GetUserWorkspaces(ctx context.Context, userID string) ([
 		if err != nil {
 			return nil, err
 		}
-		workspaces = append(workspaces, &app.AuthorizationUserWorkspace{
+		workspaces[i] = app.AuthorizationUserWorkspace{
 			ID:   id,
 			Role: role,
-		})
+		}
 	}
 	return workspaces, nil
 }
@@ -139,7 +138,7 @@ func (a *Authorization) UpdateWorkspaceMembers(
 	ctx context.Context,
 	userID string,
 	workspaceID uuid.UUID,
-	members []*app.WorkspaceMemberUpdate,
+	members []app.WorkspaceMemberUpdate,
 ) error {
 	pbMembers, err := a.toWorkspaceMembersPb(members)
 	if err != nil {
@@ -153,7 +152,7 @@ func (a *Authorization) UpdateWorkspaceMembers(
 	return err
 }
 
-func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]*app.AuthorizationWorkspaceMember, error) {
+func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, workspaceID uuid.UUID) ([]app.AuthorizationWorkspaceMember, error) {
 	response, err := a.client.GetWorkspaceMembers(ctx, &pb.GetWorkspaceMembersRequest{
 		UserId:      userID,
 		WorkspaceId: workspaceID.String(),
@@ -168,19 +167,19 @@ func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, 
 	return members, nil
 }
 
-func (a *Authorization) toWorkspaceMembersPb(members []*app.WorkspaceMemberUpdate) ([]*pb.WorkspaceMember, error) {
-	pbMembers := make([]*pb.WorkspaceMember, 0, len(members))
-	for _, member := range members {
+func (a *Authorization) toWorkspaceMembersPb(members []app.WorkspaceMemberUpdate) ([]*pb.WorkspaceMember, error) {
+	pbMembers := make([]*pb.WorkspaceMember, len(members))
+	for i, member := range members {
 		pbMember, err := a.toWorkspaceMemberPb(member)
 		if err != nil {
 			return nil, err
 		}
-		pbMembers = append(pbMembers, pbMember)
+		pbMembers[i] = pbMember
 	}
 	return pbMembers, nil
 }
 
-func (a *Authorization) toWorkspaceMemberPb(member *app.WorkspaceMemberUpdate) (*pb.WorkspaceMember, error) {
+func (a *Authorization) toWorkspaceMemberPb(member app.WorkspaceMemberUpdate) (*pb.WorkspaceMember, error) {
 	role, err := a.toWorkspaceRolePb(member.Role)
 	if err != nil {
 		return nil, err
@@ -191,24 +190,24 @@ func (a *Authorization) toWorkspaceMemberPb(member *app.WorkspaceMemberUpdate) (
 	}, nil
 }
 
-func (a *Authorization) toAppWorkspaceMembers(members []*pb.WorkspaceMember) ([]*app.AuthorizationWorkspaceMember, error) {
-	appMembers := make([]*app.AuthorizationWorkspaceMember, 0, len(members))
-	for _, member := range members {
+func (a *Authorization) toAppWorkspaceMembers(members []*pb.WorkspaceMember) ([]app.AuthorizationWorkspaceMember, error) {
+	appMembers := make([]app.AuthorizationWorkspaceMember, len(members))
+	for i, member := range members {
 		appMember, err := a.toAppWorkspaceMember(member)
 		if err != nil {
 			return nil, err
 		}
-		appMembers = append(appMembers, appMember)
+		appMembers[i] = appMember
 	}
 	return appMembers, nil
 }
 
-func (a *Authorization) toAppWorkspaceMember(members *pb.WorkspaceMember) (*app.AuthorizationWorkspaceMember, error) {
+func (a *Authorization) toAppWorkspaceMember(members *pb.WorkspaceMember) (app.AuthorizationWorkspaceMember, error) {
 	role, err := a.toAppWorkspaceRole(members.Role)
 	if err != nil {
-		return nil, err
+		return app.AuthorizationWorkspaceMember{}, err
 	}
-	return &app.AuthorizationWorkspaceMember{
+	return app.AuthorizationWorkspaceMember{
 		ID:   members.Id,
 		Role: role,
 	}, nil

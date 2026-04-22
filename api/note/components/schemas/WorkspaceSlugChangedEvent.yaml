@@ -1,0 +1,31 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  id:
+    type: string
+    format: uuid
+    example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+
+  event:
+    type: string
+    enum:
+      - WorkspaceSlugChangedEvent
+    example: WorkspaceSlugChangedEvent
+
+  data:
+    type: object
+    x-go-type-name: WorkspaceSlugChangedEventData
+    properties:
+      id:
+        $ref: ./Workspace.yaml#/properties/id
+      slug:
+        $ref: ./Workspace.yaml#/properties/slug
+    required:
+      - id
+      - slug
+
+required:
+  - id
+  - event
+  - data

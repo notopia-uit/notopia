@@ -7,18 +7,17 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
-import { InjectDataSource } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { type ShareDocumentCommittedEvent } from '@notopia-uit/api-gen';
 import { randomUUID } from 'crypto';
 import { Traceable } from 'nestjs-otel';
 import { lastValueFrom } from 'rxjs';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Doc as YDoc, applyUpdate } from 'yjs';
 
 import { AuthorizationService } from '#/authorization/authorization.service';
 import { BLOCKNOTE_SCHEMA } from '#/blocknote/blocknote.module';
 import { KAFKA_CLIENT } from '#/common/token';
-import { User } from '#/common/user';
 import { RevisionEntity } from '#/revision/revision.entity';
 import { StorageService } from '#/storage/storage.service';
 
@@ -28,6 +27,8 @@ import { DocumentEntity } from './document.entity';
 @Traceable()
 export class DocumentService {
   constructor(
+    @InjectRepository(DocumentEntity)
+    private readonly repo: Repository<DocumentEntity>,
     private readonly storageService: StorageService,
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly authorizationService: AuthorizationService,
@@ -109,7 +110,7 @@ export class DocumentService {
         { id: documentId },
         { modified: false }
       );
-      // TODO: Consider refactor into a module named "EventBus", which manage event topic
+      // TODO: Consider refactor into a module named "EventBus", which manages event topic
       const { tags, outgoingLinkIds } =
         this.extractTagsAndOutgoingLinkIds(editor);
       await lastValueFrom(
@@ -127,15 +128,15 @@ export class DocumentService {
     });
   }
 
-  async getAttachmentUploadUrl(documentId: string, user: User) {
+  async getAttachmentUploadUrl(documentId: string, userId: string) {
     const hasPermission = await this.authorizationService.hasNotePermission({
       documentId,
-      memberId: user.id,
+      memberId: userId,
       permission: 'write',
     });
     if (!hasPermission) {
       throw new UnauthorizedException(
-        `User ${user.id} does not have permission to upload attachment to ${documentId}`
+        `User ${userId} does not have permission to upload attachment to ${documentId}`
       );
     }
     const key = `document-attachments/${documentId}/${randomUUID()}`;
@@ -145,5 +146,13 @@ export class DocumentService {
       url: publicUrl,
       uploadUrl: uploadUrl,
     };
+  }
+
+  async updateDataById(id: string, data: Buffer): Promise<void> {
+    await this.repo.update(id, { data });
+  }
+
+  async getById(id: string): Promise<DocumentEntity | null> {
+    return this.repo.findOneBy({ id });
   }
 }

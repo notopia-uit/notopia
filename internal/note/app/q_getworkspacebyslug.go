@@ -14,45 +14,42 @@ type GetWorkspaceBySlug struct {
 }
 
 type WorkspaceBySlugReadModel interface {
-	GetWorkspaceBySlug(ctx context.Context, q *GetWorkspaceBySlug) (*Workspace, error)
+	GetWorkspaceBySlug(ctx context.Context, q *GetWorkspaceBySlug) (Workspace, error)
 }
 
 type GetWorkspaceHandler struct {
-	authorizationService AuthorizationService
-	readModel            WorkspaceBySlugReadModel
+	authorizationSvc AuthorizationSvc
+	readModel        WorkspaceBySlugReadModel
 }
 
 func NewGetWorkspaceBySlugHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	readModel WorkspaceBySlugReadModel,
 ) *GetWorkspaceHandler {
 	return &GetWorkspaceHandler{
-		authorizationService: authorizationService,
-		readModel:            readModel,
+		authorizationSvc: authorizationSvc,
+		readModel:        readModel,
 	}
 }
 
 var ProvideGetWorkspaceBySlugHandler = NewGetWorkspaceBySlugHandler
 
-func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspaceBySlug) (*Workspace, error) {
+func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspaceBySlug) (Workspace, error) {
 	workspace, err := h.readModel.GetWorkspaceBySlug(ctx, query)
 	if err != nil {
-		return nil, err
+		return Workspace{}, err
 	}
-	if workspace == nil {
-		return nil, nil
-	}
-	hasPermission, err := h.authorizationService.HasWorkspacePermission(
+	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(
 		ctx,
 		query.UserID,
 		workspace.ID,
 		WorkspacePermissionRead,
 	)
 	if err != nil {
-		return nil, err
+		return Workspace{}, err
 	}
 	if !hasPermission {
-		return nil, errs.NewForbidden(
+		return Workspace{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read workspace %s", query.UserID, workspace.ID),
 		)
 	}

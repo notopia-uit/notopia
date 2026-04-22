@@ -16,8 +16,8 @@ services:
       # - --accesslog=true
       - --tracing=true
       # - --tracing.samplerate=1.0
-      # - --tracing.otlp.http=true
-      # - --tracing.otlp.http.endpoint=http://alloy:4318/v1/traces
+      # - --tracing.otlp.grpc=true
+      # - --tracing.otlp.grpc.endpoint=http://alloy:4317/v1/traces
       - --experimental.plugins.jwt.moduleName=github.com/traefik-plugins/traefik-jwt-plugin
       - --experimental.plugins.jwt.version=v0.10.0
     environment:

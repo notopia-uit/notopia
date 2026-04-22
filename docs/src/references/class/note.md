@@ -515,3 +515,5 @@ WorkspaceEventHub ..|> WorkspaceEventSubscriber
 ```
 
 <!-- diagram id="class-diagram-note-application" -->
+
+<!-- vim:set tabstop=4 softtabstop=4 shiftwidth=4: -->

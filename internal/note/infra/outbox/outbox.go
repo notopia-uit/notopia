@@ -32,6 +32,7 @@ func NewOutbox(
 			InitializeSchema: true,
 			SchemaAdapter:    schemaAdapter,
 			ConsumerGroup:    "", // NOTE: If scale, we should care about this
+			OffsetsAdapter:   sql.DefaultPostgreSQLOffsetsAdapter{},
 		},
 		logger,
 	)

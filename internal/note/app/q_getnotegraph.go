@@ -18,45 +18,45 @@ type GetNoteGraph struct {
 }
 
 type GetNoteGraphReadModel interface {
-	GetNoteGraph(ctx context.Context, q *GetNoteGraph) (*Graph, error)
+	GetNoteGraph(ctx context.Context, q *GetNoteGraph) (Graph, error)
 }
 
 type GetNoteGraphHandler struct {
-	authorizationService AuthorizationService
-	noteRepo             domain.NoteRepo
-	readModel            GetNoteGraphReadModel
+	authorizationSvc AuthorizationSvc
+	noteRepo         domain.NoteRepo
+	readModel        GetNoteGraphReadModel
 }
 
 func NewGetNoteGraphHandler(
-	authorizationService AuthorizationService,
+	authorizationSvc AuthorizationSvc,
 	noteRepo domain.NoteRepo,
 	readModel GetNoteGraphReadModel,
 ) *GetNoteGraphHandler {
 	return &GetNoteGraphHandler{
-		authorizationService: authorizationService,
-		noteRepo:             noteRepo,
-		readModel:            readModel,
+		authorizationSvc: authorizationSvc,
+		noteRepo:         noteRepo,
+		readModel:        readModel,
 	}
 }
 
 var ProvideGetNoteGraphHandler = NewGetNoteGraphHandler
 
-func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (*Graph, error) {
+func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (Graph, error) {
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)
 	if err != nil {
-		return nil, err
+		return Graph{}, err
 	}
-	hasPermission, err := h.authorizationService.HasWorkspaceItemPermission(
+	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
 		workspaceID,
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
-		return nil, err
+		return Graph{}, err
 	}
 	if !hasPermission {
-		return nil, errs.NewForbidden(
+		return Graph{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read note graph %s", query.UserID, query.ID),
 		)
 	}

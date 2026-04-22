@@ -1,6 +1,9 @@
 package common
 
 import (
+	"fmt"
+	"log/slog"
+
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
 	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
@@ -16,7 +19,7 @@ func NewKafkaPublisher(
 	cfg *commonconfig.Kafka,
 	logger watermill.LoggerAdapter,
 	tracer kafka.SaramaTracer,
-) (*KafkaPublisher, error) {
+) (*KafkaPublisher, func(), error) {
 	publisher, err := kafka.NewPublisher(
 		kafka.PublisherConfig{
 			Brokers: cfg.Brokers,
@@ -25,11 +28,16 @@ func NewKafkaPublisher(
 		logger,
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, fmt.Errorf("failed to create Kafka publisher: %w", err)
+	}
+	cleanup := func() {
+		if err := publisher.Close(); err != nil {
+			slog.Error("failed to close Kafka publisher", slog.Any("error", err))
+		}
 	}
 	return &KafkaPublisher{
 		Publisher: publisher,
-	}, nil
+	}, cleanup, nil
 }
 
 var ProvideKafkaPublisher = NewKafkaPublisher

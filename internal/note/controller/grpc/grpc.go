@@ -47,7 +47,7 @@ func New(
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create protovalidate validator: %w", err)
 	}
-	grpcServer := grpc.NewServer(
+	server := grpc.NewServer(
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
@@ -56,11 +56,11 @@ func New(
 		),
 	)
 	grpc := &GRPC{
-		server:  grpcServer,
+		server:  server,
 		address: cfg.GRPC.Address(),
 	}
-	pb.RegisterNoteServiceServer(grpcServer, serviceServer)
-	return grpc, grpcServer.GracefulStop, nil
+	pb.RegisterNoteServiceServer(server, serviceServer)
+	return grpc, server.GracefulStop, nil
 }
 
 func (g *GRPC) Run() error {

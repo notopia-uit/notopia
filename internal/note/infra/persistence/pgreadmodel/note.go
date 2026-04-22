@@ -50,14 +50,14 @@ func (h *Note) GetNote(ctx context.Context, q *app.GetNote) (*app.Note, error) {
 		icon = *note.Icon
 	}
 
-	var trashed *app.Trashed
+	var trashed app.Trashed
 
 	if note.TrashedAt != nil && note.TrashedBy != nil {
 		trashedBy, err := toAppTrashedBy(note.TrashedBy)
 		if err != nil {
 			return nil, err
 		}
-		trashed = &app.Trashed{
+		trashed = app.Trashed{
 			By: trashedBy,
 			At: *note.TrashedAt,
 		}

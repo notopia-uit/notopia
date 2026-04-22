@@ -2,7 +2,7 @@
 order: 3
 ---
 
-# Database Diagram
+# Authorization Database Diagram
 
 ```d2
 vars: {

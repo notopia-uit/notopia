@@ -1,7 +1,6 @@
 package app_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -11,7 +10,7 @@ import (
 )
 
 func TestHasWorkspaceItemPermissionHandler(t *testing.T) {
-	e, err := GetLocalEnforcer(true)
+	e, err := GetLocalEnforcer(t, true)
 	require.NoError(t, err, "Failed to create enforcer")
 
 	handler := app.NewHasWorkspaceItemPermissionHandler(e)
@@ -43,7 +42,7 @@ func TestHasWorkspaceItemPermissionHandler(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			ctx := context.Background()
+			ctx := t.Context()
 			workspaceID := uuid.MustParse(tc.workspaceID)
 			ok, err := handler.Handle(ctx, app.HasWorkspaceItemPermission{
 				UserID:      tc.userID,
