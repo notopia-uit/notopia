@@ -6,6 +6,17 @@ properties:
     type: string
     format: uuid
 
+  workspaceId:
+    type: string
+    format: uuid
+
+  folderId:
+    type: string
+    format: uuid
+
+  folderName:
+    type: string
+
   name:
     type: string
 
@@ -18,6 +29,16 @@ properties:
     items:
       type: string
 
+  trashed:
+    $ref: ../../../note/components/schemas/Trashed.yaml
+    nullable: true
+
 required:
   - id
+  - workspaceId
+  - folderId
+  - folderName
   - name
+  - plainTextContent
+  - tags
+  - trashed

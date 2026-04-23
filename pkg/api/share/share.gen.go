@@ -9,6 +9,24 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for TrashedBy.
+const (
+	Parent  TrashedBy = "parent"
+	Purpose TrashedBy = "purpose"
+)
+
+// Valid indicates whether the value is a known member of the TrashedBy enum.
+func (e TrashedBy) Valid() bool {
+	switch e {
+	case Parent:
+		return true
+	case Purpose:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for WorkspaceRole.
 const (
 	Editor WorkspaceRole = "editor"
@@ -52,9 +70,10 @@ type DocumentContent = []map[string]interface{}
 
 // NoteCreatedEvent defines model for NoteCreatedEvent.
 type NoteCreatedEvent struct {
-	Icon *string            `json:"icon,omitempty"`
-	Id   openapi_types.UUID `json:"id"`
-	Name string             `json:"name"`
+	Icon        *string            `json:"icon"`
+	Id          openapi_types.UUID `json:"id"`
+	Name        string             `json:"name"`
+	WorkspaceId openapi_types.UUID `json:"workspaceId"`
 }
 
 // NoteDeletedEvent defines model for NoteDeletedEvent.
@@ -64,23 +83,38 @@ type NoteDeletedEvent struct {
 
 // NoteSearch defines model for NoteSearch.
 type NoteSearch struct {
-	Id   openapi_types.UUID `json:"id"`
-	Name string             `json:"name"`
+	FolderId   openapi_types.UUID `json:"folderId"`
+	FolderName string             `json:"folderName"`
+	Id         openapi_types.UUID `json:"id"`
+	Name       string             `json:"name"`
 
 	// PlainTextContent Plain text content
-	PlainTextContent *string   `json:"plainTextContent,omitempty"`
-	Tags             *[]string `json:"tags,omitempty"`
+	PlainTextContent string             `json:"plainTextContent"`
+	Tags             []string           `json:"tags"`
+	Trashed          Trashed            `json:"trashed"`
+	WorkspaceId      openapi_types.UUID `json:"workspaceId"`
 }
 
 // NoteUpdatedEvent defines model for NoteUpdatedEvent.
 type NoteUpdatedEvent struct {
-	FolderId  openapi_types.UUID `json:"folderId"`
-	Icon      *string            `json:"icon"`
-	Id        openapi_types.UUID `json:"id"`
-	Name      string             `json:"name"`
-	Tags      []string           `json:"tags"`
-	UpdatedAt time.Time          `json:"updatedAt"`
+	FolderId    openapi_types.UUID `json:"folderId"`
+	FolderName  string             `json:"folderName"`
+	Icon        *string            `json:"icon"`
+	Id          openapi_types.UUID `json:"id"`
+	Name        string             `json:"name"`
+	Trashed     *Trashed           `json:"trashed,omitempty"`
+	UpdatedAt   time.Time          `json:"updatedAt"`
+	WorkspaceId openapi_types.UUID `json:"workspaceId"`
 }
+
+// Trashed defines model for Trashed.
+type Trashed struct {
+	At time.Time `json:"at"`
+	By TrashedBy `json:"by"`
+}
+
+// TrashedBy defines model for TrashedBy.
+type TrashedBy string
 
 // UserDeletedEvent defines model for UserDeletedEvent.
 type UserDeletedEvent struct {

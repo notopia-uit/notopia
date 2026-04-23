@@ -9,15 +9,12 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
+// FIXME: query don't use domain repo, because it is used for triggering business logic
 type GetNote struct {
 	ID             uuid.UUID
 	ExcludeTrashed bool
 
 	UserID string
-}
-
-type GetNoteReadModel interface {
-	GetNote(ctx context.Context, q *GetNote) (*Note, error)
 }
 
 type GetNoteHandler struct {
@@ -59,5 +56,8 @@ func (h *GetNoteHandler) Handle(ctx context.Context, query *GetNote) (*Note, err
 			fmt.Sprintf("user %s does not have permission to read note %s", query.UserID, query.ID),
 		)
 	}
-	return h.readModel.GetNote(ctx, query)
+	return h.readModel.GetNote(ctx, &GetNoteReadModelParams{
+		ID:             query.ID,
+		ExcludeTrashed: query.ExcludeTrashed,
+	})
 }

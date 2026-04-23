@@ -121,7 +121,7 @@ export class DocumentService {
             userId,
             tags,
             outgoingLinkIds,
-            content: editor.editor.document,
+            content: editor.editor.document satisfies MyBlock[],
           } satisfies ShareDocumentCommittedEvent
         )
       );

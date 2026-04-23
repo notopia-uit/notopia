@@ -60,9 +60,10 @@ func transformIntegrationEvent(event app.IntegrationEvent) (any, error) {
 			icon = &e.Icon
 		}
 		return &share.NoteCreatedEvent{
-			Id:   e.ID,
-			Icon: icon,
-			Name: e.Name,
+			Id:          e.ID,
+			WorkspaceId: e.WorkspaceID,
+			Icon:        icon,
+			Name:        e.Name,
 		}, nil
 	case app.IntegrationEventNoteDeleted:
 		return &share.NoteDeletedEvent{
@@ -73,14 +74,46 @@ func transformIntegrationEvent(event app.IntegrationEvent) (any, error) {
 		if e.Icon != "" {
 			icon = &e.Icon
 		}
+		trashed, err := toTrashed(&e.Trashed)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert trashed: %w", err)
+		}
 		return &share.NoteUpdatedEvent{
-			Id:        e.ID,
-			Name:      e.Name,
-			Icon:      icon,
-			Tags:      e.Tags,
-			FolderId:  e.FolderID,
-			UpdatedAt: e.UpdatedAt,
+			Id:          e.ID,
+			WorkspaceId: e.WorkspaceID,
+			Name:        e.Name,
+			Icon:        icon,
+			FolderId:    e.FolderID,
+			FolderName:  e.FolderName,
+			Trashed:     trashed,
+			UpdatedAt:   e.UpdatedAt,
 		}, nil
 	}
 	return nil, fmt.Errorf("unknown integration event type: %T", event)
+}
+
+func toTrashed(trashed *app.Trashed) (*share.Trashed, error) {
+	if trashed == nil || !trashed.IsTrashed() {
+		return nil, nil
+	}
+	trashedBy, err := toTrashedBy(trashed.By)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert trashed by: %w", err)
+	}
+	return &share.Trashed{
+		At: trashed.At,
+		By: trashedBy,
+	}, nil
+}
+
+func toTrashedBy(trashedBy app.TrashedBy) (share.TrashedBy, error) {
+	switch trashedBy {
+	case app.TrashedByPurpose:
+		return share.Parent, nil
+	case app.TrashedByParent:
+		return share.Parent, nil
+	case app.TrashedByUnspecified:
+		return "", fmt.Errorf("invalid trashed by value: %v", trashedBy)
+	}
+	return "", fmt.Errorf("unknown trashed by value: %v", trashedBy)
 }

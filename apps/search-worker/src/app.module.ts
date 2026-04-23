@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
 import { Meilisearch } from 'meilisearch';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
+import { BLOCKNOTE_SCHEMA } from 'token';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -60,6 +62,10 @@ import {
         });
       },
       inject: [ConfigService],
+    },
+    {
+      provide: BLOCKNOTE_SCHEMA,
+      useFactory: createServerBlockNoteSchema,
     },
     AppService,
     AppController,

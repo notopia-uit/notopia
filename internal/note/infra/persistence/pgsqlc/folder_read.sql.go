@@ -20,32 +20,21 @@ FROM
   folders
 WHERE
   id = $1
-  AND workspace_id = $2::uuid -- :if $2
-  AND parent_id = $3::uuid -- :if $3
-  AND ( -- :if $4
-    trashed_by = $4::text -- :if $4
-    OR trashed_by IS NULL -- :if $4
-  ) -- :if $4
-  AND trashed_by IS NULL -- :if $5
-  AND trashed_by IS NOT NULL -- :if $6
+  AND trashed_by IS NULL -- :if $2
 `
 
 var _readGetFolderDynQ = dynCompile(readGetFolder)
 
 type ReadGetFolderParams struct {
 	ID             uuid.UUID
-	WorkspaceID    *uuid.UUID
-	ParentID       *uuid.UUID
-	TrashedBy      *string
 	OnlyNonTrashed bool
-	OnlyTrashed    bool
 }
 
 // TODO: Check not use params
-func (q *Queries) ReadGetFolder(ctx context.Context, arg *ReadGetFolderParams) (*Folder, error) {
+func (q *Queries) ReadGetFolder(ctx context.Context, arg ReadGetFolderParams) (*Folder, error) {
 	ctx, span := otel.Tracer("Queries").Start(ctx, "ReadGetFolder")
 	defer span.End()
-	dynQuery, dynArgs := _readGetFolderDynQ.Build([]any{arg.ID, arg.WorkspaceID, arg.ParentID, arg.TrashedBy, arg.OnlyNonTrashed, arg.OnlyTrashed})
+	dynQuery, dynArgs := _readGetFolderDynQ.Build([]any{arg.ID, arg.OnlyNonTrashed})
 	row := q.db.QueryRow(ctx, dynQuery, dynArgs...)
 	var i Folder
 	err := row.Scan(

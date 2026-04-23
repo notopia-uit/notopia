@@ -23,10 +23,8 @@ async function run() {
     const documentSeeder = new DocumentSeeder(editor);
     const revisionSeeder = new RevisionSeeder(editor);
 
-    await Promise.all([
-      documentSeeder.run(datasource),
-      revisionSeeder.run(datasource),
-    ]);
+    await documentSeeder.run(datasource);
+    await revisionSeeder.run(datasource);
 
     console.log('✅ Seeding completed!');
     process.exit(0);

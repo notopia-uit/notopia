@@ -17,10 +17,6 @@ type GetNoteGraph struct {
 	UserID string
 }
 
-type GetNoteGraphReadModel interface {
-	GetNoteGraph(ctx context.Context, q *GetNoteGraph) (Graph, error)
-}
-
 type GetNoteGraphHandler struct {
 	authorizationSvc AuthorizationSvc
 	noteRepo         domain.NoteRepo
@@ -63,5 +59,8 @@ func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (
 	if query.Depth <= 0 {
 		query.Depth = math.MaxInt
 	}
-	return h.readModel.GetNoteGraph(ctx, query)
+	return h.readModel.GetNoteGraph(ctx, &GetNoteGraphReadModelParams{
+		ID:    query.ID,
+		Depth: query.Depth,
+	})
 }

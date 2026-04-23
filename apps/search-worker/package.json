@@ -2,6 +2,7 @@
   "name": "@notopia-uit/search-worker",
   "private": true,
   "dependencies": {
+    "@blocknote/core": "catalog:",
     "@blocknote/server-util": "catalog:",
     "@nestjs/common": "catalog:",
     "@nestjs/config": "catalog:",

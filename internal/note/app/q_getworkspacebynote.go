@@ -13,10 +13,6 @@ type GetWorkspaceByNote struct {
 	UserID string
 }
 
-type GetWorkspaceByNoteReadModel interface {
-	GetWorkspaceByNoteID(ctx context.Context, noteID uuid.UUID) (Workspace, error)
-}
-
 type GetWorkspaceByNoteHandler struct {
 	authorizationSvc AuthorizationSvc
 	readModel        GetWorkspaceByNoteReadModel

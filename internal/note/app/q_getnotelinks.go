@@ -17,10 +17,6 @@ type GetNoteLinks struct {
 	UserID string
 }
 
-type GetNoteLinksReadModel interface {
-	GetNoteLinks(ctx context.Context, q *GetNoteLinks) (NoteLinkResult, error)
-}
-
 type GetNoteLinksHandler struct {
 	authorizationSvc AuthorizationSvc
 	noteRepo         domain.NoteRepo
@@ -60,5 +56,9 @@ func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (
 			fmt.Sprintf("user %s does not have permission to read note links %s", query.UserID, query.ID),
 		)
 	}
-	return h.readModel.GetNoteLinks(ctx, query)
+	return h.readModel.GetNoteLinks(ctx, &GetNoteLinksReadModelParams{
+		ID:            query.ID,
+		OutgoingLinks: query.OutgoingLinks,
+		Backlinks:     query.Backlinks,
+	})
 }

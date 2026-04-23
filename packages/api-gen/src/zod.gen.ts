@@ -4,28 +4,13 @@ import * as z from 'zod';
 
 export const zShareNoteCreatedEvent = z.object({
     id: z.uuid(),
+    workspaceId: z.uuid(),
     name: z.string(),
-    icon: z.string().nullish()
+    icon: z.string().nullable()
 });
 
 export const zShareNoteDeletedEvent = z.object({
     id: z.uuid()
-});
-
-export const zShareNoteSearch = z.object({
-    id: z.uuid(),
-    name: z.string(),
-    plainTextContent: z.string().optional(),
-    tags: z.array(z.string()).optional()
-});
-
-export const zShareNoteUpdatedEvent = z.object({
-    id: z.uuid(),
-    name: z.string(),
-    icon: z.string().nullable(),
-    folderId: z.uuid(),
-    tags: z.array(z.string()),
-    updatedAt: z.iso.datetime()
 });
 
 /**
@@ -43,6 +28,35 @@ export const zShareDocumentCommittedEvent = zShareDocument.and(z.object({
     tags: z.array(z.string()),
     outgoingLinkIds: z.array(z.uuid())
 }));
+
+export const zShareTrashedBy = z.enum(['purpose', 'parent']);
+
+export const zShareTrashed = z.object({
+    by: zShareTrashedBy,
+    at: z.iso.datetime()
+});
+
+export const zShareNoteSearch = z.object({
+    id: z.uuid(),
+    workspaceId: z.uuid(),
+    folderId: z.uuid(),
+    folderName: z.string(),
+    name: z.string(),
+    plainTextContent: z.string(),
+    tags: z.array(z.string()),
+    trashed: zShareTrashed
+});
+
+export const zShareNoteUpdatedEvent = z.object({
+    id: z.uuid(),
+    workspaceId: z.uuid(),
+    name: z.string(),
+    icon: z.string().nullable(),
+    folderId: z.uuid(),
+    folderName: z.string(),
+    trashed: zShareTrashed.optional(),
+    updatedAt: z.iso.datetime()
+});
 
 /**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)

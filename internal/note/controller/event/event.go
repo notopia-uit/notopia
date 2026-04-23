@@ -182,6 +182,21 @@ func (e *Event) setup() error {
 			e.notifyWorkspaceItemsUpdatedNoteHandler,
 		)
 	}
+	noteUpdatedTopics := []string{
+		component.DomainEventTopicPrefix + "note.renamed",
+		component.DomainEventTopicPrefix + "note.icon_changed",
+		component.DomainEventTopicPrefix + "note.moved",
+		component.DomainEventTopicPrefix + "note.trashed",
+		component.DomainEventTopicPrefix + "note.restored",
+	}
+	for _, topic := range noteUpdatedTopics {
+		e.router.AddConsumerHandler(
+			fmt.Sprintf("NoteUpdatedHandler.%s", topic),
+			topic,
+			e.subcriber,
+			e.noteUpdatedToIntegrationHandler,
+		)
+	}
 	return nil
 }
 

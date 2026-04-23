@@ -22,25 +22,25 @@ func GetNote(queries *pgsqlc.Queries) *Note {
 
 var ProvideNote = GetNote
 
-func (h *Note) GetNote(ctx context.Context, q *app.GetNote) (*app.Note, error) {
-	note, err := h.queries.ReadGetNoteByID(ctx, q.ID)
+func (h *Note) GetNote(ctx context.Context, p *app.GetNoteReadModelParams) (*app.Note, error) {
+	note, err := h.queries.ReadGetNoteByID(ctx, p.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errs.NewNoteNotFound(q.ID, err)
+			return nil, errs.NewNoteNotFound(p.ID, err)
 		}
 		return nil, toErr(err)
 	}
 
-	if q.ExcludeTrashed && note.TrashedAt != nil {
-		return nil, errs.NewNoteNotFound(q.ID, nil)
+	if p.ExcludeTrashed && note.TrashedAt != nil {
+		return nil, errs.NewNoteNotFound(p.ID, nil)
 	}
 
-	backlinkCount, err := h.queries.ReadCountNoteBacklinks(ctx, q.ID)
+	backlinkCount, err := h.queries.ReadCountNoteBacklinks(ctx, p.ID)
 	if err != nil {
 		return nil, toErr(err)
 	}
 
-	outgoingLinkCount, err := h.queries.ReadCountNoteOutgoingLinks(ctx, q.ID)
+	outgoingLinkCount, err := h.queries.ReadCountNoteOutgoingLinks(ctx, p.ID)
 	if err != nil {
 		return nil, toErr(err)
 	}
@@ -50,17 +50,9 @@ func (h *Note) GetNote(ctx context.Context, q *app.GetNote) (*app.Note, error) {
 		icon = *note.Icon
 	}
 
-	var trashed app.Trashed
-
-	if note.TrashedAt != nil && note.TrashedBy != nil {
-		trashedBy, err := toAppTrashedBy(note.TrashedBy)
-		if err != nil {
-			return nil, err
-		}
-		trashed = app.Trashed{
-			By: trashedBy,
-			At: *note.TrashedAt,
-		}
+	trashed, err := toAppTrashed(note.TrashedAt, note.TrashedBy)
+	if err != nil {
+		return nil, err
 	}
 
 	result := &app.Note{

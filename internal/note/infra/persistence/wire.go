@@ -12,8 +12,9 @@ import (
 
 var PGReadModelProviderSet = wire.NewSet(
 	pgreadmodel.ProvideCheckWorkspaceSlugExists,
+	pgreadmodel.ProvideGetFolder,
 	pgreadmodel.ProvideGetWorkspaceByNote,
-	pgreadmodel.ProvideGetWorkspacesByIDs,
+	pgreadmodel.ProvideGetWorkspaces,
 	pgreadmodel.ProvideNote,
 	pgreadmodel.ProvideNoteGraph,
 	pgreadmodel.ProvideNoteLinks,
@@ -22,13 +23,14 @@ var PGReadModelProviderSet = wire.NewSet(
 	pgreadmodel.ProvideWorkspaceGraph,
 	pgreadmodel.ProvideWorkspaceTree,
 	wire.Bind(new(app.CheckWorkspaceSlugExistsReadModel), new(*pgreadmodel.CheckWorkspaceSlugExists)),
-	wire.Bind(new(app.GetMyWorkspacesReadModel), new(*pgreadmodel.GetWorkspacesByIDs)),
+	wire.Bind(new(app.GetFolderReadModel), new(*pgreadmodel.GetFolder)),
 	wire.Bind(new(app.GetNoteGraphReadModel), new(*pgreadmodel.NoteGraph)),
 	wire.Bind(new(app.GetNoteLinksReadModel), new(*pgreadmodel.NoteLinks)),
 	wire.Bind(new(app.GetNoteReadModel), new(*pgreadmodel.Note)),
 	wire.Bind(new(app.GetWorkspaceByNoteReadModel), new(*pgreadmodel.GetWorkspaceByNote)),
 	wire.Bind(new(app.GetWorkspaceGraphReadModel), new(*pgreadmodel.WorkspaceGraph)),
 	wire.Bind(new(app.GetWorkspaceTreeReadModel), new(*pgreadmodel.WorkspaceTree)),
+	wire.Bind(new(app.GetWorkspacesReadModel), new(*pgreadmodel.GetWorkspaces)),
 	wire.Bind(new(app.ShowTrashReadModel), new(*pgreadmodel.ShowTrash)),
 	wire.Bind(new(app.WorkspaceBySlugReadModel), new(*pgreadmodel.WorkspaceBySlug)),
 )

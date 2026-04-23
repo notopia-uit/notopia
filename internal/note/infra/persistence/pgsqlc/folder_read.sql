@@ -6,14 +6,7 @@ FROM
   folders
 WHERE
   id = sqlc.arg('id')
-  AND workspace_id = sqlc.narg('workspace_id')::uuid -- :if @workspace_id
-  AND parent_id = sqlc.narg('parent_id')::uuid -- :if @parent_id
-  AND ( -- :if @trashed_by
-    trashed_by = sqlc.narg('trashed_by')::text
-    OR trashed_by IS NULL
-  )
   AND trashed_by IS NULL -- :if @only_non_trashed
-  AND trashed_by IS NOT NULL -- :if @only_trashed
 ;
 
 -- name: ReadGetFolderByID :one

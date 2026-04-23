@@ -20,6 +20,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/infra/common"
 	"github.com/notopia-uit/notopia/internal/note/infra/identity"
+	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
 	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgreadmodel"
@@ -160,24 +161,50 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
+	kafka := &configConfig.Kafka
+	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
+	kafkaPublisher, cleanup6, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	integrationPublisher, err := integrationpublisher.NewIntegrationPublisher(kafkaPublisher)
+	if err != nil {
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	getWorkspaceByNote := pgreadmodel.NewGetWorkspaceByNote(queries)
+	noteCreatedDomainToIntegrationEventHandler := app.NewNoteCreatedDomainToIntegrationEventHandler(integrationPublisher, getWorkspaceByNote)
+	pgreadmodelNote := pgreadmodel.GetNote(queries)
+	getFolder := pgreadmodel.NewGetFolder(queries)
+	noteUpdatedDomainToIntegrationEventHandler := app.NewNoteUpdatedDomainToIntegrationEventHandler(integrationPublisher, pgreadmodelNote, getFolder)
 	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(workspaceEventHub)
 	notifyWorkspaceRenamedHandler := app.NewNotifyWorkspaceRenamedHandler(workspaceEventHub)
 	notifyWorkspaceSlugChangedHandler := app.NewNotifyWorkspaceSlugChangedHandler(workspaceEventHub)
 	events := &app.Events{
-		DocumentCommittedHandler:           documentCommittedHandler,
-		NotifyWorkspaceItemsUpdatedHandler: notifyWorkspaceItemsUpdatedHandler,
-		NotifyWorkspaceRenamedHandler:      notifyWorkspaceRenamedHandler,
-		NotifyWorkspaceSlugChangedHandler:  notifyWorkspaceSlugChangedHandler,
+		DocumentCommittedHandler:                   documentCommittedHandler,
+		NoteCreatedDomainToIntegrationEventHandler: noteCreatedDomainToIntegrationEventHandler,
+		NoteUpdatedDomainToIntegrationEventHandler: noteUpdatedDomainToIntegrationEventHandler,
+		NotifyWorkspaceItemsUpdatedHandler:         notifyWorkspaceItemsUpdatedHandler,
+		NotifyWorkspaceRenamedHandler:              notifyWorkspaceRenamedHandler,
+		NotifyWorkspaceSlugChangedHandler:          notifyWorkspaceSlugChangedHandler,
 	}
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)
-	getWorkspacesByIDs := pgreadmodel.NewGetWorkspacesByIDs(queries)
-	getMyWorkspacesHandler := app.NewGetMyWorkspacesHandler(authorization, getWorkspacesByIDs)
+	getWorkspaces := pgreadmodel.NewGetWorkspaces(queries)
+	getMyWorkspacesHandler := app.NewGetMyWorkspacesHandler(authorization, getWorkspaces)
 	noteGraph := pgreadmodel.NewNoteGraph(queries)
 	getNoteGraphHandler := app.NewGetNoteGraphHandler(authorization, pgrepoNote, noteGraph)
-	pgreadmodelNote := pgreadmodel.GetNote(queries)
 	getNoteHandler := app.NewGetNoteHandler(authorization, pgrepoNote, pgreadmodelNote)
-	getWorkspaceByNote := pgreadmodel.NewGetWorkspaceByNote(queries)
 	getWorkspaceByNoteHandler := app.NewGetWorkspaceByNoteHandler(authorization, getWorkspaceByNote)
 	noteLinks := pgreadmodel.GetNoteLinks(queries)
 	getNoteLinksHandler := app.NewGetNoteLinksHandler(authorization, pgrepoNote, noteLinks)
@@ -214,17 +241,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	configServer := &configConfig.Server
 	strictHandler := http.NewStrictHandler(server, configServer, workspaceEventHub)
 	serverInterface := http.NewHandler(strictHandler)
-	httpHTTP, cleanup6, err := http.New(ctx, engine, serverInterface, configServer, logger)
-	if err != nil {
-		cleanup5()
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	serviceServer := grpc.NewServiceServer(server)
-	grpcGRPC, cleanup7, err := grpc.New(ctx, serviceServer, configServer, loggingLogger)
+	httpHTTP, cleanup7, err := http.New(ctx, engine, serverInterface, configServer, logger)
 	if err != nil {
 		cleanup6()
 		cleanup5()
@@ -234,10 +251,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	kafka := &configConfig.Kafka
-	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	jsonMarshaler := component.NewWatermillJsonMarshaler()
-	eventEvent, err := event.NewEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent)
+	serviceServer := grpc.NewServiceServer(server)
+	grpcGRPC, cleanup8, err := grpc.New(ctx, serviceServer, configServer, loggingLogger)
 	if err != nil {
 		cleanup7()
 		cleanup6()
@@ -248,8 +263,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	kafkaPublisher, cleanup8, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
+	jsonMarshaler := component.NewWatermillJsonMarshaler()
+	eventEvent, err := event.NewEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent)
 	if err != nil {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()

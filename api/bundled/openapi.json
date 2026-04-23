@@ -1907,6 +1907,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "workspaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
           "name": {
             "type": "string"
           },
@@ -1917,7 +1921,9 @@
         },
         "required": [
           "id",
-          "name"
+          "workspaceId",
+          "name",
+          "icon"
         ]
       },
       "share_NoteDeletedEvent": {
@@ -1939,6 +1945,17 @@
             "type": "string",
             "format": "uuid"
           },
+          "workspaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "folderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "folderName": {
+            "type": "string"
+          },
           "name": {
             "type": "string"
           },
@@ -1951,17 +1968,31 @@
             "items": {
               "type": "string"
             }
+          },
+          "trashed": {
+            "$ref": "#/components/schemas/share_Trashed",
+            "nullable": true
           }
         },
         "required": [
           "id",
-          "name"
+          "workspaceId",
+          "folderId",
+          "folderName",
+          "name",
+          "plainTextContent",
+          "tags",
+          "trashed"
         ]
       },
       "share_NoteUpdatedEvent": {
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workspaceId": {
             "type": "string",
             "format": "uuid"
           },
@@ -1976,11 +2007,11 @@
             "type": "string",
             "format": "uuid"
           },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "folderName": {
+            "type": "string"
+          },
+          "trashed": {
+            "$ref": "#/components/schemas/share_Trashed"
           },
           "updatedAt": {
             "type": "string",
@@ -1989,10 +2020,11 @@
         },
         "required": [
           "id",
+          "workspaceId",
           "name",
           "icon",
           "folderId",
-          "tags",
+          "folderName",
           "updatedAt"
         ]
       },
@@ -2243,6 +2275,31 @@
         "required": [
           "id",
           "content"
+        ]
+      },
+      "share_TrashedBy": {
+        "type": "string",
+        "enum": [
+          "purpose",
+          "parent"
+        ],
+        "example": "purpose"
+      },
+      "share_Trashed": {
+        "type": "object",
+        "properties": {
+          "by": {
+            "$ref": "#/components/schemas/share_TrashedBy"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-01T12:00:00Z"
+          }
+        },
+        "required": [
+          "by",
+          "at"
         ]
       },
       "share_id": {

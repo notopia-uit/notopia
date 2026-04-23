@@ -2,11 +2,37 @@ package pgreadmodel
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
+
+func toAppFolder(f *pgsqlc.Folder) (app.Folder, error) {
+	trashed, err := toAppTrashed(f.TrashedAt, f.TrashedBy)
+	if err != nil {
+		return app.Folder{}, err
+	}
+	var icon string
+	if f.Icon != nil {
+		icon = *f.Icon
+	}
+	var parentID uuid.UUID
+	if f.ParentID != nil {
+		parentID = *f.ParentID
+	}
+	return app.Folder{
+		ID:          f.ID,
+		Name:        f.Name,
+		Trashed:     trashed,
+		WorkspaceID: f.WorkspaceID,
+		UpdatedAt:   f.UpdatedAt,
+		Icon:        icon,
+		ParentID:    parentID,
+	}, nil
+}
 
 func toAppWorkspaces(workspaces []*pgsqlc.Workspace) []app.Workspace {
 	appWorkspaces := make([]app.Workspace, len(workspaces))
@@ -22,6 +48,23 @@ func toAppWorkspace(w *pgsqlc.Workspace) app.Workspace {
 		Slug: w.Slug,
 		Name: w.Name,
 	}
+}
+
+func toAppTrashed(at *time.Time, by *string) (app.Trashed, error) {
+	if at == nil {
+		return app.Trashed{}, errs.NewPersistenceInternal("trashedAt is nil", nil)
+	}
+	if by == nil {
+		return app.Trashed{}, errs.NewPersistenceInternal("trashedBy is nil", nil)
+	}
+	trashedBy, err := toAppTrashedBy(by)
+	if err != nil {
+		return app.Trashed{}, err
+	}
+	return app.Trashed{
+		At: *at,
+		By: trashedBy,
+	}, nil
 }
 
 func toAppTrashedBy(trashedBy *string) (app.TrashedBy, error) {

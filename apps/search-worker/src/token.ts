@@ -1,0 +1,1 @@
+export const BLOCKNOTE_SCHEMA = Symbol('BLOCKNOTE_SCHEMA');

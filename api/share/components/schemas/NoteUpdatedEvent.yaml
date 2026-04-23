@@ -6,6 +6,10 @@ properties:
     type: string
     format: uuid
 
+  workspaceId:
+    type: string
+    format: uuid
+
   name:
     type: string
 
@@ -17,10 +21,13 @@ properties:
     type: string
     format: uuid
 
-  tags:
-    type: array
-    items:
-      type: string
+  folderName:
+    type: string
+
+  # This should be nullable, but oapi codegen cannot
+  # So, we decided to not make it required instead
+  trashed:
+    $ref: ../../../note/components/schemas/Trashed.yaml
 
   updatedAt:
     type: string
@@ -28,8 +35,9 @@ properties:
 
 required:
   - id
+  - workspaceId
   - name
   - icon
   - folderId
-  - tags
+  - folderName
   - updatedAt

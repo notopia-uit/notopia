@@ -6,6 +6,10 @@ properties:
     type: string
     format: uuid
 
+  workspaceId:
+    type: string
+    format: uuid
+
   name:
     type: string
 
@@ -15,4 +19,6 @@ properties:
 
 required:
   - id
+  - workspaceId
   - name
+  - icon

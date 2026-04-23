@@ -19,8 +19,8 @@ func NewNoteGraph(queries *pgsqlc.Queries) *NoteGraph {
 
 var ProvideNoteGraph = NewNoteGraph
 
-func (h *NoteGraph) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (app.Graph, error) {
-	workspaceID, err := h.queries.GetWorkspaceIDByNoteID(ctx, q.ID)
+func (h *NoteGraph) GetNoteGraph(ctx context.Context, p *app.GetNoteGraphReadModelParams) (app.Graph, error) {
+	workspaceID, err := h.queries.GetWorkspaceIDByNoteID(ctx, p.ID)
 	if err != nil {
 		return app.Graph{}, toErr(err)
 	}
@@ -57,7 +57,7 @@ func (h *NoteGraph) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (app.
 		depth int
 	}
 
-	startID := q.ID.String()
+	startID := p.ID.String()
 	queue := []queueItem{{id: startID, depth: 0}}
 
 	for len(queue) > 0 {
@@ -69,7 +69,7 @@ func (h *NoteGraph) GetNoteGraph(ctx context.Context, q *app.GetNoteGraph) (app.
 		}
 		reachableIDs[curr.id] = true
 
-		if curr.depth < q.Depth {
+		if curr.depth < p.Depth {
 			for _, neighbor := range adj[curr.id] {
 				if !reachableIDs[neighbor] {
 					queue = append(queue, queueItem{id: neighbor, depth: curr.depth + 1})
