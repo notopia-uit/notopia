@@ -7,11 +7,15 @@ services:
     environment:
       SKIP_ALL_AUTH: true
 
-      CONNECTIONS: note_postgresql,document_postgresql,authorization_postgresql
+      CONNECTIONS: note_postgresql,note_redis,document_postgresql,authorization_postgresql
 
       LABEL_note_postgresql: Note PostgreSQL
       ENGINE_note_postgresql: postgres@dbgate-plugin-postgres
       URL_note_postgresql: postgres://${NOTE_POSTGRESQL_USER:-notopiauit}:${NOTE_POSTGRESQL_PASSWORD:-notopiauit}@note_postgresql:5432/${NOTE_POSTGRESQL_DB:-note}
+
+      LABEL_note_redis: Note Redis
+      ENGINE_note_redis: redis@dbgate-plugin-redis
+      URL_note_redis: redis://note_redis:6379
 
       LABEL_document_postgresql: Document PostgreSQL
       ENGINE_document_postgresql: postgres@dbgate-plugin-postgres

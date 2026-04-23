@@ -3,6 +3,7 @@
 [env]
 REDOCLY_TELEMETRY = "off"
 REDOCLY_SUPPRESS_UPDATE_NOTICE = "true"
+MISE_EXPERIMENTAL = 1
 
 [tools]
 "github:pressly/goose" = "3.27.0"
@@ -13,8 +14,22 @@ pnpm = "10.28.2"
 sqlc = "1.30.0"
 java = "latest"
 mockery = "3.7.0"
+"pipx:pgcli" = "4.4.0"
 
 [shell_alias]
 nx = "pnpm exec nx"
 shadcn = "pnpm exec shadcn"
 tsgo = "pnpm exec tsgo"
+
+[deps.pnpm]
+auto = true
+
+[deps.go]
+auto = true
+
+[deps.buf]
+auto = true
+sources = ["./buf.yaml"]
+outputs = ["./buf.lock"]
+run = "buf dep update"
+description = "Manage buf dependencies"
