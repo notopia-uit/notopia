@@ -3,19 +3,30 @@ import 'reflect-metadata';
 
 import datasource from '../src/database/datasource.typeorm';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
+import { type MySchema } from '@blocknote/core';
 import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
+import DocumentSeeder from './seeds/documents';
+import RevisionSeeder from './seeds/revisions';
 
 async function run() {
   try {
     console.log('🌱 Initializing DataSource...');
     await datasource.initialize();
 
-    const blockNoteSchema = createServerBlockNoteSchema();
+    const blockNoteSchema: MySchema = createServerBlockNoteSchema();
     // TODO: will do with editor later
-    ServerBlockNoteEditor.create({ schema: blockNoteSchema });
+    const editor = ServerBlockNoteEditor.create({
+      schema: blockNoteSchema,
+    });
 
     console.log('🏃 Running Seeders...');
-    // seed
+    const documentSeeder = new DocumentSeeder(editor);
+    const revisionSeeder = new RevisionSeeder(editor);
+
+    await Promise.all([
+      documentSeeder.run(datasource),
+      revisionSeeder.run(datasource),
+    ]);
 
     console.log('✅ Seeding completed!');
     process.exit(0);

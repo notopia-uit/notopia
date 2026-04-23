@@ -216,6 +216,9 @@ catalogs:
     lucide-react:
       specifier: 1.6.0
       version: 1.6.0
+    marked:
+      specifier: 18.0.2
+      version: 18.0.2
     meilisearch:
       specifier: 0.57.0
       version: 0.57.0
@@ -590,7 +593,7 @@ importers:
         version: 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.19)(rxjs@7.8.2)
       '@nestjs/typeorm':
         specifier: 'catalog:'
-        version: 11.0.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3)))
+        version: 11.0.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.3)))
       '@nestjs/websockets':
         specifier: 'catalog:'
         version: 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -633,6 +636,9 @@ importers:
       kafkajs:
         specifier: 'catalog:'
         version: 2.2.4
+      marked:
+        specifier: 'catalog:'
+        version: 18.0.2
       nestjs-otel:
         specifier: 'catalog:'
         version: 8.0.2(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)
@@ -662,7 +668,7 @@ importers:
         version: 2.8.1
       typeorm:
         specifier: 'catalog:'
-        version: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3))
+        version: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.3))
       ws:
         specifier: 'catalog:'
         version: 8.19.0
@@ -690,7 +696,7 @@ importers:
         version: 4.21.0
       typeorm-extension:
         specifier: 'catalog:'
-        version: 3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3)))
+        version: 3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.3)))
       webpack-node-externals:
         specifier: 'catalog:'
         version: 3.0.0
@@ -12339,6 +12345,11 @@ packages:
     engines: {node: '>= 20'}
     hasBin: true
 
+  marked@18.0.2:
+    resolution: {integrity: sha512-NsmlUYBS/Zg57rgDWMYdnre6OTj4e+qq/JS2ot3KrYLSoHLw+sDu0Nm1ZGpRgYAq6c+b1ekaY5NzVchMCQnzcg==}
+    engines: {node: '>= 20'}
+    hasBin: true
+
   marked@4.3.0:
     resolution: {integrity: sha512-PRsaiG84bK+AMvxziE/lCFss8juXjNaWzVbN5tXAm4XjeaS9NAHhop+PjQxz2A9h8Q4M/xGmzP8vqNwy6JeK0A==}
     engines: {node: '>= 12'}
@@ -20201,13 +20212,13 @@ snapshots:
       '@nestjs/microservices': 11.1.19(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(@nestjs/websockets@11.1.19)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express': 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)
 
-  '@nestjs/typeorm@11.0.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3)))':
+  '@nestjs/typeorm@11.0.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.3)))':
     dependencies:
       '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.19(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.19)(@nestjs/platform-express@11.1.19)(@nestjs/websockets@11.1.19)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
-      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3))
+      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.3))
 
   '@nestjs/websockets@11.1.19(@nestjs/common@11.1.17(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
@@ -31068,6 +31079,8 @@ snapshots:
 
   marked@16.4.2: {}
 
+  marked@18.0.2: {}
+
   marked@4.3.0: {}
 
   math-intrinsics@1.1.0: {}
@@ -35014,6 +35027,27 @@ snapshots:
       '@swc/core': 1.15.30(@swc/helpers@0.5.21)
     optional: true
 
+  ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.3):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.12
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 25.5.0
+      acorn: 8.16.0
+      acorn-walk: 8.3.5
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.4
+      make-error: 1.3.6
+      typescript: 6.0.3
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+    optionalDependencies:
+      '@swc/core': 1.15.30(@swc/helpers@0.5.21)
+    optional: true
+
   tsconfig-paths-webpack-plugin@4.2.0:
     dependencies:
       chalk: 4.1.2
@@ -35126,7 +35160,7 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm-extension@3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3))):
+  typeorm-extension@3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.3))):
     dependencies:
       '@faker-js/faker': 10.4.0
       consola: 3.4.2
@@ -35136,10 +35170,10 @@ snapshots:
       rapiq: 0.9.0
       reflect-metadata: 0.2.2
       smob: 1.6.1
-      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3))
+      typeorm: 0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.3))
       yargs: 18.0.0
 
-  typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3)):
+  typeorm@0.3.28(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.3)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 4.2.0
@@ -35158,7 +35192,7 @@ snapshots:
       yargs: 17.7.2
     optionalDependencies:
       pg: 8.20.0
-      ts-node: 10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3)
+      ts-node: 10.9.2(@swc/core@1.15.30(@swc/helpers@0.5.21))(@types/node@25.5.0)(typescript@6.0.3)
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
