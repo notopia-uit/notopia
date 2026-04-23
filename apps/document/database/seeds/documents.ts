@@ -1,4 +1,3 @@
-import { Block } from '@blocknote/core';
 import { blocksToYDoc } from '@blocknote/core/yjs';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import * as fs from 'fs';

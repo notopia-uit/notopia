@@ -1,7 +1,7 @@
 // sort-imports-ignore
 import 'reflect-metadata';
 
-import datasource from '../src/database/datasource.typeorm';
+import datasource from './datasource';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { type MySchema } from '@blocknote/core';
 import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
