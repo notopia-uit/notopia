@@ -33,6 +33,5 @@ buf.*
 **/justfile
 mise.*
 .tool-versions
-nx.json
 **/openapitools.json
 **/README.md
