@@ -387,45 +387,71 @@ func renderSQL(workspaceID uuid.UUID, folders []Folder, notes []Note, links []No
 	b.WriteString(fmt.Sprintf("INSERT INTO workspaces (id, slug, name) VALUES ('%s', '%s', '%s');\n\n", workspaceID, sqlString(workspaceSlug), sqlString(workspaceName)))
 
 	b.WriteString("-- Folders\n")
-	for _, folder := range folders {
-		parent := "NULL"
-		if folder.ParentID != nil {
-			parent = fmt.Sprintf("'%s'", folder.ParentID.String())
+	if len(folders) > 0 {
+		b.WriteString("INSERT INTO folders (id, name, icon, workspace_id, parent_id) VALUES\n")
+		for i, folder := range folders {
+			parent := "NULL"
+			if folder.ParentID != nil {
+				parent = fmt.Sprintf("'%s'", folder.ParentID.String())
+			}
+			b.WriteString(fmt.Sprintf(
+				"  ('%s', '%s', NULL, '%s', %s)",
+				folder.ID,
+				sqlString(folder.Name),
+				folder.WorkspaceID,
+				parent,
+			))
+			if i < len(folders)-1 {
+				b.WriteString(",")
+			}
+			b.WriteString("\n")
 		}
-		b.WriteString(fmt.Sprintf(
-			"INSERT INTO folders (id, name, icon, workspace_id, parent_id) VALUES ('%s', '%s', NULL, '%s', %s);\n",
-			folder.ID,
-			sqlString(folder.Name),
-			folder.WorkspaceID,
-			parent,
-		))
+		b.WriteString(";\n\n")
 	}
-	b.WriteString("\n")
 
 	b.WriteString("-- Notes\n")
-	for _, note := range notes {
-		tagsSQL := "ARRAY[]::text[]"
-		if len(note.Tags) > 0 {
-			tags := make([]string, 0, len(note.Tags))
-			for _, tag := range note.Tags {
-				tags = append(tags, fmt.Sprintf("'%s'", sqlString(tag)))
+	if len(notes) > 0 {
+		b.WriteString("INSERT INTO notes (id, name, icon, folder_id, tags, size) VALUES\n")
+		for i, note := range notes {
+			tagsSQL := "ARRAY[]::text[]"
+			if len(note.Tags) > 0 {
+				tags := make([]string, 0, len(note.Tags))
+				for _, tag := range note.Tags {
+					tags = append(tags, fmt.Sprintf("'%s'", sqlString(tag)))
+				}
+				tagsSQL = fmt.Sprintf("ARRAY[%s]::text[]", strings.Join(tags, ", "))
 			}
-			tagsSQL = fmt.Sprintf("ARRAY[%s]::text[]", strings.Join(tags, ", "))
+			b.WriteString(fmt.Sprintf(
+				"  ('%s', '%s', NULL, '%s', %s, %d)",
+				note.ID,
+				sqlString(note.Name),
+				note.FolderID,
+				tagsSQL,
+				note.Size,
+			))
+			if i < len(notes)-1 {
+				b.WriteString(",")
+			}
+			b.WriteString("\n")
 		}
-		b.WriteString(fmt.Sprintf(
-			"INSERT INTO notes (id, name, icon, folder_id, tags, size) VALUES ('%s', '%s', NULL, '%s', %s, %d);\n",
-			note.ID,
-			sqlString(note.Name),
-			note.FolderID,
-			tagsSQL,
-			note.Size,
-		))
+		b.WriteString(";\n\n")
 	}
-	b.WriteString("\n")
 
 	b.WriteString("-- Note links\n")
-	for _, link := range links {
-		b.WriteString(fmt.Sprintf("INSERT INTO note_links (source_id, target_id) VALUES ('%s', '%s');\n", link.SourceID, link.TargetID))
+	if len(links) > 0 {
+		b.WriteString("INSERT INTO note_links (source_id, target_id) VALUES\n")
+		for i, link := range links {
+			b.WriteString(fmt.Sprintf(
+				"  ('%s', '%s')",
+				link.SourceID,
+				link.TargetID,
+			))
+			if i < len(links)-1 {
+				b.WriteString(",")
+			}
+			b.WriteString("\n")
+		}
+		b.WriteString(";\n")
 	}
 	return b.String()
 }
