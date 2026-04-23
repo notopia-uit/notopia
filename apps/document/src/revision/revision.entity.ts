@@ -1,4 +1,4 @@
-import { Block } from '@blocknote/core';
+import { MyBlock } from '@blocknote/core';
 import {
   Column,
   CreateDateColumn,
@@ -25,7 +25,7 @@ export class RevisionEntity {
   name!: string | null;
 
   @Column({ type: 'simple-json' })
-  content!: Block[];
+  content!: MyBlock[];
 
   @CreateDateColumn()
   createdAt!: Date;

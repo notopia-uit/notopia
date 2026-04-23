@@ -25,8 +25,6 @@ var (
 	markdownLinkRegex = regexp.MustCompile(`\[([^\]]+)\]\(([^\)]+)\)`)
 	// Match tags as standalone #word patterns (word boundaries)
 	tagRegex = regexp.MustCompile(`(^|\s)#([^\s#\)\]]+)`)
-	// Regex to detect if a link is a relative file path (not a URL or anchor)
-	relativePathRegex = regexp.MustCompile(`^(\.{1,2}/|[^/:]+).*\.md($|#)`)
 )
 
 type Config struct {
@@ -76,7 +74,7 @@ func run(config Config) error {
 	if err := os.RemoveAll(config.OutputDir); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("failed to clean output directory: %w", err)
 	}
-	if err := os.MkdirAll(config.OutputDir, 0755); err != nil {
+	if err := os.MkdirAll(config.OutputDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
@@ -149,7 +147,7 @@ func processFile(filePath string, config Config, fileMapping map[string]uuid.UUI
 	// Write output file
 	outputFileName := fmt.Sprintf("%s.md", fileUUID.String())
 	outputPath := filepath.Join(config.OutputDir, outputFileName)
-	if err := os.WriteFile(outputPath, []byte(transformed), 0644); err != nil {
+	if err := os.WriteFile(outputPath, []byte(transformed), 0o644); err != nil {
 		return fmt.Errorf("failed to write output file %s: %w", outputPath, err)
 	}
 
@@ -257,21 +255,21 @@ func isRelativeFilePath(urlPath string) bool {
 	// It should NOT be:
 	// - A URL (contains ://)
 	// - Just an anchor (starts with #)
-	
+
 	if strings.Contains(urlPath, "://") {
 		return false // It's a URL like http://, https://, etc.
 	}
-	
+
 	if strings.HasPrefix(urlPath, "#") {
 		return false // It's just an anchor
 	}
-	
+
 	// Check if it looks like a file path (has .md or starts with ../, ./, or just a name)
 	trimmed := strings.TrimSuffix(urlPath, ".md")
 	hasMdExt := len(urlPath) > len(trimmed) && urlPath[len(trimmed):] == ".md"
-	
+
 	startsWithRelative := strings.HasPrefix(urlPath, "../") || strings.HasPrefix(urlPath, "./") || strings.HasPrefix(urlPath, "/")
-	
+
 	// If it has .md extension or starts with relative path, it's likely a file
 	return hasMdExt || startsWithRelative
 }

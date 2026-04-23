@@ -1,4 +1,4 @@
-import { type MySchema, type Block } from '@blocknote/core';
+import { type MyBlock, type MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
 import { marked } from 'marked';
@@ -8,50 +8,29 @@ import { fileURLToPath } from 'node:url';
 
 import { parseSeedMarkdownToBlocks } from './seeds/blocknote-seed-transform';
 
-type InlineNode = {
-  type?: string;
-  [key: string]: unknown;
-};
-
-type MutableBlock = Block & {
-  content?: unknown;
-  children?: unknown;
-};
-
-function isInlineNodeArray(value: unknown): value is InlineNode[] {
-  return Array.isArray(value);
-}
-
-function isReferenceInline(node: InlineNode): boolean {
-  return node.type === 'reference';
-}
-
-function isTagInline(node: InlineNode): boolean {
-  return node.type === 'tag';
-}
-
-function countInlineTypes(blocks: Block[]): { references: number; tags: number } {
+function countInlineTypes(blocks: MyBlock[]): {
+  references: number;
+  tags: number;
+} {
   let references = 0;
   let tags = 0;
 
-  const walk = (block: Block): void => {
-    const current = block as MutableBlock;
-
-    if (isInlineNodeArray(current.content)) {
-      for (const inline of current.content) {
-        if (isReferenceInline(inline)) {
-          references += 1;
-        }
-        if (isTagInline(inline)) {
-          tags += 1;
+  const walk = (block: MyBlock): void => {
+    if (Array.isArray(block.content)) {
+      for (const inline of block.content) {
+        switch (inline.type) {
+          case 'reference':
+            references += 1;
+            break;
+          case 'tag':
+            tags += 1;
+            break;
         }
       }
     }
 
-    if (Array.isArray(current.children)) {
-      for (const child of current.children) {
-        walk(child as Block);
-      }
+    for (const child of block.children) {
+      walk(child as MyBlock);
     }
   };
 
@@ -81,7 +60,7 @@ async function main(): Promise<void> {
   if (typeof html === 'string') {
     console.log(html.slice(0, 300));
   }
-  const blocks = (await parseSeedMarkdownToBlocks(editor, markdown)) as Block[];
+  const blocks = await parseSeedMarkdownToBlocks(editor, markdown);
   const counts = countInlineTypes(blocks);
 
   console.log(`file=${target}`);

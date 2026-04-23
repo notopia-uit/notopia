@@ -1,4 +1,4 @@
-import { Block, type MySchema } from '@blocknote/core';
+import { type MyBlock, type MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import {
   Inject,
@@ -45,7 +45,7 @@ export class DocumentService {
   private bufferToBlockNote(
     data: Buffer,
     editor: ServerBlockNoteEditor
-  ): Block[] {
+  ): MyBlock[] {
     const yDoc = new YDoc();
     applyUpdate(yDoc, new Uint8Array(data));
     return editor.yDocToBlocks(yDoc);

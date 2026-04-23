@@ -1,6 +1,4 @@
-import { Block } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import { randomUUID } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { DataSource, Repository } from 'typeorm';
@@ -56,7 +54,7 @@ export default class RevisionSeeder implements Seeder {
         return;
       }
 
-      const blocks = (await parseSeedMarkdownToBlocks(this.editor, content)) as Block[];
+      const blocks = await parseSeedMarkdownToBlocks(this.editor, content);
 
       const revision = revisionRepo.create({
         id: documentId,

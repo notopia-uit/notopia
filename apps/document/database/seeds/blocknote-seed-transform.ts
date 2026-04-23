@@ -1,29 +1,9 @@
+import { InlineNode, type MyBlock } from '@blocknote/core';
 import { type ServerBlockNoteEditor } from '@blocknote/server-util';
+import { ReferenceInline, TagInline } from '@notopia-uit/lib/block-note';
 import { marked } from 'marked';
 
-type InlineNode = {
-  type?: string;
-  href?: unknown;
-  props?: Record<string, unknown>;
-  [key: string]: unknown;
-};
-
-type ParsedBlocks = Awaited<
-  ReturnType<ServerBlockNoteEditor['tryParseHTMLToBlocks']>
->;
-
-type ParsedBlock = ParsedBlocks[number];
-
-type BlockView = ParsedBlock & {
-  content?: unknown;
-  children: ParsedBlock[];
-};
-
-function isInlineArray(content: unknown): content is InlineNode[] {
-  return Array.isArray(content);
-}
-
-function toReferenceInline(noteId: string): InlineNode {
+function toReferenceInline(noteId: string): ReferenceInline {
   return {
     type: 'reference',
     props: { noteId },
@@ -31,16 +11,12 @@ function toReferenceInline(noteId: string): InlineNode {
   };
 }
 
-function toTagInline(tag: string): InlineNode {
+function toTagInline(tag: string): TagInline {
   return {
     type: 'tag',
     props: { tag },
     content: undefined,
   };
-}
-
-function isLinkInlineNode(node: InlineNode): node is InlineNode & { href: string } {
-  return node.type === 'link' && typeof node.href === 'string';
 }
 
 function markdownToHTML(markdown: string): string {
@@ -52,11 +28,16 @@ function markdownToHTML(markdown: string): string {
   return typeof parsed === 'string' ? parsed : '';
 }
 
-function transformInlineContent(content: InlineNode[]): InlineNode[] {
+function transformInlineContent(
+  content: MyBlock['content']
+): MyBlock['content'] {
   const transformed: InlineNode[] = [];
+  if (!Array.isArray(content)) {
+    return content;
+  }
 
   for (const node of content) {
-    if (isLinkInlineNode(node)) {
+    if (node.type === 'link' && typeof node.href === 'string') {
       const href = node.href;
 
       if (href.startsWith('@') && href.length > 1) {
@@ -70,33 +51,29 @@ function transformInlineContent(content: InlineNode[]): InlineNode[] {
       }
     }
 
-    transformed.push(node);
+    transformed.push(node as InlineNode);
+  }
+
+  return transformed as MyBlock['content'];
+}
+
+function transformBlock(block: MyBlock): MyBlock {
+  const transformed = {
+    ...block,
+    children: block.children.map((child) => transformBlock(child)),
+  };
+  if (block.type !== 'codeBlock') {
+    transformed.content = transformInlineContent(block.content);
   }
 
   return transformed;
 }
 
-function transformBlock(block: ParsedBlock): ParsedBlock {
-  const blockView = block as BlockView;
-  const transformed = {
-    ...block,
-    children: blockView.children.map((child) => transformBlock(child)),
-  };
-
-  if (block.type !== 'codeBlock' && isInlineArray(blockView.content)) {
-    transformed.content = transformInlineContent(
-      blockView.content
-    ) as ParsedBlock['content'];
-  }
-
-  return transformed as ParsedBlock;
-}
-
 export async function parseSeedMarkdownToBlocks(
   editor: ServerBlockNoteEditor,
   markdown: string
-): Promise<unknown> {
+): Promise<MyBlock[]> {
   const html = markdownToHTML(markdown);
-  const parsedBlocks = await editor.tryParseHTMLToBlocks(html);
+  const parsedBlocks = (await editor.tryParseHTMLToBlocks(html)) as MyBlock[];
   return parsedBlocks.map((block) => transformBlock(block));
 }

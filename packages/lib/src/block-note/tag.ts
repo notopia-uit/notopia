@@ -1,5 +1,6 @@
 import {
   CustomInlineContentConfig,
+  CustomInlineContentFromConfig,
   type InlineContentSpec,
 } from '@blocknote/core';
 
@@ -13,4 +14,9 @@ export const BlockNoteTagConfig = {
 
 export type BlockNoteTagInlineContentSpec = InlineContentSpec<
   typeof BlockNoteTagConfig
+>;
+
+export type TagInline = CustomInlineContentFromConfig<
+  typeof BlockNoteTagConfig,
+  any
 >;

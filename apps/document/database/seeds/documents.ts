@@ -46,10 +46,7 @@ export default class DocumentSeeder implements Seeder {
 
       const id = fileName.replace('.md', '');
 
-      const blocks = (await parseSeedMarkdownToBlocks(
-        this.editor,
-        content
-      )) as Block[];
+      const blocks = await parseSeedMarkdownToBlocks(this.editor, content);
       const yDoc = blocksToYDoc(this.editor.editor, blocks);
       const encodedData = encodeStateAsUpdateV2(yDoc);
 

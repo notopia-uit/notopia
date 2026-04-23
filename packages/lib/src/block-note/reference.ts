@@ -1,5 +1,6 @@
 import {
   CustomInlineContentConfig,
+  CustomInlineContentFromConfig,
   type InlineContentSpec,
 } from '@blocknote/core';
 
@@ -13,4 +14,9 @@ export const BlockNoteReferenceConfig = {
 
 export type BlockNoteReferenceInlineContentSpec = InlineContentSpec<
   typeof BlockNoteReferenceConfig
+>;
+
+export type ReferenceInline = CustomInlineContentFromConfig<
+  typeof BlockNoteReferenceConfig,
+  any
 >;
