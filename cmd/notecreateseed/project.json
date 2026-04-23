@@ -1,0 +1,35 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "notecreateseed",
+  "projectType": "application",
+  "tags": ["type:go"],
+  "namedInputs": {
+    "default": [
+      "goPkgFiles",
+      "goFiles",
+      "{workspaceRoot}/api/**/*.go",
+      "{workspaceRoot}/internal/notecreateseed/**/*.go"
+    ]
+  },
+  "targets": {
+    "run": {
+      "executor": "nx:run-commands",
+      "inputs": ["default"],
+      "options": {
+        "command": "go run ./cmd/notecreateseed/...",
+        "cwd": "{workspaceRoot}",
+        "tty": true
+      },
+      "continuous": false
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "golangci-lint run ./cmd/notecreateseed/... ./internal/notecreateseed/...",
+        "cwd": "{workspaceRoot}"
+      },
+      "cache": false,
+      "parallelism": false
+    }
+  }
+}
