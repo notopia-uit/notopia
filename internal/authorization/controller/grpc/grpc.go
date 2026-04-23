@@ -32,7 +32,12 @@ func NewServer(
 	server := grpc.NewServer(
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(
-			logging.UnaryServerInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
+			logging.UnaryServerInterceptor(logger, logging.WithLogOnEvents(
+				logging.StartCall,
+				logging.FinishCall,
+				logging.PayloadSent,
+				logging.PayloadReceived,
+			)),
 			protovalidate_middleware.UnaryServerInterceptor(validator),
 			unaryErrorInterceptor,
 		),
