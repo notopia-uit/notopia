@@ -91,7 +91,7 @@ type NoteSearch struct {
 	// PlainTextContent Plain text content
 	PlainTextContent string             `json:"plainTextContent"`
 	Tags             []string           `json:"tags"`
-	Trashed          Trashed            `json:"trashed"`
+	Trashed          *Trashed           `json:"trashed,omitempty"`
 	WorkspaceId      openapi_types.UUID `json:"workspaceId"`
 }
 

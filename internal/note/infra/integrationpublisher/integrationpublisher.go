@@ -109,7 +109,7 @@ func toTrashed(trashed *app.Trashed) (*share.Trashed, error) {
 func toTrashedBy(trashedBy app.TrashedBy) (share.TrashedBy, error) {
 	switch trashedBy {
 	case app.TrashedByPurpose:
-		return share.Parent, nil
+		return share.Purpose, nil
 	case app.TrashedByParent:
 		return share.Parent, nil
 	case app.TrashedByUnspecified:

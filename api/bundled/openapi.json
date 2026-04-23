@@ -1970,8 +1970,7 @@
             }
           },
           "trashed": {
-            "$ref": "#/components/schemas/share_Trashed",
-            "nullable": true
+            "$ref": "#/components/schemas/share_Trashed"
           }
         },
         "required": [
@@ -1981,8 +1980,7 @@
           "folderName",
           "name",
           "plainTextContent",
-          "tags",
-          "trashed"
+          "tags"
         ]
       },
       "share_NoteUpdatedEvent": {

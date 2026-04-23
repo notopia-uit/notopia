@@ -51,11 +51,8 @@ func toAppWorkspace(w *pgsqlc.Workspace) app.Workspace {
 }
 
 func toAppTrashed(at *time.Time, by *string) (app.Trashed, error) {
-	if at == nil {
-		return app.Trashed{}, errs.NewPersistenceInternal("trashedAt is nil", nil)
-	}
-	if by == nil {
-		return app.Trashed{}, errs.NewPersistenceInternal("trashedBy is nil", nil)
+	if at == nil && by == nil {
+		return app.Trashed{}, nil
 	}
 	trashedBy, err := toAppTrashedBy(by)
 	if err != nil {

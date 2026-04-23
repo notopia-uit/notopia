@@ -114,8 +114,7 @@
             }
           },
           "trashed": {
-            "$ref": "#/components/schemas/Trashed",
-            "nullable": true
+            "$ref": "#/components/schemas/Trashed"
           }
         },
         "required": [
@@ -125,8 +124,7 @@
           "folderName",
           "name",
           "plainTextContent",
-          "tags",
-          "trashed"
+          "tags"
         ]
       },
       "NoteUpdatedEvent": {

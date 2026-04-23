@@ -44,7 +44,7 @@ export const zShareNoteSearch = z.object({
     name: z.string(),
     plainTextContent: z.string(),
     tags: z.array(z.string()),
-    trashed: zShareTrashed
+    trashed: zShareTrashed.optional()
 });
 
 export const zShareNoteUpdatedEvent = z.object({

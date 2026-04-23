@@ -17,7 +17,7 @@ import { BLOCKNOTE_SCHEMA } from 'token';
 //    sortableAttributes: ['createdAt'], // Missing field!
 //  });
 
-export type HandleNotCreatedParams = Required<
+export type HandleNoteCreatedParams = Required<
   Pick<NoteSearch, 'id' | 'name' | 'workspaceId'>
 >;
 
@@ -41,7 +41,7 @@ export class AppService {
     @Inject(BLOCKNOTE_SCHEMA) private readonly blocknoteSchema: MySchema
   ) {}
 
-  async handleNoteCreated(params: HandleNotCreatedParams) {
+  async handleNoteCreated(params: HandleNoteCreatedParams) {
     const index = this.meili.index(AppService.noteIndex);
     const noteSearch: NoteSearch = {
       id: params.id,

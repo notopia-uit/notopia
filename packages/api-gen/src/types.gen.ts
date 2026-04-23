@@ -32,7 +32,7 @@ export type ShareNoteSearch = {
      */
     plainTextContent: string;
     tags: Array<string>;
-    trashed: ShareTrashed;
+    trashed?: ShareTrashed;
 };
 
 export type ShareNoteUpdatedEvent = {

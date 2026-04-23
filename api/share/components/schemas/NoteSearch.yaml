@@ -29,9 +29,9 @@ properties:
     items:
       type: string
 
+  # Due to oapi-codegen, we make this optional. But it should be nullable
   trashed:
     $ref: ../../../note/components/schemas/Trashed.yaml
-    nullable: true
 
 required:
   - id
@@ -41,4 +41,3 @@ required:
   - name
   - plainTextContent
   - tags
-  - trashed

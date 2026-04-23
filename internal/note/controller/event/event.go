@@ -32,11 +32,13 @@ func eventToTopic(event any) (string, error) {
 	}
 }
 
+// Be careful if we use single subcriber, they will steal each other message
 type Event struct {
-	subcriber      message.Subscriber
-	eventProcessor *cqrs.EventProcessor
-	router         *message.Router
-	app            *app.Server
+	workspaceEventSubcriber message.Subscriber
+	subcriber               message.Subscriber
+	eventProcessor          *cqrs.EventProcessor
+	router                  *message.Router
+	app                     *app.Server
 
 	domainEventCfg *config.DomainEvent
 }
@@ -59,6 +61,17 @@ func NewEvent(
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create event controller subscriber: %w", err)
+	}
+	workspaceEventSubcriber, err := kafka.NewSubscriber(
+		kafka.SubscriberConfig{
+			Brokers:       cfg.Brokers,
+			ConsumerGroup: cfg.ConsumerGroup + ".workspace-event",
+			Tracer:        tracer,
+		},
+		logger,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create event controller workspace event subscriber: %w", err)
 	}
 	router, err := message.NewRouter(message.RouterConfig{}, logger)
 	if err != nil {
@@ -105,11 +118,12 @@ func NewEvent(
 		return nil, fmt.Errorf("failed to create event controller event processor: %w", err)
 	}
 	event := &Event{
-		subcriber:      subcriber,
-		eventProcessor: eventProcessor,
-		router:         router,
-		app:            app,
-		domainEventCfg: domainEventCfg,
+		workspaceEventSubcriber: workspaceEventSubcriber,
+		subcriber:               subcriber,
+		eventProcessor:          eventProcessor,
+		router:                  router,
+		app:                     app,
+		domainEventCfg:          domainEventCfg,
 	}
 	if err := event.setup(); err != nil {
 		return nil, fmt.Errorf("failed to setup event controller: %w", err)
@@ -155,9 +169,9 @@ func (e *Event) setup() error {
 	}
 	for _, topic := range workspaceItemUpdatedFolderTopics {
 		e.router.AddConsumerHandler(
-			fmt.Sprintf("WorkspaceItemsUpdatedHandler.%s", topic),
+			fmt.Sprintf("NotifyWorkspaceItemsUpdatedHandler.%s", topic),
 			topic,
-			e.subcriber,
+			e.workspaceEventSubcriber,
 			e.notifyWorkspaceItemsUpdatedFolderHandler,
 		)
 	}
@@ -176,9 +190,9 @@ func (e *Event) setup() error {
 	}
 	for _, topic := range workspaceItemUpdatedNoteTopics {
 		e.router.AddConsumerHandler(
-			fmt.Sprintf("WorkspaceItemsUpdatedHandler.%s", topic),
+			fmt.Sprintf("NotifyWorkspaceItemsUpdatedHandler.%s", topic),
 			topic,
-			e.subcriber,
+			e.workspaceEventSubcriber,
 			e.notifyWorkspaceItemsUpdatedNoteHandler,
 		)
 	}

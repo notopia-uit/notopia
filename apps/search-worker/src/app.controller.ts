@@ -40,6 +40,7 @@ export class AppController {
     return this.appService.handleDocumentCommitted({
       id: data.id,
       tags: data.tags,
+      // we should validate? or let blocknote throw error
       content: data.content as MyBlock[],
     });
   }

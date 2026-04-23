@@ -55,7 +55,7 @@ func (h *NoteUpdatedDomainToIntegrationEventHandler) Handle(ctx context.Context,
 		UpdatedAt:   note.UpdatedAt,
 	}
 	if err := h.integrationPublisher.Publish(ctx, integrationEvent); err != nil {
-		return fmt.Errorf("failed to publish the converted note created event to the integration publisher: %w", err)
+		return fmt.Errorf("failed to publish note updated integration event: %w", err)
 	}
 	return nil
 }
