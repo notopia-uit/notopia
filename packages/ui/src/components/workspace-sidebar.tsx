@@ -14,13 +14,11 @@ import {
   CreditCard,
   Folder,
   Forward,
-  Frame,
   GalleryVerticalEnd,
   LogOut,
-  Map,
   MoreHorizontal,
-  PieChart,
   Plus,
+  Settings2,
   Sparkles,
   Trash2,
 } from 'lucide-react';
@@ -28,7 +26,6 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from './shadcn/avatar';
-import TreeView from './tree-view';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +49,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from './shadcn/sidebar';
+import TreeView from './tree-view';
 
 const data = {
   user: {
@@ -78,27 +76,22 @@ const data = {
   ],
   projects: [
     {
-      name: 'Design Engineering',
+      name: 'Settings',
       url: '#',
-      icon: Frame,
+      icon: Settings2,
     },
     {
-      name: 'Sales & Marketing',
+      name: 'Graph',
       url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
+      icon: Sparkles,
     },
   ],
 };
 
 export default function WorkspaceSideBar({
-  currentWorkspaceSlug,
+  currentWorkspaceId,
 }: {
-  currentWorkspaceSlug: string;
+  currentWorkspaceId: string;
 }) {
   const [activeWorkspacenow, setActiveWorkspace] =
     useState<NoteUserWorkspace>();
@@ -114,7 +107,7 @@ export default function WorkspaceSideBar({
     return;
   }
   const currentWorkspace = allWorkspaceData.find(
-    (ws) => ws.workspace.slug === currentWorkspaceSlug
+    (ws) => ws.workspace.id === currentWorkspaceId
   );
   if (!currentWorkspace) {
     return;
@@ -189,10 +182,7 @@ export default function WorkspaceSideBar({
         <SidebarGroup>
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarMenu>
-            <TreeView />
-            {/* {activeWorkspace.Files!.map((item, index) => ( */}
-            {/*   <TreeItem key={index} item={item} /> */}
-            {/* ))} */}
+            <TreeView currentWorkspaceId={currentWorkspaceId} />
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
