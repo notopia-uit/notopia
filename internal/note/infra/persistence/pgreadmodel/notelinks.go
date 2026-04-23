@@ -23,16 +23,16 @@ func GetNoteLinks(queries *pgsqlc.Queries) *NoteLinks {
 
 var ProvideNoteLinks = GetNoteLinks
 
-func (h *NoteLinks) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (app.NoteLinkResult, error) {
+func (h *NoteLinks) GetNoteLinks(ctx context.Context, p *app.GetNoteLinksReadModelParams) (app.NoteLinkResult, error) {
 	_, err := h.queries.GetNoteByID(ctx,
 		//exhaustruct:ignore
 		pgsqlc.GetNoteByIDParams{
-			ID: q.ID,
+			ID: p.ID,
 		},
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return app.NoteLinkResult{}, errs.NewNoteNotFound(q.ID, err)
+			return app.NoteLinkResult{}, errs.NewNoteNotFound(p.ID, err)
 		}
 		return app.NoteLinkResult{}, toErr(err)
 	}
@@ -42,16 +42,16 @@ func (h *NoteLinks) GetNoteLinks(ctx context.Context, q *app.GetNoteLinks) (app.
 		Backlinks:     []app.NoteLink{},
 	}
 
-	if q.OutgoingLinks {
-		outgoingLinks, err := h.getOutgoingLinks(ctx, q.ID)
+	if p.OutgoingLinks {
+		outgoingLinks, err := h.getOutgoingLinks(ctx, p.ID)
 		if err != nil {
 			return app.NoteLinkResult{}, err
 		}
 		result.OutgoingLinks = outgoingLinks
 	}
 
-	if q.Backlinks {
-		backlinks, err := h.getBacklinks(ctx, q.ID)
+	if p.Backlinks {
+		backlinks, err := h.getBacklinks(ctx, p.ID)
 		if err != nil {
 			return app.NoteLinkResult{}, err
 		}

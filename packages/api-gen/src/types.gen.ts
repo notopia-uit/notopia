@@ -12,8 +12,9 @@ export type ShareDocumentCommittedEvent = ShareDocument & {
 
 export type ShareNoteCreatedEvent = {
     id: string;
+    workspaceId: string;
     name: string;
-    icon?: string | null;
+    icon: string | null;
 };
 
 export type ShareNoteDeletedEvent = {
@@ -22,20 +23,26 @@ export type ShareNoteDeletedEvent = {
 
 export type ShareNoteSearch = {
     id: string;
+    workspaceId: string;
+    folderId: string;
+    folderName: string;
     name: string;
     /**
      * Plain text content
      */
-    plainTextContent?: string;
-    tags?: Array<string>;
+    plainTextContent: string;
+    tags: Array<string>;
+    trashed?: ShareTrashed;
 };
 
 export type ShareNoteUpdatedEvent = {
     id: string;
+    workspaceId: string;
     name: string;
     icon: string | null;
     folderId: string;
-    tags: Array<string>;
+    folderName: string;
+    trashed?: ShareTrashed;
     updatedAt: Date;
 };
 
@@ -68,6 +75,15 @@ export type ShareDocumentContent = Array<unknown>;
 export type ShareDocument = {
     id: string;
     content: ShareDocumentContent;
+};
+
+export const ShareTrashedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
+
+export type ShareTrashedBy = typeof ShareTrashedBy[keyof typeof ShareTrashedBy];
+
+export type ShareTrashed = {
+    by: ShareTrashedBy;
+    at: Date;
 };
 
 /**

@@ -4,7 +4,7 @@
   "compilerOptions": {
     "module": "preserve",
     "moduleResolution": "bundler",
-    "types": ["node", "../../packages/lib/src/server/types.d.ts"],
+    "types": ["node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2024",
@@ -16,10 +16,7 @@
       "@database/*": ["./database/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "../../packages/lib/src/server/types.d.ts",
-  ],
+  "include": ["src/**/*", "../../packages/lib/src/server/types.d.ts"],
   "references": [
     {
       "path": "../../packages/pb/tsconfig.lib.json"

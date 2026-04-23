@@ -17,10 +17,6 @@ type GetWorkspaceTree struct {
 	UserID string
 }
 
-type GetWorkspaceTreeReadModel interface {
-	GetWorkspaceTree(ctx context.Context, q *GetWorkspaceTree) (WorkspaceTreeFolder, error)
-}
-
 type GetWorkspaceTreeHandler struct {
 	authorizationSvc AuthorizationSvc
 	readModel        GetWorkspaceTreeReadModel
@@ -53,5 +49,10 @@ func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspac
 			fmt.Sprintf("user %s does not have permission to read workspace tree %s", query.UserID, query.WorkspaceID),
 		)
 	}
-	return h.readModel.GetWorkspaceTree(ctx, query)
+	return h.readModel.GetWorkspaceTree(ctx, &GetWorkspaceTreeReadModelParams{
+		WorkspaceID:    query.WorkspaceID,
+		RootFolderID:   query.RootFolderID,
+		IncludeTrashed: query.IncludeTrashed,
+		Depth:          query.Depth,
+	})
 }

@@ -5,13 +5,17 @@
     "emitDecoratorMetadata": true,
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
-    "types": ["node", "../../packages/lib/src/server/types.d.ts"],
+    "types": ["node"],
     "paths": {
       "#/*": ["./src/*"]
     }
   },
   "files": [],
-  "include": ["src/**/*", "database/**/*"],
+  "include": [
+    "src/**/*",
+    "database/**/*",
+    "../../packages/lib/src/server/types.d.ts"
+  ],
   "exclude": ["dist/**/*", "node_modules"],
   "references": [
     {

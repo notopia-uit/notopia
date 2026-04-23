@@ -37,10 +37,12 @@ type Queries struct {
 }
 
 type Events struct {
-	DocumentCommittedHandler           *DocumentCommittedHandler
-	NotifyWorkspaceItemsUpdatedHandler *NotifyWorkspaceItemsUpdatedHandler
-	NotifyWorkspaceRenamedHandler      *NotifyWorkspaceRenamedHandler
-	NotifyWorkspaceSlugChangedHandler  *NotifyWorkspaceSlugChangedHandler
+	DocumentCommittedHandler                   *DocumentCommittedHandler
+	NoteCreatedDomainToIntegrationEventHandler *NoteCreatedDomainToIntegrationEventHandler
+	NoteUpdatedDomainToIntegrationEventHandler *NoteUpdatedDomainToIntegrationEventHandler
+	NotifyWorkspaceItemsUpdatedHandler         *NotifyWorkspaceItemsUpdatedHandler
+	NotifyWorkspaceRenamedHandler              *NotifyWorkspaceRenamedHandler
+	NotifyWorkspaceSlugChangedHandler          *NotifyWorkspaceSlugChangedHandler
 }
 
 type Server struct {

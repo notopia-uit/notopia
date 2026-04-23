@@ -13,10 +13,6 @@ type GetWorkspaceBySlug struct {
 	UserID string
 }
 
-type WorkspaceBySlugReadModel interface {
-	GetWorkspaceBySlug(ctx context.Context, q *GetWorkspaceBySlug) (Workspace, error)
-}
-
 type GetWorkspaceHandler struct {
 	authorizationSvc AuthorizationSvc
 	readModel        WorkspaceBySlugReadModel
@@ -35,7 +31,7 @@ func NewGetWorkspaceBySlugHandler(
 var ProvideGetWorkspaceBySlugHandler = NewGetWorkspaceBySlugHandler
 
 func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspaceBySlug) (Workspace, error) {
-	workspace, err := h.readModel.GetWorkspaceBySlug(ctx, query)
+	workspace, err := h.readModel.GetWorkspaceBySlug(ctx, query.Slug)
 	if err != nil {
 		return Workspace{}, err
 	}

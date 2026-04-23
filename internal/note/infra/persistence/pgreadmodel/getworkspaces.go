@@ -8,19 +8,19 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-type GetWorkspacesByIDs struct {
+type GetWorkspaces struct {
 	queries *pgsqlc.Queries
 }
 
-var _ app.GetMyWorkspacesReadModel = (*GetWorkspacesByIDs)(nil)
+var _ app.GetWorkspacesReadModel = (*GetWorkspaces)(nil)
 
-func NewGetWorkspacesByIDs(queries *pgsqlc.Queries) *GetWorkspacesByIDs {
-	return &GetWorkspacesByIDs{queries: queries}
+func NewGetWorkspaces(queries *pgsqlc.Queries) *GetWorkspaces {
+	return &GetWorkspaces{queries: queries}
 }
 
-var ProvideGetWorkspacesByIDs = NewGetWorkspacesByIDs
+var ProvideGetWorkspaces = NewGetWorkspaces
 
-func (h *GetWorkspacesByIDs) GetWorkspacesByIDs(ctx context.Context, ids []uuid.UUID) ([]app.Workspace, error) {
+func (h *GetWorkspaces) GetWorkspaces(ctx context.Context, ids []uuid.UUID) ([]app.Workspace, error) {
 	workspaces, err := h.queries.ReadGetWorkspacesByIDs(ctx, ids)
 	if err != nil {
 		return nil, toErr(err)

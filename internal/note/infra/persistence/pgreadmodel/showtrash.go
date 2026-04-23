@@ -38,14 +38,15 @@ func (h *ShowTrash) ShowTrash(ctx context.Context, q *app.ShowTrash) (app.Trash,
 		if note.Icon != nil {
 			icon = *note.Icon
 		}
+		trashed, err := toAppTrashed(note.TrashedAt, note.TrashedBy)
+		if err != nil {
+			return app.Trash{}, err
+		}
 		notes[i] = app.TrashedNote{
-			ID:   note.ID,
-			Name: note.Name,
-			Icon: icon,
-			Trashed: app.Trashed{
-				By: app.TrashedByPurpose,
-				At: *note.TrashedAt,
-			},
+			ID:      note.ID,
+			Name:    note.Name,
+			Icon:    icon,
+			Trashed: trashed,
 		}
 	}
 
@@ -55,14 +56,15 @@ func (h *ShowTrash) ShowTrash(ctx context.Context, q *app.ShowTrash) (app.Trash,
 		if folder.Icon != nil {
 			icon = *folder.Icon
 		}
+		trashed, err := toAppTrashed(folder.TrashedAt, folder.TrashedBy)
+		if err != nil {
+			return app.Trash{}, err
+		}
 		folders[i] = app.TrashedFolder{
-			ID:   folder.ID,
-			Name: folder.Name,
-			Icon: icon,
-			Trashed: app.Trashed{
-				By: app.TrashedByPurpose,
-				At: *folder.TrashedAt,
-			},
+			ID:      folder.ID,
+			Name:    folder.Name,
+			Icon:    icon,
+			Trashed: trashed,
 		}
 	}
 
