@@ -3,13 +3,13 @@ import {
   getWorkspaceTreeOptions,
 } from '@notopia-uit/api-gen/index';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-import { Separator } from '@ui/components/shadcn/separator';
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from '@ui/components/shadcn/sidebar';
 import WorkspaceSideBar from '@ui/components/workspace-sidebar';
+import { fetchAccessToken } from '@ui/lib/get-access-token';
 
 import getQueryClient from '../../../get-query-client';
 
@@ -35,6 +35,7 @@ export default async function WorkspaceLayout({
     path: {
       workspaceId: workspaceId,
     },
+    auth: fetchAccessToken,
   });
 
   await Promise.all([
@@ -62,7 +63,6 @@ export default async function WorkspaceLayout({
           >
             <div className="flex items-center gap-2 px-4">
               <SidebarTrigger className="-ml-1" />
-              <Separator orientation="vertical" className="mr-2 h-4" />
             </div>
           </header>
           <div>{children}</div>
