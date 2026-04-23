@@ -2,6 +2,7 @@
 
 import {
   NoteUserWorkspace,
+  NoteWorkspaceRole,
   getMyWorkspacesOptions,
 } from '@notopia-uit/api-gen';
 import { Badge } from '@notopia-uit/ui/components/shadcn/badge';
@@ -41,11 +42,13 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+type UserRole = (typeof NoteWorkspaceRole)[keyof typeof NoteWorkspaceRole];
+
 interface UserWorkspace {
   id: string;
   slug: string;
   name: string;
-  userRole: 'owner' | 'admin' | 'member';
+  userRole: UserRole;
 }
 
 const mapUserWorkspaceDtoToDomain = (
@@ -55,7 +58,7 @@ const mapUserWorkspaceDtoToDomain = (
     id: dto.workspace.id,
     slug: dto.workspace.slug,
     name: dto.workspace.name,
-    userRole: dto.role as 'owner' | 'admin' | 'member',
+    userRole: dto.role as UserRole,
   }));
 
 const generateSlug = (name: string) => {
@@ -249,9 +252,12 @@ const WorkspaceSwitcher = () => {
                           </Label>
                           <Select
                             value={editForm.userRole || 'member'}
-                            onValueChange={(
-                              value: 'owner' | 'admin' | 'member'
-                            ) => setEditForm({ ...editForm, userRole: value })}
+                            onValueChange={(value: UserRole) =>
+                              setEditForm({
+                                ...editForm,
+                                userRole: value,
+                              })
+                            }
                           >
                             <SelectTrigger
                               id={`role-${workspace.id}`}
@@ -275,7 +281,7 @@ const WorkspaceSwitcher = () => {
                       {/* Icon based on role */}
                       <div className="flex size-12 items-center justify-center rounded-lg bg-muted/50">
                         {workspace.userRole === 'owner' ||
-                        workspace.userRole === 'admin' ? (
+                        workspace.userRole === 'viewer' ? (
                           <Shield className="size-6 text-primary" />
                         ) : (
                           <User className="size-6 text-muted-foreground" />
@@ -391,9 +397,9 @@ const WorkspaceSwitcher = () => {
                         <Label htmlFor="new-role">Initial Role</Label>
                         <Select
                           value={editForm.userRole || 'owner'}
-                          onValueChange={(
-                            value: 'owner' | 'admin' | 'member'
-                          ) => setEditForm({ ...editForm, userRole: value })}
+                          onValueChange={(value: UserRole) =>
+                            setEditForm({ ...editForm, userRole: value })
+                          }
                         >
                           <SelectTrigger id="new-role">
                             <SelectValue />
