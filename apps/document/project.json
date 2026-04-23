@@ -47,7 +47,8 @@
       "executor": "@nx/js:node",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "document:build:development"
+        "buildTarget": "document:build:development",
+        "port": 9222
       },
       "configurations": {
         "development": {

@@ -29,12 +29,16 @@ func (h *StrictHandler) CreateFolder(
 	if body.Icon != nil {
 		icon = *body.Icon
 	}
+	parentID := uuid.Nil
+	if body.ParentId != nil {
+		parentID = *body.ParentId
+	}
 	cmd := &app.CreateFolder{
 		ID:          id,
 		Name:        body.Name,
 		Icon:        icon,
-		ParentID:    *body.ParentId,
-		WorkspaceID: *body.WorkspaceId,
+		ParentID:    parentID,
+		WorkspaceID: body.WorkspaceId,
 		UserID:      user.ID,
 	}
 
@@ -44,7 +48,7 @@ func (h *StrictHandler) CreateFolder(
 
 	return note.CreateFolder201Response{
 		Headers: note.CreateFolder201ResponseHeaders{
-			ContentLocation: h.BaseURL.JoinPath("folders", id.String()).String(),
+			ContentLocation: h.BaseURL.JoinPath("note", "folders", id.String()).String(),
 		},
 	}, nil
 }

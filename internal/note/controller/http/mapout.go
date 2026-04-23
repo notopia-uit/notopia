@@ -71,7 +71,7 @@ func toFolderDTO(f *app.Folder) (note.Folder, error) {
 		Name:        f.Name,
 		Icon:        icon,
 		ParentId:    parentID,
-		WorkspaceId: &f.WorkspaceID,
+		WorkspaceId: f.WorkspaceID,
 		UpdatedAt:   &f.UpdatedAt,
 		Trashed:     trashed,
 	}, nil

@@ -204,7 +204,7 @@ type Folder struct {
 	ParentId    *Id                 `json:"parentId,omitempty"`
 	Trashed     *FolderTrashed      `json:"trashed,omitempty"`
 	UpdatedAt   *time.Time          `json:"updatedAt,omitempty"`
-	WorkspaceId *PropertiesId       `json:"workspaceId,omitempty"`
+	WorkspaceId openapi_types.UUID  `json:"workspaceId"`
 }
 
 // FolderTrashed defines model for .
@@ -274,15 +274,12 @@ type NoteTrashed struct {
 
 // NoteLink defines model for NoteLink.
 type NoteLink struct {
-	Icon *Icon             `json:"icon"`
-	Id   *NotePropertiesId `json:"id,omitempty"`
+	Icon *Icon         `json:"icon"`
+	Id   *PropertiesId `json:"id,omitempty"`
 
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name PropertiesName `json:"name"`
 }
-
-// NotePropertiesId defines model for Note_properties-id.
-type NotePropertiesId = openapi_types.UUID
 
 // Trashed defines model for Trashed.
 type Trashed struct {
@@ -335,7 +332,7 @@ type WorkspaceDeletedEvent struct {
 
 // WorkspaceDeletedEventData defines model for .
 type WorkspaceDeletedEventData struct {
-	Id *PropertiesId `json:"id,omitempty"`
+	Id *WorkspacePropertiesId `json:"id,omitempty"`
 }
 
 // WorkspaceDeletedEventEvent defines model for WorkspaceDeletedEvent.Event.
@@ -350,7 +347,7 @@ type WorkspaceItemsUpdatedEvent struct {
 
 // WorkspaceItemsUpdatedEventData defines model for .
 type WorkspaceItemsUpdatedEventData struct {
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	WorkspaceId *WorkspacePropertiesId `json:"workspaceId,omitempty"`
 }
 
 // WorkspaceItemsUpdatedEventEvent defines model for WorkspaceItemsUpdatedEvent.Event.
@@ -375,7 +372,7 @@ type WorkspaceMembersUpdatedEvent struct {
 
 // WorkspaceMembersUpdatedEventData defines model for .
 type WorkspaceMembersUpdatedEventData struct {
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	WorkspaceId *WorkspacePropertiesId `json:"workspaceId,omitempty"`
 }
 
 // WorkspaceMembersUpdatedEventEvent defines model for WorkspaceMembersUpdatedEvent.Event.
@@ -390,7 +387,7 @@ type WorkspaceRenamedEvent struct {
 
 // WorkspaceRenamedEventData defines model for .
 type WorkspaceRenamedEventData struct {
-	Id   *PropertiesId           `json:"id,omitempty"`
+	Id   *WorkspacePropertiesId  `json:"id,omitempty"`
 	Name WorkspacePropertiesName `json:"name"`
 }
 
@@ -409,8 +406,8 @@ type WorkspaceSlugChangedEvent struct {
 
 // WorkspaceSlugChangedEventData defines model for .
 type WorkspaceSlugChangedEventData struct {
-	Id   *PropertiesId `json:"id,omitempty"`
-	Slug Slug          `json:"slug"`
+	Id   *WorkspacePropertiesId `json:"id,omitempty"`
+	Slug Slug                   `json:"slug"`
 }
 
 // WorkspaceSlugChangedEventEvent defines model for WorkspaceSlugChangedEvent.Event.
@@ -428,13 +425,16 @@ type WorkspaceTreeFolder struct {
 
 // WorkspaceTreeNote defines model for WorkspaceTreeNote.
 type WorkspaceTreeNote struct {
-	Icon *Icon             `json:"icon"`
-	Id   *NotePropertiesId `json:"id,omitempty"`
+	Icon *Icon         `json:"icon"`
+	Id   *PropertiesId `json:"id,omitempty"`
 
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name      PropertiesName `json:"name"`
 	UpdatedAt *UpdatedAt     `json:"updatedAt,omitempty"`
 }
+
+// WorkspacePropertiesId defines model for Workspace_properties-id.
+type WorkspacePropertiesId = openapi_types.UUID
 
 // WorkspacePropertiesName defines model for Workspace_properties-name.
 type WorkspacePropertiesName = string
@@ -470,10 +470,10 @@ type UpdatedAt = time.Time
 type FolderIdPath = Id
 
 // NoteIdPath defines model for noteIdPath.
-type NoteIdPath = NotePropertiesId
+type NoteIdPath = PropertiesId
 
 // WorkspaceIdPath defines model for workspaceIdPath.
-type WorkspaceIdPath = PropertiesId
+type WorkspaceIdPath = WorkspacePropertiesId
 
 // WorkspaceSlugPath defines model for workspaceSlugPath.
 type WorkspaceSlugPath = Slug
@@ -548,15 +548,15 @@ type UpdateWorkspaceMembersJSONBody = []WorkspaceMember
 
 // MoveWorkspaceItemsJSONBody defines parameters for MoveWorkspaceItems.
 type MoveWorkspaceItemsJSONBody struct {
-	DestinationFolderId *Id                 `json:"destinationFolderId,omitempty"`
-	FolderIds           *[]Id               `json:"folderIds,omitempty"`
-	NoteIds             *[]NotePropertiesId `json:"noteIds,omitempty"`
+	DestinationFolderId *Id             `json:"destinationFolderId,omitempty"`
+	FolderIds           *[]Id           `json:"folderIds,omitempty"`
+	NoteIds             *[]PropertiesId `json:"noteIds,omitempty"`
 }
 
 // PermanentlyDeleteWorkspaceItemsJSONBody defines parameters for PermanentlyDeleteWorkspaceItems.
 type PermanentlyDeleteWorkspaceItemsJSONBody struct {
-	FolderIds *[]Id               `json:"folderIds,omitempty"`
-	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
+	FolderIds *[]Id           `json:"folderIds,omitempty"`
+	NoteIds   *[]PropertiesId `json:"noteIds,omitempty"`
 }
 
 // RenameWorkspaceJSONBody defines parameters for RenameWorkspace.
@@ -566,14 +566,14 @@ type RenameWorkspaceJSONBody struct {
 
 // RestoreTrashedWorkspaceItemsJSONBody defines parameters for RestoreTrashedWorkspaceItems.
 type RestoreTrashedWorkspaceItemsJSONBody struct {
-	FolderIds *[]Id               `json:"folderIds,omitempty"`
-	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
+	FolderIds *[]Id           `json:"folderIds,omitempty"`
+	NoteIds   *[]PropertiesId `json:"noteIds,omitempty"`
 }
 
 // TrashWorkspaceItemsJSONBody defines parameters for TrashWorkspaceItems.
 type TrashWorkspaceItemsJSONBody struct {
-	FolderIds *[]Id               `json:"folderIds,omitempty"`
-	NoteIds   *[]NotePropertiesId `json:"noteIds,omitempty"`
+	FolderIds *[]Id           `json:"folderIds,omitempty"`
+	NoteIds   *[]PropertiesId `json:"noteIds,omitempty"`
 }
 
 // GetWorkspaceTreeParams defines parameters for GetWorkspaceTree.

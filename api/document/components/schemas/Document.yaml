@@ -5,7 +5,7 @@ properties:
   id:
     type: string
     format: uuid
-    example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+    example: 000c2575-1847-5293-8117-2415a2328ef8
 
   content:
     $ref: ./DocumentContent.yaml

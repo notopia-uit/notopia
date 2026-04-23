@@ -12,7 +12,6 @@ RUN pnpm --filter @notopia-uit/search-worker... install --frozen-lockfile && \
 FROM node:25.6.1-alpine3.23 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-ENV NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register"
 COPY --from=builder /app/ ./
 EXPOSE 8082
 CMD ["node", "dist/main.js"]

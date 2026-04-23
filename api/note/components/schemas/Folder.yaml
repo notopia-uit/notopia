@@ -23,9 +23,11 @@ properties:
     $ref: ./Folder.yaml#/properties/id
     example: cc7a2e47-6267-4c60-8d36-257f849777e4
 
+  # This ref to ./Workspace.yaml#/properties/id
   workspaceId:
-    $ref: ./Workspace.yaml#/properties/id
-    readOnly: false
+    type: string
+    format: uuid
+    example: 00000000-0000-0000-0000-000000000110
 
   updatedAt:
     type: string

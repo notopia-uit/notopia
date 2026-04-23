@@ -44,7 +44,8 @@
       "executor": "@nx/js:node",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "search-worker:build:development"
+        "buildTarget": "search-worker:build:development",
+        "port": 9223
       },
       "configurations": {
         "development": {

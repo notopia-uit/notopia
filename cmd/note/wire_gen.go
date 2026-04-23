@@ -238,7 +238,16 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		WorkspaceEventHub: workspaceEventHub,
 	}
 	configServer := &configConfig.Server
-	strictHandler := http.NewStrictHandler(server, configServer, workspaceEventHub)
+	strictHandler, err := http.NewStrictHandler(server, configServer, workspaceEventHub)
+	if err != nil {
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	serverInterface := http.NewHandler(strictHandler)
 	httpHTTP, cleanup7, err := http.New(ctx, engine, serverInterface, configServer, logger)
 	if err != nil {

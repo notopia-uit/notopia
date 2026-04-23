@@ -39,7 +39,7 @@ func (h *StrictHandler) CreateWorkspace(
 
 	return note.CreateWorkspace201Response{
 		Headers: note.CreateWorkspace201ResponseHeaders{
-			ContentLocation: h.BaseURL.JoinPath("workspaces", id.String()).String(),
+			ContentLocation: h.BaseURL.JoinPath("note", "workspaces", id.String()).String(),
 		},
 	}, nil
 }
