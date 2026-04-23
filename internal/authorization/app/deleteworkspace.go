@@ -25,6 +25,7 @@ func NewDeleteWorkspaceHandler(enforcer *casbin.TransactionalEnforcer) *DeleteWo
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, params DeleteWorkspace) error {
+	slog.DebugContext(ctx, "Handling delete workspace", slog.String("user_id", params.UserID), slog.String("workspace_id", params.WorkspaceID.String()))
 	deleteAllowed, err := h.enforcer.Enforce(
 		formatUser(params.UserID),
 		formatWorkspace(params.WorkspaceID),
@@ -32,14 +33,17 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, params DeleteWorksp
 		WorkspacePermissionDelete.String(),
 	)
 	if err != nil {
+		slog.ErrorContext(ctx, "failed to enforce policy", slog.String("user_id", params.UserID), slog.String("workspace_id", params.WorkspaceID.String()), slog.Any("error", err))
 		return errs.NewCasbinEnforcerError(err)
 	}
 	if !deleteAllowed {
+		slog.WarnContext(ctx, "permission denied for delete workspace", slog.String("user_id", params.UserID), slog.String("workspace_id", params.WorkspaceID.String()))
 		return errs.NewMemberHasNoPermission(params.UserID, params.WorkspaceID, WorkspacePermissionDelete.String())
 	}
 
 	_, err = h.enforcer.RemoveFilteredGroupingPolicy(2, formatWorkspace(params.WorkspaceID))
 	if err != nil {
+		slog.ErrorContext(ctx, "failed to remove grouping policy", slog.String("workspace_id", params.WorkspaceID.String()), slog.Any("error", err))
 		return errs.NewCasbinInternalError(err)
 	}
 
