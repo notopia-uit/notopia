@@ -32,11 +32,9 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, params CreateWorksp
 		formatWorkspace(params.WorkspaceID),
 	)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to add grouping policy", slog.String("owner_id", params.OwnerID), slog.String("workspace_id", params.WorkspaceID.String()), slog.Any("error", err))
 		return errs.NewCasbinInternalError(err)
 	}
 	if !ok {
-		slog.WarnContext(ctx, "workspace already exists", slog.String("owner_id", params.OwnerID), slog.String("workspace_id", params.WorkspaceID.String()))
 		return errs.NewCreateWorkspaceExists(params.OwnerID, params.WorkspaceID)
 	}
 	slog.InfoContext(ctx, "created workspace",

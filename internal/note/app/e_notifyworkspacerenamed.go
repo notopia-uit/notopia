@@ -35,7 +35,6 @@ func (h *NotifyWorkspaceRenamedHandler) Handle(ctx context.Context, params *doma
 		},
 	})
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to publish workspace renamed event", slog.String("workspace_id", params.AggregateID.String()), slog.Any("error", err))
 		return err
 	}
 	slog.InfoContext(ctx, "Workspace renamed event published", slog.String("workspace_id", params.AggregateID.String()))

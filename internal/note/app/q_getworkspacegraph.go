@@ -42,11 +42,9 @@ func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspa
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to check permission", slog.String("user_id", query.UserID), slog.String("workspace_id", query.ID.String()), slog.Any("error", err))
 		return Graph{}, err
 	}
 	if !hasPermission {
-		slog.WarnContext(ctx, "permission denied", slog.String("user_id", query.UserID), slog.String("workspace_id", query.ID.String()))
 		return Graph{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read workspace graph %s", query.UserID, query.ID),
 		)
@@ -56,7 +54,6 @@ func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspa
 		IgnoreOrphans: query.IgnoreOrphans,
 	})
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to get workspace graph", slog.String("workspace_id", query.ID.String()), slog.Any("error", err))
 		return Graph{}, err
 	}
 	slog.InfoContext(ctx, "Get workspace graph query completed", slog.String("workspace_id", query.ID.String()))

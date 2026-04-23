@@ -45,18 +45,15 @@ func (h *ShowTrashHandler) Handle(ctx context.Context, query *ShowTrash) (Trash,
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to check permission", slog.String("user_id", query.UserID), slog.String("workspace_id", query.WorkspaceID.String()), slog.Any("error", err))
 		return Trash{}, err
 	}
 	if !hasPermission {
-		slog.WarnContext(ctx, "permission denied", slog.String("user_id", query.UserID), slog.String("workspace_id", query.WorkspaceID.String()))
 		return Trash{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read trash in workspace %s", query.UserID, query.WorkspaceID),
 		)
 	}
 	trash, err := h.readModel.ShowTrash(ctx, query)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to show trash", slog.String("workspace_id", query.WorkspaceID.String()), slog.Any("error", err))
 		return Trash{}, err
 	}
 	slog.InfoContext(ctx, "Show trash query completed", slog.String("workspace_id", query.WorkspaceID.String()))

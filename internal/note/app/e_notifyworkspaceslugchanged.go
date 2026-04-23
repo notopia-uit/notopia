@@ -35,7 +35,6 @@ func (h *NotifyWorkspaceSlugChangedHandler) Handle(ctx context.Context, params *
 		},
 	})
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to publish workspace slug changed event", slog.String("workspace_id", params.AggregateID.String()), slog.Any("error", err))
 		return err
 	}
 	slog.InfoContext(ctx, "Workspace slug changed event published", slog.String("workspace_id", params.AggregateID.String()))

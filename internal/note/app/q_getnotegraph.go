@@ -42,7 +42,6 @@ func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (
 	slog.DebugContext(ctx, "Handling get note graph query", slog.String("note_id", query.ID.String()), slog.Int("depth", query.Depth))
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to get workspace ID for note", slog.String("note_id", query.ID.String()), slog.Any("error", err))
 		return Graph{}, err
 	}
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
@@ -52,11 +51,9 @@ func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to check permission", slog.String("user_id", query.UserID), slog.String("workspace_id", workspaceID.String()), slog.Any("error", err))
 		return Graph{}, err
 	}
 	if !hasPermission {
-		slog.WarnContext(ctx, "permission denied", slog.String("user_id", query.UserID), slog.String("note_id", query.ID.String()))
 		return Graph{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read note graph %s", query.UserID, query.ID),
 		)
@@ -69,7 +66,6 @@ func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (
 		Depth: query.Depth,
 	})
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to get note graph", slog.String("note_id", query.ID.String()), slog.Any("error", err))
 		return Graph{}, err
 	}
 	slog.InfoContext(ctx, "Get note graph query completed", slog.String("note_id", query.ID.String()))

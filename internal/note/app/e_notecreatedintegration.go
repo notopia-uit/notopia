@@ -29,7 +29,6 @@ func (h *NoteCreatedDomainToIntegrationEventHandler) Handle(ctx context.Context,
 	slog.DebugContext(ctx, "Handling note created integration event", slog.String("note_id", event.AggregateID.String()))
 	workspace, err := h.getWorkspaceByNoteReadModel.GetWorkspaceByNoteID(ctx, event.AggregateID)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to get workspace for note", slog.String("note_id", event.AggregateID.String()), slog.Any("error", err))
 		return fmt.Errorf("failed to get workspace for note: %w", err)
 	}
 	integrationEvent := IntegrationEventNoteCreated{
@@ -39,7 +38,6 @@ func (h *NoteCreatedDomainToIntegrationEventHandler) Handle(ctx context.Context,
 		Name:        event.Name,
 	}
 	if err := h.integrationPublisher.Publish(ctx, integrationEvent); err != nil {
-		slog.ErrorContext(ctx, "failed to publish note created event", slog.String("note_id", event.AggregateID.String()), slog.Any("error", err))
 		return fmt.Errorf("failed to publish the converted note created event to the integration publisher: %w", err)
 	}
 	slog.InfoContext(ctx, "Note created integration event published", slog.String("note_id", event.AggregateID.String()))

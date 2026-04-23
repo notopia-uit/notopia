@@ -33,7 +33,6 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 	slog.DebugContext(ctx, "Handling get my workspaces query", slog.String("user_id", query.UserID))
 	authorizationUserWorkspaces, err := h.authorizationSvc.GetUserWorkspaces(ctx, query.UserID)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to get user workspaces", slog.String("user_id", query.UserID), slog.Any("error", err))
 		return nil, err
 	}
 	workspaceIDs := make([]uuid.UUID, len(authorizationUserWorkspaces))
@@ -42,7 +41,6 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 	}
 	workspaces, err := h.readModel.GetWorkspaces(ctx, workspaceIDs)
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to get workspaces from read model", slog.Any("workspace_ids", workspaceIDs), slog.Any("error", err))
 		return nil, err
 	}
 	workspaceIDToIndex := make(map[uuid.UUID]int, len(workspaces))
@@ -53,7 +51,6 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 	for i, auw := range authorizationUserWorkspaces {
 		wsIndex, ok := workspaceIDToIndex[auw.ID]
 		if !ok {
-			slog.ErrorContext(ctx, "workspace not found for user workspace", slog.String("workspace_id", auw.ID.String()))
 			return nil, errs.NewInternal("workspace not found for user workspace")
 		}
 		userWorkspaces[i] = UserWorkspace{

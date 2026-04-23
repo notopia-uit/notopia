@@ -78,6 +78,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer, integrationPublisher)
 	appApp := &app.App{
+		Enforcer:                        transactionalEnforcer,
 		CreateWorkspace:                 createWorkspaceHandler,
 		DeleteWorkspace:                 deleteWorkspaceHandler,
 		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
@@ -107,7 +108,16 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
-	authorizationServer := authorization.NewServer(server, healthHealth, logger, global)
+	general := &configConfig.General
+	authorizationServer, err := authorization.NewServer(ctx, server, healthHealth, logger, global, general, appApp)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	return authorizationServer, func() {
 		cleanup5()
 		cleanup4()
