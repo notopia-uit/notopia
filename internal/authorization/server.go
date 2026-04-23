@@ -7,6 +7,7 @@ import (
 
 	"github.com/notopia-uit/notopia/internal/authorization/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/authorization/controller/health"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
 )
@@ -15,6 +16,7 @@ type Server struct {
 	grpc   *grpc.Server
 	health *health.Health
 	logger *slog.Logger
+	appEnv commonconfig.AppEnv
 }
 
 func NewServer(
@@ -22,6 +24,7 @@ func NewServer(
 	health *health.Health,
 	logger *slog.Logger,
 	globalOtel otel.Global,
+	generalCfg *commonconfig.General,
 ) *Server {
 	slog.SetDefault(logger)
 
@@ -29,6 +32,7 @@ func NewServer(
 		grpc:   grpc,
 		health: health,
 		logger: logger,
+		appEnv: generalCfg.AppEnv,
 	}
 }
 

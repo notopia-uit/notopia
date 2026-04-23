@@ -21,15 +21,15 @@ nx = "pnpm exec nx"
 shadcn = "pnpm exec shadcn"
 tsgo = "pnpm exec tsgo"
 
-[deps.pnpm]
-auto = true
-
-[deps.go]
-auto = true
-
-[deps.buf]
-auto = true
-sources = ["./buf.yaml"]
-outputs = ["./buf.lock"]
-run = "buf dep update"
-description = "Manage buf dependencies"
+# [deps.pnpm]
+# auto = true
+#
+# [deps.go]
+# auto = true
+#
+# [deps.buf]
+# auto = true
+# sources = ["./buf.yaml"]
+# outputs = ["./buf.lock"]
+# run = "buf dep update"
+# description = "Manage buf dependencies"
