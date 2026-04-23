@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/pkg/api/note"
@@ -22,7 +23,8 @@ func NewNotifyWorkspaceSlugChangedHandler(
 var ProvideNotifyWorkspaceSlugChangedHandler = NewNotifyWorkspaceSlugChangedHandler
 
 func (h *NotifyWorkspaceSlugChangedHandler) Handle(ctx context.Context, params *domain.WorkspaceSlugChangedEvent) error {
-	return h.workspaceEventPublisher.Publish(ctx, params.AggregateID, params.UserID, &WorkspaceEventWorkspaceSlugChanged{
+	slog.DebugContext(ctx, "Handling workspace slug changed event", slog.String("workspace_id", params.AggregateID.String()))
+	err := h.workspaceEventPublisher.Publish(ctx, params.AggregateID, params.UserID, &WorkspaceEventWorkspaceSlugChanged{
 		workspaceEvent[note.WorkspaceSlugChangedEventEvent]{
 			Id:    params.ID,
 			Event: note.WorkspaceSlugChangedEventEventWorkspaceSlugChangedEvent,
@@ -32,4 +34,10 @@ func (h *NotifyWorkspaceSlugChangedHandler) Handle(ctx context.Context, params *
 			},
 		},
 	})
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to publish workspace slug changed event", slog.String("workspace_id", params.AggregateID.String()), slog.Any("error", err))
+		return err
+	}
+	slog.InfoContext(ctx, "Workspace slug changed event published", slog.String("workspace_id", params.AggregateID.String()))
+	return nil
 }

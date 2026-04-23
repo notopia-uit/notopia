@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 )
@@ -29,11 +30,13 @@ func NewNoteUpdatedDomainToIntegrationEventHandler(
 var ProvideNoteUpdatedDomainToIntegrationEventHandler = NewNoteUpdatedDomainToIntegrationEventHandler
 
 func (h *NoteUpdatedDomainToIntegrationEventHandler) Handle(ctx context.Context, noteID uuid.UUID) error {
+	slog.DebugContext(ctx, "Handling note updated integration event", slog.String("note_id", noteID.String()))
 	note, err := h.getNoteReadModel.GetNote(ctx, &GetNoteReadModelParams{
 		ID:             noteID,
 		ExcludeTrashed: false,
 	})
 	if err != nil {
+		slog.ErrorContext(ctx, "failed to get note for note updated event", slog.String("note_id", noteID.String()), slog.Any("error", err))
 		return fmt.Errorf("failed to get note for note updated event: %w", err)
 	}
 	folder, err := h.getFolderReadModel.GetFolder(ctx, &GetFolderReadModelParams{
@@ -41,6 +44,7 @@ func (h *NoteUpdatedDomainToIntegrationEventHandler) Handle(ctx context.Context,
 		ExcludeTrashed: false,
 	})
 	if err != nil {
+		slog.ErrorContext(ctx, "failed to get folder for note updated event", slog.String("note_id", noteID.String()), slog.Any("error", err))
 		return fmt.Errorf("failed to get note or folder for note updated event: %w", err)
 	}
 	integrationEvent := IntegrationEventNoteUpdated{
@@ -55,7 +59,9 @@ func (h *NoteUpdatedDomainToIntegrationEventHandler) Handle(ctx context.Context,
 		UpdatedAt:   note.UpdatedAt,
 	}
 	if err := h.integrationPublisher.Publish(ctx, integrationEvent); err != nil {
+		slog.ErrorContext(ctx, "failed to publish note updated integration event", slog.String("note_id", noteID.String()), slog.Any("error", err))
 		return fmt.Errorf("failed to publish note updated integration event: %w", err)
 	}
+	slog.InfoContext(ctx, "Note updated integration event published", slog.String("note_id", noteID.String()))
 	return nil
 }

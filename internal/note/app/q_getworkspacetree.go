@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -35,6 +36,7 @@ func NewGetWorkspaceTreeHandler(
 var ProvideGetWorkspaceTreeHandler = NewGetWorkspaceTreeHandler
 
 func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspaceTree) (WorkspaceTreeFolder, error) {
+	slog.DebugContext(ctx, "Handling get workspace tree query", slog.String("workspace_id", query.WorkspaceID.String()))
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
@@ -42,17 +44,25 @@ func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspac
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
+		slog.ErrorContext(ctx, "failed to check permission", slog.String("user_id", query.UserID), slog.String("workspace_id", query.WorkspaceID.String()), slog.Any("error", err))
 		return WorkspaceTreeFolder{}, err
 	}
 	if !hasPermission {
+		slog.WarnContext(ctx, "permission denied", slog.String("user_id", query.UserID), slog.String("workspace_id", query.WorkspaceID.String()))
 		return WorkspaceTreeFolder{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read workspace tree %s", query.UserID, query.WorkspaceID),
 		)
 	}
-	return h.readModel.GetWorkspaceTree(ctx, &GetWorkspaceTreeReadModelParams{
+	tree, err := h.readModel.GetWorkspaceTree(ctx, &GetWorkspaceTreeReadModelParams{
 		WorkspaceID:    query.WorkspaceID,
 		RootFolderID:   query.RootFolderID,
 		IncludeTrashed: query.IncludeTrashed,
 		Depth:          query.Depth,
 	})
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get workspace tree", slog.String("workspace_id", query.WorkspaceID.String()), slog.Any("error", err))
+		return WorkspaceTreeFolder{}, err
+	}
+	slog.InfoContext(ctx, "Get workspace tree query completed", slog.String("workspace_id", query.WorkspaceID.String()))
+	return tree, nil
 }

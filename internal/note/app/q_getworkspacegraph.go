@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -33,6 +34,7 @@ func NewGetWorkspaceGraphHandler(
 var ProvideGetWorkspaceGraphHandler = NewGetWorkspaceGraphHandler
 
 func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspaceGraph) (Graph, error) {
+	slog.DebugContext(ctx, "Handling get workspace graph query", slog.String("workspace_id", query.ID.String()))
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
@@ -40,15 +42,23 @@ func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspa
 		WorkspaceItemPermissionRead,
 	)
 	if err != nil {
+		slog.ErrorContext(ctx, "failed to check permission", slog.String("user_id", query.UserID), slog.String("workspace_id", query.ID.String()), slog.Any("error", err))
 		return Graph{}, err
 	}
 	if !hasPermission {
+		slog.WarnContext(ctx, "permission denied", slog.String("user_id", query.UserID), slog.String("workspace_id", query.ID.String()))
 		return Graph{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read workspace graph %s", query.UserID, query.ID),
 		)
 	}
-	return h.readModel.GetWorkspaceGraph(ctx, &GetWorkspaceGraphReadModelParams{
+	graph, err := h.readModel.GetWorkspaceGraph(ctx, &GetWorkspaceGraphReadModelParams{
 		ID:            query.ID,
 		IgnoreOrphans: query.IgnoreOrphans,
 	})
+	if err != nil {
+		slog.ErrorContext(ctx, "failed to get workspace graph", slog.String("workspace_id", query.ID.String()), slog.Any("error", err))
+		return Graph{}, err
+	}
+	slog.InfoContext(ctx, "Get workspace graph query completed", slog.String("workspace_id", query.ID.String()))
+	return graph, nil
 }

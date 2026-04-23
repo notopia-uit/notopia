@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
@@ -36,6 +37,8 @@ var ProvidePermanentlyDeleteWorkspaceItemsHandler = NewPermanentlyDeleteWorkspac
 // NOTE: We delegate the infra persistence to cascading delete things (folder)
 // Fact, we should handle this in domain, not infra
 func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteWorkspaceItems) error {
+	slog.DebugContext(ctx, "permanently deleting workspace items", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("note_count", len(cmd.NoteIDs)), slog.Int("folder_count", len(cmd.FolderIDs)), slog.String("user_id", cmd.UserID))
+	slog.DebugContext(ctx, "checking permission", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.WorkspaceID.String()), slog.String("permission", "delete"))
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
 	if err != nil {
 		return err
@@ -46,6 +49,7 @@ func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd
 			fmt.Sprintf("user %s does not have permission to permanently delete items in workspace %s", cmd.UserID, cmd.WorkspaceID),
 		)
 	}
+	slog.DebugContext(ctx, "permission granted", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.WorkspaceID.String()))
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		if len(cmd.FolderIDs) > 0 {
@@ -65,6 +69,7 @@ func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd
 			if err := folderRepo.SaveMany(ctx, folders); err != nil {
 				return err
 			}
+			slog.DebugContext(ctx, "folders permanently deleted", slog.Int("folder_count", len(folders)))
 		}
 
 		if len(cmd.NoteIDs) > 0 {
@@ -84,7 +89,9 @@ func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd
 			if err := noteRepo.SaveMany(ctx, notes); err != nil {
 				return err
 			}
+			slog.DebugContext(ctx, "notes permanently deleted", slog.Int("note_count", len(notes)))
 		}
+		slog.InfoContext(ctx, "workspace items permanently deleted successfully", slog.String("workspace_id", cmd.WorkspaceID.String()))
 		return nil
 	})
 }
