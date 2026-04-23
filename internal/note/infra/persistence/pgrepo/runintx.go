@@ -38,6 +38,7 @@ func (r *RunInTx) Execute(
 	params *runInTxParams,
 	fn func(params *RunInTxFnParams) error,
 ) error {
+	slog.DebugContext(ctx, "Starting RunInTx execution", slog.Bool("in_transaction", params.inTransaction))
 	if params.inTransaction {
 		return fn(&RunInTxFnParams{
 			queries:   params.queries,
@@ -70,7 +71,7 @@ func (r *RunInTx) Execute(
 	}()
 
 	queries := pgsqlc.New(tx)
-	publisher, err := r.publisherFactory.Create(tx)
+	publisher, err := r.publisherFactory.Create(ctx, tx)
 	if err != nil {
 		return errs.NewPersistenceInternal("failed to create publisher in RunInTx", err)
 	}
@@ -87,6 +88,7 @@ func (r *RunInTx) Execute(
 	if err := tx.Commit(ctx); err != nil {
 		return errs.NewPersistenceInternal("failed to commit transaction in RunInTx", err)
 	}
+	slog.DebugContext(ctx, "Completed RunInTx execution successfully")
 
 	return nil
 }

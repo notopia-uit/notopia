@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"sync"
@@ -51,7 +50,7 @@ func (h *NotifyWorkspaceItemsUpdatedHandler) Handle(params *NotifyWorkspaceItems
 		err := h.publishWorkspaceUpdate(publishCtx, params.WorkspaceID, params.UserID)
 		if err != nil {
 			slog.Error(
-				"failed to publish workspace update",
+				"notify workspace items updated failed to publish event",
 				slog.String("workspaceID", params.WorkspaceID.String()),
 				slog.Any("error", err),
 			)
@@ -69,7 +68,7 @@ func (h *NotifyWorkspaceItemsUpdatedHandler) publishWorkspaceUpdate(
 ) error {
 	id, err := uuid.NewV7()
 	if err != nil {
-		return errors.New("failed to generate event ID")
+		return fmt.Errorf("notify workspace item updated failed to generate event ID: %w", err)
 	}
 	event := &WorkspaceEventWorkspaceItemsUpdated{
 		workspaceEvent[note.WorkspaceItemsUpdatedEventEvent]{
@@ -81,7 +80,7 @@ func (h *NotifyWorkspaceItemsUpdatedHandler) publishWorkspaceUpdate(
 		},
 	}
 	if err := h.workspaceEventPublisher.Publish(ctx, workspaceID, userID, event); err != nil {
-		return fmt.Errorf("failed to publish workspace update event: %w", err)
+		return fmt.Errorf("notify workspace item updated failed to publish event: %w", err)
 	}
 	return nil
 }

@@ -14,5 +14,5 @@ type Publisher interface {
 }
 
 type PublisherFactory interface {
-	Create(pgxTx pgx.Tx) (Publisher, error)
+	Create(ctx context.Context, pgxTx pgx.Tx) (Publisher, error)
 }

@@ -23,7 +23,7 @@ func NewNotifyWorkspaceRenamedHandler(
 var ProvideNotifyWorkspaceRenamedHandler = NewNotifyWorkspaceRenamedHandler
 
 func (h *NotifyWorkspaceRenamedHandler) Handle(ctx context.Context, params *domain.WorkspaceRenamedEvent) error {
-	slog.DebugContext(ctx, "Handling workspace renamed event", slog.String("workspace_id", params.AggregateID.String()))
+	slog.DebugContext(ctx, "Handling notify workspace renamed event", slog.String("workspace_id", params.AggregateID.String()))
 	err := h.workspaceEventPublisher.Publish(ctx, params.AggregateID, params.UserID, &WorkspaceEventWorkspaceRenamed{
 		workspaceEvent[note.WorkspaceRenamedEventEvent]{
 			Id:    params.ID,
@@ -37,6 +37,6 @@ func (h *NotifyWorkspaceRenamedHandler) Handle(ctx context.Context, params *doma
 	if err != nil {
 		return err
 	}
-	slog.InfoContext(ctx, "Workspace renamed event published", slog.String("workspace_id", params.AggregateID.String()))
+	slog.InfoContext(ctx, "Notify workspace renamed event published", slog.String("workspace_id", params.AggregateID.String()))
 	return nil
 }

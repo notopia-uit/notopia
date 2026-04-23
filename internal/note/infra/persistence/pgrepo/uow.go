@@ -100,7 +100,7 @@ func (u *UnitOfWork) Execute(
 	}()
 
 	txQueries := pgsqlc.New(tx)
-	publisher, err := u.publisherFactory.Create(tx)
+	publisher, err := u.publisherFactory.Create(ctx, tx)
 	if err != nil {
 		return errs.NewPersistenceInternal("failed to create publisher in unit of work", err)
 	}

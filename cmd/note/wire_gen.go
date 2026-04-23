@@ -91,7 +91,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	loggerAdapter := logging.NewWatermill(logger)
 	configDomainEvent := &advanced.DomainEvent
 	defaultPostgreSQLSchema := outbox.NewSchemaAdapter(configDomainEvent)
-	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema, serviceName)
+	jsonMarshaler := component.NewWatermillJsonMarshaler()
+	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema, serviceName, jsonMarshaler)
 	runInTx := pgrepo.NewRunInTx(fromPersistenceToQSLForwarder)
 	unitOfWork := pgrepo.NewUnitOfWork(pool, fromPersistenceToQSLForwarder, runInTx)
 	changeWorkspaceSlugHandler := app.NewChangeWorkspaceSlugHandler(authorization, unitOfWork)
@@ -261,8 +262,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	jsonMarshaler := component.NewWatermillJsonMarshaler()
-	eventEvent, err := event.NewEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent)
+	eventEvent, err := event.NewEvent(kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent, kafkaPublisher)
 	if err != nil {
 		cleanup8()
 		cleanup7()

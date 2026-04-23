@@ -23,7 +23,7 @@ func NewNotifyWorkspaceSlugChangedHandler(
 var ProvideNotifyWorkspaceSlugChangedHandler = NewNotifyWorkspaceSlugChangedHandler
 
 func (h *NotifyWorkspaceSlugChangedHandler) Handle(ctx context.Context, params *domain.WorkspaceSlugChangedEvent) error {
-	slog.DebugContext(ctx, "Handling workspace slug changed event", slog.String("workspace_id", params.AggregateID.String()))
+	slog.DebugContext(ctx, "Handling notify workspace slug changed event", slog.String("workspace_id", params.AggregateID.String()))
 	err := h.workspaceEventPublisher.Publish(ctx, params.AggregateID, params.UserID, &WorkspaceEventWorkspaceSlugChanged{
 		workspaceEvent[note.WorkspaceSlugChangedEventEvent]{
 			Id:    params.ID,
@@ -37,6 +37,6 @@ func (h *NotifyWorkspaceSlugChangedHandler) Handle(ctx context.Context, params *
 	if err != nil {
 		return err
 	}
-	slog.InfoContext(ctx, "Workspace slug changed event published", slog.String("workspace_id", params.AggregateID.String()))
+	slog.InfoContext(ctx, "Notify workspace slug changed event published", slog.String("workspace_id", params.AggregateID.String()))
 	return nil
 }

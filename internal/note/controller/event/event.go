@@ -43,6 +43,9 @@ type Event struct {
 	domainEventCfg *config.DomainEvent
 }
 
+// I mean, kafka
+type Publisher message.Publisher
+
 func NewEvent(
 	cfg *commonconfig.Kafka,
 	app *app.Server,
@@ -50,6 +53,7 @@ func NewEvent(
 	logger watermill.LoggerAdapter,
 	marshaler *cqrs.JSONMarshaler,
 	domainEventCfg *config.DomainEvent,
+	publisher Publisher,
 ) (*Event, error) {
 	subcriber, err := kafka.NewSubscriber(
 		kafka.SubscriberConfig{
@@ -84,7 +88,12 @@ func NewEvent(
 		Multiplier:      2,
 		Logger:          logger,
 	}
+	poisonQueueMiddleware, err := middleware.PoisonQueue(publisher, component.DomainEventTopicPrefix+"poison")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create poison queue middleware: %w", err)
+	}
 	router.AddMiddleware(
+		poisonQueueMiddleware,
 		middleware.CorrelationID,
 		middleware.Recoverer,
 		retryMiddleware.Middleware,

@@ -6,6 +6,7 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
+	"github.com/notopia-uit/notopia/internal/note/controller/event"
 	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
 	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
@@ -45,4 +46,5 @@ var ProvideKafkaPublisher = NewKafkaPublisher
 var (
 	_ outbox.Publisher               = (*KafkaPublisher)(nil)
 	_ integrationpublisher.Publisher = (*KafkaPublisher)(nil)
+	_ event.Publisher                = (*KafkaPublisher)(nil)
 )
