@@ -104,7 +104,7 @@ func (f *FromPersistenceToQSLForwarder) Create(
 		sql.TxFromPgx(pgxTx),
 		sql.PublisherConfig{
 			SchemaAdapter:        f.schemaAdapter,
-			AutoInitializeSchema: true,
+			AutoInitializeSchema: false,
 		},
 		watermill.NopLogger{},
 	)

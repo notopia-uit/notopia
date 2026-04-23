@@ -22,13 +22,13 @@
       "path": "../../packages/pb/tsconfig.lib.json"
     },
     {
-      "path": "../../packages/lib/tsconfig.lib.json"
-    },
-    {
       "path": "../../packages/api-document-nestjs-server/tsconfig.lib.json"
     },
     {
       "path": "../../packages/api-gen/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/lib/tsconfig.lib.json"
     }
   ]
 }

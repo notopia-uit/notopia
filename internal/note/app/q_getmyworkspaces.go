@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/google/uuid"
@@ -43,6 +44,9 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 	if err != nil {
 		return nil, err
 	}
+	if len(workspaces) != len(authorizationUserWorkspaces) {
+		return nil, errs.NewInternal(fmt.Sprintf("number of workspaces found (%d) does not match number of user workspaces (%d) for user %s", len(workspaces), len(authorizationUserWorkspaces), query.UserID))
+	}
 	workspaceIDToIndex := make(map[uuid.UUID]int, len(workspaces))
 	for i := range workspaces {
 		workspaceIDToIndex[workspaces[i].ID] = i
@@ -51,7 +55,7 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 	for i, auw := range authorizationUserWorkspaces {
 		wsIndex, ok := workspaceIDToIndex[auw.ID]
 		if !ok {
-			return nil, errs.NewInternal("workspace not found for user workspace")
+			return nil, errs.NewInternal(fmt.Sprintf("workspace with ID %s not found for user %s", auw.ID, query.UserID))
 		}
 		userWorkspaces[i] = UserWorkspace{
 			Workspace: workspaces[wsIndex],

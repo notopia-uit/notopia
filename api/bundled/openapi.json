@@ -999,7 +999,7 @@
                 "schema": {
                   "type": "string",
                   "format": "uri",
-                  "example": "http://api.notopia.localhost/workspaces/550e8400-e29b-41d4-a716-446655440000"
+                  "example": "http://api.notopia.localhost/workspaces/00000000-0000-0000-0000-000000000110"
                 }
               }
             }
@@ -2308,7 +2308,7 @@
       "share_properties-id": {
         "type": "string",
         "format": "uuid",
-        "example": "550e8400-e29b-41d4-a716-446655440000",
+        "example": "00000000-0000-0000-0000-000000000110",
         "readOnly": true
       },
       "share_WorkspaceRole": {
@@ -2623,7 +2623,7 @@
       "note_properties-id": {
         "type": "string",
         "format": "uuid",
-        "example": "550e8400-e29b-41d4-a716-446655440000",
+        "example": "00000000-0000-0000-0000-000000000110",
         "readOnly": true
       },
       "note_TrashedBy": {
@@ -2919,7 +2919,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "example": "00000000-0000-0000-0000-000000000110",
             "readOnly": true
           },
           "slug": {

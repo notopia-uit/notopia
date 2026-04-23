@@ -19,6 +19,7 @@ import {
   APP_CONFIG,
   appConfig,
   databaseConfig,
+  kafkaConfig,
   s3Config,
   servicesConfig,
 } from './config/config.factory';
@@ -36,7 +37,7 @@ import { StorageModule } from './storage/storage.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, servicesConfig, s3Config],
+      load: [appConfig, databaseConfig, servicesConfig, s3Config, kafkaConfig],
     }),
     OpenTelemetryModule.forRoot({
       metrics: {
@@ -80,10 +81,19 @@ import { StorageModule } from './storage/storage.module';
           documentApi: DocumentApi,
           revisionApi: RevisionApi,
         },
-        providers: [DocumentService, RevisionService],
+        providers: [
+          DocumentService,
+          RevisionService,
+          {
+            provide: KAFKA_CLIENT,
+            useFactory: getKafkaConfig,
+            inject: [ConfigService],
+          },
+        ],
       }),
       {
         imports: [
+          ConfigModule,
           TypeOrmModule.forFeature([DocumentEntity, RevisionEntity]),
           DatabaseModule,
           AuthorizationModule,

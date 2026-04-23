@@ -21,6 +21,7 @@ func NewAuthentik(
 ) *Authentik {
 	authentikCfg := api.NewConfiguration()
 	authentikCfg.Host = cfg.Host
+	authentikCfg.Scheme = cfg.Scheme
 	authentikCfg.Servers = api.ServerConfigurations{
 		{
 			URL: cfg.URL,

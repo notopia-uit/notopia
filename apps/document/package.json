@@ -1,7 +1,6 @@
 {
   "name": "@notopia-uit/document",
   "private": true,
-  "type": "module",
   "scripts": {
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
     "typeorm-extension": "tsx ./node_modules/typeorm-extension/bin/cli.mjs",
@@ -39,8 +38,8 @@
     "@types/express": "catalog:",
     "express": "catalog:",
     "kafkajs": "catalog:",
-    "nestjs-otel": "catalog:",
     "marked": "catalog:",
+    "nestjs-otel": "catalog:",
     "nestjs-pino": "catalog:",
     "pino-http": "catalog:",
     "pino-pretty": "catalog:",

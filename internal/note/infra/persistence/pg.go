@@ -15,21 +15,17 @@ import (
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/pressly/goose/v3"
 	"github.com/pressly/goose/v3/lock"
-	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 func NewPgPool(
 	ctx context.Context,
-	tracerProvider *trace.TracerProvider,
 	cfg *commonconfig.SQL,
 ) (*pgxpool.Pool, func(), error) {
 	pgxCfg, err := pgxpool.ParseConfig(cfg.GetURL())
 	if err != nil {
 		return nil, nil, err
 	}
-	pgxCfg.ConnConfig.Tracer = otelpgx.NewTracer(
-		otelpgx.WithTracerProvider(tracerProvider),
-	)
+	pgxCfg.ConnConfig.Tracer = otelpgx.NewTracer()
 	pool, err := pgxpool.NewWithConfig(ctx, pgxCfg)
 	if err != nil {
 		return nil, nil, err

@@ -35,35 +35,29 @@ import (
 // Injectors from wire.go:
 
 func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
-	serviceName := _wireServiceNameValue
-	serviceVersion := _wireServiceVersionValue
-	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
-	if err != nil {
-		return nil, nil, err
-	}
-	tracerProvider, cleanup, err := otel.NewTracerProvider(ctx, resource)
-	if err != nil {
-		return nil, nil, err
-	}
 	validate := component.ProvideValidate()
 	viper := config.NewViper()
 	configConfig, err := config.New(validate, viper)
 	if err != nil {
-		cleanup()
 		return nil, nil, err
 	}
 	sql := &configConfig.Database
-	pool, cleanup2, err := persistence.NewPgPool(ctx, tracerProvider, sql)
+	pool, cleanup, err := persistence.NewPgPool(ctx, sql)
 	if err != nil {
-		cleanup()
 		return nil, nil, err
 	}
 	db := persistence.NewPgxPoolStdlib(pool)
 	log := &configConfig.Log
 	stdoutHandler := logging.NewStdoutHandler(log)
-	loggerProvider, cleanup3, err := otel.NewLoggerProvider(ctx, resource)
+	serviceName := _wireServiceNameValue
+	serviceVersion := _wireServiceVersionValue
+	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
 	if err != nil {
-		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	loggerProvider, cleanup2, err := otel.NewLoggerProvider(ctx, resource)
+	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
@@ -71,14 +65,12 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
 	provider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
-		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
 	pg, err := persistence.NewPg(pool, provider)
 	if err != nil {
-		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
@@ -88,9 +80,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc)
 	services := &configConfig.Services
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	authorization, cleanup4, err := service.NewAuthorization(services, loggingLogger)
+	authorization, cleanup3, err := service.NewAuthorization(services, loggingLogger)
 	if err != nil {
-		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
@@ -127,10 +118,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	workspaceEvent := &advanced.WorkspaceEvent
 	redis := &configConfig.Redis
-	redisClient, cleanup5 := workspaceevent.NewRedisClient(ctx, redis, logger)
+	redisClient, cleanup4 := workspaceevent.NewRedisClient(ctx, redis, logger)
 	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName)
 	if err != nil {
-		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
@@ -162,6 +152,14 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
 	kafka := &configConfig.Kafka
+	tracerProvider, cleanup5, err := otel.NewTracerProvider(ctx, resource)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
 	kafkaPublisher, cleanup6, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
 	if err != nil {

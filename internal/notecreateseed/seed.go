@@ -65,7 +65,7 @@ func DefaultConfig() (Config, error) {
 	}
 	return Config{
 		SourceDir: "./submodule/trshpuppy-obsidian-notes",
-		OutputSQL: "./internal/notecreateseed/seed.sql",
+		OutputSQL: "./internal/notecreateseed/seed.gen.sql",
 		Namespace: namespace,
 	}, nil
 }

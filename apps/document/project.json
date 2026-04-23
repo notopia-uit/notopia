@@ -47,17 +47,17 @@
       "executor": "@nx/js:node",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "development"
+        "buildTarget": "document:build:development"
       },
       "configurations": {
         "development": {
-          "buildTarget": "development"
+          "buildTarget": "document:build:development"
         },
         "mon": {
-          "buildTarget": "development"
+          "buildTarget": "document:build:development"
         },
         "production": {
-          "buildTarget": "production"
+          "buildTarget": "document:build:production"
         }
       }
     }

@@ -44,17 +44,17 @@
       "executor": "@nx/js:node",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "development"
+        "buildTarget": "search-worker:build:development"
       },
       "configurations": {
         "development": {
-          "buildTarget": "development"
+          "buildTarget": "search-worker:build:development"
         },
         "mon": {
-          "buildTarget": "development"
+          "buildTarget": "search-worker:build:development"
         },
         "production": {
-          "buildTarget": "production"
+          "buildTarget": "search-worker:build:production"
         }
       }
     },
