@@ -1,6 +1,6 @@
 import { showTrashOptions } from '@notopia-uit/api-gen/index';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-import TrashedItemManagement from '@ui/components/trashed-file-managment';
+import TrashedItemManagement from '@ui/components/trashed-file-management';
 
 import getQueryClient from '#/get-query-client';
 

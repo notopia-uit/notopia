@@ -77,6 +77,10 @@ const WorkspaceSwitcher = () => {
     select: mapUserWorkspaceDtoToDomain,
   });
 
+  //TODO: Local state mirroring server data will desync on refetch.
+  // workspaces and selectedId are initialized from allWorkspaceData once at mount. If the underlying getMyWorkspaces query refetches (on focus, reconnect, manual invalidation, etc.), useSuspenseQuery updates allWorkspaceData but the local useState snapshot is never re-synced, so the UI will silently drift from server state. Combined with the TODO at Line 69, this whole component currently operates on local-only edits.
+  // Consider either deriving the list directly from the query data (with a mutation that invalidates the query) or using useEffect to sync — but the former is the idiomatic React Query pattern.
+
   const [workspaces, setWorkspaces] =
     useState<UserWorkspace[]>(allWorkspaceData);
   const [selectedId, setSelectedId] = useState<string>(workspaces[0]?.id || '');
@@ -125,6 +129,11 @@ const WorkspaceSwitcher = () => {
     setEditForm({});
   };
 
+  //   TODO:Create/edit/delete are local-only and will not persist.
+  //
+  // saveEdit, saveNewWorkspace, and deleteWorkspace only mutate local state — no API calls — and saveNewWorkspace assigns Date.now().toString() as id, which will collide with real backend ids once the mutation is wired up. The TODO at Line 69 acknowledges this, but flagging so it isn't missed before release. Consider wiring useMutation with query invalidation for getMyWorkspacesQueryKey().
+  //
+
   const saveNewWorkspace = () => {
     if (editForm.name && editForm.slug && editForm.userRole) {
       const newWorkspace: UserWorkspace = {
@@ -143,10 +152,17 @@ const WorkspaceSwitcher = () => {
   };
 
   const deleteWorkspace = (id: string) => {
-    setWorkspaces((prev) => prev.filter((workspace) => workspace.id !== id));
-    if (selectedId === id && workspaces.length > 1) {
-      setSelectedId(workspaces.find((w) => w.id !== id)?.id || '');
-    }
+    setWorkspaces((prev) => {
+      const nextWorkspaces = prev.filter((workspace) => workspace.id !== id);
+      if (selectedId === id) {
+        if (prev.length === 1) {
+          setSelectedId('');
+        } else {
+          setSelectedId(nextWorkspaces[0]?.id || '');
+        }
+      }
+      return nextWorkspaces;
+    });
     if (editingId === id) {
       setEditingId(null);
       setEditForm({});

@@ -10,7 +10,13 @@ import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   ControlledTreeEnvironment,
   DraggingPosition,
@@ -214,6 +220,10 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
 
   const [items, setItems] =
     useState<Record<TreeItemIndex, TreeItem<string>>>(workspaceTreeData);
+  useEffect(() => {
+    setItems(workspaceTreeData);
+  }, [workspaceTreeData]);
+
   const dataProvider = useMemo(
     () => new TreeDataProvider<string>(items),
     [items]

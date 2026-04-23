@@ -18,6 +18,8 @@ interface WorkspaceLayoutProps {
   params: Promise<{ workspaceId: string }>;
 }
 
+//TODO: Prefetch errors will crash the layout / leak via Next.js error boundary.
+// If either getMyWorkspaces or getWorkspaceTree rejects (e.g., invalid workspaceId, unauthenticated user, backend down), Promise.all rejects and the whole workspace layout — including the sidebar chrome — fails to render. Prefer prefetchQuery inside a try/catch or using queryClient.fetchQuery only where hydration is strictly needed, and let the client useSuspenseQuery boundary handle errors with a proper error UI. At minimum, consider an error.tsx boundary for this route segment so users don't see an unstyled error page.
 export default async function WorkspaceLayout({
   children,
   params,
