@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "preserve",
+    "module": "esnext",
     "moduleResolution": "bundler",
     "types": ["node"],
     "experimentalDecorators": true,
@@ -12,8 +12,7 @@
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
     "paths": {
-      "#/*": ["./src/*"],
-      "@database/*": ["./database/*"]
+      "#/*": ["./src/*"]
     }
   },
   "include": ["src/**/*", "../../packages/lib/src/server/types.d.ts"],

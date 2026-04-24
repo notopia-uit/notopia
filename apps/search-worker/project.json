@@ -39,7 +39,7 @@
       "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
       "executor": "nx:noop"
     },
-    "dev": {
+    "run": {
       "continuous": true,
       "executor": "@nx/js:node",
       "dependsOn": ["build"],

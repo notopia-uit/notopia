@@ -30,12 +30,12 @@
       },
       "cache": false
     },
-    "dev": {
+    "run": {
       "executor": "nx:run-commands",
       "inputs": ["default"],
       "options": {
-        "command": "go run .",
-        "cwd": "{projectRoot}",
+        "command": "go run ./cmd/note/",
+        "cwd": "{workspaceRoot}",
         "tty": true
       },
       "dependsOn": ["gen", "^gen*"],
@@ -45,8 +45,19 @@
       "executor": "nx:run-commands",
       "inputs": ["default"],
       "options": {
-        "command": "go build -o ./note .",
-        "cwd": "{projectRoot}"
+        "command": "go build -o ./cmd/note/note ./cmd/note/",
+        "cwd": "{workspaceRoot}"
+      },
+      "configurations": {
+        "debug": {
+          "command": "go build -gcflags='all=-N -l' -o ./cmd/note/__debug_bin ./cmd/note/"
+        },
+        "development": {
+          "command": "go build -o ./cmd/note/note ./cmd/note/"
+        },
+        "production": {
+          "command": "go build -ldflags='-s -w' -o ./cmd/note/note ./cmd/note/"
+        }
       },
       "dependsOn": ["gen", "^gen*", "^build*"]
     },
@@ -63,10 +74,9 @@
     },
     "debug": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
-        "command": "dlv debug --headless --listen=127.0.0.1:23451 --accept-multiclient",
-        "cwd": "{projectRoot}",
+        "command": "dlv debug --headless --listen=127.0.0.1:23451 --accept-multiclient --output ./cmd/note/__debug_bin ./cmd/note/",
+        "cwd": "{workspaceRoot}",
         "tty": true
       },
       "dependsOn": ["gen", "^gen*"],

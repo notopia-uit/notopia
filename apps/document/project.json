@@ -32,17 +32,22 @@
       "parallelism": false
     },
     "build": {
-      "defaultConfiguration": "development",
+      "options": {
+        "mode": "development",
+        "args": ["--node-env=development"]
+      },
       "configurations": {
         "development": {
-          "mode": "development"
+          "mode": "development",
+          "args": ["--node-env=development"]
         },
         "production": {
-          "mode": "production"
+          "mode": "production",
+          "args": ["--node-env=production"]
         }
       }
     },
-    "dev": {
+    "run": {
       "continuous": true,
       "executor": "@nx/js:node",
       "dependsOn": ["build"],
@@ -58,7 +63,8 @@
           "buildTarget": "document:build:development"
         },
         "production": {
-          "buildTarget": "document:build:production"
+          "buildTarget": "document:build:production",
+          "inspect": false
         }
       }
     }

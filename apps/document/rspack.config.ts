@@ -14,12 +14,15 @@ const tsConfigFile = join(__dirname, 'tsconfig.app.json');
 
 const config: Configuration = {
   target: 'node',
+  // devtool: process.env['NODE_ENV'] === 'production' ? false : 'source-map',
+  // devtool: 'source-map',
   output: {
     module: isEsm,
     path: join(__dirname, './dist'),
     chunkFormat: isEsm ? 'module' : 'array-push',
-    filename: '[name].js',
+    filename: `[name].${isEsm ? 'm' : 'c'}js`,
     chunkFilename: '[name].[contenthash].js',
+    devtoolModuleFilenameTemplate: '[absolute-resource-path]',
   },
   experiments: {
     outputModule: isEsm,
@@ -58,7 +61,7 @@ const config: Configuration = {
                   legacyDecorator: true,
                   decoratorMetadata: true,
                 },
-                target: 'es2021',
+                target: 'esnext',
               },
               sourceMaps: process.env['NODE_ENV'] !== 'production',
             },

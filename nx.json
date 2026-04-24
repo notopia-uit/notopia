@@ -38,6 +38,7 @@
     },
     "build*": {
       "dependsOn": ["^build*", "^bundle*", "^gen"],
+      "defaultConfiguration": "development",
       "cache": true
     },
     "dev": {

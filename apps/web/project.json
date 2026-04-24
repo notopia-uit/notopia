@@ -10,6 +10,12 @@
         "hostname": "0.0.0.0"
       }
     },
+    "debug": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm -F @notopia-uit/web run next --hostname 0.0.0.0 --inspect=9300"
+      }
+    },
     "serve-static": {
       "options": {
         "hostname": "0.0.0.0"

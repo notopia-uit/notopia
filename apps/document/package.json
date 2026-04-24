@@ -1,6 +1,7 @@
 {
   "name": "@notopia-uit/document",
   "private": true,
+  "type": "module",
   "scripts": {
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
     "typeorm-extension": "tsx ./node_modules/typeorm-extension/bin/cli.mjs",

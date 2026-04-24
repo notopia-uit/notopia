@@ -5,59 +5,154 @@
       "name": "Debug Note",
       "type": "go",
       "request": "launch",
-      "program": "${workspaceFolder}/cmd/note",
-      "envFile": "${workspaceFolder}/cmd/note/.env"
+      "mode": "exec",
+      "port": 23451,
+      "cwd": "${workspaceFolder}",
+      "dlvFlags": ["--output=${workspaceFolder}/cmd/note/__debug_bin"],
+      "program": "${workspaceFolder}/cmd/note/__debug_bin",
+      "envFile": "${workspaceFolder}/cmd/note/.env",
+      "preLaunchTask": "Build Note (Debug)"
     },
     {
-      "name": "Attach to Note",
+      "name": "Attach Note",
       "type": "go",
+      "debugAdapter": "dlv-dap",
       "request": "attach",
       "mode": "remote",
-      "port": 23451,
       "host": "127.0.0.1",
-      "substitutePath": [
-        {
-          "from": "${workspaceFolder}",
-          "to": "${workspaceFolder}"
-        }
-      ]
+      "port": 23451
     },
     {
       "name": "Debug Authorization",
       "type": "go",
       "request": "launch",
-      "program": "${workspaceFolder}/cmd/authorization",
-      "envFile": "${workspaceFolder}/cmd/authorization/.env"
+      "mode": "exec",
+      "port": 23459,
+      "cwd": "${workspaceFolder}",
+      "dlvFlags": ["--output=${workspaceFolder}/cmd/authorization/__debug_bin"],
+      "program": "${workspaceFolder}/cmd/authorization/__debug_bin",
+      "envFile": "${workspaceFolder}/cmd/authorization/.env",
+      "preLaunchTask": "Build Authorization (Debug)"
     },
     {
-      "name": "Attach to Authorization",
+      "name": "Attach Authorization",
       "type": "go",
+      "debugAdapter": "dlv-dap",
       "request": "attach",
       "mode": "remote",
-      "port": 23459,
       "host": "127.0.0.1",
-      "substitutePath": [
-        {
-          "from": "${workspaceFolder}",
-          "to": "${workspaceFolder}"
-        }
+      "port": 23459
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Debug Document",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["exec", "nx", "run", "document"],
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMapPathOverrides": {
+        "webpack://@notopia-uit/document/./*": "${workspaceFolder}/apps/document/*",
+        "webpack://@notopia-uit/document/*": "${workspaceFolder}/apps/document/*",
+        "webpack://@notopia-uit/document/../../node_modules/*": "${workspaceFolder}/node_modules/*"
+      },
+      "outFiles": [
+        "${workspaceFolder}/apps/document/dist/**/*.(m|c|)js",
+        "!**/node_modules/**"
       ]
     },
     {
+      "type": "pwa-node",
+      "request": "attach",
+      "name": "Attach Document",
+      "address": "localhost",
+      "port": 9222,
+      "skipFiles": ["<node_internals>/**"],
+      "restart": true,
+      "sourceMapPathOverrides": {
+        "webpack://@notopia-uit/document/./*": "${workspaceFolder}/apps/document/*",
+        "webpack://@notopia-uit/document/*": "${workspaceFolder}/apps/document/*",
+        "webpack://@notopia-uit/document/../../node_modules/*": "${workspaceFolder}/node_modules/*"
+      },
+      "outFiles": [
+        "${workspaceFolder}/apps/document/dist/**/*.(m|c|)js",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Debug Search Worker",
+      "runtimeExecutable": "pnpm exec nx",
+      "runtimeArgs": ["run", "search-worker"],
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMapPathOverrides": {
+        "webpack://@notopia-uit/search-worker/./*": "${workspaceFolder}/apps/search-worker/*",
+        "webpack://@notopia-uit/search-worker/*": "${workspaceFolder}/apps/search-worker/*",
+        "webpack://@notopia-uit/search-worker/../../node_modules/*": "${workspaceFolder}/node_modules/*"
+      },
+      "outFiles": [
+        "${workspaceFolder}/apps/search-worker/dist/**/*.(m|c|)js",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "type": "pwa-node",
+      "request": "attach",
+      "name": "Attach Search Worker",
+      "address": "localhost",
+      "port": 9223,
+      "skipFiles": ["<node_internals>/**"],
+      "restart": true,
+      "sourceMapPathOverrides": {
+        "webpack://@notopia-uit/search-worker/./*": "${workspaceFolder}/apps/search-worker/*",
+        "webpack://@notopia-uit/search-worker/*": "${workspaceFolder}/apps/search-worker/*",
+        "webpack://@notopia-uit/search-worker/../../node_modules/*": "${workspaceFolder}/node_modules/*"
+      },
+      "outFiles": [
+        "${workspaceFolder}/apps/search-worker/dist/**/*.(m|c|)js",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "Debug Web (Full)",
       "type": "node",
       "request": "launch",
-      "name": "Debug Edit with Nx",
-      "runtimeExecutable": "pnpm exec",
-      "runtimeArgs": ["nx", "serve", "edit"],
-      "env": {
-        "NODE_OPTIONS": "--inspect=9229"
-      },
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["exec", "nx", "run", "web:debug"],
       "skipFiles": ["<node_internals>/**"],
-      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack://_N_E/*": "${workspaceFolder}/*",
+        "../../../*": "${workspaceFolder}/*",
+        "../../*": "${workspaceFolder}/*",
+        "server/app/*": "${workspaceFolder}/apps/web/app/*",
+        "server/chunks/ssr/[root-of-the-server]__*": "${workspaceFolder}/apps/web/*",
+        "server/chunks/ssr/packages_ui_src_*": "${workspaceFolder}/packages/ui/src/*",
+        "server/chunks/ssr/packages_*": "${workspaceFolder}/packages/*",
+        "/turbopack/[project]/*": "${workspaceFolder}/*"
+      },
       "outFiles": [
-        "${workspaceFolder}/apps/edit/dist/**/*.(m|c|)js",
+        "${workspaceFolder}/apps/web/.next/**/*.js",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "Attach Web (Full)",
+      "type": "pwa-node",
+      "request": "attach",
+      "port": 9300,
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMapPathOverrides": {
+        "webpack://_N_E/*": "${workspaceFolder}/*",
+        "../../../*": "${workspaceFolder}/*",
+        "../../*": "${workspaceFolder}/*",
+        "server/app/*": "${workspaceFolder}/apps/web/app/*",
+        "server/chunks/ssr/[root-of-the-server]__*": "${workspaceFolder}/apps/web/*",
+        "server/chunks/ssr/packages_ui_src_*": "${workspaceFolder}/packages/ui/src/*",
+        "server/chunks/ssr/packages_*": "${workspaceFolder}/packages/*",
+        "/turbopack/[project]/*": "${workspaceFolder}/*"
+      },
+      "outFiles": [
+        "${workspaceFolder}/apps/web/.next/**/*.js",
         "!**/node_modules/**"
       ]
     }

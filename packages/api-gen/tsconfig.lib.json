@@ -3,15 +3,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "moduleResolution": "bundler",
-    "jsx": "preserve",
-    "noEmit": false,
-    "resolveJsonModule": true,
     "lib": ["dom", "dom.iterable", "ES2024"],
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "rootDir": "src",
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",

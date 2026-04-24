@@ -1,6 +1,9 @@
 {
   "name": "@notopia-uit/web",
   "private": true,
+  "scripts": {
+    "next": "next"
+  },
   "dependencies": {
     "@notopia-uit/ui": "workspace:",
     "@tanstack/react-query": "catalog:",

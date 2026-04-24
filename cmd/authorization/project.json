@@ -25,12 +25,12 @@
       },
       "cache": false
     },
-    "dev": {
+    "run": {
       "executor": "nx:run-commands",
       "inputs": ["default"],
       "options": {
-        "command": "go run .",
-        "cwd": "{projectRoot}",
+        "command": "go run ./cmd/authorization/",
+        "cwd": "{workspaceRoot}",
         "tty": true
       },
       "continuous": true
@@ -39,8 +39,8 @@
       "executor": "nx:run-commands",
       "inputs": ["default"],
       "options": {
-        "command": "go build -o ./authorization .",
-        "cwd": "{projectRoot}"
+        "command": "go build -o ./cmd/authorization/authorization ./cmd/authorization/",
+        "cwd": "{workspaceRoot}"
       },
       "dependsOn": ["gen:wire", "gen:mockery", "^gen*", "^build*"]
     },
@@ -57,10 +57,9 @@
     },
     "debug": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
-        "command": "dlv debug --headless --listen=127.0.0.1:23459 --accept-multiclient",
-        "cwd": "{projectRoot}",
+        "command": "dlv debug --headless --listen=127.0.0.1:23459 --accept-multiclient --output ./cmd/authorization/__debug_bin ./cmd/authorization/",
+        "cwd": "{workspaceRoot}",
         "tty": true
       },
       "dependsOn": ["gen:wire", "^gen*"],
