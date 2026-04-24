@@ -3,8 +3,12 @@
 import {
   NoteUserWorkspace,
   getMyWorkspacesOptions,
+  useCreateWorkspaceMutation,
 } from '@notopia-uit/api-gen';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { Button } from '@notopia-uit/ui/components/shadcn/button';
+import { Input } from '@notopia-uit/ui/components/shadcn/input';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import {
   AudioWaveform,
   BadgeCheck,
@@ -18,6 +22,7 @@ import {
   LogOut,
   MoreHorizontal,
   Plus,
+  Save,
   Settings2,
   Sparkles,
   Trash2,
@@ -26,6 +31,14 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from './shadcn/avatar';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './shadcn/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +49,14 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from './shadcn/dropdown-menu';
+import { Label } from './shadcn/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './shadcn/select';
 import {
   Sidebar,
   SidebarContent,
@@ -51,6 +72,127 @@ import {
 } from './shadcn/sidebar';
 import TreeView from './tree-view';
 
+const generateSlug = (name: string) => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+};
+
+export function CreateWorkspaceDialog() {
+  const queryClient = useQueryClient();
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [userRole, setUserRole] = useState('owner');
+
+  const { mutate: createWorkspace, isPending: isCreating } =
+    useCreateWorkspaceMutation({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: getMyWorkspacesOptions({}).queryKey,
+        });
+
+        setName('');
+        setSlug('');
+        setUserRole('owner');
+
+        setIsOpen(false);
+      },
+    });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !slug) return;
+
+    createWorkspace({
+      body: {
+        name: name,
+        slug: slug,
+      },
+    });
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="sm:max-w-106.25">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>Create New Workspace</DialogTitle>
+            <DialogDescription>
+              Set up a new workspace to organize your notes and graphs.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Workspace Name</Label>
+              <Input
+                id="name"
+                placeholder="e.g. My Awesome Project"
+                value={name}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setName(newName);
+                  setSlug(generateSlug(newName));
+                }}
+                disabled={isCreating}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="slug">Slug URL</Label>
+              <Input
+                id="slug"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                disabled={isCreating}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="role">Initial Role</Label>
+              <Select
+                value={userRole}
+                onValueChange={setUserRole}
+                disabled={isCreating}
+              >
+                <SelectTrigger id="role">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="owner">Owner</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="member">Member</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+              disabled={isCreating}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isCreating}>
+              {isCreating ? (
+                <Spinner className="mr-2 size-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 size-4" />
+              )}
+              Create
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+//TODO: get user data from betterauth
 const data = {
   user: {
     name: 'shadcn',
@@ -309,6 +451,7 @@ export default function WorkspaceSideBar({
                   <LogOut />
                   Log out
                 </DropdownMenuItem>
+                <CreateWorkspaceDialog />
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
