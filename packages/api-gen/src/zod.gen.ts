@@ -92,6 +92,8 @@ export const zShareWorkspaceMemberAddedEvent = z.object({
     role: zShareWorkspaceRole
 });
 
+export const zDocumentId = z.uuid();
+
 export const zDocumentError = z.object({
     code: z.string(),
     message: z.string(),
@@ -434,9 +436,9 @@ export const zNoteWorkspaceTreeFolderWritable = z.object({
 /**
  * Unique identifier of the document (note)
  */
-export const zDocumentDocumentIdPath = z.uuid();
+export const zDocumentDocumentIdPath = zDocumentId;
 
-export const zDocumentDocumentIdQuery = z.uuid();
+export const zDocumentDocumentIdQuery = zDocumentId;
 
 /**
  * Page number for pagination
@@ -459,7 +461,7 @@ export const zNoteWorkspaceSlugPath = zNoteSlug;
 export const zNoteWorkspaceIdPath = zNoteWorkspacePropertiesId;
 
 export const zGetDocumentAttachmentUploadUrlPath = z.object({
-    documentId: z.uuid()
+    documentId: zDocumentId
 });
 
 /**
@@ -471,7 +473,7 @@ export const zGetDocumentAttachmentUploadUrlResponse = z.object({
 });
 
 export const zCommitDocumentPath = z.object({
-    documentId: z.uuid()
+    documentId: zDocumentId
 });
 
 /**
@@ -480,7 +482,7 @@ export const zCommitDocumentPath = z.object({
 export const zCommitDocumentResponse = z.void();
 
 export const zGetRevisionsQuery = z.object({
-    documentId: z.uuid(),
+    documentId: zDocumentId,
     page: z.int().gte(1).optional().default(1),
     limit: z.int().gte(1).lte(100).optional().default(20)
 });

@@ -22,6 +22,11 @@ docker-up-monitoring:
       up \
       -d
 
+docker-stop-all:
+    docker compose \
+      --profile="*" \
+      down
+
 export-authentik-blueprint:
     docker exec notopia-authentik_worker ak export_blueprint
 

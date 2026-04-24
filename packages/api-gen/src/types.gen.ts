@@ -101,6 +101,8 @@ export const ShareWorkspaceRole = {
 
 export type ShareWorkspaceRole = typeof ShareWorkspaceRole[keyof typeof ShareWorkspaceRole];
 
+export type DocumentId = string;
+
 export type DocumentError = {
     /**
      * Error code
@@ -504,9 +506,9 @@ export type NoteWorkspaceTreeFolderWritable = {
 /**
  * Unique identifier of the document (note)
  */
-export type DocumentDocumentIdPath = string;
+export type DocumentDocumentIdPath = DocumentId;
 
-export type DocumentDocumentIdQuery = string;
+export type DocumentDocumentIdQuery = DocumentId;
 
 /**
  * Page number for pagination
@@ -534,7 +536,7 @@ export type GetDocumentAttachmentUploadUrlData = {
         /**
          * Unique identifier of the document (note)
          */
-        documentId: string;
+        documentId: DocumentId;
     };
     query?: never;
     url: '/document/documents/{documentId}/attachment-url';
@@ -592,7 +594,7 @@ export type CommitDocumentData = {
         /**
          * Unique identifier of the document (note)
          */
-        documentId: string;
+        documentId: DocumentId;
     };
     query?: never;
     url: '/document/documents/{documentId}/commit';
@@ -645,7 +647,7 @@ export type GetRevisionsData = {
     body?: never;
     path?: never;
     query: {
-        documentId: string;
+        documentId: DocumentId;
         /**
          * Page number for pagination
          */
