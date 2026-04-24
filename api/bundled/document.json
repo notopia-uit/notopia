@@ -388,7 +388,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
+            "example": "000c2575-1847-5293-8117-2415a2328ef8",
             "readOnly": true
           },
           "name": {
@@ -458,6 +458,12 @@
           "hasNext",
           "hasPrev"
         ]
+      },
+      "id-2": {
+        "type": "string",
+        "format": "uuid",
+        "example": "000c2575-1847-5293-8117-2415a2328ef8",
+        "readOnly": true
       },
       "DocumentContent": {
         "type": "array",
@@ -699,10 +705,8 @@
         "in": "path",
         "required": true,
         "schema": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+          "$ref": "#/components/schemas/id-2"
+        }
       }
     },
     "responses": {

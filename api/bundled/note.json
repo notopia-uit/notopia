@@ -9146,7 +9146,7 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "$ref": "#/components/schemas/properties-name"
+                    "$ref": "#/components/schemas/name-2"
                   }
                 },
                 "required": [
@@ -18350,7 +18350,7 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/properties-id"
+                      "$ref": "#/components/schemas/id-2"
                     }
                   },
                   "folderIds": {
@@ -18416,7 +18416,7 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/properties-id"
+                      "$ref": "#/components/schemas/id-2"
                     }
                   },
                   "folderIds": {
@@ -18510,7 +18510,7 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "$ref": "#/components/schemas/Workspace_properties-name"
+                    "$ref": "#/components/schemas/name-3"
                   }
                 },
                 "required": [
@@ -18566,7 +18566,7 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/properties-id"
+                      "$ref": "#/components/schemas/id-2"
                     }
                   },
                   "folderIds": {
@@ -18687,7 +18687,7 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/properties-id"
+                      "$ref": "#/components/schemas/id-2"
                     }
                   },
                   "folderIds": {
@@ -19030,7 +19030,7 @@
           "trashed"
         ]
       },
-      "properties-id": {
+      "id-2": {
         "type": "string",
         "format": "uuid",
         "example": "000c2575-1847-5293-8117-2415a2328ef8",
@@ -19107,7 +19107,7 @@
           "links"
         ]
       },
-      "properties-name": {
+      "name-2": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
@@ -19123,10 +19123,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/id-2"
           },
           "name": {
-            "$ref": "#/components/schemas/properties-name"
+            "$ref": "#/components/schemas/name-2"
           },
           "icon": {
             "$ref": "#/components/schemas/icon"
@@ -19192,7 +19192,7 @@
           "role"
         ]
       },
-      "Workspace_properties-id": {
+      "id-3": {
         "type": "string",
         "format": "uuid",
         "example": "00000000-0000-0000-0000-000000000110",
@@ -19239,7 +19239,7 @@
             "x-go-type-name": "WorkspaceDeletedEventData",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Workspace_properties-id"
+                "$ref": "#/components/schemas/id-3"
               }
             },
             "required": [
@@ -19273,7 +19273,7 @@
             "x-go-type-name": "WorkspaceItemsUpdatedEventData",
             "properties": {
               "workspaceId": {
-                "$ref": "#/components/schemas/Workspace_properties-id"
+                "$ref": "#/components/schemas/id-3"
               }
             },
             "required": [
@@ -19307,7 +19307,7 @@
             "x-go-type-name": "WorkspaceMembersUpdatedEventData",
             "properties": {
               "workspaceId": {
-                "$ref": "#/components/schemas/Workspace_properties-id"
+                "$ref": "#/components/schemas/id-3"
               }
             },
             "required": [
@@ -19321,7 +19321,7 @@
           "data"
         ]
       },
-      "Workspace_properties-name": {
+      "name-3": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
@@ -19347,10 +19347,10 @@
             "x-go-type-name": "WorkspaceRenamedEventData",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Workspace_properties-id"
+                "$ref": "#/components/schemas/id-3"
               },
               "name": {
-                "$ref": "#/components/schemas/Workspace_properties-name"
+                "$ref": "#/components/schemas/name-3"
               }
             },
             "required": [
@@ -19385,7 +19385,7 @@
             "x-go-type-name": "WorkspaceSlugChangedEventData",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/Workspace_properties-id"
+                "$ref": "#/components/schemas/id-3"
               },
               "slug": {
                 "$ref": "#/components/schemas/slug"
@@ -19403,12 +19403,12 @@
           "data"
         ]
       },
-      "User_properties-id": {
+      "id-4": {
         "type": "string",
         "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
         "example": "100"
       },
-      "User_properties-name": {
+      "name-4": {
         "type": "string",
         "description": "Full name from Authentik",
         "example": "User",
@@ -19418,10 +19418,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/User_properties-id"
+            "$ref": "#/components/schemas/id-4"
           },
           "name": {
-            "$ref": "#/components/schemas/User_properties-name",
+            "$ref": "#/components/schemas/name-4",
             "readOnly": true
           },
           "role": {
@@ -19500,7 +19500,7 @@
           "trashed"
         ]
       },
-      "properties-icon": {
+      "icon-2": {
         "type": "string",
         "nullable": true,
         "example": "📁"
@@ -19515,10 +19515,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/id-2"
           },
           "name": {
-            "$ref": "#/components/schemas/properties-name"
+            "$ref": "#/components/schemas/name-2"
           },
           "icon": {
             "$ref": "#/components/schemas/icon"
@@ -19544,7 +19544,7 @@
             "$ref": "#/components/schemas/name"
           },
           "icon": {
-            "$ref": "#/components/schemas/properties-icon"
+            "$ref": "#/components/schemas/icon-2"
           },
           "notes": {
             "type": "array",
@@ -19559,7 +19559,7 @@
             }
           },
           "updatedAt": {
-            "$ref": "#/components/schemas/properties-updatedAt"
+            "$ref": "#/components/schemas/updatedAt-2"
           }
         },
         "required": [
@@ -19571,7 +19571,7 @@
           "updatedAt"
         ]
       },
-      "properties-updatedAt": {
+      "updatedAt-2": {
         "type": "string",
         "format": "date-time",
         "example": "2024-06-01T12:00:00Z",
@@ -19701,7 +19701,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/properties-id"
+          "$ref": "#/components/schemas/id-2"
         }
       },
       "workspaceSlugPath": {
@@ -19717,7 +19717,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/Workspace_properties-id"
+          "$ref": "#/components/schemas/id-3"
         }
       }
     }

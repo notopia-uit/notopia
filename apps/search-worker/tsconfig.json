@@ -3,9 +3,17 @@
   "files": [],
   "include": ["seed/**/*.ts"],
   "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "types": ["node"]
   },
   "references": [
+    {
+      "path": "../../packages/lib"
+    },
+    {
+      "path": "../../packages/api-gen"
+    },
     {
       "path": "./tsconfig.app.json"
     }

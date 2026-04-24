@@ -66,7 +66,7 @@ const noteWorkspaceTreeNoteSchemaResponseTransformer = (data: any) => {
     return data;
 };
 
-const notePropertiesUpdatedAtSchemaResponseTransformer = (data: any) => {
+const noteUpdatedAt2SchemaResponseTransformer = (data: any) => {
     data = new Date(data);
     return data;
 };
@@ -74,7 +74,7 @@ const notePropertiesUpdatedAtSchemaResponseTransformer = (data: any) => {
 const noteWorkspaceTreeFolderSchemaResponseTransformer = (data: any) => {
     data.notes = data.notes.map((item: any) => noteWorkspaceTreeNoteSchemaResponseTransformer(item));
     data.children = data.children.map((item: any) => noteWorkspaceTreeFolderSchemaResponseTransformer(item));
-    data.updatedAt = notePropertiesUpdatedAtSchemaResponseTransformer(data.updatedAt);
+    data.updatedAt = noteUpdatedAt2SchemaResponseTransformer(data.updatedAt);
     return data;
 };
 

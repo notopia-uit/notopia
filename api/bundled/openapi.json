@@ -9456,7 +9456,7 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "$ref": "#/components/schemas/note_properties-name"
+                    "$ref": "#/components/schemas/note_name-2"
                   }
                 },
                 "required": [
@@ -18660,7 +18660,7 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_properties-id"
+                      "$ref": "#/components/schemas/note_id-2"
                     }
                   },
                   "folderIds": {
@@ -18726,7 +18726,7 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_properties-id"
+                      "$ref": "#/components/schemas/note_id-2"
                     }
                   },
                   "folderIds": {
@@ -18820,7 +18820,7 @@
                 "type": "object",
                 "properties": {
                   "name": {
-                    "$ref": "#/components/schemas/note_Workspace_properties-name"
+                    "$ref": "#/components/schemas/note_name-3"
                   }
                 },
                 "required": [
@@ -18876,7 +18876,7 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_properties-id"
+                      "$ref": "#/components/schemas/note_id-2"
                     }
                   },
                   "folderIds": {
@@ -18997,7 +18997,7 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_properties-id"
+                      "$ref": "#/components/schemas/note_id-2"
                     }
                   },
                   "folderIds": {
@@ -19311,7 +19311,7 @@
         "type": "object",
         "properties": {
           "workspaceId": {
-            "$ref": "#/components/schemas/share_properties-id"
+            "$ref": "#/components/schemas/share_id-2"
           },
           "userId": {
             "$ref": "#/components/schemas/share_id"
@@ -19330,7 +19330,7 @@
         "type": "object",
         "properties": {
           "workspaceId": {
-            "$ref": "#/components/schemas/share_properties-id"
+            "$ref": "#/components/schemas/share_id-2"
           },
           "userId": {
             "$ref": "#/components/schemas/share_id"
@@ -19349,7 +19349,7 @@
         "type": "object",
         "properties": {
           "workspaceId": {
-            "$ref": "#/components/schemas/share_properties-id"
+            "$ref": "#/components/schemas/share_id-2"
           },
           "userId": {
             "$ref": "#/components/schemas/share_id"
@@ -19534,7 +19534,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+            "example": "000c2575-1847-5293-8117-2415a2328ef8"
           },
           "content": {
             "$ref": "#/components/schemas/share_DocumentContent"
@@ -19575,7 +19575,7 @@
         "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
         "example": "100"
       },
-      "share_properties-id": {
+      "share_id-2": {
         "type": "string",
         "format": "uuid",
         "example": "00000000-0000-0000-0000-000000000110",
@@ -19625,7 +19625,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "ce5060da-b15c-4aee-898f-5449fafacfc4",
+            "example": "000c2575-1847-5293-8117-2415a2328ef8",
             "readOnly": true
           },
           "name": {
@@ -19695,6 +19695,12 @@
           "hasNext",
           "hasPrev"
         ]
+      },
+      "document_id-2": {
+        "type": "string",
+        "format": "uuid",
+        "example": "000c2575-1847-5293-8117-2415a2328ef8",
+        "readOnly": true
       },
       "document_DocumentContent": {
         "type": "array",
@@ -20071,7 +20077,7 @@
           "trashed"
         ]
       },
-      "note_properties-id": {
+      "note_id-2": {
         "type": "string",
         "format": "uuid",
         "example": "000c2575-1847-5293-8117-2415a2328ef8",
@@ -20148,7 +20154,7 @@
           "links"
         ]
       },
-      "note_properties-name": {
+      "note_name-2": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
@@ -20164,10 +20170,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/note_properties-id"
+            "$ref": "#/components/schemas/note_id-2"
           },
           "name": {
-            "$ref": "#/components/schemas/note_properties-name"
+            "$ref": "#/components/schemas/note_name-2"
           },
           "icon": {
             "$ref": "#/components/schemas/note_icon"
@@ -20233,7 +20239,7 @@
           "role"
         ]
       },
-      "note_Workspace_properties-id": {
+      "note_id-3": {
         "type": "string",
         "format": "uuid",
         "example": "00000000-0000-0000-0000-000000000110",
@@ -20280,7 +20286,7 @@
             "x-go-type-name": "WorkspaceDeletedEventData",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/note_Workspace_properties-id"
+                "$ref": "#/components/schemas/note_id-3"
               }
             },
             "required": [
@@ -20314,7 +20320,7 @@
             "x-go-type-name": "WorkspaceItemsUpdatedEventData",
             "properties": {
               "workspaceId": {
-                "$ref": "#/components/schemas/note_Workspace_properties-id"
+                "$ref": "#/components/schemas/note_id-3"
               }
             },
             "required": [
@@ -20348,7 +20354,7 @@
             "x-go-type-name": "WorkspaceMembersUpdatedEventData",
             "properties": {
               "workspaceId": {
-                "$ref": "#/components/schemas/note_Workspace_properties-id"
+                "$ref": "#/components/schemas/note_id-3"
               }
             },
             "required": [
@@ -20362,7 +20368,7 @@
           "data"
         ]
       },
-      "note_Workspace_properties-name": {
+      "note_name-3": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255,
@@ -20388,10 +20394,10 @@
             "x-go-type-name": "WorkspaceRenamedEventData",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/note_Workspace_properties-id"
+                "$ref": "#/components/schemas/note_id-3"
               },
               "name": {
-                "$ref": "#/components/schemas/note_Workspace_properties-name"
+                "$ref": "#/components/schemas/note_name-3"
               }
             },
             "required": [
@@ -20426,7 +20432,7 @@
             "x-go-type-name": "WorkspaceSlugChangedEventData",
             "properties": {
               "id": {
-                "$ref": "#/components/schemas/note_Workspace_properties-id"
+                "$ref": "#/components/schemas/note_id-3"
               },
               "slug": {
                 "$ref": "#/components/schemas/note_slug"
@@ -20444,12 +20450,12 @@
           "data"
         ]
       },
-      "note_User_properties-id": {
+      "note_id-4": {
         "type": "string",
         "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
         "example": "100"
       },
-      "note_User_properties-name": {
+      "note_name-4": {
         "type": "string",
         "description": "Full name from Authentik",
         "example": "User",
@@ -20459,10 +20465,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/note_User_properties-id"
+            "$ref": "#/components/schemas/note_id-4"
           },
           "name": {
-            "$ref": "#/components/schemas/note_User_properties-name",
+            "$ref": "#/components/schemas/note_name-4",
             "readOnly": true
           },
           "role": {
@@ -20541,7 +20547,7 @@
           "trashed"
         ]
       },
-      "note_properties-icon": {
+      "note_icon-2": {
         "type": "string",
         "nullable": true,
         "example": "📁"
@@ -20556,10 +20562,10 @@
         "type": "object",
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/note_properties-id"
+            "$ref": "#/components/schemas/note_id-2"
           },
           "name": {
-            "$ref": "#/components/schemas/note_properties-name"
+            "$ref": "#/components/schemas/note_name-2"
           },
           "icon": {
             "$ref": "#/components/schemas/note_icon"
@@ -20585,7 +20591,7 @@
             "$ref": "#/components/schemas/note_name"
           },
           "icon": {
-            "$ref": "#/components/schemas/note_properties-icon"
+            "$ref": "#/components/schemas/note_icon-2"
           },
           "notes": {
             "type": "array",
@@ -20600,7 +20606,7 @@
             }
           },
           "updatedAt": {
-            "$ref": "#/components/schemas/note_properties-updatedAt"
+            "$ref": "#/components/schemas/note_updatedAt-2"
           }
         },
         "required": [
@@ -20612,7 +20618,7 @@
           "updatedAt"
         ]
       },
-      "note_properties-updatedAt": {
+      "note_updatedAt-2": {
         "type": "string",
         "format": "date-time",
         "example": "2024-06-01T12:00:00Z",
@@ -20703,10 +20709,8 @@
         "in": "path",
         "required": true,
         "schema": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+          "$ref": "#/components/schemas/document_id-2"
+        }
       },
       "note_folderIdPath": {
         "name": "folderId",
@@ -20721,7 +20725,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/note_properties-id"
+          "$ref": "#/components/schemas/note_id-2"
         }
       },
       "note_workspaceSlugPath": {
@@ -20737,7 +20741,7 @@
         "in": "path",
         "required": true,
         "schema": {
-          "$ref": "#/components/schemas/note_Workspace_properties-id"
+          "$ref": "#/components/schemas/note_id-3"
         }
       }
     },

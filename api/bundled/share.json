@@ -185,7 +185,7 @@
         "type": "object",
         "properties": {
           "workspaceId": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/id-2"
           },
           "userId": {
             "$ref": "#/components/schemas/id"
@@ -204,7 +204,7 @@
         "type": "object",
         "properties": {
           "workspaceId": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/id-2"
           },
           "userId": {
             "$ref": "#/components/schemas/id"
@@ -223,7 +223,7 @@
         "type": "object",
         "properties": {
           "workspaceId": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/id-2"
           },
           "userId": {
             "$ref": "#/components/schemas/id"
@@ -408,7 +408,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+            "example": "000c2575-1847-5293-8117-2415a2328ef8"
           },
           "content": {
             "$ref": "#/components/schemas/DocumentContent"
@@ -449,7 +449,7 @@
         "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
         "example": "100"
       },
-      "properties-id": {
+      "id-2": {
         "type": "string",
         "format": "uuid",
         "example": "00000000-0000-0000-0000-000000000110",

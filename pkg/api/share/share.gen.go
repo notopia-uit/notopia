@@ -127,8 +127,8 @@ type UserWorkspaceRoleUpdatedEvent struct {
 	Role WorkspaceRole `json:"role"`
 
 	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	UserId      Id            `json:"userId"`
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	UserId      Id   `json:"userId"`
+	WorkspaceId *Id2 `json:"workspaceId,omitempty"`
 }
 
 // WorkspaceMemberAddedEvent defines model for WorkspaceMemberAddedEvent.
@@ -136,15 +136,15 @@ type WorkspaceMemberAddedEvent struct {
 	Role WorkspaceRole `json:"role"`
 
 	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	UserId      Id            `json:"userId"`
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	UserId      Id   `json:"userId"`
+	WorkspaceId *Id2 `json:"workspaceId,omitempty"`
 }
 
 // WorkspaceMemberRemovedEvent defines model for WorkspaceMemberRemovedEvent.
 type WorkspaceMemberRemovedEvent struct {
 	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	UserId      Id            `json:"userId"`
-	WorkspaceId *PropertiesId `json:"workspaceId,omitempty"`
+	UserId      Id   `json:"userId"`
+	WorkspaceId *Id2 `json:"workspaceId,omitempty"`
 }
 
 // WorkspaceRole defines model for WorkspaceRole.
@@ -153,5 +153,5 @@ type WorkspaceRole string
 // Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 type Id = string
 
-// PropertiesId defines model for properties-id.
-type PropertiesId = openapi_types.UUID
+// Id2 defines model for id-2.
+type Id2 = openapi_types.UUID
