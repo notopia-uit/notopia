@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "files": [],
-  "include": [],
+  "include": ["seed/**/*.ts"],
+  "compilerOptions": {
+    "types": ["node"]
+  },
   "references": [
     {
       "path": "./tsconfig.app.json"

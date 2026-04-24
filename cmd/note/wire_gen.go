@@ -162,7 +162,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	kafkaPublisher, cleanup6, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer)
+	kafkaPublisher, cleanup6, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
 	if err != nil {
 		cleanup5()
 		cleanup4()
