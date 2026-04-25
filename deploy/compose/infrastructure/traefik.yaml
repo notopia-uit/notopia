@@ -3,7 +3,7 @@
 services:
   traefik:
     container_name: notopia-traefik
-    image: traefik:v3.6.13
+    image: traefik:v3.6.14
     command:
       - --api.insecure=true
       - --providers.docker=true
