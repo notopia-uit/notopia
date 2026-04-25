@@ -238,7 +238,6 @@
         "version": {
           "conventionalCommits": false
         },
-        "groupPreVersionCommand": "nx run-many -t prune -p document,search-worker,web -c production",
         "releaseTagPatternRequireSemver": false
       }
     },

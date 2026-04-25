@@ -62,6 +62,9 @@
           "inspect": false
         }
       }
+    },
+    "docker:build": {
+      "dependsOn": ["prune", "build", "^build"]
     }
   },
   "release": {

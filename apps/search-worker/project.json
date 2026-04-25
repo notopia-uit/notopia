@@ -59,6 +59,9 @@
         }
       }
     },
+    "docker:build": {
+      "dependsOn": ["prune", "build", "^build"]
+    },
     "nx-release-publish": {
       "parallelism": false
     }

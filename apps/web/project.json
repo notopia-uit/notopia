@@ -45,6 +45,9 @@
       "options": {
         "hostname": "0.0.0.0"
       }
+    },
+    "docker:build": {
+      "dependsOn": ["prune", "build", "^build"]
     }
   },
   "release": {
