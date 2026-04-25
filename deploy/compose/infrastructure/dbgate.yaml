@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
 services:
   dbgate:
-    image: dbgate/dbgate:7.1.8-alpine
+    image: dbgate/dbgate:7.1.9-alpine
     container_name: dbgate
     environment:
       SKIP_ALL_AUTH: true
