@@ -869,8 +869,8 @@ importers:
         specifier: 2.0.0-alpha.17
         version: 2.0.0-alpha.17(@types/node@25.6.0)(axios@1.15.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.32.0)(postcss@8.5.10)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)
       vitepress-plugin-diagrams:
-        specifier: 1.2.2
-        version: 1.2.2(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.6.1)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.3))(vitepress@2.0.0-alpha.17(@types/node@25.6.0)(axios@1.15.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.32.0)(postcss@8.5.10)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))
+        specifier: 1.3.0
+        version: 1.3.0(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.6.1)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.3))(vitepress@2.0.0-alpha.17(@types/node@25.6.0)(axios@1.15.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.32.0)(postcss@8.5.10)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3))
       vitepress-sidebar:
         specifier: 1.33.1
         version: 1.33.1
@@ -16294,8 +16294,8 @@ packages:
       vitepress: '>=1.0.0'
       vue: ^3.0.0
 
-  vitepress-plugin-diagrams@1.2.2:
-    resolution: {integrity: sha512-Ke1xvunKue38ZWixBLrumD+rC6F9y6idnLryD6fGZ6dmEDtihQYVLoS3bSSu9rIWXLgUFGvLQ9CHRntuLfRoxQ==}
+  vitepress-plugin-diagrams@1.3.0:
+    resolution: {integrity: sha512-4NRS/wdoauUFxIFZjrH/WxJDzQjeu4FBu4MIW3AL5uWyexjSstcHgwRfxExGjpQyqEKW7jBBAcjD2LnoGeerRA==}
     hasBin: true
     peerDependencies:
       vite: '>= 4.0.0'
@@ -36161,7 +36161,7 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
 
-  vitepress-plugin-diagrams@1.2.2(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.6.1)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.3))(vitepress@2.0.0-alpha.17(@types/node@25.6.0)(axios@1.15.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.32.0)(postcss@8.5.10)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)):
+  vitepress-plugin-diagrams@1.3.0(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.3)(jiti@2.6.1)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.3))(vitepress@2.0.0-alpha.17(@types/node@25.6.0)(axios@1.15.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.6.1)(less@4.5.1)(lightningcss@1.32.0)(postcss@8.5.10)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@6.0.3)(yaml@2.8.3)):
     dependencies:
       commander: 14.0.3
       markdown-it: 14.1.1
