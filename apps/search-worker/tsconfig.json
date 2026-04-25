@@ -3,8 +3,10 @@
   "files": [],
   "include": ["seed/**/*.ts"],
   "compilerOptions": {
-    "module": "esnext",
+    "module": "preserve",
     "moduleResolution": "bundler",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "types": ["node"]
   },
   "references": [

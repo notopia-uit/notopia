@@ -42,6 +42,17 @@
         "command": "go build -o ./cmd/authorization/authorization ./cmd/authorization/",
         "cwd": "{workspaceRoot}"
       },
+      "configurations": {
+        "debug": {
+          "command": "go build -gcflags='all=-N -l' -o ./cmd/authorization/__debug_bin ./cmd/authorization/"
+        },
+        "development": {
+          "command": "go build -o ./cmd/authorization/authorization ./cmd/authorization/"
+        },
+        "production": {
+          "command": "go build -ldflags='-s -w' -o ./cmd/authorization/authorization ./cmd/authorization/"
+        }
+      },
       "dependsOn": ["gen:wire", "gen:mockery", "^gen*", "^build*"]
     },
     "preview": {

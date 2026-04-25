@@ -5,12 +5,12 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 \
   go build \
-  # -ldflags "-s -w -extldflags '-static'" \
+  -ldflags='-s -w' \
   -o authorization \
   ./cmd/authorization
 
 FROM alpine:3.23 AS final
 WORKDIR /app
 COPY --from=builder /app/authorization .
-EXPOSE 8080
+EXPOSE 8089 18089 28089
 ENTRYPOINT ["/app/authorization"]
