@@ -39,7 +39,7 @@ catalog:
   '@nestjs/core': '11.1.19'
   '@nestjs/microservices': '11.1.19'
   '@nestjs/platform-express': '11.1.19'
-  '@typescript/native-preview': '7.0.0-dev.20260422.1'
+  '@typescript/native-preview': '7.0.0-dev.20260425.1'
   '@nestjs/platform-socket.io': '11.1.19'
   '@nestjs/platform-ws': '11.1.19'
   '@nestjs/schematics': '11.0.10'
