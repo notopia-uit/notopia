@@ -12,7 +12,7 @@ catalog:
   '@hey-api/openapi-ts': '0.96.1'
   '@openapitools/openapi-generator-cli': '2.31.1'
   '@redocly/cli': '2.29.2'
-  '@scalar/cli': '1.8.7'
+  '@scalar/cli': '1.8.8'
   google-protobuf: '4.0.2'
   '@aws-sdk/client-s3': '3.1008.0'
   '@aws-sdk/s3-request-presigner': '3.1008.0'
