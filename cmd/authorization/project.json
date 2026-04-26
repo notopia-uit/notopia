@@ -33,6 +33,7 @@
         "cwd": "{workspaceRoot}",
         "tty": true
       },
+      "dependsOn": ["build-deps"],
       "continuous": true
     },
     "build": {
@@ -53,7 +54,11 @@
           "command": "go build -ldflags='-s -w' -o ./cmd/authorization/authorization ./cmd/authorization/"
         }
       },
-      "dependsOn": ["gen:wire", "gen:mockery", "^gen*", "^build*"]
+      "dependsOn": ["gen", "^gen*", "^build*"]
+    },
+    "build-deps": {
+      "executor": "nx:noop",
+      "dependsOn": ["gen", "^gen*", "^build*"]
     },
     "preview": {
       "executor": "nx:run-commands",
@@ -73,7 +78,7 @@
         "cwd": "{workspaceRoot}",
         "tty": true
       },
-      "dependsOn": ["gen:wire", "^gen*"],
+      "dependsOn": ["build-deps"],
       "continuous": true
     },
     "lint": {
@@ -85,11 +90,8 @@
       "cache": false,
       "parallelism": false
     },
-    "tidy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "go mod tidy"
-      }
+    "gen": {
+      "dependsOn": ["gen:wire", "gen:mockery"]
     },
     "nx-release-publish": {
       "parallelism": false

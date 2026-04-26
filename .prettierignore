@@ -22,3 +22,4 @@ packages/ui/src/components/shadcn/**
 packages/ui/src/lib/shadcn/**
 packages/ui/src/hooks/shadcn/**
 packages/pb/src/**
+.nx/self-healing

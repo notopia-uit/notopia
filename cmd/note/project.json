@@ -38,7 +38,7 @@
         "cwd": "{workspaceRoot}",
         "tty": true
       },
-      "dependsOn": ["gen", "^gen*"],
+      "dependsOn": ["build-deps"],
       "continuous": true
     },
     "build": {
@@ -61,6 +61,10 @@
       },
       "dependsOn": ["gen", "^gen*", "^build*"]
     },
+    "build-deps": {
+      "executor": "nx:noop",
+      "dependsOn": ["gen", "^gen*", "^build*"]
+    },
     "preview": {
       "executor": "nx:run-commands",
       "inputs": ["default"],
@@ -79,7 +83,7 @@
         "cwd": "{workspaceRoot}",
         "tty": true
       },
-      "dependsOn": ["gen", "^gen*"],
+      "dependsOn": ["build-deps"],
       "continuous": true
     },
     "lint": {
@@ -90,12 +94,6 @@
       },
       "cache": false,
       "parallelism": false
-    },
-    "tidy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "go mod tidy"
-      }
     },
     "goose": {
       "executor": "nx:run-commands",

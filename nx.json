@@ -195,30 +195,13 @@
         }
       },
       "docker-go": {
-        "projects": ["note", "authorization", "document", "web"],
-        "releaseTag": {
-          "pattern": "{projectName}@{version}"
-        },
-        "changelog": {
-          "createRelease": "github",
-          "file": false
-        },
-        "docker": {
-          "registryUrl": "ghcr.io",
-          "skipVersionActions": true,
-          "versionSchemes": {
-            "production": "{currentDate|YYMM.DD.HHmm}",
-            "development": "dev-{currentDate|YYMM.DD.HHmm}"
-          }
-        },
-        "projectsRelationship": "independent",
-        "version": {
-          "conventionalCommits": false
-        },
-        "releaseTagPatternRequireSemver": false
-      },
-      "docker-js": {
-        "projects": ["document", "search-worker", "web"],
+        "projects": [
+          "note",
+          "authorization",
+          "document",
+          "search-worker",
+          "web"
+        ],
         "releaseTag": {
           "pattern": "{projectName}@{version}"
         },

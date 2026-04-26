@@ -2,26 +2,6 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "web",
   "targets": {
-    "prune-lockfile": {
-      "dependsOn": ["build"],
-      "cache": true,
-      "executor": "@nx/js:prune-lockfile",
-      "options": {
-        "outputPath": "{projectRoot}/.next/"
-      }
-    },
-    "copy-workspace-modules": {
-      "dependsOn": ["build"],
-      "cache": true,
-      "executor": "@nx/js:copy-workspace-modules",
-      "options": {
-        "outputPath": "{projectRoot}/.next/"
-      }
-    },
-    "prune": {
-      "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
-      "executor": "nx:noop"
-    },
     "nx-release-publish": {
       "parallelism": false
     },

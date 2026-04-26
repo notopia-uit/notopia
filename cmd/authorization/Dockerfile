@@ -13,4 +13,4 @@ FROM alpine:3.23 AS final
 WORKDIR /app
 COPY --from=builder /app/authorization .
 EXPOSE 8089 18089 28089
-ENTRYPOINT ["/app/authorization"]
+ENTRYPOINT ["./authorization"]

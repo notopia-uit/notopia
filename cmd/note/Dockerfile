@@ -13,4 +13,4 @@ FROM alpine:3.23 AS final
 WORKDIR /app
 COPY --from=builder /app/note .
 EXPOSE 8081 18081 28081
-ENTRYPOINT ["/app/note"]
+ENTRYPOINT ["./note"]

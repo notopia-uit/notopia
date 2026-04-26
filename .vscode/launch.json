@@ -127,6 +127,8 @@
         "server/app/*": "${workspaceFolder}/apps/web/app/*",
         "server/chunks/ssr/[root-of-the-server]__*": "${workspaceFolder}/apps/web/*",
         "server/chunks/ssr/packages_ui_src_*": "${workspaceFolder}/packages/ui/src/*",
+        "server/chunks/ssr/packages_lib_src_*": "${workspaceFolder}/packages/lib/src/*",
+        "server/chunks/ssr/packages_api-gen_src_*": "${workspaceFolder}/packages/api-gen/src/*",
         "server/chunks/ssr/packages_*": "${workspaceFolder}/packages/*",
         "/turbopack/[project]/*": "${workspaceFolder}/*"
       },
@@ -148,6 +150,8 @@
         "server/app/*": "${workspaceFolder}/apps/web/app/*",
         "server/chunks/ssr/[root-of-the-server]__*": "${workspaceFolder}/apps/web/*",
         "server/chunks/ssr/packages_ui_src_*": "${workspaceFolder}/packages/ui/src/*",
+        "server/chunks/ssr/packages_lib_src_*": "${workspaceFolder}/packages/lib/src/*",
+        "server/chunks/ssr/packages_api-gen_src_*": "${workspaceFolder}/packages/api-gen/src/*",
         "server/chunks/ssr/packages_*": "${workspaceFolder}/packages/*",
         "/turbopack/[project]/*": "${workspaceFolder}/*"
       },

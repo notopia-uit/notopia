@@ -17,7 +17,7 @@
       "@ui/*": ["../../packages/ui/src/*"],
       "@notopia-uit/ui/*": ["../../packages/ui/src/*"],
       "@notopia-uit/api-gen/*": ["../../packages/api-gen/src/*"],
-      "@notopia-uit/block-note/*": ["../../packages/block-note/src/*"]
+      "@notopia-uit/lib/*": ["../../packages/lib/src/*"]
     }
   },
   "include": [
