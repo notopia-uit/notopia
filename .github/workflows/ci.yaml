@@ -5,6 +5,7 @@ on:
     branches:
       - '**'
     paths-ignore: &pushPathsIgnore
+      - .agents/**/*
       - .dockerignore
       - .editorconfig
       - .gitattributes
@@ -83,10 +84,10 @@ on:
         type: boolean
       releaseContainerType:
         type: choice
-        description: Mark the container tag as production or development
+        description: Container tag as development or production
         options:
-          - production
           - development
+          - production
         default: development
         required: true
 
@@ -138,6 +139,18 @@ jobs:
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v4
 
+      # - name: Get token
+      #   id: get-bot-token
+      #   if: ${{ env.SHOULD_RELEASE == 'true' }}
+      #   uses: actions/create-github-app-token@v2
+      #   with:
+      #     private-key: ${{ secrets.NOTOPIA_BOT_PRIVATE_KEY }}
+      #     app-id: ${{ vars.NOTOPIA_BOT_APP_ID }}
+      #     owner: ${{ github.repository_owner }}
+      #     repositories: |
+      #       ${{ github.event.repository.name }}
+      #       infra
+
       - name: Setup Git User
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
@@ -163,34 +176,34 @@ jobs:
           filter: tree:0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v6
         with:
-          cache: ${{ env.SHOULD_CACHE == 'true' }}
+          cache: true
+          version: 10.28.2
 
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version-file: .tool-versions
-          cache: ${{ env.SHOULD_CACHE == 'true' && 'pnpm' || '' }}
 
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
           go-version-file: .tool-versions
-          cache: ${{ env.SHOULD_CACHE == 'true' }}
+          cache: true
 
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
           install-only: true
           version-file: .tool-versions
-          skip-save-cache: ${{ env.SHOULD_CACHE != 'true' }}
+          skip-save-cache: true
 
       - name: Setup Mise
         uses: jdx/mise-action@v4
         with:
           experimental: true
-          cache: ${{ env.SHOULD_CACHE == 'true' }}
+          cache: true
 
       - name: Cache Buf dependencies
         uses: actions/cache@v5
@@ -271,9 +284,14 @@ jobs:
           BUILDX_BUILDER: ${{ steps.setup-buildx.outputs.name }}
           DOCKER_BUILDKIT: 1
         run: |
+          # Hey we haven't handle build for npm...
           echo 'Build Docker images'
           nx-cache-action -- \
           pnpm exec nx run-many \
+              ${{ (github.event.inputs.releaseAll || github.event.inputs.releaseWeb == 'true') && '--projects web' || '' }} \
+              ${{ (github.event.inputs.releaseAll || github.event.inputs.releaseNote == 'true') && '--projects note' || '' }} \
+              ${{ (github.event.inputs.releaseAll || github.event.inputs.releaseDocument == 'true') && '--projects document' || '' }} \
+              ${{ (github.event.inputs.releaseAll || github.event.inputs.releaseSearchWorker == 'true') && '--projects search-worker' || '' }} \
             --target docker:build \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration production
@@ -290,13 +308,21 @@ jobs:
             nx-cache-action -- \
             pnpm exec nx release \
               --dockerVersionScheme=${{ github.event.inputs.releaseContainerType }} \
-              ${{ (github.event_name == 'push' || github.event.inputs.releaseWeb == 'true') && '--projects web' || '' }} \
-              ${{ (github.event_name == 'push' || github.event.inputs.releaseNote == 'true') && '--projects note' || '' }} \
-              ${{ (github.event_name == 'push' || github.event.inputs.releaseDocument == 'true') && '--projects document' || '' }} \
-              ${{ (github.event_name == 'push' || github.event.inputs.releaseSearchWorker == 'true') && '--projects search-worker' || '' }} \
+              ${{ github.event.inputs.releaseWeb == 'true' && '--projects web' || '' }} \
+              ${{ github.event.inputs.releaseNote == 'true' && '--projects note' || '' }} \
+              ${{ github.event.inputs.releaseDocument == 'true' && '--projects document' || '' }} \
+              ${{ github.event.inputs.releaseSearchWorker == 'true' && '--projects search-worker' || '' }} \
               ${{ github.event.inputs.releaseNpm == 'true' && '--groups npm' || '' }} \
               --yes
           fi
+
+      # - name: Dispatch Update Deploy
+      #   uses: benc-uk/workflow-dispatch@v1
+      #   if: ${{ env.SHOULD_RELEASE == 'true' }}
+      #   with:
+      #     workflow: update.yaml
+      #     repo: ${{ github.repository_owner }}/infra
+      #     token: ${{ steps.get-bot-token.outputs.token }}
 
       - name: Cache Docs diagrams
         uses: actions/cache/save@v5
