@@ -1,0 +1,19 @@
+### 
+
+@host = http://meilisearch.notopia.localhost
+@meiliMasterToken = notopiauit
+
+
+### List Keys
+
+GET {{host}}/keys HTTP/1.1
+Authorization: Bearer {{meiliMasterToken}}
+
+
+### Search Note Index
+
+# @prompt query
+# @prompt searchToken
+
+GET {{host}}/indexes/notes/search?q={{query}} HTTP/1.1
+Authorization: Bearer {{searchToken}}

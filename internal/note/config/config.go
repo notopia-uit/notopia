@@ -22,10 +22,10 @@ type Services struct {
 }
 
 type Meilisearch struct {
-	commonconfig.Meilisearch
-	NoteSearchKeyUID         string `json:"noteSearchKeyUid"         mapstructure:"note_search_key_uid"         validate:"required" yaml:"note_search_key_uid"`
-	NoteIndexName            string `json:"noteIndexName"            mapstructure:"note_index_name"             validate:"required" yaml:"note_index_name"`
-	NoteSearchExpireDuration int    `json:"noteSearchExpireDuration" mapstructure:"note_search_expire_duration" validate:"required" yaml:"note_search_expire_duration"`
+	commonconfig.Meilisearch `json:""                         mapstructure:",squash"                     validate:"required"               yaml:""`
+	NoteSearchKeyUID         string `json:"noteSearchKeyUid"         mapstructure:"note_search_key_uid"         validate:"required,uuid4_rfc4122" yaml:"note_search_key_uid"`
+	NoteIndexName            string `json:"noteIndexName"            mapstructure:"note_index_name"             validate:"required"               yaml:"note_index_name"`
+	NoteSearchExpireDuration int    `json:"noteSearchExpireDuration" mapstructure:"note_search_expire_duration" validate:"required"               yaml:"note_search_expire_duration"`
 }
 
 func setViperMeilisearchDefault(viper *viper.Viper) {

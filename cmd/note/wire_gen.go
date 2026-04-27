@@ -25,6 +25,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgreadmodel"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgrepo"
+	"github.com/notopia-uit/notopia/internal/note/infra/search"
 	"github.com/notopia-uit/notopia/internal/note/infra/service"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 	"github.com/notopia-uit/notopia/pkg/common/http"
@@ -204,9 +205,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	noteGraph := pgreadmodel.NewNoteGraph(queries)
 	getNoteGraphHandler := app.NewGetNoteGraphHandler(authorization, pgrepoNote, noteGraph)
 	getNoteHandler := app.NewGetNoteHandler(authorization, pgrepoNote, pgreadmodelNote)
-	getWorkspaceByNoteHandler := app.NewGetWorkspaceByNoteHandler(authorization, getWorkspaceByNote)
 	noteLinks := pgreadmodel.GetNoteLinks(queries)
 	getNoteLinksHandler := app.NewGetNoteLinksHandler(authorization, pgrepoNote, noteLinks)
+	getWorkspaceByNoteHandler := app.NewGetWorkspaceByNoteHandler(authorization, getWorkspaceByNote)
 	workspaceGraph := pgreadmodel.GetWorkspaceGraph(queries)
 	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(authorization, workspaceGraph)
 	workspaceBySlug := pgreadmodel.NewWorkspaceBySlug(queries)
@@ -214,6 +215,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	authentik := &configConfig.Authentik
 	identityAuthentik := identity.NewAuthentik(authentik)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(identityAuthentik, authorization)
+	meilisearch := &configConfig.Meilisearch
+	searchMeilisearch := search.NewMeilisearch(meilisearch)
+	getWorkspaceSearchTokenHandler := app.NewGetWorkspaceSearchTokenHandler(authorization, searchMeilisearch)
 	workspaceTree := pgreadmodel.NewWorkspaceTree(queries)
 	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(authorization, workspaceTree)
 	showTrash := pgreadmodel.NewShowTrash(queries)
@@ -223,11 +227,12 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		GetMyWorkspacesHandler:          getMyWorkspacesHandler,
 		GetNoteGraphHandler:             getNoteGraphHandler,
 		GetNoteHandler:                  getNoteHandler,
-		GetWorkspaceByNoteHandler:       getWorkspaceByNoteHandler,
 		GetNoteLinksHandler:             getNoteLinksHandler,
+		GetWorkspaceByNoteHandler:       getWorkspaceByNoteHandler,
 		GetWorkspaceGraphHandler:        getWorkspaceGraphHandler,
 		GetWorkspaceHandler:             getWorkspaceHandler,
 		GetWorkspaceMembersHandler:      getWorkspaceMembersHandler,
+		GetWorkspaceSearchTokenHandler:  getWorkspaceSearchTokenHandler,
 		GetWorkspaceTreeHandler:         getWorkspaceTreeHandler,
 		ShowTrashHandler:                showTrashHandler,
 	}

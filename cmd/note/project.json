@@ -102,35 +102,35 @@
         "cwd": "{projectRoot}"
       }
     },
-    "migration:create": {
+    "goose:create": {
       "executor": "nx:run-commands",
       "options": {
         "command": "goose create",
         "cwd": "{projectRoot}"
       }
     },
-    "migration:up": {
+    "goose:up": {
       "executor": "nx:run-commands",
       "options": {
         "command": "goose up",
         "cwd": "{projectRoot}"
       }
     },
-    "migration:down": {
+    "goose:down": {
       "executor": "nx:run-commands",
       "options": {
         "command": "goose down",
         "cwd": "{projectRoot}"
       }
     },
-    "migration:validate": {
+    "goose:validate": {
       "executor": "nx:run-commands",
       "options": {
         "command": "goose validate",
         "cwd": "{projectRoot}"
       }
     },
-    "lint:migration": {
+    "lint:goose": {
       "dependsOn": ["migration:validate"]
     },
     "gen:sqlc": {

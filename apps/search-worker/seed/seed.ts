@@ -74,20 +74,27 @@ async function run() {
   }
 
   console.log('Check if default search API key exists...');
+  const searchApiKey = '00000000-0000-4000-8000-000000000001';
   try {
-    await client.getKey('00000000-0000-4000-0000-000000000000');
+    await client.getKey(searchApiKey);
     console.log('Default search API key already exists, skipping creation.');
   } catch (error) {
     if (error instanceof MeilisearchApiError) {
       console.log('Default search API key not found, creating it...');
-      await client.createKey({
-        uid: '00000000-0000-4000-0000-000000000000',
+      const key = await client.createKey({
+        uid: searchApiKey,
         actions: ['search'],
         indexes: ['notes'],
         expiresAt: null,
-        name: 'Default Search Key',
+        name: 'Default Note Index Search Key',
       });
-      console.log('Default search API key created successfully.');
+      console.log('Default search API key created successfully');
+      console.log(`Key UID: ${key.uid}`);
+      console.log(`Key: ${key.key}`);
+      console.log(
+        `Please save the Key to cmd/note/.env.local as
+NOTOPIA_NOTE_MEILISEARCH_API_KEY=${key.key}`
+      );
     } else {
       console.error('Error checking/creating default search API key:', error);
       process.exit(1);

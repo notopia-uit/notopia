@@ -9,7 +9,7 @@ import (
 
 func main() {
 	sourceDir := flag.String("source", "./submodule/trshpuppy-obsidian-notes", "Obsidian vault directory")
-	outputSQL := flag.String("output", "./internal/note/seed.sql", "Output seed sql path")
+	outputSQL := flag.String("output", "./internal/notecreateseed/seed.gen.sql", "Output seed sql path")
 	flag.Parse()
 
 	config, err := notecreateseed.DefaultConfig()
