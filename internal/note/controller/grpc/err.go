@@ -19,6 +19,7 @@ func toGRPCError(err error) error {
 		case errs.CodeForbidden:
 			return status.Error(codes.PermissionDenied, cerr.Error())
 		case errs.CodeInvalid,
+			errs.CodeTrashedInValid,
 			errs.CodeEmptyFolderName,
 			errs.CodePersistenceInvalid,
 			errs.CodeInvalidWorkspaceName,

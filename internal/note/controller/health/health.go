@@ -49,6 +49,7 @@ func New(
 	)
 
 	httpPing := fmt.Sprintf("http://%s/note/ping", serverCfg.Health.Address())
+	grpcAddr := serverCfg.GRPC.Address()
 
 	readyChecker := health.NewChecker(
 		health.WithPeriodicCheck(
@@ -82,7 +83,7 @@ func New(
 			health.Check{
 				Name: "grpc",
 				Check: func(ctx context.Context) error {
-					conn, err := net.DialTimeout("tcp", serverCfg.GRPC.Address(), 5*time.Second)
+					conn, err := net.DialTimeout("tcp", grpcAddr, 5*time.Second)
 					if err != nil {
 						return fmt.Errorf("failed to connect to gRPC server: %w", err)
 					}
@@ -94,7 +95,7 @@ func New(
 			},
 		),
 
-		// TODO: this have to check kafka, not the pub sub
+		// TODO: this have to check Kafka, not the pub sub
 		health.WithPeriodicCheck(
 			15*time.Second,
 			3*time.Second,

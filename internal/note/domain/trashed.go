@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/notopia-uit/notopia/internal/note/errs"
+)
 
 type TrashedBy uint8
 
@@ -39,11 +43,14 @@ type Trashed struct {
 	at time.Time
 }
 
-func NewTrashed(by TrashedBy, at time.Time) Trashed {
+func NewTrashed(by TrashedBy, at time.Time) (Trashed, error) {
+	if !by.IsValid() {
+		return Trashed{}, errs.NewTrashedInvalid(by.String(), at)
+	}
 	return Trashed{
 		by: by,
 		at: at,
-	}
+	}, nil
 }
 
 func NewUntrashed() Trashed {

@@ -151,7 +151,11 @@ func (n *Note) Trash(trashedBy TrashedBy, userID string) error {
 	if n.trashed.IsTrashed() {
 		return errs.NewNoteAlreadyTrashed(n.id)
 	}
-	n.trashed = NewTrashed(trashedBy, time.Now())
+	var err error
+	n.trashed, err = NewTrashed(trashedBy, time.Now())
+	if err != nil {
+		return err
+	}
 	n.addEvent(&NoteTrashedEvent{
 		BaseEvent: NewBaseEvent(n.id, userID),
 	})

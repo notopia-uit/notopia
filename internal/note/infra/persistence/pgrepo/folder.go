@@ -61,7 +61,7 @@ func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*do
 		}
 		return nil, toErr(err)
 	}
-	return folderToDomain(folder), nil
+	return folderToDomain(folder)
 }
 
 func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyParams) ([]*domain.Folder, error) {
@@ -98,7 +98,10 @@ func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyPa
 
 	result := make([]*domain.Folder, len(folders))
 	for i, folder := range folders {
-		result[i] = folderToDomain(folder)
+		result[i], err = folderToDomain(folder)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return result, nil
 }
@@ -115,17 +118,23 @@ func (f *Folder) GetRecursiveChildren(ctx context.Context, params *domain.Folder
 
 	result := make([]*domain.Folder, len(folders))
 	for i, folder := range folders {
-		result[i] = folderToDomain(new(pgsqlc.Folder(*folder)))
+		result[i], err = folderToDomain(new(pgsqlc.Folder(*folder)))
+		if err != nil {
+			return nil, err
+		}
 	}
 	return result, nil
 }
 
-func folderToDomain(folder *pgsqlc.Folder) *domain.Folder {
+func folderToDomain(folder *pgsqlc.Folder) (*domain.Folder, error) {
 	var icon string
 	if folder.Icon != nil {
 		icon = *folder.Icon
 	}
-	trashed := toDomainTrashed(folder.TrashedBy, folder.TrashedAt)
+	trashed, err := toDomainTrashed(folder.TrashedBy, folder.TrashedAt)
+	if err != nil {
+		return nil, err
+	}
 	var parentID uuid.UUID
 	if folder.ParentID != nil {
 		parentID = *folder.ParentID
@@ -138,7 +147,7 @@ func folderToDomain(folder *pgsqlc.Folder) *domain.Folder {
 		domain.NewFolderHierarchy(parentID),
 		trashed,
 		false,
-	)
+	), nil
 }
 
 func (f *Folder) Save(ctx context.Context, folder *domain.Folder) (cerr error) {
