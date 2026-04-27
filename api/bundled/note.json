@@ -18599,6 +18599,52 @@
         }
       }
     },
+    "/note/workspaces/{workspaceId}/search-token": {
+      "get": {
+        "security": [
+          {
+            "Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Get Workspace Search Token",
+        "operationId": "getWorkspaceSearchToken",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchToken"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/show-trash": {
       "get": {
         "security": [
@@ -19432,6 +19478,25 @@
         "required": [
           "id",
           "role"
+        ]
+      },
+      "SearchToken": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Meilisearch token already filter for workspace",
+            "example": "jwt"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-30T12:00:00Z"
+          }
+        },
+        "required": [
+          "token",
+          "expiresAt"
         ]
       },
       "Trashed": {

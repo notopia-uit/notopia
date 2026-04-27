@@ -27,11 +27,12 @@ type Queries struct {
 	GetMyWorkspacesHandler          *GetMyWorkspacesHandler
 	GetNoteGraphHandler             *GetNoteGraphHandler
 	GetNoteHandler                  *GetNoteHandler
-	GetWorkspaceByNoteHandler       *GetWorkspaceByNoteHandler
 	GetNoteLinksHandler             *GetNoteLinksHandler
+	GetWorkspaceByNoteHandler       *GetWorkspaceByNoteHandler
 	GetWorkspaceGraphHandler        *GetWorkspaceGraphHandler
 	GetWorkspaceHandler             *GetWorkspaceHandler
 	GetWorkspaceMembersHandler      *GetWorkspaceMembersHandler
+	GetWorkspaceSearchTokenHandler  *GetWorkspaceSearchTokenHandler
 	GetWorkspaceTreeHandler         *GetWorkspaceTreeHandler
 	ShowTrashHandler                *ShowTrashHandler
 }

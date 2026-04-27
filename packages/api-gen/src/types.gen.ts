@@ -347,6 +347,14 @@ export type NoteWorkspaceMember = {
     role: NoteWorkspaceRole;
 };
 
+export type NoteSearchToken = {
+    /**
+     * Meilisearch token already filter for workspace
+     */
+    token: string;
+    expiresAt: Date;
+};
+
 export type NoteTrashed = {
     by: NoteTrashedBy;
     at: Date;
@@ -2258,6 +2266,62 @@ export type RestoreTrashedWorkspaceItemsResponses = {
 };
 
 export type RestoreTrashedWorkspaceItemsResponse = RestoreTrashedWorkspaceItemsResponses[keyof RestoreTrashedWorkspaceItemsResponses];
+
+export type GetWorkspaceSearchTokenData = {
+    body?: never;
+    path: {
+        workspaceId: NoteId3;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceId}/search-token';
+};
+
+export type GetWorkspaceSearchTokenErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * The error response body returned when JWT validation or OPA authorization fails.
+     */
+    401: {
+        /**
+         * The category of the error encountered during the middleware lifecycle.
+         */
+        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
+        /**
+         * A descriptive message providing technical context for the failure.
+         */
+        details: string;
+        /**
+         * An optional, developer-defined message, often populated by OPA policy violations.
+         */
+        custom_message: string | null;
+    };
+    /**
+     * Forbidden Error response
+     */
+    403: NoteError;
+    /**
+     * Not Found Error response
+     */
+    404: NoteError;
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type GetWorkspaceSearchTokenError = GetWorkspaceSearchTokenErrors[keyof GetWorkspaceSearchTokenErrors];
+
+export type GetWorkspaceSearchTokenResponses = {
+    /**
+     * Successful response
+     */
+    200: NoteSearchToken;
+};
+
+export type GetWorkspaceSearchTokenResponse = GetWorkspaceSearchTokenResponses[keyof GetWorkspaceSearchTokenResponses];
 
 export type ShowTrashData = {
     body?: never;

@@ -5,7 +5,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 )
 
-var ProviderSet = wire.NewSet(
+var AuthentikProviderSet = wire.NewSet(
 	ProvideAuthentik,
 	wire.Bind(new(app.IdentitySvc), new(*Authentik)),
 )

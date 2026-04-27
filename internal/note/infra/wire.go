@@ -9,6 +9,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/integrationpublisher"
 	"github.com/notopia-uit/notopia/internal/note/infra/outbox"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/note/infra/search"
 	"github.com/notopia-uit/notopia/internal/note/infra/service"
 	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 )
@@ -17,10 +18,11 @@ var ProviderSet = wire.NewSet(
 	wire.Bind(new(sql.Conn), new(*pgxpool.Pool)),
 
 	common.ProviderSet,
-	identity.ProviderSet,
+	identity.AuthentikProviderSet,
 	integrationpublisher.ProviderSet,
 	outbox.ProviderSet,
 	persistence.PostgresProviderSet,
+	search.MeilisearchProviderSet,
 	service.ProviderSet,
 	workspaceevent.ProviderSet,
 )

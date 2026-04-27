@@ -18909,6 +18909,52 @@
         }
       }
     },
+    "/note/workspaces/{workspaceId}/search-token": {
+      "get": {
+        "security": [
+          {
+            "note_Oauth2": []
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Get Workspace Search Token",
+        "operationId": "getWorkspaceSearchToken",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/note_workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/note_SearchToken"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/note_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/note_UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/note_ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/note_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/note_InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/show-trash": {
       "get": {
         "security": [
@@ -20479,6 +20525,25 @@
         "required": [
           "id",
           "role"
+        ]
+      },
+      "note_SearchToken": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Meilisearch token already filter for workspace",
+            "example": "jwt"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-30T12:00:00Z"
+          }
+        },
+        "required": [
+          "token",
+          "expiresAt"
         ]
       },
       "note_Trashed": {

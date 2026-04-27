@@ -95,6 +95,9 @@ type ServerInterface interface {
 	// Restore trashed workspace items
 	// (POST /note/workspaces/{workspaceId}/restore-trashed-items)
 	RestoreTrashedWorkspaceItems(c *gin.Context, workspaceId WorkspaceIdPath)
+	// Get Workspace Search Token
+	// (GET /note/workspaces/{workspaceId}/search-token)
+	GetWorkspaceSearchToken(c *gin.Context, workspaceId WorkspaceIdPath)
 	// Show trash
 	// (GET /note/workspaces/{workspaceId}/show-trash)
 	ShowTrash(c *gin.Context, workspaceId WorkspaceIdPath)
@@ -802,6 +805,32 @@ func (siw *ServerInterfaceWrapper) RestoreTrashedWorkspaceItems(c *gin.Context) 
 	siw.Handler.RestoreTrashedWorkspaceItems(c, workspaceId)
 }
 
+// GetWorkspaceSearchToken operation middleware
+func (siw *ServerInterfaceWrapper) GetWorkspaceSearchToken(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "workspaceId" -------------
+	var workspaceId WorkspaceIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(Oauth2Scopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetWorkspaceSearchToken(c, workspaceId)
+}
+
 // ShowTrash operation middleware
 func (siw *ServerInterfaceWrapper) ShowTrash(c *gin.Context) {
 
@@ -986,6 +1015,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/publish", wrapper.PublishWorkspace)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/rename", wrapper.RenameWorkspace)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/restore-trashed-items", wrapper.RestoreTrashedWorkspaceItems)
+	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/search-token", wrapper.GetWorkspaceSearchToken)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/show-trash", wrapper.ShowTrash)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/trash-items", wrapper.TrashWorkspaceItems)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/tree", wrapper.GetWorkspaceTree)
@@ -2473,6 +2503,70 @@ func (response RestoreTrashedWorkspaceItems500JSONResponse) VisitRestoreTrashedW
 	return json.NewEncoder(w).Encode(response)
 }
 
+type GetWorkspaceSearchTokenRequestObject struct {
+	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+}
+
+type GetWorkspaceSearchTokenResponseObject interface {
+	VisitGetWorkspaceSearchTokenResponse(w http.ResponseWriter) error
+}
+
+type GetWorkspaceSearchToken200JSONResponse SearchToken
+
+func (response GetWorkspaceSearchToken200JSONResponse) VisitGetWorkspaceSearchTokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceSearchToken400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response GetWorkspaceSearchToken400JSONResponse) VisitGetWorkspaceSearchTokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceSearchToken401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response GetWorkspaceSearchToken401JSONResponse) VisitGetWorkspaceSearchTokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceSearchToken403JSONResponse struct{ ForbiddenErrorJSONResponse }
+
+func (response GetWorkspaceSearchToken403JSONResponse) VisitGetWorkspaceSearchTokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceSearchToken404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response GetWorkspaceSearchToken404JSONResponse) VisitGetWorkspaceSearchTokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetWorkspaceSearchToken500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response GetWorkspaceSearchToken500JSONResponse) VisitGetWorkspaceSearchTokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type ShowTrashRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
 }
@@ -2776,6 +2870,9 @@ type StrictServerInterface interface {
 	// Restore trashed workspace items
 	// (POST /note/workspaces/{workspaceId}/restore-trashed-items)
 	RestoreTrashedWorkspaceItems(ctx context.Context, request RestoreTrashedWorkspaceItemsRequestObject) (RestoreTrashedWorkspaceItemsResponseObject, error)
+	// Get Workspace Search Token
+	// (GET /note/workspaces/{workspaceId}/search-token)
+	GetWorkspaceSearchToken(ctx context.Context, request GetWorkspaceSearchTokenRequestObject) (GetWorkspaceSearchTokenResponseObject, error)
 	// Show trash
 	// (GET /note/workspaces/{workspaceId}/show-trash)
 	ShowTrash(ctx context.Context, request ShowTrashRequestObject) (ShowTrashResponseObject, error)
@@ -3581,6 +3678,33 @@ func (sh *strictHandler) RestoreTrashedWorkspaceItems(ctx *gin.Context, workspac
 		ctx.Status(http.StatusInternalServerError)
 	} else if validResponse, ok := response.(RestoreTrashedWorkspaceItemsResponseObject); ok {
 		if err := validResponse.VisitRestoreTrashedWorkspaceItemsResponse(ctx.Writer); err != nil {
+			ctx.Error(err)
+		}
+	} else if response != nil {
+		ctx.Error(fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetWorkspaceSearchToken operation middleware
+func (sh *strictHandler) GetWorkspaceSearchToken(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+	var request GetWorkspaceSearchTokenRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetWorkspaceSearchToken(ctx, request.(GetWorkspaceSearchTokenRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetWorkspaceSearchToken")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		ctx.Error(err)
+		ctx.Status(http.StatusInternalServerError)
+	} else if validResponse, ok := response.(GetWorkspaceSearchTokenResponseObject); ok {
+		if err := validResponse.VisitGetWorkspaceSearchTokenResponse(ctx.Writer); err != nil {
 			ctx.Error(err)
 		}
 	} else if response != nil {

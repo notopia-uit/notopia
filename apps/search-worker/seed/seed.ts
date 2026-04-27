@@ -1,6 +1,6 @@
 import { ShareNoteSearch } from '@notopia-uit/api-gen';
 import * as fs from 'fs';
-import { Meilisearch } from 'meilisearch';
+import { Meilisearch, MeilisearchApiError, type Settings } from 'meilisearch';
 import { fileURLToPath } from 'node:url';
 import * as path from 'path';
 
@@ -19,16 +19,80 @@ async function run() {
     apiKey: MEILI_MASTER_KEY,
   });
   const index = client.index('notes');
-  await index.update({ primaryKey: 'id' }).waitTask();
+  console.log('Ensuring index exists and has correct primary key...');
+  try {
+    const indexInfo = await index.getRawInfo();
+    if (indexInfo.primaryKey !== 'id') {
+      console.log(
+        `Index primary key is '${indexInfo.primaryKey}', updating to 'id'...`
+      );
+      await index.update({ primaryKey: 'id' }).waitTask();
+    } else {
+      console.log('Index primary key is already set to "id", skipping update.');
+    }
+  } catch (error) {
+    if (error instanceof MeilisearchApiError) {
+      console.log('Index not found, creating it with primary key "id"...');
+      await index.update({ primaryKey: 'id' }).waitTask();
+      console.log('Index created successfully.');
+    } else {
+      console.error('Error checking/creating index:', error);
+      process.exit(1);
+    }
+  }
 
-  console.log('Updating Meilisearch settings...');
-  await index
-    .updateSettings({
-      searchableAttributes: ['name', 'plainTextContent', 'tags'],
-      filterableAttributes: ['workspaceId', 'tags'],
-      sortableAttributes: ['name'],
-    })
-    .waitTask();
+  const settings: Settings = {
+    searchableAttributes: ['name', 'plainTextContent', 'tags'],
+    filterableAttributes: ['workspaceId', 'tags'],
+    sortableAttributes: ['name'],
+  };
+
+  console.log('Get current index settings...');
+  try {
+    const existedSettings = await index.getSettings();
+    console.log('Checking if existing settings match desired settings...');
+    const settingsMatch =
+      JSON.stringify(existedSettings) === JSON.stringify(settings);
+    if (settingsMatch) {
+      console.log('Existing settings match desired settings, skipping update.');
+    } else {
+      console.log(
+        'Existing settings do not match desired settings, updating...'
+      );
+      await index.updateSettings(settings).waitTask();
+      console.log('Index settings updated successfully.');
+    }
+  } catch (error) {
+    if (error instanceof MeilisearchApiError) {
+      console.log('Index not found, creating it with settings...');
+      await index.updateSettings(settings).waitTask();
+      console.log('Index created successfully.');
+    } else {
+      console.error('Error checking/creating index:', error);
+      process.exit(1);
+    }
+  }
+
+  console.log('Check if default search API key exists...');
+  try {
+    await client.getKey('00000000-0000-4000-0000-000000000000');
+    console.log('Default search API key already exists, skipping creation.');
+  } catch (error) {
+    if (error instanceof MeilisearchApiError) {
+      console.log('Default search API key not found, creating it...');
+      await client.createKey({
+        uid: '00000000-0000-4000-0000-000000000000',
+        actions: ['search'],
+        indexes: ['notes'],
+        expiresAt: null,
+        name: 'Default Search Key',
+      });
+      console.log('Default search API key created successfully.');
+    } else {
+      console.error('Error checking/creating default search API key:', error);
+      process.exit(1);
+    }
+  }
 
   const files = fs.readdirSync(DATA_DIR);
   const documents = files.map(

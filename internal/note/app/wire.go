@@ -47,6 +47,7 @@ var ProviderSetQuery = wire.NewSet(
 	ProvideGetWorkspaceBySlugHandler,
 	ProvideGetWorkspaceGraphHandler,
 	ProvideGetWorkspaceMembersHandler,
+	ProvideGetWorkspaceSearchTokenHandler,
 	ProvideGetWorkspaceTreeHandler,
 	ProvideShowTrashHandler,
 	wire.Struct(new(Queries), "*"),

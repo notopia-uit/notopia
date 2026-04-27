@@ -289,3 +289,10 @@ func toTrashedByDTO(t app.TrashedBy) (note.TrashedBy, error) {
 		return "", errs.NewInternal(fmt.Sprintf("invalid trashed by: %v", t))
 	}
 }
+
+func toSearchTokenDTO(t *app.SearchToken) note.SearchToken {
+	return note.SearchToken{
+		Token:     t.Token,
+		ExpiresAt: t.ExpiresAt,
+	}
+}

@@ -201,3 +201,8 @@ type User struct {
 	Groups []string
 	Roles  []string
 }
+
+type SearchToken struct {
+	Token     string
+	ExpiresAt time.Time
+}

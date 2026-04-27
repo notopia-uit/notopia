@@ -280,6 +280,11 @@ export const zNoteWorkspaceMember = z.object({
     role: zNoteWorkspaceRole
 });
 
+export const zNoteSearchToken = z.object({
+    token: z.string(),
+    expiresAt: z.iso.datetime()
+});
+
 export const zNoteTrashed = z.object({
     by: zNoteTrashedBy,
     at: z.iso.datetime()
@@ -792,6 +797,15 @@ export const zRestoreTrashedWorkspaceItemsPath = z.object({
  * Workspace items successfully restored
  */
 export const zRestoreTrashedWorkspaceItemsResponse = z.void();
+
+export const zGetWorkspaceSearchTokenPath = z.object({
+    workspaceId: zNoteId3
+});
+
+/**
+ * Successful response
+ */
+export const zGetWorkspaceSearchTokenResponse = zNoteSearchToken;
 
 export const zShowTrashPath = z.object({
     workspaceId: zNoteId3

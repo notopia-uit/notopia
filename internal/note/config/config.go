@@ -21,6 +21,18 @@ type Services struct {
 	Authorization commonconfig.Service `json:"authorization" mapstructure:"authorization" validate:"required" yaml:"authorization"`
 }
 
+type Meilisearch struct {
+	commonconfig.Meilisearch
+	NoteSearchKeyUID         string `json:"noteSearchKeyUid"         mapstructure:"note_search_key_uid"         validate:"required" yaml:"note_search_key_uid"`
+	NoteIndexName            string `json:"noteIndexName"            mapstructure:"note_index_name"             validate:"required" yaml:"note_index_name"`
+	NoteSearchExpireDuration int    `json:"noteSearchExpireDuration" mapstructure:"note_search_expire_duration" validate:"required" yaml:"note_search_expire_duration"`
+}
+
+func setViperMeilisearchDefault(viper *viper.Viper) {
+	viper.SetDefault("meilisearch.note_index_name", "notes")
+	viper.SetDefault("meilisearch.note_search_expire_duration", 3600)
+}
+
 type DomainEvent struct {
 	MessageMetadataUserIDKey      string `json:"messageMetadataUserIdKey"      mapstructure:"message_metadata_user_id_key"      validate:"required" yaml:"message_metadata_user_id_key"`
 	MessageWorkspaceIDKey         string `json:"messageMetadataWorkspaceIdKey" mapstructure:"message_metadata_workspace_id_key" validate:"required" yaml:"message_metadata_workspace_id_key"`
@@ -60,15 +72,16 @@ func setViperAdvancedDefault(viper *viper.Viper) {
 }
 
 type Config struct {
-	General   commonconfig.General   `json:"general"   mapstructure:"general"   validate:"omitempty" yaml:"general"`
-	Log       commonconfig.Log       `json:"log"       mapstructure:"log"       validate:"omitempty" yaml:"log"`
-	Server    Server                 `json:"server"    mapstructure:"server"    validate:"required"  yaml:"server"`
-	Database  commonconfig.SQL       `json:"database"  mapstructure:"database"  validate:"required"  yaml:"database"`
-	Kafka     commonconfig.Kafka     `json:"kafka"     mapstructure:"kafka"     validate:"required"  yaml:"kafka"`
-	Redis     commonconfig.Redis     `json:"redis"     mapstructure:"redis"     validate:"required"  yaml:"redis"`
-	Authentik commonconfig.Authentik `json:"authentik" mapstructure:"authentik" validate:"required"  yaml:"authentik"`
-	Services  Services               `json:"services"  mapstructure:"services"  validate:"required"  yaml:"services"`
-	Advanced  Advanced               `json:"advanced"  mapstructure:"advanced"  validate:"omitempty" yaml:"advanced"`
+	General     commonconfig.General   `json:"general"     mapstructure:"general"     validate:"omitempty" yaml:"general"`
+	Log         commonconfig.Log       `json:"log"         mapstructure:"log"         validate:"omitempty" yaml:"log"`
+	Server      Server                 `json:"server"      mapstructure:"server"      validate:"required"  yaml:"server"`
+	Database    commonconfig.SQL       `json:"database"    mapstructure:"database"    validate:"required"  yaml:"database"`
+	Kafka       commonconfig.Kafka     `json:"kafka"       mapstructure:"kafka"       validate:"required"  yaml:"kafka"`
+	Redis       commonconfig.Redis     `json:"redis"       mapstructure:"redis"       validate:"required"  yaml:"redis"`
+	Authentik   commonconfig.Authentik `json:"authentik"   mapstructure:"authentik"   validate:"required"  yaml:"authentik"`
+	Meilisearch Meilisearch            `json:"meilisearch" mapstructure:"meilisearch" validate:"required"  yaml:"meilisearch"`
+	Services    Services               `json:"services"    mapstructure:"services"    validate:"required"  yaml:"services"`
+	Advanced    Advanced               `json:"advanced"    mapstructure:"advanced"    validate:"omitempty" yaml:"advanced"`
 }
 
 func New(
@@ -89,6 +102,7 @@ func New(
 	commonconfig.KafkaViperSetDefault(viper, "kafka", "note-service")
 	commonconfig.SQLViperSetDefault(viper, "database")
 	commonconfig.GeneralViperSetDefault(viper, "general")
+	setViperMeilisearchDefault(viper)
 	commonconfig.AuthentikViperSetDefault(viper, "authentik")
 
 	viper.AutomaticEnv()

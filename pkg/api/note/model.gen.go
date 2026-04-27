@@ -281,6 +281,14 @@ type NoteLink struct {
 	Name Name2 `json:"name"`
 }
 
+// SearchToken defines model for SearchToken.
+type SearchToken struct {
+	ExpiresAt time.Time `json:"expiresAt"`
+
+	// Token Meilisearch token already filter for workspace
+	Token string `json:"token"`
+}
+
 // Trashed defines model for Trashed.
 type Trashed struct {
 	At time.Time `json:"at"`

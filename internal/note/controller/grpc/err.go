@@ -40,6 +40,7 @@ func toGRPCError(err error) error {
 			errs.CodeWorkspaceEventPubSubFailedToCreateMessage,
 			errs.CodeWorkspaceEventPubSubPublishFailed,
 			errs.CodeWorkspaceEventPubSubSubscribeFailed,
+			errs.CodeGenerateWorkspaceSearchTokenFailed,
 			errs.CodeInternalGenerateID:
 			return status.Error(codes.Internal, cerr.Error())
 		case errs.CodeFolderNotFound,

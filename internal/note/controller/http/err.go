@@ -110,6 +110,9 @@ func strictServerToHTTPErr(err errs.Error) (
 	case errs.CodeWorkspaceSlugAlreadyExists:
 		statusCode = 409
 
+	case errs.CodeGenerateWorkspaceSearchTokenFailed:
+		statusCode = 500
+
 	case errs.CodeWorkspaceEventPubSubFailedToCreateMessage:
 		statusCode = 500
 	case errs.CodeWorkspaceEventPubSubPublishFailed:
