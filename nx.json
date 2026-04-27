@@ -89,6 +89,7 @@
     {
       "plugin": "@nx/vite/plugin",
       "options": {
+        "compiler": "tsgo",
         "buildTargetName": "build",
         "testTargetName": "test",
         "serveTargetName": "serve",
