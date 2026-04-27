@@ -173,7 +173,7 @@ export const zNoteGraph = z.object({
         id: z.string(),
         name: z.string(),
         type: z.enum(['note', 'tag']),
-        weight: z.number().gte(0).lte(1).optional()
+        weight: z.number().gte(0.5).lte(1).optional()
     })),
     links: z.array(z.object({
         source: z.string(),

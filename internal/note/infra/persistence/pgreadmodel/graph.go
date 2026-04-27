@@ -8,14 +8,15 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 )
 
-func calculateGraphWeight(size, minSize, maxSize int32) float64 {
-	var w float64
+func calculateGraphWeight(size, minSize, maxSize int32) float32 {
+	var w float32
 	if maxSize == minSize {
 		w = 1
 	} else {
-		w = float64(size-minSize) / float64(maxSize-minSize)
+		w = float32(size-minSize) / float32(maxSize-minSize)
 	}
-	return w
+	res := 0.5 + w*0.5
+	return float32(int((res*10)+0.5)) / 10.0
 }
 
 func buildGraph(notes []*pgsqlc.Note, links []*pgsqlc.NoteLink, reachableIDs map[string]bool) app.Graph {

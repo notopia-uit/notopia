@@ -225,8 +225,7 @@ func toGraphDTO(g *app.Graph) note.Graph {
 		nodes[i].Name = n.Name
 		nodes[i].Type = note.GraphNodesType(n.Type)
 		if n.Weight != 0 {
-			w := float32(n.Weight)
-			nodes[i].Weight = &w
+			nodes[i].Weight = &n.Weight
 		}
 	}
 	links := make([]note.GraphLink, len(g.Links))

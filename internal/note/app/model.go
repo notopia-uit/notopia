@@ -68,7 +68,7 @@ type GraphNode struct {
 	ID     string
 	Name   string
 	Type   GraphNodeType
-	Weight float64
+	Weight float32
 }
 
 type GraphLink struct {

@@ -25,7 +25,8 @@ properties:
         weight:
           type: number
           description: Optional weight for the note node, rounded to 1 decimal place
-          minimum: 0
+          multipleOf: 0.1
+          minimum: 0.5
           maximum: 1
           example: 0.8
       required:
