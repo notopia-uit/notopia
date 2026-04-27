@@ -59,7 +59,8 @@
         },
         "production": {
           "buildTarget": "document:build:production",
-          "inspect": false
+          "inspect": false,
+          "watch": false
         }
       }
     },

@@ -15,7 +15,6 @@ sqlc = "1.30.0"
 java = "latest"
 mockery = "3.7.0"
 "pipx:pgcli" = "4.4.0"
-"pipx:tmuxp" = "latest"
 "aqua:go-delve/delve" = "1.26.2"
 
 [shell_alias]

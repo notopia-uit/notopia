@@ -55,7 +55,9 @@
           "buildTarget": "search-worker:build:development"
         },
         "production": {
-          "buildTarget": "search-worker:build:production"
+          "buildTarget": "search-worker:build:production",
+          "inspect": false,
+          "watch": false
         }
       }
     },

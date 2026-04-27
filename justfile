@@ -1,12 +1,11 @@
 all parallel="4" exclude="tag:scope:docs":
     pnpm exec nx run-many -t lint typecheck build gen bundle --parallel={{ parallel }} --exclude={{ exclude }}
 
-up-api configuration="development":
-    pnpm exec nx run-many \
-      -t dev \
-      --projects=document,note,authorization,search-worker \
-      --configuration={{ configuration }} \
-      --parallel=99
+prod-svcs *args="--append":
+    tmuxinator start -p ./.tmuxinator/services-prod.yaml {{ args }}
+
+dev-svcs *args="--append":
+    tmuxinator start -p ./.tmuxinator/services-dev.yaml {{ args }}
 
 lazydocker COMPOSE_PROFILES="*":
     COMPOSE_PROFILES={{ COMPOSE_PROFILES }} lazydocker
