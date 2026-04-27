@@ -21,6 +21,7 @@ mockery = "3.7.0"
 nx = "pnpm exec nx"
 shadcn = "pnpm exec shadcn"
 tsgo = "pnpm exec tsgo"
+compose = "docker compose"
 
 # [deps.pnpm]
 # auto = true
