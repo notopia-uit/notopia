@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "vitepress": "2.0.0-alpha.17",
-    "vitepress-plugin-diagrams": "1.2.2",
+    "vitepress-plugin-diagrams": "1.3.0",
     "vitepress-sidebar": "1.33.1"
   }
 }
