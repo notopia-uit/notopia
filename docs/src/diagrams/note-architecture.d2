@@ -23,13 +23,13 @@ vars: {
   }
 }
 
-Controllers: Controllers {
+controllers: Controllers {
   http: HTTP / REST Controller
   grpc: gRPC Server
   event: Event Processor
 }
 
-Application: Application {
+application: Application {
   command_handler: Command Handler
   query_handler: Query Handler
   event_handler: Event Handler
@@ -41,13 +41,13 @@ Application: Application {
   integration_events: Integration Events
 }
 
-Domain: Domain {
+domain: Domain {
   model: Domain Model
   repository_interface: Repository Interface
   domain_event: Domain Events
 }
 
-Infrastructure: Secondary Adapters {
+infrastructure: Infrastructure {
   persistence: Persistence/SQL
   authentik_svc: Authentication Svc
   authorization_svc: Authorization Svc
@@ -56,8 +56,7 @@ Infrastructure: Secondary Adapters {
   integration_event_publisher: Integration Event Publisher
 }
 
-Controllers -> Application
-Application -> Domain
-
-Infrastructure -> Application
-Infrastructure -> Domain
+application -> domain
+controllers -> application
+infrastructure -> application
+infrastructure -> domain
