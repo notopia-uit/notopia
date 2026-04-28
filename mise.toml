@@ -14,7 +14,7 @@ pnpm = "10.33.2"
 sqlc = "1.30.0"
 java = "latest"
 mockery = "3.7.0"
-"aqua:go-delve/delve" = "1.26.2"
+"aqua:go-delve/delve" = "1.26.3"
 
 [shell_alias]
 nx = "pnpm exec nx"
