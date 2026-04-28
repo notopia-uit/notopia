@@ -1,0 +1,12 @@
+# vim:ft=yaml.docker-compose:
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  kroki:
+    container_name: notopia-kroki
+    image: yuzutech/kroki
+    ports:
+      - 8002:8002
+    environment:
+      KROKI_LISTEN: 0.0.0.0:8002
+    profiles:
+      - docs

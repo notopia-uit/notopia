@@ -18,3 +18,5 @@ include:
   - ./services/note.yaml
   - ./services/document.yaml
   - ./services/authorization.yaml
+
+  - ./dev/kroki.yaml

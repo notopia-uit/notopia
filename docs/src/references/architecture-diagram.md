@@ -9,3 +9,11 @@ order: 1
 ```
 
 <!-- diagram id="architecture-diagram" -->
+
+## Note Architecture Diagram
+
+```d2
+@file:../diagrams/note-architecture.d2
+```
+
+<!-- diagram id="architecture-note-diagram" -->

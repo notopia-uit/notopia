@@ -1,0 +1,63 @@
+direction: right
+
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-overrides: {
+      N1: "#4c4f69"
+      N2: "#5c5f77"
+      N4: "#acb0be"
+      N5: "#ccd0da"
+      N7: "#eff1f5"
+      B1: "#4c4f69"
+      B2: "#6c6f85"
+      B3: "#bcc0cc"
+      B4: "#ccd0da"
+      B5: "#dce0e8"
+      B6: "#eff1f5"
+      AA4: "#1e66f5"
+      AA5: "#7287fd"
+      AB4: "#8839ef"
+      AB5: "#dc8a78"
+    }
+  }
+}
+
+Controllers: Controllers {
+  http: HTTP / REST Controller
+  grpc: gRPC Server
+  event: Event Processor
+}
+
+Application: Application {
+  command_handler: Command Handler
+  query_handler: Query Handler
+  event_handler: Event Handler
+  authorization_svc_interface: Authorization Svc Interface
+  identity_svc_interface: Identity Svc Interface
+  workspace_event_bus_interface: Workspace Event Bus Interface
+  workspace_events: Workspace Events
+  integration_event_publisher_interface: Integration Event Publisher Interface
+  integration_events: Integration Events
+}
+
+Domain: Domain {
+  model: Domain Model
+  repository_interface: Repository Interface
+  domain_event: Domain Events
+}
+
+Infrastructure: Secondary Adapters {
+  persistence: Persistence/SQL
+  authentik_svc: Authentication Svc
+  authorization_svc: Authorization Svc
+  outbox: Outbox
+  workspace_event_bus: Workspace Event Bus
+  integration_event_publisher: Integration Event Publisher
+}
+
+Controllers -> Application
+Application -> Domain
+
+Infrastructure -> Application
+Infrastructure -> Domain
