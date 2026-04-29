@@ -5,7 +5,7 @@ REDOCLY_TELEMETRY = "off"
 REDOCLY_SUPPRESS_UPDATE_NOTICE = "true"
 NEXT_TELEMETRY_DISABLED = 1
 MISE_EXPERIMENTAL = 1
-'_'.path.paths = ["./scripts/"]
+'_'.path.paths = ["./bin/", "./scripts/"]
 
 [tools]
 "github:pressly/goose" = "3.27.1"

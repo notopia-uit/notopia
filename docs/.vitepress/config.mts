@@ -42,7 +42,9 @@ export function createDiagramsWithKroki(
       krokiProcess = spawn(
         'docker',
         ['run', '--rm', '-p', `${options.port}:8000`, 'yuzutech/kroki'],
-        { stdio: 'inherit' }
+        {
+          stdio: ['ignore', 'ignore', 'inherit'],
+        }
       );
     } else {
       krokiProcess = spawn('kroki', {
