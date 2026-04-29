@@ -11,7 +11,7 @@ autoInstallPeers: true
 catalog:
   '@hey-api/openapi-ts': '0.97.0'
   '@openapitools/openapi-generator-cli': '2.31.1'
-  '@redocly/cli': '2.29.2'
+  '@redocly/cli': '2.30.2'
   '@scalar/cli': '1.8.9'
   google-protobuf: '4.0.2'
   '@aws-sdk/client-s3': '3.1008.0'
