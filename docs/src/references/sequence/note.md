@@ -19,6 +19,7 @@ sequenceDiagram
     participant MB as Message Broker
     participant SW as Search Worker
     participant SS as Search Service
+    actor SU as Subcribed Users
 
     U->>+NS: CreateNote
     NS->>+AS: HasWorkspacePermission
@@ -30,12 +31,30 @@ sequenceDiagram
     NS->>NS: Create Note
     par Response
         NS-->>-U: Note ID
-    and NoteCreated event
-        NS-)MB: Publish NoteCreatedEvent
-        MB-)SW: Retrieve NoteCreatedEvent
-        SW->>SW: Process NoteCreatedEvent
-        SW->>+SS: Index Note info
-        SS->>+SS: Index Note
+    and NoteCreated domain event
+        loop Domain NoteCreatedEvent not published
+            NS-)MB: Publish domain NoteCreatedEvent
+        end
+        MB-)+NS: Domain NoteCreatedEvent
+        par Publish workspace event
+            loop Not processed domain NoteCreatedEvent
+                NS->>NS: Convert to workspace NoteCreatedEvent
+            end
+            NS-)SU: Publish workspace NoteCreatedEvent
+        and Publish NoteCreatedEvent integration event
+            loop Not processed domain NoteCreatedEvent
+                NS->>NS: Convert to NoteCreatedEvent
+            end
+            NS-)-MB: Publish integration NoteCreatedEvent
+            MB-)+SW: Retrieve integration NoteCreatedEvent
+            SW->>SW: Process NoteCreatedEvent
+            SW->>+SS: Index Note
+            par Ack
+                SS-->>-SW: Ok
+            and Indexing Note
+                SS->>+SS: Index Note
+            end
+        end
     end
 ```
 
@@ -57,9 +76,11 @@ sequenceDiagram
         AS-->>NS: No Permission
         NS-->>U: No Permission
     end
+    AS-->>-NS: Ok
     NS-->>-U: Note
-    opt Enter Edit Mode
+    opt Enter Document
         U->>+DS: WsDocument
+        DS->>DS: Get Document
         opt Document does not exists
             DS->>+NS: CheckNoteExistence
             NS->>NS: Check Note existence
@@ -71,14 +92,14 @@ sequenceDiagram
             end
         end
         DS-->>U: Hocuspocus Connection
-        loop Edit Document
+        loop Edit debounce by handled by Hocuspocus
             U->>DS: Edit Document
             DS->>DS: Save Document changes, broadcast to other clients
         end
     end
 ```
 
-## Commit Note
+## Commit Document
 
 ```mermaid
 sequenceDiagram
@@ -92,20 +113,28 @@ sequenceDiagram
     participant SS as Search Service
 
     U->>+DS: CommitDocument
-    DS->>DS: Create Document revision
+    DS->>+DS: Create Document revision
     par Response
         DS-->>-U: Ok
-    and Publish DocumentCommittedEvent
-        DS->>MB: Publish DocumentCommittedEvent
+    and Publish integration DocumentCommittedEvent
+        DS-)MB: Publish integration DocumentCommittedEvent
     end
-    par Process DocumentCommittedEvent
-        MB->>NS: DocumentCommittedEvent
-        SW->>NS: Update note size, tags
-    and
-        MB->>SW: NoteUpdated event
-        SW->>SW: Convert to markdownContent in form of NoteSearch
-        SW->>+SS: Update Note size, tags
-        SS->>SS: Update Note index
+    par Note service update note
+        loop Not processed integration DocumentCommittedEvent
+            MB-)NS: Receive DocumentCommittedEvent
+        end
+        NS->>NS: Update note size, tags
+    and Search service update note index
+        loop Not processed integration DocumentCommittedEvent
+            MB-)SW: Receive DocumentCommittedEvent
+        end
+        SW->>SW: Convert to markdownContent, tags in form of NoteSearch
+        SW->>+SS: Index Note
+        par Ack
+            SS-->>-SW: Ok
+        and Indexing Note
+            SS->>+SS: Index Note
+        end
     end
 ```
 
@@ -134,14 +163,23 @@ sequenceDiagram
         AS-->>NS: No Permission
         NS-->>U: No Permission
     end
+    AS-->>-NS: Ok
     NS->>NS: Update Note
     par Response
         NS-->>-U: Ok
-    and Publish NoteUpdatedEvent
-        NS->>MB: Publish NoteUpdatedEvent
-        MB->>SW: NoteUpdatedEvent
-        SW->>+SS: Update Note info
-        SS->>+SS: Update Note index
+    and Publish integration NoteUpdatedEvent
+        loop Not published integration NoteUpdatedEvent
+            NS-)MB: Publish NoteUpdatedEvent
+        end
+        loop Not processed integration NoteUpdatedEvent
+            MB-)SW: NoteUpdatedEvent
+        end
+        SW->>+SS: Index Note
+        par Ack
+            SS-->>-SW: Ok
+        and Indexing Note
+            SS->>SS: Index Note
+        end
     end
 ```
 

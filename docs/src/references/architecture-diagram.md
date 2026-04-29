@@ -34,10 +34,10 @@ order: 1
 
 <!-- diagram id="architecture-document-diagram" -->
 
-## SearchWorker Architecture
+## Search Worker Architecture
 
 ```d2
-@file:../diagrams/searchworker-architecture.d2
+@file:../diagrams/search-worker-architecture.d2
 ```
 
-<!-- diagram id="architecture-searchworker-diagram" -->
+<!-- diagram id="architecture-search-worker-diagram" -->
