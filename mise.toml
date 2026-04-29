@@ -21,6 +21,7 @@ nx = "pnpm exec nx"
 shadcn = "pnpm exec shadcn"
 tsgo = "pnpm exec tsgo"
 compose = "docker compose"
+p = "pnpm"
 
 # [deps.pnpm]
 # auto = true
