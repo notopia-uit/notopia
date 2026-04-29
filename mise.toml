@@ -3,6 +3,7 @@
 [env]
 REDOCLY_TELEMETRY = "off"
 REDOCLY_SUPPRESS_UPDATE_NOTICE = "true"
+NEXT_TELEMETRY_DISABLED = 1
 MISE_EXPERIMENTAL = 1
 
 [tools]
@@ -22,6 +23,7 @@ shadcn = "pnpm exec shadcn"
 tsgo = "pnpm exec tsgo"
 compose = "docker compose"
 p = "pnpm"
+pi = "pnpm install"
 
 # [deps.pnpm]
 # auto = true
