@@ -1,8 +1,18 @@
 import { DefaultTheme, UserConfig, defineConfig } from 'vitepress';
-import { configureDiagramsPlugin } from 'vitepress-plugin-diagrams';
+import {
+  DiagramPluginOptions,
+  configureDiagramsPlugin,
+} from 'vitepress-plugin-diagrams';
 import { pagefindPlugin } from 'vitepress-plugin-pagefind';
 import { withSidebar } from 'vitepress-sidebar';
 import { VitePressSidebarOptions } from 'vitepress-sidebar/types';
+
+const diagramPluginOptions = {
+  diagramsDir: 'src/public/diagrams',
+  publicPath: '/notopia/diagrams',
+  excludedDiagramTypes: ['mermaid'],
+  krokiServerUrl: process.env.CI ? undefined : process.env.KROKI_SERVER_URL,
+} satisfies DiagramPluginOptions;
 
 // https://vitepress.dev/reference/site-config
 const vitePressOptions = {
@@ -17,14 +27,7 @@ const vitePressOptions = {
       dark: 'catppuccin-mocha',
     },
     config: (md) => {
-      configureDiagramsPlugin(md, {
-        diagramsDir: 'src/public/diagrams',
-        publicPath: '/notopia/diagrams',
-        excludedDiagramTypes: ['mermaid'],
-        krokiServerUrl: process.env.CI
-          ? undefined
-          : process.env.KROKI_SERVER_URL,
-      });
+      configureDiagramsPlugin(md, diagramPluginOptions);
     },
   },
   themeConfig: {

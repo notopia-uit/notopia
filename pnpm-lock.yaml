@@ -856,7 +856,7 @@ importers:
         specifier: 1.5.2
         version: 1.5.2
       vitepress-mermaid-renderer:
-        specifier: ^1.1.18
+        specifier: 1.1.23
         version: 1.1.23(mermaid@11.13.0)(vue@3.5.32(typescript@6.0.3))
       vitepress-openapi:
         specifier: 0.1.20
