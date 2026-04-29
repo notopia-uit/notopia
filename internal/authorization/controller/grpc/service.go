@@ -12,14 +12,12 @@ import (
 )
 
 type Service struct {
-	pb.UnimplementedAuthorizationServiceServer
 	app *app.App
 }
 
 func NewService(app *app.App) *Service {
 	return &Service{
-		UnimplementedAuthorizationServiceServer: pb.UnimplementedAuthorizationServiceServer{},
-		app:                                     app,
+		app: app,
 	}
 }
 
