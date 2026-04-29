@@ -40,6 +40,18 @@
       "groupName": "go",
       "matchPackageNames": ["/^golang$/"],
       "automerge": false
+    },
+    {
+      "groupName": "github",
+      "matchPackageNames": ["/^github\\.com\\/.*$/"],
+      "automerge": false
+    },
+    {
+      "groupName": "wire",
+      "matchPackageNames": [
+        "go:github.com/goforj/wire/cmd/wire",
+        "github.com/goforj/wire"
+      ]
     }
   ],
   "docker-compose": {
