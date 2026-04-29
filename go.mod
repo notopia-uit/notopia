@@ -25,11 +25,12 @@ require (
 	github.com/hellofresh/health-go/v5 v5.5.5
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
 	github.com/jackc/pgx/v5 v5.9.2
+	github.com/meilisearch/meilisearch-go v0.36.2
 	github.com/nkonev/watermill-opentelemetry v0.1.11
 	github.com/oapi-codegen/gin-middleware v1.0.2
 	github.com/oapi-codegen/runtime v1.4.0
 	github.com/pressly/goose/v3 v3.27.1
-	github.com/redis/go-redis/v9 v9.18.0
+	github.com/redis/go-redis/v9 v9.19.0
 	github.com/samber/slog-gin v1.21.0
 	github.com/samber/slog-multi v1.8.0
 	github.com/spf13/viper v1.21.0
@@ -118,7 +119,6 @@ require (
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.21 // indirect
-	github.com/meilisearch/meilisearch-go v0.36.2 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/microsoft/go-mssqldb v1.9.8 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
