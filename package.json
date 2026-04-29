@@ -61,7 +61,7 @@
     "postcss": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-package": "2.0.0",
-    "prettier-plugin-tailwindcss": "0.7.4",
+    "prettier-plugin-tailwindcss": "0.8.0",
     "shadcn": "catalog:",
     "swc-loader": "^0.2.7",
     "tailwindcss": "catalog:",
