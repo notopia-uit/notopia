@@ -19,7 +19,7 @@ require (
 	github.com/getkin/kin-openapi v0.133.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-playground/validator/v10 v10.30.2
-	github.com/goforj/wire v1.1.0
+	github.com/goforj/wire v1.2.0
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	github.com/hellofresh/health-go/v5 v5.5.5
