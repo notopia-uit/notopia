@@ -76,7 +76,7 @@ catalog:
   eslint-plugin-react-hooks: '7.0.1'
   '@trivago/prettier-plugin-sort-imports': '6.0.2'
   express: '5.2.1'
-  jsonc-eslint-parser: '2.1.0'
+  jsonc-eslint-parser: '2.4.2'
   lucide-react: '1.6.0'
   nestjs-otel: '8.0.2'
   nestjs-pino: '4.6.1'
