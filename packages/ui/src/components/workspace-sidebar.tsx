@@ -8,13 +8,12 @@ import {
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import {
-  AudioWaveform,
   BadgeCheck,
   Bell,
   ChevronsUpDown,
-  Command,
   CreditCard,
   Folder,
   Forward,
@@ -194,28 +193,6 @@ export function CreateWorkspaceDialog() {
 
 //TODO: get user data from betterauth
 const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-  workspaces: [
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
-    },
-    {
-      name: 'Evil Corp.',
-      logo: Command,
-      plan: 'Free',
-    },
-  ],
   projects: [
     {
       name: 'Settings',
@@ -235,6 +212,8 @@ export default function WorkspaceSideBar({
 }: {
   currentWorkspaceId: string;
 }) {
+  const { data: sessionData } = authClient.useSession();
+
   const [activeWorkspacenow, setActiveWorkspace] =
     useState<NoteUserWorkspace>();
 
@@ -245,6 +224,9 @@ export default function WorkspaceSideBar({
   );
 
   //TODO: check error
+  if (!sessionData) {
+    return;
+  }
   if (!allWorkspaceData) {
     return;
   }
@@ -387,14 +369,19 @@ export default function WorkspaceSideBar({
                 >
                   {/* TODO: get user data from betterauth */}
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={data.user.avatar} alt={data.user.name} />
+                    <AvatarImage
+                      src={sessionData.user.image || ''}
+                      alt={'avatar here'}
+                    />
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {data.user.name}
+                      {sessionData.user.name}
                     </span>
-                    <span className="truncate text-xs">{data.user.email}</span>
+                    <span className="truncate text-xs">
+                      {sessionData.user.email}
+                    </span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
                 </SidebarMenuButton>
@@ -409,17 +396,17 @@ export default function WorkspaceSideBar({
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarImage
-                        src={data.user.avatar}
-                        alt={data.user.name}
+                        src={sessionData.user.image || ''}
+                        alt={sessionData.user.name}
                       />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-semibold">
-                        {data.user.name}
+                        {sessionData.user.name}
                       </span>
                       <span className="truncate text-xs">
-                        {data.user.email}
+                        {sessionData.user.email}
                       </span>
                     </div>
                   </div>
