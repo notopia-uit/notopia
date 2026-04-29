@@ -5,6 +5,7 @@ REDOCLY_TELEMETRY = "off"
 REDOCLY_SUPPRESS_UPDATE_NOTICE = "true"
 NEXT_TELEMETRY_DISABLED = 1
 MISE_EXPERIMENTAL = 1
+'_'.path.paths = ["./scripts/"]
 
 [tools]
 "github:pressly/goose" = "3.27.1"
@@ -13,9 +14,19 @@ MISE_EXPERIMENTAL = 1
 buf = "1.65.0"
 pnpm = "10.33.2"
 sqlc = "1.30.0"
-java = "latest"
+java = "26.0.1"
 mockery = "3.7.0"
 "aqua:go-delve/delve" = "1.26.3"
+d2 = "0.7.1"
+
+[tools."http:plantuml"]
+version = "1.2026.2"
+url = "https://github.com/plantuml/plantuml/releases/download/v{{ version }}/plantuml.jar"
+
+[tools."http:kroki"]
+url = "https://github.com/yuzutech/kroki/releases/download/v{{ version }}/kroki-standalone-server-v{{ version }}.jar"
+version = "0.30.1"
+bin = "kroki-server.jar"
 
 [shell_alias]
 nx = "pnpm exec nx"
@@ -24,6 +35,8 @@ tsgo = "pnpm exec tsgo"
 compose = "docker compose"
 p = "pnpm"
 pi = "pnpm install"
+plantuml = "./scripts/plantuml"
+kroki = "./scripts/kroki"
 
 # [deps.pnpm]
 # auto = true

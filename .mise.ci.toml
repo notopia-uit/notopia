@@ -9,11 +9,19 @@ sqlc = "1.30.0"
 java = "latest"
 "npm:@kevinnitro/nx-cache-action" = "0.1.0"
 mockery = "3.7.0"
+d2 = "0.7.1"
+
+[tools."http:kroki"]
+url = "https://github.com/yuzutech/kroki/releases/download/v{{ version }}/kroki-standalone-server-v{{ version }}.jar"
+version = "0.30.1"
+bin = "kroki-server.jar"
 
 [shell_alias]
 nx = "pnpm exec nx"
 shadcn = "pnpm exec shadcn"
 tsgo = "pnpm exec tsgo"
+plantuml = "./scripts/plantuml"
+kroki = "./scripts/kroki"
 
 [settings]
 legacy_version_file = false
