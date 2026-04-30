@@ -47,7 +47,8 @@ type Event struct {
 type Publisher message.Publisher
 
 func NewEvent(
-	cfg *commonconfig.Kafka,
+	generalCfg *commonconfig.General,
+	kafkaCfg *commonconfig.Kafka,
 	app *app.Server,
 	tracer kafka.SaramaTracer,
 	logger watermill.LoggerAdapter,
@@ -55,11 +56,16 @@ func NewEvent(
 	domainEventCfg *config.DomainEvent,
 	publisher Publisher,
 ) (*Event, error) {
+	saramaConfig := kafka.DefaultSaramaSubscriberConfig()
+	if generalCfg.AppEnv == commonconfig.AppEnvDevelopment {
+		saramaConfig.Consumer.Group.Session.Timeout = time.Hour
+	}
 	subcriber, err := kafka.NewSubscriber(
 		kafka.SubscriberConfig{
-			Brokers:       cfg.Brokers,
-			ConsumerGroup: cfg.ConsumerGroup,
-			Tracer:        tracer,
+			Brokers:               kafkaCfg.Brokers,
+			ConsumerGroup:         kafkaCfg.ConsumerGroup,
+			Tracer:                tracer,
+			OverwriteSaramaConfig: saramaConfig,
 		},
 		logger,
 	)
@@ -68,9 +74,10 @@ func NewEvent(
 	}
 	workspaceEventSubcriber, err := kafka.NewSubscriber(
 		kafka.SubscriberConfig{
-			Brokers:       cfg.Brokers,
-			ConsumerGroup: cfg.ConsumerGroup + ".workspace-event",
-			Tracer:        tracer,
+			Brokers:               kafkaCfg.Brokers,
+			ConsumerGroup:         kafkaCfg.ConsumerGroup + ".workspace-event",
+			Tracer:                tracer,
+			OverwriteSaramaConfig: saramaConfig,
 		},
 		logger,
 	)
@@ -112,9 +119,10 @@ func NewEvent(
 			SubscriberConstructor: func(params cqrs.EventProcessorSubscriberConstructorParams) (message.Subscriber, error) {
 				return kafka.NewSubscriber(
 					kafka.SubscriberConfig{
-						Brokers:       cfg.Brokers,
-						ConsumerGroup: cfg.ConsumerGroup + "." + params.HandlerName,
-						Tracer:        tracer,
+						Brokers:               kafkaCfg.Brokers,
+						ConsumerGroup:         kafkaCfg.ConsumerGroup + "." + params.HandlerName,
+						Tracer:                tracer,
+						OverwriteSaramaConfig: saramaConfig,
 					},
 					logger,
 				)

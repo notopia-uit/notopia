@@ -21,6 +21,7 @@ services:
       - --set auto_create_topics_enabled=true
       - --set partition_autobalancing_mode=off
       - --set core_balancing_continuous=false
+      - --set group_max_session_timeout_ms=3600000
     ports:
       - 38081:38081
       - 38082:38082
