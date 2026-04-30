@@ -45,7 +45,7 @@ WHERE
 -- name: GetNotesOutgoingLinks :many
 SELECT
   source_id,
-  ARRAY_AGG(target_id) AS target_ids
+  ARRAY_AGG(target_id)::uuid[] AS target_ids
 FROM
   note_links
 WHERE

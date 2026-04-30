@@ -84,8 +84,8 @@ FROM
   notes
 WHERE
   id = ANY($1::uuid[]) -- :if $1
-  AND folder_id IN (
-    SELECT id FROM folders WHERE workspace_id = $2::uuid
+  AND folder_id IN ( -- :if $2
+    SELECT id FROM folders WHERE workspace_id = $2::uuid -- :if $2
   ) -- :if $2
   AND ( -- :if $3
     trashed_by = $3::text -- :if $3

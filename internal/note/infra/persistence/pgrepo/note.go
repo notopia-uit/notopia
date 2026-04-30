@@ -114,11 +114,7 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 	}
 	noteIDOutgoingLinksMap := make(map[uuid.UUID][]uuid.UUID, len(noteIDOutgoingLinksPairs))
 	for _, pair := range noteIDOutgoingLinksPairs {
-		targetIDs, ok := pair.TargetIDs.([]uuid.UUID)
-		if !ok {
-			return nil, errs.NewPersistenceInvalid(fmt.Sprintf("invalid type for target ids: %T", pair.TargetIDs), nil)
-		}
-		noteIDOutgoingLinksMap[pair.SourceID] = targetIDs
+		noteIDOutgoingLinksMap[pair.SourceID] = pair.TargetIDs
 	}
 	result := make([]*domain.Note, len(notes))
 	for i, note := range notes {
@@ -150,11 +146,7 @@ func (n *Note) GetRecursiveChildrenFromFolder(ctx context.Context, folderID uuid
 	}
 	noteIDOutgoingLinksMap := make(map[uuid.UUID][]uuid.UUID, len(noteIDOutgoingLinksPairs))
 	for _, pair := range noteIDOutgoingLinksPairs {
-		targetIDs, ok := pair.TargetIDs.([]uuid.UUID)
-		if !ok {
-			return nil, errs.NewPersistenceInvalid(fmt.Sprintf("invalid type for target ids: %T", pair.TargetIDs), nil)
-		}
-		noteIDOutgoingLinksMap[pair.SourceID] = targetIDs
+		noteIDOutgoingLinksMap[pair.SourceID] = pair.TargetIDs
 	}
 	result := make([]*domain.Note, len(notes))
 	for i, note := range notes {

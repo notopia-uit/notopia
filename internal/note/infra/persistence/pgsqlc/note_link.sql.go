@@ -69,7 +69,7 @@ func (q *Queries) GetNoteOutgoingLinks(ctx context.Context, sourceID uuid.UUID) 
 const getNotesOutgoingLinks = `-- name: GetNotesOutgoingLinks :many
 SELECT
   source_id,
-  ARRAY_AGG(target_id) AS target_ids
+  ARRAY_AGG(target_id)::uuid[] AS target_ids
 FROM
   note_links
 WHERE
@@ -80,7 +80,7 @@ GROUP BY
 
 type GetNotesOutgoingLinksRow struct {
 	SourceID  uuid.UUID
-	TargetIDs interface{}
+	TargetIDs []uuid.UUID
 }
 
 func (q *Queries) GetNotesOutgoingLinks(ctx context.Context, sourceIds []uuid.UUID) ([]*GetNotesOutgoingLinksRow, error) {
