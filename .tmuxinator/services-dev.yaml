@@ -5,7 +5,12 @@ windows:
   - svcs dev:
       layout: tiled
       panes:
-        - note: nx run note --no-tui
-        - authorization: nx run authorization --no-tui
-        - document: nx run document --no-tui
-        - search-worker: nx run search-worker --no-tui
+        - note:
+            - tmux set-option -w pane-border-status top
+            - nx run note --no-tui
+        - authorization:
+            - nx run authorization --no-tui
+        - document:
+            - nx run document --no-tui
+        - search-worker:
+            - nx run search-worker --no-tui

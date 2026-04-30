@@ -5,7 +5,12 @@ windows:
   - svcs prod:
       layout: tiled
       panes:
-        - note: nx run note --no-tui --configuration=production
-        - authorization: nx run authorization --no-tui --configuration=production
-        - document: nx run document --no-tui --configuration=production
-        - search-worker: nx run search-worker --no-tui --configuration=production
+        - note:
+        - tmux set-option -w pane-border-status top
+        - nx run note --no-tui --configuration=production
+        - authorization:
+            - nx run authorization --no-tui --configuration=production
+        - document:
+            - nx run document --no-tui --configuration=production
+        - search-worker:
+            - nx run search-worker --no-tui --configuration=production
