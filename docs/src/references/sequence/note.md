@@ -68,6 +68,7 @@ sequenceDiagram
     participant NS as Note Service
     participant DS as Document Service
     participant AS as Authorization Service
+    actor SU as Subcribed Users
 
     U->>+NS: GetNote
     NS->>NS: Get Note
@@ -78,24 +79,23 @@ sequenceDiagram
     end
     AS-->>-NS: Ok
     NS-->>-U: Note
-    opt Enter Document
-        U->>+DS: WsDocument
-        DS->>DS: Get Document
-        opt Document does not exists
-            DS->>+NS: CheckNoteExistence
-            NS->>NS: Check Note existence
-            alt Note does not exists
-                NS-->>-DS: Not found
-                DS-->>U: Not found
-            else Note exists
-                DS->>DS: Init document
-            end
+    U->>+DS: Hocuspocus Connection
+    DS->>DS: Get Document
+    alt Document does not exists
+        DS->>+NS: CheckNoteExistence
+        NS->>NS: Check Note existence
+        alt Note does not exists
+            NS-->>-DS: Not found
+            DS-->>U: Not found
+        else Note exists
+            DS->>DS: Init document
         end
-        DS-->>U: Hocuspocus Connection
-        loop Edit debounce by handled by Hocuspocus
-            U->>DS: Edit Document
-            DS->>DS: Save Document changes, broadcast to other clients
-        end
+    end
+    DS-->>U: Hocuspocus Connection
+    loop Edit debounce by handled by Hocuspocus
+        U->>DS: Edit Document
+        DS->>DS: Save Document changes
+        DS-->>SU: Broadcast Document changes
     end
 ```
 
