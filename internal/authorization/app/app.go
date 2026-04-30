@@ -73,6 +73,8 @@ func (a *App) SeedDev(ctx context.Context) error {
 		{"user:112", "owner", "workspace:00000000-0000-0000-0000-000000000112"},
 		{"user:111", "editor", "workspace:00000000-0000-0000-0000-000000000112"},
 		{"user:110", "owner", "workspace:00000000-0000-0000-0000-000000000110"},
+		{"user:112", "owner", "workspace:00000000-0000-0000-0000-000000000110"},
+		{"user:111", "owner", "workspace:00000000-0000-0000-0000-000000000110"},
 	}
 
 	_, err := a.Enforcer.AddGroupingPolicies(devPolicies)
