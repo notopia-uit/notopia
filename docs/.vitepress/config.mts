@@ -3,8 +3,10 @@ import { ChildProcess, spawn } from 'node:child_process';
 import { DefaultTheme, UserConfig, defineConfig } from 'vitepress';
 import { type Plugin } from 'vitepress';
 import {
+  BuildTimeDiagramPluginOptions,
   DiagramPluginOptions,
   configureDiagramsPlugin,
+  createBuildTimeDiagramsPlugin,
 } from 'vitepress-plugin-diagrams';
 import { pagefindPlugin } from 'vitepress-plugin-pagefind';
 import { withSidebar } from 'vitepress-sidebar';
@@ -18,7 +20,7 @@ const diagramPluginOptions = {
   publicPath: '/notopia/diagrams',
   excludedDiagramTypes: ['mermaid'],
   krokiServerUrl: `http://localhost:${krokiPort}`,
-} satisfies DiagramPluginOptions;
+} satisfies DiagramPluginOptions & BuildTimeDiagramPluginOptions;
 
 type KrokiWrapperOptions = {
   port?: number;
@@ -132,7 +134,11 @@ const vitePressOptions = {
     ],
   },
   vite: {
-    plugins: [createDiagramsWithKroki({ port: krokiPort }), pagefindPlugin()],
+    plugins: [
+      createDiagramsWithKroki({ port: krokiPort }),
+      pagefindPlugin(),
+      createBuildTimeDiagramsPlugin(diagramPluginOptions),
+    ],
   },
   ignoreDeadLinks: ['/notopia/api/index.html'],
 } satisfies UserConfig<NoInfer<DefaultTheme.Config>>;

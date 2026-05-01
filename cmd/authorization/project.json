@@ -17,7 +17,6 @@
     },
     "gen:wire": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "outputs": ["{projectRoot}/wire_gen.go"],
       "options": {
         "command": "wire",
@@ -27,7 +26,6 @@
     },
     "run": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
         "command": "go run ./cmd/authorization/",
         "cwd": "{workspaceRoot}",
@@ -38,7 +36,6 @@
     },
     "build": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
         "command": "go build -o ./cmd/authorization/authorization ./cmd/authorization/",
         "cwd": "{workspaceRoot}"
@@ -62,7 +59,6 @@
     },
     "preview": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
         "command": "./authorization",
         "cwd": "{projectRoot}",

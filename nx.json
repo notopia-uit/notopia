@@ -37,6 +37,7 @@
       "cache": true
     },
     "build*": {
+      "inputs": ["default", "^default"],
       "dependsOn": ["^build*", "^bundle*", "^gen"],
       "defaultConfiguration": "development",
       "cache": true

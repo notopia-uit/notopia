@@ -4,11 +4,12 @@
   "projectType": "application",
   "tags": ["scope:docs"],
   "namedInputs": {
-    "vitepressFiles": [
+    "default": [
       "{projectRoot}/.vitepress/config.{mts,ts}",
       "{projectRoot}/.vitepress/theme/**/*.{vue,ts,mts}",
       "{projectRoot}/src/**/*.md",
-      "{projectRoot}/public/**"
+      "{projectRoot}/public/**",
+      "{projectRoot}/diagrams/**"
     ]
   },
   "targets": {
@@ -21,41 +22,20 @@
       },
       "continuous": true
     },
-    "build:1": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "vitepress build",
-        "cwd": "{projectRoot}"
-      },
-      "configurations": {
-        "production": {
-          "env": {
-            "DOCS_BASE": "/notopia"
-          }
-        }
-      },
-      "outputs": ["{projectRoot}/.vitepress/dist"],
-      "inputs": ["vitepressFiles"]
-    },
-    "build:2": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "vitepress build",
-        "cwd": "{projectRoot}"
-      },
-      "configurations": {
-        "production": {
-          "env": {
-            "DOCS_BASE": "/notopia"
-          }
-        }
-      },
-      "outputs": ["{projectRoot}/.vitepress/dist"],
-      "inputs": ["vitepressFiles"],
-      "dependsOn": ["build:1"]
-    },
     "build": {
-      "dependsOn": ["build:1", "build:2"]
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitepress build",
+        "cwd": "{projectRoot}"
+      },
+      "configurations": {
+        "production": {
+          "env": {
+            "DOCS_BASE": "/notopia"
+          }
+        }
+      },
+      "outputs": ["{projectRoot}/.vitepress/dist"]
     },
     "preview": {
       "executor": "nx:run-commands",
