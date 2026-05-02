@@ -96,7 +96,7 @@ catalog:
   zod: '4.3.6'
   '@hocuspocus/extension-logger': '3.4.4'
   meilisearch: '0.57.0'
-  marked: '18.0.2'
+  marked: '18.0.3'
   markdown-to-txt: '2.0.1'
   kafkajs: '2.2.4'
   '@swc-node/register': '1.11.1'
