@@ -1,8 +1,5 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import {
-  InternalServerErrorException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { InternalServerErrorException, UnprocessableEntityException } from '@nestjs/common';
 import { type ClientGrpc } from '@nestjs/microservices';
 import {
   AUTHORIZATION_PACKAGE_NAME,
@@ -14,10 +11,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { NoteService } from '#/note/note.service';
 
-import {
-  UserNotePermissions as UserNotePermission,
-  WorkspaceItemPermission,
-} from './models';
+import { UserNotePermissions as UserNotePermission, WorkspaceItemPermission } from './models';
 
 @Injectable()
 export class AuthorizationService implements OnModuleInit {
@@ -29,15 +23,12 @@ export class AuthorizationService implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
-    this.authorizationServiceClient =
-      this.client.getService<AuthorizationServiceClient>(
-        AUTHORIZATION_SERVICE_NAME
-      );
+    this.authorizationServiceClient = this.client.getService<AuthorizationServiceClient>(
+      AUTHORIZATION_SERVICE_NAME
+    );
   }
 
-  private toWorkspaceItemPermissionPb(
-    permission: UserNotePermission
-  ): WorkspaceItemPermissionPb {
+  private toWorkspaceItemPermissionPb(permission: UserNotePermission): WorkspaceItemPermissionPb {
     switch (permission) {
       case 'read':
         return WorkspaceItemPermissionPb.WORKSPACE_ITEM_PERMISSION_READ;
@@ -47,9 +38,7 @@ export class AuthorizationService implements OnModuleInit {
         return WorkspaceItemPermissionPb.WORKSPACE_ITEM_PERMISSION_DELETE;
       default: {
         const exhaustiveCheck: never = permission;
-        throw new UnprocessableEntityException(
-          `Invalid permission: ${String(exhaustiveCheck)}`
-        );
+        throw new UnprocessableEntityException(`Invalid permission: ${String(exhaustiveCheck)}`);
       }
     }
   }

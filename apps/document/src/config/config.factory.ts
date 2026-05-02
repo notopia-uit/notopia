@@ -1,12 +1,6 @@
 import { registerAs } from '@nestjs/config';
 
-import {
-  AppConfig,
-  DatabaseConfig,
-  KafkaConfig,
-  S3Config,
-  ServicesConfig,
-} from './config';
+import { AppConfig, DatabaseConfig, KafkaConfig, S3Config, ServicesConfig } from './config';
 
 export const APP_CONFIG = Symbol('APP_CONFIG');
 
@@ -38,8 +32,7 @@ export const servicesConfig = registerAs(
   SERVICE_CONFIG,
   (): ServicesConfig => ({
     noteUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_NOTE_GPRC_URL ?? '',
-    authorizationUrl:
-      process.env.NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_GRPC_URL ?? '',
+    authorizationUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_GRPC_URL ?? '',
   })
 );
 
@@ -62,9 +55,7 @@ export const kafkaConfig = registerAs(
   KAFKA_CONFIG,
   (): KafkaConfig => ({
     clientId: process.env.NOTOPIA_DOCUMENT_KAFKA_CLIENT_ID ?? 'document',
-    brokers: (
-      process.env.NOTOPIA_DOCUMENT_KAFKA_BROKERS ?? 'localhost:19092'
-    ).split(','),
+    brokers: (process.env.NOTOPIA_DOCUMENT_KAFKA_BROKERS ?? 'localhost:19092').split(','),
     groupId: process.env.NOTOPIA_DOCUMENT_KAFKA_GROUP_ID ?? 'document',
   })
 );

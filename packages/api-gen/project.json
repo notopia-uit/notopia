@@ -3,9 +3,6 @@
   "name": "packages/api-gen",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "nx:noop"
-    },
     "gen": {
       "dependsOn": [
         {

@@ -2,6 +2,9 @@
   "name": "@notopia-uit/document",
   "private": true,
   "type": "module",
+  "imports": {
+    "#/*": "./src/*.js"
+  },
   "scripts": {
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
     "typeorm-extension": "tsx ./node_modules/typeorm-extension/bin/cli.mjs",
@@ -62,8 +65,5 @@
     "tsx": "catalog:",
     "typeorm-extension": "catalog:",
     "webpack-node-externals": "catalog:"
-  },
-  "imports": {
-    "#/*": "./src/*.js"
   }
 }

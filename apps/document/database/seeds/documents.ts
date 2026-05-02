@@ -1,10 +1,11 @@
-import { blocksToYDoc } from '@blocknote/core/yjs';
-import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+import { blocksToYDoc } from '@blocknote/core/yjs';
+import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { DataSource, Repository } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
-import { fileURLToPath } from 'url';
 import { encodeStateAsUpdateV2 } from 'yjs';
 
 import { DocumentEntity } from '#/document/document.entity';
@@ -20,15 +21,11 @@ export default class DocumentSeeder implements Seeder {
     const documentRepo = dataSource.getRepository(DocumentEntity);
     const seedDataDir = path.join(__dirname, '../seed-data');
 
-    const files = fs
-      .readdirSync(seedDataDir)
-      .filter((file) => file.endsWith('.md'));
+    const files = fs.readdirSync(seedDataDir).filter((file) => file.endsWith('.md'));
 
     console.log(`Found ${files.length} markdown files to seed`);
 
-    const seedPromises = files.map((file) =>
-      this.seedDocument(file, seedDataDir, documentRepo)
-    );
+    const seedPromises = files.map((file) => this.seedDocument(file, seedDataDir, documentRepo));
 
     await Promise.all(seedPromises);
     console.log(`Successfully seeded ${files.length} documents`);

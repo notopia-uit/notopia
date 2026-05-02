@@ -1,6 +1,7 @@
 'use client';
 import { BlockNoteEditor, PartialBlock } from '@blocknote/core';
 import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
+
 import '@blocknote/core/fonts/inter.css';
 import {
   DefaultReactSuggestionItem,
@@ -9,6 +10,7 @@ import {
   useCreateBlockNote,
 } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
+
 import '@blocknote/shadcn/style.css';
 import { getNoteOptions } from '@notopia-uit/api-gen';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -30,9 +32,7 @@ const insertHelloWorldItem = (editor: BlockNoteEditor) => ({
   subtext: "Used to insert a block with 'Hello World' below.",
 });
 
-const getCustomSlashMenuItems = (
-  editor: BlockNoteEditor
-): DefaultReactSuggestionItem[] => [
+const getCustomSlashMenuItems = (editor: BlockNoteEditor): DefaultReactSuggestionItem[] => [
   ...getDefaultReactSlashMenuItems(editor),
   insertHelloWorldItem(editor),
 ];
@@ -64,7 +64,7 @@ export default function Editor({ noteId }: { noteId: string }) {
         />
       </BlockNoteView>
       {isDirty && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">
           <Button
             variant="outline"
             size="icon"

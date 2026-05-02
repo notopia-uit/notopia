@@ -1,16 +1,17 @@
-// sort-imports-ignore
+// oxfmt-ignore
 import './otel';
 import 'reflect-metadata';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { WsAdapter } from '@nestjs/platform-ws';
+import { Logger } from 'nestjs-pino';
+
+import { getKafkaConfig } from '#/config/kafka.config';
 
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/http-exception.filter';
 import { AppConfig } from './config/config';
 import { APP_CONFIG } from './config/config.factory';
-import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
-import { WsAdapter } from '@nestjs/platform-ws';
-import { Logger } from 'nestjs-pino';
-import { getKafkaConfig } from '#/config/kafka.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });

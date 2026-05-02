@@ -1,10 +1,5 @@
 import { status } from '@grpc/grpc-js';
-import {
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, OnModuleInit } from '@nestjs/common';
 import { type ClientGrpc } from '@nestjs/microservices';
 import {
   NOTE_PACKAGE_NAME,
@@ -30,8 +25,7 @@ export class NoteService implements OnModuleInit {
   constructor(@Inject(NOTE_PACKAGE_NAME) private client: ClientGrpc) {}
 
   onModuleInit(): void {
-    this.noteServiceClient =
-      this.client.getService<NoteServiceClient>(NOTE_SERVICE_NAME);
+    this.noteServiceClient = this.client.getService<NoteServiceClient>(NOTE_SERVICE_NAME);
   }
 
   async getNoteById({
@@ -81,9 +75,7 @@ export class NoteService implements OnModuleInit {
 
   // TODO: previously used to fetch each, but we might going to change batch, maybe this will be removed
   async getNoteName(noteId: string): Promise<string> {
-    const response = await firstValueFrom(
-      this.noteServiceClient.getNoteName({ id: noteId })
-    );
+    const response = await firstValueFrom(this.noteServiceClient.getNoteName({ id: noteId }));
     return response.name;
   }
 
@@ -122,9 +114,7 @@ export class NoteService implements OnModuleInit {
   toTrashedModel(trashed: Trashed): TrashedModel {
     switch (trashed.by) {
       case TrashedBy.TRASHED_BY_UNSPECIFIED:
-        throw new InternalServerErrorException(
-          'Trashed by value is unspecified'
-        );
+        throw new InternalServerErrorException('Trashed by value is unspecified');
       case TrashedBy.TRASHED_BY_PURPOSE:
         if (!trashed.at) {
           throw new InternalServerErrorException(

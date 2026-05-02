@@ -76,6 +76,31 @@ lsp.config("tsgo", {
   settings = tsgo_setting,
 })
 
+lsp.config("oxlint", {
+  cmd = function(dispatchers)
+    return vim.lsp.rpc.start({ "oxlint", "--lsp", "--config", "oxlint.config.mts" }, dispatchers)
+  end,
+  on_attach = function(client, bufnr)
+    vim.api.nvim_buf_create_user_command(bufnr, "LspOxlintFixAll", function()
+      client:exec_cmd({
+        title = "Apply Oxlint automatic fixes",
+        command = "oxc.fixAll",
+        arguments = { { uri = vim.uri_from_bufnr(bufnr) } },
+      })
+    end, {
+      desc = "Apply Oxlint automatic fixes",
+    })
+  end,
+  root_markers = { "oxlint.config.mts" },
+})
+
+lsp.config("oxfmt", {
+  cmd = function(dispatchers)
+    return vim.lsp.rpc.start({ "oxfmt", "--lsp", "--config", "oxfmt.config.mts" }, dispatchers)
+  end,
+  root_markers = { "oxfmt.config.mts" },
+})
+
 if vim.fn.executable("harper-ls") == 1 then
   lsp.enable("harper_ls")
 end
@@ -140,3 +165,5 @@ end, { desc = "LSP | Restart redocly_ls", silent = true })
 
 vim.o.backupcopy = "yes" -- https://github.com/nrwl/nx/issues/20622
 vim.opt.isfname:append("{,},@")
+
+lsp.enable({ "tsgo", "gopls", "oxlint", "oxfmt", "tailwindcss", "yamlls", "jsonls" })

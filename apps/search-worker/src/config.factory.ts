@@ -18,13 +18,9 @@ export const KAFKA_CONFIG = Symbol('KAFKA_CONFIG');
 export const kafkaConfig = registerAs(
   KAFKA_CONFIG,
   (): KafkaConfig => ({
-    clientId:
-      process.env.NOTOPIA_SEARCH_WORKER_KAFKA_CLIENT_ID ?? 'search-worker',
-    brokers: (
-      process.env.NOTOPIA_SEARCH_WORKER_KAFKA_BROKERS ?? 'localhost:19092'
-    ).split(','),
-    groupId:
-      process.env.NOTOPIA_SEARCH_WORKER_KAFKA_GROUP_ID ?? 'search-worker',
+    clientId: process.env.NOTOPIA_SEARCH_WORKER_KAFKA_CLIENT_ID ?? 'search-worker',
+    brokers: (process.env.NOTOPIA_SEARCH_WORKER_KAFKA_BROKERS ?? 'localhost:19092').split(','),
+    groupId: process.env.NOTOPIA_SEARCH_WORKER_KAFKA_GROUP_ID ?? 'search-worker',
   })
 );
 

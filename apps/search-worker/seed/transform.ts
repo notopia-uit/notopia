@@ -1,17 +1,15 @@
-import { ShareNoteSearch } from '@notopia-uit/api-gen';
 import { existsSync, mkdirSync, readdirSync, statSync } from 'fs';
 import * as fs from 'fs/promises';
-import markdownToTxt from 'markdown-to-txt';
 import * as path from 'path';
+
+import { ShareNoteSearch } from '@notopia-uit/api-gen';
+import markdownToTxt from 'markdown-to-txt';
 import { v5 as uuidv5 } from 'uuid';
 
 // Constants
 const NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 const WORKSPACE_ID = '00000000-0000-0000-0000-000000000110';
-const SOURCE_DIR = path.join(
-  __dirname,
-  '../../../submodule/trshpuppy-obsidian-notes'
-);
+const SOURCE_DIR = path.join(__dirname, '../../../submodule/trshpuppy-obsidian-notes');
 const OUTPUT_DIR = path.join(__dirname, 'data');
 
 // Regex
@@ -60,10 +58,7 @@ async function processFile(filePath: string): Promise<void> {
     tags: extractTags(content),
   };
 
-  await fs.writeFile(
-    path.join(OUTPUT_DIR, `${id}.json`),
-    JSON.stringify(note, null, 2)
-  );
+  await fs.writeFile(path.join(OUTPUT_DIR, `${id}.json`), JSON.stringify(note, null, 2));
 }
 
 async function run() {

@@ -10,13 +10,7 @@ import { BLOCKNOTE_SCHEMA } from 'token';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppConfig, MeiliConfig } from './config';
-import {
-  APP_CONFIG,
-  MEILI_CONFIG,
-  appConfig,
-  kafkaConfig,
-  meiliConfig,
-} from './config.factory';
+import { APP_CONFIG, MEILI_CONFIG, appConfig, kafkaConfig, meiliConfig } from './config.factory';
 
 @Module({
   imports: [

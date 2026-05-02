@@ -1,5 +1,6 @@
-import getPort from 'get-port';
 import { ChildProcess, spawn } from 'node:child_process';
+
+import getPort from 'get-port';
 import { DefaultTheme, UserConfig, defineConfig } from 'vitepress';
 import { type Plugin } from 'vitepress';
 import {
@@ -27,9 +28,7 @@ type KrokiWrapperOptions = {
   docker?: boolean;
 };
 
-export function createDiagramsWithKroki(
-  options: KrokiWrapperOptions = {}
-): Plugin {
+export function createDiagramsWithKroki(options: KrokiWrapperOptions = {}): Plugin {
   let krokiProcess: ChildProcess | null = null;
   let krokiUrl: string;
   let started = false;
@@ -154,6 +153,4 @@ const vitePressSidebarOptions = {
   collapseDepth: 2,
 } satisfies VitePressSidebarOptions;
 
-export default defineConfig(
-  withSidebar(vitePressOptions, vitePressSidebarOptions)
-);
+export default defineConfig(withSidebar(vitePressOptions, vitePressSidebarOptions));

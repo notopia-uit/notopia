@@ -21,9 +21,7 @@ export class KafkaMaxRetryExceptionFilter extends BaseExceptionFilter {
 
     if (currentRetryCount >= this.maxRetries) {
       this.logger.warn(
-        `Max retries (${
-          this.maxRetries
-        }) exceeded for message: ${JSON.stringify(message)}`
+        `Max retries (${this.maxRetries}) exceeded for message: ${JSON.stringify(message)}`
       );
 
       if (this.skipHandler) {
@@ -59,9 +57,7 @@ export class KafkaMaxRetryExceptionFilter extends BaseExceptionFilter {
     const offset = message.offset;
 
     if (!topic || partition === undefined || offset === undefined) {
-      throw new Error(
-        'Incomplete Kafka message context for committing offset.'
-      );
+      throw new Error('Incomplete Kafka message context for committing offset.');
     }
 
     await consumer.commitOffsets([

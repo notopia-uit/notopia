@@ -5,12 +5,12 @@ http:
       entryPoints:
         - web
       rule: Host(`api.notopia.localhost`) && PathPrefix(`/document`)
-      service:  document
+      service: document
       middlewares:
         - jwt
 
   services:
-     document:
+    document:
       loadBalancer:
         servers:
           - url: http://host.docker.internal:8082

@@ -1,11 +1,8 @@
+import { IncomingMessage } from 'http';
+
 import { Hocuspocus } from '@hocuspocus/server';
 import { UseGuards } from '@nestjs/common';
-import {
-  ConnectedSocket,
-  OnGatewayConnection,
-  WebSocketGateway,
-} from '@nestjs/websockets';
-import { IncomingMessage } from 'http';
+import { ConnectedSocket, OnGatewayConnection, WebSocketGateway } from '@nestjs/websockets';
 import { Traceable } from 'nestjs-otel';
 import { WebSocket } from 'ws';
 

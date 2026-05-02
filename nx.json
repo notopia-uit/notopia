@@ -17,11 +17,7 @@
       "{workspaceRoot}/pkg/**/*.{go}",
       "!{workspaceRoot}/pkg/**/*_test.{go}"
     ],
-    "goFiles": [
-      "{workspaceRoot}/go.mod",
-      "{workspaceRoot}/go.sum",
-      "{projectRoot}/**/*.go"
-    ],
+    "goFiles": ["{workspaceRoot}/go.mod", "{workspaceRoot}/go.sum", "{projectRoot}/**/*.go"],
     "protoFiles": [
       "{projectRoot}/**/*.proto",
       "{workspaceRoot}/buf.gen.yaml",
@@ -66,12 +62,6 @@
     }
   },
   "plugins": [
-    {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "lint"
-      }
-    },
     {
       "plugin": "@nx/js/typescript",
       "options": {
@@ -173,6 +163,13 @@
         "buildDepsTargetName": "build-deps",
         "watchDepsTargetName": "watch-deps"
       }
+    },
+    {
+      "plugin": "nx-oxlint",
+      "options": {
+        "lintTargetName": "lint",
+        "configFile": "oxlint.config.mts"
+      }
     }
   ],
   "release": {
@@ -197,13 +194,7 @@
         }
       },
       "docker-go": {
-        "projects": [
-          "note",
-          "authorization",
-          "document",
-          "search-worker",
-          "web"
-        ],
+        "projects": ["note", "authorization", "document", "search-worker", "web"],
         "releaseTag": {
           "pattern": "{projectName}@{version}"
         },
@@ -232,7 +223,7 @@
       "application": {
         "babel": true,
         "style": "css",
-        "linter": "eslint",
+        "linter": "none",
         "bundler": "vite"
       },
       "component": {
@@ -240,14 +231,14 @@
       },
       "library": {
         "style": "css",
-        "linter": "eslint",
+        "linter": "none",
         "unitTestRunner": "none"
       }
     },
     "@nx/next": {
       "application": {
         "style": "tailwind",
-        "linter": "eslint"
+        "linter": "none"
       }
     }
   },

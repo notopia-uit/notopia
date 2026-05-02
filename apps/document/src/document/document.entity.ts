@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryColumn,
-  type Relation,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn, type Relation } from 'typeorm';
 
 import { RevisionEntity } from '#/revision/revision.entity';
 

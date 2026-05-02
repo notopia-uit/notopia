@@ -28,9 +28,7 @@ function markdownToHTML(markdown: string): string {
   return typeof parsed === 'string' ? parsed : '';
 }
 
-function transformInlineContent(
-  content: MyBlock['content']
-): MyBlock['content'] {
+function transformInlineContent(content: MyBlock['content']): MyBlock['content'] {
   const transformed: InlineNode[] = [];
   if (!Array.isArray(content)) {
     return content;

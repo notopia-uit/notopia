@@ -14,10 +14,7 @@ declare global {
         | 'parentbased_traceidratio';
       OTEL_TRACES_SAMPLER_ARG?: string; // (0.0 - 1.0)
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?: string; // Standard
-      OTEL_EXPORTER_OTLP_TRACES_PROTOCOL?:
-        | 'grpc'
-        | 'http/protobuf'
-        | 'http/json';
+      OTEL_EXPORTER_OTLP_TRACES_PROTOCOL?: 'grpc' | 'http/protobuf' | 'http/json';
       OTEL_METRICS_EXPORTER?: 'otlp' | 'console' | 'none';
       OTEL_METRIC_EXPORT_INTERVAL?: string; // (ms)
       OTEL_EXPORTER_OTLP_METRICS_ENDPOINT?: string; // Standard
@@ -33,13 +30,7 @@ declare global {
       NODE_ENV?: 'development' | 'production' | 'test';
 
       NOTOPIA_DOCUMENT_PORT?: string;
-      NOTOPIA_DOCUMENT_LOG_LEVEL?:
-        | 'trace'
-        | 'debug'
-        | 'info'
-        | 'warn'
-        | 'error'
-        | 'fatal';
+      NOTOPIA_DOCUMENT_LOG_LEVEL?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
       NOTOPIA_DOCUMENT_API_URL?: string; // public serve, for it own, and other services reference
 
       NOTOPIA_DOCUMENT_DB_HOST?: string;

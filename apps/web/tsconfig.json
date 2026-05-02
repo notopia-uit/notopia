@@ -29,18 +29,10 @@
     "index.d.ts",
     "global.d.ts",
     ".next/types/**/*.ts",
-    "eslint.config.mjs",
     "postcss.config.mjs",
     "../../packages/ui/src/global.d.ts"
   ],
-  "exclude": [
-    "out-tsc",
-    "dist",
-    "node_modules",
-    "app/**/*.spec.ts",
-    "app/**/*.test.ts",
-    ".next"
-  ],
+  "exclude": ["out-tsc", "dist", "node_modules", "app/**/*.spec.ts", "app/**/*.test.ts", ".next"],
   "references": [
     {
       "path": "../../packages/ui"

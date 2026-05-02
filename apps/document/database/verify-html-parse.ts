@@ -1,10 +1,11 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { type MyBlock, type MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
 import { marked } from 'marked';
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { parseSeedMarkdownToBlocks } from './seeds/blocknote-seed-transform';
 
@@ -47,12 +48,7 @@ async function main(): Promise<void> {
   const editor = ServerBlockNoteEditor.create({ schema: blockNoteSchema });
 
   const target =
-    process.argv[2] ??
-    path.join(
-      __dirname,
-      'seed-data',
-      '000c2575-1847-5293-8117-2415a2328ef8.md'
-    );
+    process.argv[2] ?? path.join(__dirname, 'seed-data', '000c2575-1847-5293-8117-2415a2328ef8.md');
 
   const markdown = readFileSync(target, 'utf-8');
   const html = marked.parse(markdown, { async: false, gfm: true });

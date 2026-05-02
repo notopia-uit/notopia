@@ -1,15 +1,11 @@
+import { randomUUID } from 'crypto';
+
 import { type MyBlock, type MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { type ShareDocumentCommittedEvent } from '@notopia-uit/api-gen';
-import { randomUUID } from 'crypto';
 import { Traceable } from 'nestjs-otel';
 import { lastValueFrom } from 'rxjs';
 import { DataSource, Repository } from 'typeorm';
@@ -42,10 +38,7 @@ export class DocumentService {
     return doc;
   }
 
-  private bufferToBlockNote(
-    data: Buffer,
-    editor: ServerBlockNoteEditor
-  ): MyBlock[] {
+  private bufferToBlockNote(data: Buffer, editor: ServerBlockNoteEditor): MyBlock[] {
     const yDoc = new YDoc();
     applyUpdate(yDoc, new Uint8Array(data));
     return editor.yDocToBlocks(yDoc);
@@ -82,13 +75,7 @@ export class DocumentService {
     };
   }
 
-  async commitDocument({
-    documentId,
-    userId,
-  }: {
-    documentId: string;
-    userId: string;
-  }) {
+  async commitDocument({ documentId, userId }: { documentId: string; userId: string }) {
     const editor = ServerBlockNoteEditor.create({
       schema: this.blocknoteSchema,
     });
@@ -105,25 +92,17 @@ export class DocumentService {
         document,
         content: this.bufferToBlockNote(document.data, editor),
       });
-      await manager.update(
-        DocumentEntity,
-        { id: documentId },
-        { modified: false }
-      );
+      await manager.update(DocumentEntity, { id: documentId }, { modified: false });
       // TODO: Consider refactor into a module named "EventBus", which manages event topic
-      const { tags, outgoingLinkIds } =
-        this.extractTagsAndOutgoingLinkIds(editor);
+      const { tags, outgoingLinkIds } = this.extractTagsAndOutgoingLinkIds(editor);
       await lastValueFrom(
-        this.kafkaClient.emit(
-          'events.integration.document.document.committed',
-          {
-            id: documentId,
-            userId,
-            tags,
-            outgoingLinkIds,
-            content: editor.editor.document satisfies MyBlock[],
-          } satisfies ShareDocumentCommittedEvent
-        )
+        this.kafkaClient.emit('events.integration.document.document.committed', {
+          id: documentId,
+          userId,
+          tags,
+          outgoingLinkIds,
+          content: editor.editor.document satisfies MyBlock[],
+        } satisfies ShareDocumentCommittedEvent)
       );
     });
   }

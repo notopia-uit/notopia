@@ -17,18 +17,14 @@ import { BLOCKNOTE_SCHEMA } from 'token';
 //    sortableAttributes: ['createdAt'], // Missing field!
 //  });
 
-export type HandleNoteCreatedParams = Required<
-  Pick<NoteSearch, 'id' | 'name' | 'workspaceId'>
->;
+export type HandleNoteCreatedParams = Required<Pick<NoteSearch, 'id' | 'name' | 'workspaceId'>>;
 
 export type HandleNoteUpdatedParams = Required<
   Pick<NoteSearch, 'id' | 'name' | 'folderId' | 'folderName'>
 > &
   Pick<NoteSearch, 'trashed'>;
 
-export type HandleDocumentCommittedParams = Required<
-  Pick<NoteSearch, 'id' | 'tags'>
-> & {
+export type HandleDocumentCommittedParams = Required<Pick<NoteSearch, 'id' | 'tags'>> & {
   content: MyBlock[];
 };
 

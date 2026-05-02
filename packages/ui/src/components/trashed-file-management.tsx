@@ -1,9 +1,5 @@
 'use client';
-import {
-  NoteTrashedFolder,
-  NoteTrashedNote,
-  showTrashOptions,
-} from '@notopia-uit/api-gen';
+import { NoteTrashedFolder, NoteTrashedNote, showTrashOptions } from '@notopia-uit/api-gen';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Checkbox } from '@notopia-uit/ui/components/shadcn/checkbox';
 import {
@@ -21,13 +17,7 @@ import {
   TableRow,
 } from '@notopia-uit/ui/components/shadcn/table';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import {
-  FileText,
-  Folder,
-  MoreVertical,
-  RotateCcw,
-  Trash2,
-} from 'lucide-react';
+import { FileText, Folder, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
 interface TrashedBy {
@@ -84,11 +74,7 @@ const formatDate = (isoString: string) => {
   }).format(date);
 };
 
-export default function TrashedFileManager({
-  workspaceId,
-}: {
-  workspaceId: string;
-}) {
+export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
   const { data: trashedData } = useSuspenseQuery({
     ...showTrashOptions({ path: { workspaceId: workspaceId } }),
     select: (data) => mapDtoTrashedData(data),
@@ -110,8 +96,7 @@ export default function TrashedFileManager({
     }));
 
     return [...foldersMapped, ...notesMapped].sort(
-      (a, b) =>
-        new Date(b.trashed.at).getTime() - new Date(a.trashed.at).getTime()
+      (a, b) => new Date(b.trashed.at).getTime() - new Date(a.trashed.at).getTime()
     );
   }, [trashedData]);
 
@@ -134,21 +119,19 @@ export default function TrashedFileManager({
   };
 
   return (
-    <div className="w-full text-zinc-300 font-sans">
+    <div className="w-full font-sans text-zinc-300">
       <div className="w-full">
         {/* Header Actions */}
-        <div className="flex items-center justify-end pb-6 pr-6">
+        <div className="flex items-center justify-end pr-6 pb-6">
           <div className="flex gap-3 space-x-0.5">
             <Button
               variant="destructive"
-              className="bg-transparent border-white/10 text-zinc-300 hover:bg-white/5 hover:text-white space-x-0.5 gap-0.5"
+              className="gap-0.5 space-x-0.5 border-white/10 bg-transparent text-zinc-300 hover:bg-white/5 hover:text-white"
             >
               Empty Trash
             </Button>
             {selectedItems.size > 0 && (
-              <Button className="bg-blue-600 text-white hover:bg-blue-700">
-                Restore Selected
-              </Button>
+              <Button className="bg-blue-600 text-white hover:bg-blue-700">Restore Selected</Button>
             )}
           </div>
         </div>
@@ -157,21 +140,16 @@ export default function TrashedFileManager({
         <Table>
           <TableHeader className="bg-transparent hover:bg-transparent">
             <TableRow className="border-white/10 hover:bg-transparent">
-              <TableHead className="w-12 text-center pl-6">
+              <TableHead className="w-12 pl-6 text-center">
                 <Checkbox
-                  checked={
-                    selectedItems.size === displayData.length &&
-                    displayData.length > 0
-                  }
+                  checked={selectedItems.size === displayData.length && displayData.length > 0}
                   onCheckedChange={toggleAll}
-                  className="border-white/20 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                  className="border-white/20 data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600"
                 />
               </TableHead>
-              <TableHead className="text-zinc-400 font-medium">Name</TableHead>
-              <TableHead className="text-zinc-400 font-medium text-right w-24">
-                Type
-              </TableHead>
-              <TableHead className="text-zinc-400 font-medium text-right w-48 pr-6">
+              <TableHead className="font-medium text-zinc-400">Name</TableHead>
+              <TableHead className="w-24 text-right font-medium text-zinc-400">Type</TableHead>
+              <TableHead className="w-48 pr-6 text-right font-medium text-zinc-400">
                 Deleted Date
               </TableHead>
               <TableHead className="w-12"></TableHead>
@@ -191,38 +169,34 @@ export default function TrashedFileManager({
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => toggleSelection(item.id)}
-                      className="border-white/20 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                      className="border-white/20 data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600"
                     />
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Icon
-                        className={`w-5 h-5 ${item.displayType === 'Folder' ? 'text-blue-400' : 'text-zinc-400'}`}
+                        className={`h-5 w-5 ${item.displayType === 'Folder' ? 'text-blue-400' : 'text-zinc-400'}`}
                       />
-                      <span className="font-medium text-zinc-200">
-                        {item.name}
-                      </span>
+                      <span className="font-medium text-zinc-200">{item.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right text-zinc-400">
-                    {item.displayType}
-                  </TableCell>
-                  <TableCell className="text-right text-zinc-400 pr-6">
+                  <TableCell className="text-right text-zinc-400">{item.displayType}</TableCell>
+                  <TableCell className="pr-6 text-right text-zinc-400">
                     {formatDate(item.trashed.at)}
                   </TableCell>
-                  <TableCell className="text-right pr-6">
+                  <TableCell className="pr-6 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="h-8 w-8 p-0 text-zinc-400 hover:text-zinc-100 hover:bg-white/10"
+                          className="h-8 w-8 p-0 text-zinc-400 hover:bg-white/10 hover:text-zinc-100"
                         >
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="w-48 bg-[#2c2c2e] border-white/10 text-zinc-200"
+                        className="w-48 border-white/10 bg-[#2c2c2e] text-zinc-200"
                       >
                         <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white">
                           <RotateCcw className="mr-2 h-4 w-4" />

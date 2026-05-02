@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 
 import { S3Config } from '../config/config';
 import { S3_CONFIG } from '../config/config.factory';
-
 import { StorageService } from './storage.service';
 
 @Module({

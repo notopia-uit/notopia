@@ -113,9 +113,7 @@ import { StorageModule } from './storage/storage.module';
 })
 export class AppModule implements OnModuleInit {
   // We should refactor into bus or so, this is a mess for app module
-  constructor(
-    @Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka
-  ) {}
+  constructor(@Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka) {}
 
   async onModuleInit() {
     await this.kafkaClient.connect();

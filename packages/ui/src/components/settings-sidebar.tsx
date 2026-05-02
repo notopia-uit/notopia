@@ -41,7 +41,7 @@ export function SettingsSidebar({ workspaceId }: SettingsSidebarProps) {
   ];
 
   return (
-    <nav className="flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1">
+    <nav className="flex space-x-2 lg:flex-col lg:space-y-1 lg:space-x-0">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         const Icon = item.icon;

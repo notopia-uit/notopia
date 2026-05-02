@@ -5,10 +5,7 @@ import { BlockNoteTagConfig } from '../block-note';
 export const createServerBlockNoteTagSpec = () =>
   createReactInlineContentSpec(BlockNoteTagConfig, {
     render: (props) => (
-      <span
-        className="notopia-tag"
-        data-notopia-tag={props.inlineContent.props.tag}
-      >
+      <span className="notopia-tag" data-notopia-tag={props.inlineContent.props.tag}>
         #{props.inlineContent.props.tag}
       </span>
     ),

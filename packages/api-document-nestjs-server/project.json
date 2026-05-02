@@ -13,9 +13,6 @@
         "skipTypeCheck": false,
         "stripLeadingPaths": true
       }
-    },
-    "lint": {
-      "executor": "nx:noop"
     }
   }
 }

@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  NoteUserWorkspace,
-  getMyWorkspacesOptions,
-} from '@notopia-uit/api-gen';
+import { NoteUserWorkspace, getMyWorkspacesOptions } from '@notopia-uit/api-gen';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   AudioWaveform,
@@ -88,27 +85,18 @@ const data = {
   ],
 };
 
-export default function WorkspaceSideBar({
-  currentWorkspaceId,
-}: {
-  currentWorkspaceId: string;
-}) {
-  const [activeWorkspacenow, setActiveWorkspace] =
-    useState<NoteUserWorkspace>();
+export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorkspaceId: string }) {
+  const [activeWorkspacenow, setActiveWorkspace] = useState<NoteUserWorkspace>();
 
   const router = useRouter();
 
-  const { data: allWorkspaceData } = useSuspenseQuery(
-    getMyWorkspacesOptions({})
-  );
+  const { data: allWorkspaceData } = useSuspenseQuery(getMyWorkspacesOptions({}));
 
   //TODO: check error
   if (!allWorkspaceData) {
     return;
   }
-  const currentWorkspace = allWorkspaceData.find(
-    (ws) => ws.workspace.id === currentWorkspaceId
-  );
+  const currentWorkspace = allWorkspaceData.find((ws) => ws.workspace.id === currentWorkspaceId);
   if (!currentWorkspace) {
     return;
   }
@@ -125,7 +113,7 @@ export default function WorkspaceSideBar({
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                     <GalleryVerticalEnd className="size-4" />
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
@@ -145,7 +133,7 @@ export default function WorkspaceSideBar({
                 side="bottom"
                 sideOffset={4}
               >
-                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                <DropdownMenuLabel className="text-muted-foreground text-xs">
                   Workspace
                 </DropdownMenuLabel>
                 {allWorkspaceData.map((ws, index) => (
@@ -166,12 +154,10 @@ export default function WorkspaceSideBar({
                 ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2 p-2">
-                  <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                  <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                     <Plus className="size-4" />
                   </div>
-                  <div className="font-medium text-muted-foreground">
-                    Add workspace
-                  </div>
+                  <div className="text-muted-foreground font-medium">Add workspace</div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -203,11 +189,7 @@ export default function WorkspaceSideBar({
                       <span className="sr-only">More</span>
                     </SidebarMenuAction>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-48 rounded-lg"
-                    side="bottom"
-                    align="end"
-                  >
+                  <DropdownMenuContent className="w-48 rounded-lg" side="bottom" align="end">
                     <DropdownMenuItem>
                       <Folder className="text-muted-foreground" />
                       <span>View Project</span>
@@ -249,9 +231,7 @@ export default function WorkspaceSideBar({
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {data.user.name}
-                    </span>
+                    <span className="truncate font-semibold">{data.user.name}</span>
                     <span className="truncate text-xs">{data.user.email}</span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
@@ -266,19 +246,12 @@ export default function WorkspaceSideBar({
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage
-                        src={data.user.avatar}
-                        alt={data.user.name}
-                      />
+                      <AvatarImage src={data.user.avatar} alt={data.user.name} />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        {data.user.name}
-                      </span>
-                      <span className="truncate text-xs">
-                        {data.user.email}
-                      </span>
+                      <span className="truncate font-semibold">{data.user.name}</span>
+                      <span className="truncate text-xs">{data.user.email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>

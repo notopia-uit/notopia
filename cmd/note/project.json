@@ -15,9 +15,7 @@
       "{workspaceRoot}/internal/note/infra/persistence/pgmigration/*.{sql,go}",
       "{projectRoot}/sqlc.yaml"
     ],
-    "migrations": [
-      "{workspaceRoot}/internal/note/infra/persistence/pgmigration/*.{sql,go}"
-    ]
+    "migrations": ["{workspaceRoot}/internal/note/infra/persistence/pgmigration/*.{sql,go}"]
   },
   "targets": {
     "gen:wire": {
@@ -131,9 +129,7 @@
     },
     "gen:sqlc": {
       "inputs": ["sqlc"],
-      "outputs": [
-        "{workspaceRoot}/internal/note/infra/persistence/pgsqlc/*.go"
-      ],
+      "outputs": ["{workspaceRoot}/internal/note/infra/persistence/pgsqlc/*.go"],
       "executor": "nx:run-commands",
       "options": {
         "command": "sqlc generate",

@@ -1,9 +1,10 @@
-import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { DataSource, Repository } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
-import { fileURLToPath } from 'url';
 
 import { DocumentEntity } from '#/document/document.entity';
 import { RevisionEntity } from '#/revision/revision.entity';
@@ -20,9 +21,7 @@ export default class RevisionSeeder implements Seeder {
     const revisionRepo = dataSource.getRepository(RevisionEntity);
     const seedDataDir = path.join(__dirname, '../seed-data');
 
-    const files = fs
-      .readdirSync(seedDataDir)
-      .filter((file) => file.endsWith('.md'));
+    const files = fs.readdirSync(seedDataDir).filter((file) => file.endsWith('.md'));
 
     console.log(`Found ${files.length} markdown files to create revisions for`);
 
@@ -48,9 +47,7 @@ export default class RevisionSeeder implements Seeder {
 
       const document = await documentRepo.findOneBy({ id: documentId });
       if (!document) {
-        console.warn(
-          `Document ${documentId} not found, skipping revision creation`
-        );
+        console.warn(`Document ${documentId} not found, skipping revision creation`);
         return;
       }
 

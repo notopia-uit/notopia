@@ -37,6 +37,8 @@ p = "pnpm"
 pi = "pnpm install"
 plantuml = "./bin/plantuml"
 kroki = "./bin/kroki"
+oxlint = "pnpm exec oxlint"
+oxfmt = "pnpm exec oxfmt"
 
 # [deps.pnpm]
 # auto = true

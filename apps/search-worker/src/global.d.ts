@@ -4,11 +4,7 @@ declare namespace NodeJS {
     OTEL_SERVICE_NAME?: string;
     OTEL_RESOURCE_ATTRIBUTES?: string; // 'env=prod,version=1.0.0'
     OTEL_TRACES_EXPORTER?: 'otlp' | 'console' | 'none';
-    OTEL_TRACES_SAMPLER?:
-      | 'always_on'
-      | 'always_off'
-      | 'traceidratio'
-      | 'parentbased_traceidratio';
+    OTEL_TRACES_SAMPLER?: 'always_on' | 'always_off' | 'traceidratio' | 'parentbased_traceidratio';
     OTEL_TRACES_SAMPLER_ARG?: string; // (0.0 - 1.0)
     OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?: string; // Standard
     OTEL_EXPORTER_OTLP_TRACES_PROTOCOL?: 'grpc' | 'http/protobuf' | 'http/json';
@@ -27,13 +23,7 @@ declare namespace NodeJS {
     NODE_ENV?: 'development' | 'production' | 'test';
 
     NOTOPIA_SEARCH_WORKER_PORT?: string;
-    NOTOPIA_SEARCH_WORKER_LOG_LEVEL?:
-      | 'trace'
-      | 'debug'
-      | 'info'
-      | 'warn'
-      | 'error'
-      | 'fatal';
+    NOTOPIA_SEARCH_WORKER_LOG_LEVEL?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
     NOTOPIA_SEARCH_WORKER_KAFKA_CLIENT_ID?: string;
     NOTOPIA_SEARCH_WORKER_KAFKA_BROKERS?: string; // Comma-separated list

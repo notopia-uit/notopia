@@ -1,4 +1,4 @@
-// sort-imports-ignore
+// oxfmt-ignore
 import './otel';
 
 import { ConfigService } from '@nestjs/config';

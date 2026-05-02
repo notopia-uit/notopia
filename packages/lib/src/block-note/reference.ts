@@ -16,7 +16,4 @@ export type BlockNoteReferenceInlineContentSpec = InlineContentSpec<
   typeof BlockNoteReferenceConfig
 >;
 
-export type ReferenceInline = CustomInlineContentFromConfig<
-  typeof BlockNoteReferenceConfig,
-  any
->;
+export type ReferenceInline = CustomInlineContentFromConfig<typeof BlockNoteReferenceConfig, any>;

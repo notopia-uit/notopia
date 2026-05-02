@@ -10,13 +10,7 @@ import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ControlledTreeEnvironment,
   DraggingPosition,
@@ -33,10 +27,7 @@ type TreeData = Record<TreeItemIndex, TreeItem<string>>;
 const mapDtoTreeData = (rootFolder: NoteWorkspaceTreeFolder): TreeData => {
   const tree: TreeData = {};
 
-  const traverse = (
-    node: NoteWorkspaceTreeFolder | NoteWorkspaceTreeNote,
-    isFolder: boolean
-  ) => {
+  const traverse = (node: NoteWorkspaceTreeFolder | NoteWorkspaceTreeNote, isFolder: boolean) => {
     const { id, name } = node;
 
     const treeItem: TreeItem<string> = {
@@ -57,9 +48,7 @@ const mapDtoTreeData = (rootFolder: NoteWorkspaceTreeFolder): TreeData => {
         treeItem.children = childrenIds;
       }
 
-      folderNode.children?.forEach((childFolder) =>
-        traverse(childFolder, true)
-      );
+      folderNode.children?.forEach((childFolder) => traverse(childFolder, true));
 
       folderNode.notes?.forEach((note) => traverse(note, false));
     }
@@ -80,22 +69,14 @@ type EventEmitterOptionsType<T> = {
   logger?: (log: string, payload?: T) => void;
 };
 
-type EventHandlerType<T> =
-  | ((payload: T) => Promise<void> | void)
-  | null
-  | undefined;
+type EventHandlerType<T> = ((payload: T) => Promise<void> | void) | null | undefined;
 
 type TreeDataProviderType<T> = {
   getTreeItem: (itemId: TreeItemIndex) => Promise<TreeItem<T>>;
   getTreeItems?: (itemIds: TreeItemIndex[]) => Promise<TreeItem<T>[]>;
   onRenameItem?: (item: TreeItem<T>, name: string) => Promise<void>;
-  onDidChangeTreeData?: (
-    listener: (changedItemIds: TreeItemIndex[]) => void
-  ) => DisposableType;
-  onChangeItemChildren?: (
-    itemId: TreeItemIndex,
-    newChildren: TreeItemIndex[]
-  ) => Promise<void>;
+  onDidChangeTreeData?: (listener: (changedItemIds: TreeItemIndex[]) => void) => DisposableType;
+  onChangeItemChildren?: (itemId: TreeItemIndex, newChildren: TreeItemIndex[]) => Promise<void>;
 };
 
 class EventEmitter<EventPayload> {
@@ -151,9 +132,7 @@ class TreeDataProvider<T> implements TreeDataProviderType<T> {
   private items: Record<TreeItemIndex, TreeItem<T>>;
   private setItemName?: (item: TreeItem<T>, newName: string) => TreeItem<T>;
 
-  public readonly onDidChangeTreeDataEmitter = new EventEmitter<
-    TreeItemIndex[]
-  >();
+  public readonly onDidChangeTreeDataEmitter = new EventEmitter<TreeItemIndex[]>();
 
   constructor(
     items: Record<TreeItemIndex, TreeItem<T>>,
@@ -175,22 +154,15 @@ class TreeDataProvider<T> implements TreeDataProviderType<T> {
     return Promise.resolve(item);
   }
 
-  public async onChangeItemChildren(
-    itemId: TreeItemIndex,
-    newChildren: TreeItemIndex[]
-  ) {
+  public async onChangeItemChildren(itemId: TreeItemIndex, newChildren: TreeItemIndex[]) {
     if (this.items[itemId]) {
       this.items[itemId].children = newChildren;
       await this.onDidChangeTreeDataEmitter.emit([itemId]);
     }
   }
 
-  public onDidChangeTreeData(
-    listener: (changedItemIds: TreeItemIndex[]) => void
-  ) {
-    const handlerId = this.onDidChangeTreeDataEmitter.on((payload) =>
-      listener(payload)
-    );
+  public onDidChangeTreeData(listener: (changedItemIds: TreeItemIndex[]) => void) {
+    const handlerId = this.onDidChangeTreeDataEmitter.on((payload) => listener(payload));
     return { dispose: () => this.onDidChangeTreeDataEmitter.off(handlerId) };
   }
 
@@ -206,9 +178,7 @@ const viewStateInitial: TreeViewState = {
   'tree-sample': {},
 };
 
-const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
-  currentWorkspaceId,
-}) => {
+const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
   const { data: workspaceTreeData } = useSuspenseQuery({
     ...getWorkspaceTreeOptions({ path: { workspaceId: currentWorkspaceId } }),
     select: (data) => mapDtoTreeData(data),
@@ -218,85 +188,63 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
 
-  const [items, setItems] =
-    useState<Record<TreeItemIndex, TreeItem<string>>>(workspaceTreeData);
+  const [items, setItems] = useState<Record<TreeItemIndex, TreeItem<string>>>(workspaceTreeData);
   useEffect(() => {
     setItems(workspaceTreeData);
   }, [workspaceTreeData]);
 
-  const dataProvider = useMemo(
-    () => new TreeDataProvider<string>(items),
-    [items]
-  );
-  const onDrop = useCallback(
-    (draggedItems: TreeItem<string>[], target: DraggingPosition) => {
-      setItems((prevItems) => {
-        const newItems = { ...prevItems };
+  const dataProvider = useMemo(() => new TreeDataProvider<string>(items), [items]);
+  const onDrop = useCallback((draggedItems: TreeItem<string>[], target: DraggingPosition) => {
+    setItems((prevItems) => {
+      const newItems = { ...prevItems };
 
-        for (const item of draggedItems) {
-          const parent = Object.values(newItems).find(
-            (p) => p.isFolder && p.children?.includes(item.index)
-          );
-          if (parent && parent.children) {
-            newItems[parent.index] = {
-              ...parent,
-              children: parent.children.filter((child) => child !== item.index),
-            };
-          }
+      for (const item of draggedItems) {
+        const parent = Object.values(newItems).find(
+          (p) => p.isFolder && p.children?.includes(item.index)
+        );
+        if (parent && parent.children) {
+          newItems[parent.index] = {
+            ...parent,
+            children: parent.children.filter((child) => child !== item.index),
+          };
         }
+      }
 
-        if (target.targetType === 'item') {
-          const targetItem = newItems[target.targetItem];
-          if (targetItem && targetItem.isFolder) {
-            newItems[target.targetItem] = {
-              ...targetItem,
-              children: [
-                ...(targetItem.children || []),
-                ...draggedItems.map((i) => i.index),
-              ],
-            };
-          }
-        } else if (target.targetType === 'between-items') {
-          const parentItem = newItems[target.parentItem];
-          if (parentItem && parentItem.isFolder) {
-            const newChildren = [...(parentItem.children || [])];
-            newChildren.splice(
-              target.childIndex,
-              0,
-              ...draggedItems.map((i) => i.index)
-            );
-            newItems[target.parentItem] = {
-              ...parentItem,
-              children: newChildren,
-            };
-          }
-        } else if (target.targetType === 'root') {
-          const rootItem = newItems['root'];
-          if (rootItem) {
-            newItems['root'] = {
-              ...rootItem,
-              children: [
-                ...(rootItem.children || []),
-                ...draggedItems.map((i) => i.index),
-              ],
-            };
-          }
+      if (target.targetType === 'item') {
+        const targetItem = newItems[target.targetItem];
+        if (targetItem && targetItem.isFolder) {
+          newItems[target.targetItem] = {
+            ...targetItem,
+            children: [...(targetItem.children || []), ...draggedItems.map((i) => i.index)],
+          };
         }
+      } else if (target.targetType === 'between-items') {
+        const parentItem = newItems[target.parentItem];
+        if (parentItem && parentItem.isFolder) {
+          const newChildren = [...(parentItem.children || [])];
+          newChildren.splice(target.childIndex, 0, ...draggedItems.map((i) => i.index));
+          newItems[target.parentItem] = {
+            ...parentItem,
+            children: newChildren,
+          };
+        }
+      } else if (target.targetType === 'root') {
+        const rootItem = newItems['root'];
+        if (rootItem) {
+          newItems['root'] = {
+            ...rootItem,
+            children: [...(rootItem.children || []), ...draggedItems.map((i) => i.index)],
+          };
+        }
+      }
 
-        return newItems;
-      });
-    },
-    []
-  );
+      return newItems;
+    });
+  }, []);
 
   const getItemPath = useCallback(
-    async (
-      search: string,
-      searchRoot: TreeItemIndex = 'root'
-    ): Promise<TreeItemIndex[] | null> => {
-      const searchTree = async (
-        currentId: TreeItemIndex
-      ): Promise<TreeItemIndex[] | null> => {
+    async (search: string, searchRoot: TreeItemIndex = 'root'): Promise<TreeItemIndex[] | null> => {
+      const searchTree = async (currentId: TreeItemIndex): Promise<TreeItemIndex[] | null> => {
         const item = await dataProvider.getTreeItem(currentId);
 
         if (item.data.toLowerCase().includes(search.toLowerCase())) {
@@ -304,13 +252,9 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
         }
 
         if (item.children && item.children.length > 0) {
-          const results = await Promise.all(
-            item.children.map((childId) => searchTree(childId))
-          );
+          const results = await Promise.all(item.children.map((childId) => searchTree(childId)));
 
-          const foundPath = results.find(
-            (path): path is TreeItemIndex[] => path !== null
-          );
+          const foundPath = results.find((path): path is TreeItemIndex[] => path !== null);
 
           if (foundPath) {
             return [item.index, ...foundPath];
@@ -349,16 +293,9 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
   );
 
   return (
-    <div className="flex flex-col h-full w-full gap-4 overflow-hidden">
-      <form
-        onSubmit={onSubmit}
-        className="flex items-center justify-start gap-2 shrink-0"
-      >
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search..."
-        />
+    <div className="flex h-full w-full flex-col gap-4 overflow-hidden">
+      <form onSubmit={onSubmit} className="flex shrink-0 items-center justify-start gap-2">
+        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
         <Button type="submit">Search</Button>
       </form>
       <div className="flex-1 overflow-auto">
@@ -378,10 +315,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
               ...prevViewState,
               [treeId]: {
                 ...prevViewState[treeId],
-                expandedItems: [
-                  ...(prevViewState[treeId]?.expandedItems ?? []),
-                  item.index,
-                ],
+                expandedItems: [...(prevViewState[treeId]?.expandedItems ?? []), item.index],
               },
             }));
           }}
@@ -391,9 +325,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
               [treeId]: {
                 ...prevViewState[treeId],
                 expandedItems:
-                  prevViewState[treeId]?.expandedItems?.filter(
-                    (id) => id !== item.index
-                  ) ?? [],
+                  prevViewState[treeId]?.expandedItems?.filter((id) => id !== item.index) ?? [],
               },
             }));
           }}
@@ -417,10 +349,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
           }}
           renderTreeContainer={({ children, containerProps }) => {
             return (
-              <div
-                {...containerProps}
-                className="tree-container border border-border "
-              >
+              <div {...containerProps} className="tree-container border-border border">
                 {children}
               </div>
             );
@@ -434,7 +363,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
             return (
               <li
                 {...context.itemContainerWithChildrenProps}
-                className="my-px [&>button>svg]:aria-expanded:rotate-90 [&>button]:aria-selected:bg-primary/50"
+                className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
               >
                 <Button
                   {...context.itemContainerWithoutChildrenProps}
@@ -458,18 +387,11 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
             );
           }}
           renderItemArrow={({ context }) => {
-            return (
-              <ChevronRight {...context.arrowProps} className="size-3.5!" />
-            );
+            return <ChevronRight {...context.arrowProps} className="size-3.5!" />;
           }}
           renderItemTitle={({ title }) => <span>{title}</span>}
         >
-          <Tree
-            ref={tree}
-            treeId="tree-sample"
-            rootItem="root"
-            treeLabel="Sample Tree"
-          />
+          <Tree ref={tree} treeId="tree-sample" rootItem="root" treeLabel="Sample Tree" />
         </ControlledTreeEnvironment>
       </div>
     </div>

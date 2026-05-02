@@ -55,10 +55,7 @@
         "webpack://@notopia-uit/document/*": "${workspaceFolder}/apps/document/*",
         "webpack://@notopia-uit/document/../../node_modules/*": "${workspaceFolder}/node_modules/*"
       },
-      "outFiles": [
-        "${workspaceFolder}/apps/document/dist/**/*.(m|c|)js",
-        "!**/node_modules/**"
-      ]
+      "outFiles": ["${workspaceFolder}/apps/document/dist/**/*.(m|c|)js", "!**/node_modules/**"]
     },
     {
       "type": "pwa-node",
@@ -73,10 +70,7 @@
         "webpack://@notopia-uit/document/*": "${workspaceFolder}/apps/document/*",
         "webpack://@notopia-uit/document/../../node_modules/*": "${workspaceFolder}/node_modules/*"
       },
-      "outFiles": [
-        "${workspaceFolder}/apps/document/dist/**/*.(m|c|)js",
-        "!**/node_modules/**"
-      ]
+      "outFiles": ["${workspaceFolder}/apps/document/dist/**/*.(m|c|)js", "!**/node_modules/**"]
     },
     {
       "type": "pwa-node",
@@ -132,10 +126,7 @@
         "server/chunks/ssr/packages_*": "${workspaceFolder}/packages/*",
         "/turbopack/[project]/*": "${workspaceFolder}/*"
       },
-      "outFiles": [
-        "${workspaceFolder}/apps/web/.next/**/*.js",
-        "!**/node_modules/**"
-      ]
+      "outFiles": ["${workspaceFolder}/apps/web/.next/**/*.js", "!**/node_modules/**"]
     },
     {
       "name": "Attach Web (Full)",
@@ -155,10 +146,7 @@
         "server/chunks/ssr/packages_*": "${workspaceFolder}/packages/*",
         "/turbopack/[project]/*": "${workspaceFolder}/*"
       },
-      "outFiles": [
-        "${workspaceFolder}/apps/web/.next/**/*.js",
-        "!**/node_modules/**"
-      ]
+      "outFiles": ["${workspaceFolder}/apps/web/.next/**/*.js", "!**/node_modules/**"]
     }
   ]
 }

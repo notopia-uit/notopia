@@ -1,8 +1,9 @@
+import { join } from 'path';
+
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AUTHORIZATION_PACKAGE_NAME } from '@notopia-uit/pb/authorization';
-import { join } from 'path';
 
 import { ServicesConfig } from '#/config/config';
 import { SERVICE_CONFIG } from '#/config/config.factory';
@@ -26,10 +27,7 @@ import { AuthorizationService } from './authorization.service';
             transport: Transport.GRPC,
             options: {
               package: AUTHORIZATION_PACKAGE_NAME,
-              protoPath: join(
-                __dirname,
-                '../../../proto/authorization/authorization.proto'
-              ),
+              protoPath: join(__dirname, '../../../proto/authorization/authorization.proto'),
               loader: {
                 includeDirs: [join(__dirname, '../../../proto')],
               },

@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  NoteUserWorkspace,
-  NoteWorkspaceRole,
-  getMyWorkspacesOptions,
-} from '@notopia-uit/api-gen';
+import { NoteUserWorkspace, NoteWorkspaceRole, getMyWorkspacesOptions } from '@notopia-uit/api-gen';
 import { Badge } from '@notopia-uit/ui/components/shadcn/badge';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Card, CardContent } from '@notopia-uit/ui/components/shadcn/card';
@@ -16,10 +12,7 @@ import {
 } from '@notopia-uit/ui/components/shadcn/dropdown-menu';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Label } from '@notopia-uit/ui/components/shadcn/label';
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from '@notopia-uit/ui/components/shadcn/radio-group';
+import { RadioGroup, RadioGroupItem } from '@notopia-uit/ui/components/shadcn/radio-group';
 import {
   Select,
   SelectContent,
@@ -29,17 +22,7 @@ import {
 } from '@notopia-uit/ui/components/shadcn/select';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import {
-  Briefcase,
-  MoreVertical,
-  Pencil,
-  Plus,
-  Save,
-  Shield,
-  Trash2,
-  User,
-  X,
-} from 'lucide-react';
+import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
 import { useState } from 'react';
 
 type UserRole = (typeof NoteWorkspaceRole)[keyof typeof NoteWorkspaceRole];
@@ -51,9 +34,7 @@ interface UserWorkspace {
   userRole: UserRole;
 }
 
-const mapUserWorkspaceDtoToDomain = (
-  dtos: NoteUserWorkspace[]
-): UserWorkspace[] =>
+const mapUserWorkspaceDtoToDomain = (dtos: NoteUserWorkspace[]): UserWorkspace[] =>
   dtos.map((dto) => ({
     id: dto.workspace.id,
     slug: dto.workspace.slug,
@@ -81,8 +62,7 @@ const WorkspaceSwitcher = () => {
   // workspaces and selectedId are initialized from allWorkspaceData once at mount. If the underlying getMyWorkspaces query refetches (on focus, reconnect, manual invalidation, etc.), useSuspenseQuery updates allWorkspaceData but the local useState snapshot is never re-synced, so the UI will silently drift from server state. Combined with the TODO at Line 69, this whole component currently operates on local-only edits.
   // Consider either deriving the list directly from the query data (with a mutation that invalidates the query) or using useEffect to sync — but the former is the idiomatic React Query pattern.
 
-  const [workspaces, setWorkspaces] =
-    useState<UserWorkspace[]>(allWorkspaceData);
+  const [workspaces, setWorkspaces] = useState<UserWorkspace[]>(allWorkspaceData);
   const [selectedId, setSelectedId] = useState<string>(workspaces[0]?.id || '');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -174,12 +154,8 @@ const WorkspaceSwitcher = () => {
       <div className="container max-w-2xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
-              Workspaces
-            </h1>
-            <p className="mt-1 text-muted-foreground">
-              Select or manage your active workspaces
-            </p>
+            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Workspaces</h1>
+            <p className="text-muted-foreground mt-1">Select or manage your active workspaces</p>
           </div>
           <Button onClick={startAddingNew}>
             <Plus className="mr-2 size-4" />
@@ -194,14 +170,10 @@ const WorkspaceSwitcher = () => {
                 key={workspace.id}
                 className={cn(
                   'cursor-pointer gap-0 p-0 transition-colors',
-                  selectedId === workspace.id &&
-                    editingId !== workspace.id &&
-                    'border-primary',
+                  selectedId === workspace.id && editingId !== workspace.id && 'border-primary',
                   editingId === workspace.id && 'border-primary'
                 )}
-                onClick={() =>
-                  editingId !== workspace.id && setSelectedId(workspace.id)
-                }
+                onClick={() => editingId !== workspace.id && setSelectedId(workspace.id)}
               >
                 <CardContent className="p-4">
                   {editingId === workspace.id ? (
@@ -233,9 +205,7 @@ const WorkspaceSwitcher = () => {
                       </div>
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2 sm:col-span-2">
-                          <Label htmlFor={`name-${workspace.id}`}>
-                            Workspace Name
-                          </Label>
+                          <Label htmlFor={`name-${workspace.id}`}>Workspace Name</Label>
                           <Input
                             id={`name-${workspace.id}`}
                             value={editForm.name || ''}
@@ -263,9 +233,7 @@ const WorkspaceSwitcher = () => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor={`role-${workspace.id}`}>
-                            Your Role
-                          </Label>
+                          <Label htmlFor={`role-${workspace.id}`}>Your Role</Label>
                           <Select
                             value={editForm.userRole || 'member'}
                             onValueChange={(value: UserRole) =>
@@ -295,12 +263,11 @@ const WorkspaceSwitcher = () => {
                       <RadioGroupItem value={workspace.id} id={workspace.id} />
 
                       {/* Icon based on role */}
-                      <div className="flex size-12 items-center justify-center rounded-lg bg-muted/50">
-                        {workspace.userRole === 'owner' ||
-                        workspace.userRole === 'viewer' ? (
-                          <Shield className="size-6 text-primary" />
+                      <div className="bg-muted/50 flex size-12 items-center justify-center rounded-lg">
+                        {workspace.userRole === 'owner' || workspace.userRole === 'viewer' ? (
+                          <Shield className="text-primary size-6" />
                         ) : (
-                          <User className="size-6 text-muted-foreground" />
+                          <User className="text-muted-foreground size-6" />
                         )}
                       </div>
 
@@ -313,9 +280,7 @@ const WorkspaceSwitcher = () => {
                               workspace.userRole.slice(1)}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          /{workspace.slug}
-                        </p>
+                        <p className="text-muted-foreground text-sm">/{workspace.slug}</p>
                       </div>
 
                       {/* Actions */}
@@ -361,17 +326,13 @@ const WorkspaceSwitcher = () => {
             ))}
 
             {isAddingNew && (
-              <Card className="gap-0 border-primary p-0">
+              <Card className="border-primary gap-0 p-0">
                 <CardContent className="p-4">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold">Create New Workspace</h3>
                       <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={cancelAddingNew}
-                        >
+                        <Button variant="ghost" size="sm" onClick={cancelAddingNew}>
                           <X className="size-4" />
                         </Button>
                         <Button size="sm" onClick={saveNewWorkspace}>
@@ -438,11 +399,9 @@ const WorkspaceSwitcher = () => {
         {workspaces.length === 0 && (
           <Card className="p-0">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <Briefcase className="mb-4 size-12 text-muted-foreground" />
+              <Briefcase className="text-muted-foreground mb-4 size-12" />
               <h2 className="text-xl font-semibold">No workspaces found</h2>
-              <p className="mt-2 text-muted-foreground">
-                Create a new workspace to get started
-              </p>
+              <p className="text-muted-foreground mt-2">Create a new workspace to get started</p>
               <Button className="mt-4" onClick={startAddingNew}>
                 <Plus className="mr-2 size-4" />
                 Create Workspace

@@ -1,10 +1,11 @@
-// sort-imports-ignore
+// oxfmt-ignore
 import 'reflect-metadata';
 
-import datasource from './datasource';
-import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { type MySchema } from '@blocknote/core';
+import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
+
+import datasource from './datasource';
 import DocumentSeeder from './seeds/documents';
 import RevisionSeeder from './seeds/revisions';
 
