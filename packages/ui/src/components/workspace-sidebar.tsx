@@ -116,7 +116,7 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                   <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                     <GalleryVerticalEnd className="size-4" />
                   </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
+                  <div className="grid flex-1 text-left text-sm/tight">
                     <span className="truncate font-semibold">
                       {activeWorkspacenow?.workspace.name}
                     </span>
@@ -226,11 +226,11 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   {/* TODO: get user data from betterauth */}
-                  <Avatar className="h-8 w-8 rounded-lg">
+                  <Avatar className="size-8 rounded-lg">
                     <AvatarImage src={data.user.avatar} alt={data.user.name} />
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
+                  <div className="grid flex-1 text-left text-sm/tight">
                     <span className="truncate font-semibold">{data.user.name}</span>
                     <span className="truncate text-xs">{data.user.email}</span>
                   </div>
@@ -245,11 +245,11 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
               >
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <Avatar className="h-8 w-8 rounded-lg">
+                    <Avatar className="size-8 rounded-lg">
                       <AvatarImage src={data.user.avatar} alt={data.user.name} />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                     </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
+                    <div className="grid flex-1 text-left text-sm/tight">
                       <span className="truncate font-semibold">{data.user.name}</span>
                       <span className="truncate text-xs">{data.user.email}</span>
                     </div>

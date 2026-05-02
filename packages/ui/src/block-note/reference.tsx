@@ -33,7 +33,7 @@ const ReferenceLink = ({ noteId }: { noteId: string }) => {
     <a
       // TODO: tailwind shadcn
       href={`/note/${noteId}`}
-      className="notopia-reference cursor-pointer rounded bg-blue-100 px-1 text-blue-700"
+      className="notopia-reference cursor-pointer rounded-sm bg-blue-100 px-1 text-blue-700"
       data-notopia-ref={noteId}
     >
       @{noteName}

@@ -17,12 +17,13 @@ export default defineConfig({
       jsPlugins: ['eslint-plugin-better-tailwindcss'],
       rules: {
         ...eslintPluginBetterTailwindcss.configs.recommended.rules,
+        'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
       },
     },
   ],
   settings: {
     'better-tailwindcss': {
-      entryPoint: './app/globals.css',
+      entryPoint: `${import.meta.dirname}/app/globals.css`, // Because it is ran by nx from workspace root
     },
   },
 });

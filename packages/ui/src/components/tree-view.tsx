@@ -277,7 +277,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           .then((path) => {
             if (path) {
               return tree.current?.expandSubsequently(path).then(() => {
-                tree.current?.selectItems([...[path.at(-1) ?? '']]);
+                tree.current?.selectItems([path.at(-1) ?? '']);
                 tree.current?.focusItem(path.at(-1) ?? '');
                 tree.current?.toggleItemSelectStatus(path.at(-1) ?? '');
               });
@@ -293,7 +293,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   );
 
   return (
-    <div className="flex h-full w-full flex-col gap-4 overflow-hidden">
+    <div className="flex size-full flex-col gap-4 overflow-hidden">
       <form onSubmit={onSubmit} className="flex shrink-0 items-center justify-start gap-2">
         <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
         <Button type="submit">Search</Button>
@@ -372,7 +372,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                   variant="outline"
                   size="sm"
                   className={cn(
-                    'grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none',
+                    `grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none`,
                     'focus:bg-secondary/20'
                   )}
                   style={{

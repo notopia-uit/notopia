@@ -170,7 +170,7 @@ const WorkspaceSwitcher = () => {
                 key={workspace.id}
                 className={cn(
                   'cursor-pointer gap-0 p-0 transition-colors',
-                  selectedId === workspace.id && editingId !== workspace.id && 'border-primary',
+                  selectedId === workspace.id && editingId !== workspace.id && `border-primary`,
                   editingId === workspace.id && 'border-primary'
                 )}
                 onClick={() => editingId !== workspace.id && setSelectedId(workspace.id)}

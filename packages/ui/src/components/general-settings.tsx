@@ -49,7 +49,7 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
           asChild
         >
           <Link href={`/workspace/${workspaceId}/trash`}>
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="size-4" />
             View Trash
           </Link>
         </Button>

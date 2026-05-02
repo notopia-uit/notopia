@@ -1,5 +1,5 @@
 'use client';
-import { BlockNoteEditor, PartialBlock } from '@blocknote/core';
+import { BlockNoteEditor } from '@blocknote/core';
 import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 
 import '@blocknote/core/fonts/inter.css';
@@ -12,8 +12,6 @@ import {
 import { BlockNoteView } from '@blocknote/shadcn';
 
 import '@blocknote/shadcn/style.css';
-import { getNoteOptions } from '@notopia-uit/api-gen';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { Icons } from './icons';

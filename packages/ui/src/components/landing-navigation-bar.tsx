@@ -13,7 +13,7 @@ import Link from 'next/link';
 
 function NavigationButtonGroup() {
   return (
-    <div className="flex items-center justify-end space-x-2 px-2 py-2">
+    <div className="flex items-center justify-end space-x-2 p-2">
       <Button variant="outline" size="icon" aria-label="Github">
         <Icons.Github />
       </Button>
@@ -47,8 +47,8 @@ function NavigationBarMenu() {
 
 function NavigationBarLogo() {
   return (
-    <div className="flex items-center space-x-4 px-2 py-2">
-      <Link href="/" className="hidden items-center justify-start space-x-2 px-2 py-2 sm:flex">
+    <div className="flex items-center space-x-4 p-2">
+      <Link href="/" className="hidden items-center justify-start space-x-2 p-2 sm:flex">
         <Icons.Logo />
         <span className="hidden font-bold sm:inline-block">Notopia</span>
       </Link>

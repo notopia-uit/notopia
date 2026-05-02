@@ -16,12 +16,28 @@ export default defineConfig({
       jsPlugins: ['eslint-plugin-better-tailwindcss'],
       rules: {
         ...eslintPluginBetterTailwindcss.configs.recommended.rules,
+        'better-tailwindcss/no-unknown-classes': [
+          'error',
+          {
+            ignore: [
+              'animate-in',
+              'fade-in',
+              'font-heading',
+              'notopia-reference',
+              'notopia-tag',
+              'slide-in-from-bottom-4',
+              'tree-container',
+            ],
+          },
+        ],
+        'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
       },
     },
   ],
+  ignorePatterns: ['**/shadcn/**'],
   settings: {
     'better-tailwindcss': {
-      entryPoint: './app/globals.css',
+      entryPoint: `${import.meta.dirname}/src/globals.css`, // Because it is ran by nx from workspace root
     },
   },
 });

@@ -167,8 +167,7 @@
     {
       "plugin": "nx-oxlint",
       "options": {
-        "lintTargetName": "lint",
-        "configFile": "oxlint.config.mts"
+        "lintTargetName": "lint"
       }
     }
   ],

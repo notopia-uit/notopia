@@ -28,6 +28,12 @@
     },
     "docker:build": {
       "dependsOn": ["prune", "build", "^build"]
+    },
+    "lint": {
+      "executor": "nx-oxlint:lint",
+      "options": {
+        "configFile": "apps/web/oxlint.config.mts"
+      }
     }
   },
   "release": {

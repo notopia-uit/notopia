@@ -3,6 +3,12 @@
   "name": "api-web",
   "projectType": "application",
   "targets": {
+    "lint": {
+      "executor": "nx-oxlint:lint",
+      "options": {
+        "configFile": "apps/api-web/oxlint.config.mts"
+      }
+    },
     "dev": {
       "dependsOn": [
         {

@@ -1,9 +1,13 @@
 import { defineConfig } from 'oxlint';
 
 export default defineConfig({
-  plugins: ['import', 'typescript', 'unicorn', 'eslint'],
-  rules: {
-    'import/no-cycle': ['error', { maxDepth: 3 }],
+  plugins: ['typescript', 'unicorn', 'eslint'],
+  options: {
+    typeAware: true,
   },
-  options: { typeAware: true },
+  settings: {
+    'better-tailwindcss': {
+      detectComponentClasses: true,
+    },
+  },
 });

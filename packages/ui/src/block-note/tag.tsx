@@ -6,7 +6,7 @@ export const createBlockNoteTagSpec = () =>
     render: (props) => (
       <span
         // TODO: tailwind shadcn
-        className="notopia-tag rounded bg-gray-200 px-1 font-semibold text-gray-800"
+        className="notopia-tag rounded-sm bg-gray-200 px-1 font-semibold text-gray-800"
         data-notopia-tag={props.inlineContent.props.tag}
       >
         #{props.inlineContent.props.tag}

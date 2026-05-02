@@ -163,7 +163,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
               return (
                 <TableRow
                   key={item.id}
-                  className={`border-white/5 transition-colors hover:bg-white/5 ${isSelected ? 'bg-white/5' : ''}`}
+                  className={`border-white/5 transition-colors hover:bg-white/5 ${isSelected ? `bg-white/5` : ''}`}
                 >
                   <TableCell className="pl-6">
                     <Checkbox
@@ -175,7 +175,9 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Icon
-                        className={`h-5 w-5 ${item.displayType === 'Folder' ? 'text-blue-400' : 'text-zinc-400'}`}
+                        className={`size-5 ${
+                          item.displayType === 'Folder' ? `text-blue-400` : `text-zinc-400`
+                        }`}
                       />
                       <span className="font-medium text-zinc-200">{item.name}</span>
                     </div>
@@ -189,9 +191,9 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="h-8 w-8 p-0 text-zinc-400 hover:bg-white/10 hover:text-zinc-100"
+                          className="size-8 p-0 text-zinc-400 hover:bg-white/10 hover:text-zinc-100"
                         >
-                          <MoreVertical className="h-4 w-4" />
+                          <MoreVertical className="size-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
@@ -199,11 +201,11 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
                         className="w-48 border-white/10 bg-[#2c2c2e] text-zinc-200"
                       >
                         <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white">
-                          <RotateCcw className="mr-2 h-4 w-4" />
+                          <RotateCcw className="mr-2 size-4" />
                           <span>Restore</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-400">
-                          <Trash2 className="mr-2 h-4 w-4" />
+                          <Trash2 className="mr-2 size-4" />
                           <span>Delete Permanently</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>

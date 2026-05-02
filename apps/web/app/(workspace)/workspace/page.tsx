@@ -16,7 +16,7 @@ export default async function WorkspacePage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <main className="bg-muted/20 flex min-h-screen flex-col items-center justify-center p-4 md:p-8">
+      <main className="flex min-h-screen flex-col items-center justify-center bg-muted/20 p-4 md:p-8">
         <div className="w-full max-w-3xl">
           <WorkspaceSwitcher />
         </div>
