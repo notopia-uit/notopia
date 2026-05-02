@@ -96,9 +96,9 @@ lsp.config("oxlint", {
 
 lsp.config("oxfmt", {
   cmd = function(dispatchers)
-    return vim.lsp.rpc.start({ "oxfmt", "--lsp", "--config", "oxfmt.config.mts" }, dispatchers)
+    return vim.lsp.rpc.start({ "oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" }, dispatchers)
   end,
-  root_markers = { "oxfmt.config.mts" },
+  root_markers = { ".oxfmtrc.jsonc" },
 })
 
 if vim.fn.executable("harper-ls") == 1 then
