@@ -84,6 +84,10 @@ local tsgo_setting = {
 
 lsp.config("tsgo", {
   settings = tsgo_setting,
+  on_attach = function(client)
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+  end,
 })
 
 lsp.config("oxlint", {
