@@ -237,7 +237,7 @@ jobs:
 
       - name: Nx all
         run: |
-          ${{ github.event.inputs.skipNxCache == 'false' && 'nx-cache-action -- ' || '' }} \
+          nx-cache-action -- \
           pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
             --target lint \
             --target format:check \
@@ -264,7 +264,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          ${{ github.event.inputs.skipNxCache == 'false' && 'nx-cache-action --' || '' }} \
+          nx-cache-action -- \
           pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
             '--target deployPage' \
             --parallel=${{env.NX_PARALLEL }} \
