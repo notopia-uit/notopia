@@ -46,7 +46,7 @@ catalog:
   '@nestjs/typeorm': '11.0.1'
   '@nestjs/websockets': '11.1.19'
   oxlint: '1.62.0'
-  oxlint-tsgolint: '0.22.0'
+  oxlint-tsgolint: '0.22.1'
   oxfmt: '0.47.0'
   '@opentelemetry/api': '1.9.1'
   '@opentelemetry/auto-instrumentations-node': '0.72.0'
