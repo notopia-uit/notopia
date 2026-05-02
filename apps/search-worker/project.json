@@ -25,12 +25,6 @@
       "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
       "executor": "nx:noop"
     },
-    "lint": {
-      "executor": "nx-oxlint:lint",
-      "options": {
-        "configFile": "apps/search-worker/oxlint.config.mts"
-      }
-    },
     "build": {
       "defaultConfiguration": "development",
       "configurations": {

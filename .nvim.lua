@@ -1,5 +1,7 @@
 local lsp = vim.lsp
 local map = vim.keymap.set
+local root = vim.fn.getcwd()
+local uri_root = vim.uri_from_fname(root)
 
 -- lsp.config("yamlls", {
 --   ---@module 'codesettings'
@@ -65,7 +67,15 @@ lsp.config("tailwindcss", {
 
 ---@type lsp.vtsls
 local tsgo_setting = {
+  javascript = {
+    format = {
+      enable = false,
+    },
+  },
   typescript = {
+    format = {
+      enable = false,
+    },
     preferences = {
       importModuleSpecifier = "non-relative",
     },
@@ -78,8 +88,18 @@ lsp.config("tsgo", {
 
 lsp.config("oxlint", {
   cmd = function(dispatchers)
-    return vim.lsp.rpc.start({ "oxlint", "--lsp", "--config", "oxlint.config.mts" }, dispatchers)
+    return vim.lsp.rpc.start({ "oxlint", "--lsp" }, dispatchers)
   end,
+  root_markers = { ".git" },
+  init_options = {
+    {
+      workspaceUri = uri_root,
+      options = {
+        fixKind = "all",
+        typeAware = true,
+      },
+    },
+  },
   on_attach = function(client, bufnr)
     vim.api.nvim_buf_create_user_command(bufnr, "LspOxlintFixAll", function()
       client:exec_cmd({
@@ -95,13 +115,6 @@ lsp.config("oxlint", {
       command = "LspOxlintFixAll",
     })
   end,
-  init_options = {
-    settings = {
-      fixKind = "all",
-      typeAware = true,
-    },
-  },
-  root_markers = { "oxlint.config.mts" },
 })
 
 lsp.config("oxfmt", {

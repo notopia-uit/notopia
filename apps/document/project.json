@@ -26,12 +26,6 @@
     "nx-release-publish": {
       "parallelism": false
     },
-    "lint": {
-      "executor": "nx-oxlint:lint",
-      "options": {
-        "configFile": "apps/document/oxlint.config.mts"
-      }
-    },
     "build": {
       "options": {
         "mode": "development",

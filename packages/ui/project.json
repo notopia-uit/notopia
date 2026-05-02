@@ -1,13 +1,5 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "packages/ui",
-  "projectType": "library",
-  "targets": {
-    "lint": {
-      "executor": "nx-oxlint:lint",
-      "options": {
-        "configFile": "packages/ui/oxlint.config.mts"
-      }
-    }
-  }
+  "projectType": "library"
 }

@@ -3,12 +3,6 @@
   "name": "packages/lib",
   "projectType": "library",
   "targets": {
-    "lint": {
-      "executor": "nx-oxlint:lint",
-      "options": {
-        "configFile": "packages/lib/oxlint.config.mts"
-      }
-    },
     "build": {
       "executor": "@nx/js:swc",
       "outputs": ["{options.outputPath}"],
