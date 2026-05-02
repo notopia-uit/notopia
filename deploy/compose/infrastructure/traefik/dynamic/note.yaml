@@ -8,6 +8,7 @@ http:
       service: note
       middlewares:
         - jwt
+        - cors
     note-health:
       entryPoints:
         - web

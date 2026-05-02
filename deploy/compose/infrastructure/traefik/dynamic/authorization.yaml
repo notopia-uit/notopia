@@ -8,6 +8,7 @@ http:
       service: authorization
       middlewares:
         - jwt
+        - cors
     authorization-health:
       entryPoints:
         - web

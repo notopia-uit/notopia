@@ -8,6 +8,7 @@ http:
       service: document
       middlewares:
         - jwt
+        - cors
 
   services:
     document:

@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://www.schemastore.org/traefik-v3.json
+api:
+  insecure: true
+
+providers:
+  docker:
+    exposedByDefault: false
+    network: notopia_default
+  file:
+    directory: /etc/traefik/dynamic
+
+log:
+  level: INFO
+
+accessLog: false
+
+# tracing:
+#   samplerate: 1.0
+#   otlp:
+#     grpc:
+#       endpoint: http://alloy:4317/v1/traces
+
+entryPoints:
+  web:
+    address: ':80'
+
+experimental:
+  plugins:
+    jwt:
+      moduleName: github.com/traefik-plugins/traefik-jwt-plugin
+      version: v0.10.0
