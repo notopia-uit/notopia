@@ -38,7 +38,7 @@ on:
         default: false
         type: boolean
       resetNxCache:
-        description: Reset Nx cache (when CI keep warning cache unrecognized)
+        description: Reset Nx cache
         required: true
         default: false
         type: boolean
@@ -76,7 +76,7 @@ on:
         default: false
         type: boolean
       releaseNpm:
-        description: Release npm packages
+        description: Release NPM packages
         required: true
         default: false
         type: boolean
@@ -87,7 +87,7 @@ on:
         type: boolean
       releaseContainerType:
         type: choice
-        description: Container tag as development or production
+        description: Container Release Type
         options:
           - development
           - production
@@ -237,8 +237,8 @@ jobs:
 
       - name: Nx all
         run: |
-          ${{ github.event.inputs.skipNxCache == 'false' && 'nx-cache-action --' || '' }} \
-          pnpm exec nx ${{ github.event.inputs.nxAllCmd }} \
+          ${{ github.event.inputs.skipNxCache == 'false' && 'nx-cache-action -- ' || '' }} \
+          pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
             --target lint \
             --target format:check \
             --target gen \
@@ -265,7 +265,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           ${{ github.event.inputs.skipNxCache == 'false' && 'nx-cache-action --' || '' }} \
-          pnpm exec nx ${{ github.event.inputs.nxAllCmd }} \
+          pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
             '--target deployPage' \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
