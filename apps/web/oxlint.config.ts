@@ -23,7 +23,7 @@ export default defineConfig({
   ],
   settings: {
     'better-tailwindcss': {
-      entryPoint: `${import.meta.dirname}/app/globals.css`, // Because it is ran by nx from workspace root
+      entryPoint: `${import.meta.dirname}/app/globals.css`,
     },
   },
 });
