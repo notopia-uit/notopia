@@ -38,7 +38,9 @@ export default defineConfig({
   ignorePatterns: ['**/shadcn/**'],
   settings: {
     'better-tailwindcss': {
-      entryPoint: `${import.meta.dirname}/src/globals.css`, // Because it is ran by nx from workspace root
+      entryPoint: `${import.meta.dirname}/src/globals.css`,
+      tsconfig: `${import.meta.dirname}/tsconfig.lib.json`,
+      detectComponentClasses: true, // may oxlint doesnt work
     },
   },
 });
