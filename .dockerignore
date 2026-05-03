@@ -24,6 +24,7 @@ page/
 scripts/
 buf.*
 **/eslint.config.mjs
+.eslintignore
 **/.prettierignore
 **/.prettierrc.ts
 **/justfile

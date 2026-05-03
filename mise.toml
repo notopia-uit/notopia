@@ -42,6 +42,7 @@ plantuml = "./bin/plantuml"
 kroki = "./bin/kroki"
 oxlint = "pnpm exec oxlint"
 oxfmt = "pnpm exec oxfmt"
+lazydocker = "lazydocker -f ./deploy/compose/compose.yaml"
 
 # [deps.pnpm]
 # auto = true
