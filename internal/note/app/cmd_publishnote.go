@@ -24,6 +24,10 @@ func NewPublishNoteHandler(noteRepo domain.NoteRepo) *PublishNoteHandler {
 var ProvidePublishNoteHandler = NewPublishNoteHandler
 
 func (h *PublishNoteHandler) Handle(ctx context.Context, cmd *PublishNote) error {
-	slog.DebugContext(ctx, "publishing note", slog.String("note_id", cmd.ID.String()), slog.String("user_id", cmd.UserID))
+	slog.DebugContext(
+		ctx, "publishing note",
+		slog.String("note_id", cmd.ID.String()),
+		slog.String("user_id", cmd.UserID),
+	)
 	return nil
 }

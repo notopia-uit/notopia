@@ -39,7 +39,11 @@ func NewGetNoteGraphHandler(
 var ProvideGetNoteGraphHandler = NewGetNoteGraphHandler
 
 func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (Graph, error) {
-	slog.DebugContext(ctx, "Handling get note graph query", slog.String("note_id", query.ID.String()), slog.Int("depth", query.Depth))
+	slog.DebugContext(
+		ctx, "Handling get note graph query",
+		slog.String("note_id", query.ID.String()),
+		slog.Int("depth", query.Depth),
+	)
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)
 	if err != nil {
 		return Graph{}, err

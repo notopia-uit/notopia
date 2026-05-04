@@ -33,8 +33,17 @@ func NewDeleteWorkspaceHandler(
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) error {
-	slog.DebugContext(ctx, "deleting workspace", slog.String("workspace_id", cmd.ID.String()), slog.String("user_id", cmd.UserID))
-	slog.DebugContext(ctx, "checking permission", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.ID.String()), slog.String("permission", "delete"))
+	slog.DebugContext(
+		ctx, "deleting workspace",
+		slog.String("workspace_id", cmd.ID.String()),
+		slog.String("user_id", cmd.UserID),
+	)
+	slog.DebugContext(
+		ctx, "checking permission",
+		slog.String("user_id", cmd.UserID),
+		slog.String("workspace_id", cmd.ID.String()),
+		slog.String("permission", "delete"),
+	)
 	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionDelete)
 	if err != nil {
 		return err
@@ -45,7 +54,11 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspac
 			fmt.Sprintf("user %s does not have permission to delete workspace %s", cmd.UserID, cmd.ID),
 		)
 	}
-	slog.DebugContext(ctx, "permission granted", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.ID.String()))
+	slog.DebugContext(
+		ctx, "permission granted",
+		slog.String("user_id", cmd.UserID),
+		slog.String("workspace_id", cmd.ID.String()),
+	)
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		workspaceRepo := r.Workspace()

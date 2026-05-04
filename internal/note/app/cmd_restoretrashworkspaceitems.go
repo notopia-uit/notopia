@@ -43,8 +43,19 @@ var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItems
 // Because if we filter, we will need to check no further down the tree has filtered trashed by "purpose" or "parent"
 
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) error {
-	slog.DebugContext(ctx, "restoring trashed workspace items", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("note_count", len(cmd.NoteIDs)), slog.Int("folder_count", len(cmd.FolderIDs)), slog.String("user_id", cmd.UserID))
-	slog.DebugContext(ctx, "checking permission", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.WorkspaceID.String()), slog.String("permission", "delete"))
+	slog.DebugContext(
+		ctx, "restoring trashed workspace items",
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+		slog.Int("note_count", len(cmd.NoteIDs)),
+		slog.Int("folder_count", len(cmd.FolderIDs)),
+		slog.String("user_id", cmd.UserID),
+	)
+	slog.DebugContext(
+		ctx, "checking permission",
+		slog.String("user_id", cmd.UserID),
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+		slog.String("permission", "delete"),
+	)
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
 	if err != nil {
 		return err
@@ -55,7 +66,11 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 			fmt.Sprintf("user %s does not have permission to restore items in workspace %s", cmd.UserID, cmd.WorkspaceID),
 		)
 	}
-	slog.DebugContext(ctx, "permission granted", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.WorkspaceID.String()))
+	slog.DebugContext(
+		ctx, "permission granted",
+		slog.String("user_id", cmd.UserID),
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+	)
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		noteRepo := r.Note()

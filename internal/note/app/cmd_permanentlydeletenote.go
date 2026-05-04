@@ -33,7 +33,11 @@ func PermanentlyNewDeleteNoteHandler(
 var ProvidePermanentlyDeleteNoteHandler = PermanentlyNewDeleteNoteHandler
 
 func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteNote) error {
-	slog.DebugContext(ctx, "permanently deleting note", slog.String("note_id", cmd.ID.String()), slog.String("user_id", cmd.UserID))
+	slog.DebugContext(
+		ctx, "permanently deleting note",
+		slog.String("note_id", cmd.ID.String()),
+		slog.String("user_id", cmd.UserID),
+	)
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		noteRepo := r.Note()
 		workspaceID, err := noteRepo.GetWorkspaceIDByID(ctx, cmd.ID)

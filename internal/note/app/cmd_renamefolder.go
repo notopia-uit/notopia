@@ -34,7 +34,12 @@ func NewRenameFolderHandler(
 var ProvideRenameFolderHandler = NewRenameFolderHandler
 
 func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) error {
-	slog.DebugContext(ctx, "renaming folder", slog.String("folder_id", cmd.ID.String()), slog.String("new_name", cmd.Name), slog.String("user_id", cmd.UserID))
+	slog.DebugContext(
+		ctx, "renaming folder",
+		slog.String("folder_id", cmd.ID.String()),
+		slog.String("new_name", cmd.Name),
+		slog.String("user_id", cmd.UserID),
+	)
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
 

@@ -35,7 +35,11 @@ var ProvidePermanentlyDeleteFolderHandler = NewPermanentlyDeleteFolderHandler
 // NOTE: We delegate the infra persistence to cascading delete things
 // Fact, we should handle this in domain, not infra
 func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteFolder) error {
-	slog.DebugContext(ctx, "permanently deleting folder", slog.String("folder_id", cmd.ID.String()), slog.String("user_id", cmd.UserID))
+	slog.DebugContext(
+		ctx, "permanently deleting folder",
+		slog.String("folder_id", cmd.ID.String()),
+		slog.String("user_id", cmd.UserID),
+	)
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
 		workspaceID, err := folderRepo.GetWorkspaceIDByID(ctx, cmd.ID)

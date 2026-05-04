@@ -75,6 +75,10 @@ func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, query *GetWorks
 			Role: authorizationWorkspaceMember.Role,
 		}
 	}
-	slog.InfoContext(ctx, "Get workspace members query completed", slog.String("workspace_id", query.ID.String()), slog.Int("count", len(workspaceMembers)))
+	slog.InfoContext(
+		ctx, "Get workspace members query completed",
+		slog.String("workspace_id", query.ID.String()),
+		slog.Int("count", len(workspaceMembers)),
+	)
 	return workspaceMembers, nil
 }

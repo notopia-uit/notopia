@@ -23,6 +23,10 @@ func NewPublishWorkspaceHandler(workspaceRepo domain.WorkspaceRepo) *PublishWork
 var ProvidePublishWorkspaceHandler = NewPublishWorkspaceHandler
 
 func (h *PublishWorkspaceHandler) Handle(ctx context.Context, cmd *PublishWorkspace) error {
-	slog.DebugContext(ctx, "publishing workspace", slog.String("slug", cmd.Slug), slog.String("user_id", cmd.UserID))
+	slog.DebugContext(
+		ctx, "publishing workspace",
+		slog.String("slug", cmd.Slug),
+		slog.String("user_id", cmd.UserID),
+	)
 	return nil
 }

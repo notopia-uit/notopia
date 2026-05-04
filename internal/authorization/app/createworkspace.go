@@ -25,7 +25,11 @@ func NewCreateWorkspaceHandler(enforcer *casbin.TransactionalEnforcer) *CreateWo
 var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
 
 func (h *CreateWorkspaceHandler) Handle(ctx context.Context, params CreateWorkspace) error {
-	slog.DebugContext(ctx, "Handling create workspace", slog.String("owner_id", params.OwnerID), slog.String("workspace_id", params.WorkspaceID.String()))
+	slog.DebugContext(
+		ctx, "Handling create workspace",
+		slog.String("owner_id", params.OwnerID),
+		slog.String("workspace_id", params.WorkspaceID.String()),
+	)
 	ok, err := h.enforcer.AddGroupingPolicy(
 		formatUser(params.OwnerID),
 		WorkspaceRoleOwner.String(),

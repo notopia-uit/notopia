@@ -36,7 +36,13 @@ var _ pgrepo.Publisher = (*ForwarderPublisher)(nil)
 // TODO: create topic, metadata...
 // TODO: If otel already, we can remove correlation ID
 func (p *ForwarderPublisher) PublishWorkspaceItem(ctx context.Context, event domain.Event, workspaceID uuid.UUID) error {
-	slog.DebugContext(ctx, "Publishing workspace item event to forwarder publisher", slog.String("event_type", fmt.Sprintf("%T", event)), slog.String("workspace_id", workspaceID.String()), slog.String("aggregate_id", event.GetAggregateID().String()), slog.String("user_id", event.GetUserID()))
+	slog.DebugContext(
+		ctx, "Publishing workspace item event to forwarder publisher",
+		slog.String("event_type", fmt.Sprintf("%T", event)),
+		slog.String("workspace_id", workspaceID.String()),
+		slog.String("aggregate_id", event.GetAggregateID().String()),
+		slog.String("user_id", event.GetUserID()),
+	)
 	msg, err := p.jsonMarshaler.Marshal(event)
 	if err != nil {
 		return fmt.Errorf("failed to marshal event for forwarder publisher: %w", err)
@@ -53,12 +59,23 @@ func (p *ForwarderPublisher) PublishWorkspaceItem(ctx context.Context, event dom
 	if err := p.publisher.Publish(topic, msg); err != nil {
 		return fmt.Errorf("failed to publish forwarder SQL event to event bus: %w", err)
 	}
-	slog.InfoContext(ctx, "Published workspace item event to forwarder publisher", slog.String("event_type", fmt.Sprintf("%T", event)), slog.String("workspace_id", workspaceID.String()), slog.String("aggregate_id", event.GetAggregateID().String()), slog.String("user_id", event.GetUserID()))
+	slog.InfoContext(
+		ctx, "Published workspace item event to forwarder publisher",
+		slog.String("event_type", fmt.Sprintf("%T", event)),
+		slog.String("workspace_id", workspaceID.String()),
+		slog.String("aggregate_id", event.GetAggregateID().String()),
+		slog.String("user_id", event.GetUserID()),
+	)
 	return nil
 }
 
 func (p *ForwarderPublisher) Publish(ctx context.Context, event domain.Event) error {
-	slog.DebugContext(ctx, "Publishing event to forwarder publisher", slog.String("event_type", fmt.Sprintf("%T", event)), slog.String("aggregate_id", event.GetAggregateID().String()), slog.String("user_id", event.GetUserID()))
+	slog.DebugContext(
+		ctx, "Publishing event to forwarder publisher",
+		slog.String("event_type", fmt.Sprintf("%T", event)),
+		slog.String("aggregate_id", event.GetAggregateID().String()),
+		slog.String("user_id", event.GetUserID()),
+	)
 	msg, err := p.jsonMarshaler.Marshal(event)
 	if err != nil {
 		return fmt.Errorf("failed to marshal event for forwarder publisher: %w", err)
@@ -74,7 +91,12 @@ func (p *ForwarderPublisher) Publish(ctx context.Context, event domain.Event) er
 	if err := p.publisher.Publish(topic, msg); err != nil {
 		return fmt.Errorf("failed to publish forwarder SQL event to event bus: %w", err)
 	}
-	slog.InfoContext(ctx, "Published event to forwarder publisher", slog.String("event_type", fmt.Sprintf("%T", event)), slog.String("aggregate_id", event.GetAggregateID().String()), slog.String("user_id", event.GetUserID()))
+	slog.InfoContext(
+		ctx, "Published event to forwarder publisher",
+		slog.String("event_type", fmt.Sprintf("%T", event)),
+		slog.String("aggregate_id", event.GetAggregateID().String()),
+		slog.String("user_id", event.GetUserID()),
+	)
 	return nil
 }
 

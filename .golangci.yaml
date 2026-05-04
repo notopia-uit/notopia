@@ -6,9 +6,10 @@ linters:
   enable:
     - exhaustive
     - exhaustruct
+    - sloglint
     - tagalign
-    - unparam
     - testifylint
+    - unparam
   disable:
     - unused
   settings:
@@ -24,6 +25,12 @@ linters:
         - github\.com/notopia-uit/notopia/.*\.*
       exclude:
         - github\.com/notopia-uit/notopia/.*/errs\.Err
+    sloglint:
+      static-msg: true
+      no-mixed-args: true
+      attr-only: true
+      args-on-sep-lines: true
+      context: scope
   exclusions:
     generated: strict
     rules:

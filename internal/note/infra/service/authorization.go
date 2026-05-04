@@ -63,7 +63,7 @@ func NewAuthorization(
 
 	cleanup := func() {
 		if err := conn.Close(); err != nil {
-			slog.Error("failed to close authorization service connection", "error", err)
+			slog.Error("failed to close authorization service connection", slog.Any("error", err))
 		}
 	}
 	return &Authorization{

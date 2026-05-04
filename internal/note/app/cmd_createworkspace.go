@@ -34,7 +34,13 @@ func NewCreateWorkspaceHandler(
 var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
 
 func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspace) error {
-	slog.DebugContext(ctx, "creating workspace", slog.String("workspace_id", cmd.ID.String()), slog.String("name", cmd.Name), slog.String("slug", cmd.Slug), slog.String("owner_id", cmd.OwnerID))
+	slog.DebugContext(
+		ctx, "creating workspace",
+		slog.String("workspace_id", cmd.ID.String()),
+		slog.String("name", cmd.Name),
+		slog.String("slug", cmd.Slug),
+		slog.String("owner_id", cmd.OwnerID),
+	)
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		workspaceRepo := r.Workspace()
 		folderRepo := r.Folder()

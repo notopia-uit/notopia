@@ -38,8 +38,19 @@ func NewTrashWorkspaceItemsHandler(
 var ProvideTrashWorkspaceItemsHandler = NewTrashWorkspaceItemsHandler
 
 func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorkspaceItems) error {
-	slog.DebugContext(ctx, "trashing workspace items", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("note_count", len(cmd.NoteIDs)), slog.Int("folder_count", len(cmd.FolderIDs)), slog.String("user_id", cmd.UserID))
-	slog.DebugContext(ctx, "checking permission", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.WorkspaceID.String()), slog.String("permission", "delete"))
+	slog.DebugContext(
+		ctx, "trashing workspace items",
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+		slog.Int("note_count", len(cmd.NoteIDs)),
+		slog.Int("folder_count", len(cmd.FolderIDs)),
+		slog.String("user_id", cmd.UserID),
+	)
+	slog.DebugContext(
+		ctx, "checking permission",
+		slog.String("user_id", cmd.UserID),
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+		slog.String("permission", "delete"),
+	)
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		cmd.UserID,
@@ -55,7 +66,11 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			fmt.Sprintf("user %s does not have permission to trash items in workspace %s", cmd.UserID, cmd.WorkspaceID),
 		)
 	}
-	slog.DebugContext(ctx, "permission granted", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.WorkspaceID.String()))
+	slog.DebugContext(
+		ctx, "permission granted",
+		slog.String("user_id", cmd.UserID),
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+	)
 
 	if len(cmd.NoteIDs) == 0 && len(cmd.FolderIDs) == 0 {
 		return nil

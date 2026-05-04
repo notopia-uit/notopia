@@ -34,8 +34,18 @@ func NewRenameWorkspaceHandler(
 var ProvideRenameWorkspaceHandler = NewRenameWorkspaceHandler
 
 func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspace) error {
-	slog.DebugContext(ctx, "renaming workspace", slog.String("workspace_id", cmd.ID.String()), slog.String("new_name", cmd.Name), slog.String("user_id", cmd.UserID))
-	slog.DebugContext(ctx, "checking permission", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.ID.String()), slog.String("permission", "edit"))
+	slog.DebugContext(
+		ctx, "renaming workspace",
+		slog.String("workspace_id", cmd.ID.String()),
+		slog.String("new_name", cmd.Name),
+		slog.String("user_id", cmd.UserID),
+	)
+	slog.DebugContext(
+		ctx, "checking permission",
+		slog.String("user_id", cmd.UserID),
+		slog.String("workspace_id", cmd.ID.String()),
+		slog.String("permission", "edit"),
+	)
 	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionEdit)
 	if err != nil {
 		return err
@@ -45,7 +55,11 @@ func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspac
 			fmt.Sprintf("user %s does not have permission to rename workspace %s", cmd.UserID, cmd.ID),
 		)
 	}
-	slog.DebugContext(ctx, "permission granted", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.ID.String()))
+	slog.DebugContext(
+		ctx, "permission granted",
+		slog.String("user_id", cmd.UserID),
+		slog.String("workspace_id", cmd.ID.String()),
+	)
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		workspaceRepo := r.Workspace()
 		workspace, err := workspaceRepo.GetByID(ctx, cmd.ID, true)

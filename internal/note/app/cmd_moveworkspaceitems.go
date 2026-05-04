@@ -36,8 +36,20 @@ func NewMoveWorkspaceItemsHandler(
 var ProvideMoveWorkspaceItemsHandler = NewMoveWorkspaceItemsHandler
 
 func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) error {
-	slog.DebugContext(ctx, "moving workspace items", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("note_count", len(cmd.NoteIDs)), slog.Int("folder_count", len(cmd.FolderIDs)), slog.String("destination_folder_id", cmd.DestinationFolderID.String()), slog.String("user_id", cmd.UserID))
-	slog.DebugContext(ctx, "checking permission", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.WorkspaceID.String()), slog.String("permission", "write"))
+	slog.DebugContext(
+		ctx, "moving workspace items",
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+		slog.Int("note_count", len(cmd.NoteIDs)),
+		slog.Int("folder_count", len(cmd.FolderIDs)),
+		slog.String("destination_folder_id", cmd.DestinationFolderID.String()),
+		slog.String("user_id", cmd.UserID),
+	)
+	slog.DebugContext(
+		ctx, "checking permission",
+		slog.String("user_id", cmd.UserID),
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+		slog.String("permission", "write"),
+	)
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
 	if err != nil {
 		return err
@@ -48,7 +60,11 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			fmt.Sprintf("user %s does not have permission to move items in workspace %s", cmd.UserID, cmd.WorkspaceID),
 		)
 	}
-	slog.DebugContext(ctx, "permission granted", slog.String("user_id", cmd.UserID), slog.String("workspace_id", cmd.WorkspaceID.String()))
+	slog.DebugContext(
+		ctx, "permission granted",
+		slog.String("user_id", cmd.UserID),
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+	)
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()

@@ -23,7 +23,11 @@ func (h *CheckWorkspaceSlugExistsHandler) Handle(ctx context.Context, query *Che
 	slog.DebugContext(ctx, "checking workspace slug exists", slog.String("slug", query.Slug))
 	exists, err := h.readModel.CheckWorkspaceSlugExists(ctx, query.Slug)
 	if err == nil {
-		slog.DebugContext(ctx, "workspace slug check completed", slog.String("slug", query.Slug), slog.Bool("exists", exists))
+		slog.DebugContext(
+			ctx, "workspace slug check completed",
+			slog.String("slug", query.Slug),
+			slog.Bool("exists", exists),
+		)
 	}
 	return exists, err
 }

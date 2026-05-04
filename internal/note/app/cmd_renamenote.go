@@ -34,7 +34,12 @@ func NewRenameNoteHandler(
 var ProvideRenameNoteHandler = NewRenameNoteHandler
 
 func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
-	slog.DebugContext(ctx, "renaming note", slog.String("note_id", cmd.ID.String()), slog.String("new_name", cmd.Name), slog.String("user_id", cmd.UserID))
+	slog.DebugContext(
+		ctx, "renaming note",
+		slog.String("note_id", cmd.ID.String()),
+		slog.String("new_name", cmd.Name),
+		slog.String("user_id", cmd.UserID),
+	)
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		noteRepo := r.Note()
 		workspaceID, err := noteRepo.GetWorkspaceIDByID(ctx, cmd.ID)

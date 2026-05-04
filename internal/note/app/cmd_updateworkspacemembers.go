@@ -35,7 +35,12 @@ var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
 // FIXME: This maybe need saga? Because it involves 2 external things
 // Or we have to persist event and let another handler to consume
 func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateWorkspaceMembers) error {
-	slog.DebugContext(ctx, "updating workspace members", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("member_count", len(cmd.Members)), slog.String("user_id", cmd.UserID))
+	slog.DebugContext(
+		ctx, "updating workspace members",
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+		slog.Int("member_count", len(cmd.Members)),
+		slog.String("user_id", cmd.UserID),
+	)
 	if len(cmd.Members) == 0 {
 		return errs.NewWorkspaceMembersCannotBeEmpty(cmd.WorkspaceID)
 	}
@@ -49,7 +54,11 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateW
 	if !anyOwner {
 		return errs.NewWorkspaceMustHaveAtLeastOneOwner(cmd.WorkspaceID)
 	}
-	slog.DebugContext(ctx, "validating members", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("member_count", len(cmd.Members)))
+	slog.DebugContext(
+		ctx, "validating members",
+		slog.String("workspace_id", cmd.WorkspaceID.String()),
+		slog.Int("member_count", len(cmd.Members)),
+	)
 	if err := h.authorizationSvc.UpdateWorkspaceMembers(ctx, cmd.UserID, cmd.WorkspaceID, cmd.Members); err != nil {
 		return err
 	}
@@ -68,7 +77,11 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateW
 		},
 	})
 	if err == nil {
-		slog.InfoContext(ctx, "workspace members updated successfully", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("member_count", len(cmd.Members)))
+		slog.InfoContext(
+			ctx, "workspace members updated successfully",
+			slog.String("workspace_id", cmd.WorkspaceID.String()),
+			slog.Int("member_count", len(cmd.Members)),
+		)
 	}
 	return err
 }
