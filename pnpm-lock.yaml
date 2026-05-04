@@ -265,8 +265,8 @@ catalogs:
       specifier: 6.0.3
       version: 6.0.3
     uuid:
-      specifier: 13.0.1
-      version: 13.0.1
+      specifier: 14.0.0
+      version: 14.0.0
     vite:
       specifier: 8.0.10
       version: 8.0.10
@@ -319,7 +319,7 @@ importers:
         version: 7.8.2
       uuid:
         specifier: 'catalog:'
-        version: 13.0.1
+        version: 14.0.0
     devDependencies:
       '@nestjs/schematics':
         specifier: 'catalog:'
@@ -723,7 +723,7 @@ importers:
         version: 2.8.1
       uuid:
         specifier: 'catalog:'
-        version: 13.0.1
+        version: 14.0.0
     devDependencies:
       '@nestjs/testing':
         specifier: 'catalog:'
@@ -16041,8 +16041,8 @@ packages:
     resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
     hasBin: true
 
-  uuid@13.0.1:
-    resolution: {integrity: sha512-9ezox2roIft6ExBVTVqibSd5dc5/47Sw/uY6b4SjQUT2TzQ0tltNquWA46y4xPQmdZYqvnio22SgWd41M86+jw==}
+  uuid@14.0.0:
+    resolution: {integrity: sha512-Qo+uWgilfSmAhXCMav1uYFynlQO7fMFiMVZsQqZRMIXp0O7rR7qjkj+cPvBHLgBqi960QCoo/PH2/6ZtVqKvrg==}
     hasBin: true
 
   uuid@8.3.2:
@@ -35775,7 +35775,7 @@ snapshots:
 
   uuid@11.1.0: {}
 
-  uuid@13.0.1: {}
+  uuid@14.0.0: {}
 
   uuid@8.3.2: {}
 
