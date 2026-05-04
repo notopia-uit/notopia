@@ -77,11 +77,18 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 		//	This is a cross-service side effect inside uow.Execute.
 		//	If the auth call succeeds and the DB commit later fails, note and authorization will diverge.
 		//	Trigger it after commit or via an outbox/after-commit hook instead.
-		slog.DebugContext(ctx, "root folder saved", slog.String("folder_id", rootFolderID.String()))
+		slog.DebugContext(
+			ctx, "root folder saved",
+			slog.String("folder_id", rootFolderID.String()),
+		)
 		if err := h.authorizationSvc.CreateWorkspaceWithOwner(ctx, cmd.OwnerID, workspace.ID()); err != nil {
 			return err
 		}
-		slog.InfoContext(ctx, "workspace created successfully", slog.String("workspace_id", cmd.ID.String()), slog.String("owner_id", cmd.OwnerID))
+		slog.InfoContext(
+			ctx, "workspace created successfully",
+			slog.String("workspace_id", cmd.ID.String()),
+			slog.String("owner_id", cmd.OwnerID),
+		)
 		return nil
 	})
 }

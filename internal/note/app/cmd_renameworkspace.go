@@ -69,7 +69,11 @@ func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspac
 		workspace.Rename(cmd.Name, cmd.UserID)
 		err = workspaceRepo.Save(ctx, workspace)
 		if err == nil {
-			slog.InfoContext(ctx, "workspace renamed successfully", slog.String("workspace_id", cmd.ID.String()), slog.String("new_name", cmd.Name))
+			slog.InfoContext(
+				ctx, "workspace renamed successfully",
+				slog.String("workspace_id", cmd.ID.String()),
+				slog.String("new_name", cmd.Name),
+			)
 		}
 		return err
 	})

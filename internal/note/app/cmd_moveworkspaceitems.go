@@ -164,7 +164,11 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			}
 			slog.DebugContext(ctx, "notes moved", slog.Int("note_count", len(notes)))
 		}
-		slog.InfoContext(ctx, "workspace items moved successfully", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.String("destination_folder_id", cmd.DestinationFolderID.String()))
+		slog.InfoContext(
+			ctx, "workspace items moved successfully",
+			slog.String("workspace_id", cmd.WorkspaceID.String()),
+			slog.String("destination_folder_id", cmd.DestinationFolderID.String()),
+		)
 		return nil
 	})
 }

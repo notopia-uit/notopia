@@ -144,7 +144,12 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			allModifiedFolders = append(allModifiedFolders, folders...)
 			allModifiedFolders = append(allModifiedFolders, childFolders...)
 			allModifiedNotes = append(allModifiedNotes, childNotes...)
-			slog.DebugContext(ctx, "folders and children trashed", slog.Int("folder_count", len(folders)), slog.Int("child_folder_count", len(childFolders)), slog.Int("child_note_count", len(childNotes)))
+			slog.DebugContext(
+				ctx, "folders and children trashed",
+				slog.Int("folder_count", len(folders)),
+				slog.Int("child_folder_count", len(childFolders)),
+				slog.Int("child_note_count", len(childNotes)),
+			)
 		}
 
 		allModifiedNotes = deduplicateNotes(allModifiedNotes)
@@ -162,7 +167,12 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			}
 		}
 
-		slog.InfoContext(ctx, "workspace items trashed successfully", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("total_notes", len(allModifiedNotes)), slog.Int("total_folders", len(allModifiedFolders)))
+		slog.InfoContext(
+			ctx, "workspace items trashed successfully",
+			slog.String("workspace_id", cmd.WorkspaceID.String()),
+			slog.Int("total_notes", len(allModifiedNotes)),
+			slog.Int("total_folders", len(allModifiedFolders)),
+		)
 		return nil
 	})
 }

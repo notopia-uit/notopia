@@ -67,6 +67,7 @@ var ProvideSlogHandler = NewSlogHandler
 
 func MapSlogToGRPCMiddlewareLogger(l *slog.Logger) logging.Logger {
 	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
+		//nolint:sloglint
 		l.Log(ctx, slog.Level(lvl), msg, fields...)
 	})
 }
