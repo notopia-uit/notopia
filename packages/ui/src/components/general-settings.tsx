@@ -12,7 +12,6 @@ interface GeneralSettingsProps {
 export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
   return (
     <div className="space-y-8">
-      {/* Rename Workspace Form */}
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="workspace-name" className="text-zinc-200">
@@ -36,7 +35,6 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
 
       <Separator className="bg-zinc-800" />
 
-      {/* Trash / Data Management Section */}
       <div className="space-y-4">
         <div className="space-y-2">
           <h3 className="text-lg font-medium text-zinc-200">Recycle Bin</h3>

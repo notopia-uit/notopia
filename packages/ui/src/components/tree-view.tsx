@@ -10,6 +10,7 @@ import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import React, {
   useCallback,
   useEffect,
@@ -214,6 +215,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
     select: (data) => mapDtoTreeData(data),
   });
 
+  const router = useRouter();
   const tree = useRef<TreeRef>(null);
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
@@ -481,14 +483,22 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
               },
             }));
           }}
-          onSelectItems={(items, treeId) => {
+          onSelectItems={(selectedItems, treeId) => {
+            const selectedId = selectedItems.at(-1) ?? '';
             setViewState((prevViewState) => ({
               ...prevViewState,
               [treeId]: {
                 ...prevViewState[treeId],
-                selectedItems: [items.at(-1) ?? ''],
+                selectedItems: [selectedId],
               },
             }));
+            if (
+              selectedId &&
+              items[selectedId] &&
+              !items[selectedId].isFolder
+            ) {
+              router.push(`/workspace/${currentWorkspaceId}/${selectedId}`);
+            }
           }}
           renderTreeContainer={({ children, containerProps }) => {
             return (
