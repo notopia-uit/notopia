@@ -9,7 +9,7 @@ import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
 import React, {
   useCallback,
   useEffect,
@@ -289,6 +289,60 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
     []
   );
 
+  const handleCreateItem = useCallback(
+    (isFolder: boolean) => {
+      setItems((prevItems) => {
+        const focusedId = viewState['tree-sample']?.focusedItem;
+        let parentId: TreeItemIndex = 'root';
+
+        if (focusedId && prevItems[focusedId]) {
+          if (prevItems[focusedId].isFolder) {
+            parentId = focusedId;
+          } else {
+            const parent = Object.values(prevItems).find(
+              (p) => p.isFolder && p.children?.includes(focusedId)
+            );
+            if (parent) parentId = parent.index;
+          }
+        }
+
+        const newItemId = `item_${Date.now()}`;
+
+        const newItem: TreeItem<string> = {
+          index: newItemId,
+          isFolder,
+          data: isFolder ? 'New Folder' : 'New Note',
+          children: isFolder ? [] : undefined,
+        };
+
+        setViewState((prev) => {
+          const currentExpanded = prev['tree-sample']?.expandedItems ?? [];
+          if (!currentExpanded.includes(parentId)) {
+            return {
+              ...prev,
+              'tree-sample': {
+                ...prev['tree-sample'],
+                expandedItems: [...currentExpanded, parentId],
+              },
+            };
+          }
+          return prev;
+        });
+
+        const parentNode = prevItems[parentId];
+        return {
+          ...prevItems,
+          [newItemId]: newItem,
+          [parentId]: {
+            ...parentNode,
+            children: [...(parentNode.children || []), newItemId],
+          },
+        };
+      });
+    },
+    [viewState]
+  );
+
   const getItemPath = useCallback(
     async (
       search: string,
@@ -350,17 +404,38 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
 
   return (
     <div className="flex flex-col h-full w-full gap-4 overflow-hidden">
-      <form
-        onSubmit={onSubmit}
-        className="flex items-center justify-start gap-2 shrink-0"
-      >
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search..."
-        />
-        <Button type="submit">Search</Button>
-      </form>
+      <div className="flex flex-col gap-2 shrink-0">
+        <form onSubmit={onSubmit} className="flex items-center gap-2">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search..."
+            className="h-8 text-sm"
+          />
+          <Button type="submit">Search</Button>
+        </form>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 h-8 text-xs" // flex-1 makes them share the space equally
+            onClick={() => handleCreateItem(false)}
+          >
+            <FilePlus className="w-3 h-3 mr-1.5" />
+            New Note
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 h-8 text-xs"
+            onClick={() => handleCreateItem(true)}
+          >
+            <FolderPlus className="w-3 h-3 mr-1.5" />
+            New Folder
+          </Button>
+        </div>
+      </div>
       <div className="flex-1 overflow-auto">
         <ControlledTreeEnvironment<string>
           items={items}

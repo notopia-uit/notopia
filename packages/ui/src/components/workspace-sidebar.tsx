@@ -302,14 +302,14 @@ export default function WorkspaceSideBar({
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
+      <SidebarContent className="flex flex-col overflow-hidden">
+        <SidebarGroup className="flex flex-col flex-1 overflow-hidden group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
-          <SidebarMenu>
+          <SidebarMenu className="flex-col flex-1 overflow-hidden">
             <TreeView currentWorkspaceId={currentWorkspaceId} />
           </SidebarMenu>
         </SidebarGroup>
-        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+        <SidebarGroup className="shrink-0 group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarMenu>
             {data.projects.map((item) => (
