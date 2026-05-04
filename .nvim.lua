@@ -4,7 +4,7 @@ local root = vim.fn.getcwd()
 local uri_root = vim.uri_from_fname(root)
 
 -- lsp.config("yamlls", {
---   ---@module 'codesettings'
+--   ---@module 'lspconfig'
 --   ---@type lsp.yamlls
 --   settings = {
 --     yaml = {
@@ -28,6 +28,8 @@ local uri_root = vim.uri_from_fname(root)
 -- })
 
 lsp.config("gopls", {
+  ---@module 'lspconfig'
+  ---@type lspconfig.settings.gopls
   settings = {
     gopls = {
       buildFlags = {
@@ -36,15 +38,12 @@ lsp.config("gopls", {
       },
     },
   },
+  root_dir = function(_, on_dir)
+    on_dir(root)
+  end,
 })
 
 lsp.config("tailwindcss", {
-  filetypes = {
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-  },
   root_dir = function(bufnr, on_dir)
     local fname = vim.api.nvim_buf_get_name(bufnr)
     local allowed_paths = {
@@ -61,29 +60,60 @@ lsp.config("tailwindcss", {
     if not is_allowed then
       return
     end
-    on_dir(require("lspconfig.util").root_pattern("package.json")(fname))
+    on_dir(root)
   end,
+  ---@module 'lspconfig'
+  ---@type lspconfig.settings.tailwindcss
+  settings = {
+    tailwindCSS = {
+      experimental = {
+        configFile = {
+          ["apps/web/app/globals.css"] = "apps/web/app/**",
+          ["packages/ui/src/globals.css"] = "packages/ui/src/**",
+        },
+      },
+    },
+  },
 })
 
----@type lsp.vtsls
-local tsgo_setting = {
-  javascript = {
-    format = {
-      enable = false,
+lsp.config("twcssls", {
+  cmd = { "css-language-server", "--stdio" },
+  root_dir = function(_, on_dir)
+    on_dir(root)
+  end,
+  workspace_folders = {
+    {
+      name = "web",
+      uri = string.format("%s/apps/web", uri_root),
+    },
+    {
+      name = "ui",
+      uri = string.format("%s/packages/ui", uri_root),
     },
   },
-  typescript = {
-    format = {
-      enable = false,
-    },
-    preferences = {
-      importModuleSpecifier = "non-relative",
-    },
-  },
-}
+})
 
 lsp.config("tsgo", {
-  settings = tsgo_setting,
+  cmd = { "tsgo", "--lsp", "--stdio" },
+  root_dir = function(_, on_dir)
+    on_dir(root)
+  end,
+  ---@type lspconfig.settings.vtsls
+  settings = {
+    javascript = {
+      format = {
+        enable = false,
+      },
+    },
+    typescript = {
+      format = {
+        enable = false,
+      },
+      preferences = {
+        importModuleSpecifier = "non-relative",
+      },
+    },
+  },
   on_attach = function(client)
     client.server_capabilities.documentFormattingProvider = false
     client.server_capabilities.documentRangeFormattingProvider = false
@@ -91,10 +121,10 @@ lsp.config("tsgo", {
 })
 
 lsp.config("oxlint", {
-  cmd = function(dispatchers)
-    return vim.lsp.rpc.start({ "oxlint", "--lsp" }, dispatchers)
+  cmd = { "oxlint", "--lsp" },
+  root_dir = function(_, on_dir)
+    on_dir(root)
   end,
-  root_markers = { ".git" },
   init_options = {
     {
       workspaceUri = uri_root,
@@ -122,17 +152,30 @@ lsp.config("oxlint", {
 })
 
 lsp.config("oxfmt", {
-  cmd = function(dispatchers)
-    return vim.lsp.rpc.start({ "oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" }, dispatchers)
+  cmd = { "oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" },
+  root_dir = function(_, on_dir)
+    on_dir(root)
   end,
-  root_markers = { ".oxfmtrc.jsonc" },
 })
 
-lsp.enable({ "tsgo", "gopls", "oxlint", "oxfmt", "tailwindcss", "yamlls", "jsonls" })
-
-if vim.fn.executable("harper-ls") == 1 then
-  lsp.enable("harper_ls")
-end
+lsp.enable({
+  "ecfg",
+  "golangci_lint_ls",
+  "gopls",
+  "harper_ls",
+  "jsonls",
+  "jsonls",
+  "lua_ls",
+  "nxls",
+  "oxfmt",
+  "oxlint",
+  "redocly_ls",
+  "tailwindcss",
+  "tsgo",
+  "twcssls",
+  "yamlls",
+  "yamlls",
+})
 
 map("n", "<localleader>b", function()
   vim.ui.select({
@@ -165,7 +208,7 @@ map("n", "<localleader>b", function()
 end, { desc = "LSP | Switch buildFlags", silent = true })
 
 local function restart_lsp_client(client_name)
-  local clients = lsp.get_clients({ name = client_name })
+  local clients = lsp.get_clients({ name = client_name, bufnr = 0 })
   for client in vim.iter(clients) do ---@cast client vim.lsp.Client
     client:stop()
   end
@@ -174,11 +217,19 @@ end
 
 map("n", "<localleader>lrt", function()
   restart_lsp_client("tsgo")
-end, { desc = "LSP | Restart TSGO", silent = true })
+end, { desc = "LSP | Restart tsgo", silent = true })
 
-map("n", "<localleader>lre", function()
-  restart_lsp_client("eslint")
-end, { desc = "LSP | Restart eslint", silent = true })
+map("n", "<localleader>lrc", function()
+  restart_lsp_client("twcssls")
+end, { desc = "LSP | Restart twcssls", silent = true })
+
+map("n", "<localleader>lro", function()
+  restart_lsp_client("oxlint")
+end, { desc = "LSP | Restart oxlint", silent = true })
+
+map("n", "<localleader>lrO", function()
+  restart_lsp_client("oxfmt")
+end, { desc = "LSP | Restart oxfmt", silent = true })
 
 map("n", "<localleader>lrg", function()
   restart_lsp_client("gopls")
