@@ -73,7 +73,11 @@ func (h *ChangeWorkspaceSlugHandler) Handle(ctx context.Context, cmd *ChangeWork
 		}
 		err = workspaceRepo.Save(ctx, workspace)
 		if err == nil {
-			slog.InfoContext(ctx, "workspace slug changed successfully", slog.String("workspace_id", cmd.ID.String()), slog.String("new_slug", cmd.Slug))
+			slog.InfoContext(
+				ctx, "workspace slug changed successfully",
+				slog.String("workspace_id", cmd.ID.String()),
+				slog.String("new_slug", cmd.Slug),
+			)
 		}
 		return err
 	})
