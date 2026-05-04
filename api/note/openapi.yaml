@@ -78,6 +78,8 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_rename.yaml
   /note/workspaces/{workspaceId}/restore-trashed-items:
     $ref: ./paths/workspaces_{workspaceId}_restore-trashed-items.yaml
+  /note/workspaces/{workspaceId}/search-token:
+    $ref: ./paths/workspaces_{workspaceId}_search-token.yaml
   /note/workspaces/{workspaceId}/show-trash:
     $ref: ./paths/workspaces_{workspaceId}_show-trash.yaml
   /note/workspaces/{workspaceId}/trash-items:

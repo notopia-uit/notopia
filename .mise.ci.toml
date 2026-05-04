@@ -1,19 +1,34 @@
 #:schema https://raw.githubusercontent.com/jdx/mise/refs/heads/main/schema/mise.json
 
+[env]
+REDOCLY_TELEMETRY = "off"
+REDOCLY_SUPPRESS_UPDATE_NOTICE = "true"
+NEXT_TELEMETRY_DISABLED = 1
+MISE_EXPERIMENTAL = 1
+'_'.path.paths = ["./bin/", "./scripts/"]
+
 [tools]
-"github:pressly/goose" = "3.27.0"
-"go:github.com/goforj/wire/cmd/wire" = "v1.1.0"
+"github:pressly/goose" = "3.27.1"
+"go:github.com/goforj/wire/cmd/wire" = "1.2.0"
 "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.6.0"
 buf = "1.65.0"
-sqlc = "1.30.0"
-java = "latest"
+sqlc = "1.31.1"
+java = "26.0.1"
 "npm:@kevinnitro/nx-cache-action" = "0.1.0"
 mockery = "3.7.0"
+d2 = "0.7.1"
+
+[tools."http:kroki"]
+url = "https://github.com/yuzutech/kroki/releases/download/v{{ version }}/kroki-standalone-server-v{{ version }}.jar"
+version = "0.30.1"
+bin = "kroki-server.jar"
 
 [shell_alias]
 nx = "pnpm exec nx"
 shadcn = "pnpm exec shadcn"
 tsgo = "pnpm exec tsgo"
+plantuml = "./bin/plantuml"
+kroki = "./bin/kroki"
 
 [settings]
 legacy_version_file = false

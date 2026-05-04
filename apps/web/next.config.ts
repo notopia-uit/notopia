@@ -8,6 +8,7 @@ const nextConfig: WithNxOptions = {
   nx: {},
   output: 'standalone',
   allowedDevOrigins: ['web.notopia.localhost'],
+  productionBrowserSourceMaps: true,
 };
 
 const plugins = [withNx];

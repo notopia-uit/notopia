@@ -1,17 +1,19 @@
-'use client';
-import '@blocknote/core/fonts/inter.css';
-import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
-import { BlockNoteView } from '@blocknote/shadcn';
-import '@blocknote/shadcn/style.css';
+"use client";
+
+import "@blocknote/core/fonts/inter.css";
+import { SuggestionMenuController, useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/shadcn";
+
+import "@blocknote/shadcn/style.css";
 import {
   createBlockNoteSchema,
   getNoteMenuItems,
   getTagMenuItems,
-} from '@notopia-uit/ui/block-note';
-import { useMemo, useState } from 'react';
+} from "@notopia-uit/ui/block-note";
+import { useMemo, useState } from "react";
 
-import { Icons } from './icons';
-import { Button } from './shadcn/button';
+import { Icons } from "./icons";
+import { Button } from "./shadcn/button";
 
 export default function Editor({ noteId }: { noteId: string }) {
   // const { data: note } = useSuspenseQuery(
@@ -37,21 +39,21 @@ export default function Editor({ noteId }: { noteId: string }) {
         }}
       >
         <SuggestionMenuController
-          triggerCharacter={'#'}
+          triggerCharacter={"#"}
           getItems={async (query) => {
             return await getTagMenuItems(editor, query, []);
           }}
         />
 
         <SuggestionMenuController
-          triggerCharacter={'@'}
+          triggerCharacter={"@"}
           getItems={async (query) => {
             return await getNoteMenuItems(editor, query, []);
           }}
         />
       </BlockNoteView>
       {isDirty && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">
           <Button
             variant="outline"
             size="icon"

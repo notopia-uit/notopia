@@ -25,18 +25,18 @@ func NewWorkspaceTree(queries *pgsqlc.Queries) *WorkspaceTree {
 
 var ProvideWorkspaceTree = NewWorkspaceTree
 
-func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspaceTree) (app.WorkspaceTreeFolder, error) {
+func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, p *app.GetWorkspaceTreeReadModelParams) (app.WorkspaceTreeFolder, error) {
 	var rootFolderID uuid.UUID
 
-	if q.RootFolderID != uuid.Nil {
-		rootFolderID = q.RootFolderID
+	if p.RootFolderID != uuid.Nil {
+		rootFolderID = p.RootFolderID
 	} else {
-		rootFolderIDs, err := h.queries.ReadGetRootFolderIDsByWorkspaceID(ctx, q.WorkspaceID)
+		rootFolderIDs, err := h.queries.ReadGetRootFolderIDsByWorkspaceID(ctx, p.WorkspaceID)
 		if err != nil {
 			return app.WorkspaceTreeFolder{}, toErr(err)
 		}
 		if len(rootFolderIDs) == 0 {
-			return app.WorkspaceTreeFolder{}, errs.NewWorkspaceRootFolderNotFound(q.WorkspaceID, pgx.ErrNoRows)
+			return app.WorkspaceTreeFolder{}, errs.NewWorkspaceRootFolderNotFound(p.WorkspaceID, pgx.ErrNoRows)
 		}
 		rootFolderID = rootFolderIDs[0]
 	}
@@ -50,13 +50,13 @@ func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspac
 	}
 
 	var depth *int32
-	if q.Depth != 0 {
-		depth = new(int32(q.Depth))
+	if p.Depth != 0 {
+		depth = new(int32(p.Depth))
 	}
 	recursiveFolders, err := h.queries.ReadGetRecursiveFolderByParentID(ctx, &pgsqlc.ReadGetRecursiveFolderByParentIDParams{
 		ParentID:       rootFolderID,
 		Depth:          depth,
-		IncludeTrashed: q.IncludeTrashed,
+		IncludeTrashed: p.IncludeTrashed,
 	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return app.WorkspaceTreeFolder{}, toErr(err)
@@ -88,7 +88,7 @@ func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, q *app.GetWorkspac
 
 	allNotes, err := h.queries.ReadGetNotesByFolderIDs(ctx, pgsqlc.ReadGetNotesByFolderIDsParams{
 		FolderIds:    folderIDs,
-		ExcludeTrash: !q.IncludeTrashed,
+		ExcludeTrash: !p.IncludeTrashed,
 	})
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return app.WorkspaceTreeFolder{}, toErr(err)

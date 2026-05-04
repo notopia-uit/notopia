@@ -143,7 +143,11 @@ func (f *Folder) Trash(trashedBy TrashedBy, userID string) error {
 	if f.trashed.IsTrashed() {
 		return errs.NewFolderAlreadyTrashed(f.id)
 	}
-	f.trashed = NewTrashed(trashedBy, time.Now())
+	var err error
+	f.trashed, err = NewTrashed(trashedBy, time.Now())
+	if err != nil {
+		return err
+	}
 	f.addEvent(&FolderTrashedEvent{
 		BaseEvent: NewBaseEvent(f.id, userID),
 	})

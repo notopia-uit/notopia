@@ -2,6 +2,9 @@
   "name": "@notopia-uit/document",
   "private": true,
   "type": "module",
+  "imports": {
+    "#/*": "./src/*.js"
+  },
   "scripts": {
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
     "typeorm-extension": "tsx ./node_modules/typeorm-extension/bin/cli.mjs",
@@ -39,6 +42,7 @@
     "@types/express": "catalog:",
     "express": "catalog:",
     "kafkajs": "catalog:",
+    "marked": "catalog:",
     "nestjs-otel": "catalog:",
     "nestjs-pino": "catalog:",
     "pino-http": "catalog:",
@@ -61,8 +65,5 @@
     "tsx": "catalog:",
     "typeorm-extension": "catalog:",
     "webpack-node-externals": "catalog:"
-  },
-  "imports": {
-    "#/*": "./src/*.js"
   }
 }

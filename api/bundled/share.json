@@ -51,6 +51,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "workspaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
           "name": {
             "type": "string"
           },
@@ -61,7 +65,9 @@
         },
         "required": [
           "id",
-          "name"
+          "workspaceId",
+          "name",
+          "icon"
         ]
       },
       "NoteDeletedEvent": {
@@ -83,6 +89,17 @@
             "type": "string",
             "format": "uuid"
           },
+          "workspaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "folderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "folderName": {
+            "type": "string"
+          },
           "name": {
             "type": "string"
           },
@@ -95,17 +112,29 @@
             "items": {
               "type": "string"
             }
+          },
+          "trashed": {
+            "$ref": "#/components/schemas/Trashed"
           }
         },
         "required": [
           "id",
-          "name"
+          "workspaceId",
+          "folderId",
+          "folderName",
+          "name",
+          "plainTextContent",
+          "tags"
         ]
       },
       "NoteUpdatedEvent": {
         "type": "object",
         "properties": {
           "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workspaceId": {
             "type": "string",
             "format": "uuid"
           },
@@ -120,11 +149,11 @@
             "type": "string",
             "format": "uuid"
           },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "folderName": {
+            "type": "string"
+          },
+          "trashed": {
+            "$ref": "#/components/schemas/Trashed"
           },
           "updatedAt": {
             "type": "string",
@@ -133,10 +162,11 @@
         },
         "required": [
           "id",
+          "workspaceId",
           "name",
           "icon",
           "folderId",
-          "tags",
+          "folderName",
           "updatedAt"
         ]
       },
@@ -155,7 +185,7 @@
         "type": "object",
         "properties": {
           "workspaceId": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/id-2"
           },
           "userId": {
             "$ref": "#/components/schemas/id"
@@ -174,7 +204,7 @@
         "type": "object",
         "properties": {
           "workspaceId": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/id-2"
           },
           "userId": {
             "$ref": "#/components/schemas/id"
@@ -193,7 +223,7 @@
         "type": "object",
         "properties": {
           "workspaceId": {
-            "$ref": "#/components/schemas/properties-id"
+            "$ref": "#/components/schemas/id-2"
           },
           "userId": {
             "$ref": "#/components/schemas/id"
@@ -378,7 +408,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "46f94d4d-41b5-4df6-bf8d-270fb9a49c97"
+            "example": "000c2575-1847-5293-8117-2415a2328ef8"
           },
           "content": {
             "$ref": "#/components/schemas/DocumentContent"
@@ -389,15 +419,40 @@
           "content"
         ]
       },
+      "TrashedBy": {
+        "type": "string",
+        "enum": [
+          "purpose",
+          "parent"
+        ],
+        "example": "purpose"
+      },
+      "Trashed": {
+        "type": "object",
+        "properties": {
+          "by": {
+            "$ref": "#/components/schemas/TrashedBy"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-06-01T12:00:00Z"
+          }
+        },
+        "required": [
+          "by",
+          "at"
+        ]
+      },
       "id": {
         "type": "string",
         "description": "User ID from Authentik (need to change subject mode to User's ID instead of hashed)",
         "example": "100"
       },
-      "properties-id": {
+      "id-2": {
         "type": "string",
         "format": "uuid",
-        "example": "550e8400-e29b-41d4-a716-446655440000",
+        "example": "00000000-0000-0000-0000-000000000110",
         "readOnly": true
       },
       "WorkspaceRole": {

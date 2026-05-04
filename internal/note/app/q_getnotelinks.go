@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
@@ -15,10 +16,6 @@ type GetNoteLinks struct {
 	Backlinks     bool
 
 	UserID string
-}
-
-type GetNoteLinksReadModel interface {
-	GetNoteLinks(ctx context.Context, q *GetNoteLinks) (NoteLinkResult, error)
 }
 
 type GetNoteLinksHandler struct {
@@ -42,6 +39,7 @@ func NewGetNoteLinksHandler(
 var ProvideGetNoteLinksHandler = NewGetNoteLinksHandler
 
 func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (NoteLinkResult, error) {
+	slog.DebugContext(ctx, "Handling get note links query", slog.String("note_id", query.ID.String()))
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)
 	if err != nil {
 		return NoteLinkResult{}, err
@@ -60,5 +58,14 @@ func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (
 			fmt.Sprintf("user %s does not have permission to read note links %s", query.UserID, query.ID),
 		)
 	}
-	return h.readModel.GetNoteLinks(ctx, query)
+	result, err := h.readModel.GetNoteLinks(ctx, &GetNoteLinksReadModelParams{
+		ID:            query.ID,
+		OutgoingLinks: query.OutgoingLinks,
+		Backlinks:     query.Backlinks,
+	})
+	if err != nil {
+		return NoteLinkResult{}, err
+	}
+	slog.InfoContext(ctx, "Get note links query completed", slog.String("note_id", query.ID.String()))
+	return result, nil
 }

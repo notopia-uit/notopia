@@ -36,15 +36,16 @@ func NewStrictHandler(
 	app *app.Server,
 	cfg *config.Server,
 	workspaceEventHub app.WorkspaceEventHub,
-) *StrictHandler {
-	return &StrictHandler{
-		App: app,
-		BaseURL: &url.URL{
-			Scheme: "http",
-			Host:   cfg.HTTP.Address(),
-		},
-		WorkspaceEventHub: workspaceEventHub,
+) (*StrictHandler, error) {
+	baseURL, err := url.Parse(cfg.URL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse base url: %w", err)
 	}
+	return &StrictHandler{
+		App:               app,
+		BaseURL:           baseURL,
+		WorkspaceEventHub: workspaceEventHub,
+	}, nil
 }
 
 var ProvideStrictHandler = NewStrictHandler

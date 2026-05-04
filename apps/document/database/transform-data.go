@@ -74,7 +74,7 @@ func run(config Config) error {
 	if err := os.RemoveAll(config.OutputDir); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("failed to clean output directory: %w", err)
 	}
-	if err := os.MkdirAll(config.OutputDir, 0755); err != nil {
+	if err := os.MkdirAll(config.OutputDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
@@ -147,7 +147,7 @@ func processFile(filePath string, config Config, fileMapping map[string]uuid.UUI
 	// Write output file
 	outputFileName := fmt.Sprintf("%s.md", fileUUID.String())
 	outputPath := filepath.Join(config.OutputDir, outputFileName)
-	if err := os.WriteFile(outputPath, []byte(transformed), 0644); err != nil {
+	if err := os.WriteFile(outputPath, []byte(transformed), 0o644); err != nil {
 		return fmt.Errorf("failed to write output file %s: %w", outputPath, err)
 	}
 
@@ -158,7 +158,43 @@ func transformContent(content string, config Config, fileMapping map[string]uuid
 	// Step 1: Strip frontmatter
 	content = frontmatterRegex.ReplaceAllString(content, "")
 
-	// Step 2: Protect markdown links from tag processing by temporarily replacing them
+	// Step 2: Replace markdown links with relative file paths
+	content = markdownLinkRegex.ReplaceAllStringFunc(content, func(match string) string {
+		// Extract link text and URL using capturing groups
+		parts := markdownLinkRegex.FindStringSubmatch(match)
+		if len(parts) < 3 {
+			return match
+		}
+		linkText := parts[1]
+		linkURL := parts[2]
+
+		// Check if this is a relative file path (not a URL or anchor-only)
+		if isRelativeFilePath(linkURL) {
+			// Extract the file path (remove anchor if present)
+			filePath := linkURL
+			if idx := strings.Index(filePath, "#"); idx != -1 {
+				filePath = filePath[:idx]
+			}
+
+			// Resolve the absolute path relative to vault root
+			resolvedPath := resolveLinkPath(filePath)
+
+			// Look up UUID for this path
+			linkUUID, found := fileMapping[resolvedPath]
+			if !found {
+				// If not found, generate UUID from the path anyway
+				linkUUID = uuid.NewSHA1(config.NamespaceUUID, []byte(resolvedPath))
+			}
+
+			// Return the JSX replacement (condensed to one line)
+			return fmt.Sprintf(`<a href="@%s" data-notopia-ref="%s">%s</a>`, linkUUID.String(), linkUUID.String(), linkText)
+		}
+
+		// Not a relative file path, keep original
+		return match
+	})
+
+	// Step 3: Protect remaining markdown links from tag processing by temporarily replacing them
 	markdownLinks := make(map[string]string)
 	linkCounter := 0
 	content = markdownLinkRegex.ReplaceAllStringFunc(content, func(match string) string {
@@ -168,7 +204,7 @@ func transformContent(content string, config Config, fileMapping map[string]uuid
 		return placeholder
 	})
 
-	// Step 3: Replace wiki-style links
+	// Step 4: Replace wiki-style links
 	content = wikiLinkRegex.ReplaceAllStringFunc(content, func(match string) string {
 		// Extract the link content (without [[ and ]])
 		linkContent := match[2 : len(match)-2]
@@ -191,7 +227,7 @@ func transformContent(content string, config Config, fileMapping map[string]uuid
 		return fmt.Sprintf(`<a href="@%s" data-notopia-ref="%s">@%s</a>`, linkUUID.String(), linkUUID.String(), linkUUID.String())
 	})
 
-	// Step 4: Replace tags (now markdown links are protected)
+	// Step 5: Replace tags (now markdown links are protected)
 	content = tagRegex.ReplaceAllStringFunc(content, func(match string) string {
 		// The regex captures whitespace/start and the tag
 		hashIdx := strings.Index(match, "#")
@@ -206,12 +242,36 @@ func transformContent(content string, config Config, fileMapping map[string]uuid
 		return prefix + fmt.Sprintf(`<a href="#%s" data-notopia-tag="%s">#%s</a>`, tag, tag, tag)
 	})
 
-	// Step 5: Restore markdown links
+	// Step 6: Restore remaining markdown links
 	for placeholder, original := range markdownLinks {
 		content = strings.ReplaceAll(content, placeholder, original)
 	}
 
 	return content
+}
+
+func isRelativeFilePath(urlPath string) bool {
+	// Check if the path looks like a relative file path
+	// It should NOT be:
+	// - A URL (contains ://)
+	// - Just an anchor (starts with #)
+
+	if strings.Contains(urlPath, "://") {
+		return false // It's a URL like http://, https://, etc.
+	}
+
+	if strings.HasPrefix(urlPath, "#") {
+		return false // It's just an anchor
+	}
+
+	// Check if it looks like a file path (has .md or starts with ../, ./, or just a name)
+	trimmed := strings.TrimSuffix(urlPath, ".md")
+	hasMdExt := len(urlPath) > len(trimmed) && urlPath[len(trimmed):] == ".md"
+
+	startsWithRelative := strings.HasPrefix(urlPath, "../") || strings.HasPrefix(urlPath, "./") || strings.HasPrefix(urlPath, "/")
+
+	// If it has .md extension or starts with relative path, it's likely a file
+	return hasMdExt || startsWithRelative
 }
 
 func resolveLinkPath(linkPath string) string {

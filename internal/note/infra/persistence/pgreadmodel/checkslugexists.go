@@ -19,8 +19,8 @@ func NewCheckWorkspaceSlugExists(queries *pgsqlc.Queries) *CheckWorkspaceSlugExi
 
 var ProvideCheckWorkspaceSlugExists = NewCheckWorkspaceSlugExists
 
-func (h *CheckWorkspaceSlugExists) CheckWorkspaceSlugExists(ctx context.Context, q *app.CheckWorkspaceSlugExists) (bool, error) {
-	exists, err := h.queries.CheckSlugExists(ctx, q.Slug)
+func (h *CheckWorkspaceSlugExists) CheckWorkspaceSlugExists(ctx context.Context, slug string) (bool, error) {
+	exists, err := h.queries.CheckSlugExists(ctx, slug)
 	if err != nil {
 		return false, toErr(err)
 	}

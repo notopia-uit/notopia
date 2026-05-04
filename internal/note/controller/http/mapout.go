@@ -71,7 +71,7 @@ func toFolderDTO(f *app.Folder) (note.Folder, error) {
 		Name:        f.Name,
 		Icon:        icon,
 		ParentId:    parentID,
-		WorkspaceId: &f.WorkspaceID,
+		WorkspaceId: f.WorkspaceID,
 		UpdatedAt:   &f.UpdatedAt,
 		Trashed:     trashed,
 	}, nil
@@ -225,8 +225,7 @@ func toGraphDTO(g *app.Graph) note.Graph {
 		nodes[i].Name = n.Name
 		nodes[i].Type = note.GraphNodesType(n.Type)
 		if n.Weight != 0 {
-			w := float32(n.Weight)
-			nodes[i].Weight = &w
+			nodes[i].Weight = &n.Weight
 		}
 	}
 	links := make([]note.GraphLink, len(g.Links))
@@ -288,5 +287,12 @@ func toTrashedByDTO(t app.TrashedBy) (note.TrashedBy, error) {
 		return "", errs.NewInternal("unspecified trashed by")
 	default:
 		return "", errs.NewInternal(fmt.Sprintf("invalid trashed by: %v", t))
+	}
+}
+
+func toSearchTokenDTO(t *app.SearchToken) note.SearchToken {
+	return note.SearchToken{
+		Token:     t.Token,
+		ExpiresAt: t.ExpiresAt,
 	}
 }

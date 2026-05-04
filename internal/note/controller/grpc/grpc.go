@@ -17,7 +17,6 @@ import (
 )
 
 type ServiceServer struct {
-	pb.UnimplementedNoteServiceServer
 	app *app.Server
 }
 
@@ -25,8 +24,7 @@ var _ pb.NoteServiceServer = (*ServiceServer)(nil)
 
 func NewServiceServer(app *app.Server) *ServiceServer {
 	return &ServiceServer{
-		UnimplementedNoteServiceServer: pb.UnimplementedNoteServiceServer{},
-		app:                            app,
+		app: app,
 	}
 }
 
@@ -50,7 +48,12 @@ func New(
 	server := grpc.NewServer(
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(
-			logging.UnaryServerInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)),
+			logging.UnaryServerInterceptor(logger, logging.WithLogOnEvents(
+				logging.StartCall,
+				logging.FinishCall,
+				logging.PayloadSent,
+				logging.PayloadReceived,
+			)),
 			protovalidate_middleware.UnaryServerInterceptor(validator),
 			unaryErrorInterceptor,
 		),

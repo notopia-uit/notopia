@@ -22,6 +22,8 @@ get:
         application/json:
           schema:
             $ref: ../components/schemas/Graph.yaml
+          example:
+            $ref: ../components/examples/NoteGraph.json
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

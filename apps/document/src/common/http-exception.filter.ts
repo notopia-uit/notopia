@@ -1,10 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Logger } from 'nestjs-pino';
 
@@ -24,9 +18,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
     let message = 'Internal server error';
     let code = 'INTERNAL_SERVER_ERROR';

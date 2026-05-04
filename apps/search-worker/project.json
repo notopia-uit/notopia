@@ -3,25 +3,11 @@
   "name": "search-worker",
   "projectType": "application",
   "targets": {
-    "build": {
-      "defaultConfiguration": "development",
-      "configurations": {
-        "development": {
-          "mode": "development"
-        },
-        "production": {
-          "mode": "production"
-        }
-      }
-    },
     "prune-lockfile": {
       "dependsOn": ["build"],
       "cache": true,
       "executor": "@nx/js:prune-lockfile",
-      "outputs": [
-        "{projectRoot}/dist/package.json",
-        "{projectRoot}/dist/pnpm-lock.yaml"
-      ],
+      "outputs": ["{projectRoot}/dist/package.json", "{projectRoot}/dist/pnpm-lock.yaml"],
       "options": {
         "buildTarget": "build"
       }
@@ -39,24 +25,41 @@
       "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
       "executor": "nx:noop"
     },
-    "dev": {
+    "build": {
+      "defaultConfiguration": "development",
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "run": {
       "continuous": true,
       "executor": "@nx/js:node",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "development"
+        "buildTarget": "search-worker:build:development",
+        "port": 9223
       },
       "configurations": {
         "development": {
-          "buildTarget": "development"
+          "buildTarget": "search-worker:build:development"
         },
         "mon": {
-          "buildTarget": "development"
+          "buildTarget": "search-worker:build:development"
         },
         "production": {
-          "buildTarget": "production"
+          "buildTarget": "search-worker:build:production",
+          "inspect": false,
+          "watch": false
         }
       }
+    },
+    "docker:build": {
+      "dependsOn": ["prune", "build", "^build"]
     },
     "nx-release-publish": {
       "parallelism": false

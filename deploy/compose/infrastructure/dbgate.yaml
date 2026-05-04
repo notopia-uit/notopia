@@ -2,16 +2,20 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
 services:
   dbgate:
-    image: dbgate/dbgate:7.1.8-alpine
+    image: dbgate/dbgate:7.1.10-alpine
     container_name: dbgate
     environment:
       SKIP_ALL_AUTH: true
 
-      CONNECTIONS: note_postgresql,document_postgresql,authorization_postgresql
+      CONNECTIONS: note_postgresql,note_redis,document_postgresql,authorization_postgresql
 
       LABEL_note_postgresql: Note PostgreSQL
       ENGINE_note_postgresql: postgres@dbgate-plugin-postgres
       URL_note_postgresql: postgres://${NOTE_POSTGRESQL_USER:-notopiauit}:${NOTE_POSTGRESQL_PASSWORD:-notopiauit}@note_postgresql:5432/${NOTE_POSTGRESQL_DB:-note}
+
+      LABEL_note_redis: Note Redis
+      ENGINE_note_redis: redis@dbgate-plugin-redis
+      URL_note_redis: redis://note_redis:6379
 
       LABEL_document_postgresql: Document PostgreSQL
       ENGINE_document_postgresql: postgres@dbgate-plugin-postgres

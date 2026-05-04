@@ -30,3 +30,4 @@ tmp
 .claude/settings.local.json
 
 mise.local.toml
+.nx/self-healing

@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/notopia-uit/notopia/internal/authorization/app"
 	"github.com/notopia-uit/notopia/internal/authorization/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/authorization/controller/health"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
 )
@@ -15,21 +17,37 @@ type Server struct {
 	grpc   *grpc.Server
 	health *health.Health
 	logger *slog.Logger
+	app    *app.App
+	appEnv commonconfig.AppEnv
 }
 
 func NewServer(
+	ctx context.Context,
 	grpc *grpc.Server,
 	health *health.Health,
 	logger *slog.Logger,
 	globalOtel otel.Global,
-) *Server {
+	generalCfg *commonconfig.General,
+	authApp *app.App,
+) (*Server, error) {
 	slog.SetDefault(logger)
+
+	if err := authApp.BootStrapPolicies(ctx); err != nil {
+		return nil, fmt.Errorf("failed to bootstrap policies: %w", err)
+	}
+	if generalCfg.AppEnv == commonconfig.AppEnvDevelopment {
+		if err := authApp.SeedDev(ctx); err != nil {
+			return nil, fmt.Errorf("failed to seed dev policies: %w", err)
+		}
+	}
 
 	return &Server{
 		grpc:   grpc,
 		health: health,
 		logger: logger,
-	}
+		app:    authApp,
+		appEnv: generalCfg.AppEnv,
+	}, nil
 }
 
 var ProvideServer = NewServer

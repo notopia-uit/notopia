@@ -1,0 +1,17 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  token:
+    type: string
+    description: Meilisearch token already filter for workspace
+    example: jwt
+
+  expiresAt:
+    type: string
+    format: date-time
+    example: 2024-06-30T12:00:00Z
+
+required:
+  - token
+  - expiresAt

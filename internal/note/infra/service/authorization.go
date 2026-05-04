@@ -49,7 +49,12 @@ func NewAuthorization(
 		servicesCfg.Authorization.URL,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithStatsHandler(statsHandler),
-		grpc.WithChainUnaryInterceptor(logging.UnaryClientInterceptor(logger, logging.WithLogOnEvents(logging.StartCall, logging.FinishCall)), authorizationUnaryClientErrorInterceptor()),
+		grpc.WithChainUnaryInterceptor(logging.UnaryClientInterceptor(logger, logging.WithLogOnEvents(
+			logging.StartCall,
+			logging.FinishCall,
+			logging.PayloadSent,
+			logging.PayloadReceived,
+		)), authorizationUnaryClientErrorInterceptor()),
 	)
 	if err != nil {
 		return nil, nil, fmt.Errorf("invalid authorization service client configuration: %w", err)

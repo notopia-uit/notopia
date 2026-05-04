@@ -4,14 +4,16 @@
   "dependencies": {
     "@catppuccin/vitepress": "0.1.2",
     "@notopia-uit/api": "workspace:",
-    "pagefind": "1.4.0",
-    "vitepress-mermaid-renderer": "^1.1.18",
+    "pagefind": "1.5.2",
+    "vitepress-mermaid-renderer": "1.1.23",
     "vitepress-openapi": "0.1.20",
-    "vitepress-plugin-pagefind": "0.4.19"
+    "vitepress-plugin-pagefind": "0.4.20"
   },
   "devDependencies": {
+    "get-port": "7.2.0",
     "vitepress": "2.0.0-alpha.17",
-    "vitepress-plugin-diagrams": "1.2.2",
-    "vitepress-sidebar": "1.33.1"
+    "vitepress-plugin-diagrams": "1.3.1",
+    "vitepress-sidebar": "1.33.1",
+    "wait-on": "9.0.5"
   }
 }

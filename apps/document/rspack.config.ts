@@ -1,9 +1,10 @@
-import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
-import type { Configuration } from '@rspack/cli';
-import rspack from '@rspack/core';
 import { builtinModules } from 'module';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
+
+import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
+import type { Configuration } from '@rspack/cli';
+import rspack from '@rspack/core';
 import nodeExternals from 'webpack-node-externals';
 
 const require = createRequire(import.meta.url);
@@ -14,12 +15,15 @@ const tsConfigFile = join(__dirname, 'tsconfig.app.json');
 
 const config: Configuration = {
   target: 'node',
+  // devtool: process.env['NODE_ENV'] === 'production' ? false : 'source-map',
+  // devtool: 'source-map',
   output: {
     module: isEsm,
     path: join(__dirname, './dist'),
     chunkFormat: isEsm ? 'module' : 'array-push',
-    filename: '[name].js',
+    filename: `[name].${isEsm ? 'm' : 'c'}js`,
     chunkFilename: '[name].[contenthash].js',
+    devtoolModuleFilenameTemplate: '[absolute-resource-path]',
   },
   experiments: {
     outputModule: isEsm,
@@ -58,16 +62,14 @@ const config: Configuration = {
                   legacyDecorator: true,
                   decoratorMetadata: true,
                 },
-                target: 'es2021',
+                target: 'esnext',
               },
               sourceMaps: process.env['NODE_ENV'] !== 'production',
             },
           },
         ],
         exclude: /node_modules/,
-        type: isEsm
-          ? ('javascript/esm' as const)
-          : ('javascript/auto' as const),
+        type: isEsm ? ('javascript/esm' as const) : ('javascript/auto' as const),
       },
       {
         test: /\.node$/,
@@ -109,9 +111,7 @@ const config: Configuration = {
             const request: string | undefined = data.request;
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
             if (!request) return callback(null);
-            const bare = request.startsWith('node:')
-              ? request.slice(5)
-              : request;
+            const bare = request.startsWith('node:') ? request.slice(5) : request;
             if (builtinModules.includes(bare)) {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
               return callback(null, `node:${bare}`);
@@ -130,10 +130,7 @@ const config: Configuration = {
       optimization: process.env['NODE_ENV'] === 'production',
       externalDependencies: 'none',
     }),
-    new rspack.NormalModuleReplacementPlugin(
-      /file-type$/,
-      require.resolve('./stub.js')
-    ),
+    new rspack.NormalModuleReplacementPlugin(/file-type$/, require.resolve('./stub.js')),
     new rspack.IgnorePlugin({
       checkResource(resource) {
         const lazyImports = [

@@ -39,7 +39,7 @@ func (h *StrictHandler) CreateWorkspace(
 
 	return note.CreateWorkspace201Response{
 		Headers: note.CreateWorkspace201ResponseHeaders{
-			ContentLocation: h.BaseURL.JoinPath("workspaces", id.String()).String(),
+			ContentLocation: h.BaseURL.JoinPath("note", "workspaces", id.String()).String(),
 		},
 	}, nil
 }
@@ -353,6 +353,24 @@ func (h *StrictHandler) RestoreTrashedWorkspaceItems(
 	return note.RestoreTrashedWorkspaceItems204Response{}, nil
 }
 
+func (h *StrictHandler) GetWorkspaceSearchToken(ctx context.Context, request note.GetWorkspaceSearchTokenRequestObject) (note.GetWorkspaceSearchTokenResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.Unauthorized
+	}
+
+	query := &app.GetWorkspaceSearchToken{
+		WorkspaceID: request.WorkspaceId,
+		UserID:      user.ID,
+	}
+	result, err := h.App.Queries.GetWorkspaceSearchTokenHandler.Handle(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	dto := toSearchTokenDTO(&result)
+	return note.GetWorkspaceSearchToken200JSONResponse(dto), nil
+}
+
 func (h *StrictHandler) ShowTrash(
 	ctx context.Context,
 	request note.ShowTrashRequestObject,
@@ -361,6 +379,7 @@ func (h *StrictHandler) ShowTrash(
 	if !ok {
 		return nil, errs.Unauthorized
 	}
+
 	query := &app.ShowTrash{
 		WorkspaceID: request.WorkspaceId,
 		UserID:      user.ID,

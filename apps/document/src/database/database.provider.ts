@@ -1,13 +1,21 @@
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSourceOptions } from 'typeorm';
+import { type BaseDataSourceOptions } from 'typeorm/data-source/BaseDataSourceOptions.js';
 
 import { DatabaseConfig } from '../config/config';
 import { DocumentEntity } from '../document/document.entity';
 import { RevisionEntity } from '../revision/revision.entity';
 
-export const createDatasourceOptions = (
-  databaseCfg: DatabaseConfig,
-  synchronize: boolean
-) => {
+export const createDatasourceOptions = ({
+  databaseCfg,
+  synchronize,
+  logger = 'simple-console',
+  logging = ['error'],
+}: {
+  databaseCfg: DatabaseConfig;
+  synchronize: boolean;
+  logger?: BaseDataSourceOptions['logger'];
+  logging?: BaseDataSourceOptions['logging'];
+}) => {
   return {
     type: 'postgres',
     host: databaseCfg.host,
@@ -17,16 +25,7 @@ export const createDatasourceOptions = (
     database: databaseCfg.database,
     entities: [DocumentEntity, RevisionEntity],
     synchronize,
-    logging: true,
-    logger: 'simple-console',
+    logging,
+    logger: logger,
   } satisfies DataSourceOptions;
-};
-
-export const createDatasource = (
-  databaseCfg: DatabaseConfig,
-  synchronize: boolean
-) => {
-  const options = createDatasourceOptions(databaseCfg, synchronize);
-  const dataSource = new DataSource(options);
-  return dataSource;
 };

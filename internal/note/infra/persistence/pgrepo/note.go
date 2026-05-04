@@ -68,7 +68,7 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 		return nil, toErr(err)
 	}
 
-	return noteToDomain(note, links), nil
+	return noteToDomain(note, links)
 }
 
 func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams) ([]*domain.Note, error) {
@@ -114,16 +114,15 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 	}
 	noteIDOutgoingLinksMap := make(map[uuid.UUID][]uuid.UUID, len(noteIDOutgoingLinksPairs))
 	for _, pair := range noteIDOutgoingLinksPairs {
-		targetIDs, ok := pair.TargetIDs.([]uuid.UUID)
-		if !ok {
-			return nil, errs.NewPersistenceInvalid(fmt.Sprintf("invalid type for target ids: %T", pair.TargetIDs), nil)
-		}
-		noteIDOutgoingLinksMap[pair.SourceID] = targetIDs
+		noteIDOutgoingLinksMap[pair.SourceID] = pair.TargetIDs
 	}
 	result := make([]*domain.Note, len(notes))
 	for i, note := range notes {
 		links := noteIDOutgoingLinksMap[note.ID]
-		result[i] = noteToDomain(note, links)
+		result[i], err = noteToDomain(note, links)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return result, nil
 }
@@ -147,26 +146,29 @@ func (n *Note) GetRecursiveChildrenFromFolder(ctx context.Context, folderID uuid
 	}
 	noteIDOutgoingLinksMap := make(map[uuid.UUID][]uuid.UUID, len(noteIDOutgoingLinksPairs))
 	for _, pair := range noteIDOutgoingLinksPairs {
-		targetIDs, ok := pair.TargetIDs.([]uuid.UUID)
-		if !ok {
-			return nil, errs.NewPersistenceInvalid(fmt.Sprintf("invalid type for target ids: %T", pair.TargetIDs), nil)
-		}
-		noteIDOutgoingLinksMap[pair.SourceID] = targetIDs
+		noteIDOutgoingLinksMap[pair.SourceID] = pair.TargetIDs
 	}
 	result := make([]*domain.Note, len(notes))
 	for i, note := range notes {
 		links := noteIDOutgoingLinksMap[note.ID]
-		result[i] = noteToDomain(note, links)
+		result[i], err = noteToDomain(note, links)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return result, nil
 }
 
-func noteToDomain(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
+func noteToDomain(note *pgsqlc.Note, links []uuid.UUID) (*domain.Note, error) {
 	var icon string
 	if note.Icon != nil {
 		icon = *note.Icon
 	}
-	trashed := toDomainTrashed(note.TrashedBy, note.TrashedAt)
+	trashed, err := toDomainTrashed(note.TrashedBy, note.TrashedAt)
+	if err != nil {
+		return nil, err
+	}
+
 	return domain.UnmarshalNote(
 		note.ID,
 		note.Name,
@@ -177,7 +179,7 @@ func noteToDomain(note *pgsqlc.Note, links []uuid.UUID) *domain.Note {
 		links,
 		trashed,
 		false,
-	)
+	), nil
 }
 
 // TODO: It doesn't save the outgoing links

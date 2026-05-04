@@ -4,11 +4,7 @@
   "projectType": "library",
   "tags": ["scope:library", "type:go"],
   "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*.go",
-      "{projectRoot}/model.conf",
-      "!{projectRoot}/_test.go"
-    ],
+    "default": ["{projectRoot}/**/*.go", "{projectRoot}/model.conf", "!{projectRoot}/_test.go"],
     "test": ["{projectRoot}/**/*_test.go", "{projectRoot}/**/*.csv"]
   },
   "targets": {

@@ -57,6 +57,9 @@ func strictServerToHTTPErr(err errs.Error) (
 	case errs.CodeAuthorizationServiceInternalError:
 		statusCode = 503
 
+	case errs.CodeTrashedInValid:
+		statusCode = 400
+
 	case errs.CodeFolderAlreadyExisted:
 		statusCode = 409
 	case errs.CodeFolderNotFound:
@@ -106,6 +109,9 @@ func strictServerToHTTPErr(err errs.Error) (
 		statusCode = 400
 	case errs.CodeWorkspaceSlugAlreadyExists:
 		statusCode = 409
+
+	case errs.CodeGenerateWorkspaceSearchTokenFailed:
+		statusCode = 500
 
 	case errs.CodeWorkspaceEventPubSubFailedToCreateMessage:
 		statusCode = 500

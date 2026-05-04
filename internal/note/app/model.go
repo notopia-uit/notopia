@@ -68,7 +68,7 @@ type GraphNode struct {
 	ID     string
 	Name   string
 	Type   GraphNodeType
-	Weight float64
+	Weight float32
 }
 
 type GraphLink struct {
@@ -200,4 +200,9 @@ type User struct {
 	Email  string // Can be empty
 	Groups []string
 	Roles  []string
+}
+
+type SearchToken struct {
+	Token     string
+	ExpiresAt time.Time
 }

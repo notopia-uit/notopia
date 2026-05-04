@@ -32,17 +32,15 @@ export class RevisionService {
     page: number,
     limit: number
   ): Promise<PaginatedRevisions> {
-    const [revisions, total] = await this.dataSource
-      .getRepository(RevisionEntity)
-      .findAndCount({
-        where: {
-          document: {
-            id: documentId,
-          },
+    const [revisions, total] = await this.dataSource.getRepository(RevisionEntity).findAndCount({
+      where: {
+        document: {
+          id: documentId,
         },
-        skip: (page - 1) * limit,
-        take: limit,
-      });
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
     return {
       data: revisions,
       page,
@@ -53,9 +51,7 @@ export class RevisionService {
 
   // No checking exist first
   async renameRevision(revisionId: string, name: string | null): Promise<void> {
-    const result = await this.dataSource
-      .getRepository(RevisionEntity)
-      .update(revisionId, { name });
+    const result = await this.dataSource.getRepository(RevisionEntity).update(revisionId, { name });
     if (result.affected === 0) {
       throw new NotFoundException(`Revision ${revisionId} not found`);
     }

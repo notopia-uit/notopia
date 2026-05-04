@@ -1,10 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "github>notopia-uit/renovate-config",
-    ":automergeBranch",
-    ":automergePatch"
-  ],
+  "extends": ["github>notopia-uit/renovate-config", ":automergeBranch", ":automergePatch"],
   "packageRules": [
     {
       "groupName": "Nx Monorepo Toolkit",
@@ -40,6 +36,15 @@
       "groupName": "go",
       "matchPackageNames": ["/^golang$/"],
       "automerge": false
+    },
+    {
+      "groupName": "github",
+      "matchPackageNames": ["/^github\\.com\\/.*$/"],
+      "automerge": false
+    },
+    {
+      "groupName": "wire",
+      "matchPackageNames": ["go:github.com/goforj/wire/cmd/wire", "github.com/goforj/wire"]
     }
   ],
   "docker-compose": {

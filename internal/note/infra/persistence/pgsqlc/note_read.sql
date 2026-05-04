@@ -22,9 +22,9 @@ FROM
   notes
 WHERE
   id = ANY(sqlc.narg('ids')::uuid[]) -- :if @ids
-  AND folder_id IN (
+  AND folder_id IN ( -- :if @workspace_id
     SELECT id FROM folders WHERE workspace_id = sqlc.narg('workspace_id')::uuid
-  ) -- :if @workspace_id
+  )
   AND ( -- :if @trashed_by
     trashed_by = sqlc.narg('trashed_by')::text
     OR trashed_by IS NULL

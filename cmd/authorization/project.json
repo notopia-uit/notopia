@@ -17,7 +17,6 @@
     },
     "gen:wire": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "outputs": ["{projectRoot}/wire_gen.go"],
       "options": {
         "command": "wire",
@@ -25,28 +24,41 @@
       },
       "cache": false
     },
-    "dev": {
+    "run": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
-        "command": "go run .",
-        "cwd": "{projectRoot}",
+        "command": "go run ./cmd/authorization/",
+        "cwd": "{workspaceRoot}",
         "tty": true
       },
+      "dependsOn": ["build-deps"],
       "continuous": true
     },
     "build": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
-        "command": "go build -o ./authorization .",
-        "cwd": "{projectRoot}"
+        "command": "go build -o ./cmd/authorization/authorization ./cmd/authorization/",
+        "cwd": "{workspaceRoot}"
       },
-      "dependsOn": ["gen:wire", "gen:mockery", "^gen*", "^build*"]
+      "configurations": {
+        "debug": {
+          "command": "go build -gcflags='all=-N -l' -o ./cmd/authorization/__debug_bin ./cmd/authorization/"
+        },
+        "development": {
+          "command": "go build -o ./cmd/authorization/authorization ./cmd/authorization/"
+        },
+        "production": {
+          "command": "go build -ldflags='-s -w' -o ./cmd/authorization/authorization ./cmd/authorization/"
+        }
+      },
+      "dependsOn": ["gen", "^gen*", "^build*"]
+    },
+    "build-deps": {
+      "executor": "nx:noop",
+      "dependsOn": ["gen", "^gen*", "^build*"]
     },
     "preview": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
         "command": "./authorization",
         "cwd": "{projectRoot}",
@@ -57,13 +69,12 @@
     },
     "debug": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
-        "command": "dlv debug --headless --listen=127.0.0.1:23459 --accept-multiclient",
-        "cwd": "{projectRoot}",
+        "command": "dlv debug --headless --listen=127.0.0.1:23459 --accept-multiclient --output ./cmd/authorization/__debug_bin ./cmd/authorization/",
+        "cwd": "{workspaceRoot}",
         "tty": true
       },
-      "dependsOn": ["gen:wire", "^gen*"],
+      "dependsOn": ["build-deps"],
       "continuous": true
     },
     "lint": {
@@ -75,11 +86,8 @@
       "cache": false,
       "parallelism": false
     },
-    "tidy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "go mod tidy"
-      }
+    "gen": {
+      "dependsOn": ["gen:wire", "gen:mockery"]
     },
     "nx-release-publish": {
       "parallelism": false

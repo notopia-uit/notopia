@@ -44,11 +44,10 @@ export const HocuspocusProvider: Provider = {
         if (!note) {
           throw new Error(`Document with ID ${documentId} does not exist`);
         }
-        const userPermissionsRes =
-          await authorizationService.getUserDocumentPermissions(
-            context.user.id,
-            documentId
-          );
+        const userPermissionsRes = await authorizationService.getUserDocumentPermissions(
+          context.user.id,
+          documentId
+        );
         if (!userPermissionsRes.canRead) {
           throw new Error(
             `User ${context.user.id} does not have permission to access document ${documentId}`

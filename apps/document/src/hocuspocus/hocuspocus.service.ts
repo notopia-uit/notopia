@@ -19,13 +19,7 @@ export class HocuspocusService {
 
   // NOTE: We don't really need to check the permission canRead, because yeah
   // Because based on the casbin rules, it will be always canRead when this event fired
-  async onRoleChanged({
-    workspaceId,
-    userId,
-  }: {
-    workspaceId: string;
-    userId: string;
-  }) {
+  async onRoleChanged({ workspaceId, userId }: { workspaceId: string; userId: string }) {
     for (const [documentName, document] of this.hocuspocus.documents) {
       for (const [_, connection] of document.connections) {
         const context = connection.connection.context as HocuspocusContext;
@@ -50,11 +44,10 @@ export class HocuspocusService {
         if (workspace?.id !== workspaceId) {
           continue;
         }
-        const permissions =
-          await this.authorizationService.getWorkspaceItemPermissions({
-            workspaceId,
-            memberId: userId,
-          });
+        const permissions = await this.authorizationService.getWorkspaceItemPermissions({
+          workspaceId,
+          memberId: userId,
+        });
         if (!permissions.canRead) {
           connection.connection.close({
             code: 4002,
@@ -69,13 +62,7 @@ export class HocuspocusService {
   }
 
   // NOTE: If we handle the published, then this should be adjusted
-  async onMemberRemoved({
-    workspaceId,
-    userId,
-  }: {
-    workspaceId: string;
-    userId: string;
-  }) {
+  async onMemberRemoved({ workspaceId, userId }: { workspaceId: string; userId: string }) {
     for (const [documentName, document] of this.hocuspocus.documents) {
       for (const [_, connection] of document.connections) {
         const context = connection.connection.context as HocuspocusContext;

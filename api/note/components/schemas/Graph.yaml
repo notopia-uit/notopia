@@ -11,11 +11,11 @@ properties:
         id:
           type: string
           description: Can be either a note ID or a hashtag prefixed tag name
-          example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+          example: 000c2575-1847-5293-8117-2415a2328ef8
         name:
           type: string
           description: Can be either a note name or a tag name (no hashtag prefix)
-          example: Meeting Notes
+          example: PowerUp.ps1
         type:
           type: string
           enum:
@@ -25,7 +25,8 @@ properties:
         weight:
           type: number
           description: Optional weight for the note node, rounded to 1 decimal place
-          minimum: 0
+          multipleOf: 0.1
+          minimum: 0.5
           maximum: 1
           example: 0.8
       required:
@@ -42,11 +43,11 @@ properties:
         source:
           type: string
           description: The ID of the source node (note id or hashtag prefixed tag name)
-          example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+          example: 000c2575-1847-5293-8117-2415a2328ef8
         target:
           type: string
           description: The ID of the target node (note id or hashtag prefixed tag name)
-          example: 46f94d4d-41b5-4df6-bf8d-270fb9a49c97
+          example: '#socks4'
 
       required:
         - source

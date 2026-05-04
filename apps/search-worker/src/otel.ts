@@ -12,6 +12,8 @@ export const otelSdk = new NodeSDK({
   instrumentations: [getNodeAutoInstrumentations()],
 });
 
+otelSdk.start();
+
 process.on('SIGTERM', () => {
   otelSdk
     .shutdown()

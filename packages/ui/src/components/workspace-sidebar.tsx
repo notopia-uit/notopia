@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
 import {
   NoteUserWorkspace,
   getMyWorkspacesOptions,
   useCreateWorkspaceMutation,
-} from '@notopia-uit/api-gen';
-import { Button } from '@notopia-uit/ui/components/shadcn/button';
-import { Input } from '@notopia-uit/ui/components/shadcn/input';
-import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-import { authClient } from '@notopia-uit/ui/lib/auth-client';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+} from "@notopia-uit/api-gen";
+import { Button } from "@notopia-uit/ui/components/shadcn/button";
+import { Input } from "@notopia-uit/ui/components/shadcn/input";
+import { Spinner } from "@notopia-uit/ui/components/shadcn/spinner";
+import { authClient } from "@notopia-uit/ui/lib/auth-client";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import {
   BadgeCheck,
   Bell,
@@ -25,11 +25,11 @@ import {
   Settings2,
   Sparkles,
   Trash2,
-} from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from './shadcn/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from "./shadcn/avatar";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +37,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from './shadcn/dialog';
+} from "./shadcn/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,15 +47,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from './shadcn/dropdown-menu';
-import { Label } from './shadcn/label';
+} from "./shadcn/dropdown-menu";
+import { Label } from "./shadcn/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './shadcn/select';
+} from "./shadcn/select";
 import {
   Sidebar,
   SidebarContent,
@@ -68,23 +68,23 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from './shadcn/sidebar';
-import TreeView from './tree-view';
+} from "./shadcn/sidebar";
+import TreeView from "./tree-view";
 
 const generateSlug = (name: string) => {
   return name
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)+/g, '');
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
 };
 
 export function CreateWorkspaceDialog() {
   const queryClient = useQueryClient();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
-  const [userRole, setUserRole] = useState('owner');
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [userRole, setUserRole] = useState("owner");
 
   const { mutate: createWorkspace, isPending: isCreating } =
     useCreateWorkspaceMutation({
@@ -93,9 +93,9 @@ export function CreateWorkspaceDialog() {
           queryKey: getMyWorkspacesOptions({}).queryKey,
         });
 
-        setName('');
-        setSlug('');
-        setUserRole('owner');
+        setName("");
+        setSlug("");
+        setUserRole("owner");
 
         setIsOpen(false);
       },
@@ -195,13 +195,13 @@ export function CreateWorkspaceDialog() {
 const data = {
   projects: [
     {
-      name: 'Settings',
-      url: '#',
+      name: "Settings",
+      url: "#",
       icon: Settings2,
     },
     {
-      name: 'Graph',
-      url: '#',
+      name: "Graph",
+      url: "#",
       icon: Sparkles,
     },
   ],
@@ -220,7 +220,7 @@ export default function WorkspaceSideBar({
   const router = useRouter();
 
   const { data: allWorkspaceData } = useSuspenseQuery(
-    getMyWorkspacesOptions({})
+    getMyWorkspacesOptions({}),
   );
 
   //TODO: check error
@@ -231,7 +231,7 @@ export default function WorkspaceSideBar({
     return;
   }
   const currentWorkspace = allWorkspaceData.find(
-    (ws) => ws.workspace.id === currentWorkspaceId
+    (ws) => ws.workspace.id === currentWorkspaceId,
   );
   if (!currentWorkspace) {
     return;
@@ -249,10 +249,10 @@ export default function WorkspaceSideBar({
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                     <GalleryVerticalEnd className="size-4" />
                   </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
+                  <div className="grid flex-1 text-left text-sm/tight">
                     <span className="truncate font-semibold">
                       {activeWorkspacenow?.workspace.name}
                     </span>
@@ -269,7 +269,7 @@ export default function WorkspaceSideBar({
                 side="bottom"
                 sideOffset={4}
               >
-                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                <DropdownMenuLabel className="text-muted-foreground text-xs">
                   Workspace
                 </DropdownMenuLabel>
                 {allWorkspaceData.map((ws, index) => (
@@ -290,10 +290,10 @@ export default function WorkspaceSideBar({
                 ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2 p-2">
-                  <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                  <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                     <Plus className="size-4" />
                   </div>
-                  <div className="font-medium text-muted-foreground">
+                  <div className="text-muted-foreground font-medium">
                     Add workspace
                   </div>
                 </DropdownMenuItem>
@@ -370,8 +370,8 @@ export default function WorkspaceSideBar({
                   {/* TODO: get user data from betterauth */}
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage
-                      src={sessionData.user.image || ''}
-                      alt={'avatar here'}
+                      src={sessionData.user.image || ""}
+                      alt={"avatar here"}
                     />
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
@@ -396,7 +396,7 @@ export default function WorkspaceSideBar({
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarImage
-                        src={sessionData.user.image || ''}
+                        src={sessionData.user.image || ""}
                         alt={sessionData.user.name}
                       />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>

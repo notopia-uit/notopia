@@ -33,7 +33,7 @@ const ReferenceLink = ({ noteId }: { noteId: string }) => {
     <a
       // TODO: tailwind shadcn
       href={`/note/${noteId}`}
-      className="notopia-reference bg-blue-100 text-blue-700 rounded px-1 cursor-pointer"
+      className="notopia-reference cursor-pointer rounded-sm bg-blue-100 px-1 text-blue-700"
       data-notopia-ref={noteId}
     >
       @{noteName}
@@ -41,29 +41,28 @@ const ReferenceLink = ({ noteId }: { noteId: string }) => {
   );
 };
 
-export const createBlockNoteReferenceSpec =
-  (): BlockNoteReferenceInlineContentSpec =>
-    createReactInlineContentSpec(BlockNoteReferenceConfig, {
-      render: (props) => {
-        return <ReferenceLink noteId={props.inlineContent.props.noteId} />;
-      },
-      toExternalHTML: (props) => {
-        const id = props.inlineContent.props.noteId;
-        return (
-          <a href={`@${id}`} data-notopia-ref={id}>
-            @{props.inlineContent.props.noteId}
-          </a>
-        );
-      },
+export const createBlockNoteReferenceSpec = (): BlockNoteReferenceInlineContentSpec =>
+  createReactInlineContentSpec(BlockNoteReferenceConfig, {
+    render: (props) => {
+      return <ReferenceLink noteId={props.inlineContent.props.noteId} />;
+    },
+    toExternalHTML: (props) => {
+      const id = props.inlineContent.props.noteId;
+      return (
+        <a href={`@${id}`} data-notopia-ref={id}>
+          @{props.inlineContent.props.noteId}
+        </a>
+      );
+    },
 
-      parse: (element) => {
-        const noteId = element.getAttribute('data-notopia-ref');
-        if (!noteId) {
-          return undefined;
-        } else {
-          return {
-            noteId,
-          };
-        }
-      },
-    });
+    parse: (element) => {
+      const noteId = element.getAttribute('data-notopia-ref');
+      if (!noteId) {
+        return undefined;
+      } else {
+        return {
+          noteId,
+        };
+      }
+    },
+  });

@@ -31,9 +31,9 @@ func toDomainTrashedBy(trashedBy string) domain.TrashedBy {
 	}
 }
 
-func toDomainTrashed(by *string, at *time.Time) domain.Trashed {
+func toDomainTrashed(by *string, at *time.Time) (domain.Trashed, error) {
 	if by == nil || at == nil {
-		return domain.NewUntrashed()
+		return domain.NewUntrashed(), nil
 	}
 	return domain.NewTrashed(toDomainTrashedBy(*by), *at)
 }

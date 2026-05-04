@@ -1,7 +1,12 @@
 {
   "name": "@notopia-uit/search-worker",
   "private": true,
+  "scripts": {
+    "seed": "tsx ./seed/seed.ts",
+    "seed:transform": "tsx ./seed/transform.ts"
+  },
   "dependencies": {
+    "@blocknote/core": "catalog:",
     "@blocknote/server-util": "catalog:",
     "@nestjs/common": "catalog:",
     "@nestjs/config": "catalog:",
@@ -18,6 +23,7 @@
     "@types/express": "catalog:",
     "express": "catalog:",
     "kafkajs": "catalog:",
+    "markdown-to-txt": "catalog:",
     "meilisearch": "catalog:",
     "nestjs-otel": "catalog:",
     "nestjs-pino": "catalog:",
@@ -25,7 +31,8 @@
     "pino-pretty": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
-    "tslib": "catalog:"
+    "tslib": "catalog:",
+    "uuid": "catalog:"
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",

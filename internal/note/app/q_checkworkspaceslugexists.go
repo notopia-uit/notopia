@@ -2,14 +2,11 @@ package app
 
 import (
 	"context"
+	"log/slog"
 )
 
 type CheckWorkspaceSlugExists struct {
 	Slug string
-}
-
-type CheckWorkspaceSlugExistsReadModel interface {
-	CheckWorkspaceSlugExists(ctx context.Context, q *CheckWorkspaceSlugExists) (bool, error)
 }
 
 type CheckWorkspaceSlugExistsHandler struct {
@@ -23,5 +20,10 @@ func NewCheckWorkspaceSlugExistsHandler(readModel CheckWorkspaceSlugExistsReadMo
 var ProvideCheckWorkspaceSlugExistsHandler = NewCheckWorkspaceSlugExistsHandler
 
 func (h *CheckWorkspaceSlugExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceSlugExists) (bool, error) {
-	return h.readModel.CheckWorkspaceSlugExists(ctx, query)
+	slog.DebugContext(ctx, "checking workspace slug exists", slog.String("slug", query.Slug))
+	exists, err := h.readModel.CheckWorkspaceSlugExists(ctx, query.Slug)
+	if err == nil {
+		slog.DebugContext(ctx, "workspace slug check completed", slog.String("slug", query.Slug), slog.Bool("exists", exists))
+	}
+	return exists, err
 }

@@ -30,6 +30,8 @@ var ProviderSetCommand = wire.NewSet(
 
 var ProviderSetEvent = wire.NewSet(
 	ProvideDocumentCommittedHandler,
+	ProvideNoteCreatedDomainToIntegrationEventHandler,
+	ProvideNoteUpdatedDomainToIntegrationEventHandler,
 	ProvideNotifyWorkspaceItemsUpdatedHandler,
 	ProvideNotifyWorkspaceRenamedHandler,
 	ProvideNotifyWorkspaceSlugChangedHandler,
@@ -45,6 +47,7 @@ var ProviderSetQuery = wire.NewSet(
 	ProvideGetWorkspaceBySlugHandler,
 	ProvideGetWorkspaceGraphHandler,
 	ProvideGetWorkspaceMembersHandler,
+	ProvideGetWorkspaceSearchTokenHandler,
 	ProvideGetWorkspaceTreeHandler,
 	ProvideShowTrashHandler,
 	wire.Struct(new(Queries), "*"),

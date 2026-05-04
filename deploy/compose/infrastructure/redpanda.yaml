@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
 services:
   redpanda:
-    image: redpandadata/redpanda:v26.1.5
+    image: redpandadata/redpanda:v26.1.6
     command:
       - redpanda start
       - --smp 1
@@ -21,6 +21,7 @@ services:
       - --set auto_create_topics_enabled=true
       - --set partition_autobalancing_mode=off
       - --set core_balancing_continuous=false
+      - --set group_max_session_timeout_ms=3600000
     ports:
       - 38081:38081
       - 38082:38082
@@ -30,7 +31,7 @@ services:
       - redpanda_data:/var/lib/redpanda/data
 
   redpanda_console:
-    image: redpandadata/console:v3.7.1
+    image: redpandadata/console:v3.7.2
     container_name: notopia-redpanda_console
     environment:
       CONFIG_FILEPATH: /etc/redpanda/config.yaml

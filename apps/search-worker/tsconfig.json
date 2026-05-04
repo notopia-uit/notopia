@@ -1,8 +1,21 @@
 {
   "extends": "../../tsconfig.base.json",
   "files": [],
-  "include": [],
+  "include": ["seed/**/*.ts"],
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "types": ["node"]
+  },
   "references": [
+    {
+      "path": "../../packages/lib"
+    },
+    {
+      "path": "../../packages/api-gen"
+    },
     {
       "path": "./tsconfig.app.json"
     }

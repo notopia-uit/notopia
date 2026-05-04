@@ -6,6 +6,17 @@ properties:
     type: string
     format: uuid
 
+  workspaceId:
+    type: string
+    format: uuid
+
+  folderId:
+    type: string
+    format: uuid
+
+  folderName:
+    type: string
+
   name:
     type: string
 
@@ -18,6 +29,15 @@ properties:
     items:
       type: string
 
+  # Due to oapi-codegen, we make this optional. But it should be nullable
+  trashed:
+    $ref: ../../../note/components/schemas/Trashed.yaml
+
 required:
   - id
+  - workspaceId
+  - folderId
+  - folderName
   - name
+  - plainTextContent
+  - tags

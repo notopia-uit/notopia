@@ -74,7 +74,7 @@ func (c *noteServiceClient) GetWorkspaceByNote(ctx context.Context, in *GetWorks
 }
 
 // NoteServiceServer is the server API for NoteService service.
-// All implementations must embed UnimplementedNoteServiceServer
+// All implementations should embed UnimplementedNoteServiceServer
 // for forward compatibility.
 type NoteServiceServer interface {
 	// NOTE: maybe this will be replaced with batch get
@@ -82,10 +82,9 @@ type NoteServiceServer interface {
 	GetNote(context.Context, *GetNoteRequest) (*GetNoteResponse, error)
 	// NOTE: what, where is this used?
 	GetWorkspaceByNote(context.Context, *GetWorkspaceByNoteRequest) (*GetWorkspaceByNoteResponse, error)
-	mustEmbedUnimplementedNoteServiceServer()
 }
 
-// UnimplementedNoteServiceServer must be embedded to have
+// UnimplementedNoteServiceServer should be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
@@ -101,8 +100,7 @@ func (UnimplementedNoteServiceServer) GetNote(context.Context, *GetNoteRequest) 
 func (UnimplementedNoteServiceServer) GetWorkspaceByNote(context.Context, *GetWorkspaceByNoteRequest) (*GetWorkspaceByNoteResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetWorkspaceByNote not implemented")
 }
-func (UnimplementedNoteServiceServer) mustEmbedUnimplementedNoteServiceServer() {}
-func (UnimplementedNoteServiceServer) testEmbeddedByValue()                     {}
+func (UnimplementedNoteServiceServer) testEmbeddedByValue() {}
 
 // UnsafeNoteServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to NoteServiceServer will

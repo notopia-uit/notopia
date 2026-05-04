@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 
 import { User } from './user';
@@ -17,18 +12,12 @@ export abstract class UserGuard implements CanActivate {
     switch (type) {
       case 'http': {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        headers = context.switchToHttp().getRequest().headers as Record<
-          string,
-          unknown
-        >;
+        headers = context.switchToHttp().getRequest().headers as Record<string, unknown>;
         break;
       }
       case 'ws': {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        headers = context.switchToWs().getClient().handshake as Record<
-          string,
-          unknown
-        >;
+        headers = context.switchToWs().getClient().handshake as Record<string, unknown>;
         break;
       }
     }
@@ -51,12 +40,8 @@ export abstract class UserGuard implements CanActivate {
       return cleaned === '' ? [] : cleaned.split(/\s+/);
     };
 
-    const groupsList = parseHeaderList(
-      headers['x-forwarded-groups'] as string | undefined
-    );
-    const rolesList = parseHeaderList(
-      headers['x-forwarded-roles'] as string | undefined
-    );
+    const groupsList = parseHeaderList(headers['x-forwarded-groups'] as string | undefined);
+    const rolesList = parseHeaderList(headers['x-forwarded-roles'] as string | undefined);
 
     const user: User = {
       id,

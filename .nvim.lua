@@ -1,5 +1,7 @@
 local lsp = vim.lsp
 local map = vim.keymap.set
+local root = vim.fn.getcwd()
+local uri_root = vim.uri_from_fname(root)
 
 -- lsp.config("yamlls", {
 --   ---@module 'codesettings'
@@ -65,7 +67,15 @@ lsp.config("tailwindcss", {
 
 ---@type lsp.vtsls
 local tsgo_setting = {
+  javascript = {
+    format = {
+      enable = false,
+    },
+  },
   typescript = {
+    format = {
+      enable = false,
+    },
     preferences = {
       importModuleSpecifier = "non-relative",
     },
@@ -74,7 +84,51 @@ local tsgo_setting = {
 
 lsp.config("tsgo", {
   settings = tsgo_setting,
+  on_attach = function(client)
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+  end,
 })
+
+lsp.config("oxlint", {
+  cmd = function(dispatchers)
+    return vim.lsp.rpc.start({ "oxlint", "--lsp" }, dispatchers)
+  end,
+  root_markers = { ".git" },
+  init_options = {
+    {
+      workspaceUri = uri_root,
+      options = {
+        fixKind = "all",
+        typeAware = true,
+      },
+    },
+  },
+  on_attach = function(client, bufnr)
+    vim.api.nvim_buf_create_user_command(bufnr, "LspOxlintFixAll", function()
+      client:exec_cmd({
+        title = "Apply Oxlint automatic fixes",
+        command = "oxc.fixAll",
+        arguments = { { uri = vim.uri_from_bufnr(bufnr) } },
+      })
+    end, {
+      desc = "Apply Oxlint automatic fixes",
+    })
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = bufnr,
+      command = "LspOxlintFixAll",
+    })
+  end,
+})
+
+lsp.config("oxfmt", {
+  cmd = function(dispatchers)
+    return vim.lsp.rpc.start({ "oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" }, dispatchers)
+  end,
+  root_markers = { ".oxfmtrc.jsonc" },
+})
+
+lsp.enable({ "tsgo", "gopls", "oxlint", "oxfmt", "tailwindcss", "yamlls", "jsonls" })
 
 if vim.fn.executable("harper-ls") == 1 then
   lsp.enable("harper_ls")

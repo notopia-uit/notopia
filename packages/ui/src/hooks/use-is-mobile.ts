@@ -29,13 +29,10 @@ export const useIsMobile = (): UseIsMobileReturn => {
         'mobile',
       ];
 
-      const isMobileUA = mobileKeywords.some((keyword) =>
-        userAgent.includes(keyword)
-      );
+      const isMobileUA = mobileKeywords.some((keyword) => userAgent.includes(keyword));
 
       // Combine both checks - prioritize media query but consider user agent
-      const isMobileDevice =
-        mediaQuery.matches || (isMobileUA && window.innerWidth <= 768);
+      const isMobileDevice = mediaQuery.matches || (isMobileUA && window.innerWidth <= 768);
 
       setIsMobile(isMobileDevice);
       setIsLoading(false);

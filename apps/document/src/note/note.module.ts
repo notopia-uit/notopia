@@ -1,8 +1,9 @@
+import { join } from 'path';
+
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NOTE_PACKAGE_NAME } from '@notopia-uit/pb/note';
-import { join } from 'path';
 
 import { ServicesConfig } from '#/config/config';
 import { SERVICE_CONFIG } from '#/config/config.factory';

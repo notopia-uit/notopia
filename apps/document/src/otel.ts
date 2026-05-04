@@ -5,13 +5,14 @@ if (process.env.OTEL_SDK_DISABLED !== 'false') {
   process.env.OTEL_SDK_DISABLED = 'true';
   process.env.OTEL_NODE_DISABLED_INSTRUMENTATIONS = 'all';
 } else {
-  process.env.OTEL_NODE_ENABLED_INSTRUMENTATIONS =
-    'grpc,http,kafkajs,pino,pg,runtime-node';
+  process.env.OTEL_NODE_ENABLED_INSTRUMENTATIONS = 'grpc,http,kafkajs,pino,pg,runtime-node';
 }
 
 export const otelSdk = new NodeSDK({
   instrumentations: [getNodeAutoInstrumentations()],
 });
+
+otelSdk.start();
 
 process.on('SIGTERM', () => {
   otelSdk

@@ -31,20 +31,13 @@ export const getNoteMenuItems = (
     title: note.name,
     subtext: `ID: ${note.id}`,
     onItemClick: () => {
-      editor.insertInlineContent([
-        { type: 'reference', props: { noteId: note.id } },
-        ' ',
-      ]);
+      editor.insertInlineContent([{ type: 'reference', props: { noteId: note.id } }, ' ']);
     },
   }));
   return filterSuggestionItems(items, query);
 };
 
-export const getTagMenuItems = (
-  editor: MyEditor,
-  query: string,
-  tags: string[]
-) => {
+export const getTagMenuItems = (editor: MyEditor, query: string, tags: string[]) => {
   const localTags = getLocalDocumentTags(editor);
 
   const combinedTags = Array.from(new Set([...localTags, ...tags]));
@@ -58,19 +51,11 @@ export const getTagMenuItems = (
 
   const filteredItems = filterSuggestionItems(items, query);
 
-  if (
-    query &&
-    !filteredItems.some(
-      (item) => item.title.toLowerCase() === query.toLowerCase()
-    )
-  ) {
+  if (query && !filteredItems.some((item) => item.title.toLowerCase() === query.toLowerCase())) {
     filteredItems.unshift({
       title: `Create new tag: #${query}`,
       onItemClick: () => {
-        editor.insertInlineContent([
-          { type: 'tag', props: { tag: query } },
-          ' ',
-        ]);
+        editor.insertInlineContent([{ type: 'tag', props: { tag: query } }, ' ']);
       },
     });
   }

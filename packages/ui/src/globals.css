@@ -129,8 +129,20 @@
   * {
     border-color: hsl(var(--border));
   }
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
 }
+
+@source inline('notopia-reference');
+@source inline('notopia-tag');
+
+/* TODO: Check this again, those are not tailwind stuff, just for oxlint not to error */
+/* https://github.com/tailwindlabs/tailwindcss/discussions/18588 */
+@source inline('font-heading');
+@source inline('tree-container');
+@source inline('animate-in');
+@source inline('fade-in');
+@source inline('slide-in-from-bottom-4');

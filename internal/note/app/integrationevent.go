@@ -18,34 +18,34 @@ type IntegrationEvent interface {
 }
 
 type IntegrationEventNoteCreated struct {
-	ID   uuid.UUID
-	Name string
-	Icon string
+	ID          uuid.UUID
+	WorkspaceID uuid.UUID
+	Name        string
+	Icon        string
 }
-
-var _ IntegrationEvent = (*IntegrationEventNoteCreated)(nil)
-
-func (e IntegrationEventNoteCreated) isIntegrationEvent() {}
 
 type IntegrationEventNoteDeleted struct {
 	ID uuid.UUID
 }
 
-var _ IntegrationEvent = (*IntegrationEventNoteDeleted)(nil)
-
-func (e IntegrationEventNoteDeleted) isIntegrationEvent() {}
-
 type IntegrationEventNoteUpdated struct {
-	ID            uuid.UUID
-	Name          string
-	Icon          string
-	Tags          []string
-	Size          uint64
-	FolderID      uuid.UUID
-	OutgoingLinks uuid.UUIDs
-	UpdatedAt     time.Time
+	ID          uuid.UUID
+	WorkspaceID uuid.UUID
+	Name        string
+	Icon        string
+	Size        uint64
+	FolderID    uuid.UUID
+	FolderName  string
+	Trashed     Trashed
+	UpdatedAt   time.Time
 }
 
-var _ IntegrationEvent = (*IntegrationEventNoteUpdated)(nil)
+var (
+	_ IntegrationEvent = (*IntegrationEventNoteCreated)(nil)
+	_ IntegrationEvent = (*IntegrationEventNoteDeleted)(nil)
+	_ IntegrationEvent = (*IntegrationEventNoteUpdated)(nil)
+)
 
+func (e IntegrationEventNoteCreated) isIntegrationEvent() {}
+func (e IntegrationEventNoteDeleted) isIntegrationEvent() {}
 func (e IntegrationEventNoteUpdated) isIntegrationEvent() {}

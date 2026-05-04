@@ -1,38 +1,24 @@
 package commonconfig
 
 import (
-	"fmt"
-	"net/url"
-
 	"github.com/spf13/viper"
 )
 
 type Authentik struct {
-	Host  string `json:"host"  mapstructure:"host"  validate:"required,http_url" yaml:"host"`
-	URL   string `json:"url"   mapstructure:"url"   validate:"required"          yaml:"url"`
-	Token string `json:"token" mapstructure:"token" validate:"required"          yaml:"token"`
-
-	hostURL       *url.URL
-	healthLiveURL string
-}
-
-func (a *Authentik) Init() error {
-	var err error
-	a.hostURL, err = url.Parse(a.Host)
-	if err != nil {
-		return fmt.Errorf("invalid authentik host URL: %w", err)
-	}
-	a.healthLiveURL = a.hostURL.ResolveReference(&url.URL{Path: "/-/health/live"}).String()
-	return nil
+	Host   string `json:"host"   mapstructure:"host"   validate:"required,hostname"          yaml:"host"`
+	Scheme string `json:"scheme" mapstructure:"scheme" validate:"omitempty,oneof=http https" yaml:"scheme"`
+	URL    string `json:"url"    mapstructure:"url"    validate:"required"                   yaml:"url"`
+	Token  string `json:"token"  mapstructure:"token"  validate:"required"                   yaml:"token"`
 }
 
 func (a *Authentik) HealthLiveURL() string {
-	return a.healthLiveURL
+	return a.Scheme + "://" + a.Host + "/-/health/live"
 }
 
 func AuthentikViperSetDefault(
 	viper *viper.Viper,
 	prefix string,
 ) {
+	viper.SetDefault(prefix+".scheme", "http")
 	viper.SetDefault(prefix+".url", "/api/v3")
 }

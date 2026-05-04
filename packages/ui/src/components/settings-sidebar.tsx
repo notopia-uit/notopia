@@ -41,7 +41,7 @@ export function SettingsSidebar({ workspaceId }: SettingsSidebarProps) {
   ];
 
   return (
-    <nav className="flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1">
+    <nav className="flex space-x-2 lg:flex-col lg:space-y-1 lg:space-x-0">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         const Icon = item.icon;
@@ -51,13 +51,13 @@ export function SettingsSidebar({ workspaceId }: SettingsSidebarProps) {
             key={item.name}
             href={item.href}
             className={cn(
-              'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              `flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors`,
               isActive
                 ? 'bg-zinc-900 text-zinc-50'
-                : 'text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-50'
+                : `text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-50`
             )}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="size-4" />
             {item.name}
           </Link>
         );

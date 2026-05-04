@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "type": "module",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "@nx/source": "./src/index.ts",
@@ -31,6 +32,10 @@
     },
     "./package.json": "./package.json"
   },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  },
   "peerDependencies": {
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",
@@ -38,10 +43,5 @@
     "@swc/helpers": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:"
-  },
-  "devDependencies": {
-    "@types/node": "catalog:",
-    "typescript": "catalog:"
-  },
-  "types": "./dist/index.d.ts"
+  }
 }

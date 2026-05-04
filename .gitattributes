@@ -20,6 +20,7 @@ pkg/api/**/*.go linguist-generated
 pkg/pb/**/*.go linguist-generated
 
 **/pgsqlc/*.go linguist-generated
-**/pgjet/*.go linguist-generated
 
 docs/src/** linguist-detectable
+
+internal/notecreateseed/seed.gen.sql linguist-generated

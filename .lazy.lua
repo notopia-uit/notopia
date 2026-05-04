@@ -7,19 +7,20 @@ return {
     ---@param opts conform.setupOpts
     ---@return conform.setupOpts
     opts = function(_, opts)
-      opts.formatters.prettier = {
-        command = function(_, ctx)
-          local root = vim.fs.root(ctx.dirname, { ".git", "pnpm-workspace.yaml" })
-          if root then
-            local root_prettier = root .. "/node_modules/.bin/prettier"
-            if vim.fn.executable(root_prettier) == 1 then
-              return root_prettier
-            end
-          end
-          return "prettier"
-        end,
-        cwd = require("conform.util").root_file({ "pnpm-workspace.yaml" }),
-      }
+      opts.formatters_by_ft = opts.formatters_by_ft or {}
+      opts.formatters_by_ft.html = nil
+      opts.formatters_by_ft.css = nil
+      opts.formatters_by_ft.scss = nil
+      opts.formatters_by_ft.markdown = nil
+      opts.formatters_by_ft.javascript = nil
+      opts.formatters_by_ft.json = nil
+      opts.formatters_by_ft.json5 = nil
+      opts.formatters_by_ft.jsonc = nil
+      opts.formatters_by_ft.typescript = nil
+      opts.formatters_by_ft.typescriptreact = nil
+      opts.formatters_by_ft.javascriptreact = nil
+      opts.formatters_by_ft.toml = nil
+      opts.formatters_by_ft.yaml = nil
       return opts
     end,
     optional = true,
@@ -35,6 +36,17 @@ return {
     },
     opts_extend = {
       "spec",
+    },
+    optional = true,
+  },
+  {
+    "mason-org/mason-lspconfig.nvim",
+    ---@module 'mason-lspconfig'
+    ---@type MasonLspconfigSettings
+    opts = {
+      automatic_enable = {
+        exclude = { "eslint" },
+      },
     },
     optional = true,
   },

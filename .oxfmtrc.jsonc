@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "trailingComma": "es5",
+  "sortImports": true,
+  "semi": true,
+  "sortPackageJson": true,
+  "sortTailwindcss": true,
+  "sortScripts": true,
+  "overrides": [
+    {
+      "files": ["*.json", "*.jsonc"],
+      "options": {
+        "trailingComma": "none"
+      }
+    }
+  ]
+}

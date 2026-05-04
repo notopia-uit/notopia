@@ -18,9 +18,7 @@ export class RevisionApi extends RevisionApiDefinition {
     await this.revisionService.deleteRevision(revisionId);
   }
 
-  async getRevisionWithContent(
-    revisionId: string
-  ): Promise<RevisionWithContent> {
+  async getRevisionWithContent(revisionId: string): Promise<RevisionWithContent> {
     const revisionEntity = await this.revisionService.getRevision(revisionId);
     return {
       id: revisionEntity.id,
@@ -35,11 +33,7 @@ export class RevisionApi extends RevisionApiDefinition {
     page: number,
     limit: number
   ): Promise<GetRevisions200Response> {
-    const result = await this.revisionService.getRevisionsByDocumentId(
-      documentId,
-      page,
-      limit
-    );
+    const result = await this.revisionService.getRevisionsByDocumentId(documentId, page, limit);
     const totalPages = Math.ceil(result.total / result.limit);
     return {
       data: result.data.map((r) => ({
@@ -62,9 +56,6 @@ export class RevisionApi extends RevisionApiDefinition {
     revisionId: string,
     renameRevisionRequest: RenameRevisionRequest
   ): Promise<void> {
-    await this.revisionService.renameRevision(
-      revisionId,
-      renameRevisionRequest.name
-    );
+    await this.revisionService.renameRevision(revisionId, renameRevisionRequest.name);
   }
 }

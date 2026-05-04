@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
 import {
   NoteWorkspaceTreeFolder,
   NoteWorkspaceTreeNote,
   getWorkspaceTreeOptions,
-} from '@notopia-uit/api-gen';
-import { Button } from '@notopia-uit/ui/components/shadcn/button';
-import { Input } from '@notopia-uit/ui/components/shadcn/input';
-import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+} from "@notopia-uit/api-gen";
+import { Button } from "@notopia-uit/ui/components/shadcn/button";
+import { Input } from "@notopia-uit/ui/components/shadcn/input";
+import { cn } from "@notopia-uit/ui/lib/shadcn/utils";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { ChevronRight, FilePlus, FolderPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, {
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-} from 'react';
+} from "react";
 import {
   ControlledTreeEnvironment,
   DraggingPosition,
@@ -26,7 +26,7 @@ import {
   type TreeItemIndex,
   type TreeRef,
   type TreeViewState,
-} from 'react-complex-tree';
+} from "react-complex-tree";
 
 //TODO: fetch data from api and handle loading states, errors, etc.
 type TreeData = Record<TreeItemIndex, TreeItem<string>>;
@@ -36,7 +36,7 @@ const mapDtoTreeData = (rootFolder: NoteWorkspaceTreeFolder): TreeData => {
 
   const traverse = (
     node: NoteWorkspaceTreeFolder | NoteWorkspaceTreeNote,
-    isFolder: boolean
+    isFolder: boolean,
   ) => {
     const { id, name } = node;
 
@@ -59,7 +59,7 @@ const mapDtoTreeData = (rootFolder: NoteWorkspaceTreeFolder): TreeData => {
       }
 
       folderNode.children?.forEach((childFolder) =>
-        traverse(childFolder, true)
+        traverse(childFolder, true),
       );
 
       folderNode.notes?.forEach((note) => traverse(note, false));
@@ -91,11 +91,11 @@ type TreeDataProviderType<T> = {
   getTreeItems?: (itemIds: TreeItemIndex[]) => Promise<TreeItem<T>[]>;
   onRenameItem?: (item: TreeItem<T>, name: string) => Promise<void>;
   onDidChangeTreeData?: (
-    listener: (changedItemIds: TreeItemIndex[]) => void
+    listener: (changedItemIds: TreeItemIndex[]) => void,
   ) => DisposableType;
   onChangeItemChildren?: (
     itemId: TreeItemIndex,
-    newChildren: TreeItemIndex[]
+    newChildren: TreeItemIndex[],
   ) => Promise<void>;
 };
 
@@ -117,12 +117,12 @@ class EventEmitter<EventPayload> {
   public async emit(payload: EventPayload): Promise<void> {
     const promises: Array<Promise<void>> = [];
 
-    this.options?.logger?.('emit', payload);
+    this.options?.logger?.("emit", payload);
 
     for (const handler of this.handlers) {
       if (handler) {
         const res = handler(payload) as Promise<void>;
-        if (typeof res?.then === 'function') {
+        if (typeof res?.then === "function") {
           promises.push(res);
         }
       }
@@ -132,7 +132,7 @@ class EventEmitter<EventPayload> {
   }
 
   public on(handler: EventHandlerType<EventPayload>): number {
-    this.options?.logger?.('on');
+    this.options?.logger?.("on");
     this.handlers.push(handler);
 
     return this.handlerCount++;
@@ -143,7 +143,7 @@ class EventEmitter<EventPayload> {
   }
 
   public delete(handlerId: number) {
-    this.options?.logger?.('off');
+    this.options?.logger?.("off");
     this.handlers[handlerId] = null;
   }
 }
@@ -158,7 +158,7 @@ class TreeDataProvider<T> implements TreeDataProviderType<T> {
 
   constructor(
     items: Record<TreeItemIndex, TreeItem<T>>,
-    setItemName?: (item: TreeItem<T>, newName: string) => TreeItem<T>
+    setItemName?: (item: TreeItem<T>, newName: string) => TreeItem<T>,
   ) {
     this.items = items;
     this.setItemName = setItemName;
@@ -178,7 +178,7 @@ class TreeDataProvider<T> implements TreeDataProviderType<T> {
 
   public async onChangeItemChildren(
     itemId: TreeItemIndex,
-    newChildren: TreeItemIndex[]
+    newChildren: TreeItemIndex[],
   ) {
     if (this.items[itemId]) {
       this.items[itemId].children = newChildren;
@@ -187,10 +187,10 @@ class TreeDataProvider<T> implements TreeDataProviderType<T> {
   }
 
   public onDidChangeTreeData(
-    listener: (changedItemIds: TreeItemIndex[]) => void
+    listener: (changedItemIds: TreeItemIndex[]) => void,
   ) {
     const handlerId = this.onDidChangeTreeDataEmitter.on((payload) =>
-      listener(payload)
+      listener(payload),
     );
     return { dispose: () => this.onDidChangeTreeDataEmitter.off(handlerId) };
   }
@@ -204,7 +204,7 @@ class TreeDataProvider<T> implements TreeDataProviderType<T> {
 }
 
 const viewStateInitial: TreeViewState = {
-  'tree-sample': {},
+  "tree-sample": {},
 };
 
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
@@ -218,7 +218,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
   const router = useRouter();
   const tree = useRef<TreeRef>(null);
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
-  const [search, setSearch] = useState<string | undefined>('');
+  const [search, setSearch] = useState<string | undefined>("");
 
   const [items, setItems] =
     useState<Record<TreeItemIndex, TreeItem<string>>>(workspaceTreeData);
@@ -228,7 +228,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
 
   const dataProvider = useMemo(
     () => new TreeDataProvider<string>(items),
-    [items]
+    [items],
   );
   const onDrop = useCallback(
     (draggedItems: TreeItem<string>[], target: DraggingPosition) => {
@@ -237,7 +237,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
 
         for (const item of draggedItems) {
           const parent = Object.values(newItems).find(
-            (p) => p.isFolder && p.children?.includes(item.index)
+            (p) => p.isFolder && p.children?.includes(item.index),
           );
           if (parent && parent.children) {
             newItems[parent.index] = {
@@ -247,7 +247,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
           }
         }
 
-        if (target.targetType === 'item') {
+        if (target.targetType === "item") {
           const targetItem = newItems[target.targetItem];
           if (targetItem && targetItem.isFolder) {
             newItems[target.targetItem] = {
@@ -258,24 +258,24 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
               ],
             };
           }
-        } else if (target.targetType === 'between-items') {
+        } else if (target.targetType === "between-items") {
           const parentItem = newItems[target.parentItem];
           if (parentItem && parentItem.isFolder) {
             const newChildren = [...(parentItem.children || [])];
             newChildren.splice(
               target.childIndex,
               0,
-              ...draggedItems.map((i) => i.index)
+              ...draggedItems.map((i) => i.index),
             );
             newItems[target.parentItem] = {
               ...parentItem,
               children: newChildren,
             };
           }
-        } else if (target.targetType === 'root') {
-          const rootItem = newItems['root'];
+        } else if (target.targetType === "root") {
+          const rootItem = newItems["root"];
           if (rootItem) {
-            newItems['root'] = {
+            newItems["root"] = {
               ...rootItem,
               children: [
                 ...(rootItem.children || []),
@@ -288,21 +288,21 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
         return newItems;
       });
     },
-    []
+    [],
   );
 
   const handleCreateItem = useCallback(
     (isFolder: boolean) => {
       setItems((prevItems) => {
-        const focusedId = viewState['tree-sample']?.focusedItem;
-        let parentId: TreeItemIndex = 'root';
+        const focusedId = viewState["tree-sample"]?.focusedItem;
+        let parentId: TreeItemIndex = "root";
 
         if (focusedId && prevItems[focusedId]) {
           if (prevItems[focusedId].isFolder) {
             parentId = focusedId;
           } else {
             const parent = Object.values(prevItems).find(
-              (p) => p.isFolder && p.children?.includes(focusedId)
+              (p) => p.isFolder && p.children?.includes(focusedId),
             );
             if (parent) parentId = parent.index;
           }
@@ -313,17 +313,17 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
         const newItem: TreeItem<string> = {
           index: newItemId,
           isFolder,
-          data: isFolder ? 'New Folder' : 'New Note',
+          data: isFolder ? "New Folder" : "New Note",
           children: isFolder ? [] : undefined,
         };
 
         setViewState((prev) => {
-          const currentExpanded = prev['tree-sample']?.expandedItems ?? [];
+          const currentExpanded = prev["tree-sample"]?.expandedItems ?? [];
           if (!currentExpanded.includes(parentId)) {
             return {
               ...prev,
-              'tree-sample': {
-                ...prev['tree-sample'],
+              "tree-sample": {
+                ...prev["tree-sample"],
                 expandedItems: [...currentExpanded, parentId],
               },
             };
@@ -342,16 +342,16 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
         };
       });
     },
-    [viewState]
+    [viewState],
   );
 
   const getItemPath = useCallback(
     async (
       search: string,
-      searchRoot: TreeItemIndex = 'root'
+      searchRoot: TreeItemIndex = "root",
     ): Promise<TreeItemIndex[] | null> => {
       const searchTree = async (
-        currentId: TreeItemIndex
+        currentId: TreeItemIndex,
       ): Promise<TreeItemIndex[] | null> => {
         const item = await dataProvider.getTreeItem(currentId);
 
@@ -361,11 +361,11 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
 
         if (item.children && item.children.length > 0) {
           const results = await Promise.all(
-            item.children.map((childId) => searchTree(childId))
+            item.children.map((childId) => searchTree(childId)),
           );
 
           const foundPath = results.find(
-            (path): path is TreeItemIndex[] => path !== null
+            (path): path is TreeItemIndex[] => path !== null,
           );
 
           if (foundPath) {
@@ -378,7 +378,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
 
       return searchTree(searchRoot);
     },
-    [dataProvider]
+    [dataProvider],
   );
 
   const onSubmit = useCallback(
@@ -389,19 +389,19 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
           .then((path) => {
             if (path) {
               return tree.current?.expandSubsequently(path).then(() => {
-                tree.current?.selectItems([...[path.at(-1) ?? '']]);
-                tree.current?.focusItem(path.at(-1) ?? '');
-                tree.current?.toggleItemSelectStatus(path.at(-1) ?? '');
+                tree.current?.selectItems([path.at(-1) ?? ""]);
+                tree.current?.focusItem(path.at(-1) ?? "");
+                tree.current?.toggleItemSelectStatus(path.at(-1) ?? "");
               });
             }
             return;
           })
           .catch((error) => {
-            console.error('Error getting item:', error);
+            console.error("Error getting item:", error);
           });
       }
     },
-    [getItemPath, search]
+    [getItemPath, search],
   );
 
   return (
@@ -469,7 +469,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
                 ...prevViewState[treeId],
                 expandedItems:
                   prevViewState[treeId]?.expandedItems?.filter(
-                    (id) => id !== item.index
+                    (id) => id !== item.index,
                   ) ?? [],
               },
             }));
@@ -484,7 +484,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
             }));
           }}
           onSelectItems={(selectedItems, treeId) => {
-            const selectedId = selectedItems.at(-1) ?? '';
+            const selectedId = selectedItems.at(-1) ?? "";
             setViewState((prevViewState) => ({
               ...prevViewState,
               [treeId]: {
@@ -504,7 +504,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
             return (
               <div
                 {...containerProps}
-                className="tree-container border border-border "
+                className="tree-container border-border border"
               >
                 {children}
               </div>
@@ -519,7 +519,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
             return (
               <li
                 {...context.itemContainerWithChildrenProps}
-                className="my-px [&>button>svg]:aria-expanded:rotate-90 [&>button]:aria-selected:bg-primary/50"
+                className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
               >
                 <Button
                   {...context.itemContainerWithoutChildrenProps}
@@ -528,8 +528,8 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({
                   variant="outline"
                   size="sm"
                   className={cn(
-                    'grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none',
-                    'focus:bg-secondary/20'
+                    `grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none`,
+                    "focus:bg-secondary/20",
                   )}
                   style={{
                     paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,

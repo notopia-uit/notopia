@@ -7,10 +7,6 @@
       "dependsOn": ["build"],
       "cache": true,
       "executor": "@nx/js:prune-lockfile",
-      "outputs": [
-        "{projectRoot}/dist/package.json",
-        "{projectRoot}/dist/pnpm-lock.yaml"
-      ],
       "options": {
         "buildTarget": "build"
       }
@@ -18,7 +14,6 @@
     "copy-workspace-modules": {
       "dependsOn": ["build"],
       "cache": true,
-      "outputs": ["{projectRoot}/dist/workspace_modules"],
       "executor": "@nx/js:copy-workspace-modules",
       "options": {
         "buildTarget": "build"
@@ -32,34 +27,45 @@
       "parallelism": false
     },
     "build": {
-      "defaultConfiguration": "development",
+      "options": {
+        "mode": "development",
+        "args": ["--node-env=development"]
+      },
       "configurations": {
         "development": {
-          "mode": "development"
+          "mode": "development",
+          "args": ["--node-env=development"]
         },
         "production": {
-          "mode": "production"
+          "mode": "production",
+          "args": ["--node-env=production"]
         }
       }
     },
-    "dev": {
+    "run": {
       "continuous": true,
       "executor": "@nx/js:node",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "development"
+        "buildTarget": "document:build:development",
+        "port": 9222
       },
       "configurations": {
         "development": {
-          "buildTarget": "development"
+          "buildTarget": "document:build:development"
         },
         "mon": {
-          "buildTarget": "development"
+          "buildTarget": "document:build:development"
         },
         "production": {
-          "buildTarget": "production"
+          "buildTarget": "document:build:production",
+          "inspect": false,
+          "watch": false
         }
       }
+    },
+    "docker:build": {
+      "dependsOn": ["prune", "build", "^build"]
     }
   },
   "release": {

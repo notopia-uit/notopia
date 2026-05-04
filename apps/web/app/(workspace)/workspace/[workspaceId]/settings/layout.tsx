@@ -16,9 +16,7 @@ export default async function WorkspaceSettingsLayout({
     <div className="min-h-screen bg-zinc-950 p-10 font-sans text-zinc-50">
       <div className="mx-auto max-w-5xl space-y-6">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold tracking-tight">
-            Workspace Settings
-          </h2>
+          <h2 className="text-2xl font-bold tracking-tight">Workspace Settings</h2>
           <p className="text-sm text-zinc-400">
             Manage your workspace details, members, and preferences.
           </p>
@@ -26,18 +24,8 @@ export default async function WorkspaceSettingsLayout({
 
         <Separator className="my-6 bg-zinc-800" />
 
-        <div
-          className="
-            flex flex-col gap-8
-            lg:flex-row lg:gap-12
-          "
-        >
-          <aside
-            className="
-              w-full
-              lg:w-1/4
-            "
-          >
+        <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
+          <aside className="w-full lg:w-1/4">
             <SettingsSidebar workspaceId={workspaceId} />
           </aside>
 

@@ -2,6 +2,7 @@
 // import styles from './app.module.css';
 import openapi from '@notopia-uit/api/openapi' with { type: 'json' };
 import { ApiReferenceReact } from '@scalar/api-reference-react';
+
 import '@scalar/api-reference-react/style.css';
 
 export function App() {

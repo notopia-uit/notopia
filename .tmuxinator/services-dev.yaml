@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://www.schemastore.org/tmuxinator.json
+name: notopia svcs dev
+
+windows:
+  - svcs dev:
+      layout: tiled
+      panes:
+        - note:
+            - tmux set-option -w pane-border-status top
+            - nx run note --no-tui
+        - authorization:
+            - nx run authorization --no-tui
+        - document:
+            - nx run document --no-tui
+        - search-worker:
+            - nx run search-worker --no-tui

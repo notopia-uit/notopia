@@ -1,8 +1,9 @@
+import { builtinModules } from 'module';
+import { join } from 'path';
+
 import { NxAppRspackPlugin } from '@nx/rspack/app-plugin';
 import type { Configuration } from '@rspack/cli';
 import rspack from '@rspack/core';
-import { builtinModules } from 'module';
-import { join } from 'path';
 import nodeExternals from 'webpack-node-externals';
 
 const isEsm = false;
@@ -61,9 +62,7 @@ const config: Configuration = {
           },
         ],
         exclude: /node_modules/,
-        type: isEsm
-          ? ('javascript/esm' as const)
-          : ('javascript/auto' as const),
+        type: isEsm ? ('javascript/esm' as const) : ('javascript/auto' as const),
       },
       {
         test: /\.node$/,
@@ -105,9 +104,7 @@ const config: Configuration = {
             const request: string | undefined = data.request;
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
             if (!request) return callback(null);
-            const bare = request.startsWith('node:')
-              ? request.slice(5)
-              : request;
+            const bare = request.startsWith('node:') ? request.slice(5) : request;
             if (builtinModules.includes(bare)) {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
               return callback(null, `node:${bare}`);
@@ -126,10 +123,7 @@ const config: Configuration = {
       optimization: process.env['NODE_ENV'] === 'production',
       externalDependencies: 'none',
     }),
-    new rspack.NormalModuleReplacementPlugin(
-      /file-type$/,
-      require.resolve('./stub.js')
-    ),
+    new rspack.NormalModuleReplacementPlugin(/file-type$/, require.resolve('./stub.js')),
     new rspack.IgnorePlugin({
       checkResource(resource) {
         const lazyImports = [

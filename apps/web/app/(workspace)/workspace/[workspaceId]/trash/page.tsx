@@ -4,15 +4,12 @@ import TrashedItemManagement from '@ui/components/trashed-file-management';
 
 import getQueryClient from '#/get-query-client';
 
-export default async function TrashPage({
-  params,
-}: {
-  params: Promise<{ workspaceId: string }>;
-}) {
+export default async function TrashPage({ params }: { params: Promise<{ workspaceId: string }> }) {
   const { workspaceId } = await params;
   const queryClient = getQueryClient();
-  const { queryKey: showTrashQueryKey, queryFn: showTrashQueryFn } =
-    showTrashOptions({ path: { workspaceId: workspaceId } });
+  const { queryKey: showTrashQueryKey, queryFn: showTrashQueryFn } = showTrashOptions({
+    path: { workspaceId: workspaceId },
+  });
   await queryClient.prefetchQuery({
     queryKey: showTrashQueryKey,
     queryFn: showTrashQueryFn,

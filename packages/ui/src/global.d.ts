@@ -1,5 +1,4 @@
 import '@blocknote/core';
-
 import { createBlockNoteSchema } from './block-note';
 
 declare global {

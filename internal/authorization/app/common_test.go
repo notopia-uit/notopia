@@ -8,26 +8,18 @@ import (
 	"github.com/casbin/casbin/v3"
 	"github.com/casbin/casbin/v3/model"
 	stringadapter "github.com/casbin/casbin/v3/persist/string-adapter"
+	"github.com/notopia-uit/notopia/internal/authorization/app"
 )
-
-//go:embed model.conf
-var modelConf string
-
-//go:embed policy.csv
-var policyCSV string
-
-//go:embed policy_test.csv
-var policyTestCSV string
 
 func GetLocalEnforcer(t testing.TB, loadTestPolicies bool) (*casbin.TransactionalEnforcer, error) {
 	t.Helper()
 
-	policy := policyCSV
+	policy := app.PolicyCSV
 	if loadTestPolicies {
-		policy += "\n" + policyTestCSV
+		policy += "\n" + app.PolicyTestCSV
 	}
 	adapter := stringadapter.NewAdapter(policy)
-	model, err := model.NewModelFromString(modelConf)
+	model, err := model.NewModelFromString(app.ModelConf)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load Casbin model: %w", err)
 	}

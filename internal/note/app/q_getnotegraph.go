@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"math"
 
 	"github.com/google/uuid"
@@ -15,10 +16,6 @@ type GetNoteGraph struct {
 	Depth int
 
 	UserID string
-}
-
-type GetNoteGraphReadModel interface {
-	GetNoteGraph(ctx context.Context, q *GetNoteGraph) (Graph, error)
 }
 
 type GetNoteGraphHandler struct {
@@ -42,6 +39,7 @@ func NewGetNoteGraphHandler(
 var ProvideGetNoteGraphHandler = NewGetNoteGraphHandler
 
 func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (Graph, error) {
+	slog.DebugContext(ctx, "Handling get note graph query", slog.String("note_id", query.ID.String()), slog.Int("depth", query.Depth))
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)
 	if err != nil {
 		return Graph{}, err
@@ -63,5 +61,13 @@ func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (
 	if query.Depth <= 0 {
 		query.Depth = math.MaxInt
 	}
-	return h.readModel.GetNoteGraph(ctx, query)
+	graph, err := h.readModel.GetNoteGraph(ctx, &GetNoteGraphReadModelParams{
+		ID:    query.ID,
+		Depth: query.Depth,
+	})
+	if err != nil {
+		return Graph{}, err
+	}
+	slog.InfoContext(ctx, "Get note graph query completed", slog.String("note_id", query.ID.String()))
+	return graph, nil
 }

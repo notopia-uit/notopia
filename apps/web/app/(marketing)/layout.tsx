@@ -7,9 +7,9 @@ interface MarketingLayoutProps {
 
 export default function MarketingLayout({ children }: MarketingLayoutProps) {
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="container border-b ">
-        <div className="flex items-center justify-between  px-2 py-2 space-x-2">
+    <div className="flex min-h-screen flex-col">
+      <header className="container border-b">
+        <div className="flex items-center justify-between space-x-2 p-2">
           <NavBar />
         </div>{' '}
       </header>

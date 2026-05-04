@@ -1,4 +1,5 @@
 import { join } from 'path';
+
 import { Config } from 'tailwindcss';
 
 const config: Config = {

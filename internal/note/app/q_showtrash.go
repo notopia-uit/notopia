@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -36,6 +37,7 @@ func NewShowTrashHandler(
 var ProvideShowTrashHandler = NewShowTrashHandler
 
 func (h *ShowTrashHandler) Handle(ctx context.Context, query *ShowTrash) (Trash, error) {
+	slog.DebugContext(ctx, "Handling show trash query", slog.String("workspace_id", query.WorkspaceID.String()))
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
@@ -50,5 +52,10 @@ func (h *ShowTrashHandler) Handle(ctx context.Context, query *ShowTrash) (Trash,
 			fmt.Sprintf("user %s does not have permission to read trash in workspace %s", query.UserID, query.WorkspaceID),
 		)
 	}
-	return h.readModel.ShowTrash(ctx, query)
+	trash, err := h.readModel.ShowTrash(ctx, query)
+	if err != nil {
+		return Trash{}, err
+	}
+	slog.InfoContext(ctx, "Show trash query completed", slog.String("workspace_id", query.WorkspaceID.String()))
+	return trash, nil
 }

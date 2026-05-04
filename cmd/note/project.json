@@ -15,14 +15,11 @@
       "{workspaceRoot}/internal/note/infra/persistence/pgmigration/*.{sql,go}",
       "{projectRoot}/sqlc.yaml"
     ],
-    "migrations": [
-      "{workspaceRoot}/internal/note/infra/persistence/pgmigration/*.{sql,go}"
-    ]
+    "migrations": ["{workspaceRoot}/internal/note/infra/persistence/pgmigration/*.{sql,go}"]
   },
   "targets": {
     "gen:wire": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "outputs": ["{projectRoot}/wire_gen.go"],
       "options": {
         "command": "wire",
@@ -30,29 +27,41 @@
       },
       "cache": false
     },
-    "dev": {
+    "run": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
-        "command": "go run .",
-        "cwd": "{projectRoot}",
+        "command": "go run ./cmd/note/",
+        "cwd": "{workspaceRoot}",
         "tty": true
       },
-      "dependsOn": ["gen", "^gen*"],
+      "dependsOn": ["build-deps"],
       "continuous": true
     },
     "build": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
-        "command": "go build -o ./note .",
-        "cwd": "{projectRoot}"
+        "command": "go build -o ./cmd/note/note ./cmd/note/",
+        "cwd": "{workspaceRoot}"
       },
+      "configurations": {
+        "debug": {
+          "command": "go build -gcflags='all=-N -l' -o ./cmd/note/__debug_bin ./cmd/note/"
+        },
+        "development": {
+          "command": "go build -o ./cmd/note/note ./cmd/note/"
+        },
+        "production": {
+          "command": "go build -ldflags='-s -w' -o ./cmd/note/note ./cmd/note/"
+        }
+      },
+      "dependsOn": ["gen", "^gen*", "^build*"]
+    },
+    "build-deps": {
+      "executor": "nx:noop",
       "dependsOn": ["gen", "^gen*", "^build*"]
     },
     "preview": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
         "command": "./note",
         "cwd": "{projectRoot}",
@@ -63,13 +72,12 @@
     },
     "debug": {
       "executor": "nx:run-commands",
-      "inputs": ["default"],
       "options": {
-        "command": "dlv debug --headless --listen=127.0.0.1:23451 --accept-multiclient",
-        "cwd": "{projectRoot}",
+        "command": "dlv debug --headless --listen=127.0.0.1:23451 --accept-multiclient --output ./cmd/note/__debug_bin ./cmd/note/",
+        "cwd": "{workspaceRoot}",
         "tty": true
       },
-      "dependsOn": ["gen", "^gen*"],
+      "dependsOn": ["build-deps"],
       "continuous": true
     },
     "lint": {
@@ -81,12 +89,6 @@
       "cache": false,
       "parallelism": false
     },
-    "tidy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "go mod tidy"
-      }
-    },
     "goose": {
       "executor": "nx:run-commands",
       "options": {
@@ -94,42 +96,40 @@
         "cwd": "{projectRoot}"
       }
     },
-    "migration:create": {
+    "goose:create": {
       "executor": "nx:run-commands",
       "options": {
         "command": "goose create",
         "cwd": "{projectRoot}"
       }
     },
-    "migration:up": {
+    "goose:up": {
       "executor": "nx:run-commands",
       "options": {
         "command": "goose up",
         "cwd": "{projectRoot}"
       }
     },
-    "migration:down": {
+    "goose:down": {
       "executor": "nx:run-commands",
       "options": {
         "command": "goose down",
         "cwd": "{projectRoot}"
       }
     },
-    "migration:validate": {
+    "goose:validate": {
       "executor": "nx:run-commands",
       "options": {
         "command": "goose validate",
         "cwd": "{projectRoot}"
       }
     },
-    "lint:migration": {
+    "lint:goose": {
       "dependsOn": ["migration:validate"]
     },
     "gen:sqlc": {
       "inputs": ["sqlc"],
-      "outputs": [
-        "{workspaceRoot}/internal/note/infra/persistence/pgsqlc/*.go"
-      ],
+      "outputs": ["{workspaceRoot}/internal/note/infra/persistence/pgsqlc/*.go"],
       "executor": "nx:run-commands",
       "options": {
         "command": "sqlc generate",

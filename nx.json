@@ -17,11 +17,7 @@
       "{workspaceRoot}/pkg/**/*.{go}",
       "!{workspaceRoot}/pkg/**/*_test.{go}"
     ],
-    "goFiles": [
-      "{workspaceRoot}/go.mod",
-      "{workspaceRoot}/go.sum",
-      "{projectRoot}/**/*.go"
-    ],
+    "goFiles": ["{workspaceRoot}/go.mod", "{workspaceRoot}/go.sum", "{projectRoot}/**/*.go"],
     "protoFiles": [
       "{projectRoot}/**/*.proto",
       "{workspaceRoot}/buf.gen.yaml",
@@ -37,7 +33,9 @@
       "cache": true
     },
     "build*": {
+      "inputs": ["default", "^default"],
       "dependsOn": ["^build*", "^bundle*", "^gen"],
+      "defaultConfiguration": "development",
       "cache": true
     },
     "dev": {
@@ -65,12 +63,6 @@
   },
   "plugins": [
     {
-      "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "lint"
-      }
-    },
-    {
       "plugin": "@nx/js/typescript",
       "options": {
         "compiler": "tsgo",
@@ -88,6 +80,7 @@
     {
       "plugin": "@nx/vite/plugin",
       "options": {
+        "compiler": "tsgo",
         "buildTargetName": "build",
         "testTargetName": "test",
         "serveTargetName": "serve",
@@ -170,6 +163,12 @@
         "buildDepsTargetName": "build-deps",
         "watchDepsTargetName": "watch-deps"
       }
+    },
+    {
+      "plugin": "nx-oxlint",
+      "options": {
+        "lintTargetName": "lint"
+      }
     }
   ],
   "release": {
@@ -193,8 +192,8 @@
           "file": false
         }
       },
-      "docker": {
-        "projects": ["note", "authorization", "document", "web"],
+      "docker-go": {
+        "projects": ["note", "authorization", "document", "search-worker", "web"],
         "releaseTag": {
           "pattern": "{projectName}@{version}"
         },
@@ -216,9 +215,6 @@
         },
         "releaseTagPatternRequireSemver": false
       }
-    },
-    "version": {
-      "preVersionCommand": "pnpm dlx nx run-many -t build"
     }
   },
   "generators": {
@@ -226,7 +222,7 @@
       "application": {
         "babel": true,
         "style": "css",
-        "linter": "eslint",
+        "linter": "none",
         "bundler": "vite"
       },
       "component": {
@@ -234,14 +230,14 @@
       },
       "library": {
         "style": "css",
-        "linter": "eslint",
+        "linter": "none",
         "unitTestRunner": "none"
       }
     },
     "@nx/next": {
       "application": {
         "style": "tailwind",
-        "linter": "eslint"
+        "linter": "none"
       }
     }
   },

@@ -17,7 +17,7 @@
       "@ui/*": ["../../packages/ui/src/*"],
       "@notopia-uit/ui/*": ["../../packages/ui/src/*"],
       "@notopia-uit/api-gen/*": ["../../packages/api-gen/src/*"],
-      "@notopia-uit/block-note/*": ["../../packages/block-note/src/*"]
+      "@notopia-uit/lib/*": ["../../packages/lib/src/*"]
     }
   },
   "include": [
@@ -29,18 +29,10 @@
     "index.d.ts",
     "global.d.ts",
     ".next/types/**/*.ts",
-    "eslint.config.mjs",
     "postcss.config.mjs",
     "../../packages/ui/src/global.d.ts"
   ],
-  "exclude": [
-    "out-tsc",
-    "dist",
-    "node_modules",
-    "app/**/*.spec.ts",
-    "app/**/*.test.ts",
-    ".next"
-  ],
+  "exclude": ["out-tsc", "dist", "node_modules", "app/**/*.spec.ts", "app/**/*.test.ts", ".next"],
   "references": [
     {
       "path": "../../packages/ui"

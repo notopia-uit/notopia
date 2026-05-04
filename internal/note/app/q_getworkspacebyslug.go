@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
@@ -11,10 +12,6 @@ type GetWorkspaceBySlug struct {
 	Slug string
 
 	UserID string
-}
-
-type WorkspaceBySlugReadModel interface {
-	GetWorkspaceBySlug(ctx context.Context, q *GetWorkspaceBySlug) (Workspace, error)
 }
 
 type GetWorkspaceHandler struct {
@@ -35,7 +32,8 @@ func NewGetWorkspaceBySlugHandler(
 var ProvideGetWorkspaceBySlugHandler = NewGetWorkspaceBySlugHandler
 
 func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspaceBySlug) (Workspace, error) {
-	workspace, err := h.readModel.GetWorkspaceBySlug(ctx, query)
+	slog.DebugContext(ctx, "Handling get workspace by slug query", slog.String("slug", query.Slug))
+	workspace, err := h.readModel.GetWorkspaceBySlug(ctx, query.Slug)
 	if err != nil {
 		return Workspace{}, err
 	}
@@ -53,5 +51,6 @@ func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspaceByS
 			fmt.Sprintf("user %s does not have permission to read workspace %s", query.UserID, workspace.ID),
 		)
 	}
+	slog.InfoContext(ctx, "Get workspace by slug query completed", slog.String("workspace_id", workspace.ID.String()))
 	return workspace, nil
 }

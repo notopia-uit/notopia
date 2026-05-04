@@ -19,6 +19,7 @@ func toGRPCError(err error) error {
 		case errs.CodeForbidden:
 			return status.Error(codes.PermissionDenied, cerr.Error())
 		case errs.CodeInvalid,
+			errs.CodeTrashedInValid,
 			errs.CodeEmptyFolderName,
 			errs.CodePersistenceInvalid,
 			errs.CodeInvalidWorkspaceName,
@@ -39,6 +40,7 @@ func toGRPCError(err error) error {
 			errs.CodeWorkspaceEventPubSubFailedToCreateMessage,
 			errs.CodeWorkspaceEventPubSubPublishFailed,
 			errs.CodeWorkspaceEventPubSubSubscribeFailed,
+			errs.CodeGenerateWorkspaceSearchTokenFailed,
 			errs.CodeInternalGenerateID:
 			return status.Error(codes.Internal, cerr.Error())
 		case errs.CodeFolderNotFound,

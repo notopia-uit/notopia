@@ -1,17 +1,17 @@
 import {
   getMyWorkspacesOptions,
   getWorkspaceTreeOptions,
-} from '@notopia-uit/api-gen/index';
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+} from "@notopia-uit/api-gen/index";
+import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from '@ui/components/shadcn/sidebar';
-import WorkspaceSideBar from '@ui/components/workspace-sidebar';
-import { fetchAccessToken } from '@ui/lib/get-access-token';
+} from "@ui/components/shadcn/sidebar";
+import WorkspaceSideBar from "@ui/components/workspace-sidebar";
+import { fetchAccessToken } from "@ui/lib/get-access-token";
 
-import getQueryClient from '../../../get-query-client';
+import getQueryClient from "../../../get-query-client";
 
 interface WorkspaceLayoutProps {
   children: React.ReactNode;
@@ -54,13 +54,7 @@ export default async function WorkspaceLayout({
       <SidebarProvider defaultOpen={true}>
         <WorkspaceSideBar currentWorkspaceId={workspaceId} />
         <SidebarInset>
-          <header
-            className="
-              flex h-16 shrink-0 items-center gap-2 transition-[width,height]
-              ease-linear
-              group-has-data-[collapsible=icon]/sidebar-wrapper:h-12
-            "
-          >
+          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4">
               <SidebarTrigger className="-ml-1" />
             </div>

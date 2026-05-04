@@ -25,6 +25,7 @@ func NewDeleteWorkspaceHandler(enforcer *casbin.TransactionalEnforcer) *DeleteWo
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, params DeleteWorkspace) error {
+	slog.DebugContext(ctx, "Handling delete workspace", slog.String("user_id", params.UserID), slog.String("workspace_id", params.WorkspaceID.String()))
 	deleteAllowed, err := h.enforcer.Enforce(
 		formatUser(params.UserID),
 		formatWorkspace(params.WorkspaceID),

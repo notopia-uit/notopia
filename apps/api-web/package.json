@@ -4,6 +4,6 @@
   "private": true,
   "dependencies": {
     "@notopia-uit/api": "workspace:",
-    "@scalar/api-reference-react": "0.9.24"
+    "@scalar/api-reference-react": "0.9.32"
   }
 }

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -34,6 +35,7 @@ var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
 // FIXME: This maybe need saga? Because it involves 2 external things
 // Or we have to persist event and let another handler to consume
 func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateWorkspaceMembers) error {
+	slog.DebugContext(ctx, "updating workspace members", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("member_count", len(cmd.Members)), slog.String("user_id", cmd.UserID))
 	if len(cmd.Members) == 0 {
 		return errs.NewWorkspaceMembersCannotBeEmpty(cmd.WorkspaceID)
 	}
@@ -47,16 +49,16 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateW
 	if !anyOwner {
 		return errs.NewWorkspaceMustHaveAtLeastOneOwner(cmd.WorkspaceID)
 	}
-	// NOTE: We don't check if the user have permission to update workspace members
-	// Because the service has implemented it for us
+	slog.DebugContext(ctx, "validating members", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("member_count", len(cmd.Members)))
 	if err := h.authorizationSvc.UpdateWorkspaceMembers(ctx, cmd.UserID, cmd.WorkspaceID, cmd.Members); err != nil {
 		return err
 	}
+	slog.DebugContext(ctx, "members updated in authorization service", slog.String("workspace_id", cmd.WorkspaceID.String()))
 	eventID, err := uuid.NewV7()
 	if err != nil {
 		return errs.NewInternalGenerateID(err)
 	}
-	return h.workspaceEventPublisher.Publish(ctx, cmd.WorkspaceID, cmd.UserID, &WorkspaceEventMembersUpdated{
+	err = h.workspaceEventPublisher.Publish(ctx, cmd.WorkspaceID, cmd.UserID, &WorkspaceEventMembersUpdated{
 		workspaceEvent[note.WorkspaceMembersUpdatedEventEvent]{
 			Id:    eventID,
 			Event: note.WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent,
@@ -65,4 +67,8 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateW
 			},
 		},
 	})
+	if err == nil {
+		slog.InfoContext(ctx, "workspace members updated successfully", slog.String("workspace_id", cmd.WorkspaceID.String()), slog.Int("member_count", len(cmd.Members)))
+	}
+	return err
 }

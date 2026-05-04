@@ -1,3 +1,6 @@
+// oxfmt-ignore
+import './otel';
+
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
@@ -6,9 +9,6 @@ import { AppModule } from './app.module';
 import { AppConfig } from './config';
 import { APP_CONFIG } from './config.factory';
 import { getKafkaConfig } from './kafka.config';
-import { otelSdk } from './otel';
-
-otelSdk.start();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

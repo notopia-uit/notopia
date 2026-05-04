@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppConfig, DatabaseConfig } from '../config/config';
 import { APP_CONFIG, DATABASE_CONFIG } from '../config/config.factory';
-
 import { createDatasourceOptions } from './database.provider';
 
 @Module({
@@ -16,15 +15,14 @@ import { createDatasourceOptions } from './database.provider';
         if (!appConfig) {
           throw new Error('APP_CONFIG not found');
         }
-        const databaseConfig =
-          configService.get<DatabaseConfig>(DATABASE_CONFIG);
-        if (!databaseConfig) {
+        const databaseCfg = configService.get<DatabaseConfig>(DATABASE_CONFIG);
+        if (!databaseCfg) {
           throw new Error('DATABASE_CONFIG not found');
         }
-        return createDatasourceOptions(
-          databaseConfig,
-          appConfig.env !== 'production'
-        );
+        return createDatasourceOptions({
+          databaseCfg,
+          synchronize: appConfig.env !== 'production',
+        });
       },
     }),
   ],

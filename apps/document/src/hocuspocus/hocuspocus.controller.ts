@@ -11,12 +11,8 @@ import { HocuspocusService } from '#/hocuspocus/hocuspocus.service';
 export class HocuspocusController {
   constructor(private readonly hocuspocusService: HocuspocusService) {}
 
-  @MessagePattern(
-    'events.integration.authorization.user_workspace_role_updated'
-  )
-  async handleUserWorkspaceRoleUpdated(
-    @Payload() data: ShareUserWorkspaceRoleUpdatedEvent
-  ) {
+  @MessagePattern('events.integration.authorization.user_workspace_role_updated')
+  async handleUserWorkspaceRoleUpdated(@Payload() data: ShareUserWorkspaceRoleUpdatedEvent) {
     await this.hocuspocusService.onRoleChanged({
       workspaceId: data.workspaceId,
       userId: data.userId,
@@ -24,9 +20,7 @@ export class HocuspocusController {
   }
 
   @MessagePattern('events.integration.authorization.workspace_member_removed')
-  async handleWorkspaceMemberRemoved(
-    @Payload() data: ShareWorkspaceMemberRemovedEvent
-  ) {
+  async handleWorkspaceMemberRemoved(@Payload() data: ShareWorkspaceMemberRemovedEvent) {
     await this.hocuspocusService.onMemberRemoved({
       workspaceId: data.workspaceId,
       userId: data.userId,
