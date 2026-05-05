@@ -93,7 +93,7 @@ catalog:
   vitest: '4.0.18'
   webpack-node-externals: '3.0.0'
   ws: '8.19.0'
-  zod: '4.3.6'
+  zod: '4.4.3'
   '@hocuspocus/extension-logger': '3.4.4'
   meilisearch: '0.57.0'
   marked: '18.0.3'
