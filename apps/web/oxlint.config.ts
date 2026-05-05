@@ -23,7 +23,8 @@ export default defineConfig({
   ],
   settings: {
     'better-tailwindcss': {
-      entryPoint: `${import.meta.dirname}/app/globals.css`,
+      entryPoint: 'app/globals.css',
+      cwd: import.meta.dirname,
     },
   },
 });
