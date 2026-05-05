@@ -22,7 +22,7 @@ services:
 
   note_redis:
     container_name: notopia-note_redis
-    image: redis:8.4.2-alpine3.22
+    image: redis:8.4.3-alpine3.22
     ports:
       - 6373:6379
 
