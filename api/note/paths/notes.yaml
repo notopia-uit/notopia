@@ -1,7 +1,10 @@
 # vim: ft=yaml.openapi
 post:
   security:
-    - Oauth2: []
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
   tags:
     - Note
   summary: Create note

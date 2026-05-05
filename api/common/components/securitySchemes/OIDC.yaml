@@ -1,0 +1,6 @@
+# vim: ft=yaml.openapi
+type: openIdConnect
+openIdConnectUrl: http://authentik.notopia.localhost/application/o/api-web/.well-known/openid-configuration
+description: OpenID Connect Security Scheme
+x-defaultClientId: api-web
+x-scalar-client-id: api-web

@@ -124,7 +124,9 @@ type MiddlewareFunc func(c *gin.Context)
 // CreateFolder operation middleware
 func (siw *ServerInterfaceWrapper) CreateFolder(c *gin.Context) {
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -151,7 +153,9 @@ func (siw *ServerInterfaceWrapper) PermanentlyDeleteFolder(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -178,7 +182,9 @@ func (siw *ServerInterfaceWrapper) RenameFolder(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -193,7 +199,9 @@ func (siw *ServerInterfaceWrapper) RenameFolder(c *gin.Context) {
 // CreateNote operation middleware
 func (siw *ServerInterfaceWrapper) CreateNote(c *gin.Context) {
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -220,7 +228,9 @@ func (siw *ServerInterfaceWrapper) PermanentlyDeleteNote(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -247,7 +257,9 @@ func (siw *ServerInterfaceWrapper) GetNote(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetNoteParams
@@ -285,7 +297,9 @@ func (siw *ServerInterfaceWrapper) GetNoteGraph(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetNoteGraphParams
@@ -323,7 +337,9 @@ func (siw *ServerInterfaceWrapper) GetNoteLinks(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetNoteLinksParams
@@ -369,7 +385,9 @@ func (siw *ServerInterfaceWrapper) PublishNote(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -396,7 +414,9 @@ func (siw *ServerInterfaceWrapper) RenameNote(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -423,7 +443,9 @@ func (siw *ServerInterfaceWrapper) UnpublishNote(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -438,7 +460,9 @@ func (siw *ServerInterfaceWrapper) UnpublishNote(c *gin.Context) {
 // CreateWorkspace operation middleware
 func (siw *ServerInterfaceWrapper) CreateWorkspace(c *gin.Context) {
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -465,7 +489,9 @@ func (siw *ServerInterfaceWrapper) GetWorkspace(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -492,7 +518,9 @@ func (siw *ServerInterfaceWrapper) CheckWorkspaceSlugExists(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -507,7 +535,9 @@ func (siw *ServerInterfaceWrapper) CheckWorkspaceSlugExists(c *gin.Context) {
 // GetMyWorkspaces operation middleware
 func (siw *ServerInterfaceWrapper) GetMyWorkspaces(c *gin.Context) {
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -534,7 +564,9 @@ func (siw *ServerInterfaceWrapper) DeleteWorkspace(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -561,7 +593,9 @@ func (siw *ServerInterfaceWrapper) ChangeWorkspaceSlug(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -588,7 +622,9 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -615,7 +651,9 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceGraph(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetWorkspaceGraphParams
@@ -653,7 +691,9 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceMembers(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -680,7 +720,9 @@ func (siw *ServerInterfaceWrapper) UpdateWorkspaceMembers(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -707,7 +749,9 @@ func (siw *ServerInterfaceWrapper) MoveWorkspaceItems(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -734,7 +778,9 @@ func (siw *ServerInterfaceWrapper) PermanentlyDeleteWorkspaceItems(c *gin.Contex
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -761,7 +807,9 @@ func (siw *ServerInterfaceWrapper) PublishWorkspace(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -788,7 +836,9 @@ func (siw *ServerInterfaceWrapper) RenameWorkspace(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -815,7 +865,9 @@ func (siw *ServerInterfaceWrapper) RestoreTrashedWorkspaceItems(c *gin.Context) 
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -842,7 +894,9 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceSearchToken(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -869,7 +923,9 @@ func (siw *ServerInterfaceWrapper) ShowTrash(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -896,7 +952,9 @@ func (siw *ServerInterfaceWrapper) TrashWorkspaceItems(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -923,7 +981,9 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceTree(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetWorkspaceTreeParams
@@ -977,7 +1037,9 @@ func (siw *ServerInterfaceWrapper) UnpublishWorkspace(c *gin.Context) {
 		return
 	}
 
-	c.Set(string(Oauth2Scopes), []string{})
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)

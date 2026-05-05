@@ -1,7 +1,10 @@
 # vim: ft=yaml.openapi
 get:
   security:
-    - Oauth2: []
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
   tags:
     - Note
   summary: Get note
@@ -34,7 +37,10 @@ get:
 
 delete:
   security:
-    - Oauth2: []
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
   tags:
     - Note
   summary: Permanently delete note

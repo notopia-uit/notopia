@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	OIDCScopes   oIDCContextKey   = "OIDC.Scopes"
 	Oauth2Scopes oauth2ContextKey = "Oauth2.Scopes"
 )
 
@@ -476,6 +477,9 @@ type NotFoundError = Error
 
 // UnauthorizedError defines model for UnauthorizedError.
 type UnauthorizedError = map[string]interface{}
+
+// oIDCContextKey is the context key for OIDC security scheme
+type oIDCContextKey string
 
 // oauth2ContextKey is the context key for Oauth2 security scheme
 type oauth2ContextKey string
