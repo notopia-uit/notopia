@@ -4,33 +4,3 @@ content:
   application/json:
     schema:
       type: object
-      description: The error response body returned when JWT validation or OPA authorization fails.
-      properties:
-        type:
-          type: string
-          description: The category of the error encountered during the middleware lifecycle.
-          enum:
-            - ExtractToken # Failed to find or parse the JWT from headers/cookies
-            - VerifyToken # Signature, expiration, or claims validation failed
-            - FetchJWKS # Failed to retrieve keys from the remote JKWS endpoint
-            - OPA # The Open Policy Agent query returned a denial
-          example: ExtractToken
-        details:
-          type: string
-          description: A descriptive message providing technical context for the failure.
-          x-examples:
-            - token not found
-            - Authorization header is empty
-            - token is expired
-            - failed to fetch JWKS
-            - opa policy denied
-          example: token not found
-        custom_message:
-          type: string
-          nullable: true
-          description: An optional, developer-defined message, often populated by OPA policy violations.
-          example: User does not have the required 'admin' role.
-      required:
-        - type
-        - details
-        - custom_message
