@@ -558,21 +558,10 @@ export type GetDocumentAttachmentUploadUrlErrors = {
      */
     400: DocumentError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -616,21 +605,10 @@ export type CommitDocumentErrors = {
      */
     400: DocumentError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -676,21 +654,10 @@ export type GetRevisionsErrors = {
      */
     400: DocumentError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -731,21 +698,10 @@ export type DeleteRevisionErrors = {
      */
     400: DocumentError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Forbidden Error response
@@ -787,21 +743,10 @@ export type GetRevisionWithContentErrors = {
      */
     400: DocumentError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Forbidden Error response
@@ -845,21 +790,10 @@ export type RenameRevisionErrors = {
      */
     400: DocumentError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -895,21 +829,10 @@ export type CreateFolderErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Internal Server Error response
@@ -941,21 +864,10 @@ export type PermanentlyDeleteFolderErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Forbidden Error response
@@ -999,21 +911,10 @@ export type RenameFolderErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -1049,21 +950,10 @@ export type CreateNoteErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Internal Server Error response
@@ -1095,21 +985,10 @@ export type PermanentlyDeleteNoteErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Forbidden Error response
@@ -1153,21 +1032,10 @@ export type GetNoteErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Forbidden Error response
@@ -1211,21 +1079,10 @@ export type GetNoteGraphErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Forbidden Error response
@@ -1270,21 +1127,10 @@ export type GetNoteLinksErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -1325,21 +1171,10 @@ export type PublishNoteErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -1379,21 +1214,10 @@ export type RenameNoteErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -1431,21 +1255,10 @@ export type UnpublishNoteErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -1483,21 +1296,10 @@ export type GetWorkspaceErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -1535,21 +1337,10 @@ export type CheckWorkspaceSlugExistsErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -1587,21 +1378,10 @@ export type CreateWorkspaceErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Internal Server Error response
@@ -1631,21 +1411,10 @@ export type GetMyWorkspacesErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Internal Server Error response
@@ -1679,21 +1448,10 @@ export type DeleteWorkspaceErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -1733,21 +1491,10 @@ export type ChangeWorkspaceSlugErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -1785,21 +1532,10 @@ export type GetWorkspaceEventsErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Internal Server Error response
@@ -1850,21 +1586,10 @@ export type GetWorkspaceGraphErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Forbidden Error response
@@ -1906,21 +1631,10 @@ export type GetWorkspaceMembersErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -1958,21 +1672,10 @@ export type UpdateWorkspaceMembersErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -2014,21 +1717,10 @@ export type MoveWorkspaceItemsErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -2069,21 +1761,10 @@ export type PermanentlyDeleteWorkspaceItemsErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -2121,21 +1802,10 @@ export type PublishWorkspaceErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -2175,21 +1845,10 @@ export type RenameWorkspaceErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -2230,21 +1889,10 @@ export type RestoreTrashedWorkspaceItemsErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -2282,21 +1930,10 @@ export type GetWorkspaceSearchTokenErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Forbidden Error response
@@ -2338,21 +1975,10 @@ export type ShowTrashErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -2396,21 +2022,10 @@ export type TrashWorkspaceItemsErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -2452,21 +2067,10 @@ export type GetWorkspaceTreeErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response
@@ -2504,21 +2108,10 @@ export type UnpublishWorkspaceErrors = {
      */
     400: NoteError;
     /**
-     * The error response body returned when JWT validation or OPA authorization fails.
+     * Unauthorized Error response
      */
     401: {
-        /**
-         * The category of the error encountered during the middleware lifecycle.
-         */
-        type: 'ExtractToken' | 'VerifyToken' | 'FetchJWKS' | 'OPA';
-        /**
-         * A descriptive message providing technical context for the failure.
-         */
-        details: string;
-        /**
-         * An optional, developer-defined message, often populated by OPA policy violations.
-         */
-        custom_message: string | null;
+        [key: string]: unknown;
     };
     /**
      * Not Found Error response

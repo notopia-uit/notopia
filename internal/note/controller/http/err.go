@@ -139,7 +139,7 @@ func strictHandlerError(c *gin.Context, err error) {
 	if cerr, ok := errors.AsType[errs.Error](err); ok {
 		message, code, statusCode = strictServerToHTTPErr(cerr)
 	} else {
-		message = err.Error()
+		message = "internal server error occured, please check log from server"
 		code = errs.CodeInternal.String()
 		statusCode = 500
 	}
