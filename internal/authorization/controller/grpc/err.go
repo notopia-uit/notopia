@@ -11,7 +11,7 @@ import (
 )
 
 func toGRPCError(err error) error {
-	if err, ok := errors.AsType[*errs.Err](err); ok {
+	if err, ok := errors.AsType[errs.Error](err); ok {
 		switch err.Code() {
 		case errs.CodeCasbinInternalError,
 			errs.CodeCasbinEnforcerError,
