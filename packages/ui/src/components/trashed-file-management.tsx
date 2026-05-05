@@ -1,5 +1,11 @@
 'use client';
-import { NoteTrashedFolder, NoteTrashedNote, showTrashOptions, useRestoreTrashedWorkspaceItemsMutation} from '@notopia-uit/api-gen';
+import {
+  NoteTrashedFolder,
+  NoteTrashedNote,
+  showTrashOptions,
+  useRestoreTrashedWorkspaceItemsMutation,
+  usePermanentlyDeleteWorkspaceItemsMutation
+} from '@notopia-uit/api-gen';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Checkbox } from '@notopia-uit/ui/components/shadcn/checkbox';
 import {
@@ -84,9 +90,6 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
-
-
-
   const displayData = useMemo(() => {
     const foldersMapped = trashedData.folders.map((folder) => ({
       ...folder,
@@ -105,6 +108,12 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     );
   }, [trashedData]);
 
+  const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey });
+      setSelectedItems(new Set());
+    }
+  });
 const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey });
@@ -122,7 +131,6 @@ const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorksp
     }
     setSelectedItems(newSelection);
   };
-
   const toggleAll = () => {
     if (selectedItems.size === displayData.length) {
       setSelectedItems(new Set());
@@ -140,9 +148,13 @@ const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorksp
             <Button
               variant="destructive"
               className="gap-0.5 space-x-0.5 border-white/10 bg-transparent text-zinc-300 hover:bg-white/5 hover:text-white"
+              onClick={() => deleteItems({path:{workspaceId:workspaceId}, body:{
+                noteIds: selectedItems.size > 0 ? Array.from(selectedItems).filter(id => displayData.find(item => item.id === id)?.displayType === 'Note') : trashedData.notes.map(note => note.id),
+                folderIds: selectedItems.size > 0 ? Array.from(selectedItems).filter(id => displayData.find(item => item.id === id)?.displayType === 'Folder') : trashedData.folders.map(folder => folder.id),
+              }})}
+              disabled={isDeleting}
             >
-              Empty Trash
-            </Button>
+              {isDeleting ? <Spinner /> : (selectedItems.size > 0 ? `Delete Permanently (${selectedItems.size})` : 'Empty Trash')}            </Button>
             {selectedItems.size > 0 && (
               <Button className="bg-blue-600 text-white hover:bg-blue-700"
                 onClick= {() =>
