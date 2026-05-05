@@ -1,5 +1,5 @@
 'use client';
-import { NoteTrashedFolder, NoteTrashedNote, showTrashOptions } from '@notopia-uit/api-gen';
+import { NoteTrashedFolder, NoteTrashedNote, showTrashOptions, useRestoreTrashedWorkspaceItemsMutation} from '@notopia-uit/api-gen';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Checkbox } from '@notopia-uit/ui/components/shadcn/checkbox';
 import {
@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@notopia-uit/ui/components/shadcn/dropdown-menu';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import {
   Table,
   TableBody,
@@ -16,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@notopia-uit/ui/components/shadcn/table';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { FileText, Folder, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
@@ -75,12 +76,16 @@ const formatDate = (isoString: string) => {
 };
 
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
+  const queryClient =useQueryClient();
   const { data: trashedData } = useSuspenseQuery({
     ...showTrashOptions({ path: { workspaceId: workspaceId } }),
     select: (data) => mapDtoTrashedData(data),
   });
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+
+
+
 
   const displayData = useMemo(() => {
     const foldersMapped = trashedData.folders.map((folder) => ({
@@ -100,6 +105,14 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     );
   }, [trashedData]);
 
+const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey });
+      setSelectedItems(new Set());
+    }
+  }
+
+  )
   const toggleSelection = (id: string) => {
     const newSelection = new Set(selectedItems);
     if (newSelection.has(id)) {
@@ -131,7 +144,14 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
               Empty Trash
             </Button>
             {selectedItems.size > 0 && (
-              <Button className="bg-blue-600 text-white hover:bg-blue-700">Restore Selected</Button>
+              <Button className="bg-blue-600 text-white hover:bg-blue-700"
+                onClick= {() =>
+              restoreItems({path:{
+                workspaceId: workspaceId,
+              },body:{
+                noteIds: Array.from(selectedItems).filter(id => displayData.find(item => item.id === id)?.displayType === 'Note'),
+                folderIds: Array.from(selectedItems).filter(id => displayData.find(item => item.id === id)?.displayType === 'Folder'),
+              }})} disabled={isRestoring}>{isRestoring? <Spinner></Spinner> : 'Restore Selected'}</Button>
             )}
           </div>
         </div>
