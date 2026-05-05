@@ -160,6 +160,7 @@ lsp.config("oxfmt", {
 
 lsp.enable({
   "ecfg",
+  "gh_actions_ls",
   "golangci_lint_ls",
   "gopls",
   "harper_ls",
