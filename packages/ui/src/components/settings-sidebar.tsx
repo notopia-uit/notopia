@@ -12,6 +12,7 @@ interface SettingsSidebarProps {
 export function SettingsSidebar({ workspaceId }: SettingsSidebarProps) {
   const pathname = usePathname();
 
+  //TODO: This can be moved to a separate file if we want to reuse it in the future
   const navItems = [
     {
       name: 'General',
