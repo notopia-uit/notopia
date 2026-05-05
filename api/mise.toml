@@ -1,0 +1,5 @@
+[shell_alias]
+redocly = "pnpm run redocly"
+scalar = "pnpm run scalar"
+openapi-ts = "pnpm run openapi-ts"
+openapi-generator-cli = "pnpm run openapi-generator-cli"
