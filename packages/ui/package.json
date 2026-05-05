@@ -32,7 +32,8 @@
     "react-complex-tree": "^2.6.1",
     "react-day-picker": "^9.14.0",
     "shadcn": "catalog:",
-    "yjs": "catalog:"
+    "yjs": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "autoprefixer": "catalog:",

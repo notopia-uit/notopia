@@ -61,6 +61,7 @@ export default function Editor({ noteId }: { noteId: string }) {
             // onClick={async () => {
             //   await saveContent(editor.document);
             // }}
+            //
           >
             <Icons.Save />
           </Button>
