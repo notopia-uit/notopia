@@ -18,6 +18,10 @@ java = "26.0.1"
 mockery = "3.7.0"
 d2 = "0.7.1"
 
+[tools."http:plantuml"]
+version = "1.2026.2"
+url = "https://github.com/plantuml/plantuml/releases/download/v{{ version }}/plantuml.jar"
+
 [tools."http:kroki"]
 url = "https://github.com/yuzutech/kroki/releases/download/v{{ version }}/kroki-standalone-server-v{{ version }}.jar"
 version = "0.30.1"
