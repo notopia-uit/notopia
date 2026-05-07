@@ -120,6 +120,23 @@ lsp.config("tsgo", {
   end,
 })
 
+lsp.config.nestjs_doctor = {
+  name = "nestjs_doctor",
+  cmd = { "nestjs-doctor-lsp" },
+  root_dir = function(_, on_dir)
+    on_dir(root)
+  end,
+  workspace_required = true,
+  init_options = {
+    nestjsDoctor = {
+      enable = true,
+      scanOnSave = true,
+      scanOnOpen = true,
+      debounceMs = 200,
+    },
+  },
+}
+
 lsp.config("oxlint", {
   cmd = { "oxlint", "--lsp" },
   root_dir = function(_, on_dir)
@@ -127,11 +144,66 @@ lsp.config("oxlint", {
   end,
   init_options = {
     {
-      workspaceUri = uri_root,
+      workspaceUri = string.format("%s/packages/ui", uri_root),
       options = {
         fixKind = "all",
-        typeAware = true,
       },
+    },
+    {
+      workspaceUri = string.format("%s/packages/lib", uri_root),
+      options = {
+        fixKind = "all",
+      },
+    },
+    {
+      workspaceUri = string.format("%s/apps/web", uri_root),
+      options = {
+        fixKind = "all",
+      },
+    },
+    {
+      workspaceUri = string.format("%s/apps/api-web", uri_root),
+      options = {
+        fixKind = "all",
+      },
+    },
+    {
+      workspaceUri = string.format("%s/apps/document", uri_root),
+      options = {
+        fixKind = "all",
+      },
+    },
+    {
+      workspaceUri = string.format("%s/apps/search-worker", uri_root),
+      options = {
+        fixKind = "all",
+      },
+    },
+  },
+  workspace_folders = {
+    {
+      name = "ui",
+      uri = string.format("%s/packages/ui", uri_root),
+    },
+    {
+      name = "lib",
+      uri = string.format("%s/packages/lib", uri_root),
+    },
+    {
+      name = "web",
+      uri = string.format("%s/apps/web", uri_root),
+    },
+    {
+      name = "api-web",
+      uri = string.format("%s/apps/api-web", uri_root),
+    },
+    {
+      name = "document",
+      uri = string.format("%s/apps/document", uri_root),
+    },
+    {
+      name = "search-worker",
+      uri = string.format("%s/apps/search-worker", uri_root),
     },
   },
   on_attach = function(client, bufnr)
@@ -167,6 +239,7 @@ lsp.enable({
   "jsonls",
   "jsonls",
   "lua_ls",
+  "nestjs_doctor",
   "nxls",
   "oxfmt",
   "oxlint",

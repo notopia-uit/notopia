@@ -24,6 +24,6 @@ export class DocumentApi extends DocumentApiDefinition {
     if (!user) {
       throw new UnauthorizedException('User not authenticated');
     }
-    return await this.documentService.getAttachmentUploadUrl(documentId, user.id);
+    return this.documentService.getAttachmentUploadUrl(documentId, user.id);
   }
 }

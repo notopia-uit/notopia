@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import { readFile, readdir } from 'fs/promises';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -21,7 +21,7 @@ export default class DocumentSeeder implements Seeder {
     const documentRepo = dataSource.getRepository(DocumentEntity);
     const seedDataDir = path.join(__dirname, '../seed-data');
 
-    const files = fs.readdirSync(seedDataDir).filter((file) => file.endsWith('.md'));
+    const files = (await readdir(seedDataDir)).filter((file) => file.endsWith('.md'));
 
     console.log(`Found ${files.length} markdown files to seed`);
 
@@ -38,7 +38,7 @@ export default class DocumentSeeder implements Seeder {
   ): Promise<void> {
     try {
       const filePath = path.join(seedDataDir, fileName);
-      const content = fs.readFileSync(filePath, 'utf-8');
+      const content = await readFile(filePath, 'utf-8');
 
       const id = fileName.replace('.md', '');
 

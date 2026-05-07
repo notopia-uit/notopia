@@ -18,7 +18,7 @@ export class AuthorizationService implements OnModuleInit {
   private authorizationServiceClient!: AuthorizationServiceClient;
 
   constructor(
-    @Inject(AUTHORIZATION_PACKAGE_NAME) private client: ClientGrpc,
+    @Inject(AUTHORIZATION_PACKAGE_NAME) private readonly client: ClientGrpc,
     private readonly noteService: NoteService
   ) {}
 
