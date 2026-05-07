@@ -44,6 +44,7 @@ lsp.config("gopls", {
 } --[[@as vim.lsp.Config]])
 
 lsp.config("tailwindcss", {
+  cmd = { "tailwindcss-language-server", "--stdio" },
   root_dir = function(bufnr, on_dir)
     local fname = vim.api.nvim_buf_get_name(bufnr)
     local allowed_paths = {
@@ -77,7 +78,7 @@ lsp.config("tailwindcss", {
 } --[[@as vim.lsp.Config]])
 
 lsp.config("twcssls", {
-  cmd = { "css-language-server", "--stdio" },
+  cmd = { "mise", "exec", "npm@tailwindcss/language-server", "--", "css-language-server", "--stdio" },
   root_dir = function(_, on_dir)
     on_dir(root)
   end,
@@ -94,7 +95,7 @@ lsp.config("twcssls", {
 } --[[@as vim.lsp.Config]])
 
 lsp.config("tsgo", {
-  cmd = { "tsgo", "--lsp", "--stdio" },
+  cmd = { "./node_modules/.bin/tsgo", "--lsp", "--stdio" },
   root_dir = function(_, on_dir)
     on_dir(root)
   end,
@@ -156,7 +157,7 @@ lsp.config.nestjs_doctor = {
 }
 
 lsp.config("oxlint", {
-  cmd = { "oxlint", "--lsp" },
+  cmd = { "./node_modules/.bin/oxlint", "--lsp" },
   root_dir = function(_, on_dir)
     on_dir(root)
   end,
@@ -245,7 +246,7 @@ lsp.config("oxlint", {
 } --[[@as vim.lsp.Config]])
 
 lsp.config("oxfmt", {
-  cmd = { "oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" },
+  cmd = { "./node_modules/.bin/oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" },
   root_dir = function(_, on_dir)
     on_dir(root)
   end,
