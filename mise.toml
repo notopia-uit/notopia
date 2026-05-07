@@ -19,7 +19,7 @@ pnpm = "10.33.3"
 sqlc = "1.31.1"
 java = "26.0.1"
 mockery = "3.7.0"
-"aqua:go-delve/delve" = "1.26.3"
+"github:go-delve/delve" = "1.26.3"
 d2 = "0.7.1"
 "npm:@tailwindcss/language-server" = "0.14.29"
 
