@@ -21,7 +21,6 @@ export default async function WorkspaceGeneralSettingsPage({
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <GeneralSettings workspaceId={workspaceId} />
-      );
     </HydrationBoundary>
   );
 }

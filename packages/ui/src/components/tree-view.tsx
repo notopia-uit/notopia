@@ -198,12 +198,15 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   const router = useRouter();
   const tree = useRef<TreeRef>(null);
 
-  const onRenameError = () => {
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const onRenameError = useCallback(() => {
     setShowErrorAlert(true);
-    setTimeout(() => {
-      setShowErrorAlert(false);
-    }, 3000);
-  };
+  }, []);
+  useEffect(() => {
+    if (!showErrorAlert) return;
+    const timer = setTimeout(() => setShowErrorAlert(false), 3000);
+    return () => clearTimeout(timer);
+  }, [showErrorAlert]);
   const { mutate: renameNote } = useRenameNoteMutation({
     onError: onRenameError,
   });
@@ -211,7 +214,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     onError: onRenameError,
   });
 
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
 
@@ -221,6 +223,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   }, [workspaceTreeData]);
 
   const dataProvider = useMemo(() => new TreeDataProvider<string>(items), [items]);
+  //TODO: call API to update tree data on drop
   const onDrop = useCallback((draggedItems: TreeItem<string>[], target: DraggingPosition) => {
     setItems((prevItems) => {
       const newItems = { ...prevItems };
@@ -269,6 +272,9 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     });
   }, []);
 
+  // NOTE: some problem with api contract, check this later
+  //TODO: call API to create new item and update tree data with response
+  // Maybe this logic need to be checked
   const handleCreateItem = useCallback(
     (isFolder: boolean) => {
       setItems((prevItems) => {
@@ -490,7 +496,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
               </div>
             );
           }}
-          renderLiveDescriptorContainer={({}) => <></>}
+          renderLiveDescriptorContainer={({ }) => <></>}
           renderItemsContainer={({ children, containerProps }) => {
             return <ul {...containerProps}>{children}</ul>;
           }}

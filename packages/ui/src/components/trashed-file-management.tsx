@@ -81,6 +81,7 @@ const formatDate = (isoString: string) => {
   }).format(date);
 };
 
+//TODO: add dialog onSuccess and onError for delete and restore action, also add confirm dialog when user click delete permanently or empty trash
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient();
   const { data: trashedData } = useSuspenseQuery({
@@ -142,7 +143,34 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       setSelectedItems(new Set(displayData.map((item) => item.id)));
     }
   };
-
+  const handleRestoreSelected = () => {
+    const noteIds: string[] = [];
+    const folderIds: string[] = [];
+    for (const item of displayData) {
+      if (!selectedItems.has(item.id)) continue;
+      if (item.displayType === 'Note') noteIds.push(item.id);
+      else folderIds.push(item.id);
+    }
+    restoreItems({
+      path: { workspaceId },
+      body: { noteIds, folderIds },
+    });
+  };
+  const handleDeleteSelected = () => {
+    const noteIds: string[] = [];
+    const folderIds: string[] = [];
+    if (selectedItems.size > 0) {
+      for (const item of displayData) {
+        if (!selectedItems.has(item.id)) continue;
+        if (item.displayType === 'Note') noteIds.push(item.id);
+        else folderIds.push(item.id);
+      }
+    } else {
+      noteIds.push(...trashedData.notes.map((n) => n.id));
+      folderIds.push(...trashedData.folders.map((f) => f.id));
+    }
+    deleteItems({ path: { workspaceId }, body: { noteIds, folderIds } });
+  };
   return (
     <div className="w-full font-sans text-zinc-300">
       <div className="w-full">
@@ -152,27 +180,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
             <Button
               variant="destructive"
               className="gap-0.5 space-x-0.5 border-white/10 bg-transparent text-zinc-300 hover:bg-white/5 hover:text-white"
-              onClick={() =>
-                deleteItems({
-                  path: { workspaceId: workspaceId },
-                  body: {
-                    noteIds:
-                      selectedItems.size > 0
-                        ? Array.from(selectedItems).filter(
-                            (id) =>
-                              displayData.find((item) => item.id === id)?.displayType === 'Note'
-                          )
-                        : trashedData.notes.map((note) => note.id),
-                    folderIds:
-                      selectedItems.size > 0
-                        ? Array.from(selectedItems).filter(
-                            (id) =>
-                              displayData.find((item) => item.id === id)?.displayType === 'Folder'
-                          )
-                        : trashedData.folders.map((folder) => folder.id),
-                  },
-                })
-              }
+              onClick={handleDeleteSelected}
               disabled={isDeleting}
             >
               {isDeleting ? (
@@ -186,21 +194,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
             {selectedItems.size > 0 && (
               <Button
                 className="bg-blue-600 text-white hover:bg-blue-700"
-                onClick={() =>
-                  restoreItems({
-                    path: {
-                      workspaceId: workspaceId,
-                    },
-                    body: {
-                      noteIds: Array.from(selectedItems).filter(
-                        (id) => displayData.find((item) => item.id === id)?.displayType === 'Note'
-                      ),
-                      folderIds: Array.from(selectedItems).filter(
-                        (id) => displayData.find((item) => item.id === id)?.displayType === 'Folder'
-                      ),
-                    },
-                  })
-                }
+                onClick={handleRestoreSelected}
                 disabled={isRestoring}
               >
                 {isRestoring ? <Spinner></Spinner> : 'Restore Selected'}
@@ -248,9 +242,8 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Icon
-                        className={`size-5 ${
-                          item.displayType === 'Folder' ? `text-blue-400` : `text-zinc-400`
-                        }`}
+                        className={`size-5 ${item.displayType === 'Folder' ? `text-blue-400` : `text-zinc-400`
+                          }`}
                       />
                       <span className="font-medium text-zinc-200">{item.name}</span>
                     </div>

@@ -37,6 +37,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from './shadcn/dialog';
 import {
   DropdownMenu,
@@ -108,6 +109,14 @@ export function CreateWorkspaceDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <DropdownMenuItem className="gap-2 p-2" onSelect={(e) => e.preventDefault()}>
+          <div className="bg-background flex size-6 items-center justify-center rounded-md border">
+            <Plus className="size-4" />
+          </div>
+          <span className="text-muted-foreground font-medium">Add workspace</span>
+        </DropdownMenuItem>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-106.25">
         <form onSubmit={handleSubmit}>
           <DialogHeader>

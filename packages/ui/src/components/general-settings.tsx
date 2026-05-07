@@ -6,7 +6,7 @@ import { Separator } from '@notopia-uit/ui/components/shadcn/separator';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { CheckCircle2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from './shadcn/alert';
 import {
@@ -34,14 +34,21 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
   );
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
+  const hideAlertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { mutate: renameWorkspace, isPending: isRenaming } = useRenameWorkspaceMutation({
     onSuccess: () => {
       setShowSuccessAlert(true);
-      setTimeout(() => {
+      if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
+      hideAlertTimerRef.current = setTimeout(() => {
         setShowSuccessAlert(false);
       }, 3000);
     },
   });
+  useEffect(() => {
+    return () => {
+      if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
+    };
+  }, []);
   return (
     <div className="space-y-8">
       <div className="space-y-4">
