@@ -25,7 +25,7 @@ local uri_root = vim.uri_from_fname(root)
 --       },
 --     },
 --   },
--- })
+-- } --[[@as vim.lsp.Config]])
 
 lsp.config("gopls", {
   ---@module 'lspconfig'
@@ -41,7 +41,7 @@ lsp.config("gopls", {
   root_dir = function(_, on_dir)
     on_dir(root)
   end,
-})
+} --[[@as vim.lsp.Config]])
 
 lsp.config("tailwindcss", {
   root_dir = function(bufnr, on_dir)
@@ -74,7 +74,7 @@ lsp.config("tailwindcss", {
       },
     },
   },
-})
+} --[[@as vim.lsp.Config]])
 
 lsp.config("twcssls", {
   cmd = { "css-language-server", "--stdio" },
@@ -91,7 +91,7 @@ lsp.config("twcssls", {
       uri = string.format("%s/packages/ui", uri_root),
     },
   },
-})
+} --[[@as vim.lsp.Config]])
 
 lsp.config("tsgo", {
   cmd = { "tsgo", "--lsp", "--stdio" },
@@ -118,12 +118,28 @@ lsp.config("tsgo", {
     client.server_capabilities.documentFormattingProvider = false
     client.server_capabilities.documentRangeFormattingProvider = false
   end,
-})
+} --[[@as vim.lsp.Config]])
 
 lsp.config.nestjs_doctor = {
   name = "nestjs_doctor",
   cmd = { "nestjs-doctor-lsp" },
-  root_dir = function(_, on_dir)
+  filetypes = { "typescript" },
+  root_dir = function(bufnr, on_dir)
+    local fname = vim.api.nvim_buf_get_name(bufnr)
+    local allowed_paths = {
+      "apps/document",
+      "apps/search-worker",
+    }
+    local is_allowed = false
+    for _, path in ipairs(allowed_paths) do
+      if fname:match(path) then
+        is_allowed = true
+        break
+      end
+    end
+    if not is_allowed then
+      return
+    end
     on_dir(root)
   end,
   workspace_required = true,
@@ -132,8 +148,10 @@ lsp.config.nestjs_doctor = {
       enable = true,
       scanOnSave = true,
       scanOnOpen = true,
-      debounceMs = 200,
     },
+  },
+  flags = {
+    debounce_text_changes = 2000,
   },
 }
 
@@ -221,14 +239,17 @@ lsp.config("oxlint", {
       command = "LspOxlintFixAll",
     })
   end,
-})
+  flags = {
+    debounce_text_changes = 1000,
+  },
+} --[[@as vim.lsp.Config]])
 
 lsp.config("oxfmt", {
   cmd = { "oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" },
   root_dir = function(_, on_dir)
     on_dir(root)
   end,
-})
+} --[[@as vim.lsp.Config]])
 
 lsp.enable({
   "ecfg",
