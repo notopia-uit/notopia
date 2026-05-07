@@ -38,8 +38,9 @@ export default defineConfig({
   ignorePatterns: ['**/shadcn/**'],
   settings: {
     'better-tailwindcss': {
-      entryPoint: `${import.meta.dirname}/src/globals.css`,
-      tsconfig: `${import.meta.dirname}/tsconfig.lib.json`,
+      entryPoint: 'src/globals.css',
+      tsconfig: 'tsconfig.lib.json',
+      cwd: import.meta.dirname,
       detectComponentClasses: true, // may oxlint doesnt work
     },
   },

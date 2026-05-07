@@ -1,7 +1,10 @@
 # vim: ft=yaml.openapi
 get:
   security:
-    - Oauth2: []
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
   tags:
     - Document
   summary: Get document attachment upload url

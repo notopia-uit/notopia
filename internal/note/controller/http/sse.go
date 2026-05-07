@@ -96,12 +96,12 @@ func (s *workspaceEventSSESender) Stream() {
 			select {
 			case <-s.ctx.Done():
 				if err := s.writer.Close(); err != nil {
-					slog.Warn("failed to close SSE writer", "error", err)
+					slog.Warn("failed to close SSE writer", slog.Any("error", err))
 				}
 				return
 			case <-ticker.C:
 				if err := s.sendHeartBeat(); err != nil {
-					slog.Warn("failed to send heartbeat", "error", err)
+					slog.Warn("failed to send heartbeat", slog.Any("error", err))
 				}
 				slog.Debug("sent heartbeat")
 				continue

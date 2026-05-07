@@ -3,6 +3,7 @@ package otel
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/notopia-uit/notopia/pkg/metadata"
@@ -27,8 +28,18 @@ func NewLoggerProvider(
 	)
 
 	cleanup := func() {
-		if err := lp.Shutdown(context.Background()); err != nil {
-			slog.Error(
+		ctx := context.Background()
+		if timeoutCtx, err := context.WithTimeout(ctx, 5*time.Second); err == nil {
+			slog.WarnContext(
+				ctx,
+				"cannot create timeout context for LoggerProvider shutdown, using background context instead",
+				slog.Any("error", err),
+			)
+			ctx = timeoutCtx
+		}
+		if err := lp.Shutdown(ctx); err != nil {
+			slog.ErrorContext(
+				ctx,
 				"Error shutting down LoggerProvider",
 				slog.Any("error", err),
 			)
@@ -56,6 +67,7 @@ var ProvideSlogHandler = NewSlogHandler
 
 func MapSlogToGRPCMiddlewareLogger(l *slog.Logger) logging.Logger {
 	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
+		//nolint:sloglint
 		l.Log(ctx, slog.Level(lvl), msg, fields...)
 	})
 }

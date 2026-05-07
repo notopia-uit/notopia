@@ -54,7 +54,14 @@
       "get": {
         "security": [
           {
-            "document_Oauth2": []
+            "document_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "document_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -114,7 +121,14 @@
       "get": {
         "security": [
           {
-            "document_Oauth2": []
+            "document_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "document_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -150,7 +164,14 @@
       "get": {
         "security": [
           {
-            "document_Oauth2": []
+            "document_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "document_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -214,7 +235,14 @@
       "get": {
         "security": [
           {
-            "document_Oauth2": []
+            "document_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "document_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -944,7 +972,14 @@
       "delete": {
         "security": [
           {
-            "document_Oauth2": []
+            "document_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "document_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -983,7 +1018,14 @@
       "post": {
         "security": [
           {
-            "document_Oauth2": []
+            "document_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "document_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -1037,7 +1079,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -1085,7 +1134,14 @@
       "delete": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -1124,7 +1180,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -1178,7 +1241,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -1226,7 +1296,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -1279,7 +1356,14 @@
       "delete": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -1318,7 +1402,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10010,7 +10101,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10085,7 +10183,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10121,7 +10226,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10175,7 +10287,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10211,7 +10330,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10254,7 +10380,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10293,7 +10426,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10341,7 +10481,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10379,7 +10526,14 @@
       "delete": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10415,7 +10569,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10469,7 +10630,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -10539,7 +10707,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19230,7 +19405,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19274,7 +19456,14 @@
       "put": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19323,7 +19512,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19389,7 +19585,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19449,7 +19652,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19485,7 +19695,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19539,7 +19756,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19599,7 +19823,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19645,7 +19876,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19706,7 +19944,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19766,7 +20011,14 @@
       "get": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -19835,7 +20087,14 @@
       "post": {
         "security": [
           {
-            "note_Oauth2": []
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
           }
         ],
         "tags": [
@@ -21378,6 +21637,13 @@
       }
     },
     "securitySchemes": {
+      "document_OIDC": {
+        "type": "openIdConnect",
+        "openIdConnectUrl": "http://authentik.notopia.localhost/application/o/api-web/.well-known/openid-configuration",
+        "description": "OpenID Connect Security Scheme",
+        "x-defaultClientId": "api-web",
+        "x-scalar-client-id": "api-web"
+      },
       "document_Oauth2": {
         "type": "oauth2",
         "description": "OAuth2 Security Scheme",
@@ -21387,14 +21653,38 @@
             "tokenUrl": "http://authentik.notopia.localhost/application/o/token/",
             "scopes": {
               "openid": "Required for OIDC",
-              "profile": "Access to user profile"
+              "profile": "Access to user profile",
+              "email": "Access to user email"
             },
             "x-defaultClientId": "api-web",
             "x-scalar-client-id": "api-web",
             "x-usePkce": "SHA-256",
             "x-scalar-credentials-location": "header"
+          },
+          "password": {
+            "tokenUrl": "http://authentik.notopia.localhost/application/o/token/",
+            "scopes": {
+              "openid": "Required for OIDC",
+              "profile": "Access to user profile",
+              "email": "Access to user email"
+            },
+            "x-default-scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "x-defaultClientId": "api-web",
+            "x-scalar-client-id": "api-web",
+            "x-scalar-credentials-location": "body"
           }
         }
+      },
+      "note_OIDC": {
+        "type": "openIdConnect",
+        "openIdConnectUrl": "http://authentik.notopia.localhost/application/o/api-web/.well-known/openid-configuration",
+        "description": "OpenID Connect Security Scheme",
+        "x-defaultClientId": "api-web",
+        "x-scalar-client-id": "api-web"
       },
       "note_Oauth2": {
         "type": "oauth2",
@@ -21405,12 +21695,29 @@
             "tokenUrl": "http://authentik.notopia.localhost/application/o/token/",
             "scopes": {
               "openid": "Required for OIDC",
-              "profile": "Access to user profile"
+              "profile": "Access to user profile",
+              "email": "Access to user email"
             },
             "x-defaultClientId": "api-web",
             "x-scalar-client-id": "api-web",
             "x-usePkce": "SHA-256",
             "x-scalar-credentials-location": "header"
+          },
+          "password": {
+            "tokenUrl": "http://authentik.notopia.localhost/application/o/token/",
+            "scopes": {
+              "openid": "Required for OIDC",
+              "profile": "Access to user profile",
+              "email": "Access to user email"
+            },
+            "x-default-scopes": [
+              "openid",
+              "profile",
+              "email"
+            ],
+            "x-defaultClientId": "api-web",
+            "x-scalar-client-id": "api-web",
+            "x-scalar-credentials-location": "body"
           }
         }
       }
@@ -21518,44 +21825,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "description": "The error response body returned when JWT validation or OPA authorization fails.",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "description": "The category of the error encountered during the middleware lifecycle.",
-                  "enum": [
-                    "ExtractToken",
-                    "VerifyToken",
-                    "FetchJWKS",
-                    "OPA"
-                  ],
-                  "example": "ExtractToken"
-                },
-                "details": {
-                  "type": "string",
-                  "description": "A descriptive message providing technical context for the failure.",
-                  "x-examples": [
-                    "token not found",
-                    "Authorization header is empty",
-                    "token is expired",
-                    "failed to fetch JWKS",
-                    "opa policy denied"
-                  ],
-                  "example": "token not found"
-                },
-                "custom_message": {
-                  "type": "string",
-                  "nullable": true,
-                  "description": "An optional, developer-defined message, often populated by OPA policy violations.",
-                  "example": "User does not have the required 'admin' role."
-                }
-              },
-              "required": [
-                "type",
-                "details",
-                "custom_message"
-              ]
+              "type": "object"
             }
           }
         }
@@ -21625,44 +21895,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "description": "The error response body returned when JWT validation or OPA authorization fails.",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "description": "The category of the error encountered during the middleware lifecycle.",
-                  "enum": [
-                    "ExtractToken",
-                    "VerifyToken",
-                    "FetchJWKS",
-                    "OPA"
-                  ],
-                  "example": "ExtractToken"
-                },
-                "details": {
-                  "type": "string",
-                  "description": "A descriptive message providing technical context for the failure.",
-                  "x-examples": [
-                    "token not found",
-                    "Authorization header is empty",
-                    "token is expired",
-                    "failed to fetch JWKS",
-                    "opa policy denied"
-                  ],
-                  "example": "token not found"
-                },
-                "custom_message": {
-                  "type": "string",
-                  "nullable": true,
-                  "description": "An optional, developer-defined message, often populated by OPA policy violations.",
-                  "example": "User does not have the required 'admin' role."
-                }
-              },
-              "required": [
-                "type",
-                "details",
-                "custom_message"
-              ]
+              "type": "object"
             }
           }
         }

@@ -44,10 +44,11 @@ return {
     ---@module 'mason-lspconfig'
     ---@type MasonLspconfigSettings
     opts = {
-      automatic_enable = {
-        exclude = { "eslint" },
-      },
+      automatic_enable = false,
     },
     optional = true,
+  },
+  {
+    "neovim/nvim-lspconfig",
   },
 }

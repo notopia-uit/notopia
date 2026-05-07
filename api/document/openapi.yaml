@@ -39,6 +39,8 @@ paths:
 
 components:
   securitySchemes:
+    OIDC:
+      $ref: ../common/components/securitySchemes/OIDC.yaml
     Oauth2:
       $ref: ../common/components/securitySchemes/Oauth2.yaml
 

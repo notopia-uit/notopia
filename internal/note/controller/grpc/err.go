@@ -12,7 +12,7 @@ import (
 )
 
 func toGRPCError(err error) error {
-	if cerr, ok := errors.AsType[*errs.Err](err); ok {
+	if cerr, ok := errors.AsType[errs.Error](err); ok {
 		switch cerr.Code() {
 		case errs.CodeUnauthorized:
 			return status.Error(codes.Unauthenticated, cerr.Error())

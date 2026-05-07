@@ -34,7 +34,7 @@ export const getDocumentAttachmentUploadUrl = <ThrowOnError extends boolean = fa
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zGetDocumentAttachmentUploadUrlResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/document/documents/{documentId}/attachment-url',
     ...options
 });
@@ -49,7 +49,7 @@ export const commitDocument = <ThrowOnError extends boolean = false>(options: Op
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zCommitDocumentResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/document/documents/{documentId}/commit',
     ...options
 });
@@ -65,7 +65,7 @@ export const getRevisions = <ThrowOnError extends boolean = false>(options: Opti
     }).parseAsync(data),
     responseTransformer: getRevisionsResponseTransformer,
     responseValidator: async (data) => await zGetRevisionsResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/document/revisions',
     ...options
 });
@@ -80,7 +80,7 @@ export const deleteRevision = <ThrowOnError extends boolean = false>(options: Op
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zDeleteRevisionResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/document/revisions/{revisionId}',
     ...options
 });
@@ -96,7 +96,7 @@ export const getRevisionWithContent = <ThrowOnError extends boolean = false>(opt
     }).parseAsync(data),
     responseTransformer: getRevisionWithContentResponseTransformer,
     responseValidator: async (data) => await zGetRevisionWithContentResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/document/revisions/{revisionId}',
     ...options
 });
@@ -111,7 +111,7 @@ export const renameRevision = <ThrowOnError extends boolean = false>(options: Op
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zRenameRevisionResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/document/revisions/{revisionId}/rename',
     ...options,
     headers: {
@@ -129,7 +129,7 @@ export const createFolder = <ThrowOnError extends boolean = false>(options: Opti
         path: z.never().optional(),
         query: z.never().optional()
     }).parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/folders',
     ...options,
     headers: {
@@ -148,7 +148,7 @@ export const permanentlyDeleteFolder = <ThrowOnError extends boolean = false>(op
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zPermanentlyDeleteFolderResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/folders/{folderId}',
     ...options
 });
@@ -163,7 +163,7 @@ export const renameFolder = <ThrowOnError extends boolean = false>(options: Opti
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zRenameFolderResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/folders/{folderId}/rename',
     ...options,
     headers: {
@@ -181,7 +181,7 @@ export const createNote = <ThrowOnError extends boolean = false>(options: Option
         path: z.never().optional(),
         query: z.never().optional()
     }).parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/notes',
     ...options,
     headers: {
@@ -200,7 +200,7 @@ export const permanentlyDeleteNote = <ThrowOnError extends boolean = false>(opti
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zPermanentlyDeleteNoteResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/notes/{noteId}',
     ...options
 });
@@ -216,7 +216,7 @@ export const getNote = <ThrowOnError extends boolean = false>(options: Options<G
     }).parseAsync(data),
     responseTransformer: getNoteResponseTransformer,
     responseValidator: async (data) => await zGetNoteResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/notes/{noteId}',
     ...options
 });
@@ -231,7 +231,7 @@ export const getNoteGraph = <ThrowOnError extends boolean = false>(options: Opti
         query: zGetNoteGraphQuery.optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zGetNoteGraphResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/notes/{noteId}/graph',
     ...options
 });
@@ -246,7 +246,7 @@ export const getNoteLinks = <ThrowOnError extends boolean = false>(options: Opti
         query: zGetNoteLinksQuery.optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zGetNoteLinksResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/notes/{noteId}/links',
     ...options
 });
@@ -261,7 +261,7 @@ export const publishNote = <ThrowOnError extends boolean = false>(options: Optio
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zPublishNoteResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/notes/{noteId}/publish',
     ...options
 });
@@ -276,7 +276,7 @@ export const renameNote = <ThrowOnError extends boolean = false>(options: Option
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zRenameNoteResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/notes/{noteId}/rename',
     ...options,
     headers: {
@@ -295,7 +295,7 @@ export const unpublishNote = <ThrowOnError extends boolean = false>(options: Opt
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zUnpublishNoteResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/notes/{noteId}/unpublish',
     ...options
 });
@@ -310,7 +310,7 @@ export const getWorkspace = <ThrowOnError extends boolean = false>(options: Opti
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zGetWorkspaceResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces-by-slug/{workspaceSlug}',
     ...options
 });
@@ -324,7 +324,7 @@ export const checkWorkspaceSlugExists = <ThrowOnError extends boolean = false>(o
         path: zCheckWorkspaceSlugExistsPath,
         query: z.never().optional()
     }).parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces-by-slug/{workspaceSlug}/exists',
     ...options
 });
@@ -338,7 +338,7 @@ export const createWorkspace = <ThrowOnError extends boolean = false>(options: O
         path: z.never().optional(),
         query: z.never().optional()
     }).parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces',
     ...options,
     headers: {
@@ -357,7 +357,7 @@ export const getMyWorkspaces = <ThrowOnError extends boolean = false>(options?: 
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zGetMyWorkspacesResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/me',
     ...options
 });
@@ -372,7 +372,7 @@ export const deleteWorkspace = <ThrowOnError extends boolean = false>(options: O
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zDeleteWorkspaceResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}',
     ...options
 });
@@ -387,7 +387,7 @@ export const changeWorkspaceSlug = <ThrowOnError extends boolean = false>(option
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zChangeWorkspaceSlugResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/change-slug',
     ...options,
     headers: {
@@ -406,7 +406,7 @@ export const getWorkspaceEvents = <ThrowOnError extends boolean = false>(options
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zGetWorkspaceEventsResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/events',
     ...options
 });
@@ -421,7 +421,7 @@ export const getWorkspaceGraph = <ThrowOnError extends boolean = false>(options:
         query: zGetWorkspaceGraphQuery.optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zGetWorkspaceGraphResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/graph',
     ...options
 });
@@ -436,7 +436,7 @@ export const getWorkspaceMembers = <ThrowOnError extends boolean = false>(option
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zGetWorkspaceMembersResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/members',
     ...options
 });
@@ -451,7 +451,7 @@ export const updateWorkspaceMembers = <ThrowOnError extends boolean = false>(opt
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zUpdateWorkspaceMembersResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/members',
     ...options,
     headers: {
@@ -470,7 +470,7 @@ export const moveWorkspaceItems = <ThrowOnError extends boolean = false>(options
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zMoveWorkspaceItemsResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/move-items',
     ...options,
     headers: {
@@ -489,7 +489,7 @@ export const permanentlyDeleteWorkspaceItems = <ThrowOnError extends boolean = f
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zPermanentlyDeleteWorkspaceItemsResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/permanently-delete-items',
     ...options,
     headers: {
@@ -508,7 +508,7 @@ export const publishWorkspace = <ThrowOnError extends boolean = false>(options: 
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zPublishWorkspaceResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/publish',
     ...options
 });
@@ -523,7 +523,7 @@ export const renameWorkspace = <ThrowOnError extends boolean = false>(options: O
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zRenameWorkspaceResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/rename',
     ...options,
     headers: {
@@ -542,7 +542,7 @@ export const restoreTrashedWorkspaceItems = <ThrowOnError extends boolean = fals
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zRestoreTrashedWorkspaceItemsResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/restore-trashed-items',
     ...options,
     headers: {
@@ -562,7 +562,7 @@ export const getWorkspaceSearchToken = <ThrowOnError extends boolean = false>(op
     }).parseAsync(data),
     responseTransformer: getWorkspaceSearchTokenResponseTransformer,
     responseValidator: async (data) => await zGetWorkspaceSearchTokenResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/search-token',
     ...options
 });
@@ -578,7 +578,7 @@ export const showTrash = <ThrowOnError extends boolean = false>(options: Options
     }).parseAsync(data),
     responseTransformer: showTrashResponseTransformer,
     responseValidator: async (data) => await zShowTrashResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/show-trash',
     ...options
 });
@@ -593,7 +593,7 @@ export const trashWorkspaceItems = <ThrowOnError extends boolean = false>(option
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zTrashWorkspaceItemsResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/trash-items',
     ...options,
     headers: {
@@ -613,7 +613,7 @@ export const getWorkspaceTree = <ThrowOnError extends boolean = false>(options: 
     }).parseAsync(data),
     responseTransformer: getWorkspaceTreeResponseTransformer,
     responseValidator: async (data) => await zGetWorkspaceTreeResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/tree',
     ...options
 });
@@ -628,7 +628,7 @@ export const unpublishWorkspace = <ThrowOnError extends boolean = false>(options
         query: z.never().optional()
     }).parseAsync(data),
     responseValidator: async (data) => await zUnpublishWorkspaceResponse.parseAsync(data),
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/workspaces/{workspaceId}/unpublish',
     ...options
 });

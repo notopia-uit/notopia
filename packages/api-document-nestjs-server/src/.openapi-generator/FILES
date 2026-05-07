@@ -12,7 +12,6 @@ decorators/index.ts
 index.ts
 models/error.ts
 models/get-document-attachment-upload-url-200-response.ts
-models/get-document-attachment-upload-url-401-response.ts
 models/get-revisions-200-response.ts
 models/index.ts
 models/pagination.ts
