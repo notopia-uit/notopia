@@ -3,7 +3,6 @@ package commonconfig
 import (
 	"log/slog"
 
-	"github.com/notopia-uit/notopia/pkg/helper"
 	"github.com/spf13/viper"
 )
 
@@ -13,7 +12,8 @@ type Log struct {
 }
 
 func (c *Log) GetSlogLevel() slog.Level {
-	level, err := helper.GetLogLevelFromString(c.Level)
+	var level slog.Level
+	err := level.UnmarshalText([]byte(c.Level))
 	if err != nil {
 		panic(err) // this should never happen due to validation, but we panic just in case
 	}

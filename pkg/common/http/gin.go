@@ -46,7 +46,11 @@ var ProvideOtelGinHandler = NewOtelGinHandler
 func NewGin(
 	slogHandler GinSlogHandlerFunc,
 	otelHandler OtelGinHandlerFunc,
+	generalCfg *commonconfig.General,
 ) *gin.Engine {
+	if generalCfg.AppEnv == commonconfig.AppEnvProduction {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(gin.HandlerFunc(otelHandler))
