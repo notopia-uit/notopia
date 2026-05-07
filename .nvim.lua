@@ -160,6 +160,7 @@ lsp.config("oxfmt", {
 
 lsp.enable({
   "ecfg",
+  "emmet_language_server",
   "gh_actions_ls",
   "golangci_lint_ls",
   "gopls",
