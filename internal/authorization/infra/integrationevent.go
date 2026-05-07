@@ -9,9 +9,11 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v3/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
+	wotel "github.com/nkonev/watermill-opentelemetry/pkg/opentelemetry"
 	"github.com/notopia-uit/notopia/internal/authorization/app"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	"github.com/notopia-uit/notopia/pkg/metadata"
 )
 
 type IntegrationPublisher struct {
@@ -22,6 +24,7 @@ func NewIntegrationPublisher(
 	cfg *commonconfig.Kafka,
 	logger watermill.LoggerAdapter,
 	tracer kafka.SaramaTracer,
+	serviceName metadata.ServiceName,
 ) (*IntegrationPublisher, func(), error) {
 	publisher, err := kafka.NewPublisher(
 		kafka.PublisherConfig{
@@ -30,16 +33,17 @@ func NewIntegrationPublisher(
 		},
 		logger,
 	)
+	otelPublisher := wotel.NewNamedPublisherDecorator(serviceName.String(), publisher)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create Kafka publisher: %w", err)
 	}
 	cleanup := func() {
-		if err := publisher.Close(); err != nil {
+		if err := otelPublisher.Close(); err != nil {
 			slog.Error("failed to close Kafka publisher", slog.Any("error", err))
 		}
 	}
 	return &IntegrationPublisher{
-		publisher: publisher,
+		publisher: otelPublisher,
 	}, cleanup, nil
 }
 

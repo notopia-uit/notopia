@@ -70,7 +70,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	integrationPublisher, cleanup3, err := infra.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer)
+	integrationPublisher, cleanup3, err := infra.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
 	if err != nil {
 		cleanup2()
 		cleanup()

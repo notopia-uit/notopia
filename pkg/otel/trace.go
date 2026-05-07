@@ -8,12 +8,13 @@ import (
 	"go.opentelemetry.io/contrib/exporters/autoexport"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdk "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func NewTracerProvider(
 	ctx context.Context,
 	res *resource.Resource,
-) (*sdk.TracerProvider, func(), error) {
+) (trace.TracerProvider, func(), error) {
 	exp, err := autoexport.NewSpanExporter(ctx)
 	if err != nil {
 		return nil, nil, err

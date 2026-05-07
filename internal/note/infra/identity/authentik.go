@@ -2,11 +2,15 @@ package identity
 
 import (
 	"context"
+	"net/http"
 	"strconv"
 
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
+	"go.opentelemetry.io/otel/trace"
 	"goauthentik.io/api/v3"
 	"golang.org/x/sync/errgroup"
 )
@@ -26,6 +30,14 @@ func NewAuthentik(
 		{
 			URL: cfg.URL,
 		},
+	}
+	authentikCfg.HTTPClient = &http.Client{
+		Transport: otelhttp.NewTransport(
+			http.DefaultTransport,
+			otelhttp.WithSpanOptions(trace.WithAttributes(
+				semconv.ServicePeerName("authentik"),
+			)),
+		),
 	}
 	client := api.NewAPIClient(authentikCfg)
 	return &Authentik{
@@ -47,7 +59,6 @@ func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]app.User
 	g.SetLimit(10)
 
 	for i, id := range ids {
-		i, id := i, id
 		g.Go(func() error {
 			userID, err := strconv.Atoi(id)
 			if err != nil {

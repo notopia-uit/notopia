@@ -9,6 +9,7 @@ import (
 	"github.com/notopia-uit/notopia/pkg/metadata"
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/contrib/exporters/autoexport"
+	"go.opentelemetry.io/otel/log"
 	sdk "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
@@ -16,7 +17,7 @@ import (
 func NewLoggerProvider(
 	ctx context.Context,
 	res *resource.Resource,
-) (*sdk.LoggerProvider, func(), error) {
+) (log.LoggerProvider, func(), error) {
 	exp, err := autoexport.NewLogExporter(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -55,7 +56,7 @@ type SlogHandler slog.Handler
 
 func NewSlogHandler(
 	serviceName metadata.ServiceName,
-	provider *sdk.LoggerProvider,
+	provider log.LoggerProvider,
 ) SlogHandler {
 	return otelslog.NewHandler(
 		serviceName.String(),
