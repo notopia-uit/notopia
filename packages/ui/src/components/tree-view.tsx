@@ -5,11 +5,14 @@ import {
   NoteWorkspaceTreeNote,
   getWorkspaceTreeOptions,
 } from '@notopia-uit/api-gen';
+import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
+import { Alert, AlertDescription, AlertTitle } from '@notopia-uit/ui/components/shadcn/alert';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { ChevronRight } from 'lucide-react';
+import { AlertCircleIcon, ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ControlledTreeEnvironment,
@@ -178,13 +181,39 @@ const viewStateInitial: TreeViewState = {
   'tree-sample': {},
 };
 
+const RenameErrorAlert = () => (
+  <Alert variant="destructive" className="max-w-md">
+    <AlertCircleIcon />
+    <AlertTitle>RenameFailed</AlertTitle>
+    <AlertDescription>Failed to rename item. Please try again.</AlertDescription>
+  </Alert>
+);
+
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
   const { data: workspaceTreeData } = useSuspenseQuery({
     ...getWorkspaceTreeOptions({ path: { workspaceId: currentWorkspaceId } }),
     select: (data) => mapDtoTreeData(data),
   });
 
+  const router = useRouter();
   const tree = useRef<TreeRef>(null);
+
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const onRenameError = useCallback(() => {
+    setShowErrorAlert(true);
+  }, []);
+  useEffect(() => {
+    if (!showErrorAlert) return;
+    const timer = setTimeout(() => setShowErrorAlert(false), 3000);
+    return () => clearTimeout(timer);
+  }, [showErrorAlert]);
+  const { mutate: renameNote } = useRenameNoteMutation({
+    onError: onRenameError,
+  });
+  const { mutate: renameFolder } = useRenameFolderMutation({
+    onError: onRenameError,
+  });
+
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
 
@@ -194,6 +223,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   }, [workspaceTreeData]);
 
   const dataProvider = useMemo(() => new TreeDataProvider<string>(items), [items]);
+  //TODO: call API to update tree data on drop
   const onDrop = useCallback((draggedItems: TreeItem<string>[], target: DraggingPosition) => {
     setItems((prevItems) => {
       const newItems = { ...prevItems };
@@ -241,6 +271,63 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
       return newItems;
     });
   }, []);
+
+  // NOTE: some problem with api contract, check this later
+  //TODO: call API to create new item and update tree data with response
+  // Maybe this logic need to be checked
+  const handleCreateItem = useCallback(
+    (isFolder: boolean) => {
+      setItems((prevItems) => {
+        const focusedId = viewState['tree-sample']?.focusedItem;
+        let parentId: TreeItemIndex = 'root';
+
+        if (focusedId && prevItems[focusedId]) {
+          if (prevItems[focusedId].isFolder) {
+            parentId = focusedId;
+          } else {
+            const parent = Object.values(prevItems).find(
+              (p) => p.isFolder && p.children?.includes(focusedId)
+            );
+            if (parent) parentId = parent.index;
+          }
+        }
+
+        const newItemId = `item_${Date.now()}`;
+
+        const newItem: TreeItem<string> = {
+          index: newItemId,
+          isFolder,
+          data: isFolder ? 'New Folder' : 'New Note',
+          children: isFolder ? [] : undefined,
+        };
+
+        setViewState((prev) => {
+          const currentExpanded = prev['tree-sample']?.expandedItems ?? [];
+          if (!currentExpanded.includes(parentId)) {
+            return {
+              ...prev,
+              'tree-sample': {
+                ...prev['tree-sample'],
+                expandedItems: [...currentExpanded, parentId],
+              },
+            };
+          }
+          return prev;
+        });
+
+        const parentNode = prevItems[parentId];
+        return {
+          ...prevItems,
+          [newItemId]: newItem,
+          [parentId]: {
+            ...parentNode,
+            children: [...(parentNode.children || []), newItemId],
+          },
+        };
+      });
+    },
+    [viewState]
+  );
 
   const getItemPath = useCallback(
     async (search: string, searchRoot: TreeItemIndex = 'root'): Promise<TreeItemIndex[] | null> => {
@@ -294,10 +381,40 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   return (
     <div className="flex size-full flex-col gap-4 overflow-hidden">
-      <form onSubmit={onSubmit} className="flex shrink-0 items-center justify-start gap-2">
-        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
-        <Button type="submit">Search</Button>
-      </form>
+      <div className="flex shrink-0 flex-col gap-2">
+        <form onSubmit={onSubmit} className="flex items-center gap-2">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search..."
+            className="h-8 text-sm"
+          />
+          <Button type="submit">Search</Button>
+        </form>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            size-3
+            className="h-8 flex-1 text-xs" // flex-1 makes them share the space equally
+            onClick={() => handleCreateItem(false)}
+          >
+            <FilePlus className="mr-1.5 size-3" />
+            New Note
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            size-3
+            className="h-8 flex-1 text-xs"
+            onClick={() => handleCreateItem(true)}
+          >
+            <FolderPlus className="mr-1.5 size-3" />
+            New Folder
+          </Button>
+        </div>
+      </div>
       <div className="flex-1 overflow-auto">
         <ControlledTreeEnvironment<string>
           items={items}
@@ -307,7 +424,28 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           canDragAndDrop={true}
           canReorderItems={true}
           canDropOnFolder={true}
-          canRename={false}
+          canRename={true}
+          onRenameItem={(item, name) => {
+            if (item.isFolder) {
+              renameFolder({
+                path: {
+                  folderId: item.index as string,
+                },
+                body: {
+                  name: name,
+                },
+              });
+              return;
+            }
+            renameNote({
+              path: {
+                noteId: item.index as string,
+              },
+              body: {
+                name: name,
+              },
+            });
+          }}
           viewState={viewState}
           onDrop={onDrop}
           onExpandItem={(item, treeId) => {
@@ -338,14 +476,18 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
               },
             }));
           }}
-          onSelectItems={(items, treeId) => {
+          onSelectItems={(selectedItems, treeId) => {
+            const selectedId = selectedItems.at(-1) ?? '';
             setViewState((prevViewState) => ({
               ...prevViewState,
               [treeId]: {
                 ...prevViewState[treeId],
-                selectedItems: [items.at(-1) ?? ''],
+                selectedItems: [selectedId],
               },
             }));
+            if (selectedId && items[selectedId] && !items[selectedId].isFolder) {
+              router.push(`/workspace/${currentWorkspaceId}/${selectedId}`);
+            }
           }}
           renderTreeContainer={({ children, containerProps }) => {
             return (
@@ -354,7 +496,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
               </div>
             );
           }}
-          renderLiveDescriptorContainer={({}) => <></>}
+          renderLiveDescriptorContainer={({ }) => <></>}
           renderItemsContainer={({ children, containerProps }) => {
             return <ul {...containerProps}>{children}</ul>;
           }}
@@ -394,6 +536,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           <Tree ref={tree} treeId="tree-sample" rootItem="root" treeLabel="Sample Tree" />
         </ControlledTreeEnvironment>
       </div>
+      {showErrorAlert && <RenameErrorAlert />}
     </div>
   );
 };

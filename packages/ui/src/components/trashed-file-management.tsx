@@ -1,5 +1,11 @@
 'use client';
-import { NoteTrashedFolder, NoteTrashedNote, showTrashOptions } from '@notopia-uit/api-gen';
+import {
+  NoteTrashedFolder,
+  NoteTrashedNote,
+  showTrashOptions,
+  useRestoreTrashedWorkspaceItemsMutation,
+  usePermanentlyDeleteWorkspaceItemsMutation,
+} from '@notopia-uit/api-gen';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Checkbox } from '@notopia-uit/ui/components/shadcn/checkbox';
 import {
@@ -8,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@notopia-uit/ui/components/shadcn/dropdown-menu';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import {
   Table,
   TableBody,
@@ -16,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from '@notopia-uit/ui/components/shadcn/table';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { FileText, Folder, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
@@ -74,7 +81,9 @@ const formatDate = (isoString: string) => {
   }).format(date);
 };
 
+//TODO: add dialog onSuccess and onError for delete and restore action, also add confirm dialog when user click delete permanently or empty trash
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
+  const queryClient = useQueryClient();
   const { data: trashedData } = useSuspenseQuery({
     ...showTrashOptions({ path: { workspaceId: workspaceId } }),
     select: (data) => mapDtoTrashedData(data),
@@ -100,6 +109,24 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     );
   }, [trashedData]);
 
+  const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
+        });
+        setSelectedItems(new Set());
+      },
+    }
+  );
+  const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
+      });
+      setSelectedItems(new Set());
+    },
+  });
   const toggleSelection = (id: string) => {
     const newSelection = new Set(selectedItems);
     if (newSelection.has(id)) {
@@ -109,7 +136,6 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     }
     setSelectedItems(newSelection);
   };
-
   const toggleAll = () => {
     if (selectedItems.size === displayData.length) {
       setSelectedItems(new Set());
@@ -117,7 +143,34 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       setSelectedItems(new Set(displayData.map((item) => item.id)));
     }
   };
-
+  const handleRestoreSelected = () => {
+    const noteIds: string[] = [];
+    const folderIds: string[] = [];
+    for (const item of displayData) {
+      if (!selectedItems.has(item.id)) continue;
+      if (item.displayType === 'Note') noteIds.push(item.id);
+      else folderIds.push(item.id);
+    }
+    restoreItems({
+      path: { workspaceId },
+      body: { noteIds, folderIds },
+    });
+  };
+  const handleDeleteSelected = () => {
+    const noteIds: string[] = [];
+    const folderIds: string[] = [];
+    if (selectedItems.size > 0) {
+      for (const item of displayData) {
+        if (!selectedItems.has(item.id)) continue;
+        if (item.displayType === 'Note') noteIds.push(item.id);
+        else folderIds.push(item.id);
+      }
+    } else {
+      noteIds.push(...trashedData.notes.map((n) => n.id));
+      folderIds.push(...trashedData.folders.map((f) => f.id));
+    }
+    deleteItems({ path: { workspaceId }, body: { noteIds, folderIds } });
+  };
   return (
     <div className="w-full font-sans text-zinc-300">
       <div className="w-full">
@@ -127,11 +180,25 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
             <Button
               variant="destructive"
               className="gap-0.5 space-x-0.5 border-white/10 bg-transparent text-zinc-300 hover:bg-white/5 hover:text-white"
+              onClick={handleDeleteSelected}
+              disabled={isDeleting}
             >
-              Empty Trash
+              {isDeleting ? (
+                <Spinner />
+              ) : selectedItems.size > 0 ? (
+                `Delete Permanently (${selectedItems.size})`
+              ) : (
+                'Empty Trash'
+              )}{' '}
             </Button>
             {selectedItems.size > 0 && (
-              <Button className="bg-blue-600 text-white hover:bg-blue-700">Restore Selected</Button>
+              <Button
+                className="bg-blue-600 text-white hover:bg-blue-700"
+                onClick={handleRestoreSelected}
+                disabled={isRestoring}
+              >
+                {isRestoring ? <Spinner></Spinner> : 'Restore Selected'}
+              </Button>
             )}
           </div>
         </div>
@@ -175,9 +242,8 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Icon
-                        className={`size-5 ${
-                          item.displayType === 'Folder' ? `text-blue-400` : `text-zinc-400`
-                        }`}
+                        className={`size-5 ${item.displayType === 'Folder' ? `text-blue-400` : `text-zinc-400`
+                          }`}
                       />
                       <span className="font-medium text-zinc-200">{item.name}</span>
                     </div>

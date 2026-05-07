@@ -1,39 +1,19 @@
 'use client';
-import { BlockNoteEditor } from '@blocknote/core';
-import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 
 import '@blocknote/core/fonts/inter.css';
-import {
-  DefaultReactSuggestionItem,
-  SuggestionMenuController,
-  getDefaultReactSlashMenuItems,
-  useCreateBlockNote,
-} from '@blocknote/react';
+import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
 
 import '@blocknote/shadcn/style.css';
-import { useState } from 'react';
+import {
+  createBlockNoteSchema,
+  getNoteMenuItems,
+  getTagMenuItems,
+} from '@notopia-uit/ui/block-note';
+import { useMemo, useState } from 'react';
 
 import { Icons } from './icons';
 import { Button } from './shadcn/button';
-
-const insertHelloWorldItem = (editor: BlockNoteEditor) => ({
-  title: 'Insert Hello World',
-  onItemClick: () =>
-    insertOrUpdateBlockForSlashMenu(editor, {
-      type: 'paragraph',
-      content: [{ type: 'text', text: 'Hello World', styles: { bold: true } }],
-    }),
-  aliases: ['helloworld', 'hw'],
-  group: 'Other',
-  icon: <Icons.Logo />,
-  subtext: "Used to insert a block with 'Hello World' below.",
-});
-
-const getCustomSlashMenuItems = (editor: BlockNoteEditor): DefaultReactSuggestionItem[] => [
-  ...getDefaultReactSlashMenuItems(editor),
-  insertHelloWorldItem(editor),
-];
 
 export default function Editor({ noteId }: { noteId: string }) {
   // const { data: note } = useSuspenseQuery(
@@ -43,8 +23,12 @@ export default function Editor({ noteId }: { noteId: string }) {
   //     },
   //   })
   // );
+  const mySchema = useMemo(() => createBlockNoteSchema(), []);
+
   const [isDirty, setIsDirty] = useState(false);
-  const editor = useCreateBlockNote({});
+  const editor = useCreateBlockNote({
+    schema: mySchema,
+  });
 
   return (
     <div className="relative min-h-screen">
@@ -55,10 +39,17 @@ export default function Editor({ noteId }: { noteId: string }) {
         }}
       >
         <SuggestionMenuController
-          triggerCharacter="/"
-          // getItems={async (query) =>
-          //   filterSuggestionItems(getCustomSlashMenuItems(editor), query)
-          // }
+          triggerCharacter={'#'}
+          getItems={async (query) => {
+            return Promise.resolve(getTagMenuItems(editor, query, []));
+          }}
+        />
+
+        <SuggestionMenuController
+          triggerCharacter={'@'}
+          getItems={async (query) => {
+            return Promise.resolve(getNoteMenuItems(editor, query, []));
+          }}
         />
       </BlockNoteView>
       {isDirty && (
@@ -70,6 +61,7 @@ export default function Editor({ noteId }: { noteId: string }) {
             // onClick={async () => {
             //   await saveContent(editor.document);
             // }}
+            //
           >
             <Icons.Save />
           </Button>

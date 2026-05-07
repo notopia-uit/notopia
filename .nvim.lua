@@ -1,6 +1,6 @@
 local lsp = vim.lsp
 local map = vim.keymap.set
-local root = vim.fn.getcwd()
+local root = vim.fn.expand("%:p:h")
 local uri_root = vim.uri_from_fname(root)
 
 -- lsp.config("yamlls", {
@@ -72,6 +72,14 @@ lsp.config("tailwindcss", {
   ---@module 'lspconfig'
   ---@type lspconfig.settings.tailwindcss
   settings = {
+    files = {
+      exclude = {
+        "**/.git/**",
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/build/**",
+      },
+    },
     tailwindCSS = {
       experimental = {
         configFile = {
@@ -172,6 +180,7 @@ lsp.config("oxlint", {
       workspaceUri = string.format("%s/packages/ui", uri_root),
       options = {
         fixKind = "all",
+        run = "onSave",
       },
     },
     {
@@ -184,6 +193,7 @@ lsp.config("oxlint", {
       workspaceUri = string.format("%s/apps/web", uri_root),
       options = {
         fixKind = "all",
+        run = "onSave",
       },
     },
     {
@@ -260,6 +270,7 @@ lsp.config("oxfmt", {
 
 lsp.enable({
   "ecfg",
+  "emmet_language_server",
   "gh_actions_ls",
   "golangci_lint_ls",
   "gopls",
@@ -270,7 +281,7 @@ lsp.enable({
   "nestjs_doctor",
   "nxls",
   "oxfmt",
-  "oxlint",
+  -- "oxlint",
   "redocly_ls",
   "tailwindcss",
   "tsgo",

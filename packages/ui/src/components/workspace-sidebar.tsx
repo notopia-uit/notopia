@@ -1,13 +1,19 @@
 'use client';
 
-import { NoteUserWorkspace, getMyWorkspacesOptions } from '@notopia-uit/api-gen';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import {
-  AudioWaveform,
+  NoteUserWorkspace,
+  getMyWorkspacesOptions,
+  useCreateWorkspaceMutation,
+} from '@notopia-uit/api-gen';
+import { Button } from '@notopia-uit/ui/components/shadcn/button';
+import { Input } from '@notopia-uit/ui/components/shadcn/input';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import {
   BadgeCheck,
   Bell,
   ChevronsUpDown,
-  Command,
   CreditCard,
   Folder,
   Forward,
@@ -15,6 +21,7 @@ import {
   LogOut,
   MoreHorizontal,
   Plus,
+  Save,
   Settings2,
   Sparkles,
   Trash2,
@@ -23,6 +30,15 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from './shadcn/avatar';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './shadcn/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +49,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from './shadcn/dropdown-menu';
+import { Label } from './shadcn/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './shadcn/select';
 import {
   Sidebar,
   SidebarContent,
@@ -48,29 +66,131 @@ import {
 } from './shadcn/sidebar';
 import TreeView from './tree-view';
 
+const generateSlug = (name: string) => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+};
+
+export function CreateWorkspaceDialog() {
+  const queryClient = useQueryClient();
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [userRole, setUserRole] = useState('owner');
+
+  const { mutate: createWorkspace, isPending: isCreating } = useCreateWorkspaceMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: getMyWorkspacesOptions({}).queryKey,
+      });
+
+      setName('');
+      setSlug('');
+      setUserRole('owner');
+
+      setIsOpen(false);
+    },
+  });
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!name || !slug) return;
+
+    createWorkspace({
+      body: {
+        name: name,
+        slug: slug,
+      },
+    });
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <DropdownMenuItem className="gap-2 p-2" onSelect={(e) => e.preventDefault()}>
+          <div className="bg-background flex size-6 items-center justify-center rounded-md border">
+            <Plus className="size-4" />
+          </div>
+          <span className="text-muted-foreground font-medium">Add workspace</span>
+        </DropdownMenuItem>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-106.25">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>Create New Workspace</DialogTitle>
+            <DialogDescription>
+              Set up a new workspace to organize your notes and graphs.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Workspace Name</Label>
+              <Input
+                id="name"
+                placeholder="e.g. My Awesome Project"
+                value={name}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setName(newName);
+                  setSlug(generateSlug(newName));
+                }}
+                disabled={isCreating}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="slug">Slug URL</Label>
+              <Input
+                id="slug"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                disabled={isCreating}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="role">Initial Role</Label>
+              <Select value={userRole} onValueChange={setUserRole} disabled={isCreating}>
+                <SelectTrigger id="role">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="owner">Owner</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="member">Member</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+              disabled={isCreating}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isCreating}>
+              {isCreating ? (
+                <Spinner className="mr-2 size-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 size-4" />
+              )}
+              Create
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+//TODO: get user data from betterauth
 const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-  workspaces: [
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
-    },
-    {
-      name: 'Evil Corp.',
-      logo: Command,
-      plan: 'Free',
-    },
-  ],
   projects: [
     {
       name: 'Settings',
@@ -86,6 +206,8 @@ const data = {
 };
 
 export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorkspaceId: string }) {
+  const { data: sessionData } = authClient.useSession();
+
   const [activeWorkspacenow, setActiveWorkspace] = useState<NoteUserWorkspace>();
 
   const router = useRouter();
@@ -93,6 +215,9 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
   const { data: allWorkspaceData } = useSuspenseQuery(getMyWorkspacesOptions({}));
 
   //TODO: check error
+  if (!sessionData) {
+    return;
+  }
   if (!allWorkspaceData) {
     return;
   }
@@ -164,14 +289,14 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
+      <SidebarContent className="flex flex-col overflow-hidden">
+        <SidebarGroup className="flex flex-1 flex-col overflow-hidden group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
-          <SidebarMenu>
+          <SidebarMenu className="flex-1 flex-col overflow-hidden">
             <TreeView currentWorkspaceId={currentWorkspaceId} />
           </SidebarMenu>
         </SidebarGroup>
-        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+        <SidebarGroup className="shrink-0 group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarMenu>
             {data.projects.map((item) => (
@@ -227,12 +352,12 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                 >
                   {/* TODO: get user data from betterauth */}
                   <Avatar className="size-8 rounded-lg">
-                    <AvatarImage src={data.user.avatar} alt={data.user.name} />
+                    <AvatarImage src={sessionData.user.image || ''} alt={'avatar here'} />
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm/tight">
-                    <span className="truncate font-semibold">{data.user.name}</span>
-                    <span className="truncate text-xs">{data.user.email}</span>
+                    <span className="truncate font-semibold">{sessionData.user.name}</span>
+                    <span className="truncate text-xs">{sessionData.user.email}</span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
                 </SidebarMenuButton>
@@ -246,12 +371,12 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="size-8 rounded-lg">
-                      <AvatarImage src={data.user.avatar} alt={data.user.name} />
+                      <AvatarImage src={sessionData.user.image || ''} alt={sessionData.user.name} />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm/tight">
-                      <span className="truncate font-semibold">{data.user.name}</span>
-                      <span className="truncate text-xs">{data.user.email}</span>
+                      <span className="truncate font-semibold">{sessionData.user.name}</span>
+                      <span className="truncate text-xs">{sessionData.user.email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
@@ -282,6 +407,7 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                   <LogOut />
                   Log out
                 </DropdownMenuItem>
+                <CreateWorkspaceDialog />
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

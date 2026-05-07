@@ -1,6 +1,12 @@
 'use client';
 
-import { NoteUserWorkspace, NoteWorkspaceRole, getMyWorkspacesOptions } from '@notopia-uit/api-gen';
+import {
+  NoteUserWorkspace,
+  NoteWorkspaceRole,
+  getMyWorkspacesOptions,
+  useChangeWorkspaceSlugMutation,
+  useCreateWorkspaceMutation,
+} from '@notopia-uit/api-gen';
 import { Badge } from '@notopia-uit/ui/components/shadcn/badge';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Card, CardContent } from '@notopia-uit/ui/components/shadcn/card';
@@ -20,8 +26,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@notopia-uit/ui/components/shadcn/select';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -53,6 +60,7 @@ const generateSlug = (name: string) => {
 // TODO: handle create new workspace with api and router.push to workspace
 
 const WorkspaceSwitcher = () => {
+  const queryClient = useQueryClient();
   const { data: allWorkspaceData } = useSuspenseQuery({
     ...getMyWorkspacesOptions({}),
     select: mapUserWorkspaceDtoToDomain,
@@ -68,6 +76,36 @@ const WorkspaceSwitcher = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editForm, setEditForm] = useState<Partial<UserWorkspace>>({});
 
+  const { mutate: createWorkspace, isPending: isCreating } = useCreateWorkspaceMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: getMyWorkspacesOptions({}).queryKey,
+      });
+      const newWorkspacesData = await queryClient.fetchQuery({
+        ...getMyWorkspacesOptions({}),
+      });
+      const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
+      setWorkspaces(mappedWorkspaces);
+      setIsAddingNew(false);
+      setEditForm({});
+    },
+  });
+
+  const { mutate: mutateWorkspaceSlug, isPending: isChangingSlug } = useChangeWorkspaceSlugMutation(
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: getMyWorkspacesOptions({}).queryKey,
+        });
+        const newWorkspacesData = await queryClient.fetchQuery({
+          ...getMyWorkspacesOptions({}),
+        });
+        const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
+        setWorkspaces(mappedWorkspaces);
+      },
+    }
+  );
+
   const startEditing = (workspace: UserWorkspace) => {
     setEditingId(workspace.id);
     setEditForm({ ...workspace });
@@ -76,23 +114,6 @@ const WorkspaceSwitcher = () => {
   const cancelEditing = () => {
     setEditingId(null);
     setEditForm({});
-  };
-
-  const saveEdit = () => {
-    if (editingId && editForm.name && editForm.slug && editForm.userRole) {
-      setWorkspaces((prev) =>
-        prev.map((workspace) =>
-          workspace.id === editingId
-            ? ({
-                ...workspace,
-                ...editForm,
-              } as UserWorkspace)
-            : workspace
-        )
-      );
-      setEditingId(null);
-      setEditForm({});
-    }
   };
 
   const startAddingNew = () => {
@@ -109,27 +130,10 @@ const WorkspaceSwitcher = () => {
     setEditForm({});
   };
 
-  //   TODO:Create/edit/delete are local-only and will not persist.
+  //   TODO:delete are local-only and will not persist.
   //
-  // saveEdit, saveNewWorkspace, and deleteWorkspace only mutate local state — no API calls — and saveNewWorkspace assigns Date.now().toString() as id, which will collide with real backend ids once the mutation is wired up. The TODO at Line 69 acknowledges this, but flagging so it isn't missed before release. Consider wiring useMutation with query invalidation for getMyWorkspacesQueryKey().
+  // deleteWorkspace only mutate local state — no API calls — and saveNewWorkspace assigns Date.now().toString() as id, which will collide with real backend ids once the mutation is wired up. The TODO at Line 69 acknowledges this, but flagging so it isn't missed before release. Consider wiring useMutation with query invalidation for getMyWorkspacesQueryKey().
   //
-
-  const saveNewWorkspace = () => {
-    if (editForm.name && editForm.slug && editForm.userRole) {
-      const newWorkspace: UserWorkspace = {
-        id: Date.now().toString(),
-        name: editForm.name,
-        slug: editForm.slug,
-        userRole: editForm.userRole,
-      };
-      setWorkspaces((prev) => [...prev, newWorkspace]);
-      setIsAddingNew(false);
-      setEditForm({});
-      if (workspaces.length === 0) {
-        setSelectedId(newWorkspace.id);
-      }
-    }
-  };
 
   const deleteWorkspace = (id: string) => {
     setWorkspaces((prev) => {
@@ -195,10 +199,18 @@ const WorkspaceSwitcher = () => {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              saveEdit();
+                              mutateWorkspaceSlug({
+                                path: {
+                                  workspaceId: workspace.id,
+                                },
+                                body: {
+                                  slug: editForm.slug as string,
+                                },
+                              });
                             }}
+                            disabled={isChangingSlug}
                           >
-                            <Save className="mr-2 size-4" />
+                            {isChangingSlug ? <Spinner /> : <Save className="mr-2 size-4" />}
                             Save
                           </Button>
                         </div>
@@ -335,8 +347,23 @@ const WorkspaceSwitcher = () => {
                         <Button variant="ghost" size="sm" onClick={cancelAddingNew}>
                           <X className="size-4" />
                         </Button>
-                        <Button size="sm" onClick={saveNewWorkspace}>
-                          <Save className="mr-2 size-4" />
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            createWorkspace({
+                              body: {
+                                slug: editForm.slug as string,
+                                name: editForm.name as string,
+                              },
+                            })
+                          }
+                          disabled={isCreating}
+                        >
+                          {isCreating ? (
+                            <Spinner className="mr-2 size-4" />
+                          ) : (
+                            <Save className="mr-2 size-4" />
+                          )}
                           Create
                         </Button>
                       </div>
