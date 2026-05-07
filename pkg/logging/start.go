@@ -3,14 +3,11 @@ package logging
 import (
 	"log/slog"
 	"os"
-
-	"github.com/notopia-uit/notopia/pkg/helper"
 )
 
 func FirstStart(envVar string) error {
 	var level slog.Level
-	var err error
-	level, err = helper.GetLogLevelFromString(os.Getenv(envVar))
+	err := level.UnmarshalText([]byte(os.Getenv(envVar)))
 	if err != nil {
 		level = slog.LevelInfo
 	}
