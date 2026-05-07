@@ -43,6 +43,12 @@ lsp.config("gopls", {
   end,
 } --[[@as vim.lsp.Config]])
 
+lsp.config("golangci_lint_ls", {
+  root_dir = function(_, on_dir)
+    on_dir(root)
+  end,
+} --[[@as vim.lsp.Config]])
+
 lsp.config("tailwindcss", {
   cmd = { "tailwindcss-language-server", "--stdio" },
   root_dir = function(bufnr, on_dir)

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"go.opentelemetry.io/contrib/exporters/autoexport"
+	"go.opentelemetry.io/otel/metric"
 	sdk "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 )
@@ -13,7 +14,7 @@ import (
 func NewMeterProvider(
 	ctx context.Context,
 	res *resource.Resource,
-) (*sdk.MeterProvider, func(), error) {
+) (metric.MeterProvider, func(), error) {
 	reader, err := autoexport.NewMetricReader(ctx)
 	if err != nil {
 		return nil, nil, err

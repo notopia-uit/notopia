@@ -2,6 +2,7 @@ package search
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/google/uuid"
@@ -9,6 +10,9 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Meilisearch struct {
@@ -21,7 +25,19 @@ type Meilisearch struct {
 var _ app.SearchSvc = (*Meilisearch)(nil)
 
 func NewMeilisearch(cfg *config.Meilisearch) *Meilisearch {
-	client := meilisearch.New(cfg.Host, meilisearch.WithAPIKey(cfg.APIKey))
+	httpClient := &http.Client{
+		Transport: otelhttp.NewTransport(
+			http.DefaultTransport,
+			otelhttp.WithSpanOptions(trace.WithAttributes(
+				semconv.ServicePeerName("meilisearch"),
+			)),
+		),
+	}
+	client := meilisearch.New(
+		cfg.Host,
+		meilisearch.WithAPIKey(cfg.APIKey),
+		meilisearch.WithCustomClient(httpClient),
+	)
 	return &Meilisearch{
 		client:                   client,
 		noteSearchKeyUID:         cfg.NoteSearchKeyUID,
