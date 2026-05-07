@@ -1,14 +1,12 @@
-'use client'
-import { ArrowLeft } from "lucide-react";
-import { Button } from "./shadcn/button";
+'use client';
+import { ArrowLeft } from 'lucide-react';
+
+import { Button } from './shadcn/button';
 
 export default function ErrorButton() {
   return (
     <div
-      className="
-          mt-8 flex flex-1 flex-col items-center justify-center text-center
-          xl:items-start xl:text-start
-        "
+      className="mt-8 flex flex-1 flex-col items-center justify-center text-center xl:items-start xl:text-start"
     >
       <div className="mb-3 flex items-center gap-3">
         <span className="text-sm font-semibold">404</span>
@@ -21,5 +19,5 @@ export default function ErrorButton() {
         <span>Go Back Home</span>
       </Button>
     </div>
-  )
+  );
 }

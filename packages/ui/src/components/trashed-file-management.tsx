@@ -4,7 +4,7 @@ import {
   NoteTrashedNote,
   showTrashOptions,
   useRestoreTrashedWorkspaceItemsMutation,
-  usePermanentlyDeleteWorkspaceItemsMutation
+  usePermanentlyDeleteWorkspaceItemsMutation,
 } from '@notopia-uit/api-gen';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Checkbox } from '@notopia-uit/ui/components/shadcn/checkbox';
@@ -82,7 +82,7 @@ const formatDate = (isoString: string) => {
 };
 
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
-  const queryClient =useQueryClient();
+  const queryClient = useQueryClient();
   const { data: trashedData } = useSuspenseQuery({
     ...showTrashOptions({ path: { workspaceId: workspaceId } }),
     select: (data) => mapDtoTrashedData(data),
@@ -108,20 +108,24 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     );
   }, [trashedData]);
 
-  const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey });
-      setSelectedItems(new Set());
+  const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
+        });
+        setSelectedItems(new Set());
+      },
     }
+  );
+  const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
+      });
+      setSelectedItems(new Set());
+    },
   });
-const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey });
-      setSelectedItems(new Set());
-    }
-  }
-
-  )
   const toggleSelection = (id: string) => {
     const newSelection = new Set(selectedItems);
     if (newSelection.has(id)) {
@@ -148,22 +152,59 @@ const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorksp
             <Button
               variant="destructive"
               className="gap-0.5 space-x-0.5 border-white/10 bg-transparent text-zinc-300 hover:bg-white/5 hover:text-white"
-              onClick={() => deleteItems({path:{workspaceId:workspaceId}, body:{
-                noteIds: selectedItems.size > 0 ? Array.from(selectedItems).filter(id => displayData.find(item => item.id === id)?.displayType === 'Note') : trashedData.notes.map(note => note.id),
-                folderIds: selectedItems.size > 0 ? Array.from(selectedItems).filter(id => displayData.find(item => item.id === id)?.displayType === 'Folder') : trashedData.folders.map(folder => folder.id),
-              }})}
+              onClick={() =>
+                deleteItems({
+                  path: { workspaceId: workspaceId },
+                  body: {
+                    noteIds:
+                      selectedItems.size > 0
+                        ? Array.from(selectedItems).filter(
+                            (id) =>
+                              displayData.find((item) => item.id === id)?.displayType === 'Note'
+                          )
+                        : trashedData.notes.map((note) => note.id),
+                    folderIds:
+                      selectedItems.size > 0
+                        ? Array.from(selectedItems).filter(
+                            (id) =>
+                              displayData.find((item) => item.id === id)?.displayType === 'Folder'
+                          )
+                        : trashedData.folders.map((folder) => folder.id),
+                  },
+                })
+              }
               disabled={isDeleting}
             >
-              {isDeleting ? <Spinner /> : (selectedItems.size > 0 ? `Delete Permanently (${selectedItems.size})` : 'Empty Trash')}            </Button>
+              {isDeleting ? (
+                <Spinner />
+              ) : selectedItems.size > 0 ? (
+                `Delete Permanently (${selectedItems.size})`
+              ) : (
+                'Empty Trash'
+              )}{' '}
+            </Button>
             {selectedItems.size > 0 && (
-              <Button className="bg-blue-600 text-white hover:bg-blue-700"
-                onClick= {() =>
-              restoreItems({path:{
-                workspaceId: workspaceId,
-              },body:{
-                noteIds: Array.from(selectedItems).filter(id => displayData.find(item => item.id === id)?.displayType === 'Note'),
-                folderIds: Array.from(selectedItems).filter(id => displayData.find(item => item.id === id)?.displayType === 'Folder'),
-              }})} disabled={isRestoring}>{isRestoring? <Spinner></Spinner> : 'Restore Selected'}</Button>
+              <Button
+                className="bg-blue-600 text-white hover:bg-blue-700"
+                onClick={() =>
+                  restoreItems({
+                    path: {
+                      workspaceId: workspaceId,
+                    },
+                    body: {
+                      noteIds: Array.from(selectedItems).filter(
+                        (id) => displayData.find((item) => item.id === id)?.displayType === 'Note'
+                      ),
+                      folderIds: Array.from(selectedItems).filter(
+                        (id) => displayData.find((item) => item.id === id)?.displayType === 'Folder'
+                      ),
+                    },
+                  })
+                }
+                disabled={isRestoring}
+              >
+                {isRestoring ? <Spinner></Spinner> : 'Restore Selected'}
+              </Button>
             )}
           </div>
         </div>

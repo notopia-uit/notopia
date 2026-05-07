@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
 import {
   NoteUserWorkspace,
   getMyWorkspacesOptions,
   useCreateWorkspaceMutation,
-} from "@notopia-uit/api-gen";
-import { Button } from "@notopia-uit/ui/components/shadcn/button";
-import { Input } from "@notopia-uit/ui/components/shadcn/input";
-import { Spinner } from "@notopia-uit/ui/components/shadcn/spinner";
-import { authClient } from "@notopia-uit/ui/lib/auth-client";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+} from '@notopia-uit/api-gen';
+import { Button } from '@notopia-uit/ui/components/shadcn/button';
+import { Input } from '@notopia-uit/ui/components/shadcn/input';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import {
   BadgeCheck,
   Bell,
@@ -25,11 +25,11 @@ import {
   Settings2,
   Sparkles,
   Trash2,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { Avatar, AvatarFallback, AvatarImage } from "./shadcn/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from './shadcn/avatar';
 import {
   Dialog,
   DialogContent,
@@ -37,7 +37,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "./shadcn/dialog";
+} from './shadcn/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,15 +47,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "./shadcn/dropdown-menu";
-import { Label } from "./shadcn/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./shadcn/select";
+} from './shadcn/dropdown-menu';
+import { Label } from './shadcn/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './shadcn/select';
 import {
   Sidebar,
   SidebarContent,
@@ -68,38 +62,37 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "./shadcn/sidebar";
-import TreeView from "./tree-view";
+} from './shadcn/sidebar';
+import TreeView from './tree-view';
 
 const generateSlug = (name: string) => {
   return name
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
 };
 
 export function CreateWorkspaceDialog() {
   const queryClient = useQueryClient();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [userRole, setUserRole] = useState("owner");
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [userRole, setUserRole] = useState('owner');
 
-  const { mutate: createWorkspace, isPending: isCreating } =
-    useCreateWorkspaceMutation({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: getMyWorkspacesOptions({}).queryKey,
-        });
+  const { mutate: createWorkspace, isPending: isCreating } = useCreateWorkspaceMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: getMyWorkspacesOptions({}).queryKey,
+      });
 
-        setName("");
-        setSlug("");
-        setUserRole("owner");
+      setName('');
+      setSlug('');
+      setUserRole('owner');
 
-        setIsOpen(false);
-      },
-    });
+      setIsOpen(false);
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,11 +144,7 @@ export function CreateWorkspaceDialog() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="role">Initial Role</Label>
-              <Select
-                value={userRole}
-                onValueChange={setUserRole}
-                disabled={isCreating}
-              >
+              <Select value={userRole} onValueChange={setUserRole} disabled={isCreating}>
                 <SelectTrigger id="role">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
@@ -195,33 +184,26 @@ export function CreateWorkspaceDialog() {
 const data = {
   projects: [
     {
-      name: "Settings",
-      url: "#",
+      name: 'Settings',
+      url: '#',
       icon: Settings2,
     },
     {
-      name: "Graph",
-      url: "#",
+      name: 'Graph',
+      url: '#',
       icon: Sparkles,
     },
   ],
 };
 
-export default function WorkspaceSideBar({
-  currentWorkspaceId,
-}: {
-  currentWorkspaceId: string;
-}) {
+export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorkspaceId: string }) {
   const { data: sessionData } = authClient.useSession();
 
-  const [activeWorkspacenow, setActiveWorkspace] =
-    useState<NoteUserWorkspace>();
+  const [activeWorkspacenow, setActiveWorkspace] = useState<NoteUserWorkspace>();
 
   const router = useRouter();
 
-  const { data: allWorkspaceData } = useSuspenseQuery(
-    getMyWorkspacesOptions({}),
-  );
+  const { data: allWorkspaceData } = useSuspenseQuery(getMyWorkspacesOptions({}));
 
   //TODO: check error
   if (!sessionData) {
@@ -230,9 +212,7 @@ export default function WorkspaceSideBar({
   if (!allWorkspaceData) {
     return;
   }
-  const currentWorkspace = allWorkspaceData.find(
-    (ws) => ws.workspace.id === currentWorkspaceId,
-  );
+  const currentWorkspace = allWorkspaceData.find((ws) => ws.workspace.id === currentWorkspaceId);
   if (!currentWorkspace) {
     return;
   }
@@ -293,9 +273,7 @@ export default function WorkspaceSideBar({
                   <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                     <Plus className="size-4" />
                   </div>
-                  <div className="text-muted-foreground font-medium">
-                    Add workspace
-                  </div>
+                  <div className="text-muted-foreground font-medium">Add workspace</div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -303,9 +281,9 @@ export default function WorkspaceSideBar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="flex flex-col overflow-hidden">
-        <SidebarGroup className="flex flex-col flex-1 overflow-hidden group-data-[collapsible=icon]:hidden">
+        <SidebarGroup className="flex flex-1 flex-col overflow-hidden group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
-          <SidebarMenu className="flex-col flex-1 overflow-hidden">
+          <SidebarMenu className="flex-1 flex-col overflow-hidden">
             <TreeView currentWorkspaceId={currentWorkspaceId} />
           </SidebarMenu>
         </SidebarGroup>
@@ -327,11 +305,7 @@ export default function WorkspaceSideBar({
                       <span className="sr-only">More</span>
                     </SidebarMenuAction>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-48 rounded-lg"
-                    side="bottom"
-                    align="end"
-                  >
+                  <DropdownMenuContent className="w-48 rounded-lg" side="bottom" align="end">
                     <DropdownMenuItem>
                       <Folder className="text-muted-foreground" />
                       <span>View Project</span>
@@ -369,19 +343,12 @@ export default function WorkspaceSideBar({
                 >
                   {/* TODO: get user data from betterauth */}
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage
-                      src={sessionData.user.image || ""}
-                      alt={"avatar here"}
-                    />
+                    <AvatarImage src={sessionData.user.image || ''} alt={'avatar here'} />
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {sessionData.user.name}
-                    </span>
-                    <span className="truncate text-xs">
-                      {sessionData.user.email}
-                    </span>
+                    <span className="truncate font-semibold">{sessionData.user.name}</span>
+                    <span className="truncate text-xs">{sessionData.user.email}</span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
                 </SidebarMenuButton>
@@ -395,19 +362,12 @@ export default function WorkspaceSideBar({
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage
-                        src={sessionData.user.image || ""}
-                        alt={sessionData.user.name}
-                      />
+                      <AvatarImage src={sessionData.user.image || ''} alt={sessionData.user.name} />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        {sessionData.user.name}
-                      </span>
-                      <span className="truncate text-xs">
-                        {sessionData.user.email}
-                      </span>
+                      <span className="truncate font-semibold">{sessionData.user.name}</span>
+                      <span className="truncate text-xs">{sessionData.user.email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
