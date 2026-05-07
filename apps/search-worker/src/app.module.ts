@@ -62,7 +62,7 @@ import { APP_CONFIG, MEILI_CONFIG, appConfig, kafkaConfig, meiliConfig } from '.
       useFactory: createServerBlockNoteSchema,
     },
     AppService,
-    AppController,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

@@ -1,0 +1,10 @@
+{
+  "ignore": {
+    "rules": [
+      "security/no-synchronize-in-production",
+      "architecture/no-orm-in-services",
+      "correctness/no-async-without-await"
+    ],
+    "files": ["packages/api-document-nestjs-server/**"]
+  }
+}

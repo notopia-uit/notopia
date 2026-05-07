@@ -22,7 +22,7 @@ import { NoteModel, TrashedModel, WorkspaceModel } from './models';
 export class NoteService implements OnModuleInit {
   private noteServiceClient!: NoteServiceClient;
 
-  constructor(@Inject(NOTE_PACKAGE_NAME) private client: ClientGrpc) {}
+  constructor(@Inject(NOTE_PACKAGE_NAME) private readonly client: ClientGrpc) {}
 
   onModuleInit(): void {
     this.noteServiceClient = this.client.getService<NoteServiceClient>(NOTE_SERVICE_NAME);
