@@ -342,11 +342,11 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   {/* TODO: get user data from betterauth */}
-                  <Avatar className="size-8  rounded-lg">
+                  <Avatar className="size-8 rounded-lg">
                     <AvatarImage src={sessionData.user.image || ''} alt={'avatar here'} />
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
-                  <div className="grid flex-1 text-left text-sm/tight ">
+                  <div className="grid flex-1 text-left text-sm/tight">
                     <span className="truncate font-semibold">{sessionData.user.name}</span>
                     <span className="truncate text-xs">{sessionData.user.email}</span>
                   </div>
@@ -361,11 +361,11 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
               >
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <Avatar className="size-8  rounded-lg">
+                    <Avatar className="size-8 rounded-lg">
                       <AvatarImage src={sessionData.user.image || ''} alt={sessionData.user.name} />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                     </Avatar>
-                    <div className="grid flex-1 text-left text-sm/tight ">
+                    <div className="grid flex-1 text-left text-sm/tight">
                       <span className="truncate font-semibold">{sessionData.user.name}</span>
                       <span className="truncate text-xs">{sessionData.user.email}</span>
                     </div>

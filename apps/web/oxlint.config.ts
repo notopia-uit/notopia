@@ -1,3 +1,5 @@
+import { resolve } from 'path';
+
 import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss';
 import { defineConfig } from 'oxlint';
 
@@ -23,8 +25,9 @@ export default defineConfig({
   ],
   settings: {
     'better-tailwindcss': {
-      entryPoint: 'app/globals.css',
-      cwd: import.meta.dirname,
+      entryPoint: resolve(import.meta.dirname, 'app/globals.css'),
+      tsconfig: resolve(import.meta.dirname, 'tsconfig.json'),
+      cwd: 'apps/web',
     },
   },
 });

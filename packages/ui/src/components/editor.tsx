@@ -41,14 +41,14 @@ export default function Editor({ noteId }: { noteId: string }) {
         <SuggestionMenuController
           triggerCharacter={'#'}
           getItems={async (query) => {
-            return await getTagMenuItems(editor, query, []);
+            return Promise.resolve(getTagMenuItems(editor, query, []));
           }}
         />
 
         <SuggestionMenuController
           triggerCharacter={'@'}
           getItems={async (query) => {
-            return await getNoteMenuItems(editor, query, []);
+            return Promise.resolve(getNoteMenuItems(editor, query, []));
           }}
         />
       </BlockNoteView>

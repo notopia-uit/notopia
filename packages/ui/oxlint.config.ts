@@ -1,3 +1,5 @@
+import { resolve } from 'path';
+
 import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss';
 import { defineConfig } from 'oxlint';
 
@@ -19,15 +21,7 @@ export default defineConfig({
         'better-tailwindcss/no-unknown-classes': [
           'error',
           {
-            ignore: [
-              'animate-in',
-              'fade-in',
-              'font-heading',
-              'notopia-reference',
-              'notopia-tag',
-              'slide-in-from-bottom-4',
-              'tree-container',
-            ],
+            ignore: ['font-heading', 'notopia-reference', 'notopia-tag', 'tree-container'],
           },
         ],
         'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
@@ -38,9 +32,9 @@ export default defineConfig({
   ignorePatterns: ['**/shadcn/**'],
   settings: {
     'better-tailwindcss': {
-      entryPoint: 'src/globals.css',
-      tsconfig: 'tsconfig.lib.json',
-      cwd: import.meta.dirname,
+      entryPoint: resolve(import.meta.dirname, 'src/globals.css'),
+      tsconfig: resolve(import.meta.dirname, 'tsconfig.lib.json'),
+      cwd: 'packages/ui',
       detectComponentClasses: true, // may oxlint doesnt work
     },
   },

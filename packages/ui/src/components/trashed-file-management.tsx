@@ -110,8 +110,8 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
 
   const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
           queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
         });
         setSelectedItems(new Set());
@@ -119,8 +119,8 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     }
   );
   const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
       });
       setSelectedItems(new Set());

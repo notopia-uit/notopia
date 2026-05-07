@@ -40,5 +40,9 @@
     "postcss": "catalog:",
     "tailwind-merge": "catalog:",
     "tw-animate-css": "catalog:"
+  },
+  "peerDependencies": {
+    "@blocknote/shadcn": "catalog:",
+    "tw-animate-css": "catalog:"
   }
 }
