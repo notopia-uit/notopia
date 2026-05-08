@@ -33,6 +33,8 @@ catalog:
   '@grpc/grpc-js': '1.14.3'
   '@hocuspocus/extension-database': '3.4.4'
   '@hocuspocus/server': '3.4.4'
+  '@hocuspocus/provider': '4.0.0'
+  '@hocuspocus/provider-react': '4.0.0'
   '@nestjs/common': '11.1.19'
   '@nestjs/config': '4.0.4'
   '@nestjs/core': '11.1.19'

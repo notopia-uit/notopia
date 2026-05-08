@@ -6,6 +6,8 @@
     "next": "next"
   },
   "dependencies": {
+    "@hocuspocus/provider": "catalog:",
+    "@hocuspocus/provider-react": "catalog:",
     "@notopia-uit/ui": "workspace:",
     "@tanstack/react-query": "catalog:",
     "better-auth": "catalog:",
