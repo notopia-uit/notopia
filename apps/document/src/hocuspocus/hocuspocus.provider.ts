@@ -24,9 +24,10 @@ export const HocuspocusProvider: Provider = {
           log: (message) => logger.log(message),
         }),
         new Database({
-          fetch: async ({ documentName: id }) => {
-            const document = await documentService.getById(id);
-            return document?.data ?? null;
+          fetch: async ({ documentName: id, document }) => {
+            document.awareness.setLocalStateField('documentId', id);
+            const documentState = await documentService.getById(id);
+            return documentState?.data ?? null;
           },
           store: async ({ documentName: id, state }) => {
             await documentService.updateDataById(id, state);

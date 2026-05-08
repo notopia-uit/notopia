@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@blocknote/core": "catalog:",
-    "@blocknote/react": "catalog:"
+    "@blocknote/react": "catalog:",
+    "@hocuspocus/provider-react": "catalog:"
   }
 }
