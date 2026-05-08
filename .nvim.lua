@@ -180,6 +180,8 @@ lsp.config.nestjs_doctor = {
   },
 }
 
+vim.env.EDITING = "true"
+
 lsp.config("oxlint", {
   cmd = { "./node_modules/.bin/oxlint", "--lsp" },
   root_dir = function(_, on_dir)
