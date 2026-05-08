@@ -7,7 +7,7 @@ import baseConfig from '../../oxlint-base.config.mts';
 
 export default defineConfig({
   extends: [baseConfig],
-  plugins: ['jsx-a11y', 'react', 'react-perf'],
+  plugins: ['jsx-a11y', 'react', 'react-perf', 'nextjs'],
   env: {
     browser: true,
     node: true,
