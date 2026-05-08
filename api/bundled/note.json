@@ -19135,12 +19135,6 @@
       }
     },
     "schemas": {
-      "id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000",
-        "readOnly": true
-      },
       "TrashedBy": {
         "type": "string",
         "enum": [
@@ -19170,8 +19164,10 @@
             "example": "📁"
           },
           "parentId": {
-            "$ref": "#/components/schemas/id",
-            "example": "cc7a2e47-6267-4c60-8d36-257f849777e4"
+            "type": "string",
+            "format": "uuid",
+            "example": "cc7a2e47-6267-4c60-8d36-257f849777e4",
+            "nullable": true
           },
           "workspaceId": {
             "type": "string",
@@ -19239,6 +19235,12 @@
           "message"
         ]
       },
+      "id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000",
+        "readOnly": true
+      },
       "name": {
         "type": "string",
         "minLength": 1,
@@ -19267,7 +19269,9 @@
             "example": "📓"
           },
           "folderId": {
-            "$ref": "#/components/schemas/id"
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
           },
           "tags": {
             "type": "array",

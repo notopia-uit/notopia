@@ -32,7 +32,7 @@ func (h *StrictHandler) CreateNote(
 		ID:       id,
 		Name:     request.Body.Name,
 		Icon:     icon,
-		FolderID: *request.Body.FolderId,
+		FolderID: request.Body.FolderId,
 		UserID:   user.ID,
 	}
 	err = h.App.Cmds.CreateNoteHandler.Handle(ctx, cmd)

@@ -128,15 +128,13 @@ export const zDocumentRevisionWithContent = zDocumentRevision.and(z.object({
 
 export const zDocumentName = z.string().min(1).max(255).nullable();
 
-export const zNoteId = z.uuid().readonly();
-
 export const zNoteTrashedBy = z.enum(['purpose', 'parent']);
 
 export const zNoteFolder = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
-    parentId: zNoteId,
+    parentId: z.uuid().nullable(),
     workspaceId: z.uuid(),
     updatedAt: z.iso.datetime().readonly(),
     trashed: z.object({
@@ -151,13 +149,15 @@ export const zNoteError = z.object({
     more_info: z.string().optional()
 });
 
+export const zNoteId = z.uuid().readonly();
+
 export const zNoteName = z.string().min(1).max(255);
 
 export const zNoteNote = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
-    folderId: zNoteId,
+    folderId: z.uuid(),
     tags: z.array(z.string()).readonly(),
     updatedAt: z.iso.datetime().readonly(),
     trashed: z.object({
@@ -359,12 +359,14 @@ export const zDocumentRevisionWithContentWritable = zDocumentRevisionWritable.an
 export const zNoteFolderWritable = z.object({
     name: z.string().min(1).max(255),
     icon: z.string().nullable(),
+    parentId: z.uuid().nullable(),
     workspaceId: z.uuid()
 });
 
 export const zNoteNoteWritable = z.object({
     name: z.string().min(1).max(255),
-    icon: z.string().nullable()
+    icon: z.string().nullable(),
+    folderId: z.uuid()
 });
 
 export const zNoteNoteLinkWritable = z.object({

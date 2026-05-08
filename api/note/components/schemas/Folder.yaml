@@ -20,8 +20,10 @@ properties:
     example: 📁
 
   parentId:
-    $ref: ./Folder.yaml#/properties/id
+    type: string
+    format: uuid
     example: cc7a2e47-6267-4c60-8d36-257f849777e4
+    nullable: true
 
   # This ref to ./Workspace.yaml#/properties/id
   workspaceId:

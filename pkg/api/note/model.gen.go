@@ -178,7 +178,7 @@ type Folder struct {
 	Icon        *string             `json:"icon"`
 	Id          *openapi_types.UUID `json:"id,omitempty"`
 	Name        string              `json:"name"`
-	ParentId    *Id                 `json:"parentId,omitempty"`
+	ParentId    *openapi_types.UUID `json:"parentId"`
 	Trashed     *FolderTrashed      `json:"trashed,omitempty"`
 	UpdatedAt   *time.Time          `json:"updatedAt,omitempty"`
 	WorkspaceId openapi_types.UUID  `json:"workspaceId"`
@@ -232,7 +232,7 @@ type HeartBeatWorkspaceEventEvent string
 
 // Note defines model for Note.
 type Note struct {
-	FolderId *Id                 `json:"folderId,omitempty"`
+	FolderId openapi_types.UUID  `json:"folderId"`
 	Icon     *string             `json:"icon"`
 	Id       *openapi_types.UUID `json:"id,omitempty"`
 
