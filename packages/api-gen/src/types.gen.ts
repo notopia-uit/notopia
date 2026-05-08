@@ -164,8 +164,6 @@ export type DocumentRevisionWithContent = DocumentRevision & {
 
 export type DocumentName = string | null;
 
-export type NoteId = string;
-
 export const NoteTrashedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
 
 export type NoteTrashedBy = typeof NoteTrashedBy[keyof typeof NoteTrashedBy];
@@ -174,7 +172,7 @@ export type NoteFolder = {
     readonly id: string;
     name: string;
     icon: string | null;
-    parentId: NoteId;
+    parentId: string | null;
     workspaceId: string;
     readonly updatedAt: Date;
     readonly trashed: {
@@ -198,6 +196,8 @@ export type NoteError = {
     more_info?: string;
 };
 
+export type NoteId = string;
+
 export type NoteName = string;
 
 export type NoteNote = {
@@ -207,7 +207,7 @@ export type NoteNote = {
      */
     name: string;
     icon: string | null;
-    folderId: NoteId;
+    folderId: string;
     readonly tags: Array<string>;
     readonly updatedAt: Date;
     readonly trashed: {
@@ -429,6 +429,7 @@ export type DocumentRevisionWithContentWritable = DocumentRevisionWritable & {
 export type NoteFolderWritable = {
     name: string;
     icon: string | null;
+    parentId: string | null;
     workspaceId: string;
 };
 
@@ -438,6 +439,7 @@ export type NoteNoteWritable = {
      */
     name: string;
     icon: string | null;
+    folderId: string;
 };
 
 export type NoteNoteLinkWritable = {

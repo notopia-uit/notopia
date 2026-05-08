@@ -37,7 +37,7 @@ func toNoteDTO(n *app.Note) (note.Note, error) {
 		Name:      n.Name,
 		Icon:      icon,
 		Tags:      tags,
-		FolderId:  &n.FolderID,
+		FolderId:  n.FolderID,
 		UpdatedAt: &n.UpdatedAt,
 		Trashed:   trashed,
 	}, nil

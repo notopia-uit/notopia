@@ -180,6 +180,8 @@ lsp.config.nestjs_doctor = {
   },
 }
 
+vim.env.EDITING = "true"
+
 lsp.config("oxlint", {
   cmd = { "./node_modules/.bin/oxlint", "--lsp" },
   root_dir = function(_, on_dir)
@@ -189,6 +191,7 @@ lsp.config("oxlint", {
     {
       workspaceUri = string.format("%s/packages/ui", uri_root),
       options = {
+        configPath = string.format("%s/packages/ui/oxlint.config.ts", root),
         fixKind = "all",
         run = "onSave",
         typeAware = false,
@@ -197,6 +200,7 @@ lsp.config("oxlint", {
     {
       workspaceUri = string.format("%s/packages/lib", uri_root),
       options = {
+        configPath = string.format("%s/packages/lib/oxlint.config.ts", root),
         fixKind = "all",
         run = "onSave",
         typeAware = false,
@@ -205,6 +209,7 @@ lsp.config("oxlint", {
     {
       workspaceUri = string.format("%s/apps/web", uri_root),
       options = {
+        configPath = string.format("%s/apps/web/oxlint.config.ts", root),
         fixKind = "all",
         run = "onSave",
         typeAware = false,
@@ -213,6 +218,7 @@ lsp.config("oxlint", {
     {
       workspaceUri = string.format("%s/apps/api-web", uri_root),
       options = {
+        configPath = string.format("%s/apps/api-web/oxlint.config.ts", root),
         fixKind = "all",
         run = "onSave",
         typeAware = false,
@@ -221,6 +227,7 @@ lsp.config("oxlint", {
     {
       workspaceUri = string.format("%s/apps/document", uri_root),
       options = {
+        configPath = string.format("%s/apps/document/oxlint.config.ts", root),
         fixKind = "all",
         run = "onSave",
         typeAware = false,
@@ -229,6 +236,7 @@ lsp.config("oxlint", {
     {
       workspaceUri = string.format("%s/apps/search-worker", uri_root),
       options = {
+        configPath = string.format("%s/apps/search-worker/oxlint.config.ts", root),
         fixKind = "all",
         run = "onSave",
         typeAware = false,

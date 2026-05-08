@@ -3,7 +3,7 @@ import { defineConfig } from 'oxlint';
 export default defineConfig({
   plugins: ['typescript', 'unicorn', 'eslint'],
   options: {
-    typeAware: false,
+    typeAware: process.env.EDITING !== 'true',
   },
   rules: {
     'typescript/require-await': 'error',

@@ -2,6 +2,8 @@
 
 import '@blocknote/core/fonts/inter.css';
 import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
+
+import '@blocknote/core/fonts/inter.css';
 import { BlockNoteView } from '@blocknote/shadcn';
 import {
   useHocuspocusAwareness,
@@ -9,15 +11,19 @@ import {
   useHocuspocusConnectionStatus,
   useHocuspocusProvider,
 } from '@hocuspocus/provider-react';
+
+import '@blocknote/shadcn/style.css';
+import '@blocknote/core/fonts/inter.css';
+import '@blocknote/shadcn/style.css';
 import {
   createBlockNoteSchema,
   getNoteMenuItems,
   getTagMenuItems,
 } from '@notopia-uit/ui/block-note';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 
 import '@blocknote/shadcn/style.css';
-import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { getDeterministicColor } from './../lib/utils/color';
