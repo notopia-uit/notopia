@@ -191,6 +191,7 @@ lsp.config("oxlint", {
       options = {
         fixKind = "all",
         run = "onSave",
+        typeAware = false,
       },
     },
     {
@@ -198,6 +199,7 @@ lsp.config("oxlint", {
       options = {
         fixKind = "all",
         run = "onSave",
+        typeAware = false,
       },
     },
     {
@@ -205,6 +207,7 @@ lsp.config("oxlint", {
       options = {
         fixKind = "all",
         run = "onSave",
+        typeAware = false,
       },
     },
     {
@@ -212,6 +215,7 @@ lsp.config("oxlint", {
       options = {
         fixKind = "all",
         run = "onSave",
+        typeAware = false,
       },
     },
     {
@@ -219,6 +223,7 @@ lsp.config("oxlint", {
       options = {
         fixKind = "all",
         run = "onSave",
+        typeAware = false,
       },
     },
     {
@@ -226,6 +231,7 @@ lsp.config("oxlint", {
       options = {
         fixKind = "all",
         run = "onSave",
+        typeAware = false,
       },
     },
   },
@@ -270,9 +276,6 @@ lsp.config("oxlint", {
       command = "LspOxlintFixAll",
     })
   end,
-  handlers = {
-    [vim.lsp.protocol.Methods.textDocument_publishDiagnostics] = function() end,
-  },
   flags = {
     debounce_text_changes = 500,
   },
