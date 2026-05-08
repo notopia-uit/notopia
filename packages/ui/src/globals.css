@@ -2,17 +2,6 @@
 @import 'tw-animate-css';
 @import '@blocknote/shadcn/style.css';
 
-/* Wait do we need this */
-@source './**/*.{ts,tsx}';
-
-@source inline('notopia-reference');
-@source inline('notopia-tag');
-
-/* TODO: Check this again, those are not tailwind stuff, just for oxlint not to error */
-/* https://github.com/tailwindlabs/tailwindcss/discussions/18588 */
-@source inline('font-heading');
-@source inline('tree-container');
-
 @custom-variant dark (&:is(.dark *));
 
 @theme {

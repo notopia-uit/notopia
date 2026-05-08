@@ -491,7 +491,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           }}
           renderTreeContainer={({ children, containerProps }) => {
             return (
-              <div {...containerProps} className="tree-container border-border border">
+              <div {...containerProps} className="border-border border">
                 {children}
               </div>
             );
