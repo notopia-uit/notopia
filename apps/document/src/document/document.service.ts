@@ -17,6 +17,7 @@ import { KAFKA_CLIENT } from '#/common/token';
 import { RevisionEntity } from '#/revision/revision.entity';
 import { StorageService } from '#/storage/storage.service';
 
+import { HocuspocusService } from '../hocuspocus/hocuspocus.service';
 import { DocumentEntity } from './document.entity';
 
 @Injectable()
@@ -29,7 +30,8 @@ export class DocumentService {
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly authorizationService: AuthorizationService,
     @Inject(BLOCKNOTE_SCHEMA) private readonly blocknoteSchema: MySchema,
-    @Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka
+    @Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka,
+    private readonly hocuspocusService: HocuspocusService
   ) {}
 
   toYDoc(entity: DocumentEntity): YDoc {
@@ -104,6 +106,7 @@ export class DocumentService {
           content: editor.editor.document satisfies MyBlock[],
         } satisfies ShareDocumentCommittedEvent)
       );
+      this.hocuspocusService.setDocumentModifiedFalse(documentId);
     });
   }
 
