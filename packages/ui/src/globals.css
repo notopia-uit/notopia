@@ -1,8 +1,9 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '@blocknote/shadcn/style.css';
+
+/* Wait do we need this */
 @source './**/*.{ts,tsx}';
-@source '../../apps/**/*.{ts,tsx}';
 
 @source inline('notopia-reference');
 @source inline('notopia-tag');

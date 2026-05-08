@@ -72,15 +72,15 @@ lsp.config("tailwindcss", {
   ---@module 'lspconfig'
   ---@type lspconfig.settings.tailwindcss
   settings = {
-    files = {
-      exclude = {
-        "**/.git/**",
-        "**/node_modules/**",
-        "**/dist/**",
-        "**/build/**",
-      },
-    },
     tailwindCSS = {
+      files = {
+        exclude = {
+          "**/.git/**",
+          "**/node_modules/**",
+          "**/dist/**",
+          "**/build/**",
+        },
+      },
       experimental = {
         configFile = {
           ["apps/web/app/globals.css"] = "apps/web/app/**",
@@ -88,6 +88,16 @@ lsp.config("tailwindcss", {
         },
       },
     },
+  },
+  capabilities = {
+    workspace = {
+      didChangeConfiguration = {
+        dynamicRegistration = false,
+      },
+    },
+  },
+  flags = {
+    debounce_text_changes = 250,
   },
 } --[[@as vim.lsp.Config]])
 
@@ -187,6 +197,7 @@ lsp.config("oxlint", {
       workspaceUri = string.format("%s/packages/lib", uri_root),
       options = {
         fixKind = "all",
+        run = "onSave",
       },
     },
     {
@@ -200,18 +211,21 @@ lsp.config("oxlint", {
       workspaceUri = string.format("%s/apps/api-web", uri_root),
       options = {
         fixKind = "all",
+        run = "onSave",
       },
     },
     {
       workspaceUri = string.format("%s/apps/document", uri_root),
       options = {
         fixKind = "all",
+        run = "onSave",
       },
     },
     {
       workspaceUri = string.format("%s/apps/search-worker", uri_root),
       options = {
         fixKind = "all",
+        run = "onSave",
       },
     },
   },
@@ -256,8 +270,11 @@ lsp.config("oxlint", {
       command = "LspOxlintFixAll",
     })
   end,
+  handlers = {
+    [vim.lsp.protocol.Methods.textDocument_publishDiagnostics] = function() end,
+  },
   flags = {
-    debounce_text_changes = 1000,
+    debounce_text_changes = 500,
   },
 } --[[@as vim.lsp.Config]])
 
@@ -281,7 +298,7 @@ lsp.enable({
   "nestjs_doctor",
   "nxls",
   "oxfmt",
-  -- "oxlint",
+  "oxlint",
   "redocly_ls",
   "tailwindcss",
   "tsgo",
