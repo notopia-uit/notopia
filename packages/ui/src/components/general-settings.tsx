@@ -1,3 +1,4 @@
+'use client';
 import { getMyWorkspacesOptions, useRenameWorkspaceMutation } from '@notopia-uit/api-gen';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';

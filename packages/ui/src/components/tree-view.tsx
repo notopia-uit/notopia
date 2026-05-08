@@ -496,7 +496,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
               </div>
             );
           }}
-          renderLiveDescriptorContainer={({ }) => <></>}
+          renderLiveDescriptorContainer={({}) => <></>}
           renderItemsContainer={({ children, containerProps }) => {
             return <ul {...containerProps}>{children}</ul>;
           }}

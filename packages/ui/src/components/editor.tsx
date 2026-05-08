@@ -17,10 +17,10 @@ import {
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
 
 import '@blocknote/shadcn/style.css';
-import { getDeterministicColor } from 'lib/utils/color';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { getDeterministicColor } from './../lib/utils/color';
 import { Icons } from './icons';
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
