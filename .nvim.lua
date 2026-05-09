@@ -274,9 +274,6 @@ lsp.config("oxlint", {
       command = "LspOxlintFixAll",
     })
   end,
-  flags = {
-    debounce_text_changes = 1000,
-  },
 } --[[@as vim.lsp.Config]])
 
 lsp.config("oxfmt", {

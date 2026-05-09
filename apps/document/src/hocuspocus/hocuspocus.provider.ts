@@ -24,9 +24,8 @@ export const HocuspocusProvider: Provider = {
           log: (message) => logger.log(message),
         }),
         new Database({
-          fetch: async ({ documentName: id, document: hocuspocusDocument }) => {
+          fetch: async ({ documentName: id }) => {
             const document = await documentService.getById(id);
-            hocuspocusDocument.awareness.setLocalStateField('isModified', document?.modified);
             return document?.data ?? null;
           },
           store: async ({ documentName: id, state }) => {
@@ -60,7 +59,7 @@ export const HocuspocusProvider: Provider = {
       },
 
       async onChange(data) {
-        data.document.getMap('isModified').set('value', true);
+        data.document.setIsModified(true);
         return Promise.resolve();
       },
     });

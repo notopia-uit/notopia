@@ -1,5 +1,7 @@
 // oxfmt-ignore
 import './otel';
+// oxfmt-ignore
+import '@notopia-uit/lib/yjs';
 import 'reflect-metadata';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';

@@ -1,7 +1,5 @@
 import { CollaborationUser as BlockNoteCollaborationUser } from '@blocknote/core/extensions';
-import { CollabUser as HocuspocusCollabUser } from '@hocuspocus/provider-react';
 
-export type CollabUser = {
+export interface CollaborationUser extends BlockNoteCollaborationUser {
   avatar: string;
-} & BlockNoteCollaborationUser &
-  HocuspocusCollabUser;
+}

@@ -14,11 +14,23 @@
       "@nx/source": "./src/server/index.ts",
       "types": "./dist/server/index.d.ts",
       "default": "./dist/server/index.js"
+    },
+    "./hocuspocus": {
+      "@nx/source": "./src/hocuspocus/index.ts",
+      "types": "./dist/hocuspocus/index.d.ts",
+      "default": "./dist/hocuspocus/index.js"
+    },
+    "./yjs": {
+      "@nx/source": "./src/yjs/index.ts",
+      "types": "./dist/yjs/index.d.ts",
+      "default": "./dist/yjs/index.js"
     }
   },
   "dependencies": {
     "@blocknote/core": "catalog:",
     "@blocknote/react": "catalog:",
-    "@hocuspocus/provider-react": "catalog:"
+    "@hocuspocus/provider": "catalog:",
+    "@hocuspocus/provider-react": "catalog:",
+    "yjs": "catalog:"
   }
 }

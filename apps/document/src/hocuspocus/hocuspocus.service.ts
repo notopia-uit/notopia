@@ -99,7 +99,7 @@ export class HocuspocusService {
   setDocumentModifiedFalse(documentId: string) {
     for (const [documentName, document] of this.hocuspocus.documents) {
       if (documentName === documentId) {
-        document.awareness.setLocalStateField('isModified', false);
+        document.setIsModified(false);
         break;
       }
     }

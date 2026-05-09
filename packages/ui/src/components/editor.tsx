@@ -1,5 +1,11 @@
 'use client';
 
+// we have to import the prototype augment, type augment for lib/yjs and hocuspocus
+// oxfmt-ignore
+import '@notopia-uit/lib/yjs';
+// oxfmt-ignore
+import '@notopia-uit/lib/hocuspocus';
+
 import '@blocknote/core/fonts/inter.css';
 import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
 
@@ -83,16 +89,16 @@ function EditorStatus() {
               <Tooltip key={user.clientId}>
                 <TooltipTrigger asChild>
                   <Avatar className="border-background ring-border size-8 border-2 ring-1">
-                    <AvatarImage src={(user as any).avatar} />
+                    <AvatarImage src={user.avatar} />
                     <AvatarFallback
-                      style={{ backgroundColor: (user as any).color ?? '#ccc' }}
+                      style={{ backgroundColor: user.color }}
                       className="text-[10px] text-white"
                     >
-                      {(user as any).name?.substring(0, 2).toUpperCase() ?? '??'}
+                      {user.name.substring(0, 2).toUpperCase() ?? '??'}
                     </AvatarFallback>
                   </Avatar>
                 </TooltipTrigger>
-                <TooltipContent>{(user as any).name ?? 'Anonymous'}</TooltipContent>
+                <TooltipContent>{user.name}</TooltipContent>
               </Tooltip>
             ))}
           </div>

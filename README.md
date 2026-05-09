@@ -47,3 +47,4 @@
 - [ ] gin should be protected with `SetTrustedProxies`
 - [ ] Event is tracked by either otel or correlation id. But, currently use wotel + kafka tracer, and partially correlation id but not really connected.
 - [ ] If deploy, but not using roles. Change to `https://github.com/agilezebra/jwt-middleware`, and use istio
+- [ ] Document and search worker has duplicate dist for src, and ts code
