@@ -9,7 +9,11 @@ OPENCODE_EXPERIMENTAL = "true"
 OPENCODE_EXPERIMENTAL_OXFMT = "true"
 OPENCODE_EXPERIMENTAL_EXA = "true"
 COMPOSE_FILE = "./deploy/compose/compose.yaml"
-'_'.path.paths = ["./bin/", "./scripts/"]
+'_'.path.paths = [
+  "./bin/",
+  "./scripts/",
+  "./node_modules/.bin/"
+]
 
 [tools]
 "github:pressly/goose" = "3.27.1"
