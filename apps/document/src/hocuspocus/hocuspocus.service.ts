@@ -1,4 +1,4 @@
-import { Hocuspocus } from '@hocuspocus/server';
+import { Connection, Hocuspocus } from '@hocuspocus/server';
 import { Injectable } from '@nestjs/common';
 import { Traceable } from 'nestjs-otel';
 
@@ -13,7 +13,7 @@ import { WorkspaceNoteNotFoundException } from '#/note/workspace-note-not-found.
 export class HocuspocusService {
   constructor(
     private readonly noteService: NoteService,
-    private readonly hocuspocus: Hocuspocus,
+    private readonly hocuspocus: Hocuspocus<HocuspocusContext>,
     private readonly authorizationService: AuthorizationService
   ) {}
 
@@ -21,8 +21,8 @@ export class HocuspocusService {
   // Because based on the casbin rules, it will be always canRead when this event fired
   async onRoleChanged({ workspaceId, userId }: { workspaceId: string; userId: string }) {
     for (const [documentName, document] of this.hocuspocus.documents) {
-      for (const [_, connection] of document.connections) {
-        const context = connection.connection.context as HocuspocusContext;
+      for (const connection of document.getConnections() as Connection<HocuspocusContext>[]) {
+        const context = connection.context as HocuspocusContext;
         if (context.user.id !== userId) {
           continue;
         }
@@ -34,7 +34,7 @@ export class HocuspocusService {
           });
         } catch (e) {
           if (e instanceof WorkspaceNoteNotFoundException) {
-            connection.connection.close({
+            connection.close({
               code: 4001,
               reason: `Your access to document ${documentName} has been revoked due to workspace be found for this document.`,
             });
@@ -49,13 +49,13 @@ export class HocuspocusService {
           memberId: userId,
         });
         if (!permissions.canRead) {
-          connection.connection.close({
+          connection.close({
             code: 4002,
             reason:
               'Your access to this document has been revoked because you no longer have read permission.',
           });
         } else {
-          connection.connection.readOnly = !permissions.canWrite;
+          connection.readOnly = !permissions.canWrite;
         }
       }
     }
@@ -64,8 +64,8 @@ export class HocuspocusService {
   // NOTE: If we handle the published, then this should be adjusted
   async onMemberRemoved({ workspaceId, userId }: { workspaceId: string; userId: string }) {
     for (const [documentName, document] of this.hocuspocus.documents) {
-      for (const [_, connection] of document.connections) {
-        const context = connection.connection.context as HocuspocusContext;
+      for (const connection of document.getConnections() as Connection<HocuspocusContext>[]) {
+        const context = connection.context as HocuspocusContext;
         if (context.user.id !== userId) {
           continue;
         }
@@ -77,7 +77,7 @@ export class HocuspocusService {
           });
         } catch (e) {
           if (e instanceof WorkspaceNoteNotFoundException) {
-            connection.connection.close({
+            connection.close({
               code: 4001,
               reason: `Your access to document ${documentName} has been revoked due to workspace be found for this document.`,
             });
@@ -87,7 +87,7 @@ export class HocuspocusService {
         if (workspace?.id !== workspaceId) {
           continue;
         }
-        connection.connection.close({
+        connection.close({
           code: 4002,
           reason:
             'Your access to this document has been revoked because you have been removed from the workspace.',

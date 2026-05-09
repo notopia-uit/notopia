@@ -1,5 +1,3 @@
-import { IncomingMessage } from 'http';
-
 import { Hocuspocus } from '@hocuspocus/server';
 import { UseGuards } from '@nestjs/common';
 import { ConnectedSocket, OnGatewayConnection, WebSocketGateway } from '@nestjs/websockets';
@@ -18,11 +16,7 @@ export class HocuspocusGateway implements OnGatewayConnection {
   constructor(private readonly hocuspocus: Hocuspocus) {}
 
   @UseGuards(WsUserGuard)
-  handleConnection(
-    @ConnectedSocket() socket: WebSocket,
-    @ReqUser() user: User,
-    req: IncomingMessage
-  ) {
+  handleConnection(@ConnectedSocket() socket: WebSocket, @ReqUser() user: User, req: Request) {
     const context: HocuspocusContext = { user };
     this.hocuspocus.handleConnection(socket, req, context);
   }

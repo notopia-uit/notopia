@@ -10,14 +10,14 @@ import { NoteService } from '#/note/note.service';
 import { HocuspocusContext } from './hocuspocus-context';
 
 export const HocuspocusProvider: Provider = {
-  provide: Hocuspocus,
+  provide: Hocuspocus<HocuspocusContext>,
   useFactory: (
     documentService: DocumentService,
     noteService: NoteService,
     authorizationService: AuthorizationService,
     logger: Logger
   ) => {
-    return new Hocuspocus({
+    return new Hocuspocus<HocuspocusContext>({
       name: 'document', // TODO: Inject host
       extensions: [
         new HocuspocusLogger({
@@ -36,7 +36,7 @@ export const HocuspocusProvider: Provider = {
 
       async onAuthenticate(data) {
         const documentId = data.documentName;
-        const context = data.context as HocuspocusContext;
+        const context = data.context;
         const note = await noteService.getNoteById({
           noteId: documentId,
           userId: context.user.id,
@@ -56,6 +56,11 @@ export const HocuspocusProvider: Provider = {
         if (!userPermissionsRes.canWrite || note.trashed) {
           data.connectionConfig.readOnly = true;
         }
+      },
+
+      async onChange(data) {
+        data.document.getMap('isModified').set('value', true);
+        return Promise.resolve();
       },
     });
   },
