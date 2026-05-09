@@ -37,14 +37,14 @@ catalogs:
       specifier: 0.97.1
       version: 0.97.1
     '@hocuspocus/extension-database':
-      specifier: 3.4.4
-      version: 3.4.4
+      specifier: 4.0.0
+      version: 4.0.0
     '@hocuspocus/extension-logger':
-      specifier: 3.4.4
-      version: 3.4.4
+      specifier: 4.0.0
+      version: 4.0.0
     '@hocuspocus/server':
-      specifier: 3.4.4
-      version: 3.4.4
+      specifier: 4.0.0
+      version: 4.0.0
     '@icons-pack/react-simple-icons':
       specifier: 13.13.0
       version: 13.13.0
@@ -506,13 +506,13 @@ importers:
         version: 0.8.0
       '@hocuspocus/extension-database':
         specifier: 'catalog:'
-        version: 3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
+        version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
       '@hocuspocus/extension-logger':
         specifier: 'catalog:'
-        version: 3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
+        version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
       '@hocuspocus/server':
         specifier: 'catalog:'
-        version: 3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
+        version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
       '@nestjs/common':
         specifier: 'catalog:'
         version: 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -2665,19 +2665,20 @@ packages:
   '@hey-api/types@0.1.4':
     resolution: {integrity: sha512-thWfawrDIP7wSI9ioT13I5soaaqB5vAPIiZmgD8PbeEVKNrkonc0N/Sjj97ezl7oQgusZmaNphGdMKipPO6IBg==}
 
-  '@hocuspocus/common@3.4.4':
-    resolution: {integrity: sha512-RykIJ0tsHHMP4Xk+4UCbc7SO5LgGxGUSTdbh6anJEsaALAyqinf1Nn5HYuMjLPolAmsar1v++m9zufR09NLpXA==}
+  '@hocuspocus/common@4.0.0':
+    resolution: {integrity: sha512-7BE8TsKBkdiOZO6tfm3ny6bIHPbxkIZb3hsYdVn/X5xbXI8n8w9pnE6pXgEMKQhJm6zsWsa9IDRJIp/c9u+DmA==}
 
-  '@hocuspocus/extension-database@3.4.4':
-    resolution: {integrity: sha512-z7iq2Dw+GOp4aQq7ys3PD0BA++7tQdXBsSHZ+8mkAbxfTDzjzQ576TphxPiXXC1WQ7yjeFXq03xp/KLIhg3Pyg==}
+  '@hocuspocus/extension-database@4.0.0':
+    resolution: {integrity: sha512-LbulNYn3Jtu/xp1di8VMHLu6lBtO4zlssIEXw3i1ddT/0A0AbXYSwYTr4LocpsRta4vsGwjEu3fDpFzwVfax8g==}
     peerDependencies:
       yjs: ^13.6.8
 
-  '@hocuspocus/extension-logger@3.4.4':
-    resolution: {integrity: sha512-GEnjmvQlrDlr5hoTQ8NHStZkzpL42wkwZ5XOBMkEX/TgqcnEtKCK1SOK0xj+px9tEHaflDLtCq6f5oy4gOCkPQ==}
+  '@hocuspocus/extension-logger@4.0.0':
+    resolution: {integrity: sha512-9eWfWx5VE/Ef9rWfHWhUC26aMrGKwNcLy2D/Uxf5tIBdcW2ohQpeWlriz1uTCHahyOogu6uRFKaAddZnEZDlJA==}
 
-  '@hocuspocus/server@3.4.4':
-    resolution: {integrity: sha512-UV+oaONAejOzeYgUygNcgsc8RdZvSokVvAxluZJIisLACpRO/VsseQ5lWKDRwLd7Fn6+rHWDH3hGuQ1fdX1Ycg==}
+  '@hocuspocus/server@4.0.0':
+    resolution: {integrity: sha512-Pgm+kVtTrVvybIJUVot5XumSzD8rPLQglUV0QAAiN6J64dkYc2wWNdGcMwJz3q3yJPV0dO+eRU9JEck+iVdgzQ==}
+    engines: {node: '>=22'}
     peerDependencies:
       y-protocols: ^1.0.6
       yjs: ^13.6.8
@@ -8920,9 +8921,6 @@ packages:
     resolution: {integrity: sha512-hsU18Ae8CDTR6Kgu9DYf0EbCr/a5iGL0rytQDobUcdpYOKokk8LEjVphnXkDkgpi0wYVsqrXuP0bZxJaTqdgoA==}
     engines: {node: '>= 0.4'}
 
-  async-lock@1.4.1:
-    resolution: {integrity: sha512-Az2ZTpuytrtqENulXwO3GGv1Bztugx6TT37NIo7imr/Qo0gsYiGtSdBa2B6fsXhTpVZDNfu1Qn3pk531e3q+nQ==}
-
   async-mutex@0.5.0:
     resolution: {integrity: sha512-1A94B18jkJ3DYq284ohPxoXbfTA5HsQ7/Mf4DEhcyLx3Bz27Rh59iScbB6EPiP+B+joue6YCxcMXSbFC1tZKwA==}
 
@@ -9790,6 +9788,14 @@ packages:
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
+
+  crossws@0.4.5:
+    resolution: {integrity: sha512-wUR89x/Rw7/8t+vn0CmGDYM9TD6VtARGb0LD5jq2wjtMy1vCP4M+sm6N6TigWeTYvnA8MoW29NqqXD0ep0rfBA==}
+    peerDependencies:
+      srvx: '>=0.11.5'
+    peerDependenciesMeta:
+      srvx:
+        optional: true
 
   css-color-keywords@1.0.0:
     resolution: {integrity: sha512-FyyrDHZKEjXDpNJYvVsV960FiqQyXc/LlYmsxl2BcdMb2WPx0OGRVgTg55rPSyLSNMqP52R9r8geSp7apN3Ofg==}
@@ -19117,41 +19123,37 @@ snapshots:
 
   '@hey-api/types@0.1.4': {}
 
-  '@hocuspocus/common@3.4.4':
+  '@hocuspocus/common@4.0.0':
     dependencies:
       lib0: 0.2.117
 
-  '@hocuspocus/extension-database@3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)':
+  '@hocuspocus/extension-database@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)':
     dependencies:
-      '@hocuspocus/server': 3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
+      '@hocuspocus/server': 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
       yjs: 13.6.30
     transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
+      - srvx
       - y-protocols
 
-  '@hocuspocus/extension-logger@3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)':
+  '@hocuspocus/extension-logger@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)':
     dependencies:
-      '@hocuspocus/server': 3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
+      '@hocuspocus/server': 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
     transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
+      - srvx
       - y-protocols
       - yjs
 
-  '@hocuspocus/server@3.4.4(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)':
+  '@hocuspocus/server@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)':
     dependencies:
-      '@hocuspocus/common': 3.4.4
-      async-lock: 1.4.1
+      '@hocuspocus/common': 4.0.0
       async-mutex: 0.5.0
+      crossws: 0.4.5
       kleur: 4.1.5
       lib0: 0.2.117
-      ws: 8.19.0
       y-protocols: 1.0.7(yjs@13.6.30)
       yjs: 13.6.30
     transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
+      - srvx
 
   '@hono/node-server@1.19.14(hono@4.12.14)':
     dependencies:
@@ -27227,8 +27229,6 @@ snapshots:
 
   async-function@1.0.0: {}
 
-  async-lock@1.4.1: {}
-
   async-mutex@0.5.0:
     dependencies:
       tslib: 2.8.1
@@ -28122,6 +28122,8 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  crossws@0.4.5: {}
 
   css-color-keywords@1.0.0: {}
 
