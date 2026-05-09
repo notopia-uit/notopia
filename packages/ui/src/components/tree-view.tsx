@@ -4,13 +4,15 @@ import {
   NoteWorkspaceTreeFolder,
   NoteWorkspaceTreeNote,
   getWorkspaceTreeOptions,
+  useCreateFolderMutation,
+  useCreateNoteMutation,
 } from '@notopia-uit/api-gen';
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
 import { Alert, AlertDescription, AlertTitle } from '@notopia-uit/ui/components/shadcn/alert';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { AlertCircleIcon, ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -27,7 +29,7 @@ import {
 //TODO: fetch data from api and handle loading states, errors, etc.
 type TreeData = Record<TreeItemIndex, TreeItem<string>>;
 
-const mapDtoTreeData = (rootFolder: NoteWorkspaceTreeFolder): TreeData => {
+const mapDtoTreeData = (rootFolder: NoteWorkspaceTreeFolder) => {
   const tree: TreeData = {};
 
   const traverse = (node: NoteWorkspaceTreeFolder | NoteWorkspaceTreeNote, isFolder: boolean) => {
@@ -61,7 +63,10 @@ const mapDtoTreeData = (rootFolder: NoteWorkspaceTreeFolder): TreeData => {
 
   traverse(rootFolder, true);
 
-  return tree;
+  return {
+    treeData: tree,
+    rootId: rootFolder.id,
+  };
 };
 
 type DisposableType = {
@@ -189,8 +194,19 @@ const RenameErrorAlert = () => (
   </Alert>
 );
 
+const CreateErrorAlert = () => (
+  <Alert variant="destructive" className="max-w-md">
+    <AlertCircleIcon />
+    <AlertTitle>CreateFailed</AlertTitle>
+    <AlertDescription>Failed to create item. Please try again.</AlertDescription>
+  </Alert>
+);
+
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
-  const { data: workspaceTreeData } = useSuspenseQuery({
+  const queryClient = useQueryClient();
+  const {
+    data: { treeData: workspaceTreeData, rootId },
+  } = useSuspenseQuery({
     ...getWorkspaceTreeOptions({ path: { workspaceId: currentWorkspaceId } }),
     select: (data) => mapDtoTreeData(data),
   });
@@ -198,22 +214,59 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   const router = useRouter();
   const tree = useRef<TreeRef>(null);
 
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showRenameErrorAlert, setShowRenameErrorAlert] = useState(false);
+  const [showCreateErrorAlert, setShowCreateErrorAlert] = useState(false);
+
   const onRenameError = useCallback(() => {
-    setShowErrorAlert(true);
+    setShowRenameErrorAlert(true);
   }, []);
   useEffect(() => {
-    if (!showErrorAlert) return;
-    const timer = setTimeout(() => setShowErrorAlert(false), 3000);
+    if (!showRenameErrorAlert) return;
+    const timer = setTimeout(() => setShowRenameErrorAlert(false), 3000);
     return () => clearTimeout(timer);
-  }, [showErrorAlert]);
+  }, [showRenameErrorAlert]);
   const { mutate: renameNote } = useRenameNoteMutation({
     onError: onRenameError,
   });
   const { mutate: renameFolder } = useRenameFolderMutation({
     onError: onRenameError,
   });
+  const onCreateError = useCallback(() => {
+    setShowCreateErrorAlert(true);
+  }, []);
+  useEffect(() => {
+    if (!showCreateErrorAlert) return;
+    const timer = setTimeout(() => setShowCreateErrorAlert(false), 3000);
+    return () => clearTimeout(timer);
+  }, [showCreateErrorAlert]);
+  const handleCreateSuccess = async (parentId: string) => {
+    await queryClient.invalidateQueries({
+      queryKey: getWorkspaceTreeOptions({ path: { workspaceId: currentWorkspaceId } }).queryKey,
+    });
 
+    setViewState((prev) => {
+      const currentExpanded = prev['tree-sample']?.expandedItems ?? [];
+      if (!currentExpanded.includes(parentId)) {
+        return {
+          ...prev,
+          'tree-sample': {
+            ...prev['tree-sample'],
+            expandedItems: [...currentExpanded, parentId],
+          },
+        };
+      }
+      return prev;
+    });
+  };
+  //TODO:: call API to create new item and update tree data with response
+  const { mutate: createNote } = useCreateNoteMutation({
+    onSuccess: (_, variables) => handleCreateSuccess(variables.body.folderId as string),
+    onError: onCreateError,
+  });
+  const { mutate: createFolder } = useCreateFolderMutation({
+    onError: onCreateError,
+    onSuccess: (_, variables) => handleCreateSuccess(variables.body.parentId as string),
+  });
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
 
@@ -224,113 +277,106 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   const dataProvider = useMemo(() => new TreeDataProvider<string>(items), [items]);
   //TODO: call API to update tree data on drop
-  const onDrop = useCallback((draggedItems: TreeItem<string>[], target: DraggingPosition) => {
-    setItems((prevItems) => {
-      const newItems = { ...prevItems };
+  const getTargetParentId = useCallback(() => {
+    const focusedId = viewState['tree-sample']?.focusedItem;
+    let parentId: TreeItemIndex = rootId;
 
-      for (const item of draggedItems) {
-        const parent = Object.values(newItems).find(
-          (p) => p.isFolder && p.children?.includes(item.index)
+    if (focusedId && items[focusedId]) {
+      if (items[focusedId].isFolder) {
+        parentId = focusedId;
+      } else {
+        const parent = Object.values(items).find(
+          (p) => p.isFolder && p.children?.includes(focusedId)
         );
-        if (parent && parent.children) {
-          newItems[parent.index] = {
-            ...parent,
-            children: parent.children.filter((child) => child !== item.index),
-          };
-        }
+        if (parent) parentId = parent.index;
       }
+    }
+    return parentId;
+  }, [viewState, items, rootId]);
 
-      if (target.targetType === 'item') {
-        const targetItem = newItems[target.targetItem];
-        if (targetItem && targetItem.isFolder) {
-          newItems[target.targetItem] = {
-            ...targetItem,
-            children: [...(targetItem.children || []), ...draggedItems.map((i) => i.index)],
-          };
-        }
-      } else if (target.targetType === 'between-items') {
-        const parentItem = newItems[target.parentItem];
-        if (parentItem && parentItem.isFolder) {
-          const newChildren = [...(parentItem.children || [])];
-          newChildren.splice(target.childIndex, 0, ...draggedItems.map((i) => i.index));
-          newItems[target.parentItem] = {
-            ...parentItem,
-            children: newChildren,
-          };
-        }
-      } else if (target.targetType === 'root') {
-        const rootItem = newItems['root'];
-        if (rootItem) {
-          newItems['root'] = {
-            ...rootItem,
-            children: [...(rootItem.children || []), ...draggedItems.map((i) => i.index)],
-          };
-        }
-      }
+  const onDrop = useCallback(
+    (draggedItems: TreeItem<string>[], target: DraggingPosition) => {
+      setItems((prevItems) => {
+        const newItems = { ...prevItems };
 
-      return newItems;
-    });
-  }, []);
+        for (const item of draggedItems) {
+          const parent = Object.values(newItems).find(
+            (p) => p.isFolder && p.children?.includes(item.index)
+          );
+          if (parent && parent.children) {
+            newItems[parent.index] = {
+              ...parent,
+              children: parent.children.filter((child) => child !== item.index),
+            };
+          }
+        }
+
+        if (target.targetType === 'item') {
+          const targetItem = newItems[target.targetItem];
+          if (targetItem && targetItem.isFolder) {
+            newItems[target.targetItem] = {
+              ...targetItem,
+              children: [...(targetItem.children || []), ...draggedItems.map((i) => i.index)],
+            };
+          }
+        } else if (target.targetType === 'between-items') {
+          const parentItem = newItems[target.parentItem];
+          if (parentItem && parentItem.isFolder) {
+            const newChildren = [...(parentItem.children || [])];
+            newChildren.splice(target.childIndex, 0, ...draggedItems.map((i) => i.index));
+            newItems[target.parentItem] = {
+              ...parentItem,
+              children: newChildren,
+            };
+          }
+        } else if (target.targetType === 'root') {
+          const rootItem = newItems['root'];
+          if (rootItem) {
+            newItems['root'] = {
+              ...rootItem,
+              children: [...(rootItem.children || []), ...draggedItems.map((i) => i.index)],
+            };
+          }
+        }
+
+        return newItems;
+      });
+    },
+    [rootId]
+  );
 
   // NOTE: some problem with api contract, check this later
   //TODO: call API to create new item and update tree data with response
   // Maybe this logic need to be checked
   const handleCreateItem = useCallback(
     (isFolder: boolean) => {
-      setItems((prevItems) => {
-        const focusedId = viewState['tree-sample']?.focusedItem;
-        let parentId: TreeItemIndex = 'root';
+      const parentId = getTargetParentId();
+      const defaultName = isFolder ? 'New Folder' : 'New Note';
 
-        if (focusedId && prevItems[focusedId]) {
-          if (prevItems[focusedId].isFolder) {
-            parentId = focusedId;
-          } else {
-            const parent = Object.values(prevItems).find(
-              (p) => p.isFolder && p.children?.includes(focusedId)
-            );
-            if (parent) parentId = parent.index;
-          }
-        }
-
-        const newItemId = `item_${Date.now()}`;
-
-        const newItem: TreeItem<string> = {
-          index: newItemId,
-          isFolder,
-          data: isFolder ? 'New Folder' : 'New Note',
-          children: isFolder ? [] : undefined,
-        };
-
-        setViewState((prev) => {
-          const currentExpanded = prev['tree-sample']?.expandedItems ?? [];
-          if (!currentExpanded.includes(parentId)) {
-            return {
-              ...prev,
-              'tree-sample': {
-                ...prev['tree-sample'],
-                expandedItems: [...currentExpanded, parentId],
-              },
-            };
-          }
-          return prev;
-        });
-
-        const parentNode = prevItems[parentId];
-        return {
-          ...prevItems,
-          [newItemId]: newItem,
-          [parentId]: {
-            ...parentNode,
-            children: [...(parentNode.children || []), newItemId],
+      if (isFolder) {
+        createFolder({
+          body: {
+            workspaceId: currentWorkspaceId,
+            icon: '📁',
+            name: defaultName,
+            parentId: parentId as string,
           },
-        };
-      });
+        });
+      } else {
+        createNote({
+          body: {
+            folderId: parentId as string,
+            icon: '📝',
+            name: defaultName,
+          },
+        });
+      }
     },
-    [viewState]
+    [getTargetParentId, createFolder, createNote, currentWorkspaceId]
   );
 
   const getItemPath = useCallback(
-    async (search: string, searchRoot: TreeItemIndex = 'root'): Promise<TreeItemIndex[] | null> => {
+    async (search: string, searchRoot: TreeItemIndex = rootId): Promise<TreeItemIndex[] | null> => {
       const searchTree = async (currentId: TreeItemIndex): Promise<TreeItemIndex[] | null> => {
         const item = await dataProvider.getTreeItem(currentId);
 
@@ -353,7 +399,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
       return searchTree(searchRoot);
     },
-    [dataProvider]
+    [dataProvider, rootId]
   );
 
   const onSubmit = useCallback(
@@ -486,7 +532,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
               },
             }));
             if (selectedId && items[selectedId] && !items[selectedId].isFolder) {
-              router.push(`/workspace/${currentWorkspaceId}/${selectedId}`);
+              router.push(`/workspace/${currentWorkspaceId}/note/${selectedId}`);
             }
           }}
           renderTreeContainer={({ children, containerProps }) => {
@@ -533,10 +579,11 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           }}
           renderItemTitle={({ title }) => <span>{title}</span>}
         >
-          <Tree ref={tree} treeId="tree-sample" rootItem="root" treeLabel="Sample Tree" />
+          <Tree ref={tree} treeId="tree-sample" rootItem={rootId} treeLabel="Sample Tree" />
         </ControlledTreeEnvironment>
       </div>
-      {showErrorAlert && <RenameErrorAlert />}
+      {showRenameErrorAlert && <RenameErrorAlert />}
+      {showCreateErrorAlert && <CreateErrorAlert />}
     </div>
   );
 };
