@@ -89,16 +89,6 @@ lsp.config("tailwindcss", {
       },
     },
   },
-  capabilities = {
-    workspace = {
-      didChangeConfiguration = {
-        dynamicRegistration = false,
-      },
-    },
-  },
-  flags = {
-    debounce_text_changes = 250,
-  },
 } --[[@as vim.lsp.Config]])
 
 lsp.config("twcssls", {
@@ -285,7 +275,7 @@ lsp.config("oxlint", {
     })
   end,
   flags = {
-    debounce_text_changes = 500,
+    debounce_text_changes = 1000,
   },
 } --[[@as vim.lsp.Config]])
 
