@@ -8,8 +8,6 @@ import '@notopia-uit/lib/hocuspocus';
 
 import '@blocknote/core/fonts/inter.css';
 import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
-
-import '@blocknote/core/fonts/inter.css';
 import { BlockNoteView } from '@blocknote/shadcn';
 import {
   useHocuspocusAwareness,
@@ -17,19 +15,15 @@ import {
   useHocuspocusConnectionStatus,
   useHocuspocusProvider,
 } from '@hocuspocus/provider-react';
-
-import '@blocknote/shadcn/style.css';
-import '@blocknote/core/fonts/inter.css';
-import '@blocknote/shadcn/style.css';
 import {
   createBlockNoteSchema,
   getNoteMenuItems,
   getTagMenuItems,
 } from '@notopia-uit/ui/block-note';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
-import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 
 import '@blocknote/shadcn/style.css';
+import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { getDeterministicColor } from './../lib/utils/color';
@@ -112,6 +106,7 @@ function EditorStatus() {
   );
 }
 
+//TODO: set local state for avatar when override from session data, and update awareness state on session change (e.g. login/logout or user update)
 export default function Editor({ noteId }: { noteId: string }) {
   // const { data: note } = useSuspenseQuery(
   //   getNoteOptions({
@@ -135,6 +130,7 @@ export default function Editor({ noteId }: { noteId: string }) {
       user: {
         name: sessionData?.user?.name ?? 'Anonymous',
         color: getDeterministicColor(sessionData?.user?.id ?? 'anonymous'),
+        avatar: sessionData?.user?.image ?? 'https://placehold.net/default.svg',
       },
     },
   });

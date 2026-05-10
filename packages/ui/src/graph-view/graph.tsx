@@ -157,7 +157,7 @@ export default function Graph({ data, currentSlug = '', options, className = '' 
           </svg>
         </button>
       </div>
-      <div className="global-graph-outer">
+      <div /*className="global-graph-outer"*/>
         <div
           ref={globalGraphRef}
           className={styles.globalGraphContainer}
