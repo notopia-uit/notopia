@@ -181,6 +181,8 @@ export type NoteFolder = {
     } | null;
 };
 
+export type NoteId = string;
+
 export type NoteError = {
     /**
      * Error code
@@ -195,8 +197,6 @@ export type NoteError = {
      */
     more_info?: string;
 };
-
-export type NoteId = string;
 
 export type NoteName = string;
 
@@ -267,6 +267,8 @@ export type NoteWorkspace = {
     name: string;
 };
 
+export type NoteId3 = string;
+
 export const NoteWorkspaceRole = {
     OWNER: 'owner',
     EDITOR: 'editor',
@@ -279,8 +281,6 @@ export type NoteUserWorkspace = {
     workspace: NoteWorkspace;
     role: NoteWorkspaceRole;
 };
-
-export type NoteId3 = string;
 
 export type NoteHeartBeatWorkspaceEvent = {
     event: 'HeartBeatWorkspaceEvent';
@@ -850,8 +850,12 @@ export type CreateFolderResponses = {
     /**
      * Folder successfully created
      */
-    201: unknown;
+    201: {
+        id: NoteId;
+    };
 };
+
+export type CreateFolderResponse = CreateFolderResponses[keyof CreateFolderResponses];
 
 export type PermanentlyDeleteFolderData = {
     body?: never;
@@ -971,8 +975,12 @@ export type CreateNoteResponses = {
     /**
      * Note successfully created
      */
-    201: unknown;
+    201: {
+        id: NoteId2;
+    };
 };
+
+export type CreateNoteResponse = CreateNoteResponses[keyof CreateNoteResponses];
 
 export type PermanentlyDeleteNoteData = {
     body?: never;
@@ -1399,8 +1407,12 @@ export type CreateWorkspaceResponses = {
     /**
      * Workspace successfully created
      */
-    201: unknown;
+    201: {
+        id: NoteId3;
+    };
 };
+
+export type CreateWorkspaceResponse = CreateWorkspaceResponses[keyof CreateWorkspaceResponses];
 
 export type GetMyWorkspacesData = {
     body?: never;

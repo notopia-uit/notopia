@@ -40,9 +40,12 @@ func (h *StrictHandler) CreateNote(
 		return nil, err
 	}
 
-	return note.CreateNote201Response{
+	return note.CreateNote201JSONResponse{
 		Headers: note.CreateNote201ResponseHeaders{
 			ContentLocation: h.BaseURL.JoinPath("note", "notes", id.String()).String(),
+		},
+		Body: note.CreateNoteResponse{
+			Id: &id,
 		},
 	}, nil
 }

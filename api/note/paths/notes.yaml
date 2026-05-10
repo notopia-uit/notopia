@@ -25,6 +25,16 @@ post:
             type: string
             format: uri
             example: http://api.notopia.localhost/notes/note/000c2575-1847-5293-8117-2415a2328ef8
+      content:
+        application/json:
+          schema:
+            type: object
+            x-go-type-name: CreateNoteResponse
+            properties:
+              id:
+                $ref: ../components/schemas/Note.yaml#/properties/id
+            required:
+              - id
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

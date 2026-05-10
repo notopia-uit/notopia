@@ -1133,14 +1133,22 @@ type CreateFolder201ResponseHeaders struct {
 	ContentLocation string
 }
 
-type CreateFolder201Response struct {
+type CreateFolder201JSONResponse struct {
+	Body    CreateFolderResponse
 	Headers CreateFolder201ResponseHeaders
 }
 
-func (response CreateFolder201Response) VisitCreateFolderResponse(w http.ResponseWriter) error {
+func (response CreateFolder201JSONResponse) VisitCreateFolderResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
 	w.WriteHeader(201)
-	return nil
+	_, err := buf.WriteTo(w)
+	return err
 }
 
 type CreateFolder400JSONResponse struct{ BadRequestErrorJSONResponse }
@@ -1362,14 +1370,22 @@ type CreateNote201ResponseHeaders struct {
 	ContentLocation string
 }
 
-type CreateNote201Response struct {
+type CreateNote201JSONResponse struct {
+	Body    CreateNoteResponse
 	Headers CreateNote201ResponseHeaders
 }
 
-func (response CreateNote201Response) VisitCreateNoteResponse(w http.ResponseWriter) error {
+func (response CreateNote201JSONResponse) VisitCreateNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
 	w.WriteHeader(201)
-	return nil
+	_, err := buf.WriteTo(w)
+	return err
 }
 
 type CreateNote400JSONResponse struct{ BadRequestErrorJSONResponse }
@@ -2013,14 +2029,22 @@ type CreateWorkspace201ResponseHeaders struct {
 	ContentLocation string
 }
 
-type CreateWorkspace201Response struct {
+type CreateWorkspace201JSONResponse struct {
+	Body    CreateWorkspaceResponse
 	Headers CreateWorkspace201ResponseHeaders
 }
 
-func (response CreateWorkspace201Response) VisitCreateWorkspaceResponse(w http.ResponseWriter) error {
+func (response CreateWorkspace201JSONResponse) VisitCreateWorkspaceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Location", fmt.Sprint(response.Headers.ContentLocation))
 	w.WriteHeader(201)
-	return nil
+	_, err := buf.WriteTo(w)
+	return err
 }
 
 type CreateWorkspace400JSONResponse struct{ BadRequestErrorJSONResponse }

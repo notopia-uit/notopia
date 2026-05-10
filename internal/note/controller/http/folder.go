@@ -46,9 +46,12 @@ func (h *StrictHandler) CreateFolder(
 		return nil, err
 	}
 
-	return note.CreateFolder201Response{
+	return note.CreateFolder201JSONResponse{
 		Headers: note.CreateFolder201ResponseHeaders{
 			ContentLocation: h.BaseURL.JoinPath("note", "folders", id.String()).String(),
+		},
+		Body: note.CreateFolderResponse{
+			Id: &id,
 		},
 	}, nil
 }
