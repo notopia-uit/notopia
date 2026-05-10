@@ -1131,6 +1131,22 @@
                   "example": "http://api.notopia.localhost/notes/folder/123e4567-e89b-12d3-a456-426614174000"
                 }
               }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "x-go-type-name": "CreateFolderResponse",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/note_id"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              }
             }
           },
           "400": {
@@ -1291,6 +1307,22 @@
                   "type": "string",
                   "format": "uri",
                   "example": "http://api.notopia.localhost/notes/note/000c2575-1847-5293-8117-2415a2328ef8"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "x-go-type-name": "CreateNoteResponse",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/note_id-2"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
                 }
               }
             }
@@ -10476,6 +10508,22 @@
                   "type": "string",
                   "format": "uri",
                   "example": "http://api.notopia.localhost/workspaces/00000000-0000-0000-0000-000000000110"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "x-go-type-name": "CreateWorkspaceResponse",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/note_id-3"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
                 }
               }
             }
@@ -20977,6 +21025,12 @@
           "trashed"
         ]
       },
+      "note_id": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000",
+        "readOnly": true
+      },
       "note_Error": {
         "type": "object",
         "properties": {
@@ -21000,12 +21054,6 @@
           "code",
           "message"
         ]
-      },
-      "note_id": {
-        "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000",
-        "readOnly": true
       },
       "note_name": {
         "type": "string",
@@ -21226,6 +21274,12 @@
           "name"
         ]
       },
+      "note_id-3": {
+        "type": "string",
+        "format": "uuid",
+        "example": "00000000-0000-0000-0000-000000000110",
+        "readOnly": true
+      },
       "note_WorkspaceRole": {
         "type": "string",
         "enum": [
@@ -21249,12 +21303,6 @@
           "workspace",
           "role"
         ]
-      },
-      "note_id-3": {
-        "type": "string",
-        "format": "uuid",
-        "example": "00000000-0000-0000-0000-000000000110",
-        "readOnly": true
       },
       "note_HeartBeatWorkspaceEvent": {
         "type": "object",
