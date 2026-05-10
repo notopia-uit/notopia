@@ -111,16 +111,49 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
 
   const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
     {
-      onSuccess: async () => {
+      onSuccess: async (_, variables) => {
+        const { noteIds, folderIds } = variables.body;
+        queryClient.setQueryData<TrashedDataDto>(
+          showTrashOptions({ path: { workspaceId } }).queryKey,
+          (oldData) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              notes:
+                oldData.notes?.filter((note) => (noteIds ? noteIds : []).includes(note.id)) || [],
+              folders:
+                oldData.folders?.filter((folder) =>
+                  (folderIds ? folderIds : []).includes(folder.id)
+                ) || [],
+            };
+          }
+        );
+
+        setSelectedItems(new Set());
         await queryClient.invalidateQueries({
           queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
         });
-        setSelectedItems(new Set());
       },
     }
   );
   const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
-    onSuccess: async () => {
+    onSuccess: async (_, variables) => {
+      const { noteIds, folderIds } = variables.body;
+      queryClient.setQueryData<TrashedDataDto>(
+        showTrashOptions({ path: { workspaceId } }).queryKey,
+        (oldData) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            notes:
+              oldData.notes?.filter((note) => (noteIds ? noteIds : []).includes(note.id)) || [],
+            folders:
+              oldData.folders?.filter((folder) =>
+                (folderIds ? folderIds : []).includes(folder.id)
+              ) || [],
+          };
+        }
+      );
       await queryClient.invalidateQueries({
         queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
       });
@@ -242,8 +275,9 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Icon
-                        className={`size-5 ${item.displayType === 'Folder' ? `text-blue-400` : `text-zinc-400`
-                          }`}
+                        className={`size-5 ${
+                          item.displayType === 'Folder' ? `text-blue-400` : `text-zinc-400`
+                        }`}
                       />
                       <span className="font-medium text-zinc-200">{item.name}</span>
                     </div>
