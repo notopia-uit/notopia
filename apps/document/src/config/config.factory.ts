@@ -1,6 +1,13 @@
 import { registerAs } from '@nestjs/config';
 
-import { AppConfig, DatabaseConfig, KafkaConfig, S3Config, ServicesConfig } from './config';
+import {
+  AppConfig,
+  AuthenticationConfig,
+  DatabaseConfig,
+  KafkaConfig,
+  S3Config,
+  ServicesConfig,
+} from './config';
 
 export const APP_CONFIG = Symbol('APP_CONFIG');
 
@@ -57,5 +64,16 @@ export const kafkaConfig = registerAs(
     clientId: process.env.NOTOPIA_DOCUMENT_KAFKA_CLIENT_ID ?? 'document',
     brokers: (process.env.NOTOPIA_DOCUMENT_KAFKA_BROKERS ?? 'localhost:19092').split(','),
     groupId: process.env.NOTOPIA_DOCUMENT_KAFKA_GROUP_ID ?? 'document',
+  })
+);
+
+export const AUTHENTICATION_CONFIG = Symbol('AUTHENTICATION_CONFIG');
+
+export const authenticationConfig = registerAs(
+  AUTHENTICATION_CONFIG,
+  (): AuthenticationConfig => ({
+    jwksUrls: process.env.NOTOPIA_DOCUMENT_AUTHENTICATION_JWKS_URLS?.split(',') ?? [],
+    issuers: process.env.NOTOPIA_DOCUMENT_AUTHENTICATION_ISSUERS?.split(','),
+    audiences: process.env.NOTOPIA_DOCUMENT_AUTHENTICATION_AUDIENCES?.split(','),
   })
 );
