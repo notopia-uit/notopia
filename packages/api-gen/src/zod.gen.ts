@@ -143,13 +143,13 @@ export const zNoteFolder = z.object({
     }).readonly().nullable()
 });
 
+export const zNoteId = z.uuid().readonly();
+
 export const zNoteError = z.object({
     code: z.string(),
     message: z.string(),
     more_info: z.string().optional()
 });
-
-export const zNoteId = z.uuid().readonly();
 
 export const zNoteName = z.string().min(1).max(255);
 
@@ -202,6 +202,8 @@ export const zNoteWorkspace = z.object({
     name: z.string().min(1).max(255)
 });
 
+export const zNoteId3 = z.uuid().readonly();
+
 export const zNoteWorkspaceRole = z.enum([
     'owner',
     'editor',
@@ -212,8 +214,6 @@ export const zNoteUserWorkspace = z.object({
     workspace: zNoteWorkspace,
     role: zNoteWorkspaceRole
 });
-
-export const zNoteId3 = z.uuid().readonly();
 
 export const zNoteHeartBeatWorkspaceEvent = z.object({
     event: z.enum(['HeartBeatWorkspaceEvent']),
@@ -539,6 +539,13 @@ export const zRenameRevisionResponse = z.void();
 
 export const zCreateFolderBody = zNoteFolderWritable;
 
+/**
+ * Folder successfully created
+ */
+export const zCreateFolderResponse = z.object({
+    id: zNoteId
+});
+
 export const zPermanentlyDeleteFolderPath = z.object({
     folderId: zNoteId
 });
@@ -562,6 +569,13 @@ export const zRenameFolderPath = z.object({
 export const zRenameFolderResponse = z.void();
 
 export const zCreateNoteBody = zNoteNoteWritable;
+
+/**
+ * Note successfully created
+ */
+export const zCreateNoteResponse = z.object({
+    id: zNoteId2
+});
 
 export const zPermanentlyDeleteNotePath = z.object({
     noteId: zNoteId2
@@ -660,6 +674,13 @@ export const zCheckWorkspaceSlugExistsPath = z.object({
 });
 
 export const zCreateWorkspaceBody = zNoteWorkspaceWritable;
+
+/**
+ * Workspace successfully created
+ */
+export const zCreateWorkspaceResponse = z.object({
+    id: zNoteId3
+});
 
 /**
  * A list of workspaces

@@ -6,7 +6,6 @@ local uri_root = vim.uri_from_fname(root)
 vim.env.EDITING = "true" -- Trick with oxlint, for typeAware false
 
 local allowed_linked_editing_range_clients = {
-  gopls = true,
   html = true,
   tsgo = true,
 }

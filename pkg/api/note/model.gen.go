@@ -484,9 +484,19 @@ type oIDCContextKey string
 // oauth2ContextKey is the context key for Oauth2 security scheme
 type oauth2ContextKey string
 
+// CreateFolderResponse defines parameters for CreateFolder.
+type CreateFolderResponse struct {
+	Id *Id `json:"id,omitempty"`
+}
+
 // RenameFolderJSONBody defines parameters for RenameFolder.
 type RenameFolderJSONBody struct {
 	Name Name `json:"name"`
+}
+
+// CreateNoteResponse defines parameters for CreateNote.
+type CreateNoteResponse struct {
+	Id *Id2 `json:"id,omitempty"`
 }
 
 // GetNoteParams defines parameters for GetNote.
@@ -509,6 +519,11 @@ type GetNoteLinksParams struct {
 type RenameNoteJSONBody struct {
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name Name2 `json:"name"`
+}
+
+// CreateWorkspaceResponse defines parameters for CreateWorkspace.
+type CreateWorkspaceResponse struct {
+	Id *Id3 `json:"id,omitempty"`
 }
 
 // ChangeWorkspaceSlugJSONBody defines parameters for ChangeWorkspaceSlug.
