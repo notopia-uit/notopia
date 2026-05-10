@@ -8,6 +8,7 @@ import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
 
+import { AuthenticationModule } from '#/authentication/authentication.module';
 import { getKafkaConfig } from '#/config/kafka.config';
 
 import { AuthorizationModule } from './authorization/authorization.module';
@@ -18,6 +19,7 @@ import { AppConfig } from './config/config';
 import {
   APP_CONFIG,
   appConfig,
+  authenticationConfig,
   databaseConfig,
   kafkaConfig,
   s3Config,
@@ -37,7 +39,14 @@ import { StorageModule } from './storage/storage.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, servicesConfig, s3Config, kafkaConfig],
+      load: [
+        appConfig,
+        databaseConfig,
+        servicesConfig,
+        s3Config,
+        kafkaConfig,
+        authenticationConfig,
+      ],
     }),
     OpenTelemetryModule.forRoot({
       metrics: {
@@ -71,6 +80,7 @@ import { StorageModule } from './storage/storage.module';
       },
     ]),
     StorageModule,
+    AuthenticationModule,
     AuthorizationModule,
     NoteModule,
     DatabaseModule,

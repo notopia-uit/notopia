@@ -107,6 +107,8 @@ catalog:
   'uuid': '14.0.0'
   eslint-plugin-better-tailwindcss: '4.5.0'
   'nx-oxlint': '1.0.0-rc1'
+  '@types/d3': '7.4.3'
+  jose: 6.2.3
 onlyBuiltDependencies:
   - '@bufbuild/buf'
   - '@nestjs/core'
