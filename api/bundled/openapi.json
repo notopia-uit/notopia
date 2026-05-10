@@ -118,7 +118,7 @@
       }
     },
     "/document/documents/{documentId}/commit": {
-      "get": {
+      "post": {
         "security": [
           {
             "document_Oauth2": [
@@ -142,8 +142,23 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "Document revision committed successfully"
+          "201": {
+            "description": "Document revision committed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/document_id-2"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/document_BadRequestError"
@@ -20610,6 +20625,12 @@
           "message"
         ]
       },
+      "document_id-2": {
+        "type": "string",
+        "format": "uuid",
+        "example": "000c2575-1847-5293-8117-2415a2328ef8",
+        "readOnly": true
+      },
       "document_Revision": {
         "type": "object",
         "properties": {
@@ -20686,12 +20707,6 @@
           "hasNext",
           "hasPrev"
         ]
-      },
-      "document_id-2": {
-        "type": "string",
-        "format": "uuid",
-        "example": "000c2575-1847-5293-8117-2415a2328ef8",
-        "readOnly": true
       },
       "document_DocumentContent": {
         "type": "array",

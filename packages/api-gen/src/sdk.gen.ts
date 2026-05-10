@@ -42,7 +42,7 @@ export const getDocumentAttachmentUploadUrl = <ThrowOnError extends boolean = fa
 /**
  * Commit document
  */
-export const commitDocument = <ThrowOnError extends boolean = false>(options: Options<CommitDocumentData, ThrowOnError>) => (options.client ?? client).get<CommitDocumentResponses, CommitDocumentErrors, ThrowOnError>({
+export const commitDocument = <ThrowOnError extends boolean = false>(options: Options<CommitDocumentData, ThrowOnError>) => (options.client ?? client).post<CommitDocumentResponses, CommitDocumentErrors, ThrowOnError>({
     requestValidator: async (data) => await z.object({
         body: z.never().optional(),
         path: zCommitDocumentPath,

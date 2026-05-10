@@ -118,6 +118,8 @@ export type DocumentError = {
     more_info?: string;
 };
 
+export type DocumentId2 = string;
+
 export type DocumentRevision = {
     readonly id: string;
     name: string | null;
@@ -150,8 +152,6 @@ export type DocumentPagination = {
      */
     hasPrev: boolean;
 };
-
-export type DocumentId2 = string;
 
 /**
  * BlockNote model
@@ -628,7 +628,9 @@ export type CommitDocumentResponses = {
     /**
      * Document revision committed successfully
      */
-    204: void;
+    201: {
+        id: DocumentId2;
+    };
 };
 
 export type CommitDocumentResponse = CommitDocumentResponses[keyof CommitDocumentResponses];

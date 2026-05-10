@@ -66,28 +66,27 @@ export const getDocumentAttachmentUploadUrlOptions = (options: Options<GetDocume
  */
 export const useGetDocumentAttachmentUploadUrlQuery = (options: Options<GetDocumentAttachmentUploadUrlData>) => useQuery(getDocumentAttachmentUploadUrlOptions(options));
 
-export const commitDocumentQueryKey = (options: Options<CommitDocumentData>) => createQueryKey('commitDocument', options);
+/**
+ * Commit document
+ */
+export const commitDocumentMutation = (options?: Partial<Options<CommitDocumentData>>): UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> => {
+    const mutationOptions: UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await commitDocument({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
  * Commit document
  */
-export const commitDocumentOptions = (options: Options<CommitDocumentData>) => queryOptions<CommitDocumentResponse, CommitDocumentError, CommitDocumentResponse, ReturnType<typeof commitDocumentQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await commitDocument({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: commitDocumentQueryKey(options)
-});
-
-/**
- * Commit document
- */
-export const useCommitDocumentQuery = (options: Options<CommitDocumentData>) => useQuery(commitDocumentOptions(options));
+export const useCommitDocumentMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>>, 'mutationFn'>>) => useMutation({ ...commitDocumentMutation(), ...mutationOptions });
 
 export const getRevisionsQueryKey = (options: Options<GetRevisionsData>) => createQueryKey('getRevisions', options);
 

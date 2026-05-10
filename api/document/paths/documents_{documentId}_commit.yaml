@@ -1,5 +1,5 @@
 # vim: ft=yaml.openapi
-get:
+post:
   security:
     - Oauth2:
         - openid
@@ -12,8 +12,17 @@ get:
   parameters:
     - $ref: ../components/parameters/documentIdPath.yaml
   responses:
-    204:
+    201:
       description: Document revision committed successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                $ref: ../components/schemas/Revision.yaml#/properties/id
+            required:
+              - id
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:

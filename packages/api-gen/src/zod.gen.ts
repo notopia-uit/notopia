@@ -100,6 +100,8 @@ export const zDocumentError = z.object({
     more_info: z.string().optional()
 });
 
+export const zDocumentId2 = z.uuid().readonly();
+
 export const zDocumentRevision = z.object({
     id: z.uuid().readonly(),
     name: z.string().min(1).max(255).nullable(),
@@ -114,8 +116,6 @@ export const zDocumentPagination = z.object({
     hasNext: z.boolean(),
     hasPrev: z.boolean()
 });
-
-export const zDocumentId2 = z.uuid().readonly();
 
 /**
  * BlockNote model
@@ -488,7 +488,9 @@ export const zCommitDocumentPath = z.object({
 /**
  * Document revision committed successfully
  */
-export const zCommitDocumentResponse = z.void();
+export const zCommitDocumentResponse = z.object({
+    id: zDocumentId2
+});
 
 export const zGetRevisionsQuery = z.object({
     documentId: zDocumentId,

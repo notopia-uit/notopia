@@ -1,5 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { DocumentApi as DocumentApiDefinition } from '@notopia-uit/api-document-nestjs-server/api';
+import { CommitDocument201Response } from '@notopia-uit/api-document-nestjs-server/models';
 import { Traceable } from 'nestjs-otel';
 
 import { User } from '../common/user';
@@ -11,12 +12,13 @@ export class DocumentApi extends DocumentApiDefinition {
     super();
   }
 
-  async commitDocument(documentId: string, req: Request) {
+  async commitDocument(documentId: string, req: Request): Promise<CommitDocument201Response> {
     const user = (req as unknown as Record<string, unknown>).user as User | undefined;
     if (!user) {
       throw new UnauthorizedException('User not authenticated');
     }
-    await this.documentService.commitDocument({ documentId, userId: user.id });
+    const revisionId = await this.documentService.commitDocument({ documentId, userId: user.id });
+    return { id: revisionId } as CommitDocument201Response;
   }
 
   async getDocumentAttachmentUploadUrl(documentId: string, req: Request) {

@@ -101,7 +101,7 @@
       }
     },
     "/document/documents/{documentId}/commit": {
-      "get": {
+      "post": {
         "security": [
           {
             "Oauth2": [
@@ -125,8 +125,23 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "Document revision committed successfully"
+          "201": {
+            "description": "Document revision committed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "$ref": "#/components/schemas/id-2"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
@@ -1134,6 +1149,12 @@
           "message"
         ]
       },
+      "id-2": {
+        "type": "string",
+        "format": "uuid",
+        "example": "000c2575-1847-5293-8117-2415a2328ef8",
+        "readOnly": true
+      },
       "Revision": {
         "type": "object",
         "properties": {
@@ -1210,12 +1231,6 @@
           "hasNext",
           "hasPrev"
         ]
-      },
-      "id-2": {
-        "type": "string",
-        "format": "uuid",
-        "example": "000c2575-1847-5293-8117-2415a2328ef8",
-        "readOnly": true
       },
       "DocumentContent": {
         "type": "array",

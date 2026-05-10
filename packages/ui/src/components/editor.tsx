@@ -15,17 +15,19 @@ import {
   useHocuspocusConnectionStatus,
   useHocuspocusProvider,
 } from '@hocuspocus/provider-react';
+import { useCommitDocumentMutation } from '@notopia-uit/api-gen';
 import {
   createBlockNoteSchema,
   getNoteMenuItems,
   getTagMenuItems,
 } from '@notopia-uit/ui/block-note';
-import { useIsDocModified } from '@notopia-uit/ui/hooks/use-is-doc-modified';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 
 import '@blocknote/shadcn/style.css';
+import { useIsDocModified } from '@notopia-uit/ui/hooks/use-is-doc-modified';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { Icons } from './icons';
@@ -107,6 +109,7 @@ function EditorStatus() {
 }
 
 //TODO: set local state for avatar when override from session data, and update awareness state on session change (e.g. login/logout or user update)
+//TODO: add dialog
 export default function Editor({ noteId }: { noteId: string }) {
   // const { data: note } = useSuspenseQuery(
   //   getNoteOptions({
@@ -119,11 +122,16 @@ export default function Editor({ noteId }: { noteId: string }) {
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
 
-  const [isDirty, setIsDirty] = useState(false);
   const { isModified, setModified } = useIsDocModified(
     provider.document,
     provider.awareness?.clientID.toString() ?? 'anonymous'
   );
+
+  const { mutate: commitDocument, isPending: isCommitingDocument } = useCommitDocumentMutation({
+    onSuccess: () => {
+      setModified(false);
+    },
+  });
   const editor = useCreateBlockNote({
     schema: mySchema,
     collaboration: {
@@ -159,17 +167,24 @@ export default function Editor({ noteId }: { noteId: string }) {
       </BlockNoteView>
       {isModified && (
         <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">
-          <Button
-            variant="outline"
-            size="icon"
-            aria-label="save"
-            // onClick={async () => {
-            //   await saveContent(editor.document);
-            // }}
-            //
-          >
-            <Icons.Save />
-          </Button>
+          {isCommitingDocument ? (
+            <Spinner />
+          ) : (
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="save"
+              onClick={() => {
+                commitDocument({
+                  path: {
+                    documentId: noteId,
+                  },
+                });
+              }}
+            >
+              <Icons.Save />
+            </Button>
+          )}
         </div>
       )}
     </div>
