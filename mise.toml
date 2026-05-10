@@ -9,11 +9,7 @@ OPENCODE_EXPERIMENTAL = "true"
 OPENCODE_EXPERIMENTAL_OXFMT = "true"
 OPENCODE_EXPERIMENTAL_EXA = "true"
 COMPOSE_FILE = "./deploy/compose/compose.yaml"
-'_'.path.paths = [
-  "./bin/",
-  "./scripts/",
-  "./node_modules/.bin/"
-]
+'_'.path.paths = ["./bin/", "./scripts/", "./node_modules/.bin/"]
 
 [tools]
 "github:pressly/goose" = "3.27.1"
@@ -27,8 +23,6 @@ mockery = "3.7.0"
 "github:go-delve/delve" = "1.26.3"
 d2 = "0.7.1"
 "npm:@tailwindcss/language-server" = "0.14.29"
-"npm:nestjs-doctor" = "0.4.31"
-"npm:nestjs-doctor-lsp" = "0.1.1"
 
 [tools."http:plantuml"]
 version = "1.2026.2"
