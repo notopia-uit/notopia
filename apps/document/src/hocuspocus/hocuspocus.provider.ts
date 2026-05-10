@@ -3,6 +3,7 @@ import { Logger as HocuspocusLogger } from '@hocuspocus/extension-logger';
 import { Hocuspocus } from '@hocuspocus/server';
 import { Logger, Provider } from '@nestjs/common';
 
+import { AuthenticationService } from '#/authentication/authentication.service';
 import { AuthorizationService } from '#/authorization/authorization.service';
 import { DocumentService } from '#/document/document.service';
 import { NoteService } from '#/note/note.service';
@@ -15,7 +16,8 @@ export const HocuspocusProvider: Provider = {
     documentService: DocumentService,
     noteService: NoteService,
     authorizationService: AuthorizationService,
-    logger: Logger
+    logger: Logger,
+    authenticationService: AuthenticationService
   ) => {
     return new Hocuspocus<HocuspocusContext>({
       name: 'document', // TODO: Inject host
@@ -34,28 +36,29 @@ export const HocuspocusProvider: Provider = {
         }),
       ],
 
-      async onAuthenticate(data) {
+      async onAuthenticate(data): Promise<HocuspocusContext> {
         const documentId = data.documentName;
-        const context = data.context;
+        const user = await authenticationService.validateToken(data.token);
         const note = await noteService.getNoteById({
           noteId: documentId,
-          userId: context.user.id,
+          userId: user.id,
         });
         if (!note) {
           throw new Error(`Document with ID ${documentId} does not exist`);
         }
         const userPermissionsRes = await authorizationService.getUserDocumentPermissions(
-          context.user.id,
+          user.id,
           documentId
         );
         if (!userPermissionsRes.canRead) {
           throw new Error(
-            `User ${context.user.id} does not have permission to access document ${documentId}`
+            `User ${user.id} does not have permission to access document ${documentId}`
           );
         }
         if (!userPermissionsRes.canWrite || note.trashed) {
           data.connectionConfig.readOnly = true;
         }
+        return { user };
       },
 
       async onChange(data) {
@@ -64,5 +67,5 @@ export const HocuspocusProvider: Provider = {
       },
     });
   },
-  inject: [DocumentService, NoteService, AuthorizationService, Logger],
+  inject: [DocumentService, NoteService, AuthorizationService, Logger, AuthenticationService],
 };

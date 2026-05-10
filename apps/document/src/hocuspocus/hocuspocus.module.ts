@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { AuthenticationModule } from '#/authentication/authentication.module';
 import { AuthorizationModule } from '#/authorization/authorization.module';
 import { HocuspocusController } from '#/hocuspocus/hocuspocus.controller';
 import { HocuspocusService } from '#/hocuspocus/hocuspocus.service';
@@ -10,7 +11,7 @@ import { HocuspocusProvider } from './hocuspocus.provider';
 
 @Module({
   controllers: [HocuspocusController],
-  imports: [NoteModule, AuthorizationModule],
+  imports: [NoteModule, AuthorizationModule, AuthenticationModule],
   providers: [HocuspocusGateway, HocuspocusProvider, HocuspocusService],
   exports: [HocuspocusProvider],
 })

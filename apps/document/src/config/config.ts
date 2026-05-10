@@ -31,3 +31,9 @@ export interface KafkaConfig {
   brokers: string[];
   groupId: string;
 }
+
+export interface AuthenticationConfig {
+  jwksUrls: string[];
+  issuers?: string[];
+  audiences?: string[];
+}
