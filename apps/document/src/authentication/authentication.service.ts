@@ -17,6 +17,9 @@ export class AuthenticationService {
   constructor(configService: ConfigService) {
     const authenticationConfig = configService.get<AuthenticationConfig>(AUTHENTICATION_CONFIG)!;
     const jwksUrls = authenticationConfig.jwksUrls.map((url) => new URL(url));
+    if (jwksUrls.length === 0) {
+      throw new Error('NOTOPIA_DOCUMENT_AUTHENTICATION_JWKS_URLS must contain at least one URL');
+    }
     this.keySets = jwksUrls.map((url) => jose.createRemoteJWKSet(url));
   }
 
