@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 
 import { type MyBlock, type MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { type ShareDocumentCommittedEvent } from '@notopia-uit/api-gen';
@@ -22,6 +22,8 @@ import { DocumentEntity } from './document.entity';
 @Injectable()
 @Traceable()
 export class DocumentService {
+  private readonly logger = new Logger(DocumentService.name);
+
   constructor(
     @InjectRepository(DocumentEntity)
     private readonly repo: Repository<DocumentEntity>,
@@ -82,6 +84,7 @@ export class DocumentService {
     documentId: string;
     userId: string;
   }): Promise<string> {
+    this.logger.debug(`commitDocument: start documentId=${documentId} userId=${userId}`);
     const editor = ServerBlockNoteEditor.create({
       schema: this.blocknoteSchema,
     });
@@ -91,9 +94,11 @@ export class DocumentService {
         lock: { mode: 'pessimistic_write' },
       });
       if (!document) {
+        this.logger.warn(`commitDocument: document not found documentId=${documentId}`);
         throw new NotFoundException(`Document ${documentId} not found`);
       }
       const revisionId = randomUUID();
+      this.logger.debug(`commitDocument: saving revision revisionId=${revisionId}`);
       await manager.save(RevisionEntity, {
         id: revisionId,
         document,
@@ -102,6 +107,9 @@ export class DocumentService {
       await manager.update(DocumentEntity, { id: documentId }, { modified: false });
       // TODO: Consider refactor into a module named "EventBus", which manages event topic
       const { tags, outgoingLinkIds } = this.extractTagsAndOutgoingLinkIds(editor);
+      this.logger.debug(
+        `commitDocument: emitting committed event documentId=${documentId} tags=${tags.join(',')}`
+      );
       await lastValueFrom(
         this.kafkaClient.emit('events.integration.document.document.committed', {
           id: documentId,
@@ -111,17 +119,24 @@ export class DocumentService {
           content: editor.editor.document satisfies MyBlock[],
         } satisfies ShareDocumentCommittedEvent)
       );
+      this.logger.log(`commitDocument: done documentId=${documentId} revisionId=${revisionId}`);
       return revisionId;
     });
   }
 
   async getAttachmentUploadUrl(documentId: string, userId: string) {
+    this.logger.debug(
+      `getAttachmentUploadUrl: checking permission documentId=${documentId} userId=${userId}`
+    );
     const hasPermission = await this.authorizationService.hasNotePermission({
       documentId,
       memberId: userId,
       permission: 'write',
     });
     if (!hasPermission) {
+      this.logger.warn(
+        `getAttachmentUploadUrl: permission denied documentId=${documentId} userId=${userId}`
+      );
       throw new UnauthorizedException(
         `User ${userId} does not have permission to upload attachment to ${documentId}`
       );
@@ -129,6 +144,7 @@ export class DocumentService {
     const key = `document-attachments/${documentId}/${randomUUID()}`;
     const { uploadUrl, publicUrl } =
       await this.storageService.generateAttachmentPresignedUploadUrl(key);
+    this.logger.log(`getAttachmentUploadUrl: done documentId=${documentId}`);
     return {
       url: publicUrl,
       uploadUrl: uploadUrl,
@@ -136,10 +152,12 @@ export class DocumentService {
   }
 
   async updateDataById(id: string, data: Buffer): Promise<void> {
+    this.logger.debug(`updateDataById: id=${id} dataLength=${data.length}`);
     await this.repo.update(id, { data });
   }
 
   async getById(id: string): Promise<DocumentEntity | null> {
+    this.logger.debug(`getById: id=${id}`);
     return this.repo.findOneBy({ id });
   }
 }
