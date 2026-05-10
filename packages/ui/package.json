@@ -23,12 +23,15 @@
     "@notopia-uit/api-gen": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@tanstack/react-query": "catalog:",
+    "@tweenjs/tween.js": "catalog:",
     "better-auth": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
+    "d3": "catalog:",
     "date-fns": "^4.1.0",
     "lucide-react": "catalog:",
     "next-themes": "^0.4.6",
+    "pixi.js": "catalog:",
     "radix-ui": "catalog:",
     "react": "catalog:",
     "react-complex-tree": "^2.6.1",
@@ -38,6 +41,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@types/d3": "catalog:",
     "autoprefixer": "catalog:",
     "postcss": "catalog:",
     "tailwind-merge": "catalog:",
