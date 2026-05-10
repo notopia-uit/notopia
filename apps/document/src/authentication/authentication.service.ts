@@ -12,6 +12,9 @@ import { AUTHENTICATION_CONFIG } from '#/config/config.factory';
 @Traceable()
 export class AuthenticationService {
   private readonly keySets: ReturnType<typeof jose.createRemoteJWKSet>[];
+  private readonly issuers?: string[];
+  private readonly audiences?: string[];
+
   private readonly logger = new Logger(AuthenticationService.name);
 
   constructor(configService: ConfigService) {
@@ -21,12 +24,21 @@ export class AuthenticationService {
       throw new Error('NOTOPIA_DOCUMENT_AUTHENTICATION_JWKS_URLS must contain at least one URL');
     }
     this.keySets = jwksUrls.map((url) => jose.createRemoteJWKSet(url));
+    this.issuers = authenticationConfig.issuers;
+    this.audiences = authenticationConfig.audiences;
   }
 
   async validateToken(token: string): Promise<User> {
     try {
       this.logger.debug(`Validating token: ${token}`);
-      const { payload } = await jose.jwtVerify(token, this.multiTenantJWKS.bind(this));
+      let options: jose.JWTVerifyOptions | undefined;
+      if (this.issuers || this.audiences) {
+        options = {
+          issuer: this.issuers,
+          audience: this.audiences,
+        };
+      }
+      const { payload } = await jose.jwtVerify(token, this.multiTenantJWKS.bind(this), options);
       return {
         id: payload.sub!,
         email: payload.email as string,

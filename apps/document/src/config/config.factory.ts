@@ -72,8 +72,15 @@ export const AUTHENTICATION_CONFIG = Symbol('AUTHENTICATION_CONFIG');
 export const authenticationConfig = registerAs(
   AUTHENTICATION_CONFIG,
   (): AuthenticationConfig => ({
-    jwksUrls: process.env.NOTOPIA_DOCUMENT_AUTHENTICATION_JWKS_URLS?.split(',') ?? [],
-    issuers: process.env.NOTOPIA_DOCUMENT_AUTHENTICATION_ISSUERS?.split(','),
-    audiences: process.env.NOTOPIA_DOCUMENT_AUTHENTICATION_AUDIENCES?.split(','),
+    jwksUrls:
+      process.env.NOTOPIA_DOCUMENT_AUTHENTICATION_JWKS_URLS?.split(',')
+        .map((v) => v.trim())
+        .filter(Boolean) ?? [],
+    issuers: process.env.NOTOPIA_DOCUMENT_AUTHENTICATION_ISSUERS?.split(',')
+      .map((v) => v.trim())
+      .filter(Boolean),
+    audiences: process.env.NOTOPIA_DOCUMENT_AUTHENTICATION_AUDIENCES?.split(',')
+      .map((v) => v.trim())
+      .filter(Boolean),
   })
 );
