@@ -75,11 +75,17 @@ export class DocumentService {
     };
   }
 
-  async commitDocument({ documentId, userId }: { documentId: string; userId: string }) {
+  async commitDocument({
+    documentId,
+    userId,
+  }: {
+    documentId: string;
+    userId: string;
+  }): Promise<string> {
     const editor = ServerBlockNoteEditor.create({
       schema: this.blocknoteSchema,
     });
-    await this.dataSource.transaction(async (manager) => {
+    return this.dataSource.transaction(async (manager) => {
       const document = await manager.findOne(DocumentEntity, {
         where: { id: documentId },
         lock: { mode: 'pessimistic_write' },
@@ -87,8 +93,9 @@ export class DocumentService {
       if (!document) {
         throw new NotFoundException(`Document ${documentId} not found`);
       }
+      const revisionId = randomUUID();
       await manager.save(RevisionEntity, {
-        id: randomUUID(),
+        id: revisionId,
         document,
         content: this.bufferToBlockNote(document.data, editor),
       });
@@ -104,6 +111,7 @@ export class DocumentService {
           content: editor.editor.document satisfies MyBlock[],
         } satisfies ShareDocumentCommittedEvent)
       );
+      return revisionId;
     });
   }
 

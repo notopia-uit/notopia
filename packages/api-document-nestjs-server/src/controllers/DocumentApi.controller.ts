@@ -1,15 +1,15 @@
-import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, ParseFloatPipe, Query, Req } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Post, Param, ParseIntPipe, ParseFloatPipe, Query, Req } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Cookies, Headers } from '../decorators';
 import { DocumentApi } from '../api';
-import { GetDocumentAttachmentUploadUrl200Response,  } from '../models';
+import { CommitDocument201Response, GetDocumentAttachmentUploadUrl200Response,  } from '../models';
 
 @Controller()
 export class DocumentApiController {
   constructor(private readonly documentApi: DocumentApi) {}
 
-  @Get('/document/documents/:documentId/commit')
-  commitDocument(@Param('documentId') documentId: string, @Req() request: Request): void | Promise<void> | Observable<void> {
+  @Post('/document/documents/:documentId/commit')
+  commitDocument(@Param('documentId') documentId: string, @Req() request: Request): CommitDocument201Response | Promise<CommitDocument201Response> | Observable<CommitDocument201Response> {
     return this.documentApi.commitDocument(documentId, request);
   }
 
