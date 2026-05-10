@@ -20,9 +20,10 @@ import {
   getNoteMenuItems,
   getTagMenuItems,
 } from '@notopia-uit/ui/block-note';
-import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { useIsDocModified } from '@notopia-uit/ui/hooks/use-is-doc-modified';
 
 import '@blocknote/shadcn/style.css';
+import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -32,7 +33,6 @@ import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
 import { Button } from './shadcn/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
-
 function EditorStatus() {
   const connection = useHocuspocusConnectionStatus();
   const sync = useHocuspocusSyncStatus();
@@ -120,6 +120,10 @@ export default function Editor({ noteId }: { noteId: string }) {
   const provider = useHocuspocusProvider();
 
   const [isDirty, setIsDirty] = useState(false);
+  const { isModified, setModified } = useIsDocModified(
+    provider.document,
+    provider.awareness?.clientID.toString() ?? 'anonymous'
+  );
   const editor = useCreateBlockNote({
     schema: mySchema,
     collaboration: {
@@ -138,12 +142,7 @@ export default function Editor({ noteId }: { noteId: string }) {
   return (
     <div className="relative min-h-screen">
       <EditorStatus />
-      <BlockNoteView
-        editor={editor}
-        onChange={() => {
-          setIsDirty(true);
-        }}
-      >
+      <BlockNoteView editor={editor}>
         <SuggestionMenuController
           triggerCharacter={'#'}
           getItems={async (query) => {
@@ -158,7 +157,7 @@ export default function Editor({ noteId }: { noteId: string }) {
           }}
         />
       </BlockNoteView>
-      {isDirty && (
+      {isModified && (
         <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">
           <Button
             variant="outline"
