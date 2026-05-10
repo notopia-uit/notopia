@@ -3,6 +3,28 @@ local map = vim.keymap.set
 local root = vim.fn.expand("%:p:h")
 local uri_root = vim.uri_from_fname(root)
 
+vim.env.EDITING = "true" -- Trick with oxlint, for typeAware false
+
+local allowed_linked_editing_range_clients = {
+  gopls = true,
+  html = true,
+  tsgo = true,
+}
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  ---@param args vim.api.keyset.create_autocmd.callback_args | {data: vim.event.lspattach.data}
+  callback = function(args)
+    local client = lsp.get_client_by_id(args.data.client_id)
+    assert(client, "LSP client not found")
+    if not allowed_linked_editing_range_clients[client.name] then
+      return
+    end
+    lsp.linked_editing_range.enable(true, {
+      client_id = args.data.client_id,
+    })
+  end,
+})
+
 -- lsp.config("yamlls", {
 --   ---@module 'lspconfig'
 --   ---@type lsp.yamlls
@@ -137,7 +159,7 @@ lsp.config("tsgo", {
 
 lsp.config.nestjs_doctor = {
   name = "nestjs_doctor",
-  cmd = { "nestjs-doctor-lsp" },
+  cmd = { "nestjs-doctor-lsp", "--stdio" },
   filetypes = { "typescript" },
   root_dir = function(bufnr, on_dir)
     local fname = vim.api.nvim_buf_get_name(bufnr)
@@ -169,8 +191,6 @@ lsp.config.nestjs_doctor = {
     debounce_text_changes = 2000,
   },
 }
-
-vim.env.EDITING = "true"
 
 lsp.config("oxlint", {
   cmd = { "./node_modules/.bin/oxlint", "--lsp" },
