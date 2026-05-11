@@ -1,17 +1,20 @@
 import { getMyWorkspacesOptions } from '@notopia-uit/api-gen/index';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { WorkspaceSwitcher } from '@ui/components/workspace-switcher';
-
+import { fetchAccessTokenServerSide } from '@ui/lib/get-access-token';
 import getQueryClient from '#/get-query-client';
 
 export const dynamic = 'force-dynamic';
 
 export default async function WorkspacePage() {
   const queryClient = getQueryClient();
-  const { queryKey, queryFn } = getMyWorkspacesOptions();
+  const { queryKey, queryFn } = getMyWorkspacesOptions({
+    auth : fetchAccessTokenServerSide,
+  });
   await queryClient.prefetchQuery({
     queryKey: queryKey,
     queryFn: queryFn,
+
   });
 
   return (
