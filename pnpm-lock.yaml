@@ -758,6 +758,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@blocknote/shadcn':
+        specifier: 'catalog:'
+        version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(postcss@8.4.49)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.4)
       '@hocuspocus/provider':
         specifier: 'catalog:'
         version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
@@ -767,6 +770,9 @@ importers:
       '@notopia-uit/ui':
         specifier: 'workspace:'
         version: link:../../packages/ui
+      '@tailwindcss/postcss':
+        specifier: 'catalog:'
+        version: 4.2.4
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.21(react@19.2.5)
@@ -794,6 +800,9 @@ importers:
       shadcn:
         specifier: 'catalog:'
         version: 4.2.0(@types/node@25.6.0)(babel-plugin-macros@3.1.0)(typescript@6.0.3)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.2.4
     devDependencies:
       autoprefixer:
         specifier: 'catalog:'
@@ -941,6 +950,9 @@ importers:
       '@notopia-uit/lib':
         specifier: 'workspace:'
         version: link:../lib
+      '@tailwindcss/postcss':
+        specifier: 'catalog:'
+        version: 4.2.4
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.21(react@19.2.5)
@@ -986,6 +998,9 @@ importers:
       shadcn:
         specifier: 'catalog:'
         version: 4.2.0(@types/node@25.6.0)(babel-plugin-macros@3.1.0)(typescript@6.0.3)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.2.4
       yjs:
         specifier: 'catalog:'
         version: 13.6.30
