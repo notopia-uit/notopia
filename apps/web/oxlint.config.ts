@@ -20,6 +20,8 @@ export default defineConfig({
       rules: {
         ...eslintPluginBetterTailwindcss.configs.recommended.rules,
         'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
+        'better-tailwindcss/enforce-consistent-class-order': 'off',
+        'better-tailwindcss/enforce-consistent-variant-order': 'off',
       },
     },
   ],
@@ -28,6 +30,7 @@ export default defineConfig({
       entryPoint: resolve(import.meta.dirname, 'app/globals.css'),
       tsconfig: resolve(import.meta.dirname, 'tsconfig.json'),
       cwd: 'apps/web',
+      detectComponentClasses: true, // may oxlint doesnt work
     },
   },
 });
