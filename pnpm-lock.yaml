@@ -791,6 +791,9 @@ importers:
       next:
         specifier: 'catalog:'
         version: 16.2.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.97.3)
+      postcss:
+        specifier: 'catalog:'
+        version: 8.4.49
       react:
         specifier: 'catalog:'
         version: 19.2.5
@@ -807,9 +810,6 @@ importers:
       autoprefixer:
         specifier: 'catalog:'
         version: 10.4.27(postcss@8.4.49)
-      postcss:
-        specifier: 'catalog:'
-        version: 8.4.49
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.5.0
@@ -983,6 +983,9 @@ importers:
       pixi.js:
         specifier: 'catalog:'
         version: 8.15.0
+      postcss:
+        specifier: 'catalog:'
+        version: 8.4.49
       radix-ui:
         specifier: 'catalog:'
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -1014,9 +1017,6 @@ importers:
       autoprefixer:
         specifier: 'catalog:'
         version: 10.4.27(postcss@8.4.49)
-      postcss:
-        specifier: 'catalog:'
-        version: 8.4.49
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.5.0
