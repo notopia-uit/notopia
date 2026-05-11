@@ -16,9 +16,9 @@ export const HocuspocusProvider: Provider = {
     documentService: DocumentService,
     noteService: NoteService,
     authorizationService: AuthorizationService,
-    logger: Logger,
     authenticationService: AuthenticationService
   ) => {
+    const logger = new Logger('Hocuspocus');
     return new Hocuspocus<HocuspocusContext>({
       name: 'document', // TODO: Inject host
       extensions: [
@@ -67,5 +67,5 @@ export const HocuspocusProvider: Provider = {
       },
     });
   },
-  inject: [DocumentService, NoteService, AuthorizationService, Logger, AuthenticationService],
+  inject: [DocumentService, NoteService, AuthorizationService, AuthenticationService],
 };
