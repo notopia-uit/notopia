@@ -4,18 +4,13 @@ http:
     jwt:
       plugin:
         jwt:
-          Keys:
-            - http://authentik.notopia.localhost/application/o/api-web/jwks/
-            - http://authentik.notopia.localhost/application/o/app-web/jwks/
-          Required: true
-          PayloadFields:
-            - exp
-            - sub
-          JwtHeaders:
+          issuers:
+            - issuer: http://authentik.notopia.localhost/application/o/api-web/
+              jwks: http://authentik.notopia.localhost/application/o/api-web/jwks/
+            - issuer: http://authentik.notopia.localhost/application/o/app-web/
+              jwks: http://authentik.notopia.localhost/application/o/app-web/jwks/
+          headerMap:
             X-Forwarded-ID: sub
             X-Forwarded-Email: email
-            X-Forwarded-Groups: groups
             X-Forwarded-Roles: roles
-          JwtSources:
-            - type: bearer
-              key: Authorization
+            X-Forwarded-Groups: groups

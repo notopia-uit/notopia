@@ -13,7 +13,6 @@ export default defineConfig({
     'zod',
     {
       name: '@hey-api/sdk',
-      validator: true,
       transformer: true,
     },
     {

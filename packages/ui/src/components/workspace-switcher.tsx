@@ -1,12 +1,13 @@
 'use client';
-
 import {
   NoteUserWorkspace,
   NoteWorkspaceRole,
+  getMyWorkspaces,
   getMyWorkspacesOptions,
   useChangeWorkspaceSlugMutation,
   useCreateWorkspaceMutation,
 } from '@notopia-uit/api-gen';
+import { createClient, CreateClientConfig } from '@notopia-uit/api-gen/client';
 import { Badge } from '@notopia-uit/ui/components/shadcn/badge';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Card, CardContent } from '@notopia-uit/ui/components/shadcn/card';
@@ -27,10 +28,11 @@ import {
   SelectValue,
 } from '@notopia-uit/ui/components/shadcn/select';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type UserRole = (typeof NoteWorkspaceRole)[keyof typeof NoteWorkspaceRole];
 
@@ -59,23 +61,63 @@ const generateSlug = (name: string) => {
 
 // TODO: handle create new workspace with api and router.push to workspace
 
+export const createClientConfig: CreateClientConfig = (config) => ({
+  ...config,
+  auth: async () =>
+    (
+      await authClient.getAccessToken({
+        providerId: 'authentik',
+      })
+    ).data?.accessToken,
+});
+
 const WorkspaceSwitcher = () => {
   const queryClient = useQueryClient();
-  const { data: allWorkspaceData } = useSuspenseQuery({
-    ...getMyWorkspacesOptions({}),
+  const _data = useQuery({
+    ...getMyWorkspacesOptions({
+      auth: async () =>
+        (
+          await authClient.getAccessToken({
+            providerId: 'authentik',
+          })
+        ).data?.accessToken,
+    }),
     select: mapUserWorkspaceDtoToDomain,
   });
+
+  const { data: allWorkspaceData } = _data;
+
+  console.log('Fetched data:', JSON.stringify(_data));
 
   //TODO: Local state mirroring server data will desync on refetch.
   // workspaces and selectedId are initialized from allWorkspaceData once at mount. If the underlying getMyWorkspaces query refetches (on focus, reconnect, manual invalidation, etc.), useSuspenseQuery updates allWorkspaceData but the local useState snapshot is never re-synced, so the UI will silently drift from server state. Combined with the TODO at Line 69, this whole component currently operates on local-only edits.
   // Consider either deriving the list directly from the query data (with a mutation that invalidates the query) or using useEffect to sync — but the former is the idiomatic React Query pattern.
 
-  const [workspaces, setWorkspaces] = useState<UserWorkspace[]>(allWorkspaceData);
-  const [selectedId, setSelectedId] = useState<string>(workspaces[0]?.id || '');
+  const [workspaces, setWorkspaces] = useState<UserWorkspace[]>([]);
+  const [selectedId, setSelectedId] = useState<string>();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editForm, setEditForm] = useState<Partial<UserWorkspace>>({});
 
+  // useEffect(() => {
+  //   const fetchWorkspaces = async () => {
+  //     console.log("Fetching workspaces...");
+  //     const dto = await getMyWorkspaces({
+  //       client,
+  //     });
+  //     if (!dto.data) return;
+  //     const mappedWorkspaces = mapUserWorkspaceDtoToDomain(dto.data);
+  //     setWorkspaces(mappedWorkspaces);
+  //   };
+  //   fetchWorkspaces();
+  // }, []);
+
+  if (allWorkspaceData && workspaces.length === 0) {
+    setWorkspaces(allWorkspaceData);
+  }
+  if (workspaces.length > 0 && !selectedId) {
+    setSelectedId(workspaces[0]?.id || '');
+  }
   const { mutate: createWorkspace, isPending: isCreating } = useCreateWorkspaceMutation({
     onSuccess: async () => {
       await queryClient.invalidateQueries({

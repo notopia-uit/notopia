@@ -288,10 +288,10 @@ lsp.config("oxlint", {
     end, {
       desc = "Apply Oxlint automatic fixes",
     })
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      buffer = bufnr,
-      command = "LspOxlintFixAll",
-    })
+    -- vim.api.nvim_create_autocmd("BufWritePre", {
+    --   buffer = bufnr,
+    --   command = "LspOxlintFixAll",
+    -- })
   end,
 } --[[@as vim.lsp.Config]])
 

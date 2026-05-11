@@ -7,8 +7,8 @@ http:
       rule: Host(`api.notopia.localhost`) && PathPrefix(`/note`) && !PathPrefix(`/note/health`)
       service: note
       middlewares:
-        - jwt
         - cors
+        - jwt
     note-health:
       entryPoints:
         - web

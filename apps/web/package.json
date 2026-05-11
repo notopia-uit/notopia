@@ -9,6 +9,7 @@
     "@blocknote/shadcn": "catalog:",
     "@hocuspocus/provider": "catalog:",
     "@hocuspocus/provider-react": "catalog:",
+    "@notopia-uit/api-gen": "workspace:",
     "@notopia-uit/ui": "workspace:",
     "@tailwindcss/postcss": "catalog:",
     "@tanstack/react-query": "catalog:",
