@@ -1,10 +1,11 @@
 'use client';
 import { getMyWorkspacesOptions, useRenameWorkspaceMutation } from '@notopia-uit/api-gen';
+import { type NoteUserWorkspace } from '@notopia-uit/api-gen';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Label } from '@notopia-uit/ui/components/shadcn/label';
 import { Separator } from '@notopia-uit/ui/components/shadcn/separator';
-import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
@@ -29,11 +30,16 @@ interface GeneralSettingsProps {
 
 //TODO: handle loading and error states
 export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
-  const { data: allWorkspaceData } = useQuery({
+  const {
+    data: allWorkspaceData = {} as NoteUserWorkspace[],
+    isPending,
+    isError,
+    error,
+  } = useQuery({
     ...getMyWorkspacesOptions({}),
   });
-  if (!allWorkspaceData) {
-    return;
+  if (isError) {
+    throw error;
   }
   const [workspaceName, setWorkspaceName] = useState(
     allWorkspaceData.find((ws) => ws.workspace.id === workspaceId)?.workspace.name || ''
@@ -55,7 +61,9 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
       if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
     };
   }, []);
-  return (
+  return isPending ? (
+    <Spinner />
+  ) : (
     <div className="space-y-8">
       <div className="space-y-4">
         {showSuccessAlert && (

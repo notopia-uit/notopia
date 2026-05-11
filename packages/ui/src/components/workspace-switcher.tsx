@@ -26,11 +26,13 @@ import {
   SelectValue,
 } from '@notopia-uit/ui/components/shadcn/select';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+
+import { ErrorAlert } from './error-alert';
+import { SuccessAlert } from './success-alert';
 
 type UserRole = (typeof NoteWorkspaceRole)[keyof typeof NoteWorkspaceRole];
 
@@ -66,18 +68,32 @@ const WorkspaceSwitcher = () => {
     select: mapUserWorkspaceDtoToDomain,
   });
 
-  const { data: allWorkspaceData } = _data;
+  const {
+    data: allWorkspaceData,
+    isPending: isGetMyWorkspacesPending,
+    isError: isGetMyWorkspacesError,
+    error: getMyWorkspacesError,
+  } = _data;
 
   //TODO: Local state mirroring server data will desync on refetch.
   // workspaces and selectedId are initialized from allWorkspaceData once at mount. If the underlying getMyWorkspaces query refetches (on focus, reconnect, manual invalidation, etc.), useSuspenseQuery updates allWorkspaceData but the local useState snapshot is never re-synced, so the UI will silently drift from server state. Combined with the TODO at Line 69, this whole component currently operates on local-only edits.
   // Consider either deriving the list directly from the query data (with a mutation that invalidates the query) or using useEffect to sync — but the former is the idiomatic React Query pattern.
 
+  if (isGetMyWorkspacesError) {
+    throw getMyWorkspacesError;
+  }
   const [workspaces, setWorkspaces] = useState<UserWorkspace[]>([]);
   const [selectedId, setSelectedId] = useState<string>();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editForm, setEditForm] = useState<Partial<UserWorkspace>>({});
 
+  const [showCreateWorkspaceSuccessAlert, setShowCreateWorkspaceSuccessAlert] = useState(false);
+  const [showChangeSlugSuccessAlert, setShowChangeSlugSuccessAlert] = useState(false);
+  const [showCreateWorkspaceErrorAlert, setShowCreateWorkspaceErrorAlert] = useState(false);
+  const [showChangeSlugErrorAlert, setShowChangeSlugErrorAlert] = useState(false);
+
+  const hideAlertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   if (allWorkspaceData && workspaces.length === 0) {
     setWorkspaces(allWorkspaceData);
   }
@@ -96,6 +112,18 @@ const WorkspaceSwitcher = () => {
       setWorkspaces(mappedWorkspaces);
       setIsAddingNew(false);
       setEditForm({});
+      setShowCreateWorkspaceSuccessAlert(true);
+      if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
+      hideAlertTimerRef.current = setTimeout(() => {
+        setShowCreateWorkspaceSuccessAlert(false);
+      }, 3000);
+    },
+    onError: () => {
+      setShowCreateWorkspaceErrorAlert(true);
+      if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
+      hideAlertTimerRef.current = setTimeout(() => {
+        setShowCreateWorkspaceErrorAlert(false);
+      }, 3000);
     },
   });
 
@@ -110,6 +138,21 @@ const WorkspaceSwitcher = () => {
         });
         const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
         setWorkspaces(mappedWorkspaces);
+        setEditingId(null);
+        setEditForm({});
+        setShowChangeSlugSuccessAlert(true);
+        if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
+        hideAlertTimerRef.current = setTimeout(() => {
+          setShowChangeSlugSuccessAlert(false);
+        }, 3000);
+      },
+      onError: () => {
+        setShowChangeSlugErrorAlert(true);
+
+        if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
+        hideAlertTimerRef.current = setTimeout(() => {
+          setShowChangeSlugErrorAlert(false);
+        }, 3000);
       },
     }
   );
@@ -161,7 +204,9 @@ const WorkspaceSwitcher = () => {
     }
   };
 
-  return (
+  return isGetMyWorkspacesPending ? (
+    <Spinner className="size-8" />
+  ) : (
     <section className="py-16 md:py-24">
       <div className="container max-w-2xl">
         <div className="mb-6 flex items-center justify-between">
@@ -443,6 +488,31 @@ const WorkspaceSwitcher = () => {
               </Button>
             </CardContent>
           </Card>
+        )}
+        {showCreateWorkspaceSuccessAlert && (
+          <SuccessAlert
+            title="Workspace Created"
+            message="Your new workspace has been created successfully."
+          />
+        )}
+        {showChangeSlugSuccessAlert && (
+          <SuccessAlert
+            title="Workspace Updated"
+            message="Your workspace details have been updated successfully."
+          />
+        )}
+
+        {showCreateWorkspaceErrorAlert && (
+          <ErrorAlert
+            title="Creation Failed"
+            message="There was an error creating your workspace. Please try again."
+          />
+        )}
+        {showChangeSlugErrorAlert && (
+          <ErrorAlert
+            title="Update Failed"
+            message="There was an error updating your workspace. Please try again."
+          />
         )}
       </div>
     </section>

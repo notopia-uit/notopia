@@ -23,10 +23,12 @@ import {
   TableHeader,
   TableRow,
 } from '@notopia-uit/ui/components/shadcn/table';
-import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Folder, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
+
+import { ErrorAlert } from './error-alert';
+import { SuccessAlert } from './success-alert';
 
 interface TrashedBy {
   by: 'purpose' | 'parent';
@@ -85,13 +87,13 @@ const formatDate = (isoString: string) => {
 //TODO: add dialog onSuccess and onError for delete and restore action, also add confirm dialog when user click delete permanently or empty trash
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient();
-  const { data, isError } = useQuery({
+  const { data, isError, error, isPending } = useQuery({
     ...showTrashOptions({ path: { workspaceId: workspaceId } }),
     select: (data) => mapDtoTrashedData(data),
   });
 
   if (isError) {
-    return;
+    throw error;
   }
 
   const trashedData = data ? data : { notes: [], folders: [] };
@@ -115,6 +117,15 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     );
   }, [trashedData]);
 
+  const [
+    showPermanentlyDeleteWorkspaceSuccessAlert,
+    setShowPermanentlyDeleteWorkspaceSuccessAlert,
+  ] = useState(false);
+  const [showRestoreWorkspaceSuccessAlert, setShowRestoreWorkspaceSuccessAlert] = useState(false);
+  const [showPermanentlyDeleteWorkspaceErrorAlert, setShowPermanentlyDeleteWorkspaceErrorAlert] =
+    useState(false);
+  const [showRestoreWorkspaceErrorAlert, setShowRestoreWorkspaceErrorAlert] = useState(false);
+  const hideAlertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
     {
       onSuccess: async (_, variables) => {
@@ -139,6 +150,11 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
         await queryClient.invalidateQueries({
           queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
         });
+        setShowPermanentlyDeleteWorkspaceSuccessAlert(true);
+        if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
+        hideAlertTimerRef.current = setTimeout(() => {
+          setShowPermanentlyDeleteWorkspaceSuccessAlert(false);
+        }, 3000);
       },
     }
   );
@@ -164,6 +180,11 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
         queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
       });
       setSelectedItems(new Set());
+      setShowRestoreWorkspaceSuccessAlert(true);
+      if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
+      hideAlertTimerRef.current = setTimeout(() => {
+        setShowRestoreWorkspaceSuccessAlert(false);
+      }, 3000);
     },
   });
   const toggleSelection = (id: string) => {
@@ -213,7 +234,9 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       body: { noteIds, folderIds },
     });
   };
-  return (
+  return isPending ? (
+    <Spinner />
+  ) : (
     <div className="w-full font-sans text-zinc-300">
       <div className="w-full">
         {/* Header Actions */}
@@ -325,6 +348,30 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
             })}
           </TableBody>
         </Table>
+        {showPermanentlyDeleteWorkspaceSuccessAlert && (
+          <SuccessAlert
+            title="Successfully Deleted"
+            message="Selected items have been permanently deleted."
+          />
+        )}
+        {showRestoreWorkspaceSuccessAlert && (
+          <SuccessAlert
+            title="Successfully Restored"
+            message="Selected items have been restored."
+          />
+        )}
+        {showPermanentlyDeleteWorkspaceErrorAlert && (
+          <ErrorAlert
+            title="Failed to Delete"
+            message="An error occurred while trying to permanently delete the selected items."
+          />
+        )}
+        {showRestoreWorkspaceErrorAlert && (
+          <ErrorAlert
+            title="Failed to Restore"
+            message="An error occurred while trying to restore the selected items."
+          />
+        )}
       </div>
     </div>
   );

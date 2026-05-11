@@ -8,10 +8,11 @@ import {
   useCreateNoteMutation,
 } from '@notopia-uit/api-gen';
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
+import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
 import { Alert, AlertDescription, AlertTitle } from '@notopia-uit/ui/components/shadcn/alert';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
-import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertCircleIcon, ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
@@ -188,33 +189,31 @@ const viewStateInitial: TreeViewState = {
 };
 
 const RenameErrorAlert = () => (
-  <Alert variant="destructive" className="max-w-md">
-    <AlertCircleIcon />
-    <AlertTitle>RenameFailed</AlertTitle>
-    <AlertDescription>Failed to rename item. Please try again.</AlertDescription>
-  </Alert>
+  <ErrorAlert title="RenameFailed" message="Failed to rename item. Please try again." />
 );
 
 const CreateErrorAlert = () => (
-  <Alert variant="destructive" className="max-w-md">
-    <AlertCircleIcon />
-    <AlertTitle>CreateFailed</AlertTitle>
-    <AlertDescription>Failed to create item. Please try again.</AlertDescription>
-  </Alert>
+  <ErrorAlert title="CreateFailed" message="Failed to create item. Please try again." />
 );
 
 //TODO: handle loading states, errors, empty states, etc.
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
   const queryClient = useQueryClient();
-  const { data: { treeData: workspaceTreeData, rootId } = { treeData: {}, rootId: '' } } = useQuery(
-    {
-      ...getWorkspaceTreeOptions({
-        path: { workspaceId: currentWorkspaceId },
-      }),
-      select: (data) => mapDtoTreeData(data),
-    }
-  );
+  const {
+    data: { treeData: workspaceTreeData, rootId } = { treeData: {}, rootId: '' },
+    isError: isGetWorkSpaceTreeError,
+    error: getWorkspaceTreeError,
+    isPending: isGettingWorkspaceTree,
+  } = useQuery({
+    ...getWorkspaceTreeOptions({
+      path: { workspaceId: currentWorkspaceId },
+    }),
+    select: (data) => mapDtoTreeData(data),
+  });
 
+  if (isGetWorkSpaceTreeError) {
+    throw getWorkspaceTreeError;
+  }
   const router = useRouter();
   const tree = useRef<TreeRef>(null);
 
@@ -429,7 +428,10 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     [getItemPath, search]
   );
 
-  return (
+  //TODO: maybe use skeleton?
+  return isGettingWorkspaceTree ? (
+    <Spinner />
+  ) : (
     <div className="flex size-full flex-col gap-4 overflow-hidden">
       <div className="flex shrink-0 flex-col gap-2">
         <form onSubmit={onSubmit} className="flex items-center gap-2">

@@ -26,15 +26,19 @@ export function mapDtoNoteData(dto: NoteGraph): GraphData {
 }
 //TODO: handle loading and error states
 export default function GraphView({ workspaceId }: { workspaceId: string }) {
-  const { data: graphData } = useQuery({
+  const {
+    data: graphData = { nodes: [], links: [] },
+    isError,
+    error,
+  } = useQuery({
     ...getWorkspaceGraphOptions({
       path: { workspaceId: workspaceId },
     }),
     select: (dto: NoteGraph) => mapDtoNoteData(dto),
   });
 
-  if (!graphData) {
-    return;
+  if (isError) {
+    throw error;
   }
   return <Graph data={graphData} />;
 }
