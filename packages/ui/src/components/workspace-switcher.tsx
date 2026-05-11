@@ -62,9 +62,7 @@ const generateSlug = (name: string) => {
 const WorkspaceSwitcher = () => {
   const queryClient = useQueryClient();
   const _data = useQuery({
-    ...getMyWorkspacesOptions({
-      auth: fetchAccessTokenClientSide,
-    }),
+    ...getMyWorkspacesOptions({}),
     select: mapUserWorkspaceDtoToDomain,
   });
 
@@ -92,9 +90,7 @@ const WorkspaceSwitcher = () => {
         queryKey: getMyWorkspacesOptions({}).queryKey,
       });
       const newWorkspacesData = await queryClient.fetchQuery({
-        ...getMyWorkspacesOptions({
-          auth: fetchAccessTokenClientSide,
-        }),
+        ...getMyWorkspacesOptions({}),
       });
       const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
       setWorkspaces(mappedWorkspaces);
@@ -110,9 +106,7 @@ const WorkspaceSwitcher = () => {
           queryKey: getMyWorkspacesOptions({}).queryKey,
         });
         const newWorkspacesData = await queryClient.fetchQuery({
-          ...getMyWorkspacesOptions({
-            auth: fetchAccessTokenClientSide,
-          }),
+          ...getMyWorkspacesOptions({}),
         });
         const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
         setWorkspaces(mappedWorkspaces);
@@ -214,7 +208,6 @@ const WorkspaceSwitcher = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               mutateWorkspaceSlug({
-                                auth: fetchAccessTokenClientSide,
                                 path: {
                                   workspaceId: workspace.id,
                                 },
@@ -366,7 +359,6 @@ const WorkspaceSwitcher = () => {
                           size="sm"
                           onClick={() =>
                             createWorkspace({
-                              auth: fetchAccessTokenClientSide,
                               body: {
                                 slug: editForm.slug as string,
                                 name: editForm.name as string,

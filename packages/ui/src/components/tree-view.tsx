@@ -210,7 +210,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     {
       ...getWorkspaceTreeOptions({
         path: { workspaceId: currentWorkspaceId },
-        auth: fetchAccessTokenClientSide,
       }),
       select: (data) => mapDtoTreeData(data),
     }
@@ -360,7 +359,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
       if (isFolder) {
         createFolder({
-          auth: fetchAccessTokenClientSide,
           body: {
             workspaceId: currentWorkspaceId,
             icon: '📁',
@@ -370,7 +368,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
         });
       } else {
         createNote({
-          auth: fetchAccessTokenClientSide,
           body: {
             folderId: parentId as string,
             icon: '📝',
@@ -481,7 +478,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           onRenameItem={(item, name) => {
             if (item.isFolder) {
               renameFolder({
-                auth: fetchAccessTokenClientSide,
                 path: {
                   folderId: item.index as string,
                 },
@@ -492,7 +488,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
               return;
             }
             renameNote({
-              auth: fetchAccessTokenClientSide,
               path: {
                 noteId: item.index as string,
               },

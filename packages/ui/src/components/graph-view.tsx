@@ -28,7 +28,6 @@ export function mapDtoNoteData(dto: NoteGraph): GraphData {
 export default function GraphView({ workspaceId }: { workspaceId: string }) {
   const { data: graphData } = useQuery({
     ...getWorkspaceGraphOptions({
-      auth: fetchAccessTokenClientSide,
       path: { workspaceId: workspaceId },
     }),
     select: (dto: NoteGraph) => mapDtoNoteData(dto),

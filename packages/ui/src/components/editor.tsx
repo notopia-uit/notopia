@@ -177,7 +177,6 @@ export default function Editor({ noteId }: { noteId: string }) {
               aria-label="save"
               onClick={() => {
                 commitDocument({
-                  auth: fetchAccessTokenClientSide,
                   path: {
                     documentId: noteId,
                   },

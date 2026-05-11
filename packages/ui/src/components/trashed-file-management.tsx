@@ -120,7 +120,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       onSuccess: async (_, variables) => {
         const { noteIds, folderIds } = variables.body;
         queryClient.setQueryData<TrashedDataDto>(
-          showTrashOptions({ path: { workspaceId }, auth: fetchAccessTokenClientSide }).queryKey,
+          showTrashOptions({ path: { workspaceId } }).queryKey,
           (oldData) => {
             if (!oldData) return oldData;
             return {
@@ -146,7 +146,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     onSuccess: async (_, variables) => {
       const { noteIds, folderIds } = variables.body;
       queryClient.setQueryData<TrashedDataDto>(
-        showTrashOptions({ auth: fetchAccessTokenClientSide, path: { workspaceId } }).queryKey,
+        showTrashOptions({ path: { workspaceId } }).queryKey,
         (oldData) => {
           if (!oldData) return oldData;
           return {
@@ -191,7 +191,6 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       else folderIds.push(item.id);
     }
     restoreItems({
-      auth: fetchAccessTokenClientSide,
       path: { workspaceId },
       body: { noteIds, folderIds },
     });
@@ -210,7 +209,6 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       folderIds.push(...trashedData.folders.map((f) => f.id));
     }
     deleteItems({
-      auth: fetchAccessTokenClientSide,
       path: { workspaceId },
       body: { noteIds, folderIds },
     });

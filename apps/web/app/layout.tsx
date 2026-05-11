@@ -1,10 +1,16 @@
+import { client } from '@notopia-uit/api-gen/client.gen';
 import QueryClientProvider from '@notopia-uit/ui/components/client-query-provider';
 import { ThemeProvider } from '@notopia-uit/ui/components/theme-provider';
-import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 
 import './globals.css';
+import { fetchAccessTokenServerSide } from '@notopia-uit/ui/lib/get-access-token';
+import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { Inter as FontSans } from 'next/font/google';
 import localFont from 'next/font/local';
+
+client.setConfig({
+  auth: fetchAccessTokenServerSide,
+});
 
 const fontSans = FontSans({
   subsets: ['latin'],

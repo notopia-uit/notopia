@@ -30,9 +30,7 @@ interface GeneralSettingsProps {
 //TODO: handle loading and error states
 export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
   const { data: allWorkspaceData } = useQuery({
-    ...getMyWorkspacesOptions({
-      auth: fetchAccessTokenClientSide,
-    }),
+    ...getMyWorkspacesOptions({}),
   });
   if (!allWorkspaceData) {
     return;

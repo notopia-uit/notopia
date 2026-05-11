@@ -214,9 +214,7 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
   const router = useRouter();
 
   const { data: allWorkspaceData } = useQuery({
-    ...getMyWorkspacesOptions({
-      auth: fetchAccessTokenClientSide,
-    }),
+    ...getMyWorkspacesOptions({}),
   });
   //TODO: check error
   if (!sessionData) {
