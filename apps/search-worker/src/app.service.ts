@@ -1,6 +1,6 @@
 import { MyBlock, type MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Meilisearch, MeilisearchError } from 'meilisearch';
 import { NoteSearch } from 'model';
 import { BLOCKNOTE_SCHEMA } from 'token';
@@ -30,6 +30,7 @@ export type HandleDocumentCommittedParams = Required<Pick<NoteSearch, 'id' | 'ta
 
 @Injectable()
 export class AppService {
+  private readonly logger = new Logger(AppService.name);
   private static readonly noteIndex = 'notes';
 
   constructor(
@@ -38,6 +39,7 @@ export class AppService {
   ) {}
 
   async handleNoteCreated(params: HandleNoteCreatedParams) {
+    this.logger.debug(`handleNoteCreated: indexing id=${params.id} workspaceId=${params.workspaceId}`);
     const index = this.meili.index(AppService.noteIndex);
     const noteSearch: NoteSearch = {
       id: params.id,
@@ -46,16 +48,20 @@ export class AppService {
     };
     try {
       await index.updateDocuments([noteSearch]);
+      this.logger.log(`handleNoteCreated: indexed id=${params.id}`);
     } catch (e) {
       if (e instanceof MeilisearchError) {
         // FIXME: ????? What, retry? not process anymore? how many time
+        this.logger.warn(`handleNoteCreated: meilisearch error id=${params.id} message=${e.message}`);
         throw new Error(`Failed to index note ${params.id}: ${e.message}`);
       }
+      this.logger.warn(`handleNoteCreated: unexpected error id=${params.id}`);
       throw e;
     }
   }
 
   async handleNoteUpdated(params: HandleNoteUpdatedParams) {
+    this.logger.debug(`handleNoteUpdated: indexing id=${params.id}`);
     const index = this.meili.index(AppService.noteIndex);
     const noteSearch: NoteSearch = {
       id: params.id,
@@ -66,15 +72,19 @@ export class AppService {
     };
     try {
       await index.updateDocuments([noteSearch]);
+      this.logger.log(`handleNoteUpdated: indexed id=${params.id}`);
     } catch (e) {
       if (e instanceof MeilisearchError) {
+        this.logger.warn(`handleNoteUpdated: meilisearch error id=${params.id} message=${e.message}`);
         throw new Error(`Failed to index note ${params.id}: ${e.message}`);
       }
+      this.logger.warn(`handleNoteUpdated: unexpected error id=${params.id}`);
       throw e;
     }
   }
 
   async handleDocumentCommitted(params: HandleDocumentCommittedParams) {
+    this.logger.debug(`handleDocumentCommitted: extracting content id=${params.id} tags=${params.tags.join(',')}`);
     const index = this.meili.index(AppService.noteIndex);
     const editor = ServerBlockNoteEditor.create({
       schema: this.blocknoteSchema,
@@ -87,10 +97,13 @@ export class AppService {
     };
     try {
       await index.updateDocuments([noteSearch]);
+      this.logger.log(`handleDocumentCommitted: indexed id=${params.id}`);
     } catch (e) {
       if (e instanceof MeilisearchError) {
+        this.logger.warn(`handleDocumentCommitted: meilisearch error id=${params.id} message=${e.message}`);
         throw new Error(`Failed to index document ${params.id}: ${e.message}`);
       }
+      this.logger.warn(`handleDocumentCommitted: unexpected error id=${params.id}`);
       throw e;
     }
   }

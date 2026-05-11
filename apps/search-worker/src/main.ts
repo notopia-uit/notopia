@@ -11,7 +11,7 @@ import { APP_CONFIG } from './config.factory';
 import { getKafkaConfig } from './kafka.config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.connectMicroservice({
     useFactory: getKafkaConfig,
     inject: [ConfigService],
