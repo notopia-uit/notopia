@@ -30,6 +30,8 @@
 
 ## TO-DO
 
+### Backend
+
 - [ ] Note service
   - [ ] Routing kafka message based on metadata workspace id if partitioning or listening
   - [ ] Some handlers should rename the UserID to actor ID, and... so do the domain event?
@@ -49,3 +51,10 @@
 - [ ] If deploy, but not using roles. Change to `https://github.com/agilezebra/jwt-middleware`, and use istio
 - [ ] Document and search worker has duplicate dist for src, and ts code
 - [ ] Be careful about distributing those nestjs, which require proto file at runtime
+- [ ] Those NestJS logging, we need to find a better way to wrap those controller log. NestJS Pino only http? not microservice.
+      And guess that we should either using middleware or interceptor
+
+### Both
+
+- [] yjs isn't typesafety, like getting Ymap, and set value.
+  May try to see other libs, how do they do

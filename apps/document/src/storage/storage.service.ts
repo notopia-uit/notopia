@@ -1,6 +1,6 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Traceable } from 'nestjs-otel';
 
@@ -10,6 +10,7 @@ import { S3_CONFIG } from '../config/config.factory';
 @Injectable()
 @Traceable()
 export class StorageService {
+  private readonly logger = new Logger(StorageService.name);
   private readonly bucketName: string;
   private readonly s3Endpoint: string;
   private static readonly s3UrlExpirationSeconds = 3600;
@@ -27,6 +28,7 @@ export class StorageService {
   }
 
   async generateAttachmentPresignedUploadUrl(key: string) {
+    this.logger.debug(`generateAttachmentPresignedUploadUrl: key=${key}`);
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
       Key: key,
@@ -36,6 +38,7 @@ export class StorageService {
       expiresIn: StorageService.s3UrlExpirationSeconds,
     });
     const publicUrl = `${this.s3Endpoint}/${this.bucketName}/${key}`;
+    this.logger.debug(`generateAttachmentPresignedUploadUrl: done key=${key}`);
     return { uploadUrl, publicUrl };
   }
 }
