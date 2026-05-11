@@ -9,7 +9,8 @@ import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   BadgeCheck,
   Bell,
@@ -212,8 +213,11 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
 
   const router = useRouter();
 
-  const { data: allWorkspaceData } = useSuspenseQuery(getMyWorkspacesOptions({}));
-
+  const { data: allWorkspaceData } = useQuery({
+    ...getMyWorkspacesOptions({
+      auth: fetchAccessTokenClientSide,
+    }),
+  });
   //TODO: check error
   if (!sessionData) {
     return;

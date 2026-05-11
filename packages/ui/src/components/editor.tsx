@@ -26,6 +26,7 @@ import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import '@blocknote/shadcn/style.css';
 import { useIsDocModified } from '@notopia-uit/ui/hooks/use-is-doc-modified';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useMemo } from 'react';
 
@@ -176,6 +177,7 @@ export default function Editor({ noteId }: { noteId: string }) {
               aria-label="save"
               onClick={() => {
                 commitDocument({
+                  auth: fetchAccessTokenClientSide,
                   path: {
                     documentId: noteId,
                   },

@@ -11,8 +11,9 @@ import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api
 import { Alert, AlertDescription, AlertTitle } from '@notopia-uit/ui/components/shadcn/alert';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
+import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AlertCircleIcon, ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -202,14 +203,18 @@ const CreateErrorAlert = () => (
   </Alert>
 );
 
+//TODO: handle loading states, errors, empty states, etc.
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
   const queryClient = useQueryClient();
-  const {
-    data: { treeData: workspaceTreeData, rootId },
-  } = useSuspenseQuery({
-    ...getWorkspaceTreeOptions({ path: { workspaceId: currentWorkspaceId } }),
-    select: (data) => mapDtoTreeData(data),
-  });
+  const { data: { treeData: workspaceTreeData, rootId } = { treeData: {}, rootId: '' } } = useQuery(
+    {
+      ...getWorkspaceTreeOptions({
+        path: { workspaceId: currentWorkspaceId },
+        auth: fetchAccessTokenClientSide,
+      }),
+      select: (data) => mapDtoTreeData(data),
+    }
+  );
 
   const router = useRouter();
   const tree = useRef<TreeRef>(null);
@@ -355,6 +360,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
       if (isFolder) {
         createFolder({
+          auth: fetchAccessTokenClientSide,
           body: {
             workspaceId: currentWorkspaceId,
             icon: '📁',
@@ -364,6 +370,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
         });
       } else {
         createNote({
+          auth: fetchAccessTokenClientSide,
           body: {
             folderId: parentId as string,
             icon: '📝',
@@ -474,6 +481,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           onRenameItem={(item, name) => {
             if (item.isFolder) {
               renameFolder({
+                auth: fetchAccessTokenClientSide,
                 path: {
                   folderId: item.index as string,
                 },
@@ -484,6 +492,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
               return;
             }
             renameNote({
+              auth: fetchAccessTokenClientSide,
               path: {
                 noteId: item.index as string,
               },

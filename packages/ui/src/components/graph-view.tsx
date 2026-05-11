@@ -3,7 +3,8 @@
 import { getWorkspaceGraphOptions, NoteGraph } from '@notopia-uit/api-gen';
 import { GraphData, GraphNode, GraphLink } from '@notopia-uit/ui/graph-view/graph';
 import Graph from '@notopia-uit/ui/graph-view/graph';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
+import { useQuery } from '@tanstack/react-query';
 
 export function mapDtoNoteData(dto: NoteGraph): GraphData {
   return {
@@ -23,13 +24,18 @@ export function mapDtoNoteData(dto: NoteGraph): GraphData {
     ),
   };
 }
+//TODO: handle loading and error states
 export default function GraphView({ workspaceId }: { workspaceId: string }) {
-  const { data: graphData } = useSuspenseQuery({
+  const { data: graphData } = useQuery({
     ...getWorkspaceGraphOptions({
+      auth: fetchAccessTokenClientSide,
       path: { workspaceId: workspaceId },
     }),
     select: (dto: NoteGraph) => mapDtoNoteData(dto),
   });
 
+  if (!graphData) {
+    return;
+  }
   return <Graph data={graphData} />;
 }

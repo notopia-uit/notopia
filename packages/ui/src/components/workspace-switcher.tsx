@@ -2,12 +2,10 @@
 import {
   NoteUserWorkspace,
   NoteWorkspaceRole,
-  getMyWorkspaces,
   getMyWorkspacesOptions,
   useChangeWorkspaceSlugMutation,
   useCreateWorkspaceMutation,
 } from '@notopia-uit/api-gen';
-import { createClient, CreateClientConfig } from '@notopia-uit/api-gen/client';
 import { Badge } from '@notopia-uit/ui/components/shadcn/badge';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Card, CardContent } from '@notopia-uit/ui/components/shadcn/card';
@@ -28,11 +26,11 @@ import {
   SelectValue,
 } from '@notopia-uit/ui/components/shadcn/select';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 type UserRole = (typeof NoteWorkspaceRole)[keyof typeof NoteWorkspaceRole];
 
@@ -60,34 +58,17 @@ const generateSlug = (name: string) => {
 };
 
 // TODO: handle create new workspace with api and router.push to workspace
-
-export const createClientConfig: CreateClientConfig = (config) => ({
-  ...config,
-  auth: async () =>
-    (
-      await authClient.getAccessToken({
-        providerId: 'authentik',
-      })
-    ).data?.accessToken,
-});
-
+//TODO: handle on error, loading states, and edge cases like slug conflicts for both create and edit flows. Currently the UI optimistically updates local state without any backend integration, so it will drift from server state on any refetch (focus, reconnect, manual invalidation, etc.) and doesn't persist across sessions. Consider using React Query's useMutation with query invalidation for a more robust implementation.
 const WorkspaceSwitcher = () => {
   const queryClient = useQueryClient();
   const _data = useQuery({
     ...getMyWorkspacesOptions({
-      auth: async () =>
-        (
-          await authClient.getAccessToken({
-            providerId: 'authentik',
-          })
-        ).data?.accessToken,
+      auth: fetchAccessTokenClientSide,
     }),
     select: mapUserWorkspaceDtoToDomain,
   });
 
   const { data: allWorkspaceData } = _data;
-
-  console.log('Fetched data:', JSON.stringify(_data));
 
   //TODO: Local state mirroring server data will desync on refetch.
   // workspaces and selectedId are initialized from allWorkspaceData once at mount. If the underlying getMyWorkspaces query refetches (on focus, reconnect, manual invalidation, etc.), useSuspenseQuery updates allWorkspaceData but the local useState snapshot is never re-synced, so the UI will silently drift from server state. Combined with the TODO at Line 69, this whole component currently operates on local-only edits.
@@ -98,19 +79,6 @@ const WorkspaceSwitcher = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editForm, setEditForm] = useState<Partial<UserWorkspace>>({});
-
-  // useEffect(() => {
-  //   const fetchWorkspaces = async () => {
-  //     console.log("Fetching workspaces...");
-  //     const dto = await getMyWorkspaces({
-  //       client,
-  //     });
-  //     if (!dto.data) return;
-  //     const mappedWorkspaces = mapUserWorkspaceDtoToDomain(dto.data);
-  //     setWorkspaces(mappedWorkspaces);
-  //   };
-  //   fetchWorkspaces();
-  // }, []);
 
   if (allWorkspaceData && workspaces.length === 0) {
     setWorkspaces(allWorkspaceData);
@@ -124,7 +92,9 @@ const WorkspaceSwitcher = () => {
         queryKey: getMyWorkspacesOptions({}).queryKey,
       });
       const newWorkspacesData = await queryClient.fetchQuery({
-        ...getMyWorkspacesOptions({}),
+        ...getMyWorkspacesOptions({
+          auth: fetchAccessTokenClientSide,
+        }),
       });
       const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
       setWorkspaces(mappedWorkspaces);
@@ -140,7 +110,9 @@ const WorkspaceSwitcher = () => {
           queryKey: getMyWorkspacesOptions({}).queryKey,
         });
         const newWorkspacesData = await queryClient.fetchQuery({
-          ...getMyWorkspacesOptions({}),
+          ...getMyWorkspacesOptions({
+            auth: fetchAccessTokenClientSide,
+          }),
         });
         const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
         setWorkspaces(mappedWorkspaces);
@@ -242,6 +214,7 @@ const WorkspaceSwitcher = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               mutateWorkspaceSlug({
+                                auth: fetchAccessTokenClientSide,
                                 path: {
                                   workspaceId: workspace.id,
                                 },
@@ -393,6 +366,7 @@ const WorkspaceSwitcher = () => {
                           size="sm"
                           onClick={() =>
                             createWorkspace({
+                              auth: fetchAccessTokenClientSide,
                               body: {
                                 slug: editForm.slug as string,
                                 name: editForm.name as string,

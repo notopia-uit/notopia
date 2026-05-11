@@ -23,7 +23,8 @@ import {
   TableHeader,
   TableRow,
 } from '@notopia-uit/ui/components/shadcn/table';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Folder, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
@@ -84,11 +85,16 @@ const formatDate = (isoString: string) => {
 //TODO: add dialog onSuccess and onError for delete and restore action, also add confirm dialog when user click delete permanently or empty trash
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient();
-  const { data: trashedData } = useSuspenseQuery({
+  const { data, isError } = useQuery({
     ...showTrashOptions({ path: { workspaceId: workspaceId } }),
     select: (data) => mapDtoTrashedData(data),
   });
 
+  if (isError) {
+    return;
+  }
+
+  const trashedData = data ? data : { notes: [], folders: [] };
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   const displayData = useMemo(() => {
@@ -114,7 +120,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       onSuccess: async (_, variables) => {
         const { noteIds, folderIds } = variables.body;
         queryClient.setQueryData<TrashedDataDto>(
-          showTrashOptions({ path: { workspaceId } }).queryKey,
+          showTrashOptions({ path: { workspaceId }, auth: fetchAccessTokenClientSide }).queryKey,
           (oldData) => {
             if (!oldData) return oldData;
             return {
@@ -140,7 +146,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     onSuccess: async (_, variables) => {
       const { noteIds, folderIds } = variables.body;
       queryClient.setQueryData<TrashedDataDto>(
-        showTrashOptions({ path: { workspaceId } }).queryKey,
+        showTrashOptions({ auth: fetchAccessTokenClientSide, path: { workspaceId } }).queryKey,
         (oldData) => {
           if (!oldData) return oldData;
           return {
@@ -185,6 +191,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       else folderIds.push(item.id);
     }
     restoreItems({
+      auth: fetchAccessTokenClientSide,
       path: { workspaceId },
       body: { noteIds, folderIds },
     });
@@ -202,7 +209,11 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       noteIds.push(...trashedData.notes.map((n) => n.id));
       folderIds.push(...trashedData.folders.map((f) => f.id));
     }
-    deleteItems({ path: { workspaceId }, body: { noteIds, folderIds } });
+    deleteItems({
+      auth: fetchAccessTokenClientSide,
+      path: { workspaceId },
+      body: { noteIds, folderIds },
+    });
   };
   return (
     <div className="w-full font-sans text-zinc-300">

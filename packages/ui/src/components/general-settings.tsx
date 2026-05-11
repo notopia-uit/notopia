@@ -4,7 +4,8 @@ import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Label } from '@notopia-uit/ui/components/shadcn/label';
 import { Separator } from '@notopia-uit/ui/components/shadcn/separator';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
+import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
@@ -26,10 +27,16 @@ interface GeneralSettingsProps {
   workspaceId: string;
 }
 
+//TODO: handle loading and error states
 export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
-  const { data: allWorkspaceData } = useSuspenseQuery({
-    ...getMyWorkspacesOptions({}),
+  const { data: allWorkspaceData } = useQuery({
+    ...getMyWorkspacesOptions({
+      auth: fetchAccessTokenClientSide,
+    }),
   });
+  if (!allWorkspaceData) {
+    return;
+  }
   const [workspaceName, setWorkspaceName] = useState(
     allWorkspaceData.find((ws) => ws.workspace.id === workspaceId)?.workspace.name || ''
   );
