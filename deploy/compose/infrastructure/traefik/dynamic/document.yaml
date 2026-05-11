@@ -10,6 +10,14 @@ http:
         - jwt
         - cors
 
+    document-public:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/document/ws/document`)
+      service: document
+      middlewares:
+        - cors
+
   services:
     document:
       loadBalancer:
