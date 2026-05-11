@@ -20,36 +20,49 @@ export class AppController {
   @EventPattern('events.integration.note.note.created')
   async handleNoteCreated(@Payload() data: ShareNoteCreatedEvent) {
     this.logger.log(`handleNoteCreated: received id=${data.id} workspaceId=${data.workspaceId}`);
-    await this.appService.handleNoteCreated({
-      id: data.id,
-      name: data.name,
-      workspaceId: data.workspaceId,
-    });
-    this.logger.log(`handleNoteCreated: done id=${data.id}`);
+    try {
+      await this.appService.handleNoteCreated({
+        id: data.id,
+        name: data.name,
+        workspaceId: data.workspaceId,
+      });
+    } catch (error) {
+      this.logger.error(`handleNoteCreated: error occurred id=${data.id}`, error);
+      throw error;
+    }
   }
 
   @EventPattern('events.integration.note.note.updated')
   async handleNoteUpdated(@Payload() data: ShareNoteUpdatedEvent) {
     this.logger.log(`handleNoteUpdated: received id=${data.id}`);
-    await this.appService.handleNoteUpdated({
-      id: data.id,
-      name: data.name,
-      folderId: data.folderId,
-      folderName: data.folderName,
-      trashed: data.trashed,
-    });
+    try {
+      await this.appService.handleNoteUpdated({
+        id: data.id,
+        name: data.name,
+        folderId: data.folderId,
+        folderName: data.folderName,
+        trashed: data.trashed,
+      });
+    } catch (error) {
+      this.logger.error(`handleNoteUpdated: error occurred id=${data.id}`, error);
+      throw error;
+    }
     this.logger.log(`handleNoteUpdated: done id=${data.id}`);
   }
 
   @EventPattern('events.integration.document.document.committed')
   async handleDocumentCommitted(@Payload() data: ShareDocumentCommittedEvent) {
     this.logger.log(`handleDocumentCommitted: received id=${data.id}`);
-    await this.appService.handleDocumentCommitted({
-      id: data.id,
-      tags: data.tags,
-      // we should validate? or let blocknote throw error
-      content: data.content as MyBlock[],
-    });
-    this.logger.log(`handleDocumentCommitted: done id=${data.id}`);
+    try {
+      await this.appService.handleDocumentCommitted({
+        id: data.id,
+        tags: data.tags,
+        // we should validate? or let blocknote throw error
+        content: data.content as MyBlock[],
+      });
+    } catch (error) {
+      this.logger.error(`handleDocumentCommitted: error occurred id=${data.id}`, error);
+      throw error;
+    }
   }
 }
