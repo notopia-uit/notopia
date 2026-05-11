@@ -67,5 +67,5 @@ export const HocuspocusProvider: Provider = {
       },
     });
   },
-  inject: [DocumentService, NoteService, AuthorizationService, AuthenticationService],
+  inject: [DocumentService, NoteService, AuthorizationService, Logger, AuthenticationService],
 };
