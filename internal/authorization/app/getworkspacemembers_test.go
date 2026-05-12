@@ -25,7 +25,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W111-Owner can view members",
 			requesterID: "111",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			expectErr:   false,
 			expectedMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
@@ -36,7 +36,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W111-Editor can view members",
 			requesterID: "112",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			expectErr:   false,
 			expectedMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
@@ -47,7 +47,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W111-Viewer can view members",
 			requesterID: "110",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			expectErr:   false,
 			expectedMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
@@ -58,7 +58,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:            "W112-Stranger CANNOT view members",
 			requesterID:     "110",
-			workspaceID:     "00000000-0000-0000-0000-000000000112",
+			workspaceID:     "00000000-0000-4000-8000-000000000112",
 			expectErr:       true,
 			expectedMembers: nil,
 		},

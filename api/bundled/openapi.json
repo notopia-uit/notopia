@@ -10507,7 +10507,7 @@
                 "schema": {
                   "type": "string",
                   "format": "uri",
-                  "example": "http://api.notopia.localhost/workspaces/00000000-0000-0000-0000-000000000110"
+                  "example": "http://api.notopia.localhost/workspaces/00000000-0000-4000-8000-000000000110"
                 }
               }
             },
@@ -20675,7 +20675,7 @@
       "share_id-2": {
         "type": "string",
         "format": "uuid",
-        "example": "00000000-0000-0000-0000-000000000110",
+        "example": "00000000-0000-4000-8000-000000000110",
         "readOnly": true
       },
       "share_WorkspaceRole": {
@@ -21029,7 +21029,7 @@
           "workspaceId": {
             "type": "string",
             "format": "uuid",
-            "example": "00000000-0000-0000-0000-000000000110"
+            "example": "00000000-0000-4000-8000-000000000110"
           },
           "updatedAt": {
             "type": "string",
@@ -21297,7 +21297,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "00000000-0000-0000-0000-000000000110",
+            "example": "00000000-0000-4000-8000-000000000110",
             "readOnly": true
           },
           "slug": {
@@ -21320,7 +21320,7 @@
       "note_id-3": {
         "type": "string",
         "format": "uuid",
-        "example": "00000000-0000-0000-0000-000000000110",
+        "example": "00000000-0000-4000-8000-000000000110",
         "readOnly": true
       },
       "note_WorkspaceRole": {

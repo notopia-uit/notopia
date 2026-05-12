@@ -22,51 +22,51 @@ func TestLeaveWorkspaceHandler(t *testing.T) {
 		{
 			name:          "W111-Owner cannot leave (only owner)",
 			userID:        "111",
-			workspaceID:   "00000000-0000-0000-0000-000000000111",
+			workspaceID:   "00000000-0000-4000-8000-000000000111",
 			expectErr:     true,
 			expectedError: "only owner",
 		},
 		{
 			name:        "W111-Editor leaves workspace successfully",
 			userID:      "112",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			expectErr:   false,
 		},
 		{
 			name:        "W111-Viewer leaves workspace successfully",
 			userID:      "110",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			expectErr:   false,
 		},
 		{
 			name:          "W112-Only owner cannot leave workspace",
 			userID:        "112",
-			workspaceID:   "00000000-0000-0000-0000-000000000112",
+			workspaceID:   "00000000-0000-4000-8000-000000000112",
 			expectErr:     true,
 			expectedError: "only owner",
 		},
 		{
 			name:        "W110-Owner can leave (multiple owners)",
 			userID:      "110",
-			workspaceID: "00000000-0000-0000-0000-000000000110",
+			workspaceID: "00000000-0000-4000-8000-000000000110",
 			expectErr:   false,
 		},
 		{
 			name:        "W110-user 111 can leave (multiple owners)",
 			userID:      "111",
-			workspaceID: "00000000-0000-0000-0000-000000000110",
+			workspaceID: "00000000-0000-4000-8000-000000000110",
 			expectErr:   false,
 		},
 		{
 			name:        "W110-user 112 can leave (multiple owners)",
 			userID:      "112",
-			workspaceID: "00000000-0000-0000-0000-000000000110",
+			workspaceID: "00000000-0000-4000-8000-000000000110",
 			expectErr:   false,
 		},
 		{
 			name:          "User not a member cannot leave",
 			userID:        "999",
-			workspaceID:   "00000000-0000-0000-0000-000000000111",
+			workspaceID:   "00000000-0000-4000-8000-000000000111",
 			expectErr:     true,
 			expectedError: "does not have",
 		},
@@ -148,7 +148,7 @@ func TestLeaveWorkspaceHandler_PublishEventFailure(t *testing.T) {
 
 	handler := app.NewLeaveWorkspaceHandler(e, mockPublisher)
 
-	workspaceID := uuid.MustParse("00000000-0000-0000-0000-000000000111")
+	workspaceID := uuid.MustParse("00000000-0000-4000-8000-000000000111")
 	ctx := t.Context()
 	err = handler.Handle(ctx, &app.LeaveWorkspace{
 		UserID:      "112", // Editor, can leave

@@ -23,7 +23,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 			// W111 initial state from policy_test.csv: {111: owner, 112: editor, 110: viewer}
 			name:        "W111-Owner can update members - add new member",
 			requesterID: "111",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			newMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 				{ID: "112", Role: app.WorkspaceRoleEditor},
@@ -36,7 +36,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W111-Owner can update members - remove member",
 			requesterID: "111",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			newMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 				{ID: "110", Role: app.WorkspaceRoleViewer},
@@ -47,7 +47,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W111-Owner can update members - change role",
 			requesterID: "111",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			newMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 				{ID: "112", Role: app.WorkspaceRoleViewer},
@@ -59,7 +59,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W111-Editor CANNOT update members",
 			requesterID: "112",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			newMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 			},
@@ -68,7 +68,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W111-Viewer CANNOT update members",
 			requesterID: "110",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			newMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
 			},
@@ -77,7 +77,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W112-Stranger CANNOT update members",
 			requesterID: "110",
-			workspaceID: "00000000-0000-0000-0000-000000000112",
+			workspaceID: "00000000-0000-4000-8000-000000000112",
 			newMembers: []app.WorkspaceMember{
 				{ID: "112", Role: app.WorkspaceRoleOwner},
 			},

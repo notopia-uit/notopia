@@ -24,7 +24,7 @@ post:
           schema:
             type: string
             format: uri
-            example: http://api.notopia.localhost/workspaces/00000000-0000-0000-0000-000000000110
+            example: http://api.notopia.localhost/workspaces/00000000-0000-4000-8000-000000000110
       content:
         application/json:
           schema:
