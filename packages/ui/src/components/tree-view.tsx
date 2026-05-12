@@ -9,13 +9,12 @@ import {
 } from '@notopia-uit/api-gen';
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
 import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
-import { Alert, AlertDescription, AlertTitle } from '@notopia-uit/ui/components/shadcn/alert';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertCircleIcon, ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
+import { ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -263,12 +262,51 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   };
   //TODO:: call API to create new item and update tree data with response
   const { mutate: createNote } = useCreateNoteMutation({
-    onSuccess: (_, variables) => handleCreateSuccess(variables.body.folderId as string),
+    onSuccess: (responses, variables) => {
+      const newNoteId = responses.id;
+      const parentId = variables.body.folderId;
+      setItems((prevItems) => {
+        const newItems = { ...prevItems };
+        const parentItem = newItems[parentId];
+        if (parentItem && parentItem.isFolder) {
+          newItems[parentId] = {
+            ...parentItem,
+            children: [...(parentItem.children ?? []), newNoteId],
+          };
+        }
+        newItems[newNoteId] = {
+          index: newNoteId,
+          data: variables.body.name,
+          isFolder: false,
+        };
+        return newItems;
+      });
+    },
     onError: onCreateError,
   });
   const { mutate: createFolder } = useCreateFolderMutation({
     onError: onCreateError,
-    onSuccess: (_, variables) => handleCreateSuccess(variables.body.parentId as string),
+    onSuccess: (responses, variables) => {
+      const newFolderId = responses.id;
+      const parentId = variables.body.parentId ? variables.body.parentId : rootId;
+      setItems((prevItems) => {
+        const newItems = { ...prevItems };
+        const parentItem = newItems[parentId];
+        if (parentItem && parentItem.isFolder) {
+          newItems[parentId] = {
+            ...parentItem,
+
+            children: [...(parentItem.children ?? []), newFolderId],
+          };
+        }
+        newItems[newFolderId] = {
+          index: newFolderId,
+          data: variables.body.name,
+          isFolder: true,
+        };
+        return newItems;
+      });
+    },
   });
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
