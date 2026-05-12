@@ -18,6 +18,7 @@ type App struct {
 	HasWorkspaceItemPermission      *HasWorkspaceItemPermissionHandler
 	HasWorkspacePermission          *HasWorkspacePermissionHandler
 	UpdateWorkspaceMembers          *UpdateWorkspaceMembersHandler
+	LeaveWorkspace                  *LeaveWorkspaceHandler
 }
 
 func (a *App) BootStrapPolicies(ctx context.Context) error {
@@ -66,19 +67,8 @@ func (a *App) BootStrapPolicies(ctx context.Context) error {
 func (a *App) SeedDev(ctx context.Context) error {
 	slog.DebugContext(ctx, "SeedDev: seeding dev user workspace policies")
 
-	devPolicies := [][]string{
-		{"user:111", "owner", "workspace:00000000-0000-0000-0000-000000000111"},
-		{"user:112", "editor", "workspace:00000000-0000-0000-0000-000000000111"},
-		{"user:110", "viewer", "workspace:00000000-0000-0000-0000-000000000111"},
-		{"user:112", "owner", "workspace:00000000-0000-0000-0000-000000000112"},
-		{"user:111", "editor", "workspace:00000000-0000-0000-0000-000000000112"},
-		{"user:110", "owner", "workspace:00000000-0000-0000-0000-000000000110"},
-		{"user:112", "owner", "workspace:00000000-0000-0000-0000-000000000110"},
-		{"user:111", "owner", "workspace:00000000-0000-0000-0000-000000000110"},
-	}
-
-	_, err := a.Enforcer.AddGroupingPolicies(devPolicies)
-	if err != nil {
+	if err := LoadPoliciesFromString(a.Enforcer, PolicyTestCSV); err != nil {
+		slog.ErrorContext(ctx, "SeedDev: failed to load test policies", slog.Any("error", err))
 		return fmt.Errorf("failed to seed dev policies: %w", err)
 	}
 

@@ -172,6 +172,22 @@ func (a *Authorization) GetWorkspaceMembers(ctx context.Context, userID string, 
 	return members, nil
 }
 
+func (a *Authorization) LeaveWorkspace(ctx context.Context, userID string, workspaceID uuid.UUID) error {
+	_, err := a.client.LeaveWorkspace(ctx, &pb.LeaveWorkspaceRequest{
+		UserId:      userID,
+		WorkspaceId: workspaceID.String(),
+	})
+	return err
+}
+
+func (a *Authorization) DeleteWorkspace(ctx context.Context, userID string, workspaceID uuid.UUID) error {
+	_, err := a.client.DeleteWorkspace(ctx, &pb.DeleteWorkspaceRequest{
+		UserId:      userID,
+		WorkspaceId: workspaceID.String(),
+	})
+	return err
+}
+
 func (a *Authorization) toWorkspaceMembersPb(members []app.WorkspaceMemberUpdate) ([]*pb.WorkspaceMember, error) {
 	pbMembers := make([]*pb.WorkspaceMember, len(members))
 	for i, member := range members {

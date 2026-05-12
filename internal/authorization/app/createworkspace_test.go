@@ -13,7 +13,7 @@ func TestCreateWorkspaceHandler(t *testing.T) {
 
 	ctx := t.Context()
 
-	e, err := GetLocalEnforcer(t, false)
+	e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: false})
 	require.NoError(t, err, "Failed to create enforcer")
 
 	handler := app.NewCreateWorkspaceHandler(e)

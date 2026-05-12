@@ -207,6 +207,27 @@ func (h *StrictHandler) GetWorkspaceGraph(
 	return note.GetWorkspaceGraph200JSONResponse(dto), nil
 }
 
+func (h *StrictHandler) LeaveWorkspace(
+	ctx context.Context,
+	request note.LeaveWorkspaceRequestObject,
+) (note.LeaveWorkspaceResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.Unauthorized
+	}
+
+	cmd := &app.LeaveWorkspace{
+		UserID:      user.ID,
+		WorkspaceID: request.WorkspaceId,
+	}
+	err := h.App.Cmds.LeaveWorkspaceHandler.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.LeaveWorkspace204Response{}, nil
+}
+
 func (h *StrictHandler) GetWorkspaceMembers(
 	ctx context.Context,
 	request note.GetWorkspaceMembersRequestObject,

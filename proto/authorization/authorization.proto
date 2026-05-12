@@ -9,6 +9,7 @@ service AuthorizationService {
   rpc CreateWorkspaceWithOwner(CreateWorkspaceWithOwnerRequest) returns (CreateWorkspaceWithOwnerResponse);
   rpc UpdateWorkspaceMembers(UpdateWorkspaceMembersRequest) returns (UpdateWorkspaceMembersResponse);
   rpc GetWorkspaceMembers(GetWorkspaceMembersRequest) returns (GetWorkspaceMembersResponse);
+  rpc LeaveWorkspace(LeaveWorkspaceRequest) returns (LeaveWorkspaceResponse);
   rpc HasWorkspacePermission(HasWorkspacePermissionRequest) returns (HasWorkspacePermissionResponse);
   rpc HasWorkspaceItemPermission(HasWorkspaceItemPermissionRequest) returns (HasWorkspaceItemPermissionResponse);
   rpc GetUserWorkspaceItemPermissions(GetUserWorkspaceItemPermissionsRequest) returns (GetUserWorkspaceItemPermissionsResponse);
@@ -77,6 +78,16 @@ message UpdateWorkspaceMembersRequest {
 }
 
 message UpdateWorkspaceMembersResponse {}
+
+message LeaveWorkspaceRequest {
+  string user_id = 1 [(buf.validate.field).required = true];
+  string workspace_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uuid = true
+  ];
+}
+
+message LeaveWorkspaceResponse {}
 
 message GetWorkspaceMembersRequest {
   string user_id = 1 [(buf.validate.field).required = true];

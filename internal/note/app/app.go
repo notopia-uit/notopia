@@ -8,6 +8,7 @@ type Cmds struct {
 	DeleteFolderHandler                    *PermanentlyDeleteFolderHandler
 	DeleteNoteHandler                      *PermanentlyDeleteNoteHandler
 	DeleteWorkspaceHandler                 *DeleteWorkspaceHandler
+	LeaveWorkspaceHandler                  *LeaveWorkspaceHandler
 	MoveWorkspaceItemsHandler              *MoveWorkspaceItemsHandler
 	PermanentlyDeleteWorkspaceItemsHandler *PermanentlyDeleteWorkspaceItemsHandler
 	PublishNoteHandler                     *PublishNoteHandler

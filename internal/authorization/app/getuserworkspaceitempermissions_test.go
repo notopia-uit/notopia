@@ -10,7 +10,7 @@ import (
 )
 
 func TestGetUserWorkspaceItemPermissionsHandler(t *testing.T) {
-	e, err := GetLocalEnforcer(t, true)
+	e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: true})
 	require.NoError(t, err, "Failed to create enforcer")
 
 	handler := app.NewGetUserWorkspaceItemPermissionsHandler(e)
@@ -29,8 +29,8 @@ func TestGetUserWorkspaceItemPermissionsHandler(t *testing.T) {
 		{"W112-Editor: Read, Write, Delete", "111", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}, false},
 		{"W112-Stranger: No permissions", "110", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissions{Read: false, Write: false, Delete: false}, true},
 		{"W110-Owner: All permissions", "110", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}, false},
-		{"W110-Stranger user 111: No permissions", "111", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: false, Write: false, Delete: false}, true},
-		{"W110-Stranger user 112: No permissions", "112", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: false, Write: false, Delete: false}, true},
+		{"W110-Owner user 112: All permissions", "112", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}, false},
+		{"W110-Owner user 111: All permissions", "111", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissions{Read: true, Write: true, Delete: true}, false},
 	}
 
 	for _, tc := range tests {

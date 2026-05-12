@@ -81,7 +81,8 @@ func (g *Service) UpdateWorkspaceMembers(ctx context.Context, req *pb.UpdateWork
 		// Log publish failures but don't fail the entire operation
 		// since the members have already been updated in Casbin
 		if pubErr, ok := err.(*errs.PublishIntegrationEventsFailed); ok {
-			slog.WarnContext(ctx, "failed to publish integration events after successful member update",
+			slog.WarnContext(
+				ctx, "failed to publish integration events after successful member update",
 				slog.String("workspace_id", pubErr.WorkspaceID.String()),
 				slog.String("error", pubErr.Error()),
 			)
@@ -91,6 +92,20 @@ func (g *Service) UpdateWorkspaceMembers(ctx context.Context, req *pb.UpdateWork
 	}
 
 	return &pb.UpdateWorkspaceMembersResponse{}, nil
+}
+
+func (g *Service) LeaveWorkspace(ctx context.Context, req *pb.LeaveWorkspaceRequest) (*pb.LeaveWorkspaceResponse, error) {
+	workspaceID, err := uuid.Parse(req.WorkspaceId)
+	if err != nil {
+		return nil, err
+	}
+	if err := g.app.LeaveWorkspace.Handle(ctx, app.LeaveWorkspace{
+		UserID:      req.UserId,
+		WorkspaceID: workspaceID,
+	}); err != nil {
+		return nil, err
+	}
+	return &pb.LeaveWorkspaceResponse{}, nil
 }
 
 func (g *Service) GetWorkspaceMembers(ctx context.Context, req *pb.GetWorkspaceMembersRequest) (*pb.GetWorkspaceMembersResponse, error) {

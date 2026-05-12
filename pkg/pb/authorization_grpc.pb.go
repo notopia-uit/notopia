@@ -23,6 +23,7 @@ const (
 	AuthorizationService_CreateWorkspaceWithOwner_FullMethodName        = "/authorization.AuthorizationService/CreateWorkspaceWithOwner"
 	AuthorizationService_UpdateWorkspaceMembers_FullMethodName          = "/authorization.AuthorizationService/UpdateWorkspaceMembers"
 	AuthorizationService_GetWorkspaceMembers_FullMethodName             = "/authorization.AuthorizationService/GetWorkspaceMembers"
+	AuthorizationService_LeaveWorkspace_FullMethodName                  = "/authorization.AuthorizationService/LeaveWorkspace"
 	AuthorizationService_HasWorkspacePermission_FullMethodName          = "/authorization.AuthorizationService/HasWorkspacePermission"
 	AuthorizationService_HasWorkspaceItemPermission_FullMethodName      = "/authorization.AuthorizationService/HasWorkspaceItemPermission"
 	AuthorizationService_GetUserWorkspaceItemPermissions_FullMethodName = "/authorization.AuthorizationService/GetUserWorkspaceItemPermissions"
@@ -37,6 +38,7 @@ type AuthorizationServiceClient interface {
 	CreateWorkspaceWithOwner(ctx context.Context, in *CreateWorkspaceWithOwnerRequest, opts ...grpc.CallOption) (*CreateWorkspaceWithOwnerResponse, error)
 	UpdateWorkspaceMembers(ctx context.Context, in *UpdateWorkspaceMembersRequest, opts ...grpc.CallOption) (*UpdateWorkspaceMembersResponse, error)
 	GetWorkspaceMembers(ctx context.Context, in *GetWorkspaceMembersRequest, opts ...grpc.CallOption) (*GetWorkspaceMembersResponse, error)
+	LeaveWorkspace(ctx context.Context, in *LeaveWorkspaceRequest, opts ...grpc.CallOption) (*LeaveWorkspaceResponse, error)
 	HasWorkspacePermission(ctx context.Context, in *HasWorkspacePermissionRequest, opts ...grpc.CallOption) (*HasWorkspacePermissionResponse, error)
 	HasWorkspaceItemPermission(ctx context.Context, in *HasWorkspaceItemPermissionRequest, opts ...grpc.CallOption) (*HasWorkspaceItemPermissionResponse, error)
 	GetUserWorkspaceItemPermissions(ctx context.Context, in *GetUserWorkspaceItemPermissionsRequest, opts ...grpc.CallOption) (*GetUserWorkspaceItemPermissionsResponse, error)
@@ -91,6 +93,16 @@ func (c *authorizationServiceClient) GetWorkspaceMembers(ctx context.Context, in
 	return out, nil
 }
 
+func (c *authorizationServiceClient) LeaveWorkspace(ctx context.Context, in *LeaveWorkspaceRequest, opts ...grpc.CallOption) (*LeaveWorkspaceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LeaveWorkspaceResponse)
+	err := c.cc.Invoke(ctx, AuthorizationService_LeaveWorkspace_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authorizationServiceClient) HasWorkspacePermission(ctx context.Context, in *HasWorkspacePermissionRequest, opts ...grpc.CallOption) (*HasWorkspacePermissionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(HasWorkspacePermissionResponse)
@@ -139,6 +151,7 @@ type AuthorizationServiceServer interface {
 	CreateWorkspaceWithOwner(context.Context, *CreateWorkspaceWithOwnerRequest) (*CreateWorkspaceWithOwnerResponse, error)
 	UpdateWorkspaceMembers(context.Context, *UpdateWorkspaceMembersRequest) (*UpdateWorkspaceMembersResponse, error)
 	GetWorkspaceMembers(context.Context, *GetWorkspaceMembersRequest) (*GetWorkspaceMembersResponse, error)
+	LeaveWorkspace(context.Context, *LeaveWorkspaceRequest) (*LeaveWorkspaceResponse, error)
 	HasWorkspacePermission(context.Context, *HasWorkspacePermissionRequest) (*HasWorkspacePermissionResponse, error)
 	HasWorkspaceItemPermission(context.Context, *HasWorkspaceItemPermissionRequest) (*HasWorkspaceItemPermissionResponse, error)
 	GetUserWorkspaceItemPermissions(context.Context, *GetUserWorkspaceItemPermissionsRequest) (*GetUserWorkspaceItemPermissionsResponse, error)
@@ -163,6 +176,9 @@ func (UnimplementedAuthorizationServiceServer) UpdateWorkspaceMembers(context.Co
 }
 func (UnimplementedAuthorizationServiceServer) GetWorkspaceMembers(context.Context, *GetWorkspaceMembersRequest) (*GetWorkspaceMembersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetWorkspaceMembers not implemented")
+}
+func (UnimplementedAuthorizationServiceServer) LeaveWorkspace(context.Context, *LeaveWorkspaceRequest) (*LeaveWorkspaceResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LeaveWorkspace not implemented")
 }
 func (UnimplementedAuthorizationServiceServer) HasWorkspacePermission(context.Context, *HasWorkspacePermissionRequest) (*HasWorkspacePermissionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method HasWorkspacePermission not implemented")
@@ -268,6 +284,24 @@ func _AuthorizationService_GetWorkspaceMembers_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthorizationService_LeaveWorkspace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaveWorkspaceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizationServiceServer).LeaveWorkspace(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthorizationService_LeaveWorkspace_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizationServiceServer).LeaveWorkspace(ctx, req.(*LeaveWorkspaceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthorizationService_HasWorkspacePermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HasWorkspacePermissionRequest)
 	if err := dec(in); err != nil {
@@ -362,6 +396,10 @@ var AuthorizationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWorkspaceMembers",
 			Handler:    _AuthorizationService_GetWorkspaceMembers_Handler,
+		},
+		{
+			MethodName: "LeaveWorkspace",
+			Handler:    _AuthorizationService_LeaveWorkspace_Handler,
 		},
 		{
 			MethodName: "HasWorkspacePermission",

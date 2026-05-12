@@ -104,6 +104,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	permanentlyDeleteFolderHandler := app.NewPermanentlyDeleteFolderHandler(authorization, unitOfWork)
 	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, unitOfWork)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, unitOfWork)
+	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(authorization)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, unitOfWork)
 	permanentlyDeleteWorkspaceItemsHandler := app.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, unitOfWork)
 	queries := persistence.NewSQLCQueries(pool)
@@ -139,6 +140,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		DeleteFolderHandler:                    permanentlyDeleteFolderHandler,
 		DeleteNoteHandler:                      permanentlyDeleteNoteHandler,
 		DeleteWorkspaceHandler:                 deleteWorkspaceHandler,
+		LeaveWorkspaceHandler:                  leaveWorkspaceHandler,
 		MoveWorkspaceItemsHandler:              moveWorkspaceItemsHandler,
 		PermanentlyDeleteWorkspaceItemsHandler: permanentlyDeleteWorkspaceItemsHandler,
 		PublishNoteHandler:                     publishNoteHandler,

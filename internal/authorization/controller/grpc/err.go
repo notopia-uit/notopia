@@ -25,6 +25,7 @@ func toGRPCError(err error) error {
 			errs.CodeInvalid:
 			return status.Error(codes.InvalidArgument, err.Message())
 		case errs.CodeMemberHasNoPermission,
+			errs.CodeUserIsOnlyOwner,
 			errs.CodeForbidden:
 			return status.Error(codes.PermissionDenied, err.Message())
 		case errs.CodeCreateWorkspaceExists:

@@ -67,10 +67,15 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspac
 			return err
 		}
 		workspace.Delete(cmd.UserID)
-		err = workspaceRepo.Save(ctx, workspace)
-		if err == nil {
-			slog.InfoContext(ctx, "workspace deleted successfully", slog.String("workspace_id", cmd.ID.String()))
+		if err := workspaceRepo.Save(ctx, workspace); err != nil {
+			slog.WarnContext(ctx, "failed to delete workspace", slog.String("workspace_id", cmd.ID.String()))
+			return err
 		}
-		return err
+		if err := h.authorizationSvc.DeleteWorkspace(ctx, cmd.UserID, cmd.ID); err != nil {
+			slog.WarnContext(ctx, "failed to delete workspace in authorization service", slog.String("workspace_id", cmd.ID.String()))
+			return err
+		}
+		slog.InfoContext(ctx, "workspace deleted successfully", slog.String("workspace_id", cmd.ID.String()))
+		return nil
 	})
 }
