@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
@@ -24,7 +23,7 @@ func NewGetUserWorkspacesHandler(enforcer *casbin.TransactionalEnforcer) *GetUse
 
 var ProvideGetUserWorkspacesHandler = NewGetUserWorkspacesHandler
 
-func (h *GetUserWorkspacesHandler) Handle(ctx context.Context, params GetUserWorkspaces) ([]UserWorkspace, error) {
+func (h *GetUserWorkspacesHandler) Handle(ctx context.Context, params *GetUserWorkspaces) ([]UserWorkspace, error) {
 	rules, err := h.enforcer.GetFilteredGroupingPolicy(0, formatUser(params.UserID))
 	if err != nil {
 		return nil, errs.NewCasbinInternalError(err)
@@ -45,9 +44,5 @@ func (h *GetUserWorkspacesHandler) Handle(ctx context.Context, params GetUserWor
 			Role: WorkspaceRole(rule[1]),
 		})
 	}
-	slog.DebugContext(ctx, "retrieved user workspaces",
-		slog.String("user_id", params.UserID),
-		slog.Int("workspace_count", len(workspaces)),
-	)
 	return workspaces, nil
 }

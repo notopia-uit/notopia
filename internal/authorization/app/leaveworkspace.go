@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
@@ -28,8 +27,8 @@ func NewLeaveWorkspaceHandler(enforcer *casbin.TransactionalEnforcer, publisher 
 
 var ProvideLeaveWorkspaceHandler = NewLeaveWorkspaceHandler
 
-func (h *LeaveWorkspaceHandler) Handle(ctx context.Context, params LeaveWorkspace) error {
-	err := h.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
+func (h *LeaveWorkspaceHandler) Handle(ctx context.Context, params *LeaveWorkspace) error {
+	return h.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
 		bufferedModel, err := tx.GetBufferedModel()
 		if err != nil {
 			return errs.NewCasbinInternalError(err)
@@ -89,14 +88,4 @@ func (h *LeaveWorkspaceHandler) Handle(ctx context.Context, params LeaveWorkspac
 
 		return nil
 	})
-	if err != nil {
-		return err
-	}
-
-	slog.InfoContext(
-		ctx, "user left workspace",
-		slog.String("user_id", params.UserID),
-		slog.String("workspace_id", params.WorkspaceID.String()),
-	)
-	return nil
 }

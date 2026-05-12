@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -31,7 +30,6 @@ func NewGetMyWorkspacesHandler(
 var ProvideGetMyWorkspacesHandler = NewGetMyWorkspacesHandler
 
 func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspaces) ([]UserWorkspace, error) {
-	slog.DebugContext(ctx, "Handling get my workspaces query", slog.String("user_id", query.UserID))
 	authorizationUserWorkspaces, err := h.authorizationSvc.GetUserWorkspaces(ctx, query.UserID)
 	if err != nil {
 		return nil, err
@@ -62,6 +60,5 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 			Role:      auw.Role,
 		}
 	}
-	slog.InfoContext(ctx, "Get my workspaces query completed", slog.Int("count", len(userWorkspaces)))
 	return userWorkspaces, nil
 }

@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
@@ -25,7 +24,7 @@ func NewGetWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer) *GetW
 
 var ProvideGetWorkspaceMembersHandler = NewGetWorkspaceMembersHandler
 
-func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, params GetWorkspaceMembers) ([]WorkspaceMember, error) {
+func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, params *GetWorkspaceMembers) ([]WorkspaceMember, error) {
 	readAllowed, err := h.enforcer.Enforce(formatUser(params.UserID), formatWorkspace(params.WorkspaceID), "workspace", WorkspacePermissionRead.String())
 	if err != nil {
 		return nil, errs.NewCasbinEnforcerError(err)
@@ -53,10 +52,5 @@ func (h *GetWorkspaceMembersHandler) Handle(ctx context.Context, params GetWorks
 			Role: WorkspaceRole(rule[1]),
 		})
 	}
-	slog.DebugContext(ctx, "retrieved workspace members",
-		slog.String("user_id", params.UserID),
-		slog.String("workspace_id", params.WorkspaceID.String()),
-		slog.Int("member_count", len(members)),
-	)
 	return members, nil
 }

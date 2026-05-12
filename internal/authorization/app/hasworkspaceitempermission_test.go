@@ -45,7 +45,7 @@ func TestHasWorkspaceItemPermissionHandler(t *testing.T) {
 			t.Parallel()
 			ctx := t.Context()
 			workspaceID := uuid.MustParse(tc.workspaceID)
-			ok, err := handler.Handle(ctx, app.HasWorkspaceItemPermission{
+			ok, err := handler.Handle(ctx, &app.HasWorkspaceItemPermission{
 				UserID:      tc.userID,
 				WorkspaceID: workspaceID,
 				Permission:  tc.permission,

@@ -35,12 +35,6 @@ var ProvideChangeWorkspaceSlugHandler = NewChangeWorkspaceSlugHandler
 
 func (h *ChangeWorkspaceSlugHandler) Handle(ctx context.Context, cmd *ChangeWorkspaceSlug) error {
 	slog.DebugContext(
-		ctx, "changing workspace slug",
-		slog.String("workspace_id", cmd.ID.String()),
-		slog.String("new_slug", cmd.Slug),
-		slog.String("user_id", cmd.UserID),
-	)
-	slog.DebugContext(
 		ctx, "checking permission",
 		slog.String("user_id", cmd.UserID),
 		slog.String("workspace_id", cmd.ID.String()),
@@ -71,14 +65,6 @@ func (h *ChangeWorkspaceSlugHandler) Handle(ctx context.Context, cmd *ChangeWork
 		if err := workspace.ChangeSlug(cmd.Slug, cmd.UserID); err != nil {
 			return err
 		}
-		err = workspaceRepo.Save(ctx, workspace)
-		if err == nil {
-			slog.InfoContext(
-				ctx, "workspace slug changed successfully",
-				slog.String("workspace_id", cmd.ID.String()),
-				slog.String("new_slug", cmd.Slug),
-			)
-		}
-		return err
+		return workspaceRepo.Save(ctx, workspace)
 	})
 }

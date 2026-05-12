@@ -20,7 +20,7 @@ type PermanentlyDeleteNoteHandler struct {
 	uow              domain.UnitOfWork
 }
 
-func PermanentlyNewDeleteNoteHandler(
+func NewPermanentlyDeleteNoteHandler(
 	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *PermanentlyDeleteNoteHandler {
@@ -30,14 +30,9 @@ func PermanentlyNewDeleteNoteHandler(
 	}
 }
 
-var ProvidePermanentlyDeleteNoteHandler = PermanentlyNewDeleteNoteHandler
+var ProvidePermanentlyDeleteNoteHandler = NewPermanentlyDeleteNoteHandler
 
 func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteNote) error {
-	slog.DebugContext(
-		ctx, "permanently deleting note",
-		slog.String("note_id", cmd.ID.String()),
-		slog.String("user_id", cmd.UserID),
-	)
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		noteRepo := r.Note()
 		workspaceID, err := noteRepo.GetWorkspaceIDByID(ctx, cmd.ID)
@@ -75,10 +70,6 @@ func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *Permanen
 			return err
 		}
 		note.PermanentlyDelete(cmd.UserID)
-		err = noteRepo.Save(ctx, note)
-		if err == nil {
-			slog.InfoContext(ctx, "note permanently deleted successfully", slog.String("note_id", cmd.ID.String()))
-		}
-		return err
+		return noteRepo.Save(ctx, note)
 	})
 }

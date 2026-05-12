@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
@@ -24,12 +23,7 @@ func NewDeleteWorkspaceHandler(enforcer *casbin.TransactionalEnforcer) *DeleteWo
 
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
-func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, params DeleteWorkspace) error {
-	slog.DebugContext(
-		ctx, "Handling delete workspace",
-		slog.String("user_id", params.UserID),
-		slog.String("workspace_id", params.WorkspaceID.String()),
-	)
+func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, params *DeleteWorkspace) error {
 	deleteAllowed, err := h.enforcer.Enforce(
 		formatUser(params.UserID),
 		formatWorkspace(params.WorkspaceID),
@@ -48,9 +42,5 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, params DeleteWorksp
 		return errs.NewCasbinInternalError(err)
 	}
 
-	slog.InfoContext(ctx, "deleted workspace",
-		slog.String("user_id", params.UserID),
-		slog.String("workspace_id", params.WorkspaceID.String()),
-	)
 	return nil
 }

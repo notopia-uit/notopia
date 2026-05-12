@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
@@ -25,7 +24,7 @@ func NewHasWorkspaceItemPermissionHandler(enforcer *casbin.TransactionalEnforcer
 
 var ProvideHasWorkspaceItemPermissionHandler = NewHasWorkspaceItemPermissionHandler
 
-func (h *HasWorkspaceItemPermissionHandler) Handle(ctx context.Context, params HasWorkspaceItemPermission) (bool, error) {
+func (h *HasWorkspaceItemPermissionHandler) Handle(ctx context.Context, params *HasWorkspaceItemPermission) (bool, error) {
 	ok, err := h.enforcer.Enforce(
 		formatUser(params.UserID),
 		formatWorkspace(params.WorkspaceID),
@@ -35,11 +34,5 @@ func (h *HasWorkspaceItemPermissionHandler) Handle(ctx context.Context, params H
 	if err != nil {
 		return false, errs.NewCasbinEnforcerError(err)
 	}
-	slog.DebugContext(ctx, "checked workspace item permission",
-		slog.String("user_id", params.UserID),
-		slog.String("workspace_id", params.WorkspaceID.String()),
-		slog.String("permission", params.Permission.String()),
-		slog.Bool("allowed", ok),
-	)
 	return ok, nil
 }

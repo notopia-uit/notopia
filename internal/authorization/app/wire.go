@@ -4,16 +4,29 @@ import (
 	"github.com/goforj/wire"
 )
 
-var ProviderSet = wire.NewSet(
-	ProvideCasbinEnforcer,
+var ProviderSetCommand = wire.NewSet(
 	ProvideCreateWorkspaceHandler,
 	ProvideDeleteWorkspaceHandler,
+	ProvideUpdateWorkspaceMembersHandler,
+	ProvideLeaveWorkspaceHandler,
+
+	ProvideCmds,
+)
+
+var ProviderSetQuery = wire.NewSet(
 	ProvideGetUserWorkspaceItemPermissionsHandler,
 	ProvideGetUserWorkspacesHandler,
 	ProvideGetWorkspaceMembersHandler,
 	ProvideHasWorkspaceItemPermissionHandler,
 	ProvideHasWorkspacePermissionHandler,
-	ProvideUpdateWorkspaceMembersHandler,
-	ProvideLeaveWorkspaceHandler,
+
+	ProvideQueries,
+)
+
+var ProviderSet = wire.NewSet(
+	ProvideHandlerProvider,
+	ProvideCasbinEnforcer,
+	ProviderSetCommand,
+	ProviderSetQuery,
 	wire.Struct(new(App), "*"),
 )

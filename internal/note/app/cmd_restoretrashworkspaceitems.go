@@ -44,13 +44,6 @@ var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItems
 
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) error {
 	slog.DebugContext(
-		ctx, "restoring trashed workspace items",
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-		slog.Int("note_count", len(cmd.NoteIDs)),
-		slog.Int("folder_count", len(cmd.FolderIDs)),
-		slog.String("user_id", cmd.UserID),
-	)
-	slog.DebugContext(
 		ctx, "checking permission",
 		slog.String("user_id", cmd.UserID),
 		slog.String("workspace_id", cmd.WorkspaceID.String()),
@@ -165,12 +158,6 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 			}
 		}
 
-		slog.InfoContext(
-			ctx, "trashed workspace items restored successfully",
-			slog.String("workspace_id", cmd.WorkspaceID.String()),
-			slog.Int("total_notes", len(allModifiedNotes)),
-			slog.Int("total_folders", len(allModifiedFolders)),
-		)
 		return nil
 	})
 }

@@ -22,7 +22,7 @@ func (e *Event) notifyWorkspaceItemsUpdatedNoteHandler(msg *message.Message) err
 	if userID == "" {
 		return errors.New("missing user id in message metadata in notifyWorkspaceItemsUpdatedNoteHandler")
 	}
-	if err := e.app.Events.NotifyWorkspaceItemsUpdatedHandler.Handle(&app.NotifyWorkspaceItemsUpdated{
+	if err := e.app.Events.NotifyWorkspaceItemsUpdated.Handle(&app.NotifyWorkspaceItemsUpdated{
 		WorkspaceID: workspaceID,
 		UserID:      userID,
 	}); err != nil {
@@ -44,7 +44,7 @@ func (e *Event) notifyWorkspaceItemsUpdatedFolderHandler(msg *message.Message) e
 	if userID == "" {
 		return errors.New("missing user id in message metadata in notifyWorkspaceItemsUpdatedFolderHandler")
 	}
-	if err := e.app.Events.NotifyWorkspaceItemsUpdatedHandler.Handle(&app.NotifyWorkspaceItemsUpdated{
+	if err := e.app.Events.NotifyWorkspaceItemsUpdated.Handle(&app.NotifyWorkspaceItemsUpdated{
 		WorkspaceID: workspaceID,
 		UserID:      userID,
 	}); err != nil {
