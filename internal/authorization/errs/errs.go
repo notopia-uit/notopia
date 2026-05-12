@@ -16,6 +16,7 @@ const (
 	CodeCreateWorkspaceExists          Code = "createWorkspaceExists"
 	CodeInvalidWorkspaceRoleFormat     Code = "invalidWorkspaceRoleFormat"
 	CodePublishIntegrationEventsFailed Code = "publishIntegrationEventsFailed"
+	CodeUserIsOnlyOwner                Code = "userIsOnlyOwner"
 )
 
 type CasbinInternalError struct {
@@ -160,6 +161,23 @@ func NewPublishIntegrationEventsFailed(workspaceID uuid.UUID, err error) *Publis
 			message: fmt.Sprintf("failed to publish integration events for workspace %q", workspaceID.String()),
 			code:    CodePublishIntegrationEventsFailed,
 			err:     err,
+		},
+	}
+}
+
+type UserIsOnlyOwner struct {
+	Err
+	UserID      string
+	WorkspaceID uuid.UUID
+}
+
+func NewUserIsOnlyOwner(userID string, workspaceID uuid.UUID) *UserIsOnlyOwner {
+	return &UserIsOnlyOwner{
+		UserID:      userID,
+		WorkspaceID: workspaceID,
+		Err: Err{
+			message: fmt.Sprintf("user %q is the only owner of workspace %q and cannot leave", userID, workspaceID.String()),
+			code:    CodeUserIsOnlyOwner,
 		},
 	}
 }

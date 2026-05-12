@@ -18,6 +18,7 @@ type App struct {
 	HasWorkspaceItemPermission      *HasWorkspaceItemPermissionHandler
 	HasWorkspacePermission          *HasWorkspacePermissionHandler
 	UpdateWorkspaceMembers          *UpdateWorkspaceMembersHandler
+	LeaveWorkspace                  *LeaveWorkspaceHandler
 }
 
 func (a *App) BootStrapPolicies(ctx context.Context) error {
