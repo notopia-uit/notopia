@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
@@ -45,10 +44,5 @@ func (h *GetUserWorkspacesHandler) Handle(ctx context.Context, params *GetUserWo
 			Role: WorkspaceRole(rule[1]),
 		})
 	}
-	slog.DebugContext(
-		ctx, "retrieved user workspaces",
-		slog.String("user_id", params.UserID),
-		slog.Int("workspace_count", len(workspaces)),
-	)
 	return workspaces, nil
 }

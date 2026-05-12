@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
@@ -53,10 +52,5 @@ func (h *GetUserWorkspaceItemPermissionsHandler) Handle(ctx context.Context, par
 		Write:  oks[1],
 		Delete: oks[2],
 	}
-	slog.DebugContext(
-		ctx, "retrieved user workspace item permissions",
-		slog.String("user_id", params.UserID),
-		slog.String("workspace_id", params.WorkspaceID.String()),
-	)
 	return wip, nil
 }

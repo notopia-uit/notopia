@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
@@ -35,12 +34,5 @@ func (h *HasWorkspacePermissionHandler) Handle(ctx context.Context, params *HasW
 	if err != nil {
 		return false, errs.NewCasbinEnforcerError(err)
 	}
-	slog.DebugContext(
-		ctx, "checked workspace permission",
-		slog.String("user_id", params.UserID),
-		slog.String("workspace_id", params.WorkspaceID.String()),
-		slog.String("permission", params.Permission.String()),
-		slog.Bool("allowed", ok),
-	)
 	return ok, nil
 }
