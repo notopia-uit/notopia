@@ -5,6 +5,8 @@ import (
 )
 
 var ProviderSetCommand = wire.NewSet(
+	ProvideCmds,
+
 	ProvideChangeWorkspaceSlugHandler,
 	ProvideCreateFolderHandler,
 	ProvideCreateNoteHandler,
@@ -26,7 +28,6 @@ var ProviderSetCommand = wire.NewSet(
 	ProvideUnpublishNoteHandler,
 	ProvideUnpublishWorkspaceHandler,
 	ProvideUpdateWorkspaceMembersHandler,
-	wire.Struct(new(Cmds), "*"),
 )
 
 var ProviderSetEvent = wire.NewSet(
