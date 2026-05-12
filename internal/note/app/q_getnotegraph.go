@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"math"
 
 	"github.com/google/uuid"
@@ -39,11 +38,6 @@ func NewGetNoteGraphHandler(
 var ProvideGetNoteGraphHandler = NewGetNoteGraphHandler
 
 func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (Graph, error) {
-	slog.DebugContext(
-		ctx, "Handling get note graph query",
-		slog.String("note_id", query.ID.String()),
-		slog.Int("depth", query.Depth),
-	)
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)
 	if err != nil {
 		return Graph{}, err
@@ -72,6 +66,5 @@ func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (
 	if err != nil {
 		return Graph{}, err
 	}
-	slog.InfoContext(ctx, "Get note graph query completed", slog.String("note_id", query.ID.String()))
 	return graph, nil
 }

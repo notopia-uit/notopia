@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
@@ -14,7 +13,7 @@ type GetWorkspaceBySlug struct {
 	UserID string
 }
 
-type GetWorkspaceHandler struct {
+type GetWorkspaceBySlugHandler struct {
 	authorizationSvc AuthorizationSvc
 	readModel        WorkspaceBySlugReadModel
 }
@@ -22,8 +21,8 @@ type GetWorkspaceHandler struct {
 func NewGetWorkspaceBySlugHandler(
 	authorizationSvc AuthorizationSvc,
 	readModel WorkspaceBySlugReadModel,
-) *GetWorkspaceHandler {
-	return &GetWorkspaceHandler{
+) *GetWorkspaceBySlugHandler {
+	return &GetWorkspaceBySlugHandler{
 		authorizationSvc: authorizationSvc,
 		readModel:        readModel,
 	}
@@ -31,8 +30,7 @@ func NewGetWorkspaceBySlugHandler(
 
 var ProvideGetWorkspaceBySlugHandler = NewGetWorkspaceBySlugHandler
 
-func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspaceBySlug) (Workspace, error) {
-	slog.DebugContext(ctx, "Handling get workspace by slug query", slog.String("slug", query.Slug))
+func (h *GetWorkspaceBySlugHandler) Handle(ctx context.Context, query *GetWorkspaceBySlug) (Workspace, error) {
 	workspace, err := h.readModel.GetWorkspaceBySlug(ctx, query.Slug)
 	if err != nil {
 		return Workspace{}, err
@@ -51,6 +49,5 @@ func (h *GetWorkspaceHandler) Handle(ctx context.Context, query *GetWorkspaceByS
 			fmt.Sprintf("user %s does not have permission to read workspace %s", query.UserID, workspace.ID),
 		)
 	}
-	slog.InfoContext(ctx, "Get workspace by slug query completed", slog.String("workspace_id", workspace.ID.String()))
 	return workspace, nil
 }

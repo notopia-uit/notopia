@@ -39,13 +39,6 @@ var ProvideTrashWorkspaceItemsHandler = NewTrashWorkspaceItemsHandler
 
 func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorkspaceItems) error {
 	slog.DebugContext(
-		ctx, "trashing workspace items",
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-		slog.Int("note_count", len(cmd.NoteIDs)),
-		slog.Int("folder_count", len(cmd.FolderIDs)),
-		slog.String("user_id", cmd.UserID),
-	)
-	slog.DebugContext(
 		ctx, "checking permission",
 		slog.String("user_id", cmd.UserID),
 		slog.String("workspace_id", cmd.WorkspaceID.String()),
@@ -167,12 +160,6 @@ func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorks
 			}
 		}
 
-		slog.InfoContext(
-			ctx, "workspace items trashed successfully",
-			slog.String("workspace_id", cmd.WorkspaceID.String()),
-			slog.Int("total_notes", len(allModifiedNotes)),
-			slog.Int("total_folders", len(allModifiedFolders)),
-		)
 		return nil
 	})
 }

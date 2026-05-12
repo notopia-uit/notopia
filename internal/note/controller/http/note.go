@@ -35,7 +35,7 @@ func (h *StrictHandler) CreateNote(
 		FolderID: request.Body.FolderId,
 		UserID:   user.ID,
 	}
-	err = h.App.Cmds.CreateNoteHandler.Handle(ctx, cmd)
+	err = h.App.Cmds.CreateNote.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (h *StrictHandler) PermanentlyDeleteNote(
 		ID:     request.NoteId,
 		UserID: user.ID,
 	}
-	err := h.App.Cmds.DeleteNoteHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.DeleteNote.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (h *StrictHandler) GetNote(
 		UserID:         user.ID,
 	}
 
-	result, err := h.App.Queries.GetNoteHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetNote.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (h *StrictHandler) GetNoteGraph(
 		UserID: user.ID,
 	}
 
-	result, err := h.App.Queries.GetNoteGraphHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetNoteGraph.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (h *StrictHandler) GetNoteLinks(
 		Backlinks:     backlinks,
 		UserID:        user.ID,
 	}
-	result, err := h.App.Queries.GetNoteLinksHandler.Handle(ctx, query)
+	result, err := h.App.Queries.GetNoteLinks.Handle(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +173,7 @@ func (h *StrictHandler) RenameNote(
 		Name:   request.Body.Name,
 		UserID: user.ID,
 	}
-	err := h.App.Cmds.RenameNoteHandler.Handle(ctx, cmd)
+	err := h.App.Cmds.RenameNote.Handle(ctx, cmd)
 	if err != nil {
 		return nil, err
 	}

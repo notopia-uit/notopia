@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -34,7 +33,6 @@ func NewGetWorkspaceGraphHandler(
 var ProvideGetWorkspaceGraphHandler = NewGetWorkspaceGraphHandler
 
 func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspaceGraph) (Graph, error) {
-	slog.DebugContext(ctx, "Handling get workspace graph query", slog.String("workspace_id", query.ID.String()))
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
 		query.UserID,
@@ -56,6 +54,5 @@ func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspa
 	if err != nil {
 		return Graph{}, err
 	}
-	slog.InfoContext(ctx, "Get workspace graph query completed", slog.String("workspace_id", query.ID.String()))
 	return graph, nil
 }

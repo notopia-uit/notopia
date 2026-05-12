@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
-	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type ChangeWorkspaceSlug struct {
@@ -16,8 +15,6 @@ type ChangeWorkspaceSlug struct {
 	Slug   string
 	UserID string
 }
-
-type ChangeWorkspaceSlugCmd commonhandler.Cmd[ChangeWorkspaceSlug]
 
 type ChangeWorkspaceSlugHandler struct {
 	authorizationSvc AuthorizationSvc

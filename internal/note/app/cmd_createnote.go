@@ -37,13 +37,6 @@ func NewCreateNoteHandler(
 var ProvideCreateNoteHandler = NewCreateNoteHandler
 
 func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) error {
-	slog.DebugContext(
-		ctx, "creating note",
-		slog.String("note_id", cmd.ID.String()),
-		slog.String("name", cmd.Name),
-		slog.String("folder_id", cmd.FolderID.String()),
-		slog.String("user_id", cmd.UserID),
-	)
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
 		noteRepo := r.Note()
@@ -83,13 +76,6 @@ func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) error {
 			slog.String("workspace_id", workspaceID.String()),
 		)
 		note := domain.NewNote(cmd.ID, cmd.Name, cmd.Icon, cmd.FolderID)
-		err = noteRepo.Save(ctx, note)
-		if err == nil {
-			slog.InfoContext(
-				ctx, "note created successfully",
-				slog.String("note_id", note.ID().String()),
-			)
-		}
-		return err
+		return noteRepo.Save(ctx, note)
 	})
 }

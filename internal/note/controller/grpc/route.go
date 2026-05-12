@@ -23,7 +23,7 @@ func (s *ServiceServer) GetNote(
 	if err != nil {
 		return nil, errs.NewInvalid(fmt.Sprintf("invalid note id: %v", err))
 	}
-	note, err := s.app.Queries.GetNoteHandler.Handle(ctx, &app.GetNote{
+	note, err := s.app.Queries.GetNote.Handle(ctx, &app.GetNote{
 		ID:             noteID,
 		ExcludeTrashed: req.ExcludeTrashed,
 		UserID:         req.UserId,
@@ -45,7 +45,7 @@ func (s *ServiceServer) GetWorkspaceByNote(
 	if err != nil {
 		return nil, errs.NewInvalid(fmt.Sprintf("invalid note id: %v", err))
 	}
-	workspace, err := s.app.Queries.GetWorkspaceByNoteHandler.Handle(ctx, &app.GetWorkspaceByNote{
+	workspace, err := s.app.Queries.GetWorkspaceByNote.Handle(ctx, &app.GetWorkspaceByNote{
 		NoteID: noteID,
 		UserID: req.UserId,
 	})

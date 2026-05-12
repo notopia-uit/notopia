@@ -38,13 +38,6 @@ var ProvidePermanentlyDeleteWorkspaceItemsHandler = NewPermanentlyDeleteWorkspac
 // Fact, we should handle this in domain, not infra
 func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteWorkspaceItems) error {
 	slog.DebugContext(
-		ctx, "permanently deleting workspace items",
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-		slog.Int("note_count", len(cmd.NoteIDs)),
-		slog.Int("folder_count", len(cmd.FolderIDs)),
-		slog.String("user_id", cmd.UserID),
-	)
-	slog.DebugContext(
 		ctx, "checking permission",
 		slog.String("user_id", cmd.UserID),
 		slog.String("workspace_id", cmd.WorkspaceID.String()),
@@ -106,7 +99,6 @@ func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd
 			}
 			slog.DebugContext(ctx, "notes permanently deleted", slog.Int("note_count", len(notes)))
 		}
-		slog.InfoContext(ctx, "workspace items permanently deleted successfully", slog.String("workspace_id", cmd.WorkspaceID.String()))
 		return nil
 	})
 }

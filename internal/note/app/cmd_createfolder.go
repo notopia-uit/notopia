@@ -19,7 +19,6 @@ type CreateFolder struct {
 
 	UserID string
 }
-
 type CreateFolderHandler struct {
 	authorizationSvc AuthorizationSvc
 	uow              domain.UnitOfWork
@@ -38,13 +37,6 @@ func NewCreateFolderHandler(
 var ProvideCreateFolderHandler = NewCreateFolderHandler
 
 func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) error {
-	slog.DebugContext(
-		ctx, "creating folder",
-		slog.String("folder_id", cmd.ID.String()),
-		slog.String("name", cmd.Name),
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-		slog.String("user_id", cmd.UserID),
-	)
 	slog.DebugContext(
 		ctx, "checking permission",
 		slog.String("user_id", cmd.UserID),
@@ -80,10 +72,6 @@ func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) err
 		if err != nil {
 			return err
 		}
-		if err := folderRepo.Save(ctx, folder); err != nil {
-			return err
-		}
-		slog.InfoContext(ctx, "folder created successfully", slog.String("folder_id", folder.ID().String()))
-		return nil
+		return folderRepo.Save(ctx, folder)
 	})
 }

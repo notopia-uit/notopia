@@ -41,6 +41,8 @@ var ProviderSetEvent = wire.NewSet(
 )
 
 var ProviderSetQuery = wire.NewSet(
+	ProvideQueries,
+
 	ProvideCheckWorkspaceSlugExistsHandler,
 	ProvideGetMyWorkspacesHandler,
 	ProvideGetNoteGraphHandler,
@@ -52,10 +54,10 @@ var ProviderSetQuery = wire.NewSet(
 	ProvideGetWorkspaceSearchTokenHandler,
 	ProvideGetWorkspaceTreeHandler,
 	ProvideShowTrashHandler,
-	wire.Struct(new(Queries), "*"),
 )
 
 var ProviderSet = wire.NewSet(
+	ProvideHandlerProvider,
 	ProviderSetCommand,
 	ProviderSetEvent,
 	ProviderSetQuery,
