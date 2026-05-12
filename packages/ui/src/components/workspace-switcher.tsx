@@ -59,8 +59,7 @@ const generateSlug = (name: string) => {
     .replace(/^-|-$/g, '');
 };
 
-// TODO: handle create new workspace with api and router.push to workspace
-//TODO: handle on error, loading states, and edge cases like slug conflicts for both create and edit flows. Currently the UI optimistically updates local state without any backend integration, so it will drift from server state on any refetch (focus, reconnect, manual invalidation, etc.) and doesn't persist across sessions. Consider using React Query's useMutation with query invalidation for a more robust implementation.
+//TODO: add context for error alert
 const WorkspaceSwitcher = () => {
   const queryClient = useQueryClient();
   const _data = useQuery({
@@ -101,15 +100,19 @@ const WorkspaceSwitcher = () => {
     setSelectedId(workspaces[0]?.id || '');
   }
   const { mutate: createWorkspace, isPending: isCreating } = useCreateWorkspaceMutation({
-    onSuccess: async () => {
+    onSuccess: async (responses, variables) => {
       await queryClient.invalidateQueries({
         queryKey: getMyWorkspacesOptions({}).queryKey,
       });
-      const newWorkspacesData = await queryClient.fetchQuery({
-        ...getMyWorkspacesOptions({}),
-      });
-      const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
-      setWorkspaces(mappedWorkspaces);
+      setWorkspaces((prev) => [
+        ...prev,
+        {
+          id: responses.id,
+          slug: variables.body.slug,
+          name: variables.body.name,
+          userRole: 'owner',
+        },
+      ]);
       setIsAddingNew(false);
       setEditForm({});
       setShowCreateWorkspaceSuccessAlert(true);
@@ -129,15 +132,18 @@ const WorkspaceSwitcher = () => {
 
   const { mutate: mutateWorkspaceSlug, isPending: isChangingSlug } = useChangeWorkspaceSlugMutation(
     {
-      onSuccess: async () => {
+      onSuccess: async (_, variables) => {
         await queryClient.invalidateQueries({
           queryKey: getMyWorkspacesOptions({}).queryKey,
         });
-        const newWorkspacesData = await queryClient.fetchQuery({
-          ...getMyWorkspacesOptions({}),
-        });
-        const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
-        setWorkspaces(mappedWorkspaces);
+
+        setWorkspaces((prev) =>
+          prev.map((workspace) =>
+            workspace.id === variables.path.workspaceId
+              ? { ...workspace, slug: variables.body.slug }
+              : workspace
+          )
+        );
         setEditingId(null);
         setEditForm({});
         setShowChangeSlugSuccessAlert(true);
