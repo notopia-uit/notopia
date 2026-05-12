@@ -105,7 +105,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			e, err := GetLocalEnforcer(t, false)
+			e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: false})
 			require.NoError(t, err, "Failed to create enforcer")
 
 			mockPublisher := app.NewMockIntegrationPublisher(t)
