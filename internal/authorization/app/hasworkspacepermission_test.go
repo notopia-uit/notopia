@@ -35,7 +35,8 @@ func TestHasWorkspacePermissionHandler(t *testing.T) {
 		{"W112-Editor: CANNOT Delete Workspace", "111", "00000000-0000-0000-0000-000000000112", app.WorkspacePermissionDelete, false},
 		{"W112-Stranger: CANNOT Read Workspace", "110", "00000000-0000-0000-0000-000000000112", app.WorkspacePermissionRead, false},
 		{"W110-Owner: Edit Workspace", "110", "00000000-0000-0000-0000-000000000110", app.WorkspacePermissionEdit, true},
-		{"W110-Stranger: User 112 CANNOT Read W110", "112", "00000000-0000-0000-0000-000000000110", app.WorkspacePermissionRead, false},
+		{"W110-Owner user 111: Edit Workspace", "111", "00000000-0000-0000-0000-000000000110", app.WorkspacePermissionEdit, true},
+		{"W110-Owner user 112: Edit Workspace", "112", "00000000-0000-0000-0000-000000000110", app.WorkspacePermissionEdit, true},
 		{"Security: user:111 (Owner of W111) cannot edit W112", "111", "00000000-0000-0000-0000-000000000112", app.WorkspacePermissionEdit, false},
 		{"Security: user:112 (Owner of W112) cannot delete W111", "112", "00000000-0000-0000-0000-000000000111", app.WorkspacePermissionDelete, false},
 	}

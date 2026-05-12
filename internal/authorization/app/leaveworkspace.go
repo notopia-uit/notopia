@@ -41,7 +41,7 @@ func (h *LeaveWorkspaceHandler) Handle(ctx context.Context, params LeaveWorkspac
 		}
 
 		var userRole WorkspaceRole
-		var userRuleIndex int = -1
+		userRuleIndex := -1
 		ownerCount := 0
 
 		for i, rule := range currentRules {
@@ -93,7 +93,8 @@ func (h *LeaveWorkspaceHandler) Handle(ctx context.Context, params LeaveWorkspac
 		return err
 	}
 
-	slog.InfoContext(ctx, "user left workspace",
+	slog.InfoContext(
+		ctx, "user left workspace",
 		slog.String("user_id", params.UserID),
 		slog.String("workspace_id", params.WorkspaceID.String()),
 	)

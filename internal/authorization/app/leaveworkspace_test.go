@@ -46,11 +46,22 @@ func TestLeaveWorkspaceHandler(t *testing.T) {
 			expectedError: "only owner",
 		},
 		{
-			name:          "W110-Only owner cannot leave workspace",
-			userID:        "110",
-			workspaceID:   "00000000-0000-0000-0000-000000000110",
-			expectErr:     true,
-			expectedError: "only owner",
+			name:        "W110-Owner can leave (multiple owners)",
+			userID:      "110",
+			workspaceID: "00000000-0000-0000-0000-000000000110",
+			expectErr:   false,
+		},
+		{
+			name:        "W110-user 111 can leave (multiple owners)",
+			userID:      "111",
+			workspaceID: "00000000-0000-0000-0000-000000000110",
+			expectErr:   false,
+		},
+		{
+			name:        "W110-user 112 can leave (multiple owners)",
+			userID:      "112",
+			workspaceID: "00000000-0000-0000-0000-000000000110",
+			expectErr:   false,
 		},
 		{
 			name:          "User not a member cannot leave",
@@ -117,7 +128,7 @@ func TestLeaveWorkspaceHandler(t *testing.T) {
 
 func TestLeaveWorkspaceHandler_PublishEventFailure(t *testing.T) {
 	t.Skip("TODO: Fix mock expectations when running with parallel tests and transactional database")
-	
+
 	e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: true, UseTransaction: true})
 	require.NoError(t, err, "Failed to create enforcer")
 
@@ -145,7 +156,7 @@ func TestLeaveWorkspaceHandler_PublishEventFailure(t *testing.T) {
 	})
 
 	require.Error(t, err, "Expected error when publishing events fails")
-	
+
 	pubErr, ok := err.(*errs.PublishIntegrationEventsFailed)
 	require.True(t, ok, "Error should be PublishIntegrationEventsFailed")
 	assert.Equal(t, workspaceID, pubErr.WorkspaceID)

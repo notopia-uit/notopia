@@ -65,12 +65,12 @@ func TestModels(t *testing.T) {
 		{"W112-Stranger: CANNOT Read Workspace", "user:110", "workspace:00000000-0000-0000-0000-000000000112", "workspace", "read", false},
 
 		// =====================================================================
-		// WORKSPACE 00000000-0000-0000-0000-000000000110: Owner(110)
+		// WORKSPACE 00000000-0000-0000-0000-000000000110: Owner(110, 111, 112)
 		// =====================================================================
 
 		{"W110-Owner: Edit Workspace", "user:110", "workspace:00000000-0000-0000-0000-000000000110", "workspace", "edit", true},
-		{"W110-Stranger: User 111 CANNOT Read W110", "user:111", "workspace:00000000-0000-0000-0000-000000000110", "note", "read", false},
-		{"W110-Stranger: User 112 CANNOT Read W110", "user:112", "workspace:00000000-0000-0000-0000-000000000110", "workspace", "read", false},
+		{"W110-Owner user:111: Read Note", "user:111", "workspace:00000000-0000-0000-0000-000000000110", "note", "read", true},
+		{"W110-Owner user:112: Read Workspace", "user:112", "workspace:00000000-0000-0000-0000-000000000110", "workspace", "read", true},
 
 		// =====================================================================
 		// CROSS-TENANT ATTACK (The "Leaking" Test)

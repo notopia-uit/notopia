@@ -77,6 +77,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer, integrationPublisher)
+	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(transactionalEnforcer, integrationPublisher)
 	appApp := &app.App{
 		Enforcer:                        transactionalEnforcer,
 		CreateWorkspace:                 createWorkspaceHandler,
@@ -87,6 +88,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
 		HasWorkspacePermission:          hasWorkspacePermissionHandler,
 		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
+		LeaveWorkspace:                  leaveWorkspaceHandler,
 	}
 	service := grpc.NewService(appApp)
 	serverConfig := &configConfig.Server

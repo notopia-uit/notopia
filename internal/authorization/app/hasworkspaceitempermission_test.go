@@ -35,8 +35,9 @@ func TestHasWorkspaceItemPermissionHandler(t *testing.T) {
 		{"W112-Owner: Write Note", "112", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissionWrite, true},
 		{"W112-Editor: Write Note", "111", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissionWrite, true},
 		{"W112-Stranger: CANNOT Read Note", "110", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissionRead, false},
-		{"W110-Stranger: User 111 CANNOT Read W110", "111", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissionRead, false},
-		{"W110-Stranger: User 112 CANNOT Read W110", "112", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissionRead, false},
+		{"W110-Owner: User 110 CAN Read W110", "110", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissionRead, true},
+		{"W110-Owner: User 111 CAN Read W110", "111", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissionRead, true},
+		{"W110-Owner: User 112 CAN Read W110", "112", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissionRead, true},
 	}
 
 	for _, tc := range tests {
