@@ -16,7 +16,7 @@ func NewHandlerProvider(
 	traceProvider trace.TracerProvider,
 	logger *slog.Logger,
 ) *HandlerProvider {
-	tracer := traceProvider.Tracer("note-app")
+	tracer := traceProvider.Tracer("authorization-app")
 	return (*HandlerProvider)(
 		commonhandler.NewHandlerProvider(
 			commonhandler.WithTracer(tracer),

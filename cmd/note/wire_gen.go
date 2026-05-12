@@ -113,7 +113,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(authorization)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, unitOfWork)
 	permanentlyDeleteFolderHandler := app.NewPermanentlyDeleteFolderHandler(authorization, unitOfWork)
-	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, unitOfWork)
+	permanentlyDeleteNoteHandler := app.NewPermanentlyDeleteNoteHandler(authorization, unitOfWork)
 	permanentlyDeleteWorkspaceItemsHandler := app.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, unitOfWork)
 	queries := persistence.NewSQLCQueries(pool)
 	pgrepoNote := pgrepo.NewNoTransactionNote(pool, queries, runInTx)

@@ -20,7 +20,7 @@ type PermanentlyDeleteNoteHandler struct {
 	uow              domain.UnitOfWork
 }
 
-func PermanentlyNewDeleteNoteHandler(
+func NewPermanentlyDeleteNoteHandler(
 	authorizationSvc AuthorizationSvc,
 	uow domain.UnitOfWork,
 ) *PermanentlyDeleteNoteHandler {
@@ -30,7 +30,7 @@ func PermanentlyNewDeleteNoteHandler(
 	}
 }
 
-var ProvidePermanentlyDeleteNoteHandler = PermanentlyNewDeleteNoteHandler
+var ProvidePermanentlyDeleteNoteHandler = NewPermanentlyDeleteNoteHandler
 
 func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteNote) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
