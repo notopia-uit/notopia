@@ -102,4 +102,10 @@ type AuthorizationSvc interface {
 		userID string,
 		workspaceID uuid.UUID,
 	) ([]AuthorizationWorkspaceMember, error)
+
+	DeleteWorkspace(
+		ctx context.Context,
+		userID string,
+		workspaceID uuid.UUID,
+	) error
 }

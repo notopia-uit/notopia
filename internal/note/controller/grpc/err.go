@@ -30,6 +30,7 @@ func toGRPCError(err error) error {
 			errs.CodeWorkspaceMembersCannotBeEmpty,
 			errs.CodeWorkspaceMustHaveAtLeastOneOwner,
 			errs.CodeIdentityUserIDInvalid,
+			errs.CodeCannotLeaveWorkspaceWithOnlyOneMember,
 			errs.CodeCannotMoveFolderToItOwnSubfolder:
 			return status.Error(codes.InvalidArgument, cerr.Error())
 		case errs.CodeUnimplemented:

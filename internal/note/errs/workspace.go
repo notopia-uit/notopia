@@ -7,15 +7,16 @@ import (
 )
 
 const (
-	CodeWorkspaceNotFound                Code = "workspaceNotFound"
-	CodeWorkspaceByNoteNotFound          Code = "workspaceByNoteNotFound"
-	CodeWorkspaceBySlugNotFound          Code = "workspaceBySlugNotFound"
-	CodeWorkspaceRootFolderNotFound      Code = "workspaceRootFolderNotFound"
-	CodeInvalidWorkspaceName             Code = "invalidWorkspaceName"
-	CodeInvalidWorkspaceSlug             Code = "invalidWorkspaceSlug"
-	CodeWorkspaceSlugAlreadyExists       Code = "workspaceSlugAlreadyExists"
-	CodeWorkspaceMembersCannotBeEmpty    Code = "workspaceMembersCannotBeEmpty"
-	CodeWorkspaceMustHaveAtLeastOneOwner Code = "workspaceMustHaveAtLeastOneOwner"
+	CodeWorkspaceNotFound                     Code = "workspaceNotFound"
+	CodeWorkspaceByNoteNotFound               Code = "workspaceByNoteNotFound"
+	CodeWorkspaceBySlugNotFound               Code = "workspaceBySlugNotFound"
+	CodeWorkspaceRootFolderNotFound           Code = "workspaceRootFolderNotFound"
+	CodeInvalidWorkspaceName                  Code = "invalidWorkspaceName"
+	CodeInvalidWorkspaceSlug                  Code = "invalidWorkspaceSlug"
+	CodeWorkspaceSlugAlreadyExists            Code = "workspaceSlugAlreadyExists"
+	CodeWorkspaceMembersCannotBeEmpty         Code = "workspaceMembersCannotBeEmpty"
+	CodeWorkspaceMustHaveAtLeastOneOwner      Code = "workspaceMustHaveAtLeastOneOwner"
+	CodeCannotLeaveWorkspaceWithOnlyOneMember Code = "cannotLeaveWorkspaceWithOnlyOneMember"
 )
 
 type WorkspaceNotFound struct {
@@ -134,6 +135,23 @@ func NewWorkspaceMustHaveAtLeastOneOwner(id uuid.UUID) *WorkspaceMustHaveAtLeast
 		Err: Err{
 			message: fmt.Sprintf("workspace with id %q must have at least one owner", id.String()),
 			code:    CodeWorkspaceMustHaveAtLeastOneOwner,
+		},
+	}
+}
+
+type CannotLeaveWorkspaceWithOnlyOneMember struct {
+	Err
+	WorkspaceID uuid.UUID
+}
+
+func NewCannotLeaveWorkspaceWithOnlyOneMember(workspaceID uuid.UUID) *CannotLeaveWorkspaceWithOnlyOneMember {
+	return &CannotLeaveWorkspaceWithOnlyOneMember{
+		WorkspaceID: workspaceID,
+		Err: Err{
+			message: fmt.Sprintf(`cannot leave workspace with id %q because it only has one member.
+				Should use delete workspace instead.
+				`, workspaceID.String()),
+			code: CodeCannotLeaveWorkspaceWithOnlyOneMember,
 		},
 	}
 }

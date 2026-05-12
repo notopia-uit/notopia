@@ -95,6 +95,8 @@ func strictServerToHTTPErr(err errs.Error) (
 		statusCode = 400
 	case errs.CodeWorkspaceMustHaveAtLeastOneOwner:
 		statusCode = 400
+	case errs.CodeCannotLeaveWorkspaceWithOnlyOneMember:
+		statusCode = 400
 	case errs.CodeWorkspaceNotFound:
 		statusCode = 404
 	case errs.CodeWorkspaceBySlugNotFound:
