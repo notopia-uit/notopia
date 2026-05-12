@@ -48,14 +48,14 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		cleanup()
 		return nil, nil, err
 	}
-	slogLogger := infra.NewCasbinLogger(logger)
-	adapter, err := infra.NewCasbinAdapter(db, slogLogger)
+	adapter, err := infra.NewCasbinAdapter(db)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	transactionalEnforcer, err := app.NewCasbinEnforcer(adapter)
+	slogLogger := infra.NewCasbinLogger(logger)
+	transactionalEnforcer, err := app.NewCasbinEnforcer(adapter, slogLogger)
 	if err != nil {
 		cleanup2()
 		cleanup()

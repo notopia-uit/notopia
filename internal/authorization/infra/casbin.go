@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/casbin/casbin/v3/log"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/notopia-uit/notopia/pkg/casbin"
 	"gorm.io/gorm"
@@ -18,7 +17,6 @@ var ProvideCasbinLogger = NewCasbinLogger
 
 func NewCasbinAdapter(
 	gormDB *gorm.DB,
-	logger log.Logger,
 ) (*gormadapter.Adapter, error) {
 	adapter, err := gormadapter.NewTransactionalAdapterByDB(gormDB)
 	if err != nil {
