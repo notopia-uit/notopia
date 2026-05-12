@@ -24,3 +24,8 @@ pkg/pb/**/*.go linguist-generated
 docs/src/** linguist-detectable
 
 internal/notecreateseed/seed.gen.sql linguist-generated
+
+.agents/skills/next-*/** linguist-vendored
+.agents/skills/ckm-*/** linguist-vendored
+.agents/skills/ui-ux-pro-max/** linguist-vendored
+.agents/skills/vercel-react-best-practices/** linguist-vendored
