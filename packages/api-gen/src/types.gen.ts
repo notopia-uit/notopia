@@ -1632,6 +1632,47 @@ export type GetWorkspaceGraphResponses = {
 
 export type GetWorkspaceGraphResponse = GetWorkspaceGraphResponses[keyof GetWorkspaceGraphResponses];
 
+export type LeaveWorkspaceData = {
+    body?: never;
+    path: {
+        workspaceId: NoteId3;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceId}/leave';
+};
+
+export type LeaveWorkspaceErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * Unauthorized Error response
+     */
+    401: {
+        [key: string]: unknown;
+    };
+    /**
+     * Not Found Error response
+     */
+    404: NoteError;
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type LeaveWorkspaceError = LeaveWorkspaceErrors[keyof LeaveWorkspaceErrors];
+
+export type LeaveWorkspaceResponses = {
+    /**
+     * No Content - Workspace successfully left
+     */
+    204: void;
+};
+
+export type LeaveWorkspaceResponse = LeaveWorkspaceResponses[keyof LeaveWorkspaceResponses];
+
 export type GetWorkspaceMembersData = {
     body?: never;
     path: {

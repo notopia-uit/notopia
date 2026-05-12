@@ -49,3 +49,9 @@
 - [ ] If deploy, but not using roles. Change to `https://github.com/agilezebra/jwt-middleware`, and use istio
 - [ ] Those NestJS logging, we need to find a better way to wrap those controller log. NestJS Pino only http? not microservice.
       And guess that we should either using middleware or interceptor
+- [ ] Mutating `update, add, delete` workspace member doesn't send event to user client
+
+### Both
+
+- [] yjs isn't typesafety, like getting Ymap, and set value.
+  May try to see other libs, how do they do

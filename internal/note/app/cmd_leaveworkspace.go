@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 
 	"github.com/google/uuid"
@@ -44,25 +43,5 @@ func (h *LeaveWorkspaceHandler) Handle(ctx context.Context, cmd *LeaveWorkspace)
 	if len(members) == 1 {
 		return errs.NewCannotLeaveWorkspaceWithOnlyOneMember(cmd.WorkspaceID)
 	}
-	slog.DebugContext(
-		ctx, "checking permission",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-		slog.String("permission", WorkspaceItemPermissionWrite.String()),
-	)
-	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
-	if err != nil {
-		return err
-	}
-
-	if !hasPermission {
-		return errs.NewForbidden(
-			fmt.Sprintf("user %s does not have permission to move items in workspace %s", cmd.UserID, cmd.WorkspaceID),
-		)
-	}
-	slog.DebugContext(
-		ctx, "permission granted",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-	)
+	return h.authorizationSvc.LeaveWorkspace(ctx, cmd.UserID, cmd.WorkspaceID)
 }

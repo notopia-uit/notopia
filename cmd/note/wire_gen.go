@@ -104,6 +104,18 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	permanentlyDeleteFolderHandler := app.NewPermanentlyDeleteFolderHandler(authorization, unitOfWork)
 	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, unitOfWork)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, unitOfWork)
+	workspaceEvent := &advanced.WorkspaceEvent
+	redis := &configConfig.Redis
+	redisClient, cleanup4 := workspaceevent.NewRedisClient(ctx, redis, logger)
+	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(authorization, workspaceEventHub)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, unitOfWork)
 	permanentlyDeleteWorkspaceItemsHandler := app.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, unitOfWork)
 	queries := persistence.NewSQLCQueries(pool)
@@ -119,17 +131,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	trashWorkspaceItemsHandler := app.NewTrashWorkspaceItemsHandler(authorization, unitOfWork, trashService)
 	unpublishNoteHandler := app.NewUnpublishNoteHandler(pgrepoNote)
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
-	workspaceEvent := &advanced.WorkspaceEvent
-	redis := &configConfig.Redis
-	redisClient, cleanup4 := workspaceevent.NewRedisClient(ctx, redis, logger)
-	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName)
-	if err != nil {
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization)
 	cmds := &app.Cmds{
 		ChangeWorkspaceSlugHandler:             changeWorkspaceSlugHandler,
@@ -139,6 +140,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		DeleteFolderHandler:                    permanentlyDeleteFolderHandler,
 		DeleteNoteHandler:                      permanentlyDeleteNoteHandler,
 		DeleteWorkspaceHandler:                 deleteWorkspaceHandler,
+		LeaveWorkspaceHandler:                  leaveWorkspaceHandler,
 		MoveWorkspaceItemsHandler:              moveWorkspaceItemsHandler,
 		PermanentlyDeleteWorkspaceItemsHandler: permanentlyDeleteWorkspaceItemsHandler,
 		PublishNoteHandler:                     publishNoteHandler,

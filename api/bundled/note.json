@@ -18411,6 +18411,49 @@
         }
       }
     },
+    "/note/workspaces/{workspaceId}/leave": {
+      "post": {
+        "security": [
+          {
+            "Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "OIDC": [
+              "openid"
+            ]
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Leave workspace",
+        "operationId": "leaveWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content - Workspace successfully left"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/members": {
       "get": {
         "security": [

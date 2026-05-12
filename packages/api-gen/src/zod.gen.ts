@@ -738,6 +738,15 @@ export const zGetWorkspaceGraphQuery = z.object({
  */
 export const zGetWorkspaceGraphResponse = zNoteGraph;
 
+export const zLeaveWorkspacePath = z.object({
+    workspaceId: zNoteId3
+});
+
+/**
+ * No Content - Workspace successfully left
+ */
+export const zLeaveWorkspaceResponse = z.void();
+
 export const zGetWorkspaceMembersPath = z.object({
     workspaceId: zNoteId3
 });

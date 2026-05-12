@@ -74,6 +74,9 @@ type ServerInterface interface {
 	// Get workspace graph
 	// (GET /note/workspaces/{workspaceId}/graph)
 	GetWorkspaceGraph(c *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceGraphParams)
+	// Leave workspace
+	// (POST /note/workspaces/{workspaceId}/leave)
+	LeaveWorkspace(c *gin.Context, workspaceId WorkspaceIdPath)
 	// Get workspace members
 	// (GET /note/workspaces/{workspaceId}/members)
 	GetWorkspaceMembers(c *gin.Context, workspaceId WorkspaceIdPath)
@@ -676,6 +679,35 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceGraph(c *gin.Context) {
 	siw.Handler.GetWorkspaceGraph(c, workspaceId, params)
 }
 
+// LeaveWorkspace operation middleware
+func (siw *ServerInterfaceWrapper) LeaveWorkspace(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "workspaceId" -------------
+	var workspaceId WorkspaceIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.LeaveWorkspace(c, workspaceId)
+}
+
 // GetWorkspaceMembers operation middleware
 func (siw *ServerInterfaceWrapper) GetWorkspaceMembers(c *gin.Context) {
 
@@ -1097,6 +1129,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/change-slug", wrapper.ChangeWorkspaceSlug)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/events", wrapper.GetWorkspaceEvents)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/graph", wrapper.GetWorkspaceGraph)
+	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/leave", wrapper.LeaveWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/members", wrapper.GetWorkspaceMembers)
 	router.PUT(options.BaseURL+"/note/workspaces/:workspaceId/members", wrapper.UpdateWorkspaceMembers)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/move-items", wrapper.MoveWorkspaceItems)
@@ -2657,6 +2690,80 @@ func (response GetWorkspaceGraph500JSONResponse) VisitGetWorkspaceGraphResponse(
 	return err
 }
 
+type LeaveWorkspaceRequestObject struct {
+	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+}
+
+type LeaveWorkspaceResponseObject interface {
+	VisitLeaveWorkspaceResponse(w http.ResponseWriter) error
+}
+
+type LeaveWorkspace204Response struct {
+}
+
+func (response LeaveWorkspace204Response) VisitLeaveWorkspaceResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type LeaveWorkspace400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response LeaveWorkspace400JSONResponse) VisitLeaveWorkspaceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type LeaveWorkspace401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response LeaveWorkspace401JSONResponse) VisitLeaveWorkspaceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type LeaveWorkspace404JSONResponse struct{ NotFoundErrorJSONResponse }
+
+func (response LeaveWorkspace404JSONResponse) VisitLeaveWorkspaceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type LeaveWorkspace500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response LeaveWorkspace500JSONResponse) VisitLeaveWorkspaceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetWorkspaceMembersRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
 }
@@ -3652,6 +3759,9 @@ type StrictServerInterface interface {
 	// Get workspace graph
 	// (GET /note/workspaces/{workspaceId}/graph)
 	GetWorkspaceGraph(ctx context.Context, request GetWorkspaceGraphRequestObject) (GetWorkspaceGraphResponseObject, error)
+	// Leave workspace
+	// (POST /note/workspaces/{workspaceId}/leave)
+	LeaveWorkspace(ctx context.Context, request LeaveWorkspaceRequestObject) (LeaveWorkspaceResponseObject, error)
 	// Get workspace members
 	// (GET /note/workspaces/{workspaceId}/members)
 	GetWorkspaceMembers(ctx context.Context, request GetWorkspaceMembersRequestObject) (GetWorkspaceMembersResponseObject, error)
@@ -4272,6 +4382,32 @@ func (sh *strictHandler) GetWorkspaceGraph(ctx *gin.Context, workspaceId Workspa
 		sh.options.HandlerErrorFunc(ctx, err)
 	} else if validResponse, ok := response.(GetWorkspaceGraphResponseObject); ok {
 		if err := validResponse.VisitGetWorkspaceGraphResponse(ctx.Writer); err != nil {
+			sh.options.ResponseErrorHandlerFunc(ctx, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(ctx, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// LeaveWorkspace operation middleware
+func (sh *strictHandler) LeaveWorkspace(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+	var request LeaveWorkspaceRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.LeaveWorkspace(ctx, request.(LeaveWorkspaceRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "LeaveWorkspace")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		sh.options.HandlerErrorFunc(ctx, err)
+	} else if validResponse, ok := response.(LeaveWorkspaceResponseObject); ok {
+		if err := validResponse.VisitLeaveWorkspaceResponse(ctx.Writer); err != nil {
 			sh.options.ResponseErrorHandlerFunc(ctx, err)
 		}
 	} else if response != nil {
