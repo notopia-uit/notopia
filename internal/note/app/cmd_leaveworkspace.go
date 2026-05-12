@@ -14,17 +14,14 @@ type LeaveWorkspace struct {
 }
 
 type LeaveWorkspaceHandler struct {
-	authorizationSvc        AuthorizationSvc
-	workspaceEventPublisher WorkspaceEventPublisher
+	authorizationSvc AuthorizationSvc
 }
 
 func NewLeaveWorkspaceHandler(
 	authorizationSvc AuthorizationSvc,
-	workspaceEventPublisher WorkspaceEventPublisher,
 ) *LeaveWorkspaceHandler {
 	return &LeaveWorkspaceHandler{
-		authorizationSvc:        authorizationSvc,
-		workspaceEventPublisher: workspaceEventPublisher,
+		authorizationSvc: authorizationSvc,
 	}
 }
 

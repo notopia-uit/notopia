@@ -53,5 +53,5 @@
 
 ### Both
 
-- [] yjs isn't typesafety, like getting Ymap, and set value.
-  May try to see other libs, how do they do
+- [ ] yjs isn't typesafety, like getting Ymap, and set value.
+      May try to see other libs, how do they do

@@ -148,10 +148,8 @@ func NewCannotLeaveWorkspaceWithOnlyOneMember(workspaceID uuid.UUID) *CannotLeav
 	return &CannotLeaveWorkspaceWithOnlyOneMember{
 		WorkspaceID: workspaceID,
 		Err: Err{
-			message: fmt.Sprintf(`cannot leave workspace with id %q because it only has one member.
-				Should use delete workspace instead.
-				`, workspaceID.String()),
-			code: CodeCannotLeaveWorkspaceWithOnlyOneMember,
+			message: fmt.Sprintf("cannot leave workspace with id %q because it only has one member. Should use delete workspace instead.", workspaceID.String()),
+			code:    CodeCannotLeaveWorkspaceWithOnlyOneMember,
 		},
 	}
 }

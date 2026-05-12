@@ -46,9 +46,6 @@ func GetLocalEnforcer(t testing.TB, params *GetLocalEnforcerParams) (*casbin.Tra
 		t.Cleanup(func() {
 			_ = sqlDB.Close()
 		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to connect to in-memory database: %w", err)
-		}
 
 		adapter, err := gormadapter.NewAdapterByDB(db)
 		if err != nil {

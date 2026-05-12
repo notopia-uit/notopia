@@ -76,6 +76,6 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspac
 			return err
 		}
 		slog.InfoContext(ctx, "workspace deleted successfully", slog.String("workspace_id", cmd.ID.String()))
-		return err
+		return nil
 	})
 }
