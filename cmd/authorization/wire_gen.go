@@ -29,45 +29,52 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	sql := &configConfig.Database
-	db, err := infra.NewGORMDB(sql)
-	if err != nil {
-		return nil, nil, err
-	}
-	adapter, err := infra.NewCasbinAdapter(db)
-	if err != nil {
-		return nil, nil, err
-	}
-	transactionalEnforcer, err := app.NewCasbinEnforcer(adapter)
-	if err != nil {
-		return nil, nil, err
-	}
+	log := &configConfig.Log
+	stdoutHandler := logging.NewStdoutHandler(log)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
 	if err != nil {
 		return nil, nil, err
 	}
-	tracerProvider, cleanup, err := otel.NewTracerProvider(ctx, resource)
+	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, resource)
 	if err != nil {
-		return nil, nil, err
-	}
-	log := &configConfig.Log
-	stdoutHandler := logging.NewStdoutHandler(log)
-	loggerProvider, cleanup2, err := otel.NewLoggerProvider(ctx, resource)
-	if err != nil {
-		cleanup()
 		return nil, nil, err
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
+	db, cleanup2, err := infra.NewGORMDB(sql, logger)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	adapter, err := infra.NewCasbinAdapter(db)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	transactionalEnforcer, err := app.NewCasbinEnforcer(adapter)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(transactionalEnforcer)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(transactionalEnforcer)
 	kafka := &configConfig.Kafka
 	loggerAdapter := logging.NewWatermill(logger)
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	integrationPublisher, cleanup3, err := infra.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
+	integrationPublisher, cleanup4, err := infra.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
 	if err != nil {
+		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
@@ -89,16 +96,18 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	service := grpc.NewService(appApp)
 	serverConfig := &configConfig.Server
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	server, cleanup4, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger)
+	server, cleanup5, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger)
 	if err != nil {
+		cleanup4()
 		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
 	healthHealth := health.New(db, serverConfig, kafka)
-	meterProvider, cleanup5, err := otel.NewMeterProvider(ctx, resource)
+	meterProvider, cleanup6, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
+		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
@@ -109,6 +118,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	general := &configConfig.General
 	authorizationServer, err := authorization.NewServer(ctx, server, healthHealth, logger, global, general, appApp)
 	if err != nil {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -117,6 +127,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	return authorizationServer, func() {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
