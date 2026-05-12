@@ -105,7 +105,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 
 			workspaceID := uuid.MustParse(tc.workspaceID)
 			ctx := t.Context()
-			err = handler.Handle(ctx, app.UpdateWorkspaceMembers{
+			err = handler.Handle(ctx, &app.UpdateWorkspaceMembers{
 				UserID:      tc.requesterID,
 				WorkspaceID: workspaceID,
 				Members:     tc.newMembers,
@@ -119,7 +119,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 			require.NoError(t, err, "Handler threw an error")
 
 			getMembersHandler := app.NewGetWorkspaceMembersHandler(e)
-			members, err := getMembersHandler.Handle(ctx, app.GetWorkspaceMembers{
+			members, err := getMembersHandler.Handle(ctx, &app.GetWorkspaceMembers{
 				UserID:      tc.requesterID,
 				WorkspaceID: workspaceID,
 			})

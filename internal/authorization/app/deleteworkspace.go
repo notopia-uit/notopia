@@ -24,7 +24,7 @@ func NewDeleteWorkspaceHandler(enforcer *casbin.TransactionalEnforcer) *DeleteWo
 
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
-func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, params DeleteWorkspace) error {
+func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, params *DeleteWorkspace) error {
 	slog.DebugContext(
 		ctx, "Handling delete workspace",
 		slog.String("user_id", params.UserID),
@@ -48,7 +48,8 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, params DeleteWorksp
 		return errs.NewCasbinInternalError(err)
 	}
 
-	slog.InfoContext(ctx, "deleted workspace",
+	slog.InfoContext(
+		ctx, "deleted workspace",
 		slog.String("user_id", params.UserID),
 		slog.String("workspace_id", params.WorkspaceID.String()),
 	)

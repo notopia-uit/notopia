@@ -96,7 +96,7 @@ func TestLeaveWorkspaceHandler(t *testing.T) {
 
 			workspaceID := uuid.MustParse(tc.workspaceID)
 			ctx := t.Context()
-			err = handler.Handle(ctx, app.LeaveWorkspace{
+			err = handler.Handle(ctx, &app.LeaveWorkspace{
 				UserID:      tc.userID,
 				WorkspaceID: workspaceID,
 			})
@@ -111,7 +111,7 @@ func TestLeaveWorkspaceHandler(t *testing.T) {
 
 			// Verify the user is no longer a member
 			getMembersHandler := app.NewGetWorkspaceMembersHandler(e)
-			members, err := getMembersHandler.Handle(ctx, app.GetWorkspaceMembers{
+			members, err := getMembersHandler.Handle(ctx, &app.GetWorkspaceMembers{
 				UserID:      tc.userID,
 				WorkspaceID: workspaceID,
 			})
@@ -150,7 +150,7 @@ func TestLeaveWorkspaceHandler_PublishEventFailure(t *testing.T) {
 
 	workspaceID := uuid.MustParse("00000000-0000-0000-0000-000000000111")
 	ctx := t.Context()
-	err = handler.Handle(ctx, app.LeaveWorkspace{
+	err = handler.Handle(ctx, &app.LeaveWorkspace{
 		UserID:      "112", // Editor, can leave
 		WorkspaceID: workspaceID,
 	})

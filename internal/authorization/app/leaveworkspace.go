@@ -28,7 +28,7 @@ func NewLeaveWorkspaceHandler(enforcer *casbin.TransactionalEnforcer, publisher 
 
 var ProvideLeaveWorkspaceHandler = NewLeaveWorkspaceHandler
 
-func (h *LeaveWorkspaceHandler) Handle(ctx context.Context, params LeaveWorkspace) error {
+func (h *LeaveWorkspaceHandler) Handle(ctx context.Context, params *LeaveWorkspace) error {
 	err := h.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
 		bufferedModel, err := tx.GetBufferedModel()
 		if err != nil {

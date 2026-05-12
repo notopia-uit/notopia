@@ -24,7 +24,7 @@ func NewGetUserWorkspaceItemPermissionsHandler(enforcer *casbin.TransactionalEnf
 
 var ProvideGetUserWorkspaceItemPermissionsHandler = NewGetUserWorkspaceItemPermissionsHandler
 
-func (h *GetUserWorkspaceItemPermissionsHandler) Handle(ctx context.Context, params GetUserWorkspaceItemPermissions) (WorkspaceItemPermissions, error) {
+func (h *GetUserWorkspaceItemPermissionsHandler) Handle(ctx context.Context, params *GetUserWorkspaceItemPermissions) (WorkspaceItemPermissions, error) {
 	readAllowed, err := h.enforcer.Enforce(
 		formatUser(params.UserID),
 		formatWorkspace(params.WorkspaceID),
@@ -53,7 +53,8 @@ func (h *GetUserWorkspaceItemPermissionsHandler) Handle(ctx context.Context, par
 		Write:  oks[1],
 		Delete: oks[2],
 	}
-	slog.DebugContext(ctx, "retrieved user workspace item permissions",
+	slog.DebugContext(
+		ctx, "retrieved user workspace item permissions",
 		slog.String("user_id", params.UserID),
 		slog.String("workspace_id", params.WorkspaceID.String()),
 	)

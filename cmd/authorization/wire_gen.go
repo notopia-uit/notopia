@@ -41,34 +41,30 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	if err != nil {
 		return nil, nil, err
 	}
-	createWorkspaceHandler := app.NewCreateWorkspaceHandler(transactionalEnforcer)
-	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(transactionalEnforcer)
-	getUserWorkspaceItemPermissionsHandler := app.NewGetUserWorkspaceItemPermissionsHandler(transactionalEnforcer)
-	getUserWorkspacesHandler := app.NewGetUserWorkspacesHandler(transactionalEnforcer)
-	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
-	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
-	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
-	kafka := &configConfig.Kafka
-	log := &configConfig.Log
-	stdoutHandler := logging.NewStdoutHandler(log)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
 	if err != nil {
 		return nil, nil, err
 	}
-	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, resource)
+	tracerProvider, cleanup, err := otel.NewTracerProvider(ctx, resource)
 	if err != nil {
 		return nil, nil, err
 	}
-	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
-	loggerAdapter := logging.NewWatermill(logger)
-	tracerProvider, cleanup2, err := otel.NewTracerProvider(ctx, resource)
+	log := &configConfig.Log
+	stdoutHandler := logging.NewStdoutHandler(log)
+	loggerProvider, cleanup2, err := otel.NewLoggerProvider(ctx, resource)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
+	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
+	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
+	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
+	createWorkspaceHandler := app.NewCreateWorkspaceHandler(transactionalEnforcer)
+	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(transactionalEnforcer)
+	kafka := &configConfig.Kafka
+	loggerAdapter := logging.NewWatermill(logger)
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
 	integrationPublisher, cleanup3, err := infra.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
 	if err != nil {
@@ -78,17 +74,17 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer, integrationPublisher)
 	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(transactionalEnforcer, integrationPublisher)
+	cmds := app.NewCmds(handlerProvider, createWorkspaceHandler, deleteWorkspaceHandler, updateWorkspaceMembersHandler, leaveWorkspaceHandler)
+	getUserWorkspaceItemPermissionsHandler := app.NewGetUserWorkspaceItemPermissionsHandler(transactionalEnforcer)
+	getUserWorkspacesHandler := app.NewGetUserWorkspacesHandler(transactionalEnforcer)
+	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
+	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
+	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
+	queries := app.NewQueries(handlerProvider, getUserWorkspaceItemPermissionsHandler, getUserWorkspacesHandler, getWorkspaceMembersHandler, hasWorkspaceItemPermissionHandler, hasWorkspacePermissionHandler)
 	appApp := &app.App{
-		Enforcer:                        transactionalEnforcer,
-		CreateWorkspace:                 createWorkspaceHandler,
-		DeleteWorkspace:                 deleteWorkspaceHandler,
-		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
-		GetUserWorkspaces:               getUserWorkspacesHandler,
-		GetWorkspaceMembers:             getWorkspaceMembersHandler,
-		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
-		HasWorkspacePermission:          hasWorkspacePermissionHandler,
-		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
-		LeaveWorkspace:                  leaveWorkspaceHandler,
+		Enforcer: transactionalEnforcer,
+		Cmds:     cmds,
+		Queries:  queries,
 	}
 	service := grpc.NewService(appApp)
 	serverConfig := &configConfig.Server

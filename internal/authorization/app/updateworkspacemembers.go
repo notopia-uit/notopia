@@ -29,7 +29,7 @@ func NewUpdateWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer, pu
 
 var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
 
-func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params UpdateWorkspaceMembers) error {
+func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params *UpdateWorkspaceMembers) error {
 	editAllowed, err := h.enforcer.Enforce(
 		formatUser(params.UserID),
 		formatWorkspace(params.WorkspaceID),
@@ -100,7 +100,8 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params Updat
 		return err
 	}
 
-	slog.InfoContext(ctx, "updated workspace members",
+	slog.InfoContext(
+		ctx, "updated workspace members",
 		slog.String("user_id", params.UserID),
 		slog.String("workspace_id", params.WorkspaceID.String()),
 		slog.Int("member_count", len(params.Members)),

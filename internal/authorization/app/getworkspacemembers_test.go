@@ -69,7 +69,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 			t.Parallel()
 			ctx := t.Context()
 			workspaceID := uuid.MustParse(tc.workspaceID)
-			members, err := handler.Handle(ctx, app.GetWorkspaceMembers{
+			members, err := handler.Handle(ctx, &app.GetWorkspaceMembers{
 				UserID:      tc.requesterID,
 				WorkspaceID: workspaceID,
 			})

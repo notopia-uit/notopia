@@ -24,7 +24,7 @@ func NewCreateWorkspaceHandler(enforcer *casbin.TransactionalEnforcer) *CreateWo
 
 var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
 
-func (h *CreateWorkspaceHandler) Handle(ctx context.Context, params CreateWorkspace) error {
+func (h *CreateWorkspaceHandler) Handle(ctx context.Context, params *CreateWorkspace) error {
 	slog.DebugContext(
 		ctx, "Handling create workspace",
 		slog.String("owner_id", params.OwnerID),
@@ -41,7 +41,8 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, params CreateWorksp
 	if !ok {
 		return errs.NewCreateWorkspaceExists(params.OwnerID, params.WorkspaceID)
 	}
-	slog.InfoContext(ctx, "created workspace",
+	slog.InfoContext(
+		ctx, "created workspace",
 		slog.String("owner_id", params.OwnerID),
 		slog.String("workspace_id", params.WorkspaceID.String()),
 	)
