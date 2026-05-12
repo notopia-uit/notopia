@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from '@notopia-uit/ui/components/shadcn/table';
+import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Folder, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import React, { useMemo, useState, useRef } from 'react';
@@ -117,15 +118,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     );
   }, [trashedData]);
 
-  const [
-    showPermanentlyDeleteWorkspaceSuccessAlert,
-    setShowPermanentlyDeleteWorkspaceSuccessAlert,
-  ] = useState(false);
-  const [showRestoreWorkspaceSuccessAlert, setShowRestoreWorkspaceSuccessAlert] = useState(false);
-  const [showPermanentlyDeleteWorkspaceErrorAlert, setShowPermanentlyDeleteWorkspaceErrorAlert] =
-    useState(false);
-  const [showRestoreWorkspaceErrorAlert, setShowRestoreWorkspaceErrorAlert] = useState(false);
-  const hideAlertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { alert, showAlert } = useAlert();
   const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
     {
       onSuccess: async (_, variables) => {
@@ -150,11 +143,19 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
         await queryClient.invalidateQueries({
           queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
         });
-        setShowPermanentlyDeleteWorkspaceSuccessAlert(true);
-        if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
-        hideAlertTimerRef.current = setTimeout(() => {
-          setShowPermanentlyDeleteWorkspaceSuccessAlert(false);
-        }, 3000);
+        showAlert(
+          'success',
+          'Successfully Deleted',
+          `Selected items have been permanently deleted.`
+        );
+      },
+      onError: (error) => {
+        showAlert(
+          'error',
+          'Failed to Delete',
+          `An error occurred while trying to permanently delete the selected items. Please try again.
+          ${error instanceof Error ? error.message : ''}`
+        );
       },
     }
   );
@@ -180,11 +181,15 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
         queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
       });
       setSelectedItems(new Set());
-      setShowRestoreWorkspaceSuccessAlert(true);
-      if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
-      hideAlertTimerRef.current = setTimeout(() => {
-        setShowRestoreWorkspaceSuccessAlert(false);
-      }, 3000);
+      showAlert('success', 'Successfully Restored', `Selected items have been restored.`);
+    },
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Failed to Restore',
+        `An error occurred while trying to restore the selected items. Please try again.
+        ${error instanceof Error ? error.message : ''}`
+      );
     },
   });
   const toggleSelection = (id: string) => {
@@ -348,30 +353,9 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
             })}
           </TableBody>
         </Table>
-        {showPermanentlyDeleteWorkspaceSuccessAlert && (
-          <SuccessAlert
-            title="Successfully Deleted"
-            message="Selected items have been permanently deleted."
-          />
-        )}
-        {showRestoreWorkspaceSuccessAlert && (
-          <SuccessAlert
-            title="Successfully Restored"
-            message="Selected items have been restored."
-          />
-        )}
-        {showPermanentlyDeleteWorkspaceErrorAlert && (
-          <ErrorAlert
-            title="Failed to Delete"
-            message="An error occurred while trying to permanently delete the selected items."
-          />
-        )}
-        {showRestoreWorkspaceErrorAlert && (
-          <ErrorAlert
-            title="Failed to Restore"
-            message="An error occurred while trying to restore the selected items."
-          />
-        )}
+        {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
+
+        {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
       </div>
     </div>
   );

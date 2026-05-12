@@ -24,6 +24,7 @@ import {
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 
 import '@blocknote/shadcn/style.css';
+import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useIsDocModified } from '@notopia-uit/ui/hooks/use-is-doc-modified';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
@@ -130,25 +131,25 @@ export default function Editor({ noteId }: { noteId: string }) {
     provider.awareness?.clientID.toString() ?? 'anonymous'
   );
 
-  const [showCommitDocumentSuccessAlert, setShowCommitDocumentSuccessAlert] = useState(false);
-  const [showCommitDocumentErrorAlert, setShowCommitDocumentErrorAlert] = useState(false);
+  const { alert, showAlert } = useAlert();
 
-  const hideAlertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { mutate: commitDocument, isPending: isCommitingDocument } = useCommitDocumentMutation({
-    onSuccess: () => {
+    onSuccess: (responses) => {
       setModified(false);
-      setShowCommitDocumentSuccessAlert(true);
-      if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
-      hideAlertTimerRef.current = setTimeout(() => {
-        setShowCommitDocumentSuccessAlert(false);
-      }, 3000);
+      showAlert(
+        'success',
+        'Document committed successfully!',
+        `Your note ${responses.id} changes were committed.`
+      );
     },
-    onError: () => {
-      setShowCommitDocumentErrorAlert(true);
-      if (hideAlertTimerRef.current) clearTimeout(hideAlertTimerRef.current);
-      hideAlertTimerRef.current = setTimeout(() => {
-        setShowCommitDocumentErrorAlert(false);
-      }, 3000);
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Failed to commit document',
+        `An error occurred while committing your note changes. ${
+          error instanceof Error ? error.message : 'Please try again.'
+        }`
+      );
     },
   });
   const editor = useCreateBlockNote({
@@ -184,18 +185,9 @@ export default function Editor({ noteId }: { noteId: string }) {
           }}
         />
       </BlockNoteView>
-      {showCommitDocumentSuccessAlert && (
-        <SuccessAlert
-          title="Document committed successfully!"
-          message="Your changes have been saved to Nexote."
-        />
-      )}
-      {showCommitDocumentErrorAlert && (
-        <ErrorAlert
-          title="Failed to commit document"
-          message="An error occurred while saving your changes. Please try again."
-        />
-      )}
+      {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
+
+      {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
       {isModified && (
         <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">
           {isCommitingDocument ? (

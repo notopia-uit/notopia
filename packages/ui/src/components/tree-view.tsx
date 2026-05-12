@@ -12,6 +12,8 @@ import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
+import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
@@ -187,17 +189,8 @@ const viewStateInitial: TreeViewState = {
   'tree-sample': {},
 };
 
-const RenameErrorAlert = () => (
-  <ErrorAlert title="RenameFailed" message="Failed to rename item. Please try again." />
-);
-
-const CreateErrorAlert = () => (
-  <ErrorAlert title="CreateFailed" message="Failed to create item. Please try again." />
-);
-
 //TODO: handle loading states, errors, empty states, etc.
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
-  const queryClient = useQueryClient();
   const {
     data: { treeData: workspaceTreeData, rootId } = { treeData: {}, rootId: '' },
     isError: isGetWorkSpaceTreeError,
@@ -216,50 +209,26 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   const router = useRouter();
   const tree = useRef<TreeRef>(null);
 
-  const [showRenameErrorAlert, setShowRenameErrorAlert] = useState(false);
-  const [showCreateErrorAlert, setShowCreateErrorAlert] = useState(false);
+  const { alert, showAlert } = useAlert();
 
-  const onRenameError = useCallback(() => {
-    setShowRenameErrorAlert(true);
-  }, []);
-  useEffect(() => {
-    if (!showRenameErrorAlert) return;
-    const timer = setTimeout(() => setShowRenameErrorAlert(false), 3000);
-    return () => clearTimeout(timer);
-  }, [showRenameErrorAlert]);
   const { mutate: renameNote } = useRenameNoteMutation({
-    onError: onRenameError,
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Rename Note Failed',
+        `${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    },
   });
   const { mutate: renameFolder } = useRenameFolderMutation({
-    onError: onRenameError,
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Rename Folder Failed',
+        `${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    },
   });
-  const onCreateError = useCallback(() => {
-    setShowCreateErrorAlert(true);
-  }, []);
-  useEffect(() => {
-    if (!showCreateErrorAlert) return;
-    const timer = setTimeout(() => setShowCreateErrorAlert(false), 3000);
-    return () => clearTimeout(timer);
-  }, [showCreateErrorAlert]);
-  const handleCreateSuccess = async (parentId: string) => {
-    await queryClient.invalidateQueries({
-      queryKey: getWorkspaceTreeOptions({ path: { workspaceId: currentWorkspaceId } }).queryKey,
-    });
-
-    setViewState((prev) => {
-      const currentExpanded = prev['tree-sample']?.expandedItems ?? [];
-      if (!currentExpanded.includes(parentId)) {
-        return {
-          ...prev,
-          'tree-sample': {
-            ...prev['tree-sample'],
-            expandedItems: [...currentExpanded, parentId],
-          },
-        };
-      }
-      return prev;
-    });
-  };
   //TODO:: call API to create new item and update tree data with response
   const { mutate: createNote } = useCreateNoteMutation({
     onSuccess: (responses, variables) => {
@@ -282,10 +251,22 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
         return newItems;
       });
     },
-    onError: onCreateError,
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Create Note Failed',
+        `${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    },
   });
   const { mutate: createFolder } = useCreateFolderMutation({
-    onError: onCreateError,
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Create Folder Failed',
+        `${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    },
     onSuccess: (responses, variables) => {
       const newFolderId = responses.id;
       const parentId = variables.body.parentId ? variables.body.parentId : rootId;
@@ -626,8 +607,8 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           <Tree ref={tree} treeId="tree-sample" rootItem={rootId} treeLabel="Sample Tree" />
         </ControlledTreeEnvironment>
       </div>
-      {showRenameErrorAlert && <RenameErrorAlert />}
-      {showCreateErrorAlert && <CreateErrorAlert />}
+      {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
+      {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}{' '}
     </div>
   );
 };
