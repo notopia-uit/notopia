@@ -393,3 +393,50 @@ end, { desc = "LSP | Restart redocly_ls", silent = true })
 
 vim.o.backupcopy = "yes" -- https://github.com/nrwl/nx/issues/20622
 vim.opt.isfname:append("{,},@")
+
+local function track_may_progress()
+  local start_date = os.time({ year = 2026, month = 5, day = 8, hour = 0 })
+  local end_date = os.time({ year = 2026, month = 5, day = 31, hour = 23, min = 59 })
+  local now = os.time()
+
+  local total_duration = os.difftime(end_date, start_date)
+  local seconds_in_day = 24 * 60 * 60
+
+  local elapsed_sec = os.difftime(now, start_date)
+  local remaining_sec = os.difftime(end_date, now)
+
+  if elapsed_sec < 0 then
+    elapsed_sec = 0
+  end
+  if remaining_sec < 0 then
+    remaining_sec = 0
+  end
+
+  local days_elapsed = math.floor(elapsed_sec / seconds_in_day)
+  local days_remaining = math.ceil(remaining_sec / seconds_in_day)
+  local percentage = math.min(100, math.max(0, (elapsed_sec / total_duration) * 100))
+
+  local msg =
+    string.format("Passed: %d day(s)\nLeft: %d day(s)\nProgress: %.0f%%", days_elapsed, days_remaining, percentage)
+
+  local level = vim.log.levels.INFO
+  if percentage >= 70 then
+    level = vim.log.levels.ERROR
+  elseif percentage >= 40 then
+    level = vim.log.levels.WARN
+  end
+  vim.notify(msg, level, { title = "Progress" })
+end
+
+local progress_augroup = vim.api.nvim_create_augroup("MayProgress", { clear = true })
+
+---@type integer
+local progress_ev
+
+progress_ev = vim.api.nvim_create_autocmd("VimEnter", {
+  group = progress_augroup,
+  callback = function()
+    track_may_progress()
+    vim.api.nvim_del_autocmd(progress_ev)
+  end,
+})
