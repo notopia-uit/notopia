@@ -36,6 +36,9 @@
   "references": [
     {
       "path": "../../packages/ui"
+    },
+    {
+      "path": "../../packages/api-gen"
     }
   ]
 }
