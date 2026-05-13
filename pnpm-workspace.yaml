@@ -42,7 +42,7 @@ catalog:
   '@nestjs/platform-socket.io': '11.1.19'
   '@nestjs/platform-ws': '11.1.19'
   '@nestjs/schematics': '11.0.10'
-  '@nestjs/testing': '11.1.19'
+  '@nestjs/testing': '11.1.20'
   '@nestjs/typeorm': '11.0.1'
   '@nestjs/websockets': '11.1.19'
   oxlint: '1.63.0'
