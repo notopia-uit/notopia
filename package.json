@@ -61,5 +61,5 @@
     "vite-plugin-dts": "catalog:",
     "vitest": "catalog:"
   },
-  "packageManager": "pnpm@10.33.3"
+  "packageManager": "pnpm@10.33.4"
 }
