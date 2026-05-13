@@ -26,7 +26,7 @@ var ProvideService = NewService
 var _ pb.AuthorizationServiceServer = (*Service)(nil)
 
 func (g *Service) GetUserWorkspaces(ctx context.Context, req *pb.GetUserWorkspacesRequest) (*pb.GetUserWorkspacesResponse, error) {
-	workspaces, err := g.app.GetUserWorkspaces.Handle(ctx, app.GetUserWorkspaces{
+	workspaces, err := g.app.Queries.GetUserWorkspaces.Handle(ctx, &app.GetUserWorkspaces{
 		UserID: req.UserId,
 	})
 	if err != nil {
@@ -49,7 +49,7 @@ func (g *Service) CreateWorkspaceWithOwner(ctx context.Context, req *pb.CreateWo
 		return nil, err
 	}
 
-	if err := g.app.CreateWorkspace.Handle(ctx, app.CreateWorkspace{
+	if err := g.app.Cmds.CreateWorkspace.Handle(ctx, &app.CreateWorkspace{
 		OwnerID:     req.OwnerId,
 		WorkspaceID: workspaceID,
 	}); err != nil {
@@ -73,7 +73,7 @@ func (g *Service) UpdateWorkspaceMembers(ctx context.Context, req *pb.UpdateWork
 		}
 	}
 
-	if err := g.app.UpdateWorkspaceMembers.Handle(ctx, app.UpdateWorkspaceMembers{
+	if err := g.app.Cmds.UpdateWorkspaceMembers.Handle(ctx, &app.UpdateWorkspaceMembers{
 		UserID:      req.UserId,
 		WorkspaceID: workspaceID,
 		Members:     members,
@@ -81,7 +81,8 @@ func (g *Service) UpdateWorkspaceMembers(ctx context.Context, req *pb.UpdateWork
 		// Log publish failures but don't fail the entire operation
 		// since the members have already been updated in Casbin
 		if pubErr, ok := err.(*errs.PublishIntegrationEventsFailed); ok {
-			slog.WarnContext(ctx, "failed to publish integration events after successful member update",
+			slog.WarnContext(
+				ctx, "failed to publish integration events after successful member update",
 				slog.String("workspace_id", pubErr.WorkspaceID.String()),
 				slog.String("error", pubErr.Error()),
 			)
@@ -93,13 +94,27 @@ func (g *Service) UpdateWorkspaceMembers(ctx context.Context, req *pb.UpdateWork
 	return &pb.UpdateWorkspaceMembersResponse{}, nil
 }
 
+func (g *Service) LeaveWorkspace(ctx context.Context, req *pb.LeaveWorkspaceRequest) (*pb.LeaveWorkspaceResponse, error) {
+	workspaceID, err := uuid.Parse(req.WorkspaceId)
+	if err != nil {
+		return nil, err
+	}
+	if err := g.app.Cmds.LeaveWorkspace.Handle(ctx, &app.LeaveWorkspace{
+		UserID:      req.UserId,
+		WorkspaceID: workspaceID,
+	}); err != nil {
+		return nil, err
+	}
+	return &pb.LeaveWorkspaceResponse{}, nil
+}
+
 func (g *Service) GetWorkspaceMembers(ctx context.Context, req *pb.GetWorkspaceMembersRequest) (*pb.GetWorkspaceMembersResponse, error) {
 	workspaceID, err := uuid.Parse(req.WorkspaceId)
 	if err != nil {
 		return nil, err
 	}
 
-	members, err := g.app.GetWorkspaceMembers.Handle(ctx, app.GetWorkspaceMembers{
+	members, err := g.app.Queries.GetWorkspaceMembers.Handle(ctx, &app.GetWorkspaceMembers{
 		UserID:      req.UserId,
 		WorkspaceID: workspaceID,
 	})
@@ -123,7 +138,7 @@ func (g *Service) HasWorkspacePermission(ctx context.Context, req *pb.HasWorkspa
 		return nil, err
 	}
 
-	hasPermission, err := g.app.HasWorkspacePermission.Handle(ctx, app.HasWorkspacePermission{
+	hasPermission, err := g.app.Queries.HasWorkspacePermission.Handle(ctx, &app.HasWorkspacePermission{
 		UserID:      req.MemberId,
 		WorkspaceID: workspaceID,
 		Permission:  pbWorkspacePermissionToApp(req.Permission),
@@ -142,7 +157,7 @@ func (g *Service) HasWorkspaceItemPermission(ctx context.Context, req *pb.HasWor
 	if err != nil {
 		return nil, err
 	}
-	hasPermission, err := g.app.HasWorkspaceItemPermission.Handle(ctx, app.HasWorkspaceItemPermission{
+	hasPermission, err := g.app.Queries.HasWorkspaceItemPermission.Handle(ctx, &app.HasWorkspaceItemPermission{
 		UserID:      req.MemberId,
 		WorkspaceID: workspaceID,
 		Permission:  pbWorkspaceItemPermissionToApp(req.Permission),
@@ -161,7 +176,7 @@ func (g *Service) GetUserWorkspaceItemPermissions(ctx context.Context, req *pb.G
 	if err != nil {
 		return nil, err
 	}
-	permissions, err := g.app.GetUserWorkspaceItemPermissions.Handle(ctx, app.GetUserWorkspaceItemPermissions{
+	permissions, err := g.app.Queries.GetUserWorkspaceItemPermissions.Handle(ctx, &app.GetUserWorkspaceItemPermissions{
 		UserID:      req.MemberId,
 		WorkspaceID: workspaceID,
 	})
@@ -181,7 +196,7 @@ func (g *Service) DeleteWorkspace(ctx context.Context, req *pb.DeleteWorkspaceRe
 	if err != nil {
 		return nil, err
 	}
-	if err := g.app.DeleteWorkspace.Handle(ctx, app.DeleteWorkspace{
+	if err := g.app.Cmds.DeleteWorkspace.Handle(ctx, &app.DeleteWorkspace{
 		UserID:      req.UserId,
 		WorkspaceID: workspaceID,
 	}); err != nil {

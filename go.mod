@@ -18,6 +18,7 @@ require (
 	github.com/exaring/otelpgx v0.10.0
 	github.com/getkin/kin-openapi v0.133.0
 	github.com/gin-gonic/gin v1.12.0
+	github.com/glebarez/sqlite v1.11.0
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/goforj/wire v1.2.0
 	github.com/google/uuid v1.6.0
@@ -29,6 +30,7 @@ require (
 	github.com/nkonev/watermill-opentelemetry v0.1.11
 	github.com/oapi-codegen/gin-middleware v1.0.2
 	github.com/oapi-codegen/runtime v1.4.0
+	github.com/orandin/slog-gorm v1.4.0
 	github.com/pressly/goose/v3 v3.27.1
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/samber/slog-gin v1.21.0
@@ -53,11 +55,14 @@ require (
 	google.golang.org/protobuf v1.36.11
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
+	gorm.io/plugin/opentelemetry v0.1.16
 )
 
 require (
 	cel.dev/expr v0.25.1 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
+	github.com/ClickHouse/ch-go v0.71.0 // indirect
+	github.com/ClickHouse/clickhouse-go/v2 v2.45.0 // indirect
 	github.com/Rican7/retry v0.3.1 // indirect
 	github.com/andybalholm/brotli v1.2.1 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
@@ -81,7 +86,8 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/gin-contrib/sse v1.1.0 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
-	github.com/glebarez/sqlite v1.11.0 // indirect
+	github.com/go-faster/city v1.0.1 // indirect
+	github.com/go-faster/errors v0.7.1 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
@@ -103,6 +109,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
+	github.com/hashicorp/go-version v1.8.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
@@ -132,6 +139,7 @@ require (
 	github.com/oasdiff/yaml v0.0.0-20250309154309-f31be36b4037 // indirect
 	github.com/oasdiff/yaml3 v0.0.0-20250309153720-d2182401db90 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
+	github.com/paulmach/orb v0.13.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pierrec/lz4/v4 v4.1.26 // indirect
@@ -149,6 +157,7 @@ require (
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/samber/lo v1.53.0 // indirect
 	github.com/samber/slog-common v0.21.0 // indirect
+	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/sony/gobreaker v1.0.0 // indirect
@@ -191,6 +200,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20260226221140-a57be14db171 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gorm.io/driver/clickhouse v0.7.0 // indirect
 	gorm.io/driver/mysql v1.6.0 // indirect
 	gorm.io/driver/sqlserver v1.6.3 // indirect
 	gorm.io/plugin/dbresolver v1.6.2 // indirect

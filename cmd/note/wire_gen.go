@@ -80,10 +80,18 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName)
 	general := &configConfig.General
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
+	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
 	services := &configConfig.Services
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	authorization, cleanup3, err := service.NewAuthorization(services, loggingLogger)
+	authorization, cleanup4, err := service.NewAuthorization(services, loggingLogger)
 	if err != nil {
+		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
@@ -101,10 +109,11 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	createFolderHandler := app.NewCreateFolderHandler(authorization, unitOfWork)
 	createNoteHandler := app.NewCreateNoteHandler(authorization, unitOfWork)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(unitOfWork, authorization)
-	permanentlyDeleteFolderHandler := app.NewPermanentlyDeleteFolderHandler(authorization, unitOfWork)
-	permanentlyDeleteNoteHandler := app.PermanentlyNewDeleteNoteHandler(authorization, unitOfWork)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, unitOfWork)
+	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(authorization)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, unitOfWork)
+	permanentlyDeleteFolderHandler := app.NewPermanentlyDeleteFolderHandler(authorization, unitOfWork)
+	permanentlyDeleteNoteHandler := app.NewPermanentlyDeleteNoteHandler(authorization, unitOfWork)
 	permanentlyDeleteWorkspaceItemsHandler := app.NewPermanentlyDeleteWorkspaceItemsHandler(authorization, unitOfWork)
 	queries := persistence.NewSQLCQueries(pool)
 	pgrepoNote := pgrepo.NewNoTransactionNote(pool, queries, runInTx)
@@ -121,9 +130,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	workspaceEvent := &advanced.WorkspaceEvent
 	redis := &configConfig.Redis
-	redisClient, cleanup4 := workspaceevent.NewRedisClient(ctx, redis, logger)
+	redisClient, cleanup5 := workspaceevent.NewRedisClient(ctx, redis, logger)
 	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName)
 	if err != nil {
+		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
@@ -131,38 +141,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization)
-	cmds := &app.Cmds{
-		ChangeWorkspaceSlugHandler:             changeWorkspaceSlugHandler,
-		CreateFolderHandler:                    createFolderHandler,
-		CreateNoteHandler:                      createNoteHandler,
-		CreateWorkspaceHandler:                 createWorkspaceHandler,
-		DeleteFolderHandler:                    permanentlyDeleteFolderHandler,
-		DeleteNoteHandler:                      permanentlyDeleteNoteHandler,
-		DeleteWorkspaceHandler:                 deleteWorkspaceHandler,
-		MoveWorkspaceItemsHandler:              moveWorkspaceItemsHandler,
-		PermanentlyDeleteWorkspaceItemsHandler: permanentlyDeleteWorkspaceItemsHandler,
-		PublishNoteHandler:                     publishNoteHandler,
-		PublishWorkspaceHandler:                publishWorkspaceHandler,
-		RenameFolderHandler:                    renameFolderHandler,
-		RenameNoteHandler:                      renameNoteHandler,
-		RenameWorkspaceHandler:                 renameWorkspaceHandler,
-		RestoreTrashedWorkspaceItemsHandler:    restoreTrashedWorkspaceItemsHandler,
-		TrashWorkspaceItemsHandler:             trashWorkspaceItemsHandler,
-		UnpublishNoteHandler:                   unpublishNoteHandler,
-		UnpublishWorkspaceHandler:              unpublishWorkspaceHandler,
-		UpdateWorkspaceMembersHandler:          updateWorkspaceMembersHandler,
-	}
+	cmds := app.NewCmds(handlerProvider, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
 	kafka := &configConfig.Kafka
-	tracerProvider, cleanup5, err := otel.NewTracerProvider(ctx, resource)
-	if err != nil {
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
 	kafkaPublisher, cleanup6, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
 	if err != nil {
@@ -192,12 +174,12 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	notifyWorkspaceRenamedHandler := app.NewNotifyWorkspaceRenamedHandler(workspaceEventHub)
 	notifyWorkspaceSlugChangedHandler := app.NewNotifyWorkspaceSlugChangedHandler(workspaceEventHub)
 	events := &app.Events{
-		DocumentCommittedHandler:                   documentCommittedHandler,
-		NoteCreatedDomainToIntegrationEventHandler: noteCreatedDomainToIntegrationEventHandler,
-		NoteUpdatedDomainToIntegrationEventHandler: noteUpdatedDomainToIntegrationEventHandler,
-		NotifyWorkspaceItemsUpdatedHandler:         notifyWorkspaceItemsUpdatedHandler,
-		NotifyWorkspaceRenamedHandler:              notifyWorkspaceRenamedHandler,
-		NotifyWorkspaceSlugChangedHandler:          notifyWorkspaceSlugChangedHandler,
+		DocumentCommitted:                   documentCommittedHandler,
+		NoteCreatedDomainToIntegrationEvent: noteCreatedDomainToIntegrationEventHandler,
+		NoteUpdatedDomainToIntegrationEvent: noteUpdatedDomainToIntegrationEventHandler,
+		NotifyWorkspaceItemsUpdated:         notifyWorkspaceItemsUpdatedHandler,
+		NotifyWorkspaceRenamed:              notifyWorkspaceRenamedHandler,
+		NotifyWorkspaceSlugChanged:          notifyWorkspaceSlugChangedHandler,
 	}
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)
@@ -212,7 +194,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspaceGraph := pgreadmodel.GetWorkspaceGraph(queries)
 	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(authorization, workspaceGraph)
 	workspaceBySlug := pgreadmodel.NewWorkspaceBySlug(queries)
-	getWorkspaceHandler := app.NewGetWorkspaceBySlugHandler(authorization, workspaceBySlug)
+	getWorkspaceBySlugHandler := app.NewGetWorkspaceBySlugHandler(authorization, workspaceBySlug)
 	authentik := &configConfig.Authentik
 	identityAuthentik := identity.NewAuthentik(authentik)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(identityAuthentik, authorization)
@@ -223,20 +205,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(authorization, workspaceTree)
 	showTrash := pgreadmodel.NewShowTrash(queries)
 	showTrashHandler := app.NewShowTrashHandler(authorization, showTrash)
-	appQueries := &app.Queries{
-		CheckWorkspaceSlugExistsHandler: checkWorkspaceSlugExistsHandler,
-		GetMyWorkspacesHandler:          getMyWorkspacesHandler,
-		GetNoteGraphHandler:             getNoteGraphHandler,
-		GetNoteHandler:                  getNoteHandler,
-		GetNoteLinksHandler:             getNoteLinksHandler,
-		GetWorkspaceByNoteHandler:       getWorkspaceByNoteHandler,
-		GetWorkspaceGraphHandler:        getWorkspaceGraphHandler,
-		GetWorkspaceHandler:             getWorkspaceHandler,
-		GetWorkspaceMembersHandler:      getWorkspaceMembersHandler,
-		GetWorkspaceSearchTokenHandler:  getWorkspaceSearchTokenHandler,
-		GetWorkspaceTreeHandler:         getWorkspaceTreeHandler,
-		ShowTrashHandler:                showTrashHandler,
-	}
+	appQueries := app.NewQueries(handlerProvider, checkWorkspaceSlugExistsHandler, getMyWorkspacesHandler, getNoteGraphHandler, getNoteHandler, getNoteLinksHandler, getWorkspaceByNoteHandler, getWorkspaceGraphHandler, getWorkspaceBySlugHandler, getWorkspaceMembersHandler, getWorkspaceSearchTokenHandler, getWorkspaceTreeHandler, showTrashHandler)
 	server := &app.Server{
 		Cmds:              cmds,
 		Events:            events,

@@ -30,7 +30,7 @@ import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 
 import { ErrorAlert } from './error-alert';
 import { SuccessAlert } from './success-alert';

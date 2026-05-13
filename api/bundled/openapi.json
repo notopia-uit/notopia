@@ -10507,7 +10507,7 @@
                 "schema": {
                   "type": "string",
                   "format": "uri",
-                  "example": "http://api.notopia.localhost/workspaces/00000000-0000-0000-0000-000000000110"
+                  "example": "http://api.notopia.localhost/workspaces/00000000-0000-4000-8000-000000000110"
                 }
               }
             },
@@ -19464,6 +19464,49 @@
         }
       }
     },
+    "/note/workspaces/{workspaceId}/leave": {
+      "post": {
+        "security": [
+          {
+            "note_Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "note_OIDC": [
+              "openid"
+            ]
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Leave workspace",
+        "operationId": "leaveWorkspace",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/note_workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content - Workspace successfully left"
+          },
+          "400": {
+            "$ref": "#/components/responses/note_BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/note_UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/note_NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/note_InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/members": {
       "get": {
         "security": [
@@ -20632,7 +20675,7 @@
       "share_id-2": {
         "type": "string",
         "format": "uuid",
-        "example": "00000000-0000-0000-0000-000000000110",
+        "example": "00000000-0000-4000-8000-000000000110",
         "readOnly": true
       },
       "share_WorkspaceRole": {
@@ -20986,7 +21029,7 @@
           "workspaceId": {
             "type": "string",
             "format": "uuid",
-            "example": "00000000-0000-0000-0000-000000000110"
+            "example": "00000000-0000-4000-8000-000000000110"
           },
           "updatedAt": {
             "type": "string",
@@ -21254,7 +21297,7 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "example": "00000000-0000-0000-0000-000000000110",
+            "example": "00000000-0000-4000-8000-000000000110",
             "readOnly": true
           },
           "slug": {
@@ -21277,7 +21320,7 @@
       "note_id-3": {
         "type": "string",
         "format": "uuid",
-        "example": "00000000-0000-0000-0000-000000000110",
+        "example": "00000000-0000-4000-8000-000000000110",
         "readOnly": true
       },
       "note_WorkspaceRole": {

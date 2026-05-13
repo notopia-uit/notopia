@@ -35,12 +35,6 @@ var ProvideRenameWorkspaceHandler = NewRenameWorkspaceHandler
 
 func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspace) error {
 	slog.DebugContext(
-		ctx, "renaming workspace",
-		slog.String("workspace_id", cmd.ID.String()),
-		slog.String("new_name", cmd.Name),
-		slog.String("user_id", cmd.UserID),
-	)
-	slog.DebugContext(
 		ctx, "checking permission",
 		slog.String("user_id", cmd.UserID),
 		slog.String("workspace_id", cmd.ID.String()),
@@ -67,14 +61,6 @@ func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspac
 			return err
 		}
 		workspace.Rename(cmd.Name, cmd.UserID)
-		err = workspaceRepo.Save(ctx, workspace)
-		if err == nil {
-			slog.InfoContext(
-				ctx, "workspace renamed successfully",
-				slog.String("workspace_id", cmd.ID.String()),
-				slog.String("new_name", cmd.Name),
-			)
-		}
-		return err
+		return workspaceRepo.Save(ctx, workspace)
 	})
 }

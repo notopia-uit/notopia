@@ -10,7 +10,7 @@ import (
 )
 
 func TestGetWorkspaceMembersHandler(t *testing.T) {
-	e, err := GetLocalEnforcer(t, true)
+	e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: true})
 	require.NoError(t, err, "Failed to create enforcer")
 
 	handler := app.NewGetWorkspaceMembersHandler(e)
@@ -25,7 +25,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W111-Owner can view members",
 			requesterID: "111",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			expectErr:   false,
 			expectedMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
@@ -36,7 +36,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W111-Editor can view members",
 			requesterID: "112",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			expectErr:   false,
 			expectedMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
@@ -47,7 +47,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:        "W111-Viewer can view members",
 			requesterID: "110",
-			workspaceID: "00000000-0000-0000-0000-000000000111",
+			workspaceID: "00000000-0000-4000-8000-000000000111",
 			expectErr:   false,
 			expectedMembers: []app.WorkspaceMember{
 				{ID: "111", Role: app.WorkspaceRoleOwner},
@@ -58,7 +58,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 		{
 			name:            "W112-Stranger CANNOT view members",
 			requesterID:     "110",
-			workspaceID:     "00000000-0000-0000-0000-000000000112",
+			workspaceID:     "00000000-0000-4000-8000-000000000112",
 			expectErr:       true,
 			expectedMembers: nil,
 		},
@@ -69,7 +69,7 @@ func TestGetWorkspaceMembersHandler(t *testing.T) {
 			t.Parallel()
 			ctx := t.Context()
 			workspaceID := uuid.MustParse(tc.workspaceID)
-			members, err := handler.Handle(ctx, app.GetWorkspaceMembers{
+			members, err := handler.Handle(ctx, &app.GetWorkspaceMembers{
 				UserID:      tc.requesterID,
 				WorkspaceID: workspaceID,
 			})

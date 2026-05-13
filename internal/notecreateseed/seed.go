@@ -16,7 +16,7 @@ import (
 
 const (
 	defaultNamespace = "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
-	workspaceIDStr   = "00000000-0000-0000-0000-000000000110"
+	workspaceIDStr   = "00000000-0000-4000-8000-000000000110"
 	workspaceSlug    = "notopia"
 	workspaceName    = "Notopia"
 	rootFolderName   = ""

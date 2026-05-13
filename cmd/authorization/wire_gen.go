@@ -29,26 +29,6 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	sql := &configConfig.Database
-	db, err := infra.NewGORMDB(sql)
-	if err != nil {
-		return nil, nil, err
-	}
-	adapter, err := infra.NewCasbinAdapter(db)
-	if err != nil {
-		return nil, nil, err
-	}
-	transactionalEnforcer, err := app.NewCasbinEnforcer(adapter)
-	if err != nil {
-		return nil, nil, err
-	}
-	createWorkspaceHandler := app.NewCreateWorkspaceHandler(transactionalEnforcer)
-	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(transactionalEnforcer)
-	getUserWorkspaceItemPermissionsHandler := app.NewGetUserWorkspaceItemPermissionsHandler(transactionalEnforcer)
-	getUserWorkspacesHandler := app.NewGetUserWorkspacesHandler(transactionalEnforcer)
-	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
-	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
-	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
-	kafka := &configConfig.Kafka
 	log := &configConfig.Log
 	stdoutHandler := logging.NewStdoutHandler(log)
 	serviceName := _wireServiceNameValue
@@ -63,44 +43,72 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
-	loggerAdapter := logging.NewWatermill(logger)
-	tracerProvider, cleanup2, err := otel.NewTracerProvider(ctx, resource)
+	db, cleanup2, err := infra.NewGORMDB(sql, logger)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	integrationPublisher, cleanup3, err := infra.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
+	adapter, err := infra.NewCasbinAdapter(db)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer, integrationPublisher)
-	appApp := &app.App{
-		Enforcer:                        transactionalEnforcer,
-		CreateWorkspace:                 createWorkspaceHandler,
-		DeleteWorkspace:                 deleteWorkspaceHandler,
-		GetUserWorkspaceItemPermissions: getUserWorkspaceItemPermissionsHandler,
-		GetUserWorkspaces:               getUserWorkspacesHandler,
-		GetWorkspaceMembers:             getWorkspaceMembersHandler,
-		HasWorkspaceItemPermission:      hasWorkspaceItemPermissionHandler,
-		HasWorkspacePermission:          hasWorkspacePermissionHandler,
-		UpdateWorkspaceMembers:          updateWorkspaceMembersHandler,
+	slogLogger := infra.NewCasbinLogger(logger)
+	transactionalEnforcer, err := app.NewCasbinEnforcer(adapter, slogLogger)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
 	}
-	service := grpc.NewService(appApp)
-	serverConfig := &configConfig.Server
-	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	server, cleanup4, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger)
+	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
+	createWorkspaceHandler := app.NewCreateWorkspaceHandler(transactionalEnforcer)
+	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(transactionalEnforcer)
+	kafka := &configConfig.Kafka
+	loggerAdapter := logging.NewWatermill(logger)
+	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
+	integrationPublisher, cleanup4, err := infra.NewIntegrationPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
 	if err != nil {
 		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	healthHealth := health.New(db, serverConfig, kafka)
-	meterProvider, cleanup5, err := otel.NewMeterProvider(ctx, resource)
+	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(transactionalEnforcer, integrationPublisher)
+	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(transactionalEnforcer, integrationPublisher)
+	cmds := app.NewCmds(handlerProvider, createWorkspaceHandler, deleteWorkspaceHandler, updateWorkspaceMembersHandler, leaveWorkspaceHandler)
+	getUserWorkspaceItemPermissionsHandler := app.NewGetUserWorkspaceItemPermissionsHandler(transactionalEnforcer)
+	getUserWorkspacesHandler := app.NewGetUserWorkspacesHandler(transactionalEnforcer)
+	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(transactionalEnforcer)
+	hasWorkspaceItemPermissionHandler := app.NewHasWorkspaceItemPermissionHandler(transactionalEnforcer)
+	hasWorkspacePermissionHandler := app.NewHasWorkspacePermissionHandler(transactionalEnforcer)
+	queries := app.NewQueries(handlerProvider, getUserWorkspaceItemPermissionsHandler, getUserWorkspacesHandler, getWorkspaceMembersHandler, hasWorkspaceItemPermissionHandler, hasWorkspacePermissionHandler)
+	appApp := &app.App{
+		Enforcer: transactionalEnforcer,
+		Cmds:     cmds,
+		Queries:  queries,
+	}
+	service := grpc.NewService(appApp)
+	serverConfig := &configConfig.Server
+	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
+	server, cleanup5, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger)
 	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	healthHealth := health.New(db, serverConfig, kafka)
+	meterProvider, cleanup6, err := otel.NewMeterProvider(ctx, resource)
+	if err != nil {
+		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
@@ -111,6 +119,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	general := &configConfig.General
 	authorizationServer, err := authorization.NewServer(ctx, server, healthHealth, logger, global, general, appApp)
 	if err != nil {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -119,6 +128,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	return authorizationServer, func() {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()

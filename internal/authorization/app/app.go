@@ -6,18 +6,99 @@ import (
 	"log/slog"
 
 	"github.com/casbin/casbin/v3"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
+	"go.opentelemetry.io/otel/trace"
 )
 
+type HandlerProvider commonhandler.HandlerProvider
+
+func NewHandlerProvider(
+	traceProvider trace.TracerProvider,
+	logger *slog.Logger,
+) *HandlerProvider {
+	tracer := traceProvider.Tracer("authorization-app")
+	return (*HandlerProvider)(
+		commonhandler.NewHandlerProvider(
+			commonhandler.WithTracer(tracer),
+			commonhandler.WithLogger(logger),
+		),
+	)
+}
+
+var ProvideHandlerProvider = NewHandlerProvider
+
+type (
+	CreateWorkspaceCmd        commonhandler.Cmd[CreateWorkspace]
+	DeleteWorkspaceCmd        commonhandler.Cmd[DeleteWorkspace]
+	UpdateWorkspaceMembersCmd commonhandler.Cmd[UpdateWorkspaceMembers]
+	LeaveWorkspaceCmd         commonhandler.Cmd[LeaveWorkspace]
+)
+
+type Cmds struct {
+	CreateWorkspace        CreateWorkspaceCmd
+	DeleteWorkspace        DeleteWorkspaceCmd
+	UpdateWorkspaceMembers UpdateWorkspaceMembersCmd
+	LeaveWorkspace         LeaveWorkspaceCmd
+}
+
+func NewCmds(
+	handlerProvider *HandlerProvider,
+	createWorkspace *CreateWorkspaceHandler,
+	deleteWorkspace *DeleteWorkspaceHandler,
+	updateWorkspaceMembers *UpdateWorkspaceMembersHandler,
+	leaveWorkspace *LeaveWorkspaceHandler,
+) *Cmds {
+	hp := (*commonhandler.HandlerProvider)(handlerProvider)
+	return &Cmds{
+		CreateWorkspace:        commonhandler.DecorateCmd(hp, createWorkspace),
+		DeleteWorkspace:        commonhandler.DecorateCmd(hp, deleteWorkspace),
+		UpdateWorkspaceMembers: commonhandler.DecorateCmd(hp, updateWorkspaceMembers),
+		LeaveWorkspace:         commonhandler.DecorateCmd(hp, leaveWorkspace),
+	}
+}
+
+var ProvideCmds = NewCmds
+
+type (
+	GetUserWorkspaceItemPermissionsCmd commonhandler.Query[GetUserWorkspaceItemPermissions, WorkspaceItemPermissions]
+	GetUserWorkspacesCmd               commonhandler.Query[GetUserWorkspaces, []UserWorkspace]
+	GetWorkspaceMembersCmd             commonhandler.Query[GetWorkspaceMembers, []WorkspaceMember]
+	HasWorkspaceItemPermissionCmd      commonhandler.Query[HasWorkspaceItemPermission, bool]
+	HasWorkspacePermissionCmd          commonhandler.Query[HasWorkspacePermission, bool]
+)
+
+type Queries struct {
+	GetUserWorkspaceItemPermissions GetUserWorkspaceItemPermissionsCmd
+	GetUserWorkspaces               GetUserWorkspacesCmd
+	GetWorkspaceMembers             GetWorkspaceMembersCmd
+	HasWorkspaceItemPermission      HasWorkspaceItemPermissionCmd
+	HasWorkspacePermission          HasWorkspacePermissionCmd
+}
+
+func NewQueries(
+	handlerProvider *HandlerProvider,
+	getUserWorkspaceItemPermissions *GetUserWorkspaceItemPermissionsHandler,
+	getUserWorkspaces *GetUserWorkspacesHandler,
+	getWorkspaceMembers *GetWorkspaceMembersHandler,
+	hasWorkspaceItemPermission *HasWorkspaceItemPermissionHandler,
+	hasWorkspacePermission *HasWorkspacePermissionHandler,
+) *Queries {
+	hp := (*commonhandler.HandlerProvider)(handlerProvider)
+	return &Queries{
+		GetUserWorkspaceItemPermissions: commonhandler.DecorateQuery(hp, getUserWorkspaceItemPermissions),
+		GetUserWorkspaces:               commonhandler.DecorateQuery(hp, getUserWorkspaces),
+		GetWorkspaceMembers:             commonhandler.DecorateQuery(hp, getWorkspaceMembers),
+		HasWorkspaceItemPermission:      commonhandler.DecorateQuery(hp, hasWorkspaceItemPermission),
+		HasWorkspacePermission:          commonhandler.DecorateQuery(hp, hasWorkspacePermission),
+	}
+}
+
+var ProvideQueries = NewQueries
+
 type App struct {
-	Enforcer                        *casbin.TransactionalEnforcer
-	CreateWorkspace                 *CreateWorkspaceHandler
-	DeleteWorkspace                 *DeleteWorkspaceHandler
-	GetUserWorkspaceItemPermissions *GetUserWorkspaceItemPermissionsHandler
-	GetUserWorkspaces               *GetUserWorkspacesHandler
-	GetWorkspaceMembers             *GetWorkspaceMembersHandler
-	HasWorkspaceItemPermission      *HasWorkspaceItemPermissionHandler
-	HasWorkspacePermission          *HasWorkspacePermissionHandler
-	UpdateWorkspaceMembers          *UpdateWorkspaceMembersHandler
+	Enforcer *casbin.TransactionalEnforcer
+	Cmds     *Cmds
+	Queries  *Queries
 }
 
 func (a *App) BootStrapPolicies(ctx context.Context) error {
@@ -66,19 +147,8 @@ func (a *App) BootStrapPolicies(ctx context.Context) error {
 func (a *App) SeedDev(ctx context.Context) error {
 	slog.DebugContext(ctx, "SeedDev: seeding dev user workspace policies")
 
-	devPolicies := [][]string{
-		{"user:111", "owner", "workspace:00000000-0000-0000-0000-000000000111"},
-		{"user:112", "editor", "workspace:00000000-0000-0000-0000-000000000111"},
-		{"user:110", "viewer", "workspace:00000000-0000-0000-0000-000000000111"},
-		{"user:112", "owner", "workspace:00000000-0000-0000-0000-000000000112"},
-		{"user:111", "editor", "workspace:00000000-0000-0000-0000-000000000112"},
-		{"user:110", "owner", "workspace:00000000-0000-0000-0000-000000000110"},
-		{"user:112", "owner", "workspace:00000000-0000-0000-0000-000000000110"},
-		{"user:111", "owner", "workspace:00000000-0000-0000-0000-000000000110"},
-	}
-
-	_, err := a.Enforcer.AddGroupingPolicies(devPolicies)
-	if err != nil {
+	if err := LoadPoliciesFromString(a.Enforcer, PolicyTestCSV); err != nil {
+		slog.ErrorContext(ctx, "SeedDev: failed to load test policies", slog.Any("error", err))
 		return fmt.Errorf("failed to seed dev policies: %w", err)
 	}
 

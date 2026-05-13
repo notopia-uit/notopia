@@ -34,11 +34,6 @@ var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) error {
 	slog.DebugContext(
-		ctx, "deleting workspace",
-		slog.String("workspace_id", cmd.ID.String()),
-		slog.String("user_id", cmd.UserID),
-	)
-	slog.DebugContext(
 		ctx, "checking permission",
 		slog.String("user_id", cmd.UserID),
 		slog.String("workspace_id", cmd.ID.String()),
@@ -67,10 +62,9 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspac
 			return err
 		}
 		workspace.Delete(cmd.UserID)
-		err = workspaceRepo.Save(ctx, workspace)
-		if err == nil {
-			slog.InfoContext(ctx, "workspace deleted successfully", slog.String("workspace_id", cmd.ID.String()))
+		if err := workspaceRepo.Save(ctx, workspace); err != nil {
+			return err
 		}
-		return err
+		return h.authorizationSvc.DeleteWorkspace(ctx, cmd.UserID, cmd.ID)
 	})
 }

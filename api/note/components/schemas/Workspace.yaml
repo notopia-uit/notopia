@@ -5,7 +5,7 @@ properties:
   id:
     type: string
     format: uuid
-    example: 00000000-0000-0000-0000-000000000110
+    example: 00000000-0000-4000-8000-000000000110
     readOnly: true
 
   slug:

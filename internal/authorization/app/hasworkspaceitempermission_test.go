@@ -10,7 +10,7 @@ import (
 )
 
 func TestHasWorkspaceItemPermissionHandler(t *testing.T) {
-	e, err := GetLocalEnforcer(t, true)
+	e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: true})
 	require.NoError(t, err, "Failed to create enforcer")
 
 	handler := app.NewHasWorkspaceItemPermissionHandler(e)
@@ -22,21 +22,22 @@ func TestHasWorkspaceItemPermissionHandler(t *testing.T) {
 		permission  app.WorkspaceItemPermission
 		expected    bool
 	}{
-		{"W111-Owner: Read Note", "111", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissionRead, true},
-		{"W111-Owner: Write Note", "111", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissionWrite, true},
-		{"W111-Owner: Delete Folder", "111", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissionDelete, true},
-		{"W111-Editor: Read Note", "112", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissionRead, true},
-		{"W111-Editor: Write Note", "112", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissionWrite, true},
-		{"W111-Editor: Delete Note", "112", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissionDelete, true},
-		{"W111-Editor: Write Folder", "112", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissionWrite, true},
-		{"W111-Viewer: Read Note", "110", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissionRead, true},
-		{"W111-Viewer: CANNOT Write Note", "110", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissionWrite, false},
-		{"W111-Viewer: CANNOT Delete Folder", "110", "00000000-0000-0000-0000-000000000111", app.WorkspaceItemPermissionDelete, false},
-		{"W112-Owner: Write Note", "112", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissionWrite, true},
-		{"W112-Editor: Write Note", "111", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissionWrite, true},
-		{"W112-Stranger: CANNOT Read Note", "110", "00000000-0000-0000-0000-000000000112", app.WorkspaceItemPermissionRead, false},
-		{"W110-Stranger: User 111 CANNOT Read W110", "111", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissionRead, false},
-		{"W110-Stranger: User 112 CANNOT Read W110", "112", "00000000-0000-0000-0000-000000000110", app.WorkspaceItemPermissionRead, false},
+		{"W111-Owner: Read Note", "111", "00000000-0000-4000-8000-000000000111", app.WorkspaceItemPermissionRead, true},
+		{"W111-Owner: Write Note", "111", "00000000-0000-4000-8000-000000000111", app.WorkspaceItemPermissionWrite, true},
+		{"W111-Owner: Delete Folder", "111", "00000000-0000-4000-8000-000000000111", app.WorkspaceItemPermissionDelete, true},
+		{"W111-Editor: Read Note", "112", "00000000-0000-4000-8000-000000000111", app.WorkspaceItemPermissionRead, true},
+		{"W111-Editor: Write Note", "112", "00000000-0000-4000-8000-000000000111", app.WorkspaceItemPermissionWrite, true},
+		{"W111-Editor: Delete Note", "112", "00000000-0000-4000-8000-000000000111", app.WorkspaceItemPermissionDelete, true},
+		{"W111-Editor: Write Folder", "112", "00000000-0000-4000-8000-000000000111", app.WorkspaceItemPermissionWrite, true},
+		{"W111-Viewer: Read Note", "110", "00000000-0000-4000-8000-000000000111", app.WorkspaceItemPermissionRead, true},
+		{"W111-Viewer: CANNOT Write Note", "110", "00000000-0000-4000-8000-000000000111", app.WorkspaceItemPermissionWrite, false},
+		{"W111-Viewer: CANNOT Delete Folder", "110", "00000000-0000-4000-8000-000000000111", app.WorkspaceItemPermissionDelete, false},
+		{"W112-Owner: Write Note", "112", "00000000-0000-4000-8000-000000000112", app.WorkspaceItemPermissionWrite, true},
+		{"W112-Editor: Write Note", "111", "00000000-0000-4000-8000-000000000112", app.WorkspaceItemPermissionWrite, true},
+		{"W112-Stranger: CANNOT Read Note", "110", "00000000-0000-4000-8000-000000000112", app.WorkspaceItemPermissionRead, false},
+		{"W110-Owner: User 110 CAN Read W110", "110", "00000000-0000-4000-8000-000000000110", app.WorkspaceItemPermissionRead, true},
+		{"W110-Owner: User 111 CAN Read W110", "111", "00000000-0000-4000-8000-000000000110", app.WorkspaceItemPermissionRead, true},
+		{"W110-Owner: User 112 CAN Read W110", "112", "00000000-0000-4000-8000-000000000110", app.WorkspaceItemPermissionRead, true},
 	}
 
 	for _, tc := range tests {
@@ -44,7 +45,7 @@ func TestHasWorkspaceItemPermissionHandler(t *testing.T) {
 			t.Parallel()
 			ctx := t.Context()
 			workspaceID := uuid.MustParse(tc.workspaceID)
-			ok, err := handler.Handle(ctx, app.HasWorkspaceItemPermission{
+			ok, err := handler.Handle(ctx, &app.HasWorkspaceItemPermission{
 				UserID:      tc.userID,
 				WorkspaceID: workspaceID,
 				Permission:  tc.permission,

@@ -66,6 +66,8 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_events.yaml
   /note/workspaces/{workspaceId}/graph:
     $ref: ./paths/workspaces_{workspaceId}_graph.yaml
+  /note/workspaces/{workspaceId}/leave:
+    $ref: ./paths/workspaces_{workspaceId}_leave.yaml
   /note/workspaces/{workspaceId}/members:
     $ref: ./paths/workspaces_{workspaceId}_members.yaml
   /note/workspaces/{workspaceId}/move-items:

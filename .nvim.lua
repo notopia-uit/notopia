@@ -303,6 +303,7 @@ lsp.config("oxfmt", {
 } --[[@as vim.lsp.Config]])
 
 lsp.enable({
+  "buf_ls",
   "ecfg",
   "emmet_language_server",
   "gh_actions_ls",

@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -32,7 +31,6 @@ func NewGetWorkspaceByNoteHandler(
 var ProvideGetWorkspaceByNoteHandler = NewGetWorkspaceByNoteHandler
 
 func (h *GetWorkspaceByNoteHandler) Handle(ctx context.Context, query *GetWorkspaceByNote) (Workspace, error) {
-	slog.DebugContext(ctx, "Handling get workspace by note query", slog.String("note_id", query.NoteID.String()))
 	workspace, err := h.readModel.GetWorkspaceByNoteID(ctx, query.NoteID)
 	if err != nil {
 		return Workspace{}, err
@@ -46,6 +44,5 @@ func (h *GetWorkspaceByNoteHandler) Handle(ctx context.Context, query *GetWorksp
 			fmt.Sprintf("user %s does not have permission to read workspace %s", query.UserID, workspace.ID),
 		)
 	}
-	slog.InfoContext(ctx, "Get workspace by note query completed", slog.String("workspace_id", workspace.ID.String()))
 	return workspace, nil
 }

@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
@@ -29,7 +28,7 @@ func NewUpdateWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer, pu
 
 var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
 
-func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params UpdateWorkspaceMembers) error {
+func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params *UpdateWorkspaceMembers) error {
 	editAllowed, err := h.enforcer.Enforce(
 		formatUser(params.UserID),
 		formatWorkspace(params.WorkspaceID),
@@ -46,7 +45,7 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params Updat
 	var oldMembers []WorkspaceMember
 	var eventsToPublish []IntegrationEvent
 
-	err = h.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
+	return h.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {
 		bufferedModel, err := tx.GetBufferedModel()
 		if err != nil {
 			return errs.NewCasbinInternalError(err)
@@ -96,16 +95,6 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params Updat
 
 		return nil
 	})
-	if err != nil {
-		return err
-	}
-
-	slog.InfoContext(ctx, "updated workspace members",
-		slog.String("user_id", params.UserID),
-		slog.String("workspace_id", params.WorkspaceID.String()),
-		slog.Int("member_count", len(params.Members)),
-	)
-	return nil
 }
 
 func compareAndGenerateEvents(workspaceID uuid.UUID, oldMembers, newMembers []WorkspaceMember) []IntegrationEvent {

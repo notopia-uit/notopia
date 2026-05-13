@@ -1,0 +1,24 @@
+# vim: ft=yaml.openapi
+post:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - Workspace
+  summary: Leave workspace
+  operationId: leaveWorkspace
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  responses:
+    204:
+      description: No Content - Workspace successfully left
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

@@ -2,22 +2,18 @@ package infra
 
 import (
 	"fmt"
+	"log/slog"
 
 	gormadapter "github.com/casbin/gorm-adapter/v3"
-	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
-	"gorm.io/driver/postgres"
+	"github.com/notopia-uit/notopia/pkg/casbin"
 	"gorm.io/gorm"
 )
 
-func NewGORMDB(databaseCfg *commonconfig.SQL) (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open(databaseCfg.GetDSN()))
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
-	}
-	return db, nil
+func NewCasbinLogger(logger *slog.Logger) *casbin.SlogLogger {
+	return casbin.NewSlogLogger(logger)
 }
 
-var ProvideGORMDB = NewGORMDB
+var ProvideCasbinLogger = NewCasbinLogger
 
 func NewCasbinAdapter(
 	gormDB *gorm.DB,

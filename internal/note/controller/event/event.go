@@ -161,14 +161,14 @@ func (e *Event) setup() error {
 
 	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
 		"NotifyWorkspaceRenamedHandler",
-		e.app.Events.NotifyWorkspaceRenamedHandler.Handle,
+		e.app.Events.NotifyWorkspaceRenamed.Handle,
 	)); err != nil {
 		return fmt.Errorf("failed to add event handler NotifyWorkspaceRenamedHandler: %w", err)
 	}
 
 	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
 		"NotifyWorkspaceSlugChangedHandler",
-		e.app.Events.NotifyWorkspaceSlugChangedHandler.Handle,
+		e.app.Events.NotifyWorkspaceSlugChanged.Handle,
 	)); err != nil {
 		return fmt.Errorf("failed to add event handler NotifyWorkspaceSlugChangedHandler: %w", err)
 	}

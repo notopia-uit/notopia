@@ -13,7 +13,7 @@ func TestCreateWorkspaceHandler(t *testing.T) {
 
 	ctx := t.Context()
 
-	e, err := GetLocalEnforcer(t, false)
+	e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: false})
 	require.NoError(t, err, "Failed to create enforcer")
 
 	handler := app.NewCreateWorkspaceHandler(e)
@@ -21,7 +21,7 @@ func TestCreateWorkspaceHandler(t *testing.T) {
 	workspaceID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	userID := "000"
 
-	err = handler.Handle(ctx, app.CreateWorkspace{
+	err = handler.Handle(ctx, &app.CreateWorkspace{
 		OwnerID:     userID,
 		WorkspaceID: workspaceID,
 	})
