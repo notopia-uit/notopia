@@ -45,7 +45,7 @@ seed-init-document: prepare-seed-document seed-document
 [parallel]
 seed-init-search: prepare-seed-search seed-search
 
-seed-note db-connection=note-db-connection:
+seed-note db-connection=note-db-connection: prepare-seed-note
     psql {{ db-connection }} \
       -f ./internal/notecreateseed/seed.sql \
       -f ./internal/notecreateseed/seed.gen.sql
