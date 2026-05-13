@@ -3,7 +3,7 @@
 services:
   dbgate:
     image: dbgate/dbgate:7.1.11-alpine
-    container_name: dbgate
+    container_name: notopia-dbgate
     environment:
       SKIP_ALL_AUTH: true
 
