@@ -30,7 +30,7 @@ import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { ErrorAlert } from './error-alert';
 import { SuccessAlert } from './success-alert';
@@ -64,7 +64,7 @@ const generateSlug = (name: string) => {
 const WorkspaceSwitcher = () => {
   const queryClient = useQueryClient();
   const _data = useQuery({
-    ...getMyWorkspacesOptions({}),
+    ...getMyWorkspacesOptions(),
     select: mapUserWorkspaceDtoToDomain,
   });
 
@@ -87,11 +87,14 @@ const WorkspaceSwitcher = () => {
 
   const { alert, showAlert } = useAlert();
 
-  if (isGetMyWorkspacesError || !allWorkspaceData) {
+  if (isGetMyWorkspacesError) {
     throw getMyWorkspacesError;
-  } else {
-    setWorkspaces(allWorkspaceData);
   }
+  useEffect(() => {
+    if (allWorkspaceData) {
+      setWorkspaces(allWorkspaceData);
+    }
+  }, [allWorkspaceData]);
   const { mutate: createWorkspace, isPending: isCreating } = useCreateWorkspaceMutation({
     onSuccess: async (responses, variables) => {
       await queryClient.invalidateQueries({

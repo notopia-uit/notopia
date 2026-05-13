@@ -22,13 +22,15 @@ import { NoteService } from './note.service';
           if (!servicesCfg) {
             throw new Error('SERVICE_CONFIG not found');
           }
+          const protoPath = join(process.cwd(), 'proto/note/note.proto');
+          const includeDirs = [join(process.cwd(), 'proto')];
           return {
             transport: Transport.GRPC,
             options: {
               package: NOTE_PACKAGE_NAME,
-              protoPath: join(__dirname, '../../../proto/note/note.proto'),
+              protoPath,
               loader: {
-                includeDirs: [join(__dirname, '../../../proto')],
+                includeDirs,
               },
               url: servicesCfg.noteUrl,
             },

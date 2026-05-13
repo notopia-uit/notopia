@@ -1,5 +1,9 @@
+import { fetchAccessTokenServerSide } from '@notopia-uit/ui/lib/get-access-token';
 import { betterAuth } from 'better-auth';
+import { createAuthMiddleware } from 'better-auth/api';
 import { genericOAuth } from 'better-auth/plugins';
+
+import { client } from '../../../api-gen/src/client.gen';
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
@@ -21,4 +25,15 @@ export const auth = betterAuth({
       ],
     }),
   ],
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      const newSession = ctx.context.session ?? ctx.context.newSession;
+      if (newSession) {
+        client.setConfig({
+          auth: fetchAccessTokenServerSide,
+        });
+      }
+      return Promise.resolve();
+    }),
+  },
 });

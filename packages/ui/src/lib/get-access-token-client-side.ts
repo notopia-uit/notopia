@@ -1,14 +1,12 @@
 'use client';
-import { auth } from '@notopia-uit/ui/lib/auth';
+import { authClient } from '@notopia-uit/ui/lib/auth-client';
 
 export const fetchAccessTokenClientSide = async (): Promise<string> => {
-  const data = await auth.api.getAccessToken({
-    body: {
-      providerId: 'authentik',
-    },
+  const data = await authClient.getAccessToken({
+    providerId: 'authentik',
   });
-  if (!data?.accessToken) {
+  if (!data?.data?.accessToken) {
     throw new Error('Missing Authentik access token');
   }
-  return data.accessToken;
+  return data.data.accessToken;
 };
