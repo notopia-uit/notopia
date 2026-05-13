@@ -36,13 +36,10 @@ shadcnadd component:
 
 seed-init: seed-init-note seed-init-document seed-init-search
 
-[parallel]
 seed-init-note: prepare-seed-note seed-note
 
-[parallel]
 seed-init-document: prepare-seed-document seed-document
 
-[parallel]
 seed-init-search: prepare-seed-search seed-search
 
 seed-note db-connection=note-db-connection: prepare-seed-note

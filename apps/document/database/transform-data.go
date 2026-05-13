@@ -55,8 +55,8 @@ func main() {
 	}
 
 	config := Config{
-		SourceDir:     "../../../submodule/trshpuppy-obsidian-notes",
-		OutputDir:     "./seed-data",
+		SourceDir:     "submodule/trshpuppy-obsidian-notes",
+		OutputDir:     "apps/document/database/seed-data",
 		MaxGoroutines: *maxGoroutines,
 		NamespaceUUID: namespaceUUID,
 	}

@@ -11,7 +11,6 @@ const NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 const WORKSPACE_ID = '00000000-0000-4000-8000-000000000110';
 const SOURCE_DIR = path.join(__dirname, '../../../submodule/trshpuppy-obsidian-notes');
 const OUTPUT_DIR = path.join(__dirname, 'data');
-console.log(`Source Directory: ${SOURCE_DIR}`);
 
 // Regex
 const frontmatterRegex = /^---\n[^]*?\n---\n/;
