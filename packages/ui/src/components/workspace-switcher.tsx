@@ -79,9 +79,6 @@ const WorkspaceSwitcher = () => {
   // workspaces and selectedId are initialized from allWorkspaceData once at mount. If the underlying getMyWorkspaces query refetches (on focus, reconnect, manual invalidation, etc.), useSuspenseQuery updates allWorkspaceData but the local useState snapshot is never re-synced, so the UI will silently drift from server state. Combined with the TODO at Line 69, this whole component currently operates on local-only edits.
   // Consider either deriving the list directly from the query data (with a mutation that invalidates the query) or using useEffect to sync — but the former is the idiomatic React Query pattern.
 
-  if (isGetMyWorkspacesError) {
-    throw getMyWorkspacesError;
-  }
   const [workspaces, setWorkspaces] = useState<UserWorkspace[]>([]);
   const [selectedId, setSelectedId] = useState<string>();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -90,6 +87,11 @@ const WorkspaceSwitcher = () => {
 
   const { alert, showAlert } = useAlert();
 
+  if (isGetMyWorkspacesError || !allWorkspaceData) {
+    throw getMyWorkspacesError;
+  } else {
+    setWorkspaces(allWorkspaceData);
+  }
   const { mutate: createWorkspace, isPending: isCreating } = useCreateWorkspaceMutation({
     onSuccess: async (responses, variables) => {
       await queryClient.invalidateQueries({
