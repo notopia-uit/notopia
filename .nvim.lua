@@ -420,10 +420,42 @@ local function track_may_progress()
     string.format("Passed: %d day(s)\nLeft: %d day(s)\nProgress: %.1f%%", days_elapsed, days_remaining, percentage)
 
   local level = vim.log.levels.INFO
-  if percentage >= 70 then
-    level = vim.log.levels.ERROR
-  elseif percentage >= 40 then
+  if percentage >= 40 then
     level = vim.log.levels.WARN
+    msg = msg .. "\nHurry up! May is almost over!"
+  elseif percentage >= 60 then
+    level = vim.log.levels.WARN
+    msg = msg .. "\nWe are down to the wire on this project, so we need to wrap it up immediately"
+  elseif percentage >= 65 then
+    level = vim.log.levels.WARN
+    msg = msg .. "\nWith the deadline looming, we have to accelerate our submission process"
+  elseif percentage >= 70 then
+    level = vim.log.levels.ERROR
+    msg = msg .. "\nWe're in the eleventh hour, so it’s crunch time to finish this"
+  elseif percentage >= 75 then
+    level = vim.log.levels.ERROR
+    msg = msg .. "\nWe really need to move quickly to meet the 5 p.m. cutoff"
+  elseif percentage >= 80 then
+    level = vim.log.levels.ERROR
+    msg = msg .. "\nTime's running out! May is ending soon!"
+  elseif percentage >= 85 then
+    level = vim.log.levels.ERROR
+    msg = msg .. "\nThe clock is ticking! We have to finish this immediately!"
+  elseif percentage >= 90 then
+    level = vim.log.levels.ERROR
+    msg = msg .. "\nThis is the final stretch! We have to finish this right now!"
+  elseif percentage >= 95 then
+    level = vim.log.levels.ERROR
+    msg = msg .. "\nThe deadline is here! We have to submit this immediately!"
+  elseif percentage >= 96 then
+    level = vim.log.levels.ERROR
+    msg = msg .. "\nIt's the last minute! We have to submit this right now!"
+  elseif percentage >= 98 then
+    level = vim.log.levels.ERROR
+    msg = msg .. "\nThe deadline is upon us! We have to submit this immediately"
+  elseif percentage >= 99 then
+    level = vim.log.levels.ERROR
+    msg = msg .. "\nIt's the final countdown! We have to submit this right now"
   end
   vim.notify(msg, level, { title = "Progress" })
 end
