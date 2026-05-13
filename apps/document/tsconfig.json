@@ -4,6 +4,7 @@
     "module": "preserve",
     "moduleResolution": "bundler",
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "types": ["node"],

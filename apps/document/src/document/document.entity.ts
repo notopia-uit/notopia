@@ -4,7 +4,7 @@ import { RevisionEntity } from '#/revision/revision.entity';
 
 @Entity('documents')
 export class DocumentEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('uuid', { type: 'uuid' })
   id!: string;
 
   @Column({ type: 'bytea' })
