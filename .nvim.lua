@@ -417,7 +417,7 @@ local function track_may_progress()
   local percentage = math.min(100, math.max(0, (elapsed_sec / total_duration) * 100))
 
   local msg =
-    string.format("Passed: %d day(s)\nLeft: %d day(s)\nProgress: %.0f%%", days_elapsed, days_remaining, percentage)
+    string.format("Passed: %d day(s)\nLeft: %d day(s)\nProgress: %.1f%%", days_elapsed, days_remaining, percentage)
 
   local level = vim.log.levels.INFO
   if percentage >= 70 then
