@@ -41,12 +41,19 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
   } = useQuery({
     ...getMyWorkspacesOptions({}),
   });
+  const [workspaceName, setWorkspaceName] = useState('');
+  useEffect(() => {
+    if (allWorkspaceData) {
+      const currentWorkspace = allWorkspaceData.find((ws) => ws.workspace.id === workspaceId);
+      if (currentWorkspace) {
+        setWorkspaceName(currentWorkspace.workspace.name);
+      }
+    }
+  }, [allWorkspaceData, workspaceId]);
+
   if (isError) {
     throw error;
   }
-  const [workspaceName, setWorkspaceName] = useState(
-    allWorkspaceData.find((ws) => ws.workspace.id === workspaceId)?.workspace.name || ''
-  );
   const { alert, showAlert } = useAlert();
 
   const { mutate: renameWorkspace, isPending: isRenaming } = useRenameWorkspaceMutation({

@@ -85,19 +85,20 @@ const formatDate = (isoString: string) => {
   }).format(date);
 };
 
+const EMPTY_TRASH_DATA: TrashedData = { notes: [], folders: [] };
 //TODO: add dialog onSuccess and onError for delete and restore action, also add confirm dialog when user click delete permanently or empty trash
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient();
   const { data, isError, error, isPending } = useQuery({
     ...showTrashOptions({ path: { workspaceId: workspaceId } }),
-    select: (data) => mapDtoTrashedData(data),
+    select: mapDtoTrashedData,
   });
 
   if (isError) {
     throw error;
   }
 
-  const trashedData = data ? data : { notes: [], folders: [] };
+  const trashedData = data || EMPTY_TRASH_DATA;
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   const displayData = useMemo(() => {
