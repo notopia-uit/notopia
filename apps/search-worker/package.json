@@ -8,6 +8,7 @@
   "dependencies": {
     "@blocknote/core": "catalog:",
     "@blocknote/server-util": "catalog:",
+    "@floating-ui/dom": "catalog:",
     "@nestjs/common": "catalog:",
     "@nestjs/config": "catalog:",
     "@nestjs/core": "catalog:",

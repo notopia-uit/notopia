@@ -16,6 +16,7 @@
     "@blocknote/core": "catalog:",
     "@blocknote/server-util": "catalog:",
     "@bufbuild/protobuf": "catalog:",
+    "@floating-ui/dom": "catalog:",
     "@grpc/grpc-js": "catalog:",
     "@grpc/proto-loader": "catalog:",
     "@hocuspocus/extension-database": "catalog:",

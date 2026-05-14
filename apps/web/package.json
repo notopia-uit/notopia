@@ -3,16 +3,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "next": "next"
+    "next": "next",
+    "next:experimental-analyze": "next experimental-analyze"
   },
   "dependencies": {
     "@blocknote/shadcn": "catalog:",
+    "@floating-ui/dom": "catalog:",
     "@hocuspocus/provider": "catalog:",
     "@hocuspocus/provider-react": "catalog:",
     "@notopia-uit/api-gen": "workspace:",
     "@notopia-uit/ui": "workspace:",
     "@tailwindcss/postcss": "catalog:",
     "@tanstack/react-query": "catalog:",
+    "@vercel/otel": "catalog:",
     "better-auth": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
@@ -22,7 +25,8 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "shadcn": "catalog:",
-    "tailwindcss": "catalog:"
+    "tailwindcss": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "autoprefixer": "catalog:",
