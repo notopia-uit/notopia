@@ -316,6 +316,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     return parentId;
   }, [viewState, items, rootId]);
 
+  //TODO: this only mutate local state, need to call API to update data on server and handle errors, etc.
   const onDrop = useCallback(
     (draggedItems: TreeItem<string>[], target: DraggingPosition) => {
       setItems((prevItems) => {
@@ -352,9 +353,9 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
             };
           }
         } else if (target.targetType === 'root') {
-          const rootItem = newItems['root'];
+          const rootItem = newItems[rootId];
           if (rootItem) {
-            newItems['root'] = {
+            newItems[rootId] = {
               ...rootItem,
               children: [...(rootItem.children || []), ...draggedItems.map((i) => i.index)],
             };

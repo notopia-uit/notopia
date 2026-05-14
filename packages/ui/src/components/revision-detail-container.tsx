@@ -3,7 +3,7 @@ import { Block } from '@blocknote/core';
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
 import { DocumentRevisionWithContent, getRevisionWithContentOptions } from '@notopia-uit/api-gen';
-import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner.jsx';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useQuery } from '@tanstack/react-query';
 
 import { ScrollArea } from './shadcn/scroll-area';

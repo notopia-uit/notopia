@@ -9,7 +9,6 @@ import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
-import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   BadgeCheck,

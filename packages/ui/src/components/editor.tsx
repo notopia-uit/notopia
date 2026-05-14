@@ -79,7 +79,7 @@ function EditorStatus() {
             </div>
           </TooltipTrigger>
           <TooltipContent>
-            {sync === 'syncing' ? 'Saving changes...' : 'All changes saved to Nexote'}
+            {sync === 'syncing' ? 'Saving changes...' : 'All changes saved to server'}
           </TooltipContent>
         </Tooltip>
 
