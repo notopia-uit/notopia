@@ -36,23 +36,23 @@ classes: {
 
 user: User {
   browser: Browser {
-    icon: https://cdn.simpleicons.org/googlechrome/e64553
+    icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/googlechrome.svg
   }
 }
 
 gateway: Gateway {
-  icon: https://cdn.simpleicons.org/traefikproxy/04a5e5
+  icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/traefikproxy.svg
 }
 
 apps: Apps {
   web: Web {
-    icon: https://cdn.simpleicons.org/nextdotjs/4c4f69
+    icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/nextdotjs.svg
   }
 }
 
 services: Services {
   identity_provider: Identity Provider {
-    icon: https://cdn.simpleicons.org/authentik/fe640b
+    icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/authentik.svg
   }
 
   object_storage: Object Storage {
@@ -61,13 +61,13 @@ services: Services {
 
   document: Document Service Group {
     document_service: Document Service {
-      icon: https://cdn.simpleicons.org/nodedotjs/40a02b
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/nodedotjs.svg
     }
     database: Database {
-      icon: https://cdn.simpleicons.org/postgresql/7287fd
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/postgresql.svg
     }
     pub_sub: Pub/Sub {
-      icon: https://cdn.simpleicons.org/redis/d20f39
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/redis.svg
       class: notUsed
     }
     document_service -> database
@@ -78,13 +78,13 @@ services: Services {
 
   note: Note Service Group {
     note_service: Note Service {
-      icon: https://cdn.simpleicons.org/go/04a5e5
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/go.svg
     }
     database: Database {
-      icon: https://cdn.simpleicons.org/postgresql/7287fd
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/postgresql.svg
     }
     pub_sub: Pub/Sub {
-      icon: https://cdn.simpleicons.org/redis/d20f39
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/redis.svg
     }
     note_service -> database
     note_service -> pub_sub
@@ -92,23 +92,23 @@ services: Services {
 
   authorization: Authorization Service Group {
     authorization_service: Authorization Service {
-      icon: https://cdn.simpleicons.org/go/04a5e5
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/go.svg
     }
     database: Database {
-      icon: https://cdn.simpleicons.org/postgresql/7287fd
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/postgresql.svg
     }
     authorization_service -> database
   }
 
   search: Search Service Group {
     search_service: Meilisearch {
-      icon: https://cdn.simpleicons.org/meilisearch/ea76cb
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/meilisearch.svg
     }
     search_sync_worker: Sync Worker {
-      icon: https://cdn.simpleicons.org/nodedotjs/40a02b
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/nodedotjs.svg
     }
     search_sync_worker_database: Sync Database {
-      icon: https://cdn.simpleicons.org/redis/d20f39
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@v16/icons/redis.svg
       class: notUsed
     }
     search_sync_worker -> search_service
