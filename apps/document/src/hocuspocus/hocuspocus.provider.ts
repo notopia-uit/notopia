@@ -2,6 +2,7 @@ import { Database } from '@hocuspocus/extension-database';
 import { Logger as HocuspocusLogger } from '@hocuspocus/extension-logger';
 import { Hocuspocus } from '@hocuspocus/server';
 import { Logger, Provider } from '@nestjs/common';
+import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
 
 import { AuthenticationService } from '#/authentication/authentication.service';
 import { AuthorizationService } from '#/authorization/authorization.service';
@@ -18,7 +19,7 @@ export const HocuspocusProvider: Provider = {
     authorizationService: AuthorizationService,
     authenticationService: AuthenticationService
   ) => {
-    const logger = new Logger('Hocuspocus');
+    const logger = new Logger(Hocuspocus.name);
     return new Hocuspocus<HocuspocusContext>({
       name: 'document', // TODO: Inject host
       extensions: [
@@ -62,7 +63,8 @@ export const HocuspocusProvider: Provider = {
       },
 
       async onChange(data) {
-        data.document.setIsModified(true);
+        const metadata = data.document.getMap('metadata') as YDocMetadataMap;
+        metadata.set('metadata', { modified: true });
         return Promise.resolve();
       },
     });

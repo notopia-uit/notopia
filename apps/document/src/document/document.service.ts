@@ -2,7 +2,13 @@ import { randomUUID } from 'crypto';
 
 import { type MyBlock, type MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import { Inject, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { type ShareDocumentCommittedEvent } from '@notopia-uit/api-gen';
@@ -153,7 +159,7 @@ export class DocumentService {
 
   async updateDataById(id: string, data: Buffer): Promise<void> {
     this.logger.debug(`updateDataById: id=${id} dataLength=${data.length}`);
-    await this.repo.update(id, { data });
+    await this.repo.update(id, { data, modified: true });
   }
 
   async getById(id: string): Promise<DocumentEntity | null> {

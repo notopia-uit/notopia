@@ -95,13 +95,4 @@ export class HocuspocusService {
       }
     }
   }
-
-  setDocumentModifiedFalse(documentId: string) {
-    for (const [documentName, document] of this.hocuspocus.documents) {
-      if (documentName === documentId) {
-        document.setIsModified(false);
-        break;
-      }
-    }
-  }
 }
