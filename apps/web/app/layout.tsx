@@ -1,6 +1,6 @@
 import QueryClientProvider from '@notopia-uit/ui/components/client-query-provider';
 import { ThemeProvider } from '@notopia-uit/ui/components/theme-provider';
-import { TokenProvider } from '@notopia-uit/ui/components/token-provider';
+import { ApiProvider } from '@notopia-uit/ui/components/token-provider';
 
 import './globals.css';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             scriptProps={{ type: 'application/json' }}
           >
             <QueryClientProvider>
-              <TokenProvider>{children}</TokenProvider>
+              <ApiProvider>{children}</ApiProvider>
             </QueryClientProvider>
           </ThemeProvider>
         </body>
