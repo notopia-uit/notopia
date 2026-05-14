@@ -3,7 +3,7 @@
 services:
   rustfs:
     container_name: notopia-rustfs
-    image: rustfs/rustfs:1.0.0-beta.1-glibc
+    image: rustfs/rustfs:1.0.0-beta.2-glibc
     environment:
       RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:-notopiauit}
       RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:-notopiauit}
