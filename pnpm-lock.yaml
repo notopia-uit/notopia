@@ -55,8 +55,8 @@ catalogs:
       specifier: 13.13.0
       version: 13.13.0
     '@nestjs/common':
-      specifier: 11.1.20
-      version: 11.1.20
+      specifier: 11.1.19
+      version: 11.1.19
     '@nestjs/config':
       specifier: 4.0.4
       version: 4.0.4
@@ -316,13 +316,13 @@ importers:
     dependencies:
       '@nestjs/common':
         specifier: 'catalog:'
-        version: 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
       next:
         specifier: 'catalog:'
         version: 16.2.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.97.3)
@@ -347,7 +347,7 @@ importers:
         version: 11.0.10(typescript@6.0.3)
       '@nestjs/testing':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)
       '@nx/docker':
         specifier: 22.7.1
         version: 22.7.1(nx@22.7.1(@swc-node/register@1.11.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@swc/core@1.15.33(@swc/helpers@0.5.21))(@swc/types@0.1.26)(typescript@6.0.3))(@swc/core@1.15.33(@swc/helpers@0.5.21)))
@@ -542,29 +542,28 @@ importers:
         version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
       '@nestjs/common':
         specifier: 'catalog:'
-        version: 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/config':
         specifier: 'catalog:'
-        version: 4.0.4(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
+        version: 4.0.4(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
       '@nestjs/core':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/microservices':
         specifier: 'catalog:'
-        version: 11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
       '@nestjs/platform-ws':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.20)(rxjs@7.8.2)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.20)(rxjs@7.8.2)
       '@nestjs/typeorm':
         specifier: 'catalog:'
-
-        version: 11.0.1(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.29(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3)))
+        version: 11.0.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.29(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@25.6.0)(typescript@6.0.3)))
       '@nestjs/websockets':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@notopia-uit/api-document-nestjs-server':
         specifier: 'workspace:'
         version: link:../../packages/api-document-nestjs-server
@@ -612,10 +611,10 @@ importers:
         version: 18.0.3
       nestjs-otel:
         specifier: 'catalog:'
-        version: 8.0.2(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
+        version: 8.0.2(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
       nestjs-pino:
         specifier: 'catalog:'
-        version: 4.6.1(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2)
+        version: 4.6.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2)
       pino-http:
         specifier: 'catalog:'
         version: 11.0.0
@@ -649,7 +648,7 @@ importers:
     devDependencies:
       '@nestjs/testing':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)
       '@notopia-uit/api-gen':
         specifier: 'workspace:'
         version: link:../../packages/api-gen
@@ -685,19 +684,19 @@ importers:
         version: 0.50.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(prosemirror-model@1.25.4)(prosemirror-state@1.4.4)(prosemirror-view@1.41.6)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@nestjs/common':
         specifier: 'catalog:'
-        version: 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/config':
         specifier: 'catalog:'
-        version: 4.0.4(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
+        version: 4.0.4(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
       '@nestjs/core':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/microservices':
         specifier: 'catalog:'
-        version: 11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
       '@notopia-uit/api-gen':
         specifier: 'workspace:'
         version: link:../../packages/api-gen
@@ -736,10 +735,10 @@ importers:
         version: 0.57.0
       nestjs-otel:
         specifier: 'catalog:'
-        version: 8.0.2(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
+        version: 8.0.2(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
       nestjs-pino:
         specifier: 'catalog:'
-        version: 4.6.1(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2)
+        version: 4.6.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2)
       pino-http:
         specifier: 'catalog:'
         version: 11.0.0
@@ -761,7 +760,7 @@ importers:
     devDependencies:
       '@nestjs/testing':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)
       webpack-node-externals:
         specifier: 'catalog:'
         version: 3.0.0
@@ -770,13 +769,13 @@ importers:
     dependencies:
       '@blocknote/shadcn':
         specifier: 'catalog:'
-        version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(postcss@8.4.49)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.4)
+        version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(postcss@8.4.49)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwindcss@4.2.4)
       '@hocuspocus/provider':
         specifier: 'catalog:'
         version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
       '@hocuspocus/provider-react':
         specifier: 'catalog:'
-        version: 4.0.0(@hocuspocus/provider@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30))(react@19.2.5)(yjs@13.6.30)
+        version: 4.0.0(@hocuspocus/provider@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30))(react@19.2.6)(yjs@13.6.30)
       '@notopia-uit/api-gen':
         specifier: 'workspace:'
         version: link:../../packages/api-gen
@@ -803,7 +802,7 @@ importers:
         version: 1.6.0(react@19.2.6)
       next:
         specifier: 'catalog:'
-        version: 16.2.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(sass@1.97.3)
+        version: 16.2.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.97.3)
       postcss:
         specifier: 'catalog:'
         version: 8.4.49
@@ -871,13 +870,13 @@ importers:
     dependencies:
       '@nestjs/common':
         specifier: 'catalog:'
-        version: 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: 'catalog:'
-        version: 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
+        version: 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
       '@swc/helpers':
         specifier: 'catalog:'
         version: 0.5.21
@@ -911,17 +910,16 @@ importers:
         version: 0.50.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(highlight.js@11.11.1)(lowlight@3.3.0)
       '@blocknote/react':
         specifier: 'catalog:'
-        version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@hocuspocus/provider':
         specifier: 'catalog:'
         version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
       '@hocuspocus/provider-react':
         specifier: 'catalog:'
-        version: 4.0.0(@hocuspocus/provider@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30))(react@19.2.5)(yjs@13.6.30)
+        version: 4.0.0(@hocuspocus/provider@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30))(react@19.2.6)(yjs@13.6.30)
       yjs:
         specifier: 'catalog:'
         version: 13.6.30
-
 
   packages/pb:
     dependencies:
@@ -933,7 +931,7 @@ importers:
         version: 1.14.3
       '@nestjs/microservices':
         specifier: 'catalog:'
-        version: 11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@types/node':
         specifier: 'catalog:'
         version: 25.3.5
@@ -948,13 +946,13 @@ importers:
         version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@blocknote/shadcn':
         specifier: 'catalog:'
-        version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(postcss@8.4.49)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(tailwindcss@4.2.4)
+        version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(postcss@8.4.49)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwindcss@4.2.4)
       '@hocuspocus/provider':
         specifier: 'catalog:'
         version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
       '@hocuspocus/provider-react':
         specifier: 'catalog:'
-        version: 4.0.0(@hocuspocus/provider@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30))(react@19.2.5)(yjs@13.6.30)
+        version: 4.0.0(@hocuspocus/provider@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30))(react@19.2.6)(yjs@13.6.30)
       '@icons-pack/react-simple-icons':
         specifier: 'catalog:'
         version: 13.13.0(react@19.2.6)
@@ -969,7 +967,7 @@ importers:
         version: 4.2.4
       '@tanstack/react-query':
         specifier: 'catalog:'
-        version: 5.90.21(react@19.2.5)
+        version: 5.90.21(react@19.2.6)
       '@tweenjs/tween.js':
         specifier: 'catalog:'
         version: 25.0.0
@@ -993,7 +991,7 @@ importers:
         version: 1.6.0(react@19.2.6)
       next-themes:
         specifier: ^0.4.6
-        version: 0.4.6(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       pixi.js:
         specifier: 'catalog:'
         version: 8.15.0
@@ -3731,8 +3729,8 @@ packages:
       class-validator:
         optional: true
 
-  '@nestjs/common@11.1.20':
-    resolution: {integrity: sha512-uivaQnTwnfnW1cam8rlh9Xpxvvq+9zKs5ywHWtHRHu1CSQ2FnsLvDewP9Ybhyuf6l075BXKgbixxyW9OKZGpmA==}
+  '@nestjs/common@11.1.19':
+    resolution: {integrity: sha512-qeiTt2tv+e5QyDKqG8HlVZb2wx64FEaSGFJouqTSRs+kG44iTfl3xlz1XqVped+rihx4hmjWgL5gkhtdK3E6+Q==}
     peerDependencies:
       class-transformer: '>=0.4.1'
       class-validator: '>=0.13.2'
@@ -18470,7 +18468,7 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)':
+  '@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)':
     dependencies:
       '@better-auth/utils': 0.4.0
       '@better-fetch/fetch': 1.1.21
@@ -18484,36 +18482,36 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
 
-  '@better-auth/drizzle-adapter@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)':
+  '@better-auth/drizzle-adapter@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)':
     dependencies:
-      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
+      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
       '@better-auth/utils': 0.4.0
 
-  '@better-auth/kysely-adapter@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)(kysely@0.28.17)':
+  '@better-auth/kysely-adapter@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)(kysely@0.28.17)':
     dependencies:
-      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
+      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
       '@better-auth/utils': 0.4.0
     optionalDependencies:
       kysely: 0.28.17
 
-  '@better-auth/memory-adapter@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)':
+  '@better-auth/memory-adapter@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)':
     dependencies:
-      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
+      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
       '@better-auth/utils': 0.4.0
 
-  '@better-auth/mongo-adapter@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)':
+  '@better-auth/mongo-adapter@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)':
     dependencies:
-      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
+      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
       '@better-auth/utils': 0.4.0
 
-  '@better-auth/prisma-adapter@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)':
+  '@better-auth/prisma-adapter@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)':
     dependencies:
-      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
+      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
       '@better-auth/utils': 0.4.0
 
-  '@better-auth/telemetry@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)':
+  '@better-auth/telemetry@1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)':
     dependencies:
-      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
+      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
       '@better-auth/utils': 0.4.0
       '@better-fetch/fetch': 1.1.21
 
@@ -19364,10 +19362,10 @@ snapshots:
       - y-protocols
       - yjs
 
-  '@hocuspocus/provider-react@4.0.0(@hocuspocus/provider@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30))(react@19.2.5)(yjs@13.6.30)':
+  '@hocuspocus/provider-react@4.0.0(@hocuspocus/provider@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30))(react@19.2.6)(yjs@13.6.30)':
     dependencies:
       '@hocuspocus/provider': 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
-      react: 19.2.5
+      react: 19.2.6
       yjs: 13.6.30
 
   '@hocuspocus/provider@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)':
@@ -20705,7 +20703,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)':
+  '@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
       file-type: 21.3.4
       iterare: 1.2.1
@@ -20717,9 +20715,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@nestjs/config@4.0.4(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)':
+  '@nestjs/config@4.0.4(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)':
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
       dotenv: 17.4.1
       dotenv-expand: 12.0.3
       lodash: 4.18.1
@@ -20758,9 +20756,9 @@ snapshots:
       '@nestjs/websockets': 11.1.20(@nestjs/common@11.1.17(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
     optional: true
 
-  '@nestjs/core@11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
+  '@nestjs/core@11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nuxt/opencollective': 0.4.1
       fast-safe-stringify: 2.1.1
       iterare: 1.2.1
@@ -20770,9 +20768,9 @@ snapshots:
       tslib: 2.8.1
       uid: 2.0.2
     optionalDependencies:
-      '@nestjs/microservices': 11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/platform-express': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
-      '@nestjs/websockets': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/microservices': 11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
+      '@nestjs/websockets': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
 
   '@nestjs/microservices@11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.17(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
@@ -20788,17 +20786,17 @@ snapshots:
       kafkajs: 2.2.4
     optional: true
 
-  '@nestjs/microservices@11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
+  '@nestjs/microservices@11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/core': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       iterare: 1.2.1
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
       tslib: 2.8.1
     optionalDependencies:
       '@grpc/grpc-js': 1.14.3
-      '@nestjs/websockets': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/websockets': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       kafkajs: 2.2.4
 
   '@nestjs/platform-express@11.1.20(@nestjs/common@11.1.17(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)':
@@ -20814,10 +20812,10 @@ snapshots:
       - supports-color
     optional: true
 
-  '@nestjs/platform-express@11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)':
+  '@nestjs/platform-express@11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)':
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/core': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       cors: 2.8.6
       express: 5.2.1
       multer: 2.1.1
@@ -20839,10 +20837,10 @@ snapshots:
       - utf-8-validate
     optional: true
 
-  '@nestjs/platform-socket.io@11.1.16(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.20)(rxjs@7.8.2)':
+  '@nestjs/platform-socket.io@11.1.16(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.20)(rxjs@7.8.2)':
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/websockets': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/websockets': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       rxjs: 7.8.2
       socket.io: 4.8.3
       tslib: 2.8.1
@@ -20852,10 +20850,10 @@ snapshots:
       - utf-8-validate
     optional: true
 
-  '@nestjs/platform-ws@11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.20)(rxjs@7.8.2)':
+  '@nestjs/platform-ws@11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.20)(rxjs@7.8.2)':
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/websockets': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/websockets': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       rxjs: 7.8.2
       tslib: 2.8.1
       ws: 8.20.1
@@ -20874,19 +20872,19 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@nestjs/testing@11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)':
+  '@nestjs/testing@11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)':
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/core': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       tslib: 2.8.1
     optionalDependencies:
-      '@nestjs/microservices': 11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/platform-express': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
+      '@nestjs/microservices': 11.1.20(@grpc/grpc-js@1.14.3)(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)
 
-  '@nestjs/typeorm@11.0.1(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.29(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@25.3.5)(typescript@6.0.3)))':
+  '@nestjs/typeorm@11.0.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.29(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@25.6.0)(typescript@6.0.3)))':
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/core': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
       typeorm: 0.3.29(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@25.6.0)(typescript@6.0.3))
@@ -20904,17 +20902,17 @@ snapshots:
       '@nestjs/platform-socket.io': 11.1.16(@nestjs/common@11.1.17(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.20)(rxjs@7.8.2)
     optional: true
 
-  '@nestjs/websockets@11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
+  '@nestjs/websockets@11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/core': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       iterare: 1.2.1
       object-hash: 3.0.0
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
       tslib: 2.8.1
     optionalDependencies:
-      '@nestjs/platform-socket.io': 11.1.16(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.20)(rxjs@7.8.2)
+      '@nestjs/platform-socket.io': 11.1.16(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/websockets@11.1.20)(rxjs@7.8.2)
 
   '@next/env@16.2.6': {}
 
@@ -26780,7 +26778,6 @@ snapshots:
     optionalDependencies:
       msw: 2.12.10(@types/node@25.6.0)(typescript@6.0.3)
       vite: 7.3.1(@types/node@25.6.0)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.32.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.3)
-    optional: true
 
   '@vitest/pretty-format@4.0.18':
     dependencies:
@@ -26808,7 +26805,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vitest: 4.0.18(@opentelemetry/api@1.9.1)(@types/node@25.3.5)(@vitest/ui@4.0.18)(jiti@2.7.0)(jsdom@28.1.0(@noble/hashes@2.2.0))(less@4.5.1)(lightningcss@1.32.0)(msw@2.12.10(@types/node@25.3.5)(typescript@6.0.3))(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.3)
+      vitest: 4.0.18(@opentelemetry/api@1.9.1)(@types/node@25.6.0)(@vitest/ui@4.0.18)(jiti@2.7.0)(jsdom@28.1.0(@noble/hashes@2.2.0))(less@4.5.1)(lightningcss@1.32.0)(msw@2.12.10(@types/node@25.6.0)(typescript@6.0.3))(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.3)
 
   '@vitest/utils@4.0.18':
     dependencies:
@@ -27753,13 +27750,13 @@ snapshots:
 
   better-auth@1.6.11(@opentelemetry/api@1.9.1)(next@16.2.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.97.3))(pg@8.20.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vitest@4.0.18)(vue@3.5.32(typescript@6.0.3)):
     dependencies:
-      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
-      '@better-auth/drizzle-adapter': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)
-      '@better-auth/kysely-adapter': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)(kysely@0.28.17)
-      '@better-auth/memory-adapter': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)
-      '@better-auth/mongo-adapter': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)
-      '@better-auth/prisma-adapter': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)
-      '@better-auth/telemetry': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)
+      '@better-auth/core': 1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0)
+      '@better-auth/drizzle-adapter': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)
+      '@better-auth/kysely-adapter': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)(kysely@0.28.17)
+      '@better-auth/memory-adapter': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)
+      '@better-auth/mongo-adapter': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)
+      '@better-auth/prisma-adapter': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)
+      '@better-auth/telemetry': 1.6.11(@better-auth/core@1.6.11(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@3.25.76))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.2.0))(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)
       '@better-auth/utils': 0.4.0
       '@better-fetch/fetch': 1.1.21
       '@noble/ciphers': 2.2.0
@@ -32454,16 +32451,16 @@ snapshots:
       tinyglobby: 0.2.16
       ts-morph: 27.0.2
 
-  nestjs-otel@8.0.2(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20):
+  nestjs-otel@8.0.2(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.20):
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/core': 11.1.20(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.20(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.20)(@nestjs/platform-express@11.1.20)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/host-metrics': 0.38.3(@opentelemetry/api@1.9.1)
 
-  nestjs-pino@4.6.1(@nestjs/common@11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2):
+  nestjs-pino@4.6.1(@nestjs/common@11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2):
     dependencies:
-      '@nestjs/common': 11.1.20(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/common': 11.1.19(reflect-metadata@0.2.2)(rxjs@7.8.2)
       pino: 10.3.1
       pino-http: 11.0.0
       rxjs: 7.8.2
@@ -36659,7 +36656,6 @@ snapshots:
       - terser
       - tsx
       - yaml
-    optional: true
 
   vscode-jsonrpc@8.2.0: {}
 
