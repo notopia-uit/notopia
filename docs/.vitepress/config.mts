@@ -42,7 +42,15 @@ export function createDiagramsWithKroki(options: KrokiWrapperOptions = {}): Plug
     if (options.docker) {
       krokiProcess = spawn(
         'docker',
-        ['run', '--rm', '-p', `${options.port}:8000`, 'yuzutech/kroki'],
+        [
+          'run',
+          '--rm',
+          '-e',
+          'DEBUG=true', // for d2
+          '-p',
+          `${options.port}:8000`,
+          'yuzutech/kroki',
+        ],
         {
           stdio: ['ignore', 'ignore', 'inherit'],
         }
@@ -53,6 +61,7 @@ export function createDiagramsWithKroki(options: KrokiWrapperOptions = {}): Plug
         env: {
           ...process.env,
           KROKI_PORT: String(options.port),
+          DEBUG: 'true', // for d2
         },
       });
     }
