@@ -34,6 +34,7 @@ import { useState, useRef } from 'react';
 import { getDeterministicColor } from './../lib/utils/color';
 import { ErrorAlert } from './error-alert';
 import { Icons } from './icons';
+import { RevisionModal } from './revision-modal';
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
 import { Button } from './shadcn/button';
@@ -115,13 +116,6 @@ function EditorStatus() {
 //TODO: set local state for avatar when override from session data, and update awareness state on session change (e.g. login/logout or user update)
 //TODO: add dialog
 export default function Editor({ noteId }: { noteId: string }) {
-  // const { data: note } = useSuspenseQuery(
-  //   getNoteOptions({
-  //     path: {
-  //       noteId: noteId,
-  //     },
-  //   })
-  // );
   const { data: sessionData } = authClient.useSession();
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
@@ -170,6 +164,9 @@ export default function Editor({ noteId }: { noteId: string }) {
   return (
     <div className="relative min-h-screen">
       <EditorStatus />
+      <div className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-14 z-40 flex gap-2 border-b px-4 py-2 backdrop-blur-sm">
+        <RevisionModal noteId={noteId} currentEditor={editor as any} />
+      </div>
       <BlockNoteView editor={editor}>
         <SuggestionMenuController
           triggerCharacter={'#'}
