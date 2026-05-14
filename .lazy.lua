@@ -96,4 +96,18 @@ return {
   {
     "neovim/nvim-lspconfig",
   },
+
+  {
+    "windwp/nvim-ts-autotag",
+    opts = {
+      per_filetype = {
+        typescriptreact = {
+          enable_close = true,
+          enable_rename = false,
+          enable_close_on_slash = true,
+        },
+      },
+    },
+    optional = true,
+  },
 }
