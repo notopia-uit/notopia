@@ -5,6 +5,7 @@ import {
   getMyWorkspacesOptions,
   useChangeWorkspaceSlugMutation,
   useCreateWorkspaceMutation,
+  useLeaveWorkspaceMutation,
 } from '@notopia-uit/api-gen';
 import { Badge } from '@notopia-uit/ui/components/shadcn/badge';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
@@ -158,6 +159,27 @@ const WorkspaceSwitcher = () => {
     }
   );
 
+  const { mutate: leaveWorkspace, isPending: isLeavingWorkspace } = useLeaveWorkspaceMutation({
+    onSuccess: async (_, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: getMyWorkspacesOptions({}).queryKey,
+      });
+      setWorkspaces((prev) =>
+        prev.filter((workspace) => workspace.id !== variables.path.workspaceId)
+      );
+      if (selectedId === variables.path.workspaceId) {
+        setSelectedId(undefined);
+      }
+      showAlert('success', 'Left Workspace', `You have left the workspace successfully.`);
+    },
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Action Failed',
+        `There was an error leaving the workspace. Please try again. Error details: ${error.message}`
+      );
+    },
+  });
   const startEditing = (workspace: UserWorkspace) => {
     setEditingId(workspace.id);
     setEditForm({ ...workspace });
@@ -186,24 +208,6 @@ const WorkspaceSwitcher = () => {
   //
   // deleteWorkspace only mutate local state — no API calls — and saveNewWorkspace assigns Date.now().toString() as id, which will collide with real backend ids once the mutation is wired up. The TODO at Line 69 acknowledges this, but flagging so it isn't missed before release. Consider wiring useMutation with query invalidation for getMyWorkspacesQueryKey().
   //
-
-  const deleteWorkspace = (id: string) => {
-    setWorkspaces((prev) => {
-      const nextWorkspaces = prev.filter((workspace) => workspace.id !== id);
-      if (selectedId === id) {
-        if (prev.length === 1) {
-          setSelectedId('');
-        } else {
-          setSelectedId(nextWorkspaces[0]?.id || '');
-        }
-      }
-      return nextWorkspaces;
-    });
-    if (editingId === id) {
-      setEditingId(null);
-      setEditForm({});
-    }
-  };
 
   return isGetMyWorkspacesPending ? (
     <Spinner className="size-8" />
@@ -371,18 +375,26 @@ const WorkspaceSwitcher = () => {
                             <Pencil className="mr-2 size-4" />
                             Edit Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteWorkspace(workspace.id);
-                            }}
-                          >
-                            <Trash2 className="mr-2 size-4" />
-                            {workspace.userRole === 'owner'
-                              ? 'Delete Workspace'
-                              : 'Leave Workspace'}
-                          </DropdownMenuItem>
+                          {workspace.userRole !== 'owner' && (
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                leaveWorkspace({
+                                  path: {
+                                    workspaceId: workspace.id,
+                                  },
+                                });
+                              }}
+                            >
+                              {isLeavingWorkspace ? (
+                                <Spinner></Spinner>
+                              ) : (
+                                <Trash2 className="mr-2 size-4" />
+                              )}
+                              Leave Workspace
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
