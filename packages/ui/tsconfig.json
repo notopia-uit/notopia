@@ -4,7 +4,7 @@
   "include": [],
   "compilerOptions": {
     "paths": {
-      "*": ["./src/*"],
+      "./*": ["./src/*"],
       "@notopia-uit/ui/*": ["./src/*"]
     }
   },

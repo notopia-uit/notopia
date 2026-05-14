@@ -9,7 +9,7 @@ import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   BadgeCheck,
   Bell,
@@ -212,14 +212,20 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
 
   const router = useRouter();
 
-  const { data: allWorkspaceData } = useSuspenseQuery(getMyWorkspacesOptions({}));
-
-  //TODO: check error
+  const {
+    data: allWorkspaceData,
+    isError,
+    error,
+    isPending,
+  } = useQuery({
+    ...getMyWorkspacesOptions({}),
+  });
+  //TODO: throw custome error if workspace not found or user not auth
   if (!sessionData) {
     return;
   }
-  if (!allWorkspaceData) {
-    return;
+  if (!allWorkspaceData || isError) {
+    throw error;
   }
   const currentWorkspace = allWorkspaceData.find((ws) => ws.workspace.id === currentWorkspaceId);
   if (!currentWorkspace) {
@@ -261,22 +267,26 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                 <DropdownMenuLabel className="text-muted-foreground text-xs">
                   Workspace
                 </DropdownMenuLabel>
-                {allWorkspaceData.map((ws, index) => (
-                  <DropdownMenuItem
-                    key={ws.workspace.name}
-                    onClick={() => {
-                      setActiveWorkspace(ws);
-                      router.push(`/workspace/${index}`);
-                    }}
-                    className="gap-2 p-2"
-                  >
-                    <div className="flex size-6 items-center justify-center rounded-sm border">
-                      <GalleryVerticalEnd className="size-4 shrink-0" />
-                    </div>
-                    {ws.workspace.name}
-                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                ))}
+                {isPending ? (
+                  <Spinner />
+                ) : (
+                  allWorkspaceData.map((ws, index) => (
+                    <DropdownMenuItem
+                      key={ws.workspace.name}
+                      onClick={() => {
+                        setActiveWorkspace(ws);
+                        router.push(`/workspace/${index}`);
+                      }}
+                      className="gap-2 p-2"
+                    >
+                      <div className="flex size-6 items-center justify-center rounded-sm border">
+                        <GalleryVerticalEnd className="size-4 shrink-0" />
+                      </div>
+                      {ws.workspace.name}
+                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  ))
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2 p-2">
                   <div className="bg-background flex size-6 items-center justify-center rounded-md border">

@@ -23,9 +23,13 @@ import {
   TableHeader,
   TableRow,
 } from '@notopia-uit/ui/components/shadcn/table';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Folder, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
+
+import { ErrorAlert } from './error-alert';
+import { SuccessAlert } from './success-alert';
 
 interface TrashedBy {
   by: 'purpose' | 'parent';
@@ -81,14 +85,20 @@ const formatDate = (isoString: string) => {
   }).format(date);
 };
 
+const EMPTY_TRASH_DATA: TrashedData = { notes: [], folders: [] };
 //TODO: add dialog onSuccess and onError for delete and restore action, also add confirm dialog when user click delete permanently or empty trash
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient();
-  const { data: trashedData } = useSuspenseQuery({
+  const { data, isError, error, isPending } = useQuery({
     ...showTrashOptions({ path: { workspaceId: workspaceId } }),
-    select: (data) => mapDtoTrashedData(data),
+    select: mapDtoTrashedData,
   });
 
+  if (isError) {
+    throw error;
+  }
+
+  const trashedData = data || EMPTY_TRASH_DATA;
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   const displayData = useMemo(() => {
@@ -109,22 +119,78 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     );
   }, [trashedData]);
 
+  const { alert, showAlert } = useAlert();
   const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
     {
-      onSuccess: async () => {
+      onSuccess: async (_, variables) => {
+        const { noteIds, folderIds } = variables.body;
+        queryClient.setQueryData<TrashedDataDto>(
+          showTrashOptions({ path: { workspaceId } }).queryKey,
+          (oldData) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              notes:
+                oldData.notes?.filter((note) => (noteIds ? noteIds : []).includes(note.id)) || [],
+              folders:
+                oldData.folders?.filter((folder) =>
+                  (folderIds ? folderIds : []).includes(folder.id)
+                ) || [],
+            };
+          }
+        );
+
+        setSelectedItems(new Set());
         await queryClient.invalidateQueries({
           queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
         });
-        setSelectedItems(new Set());
+        showAlert(
+          'success',
+          'Successfully Deleted',
+          `Selected items have been permanently deleted.`
+        );
+      },
+      onError: (error) => {
+        showAlert(
+          'error',
+          'Failed to Delete',
+          `An error occurred while trying to permanently delete the selected items. Please try again.
+          ${error instanceof Error ? error.message : ''}`
+        );
       },
     }
   );
   const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
-    onSuccess: async () => {
+    onSuccess: async (_, variables) => {
+      const { noteIds, folderIds } = variables.body;
+      queryClient.setQueryData<TrashedDataDto>(
+        showTrashOptions({ path: { workspaceId } }).queryKey,
+        (oldData) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            notes:
+              oldData.notes?.filter((note) => (noteIds ? noteIds : []).includes(note.id)) || [],
+            folders:
+              oldData.folders?.filter((folder) =>
+                (folderIds ? folderIds : []).includes(folder.id)
+              ) || [],
+          };
+        }
+      );
       await queryClient.invalidateQueries({
         queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
       });
       setSelectedItems(new Set());
+      showAlert('success', 'Successfully Restored', `Selected items have been restored.`);
+    },
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Failed to Restore',
+        `An error occurred while trying to restore the selected items. Please try again.
+        ${error instanceof Error ? error.message : ''}`
+      );
     },
   });
   const toggleSelection = (id: string) => {
@@ -169,9 +235,14 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       noteIds.push(...trashedData.notes.map((n) => n.id));
       folderIds.push(...trashedData.folders.map((f) => f.id));
     }
-    deleteItems({ path: { workspaceId }, body: { noteIds, folderIds } });
+    deleteItems({
+      path: { workspaceId },
+      body: { noteIds, folderIds },
+    });
   };
-  return (
+  return isPending ? (
+    <Spinner />
+  ) : (
     <div className="w-full font-sans text-zinc-300">
       <div className="w-full">
         {/* Header Actions */}
@@ -242,8 +313,9 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Icon
-                        className={`size-5 ${item.displayType === 'Folder' ? `text-blue-400` : `text-zinc-400`
-                          }`}
+                        className={`size-5 ${
+                          item.displayType === 'Folder' ? `text-blue-400` : `text-zinc-400`
+                        }`}
                       />
                       <span className="font-medium text-zinc-200">{item.name}</span>
                     </div>
@@ -282,6 +354,9 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
             })}
           </TableBody>
         </Table>
+        {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
+
+        {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
       </div>
     </div>
   );

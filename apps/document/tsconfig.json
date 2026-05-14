@@ -4,6 +4,7 @@
     "module": "preserve",
     "moduleResolution": "bundler",
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "types": ["node"],
@@ -12,7 +13,7 @@
     }
   },
   "files": [],
-  "include": ["src/**/*", "database/**/*", "../../packages/lib/src/server/types.d.ts"],
+  "include": ["database/**/*", "../../packages/lib/src/server"],
   "exclude": ["dist/**/*", "node_modules"],
   "references": [
     {

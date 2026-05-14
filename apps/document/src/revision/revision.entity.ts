@@ -13,7 +13,7 @@ import { DocumentEntity } from '#/document/document.entity';
 
 @Entity('revisions')
 export class RevisionEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('uuid', { type: 'uuid' })
   id!: string;
 
   @ManyToOne(() => DocumentEntity, (document) => document.revisions, {
@@ -27,9 +27,9 @@ export class RevisionEntity {
   @Column({ type: 'simple-json' })
   content!: MyBlock[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({ type: 'timestamptz' })
   deletedAt!: Date | null;
 }

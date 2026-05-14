@@ -48,8 +48,9 @@ export function SignInForm({ className, ...props }: React.ComponentProps<'div'>)
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a> and{' '}
-        <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our{' '}
+        <a href="http://example.com/terms">Terms of Service</a> and{' '}
+        <a href="http://example.com/privacy">Privacy Policy</a>.
       </FieldDescription>
     </div>
   );

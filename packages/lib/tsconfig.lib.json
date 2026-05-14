@@ -16,7 +16,7 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
-      "*": ["./src/*"]
+      "./*": ["./src/*"]
     }
   },
   "include": ["src/**/*"]

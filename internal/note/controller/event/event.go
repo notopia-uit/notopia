@@ -58,7 +58,8 @@ func NewEvent(
 ) (*Event, error) {
 	saramaConfig := kafka.DefaultSaramaSubscriberConfig()
 	if generalCfg.AppEnv == commonconfig.AppEnvDevelopment {
-		saramaConfig.Consumer.Group.Session.Timeout = time.Hour
+		// FIXME:
+		saramaConfig.Consumer.Group.Session.Timeout = 30 * time.Second
 	}
 	subcriber, err := kafka.NewSubscriber(
 		kafka.SubscriberConfig{

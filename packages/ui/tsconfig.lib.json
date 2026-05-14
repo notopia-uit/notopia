@@ -18,7 +18,7 @@
     "jsx": "preserve",
     "paths": {
       "@notopia-uit/ui/*": ["./src/*"],
-      "*": ["./src/*"]
+      "./*": ["./src/*"]
     }
   },
   "exclude": [
@@ -34,7 +34,7 @@
     "src/**/*.test.jsx",
     "eslint.config.mjs"
   ],
-  "include": ["src/**/*.ts", "src/**/*.tsx", "../block-note/src/global.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
       "path": "../lib/tsconfig.lib.json"

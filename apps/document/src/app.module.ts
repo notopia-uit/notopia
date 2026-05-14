@@ -1,15 +1,14 @@
 import { Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { ClientKafka, ClientsModule } from '@nestjs/microservices';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { ClientKafka } from '@nestjs/microservices';
 import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
 
 import { AuthenticationModule } from '#/authentication/authentication.module';
-import { getKafkaConfig } from '#/config/kafka.config';
+import { HocuspocusModule } from '#/hocuspocus/hocuspocus.module';
 
 import { AuthorizationModule } from './authorization/authorization.module';
 import { BlockNoteModule } from './blocknote/blocknote.module';
@@ -27,12 +26,11 @@ import {
 } from './config/config.factory';
 import { DatabaseModule } from './database/database.module';
 import { DocumentApi } from './document/document.api';
-import { DocumentEntity } from './document/document.entity';
-import { DocumentService } from './document/document.service';
+import { DocumentModule } from './document/document.module';
+import { KafkaModule } from './kafka/kafka.module';
 import { NoteModule } from './note/note.module';
 import { RevisionApi } from './revision/revision.api';
-import { RevisionEntity } from './revision/revision.entity';
-import { RevisionService } from './revision/revision.service';
+import { RevisionModule } from './revision/revision.module';
 import { StorageModule } from './storage/storage.module';
 
 @Module({
@@ -72,45 +70,26 @@ import { StorageModule } from './storage/storage.module';
         };
       },
     }),
-    ClientsModule.registerAsync([
-      {
-        name: KAFKA_CLIENT,
-        useFactory: getKafkaConfig,
-        inject: [ConfigService],
-      },
-    ]),
+
     StorageModule,
+    KafkaModule,
     AuthenticationModule,
     AuthorizationModule,
     NoteModule,
     DatabaseModule,
     BlockNoteModule,
+    HocuspocusModule,
+    DocumentModule,
+    RevisionModule,
     Object.assign(
       ApiModule.forRoot({
         apiImplementations: {
           documentApi: DocumentApi,
           revisionApi: RevisionApi,
         },
-        providers: [
-          DocumentService,
-          RevisionService,
-          {
-            provide: KAFKA_CLIENT,
-            useFactory: getKafkaConfig,
-            inject: [ConfigService],
-          },
-        ],
       }),
       {
-        imports: [
-          ConfigModule,
-          TypeOrmModule.forFeature([DocumentEntity, RevisionEntity]),
-          DatabaseModule,
-          AuthorizationModule,
-          NoteModule,
-          StorageModule,
-          BlockNoteModule,
-        ],
+        imports: [ConfigModule, DocumentModule, RevisionModule],
       }
     ),
   ],

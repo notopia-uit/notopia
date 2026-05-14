@@ -13,6 +13,10 @@
       "@nx/source": "./src/client/index.ts",
       "default": "./src/client/index.ts"
     },
+    "./client.gen": {
+      "@nx/source": "./src/client.gen.ts",
+      "default": "./src/client.gen.ts"
+    },
     "./@tanstack": {
       "@nx/source": "./src/@tanstack/index.ts",
       "default": "./src/@tanstack/index.ts"

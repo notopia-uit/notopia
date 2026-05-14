@@ -1,1 +1,2 @@
 @import '../../../packages/ui/src/globals.css';
+@source '**/*.{ts,tsx}';

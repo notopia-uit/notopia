@@ -1,10 +1,11 @@
 import QueryClientProvider from '@notopia-uit/ui/components/client-query-provider';
 import { ThemeProvider } from '@notopia-uit/ui/components/theme-provider';
+import { TokenProvider } from '@notopia-uit/ui/components/token-provider';
+
+import './globals.css';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { Inter as FontSans } from 'next/font/google';
 import localFont from 'next/font/local';
-
-import './globals.css';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -37,8 +38,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
+            scriptProps={{ type: 'application/json' }}
           >
-            <QueryClientProvider>{children}</QueryClientProvider>
+            <QueryClientProvider>
+              <TokenProvider>{children}</TokenProvider>
+            </QueryClientProvider>
           </ThemeProvider>
         </body>
       </html>

@@ -1,5 +1,4 @@
 'use client';
-
 import {
   NoteUserWorkspace,
   NoteWorkspaceRole,
@@ -27,10 +26,14 @@ import {
   SelectValue,
 } from '@notopia-uit/ui/components/shadcn/select';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+import { ErrorAlert } from './error-alert';
+import { SuccessAlert } from './success-alert';
 
 type UserRole = (typeof NoteWorkspaceRole)[keyof typeof NoteWorkspaceRole];
 
@@ -57,51 +60,100 @@ const generateSlug = (name: string) => {
     .replace(/^-|-$/g, '');
 };
 
-// TODO: handle create new workspace with api and router.push to workspace
-
+//TODO: add context for error alert
 const WorkspaceSwitcher = () => {
   const queryClient = useQueryClient();
-  const { data: allWorkspaceData } = useSuspenseQuery({
-    ...getMyWorkspacesOptions({}),
+  const _data = useQuery({
+    ...getMyWorkspacesOptions(),
     select: mapUserWorkspaceDtoToDomain,
   });
+
+  const {
+    data: allWorkspaceData,
+    isPending: isGetMyWorkspacesPending,
+    isError: isGetMyWorkspacesError,
+    error: getMyWorkspacesError,
+  } = _data;
 
   //TODO: Local state mirroring server data will desync on refetch.
   // workspaces and selectedId are initialized from allWorkspaceData once at mount. If the underlying getMyWorkspaces query refetches (on focus, reconnect, manual invalidation, etc.), useSuspenseQuery updates allWorkspaceData but the local useState snapshot is never re-synced, so the UI will silently drift from server state. Combined with the TODO at Line 69, this whole component currently operates on local-only edits.
   // Consider either deriving the list directly from the query data (with a mutation that invalidates the query) or using useEffect to sync — but the former is the idiomatic React Query pattern.
 
-  const [workspaces, setWorkspaces] = useState<UserWorkspace[]>(allWorkspaceData);
-  const [selectedId, setSelectedId] = useState<string>(workspaces[0]?.id || '');
+  const [workspaces, setWorkspaces] = useState<UserWorkspace[]>([]);
+  const [selectedId, setSelectedId] = useState<string>();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editForm, setEditForm] = useState<Partial<UserWorkspace>>({});
 
+  const { alert, showAlert } = useAlert();
+
+  if (isGetMyWorkspacesError) {
+    throw getMyWorkspacesError;
+  }
+  useEffect(() => {
+    if (allWorkspaceData) {
+      setWorkspaces(allWorkspaceData);
+    }
+  }, [allWorkspaceData]);
   const { mutate: createWorkspace, isPending: isCreating } = useCreateWorkspaceMutation({
-    onSuccess: async () => {
+    onSuccess: async (responses, variables) => {
       await queryClient.invalidateQueries({
         queryKey: getMyWorkspacesOptions({}).queryKey,
       });
-      const newWorkspacesData = await queryClient.fetchQuery({
-        ...getMyWorkspacesOptions({}),
-      });
-      const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
-      setWorkspaces(mappedWorkspaces);
+      setWorkspaces((prev) => [
+        ...prev,
+        {
+          id: responses.id,
+          slug: variables.body.slug,
+          name: variables.body.name,
+          userRole: 'owner',
+        },
+      ]);
       setIsAddingNew(false);
       setEditForm({});
+      showAlert(
+        'success',
+        'Workspace Created',
+        `Your new workspace "${variables.body.name}" has been created successfully.`
+      );
+    },
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Creation Failed',
+        `There was an error creating your workspace. Please try again. Error details: ${error.message}`
+      );
     },
   });
 
   const { mutate: mutateWorkspaceSlug, isPending: isChangingSlug } = useChangeWorkspaceSlugMutation(
     {
-      onSuccess: async () => {
+      onSuccess: async (_, variables) => {
         await queryClient.invalidateQueries({
           queryKey: getMyWorkspacesOptions({}).queryKey,
         });
-        const newWorkspacesData = await queryClient.fetchQuery({
-          ...getMyWorkspacesOptions({}),
-        });
-        const mappedWorkspaces = mapUserWorkspaceDtoToDomain(newWorkspacesData);
-        setWorkspaces(mappedWorkspaces);
+
+        setWorkspaces((prev) =>
+          prev.map((workspace) =>
+            workspace.id === variables.path.workspaceId
+              ? { ...workspace, slug: variables.body.slug }
+              : workspace
+          )
+        );
+        setEditingId(null);
+        setEditForm({});
+        showAlert(
+          'success',
+          'Slug Updated',
+          `Workspace slug has been updated to "${variables.body.slug}".`
+        );
+      },
+      onError: () => {
+        showAlert(
+          'error',
+          'Update Failed',
+          `There was an error updating the workspace slug. Please try again.`
+        );
       },
     }
   );
@@ -153,7 +205,9 @@ const WorkspaceSwitcher = () => {
     }
   };
 
-  return (
+  return isGetMyWorkspacesPending ? (
+    <Spinner className="size-8" />
+  ) : (
     <section className="py-16 md:py-24">
       <div className="container max-w-2xl">
         <div className="mb-6 flex items-center justify-between">
@@ -436,6 +490,8 @@ const WorkspaceSwitcher = () => {
             </CardContent>
           </Card>
         )}
+        {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
+        {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
       </div>
     </section>
   );

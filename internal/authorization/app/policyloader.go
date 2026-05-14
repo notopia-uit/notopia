@@ -52,14 +52,18 @@ func LoadPoliciesFromString(enforcer *casbin.TransactionalEnforcer, csv string) 
 		}
 	}
 
-	// Copy g3 grouping policies if they exist
-	g3Policies, err := tempEnforcer.GetNamedGroupingPolicy("g3")
-	if err != nil {
-		return fmt.Errorf("failed to get g3 policies from temp enforcer: %w", err)
-	}
-	if len(g3Policies) > 0 {
-		if _, err := enforcer.AddNamedGroupingPolicies("g3", g3Policies); err != nil {
-			return fmt.Errorf("failed to add g3 policies: %w", err)
+	// Copy g3 grouping policies if the model defines g3
+	_, err = tempEnforcer.GetModel().GetAssertion("g", "g3")
+	hasG3 := err == nil
+	if hasG3 {
+		g3Policies, err := tempEnforcer.GetNamedGroupingPolicy("g3")
+		if err != nil {
+			return fmt.Errorf("failed to get g3 policies from temp enforcer: %w", err)
+		}
+		if len(g3Policies) > 0 {
+			if _, err := enforcer.AddNamedGroupingPolicies("g3", g3Policies); err != nil {
+				return fmt.Errorf("failed to add g3 policies: %w", err)
+			}
 		}
 	}
 

@@ -8,7 +8,7 @@
   "scripts": {
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
     "typeorm-extension": "tsx ./node_modules/typeorm-extension/bin/cli.mjs",
-    "typeorm-extension:seed": "tsx ./database/seed.ts"
+    "typeorm-extension:seed": "node --import @swc-node/register/esm-register ./database/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
@@ -36,12 +36,12 @@
     "@opentelemetry/auto-instrumentations-node": "catalog:",
     "@opentelemetry/resources": "catalog:",
     "@opentelemetry/sdk-metrics": "catalog:",
-    "jose": "catalog:",
     "@opentelemetry/sdk-node": "catalog:",
     "@opentelemetry/sdk-trace-node": "catalog:",
     "@opentelemetry/semantic-conventions": "catalog:",
     "@types/express": "catalog:",
     "express": "catalog:",
+    "jose": "catalog:",
     "kafkajs": "catalog:",
     "marked": "catalog:",
     "nestjs-otel": "catalog:",
@@ -60,6 +60,7 @@
   "devDependencies": {
     "@nestjs/testing": "catalog:",
     "@notopia-uit/api-gen": "workspace:",
+    "@swc-node/register": "catalog:",
     "@swc/core": "catalog:",
     "@swc/helpers": "catalog:",
     "@types/ws": "catalog:",

@@ -1,0 +1,76 @@
+.graph > h3 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.graph .graphOuter {
+  border-radius: 5px;
+  border: 1px solid var(--lightgray, #e0e0e0);
+  box-sizing: border-box;
+  height: 250px;
+  margin: 0.5em 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.graph .globalGraphIcon {
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--dark, #333);
+  opacity: 0.5;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  padding: 0.2rem;
+  margin: 0.3rem;
+  top: 0;
+  right: 0;
+  border-radius: 4px;
+  background-color: transparent;
+  transition: background-color 0.5s ease;
+}
+
+.graph .globalGraphIcon:hover {
+  background-color: var(--lightgray, #e0e0e0);
+}
+
+.graphContainer {
+  width: 100%;
+  height: 100%;
+}
+
+:global(.global-graph-outer) {
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100%;
+  backdrop-filter: blur(4px);
+  display: none;
+  overflow: hidden;
+}
+
+:global(.global-graph-outer.active) {
+  display: inline-block;
+}
+
+.globalGraphContainer {
+  border: 1px solid var(--lightgray, #e0e0e0);
+  background-color: var(--light, #fff);
+  border-radius: 5px;
+  box-sizing: border-box;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+}
+
+@media (max-width: 1024px) {
+  .globalGraphContainer {
+    width: 90%;
+  }
+}

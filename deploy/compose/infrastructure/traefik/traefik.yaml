@@ -12,7 +12,13 @@ providers:
 log:
   level: INFO
 
-accessLog: false
+accessLog:
+  format: json
+  fields:
+    headers:
+      defaultMode: keep
+      names:
+        Authorization: keep
 
 # tracing:
 #   samplerate: 1.0
@@ -27,5 +33,5 @@ entryPoints:
 experimental:
   plugins:
     jwt:
-      moduleName: github.com/traefik-plugins/traefik-jwt-plugin
-      version: v0.10.0
+      moduleName: github.com/agilezebra/jwt-middleware
+      version: v1.4.0
