@@ -10,35 +10,47 @@ return {
     ---@return conform.setupOpts
     opts = function(_, opts)
       opts.formatters_by_ft = opts.formatters_by_ft or {}
-      opts.formatters_by_ft.html = nil
-      opts.formatters_by_ft.css = nil
-      opts.formatters_by_ft.scss = nil
-      opts.formatters_by_ft.markdown = nil
-      opts.formatters_by_ft.json = nil
-      opts.formatters_by_ft.json5 = nil
-      opts.formatters_by_ft.jsonc = nil
-      opts.formatters_by_ft.toml = nil
-      opts.formatters_by_ft.yaml = nil
-      opts.formatters_by_ft.typescript = nil
-      opts.formatters_by_ft.typescriptreact = nil
-      opts.formatters_by_ft.javascriptreact = nil
-      opts.formatters_by_ft.javascript = nil
+      -- opts.formatters_by_ft.html = nil
+      -- opts.formatters_by_ft.css = nil
+      -- opts.formatters_by_ft.scss = nil
+      -- opts.formatters_by_ft.markdown = nil
+      -- opts.formatters_by_ft.json = nil
+      -- opts.formatters_by_ft.json5 = nil
+      -- opts.formatters_by_ft.jsonc = nil
+      -- opts.formatters_by_ft.toml = nil
+      -- opts.formatters_by_ft.yaml = nil
+      -- opts.formatters_by_ft.typescript = nil
+      -- opts.formatters_by_ft.typescriptreact = nil
+      -- opts.formatters_by_ft.javascriptreact = nil
+      -- opts.formatters_by_ft.javascript = nil
 
-      -- opts.formatters.oxlint = {
-      --   command = string.format("%s/node_modules/.bin/oxlint", root),
-      --   cwd = require("conform.util").root_file("oxlint.config.ts"),
-      --   require_cwd = true,
-      -- }
-      --
-      -- ---@type conform.FiletypeFormatter
-      -- local formatters = {
-      --   "oxlint",
-      -- }
-      --
-      -- opts.formatters_by_ft.typescript = formatters
-      -- opts.formatters_by_ft.typescriptreact = formatters
-      -- opts.formatters_by_ft.javascriptreact = formatters
-      -- opts.formatters_by_ft.javascript = formatters
+      opts.formatters.oxfmt = {
+        command = string.format("%s/node_modules/.bin/oxfmt", root),
+        append_args = { "--config", ".oxfmtrc.jsonc" },
+        cwd = function()
+          return root
+        end,
+        require_cwd = true,
+      }
+
+      ---@type conform.FiletypeFormatter
+      local formatters = {
+        "oxfmt",
+      }
+
+      opts.formatters_by_ft.html = formatters
+      opts.formatters_by_ft.css = formatters
+      opts.formatters_by_ft.scss = formatters
+      opts.formatters_by_ft.markdown = formatters
+      opts.formatters_by_ft.json = formatters
+      opts.formatters_by_ft.json5 = formatters
+      opts.formatters_by_ft.jsonc = formatters
+      opts.formatters_by_ft.toml = formatters
+      opts.formatters_by_ft.yaml = formatters
+      opts.formatters_by_ft.typescript = formatters
+      opts.formatters_by_ft.typescriptreact = formatters
+      opts.formatters_by_ft.javascriptreact = formatters
+      opts.formatters_by_ft.javascript = formatters
       return opts
     end,
     optional = true,

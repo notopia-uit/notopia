@@ -295,12 +295,12 @@ lsp.config("oxlint", {
   end,
 } --[[@as vim.lsp.Config]])
 
-lsp.config("oxfmt", {
-  cmd = { "./node_modules/.bin/oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" },
-  root_dir = function(_, on_dir)
-    on_dir(root)
-  end,
-} --[[@as vim.lsp.Config]])
+-- lsp.config("oxfmt", {
+--   cmd = { "./node_modules/.bin/oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" },
+--   root_dir = function(_, on_dir)
+--     on_dir(root)
+--   end,
+-- } --[[@as vim.lsp.Config]])
 
 lsp.enable({
   "buf_ls",
@@ -315,7 +315,6 @@ lsp.enable({
   "lua_ls",
   "nestjs_doctor",
   "nxls",
-  "oxfmt",
   "oxlint",
   "redocly_ls",
   "tailwindcss",
@@ -323,6 +322,7 @@ lsp.enable({
   "twcssls",
   "yamlls",
   "yamlls",
+  -- "oxfmt",
 })
 
 map("n", "<localleader>b", function()
