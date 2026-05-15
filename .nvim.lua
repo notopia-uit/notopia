@@ -2,13 +2,42 @@ local lsp = vim.lsp
 local map = vim.keymap.set
 local root = vim.fn.expand("%:p:h")
 local uri_root = vim.uri_from_fname(root)
+local lsp_watchfile = vim.lsp._watchfiles
 
 vim.env.EDITING = "true" -- Trick with oxlint, for typeAware false
+
+-- For toggle
+local enable_lsp_watchfile = false
 
 local allowed_linked_editing_range_clients = {
   html = true,
   tsgo = true,
 }
+
+lsp.config("*", {
+  capabilities = {
+    workspace = {
+      didChangeWatchedFiles = {
+        dynamicRegistration = enable_lsp_watchfile,
+      },
+    },
+  },
+} --[[@as vim.lsp.Config]])
+
+if enable_lsp_watchfile and lsp_watchfile then
+  local glob = vim.glob
+  lsp_watchfile._poll_exclude_pattern = lsp_watchfile._poll_exclude_pattern
+    + glob.to_lpeg(string.format("%s/submodule/**", root))
+    + glob.to_lpeg(string.format("%s/deploy/**", root))
+    + glob.to_lpeg(string.format("%s/http/**", root))
+    + glob.to_lpeg(string.format("%s/.nx/**", root))
+    + glob.to_lpeg(string.format("%s/.agent/**", root))
+    + glob.to_lpeg(string.format("%s/.claude/**", root))
+    + glob.to_lpeg("**/.next/**")
+    + glob.to_lpeg("**/dist/**")
+    + glob.to_lpeg("**/build/**")
+    + glob.to_lpeg("**/__debug*")
+end
 
 vim.api.nvim_create_autocmd("LspAttach", {
   ---@param args vim.api.keyset.create_autocmd.callback_args | {data: vim.event.lspattach.data}
@@ -302,6 +331,17 @@ lsp.config("oxfmt", {
   end,
 } --[[@as vim.lsp.Config]])
 
+lsp.config("harper_ls", {
+  capabilities = {
+    workspace = {
+      didChangeWatchedFiles = {
+        dynamicRegistration = false,
+        relativePatternSupport = false,
+      },
+    },
+  },
+} --[[@as vim.lsp.Config]])
+
 lsp.enable({
   "buf_ls",
   "ecfg",
@@ -309,7 +349,7 @@ lsp.enable({
   "gh_actions_ls",
   "golangci_lint_ls",
   "gopls",
-  "harper_ls",
+  -- "harper_ls",
   "jsonls",
   "jsonls",
   "lua_ls",
