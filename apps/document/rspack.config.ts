@@ -1,30 +1,28 @@
 import { builtinModules } from 'module';
-import { createRequire } from 'node:module';
-import { join } from 'node:path';
+import { join } from 'path';
 
 import { NxAppRspackPlugin } from '@nx/rspack/app-plugin';
 import type { Configuration } from '@rspack/cli';
 import rspack from '@rspack/core';
+import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
-
-const require = createRequire(import.meta.url);
-const __dirname = import.meta.dirname;
 
 const isEsm = false;
 const tsConfigFile = join(__dirname, 'tsconfig.app.json');
 
 const NODE_ENV = process.env['NODE_ENV'] || 'development';
+const isDev = NODE_ENV === 'development';
 
 const config: Configuration = {
   target: 'node',
   devtool: NODE_ENV === 'production' ? false : 'source-map',
+  entry: isDev ? ['@rspack/core/hot/poll?1000', './src/main.ts'] : ['./src/main.ts'],
   output: {
     module: isEsm,
     path: join(__dirname, './dist'),
     chunkFormat: isEsm ? 'module' : 'array-push',
     filename: `[name].${isEsm ? 'm' : 'c'}js`,
     chunkFilename: '[name].[contenthash].js',
-    devtoolModuleFilenameTemplate: '[absolute-resource-path]',
   },
   externalsPresets: { node: true },
   optimization: {
@@ -98,23 +96,19 @@ const config: Configuration = {
   },
   externals: [
     // nodeExternals returns an untyped function that webpack expects
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     nodeExternals({
       importType: isEsm ? 'module' : 'commonjs',
+      allowlist: [/@rspack\/core\/hot\/poll/],
     }) as unknown as Configuration['externals'],
     ...(isEsm
       ? [
           ((data: any, callback: any) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             const request: string | undefined = data.request;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
             if (!request) return callback(null);
             const bare = request.startsWith('node:') ? request.slice(5) : request;
             if (builtinModules.includes(bare)) {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
               return callback(null, `node:${bare}`);
             }
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             callback(null);
           }) as unknown as Configuration['externals'],
         ]
@@ -195,6 +189,8 @@ const config: Configuration = {
         }
       },
     }),
+    isDev && new rspack.HotModuleReplacementPlugin(),
+    isDev && new RunScriptWebpackPlugin({ name: 'main.cjs', autoRestart: false }),
   ],
 };
 

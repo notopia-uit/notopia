@@ -50,6 +50,10 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["exec", "nx", "run", "document"],
       "skipFiles": ["<node_internals>/**", "${workspaceFolder}/apps/document/dist/**"],
+      "sourceMapPathOverrides": {
+        "webpack://@notopia-uit/document/./*": "${workspaceFolder}/apps/document/*",
+        "webpack://@notopia-uit/document/../../*": "${workspaceFolder}//*"
+      },
       "outFiles": ["${workspaceFolder}/apps/document/dist/**/*.(m|c|)js", "!**/node_modules/**"]
     },
     {
@@ -60,6 +64,10 @@
       "port": 9222,
       "skipFiles": ["<node_internals>/**", "${workspaceFolder}/apps/document/dist/**"],
       "restart": true,
+      "sourceMapPathOverrides": {
+        "webpack://@notopia-uit/document/./*": "${workspaceFolder}/apps/document/*",
+        "webpack://@notopia-uit/document/../../*": "${workspaceFolder}//*"
+      },
       "outFiles": ["${workspaceFolder}/apps/document/dist/**/*.(m|c|)js", "!**/node_modules/**"]
     },
     {
@@ -69,6 +77,10 @@
       "runtimeExecutable": "pnpm exec nx",
       "runtimeArgs": ["run", "search-worker"],
       "skipFiles": ["<node_internals>/**", "${workspaceFolder}/apps/search-worker/dist/**"],
+      "sourceMapPathOverrides": {
+        "webpack://@notopia-uit/search-worker/./*": "${workspaceFolder}/apps/search-worker/*",
+        "webpack://@notopia-uit/search-worker/../../*": "${workspaceFolder}//*"
+      },
       "outFiles": [
         "${workspaceFolder}/apps/search-worker/dist/**/*.(m|c|)js",
         "!**/node_modules/**"
@@ -82,6 +94,10 @@
       "port": 9223,
       "skipFiles": ["<node_internals>/**", "${workspaceFolder}/apps/search-worker/dist/**"],
       "restart": true,
+      "sourceMapPathOverrides": {
+        "webpack://@notopia-uit/search-worker/./*": "${workspaceFolder}/apps/search-worker/*",
+        "webpack://@notopia-uit/search-worker/../../*": "${workspaceFolder}//*"
+      },
       "outFiles": [
         "${workspaceFolder}/apps/search-worker/dist/**/*.(m|c|)js",
         "!**/node_modules/**"

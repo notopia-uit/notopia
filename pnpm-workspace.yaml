@@ -116,6 +116,7 @@ catalog:
   '@types/d3': '7.4.3'
   jose: 6.2.3
   '@vercel/otel': 2.1.2
+  'run-script-webpack-plugin': 0.2.3
 onlyBuiltDependencies:
   - '@bufbuild/buf'
   - '@nestjs/core'

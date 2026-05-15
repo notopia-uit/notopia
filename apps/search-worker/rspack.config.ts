@@ -4,22 +4,25 @@ import { join } from 'path';
 import { NxAppRspackPlugin } from '@nx/rspack/app-plugin';
 import type { Configuration } from '@rspack/cli';
 import rspack from '@rspack/core';
+import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
 
 const isEsm = false;
 const tsConfigFile = join(__dirname, 'tsconfig.app.json');
 
+const NODE_ENV = process.env['NODE_ENV'] || 'development';
+const isDev = NODE_ENV === 'development';
+
 const config: Configuration = {
   target: 'node',
+  devtool: NODE_ENV === 'production' ? false : 'source-map',
+  entry: isDev ? ['@rspack/core/hot/poll?1000', './src/main.ts'] : ['./src/main.ts'],
   output: {
     module: isEsm,
     path: join(__dirname, './dist'),
     chunkFormat: isEsm ? 'module' : 'array-push',
-    filename: '[name].js',
+    filename: `[name].${isEsm ? 'm' : 'c'}js`,
     chunkFilename: '[name].[contenthash].js',
-  },
-  experiments: {
-    outputModule: isEsm,
   },
   externalsPresets: { node: true },
   optimization: {
@@ -46,6 +49,7 @@ const config: Configuration = {
           {
             loader: 'builtin:swc-loader',
             options: {
+              detectSyntax: 'auto',
               jsc: {
                 parser: {
                   syntax: 'typescript',
@@ -55,9 +59,8 @@ const config: Configuration = {
                   legacyDecorator: true,
                   decoratorMetadata: true,
                 },
-                target: 'es2021',
+                target: 'esnext',
               },
-              sourceMaps: process.env['NODE_ENV'] !== 'production',
             },
           },
         ],
@@ -93,23 +96,19 @@ const config: Configuration = {
   },
   externals: [
     // nodeExternals returns an untyped function that webpack expects
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     nodeExternals({
       importType: isEsm ? 'module' : 'commonjs',
+      allowlist: [/@rspack\/core\/hot\/poll/],
     }) as unknown as Configuration['externals'],
     ...(isEsm
       ? [
           ((data: any, callback: any) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             const request: string | undefined = data.request;
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
             if (!request) return callback(null);
             const bare = request.startsWith('node:') ? request.slice(5) : request;
             if (builtinModules.includes(bare)) {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
               return callback(null, `node:${bare}`);
             }
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             callback(null);
           }) as unknown as Configuration['externals'],
         ]
@@ -119,9 +118,8 @@ const config: Configuration = {
     new NxAppRspackPlugin({
       tsConfig: tsConfigFile,
       main: 'apps/search-worker/src/main.ts',
-      sourceMap: process.env['NODE_ENV'] !== 'production',
-      optimization: process.env['NODE_ENV'] === 'production',
-      externalDependencies: 'none',
+      sourceMap: NODE_ENV !== 'production',
+      optimization: NODE_ENV === 'production',
     }),
     new rspack.NormalModuleReplacementPlugin(/file-type$/, require.resolve('./stub.js')),
     new rspack.IgnorePlugin({
@@ -183,6 +181,8 @@ const config: Configuration = {
         }
       },
     }),
+    isDev && new rspack.HotModuleReplacementPlugin(),
+    isDev && new RunScriptWebpackPlugin({ name: 'main.cjs', autoRestart: false }),
   ],
 };
 

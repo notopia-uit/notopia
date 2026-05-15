@@ -65,6 +65,7 @@
     "@swc/core": "catalog:",
     "@swc/helpers": "catalog:",
     "@types/ws": "catalog:",
+    "run-script-webpack-plugin": "catalog:",
     "tsx": "catalog:",
     "typeorm-extension": "catalog:",
     "webpack-node-externals": "catalog:"

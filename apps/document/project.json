@@ -23,9 +23,6 @@
       "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
       "executor": "nx:noop"
     },
-    "nx-release-publish": {
-      "parallelism": false
-    },
     "build": {
       "options": {
         "mode": "development",
@@ -51,17 +48,6 @@
         "inspect": false,
         "port": 9222,
         "watch": false
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "document:build:development"
-        },
-        "mon": {
-          "buildTarget": "document:build:development"
-        },
-        "production": {
-          "buildTarget": "document:build:production"
-        }
       }
     },
     "debug": {
@@ -77,6 +63,9 @@
     },
     "docker:build": {
       "dependsOn": ["prune", "build", "^build"]
+    },
+    "nx-release-publish": {
+      "parallelism": false
     }
   },
   "release": {
