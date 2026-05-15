@@ -6,7 +6,9 @@ export default async function NotePage({ params }: { params: Promise<{ noteId: s
   const token = await fetchAccessTokenServerSide();
   return (
     <div className="p-4">
-      <HocuspocusProviderWebsocketComponent url= {process.env.NEXT_PUBLIC_HOCUSPOCUS_SERVER_URL ?? 'ws://localhost:4000'} >
+      <HocuspocusProviderWebsocketComponent
+        url={`ws://${process.env.NEXT_PUBLIC_API_URL}/document/ws/document`}
+      >
         <HocuspocusRoom name={noteId} token={token}>
           <Editor noteId={noteId} />
         </HocuspocusRoom>

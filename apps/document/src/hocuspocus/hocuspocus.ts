@@ -35,7 +35,9 @@ export class Hocuspocus {
         }),
         new HocuspocusDatabase({
           fetch: async ({ documentName: id }) => {
+            this.logger.log(`[Hey] Fetching document with ID: ${id}`);
             const document = await documentService.getById(id);
+            this.logger.log(`[Hey] Fetched document: ${JSON.stringify(document?.data)}`);
             return document?.data ?? null;
           },
           store: async ({ documentName: id, state }) => {
@@ -50,6 +52,7 @@ export class Hocuspocus {
     data: onAuthenticatePayload<HocuspocusContext>
   ): Promise<HocuspocusContext> {
     const documentId = data.documentName;
+    this.logger.log(`[Hey] Authenticating user for document ID: ${documentId}`);
     const user = await this.authenticationService.validateToken(data.token);
     const note = await this.noteService.getNoteById({
       noteId: documentId,

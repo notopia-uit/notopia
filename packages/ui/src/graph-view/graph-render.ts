@@ -140,8 +140,8 @@ export async function renderGraph(
     links: validLinks
       .filter((l: any) => neighbourhood.has(l.source) && neighbourhood.has(l.target))
       .map((l: any) => ({
-        source: nodes.find((n: NodeData) => n.id === l.source)!,
-        target: nodes.find((n: NodeData) => n.id === l.target)!,
+        source: nodes.find((n: NodeData) => n.id === l.source),
+        target: nodes.find((n: NodeData) => n.id === l.target),
       })),
   };
 
@@ -199,7 +199,7 @@ export async function renderGraph(
     const isCurrent = d.id === currentSlug;
     if (isCurrent) {
       return computedStyleMap['--secondary'];
-    } else if (visited.has(d.id) || d.id.startsWith('tags/')) {
+    } else if (visited.has(d.id) || d.id.startsWith('#')) {
       return computedStyleMap['--tertiary'];
     } else {
       return computedStyleMap['--gray'];
@@ -385,7 +385,7 @@ export async function renderGraph(
     label.scale.set(1 / scale);
 
     let oldLabelOpacity = 0;
-    const isTagNode = nodeId.startsWith('tags/');
+    const isTagNode = nodeId.startsWith('#');
     const gfx = new Graphics({
       interactive: true,
       label: nodeId,

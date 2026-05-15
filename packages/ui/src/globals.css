@@ -1,9 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '@blocknote/shadcn/style.css';
-@source '../../../apps/**/*.{ts,tsx}';
-@source '../../../components/**/*.{ts,tsx}';
-@source '../**/*.{ts,tsx}';
+@source '**/*.{ts,tsx}';
 @source '../node_modules/@blocknote/shadcn';
 
 @custom-variant dark (&:is(.dark *));

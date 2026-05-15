@@ -29,7 +29,6 @@ import { useIsDocModified } from '@notopia-uit/ui/hooks/use-is-doc-modified';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useMemo } from 'react';
-import { useState, useRef } from 'react';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { ErrorAlert } from './error-alert';
@@ -40,6 +39,7 @@ import { Badge } from './shadcn/badge';
 import { Button } from './shadcn/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
 import { SuccessAlert } from './success-alert';
+
 function EditorStatus() {
   const connection = useHocuspocusConnectionStatus();
   const sync = useHocuspocusSyncStatus();
@@ -86,20 +86,20 @@ function EditorStatus() {
 
         <div className="ml-auto flex items-center gap-2">
           <div className="mr-2 flex -space-x-2">
-            {users.slice(0, 3).map((user, i) => (
+            {users.slice(0, 3).map((user) => (
               <Tooltip key={user.clientId}>
                 <TooltipTrigger asChild>
                   <Avatar className="border-background ring-border size-8 border-2 ring-1">
-                    <AvatarImage src={user.avatar} />
+                    <AvatarImage src={user.user.avatar} />
                     <AvatarFallback
-                      style={{ backgroundColor: user.color }}
+                      style={{ backgroundColor: user.user.color }}
                       className="text-[10px] text-white"
                     >
-                      {user.name.substring(0, 2).toUpperCase() ?? '??'}
+                      {user.user.name.substring(0, 2).toUpperCase() ?? '??'}
                     </AvatarFallback>
                   </Avatar>
                 </TooltipTrigger>
-                <TooltipContent>{user.name}</TooltipContent>
+                <TooltipContent>{user.user.name}</TooltipContent>
               </Tooltip>
             ))}
           </div>

@@ -59,11 +59,15 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
       },
     }),
     select: (response) =>
-      response.data.map((revision) => ({
-        id: revision.id,
-        name: revision.name,
-        createdAt: revision.createdAt.toString(),
-      })) as Revision[],
+      response.data.map((revision) => {
+        const createdAt = revision.createdAt.toString();
+        const name = revision.name ?? createdAt;
+        return {
+          id: revision.id,
+          name: name,
+          createdAt: createdAt,
+        } satisfies Revision;
+      }),
   });
 
   const {

@@ -504,7 +504,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           <Button
             variant="outline"
             size="sm"
-            size-3
+            size-3="true"
             className="h-8 flex-1 text-xs" // flex-1 makes them share the space equally
             onClick={() => handleCreateItem(false)}
           >
@@ -514,7 +514,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           <Button
             variant="outline"
             size="sm"
-            size-3
+            size-3="true"
             className="h-8 flex-1 text-xs"
             onClick={() => handleCreateItem(true)}
           >
