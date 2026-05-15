@@ -1,2 +1,2 @@
-@import '../../../packages/ui/src/globals.css';
+@import '@notopia-uit/ui/styles';
 @source '**/*.{ts,tsx}';
