@@ -15,6 +15,8 @@ import { GlobalExceptionFilter } from './common/http-exception.filter';
 import { AppConfig } from './config/config';
 import { APP_CONFIG } from './config/config.factory';
 
+declare const module: any;
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.useWebSocketAdapter(new WsAdapter(app));
@@ -33,6 +35,11 @@ async function bootstrap() {
   const port = appConfig.port;
   await app.startAllMicroservices();
   await app.listen(port);
+
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
 }
 
 bootstrap().catch((err) => {

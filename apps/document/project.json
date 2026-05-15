@@ -48,7 +48,9 @@
       "dependsOn": ["build"],
       "options": {
         "buildTarget": "document:build:development",
-        "port": 9222
+        "inspect": false,
+        "port": 9222,
+        "watch": false
       },
       "configurations": {
         "development": {
@@ -58,10 +60,19 @@
           "buildTarget": "document:build:development"
         },
         "production": {
-          "buildTarget": "document:build:production",
-          "inspect": false,
-          "watch": false
+          "buildTarget": "document:build:production"
         }
+      }
+    },
+    "debug": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "document:build:development",
+        "inspect": "inspect-brk",
+        "port": 9222,
+        "watch": false
       }
     },
     "docker:build": {

@@ -49,12 +49,7 @@
       "name": "Debug Document",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["exec", "nx", "run", "document"],
-      "skipFiles": ["<node_internals>/**"],
-      "sourceMapPathOverrides": {
-        "webpack://@notopia-uit/document/./*": "${workspaceFolder}/apps/document/*",
-        "webpack://@notopia-uit/document/*": "${workspaceFolder}/apps/document/*",
-        "webpack://@notopia-uit/document/../../node_modules/*": "${workspaceFolder}/node_modules/*"
-      },
+      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/apps/document/dist/**"],
       "outFiles": ["${workspaceFolder}/apps/document/dist/**/*.(m|c|)js", "!**/node_modules/**"]
     },
     {
@@ -63,13 +58,8 @@
       "name": "Attach Document",
       "address": "localhost",
       "port": 9222,
-      "skipFiles": ["<node_internals>/**"],
+      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/apps/document/dist/**"],
       "restart": true,
-      "sourceMapPathOverrides": {
-        "webpack://@notopia-uit/document/./*": "${workspaceFolder}/apps/document/*",
-        "webpack://@notopia-uit/document/*": "${workspaceFolder}/apps/document/*",
-        "webpack://@notopia-uit/document/../../node_modules/*": "${workspaceFolder}/node_modules/*"
-      },
       "outFiles": ["${workspaceFolder}/apps/document/dist/**/*.(m|c|)js", "!**/node_modules/**"]
     },
     {
@@ -78,12 +68,7 @@
       "name": "Debug Search Worker",
       "runtimeExecutable": "pnpm exec nx",
       "runtimeArgs": ["run", "search-worker"],
-      "skipFiles": ["<node_internals>/**"],
-      "sourceMapPathOverrides": {
-        "webpack://@notopia-uit/search-worker/./*": "${workspaceFolder}/apps/search-worker/*",
-        "webpack://@notopia-uit/search-worker/*": "${workspaceFolder}/apps/search-worker/*",
-        "webpack://@notopia-uit/search-worker/../../node_modules/*": "${workspaceFolder}/node_modules/*"
-      },
+      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/apps/search-worker/dist/**"],
       "outFiles": [
         "${workspaceFolder}/apps/search-worker/dist/**/*.(m|c|)js",
         "!**/node_modules/**"
@@ -95,13 +80,8 @@
       "name": "Attach Search Worker",
       "address": "localhost",
       "port": 9223,
-      "skipFiles": ["<node_internals>/**"],
+      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/apps/search-worker/dist/**"],
       "restart": true,
-      "sourceMapPathOverrides": {
-        "webpack://@notopia-uit/search-worker/./*": "${workspaceFolder}/apps/search-worker/*",
-        "webpack://@notopia-uit/search-worker/*": "${workspaceFolder}/apps/search-worker/*",
-        "webpack://@notopia-uit/search-worker/../../node_modules/*": "${workspaceFolder}/node_modules/*"
-      },
       "outFiles": [
         "${workspaceFolder}/apps/search-worker/dist/**/*.(m|c|)js",
         "!**/node_modules/**"

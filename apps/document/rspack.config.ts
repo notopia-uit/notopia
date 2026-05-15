@@ -2,7 +2,7 @@ import { builtinModules } from 'module';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 
-import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
+import { NxAppRspackPlugin } from '@nx/rspack/app-plugin';
 import type { Configuration } from '@rspack/cli';
 import rspack from '@rspack/core';
 import nodeExternals from 'webpack-node-externals';
@@ -13,10 +13,11 @@ const __dirname = import.meta.dirname;
 const isEsm = false;
 const tsConfigFile = join(__dirname, 'tsconfig.app.json');
 
+const NODE_ENV = process.env['NODE_ENV'] || 'development';
+
 const config: Configuration = {
   target: 'node',
-  // devtool: process.env['NODE_ENV'] === 'production' ? false : 'source-map',
-  // devtool: 'source-map',
+  devtool: NODE_ENV === 'production' ? false : 'source-map',
   output: {
     module: isEsm,
     path: join(__dirname, './dist'),
@@ -24,9 +25,6 @@ const config: Configuration = {
     filename: `[name].${isEsm ? 'm' : 'c'}js`,
     chunkFilename: '[name].[contenthash].js',
     devtoolModuleFilenameTemplate: '[absolute-resource-path]',
-  },
-  experiments: {
-    outputModule: isEsm,
   },
   externalsPresets: { node: true },
   optimization: {
@@ -53,6 +51,7 @@ const config: Configuration = {
           {
             loader: 'builtin:swc-loader',
             options: {
+              detectSyntax: 'auto',
               jsc: {
                 parser: {
                   syntax: 'typescript',
@@ -64,7 +63,6 @@ const config: Configuration = {
                 },
                 target: 'esnext',
               },
-              sourceMaps: process.env['NODE_ENV'] !== 'production',
             },
           },
         ],
@@ -126,15 +124,18 @@ const config: Configuration = {
     new NxAppRspackPlugin({
       tsConfig: tsConfigFile,
       main: 'apps/document/src/main.ts',
-      sourceMap: process.env['NODE_ENV'] !== 'production',
-      optimization: process.env['NODE_ENV'] === 'production',
-      externalDependencies: 'none',
+      sourceMap: NODE_ENV !== 'production',
+      optimization: NODE_ENV === 'production',
     }),
     new rspack.CopyRspackPlugin({
       patterns: [{ from: join(__dirname, '../../proto'), to: 'proto' }],
     }),
     new rspack.NormalModuleReplacementPlugin(/file-type$/, require.resolve('./stub.js')),
-    new rspack.NormalModuleReplacementPlugin(/@protobufjs\/inquire/, require.resolve('./inquire-shim.js')),
+    new rspack.NormalModuleReplacementPlugin(
+      /@protobufjs\/inquire/,
+      require.resolve('./inquire-shim.js')
+    ),
+    new rspack.SourceMapDevToolPlugin({}),
     new rspack.IgnorePlugin({
       checkResource(resource) {
         const lazyImports = [

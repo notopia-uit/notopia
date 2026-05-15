@@ -16,7 +16,7 @@
     "loose": false
   },
   "module": {
-    "type": "nodenext"
+    "type": "commonjs"
   },
   "sourceMaps": true,
   "minify": false
