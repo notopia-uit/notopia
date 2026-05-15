@@ -1,6 +1,5 @@
 'use client';
 import { getMyWorkspacesOptions, useRenameWorkspaceMutation } from '@notopia-uit/api-gen';
-import { type NoteUserWorkspace } from '@notopia-uit/api-gen';
 import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
@@ -10,11 +9,10 @@ import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useQuery } from '@tanstack/react-query';
-import { CheckCircle2, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-import { Alert, AlertDescription, AlertTitle } from './shadcn/alert';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +32,7 @@ interface GeneralSettingsProps {
 //TODO: handle loading and error states
 export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
   const {
-    data: allWorkspaceData = {} as NoteUserWorkspace[],
+    data: allWorkspaceData,
     isPending,
     isError,
     error,

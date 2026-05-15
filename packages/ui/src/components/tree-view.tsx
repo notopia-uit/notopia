@@ -193,7 +193,7 @@ const viewStateInitial: TreeViewState = {
 //TODO: handle loading states, errors, empty states, etc.
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
   const {
-    data: { treeData: workspaceTreeData, rootId } = { treeData: {}, rootId: '' },
+    data,
     isError: isGetWorkSpaceTreeError,
     error: getWorkspaceTreeError,
     isPending: isGettingWorkspaceTree,
@@ -204,9 +204,8 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     select: (data) => mapDtoTreeData(data),
   });
 
-  if (isGetWorkSpaceTreeError) {
-    throw getWorkspaceTreeError;
-  }
+  const workspaceTreeData = data?.treeData;
+  const rootId = data?.rootId ?? '';
   const router = useRouter();
   const tree = useRef<TreeRef>(null);
 
@@ -294,7 +293,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   const [search, setSearch] = useState<string | undefined>('');
   useEffect(() => {
     const abortController = new AbortController();
-    const _ = getWorkspaceEvents({
+    getWorkspaceEvents({
       path: { workspaceId: currentWorkspaceId },
       signal: abortController.signal,
       onSseEvent: (event) => {
@@ -323,9 +322,11 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     };
   }, [currentWorkspaceId, showAlert]);
 
-  const [items, setItems] = useState<Record<TreeItemIndex, TreeItem<string>>>(workspaceTreeData);
+  const [items, setItems] = useState<Record<TreeItemIndex, TreeItem<string>>>({});
   useEffect(() => {
-    setItems(workspaceTreeData);
+    if (workspaceTreeData) {
+      setItems(workspaceTreeData);
+    }
   }, [workspaceTreeData]);
 
   const dataProvider = useMemo(() => new TreeDataProvider<string>(items), [items]);
@@ -478,6 +479,10 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     },
     [getItemPath, search]
   );
+
+  if (isGetWorkSpaceTreeError) {
+    throw getWorkspaceTreeError;
+  }
 
   //TODO: maybe use skeleton?
   return isGettingWorkspaceTree ? (
