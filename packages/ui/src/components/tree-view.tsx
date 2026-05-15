@@ -3,6 +3,7 @@
 import {
   NoteWorkspaceTreeFolder,
   NoteWorkspaceTreeNote,
+  getWorkspaceEvents,
   getWorkspaceTreeOptions,
   useCreateFolderMutation,
   useCreateNoteMutation,
@@ -15,7 +16,7 @@ import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -291,6 +292,36 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   });
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
+  useEffect(() => {
+    const abortController = new AbortController();
+    const _ = getWorkspaceEvents({
+      path: { workspaceId: currentWorkspaceId },
+      signal: abortController.signal,
+      onSseEvent: (event) => {
+        switch (event.event) {
+          case 'WorkspaceItemsUpdatedEvent':
+          case 'WorkspaceRenamedEvent':
+          case 'WorkspaceDeletedEvent':
+            break;
+          case 'HeartBeatWorkspaceEvent':
+            break;
+          default:
+            showAlert('error', 'Unknown Event', `Received unknown event: ${event.event}`);
+        }
+      },
+      onSseError: (error) => {
+        showAlert(
+          'error',
+          'Connection Error',
+          `${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+      },
+    });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [currentWorkspaceId, showAlert]);
 
   const [items, setItems] = useState<Record<TreeItemIndex, TreeItem<string>>>(workspaceTreeData);
   useEffect(() => {
