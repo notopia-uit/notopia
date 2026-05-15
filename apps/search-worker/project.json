@@ -1,13 +1,12 @@
 {
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "search-worker",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "targets": {
     "prune-lockfile": {
       "dependsOn": ["build"],
       "cache": true,
       "executor": "@nx/js:prune-lockfile",
-      "outputs": ["{projectRoot}/dist/package.json", "{projectRoot}/dist/pnpm-lock.yaml"],
       "options": {
         "buildTarget": "build"
       }
@@ -15,7 +14,6 @@
     "copy-workspace-modules": {
       "dependsOn": ["build"],
       "cache": true,
-      "outputs": ["{projectRoot}/dist/workspace_modules"],
       "executor": "@nx/js:copy-workspace-modules",
       "options": {
         "buildTarget": "build"
@@ -26,13 +24,18 @@
       "executor": "nx:noop"
     },
     "build": {
-      "defaultConfiguration": "development",
+      "options": {
+        "mode": "development",
+        "args": ["--node-env=development"]
+      },
       "configurations": {
         "development": {
-          "mode": "development"
+          "mode": "development",
+          "args": ["--node-env=development"]
         },
         "production": {
-          "mode": "production"
+          "mode": "production",
+          "args": ["--node-env=production"]
         }
       }
     },
@@ -42,20 +45,20 @@
       "dependsOn": ["build"],
       "options": {
         "buildTarget": "search-worker:build:development",
-        "port": 9223
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "search-worker:build:development"
-        },
-        "mon": {
-          "buildTarget": "search-worker:build:development"
-        },
-        "production": {
-          "buildTarget": "search-worker:build:production",
-          "inspect": false,
-          "watch": false
-        }
+        "inspect": false,
+        "port": 9223,
+        "watch": false
+      }
+    },
+    "debug": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "search-worker:build:development",
+        "inspect": "inspect-brk",
+        "port": 9223,
+        "watch": false
       }
     },
     "docker:build": {

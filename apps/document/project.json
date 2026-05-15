@@ -23,9 +23,6 @@
       "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
       "executor": "nx:noop"
     },
-    "nx-release-publish": {
-      "parallelism": false
-    },
     "build": {
       "options": {
         "mode": "development",
@@ -48,24 +45,27 @@
       "dependsOn": ["build"],
       "options": {
         "buildTarget": "document:build:development",
-        "port": 9222
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "document:build:development"
-        },
-        "mon": {
-          "buildTarget": "document:build:development"
-        },
-        "production": {
-          "buildTarget": "document:build:production",
-          "inspect": false,
-          "watch": false
-        }
+        "inspect": false,
+        "port": 9222,
+        "watch": false
+      }
+    },
+    "debug": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "document:build:development",
+        "inspect": "inspect-brk",
+        "port": 9222,
+        "watch": false
       }
     },
     "docker:build": {
       "dependsOn": ["prune", "build", "^build"]
+    },
+    "nx-release-publish": {
+      "parallelism": false
     }
   },
   "release": {

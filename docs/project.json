@@ -8,8 +8,9 @@
       "{projectRoot}/.vitepress/config.{mts,ts}",
       "{projectRoot}/.vitepress/theme/**/*.{vue,ts,mts}",
       "{projectRoot}/src/**/*.md",
-      "{projectRoot}/public/**",
-      "{projectRoot}/diagrams/**"
+      "{projectRoot}/src/public/**",
+      "!{projectRoot}/src/public/diagrams/**",
+      "{projectRoot}/src/diagrams/**"
     ]
   },
   "targets": {

@@ -2,7 +2,7 @@
   "name": "@notopia-uit/api-document-nestjs-server",
   "version": "0.2.0",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
