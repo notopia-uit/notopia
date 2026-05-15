@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",
+    "run-script-webpack-plugin": "catalog:",
     "webpack-node-externals": "catalog:"
   }
 }

@@ -22,8 +22,8 @@ import { NoteService } from './note.service';
           if (!servicesCfg) {
             throw new Error('SERVICE_CONFIG not found');
           }
-          const protoPath = join(process.cwd(), 'proto/note/note.proto');
-          const includeDirs = [join(process.cwd(), 'proto')];
+          const protoPath = join(__dirname, 'proto/note/note.proto');
+          const includeDirs = [join(__dirname, 'proto')];
           return {
             transport: Transport.GRPC,
             options: {
