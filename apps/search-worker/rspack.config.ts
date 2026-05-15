@@ -4,7 +4,7 @@ import { join } from 'path';
 import { NxAppRspackPlugin } from '@nx/rspack/app-plugin';
 import type { Configuration } from '@rspack/cli';
 import rspack from '@rspack/core';
-import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
+// import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
 
 const isEsm = false;
@@ -182,7 +182,7 @@ const config: Configuration = {
       },
     }),
     isDev && new rspack.HotModuleReplacementPlugin(),
-    isDev && new RunScriptWebpackPlugin({ name: 'main.cjs', autoRestart: false }),
+    // isDev && new RunScriptWebpackPlugin({ name: 'main.cjs', autoRestart: false }),
   ],
 };
 
