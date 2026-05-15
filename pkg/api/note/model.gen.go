@@ -542,15 +542,15 @@ type UpdateWorkspaceMembersJSONBody = []WorkspaceMember
 
 // MoveWorkspaceItemsJSONBody defines parameters for MoveWorkspaceItems.
 type MoveWorkspaceItemsJSONBody struct {
-	DestinationFolderId *Id    `json:"destinationFolderId,omitempty"`
-	FolderIds           *[]Id  `json:"folderIds,omitempty"`
-	NoteIds             *[]Id2 `json:"noteIds,omitempty"`
+	DestinationFolderId openapi_types.UUID    `json:"destinationFolderId"`
+	FolderIds           *[]openapi_types.UUID `json:"folderIds,omitempty"`
+	NoteIds             *[]openapi_types.UUID `json:"noteIds,omitempty"`
 }
 
 // PermanentlyDeleteWorkspaceItemsJSONBody defines parameters for PermanentlyDeleteWorkspaceItems.
 type PermanentlyDeleteWorkspaceItemsJSONBody struct {
-	FolderIds *[]Id  `json:"folderIds,omitempty"`
-	NoteIds   *[]Id2 `json:"noteIds,omitempty"`
+	FolderIds *[]openapi_types.UUID `json:"folderIds,omitempty"`
+	NoteIds   *[]openapi_types.UUID `json:"noteIds,omitempty"`
 }
 
 // RenameWorkspaceJSONBody defines parameters for RenameWorkspace.
@@ -560,14 +560,14 @@ type RenameWorkspaceJSONBody struct {
 
 // RestoreTrashedWorkspaceItemsJSONBody defines parameters for RestoreTrashedWorkspaceItems.
 type RestoreTrashedWorkspaceItemsJSONBody struct {
-	FolderIds *[]Id  `json:"folderIds,omitempty"`
-	NoteIds   *[]Id2 `json:"noteIds,omitempty"`
+	FolderIds *[]openapi_types.UUID `json:"folderIds,omitempty"`
+	NoteIds   *[]openapi_types.UUID `json:"noteIds,omitempty"`
 }
 
 // TrashWorkspaceItemsJSONBody defines parameters for TrashWorkspaceItems.
 type TrashWorkspaceItemsJSONBody struct {
-	FolderIds *[]Id  `json:"folderIds,omitempty"`
-	NoteIds   *[]Id2 `json:"noteIds,omitempty"`
+	FolderIds *[]openapi_types.UUID `json:"folderIds,omitempty"`
+	NoteIds   *[]openapi_types.UUID `json:"noteIds,omitempty"`
 }
 
 // GetWorkspaceTreeParams defines parameters for GetWorkspaceTree.

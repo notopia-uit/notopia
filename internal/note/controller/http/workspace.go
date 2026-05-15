@@ -295,10 +295,7 @@ func (h *StrictHandler) MoveWorkspaceItems(
 		folderIDs = *request.Body.FolderIds
 	}
 
-	var destFolderID uuid.UUID
-	if request.Body.DestinationFolderId != nil {
-		destFolderID = *request.Body.DestinationFolderId
-	}
+	destFolderID := request.Body.DestinationFolderId
 
 	cmd := &app.MoveWorkspaceItems{
 		UserID:              user.ID,

@@ -768,9 +768,9 @@ export const zUpdateWorkspaceMembersPath = z.object({
 export const zUpdateWorkspaceMembersResponse = z.void();
 
 export const zMoveWorkspaceItemsBody = z.object({
-    noteIds: z.array(zNoteId2).optional(),
-    folderIds: z.array(zNoteId).optional(),
-    destinationFolderId: zNoteId
+    noteIds: z.array(z.uuid()).optional(),
+    folderIds: z.array(z.uuid()).optional(),
+    destinationFolderId: z.uuid()
 });
 
 export const zMoveWorkspaceItemsPath = z.object({
@@ -783,8 +783,8 @@ export const zMoveWorkspaceItemsPath = z.object({
 export const zMoveWorkspaceItemsResponse = z.void();
 
 export const zPermanentlyDeleteWorkspaceItemsBody = z.object({
-    noteIds: z.array(zNoteId2).optional(),
-    folderIds: z.array(zNoteId).optional()
+    noteIds: z.array(z.uuid()).optional(),
+    folderIds: z.array(z.uuid()).optional()
 });
 
 export const zPermanentlyDeleteWorkspaceItemsPath = z.object({
@@ -819,8 +819,8 @@ export const zRenameWorkspacePath = z.object({
 export const zRenameWorkspaceResponse = z.void();
 
 export const zRestoreTrashedWorkspaceItemsBody = z.object({
-    noteIds: z.array(zNoteId2).optional(),
-    folderIds: z.array(zNoteId).optional()
+    noteIds: z.array(z.uuid()).optional(),
+    folderIds: z.array(z.uuid()).optional()
 });
 
 export const zRestoreTrashedWorkspaceItemsPath = z.object({
@@ -854,8 +854,8 @@ export const zShowTrashResponse = z.object({
 });
 
 export const zTrashWorkspaceItemsBody = z.object({
-    noteIds: z.array(zNoteId2).optional(),
-    folderIds: z.array(zNoteId).optional()
+    noteIds: z.array(z.uuid()).optional(),
+    folderIds: z.array(z.uuid()).optional()
 });
 
 export const zTrashWorkspaceItemsPath = z.object({

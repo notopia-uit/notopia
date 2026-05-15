@@ -1757,9 +1757,9 @@ export type UpdateWorkspaceMembersResponse = UpdateWorkspaceMembersResponses[key
 
 export type MoveWorkspaceItemsData = {
     body: {
-        noteIds?: Array<NoteId2>;
-        folderIds?: Array<NoteId>;
-        destinationFolderId: NoteId;
+        noteIds?: Array<string>;
+        folderIds?: Array<string>;
+        destinationFolderId: string;
     };
     path: {
         workspaceId: NoteId3;
@@ -1802,8 +1802,8 @@ export type MoveWorkspaceItemsResponse = MoveWorkspaceItemsResponses[keyof MoveW
 
 export type PermanentlyDeleteWorkspaceItemsData = {
     body: {
-        noteIds?: Array<NoteId2>;
-        folderIds?: Array<NoteId>;
+        noteIds?: Array<string>;
+        folderIds?: Array<string>;
     };
     path: {
         workspaceId: NoteId3;
@@ -1930,8 +1930,8 @@ export type RenameWorkspaceResponse = RenameWorkspaceResponses[keyof RenameWorks
 
 export type RestoreTrashedWorkspaceItemsData = {
     body: {
-        noteIds?: Array<NoteId2>;
-        folderIds?: Array<NoteId>;
+        noteIds?: Array<string>;
+        folderIds?: Array<string>;
     };
     path: {
         workspaceId: NoteId3;
@@ -2063,8 +2063,8 @@ export type ShowTrashResponse = ShowTrashResponses[keyof ShowTrashResponses];
 
 export type TrashWorkspaceItemsData = {
     body: {
-        noteIds?: Array<NoteId2>;
-        folderIds?: Array<NoteId>;
+        noteIds?: Array<string>;
+        folderIds?: Array<string>;
     };
     path: {
         workspaceId: NoteId3;

@@ -19648,17 +19648,23 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_id-2"
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "000c2575-1847-5293-8117-2415a2328ef8"
                     }
                   },
                   "folderIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_id"
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "123e4567-e89b-12d3-a456-426614174000"
                     }
                   },
                   "destinationFolderId": {
-                    "$ref": "#/components/schemas/note_id"
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
                   }
                 },
                 "required": [
@@ -19721,13 +19727,17 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_id-2"
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "000c2575-1847-5293-8117-2415a2328ef8"
                     }
                   },
                   "folderIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_id"
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "123e4567-e89b-12d3-a456-426614174000"
                     }
                   }
                 }
@@ -19892,13 +19902,17 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_id-2"
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "000c2575-1847-5293-8117-2415a2328ef8"
                     }
                   },
                   "folderIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_id"
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "123e4567-e89b-12d3-a456-426614174000"
                     }
                   }
                 }
@@ -20080,13 +20094,17 @@
                   "noteIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_id-2"
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "000c2575-1847-5293-8117-2415a2328ef8"
                     }
                   },
                   "folderIds": {
                     "type": "array",
                     "items": {
-                      "$ref": "#/components/schemas/note_id"
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "123e4567-e89b-12d3-a456-426614174000"
                     }
                   }
                 }
