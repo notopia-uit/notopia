@@ -1,4 +1,4 @@
-import { Connection, Hocuspocus } from '@hocuspocus/server';
+import { Connection } from '@hocuspocus/server';
 import { Injectable } from '@nestjs/common';
 import { Traceable } from 'nestjs-otel';
 
@@ -8,19 +8,21 @@ import { WorkspaceModel } from '#/note/models';
 import { NoteService } from '#/note/note.service';
 import { WorkspaceNoteNotFoundException } from '#/note/workspace-note-not-found.exception';
 
+import { Hocuspocus } from './hocuspocus';
+
 @Injectable()
 @Traceable()
 export class HocuspocusService {
   constructor(
     private readonly noteService: NoteService,
-    private readonly hocuspocus: Hocuspocus<HocuspocusContext>,
+    private readonly hocuspocus: Hocuspocus,
     private readonly authorizationService: AuthorizationService
   ) {}
 
   // NOTE: We don't really need to check the permission canRead, because yeah
   // Because based on the casbin rules, it will be always canRead when this event fired
   async onRoleChanged({ workspaceId, userId }: { workspaceId: string; userId: string }) {
-    for (const [documentName, document] of this.hocuspocus.documents) {
+    for (const [documentName, document] of this.hocuspocus.hocuspocus.documents) {
       for (const connection of document.getConnections() as Connection<HocuspocusContext>[]) {
         const context = connection.context as HocuspocusContext;
         if (context.user.id !== userId) {
@@ -63,7 +65,7 @@ export class HocuspocusService {
 
   // NOTE: If we handle the published, then this should be adjusted
   async onMemberRemoved({ workspaceId, userId }: { workspaceId: string; userId: string }) {
-    for (const [documentName, document] of this.hocuspocus.documents) {
+    for (const [documentName, document] of this.hocuspocus.hocuspocus.documents) {
       for (const connection of document.getConnections() as Connection<HocuspocusContext>[]) {
         const context = connection.context as HocuspocusContext;
         if (context.user.id !== userId) {

@@ -7,13 +7,13 @@ import { HocuspocusController } from '#/hocuspocus/hocuspocus.controller';
 import { HocuspocusService } from '#/hocuspocus/hocuspocus.service';
 import { NoteModule } from '#/note/note.module';
 
+import { Hocuspocus } from './hocuspocus';
 import { HocuspocusGateway } from './hocuspocus.gateway';
-import { HocuspocusProvider } from './hocuspocus.provider';
 
 @Module({
   controllers: [HocuspocusController],
   imports: [NoteModule, AuthorizationModule, AuthenticationModule, DocumentModule],
-  providers: [HocuspocusGateway, HocuspocusProvider, HocuspocusService],
-  exports: [HocuspocusProvider, HocuspocusService],
+  providers: [HocuspocusGateway, HocuspocusService, Hocuspocus],
+  exports: [HocuspocusService, Hocuspocus],
 })
 export class HocuspocusModule {}
