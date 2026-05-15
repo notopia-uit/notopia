@@ -139,6 +139,13 @@ lsp.config("tailwindcss", {
       },
     },
   },
+  capabilities = {
+    workspace = {
+      didChangeWatchedFiles = {
+        dynamicRegistration = false,
+      },
+    },
+  },
 } --[[@as vim.lsp.Config]])
 
 lsp.config("twcssls", {
