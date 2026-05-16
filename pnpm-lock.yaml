@@ -135,6 +135,9 @@ catalogs:
     '@tailwindcss/postcss':
       specifier: 4.2.4
       version: 4.2.4
+    '@tailwindcss/vite':
+      specifier: 4.2.4
+      version: 4.2.4
     '@tanstack/react-query':
       specifier: 5.90.21
       version: 5.90.21
@@ -797,12 +800,21 @@ importers:
       '@notopia-uit/ui':
         specifier: 'workspace:'
         version: link:../../packages/ui
+      '@tailwindcss/vite':
+        specifier: 'catalog:'
+        version: 4.2.4(vite@8.0.12(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.3))
       oidc-client-ts:
         specifier: 'catalog:'
         version: 3.5.0
       react-oidc-context:
         specifier: 'catalog:'
         version: 3.3.1(oidc-client-ts@3.5.0)(react@19.2.6)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.2.4
+      tw-animate-css:
+        specifier: 'catalog:'
+        version: 1.4.0
 
   apps/web:
     dependencies:
@@ -7603,6 +7615,11 @@ packages:
 
   '@tailwindcss/postcss@4.2.4':
     resolution: {integrity: sha512-wgAVj6nUWAolAu8YFvzT2cTBIElWHkjZwFYovF+xsqKsW2ADxM/X2opxj5NsF/qVccAOjRNe8X2IdPzMsWyHTg==}
+
+  '@tailwindcss/vite@4.2.4':
+    resolution: {integrity: sha512-pCvohwOCspk3ZFn6eJzrrX3g4n2JY73H6MmYC87XfGPyTty4YsCjYTMArRZm/zOI8dIt3+EcrLHAFPe5A4bgtw==}
+    peerDependencies:
+      vite: ^5.2.0 || ^6 || ^7 || ^8
 
   '@tanstack/query-core@5.90.20':
     resolution: {integrity: sha512-OMD2HLpNouXEfZJWcKeVKUgQ5n+n3A2JFmBaScpNDUqSrQSjiveC7dKMe53uJUg1nDG16ttFPz2xfilz6i2uVg==}
@@ -25615,6 +25632,13 @@ snapshots:
       '@tailwindcss/oxide': 4.2.4
       postcss: 8.5.10
       tailwindcss: 4.2.4
+
+  '@tailwindcss/vite@4.2.4(vite@8.0.12(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.3))':
+    dependencies:
+      '@tailwindcss/node': 4.2.4
+      '@tailwindcss/oxide': 4.2.4
+      tailwindcss: 4.2.4
+      vite: 8.0.12(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.3)
 
   '@tanstack/query-core@5.90.20': {}
 

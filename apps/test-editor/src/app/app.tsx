@@ -2,8 +2,6 @@ import '@blocknote/core/fonts/inter.css';
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
 import { HocuspocusProviderWebsocketComponent, HocuspocusRoom } from '@hocuspocus/provider-react';
-
-import '@blocknote/shadcn/style.css';
 import { useHocuspocusProvider, useHocuspocusConnectionStatus } from '@hocuspocus/provider-react';
 import { createBlockNoteSchema } from '@notopia-uit/ui';
 import type { User } from 'oidc-client-ts';
@@ -29,7 +27,7 @@ function AuthenticatedEditor({ user }: { user: User }) {
       provider: {
         awareness: provider.awareness ?? undefined,
       },
-      fragment: provider.document.getXmlFragment('document-store'),
+      fragment: provider.document.getXmlFragment('prosemirror'),
       user: {
         name: user.profile?.name ?? user.profile?.preferred_username ?? 'Anonymous',
         color: getDeterministicColor(user.profile?.sub ?? 'anonymous'),

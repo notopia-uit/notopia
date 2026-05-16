@@ -7,7 +7,10 @@
     "@blocknote/shadcn": "catalog:",
     "@hocuspocus/provider-react": "catalog:",
     "@notopia-uit/ui": "workspace:",
+    "@tailwindcss/vite": "catalog:",
     "oidc-client-ts": "catalog:",
-    "react-oidc-context": "catalog:"
+    "react-oidc-context": "catalog:",
+    "tailwindcss": "catalog:",
+    "tw-animate-css": "catalog:"
   }
 }

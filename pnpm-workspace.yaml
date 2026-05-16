@@ -59,6 +59,7 @@ catalog:
   "@opentelemetry/sdk-trace-node": "2.7.1"
   "@opentelemetry/semantic-conventions": "1.40.0"
   "@tailwindcss/postcss": "4.2.4"
+  "@tailwindcss/vite": "4.2.4"
   "@tanstack/react-query": "5.90.21"
   "@types/express": "5.0.6"
   "@types/node": "25.3.5"
