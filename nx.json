@@ -22,7 +22,11 @@
       "{workspaceRoot}/pkg/**/*.{go}",
       "!{workspaceRoot}/pkg/**/*_test.{go}"
     ],
-    "goFiles": ["{workspaceRoot}/go.mod", "{workspaceRoot}/go.sum", "{projectRoot}/**/*.go"],
+    "goFiles": [
+      "{workspaceRoot}/go.mod",
+      "{workspaceRoot}/go.sum",
+      "{projectRoot}/**/*.go"
+    ],
     "protoFiles": [
       "{projectRoot}/**/*.proto",
       "{workspaceRoot}/buf.gen.yaml",
@@ -38,8 +42,15 @@
       "cache": true
     },
     "build*": {
-      "inputs": ["default", "^default"],
-      "dependsOn": ["^build*", "^bundle*", "^gen"],
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "dependsOn": [
+        "^build*",
+        "^bundle*",
+        "^gen"
+      ],
       "defaultConfiguration": "development",
       "cache": true
     },
@@ -54,7 +65,9 @@
       }
     },
     "test": {
-      "dependsOn": ["^test*"],
+      "dependsOn": [
+        "^test*"
+      ],
       "cache": true
     },
     "lint*": {
@@ -62,8 +75,13 @@
     },
     "@nx/js:swc": {
       "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["default", "^default"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "default",
+        "^default"
+      ]
     }
   },
   "plugins": [
@@ -154,7 +172,10 @@
         "runTarget": {
           "name": "docker:run",
           "cwd": "{workspaceRoot}",
-          "args": ["-f", "{projectRoot}/Dockerfile"]
+          "args": [
+            "-f",
+            "{projectRoot}/Dockerfile"
+          ]
         }
       }
     },
@@ -185,7 +206,9 @@
         "releaseTag": {
           "pattern": "notopia-packages@{version}"
         },
-        "projects": ["packages/*"],
+        "projects": [
+          "packages/*"
+        ],
         "projectsRelationship": "fixed",
         "version": {
           "conventionalCommits": true,
@@ -198,7 +221,13 @@
         }
       },
       "docker-go": {
-        "projects": ["note", "authorization", "document", "search-worker", "web"],
+        "projects": [
+          "note",
+          "authorization",
+          "document",
+          "search-worker",
+          "web"
+        ],
         "releaseTag": {
           "pattern": "{projectName}@{version}"
         },

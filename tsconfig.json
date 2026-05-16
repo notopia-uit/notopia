@@ -33,6 +33,9 @@
     },
     {
       "path": "./apps/search-worker"
+    },
+    {
+      "path": "./apps/test-editor"
     }
   ]
 }
