@@ -5,7 +5,6 @@ import '@notopia-uit/lib/yjs';
 import 'reflect-metadata';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { WsAdapter } from '@nestjs/platform-ws';
 import { Logger } from 'nestjs-pino';
 
 import { getKafkaConfig } from '#/config/kafka.config';
@@ -19,7 +18,6 @@ declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.useWebSocketAdapter(new WsAdapter(app));
   app.connectMicroservice({
     useFactory: getKafkaConfig,
     inject: [ConfigService],

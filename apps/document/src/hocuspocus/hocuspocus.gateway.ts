@@ -1,19 +1,49 @@
-import { UseGuards } from '@nestjs/common';
-import { ConnectedSocket, OnGatewayConnection, WebSocketGateway } from '@nestjs/websockets';
-import { Traceable } from 'nestjs-otel';
-import { WebSocket } from 'ws';
+import { Server as HttpServer } from 'node:http'; // or 'node:https' if you use SSL
 
-import { WsUserGuard } from '#/common/user.guard';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { HttpAdapterHost } from '@nestjs/core';
+import { Traceable } from 'nestjs-otel';
+import { WebSocketServer } from 'ws';
 
 import { Hocuspocus } from './hocuspocus';
 
-@WebSocketGateway({ path: '/document/ws/document' })
+// You know, it is not really a nestjs gateway at all
 @Traceable()
-export class HocuspocusGateway implements OnGatewayConnection {
-  constructor(private readonly hocuspocus: Hocuspocus) {}
+@Injectable()
+export class HocuspocusGateway implements OnModuleInit, OnModuleDestroy {
+  private server: WebSocketServer | undefined;
 
-  @UseGuards(WsUserGuard)
-  handleConnection(@ConnectedSocket() socket: WebSocket, req: Request) {
-    this.hocuspocus.hocuspocus.handleConnection(socket, req);
+  constructor(
+    private readonly hocuspocus: Hocuspocus,
+    private readonly adapterHost: HttpAdapterHost
+  ) {}
+
+  onModuleInit() {
+    const server = this.adapterHost.httpAdapter.getHttpServer() as HttpServer;
+    this.server = new WebSocketServer({ noServer: true });
+
+    server.on('upgrade', (request, socket, head) => {
+      const url = new URL(request.url || '', `http://${request.headers.host}`);
+      if (url.pathname === '/document/ws/document') {
+        this.server?.handleUpgrade(request, socket, head, (ws) => {
+          this.server?.emit('connection', ws, request);
+        });
+      }
+    });
+
+    this.server?.on('connection', (ws, request) => {
+      const protocol = request.headers['x-forwarded-proto'] || 'http';
+      const webRequest = new Request(`${protocol}://${request.headers.host}${request.url}`, {
+        headers: new Headers(request.headers as any),
+        method: request.method,
+      });
+
+      this.hocuspocus.hocuspocus.handleConnection(ws, webRequest);
+    });
+  }
+
+  onModuleDestroy() {
+    this.hocuspocus.hocuspocus.closeConnections();
+    this.server?.close();
   }
 }
