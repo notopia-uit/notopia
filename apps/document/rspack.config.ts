@@ -125,7 +125,6 @@ const config: Configuration = {
     new NxAppRspackPlugin({
       tsConfig: tsConfigFile,
       main: 'apps/document/src/main.ts',
-      sourceMap: isDev,
       optimization: !isDev,
       generatePackageJson: true,
     }),
