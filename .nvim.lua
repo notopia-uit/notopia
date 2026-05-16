@@ -339,6 +339,20 @@ lsp.config("oxlint", {
 } --[[@as vim.lsp.Config]])
 
 lsp.config("oxfmt", {
+  filetypes = {
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "toml",
+    "html",
+    "vue",
+    "handlebars",
+    "css",
+    "scss",
+    "less",
+    "markdown",
+  },
   cmd = { "./node_modules/.bin/oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" },
   root_dir = function(_, on_dir)
     on_dir(root)
