@@ -18,23 +18,33 @@ export class RevisionApi extends RevisionApiDefinition {
   }
 
   async deleteRevision(revisionId: string): Promise<void> {
-    this.logger.log(`deleteRevision: received revisionId=${revisionId}`);
-    await this.revisionService.deleteRevision(revisionId);
-    this.logger.log(`deleteRevision: done revisionId=${revisionId}`);
+    this.logger.log({ revisionId }, 'deleteRevision: received');
+    try {
+      await this.revisionService.deleteRevision(revisionId);
+      this.logger.log({ revisionId }, 'deleteRevision: done');
+    } catch (error) {
+      this.logger.error({ err: error, revisionId }, 'deleteRevision: error');
+      throw error;
+    }
   }
 
   async getRevisionWithContent(revisionId: string): Promise<RevisionWithContent> {
-    this.logger.log(`getRevisionWithContent: received revisionId=${revisionId}`);
-    const revisionEntity = await this.revisionService.getRevision(revisionId);
-    const response: RevisionWithContent = {
-      id: revisionEntity.id,
-      name: revisionEntity.name,
-      content: revisionEntity.content,
-      createdAt: revisionEntity.createdAt.toISOString(),
-    };
-    this.logger.log(`getRevisionWithContent: done revisionId=${revisionId}`);
-    this.logger.debug({ id: response.id, name: response.name }, 'getRevisionWithContent: response');
-    return response;
+    this.logger.log({ revisionId }, 'getRevisionWithContent: received');
+    try {
+      const revisionEntity = await this.revisionService.getRevision(revisionId);
+      const response: RevisionWithContent = {
+        id: revisionEntity.id,
+        name: revisionEntity.name,
+        content: revisionEntity.content,
+        createdAt: revisionEntity.createdAt.toISOString(),
+      };
+      this.logger.log({ revisionId }, 'getRevisionWithContent: done');
+      this.logger.debug({ id: response.id, name: response.name }, 'getRevisionWithContent: response');
+      return response;
+    } catch (error) {
+      this.logger.error({ err: error, revisionId }, 'getRevisionWithContent: error');
+      throw error;
+    }
   }
 
   async getRevisions(
@@ -42,38 +52,48 @@ export class RevisionApi extends RevisionApiDefinition {
     page: number,
     limit: number
   ): Promise<GetRevisions200Response> {
-    this.logger.log(`getRevisions: received documentId=${documentId} page=${page} limit=${limit}`);
-    const result = await this.revisionService.getRevisionsByDocumentId(documentId, page, limit);
-    const totalPages = Math.ceil(result.total / result.limit);
-    const response: GetRevisions200Response = {
-      data: result.data.map((r) => ({
-        id: r.id,
-        name: r.name,
-        createdAt: r.createdAt.toISOString(),
-      })),
-      pagination: {
-        page: result.page,
-        limit: result.limit,
-        total: result.total,
-        totalPages,
-        hasNext: result.page < totalPages,
-        hasPrev: result.page > 1,
-      },
-    };
-    this.logger.log(`getRevisions: done documentId=${documentId} total=${result.total}`);
-    this.logger.debug(
-      { count: response.data.length, pagination: response.pagination },
-      'getRevisions: response'
-    );
-    return response;
+    this.logger.log({ documentId, page, limit }, 'getRevisions: received');
+    try {
+      const result = await this.revisionService.getRevisionsByDocumentId(documentId, page, limit);
+      const totalPages = Math.ceil(result.total / result.limit);
+      const response: GetRevisions200Response = {
+        data: result.data.map((r) => ({
+          id: r.id,
+          name: r.name,
+          createdAt: r.createdAt.toISOString(),
+        })),
+        pagination: {
+          page: result.page,
+          limit: result.limit,
+          total: result.total,
+          totalPages,
+          hasNext: result.page < totalPages,
+          hasPrev: result.page > 1,
+        },
+      };
+      this.logger.log({ documentId, total: result.total }, 'getRevisions: done');
+      this.logger.debug(
+        { count: response.data.length, pagination: response.pagination },
+        'getRevisions: response'
+      );
+      return response;
+    } catch (error) {
+      this.logger.error({ err: error, documentId }, 'getRevisions: error');
+      throw error;
+    }
   }
 
   async renameRevision(
     revisionId: string,
     renameRevisionRequest: RenameRevisionRequest
   ): Promise<void> {
-    this.logger.log(`renameRevision: received revisionId=${revisionId}`);
-    await this.revisionService.renameRevision(revisionId, renameRevisionRequest.name);
-    this.logger.log(`renameRevision: done revisionId=${revisionId}`);
+    this.logger.log({ revisionId }, 'renameRevision: received');
+    try {
+      await this.revisionService.renameRevision(revisionId, renameRevisionRequest.name);
+      this.logger.log({ revisionId }, 'renameRevision: done');
+    } catch (error) {
+      this.logger.error({ err: error, revisionId }, 'renameRevision: error');
+      throw error;
+    }
   }
 }

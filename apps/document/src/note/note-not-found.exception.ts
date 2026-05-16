@@ -1,7 +1,11 @@
 import { NotFoundException } from '@nestjs/common';
 
 export class NoteNotFoundException extends NotFoundException {
-  constructor(noteId: string) {
-    super(`Note with id ${noteId} not found`);
+  override name = NoteNotFoundException.name;
+
+  readonly noteId: string;
+  constructor(noteId: string, cause?: unknown) {
+    super(`Note with id ${noteId} not found`, { cause });
+    this.noteId = noteId;
   }
 }

@@ -38,7 +38,7 @@ export const SERVICE_CONFIG = Symbol('SERVICE_CONFIG');
 export const servicesConfig = registerAs(
   SERVICE_CONFIG,
   (): ServicesConfig => ({
-    noteUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_NOTE_GPRC_URL ?? '',
+    noteUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_NOTE_GRPC_URL ?? '',
     authorizationUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_GRPC_URL ?? '',
   })
 );

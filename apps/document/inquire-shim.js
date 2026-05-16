@@ -7,11 +7,12 @@
 // Upstream fix (webpackIgnore magic comment) is in protobufjs PR#2226, not yet released.
 const fs = require("fs");
 const path = require("path");
+const buffer = require("buffer");
 
 let long = null;
 try { long = require("long"); } catch (e) {}
 
-const _modules = { fs, path, long };
+const _modules = { fs, path, long, buffer };
 
 module.exports = function inquire(moduleName) {
   const mod = _modules[moduleName];

@@ -1,0 +1,16 @@
+{
+  "name": "@notopia-uit/test-editor",
+  "private": true,
+  "dependencies": {
+    "@blocknote/core": "catalog:",
+    "@blocknote/react": "catalog:",
+    "@blocknote/shadcn": "catalog:",
+    "@hocuspocus/provider-react": "catalog:",
+    "@notopia-uit/ui": "workspace:",
+    "@tailwindcss/vite": "catalog:",
+    "oidc-client-ts": "catalog:",
+    "react-oidc-context": "catalog:",
+    "tailwindcss": "catalog:",
+    "tw-animate-css": "catalog:"
+  }
+}
