@@ -1,6 +1,6 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 
-export class DocumentPermissionException extends UnauthorizedException {
+export class DocumentPermissionException extends ForbiddenException {
   override name = DocumentPermissionException.name;
 
   readonly documentId: string;

@@ -38,12 +38,26 @@ import { APP_CONFIG, MEILI_CONFIG, appConfig, kafkaConfig, meiliConfig } from '.
             level,
             stream,
             serializers: {
-              err: (err: HttpException) => ({
-                status: err.getStatus(),
-                message: err.message,
-                stack: err.stack,
-                cause: err.cause,
-              }),
+              err: (err: unknown) => {
+                if (err instanceof HttpException) {
+                  return {
+                    type: err.name,
+                    status: err.getStatus(),
+                    message: err.message,
+                    stack: err.stack,
+                    cause: err.cause,
+                  };
+                }
+                if (err instanceof Error) {
+                  return {
+                    type: err.name,
+                    message: err.message,
+                    stack: err.stack,
+                    cause: (err as Error & { cause?: unknown }).cause,
+                  };
+                }
+                return { message: String(err) };
+              },
             },
           },
         };

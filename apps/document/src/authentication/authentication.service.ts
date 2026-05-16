@@ -26,8 +26,13 @@ export class AuthenticationService {
     this.keySets = jwksUrls.map((url) => jose.createRemoteJWKSet(url));
     this.issuers = authenticationConfig.issuers;
     this.audiences = authenticationConfig.audiences;
-    console.info(
-      `AuthenticationService initialized with JWKS URLs: ${jwksUrls.join(', ')}, Issuers: ${this.issuers?.join(', ')}, Audiences: ${this.audiences?.join(', ')}`
+    this.logger.log(
+      {
+        jwksUrls: jwksUrls.map((url) => url.toString()),
+        issuers: this.issuers,
+        audiences: this.audiences,
+      },
+      'AuthenticationService initialized'
     );
   }
 

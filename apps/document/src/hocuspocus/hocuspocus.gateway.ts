@@ -1,4 +1,5 @@
-import { Server as HttpServer } from 'node:http';
+import { Server as HttpServer, IncomingMessage } from 'node:http';
+import { Duplex } from 'node:stream';
 
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
@@ -11,6 +12,8 @@ import { Hocuspocus } from './hocuspocus';
 @Injectable()
 export class HocuspocusGateway implements OnModuleInit, OnModuleDestroy {
   private server: WebSocketServer | undefined;
+
+  private httpServer: HttpServer | undefined;
   private readonly logger = new Logger(HocuspocusGateway.name);
 
   constructor(
@@ -19,18 +22,10 @@ export class HocuspocusGateway implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit() {
-    const server = this.adapterHost.httpAdapter.getHttpServer() as HttpServer;
+    this.httpServer = this.adapterHost.httpAdapter.getHttpServer() as HttpServer;
     this.server = new WebSocketServer({ noServer: true });
 
-    server.on('upgrade', (request, socket, head) => {
-      const url = new URL(request.url || '', `http://${request.headers.host}`);
-      if (url.pathname === '/document/ws/document') {
-        this.logger.debug({ pathname: url.pathname }, 'Upgrading connection to WebSocket');
-        this.server?.handleUpgrade(request, socket, head, (ws) => {
-          this.server?.emit('connection', ws, request);
-        });
-      }
-    });
+    this.httpServer.on('upgrade', (request, socket, head) => this.onUpgrade(request, socket, head));
 
     this.server?.on('connection', (ws, request) => {
       this.logger.debug(
@@ -55,8 +50,19 @@ export class HocuspocusGateway implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  private onUpgrade(request: IncomingMessage, socket: Duplex, head: Buffer) {
+    const url = new URL(request.url || '', `http://${request.headers.host}`);
+    if (url.pathname === '/document/ws/document') {
+      this.logger.debug(`Upgrading connection to WebSocket for ${url.pathname}`);
+      this.server?.handleUpgrade(request, socket, head, (ws) => {
+        this.server?.emit('connection', ws, request);
+      });
+    }
+  }
+
   onModuleDestroy() {
     this.hocuspocus.hocuspocus.closeConnections();
     this.server?.close();
+    this.httpServer?.off('upgrade', this.onUpgrade);
   }
 }

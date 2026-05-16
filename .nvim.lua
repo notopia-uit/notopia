@@ -111,6 +111,7 @@ lsp.config("tailwindcss", {
     local fname = vim.api.nvim_buf_get_name(bufnr)
     local allowed_paths = {
       "apps/web",
+      "apps/test-editor",
       "packages/ui",
     }
     local is_allowed = false
@@ -521,7 +522,7 @@ local progress_ev
 progress_ev = vim.api.nvim_create_autocmd("VimEnter", {
   group = progress_augroup,
   callback = function()
-    track_may_progress()
+    vim.schedule(track_may_progress)
     vim.api.nvim_del_autocmd(progress_ev)
   end,
 })

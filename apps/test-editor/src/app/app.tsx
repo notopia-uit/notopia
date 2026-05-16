@@ -54,16 +54,7 @@ function AuthenticatedEditor({ user }: { user: User }) {
 function SignInButton() {
   const auth = useAuth();
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        flexDirection: 'column',
-        gap: '1rem',
-      }}
-    >
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4">
       <p>You need to sign in to use the editor.</p>
       <button onClick={() => auth.signinRedirect()}>Sign In</button>
     </div>
@@ -72,14 +63,7 @@ function SignInButton() {
 
 function LoadingSpinner() {
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-      }}
-    >
+    <div className="flex min-h-screen items-center justify-center">
       <p>Loading...</p>
     </div>
   );
@@ -87,15 +71,8 @@ function LoadingSpinner() {
 
 function ErrorMessage({ message }: { message: string }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-      }}
-    >
-      <p style={{ color: 'red' }}>{message}</p>
+    <div className="flex min-h-screen items-center justify-center">
+      <p className="text-red-600">{message}</p>
     </div>
   );
 }
