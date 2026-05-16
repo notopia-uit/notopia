@@ -25,9 +25,9 @@ catalog:
   '@floating-ui/dom': '1.7.6'
   typeorm-extension: '3.9.0'
   tsx: 4.21.0
-  '@rspack/cli': '2.0.3'
-  '@rspack/core': '2.0.3'
-  '@rspack/dev-server': '^1.1.4'
+  '@rspack/cli': '1.6.8'
+  '@rspack/core': '1.6.8'
+  '@rspack/dev-server': '1.2.1'
   '@grpc/proto-loader': '0.8.1'
   '@bufbuild/protobuf': '2.11.0'
   '@connectrpc/validate': '0.2.0'

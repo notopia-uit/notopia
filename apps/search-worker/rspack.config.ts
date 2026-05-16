@@ -1,28 +1,35 @@
-import { builtinModules } from 'module';
+import { builtinModules, createRequire } from 'module';
 import { join } from 'path';
 
-import { NxAppRspackPlugin } from '@nx/rspack/app-plugin';
+import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
 import type { Configuration } from '@rspack/cli';
 import rspack from '@rspack/core';
 // import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
+
+const require = createRequire(import.meta.url);
+const __dirname = import.meta.dirname;
 
 const isEsm = false;
 const tsConfigFile = join(__dirname, 'tsconfig.app.json');
 
 const NODE_ENV = process.env['NODE_ENV'] || 'development';
 const isDev = NODE_ENV === 'development';
+const useHmr = false; // because nx handle that. But it isn't nicely I guess, it stop the whole process
 
 const config: Configuration = {
   target: 'node',
   devtool: NODE_ENV === 'production' ? false : 'source-map',
-  entry: isDev ? ['@rspack/core/hot/poll?1000', './src/main.ts'] : ['./src/main.ts'],
+  entry: useHmr ? ['@rspack/core/hot/poll?1000', './src/main.ts'] : ['./src/main.ts'],
   output: {
     module: isEsm,
     path: join(__dirname, './dist'),
     chunkFormat: isEsm ? 'module' : 'array-push',
     filename: `[name].${isEsm ? 'm' : 'c'}js`,
     chunkFilename: '[name].[contenthash].js',
+  },
+  experiments: {
+    outputModule: isEsm,
   },
   externalsPresets: { node: true },
   optimization: {
@@ -120,6 +127,7 @@ const config: Configuration = {
       main: 'apps/search-worker/src/main.ts',
       sourceMap: NODE_ENV !== 'production',
       optimization: NODE_ENV === 'production',
+      generatePackageJson: true,
     }),
     new rspack.NormalModuleReplacementPlugin(/file-type$/, require.resolve('./stub.js')),
     new rspack.IgnorePlugin({
@@ -181,9 +189,12 @@ const config: Configuration = {
         }
       },
     }),
-    isDev && new rspack.HotModuleReplacementPlugin(),
+    useHmr && new rspack.HotModuleReplacementPlugin(),
     // isDev && new RunScriptWebpackPlugin({ name: 'main.cjs', autoRestart: false }),
   ],
+  devServer: {
+    allowedHosts: 'all',
+  },
 };
 
 export default config;

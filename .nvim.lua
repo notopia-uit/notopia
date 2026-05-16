@@ -4,6 +4,12 @@ local root = vim.fn.expand("%:p:h")
 local uri_root = vim.uri_from_fname(root)
 local lsp_watchfile = vim.lsp._watchfiles
 
+vim.filetype.add({
+  filename = {
+    ["project.json"] = "jsonc",
+  },
+})
+
 vim.env.EDITING = "true" -- Trick with oxlint, for typeAware false
 
 -- For toggle
