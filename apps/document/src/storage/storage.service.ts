@@ -28,7 +28,7 @@ export class StorageService {
   }
 
   async generateAttachmentPresignedUploadUrl(key: string) {
-    this.logger.debug(`generateAttachmentPresignedUploadUrl: key=${key}`);
+    this.logger.debug({ key }, 'generateAttachmentPresignedUploadUrl');
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
       Key: key,
@@ -38,7 +38,7 @@ export class StorageService {
       expiresIn: StorageService.s3UrlExpirationSeconds,
     });
     const publicUrl = `${this.s3Endpoint}/${this.bucketName}/${key}`;
-    this.logger.debug(`generateAttachmentPresignedUploadUrl: done key=${key}`);
+    this.logger.debug({ key }, 'generateAttachmentPresignedUploadUrl: done');
     return { uploadUrl, publicUrl };
   }
 }

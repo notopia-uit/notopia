@@ -57,14 +57,11 @@ export class NoteService implements OnModuleInit {
       note = response.note;
     } catch (error) {
       if (isGrpcError(error) && error.code === status.NOT_FOUND) {
-        this.logger.warn({ noteId, err: error }, 'Note not found');
-        throw new NoteNotFoundException(noteId);
+        throw new NoteNotFoundException(noteId, error);
       }
-      this.logger.warn({ noteId, err: error }, 'gRPC error');
       throw error;
     }
     if (!note) {
-      this.logger.warn({ noteId }, 'Empty response for note');
       throw new NoteNotFoundException(noteId);
     }
 
@@ -86,7 +83,7 @@ export class NoteService implements OnModuleInit {
 
   // TODO: previously used to fetch each, but we might going to change batch, maybe this will be removed
   async getNoteName(noteId: string): Promise<string> {
-    this.logger.debug(`getNoteName: noteId=${noteId}`);
+    this.logger.debug({ noteId }, 'getNoteName');
     const response = await firstValueFrom(this.noteServiceClient.getNoteName({ id: noteId }));
     return response.name;
   }
@@ -110,14 +107,11 @@ export class NoteService implements OnModuleInit {
       workspace = response.workspace;
     } catch (error) {
       if (isGrpcError(error) && error.code === status.NOT_FOUND) {
-        this.logger.warn({ noteId, err: error }, 'Workspace not found for note');
-        throw new WorkspaceNoteNotFoundException(noteId);
+        throw new WorkspaceNoteNotFoundException(noteId, error);
       }
-      this.logger.warn({ noteId, err: error }, 'gRPC error');
       throw error;
     }
     if (!workspace) {
-      this.logger.warn({ noteId }, 'Empty response for workspace');
       throw new WorkspaceNoteNotFoundException(noteId);
     }
     return {

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpException, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
 import { Meilisearch } from 'meilisearch';
@@ -37,6 +37,14 @@ import { APP_CONFIG, MEILI_CONFIG, appConfig, kafkaConfig, meiliConfig } from '.
           pinoHttp: {
             level,
             stream,
+            serializers: {
+              err: (err: HttpException) => ({
+                status: err.getStatus(),
+                message: err.message,
+                stack: err.stack,
+                cause: err.cause,
+              }),
+            },
           },
         };
       },

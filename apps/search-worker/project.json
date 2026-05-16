@@ -35,8 +35,7 @@
         },
         "production": {
           "mode": "production",
-          "args": ["--node-env=production"],
-          "generatePackageJson": true
+          "args": ["--node-env=production"]
         }
       }
     },

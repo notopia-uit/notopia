@@ -19,7 +19,7 @@ const useHmr = false; // because nx handle that. But it isn't nicely I guess, it
 
 const config: Configuration = {
   target: 'node',
-  devtool: isDev ? false : 'source-map',
+  devtool: isDev ? 'source-map' : false,
   entry: useHmr ? ['@rspack/core/hot/poll?1000', './src/main.ts'] : ['./src/main.ts'],
   output: {
     module: isEsm,
@@ -125,8 +125,9 @@ const config: Configuration = {
     new NxAppRspackPlugin({
       tsConfig: tsConfigFile,
       main: 'apps/document/src/main.ts',
-      sourceMap: NODE_ENV !== 'production',
-      optimization: NODE_ENV === 'production',
+      sourceMap: isDev,
+      optimization: !isDev,
+      generatePackageJson: true,
     }),
     new rspack.CopyRspackPlugin({
       patterns: [{ from: join(__dirname, '../../proto'), to: 'proto' }],

@@ -1,4 +1,4 @@
-import { Inject, Module, OnModuleInit } from '@nestjs/common';
+import { HttpException, Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ClientKafka } from '@nestjs/microservices';
@@ -67,8 +67,8 @@ import { StorageModule } from './storage/storage.module';
                 ? pretty({ colorize: true, ignore: 'pid,hostname' })
                 : undefined,
             serializers: {
-              err: (err) => ({
-                type: err.type,
+              err: (err: HttpException) => ({
+                status: err.getStatus(),
                 message: err.message,
                 stack: err.stack,
                 cause: err.cause,
