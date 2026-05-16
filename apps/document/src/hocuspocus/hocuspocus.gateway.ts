@@ -41,7 +41,15 @@ export class HocuspocusGateway implements OnModuleInit, OnModuleDestroy {
         method: request.method,
       });
 
-      this.hocuspocus.hocuspocus.handleConnection(ws, webRequest);
+      const clientConnection = this.hocuspocus.hocuspocus.handleConnection(ws, webRequest);
+
+      ws.on('message', (data: Buffer) => {
+        clientConnection.handleMessage(new Uint8Array(data));
+      });
+
+      ws.on('close', (code: number, reason: Buffer) => {
+        clientConnection.handleClose({ code, reason: reason.toString() });
+      });
     });
   }
 

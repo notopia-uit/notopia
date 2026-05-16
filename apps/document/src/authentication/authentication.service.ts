@@ -26,6 +26,9 @@ export class AuthenticationService {
     this.keySets = jwksUrls.map((url) => jose.createRemoteJWKSet(url));
     this.issuers = authenticationConfig.issuers;
     this.audiences = authenticationConfig.audiences;
+    console.info(
+      `AuthenticationService initialized with JWKS URLs: ${jwksUrls.join(', ')}, Issuers: ${this.issuers?.join(', ')}, Audiences: ${this.audiences?.join(', ')}`
+    );
   }
 
   async validateToken(token: string): Promise<User> {

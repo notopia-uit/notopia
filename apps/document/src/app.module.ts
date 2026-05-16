@@ -66,6 +66,14 @@ import { StorageModule } from './storage/storage.module';
               appCfg.env !== 'production'
                 ? pretty({ colorize: true, ignore: 'pid,hostname' })
                 : undefined,
+            serializers: {
+              err: (err) => ({
+                type: err.type,
+                message: err.message,
+                stack: err.stack,
+                cause: err.cause,
+              }),
+            },
           },
         };
       },
