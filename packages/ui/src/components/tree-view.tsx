@@ -8,6 +8,7 @@ import {
   useCreateFolderMutation,
   useCreateNoteMutation,
   useMoveWorkspaceItemsMutation,
+  useTrashWorkspaceItemsMutation,
 } from '@notopia-uit/api-gen';
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
 import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
@@ -15,10 +16,16 @@ import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@notopia-uit/ui/components/shadcn/context-menu';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
+import { ChevronRight, FilePlus, FolderPlus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -439,9 +446,56 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     [rootId, items, currentWorkspaceId, moveWorkspaceItems]
   );
 
-  // NOTE: some problem with api contract, check this later
-  //TODO: call API to create new item and update tree data with response
-  // Maybe this logic need to be checked
+  const { mutate: trashItems } = useTrashWorkspaceItemsMutation({
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Trash Items Failed',
+        `${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    },
+    onSuccess: () => {
+      showAlert('success', 'Items Trashed', 'Items have been moved to trash successfully');
+    },
+  });
+
+  const handleTrashItem = useCallback(
+    (itemId: TreeItemIndex) => {
+      const item = items[itemId];
+      if (!item) return;
+
+      const isFolder = item.isFolder;
+
+      setItems((prevItems) => {
+        const newItems = { ...prevItems };
+
+        const parent = Object.values(newItems).find(
+          (p) => p.isFolder && p.children?.includes(itemId)
+        );
+        if (parent && parent.children) {
+          newItems[parent.index] = {
+            ...parent,
+            children: parent.children.filter((child) => child !== itemId),
+          };
+        }
+
+        delete newItems[itemId];
+        return newItems;
+      });
+
+      trashItems({
+        path: {
+          workspaceId: currentWorkspaceId,
+        },
+        body: {
+          noteIds: isFolder ? [] : [String(itemId)],
+          folderIds: isFolder ? [String(itemId)] : [],
+        },
+      });
+    },
+    [items, currentWorkspaceId, trashItems]
+  );
+
   const handleCreateItem = useCallback(
     (isFolder: boolean) => {
       const parentId = getTargetParentId();
@@ -647,34 +701,47 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           renderItemsContainer={({ children, containerProps }) => {
             return <ul {...containerProps}>{children}</ul>;
           }}
-          renderItem={({ title, item, arrow, context, depth, children }) => {
-            const indentation = 10 * depth;
-            return (
-              <li
-                {...context.itemContainerWithChildrenProps}
-                className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
-              >
-                <Button
-                  {...context.itemContainerWithoutChildrenProps}
-                  {...context.interactiveElementProps}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    `grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none`,
-                    'focus:bg-secondary/20'
-                  )}
-                  style={{
-                    paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,
-                  }}
-                >
-                  {item.isFolder && arrow}
-                  {title}
-                </Button>
-                {children}
-              </li>
-            );
-          }}
+           renderItem={({ title, item, arrow, context, depth, children }) => {
+             const indentation = 10 * depth;
+             return (
+               <li
+                 {...context.itemContainerWithChildrenProps}
+                 className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
+               >
+                 <ContextMenu>
+                   <ContextMenuTrigger asChild>
+                     <Button
+                       {...context.itemContainerWithoutChildrenProps}
+                       {...context.interactiveElementProps}
+                       type="button"
+                       variant="outline"
+                       size="sm"
+                       className={cn(
+                         `grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none`,
+                         'focus:bg-secondary/20'
+                       )}
+                       style={{
+                         paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,
+                       }}
+                     >
+                       {item.isFolder && arrow}
+                       {title}
+                     </Button>
+                   </ContextMenuTrigger>
+                   <ContextMenuContent>
+                     <ContextMenuItem
+                       variant="destructive"
+                       onClick={() => handleTrashItem(item.index)}
+                     >
+                       <Trash2 className="mr-2 size-4" />
+                       Move to Trash
+                     </ContextMenuItem>
+                   </ContextMenuContent>
+                 </ContextMenu>
+                 {children}
+               </li>
+             );
+           }}
           renderItemArrow={({ context }) => {
             return <ChevronRight {...context.arrowProps} className="size-3.5!" />;
           }}
