@@ -68,7 +68,7 @@ catalog:
   "@types/ws": "8.18.1"
   "@vitejs/plugin-react": "^6.0.0"
   "@vitejs/plugin-react-swc": "4.3.0"
-  autoprefixer: "10.4.27"
+  autoprefixer: "10.5.0"
   class-variance-authority: "0.7.1"
   clsx: "2.1.1"
   express: "5.2.1"
