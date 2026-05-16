@@ -93,7 +93,7 @@ catalog:
   typescript: '6.0.3'
   vite: '8.0.12'
   vite-plugin-dts: '4.5.4'
-  vitest: '4.0.18'
+  vitest: '4.1.6'
   webpack-node-externals: '3.0.0'
   ws: '8.19.0'
   zod: '4.4.3'
