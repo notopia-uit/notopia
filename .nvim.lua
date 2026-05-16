@@ -366,7 +366,7 @@ lsp.enable({
   "jsonls",
   "jsonls",
   "lua_ls",
-  "nestjs_doctor",
+  -- "nestjs_doctor",
   "nxls",
   "oxfmt",
   "oxlint",

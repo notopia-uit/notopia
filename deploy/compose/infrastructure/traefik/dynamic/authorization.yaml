@@ -19,7 +19,7 @@ http:
     authorization:
       loadBalancer:
         servers:
-          - url: http://host.docker.internal:18089
+          - url: http://host.docker.internal:8089
     authorization-health:
       loadBalancer:
         servers:

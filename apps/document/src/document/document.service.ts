@@ -90,7 +90,7 @@ export class DocumentService {
     documentId: string;
     userId: string;
   }): Promise<string> {
-    this.logger.debug(`commitDocument: start documentId=${documentId} userId=${userId}`);
+    this.logger.debug({ documentId, userId }, `commitDocument: checking permission`);
     const editor = ServerBlockNoteEditor.create({
       schema: this.blocknoteSchema,
     });
@@ -100,11 +100,14 @@ export class DocumentService {
         lock: { mode: 'pessimistic_write' },
       });
       if (!document) {
-        this.logger.warn(`commitDocument: document not found documentId=${documentId}`);
+        this.logger.warn({ documentId }, `commitDocument: document not found`);
         throw new NotFoundException(`Document ${documentId} not found`);
       }
       const revisionId = randomUUID();
-      this.logger.debug(`commitDocument: saving revision revisionId=${revisionId}`);
+      this.logger.debug(
+        { documentId, userId },
+        `commitDocument: saving revision revisionId=${revisionId}`
+      );
       await manager.save(RevisionEntity, {
         id: revisionId,
         document,
@@ -114,7 +117,8 @@ export class DocumentService {
       // TODO: Consider refactor into a module named "EventBus", which manages event topic
       const { tags, outgoingLinkIds } = this.extractTagsAndOutgoingLinkIds(editor);
       this.logger.debug(
-        `commitDocument: emitting committed event documentId=${documentId} tags=${tags.join(',')}`
+        { documentId, userId, tags, outgoingLinkIds },
+        `commitDocument: emitting event with tags and outgoingLinkIds`
       );
       await lastValueFrom(
         this.kafkaClient.emit('events.integration.document.document.committed', {
@@ -125,15 +129,13 @@ export class DocumentService {
           content: editor.editor.document satisfies MyBlock[],
         } satisfies ShareDocumentCommittedEvent)
       );
-      this.logger.log(`commitDocument: done documentId=${documentId} revisionId=${revisionId}`);
+      this.logger.log({ documentId, userId, revisionId }, `commitDocument: done`);
       return revisionId;
     });
   }
 
   async getAttachmentUploadUrl(documentId: string, userId: string) {
-    this.logger.debug(
-      `getAttachmentUploadUrl: checking permission documentId=${documentId} userId=${userId}`
-    );
+    this.logger.debug({ documentId, userId }, `getAttachmentUploadUrl: checking permission`);
     const hasPermission = await this.authorizationService.hasNotePermission({
       documentId,
       memberId: userId,
@@ -141,7 +143,8 @@ export class DocumentService {
     });
     if (!hasPermission) {
       this.logger.warn(
-        `getAttachmentUploadUrl: permission denied documentId=${documentId} userId=${userId}`
+        { documentId, userId },
+        `getAttachmentUploadUrl: user does not have permission`
       );
       throw new UnauthorizedException(
         `User ${userId} does not have permission to upload attachment to ${documentId}`
@@ -150,7 +153,7 @@ export class DocumentService {
     const key = `document-attachments/${documentId}/${randomUUID()}`;
     const { uploadUrl, publicUrl } =
       await this.storageService.generateAttachmentPresignedUploadUrl(key);
-    this.logger.log(`getAttachmentUploadUrl: done documentId=${documentId}`);
+    this.logger.log({ documentId, userId, key }, `getAttachmentUploadUrl: generated upload URL`);
     return {
       url: publicUrl,
       uploadUrl: uploadUrl,
@@ -158,12 +161,15 @@ export class DocumentService {
   }
 
   async updateDataById(id: string, data: Buffer): Promise<void> {
-    this.logger.debug(`updateDataById: id=${id} dataLength=${data.length}`);
+    this.logger.debug({ id, dataSize: data.length }, `updateDataById: updating document data`);
     await this.repo.update(id, { data, modified: true });
+    this.logger.log({ id, dataSize: data.length }, `updateDataById: document data updated`);
   }
 
   async getById(id: string): Promise<DocumentEntity | null> {
-    this.logger.debug(`getById: id=${id}`);
-    return this.repo.findOneBy({ id });
+    this.logger.debug({ id }, `getById: fetching document`);
+    const document = await this.repo.findOneBy({ id });
+    this.logger.log({ id }, `getById: document fetched`);
+    return document;
   }
 }
