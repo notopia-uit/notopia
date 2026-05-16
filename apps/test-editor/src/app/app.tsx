@@ -5,7 +5,9 @@ import { HocuspocusProviderWebsocketComponent, HocuspocusRoom } from '@hocuspocu
 
 import '@blocknote/shadcn/style.css';
 import { useHocuspocusProvider, useHocuspocusConnectionStatus } from '@hocuspocus/provider-react';
+import { createBlockNoteSchema } from '@notopia-uit/ui';
 import type { User } from 'oidc-client-ts';
+import { useMemo } from 'react';
 import { useAuth } from 'react-oidc-context';
 
 function getDeterministicColor(id: string): string {
@@ -18,9 +20,11 @@ function getDeterministicColor(id: string): string {
 }
 
 function AuthenticatedEditor({ user }: { user: User }) {
+  const schema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
   const connectionStatus = useHocuspocusConnectionStatus();
   const editor = useCreateBlockNote({
+    schema,
     collaboration: {
       provider: {
         awareness: provider.awareness ?? undefined,
@@ -39,7 +43,14 @@ function AuthenticatedEditor({ user }: { user: User }) {
     return <LoadingSpinner />;
   }
 
-  return <BlockNoteView editor={editor} />;
+  return (
+    <BlockNoteView
+      editor={editor}
+      onInvalid={(e) => {
+        console.error('BlockNoteView error:', e);
+      }}
+    />
+  );
 }
 
 function SignInButton() {

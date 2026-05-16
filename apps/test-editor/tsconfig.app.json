@@ -22,5 +22,12 @@
     "src/**/*.spec.tsx",
     "src/**/*.test.tsx"
   ],
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../../packages/ui/tsconfig.lib.json"
+    }
+  ]
 }

@@ -19,7 +19,7 @@ const useHmr = false; // because nx handle that. But it isn't nicely I guess, it
 
 const config: Configuration = {
   target: 'node',
-  devtool: isDev ? false : 'eval-source-map',
+  devtool: isDev ? false : 'source-map',
   entry: useHmr ? ['@rspack/core/hot/poll?1000', './src/main.ts'] : ['./src/main.ts'],
   output: {
     module: isEsm,

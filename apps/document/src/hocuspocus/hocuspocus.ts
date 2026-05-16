@@ -75,7 +75,10 @@ export class Hocuspocus {
     data: onChangePayload<HocuspocusContext>
   ): Promise<HocuspocusContext | void> {
     const metadata = data.document.getMap('metadata') as YDocMetadataMap;
-    metadata.set('metadata', { modified: true });
+    const existing = metadata.get('metadata');
+    if (!existing || !existing.modified) {
+      metadata.set('metadata', { modified: true });
+    }
     return Promise.resolve();
   }
 }

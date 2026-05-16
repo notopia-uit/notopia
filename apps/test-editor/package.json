@@ -6,7 +6,8 @@
     "@blocknote/react": "catalog:",
     "@blocknote/shadcn": "catalog:",
     "@hocuspocus/provider-react": "catalog:",
-    "react-oidc-context": "catalog:",
-    "oidc-client-ts": "catalog:"
+    "@notopia-uit/ui": "workspace:",
+    "oidc-client-ts": "catalog:",
+    "react-oidc-context": "catalog:"
   }
 }
