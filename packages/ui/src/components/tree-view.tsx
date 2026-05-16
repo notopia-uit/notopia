@@ -7,6 +7,7 @@ import {
   getWorkspaceTreeOptions,
   useCreateFolderMutation,
   useCreateNoteMutation,
+  useMoveWorkspaceItemsMutation,
 } from '@notopia-uit/api-gen';
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
 import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
@@ -348,9 +349,32 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     return parentId;
   }, [viewState, items, rootId]);
 
-  //TODO: this only mutate local state, need to call API to update data on server and handle errors, etc.
+  const { mutate: moveWorkspaceItems } = useMoveWorkspaceItemsMutation({
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Move Items Failed',
+        `${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    },
+    onSuccess: () => {
+      showAlert('success', 'Items Moved', 'Items have been moved successfully');
+    },
+  });
+
   const onDrop = useCallback(
     (draggedItems: TreeItem<string>[], target: DraggingPosition) => {
+      let destinationFolderId: TreeItemIndex = rootId;
+
+      if (target.targetType === 'item') {
+        const targetItem = items[target.targetItem];
+        destinationFolderId = targetItem?.isFolder ? target.targetItem : rootId;
+      } else if (target.targetType === 'between-items') {
+        destinationFolderId = target.parentItem;
+      } else if (target.targetType === 'root') {
+        destinationFolderId = rootId;
+      }
+
       setItems((prevItems) => {
         const newItems = { ...prevItems };
 
@@ -396,8 +420,23 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
         return newItems;
       });
+
+      for (const draggedItem of draggedItems) {
+        const isFolder = items[draggedItem.index]?.isFolder ?? false;
+
+        moveWorkspaceItems({
+          path: {
+            workspaceId: currentWorkspaceId,
+          },
+          body: {
+            noteIds: isFolder ? [] : [String(draggedItem.index)],
+            folderIds: isFolder ? [String(draggedItem.index)] : [],
+            destinationFolderId: String(destinationFolderId),
+          },
+        });
+      }
     },
-    [rootId]
+    [rootId, items, currentWorkspaceId, moveWorkspaceItems]
   );
 
   // NOTE: some problem with api contract, check this later
