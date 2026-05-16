@@ -100,6 +100,11 @@ func (lq *LogQuery[Q, R]) Handle(ctx context.Context, query *Q) (R, error) {
 			ctx, "Successfully handled query",
 			slog.String("handler", lq.handlerName),
 			slog.Any("query", query),
+		)
+		lq.logger.DebugContext(
+			ctx, "Query result",
+			slog.String("handler", lq.handlerName),
+			slog.Any("query", query),
 			slog.Any("result", result),
 		)
 	}
