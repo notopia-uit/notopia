@@ -2,8 +2,9 @@ import { builtinModules, createRequire } from 'module';
 import { join } from 'path';
 
 import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
+import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import type { Configuration } from '@rspack/cli';
-import rspack from '@rspack/core';
+import rspack, { type DevTool } from '@rspack/core';
 // import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
 
@@ -17,9 +18,11 @@ const NODE_ENV = process.env['NODE_ENV'] || 'development';
 const isDev = NODE_ENV === 'development';
 const useHmr = false; // because nx handle that. But it isn't nicely I guess, it stop the whole process
 
+const devTool: DevTool = isDev ? 'source-map' : false;
+
 const config: Configuration = {
   target: 'node',
-  devtool: isDev ? 'source-map' : false,
+  devtool: devTool,
   entry: useHmr ? ['@rspack/core/hot/poll?1000', './src/main.ts'] : ['./src/main.ts'],
   output: {
     module: isEsm,
@@ -126,6 +129,7 @@ const config: Configuration = {
       tsConfig: tsConfigFile,
       main: 'apps/document/src/main.ts',
       optimization: !isDev,
+      sourceMap: devTool,
       generatePackageJson: true,
     }),
     new rspack.CopyRspackPlugin({
@@ -149,7 +153,9 @@ const config: Configuration = {
           '@nestjs/platform-express',
           '@nestjs/websockets',
           '@nestjs/websockets/socket-module',
+          '@opentelemetry/winston-transport',
           '@sap/hana-client',
+          '@sap/hana-client/extension/Stream',
           'amqp-connection-manager',
           'amqplib',
           'aws4',
@@ -166,6 +172,7 @@ const config: Configuration = {
           'ioredis',
           'kafkajs',
           'kerberos',
+          'long',
           'mongodb',
           'mongodb-client-encryption',
           'mqtt',
@@ -198,6 +205,15 @@ const config: Configuration = {
     }),
     useHmr && new rspack.HotModuleReplacementPlugin(),
     // isDev && new RunScriptWebpackPlugin({ name: 'main.cjs', autoRestart: false }),
+    process.env.RSDOCTOR === 'true' ? new RsdoctorRspackPlugin() : undefined,
+  ],
+  ignoreWarnings: [
+    // Dynamic require(expression) in third-party packages — structural, cannot be fixed externally
+    { module: /typeorm/, message: /Critical dependency/ },
+    { module: /nestjs/, message: /Critical dependency/ },
+    { module: /express/, message: /Critical dependency/ },
+    { module: /app-root-path/, message: /Critical dependency/ },
+    { module: /load-esm/, message: /Critical dependency/ },
   ],
   devServer: {
     allowedHosts: 'all',

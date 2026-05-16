@@ -52,7 +52,12 @@
         "^gen"
       ],
       "defaultConfiguration": "development",
-      "cache": true
+      "cache": true,
+      "configurations": {
+        "development": {},
+        "production": {},
+        "doctor":{}
+      }
     },
     "dev": {
       "configurations": {

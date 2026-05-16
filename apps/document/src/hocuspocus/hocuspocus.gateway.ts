@@ -32,7 +32,7 @@ export class HocuspocusGateway implements OnModuleInit, OnModuleDestroy {
         { remoteAddress: request.socket.remoteAddress },
         'WebSocket connection established'
       );
-      const protocol = request.headers['x-forwarded-proto'] || 'http';
+      const protocol = (request.headers['x-forwarded-proto'] || 'http') as string;
       const webRequest = new Request(`${protocol}://${request.headers.host}${request.url}`, {
         headers: new Headers(request.headers as any),
         method: request.method,
@@ -63,6 +63,6 @@ export class HocuspocusGateway implements OnModuleInit, OnModuleDestroy {
   onModuleDestroy() {
     this.hocuspocus.hocuspocus.closeConnections();
     this.server?.close();
-    this.httpServer?.off('upgrade', this.onUpgrade);
+    this.httpServer?.off('upgrade', this.onUpgrade.bind(this));
   }
 }

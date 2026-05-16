@@ -2,8 +2,9 @@ import { builtinModules, createRequire } from 'module';
 import { join } from 'path';
 
 import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
+import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import type { Configuration } from '@rspack/cli';
-import rspack from '@rspack/core';
+import rspack, { type DevTool } from '@rspack/core';
 // import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
 
@@ -16,6 +17,8 @@ const tsConfigFile = join(__dirname, 'tsconfig.app.json');
 const NODE_ENV = process.env['NODE_ENV'] || 'development';
 const isDev = NODE_ENV === 'development';
 const useHmr = false; // because nx handle that. But it isn't nicely I guess, it stop the whole process
+
+const devTool: DevTool = isDev ? 'source-map' : false;
 
 const config: Configuration = {
   target: 'node',
@@ -126,6 +129,7 @@ const config: Configuration = {
       tsConfig: tsConfigFile,
       main: 'apps/search-worker/src/main.ts',
       optimization: !isDev,
+      sourceMap: devTool,
       generatePackageJson: true,
     }),
     new rspack.NormalModuleReplacementPlugin(/file-type$/, require.resolve('./stub.js')),
@@ -190,6 +194,7 @@ const config: Configuration = {
     }),
     useHmr && new rspack.HotModuleReplacementPlugin(),
     // isDev && new RunScriptWebpackPlugin({ name: 'main.cjs', autoRestart: false }),
+    process.env.RSDOCTOR === 'true' ? new RsdoctorRspackPlugin() : undefined,
   ],
   devServer: {
     allowedHosts: 'all',

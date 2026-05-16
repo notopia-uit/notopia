@@ -36,7 +36,8 @@
         "production": {
           "mode": "production",
           "args": ["--node-env=production"]
-        }
+        },
+        "doctor":{}
       }
     },
     "run": {
