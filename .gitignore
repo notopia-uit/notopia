@@ -31,3 +31,4 @@ tmp
 
 mise.local.toml
 .nx/self-healing
+vitest.config.*.timestamp*

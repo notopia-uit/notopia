@@ -95,7 +95,7 @@ catalog:
   typescript: "^6.0.3"
   vite: "^8.0.12"
   vite-plugin-dts: "^4.5.4"
-  vitest: "~4.1.0"
+  vitest: "^4.1.6"
   webpack-node-externals: "^3.0.0"
   ws: "^8.19.0"
   zod: "^4.4.3"
@@ -121,6 +121,9 @@ catalog:
   run-script-webpack-plugin: "0.2.3"
   react-oidc-context: "^3.3.1"
   oidc-client-ts: "^3.5.0"
+  "@suites/unit": "~3.1.0"
+  "@suites/di.nestjs": "~3.1.0"
+  "@suites/doubles.vitest": "~3.1.0"
 onlyBuiltDependencies:
   - "@bufbuild/buf"
   - "@nestjs/core"
