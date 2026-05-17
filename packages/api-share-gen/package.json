@@ -1,21 +1,13 @@
 {
-  "name": "@notopia-uit/api-gen",
-  "version": "0.2.0",
+  "name": "@notopia-uit/api-share-gen",
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
   "exports": {
     ".": {
-      "default": "./src/index.ts"
-    },
-    "./client": {
-      "default": "./src/client/index.ts"
-    },
-    "./client.gen": {
-      "default": "./src/client.gen.ts"
-    },
-    "./@tanstack": {
-      "default": "./src/@tanstack/index.ts"
+      "@nx/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },

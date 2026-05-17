@@ -62,8 +62,24 @@
       },
       "dependsOn": ["bundle:json"]
     },
+    "gen:hey-api": {
+      "outputs": ["{workspaceRoot}/packages/api-share-gen/src/"],
+      "inputs": [
+        {
+          "dependentTasksOutputFiles": "api/bundled/share.json",
+          "transitive": true
+        },
+        "{projectRoot}/openapi-ts.config.ts"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm exec openapi-ts",
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": ["bundle:json"]
+    },
     "gen": {
-      "dependsOn": ["gen:go"]
+      "dependsOn": ["gen:go", "gen:hey-api"]
     }
   }
 }

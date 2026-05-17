@@ -2,14 +2,10 @@ import { randomUUID } from 'crypto';
 
 import { type MyBlock, type MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import {
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { type ShareDocumentCommittedEvent } from '@notopia-uit/api-gen';
+import { type DocumentCommittedEvent } from '@notopia-uit/api-share-gen';
 import { Traceable } from 'nestjs-otel';
 import { lastValueFrom } from 'rxjs';
 import { DataSource, Repository } from 'typeorm';
@@ -103,10 +99,7 @@ export class DocumentService {
         throw new DocumentNotFoundException(documentId);
       }
       const revisionId = randomUUID();
-      this.logger.debug(
-        { documentId, revisionId },
-        'commitDocument: saving revision'
-      );
+      this.logger.debug({ documentId, revisionId }, 'commitDocument: saving revision');
       await manager.save(RevisionEntity, {
         id: revisionId,
         document,
@@ -115,10 +108,7 @@ export class DocumentService {
       await manager.update(DocumentEntity, { id: documentId }, { modified: false });
       // TODO: Consider refactor into a module named "EventBus", which manages event topic
       const { tags, outgoingLinkIds } = this.extractTagsAndOutgoingLinkIds(editor);
-      this.logger.debug(
-        { documentId, tags, outgoingLinkIds },
-        'commitDocument: emitting event'
-      );
+      this.logger.debug({ documentId, tags, outgoingLinkIds }, 'commitDocument: emitting event');
       await lastValueFrom(
         this.kafkaClient.emit('events.integration.document.document.committed', {
           id: documentId,
@@ -126,7 +116,7 @@ export class DocumentService {
           tags,
           outgoingLinkIds,
           content: editor.editor.document satisfies MyBlock[],
-        } satisfies ShareDocumentCommittedEvent)
+        } satisfies DocumentCommittedEvent)
       );
       this.logger.log({ documentId, revisionId }, 'commitDocument: done');
       return revisionId;

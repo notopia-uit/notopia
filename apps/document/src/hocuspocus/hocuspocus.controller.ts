@@ -1,9 +1,9 @@
 import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import type {
-  ShareUserWorkspaceRoleUpdatedEvent,
-  ShareWorkspaceMemberRemovedEvent,
-} from '@notopia-uit/api-gen';
+  UserWorkspaceRoleUpdatedEvent,
+  WorkspaceMemberRemovedEvent,
+} from '@notopia-uit/api-share-gen';
 
 import { HocuspocusService } from '#/hocuspocus/hocuspocus.service';
 
@@ -14,7 +14,7 @@ export class HocuspocusController {
   constructor(private readonly hocuspocusService: HocuspocusService) {}
 
   @MessagePattern('events.integration.authorization.user_workspace_role_updated')
-  async handleUserWorkspaceRoleUpdated(@Payload() data: ShareUserWorkspaceRoleUpdatedEvent) {
+  async handleUserWorkspaceRoleUpdated(@Payload() data: UserWorkspaceRoleUpdatedEvent) {
     this.logger.log(
       { workspaceId: data.workspaceId, userId: data.userId },
       'handleUserWorkspaceRoleUpdated: received'
@@ -30,7 +30,7 @@ export class HocuspocusController {
   }
 
   @MessagePattern('events.integration.authorization.workspace_member_removed')
-  async handleWorkspaceMemberRemoved(@Payload() data: ShareWorkspaceMemberRemovedEvent) {
+  async handleWorkspaceMemberRemoved(@Payload() data: WorkspaceMemberRemovedEvent) {
     this.logger.log(
       { workspaceId: data.workspaceId, userId: data.userId },
       'handleWorkspaceMemberRemoved: received'

@@ -36,6 +36,9 @@
     },
     {
       "path": "./apps/test-editor"
+    },
+    {
+      "path": "./packages/api-share-gen"
     }
   ]
 }

@@ -1,15 +1,5 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "packages/api-gen",
-  "projectType": "library",
-  "targets": {
-    "gen": {
-      "dependsOn": [
-        {
-          "projects": "api",
-          "target": "gen:hey-api"
-        }
-      ]
-    }
-  }
+  "projectType": "library"
 }

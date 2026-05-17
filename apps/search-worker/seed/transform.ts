@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readdirSync, statSync } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-import { ShareNoteSearch } from '@notopia-uit/api-gen';
+import { NoteSearch } from '@notopia-uit/api-share-gen';
 import markdownToTxt from 'markdown-to-txt';
 import { v5 as uuidv5 } from 'uuid';
 
@@ -48,7 +48,7 @@ async function processFile(filePath: string): Promise<void> {
 
   const content = await fs.readFile(filePath, 'utf-8');
 
-  const note: ShareNoteSearch = {
+  const note: NoteSearch = {
     id,
     workspaceId: WORKSPACE_ID,
     folderId,

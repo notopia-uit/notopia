@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { fileURLToPath } from 'node:url';
 import * as path from 'path';
 
-import { ShareNoteSearch } from '@notopia-uit/api-gen';
+import { NoteSearch } from '@notopia-uit/api-share-gen';
 import { Meilisearch, MeilisearchApiError, type Settings } from 'meilisearch';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -97,7 +97,7 @@ NOTOPIA_NOTE_MEILISEARCH_API_KEY=${key.key}`
 
   const files = fs.readdirSync(DATA_DIR);
   const documents = files.map(
-    (file) => JSON.parse(fs.readFileSync(path.join(DATA_DIR, file), 'utf-8')) as ShareNoteSearch
+    (file) => JSON.parse(fs.readFileSync(path.join(DATA_DIR, file), 'utf-8')) as NoteSearch
   );
 
   console.log(`Seeding ${documents.length} documents to Meilisearch...`);

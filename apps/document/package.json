@@ -29,6 +29,7 @@
     "@nestjs/platform-express": "catalog:",
     "@nestjs/typeorm": "catalog:",
     "@notopia-uit/api-document-nestjs-server": "workspace:",
+    "@notopia-uit/api-share-gen": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@notopia-uit/pb": "workspace:",
     "@opentelemetry/api": "catalog:",
@@ -58,7 +59,6 @@
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",
-    "@notopia-uit/api-gen": "workspace:",
     "@suites/di.nestjs": "catalog:",
     "@suites/doubles.vitest": "catalog:",
     "@suites/unit": "catalog:",
@@ -66,7 +66,6 @@
     "@swc/core": "catalog:",
     "@swc/helpers": "catalog:",
     "@types/ws": "catalog:",
-    "run-script-webpack-plugin": "catalog:",
     "tsx": "catalog:",
     "typeorm-extension": "catalog:",
     "unplugin-swc": "catalog:",

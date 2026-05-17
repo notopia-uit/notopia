@@ -2,7 +2,8 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "lib": ["dom"],
     "types": [
@@ -12,19 +13,12 @@
       "vite/client"
     ],
     "rootDir": "src",
-    "module": "esnext",
-    "moduleResolution": "bundler"
+    "outDir": "out-tsc",
+    "paths": {
+      "@notopia-uit/ui/*": ["../../packages/ui/src/*"]
+    }
   },
-  "exclude": [
-    "dist",
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
-    "src/**/*.spec.tsx",
-    "src/**/*.test.tsx"
-  ],
-  "include": [
-    "src/**/*"
-  ],
+  "include": ["src/**/*"],
   "references": [
     {
       "path": "../../packages/ui/tsconfig.lib.json"

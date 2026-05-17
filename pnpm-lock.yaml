@@ -282,9 +282,6 @@ catalogs:
     reflect-metadata:
       specifier: ^0.2.2
       version: 0.2.2
-    run-script-webpack-plugin:
-      specifier: 0.2.3
-      version: 0.2.3
     rxjs:
       specifier: ^7.8.2
       version: 7.8.2
@@ -606,6 +603,9 @@ importers:
       '@notopia-uit/api-document-nestjs-server':
         specifier: 'workspace:'
         version: link:../../packages/api-document-nestjs-server
+      '@notopia-uit/api-share-gen':
+        specifier: 'workspace:'
+        version: link:../../packages/api-share-gen
       '@notopia-uit/lib':
         specifier: 'workspace:'
         version: link:../../packages/lib
@@ -688,9 +688,6 @@ importers:
       '@nestjs/testing':
         specifier: 'catalog:'
         version: 11.1.21(@nestjs/common@11.1.21(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(@nestjs/microservices@11.1.21)(@nestjs/platform-express@11.1.21)
-      '@notopia-uit/api-gen':
-        specifier: 'workspace:'
-        version: link:../../packages/api-gen
       '@suites/di.nestjs':
         specifier: 'catalog:'
         version: 3.1.0(@nestjs/common@11.1.21(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)
@@ -712,9 +709,6 @@ importers:
       '@types/ws':
         specifier: 'catalog:'
         version: 8.18.1
-      run-script-webpack-plugin:
-        specifier: 'catalog:'
-        version: 0.2.3
       tsx:
         specifier: 'catalog:'
         version: 4.21.1
@@ -754,9 +748,9 @@ importers:
       '@nestjs/platform-express':
         specifier: 'catalog:'
         version: 11.1.21(@nestjs/common@11.1.21(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)
-      '@notopia-uit/api-gen':
+      '@notopia-uit/api-share-gen':
         specifier: 'workspace:'
-        version: link:../../packages/api-gen
+        version: link:../../packages/api-share-gen
       '@notopia-uit/lib':
         specifier: 'workspace:'
         version: link:../../packages/lib
@@ -818,9 +812,6 @@ importers:
       '@nestjs/testing':
         specifier: 'catalog:'
         version: 11.1.21(@nestjs/common@11.1.21(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(@nestjs/microservices@11.1.21)(@nestjs/platform-express@11.1.21)
-      run-script-webpack-plugin:
-        specifier: 'catalog:'
-        version: 0.2.3
       webpack-node-externals:
         specifier: 'catalog:'
         version: 3.0.0
@@ -997,6 +988,15 @@ importers:
         version: 6.0.3
 
   packages/api-gen:
+    devDependencies:
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.90.21(react@19.2.6)
+      zod:
+        specifier: 'catalog:'
+        version: 4.4.3
+
+  packages/api-share-gen:
     devDependencies:
       '@tanstack/react-query':
         specifier: 'catalog:'
@@ -14884,10 +14884,6 @@ packages:
 
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
-
-  run-script-webpack-plugin@0.2.3:
-    resolution: {integrity: sha512-GX1JqSNAmtGMAcE3iyLFlnxWpxKBWPNkpac/02w2RF3xynTjA8LWLkFzMzlvATA3c3kARWnT2OrsnvJviB79Lg==}
-    engines: {node: '>=14'}
 
   rw@1.3.3:
     resolution: {integrity: sha512-PdhdWy89SiZogBLaw42zdeqtRJ//zFd2PgQavcICDUgJT5oW10QCRKbJ6bg4r0/UY2M6BWd5tkxuGFRvCkgfHQ==}
@@ -34550,8 +34546,6 @@ snapshots:
   run-parallel@1.2.0:
     dependencies:
       queue-microtask: 1.2.3
-
-  run-script-webpack-plugin@0.2.3: {}
 
   rw@1.3.3: {}
 

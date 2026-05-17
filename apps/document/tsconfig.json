@@ -1,25 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "module": "preserve",
-    "moduleResolution": "bundler"
-  },
+  "compilerOptions": {},
   "files": [],
   "include": [],
   "exclude": [],
   "references": [
-    {
-      "path": "../../packages/pb"
-    },
-    {
-      "path": "../../packages/api-document-nestjs-server"
-    },
-    {
-      "path": "../../packages/api-gen"
-    },
-    {
-      "path": "../../packages/lib"
-    },
     {
       "path": "./tsconfig.app.json"
     },

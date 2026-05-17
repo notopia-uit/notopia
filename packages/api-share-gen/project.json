@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "packages/api-document-nestjs-server",
+  "name": "packages/api-share-gen",
   "projectType": "library",
   "targets": {
     "build": {
@@ -8,7 +8,7 @@
         "^build",
         {
           "projects": "api",
-          "target": "gen:document-nestjs-server"
+          "target": "gen:hey-api"
         }
       ]
     }
