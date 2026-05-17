@@ -63,6 +63,10 @@ func (g *Server) Run() error {
 	return g.server.Serve(lis)
 }
 
-func (g *Server) Stop() {
+func (g *Server) GracefulStop() {
 	g.server.GracefulStop()
+}
+
+func (g *Server) Stop() {
+	g.server.Stop()
 }

@@ -63,13 +63,14 @@ func (s *Server) Run(ctx context.Context) error {
 			<-ctx.Done()
 			done := make(chan struct{})
 			go func() {
-				s.grpc.Stop()
+				s.grpc.GracefulStop()
 				close(done)
 			}()
 			select {
 			case <-done:
 			case <-time.After(grpcShutdownTimeout):
 				s.logger.WarnContext(ctx, "grpc shutdown timed out")
+				s.grpc.Stop()
 			}
 		}()
 		if err := s.grpc.Run(); err != nil {

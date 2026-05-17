@@ -74,8 +74,12 @@ func (g *GRPC) Run() error {
 	return g.server.Serve(lis)
 }
 
-func (g *GRPC) Stop() {
+func (g *GRPC) GracefulStop() {
 	g.server.GracefulStop()
+}
+
+func (g *GRPC) Stop() {
+	g.server.Stop()
 }
 
 var Provide = New
