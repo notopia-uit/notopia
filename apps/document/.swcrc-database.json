@@ -16,8 +16,8 @@
     "loose": false
   },
   "module": {
-    "type": "nodenext"
+    "type": "es6"
   },
-  "sourceMaps": true,
-  "minify": true
+  "sourceMaps": false,
+  "minify": false
 }

@@ -12,9 +12,6 @@ export default defineConfig(() => ({
       },
     }),
   ],
-  resolve: {
-    tsconfigPaths: true,
-  },
   test: {
     name: 'document',
     watch: false,
