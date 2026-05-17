@@ -8,7 +8,7 @@
   "scripts": {
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
     "typeorm-extension": "tsx ./node_modules/typeorm-extension/bin/cli.mjs",
-    "typeorm-extension:seed": "node --import @swc-node/register/esm-register ./database/seed.ts"
+    "typeorm-extension:seed": "SWCRC=true node --import @swc-node/register/esm-register ./database/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
