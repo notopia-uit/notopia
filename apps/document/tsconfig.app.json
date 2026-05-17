@@ -7,7 +7,7 @@
     "types": ["node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "es2024",
+    "target": "esnext",
     "rootDir": "src",
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
@@ -29,5 +29,6 @@
     {
       "path": "../../packages/lib/tsconfig.lib.json"
     }
-  ]
+  ],
+  "exclude": ["vitest.config.mts", "**/*.spec.ts", "**/*.spec.tsx"]
 }
