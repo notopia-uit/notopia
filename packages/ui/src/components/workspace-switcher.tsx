@@ -32,6 +32,7 @@ import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { ErrorAlert } from './error-alert';
 import { SuccessAlert } from './success-alert';
@@ -63,6 +64,7 @@ const generateSlug = (name: string) => {
 
 //TODO: add context for error alert
 const WorkspaceSwitcher = () => {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const _data = useQuery({
     ...getMyWorkspacesOptions(),
@@ -87,6 +89,14 @@ const WorkspaceSwitcher = () => {
   const [editForm, setEditForm] = useState<Partial<UserWorkspace>>({});
 
   const { alert, showAlert } = useAlert();
+
+  const handleSelectWorkspace = (workspaceId: string) => {
+    const workspace = workspaces.find((w) => w.id === workspaceId);
+    if (workspace && editingId !== workspaceId) {
+      setSelectedId(workspaceId);
+      router.push(`/workspace/${workspace.slug}`);
+    }
+  };
 
   if (isGetMyWorkspacesError) {
     throw getMyWorkspacesError;
@@ -225,7 +235,7 @@ const WorkspaceSwitcher = () => {
           </Button>
         </div>
 
-        <RadioGroup value={selectedId} onValueChange={setSelectedId}>
+        <RadioGroup value={selectedId} onValueChange={handleSelectWorkspace}>
           <div className="space-y-3">
             {workspaces.map((workspace) => (
               <Card
