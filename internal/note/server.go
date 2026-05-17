@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/notopia-uit/notopia/internal/note/controller/event"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
@@ -60,10 +61,16 @@ func (s *Server) Run(ctx context.Context) error {
 
 	g, ctx := errgroup.WithContext(ctx)
 
+	httpShutdownTimeout := 10 * time.Second
+	grpcShutdownTimeout := 10 * time.Second
+	healthShutdownTimeout := 5 * time.Second
+
 	g.Go(func() error {
 		go func() {
 			<-ctx.Done()
-			if err := s.http.Shutdown(context.Background()); err != nil {
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), httpShutdownTimeout)
+			defer cancel()
+			if err := s.http.Shutdown(shutdownCtx); err != nil {
 				s.logger.ErrorContext(ctx, "failed to shutdown http server", slog.Any("error", err))
 			}
 		}()
@@ -76,7 +83,17 @@ func (s *Server) Run(ctx context.Context) error {
 	g.Go(func() error {
 		go func() {
 			<-ctx.Done()
-			s.grpc.Stop()
+			done := make(chan struct{})
+			go func() {
+				s.grpc.GracefulStop()
+				close(done)
+			}()
+			select {
+			case <-done:
+			case <-time.After(grpcShutdownTimeout):
+				s.logger.WarnContext(ctx, "grpc shutdown timed out")
+				s.grpc.Stop()
+			}
 		}()
 		if err := s.grpc.Run(); err != nil {
 			return fmt.Errorf("failed to run grpc server: %w", err)
@@ -87,7 +104,9 @@ func (s *Server) Run(ctx context.Context) error {
 	g.Go(func() error {
 		go func() {
 			<-ctx.Done()
-			if err := s.health.Shutdown(context.Background()); err != nil {
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), healthShutdownTimeout)
+			defer cancel()
+			if err := s.health.Shutdown(shutdownCtx); err != nil {
 				s.logger.ErrorContext(ctx, "failed to shutdown health server", slog.Any("error", err))
 			}
 		}()

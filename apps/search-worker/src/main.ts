@@ -25,6 +25,7 @@ async function bootstrap() {
   const port = appConfig.port;
   const logger = app.get(Logger);
   app.useLogger(logger);
+  app.enableShutdownHooks();
   await app.startAllMicroservices();
   await app.listen(port);
 
