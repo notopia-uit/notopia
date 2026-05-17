@@ -31,8 +31,8 @@ import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 import { ErrorAlert } from './error-alert';
 import { SuccessAlert } from './success-alert';
@@ -62,7 +62,6 @@ const generateSlug = (name: string) => {
     .replace(/^-|-$/g, '');
 };
 
-//TODO: add context for error alert
 const WorkspaceSwitcher = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -77,10 +76,6 @@ const WorkspaceSwitcher = () => {
     isError: isGetMyWorkspacesError,
     error: getMyWorkspacesError,
   } = _data;
-
-  //TODO: Local state mirroring server data will desync on refetch.
-  // workspaces and selectedId are initialized from allWorkspaceData once at mount. If the underlying getMyWorkspaces query refetches (on focus, reconnect, manual invalidation, etc.), useSuspenseQuery updates allWorkspaceData but the local useState snapshot is never re-synced, so the UI will silently drift from server state. Combined with the TODO at Line 69, this whole component currently operates on local-only edits.
-  // Consider either deriving the list directly from the query data (with a mutation that invalidates the query) or using useEffect to sync — but the former is the idiomatic React Query pattern.
 
   const [workspaces, setWorkspaces] = useState<UserWorkspace[]>([]);
   const [selectedId, setSelectedId] = useState<string>();
@@ -213,11 +208,6 @@ const WorkspaceSwitcher = () => {
     setIsAddingNew(false);
     setEditForm({});
   };
-
-  //   TODO:delete are local-only and will not persist.
-  //
-  // deleteWorkspace only mutate local state — no API calls — and saveNewWorkspace assigns Date.now().toString() as id, which will collide with real backend ids once the mutation is wired up. The TODO at Line 69 acknowledges this, but flagging so it isn't missed before release. Consider wiring useMutation with query invalidation for getMyWorkspacesQueryKey().
-  //
 
   return isGetMyWorkspacesPending ? (
     <Spinner className="size-8" />

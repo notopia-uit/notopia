@@ -13,15 +13,15 @@ import {
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
 import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
-import { Input } from '@notopia-uit/ui/components/shadcn/input';
-import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@notopia-uit/ui/components/shadcn/context-menu';
+import { Input } from '@notopia-uit/ui/components/shadcn/input';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -198,7 +198,6 @@ const viewStateInitial: TreeViewState = {
   'tree-sample': {},
 };
 
-//TODO: handle loading states, errors, empty states, etc.
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
   const {
     data,
@@ -338,7 +337,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   }, [workspaceTreeData]);
 
   const dataProvider = useMemo(() => new TreeDataProvider<string>(items), [items]);
-  //TODO: call API to update tree data on drop
   const getTargetParentId = useCallback(() => {
     const focusedId = viewState['tree-sample']?.focusedItem;
     let parentId: TreeItemIndex = rootId;
@@ -701,47 +699,47 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           renderItemsContainer={({ children, containerProps }) => {
             return <ul {...containerProps}>{children}</ul>;
           }}
-           renderItem={({ title, item, arrow, context, depth, children }) => {
-             const indentation = 10 * depth;
-             return (
-               <li
-                 {...context.itemContainerWithChildrenProps}
-                 className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
-               >
-                 <ContextMenu>
-                   <ContextMenuTrigger asChild>
-                     <Button
-                       {...context.itemContainerWithoutChildrenProps}
-                       {...context.interactiveElementProps}
-                       type="button"
-                       variant="outline"
-                       size="sm"
-                       className={cn(
-                         `grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none`,
-                         'focus:bg-secondary/20'
-                       )}
-                       style={{
-                         paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,
-                       }}
-                     >
-                       {item.isFolder && arrow}
-                       {title}
-                     </Button>
-                   </ContextMenuTrigger>
-                   <ContextMenuContent>
-                     <ContextMenuItem
-                       variant="destructive"
-                       onClick={() => handleTrashItem(item.index)}
-                     >
-                       <Trash2 className="mr-2 size-4" />
-                       Move to Trash
-                     </ContextMenuItem>
-                   </ContextMenuContent>
-                 </ContextMenu>
-                 {children}
-               </li>
-             );
-           }}
+          renderItem={({ title, item, arrow, context, depth, children }) => {
+            const indentation = 10 * depth;
+            return (
+              <li
+                {...context.itemContainerWithChildrenProps}
+                className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
+              >
+                <ContextMenu>
+                  <ContextMenuTrigger asChild>
+                    <Button
+                      {...context.itemContainerWithoutChildrenProps}
+                      {...context.interactiveElementProps}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        `grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none`,
+                        'focus:bg-secondary/20'
+                      )}
+                      style={{
+                        paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,
+                      }}
+                    >
+                      {item.isFolder && arrow}
+                      {title}
+                    </Button>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem
+                      variant="destructive"
+                      onClick={() => handleTrashItem(item.index)}
+                    >
+                      <Trash2 className="mr-2 size-4" />
+                      Move to Trash
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
+                {children}
+              </li>
+            );
+          }}
           renderItemArrow={({ context }) => {
             return <ChevronRight {...context.arrowProps} className="size-3.5!" />;
           }}

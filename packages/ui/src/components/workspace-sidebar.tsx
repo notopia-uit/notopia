@@ -189,7 +189,6 @@ export function CreateWorkspaceDialog() {
   );
 }
 
-//TODO: get user data from betterauth
 const data = {
   projects: [
     {
@@ -220,9 +219,7 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
   } = useQuery({
     ...getMyWorkspacesOptions({}),
   });
-  const currentWorkspace = allWorkspaceData?.find(
-    (ws) => ws.workspace.id === currentWorkspaceId
-  );
+  const currentWorkspace = allWorkspaceData?.find((ws) => ws.workspace.id === currentWorkspaceId);
 
   useEffect(() => {
     if (currentWorkspace) {
@@ -230,7 +227,6 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
     }
   }, [currentWorkspaceId, currentWorkspace]);
 
-  //TODO: throw custome error if workspace not found or user not auth
   if (!sessionData) {
     return;
   }

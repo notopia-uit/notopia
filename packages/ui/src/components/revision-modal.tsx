@@ -142,13 +142,13 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="flex h-[600px] max-w-4xl flex-col p-0">
+      <DialogContent className="flex h-[90vh] max-w-6xl flex-col p-0">
         <DialogHeader className="border-b px-6 py-4">
           <DialogTitle>Version History</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-1 overflow-hidden">
-          <div className="flex w-80 flex-none flex-col border-r">
+          <div className="flex w-72 flex-none flex-col border-r overflow-y-auto">
             <div className="border-b p-4">
               <div className="relative">
                 <Search className="text-muted-foreground absolute top-1/2 left-2 size-4 -translate-y-1/2" />
