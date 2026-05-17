@@ -1,14 +1,11 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { type MyBlock } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
 
 import { parseSeedMarkdownToBlocks } from './blocknote-seed-transform';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function countInlineTypes(blocks: MyBlock[]): {
   references: number;
