@@ -70,7 +70,7 @@ catalog:
   "@types/react": "^19.2.14"
   "@types/react-dom": "^19.2.3"
   "@types/ws": "^8.18.1"
-  "@typescript/native-preview": "7.0.0-dev.20260516.1"
+  "@typescript/native-preview": "7.0.0-dev.20260517.1"
   "@vercel/otel": "^2.1.2"
   "@vitejs/plugin-react": "^6.0.0"
   "@vitejs/plugin-react-swc": "4.3.1"
@@ -132,8 +132,8 @@ onlyBuiltDependencies:
   - "@nestjs/core"
   - "@openapitools/openapi-generator-cli"
   - "@parcel/watcher"
-  - '@suites/di.nestjs'
-  - '@suites/doubles.vitest'
+  - "@suites/di.nestjs"
+  - "@suites/doubles.vitest"
   - "@swc/core"
   - "core-js"
   - "esbuild"
