@@ -1,7 +1,6 @@
 import { randomUUID } from 'crypto';
 
-import { type MyBlock, type MySchema } from '@blocknote/core';
-import { ServerBlockNoteEditor } from '@blocknote/server-util';
+import { type MyBlock } from '@blocknote/core';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
@@ -9,15 +8,14 @@ import { type DocumentCommittedEvent } from '@notopia-uit/api-share-gen';
 import { Traceable } from 'nestjs-otel';
 import { lastValueFrom } from 'rxjs';
 import { DataSource, Repository } from 'typeorm';
-import { Doc as YDoc, applyUpdate } from 'yjs';
 
-import { AuthorizationService } from '#/authorization/authorization.service';
-import { BLOCKNOTE_SCHEMA } from '#/blocknote/blocknote.module';
-import { KAFKA_CLIENT } from '#/common/token';
-import { DocumentNotFoundException } from '#/document/document-not-found.exception';
-import { DocumentPermissionException } from '#/document/document-permission.exception';
-import { RevisionEntity } from '#/revision/revision.entity';
-import { StorageService } from '#/storage/storage.service';
+import { AuthorizationService } from '#/authorization';
+import { BlocknoteService } from '#/blocknote';
+import { DocumentNotFoundException } from '#/document';
+import { DocumentPermissionException } from '#/document';
+import { KAFKA_CLIENT } from '#/kafka';
+import { RevisionEntity } from '#/revision';
+import { StorageService } from '#/storage';
 
 import { DocumentEntity } from './document.entity';
 
@@ -32,52 +30,9 @@ export class DocumentService {
     private readonly storageService: StorageService,
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly authorizationService: AuthorizationService,
-    @Inject(BLOCKNOTE_SCHEMA) private readonly blocknoteSchema: MySchema,
+    private readonly blocknoteService: BlocknoteService,
     @Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka
   ) {}
-
-  toYDoc(entity: DocumentEntity): YDoc {
-    const doc = new YDoc();
-    applyUpdate(doc, new Uint8Array(entity.data));
-    return doc;
-  }
-
-  private bufferToBlockNote(data: Buffer, editor: ServerBlockNoteEditor): MyBlock[] {
-    const yDoc = new YDoc();
-    applyUpdate(yDoc, new Uint8Array(data));
-    return editor.yDocToBlocks(yDoc);
-  }
-
-  extractTagsAndOutgoingLinkIds(editor: ServerBlockNoteEditor): {
-    tags: string[];
-    outgoingLinkIds: string[];
-  } {
-    const tags = new Set<string>();
-    const linkIds = new Set<string>();
-
-    editor.editor.forEachBlock((block) => {
-      if (!Array.isArray(block.content)) {
-        return false;
-      }
-      for (const inlineNode of block.content) {
-        switch (inlineNode.type) {
-          case 'tag':
-            tags.add(inlineNode.props.tag);
-            break;
-          case 'reference':
-            linkIds.add(inlineNode.props.noteId);
-            break;
-        }
-      }
-
-      return true;
-    });
-
-    return {
-      tags: Array.from(tags),
-      outgoingLinkIds: Array.from(linkIds),
-    };
-  }
 
   async commitDocument({
     documentId,
@@ -87,9 +42,7 @@ export class DocumentService {
     userId: string;
   }): Promise<string> {
     this.logger.debug({ documentId, userId }, 'commitDocument: checking permission');
-    const editor = ServerBlockNoteEditor.create({
-      schema: this.blocknoteSchema,
-    });
+    const editor = this.blocknoteService.createEditor();
     return this.dataSource.transaction(async (manager) => {
       const document = await manager.findOne(DocumentEntity, {
         where: { id: documentId },
@@ -103,11 +56,11 @@ export class DocumentService {
       await manager.save(RevisionEntity, {
         id: revisionId,
         document,
-        content: this.bufferToBlockNote(document.data, editor),
+        content: this.blocknoteService.bufferToBlockNote(document.data, editor),
       });
       await manager.update(DocumentEntity, { id: documentId }, { modified: false });
       // TODO: Consider refactor into a module named "EventBus", which manages event topic
-      const { tags, outgoingLinkIds } = this.extractTagsAndOutgoingLinkIds(editor);
+      const { tags, outgoingLinkIds } = this.blocknoteService.extractTagsAndOutgoingLinkIds(editor);
       this.logger.debug({ documentId, tags, outgoingLinkIds }, 'commitDocument: emitting event');
       await lastValueFrom(
         this.kafkaClient.emit('events.integration.document.document.committed', {

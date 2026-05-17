@@ -12,7 +12,6 @@ export default defineConfig(() => ({
       },
     }),
   ],
-  oxc: {},
   test: {
     name: 'document',
     watch: false,

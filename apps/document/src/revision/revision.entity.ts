@@ -9,7 +9,7 @@ import {
   type Relation,
 } from 'typeorm';
 
-import { DocumentEntity } from '#/document/document.entity';
+import { DocumentEntity } from '#/document';
 
 @Entity('revisions')
 export class RevisionEntity {

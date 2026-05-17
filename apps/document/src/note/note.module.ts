@@ -5,8 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { NOTE_PACKAGE_NAME } from '@notopia-uit/pb/note';
 
-import { ServicesConfig } from '#/config/config';
-import { SERVICE_CONFIG } from '#/config/config.factory';
+import { ServicesConfig, SERVICE_CONFIG } from '#/config';
 
 import { NoteService } from './note.service';
 

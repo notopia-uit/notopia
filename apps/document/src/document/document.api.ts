@@ -3,7 +3,8 @@ import { DocumentApi as DocumentApiDefinition } from '@notopia-uit/api-document-
 import { CommitDocument201Response } from '@notopia-uit/api-document-nestjs-server/models';
 import { Traceable } from 'nestjs-otel';
 
-import { User } from '../common/user';
+import { User } from '#/common';
+
 import { DocumentService } from './document.service';
 
 @Traceable()
@@ -41,7 +42,10 @@ export class DocumentApi extends DocumentApiDefinition {
     try {
       const result = await this.documentService.getAttachmentUploadUrl(documentId, user.id);
       this.logger.log({ documentId }, 'getDocumentAttachmentUploadUrl: done');
-      this.logger.debug({ uploadUrl: result.uploadUrl }, 'getDocumentAttachmentUploadUrl: response');
+      this.logger.debug(
+        { uploadUrl: result.uploadUrl },
+        'getDocumentAttachmentUploadUrl: response'
+      );
       return result;
     } catch (error) {
       this.logger.error({ err: error, documentId }, 'getDocumentAttachmentUploadUrl: error');

@@ -53,7 +53,11 @@ describe('seed markdown parsing', () => {
     ['0093caa1-295e-5100-b082-4a562d3f1f2c.md', 'Directory Busting', 8, 0],
     ['00d2e172-1642-52d7-adf3-a40ff4587f66.md', 'LDAP', 11, 0],
   ])('parses %s (%s)', async (file, _name, expectedRefs, expectedTags) => {
-    const markdown = readFileSync(path.join(__dirname, '..', 'seed-data', file), 'utf-8');
+    const filePath = path.join(__dirname, '..', 'seed-data', file);
+    if (!filePath) {
+      test.skip(`File not found: ${file}`);
+    }
+    const markdown = readFileSync(filePath, 'utf-8');
     const blocks = await parseSeedMarkdownToBlocks(editor, markdown);
     const counts = countInlineTypes(blocks);
 

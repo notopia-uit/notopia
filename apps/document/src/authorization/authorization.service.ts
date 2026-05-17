@@ -9,7 +9,7 @@ import {
 } from '@notopia-uit/pb/authorization';
 import { firstValueFrom } from 'rxjs';
 
-import { NoteService } from '#/note/note.service';
+import { NoteService } from '#/note';
 
 import { UserNotePermissions as UserNotePermission, WorkspaceItemPermission } from './models';
 

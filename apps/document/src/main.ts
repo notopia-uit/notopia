@@ -9,12 +9,11 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
 
-import { getKafkaConfig } from '#/config/kafka.config';
-
 import { AppModule } from './app.module';
-import { GlobalExceptionFilter } from './common/http-exception.filter';
-import { AppConfig } from './config/config';
-import { APP_CONFIG } from './config/config.factory';
+import { GlobalExceptionFilter } from './common';
+import { getKafkaConfig } from './config';
+import { AppConfig } from './config';
+import { APP_CONFIG } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });

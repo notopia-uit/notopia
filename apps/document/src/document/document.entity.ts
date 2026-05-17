@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryColumn, type Relation } from 'typeorm';
 
-import { RevisionEntity } from '#/revision/revision.entity';
+import { RevisionEntity } from '#/revision';
 
 @Entity('documents')
 export class DocumentEntity {

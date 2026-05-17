@@ -18,9 +18,8 @@ import {
 } from '@notopia-uit/pb/note';
 import { firstValueFrom } from 'rxjs';
 
-import { isGrpcError, protoTimestampToDate } from '#/common/grpc';
-import { NoteNotFoundException } from '#/note/note-not-found.exception';
-import { WorkspaceNoteNotFoundException } from '#/note/workspace-note-not-found.exception';
+import { isGrpcError, protoTimestampToDate } from '#/common';
+import { NoteNotFoundException, WorkspaceNoteNotFoundException } from '#/note';
 
 import { NoteModel, TrashedModel, WorkspaceModel } from './models';
 

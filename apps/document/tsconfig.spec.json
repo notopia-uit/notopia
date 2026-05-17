@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./out-tsc/vitest",
-    "types": ["vitest/globals", "node", "@rspack/core/module"],
+    "types": ["vitest/globals", "node", "vitest", "vitest/importMeta"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "paths": {
@@ -11,7 +11,8 @@
   },
   "include": [
     "vitest.config.mts",
-    "{src,database}/**/*.spec.{ts,tsx,d.ts}",
+    "src/**/*.spec.ts",
+    "database/**/*.spec.ts",
     "../../packages/lib/src/server/types.d.ts"
   ],
   "exclude": ["dist/**/*", "out-tsc/**/*"],

@@ -4,8 +4,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Traceable } from 'nestjs-otel';
 
-import { S3Config } from '../config/config';
-import { S3_CONFIG } from '../config/config.factory';
+import { S3Config, S3_CONFIG } from '#/config';
 
 @Injectable()
 @Traceable()

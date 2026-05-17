@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
 
-export const BLOCKNOTE_SCHEMA = Symbol('BLOCKNOTE_SCHEMA');
+import { BlocknoteService } from './blocknote.service';
+import { BLOCKNOTE_SCHEMA } from './token';
 
 @Module({
   imports: [],
@@ -10,7 +11,8 @@ export const BLOCKNOTE_SCHEMA = Symbol('BLOCKNOTE_SCHEMA');
       provide: BLOCKNOTE_SCHEMA,
       useFactory: createServerBlockNoteSchema,
     },
+    BlocknoteService,
   ],
-  exports: [BLOCKNOTE_SCHEMA],
+  exports: [BLOCKNOTE_SCHEMA, BlocknoteService],
 })
 export class BlockNoteModule {}

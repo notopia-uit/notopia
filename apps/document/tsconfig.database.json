@@ -12,8 +12,8 @@
     }
   },
   "files": [],
-  "include": ["database/**/*", "../../packages/lib/src/server/types.d.ts"],
-  "exclude": ["**/*.spec.ts", "**/*.spec.tsx"],
+  "include": ["database/**/*.ts", "../../packages/lib/src/server/types.d.ts"],
+  "exclude": ["**/*.spec.ts"],
   "references": [
     {
       "path": "./tsconfig.app.json"

@@ -3,8 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { Traceable } from 'nestjs-otel';
 import { DataSource } from 'typeorm';
 
-import { RevisionNotFoundException } from '#/revision/revision-not-found.exception';
-
+import { RevisionNotFoundException } from './revision-not-found.exception';
 import { RevisionEntity } from './revision.entity';
 
 export interface PaginatedRevisions {

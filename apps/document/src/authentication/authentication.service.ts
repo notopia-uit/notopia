@@ -3,10 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import * as jose from 'jose';
 import { Traceable } from 'nestjs-otel';
 
-import { InvalidAuthenticationTokenException } from '#/authentication/authentication.exception';
-import { User } from '#/common/user';
-import { AuthenticationConfig } from '#/config/config';
-import { AUTHENTICATION_CONFIG } from '#/config/config.factory';
+import { User } from '#/common';
+import { AuthenticationConfig, AUTHENTICATION_CONFIG } from '#/config';
+
+import { InvalidAuthenticationTokenException } from './authentication.exception';
 
 @Injectable()
 @Traceable()

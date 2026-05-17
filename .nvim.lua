@@ -189,7 +189,8 @@ lsp.config("tsgo", {
         enable = false,
       },
       preferences = {
-        importModuleSpecifier = "non-relative",
+        importModuleSpecifier = "shortest",
+        importModuleSpecifierEnding = "minimal",
       },
     },
   },
