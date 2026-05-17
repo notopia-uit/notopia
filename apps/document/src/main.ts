@@ -2,7 +2,9 @@
 import './otel';
 // oxfmt-ignore
 import '@notopia-uit/lib/yjs';
+// oxfmt-ignore
 import 'reflect-metadata';
+
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
@@ -31,6 +33,7 @@ async function bootstrap() {
     throw new Error('APP_CONFIG not found');
   }
   const port = appConfig.port;
+  app.enableShutdownHooks();
   await app.startAllMicroservices();
   await app.listen(port);
 

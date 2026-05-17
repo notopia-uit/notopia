@@ -34,6 +34,7 @@ import { AuthorizationService } from './authorization.service';
                 includeDirs,
               },
               url: servicesCfg.authorizationUrl,
+              gracefulShutdown: true,
             },
           };
         },

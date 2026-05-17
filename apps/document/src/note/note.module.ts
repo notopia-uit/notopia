@@ -33,6 +33,7 @@ import { NoteService } from './note.service';
                 includeDirs,
               },
               url: servicesCfg.noteUrl,
+              gracefulShutdown: true,
             },
           };
         },
