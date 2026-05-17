@@ -4,7 +4,7 @@
   "compilerOptions": {
     "module": "esnext",
     "moduleResolution": "bundler",
-    "types": ["node"],
+    "types": ["node", "@rspack/core/module"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2024",

@@ -16,8 +16,6 @@ import { GlobalExceptionFilter } from './common/http-exception.filter';
 import { AppConfig } from './config/config';
 import { APP_CONFIG } from './config/config.factory';
 
-declare const module: any;
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.connectMicroservice({

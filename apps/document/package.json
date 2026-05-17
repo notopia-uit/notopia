@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#/*": "./src/*.js"
+    "#/*": "./src/*"
   },
   "scripts": {
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
