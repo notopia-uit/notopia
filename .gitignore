@@ -6,6 +6,7 @@ node_modules
 dist
 vite.config.*.timestamp*
 *tsbuildinfo
+out-tsc/
 
 # Next.js
 .next

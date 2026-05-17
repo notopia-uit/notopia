@@ -5,5 +5,5 @@
     "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"]
   },
   "include": ["vitest.config.mts", "**/*.spec.ts", "**/*.spec.tsx", "**/*.d.ts"],
-  "exclude": ["dist/**/*"]
+  "exclude": ["dist/**/*", "out-tsc/**/*"]
 }

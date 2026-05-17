@@ -2,19 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "module": "preserve",
-    "moduleResolution": "bundler",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
-    "types": ["node"],
-    "paths": {
-      "#/*": ["./src/*"]
-    }
+    "moduleResolution": "bundler"
   },
   "files": [],
-  "include": ["database/**/*", "../../packages/lib/src/server"],
-  "exclude": ["dist/**/*", "node_modules"],
+  "include": [],
+  "exclude": [],
   "references": [
     {
       "path": "../../packages/pb"
@@ -30,6 +22,9 @@
     },
     {
       "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.database.json"
     },
     {
       "path": "./tsconfig.spec.json"

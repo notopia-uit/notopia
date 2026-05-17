@@ -2,6 +2,8 @@
 **/node_modules
 **/.env.local
 
+out-tsc/
+
 .nx/cache/
 .nx/workspace-data/
 vite.config.*.timestamp*

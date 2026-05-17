@@ -9,8 +9,7 @@
     "emitDecoratorMetadata": true,
     "target": "esnext",
     "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
+    "outDir": "out-tsc/app",
     "paths": {
       "#/*": ["./src/*"]
     }
@@ -30,5 +29,5 @@
       "path": "../../packages/lib/tsconfig.lib.json"
     }
   ],
-  "exclude": ["vitest.config.mts", "**/*.spec.ts", "**/*.spec.tsx"]
+  "exclude": ["**/*.spec.ts", "**/*.spec.tsx"]
 }
