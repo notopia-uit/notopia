@@ -3,12 +3,12 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#/*": "./src/*.js"
+    "#/*": "./src/*"
   },
   "scripts": {
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
     "typeorm-extension": "tsx ./node_modules/typeorm-extension/bin/cli.mjs",
-    "typeorm-extension:seed": "node --import @swc-node/register/esm-register ./database/seed.ts"
+    "typeorm-extension:seed": "SWCRC=true SWC_CONFIG_FILE=.swcrc-database.json node --import @swc-node/register/esm-register ./database/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
@@ -29,6 +29,7 @@
     "@nestjs/platform-express": "catalog:",
     "@nestjs/typeorm": "catalog:",
     "@notopia-uit/api-document-nestjs-server": "workspace:",
+    "@notopia-uit/api-share-gen": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@notopia-uit/pb": "workspace:",
     "@opentelemetry/api": "catalog:",
@@ -58,14 +59,16 @@
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",
-    "@notopia-uit/api-gen": "workspace:",
+    "@suites/di.nestjs": "catalog:",
+    "@suites/doubles.vitest": "catalog:",
+    "@suites/unit": "catalog:",
     "@swc-node/register": "catalog:",
     "@swc/core": "catalog:",
     "@swc/helpers": "catalog:",
     "@types/ws": "catalog:",
-    "run-script-webpack-plugin": "catalog:",
     "tsx": "catalog:",
     "typeorm-extension": "catalog:",
+    "unplugin-swc": "catalog:",
     "webpack-node-externals": "catalog:"
   }
 }

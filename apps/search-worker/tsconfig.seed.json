@@ -2,19 +2,17 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "esnext",
+    "module": "preserve",
     "moduleResolution": "bundler",
-    "types": ["node", "@rspack/core/module"],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "types": ["node"],
     "target": "esnext",
-    "rootDir": "src",
-    "outDir": "out-tsc/app",
+    "rootDir": "seed",
+    "outDir": "out-tsc/seed",
     "paths": {
       "*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "../../packages/lib/src/server/types.d.ts"],
+  "include": ["seed/**/*", "../../packages/lib/src/server/types.d.ts"],
   "references": [
     {
       "path": "../../packages/lib/tsconfig.lib.json"

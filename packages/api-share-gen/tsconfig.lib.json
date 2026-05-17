@@ -3,13 +3,12 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "moduleResolution": "bundler",
-    "lib": ["dom", "dom.iterable", "ES2024"],
+    "target": "esnext",
     "rootDir": "src",
-    "emitDeclarationOnly": true,
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
-      "*": ["./src/*"]
+      "./*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts"]

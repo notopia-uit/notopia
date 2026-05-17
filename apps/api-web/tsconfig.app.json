@@ -6,12 +6,12 @@
     "lib": ["dom", "dom.iterable", "ES2024"],
     "types": ["@nx/react/typings/cssmodule.d.ts", "@nx/react/typings/image.d.ts", "vite/client"],
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
-    "outDir": "dist",
+    "outDir": "out-tsc",
     "rootDir": "src",
     "target": "es2024",
     "moduleResolution": "bundler",
     "paths": {
-      "*": ["./src/*"]
+      "./*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]

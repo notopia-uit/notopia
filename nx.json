@@ -22,11 +22,7 @@
       "{workspaceRoot}/pkg/**/*.{go}",
       "!{workspaceRoot}/pkg/**/*_test.{go}"
     ],
-    "goFiles": [
-      "{workspaceRoot}/go.mod",
-      "{workspaceRoot}/go.sum",
-      "{projectRoot}/**/*.go"
-    ],
+    "goFiles": ["{workspaceRoot}/go.mod", "{workspaceRoot}/go.sum", "{projectRoot}/**/*.go"],
     "protoFiles": [
       "{projectRoot}/**/*.proto",
       "{workspaceRoot}/buf.gen.yaml",
@@ -42,21 +38,14 @@
       "cache": true
     },
     "build*": {
-      "inputs": [
-        "default",
-        "^default"
-      ],
-      "dependsOn": [
-        "^build*",
-        "^bundle*",
-        "^gen"
-      ],
+      "inputs": ["default", "^default"],
+      "dependsOn": ["^build*", "^bundle*", "^gen"],
       "defaultConfiguration": "development",
       "cache": true,
       "configurations": {
         "development": {},
         "production": {},
-        "doctor":{}
+        "doctor": {}
       }
     },
     "dev": {
@@ -70,9 +59,7 @@
       }
     },
     "test": {
-      "dependsOn": [
-        "^test*"
-      ],
+      "dependsOn": ["^test*", "^build"],
       "cache": true
     },
     "lint*": {
@@ -80,18 +67,14 @@
     },
     "@nx/js:swc": {
       "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "default",
-        "^default"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["default", "^default"]
     }
   },
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
+      "exclude": ["packages/api-gen/**"],
       "options": {
         "compiler": "tsgo",
         "typecheck": {
@@ -177,10 +160,7 @@
         "runTarget": {
           "name": "docker:run",
           "cwd": "{workspaceRoot}",
-          "args": [
-            "-f",
-            "{projectRoot}/Dockerfile"
-          ]
+          "args": ["-f", "{projectRoot}/Dockerfile"]
         }
       }
     },
@@ -200,6 +180,24 @@
       "options": {
         "lintTargetName": "lint"
       }
+    },
+    {
+      "plugin": "@nx/vitest",
+      "exclude": ["e2e/**/*"],
+      "options": {
+        "testTargetName": "test",
+        "testMode": "watch"
+      }
+    },
+    {
+      "plugin": "@nx/vitest",
+      "include": ["e2e/**/*"],
+      "options": {
+        "testTargetName": "e2e",
+        "ciTargetName": "e2e-ci",
+        "ciGroupName": "E2E Tests (CI)",
+        "testMode": "run"
+      }
     }
   ],
   "release": {
@@ -211,9 +209,7 @@
         "releaseTag": {
           "pattern": "notopia-packages@{version}"
         },
-        "projects": [
-          "packages/*"
-        ],
+        "projects": ["packages/*"],
         "projectsRelationship": "fixed",
         "version": {
           "conventionalCommits": true,
@@ -226,13 +222,7 @@
         }
       },
       "docker-go": {
-        "projects": [
-          "note",
-          "authorization",
-          "document",
-          "search-worker",
-          "web"
-        ],
+        "projects": ["note", "authorization", "document", "search-worker", "web"],
         "releaseTag": {
           "pattern": "{projectName}@{version}"
         },

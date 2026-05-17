@@ -1,6 +1,6 @@
-/// <reference types='vitest' />
-import react from '@vitejs/plugin-react';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 export default defineConfig(() => ({
@@ -8,7 +8,6 @@ export default defineConfig(() => ({
     tsconfigPaths: true,
   },
   root: import.meta.dirname,
-  cacheDir: 'node_modules/.vite/apps/test-editor',
   server: {
     port: 4201,
     host: true,
@@ -17,7 +16,7 @@ export default defineConfig(() => ({
     port: 4201,
     host: true,
   },
-  plugins: [tailwindcss(), react()],
+  plugins: [nxViteTsPaths(), tailwindcss(), react()],
   build: {
     outDir: './dist',
     emptyOutDir: true,

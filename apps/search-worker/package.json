@@ -14,7 +14,7 @@
     "@nestjs/core": "catalog:",
     "@nestjs/microservices": "catalog:",
     "@nestjs/platform-express": "catalog:",
-    "@notopia-uit/api-gen": "workspace:",
+    "@notopia-uit/api-share-gen": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@opentelemetry/api": "catalog:",
     "@opentelemetry/auto-instrumentations-node": "catalog:",
@@ -37,7 +37,6 @@
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",
-    "run-script-webpack-plugin": "catalog:",
     "webpack-node-externals": "catalog:"
   }
 }

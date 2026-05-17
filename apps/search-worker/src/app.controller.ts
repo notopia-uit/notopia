@@ -2,10 +2,10 @@ import type { MyBlock } from '@blocknote/core';
 import { Controller, Logger } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import type {
-  ShareDocumentCommittedEvent,
-  ShareNoteCreatedEvent,
-  ShareNoteUpdatedEvent,
-} from '@notopia-uit/api-gen';
+  DocumentCommittedEvent,
+  NoteCreatedEvent,
+  NoteUpdatedEvent,
+} from '@notopia-uit/api-share-gen';
 
 import { AppService } from './app.service';
 
@@ -18,11 +18,8 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @EventPattern('events.integration.note.note.created')
-  async handleNoteCreated(@Payload() data: ShareNoteCreatedEvent) {
-    this.logger.log(
-      { id: data.id, workspaceId: data.workspaceId },
-      'handleNoteCreated: received'
-    );
+  async handleNoteCreated(@Payload() data: NoteCreatedEvent) {
+    this.logger.log({ id: data.id, workspaceId: data.workspaceId }, 'handleNoteCreated: received');
     try {
       await this.appService.handleNoteCreated({
         id: data.id,
@@ -36,7 +33,7 @@ export class AppController {
   }
 
   @EventPattern('events.integration.note.note.updated')
-  async handleNoteUpdated(@Payload() data: ShareNoteUpdatedEvent) {
+  async handleNoteUpdated(@Payload() data: NoteUpdatedEvent) {
     this.logger.log({ id: data.id }, 'handleNoteUpdated: received');
     try {
       await this.appService.handleNoteUpdated({
@@ -54,7 +51,7 @@ export class AppController {
   }
 
   @EventPattern('events.integration.document.document.committed')
-  async handleDocumentCommitted(@Payload() data: ShareDocumentCommittedEvent) {
+  async handleDocumentCommitted(@Payload() data: DocumentCommittedEvent) {
     this.logger.log({ id: data.id }, 'handleDocumentCommitted: received');
     try {
       await this.appService.handleDocumentCommitted({
