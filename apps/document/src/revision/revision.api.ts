@@ -17,7 +17,7 @@ export class RevisionApi extends RevisionApiDefinition {
     super();
   }
 
-  async deleteRevision(revisionId: string): Promise<void> {
+  override async deleteRevision(revisionId: string): Promise<void> {
     this.logger.log({ revisionId }, 'deleteRevision: received');
     try {
       await this.revisionService.deleteRevision(revisionId);
@@ -28,7 +28,7 @@ export class RevisionApi extends RevisionApiDefinition {
     }
   }
 
-  async getRevisionWithContent(revisionId: string): Promise<RevisionWithContent> {
+  override async getRevisionWithContent(revisionId: string): Promise<RevisionWithContent> {
     this.logger.log({ revisionId }, 'getRevisionWithContent: received');
     try {
       const revisionEntity = await this.revisionService.getRevision(revisionId);
@@ -39,7 +39,10 @@ export class RevisionApi extends RevisionApiDefinition {
         createdAt: revisionEntity.createdAt.toISOString(),
       };
       this.logger.log({ revisionId }, 'getRevisionWithContent: done');
-      this.logger.debug({ id: response.id, name: response.name }, 'getRevisionWithContent: response');
+      this.logger.debug(
+        { id: response.id, name: response.name },
+        'getRevisionWithContent: response'
+      );
       return response;
     } catch (error) {
       this.logger.error({ err: error, revisionId }, 'getRevisionWithContent: error');
@@ -47,7 +50,7 @@ export class RevisionApi extends RevisionApiDefinition {
     }
   }
 
-  async getRevisions(
+  override async getRevisions(
     documentId: string,
     page: number,
     limit: number
@@ -83,7 +86,7 @@ export class RevisionApi extends RevisionApiDefinition {
     }
   }
 
-  async renameRevision(
+  override async renameRevision(
     revisionId: string,
     renameRevisionRequest: RenameRevisionRequest
   ): Promise<void> {

@@ -7,6 +7,7 @@
     "types": ["node", "@rspack/core/module"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "noImplicitOverride": true,
     "target": "esnext",
     "rootDir": "src",
     "outDir": "out-tsc/app",

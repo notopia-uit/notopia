@@ -156,11 +156,10 @@ const config: Configuration = {
     },
   },
   externals: [
-    // nodeExternals returns an untyped function that webpack expects
     nodeExternals({
       importType: isEsm ? 'module' : 'commonjs',
       allowlist: [/@rspack\/core\/hot\/poll/],
-    }) as unknown as Configuration['externals'],
+    }),
     ...(isEsm
       ? [
           ((data: any, callback: any) => {
@@ -219,6 +218,9 @@ const config: Configuration = {
   ],
   devServer: {
     allowedHosts: 'all',
+    devMiddleware: {
+      writeToDisk: true,
+    },
   },
 };
 

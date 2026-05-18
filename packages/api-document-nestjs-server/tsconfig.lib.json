@@ -6,6 +6,7 @@
     "target": "esnext",
     "types": ["node"],
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "verbatimModuleSyntax": false,
     "sourceMap": true,
     "rootDir": "src",

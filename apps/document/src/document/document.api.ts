@@ -15,7 +15,10 @@ export class DocumentApi extends DocumentApiDefinition {
     super();
   }
 
-  async commitDocument(documentId: string, req: Request): Promise<CommitDocument201Response> {
+  override async commitDocument(
+    documentId: string,
+    req: Request
+  ): Promise<CommitDocument201Response> {
     this.logger.log({ documentId }, 'commitDocument: received');
     const user = (req as unknown as Record<string, unknown>).user as User | undefined;
     if (!user) {
@@ -33,7 +36,7 @@ export class DocumentApi extends DocumentApiDefinition {
     }
   }
 
-  async getDocumentAttachmentUploadUrl(documentId: string, req: Request) {
+  override async getDocumentAttachmentUploadUrl(documentId: string, req: Request) {
     this.logger.log({ documentId }, 'getDocumentAttachmentUploadUrl: received');
     const user = (req as unknown as Record<string, unknown>).user as User | undefined;
     if (!user) {

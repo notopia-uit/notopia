@@ -37,7 +37,7 @@
           "mode": "production",
           "args": ["--node-env=production"]
         },
-        "doctor":{}
+        "doctor": {}
       }
     },
     "run": {
@@ -46,11 +46,12 @@
       "dependsOn": ["build"],
       "options": {
         "buildTarget": "document:build:development",
-        "inspect": false
+        "inspect": false,
+        "watch": false
       },
       "configurations": {
         "development": {
-          "watch": true
+          "watch": false
         }
       }
     },
