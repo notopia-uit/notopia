@@ -20,6 +20,7 @@ import {
   kafkaConfig,
   s3Config,
   servicesConfig,
+  validate,
 } from './config';
 import { DatabaseModule } from './database';
 import { DocumentApi, DocumentModule } from './document';
@@ -33,6 +34,7 @@ import { StorageModule } from './storage';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validate,
       load: [
         appConfig,
         databaseConfig,
