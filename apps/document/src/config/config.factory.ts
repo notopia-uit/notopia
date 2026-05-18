@@ -59,7 +59,10 @@ export const KAFKA_CONFIG = Symbol('KAFKA_CONFIG');
 export const kafkaConfig = registerAs(KAFKA_CONFIG, () =>
   kafkaConfigSchema.parse({
     clientId: process.env.NOTOPIA_DOCUMENT_KAFKA_CLIENT_ID ?? 'document',
-    brokers: (process.env.NOTOPIA_DOCUMENT_KAFKA_BROKERS ?? 'localhost:19092').split(','),
+    brokers: (process.env.NOTOPIA_DOCUMENT_KAFKA_BROKERS ?? 'localhost:19092')
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean),
     groupId: process.env.NOTOPIA_DOCUMENT_KAFKA_GROUP_ID ?? 'document',
   })
 );

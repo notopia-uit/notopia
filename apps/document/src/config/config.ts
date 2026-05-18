@@ -40,7 +40,7 @@ export const kafkaConfigSchema = z.object({
 export type KafkaConfig = z.infer<typeof kafkaConfigSchema>;
 
 export const authenticationConfigSchema = z.object({
-  jwksUrls: z.array(z.string()),
+  jwksUrls: z.array(z.string().url()).nonempty(),
   issuers: z.array(z.string()).optional(),
   audiences: z.array(z.string()).optional(),
 });

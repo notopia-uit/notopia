@@ -5,10 +5,10 @@ export const envSchema = z.object({
   NOTOPIA_DOCUMENT_LOG_LEVEL: z
     .enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal'])
     .default('warn'),
-  NOTOPIA_DOCUMENT_PORT: z.coerce.number().default(8082),
+  NOTOPIA_DOCUMENT_PORT: z.coerce.number().int().min(1).max(65535).default(8082),
   NOTOPIA_DOCUMENT_API_URL: z.string().default(''),
   NOTOPIA_DOCUMENT_DB_HOST: z.string().default('localhost'),
-  NOTOPIA_DOCUMENT_DB_PORT: z.coerce.number().default(5434),
+  NOTOPIA_DOCUMENT_DB_PORT: z.coerce.number().int().min(1).max(65535).default(5434),
   NOTOPIA_DOCUMENT_DB_USER: z.string().default('postgres'),
   NOTOPIA_DOCUMENT_DB_PASSWORD: z.string().default(''),
   NOTOPIA_DOCUMENT_DB_NAME: z.string().default('document'),
