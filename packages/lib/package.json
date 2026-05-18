@@ -10,11 +10,6 @@
       "types": "./dist/block-note/index.d.ts",
       "default": "./dist/block-note/index.js"
     },
-    "./server": {
-      "@nx/source": "./src/server/index.ts",
-      "types": "./dist/server/index.d.ts",
-      "default": "./dist/server/index.js"
-    },
     "./hocuspocus": {
       "@nx/source": "./src/hocuspocus/index.ts",
       "types": "./dist/hocuspocus/index.d.ts",
