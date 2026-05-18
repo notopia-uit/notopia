@@ -110,7 +110,7 @@ export async function renderGraph(
     // Filter by removeTags list
     if (removeTags.length > 0 && isTag) {
       // Extract tag name from node id or use node name
-      const tagName = node.id.replace('tags/', '').split('-')[0] || node.name.toLowerCase();
+      const tagName = node.id.replace('#', '').split('-')[0] || node.name.toLowerCase();
       if (removeTags.includes(tagName)) {
         return false;
       }

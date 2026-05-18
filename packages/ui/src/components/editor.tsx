@@ -152,7 +152,7 @@ export default function Editor({ noteId }: { noteId: string }) {
       provider: {
         awareness: provider.awareness ? provider.awareness : undefined,
       },
-      fragment: provider.document.getXmlFragment('document-store'),
+      fragment: provider.document.getXmlFragment('prosemirror'),
       user: {
         name: sessionData?.user?.name ?? 'Anonymous',
         color: getDeterministicColor(sessionData?.user?.id ?? 'anonymous'),
