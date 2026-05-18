@@ -4,11 +4,15 @@ export default defineConfig({
   input: ['./bundled/openapi.json'],
   output: '../packages/api-gen/src/',
   plugins: [
-    '@hey-api/client-next',
+    {
+      name: '@hey-api/client-next',
+      includeInEntry: true,
+    },
     '@hey-api/transformers',
     {
       name: '@hey-api/typescript',
       enums: 'javascript',
+      includeInEntry: true,
     },
     'zod',
     {
@@ -22,7 +26,6 @@ export default defineConfig({
       useQuery: true,
       useMutation: true,
       exportFromIndex: true,
-      includeInEntry: true,
     },
   ],
 });

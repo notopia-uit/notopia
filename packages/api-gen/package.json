@@ -11,9 +11,6 @@
     "./client": {
       "default": "./src/client/index.ts"
     },
-    "./client.gen": {
-      "default": "./src/client.gen.ts"
-    },
     "./@tanstack": {
       "default": "./src/@tanstack/index.ts"
     },

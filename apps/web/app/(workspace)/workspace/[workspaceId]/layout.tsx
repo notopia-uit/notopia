@@ -4,7 +4,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@ui/components/sh
 import WorkspaceSideBar from '@ui/components/workspace-sidebar';
 import { fetchAccessTokenServerSide } from '@ui/lib/get-access-token';
 
-import getQueryClient from '../../../get-query-client';
+import getQueryClient from '#/get-query-client';
 
 interface WorkspaceLayoutProps {
   children: React.ReactNode;

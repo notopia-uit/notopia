@@ -1,6 +1,6 @@
 'use client';
 
-import { client } from '@notopia-uit/api-gen/client.gen';
+import { client } from '@notopia-uit/api-gen';
 import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import * as React from 'react';
 
