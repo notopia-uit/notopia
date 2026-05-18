@@ -11,14 +11,6 @@ import { MeiliError } from './errors';
 // Handle the meilisearch setting
 // Or just settup the consumer retries alerady in kafka js config
 
-//  const index = this.meili.index('notes');
-//  await index.updateSettings({
-//    primaryKey: 'id',
-//    searchableAttributes: ['name', 'plainTextContent', 'tags'],
-//    filterableAttributes: ['tags'],
-//    sortableAttributes: ['createdAt'], // Missing field!
-//  });
-
 export type HandleNoteCreatedParams = Required<Pick<NoteSearch, 'id' | 'name' | 'workspaceId'>>;
 
 export type HandleNoteUpdatedParams = Required<
