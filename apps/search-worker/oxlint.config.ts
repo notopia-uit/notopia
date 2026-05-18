@@ -8,4 +8,7 @@ export default defineConfig({
   env: {
     node: true,
   },
+  rules: {
+    'oxc/no-barrel-file': 'error',
+  },
 });
