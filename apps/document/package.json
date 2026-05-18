@@ -70,6 +70,7 @@
     "tsx": "catalog:",
     "typeorm-extension": "catalog:",
     "unplugin-swc": "catalog:",
+    "run-script-webpack-plugin": "catalog:",
     "webpack-node-externals": "catalog:"
   }
 }

@@ -1,3 +1,3 @@
-export * from './reference';
-export * from './tag';
-export * from './collab-user';
+export * from './reference.js';
+export * from './tag.js';
+export * from './collab-user.js';

@@ -40,6 +40,14 @@
         "doctor": {}
       }
     },
+    "dev": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "USE_HMR=true rspack build --watch --node-env=development",
+        "cwd": "apps/document"
+      }
+    },
     "run": {
       "continuous": true,
       "executor": "@nx/js:node",

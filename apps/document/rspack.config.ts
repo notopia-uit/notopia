@@ -5,7 +5,6 @@ import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
 import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import type { Configuration } from '@rspack/cli';
 import rspack, { type DevTool } from '@rspack/core';
-// import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
 
 const require = createRequire(import.meta.url);
@@ -16,7 +15,14 @@ const tsConfigFile = join(__dirname, 'tsconfig.app.json');
 
 const NODE_ENV = process.env['NODE_ENV'] || 'development';
 const isDev = NODE_ENV === 'development';
-const useHmr = false; // because nx handle that. But it isn't nicely I guess, it stop the whole process
+// USE_HMR=true enables true rspack HMR (used by the `dev` target).
+// Must NOT be set during regular `nx build` — RunScriptWebpackPlugin would conflict with @nx/js:node.
+const useHmr = isDev && process.env['USE_HMR'] === 'true';
+// Lazy-required so NX project graph analysis (NX_GRAPH_CREATION=true) never executes this import.
+const RunScriptWebpackPlugin = useHmr
+  ? (require('run-script-webpack-plugin') as typeof import('run-script-webpack-plugin'))
+      .RunScriptWebpackPlugin
+  : null;
 
 const devTool: DevTool = isDev ? 'source-map' : false;
 const lazyImports = new Set([
@@ -181,7 +187,34 @@ const config: Configuration = {
       optimization: !isDev,
       sourceMap: devTool,
       generatePackageJson: true,
+      // apply-base-config.js:119 unconditionally does `config.watch = options.watch`,
+      // clobbering the CLI --watch flag to undefined. Pass it explicitly to preserve it.
+      watch: useHmr,
     }),
+    // NxAppRspackPlugin.apply() unconditionally does:
+    //   config.entry['main'] = { import: ['/abs/path/to/main.ts'] }  — drops our poll entry
+    //   config.externals = [nodeExternals(workspaceRoot/node_modules)]  — no hot/poll allowlist
+    //   config.watch = options.watch                                   — clobbers CLI --watch flag
+    // This plugin runs after it and restores what's needed for HMR.
+    useHmr && {
+      apply(compiler: any) {
+        const mainEntry = compiler.options.entry?.main;
+        if (mainEntry?.import && !mainEntry.import.some((e: string) => e.includes('hot/poll'))) {
+          mainEntry.import.unshift('@rspack/core/hot/poll?100');
+        }
+        // Replace externals entirely: same workspace-root modulesDir as NxAppRspackPlugin uses,
+        // but with hot/poll added to the allowlist so it gets bundled, not externalized.
+        // Prepending a second nodeExternals with default modulesDir causes workspace packages
+        // in apps/document/node_modules to be incorrectly externalized.
+        compiler.options.externals = [
+          nodeExternals({
+            modulesDir: join(__dirname, '../../node_modules'),
+            importType: isEsm ? 'module' : 'commonjs',
+            allowlist: [/@rspack\/core\/hot\/poll/],
+          }),
+        ];
+      },
+    },
     new rspack.CopyRspackPlugin({
       patterns: [{ from: join(__dirname, '../../proto'), to: 'proto' }],
     }),
@@ -205,8 +238,10 @@ const config: Configuration = {
       },
     }),
     useHmr && new rspack.HotModuleReplacementPlugin(),
-    // isDev && new RunScriptWebpackPlugin({ name: 'main.cjs', autoRestart: false }),
-    process.env.RSDOCTOR === 'true' ? new RsdoctorRspackPlugin() : undefined,
+    useHmr &&
+      RunScriptWebpackPlugin &&
+      new RunScriptWebpackPlugin({ name: 'main.cjs', autoRestart: false }),
+    process.env.RSDOCTOR === 'true' && new RsdoctorRspackPlugin(),
   ],
   ignoreWarnings: [
     // Dynamic require(expression) in third-party packages — structural, cannot be fixed externally

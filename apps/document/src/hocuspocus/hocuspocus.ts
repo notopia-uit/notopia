@@ -6,13 +6,12 @@ import {
   Hocuspocus as ServerHocuspocus,
 } from '@hocuspocus/server';
 import { Injectable, Logger } from '@nestjs/common';
-import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
+import { type YDocMetadataMap } from '@notopia-uit/lib/yjs';
 
 import { AuthenticationService } from '../authentication/authentication.service';
 import { AuthorizationService } from '../authorization/authorization.service';
 import { DocumentService } from '../document/document.service';
 import { NoteService } from '../note/note.service';
-
 import { HocuspocusContext } from './hocuspocus-context';
 
 @Injectable()
