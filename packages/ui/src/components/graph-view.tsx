@@ -40,5 +40,28 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
   if (isError) {
     throw error;
   }
-  return isPending ? <Spinner /> : <Graph data={graphData} />;
+  return isPending ? (
+    <Spinner />
+  ) : (
+    <Graph
+      data={graphData}
+      options={{
+        localGraph: {
+          drag: true,
+          zoom: true,
+          depth: -1,
+          scale: 0.9,
+          repelForce: 0.5,
+          centerForce: 0.2,
+          linkDistance: 30,
+          fontSize: 0.6,
+          opacityScale: 1,
+          showTags: true,
+          removeTags: [],
+          focusOnHover: true,
+          enableRadial: true,
+        },
+      }}
+    />
+  );
 }
