@@ -1,0 +1,18 @@
+{
+  "name": "@notopia-uit/lib-server",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    "./block-note": {
+      "@nx/source": "./src/block-note/index.ts",
+      "types": "./dist/block-note/index.d.ts",
+      "default": "./dist/block-note/index.js"
+    }
+  },
+  "dependencies": {
+    "@blocknote/core": "catalog:",
+    "@notopia-uit/lib": "workspace:",
+    "jsdom": "catalog:"
+  }
+}

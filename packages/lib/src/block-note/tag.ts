@@ -4,7 +4,7 @@ import {
   type InlineContentSpec,
 } from '@blocknote/core';
 
-export const BlockNoteTagConfig = {
+export const TagConfig = {
   type: 'tag',
   propSchema: {
     tag: { default: '' },
@@ -12,6 +12,6 @@ export const BlockNoteTagConfig = {
   content: 'none',
 } as const satisfies CustomInlineContentConfig;
 
-export type BlockNoteTagInlineContentSpec = InlineContentSpec<typeof BlockNoteTagConfig>;
+export type TagInlineContentSpec = InlineContentSpec<typeof TagConfig>;
 
-export type TagInline = CustomInlineContentFromConfig<typeof BlockNoteTagConfig, any>;
+export type TagInline = CustomInlineContentFromConfig<typeof TagConfig, any>;

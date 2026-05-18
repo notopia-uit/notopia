@@ -13,7 +13,7 @@
     "vitest.config.mts",
     "src/**/*.spec.ts",
     "database/**/*.spec.ts",
-    "../../packages/lib/src/server/types.d.ts"
+    "../../packages/lib-server/src/block-note/types.d.ts"
   ],
   "exclude": ["dist/**/*", "out-tsc/**/*"],
   "references": [

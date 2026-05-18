@@ -3,7 +3,7 @@ import 'reflect-metadata';
 
 import { type MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
+import { createSchema } from '@notopia-uit/lib-server/block-note';
 
 import datasource from './datasource';
 import DocumentSeeder from './seeds/documents';
@@ -14,7 +14,7 @@ async function run() {
     console.log('🌱 Initializing DataSource...');
     await datasource.initialize();
 
-    const blockNoteSchema: MySchema = createServerBlockNoteSchema();
+    const blockNoteSchema: MySchema = createSchema();
     // TODO: will do with editor later
     const editor = ServerBlockNoteEditor.create({
       schema: blockNoteSchema,

@@ -12,7 +12,7 @@
     }
   },
   "files": [],
-  "include": ["database/**/*.ts", "../../packages/lib/src/server/types.d.ts"],
+  "include": ["database/**/*.ts", "../../packages/lib-server/src/block-note/types.d.ts"],
   "exclude": ["**/*.spec.ts"],
   "references": [
     {

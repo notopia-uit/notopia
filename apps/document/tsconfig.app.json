@@ -14,13 +14,19 @@
       "#/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "../../packages/lib/src/server/types.d.ts"],
+  "include": ["src/**/*", "../../packages/lib-server/src/block-note/types.d.ts"],
   "references": [
     {
       "path": "../../packages/pb/tsconfig.lib.json"
     },
     {
+      "path": "../../packages/lib-server/tsconfig.lib.json"
+    },
+    {
       "path": "../../packages/api-share-gen/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/api-document-nestjs-server/tsconfig.lib.json"
     },
     {
       "path": "../../packages/lib/tsconfig.lib.json"

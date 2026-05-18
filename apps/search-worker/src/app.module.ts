@@ -1,6 +1,6 @@
 import { HttpException, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
+import { createSchema } from '@notopia-uit/lib-server/block-note';
 import { Meilisearch } from 'meilisearch';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
@@ -81,7 +81,7 @@ import { APP_CONFIG, MEILI_CONFIG, appConfig, kafkaConfig, meiliConfig } from '.
     },
     {
       provide: BLOCKNOTE_SCHEMA,
-      useFactory: createServerBlockNoteSchema,
+      useFactory: createSchema,
     },
     AppService,
   ],

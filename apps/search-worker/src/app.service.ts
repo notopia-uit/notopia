@@ -1,4 +1,4 @@
-import { MyBlock, type MySchema } from '@blocknote/core';
+import type { MyBlock, MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Meilisearch, MeilisearchError } from 'meilisearch';
@@ -41,7 +41,10 @@ export class AppService {
   ) {}
 
   async handleNoteCreated(params: HandleNoteCreatedParams) {
-    this.logger.debug({ id: params.id, workspaceId: params.workspaceId }, 'handleNoteCreated: indexing');
+    this.logger.debug(
+      { id: params.id, workspaceId: params.workspaceId },
+      'handleNoteCreated: indexing'
+    );
     const index = this.meili.index(AppService.noteIndex);
     const noteSearch: NoteSearch = {
       id: params.id,

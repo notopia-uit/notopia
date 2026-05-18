@@ -1,8 +1,5 @@
 import { createReactInlineContentSpec } from '@blocknote/react';
-import {
-  BlockNoteReferenceConfig,
-  BlockNoteReferenceInlineContentSpec,
-} from '@notopia-uit/lib/block-note';
+import { ReferenceConfig, ReferenceInlineContentSpec } from '@notopia-uit/lib/block-note';
 import { useState } from 'react';
 import { useEffect } from 'react';
 
@@ -41,8 +38,8 @@ const ReferenceLink = ({ noteId }: { noteId: string }) => {
   );
 };
 
-export const createBlockNoteReferenceSpec = (): BlockNoteReferenceInlineContentSpec =>
-  createReactInlineContentSpec(BlockNoteReferenceConfig, {
+export const createBlockNoteReferenceSpec = (): ReferenceInlineContentSpec =>
+  createReactInlineContentSpec(ReferenceConfig, {
     render: (props) => {
       return <ReferenceLink noteId={props.inlineContent.props.noteId} />;
     },
