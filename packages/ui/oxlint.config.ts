@@ -21,7 +21,7 @@ export default defineConfig({
         'better-tailwindcss/no-unknown-classes': [
           'error',
           {
-            ignore: ['notopia-reference', 'notopia-tag'],
+            ignore: ['notopia-reference', 'notopia-tag', 'global-graph-outer'],
           },
         ],
         'better-tailwindcss/enforce-consistent-line-wrapping': 'off',

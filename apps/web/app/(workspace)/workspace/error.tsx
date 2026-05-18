@@ -29,13 +29,13 @@ const ErrorPage = ({ error, reset }: { error: Error & { digest?: string }; reset
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Button onClick={() => reset()} variant="default" className="h-9 px-4 py-2">
-            <RefreshCcw className="mr-2 size-4 " />
+            <RefreshCcw className="mr-2 size-4" />
             Try Again
           </Button>
 
           {/* Action 2: Go back home */}
           <Button onClick={() => router.push('/')} variant="outline" className="h-9 px-4 py-2">
-            <ArrowLeft className="mr-2 size-4 " />
+            <ArrowLeft className="mr-2 size-4" />
             Go Back Home
           </Button>
         </div>
@@ -45,7 +45,7 @@ const ErrorPage = ({ error, reset }: { error: Error & { digest?: string }; reset
         <img
           src="https://ui.shadcn.com/placeholder.svg"
           alt="Error illustration"
-          className="absolute inset-0 size-full  object-cover dark:brightness-[0.95] dark:invert"
+          className="absolute inset-0 size-full object-cover dark:brightness-[0.95] dark:invert"
         />
       </div>
     </div>

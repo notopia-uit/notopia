@@ -27,7 +27,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from './shadcn/avatar';
 import {
@@ -189,7 +189,6 @@ export function CreateWorkspaceDialog() {
   );
 }
 
-//TODO: get user data from betterauth
 const data = {
   projects: [
     {
@@ -220,18 +219,26 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
   } = useQuery({
     ...getMyWorkspacesOptions({}),
   });
-  //TODO: throw custome error if workspace not found or user not auth
+  const currentWorkspace = allWorkspaceData?.find((ws) => ws.workspace.id === currentWorkspaceId);
+
+  useEffect(() => {
+    if (currentWorkspace) {
+      setActiveWorkspace(currentWorkspace);
+    }
+  }, [currentWorkspaceId, currentWorkspace]);
+
   if (!sessionData) {
     return;
   }
-  if (!allWorkspaceData || isError) {
+  if (isPending) {
+    return <Spinner />;
+  }
+  if (isError) {
     throw error;
   }
-  const currentWorkspace = allWorkspaceData.find((ws) => ws.workspace.id === currentWorkspaceId);
-  if (!currentWorkspace) {
+  if (!allWorkspaceData || !currentWorkspace) {
     return;
   }
-  setActiveWorkspace(currentWorkspace);
 
   return (
     <Sidebar collapsible="icon">

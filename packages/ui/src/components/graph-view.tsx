@@ -1,9 +1,9 @@
 'use client';
 
 import { getWorkspaceGraphOptions, NoteGraph } from '@notopia-uit/api-gen';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { GraphData, GraphNode, GraphLink } from '@notopia-uit/ui/graph-view/graph';
 import Graph from '@notopia-uit/ui/graph-view/graph';
-import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { useQuery } from '@tanstack/react-query';
 
 export function mapDtoNoteData(dto: NoteGraph): GraphData {
@@ -24,12 +24,12 @@ export function mapDtoNoteData(dto: NoteGraph): GraphData {
     ),
   };
 }
-//TODO: handle loading and error states
 export default function GraphView({ workspaceId }: { workspaceId: string }) {
   const {
     data: graphData = { nodes: [], links: [] },
     isError,
     error,
+    isPending,
   } = useQuery({
     ...getWorkspaceGraphOptions({
       path: { workspaceId: workspaceId },
@@ -40,5 +40,5 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
   if (isError) {
     throw error;
   }
-  return <Graph data={graphData} />;
+  return isPending ? <Spinner /> : <Graph data={graphData} />;
 }

@@ -3,20 +3,29 @@
 import {
   NoteWorkspaceTreeFolder,
   NoteWorkspaceTreeNote,
+  getWorkspaceEvents,
   getWorkspaceTreeOptions,
   useCreateFolderMutation,
   useCreateNoteMutation,
+  useMoveWorkspaceItemsMutation,
+  useTrashWorkspaceItemsMutation,
 } from '@notopia-uit/api-gen';
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
 import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@notopia-uit/ui/components/shadcn/context-menu';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronRight, FilePlus, FolderPlus } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { ChevronRight, FilePlus, FolderPlus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -189,10 +198,9 @@ const viewStateInitial: TreeViewState = {
   'tree-sample': {},
 };
 
-//TODO: handle loading states, errors, empty states, etc.
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
   const {
-    data: { treeData: workspaceTreeData, rootId } = { treeData: {}, rootId: '' },
+    data,
     isError: isGetWorkSpaceTreeError,
     error: getWorkspaceTreeError,
     isPending: isGettingWorkspaceTree,
@@ -203,9 +211,8 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     select: (data) => mapDtoTreeData(data),
   });
 
-  if (isGetWorkSpaceTreeError) {
-    throw getWorkspaceTreeError;
-  }
+  const workspaceTreeData = data?.treeData;
+  const rootId = data?.rootId ?? '';
   const router = useRouter();
   const tree = useRef<TreeRef>(null);
 
@@ -291,14 +298,45 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   });
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
-
-  const [items, setItems] = useState<Record<TreeItemIndex, TreeItem<string>>>(workspaceTreeData);
   useEffect(() => {
-    setItems(workspaceTreeData);
+    const abortController = new AbortController();
+    getWorkspaceEvents({
+      path: { workspaceId: currentWorkspaceId },
+      signal: abortController.signal,
+      onSseEvent: (event) => {
+        switch (event.event) {
+          case 'WorkspaceItemsUpdatedEvent':
+          case 'WorkspaceRenamedEvent':
+          case 'WorkspaceDeletedEvent':
+            break;
+          case 'HeartBeatWorkspaceEvent':
+            break;
+          default:
+            showAlert('error', 'Unknown Event', `Received unknown event: ${event.event}`);
+        }
+      },
+      onSseError: (error) => {
+        showAlert(
+          'error',
+          'Connection Error',
+          `${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+      },
+    });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [currentWorkspaceId, showAlert]);
+
+  const [items, setItems] = useState<Record<TreeItemIndex, TreeItem<string>>>({});
+  useEffect(() => {
+    if (workspaceTreeData) {
+      setItems(workspaceTreeData);
+    }
   }, [workspaceTreeData]);
 
   const dataProvider = useMemo(() => new TreeDataProvider<string>(items), [items]);
-  //TODO: call API to update tree data on drop
   const getTargetParentId = useCallback(() => {
     const focusedId = viewState['tree-sample']?.focusedItem;
     let parentId: TreeItemIndex = rootId;
@@ -316,9 +354,32 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     return parentId;
   }, [viewState, items, rootId]);
 
-  //TODO: this only mutate local state, need to call API to update data on server and handle errors, etc.
+  const { mutate: moveWorkspaceItems } = useMoveWorkspaceItemsMutation({
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Move Items Failed',
+        `${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    },
+    onSuccess: () => {
+      showAlert('success', 'Items Moved', 'Items have been moved successfully');
+    },
+  });
+
   const onDrop = useCallback(
     (draggedItems: TreeItem<string>[], target: DraggingPosition) => {
+      let destinationFolderId: TreeItemIndex = rootId;
+
+      if (target.targetType === 'item') {
+        const targetItem = items[target.targetItem];
+        destinationFolderId = targetItem?.isFolder ? target.targetItem : rootId;
+      } else if (target.targetType === 'between-items') {
+        destinationFolderId = target.parentItem;
+      } else if (target.targetType === 'root') {
+        destinationFolderId = rootId;
+      }
+
       setItems((prevItems) => {
         const newItems = { ...prevItems };
 
@@ -364,13 +425,75 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
         return newItems;
       });
+
+      for (const draggedItem of draggedItems) {
+        const isFolder = items[draggedItem.index]?.isFolder ?? false;
+
+        moveWorkspaceItems({
+          path: {
+            workspaceId: currentWorkspaceId,
+          },
+          body: {
+            noteIds: isFolder ? [] : [String(draggedItem.index)],
+            folderIds: isFolder ? [String(draggedItem.index)] : [],
+            destinationFolderId: String(destinationFolderId),
+          },
+        });
+      }
     },
-    [rootId]
+    [rootId, items, currentWorkspaceId, moveWorkspaceItems]
   );
 
-  // NOTE: some problem with api contract, check this later
-  //TODO: call API to create new item and update tree data with response
-  // Maybe this logic need to be checked
+  const { mutate: trashItems } = useTrashWorkspaceItemsMutation({
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Trash Items Failed',
+        `${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    },
+    onSuccess: () => {
+      showAlert('success', 'Items Trashed', 'Items have been moved to trash successfully');
+    },
+  });
+
+  const handleTrashItem = useCallback(
+    (itemId: TreeItemIndex) => {
+      const item = items[itemId];
+      if (!item) return;
+
+      const isFolder = item.isFolder;
+
+      setItems((prevItems) => {
+        const newItems = { ...prevItems };
+
+        const parent = Object.values(newItems).find(
+          (p) => p.isFolder && p.children?.includes(itemId)
+        );
+        if (parent && parent.children) {
+          newItems[parent.index] = {
+            ...parent,
+            children: parent.children.filter((child) => child !== itemId),
+          };
+        }
+
+        delete newItems[itemId];
+        return newItems;
+      });
+
+      trashItems({
+        path: {
+          workspaceId: currentWorkspaceId,
+        },
+        body: {
+          noteIds: isFolder ? [] : [String(itemId)],
+          folderIds: isFolder ? [String(itemId)] : [],
+        },
+      });
+    },
+    [items, currentWorkspaceId, trashItems]
+  );
+
   const handleCreateItem = useCallback(
     (isFolder: boolean) => {
       const parentId = getTargetParentId();
@@ -448,6 +571,10 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     [getItemPath, search]
   );
 
+  if (isGetWorkSpaceTreeError) {
+    throw getWorkspaceTreeError;
+  }
+
   //TODO: maybe use skeleton?
   return isGettingWorkspaceTree ? (
     <Spinner />
@@ -468,7 +595,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           <Button
             variant="outline"
             size="sm"
-            size-3
+            size-3="true"
             className="h-8 flex-1 text-xs" // flex-1 makes them share the space equally
             onClick={() => handleCreateItem(false)}
           >
@@ -478,7 +605,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           <Button
             variant="outline"
             size="sm"
-            size-3
+            size-3="true"
             className="h-8 flex-1 text-xs"
             onClick={() => handleCreateItem(true)}
           >
@@ -579,23 +706,36 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                 {...context.itemContainerWithChildrenProps}
                 className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
               >
-                <Button
-                  {...context.itemContainerWithoutChildrenProps}
-                  {...context.interactiveElementProps}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    `grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none`,
-                    'focus:bg-secondary/20'
-                  )}
-                  style={{
-                    paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,
-                  }}
-                >
-                  {item.isFolder && arrow}
-                  {title}
-                </Button>
+                <ContextMenu>
+                  <ContextMenuTrigger asChild>
+                    <Button
+                      {...context.itemContainerWithoutChildrenProps}
+                      {...context.interactiveElementProps}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        `grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none`,
+                        'focus:bg-secondary/20'
+                      )}
+                      style={{
+                        paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,
+                      }}
+                    >
+                      {item.isFolder && arrow}
+                      {title}
+                    </Button>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem
+                      variant="destructive"
+                      onClick={() => handleTrashItem(item.index)}
+                    >
+                      <Trash2 className="mr-2 size-4" />
+                      Move to Trash
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
                 {children}
               </li>
             );

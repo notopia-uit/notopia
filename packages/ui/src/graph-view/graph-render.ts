@@ -16,7 +16,7 @@ import {
 } from 'd3';
 import { Text, Graphics, Application, Container, Circle } from 'pixi.js';
 
-import type { D3Config } from './graph.tsx';
+import type { D3Config } from './graph';
 
 type GraphicsInfo = {
   color: string;
@@ -96,9 +96,32 @@ export async function renderGraph(
     enableRadial = false,
   } = config;
 
+  // Filter nodes based on showTags and removeTags config
+  const isTagNode = (node: NodeData) => node.type === 'tag';
+
+  const filteredNodes = graphData.nodes.filter((node: NodeData) => {
+    const isTag = isTagNode(node);
+
+    // Filter by showTags setting
+    if (isTag && !showTags) {
+      return false;
+    }
+
+    // Filter by removeTags list
+    if (removeTags.length > 0 && isTag) {
+      // Extract tag name from node id or use node name
+      const tagName = node.id.replace('tags/', '').split('-')[0] || node.name.toLowerCase();
+      if (removeTags.includes(tagName)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
   // Create node map for quick lookup
-  const nodeMap = new Map(graphData.nodes.map((node: NodeData) => [node.id, node]));
-  const validNodeIds = new Set(graphData.nodes.map((n: NodeData) => n.id));
+  const nodeMap = new Map(filteredNodes.map((node: NodeData) => [node.id, node]));
+  const validNodeIds = new Set(filteredNodes.map((n: NodeData) => n.id));
 
   const tweens = new Map<string, TweenNode>();
 
@@ -109,7 +132,14 @@ export async function renderGraph(
 
   // Calculate neighborhood based on depth
   const neighbourhood = new Set<string>();
-  const wl: (string | '__SENTINEL')[] = [currentSlug, '__SENTINEL'];
+
+  // If currentSlug doesn't exist in the filtered nodes, use the first available node
+  let startNode = currentSlug;
+  if (!validNodeIds.has(currentSlug) && validNodeIds.size > 0) {
+    startNode = Array.from(validNodeIds)[0] as string;
+  }
+
+  const wl: (string | '__SENTINEL')[] = [startNode, '__SENTINEL'];
 
   if (depth >= 0) {
     let currentDepth = depth;
@@ -174,7 +204,7 @@ export async function renderGraph(
 
   const computedStyleMap = cssVars.reduce(
     (acc, key) => {
-      const value = getComputedStyle(document.documentElement).getPropertyValue(key);
+      const value = getComputedStyle(document.documentElement).getPropertyValue(key).trim();
       acc[key] = value || getDefaultColor(key);
       return acc;
     },
@@ -197,13 +227,19 @@ export async function renderGraph(
 
   const color = (d: NodeData) => {
     const isCurrent = d.id === currentSlug;
+
+    // If this is the current node, highlight it
     if (isCurrent) {
       return computedStyleMap['--secondary'];
-    } else if (visited.has(d.id) || d.id.startsWith('tags/')) {
-      return computedStyleMap['--tertiary'];
-    } else {
-      return computedStyleMap['--gray'];
     }
+
+    // All tags get the same tag color
+    if (d.type === 'tag') {
+      return computedStyleMap['--tertiary'];
+    }
+
+    // All notes get the same note color
+    return computedStyleMap['--gray'];
   };
 
   function nodeRadius(d: NodeData) {
@@ -385,7 +421,7 @@ export async function renderGraph(
     label.scale.set(1 / scale);
 
     let oldLabelOpacity = 0;
-    const isTagNode = nodeId.startsWith('tags/');
+    const isTag = isTagNode(n);
     const gfx = new Graphics({
       interactive: true,
       label: nodeId,
@@ -394,7 +430,7 @@ export async function renderGraph(
       cursor: 'pointer',
     })
       .circle(0, 0, nodeRadius(n))
-      .fill({ color: isTagNode ? computedStyleMap['--light'] : color(n) })
+      .fill({ color: isTag ? computedStyleMap['--light'] : color(n) })
       .on('pointerover', (e: any) => {
         updateHoverInfo(e.target.label);
         oldLabelOpacity = label.alpha;
@@ -410,7 +446,7 @@ export async function renderGraph(
         }
       });
 
-    if (isTagNode) {
+    if (isTag) {
       gfx.stroke({ width: 2, color: computedStyleMap['--tertiary'] });
     }
 

@@ -1,10 +1,10 @@
-import { RevisionDetailContainer } from '@notopia-uit/ui/components/revision-detail-container';
+import { redirect } from 'next/navigation';
 
 export default async function RevisionPage({
   params,
 }: {
-  params: Promise<{ noteId: string; revisionId: string }>;
+  params: Promise<{ workspaceId: string; noteId: string }>;
 }) {
-  const { revisionId } = await params;
-  return <RevisionDetailContainer selectedRevisionId={revisionId} />;
+  const { workspaceId, noteId } = await params;
+  redirect(`/workspace/${workspaceId}/note/${noteId}`);
 }

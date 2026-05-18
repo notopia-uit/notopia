@@ -29,16 +29,17 @@ import { useIsDocModified } from '@notopia-uit/ui/hooks/use-is-doc-modified';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useMemo } from 'react';
-import { useState, useRef } from 'react';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { ErrorAlert } from './error-alert';
 import { Icons } from './icons';
+import { RevisionModal } from './revision-modal';
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
 import { Button } from './shadcn/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
 import { SuccessAlert } from './success-alert';
+
 function EditorStatus() {
   const connection = useHocuspocusConnectionStatus();
   const sync = useHocuspocusSyncStatus();
@@ -85,20 +86,20 @@ function EditorStatus() {
 
         <div className="ml-auto flex items-center gap-2">
           <div className="mr-2 flex -space-x-2">
-            {users.slice(0, 3).map((user, i) => (
+            {users.slice(0, 3).map((user) => (
               <Tooltip key={user.clientId}>
                 <TooltipTrigger asChild>
                   <Avatar className="border-background ring-border size-8 border-2 ring-1">
-                    <AvatarImage src={user.avatar} />
+                    <AvatarImage src={user.user.avatar} />
                     <AvatarFallback
-                      style={{ backgroundColor: user.color }}
+                      style={{ backgroundColor: user.user.color }}
                       className="text-[10px] text-white"
                     >
-                      {user.name.substring(0, 2).toUpperCase() ?? '??'}
+                      {user.user.name.substring(0, 2).toUpperCase() ?? '??'}
                     </AvatarFallback>
                   </Avatar>
                 </TooltipTrigger>
-                <TooltipContent>{user.name}</TooltipContent>
+                <TooltipContent>{user.user.name}</TooltipContent>
               </Tooltip>
             ))}
           </div>
@@ -115,13 +116,6 @@ function EditorStatus() {
 //TODO: set local state for avatar when override from session data, and update awareness state on session change (e.g. login/logout or user update)
 //TODO: add dialog
 export default function Editor({ noteId }: { noteId: string }) {
-  // const { data: note } = useSuspenseQuery(
-  //   getNoteOptions({
-  //     path: {
-  //       noteId: noteId,
-  //     },
-  //   })
-  // );
   const { data: sessionData } = authClient.useSession();
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
@@ -170,6 +164,9 @@ export default function Editor({ noteId }: { noteId: string }) {
   return (
     <div className="relative min-h-screen">
       <EditorStatus />
+      <div className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-14 z-40 flex gap-2 border-b px-4 py-2 backdrop-blur-sm">
+        <RevisionModal noteId={noteId} currentEditor={editor as any} />
+      </div>
       <BlockNoteView editor={editor}>
         <SuggestionMenuController
           triggerCharacter={'#'}

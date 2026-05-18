@@ -66,9 +66,9 @@ export function RevisionSidebar({ noteId }: { noteId: string }) {
   return isPending ? (
     <Spinner />
   ) : (
-    <div className="bg-muted/10 flex w-80 flex-shrink-0 flex-col border-r">
+    <div className="bg-muted/10 flex w-80 shrink-0 flex-col border-r">
       <div className="flex items-center gap-2 border-b p-4">
-        <History className="text-muted-foreground h-5 w-5" />
+        <History className="text-muted-foreground size-5" />
         <h2 className="font-semibold">Version History</h2>
       </div>
 

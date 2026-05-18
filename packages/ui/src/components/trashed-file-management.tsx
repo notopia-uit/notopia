@@ -86,7 +86,6 @@ const formatDate = (isoString: string) => {
 };
 
 const EMPTY_TRASH_DATA: TrashedData = { notes: [], folders: [] };
-//TODO: add dialog onSuccess and onError for delete and restore action, also add confirm dialog when user click delete permanently or empty trash
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient();
   const { data, isError, error, isPending } = useQuery({

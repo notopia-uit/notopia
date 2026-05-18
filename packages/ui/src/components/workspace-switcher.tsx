@@ -5,6 +5,7 @@ import {
   getMyWorkspacesOptions,
   useChangeWorkspaceSlugMutation,
   useCreateWorkspaceMutation,
+  useLeaveWorkspaceMutation,
 } from '@notopia-uit/api-gen';
 import { Badge } from '@notopia-uit/ui/components/shadcn/badge';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
@@ -30,6 +31,7 @@ import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 import { ErrorAlert } from './error-alert';
@@ -60,8 +62,8 @@ const generateSlug = (name: string) => {
     .replace(/^-|-$/g, '');
 };
 
-//TODO: add context for error alert
 const WorkspaceSwitcher = () => {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const _data = useQuery({
     ...getMyWorkspacesOptions(),
@@ -75,10 +77,6 @@ const WorkspaceSwitcher = () => {
     error: getMyWorkspacesError,
   } = _data;
 
-  //TODO: Local state mirroring server data will desync on refetch.
-  // workspaces and selectedId are initialized from allWorkspaceData once at mount. If the underlying getMyWorkspaces query refetches (on focus, reconnect, manual invalidation, etc.), useSuspenseQuery updates allWorkspaceData but the local useState snapshot is never re-synced, so the UI will silently drift from server state. Combined with the TODO at Line 69, this whole component currently operates on local-only edits.
-  // Consider either deriving the list directly from the query data (with a mutation that invalidates the query) or using useEffect to sync — but the former is the idiomatic React Query pattern.
-
   const [workspaces, setWorkspaces] = useState<UserWorkspace[]>([]);
   const [selectedId, setSelectedId] = useState<string>();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -86,6 +84,14 @@ const WorkspaceSwitcher = () => {
   const [editForm, setEditForm] = useState<Partial<UserWorkspace>>({});
 
   const { alert, showAlert } = useAlert();
+
+  const handleSelectWorkspace = (workspaceId: string) => {
+    const workspace = workspaces.find((w) => w.id === workspaceId);
+    if (workspace && editingId !== workspaceId) {
+      setSelectedId(workspaceId);
+      router.push(`/workspace/${workspace.slug}`);
+    }
+  };
 
   if (isGetMyWorkspacesError) {
     throw getMyWorkspacesError;
@@ -158,6 +164,27 @@ const WorkspaceSwitcher = () => {
     }
   );
 
+  const { mutate: leaveWorkspace, isPending: isLeavingWorkspace } = useLeaveWorkspaceMutation({
+    onSuccess: async (_, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: getMyWorkspacesOptions({}).queryKey,
+      });
+      setWorkspaces((prev) =>
+        prev.filter((workspace) => workspace.id !== variables.path.workspaceId)
+      );
+      if (selectedId === variables.path.workspaceId) {
+        setSelectedId(undefined);
+      }
+      showAlert('success', 'Left Workspace', `You have left the workspace successfully.`);
+    },
+    onError: (error) => {
+      showAlert(
+        'error',
+        'Action Failed',
+        `There was an error leaving the workspace. Please try again. Error details: ${error.message}`
+      );
+    },
+  });
   const startEditing = (workspace: UserWorkspace) => {
     setEditingId(workspace.id);
     setEditForm({ ...workspace });
@@ -182,29 +209,6 @@ const WorkspaceSwitcher = () => {
     setEditForm({});
   };
 
-  //   TODO:delete are local-only and will not persist.
-  //
-  // deleteWorkspace only mutate local state — no API calls — and saveNewWorkspace assigns Date.now().toString() as id, which will collide with real backend ids once the mutation is wired up. The TODO at Line 69 acknowledges this, but flagging so it isn't missed before release. Consider wiring useMutation with query invalidation for getMyWorkspacesQueryKey().
-  //
-
-  const deleteWorkspace = (id: string) => {
-    setWorkspaces((prev) => {
-      const nextWorkspaces = prev.filter((workspace) => workspace.id !== id);
-      if (selectedId === id) {
-        if (prev.length === 1) {
-          setSelectedId('');
-        } else {
-          setSelectedId(nextWorkspaces[0]?.id || '');
-        }
-      }
-      return nextWorkspaces;
-    });
-    if (editingId === id) {
-      setEditingId(null);
-      setEditForm({});
-    }
-  };
-
   return isGetMyWorkspacesPending ? (
     <Spinner className="size-8" />
   ) : (
@@ -221,7 +225,7 @@ const WorkspaceSwitcher = () => {
           </Button>
         </div>
 
-        <RadioGroup value={selectedId} onValueChange={setSelectedId}>
+        <RadioGroup value={selectedId} onValueChange={handleSelectWorkspace}>
           <div className="space-y-3">
             {workspaces.map((workspace) => (
               <Card
@@ -371,18 +375,27 @@ const WorkspaceSwitcher = () => {
                             <Pencil className="mr-2 size-4" />
                             Edit Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteWorkspace(workspace.id);
-                            }}
-                          >
-                            <Trash2 className="mr-2 size-4" />
-                            {workspace.userRole === 'owner'
-                              ? 'Delete Workspace'
-                              : 'Leave Workspace'}
-                          </DropdownMenuItem>
+                          {workspace.userRole !== 'owner' && (
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              disabled={isLeavingWorkspace}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                leaveWorkspace({
+                                  path: {
+                                    workspaceId: workspace.id,
+                                  },
+                                });
+                              }}
+                            >
+                              {isLeavingWorkspace ? (
+                                <Spinner></Spinner>
+                              ) : (
+                                <Trash2 className="mr-2 size-4" />
+                              )}
+                              Leave Workspace
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
