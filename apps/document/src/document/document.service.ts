@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 
-import { type MyBlock } from '@blocknote/core';
+import type { MySchema } from '@blocknote/core';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
@@ -10,13 +10,13 @@ import { lastValueFrom } from 'rxjs';
 import { DataSource, Repository } from 'typeorm';
 
 import { AuthorizationService } from '../authorization/authorization.service';
-import { BlocknoteService } from '../blocknote/blocknote.service';
-import { DocumentNotFoundException } from './document-not-found.exception';
-import { DocumentPermissionException } from './document-permission.exception';
+import { BLOCKNOTE_SCHEMA } from '../blocknote';
+import { BlocknoteEditorService } from '../blocknote/blocknote-editor.service';
 import { KAFKA_CLIENT } from '../kafka/token';
 import { RevisionEntity } from '../revision/revision.entity';
 import { StorageService } from '../storage/storage.service';
-
+import { DocumentNotFoundException } from './document-not-found.exception';
+import { DocumentPermissionException } from './document-permission.exception';
 import { DocumentEntity } from './document.entity';
 
 @Injectable()
@@ -30,8 +30,8 @@ export class DocumentService {
     private readonly storageService: StorageService,
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly authorizationService: AuthorizationService,
-    private readonly blocknoteService: BlocknoteService,
-    @Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka
+    @Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka,
+    @Inject(BLOCKNOTE_SCHEMA) private readonly blocknoteSchema: MySchema
   ) {}
 
   async commitDocument({
@@ -42,7 +42,6 @@ export class DocumentService {
     userId: string;
   }): Promise<string> {
     this.logger.debug({ documentId, userId }, 'commitDocument: checking permission');
-    const editor = this.blocknoteService.createEditor();
     return this.dataSource.transaction(async (manager) => {
       const document = await manager.findOne(DocumentEntity, {
         where: { id: documentId },
@@ -53,14 +52,18 @@ export class DocumentService {
       }
       const revisionId = randomUUID();
       this.logger.debug({ documentId, revisionId }, 'commitDocument: saving revision');
+      const blocknoteEditorService = new BlocknoteEditorService({
+        schema: this.blocknoteSchema,
+        initialContent: document.data,
+      });
       await manager.save(RevisionEntity, {
         id: revisionId,
         document,
-        content: this.blocknoteService.bufferToBlockNote(document.data, editor),
+        content: blocknoteEditorService.blocks(),
       });
       await manager.update(DocumentEntity, { id: documentId }, { modified: false });
       // TODO: Consider refactor into a module named "EventBus", which manages event topic
-      const { tags, outgoingLinkIds } = this.blocknoteService.extractTagsAndOutgoingLinkIds(editor);
+      const { tags, outgoingLinkIds } = blocknoteEditorService.extractTagsAndOutgoingLinkIds();
       this.logger.debug({ documentId, tags, outgoingLinkIds }, 'commitDocument: emitting event');
       await lastValueFrom(
         this.kafkaClient.emit('events.integration.document.document.committed', {
@@ -68,7 +71,7 @@ export class DocumentService {
           userId,
           tags,
           outgoingLinkIds,
-          content: editor.editor.document satisfies MyBlock[],
+          content: blocknoteEditorService.blocks(),
         } satisfies DocumentCommittedEvent)
       );
       this.logger.log({ documentId, revisionId }, 'commitDocument: done');
