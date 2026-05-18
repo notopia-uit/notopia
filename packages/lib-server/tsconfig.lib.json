@@ -4,7 +4,6 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "types": ["node"],
-    "lib": ["ESNext", "DOM"],
     "target": "esnext",
     "sourceMap": true,
     "declaration": true,
@@ -15,9 +14,7 @@
       "./*": ["./src/*"]
     }
   },
-  "include": [
-    "src/**/*"
-  ],
+  "include": ["src/**/*"],
   "references": [
     {
       "path": "../lib/tsconfig.lib.json"

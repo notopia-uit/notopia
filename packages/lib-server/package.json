@@ -14,5 +14,8 @@
     "@blocknote/core": "catalog:",
     "@notopia-uit/lib": "workspace:",
     "jsdom": "catalog:"
+  },
+  "devDependencies": {
+    "@types/jsdom": "catalog:"
   }
 }

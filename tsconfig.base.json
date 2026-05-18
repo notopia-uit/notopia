@@ -13,7 +13,7 @@
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "isolatedModules": true,
-    "lib": ["es2024"],
+    "lib": ["ESNext"],
     "module": "preserve",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
