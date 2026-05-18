@@ -5,6 +5,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "types": ["node", "@rspack/core/module"],
+    "lib": ["esnext", "DOM"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "esnext",

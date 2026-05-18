@@ -1,6 +1,5 @@
 {
   "name": "@notopia-uit/api-document-nestjs-server",
-  "version": "0.2.0",
   "private": true,
   "type": "commonjs",
   "types": "./dist/index.d.ts",

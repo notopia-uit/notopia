@@ -1,7 +1,7 @@
 {
   "name": "@notopia-uit/api-share-gen",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "main": "./src/index.ts",
   "exports": {
     ".": {

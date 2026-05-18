@@ -1,7 +1,7 @@
 {
   "name": "@notopia-uit/lib-server",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "exports": {
     "./package.json": "./package.json",
     "./block-note": {
@@ -12,10 +12,10 @@
   },
   "dependencies": {
     "@blocknote/core": "catalog:",
-    "@notopia-uit/lib": "workspace:",
-    "jsdom": "catalog:"
+    "@notopia-uit/lib": "workspace:"
   },
-  "devDependencies": {
-    "@types/jsdom": "catalog:"
+  "peerDependencies": {
+    "@blocknote/server-util": "catalog:",
+    "@floating-ui/dom": "catalog:"
   }
 }

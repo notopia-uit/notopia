@@ -1,0 +1,1 @@
+- Blocnote server util will populate the global document. So, we can safely include lib DOM in tsconfig

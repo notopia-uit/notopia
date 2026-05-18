@@ -4,6 +4,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "types": ["node"],
+    "lib": ["esnext", "DOM"],
     "target": "esnext",
     "sourceMap": true,
     "declaration": true,
