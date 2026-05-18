@@ -19,6 +19,7 @@ export class BlocknoteEditorService {
       schema: options.schema,
       ...options.editorOptions,
     });
+    this.editor = this.serverEditor.editor;
     if (options.initialContent) {
       if (Buffer.isBuffer(options.initialContent)) {
         const blocks = this.bufferToBlockNote(options.initialContent);
@@ -27,7 +28,6 @@ export class BlocknoteEditorService {
         this.replaceContent(options.initialContent);
       }
     }
-    this.editor = this.serverEditor.editor;
   }
 
   blocks(): MyBlock[] {
@@ -61,7 +61,7 @@ export class BlocknoteEditorService {
 
     this.editor.forEachBlock((block) => {
       if (!Array.isArray(block.content)) {
-        return false;
+        return true;
       }
       for (const inlineNode of block.content) {
         switch (inlineNode.type) {
