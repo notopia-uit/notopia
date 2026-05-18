@@ -19,7 +19,8 @@ import {
 import { firstValueFrom } from 'rxjs';
 
 import { isGrpcError, protoTimestampToDate } from '#/common';
-import { NoteNotFoundException, WorkspaceNoteNotFoundException } from '#/note';
+import { NoteNotFoundException } from './note-not-found.exception';
+import { WorkspaceNoteNotFoundException } from './workspace-note-not-found.exception';
 
 import { NoteModel, TrashedModel, WorkspaceModel } from './models';
 

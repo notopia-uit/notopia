@@ -8,10 +8,10 @@ import {
 import { Injectable, Logger } from '@nestjs/common';
 import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
 
-import { AuthenticationService } from '#/authentication';
-import { AuthorizationService } from '#/authorization';
-import { DocumentService } from '#/document';
-import { NoteService } from '#/note';
+import { AuthenticationService } from '../authentication/authentication.service';
+import { AuthorizationService } from '../authorization/authorization.service';
+import { DocumentService } from '../document/document.service';
+import { NoteService } from '../note/note.service';
 
 import { HocuspocusContext } from './hocuspocus-context';
 

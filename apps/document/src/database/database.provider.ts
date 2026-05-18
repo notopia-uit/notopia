@@ -2,8 +2,8 @@ import { DataSourceOptions } from 'typeorm';
 import { type BaseDataSourceOptions } from 'typeorm/data-source/BaseDataSourceOptions.js';
 
 import { DatabaseConfig } from '#/config';
-import { DocumentEntity } from '#/document';
-import { RevisionEntity } from '#/revision';
+import { DocumentEntity } from '../document/document.entity';
+import { RevisionEntity } from '../revision/revision.entity';
 
 export const createDatasourceOptions = ({
   databaseCfg,

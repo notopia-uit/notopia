@@ -9,13 +9,13 @@ import { Traceable } from 'nestjs-otel';
 import { lastValueFrom } from 'rxjs';
 import { DataSource, Repository } from 'typeorm';
 
-import { AuthorizationService } from '#/authorization';
-import { BlocknoteService } from '#/blocknote';
-import { DocumentNotFoundException } from '#/document';
-import { DocumentPermissionException } from '#/document';
-import { KAFKA_CLIENT } from '#/kafka';
-import { RevisionEntity } from '#/revision';
-import { StorageService } from '#/storage';
+import { AuthorizationService } from '../authorization/authorization.service';
+import { BlocknoteService } from '../blocknote/blocknote.service';
+import { DocumentNotFoundException } from './document-not-found.exception';
+import { DocumentPermissionException } from './document-permission.exception';
+import { KAFKA_CLIENT } from '../kafka/token';
+import { RevisionEntity } from '../revision/revision.entity';
+import { StorageService } from '../storage/storage.service';
 
 import { DocumentEntity } from './document.entity';
 

@@ -7,7 +7,7 @@ import { AUTHORIZATION_PACKAGE_NAME } from '@notopia-uit/pb/authorization';
 
 import { ServicesConfig } from '#/config';
 import { SERVICE_CONFIG } from '#/config';
-import { NoteModule } from '#/note';
+import { NoteModule } from '../note/note.module';
 
 import { AuthorizationService } from './authorization.service';
 

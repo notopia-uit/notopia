@@ -3,7 +3,7 @@ import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { Inject, Injectable } from '@nestjs/common';
 import { Doc as YDoc, applyUpdate } from 'yjs';
 
-import { DocumentEntity } from '#/document';
+import { DocumentEntity } from '../document/document.entity';
 
 import { BLOCKNOTE_SCHEMA } from './token';
 
