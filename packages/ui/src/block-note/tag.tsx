@@ -1,8 +1,8 @@
 import { createReactInlineContentSpec } from '@blocknote/react';
-import { BlockNoteTagConfig } from '@notopia-uit/lib/block-note';
+import { TagConfig } from '@notopia-uit/lib/block-note';
 
 export const createBlockNoteTagSpec = () =>
-  createReactInlineContentSpec(BlockNoteTagConfig, {
+  createReactInlineContentSpec(TagConfig, {
     render: (props) => (
       <span
         // TODO: tailwind shadcn

@@ -1,10 +1,10 @@
-import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { type MyBlock } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
-import { createServerBlockNoteSchema } from '@notopia-uit/lib/server';
+import { createSchema } from '@notopia-uit/lib-server/block-note';
 
 import { parseSeedMarkdownToBlocks } from './blocknote-seed-transform';
 
@@ -48,7 +48,7 @@ describe('seed markdown parsing', () => {
   let editor: ServerBlockNoteEditor;
 
   beforeAll(() => {
-    const schema = createServerBlockNoteSchema();
+    const schema = createSchema();
     editor = ServerBlockNoteEditor.create({ schema });
   });
 

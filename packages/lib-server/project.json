@@ -1,5 +1,5 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "packages/lib",
+  "name": "packages/lib-server",
   "projectType": "library"
 }

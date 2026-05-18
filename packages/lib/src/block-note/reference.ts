@@ -4,7 +4,7 @@ import {
   type InlineContentSpec,
 } from '@blocknote/core';
 
-export const BlockNoteReferenceConfig = {
+export const ReferenceConfig = {
   type: 'reference',
   propSchema: {
     noteId: { default: 'unknown' },
@@ -12,8 +12,6 @@ export const BlockNoteReferenceConfig = {
   content: 'none',
 } as const satisfies CustomInlineContentConfig;
 
-export type BlockNoteReferenceInlineContentSpec = InlineContentSpec<
-  typeof BlockNoteReferenceConfig
->;
+export type ReferenceInlineContentSpec = InlineContentSpec<typeof ReferenceConfig>;
 
-export type ReferenceInline = CustomInlineContentFromConfig<typeof BlockNoteReferenceConfig, any>;
+export type ReferenceInline = CustomInlineContentFromConfig<typeof ReferenceConfig, any>;

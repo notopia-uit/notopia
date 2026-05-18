@@ -1,4 +1,4 @@
-import { InlineNode, type MyBlock } from '@blocknote/core';
+import type { MyInlineContent, MyBlock } from '@blocknote/core';
 import { type ServerBlockNoteEditor } from '@blocknote/server-util';
 import { ReferenceInline, TagInline } from '@notopia-uit/lib/block-note';
 import { marked } from 'marked';
@@ -29,7 +29,7 @@ function markdownToHTML(markdown: string): string {
 }
 
 function transformInlineContent(content: MyBlock['content']): MyBlock['content'] {
-  const transformed: InlineNode[] = [];
+  const transformed: MyInlineContent[] = [];
   if (!Array.isArray(content)) {
     return content;
   }
@@ -49,7 +49,7 @@ function transformInlineContent(content: MyBlock['content']): MyBlock['content']
       }
     }
 
-    transformed.push(node as InlineNode);
+    transformed.push(node as MyInlineContent);
   }
 
   return transformed as MyBlock['content'];

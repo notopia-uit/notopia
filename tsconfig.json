@@ -39,6 +39,9 @@
     },
     {
       "path": "./packages/api-share-gen"
+    },
+    {
+      "path": "./packages/lib-server"
     }
   ]
 }

@@ -31,6 +31,7 @@
     "@notopia-uit/api-document-nestjs-server": "workspace:",
     "@notopia-uit/api-share-gen": "workspace:",
     "@notopia-uit/lib": "workspace:",
+    "@notopia-uit/lib-server": "workspace:",
     "@notopia-uit/pb": "workspace:",
     "@opentelemetry/api": "catalog:",
     "@opentelemetry/auto-instrumentations-node": "catalog:",

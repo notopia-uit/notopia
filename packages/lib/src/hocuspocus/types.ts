@@ -1,4 +1,4 @@
-import { CollaborationUser as BlockNoteCollaborationUser } from '../block-note/types';
+import { CollaborationUser as BlockNoteCollaborationUser } from '../block-note/';
 import '@hocuspocus/provider-react';
 
 declare module '@hocuspocus/provider-react' {
