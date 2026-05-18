@@ -78,7 +78,7 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
   } = useQuery({
     ...getRevisionWithContentOptions({
       path: {
-        revisionId: selectedRevisionId || '',
+        revisionId: selectedRevisionId ?? '',
       },
     }),
     enabled: !!selectedRevisionId,
@@ -104,7 +104,10 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
 
     try {
       const blocks = selectedRevisionData.content;
-      currentEditor.replaceBlocks(currentEditor.document, blocks);
+      currentEditor.replaceBlocks(
+        currentEditor.document.map((block) => block.id),
+        blocks
+      );
 
       showAlert(
         'success',
@@ -148,7 +151,7 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
         </DialogHeader>
 
         <div className="flex flex-1 overflow-hidden">
-          <div className="flex w-72 flex-none flex-col border-r overflow-y-auto">
+          <div className="flex w-72 flex-none flex-col overflow-y-auto border-r">
             <div className="border-b p-4">
               <div className="relative">
                 <Search className="text-muted-foreground absolute top-1/2 left-2 size-4 -translate-y-1/2" />
@@ -182,7 +185,7 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
                       >
                         <div className="mb-1 flex w-full items-center justify-between">
                           <span className="font-medium">
-                            {formatDistanceToNow(revision.createdAt, { addSuffix: true })}
+                            {formatDistanceToNow(new Date(revision.createdAt), { addSuffix: true })}
                           </span>
                         </div>
                         <span className="text-muted-foreground line-clamp-1">{revision.name}</span>

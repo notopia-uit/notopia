@@ -378,6 +378,7 @@ const WorkspaceSwitcher = () => {
                           {workspace.userRole !== 'owner' && (
                             <DropdownMenuItem
                               className="text-destructive"
+                              disabled={isLeavingWorkspace}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 leaveWorkspace({
