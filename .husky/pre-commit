@@ -9,11 +9,21 @@ CI=true pnpm nx affected \
   --tui false
 
 for file in $(git diff --cached --name-only --diff-filter=A); do
-  if [ "$(wc -c <"$file")" -gt "$FILE_LIMIT_BYTES" ]; then
+  filesize=$(wc -c <"$file")
+  if [ "$filesize" -eq 0 ]; then
+    continue
+  fi
+  if [ "$filesize" -gt "$FILE_LIMIT_BYTES" ]; then
     echo "Error: File '$file' is too large (>${FILE_LIMIT_BYTES} bytes)."
     exit 2
   fi
-  if file --mime "$file" | grep -q "binary"; then
+  mime=$(file --mime "$file" | awk '{print $2}' | tr -d ';')
+  case "$mime" in
+    font/*|application/x-font-*)
+      continue
+      ;;
+  esac
+  if echo "$mime" | grep -q "binary"; then
     echo "Error: Binary file '$file' detected. Use Git LFS."
     exit 3
   fi
