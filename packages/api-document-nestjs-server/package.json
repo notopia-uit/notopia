@@ -11,22 +11,22 @@
       "default": "./dist/index.js"
     },
     "./api": {
-      "@nx/source": "./src/api",
+      "@nx/source": "./src/api/index.ts",
       "types": "./dist/api/index.d.ts",
       "default": "./dist/api/index.js"
     },
     "./controller": {
-      "@nx/source": "./src/controller",
+      "@nx/source": "./src/controllers/index.ts",
       "types": "./dist/controller/index.d.ts",
       "default": "./dist/controller/index.js"
     },
     "./decorator": {
-      "@nx/source": "./src/decorator",
+      "@nx/source": "./src/decorators/index.ts",
       "types": "./dist/decorator/index.d.ts",
       "default": "./dist/decorator/index.js"
     },
     "./models": {
-      "@nx/source": "./src/models",
+      "@nx/source": "./src/models/index.ts",
       "types": "./dist/models/index.d.ts",
       "default": "./dist/models/index.js"
     },

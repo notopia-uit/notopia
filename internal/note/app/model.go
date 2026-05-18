@@ -1,6 +1,7 @@
 package app
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/google/uuid"
@@ -81,6 +82,15 @@ type Graph struct {
 	Links []GraphLink
 }
 
+var _ slog.LogValuer = Graph{}
+
+func (g Graph) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.Int("nodes_count", len(g.Nodes)),
+		slog.Int("links_count", len(g.Links)),
+	)
+}
+
 type NoteLink struct {
 	ID   uuid.UUID
 	Name string
@@ -142,6 +152,19 @@ type WorkspaceTreeFolder struct {
 	Notes     []WorkspaceTreeNote
 	Children  []WorkspaceTreeFolder
 	UpdatedAt time.Time
+}
+
+var _ slog.LogValuer = WorkspaceTreeFolder{}
+
+func (f WorkspaceTreeFolder) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("id", f.ID.String()),
+		slog.String("name", f.Name),
+		slog.String("icon", f.Icon),
+		slog.Int("notes_count", len(f.Notes)),
+		slog.Int("direct_children_count", len(f.Children)),
+		slog.Time("updated_at", f.UpdatedAt),
+	)
 }
 
 type TrashedBy uint8

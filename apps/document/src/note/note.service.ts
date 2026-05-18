@@ -1,5 +1,11 @@
 import { status } from '@grpc/grpc-js';
-import { Inject, Injectable, InternalServerErrorException, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { type ClientGrpc } from '@nestjs/microservices';
 import {
   NOTE_PACKAGE_NAME,
@@ -12,9 +18,8 @@ import {
 } from '@notopia-uit/pb/note';
 import { firstValueFrom } from 'rxjs';
 
-import { isGrpcError, protoTimestampToDate } from '#/common/grpc';
-import { NoteNotFoundException } from '#/note/note-not-found.exception';
-import { WorkspaceNoteNotFoundException } from '#/note/workspace-note-not-found.exception';
+import { isGrpcError, protoTimestampToDate } from '#/common';
+import { NoteNotFoundException, WorkspaceNoteNotFoundException } from '#/note';
 
 import { NoteModel, TrashedModel, WorkspaceModel } from './models';
 
@@ -38,7 +43,7 @@ export class NoteService implements OnModuleInit {
     userId: string;
     excludeTrashed?: boolean;
   }): Promise<NoteModel> {
-    this.logger.debug(`getNoteById: noteId=${noteId} userId=${userId}`);
+    this.logger.debug({ noteId, userId, excludeTrashed }, 'Fetching note by ID');
     let note: Note | undefined;
     try {
       const response = await firstValueFrom(
@@ -51,14 +56,11 @@ export class NoteService implements OnModuleInit {
       note = response.note;
     } catch (error) {
       if (isGrpcError(error) && error.code === status.NOT_FOUND) {
-        this.logger.warn(`getNoteById: not found noteId=${noteId}`);
-        throw new NoteNotFoundException(noteId);
+        throw new NoteNotFoundException(noteId, error);
       }
-      this.logger.warn(`getNoteById: gRPC error noteId=${noteId}`);
       throw error;
     }
     if (!note) {
-      this.logger.warn(`getNoteById: empty response noteId=${noteId}`);
       throw new NoteNotFoundException(noteId);
     }
 
@@ -80,7 +82,7 @@ export class NoteService implements OnModuleInit {
 
   // TODO: previously used to fetch each, but we might going to change batch, maybe this will be removed
   async getNoteName(noteId: string): Promise<string> {
-    this.logger.debug(`getNoteName: noteId=${noteId}`);
+    this.logger.debug({ noteId }, 'getNoteName');
     const response = await firstValueFrom(this.noteServiceClient.getNoteName({ id: noteId }));
     return response.name;
   }
@@ -92,7 +94,7 @@ export class NoteService implements OnModuleInit {
     userId: string;
     noteId: string;
   }): Promise<WorkspaceModel> {
-    this.logger.debug(`getWorkspaceByNote: noteId=${noteId} userId=${userId}`);
+    this.logger.debug({ noteId, userId }, 'Fetching workspace by note ID');
     let workspace: Workspace | undefined;
     try {
       const response = await firstValueFrom(
@@ -104,14 +106,11 @@ export class NoteService implements OnModuleInit {
       workspace = response.workspace;
     } catch (error) {
       if (isGrpcError(error) && error.code === status.NOT_FOUND) {
-        this.logger.warn(`getWorkspaceByNote: not found noteId=${noteId}`);
-        throw new WorkspaceNoteNotFoundException(noteId);
+        throw new WorkspaceNoteNotFoundException(noteId, error);
       }
-      this.logger.warn(`getWorkspaceByNote: gRPC error noteId=${noteId}`);
       throw error;
     }
     if (!workspace) {
-      this.logger.warn(`getWorkspaceByNote: empty response noteId=${noteId}`);
       throw new WorkspaceNoteNotFoundException(noteId);
     }
     return {

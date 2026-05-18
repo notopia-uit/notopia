@@ -36,7 +36,8 @@
         "production": {
           "mode": "production",
           "args": ["--node-env=production"]
-        }
+        },
+        "doctor":{}
       }
     },
     "run": {
@@ -45,9 +46,12 @@
       "dependsOn": ["build"],
       "options": {
         "buildTarget": "document:build:development",
-        "inspect": false,
-        "port": 9222,
-        "watch": false
+        "inspect": false
+      },
+      "configurations": {
+        "development": {
+          "watch": true
+        }
       }
     },
     "debug": {
@@ -58,11 +62,15 @@
         "buildTarget": "document:build:development",
         "inspect": "inspect-brk",
         "port": 9222,
-        "watch": false
+        "watch": true
       }
     },
     "docker:build": {
-      "dependsOn": ["prune", "build", "^build"]
+      "dependsOn": [
+        // "prune", // It got nx error, so just... generatePackageJson in build production
+        "build",
+        "^build"
+      ]
     },
     "nx-release-publish": {
       "parallelism": false

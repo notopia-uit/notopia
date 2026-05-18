@@ -1,0 +1,16 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "packages/api-share-gen",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "dependsOn": [
+        "^build",
+        {
+          "projects": "api",
+          "target": "gen:hey-api"
+        }
+      ]
+    }
+  }
+}

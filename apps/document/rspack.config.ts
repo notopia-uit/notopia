@@ -1,28 +1,89 @@
-import { builtinModules } from 'module';
+import { builtinModules, createRequire } from 'module';
 import { join } from 'path';
 
-import { NxAppRspackPlugin } from '@nx/rspack/app-plugin';
+import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
+import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import type { Configuration } from '@rspack/cli';
-import rspack from '@rspack/core';
+import rspack, { type DevTool } from '@rspack/core';
 // import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
+
+const require = createRequire(import.meta.url);
+const __dirname = import.meta.dirname;
 
 const isEsm = false;
 const tsConfigFile = join(__dirname, 'tsconfig.app.json');
 
 const NODE_ENV = process.env['NODE_ENV'] || 'development';
 const isDev = NODE_ENV === 'development';
+const useHmr = false; // because nx handle that. But it isn't nicely I guess, it stop the whole process
+
+const devTool: DevTool = isDev ? 'source-map' : false;
+const lazyImports = new Set([
+  '@aws-sdk/credential-providers',
+  '@google-cloud/spanner',
+  '@mongodb-js/zstd',
+  '@nestjs/core',
+  '@nestjs/microservices',
+  '@nestjs/microservices/microservices-module',
+  '@nestjs/platform-express',
+  '@nestjs/websockets',
+  '@nestjs/websockets/socket-module',
+  '@opentelemetry/winston-transport',
+  '@sap/hana-client',
+  '@sap/hana-client/extension/Stream',
+  'amqp-connection-manager',
+  'amqplib',
+  'aws4',
+  'better-sqlite3',
+  'bson-ext',
+  'bufferutil',
+  'cache-manager',
+  'canvas',
+  'class-transformer',
+  'class-validator',
+  'file-type',
+  'gcp-metadata',
+  'hiredis',
+  'ioredis',
+  'kafkajs',
+  'kerberos',
+  'long',
+  'mongodb',
+  'mongodb-client-encryption',
+  'mqtt',
+  'mssql',
+  'mysql',
+  'mysql2',
+  'nats',
+  'oracledb',
+  'pg-native',
+  'pg-query-stream',
+  'react-native-sqlite-storage',
+  'redis',
+  'snappy',
+  'snappy/package.json',
+  'socket.io-adapter',
+  'spanner',
+  'sql.js',
+  'sqlite3',
+  'typeorm-aurora-data-api-driver',
+  'utf-8-validate',
+]);
 
 const config: Configuration = {
   target: 'node',
-  devtool: NODE_ENV === 'production' ? false : 'source-map',
-  entry: isDev ? ['@rspack/core/hot/poll?1000', './src/main.ts'] : ['./src/main.ts'],
+  devtool: devTool,
+  entry: useHmr ? ['@rspack/core/hot/poll?1000', './src/main.ts'] : ['./src/main.ts'],
   output: {
     module: isEsm,
     path: join(__dirname, './dist'),
     chunkFormat: isEsm ? 'module' : 'array-push',
     filename: `[name].${isEsm ? 'm' : 'c'}js`,
     chunkFilename: '[name].[contenthash].js',
+  },
+  experiments: {
+    outputModule: isEsm,
   },
   externalsPresets: { node: true },
   optimization: {
@@ -118,8 +179,9 @@ const config: Configuration = {
     new NxAppRspackPlugin({
       tsConfig: tsConfigFile,
       main: 'apps/document/src/main.ts',
-      sourceMap: NODE_ENV !== 'production',
-      optimization: NODE_ENV === 'production',
+      optimization: !isDev,
+      sourceMap: devTool,
+      generatePackageJson: true,
     }),
     new rspack.CopyRspackPlugin({
       patterns: [{ from: join(__dirname, '../../proto'), to: 'proto' }],
@@ -132,55 +194,9 @@ const config: Configuration = {
     new rspack.SourceMapDevToolPlugin({}),
     new rspack.IgnorePlugin({
       checkResource(resource) {
-        const lazyImports = [
-          '@aws-sdk/credential-providers',
-          '@google-cloud/spanner',
-          '@mongodb-js/zstd',
-          '@nestjs/core',
-          '@nestjs/microservices',
-          '@nestjs/microservices/microservices-module',
-          '@nestjs/platform-express',
-          '@nestjs/websockets',
-          '@nestjs/websockets/socket-module',
-          '@sap/hana-client',
-          'amqp-connection-manager',
-          'amqplib',
-          'aws4',
-          'better-sqlite3',
-          'bson-ext',
-          'bufferutil',
-          'cache-manager',
-          'canvas',
-          'class-transformer',
-          'class-validator',
-          'file-type',
-          'gcp-metadata',
-          'hiredis',
-          'ioredis',
-          'kafkajs',
-          'kerberos',
-          'mongodb',
-          'mongodb-client-encryption',
-          'mqtt',
-          'mssql',
-          'mysql',
-          'mysql2',
-          'nats',
-          'oracledb',
-          'pg-native',
-          'pg-query-stream',
-          'react-native-sqlite-storage',
-          'redis',
-          'snappy',
-          'snappy/package.json',
-          'socket.io-adapter',
-          'spanner',
-          'sql.js',
-          'sqlite3',
-          'typeorm-aurora-data-api-driver',
-          'utf-8-validate',
-        ];
-        if (!lazyImports.includes(resource)) return false;
+        if (!lazyImports.has(resource)) {
+          return false;
+        }
         try {
           require.resolve(resource, { paths: [process.cwd()] });
           return false;
@@ -189,9 +205,21 @@ const config: Configuration = {
         }
       },
     }),
-    isDev && new rspack.HotModuleReplacementPlugin(),
+    useHmr && new rspack.HotModuleReplacementPlugin(),
     // isDev && new RunScriptWebpackPlugin({ name: 'main.cjs', autoRestart: false }),
+    process.env.RSDOCTOR === 'true' ? new RsdoctorRspackPlugin() : undefined,
   ],
+  ignoreWarnings: [
+    // Dynamic require(expression) in third-party packages — structural, cannot be fixed externally
+    { module: /typeorm/, message: /Critical dependency/ },
+    { module: /nestjs/, message: /Critical dependency/ },
+    { module: /express/, message: /Critical dependency/ },
+    { module: /app-root-path/, message: /Critical dependency/ },
+    { module: /load-esm/, message: /Critical dependency/ },
+  ],
+  devServer: {
+    allowedHosts: 'all',
+  },
 };
 
 export default config;

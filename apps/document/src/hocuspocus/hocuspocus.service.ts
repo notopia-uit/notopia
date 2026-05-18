@@ -2,11 +2,9 @@ import { Connection } from '@hocuspocus/server';
 import { Injectable } from '@nestjs/common';
 import { Traceable } from 'nestjs-otel';
 
-import { AuthorizationService } from '#/authorization/authorization.service';
-import { HocuspocusContext } from '#/hocuspocus/hocuspocus-context';
-import { WorkspaceModel } from '#/note/models';
-import { NoteService } from '#/note/note.service';
-import { WorkspaceNoteNotFoundException } from '#/note/workspace-note-not-found.exception';
+import { AuthorizationService } from '#/authorization';
+import { HocuspocusContext } from '#/hocuspocus';
+import { NoteService, WorkspaceModel, WorkspaceNoteNotFoundException } from '#/note';
 
 import { Hocuspocus } from './hocuspocus';
 

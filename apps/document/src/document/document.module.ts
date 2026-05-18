@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { KafkaModule } from '#/kafka/kafka.module';
-import { DatabaseModule } from '#/database/database.module';
-import { AuthorizationModule } from '#/authorization/authorization.module';
-import { BlockNoteModule } from '#/blocknote/blocknote.module';
-import { StorageModule } from '#/storage/storage.module';
+import { AuthorizationModule } from '#/authorization';
+import { BlockNoteModule } from '#/blocknote';
+import { DatabaseModule } from '#/database';
+import { KafkaModule } from '#/kafka';
+import { StorageModule } from '#/storage';
 
 import { DocumentEntity } from './document.entity';
 import { DocumentService } from './document.service';

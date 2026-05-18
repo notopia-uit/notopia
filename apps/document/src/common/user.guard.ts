@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { WsException } from '@nestjs/websockets';
+// import { WsException } from '@nestjs/websockets';
 
 import { User } from './user';
 
@@ -76,9 +76,11 @@ export class HttpUserGuard extends UserGuard {
   }
 }
 
-@Injectable()
-export class WsUserGuard extends UserGuard {
-  protected throwException(message: string): void {
-    throw new WsException(message);
-  }
-}
+// Previously this is used for websocket hoscuspocus
+// But I realised it isn't. So, keep this for future use
+// @Injectable()
+// export class WsUserGuard extends UserGuard {
+//   protected throwException(message: string): void {
+//     throw new WsException(message);
+//   }
+// }

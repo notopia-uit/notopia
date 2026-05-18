@@ -4,6 +4,12 @@ local root = vim.fn.expand("%:p:h")
 local uri_root = vim.uri_from_fname(root)
 local lsp_watchfile = vim.lsp._watchfiles
 
+vim.filetype.add({
+  filename = {
+    ["project.json"] = "jsonc",
+  },
+})
+
 vim.env.EDITING = "true" -- Trick with oxlint, for typeAware false
 
 -- For toggle
@@ -105,6 +111,7 @@ lsp.config("tailwindcss", {
     local fname = vim.api.nvim_buf_get_name(bufnr)
     local allowed_paths = {
       "apps/web",
+      "apps/test-editor",
       "packages/ui",
     }
     local is_allowed = false
@@ -182,7 +189,8 @@ lsp.config("tsgo", {
         enable = false,
       },
       preferences = {
-        importModuleSpecifier = "non-relative",
+        importModuleSpecifier = "shortest",
+        importModuleSpecifierEnding = "minimal",
       },
     },
   },
@@ -332,6 +340,23 @@ lsp.config("oxlint", {
 } --[[@as vim.lsp.Config]])
 
 lsp.config("oxfmt", {
+  filetypes = {
+    "css",
+    "handlebars",
+    "html",
+    "javascript",
+    "javascriptreact",
+    "json",
+    "json5",
+    "jsonc",
+    "less",
+    "markdown",
+    "scss",
+    "toml",
+    "typescript",
+    "typescriptreact",
+    "vue",
+  },
   cmd = { "./node_modules/.bin/oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" },
   root_dir = function(_, on_dir)
     on_dir(root)
@@ -360,7 +385,7 @@ lsp.enable({
   "jsonls",
   "jsonls",
   "lua_ls",
-  "nestjs_doctor",
+  -- "nestjs_doctor",
   "nxls",
   "oxfmt",
   "oxlint",
@@ -515,7 +540,7 @@ local progress_ev
 progress_ev = vim.api.nvim_create_autocmd("VimEnter", {
   group = progress_augroup,
   callback = function()
-    track_may_progress()
+    vim.schedule(track_may_progress)
     vim.api.nvim_del_autocmd(progress_ev)
   end,
 })

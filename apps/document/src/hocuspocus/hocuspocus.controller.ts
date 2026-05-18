@@ -1,11 +1,11 @@
 import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import type {
-  ShareUserWorkspaceRoleUpdatedEvent,
-  ShareWorkspaceMemberRemovedEvent,
-} from '@notopia-uit/api-gen';
+  UserWorkspaceRoleUpdatedEvent,
+  WorkspaceMemberRemovedEvent,
+} from '@notopia-uit/api-share-gen';
 
-import { HocuspocusService } from '#/hocuspocus/hocuspocus.service';
+import { HocuspocusService } from '#/hocuspocus';
 
 @Controller()
 export class HocuspocusController {
@@ -14,30 +14,34 @@ export class HocuspocusController {
   constructor(private readonly hocuspocusService: HocuspocusService) {}
 
   @MessagePattern('events.integration.authorization.user_workspace_role_updated')
-  async handleUserWorkspaceRoleUpdated(@Payload() data: ShareUserWorkspaceRoleUpdatedEvent) {
+  async handleUserWorkspaceRoleUpdated(@Payload() data: UserWorkspaceRoleUpdatedEvent) {
     this.logger.log(
-      `handleUserWorkspaceRoleUpdated: received workspaceId=${data.workspaceId} userId=${data.userId}`
+      { workspaceId: data.workspaceId, userId: data.userId },
+      'handleUserWorkspaceRoleUpdated: received'
     );
     await this.hocuspocusService.onRoleChanged({
       workspaceId: data.workspaceId,
       userId: data.userId,
     });
     this.logger.log(
-      `handleUserWorkspaceRoleUpdated: done workspaceId=${data.workspaceId} userId=${data.userId}`
+      { workspaceId: data.workspaceId, userId: data.userId },
+      'handleUserWorkspaceRoleUpdated: done'
     );
   }
 
   @MessagePattern('events.integration.authorization.workspace_member_removed')
-  async handleWorkspaceMemberRemoved(@Payload() data: ShareWorkspaceMemberRemovedEvent) {
+  async handleWorkspaceMemberRemoved(@Payload() data: WorkspaceMemberRemovedEvent) {
     this.logger.log(
-      `handleWorkspaceMemberRemoved: received workspaceId=${data.workspaceId} userId=${data.userId}`
+      { workspaceId: data.workspaceId, userId: data.userId },
+      'handleWorkspaceMemberRemoved: received'
     );
     await this.hocuspocusService.onMemberRemoved({
       workspaceId: data.workspaceId,
       userId: data.userId,
     });
     this.logger.log(
-      `handleWorkspaceMemberRemoved: done workspaceId=${data.workspaceId} userId=${data.userId}`
+      { workspaceId: data.workspaceId, userId: data.userId },
+      'handleWorkspaceMemberRemoved: done'
     );
   }
 }

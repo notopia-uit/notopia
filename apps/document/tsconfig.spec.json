@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/vitest",
+    "types": ["vitest/globals", "node", "vitest", "vitest/importMeta"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "#/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "vitest.config.mts",
+    "src/**/*.spec.ts",
+    "database/**/*.spec.ts",
+    "../../packages/lib/src/server/types.d.ts"
+  ],
+  "exclude": ["dist/**/*", "out-tsc/**/*"],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.database.json"
+    }
+  ]
+}

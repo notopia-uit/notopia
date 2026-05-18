@@ -5,9 +5,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AUTHORIZATION_PACKAGE_NAME } from '@notopia-uit/pb/authorization';
 
-import { ServicesConfig } from '#/config/config';
-import { SERVICE_CONFIG } from '#/config/config.factory';
-import { NoteModule } from '#/note/note.module';
+import { ServicesConfig } from '#/config';
+import { SERVICE_CONFIG } from '#/config';
+import { NoteModule } from '#/note';
 
 import { AuthorizationService } from './authorization.service';
 
@@ -34,6 +34,7 @@ import { AuthorizationService } from './authorization.service';
                 includeDirs,
               },
               url: servicesCfg.authorizationUrl,
+              gracefulShutdown: true,
             },
           };
         },

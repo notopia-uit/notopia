@@ -6,7 +6,7 @@ import { blocksToYDoc } from '@blocknote/core/yjs';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { DataSource, Repository } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
-import { encodeStateAsUpdateV2 } from 'yjs';
+import { encodeStateAsUpdate } from 'yjs';
 
 import { DocumentEntity } from '#/document/document.entity';
 
@@ -44,7 +44,7 @@ export default class DocumentSeeder implements Seeder {
 
       const blocks = await parseSeedMarkdownToBlocks(this.editor, content);
       const yDoc = blocksToYDoc(this.editor.editor, blocks);
-      const encodedData = encodeStateAsUpdateV2(yDoc);
+      const encodedData = encodeStateAsUpdate(yDoc);
 
       const document = documentRepo.create({
         id,

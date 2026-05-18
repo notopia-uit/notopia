@@ -6,6 +6,7 @@ node_modules
 dist
 vite.config.*.timestamp*
 *tsbuildinfo
+out-tsc/
 
 # Next.js
 .next
@@ -13,6 +14,7 @@ next-env.d.ts
 out
 
 coverage.out
+coverage/
 
 # go bin, usually run with nx won't generate this, but if you accidentally run go build
 /note
@@ -31,3 +33,4 @@ tmp
 
 mise.local.toml
 .nx/self-healing
+vitest.config.*.timestamp*

@@ -2,10 +2,10 @@ import type { MyBlock } from '@blocknote/core';
 import { Controller, Logger } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import type {
-  ShareDocumentCommittedEvent,
-  ShareNoteCreatedEvent,
-  ShareNoteUpdatedEvent,
-} from '@notopia-uit/api-gen';
+  DocumentCommittedEvent,
+  NoteCreatedEvent,
+  NoteUpdatedEvent,
+} from '@notopia-uit/api-share-gen';
 
 import { AppService } from './app.service';
 
@@ -18,8 +18,8 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @EventPattern('events.integration.note.note.created')
-  async handleNoteCreated(@Payload() data: ShareNoteCreatedEvent) {
-    this.logger.log(`handleNoteCreated: received id=${data.id} workspaceId=${data.workspaceId}`);
+  async handleNoteCreated(@Payload() data: NoteCreatedEvent) {
+    this.logger.log({ id: data.id, workspaceId: data.workspaceId }, 'handleNoteCreated: received');
     try {
       await this.appService.handleNoteCreated({
         id: data.id,
@@ -27,14 +27,14 @@ export class AppController {
         workspaceId: data.workspaceId,
       });
     } catch (error) {
-      this.logger.error(`handleNoteCreated: error occurred id=${data.id}`, error);
+      this.logger.error({ err: error, id: data.id }, 'handleNoteCreated: error');
       throw error;
     }
   }
 
   @EventPattern('events.integration.note.note.updated')
-  async handleNoteUpdated(@Payload() data: ShareNoteUpdatedEvent) {
-    this.logger.log(`handleNoteUpdated: received id=${data.id}`);
+  async handleNoteUpdated(@Payload() data: NoteUpdatedEvent) {
+    this.logger.log({ id: data.id }, 'handleNoteUpdated: received');
     try {
       await this.appService.handleNoteUpdated({
         id: data.id,
@@ -44,15 +44,15 @@ export class AppController {
         trashed: data.trashed,
       });
     } catch (error) {
-      this.logger.error(`handleNoteUpdated: error occurred id=${data.id}`, error);
+      this.logger.error({ err: error, id: data.id }, 'handleNoteUpdated: error');
       throw error;
     }
-    this.logger.log(`handleNoteUpdated: done id=${data.id}`);
+    this.logger.log({ id: data.id }, 'handleNoteUpdated: done');
   }
 
   @EventPattern('events.integration.document.document.committed')
-  async handleDocumentCommitted(@Payload() data: ShareDocumentCommittedEvent) {
-    this.logger.log(`handleDocumentCommitted: received id=${data.id}`);
+  async handleDocumentCommitted(@Payload() data: DocumentCommittedEvent) {
+    this.logger.log({ id: data.id }, 'handleDocumentCommitted: received');
     try {
       await this.appService.handleDocumentCommitted({
         id: data.id,
@@ -61,7 +61,7 @@ export class AppController {
         content: data.content as MyBlock[],
       });
     } catch (error) {
-      this.logger.error(`handleDocumentCommitted: error occurred id=${data.id}`, error);
+      this.logger.error({ err: error, id: data.id }, 'handleDocumentCommitted: error');
       throw error;
     }
   }

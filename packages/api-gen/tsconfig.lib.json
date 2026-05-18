@@ -5,6 +5,7 @@
     "moduleResolution": "bundler",
     "lib": ["dom", "dom.iterable", "ES2024"],
     "rootDir": "src",
+    "emitDeclarationOnly": true,
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {

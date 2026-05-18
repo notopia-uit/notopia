@@ -2,8 +2,9 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientsModule } from '@nestjs/microservices';
 
-import { KAFKA_CLIENT } from '#/common/token';
-import { getKafkaConfig } from '#/config/kafka.config';
+import { getKafkaConfig } from '#/config';
+
+import { KAFKA_CLIENT } from './token';
 
 @Global()
 @Module({

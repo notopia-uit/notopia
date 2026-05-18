@@ -33,6 +33,12 @@
     },
     {
       "path": "./apps/search-worker"
+    },
+    {
+      "path": "./apps/test-editor"
+    },
+    {
+      "path": "./packages/api-share-gen"
     }
   ]
 }

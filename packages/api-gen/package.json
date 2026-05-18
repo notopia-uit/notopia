@@ -6,19 +6,15 @@
   "main": "./src/index.ts",
   "exports": {
     ".": {
-      "@nx/source": "./src/index.ts",
       "default": "./src/index.ts"
     },
     "./client": {
-      "@nx/source": "./src/client/index.ts",
       "default": "./src/client/index.ts"
     },
     "./client.gen": {
-      "@nx/source": "./src/client.gen.ts",
       "default": "./src/client.gen.ts"
     },
     "./@tanstack": {
-      "@nx/source": "./src/@tanstack/index.ts",
       "default": "./src/@tanstack/index.ts"
     },
     "./package.json": "./package.json"

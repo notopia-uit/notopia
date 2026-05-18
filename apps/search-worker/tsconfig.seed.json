@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "target": "esnext",
+    "rootDir": "seed",
+    "outDir": "out-tsc/seed",
+    "paths": {
+      "*": ["./src/*"]
+    }
+  },
+  "include": ["seed/**/*", "../../packages/lib/src/server/types.d.ts"],
+  "references": [
+    {
+      "path": "../../packages/lib/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/api-share-gen/tsconfig.lib.json"
+    }
+  ]
+}

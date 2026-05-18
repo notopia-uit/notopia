@@ -3,10 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import * as jose from 'jose';
 import { Traceable } from 'nestjs-otel';
 
-import { InvalidAuthenticationTokenException } from '#/authentication/authentication.exception';
-import { User } from '#/common/user';
-import { AuthenticationConfig } from '#/config/config';
-import { AUTHENTICATION_CONFIG } from '#/config/config.factory';
+import { User } from '#/common';
+import { AuthenticationConfig, AUTHENTICATION_CONFIG } from '#/config';
+
+import { InvalidAuthenticationTokenException } from './authentication.exception';
 
 @Injectable()
 @Traceable()
@@ -26,11 +26,19 @@ export class AuthenticationService {
     this.keySets = jwksUrls.map((url) => jose.createRemoteJWKSet(url));
     this.issuers = authenticationConfig.issuers;
     this.audiences = authenticationConfig.audiences;
+    this.logger.log(
+      {
+        jwksUrls: jwksUrls.map((url) => url.toString()),
+        issuers: this.issuers,
+        audiences: this.audiences,
+      },
+      'AuthenticationService initialized'
+    );
   }
 
   async validateToken(token: string): Promise<User> {
     try {
-      this.logger.debug(`Validating token: ${token}`);
+      this.logger.debug('Validating token');
       let options: jose.JWTVerifyOptions | undefined;
       if (this.issuers || this.audiences) {
         options = {
@@ -46,7 +54,6 @@ export class AuthenticationService {
         roles: payload.roles as string[],
       };
     } catch (error) {
-      this.logger.warn(`Failed to validate token: ${token}`);
       throw new InvalidAuthenticationTokenException(token, error);
     }
   }
@@ -57,20 +64,17 @@ export class AuthenticationService {
   ): Promise<jose.CryptoKey> {
     for (const getKey of this.keySets) {
       try {
-        this.logger.debug(`Trying JWKS for token: ${JSON.stringify(token)}`);
+        this.logger.debug('Trying JWKS for token');
         return await getKey(protectedHeader, token);
       } catch (err) {
         if (err instanceof jose.errors.JWKSNoMatchingKey) {
-          this.logger.debug(
-            `No matching key found in this JWKS for token: ${JSON.stringify(token)}`
-          );
+          this.logger.debug('No matching key found in this JWKS');
           continue;
         }
-        this.logger.log(`Error fetching key from JWKS for token: ${JSON.stringify(token)}`);
         throw err;
       }
     }
-    this.logger.warn(`No matching key found in any JWKS for token: ${JSON.stringify(token)}`);
+    this.logger.warn('No matching key found in any configured JWKS');
     throw new Error('ERR_JWKS_NO_MATCHING_KEY: Key not found in any configured JWKS');
   }
 }

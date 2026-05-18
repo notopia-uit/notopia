@@ -5,7 +5,7 @@ export class SearchWorkerError extends Error {
 }
 
 export class MeiliError extends SearchWorkerError {
-  override name = 'MeiliError';
+  override name = MeiliError.name;
   override cause: MeilisearchError;
 
   constructor(cause: MeilisearchError) {

@@ -33,6 +33,10 @@
       "matchPackageNames": ["/^@blocknote/"]
     },
     {
+      "groupName": "npm @suites",
+      "matchPackageNames": ["/^@suites/"]
+    },
+    {
       "groupName": "go",
       "matchPackageNames": ["/^golang$/"],
       "automerge": false

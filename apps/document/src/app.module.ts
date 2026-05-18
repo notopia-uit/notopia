@@ -1,4 +1,4 @@
-import { Inject, Module, OnModuleInit } from '@nestjs/common';
+import { HttpException, Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ClientKafka } from '@nestjs/microservices';
@@ -7,31 +7,27 @@ import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
 
-import { AuthenticationModule } from '#/authentication/authentication.module';
-import { HocuspocusModule } from '#/hocuspocus/hocuspocus.module';
-
-import { AuthorizationModule } from './authorization/authorization.module';
-import { BlockNoteModule } from './blocknote/blocknote.module';
-import { KAFKA_CLIENT } from './common/token';
-import { HttpUserGuard } from './common/user.guard';
-import { AppConfig } from './config/config';
+import { AuthenticationModule } from './authentication';
+import { AuthorizationModule } from './authorization';
+import { BlockNoteModule } from './blocknote';
+import { HttpUserGuard } from './common';
 import {
   APP_CONFIG,
+  AppConfig,
   appConfig,
   authenticationConfig,
   databaseConfig,
   kafkaConfig,
   s3Config,
   servicesConfig,
-} from './config/config.factory';
-import { DatabaseModule } from './database/database.module';
-import { DocumentApi } from './document/document.api';
-import { DocumentModule } from './document/document.module';
-import { KafkaModule } from './kafka/kafka.module';
-import { NoteModule } from './note/note.module';
-import { RevisionApi } from './revision/revision.api';
-import { RevisionModule } from './revision/revision.module';
-import { StorageModule } from './storage/storage.module';
+} from './config';
+import { DatabaseModule } from './database';
+import { DocumentApi, DocumentModule } from './document';
+import { HocuspocusModule } from './hocuspocus';
+import { KAFKA_CLIENT, KafkaModule } from './kafka';
+import { NoteModule } from './note';
+import { RevisionApi, RevisionModule } from './revision';
+import { StorageModule } from './storage';
 
 @Module({
   imports: [
@@ -66,6 +62,28 @@ import { StorageModule } from './storage/storage.module';
               appCfg.env !== 'production'
                 ? pretty({ colorize: true, ignore: 'pid,hostname' })
                 : undefined,
+            serializers: {
+              err: (err: unknown) => {
+                if (err instanceof HttpException) {
+                  return {
+                    type: err.name,
+                    status: err.getStatus(),
+                    message: err.message,
+                    stack: err.stack,
+                    cause: err.cause,
+                  };
+                }
+                if (err instanceof Error) {
+                  return {
+                    type: err.name,
+                    message: err.message,
+                    stack: err.stack,
+                    cause: (err as Error & { cause?: unknown }).cause,
+                  };
+                }
+                return { message: String(err) };
+              },
+            },
           },
         };
       },

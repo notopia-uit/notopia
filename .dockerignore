@@ -2,11 +2,14 @@
 **/node_modules
 **/.env.local
 
+out-tsc/
+
 .nx/cache/
 .nx/workspace-data/
 vite.config.*.timestamp*
 
 **/coverage.out
+**/coverage/
 
 # go bin, usually run with nx won't generate this, but if you accidentally run go build
 /note

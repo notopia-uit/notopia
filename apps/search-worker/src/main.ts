@@ -9,7 +9,6 @@ import { AppModule } from './app.module';
 import { AppConfig } from './config';
 import { APP_CONFIG } from './config.factory';
 import { getKafkaConfig } from './kafka.config';
-declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -25,6 +24,7 @@ async function bootstrap() {
   const port = appConfig.port;
   const logger = app.get(Logger);
   app.useLogger(logger);
+  app.enableShutdownHooks();
   await app.startAllMicroservices();
   await app.listen(port);
 

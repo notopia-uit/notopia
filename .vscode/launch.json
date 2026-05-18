@@ -104,6 +104,47 @@
       ]
     },
     {
+      "name": "Debug Web (Browser Launch)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://web.notopia.localhost",
+      "webRoot": "${workspaceFolder}/apps/web",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "pathMapping": {
+        "/_next/*": "${workspaceFolder}/apps/web/.next/*",
+        "/_next/static/*": "${workspaceFolder}/apps/web/.next/static/*"
+      },
+      "sourceMapPathOverrides": {
+        "webpack://_N_E/*": "${workspaceFolder}/*",
+        "webpack://_N_E/apps/web/*": "${workspaceFolder}/apps/web/*",
+        "webpack://_N_E/packages/ui/*": "${workspaceFolder}/packages/ui/*",
+        "webpack://_N_E/packages/lib/*": "${workspaceFolder}/packages/lib/*",
+        "webpack://_N_E/packages/api-gen/*": "${workspaceFolder}/packages/api-gen/*",
+        "/turbopack/[project]/*": "${workspaceFolder}/*"
+      }
+    },
+    {
+      "name": "Debug Web (Browser Attach)",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9300,
+      "urlFilter": "http://web.notopia.localhost/*",
+      "webRoot": "${workspaceFolder}/apps/web",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "pathMapping": {
+        "/_next/*": "${workspaceFolder}/apps/web/.next/*",
+        "/_next/static/*": "${workspaceFolder}/apps/web/.next/static/*"
+      },
+      "sourceMapPathOverrides": {
+        "webpack://_N_E/*": "${workspaceFolder}/*",
+        "webpack://_N_E/apps/web/*": "${workspaceFolder}/apps/web/*",
+        "webpack://_N_E/packages/ui/*": "${workspaceFolder}/packages/ui/*",
+        "webpack://_N_E/packages/lib/*": "${workspaceFolder}/packages/lib/*",
+        "webpack://_N_E/packages/api-gen/*": "${workspaceFolder}/packages/api-gen/*",
+        "/turbopack/[project]/*": "${workspaceFolder}/*"
+      }
+    },
+    {
       "name": "Debug Web (Full)",
       "type": "node",
       "request": "launch",

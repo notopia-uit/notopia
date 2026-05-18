@@ -2,24 +2,21 @@
 import './otel';
 // oxfmt-ignore
 import '@notopia-uit/lib/yjs';
+// oxfmt-ignore
 import 'reflect-metadata';
+
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { WsAdapter } from '@nestjs/platform-ws';
 import { Logger } from 'nestjs-pino';
 
-import { getKafkaConfig } from '#/config/kafka.config';
-
 import { AppModule } from './app.module';
-import { GlobalExceptionFilter } from './common/http-exception.filter';
-import { AppConfig } from './config/config';
-import { APP_CONFIG } from './config/config.factory';
-
-declare const module: any;
+import { GlobalExceptionFilter } from './common';
+import { getKafkaConfig } from './config';
+import { AppConfig } from './config';
+import { APP_CONFIG } from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.useWebSocketAdapter(new WsAdapter(app));
   app.connectMicroservice({
     useFactory: getKafkaConfig,
     inject: [ConfigService],
@@ -33,6 +30,7 @@ async function bootstrap() {
     throw new Error('APP_CONFIG not found');
   }
   const port = appConfig.port;
+  app.enableShutdownHooks();
   await app.startAllMicroservices();
   await app.listen(port);
 

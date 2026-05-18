@@ -1,7 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
 
 export class InvalidAuthenticationTokenException extends BadRequestException {
-  token: string;
+  override name = InvalidAuthenticationTokenException.name;
+
+  readonly token: string;
 
   constructor(token: string, cause: unknown) {
     super(`Invalid authentication token: ${token}`, {

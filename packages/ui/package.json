@@ -6,10 +6,11 @@
   "main": "./dist/index.mjs",
   "exports": {
     ".": {
-      "default": "./src/index.ts"
+      "default": "./src/index.ts",
+      "types": "./dist/index.d.ts"
     },
-    "./lib/utils": {
-      "default": "./src/lib/utils.mjs"
+    "./lib/shadcn/utils": {
+      "default": "./src/lib/shadcn/utils.ts"
     },
     "./styles": "./src/globals.css"
   },
