@@ -3,6 +3,7 @@ import {
   NoteTrashedFolder,
   NoteTrashedNote,
   showTrashOptions,
+  getWorkspaceTreeOptions,
   useRestoreTrashedWorkspaceItemsMutation,
   usePermanentlyDeleteWorkspaceItemsMutation,
 } from '@notopia-uit/api-gen';
@@ -177,6 +178,9 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
           };
         }
       );
+      await queryClient.invalidateQueries({
+        queryKey: getWorkspaceTreeOptions({ path: { workspaceId } }).queryKey,
+      });
       await queryClient.invalidateQueries({
         queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
       });

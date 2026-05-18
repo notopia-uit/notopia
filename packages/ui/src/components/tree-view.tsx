@@ -5,6 +5,7 @@ import {
   NoteWorkspaceTreeNote,
   getWorkspaceEvents,
   getWorkspaceTreeOptions,
+  showTrashOptions,
   useCreateFolderMutation,
   useCreateNoteMutation,
   useMoveWorkspaceItemsMutation,
@@ -24,7 +25,7 @@ import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, FilePlus, FolderPlus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -199,6 +200,7 @@ const viewStateInitial: TreeViewState = {
 };
 
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
+  const queryClient = useQueryClient();
   const {
     data,
     isError: isGetWorkSpaceTreeError,
@@ -452,7 +454,10 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
         `${error instanceof Error ? error.message : 'Unknown error'}`
       );
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: showTrashOptions({ path: { workspaceId: currentWorkspaceId } }).queryKey,
+      });
       showAlert('success', 'Items Trashed', 'Items have been moved to trash successfully');
     },
   });
