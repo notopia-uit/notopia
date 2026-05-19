@@ -118,7 +118,8 @@
     "upload-codecov": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "codecov --disable-telem upload-process --disable-search --file ./coverage.out --flag authorization"
+        "command": "codecov --disable-telem upload-process --disable-search --file ./coverage.out --flag authorization",
+        "cwd": "{projectRoot}"
       },
       "dependsOn": ["test"]
     }
