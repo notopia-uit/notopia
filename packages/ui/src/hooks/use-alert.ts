@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 
-type AlertType = 'success' | 'error';
+export type AlertType = 'success' | 'error';
 
-interface AlertState {
+export interface AlertState {
   type: AlertType;
   title: string;
   message: string;

@@ -102,7 +102,7 @@ export function NoteGraphModal({ isOpen, onOpenChange, noteId }: NoteGraphModalP
                   enableRadial: true,
                 },
               }}
-              className="h-full w-full"
+              className="size-full "
             />
           )}
         </div>
