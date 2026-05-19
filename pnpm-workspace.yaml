@@ -127,6 +127,7 @@ catalog:
   ws: "^8.19.0"
   yjs: "^13.6.30"
   zod: "^4.4.3"
+  vitest-ctrf-json-reporter: ~0.0.3
 onlyBuiltDependencies:
   - "@bufbuild/buf"
   - "@nestjs/core"

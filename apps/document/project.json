@@ -66,6 +66,9 @@
         "watch": true
       }
     },
+    "test": {
+      "outputs": ["{projectRoot}/coverage/**", "{projectRoot}/test-report.junit.xml"]
+    },
     "docker:build": {
       "dependsOn": [
         // "prune", // It got nx error, so just... generatePackageJson in build production

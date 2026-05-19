@@ -8,7 +8,7 @@ MISE_EXPERIMENTAL = 1
 '_'.path.paths = ["./bin/", "./scripts/"]
 
 [tools]
-"github:pressly/goose" = "3.27.1"
+pipx:codecov-cli= "11.2.8""github:pressly/goose" = "3.27.1"
 "go:github.com/goforj/wire/cmd/wire" = "1.2.0"
 "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.7.0"
 buf = "1.65.0"

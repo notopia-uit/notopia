@@ -35,3 +35,11 @@ mise.*
 .tool-versions
 **/openapitools.json
 **/README.md
+
+# Go test
+cmd/authorization/coverage.out
+cmd/authorization/gotestsum.json
+cmd/authorization/tests-ctrf.json
+
+# Vitest
+apps/document/test-report.junit.xml

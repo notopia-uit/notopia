@@ -9,6 +9,11 @@
       "goFiles",
       "{workspaceRoot}/api/**/*.go",
       "{workspaceRoot}/internal/authorization/**/*.go"
+    ],
+    "test": [
+      "{projectRoot}/**/*_test.go",
+      "{workspaceRoot}/internal/authorization/**/*_test.go",
+      "{workspaceRoot}/internal/authorization/**/*.csv"
     ]
   },
   "targets": {
@@ -92,7 +97,24 @@
     "nx-release-publish": {
       "parallelism": false
     },
-    "test": {}
+    "test": {
+      "executor": "nx:run-commands",
+      "inputs": ["default", "test"],
+      "outputs": [
+        "{projectRoot}/coverage.out",
+        "{projectRoot}/gotestsum.json",
+        "{projectRoot}/tests-ctrf.json"
+      ],
+      "options": {
+        "command": "./test.sh",
+        "cwd": "{projectRoot}"
+      },
+      "configurations": {
+        "production": {
+          "command": "./test.sh --production"
+        }
+      }
+    }
   },
   "implicitDependencies": ["pkg", "internal/authorization"],
   "release": {

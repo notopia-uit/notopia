@@ -18,6 +18,15 @@ export default defineConfig(() => ({
     globals: true,
     environment: 'node',
     include: ['{src,tests,database}/**/*.{test,spec}.{ts,tsx}'],
+    reporters: [
+      'default',
+      'vitest-ctrf-json-reporter',
+      'junit',
+      ...((process.env.GITHUB_ACTIONS === 'true' && 'github-actions') || []),
+    ],
+    outputFile: {
+      junit: 'test-report.junit.xml',
+    },
     coverage: {
       enabled: true,
     },

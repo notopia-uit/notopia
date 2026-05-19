@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://www.schemastore.org/codecov.json
+flag_management:
+  default_rules:
+    carryforward: true
+
+  individual_flags:
+    - name: authorization
+      paths:
+        - cmd/authorization/
+        - internal/authorization/
+    - name: note
+      paths:
+        - cmd/note/
+        - internal/note/
+    - name: document
+      paths:
+        - apps/document/
+    - name: search-worker
+      paths:
+        - apps/search-worker/
+    - name: web
+      paths:
+        - apps/web
+    - name: package-ui
+      paths:
+        - packages/ui/
