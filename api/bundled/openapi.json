@@ -10711,6 +10711,16 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/note_workspaceIdPath"
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "What ever the string is, just ensure it is unique for each client connection for a workspace",
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           }
         ],
         "responses": {

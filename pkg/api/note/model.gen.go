@@ -531,6 +531,11 @@ type ChangeWorkspaceSlugJSONBody struct {
 	Slug Slug `json:"slug"`
 }
 
+// GetWorkspaceEventsParams defines parameters for GetWorkspaceEvents.
+type GetWorkspaceEventsParams struct {
+	SessionId string `form:"sessionId" json:"sessionId"`
+}
+
 // GetWorkspaceGraphParams defines parameters for GetWorkspaceGraph.
 type GetWorkspaceGraphParams struct {
 	// IncludeOrphans Include node that are not connected to any other node

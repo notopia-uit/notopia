@@ -50,6 +50,7 @@ func setViperAdvancedDomainEventDefault(viper *viper.Viper) {
 type WorkspaceEvent struct {
 	MessageMetadataWorkspaceIDKey string `json:"messageMetadataWorkspaceIdKey" mapstructure:"message_metadata_workspace_id_key" validate:"required" yaml:"message_metadata_workspace_id_key"`
 	MessageMetadataUserIDKey      string `json:"messageMetadataUserIdKey"      mapstructure:"message_metadata_user_id_key"      validate:"required" yaml:"message_metadata_user_id_key"`
+	MessageMetadataSessionIDKey   string `json:"messageMetadataSessionIdKey"   mapstructure:"message_metadata_session_id_key"   validate:"required" yaml:"message_metadata_session_id_key"`
 	MessageMetadataEventTypeKey   string `json:"messageMetadataEventTypeKey"   mapstructure:"message_metadata_event_type_key"   validate:"required" yaml:"message_metadata_event_type_key"`
 	MessageGeneralTopic           string `json:"messageGeneralTopic"           mapstructure:"message_general_topic"             validate:"required" yaml:"message_general_topic"`
 }
@@ -57,6 +58,7 @@ type WorkspaceEvent struct {
 func setViperAdvancedWorkspaceEventDefault(viper *viper.Viper) {
 	viper.SetDefault("advanced.workspace_event.message_metadata_workspace_id_key", "workspace_id")
 	viper.SetDefault("advanced.workspace_event.message_metadata_user_id_key", "user_id")
+	viper.SetDefault("advanced.workspace_event.message_metadata_session_id_key", "session_id")
 	viper.SetDefault("advanced.workspace_event.message_metadata_event_type_key", "event_type")
 	viper.SetDefault("advanced.workspace_event.message_general_topic", "events:workspaces")
 }

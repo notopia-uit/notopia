@@ -79,7 +79,11 @@ func (h *NotifyWorkspaceItemsUpdatedHandler) publishWorkspaceUpdate(
 			},
 		},
 	}
-	if err := h.workspaceEventPublisher.Publish(ctx, workspaceID, userID, event); err != nil {
+	if err := h.workspaceEventPublisher.Publish(ctx, &WorkspaceEventPublishParams{
+		WorkspaceID: workspaceID,
+		UserID:      userID,
+		SessionID:   "",
+	}, event); err != nil {
 		return fmt.Errorf("notify workspace item updated failed to publish event: %w", err)
 	}
 	return nil

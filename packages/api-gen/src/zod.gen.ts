@@ -713,6 +713,10 @@ export const zGetWorkspaceEventsPath = z.object({
     workspaceId: zNoteId3
 });
 
+export const zGetWorkspaceEventsQuery = z.object({
+    sessionId: z.string()
+});
+
 /**
  * A persistent stream of events
  */

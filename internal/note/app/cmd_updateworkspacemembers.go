@@ -61,7 +61,11 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateW
 	if err != nil {
 		return errs.NewInternalGenerateID(err)
 	}
-	return h.workspaceEventPublisher.Publish(ctx, cmd.WorkspaceID, cmd.UserID, &WorkspaceEventMembersUpdated{
+	return h.workspaceEventPublisher.Publish(ctx, &WorkspaceEventPublishParams{
+		WorkspaceID: cmd.WorkspaceID,
+		UserID:      cmd.UserID,
+		SessionID:   "",
+	}, &WorkspaceEventMembersUpdated{
 		workspaceEvent[note.WorkspaceMembersUpdatedEventEvent]{
 			Id:    eventID,
 			Event: note.WorkspaceMembersUpdatedEventEventWorkspaceMembersUpdatedEvent,

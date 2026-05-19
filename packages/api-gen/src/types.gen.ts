@@ -1538,7 +1538,12 @@ export type GetWorkspaceEventsData = {
     path: {
         workspaceId: NoteId3;
     };
-    query?: never;
+    query: {
+        /**
+         * What ever the string is, just ensure it is unique for each client connection for a workspace
+         */
+        sessionId: string;
+    };
     url: '/note/workspaces/{workspaceId}/events';
 };
 

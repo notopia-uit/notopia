@@ -30,6 +30,7 @@ type WorkspaceEventHub struct {
 	topic                  string
 	MetadataWorkspaceIDKey string
 	metadataUserIDKey      string
+	metadataSessionIDKey   string
 	metadataEventTypeKey   string
 }
 
@@ -83,6 +84,7 @@ func NewWorkspaceEventHub(
 
 		topic:                  workspaceEventCfg.MessageGeneralTopic,
 		metadataUserIDKey:      workspaceEventCfg.MessageMetadataUserIDKey,
+		metadataSessionIDKey:   workspaceEventCfg.MessageMetadataSessionIDKey,
 		metadataEventTypeKey:   workspaceEventCfg.MessageMetadataEventTypeKey,
 		MetadataWorkspaceIDKey: workspaceEventCfg.MessageMetadataWorkspaceIDKey,
 	}, nil
@@ -114,8 +116,7 @@ func (h *WorkspaceEventHub) setupRouting() {
 
 func (h *WorkspaceEventHub) Publish(
 	ctx context.Context,
-	workspaceID uuid.UUID,
-	userID string,
+	params *app.WorkspaceEventPublishParams,
 	events ...app.WorkspaceEvent,
 ) error {
 	if len(events) == 0 {
@@ -128,24 +129,25 @@ func (h *WorkspaceEventHub) Publish(
 		payload, err := json.Marshal(event)
 		if err != nil {
 			return errs.NewWorkspaceEventPubSubFailedToCreateMessage(
-				userID,
-				workspaceID,
+				params.UserID,
+				params.WorkspaceID,
 				err,
 			)
 		}
 
 		msg := message.NewMessage(watermill.NewUUID(), payload)
 		msg.SetContext(ctx)
-		msg.Metadata.Set(h.MetadataWorkspaceIDKey, workspaceID.String())
-		msg.Metadata.Set(h.metadataUserIDKey, userID)
+		msg.Metadata.Set(h.MetadataWorkspaceIDKey, params.WorkspaceID.String())
+		msg.Metadata.Set(h.metadataUserIDKey, params.UserID)
+		msg.Metadata.Set(h.metadataSessionIDKey, params.SessionID)
 		msg.Metadata.Set(h.metadataEventTypeKey, event.GetEvent())
 		msgs[i] = msg
 	}
 
 	if err := h.redisPublisher.Publish(h.topic, msgs...); err != nil {
 		return errs.NewWorkspaceEventPubSubPublishFailed(
-			userID,
-			workspaceID,
+			params.UserID,
+			params.WorkspaceID,
 			err,
 		)
 	}
@@ -157,15 +159,14 @@ func (h *WorkspaceEventHub) Publish(
 // But, currently the logic is under infra, I will somehow bring partially up to app layer
 func (h *WorkspaceEventHub) Subscribe(
 	ctx context.Context,
-	workspaceID uuid.UUID,
-	userID string,
+	params *app.WorkspaceEventSubscriberParams,
 ) (<-chan app.WorkspaceEvent, error) {
 	eventCh := make(chan app.WorkspaceEvent, 10)
-	workspaceKey := fmt.Sprintf("workspace:%s", workspaceID)
+	workspaceKey := fmt.Sprintf("workspace:%s", params.WorkspaceID)
 
 	msgCh, err := h.internalPubSub.Subscribe(ctx, workspaceKey)
 	if err != nil {
-		return nil, errs.NewWorkspaceEventPubSubSubscribeFailed(userID, workspaceID, err)
+		return nil, errs.NewWorkspaceEventPubSubSubscribeFailed(params.UserID, params.WorkspaceID, err)
 	}
 
 	go func() {
@@ -178,7 +179,7 @@ func (h *WorkspaceEventHub) Subscribe(
 				if !ok {
 					return
 				}
-				h.processMessage(ctx, msg, eventCh, userID, workspaceID)
+				h.processMessage(ctx, msg, eventCh, params.UserID, params.SessionID, params.WorkspaceID)
 			}
 		}
 	}()
@@ -191,17 +192,20 @@ func (h *WorkspaceEventHub) processMessage(
 	msg *message.Message,
 	eventCh chan app.WorkspaceEvent,
 	userID string,
+	sessionID string,
 	workspaceID uuid.UUID,
 ) {
-	// Skip own events
-	if msg.Metadata.Get(h.metadataUserIDKey) == userID {
+	// Skip own events (same session)
+	msgSessionID := msg.Metadata.Get(h.metadataSessionIDKey)
+	if msgSessionID != "" && msgSessionID == sessionID {
 		msg.Ack()
 		return
 	}
 
 	eventType := msg.Metadata.Get(h.metadataEventTypeKey)
 	if eventType == "" {
-		slog.ErrorContext(ctx, "missing event type in message metadata",
+		slog.ErrorContext(
+			ctx, "missing event type in message metadata",
 			slog.String("workspace_id", workspaceID.String()),
 			slog.String("user_id", userID),
 		)
@@ -211,7 +215,8 @@ func (h *WorkspaceEventHub) processMessage(
 
 	event, ok := app.NewEmptyWorkspaceEventFromType(eventType)
 	if !ok {
-		slog.ErrorContext(ctx, "unknown event type",
+		slog.ErrorContext(
+			ctx, "unknown event type",
 			slog.String("event_type", eventType),
 			slog.String("workspace_id", workspaceID.String()),
 			slog.String("user_id", userID),
@@ -221,7 +226,8 @@ func (h *WorkspaceEventHub) processMessage(
 	}
 
 	if err := json.Unmarshal(msg.Payload, event); err != nil {
-		slog.ErrorContext(ctx, "failed to unmarshal event",
+		slog.ErrorContext(
+			ctx, "failed to unmarshal event",
 			slog.Any("error", err),
 			slog.String("workspace_id", workspaceID.String()),
 		)
@@ -235,7 +241,8 @@ func (h *WorkspaceEventHub) processMessage(
 	case <-ctx.Done():
 		return
 	default:
-		slog.WarnContext(ctx, "dropping event (subscriber buffer full)",
+		slog.WarnContext(
+			ctx, "dropping event (subscriber buffer full)",
 			slog.String("workspace_id", workspaceID.String()),
 			slog.String("user_id", userID),
 			slog.String("event_type", eventType),

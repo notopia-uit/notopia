@@ -167,7 +167,11 @@ func (h *StrictHandler) GetWorkspaceEvents(
 		return nil, errs.Unauthorized
 	}
 
-	eventCh, err := h.WorkspaceEventHub.Subscribe(ctx, request.WorkspaceId, user.ID)
+	eventCh, err := h.WorkspaceEventHub.Subscribe(ctx, &app.WorkspaceEventSubscriberParams{
+		WorkspaceID: request.WorkspaceId,
+		SessionID:   request.Params.SessionId,
+		UserID:      user.ID,
+	})
 	if err != nil {
 		return nil, errs.NewInternalErr("failed to subscribe to workspace events", err)
 	}

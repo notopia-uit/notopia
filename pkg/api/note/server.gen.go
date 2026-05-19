@@ -70,7 +70,7 @@ type ServerInterface interface {
 	ChangeWorkspaceSlug(c *gin.Context, workspaceId WorkspaceIdPath)
 	// SSE workspace updates
 	// (GET /note/workspaces/{workspaceId}/events)
-	GetWorkspaceEvents(c *gin.Context, workspaceId WorkspaceIdPath)
+	GetWorkspaceEvents(c *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceEventsParams)
 	// Get workspace graph
 	// (GET /note/workspaces/{workspaceId}/graph)
 	GetWorkspaceGraph(c *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceGraphParams)
@@ -629,6 +629,17 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 
 	c.Set(string(OIDCScopes), []string{"openid"})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetWorkspaceEventsParams
+
+	// ------------- Required query parameter "sessionId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "sessionId", c.Request.URL.Query(), &params.SessionId, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sessionId: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -636,7 +647,7 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetWorkspaceEvents(c, workspaceId)
+	siw.Handler.GetWorkspaceEvents(c, workspaceId, params)
 }
 
 // GetWorkspaceGraph operation middleware
@@ -2502,6 +2513,7 @@ func (response ChangeWorkspaceSlug500JSONResponse) VisitChangeWorkspaceSlugRespo
 
 type GetWorkspaceEventsRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+	Params      GetWorkspaceEventsParams
 }
 
 type GetWorkspaceEventsResponseObject interface {
@@ -4337,10 +4349,11 @@ func (sh *strictHandler) ChangeWorkspaceSlug(ctx *gin.Context, workspaceId Works
 }
 
 // GetWorkspaceEvents operation middleware
-func (sh *strictHandler) GetWorkspaceEvents(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+func (sh *strictHandler) GetWorkspaceEvents(ctx *gin.Context, workspaceId WorkspaceIdPath, params GetWorkspaceEventsParams) {
 	var request GetWorkspaceEventsRequestObject
 
 	request.WorkspaceId = workspaceId
+	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
 		return sh.ssi.GetWorkspaceEvents(ctx, request.(GetWorkspaceEventsRequestObject))

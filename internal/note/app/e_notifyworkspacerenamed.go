@@ -24,7 +24,11 @@ var ProvideNotifyWorkspaceRenamedHandler = NewNotifyWorkspaceRenamedHandler
 
 func (h *NotifyWorkspaceRenamedHandler) Handle(ctx context.Context, params *domain.WorkspaceRenamedEvent) error {
 	slog.DebugContext(ctx, "Handling notify workspace renamed event", slog.String("workspace_id", params.AggregateID.String()))
-	err := h.workspaceEventPublisher.Publish(ctx, params.AggregateID, params.UserID, &WorkspaceEventWorkspaceRenamed{
+	err := h.workspaceEventPublisher.Publish(ctx, &WorkspaceEventPublishParams{
+		WorkspaceID: params.AggregateID,
+		UserID:      params.UserID,
+		SessionID:   "",
+	}, &WorkspaceEventWorkspaceRenamed{
 		workspaceEvent[note.WorkspaceRenamedEventEvent]{
 			Id:    params.ID,
 			Event: note.WorkspaceRenamedEventEventWorkspaceRenamedEvent,
