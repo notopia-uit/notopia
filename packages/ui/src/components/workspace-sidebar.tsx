@@ -65,6 +65,7 @@ import {
   SidebarRail,
 } from './shadcn/sidebar';
 import TreeView from './tree-view';
+import { WorkspaceMembersModal } from './workspace-members-modal';
 
 const generateSlug = (name: string) => {
   return name
@@ -356,6 +357,9 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
+        </SidebarGroup>
+        <SidebarGroup className="shrink-0 group-data-[collapsible=icon]:hidden">
+          <WorkspaceMembersModal workspaceId={currentWorkspaceId} />
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
