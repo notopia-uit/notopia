@@ -4,7 +4,7 @@ import baseConfig from '../../oxlint-base.config.mts';
 
 export default defineConfig({
   extends: [baseConfig],
-  plugins: ['node'],
+  plugins: ['node', 'vitest'],
   ignorePatterns: ['dist/**', 'coverage/**', 'out-tsc/**'],
   env: {
     node: true,
