@@ -7,7 +7,7 @@
     "bundle:json": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "redocly bundle document --config ../redocly.yaml",
+        "command": "redocly bundle document --component-renaming-conflicts-severity off --config ../redocly.yaml",
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/../bundled/document.json"],
