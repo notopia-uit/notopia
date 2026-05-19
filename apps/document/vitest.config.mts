@@ -22,7 +22,7 @@ export default defineConfig(() => ({
       'default',
       'vitest-ctrf-json-reporter',
       'junit',
-      ...((process.env.GITHUB_ACTIONS === 'true' && 'github-actions') || []),
+      ...(process.env.GITHUB_ACTIONS === 'true' ? ['github-actions'] : []),
     ],
     outputFile: {
       junit: 'test-report.junit.xml',
