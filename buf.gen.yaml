@@ -3,17 +3,17 @@ version: v2
 inputs:
   - directory: ./proto/
 plugins:
-  - remote: buf.build/protocolbuffers/go:v1.36.11
+  - local: protoc-gen-go
     out: ./pkg/pb/
     include_imports: true
     opt:
       - paths=source_relative
-  - remote: buf.build/grpc/go:v1.6.1
+  - local: protoc-gen-go-grpc
     out: ./pkg/pb/
     opt:
       - paths=source_relative
       - require_unimplemented_servers=false
-  - remote: buf.build/community/stephenh-ts-proto:v2.11.6
+  - local: protoc-gen-ts_proto
     out: ./packages/pb/src
     opt:
       - outputServices=grpc-js
