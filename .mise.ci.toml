@@ -20,6 +20,8 @@ mockery = "3.7.0"
 d2 = "0.7.1"
 python = "3.13.12"
 uv = "0.11.15"
+gotestsum = "1.13.0"
+"go:github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter" = "0.1.0"
 
 [tools."http:plantuml"]
 version = "1.2026.2"
