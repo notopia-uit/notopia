@@ -53,6 +53,7 @@
     "react-dom": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
+    "zod": "catalog:",
     "tslib": "catalog:",
     "typeorm": "catalog:",
     "ws": "catalog:",

@@ -1,39 +1,47 @@
-export interface AppConfig {
-  env: 'test' | 'production' | 'development';
-  logLevel: 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
-  port: number;
-  apiUrl: string;
-}
+import { z } from 'zod';
 
-export interface DatabaseConfig {
-  host: string;
-  port: number;
-  username: string;
-  password: string;
-  database: string;
-}
+export const appConfigSchema = z.object({
+  env: z.enum(['test', 'production', 'development']),
+  logLevel: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']),
+  port: z.number(),
+  apiUrl: z.string(),
+});
+export type AppConfig = z.infer<typeof appConfigSchema>;
 
-export interface ServicesConfig {
-  noteUrl: string;
-  authorizationUrl: string;
-}
+export const databaseConfigSchema = z.object({
+  host: z.string(),
+  port: z.number(),
+  username: z.string(),
+  password: z.string(),
+  database: z.string(),
+});
+export type DatabaseConfig = z.infer<typeof databaseConfigSchema>;
 
-export interface S3Config {
-  endpoint: string;
-  region: string;
-  accessKeyId: string;
-  secretAccessKey: string;
-  bucketName: string;
-}
+export const servicesConfigSchema = z.object({
+  noteUrl: z.string(),
+  authorizationUrl: z.string(),
+});
+export type ServicesConfig = z.infer<typeof servicesConfigSchema>;
 
-export interface KafkaConfig {
-  clientId: string;
-  brokers: string[];
-  groupId: string;
-}
+export const s3ConfigSchema = z.object({
+  endpoint: z.string(),
+  region: z.string(),
+  accessKeyId: z.string(),
+  secretAccessKey: z.string(),
+  bucketName: z.string(),
+});
+export type S3Config = z.infer<typeof s3ConfigSchema>;
 
-export interface AuthenticationConfig {
-  jwksUrls: string[];
-  issuers?: string[];
-  audiences?: string[];
-}
+export const kafkaConfigSchema = z.object({
+  clientId: z.string(),
+  brokers: z.array(z.string()),
+  groupId: z.string(),
+});
+export type KafkaConfig = z.infer<typeof kafkaConfigSchema>;
+
+export const authenticationConfigSchema = z.object({
+  jwksUrls: z.array(z.string().url()).nonempty(),
+  issuers: z.array(z.string()).optional(),
+  audiences: z.array(z.string()).optional(),
+});
+export type AuthenticationConfig = z.infer<typeof authenticationConfigSchema>;

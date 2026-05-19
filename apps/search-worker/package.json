@@ -32,6 +32,7 @@
     "pino-pretty": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
+    "zod": "catalog:",
     "tslib": "catalog:",
     "uuid": "catalog:"
   },
