@@ -33,12 +33,15 @@ import { useMemo } from 'react';
 import { getDeterministicColor } from './../lib/utils/color';
 import { ErrorAlert } from './error-alert';
 import { Icons } from './icons';
+import { NoteGraphModal } from './note-graph-modal';
 import { RevisionModal } from './revision-modal';
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
 import { Button } from './shadcn/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
 import { SuccessAlert } from './success-alert';
+import { Network } from 'lucide-react';
+import { useState } from 'react';
 
 function EditorStatus() {
   const connection = useHocuspocusConnectionStatus();
@@ -117,6 +120,7 @@ function EditorStatus() {
 //TODO: add dialog
 export default function Editor({ noteId }: { noteId: string }) {
   const { data: sessionData } = authClient.useSession();
+  const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
 
@@ -166,6 +170,19 @@ export default function Editor({ noteId }: { noteId: string }) {
       <EditorStatus />
       <div className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-14 z-40 flex gap-2 border-b px-4 py-2 backdrop-blur-sm">
         <RevisionModal noteId={noteId} currentEditor={editor as any} />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsGraphModalOpen(true)}
+              aria-label="Open note graph"
+            >
+              <Network className="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>View note graph</TooltipContent>
+        </Tooltip>
       </div>
       <BlockNoteView editor={editor}>
         <SuggestionMenuController
@@ -207,6 +224,7 @@ export default function Editor({ noteId }: { noteId: string }) {
           )}
         </div>
       )}
+      <NoteGraphModal isOpen={isGraphModalOpen} onOpenChange={setIsGraphModalOpen} noteId={noteId} />
     </div>
   );
 }
