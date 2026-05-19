@@ -85,42 +85,41 @@ const defaultOptions: GraphOptions = {
 };
 
 export default function Graph({ data, currentSlug = '', options, className = '' }: GraphProps) {
-  const localGraphRef = useRef<HTMLDivElement>(null);
-  const globalGraphRef = useRef<HTMLDivElement>(null);
-  const cleanupRef = useRef<(() => void) | null>(null);
+   const localGraphRef = useRef<HTMLDivElement>(null);
+   const globalGraphRef = useRef<HTMLDivElement>(null);
+   const cleanupRef = useRef<(() => void) | null>(null);
 
-  const localGraph = { ...defaultOptions.localGraph, ...options?.localGraph };
-  const globalGraph = { ...defaultOptions.globalGraph, ...options?.globalGraph };
+   const localGraph = { ...defaultOptions.localGraph, ...options?.localGraph };
+   const globalGraph = { ...defaultOptions.globalGraph, ...options?.globalGraph };
 
-  useEffect(() => {
-    if (localGraphRef.current) {
-      renderGraph(localGraphRef.current, currentSlug, data, localGraph).then((cleanup) => {
-        cleanupRef.current = cleanup;
-      });
-    }
+   useEffect(() => {
+     if (localGraphRef.current) {
+       renderGraph(localGraphRef.current, currentSlug, data, localGraph).then((cleanup) => {
+         cleanupRef.current = cleanup;
+       });
+     }
 
-    return () => {
-      if (cleanupRef.current) {
-        cleanupRef.current();
-      }
-    };
-  }, [data, currentSlug, localGraph]);
+     return () => {
+       if (cleanupRef.current) {
+         cleanupRef.current();
+       }
+     };
+   }, [data, currentSlug, localGraph]);
 
-  const handleGlobalGraphToggle = () => {
-    const globalOuter = document.querySelector('.global-graph-outer');
-    if (globalOuter) {
-      globalOuter.classList.toggle('active');
+   const handleGlobalGraphToggle = () => {
+     const globalOuter = document.querySelector('.global-graph-outer');
+     if (globalOuter) {
+       globalOuter.classList.toggle('active');
 
-      if (globalOuter.classList.contains('active') && globalGraphRef.current) {
-        renderGraph(globalGraphRef.current, currentSlug, data, globalGraph);
-      }
-    }
-  };
+       if (globalOuter.classList.contains('active') && globalGraphRef.current) {
+         renderGraph(globalGraphRef.current, currentSlug, data, globalGraph);
+       }
+     }
+   };
 
-  return (
-    <div className={`${styles.graph} ${className}`}>
-      <h3>Graph View</h3>
-      <div className={styles.graphOuter}>
+   return (
+     <div className={`${styles.graph} ${className} h-full w-full`}>
+       <div className={styles.graphOuter}>
         <div
           ref={localGraphRef}
           className={styles.graphContainer}

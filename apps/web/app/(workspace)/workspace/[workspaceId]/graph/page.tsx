@@ -19,8 +19,10 @@ export default async function GraphPage({ params }: { params: Promise<{ workspac
   });
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <GraphView workspaceId={workspaceId} />
-    </HydrationBoundary>
+    <div className="h-full w-full">
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <GraphView workspaceId={workspaceId} />
+      </HydrationBoundary>
+    </div>
   );
 }
