@@ -98,6 +98,8 @@ on:
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
   NX_PARALLEL: 3
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 concurrency:
   group: ${{ github.ref == 'refs/heads/main' && format('{0}-{1}', github.workflow, github.ref) || github.run_id }}
@@ -253,13 +255,14 @@ jobs:
         run: |
           nx-cache-action -- \
           pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
-            --target lint \
             --target format:check \
             --target gen \
+            --target typecheck \
+            --target lint \
             --target bundle \
             --target build \
             --target test \
-            --target typecheck \
+            --target upload-codecov \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
@@ -267,8 +270,6 @@ jobs:
       - name: Publish Test Report
         uses: ctrf-io/github-test-reporter@v1
         if: always()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           report-path: "**/tests-ctrf.json"
           summary-delta-report: true
@@ -278,11 +279,6 @@ jobs:
           slowest-report: true
           upload-artifact: true
           pull-request-report: true
-
-      - name: Upload coverage to Codecov
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: scripts/upload-codecov.js
 
       - name: Check for changes after Build/Gen
         run: |
@@ -295,7 +291,6 @@ jobs:
 
       - name: Nx Deploy Page
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NX_CACHE_ACTION_SKIP_UPLOAD_CACHE: ${{ steps.setup-vars.outputs.NX_CACHE_ACTION_SKIP_UPLOAD_CACHE }}
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
@@ -317,7 +312,6 @@ jobs:
       - name: Nx Release
         if: ${{ steps.setup-vars.outputs.SHOULD_RELEASE == 'true' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILDX_BUILDER: ${{ steps.setup-buildx.outputs.name }}
           DOCKER_BUILDKIT: 1
           NX_CACHE_ACTION_SKIP_UPLOAD_CACHE: ${{ steps.setup-vars.outputs.NX_CACHE_ACTION_SKIP_UPLOAD_CACHE }}

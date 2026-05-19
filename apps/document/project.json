@@ -76,6 +76,13 @@
         "^build"
       ]
     },
+    "upload-codecov": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "codecov --disable-telem upload-process --disable-search --file ./test-report.junit.xml --flag document"
+      },
+      "dependsOn": ["test"]
+    },
     "nx-release-publish": {
       "parallelism": false
     }

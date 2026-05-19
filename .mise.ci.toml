@@ -8,7 +8,8 @@ MISE_EXPERIMENTAL = 1
 '_'.path.paths = ["./bin/", "./scripts/"]
 
 [tools]
-pipx:codecov-cli= "11.2.8""github:pressly/goose" = "3.27.1"
+pipx:codecov-cli= "11.2.8"
+"github:pressly/goose" = "3.27.1"
 "go:github.com/goforj/wire/cmd/wire" = "1.2.0"
 "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.7.0"
 buf = "1.65.0"
@@ -17,6 +18,8 @@ java = "26.0.1"
 "npm:@kevinnitro/nx-cache-action" = "0.1.0"
 mockery = "3.7.0"
 d2 = "0.7.1"
+python = "3.13.12"
+uv = "0.11.15"
 
 [tools."http:plantuml"]
 version = "1.2026.2"

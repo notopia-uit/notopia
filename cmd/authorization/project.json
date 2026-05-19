@@ -114,6 +114,13 @@
           "command": "./test.sh --production"
         }
       }
+    },
+    "upload-codecov": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "codecov --disable-telem upload-process --disable-search --file ./coverage.out --flag authorization"
+      },
+      "dependsOn": ["test"]
     }
   },
   "implicitDependencies": ["pkg", "internal/authorization"],
