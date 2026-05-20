@@ -8,6 +8,8 @@ import {
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -207,6 +209,7 @@ const data = {
 
 export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorkspaceId: string }) {
   const { data: sessionData } = authClient.useSession();
+  const { retry } = useQueryErrorHandler();
 
   const [activeWorkspacenow, setActiveWorkspace] = useState<NoteUserWorkspace>();
 
@@ -235,7 +238,17 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
     return <Spinner />;
   }
   if (isError) {
-    throw error;
+    return (
+      <div className="p-4">
+        <QueryErrorFallback
+          error={error}
+          onRetry={retry}
+          title="Failed to Load Workspaces"
+          description="Unable to load your workspaces. Please try again."
+          compact
+        />
+      </div>
+    );
   }
   if (!allWorkspaceData || !currentWorkspace) {
     return;

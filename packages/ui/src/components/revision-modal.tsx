@@ -10,6 +10,8 @@ import {
 } from '@notopia-uit/api-gen';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useQuery } from '@tanstack/react-query';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { formatDistanceToNow } from 'date-fns';
 import { History, RotateCcw, Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
@@ -46,6 +48,7 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
   const [selectedRevisionId, setSelectedRevisionId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { alert, showAlert } = useAlert();
+  const { retry } = useQueryErrorHandler();
 
   const {
     data: revisions,
@@ -129,11 +132,55 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
   };
 
   if (isRevisionsError) {
-    throw revisionsError;
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-2" title="View version history">
+            <History className="size-4" />
+            History
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="flex h-[90vh] max-w-6xl flex-col p-0">
+          <DialogHeader className="border-b px-6 py-4">
+            <DialogTitle>Version History</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto p-6">
+            <QueryErrorFallback
+              error={revisionsError}
+              onRetry={retry}
+              title="Failed to Load Revisions"
+              description="Unable to load version history. Please try again."
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   if (isRevisionError) {
-    throw revisionError;
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-2" title="View version history">
+            <History className="size-4" />
+            History
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="flex h-[90vh] max-w-6xl flex-col p-0">
+          <DialogHeader className="border-b px-6 py-4">
+            <DialogTitle>Version History</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto p-6">
+            <QueryErrorFallback
+              error={revisionError}
+              onRetry={retry}
+              title="Failed to Load Revision"
+              description="Unable to load the selected revision. Please try again."
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   return (

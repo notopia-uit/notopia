@@ -27,6 +27,8 @@ import {
   SelectValue,
 } from '@notopia-uit/ui/components/shadcn/select';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
@@ -65,6 +67,8 @@ const generateSlug = (name: string) => {
 const WorkspaceSwitcher = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { retry } = useQueryErrorHandler();
+
   const _data = useQuery({
     ...getMyWorkspacesOptions(),
     select: mapUserWorkspaceDtoToDomain,
@@ -94,7 +98,17 @@ const WorkspaceSwitcher = () => {
   };
 
   if (isGetMyWorkspacesError) {
-    throw getMyWorkspacesError;
+    return (
+      <div className="p-4">
+        <QueryErrorFallback
+          error={getMyWorkspacesError}
+          onRetry={retry}
+          title="Failed to Load Workspaces"
+          description="Unable to load your workspaces. Please try again."
+          compact
+        />
+      </div>
+    );
   }
   useEffect(() => {
     if (allWorkspaceData) {

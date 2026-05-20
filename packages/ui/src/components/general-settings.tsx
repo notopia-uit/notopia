@@ -1,6 +1,8 @@
 'use client';
 import { getMyWorkspacesOptions, useRenameWorkspaceMutation } from '@notopia-uit/api-gen';
 import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Label } from '@notopia-uit/ui/components/shadcn/label';
@@ -29,7 +31,6 @@ interface GeneralSettingsProps {
   workspaceId: string;
 }
 
-//TODO: handle loading and error states
 export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
   const {
     data: allWorkspaceData,
@@ -39,6 +40,7 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
   } = useQuery({
     ...getMyWorkspacesOptions({}),
   });
+  const { retry } = useQueryErrorHandler();
   const [workspaceName, setWorkspaceName] = useState('');
   useEffect(() => {
     if (allWorkspaceData) {
@@ -49,9 +51,6 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
     }
   }, [allWorkspaceData, workspaceId]);
 
-  if (isError) {
-    throw error;
-  }
   const { alert, showAlert } = useAlert();
 
   const { mutate: renameWorkspace, isPending: isRenaming } = useRenameWorkspaceMutation({
@@ -70,9 +69,24 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
       );
     },
   });
-  return isPending ? (
-    <Spinner />
-  ) : (
+  if (isPending) {
+    return <Spinner />;
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-4">
+        <QueryErrorFallback
+          error={error}
+          onRetry={retry}
+          title="Failed to Load Workspace Settings"
+          description="Unable to fetch workspace information. Please try again."
+        />
+      </div>
+    );
+  }
+
+  return (
     <div className="space-y-8">
       <div className="space-y-4">
         {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}

@@ -16,6 +16,8 @@ import {
   DropdownMenuTrigger,
 } from '@notopia-uit/ui/components/shadcn/dropdown-menu';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import {
   Table,
   TableBody,
@@ -89,13 +91,24 @@ const formatDate = (isoString: string) => {
 const EMPTY_TRASH_DATA: TrashedData = { notes: [], folders: [] };
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient();
+  const { retry } = useQueryErrorHandler();
+
   const { data, isError, error, isPending } = useQuery({
     ...showTrashOptions({ path: { workspaceId: workspaceId } }),
     select: mapDtoTrashedData,
   });
 
   if (isError) {
-    throw error;
+    return (
+      <div className="p-4">
+        <QueryErrorFallback
+          error={error}
+          onRetry={retry}
+          title="Failed to Load Trash"
+          description="Unable to load deleted items. Please try again."
+        />
+      </div>
+    );
   }
 
   const trashedData = data || EMPTY_TRASH_DATA;

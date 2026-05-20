@@ -2,6 +2,8 @@
 
 import { getWorkspaceGraphOptions, NoteGraph } from '@notopia-uit/api-gen';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { GraphData, GraphNode, GraphLink } from '@notopia-uit/ui/graph-view/graph';
 import Graph from '@notopia-uit/ui/graph-view/graph';
 import { useQuery } from '@tanstack/react-query';
@@ -25,6 +27,8 @@ export function mapDtoNoteData(dto: NoteGraph): GraphData {
   };
 }
 export default function GraphView({ workspaceId }: { workspaceId: string }) {
+  const { retry } = useQueryErrorHandler();
+
   const {
     data: graphData = { nodes: [], links: [] },
     isError,
@@ -37,12 +41,24 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
     select: (dto: NoteGraph) => mapDtoNoteData(dto),
   });
 
-  if (isError) {
-    throw error;
+  if (isPending) {
+    return <Spinner />;
   }
-  return isPending ? (
-    <Spinner />
-  ) : (
+
+  if (isError) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <QueryErrorFallback
+          error={error}
+          onRetry={retry}
+          title="Failed to Load Graph"
+          description="Unable to load the workspace graph. Please try again."
+        />
+      </div>
+    );
+  }
+
+  return (
     <Graph
       data={graphData}
       options={{

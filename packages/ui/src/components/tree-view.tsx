@@ -13,6 +13,8 @@ import {
 } from '@notopia-uit/api-gen';
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
 import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import {
   ContextMenu,
@@ -38,8 +40,6 @@ import {
   type TreeRef,
   type TreeViewState,
 } from 'react-complex-tree';
-
-//TODO: fetch data from api and handle loading states, errors, etc.
 type TreeData = Record<TreeItemIndex, TreeItem<string>>;
 
 const mapDtoTreeData = (rootFolder: NoteWorkspaceTreeFolder) => {
@@ -201,6 +201,8 @@ const viewStateInitial: TreeViewState = {
 
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
   const queryClient = useQueryClient();
+  const { retry } = useQueryErrorHandler();
+
   const {
     data,
     isError: isGetWorkSpaceTreeError,
@@ -577,7 +579,16 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   );
 
   if (isGetWorkSpaceTreeError) {
-    throw getWorkspaceTreeError;
+    return (
+      <div className="flex h-full items-center justify-center p-4">
+        <QueryErrorFallback
+          error={getWorkspaceTreeError}
+          onRetry={retry}
+          title="Failed to Load Workspace Tree"
+          description="Unable to load your workspace folder and file structure. Please try again."
+        />
+      </div>
+    );
   }
 
   //TODO: maybe use skeleton?

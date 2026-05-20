@@ -2,6 +2,8 @@
 
 import { getNoteGraphOptions, NoteGraph } from '@notopia-uit/api-gen';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { GraphData, GraphNode, GraphLink } from '@notopia-uit/ui/graph-view/graph';
 import Graph from '@notopia-uit/ui/graph-view/graph';
 import { useQuery } from '@tanstack/react-query';
@@ -34,6 +36,8 @@ interface NoteGraphModalProps {
 }
 
 export function NoteGraphModal({ isOpen, onOpenChange, noteId }: NoteGraphModalProps) {
+  const { retry } = useQueryErrorHandler();
+
   const {
     data: graphData = { nodes: [], links: [] },
     isError,
@@ -47,23 +51,6 @@ export function NoteGraphModal({ isOpen, onOpenChange, noteId }: NoteGraphModalP
     enabled: isOpen,
   });
 
-  if (isError) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="h-[600px] max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Note Graph</DialogTitle>
-          </DialogHeader>
-          <div className="flex h-full items-center justify-center">
-            <p className="text-red-500">
-              Error loading graph: {error instanceof Error ? error.message : 'Unknown error'}
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="flex h-[600px] max-w-4xl flex-col">
@@ -74,6 +61,15 @@ export function NoteGraphModal({ isOpen, onOpenChange, noteId }: NoteGraphModalP
           {isPending ? (
             <div className="flex h-full items-center justify-center">
               <Spinner />
+            </div>
+          ) : isError ? (
+            <div className="flex h-full flex-col items-center justify-center p-4">
+              <QueryErrorFallback
+                error={error}
+                onRetry={retry}
+                title="Failed to Load Graph"
+                description="Unable to load the note graph. Please try again."
+              />
             </div>
           ) : (
             <Graph
