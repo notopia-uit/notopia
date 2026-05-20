@@ -34,6 +34,6 @@ gotestsum \
 if [ "$production" = true ]; then
   go-ctrf-json-reporter \
     -appName 'authorization' \
-    -output './coverage/authorization/tests-ctrf.json' \
+    -output './coverage/authorization/ctrf.json' \
     <./coverage/authorization/gotestsum.json
 fi

@@ -14,7 +14,7 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "codecov --disable-telem upload-process --disable-search --file ./coverage/vitest-junit.xml --flag vitest"
+          "codecov --disable-telem upload-process --disable-search --file ./coverage/vitest/junit.xml --flag vitest"
         ],
         "parallel": true
       },

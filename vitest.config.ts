@@ -4,22 +4,24 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    watch: false,
     projects: ['packages/*', 'apps/*'],
     reporters: [
       'default',
       'junit',
       ...(process.env.GITHUB_ACTIONS === 'true' ? ['github-actions'] : []),
       new CtrfReporter({
-        outputFile: 'vitest-ctrf.json',
-        outputDir: './coverage',
+        outputFile: 'ctrf.json',
+        outputDir: './coverage/vitest',
         appName: 'vitest',
       }),
     ],
     outputFile: {
-      junit: './coverage/vitest-junit.xml',
+      junit: './coverage/vitest/junit.xml',
     },
     coverage: {
       enabled: true,
+      reportsDirectory: './coverage/vitest',
     },
     passWithNoTests: true,
   },

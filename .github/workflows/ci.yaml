@@ -261,18 +261,20 @@ jobs:
             --target lint \
             --target bundle \
             --target build \
-            --batch \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
 
+      # We need to exclude those vitest project that we will run by workspace
+      - name: Nx test
+        env:
+          NX_CACHE_ACTION_SKIP_UPLOAD_CACHE: ${{ steps.setup-vars.outputs.NX_CACHE_ACTION_SKIP_UPLOAD_CACHE }}
+        run: |
           nx-cache-action -- \
           pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
             --target test \
             --target upload-codecov \
-            # We need to exclude those vitest project that we will run by workspace
             --exclude document \
-            --batch \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
@@ -281,7 +283,7 @@ jobs:
         uses: ctrf-io/github-test-reporter@v1
         if: always()
         with:
-          report-path: "**/tests-ctrf.json"
+          report-path: "./coverage/**/ctrf.json"
           github-report: true
           summary-delta-report: true
           insights-report: true
