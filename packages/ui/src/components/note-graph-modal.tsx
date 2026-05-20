@@ -5,14 +5,8 @@ import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { GraphData, GraphNode, GraphLink } from '@notopia-uit/ui/graph-view/graph';
 import Graph from '@notopia-uit/ui/graph-view/graph';
 import { useQuery } from '@tanstack/react-query';
-import { X } from 'lucide-react';
-import { Button } from './shadcn/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from './shadcn/dialog';
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './shadcn/dialog';
 
 export function mapDtoNoteData(dto: NoteGraph): GraphData {
   return {
@@ -56,11 +50,11 @@ export function NoteGraphModal({ isOpen, onOpenChange, noteId }: NoteGraphModalP
   if (isError) {
     return (
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl h-[600px]">
+        <DialogContent className="h-[600px] max-w-4xl">
           <DialogHeader>
             <DialogTitle>Note Graph</DialogTitle>
           </DialogHeader>
-          <div className="flex items-center justify-center h-full">
+          <div className="flex h-full items-center justify-center">
             <p className="text-red-500">
               Error loading graph: {error instanceof Error ? error.message : 'Unknown error'}
             </p>
@@ -72,13 +66,13 @@ export function NoteGraphModal({ isOpen, onOpenChange, noteId }: NoteGraphModalP
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[600px] flex flex-col">
+      <DialogContent className="flex h-[600px] max-w-4xl flex-col">
         <DialogHeader>
           <DialogTitle>Note Graph</DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-hidden">
           {isPending ? (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex h-full items-center justify-center">
               <Spinner />
             </div>
           ) : (
@@ -102,7 +96,7 @@ export function NoteGraphModal({ isOpen, onOpenChange, noteId }: NoteGraphModalP
                   enableRadial: true,
                 },
               }}
-              className="size-full "
+              className="size-full"
             />
           )}
         </div>
