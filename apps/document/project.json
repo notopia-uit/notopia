@@ -38,7 +38,14 @@
           "args": ["--node-env=production"]
         },
         "doctor": {}
-      }
+      },
+      "dependsOn": [
+        "^build",
+        {
+          "target": "build",
+          "projects": ["proto"]
+        }
+      ]
     },
     "run": {
       "continuous": true,
@@ -77,7 +84,6 @@
       "parallelism": false
     }
   },
-  "implicitDependencies": ["proto"],
   "release": {
     "docker": {
       "repositoryName": "notopia-uit/document"
