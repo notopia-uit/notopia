@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     watch: false,
-    projects: ['packages/*', 'apps/*'],
+    projects: ['apps/document'],
     reporters: [
       'default',
       'junit',

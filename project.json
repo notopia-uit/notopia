@@ -6,17 +6,13 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["vitest"],
-        "parallel": true
+        "command": "vitest"
       }
     },
     "upload-codecov": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "codecov --disable-telem upload-process --disable-search --file ./coverage/vitest/junit.xml --flag vitest"
-        ],
-        "parallel": true
+        "command": "codecov --disable-telem upload-process --disable-search --file ./coverage/vitest/junit.xml --flag vitest"
       },
       "dependsOn": ["test"]
     }
