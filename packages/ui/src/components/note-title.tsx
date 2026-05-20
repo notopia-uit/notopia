@@ -1,50 +1,50 @@
 'use client';
 
-import { useRenameNoteMutation } from '@notopia-uit/api-gen';
+import { useRenameNoteMutation, useGetNoteQuery, getNoteOptions } from '@notopia-uit/api-gen';
 import { useQueryClient } from '@tanstack/react-query';
-import { Input } from './shadcn/input';
 import { useState, useEffect, useCallback } from 'react';
+
+import { Input } from './shadcn/input';
 
 interface NoteTitleProps {
   noteId: string;
-  initialTitle?: string;
   workspaceId?: string;
   isEditing?: boolean;
 }
 
-export function NoteTitle({
-  noteId,
-  initialTitle = 'Untitled',
-  workspaceId,
-  isEditing = true,
-}: NoteTitleProps) {
-  const [title, setTitle] = useState(initialTitle);
+export function NoteTitle({ noteId, workspaceId, isEditing = true }: NoteTitleProps) {
+  const [title, setTitle] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const queryClient = useQueryClient();
+
+  const { data: noteData } = useGetNoteQuery({
+    path: { noteId },
+  });
 
   const { mutate: renameNote, isPending: isRenamingNote } = useRenameNoteMutation({
     onSuccess: () => {
       if (workspaceId) {
-        queryClient.invalidateQueries({ queryKey: ['workspace', workspaceId, 'tree'] });
+        queryClient.invalidateQueries({
+          queryKey: getNoteOptions({ path: { noteId } }).queryKey,
+        });
       }
     },
   });
 
   useEffect(() => {
-    setTitle(initialTitle);
-  }, [initialTitle, noteId]);
+    if (noteData?.name) {
+      setTitle(noteData.name);
+    }
+  }, [noteData?.name, noteId]);
 
-  const handleTitleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newTitle = e.target.value;
-      setTitle(newTitle);
-    },
-    []
-  );
+  const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+  }, []);
 
   const handleTitleBlur = useCallback(() => {
     setIsFocused(false);
-    if (title && title !== initialTitle) {
+    if (title && title !== noteData?.name) {
       renameNote({
         path: {
           noteId: noteId,
@@ -54,14 +54,10 @@ export function NoteTitle({
         },
       });
     }
-  }, [title, initialTitle, noteId, renameNote]);
+  }, [title, noteData?.name, noteId, renameNote]);
 
   if (!isEditing) {
-    return (
-      <div className="px-4 py-3 text-2xl font-bold text-foreground">
-        {title}
-      </div>
-    );
+    return <div className="text-foreground px-4 py-3 text-2xl font-bold">{title}</div>;
   }
 
   return (
@@ -73,7 +69,7 @@ export function NoteTitle({
         onBlur={handleTitleBlur}
         placeholder="Untitled"
         disabled={isRenamingNote}
-        className={`border-0 bg-transparent text-2xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 placeholder-muted-foreground ${
+        className={`placeholder-muted-foreground border-0 bg-transparent text-2xl font-bold focus-visible:ring-0 focus-visible:ring-offset-0 ${
           isFocused ? 'text-foreground' : 'text-foreground'
         }`}
       />

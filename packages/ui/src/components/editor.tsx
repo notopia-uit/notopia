@@ -24,7 +24,6 @@ import { Icons } from './icons';
 export default function Editor({ noteId, workspaceId }: { noteId: string; workspaceId?: string }) {
   const { data: sessionData } = authClient.useSession();
   const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
-  const [noteTitle, setNoteTitle] = useState('Untitled');
   
   const { isModified, isCommitingDocument, alert, handleSave } = useEditorState(noteId);
 
@@ -39,7 +38,6 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
       <EditorStatus />
       <NoteTitle 
         noteId={noteId}
-        initialTitle={noteTitle}
         workspaceId={workspaceId}
       />
       <EditorToolbar 
