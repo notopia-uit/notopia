@@ -42,9 +42,6 @@
     },
     {
       "path": "./packages/lib-server"
-    },
-    {
-      "path": "./scripts/tsconfig.json"
     }
   ]
 }

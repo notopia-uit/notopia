@@ -24,3 +24,11 @@ flag_management:
     - name: package-ui
       paths:
         - packages/ui/
+
+ignore:
+  - "**/*.bak"
+  - "**/*.sql.go"
+  - "**/*wire.go"
+  - "**/mock.go"
+  - "**/_test.go"
+  - "**/.spec.ts"

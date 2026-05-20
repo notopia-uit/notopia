@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/nx/schemas/project-schema.json",
+  "name": "notopia",
+  "projectType": "application",
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["vitest"],
+        "parallel": true
+      }
+    },
+    "upload-codecov": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "codecov --disable-telem upload-process --disable-search --file ./coverage/vitest-junit.xml --flag vitest"
+        ],
+        "parallel": true
+      },
+      "dependsOn": ["test"]
+    }
+  }
+}

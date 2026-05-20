@@ -66,23 +66,12 @@
         "watch": true
       }
     },
-    "test": {
-      "outputs": ["{projectRoot}/coverage/**", "{projectRoot}/test-report.junit.xml"]
-    },
     "docker:build": {
       "dependsOn": [
         // "prune", // It got nx error, so just... generatePackageJson in build production
         "build",
         "^build"
       ]
-    },
-    "upload-codecov": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "codecov --disable-telem upload-process --disable-search --file ./test-report.junit.xml --flag document",
-        "cwd": "{projectRoot}"
-      },
-      "dependsOn": ["test"]
     },
     "nx-release-publish": {
       "parallelism": false

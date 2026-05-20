@@ -6,6 +6,7 @@ CI=true pnpm nx affected \
   --target typecheck \
   --target lint \
   --target format:check \
+  --batch \
   --tui false
 
 for file in $(git diff --cached --name-only --diff-filter=A); do
@@ -19,9 +20,9 @@ for file in $(git diff --cached --name-only --diff-filter=A); do
   fi
   mime=$(file --mime "$file" | awk '{print $2}' | tr -d ';')
   case "$mime" in
-    font/*|application/x-font-*)
-      continue
-      ;;
+  font/* | application/x-font-*)
+    continue
+    ;;
   esac
   if echo "$mime" | grep -q "binary"; then
     echo "Error: Binary file '$file' detected. Use Git LFS."

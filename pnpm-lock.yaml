@@ -27,6 +27,9 @@ catalogs:
     '@bufbuild/protobuf':
       specifier: 2.11.0
       version: 2.11.0
+    '@d2t/vitest-ctrf-json-reporter':
+      specifier: ~1.3.0
+      version: 1.3.0
     '@floating-ui/dom':
       specifier: ^1.7.6
       version: 1.7.6
@@ -327,9 +330,6 @@ catalogs:
     vitest:
       specifier: ^4.1.6
       version: 4.1.6
-    vitest-ctrf-json-reporter:
-      specifier: ~0.0.3
-      version: 0.0.3
     webpack-node-externals:
       specifier: ^3.0.0
       version: 3.0.0
@@ -375,6 +375,9 @@ importers:
         specifier: 'catalog:'
         version: 14.0.0
     devDependencies:
+      '@d2t/vitest-ctrf-json-reporter':
+        specifier: 'catalog:'
+        version: 1.3.0
       '@nestjs/schematics':
         specifier: 'catalog:'
         version: 11.0.10(typescript@6.0.3)
@@ -727,9 +730,6 @@ importers:
       unplugin-swc:
         specifier: 'catalog:'
         version: 1.5.9(@swc/core@1.15.33(@swc/helpers@0.5.21))(rollup@4.59.0)
-      vitest-ctrf-json-reporter:
-        specifier: 'catalog:'
-        version: 0.0.3
       webpack-node-externals:
         specifier: 'catalog:'
         version: 3.0.0
@@ -2332,6 +2332,9 @@ packages:
   '@cypress/request@3.0.10':
     resolution: {integrity: sha512-hauBrOdvu08vOsagkZ/Aju5XuiZx6ldsLfByg1htFeldhex+PeMrYauANzFsMJeAA0+dyPLbDoX2OYuvVoLDkQ==}
     engines: {node: '>= 6'}
+
+  '@d2t/vitest-ctrf-json-reporter@1.3.0':
+    resolution: {integrity: sha512-3Xgkay0Hubq1hA67IW2vM3YhX4TQgjOFW2TydB0ytAL97zOZI9xr/9vqCjo31bK1qUDNEdlKYLYHd8KR9YSCCw==}
 
   '@date-fns/tz@1.4.1':
     resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
@@ -16736,9 +16739,6 @@ packages:
       postcss:
         optional: true
 
-  vitest-ctrf-json-reporter@0.0.3:
-    resolution: {integrity: sha512-gYg3DgdiTsSY2i3N7YXwNR8wWIkycGsP8inaGQP9bw2yh6Z8YsrUsVgRQ9FxhDHtte63ZBV9ckUIAQCTjLh/sA==}
-
   vitest@4.1.6:
     resolution: {integrity: sha512-6lvjbS3p9b4CrdCmguzbh2/4uoXhGE2q71R4OX5sqF9R1bo9Xd6fGrMAfvp5wnCzlBnFVdCOp6onuTQVbo8iUQ==}
     engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
@@ -19071,6 +19071,8 @@ snapshots:
       tunnel-agent: 0.6.0
       uuid: 8.3.2
     optional: true
+
+  '@d2t/vitest-ctrf-json-reporter@1.3.0': {}
 
   '@date-fns/tz@1.4.1': {}
 
@@ -36767,8 +36769,6 @@ snapshots:
       - typescript
       - universal-cookie
       - yaml
-
-  vitest-ctrf-json-reporter@0.0.3: {}
 
   vitest@4.1.6(@opentelemetry/api@1.9.1)(@types/node@25.6.2)(@vitest/coverage-v8@4.1.6)(@vitest/ui@4.1.6)(jsdom@28.1.0(@noble/hashes@2.2.0))(msw@2.12.10(@types/node@25.6.2)(typescript@6.0.3))(vite@8.0.13(@types/node@25.6.2)(esbuild@0.27.7)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.47.1)(tsx@4.21.1)(yaml@2.9.0)):
     dependencies:

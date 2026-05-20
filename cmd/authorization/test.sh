@@ -24,9 +24,9 @@ cd "${WORKSPACE_ROOT}"
 
 gotestsum \
   --jsonfile \
-  ./cmd/authorization/gotestsum.json \
+  ./coverage/authorization/gotestsum.json \
   -- \
-  -coverprofile=./cmd/authorization/coverage.out \
+  -coverprofile=./coverage/authorization/coverage.out \
   -covermode=atomic \
   ./cmd/authorization/... \
   ./internal/authorization/...
@@ -34,6 +34,6 @@ gotestsum \
 if [ "$production" = true ]; then
   go-ctrf-json-reporter \
     -appName 'authorization' \
-    -output './cmd/authorization/tests-ctrf.json' \
-    <./cmd/authorization/gotestsum.json
+    -output './coverage/authorization/tests-ctrf.json' \
+    <./coverage/authorization/gotestsum.json
 fi
