@@ -15,4 +15,4 @@ breaking:
   use:
     - FILE
 deps:
-  - buf.build/bufbuild/protovalidate:v1.1.0
+  - buf.build/bufbuild/protovalidate:v1.2.0

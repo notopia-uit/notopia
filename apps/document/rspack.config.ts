@@ -183,13 +183,9 @@ const config: Configuration = {
       generatePackageJson: true,
     }),
     new rspack.CopyRspackPlugin({
-      patterns: [{ from: join(__dirname, '../../proto'), to: 'proto' }],
+      patterns: [{ from: join(__dirname, '../../proto/build.bin'), to: 'proto/build.bin' }],
     }),
     new rspack.NormalModuleReplacementPlugin(/file-type$/, require.resolve('./stub.js')),
-    new rspack.NormalModuleReplacementPlugin(
-      /@protobufjs\/inquire/,
-      require.resolve('./inquire-shim.js')
-    ),
     new rspack.SourceMapDevToolPlugin({}),
     new rspack.IgnorePlugin({
       checkResource(resource) {
