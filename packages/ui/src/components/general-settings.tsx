@@ -80,16 +80,15 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
         {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
 
         <div className="space-y-2">
-          <Label htmlFor="workspace-name" className="text-zinc-200">
+          <Label htmlFor="workspace-name">
             Workspace Name
           </Label>
           <Input
             id="workspace-name"
             defaultValue={workspaceName}
             onChange={(e) => setWorkspaceName(e.target.value)}
-            className="border-zinc-800 bg-zinc-900/50 text-zinc-100 focus-visible:ring-zinc-700"
           />
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-muted-foreground">
             This is the name that will be displayed on your workspace dashboard and invitations.
           </p>
         </div>
@@ -97,22 +96,21 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button
-            className="bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
             disabled={isRenaming || !workspaceName.trim()}
           >
             {isRenaming ? 'Updating...' : 'Update workspace'}
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className="border-zinc-800 bg-zinc-950 text-zinc-50">
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Rename Workspace</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
+            <AlertDialogDescription>
               Are you sure you want to rename this workspace to "{workspaceName}"? This change will
               be visible to all members inside the workspace.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-zinc-800 bg-transparent text-zinc-100 hover:bg-zinc-800 hover:text-zinc-50">
+            <AlertDialogCancel>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -122,7 +120,6 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
                   body: { name: workspaceName },
                 })
               }
-              className="bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
             >
               Confirm
             </AlertDialogAction>
@@ -130,12 +127,12 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Separator className="bg-zinc-800" />
+      <Separator />
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <h3 className="text-lg font-medium text-zinc-200">Recycle Bin</h3>
-          <p className="text-sm text-zinc-500">
+          <h3 className="text-lg font-medium">Recycle Bin</h3>
+          <p className="text-sm text-muted-foreground">
             View and restore recently deleted notes, diagrams, and files from this workspace. Items
             remain in the trash for 30 days before permanent deletion.
           </p>
@@ -143,7 +140,7 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
 
         <Button
           variant="outline"
-          className="flex items-center gap-2 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-zinc-50"
+          className="flex items-center gap-2"
           asChild
         >
           <Link href={`/workspace/${workspaceId}/trash`}>
