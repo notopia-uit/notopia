@@ -35,3 +35,9 @@ mise.*
 .tool-versions
 **/openapitools.json
 **/README.md
+
+# Agents
+.agents/
+.claude/
+CLAUDE.md
+AGENTS.md

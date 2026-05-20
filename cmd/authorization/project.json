@@ -100,11 +100,7 @@
     "test": {
       "executor": "nx:run-commands",
       "inputs": ["default", "test"],
-      "outputs": [
-        "{projectRoot}/coverage.out",
-        "{projectRoot}/gotestsum.json",
-        "{projectRoot}/tests-ctrf.json"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/authorization"],
       "options": {
         "command": "./test.sh",
         "cwd": "{projectRoot}"
