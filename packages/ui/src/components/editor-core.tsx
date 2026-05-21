@@ -3,13 +3,17 @@
 import { BlockNoteEditor } from '@blocknote/core';
 import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
-import { useHocuspocusProvider } from '@hocuspocus/provider-react';
+import {
+  useHocuspocusProvider,
+  useHocuspocusConnectionStatus,
+} from '@hocuspocus/provider-react';
 import {
   createBlockNoteSchema,
   getNoteMenuItems,
   getTagMenuItems,
 } from '@notopia-uit/ui/block-note';
-import { ForwardedRef, forwardRef, useMemo } from 'react';
+import { forwardRef, useMemo, useEffect, useState } from 'react';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 
 interface EditorCoreProps {
   sessionUser?: {
@@ -21,10 +25,16 @@ interface EditorCoreProps {
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
   { sessionUser },
-  ref
+  _ref
 ) {
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
+  const connectionStatus = useHocuspocusConnectionStatus();
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    setIsReady(connectionStatus === 'connected');
+  }, [connectionStatus]);
 
   const editor = useCreateBlockNote({
     schema: mySchema,
@@ -39,6 +49,14 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
       },
     },
   });
+
+  if (!isReady) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <BlockNoteView editor={editor}>
