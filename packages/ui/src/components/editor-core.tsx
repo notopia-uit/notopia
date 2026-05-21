@@ -23,6 +23,7 @@ import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
+import { useS3Storage } from '@notopia-uit/ui/contexts/s3-storage-context';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 
 interface EditorCoreProps {
@@ -114,6 +115,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
   const meilisearchClient = useMeilisearch();
+  const s3Storage = useS3Storage();
 
   const editor = useCreateBlockNote({
     schema: mySchema,
@@ -127,6 +129,8 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
         color: '#999999',
       },
     },
+    uploadFile: s3Storage.uploadFile,
+    resolveFileUrl: s3Storage.resolveFileUrl,
   });
 
   const noteSearchFn = useCallback(
@@ -191,3 +195,4 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     </>
   );
 });
+

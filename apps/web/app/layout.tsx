@@ -1,6 +1,7 @@
 import QueryClientProvider from '@notopia-uit/ui/components/client-query-provider';
 import { ThemeProvider } from '@notopia-uit/ui/components/theme-provider';
 import { ApiProvider } from '@notopia-uit/ui/components/token-provider';
+import { MeilisearchProvider } from '@notopia-uit/ui/contexts/meilisearch-context';
 
 import './globals.css';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
@@ -22,6 +23,9 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
+  const meilisearchHost = process.env.NEXT_PUBLIC_MEILISEARCH_HOST || 'http://localhost:7700';
+  const meilisearchApiKey = process.env.NEXT_PUBLIC_MEILISEARCH_API_KEY || '';
+
   return (
     <>
       <html lang="en" suppressHydrationWarning>
@@ -41,7 +45,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
             scriptProps={{ type: 'application/json' }}
           >
             <QueryClientProvider>
-              <ApiProvider>{children}</ApiProvider>
+              <ApiProvider>
+                <MeilisearchProvider host={meilisearchHost} apiKey={meilisearchApiKey}>
+                  {children}
+                </MeilisearchProvider>
+              </ApiProvider>
             </QueryClientProvider>
           </ThemeProvider>
         </body>
