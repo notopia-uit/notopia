@@ -91,7 +91,7 @@ export function NoteGraphModal({ isOpen, onOpenChange, noteId }: NoteGraphModalP
               onClick={() => setIsSettingsOpen(true)}
               aria-label="Graph settings"
             >
-              <Icons.Settings className="size-4 " />
+              <Icons.Settings className="size-4" />
             </Button>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">

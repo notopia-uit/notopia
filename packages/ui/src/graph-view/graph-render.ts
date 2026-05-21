@@ -190,7 +190,7 @@ export async function renderGraph(
   const radius = (Math.min(width, height) / 2) * 0.8;
   if (enableRadial) simulation.force('radial', forceRadial(radius).strength(0.2));
 
-  // Get CSS variables
+  // Get CSS variables and convert them to safe hex colors for Pixi.js
   const cssVars = [
     '--secondary',
     '--tertiary',
@@ -202,16 +202,7 @@ export async function renderGraph(
     '--bodyFont',
   ] as const;
 
-  const computedStyleMap = cssVars.reduce(
-    (acc, key) => {
-      const value = getComputedStyle(document.documentElement).getPropertyValue(key).trim();
-      acc[key] = value || getDefaultColor(key);
-      return acc;
-    },
-    {} as Record<(typeof cssVars)[number], string>
-  );
-
-  function getDefaultColor(varName: string): string {
+  const getDefaultColor = (varName: string): string => {
     const defaults: Record<string, string> = {
       '--secondary': '#4e9f3d',
       '--tertiary': '#8e44ad',
@@ -223,7 +214,94 @@ export async function renderGraph(
       '--bodyFont': 'Arial, sans-serif',
     };
     return defaults[varName] || '#000000';
-  }
+  };
+
+  const convertColorToHex = (colorValue: string): string => {
+    // If already a hex color, return it
+    if (colorValue.startsWith('#')) {
+      return colorValue;
+    }
+
+    // If empty, return default
+    if (!colorValue.trim()) {
+      return '#000000';
+    }
+
+    // Try to parse HSL colors (they come as "h s% l%")
+    const hslMatch = colorValue.match(/^(\d+\.?\d*)\s+(\d+\.?\d*)%\s+(\d+\.?\d*)%$/);
+    if (hslMatch) {
+      const [, h, s, l] = hslMatch.map(Number);
+      // Convert HSL to hex
+      const hslToRgb = (h: number, s: number, l: number) => {
+        h = h / 360;
+        s = s / 100;
+        l = l / 100;
+
+        let r, g, b;
+        if (s === 0) {
+          r = g = b = l;
+        } else {
+          const hue2rgb = (p: number, q: number, t: number) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+          };
+
+          const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+          const p = 2 * l - q;
+          r = hue2rgb(p, q, h + 1 / 3);
+          g = hue2rgb(p, q, h);
+          b = hue2rgb(p, q, h - 1 / 3);
+        }
+
+        const toHex = (x: number) => {
+          const hex = Math.round(x * 255).toString(16);
+          return hex.length === 1 ? '0' + hex : hex;
+        };
+
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      };
+      return hslToRgb(h, s, l);
+    }
+
+    // For any other color format (rgb, hsl with parentheses, lab, etc.),
+    // use a canvas element to parse it
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 1;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return '#000000';
+
+      ctx.fillStyle = colorValue;
+      ctx.fillRect(0, 0, 1, 1);
+
+      const imageData = ctx.getImageData(0, 0, 1, 1);
+      const [r, g, b] = imageData.data;
+
+      const toHex = (x: number) => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+      };
+
+      return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    } catch {
+      return '#000000';
+    }
+  };
+
+  const computedStyleMap = cssVars.reduce(
+    (acc, key) => {
+      const value = getComputedStyle(document.documentElement).getPropertyValue(key).trim();
+      const colorValue = value || getDefaultColor(key);
+      // Convert all colors to hex format safe for Pixi.js
+      acc[key] = key === '--bodyFont' ? colorValue : convertColorToHex(colorValue);
+      return acc;
+    },
+    {} as Record<(typeof cssVars)[number], string>
+  );
 
   const color = (d: NodeData) => {
     const isCurrent = d.id === currentSlug;

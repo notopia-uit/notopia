@@ -86,7 +86,7 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <div className="relative h-full w-full">
+    <div className="relative size-full ">
       <Graph
         data={graphData}
         options={{

@@ -157,7 +157,7 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
                   </div>
 
                    {editingMemberId === member.id ? (
-                     <div className="flex flex-shrink-0 items-center gap-2">
+                     <div className="flex shrink-0 items-center gap-2">
                        <Select
                          value={editingRole || member.role}
                          onValueChange={(value: UserRole) => {
@@ -184,7 +184,7 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex flex-shrink-0 items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                       <Badge variant="secondary">
                         {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                       </Badge>
