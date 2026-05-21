@@ -26,18 +26,11 @@ func NewTracerProvider(
 	)
 
 	cleanup := func() {
-		ctx := context.Background()
-		if timeoutCtx, err := context.WithTimeout(ctx, 5*time.Second); err == nil {
-			slog.WarnContext(
-				ctx,
-				"cannot create timeout context for TracerProvider shutdown, using background context instead",
-				slog.Any("error", err),
-			)
-			ctx = timeoutCtx
-		}
-		if err := tp.Shutdown(ctx); err != nil {
+		timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := tp.Shutdown(timeoutCtx); err != nil {
 			slog.ErrorContext(
-				ctx,
+				timeoutCtx,
 				"Error shutting down TracerProvider",
 				slog.Any("error", err),
 			)

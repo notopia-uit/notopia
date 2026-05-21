@@ -29,18 +29,11 @@ func NewLoggerProvider(
 	)
 
 	cleanup := func() {
-		ctx := context.Background()
-		if timeoutCtx, err := context.WithTimeout(ctx, 5*time.Second); err == nil {
-			slog.WarnContext(
-				ctx,
-				"cannot create timeout context for LoggerProvider shutdown, using background context instead",
-				slog.Any("error", err),
-			)
-			ctx = timeoutCtx
-		}
-		if err := lp.Shutdown(ctx); err != nil {
+		timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := lp.Shutdown(timeoutCtx); err != nil {
 			slog.ErrorContext(
-				ctx,
+				timeoutCtx,
 				"Error shutting down LoggerProvider",
 				slog.Any("error", err),
 			)
