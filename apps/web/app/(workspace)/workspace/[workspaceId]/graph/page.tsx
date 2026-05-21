@@ -19,7 +19,7 @@ export default async function GraphPage({ params }: { params: Promise<{ workspac
   });
 
   return (
-    <div className="size-full ">
+    <div className="h-screen w-screen overflow-hidden">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <GraphView workspaceId={workspaceId} />
       </HydrationBoundary>

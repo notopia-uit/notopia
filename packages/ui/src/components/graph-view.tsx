@@ -89,7 +89,13 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <>
+    <div className="relative w-full h-full">
+      <Graph
+        data={graphData}
+        options={{
+          localGraph: graphSettings,
+        }}
+      />
       <div className="absolute top-4 right-4 z-10">
         <Button
           variant="outline"
@@ -101,12 +107,6 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
           Settings
         </Button>
       </div>
-      <Graph
-        data={graphData}
-        options={{
-          localGraph: graphSettings,
-        }}
-      />
       <GraphSettingsDialog
         isOpen={isSettingsOpen}
         onOpenChange={setIsSettingsOpen}
@@ -114,6 +114,6 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
         currentSettings={graphSettings}
         onSave={handleSaveSettings}
       />
-    </>
+    </div>
   );
 }
