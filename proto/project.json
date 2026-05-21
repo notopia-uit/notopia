@@ -12,14 +12,6 @@
         "command": "buf generate"
       }
     },
-    "build": {
-      "inputs": ["protoFiles"],
-      "outputs": ["{projectRoot}/build.json"],
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "buf build -o proto/build.bin --as-file-descriptor-set"
-      }
-    },
     "lint": {
       "inputs": ["protoFiles"],
       "executor": "nx:run-commands",

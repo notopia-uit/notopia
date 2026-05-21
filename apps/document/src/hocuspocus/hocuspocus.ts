@@ -12,7 +12,6 @@ import { AuthenticationService } from '../authentication/authentication.service'
 import { AuthorizationService } from '../authorization/authorization.service';
 import { DocumentService } from '../document/document.service';
 import { NoteService } from '../note/note.service';
-
 import { HocuspocusContext } from './hocuspocus-context';
 
 @Injectable()
@@ -36,9 +35,9 @@ export class Hocuspocus {
         }),
         new HocuspocusDatabase({
           fetch: async ({ documentName: id }) => {
-            this.logger.log(`[Hey] Fetching document with ID: ${id}`);
+            this.logger.log({ documentId: id }, 'Fetching document from database');
             const document = await documentService.getById(id);
-            this.logger.log(`[Hey] Fetched document: ${JSON.stringify(document?.data)}`);
+            this.logger.log({ documentId: id }, 'Fetched document from database');
             return document?.data ?? null;
           },
           store: async ({ documentName: id, state }) => {
@@ -53,7 +52,7 @@ export class Hocuspocus {
     data: onAuthenticatePayload<HocuspocusContext>
   ): Promise<HocuspocusContext> {
     const documentId = data.documentName;
-    this.logger.log(`[Hey] Authenticating user for document ID: ${documentId}`);
+    this.logger.log({ documentId }, 'Authenticating user for document');
     const user = await this.authenticationService.validateToken(data.token);
     const note = await this.noteService.getNoteById({
       noteId: documentId,
