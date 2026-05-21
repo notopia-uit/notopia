@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type ChangeWorkspaceSlug struct {
@@ -31,6 +32,10 @@ func NewChangeWorkspaceSlugHandler(
 }
 
 var ProvideChangeWorkspaceSlugHandler = NewChangeWorkspaceSlugHandler
+
+type ChangeWorkspaceSlugCmd commonhandler.Cmd[ChangeWorkspaceSlug]
+
+var _ ChangeWorkspaceSlugCmd = (*ChangeWorkspaceSlugHandler)(nil)
 
 func (h *ChangeWorkspaceSlugHandler) Handle(ctx context.Context, cmd *ChangeWorkspaceSlug) error {
 	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionEdit)

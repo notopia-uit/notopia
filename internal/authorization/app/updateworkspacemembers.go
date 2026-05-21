@@ -6,6 +6,7 @@ import (
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type UpdateWorkspaceMembers struct {
@@ -27,6 +28,10 @@ func NewUpdateWorkspaceMembersHandler(enforcer *casbin.TransactionalEnforcer, pu
 }
 
 var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
+
+type UpdateWorkspaceMembersCmd commonhandler.Cmd[UpdateWorkspaceMembers]
+
+var _ UpdateWorkspaceMembersCmd = (*UpdateWorkspaceMembersHandler)(nil)
 
 func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, params *UpdateWorkspaceMembers) error {
 	editAllowed, err := h.enforcer.Enforce(

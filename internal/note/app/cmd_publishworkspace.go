@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type PublishWorkspace struct {
@@ -20,6 +21,10 @@ func NewPublishWorkspaceHandler(workspaceRepo domain.WorkspaceRepo) *PublishWork
 }
 
 var ProvidePublishWorkspaceHandler = NewPublishWorkspaceHandler
+
+type PublishWorkspaceCmd commonhandler.Cmd[PublishWorkspace]
+
+var _ PublishWorkspaceCmd = (*PublishWorkspaceHandler)(nil)
 
 func (h *PublishWorkspaceHandler) Handle(ctx context.Context, cmd *PublishWorkspace) error {
 	return nil

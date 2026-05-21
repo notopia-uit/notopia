@@ -6,6 +6,7 @@ import (
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type DeleteWorkspace struct {
@@ -22,6 +23,10 @@ func NewDeleteWorkspaceHandler(enforcer *casbin.TransactionalEnforcer) *DeleteWo
 }
 
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
+
+type DeleteWorkspaceCmd commonhandler.Cmd[DeleteWorkspace]
+
+var _ DeleteWorkspaceCmd = (*DeleteWorkspaceHandler)(nil)
 
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, params *DeleteWorkspace) error {
 	deleteAllowed, err := h.enforcer.Enforce(

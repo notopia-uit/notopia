@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type UpdateWorkspaceMembers struct {
@@ -30,6 +31,10 @@ func NewUpdateWorkspaceMembersHandler(
 }
 
 var ProvideUpdateWorkspaceMembersHandler = NewUpdateWorkspaceMembersHandler
+
+type UpdateWorkspaceMembersCmd commonhandler.Cmd[UpdateWorkspaceMembers]
+
+var _ UpdateWorkspaceMembersCmd = (*UpdateWorkspaceMembersHandler)(nil)
 
 // FIXME: This maybe need saga? Because it involves 2 external things
 // Or we have to persist event and let another handler to consume

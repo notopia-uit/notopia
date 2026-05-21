@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type RenameFolder struct {
@@ -31,6 +32,10 @@ func NewRenameFolderHandler(
 }
 
 var ProvideRenameFolderHandler = NewRenameFolderHandler
+
+type RenameFolderCmd commonhandler.Cmd[RenameFolder]
+
+var _ RenameFolderCmd = (*RenameFolderHandler)(nil)
 
 func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {

@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type CreateNote struct {
@@ -34,6 +35,10 @@ func NewCreateNoteHandler(
 }
 
 var ProvideCreateNoteHandler = NewCreateNoteHandler
+
+type CreateNoteCmd commonhandler.Cmd[CreateNote]
+
+var _ CreateNoteCmd = (*CreateNoteHandler)(nil)
 
 func (h *CreateNoteHandler) Handle(ctx context.Context, cmd *CreateNote) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {

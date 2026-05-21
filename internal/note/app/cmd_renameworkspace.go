@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type RenameWorkspace struct {
@@ -31,6 +32,10 @@ func NewRenameWorkspaceHandler(
 }
 
 var ProvideRenameWorkspaceHandler = NewRenameWorkspaceHandler
+
+type RenameWorkspaceCmd commonhandler.Cmd[RenameWorkspace]
+
+var _ RenameWorkspaceCmd = (*RenameWorkspaceHandler)(nil)
 
 func (h *RenameWorkspaceHandler) Handle(ctx context.Context, cmd *RenameWorkspace) error {
 	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionEdit)

@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type GetWorkspaceGraph struct {
@@ -31,6 +32,10 @@ func NewGetWorkspaceGraphHandler(
 }
 
 var ProvideGetWorkspaceGraphHandler = NewGetWorkspaceGraphHandler
+
+type GetWorkspaceGraphQuery commonhandler.Query[GetWorkspaceGraph, Graph]
+
+var _ GetWorkspaceGraphQuery = (*GetWorkspaceGraphHandler)(nil)
 
 func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspaceGraph) (Graph, error) {
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(

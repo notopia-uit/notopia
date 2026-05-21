@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type CreateFolder struct {
@@ -34,6 +35,10 @@ func NewCreateFolderHandler(
 }
 
 var ProvideCreateFolderHandler = NewCreateFolderHandler
+
+type CreateFolderCmd commonhandler.Cmd[CreateFolder]
+
+var _ CreateFolderCmd = (*CreateFolderHandler)(nil)
 
 func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) error {
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)

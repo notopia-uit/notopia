@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type RestoreTrashedWorkspaceItems struct {
@@ -35,6 +36,10 @@ func NewRestoreTrashedWorkspaceItemsHandler(
 }
 
 var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItemsHandler
+
+type RestoreTrashedWorkspaceItemsCmd commonhandler.Cmd[RestoreTrashedWorkspaceItems]
+
+var _ RestoreTrashedWorkspaceItemsCmd = (*RestoreTrashedWorkspaceItemsHandler)(nil)
 
 // spellcheck:ignore
 // NOTE: performance issue. If we follow strictly the DDD, this is right

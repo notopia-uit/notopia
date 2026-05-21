@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type DeleteWorkspace struct {
@@ -30,6 +31,10 @@ func NewDeleteWorkspaceHandler(
 }
 
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
+
+type DeleteWorkspaceCmd commonhandler.Cmd[DeleteWorkspace]
+
+var _ DeleteWorkspaceCmd = (*DeleteWorkspaceHandler)(nil)
 
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) error {
 	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionDelete)

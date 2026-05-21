@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type MoveWorkspaceItems struct {
@@ -33,6 +34,10 @@ func NewMoveWorkspaceItemsHandler(
 }
 
 var ProvideMoveWorkspaceItemsHandler = NewMoveWorkspaceItemsHandler
+
+type MoveWorkspaceItemsCmd commonhandler.Cmd[MoveWorkspaceItems]
+
+var _ MoveWorkspaceItemsCmd = (*MoveWorkspaceItemsHandler)(nil)
 
 func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) error {
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)

@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type RenameNote struct {
@@ -31,6 +32,10 @@ func NewRenameNoteHandler(
 }
 
 var ProvideRenameNoteHandler = NewRenameNoteHandler
+
+type RenameNoteCmd commonhandler.Cmd[RenameNote]
+
+var _ RenameNoteCmd = (*RenameNoteHandler)(nil)
 
 func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {

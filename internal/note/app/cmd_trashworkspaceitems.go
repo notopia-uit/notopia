@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type TrashWorkspaceItems struct {
@@ -35,6 +36,10 @@ func NewTrashWorkspaceItemsHandler(
 }
 
 var ProvideTrashWorkspaceItemsHandler = NewTrashWorkspaceItemsHandler
+
+type TrashWorkspaceItemsCmd commonhandler.Cmd[TrashWorkspaceItems]
+
+var _ TrashWorkspaceItemsCmd = (*TrashWorkspaceItemsHandler)(nil)
 
 func (h *TrashWorkspaceItemsHandler) Handle(ctx context.Context, cmd *TrashWorkspaceItems) error {
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(

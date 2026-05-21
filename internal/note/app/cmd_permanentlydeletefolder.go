@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type PermanentlyDeleteFolder struct {
@@ -30,6 +31,10 @@ func NewPermanentlyDeleteFolderHandler(
 }
 
 var ProvidePermanentlyDeleteFolderHandler = NewPermanentlyDeleteFolderHandler
+
+type PermanentlyDeleteFolderCmd commonhandler.Cmd[PermanentlyDeleteFolder]
+
+var _ PermanentlyDeleteFolderCmd = (*PermanentlyDeleteFolderHandler)(nil)
 
 // NOTE: We delegate the infra persistence to cascading delete things
 // Fact, we should handle this in domain, not infra

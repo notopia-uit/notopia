@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type GetNoteGraph struct {
@@ -36,6 +37,10 @@ func NewGetNoteGraphHandler(
 }
 
 var ProvideGetNoteGraphHandler = NewGetNoteGraphHandler
+
+type GetNoteGraphQuery commonhandler.Query[GetNoteGraph, Graph]
+
+var _ GetNoteGraphQuery = (*GetNoteGraphHandler)(nil)
 
 func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (Graph, error) {
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)

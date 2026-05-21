@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type CreateWorkspace struct {
@@ -31,6 +32,10 @@ func NewCreateWorkspaceHandler(
 }
 
 var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
+
+type CreateWorkspaceCmd commonhandler.Cmd[CreateWorkspace]
+
+var _ CreateWorkspaceCmd = (*CreateWorkspaceHandler)(nil)
 
 func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspace) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {

@@ -6,6 +6,7 @@ import (
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type CreateWorkspace struct {
@@ -22,6 +23,10 @@ func NewCreateWorkspaceHandler(enforcer *casbin.TransactionalEnforcer) *CreateWo
 }
 
 var ProvideCreateWorkspaceHandler = NewCreateWorkspaceHandler
+
+type CreateWorkspaceCmd commonhandler.Cmd[CreateWorkspace]
+
+var _ CreateWorkspaceCmd = (*CreateWorkspaceHandler)(nil)
 
 func (h *CreateWorkspaceHandler) Handle(ctx context.Context, params *CreateWorkspace) error {
 	ok, err := h.enforcer.AddGroupingPolicy(

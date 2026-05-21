@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type GetNoteLinks struct {
@@ -36,6 +37,10 @@ func NewGetNoteLinksHandler(
 }
 
 var ProvideGetNoteLinksHandler = NewGetNoteLinksHandler
+
+type GetNoteLinksQuery commonhandler.Query[GetNoteLinks, NoteLinkResult]
+
+var _ GetNoteLinksQuery = (*GetNoteLinksHandler)(nil)
 
 func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (NoteLinkResult, error) {
 	workspaceID, err := h.noteRepo.GetWorkspaceIDByID(ctx, query.ID)

@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type PermanentlyDeleteNote struct {
@@ -30,6 +31,10 @@ func NewPermanentlyDeleteNoteHandler(
 }
 
 var ProvidePermanentlyDeleteNoteHandler = NewPermanentlyDeleteNoteHandler
+
+type PermanentlyDeleteNoteCmd commonhandler.Cmd[PermanentlyDeleteNote]
+
+var _ PermanentlyDeleteNoteCmd = (*PermanentlyDeleteNoteHandler)(nil)
 
 func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteNote) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {

@@ -24,29 +24,6 @@ func NewHandlerProvider(
 
 var ProvideHandlerProvider = NewHandlerProvider
 
-type (
-	ChangeWorkspaceSlugCmd             commonhandler.Cmd[ChangeWorkspaceSlug]
-	CreateFolderCmd                    commonhandler.Cmd[CreateFolder]
-	CreateNoteCmd                      commonhandler.Cmd[CreateNote]
-	CreateWorkspaceCmd                 commonhandler.Cmd[CreateWorkspace]
-	DeleteWorkspaceCmd                 commonhandler.Cmd[DeleteWorkspace]
-	LeaveWorkspaceCmd                  commonhandler.Cmd[LeaveWorkspace]
-	MoveWorkspaceItemsCmd              commonhandler.Cmd[MoveWorkspaceItems]
-	PermanentlyDeleteFolderCmd         commonhandler.Cmd[PermanentlyDeleteFolder]
-	PermanentlyDeleteNoteCmd           commonhandler.Cmd[PermanentlyDeleteNote]
-	PermanentlyDeleteWorkspaceItemsCmd commonhandler.Cmd[PermanentlyDeleteWorkspaceItems]
-	PublishNoteCmd                     commonhandler.Cmd[PublishNote]
-	PublishWorkspaceCmd                commonhandler.Cmd[PublishWorkspace]
-	RenameFolderCmd                    commonhandler.Cmd[RenameFolder]
-	RenameNoteCmd                      commonhandler.Cmd[RenameNote]
-	RenameWorkspaceCmd                 commonhandler.Cmd[RenameWorkspace]
-	RestoreTrashedWorkspaceItemsCmd    commonhandler.Cmd[RestoreTrashedWorkspaceItems]
-	TrashWorkspaceItemsCmd             commonhandler.Cmd[TrashWorkspaceItems]
-	UnpublishNoteCmd                   commonhandler.Cmd[UnpublishNote]
-	UnpublishWorkspaceCmd              commonhandler.Cmd[UnpublishWorkspace]
-	UpdateWorkspaceMembersCmd          commonhandler.Cmd[UpdateWorkspaceMembers]
-)
-
 type Cmds struct {
 	ChangeWorkspaceSlug             ChangeWorkspaceSlugCmd
 	CreateFolder                    CreateFolderCmd
@@ -119,21 +96,6 @@ func NewCmds(
 }
 
 var ProvideCmds = NewCmds
-
-type (
-	CheckWorkspaceSlugExistsQuery commonhandler.Query[CheckWorkspaceSlugExists, bool]
-	GetMyWorkspacesQuery          commonhandler.Query[GetMyWorkspaces, []UserWorkspace]
-	GetNoteGraphQuery             commonhandler.Query[GetNoteGraph, Graph]
-	GetNoteQuery                  commonhandler.Query[GetNote, *Note]
-	GetNoteLinksQuery             commonhandler.Query[GetNoteLinks, NoteLinkResult]
-	GetWorkspaceByNoteQuery       commonhandler.Query[GetWorkspaceByNote, Workspace]
-	GetWorkspaceGraphQuery        commonhandler.Query[GetWorkspaceGraph, Graph]
-	GetWorkspaceBySlugQuery       commonhandler.Query[GetWorkspaceBySlug, Workspace]
-	GetWorkspaceMembersQuery      commonhandler.Query[GetWorkspaceMembers, []WorkspaceMember]
-	GetWorkspaceSearchTokenQuery  commonhandler.Query[GetWorkspaceSearchToken, SearchToken]
-	GetWorkspaceTreeQuery         commonhandler.Query[GetWorkspaceTree, WorkspaceTreeFolder]
-	ShowTrashQuery                commonhandler.Query[ShowTrash, Trash]
-)
 
 type Queries struct {
 	CheckWorkspaceSlugExists CheckWorkspaceSlugExistsQuery

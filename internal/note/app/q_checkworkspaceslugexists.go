@@ -2,6 +2,8 @@ package app
 
 import (
 	"context"
+
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type CheckWorkspaceSlugExists struct {
@@ -17,6 +19,10 @@ func NewCheckWorkspaceSlugExistsHandler(readModel CheckWorkspaceSlugExistsReadMo
 }
 
 var ProvideCheckWorkspaceSlugExistsHandler = NewCheckWorkspaceSlugExistsHandler
+
+type CheckWorkspaceSlugExistsQuery commonhandler.Query[CheckWorkspaceSlugExists, bool]
+
+var _ CheckWorkspaceSlugExistsQuery = (*CheckWorkspaceSlugExistsHandler)(nil)
 
 func (h *CheckWorkspaceSlugExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceSlugExists) (bool, error) {
 	return h.readModel.CheckWorkspaceSlugExists(ctx, query.Slug)
