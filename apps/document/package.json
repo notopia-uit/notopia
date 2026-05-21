@@ -72,6 +72,7 @@
     "tsx": "catalog:",
     "typeorm-extension": "catalog:",
     "unplugin-swc": "catalog:",
-    "webpack-node-externals": "catalog:"
+    "webpack-node-externals": "catalog:",
+    "@d2t/vitest-ctrf-json-reporter": "catalog:"
   }
 }
