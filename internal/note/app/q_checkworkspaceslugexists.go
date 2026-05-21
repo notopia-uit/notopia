@@ -25,5 +25,5 @@ type CheckWorkspaceSlugExistsQuery commonhandler.Query[CheckWorkspaceSlugExists,
 var _ CheckWorkspaceSlugExistsQuery = (*CheckWorkspaceSlugExistsHandler)(nil)
 
 func (h *CheckWorkspaceSlugExistsHandler) Handle(ctx context.Context, query *CheckWorkspaceSlugExists) (bool, error) {
-	return h.readModel.CheckWorkspaceSlugExists(ctx, query.Slug)
+	return h.readModel.Handle(ctx, query.Slug)
 }

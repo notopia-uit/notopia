@@ -23,7 +23,7 @@ func NewGetWorkspaceByNote(queries *pgsqlc.Queries) *GetWorkspaceByNote {
 
 var ProvideGetWorkspaceByNote = NewGetWorkspaceByNote
 
-func (h *GetWorkspaceByNote) GetWorkspaceByNoteID(ctx context.Context, noteID uuid.UUID) (app.Workspace, error) {
+func (h *GetWorkspaceByNote) Handle(ctx context.Context, noteID uuid.UUID) (app.Workspace, error) {
 	workspaces, err := h.queries.ReadGetWorkspaceByNoteID(ctx, noteID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

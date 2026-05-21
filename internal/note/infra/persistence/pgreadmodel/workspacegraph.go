@@ -19,7 +19,7 @@ func GetWorkspaceGraph(queries *pgsqlc.Queries) *WorkspaceGraph {
 
 var ProvideWorkspaceGraph = GetWorkspaceGraph
 
-func (h *WorkspaceGraph) GetWorkspaceGraph(ctx context.Context, p *app.GetWorkspaceGraphReadModelParams) (app.Graph, error) {
+func (h *WorkspaceGraph) Handle(ctx context.Context, p *app.GetWorkspaceGraphReadModelParams) (app.Graph, error) {
 	notes, err := h.queries.ReadGetNotesInWorkspace(ctx, pgsqlc.ReadGetNotesInWorkspaceParams{
 		WorkspaceID:  p.ID,
 		ExcludeTrash: true,

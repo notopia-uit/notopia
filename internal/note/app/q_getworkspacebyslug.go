@@ -36,7 +36,7 @@ type GetWorkspaceBySlugQuery commonhandler.Query[GetWorkspaceBySlug, Workspace]
 var _ GetWorkspaceBySlugQuery = (*GetWorkspaceBySlugHandler)(nil)
 
 func (h *GetWorkspaceBySlugHandler) Handle(ctx context.Context, query *GetWorkspaceBySlug) (Workspace, error) {
-	workspace, err := h.readModel.GetWorkspaceBySlug(ctx, query.Slug)
+	workspace, err := h.readModel.Handle(ctx, query.Slug)
 	if err != nil {
 		return Workspace{}, err
 	}

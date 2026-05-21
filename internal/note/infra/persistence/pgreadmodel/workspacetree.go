@@ -25,7 +25,7 @@ func NewWorkspaceTree(queries *pgsqlc.Queries) *WorkspaceTree {
 
 var ProvideWorkspaceTree = NewWorkspaceTree
 
-func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, p *app.GetWorkspaceTreeReadModelParams) (app.WorkspaceTreeFolder, error) {
+func (h *WorkspaceTree) Handle(ctx context.Context, p *app.GetWorkspaceTreeReadModelParams) (app.WorkspaceTreeFolder, error) {
 	var rootFolderID uuid.UUID
 
 	if p.RootFolderID != uuid.Nil {

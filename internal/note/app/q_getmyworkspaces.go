@@ -43,7 +43,7 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 	for i, uw := range authorizationUserWorkspaces {
 		workspaceIDs[i] = uw.ID
 	}
-	workspaces, err := h.readModel.GetWorkspaces(ctx, workspaceIDs)
+	workspaces, err := h.readModel.Handle(ctx, workspaceIDs)
 	if err != nil {
 		return nil, err
 	}

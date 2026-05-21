@@ -22,7 +22,7 @@ func NewWorkspaceBySlug(queries *pgsqlc.Queries) *WorkspaceBySlug {
 
 var ProvideWorkspaceBySlug = NewWorkspaceBySlug
 
-func (h *WorkspaceBySlug) GetWorkspaceBySlug(ctx context.Context, slug string) (app.Workspace, error) {
+func (h *WorkspaceBySlug) Handle(ctx context.Context, slug string) (app.Workspace, error) {
 	workspace, err := h.queries.ReadGetWorkspaceBySlug(ctx, slug)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

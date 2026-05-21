@@ -36,7 +36,7 @@ type GetWorkspaceByNoteQuery commonhandler.Query[GetWorkspaceByNote, Workspace]
 var _ GetWorkspaceByNoteQuery = (*GetWorkspaceByNoteHandler)(nil)
 
 func (h *GetWorkspaceByNoteHandler) Handle(ctx context.Context, query *GetWorkspaceByNote) (Workspace, error) {
-	workspace, err := h.readModel.GetWorkspaceByNoteID(ctx, query.NoteID)
+	workspace, err := h.readModel.Handle(ctx, query.NoteID)
 	if err != nil {
 		return Workspace{}, err
 	}

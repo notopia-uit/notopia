@@ -52,7 +52,7 @@ func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspa
 			fmt.Sprintf("user %s does not have permission to read workspace graph %s", query.UserID, query.ID),
 		)
 	}
-	graph, err := h.readModel.GetWorkspaceGraph(ctx, &GetWorkspaceGraphReadModelParams{
+	graph, err := h.readModel.Handle(ctx, &GetWorkspaceGraphReadModelParams{
 		ID:            query.ID,
 		IgnoreOrphans: query.IgnoreOrphans,
 	})

@@ -27,7 +27,7 @@ var ProvideNoteCreatedDomainToIntegrationEventHandler = NewNoteCreatedDomainToIn
 
 func (h *NoteCreatedDomainToIntegrationEventHandler) Handle(ctx context.Context, event *domain.NoteCreatedEvent) error {
 	slog.DebugContext(ctx, "Handling note created integration event", slog.String("note_id", event.AggregateID.String()))
-	workspace, err := h.getWorkspaceByNoteReadModel.GetWorkspaceByNoteID(ctx, event.AggregateID)
+	workspace, err := h.getWorkspaceByNoteReadModel.Handle(ctx, event.AggregateID)
 	if err != nil {
 		return fmt.Errorf("failed to get workspace for note: %w", err)
 	}

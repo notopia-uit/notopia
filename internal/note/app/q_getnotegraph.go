@@ -64,7 +64,7 @@ func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (
 	if query.Depth <= 0 {
 		query.Depth = math.MaxInt
 	}
-	graph, err := h.readModel.GetNoteGraph(ctx, &GetNoteGraphReadModelParams{
+	graph, err := h.readModel.Handle(ctx, &GetNoteGraphReadModelParams{
 		ID:    query.ID,
 		Depth: query.Depth,
 	})

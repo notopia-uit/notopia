@@ -61,7 +61,7 @@ func (h *GetNoteLinksHandler) Handle(ctx context.Context, query *GetNoteLinks) (
 			fmt.Sprintf("user %s does not have permission to read note links %s", query.UserID, query.ID),
 		)
 	}
-	result, err := h.readModel.GetNoteLinks(ctx, &GetNoteLinksReadModelParams{
+	result, err := h.readModel.Handle(ctx, &GetNoteLinksReadModelParams{
 		ID:            query.ID,
 		OutgoingLinks: query.OutgoingLinks,
 		Backlinks:     query.Backlinks,

@@ -19,7 +19,7 @@ func NewNoteGraph(queries *pgsqlc.Queries) *NoteGraph {
 
 var ProvideNoteGraph = NewNoteGraph
 
-func (h *NoteGraph) GetNoteGraph(ctx context.Context, p *app.GetNoteGraphReadModelParams) (app.Graph, error) {
+func (h *NoteGraph) Handle(ctx context.Context, p *app.GetNoteGraphReadModelParams) (app.Graph, error) {
 	workspaceID, err := h.queries.GetWorkspaceIDByNoteID(ctx, p.ID)
 	if err != nil {
 		return app.Graph{}, toErr(err)

@@ -61,7 +61,7 @@ func (h *GetNoteHandler) Handle(ctx context.Context, query *GetNote) (*Note, err
 			fmt.Sprintf("user %s does not have permission to read note %s", query.UserID, query.ID),
 		)
 	}
-	note, err := h.readModel.GetNote(ctx, &GetNoteReadModelParams{
+	note, err := h.readModel.Handle(ctx, &GetNoteReadModelParams{
 		ID:             query.ID,
 		ExcludeTrashed: query.ExcludeTrashed,
 	})

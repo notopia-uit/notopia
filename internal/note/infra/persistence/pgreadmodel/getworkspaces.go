@@ -20,7 +20,7 @@ func NewGetWorkspaces(queries *pgsqlc.Queries) *GetWorkspaces {
 
 var ProvideGetWorkspaces = NewGetWorkspaces
 
-func (h *GetWorkspaces) GetWorkspaces(ctx context.Context, ids []uuid.UUID) ([]app.Workspace, error) {
+func (h *GetWorkspaces) Handle(ctx context.Context, ids []uuid.UUID) ([]app.Workspace, error) {
 	workspaces, err := h.queries.ReadGetWorkspacesByIDs(ctx, ids)
 	if err != nil {
 		return nil, toErr(err)

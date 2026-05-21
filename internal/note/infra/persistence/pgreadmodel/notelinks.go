@@ -23,7 +23,7 @@ func GetNoteLinks(queries *pgsqlc.Queries) *NoteLinks {
 
 var ProvideNoteLinks = GetNoteLinks
 
-func (h *NoteLinks) GetNoteLinks(ctx context.Context, p *app.GetNoteLinksReadModelParams) (app.NoteLinkResult, error) {
+func (h *NoteLinks) Handle(ctx context.Context, p *app.GetNoteLinksReadModelParams) (app.NoteLinkResult, error) {
 	_, err := h.queries.GetNoteByID(ctx,
 		//exhaustruct:ignore
 		pgsqlc.GetNoteByIDParams{

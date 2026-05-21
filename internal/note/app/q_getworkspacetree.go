@@ -61,7 +61,7 @@ func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspac
 			fmt.Sprintf("user %s does not have permission to read workspace tree %s", query.UserID, query.WorkspaceID),
 		)
 	}
-	tree, err := h.readModel.GetWorkspaceTree(ctx, &GetWorkspaceTreeReadModelParams{
+	tree, err := h.readModel.Handle(ctx, &GetWorkspaceTreeReadModelParams{
 		WorkspaceID:    query.WorkspaceID,
 		RootFolderID:   query.RootFolderID,
 		IncludeTrashed: query.IncludeTrashed,
