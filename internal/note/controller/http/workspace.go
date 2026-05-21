@@ -90,6 +90,26 @@ func (h *StrictHandler) ChangeWorkspaceSlug(
 	return note.ChangeWorkspaceSlug204Response{}, nil
 }
 
+func (h *StrictHandler) EmptyTrash(
+	ctx context.Context,
+	request note.EmptyTrashRequestObject,
+) (note.EmptyTrashResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.Unauthorized
+	}
+	cmd := &app.EmptyTrash{
+		WorkspaceID: request.WorkspaceId,
+		UserID:      user.ID,
+	}
+	err := h.App.Cmds.EmptyTrash.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.EmptyTrash204Response{}, nil
+}
+
 func (h *StrictHandler) GetWorkspace(
 	ctx context.Context,
 	request note.GetWorkspaceRequestObject,

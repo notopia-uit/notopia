@@ -1,0 +1,22 @@
+# vim: ft=yaml.openapi
+delete:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - Workspace
+  summary: Empty trash
+  operationId: emptyTrash
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  responses:
+    204:
+      description: Trash emptied successfully
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

@@ -62,6 +62,8 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}.yaml
   /note/workspaces/{workspaceId}/change-slug:
     $ref: ./paths/workspaces_{workspaceId}_change_slug.yaml
+  /note/workspaces/{workspaceId}/empty-trash:
+    $ref: ./paths/workspaces_{workspaceId}_empty-trash.yaml
   /note/workspaces/{workspaceId}/events:
     $ref: ./paths/workspaces_{workspaceId}_events.yaml
   /note/workspaces/{workspaceId}/graph:

@@ -709,6 +709,15 @@ export const zChangeWorkspaceSlugPath = z.object({
  */
 export const zChangeWorkspaceSlugResponse = z.void();
 
+export const zEmptyTrashPath = z.object({
+    workspaceId: zNoteId3
+});
+
+/**
+ * Trash emptied successfully
+ */
+export const zEmptyTrashResponse = z.void();
+
 export const zGetWorkspaceEventsPath = z.object({
     workspaceId: zNoteId3
 });
