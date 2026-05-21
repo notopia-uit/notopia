@@ -13,8 +13,6 @@ import {
 } from '@notopia-uit/api-gen';
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
 import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
-import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
-import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import {
   ContextMenu,
@@ -25,7 +23,9 @@ import {
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, FilePlus, FolderPlus, Trash2 } from 'lucide-react';

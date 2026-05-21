@@ -12,7 +12,6 @@ import { AuthenticationService } from '../authentication/authentication.service'
 import { AuthorizationService } from '../authorization/authorization.service';
 import { DocumentService } from '../document/document.service';
 import { NoteService } from '../note/note.service';
-
 import { HocuspocusContext } from './hocuspocus-context';
 
 @Injectable()
@@ -28,17 +27,17 @@ export class Hocuspocus {
   ) {
     this.hocuspocus = new ServerHocuspocus<HocuspocusContext>({
       name: 'document', // TODO: Inject host
-      onAuthenticate: this.onAuthenticate.bind(this),
-      onChange: this.onChange.bind(this),
+      onAuthenticate: (...args) => this.onAuthenticate(...args),
+      onChange: (...args) => this.onChange(...args),
       extensions: [
         new HocuspocusLogger({
           log: (message) => this.logger.log(message),
         }),
         new HocuspocusDatabase({
           fetch: async ({ documentName: id }) => {
-            this.logger.log(`[Hey] Fetching document with ID: ${id}`);
+            this.logger.log({ documentId: id }, 'Fetching document from database');
             const document = await documentService.getById(id);
-            this.logger.log(`[Hey] Fetched document: ${JSON.stringify(document?.data)}`);
+            this.logger.log({ documentId: id }, 'Fetched document from database');
             return document?.data ?? null;
           },
           store: async ({ documentName: id, state }) => {
@@ -53,7 +52,6 @@ export class Hocuspocus {
     data: onAuthenticatePayload<HocuspocusContext>
   ): Promise<HocuspocusContext> {
     const documentId = data.documentName;
-    this.logger.log(`[Hey] Authenticating user for document ID: ${documentId}`);
     const user = await this.authenticationService.validateToken(data.token);
     const note = await this.noteService.getNoteById({
       noteId: documentId,

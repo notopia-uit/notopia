@@ -160,8 +160,8 @@ WITH RECURSIVE parent_folders(id, parent_id) AS (
     id = sqlc.arg('id')::uuid
   UNION ALL
   SELECT
-    id,
-    parent_id
+    f.id,
+    f.parent_id
   FROM
     folders
     INNER JOIN parent_folders AS pf ON id = pf.parent_id
