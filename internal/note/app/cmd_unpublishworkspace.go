@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/note/domain"
 )
@@ -22,6 +21,5 @@ func NewUnpublishWorkspaceHandler(workspaceRepo domain.WorkspaceRepo) *Unpublish
 var ProvideUnpublishWorkspaceHandler = NewUnpublishWorkspaceHandler
 
 func (h *UnpublishWorkspaceHandler) Handle(ctx context.Context, cmd *UnpublishWorkspace) error {
-	slog.DebugContext(ctx, "unpublishing workspace", slog.String("slug", cmd.Slug))
 	return nil
 }

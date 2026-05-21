@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -48,15 +47,9 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateW
 	if !anyOwner {
 		return errs.NewWorkspaceMustHaveAtLeastOneOwner(cmd.WorkspaceID)
 	}
-	slog.DebugContext(
-		ctx, "validating members",
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-		slog.Int("member_count", len(cmd.Members)),
-	)
 	if err := h.authorizationSvc.UpdateWorkspaceMembers(ctx, cmd.UserID, cmd.WorkspaceID, cmd.Members); err != nil {
 		return err
 	}
-	slog.DebugContext(ctx, "members updated in authorization service", slog.String("workspace_id", cmd.WorkspaceID.String()))
 	eventID, err := uuid.NewV7()
 	if err != nil {
 		return errs.NewInternalGenerateID(err)

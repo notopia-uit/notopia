@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
@@ -43,12 +42,6 @@ var ProvideRestoreTrashedWorkspaceItemsHandler = NewRestoreTrashedWorkspaceItems
 // Because if we filter, we will need to check no further down the tree has filtered trashed by "purpose" or "parent"
 
 func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *RestoreTrashedWorkspaceItems) error {
-	slog.DebugContext(
-		ctx, "checking permission",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-		slog.String("permission", "delete"),
-	)
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
 	if err != nil {
 		return err
@@ -59,11 +52,6 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 			fmt.Sprintf("user %s does not have permission to restore items in workspace %s", cmd.UserID, cmd.WorkspaceID),
 		)
 	}
-	slog.DebugContext(
-		ctx, "permission granted",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-	)
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		noteRepo := r.Note()
@@ -90,7 +78,6 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 			}
 
 			allModifiedNotes = append(allModifiedNotes, notes...)
-			slog.DebugContext(ctx, "notes restored", slog.Int("note_count", len(notes)))
 		}
 
 		if len(cmd.FolderIDs) > 0 {
@@ -135,12 +122,6 @@ func (h *RestoreTrashedWorkspaceItemsHandler) Handle(ctx context.Context, cmd *R
 			allModifiedFolders = append(allModifiedFolders, folders...)
 			allModifiedFolders = append(allModifiedFolders, childFolders...)
 			allModifiedNotes = append(allModifiedNotes, childNotes...)
-			slog.DebugContext(
-				ctx, "folders and children restored",
-				slog.Int("folder_count", len(folders)),
-				slog.Int("child_folder_count", len(childFolders)),
-				slog.Int("child_note_count", len(childNotes)),
-			)
 		}
 
 		allModifiedNotes = deduplicateNotes(allModifiedNotes)

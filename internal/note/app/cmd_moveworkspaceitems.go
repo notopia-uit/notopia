@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
@@ -36,12 +35,6 @@ func NewMoveWorkspaceItemsHandler(
 var ProvideMoveWorkspaceItemsHandler = NewMoveWorkspaceItemsHandler
 
 func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspaceItems) error {
-	slog.DebugContext(
-		ctx, "checking permission",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-		slog.String("permission", "write"),
-	)
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
 	if err != nil {
 		return err
@@ -52,11 +45,6 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			fmt.Sprintf("user %s does not have permission to move items in workspace %s", cmd.UserID, cmd.WorkspaceID),
 		)
 	}
-	slog.DebugContext(
-		ctx, "permission granted",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-	)
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
@@ -70,7 +58,6 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			if !folderValid {
 				return errs.NewFoldersNotInWorkspace(cmd.WorkspaceID)
 			}
-			slog.DebugContext(ctx, "folders validated", slog.Int("folder_count", len(cmd.FolderIDs)))
 		}
 
 		{
@@ -81,7 +68,6 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			if !noteValid {
 				return errs.NewNotesNotInWorkspace(cmd.WorkspaceID)
 			}
-			slog.DebugContext(ctx, "notes validated", slog.Int("note_count", len(cmd.NoteIDs)))
 		}
 
 		{
@@ -93,7 +79,6 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			if destinationFolder.WorkspaceID() != cmd.WorkspaceID {
 				return errs.NewDestinationFolderNotInWorkspace(cmd.DestinationFolderID, cmd.WorkspaceID)
 			}
-			slog.DebugContext(ctx, "destination folder validated", slog.String("destination_folder_id", cmd.DestinationFolderID.String()))
 		}
 
 		{
@@ -110,7 +95,6 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 					return errs.NewCannotMoveFolderToItOwnSubfolder(folderID, cmd.DestinationFolderID)
 				}
 			}
-			slog.DebugContext(ctx, "folder hierarchy validated")
 		}
 
 		if len(cmd.FolderIDs) == 0 && len(cmd.NoteIDs) == 0 {
@@ -134,7 +118,6 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			if err := folderRepo.SaveMany(ctx, folders); err != nil {
 				return err
 			}
-			slog.DebugContext(ctx, "folders moved", slog.Int("folder_count", len(folders)))
 		}
 		if len(cmd.NoteIDs) > 0 {
 			notes, err := noteRepo.GetMany(ctx,
@@ -154,7 +137,6 @@ func (h *MoveWorkspaceItemsHandler) Handle(ctx context.Context, cmd *MoveWorkspa
 			if err := noteRepo.SaveMany(ctx, notes); err != nil {
 				return err
 			}
-			slog.DebugContext(ctx, "notes moved", slog.Int("note_count", len(notes)))
 		}
 		return nil
 	})

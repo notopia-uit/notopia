@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
@@ -37,7 +36,6 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		workspaceRepo := r.Workspace()
 		folderRepo := r.Folder()
-		slog.DebugContext(ctx, "checking slug exists", slog.String("slug", cmd.Slug))
 		slugExisted, err := workspaceRepo.CheckSlugExists(ctx, cmd.Slug)
 		if err != nil {
 			return err
@@ -45,7 +43,6 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 		if slugExisted {
 			return errs.NewWorkspaceSlugAlreadyExists(cmd.Slug, nil)
 		}
-		slog.DebugContext(ctx, "slug is available", slog.String("slug", cmd.Slug))
 		rootFolderID, err := uuid.NewV7()
 		if err != nil {
 			return errs.NewInternalGenerateID(err)
@@ -61,7 +58,6 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 		if err := workspaceRepo.Save(ctx, workspace); err != nil {
 			return err
 		}
-		slog.DebugContext(ctx, "workspace saved", slog.String("workspace_id", cmd.ID.String()))
 		if err := folderRepo.Save(ctx, rootFolder); err != nil {
 			return err
 		}
@@ -70,10 +66,6 @@ func (h *CreateWorkspaceHandler) Handle(ctx context.Context, cmd *CreateWorkspac
 		//	This is a cross-service side effect inside uow.Execute.
 		//	If the auth call succeeds and the DB commit later fails, note and authorization will diverge.
 		//	Trigger it after commit or via an outbox/after-commit hook instead.
-		slog.DebugContext(
-			ctx, "root folder saved",
-			slog.String("folder_id", rootFolderID.String()),
-		)
 		return h.authorizationSvc.CreateWorkspaceWithOwner(ctx, cmd.OwnerID, workspace.ID())
 	})
 }

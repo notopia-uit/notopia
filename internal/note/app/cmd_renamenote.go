@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
@@ -44,12 +43,6 @@ func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
 		//	uow.Execute(...) now wraps HasWorkspaceItemPermission(...).
 		//	If that check goes over gRPC/HTTP, the DB transaction stays open while waiting on another service, which extends lock time and turns transient auth latency into write-path contention.
 		//	Do the permission check before opening the write transaction, then load and rename the note inside the transaction.
-		slog.DebugContext(
-			ctx, "checking permission",
-			slog.String("user_id", cmd.UserID),
-			slog.String("workspace_id", workspaceID.String()),
-			slog.String("permission", "write"),
-		)
 		hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionWrite)
 		if err != nil {
 			return err
@@ -59,11 +52,6 @@ func (h *RenameNoteHandler) Handle(ctx context.Context, cmd *RenameNote) error {
 				fmt.Sprintf("user %s does not have permission to rename note %s", cmd.UserID, cmd.ID),
 			)
 		}
-		slog.DebugContext(
-			ctx, "permission granted",
-			slog.String("user_id", cmd.UserID),
-			slog.String("note_id", cmd.ID.String()),
-		)
 		note, err := noteRepo.GetByID(ctx, cmd.ID, true)
 		if err != nil {
 			return err
