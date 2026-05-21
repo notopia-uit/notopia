@@ -3,7 +3,6 @@ package identity
 import (
 	"log/slog"
 	"net/http"
-	"time"
 )
 
 type AuthentikLogRoundTripper struct {
@@ -14,20 +13,13 @@ type AuthentikLogRoundTripper struct {
 var _ http.RoundTripper = (*AuthentikLogRoundTripper)(nil)
 
 func (l *AuthentikLogRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	start := time.Now()
 	resp, err := l.next.RoundTrip(req)
-	duration := time.Since(start)
-	statusCode := 0
-	if resp != nil {
-		statusCode = resp.StatusCode
-	}
 	l.logger.InfoContext(
 		req.Context(),
 		"Request to Authentik API completed",
 		slog.String("method", req.Method),
 		slog.String("url", req.URL.String()),
-		slog.Int("status_code", statusCode),
-		slog.Duration("latency", duration),
+		slog.Int("status_code", resp.StatusCode),
 		slog.Any("error", err),
 	)
 
