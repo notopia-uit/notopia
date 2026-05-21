@@ -1533,6 +1533,43 @@ export type ChangeWorkspaceSlugResponses = {
 
 export type ChangeWorkspaceSlugResponse = ChangeWorkspaceSlugResponses[keyof ChangeWorkspaceSlugResponses];
 
+export type EmptyTrashData = {
+    body?: never;
+    path: {
+        workspaceId: NoteId3;
+    };
+    query?: never;
+    url: '/note/workspaces/{workspaceId}/empty-trash';
+};
+
+export type EmptyTrashErrors = {
+    /**
+     * Bad Request Error response
+     */
+    400: NoteError;
+    /**
+     * Unauthorized Error response
+     */
+    401: {
+        [key: string]: unknown;
+    };
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type EmptyTrashError = EmptyTrashErrors[keyof EmptyTrashErrors];
+
+export type EmptyTrashResponses = {
+    /**
+     * Workspace items successfully moved
+     */
+    204: void;
+};
+
+export type EmptyTrashResponse = EmptyTrashResponses[keyof EmptyTrashResponses];
+
 export type GetWorkspaceEventsData = {
     body?: never;
     path: {

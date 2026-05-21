@@ -32,6 +32,7 @@ type Cmds struct {
 	DeleteFolder                    PermanentlyDeleteFolderCmd
 	DeleteNote                      PermanentlyDeleteNoteCmd
 	DeleteWorkspace                 DeleteWorkspaceCmd
+	EmptyTrash                      EmptyTrashCmd
 	LeaveWorkspace                  LeaveWorkspaceCmd
 	MoveWorkspaceItems              MoveWorkspaceItemsCmd
 	PermanentlyDeleteWorkspaceItems PermanentlyDeleteWorkspaceItemsCmd
@@ -54,6 +55,7 @@ func NewCmds(
 	createNoteHandler *CreateNoteHandler,
 	createWorkspaceHandler *CreateWorkspaceHandler,
 	deleteWorkspaceHandler *DeleteWorkspaceHandler,
+	emptyTrashHandler *EmptyTrashHandler,
 	leaveWorkspaceHandler *LeaveWorkspaceHandler,
 	moveWorkspaceItemsHandler *MoveWorkspaceItemsHandler,
 	permanentlyDeleteFolderHandler *PermanentlyDeleteFolderHandler,
@@ -77,6 +79,7 @@ func NewCmds(
 		CreateNote:                      commonhandler.DecorateCmd(hp, createNoteHandler),
 		CreateWorkspace:                 commonhandler.DecorateCmd(hp, createWorkspaceHandler),
 		DeleteWorkspace:                 commonhandler.DecorateCmd(hp, deleteWorkspaceHandler),
+		EmptyTrash:                      commonhandler.DecorateCmd(hp, emptyTrashHandler),
 		LeaveWorkspace:                  commonhandler.DecorateCmd(hp, leaveWorkspaceHandler),
 		MoveWorkspaceItems:              commonhandler.DecorateCmd(hp, moveWorkspaceItemsHandler),
 		DeleteFolder:                    commonhandler.DecorateCmd(hp, permanentlyDeleteFolderHandler),

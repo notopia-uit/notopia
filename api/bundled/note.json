@@ -9636,6 +9636,46 @@
         }
       }
     },
+    "/note/workspaces/{workspaceId}/empty-trash": {
+      "delete": {
+        "security": [
+          {
+            "Oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "OIDC": [
+              "openid"
+            ]
+          }
+        ],
+        "tags": [
+          "Workspace"
+        ],
+        "summary": "Empty trash",
+        "operationId": "emptyTrash",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/workspaceIdPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Workspace items successfully moved"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/note/workspaces/{workspaceId}/events": {
       "get": {
         "security": [
