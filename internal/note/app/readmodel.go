@@ -73,6 +73,7 @@ type GetWorkspaceTreeReadModelParams struct {
 	RootFolderID   uuid.UUID
 	IncludeTrashed bool
 	Depth          uint
+	Sort           GetWorkspaceTreeSort
 }
 
 type GetWorkspaceTreeReadModel interface {

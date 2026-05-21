@@ -2114,6 +2114,11 @@ export type GetWorkspaceTreeData = {
         rootFolderId?: NoteId;
         includeTrashed?: boolean;
         depth?: number;
+        sort?: {
+            name?: 'asc' | 'desc';
+            createdAt?: 'asc' | 'desc';
+            updatedAt?: 'asc' | 'desc';
+        };
     };
     url: '/note/workspaces/{workspaceId}/tree';
 };

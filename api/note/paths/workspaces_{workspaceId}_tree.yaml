@@ -28,6 +28,32 @@ get:
       schema:
         type: integer
         minimum: 1
+    - name: sort
+      in: query
+      required: false
+      style: deepObject
+      explode: true
+      schema:
+        type: object
+        x-go-type-name: WorkspaceTreeSort
+        properties:
+          # I have tried to add nullable for name, but AI said there is a problem
+          #  The original nullable.Nullable approach would have given us exactly the semantics you want — 3 states: absent (default asc), explicit asc/
+          #  desc, and null (opt out). But it cannot work because the deepObject runtime treats nullable.Nullable (a map type) as a nested object
+          #  container, not a leaf value — the value is silently discarded before your handler ever sees it.
+          name:
+            type: string
+            enum: [asc, desc]
+            example: asc
+            default: asc
+          createdAt:
+            type: string
+            enum: [asc, desc]
+            example: asc
+          updatedAt:
+            type: string
+            enum: [asc, desc]
+            example: asc
   responses:
     200:
       description: OK

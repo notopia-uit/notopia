@@ -458,12 +458,38 @@ func (h *StrictHandler) GetWorkspaceTree(
 		rootFolderID = *request.Params.RootFolderId
 	}
 
+	sortQuery := app.GetWorkspaceTreeSort{
+		Name:      app.SortOrderAsc,
+		CreatedAt: app.SortOrderUnspecified,
+		UpdatedAt: app.SortOrderUnspecified,
+	}
+	if request.Params.Sort != nil {
+		if request.Params.Sort.Name != nil && *request.Params.Sort.Name == note.GetWorkspaceTreeParamsSortNameDesc {
+			sortQuery.Name = app.SortOrderDesc
+		}
+		if request.Params.Sort.CreatedAt != nil {
+			if *request.Params.Sort.CreatedAt == note.GetWorkspaceTreeParamsSortCreatedAtDesc {
+				sortQuery.CreatedAt = app.SortOrderDesc
+			} else {
+				sortQuery.CreatedAt = app.SortOrderAsc
+			}
+		}
+		if request.Params.Sort.UpdatedAt != nil {
+			if *request.Params.Sort.UpdatedAt == note.Desc {
+				sortQuery.UpdatedAt = app.SortOrderDesc
+			} else {
+				sortQuery.UpdatedAt = app.SortOrderAsc
+			}
+		}
+	}
+
 	query := &app.GetWorkspaceTree{
 		WorkspaceID:    request.WorkspaceId,
 		RootFolderID:   rootFolderID,
 		IncludeTrashed: request.Params.IncludeTrashed != nil && *request.Params.IncludeTrashed,
 		Depth:          depth,
 		UserID:         user.ID,
+		Sort:           sortQuery,
 	}
 
 	result, err := h.App.Queries.GetWorkspaceTree.Handle(ctx, query)
