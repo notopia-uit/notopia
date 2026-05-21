@@ -1,17 +1,16 @@
 'use client';
 
 import { getWorkspaceGraphOptions, NoteGraph } from '@notopia-uit/api-gen';
-import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
-import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
-import { GraphData, GraphNode, GraphLink, D3Config } from '@notopia-uit/ui/graph-view/graph';
-import Graph from '@notopia-uit/ui/graph-view/graph';
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-
-import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { GraphSettingsDialog } from '@notopia-uit/ui/components/graph-settings-dialog';
 import { Icons } from '@notopia-uit/ui/components/icons';
+import { Button } from '@notopia-uit/ui/components/shadcn/button';
+import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { GraphData, GraphNode, GraphLink, D3Config } from '@notopia-uit/ui/graph-view/graph';
+import Graph from '@notopia-uit/ui/graph-view/graph';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 const defaultGlobalGraphSettings: Partial<D3Config> = {
   drag: true,
@@ -51,9 +50,7 @@ export function mapDtoNoteData(dto: NoteGraph): GraphData {
 export default function GraphView({ workspaceId }: { workspaceId: string }) {
   const { retry } = useQueryErrorHandler();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [graphSettings, setGraphSettings] = useState<Partial<D3Config>>(
-    defaultGlobalGraphSettings
-  );
+  const [graphSettings, setGraphSettings] = useState<Partial<D3Config>>(defaultGlobalGraphSettings);
 
   const {
     data: graphData = { nodes: [], links: [] },
@@ -89,7 +86,7 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
   }
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative h-full w-full">
       <Graph
         data={graphData}
         options={{
@@ -103,7 +100,7 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
           onClick={() => setIsSettingsOpen(true)}
           aria-label="Graph settings"
         >
-          <Icons.Settings className="size-4  mr-2" />
+          <Icons.Settings className="mr-2 size-4" />
           Settings
         </Button>
       </div>

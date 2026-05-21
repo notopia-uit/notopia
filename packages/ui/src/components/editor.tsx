@@ -7,7 +7,8 @@ import '@blocknote/shadcn/style.css';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useHocuspocusProvider } from '@hocuspocus/provider-react';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { EditorCore } from './editor-core';
@@ -23,6 +24,24 @@ import { SuccessAlert } from './success-alert';
 export default function Editor({ noteId, workspaceId }: { noteId: string; workspaceId?: string }) {
   const { data: sessionData } = authClient.useSession();
   const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
+  const [isAwarenessReady, setIsAwarenessReady] = useState(false);
+  const provider = useHocuspocusProvider();
+
+  const sessionUser = useMemo(
+    () => ({
+      name: sessionData?.user?.name ?? 'Anonymous',
+      color: getDeterministicColor(sessionData?.user?.id ?? 'anonymous'),
+      avatar: sessionData?.user?.image ?? 'https://placehold.net/default.svg',
+    }),
+    [sessionData?.user?.name, sessionData?.user?.id, sessionData?.user?.image]
+  );
+
+  useEffect(() => {
+    if (provider.awareness && sessionUser) {
+      provider.awareness.setLocalState(sessionUser);
+      setIsAwarenessReady(true);
+    }
+  }, [provider.awareness, sessionUser]);
 
   const { isModified, isCommitingDocument, alert, handleSave } = useEditorState(noteId);
 
@@ -38,12 +57,6 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const sessionUser = {
-    name: sessionData?.user?.name ?? 'Anonymous',
-    color: getDeterministicColor(sessionData?.user?.id ?? 'anonymous'),
-    avatar: sessionData?.user?.image ?? 'https://placehold.net/default.svg',
-  };
-
   return (
     <div className="relative min-h-screen">
       <EditorStatus />
@@ -53,7 +66,13 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
         currentEditor={undefined}
         onGraphOpen={() => setIsGraphModalOpen(true)}
       />
-      <EditorCore sessionUser={sessionUser} />
+      {isAwarenessReady ? (
+        <EditorCore sessionUser={sessionUser} />
+      ) : (
+        <div className="flex items-center justify-center h-96">
+          <Spinner />
+        </div>
+      )}
 
       {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
       {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
