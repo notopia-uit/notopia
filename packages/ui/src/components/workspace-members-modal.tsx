@@ -147,81 +147,81 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
               </div>
             ) : (
               filteredMembers.map((member) => (
-                <div
-                  key={member.id}
-                  className="hover:bg-muted/50 flex items-center justify-between gap-3 rounded-lg border p-3 transition-colors"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate font-medium">{member.name}</div>
-                  </div>
+                 <div
+                   key={member.id}
+                   className="hover:bg-muted/50 flex items-center justify-between gap-3 rounded-lg border p-3 transition-colors overflow-hidden"
+                 >
+                   <div className="min-w-0 flex-1">
+                     <div className="truncate font-medium">{member.name}</div>
+                   </div>
 
-                  {editingMemberId === member.id ? (
-                    <div className="flex items-center gap-2">
-                      <Select
-                        value={editingRole || member.role}
-                        onValueChange={(value: UserRole) => {
-                          setEditingRole(value);
-                          handleUpdateRole(member.id, value);
-                        }}
-                      >
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="owner">Owner</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="member">Member</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingMemberId(null);
-                          setEditingRole(null);
-                        }}
-                      >
-                        Done
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary">
-                        {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
-                      </Badge>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingMemberId(member.id);
-                          setEditingRole(member.role);
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => {
-                          handleDeleteMember(member.id);
-                          showAlert(
-                            'success',
-                            'Member Removed',
-                            'The member has been removed from the workspace.'
-                          );
-                        }}
-                        disabled={isUpdating}
-                      >
-                        {isUpdating ? (
-                          <Spinner className="size-4" />
-                        ) : (
-                          <Trash2 className="size-4" />
-                        )}
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                   {editingMemberId === member.id ? (
+                     <div className="flex items-center gap-2 flex-shrink-0">
+                       <Select
+                         value={editingRole || member.role}
+                         onValueChange={(value: UserRole) => {
+                           setEditingRole(value);
+                           handleUpdateRole(member.id, value);
+                         }}
+                       >
+                         <SelectTrigger className="w-28">
+                           <SelectValue />
+                         </SelectTrigger>
+                         <SelectContent>
+                           <SelectItem value="owner">Owner</SelectItem>
+                           <SelectItem value="admin">Admin</SelectItem>
+                           <SelectItem value="member">Member</SelectItem>
+                         </SelectContent>
+                       </Select>
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         onClick={() => {
+                           setEditingMemberId(null);
+                           setEditingRole(null);
+                         }}
+                       >
+                         Done
+                       </Button>
+                     </div>
+                   ) : (
+                     <div className="flex items-center gap-2 flex-shrink-0">
+                       <Badge variant="secondary">
+                         {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
+                       </Badge>
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         onClick={() => {
+                           setEditingMemberId(member.id);
+                           setEditingRole(member.role);
+                         }}
+                       >
+                         Edit
+                       </Button>
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                         onClick={() => {
+                           handleDeleteMember(member.id);
+                           showAlert(
+                             'success',
+                             'Member Removed',
+                             'The member has been removed from the workspace.'
+                           );
+                         }}
+                         disabled={isUpdating}
+                       >
+                         {isUpdating ? (
+                           <Spinner className="size-4" />
+                         ) : (
+                           <Trash2 className="size-4" />
+                         )}
+                       </Button>
+                     </div>
+                   )}
+                 </div>
               ))
             )}
           </div>
