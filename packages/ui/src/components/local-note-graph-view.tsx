@@ -10,6 +10,7 @@ import Graph from '@notopia-uit/ui/graph-view/graph';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const defaultLocalGraphSettings: Partial<D3Config> = {
@@ -49,10 +50,12 @@ export function mapDtoNoteData(dto: NoteGraph): GraphData {
 
 interface LocalNoteGraphViewProps {
   noteId: string;
+  workspaceId?: string;
 }
 
-export default function LocalNoteGraphView({ noteId }: LocalNoteGraphViewProps) {
+export default function LocalNoteGraphView({ noteId, workspaceId }: LocalNoteGraphViewProps) {
   const { retry } = useQueryErrorHandler();
+  const router = useRouter();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [graphSettings, setGraphSettings] = useState<Partial<D3Config>>(
     defaultLocalGraphSettings
@@ -72,6 +75,13 @@ export default function LocalNoteGraphView({ noteId }: LocalNoteGraphViewProps) 
 
   const handleSaveSettings = (settings: Partial<D3Config>) => {
     setGraphSettings(settings);
+  };
+
+  const handleNodeClick = (clickedNodeId: string, nodeType: 'note' | 'tag') => {
+    // Only navigate for notes
+    if (nodeType === 'note' && workspaceId) {
+      router.push(`/workspace/${workspaceId}/note/${clickedNodeId}/`);
+    }
   };
 
   if (isPending) {
@@ -103,6 +113,7 @@ export default function LocalNoteGraphView({ noteId }: LocalNoteGraphViewProps) 
         options={{
           localGraph: graphSettings,
         }}
+        onNodeClick={handleNodeClick}
       />
       <div className="absolute top-4 right-4 z-10">
         <Button

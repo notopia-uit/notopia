@@ -75,7 +75,8 @@ export async function renderGraph(
   graph: HTMLElement,
   currentSlug: string,
   graphData: any,
-  config: Partial<D3Config>
+  config: Partial<D3Config>,
+  onNodeClick?: (nodeId: string, nodeType: 'note' | 'tag') => void
 ): Promise<() => void> {
   const visited = getVisited();
   removeAllChildren(graph);
@@ -595,7 +596,10 @@ export async function renderGraph(
             const node = processedGraphData.nodes.find(
               (n) => n.id === event.subject.id
             ) as NodeData;
-            // Handle node click - you can customize this
+            // Handle node click - only trigger for notes, not tags
+            if (node && node.type === 'note' && onNodeClick) {
+              onNodeClick(node.id, node.type);
+            }
             addToVisited(node.id);
             console.log('Node clicked:', node.id);
           }
@@ -604,6 +608,10 @@ export async function renderGraph(
   } else {
     for (const node of nodeRenderData) {
       node.gfx.on('click', () => {
+        // Handle node click - only trigger for notes, not tags
+        if (node.simulationData.type === 'note' && onNodeClick) {
+          onNodeClick(node.simulationData.id, node.simulationData.type);
+        }
         addToVisited(node.simulationData.id);
         console.log('Node clicked:', node.simulationData.id);
       });

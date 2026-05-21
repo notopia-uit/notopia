@@ -32,6 +32,7 @@ interface GraphProps {
   currentSlug?: string;
   options?: Partial<GraphOptions>;
   className?: string;
+  onNodeClick?: (nodeId: string, nodeType: 'note' | 'tag') => void;
 }
 
 export interface GraphNode {
@@ -84,7 +85,7 @@ const defaultOptions: GraphOptions = {
   },
 };
 
-export default function Graph({ data, currentSlug = '', options, className = '' }: GraphProps) {
+export default function Graph({ data, currentSlug = '', options, className = '', onNodeClick }: GraphProps) {
   const localGraphRef = useRef<HTMLDivElement>(null);
   const globalGraphRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
@@ -94,7 +95,7 @@ export default function Graph({ data, currentSlug = '', options, className = '' 
 
   useEffect(() => {
     if (localGraphRef.current) {
-      renderGraph(localGraphRef.current, currentSlug, data, localGraph).then((cleanup) => {
+      renderGraph(localGraphRef.current, currentSlug, data, localGraph, onNodeClick).then((cleanup) => {
         cleanupRef.current = cleanup;
       });
     }
@@ -104,7 +105,7 @@ export default function Graph({ data, currentSlug = '', options, className = '' 
         cleanupRef.current();
       }
     };
-  }, [data, currentSlug, localGraph]);
+  }, [data, currentSlug, localGraph, onNodeClick]);
 
   const handleGlobalGraphToggle = () => {
     const globalOuter = document.querySelector('.global-graph-outer');
