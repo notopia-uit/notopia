@@ -37,6 +37,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 import { ErrorAlert } from './error-alert';
+import { RoleSelectItems } from './role-select-items';
 import { SuccessAlert } from './success-alert';
 
 type UserRole = (typeof NoteWorkspaceRole)[keyof typeof NoteWorkspaceRole];
@@ -318,27 +319,25 @@ const WorkspaceSwitcher = () => {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor={`role-${workspace.id}`}>Your Role</Label>
-                          <Select
-                            value={editForm.userRole || 'member'}
-                            onValueChange={(value: UserRole) =>
-                              setEditForm({
-                                ...editForm,
-                                userRole: value,
-                              })
-                            }
-                          >
-                            <SelectTrigger
-                              id={`role-${workspace.id}`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="owner">Owner</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
-                              <SelectItem value="member">Member</SelectItem>
-                            </SelectContent>
-                          </Select>
+                           <Select
+                             value={editForm.userRole || 'editor'}
+                             onValueChange={(value: UserRole) =>
+                               setEditForm({
+                                 ...editForm,
+                                 userRole: value,
+                               })
+                             }
+                           >
+                             <SelectTrigger
+                               id={`role-${workspace.id}`}
+                               onClick={(e) => e.stopPropagation()}
+                             >
+                               <SelectValue />
+                             </SelectTrigger>
+                             <SelectContent>
+                               <RoleSelectItems />
+                             </SelectContent>
+                           </Select>
                         </div>
                       </div>
                     </div>
@@ -478,24 +477,22 @@ const WorkspaceSwitcher = () => {
                           }
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="new-role">Initial Role</Label>
-                        <Select
-                          value={editForm.userRole || 'owner'}
-                          onValueChange={(value: UserRole) =>
-                            setEditForm({ ...editForm, userRole: value })
-                          }
-                        >
-                          <SelectTrigger id="new-role">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="owner">Owner</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="member">Member</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="new-role">Initial Role</Label>
+                         <Select
+                           value={editForm.userRole || 'owner'}
+                           onValueChange={(value: UserRole) =>
+                             setEditForm({ ...editForm, userRole: value })
+                           }
+                         >
+                           <SelectTrigger id="new-role">
+                             <SelectValue />
+                           </SelectTrigger>
+                           <SelectContent>
+                             <RoleSelectItems />
+                           </SelectContent>
+                         </Select>
+                       </div>
                     </div>
                   </div>
                 </CardContent>

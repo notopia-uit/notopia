@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './shadcn/dialog';
+import { RoleSelectItems } from './role-select-items';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './shadcn/select';
 import { SuccessAlert } from './success-alert';
 
@@ -155,24 +156,22 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
                     <div className="truncate font-medium">{member.name}</div>
                   </div>
 
-                  {editingMemberId === member.id ? (
-                    <div className="flex flex-shrink-0 items-center gap-2">
-                      <Select
-                        value={editingRole || member.role}
-                        onValueChange={(value: UserRole) => {
-                          setEditingRole(value);
-                          handleUpdateRole(member.id, value);
-                        }}
-                      >
-                        <SelectTrigger className="w-28">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="owner">Owner</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="viewer">Viewer</SelectItem>
-                        </SelectContent>
-                      </Select>
+                   {editingMemberId === member.id ? (
+                     <div className="flex flex-shrink-0 items-center gap-2">
+                       <Select
+                         value={editingRole || member.role}
+                         onValueChange={(value: UserRole) => {
+                           setEditingRole(value);
+                           handleUpdateRole(member.id, value);
+                         }}
+                       >
+                         <SelectTrigger className="w-28">
+                           <SelectValue />
+                         </SelectTrigger>
+                         <SelectContent>
+                           <RoleSelectItems />
+                         </SelectContent>
+                       </Select>
                       <Button
                         variant="ghost"
                         size="sm"
