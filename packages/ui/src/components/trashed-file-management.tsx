@@ -133,25 +133,25 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
   }, [trashedData]);
 
   const { alert, showAlert } = useAlert();
-  const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
-    {
-      onSuccess: async (_, variables) => {
-        const { noteIds, folderIds } = variables.body;
-        queryClient.setQueryData<TrashedDataDto>(
-          showTrashOptions({ path: { workspaceId } }).queryKey,
-          (oldData) => {
-            if (!oldData) return oldData;
-            return {
-              ...oldData,
-              notes:
-                oldData.notes?.filter((note) => (noteIds ? noteIds : []).includes(note.id)) || [],
-              folders:
-                oldData.folders?.filter((folder) =>
-                  (folderIds ? folderIds : []).includes(folder.id)
-                ) || [],
-            };
-          }
-        );
+   const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
+     {
+       onSuccess: async (_, variables) => {
+         const { noteIds, folderIds } = variables.body;
+         queryClient.setQueryData<TrashedDataDto>(
+           showTrashOptions({ path: { workspaceId } }).queryKey,
+           (oldData) => {
+             if (!oldData) return oldData;
+             return {
+               ...oldData,
+               notes:
+                 oldData.notes?.filter((note) => !(noteIds ? noteIds : []).includes(note.id)) || [],
+               folders:
+                 oldData.folders?.filter((folder) =>
+                   !(folderIds ? folderIds : []).includes(folder.id)
+                 ) || [],
+             };
+           }
+         );
 
         setSelectedItems(new Set());
         await queryClient.invalidateQueries({
@@ -173,24 +173,24 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       },
     }
   );
-  const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
-    onSuccess: async (_, variables) => {
-      const { noteIds, folderIds } = variables.body;
-      queryClient.setQueryData<TrashedDataDto>(
-        showTrashOptions({ path: { workspaceId } }).queryKey,
-        (oldData) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            notes:
-              oldData.notes?.filter((note) => (noteIds ? noteIds : []).includes(note.id)) || [],
-            folders:
-              oldData.folders?.filter((folder) =>
-                (folderIds ? folderIds : []).includes(folder.id)
-              ) || [],
-          };
-        }
-      );
+   const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
+     onSuccess: async (_, variables) => {
+       const { noteIds, folderIds } = variables.body;
+       queryClient.setQueryData<TrashedDataDto>(
+         showTrashOptions({ path: { workspaceId } }).queryKey,
+         (oldData) => {
+           if (!oldData) return oldData;
+           return {
+             ...oldData,
+             notes:
+               oldData.notes?.filter((note) => !(noteIds ? noteIds : []).includes(note.id)) || [],
+             folders:
+               oldData.folders?.filter((folder) =>
+                 !(folderIds ? folderIds : []).includes(folder.id)
+               ) || [],
+           };
+         }
+       );
       await queryClient.invalidateQueries({
         queryKey: getWorkspaceTreeOptions({ path: { workspaceId } }).queryKey,
       });
