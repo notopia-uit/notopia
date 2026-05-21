@@ -82,4 +82,11 @@ async function run() {
   console.log('Transformation completed.');
 }
 
-run().catch(console.error);
+if (require.main === module) {
+  try {
+    void run();
+  } catch (error) {
+    console.error('Error during transformation:', error);
+    process.exit(1);
+  }
+}

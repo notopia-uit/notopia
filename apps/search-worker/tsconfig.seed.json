@@ -9,7 +9,7 @@
     "rootDir": "seed",
     "outDir": "out-tsc/seed",
     "paths": {
-      "*": ["./src/*"]
+      "#/*": ["./src/*"]
     }
   },
   "include": ["seed/**/*", "../../packages/lib-server/src/block-note/types.d.ts"],

@@ -5,13 +5,13 @@ import { Meilisearch } from 'meilisearch';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
-import { BLOCKNOTE_SCHEMA } from 'token';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppConfig, MeiliConfig } from './config';
 import { APP_CONFIG, MEILI_CONFIG, appConfig, kafkaConfig, meiliConfig } from './config.factory';
 import { validate } from './env.validation';
+import { BLOCKNOTE_SCHEMA } from './token';
 
 @Module({
   imports: [
