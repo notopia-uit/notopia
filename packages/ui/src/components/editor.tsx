@@ -7,6 +7,7 @@ import '@blocknote/shadcn/style.css';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
 import { useHocuspocusProvider } from '@hocuspocus/provider-react';
 
@@ -15,14 +16,13 @@ import { EditorCore } from './editor-core';
 import { EditorToolbar } from './editor-toolbar';
 import { ErrorAlert } from './error-alert';
 import { Icons } from './icons';
-import { NoteGraphModal } from './note-graph-modal';
 import { NoteTitle } from './note-title';
 import { Button } from './shadcn/button';
 import { SuccessAlert } from './success-alert';
 
 export default function Editor({ noteId, workspaceId }: { noteId: string; workspaceId?: string }) {
   const { data: sessionData } = authClient.useSession();
-  const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
+  const router = useRouter();
   const [isAwarenessReady, setIsAwarenessReady] = useState(false);
   const provider = useHocuspocusProvider();
 
@@ -48,13 +48,13 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
         e.preventDefault();
-        setIsGraphModalOpen(true);
+        router.push(`/workspace/${workspaceId}/note/${noteId}/graph`);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [router, workspaceId, noteId]);
 
   return (
     <div className="relative min-h-screen">
@@ -62,7 +62,6 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
       <EditorToolbar
         noteId={noteId}
         currentEditor={undefined}
-        onGraphOpen={() => setIsGraphModalOpen(true)}
       />
       {isAwarenessReady ? (
         <EditorCore sessionUser={sessionUser} />
@@ -86,11 +85,6 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
           )}
         </div>
       )}
-      <NoteGraphModal
-        isOpen={isGraphModalOpen}
-        onOpenChange={setIsGraphModalOpen}
-        noteId={noteId}
-      />
     </div>
   );
 }
