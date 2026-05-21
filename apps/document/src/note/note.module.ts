@@ -1,5 +1,4 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFile } from 'fs/promises';
 
 import { loadFileDescriptorSetFromBuffer } from '@grpc/proto-loader';
 import { Module } from '@nestjs/common';
@@ -18,18 +17,20 @@ import { NoteService } from './note.service';
         name: NOTE_PACKAGE_NAME,
         imports: [ConfigModule],
         inject: [ConfigService],
-        useFactory: (configService: ConfigService) => {
+        useFactory: async (configService: ConfigService) => {
           const servicesCfg = configService.get<ServicesConfig>(SERVICE_CONFIG);
           if (!servicesCfg) {
             throw new Error('SERVICE_CONFIG not found');
           }
+          const binaryBuffer = await readFile('proto/build.bin');
+          const packageDefinition = loadFileDescriptorSetFromBuffer(binaryBuffer, {
+            keepCase: false,
+          });
           return {
             transport: Transport.GRPC,
             options: {
               package: NOTE_PACKAGE_NAME,
-              packageDefinition: loadFileDescriptorSetFromBuffer(
-                readFileSync(join(__dirname, 'proto/build.bin'))
-              ),
+              packageDefinition: packageDefinition,
               url: servicesCfg.noteUrl,
               gracefulShutdown: true,
             },

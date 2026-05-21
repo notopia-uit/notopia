@@ -8,6 +8,7 @@
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import type { handleUnaryCall, Metadata, UntypedServiceImplementation } from "@grpc/grpc-js";
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
+import { wrappers } from "protobufjs";
 import { Observable } from "rxjs";
 import { Timestamp } from "./google/protobuf/timestamp";
 
@@ -22,7 +23,7 @@ export enum TrashedBy {
 
 export interface Trashed {
   by: TrashedBy;
-  at: Timestamp | undefined;
+  at: Date | undefined;
 }
 
 export interface Note {
@@ -31,7 +32,7 @@ export interface Note {
   icon?: string | undefined;
   folderId: string;
   tags: string[];
-  updatedAt: Timestamp | undefined;
+  updatedAt: Date | undefined;
   trashed?: Trashed | undefined;
 }
 
@@ -70,6 +71,15 @@ export interface GetWorkspaceByNoteResponse {
 
 export const NOTE_PACKAGE_NAME = "note";
 
+wrappers[".google.protobuf.Timestamp"] = {
+  fromObject(value: Date) {
+    return { seconds: value.getTime() / 1000, nanos: (value.getTime() % 1000) * 1e6 };
+  },
+  toObject(message: { seconds: number; nanos: number }) {
+    return new Date(message.seconds * 1000 + message.nanos / 1e6);
+  },
+} as any;
+
 function createBaseTrashed(): Trashed {
   return { by: 0, at: undefined };
 }
@@ -80,7 +90,7 @@ export const Trashed: MessageFns<Trashed> = {
       writer.uint32(8).int32(message.by);
     }
     if (message.at !== undefined) {
-      Timestamp.encode(message.at, writer.uint32(18).fork()).join();
+      Timestamp.encode(toTimestamp(message.at), writer.uint32(18).fork()).join();
     }
     return writer;
   },
@@ -105,7 +115,7 @@ export const Trashed: MessageFns<Trashed> = {
             break;
           }
 
-          message.at = Timestamp.decode(reader, reader.uint32());
+          message.at = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
       }
@@ -140,7 +150,7 @@ export const Note: MessageFns<Note> = {
       writer.uint32(42).string(v!);
     }
     if (message.updatedAt !== undefined) {
-      Timestamp.encode(message.updatedAt, writer.uint32(50).fork()).join();
+      Timestamp.encode(toTimestamp(message.updatedAt), writer.uint32(50).fork()).join();
     }
     if (message.trashed !== undefined) {
       Trashed.encode(message.trashed, writer.uint32(58).fork()).join();
@@ -200,7 +210,7 @@ export const Note: MessageFns<Note> = {
             break;
           }
 
-          message.updatedAt = Timestamp.decode(reader, reader.uint32());
+          message.updatedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
         case 7: {
@@ -626,6 +636,18 @@ export interface NoteServiceServer extends UntypedServiceImplementation {
   getNote: handleUnaryCall<GetNoteRequest, GetNoteResponse>;
   /** NOTE: what, where is this used? */
   getWorkspaceByNote: handleUnaryCall<GetWorkspaceByNoteRequest, GetWorkspaceByNoteResponse>;
+}
+
+function toTimestamp(date: Date): Timestamp {
+  const seconds = Math.trunc(date.getTime() / 1_000);
+  const nanos = (date.getTime() % 1_000) * 1_000_000;
+  return { seconds, nanos };
+}
+
+function fromTimestamp(t: Timestamp): Date {
+  let millis = (t.seconds || 0) * 1_000;
+  millis += (t.nanos || 0) / 1_000_000;
+  return new globalThis.Date(millis);
 }
 
 export interface MessageFns<T> {

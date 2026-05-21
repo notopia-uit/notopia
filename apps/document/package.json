@@ -49,15 +49,16 @@
     "nestjs-pino": "catalog:",
     "pino-http": "catalog:",
     "pino-pretty": "catalog:",
+    "protobufjs": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
-    "zod": "catalog:",
     "tslib": "catalog:",
     "typeorm": "catalog:",
     "ws": "catalog:",
-    "yjs": "catalog:"
+    "yjs": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",

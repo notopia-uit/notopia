@@ -1,16 +1,15 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFile } from 'fs/promises';
 
+import { loadFileDescriptorSetFromBuffer } from '@grpc/proto-loader';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { loadFileDescriptorSetFromBuffer } from '@grpc/proto-loader';
 import { AUTHORIZATION_PACKAGE_NAME } from '@notopia-uit/pb/authorization';
 
 import { ServicesConfig } from '#/config';
 import { SERVICE_CONFIG } from '#/config';
-import { NoteModule } from '../note/note.module';
 
+import { NoteModule } from '../note/note.module';
 import { AuthorizationService } from './authorization.service';
 
 @Module({
@@ -20,18 +19,20 @@ import { AuthorizationService } from './authorization.service';
         name: AUTHORIZATION_PACKAGE_NAME,
         imports: [ConfigModule],
         inject: [ConfigService],
-        useFactory: (configService: ConfigService) => {
+        useFactory: async (configService: ConfigService) => {
           const servicesCfg = configService.get<ServicesConfig>(SERVICE_CONFIG);
           if (!servicesCfg) {
             throw new Error('SERVICE_CONFIG not found');
           }
+          const binaryBuffer = await readFile('proto/build.bin');
+          const packageDefinition = loadFileDescriptorSetFromBuffer(binaryBuffer, {
+            keepCase: false,
+          });
           return {
             transport: Transport.GRPC,
             options: {
               package: AUTHORIZATION_PACKAGE_NAME,
-              packageDefinition: loadFileDescriptorSetFromBuffer(
-                readFileSync(join(__dirname, 'proto/build.bin'))
-              ),
+              packageDefinition: packageDefinition,
               url: servicesCfg.authorizationUrl,
               gracefulShutdown: true,
             },
