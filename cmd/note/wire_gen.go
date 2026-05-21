@@ -196,10 +196,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspaceBySlug := pgreadmodel.NewWorkspaceBySlug(queries)
 	getWorkspaceBySlugHandler := app.NewGetWorkspaceBySlugHandler(authorization, workspaceBySlug)
 	authentik := &configConfig.Authentik
-	identityAuthentik := identity.NewAuthentik(authentik)
+	identityAuthentik := identity.NewAuthentik(authentik, logger)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(identityAuthentik, authorization)
 	meilisearch := &configConfig.Meilisearch
-	searchMeilisearch := search.NewMeilisearch(meilisearch)
+	searchMeilisearch := search.NewMeilisearch(meilisearch, logger)
 	getWorkspaceSearchTokenHandler := app.NewGetWorkspaceSearchTokenHandler(authorization, searchMeilisearch)
 	workspaceTree := pgreadmodel.NewWorkspaceTree(queries)
 	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(authorization, workspaceTree)

@@ -2,6 +2,7 @@ package identity
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -22,6 +23,7 @@ type Authentik struct {
 
 func NewAuthentik(
 	cfg *commonconfig.Authentik,
+	logger *slog.Logger,
 ) *Authentik {
 	authentikCfg := api.NewConfiguration()
 	authentikCfg.Host = cfg.Host
@@ -31,13 +33,18 @@ func NewAuthentik(
 			URL: cfg.URL,
 		},
 	}
+	otelTransport := otelhttp.NewTransport(
+		http.DefaultTransport,
+		otelhttp.WithSpanOptions(trace.WithAttributes(
+			semconv.ServicePeerName("authentik"),
+		)),
+	)
+	logTransport := &AuthentikLogRoundTripper{
+		next:   otelTransport,
+		logger: logger,
+	}
 	authentikCfg.HTTPClient = &http.Client{
-		Transport: otelhttp.NewTransport(
-			http.DefaultTransport,
-			otelhttp.WithSpanOptions(trace.WithAttributes(
-				semconv.ServicePeerName("authentik"),
-			)),
-		),
+		Transport: logTransport,
 	}
 	client := api.NewAPIClient(authentikCfg)
 	return &Authentik{

@@ -2,6 +2,7 @@ package search
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -24,14 +25,22 @@ type Meilisearch struct {
 
 var _ app.SearchSvc = (*Meilisearch)(nil)
 
-func NewMeilisearch(cfg *config.Meilisearch) *Meilisearch {
+func NewMeilisearch(
+	cfg *config.Meilisearch,
+	logger *slog.Logger,
+) *Meilisearch {
+	otelTransport := otelhttp.NewTransport(
+		http.DefaultTransport,
+		otelhttp.WithSpanOptions(trace.WithAttributes(
+			semconv.ServicePeerName("meilisearch"),
+		)),
+	)
+	logTransport := &MeilisearchLogRoundTripper{
+		next:   otelTransport,
+		logger: logger,
+	}
 	httpClient := &http.Client{
-		Transport: otelhttp.NewTransport(
-			http.DefaultTransport,
-			otelhttp.WithSpanOptions(trace.WithAttributes(
-				semconv.ServicePeerName("meilisearch"),
-			)),
-		),
+		Transport: logTransport,
 	}
 	client := meilisearch.New(
 		cfg.Host,
