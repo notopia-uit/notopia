@@ -10,6 +10,7 @@ import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
 import { useHocuspocusProvider } from '@hocuspocus/provider-react';
+import { S3StorageProvider } from '@notopia-uit/ui/contexts/s3-storage-context';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { EditorCore } from './editor-core';
@@ -55,31 +56,39 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
   }, [router, workspaceId, noteId]);
 
   return (
-    <div className="relative min-h-screen">
-      <NoteTitle noteId={noteId} workspaceId={workspaceId} />
-      <EditorToolbar
-        noteId={noteId}
-        currentEditor={undefined}
-      />
-      {isAwarenessReady ? (
-        <EditorCore sessionUser={sessionUser} />
-      ) : (
-        <div className="flex items-center justify-center h-96">
-          <Spinner />
-        </div>
-      )}
-
-      {isModified && (
-        <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">
-          {isCommitingDocument ? (
+    <S3StorageProvider
+      endpoint={process.env.NEXT_PUBLIC_RUSTFS_ENDPOINT || ''}
+      bucket={process.env.NEXT_PUBLIC_RUSTFS_BUCKET || ''}
+      region={process.env.NEXT_PUBLIC_RUSTFS_REGION || ''}
+      accessKeyId={process.env.RUSTFS_ACCESS_KEY || ''}
+      secretAccessKey={process.env.RUSTFS_SECRET_KEY || ''}
+    >
+      <div className="relative min-h-screen">
+        <NoteTitle noteId={noteId} workspaceId={workspaceId} />
+        <EditorToolbar
+          noteId={noteId}
+          currentEditor={undefined}
+        />
+        {isAwarenessReady ? (
+          <EditorCore sessionUser={sessionUser} />
+        ) : (
+          <div className="flex items-center justify-center h-96">
             <Spinner />
-          ) : (
-            <Button variant="outline" size="icon" aria-label="save" onClick={handleSave}>
-              <Icons.Save />
-            </Button>
-          )}
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+
+        {isModified && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">
+            {isCommitingDocument ? (
+              <Spinner />
+            ) : (
+              <Button variant="outline" size="icon" aria-label="save" onClick={handleSave}>
+                <Icons.Save />
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </S3StorageProvider>
   );
 }
