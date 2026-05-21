@@ -28,8 +28,8 @@ import {
 } from '@notopia-uit/ui/components/shadcn/select';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
-import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
@@ -93,7 +93,7 @@ const WorkspaceSwitcher = () => {
     const workspace = workspaces.find((w) => w.id === workspaceId);
     if (workspace && editingId !== workspaceId) {
       setSelectedId(workspaceId);
-      router.push(`/workspace/${workspace.slug}`);
+      router.push(`/workspace/${workspaceId}`);
     }
   };
 
@@ -242,15 +242,15 @@ const WorkspaceSwitcher = () => {
         <RadioGroup value={selectedId} onValueChange={handleSelectWorkspace}>
           <div className="space-y-3">
             {workspaces.map((workspace) => (
-              <Card
-                key={workspace.id}
-                className={cn(
-                  'cursor-pointer gap-0 p-0 transition-colors',
-                  selectedId === workspace.id && editingId !== workspace.id && `border-primary`,
-                  editingId === workspace.id && 'border-primary'
-                )}
-                onClick={() => editingId !== workspace.id && setSelectedId(workspace.id)}
-              >
+               <Card
+                 key={workspace.id}
+                 className={cn(
+                   'cursor-pointer gap-0 p-0 transition-colors',
+                   selectedId === workspace.id && editingId !== workspace.id && `border-primary`,
+                   editingId === workspace.id && 'border-primary'
+                 )}
+                 onClick={() => editingId !== workspace.id && handleSelectWorkspace(workspace.id)}
+               >
                 <CardContent className="p-4">
                   {editingId === workspace.id ? (
                     <div className="space-y-4">
