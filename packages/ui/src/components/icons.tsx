@@ -1,4 +1,4 @@
-import { LucideIcon, LucideProps, NotepadTextDashedIcon, SaveIcon } from 'lucide-react';
+import { LucideIcon, LucideProps, NotepadTextDashedIcon, SaveIcon, SettingsIcon } from 'lucide-react';
 
 export type Icon = LucideIcon;
 
@@ -23,4 +23,5 @@ export const Icons = {
     </svg>
   ),
   Save: SaveIcon,
+  Settings: SettingsIcon,
 };
