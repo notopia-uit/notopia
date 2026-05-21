@@ -8,11 +8,18 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
+type GetWorkspaceTreeSort struct {
+	Name      SortOrder
+	CreatedAt SortOrder
+	UpdatedAt SortOrder
+}
+
 type GetWorkspaceTree struct {
 	WorkspaceID    uuid.UUID
 	RootFolderID   uuid.UUID
 	IncludeTrashed bool
 	Depth          uint
+	Sort           GetWorkspaceTreeSort
 
 	UserID string
 }
@@ -54,6 +61,7 @@ func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspac
 		RootFolderID:   query.RootFolderID,
 		IncludeTrashed: query.IncludeTrashed,
 		Depth:          query.Depth,
+		Sort:           query.Sort,
 	})
 	if err != nil {
 		return WorkspaceTreeFolder{}, err

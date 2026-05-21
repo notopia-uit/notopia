@@ -6,6 +6,7 @@ package note
 import (
 	"time"
 
+	"github.com/oapi-codegen/nullable"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
@@ -161,6 +162,60 @@ func (e WorkspaceSlugChangedEventEvent) Valid() bool {
 	}
 }
 
+// Defines values for GetWorkspaceTreeParamsSortCreatedAt.
+const (
+	GetWorkspaceTreeParamsSortCreatedAtAsc  GetWorkspaceTreeParamsSortCreatedAt = "asc"
+	GetWorkspaceTreeParamsSortCreatedAtDesc GetWorkspaceTreeParamsSortCreatedAt = "desc"
+)
+
+// Valid indicates whether the value is a known member of the GetWorkspaceTreeParamsSortCreatedAt enum.
+func (e GetWorkspaceTreeParamsSortCreatedAt) Valid() bool {
+	switch e {
+	case GetWorkspaceTreeParamsSortCreatedAtAsc:
+		return true
+	case GetWorkspaceTreeParamsSortCreatedAtDesc:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GetWorkspaceTreeParamsSortName.
+const (
+	GetWorkspaceTreeParamsSortNameAsc  GetWorkspaceTreeParamsSortName = "asc"
+	GetWorkspaceTreeParamsSortNameDesc GetWorkspaceTreeParamsSortName = "desc"
+)
+
+// Valid indicates whether the value is a known member of the GetWorkspaceTreeParamsSortName enum.
+func (e GetWorkspaceTreeParamsSortName) Valid() bool {
+	switch e {
+	case GetWorkspaceTreeParamsSortNameAsc:
+		return true
+	case GetWorkspaceTreeParamsSortNameDesc:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GetWorkspaceTreeParamsSortUpdatedAt.
+const (
+	Asc  GetWorkspaceTreeParamsSortUpdatedAt = "asc"
+	Desc GetWorkspaceTreeParamsSortUpdatedAt = "desc"
+)
+
+// Valid indicates whether the value is a known member of the GetWorkspaceTreeParamsSortUpdatedAt enum.
+func (e GetWorkspaceTreeParamsSortUpdatedAt) Valid() bool {
+	switch e {
+	case Asc:
+		return true
+	case Desc:
+		return true
+	default:
+		return false
+	}
+}
+
 // Error defines model for Error.
 type Error struct {
 	// Code Error code
@@ -175,13 +230,13 @@ type Error struct {
 
 // Folder defines model for Folder.
 type Folder struct {
-	Icon        *string             `json:"icon"`
-	Id          *openapi_types.UUID `json:"id,omitempty"`
-	Name        string              `json:"name"`
-	ParentId    *openapi_types.UUID `json:"parentId"`
-	Trashed     *FolderTrashed      `json:"trashed,omitempty"`
-	UpdatedAt   *time.Time          `json:"updatedAt,omitempty"`
-	WorkspaceId openapi_types.UUID  `json:"workspaceId"`
+	Icon        nullable.Nullable[string]             `json:"icon"`
+	Id          *openapi_types.UUID                   `json:"id,omitempty"`
+	Name        string                                `json:"name"`
+	ParentId    nullable.Nullable[openapi_types.UUID] `json:"parentId"`
+	Trashed     nullable.Nullable[FolderTrashed]      `json:"trashed,omitempty"`
+	UpdatedAt   *time.Time                            `json:"updatedAt,omitempty"`
+	WorkspaceId openapi_types.UUID                    `json:"workspaceId"`
 }
 
 // FolderTrashed defines model for .
@@ -232,15 +287,15 @@ type HeartBeatWorkspaceEventEvent string
 
 // Note defines model for Note.
 type Note struct {
-	FolderId openapi_types.UUID  `json:"folderId"`
-	Icon     *string             `json:"icon"`
-	Id       *openapi_types.UUID `json:"id,omitempty"`
+	FolderId openapi_types.UUID        `json:"folderId"`
+	Icon     nullable.Nullable[string] `json:"icon"`
+	Id       *openapi_types.UUID       `json:"id,omitempty"`
 
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
-	Name      string       `json:"name"`
-	Tags      *[]string    `json:"tags,omitempty"`
-	Trashed   *NoteTrashed `json:"trashed,omitempty"`
-	UpdatedAt *time.Time   `json:"updatedAt,omitempty"`
+	Name      string                         `json:"name"`
+	Tags      *[]string                      `json:"tags,omitempty"`
+	Trashed   nullable.Nullable[NoteTrashed] `json:"trashed,omitempty"`
+	UpdatedAt *time.Time                     `json:"updatedAt,omitempty"`
 }
 
 // NoteTrashed defines model for .
@@ -251,8 +306,8 @@ type NoteTrashed struct {
 
 // NoteLink defines model for NoteLink.
 type NoteLink struct {
-	Icon *Icon `json:"icon"`
-	Id   *Id2  `json:"id,omitempty"`
+	Icon nullable.Nullable[Icon] `json:"icon"`
+	Id   *Id2                    `json:"id,omitempty"`
 
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name Name2 `json:"name"`
@@ -338,8 +393,8 @@ type WorkspaceMember struct {
 	Id Id4 `json:"id"`
 
 	// Name Full name from Authentik
-	Name *Name4        `json:"name,omitempty"`
-	Role WorkspaceRole `json:"role"`
+	Name nullable.Nullable[Name4] `json:"name,omitempty"`
+	Role WorkspaceRole            `json:"role"`
 }
 
 // WorkspaceMembersUpdatedEvent defines model for WorkspaceMembersUpdatedEvent.
@@ -394,18 +449,18 @@ type WorkspaceSlugChangedEventEvent string
 
 // WorkspaceTreeFolder defines model for WorkspaceTreeFolder.
 type WorkspaceTreeFolder struct {
-	Children  []WorkspaceTreeFolder `json:"children"`
-	Icon      *Icon2                `json:"icon"`
-	Id        *Id                   `json:"id,omitempty"`
-	Name      Name                  `json:"name"`
-	Notes     []WorkspaceTreeNote   `json:"notes"`
-	UpdatedAt *UpdatedAt2           `json:"updatedAt,omitempty"`
+	Children  []WorkspaceTreeFolder    `json:"children"`
+	Icon      nullable.Nullable[Icon2] `json:"icon"`
+	Id        *Id                      `json:"id,omitempty"`
+	Name      Name                     `json:"name"`
+	Notes     []WorkspaceTreeNote      `json:"notes"`
+	UpdatedAt *UpdatedAt2              `json:"updatedAt,omitempty"`
 }
 
 // WorkspaceTreeNote defines model for WorkspaceTreeNote.
 type WorkspaceTreeNote struct {
-	Icon *Icon `json:"icon"`
-	Id   *Id2  `json:"id,omitempty"`
+	Icon nullable.Nullable[Icon] `json:"icon"`
+	Id   *Id2                    `json:"id,omitempty"`
 
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name      Name2      `json:"name"`
@@ -572,9 +627,26 @@ type TrashWorkspaceItemsJSONBody struct {
 
 // GetWorkspaceTreeParams defines parameters for GetWorkspaceTree.
 type GetWorkspaceTreeParams struct {
-	RootFolderId   *Id   `form:"rootFolderId,omitempty" json:"rootFolderId,omitempty"`
-	IncludeTrashed *bool `form:"includeTrashed,omitempty" json:"includeTrashed,omitempty"`
-	Depth          *int  `form:"depth,omitempty" json:"depth,omitempty"`
+	RootFolderId   *Id                `form:"rootFolderId,omitempty" json:"rootFolderId,omitempty"`
+	IncludeTrashed *bool              `form:"includeTrashed,omitempty" json:"includeTrashed,omitempty"`
+	Depth          *int               `form:"depth,omitempty" json:"depth,omitempty"`
+	Sort           *WorkspaceTreeSort `json:"sort,omitempty"`
+}
+
+// GetWorkspaceTreeParamsSortCreatedAt defines parameters for GetWorkspaceTree.
+type GetWorkspaceTreeParamsSortCreatedAt string
+
+// GetWorkspaceTreeParamsSortName defines parameters for GetWorkspaceTree.
+type GetWorkspaceTreeParamsSortName string
+
+// GetWorkspaceTreeParamsSortUpdatedAt defines parameters for GetWorkspaceTree.
+type GetWorkspaceTreeParamsSortUpdatedAt string
+
+// WorkspaceTreeSort defines parameters for GetWorkspaceTree.
+type WorkspaceTreeSort struct {
+	CreatedAt *GetWorkspaceTreeParamsSortCreatedAt `json:"createdAt,omitempty"`
+	Name      *GetWorkspaceTreeParamsSortName      `json:"name,omitempty"`
+	UpdatedAt *GetWorkspaceTreeParamsSortUpdatedAt `json:"updatedAt,omitempty"`
 }
 
 // CreateFolderJSONRequestBody defines body for CreateFolder for application/json ContentType.

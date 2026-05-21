@@ -23,10 +23,7 @@ func (h *StrictHandler) CreateNote(
 	if err != nil {
 		return nil, errs.NewInternalGenerateID(err)
 	}
-	var icon string
-	if request.Body.Icon != nil {
-		icon = *request.Body.Icon
-	}
+	icon, _ := request.Body.Icon.Get()
 
 	cmd := &app.CreateNote{
 		ID:       id,

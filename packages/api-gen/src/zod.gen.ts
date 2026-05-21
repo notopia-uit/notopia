@@ -874,7 +874,12 @@ export const zGetWorkspaceTreePath = z.object({
 export const zGetWorkspaceTreeQuery = z.object({
     rootFolderId: zNoteId.optional(),
     includeTrashed: z.boolean().optional().default(false),
-    depth: z.int().gte(1).optional()
+    depth: z.int().gte(1).optional(),
+    sort: z.object({
+        name: z.enum(['asc', 'desc']).optional().default('asc'),
+        createdAt: z.enum(['asc', 'desc']).optional(),
+        updatedAt: z.enum(['asc', 'desc']).optional()
+    }).optional()
 });
 
 /**

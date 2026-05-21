@@ -5,4 +5,4 @@ generate:
   strict-server: true
 output: ../../pkg/api/note/server.gen.go
 output-options:
-  nullable-type: false
+  nullable-type: true

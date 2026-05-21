@@ -7,6 +7,14 @@ import (
 	"github.com/google/uuid"
 )
 
+type SortOrder uint8
+
+const (
+	SortOrderUnspecified SortOrder = iota
+	SortOrderAsc
+	SortOrderDesc
+)
+
 type PaginationParams struct {
 	Page  int
 	Limit int

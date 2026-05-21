@@ -7,12 +7,15 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
+	"github.com/oapi-codegen/nullable"
 )
 
 func toNoteDTO(n *app.Note) (note.Note, error) {
-	var icon *string
+	var icon nullable.Nullable[string]
 	if n.Icon != "" {
-		icon = &n.Icon
+		icon.Set(n.Icon)
+	} else {
+		icon.SetNull()
 	}
 
 	var tags *[]string
@@ -20,16 +23,16 @@ func toNoteDTO(n *app.Note) (note.Note, error) {
 		tags = &n.Tags
 	}
 
-	var trashed *note.NoteTrashed
+	var trashed nullable.Nullable[note.NoteTrashed]
 	if n.Trashed.IsTrashed() {
 		trashedBy, err := toTrashedByDTO(n.Trashed.By)
 		if err != nil {
 			return note.Note{}, fmt.Errorf("invalid trashed by: %v", err)
 		}
-		trashed = &note.NoteTrashed{
+		trashed.Set(note.NoteTrashed{
 			By: trashedBy,
 			At: n.Trashed.At,
-		}
+		})
 	}
 
 	return note.Note{
@@ -44,26 +47,30 @@ func toNoteDTO(n *app.Note) (note.Note, error) {
 }
 
 func toFolderDTO(f *app.Folder) (note.Folder, error) {
-	var icon *string
+	var icon nullable.Nullable[string]
 	if f.Icon != "" {
-		icon = &f.Icon
+		icon.Set(f.Icon)
+	} else {
+		icon.SetNull()
 	}
 
-	var parentID *uuid.UUID
+	var parentID nullable.Nullable[uuid.UUID]
 	if f.ParentID != uuid.Nil {
-		parentID = &f.ParentID
+		parentID.Set(f.ParentID)
+	} else {
+		parentID.SetNull()
 	}
 
-	var trashed *note.FolderTrashed
+	var trashed nullable.Nullable[note.FolderTrashed]
 	if f.Trashed.IsTrashed() {
 		trashedBy, err := toTrashedByDTO(f.Trashed.By)
 		if err != nil {
 			return note.Folder{}, fmt.Errorf("invalid trashed by: %v", err)
 		}
-		trashed = &note.FolderTrashed{
+		trashed.Set(note.FolderTrashed{
 			By: trashedBy,
 			At: f.Trashed.At,
-		}
+		})
 	}
 
 	return note.Folder{
@@ -112,9 +119,11 @@ func toUserWorkspaceDTO(u *app.UserWorkspace) (note.UserWorkspace, error) {
 }
 
 func toWorkspaceMemberDTO(m *app.WorkspaceMember) (note.WorkspaceMember, error) {
-	var name *string
+	var name nullable.Nullable[string]
 	if m.Name != "" {
-		name = &m.Name
+		name.Set(m.Name)
+	} else {
+		name.SetNull()
 	}
 	role, err := toWorkspaceRoleDTO(m.Role)
 	if err != nil {
@@ -141,9 +150,11 @@ func toWorkspaceMembersDTO(members []app.WorkspaceMember) ([]note.WorkspaceMembe
 }
 
 func toWorkspaceTreeNoteDTO(n *app.WorkspaceTreeNote) note.WorkspaceTreeNote {
-	var icon *string
+	var icon nullable.Nullable[note.Icon]
 	if n.Icon != "" {
-		icon = &n.Icon
+		icon.Set(n.Icon)
+	} else {
+		icon.SetNull()
 	}
 	return note.WorkspaceTreeNote{
 		Id:        &n.ID,
@@ -154,9 +165,11 @@ func toWorkspaceTreeNoteDTO(n *app.WorkspaceTreeNote) note.WorkspaceTreeNote {
 }
 
 func toWorkspaceTreeFolderDTO(f *app.WorkspaceTreeFolder) note.WorkspaceTreeFolder {
-	var icon *string
+	var icon nullable.Nullable[note.Icon2]
 	if f.Icon != "" {
-		icon = &f.Icon
+		icon.Set(f.Icon)
+	} else {
+		icon.SetNull()
 	}
 	notes := make([]note.WorkspaceTreeNote, len(f.Notes))
 	for i := range f.Notes {
@@ -207,9 +220,11 @@ func toTrashedNoteDTO(n *app.TrashedNote) (note.TrashedNote, error) {
 }
 
 func toNoteLinkDTO(n *app.NoteLink) note.NoteLink {
-	var icon *string
+	var icon nullable.Nullable[note.Icon]
 	if n.Icon != "" {
-		icon = &n.Icon
+		icon.Set(n.Icon)
+	} else {
+		icon.SetNull()
 	}
 	return note.NoteLink{
 		Id:   &n.ID,
