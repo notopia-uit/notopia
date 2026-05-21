@@ -1,6 +1,5 @@
 import { MyEditor, filterSuggestionItems } from '@blocknote/core';
 import { DefaultReactSuggestionItem } from '@blocknote/react';
-import type { NoteNote } from '@notopia-uit/api-gen';
 import type { Meilisearch } from 'meilisearch';
 
 const getLocalDocumentTags = (editor: MyEditor): string[] => {

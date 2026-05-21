@@ -1,7 +1,6 @@
 'use client';
 
 import { DefaultReactSuggestionItem } from '@blocknote/react';
-import { useMemo } from 'react';
 
 export function createLoadingMenuItem(): DefaultReactSuggestionItem {
   return {
