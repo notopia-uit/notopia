@@ -6,7 +6,6 @@ api/common/**/*.yaml linguist-language=OASv3-yaml linguist-detectable
 api/event/**/*.yaml linguist-language=OASv3-yaml linguist-detectable
 api/document/**/*.yaml linguist-language=OASv3-yaml linguist-detectable
 api/note/**/*.yaml linguist-language=OASv3-yaml linguist-detectable
-api/bundled/*.json linguist-language=OASv3-json linguist-generated
 
 proto/**/*.proto linguist-detectable
 proto/buf/** linguist-vendored

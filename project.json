@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/nx/schemas/project-schema.json",
+  "name": "notopia",
+  "projectType": "application",
+  "targets": {
+    "test": {
+      "executor": "nx:noop"
+    },
+    "typecheck": {
+      "executor": "nx:noop"
+    }
+  }
+}

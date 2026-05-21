@@ -2,10 +2,10 @@ import type { MyBlock, MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Meilisearch, MeilisearchError } from 'meilisearch';
-import { NoteSearch } from 'model';
-import { BLOCKNOTE_SCHEMA } from 'token';
 
 import { MeiliError } from './errors';
+import { NoteSearch } from './model';
+import { BLOCKNOTE_SCHEMA } from './token';
 
 // TODO: Handle retry, reject, dedup? idempotent, log it out
 // Handle the meilisearch setting
