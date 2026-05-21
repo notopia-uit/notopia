@@ -16,13 +16,11 @@ import { formatDistanceToNow } from 'date-fns';
 import { History, RotateCcw, Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
-import { ErrorAlert } from './error-alert';
 import { Button } from './shadcn/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './shadcn/dialog';
 import { Input } from './shadcn/input';
 import { ScrollArea } from './shadcn/scroll-area';
 import { Spinner } from './shadcn/spinner';
-import { SuccessAlert } from './success-alert';
 
 interface Revision {
   id: string;
@@ -47,7 +45,7 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
   const [open, setOpen] = useState(false);
   const [selectedRevisionId, setSelectedRevisionId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const { alert, showAlert } = useAlert();
+  const { showAlert } = useAlert();
   const { retry } = useQueryErrorHandler();
 
   const {
@@ -112,22 +110,22 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
         blocks
       );
 
-      showAlert(
-        'success',
-        'Revision Applied',
-        `Successfully applied revision "${selectedRevisionData.name}" to your current note.`
-      );
+      showAlert({
+        type: 'success',
+        title: 'Revision Applied',
+        message: `Successfully applied revision "${selectedRevisionData.name}" to your current note.`,
+      });
       setOpen(false);
       setSelectedRevisionId(null);
       setSearchQuery('');
     } catch (error) {
-      showAlert(
-        'error',
-        'Failed to apply revision',
-        `An error occurred while applying the revision. ${
+      showAlert({
+        type: 'error',
+        title: 'Failed to apply revision',
+        message: `An error occurred while applying the revision. ${
           error instanceof Error ? error.message : 'Please try again.'
-        }`
-      );
+        }`,
+      });
     }
   };
 
@@ -282,11 +280,8 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
               </>
             )}
           </div>
-        </div>
-
-        {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
-        {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
-      </DialogContent>
-    </Dialog>
-  );
-}
+         </div>
+       </DialogContent>
+     </Dialog>
+   );
+ }

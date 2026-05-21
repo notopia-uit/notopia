@@ -15,7 +15,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Search, Trash2, Users } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
-import { ErrorAlert } from './error-alert';
+
 import {
   Dialog,
   DialogContent,
@@ -26,7 +26,7 @@ import {
 } from './shadcn/dialog';
 import { RoleSelectItems } from './role-select-items';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './shadcn/select';
-import { SuccessAlert } from './success-alert';
+
 
 type UserRole = (typeof NoteWorkspaceRole)[keyof typeof NoteWorkspaceRole];
 
@@ -47,7 +47,7 @@ function mapDtoToWorkspaceMembers(dto: NoteWorkspaceMember[]): WorkspaceMember[]
 //TODO: search functionality is currently client-side, we may want to move it server-side if we have a large number of members in a workspace. For now, it's fine since most workspaces will likely have a manageable number of members.
 function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient();
-  const { alert, showAlert } = useAlert();
+  const { showAlert } = useAlert();
 
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -73,10 +73,18 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
       });
       setEditingMemberId(null);
       setEditingRole(null);
-      showAlert('success', 'Member Updated', 'The member role has been updated successfully.');
+      showAlert({
+        type: 'success',
+        title: 'Member Updated',
+        message: 'The member role has been updated successfully.',
+      });
     },
     onError: (error) => {
-      showAlert('error', 'Update Failed', `Failed to update member. Error: ${error.message}`);
+      showAlert({
+        type: 'error',
+        title: 'Update Failed',
+        message: `Failed to update member. Error: ${error.message}`,
+      });
     },
   });
 
@@ -204,11 +212,11 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
                         className="text-destructive hover:text-destructive hover:bg-destructive/10"
                         onClick={() => {
                           handleDeleteMember(member.id);
-                          showAlert(
-                            'success',
-                            'Member Removed',
-                            'The member has been removed from the workspace.'
-                          );
+                          showAlert({
+                            type: 'success',
+                            title: 'Member Removed',
+                            message: 'The member has been removed from the workspace.',
+                          });
                         }}
                         disabled={isUpdating}
                       >
@@ -224,11 +232,6 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
               ))
             )}
           </div>
-
-          {alert?.type === 'success' && (
-            <SuccessAlert title={alert.title} message={alert.message} />
-          )}
-          {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
         </div>
       </DialogContent>
     </Dialog>

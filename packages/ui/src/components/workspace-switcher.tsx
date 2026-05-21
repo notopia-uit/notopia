@@ -36,9 +36,9 @@ import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-import { ErrorAlert } from './error-alert';
+
 import { RoleSelectItems } from './role-select-items';
-import { SuccessAlert } from './success-alert';
+
 
 type UserRole = (typeof NoteWorkspaceRole)[keyof typeof NoteWorkspaceRole];
 
@@ -88,7 +88,7 @@ const WorkspaceSwitcher = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editForm, setEditForm] = useState<Partial<UserWorkspace>>({});
 
-  const { alert, showAlert } = useAlert();
+  const { showAlert } = useAlert();
 
   const handleSelectWorkspace = (workspaceId: string) => {
     const workspace = workspaces.find((w) => w.id === workspaceId);
@@ -132,18 +132,10 @@ const WorkspaceSwitcher = () => {
       ]);
       setIsAddingNew(false);
       setEditForm({});
-      showAlert(
-        'success',
-        'Workspace Created',
-        `Your new workspace "${variables.body.name}" has been created successfully.`
-      );
+      showAlert({ type: 'success', title: 'Workspace Created', message: `Your new workspace "${variables.body.name}" has been created successfully.` });
     },
     onError: (error) => {
-      showAlert(
-        'error',
-        'Creation Failed',
-        `There was an error creating your workspace. Please try again. Error details: ${error.message}`
-      );
+      showAlert({ type: 'error', title: 'Creation Failed', message: `There was an error creating your workspace. Please try again. Error details: ${error.message}` });
     },
   });
 
@@ -163,18 +155,10 @@ const WorkspaceSwitcher = () => {
         );
         setEditingId(null);
         setEditForm({});
-        showAlert(
-          'success',
-          'Slug Updated',
-          `Workspace slug has been updated to "${variables.body.slug}".`
-        );
+        showAlert({ type: 'success', title: 'Slug Updated', message: `Workspace slug has been updated to "${variables.body.slug}".` });
       },
       onError: () => {
-        showAlert(
-          'error',
-          'Update Failed',
-          `There was an error updating the workspace slug. Please try again.`
-        );
+        showAlert({ type: 'error', title: 'Update Failed', message: `There was an error updating the workspace slug. Please try again.` });
       },
     }
   );
@@ -190,14 +174,10 @@ const WorkspaceSwitcher = () => {
       if (selectedId === variables.path.workspaceId) {
         setSelectedId(undefined);
       }
-      showAlert('success', 'Left Workspace', `You have left the workspace successfully.`);
+      showAlert({ type: 'success', title: 'Left Workspace', message: `You have left the workspace successfully.` });
     },
     onError: (error) => {
-      showAlert(
-        'error',
-        'Action Failed',
-        `There was an error leaving the workspace. Please try again. Error details: ${error.message}`
-      );
+      showAlert({ type: 'error', title: 'Action Failed', message: `There was an error leaving the workspace. Please try again. Error details: ${error.message}` });
     },
   });
   const startEditing = (workspace: UserWorkspace) => {
@@ -514,8 +494,6 @@ const WorkspaceSwitcher = () => {
             </CardContent>
           </Card>
         )}
-        {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
-        {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
       </div>
     </section>
   );

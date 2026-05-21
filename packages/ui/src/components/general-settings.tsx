@@ -1,6 +1,5 @@
 'use client';
 import { getMyWorkspacesOptions, useRenameWorkspaceMutation } from '@notopia-uit/api-gen';
-import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
@@ -8,7 +7,6 @@ import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Label } from '@notopia-uit/ui/components/shadcn/label';
 import { Separator } from '@notopia-uit/ui/components/shadcn/separator';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useQuery } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
@@ -51,22 +49,22 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
     }
   }, [allWorkspaceData, workspaceId]);
 
-  const { alert, showAlert } = useAlert();
+  const { showAlert } = useAlert();
 
   const { mutate: renameWorkspace, isPending: isRenaming } = useRenameWorkspaceMutation({
     onSuccess: (_, variables) => {
-      showAlert(
-        'success',
-        'Workspace Renamed',
-        `Workspace successfully renamed to "${variables.body.name}".`
-      );
+      showAlert({
+        type: 'success',
+        title: 'Workspace Renamed',
+        message: `Workspace successfully renamed to "${variables.body.name}".`,
+      });
     },
     onError: (error) => {
-      showAlert(
-        'error',
-        'Rename Failed',
-        `Failed to rename workspace. ${error instanceof Error ? error.message : 'Please try again.'}`
-      );
+      showAlert({
+        type: 'error',
+        title: 'Rename Failed',
+        message: `Failed to rename workspace. ${error instanceof Error ? error.message : 'Please try again.'}`,
+      });
     },
   });
   if (isPending) {
@@ -89,10 +87,6 @@ export function GeneralSettings({ workspaceId }: GeneralSettingsProps) {
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
-
-        {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
-
         <div className="space-y-2">
           <Label htmlFor="workspace-name">
             Workspace Name

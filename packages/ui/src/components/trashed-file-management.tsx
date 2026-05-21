@@ -31,9 +31,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Folder, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import React, { useMemo, useState, useRef } from 'react';
 
-import { ErrorAlert } from './error-alert';
-import { SuccessAlert } from './success-alert';
-
 interface TrashedBy {
   by: 'purpose' | 'parent';
   at: string;
@@ -132,7 +129,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     );
   }, [trashedData]);
 
-  const { alert, showAlert } = useAlert();
+  const { showAlert } = useAlert();
    const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
      {
        onSuccess: async (_, variables) => {
@@ -157,19 +154,19 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
         await queryClient.invalidateQueries({
           queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
         });
-        showAlert(
-          'success',
-          'Successfully Deleted',
-          `Selected items have been permanently deleted.`
-        );
+        showAlert({
+          type: 'success',
+          title: 'Successfully Deleted',
+          message: `Selected items have been permanently deleted.`,
+        });
       },
       onError: (error) => {
-        showAlert(
-          'error',
-          'Failed to Delete',
-          `An error occurred while trying to permanently delete the selected items. Please try again.
-          ${error instanceof Error ? error.message : ''}`
-        );
+        showAlert({
+          type: 'error',
+          title: 'Failed to Delete',
+          message: `An error occurred while trying to permanently delete the selected items. Please try again.
+          ${error instanceof Error ? error.message : ''}`,
+        });
       },
     }
   );
@@ -198,15 +195,19 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
         queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
       });
       setSelectedItems(new Set());
-      showAlert('success', 'Successfully Restored', `Selected items have been restored.`);
+      showAlert({
+        type: 'success',
+        title: 'Successfully Restored',
+        message: `Selected items have been restored.`,
+      });
     },
     onError: (error) => {
-      showAlert(
-        'error',
-        'Failed to Restore',
-        `An error occurred while trying to restore the selected items. Please try again.
-        ${error instanceof Error ? error.message : ''}`
-      );
+      showAlert({
+        type: 'error',
+        title: 'Failed to Restore',
+        message: `An error occurred while trying to restore the selected items. Please try again.
+        ${error instanceof Error ? error.message : ''}`,
+      });
     },
   });
   const toggleSelection = (id: string) => {
@@ -370,9 +371,6 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
             })}
           </TableBody>
         </Table>
-        {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
-
-        {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
       </div>
     </div>
   );

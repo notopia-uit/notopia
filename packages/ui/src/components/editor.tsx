@@ -14,11 +14,9 @@ import { useHocuspocusProvider } from '@hocuspocus/provider-react';
 import { getDeterministicColor } from './../lib/utils/color';
 import { EditorCore } from './editor-core';
 import { EditorToolbar } from './editor-toolbar';
-import { ErrorAlert } from './error-alert';
 import { Icons } from './icons';
 import { NoteTitle } from './note-title';
 import { Button } from './shadcn/button';
-import { SuccessAlert } from './success-alert';
 
 export default function Editor({ noteId, workspaceId }: { noteId: string; workspaceId?: string }) {
   const { data: sessionData } = authClient.useSession();
@@ -42,7 +40,7 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
     }
   }, [provider.awareness, sessionUser]);
 
-  const { isModified, isCommitingDocument, alert, handleSave } = useEditorState(noteId);
+  const { isModified, isCommitingDocument, handleSave } = useEditorState(noteId);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -70,9 +68,6 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
           <Spinner />
         </div>
       )}
-
-      {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
-      {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
 
       {isModified && (
         <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">

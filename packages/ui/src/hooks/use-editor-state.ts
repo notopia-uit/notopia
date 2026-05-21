@@ -7,7 +7,7 @@ import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 
 export const useEditorState = (noteId: string) => {
   const provider = useHocuspocusProvider();
-  const { alert, showAlert } = useAlert();
+  const { showAlert } = useAlert();
 
   const { isModified, setModified } = useIsDocModified(
     provider.document,
@@ -17,20 +17,20 @@ export const useEditorState = (noteId: string) => {
   const { mutate: commitDocument, isPending: isCommitingDocument } = useCommitDocumentMutation({
     onSuccess: (responses) => {
       setModified(false);
-      showAlert(
-        'success',
-        'Document committed successfully!',
-        `Your note ${responses.id} changes were committed.`
-      );
+      showAlert({
+        type: 'success',
+        title: 'Document committed successfully!',
+        message: `Your note ${responses.id} changes were committed.`,
+      });
     },
     onError: (error) => {
-      showAlert(
-        'error',
-        'Failed to commit document',
-        `An error occurred while committing your note changes. ${
+      showAlert({
+        type: 'error',
+        title: 'Failed to commit document',
+        message: `An error occurred while committing your note changes. ${
           error instanceof Error ? error.message : 'Please try again.'
-        }`
-      );
+        }`,
+      });
     },
   });
 
@@ -45,7 +45,6 @@ export const useEditorState = (noteId: string) => {
   return {
     isModified,
     isCommitingDocument,
-    alert,
     handleSave,
   };
 };
