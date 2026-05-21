@@ -1,8 +1,11 @@
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import swc from 'unplugin-swc';
-import { defineProject } from 'vitest/config';
+import { defineConfig } from 'vitest/config';
 
-export default defineProject({
+export default defineConfig({
+  resolve: {
+    tsconfigPaths: true,
+  },
   root: __dirname,
   plugins: [
     nxViteTsPaths(),
@@ -17,5 +20,6 @@ export default defineProject({
     globals: true,
     environment: 'node',
     include: ['{src,tests,database}/**/*.{test,spec}.{ts,tsx}'],
+    watch: false,
   },
 });

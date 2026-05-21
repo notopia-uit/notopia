@@ -3,6 +3,9 @@ import CtrfReporter from '@d2t/vitest-ctrf-json-reporter';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: {
+    tsconfigPaths: true,
+  },
   test: {
     watch: false,
     projects: ['apps/document'],
