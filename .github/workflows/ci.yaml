@@ -98,6 +98,8 @@ on:
 env:
   MISE_OVERRIDE_CONFIG_FILENAMES: .mise.ci.toml
   NX_PARALLEL: 3
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 concurrency:
   group: ${{ github.ref == 'refs/heads/main' && format('{0}-{1}', github.workflow, github.ref) || github.run_id }}
@@ -253,16 +255,43 @@ jobs:
         run: |
           nx-cache-action -- \
           pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
-            --target lint \
             --target format:check \
             --target gen \
+            --target typecheck \
+            --target lint \
             --target bundle \
             --target build \
-            --target test \
-            --target typecheck \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
+
+      # We need to exclude those vitest project that we will run by workspace
+      - name: Nx test
+        env:
+          NX_CACHE_ACTION_SKIP_UPLOAD_CACHE: ${{ steps.setup-vars.outputs.NX_CACHE_ACTION_SKIP_UPLOAD_CACHE }}
+        run: |
+          nx-cache-action -- \
+          pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
+            --target test \
+            --target upload-codecov \
+            --exclude document \
+            --parallel=${{env.NX_PARALLEL }} \
+            --configuration 'production' \
+            ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
+
+      - name: Publish Test Report
+        uses: ctrf-io/github-test-reporter@v1
+        if: always()
+        with:
+          report-path: "./coverage/**/ctrf.json"
+          github-report: true
+          summary-delta-report: true
+          insights-report: true
+          flaky-rate-report: true
+          fail-rate-report: true
+          slowest-report: true
+          upload-artifact: true
+          pull-request-report: true
 
       - name: Check for changes after Build/Gen
         run: |
@@ -275,7 +304,6 @@ jobs:
 
       - name: Nx Deploy Page
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NX_CACHE_ACTION_SKIP_UPLOAD_CACHE: ${{ steps.setup-vars.outputs.NX_CACHE_ACTION_SKIP_UPLOAD_CACHE }}
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
@@ -297,7 +325,6 @@ jobs:
       - name: Nx Release
         if: ${{ steps.setup-vars.outputs.SHOULD_RELEASE == 'true' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILDX_BUILDER: ${{ steps.setup-buildx.outputs.name }}
           DOCKER_BUILDKIT: 1
           NX_CACHE_ACTION_SKIP_UPLOAD_CACHE: ${{ steps.setup-vars.outputs.NX_CACHE_ACTION_SKIP_UPLOAD_CACHE }}

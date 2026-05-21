@@ -38,7 +38,14 @@
           "args": ["--node-env=production"]
         },
         "doctor": {}
-      }
+      },
+      "dependsOn": [
+        "^build",
+        {
+          "target": "build",
+          "projects": ["proto"]
+        }
+      ]
     },
     "run": {
       "continuous": true,
@@ -51,7 +58,7 @@
       },
       "configurations": {
         "development": {
-          "watch": false
+          "watch": true
         }
       }
     },

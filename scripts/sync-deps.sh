@@ -18,13 +18,17 @@ CHANGED_FILES=$(git diff --name-only "$PREV_HEAD" "$NEW_HEAD")
 PNPM_SYNC=false
 GO_SYNC=false
 MISE_SYNC=false
+BUF_SYNC=false
+SKILLS_SYNC=false
 
 if echo "$CHANGED_FILES" | grep -q "pnpm-lock.yaml"; then PNPM_SYNC=true; fi
 if echo "$CHANGED_FILES" | grep -q "go.sum"; then GO_SYNC=true; fi
 if echo "$CHANGED_FILES" | grep -qE ".*mise.*\.toml"; then MISE_SYNC=true; fi
+if echo "$CHANGED_FILES" | grep -qE "buf.lock"; then BUF_SYNC=true; fi
+if echo "$CHANGED_FILES" | grep -qE "skills-lock.json"; then SKILLS_SYNC=true; fi
 
 # Exit early if nothing to do
-if ! $PNPM_SYNC && ! $GO_SYNC && ! $MISE_SYNC; then
+if ! $PNPM_SYNC && ! $GO_SYNC && ! $MISE_SYNC && ! $BUF_SYNC && ! $SKILLS_SYNC; then
   exit 0
 fi
 
@@ -55,6 +59,16 @@ fi
 if [ "$GO_SYNC" = true ]; then
   echo "🐹 go mod download..."
   go mod download
+fi
+
+if [ "$BUF_SYNC" = true ]; then
+  echo "🧱 buf dep update..."
+  buf dep update
+fi
+
+if [ "$SKILLS_SYNC" = true ]; then
+  echo "🤖 skills sync..."
+  skills experimental_install
 fi
 
 echo "✅ Environment synced."

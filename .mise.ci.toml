@@ -8,6 +8,7 @@ MISE_EXPERIMENTAL = 1
 '_'.path.paths = ["./bin/", "./scripts/"]
 
 [tools]
+"pipx:codecov-cli" = "11.2.8"
 "github:pressly/goose" = "3.27.1"
 "go:github.com/goforj/wire/cmd/wire" = "1.2.0"
 "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.7.0"
@@ -17,6 +18,13 @@ java = "26.0.1"
 "npm:@kevinnitro/nx-cache-action" = "0.1.0"
 mockery = "3.7.0"
 d2 = "0.7.1"
+python = "3.13.12"
+uv = "0.11.15"
+gotestsum = "1.13.0"
+"go:github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter" = "0.1.0"
+protoc-gen-go = "1.36.11"
+protoc-gen-go-grpc = "1.6.2"
+"npm:ts-proto" = "2.11.8"
 
 [tools."http:plantuml"]
 version = "1.2026.2"

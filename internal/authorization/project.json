@@ -4,18 +4,9 @@
   "projectType": "library",
   "tags": ["scope:library", "type:go"],
   "namedInputs": {
-    "default": ["{projectRoot}/**/*.go", "{projectRoot}/model.conf", "!{projectRoot}/_test.go"],
-    "test": ["{projectRoot}/**/*_test.go", "{projectRoot}/**/*.csv"]
+    "default": ["{projectRoot}/**/*.go", "{projectRoot}/model.conf", "!{projectRoot}/_test.go"]
   },
   "targets": {
-    "test": {
-      "executor": "nx:run-commands",
-      "inputs": ["default", "test"],
-      "options": {
-        "command": "go test -v -covermode=atomic ./...",
-        "cwd": "{projectRoot}"
-      }
-    },
     "gen:mockery": {
       "executor": "nx:run-commands",
       "inputs": ["default"],

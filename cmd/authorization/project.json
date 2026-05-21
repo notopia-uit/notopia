@@ -9,6 +9,11 @@
       "goFiles",
       "{workspaceRoot}/api/**/*.go",
       "{workspaceRoot}/internal/authorization/**/*.go"
+    ],
+    "test": [
+      "{projectRoot}/**/*_test.go",
+      "{workspaceRoot}/internal/authorization/**/*_test.go",
+      "{workspaceRoot}/internal/authorization/**/*.csv"
     ]
   },
   "targets": {
@@ -92,7 +97,27 @@
     "nx-release-publish": {
       "parallelism": false
     },
-    "test": {}
+    "test": {
+      "executor": "nx:run-commands",
+      "inputs": ["default", "test"],
+      "outputs": ["{workspaceRoot}/coverage/authorization"],
+      "options": {
+        "command": "./test.sh",
+        "cwd": "{projectRoot}"
+      },
+      "configurations": {
+        "production": {
+          "command": "./test.sh --production"
+        }
+      }
+    },
+    "upload-codecov": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "codecov --disable-telem upload-process --disable-search --file ./coverage/authorization/coverage.out --flag authorization"
+      },
+      "dependsOn": ["test"]
+    }
   },
   "implicitDependencies": ["pkg", "internal/authorization"],
   "release": {

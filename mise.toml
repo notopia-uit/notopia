@@ -24,6 +24,11 @@ mockery = "3.7.0"
 d2 = "0.7.1"
 "npm:@tailwindcss/language-server" = "0.14.29"
 "npm:skills" = "latest"
+gotestsum = "1.13.0"
+"go:github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter" = "0.1.0"
+protoc-gen-go = "1.36.11"
+protoc-gen-go-grpc = "1.6.2"
+"npm:ts-proto" = "2.11.8"
 
 [tools."http:plantuml"]
 version = "1.2026.2"

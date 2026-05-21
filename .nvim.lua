@@ -375,17 +375,16 @@ lsp.config("harper_ls", {
 } --[[@as vim.lsp.Config]])
 
 lsp.enable({
+  "bashls",
   "buf_ls",
   "ecfg",
   "emmet_language_server",
   "gh_actions_ls",
   "golangci_lint_ls",
   "gopls",
-  -- "harper_ls",
   "jsonls",
   "jsonls",
   "lua_ls",
-  -- "nestjs_doctor",
   "nxls",
   "oxfmt",
   "oxlint",
@@ -395,6 +394,8 @@ lsp.enable({
   "twcssls",
   "yamlls",
   "yamlls",
+  -- "harper_ls",
+  -- "nestjs_doctor",
 })
 
 map("n", "<localleader>b", function()

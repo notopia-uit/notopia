@@ -2,6 +2,10 @@
 
 <div align="center">
 
+  <a href="https://codecov.io/gh/notopia-uit/notopia">
+    <img alt="Codecov" src="https://img.shields.io/codecov/c/github/notopia-uit/notopia"/>
+  </a>
+
 | Service           |                                                                                          Quality Gate                                                                                          |                                                                                      Bugs                                                                                      |                                                                                         Code Smells                                                                                          |                                                                                          Maintainability                                                                                          |
 | :---------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | **Note**          |          [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=notopia-uit_note)          |          [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=bugs)](https://sonarcloud.io/summary/new_code?id=notopia-uit_note)          |          [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=notopia-uit_note)          |          [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=notopia-uit_note&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=notopia-uit_note)          |
@@ -49,6 +53,7 @@
 - [ ] gin should be protected with `SetTrustedProxies`
 - [ ] Event is tracked by either otel or correlation id. But, currently use wotel + kafka tracer, and partially correlation id but not really connected.
 - [ ] If deploy, but not using roles. Change to `https://github.com/agilezebra/jwt-middleware`, and use istio
+- [ ] Revision endpoints aren't protected with authorization
 
 ### Both
 
@@ -57,4 +62,3 @@
 - [ ] Those NestJS logging, we need to find a better way to wrap those controller log. NestJS Pino only http? not microservice.
       And guess that we should either using middleware or interceptor
 - [ ] Mutating `update, add, delete` workspace member doesn't send event to user client
-

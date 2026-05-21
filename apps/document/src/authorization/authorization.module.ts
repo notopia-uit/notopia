@@ -1,8 +1,10 @@
+import { readFileSync } from 'fs';
 import { join } from 'path';
 
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { loadFileDescriptorSetFromBuffer } from '@grpc/proto-loader';
 import { AUTHORIZATION_PACKAGE_NAME } from '@notopia-uit/pb/authorization';
 
 import { ServicesConfig } from '#/config';
@@ -23,16 +25,13 @@ import { AuthorizationService } from './authorization.service';
           if (!servicesCfg) {
             throw new Error('SERVICE_CONFIG not found');
           }
-          const protoPath = join(__dirname, 'proto/authorization/authorization.proto');
-          const includeDirs = [join(__dirname, 'proto')];
           return {
             transport: Transport.GRPC,
             options: {
               package: AUTHORIZATION_PACKAGE_NAME,
-              protoPath,
-              loader: {
-                includeDirs,
-              },
+              packageDefinition: loadFileDescriptorSetFromBuffer(
+                readFileSync(join(__dirname, 'proto/build.bin'))
+              ),
               url: servicesCfg.authorizationUrl,
               gracefulShutdown: true,
             },
