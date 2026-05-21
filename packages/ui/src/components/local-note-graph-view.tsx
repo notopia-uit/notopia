@@ -2,8 +2,6 @@
 
 import { getNoteGraphOptions, NoteGraph } from '@notopia-uit/api-gen';
 import { GraphSettingsDialog } from '@notopia-uit/ui/components/graph-settings-dialog';
-import { Icons } from '@notopia-uit/ui/components/icons';
-import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { GraphData, GraphNode, GraphLink, D3Config } from '@notopia-uit/ui/graph-view/graph';
 import Graph from '@notopia-uit/ui/graph-view/graph';
@@ -56,7 +54,7 @@ interface LocalNoteGraphViewProps {
 export default function LocalNoteGraphView({ noteId, workspaceId }: LocalNoteGraphViewProps) {
   const { retry } = useQueryErrorHandler();
   const router = useRouter();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(true);
   const [graphSettings, setGraphSettings] = useState<Partial<D3Config>>(
     defaultLocalGraphSettings
   );
@@ -73,7 +71,7 @@ export default function LocalNoteGraphView({ noteId, workspaceId }: LocalNoteGra
     select: (dto: NoteGraph) => mapDtoNoteData(dto),
   });
 
-  const handleSaveSettings = (settings: Partial<D3Config>) => {
+  const handleSettingsChange = (settings: Partial<D3Config>) => {
     setGraphSettings(settings);
   };
 
@@ -115,23 +113,12 @@ export default function LocalNoteGraphView({ noteId, workspaceId }: LocalNoteGra
         }}
         onNodeClick={handleNodeClick}
       />
-      <div className="absolute top-4 right-4 z-10">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsSettingsOpen(true)}
-          aria-label="Graph settings"
-        >
-          <Icons.Settings className="mr-2 size-4" />
-          Settings
-        </Button>
-      </div>
       <GraphSettingsDialog
-        isOpen={isSettingsOpen}
-        onOpenChange={setIsSettingsOpen}
+        isOpen={showSettings}
+        onOpenChange={setShowSettings}
         isLocalGraph={true}
         currentSettings={graphSettings}
-        onSave={handleSaveSettings}
+        onSettingsChange={handleSettingsChange}
       />
     </div>
   );
