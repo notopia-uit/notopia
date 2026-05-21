@@ -12,7 +12,6 @@ import { useHocuspocusProvider } from '@hocuspocus/provider-react';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { EditorCore } from './editor-core';
-import { EditorStatus } from './editor-status';
 import { EditorToolbar } from './editor-toolbar';
 import { ErrorAlert } from './error-alert';
 import { Icons } from './icons';
@@ -59,7 +58,6 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
 
   return (
     <div className="relative min-h-screen">
-      <EditorStatus />
       <NoteTitle noteId={noteId} workspaceId={workspaceId} />
       <EditorToolbar
         noteId={noteId}
