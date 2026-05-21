@@ -6,6 +6,7 @@
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",
     "@nestjs/platform-express": "catalog:",
+    "meilisearch": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

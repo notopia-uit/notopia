@@ -20,3 +20,4 @@ export * from './components/shadcn/tooltip';
 export * from './lib/ui';
 export * from './block-note';
 export * from './global.d';
+export * from './contexts/meilisearch-context';

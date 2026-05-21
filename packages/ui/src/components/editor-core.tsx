@@ -13,12 +13,17 @@ import {
   createBlockNoteSchema,
   getNoteMenuItems,
   getTagMenuItems,
+  searchNotesFromMeilisearch,
+  searchTagsFromMeilisearch,
 } from '@notopia-uit/ui/block-note';
-import { forwardRef, useMemo } from 'react';
+import { getMenuItemsWithState } from '@notopia-uit/ui/block-note/menu-states';
+import { forwardRef, useMemo, useCallback } from 'react';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
+import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
+import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 
 interface EditorCoreProps {
   sessionUser?: {
@@ -108,6 +113,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
 ) {
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
+  const meilisearchClient = useMeilisearch();
 
   const editor = useCreateBlockNote({
     schema: mySchema,
@@ -123,6 +129,47 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     },
   });
 
+  const noteSearchFn = useCallback(
+    (query: string) => searchNotesFromMeilisearch(meilisearchClient, query),
+    [meilisearchClient]
+  );
+
+  const tagSearchFn = useCallback(
+    (query: string) => searchTagsFromMeilisearch(meilisearchClient, query),
+    [meilisearchClient]
+  );
+
+  const { search: searchNotesWithCache } = useSearchCache(noteSearchFn);
+  const { search: searchTagsWithCache } = useSearchCache(tagSearchFn);
+
+  const handleNoteMenuSearch = useCallback(
+    async (query: string) => {
+      const result = await searchNotesWithCache(query);
+      const menuItems = getNoteMenuItems(editor, query, result.data || []);
+      return getMenuItemsWithState({
+        items: menuItems,
+        isLoading: result.isLoading,
+        error: result.error,
+        query,
+      });
+    },
+    [searchNotesWithCache, editor]
+  );
+
+  const handleTagMenuSearch = useCallback(
+    async (query: string) => {
+      const result = await searchTagsWithCache(query);
+      const menuItems = getTagMenuItems(editor, query, result.data || []);
+      return getMenuItemsWithState({
+        items: menuItems,
+        isLoading: result.isLoading,
+        error: result.error,
+        query,
+      });
+    },
+    [searchTagsWithCache, editor]
+  );
+
   return (
     <>
       <EditorStatusBar />
@@ -130,14 +177,14 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
         <SuggestionMenuController
           triggerCharacter={'#'}
           getItems={async (query) => {
-            return Promise.resolve(getTagMenuItems(editor, query, []));
+            return handleTagMenuSearch(query);
           }}
         />
 
         <SuggestionMenuController
           triggerCharacter={'[['}
           getItems={async (query) => {
-            return Promise.resolve(getNoteMenuItems(editor, query, []));
+            return handleNoteMenuSearch(query);
           }}
         />
       </BlockNoteView>
