@@ -1563,7 +1563,7 @@ export type EmptyTrashError = EmptyTrashErrors[keyof EmptyTrashErrors];
 
 export type EmptyTrashResponses = {
     /**
-     * Workspace items successfully moved
+     * Trash emptied successfully
      */
     204: void;
 };

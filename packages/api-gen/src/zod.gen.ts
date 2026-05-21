@@ -714,7 +714,7 @@ export const zEmptyTrashPath = z.object({
 });
 
 /**
- * Workspace items successfully moved
+ * Trash emptied successfully
  */
 export const zEmptyTrashResponse = z.void();
 

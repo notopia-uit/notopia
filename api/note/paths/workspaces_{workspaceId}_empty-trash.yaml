@@ -13,7 +13,7 @@ delete:
     - $ref: ../components/parameters/workspaceIdPath.yaml
   responses:
     204:
-      description: Workspace items successfully moved
+      description: Trash emptied successfully
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
