@@ -21,5 +21,4 @@ export * from './lib/ui';
 export * from './block-note';
 export * from './global.d';
 export * from './contexts/meilisearch-context';
-export * from './contexts/s3-storage-context';
 export * from './components/editor-core';

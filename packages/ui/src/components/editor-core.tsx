@@ -17,14 +17,15 @@ import {
   searchTagsFromMeilisearch,
 } from '@notopia-uit/ui/block-note';
 import { getMenuItemsWithState } from '@notopia-uit/ui/block-note/menu-states';
-import { forwardRef, useMemo, useCallback } from 'react';
+import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
+import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
+import { uploadDocumentAttachment } from '@notopia-uit/ui/lib/actions/upload';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { forwardRef, useMemo, useCallback } from 'react';
+
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
-import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
-import { useS3Storage } from '@notopia-uit/ui/contexts/s3-storage-context';
-import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 
 interface EditorCoreProps {
   sessionUser?: {
@@ -32,6 +33,7 @@ interface EditorCoreProps {
     color: string;
     avatar: string;
   };
+  noteId: string;
 }
 
 function EditorStatusBar() {
@@ -109,13 +111,23 @@ function EditorStatusBar() {
 }
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
-  { sessionUser },
+  { sessionUser, noteId },
   _ref
 ) {
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
   const meilisearchClient = useMeilisearch();
-  const s3Storage = useS3Storage();
+
+  const uploadFile = useCallback(
+    async (file: File): Promise<string> => {
+      return uploadDocumentAttachment(noteId, file);
+    },
+    [noteId]
+  );
+
+  const resolveFileUrl = useCallback((url: string): Promise<string> => {
+    return Promise.resolve(url);
+  }, []);
 
   const editor = useCreateBlockNote({
     schema: mySchema,
@@ -129,8 +141,8 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
         color: '#999999',
       },
     },
-    uploadFile: s3Storage.uploadFile,
-    resolveFileUrl: s3Storage.resolveFileUrl,
+    uploadFile,
+    resolveFileUrl,
   });
 
   const noteSearchFn = useCallback(
@@ -195,4 +207,3 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     </>
   );
 });
-

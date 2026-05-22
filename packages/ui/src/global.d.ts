@@ -10,11 +10,6 @@ declare global {
       AUTHENTIK_CLIENT_SECRET?: string;
       AUTHENTIK_CLIENT_DISCOVERY_URL?: string;
       AUTHENTIK_REDIRECT_URI?: string;
-      NEXT_PUBLIC_RUSTFS_ENDPOINT?: string;
-      NEXT_PUBLIC_RUSTFS_BUCKET?: string;
-      NEXT_PUBLIC_RUSTFS_REGION?: string;
-      RUSTFS_ACCESS_KEY?: string;
-      RUSTFS_SECRET_KEY?: string;
     }
   }
 }

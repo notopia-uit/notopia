@@ -57,11 +57,11 @@ export function GraphSettingsDialog({
               variant="ghost"
               size="sm"
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="h-6 w-6 p-0"
+              className="size-6 p-0"
               aria-label={isCollapsed ? 'Expand' : 'Collapse'}
             >
               <ChevronDown
-                className={`h-4 w-4 transition-transform ${
+                className={`size-4 transition-transform ${
                   isCollapsed ? '-rotate-90' : ''
                 }`}
               />
@@ -70,10 +70,10 @@ export function GraphSettingsDialog({
               variant="ghost"
               size="sm"
               onClick={() => onOpenChange(false)}
-              className="h-6 w-6 p-0"
+              className="size-6 p-0"
               aria-label="Close settings"
             >
-              <X className="h-4 w-4" />
+              <X className="size-4" />
             </Button>
           </div>
         </div>
