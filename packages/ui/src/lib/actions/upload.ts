@@ -4,21 +4,18 @@ import { getDocumentAttachmentUploadUrl } from '@notopia-uit/api-gen';
 
 /**
  * Server Action for uploading files to document attachments
- * 
+ *
  * This runs on the server and handles:
  * 1. Getting presigned upload URL from backend API
  * 2. Uploading the file to the presigned URL
  * 3. Returning the final file URL
- * 
+ *
  * Benefits:
  * - API credentials never exposed to browser
  * - Server controls all authentication/authorization
  * - Can add validation, logging, monitoring on server
  */
-export async function uploadDocumentAttachment(
-  documentId: string,
-  file: File
-): Promise<string> {
+export async function uploadDocumentAttachment(documentId: string, file: File): Promise<string> {
   try {
     // Get presigned URLs from backend API
     const response = await getDocumentAttachmentUploadUrl({
@@ -56,10 +53,6 @@ export async function uploadDocumentAttachment(
     return url;
   } catch (error) {
     console.error('Upload error:', error);
-    throw new Error(
-      error instanceof Error
-        ? error.message
-        : 'Unknown error during file upload'
-    );
+    throw new Error(error instanceof Error ? error.message : 'Unknown error during file upload');
   }
 }

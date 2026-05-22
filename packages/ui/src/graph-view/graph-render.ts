@@ -193,29 +193,15 @@ export async function renderGraph(
 
   // Get CSS variables and convert them to safe hex colors for Pixi.js
   const cssVars = [
-    '--secondary',
-    '--tertiary',
-    '--gray',
-    '--light',
-    '--lightgray',
-    '--dark',
-    '--darkgray',
-    '--bodyFont',
+    '--primary',
+    '--chart-2',
+    '--muted-foreground',
+    '--background',
+    '--border',
+    '--foreground',
   ] as const;
 
-  const getDefaultColor = (varName: string): string => {
-    const defaults: Record<string, string> = {
-      '--secondary': '#4e9f3d',
-      '--tertiary': '#8e44ad',
-      '--gray': '#8c8c8c',
-      '--light': '#ffffff',
-      '--lightgray': '#e0e0e0',
-      '--dark': '#333333',
-      '--darkgray': '#666666',
-      '--bodyFont': 'Arial, sans-serif',
-    };
-    return defaults[varName] || '#000000';
-  };
+  const getDefaultColor = (varName: string): string => '#000000';
 
   const convertColorToHex = (colorValue: string): string => {
     // If already a hex color, return it
@@ -298,7 +284,7 @@ export async function renderGraph(
       const value = getComputedStyle(document.documentElement).getPropertyValue(key).trim();
       const colorValue = value || getDefaultColor(key);
       // Convert all colors to hex format safe for Pixi.js
-      acc[key] = key === '--bodyFont' ? colorValue : convertColorToHex(colorValue);
+      acc[key] = convertColorToHex(colorValue);
       return acc;
     },
     {} as Record<(typeof cssVars)[number], string>
@@ -309,16 +295,16 @@ export async function renderGraph(
 
     // If this is the current node, highlight it
     if (isCurrent) {
-      return computedStyleMap['--secondary'];
+      return computedStyleMap['--primary'];
     }
 
     // All tags get the same tag color
     if (d.type === 'tag') {
-      return computedStyleMap['--tertiary'];
+      return computedStyleMap['--chart-2'];
     }
 
     // All notes get the same note color
-    return computedStyleMap['--gray'];
+    return computedStyleMap['--muted-foreground'];
   };
 
   function nodeRadius(d: NodeData) {
@@ -372,7 +358,7 @@ export async function renderGraph(
       if (hoveredNodeId) {
         alpha = l.active ? 1 : 0.2;
       }
-      l.color = l.active ? computedStyleMap['--gray'] : computedStyleMap['--lightgray'];
+      l.color = l.active ? computedStyleMap['--muted-foreground'] : computedStyleMap['--border'];
       tweenGroup.add(new Tweened<LinkRenderData>(l).to({ alpha }, 200));
     }
 
@@ -492,8 +478,8 @@ export async function renderGraph(
       anchor: { x: 0.5, y: 1.2 },
       style: {
         fontSize: fontSize * 15,
-        fill: computedStyleMap['--dark'],
-        fontFamily: computedStyleMap['--bodyFont'],
+        fill: computedStyleMap['--foreground'],
+        fontFamily: 'Inter, system-ui, sans-serif',
       },
       resolution: window.devicePixelRatio * 4,
     });
@@ -509,7 +495,7 @@ export async function renderGraph(
       cursor: 'pointer',
     })
       .circle(0, 0, nodeRadius(n))
-      .fill({ color: isTag ? computedStyleMap['--light'] : color(n) })
+      .fill({ color: isTag ? computedStyleMap['--background'] : color(n) })
       .on('pointerover', (e: any) => {
         updateHoverInfo(e.target.label);
         oldLabelOpacity = label.alpha;
@@ -526,7 +512,7 @@ export async function renderGraph(
       });
 
     if (isTag) {
-      gfx.stroke({ width: 2, color: computedStyleMap['--tertiary'] });
+      gfx.stroke({ width: 2, color: computedStyleMap['--chart-2'] });
     }
 
     nodesContainer.addChild(gfx);
@@ -552,7 +538,7 @@ export async function renderGraph(
     const linkRenderDatum: LinkRenderData = {
       simulationData: l,
       gfx,
-      color: computedStyleMap['--lightgray'],
+      color: computedStyleMap['--border'],
       alpha: 1,
       active: false,
     };
