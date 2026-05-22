@@ -473,6 +473,10 @@ export const zGetDocumentAttachmentUploadUrlPath = z.object({
     documentId: zDocumentId
 });
 
+export const zGetDocumentAttachmentUploadUrlQuery = z.object({
+    filename: z.string()
+});
+
 /**
  * Presigned URL
  */

@@ -79,8 +79,19 @@ export class DocumentService {
     });
   }
 
-  async getAttachmentUploadUrl(documentId: string, userId: string) {
-    this.logger.debug({ documentId, userId }, 'getAttachmentUploadUrl: checking permission');
+  async getAttachmentUploadUrl({
+    documentId,
+    filename,
+    userId,
+  }: {
+    documentId: string;
+    filename: string;
+    userId: string;
+  }) {
+    this.logger.debug(
+      { documentId, filename, userId },
+      'getAttachmentUploadUrl: checking permission'
+    );
     const hasPermission = await this.authorizationService.hasNotePermission({
       documentId,
       memberId: userId,
@@ -89,10 +100,10 @@ export class DocumentService {
     if (!hasPermission) {
       throw new DocumentPermissionException(documentId, userId);
     }
-    const key = `document-attachments/${documentId}/${randomUUID()}`;
+    const key = `document-attachments/${documentId}/${randomUUID()}-${filename}`;
     const { uploadUrl, publicUrl } =
       await this.storageService.generateAttachmentPresignedUploadUrl(key);
-    this.logger.log({ documentId, key }, 'getAttachmentUploadUrl: generated upload URL');
+    this.logger.log({ documentId, filename, key }, 'getAttachmentUploadUrl: generated upload URL');
     return {
       url: publicUrl,
       uploadUrl: uploadUrl,

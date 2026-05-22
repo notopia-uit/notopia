@@ -550,7 +550,9 @@ export type GetDocumentAttachmentUploadUrlData = {
          */
         documentId: DocumentId;
     };
-    query?: never;
+    query: {
+        filename: string;
+    };
     url: '/document/documents/{documentId}/attachment-url';
 };
 

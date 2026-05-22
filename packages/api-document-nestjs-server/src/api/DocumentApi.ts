@@ -9,6 +9,6 @@ export abstract class DocumentApi {
   abstract commitDocument(documentId: string,  request: Request): CommitDocument201Response | Promise<CommitDocument201Response> | Observable<CommitDocument201Response>;
 
 
-  abstract getDocumentAttachmentUploadUrl(documentId: string,  request: Request): GetDocumentAttachmentUploadUrl200Response | Promise<GetDocumentAttachmentUploadUrl200Response> | Observable<GetDocumentAttachmentUploadUrl200Response>;
+  abstract getDocumentAttachmentUploadUrl(documentId: string, filename: string,  request: Request): GetDocumentAttachmentUploadUrl200Response | Promise<GetDocumentAttachmentUploadUrl200Response> | Observable<GetDocumentAttachmentUploadUrl200Response>;
 
 } 

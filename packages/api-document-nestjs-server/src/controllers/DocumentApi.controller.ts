@@ -14,8 +14,8 @@ export class DocumentApiController {
   }
 
   @Get('/document/documents/:documentId/attachment-url')
-  getDocumentAttachmentUploadUrl(@Param('documentId') documentId: string, @Req() request: Request): GetDocumentAttachmentUploadUrl200Response | Promise<GetDocumentAttachmentUploadUrl200Response> | Observable<GetDocumentAttachmentUploadUrl200Response> {
-    return this.documentApi.getDocumentAttachmentUploadUrl(documentId, request);
+  getDocumentAttachmentUploadUrl(@Param('documentId') documentId: string, @Query('filename') filename: string, @Req() request: Request): GetDocumentAttachmentUploadUrl200Response | Promise<GetDocumentAttachmentUploadUrl200Response> | Observable<GetDocumentAttachmentUploadUrl200Response> {
+    return this.documentApi.getDocumentAttachmentUploadUrl(documentId, filename, request);
   }
 
 } 
