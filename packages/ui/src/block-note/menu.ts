@@ -55,11 +55,13 @@ export const searchTagsFromMeilisearch = async (
   }
 
   try {
-    const index = client.index('tags');
-    const results = await index.search(query, {
+    const index = client.index('notes');
+    const results = await index.searchForFacetValues({
+      facetName: 'tags',
+      facetQuery: query,
       limit: 10,
     });
-    return results.hits.map((hit: any) => hit.name || hit.tag || '');
+    return results.facetHits.map((hit) => hit.value);
   } catch (error) {
     console.error('Error searching tags from Meilisearch:', error);
     return [];
