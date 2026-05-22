@@ -29,28 +29,28 @@ export function useSearchCache<T>(
   const search = useCallback(
     async (query: string): Promise<{ data: T; isLoading: boolean; error: Error | null }> => {
       // Check cache first
-      const cacheKey = query.toLowerCase();
-      const cached = cacheRef.current.get(cacheKey);
-
-      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-        setIsLoading(false);
-        setError(null);
-        return { data: cached.data, isLoading: false, error: null };
-      }
-
-      // Clear any pending debounce
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      setIsLoading(true);
-      setError(null);
+      // const cacheKey = query.toLowerCase();
+      // const cached = cacheRef.current.get(cacheKey);
+      //
+      // if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      //   setIsLoading(false);
+      //   setError(null);
+      //   return { data: cached.data, isLoading: false, error: null };
+      // }
+      //
+      // // Clear any pending debounce
+      // if (timeoutRef.current) {
+      //   clearTimeout(timeoutRef.current);
+      // }
+      //
+      // setIsLoading(true);
+      // setError(null);
 
       return new Promise((resolve) => {
         timeoutRef.current = setTimeout(async () => {
           try {
             const result = await searchFn(query);
-            cacheRef.current.set(cacheKey, { data: result, timestamp: Date.now() });
+            // cacheRef.current.set(cacheKey, { data: result, timestamp: Date.now() });
             setIsLoading(false);
             setError(null);
             resolve({ data: result, isLoading: false, error: null });

@@ -7,20 +7,22 @@ services:
     environment:
       RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:-notopiauit}
       RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:-notopiauit}
-      RUSTFS_CONSOLE_ENABLE: 'true'
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_OBS_LOGGER_LEVEL: info
+      RUST_LOG: info
       # RUSTFS_SERVER_DOMAINS: rustfs.notopia.localhost
     volumes:
       - rustfs:/data
     labels:
-      traefik.enable: 'true'
+      traefik.enable: "true"
       traefik.http.routers.rustfs-api.rule: Host(`rustfs-api.notopia.localhost`)
       traefik.http.routers.rustfs-api.entrypoints: web
       traefik.http.routers.rustfs-api.service: rustfs-api
-      traefik.http.services.rustfs-api.loadbalancer.server.port: '9000'
+      traefik.http.services.rustfs-api.loadbalancer.server.port: "9000"
       traefik.http.routers.rustfs-console.rule: Host(`rustfs.notopia.localhost`)
       traefik.http.routers.rustfs-console.entrypoints: web
       traefik.http.routers.rustfs-console.service: rustfs-console
-      traefik.http.services.rustfs-console.loadbalancer.server.port: '9001'
+      traefik.http.services.rustfs-console.loadbalancer.server.port: "9001"
     security_opt:
       - no-new-privileges:true
     healthcheck:
@@ -59,7 +61,7 @@ services:
         /usr/bin/mc mb rustfs/document;
         /usr/bin/mc anonymous set public rustfs/document;
       '
-    restart: 'no'
+    restart: "no"
     depends_on:
       rustfs:
         condition: service_healthy
