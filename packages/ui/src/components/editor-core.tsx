@@ -198,7 +198,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
         />
 
         <SuggestionMenuController
-          triggerCharacter={'[['}
+          triggerCharacter={'@'}
           getItems={async (query) => {
             return handleNoteMenuSearch(query);
           }}

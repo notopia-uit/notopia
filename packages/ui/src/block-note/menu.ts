@@ -1,5 +1,6 @@
 import { MyEditor, filterSuggestionItems } from '@blocknote/core';
 import { DefaultReactSuggestionItem } from '@blocknote/react';
+import { ShareNoteSearch } from '@notopia-uit/api-gen';
 import type { Meilisearch } from 'meilisearch';
 
 const getLocalDocumentTags = (editor: MyEditor): string[] => {
@@ -34,11 +35,11 @@ export const searchNotesFromMeilisearch = async (
   }
 
   try {
-    const index = client.index('notes');
+    const index = client.index<ShareNoteSearch>('notes');
     const results = await index.search(query, {
       limit: 10,
     });
-    return results.hits as SearchResult[];
+    return results.hits;
   } catch (error) {
     console.error('Error searching notes from Meilisearch:', error);
     return [];
