@@ -21,6 +21,7 @@ import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { uploadDocumentAttachment } from '@notopia-uit/ui/lib/actions/upload';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { forwardRef, useMemo, useCallback } from 'react';
 
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
@@ -114,6 +115,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
   { sessionUser, noteId },
   _ref
 ) {
+  const { resolvedTheme } = useTheme();
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
   const meilisearchClient = useMeilisearch();
@@ -189,7 +191,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
   return (
     <>
       <EditorStatusBar />
-      <BlockNoteView editor={editor}>
+      <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'}>
         <SuggestionMenuController
           triggerCharacter={'#'}
           getItems={async (query) => {
