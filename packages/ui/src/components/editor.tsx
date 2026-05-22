@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
 import { useHocuspocusProvider } from '@hocuspocus/provider-react';
 import { S3StorageProvider } from '@notopia-uit/ui/contexts/s3-storage-context';
+import { EditorSearchProvider } from '@notopia-uit/ui/components/editor-search-provider';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { EditorCore } from './editor-core';
@@ -70,7 +71,12 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
           currentEditor={undefined}
         />
         {isAwarenessReady ? (
-          <EditorCore sessionUser={sessionUser} />
+          <EditorSearchProvider 
+            workspaceId={workspaceId || ''} 
+            host={process.env.NEXT_PUBLIC_MEILISEARCH_HOST || 'http://localhost:7700'}
+          >
+            <EditorCore sessionUser={sessionUser} />
+          </EditorSearchProvider>
         ) : (
           <div className="flex items-center justify-center h-96">
             <Spinner />

@@ -14,13 +14,19 @@ const MeilisearchContext = createContext<MeilisearchContextType>({
 interface MeilisearchProviderProps {
   children: React.ReactNode;
   host: string;
-  apiKey: string;
+  apiKey?: string; // Optional - can be passed from parent after fetching
 }
 
 export function MeilisearchProvider({ children, host, apiKey }: MeilisearchProviderProps) {
   const client = useMemo(() => {
-    if (!host || !apiKey) {
-      console.warn('Meilisearch provider: host or apiKey is missing');
+    if (!host) {
+      console.warn('Meilisearch provider: host is missing');
+      return null;
+    }
+
+    // If apiKey is not provided, return null (client will be initialized later)
+    if (!apiKey) {
+      console.warn('Meilisearch provider: apiKey is not available yet');
       return null;
     }
 

@@ -24,7 +24,6 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   const meilisearchHost = process.env.NEXT_PUBLIC_MEILISEARCH_HOST || 'http://localhost:7700';
-  const meilisearchApiKey = process.env.NEXT_PUBLIC_MEILISEARCH_API_KEY || '';
 
   return (
     <>
@@ -46,7 +45,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           >
             <QueryClientProvider>
               <ApiProvider>
-                <MeilisearchProvider host={meilisearchHost} apiKey={meilisearchApiKey}>
+                <MeilisearchProvider host={meilisearchHost}>
                   {children}
                 </MeilisearchProvider>
               </ApiProvider>
