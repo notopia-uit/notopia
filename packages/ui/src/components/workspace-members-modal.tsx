@@ -126,7 +126,7 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
           Members
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Workspace Members</DialogTitle>
           <DialogDescription>
@@ -134,7 +134,7 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 min-w-0">
           <div className="relative">
             <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
             <Input
@@ -145,7 +145,7 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
             />
           </div>
 
-          <div className="max-h-96 space-y-2 overflow-y-auto rounded-lg border p-4">
+          <div className="max-h-96 space-y-2 overflow-y-auto rounded-lg border p-4 max-w-full">
             {isFetchingMembers ? (
               <div className="flex justify-center py-8">
                 <Spinner className="size-6" />
@@ -160,11 +160,11 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
                   key={member.id}
                   className="hover:bg-muted/50 flex items-center justify-between gap-3 overflow-hidden rounded-lg border p-3 transition-colors"
                 >
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1 overflow-hidden">
                     <div className="truncate font-medium">{member.name}</div>
                   </div>
 
-                   {editingMemberId === member.id ? (
+                  {editingMemberId === member.id ? (
                      <div className="flex shrink-0 items-center gap-2">
                        <Select
                          value={editingRole || member.role}
