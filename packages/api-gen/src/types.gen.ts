@@ -2284,6 +2284,10 @@ export type SearchUsersData = {
     path?: never;
     query?: {
         /**
+         * Search keyword
+         */
+        keyword?: string;
+        /**
          * If provided, the search will be exclude users who are members of the specified workspace
          */
         excludeMemberInWorkspaceId?: NoteId3;

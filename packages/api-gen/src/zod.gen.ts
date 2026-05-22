@@ -922,6 +922,7 @@ export const zUnpublishWorkspacePath = z.object({
 export const zUnpublishWorkspaceResponse = z.void();
 
 export const zSearchUsersQuery = z.object({
+    keyword: z.string().optional(),
     excludeMemberInWorkspaceId: zNoteId3.optional(),
     isActive: z.boolean().optional()
 });
