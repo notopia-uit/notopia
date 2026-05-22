@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { type MyBlock } from '@blocknote/core';
+import type { MyBlock, MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { createSchema } from '@notopia-uit/lib-server/block-note';
 
@@ -38,25 +38,30 @@ function countInlineTypes(blocks: MyBlock[]): {
   return { references, tags };
 }
 
-const testCases: [string, string, number, number][] = [
+const testCases = [
   ['000c2575-1847-5293-8117-2415a2328ef8.md', 'PowerUp.ps1', 4, 0],
   ['0093caa1-295e-5100-b082-4a562d3f1f2c.md', 'Directory Busting', 8, 0],
   ['00d2e172-1642-52d7-adf3-a40ff4587f66.md', 'LDAP', 11, 0],
-];
+] as const;
 
 describe('seed markdown parsing', () => {
+  let schema: MySchema;
   let editor: ServerBlockNoteEditor;
 
   beforeAll(() => {
-    const schema = createSchema();
+    schema = createSchema();
+  });
+
+  beforeEach(() => {
     editor = ServerBlockNoteEditor.create({ schema });
   });
 
-  describe.each(testCases)('parses %s (%s)', (file, _name, expectedRefs, expectedTags) => {
-    const filePath = path.join(__dirname, '..', 'seed-data', file);
-    const fileExists = existsSync(filePath);
+  test.for(testCases)(
+    'parses %s (%s)',
+    async ([file, _name, expectedRefs, expectedTags], { expect, skip }) => {
+      const filePath = path.join(__dirname, '..', 'seed-data', file);
+      skip(!existsSync(filePath));
 
-    (fileExists ? it : it.skip)('should parse correctly', async () => {
       const markdown = await readFile(filePath, 'utf-8');
       const blocks = await parseSeedMarkdownToBlocks(editor, markdown);
       const counts = countInlineTypes(blocks);
@@ -64,6 +69,6 @@ describe('seed markdown parsing', () => {
       expect(blocks.length).toBeGreaterThan(0);
       expect(counts.references).toBe(expectedRefs);
       expect(counts.tags).toBe(expectedTags);
-    });
-  });
+    }
+  );
 });
