@@ -4,4 +4,4 @@ generate:
   models: true
 output: ../../pkg/api/note/model.gen.go
 output-options:
-  nullable-type: false
+  nullable-type: true

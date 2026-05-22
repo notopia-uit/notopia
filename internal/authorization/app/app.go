@@ -27,13 +27,6 @@ func NewHandlerProvider(
 
 var ProvideHandlerProvider = NewHandlerProvider
 
-type (
-	CreateWorkspaceCmd        commonhandler.Cmd[CreateWorkspace]
-	DeleteWorkspaceCmd        commonhandler.Cmd[DeleteWorkspace]
-	UpdateWorkspaceMembersCmd commonhandler.Cmd[UpdateWorkspaceMembers]
-	LeaveWorkspaceCmd         commonhandler.Cmd[LeaveWorkspace]
-)
-
 type Cmds struct {
 	CreateWorkspace        CreateWorkspaceCmd
 	DeleteWorkspace        DeleteWorkspaceCmd
@@ -58,14 +51,6 @@ func NewCmds(
 }
 
 var ProvideCmds = NewCmds
-
-type (
-	GetUserWorkspaceItemPermissionsCmd commonhandler.Query[GetUserWorkspaceItemPermissions, WorkspaceItemPermissions]
-	GetUserWorkspacesCmd               commonhandler.Query[GetUserWorkspaces, []UserWorkspace]
-	GetWorkspaceMembersCmd             commonhandler.Query[GetWorkspaceMembers, []WorkspaceMember]
-	HasWorkspaceItemPermissionCmd      commonhandler.Query[HasWorkspaceItemPermission, bool]
-	HasWorkspacePermissionCmd          commonhandler.Query[HasWorkspacePermission, bool]
-)
 
 type Queries struct {
 	GetUserWorkspaceItemPermissions GetUserWorkspaceItemPermissionsCmd

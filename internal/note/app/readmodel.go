@@ -7,7 +7,7 @@ import (
 )
 
 type CheckWorkspaceSlugExistsReadModel interface {
-	CheckWorkspaceSlugExists(ctx context.Context, slug string) (bool, error)
+	Handle(ctx context.Context, slug string) (bool, error)
 }
 
 type GetNoteReadModelParams struct {
@@ -16,7 +16,7 @@ type GetNoteReadModelParams struct {
 }
 
 type GetNoteReadModel interface {
-	GetNote(ctx context.Context, p *GetNoteReadModelParams) (*Note, error)
+	Handle(ctx context.Context, p *GetNoteReadModelParams) (*Note, error)
 }
 
 type GetFolderReadModelParams struct {
@@ -25,11 +25,11 @@ type GetFolderReadModelParams struct {
 }
 
 type GetFolderReadModel interface {
-	GetFolder(ctx context.Context, p *GetFolderReadModelParams) (Folder, error)
+	Handle(ctx context.Context, p *GetFolderReadModelParams) (Folder, error)
 }
 
 type GetWorkspacesReadModel interface {
-	GetWorkspaces(ctx context.Context, ids []uuid.UUID) ([]Workspace, error)
+	Handle(ctx context.Context, ids []uuid.UUID) ([]Workspace, error)
 }
 
 type GetNoteGraphReadModelParams struct {
@@ -38,7 +38,7 @@ type GetNoteGraphReadModelParams struct {
 }
 
 type GetNoteGraphReadModel interface {
-	GetNoteGraph(ctx context.Context, p *GetNoteGraphReadModelParams) (Graph, error)
+	Handle(ctx context.Context, p *GetNoteGraphReadModelParams) (Graph, error)
 }
 
 type GetNoteLinksReadModelParams struct {
@@ -48,15 +48,15 @@ type GetNoteLinksReadModelParams struct {
 }
 
 type GetNoteLinksReadModel interface {
-	GetNoteLinks(ctx context.Context, p *GetNoteLinksReadModelParams) (NoteLinkResult, error)
+	Handle(ctx context.Context, p *GetNoteLinksReadModelParams) (NoteLinkResult, error)
 }
 
 type GetWorkspaceByNoteReadModel interface {
-	GetWorkspaceByNoteID(ctx context.Context, noteID uuid.UUID) (Workspace, error)
+	Handle(ctx context.Context, noteID uuid.UUID) (Workspace, error)
 }
 
 type WorkspaceBySlugReadModel interface {
-	GetWorkspaceBySlug(ctx context.Context, slug string) (Workspace, error)
+	Handle(ctx context.Context, slug string) (Workspace, error)
 }
 
 type GetWorkspaceGraphReadModelParams struct {
@@ -65,7 +65,7 @@ type GetWorkspaceGraphReadModelParams struct {
 }
 
 type GetWorkspaceGraphReadModel interface {
-	GetWorkspaceGraph(ctx context.Context, p *GetWorkspaceGraphReadModelParams) (Graph, error)
+	Handle(ctx context.Context, p *GetWorkspaceGraphReadModelParams) (Graph, error)
 }
 
 type GetWorkspaceTreeReadModelParams struct {
@@ -73,8 +73,9 @@ type GetWorkspaceTreeReadModelParams struct {
 	RootFolderID   uuid.UUID
 	IncludeTrashed bool
 	Depth          uint
+	Sort           GetWorkspaceTreeSort
 }
 
 type GetWorkspaceTreeReadModel interface {
-	GetWorkspaceTree(ctx context.Context, p *GetWorkspaceTreeReadModelParams) (WorkspaceTreeFolder, error)
+	Handle(ctx context.Context, p *GetWorkspaceTreeReadModelParams) (WorkspaceTreeFolder, error)
 }

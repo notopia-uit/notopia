@@ -6,6 +6,7 @@ import (
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type HasWorkspacePermission struct {
@@ -23,6 +24,10 @@ func NewHasWorkspacePermissionHandler(enforcer *casbin.TransactionalEnforcer) *H
 }
 
 var ProvideHasWorkspacePermissionHandler = NewHasWorkspacePermissionHandler
+
+type HasWorkspacePermissionCmd commonhandler.Query[HasWorkspacePermission, bool]
+
+var _ HasWorkspacePermissionCmd = (*HasWorkspacePermissionHandler)(nil)
 
 func (h *HasWorkspacePermissionHandler) Handle(ctx context.Context, params *HasWorkspacePermission) (bool, error) {
 	ok, err := h.enforcer.Enforce(

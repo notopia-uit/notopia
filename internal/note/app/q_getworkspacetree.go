@@ -6,13 +6,21 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
+
+type GetWorkspaceTreeSort struct {
+	Name      SortOrder
+	CreatedAt SortOrder
+	UpdatedAt SortOrder
+}
 
 type GetWorkspaceTree struct {
 	WorkspaceID    uuid.UUID
 	RootFolderID   uuid.UUID
 	IncludeTrashed bool
 	Depth          uint
+	Sort           GetWorkspaceTreeSort
 
 	UserID string
 }
@@ -34,6 +42,10 @@ func NewGetWorkspaceTreeHandler(
 
 var ProvideGetWorkspaceTreeHandler = NewGetWorkspaceTreeHandler
 
+type GetWorkspaceTreeQuery commonhandler.Query[GetWorkspaceTree, WorkspaceTreeFolder]
+
+var _ GetWorkspaceTreeQuery = (*GetWorkspaceTreeHandler)(nil)
+
 func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspaceTree) (WorkspaceTreeFolder, error) {
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(
 		ctx,
@@ -49,11 +61,12 @@ func (h *GetWorkspaceTreeHandler) Handle(ctx context.Context, query *GetWorkspac
 			fmt.Sprintf("user %s does not have permission to read workspace tree %s", query.UserID, query.WorkspaceID),
 		)
 	}
-	tree, err := h.readModel.GetWorkspaceTree(ctx, &GetWorkspaceTreeReadModelParams{
+	tree, err := h.readModel.Handle(ctx, &GetWorkspaceTreeReadModelParams{
 		WorkspaceID:    query.WorkspaceID,
 		RootFolderID:   query.RootFolderID,
 		IncludeTrashed: query.IncludeTrashed,
 		Depth:          query.Depth,
+		Sort:           query.Sort,
 	})
 	if err != nil {
 		return WorkspaceTreeFolder{}, err

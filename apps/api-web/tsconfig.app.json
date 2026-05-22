@@ -10,9 +10,6 @@
     "rootDir": "src",
     "target": "es2024",
     "moduleResolution": "bundler",
-    "paths": {
-      "./*": ["./src/*"]
-    }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

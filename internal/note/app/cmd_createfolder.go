@@ -3,11 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type CreateFolder struct {
@@ -36,13 +36,11 @@ func NewCreateFolderHandler(
 
 var ProvideCreateFolderHandler = NewCreateFolderHandler
 
+type CreateFolderCmd commonhandler.Cmd[CreateFolder]
+
+var _ CreateFolderCmd = (*CreateFolderHandler)(nil)
+
 func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) error {
-	slog.DebugContext(
-		ctx, "checking permission",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-		slog.String("permission", "write"),
-	)
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionWrite)
 	if err != nil {
 		return err
@@ -52,11 +50,6 @@ func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) err
 			fmt.Sprintf("user %q does not have permission to create folder in workspace %q", cmd.UserID, cmd.WorkspaceID.String()),
 		)
 	}
-	slog.DebugContext(
-		ctx, "permission granted",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.WorkspaceID.String()),
-	)
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
 		exist, err := folderRepo.CheckExists(ctx, cmd.ID)
@@ -66,7 +59,6 @@ func (h *CreateFolderHandler) Handle(ctx context.Context, cmd *CreateFolder) err
 		if exist {
 			return errs.NewFolderAlreadyExisted(cmd.ID)
 		}
-		slog.DebugContext(ctx, "folder does not exist, creating", slog.String("folder_id", cmd.ID.String()))
 		hierarchy := domain.NewFolderHierarchy(cmd.ParentID)
 		folder, err := domain.NewFolder(cmd.ID, cmd.Name, cmd.Icon, cmd.WorkspaceID, hierarchy, cmd.UserID)
 		if err != nil {

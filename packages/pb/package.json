@@ -22,6 +22,7 @@
     "@bufbuild/protobuf": "catalog:",
     "@grpc/grpc-js": "catalog:",
     "@nestjs/microservices": "catalog:",
-    "@types/node": "catalog:"
+    "@types/node": "catalog:",
+    "protobufjs": "catalog:"
   }
 }

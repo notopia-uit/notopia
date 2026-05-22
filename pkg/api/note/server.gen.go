@@ -68,6 +68,9 @@ type ServerInterface interface {
 	// Change workspace slug
 	// (POST /note/workspaces/{workspaceId}/change-slug)
 	ChangeWorkspaceSlug(c *gin.Context, workspaceId WorkspaceIdPath)
+	// Empty trash
+	// (DELETE /note/workspaces/{workspaceId}/empty-trash)
+	EmptyTrash(c *gin.Context, workspaceId WorkspaceIdPath)
 	// SSE workspace updates
 	// (GET /note/workspaces/{workspaceId}/events)
 	GetWorkspaceEvents(c *gin.Context, workspaceId WorkspaceIdPath)
@@ -610,6 +613,35 @@ func (siw *ServerInterfaceWrapper) ChangeWorkspaceSlug(c *gin.Context) {
 	siw.Handler.ChangeWorkspaceSlug(c, workspaceId)
 }
 
+// EmptyTrash operation middleware
+func (siw *ServerInterfaceWrapper) EmptyTrash(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "workspaceId" -------------
+	var workspaceId WorkspaceIdPath
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspaceId", c.Param("workspaceId"), &workspaceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter workspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.EmptyTrash(c, workspaceId)
+}
+
 // GetWorkspaceEvents operation middleware
 func (siw *ServerInterfaceWrapper) GetWorkspaceEvents(c *gin.Context) {
 
@@ -1044,6 +1076,14 @@ func (siw *ServerInterfaceWrapper) GetWorkspaceTree(c *gin.Context) {
 		return
 	}
 
+	// ------------- Optional query parameter "sort" -------------
+
+	err = runtime.BindQueryParameterWithOptions("deepObject", true, false, "sort", c.Request.URL.Query(), &params.Sort, runtime.BindQueryParameterOptions{Type: "object", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter sort: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
 		if c.IsAborted() {
@@ -1127,6 +1167,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/note/workspaces/me", wrapper.GetMyWorkspaces)
 	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceId", wrapper.DeleteWorkspace)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/change-slug", wrapper.ChangeWorkspaceSlug)
+	router.DELETE(options.BaseURL+"/note/workspaces/:workspaceId/empty-trash", wrapper.EmptyTrash)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/events", wrapper.GetWorkspaceEvents)
 	router.GET(options.BaseURL+"/note/workspaces/:workspaceId/graph", wrapper.GetWorkspaceGraph)
 	router.POST(options.BaseURL+"/note/workspaces/:workspaceId/leave", wrapper.LeaveWorkspace)
@@ -2500,6 +2541,66 @@ func (response ChangeWorkspaceSlug500JSONResponse) VisitChangeWorkspaceSlugRespo
 	return err
 }
 
+type EmptyTrashRequestObject struct {
+	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
+}
+
+type EmptyTrashResponseObject interface {
+	VisitEmptyTrashResponse(w http.ResponseWriter) error
+}
+
+type EmptyTrash204Response struct {
+}
+
+func (response EmptyTrash204Response) VisitEmptyTrashResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type EmptyTrash400JSONResponse struct{ BadRequestErrorJSONResponse }
+
+func (response EmptyTrash400JSONResponse) VisitEmptyTrashResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type EmptyTrash401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response EmptyTrash401JSONResponse) VisitEmptyTrashResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type EmptyTrash500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response EmptyTrash500JSONResponse) VisitEmptyTrashResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetWorkspaceEventsRequestObject struct {
 	WorkspaceId WorkspaceIdPath `json:"workspaceId"`
 }
@@ -3753,6 +3854,9 @@ type StrictServerInterface interface {
 	// Change workspace slug
 	// (POST /note/workspaces/{workspaceId}/change-slug)
 	ChangeWorkspaceSlug(ctx context.Context, request ChangeWorkspaceSlugRequestObject) (ChangeWorkspaceSlugResponseObject, error)
+	// Empty trash
+	// (DELETE /note/workspaces/{workspaceId}/empty-trash)
+	EmptyTrash(ctx context.Context, request EmptyTrashRequestObject) (EmptyTrashResponseObject, error)
 	// SSE workspace updates
 	// (GET /note/workspaces/{workspaceId}/events)
 	GetWorkspaceEvents(ctx context.Context, request GetWorkspaceEventsRequestObject) (GetWorkspaceEventsResponseObject, error)
@@ -4329,6 +4433,32 @@ func (sh *strictHandler) ChangeWorkspaceSlug(ctx *gin.Context, workspaceId Works
 		sh.options.HandlerErrorFunc(ctx, err)
 	} else if validResponse, ok := response.(ChangeWorkspaceSlugResponseObject); ok {
 		if err := validResponse.VisitChangeWorkspaceSlugResponse(ctx.Writer); err != nil {
+			sh.options.ResponseErrorHandlerFunc(ctx, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(ctx, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// EmptyTrash operation middleware
+func (sh *strictHandler) EmptyTrash(ctx *gin.Context, workspaceId WorkspaceIdPath) {
+	var request EmptyTrashRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.EmptyTrash(ctx, request.(EmptyTrashRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "EmptyTrash")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		sh.options.HandlerErrorFunc(ctx, err)
+	} else if validResponse, ok := response.(EmptyTrashResponseObject); ok {
+		if err := validResponse.VisitEmptyTrashResponse(ctx.Writer); err != nil {
 			sh.options.ResponseErrorHandlerFunc(ctx, err)
 		}
 	} else if response != nil {

@@ -19,7 +19,7 @@ func NewGinSlogHandler(
 	cfg := sloggin.Config{
 		WithUserAgent:      true,
 		WithRequestID:      true,
-		WithRequestBody:    false,
+		WithRequestBody:    true,
 		WithRequestHeader:  true,
 		WithResponseBody:   false,
 		WithResponseHeader: true,

@@ -1,11 +1,7 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
-
-import { loadFileDescriptorSetFromBuffer } from '@grpc/proto-loader';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NOTE_PACKAGE_NAME } from '@notopia-uit/pb/note';
+import { NOTE_PACKAGE_NAME, NOTE_SERVICE_NAME, NoteServiceService } from '@notopia-uit/pb/note';
 
 import { ServicesConfig, SERVICE_CONFIG } from '#/config';
 
@@ -27,9 +23,9 @@ import { NoteService } from './note.service';
             transport: Transport.GRPC,
             options: {
               package: NOTE_PACKAGE_NAME,
-              packageDefinition: loadFileDescriptorSetFromBuffer(
-                readFileSync(join(__dirname, 'proto/build.bin'))
-              ),
+              packageDefinition: {
+                [`${NOTE_PACKAGE_NAME}.${NOTE_SERVICE_NAME}`]: NoteServiceService,
+              },
               url: servicesCfg.noteUrl,
               gracefulShutdown: true,
             },

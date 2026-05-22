@@ -6,6 +6,7 @@ import (
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type LeaveWorkspace struct {
@@ -26,6 +27,10 @@ func NewLeaveWorkspaceHandler(enforcer *casbin.TransactionalEnforcer, publisher 
 }
 
 var ProvideLeaveWorkspaceHandler = NewLeaveWorkspaceHandler
+
+type LeaveWorkspaceCmd commonhandler.Cmd[LeaveWorkspace]
+
+var _ LeaveWorkspaceCmd = (*LeaveWorkspaceHandler)(nil)
 
 func (h *LeaveWorkspaceHandler) Handle(ctx context.Context, params *LeaveWorkspace) error {
 	return h.enforcer.WithTransaction(ctx, func(tx *casbin.Transaction) error {

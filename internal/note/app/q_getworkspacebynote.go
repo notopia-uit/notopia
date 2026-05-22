@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type GetWorkspaceByNote struct {
@@ -30,8 +31,12 @@ func NewGetWorkspaceByNoteHandler(
 
 var ProvideGetWorkspaceByNoteHandler = NewGetWorkspaceByNoteHandler
 
+type GetWorkspaceByNoteQuery commonhandler.Query[GetWorkspaceByNote, Workspace]
+
+var _ GetWorkspaceByNoteQuery = (*GetWorkspaceByNoteHandler)(nil)
+
 func (h *GetWorkspaceByNoteHandler) Handle(ctx context.Context, query *GetWorkspaceByNote) (Workspace, error) {
-	workspace, err := h.readModel.GetWorkspaceByNoteID(ctx, query.NoteID)
+	workspace, err := h.readModel.Handle(ctx, query.NoteID)
 	if err != nil {
 		return Workspace{}, err
 	}

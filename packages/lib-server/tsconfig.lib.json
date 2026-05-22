@@ -11,9 +11,6 @@
     "rootDir": "src",
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
-    "paths": {
-      "./*": ["./src/*"]
-    }
   },
   "include": ["src/**/*"],
   "references": [

@@ -22,7 +22,7 @@ func NewGetFolder(queries *pgsqlc.Queries) *GetFolder {
 
 var ProvideGetFolder = NewGetFolder
 
-func (h *GetFolder) GetFolder(ctx context.Context, p *app.GetFolderReadModelParams) (app.Folder, error) {
+func (h *GetFolder) Handle(ctx context.Context, p *app.GetFolderReadModelParams) (app.Folder, error) {
 	folder, err := h.queries.ReadGetFolder(ctx, pgsqlc.ReadGetFolderParams{
 		ID:             p.ID,
 		OnlyNonTrashed: p.ExcludeTrashed, // What so ... inconsistency

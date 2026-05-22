@@ -17,9 +17,6 @@
     "noUnusedParameters": false,
     "isolatedModules": false,
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
-    "paths": {
-      "./*": ["./src/*"]
-    }
   },
   "include": ["src/**/*.ts"]
 }

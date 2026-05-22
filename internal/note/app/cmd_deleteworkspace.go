@@ -3,11 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type DeleteWorkspace struct {
@@ -32,13 +32,11 @@ func NewDeleteWorkspaceHandler(
 
 var ProvideDeleteWorkspaceHandler = NewDeleteWorkspaceHandler
 
+type DeleteWorkspaceCmd commonhandler.Cmd[DeleteWorkspace]
+
+var _ DeleteWorkspaceCmd = (*DeleteWorkspaceHandler)(nil)
+
 func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspace) error {
-	slog.DebugContext(
-		ctx, "checking permission",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.ID.String()),
-		slog.String("permission", "delete"),
-	)
 	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionDelete)
 	if err != nil {
 		return err
@@ -49,11 +47,6 @@ func (h *DeleteWorkspaceHandler) Handle(ctx context.Context, cmd *DeleteWorkspac
 			fmt.Sprintf("user %s does not have permission to delete workspace %s", cmd.UserID, cmd.ID),
 		)
 	}
-	slog.DebugContext(
-		ctx, "permission granted",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.ID.String()),
-	)
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		workspaceRepo := r.Workspace()

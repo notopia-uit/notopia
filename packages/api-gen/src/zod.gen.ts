@@ -709,6 +709,15 @@ export const zChangeWorkspaceSlugPath = z.object({
  */
 export const zChangeWorkspaceSlugResponse = z.void();
 
+export const zEmptyTrashPath = z.object({
+    workspaceId: zNoteId3
+});
+
+/**
+ * Trash emptied successfully
+ */
+export const zEmptyTrashResponse = z.void();
+
 export const zGetWorkspaceEventsPath = z.object({
     workspaceId: zNoteId3
 });
@@ -874,7 +883,12 @@ export const zGetWorkspaceTreePath = z.object({
 export const zGetWorkspaceTreeQuery = z.object({
     rootFolderId: zNoteId.optional(),
     includeTrashed: z.boolean().optional().default(false),
-    depth: z.int().gte(1).optional()
+    depth: z.int().gte(1).optional(),
+    sort: z.object({
+        name: z.enum(['asc', 'desc']).optional().default('asc'),
+        createdAt: z.enum(['asc', 'desc']).optional(),
+        updatedAt: z.enum(['asc', 'desc']).optional()
+    }).optional()
 });
 
 /**

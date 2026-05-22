@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type GetMyWorkspaces struct {
@@ -29,6 +30,10 @@ func NewGetMyWorkspacesHandler(
 
 var ProvideGetMyWorkspacesHandler = NewGetMyWorkspacesHandler
 
+type GetMyWorkspacesQuery commonhandler.Query[GetMyWorkspaces, []UserWorkspace]
+
+var _ GetMyWorkspacesQuery = (*GetMyWorkspacesHandler)(nil)
+
 func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspaces) ([]UserWorkspace, error) {
 	authorizationUserWorkspaces, err := h.authorizationSvc.GetUserWorkspaces(ctx, query.UserID)
 	if err != nil {
@@ -38,7 +43,7 @@ func (h *GetMyWorkspacesHandler) Handle(ctx context.Context, query *GetMyWorkspa
 	for i, uw := range authorizationUserWorkspaces {
 		workspaceIDs[i] = uw.ID
 	}
-	workspaces, err := h.readModel.GetWorkspaces(ctx, workspaceIDs)
+	workspaces, err := h.readModel.Handle(ctx, workspaceIDs)
 	if err != nil {
 		return nil, err
 	}

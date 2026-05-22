@@ -110,6 +110,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	createNoteHandler := app.NewCreateNoteHandler(authorization, unitOfWork)
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(unitOfWork, authorization)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, unitOfWork)
+	emptyTrashHandler := app.NewEmptyTrashHandler(authorization, unitOfWork)
 	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(authorization)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, unitOfWork)
 	permanentlyDeleteFolderHandler := app.NewPermanentlyDeleteFolderHandler(authorization, unitOfWork)
@@ -141,7 +142,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization)
-	cmds := app.NewCmds(handlerProvider, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
+	cmds := app.NewCmds(handlerProvider, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, emptyTrashHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
 	kafka := &configConfig.Kafka
@@ -196,10 +197,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspaceBySlug := pgreadmodel.NewWorkspaceBySlug(queries)
 	getWorkspaceBySlugHandler := app.NewGetWorkspaceBySlugHandler(authorization, workspaceBySlug)
 	authentik := &configConfig.Authentik
-	identityAuthentik := identity.NewAuthentik(authentik)
+	identityAuthentik := identity.NewAuthentik(authentik, logger)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(identityAuthentik, authorization)
 	meilisearch := &configConfig.Meilisearch
-	searchMeilisearch := search.NewMeilisearch(meilisearch)
+	searchMeilisearch := search.NewMeilisearch(meilisearch, logger)
 	getWorkspaceSearchTokenHandler := app.NewGetWorkspaceSearchTokenHandler(authorization, searchMeilisearch)
 	workspaceTree := pgreadmodel.NewWorkspaceTree(queries)
 	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(authorization, workspaceTree)

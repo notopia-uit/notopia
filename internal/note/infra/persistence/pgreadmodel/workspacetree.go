@@ -25,7 +25,7 @@ func NewWorkspaceTree(queries *pgsqlc.Queries) *WorkspaceTree {
 
 var ProvideWorkspaceTree = NewWorkspaceTree
 
-func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, p *app.GetWorkspaceTreeReadModelParams) (app.WorkspaceTreeFolder, error) {
+func (h *WorkspaceTree) Handle(ctx context.Context, p *app.GetWorkspaceTreeReadModelParams) (app.WorkspaceTreeFolder, error) {
 	var rootFolderID uuid.UUID
 
 	if p.RootFolderID != uuid.Nil {
@@ -79,11 +79,8 @@ func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, p *app.GetWorkspac
 		}
 	}
 
-	// Sort children by name for deterministic ordering
 	for _, children := range childrenByParentID {
-		sort.Slice(children, func(i, j int) bool {
-			return children[i].Name < children[j].Name
-		})
+		sortFolders(children, p.Sort)
 	}
 
 	allNotes, err := h.queries.ReadGetNotesByFolderIDs(ctx, pgsqlc.ReadGetNotesByFolderIDsParams{
@@ -97,6 +94,10 @@ func (h *WorkspaceTree) GetWorkspaceTree(ctx context.Context, p *app.GetWorkspac
 	notesByFolder := make(map[uuid.UUID][]*pgsqlc.Note)
 	for _, note := range allNotes {
 		notesByFolder[note.FolderID] = append(notesByFolder[note.FolderID], note)
+	}
+
+	for _, notes := range notesByFolder {
+		sortNotes(notes, p.Sort)
 	}
 
 	tree := h.buildFolderTree(
@@ -163,4 +164,72 @@ func (h *WorkspaceTree) buildFolderTree(
 	}
 
 	return result
+}
+
+func sortFolders(folders []*pgsqlc.ReadGetRecursiveFolderByParentIDRow, sortBy app.GetWorkspaceTreeSort) {
+	if sortBy.Name != app.SortOrderUnspecified || sortBy.CreatedAt != app.SortOrderUnspecified || sortBy.UpdatedAt != app.SortOrderUnspecified {
+		sort.SliceStable(folders, func(i, j int) bool {
+			if sortBy.Name != app.SortOrderUnspecified {
+				if folders[i].Name != folders[j].Name {
+					if sortBy.Name == app.SortOrderAsc {
+						return folders[i].Name < folders[j].Name
+					}
+					return folders[i].Name > folders[j].Name
+				}
+			}
+			if sortBy.CreatedAt != app.SortOrderUnspecified {
+				if !folders[i].CreatedAt.Equal(folders[j].CreatedAt) {
+					if sortBy.CreatedAt == app.SortOrderAsc {
+						return folders[i].CreatedAt.Before(folders[j].CreatedAt)
+					}
+					return folders[i].CreatedAt.After(folders[j].CreatedAt)
+				}
+			}
+			if sortBy.UpdatedAt != app.SortOrderUnspecified {
+				if sortBy.UpdatedAt == app.SortOrderAsc {
+					return folders[i].UpdatedAt.Before(folders[j].UpdatedAt)
+				}
+				return folders[i].UpdatedAt.After(folders[j].UpdatedAt)
+			}
+			return false
+		})
+	} else {
+		sort.Slice(folders, func(i, j int) bool {
+			return folders[i].Name < folders[j].Name
+		})
+	}
+}
+
+func sortNotes(notes []*pgsqlc.Note, sortBy app.GetWorkspaceTreeSort) {
+	if sortBy.Name != app.SortOrderUnspecified || sortBy.CreatedAt != app.SortOrderUnspecified || sortBy.UpdatedAt != app.SortOrderUnspecified {
+		sort.SliceStable(notes, func(i, j int) bool {
+			if sortBy.Name != app.SortOrderUnspecified {
+				if notes[i].Name != notes[j].Name {
+					if sortBy.Name == app.SortOrderAsc {
+						return notes[i].Name < notes[j].Name
+					}
+					return notes[i].Name > notes[j].Name
+				}
+			}
+			if sortBy.CreatedAt != app.SortOrderUnspecified {
+				if !notes[i].CreatedAt.Equal(notes[j].CreatedAt) {
+					if sortBy.CreatedAt == app.SortOrderAsc {
+						return notes[i].CreatedAt.Before(notes[j].CreatedAt)
+					}
+					return notes[i].CreatedAt.After(notes[j].CreatedAt)
+				}
+			}
+			if sortBy.UpdatedAt != app.SortOrderUnspecified {
+				if sortBy.UpdatedAt == app.SortOrderAsc {
+					return notes[i].UpdatedAt.Before(notes[j].UpdatedAt)
+				}
+				return notes[i].UpdatedAt.After(notes[j].UpdatedAt)
+			}
+			return false
+		})
+	} else {
+		sort.Slice(notes, func(i, j int) bool {
+			return notes[i].Name < notes[j].Name
+		})
+	}
 }

@@ -3,11 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type PermanentlyDeleteNote struct {
@@ -32,6 +32,10 @@ func NewPermanentlyDeleteNoteHandler(
 
 var ProvidePermanentlyDeleteNoteHandler = NewPermanentlyDeleteNoteHandler
 
+type PermanentlyDeleteNoteCmd commonhandler.Cmd[PermanentlyDeleteNote]
+
+var _ PermanentlyDeleteNoteCmd = (*PermanentlyDeleteNoteHandler)(nil)
+
 func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteNote) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		noteRepo := r.Note()
@@ -45,12 +49,6 @@ func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *Permanen
 		//	If the authorization check is remote, the delete transaction stays open while waiting on another service,
 		//	which increases lock time and failure blast radius for a simple permission lookup.
 		//	Keep the auth check outside the write transaction, then re-load/delete inside the transaction.
-		slog.DebugContext(
-			ctx, "checking permission",
-			slog.String("user_id", cmd.UserID),
-			slog.String("workspace_id", workspaceID.String()),
-			slog.String("permission", "delete"),
-		)
 		hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionDelete)
 		if err != nil {
 			return err
@@ -60,11 +58,6 @@ func (h *PermanentlyDeleteNoteHandler) Handle(ctx context.Context, cmd *Permanen
 				fmt.Sprintf("user %s does not have permission to delete note %s", cmd.UserID, cmd.ID),
 			)
 		}
-		slog.DebugContext(
-			ctx, "permission granted",
-			slog.String("user_id", cmd.UserID),
-			slog.String("note_id", cmd.ID.String()),
-		)
 		note, err := noteRepo.GetByID(ctx, cmd.ID, true)
 		if err != nil {
 			return err

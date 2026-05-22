@@ -2,6 +2,7 @@
   "name": "@notopia-uit/search-worker",
   "private": true,
   "scripts": {
+    "config": "tsx ./seed/config.ts",
     "seed": "tsx ./seed/seed.ts",
     "seed:transform": "tsx ./seed/transform.ts"
   },
@@ -32,9 +33,9 @@
     "pino-pretty": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
-    "zod": "catalog:",
     "tslib": "catalog:",
-    "uuid": "catalog:"
+    "uuid": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",

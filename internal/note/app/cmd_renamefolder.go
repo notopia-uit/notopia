@@ -3,11 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type RenameFolder struct {
@@ -33,6 +33,10 @@ func NewRenameFolderHandler(
 
 var ProvideRenameFolderHandler = NewRenameFolderHandler
 
+type RenameFolderCmd commonhandler.Cmd[RenameFolder]
+
+var _ RenameFolderCmd = (*RenameFolderHandler)(nil)
+
 func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
@@ -41,12 +45,6 @@ func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) err
 		if err != nil {
 			return err
 		}
-		slog.DebugContext(
-			ctx, "checking permission",
-			slog.String("user_id", cmd.UserID),
-			slog.String("workspace_id", workspaceID.String()),
-			slog.String("permission", "write"),
-		)
 		hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, workspaceID, WorkspaceItemPermissionWrite)
 		if err != nil {
 			return err
@@ -56,11 +54,6 @@ func (h *RenameFolderHandler) Handle(ctx context.Context, cmd *RenameFolder) err
 				fmt.Sprintf("user %s does not have permission to rename folder %s", cmd.UserID, cmd.ID),
 			)
 		}
-		slog.DebugContext(
-			ctx, "permission granted",
-			slog.String("user_id", cmd.UserID),
-			slog.String("folder_id", cmd.ID.String()),
-		)
 		folder, err := folderRepo.GetByID(ctx, cmd.ID, true)
 		if err != nil {
 			return err

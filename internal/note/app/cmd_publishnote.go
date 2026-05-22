@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type PublishNote struct {
@@ -21,6 +22,10 @@ func NewPublishNoteHandler(noteRepo domain.NoteRepo) *PublishNoteHandler {
 }
 
 var ProvidePublishNoteHandler = NewPublishNoteHandler
+
+type PublishNoteCmd commonhandler.Cmd[PublishNote]
+
+var _ PublishNoteCmd = (*PublishNoteHandler)(nil)
 
 func (h *PublishNoteHandler) Handle(ctx context.Context, cmd *PublishNote) error {
 	return nil

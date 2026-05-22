@@ -6,6 +6,7 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { wrappers } from "protobufjs";
 import { FieldDescriptorProto_Type } from "../../google/protobuf/descriptor";
 import { Duration } from "../../google/protobuf/duration";
 import { FieldMask } from "../../google/protobuf/field_mask";
@@ -3524,7 +3525,7 @@ export interface TimestampRules {
    * ```
    */
   const?:
-    | Timestamp
+    | Date
     | undefined;
   /**
    * `lt` requires the timestamp field value to be less than the specified value (field < value). If the field value doesn't meet the required conditions, an error message is generated.
@@ -3537,7 +3538,7 @@ export interface TimestampRules {
    * ```
    */
   lt?:
-    | Timestamp
+    | Date
     | undefined;
   /**
    * `lte` requires the timestamp field value to be less than or equal to the specified value (field <= value). If the field value doesn't meet the required conditions, an error message is generated.
@@ -3550,7 +3551,7 @@ export interface TimestampRules {
    * ```
    */
   lte?:
-    | Timestamp
+    | Date
     | undefined;
   /**
    * `lt_now` specifies that this field, of the `google.protobuf.Timestamp` type, must be less than the current time. `lt_now` can only be used with the `within` rule.
@@ -3586,7 +3587,7 @@ export interface TimestampRules {
    * ```
    */
   gt?:
-    | Timestamp
+    | Date
     | undefined;
   /**
    * `gte` requires the timestamp field value to be greater than or equal to the
@@ -3609,7 +3610,7 @@ export interface TimestampRules {
    * ```
    */
   gte?:
-    | Timestamp
+    | Date
     | undefined;
   /**
    * `gt_now` specifies that this field, of the `google.protobuf.Timestamp` type, must be greater than the current time. `gt_now` can only be used with the `within` rule.
@@ -3651,7 +3652,7 @@ export interface TimestampRules {
    * }
    * ```
    */
-  example: Timestamp[];
+  example: Date[];
 }
 
 /**
@@ -3866,6 +3867,15 @@ export interface FieldPathElement {
 }
 
 export const BUF_VALIDATE_PACKAGE_NAME = "buf.validate";
+
+wrappers[".google.protobuf.Timestamp"] = {
+  fromObject(value: Date) {
+    return { seconds: value.getTime() / 1000, nanos: (value.getTime() % 1000) * 1e6 };
+  },
+  toObject(message: { seconds: number; nanos: number }) {
+    return new Date(message.seconds * 1000 + message.nanos / 1e6);
+  },
+} as any;
 
 function createBaseRule(): Rule {
   return {};
@@ -7341,22 +7351,22 @@ function createBaseTimestampRules(): TimestampRules {
 export const TimestampRules: MessageFns<TimestampRules> = {
   encode(message: TimestampRules, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.const !== undefined) {
-      Timestamp.encode(message.const, writer.uint32(18).fork()).join();
+      Timestamp.encode(toTimestamp(message.const), writer.uint32(18).fork()).join();
     }
     if (message.lt !== undefined) {
-      Timestamp.encode(message.lt, writer.uint32(26).fork()).join();
+      Timestamp.encode(toTimestamp(message.lt), writer.uint32(26).fork()).join();
     }
     if (message.lte !== undefined) {
-      Timestamp.encode(message.lte, writer.uint32(34).fork()).join();
+      Timestamp.encode(toTimestamp(message.lte), writer.uint32(34).fork()).join();
     }
     if (message.ltNow !== undefined) {
       writer.uint32(56).bool(message.ltNow);
     }
     if (message.gt !== undefined) {
-      Timestamp.encode(message.gt, writer.uint32(42).fork()).join();
+      Timestamp.encode(toTimestamp(message.gt), writer.uint32(42).fork()).join();
     }
     if (message.gte !== undefined) {
-      Timestamp.encode(message.gte, writer.uint32(50).fork()).join();
+      Timestamp.encode(toTimestamp(message.gte), writer.uint32(50).fork()).join();
     }
     if (message.gtNow !== undefined) {
       writer.uint32(64).bool(message.gtNow);
@@ -7365,7 +7375,7 @@ export const TimestampRules: MessageFns<TimestampRules> = {
       Duration.encode(message.within, writer.uint32(74).fork()).join();
     }
     for (const v of message.example) {
-      Timestamp.encode(v!, writer.uint32(82).fork()).join();
+      Timestamp.encode(toTimestamp(v!), writer.uint32(82).fork()).join();
     }
     return writer;
   },
@@ -7382,7 +7392,7 @@ export const TimestampRules: MessageFns<TimestampRules> = {
             break;
           }
 
-          message.const = Timestamp.decode(reader, reader.uint32());
+          message.const = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
         case 3: {
@@ -7390,7 +7400,7 @@ export const TimestampRules: MessageFns<TimestampRules> = {
             break;
           }
 
-          message.lt = Timestamp.decode(reader, reader.uint32());
+          message.lt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
         case 4: {
@@ -7398,7 +7408,7 @@ export const TimestampRules: MessageFns<TimestampRules> = {
             break;
           }
 
-          message.lte = Timestamp.decode(reader, reader.uint32());
+          message.lte = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
         case 7: {
@@ -7414,7 +7424,7 @@ export const TimestampRules: MessageFns<TimestampRules> = {
             break;
           }
 
-          message.gt = Timestamp.decode(reader, reader.uint32());
+          message.gt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
         case 6: {
@@ -7422,7 +7432,7 @@ export const TimestampRules: MessageFns<TimestampRules> = {
             break;
           }
 
-          message.gte = Timestamp.decode(reader, reader.uint32());
+          message.gte = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
         }
         case 8: {
@@ -7446,7 +7456,7 @@ export const TimestampRules: MessageFns<TimestampRules> = {
             break;
           }
 
-          message.example.push(Timestamp.decode(reader, reader.uint32()));
+          message.example.push(fromTimestamp(Timestamp.decode(reader, reader.uint32())));
           continue;
         }
       }
@@ -7749,6 +7759,18 @@ export const FieldPathElement: MessageFns<FieldPathElement> = {
     return message;
   },
 };
+
+function toTimestamp(date: Date): Timestamp {
+  const seconds = Math.trunc(date.getTime() / 1_000);
+  const nanos = (date.getTime() % 1_000) * 1_000_000;
+  return { seconds, nanos };
+}
+
+function fromTimestamp(t: Timestamp): Date {
+  let millis = (t.seconds || 0) * 1_000;
+  millis += (t.nanos || 0) / 1_000_000;
+  return new globalThis.Date(millis);
+}
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());

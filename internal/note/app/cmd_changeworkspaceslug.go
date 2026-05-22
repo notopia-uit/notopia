@@ -3,11 +3,11 @@ package app
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type ChangeWorkspaceSlug struct {
@@ -33,13 +33,11 @@ func NewChangeWorkspaceSlugHandler(
 
 var ProvideChangeWorkspaceSlugHandler = NewChangeWorkspaceSlugHandler
 
+type ChangeWorkspaceSlugCmd commonhandler.Cmd[ChangeWorkspaceSlug]
+
+var _ ChangeWorkspaceSlugCmd = (*ChangeWorkspaceSlugHandler)(nil)
+
 func (h *ChangeWorkspaceSlugHandler) Handle(ctx context.Context, cmd *ChangeWorkspaceSlug) error {
-	slog.DebugContext(
-		ctx, "checking permission",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.ID.String()),
-		slog.String("permission", "edit"),
-	)
 	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.ID, WorkspacePermissionEdit)
 	if err != nil {
 		return err
@@ -50,11 +48,6 @@ func (h *ChangeWorkspaceSlugHandler) Handle(ctx context.Context, cmd *ChangeWork
 			fmt.Sprintf("user %s does not have permission to edit workspace %s", cmd.UserID, cmd.ID),
 		)
 	}
-	slog.DebugContext(
-		ctx, "permission granted",
-		slog.String("user_id", cmd.UserID),
-		slog.String("workspace_id", cmd.ID.String()),
-	)
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		workspaceRepo := r.Workspace()

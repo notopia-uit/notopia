@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type GetWorkspaceSearchToken struct {
@@ -29,6 +30,10 @@ func NewGetWorkspaceSearchTokenHandler(
 }
 
 var ProvideGetWorkspaceSearchTokenHandler = NewGetWorkspaceSearchTokenHandler
+
+type GetWorkspaceSearchTokenQuery commonhandler.Query[GetWorkspaceSearchToken, SearchToken]
+
+var _ GetWorkspaceSearchTokenQuery = (*GetWorkspaceSearchTokenHandler)(nil)
 
 func (h *GetWorkspaceSearchTokenHandler) Handle(ctx context.Context, cmd *GetWorkspaceSearchToken) (SearchToken, error) {
 	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspacePermissionRead)

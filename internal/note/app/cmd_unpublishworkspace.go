@@ -2,9 +2,9 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type UnpublishWorkspace struct {
@@ -21,7 +21,10 @@ func NewUnpublishWorkspaceHandler(workspaceRepo domain.WorkspaceRepo) *Unpublish
 
 var ProvideUnpublishWorkspaceHandler = NewUnpublishWorkspaceHandler
 
+type UnpublishWorkspaceCmd commonhandler.Cmd[UnpublishWorkspace]
+
+var _ UnpublishWorkspaceCmd = (*UnpublishWorkspaceHandler)(nil)
+
 func (h *UnpublishWorkspaceHandler) Handle(ctx context.Context, cmd *UnpublishWorkspace) error {
-	slog.DebugContext(ctx, "unpublishing workspace", slog.String("slug", cmd.Slug))
 	return nil
 }

@@ -90,6 +90,26 @@ func (h *StrictHandler) ChangeWorkspaceSlug(
 	return note.ChangeWorkspaceSlug204Response{}, nil
 }
 
+func (h *StrictHandler) EmptyTrash(
+	ctx context.Context,
+	request note.EmptyTrashRequestObject,
+) (note.EmptyTrashResponseObject, error) {
+	user, ok := commonhttp.UserFromContext(ctx)
+	if !ok {
+		return nil, errs.Unauthorized
+	}
+	cmd := &app.EmptyTrash{
+		WorkspaceID: request.WorkspaceId,
+		UserID:      user.ID,
+	}
+	err := h.App.Cmds.EmptyTrash.Handle(ctx, cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return note.EmptyTrash204Response{}, nil
+}
+
 func (h *StrictHandler) GetWorkspace(
 	ctx context.Context,
 	request note.GetWorkspaceRequestObject,
@@ -458,12 +478,38 @@ func (h *StrictHandler) GetWorkspaceTree(
 		rootFolderID = *request.Params.RootFolderId
 	}
 
+	sortQuery := app.GetWorkspaceTreeSort{
+		Name:      app.SortOrderAsc,
+		CreatedAt: app.SortOrderUnspecified,
+		UpdatedAt: app.SortOrderUnspecified,
+	}
+	if request.Params.Sort != nil {
+		if request.Params.Sort.Name != nil && *request.Params.Sort.Name == note.GetWorkspaceTreeParamsSortNameDesc {
+			sortQuery.Name = app.SortOrderDesc
+		}
+		if request.Params.Sort.CreatedAt != nil {
+			if *request.Params.Sort.CreatedAt == note.GetWorkspaceTreeParamsSortCreatedAtDesc {
+				sortQuery.CreatedAt = app.SortOrderDesc
+			} else {
+				sortQuery.CreatedAt = app.SortOrderAsc
+			}
+		}
+		if request.Params.Sort.UpdatedAt != nil {
+			if *request.Params.Sort.UpdatedAt == note.Desc {
+				sortQuery.UpdatedAt = app.SortOrderDesc
+			} else {
+				sortQuery.UpdatedAt = app.SortOrderAsc
+			}
+		}
+	}
+
 	query := &app.GetWorkspaceTree{
 		WorkspaceID:    request.WorkspaceId,
 		RootFolderID:   rootFolderID,
 		IncludeTrashed: request.Params.IncludeTrashed != nil && *request.Params.IncludeTrashed,
 		Depth:          depth,
 		UserID:         user.ID,
+		Sort:           sortQuery,
 	}
 
 	result, err := h.App.Queries.GetWorkspaceTree.Handle(ctx, query)

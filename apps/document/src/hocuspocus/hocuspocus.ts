@@ -52,6 +52,7 @@ export class Hocuspocus {
     data: onAuthenticatePayload<HocuspocusContext>
   ): Promise<HocuspocusContext> {
     const documentId = data.documentName;
+    this.logger.log({ documentId }, 'Authenticating user for document');
     const user = await this.authenticationService.validateToken(data.token);
     const note = await this.noteService.getNoteById({
       noteId: documentId,

@@ -25,16 +25,20 @@ deploy/
 docs/
 page/
 scripts/
-buf.*
-**/eslint.config.mjs
+**/oxlint.config.ts
+**/oxlint-base.config.mts
 .eslintignore
+.oxfmtrc.jsonc
 **/.prettierignore
-**/.prettierrc.ts
 **/justfile
 mise.*
 .tool-versions
 **/openapitools.json
 **/README.md
+
+# Buf/Proto
+/proto/
+# buf.* # wtf is this?
 
 # Agents
 .agents/

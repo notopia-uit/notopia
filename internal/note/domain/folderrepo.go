@@ -19,9 +19,9 @@ type FolderRepo interface {
 }
 
 type FolderRepoGetManyParams struct {
-	WorkspaceID uuid.UUID
-	IDs         []uuid.UUID
-	TrashedBy   TrashedBy
+	WorkspaceID uuid.UUID   // Emptyable
+	IDs         []uuid.UUID // Nilable
+	TrashedBy   TrashedBy   // Unspecified-able
 	TrashOnly   bool
 	ForUpdate   bool
 }

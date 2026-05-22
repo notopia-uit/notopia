@@ -22,7 +22,7 @@ func GetNote(queries *pgsqlc.Queries) *Note {
 
 var ProvideNote = GetNote
 
-func (h *Note) GetNote(ctx context.Context, p *app.GetNoteReadModelParams) (*app.Note, error) {
+func (h *Note) Handle(ctx context.Context, p *app.GetNoteReadModelParams) (*app.Note, error) {
 	note, err := h.queries.ReadGetNoteByID(ctx, p.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

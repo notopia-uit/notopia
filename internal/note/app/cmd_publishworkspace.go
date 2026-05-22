@@ -2,9 +2,9 @@ package app
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type PublishWorkspace struct {
@@ -22,11 +22,10 @@ func NewPublishWorkspaceHandler(workspaceRepo domain.WorkspaceRepo) *PublishWork
 
 var ProvidePublishWorkspaceHandler = NewPublishWorkspaceHandler
 
+type PublishWorkspaceCmd commonhandler.Cmd[PublishWorkspace]
+
+var _ PublishWorkspaceCmd = (*PublishWorkspaceHandler)(nil)
+
 func (h *PublishWorkspaceHandler) Handle(ctx context.Context, cmd *PublishWorkspace) error {
-	slog.DebugContext(
-		ctx, "publishing workspace",
-		slog.String("slug", cmd.Slug),
-		slog.String("user_id", cmd.UserID),
-	)
 	return nil
 }

@@ -18,7 +18,7 @@ import {
 } from '@notopia-uit/pb/note';
 import { firstValueFrom } from 'rxjs';
 
-import { isGrpcError, protoTimestampToDate } from '#/common';
+import { isGrpcError } from '#/common';
 
 import { NoteModel, TrashedModel, WorkspaceModel } from './models';
 import { NoteNotFoundException } from './note-not-found.exception';
@@ -77,7 +77,7 @@ export class NoteService implements OnModuleInit {
       tags: note.tags,
       folderId: note.folderId,
       icon: note.icon,
-      updatedAt: protoTimestampToDate(note.updatedAt),
+      updatedAt: note.updatedAt,
       trashed: note.trashed ? this.toTrashedModel(note.trashed) : undefined,
     };
   }
@@ -139,7 +139,7 @@ export class NoteService implements OnModuleInit {
         }
         return {
           by: 'purpose',
-          at: protoTimestampToDate(trashed.at),
+          at: trashed.at,
         };
       case TrashedBy.TRASHED_BY_PARENT:
         if (!trashed.at) {
@@ -149,7 +149,7 @@ export class NoteService implements OnModuleInit {
         }
         return {
           by: 'parent',
-          at: protoTimestampToDate(trashed.at),
+          at: trashed.at,
         };
       default:
         throw new InternalServerErrorException('Unknown trashed by value');

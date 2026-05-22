@@ -7,6 +7,7 @@ import (
 	"github.com/casbin/casbin/v3"
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/authorization/errs"
+	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type GetUserWorkspaces struct {
@@ -22,6 +23,10 @@ func NewGetUserWorkspacesHandler(enforcer *casbin.TransactionalEnforcer) *GetUse
 }
 
 var ProvideGetUserWorkspacesHandler = NewGetUserWorkspacesHandler
+
+type GetUserWorkspacesCmd commonhandler.Query[GetUserWorkspaces, []UserWorkspace]
+
+var _ GetUserWorkspacesCmd = (*GetUserWorkspacesHandler)(nil)
 
 func (h *GetUserWorkspacesHandler) Handle(ctx context.Context, params *GetUserWorkspaces) ([]UserWorkspace, error) {
 	rules, err := h.enforcer.GetFilteredGroupingPolicy(0, formatUser(params.UserID))

@@ -31,14 +31,14 @@ var ProvideNoteUpdatedDomainToIntegrationEventHandler = NewNoteUpdatedDomainToIn
 
 func (h *NoteUpdatedDomainToIntegrationEventHandler) Handle(ctx context.Context, noteID uuid.UUID) error {
 	slog.DebugContext(ctx, "Handling note updated integration event", slog.String("note_id", noteID.String()))
-	note, err := h.getNoteReadModel.GetNote(ctx, &GetNoteReadModelParams{
+	note, err := h.getNoteReadModel.Handle(ctx, &GetNoteReadModelParams{
 		ID:             noteID,
 		ExcludeTrashed: false,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to get note for note updated event: %w", err)
 	}
-	folder, err := h.getFolderReadModel.GetFolder(ctx, &GetFolderReadModelParams{
+	folder, err := h.getFolderReadModel.Handle(ctx, &GetFolderReadModelParams{
 		ID:             note.FolderID,
 		ExcludeTrashed: false,
 	})
