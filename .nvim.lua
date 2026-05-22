@@ -356,6 +356,8 @@ lsp.config("oxfmt", {
     "typescript",
     "typescriptreact",
     "vue",
+    "yaml",
+    "yaml.github",
   },
   cmd = { "./node_modules/.bin/oxfmt", "--lsp", "--config", ".oxfmtrc.jsonc" },
   root_dir = function(_, on_dir)

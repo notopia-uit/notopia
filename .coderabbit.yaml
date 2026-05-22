@@ -30,9 +30,9 @@ reviews:
         - Loosely applying layered architecture
 
   path_filters:
-    - '!api/bundled/**'
-    - '!packages/api-gen/**'
-    - '!packages/api-document-nestjs-server/**'
-    - '!packages/pb/**'
-    - '!pkg/api/**'
-    - '!pkg/pb/**'
+    - "!packages/api-gen/src/**"
+    - "!packages/api-document-nestjs-server/src/**"
+    - "!packages/api-share-gen/src/**"
+    - "!packages/pb/src/**"
+    - "!pkg/api/**"
+    - "!pkg/pb/**"

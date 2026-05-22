@@ -19,6 +19,7 @@ return {
       opts.formatters_by_ft.jsonc = nil
       opts.formatters_by_ft.toml = nil
       opts.formatters_by_ft.yaml = nil
+      opts.formatters_by_ft["yaml.github"] = nil
       opts.formatters_by_ft.typescript = nil
       opts.formatters_by_ft.typescriptreact = nil
       opts.formatters_by_ft.javascriptreact = nil
