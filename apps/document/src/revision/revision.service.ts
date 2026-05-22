@@ -9,7 +9,7 @@ import { RevisionEntity } from './revision.entity';
 export interface PaginatedRevisions {
   data: RevisionEntity[];
   page: number;
-  limit: number;
+  currentTotal: number;
   total: number;
 }
 
@@ -50,7 +50,7 @@ export class RevisionService {
     return {
       data: revisions,
       page,
-      limit,
+      currentTotal: revisions.length,
       total,
     };
   }

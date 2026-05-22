@@ -1,0 +1,43 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - NoteUser
+  summary: Search users
+  operationId: searchUsers
+  parameters:
+    - name: excludeMemberInWorkspaceId
+      in: query
+      description: If provided, the search will be exclude users who are members of the specified workspace
+      schema:
+        $ref: ../components/schemas/Workspace.yaml#/properties/id
+    - name: isActive
+      in: query
+      description: If provided, the search will be limited to (in)active users
+      schema:
+        type: boolean
+  responses:
+    200:
+      description: A list of workspace members
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: ../../common/components/schemas/User.yaml
+              pagination:
+                $ref: ../../common/components/schemas/Pagination.yaml
+            required:
+              - data
+              - pagination
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

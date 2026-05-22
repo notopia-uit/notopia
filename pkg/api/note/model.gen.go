@@ -313,6 +313,27 @@ type NoteLink struct {
 	Name Name2 `json:"name"`
 }
 
+// Pagination defines model for Pagination.
+type Pagination struct {
+	// CurrentTotal Number of items in the current page
+	CurrentTotal int `json:"currentTotal"`
+
+	// HasNext Whether there is a next page
+	HasNext bool `json:"hasNext"`
+
+	// HasPrev Whether there is a previous page
+	HasPrev bool `json:"hasPrev"`
+
+	// Page Current page number, starting from 1
+	Page int `json:"page"`
+
+	// Total Total items across all pages
+	Total int `json:"total"`
+
+	// TotalPages Total number of pages
+	TotalPages int `json:"totalPages"`
+}
+
 // SearchToken defines model for SearchToken.
 type SearchToken struct {
 	ExpiresAt time.Time `json:"expiresAt"`
@@ -342,6 +363,21 @@ type TrashedNote struct {
 	Id      openapi_types.UUID `json:"id"`
 	Name    *string            `json:"name,omitempty"`
 	Trashed Trashed            `json:"trashed"`
+}
+
+// User defines model for User.
+type User struct {
+	// Email Email from Authentik
+	Email nullable.Nullable[openapi_types.Email] `json:"email"`
+
+	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+	Id string `json:"id"`
+
+	// Name Full name from Authentik
+	Name nullable.Nullable[string] `json:"name"`
+
+	// Username Username from Authentik
+	Username string `json:"username"`
 }
 
 // UserWorkspace defines model for UserWorkspace.
@@ -574,6 +610,15 @@ type GetNoteLinksParams struct {
 type RenameNoteJSONBody struct {
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name Name2 `json:"name"`
+}
+
+// SearchUsersParams defines parameters for SearchUsers.
+type SearchUsersParams struct {
+	// ExcludeMemberInWorkspaceId If provided, the search will be exclude users who are members of the specified workspace
+	ExcludeMemberInWorkspaceId *Id3 `form:"excludeMemberInWorkspaceId,omitempty" json:"excludeMemberInWorkspaceId,omitempty"`
+
+	// IsActive If provided, the search will be limited to (in)active users
+	IsActive *bool `form:"isActive,omitempty" json:"isActive,omitempty"`
 }
 
 // CreateWorkspaceResponse defines parameters for CreateWorkspace.

@@ -128,15 +128,15 @@ export type DocumentRevision = {
 
 export type DocumentPagination = {
     /**
-     * Current page number
+     * Current page number, starting from 1
      */
     page: number;
     /**
-     * Number of items per page
+     * Number of items in the current page
      */
-    limit: number;
+    currentTotal: number;
     /**
-     * Total number of items
+     * Total items across all pages
      */
     total: number;
     /**
@@ -393,6 +393,52 @@ export type NoteWorkspaceTreeFolder = {
 };
 
 export type NoteUpdatedAt2 = Date;
+
+export type NoteUser = {
+    /**
+     * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+     */
+    id: string;
+    /**
+     * Username from Authentik
+     */
+    username: string;
+    /**
+     * Full name from Authentik
+     */
+    name: string | null;
+    /**
+     * Email from Authentik
+     */
+    email: string | null;
+};
+
+export type NotePagination = {
+    /**
+     * Current page number, starting from 1
+     */
+    page: number;
+    /**
+     * Number of items in the current page
+     */
+    currentTotal: number;
+    /**
+     * Total items across all pages
+     */
+    total: number;
+    /**
+     * Total number of pages
+     */
+    totalPages: number;
+    /**
+     * Whether there is a next page
+     */
+    hasNext: boolean;
+    /**
+     * Whether there is a previous page
+     */
+    hasPrev: boolean;
+};
 
 export type ShareUserWorkspaceRoleUpdatedEventWritable = {
     userId: ShareId;
@@ -2232,3 +2278,46 @@ export type UnpublishWorkspaceResponses = {
 };
 
 export type UnpublishWorkspaceResponse = UnpublishWorkspaceResponses[keyof UnpublishWorkspaceResponses];
+
+export type SearchUsersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * If provided, the search will be exclude users who are members of the specified workspace
+         */
+        excludeMemberInWorkspaceId?: NoteId3;
+        /**
+         * If provided, the search will be limited to (in)active users
+         */
+        isActive?: boolean;
+    };
+    url: '/note/search-users';
+};
+
+export type SearchUsersErrors = {
+    /**
+     * Unauthorized Error response
+     */
+    401: {
+        [key: string]: unknown;
+    };
+    /**
+     * Internal Server Error response
+     */
+    500: NoteError;
+};
+
+export type SearchUsersError = SearchUsersErrors[keyof SearchUsersErrors];
+
+export type SearchUsersResponses = {
+    /**
+     * A list of workspace members
+     */
+    200: {
+        data: Array<NoteUser>;
+        pagination: NotePagination;
+    };
+};
+
+export type SearchUsersResponse = SearchUsersResponses[keyof SearchUsersResponses];

@@ -110,7 +110,7 @@ export const zDocumentRevision = z.object({
 
 export const zDocumentPagination = z.object({
     page: z.int().gte(1),
-    limit: z.int().gte(1).lte(100),
+    currentTotal: z.int().gte(0),
     total: z.int().gte(0),
     totalPages: z.int().gte(0),
     hasNext: z.boolean(),
@@ -322,6 +322,22 @@ export const zNoteWorkspaceTreeFolder = z.object({
     notes: z.array(zNoteWorkspaceTreeNote),
     children: z.array(z.lazy((): any => zNoteWorkspaceTreeFolder)),
     updatedAt: zNoteUpdatedAt2
+});
+
+export const zNoteUser = z.object({
+    id: z.string(),
+    username: z.string(),
+    name: z.string().nullable(),
+    email: z.email().nullable()
+});
+
+export const zNotePagination = z.object({
+    page: z.int().gte(1),
+    currentTotal: z.int().gte(0),
+    total: z.int().gte(0),
+    totalPages: z.int().gte(0),
+    hasNext: z.boolean(),
+    hasPrev: z.boolean()
 });
 
 export const zShareUserWorkspaceRoleUpdatedEventWritable = z.object({
@@ -904,3 +920,16 @@ export const zUnpublishWorkspacePath = z.object({
  * Workspace unpublished successfully
  */
 export const zUnpublishWorkspaceResponse = z.void();
+
+export const zSearchUsersQuery = z.object({
+    excludeMemberInWorkspaceId: zNoteId3.optional(),
+    isActive: z.boolean().optional()
+});
+
+/**
+ * A list of workspace members
+ */
+export const zSearchUsersResponse = z.object({
+    data: z.array(zNoteUser),
+    pagination: zNotePagination
+});
