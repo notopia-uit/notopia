@@ -479,6 +479,14 @@ func (siw *ServerInterfaceWrapper) SearchUsers(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params SearchUsersParams
 
+	// ------------- Optional query parameter "keyword" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "keyword", c.Request.URL.Query(), &params.Keyword, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter keyword: %w", err), http.StatusBadRequest)
+		return
+	}
+
 	// ------------- Optional query parameter "excludeMemberInWorkspaceId" -------------
 
 	err = runtime.BindQueryParameterWithOptions("form", true, false, "excludeMemberInWorkspaceId", c.Request.URL.Query(), &params.ExcludeMemberInWorkspaceId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})

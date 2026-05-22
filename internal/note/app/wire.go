@@ -54,6 +54,7 @@ var ProviderSetQuery = wire.NewSet(
 	ProvideGetWorkspaceMembersHandler,
 	ProvideGetWorkspaceSearchTokenHandler,
 	ProvideGetWorkspaceTreeHandler,
+	ProvideSearchUsersHandler,
 	ProvideShowTrashHandler,
 )
 

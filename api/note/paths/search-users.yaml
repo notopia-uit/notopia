@@ -10,6 +10,11 @@ get:
   summary: Search users
   operationId: searchUsers
   parameters:
+    - name: keyword
+      in: query
+      description: Search keyword
+      schema:
+        type: string
     - name: excludeMemberInWorkspaceId
       in: query
       description: If provided, the search will be exclude users who are members of the specified workspace
