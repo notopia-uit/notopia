@@ -1,0 +1,1 @@
+../../cmd/authorization/CLAUDE.md

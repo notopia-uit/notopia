@@ -1,0 +1,1 @@
+../../cmd/note/AGENTS.md
