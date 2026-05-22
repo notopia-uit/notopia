@@ -6,7 +6,6 @@ import { BlockNoteModule } from '../blocknote/blocknote.module';
 import { DatabaseModule } from '../database/database.module';
 import { KafkaModule } from '../kafka/kafka.module';
 import { StorageModule } from '../storage/storage.module';
-
 import { DocumentEntity } from './document.entity';
 import { DocumentService } from './document.service';
 

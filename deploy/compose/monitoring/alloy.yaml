@@ -17,10 +17,10 @@ services:
       - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
-      traefik.enable: 'true'
+      traefik.enable: "true"
       traefik.http.routers.alloy.rule: Host(`alloy.notopia.localhost`)
       traefik.http.routers.alloy.entrypoints: web
-      traefik.http.services.alloy.loadbalancer.server.port: '12345'
+      traefik.http.services.alloy.loadbalancer.server.port: "12345"
     profiles:
       - monitoring
     restart: unless-stopped

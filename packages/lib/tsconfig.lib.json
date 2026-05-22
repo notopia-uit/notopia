@@ -14,7 +14,7 @@
     "rootDir": "src",
     "outDir": "dist",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
   "include": ["src/**/*"]
 }

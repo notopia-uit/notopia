@@ -47,7 +47,7 @@ properties:
         target:
           type: string
           description: The ID of the target node (note id or hashtag prefixed tag name)
-          example: '#socks4'
+          example: "#socks4"
 
       required:
         - source

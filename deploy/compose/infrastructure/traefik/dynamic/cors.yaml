@@ -8,6 +8,6 @@ http:
           - http://localhost:9080
           - http://web.notopia.localhost
           - http://api.notopia.localhost
-        accessControlAllowMethods: '*'
-        accessControlAllowHeaders: '*'
+        accessControlAllowMethods: "*"
+        accessControlAllowHeaders: "*"
         accessControlAllowCredentials: true

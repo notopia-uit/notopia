@@ -15,10 +15,10 @@ services:
       - authentik_data:/data
       # - ./custom-templates:/templates
     labels:
-      traefik.enable: 'true'
+      traefik.enable: "true"
       traefik.http.routers.authentik.rule: Host(`authentik.notopia.localhost`)
       traefik.http.routers.authentik.entrypoints: web
-      traefik.http.services.authentik.loadbalancer.server.port: '9000'
+      traefik.http.services.authentik.loadbalancer.server.port: "9000"
     depends_on:
       authentik_postgresql:
         condition: service_healthy

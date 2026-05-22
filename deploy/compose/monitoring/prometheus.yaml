@@ -18,10 +18,10 @@ services:
       - ./prometheus/rules:/etc/prometheus/rules:ro
       - prometheus_data:/prometheus
     labels:
-      traefik.enable: 'true'
+      traefik.enable: "true"
       traefik.http.routers.prometheus.rule: Host(`prometheus.notopia.localhost`)
       traefik.http.routers.prometheus.entrypoints: web
-      traefik.http.services.prometheus.loadbalancer.server.port: '9090'
+      traefik.http.services.prometheus.loadbalancer.server.port: "9090"
     profiles:
       - monitoring
     restart: unless-stopped

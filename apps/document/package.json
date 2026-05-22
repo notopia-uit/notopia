@@ -61,6 +61,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@d2t/vitest-ctrf-json-reporter": "catalog:",
     "@nestjs/testing": "catalog:",
     "@suites/di.nestjs": "catalog:",
     "@suites/doubles.vitest": "catalog:",
@@ -72,7 +73,6 @@
     "tsx": "catalog:",
     "typeorm-extension": "catalog:",
     "unplugin-swc": "catalog:",
-    "webpack-node-externals": "catalog:",
-    "@d2t/vitest-ctrf-json-reporter": "catalog:"
+    "webpack-node-externals": "catalog:"
   }
 }

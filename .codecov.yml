@@ -26,9 +26,9 @@ flag_management:
         - packages/ui/
 
 ignore:
-  - "**/*.bak"
-  - "**/*.sql.go"
-  - "**/*wire.go"
-  - "**/mock.go"
-  - "**/_test.go"
-  - "**/.spec.ts"
+  - '**/*.bak'
+  - '**/*.sql.go'
+  - '**/*wire.go'
+  - '**/mock.go'
+  - '**/_test.go'
+  - '**/.spec.ts'

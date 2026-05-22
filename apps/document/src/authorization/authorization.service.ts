@@ -10,7 +10,6 @@ import {
 import { firstValueFrom } from 'rxjs';
 
 import { NoteService } from '../note/note.service';
-
 import { UserNotePermissions as UserNotePermission, WorkspaceItemPermission } from './models';
 
 @Injectable()

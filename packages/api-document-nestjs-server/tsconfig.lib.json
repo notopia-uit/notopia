@@ -16,7 +16,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "isolatedModules": false,
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
   "include": ["src/**/*.ts"]
 }

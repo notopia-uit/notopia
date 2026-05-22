@@ -30,8 +30,9 @@
     "global.d.ts",
     ".next/types/**/*.ts",
     "postcss.config.mjs",
-    "../../packages/ui/src/global.d.ts"
-,     "proxy.ts"  ],
+    "../../packages/ui/src/global.d.ts",
+    "proxy.ts"
+  ],
   "exclude": ["out-tsc", "dist", "node_modules", "app/**/*.spec.ts", "app/**/*.test.ts", ".next"],
   "references": [
     {

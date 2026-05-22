@@ -20,3 +20,5 @@ submodule/**
 packages/ui/src/**/shadcn/**
 packages/pb/src/**
 .nx/self-healing
+**/*/AGENTS.md
+**/*/CLAUDE.md

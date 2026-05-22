@@ -12,10 +12,10 @@ services:
       - ./tempo/config.yaml:/etc/tempo/config.yaml:ro
       - tempo_data:/var/tempo
     labels:
-      traefik.enable: 'true'
+      traefik.enable: "true"
       traefik.http.routers.tempo.rule: Host(`tempo.notopia.localhost`)
       traefik.http.routers.tempo.entrypoints: web
-      traefik.http.services.tempo.loadbalancer.server.port: '3200'
+      traefik.http.services.tempo.loadbalancer.server.port: "3200"
     profiles:
       - monitoring
     restart: unless-stopped

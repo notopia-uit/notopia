@@ -5,20 +5,20 @@ services:
     container_name: notopia-grafana
     image: grafana/grafana:12.4.3
     environment:
-      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
-      GF_AUTH_DISABLE_LOGIN_FORM: 'true'
-      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
       GF_SERVER_ROOT_URL: http://grafana.notopia.localhost
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/datasources/:/etc/grafana/provisioning/datasources/:ro
       - ./grafana/provisioning/dashboards/:/etc/grafana/provisioning/dashboards/:ro
     labels:
-      traefik.enable: 'true'
+      traefik.enable: "true"
       traefik.http.routers.grafana.rule: Host(`grafana.notopia.localhost`)
       traefik.http.routers.grafana.entrypoints: web
-      traefik.http.services.grafana.loadbalancer.server.port: '3000'
+      traefik.http.services.grafana.loadbalancer.server.port: "3000"
     profiles:
       - monitoring
     restart: unless-stopped

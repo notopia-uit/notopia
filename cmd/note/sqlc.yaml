@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://www.schemastore.org/sqlc-2.0.json
-version: '2'
+version: "2"
 
 plugins:
   - name: golang
@@ -93,4 +93,4 @@ rules:
     message: Query plan results in a sequential scan
     rule: postgresql.explain.plan.node_type == 'Seq Scan'
   - name: debug
-    rule: '!has(postgresql.explain)'
+    rule: "!has(postgresql.explain)"

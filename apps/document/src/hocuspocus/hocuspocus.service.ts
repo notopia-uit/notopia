@@ -3,12 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { Traceable } from 'nestjs-otel';
 
 import { AuthorizationService } from '../authorization/authorization.service';
-import { HocuspocusContext } from './hocuspocus-context';
-import { NoteService } from '../note/note.service';
 import { WorkspaceModel } from '../note/models';
+import { NoteService } from '../note/note.service';
 import { WorkspaceNoteNotFoundException } from '../note/workspace-note-not-found.exception';
-
 import { Hocuspocus } from './hocuspocus';
+import { HocuspocusContext } from './hocuspocus-context';
 
 @Injectable()
 @Traceable()
