@@ -25,6 +25,8 @@ tags:
     description: Folder in workspace
   - name: Note
     description: Note in workspace's root folder or in a folder
+  - name: NoteUser
+    description: User from Note service
 
 paths:
   /note/folders:
@@ -92,6 +94,9 @@ paths:
     $ref: ./paths/workspaces_{workspaceId}_tree.yaml
   /note/workspaces/{workspaceId}/unpublish:
     $ref: ./paths/workspaces_{workspaceId}_unpublish.yaml
+
+  /note/search-users:
+    $ref: ./paths/search-users.yaml
 
 components:
   securitySchemes:

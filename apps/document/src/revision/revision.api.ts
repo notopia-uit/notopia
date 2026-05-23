@@ -58,7 +58,7 @@ export class RevisionApi extends RevisionApiDefinition {
     this.logger.log({ documentId, page, limit }, 'getRevisions: received');
     try {
       const result = await this.revisionService.getRevisionsByDocumentId(documentId, page, limit);
-      const totalPages = Math.ceil(result.total / result.limit);
+      const totalPages = Math.ceil(result.total / result.currentTotal);
       const response: GetRevisions200Response = {
         data: result.data.map((r) => ({
           id: r.id,
@@ -67,9 +67,9 @@ export class RevisionApi extends RevisionApiDefinition {
         })),
         pagination: {
           page: result.page,
-          limit: result.limit,
-          total: result.total,
           totalPages,
+          currentTotal: result.currentTotal,
+          total: result.total,
           hasNext: result.page < totalPages,
           hasPrev: result.page > 1,
         },
