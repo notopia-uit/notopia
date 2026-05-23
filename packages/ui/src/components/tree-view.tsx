@@ -12,7 +12,6 @@ import {
   useTrashWorkspaceItemsMutation,
 } from '@notopia-uit/api-gen';
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
-
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import {
   ContextMenu,
@@ -22,7 +21,6 @@ import {
 } from '@notopia-uit/ui/components/shadcn/context-menu';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
@@ -224,12 +222,20 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   const { mutate: renameNote } = useRenameNoteMutation({
     onError: (error) => {
-      showAlert({ type: 'error', title: 'Rename Note Failed', message: `${error instanceof Error ? error.message : 'Unknown error'}` });
+      showAlert({
+        type: 'error',
+        title: 'Rename Note Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
   });
   const { mutate: renameFolder } = useRenameFolderMutation({
     onError: (error) => {
-      showAlert({ type: 'error', title: 'Rename Folder Failed', message: `${error instanceof Error ? error.message : 'Unknown error'}` });
+      showAlert({
+        type: 'error',
+        title: 'Rename Folder Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
   });
   //TODO:: call API to create new item and update tree data with response
@@ -255,12 +261,20 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
       });
     },
     onError: (error) => {
-      showAlert({ type: 'error', title: 'Create Note Failed', message: `${error instanceof Error ? error.message : 'Unknown error'}` });
+      showAlert({
+        type: 'error',
+        title: 'Create Note Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
   });
   const { mutate: createFolder } = useCreateFolderMutation({
     onError: (error) => {
-      showAlert({ type: 'error', title: 'Create Folder Failed', message: `${error instanceof Error ? error.message : 'Unknown error'}` });
+      showAlert({
+        type: 'error',
+        title: 'Create Folder Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
     onSuccess: (responses, variables) => {
       const newFolderId = responses.id;
@@ -288,7 +302,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   const [search, setSearch] = useState<string | undefined>('');
   useEffect(() => {
     const abortController = new AbortController();
-    getWorkspaceEvents({
+    const result = getWorkspaceEvents({
       path: { workspaceId: currentWorkspaceId },
       signal: abortController.signal,
       onSseEvent: (event) => {
@@ -300,13 +314,38 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           case 'HeartBeatWorkspaceEvent':
             break;
           default:
-            showAlert({ type: 'error', title: 'Unknown Event', message: `Received unknown event: ${event.event}` });
+            showAlert({
+              type: 'error',
+              title: 'Unknown Event',
+              message: `Received unknown event: ${event.event}`,
+            });
         }
       },
       onSseError: (error) => {
-        showAlert({ type: 'error', title: 'Connection Error', message: `${error instanceof Error ? error.message : 'Unknown error'}` });
+        showAlert({
+          type: 'error',
+          title: 'Connection Error',
+          message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+        });
       },
     });
+
+    const consumeStream = async () => {
+      try {
+        const { stream } = await result;
+        for await (const _ of stream) {
+        }
+      } catch (error) {
+        if (!abortController.signal.aborted) {
+          showAlert({
+            type: 'error',
+            title: 'Stream Error',
+            message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+          });
+        }
+      }
+    };
+    consumeStream();
 
     return () => {
       abortController.abort();
@@ -340,10 +379,18 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   const { mutate: moveWorkspaceItems } = useMoveWorkspaceItemsMutation({
     onError: (error) => {
-      showAlert({ type: 'error', title: 'Move Items Failed', message: `${error instanceof Error ? error.message : 'Unknown error'}` });
+      showAlert({
+        type: 'error',
+        title: 'Move Items Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
     onSuccess: () => {
-      showAlert({ type: 'success', title: 'Items Moved', message: 'Items have been moved successfully' });
+      showAlert({
+        type: 'success',
+        title: 'Items Moved',
+        message: 'Items have been moved successfully',
+      });
     },
   });
 
@@ -426,13 +473,21 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   const { mutate: trashItems } = useTrashWorkspaceItemsMutation({
     onError: (error) => {
-      showAlert({ type: 'error', title: 'Trash Items Failed', message: `${error instanceof Error ? error.message : 'Unknown error'}` });
+      showAlert({
+        type: 'error',
+        title: 'Trash Items Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: showTrashOptions({ path: { workspaceId: currentWorkspaceId } }).queryKey,
       });
-      showAlert({ type: 'success', title: 'Items Trashed', message: 'Items have been moved to trash successfully' });
+      showAlert({
+        type: 'success',
+        title: 'Items Trashed',
+        message: 'Items have been moved to trash successfully',
+      });
     },
   });
 
