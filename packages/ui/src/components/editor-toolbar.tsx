@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 
 import { Button } from './shadcn/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
+import { NoteLinksModal } from './note-links-modal';
 import { RevisionModal } from './revision-modal';
 
 interface EditorToolbarProps {
@@ -37,6 +38,12 @@ export function EditorToolbar({ noteId, currentEditor }: EditorToolbarProps) {
             </Button>
           </TooltipTrigger>
           <TooltipContent>View note graph</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <NoteLinksModal noteId={noteId} />
+          </TooltipTrigger>
+          <TooltipContent>View note links</TooltipContent>
         </Tooltip>
       </div>
     </TooltipProvider>
