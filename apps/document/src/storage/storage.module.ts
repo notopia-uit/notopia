@@ -19,6 +19,7 @@ import { StorageService } from './storage.service';
           region: s3Config.region,
           forcePathStyle: true,
           endpoint: s3Config.endpoint,
+          requestChecksumCalculation: 'WHEN_REQUIRED',
           credentials: {
             accessKeyId: s3Config.accessKeyId,
             secretAccessKey: s3Config.secretAccessKey,

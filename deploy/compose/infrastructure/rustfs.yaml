@@ -18,6 +18,7 @@ services:
       traefik.http.routers.rustfs-api.rule: Host(`rustfs-api.notopia.localhost`)
       traefik.http.routers.rustfs-api.entrypoints: web
       traefik.http.routers.rustfs-api.service: rustfs-api
+      traefik.http.routers.rustfs-api.middlewares: cors@file
       traefik.http.services.rustfs-api.loadbalancer.server.port: "9000"
       traefik.http.routers.rustfs-console.rule: Host(`rustfs.notopia.localhost`)
       traefik.http.routers.rustfs-console.entrypoints: web
