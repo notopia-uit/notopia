@@ -12,36 +12,35 @@ get:
   parameters:
     - name: keyword
       in: query
-      description: Search keyword
+      description: |
+        Search keyword.
+        In authentik, it may search based on username, email, full name, but not user ID (PK).
+      required: true
       schema:
         type: string
-    - name: excludeMemberInWorkspaceId
-      in: query
-      description: If provided, the search will be exclude users who are members of the specified workspace
-      schema:
-        $ref: ../components/schemas/Workspace.yaml#/properties/id
+        example: user
     - name: isActive
       in: query
       description: If provided, the search will be limited to (in)active users
       schema:
         type: boolean
+    - $ref: ../../common/components/parameters/limitQuery.yaml
+    - name: excludeMemberInWorkspaceId
+      in: query
+      description: |
+        If provided, the search will be exclude users who are members of the specified workspace.
+        Note that this will peform after getting users from identity provider, so it doesn't conform the `limit` parameter.
+      schema:
+        $ref: ../components/schemas/Workspace.yaml#/properties/id
   responses:
     200:
       description: A list of workspace members
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              data:
-                type: array
-                items:
-                  $ref: ../../common/components/schemas/User.yaml
-              pagination:
-                $ref: ../../common/components/schemas/Pagination.yaml
-            required:
-              - data
-              - pagination
+            type: array
+            items:
+              $ref: ../../common/components/schemas/User.yaml
     401:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
     500:

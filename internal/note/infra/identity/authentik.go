@@ -89,12 +89,11 @@ func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]app.User
 	return result, nil
 }
 
-func (a *Authentik) SearchUsers(ctx context.Context, params *app.IdentitySvcSearchUsersParams) (app.Paginated[app.User], error) {
+func (a *Authentik) SearchUsers(ctx context.Context, params *app.IdentitySvcSearchUsersParams) ([]app.User, error) {
 	ctx = context.WithValue(ctx, api.ContextAccessToken, a.token)
 	query := a.client.CoreApi.CoreUsersList(ctx).
 		Type_([]string{string(api.USERTYPEENUM_INTERNAL), string(api.USERTYPEENUM_EXTERNAL)}).
 		Search(params.Keyword).
-		Page(int32(params.Page)).
 		PageSize(int32(params.Limit))
 	switch params.ActiveStatus {
 	case app.IdentitySvcActiveStatusActive:
@@ -106,20 +105,9 @@ func (a *Authentik) SearchUsers(ctx context.Context, params *app.IdentitySvcSear
 	}
 	paginatedUsers, _, err := query.Execute()
 	if err != nil {
-		return app.Paginated[app.User]{}, err
+		return nil, err
 	}
-	return a.toAppPaginatedUsers(paginatedUsers), nil
-}
-
-func (a *Authentik) toAppPaginatedUsers(paginatedUsers *api.PaginatedUserList) app.Paginated[app.User] {
-	users := make([]app.User, len(paginatedUsers.GetResults()))
-	for i, user := range paginatedUsers.GetResults() {
-		users[i] = a.toAppUser(&user)
-	}
-	return app.Paginated[app.User]{
-		Data:       users,
-		Pagination: a.toAppPagination(&paginatedUsers.Pagination),
-	}
+	return a.toAppUsers(paginatedUsers.GetResults()), nil
 }
 
 func (a *Authentik) toAppPagination(pagination *api.Pagination) app.Pagination {
@@ -144,4 +132,12 @@ func (a *Authentik) toAppUser(user *api.User) app.User {
 		Email:    user.GetEmail(),
 		Roles:    user.GetRoles(),
 	}
+}
+
+func (a *Authentik) toAppUsers(users []api.User) []app.User {
+	result := make([]app.User, len(users))
+	for i, user := range users {
+		result[i] = a.toAppUser(&user)
+	}
+	return result
 }

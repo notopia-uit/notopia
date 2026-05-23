@@ -413,33 +413,6 @@ export type NoteUser = {
     email: string | null;
 };
 
-export type NotePagination = {
-    /**
-     * Current page number, starting from 1
-     */
-    page: number;
-    /**
-     * Number of items in the current page
-     */
-    currentTotal: number;
-    /**
-     * Total items across all pages
-     */
-    total: number;
-    /**
-     * Total number of pages
-     */
-    totalPages: number;
-    /**
-     * Whether there is a next page
-     */
-    hasNext: boolean;
-    /**
-     * Whether there is a previous page
-     */
-    hasPrev: boolean;
-};
-
 export type ShareUserWorkspaceRoleUpdatedEventWritable = {
     userId: ShareId;
     role: ShareWorkspaceRole;
@@ -2282,19 +2255,27 @@ export type UnpublishWorkspaceResponse = UnpublishWorkspaceResponses[keyof Unpub
 export type SearchUsersData = {
     body?: never;
     path?: never;
-    query?: {
+    query: {
         /**
-         * Search keyword
+         * Search keyword.
+         * In authentik, it may search based on username, email, full name, but not user ID (PK).
+         *
          */
-        keyword?: string;
-        /**
-         * If provided, the search will be exclude users who are members of the specified workspace
-         */
-        excludeMemberInWorkspaceId?: NoteId3;
+        keyword: string;
         /**
          * If provided, the search will be limited to (in)active users
          */
         isActive?: boolean;
+        /**
+         * The maximum number of users to return. Default is 10, maximum is 100.
+         */
+        limit?: number;
+        /**
+         * If provided, the search will be exclude users who are members of the specified workspace.
+         * Note that this will peform after getting users from identity provider, so it doesn't conform the `limit` parameter.
+         *
+         */
+        excludeMemberInWorkspaceId?: NoteId3;
     };
     url: '/note/search-users';
 };
@@ -2318,10 +2299,7 @@ export type SearchUsersResponses = {
     /**
      * A list of workspace members
      */
-    200: {
-        data: Array<NoteUser>;
-        pagination: NotePagination;
-    };
+    200: Array<NoteUser>;
 };
 
 export type SearchUsersResponse = SearchUsersResponses[keyof SearchUsersResponses];

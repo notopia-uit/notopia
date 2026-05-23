@@ -13,10 +13,10 @@ const (
 type IdentitySvcSearchUsersParams struct {
 	Keyword      string
 	ActiveStatus IdentitySvcActiveStatus
-	PaginationParams
+	Limit        uint
 }
 
 type IdentitySvc interface {
 	GetUsersByIDs(ctx context.Context, ids []string) ([]User, error)
-	SearchUsers(ctx context.Context, params *IdentitySvcSearchUsersParams) (Paginated[User], error)
+	SearchUsers(ctx context.Context, params *IdentitySvcSearchUsersParams) ([]User, error)
 }

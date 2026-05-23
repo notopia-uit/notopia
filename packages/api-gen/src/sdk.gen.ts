@@ -433,7 +433,7 @@ export const unpublishWorkspace = <ThrowOnError extends boolean = false>(options
 /**
  * Search users
  */
-export const searchUsers = <ThrowOnError extends boolean = false>(options?: Options<SearchUsersData, ThrowOnError>) => (options?.client ?? client).get<SearchUsersResponses, SearchUsersErrors, ThrowOnError>({
+export const searchUsers = <ThrowOnError extends boolean = false>(options: Options<SearchUsersData, ThrowOnError>) => (options.client ?? client).get<SearchUsersResponses, SearchUsersErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }, { scheme: 'bearer', type: 'http' }],
     url: '/note/search-users',
     ...options

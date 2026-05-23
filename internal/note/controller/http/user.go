@@ -31,15 +31,16 @@ func (h *StrictHandler) SearchUsers(ctx context.Context, request note.SearchUser
 		excludeWorkspaceID = *request.Params.ExcludeMemberInWorkspaceId
 	}
 
-	var keyword string
-	if request.Params.Keyword != nil {
-		keyword = *request.Params.Keyword
+	limit := uint(20)
+	if request.Params.Limit != nil {
+		limit = uint(*request.Params.Limit)
 	}
 
 	query := &app.SearchUsers{
 		UserID:                     user.ID,
-		Keyword:                    keyword,
+		Keyword:                    request.Params.Keyword,
 		ActiveStatus:               activeStatus,
+		Limit:                      limit,
 		ExcludeMemberInWorkspaceId: excludeWorkspaceID,
 		PaginationParams: app.PaginationParams{
 			Page:  1,
@@ -51,14 +52,7 @@ func (h *StrictHandler) SearchUsers(ctx context.Context, request note.SearchUser
 		return nil, err
 	}
 
-	dtos := make([]note.User, len(result.Data))
-	for i := range result.Data {
-		dtos[i] = toUserDTO(&result.Data[i])
-	}
-	paginationDTO := toPaginationDTO(&result.Pagination)
+	dtos := toUserDTOs(result)
 
-	return note.SearchUsers200JSONResponse{
-		Data:       dtos,
-		Pagination: paginationDTO,
-	}, nil
+	return note.SearchUsers200JSONResponse(dtos), nil
 }

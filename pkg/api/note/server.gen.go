@@ -479,19 +479,11 @@ func (siw *ServerInterfaceWrapper) SearchUsers(c *gin.Context) {
 	// Parameter object where we will unmarshal all parameters from the context
 	var params SearchUsersParams
 
-	// ------------- Optional query parameter "keyword" -------------
+	// ------------- Required query parameter "keyword" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "keyword", c.Request.URL.Query(), &params.Keyword, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "keyword", c.Request.URL.Query(), &params.Keyword, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter keyword: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Optional query parameter "excludeMemberInWorkspaceId" -------------
-
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "excludeMemberInWorkspaceId", c.Request.URL.Query(), &params.ExcludeMemberInWorkspaceId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter excludeMemberInWorkspaceId: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -500,6 +492,22 @@ func (siw *ServerInterfaceWrapper) SearchUsers(c *gin.Context) {
 	err = runtime.BindQueryParameterWithOptions("form", true, false, "isActive", c.Request.URL.Query(), &params.IsActive, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter isActive: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", c.Request.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "excludeMemberInWorkspaceId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "excludeMemberInWorkspaceId", c.Request.URL.Query(), &params.ExcludeMemberInWorkspaceId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter excludeMemberInWorkspaceId: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -2150,10 +2158,7 @@ type SearchUsersResponseObject interface {
 	VisitSearchUsersResponse(w http.ResponseWriter) error
 }
 
-type SearchUsers200JSONResponse struct {
-	Data       []User     `json:"data"`
-	Pagination Pagination `json:"pagination"`
-}
+type SearchUsers200JSONResponse []User
 
 func (response SearchUsers200JSONResponse) VisitSearchUsersResponse(w http.ResponseWriter) error {
 

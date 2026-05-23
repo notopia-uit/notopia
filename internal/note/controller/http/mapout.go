@@ -328,16 +328,24 @@ func toUserDTO(u *app.User) note.User {
 	}
 }
 
-func toPaginationDTO(p *app.Pagination) note.Pagination {
-	return note.Pagination{
-		Page:         int(p.Page),
-		CurrentTotal: int(p.CurrentTotal),
-		Total:        int(p.Total),
-		TotalPages:   int(p.TotalPages),
-		HasNext:      p.HasNext,
-		HasPrev:      p.HasPrev,
+func toUserDTOs(users []app.User) []note.User {
+	dtos := make([]note.User, len(users))
+	for i := range users {
+		dtos[i] = toUserDTO(&users[i])
 	}
+	return dtos
 }
+
+// func toPaginationDTO(p *app.Pagination) note.Pagination {
+// 	return note.Pagination{
+// 		Page:         int(p.Page),
+// 		CurrentTotal: int(p.CurrentTotal),
+// 		Total:        int(p.Total),
+// 		TotalPages:   int(p.TotalPages),
+// 		HasNext:      p.HasNext,
+// 		HasPrev:      p.HasPrev,
+// 	}
+// }
 
 func toSearchTokenDTO(t *app.SearchToken) note.SearchToken {
 	return note.SearchToken{

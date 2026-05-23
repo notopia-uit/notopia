@@ -331,15 +331,6 @@ export const zNoteUser = z.object({
     email: z.email().nullable()
 });
 
-export const zNotePagination = z.object({
-    page: z.int().gte(1),
-    currentTotal: z.int().gte(0),
-    total: z.int().gte(0),
-    totalPages: z.int().gte(0),
-    hasNext: z.boolean(),
-    hasPrev: z.boolean()
-});
-
 export const zShareUserWorkspaceRoleUpdatedEventWritable = z.object({
     userId: zShareId,
     role: zShareWorkspaceRole
@@ -922,15 +913,13 @@ export const zUnpublishWorkspacePath = z.object({
 export const zUnpublishWorkspaceResponse = z.void();
 
 export const zSearchUsersQuery = z.object({
-    keyword: z.string().optional(),
-    excludeMemberInWorkspaceId: zNoteId3.optional(),
-    isActive: z.boolean().optional()
+    keyword: z.string(),
+    isActive: z.boolean().optional(),
+    limit: z.int().lte(100).optional().default(10),
+    excludeMemberInWorkspaceId: zNoteId3.optional()
 });
 
 /**
  * A list of workspace members
  */
-export const zSearchUsersResponse = z.object({
-    data: z.array(zNoteUser),
-    pagination: zNotePagination
-});
+export const zSearchUsersResponse = z.array(zNoteUser);

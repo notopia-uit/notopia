@@ -313,27 +313,6 @@ type NoteLink struct {
 	Name Name2 `json:"name"`
 }
 
-// Pagination defines model for Pagination.
-type Pagination struct {
-	// CurrentTotal Number of items in the current page
-	CurrentTotal int `json:"currentTotal"`
-
-	// HasNext Whether there is a next page
-	HasNext bool `json:"hasNext"`
-
-	// HasPrev Whether there is a previous page
-	HasPrev bool `json:"hasPrev"`
-
-	// Page Current page number, starting from 1
-	Page int `json:"page"`
-
-	// Total Total items across all pages
-	Total int `json:"total"`
-
-	// TotalPages Total number of pages
-	TotalPages int `json:"totalPages"`
-}
-
 // SearchToken defines model for SearchToken.
 type SearchToken struct {
 	ExpiresAt time.Time `json:"expiresAt"`
@@ -614,14 +593,19 @@ type RenameNoteJSONBody struct {
 
 // SearchUsersParams defines parameters for SearchUsers.
 type SearchUsersParams struct {
-	// Keyword Search keyword
-	Keyword *string `form:"keyword,omitempty" json:"keyword,omitempty"`
-
-	// ExcludeMemberInWorkspaceId If provided, the search will be exclude users who are members of the specified workspace
-	ExcludeMemberInWorkspaceId *Id3 `form:"excludeMemberInWorkspaceId,omitempty" json:"excludeMemberInWorkspaceId,omitempty"`
+	// Keyword Search keyword.
+	// In authentik, it may search based on username, email, full name, but not user ID (PK).
+	Keyword string `form:"keyword" json:"keyword"`
 
 	// IsActive If provided, the search will be limited to (in)active users
 	IsActive *bool `form:"isActive,omitempty" json:"isActive,omitempty"`
+
+	// Limit The maximum number of users to return. Default is 10, maximum is 100.
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// ExcludeMemberInWorkspaceId If provided, the search will be exclude users who are members of the specified workspace.
+	// Note that this will peform after getting users from identity provider, so it doesn't conform the `limit` parameter.
+	ExcludeMemberInWorkspaceId *Id3 `form:"excludeMemberInWorkspaceId,omitempty" json:"excludeMemberInWorkspaceId,omitempty"`
 }
 
 // CreateWorkspaceResponse defines parameters for CreateWorkspace.

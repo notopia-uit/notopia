@@ -949,12 +949,12 @@ export const unpublishWorkspaceMutation = (options?: Partial<Options<UnpublishWo
  */
 export const useUnpublishWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<UnpublishWorkspaceResponse, UnpublishWorkspaceError, Options<UnpublishWorkspaceData>>, 'mutationFn'>>) => useMutation({ ...unpublishWorkspaceMutation(), ...mutationOptions });
 
-export const searchUsersQueryKey = (options?: Options<SearchUsersData>) => createQueryKey('searchUsers', options);
+export const searchUsersQueryKey = (options: Options<SearchUsersData>) => createQueryKey('searchUsers', options);
 
 /**
  * Search users
  */
-export const searchUsersOptions = (options?: Options<SearchUsersData>) => queryOptions<SearchUsersResponse, SearchUsersError, SearchUsersResponse, ReturnType<typeof searchUsersQueryKey>>({
+export const searchUsersOptions = (options: Options<SearchUsersData>) => queryOptions<SearchUsersResponse, SearchUsersError, SearchUsersResponse, ReturnType<typeof searchUsersQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
         const { data } = await searchUsers({
             ...options,
@@ -970,4 +970,4 @@ export const searchUsersOptions = (options?: Options<SearchUsersData>) => queryO
 /**
  * Search users
  */
-export const useSearchUsersQuery = (options?: Options<SearchUsersData>) => useQuery(searchUsersOptions(options));
+export const useSearchUsersQuery = (options: Options<SearchUsersData>) => useQuery(searchUsersOptions(options));
