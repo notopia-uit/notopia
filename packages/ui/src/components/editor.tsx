@@ -5,7 +5,6 @@ import '@notopia-uit/lib/hocuspocus';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
 import { useHocuspocusProvider } from '@hocuspocus/provider-react';
-import { EditorSearchProvider } from '@notopia-uit/ui/components/editor-search-provider';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
@@ -61,12 +60,7 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
       <NoteTitle noteId={noteId} workspaceId={workspaceId} />
       <EditorToolbar noteId={noteId} currentEditor={editorRef.current} />
       {isAwarenessReady ? (
-        <EditorSearchProvider
-          workspaceId={workspaceId || ''}
-          host={process.env.NEXT_PUBLIC_MEILISEARCH_HOST || 'http://localhost:7700'}
-        >
-          <EditorCore ref={editorRef} sessionUser={sessionUser} noteId={noteId} />
-        </EditorSearchProvider>
+        <EditorCore ref={editorRef} sessionUser={sessionUser} noteId={noteId} />
       ) : (
         <div className="flex h-96 items-center justify-center">
           <Spinner />

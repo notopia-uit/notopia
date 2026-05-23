@@ -1,6 +1,8 @@
 'use client';
 
-import { EditorSearchProvider } from '@notopia-uit/ui/components/editor-search-provider';
+import { getWorkspaceSearchTokenOptions } from '@notopia-uit/api-gen';
+import { useQuery } from '@tanstack/react-query';
+import { MeilisearchProvider } from '@notopia-uit/ui/contexts/meilisearch-context';
 
 import { NoteSearchModal } from './note-search-modal';
 
@@ -13,15 +15,21 @@ export function WorkspaceContentWrapper({
   children,
   workspaceId,
 }: WorkspaceContentWrapperProps) {
+  const { data: tokenData } = useQuery({
+    ...getWorkspaceSearchTokenOptions({
+      path: {
+        workspaceId,
+      },
+    }),
+  });
+
   return (
-    <EditorSearchProvider
-      workspaceId={workspaceId}
-      host={
-        process.env.NEXT_PUBLIC_MEILISEARCH_HOST || 'http://localhost:7700'
-      }
+    <MeilisearchProvider
+      host={process.env.NEXT_PUBLIC_MEILISEARCH_HOST || 'http://localhost:7700'}
+      apiKey={tokenData?.token}
     >
       {children}
       <NoteSearchModal workspaceId={workspaceId} />
-    </EditorSearchProvider>
+    </MeilisearchProvider>
   );
 }
