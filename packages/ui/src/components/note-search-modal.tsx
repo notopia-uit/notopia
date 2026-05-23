@@ -10,7 +10,6 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   Command,
   CommandDialog,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -83,7 +82,7 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
       title="Search Notes"
       description="Search for notes in your workspace"
     >
-      <Command>
+      <Command shouldFilter={false}>
         <CommandInput placeholder="Search notes..." value={query} onValueChange={handleQueryChange} />
         <CommandList>
           {!meilisearchClient && !isLoading && (
@@ -104,7 +103,7 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
             </div>
           )}
           {!isLoading && !error && meilisearchClient && query && results.length === 0 && (
-            <CommandEmpty>No notes found for "{query}"</CommandEmpty>
+            <div className="py-6 text-center text-sm">No notes found for "{query}"</div>
           )}
           {!isLoading && !error && results.length > 0 && (
             <CommandGroup heading="Notes">
