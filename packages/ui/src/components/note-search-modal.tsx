@@ -5,7 +5,7 @@ import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { FileText, SearchX } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import {
   CommandDialog,
@@ -39,8 +39,10 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const noteSearchFn = (q: string) =>
-    searchNotesFromMeilisearch(meilisearchClient, q);
+  const noteSearchFn = useCallback(
+    (q: string) => searchNotesFromMeilisearch(meilisearchClient, q),
+    [meilisearchClient],
+  );
 
   const { search, isLoading, error } = useSearchCache(noteSearchFn, 300);
 
