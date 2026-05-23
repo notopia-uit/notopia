@@ -561,6 +561,11 @@ export type NoteWorkspaceSlugPath = NoteSlug;
 
 export type NoteWorkspaceIdPath = NoteId3;
 
+/**
+ * Number of items per page
+ */
+export type NoteLimitQuery = number;
+
 export type GetDocumentAttachmentUploadUrlData = {
     body?: never;
     path: {
@@ -2269,7 +2274,7 @@ export type SearchUsersData = {
          */
         isActive?: boolean;
         /**
-         * The maximum number of users to return. Default is 10, maximum is 100.
+         * Number of items per page
          */
         limit?: number;
         /**

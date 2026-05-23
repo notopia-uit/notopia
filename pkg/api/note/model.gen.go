@@ -524,6 +524,9 @@ type UpdatedAt2 = time.Time
 // FolderIdPath defines model for folderIdPath.
 type FolderIdPath = Id
 
+// LimitQuery defines model for limitQuery.
+type LimitQuery = int
+
 // NoteIdPath defines model for noteIdPath.
 type NoteIdPath = Id2
 
@@ -600,8 +603,8 @@ type SearchUsersParams struct {
 	// IsActive If provided, the search will be limited to (in)active users
 	IsActive *bool `form:"isActive,omitempty" json:"isActive,omitempty"`
 
-	// Limit The maximum number of users to return. Default is 10, maximum is 100.
-	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+	// Limit Number of items per page
+	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
 
 	// ExcludeMemberInWorkspaceId If provided, the search will be exclude users who are members of the specified workspace.
 	// Note that this will peform after getting users from identity provider, so it doesn't conform the `limit` parameter.

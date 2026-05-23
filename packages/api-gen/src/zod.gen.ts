@@ -476,6 +476,11 @@ export const zNoteWorkspaceSlugPath = zNoteSlug;
 
 export const zNoteWorkspaceIdPath = zNoteId3;
 
+/**
+ * Number of items per page
+ */
+export const zNoteLimitQuery = z.int().gte(1).lte(100).default(20);
+
 export const zGetDocumentAttachmentUploadUrlPath = z.object({
     documentId: zDocumentId
 });
@@ -919,7 +924,7 @@ export const zUnpublishWorkspaceResponse = z.void();
 export const zSearchUsersQuery = z.object({
     keyword: z.string(),
     isActive: z.boolean().optional(),
-    limit: z.int().lte(100).optional().default(10),
+    limit: z.int().gte(1).lte(100).optional().default(20),
     excludeMemberInWorkspaceId: zNoteId3.optional()
 });
 
