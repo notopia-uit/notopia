@@ -15,7 +15,7 @@ export default function LandingHero() {
           we figure this out together.
         </p>
         <div className="space-x-4">
-          <Link href="/signin" className={cn(buttonVariants({ size: 'lg' }))}>
+          <Link href="/workspace" className={cn(buttonVariants({ size: 'lg' }))}>
             Get Started
           </Link>
           <Link
