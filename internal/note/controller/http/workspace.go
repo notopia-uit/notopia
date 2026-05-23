@@ -2,9 +2,7 @@ package http
 
 import (
 	"context"
-	"io"
 
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	commonhttp "github.com/notopia-uit/notopia/pkg/common/http"
 
@@ -178,10 +176,6 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	ctx context.Context,
 	request note.GetWorkspaceEventsRequestObject,
 ) (note.GetWorkspaceEventsResponseObject, error) {
-	c, ok := ctx.(*gin.Context)
-	if !ok {
-		return nil, errs.NewInternal("failed to cast context to gin.Context")
-	}
 	user, ok := commonhttp.UserFromContext(ctx)
 	if !ok {
 		return nil, errs.Unauthorized
@@ -191,14 +185,8 @@ func (h *StrictHandler) GetWorkspaceEvents(
 	if err != nil {
 		return nil, errs.NewInternalErr("failed to subscribe to workspace events", err)
 	}
-	r, w := io.Pipe()
-	sender := newWorkspaceEventSSESender(ctx, eventCh, w, c.Writer)
-	sender.Stream()
 
-	//exhaustruct:ignore
-	return note.GetWorkspaceEvents200TexteventStreamResponse{
-		Body: r,
-	}, nil
+	return NewWorkspaceEventStreamResponse(ctx, eventCh), nil
 }
 
 func (h *StrictHandler) GetWorkspaceGraph(
