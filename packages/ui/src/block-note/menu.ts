@@ -21,7 +21,7 @@ const getLocalDocumentTags = (editor: MyEditor): string[] => {
   return Array.from(tags);
 };
 
-interface SearchResult {
+export interface SearchResult {
   id: string;
   name: string;
 }
