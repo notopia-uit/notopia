@@ -9,6 +9,7 @@ import {
   useHocuspocusSyncStatus,
   useHocuspocusConnectionStatus,
 } from '@hocuspocus/provider-react';
+import { type CollaborationUser } from '@notopia-uit/lib/block-note';
 import {
   createBlockNoteSchema,
   getNoteMenuItems,
@@ -138,10 +139,11 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
         awareness: provider.awareness ? provider.awareness : undefined,
       },
       fragment: provider.document.getXmlFragment('prosemirror'),
-      user: sessionUser || {
+      user: (sessionUser ?? {
         name: 'Anonymous',
         color: '#999999',
-      },
+        avatar: 'https://placehold.net/default.svg',
+      }) satisfies CollaborationUser,
     },
     uploadFile,
     resolveFileUrl,

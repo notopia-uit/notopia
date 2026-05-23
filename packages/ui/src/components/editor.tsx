@@ -4,12 +4,11 @@ import '@notopia-uit/lib/yjs';
 import '@notopia-uit/lib/hocuspocus';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
-import { useHocuspocusProvider } from '@hocuspocus/provider-react';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { EditorCore } from './editor-core';
@@ -21,8 +20,6 @@ import { Button } from './shadcn/button';
 export default function Editor({ noteId, workspaceId }: { noteId: string; workspaceId?: string }) {
   const { data: sessionData } = authClient.useSession();
   const router = useRouter();
-  const [isAwarenessReady, setIsAwarenessReady] = useState(true);
-  const provider = useHocuspocusProvider();
 
   const sessionUser = useMemo(
     () => ({
@@ -32,13 +29,6 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
     }),
     [sessionData?.user?.name, sessionData?.user?.id, sessionData?.user?.image]
   );
-
-  useEffect(() => {
-    if (provider.awareness && sessionUser) {
-      provider.awareness.setLocalState(sessionUser);
-      setIsAwarenessReady(true);
-    }
-  }, [provider.awareness, sessionUser]);
 
   const editorRef = useRef<any>(null);
   const { isModified, isCommitingDocument, handleSave } = useEditorState(noteId);
@@ -59,13 +49,7 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
     <div className="relative min-h-screen">
       <NoteTitle noteId={noteId} workspaceId={workspaceId} />
       <EditorToolbar noteId={noteId} currentEditor={editorRef.current} />
-      {isAwarenessReady ? (
-        <EditorCore ref={editorRef} sessionUser={sessionUser} noteId={noteId} />
-      ) : (
-        <div className="flex h-96 items-center justify-center">
-          <Spinner />
-        </div>
-      )}
+      <EditorCore ref={editorRef} sessionUser={sessionUser} noteId={noteId} />
 
       {isModified && (
         <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">
