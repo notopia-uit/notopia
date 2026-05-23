@@ -124,13 +124,6 @@ export default function Graph({
           data-cfg={JSON.stringify(localGraph)}
         />
       </div>
-      <div className="global-graph-outer">
-        <div
-          ref={globalGraphRef}
-          className={styles.globalGraphContainer}
-          data-cfg={JSON.stringify(globalGraph)}
-        />
-      </div>
     </div>
   );
 }
