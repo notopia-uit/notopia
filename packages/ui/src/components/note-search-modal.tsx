@@ -1,6 +1,6 @@
 'use client';
 
-import { searchNotesFromMeilisearch } from '@notopia-uit/ui/block-note';
+import { searchNotesFromMeilisearch, type SearchResult } from '@notopia-uit/ui/block-note';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { FileText, SearchX } from 'lucide-react';
@@ -25,6 +25,7 @@ interface NoteSearchModalProps {
 export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
   const meilisearchClient = useMeilisearch();
   const router = useRouter();
 
@@ -45,20 +46,20 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
     [meilisearchClient]
   );
 
-  const { search, isLoading, error } = useSearchCache(noteSearchFn, 300);
+  const { search: searchNotesWithCache, isLoading, error } = useSearchCache(noteSearchFn, 300);
 
-  const [results, setResults] = useState<{ id: string; name: string }[]>([]);
-
-  useEffect(() => {
-    if (!query) {
-      setResults([]);
-      return;
-    }
-
-    search(query).then((result) => {
+  const handleQueryChange = useCallback(
+    async (value: string) => {
+      setQuery(value);
+      if (!value) {
+        setResults([]);
+        return;
+      }
+      const result = await searchNotesWithCache(value);
       setResults(result.data || []);
-    });
-  }, [query, search]);
+    },
+    [searchNotesWithCache]
+  );
 
   const handleSelect = (noteId: string) => {
     setOpen(false);
@@ -83,7 +84,7 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
       description="Search for notes in your workspace"
     >
       <Command>
-        <CommandInput placeholder="Search notes..." value={query} onValueChange={setQuery} />
+        <CommandInput placeholder="Search notes..." value={query} onValueChange={handleQueryChange} />
         <CommandList>
           {!meilisearchClient && !isLoading && (
             <div className="text-muted-foreground flex items-center justify-center gap-2 py-6 text-sm">
