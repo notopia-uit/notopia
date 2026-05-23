@@ -8,7 +8,7 @@ import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useHocuspocusProvider } from '@hocuspocus/provider-react';
 import { EditorSearchProvider } from '@notopia-uit/ui/components/editor-search-provider';
 
@@ -41,6 +41,7 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
     }
   }, [provider.awareness, sessionUser]);
 
+  const editorRef = useRef<any>(null);
   const { isModified, isCommitingDocument, handleSave } = useEditorState(noteId);
 
   useEffect(() => {
@@ -60,14 +61,14 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
       <NoteTitle noteId={noteId} workspaceId={workspaceId} />
       <EditorToolbar
         noteId={noteId}
-        currentEditor={undefined}
+        currentEditor={editorRef.current}
       />
       {isAwarenessReady ? (
         <EditorSearchProvider 
           workspaceId={workspaceId || ''} 
           host={process.env.NEXT_PUBLIC_MEILISEARCH_HOST || 'http://localhost:7700'}
         >
-          <EditorCore sessionUser={sessionUser} noteId={noteId} />
+          <EditorCore ref={editorRef} sessionUser={sessionUser} noteId={noteId} />
         </EditorSearchProvider>
       ) : (
         <div className="flex items-center justify-center h-96">

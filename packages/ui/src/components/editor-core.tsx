@@ -22,7 +22,7 @@ import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { uploadDocumentAttachment } from '@notopia-uit/ui/lib/actions/upload';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { forwardRef, useMemo, useCallback } from 'react';
+import { forwardRef, useMemo, useCallback, useEffect } from 'react';
 
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
@@ -113,7 +113,7 @@ function EditorStatusBar() {
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
   { sessionUser, noteId },
-  _ref
+  ref
 ) {
   const { resolvedTheme } = useTheme();
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
@@ -146,6 +146,17 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     uploadFile,
     resolveFileUrl,
   });
+
+  useEffect(() => {
+    if (ref) {
+      (ref as React.MutableRefObject<any>).current = editor;
+    }
+    return () => {
+      if (ref) {
+        (ref as React.MutableRefObject<any>).current = null;
+      }
+    };
+  }, [editor, ref]);
 
   const noteSearchFn = useCallback(
     (query: string) => searchNotesFromMeilisearch(meilisearchClient, query),
