@@ -44,12 +44,22 @@ pkg/                            # Go packages
 - openapi-generator generate NestJS server code
 - heyapi/openapi-ts generate frontend API client code (typescript, react-query, nextjs)
 - oapi-codegen generate Go server code (gin, strict server)
+- API/Contract change should come from API spec in `api` and `proto`, run `nx gen api` and `nx gen proto` to generate code
 
 ### Frontend
 
 - Use shadcn component as much as possible, install in `packages/ui`, the package name is `@notopia-uit/ui`
   - Example: `shadcn add button -c @notopia-uit/ui`
 - Use Tailwind CSS, try to avoid writing custom css and color
+
+### Go
+
+- Do not run `go generate`, because we don't mange tool via go tool, but via mise. Stick with nx targets
+
+### Infrastructure
+
+- Including Identity Provider (Authentik), API Gateway (Traefik), Object Storage (RustFS), and other services.
+  Read [AGENTS.md](./deploy/compose/AGENTS.md) for details
 
 ## Nx
 
@@ -68,3 +78,12 @@ pkg/                            # Go packages
 - While writing code, try to not write unnecessary comment into code
 - There are many `*.env*` file, which contains safe local development environment variables. Only `*.env.local*` can contain sensitive environment variables, and should be gitignored
 - Do not run `npx`, or `npx tsc`
+
+### Git
+
+Before commit, make sure to:
+
+- Use conventional commit
+- Should run `oxfmt {pathChanged}` after writing JS code
+- Run `nx lint {projectName} --fix` to apply eslint/golangcilint fix
+- If introduce deps, should run `go mod tidy` for go, and `pnpm install` for JS/TS

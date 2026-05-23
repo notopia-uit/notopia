@@ -28,7 +28,7 @@ accessLog:
 
 entryPoints:
   web:
-    address: ':80'
+    address: ":80"
 
 experimental:
   plugins:

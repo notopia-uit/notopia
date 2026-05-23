@@ -12,10 +12,10 @@ services:
     volumes:
       - ./loki/config.yaml:/etc/loki/config.yaml:ro
     labels:
-      traefik.enable: 'true'
+      traefik.enable: "true"
       traefik.http.routers.loki.rule: Host(`loki.notopia.localhost`)
       traefik.http.routers.loki.entrypoints: web
-      traefik.http.services.loki.loadbalancer.server.port: '3100'
+      traefik.http.services.loki.loadbalancer.server.port: "3100"
     profiles:
       - monitoring
     restart: unless-stopped

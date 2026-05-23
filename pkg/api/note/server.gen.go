@@ -50,6 +50,9 @@ type ServerInterface interface {
 	// Unpublish note
 	// (POST /note/notes/{noteId}/unpublish)
 	UnpublishNote(c *gin.Context, noteId NoteIdPath)
+	// Search users
+	// (GET /note/search-users)
+	SearchUsers(c *gin.Context, params SearchUsersParams)
 	// Create workspace
 	// (POST /note/workspaces)
 	CreateWorkspace(c *gin.Context)
@@ -461,6 +464,61 @@ func (siw *ServerInterfaceWrapper) UnpublishNote(c *gin.Context) {
 	}
 
 	siw.Handler.UnpublishNote(c, noteId)
+}
+
+// SearchUsers operation middleware
+func (siw *ServerInterfaceWrapper) SearchUsers(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	c.Set(string(Oauth2Scopes), []string{"openid"})
+
+	c.Set(string(OIDCScopes), []string{"openid"})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SearchUsersParams
+
+	// ------------- Required query parameter "keyword" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "keyword", c.Request.URL.Query(), &params.Keyword, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter keyword: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "isActive" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "isActive", c.Request.URL.Query(), &params.IsActive, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter isActive: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "limit", c.Request.URL.Query(), &params.Limit, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "excludeMemberInWorkspaceId" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "excludeMemberInWorkspaceId", c.Request.URL.Query(), &params.ExcludeMemberInWorkspaceId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter excludeMemberInWorkspaceId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.SearchUsers(c, params)
 }
 
 // CreateWorkspace operation middleware
@@ -1161,6 +1219,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/note/notes/:noteId/publish", wrapper.PublishNote)
 	router.POST(options.BaseURL+"/note/notes/:noteId/rename", wrapper.RenameNote)
 	router.POST(options.BaseURL+"/note/notes/:noteId/unpublish", wrapper.UnpublishNote)
+	router.GET(options.BaseURL+"/note/search-users", wrapper.SearchUsers)
 	router.POST(options.BaseURL+"/note/workspaces", wrapper.CreateWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces-by-slug/:workspaceSlug", wrapper.GetWorkspace)
 	router.GET(options.BaseURL+"/note/workspaces-by-slug/:workspaceSlug/exists", wrapper.CheckWorkspaceSlugExists)
@@ -2080,6 +2139,58 @@ type UnpublishNote500JSONResponse struct {
 }
 
 func (response UnpublishNote500JSONResponse) VisitUnpublishNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SearchUsersRequestObject struct {
+	Params SearchUsersParams
+}
+
+type SearchUsersResponseObject interface {
+	VisitSearchUsersResponse(w http.ResponseWriter) error
+}
+
+type SearchUsers200JSONResponse []User
+
+func (response SearchUsers200JSONResponse) VisitSearchUsersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SearchUsers401JSONResponse struct{ UnauthorizedErrorJSONResponse }
+
+func (response SearchUsers401JSONResponse) VisitSearchUsersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SearchUsers500JSONResponse struct {
+	InternalServerErrorJSONResponse
+}
+
+func (response SearchUsers500JSONResponse) VisitSearchUsersResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(response); err != nil {
@@ -3836,6 +3947,9 @@ type StrictServerInterface interface {
 	// Unpublish note
 	// (POST /note/notes/{noteId}/unpublish)
 	UnpublishNote(ctx context.Context, request UnpublishNoteRequestObject) (UnpublishNoteResponseObject, error)
+	// Search users
+	// (GET /note/search-users)
+	SearchUsers(ctx context.Context, request SearchUsersRequestObject) (SearchUsersResponseObject, error)
 	// Create workspace
 	// (POST /note/workspaces)
 	CreateWorkspace(ctx context.Context, request CreateWorkspaceRequestObject) (CreateWorkspaceResponseObject, error)
@@ -4267,6 +4381,32 @@ func (sh *strictHandler) UnpublishNote(ctx *gin.Context, noteId NoteIdPath) {
 		sh.options.HandlerErrorFunc(ctx, err)
 	} else if validResponse, ok := response.(UnpublishNoteResponseObject); ok {
 		if err := validResponse.VisitUnpublishNoteResponse(ctx.Writer); err != nil {
+			sh.options.ResponseErrorHandlerFunc(ctx, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(ctx, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SearchUsers operation middleware
+func (sh *strictHandler) SearchUsers(ctx *gin.Context, params SearchUsersParams) {
+	var request SearchUsersRequestObject
+
+	request.Params = params
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.SearchUsers(ctx, request.(SearchUsersRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SearchUsers")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		sh.options.HandlerErrorFunc(ctx, err)
+	} else if validResponse, ok := response.(SearchUsersResponseObject); ok {
+		if err := validResponse.VisitSearchUsersResponse(ctx.Writer); err != nil {
 			sh.options.ResponseErrorHandlerFunc(ctx, err)
 		}
 	} else if response != nil {

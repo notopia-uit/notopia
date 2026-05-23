@@ -13,7 +13,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/:/etc/traefik/:ro
     labels:
-      traefik.enable: 'true'
+      traefik.enable: "true"
       traefik.http.routers.traefik.rule: Host(`traefik.notopia.localhost`)
       traefik.http.routers.traefik.entrypoints: web
       traefik.http.routers.traefik.service: api@internal

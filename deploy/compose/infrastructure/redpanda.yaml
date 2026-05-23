@@ -38,7 +38,7 @@ services:
     volumes:
       - ./redpanda/console-config.yaml:/etc/redpanda/config.yaml:ro
     labels:
-      traefik.enable: 'true'
+      traefik.enable: "true"
       traefik.http.routers.redpanda-console.rule: Host(`redpanda.notopia.localhost`)
       traefik.http.routers.redpanda-console.entrypoints: web
       traefik.http.services.redpanda-console.loadbalancer.server.port: 8080

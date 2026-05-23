@@ -9,7 +9,7 @@
     "outDir": "out-tsc",
     "rootDir": "src",
     "target": "es2024",
-    "moduleResolution": "bundler",
+    "moduleResolution": "bundler"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

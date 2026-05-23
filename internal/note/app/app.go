@@ -112,6 +112,7 @@ type Queries struct {
 	GetWorkspaceMembers      GetWorkspaceMembersQuery
 	GetWorkspaceSearchToken  GetWorkspaceSearchTokenQuery
 	GetWorkspaceTree         GetWorkspaceTreeQuery
+	SearchUsers              SearchUsersQuery
 	ShowTrash                ShowTrashQuery
 }
 
@@ -128,6 +129,7 @@ func NewQueries(
 	GetWorkspaceMembersHandler *GetWorkspaceMembersHandler,
 	GetWorkspaceSearchTokenHandler *GetWorkspaceSearchTokenHandler,
 	GetWorkspaceTreeHandler *GetWorkspaceTreeHandler,
+	SearchUsersHandler *SearchUsersHandler,
 	ShowTrashHandler *ShowTrashHandler,
 ) *Queries {
 	hp := (*commonhandler.HandlerProvider)(handlerProvider)
@@ -143,6 +145,7 @@ func NewQueries(
 		GetWorkspaceMembers:      GetWorkspaceMembersQuery(commonhandler.DecorateQuery(hp, GetWorkspaceMembersHandler)),
 		GetWorkspaceSearchToken:  GetWorkspaceSearchTokenQuery(commonhandler.DecorateQuery(hp, GetWorkspaceSearchTokenHandler)),
 		GetWorkspaceTree:         GetWorkspaceTreeQuery(commonhandler.DecorateQuery(hp, GetWorkspaceTreeHandler)),
+		SearchUsers:              SearchUsersQuery(commonhandler.DecorateQuery(hp, SearchUsersHandler)),
 		ShowTrash:                ShowTrashQuery(commonhandler.DecorateQuery(hp, ShowTrashHandler)),
 	}
 }

@@ -4,10 +4,12 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/oapi-codegen/nullable"
+	openapi_types "github.com/oapi-codegen/runtime/types"
+
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/api/note"
-	"github.com/oapi-codegen/nullable"
 )
 
 func toNoteDTO(n *app.Note) (note.Note, error) {
@@ -304,6 +306,46 @@ func toTrashedByDTO(t app.TrashedBy) (note.TrashedBy, error) {
 		return "", errs.NewInternal(fmt.Sprintf("invalid trashed by: %v", t))
 	}
 }
+
+func toUserDTO(u *app.User) note.User {
+	var name nullable.Nullable[string]
+	if u.Name != "" {
+		name.Set(u.Name)
+	} else {
+		name.SetNull()
+	}
+	var email nullable.Nullable[openapi_types.Email]
+	if u.Email != "" {
+		email.Set(openapi_types.Email(u.Email))
+	} else {
+		email.SetNull()
+	}
+	return note.User{
+		Id:       u.ID,
+		Username: u.UserName,
+		Name:     name,
+		Email:    email,
+	}
+}
+
+func toUserDTOs(users []app.User) []note.User {
+	dtos := make([]note.User, len(users))
+	for i := range users {
+		dtos[i] = toUserDTO(&users[i])
+	}
+	return dtos
+}
+
+// func toPaginationDTO(p *app.Pagination) note.Pagination {
+// 	return note.Pagination{
+// 		Page:         int(p.Page),
+// 		CurrentTotal: int(p.CurrentTotal),
+// 		Total:        int(p.Total),
+// 		TotalPages:   int(p.TotalPages),
+// 		HasNext:      p.HasNext,
+// 		HasPrev:      p.HasPrev,
+// 	}
+// }
 
 func toSearchTokenDTO(t *app.SearchToken) note.SearchToken {
 	return note.SearchToken{

@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Notopia - Providers Oauth2
+  labels:
+    blueprint-group: notopia
+    blueprints.goauthentik.io/description: |
+      Notopia - Providers Oauth2 Settings
+
+entries:
+  - identifiers:
+      scope_name: picture
+    model: authentik_providers_oauth2.scopemapping
+    attrs:
+      name: "Egolia - OAuth Mapping: Picture 'picture'"
+      scope_name: picture
+      description: "Picture URL"
+      expression: | # language: python
+        return {
+          "picture": request.user.attributes.get("avatar_url") or None,
+        }

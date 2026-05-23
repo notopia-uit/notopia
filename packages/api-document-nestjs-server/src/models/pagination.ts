@@ -2,15 +2,15 @@
 
 export interface Pagination { 
   /**
-   * Current page number
+   * Current page number, starting from 1
    */
   page: number;
   /**
-   * Number of items per page
+   * Number of items in the current page
    */
-  limit: number;
+  currentTotal: number;
   /**
-   * Total number of items
+   * Total items across all pages
    */
   total: number;
   /**

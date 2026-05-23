@@ -12,6 +12,12 @@ get:
   operationId: getDocumentAttachmentUploadUrl
   parameters:
     - $ref: ../components/parameters/documentIdPath.yaml
+    - name: filename
+      in: query
+      required: true
+      schema:
+        type: string
+        example: sam_seg.mp4
   responses:
     200:
       description: Presigned URL
@@ -27,7 +33,7 @@ get:
               url:
                 type: string
                 format: uri
-                example: http://rustfs-api.notopia.localhost/document/document-attachments/d4c6b66a-03a8-486d-a139-ab72635c009b/a64cb105-4924-4441-8611-bbc91bbaa1b9
+                example: http://rustfs-api.notopia.localhost/document/document-attachments/d4c6b66a-03a8-486d-a139-ab72635c009b/a64cb105-4924-4441-8611-bbc91bbaa1b9-sam_seg.mp4
             required:
               - uploadUrl
               - url

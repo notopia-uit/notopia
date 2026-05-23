@@ -36,22 +36,33 @@ export class DocumentApi extends DocumentApiDefinition {
     }
   }
 
-  override async getDocumentAttachmentUploadUrl(documentId: string, req: Request) {
-    this.logger.log({ documentId }, 'getDocumentAttachmentUploadUrl: received');
+  override async getDocumentAttachmentUploadUrl(
+    documentId: string,
+    filename: string,
+    req: Request
+  ) {
+    this.logger.log({ documentId, filename }, 'getDocumentAttachmentUploadUrl: received');
     const user = (req as unknown as Record<string, unknown>).user as User | undefined;
     if (!user) {
       throw new UnauthorizedException('User not authenticated');
     }
     try {
-      const result = await this.documentService.getAttachmentUploadUrl(documentId, user.id);
-      this.logger.log({ documentId }, 'getDocumentAttachmentUploadUrl: done');
+      const result = await this.documentService.getAttachmentUploadUrl({
+        documentId,
+        filename,
+        userId: user.id,
+      });
+      this.logger.log({ documentId, filename }, 'getDocumentAttachmentUploadUrl: done');
       this.logger.debug(
         { uploadUrl: result.uploadUrl },
         'getDocumentAttachmentUploadUrl: response'
       );
       return result;
     } catch (error) {
-      this.logger.error({ err: error, documentId }, 'getDocumentAttachmentUploadUrl: error');
+      this.logger.error(
+        { err: error, documentId, filename },
+        'getDocumentAttachmentUploadUrl: error'
+      );
       throw error;
     }
   }

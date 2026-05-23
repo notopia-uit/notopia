@@ -94,7 +94,7 @@
       "dependsOn": ["join"]
     },
     "gen:document-nestjs-server": {
-      "outputs": ["{workspaceRoot}/packages/api-document-nestjs-server/"],
+      "outputs": ["{workspaceRoot}/packages/api-document-nestjs-server/src"],
       "inputs": [
         { "dependentTasksOutputFiles": "**/*.json", "transitive": true },
         "{projectRoot}/openapitools.json"

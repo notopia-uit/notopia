@@ -27,10 +27,10 @@ services:
     volumes:
       - dbgate_data:/root/.dbgate
     labels:
-      traefik.enable: 'true'
+      traefik.enable: "true"
       traefik.http.routers.dbgate.rule: Host(`dbgate.notopia.localhost`)
       traefik.http.routers.dbgate.entrypoints: web
-      traefik.http.services.dbgate.loadbalancer.server.port: '3000'
+      traefik.http.services.dbgate.loadbalancer.server.port: "3000"
     profiles:
       - dev-ui
     restart: unless-stopped

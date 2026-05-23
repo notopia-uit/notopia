@@ -77,13 +77,7 @@ func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]app.User
 				return err
 			}
 
-			result[i] = app.User{
-				ID:     id,
-				Name:   user.GetName(),
-				Email:  user.GetEmail(),
-				Groups: user.GetGroups(),
-				Roles:  user.GetRoles(),
-			}
+			result[i] = a.toAppUser(user)
 			return nil
 		})
 	}
@@ -93,4 +87,57 @@ func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]app.User
 	}
 
 	return result, nil
+}
+
+func (a *Authentik) SearchUsers(ctx context.Context, params *app.IdentitySvcSearchUsersParams) ([]app.User, error) {
+	ctx = context.WithValue(ctx, api.ContextAccessToken, a.token)
+	query := a.client.CoreApi.CoreUsersList(ctx).
+		Type_([]string{string(api.USERTYPEENUM_INTERNAL), string(api.USERTYPEENUM_EXTERNAL)}).
+		Search(params.Keyword).
+		PageSize(int32(params.Limit))
+	switch params.ActiveStatus {
+	case app.IdentitySvcActiveStatusActive:
+		query = query.IsActive(true)
+	case app.IdentitySvcActiveStatusInactive:
+		query = query.IsActive(false)
+	case app.IdentitySvcActiveStatusUnspecified:
+	default:
+	}
+	paginatedUsers, _, err := query.Execute()
+	if err != nil {
+		return nil, err
+	}
+	return a.toAppUsers(paginatedUsers.GetResults()), nil
+}
+
+func (a *Authentik) toAppPagination(pagination *api.Pagination) app.Pagination {
+	currentTotal := pagination.EndIndex - pagination.StartIndex
+	hasNext := pagination.Next > 0
+	hasPrev := pagination.Previous > 0
+	return app.Pagination{
+		Page:         uint(pagination.Current),
+		TotalPages:   uint(pagination.TotalPages),
+		CurrentTotal: uint(currentTotal),
+		Total:        uint(pagination.Count),
+		HasNext:      hasNext,
+		HasPrev:      hasPrev,
+	}
+}
+
+func (a *Authentik) toAppUser(user *api.User) app.User {
+	return app.User{
+		ID:       strconv.Itoa(int(user.GetPk())),
+		UserName: user.GetUsername(),
+		Name:     user.GetName(),
+		Email:    user.GetEmail(),
+		Roles:    user.GetRoles(),
+	}
+}
+
+func (a *Authentik) toAppUsers(users []api.User) []app.User {
+	result := make([]app.User, len(users))
+	for i, user := range users {
+		result[i] = a.toAppUser(&user)
+	}
+	return result
 }

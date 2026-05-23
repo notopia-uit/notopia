@@ -5,7 +5,7 @@ properties:
   id:
     type: string
     description: User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-    example: '100'
+    example: "100"
 
   username:
     type: string

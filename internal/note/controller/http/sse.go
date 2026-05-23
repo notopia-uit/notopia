@@ -1,116 +1,90 @@
 package http
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/pkg/api/note"
 )
 
-type workspaceEventSSESender struct {
+type WorkspaceEventStreamResponse struct {
 	ctx     context.Context
 	eventCh <-chan app.WorkspaceEvent
-	writer  *io.PipeWriter
-	flusher http.Flusher
-	mu      sync.Mutex
 }
 
-func newWorkspaceEventSSESender(
+func NewWorkspaceEventStreamResponse(
 	ctx context.Context,
 	eventCh <-chan app.WorkspaceEvent,
-	w *io.PipeWriter,
-	flusher http.Flusher,
-) *workspaceEventSSESender {
-	return &workspaceEventSSESender{
+) *WorkspaceEventStreamResponse {
+	return &WorkspaceEventStreamResponse{
 		ctx:     ctx,
 		eventCh: eventCh,
-		writer:  w,
-		flusher: flusher,
-		mu:      sync.Mutex{},
 	}
 }
 
-func (s *workspaceEventSSESender) send(event app.WorkspaceEvent) error {
-	payload, err := json.Marshal(event)
-	if err != nil {
-		return err
+var _ note.GetWorkspaceEventsResponseObject = (*WorkspaceEventStreamResponse)(nil)
+
+func (r *WorkspaceEventStreamResponse) VisitGetWorkspaceEventsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.WriteHeader(http.StatusOK)
+
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		return fmt.Errorf("response writer does not support flushing")
 	}
+	flusher.Flush()
 
-	var buf bytes.Buffer
-	buf.WriteString("id: ")
-	buf.WriteString(event.GetID().String())
-	buf.WriteString("\n")
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
 
-	buf.WriteString("event: ")
-	buf.WriteString(event.GetEvent())
-	buf.WriteString("\n")
+	for {
+		select {
+		case <-r.ctx.Done():
+			return nil
+		case <-ticker.C:
+			if err := writeHeartBeat(w); err != nil {
+				slog.Warn("failed to send heartbeat", slog.Any("error", err))
+				return nil
+			}
+		case evt, ok := <-r.eventCh:
+			if !ok {
+				return nil
+			}
+			if err := writeWorkspaceEvent(w, evt); err != nil {
+				slog.Error("failed to send event", slog.Any("error", err))
+				return nil
+			}
+		}
 
-	buf.WriteString("data: ")
-	buf.Write(payload)
-	buf.WriteString("\n\n")
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if _, err := s.writer.Write(buf.Bytes()); err != nil {
-		return fmt.Errorf("failed to write SSE event: %v", err)
+		flusher.Flush()
 	}
-
-	s.flusher.Flush()
-	return nil
 }
 
-func (s *workspaceEventSSESender) sendHeartBeat() error {
+func writeHeartBeat(w http.ResponseWriter) error {
 	event := note.HeartBeatWorkspaceEvent{
 		Event:     note.HeartBeatWorkspaceEventEventHeartBeatWorkspaceEvent,
 		Timestamp: time.Now(),
 	}
 	payload, err := json.Marshal(event)
 	if err != nil {
-		return fmt.Errorf("failed to marshal heartbeat event: %v", err)
+		return fmt.Errorf("failed to marshal heartbeat: %w", err)
 	}
-	heartBeatPayload := fmt.Sprintf("event: %s\ndata: %s\n\n", note.HeartBeatWorkspaceEventEventHeartBeatWorkspaceEvent, payload)
-	s.mu.Lock()
-	if _, err := s.writer.Write([]byte(heartBeatPayload)); err != nil {
-		s.mu.Unlock()
-		return fmt.Errorf("failed to write heartbeat SSE event: %v", err)
-	}
-	s.flusher.Flush()
-	s.mu.Unlock()
-	return nil
+	_, err = fmt.Fprintf(w, "event: %s\ndata: %s\n\n", note.HeartBeatWorkspaceEventEventHeartBeatWorkspaceEvent, payload)
+	return err
 }
 
-func (s *workspaceEventSSESender) Stream() {
-	ticker := time.NewTicker(30 * time.Second)
-	go func() {
-		defer ticker.Stop()
-		for {
-			select {
-			case <-s.ctx.Done():
-				if err := s.writer.Close(); err != nil {
-					slog.Warn("failed to close SSE writer", slog.Any("error", err))
-				}
-				return
-			case <-ticker.C:
-				if err := s.sendHeartBeat(); err != nil {
-					slog.Warn("failed to send heartbeat", slog.Any("error", err))
-				}
-				slog.Debug("sent heartbeat")
-				continue
-			case evt, ok := <-s.eventCh:
-				if !ok {
-					return
-				}
-				_ = s.send(evt)
-			}
-		}
-	}()
+func writeWorkspaceEvent(w http.ResponseWriter, event app.WorkspaceEvent) error {
+	payload, err := json.Marshal(event)
+	if err != nil {
+		return fmt.Errorf("failed to marshal event: %w", err)
+	}
+	_, err = fmt.Fprintf(w, "id: %s\nevent: %s\ndata: %s\n\n", event.GetID().String(), event.GetEvent(), payload)
+	return err
 }

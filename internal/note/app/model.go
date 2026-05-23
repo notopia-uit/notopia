@@ -21,12 +21,12 @@ type PaginationParams struct {
 }
 
 type Pagination struct {
-	Page       int
-	Limit      int
-	Total      int
-	TotalPages int
-	hasNext    bool
-	hasPrev    bool
+	Page         uint // Current page number (starting from 1)
+	CurrentTotal uint // Number of items in the current page
+	Total        uint // Total items across all pages
+	TotalPages   uint // Total pages
+	HasNext      bool
+	HasPrev      bool
 }
 
 type Paginated[T any] struct {
@@ -226,11 +226,11 @@ type UserWorkspace struct {
 }
 
 type User struct {
-	ID     string
-	Name   string
-	Email  string // Can be empty
-	Groups []string
-	Roles  []string
+	ID       string
+	UserName string
+	Name     string
+	Email    string // Can be empty
+	Roles    []string
 }
 
 type SearchToken struct {

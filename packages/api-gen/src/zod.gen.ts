@@ -110,7 +110,7 @@ export const zDocumentRevision = z.object({
 
 export const zDocumentPagination = z.object({
     page: z.int().gte(1),
-    limit: z.int().gte(1).lte(100),
+    currentTotal: z.int().gte(0),
     total: z.int().gte(0),
     totalPages: z.int().gte(0),
     hasNext: z.boolean(),
@@ -324,6 +324,13 @@ export const zNoteWorkspaceTreeFolder = z.object({
     updatedAt: zNoteUpdatedAt2
 });
 
+export const zNoteUser = z.object({
+    id: z.string(),
+    username: z.string(),
+    name: z.string().nullable(),
+    email: z.email().nullable()
+});
+
 export const zShareUserWorkspaceRoleUpdatedEventWritable = z.object({
     userId: zShareId,
     role: zShareWorkspaceRole
@@ -469,8 +476,17 @@ export const zNoteWorkspaceSlugPath = zNoteSlug;
 
 export const zNoteWorkspaceIdPath = zNoteId3;
 
+/**
+ * Number of items per page
+ */
+export const zNoteLimitQuery = z.int().gte(1).lte(100).default(20);
+
 export const zGetDocumentAttachmentUploadUrlPath = z.object({
     documentId: zDocumentId
+});
+
+export const zGetDocumentAttachmentUploadUrlQuery = z.object({
+    filename: z.string()
 });
 
 /**
@@ -904,3 +920,15 @@ export const zUnpublishWorkspacePath = z.object({
  * Workspace unpublished successfully
  */
 export const zUnpublishWorkspaceResponse = z.void();
+
+export const zSearchUsersQuery = z.object({
+    keyword: z.string(),
+    isActive: z.boolean().optional(),
+    limit: z.int().gte(1).lte(100).optional().default(20),
+    excludeMemberInWorkspaceId: zNoteId3.optional()
+});
+
+/**
+ * A list of workspace members
+ */
+export const zSearchUsersResponse = z.array(zNoteUser);

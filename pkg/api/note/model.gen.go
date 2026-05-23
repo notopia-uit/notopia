@@ -344,6 +344,21 @@ type TrashedNote struct {
 	Trashed Trashed            `json:"trashed"`
 }
 
+// User defines model for User.
+type User struct {
+	// Email Email from Authentik
+	Email nullable.Nullable[openapi_types.Email] `json:"email"`
+
+	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
+	Id string `json:"id"`
+
+	// Name Full name from Authentik
+	Name nullable.Nullable[string] `json:"name"`
+
+	// Username Username from Authentik
+	Username string `json:"username"`
+}
+
 // UserWorkspace defines model for UserWorkspace.
 type UserWorkspace struct {
 	Role      WorkspaceRole `json:"role"`
@@ -509,6 +524,9 @@ type UpdatedAt2 = time.Time
 // FolderIdPath defines model for folderIdPath.
 type FolderIdPath = Id
 
+// LimitQuery defines model for limitQuery.
+type LimitQuery = int
+
 // NoteIdPath defines model for noteIdPath.
 type NoteIdPath = Id2
 
@@ -574,6 +592,23 @@ type GetNoteLinksParams struct {
 type RenameNoteJSONBody struct {
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	Name Name2 `json:"name"`
+}
+
+// SearchUsersParams defines parameters for SearchUsers.
+type SearchUsersParams struct {
+	// Keyword Search keyword.
+	// In authentik, it may search based on username, email, full name, but not user ID (PK).
+	Keyword string `form:"keyword" json:"keyword"`
+
+	// IsActive If provided, the search will be limited to (in)active users
+	IsActive *bool `form:"isActive,omitempty" json:"isActive,omitempty"`
+
+	// Limit Number of items per page
+	Limit *LimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// ExcludeMemberInWorkspaceId If provided, the search will be exclude users who are members of the specified workspace.
+	// Note that this will peform after getting users from identity provider, so it doesn't conform the `limit` parameter.
+	ExcludeMemberInWorkspaceId *Id3 `form:"excludeMemberInWorkspaceId,omitempty" json:"excludeMemberInWorkspaceId,omitempty"`
 }
 
 // CreateWorkspaceResponse defines parameters for CreateWorkspace.
