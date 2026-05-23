@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useTheme } from 'next-themes';
+import { useEffect, useRef, useMemo } from 'react';
 
 import { renderGraph } from './graph-render';
 
@@ -93,11 +94,21 @@ export default function Graph({
   onNodeClick,
 }: GraphProps) {
   const localGraphRef = useRef<HTMLDivElement>(null);
-  const globalGraphRef = useRef<HTMLDivElement>(null);
+
+  // NOTE: Nguyen said comment this, maybe be used in the future?
+  // const globalGraphRef = useRef<HTMLDivElement>(null);
+
+  // NOTE: This is from gemini
+  // Why the race condition guard was added
+  // Since your renderGraph function returns a Promise (using .then()), it's highly recommended to add a boolean flag (active). If data or currentSlug changes rapidly, the old graph might finish rendering after the new graph setup has already kicked off, resulting in visual glitches or memory leaks.
+
   const cleanupRef = useRef<(() => void) | null>(null);
 
-  const localGraph = { ...defaultOptions.localGraph, ...options?.localGraph };
-  const globalGraph = { ...defaultOptions.globalGraph, ...options?.globalGraph };
+  const localGraph = useMemo(() => {
+    return { ...defaultOptions.localGraph, ...options?.localGraph };
+  }, [options?.localGraph]);
+  // const globalGraph = { ...defaultOptions.globalGraph, ...options?.globalGraph };
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     if (localGraphRef.current) {
@@ -113,7 +124,7 @@ export default function Graph({
         cleanupRef.current();
       }
     };
-  }, [data, currentSlug, localGraph, onNodeClick]);
+  }, [data, currentSlug, localGraph, onNodeClick, resolvedTheme]);
 
   return (
     <div className={`${styles.graph} ${className} size-full`}>
