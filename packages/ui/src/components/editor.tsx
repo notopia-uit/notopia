@@ -4,13 +4,13 @@ import '@notopia-uit/lib/yjs';
 import '@notopia-uit/lib/hocuspocus';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
+import { useHocuspocusProvider } from '@hocuspocus/provider-react';
+import { EditorSearchProvider } from '@notopia-uit/ui/components/editor-search-provider';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useHocuspocusProvider } from '@hocuspocus/provider-react';
-import { EditorSearchProvider } from '@notopia-uit/ui/components/editor-search-provider';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { EditorCore } from './editor-core';
@@ -22,7 +22,7 @@ import { Button } from './shadcn/button';
 export default function Editor({ noteId, workspaceId }: { noteId: string; workspaceId?: string }) {
   const { data: sessionData } = authClient.useSession();
   const router = useRouter();
-  const [isAwarenessReady, setIsAwarenessReady] = useState(false);
+  const [isAwarenessReady, setIsAwarenessReady] = useState(true);
   const provider = useHocuspocusProvider();
 
   const sessionUser = useMemo(
@@ -59,19 +59,16 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
   return (
     <div className="relative min-h-screen">
       <NoteTitle noteId={noteId} workspaceId={workspaceId} />
-      <EditorToolbar
-        noteId={noteId}
-        currentEditor={editorRef.current}
-      />
+      <EditorToolbar noteId={noteId} currentEditor={editorRef.current} />
       {isAwarenessReady ? (
-        <EditorSearchProvider 
-          workspaceId={workspaceId || ''} 
+        <EditorSearchProvider
+          workspaceId={workspaceId || ''}
           host={process.env.NEXT_PUBLIC_MEILISEARCH_HOST || 'http://localhost:7700'}
         >
           <EditorCore ref={editorRef} sessionUser={sessionUser} noteId={noteId} />
         </EditorSearchProvider>
       ) : (
-        <div className="flex items-center justify-center h-96">
+        <div className="flex h-96 items-center justify-center">
           <Spinner />
         </div>
       )}

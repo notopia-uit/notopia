@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -41,7 +42,7 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
 
   const noteSearchFn = useCallback(
     (q: string) => searchNotesFromMeilisearch(meilisearchClient, q),
-    [meilisearchClient],
+    [meilisearchClient]
   );
 
   const { search, isLoading, error } = useSearchCache(noteSearchFn, 300);
@@ -81,46 +82,41 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
       title="Search Notes"
       description="Search for notes in your workspace"
     >
-      <CommandInput
-        placeholder="Search notes..."
-        value={query}
-        onValueChange={setQuery}
-      />
-      <CommandList>
-        {!meilisearchClient && !isLoading && (
-          <div className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
-            <Spinner className="size-4" />
-            Initializing search...
-          </div>
-        )}
-        {error && (
-          <div className="flex items-center justify-center gap-2 py-6 text-sm text-red-500">
-            <SearchX className="size-4" />
-            Search failed. Please try again.
-          </div>
-        )}
-        {isLoading && (
-          <div className="flex items-center justify-center py-6">
-            <Spinner />
-          </div>
-        )}
-        {!isLoading && !error && meilisearchClient && query && results.length === 0 && (
-          <CommandEmpty>No notes found for "{query}"</CommandEmpty>
-        )}
-        {!isLoading && !error && results.length > 0 && (
-          <CommandGroup heading="Notes">
-            {results.map((note) => (
-              <CommandItem
-                key={note.id}
-                onSelect={() => handleSelect(note.id)}
-              >
-                <FileText className="size-4" />
-                <span>{note.name}</span>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-      </CommandList>
+      <Command>
+        <CommandInput placeholder="Search notes..." value={query} onValueChange={setQuery} />
+        <CommandList>
+          {!meilisearchClient && !isLoading && (
+            <div className="text-muted-foreground flex items-center justify-center gap-2 py-6 text-sm">
+              <Spinner className="size-4" />
+              Initializing search...
+            </div>
+          )}
+          {error && (
+            <div className="flex items-center justify-center gap-2 py-6 text-sm text-red-500">
+              <SearchX className="size-4" />
+              Search failed. Please try again.
+            </div>
+          )}
+          {isLoading && (
+            <div className="flex items-center justify-center py-6">
+              <Spinner />
+            </div>
+          )}
+          {!isLoading && !error && meilisearchClient && query && results.length === 0 && (
+            <CommandEmpty>No notes found for "{query}"</CommandEmpty>
+          )}
+          {!isLoading && !error && results.length > 0 && (
+            <CommandGroup heading="Notes">
+              {results.map((note) => (
+                <CommandItem key={note.id} onSelect={() => handleSelect(note.id)}>
+                  <FileText className="size-4" />
+                  <span>{note.name}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
+        </CommandList>
+      </Command>
     </CommandDialog>
   );
 }
