@@ -5,6 +5,9 @@ export async function uploadDocumentAttachment(documentId: string, file: File): 
     path: {
       documentId,
     },
+    query: {
+      filename: file.name,
+    },
   });
 
   if (response.error || !response.data) {
@@ -22,9 +25,7 @@ export async function uploadDocumentAttachment(documentId: string, file: File): 
   });
 
   if (!uploadResponse.ok) {
-    throw new Error(
-      `Failed to upload file: ${uploadResponse.status} ${uploadResponse.statusText}`
-    );
+    throw new Error(`Failed to upload file: ${uploadResponse.status} ${uploadResponse.statusText}`);
   }
 
   return url;
