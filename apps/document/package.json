@@ -73,6 +73,7 @@
     "tsx": "catalog:",
     "typeorm-extension": "catalog:",
     "unplugin-swc": "catalog:",
-    "webpack-node-externals": "catalog:"
+    "webpack-node-externals": "catalog:",
+    "@darraghor/eslint-plugin-nestjs-typed": "catalog:"
   }
 }
