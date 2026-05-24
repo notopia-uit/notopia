@@ -1,32 +1,12 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+'use client';
 
-type AlertType = 'success' | 'error';
+import { useContext } from 'react';
+import { AlertContext, type AlertContextType } from '../components/alert-context';
 
-interface AlertState {
-  type: AlertType;
-  title: string;
-  message: string;
+export function useAlert(): AlertContextType {
+  const context = useContext(AlertContext);
+  if (!context) {
+    throw new Error('useAlert must be used within AlertProvider');
+  }
+  return context;
 }
-
-export const useAlert = (duration = 3000) => {
-  const [alert, setAlert] = useState<AlertState | null>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const showAlert = useCallback(
-    (type: AlertType, title: string, message: string) => {
-      setAlert({ type, title, message });
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => {
-        setAlert(null);
-      }, duration);
-    },
-    [duration]
-  );
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
-
-  return { alert, showAlert };
-};

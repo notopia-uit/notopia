@@ -41,7 +41,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
             scriptProps={{ type: 'application/json' }}
           >
             <QueryClientProvider>
-              <ApiProvider>{children}</ApiProvider>
+              <ApiProvider>
+                {children}
+              </ApiProvider>
             </QueryClientProvider>
           </ThemeProvider>
         </body>

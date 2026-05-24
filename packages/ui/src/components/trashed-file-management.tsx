@@ -16,6 +16,8 @@ import {
   DropdownMenuTrigger,
 } from '@notopia-uit/ui/components/shadcn/dropdown-menu';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import {
   Table,
   TableBody,
@@ -28,9 +30,6 @@ import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Folder, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import React, { useMemo, useState, useRef } from 'react';
-
-import { ErrorAlert } from './error-alert';
-import { SuccessAlert } from './success-alert';
 
 interface TrashedBy {
   by: 'purpose' | 'parent';
@@ -89,13 +88,24 @@ const formatDate = (isoString: string) => {
 const EMPTY_TRASH_DATA: TrashedData = { notes: [], folders: [] };
 export default function TrashedFileManager({ workspaceId }: { workspaceId: string }) {
   const queryClient = useQueryClient();
+  const { retry } = useQueryErrorHandler();
+
   const { data, isError, error, isPending } = useQuery({
     ...showTrashOptions({ path: { workspaceId: workspaceId } }),
     select: mapDtoTrashedData,
   });
 
   if (isError) {
-    throw error;
+    return (
+      <div className="p-4">
+        <QueryErrorFallback
+          error={error}
+          onRetry={retry}
+          title="Failed to Load Trash"
+          description="Unable to load deleted items. Please try again."
+        />
+      </div>
+    );
   }
 
   const trashedData = data || EMPTY_TRASH_DATA;
@@ -119,65 +129,65 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
     );
   }, [trashedData]);
 
-  const { alert, showAlert } = useAlert();
-  const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
-    {
-      onSuccess: async (_, variables) => {
-        const { noteIds, folderIds } = variables.body;
-        queryClient.setQueryData<TrashedDataDto>(
-          showTrashOptions({ path: { workspaceId } }).queryKey,
-          (oldData) => {
-            if (!oldData) return oldData;
-            return {
-              ...oldData,
-              notes:
-                oldData.notes?.filter((note) => (noteIds ? noteIds : []).includes(note.id)) || [],
-              folders:
-                oldData.folders?.filter((folder) =>
-                  (folderIds ? folderIds : []).includes(folder.id)
-                ) || [],
-            };
-          }
-        );
+  const { showAlert } = useAlert();
+   const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
+     {
+       onSuccess: async (_, variables) => {
+         const { noteIds, folderIds } = variables.body;
+         queryClient.setQueryData<TrashedDataDto>(
+           showTrashOptions({ path: { workspaceId } }).queryKey,
+           (oldData) => {
+             if (!oldData) return oldData;
+             return {
+               ...oldData,
+               notes:
+                 oldData.notes?.filter((note) => !(noteIds ? noteIds : []).includes(note.id)) || [],
+               folders:
+                 oldData.folders?.filter((folder) =>
+                   !(folderIds ? folderIds : []).includes(folder.id)
+                 ) || [],
+             };
+           }
+         );
 
         setSelectedItems(new Set());
         await queryClient.invalidateQueries({
           queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
         });
-        showAlert(
-          'success',
-          'Successfully Deleted',
-          `Selected items have been permanently deleted.`
-        );
+        showAlert({
+          type: 'success',
+          title: 'Successfully Deleted',
+          message: `Selected items have been permanently deleted.`,
+        });
       },
       onError: (error) => {
-        showAlert(
-          'error',
-          'Failed to Delete',
-          `An error occurred while trying to permanently delete the selected items. Please try again.
-          ${error instanceof Error ? error.message : ''}`
-        );
+        showAlert({
+          type: 'error',
+          title: 'Failed to Delete',
+          message: `An error occurred while trying to permanently delete the selected items. Please try again.
+          ${error instanceof Error ? error.message : ''}`,
+        });
       },
     }
   );
-  const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
-    onSuccess: async (_, variables) => {
-      const { noteIds, folderIds } = variables.body;
-      queryClient.setQueryData<TrashedDataDto>(
-        showTrashOptions({ path: { workspaceId } }).queryKey,
-        (oldData) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            notes:
-              oldData.notes?.filter((note) => (noteIds ? noteIds : []).includes(note.id)) || [],
-            folders:
-              oldData.folders?.filter((folder) =>
-                (folderIds ? folderIds : []).includes(folder.id)
-              ) || [],
-          };
-        }
-      );
+   const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
+     onSuccess: async (_, variables) => {
+       const { noteIds, folderIds } = variables.body;
+       queryClient.setQueryData<TrashedDataDto>(
+         showTrashOptions({ path: { workspaceId } }).queryKey,
+         (oldData) => {
+           if (!oldData) return oldData;
+           return {
+             ...oldData,
+             notes:
+               oldData.notes?.filter((note) => !(noteIds ? noteIds : []).includes(note.id)) || [],
+             folders:
+               oldData.folders?.filter((folder) =>
+                 !(folderIds ? folderIds : []).includes(folder.id)
+               ) || [],
+           };
+         }
+       );
       await queryClient.invalidateQueries({
         queryKey: getWorkspaceTreeOptions({ path: { workspaceId } }).queryKey,
       });
@@ -185,15 +195,19 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
         queryKey: showTrashOptions({ path: { workspaceId: workspaceId } }).queryKey,
       });
       setSelectedItems(new Set());
-      showAlert('success', 'Successfully Restored', `Selected items have been restored.`);
+      showAlert({
+        type: 'success',
+        title: 'Successfully Restored',
+        message: `Selected items have been restored.`,
+      });
     },
     onError: (error) => {
-      showAlert(
-        'error',
-        'Failed to Restore',
-        `An error occurred while trying to restore the selected items. Please try again.
-        ${error instanceof Error ? error.message : ''}`
-      );
+      showAlert({
+        type: 'error',
+        title: 'Failed to Restore',
+        message: `An error occurred while trying to restore the selected items. Please try again.
+        ${error instanceof Error ? error.message : ''}`,
+      });
     },
   });
   const toggleSelection = (id: string) => {
@@ -357,9 +371,6 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
             })}
           </TableBody>
         </Table>
-        {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
-
-        {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
       </div>
     </div>
   );

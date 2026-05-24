@@ -15,5 +15,21 @@ Authorization: Bearer {{meiliMasterToken}}
 # @prompt query
 # @prompt searchToken
 
-GET {{host}}/indexes/notes/search?q={{query}} HTTP/1.1
+POST {{host}}/indexes/notes/search HTTP/1.1
 Authorization: Bearer {{searchToken}}
+Content-Type: application/json
+
+{
+  "attributesToCrop": [
+    "*"
+  ],
+  "attributesToHighlight": [
+    "name"
+  ],
+  "attributesToRetrieve": [
+    "*"
+  ],
+  "highlightPostTag": "</mark>",
+  "highlightPreTag": "<mark>",
+  "q": "{{query}}"
+}

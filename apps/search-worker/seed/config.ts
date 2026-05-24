@@ -97,10 +97,8 @@ NOTOPIA_NOTE_MEILISEARCH_API_KEY=${key.key}`
 export { run as ConfigMeilisearch };
 
 if (require.main === module) {
-  try {
-    void run();
-  } catch (error) {
+  run().catch((error) => {
     console.error('Error configuring Meilisearch:', error);
     process.exit(1);
-  }
+  });
 }

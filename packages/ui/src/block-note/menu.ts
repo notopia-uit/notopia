@@ -1,8 +1,7 @@
 import { MyEditor, filterSuggestionItems } from '@blocknote/core';
 import { DefaultReactSuggestionItem } from '@blocknote/react';
-import type { NoteNote } from '@notopia-uit/api-gen';
-
-// TODO: handle the note and tag fetch, this is triggered when the menu open only, not on query change
+import { ShareNoteSearch } from '@notopia-uit/api-gen';
+import type { Meilisearch } from 'meilisearch';
 
 const getLocalDocumentTags = (editor: MyEditor): string[] => {
   const tags = new Set<string>();
@@ -22,10 +21,57 @@ const getLocalDocumentTags = (editor: MyEditor): string[] => {
   return Array.from(tags);
 };
 
+export interface SearchResult {
+  id: string;
+  name: string;
+}
+
+export const searchNotesFromMeilisearch = async (
+  client: Meilisearch | null,
+  query: string
+): Promise<SearchResult[]> => {
+  if (!client || !query) {
+    return [];
+  }
+
+  try {
+    const index = client.index<ShareNoteSearch>('notes');
+    const results = await index.search(query, {
+      limit: 10,
+    });
+    return results.hits;
+  } catch (error) {
+    console.error('Error searching notes from Meilisearch:', error);
+    return [];
+  }
+};
+
+export const searchTagsFromMeilisearch = async (
+  client: Meilisearch | null,
+  query: string
+): Promise<string[]> => {
+  if (!client || !query) {
+    return [];
+  }
+
+  try {
+    const index = client.index('notes');
+    const results = await index.searchForFacetValues({
+      facetName: 'tags',
+      facetQuery: query,
+      limit: 10,
+    });
+    return results.facetHits.map((hit) => hit.value);
+  } catch (error) {
+    console.error('Error searching tags from Meilisearch:', error);
+    return [];
+  }
+};
+
 export const getNoteMenuItems = (
   editor: MyEditor,
   query: string,
-  notes: NoteNote[]
+  notes: SearchResult[]
 ): DefaultReactSuggestionItem[] => {
   const items: DefaultReactSuggestionItem[] = notes.map((note) => ({
     title: note.name,

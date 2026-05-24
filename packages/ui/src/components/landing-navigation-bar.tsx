@@ -17,9 +17,6 @@ function NavigationButtonGroup() {
       <Button variant="outline" size="icon" aria-label="Github">
         <Icons.Github />
       </Button>
-      <Button variant="outline" size="icon" aria-label="Twitter">
-        <Icons.Twitter />
-      </Button>
       <Button variant="outline" size="icon" aria-label="Facebook">
         <Icons.Facebook />
       </Button>

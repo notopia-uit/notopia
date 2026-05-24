@@ -40,17 +40,19 @@ async function run() {
 export { run as SeedMeilisearch };
 
 if (require.main === module) {
-  const { ConfigMeilisearch } = await import('./config');
-  try {
-    await ConfigMeilisearch();
-  } catch (error) {
-    console.error('Error configuring Meilisearch:', error);
-    process.exit(1);
-  }
-  try {
-    void run();
-  } catch (error) {
-    console.error('Error seeding Meilisearch:', error);
-    process.exit(2);
-  }
+  import('./config')
+    .then(({ ConfigMeilisearch }) => {
+      return ConfigMeilisearch();
+    })
+    .catch((error) => {
+      console.error('Error configuring Meilisearch:', error);
+      process.exit(1);
+    })
+    .then(() => {
+      return run();
+    })
+    .catch((error) => {
+      console.error('Error seeding Meilisearch:', error);
+      process.exit(2);
+    });
 }

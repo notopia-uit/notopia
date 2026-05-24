@@ -8,9 +8,7 @@ import {
   getRevisionWithContentOptions,
   useCommitDocumentMutation,
 } from '@notopia-uit/api-gen';
-import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useQuery } from '@tanstack/react-query';
 import { RotateCcw } from 'lucide-react';
@@ -64,7 +62,7 @@ export function RevisionDetailContainer({
   if (isError) {
     throw error;
   }
-  const { alert, showAlert } = useAlert();
+  const { showAlert } = useAlert();
   const {
     mutate: restoreVersion,
     isError: isRestoreError,
@@ -72,20 +70,20 @@ export function RevisionDetailContainer({
     isPending: isRestoring,
   } = useCommitDocumentMutation({
     onSuccess: (responses, _) => {
-      showAlert(
-        'success',
-        'Version restored successfully!',
-        `The version ${data?.name} of ${responses.id} was restored.`
-      );
+      showAlert({
+        type: 'success',
+        title: 'Version restored successfully!',
+        message: `The version ${data?.name} of ${responses.id} was restored.`,
+      });
     },
     onError: (error) => {
-      showAlert(
-        'error',
-        'Failed to restore version',
-        `An error occurred while restoring the version. ${
+      showAlert({
+        type: 'error',
+        title: 'Failed to restore version',
+        message: `An error occurred while restoring the version. ${
           error instanceof Error ? error.message : 'Please try again.'
-        }`
-      );
+        }`,
+      });
     },
   });
   if (isRestoreError) {
@@ -117,9 +115,6 @@ export function RevisionDetailContainer({
         <div className="py-8">
           <ReadOnlyEditor key={selectedRevisionId} initialContent={data?.content ?? []} />
         </div>
-
-        {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
-        {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
       </div>
     </ScrollArea>
   );

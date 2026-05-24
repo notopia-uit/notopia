@@ -29,6 +29,7 @@
     "better-auth": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
+    "cmdk": "^1.1.1",
     "d3": "catalog:",
     "date-fns": "^4.1.0",
     "lucide-react": "catalog:",

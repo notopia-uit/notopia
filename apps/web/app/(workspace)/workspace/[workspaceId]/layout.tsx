@@ -1,6 +1,8 @@
 import { getMyWorkspacesOptions, getWorkspaceTreeOptions } from '@notopia-uit/api-gen/index';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@ui/components/shadcn/sidebar';
+import { ModeToggle } from '@ui/components/theme-mode-toggle';
+import { WorkspaceContentWrapper } from '@ui/components/workspace-content-wrapper';
 import WorkspaceSideBar from '@ui/components/workspace-sidebar';
 import { fetchAccessTokenServerSide } from '@ui/lib/get-access-token';
 
@@ -39,17 +41,22 @@ export default async function WorkspaceLayout({ children, params }: WorkspaceLay
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <SidebarProvider defaultOpen={true}>
-        <WorkspaceSideBar currentWorkspaceId={workspaceId} />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-            <div className="flex items-center gap-2 px-4">
-              <SidebarTrigger className="-ml-1" />
-            </div>
-          </header>
-          <div>{children}</div>
-        </SidebarInset>
-      </SidebarProvider>
+      <WorkspaceContentWrapper workspaceId={workspaceId}>
+        <SidebarProvider defaultOpen={true}>
+          <WorkspaceSideBar currentWorkspaceId={workspaceId} />
+          <SidebarInset className="min-w-0">
+            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+              </div>
+              <div className="ml-auto mr-4">
+                <ModeToggle />
+              </div>
+            </header>
+            <div>{children}</div>
+          </SidebarInset>
+        </SidebarProvider>
+      </WorkspaceContentWrapper>
     </HydrationBoundary>
   );
 }

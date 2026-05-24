@@ -27,15 +27,18 @@ import {
   SelectValue,
 } from '@notopia-uit/ui/components/shadcn/select';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
-import { ErrorAlert } from './error-alert';
-import { SuccessAlert } from './success-alert';
+
+import { RoleSelectItems } from './role-select-items';
+
 
 type UserRole = (typeof NoteWorkspaceRole)[keyof typeof NoteWorkspaceRole];
 
@@ -65,6 +68,8 @@ const generateSlug = (name: string) => {
 const WorkspaceSwitcher = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { retry } = useQueryErrorHandler();
+
   const _data = useQuery({
     ...getMyWorkspacesOptions(),
     select: mapUserWorkspaceDtoToDomain,
@@ -83,18 +88,28 @@ const WorkspaceSwitcher = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editForm, setEditForm] = useState<Partial<UserWorkspace>>({});
 
-  const { alert, showAlert } = useAlert();
+  const { showAlert } = useAlert();
 
   const handleSelectWorkspace = (workspaceId: string) => {
     const workspace = workspaces.find((w) => w.id === workspaceId);
     if (workspace && editingId !== workspaceId) {
       setSelectedId(workspaceId);
-      router.push(`/workspace/${workspace.slug}`);
+      router.push(`/workspace/${workspaceId}`);
     }
   };
 
   if (isGetMyWorkspacesError) {
-    throw getMyWorkspacesError;
+    return (
+      <div className="p-4">
+        <QueryErrorFallback
+          error={getMyWorkspacesError}
+          onRetry={retry}
+          title="Failed to Load Workspaces"
+          description="Unable to load your workspaces. Please try again."
+          compact
+        />
+      </div>
+    );
   }
   useEffect(() => {
     if (allWorkspaceData) {
@@ -117,18 +132,10 @@ const WorkspaceSwitcher = () => {
       ]);
       setIsAddingNew(false);
       setEditForm({});
-      showAlert(
-        'success',
-        'Workspace Created',
-        `Your new workspace "${variables.body.name}" has been created successfully.`
-      );
+      showAlert({ type: 'success', title: 'Workspace Created', message: `Your new workspace "${variables.body.name}" has been created successfully.` });
     },
     onError: (error) => {
-      showAlert(
-        'error',
-        'Creation Failed',
-        `There was an error creating your workspace. Please try again. Error details: ${error.message}`
-      );
+      showAlert({ type: 'error', title: 'Creation Failed', message: `There was an error creating your workspace. Please try again. Error details: ${error.message}` });
     },
   });
 
@@ -148,18 +155,10 @@ const WorkspaceSwitcher = () => {
         );
         setEditingId(null);
         setEditForm({});
-        showAlert(
-          'success',
-          'Slug Updated',
-          `Workspace slug has been updated to "${variables.body.slug}".`
-        );
+        showAlert({ type: 'success', title: 'Slug Updated', message: `Workspace slug has been updated to "${variables.body.slug}".` });
       },
       onError: () => {
-        showAlert(
-          'error',
-          'Update Failed',
-          `There was an error updating the workspace slug. Please try again.`
-        );
+        showAlert({ type: 'error', title: 'Update Failed', message: `There was an error updating the workspace slug. Please try again.` });
       },
     }
   );
@@ -175,14 +174,10 @@ const WorkspaceSwitcher = () => {
       if (selectedId === variables.path.workspaceId) {
         setSelectedId(undefined);
       }
-      showAlert('success', 'Left Workspace', `You have left the workspace successfully.`);
+      showAlert({ type: 'success', title: 'Left Workspace', message: `You have left the workspace successfully.` });
     },
     onError: (error) => {
-      showAlert(
-        'error',
-        'Action Failed',
-        `There was an error leaving the workspace. Please try again. Error details: ${error.message}`
-      );
+      showAlert({ type: 'error', title: 'Action Failed', message: `There was an error leaving the workspace. Please try again. Error details: ${error.message}` });
     },
   });
   const startEditing = (workspace: UserWorkspace) => {
@@ -228,15 +223,15 @@ const WorkspaceSwitcher = () => {
         <RadioGroup value={selectedId} onValueChange={handleSelectWorkspace}>
           <div className="space-y-3">
             {workspaces.map((workspace) => (
-              <Card
-                key={workspace.id}
-                className={cn(
-                  'cursor-pointer gap-0 p-0 transition-colors',
-                  selectedId === workspace.id && editingId !== workspace.id && `border-primary`,
-                  editingId === workspace.id && 'border-primary'
-                )}
-                onClick={() => editingId !== workspace.id && setSelectedId(workspace.id)}
-              >
+               <Card
+                 key={workspace.id}
+                 className={cn(
+                   'cursor-pointer gap-0 p-0 transition-colors',
+                   selectedId === workspace.id && editingId !== workspace.id && `border-primary`,
+                   editingId === workspace.id && 'border-primary'
+                 )}
+                 onClick={() => editingId !== workspace.id && handleSelectWorkspace(workspace.id)}
+               >
                 <CardContent className="p-4">
                   {editingId === workspace.id ? (
                     <div className="space-y-4">
@@ -304,27 +299,25 @@ const WorkspaceSwitcher = () => {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor={`role-${workspace.id}`}>Your Role</Label>
-                          <Select
-                            value={editForm.userRole || 'member'}
-                            onValueChange={(value: UserRole) =>
-                              setEditForm({
-                                ...editForm,
-                                userRole: value,
-                              })
-                            }
-                          >
-                            <SelectTrigger
-                              id={`role-${workspace.id}`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="owner">Owner</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
-                              <SelectItem value="member">Member</SelectItem>
-                            </SelectContent>
-                          </Select>
+                           <Select
+                             value={editForm.userRole || 'editor'}
+                             onValueChange={(value: UserRole) =>
+                               setEditForm({
+                                 ...editForm,
+                                 userRole: value,
+                               })
+                             }
+                           >
+                             <SelectTrigger
+                               id={`role-${workspace.id}`}
+                               onClick={(e) => e.stopPropagation()}
+                             >
+                               <SelectValue />
+                             </SelectTrigger>
+                             <SelectContent>
+                               <RoleSelectItems />
+                             </SelectContent>
+                           </Select>
                         </div>
                       </div>
                     </div>
@@ -464,24 +457,22 @@ const WorkspaceSwitcher = () => {
                           }
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="new-role">Initial Role</Label>
-                        <Select
-                          value={editForm.userRole || 'owner'}
-                          onValueChange={(value: UserRole) =>
-                            setEditForm({ ...editForm, userRole: value })
-                          }
-                        >
-                          <SelectTrigger id="new-role">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="owner">Owner</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="member">Member</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="new-role">Initial Role</Label>
+                         <Select
+                           value={editForm.userRole || 'owner'}
+                           onValueChange={(value: UserRole) =>
+                             setEditForm({ ...editForm, userRole: value })
+                           }
+                         >
+                           <SelectTrigger id="new-role">
+                             <SelectValue />
+                           </SelectTrigger>
+                           <SelectContent>
+                             <RoleSelectItems />
+                           </SelectContent>
+                         </Select>
+                       </div>
                     </div>
                   </div>
                 </CardContent>
@@ -503,8 +494,6 @@ const WorkspaceSwitcher = () => {
             </CardContent>
           </Card>
         )}
-        {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
-        {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}
       </div>
     </section>
   );

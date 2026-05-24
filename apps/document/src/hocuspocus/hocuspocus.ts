@@ -27,8 +27,8 @@ export class Hocuspocus {
   ) {
     this.hocuspocus = new ServerHocuspocus<HocuspocusContext>({
       name: 'document', // TODO: Inject host
-      onAuthenticate: this.onAuthenticate.bind(this),
-      onChange: this.onChange.bind(this),
+      onAuthenticate: (...args) => this.onAuthenticate(...args),
+      onChange: (...args) => this.onChange(...args),
       extensions: [
         new HocuspocusLogger({
           log: (message) => this.logger.log(message),

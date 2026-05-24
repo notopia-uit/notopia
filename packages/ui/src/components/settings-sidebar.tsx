@@ -54,8 +54,8 @@ export function SettingsSidebar({ workspaceId }: SettingsSidebarProps) {
             className={cn(
               `flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors`,
               isActive
-                ? 'bg-zinc-900 text-zinc-50'
-                : `text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-50`
+                ? 'bg-accent text-accent-foreground'
+                : `text-muted-foreground hover:bg-secondary hover:text-foreground`
             )}
           >
             <Icon className="size-4" />

@@ -7,6 +7,7 @@ services:
     environment:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-notopiauit}
       MEILI_NO_ANALYTICS: "true"
+      MEILI_LOG_LEVEL: DEBUG
     volumes:
       - meilisearch_data:/meili_data
     labels:

@@ -12,7 +12,6 @@ import {
   useTrashWorkspaceItemsMutation,
 } from '@notopia-uit/api-gen';
 import { useRenameFolderMutation, useRenameNoteMutation } from '@notopia-uit/api-gen';
-import { ErrorAlert } from '@notopia-uit/ui/components/error-alert';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import {
   ContextMenu,
@@ -22,8 +21,9 @@ import {
 } from '@notopia-uit/ui/components/shadcn/context-menu';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-import { SuccessAlert } from '@notopia-uit/ui/components/success-alert';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, FilePlus, FolderPlus, Trash2 } from 'lucide-react';
@@ -38,8 +38,6 @@ import {
   type TreeRef,
   type TreeViewState,
 } from 'react-complex-tree';
-
-//TODO: fetch data from api and handle loading states, errors, etc.
 type TreeData = Record<TreeItemIndex, TreeItem<string>>;
 
 const mapDtoTreeData = (rootFolder: NoteWorkspaceTreeFolder) => {
@@ -201,6 +199,8 @@ const viewStateInitial: TreeViewState = {
 
 const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
   const queryClient = useQueryClient();
+  const { retry } = useQueryErrorHandler();
+
   const {
     data,
     isError: isGetWorkSpaceTreeError,
@@ -218,24 +218,24 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   const router = useRouter();
   const tree = useRef<TreeRef>(null);
 
-  const { alert, showAlert } = useAlert();
+  const { showAlert } = useAlert();
 
   const { mutate: renameNote } = useRenameNoteMutation({
     onError: (error) => {
-      showAlert(
-        'error',
-        'Rename Note Failed',
-        `${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      showAlert({
+        type: 'error',
+        title: 'Rename Note Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
   });
   const { mutate: renameFolder } = useRenameFolderMutation({
     onError: (error) => {
-      showAlert(
-        'error',
-        'Rename Folder Failed',
-        `${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      showAlert({
+        type: 'error',
+        title: 'Rename Folder Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
   });
   //TODO:: call API to create new item and update tree data with response
@@ -261,20 +261,20 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
       });
     },
     onError: (error) => {
-      showAlert(
-        'error',
-        'Create Note Failed',
-        `${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      showAlert({
+        type: 'error',
+        title: 'Create Note Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
   });
   const { mutate: createFolder } = useCreateFolderMutation({
     onError: (error) => {
-      showAlert(
-        'error',
-        'Create Folder Failed',
-        `${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      showAlert({
+        type: 'error',
+        title: 'Create Folder Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
     onSuccess: (responses, variables) => {
       const newFolderId = responses.id;
@@ -302,7 +302,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   const [search, setSearch] = useState<string | undefined>('');
   useEffect(() => {
     const abortController = new AbortController();
-    getWorkspaceEvents({
+    const result = getWorkspaceEvents({
       path: { workspaceId: currentWorkspaceId },
       signal: abortController.signal,
       onSseEvent: (event) => {
@@ -314,17 +314,38 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           case 'HeartBeatWorkspaceEvent':
             break;
           default:
-            showAlert('error', 'Unknown Event', `Received unknown event: ${event.event}`);
+            showAlert({
+              type: 'error',
+              title: 'Unknown Event',
+              message: `Received unknown event: ${event.event}`,
+            });
         }
       },
       onSseError: (error) => {
-        showAlert(
-          'error',
-          'Connection Error',
-          `${error instanceof Error ? error.message : 'Unknown error'}`
-        );
+        showAlert({
+          type: 'error',
+          title: 'Connection Error',
+          message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+        });
       },
     });
+
+    const consumeStream = async () => {
+      try {
+        const { stream } = await result;
+        for await (const _ of stream) {
+        }
+      } catch (error) {
+        if (!abortController.signal.aborted) {
+          showAlert({
+            type: 'error',
+            title: 'Stream Error',
+            message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+          });
+        }
+      }
+    };
+    consumeStream();
 
     return () => {
       abortController.abort();
@@ -358,14 +379,18 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   const { mutate: moveWorkspaceItems } = useMoveWorkspaceItemsMutation({
     onError: (error) => {
-      showAlert(
-        'error',
-        'Move Items Failed',
-        `${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      showAlert({
+        type: 'error',
+        title: 'Move Items Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
     onSuccess: () => {
-      showAlert('success', 'Items Moved', 'Items have been moved successfully');
+      showAlert({
+        type: 'success',
+        title: 'Items Moved',
+        message: 'Items have been moved successfully',
+      });
     },
   });
 
@@ -448,17 +473,21 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   const { mutate: trashItems } = useTrashWorkspaceItemsMutation({
     onError: (error) => {
-      showAlert(
-        'error',
-        'Trash Items Failed',
-        `${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      showAlert({
+        type: 'error',
+        title: 'Trash Items Failed',
+        message: `${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: showTrashOptions({ path: { workspaceId: currentWorkspaceId } }).queryKey,
       });
-      showAlert('success', 'Items Trashed', 'Items have been moved to trash successfully');
+      showAlert({
+        type: 'success',
+        title: 'Items Trashed',
+        message: 'Items have been moved to trash successfully',
+      });
     },
   });
 
@@ -577,7 +606,16 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   );
 
   if (isGetWorkSpaceTreeError) {
-    throw getWorkspaceTreeError;
+    return (
+      <div className="flex h-full items-center justify-center p-4">
+        <QueryErrorFallback
+          error={getWorkspaceTreeError}
+          onRetry={retry}
+          title="Failed to Load Workspace Tree"
+          description="Unable to load your workspace folder and file structure. Please try again."
+        />
+      </div>
+    );
   }
 
   //TODO: maybe use skeleton?
@@ -753,8 +791,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           <Tree ref={tree} treeId="tree-sample" rootItem={rootId} treeLabel="Sample Tree" />
         </ControlledTreeEnvironment>
       </div>
-      {alert?.type === 'success' && <SuccessAlert title={alert.title} message={alert.message} />}
-      {alert?.type === 'error' && <ErrorAlert title={alert.title} message={alert.message} />}{' '}
     </div>
   );
 };

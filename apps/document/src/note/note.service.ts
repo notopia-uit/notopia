@@ -70,6 +70,7 @@ export class NoteService implements OnModuleInit {
         `Note with id ${noteId} is missing updatedAt timestamp`
       );
     }
+    this.logger.debug({ noteId }, 'Fetched note by ID successfully');
     return {
       id: note.id,
       name: note.name,
@@ -85,6 +86,7 @@ export class NoteService implements OnModuleInit {
   async getNoteName(noteId: string): Promise<string> {
     this.logger.debug({ noteId }, 'getNoteName');
     const response = await firstValueFrom(this.noteServiceClient.getNoteName({ id: noteId }));
+    this.logger.debug({ noteId, name: response.name }, 'Fetched note name successfully');
     return response.name;
   }
 
@@ -114,6 +116,10 @@ export class NoteService implements OnModuleInit {
     if (!workspace) {
       throw new WorkspaceNoteNotFoundException(noteId);
     }
+    this.logger.debug(
+      { noteId, workspaceId: workspace.id },
+      'Fetched workspace by note ID successfully'
+    );
     return {
       id: workspace.id,
       name: workspace.name,

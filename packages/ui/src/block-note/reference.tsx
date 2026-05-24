@@ -1,39 +1,23 @@
+'use client';
+
 import { createReactInlineContentSpec } from '@blocknote/react';
 import { ReferenceConfig, ReferenceInlineContentSpec } from '@notopia-uit/lib/block-note';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useGetNoteQuery } from '@notopia-uit/api-gen';
 
 const ReferenceLink = ({ noteId }: { noteId: string }) => {
-  const [noteName, setNoteName] = useState('Loading...');
+  const { data: note, isPending, isError } = useGetNoteQuery({
+    path: { noteId },
+  });
 
-  // TODO: Inject whatever context provider, to get the client to render here
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchNote = async () => {
-      try {
-        const name = await Promise.resolve(''); // TODO: inject client heyapi fetch here
-        if (isMounted) setNoteName(name || 'Untitled Note');
-      } catch {
-        if (isMounted) setNoteName('Unknown Note');
-      }
-    };
-
-    void fetchNote();
-    return () => {
-      isMounted = false;
-    };
-  }, [noteId]);
+  const displayName = isPending ? '' : isError ? 'Unknown Note' : note?.name || 'Untitled Note';
 
   return (
     <a
-      // TODO: tailwind shadcn
       href={`/note/${noteId}`}
-      className="notopia-reference cursor-pointer rounded-sm bg-blue-100 px-1 text-blue-700"
+      className="notopia-reference cursor-pointer rounded-sm bg-primary/10 px-1 text-primary hover:bg-primary/20"
       data-notopia-ref={noteId}
     >
-      @{noteName}
+      @{displayName}
     </a>
   );
 };
