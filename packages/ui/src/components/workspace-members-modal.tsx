@@ -72,6 +72,8 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
   const [addUserSearch, setAddUserSearch] = useState('');
   const debouncedAddUserSearch = useDebouncedValue(addUserSearch, 300);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [selectedPendingUser, setSelectedPendingUser] = useState<SearchUserMember | null>(null);
+  const [selectedPendingRole, setSelectedPendingRole] = useState<UserRole>(NoteWorkspaceRole.VIEWER);
   const searchResultsRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
@@ -176,10 +178,10 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
     });
   };
 
-  const handleAddMember = (userId: string) => {
+  const handleAddMember = (userId: string, role: UserRole = NoteWorkspaceRole.VIEWER) => {
     const allMembers = [
       ...members.map((m) => ({ id: m.id, role: m.role })),
-      { id: userId, role: NoteWorkspaceRole.VIEWER },
+      { id: userId, role },
     ];
 
     updateMembers(
@@ -191,6 +193,7 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
         onSuccess: () => {
           setAddUserSearch('');
           setShowSearchResults(false);
+          setSelectedPendingUser(null);
           showAlert({
             type: 'success',
             title: 'Member Added',
@@ -250,7 +253,12 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
                       key={user.id}
                       type="button"
                       className="hover:bg-muted/50 flex w-full items-center gap-3 px-3 py-2 text-left transition-colors disabled:opacity-50"
-                      onClick={() => handleAddMember(user.id)}
+                      onClick={() => {
+                        setSelectedPendingUser(user);
+                        setSelectedPendingRole(NoteWorkspaceRole.VIEWER);
+                        setShowSearchResults(false);
+                        setAddUserSearch('');
+                      }}
                       disabled={isUpdating}
                     >
                       <div className="min-w-0 flex-1">
@@ -264,6 +272,44 @@ function WorkspaceMembersModal({ workspaceId }: { workspaceId: string }) {
               </div>
             )}
           </div>
+
+          {selectedPendingUser && (
+            <div className="flex items-center gap-3 rounded-lg border p-3">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium">{selectedPendingUser.name}</div>
+                <div className="text-muted-foreground truncate text-xs">
+                  {selectedPendingUser.email}
+                </div>
+              </div>
+              <Select
+                value={selectedPendingRole}
+                onValueChange={(value: UserRole) => setSelectedPendingRole(value)}
+              >
+                <SelectTrigger className="w-28">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <RoleSelectItems />
+                </SelectContent>
+              </Select>
+              <Button
+                size="sm"
+                onClick={() =>
+                  handleAddMember(selectedPendingUser.id, selectedPendingRole)
+                }
+                disabled={isUpdating}
+              >
+                Add
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedPendingUser(null)}
+              >
+                Cancel
+              </Button>
+            </div>
+          )}
 
           <div className="relative">
             <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
