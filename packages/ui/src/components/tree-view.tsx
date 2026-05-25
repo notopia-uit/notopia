@@ -3,7 +3,6 @@
 import {
   NoteWorkspaceTreeFolder,
   NoteWorkspaceTreeNote,
-  getWorkspaceEvents,
   getWorkspaceTreeOptions,
   showTrashOptions,
   useCreateFolderMutation,
@@ -22,6 +21,7 @@ import {
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useWorkspaceEvents } from '@notopia-uit/ui/contexts/workspace-events-context';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
@@ -220,6 +220,23 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   const { showAlert } = useAlert();
 
+  const { subscribe } = useWorkspaceEvents();
+
+  useEffect(() => {
+    const unsubscribe = subscribe((event) => {
+      if (
+        event.event === 'WorkspaceItemsUpdatedEvent'
+      ) {
+        queryClient.invalidateQueries({
+          queryKey: getWorkspaceTreeOptions({
+            path: { workspaceId: currentWorkspaceId },
+          }).queryKey,
+        });
+      }
+    });
+    return unsubscribe;
+  }, [subscribe, queryClient, currentWorkspaceId]);
+
   const { mutate: renameNote } = useRenameNoteMutation({
     onError: (error) => {
       showAlert({
@@ -300,58 +317,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   });
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
-  useEffect(() => {
-    const abortController = new AbortController();
-    const result = getWorkspaceEvents({
-      path: { workspaceId: currentWorkspaceId },
-      signal: abortController.signal,
-      onSseEvent: (event) => {
-        switch (event.event) {
-          case 'WorkspaceItemsUpdatedEvent':
-          case 'WorkspaceRenamedEvent':
-          case 'WorkspaceDeletedEvent':
-            break;
-          case 'HeartBeatWorkspaceEvent':
-            break;
-          default:
-            showAlert({
-              type: 'error',
-              title: 'Unknown Event',
-              message: `Received unknown event: ${event.event}`,
-            });
-        }
-      },
-      onSseError: (error) => {
-        showAlert({
-          type: 'error',
-          title: 'Connection Error',
-          message: `${error instanceof Error ? error.message : 'Unknown error'}`,
-        });
-      },
-    });
-
-    const consumeStream = async () => {
-      try {
-        const { stream } = await result;
-        for await (const _ of stream) {
-        }
-      } catch (error) {
-        if (!abortController.signal.aborted) {
-          showAlert({
-            type: 'error',
-            title: 'Stream Error',
-            message: `${error instanceof Error ? error.message : 'Unknown error'}`,
-          });
-        }
-      }
-    };
-    consumeStream();
-
-    return () => {
-      abortController.abort();
-    };
-  }, [currentWorkspaceId, showAlert]);
-
   const [items, setItems] = useState<Record<TreeItemIndex, TreeItem<string>>>({});
   useEffect(() => {
     if (workspaceTreeData) {
