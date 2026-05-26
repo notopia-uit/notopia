@@ -99,14 +99,14 @@ export function TableOfContents({ editor }: TableOfContentsProps) {
       <PopoverTrigger
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
-        className="fixed left-0 top-[65px] z-50 flex flex-col items-center gap-[3px] p-2  transition-all duration-300"
+        className="fixed left-0 top-[65px] z-50 flex flex-col items-center gap-[3px] p-2 transition-all duration-300"
         style={{ top: `${tocTop}px` }}
       >
         {Array.from({ length: SEGMENTS }).map((_, i) => (
           <div
             key={i}
             className={cn(
-              'size-[3px]  rounded-full transition-all duration-300',
+              'size-[3px] rounded-full transition-all duration-300',
               i < filledSegments ? 'bg-foreground/40' : 'bg-foreground/10'
             )}
           />
