@@ -192,20 +192,18 @@ export function CreateWorkspaceDialog() {
   );
 }
 
-const data = {
-  projects: [
-    {
-      name: 'Settings',
-      url: '#',
-      icon: Settings2,
-    },
-    {
-      name: 'Graph',
-      url: '#',
-      icon: Sparkles,
-    },
-  ],
-};
+const data = [
+  {
+    name: 'Settings',
+    url: (workspaceId: string) => `/workspace/${workspaceId}/settings/general`,
+    icon: Settings2,
+  },
+  {
+    name: 'Graph',
+    url: (workspaceId: string) => `/workspace/${workspaceId}/graph`,
+    icon: Sparkles,
+  },
+];
 
 export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorkspaceId: string }) {
   const { data: sessionData } = authClient.useSession();
@@ -330,13 +328,11 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
         <SidebarGroup className="shrink-0 group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarMenu>
-            {data.projects.map((item) => (
+            {data.map((item) => (
               <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url}>
-                    <item.icon />
-                    <span>{item.name}</span>
-                  </a>
+                <SidebarMenuButton onClick={() => router.push(item.url(currentWorkspaceId))}>
+                  <item.icon />
+                  <span>{item.name}</span>
                 </SidebarMenuButton>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
