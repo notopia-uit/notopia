@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"time"
+
+	"github.com/creasty/defaults"
 
 	"github.com/go-playground/validator/v10"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
@@ -22,53 +25,29 @@ type Services struct {
 }
 
 type Meilisearch struct {
-	commonconfig.Meilisearch `json:""                         mapstructure:",squash"                     validate:"required"               yaml:""`
-	NoteSearchKeyUID         string `json:"noteSearchKeyUid"         mapstructure:"note_search_key_uid"         validate:"required,uuid4_rfc4122" yaml:"note_search_key_uid"`
-	NoteIndexName            string `json:"noteIndexName"            mapstructure:"note_index_name"             validate:"required"               yaml:"note_index_name"`
-	NoteSearchExpireDuration int    `json:"noteSearchExpireDuration" mapstructure:"note_search_expire_duration" validate:"required"               yaml:"note_search_expire_duration"`
-}
-
-func setViperMeilisearchDefault(viper *viper.Viper) {
-	viper.SetDefault("meilisearch.note_index_name", "notes")
-	viper.SetDefault("meilisearch.note_search_expire_duration", 3600)
+	commonconfig.Meilisearch `default:""      json:""                         mapstructure:",squash"                     validate:"required"               yaml:""`
+	NoteSearchKeyUID         string        `default:"-"     json:"noteSearchKeyUid"         mapstructure:"note_search_key_uid"         validate:"required,uuid4_rfc4122" yaml:"note_search_key_uid"`
+	NoteIndexName            string        `default:"notes" json:"noteIndexName"            mapstructure:"note_index_name"             validate:"required"               yaml:"note_index_name"`
+	NoteSearchExpireDuration time.Duration `default:"1h"    json:"noteSearchExpireDuration" mapstructure:"note_search_expire_duration" validate:"required,gte=0"         yaml:"note_search_expire_duration"`
 }
 
 type DomainEvent struct {
-	MessageMetadataUserIDKey      string `json:"messageMetadataUserIdKey"      mapstructure:"message_metadata_user_id_key"      validate:"required" yaml:"message_metadata_user_id_key"`
-	MessageWorkspaceIDKey         string `json:"messageMetadataWorkspaceIdKey" mapstructure:"message_metadata_workspace_id_key" validate:"required" yaml:"message_metadata_workspace_id_key"`
-	MessageMetadataAggregateIDKey string `json:"messageMetadataAggregateIdKey" mapstructure:"message_metadata_aggregate_id_key" validate:"required" yaml:"message_metadata_aggregate_id_key"`
-	OutboxTableName               string `json:"outboxTableName"               mapstructure:"outbox_table_name"                 validate:"required" yaml:"outbox_table_name"`
-}
-
-func setViperAdvancedDomainEventDefault(viper *viper.Viper) {
-	viper.SetDefault("advanced.domain_event.message_metadata_user_id_key", "user_id")
-	viper.SetDefault("advanced.domain_event.message_metadata_workspace_id_key", "workspace_id")
-	viper.SetDefault("advanced.domain_event.message_metadata_aggregate_id_key", "aggregate_id")
-	viper.SetDefault("advanced.domain_event.outbox_table_name", "eventsToForward")
+	MessageMetadataUserIDKey      string `default:"user_id"         json:"messageMetadataUserIdKey"      mapstructure:"message_metadata_user_id_key"      validate:"required" yaml:"message_metadata_user_id_key"`
+	MessageWorkspaceIDKey         string `default:"workspace_id"    json:"messageMetadataWorkspaceIdKey" mapstructure:"message_metadata_workspace_id_key" validate:"required" yaml:"message_metadata_workspace_id_key"`
+	MessageMetadataAggregateIDKey string `default:"aggregate_id"    json:"messageMetadataAggregateIdKey" mapstructure:"message_metadata_aggregate_id_key" validate:"required" yaml:"message_metadata_aggregate_id_key"`
+	OutboxTableName               string `default:"eventsToForward" json:"outboxTableName"               mapstructure:"outbox_table_name"                 validate:"required" yaml:"outbox_table_name"`
 }
 
 type WorkspaceEvent struct {
-	MessageMetadataWorkspaceIDKey string `json:"messageMetadataWorkspaceIdKey" mapstructure:"message_metadata_workspace_id_key" validate:"required" yaml:"message_metadata_workspace_id_key"`
-	MessageMetadataUserIDKey      string `json:"messageMetadataUserIdKey"      mapstructure:"message_metadata_user_id_key"      validate:"required" yaml:"message_metadata_user_id_key"`
-	MessageMetadataEventTypeKey   string `json:"messageMetadataEventTypeKey"   mapstructure:"message_metadata_event_type_key"   validate:"required" yaml:"message_metadata_event_type_key"`
-	MessageGeneralTopic           string `json:"messageGeneralTopic"           mapstructure:"message_general_topic"             validate:"required" yaml:"message_general_topic"`
-}
-
-func setViperAdvancedWorkspaceEventDefault(viper *viper.Viper) {
-	viper.SetDefault("advanced.workspace_event.message_metadata_workspace_id_key", "workspace_id")
-	viper.SetDefault("advanced.workspace_event.message_metadata_user_id_key", "user_id")
-	viper.SetDefault("advanced.workspace_event.message_metadata_event_type_key", "event_type")
-	viper.SetDefault("advanced.workspace_event.message_general_topic", "events:workspaces")
+	MessageMetadataWorkspaceIDKey string `default:"workspace_id"      json:"messageMetadataWorkspaceIdKey" mapstructure:"message_metadata_workspace_id_key" validate:"required" yaml:"message_metadata_workspace_id_key"`
+	MessageMetadataUserIDKey      string `default:"user_id"           json:"messageMetadataUserIdKey"      mapstructure:"message_metadata_user_id_key"      validate:"required" yaml:"message_metadata_user_id_key"`
+	MessageMetadataEventTypeKey   string `default:"event_type"        json:"messageMetadataEventTypeKey"   mapstructure:"message_metadata_event_type_key"   validate:"required" yaml:"message_metadata_event_type_key"`
+	MessageGeneralTopic           string `default:"events:workspaces" json:"messageGeneralTopic"           mapstructure:"message_general_topic"             validate:"required" yaml:"message_general_topic"`
 }
 
 type Advanced struct {
 	DomainEvent    DomainEvent    `json:"domainEvent"    mapstructure:"domain_event"    validate:"omitempty" yaml:"domain_event"`
 	WorkspaceEvent WorkspaceEvent `json:"workspaceEvent" mapstructure:"workspace_event" validate:"omitempty" yaml:"workspace_event"`
-}
-
-func setViperAdvancedDefault(viper *viper.Viper) {
-	setViperAdvancedDomainEventDefault(viper)
-	setViperAdvancedWorkspaceEventDefault(viper)
 }
 
 type Config struct {
@@ -94,34 +73,41 @@ func New(
 	viper.SetConfigName("note.notopia.config")
 	viper.AddConfigPath(".")
 
-	commonconfig.ServerAddressViperSetDefault(viper, "server.http", 8081)
-	commonconfig.ServerAddressViperSetDefault(viper, "server.grpc", 18081)
-	commonconfig.ServerAddressViperSetDefault(viper, "server.health", 28081)
-	setViperAdvancedDefault(viper)
-	commonconfig.LogViperSetDefault(viper, "log")
-	commonconfig.KafkaViperSetDefault(viper, "kafka", "note-service")
-	commonconfig.SQLViperSetDefault(viper, "database")
-	commonconfig.GeneralViperSetDefault(viper, "general")
-	setViperMeilisearchDefault(viper)
-	commonconfig.AuthentikViperSetDefault(viper, "authentik")
-
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err == nil {
 		slog.Info("configuration loaded", slog.String("file", viper.ConfigFileUsed()))
 	}
 
-	var cfg Config
-	if err := viper.Unmarshal(&cfg); err != nil {
+	cfg := &Config{}
+	if err := defaults.Set(cfg); err != nil {
+		return nil, fmt.Errorf("cannot set default config: %w", err)
+	}
+
+	if err := viper.Unmarshal(cfg); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal config from env or config file: %w", err)
+	}
+
+	if cfg.Server.HTTP.Port == 0 {
+		cfg.Server.HTTP.Port = 8081
+	}
+	if cfg.Server.GRPC.Port == 0 {
+		cfg.Server.GRPC.Port = 18081
+	}
+	if cfg.Server.Health.Port == 0 {
+		cfg.Server.Health.Port = 28081
+	}
+
+	if cfg.Kafka.ConsumerGroup == "" {
+		cfg.Kafka.ConsumerGroup = "note-service"
 	}
 
 	slog.Info("configuration", slog.Any("config", cfg))
 
-	if err := validate.Struct(&cfg); err != nil {
+	if err := validate.Struct(cfg); err != nil {
 		return nil, fmt.Errorf("Config validation failed: %w", err)
 	}
 
-	return &cfg, nil
+	return cfg, nil
 }
 
 var Provide = New

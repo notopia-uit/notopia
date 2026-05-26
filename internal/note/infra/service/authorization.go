@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/timeout"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -55,6 +56,7 @@ func NewAuthorization(
 			logging.PayloadSent,
 			logging.PayloadReceived,
 		)), authorizationUnaryClientErrorInterceptor()),
+		grpc.WithUnaryInterceptor(timeout.UnaryClientInterceptor(servicesCfg.Authorization.ConnectionTimeout)),
 	)
 	if err != nil {
 		return nil, nil, fmt.Errorf("invalid authorization service client configuration: %w", err)
