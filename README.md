@@ -54,7 +54,11 @@
 - [ ] Event is tracked by either otel or correlation id. But, currently use wotel + kafka tracer, and partially correlation id but not really connected.
 - [ ] If deploy, but not using roles. Change to `https://github.com/agilezebra/jwt-middleware`, and use istio
 - [ ] Revision endpoints aren't protected with authorization
-
+### Frontend
+- [ ] use suspend with skeleton, use suspend query for streamming
+- [ ] Manage server state by tanstack, not always useState
+- [ ] Clean architecture is considerable? `https://www.freecodecamp.org/news/reusable-architecture-for-large-nextjs-applications/`
+- [ ] Add custom theme (or not)
 ### Both
 
 - [ ] yjs isn't typesafety, like getting Ymap, and set value.
