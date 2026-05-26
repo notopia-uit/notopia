@@ -7,6 +7,8 @@ import '@blocknote/shadcn/style.css';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
 import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { getMyWorkspacesOptions } from '@notopia-uit/api-gen';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef } from 'react';
 
@@ -33,6 +35,12 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
   const editorRef = useRef<any>(null);
   const { isModified, isCommitingDocument, handleSave } = useEditorState(noteId);
 
+  const { data: allWorkspaceData } = useQuery({
+    ...getMyWorkspacesOptions({}),
+  });
+  const currentWorkspace = allWorkspaceData?.find((ws) => ws.workspace.id === workspaceId);
+  const isViewer = currentWorkspace?.role === 'viewer';
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
@@ -49,7 +57,7 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
     <div className="relative min-h-screen">
       <NoteTitle noteId={noteId} workspaceId={workspaceId} />
       <EditorToolbar noteId={noteId} currentEditor={editorRef.current} />
-      <EditorCore ref={editorRef} sessionUser={sessionUser} noteId={noteId} />
+      <EditorCore ref={editorRef} sessionUser={sessionUser} noteId={noteId} isViewer={isViewer} />
 
       {isModified && (
         <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">

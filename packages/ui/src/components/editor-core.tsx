@@ -36,6 +36,7 @@ interface EditorCoreProps {
     avatar: string;
   };
   noteId: string;
+  isViewer?: boolean;
 }
 
 function EditorStatusBar() {
@@ -113,7 +114,7 @@ function EditorStatusBar() {
 }
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
-  { sessionUser, noteId },
+  { sessionUser, noteId, isViewer },
   ref
 ) {
   const { resolvedTheme } = useTheme();
@@ -204,7 +205,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
   return (
     <>
       <EditorStatusBar />
-      <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'}>
+      <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'} editable={!isViewer}>
         <SuggestionMenuController
           triggerCharacter={'#'}
           getItems={async (query) => {
