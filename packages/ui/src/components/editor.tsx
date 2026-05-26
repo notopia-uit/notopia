@@ -10,7 +10,7 @@ import { authClient } from '@notopia-uit/ui/lib/auth-client';
 import { getMyWorkspacesOptions } from '@notopia-uit/api-gen';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { EditorCore } from './editor-core';
@@ -18,6 +18,7 @@ import { EditorToolbar } from './editor-toolbar';
 import { Icons } from './icons';
 import { NoteTitle } from './note-title';
 import { Button } from './shadcn/button';
+import { TableOfContents } from './table-of-contents';
 
 export default function Editor({ noteId, workspaceId }: { noteId: string; workspaceId?: string }) {
   const { data: sessionData } = authClient.useSession();
@@ -33,6 +34,7 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
   );
 
   const editorRef = useRef<any>(null);
+  const [editorInstance, setEditorInstance] = useState<any>(null);
   const { isModified, isCommitingDocument, handleSave } = useEditorState(noteId);
 
   const { data: allWorkspaceData } = useQuery({
@@ -57,7 +59,15 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
     <div className="relative min-h-screen">
       <NoteTitle noteId={noteId} workspaceId={workspaceId} />
       <EditorToolbar noteId={noteId} currentEditor={editorRef.current} />
-      <EditorCore ref={editorRef} sessionUser={sessionUser} noteId={noteId} isViewer={isViewer} />
+      <EditorCore
+        ref={editorRef}
+        sessionUser={sessionUser}
+        noteId={noteId}
+        isViewer={isViewer}
+        onEditorReady={setEditorInstance}
+      />
+
+      <TableOfContents editor={editorInstance} />
 
       {isModified && (
         <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">

@@ -37,6 +37,7 @@ interface EditorCoreProps {
   };
   noteId: string;
   isViewer?: boolean;
+  onEditorReady?: (editor: any) => void;
 }
 
 function EditorStatusBar() {
@@ -114,7 +115,7 @@ function EditorStatusBar() {
 }
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
-  { sessionUser, noteId, isViewer },
+  { sessionUser, noteId, isViewer, onEditorReady },
   ref
 ) {
   const { resolvedTheme } = useTheme();
@@ -154,12 +155,15 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     if (ref) {
       (ref as React.MutableRefObject<any>).current = editor;
     }
+    if (onEditorReady) {
+      onEditorReady(editor);
+    }
     return () => {
       if (ref) {
         (ref as React.MutableRefObject<any>).current = null;
       }
     };
-  }, [editor, ref]);
+  }, [editor, ref, onEditorReady]);
 
   const noteSearchFn = useCallback(
     (query: string) => searchNotesFromMeilisearch(meilisearchClient, query),
