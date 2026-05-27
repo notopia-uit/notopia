@@ -68,6 +68,27 @@ export const searchTagsFromMeilisearch = async (
   }
 };
 
+export const searchNotesByTag = async (
+  client: Meilisearch | null,
+  tag: string
+): Promise<SearchResult[]> => {
+  if (!client || !tag) {
+    return [];
+  }
+
+  try {
+    const index = client.index<ShareNoteSearch>('notes');
+    const results = await index.search('', {
+      filter: [`tags = "${tag}"`],
+      limit: 50,
+    });
+    return results.hits;
+  } catch (error) {
+    console.error('Error searching notes by tag from Meilisearch:', error);
+    return [];
+  }
+};
+
 export const getNoteMenuItems = (
   editor: MyEditor,
   query: string,
