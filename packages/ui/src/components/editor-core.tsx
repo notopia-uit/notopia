@@ -1,6 +1,7 @@
 'use client';
 
 import { BlockNoteEditor } from '@blocknote/core';
+import { MyEditor } from '@blocknote/core';
 import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
 import {
@@ -37,7 +38,7 @@ interface EditorCoreProps {
   };
   noteId: string;
   isViewer?: boolean;
-  onEditorReady?: (editor: any) => void;
+  onEditorReady?: (editor: MyEditor) => void;
 }
 
 function EditorStatusBar() {
