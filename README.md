@@ -59,6 +59,7 @@
 - [ ] Manage server state by tanstack, not always useState
 - [ ] Clean architecture is considerable? `https://www.freecodecamp.org/news/reusable-architecture-for-large-nextjs-applications/`
 - [ ] Add custom theme (or not)
+- [ ] Set up logger 
 ### Both
 
 - [ ] yjs isn't typesafety, like getting Ymap, and set value.
