@@ -2,14 +2,23 @@
 
 import { configureAuthClient } from '@notopia-uit/ui/lib/auth-client';
 
-const authUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL;
-if (!authUrl) {
-  console.warn(
-    'NEXT_PUBLIC_BETTER_AUTH_URL is not set. Falling back to http://localhost:3000'
-  );
-}
-configureAuthClient(authUrl || 'http://localhost:3000');
+let configured = false;
 
-export function EnvInit({ children }: { children: React.ReactNode }) {
+export function EnvInit({
+  children,
+  betterAuthUrl,
+}: {
+  children: React.ReactNode;
+  betterAuthUrl: string;
+}) {
+  if (!configured) {
+    if (!betterAuthUrl) {
+      console.warn(
+        'BETTER_AUTH_URL is not set. Falling back to http://localhost:3000'
+      );
+    }
+    configureAuthClient(betterAuthUrl || 'http://localhost:3000');
+    configured = true;
+  }
   return <>{children}</>;
 }

@@ -43,7 +43,7 @@ export default async function WorkspaceLayout({ children, params }: WorkspaceLay
     <HydrationBoundary state={dehydrate(queryClient)}>
       <WorkspaceContentWrapper
         workspaceId={workspaceId}
-        meilisearchHost={process.env.NEXT_PUBLIC_MEILISEARCH_HOST}
+        meilisearchHost={process.env.MEILISEARCH_HOST}
       >
         <SidebarProvider defaultOpen={true}>
           <WorkspaceSideBar currentWorkspaceId={workspaceId} />

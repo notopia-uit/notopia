@@ -43,7 +43,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           >
             <QueryClientProvider>
               <ApiProvider>
-                <EnvInit>
+                <EnvInit betterAuthUrl={process.env.BETTER_AUTH_URL || 'http://localhost:3000'}>
                   {children}
                 </EnvInit>
               </ApiProvider>

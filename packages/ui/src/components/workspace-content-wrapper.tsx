@@ -20,7 +20,7 @@ export function WorkspaceContentWrapper({
 }: WorkspaceContentWrapperProps) {
   if (!meilisearchHost) {
     console.warn(
-      'NEXT_PUBLIC_MEILISEARCH_HOST is not set. Falling back to http://localhost:7700'
+      'MEILISEARCH_HOST is not set. Falling back to http://localhost:7700'
     );
   }
   const { data: tokenData } = useQuery({
