@@ -27,6 +27,13 @@ export class Hocuspocus {
   ) {
     this.hocuspocus = new ServerHocuspocus<HocuspocusContext>({
       name: 'document', // TODO: Inject host
+      onLoadDocument: async (data) => {
+        this.logger.debug(
+          { documentId: data.documentName, documentMetadata: data.document.getMap('metadata') },
+          'Document loaded'
+        );
+        await Promise.resolve();
+      },
       onAuthenticate: (...args) => this.onAuthenticate(...args),
       onChange: (...args) => this.onChange(...args),
       extensions: [

@@ -163,7 +163,7 @@ WITH RECURSIVE parent_folders(id, parent_id) AS (
     f.id,
     f.parent_id
   FROM
-    folders
+    folders AS f
     INNER JOIN parent_folders AS pf ON f.id = pf.parent_id
 )
 SELECT

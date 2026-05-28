@@ -35,9 +35,4 @@ async function run() {
   }
 }
 
-if (require.main === module) {
-  run().catch((error) => {
-    console.error('Error during seeding:', error);
-    process.exit(1);
-  });
-}
+run();

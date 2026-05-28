@@ -1,7 +1,7 @@
 {
   "name": "@notopia-uit/lib-server",
   "private": true,
-  "type": "commonjs",
+  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     "./block-note": {
