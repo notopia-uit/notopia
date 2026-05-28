@@ -4,7 +4,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@ui/components/sh
 import { ModeToggle } from '@ui/components/theme-mode-toggle';
 import { WorkspaceContentWrapper } from '@ui/components/workspace-content-wrapper';
 import WorkspaceSideBar from '@ui/components/workspace-sidebar';
-import { fetchAccessTokenServerSide } from '@ui/lib/get-access-token';
+import { fetchAccessTokenServerSide } from '@lib/get-access-token';
 
 import getQueryClient from '#/get-query-client';
 
@@ -41,7 +41,10 @@ export default async function WorkspaceLayout({ children, params }: WorkspaceLay
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <WorkspaceContentWrapper workspaceId={workspaceId}>
+      <WorkspaceContentWrapper
+        workspaceId={workspaceId}
+        meilisearchHost={process.env.NEXT_PUBLIC_MEILISEARCH_HOST}
+      >
         <SidebarProvider defaultOpen={true}>
           <WorkspaceSideBar currentWorkspaceId={workspaceId} />
           <SidebarInset className="min-w-0">

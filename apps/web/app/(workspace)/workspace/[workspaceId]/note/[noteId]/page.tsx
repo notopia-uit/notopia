@@ -1,6 +1,6 @@
 import { HocuspocusProviderWebsocketComponent, HocuspocusRoom } from '@hocuspocus/provider-react';
 import { Editor } from '@ui/components/dynamic-editor';
-import { fetchAccessTokenServerSide } from '@ui/lib/get-access-token';
+import { fetchAccessTokenServerSide } from '@lib/get-access-token';
 
 export default async function NotePage({
   params,

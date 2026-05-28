@@ -1,8 +1,8 @@
 'use client';
-import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { getAuthClient } from '@notopia-uit/ui/lib/auth-client';
 
 export const fetchAccessTokenClientSide = async (): Promise<string> => {
-  const data = await authClient.getAccessToken({
+  const data = await getAuthClient().getAccessToken({
     providerId: 'authentik',
   });
   if (!data?.data?.accessToken) {

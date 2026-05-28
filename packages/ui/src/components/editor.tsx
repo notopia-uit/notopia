@@ -6,7 +6,7 @@ import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
-import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { getAuthClient } from '@notopia-uit/ui/lib/auth-client';
 import { getMyWorkspacesOptions } from '@notopia-uit/api-gen';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,7 @@ import { Button } from './shadcn/button';
 import { TableOfContents } from './table-of-contents';
 
 export default function Editor({ noteId, workspaceId }: { noteId: string; workspaceId?: string }) {
-  const { data: sessionData } = authClient.useSession();
+  const { data: sessionData } = getAuthClient().useSession();
   const router = useRouter();
 
   const sessionUser = useMemo(

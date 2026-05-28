@@ -10,7 +10,7 @@ import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
-import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { getAuthClient } from '@notopia-uit/ui/lib/auth-client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   BadgeCheck,
@@ -206,7 +206,7 @@ const data = [
 ];
 
 export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorkspaceId: string }) {
-  const { data: sessionData } = authClient.useSession();
+  const { data: sessionData } = getAuthClient().useSession();
   const { retry } = useQueryErrorHandler();
 
   const [activeWorkspacenow, setActiveWorkspace] = useState<NoteUserWorkspace>();

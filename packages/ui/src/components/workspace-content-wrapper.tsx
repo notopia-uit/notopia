@@ -10,11 +10,13 @@ import { NoteSearchModal } from './note-search-modal';
 interface WorkspaceContentWrapperProps {
   children: React.ReactNode;
   workspaceId: string;
+  meilisearchHost?: string;
 }
 
 export function WorkspaceContentWrapper({
   children,
   workspaceId,
+  meilisearchHost,
 }: WorkspaceContentWrapperProps) {
   const { data: tokenData } = useQuery({
     ...getWorkspaceSearchTokenOptions({
@@ -26,7 +28,7 @@ export function WorkspaceContentWrapper({
 
   return (
     <MeilisearchProvider
-      host={process.env.NEXT_PUBLIC_MEILISEARCH_HOST || 'http://localhost:7700'}
+      host={meilisearchHost || 'http://localhost:7700'}
       apiKey={tokenData?.token}
     >
       <WorkspaceEventsProvider workspaceId={workspaceId}>
