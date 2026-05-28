@@ -219,16 +219,12 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
       <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'} editable={!isViewer}>
         <SuggestionMenuController
           triggerCharacter={'#'}
-          getItems={async (query) => {
-            return handleTagMenuSearch(query);
-          }}
+          getItems={handleTagMenuSearch}
         />
 
         <SuggestionMenuController
           triggerCharacter={'@'}
-          getItems={async (query) => {
-            return handleNoteMenuSearch(query);
-          }}
+          getItems={handleNoteMenuSearch}
         />
       </BlockNoteView>
     </>

@@ -2,21 +2,14 @@
 
 import { useCallback, useRef, useEffect, useState } from 'react';
 
-interface CacheEntry<T> {
-  data: T;
-  timestamp: number;
-}
-
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
 export function useSearchCache<T>(
   searchFn: (query: string) => Promise<T>,
   debounceMs: number = 300
 ) {
-  const cacheRef = useRef<Map<string, CacheEntry<T>>>(new Map());
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const inflightQueryRef = useRef<string | null>(null);
 
   useEffect(() => {
     return () => {
@@ -26,37 +19,46 @@ export function useSearchCache<T>(
     };
   }, []);
 
+  const doFetch = useCallback(
+    async (query: string): Promise<{ data: T; isLoading: boolean; error: Error | null }> => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const result = await searchFn(query);
+        setIsLoading(false);
+        return { data: result, isLoading: false, error: null };
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error('Unknown error occurred');
+        setError(error);
+        setIsLoading(false);
+        return { data: undefined as T, isLoading: false, error };
+      }
+    },
+    [searchFn]
+  );
+
   const search = useCallback(
     async (query: string): Promise<{ data: T; isLoading: boolean; error: Error | null }> => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
 
-      setIsLoading(true);
-      setError(null);
+      inflightQueryRef.current = query;
 
       return new Promise((resolve) => {
         timeoutRef.current = setTimeout(async () => {
-          try {
-            const result = await searchFn(query);
-            setIsLoading(false);
-            setError(null);
-            resolve({ data: result, isLoading: false, error: null });
-          } catch (err) {
-            const error = err instanceof Error ? err : new Error('Unknown error occurred');
-            setError(error);
-            setIsLoading(false);
-            resolve({ data: undefined as T, isLoading: false, error });
-          }
+          if (inflightQueryRef.current !== query) return;
+
+          const result = await doFetch(query);
+          resolve(result);
         }, debounceMs);
       });
     },
-    [searchFn, debounceMs]
+    [doFetch, debounceMs]
   );
 
-  const clearCache = useCallback(() => {
-    cacheRef.current.clear();
-  }, []);
+  const clearCache = useCallback(() => {}, []);
 
   return { search, isLoading, error, clearCache };
 }
