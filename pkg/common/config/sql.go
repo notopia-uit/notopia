@@ -3,19 +3,17 @@ package commonconfig
 import (
 	"fmt"
 	"net/url"
-
-	"github.com/spf13/viper"
 )
 
 type SQL struct {
-	URL      string `json:"url"      mapstructure:"url"      validate:"omitempty"                                                          yaml:"url"`
-	Scheme   string `json:"scheme"   mapstructure:"scheme"   validate:"omitempty,oneof=postgres mysql"                                     yaml:"scheme"`
-	Host     string `json:"host"     mapstructure:"host"     validate:"required_without=URL,omitempty,hostname_rfc1123"                    yaml:"host"`
-	Port     uint16 `json:"port"     mapstructure:"port"     validate:"omitempty,min=1,max=65535"                                          yaml:"port"`
-	User     string `json:"user"     mapstructure:"user"     validate:""                                                                   yaml:"user"`
-	Password string `json:"password" mapstructure:"password" validate:""                                                                   yaml:"password"`
-	Name     string `json:"name"     mapstructure:"name"     validate:""                                                                   yaml:"name"`
-	SSLMode  string `json:"sslmode"  mapstructure:"sslmode"  validate:"omitempty,oneof=disable allow prefer require verify-ca verify-full" yaml:"sslmode"`
+	URL      string `default:"-"    json:"url"      mapstructure:"url"      validate:"omitempty"                                                          yaml:"url"`
+	Scheme   string `default:"-"    json:"scheme"   mapstructure:"scheme"   validate:"omitempty,oneof=postgres mysql"                                     yaml:"scheme"`
+	Host     string `default:"5432" json:"host"     mapstructure:"host"     validate:"required_without=URL,omitempty,hostname_rfc1123"                    yaml:"host"`
+	Port     uint16 `default:"-"    json:"port"     mapstructure:"port"     validate:"omitempty,min=1,max=65535"                                          yaml:"port"`
+	User     string `default:"-"    json:"user"     mapstructure:"user"     validate:""                                                                   yaml:"user"`
+	Password string `default:"-"    json:"password" mapstructure:"password" validate:""                                                                   yaml:"password"`
+	Name     string `default:"-"    json:"name"     mapstructure:"name"     validate:""                                                                   yaml:"name"`
+	SSLMode  string `default:"-"    json:"sslmode"  mapstructure:"sslmode"  validate:"omitempty,oneof=disable allow prefer require verify-ca verify-full" yaml:"sslmode"`
 }
 
 func (s *SQL) GetDSN() string {
@@ -49,11 +47,4 @@ func (s *SQL) GetURL() string {
 	u.RawQuery = q.Encode()
 
 	return u.String()
-}
-
-func SQLViperSetDefault(
-	viper *viper.Viper,
-	prefix string,
-) {
-	viper.SetDefault(prefix+".port", 5432)
 }

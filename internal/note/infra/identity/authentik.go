@@ -45,6 +45,7 @@ func NewAuthentik(
 	}
 	authentikCfg.HTTPClient = &http.Client{
 		Transport: logTransport,
+		Timeout:   cfg.ConnectionTimeout,
 	}
 	client := api.NewAPIClient(authentikCfg)
 	return &Authentik{

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/creasty/defaults"
 	"github.com/go-playground/validator/v10"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/spf13/viper"
@@ -33,29 +34,36 @@ func NewConfig(
 	viper.SetConfigName("authorization.notopia.config")
 	viper.AddConfigPath(".")
 
-	commonconfig.ServerAddressViperSetDefault(viper, "server.grpc", 18089)
-	commonconfig.ServerAddressViperSetDefault(viper, "server.health", 28089)
-	commonconfig.LogViperSetDefault(viper, "log")
-	commonconfig.SQLViperSetDefault(viper, "database")
-	commonconfig.GeneralViperSetDefault(viper, "general")
-
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err == nil {
 		slog.Info("configuration loaded", slog.String("file", viper.ConfigFileUsed()))
 	}
 
-	var cfg Config
-	if err := viper.Unmarshal(&cfg); err != nil {
+	cfg := &Config{}
+	if err := defaults.Set(cfg); err != nil {
+		return nil, fmt.Errorf("cannot set default config: %w", err)
+	}
+	if err := viper.Unmarshal(cfg); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal config from env or config file: %w", err)
+	}
+
+	if cfg.Server.GRPC.Port == 0 {
+		cfg.Server.GRPC.Port = 18089
+	}
+	if cfg.Server.Health.Port == 0 {
+		cfg.Server.Health.Port = 28089
+	}
+	if cfg.Kafka.ConsumerGroup == "" {
+		cfg.Kafka.ConsumerGroup = "authorization-service"
 	}
 
 	slog.Info("configuration", slog.Any("config", cfg))
 
-	if err := validate.Struct(&cfg); err != nil {
+	if err := validate.Struct(cfg); err != nil {
 		return nil, fmt.Errorf("Config validation failed: %w", err)
 	}
 
-	return &cfg, nil
+	return cfg, nil
 }
 
 var ProvideConfig = NewConfig

@@ -20,7 +20,7 @@ type Meilisearch struct {
 	client                   meilisearch.ServiceManager
 	noteSearchKeyUID         string
 	noteIndexName            string
-	noteSearchExpireDuration int
+	noteSearchExpireDuration time.Duration
 }
 
 var _ app.SearchSvc = (*Meilisearch)(nil)
@@ -41,6 +41,7 @@ func NewMeilisearch(
 	}
 	httpClient := &http.Client{
 		Transport: logTransport,
+		Timeout:   cfg.ConnectionTimeout,
 	}
 	client := meilisearch.New(
 		cfg.Host,
@@ -63,7 +64,7 @@ func (m *Meilisearch) GenerateWorkspaceToken(ctx context.Context, workspaceID uu
 			"filter": "workspaceId = " + workspaceID.String(),
 		},
 	}
-	expiresAt := time.Now().Add(time.Duration(m.noteSearchExpireDuration) * time.Second)
+	expiresAt := time.Now().Add(m.noteSearchExpireDuration)
 	token, err := m.client.GenerateTenantToken(m.noteSearchKeyUID, rules, &meilisearch.TenantTokenOptions{
 		ExpiresAt: expiresAt,
 	})
