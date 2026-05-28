@@ -342,7 +342,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     return parentId;
   }, [viewState, items, rootId]);
 
-  const { mutate: moveWorkspaceItems } = useMoveWorkspaceItemsMutation({
+  const { mutateAsync: moveWorkspaceItems } = useMoveWorkspaceItemsMutation({
     onError: (error) => {
       showAlert({
         type: 'error',
@@ -350,17 +350,10 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
         message: `${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     },
-    onSuccess: () => {
-      showAlert({
-        type: 'success',
-        title: 'Items Moved',
-        message: 'Items have been moved successfully',
-      });
-    },
   });
 
   const onDrop = useCallback(
-    (draggedItems: TreeItem<string>[], target: DraggingPosition) => {
+    async (draggedItems: TreeItem<string>[], target: DraggingPosition) => {
       let destinationFolderId: TreeItemIndex = rootId;
 
       if (target.targetType === 'item') {
@@ -371,6 +364,28 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
       } else if (target.targetType === 'root') {
         destinationFolderId = rootId;
       }
+
+      const noteIds: string[] = [];
+      const folderIds: string[] = [];
+
+      for (const draggedItem of draggedItems) {
+        if (items[draggedItem.index]?.isFolder) {
+          folderIds.push(String(draggedItem.index));
+        } else {
+          noteIds.push(String(draggedItem.index));
+        }
+      }
+
+      await moveWorkspaceItems({
+        path: {
+          workspaceId: currentWorkspaceId,
+        },
+        body: {
+          noteIds,
+          folderIds,
+          destinationFolderId: String(destinationFolderId),
+        },
+      });
 
       setItems((prevItems) => {
         const newItems = { ...prevItems };
@@ -417,23 +432,8 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
         return newItems;
       });
-
-      for (const draggedItem of draggedItems) {
-        const isFolder = items[draggedItem.index]?.isFolder ?? false;
-
-        moveWorkspaceItems({
-          path: {
-            workspaceId: currentWorkspaceId,
-          },
-          body: {
-            noteIds: isFolder ? [] : [String(draggedItem.index)],
-            folderIds: isFolder ? [String(draggedItem.index)] : [],
-            destinationFolderId: String(destinationFolderId),
-          },
-        });
-      }
     },
-    [rootId, items, currentWorkspaceId, moveWorkspaceItems]
+    [rootId, items, currentWorkspaceId, moveWorkspaceItems, setItems]
   );
 
   const { mutate: trashItems } = useTrashWorkspaceItemsMutation({
