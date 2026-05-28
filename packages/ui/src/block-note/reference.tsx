@@ -104,6 +104,11 @@ const ReferenceLink = ({
 };
 
 export const createBlockNoteReferenceSpec = (apiUrl?: string): ReferenceInlineContentSpec => {
+  if (!apiUrl) {
+    console.warn(
+      'apiUrl not provided to createBlockNoteReferenceSpec. Falling back to api.notopia.localhost'
+    );
+  }
   const previewWsUrl = `ws://${apiUrl || 'api.notopia.localhost'}/document/ws/document`;
 
   return createReactInlineContentSpec(ReferenceConfig, {
