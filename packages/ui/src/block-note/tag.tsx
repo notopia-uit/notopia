@@ -27,7 +27,7 @@ function TagPreview({
   const workspaceId = (params?.workspaceId as string) || '';
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !meilisearchClient) return;
     setIsLoading(true);
     searchNotesByTag(meilisearchClient, tag)
       .then(setNotes)

@@ -41,7 +41,10 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
   }, []);
 
   const noteSearchFn = useCallback(
-    (q: string) => searchNotesFromMeilisearch(meilisearchClient, q),
+    (q: string) => {
+      if (!meilisearchClient) return Promise.resolve([] as SearchResult[]);
+      return searchNotesFromMeilisearch(meilisearchClient, q);
+    },
     [meilisearchClient]
   );
 

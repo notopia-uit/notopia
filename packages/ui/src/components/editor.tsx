@@ -67,7 +67,7 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
         onEditorReady={setEditorInstance}
       />
 
-      <TableOfContents editor={editorInstance} />
+      {editorInstance && <TableOfContents editor={editorInstance} />}
 
       {isModified && (
         <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">

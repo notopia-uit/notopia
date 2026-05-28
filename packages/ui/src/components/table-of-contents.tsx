@@ -13,7 +13,7 @@ type HeadingItem = {
 };
 
 interface TableOfContentsProps {
-  editor: BlockNoteEditor | null;
+  editor: BlockNoteEditor;
 }
 
 export function TableOfContents({ editor }: TableOfContentsProps) {
@@ -51,8 +51,6 @@ export function TableOfContents({ editor }: TableOfContentsProps) {
   }, []);
 
   useEffect(() => {
-    if (!editor) return;
-
     const extractHeadings = () => {
       const items: HeadingItem[] = [];
       editor.forEachBlock((block) => {

@@ -27,13 +27,9 @@ export interface SearchResult {
 }
 
 export const searchNotesFromMeilisearch = async (
-  client: Meilisearch | null,
+  client: Meilisearch,
   query: string
 ): Promise<SearchResult[]> => {
-  if (!client || !query) {
-    return [];
-  }
-
   try {
     const index = client.index<ShareNoteSearch>('notes');
     const results = await index.search(query, {
@@ -47,13 +43,9 @@ export const searchNotesFromMeilisearch = async (
 };
 
 export const searchTagsFromMeilisearch = async (
-  client: Meilisearch | null,
+  client: Meilisearch,
   query: string
 ): Promise<string[]> => {
-  if (!client || !query) {
-    return [];
-  }
-
   try {
     const index = client.index('notes');
     const results = await index.searchForFacetValues({
@@ -69,13 +61,9 @@ export const searchTagsFromMeilisearch = async (
 };
 
 export const searchNotesByTag = async (
-  client: Meilisearch | null,
+  client: Meilisearch,
   tag: string
 ): Promise<SearchResult[]> => {
-  if (!client || !tag) {
-    return [];
-  }
-
   try {
     const index = client.index<ShareNoteSearch>('notes');
     const results = await index.search('', {

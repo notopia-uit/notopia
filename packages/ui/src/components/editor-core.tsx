@@ -167,12 +167,18 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
   }, [editor, ref, onEditorReady]);
 
   const noteSearchFn = useCallback(
-    (query: string) => searchNotesFromMeilisearch(meilisearchClient, query),
+    (query: string) => {
+      if (!meilisearchClient) return Promise.resolve([]);
+      return searchNotesFromMeilisearch(meilisearchClient, query);
+    },
     [meilisearchClient]
   );
 
   const tagSearchFn = useCallback(
-    (query: string) => searchTagsFromMeilisearch(meilisearchClient, query),
+    (query: string) => {
+      if (!meilisearchClient) return Promise.resolve([]);
+      return searchTagsFromMeilisearch(meilisearchClient, query);
+    },
     [meilisearchClient]
   );
 
