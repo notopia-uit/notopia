@@ -180,7 +180,7 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
     }
 
     return (
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         <div className="flex w-72 flex-none flex-col overflow-y-auto border-r">
           <div className="border-b p-4">
             <div className="relative">
@@ -231,7 +231,7 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
           </ScrollArea>
         </div>
 
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-h-0 flex-1 flex-col">
           {!selectedRevisionId ? (
             <div className="flex flex-1 items-center justify-center text-center">
               <div>
@@ -298,7 +298,7 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="flex h-[90vh] max-w-6xl flex-col p-0">
+        <DialogContent className="flex max-h-[85vh] max-w-6xl flex-col overflow-hidden p-0">
           <DialogHeader className="border-b px-6 py-4">
             <DialogTitle>Version History</DialogTitle>
           </DialogHeader>
