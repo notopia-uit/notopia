@@ -27,12 +27,11 @@ export function TableOfContents({ editor }: TableOfContentsProps) {
   const filledSegments = Math.round(scrollProgress * SEGMENTS);
 
   useEffect(() => {
-    const container = document.querySelector('main');
-    if (!container) return;
-
     const handleScroll = () => {
-      const scrollTop = container.scrollTop;
-      const docHeight = container.scrollHeight - container.clientHeight;
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const docHeight =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
       setCanScroll(docHeight > 0);
       const progress = docHeight > 0 ? scrollTop / docHeight : 0;
       setScrollProgress(progress);
@@ -40,13 +39,11 @@ export function TableOfContents({ editor }: TableOfContentsProps) {
       setTocTop(top);
     };
 
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    const resizeObserver = new ResizeObserver(handleScroll);
-    resizeObserver.observe(container);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
 
     return () => {
-      container.removeEventListener('scroll', handleScroll);
-      resizeObserver.disconnect();
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
