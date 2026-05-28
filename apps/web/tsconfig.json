@@ -31,7 +31,6 @@
     "global.d.ts",
     ".next/types/**/*.ts",
     "postcss.config.mjs",
-    "../../packages/ui/src/global.d.ts",
     "proxy.ts",
     "lib/**/*.ts"
   ],
