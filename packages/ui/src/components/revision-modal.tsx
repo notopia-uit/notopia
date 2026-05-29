@@ -262,13 +262,13 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
                     })}
                 </p>
               </div>
-              <ScrollArea className="flex-1">
+              <div className="min-h-0 flex-1 overflow-y-auto">
                 <div className="p-4">
                   {selectedRevisionData && (
                     <ReadOnlyRevisionEditor initialContent={selectedRevisionData.content} />
                   )}
                 </div>
-              </ScrollArea>
+              </div>
               <div className="bg-muted/50 border-t px-6 py-4">
                 <Button
                   onClick={() => setConfirmApply(true)}
@@ -298,7 +298,7 @@ export function RevisionModal({ noteId, currentEditor }: RevisionModalProps) {
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="flex max-h-[85vh] max-w-6xl flex-col overflow-hidden p-0">
+        <DialogContent className="flex h-[90vh] w-[95vw] max-w-[1600px] sm:max-w-[1600px] flex-col overflow-hidden p-0">
           <DialogHeader className="border-b px-6 py-4">
             <DialogTitle>Version History</DialogTitle>
           </DialogHeader>
