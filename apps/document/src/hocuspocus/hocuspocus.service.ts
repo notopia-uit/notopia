@@ -1,5 +1,6 @@
 import { Connection } from '@hocuspocus/server';
 import { Injectable } from '@nestjs/common';
+import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
 import { Traceable } from 'nestjs-otel';
 
 import { AuthorizationService } from '../authorization/authorization.service';
@@ -95,5 +96,14 @@ export class HocuspocusService {
         });
       }
     }
+  }
+
+  setModified(documentId: string, modified: boolean): void {
+    const document = this.hocuspocus.hocuspocus.documents.get(documentId);
+    if (!document) {
+      return;
+    }
+    const metadata = document.getMap('metadata') as YDocMetadataMap;
+    metadata.set('metadata', { modified });
   }
 }

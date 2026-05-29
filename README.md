@@ -44,6 +44,7 @@
   - [ ] Currently only hocuspocus guard the document, other like create/update/delete revision not check, bcs I'm lazy
     > If do, should create a guard outside of it
   - [ ] Health check
+  - [ ] Consider merging blocknote & hocuspocus into editor module
 - [ ] Authorization service
   - [ ] Health check
 - [ ] Cannot deal with `domain.com:8080/api/v1` base path
@@ -51,15 +52,18 @@
 - [ ] Health check to other services (api service, meili, postgres...)
 - [ ] Connection pool max connections, idle, timeout for database, meili
 - [ ] gin should be protected with `SetTrustedProxies`
-- [ ] Event is tracked by either otel or correlation id. But, currently use wotel + kafka tracer, and partially correlation id but not really connected.
-- [ ] If deploy, but not using roles. Change to `https://github.com/agilezebra/jwt-middleware`, and use istio
+- [ ] Event is tracked by either otel or correlation id.
+      But, currently use wotel + kafka tracer, and partially correlation id but not really connected.
 - [ ] Revision endpoints aren't protected with authorization
+
 ### Frontend
+
 - [ ] use suspend with skeleton, use suspend query for streamming
 - [ ] Manage server state by tanstack, not always useState
 - [ ] Clean architecture is considerable? `https://www.freecodecamp.org/news/reusable-architecture-for-large-nextjs-applications/`
 - [ ] Add custom theme (or not)
-- [ ] Set up logger 
+- [ ] Set up logger
+
 ### Both
 
 - [ ] yjs isn't typesafety, like getting Ymap, and set value.

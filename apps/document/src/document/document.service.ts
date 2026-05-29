@@ -1,5 +1,3 @@
-import { randomUUID } from 'crypto';
-
 import type { MySchema } from '@blocknote/core';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
@@ -8,10 +6,12 @@ import { type DocumentCommittedEvent } from '@notopia-uit/api-share-gen';
 import { Traceable } from 'nestjs-otel';
 import { lastValueFrom } from 'rxjs';
 import { DataSource, Repository } from 'typeorm';
+import { v7 as uuidv7 } from 'uuid';
 
 import { AuthorizationService } from '../authorization/authorization.service';
 import { BLOCKNOTE_SCHEMA } from '../blocknote';
 import { BlocknoteEditorService } from '../blocknote/blocknote-editor.service';
+import { HocuspocusService } from '../hocuspocus';
 import { KAFKA_CLIENT } from '../kafka/token';
 import { RevisionEntity } from '../revision/revision.entity';
 import { StorageService } from '../storage/storage.service';
@@ -27,6 +27,7 @@ export class DocumentService {
   constructor(
     @InjectRepository(DocumentEntity)
     private readonly repo: Repository<DocumentEntity>,
+    private readonly hocuspocusService: HocuspocusService,
     private readonly storageService: StorageService,
     @InjectDataSource() private readonly dataSource: DataSource,
     private readonly authorizationService: AuthorizationService,
@@ -50,7 +51,7 @@ export class DocumentService {
       if (!document) {
         throw new DocumentNotFoundException(documentId);
       }
-      const revisionId = randomUUID();
+      const revisionId = uuidv7();
       this.logger.debug({ documentId, revisionId }, 'commitDocument: saving revision');
       const blocknoteEditorService = new BlocknoteEditorService({
         schema: this.blocknoteSchema,
@@ -62,6 +63,7 @@ export class DocumentService {
         content: blocknoteEditorService.blocks(),
       });
       await manager.update(DocumentEntity, { id: documentId }, { modified: false });
+      this.hocuspocusService.setModified(documentId, false);
       // TODO: Consider refactor into a module named "EventBus", which manages event topic
       const { tags, outgoingLinkIds } = blocknoteEditorService.extractTagsAndOutgoingLinkIds();
       this.logger.debug({ documentId, tags, outgoingLinkIds }, 'commitDocument: emitting event');
@@ -100,7 +102,7 @@ export class DocumentService {
     if (!hasPermission) {
       throw new DocumentPermissionException(documentId, userId);
     }
-    const key = `document-attachments/${documentId}/${randomUUID()}-${filename}`;
+    const key = `document-attachments/${documentId}/${uuidv7()}-${filename}`;
     const { uploadUrl, publicUrl } =
       await this.storageService.generateAttachmentPresignedUploadUrl(key);
     this.logger.log({ documentId, filename, key }, 'getAttachmentUploadUrl: generated upload URL');
