@@ -24,7 +24,6 @@ const defaultGlobalGraphSettings: Partial<D3Config> = {
   removeTags: [],
   focusOnHover: true,
   enableRadial: true,
-  showOrphansOnly: false,
 };
 
 export function mapDtoNoteData(dto: NoteGraph): GraphData {
@@ -50,6 +49,7 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
   const { retry } = useQueryErrorHandler();
   const [showSettings, setShowSettings] = useState(true);
   const [graphSettings, setGraphSettings] = useState<Partial<D3Config>>(defaultGlobalGraphSettings);
+  const [showOrphansOnly, setShowOrphansOnly] = useState(false);
 
   const {
     data: graphData = { nodes: [], links: [] },
@@ -59,6 +59,7 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
   } = useQuery({
     ...getWorkspaceGraphOptions({
       path: { workspaceId: workspaceId },
+      query: { includeOrphans: showOrphansOnly },
     }),
     select: (dto: NoteGraph) => mapDtoNoteData(dto),
   });
@@ -98,6 +99,8 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
         isLocalGraph={false}
         currentSettings={graphSettings}
         onSettingsChange={handleSettingsChange}
+        showOrphansOnly={showOrphansOnly}
+        onOrphansOnlyChange={setShowOrphansOnly}
       />
     </div>
   );

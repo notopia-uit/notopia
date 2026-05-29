@@ -21,7 +21,6 @@ export interface D3Config {
   showTags: boolean;
   focusOnHover?: boolean;
   enableRadial?: boolean;
-  showOrphansOnly?: boolean;
 }
 
 interface GraphOptions {

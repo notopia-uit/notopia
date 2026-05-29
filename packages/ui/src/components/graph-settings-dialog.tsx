@@ -17,6 +17,8 @@ interface GraphSettingsDialogProps {
   isLocalGraph?: boolean;
   currentSettings: Partial<D3Config>;
   onSettingsChange: (settings: Partial<D3Config>) => void;
+  showOrphansOnly?: boolean;
+  onOrphansOnlyChange?: (value: boolean) => void;
 }
 
 export function GraphSettingsDialog({
@@ -25,6 +27,8 @@ export function GraphSettingsDialog({
   isLocalGraph = false,
   currentSettings,
   onSettingsChange,
+  showOrphansOnly = false,
+  onOrphansOnlyChange,
 }: GraphSettingsDialogProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [localSettings, setLocalSettings] = useState<Partial<D3Config>>(currentSettings);
@@ -327,9 +331,9 @@ export function GraphSettingsDialog({
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="showOrphansOnly"
-                      checked={localSettings.showOrphansOnly ?? false}
+                      checked={showOrphansOnly ?? false}
                       onCheckedChange={(checked) =>
-                        handleBooleanChange('showOrphansOnly', checked as boolean)
+                        onOrphansOnlyChange?.(checked as boolean)
                       }
                     />
                     <Label htmlFor="showOrphansOnly" className="cursor-pointer text-xs">
