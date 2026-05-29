@@ -20,8 +20,8 @@ import {
 } from '@notopia-uit/ui/components/shadcn/context-menu';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useWorkspaceEvents } from '@notopia-uit/ui/contexts/workspace-events-context';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
@@ -224,9 +224,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   useEffect(() => {
     const unsubscribe = subscribe((event) => {
-      if (
-        event.event === 'WorkspaceItemsUpdatedEvent'
-      ) {
+      if (event.event === 'WorkspaceItemsUpdatedEvent') {
         queryClient.invalidateQueries({
           queryKey: getWorkspaceTreeOptions({
             path: { workspaceId: currentWorkspaceId },
@@ -342,7 +340,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
     return parentId;
   }, [viewState, items, rootId]);
 
-  const { mutateAsync: moveWorkspaceItems } = useMoveWorkspaceItemsMutation({
+  const { mutate: moveWorkspaceItems } = useMoveWorkspaceItemsMutation({
     onError: (error) => {
       showAlert({
         type: 'error',
@@ -350,10 +348,17 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
         message: `${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     },
+    onSuccess: () => {
+      showAlert({
+        type: 'success',
+        title: 'Items Moved',
+        message: 'Items have been moved successfully',
+      });
+    },
   });
 
   const onDrop = useCallback(
-    async (draggedItems: TreeItem<string>[], target: DraggingPosition) => {
+    (draggedItems: TreeItem<string>[], target: DraggingPosition) => {
       let destinationFolderId: TreeItemIndex = rootId;
 
       if (target.targetType === 'item') {
@@ -364,28 +369,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
       } else if (target.targetType === 'root') {
         destinationFolderId = rootId;
       }
-
-      const noteIds: string[] = [];
-      const folderIds: string[] = [];
-
-      for (const draggedItem of draggedItems) {
-        if (items[draggedItem.index]?.isFolder) {
-          folderIds.push(String(draggedItem.index));
-        } else {
-          noteIds.push(String(draggedItem.index));
-        }
-      }
-
-      await moveWorkspaceItems({
-        path: {
-          workspaceId: currentWorkspaceId,
-        },
-        body: {
-          noteIds,
-          folderIds,
-          destinationFolderId: String(destinationFolderId),
-        },
-      });
 
       setItems((prevItems) => {
         const newItems = { ...prevItems };
@@ -432,8 +415,23 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
         return newItems;
       });
+
+      for (const draggedItem of draggedItems) {
+        const isFolder = items[draggedItem.index]?.isFolder ?? false;
+
+        moveWorkspaceItems({
+          path: {
+            workspaceId: currentWorkspaceId,
+          },
+          body: {
+            noteIds: isFolder ? [] : [String(draggedItem.index)],
+            folderIds: isFolder ? [String(draggedItem.index)] : [],
+            destinationFolderId: String(destinationFolderId),
+          },
+        });
+      }
     },
-    [rootId, items, currentWorkspaceId, moveWorkspaceItems, setItems]
+    [rootId, items, currentWorkspaceId, moveWorkspaceItems]
   );
 
   const { mutate: trashItems } = useTrashWorkspaceItemsMutation({
@@ -698,7 +696,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           }}
           renderTreeContainer={({ children, containerProps }) => {
             return (
-              <div {...containerProps} className="rounded-md border">
+              <div {...containerProps} className="border-border border">
                 {children}
               </div>
             );
@@ -712,7 +710,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
             return (
               <li
                 {...context.itemContainerWithChildrenProps}
-                className="my-1 [&>button]:aria-selected:bg-primary/15 [&>button>svg]:aria-expanded:rotate-90"
+                className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
               >
                 <ContextMenu>
                   <ContextMenuTrigger asChild>
@@ -723,8 +721,8 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                       variant="outline"
                       size="sm"
                       className={cn(
-                        `grid h-8 w-full grid-flow-col items-center justify-start gap-2 border-none px-2 text-xs shadow-none`,
-                        'focus:bg-secondary/20 hover:bg-secondary/30 transition-colors'
+                        `grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none`,
+                        'focus:bg-secondary/20'
                       )}
                       style={{
                         paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,
@@ -749,9 +747,9 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
             );
           }}
           renderItemArrow={({ context }) => {
-            return <ChevronRight {...context.arrowProps} className="size-3.5 shrink-0 text-muted-foreground!" />;
+            return <ChevronRight {...context.arrowProps} className="size-3.5!" />;
           }}
-          renderItemTitle={({ title }) => <span className="truncate">{title}</span>}
+          renderItemTitle={({ title }) => <span>{title}</span>}
         >
           <Tree ref={tree} treeId="tree-sample" rootItem={rootId} treeLabel="Sample Tree" />
         </ControlledTreeEnvironment>
