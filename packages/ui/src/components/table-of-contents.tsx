@@ -13,7 +13,7 @@ type HeadingItem = {
 };
 
 interface TableOfContentsProps {
-  editor: BlockNoteEditor;
+  editor: BlockNoteEditor | null;
 }
 
 export function TableOfContents({ editor }: TableOfContentsProps) {
@@ -22,7 +22,6 @@ export function TableOfContents({ editor }: TableOfContentsProps) {
   const [open, setOpen] = useState(false);
   const [canScroll, setCanScroll] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [tocTop, setTocTop] = useState(65);
   const SEGMENTS = 10;
   const filledSegments = Math.round(scrollProgress * SEGMENTS);
 
@@ -35,8 +34,6 @@ export function TableOfContents({ editor }: TableOfContentsProps) {
       setCanScroll(docHeight > 0);
       const progress = docHeight > 0 ? scrollTop / docHeight : 0;
       setScrollProgress(progress);
-      const top = Math.max(50, 65 - progress * 50);
-      setTocTop(top);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -48,6 +45,8 @@ export function TableOfContents({ editor }: TableOfContentsProps) {
   }, []);
 
   useEffect(() => {
+    if (!editor) return;
+
     const extractHeadings = () => {
       const items: HeadingItem[] = [];
       editor.forEachBlock((block) => {
@@ -90,49 +89,58 @@ export function TableOfContents({ editor }: TableOfContentsProps) {
   if (!headings.length || !canScroll) return null;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        className="fixed left-0 top-[65px] z-50 flex flex-col items-center gap-[3px] p-2 transition-all duration-300"
-        style={{ top: `${tocTop}px` }}
-      >
-        {Array.from({ length: SEGMENTS }).map((_, i) => (
+    <div
+      className="fixed right-5 top-1/2 z-50 -translate-y-1/2"
+    >
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <div
-            key={i}
-            className={cn(
-              'size-[3px] rounded-full transition-all duration-300',
-              i < filledSegments ? 'bg-foreground/40' : 'bg-foreground/10'
-            )}
-          />
-        ))}
-      </PopoverTrigger>
-      <PopoverContent
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        side="right"
-        align="start"
-        sideOffset={10}
-        className="flex max-h-[400px] w-64 flex-col overflow-y-auto p-2"
-      >
-        <h4 className="mb-2 px-3 text-sm font-medium text-muted-foreground">
-          Page Navigation
-        </h4>
-        {headings.map((heading) => (
-          <button
-            key={heading.id}
-            onClick={() => handleClick(heading.id)}
-            className={cn(
-              'hover:bg-accent hover:text-accent-foreground text-foreground/80 w-full truncate rounded-sm px-3 py-1 text-left text-sm transition-colors',
-              activeId === heading.id &&
-                'bg-accent text-accent-foreground font-semibold'
-            )}
-            style={{ paddingLeft: `${12 + (heading.level - 1) * 12}px` }}
+            className="flex cursor-default flex-col items-center gap-4 px-1.5 py-3"
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
           >
-            {heading.text}
-          </button>
-        ))}
-      </PopoverContent>
-    </Popover>
+            {Array.from({ length: SEGMENTS }).map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  'h-1 w-5 rounded-full transition-all duration-200',
+                  i < filledSegments
+                    ? 'bg-foreground/40 scale-115'
+                    : 'bg-foreground/10 scale-100'
+                )}
+              />
+            ))}
+          </div>
+        </PopoverTrigger>
+        <PopoverContent
+          side="left"
+          align="center"
+          sideOffset={-30}
+          className="w-56 px-1 py-3"
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+        >
+          <h4 className="text-muted-foreground mb-2 px-2 text-[10px] font-semibold tracking-widest uppercase">
+            Page Navigation
+          </h4>
+          <div className="max-h-[50vh] space-y-0.5 overflow-y-auto">
+            {headings.map((heading) => (
+              <button
+                key={heading.id}
+                onClick={() => handleClick(heading.id)}
+                className={cn(
+                  'hover:bg-accent hover:text-accent-foreground text-foreground/80 w-full truncate rounded-sm px-3 py-1 text-left text-sm transition-colors',
+                  activeId === heading.id &&
+                    'bg-accent text-accent-foreground font-semibold'
+                )}
+                style={{ paddingLeft: `${12 + (heading.level - 1) * 12}px` }}
+              >
+                {heading.text}
+              </button>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

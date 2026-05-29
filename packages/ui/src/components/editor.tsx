@@ -4,10 +4,10 @@ import '@notopia-uit/lib/yjs';
 import '@notopia-uit/lib/hocuspocus';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
+import { getMyWorkspacesOptions } from '@notopia-uit/api-gen';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
 import { getAuthClient } from '@notopia-uit/ui/lib/auth-client';
-import { getMyWorkspacesOptions } from '@notopia-uit/api-gen';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -28,7 +28,7 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
     () => ({
       name: sessionData?.user?.name ?? 'Anonymous',
       color: getDeterministicColor(sessionData?.user?.id ?? 'anonymous'),
-      avatar: sessionData?.user?.image ?? 'https://placehold.net/default.svg',
+      avatar: sessionData?.user?.image ?? '',
     }),
     [sessionData?.user?.name, sessionData?.user?.id, sessionData?.user?.image]
   );
