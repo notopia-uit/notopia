@@ -141,8 +141,12 @@ func processFile(filePath string, config Config, fileMapping map[string]uuid.UUI
 	pathWithoutExt := strings.TrimSuffix(relPath, ".md")
 	fileUUID := fileMapping[pathWithoutExt]
 
+	relDir := filepath.Dir(relPath)
+	if relDir == "." {
+		relDir = ""
+	}
 	// Transform content
-	transformed := transformContent(string(content), config, fileMapping)
+	transformed := transformContent(string(content), config, fileMapping, relDir)
 
 	// Write output file
 	outputFileName := fmt.Sprintf("%s.md", fileUUID.String())
@@ -154,7 +158,7 @@ func processFile(filePath string, config Config, fileMapping map[string]uuid.UUI
 	return nil
 }
 
-func transformContent(content string, config Config, fileMapping map[string]uuid.UUID) string {
+func transformContent(content string, config Config, fileMapping map[string]uuid.UUID, sourceRelDir string) string {
 	// Step 1: Strip frontmatter
 	content = frontmatterRegex.ReplaceAllString(content, "")
 
@@ -181,6 +185,9 @@ func transformContent(content string, config Config, fileMapping map[string]uuid
 
 			// Look up UUID for this path
 			linkUUID, found := fileMapping[resolvedPath]
+			if !found && sourceRelDir != "" {
+				linkUUID, found = fileMapping[sourceRelDir+"/"+resolvedPath]
+			}
 			if !found {
 				// If not found, generate UUID from the path anyway
 				linkUUID = uuid.NewSHA1(config.NamespaceUUID, []byte(resolvedPath))
@@ -218,6 +225,9 @@ func transformContent(content string, config Config, fileMapping map[string]uuid
 
 		// Look up UUID for this path
 		linkUUID, found := fileMapping[resolvedPath]
+		if !found && sourceRelDir != "" {
+			linkUUID, found = fileMapping[sourceRelDir+"/"+resolvedPath]
+		}
 		if !found {
 			// If not found, generate UUID from the path anyway
 			linkUUID = uuid.NewSHA1(config.NamespaceUUID, []byte(resolvedPath))

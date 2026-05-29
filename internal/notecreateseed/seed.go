@@ -238,7 +238,11 @@ func buildNotes(markdownFiles []string, sourceDir string, noteIDByPath map[strin
 			Path:     pathWithoutExt,
 		})
 
-		targets := extractNoteLinks(string(content), noteIDByPath)
+		relDir := filepath.Dir(relPath)
+		if relDir == "." {
+			relDir = ""
+		}
+		targets := extractNoteLinks(string(content), noteIDByPath, relDir)
 		for _, target := range targets {
 			key := noteID.String() + ":" + target.String()
 			linkSet[key] = NoteLink{SourceID: noteID, TargetID: target}
@@ -288,7 +292,7 @@ func extractTags(content string) []string {
 	return tags
 }
 
-func extractNoteLinks(content string, noteIDByPath map[string]uuid.UUID) []uuid.UUID {
+func extractNoteLinks(content string, noteIDByPath map[string]uuid.UUID, sourceRelDir string) []uuid.UUID {
 	stripped := frontmatterRegex.ReplaceAllString(content, "")
 	targets := map[uuid.UUID]struct{}{}
 
@@ -307,6 +311,10 @@ func extractNoteLinks(content string, noteIDByPath map[string]uuid.UUID) []uuid.
 		resolved := resolveLinkPath(linkPath)
 		if id, ok := noteIDByPath[resolved]; ok {
 			targets[id] = struct{}{}
+		} else if sourceRelDir != "" {
+			if id, ok := noteIDByPath[sourceRelDir+"/"+resolved]; ok {
+				targets[id] = struct{}{}
+			}
 		}
 	}
 
@@ -326,6 +334,10 @@ func extractNoteLinks(content string, noteIDByPath map[string]uuid.UUID) []uuid.
 		resolved := resolveLinkPath(linkPath)
 		if id, ok := noteIDByPath[resolved]; ok {
 			targets[id] = struct{}{}
+		} else if sourceRelDir != "" {
+			if id, ok := noteIDByPath[sourceRelDir+"/"+resolved]; ok {
+				targets[id] = struct{}{}
+			}
 		}
 	}
 
