@@ -690,9 +690,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                 selectedItems: [selectedId],
               },
             }));
-            if (selectedId && items[selectedId] && !items[selectedId].isFolder) {
-              router.push(`/workspace/${currentWorkspaceId}/note/${selectedId}`);
-            }
           }}
           renderTreeContainer={({ children, containerProps }) => {
             return (
@@ -711,6 +708,16 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
               <li
                 {...context.itemContainerWithChildrenProps}
                 className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
+                onClick={() => {
+                  if (!item.isFolder) {
+                    router.push(`/workspace/${currentWorkspaceId}/note/${item.index}`);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !item.isFolder) {
+                    router.push(`/workspace/${currentWorkspaceId}/note/${item.index}`);
+                  }
+                }}
               >
                 <ContextMenu>
                   <ContextMenuTrigger asChild>
