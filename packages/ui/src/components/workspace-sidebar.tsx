@@ -404,7 +404,9 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="size-8 rounded-lg">
                       <AvatarImage src={sessionData.user.image || ''} alt={sessionData.user.name} />
-                      <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                      <AvatarFallback className="rounded-lg">
+                        {sessionData.user?.name?.slice(0, 2)}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm/tight">
                       <span className="truncate font-semibold">{sessionData.user.name}</span>
@@ -435,7 +437,12 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await getAuthClient().signOut();
+                    window.location.href = '/api/auth/logout';
+                  }}
+                >
                   <LogOut />
                   Log out
                 </DropdownMenuItem>
