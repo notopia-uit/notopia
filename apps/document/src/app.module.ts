@@ -109,7 +109,7 @@ import { StorageModule } from './storage';
         },
       }),
       {
-        imports: [ConfigModule, DocumentModule, RevisionModule],
+        imports: [ConfigModule, DocumentModule, HocuspocusModule, RevisionModule],
       }
     ),
   ],

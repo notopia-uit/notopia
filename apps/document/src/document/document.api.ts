@@ -4,6 +4,7 @@ import { CommitDocument201Response } from '@notopia-uit/api-document-nestjs-serv
 import { Traceable } from 'nestjs-otel';
 
 import { User } from '#/common';
+import { HocuspocusService } from '../hocuspocus';
 
 import { DocumentService } from './document.service';
 
@@ -11,7 +12,10 @@ import { DocumentService } from './document.service';
 export class DocumentApi extends DocumentApiDefinition {
   private readonly logger = new Logger(DocumentApi.name);
 
-  constructor(private readonly documentService: DocumentService) {
+  constructor(
+    private readonly documentService: DocumentService,
+    private readonly hocuspocusService: HocuspocusService
+  ) {
     super();
   }
 
@@ -26,6 +30,7 @@ export class DocumentApi extends DocumentApiDefinition {
     }
     try {
       const revisionId = await this.documentService.commitDocument({ documentId, userId: user.id });
+      this.hocuspocusService.setModified(documentId, false);
       const response = { id: revisionId } as CommitDocument201Response;
       this.logger.log({ documentId }, 'commitDocument: done');
       this.logger.debug({ response }, 'commitDocument: response');
