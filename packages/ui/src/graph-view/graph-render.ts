@@ -100,12 +100,13 @@ export async function renderGraph(
     showTags = true,
     focusOnHover = false,
     enableRadial = false,
+    showOrphansOnly = false,
   } = config;
 
   // Filter nodes based on showTags and removeTags config
   const isTagNode = (node: NodeData) => node.type === 'tag';
 
-  const filteredNodes = graphData.nodes.filter((node: NodeData) => {
+  let filteredNodes = graphData.nodes.filter((node: NodeData) => {
     const isTag = isTagNode(node);
 
     // Filter by showTags setting
@@ -126,15 +127,28 @@ export async function renderGraph(
   });
 
   // Create node map for quick lookup
-  const nodeMap = new Map(filteredNodes.map((node: NodeData) => [node.id, node]));
-  const validNodeIds = new Set(filteredNodes.map((n: NodeData) => n.id));
+  let nodeMap = new Map(filteredNodes.map((node: NodeData) => [node.id, node]));
+  let validNodeIds = new Set(filteredNodes.map((n: NodeData) => n.id));
 
   const tweens = new Map<string, TweenNode>();
 
   // Filter links to only include valid nodes
-  const validLinks = graphData.links.filter(
+  let validLinks = graphData.links.filter(
     (link: any) => validNodeIds.has(link.source) && validNodeIds.has(link.target)
   );
+
+  if (showOrphansOnly) {
+    const nodesWithLinks = new Set<string>();
+    for (const link of validLinks) {
+      nodesWithLinks.add(link.source);
+      nodesWithLinks.add(link.target);
+    }
+    const orphanNodes = filteredNodes.filter((node: NodeData) => !nodesWithLinks.has(node.id));
+    filteredNodes = orphanNodes;
+    validLinks = [];
+    nodeMap = new Map(filteredNodes.map((node: NodeData) => [node.id, node]));
+    validNodeIds = new Set(filteredNodes.map((n: NodeData) => n.id));
+  }
 
   // Calculate neighborhood based on depth
   const neighbourhood = new Set<string>();

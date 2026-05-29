@@ -24,6 +24,7 @@ const defaultGlobalGraphSettings: Partial<D3Config> = {
   removeTags: [],
   focusOnHover: true,
   enableRadial: true,
+  showOrphansOnly: false,
 };
 
 export function mapDtoNoteData(dto: NoteGraph): GraphData {

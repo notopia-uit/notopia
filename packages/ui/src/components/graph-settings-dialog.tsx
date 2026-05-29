@@ -322,6 +322,21 @@ export function GraphSettingsDialog({
                     Show Tags
                   </Label>
                 </div>
+
+                {!isLocalGraph && (
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="showOrphansOnly"
+                      checked={localSettings.showOrphansOnly ?? false}
+                      onCheckedChange={(checked) =>
+                        handleBooleanChange('showOrphansOnly', checked as boolean)
+                      }
+                    />
+                    <Label htmlFor="showOrphansOnly" className="cursor-pointer text-xs">
+                      Show Orphans Only
+                    </Label>
+                  </div>
+                )}
               </div>
             </div>
           </ScrollArea>
