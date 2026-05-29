@@ -1,15 +1,15 @@
-import { HttpException, Module } from '@nestjs/common';
+import { HttpException, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { createSchema } from '@notopia-uit/lib-server/block-note';
 import { Meilisearch } from 'meilisearch';
 import { OpenTelemetryModule } from 'nestjs-otel';
-import { LoggerModule } from 'nestjs-pino';
+import { Logger, LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppConfig, MeiliConfig } from './config';
-import { APP_CONFIG, MEILI_CONFIG, appConfig, kafkaConfig, meiliConfig } from './config.factory';
+import { APP_CONFIG, KAFKA_CONFIG, MEILI_CONFIG, appConfig, kafkaConfig, meiliConfig } from './config.factory';
 import { validate } from './env.validation';
 import { BLOCKNOTE_SCHEMA } from './token';
 
@@ -89,4 +89,17 @@ import { BLOCKNOTE_SCHEMA } from './token';
   ],
   controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly logger: Logger,
+  ) {}
+
+  onModuleInit() {
+    this.logger.log({
+      app: this.configService.get(APP_CONFIG),
+      kafka: this.configService.get(KAFKA_CONFIG),
+      meili: { ...this.configService.get(MEILI_CONFIG), apiKey: '***' },
+    }, 'Application configuration loaded');
+  }
+}
