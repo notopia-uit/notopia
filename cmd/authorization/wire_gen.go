@@ -30,7 +30,8 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	}
 	sql := &configConfig.Database
 	log := &configConfig.Log
-	stdoutHandler := logging.NewStdoutHandler(log)
+	general := &configConfig.General
+	stdoutHandler := logging.NewStdoutHandler(log, general)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
@@ -116,7 +117,6 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		return nil, nil, err
 	}
 	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
-	general := &configConfig.General
 	authorizationServer, err := authorization.NewServer(ctx, server, healthHealth, logger, global, general, appApp)
 	if err != nil {
 		cleanup6()

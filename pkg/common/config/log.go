@@ -5,8 +5,9 @@ import (
 )
 
 type Log struct {
-	Enabled bool   `default:"true" json:"enabled" mapstructure:"enabled" validate:""                                      yaml:"enabled"`
-	Level   string `default:"info" json:"level"   mapstructure:"level"   validate:"omitempty,oneof=debug info warn error" yaml:"level"`
+	Enabled bool   `default:"true"  json:"enabled" mapstructure:"enabled" validate:""                                      yaml:"enabled"`
+	Level   string `default:"info"  json:"level"   mapstructure:"level"   validate:"omitempty,oneof=debug info warn error" yaml:"level"`
+	Pretty  bool   `default:"false" json:"pretty"  mapstructure:"pretty"  validate:""                                      yaml:"pretty"`
 }
 
 func (c *Log) GetSlogLevel() slog.Level {
