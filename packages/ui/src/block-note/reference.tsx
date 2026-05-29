@@ -89,7 +89,10 @@ const ReferenceLink = ({
         href={`/note/${noteId}`}
         className="notopia-reference bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer rounded-sm px-1"
         data-notopia-ref={noteId}
-        onMouseEnter={() => setShowPreview(true)}
+        onClick={(e) => {
+          e.preventDefault();
+          setShowPreview(true);
+        }}
       >
         @{displayName}
       </a>

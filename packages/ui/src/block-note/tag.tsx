@@ -8,7 +8,7 @@ import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { FileText } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function TagPreview({
   tag,
@@ -83,7 +83,15 @@ export const createBlockNoteTagSpec = () =>
           <span
             className="notopia-tag cursor-pointer rounded-sm px-1 font-semibold"
             data-notopia-tag={tag}
-            onMouseEnter={() => setShowPreview(true)}
+            role="button"
+            tabIndex={0}
+            onClick={() => setShowPreview(true)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setShowPreview(true);
+              }
+            }}
           >
             #{tag}
           </span>
