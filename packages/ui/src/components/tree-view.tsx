@@ -698,7 +698,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           }}
           renderTreeContainer={({ children, containerProps }) => {
             return (
-              <div {...containerProps} className="border-border border">
+              <div {...containerProps} className="rounded-md border">
                 {children}
               </div>
             );
@@ -712,7 +712,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
             return (
               <li
                 {...context.itemContainerWithChildrenProps}
-                className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
+                className="my-1 [&>button]:aria-selected:bg-primary/15 [&>button>svg]:aria-expanded:rotate-90"
               >
                 <ContextMenu>
                   <ContextMenuTrigger asChild>
@@ -723,8 +723,8 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                       variant="outline"
                       size="sm"
                       className={cn(
-                        `grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 border-none text-xs shadow-none`,
-                        'focus:bg-secondary/20'
+                        `grid h-8 w-full grid-flow-col items-center justify-start gap-2 border-none px-2 text-xs shadow-none`,
+                        'focus:bg-secondary/20 hover:bg-secondary/30 transition-colors'
                       )}
                       style={{
                         paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,
@@ -749,9 +749,9 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
             );
           }}
           renderItemArrow={({ context }) => {
-            return <ChevronRight {...context.arrowProps} className="size-3.5!" />;
+            return <ChevronRight {...context.arrowProps} className="size-3.5 shrink-0 text-muted-foreground!" />;
           }}
-          renderItemTitle={({ title }) => <span>{title}</span>}
+          renderItemTitle={({ title }) => <span className="truncate">{title}</span>}
         >
           <Tree ref={tree} treeId="tree-sample" rootItem={rootId} treeLabel="Sample Tree" />
         </ControlledTreeEnvironment>
