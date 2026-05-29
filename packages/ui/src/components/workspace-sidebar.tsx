@@ -318,10 +318,10 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent className="flex flex-col overflow-hidden">
-        <SidebarGroup className="flex flex-1 flex-col overflow-hidden group-data-[collapsible=icon]:hidden">
+      <SidebarContent className="flex flex-col overflow-y-auto">
+        <SidebarGroup className="flex flex-col group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
-          <SidebarMenu className="flex-1 flex-col overflow-hidden">
+          <SidebarMenu className="flex flex-col">
             <TreeView currentWorkspaceId={currentWorkspaceId} />
           </SidebarMenu>
         </SidebarGroup>

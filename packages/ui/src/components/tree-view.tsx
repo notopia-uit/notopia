@@ -585,7 +585,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   return isGettingWorkspaceTree ? (
     <Spinner />
   ) : (
-    <div className="flex size-full flex-col gap-4 overflow-hidden">
+    <div className="flex flex-col gap-4">
       <div className="flex shrink-0 flex-col gap-2">
         <form onSubmit={onSubmit} className="flex items-center gap-2">
           <Input
@@ -620,7 +620,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           </Button>
         </div>
       </div>
-      <div className="flex-1 overflow-auto">
+      <div>
         <ControlledTreeEnvironment<string>
           items={items}
           getItemTitle={(item) => item.data}
