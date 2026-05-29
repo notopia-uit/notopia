@@ -382,8 +382,10 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                 >
                   {/* TODO: get user data from betterauth */}
                   <Avatar className="size-8 rounded-lg">
-                    <AvatarImage src={sessionData.user.image || ''} alt={'avatar here'} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarImage src={sessionData.user?.image || ''} alt={'avatar here'} />
+                    <AvatarFallback className="rounded-lg">
+                      {sessionData.user?.name?.slice(0, 2)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm/tight">
                     <span className="truncate font-semibold">{sessionData.user.name}</span>
