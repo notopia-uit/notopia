@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from '@notopia-uit/ui/components/shadcn/card';
 import { Field, FieldDescription, FieldGroup } from '@notopia-uit/ui/components/shadcn/field';
-import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { getAuthClient } from '@notopia-uit/ui/lib/auth-client';
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 
 export function SignInForm({ className, ...props }: React.ComponentProps<'div'>) {
@@ -27,7 +27,7 @@ export function SignInForm({ className, ...props }: React.ComponentProps<'div'>)
                   variant="outline"
                   type="button"
                   onClick={() => {
-                    void authClient.signIn.social({
+                    void getAuthClient().signIn.social({
                       provider: 'authentik',
                       callbackURL: '/',
                     });

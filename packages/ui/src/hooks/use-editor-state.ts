@@ -2,21 +2,17 @@
 
 import { useHocuspocusProvider } from '@hocuspocus/provider-react';
 import { useCommitDocumentMutation } from '@notopia-uit/api-gen';
-import { useIsDocModified } from '@notopia-uit/ui/hooks/use-is-doc-modified';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
+import { useIsDocModified } from '@notopia-uit/ui/hooks/use-is-doc-modified';
 
 export const useEditorState = (noteId: string) => {
   const provider = useHocuspocusProvider();
   const { showAlert } = useAlert();
 
-  const { isModified, setModified } = useIsDocModified(
-    provider.document,
-    provider.awareness?.clientID.toString() ?? 'anonymous'
-  );
+  const { isModified } = useIsDocModified(provider.document);
 
   const { mutate: commitDocument, isPending: isCommitingDocument } = useCommitDocumentMutation({
     onSuccess: (responses) => {
-      setModified(false);
       showAlert({
         type: 'success',
         title: 'Document committed successfully!',

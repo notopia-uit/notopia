@@ -14,6 +14,7 @@
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
       "#/*": ["./app/*"],
+      "@lib/*": ["./lib/*"],
       "@ui/*": ["../../packages/ui/src/*"],
       "@notopia-uit/ui/*": ["../../packages/ui/src/*"],
       "@notopia-uit/api-gen/*": ["../../packages/api-gen/src/*"],
@@ -30,8 +31,9 @@
     "global.d.ts",
     ".next/types/**/*.ts",
     "postcss.config.mjs",
-    "../../packages/ui/src/global.d.ts",
-    "proxy.ts"
+    "proxy.ts",
+    "lib/**/*.ts",
+    "../../packages/ui/src/global.d.ts"
   ],
   "exclude": ["out-tsc", "dist", "node_modules", "app/**/*.spec.ts", "app/**/*.test.ts", ".next"],
   "references": [

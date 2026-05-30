@@ -1,7 +1,7 @@
 import { getMyWorkspacesOptions } from '@notopia-uit/api-gen/index';
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
 import { WorkspaceSwitcher } from '@ui/components/workspace-switcher';
-import { fetchAccessTokenServerSide } from '@ui/lib/get-access-token';
+import { fetchAccessTokenServerSide } from '@lib/get-access-token';
 
 // import getQueryClient from '#/get-query-client';
 

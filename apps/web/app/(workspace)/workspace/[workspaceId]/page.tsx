@@ -1,7 +1,7 @@
 import { getMyWorkspacesOptions } from '@notopia-uit/api-gen/index';
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
 import { WorkspaceWelcome } from '@ui/components/workspace-welcome';
-import { fetchAccessTokenServerSide } from '@ui/lib/get-access-token';
+import { fetchAccessTokenServerSide } from '@lib/get-access-token';
 import { redirect } from 'next/navigation';
 
 interface WorkspacePageProps {

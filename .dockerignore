@@ -1,5 +1,6 @@
 # Taken from gitignore, and should be synced
 **/node_modules
+!**/.next/standalone/node_modules
 **/.env.local
 
 out-tsc/

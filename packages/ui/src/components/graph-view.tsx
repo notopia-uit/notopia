@@ -49,6 +49,7 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
   const { retry } = useQueryErrorHandler();
   const [showSettings, setShowSettings] = useState(true);
   const [graphSettings, setGraphSettings] = useState<Partial<D3Config>>(defaultGlobalGraphSettings);
+  const [showOrphansOnly, setShowOrphansOnly] = useState(false);
 
   const {
     data: graphData = { nodes: [], links: [] },
@@ -58,6 +59,7 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
   } = useQuery({
     ...getWorkspaceGraphOptions({
       path: { workspaceId: workspaceId },
+      query: { includeOrphans: showOrphansOnly },
     }),
     select: (dto: NoteGraph) => mapDtoNoteData(dto),
   });
@@ -72,7 +74,7 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
 
   if (isError) {
     return (
-      <div className="flex h-[400px] items-center justify-center">
+      <div className="flex h-100 items-center justify-center">
         <QueryErrorFallback
           error={error}
           onRetry={retry}
@@ -97,6 +99,8 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
         isLocalGraph={false}
         currentSettings={graphSettings}
         onSettingsChange={handleSettingsChange}
+        showOrphans={showOrphansOnly}
+        onOrphansOnlyChange={setShowOrphansOnly}
       />
     </div>
   );

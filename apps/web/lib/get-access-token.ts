@@ -1,5 +1,6 @@
-import { auth } from '@notopia-uit/ui/lib/auth';
 import { headers } from 'next/headers';
+
+import { auth } from './auth';
 
 export const fetchAccessTokenServerSide = async (): Promise<string> => {
   const h = await headers();

@@ -1,6 +1,7 @@
 'use client';
 
 import { BlockNoteEditor } from '@blocknote/core';
+import { MyEditor } from '@blocknote/core';
 import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
 import {
@@ -25,6 +26,7 @@ import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react'
 import { useTheme } from 'next-themes';
 import { forwardRef, useMemo, useCallback, useEffect } from 'react';
 
+import { NoteSuggestionMenu } from './note-suggestion-menu';
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
@@ -36,6 +38,8 @@ interface EditorCoreProps {
     avatar: string;
   };
   noteId: string;
+  isViewer?: boolean;
+  onEditorReady?: (editor: MyEditor) => void;
 }
 
 function EditorStatusBar() {
@@ -113,7 +117,7 @@ function EditorStatusBar() {
 }
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
-  { sessionUser, noteId },
+  { sessionUser, noteId, isViewer, onEditorReady },
   ref
 ) {
   const { resolvedTheme } = useTheme();
@@ -153,20 +157,29 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     if (ref) {
       (ref as React.MutableRefObject<any>).current = editor;
     }
+    if (onEditorReady) {
+      onEditorReady(editor);
+    }
     return () => {
       if (ref) {
         (ref as React.MutableRefObject<any>).current = null;
       }
     };
-  }, [editor, ref]);
+  }, [editor, ref, onEditorReady]);
 
   const noteSearchFn = useCallback(
-    (query: string) => searchNotesFromMeilisearch(meilisearchClient, query),
+    (query: string) => {
+      if (!meilisearchClient) return Promise.resolve([]);
+      return searchNotesFromMeilisearch(meilisearchClient, query);
+    },
     [meilisearchClient]
   );
 
   const tagSearchFn = useCallback(
-    (query: string) => searchTagsFromMeilisearch(meilisearchClient, query),
+    (query: string) => {
+      if (!meilisearchClient) return Promise.resolve([]);
+      return searchTagsFromMeilisearch(meilisearchClient, query);
+    },
     [meilisearchClient]
   );
 
@@ -204,19 +217,14 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
   return (
     <>
       <EditorStatusBar />
-      <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'}>
-        <SuggestionMenuController
-          triggerCharacter={'#'}
-          getItems={async (query) => {
-            return handleTagMenuSearch(query);
-          }}
-        />
+      <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'} editable={!isViewer}>
+        <SuggestionMenuController triggerCharacter={'#'} getItems={handleTagMenuSearch} />
 
         <SuggestionMenuController
           triggerCharacter={'@'}
-          getItems={async (query) => {
-            return handleNoteMenuSearch(query);
-          }}
+          getItems={handleNoteMenuSearch}
+          suggestionMenuComponent={NoteSuggestionMenu}
+          onItemClick={(item) => item.onItemClick?.()}
         />
       </BlockNoteView>
     </>

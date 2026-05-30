@@ -3,10 +3,10 @@ import { BlockNoteSchema as OriginalBlockNoteSchema } from '@blocknote/core';
 import { createBlockNoteReferenceSpec } from './reference';
 import { createBlockNoteTagSpec } from './tag';
 
-export function createBlockNoteSchema() {
+export function createBlockNoteSchema(apiUrl?: string) {
   return OriginalBlockNoteSchema.create().extend({
     inlineContentSpecs: {
-      reference: createBlockNoteReferenceSpec(),
+      reference: createBlockNoteReferenceSpec(apiUrl),
       tag: createBlockNoteTagSpec(),
     },
   });

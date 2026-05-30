@@ -1,6 +1,7 @@
 'use client';
 
 import { searchNotesFromMeilisearch, type SearchResult } from '@notopia-uit/ui/block-note';
+import { HighlightedText } from '@notopia-uit/ui/components/highlighted-text';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { FileText, SearchX } from 'lucide-react';
@@ -41,7 +42,10 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
   }, []);
 
   const noteSearchFn = useCallback(
-    (q: string) => searchNotesFromMeilisearch(meilisearchClient, q),
+    (q: string) => {
+      if (!meilisearchClient) return Promise.resolve([] as SearchResult[]);
+      return searchNotesFromMeilisearch(meilisearchClient, q);
+    },
     [meilisearchClient]
   );
 
@@ -83,7 +87,11 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
       description="Search for notes in your workspace"
     >
       <Command shouldFilter={false}>
-        <CommandInput placeholder="Search notes..." value={query} onValueChange={handleQueryChange} />
+        <CommandInput
+          placeholder="Search notes..."
+          value={query}
+          onValueChange={handleQueryChange}
+        />
         <CommandList>
           {!meilisearchClient && !isLoading && (
             <div className="text-muted-foreground flex items-center justify-center gap-2 py-6 text-sm">
@@ -109,8 +117,16 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
             <CommandGroup heading="Notes">
               {results.map((note) => (
                 <CommandItem key={note.id} onSelect={() => handleSelect(note.id)}>
-                  <FileText className="size-4" />
-                  <span>{note.name}</span>
+                  <FileText className="mt-0.5 size-4 shrink-0 self-start" />
+                  <div className="flex min-w-0 flex-col">
+                    <HighlightedText text={note.formattedName ?? note.name} className="truncate" />
+                    {note.contentSnippet && (
+                      <HighlightedText
+                        text={note.contentSnippet}
+                        className="text-muted-foreground line-clamp-2 text-xs"
+                      />
+                    )}
+                  </div>
                 </CommandItem>
               ))}
             </CommandGroup>

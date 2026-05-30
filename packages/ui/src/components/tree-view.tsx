@@ -3,7 +3,7 @@
 import {
   NoteWorkspaceTreeFolder,
   NoteWorkspaceTreeNote,
-  getWorkspaceEvents,
+  getNoteOptions,
   getWorkspaceTreeOptions,
   showTrashOptions,
   useCreateFolderMutation,
@@ -21,6 +21,7 @@ import {
 } from '@notopia-uit/ui/components/shadcn/context-menu';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { useWorkspaceEvents } from '@notopia-uit/ui/contexts/workspace-events-context';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
@@ -220,7 +221,27 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   const { showAlert } = useAlert();
 
+  const { subscribe } = useWorkspaceEvents();
+
+  useEffect(() => {
+    const unsubscribe = subscribe((event) => {
+      if (event.event === 'WorkspaceItemsUpdatedEvent') {
+        queryClient.invalidateQueries({
+          queryKey: getWorkspaceTreeOptions({
+            path: { workspaceId: currentWorkspaceId },
+          }).queryKey,
+        });
+      }
+    });
+    return unsubscribe;
+  }, [subscribe, queryClient, currentWorkspaceId]);
+
   const { mutate: renameNote } = useRenameNoteMutation({
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: getNoteOptions({ path: { noteId: variables.path.noteId } }).queryKey,
+      });
+    },
     onError: (error) => {
       showAlert({
         type: 'error',
@@ -300,58 +321,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   });
   const [viewState, setViewState] = useState<TreeViewState>(viewStateInitial);
   const [search, setSearch] = useState<string | undefined>('');
-  useEffect(() => {
-    const abortController = new AbortController();
-    const result = getWorkspaceEvents({
-      path: { workspaceId: currentWorkspaceId },
-      signal: abortController.signal,
-      onSseEvent: (event) => {
-        switch (event.event) {
-          case 'WorkspaceItemsUpdatedEvent':
-          case 'WorkspaceRenamedEvent':
-          case 'WorkspaceDeletedEvent':
-            break;
-          case 'HeartBeatWorkspaceEvent':
-            break;
-          default:
-            showAlert({
-              type: 'error',
-              title: 'Unknown Event',
-              message: `Received unknown event: ${event.event}`,
-            });
-        }
-      },
-      onSseError: (error) => {
-        showAlert({
-          type: 'error',
-          title: 'Connection Error',
-          message: `${error instanceof Error ? error.message : 'Unknown error'}`,
-        });
-      },
-    });
-
-    const consumeStream = async () => {
-      try {
-        const { stream } = await result;
-        for await (const _ of stream) {
-        }
-      } catch (error) {
-        if (!abortController.signal.aborted) {
-          showAlert({
-            type: 'error',
-            title: 'Stream Error',
-            message: `${error instanceof Error ? error.message : 'Unknown error'}`,
-          });
-        }
-      }
-    };
-    consumeStream();
-
-    return () => {
-      abortController.abort();
-    };
-  }, [currentWorkspaceId, showAlert]);
-
   const [items, setItems] = useState<Record<TreeItemIndex, TreeItem<string>>>({});
   useEffect(() => {
     if (workspaceTreeData) {
@@ -622,7 +591,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   return isGettingWorkspaceTree ? (
     <Spinner />
   ) : (
-    <div className="flex size-full flex-col gap-4 overflow-hidden">
+    <div className="flex flex-col gap-4">
       <div className="flex shrink-0 flex-col gap-2">
         <form onSubmit={onSubmit} className="flex items-center gap-2">
           <Input
@@ -657,7 +626,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           </Button>
         </div>
       </div>
-      <div className="flex-1 overflow-auto">
+      <div>
         <ControlledTreeEnvironment<string>
           items={items}
           getItemTitle={(item) => item.data}
@@ -727,9 +696,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                 selectedItems: [selectedId],
               },
             }));
-            if (selectedId && items[selectedId] && !items[selectedId].isFolder) {
-              router.push(`/workspace/${currentWorkspaceId}/note/${selectedId}`);
-            }
           }}
           renderTreeContainer={({ children, containerProps }) => {
             return (
@@ -748,6 +714,16 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
               <li
                 {...context.itemContainerWithChildrenProps}
                 className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
+                onClick={() => {
+                  if (!item.isFolder) {
+                    router.push(`/workspace/${currentWorkspaceId}/note/${item.index}`);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !item.isFolder) {
+                    router.push(`/workspace/${currentWorkspaceId}/note/${item.index}`);
+                  }
+                }}
               >
                 <ContextMenu>
                   <ContextMenuTrigger asChild>

@@ -1,64 +1,46 @@
 'use client';
 
-import { Icons } from '@notopia-uit/ui/components/icons';
-import { Button } from '@notopia-uit/ui/components/shadcn/button';
+import Link from 'next/link';
+
+import { Icons } from './icons';
+import { Button } from './shadcn/button';
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from '@notopia-uit/ui/components/shadcn/navigation-menu';
-import useIsMobile from '@notopia-uit/ui/hooks/use-is-mobile';
-import Link from 'next/link';
+} from './shadcn/navigation-menu';
 
-function NavigationButtonGroup() {
-  return (
-    <div className="flex items-center justify-end space-x-2 p-2">
-      <Button variant="outline" size="icon" aria-label="Github">
-        <Icons.Github />
-      </Button>
-      <Button variant="outline" size="icon" aria-label="Facebook">
-        <Icons.Facebook />
-      </Button>
-    </div>
-  );
-}
-function NavigationBarMenu() {
-  const isMobile = useIsMobile();
-  return (
-    <NavigationMenu viewport={!isMobile}>
-      <NavigationMenuList className="flex-wrap">
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Features</NavigationMenuTrigger>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Pricing</NavigationMenuTrigger>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
-  );
-}
-
-function NavigationBarLogo() {
-  return (
-    <div className="flex items-center space-x-4 p-2">
-      <Link href="/" className="hidden items-center justify-start space-x-2 p-2 sm:flex">
-        <Icons.Logo />
-        <span className="hidden font-bold sm:inline-block">Notopia</span>
-      </Link>
-    </div>
-  );
-}
+const NAV_ITEMS = ['Features', 'Pricing', 'Resources'];
 
 export default function LandingNavigationBar() {
   return (
-    <>
-      <NavigationBarLogo />
-      <NavigationBarMenu />
-      <NavigationButtonGroup />
-    </>
+    <div className="flex w-full items-center justify-between gap-6">
+      <Link href="/" className="flex shrink-0 items-center gap-2">
+        <span className="text-foreground text-xl font-semibold tracking-tight">
+          Notopia
+        </span>
+      </Link>
+
+      <div className="flex flex-1 justify-center">
+        <NavigationMenu viewport={false}>
+          <NavigationMenuList className="gap-1">
+            {NAV_ITEMS.map((item) => (
+              <NavigationMenuItem key={item}>
+                <NavigationMenuTrigger className="text-foreground hover:bg-muted h-auto rounded-lg bg-transparent px-4 py-2 text-sm font-medium">
+                  {item}
+                </NavigationMenuTrigger>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2">
+        <Button variant="outline" size="icon" className="rounded-lg" aria-label="GitHub">
+          <Icons.Github className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
   );
 }

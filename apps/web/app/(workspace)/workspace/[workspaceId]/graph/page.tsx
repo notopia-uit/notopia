@@ -1,7 +1,7 @@
 import { getWorkspaceGraphOptions } from '@notopia-uit/api-gen/index';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import GraphView from '@ui/components/graph-view';
-import { fetchAccessTokenServerSide } from '@ui/lib/get-access-token';
+import { fetchAccessTokenServerSide } from '@lib/get-access-token';
 
 import getQueryClient from '#/get-query-client';
 

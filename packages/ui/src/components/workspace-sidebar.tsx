@@ -10,7 +10,7 @@ import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
-import { authClient } from '@notopia-uit/ui/lib/auth-client';
+import { getAuthClient } from '@notopia-uit/ui/lib/auth-client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   BadgeCheck,
@@ -192,23 +192,21 @@ export function CreateWorkspaceDialog() {
   );
 }
 
-const data = {
-  projects: [
-    {
-      name: 'Settings',
-      url: '#',
-      icon: Settings2,
-    },
-    {
-      name: 'Graph',
-      url: '#',
-      icon: Sparkles,
-    },
-  ],
-};
+const data = [
+  {
+    name: 'Settings',
+    url: (workspaceId: string) => `/workspace/${workspaceId}/settings/general`,
+    icon: Settings2,
+  },
+  {
+    name: 'Graph',
+    url: (workspaceId: string) => `/workspace/${workspaceId}/graph`,
+    icon: Sparkles,
+  },
+];
 
 export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorkspaceId: string }) {
-  const { data: sessionData } = authClient.useSession();
+  const { data: sessionData } = getAuthClient().useSession();
   const { retry } = useQueryErrorHandler();
 
   const [activeWorkspacenow, setActiveWorkspace] = useState<NoteUserWorkspace>();
@@ -320,23 +318,21 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent className="flex flex-col overflow-hidden">
-        <SidebarGroup className="flex flex-1 flex-col overflow-hidden group-data-[collapsible=icon]:hidden">
+      <SidebarContent className="flex flex-col overflow-y-auto">
+        <SidebarGroup className="flex flex-col group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
-          <SidebarMenu className="flex-1 flex-col overflow-hidden">
+          <SidebarMenu className="flex flex-col">
             <TreeView currentWorkspaceId={currentWorkspaceId} />
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup className="shrink-0 group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Projects</SidebarGroupLabel>
           <SidebarMenu>
-            {data.projects.map((item) => (
+            {data.map((item) => (
               <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url}>
-                    <item.icon />
-                    <span>{item.name}</span>
-                  </a>
+                <SidebarMenuButton onClick={() => router.push(item.url(currentWorkspaceId))}>
+                  <item.icon />
+                  <span>{item.name}</span>
                 </SidebarMenuButton>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -386,8 +382,10 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                 >
                   {/* TODO: get user data from betterauth */}
                   <Avatar className="size-8 rounded-lg">
-                    <AvatarImage src={sessionData.user.image || ''} alt={'avatar here'} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarImage src={sessionData.user?.image || ''} alt={'avatar here'} />
+                    <AvatarFallback className="rounded-lg">
+                      {sessionData.user?.name?.slice(0, 2)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm/tight">
                     <span className="truncate font-semibold">{sessionData.user.name}</span>
@@ -406,7 +404,9 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="size-8 rounded-lg">
                       <AvatarImage src={sessionData.user.image || ''} alt={sessionData.user.name} />
-                      <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                      <AvatarFallback className="rounded-lg">
+                        {sessionData.user?.name?.slice(0, 2)}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm/tight">
                       <span className="truncate font-semibold">{sessionData.user.name}</span>
@@ -437,7 +437,12 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await getAuthClient().signOut();
+                    window.location.href = '/api/auth/logout';
+                  }}
+                >
                   <LogOut />
                   Log out
                 </DropdownMenuItem>

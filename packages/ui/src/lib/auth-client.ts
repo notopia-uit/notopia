@@ -1,9 +1,25 @@
 import { inferAdditionalFields } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
-import type { auth } from './auth';
+let _client: ReturnType<typeof createAuthClient> | null = null;
+let _baseURL: string | null = null;
 
-export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'http://localhost:3000',
-  plugins: [inferAdditionalFields<typeof auth>()],
-}) as ReturnType<typeof createAuthClient>;
+export function configureAuthClient(baseURL: string) {
+  _baseURL = baseURL;
+  _client = null;
+}
+
+export function getAuthClient(): ReturnType<typeof createAuthClient> {
+  if (!_baseURL) {
+    throw new Error(
+      'Auth client base URL is not configured. Please call configureAuthClient() first.'
+    );
+  }
+  if (!_client) {
+    _client = createAuthClient({
+      baseURL: _baseURL,
+      plugins: [inferAdditionalFields()],
+    });
+  }
+  return _client;
+}
