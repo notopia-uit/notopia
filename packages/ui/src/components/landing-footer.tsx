@@ -1,27 +1,27 @@
 import { Separator } from './shadcn/separator';
 import { ModeToggle } from './theme-mode-toggle';
 
-export default function Footer() {
+export default function LandingFooter() {
   return (
-    <footer>
-      <div className="container flex flex-col items-center justify-between space-y-4 border-t px-16 py-2 md:flex-row">
+    <footer className="border-t">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-6 md:flex-row">
         <div>
           <div className="space-y-1">
-            <h4 className="text-sm leading-none font-medium">Note Land</h4>
-            <p className="text-muted-foreground text-sm">An open-source Note for user.</p>
+            <h4 className="text-sm font-semibold leading-none">Notopia</h4>
+            <p className="text-muted-foreground text-sm">
+              An open-source collaborative knowledge graph.
+            </p>
           </div>
           <Separator className="my-4" />
-          <div className="flex h-5 items-center space-x-4 text-sm">
-            <div>Blog</div>
+          <div className="text-muted-foreground flex h-5 items-center gap-4 text-sm">
+            <span className="hover:text-foreground cursor-pointer transition-colors">Blog</span>
             <Separator orientation="vertical" />
-            <div>Docs</div>
+            <span className="hover:text-foreground cursor-pointer transition-colors">Docs</span>
             <Separator orientation="vertical" />
-            <div>Source</div>
+            <span className="hover:text-foreground cursor-pointer transition-colors">Source</span>
           </div>
         </div>
-        <div>
-          <ModeToggle />
-        </div>
+        <ModeToggle />
       </div>
     </footer>
   );
