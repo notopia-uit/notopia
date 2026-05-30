@@ -3,6 +3,7 @@
 import {
   NoteWorkspaceTreeFolder,
   NoteWorkspaceTreeNote,
+  getNoteOptions,
   getWorkspaceTreeOptions,
   showTrashOptions,
   useCreateFolderMutation,
@@ -236,6 +237,11 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   }, [subscribe, queryClient, currentWorkspaceId]);
 
   const { mutate: renameNote } = useRenameNoteMutation({
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: getNoteOptions({ path: { noteId: variables.path.noteId } }).queryKey,
+      });
+    },
     onError: (error) => {
       showAlert({
         type: 'error',
