@@ -3,6 +3,7 @@
 import { Block, BlockNoteEditor } from '@blocknote/core';
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
+import { useTheme } from 'next-themes';
 import {
   getRevisionWithContentOptions,
   getRevisionsOptions,
@@ -40,11 +41,12 @@ interface Revision {
 }
 
 function ReadOnlyRevisionEditor({ initialContent }: { initialContent: Block[] }) {
+  const { resolvedTheme } = useTheme();
   const editor = useCreateBlockNote({
     initialContent: initialContent,
   });
 
-  return <BlockNoteView editor={editor} editable={false} />;
+  return <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'} editable={false} />;
 }
 
 interface RevisionModalProps {
