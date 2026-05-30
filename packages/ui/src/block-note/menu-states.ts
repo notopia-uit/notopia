@@ -26,29 +26,29 @@ export function createNoResultsMenuItem(query: string): DefaultReactSuggestionIt
   };
 }
 
-interface MenuItemsWithStateProps {
-  items: DefaultReactSuggestionItem[];
+interface MenuItemsWithStateProps<T extends DefaultReactSuggestionItem> {
+  items: T[];
   isLoading: boolean;
   error: Error | null;
   query: string;
 }
 
-export function getMenuItemsWithState({
+export function getMenuItemsWithState<T extends DefaultReactSuggestionItem>({
   items,
   isLoading,
   error,
   query,
-}: MenuItemsWithStateProps): DefaultReactSuggestionItem[] {
+}: MenuItemsWithStateProps<T>): T[] {
   if (error) {
-    return [createErrorMenuItem(error)];
+    return [createErrorMenuItem(error) as T];
   }
 
   if (isLoading) {
-    return [createLoadingMenuItem()];
+    return [createLoadingMenuItem() as T];
   }
 
   if (items.length === 0 && query) {
-    return [createNoResultsMenuItem(query)];
+    return [createNoResultsMenuItem(query) as T];
   }
 
   return items;

@@ -26,6 +26,7 @@ import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react'
 import { useTheme } from 'next-themes';
 import { forwardRef, useMemo, useCallback, useEffect } from 'react';
 
+import { NoteSuggestionMenu } from './note-suggestion-menu';
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
@@ -217,14 +218,13 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     <>
       <EditorStatusBar />
       <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'} editable={!isViewer}>
-        <SuggestionMenuController
-          triggerCharacter={'#'}
-          getItems={handleTagMenuSearch}
-        />
+        <SuggestionMenuController triggerCharacter={'#'} getItems={handleTagMenuSearch} />
 
         <SuggestionMenuController
           triggerCharacter={'@'}
           getItems={handleNoteMenuSearch}
+          suggestionMenuComponent={NoteSuggestionMenu}
+          onItemClick={(item) => item.onItemClick?.()}
         />
       </BlockNoteView>
     </>
