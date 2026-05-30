@@ -35,4 +35,9 @@ async function run() {
   }
 }
 
-run();
+if (import.meta.main) {
+  run().catch((error) => {
+    console.error('Error during seeding:', error);
+    process.exit(1);
+  });
+}

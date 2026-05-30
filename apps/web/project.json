@@ -24,6 +24,9 @@
     "start": {
       "options": {
         "hostname": "0.0.0.0"
+      },
+      "configurations": {
+        "mon": {}
       }
     },
     "docker:build": {

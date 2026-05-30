@@ -152,12 +152,12 @@ func NewEvent(
 var ProvideEvent = NewEvent
 
 func (e *Event) setup() error {
-	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+	e.router.AddConsumerHandler(
 		"DocumentCommittedHandler",
+		"events.integration.document.document.committed",
+		e.subcriber,
 		e.documentCommittedHandler,
-	)); err != nil {
-		return fmt.Errorf("failed to add event handler DocumentCommittedHandler: %w", err)
-	}
+	)
 
 	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
 		"NotifyWorkspaceRenamedHandler",

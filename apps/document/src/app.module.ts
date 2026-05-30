@@ -4,7 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ClientKafka } from '@nestjs/microservices';
 import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
 import { OpenTelemetryModule } from 'nestjs-otel';
-import { LoggerModule } from 'nestjs-pino';
+import { Logger, LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
 
 import { AuthenticationModule } from './authentication';
@@ -15,10 +15,15 @@ import {
   APP_CONFIG,
   AppConfig,
   appConfig,
+  AUTHENTICATION_CONFIG,
   authenticationConfig,
+  DATABASE_CONFIG,
   databaseConfig,
+  KAFKA_CONFIG,
   kafkaConfig,
+  S3_CONFIG,
   s3Config,
+  SERVICE_CONFIG,
   servicesConfig,
   validate,
 } from './config';
@@ -109,7 +114,7 @@ import { StorageModule } from './storage';
         },
       }),
       {
-        imports: [ConfigModule, DocumentModule, RevisionModule],
+        imports: [ConfigModule, DocumentModule, HocuspocusModule, RevisionModule],
       }
     ),
   ],
@@ -122,9 +127,25 @@ import { StorageModule } from './storage';
 })
 export class AppModule implements OnModuleInit {
   // We should refactor into bus or so, this is a mess for app module
-  constructor(@Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka) {}
+  constructor(
+    @Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka,
+    private readonly configService: ConfigService,
+    private readonly logger: Logger,
+  ) {}
 
   async onModuleInit() {
     await this.kafkaClient.connect();
+    this.logger.log({
+      app: this.configService.get(APP_CONFIG),
+      database: { ...this.configService.get(DATABASE_CONFIG), password: '***' },
+      services: this.configService.get(SERVICE_CONFIG),
+      s3: {
+        ...this.configService.get(S3_CONFIG),
+        accessKeyId: '***',
+        secretAccessKey: '***',
+      },
+      kafka: this.configService.get(KAFKA_CONFIG),
+      authentication: this.configService.get(AUTHENTICATION_CONFIG),
+    }, 'Application configuration loaded');
   }
 }

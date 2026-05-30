@@ -49,7 +49,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	db := persistence.NewPgxPoolStdlib(pool)
 	log := &configConfig.Log
-	stdoutHandler := logging.NewStdoutHandler(log)
+	general := &configConfig.General
+	stdoutHandler := logging.NewStdoutHandler(log, general)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
@@ -78,7 +79,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger)
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName)
-	general := &configConfig.General
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
 	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
 	if err != nil {

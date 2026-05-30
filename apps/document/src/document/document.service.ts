@@ -1,5 +1,3 @@
-import { randomUUID } from 'crypto';
-
 import type { MySchema } from '@blocknote/core';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
@@ -8,6 +6,7 @@ import { type DocumentCommittedEvent } from '@notopia-uit/api-share-gen';
 import { Traceable } from 'nestjs-otel';
 import { lastValueFrom } from 'rxjs';
 import { DataSource, Repository } from 'typeorm';
+import { v7 as uuidv7 } from 'uuid';
 
 import { AuthorizationService } from '../authorization/authorization.service';
 import { BLOCKNOTE_SCHEMA } from '../blocknote';
@@ -50,7 +49,7 @@ export class DocumentService {
       if (!document) {
         throw new DocumentNotFoundException(documentId);
       }
-      const revisionId = randomUUID();
+      const revisionId = uuidv7();
       this.logger.debug({ documentId, revisionId }, 'commitDocument: saving revision');
       const blocknoteEditorService = new BlocknoteEditorService({
         schema: this.blocknoteSchema,
@@ -100,7 +99,7 @@ export class DocumentService {
     if (!hasPermission) {
       throw new DocumentPermissionException(documentId, userId);
     }
-    const key = `document-attachments/${documentId}/${randomUUID()}-${filename}`;
+    const key = `document-attachments/${documentId}/${uuidv7()}-${filename}`;
     const { uploadUrl, publicUrl } =
       await this.storageService.generateAttachmentPresignedUploadUrl(key);
     this.logger.log({ documentId, filename, key }, 'getAttachmentUploadUrl: generated upload URL');
