@@ -9,10 +9,7 @@ export const useEditorState = (noteId: string) => {
   const provider = useHocuspocusProvider();
   const { showAlert } = useAlert();
 
-  const { isModified } = useIsDocModified(
-    provider.document,
-    provider.awareness?.clientID.toString() ?? 'anonymous'
-  );
+  const { isModified } = useIsDocModified(provider.document);
 
   const { mutate: commitDocument, isPending: isCommitingDocument } = useCommitDocumentMutation({
     onSuccess: (responses) => {

@@ -1,21 +1,23 @@
 'use client';
 import { YDocMetadata, YDocMetadataMap } from '@notopia-uit/lib/yjs';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import * as Y from 'yjs';
 
-export function useIsDocModified(ydoc: Y.Doc, clientId: string) {
+export function useIsDocModified(ydoc: Y.Doc) {
   const [isModified, setIsModified] = useState(false);
-  const metadataMapRef = useRef<YDocMetadataMap>(null);
   useEffect(() => {
     const metadataMap = ydoc.getMap('metadata') as YDocMetadataMap;
-    metadataMapRef.current = metadataMap;
 
-    const metadata = metadataMap.get('metadata');
-    setIsModified(metadata?.modified === true);
+    const update = () => {
+      const metadata = metadataMap.get('metadata');
+      setIsModified(metadata?.modified === true);
+    };
+
+    update();
 
     const observer = (event: Y.YMapEvent<YDocMetadata>) => {
       if (event.keysChanged.has('metadata')) {
-        setIsModified(metadata?.modified === true);
+        update();
       }
     };
 
@@ -24,6 +26,6 @@ export function useIsDocModified(ydoc: Y.Doc, clientId: string) {
     return () => {
       metadataMap.unobserve(observer);
     };
-  }, [ydoc, clientId]);
+  }, [ydoc]);
   return { isModified };
 }
