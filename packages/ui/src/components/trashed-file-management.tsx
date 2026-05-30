@@ -16,8 +16,6 @@ import {
   DropdownMenuTrigger,
 } from '@notopia-uit/ui/components/shadcn/dropdown-menu';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
-import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
-import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import {
   Table,
   TableBody,
@@ -26,7 +24,9 @@ import {
   TableHeader,
   TableRow,
 } from '@notopia-uit/ui/components/shadcn/table';
+import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useAlert } from '@notopia-uit/ui/hooks/use-alert';
+import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Folder, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import React, { useMemo, useState, useRef } from 'react';
@@ -130,25 +130,25 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
   }, [trashedData]);
 
   const { showAlert } = useAlert();
-   const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
-     {
-       onSuccess: async (_, variables) => {
-         const { noteIds, folderIds } = variables.body;
-         queryClient.setQueryData<TrashedDataDto>(
-           showTrashOptions({ path: { workspaceId } }).queryKey,
-           (oldData) => {
-             if (!oldData) return oldData;
-             return {
-               ...oldData,
-               notes:
-                 oldData.notes?.filter((note) => !(noteIds ? noteIds : []).includes(note.id)) || [],
-               folders:
-                 oldData.folders?.filter((folder) =>
-                   !(folderIds ? folderIds : []).includes(folder.id)
-                 ) || [],
-             };
-           }
-         );
+  const { mutate: deleteItems, isPending: isDeleting } = usePermanentlyDeleteWorkspaceItemsMutation(
+    {
+      onSuccess: async (_, variables) => {
+        const { noteIds, folderIds } = variables.body;
+        queryClient.setQueryData<TrashedDataDto>(
+          showTrashOptions({ path: { workspaceId } }).queryKey,
+          (oldData) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              notes:
+                oldData.notes?.filter((note) => !(noteIds ? noteIds : []).includes(note.id)) || [],
+              folders:
+                oldData.folders?.filter(
+                  (folder) => !(folderIds ? folderIds : []).includes(folder.id)
+                ) || [],
+            };
+          }
+        );
 
         setSelectedItems(new Set());
         await queryClient.invalidateQueries({
@@ -170,24 +170,24 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
       },
     }
   );
-   const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
-     onSuccess: async (_, variables) => {
-       const { noteIds, folderIds } = variables.body;
-       queryClient.setQueryData<TrashedDataDto>(
-         showTrashOptions({ path: { workspaceId } }).queryKey,
-         (oldData) => {
-           if (!oldData) return oldData;
-           return {
-             ...oldData,
-             notes:
-               oldData.notes?.filter((note) => !(noteIds ? noteIds : []).includes(note.id)) || [],
-             folders:
-               oldData.folders?.filter((folder) =>
-                 !(folderIds ? folderIds : []).includes(folder.id)
-               ) || [],
-           };
-         }
-       );
+  const { mutate: restoreItems, isPending: isRestoring } = useRestoreTrashedWorkspaceItemsMutation({
+    onSuccess: async (_, variables) => {
+      const { noteIds, folderIds } = variables.body;
+      queryClient.setQueryData<TrashedDataDto>(
+        showTrashOptions({ path: { workspaceId } }).queryKey,
+        (oldData) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            notes:
+              oldData.notes?.filter((note) => !(noteIds ? noteIds : []).includes(note.id)) || [],
+            folders:
+              oldData.folders?.filter(
+                (folder) => !(folderIds ? folderIds : []).includes(folder.id)
+              ) || [],
+          };
+        }
+      );
       await queryClient.invalidateQueries({
         queryKey: getWorkspaceTreeOptions({ path: { workspaceId } }).queryKey,
       });
@@ -260,14 +260,14 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
   return isPending ? (
     <Spinner />
   ) : (
-    <div className="w-full font-sans text-zinc-300">
+    <div className="w-full font-sans">
       <div className="w-full">
         {/* Header Actions */}
         <div className="flex items-center justify-end pr-6 pb-6">
           <div className="flex gap-3 space-x-0.5">
             <Button
               variant="destructive"
-              className="gap-0.5 space-x-0.5 border-white/10 bg-transparent text-zinc-300 hover:bg-white/5 hover:text-white"
+              className="gap-0.5 space-x-0.5 bg-transparent"
               onClick={handleDeleteSelected}
               disabled={isDeleting}
             >
@@ -280,11 +280,7 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
               )}{' '}
             </Button>
             {selectedItems.size > 0 && (
-              <Button
-                className="bg-blue-600 text-white hover:bg-blue-700"
-                onClick={handleRestoreSelected}
-                disabled={isRestoring}
-              >
+              <Button onClick={handleRestoreSelected} disabled={isRestoring}>
                 {isRestoring ? <Spinner></Spinner> : 'Restore Selected'}
               </Button>
             )}
@@ -294,19 +290,16 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
         {/* Data Table */}
         <Table>
           <TableHeader className="bg-transparent hover:bg-transparent">
-            <TableRow className="border-white/10 hover:bg-transparent">
+            <TableRow className="hover:bg-transparent">
               <TableHead className="w-12 pl-6 text-center">
                 <Checkbox
                   checked={selectedItems.size === displayData.length && displayData.length > 0}
                   onCheckedChange={toggleAll}
-                  className="border-white/20 data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600"
                 />
               </TableHead>
-              <TableHead className="font-medium text-zinc-400">Name</TableHead>
-              <TableHead className="w-24 text-right font-medium text-zinc-400">Type</TableHead>
-              <TableHead className="w-48 pr-6 text-right font-medium text-zinc-400">
-                Deleted Date
-              </TableHead>
+              <TableHead className="font-medium">Name</TableHead>
+              <TableHead className="w-24 text-right font-medium">Type</TableHead>
+              <TableHead className="w-48 pr-6 text-right font-medium">Deleted Date</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
@@ -318,48 +311,39 @@ export default function TrashedFileManager({ workspaceId }: { workspaceId: strin
               return (
                 <TableRow
                   key={item.id}
-                  className={`border-white/5 transition-colors hover:bg-white/5 ${isSelected ? `bg-white/5` : ''}`}
+                  className={`transition-colors ${isSelected ? `bg-accent-foreground` : ''}`}
                 >
                   <TableCell className="pl-6">
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => toggleSelection(item.id)}
-                      className="border-white/20 data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600"
                     />
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <Icon
                         className={`size-5 ${
-                          item.displayType === 'Folder' ? `text-blue-400` : `text-zinc-400`
+                          item.displayType === 'Folder' ? `text-foreground` : `text-background`
                         }`}
                       />
-                      <span className="font-medium text-zinc-200">{item.name}</span>
+                      <span className="font-medium">{item.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right text-zinc-400">{item.displayType}</TableCell>
-                  <TableCell className="pr-6 text-right text-zinc-400">
-                    {formatDate(item.trashed.at)}
-                  </TableCell>
+                  <TableCell className="text-right">{item.displayType}</TableCell>
+                  <TableCell className="pr-6 text-right">{formatDate(item.trashed.at)}</TableCell>
                   <TableCell className="pr-6 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="size-8 p-0 text-zinc-400 hover:bg-white/10 hover:text-zinc-100"
-                        >
+                        <Button variant="ghost" className="size-8 p-0">
                           <MoreVertical className="size-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="w-48 border-white/10 bg-[#2c2c2e] text-zinc-200"
-                      >
-                        <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 focus:text-white">
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem className="cursor-pointer">
                           <RotateCcw className="mr-2 size-4" />
                           <span>Restore</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer text-red-400 hover:bg-red-500/10 focus:bg-red-500/10 focus:text-red-400">
+                        <DropdownMenuItem className="cursor-pointer">
                           <Trash2 className="mr-2 size-4" />
                           <span>Delete Permanently</span>
                         </DropdownMenuItem>
