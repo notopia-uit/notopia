@@ -1,6 +1,11 @@
 'use client';
 
-import { useRenameNoteMutation, useGetNoteQuery, getNoteOptions } from '@notopia-uit/api-gen';
+import {
+  useRenameNoteMutation,
+  useGetNoteQuery,
+  getNoteOptions,
+  getWorkspaceTreeOptions,
+} from '@notopia-uit/api-gen';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -26,6 +31,9 @@ export function NoteTitle({ noteId, workspaceId, isEditing = true }: NoteTitlePr
       if (workspaceId) {
         queryClient.invalidateQueries({
           queryKey: getNoteOptions({ path: { noteId } }).queryKey,
+        });
+        queryClient.invalidateQueries({
+          queryKey: getWorkspaceTreeOptions({ path: { workspaceId } }).queryKey,
         });
       }
     },
