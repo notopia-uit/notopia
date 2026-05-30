@@ -74,7 +74,7 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
 
   if (isError) {
     return (
-      <div className="flex h-[400px] items-center justify-center">
+      <div className="flex h-100 items-center justify-center">
         <QueryErrorFallback
           error={error}
           onRetry={retry}
@@ -99,7 +99,7 @@ export default function GraphView({ workspaceId }: { workspaceId: string }) {
         isLocalGraph={false}
         currentSettings={graphSettings}
         onSettingsChange={handleSettingsChange}
-        showOrphansOnly={showOrphansOnly}
+        showOrphans={showOrphansOnly}
         onOrphansOnlyChange={setShowOrphansOnly}
       />
     </div>

@@ -17,7 +17,7 @@ interface GraphSettingsDialogProps {
   isLocalGraph?: boolean;
   currentSettings: Partial<D3Config>;
   onSettingsChange: (settings: Partial<D3Config>) => void;
-  showOrphansOnly?: boolean;
+  showOrphans?: boolean;
   onOrphansOnlyChange?: (value: boolean) => void;
 }
 
@@ -27,8 +27,8 @@ export function GraphSettingsDialog({
   isLocalGraph = false,
   currentSettings,
   onSettingsChange,
-  showOrphansOnly = false,
-  onOrphansOnlyChange,
+  showOrphans = false,
+  onOrphansOnlyChange: onOrphansChange,
 }: GraphSettingsDialogProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [localSettings, setLocalSettings] = useState<Partial<D3Config>>(currentSettings);
@@ -111,7 +111,7 @@ export function GraphSettingsDialog({
         </div>
 
         {!isCollapsed && (
-          <ScrollArea className="h-[400px] pr-4">
+          <ScrollArea className="h-100 pr-4">
             <div className="space-y-6 p-4">
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold">Force Configuration</h3>
@@ -330,14 +330,12 @@ export function GraphSettingsDialog({
                 {!isLocalGraph && (
                   <div className="flex items-center gap-2">
                     <Checkbox
-                      id="showOrphansOnly"
-                      checked={showOrphansOnly ?? false}
-                      onCheckedChange={(checked) =>
-                        onOrphansOnlyChange?.(checked as boolean)
-                      }
+                      id="showOrphans"
+                      checked={showOrphans ?? false}
+                      onCheckedChange={(checked) => onOrphansChange?.(checked as boolean)}
                     />
-                    <Label htmlFor="showOrphansOnly" className="cursor-pointer text-xs">
-                      Show Orphans Only
+                    <Label htmlFor="showOrphans" className="cursor-pointer text-xs">
+                      Show Orphans
                     </Label>
                   </div>
                 )}
