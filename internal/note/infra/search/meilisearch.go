@@ -11,6 +11,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	"github.com/notopia-uit/notopia/pkg/otel"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
 	"go.opentelemetry.io/otel/trace"
@@ -28,6 +29,7 @@ var _ app.SearchSvc = (*Meilisearch)(nil)
 func NewMeilisearch(
 	cfg *config.Meilisearch,
 	logger *slog.Logger,
+	_ otel.Global,
 ) *Meilisearch {
 	otelTransport := otelhttp.NewTransport(
 		http.DefaultTransport,

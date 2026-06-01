@@ -11,11 +11,9 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	"github.com/notopia-uit/notopia/pkg/otel"
 	"github.com/notopia-uit/notopia/pkg/pb"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -47,15 +45,9 @@ var _ app.AuthorizationSvc = (*Authorization)(nil)
 func NewAuthorization(
 	servicesCfg *config.Services,
 	logger logging.Logger,
-	tracerProvider trace.TracerProvider,
-	meterProvider metric.MeterProvider,
-	propagator propagation.TextMapPropagator,
+	_ otel.Global,
 ) (*Authorization, func(), error) {
-	statsHandler := otelgrpc.NewClientHandler(
-		otelgrpc.WithTracerProvider(tracerProvider),
-		otelgrpc.WithMeterProvider(meterProvider),
-		otelgrpc.WithPropagators(propagator),
-	)
+	statsHandler := otelgrpc.NewClientHandler()
 	conn, err := grpc.NewClient(
 		servicesCfg.Authorization.URL,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),

@@ -13,6 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgsqlc"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	"github.com/notopia-uit/notopia/pkg/otel"
 	"github.com/pressly/goose/v3"
 	"github.com/pressly/goose/v3/lock"
 )
@@ -20,6 +21,7 @@ import (
 func NewPgPool(
 	ctx context.Context,
 	cfg *commonconfig.SQL,
+	_ otel.Global,
 ) (*pgxpool.Pool, func(), error) {
 	pgxCfg, err := pgxpool.ParseConfig(cfg.GetURL())
 	if err != nil {

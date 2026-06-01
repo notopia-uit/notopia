@@ -19,6 +19,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
 	"github.com/notopia-uit/notopia/pkg/metadata"
+	"github.com/notopia-uit/notopia/pkg/otel"
 )
 
 type WorkspaceEventHub struct {
@@ -40,6 +41,7 @@ func NewWorkspaceEventHub(
 	logger watermill.LoggerAdapter,
 	redisClient *RedisClient,
 	serviceName metadata.ServiceName,
+	_ otel.Global,
 ) (*WorkspaceEventHub, error) {
 	// TODO: If have time, try https://github.com/stong1994/watermill-rediszset, because we only need pubsub, not stream
 	// This would reduce memory overhead and be more efficient for ephemeral workspace events.
@@ -201,7 +203,8 @@ func (h *WorkspaceEventHub) processMessage(
 
 	eventType := msg.Metadata.Get(h.metadataEventTypeKey)
 	if eventType == "" {
-		slog.ErrorContext(ctx, "missing event type in message metadata",
+		slog.ErrorContext(
+			ctx, "missing event type in message metadata",
 			slog.String("workspace_id", workspaceID.String()),
 			slog.String("user_id", userID),
 		)
@@ -211,7 +214,8 @@ func (h *WorkspaceEventHub) processMessage(
 
 	event, ok := app.NewEmptyWorkspaceEventFromType(eventType)
 	if !ok {
-		slog.ErrorContext(ctx, "unknown event type",
+		slog.ErrorContext(
+			ctx, "unknown event type",
 			slog.String("event_type", eventType),
 			slog.String("workspace_id", workspaceID.String()),
 			slog.String("user_id", userID),
@@ -221,7 +225,8 @@ func (h *WorkspaceEventHub) processMessage(
 	}
 
 	if err := json.Unmarshal(msg.Payload, event); err != nil {
-		slog.ErrorContext(ctx, "failed to unmarshal event",
+		slog.ErrorContext(
+			ctx, "failed to unmarshal event",
 			slog.Any("error", err),
 			slog.String("workspace_id", workspaceID.String()),
 		)
@@ -235,7 +240,8 @@ func (h *WorkspaceEventHub) processMessage(
 	case <-ctx.Done():
 		return
 	default:
-		slog.WarnContext(ctx, "dropping event (subscriber buffer full)",
+		slog.WarnContext(
+			ctx, "dropping event (subscriber buffer full)",
 			slog.String("workspace_id", workspaceID.String()),
 			slog.String("user_id", userID),
 			slog.String("event_type", eventType),

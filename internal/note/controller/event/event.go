@@ -17,6 +17,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	"github.com/notopia-uit/notopia/pkg/otel"
 )
 
 // This include integration (from share package) and domain event, setup for event processor
@@ -55,6 +56,7 @@ func NewEvent(
 	marshaler *cqrs.JSONMarshaler,
 	domainEventCfg *config.DomainEvent,
 	publisher Publisher,
+	_ otel.Global,
 ) (*Event, error) {
 	saramaConfig := kafka.DefaultSaramaSubscriberConfig()
 	if generalCfg.AppEnv == commonconfig.AppEnvDevelopment {

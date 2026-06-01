@@ -38,7 +38,7 @@ func NewServer(
 	outbox *outbox.Outbox,
 	health *health.Health,
 	logger *slog.Logger,
-	globalOtel otel.Global, // This have to be here for deps
+	_ otel.Global,
 ) *Server {
 	slog.SetDefault(logger)
 

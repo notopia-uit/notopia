@@ -9,11 +9,9 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	protovalidate_middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	"github.com/notopia-uit/notopia/internal/authorization/config"
+	"github.com/notopia-uit/notopia/pkg/otel"
 	"github.com/notopia-uit/notopia/pkg/pb"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )
 
@@ -27,20 +25,14 @@ func NewServer(
 	serviceServer *Service,
 	cfg *config.ServerConfig,
 	logger logging.Logger,
-	tracerProvider trace.TracerProvider,
-	meterProvider metric.MeterProvider,
-	propagator propagation.TextMapPropagator,
+	_ otel.Global,
 ) (*Server, func(), error) {
 	validator, err := protovalidate.New()
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create protovalidate validator: %w", err)
 	}
 	server := grpc.NewServer(
-		grpc.StatsHandler(otelgrpc.NewServerHandler(
-			otelgrpc.WithTracerProvider(tracerProvider),
-			otelgrpc.WithMeterProvider(meterProvider),
-			otelgrpc.WithPropagators(propagator),
-		)),
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(
 			logging.UnaryServerInterceptor(logger, logging.WithLogOnEvents(
 				logging.StartCall,

@@ -19,6 +19,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/domain"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence/pgrepo"
 	"github.com/notopia-uit/notopia/pkg/metadata"
+	"github.com/notopia-uit/notopia/pkg/otel"
 )
 
 // NOTE: May not need to use correlation id if we use otel, but we have to set msg context
@@ -118,6 +119,7 @@ func NewFromPersistenceToQSLForwarder(
 	schemaAdapter sql.SchemaAdapter,
 	serviceName metadata.ServiceName,
 	jsonMarshaler *cqrs.JSONMarshaler,
+	_ otel.Global,
 ) *FromPersistenceToQSLForwarder {
 	return &FromPersistenceToQSLForwarder{
 		workspaceIDKey: domainEventCfg.MessageWorkspaceIDKey,

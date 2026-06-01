@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	"github.com/notopia-uit/notopia/pkg/otel"
 	slogGorm "github.com/orandin/slog-gorm"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -14,6 +15,7 @@ import (
 func NewGORMDB(
 	databaseCfg *commonconfig.SQL,
 	logger *slog.Logger,
+	_ otel.Global,
 ) (*gorm.DB, func(), error) {
 	gormLogger := slogGorm.New(
 		slogGorm.WithHandler(logger.Handler()),

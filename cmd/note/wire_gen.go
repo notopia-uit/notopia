@@ -43,61 +43,65 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	sql := &configConfig.Database
-	pool, cleanup, err := persistence.NewPgPool(ctx, sql)
-	if err != nil {
-		return nil, nil, err
-	}
-	db := persistence.NewPgxPoolStdlib(pool)
-	log := &configConfig.Log
-	general := &configConfig.General
-	stdoutHandler := logging.NewStdoutHandler(log, general)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
 	if err != nil {
-		cleanup()
 		return nil, nil, err
 	}
-	loggerProvider, cleanup2, err := otel.NewLoggerProvider(ctx, resource)
+	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, resource)
+	if err != nil {
+		return nil, nil, err
+	}
+	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
-	provider, err := persistence.NewGooseProvider(db, logger)
-	if err != nil {
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	pg, err := persistence.NewPg(pool, provider)
-	if err != nil {
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger)
 	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	meterProvider, cleanup4, err := otel.NewMeterProvider(ctx, resource)
+	textMapPropagator := otel.NewTextMapPropagator()
+	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider, textMapPropagator)
+	pool, cleanup4, err := persistence.NewPgPool(ctx, sql, global)
 	if err != nil {
 		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
-	textMapPropagator := otel.NewTextMapPropagator()
-	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, tracerProvider, meterProvider, textMapPropagator)
+	db := persistence.NewPgxPoolStdlib(pool)
+	log := &configConfig.Log
+	general := &configConfig.General
+	stdoutHandler := logging.NewStdoutHandler(log, general)
+	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
+	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
+	provider, err := persistence.NewGooseProvider(db, logger)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	pg, err := persistence.NewPg(pool, provider)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger)
+	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, global)
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
 	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
 	services := &configConfig.Services
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	authorization, cleanup5, err := service.NewAuthorization(services, loggingLogger, tracerProvider, meterProvider, textMapPropagator)
+	authorization, cleanup5, err := service.NewAuthorization(services, loggingLogger, global)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -111,7 +115,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	configDomainEvent := &advanced.DomainEvent
 	defaultPostgreSQLSchema := outbox.NewSchemaAdapter(configDomainEvent)
 	jsonMarshaler := component.NewWatermillJsonMarshaler()
-	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema, serviceName, jsonMarshaler)
+	fromPersistenceToQSLForwarder := outbox.NewFromPersistenceToQSLForwarder(domainEvent, loggerAdapter, defaultPostgreSQLSchema, serviceName, jsonMarshaler, global)
 	runInTx := pgrepo.NewRunInTx(fromPersistenceToQSLForwarder)
 	unitOfWork := pgrepo.NewUnitOfWork(pool, fromPersistenceToQSLForwarder, runInTx)
 	changeWorkspaceSlugHandler := app.NewChangeWorkspaceSlugHandler(authorization, unitOfWork)
@@ -141,7 +145,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspaceEvent := &advanced.WorkspaceEvent
 	redis := &configConfig.Redis
 	redisClient, cleanup6 := workspaceevent.NewRedisClient(ctx, redis, logger)
-	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName)
+	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName, global)
 	if err != nil {
 		cleanup6()
 		cleanup5()
@@ -209,10 +213,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	workspaceBySlug := pgreadmodel.NewWorkspaceBySlug(queries)
 	getWorkspaceBySlugHandler := app.NewGetWorkspaceBySlugHandler(authorization, workspaceBySlug)
 	authentik := &configConfig.Authentik
-	identityAuthentik := identity.NewAuthentik(authentik, logger)
+	identityAuthentik := identity.NewAuthentik(authentik, logger, global)
 	getWorkspaceMembersHandler := app.NewGetWorkspaceMembersHandler(identityAuthentik, authorization)
 	meilisearch := &configConfig.Meilisearch
-	searchMeilisearch := search.NewMeilisearch(meilisearch, logger)
+	searchMeilisearch := search.NewMeilisearch(meilisearch, logger, global)
 	getWorkspaceSearchTokenHandler := app.NewGetWorkspaceSearchTokenHandler(authorization, searchMeilisearch)
 	workspaceTree := pgreadmodel.NewWorkspaceTree(queries)
 	getWorkspaceTreeHandler := app.NewGetWorkspaceTreeHandler(authorization, workspaceTree)
@@ -251,7 +255,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	serviceServer := grpc.NewServiceServer(server)
-	grpcGRPC, cleanup9, err := grpc.New(ctx, serviceServer, configServer, loggingLogger, tracerProvider, meterProvider, textMapPropagator)
+	grpcGRPC, cleanup9, err := grpc.New(ctx, serviceServer, configServer, loggingLogger, global)
 	if err != nil {
 		cleanup8()
 		cleanup7()
@@ -263,7 +267,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	eventEvent, err := event.NewEvent(general, kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent, kafkaPublisher)
+	eventEvent, err := event.NewEvent(general, kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent, kafkaPublisher, global)
 	if err != nil {
 		cleanup9()
 		cleanup8()
@@ -290,7 +294,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	healthHealth := health.New(pg, configServer, kafka, workspaceEventHub, redisClient, authentik, services)
-	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider, textMapPropagator)
 	noteServer := note.NewServer(pg, httpHTTP, grpcGRPC, eventEvent, workspaceEventHub, outboxOutbox, healthHealth, logger, global)
 	return noteServer, func() {
 		cleanup9()
