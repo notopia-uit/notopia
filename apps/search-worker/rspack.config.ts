@@ -1,4 +1,4 @@
-import { createRequire } from 'module';
+import { createRequire, isBuiltin } from 'module';
 import { join } from 'path';
 
 import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
@@ -10,25 +10,52 @@ import rspack, { type DevTool } from '@rspack/core';
 const require = createRequire(import.meta.url);
 const __dirname = import.meta.dirname;
 
-// Curated regex externals. Nx's `externalDependencies` array option only does an
-// exact `ctx.request` match and hard-overwrites `config.externals`, so it can't
-// externalize subpath imports. We pass `externalDependencies: 'none'` to Nx (→
-// empty externals) and set a regex externals function in a trailing plugin
-// (ExternalizePlugin) that runs after Nx.
+// Externals: externalize everything by default, bundle ONLY what can't be loaded
+// natively. Nx's `externalDependencies` option can't express this (its array is an
+// exact-match allowlist and it hard-overwrites `config.externals`), so we pass
+// `externalDependencies: 'none'` to Nx (→ empty externals) and set our own
+// externals function in a trailing plugin (ExternalizePlugin) that runs after Nx.
 //
-// search-worker only talks to Kafka + Meilisearch, so the externalized set is
-// small: pino + kafkajs are the OTel-instrumented packages require-in-the-middle
-// must patch via a real require(). It uses no pg/grpc/@aws-sdk, so none of those
-// are externalized. Everything else stays bundled — in particular ESM/interop-
-// fragile packages like @blocknote/* must be compiled by rspack; externalizing
-// them makes Node load their broken .cjs (e.g. "Code.extend is not a function").
+// Keeping deps external is what lets OpenTelemetry's require-in-the-middle patch
+// them at runtime (pino → logs; kafkajs/nestjs → spans) and keeps the bundle
+// small. Blocknote's own deps (prosemirror, yjs, the markdown stack, …) are
+// externalized too — they load fine natively.
 //
-// NOTE: keep this in sync with the dependencies/devDependencies split in
-// package.json — the externalized set below must stay in `dependencies`.
-const externalize: RegExp[] = [
-  /^pino$/,
-  /^kafkajs$/,
-  /^jsdom$/, // server-util worker-file bug (#https://github.com/TypeCellOS/BlockNote/issues/1939); document app
+// What MUST be bundled is the blocknote editor cluster — these can't be loaded
+// natively as external CommonJS requires, so rspack has to compile them in:
+//   - @blocknote/*                 broken require()-condition build ("Code.extend
+//                                  is not a function").
+//   - prosemirror-* / @handlewithcare/* / @tiptap/*   ESM editor packages; some
+//                                  ship no CJS "exports" main, so a native
+//                                  require() throws (No "exports" main defined).
+//   - yjs / y-* / lib0             CRDT identity — one shared instance.
+//   - react / react-dom / scheduler / @floating-ui   blocknote's view deps.
+//   - @bufbuild/protobuf           type-registry singleton (keeps inquire-shim valid).
+//   - @notopia-uit/*               workspace libs — they import @blocknote, so if
+//                                  left external their native require('@blocknote')
+//                                  would hit the same crash.
+//   - tslib / @swc/helpers         tiny transpile runtimes — always inline.
+// EVERYTHING ELSE is externalized: backend infra (nestjs, rxjs, kafkajs, pino,
+// @opentelemetry/*) AND blocknote's dual-package leaf deps (the unified/remark/
+// mdast markdown stack) — they load fine natively. Keeping them external is what
+// lets OpenTelemetry's require-in-the-middle patch pino (logs) and kafkajs/nestjs.
+const keepBundled: RegExp[] = [
+  /^@blocknote\//,
+  /^prosemirror-/,
+  /^@handlewithcare\//,
+  /^@tiptap\//,
+  /^yjs$/,
+  /^y-protocols(\/|$)/,
+  /^y-prosemirror$/,
+  /^lib0(\/|$)/,
+  /^react$/,
+  /^react-dom(\/|$)/,
+  /^scheduler(\/|$)/,
+  /^@floating-ui\//,
+  /^@bufbuild\/protobuf/,
+  /^@notopia-uit\//,
+  /^tslib$/,
+  /^@swc\/helpers/,
 ];
 
 class ExternalizePlugin {
@@ -36,10 +63,23 @@ class ExternalizePlugin {
     // Overwrite the externals Nx set (it hard-assigns `config.externals`). Runs
     // after NxAppRspackPlugin because it sits later in the `plugins` array.
     compiler.options.externals = [
-      ({ request }, callback) =>
-        request && externalize.some((re) => re.test(request))
-          ? callback(undefined, `commonjs ${request}`)
-          : callback(),
+      ({ request }, callback) => {
+        // App code, path aliases (@/, @database, #/) and node builtins → bundle.
+        if (
+          !request ||
+          /^[./]/.test(request) ||
+          request.startsWith('@/') ||
+          request.startsWith('@database') ||
+          request.startsWith('#/') ||
+          isBuiltin(request)
+        ) {
+          return callback();
+        }
+        // @blocknote + the workspace libs that import it → bundle; rest external.
+        return keepBundled.some((re) => re.test(request))
+          ? callback()
+          : callback(undefined, `commonjs ${request}`);
+      },
     ];
   }
 }
