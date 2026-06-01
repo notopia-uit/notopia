@@ -95,7 +95,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger)
+	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger, global)
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, global)
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
 	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)

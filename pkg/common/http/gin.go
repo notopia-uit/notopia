@@ -16,6 +16,7 @@ type GinSlogHandlerFunc gin.HandlerFunc
 func NewGinSlogHandler(
 	logCfg *commonconfig.Log,
 	logger *slog.Logger,
+	_ otel.Global,
 ) GinSlogHandlerFunc {
 	cfg := sloggin.Config{
 		WithUserAgent:      true,
@@ -54,6 +55,7 @@ func NewGin(
 		gin.SetMode(gin.ReleaseMode)
 	}
 	r := gin.New()
+	r.ContextWithFallback = true
 	r.Use(gin.Recovery())
 	r.Use(gin.HandlerFunc(otelHandler))
 	r.Use(gin.HandlerFunc(slogHandler))
