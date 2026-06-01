@@ -22,7 +22,6 @@
     "@opentelemetry/resources": "catalog:",
     "@opentelemetry/sdk-node": "catalog:",
     "@opentelemetry/semantic-conventions": "catalog:",
-    "@types/express": "catalog:",
     "express": "catalog:",
     "kafkajs": "catalog:",
     "markdown-to-txt": "catalog:",
@@ -39,6 +38,7 @@
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",
-    "webpack-node-externals": "catalog:"
+    "webpack-node-externals": "catalog:",
+    "@types/express": "catalog:"
   }
 }
