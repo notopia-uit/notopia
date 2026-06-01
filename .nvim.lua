@@ -469,6 +469,7 @@ end, { desc = "LSP | Restart redocly_ls", silent = true })
 vim.o.backupcopy = "yes" -- https://github.com/nrwl/nx/issues/20622
 vim.opt.isfname:append("{,},@")
 
+--[[
 local function track_may_progress()
   local start_date = os.time({ year = 2026, month = 5, day = 8, hour = 0 })
   local end_date = os.time({ year = 2026, month = 5, day = 31, hour = 23, min = 59 })
@@ -547,3 +548,4 @@ progress_ev = vim.api.nvim_create_autocmd("VimEnter", {
     vim.api.nvim_del_autocmd(progress_ev)
   end,
 })
+--]]
