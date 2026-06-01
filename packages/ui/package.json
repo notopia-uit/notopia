@@ -17,14 +17,12 @@
   "dependencies": {
     "@blocknote/core": "catalog:",
     "@blocknote/react": "catalog:",
-    "@blocknote/shadcn": "catalog:",
     "@hocuspocus/provider": "catalog:",
     "@hocuspocus/provider-react": "catalog:",
     "@icons-pack/react-simple-icons": "catalog:",
     "@notopia-uit/api-gen": "workspace:",
     "@notopia-uit/lib": "workspace:",
     "@tailwindcss/postcss": "catalog:",
-    "@tanstack/react-query": "catalog:",
     "@tweenjs/tween.js": "catalog:",
     "better-auth": "catalog:",
     "class-variance-authority": "catalog:",
@@ -37,23 +35,29 @@
     "pixi.js": "catalog:",
     "postcss": "catalog:",
     "radix-ui": "catalog:",
-    "react": "catalog:",
     "react-complex-tree": "^2.6.1",
     "react-day-picker": "^9.14.0",
     "shadcn": "catalog:",
-    "tailwindcss": "catalog:",
-    "yjs": "catalog:",
-    "zod": "catalog:"
+    "tailwindcss": "catalog:"
   },
   "devDependencies": {
+    "@blocknote/shadcn": "catalog:",
+    "@tanstack/react-query": "catalog:",
     "@types/d3": "catalog:",
     "autoprefixer": "catalog:",
     "postcss": "catalog:",
+    "react": "catalog:",
     "tailwind-merge": "catalog:",
-    "tw-animate-css": "catalog:"
+    "tw-animate-css": "catalog:",
+    "yjs": "catalog:",
+    "zod": "catalog:"
   },
   "peerDependencies": {
     "@blocknote/shadcn": "catalog:",
-    "tw-animate-css": "catalog:"
+    "@tanstack/react-query": "catalog:",
+    "react": "catalog:",
+    "tw-animate-css": "catalog:",
+    "yjs": "catalog:",
+    "zod": "catalog:"
   }
 }

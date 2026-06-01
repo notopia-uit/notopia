@@ -15,9 +15,6 @@
       "import": "./dist/authorization.js"
     }
   },
-  "dependencies": {
-    "@nestjs/microservices": "catalog:"
-  },
   "peerDependencies": {
     "@bufbuild/protobuf": "catalog:",
     "@grpc/grpc-js": "catalog:",

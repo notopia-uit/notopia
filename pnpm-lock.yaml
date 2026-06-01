@@ -944,6 +944,9 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.4
+      yjs:
+        specifier: 'catalog:'
+        version: 13.6.30
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -1100,9 +1103,6 @@ importers:
       '@blocknote/react':
         specifier: 'catalog:'
         version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@blocknote/shadcn':
-        specifier: 'catalog:'
-        version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(postcss@8.5.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwindcss@4.2.4)
       '@hocuspocus/provider':
         specifier: 'catalog:'
         version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
@@ -1121,9 +1121,6 @@ importers:
       '@tailwindcss/postcss':
         specifier: 'catalog:'
         version: 4.2.4
-      '@tanstack/react-query':
-        specifier: 'catalog:'
-        version: 5.90.21(react@19.2.6)
       '@tweenjs/tween.js':
         specifier: 'catalog:'
         version: 25.0.0
@@ -1160,9 +1157,6 @@ importers:
       radix-ui:
         specifier: 'catalog:'
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      react:
-        specifier: 'catalog:'
-        version: 19.2.6
       react-complex-tree:
         specifier: ^2.6.1
         version: 2.6.1(react@19.2.6)
@@ -1175,25 +1169,34 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.4
-      yjs:
-        specifier: 'catalog:'
-        version: 13.6.30
-      zod:
-        specifier: 'catalog:'
-        version: 4.4.3
     devDependencies:
+      '@blocknote/shadcn':
+        specifier: 'catalog:'
+        version: 0.50.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(highlight.js@11.11.1)(lowlight@3.3.0)(postcss@8.5.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwindcss@4.2.4)
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.90.21(react@19.2.6)
       '@types/d3':
         specifier: 'catalog:'
         version: 7.4.3
       autoprefixer:
         specifier: 'catalog:'
         version: 10.4.27(postcss@8.5.14)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.6
       tailwind-merge:
         specifier: 'catalog:'
         version: 3.5.0
       tw-animate-css:
         specifier: 'catalog:'
         version: 1.4.0
+      yjs:
+        specifier: 'catalog:'
+        version: 13.6.30
+      zod:
+        specifier: 'catalog:'
+        version: 4.4.3
 
   page:
     dependencies:

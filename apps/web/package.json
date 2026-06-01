@@ -28,6 +28,7 @@
     "react-dom": "catalog:",
     "shadcn": "catalog:",
     "tailwindcss": "catalog:",
+    "yjs": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
