@@ -1,4 +1,4 @@
-import { builtinModules, createRequire } from 'module';
+import { createRequire } from 'module';
 import { join } from 'path';
 
 import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
@@ -6,10 +6,18 @@ import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 import type { Configuration } from '@rspack/cli';
 import rspack, { type DevTool } from '@rspack/core';
 // import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
-import nodeExternals from 'webpack-node-externals';
 
 const require = createRequire(import.meta.url);
 const __dirname = import.meta.dirname;
+
+// Externalize every runtime npm dependency so they are required at runtime
+// instead of being bundled. Keeping them external lets OpenTelemetry's
+// require-in-the-middle hooks patch packages like pino/kafkajs.
+// Workspace libs (@notopia-uit/*) stay bundled.
+const pkg = require('./package.json') as { dependencies?: Record<string, string> };
+const externalDependencies = Object.keys(pkg.dependencies ?? {}).filter(
+  (dep) => !dep.startsWith('@notopia-uit/')
+);
 
 const isEsm = false;
 const tsConfigFile = join(__dirname, 'tsconfig.app.json');
@@ -155,26 +163,6 @@ const config: Configuration = {
       '@database': join(__dirname, 'database'),
     },
   },
-  externals: [
-    // nodeExternals returns an untyped function that webpack expects
-    nodeExternals({
-      importType: isEsm ? 'module' : 'commonjs',
-      allowlist: [/@rspack\/core\/hot\/poll/],
-    }) as unknown as Configuration['externals'],
-    ...(isEsm
-      ? [
-          ((data: any, callback: any) => {
-            const request: string | undefined = data.request;
-            if (!request) return callback(null);
-            const bare = request.startsWith('node:') ? request.slice(5) : request;
-            if (builtinModules.includes(bare)) {
-              return callback(null, `node:${bare}`);
-            }
-            callback(null);
-          }) as unknown as Configuration['externals'],
-        ]
-      : []),
-  ] as Configuration['externals'],
   plugins: [
     new NxAppRspackPlugin({
       tsConfig: tsConfigFile,
@@ -182,6 +170,7 @@ const config: Configuration = {
       optimization: !isDev,
       sourceMap: devTool,
       generatePackageJson: true,
+      externalDependencies,
     }),
     new rspack.NormalModuleReplacementPlugin(/file-type$/, require.resolve('./stub.js')),
     new rspack.IgnorePlugin({
