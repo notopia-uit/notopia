@@ -54,6 +54,7 @@ const keepBundled: RegExp[] = [
   /^scheduler(\/|$)/,
   /^@floating-ui\//,
   /^@bufbuild\/protobuf/,
+  /^@hocuspocus\//,
   /^@notopia-uit\//,
   /^tslib$/,
   /^@swc\/helpers/,
