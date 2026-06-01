@@ -98,7 +98,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 	service := grpc.NewService(appApp)
 	serverConfig := &configConfig.Server
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	server, cleanup5, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger)
+	meterProvider, cleanup5, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -106,8 +106,8 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		cleanup()
 		return nil, nil, err
 	}
-	healthHealth := health.New(db, serverConfig, kafka)
-	meterProvider, cleanup6, err := otel.NewMeterProvider(ctx, resource)
+	textMapPropagator := otel.NewTextMapPropagator()
+	server, cleanup6, err := grpc.NewServer(ctx, service, serverConfig, loggingLogger, tracerProvider, meterProvider, textMapPropagator)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -116,7 +116,8 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		cleanup()
 		return nil, nil, err
 	}
-	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
+	healthHealth := health.New(db, serverConfig, kafka)
+	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider, textMapPropagator)
 	authorizationServer, err := authorization.NewServer(ctx, server, healthHealth, logger, global, general, appApp)
 	if err != nil {
 		cleanup6()

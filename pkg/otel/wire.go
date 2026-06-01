@@ -13,6 +13,7 @@ var ProviderSet = wire.NewSet(
 	ProvideOTELSaramaTracer,
 	ProvideResource,
 	ProvideSlogHandler,
+	ProvideTextMapPropagator,
 	ProvideTracerProvider,
 	wire.Bind(new(kafka.SaramaTracer), new(*WatermillKafkaTracer)),
 )

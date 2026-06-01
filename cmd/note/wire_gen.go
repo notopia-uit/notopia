@@ -78,19 +78,28 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger)
-	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName)
-	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
 	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
 	if err != nil {
 		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
+	meterProvider, cleanup4, err := otel.NewMeterProvider(ctx, resource)
+	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	textMapPropagator := otel.NewTextMapPropagator()
+	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, tracerProvider, meterProvider, textMapPropagator)
+	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
 	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
 	services := &configConfig.Services
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	authorization, cleanup4, err := service.NewAuthorization(services, loggingLogger)
+	authorization, cleanup5, err := service.NewAuthorization(services, loggingLogger, tracerProvider, meterProvider, textMapPropagator)
 	if err != nil {
+		cleanup4()
 		cleanup3()
 		cleanup2()
 		cleanup()
@@ -131,9 +140,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	workspaceEvent := &advanced.WorkspaceEvent
 	redis := &configConfig.Redis
-	redisClient, cleanup5 := workspaceevent.NewRedisClient(ctx, redis, logger)
+	redisClient, cleanup6 := workspaceevent.NewRedisClient(ctx, redis, logger)
 	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName)
 	if err != nil {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -147,8 +157,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
 	kafka := &configConfig.Kafka
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	kafkaPublisher, cleanup6, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
+	kafkaPublisher, cleanup7, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
 	if err != nil {
+		cleanup6()
 		cleanup5()
 		cleanup4()
 		cleanup3()
@@ -158,6 +169,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	integrationPublisher, err := integrationpublisher.NewIntegrationPublisher(kafkaPublisher)
 	if err != nil {
+		cleanup7()
 		cleanup6()
 		cleanup5()
 		cleanup4()
@@ -217,6 +229,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	configServer := &configConfig.Server
 	strictHandler, err := http.NewStrictHandler(server, configServer, workspaceEventHub)
 	if err != nil {
+		cleanup7()
 		cleanup6()
 		cleanup5()
 		cleanup4()
@@ -226,8 +239,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	serverInterface := http.NewHandler(strictHandler)
-	httpHTTP, cleanup7, err := http.New(ctx, engine, serverInterface, configServer, logger)
+	httpHTTP, cleanup8, err := http.New(ctx, engine, serverInterface, configServer, logger)
 	if err != nil {
+		cleanup7()
 		cleanup6()
 		cleanup5()
 		cleanup4()
@@ -237,8 +251,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	serviceServer := grpc.NewServiceServer(server)
-	grpcGRPC, cleanup8, err := grpc.New(ctx, serviceServer, configServer, loggingLogger)
+	grpcGRPC, cleanup9, err := grpc.New(ctx, serviceServer, configServer, loggingLogger, tracerProvider, meterProvider, textMapPropagator)
 	if err != nil {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()
@@ -250,6 +265,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	eventEvent, err := event.NewEvent(general, kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent, kafkaPublisher)
 	if err != nil {
+		cleanup9()
 		cleanup8()
 		cleanup7()
 		cleanup6()
@@ -262,6 +278,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, defaultPostgreSQLSchema, pool)
 	if err != nil {
+		cleanup9()
 		cleanup8()
 		cleanup7()
 		cleanup6()
@@ -273,19 +290,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	healthHealth := health.New(pg, configServer, kafka, workspaceEventHub, redisClient, authentik, services)
-	meterProvider, cleanup9, err := otel.NewMeterProvider(ctx, resource)
-	if err != nil {
-		cleanup8()
-		cleanup7()
-		cleanup6()
-		cleanup5()
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider)
+	global := otel.ProvideGlobal(loggerProvider, meterProvider, tracerProvider, textMapPropagator)
 	noteServer := note.NewServer(pg, httpHTTP, grpcGRPC, eventEvent, workspaceEventHub, outboxOutbox, healthHealth, logger, global)
 	return noteServer, func() {
 		cleanup9()

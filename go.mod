@@ -35,6 +35,7 @@ require (
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/pressly/goose/v3 v3.27.1
 	github.com/redis/go-redis/v9 v9.18.0
+	github.com/rs/zerolog v1.35.1
 	github.com/samber/slog-gin v1.21.0
 	github.com/samber/slog-multi v1.8.0
 	github.com/spf13/viper v1.21.0
@@ -44,6 +45,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.65.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.67.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.68.0
+	go.opentelemetry.io/contrib/propagators/autoprop v0.65.0
 	go.opentelemetry.io/otel v1.43.0
 	go.opentelemetry.io/otel/log v0.18.0
 	go.opentelemetry.io/otel/metric v1.43.0
@@ -157,7 +159,6 @@ require (
 	github.com/quic-go/quic-go v0.59.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/rs/zerolog v1.35.1 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/samber/lo v1.53.0 // indirect
 	github.com/samber/slog-common v0.21.0 // indirect
@@ -177,6 +178,10 @@ require (
 	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/bridges/prometheus v0.67.0 // indirect
+	go.opentelemetry.io/contrib/propagators/aws v1.40.0 // indirect
+	go.opentelemetry.io/contrib/propagators/b3 v1.40.0 // indirect
+	go.opentelemetry.io/contrib/propagators/jaeger v1.40.0 // indirect
+	go.opentelemetry.io/contrib/propagators/ot v1.40.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.16.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.16.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.40.0 // indirect

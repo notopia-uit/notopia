@@ -8,6 +8,9 @@ import (
 	"github.com/notopia-uit/notopia/pkg/metadata"
 	sloggin "github.com/samber/slog-gin"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type GinSlogHandlerFunc gin.HandlerFunc
@@ -35,9 +38,15 @@ type OtelGinHandlerFunc gin.HandlerFunc
 
 func NewOtelGinHandler(
 	serviceName metadata.ServiceName,
+	tracerProvider trace.TracerProvider,
+	meterProvider metric.MeterProvider,
+	propagator propagation.TextMapPropagator,
 ) OtelGinHandlerFunc {
 	return OtelGinHandlerFunc(otelgin.Middleware(
 		serviceName.String(),
+		otelgin.WithTracerProvider(tracerProvider),
+		otelgin.WithMeterProvider(meterProvider),
+		otelgin.WithPropagators(propagator),
 	))
 }
 

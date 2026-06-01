@@ -13,6 +13,8 @@
     "@hocuspocus/provider-react": "catalog:",
     "@notopia-uit/api-gen": "workspace:",
     "@notopia-uit/ui": "workspace:",
+    "@opentelemetry/exporter-logs-otlp-proto": "catalog:",
+    "@opentelemetry/sdk-logs": "catalog:",
     "@tailwindcss/postcss": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@vercel/otel": "catalog:",

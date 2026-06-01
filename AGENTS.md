@@ -51,6 +51,8 @@ pkg/                            # Go packages
 - Use shadcn component as much as possible, install in `packages/ui`, the package name is `@notopia-uit/ui`
   - Example: `shadcn add button -c @notopia-uit/ui`
 - Use Tailwind CSS, try to avoid writing custom css and color
+- If you wish to read nextjs documentation (new nextjs version, not the old you have been trained),
+  read in `node_modules/next/dist/docs/`, vercel have bundle all documentation in next package, you can read it offline
 
 ### Go
 
@@ -71,13 +73,14 @@ pkg/                            # Go packages
 - Run `nx lint {projectName} --fix` to apply oxlint fix for those typescript projects
 - Run `nx lint {projectsName}` for golangcilint for those go projects (especially in `cmd/` dir)
 - Should run lint whenever changing code
+- Run `nx` directly, not need to via `pnpm exec nx`
 
 ## General Rules
 
 - Temp file must be go into `./tmp/{projectName}`, avoid writing to `/tmp/` when things need to be persisted
 - While writing code, try to not write unnecessary comment into code
 - There are many `*.env*` file, which contains safe local development environment variables. Only `*.env.local*` can contain sensitive environment variables, and should be gitignored
-- Do not run `npx`, or `npx tsc`
+- Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsgo` (replace for `tsc`)
 
 ### Git
 
