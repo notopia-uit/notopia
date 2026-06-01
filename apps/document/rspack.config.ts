@@ -10,14 +10,47 @@ import rspack, { type DevTool } from '@rspack/core';
 const require = createRequire(import.meta.url);
 const __dirname = import.meta.dirname;
 
-// Externalize every runtime npm dependency so they are required at runtime
-// instead of being bundled. Keeping them external lets OpenTelemetry's
-// require-in-the-middle hooks patch packages like pino/pg/kafkajs/grpc.
-// Workspace libs (@notopia-uit/*) stay bundled.
-const pkg = require('./package.json') as { dependencies?: Record<string, string> };
-const externalDependencies = Object.keys(pkg.dependencies ?? {}).filter(
-  (dep) => !dep.startsWith('@notopia-uit/')
-);
+// Curated regex externals. Nx's `externalDependencies` array option only does an
+// exact `ctx.request` match and hard-overwrites `config.externals`, so it can't
+// externalize subpath imports (`@aws-sdk/client-s3`, `@smithy/...`). We instead
+// pass `externalDependencies: 'none'` to Nx (→ empty externals) and set a regex
+// externals function in a trailing plugin (ExternalizePlugin) that runs after Nx.
+//
+// Externalize a package only if BOTH: (1) it must be external — OTel-instrumented
+// (require-in-the-middle must patch a real `require`: pino/pg/kafkajs/grpc) or a
+// big well-behaved CJS cluster worth dropping for size (@aws-sdk/*, @smithy/*);
+// and (2) it's safe to load natively (clean CJS, not ESM/source-shipping, not a
+// bundled singleton). Everything else stays bundled — in particular
+// ESM/interop-fragile packages like @blocknote/* must be compiled by rspack;
+// externalizing them makes Node load their broken .cjs (e.g. "Code.extend is not
+// a function"). yjs/@hocuspocus/@bufbuild/protobuf are singleton/ESM-fragile too.
+//
+// NOTE: keep this in sync with the dependencies/devDependencies split in
+// package.json — the externalized set below must remain in `dependencies` so the
+// pruned runtime image (generatePackageJson) ships them; bundled-only packages
+// can live in `devDependencies`.
+const externalize: RegExp[] = [
+  /^pino$/,
+  /^pg$/,
+  /^kafkajs$/,
+  /^@grpc\/grpc-js$/, // OTel-instrumented → RITM must patch a real require()
+  /^@aws-sdk\//,
+  /^@smithy\//, // heavy, clean CJS → big size win when externalized
+  /^jsdom$/, // server-util worker-file bug (#https://github.com/TypeCellOS/BlockNote/issues/1939); document app
+];
+
+class ExternalizePlugin {
+  apply(compiler: rspack.Compiler) {
+    // Overwrite the externals Nx set (it hard-assigns `config.externals`). Runs
+    // after NxAppRspackPlugin because it sits later in the `plugins` array.
+    compiler.options.externals = [
+      ({ request }, callback) =>
+        request && externalize.some((re) => re.test(request))
+          ? callback(undefined, `commonjs ${request}`)
+          : callback(),
+    ];
+  }
+}
 
 const isEsm = false;
 const tsConfigFile = join(__dirname, 'tsconfig.app.json');
@@ -170,14 +203,14 @@ const config: Configuration = {
       optimization: !isDev,
       sourceMap: devTool,
       generatePackageJson: true,
-      externalDependencies,
+      externalDependencies: 'none',
     }),
+    new ExternalizePlugin(),
     new rspack.NormalModuleReplacementPlugin(/file-type$/, require.resolve('./stub.js')),
     new rspack.NormalModuleReplacementPlugin(
       /@protobufjs\/inquire/,
       require.resolve('./inquire-shim.js')
     ),
-    new rspack.SourceMapDevToolPlugin({}),
     new rspack.IgnorePlugin({
       checkResource(resource) {
         if (!lazyImports.has(resource)) {

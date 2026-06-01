@@ -10,14 +10,39 @@ import rspack, { type DevTool } from '@rspack/core';
 const require = createRequire(import.meta.url);
 const __dirname = import.meta.dirname;
 
-// Externalize every runtime npm dependency so they are required at runtime
-// instead of being bundled. Keeping them external lets OpenTelemetry's
-// require-in-the-middle hooks patch packages like pino/kafkajs.
-// Workspace libs (@notopia-uit/*) stay bundled.
-const pkg = require('./package.json') as { dependencies?: Record<string, string> };
-const externalDependencies = Object.keys(pkg.dependencies ?? {}).filter(
-  (dep) => !dep.startsWith('@notopia-uit/')
-);
+// Curated regex externals. Nx's `externalDependencies` array option only does an
+// exact `ctx.request` match and hard-overwrites `config.externals`, so it can't
+// externalize subpath imports. We pass `externalDependencies: 'none'` to Nx (→
+// empty externals) and set a regex externals function in a trailing plugin
+// (ExternalizePlugin) that runs after Nx.
+//
+// search-worker only talks to Kafka + Meilisearch, so the externalized set is
+// small: pino + kafkajs are the OTel-instrumented packages require-in-the-middle
+// must patch via a real require(). It uses no pg/grpc/@aws-sdk, so none of those
+// are externalized. Everything else stays bundled — in particular ESM/interop-
+// fragile packages like @blocknote/* must be compiled by rspack; externalizing
+// them makes Node load their broken .cjs (e.g. "Code.extend is not a function").
+//
+// NOTE: keep this in sync with the dependencies/devDependencies split in
+// package.json — the externalized set below must stay in `dependencies`.
+const externalize: RegExp[] = [
+  /^pino$/,
+  /^kafkajs$/,
+  /^jsdom$/, // server-util worker-file bug (#https://github.com/TypeCellOS/BlockNote/issues/1939); document app
+];
+
+class ExternalizePlugin {
+  apply(compiler: rspack.Compiler) {
+    // Overwrite the externals Nx set (it hard-assigns `config.externals`). Runs
+    // after NxAppRspackPlugin because it sits later in the `plugins` array.
+    compiler.options.externals = [
+      ({ request }, callback) =>
+        request && externalize.some((re) => re.test(request))
+          ? callback(undefined, `commonjs ${request}`)
+          : callback(),
+    ];
+  }
+}
 
 const isEsm = false;
 const tsConfigFile = join(__dirname, 'tsconfig.app.json');
@@ -170,8 +195,9 @@ const config: Configuration = {
       optimization: !isDev,
       sourceMap: devTool,
       generatePackageJson: true,
-      externalDependencies,
+      externalDependencies: 'none',
     }),
+    new ExternalizePlugin(),
     new rspack.NormalModuleReplacementPlugin(/file-type$/, require.resolve('./stub.js')),
     new rspack.IgnorePlugin({
       checkResource(resource) {

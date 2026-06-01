@@ -45,7 +45,8 @@
       "dependsOn": ["build"],
       "options": {
         "buildTarget": "search-worker:build:development",
-        "inspect": false
+        "inspect": false,
+        "watch": false
       },
       "configurations": {
         "development": {
