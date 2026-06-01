@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1844" height="2588" viewBox="0 0 1844 2588" version="1.1">
+<rect fill="#fff5f7" width="1844" height="2588"/>
+<text id="text" xml:space="preserve" font-weight="bold" fill="#cd0930" font-family="BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Helvetica', Arial, sans-serif" font-size="16px" x="0" y="5" dy="0">
+<tspan x="10" dy="16">Error 400: [2m2026-06-01T13:31:04+07:00[0m [36mDEBUG[0m default layout rootlevel=0 shapes=Objects: [user, user.browser, gateway, apps, apps.web, services, s…</tspan>
+<tspan x="10" dy="16">[2m2026-06-01T13:31:05+07:00[0m [36mDEBUG[0m done rootlevel=0 shapes=Objects: [user, user.browser, gateway, apps, apps.web, services, services.identity_prov…</tspan>
+<tspan x="10" dy="16">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; data-d2-version=&quot;v0.7.1&quot; preserveAspect…</tspan>
+<tspan x="10" dy="16">.d2-466476307 .text {</tspan>
+<tspan x="10" dy="16">	font-family: &quot;d2-466476307-font-regular&quot;;</tspan>
+<tspan x="10" dy="16">}</tspan>
+<tspan x="10" dy="16">@font-face {</tspan>
+<tspan x="10" dy="16">	font-family: d2-466476307-font-regular;</tspan>
+<tspan x="10" dy="16">	src: url(&quot;data:application/font-woff;base64,d09GRgABAAAAABCEAAoAAAAAGPAAAguFAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAAA9AAAAGAAAABgXd/Vo2NtYXAAAAFUAAAApQAAANgEOQTBZ2x…</tspan>
+<tspan x="10" dy="16">}</tspan>
+<tspan x="10" dy="16">.d2-466476307 .text-bold {</tspan>
+<tspan x="10" dy="16">	font-family: &quot;d2-466476307-font-bold&quot;;</tspan>
+<tspan x="10" dy="16">}</tspan>
+<tspan x="10" dy="16">@font-face {</tspan>
+<tspan x="10" dy="16">	font-family: d2-466476307-font-bold;</tspan>
+<tspan x="10" dy="16">	src: url(&quot;data:application/font-woff;base64,d09GRgABAAAAABB4AAoAAAAAGMwAAguFAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAAA9AAAAGAAAABgXxHXrmNtYXAAAAFUAAAApQAAANgEOQTBZ2x…</tspan>
+<tspan x="10" dy="16">}]]&gt;&lt;/style&gt;&lt;style type=&quot;text/css&quot;&gt;&lt;![CDATA[.shape {</tspan>
+<tspan x="10" dy="16">  shape-rendering: geometricPrecision;</tspan>
+<tspan x="10" dy="16">  stroke-linejoin: round;</tspan>
+<tspan x="10" dy="16">}</tspan>
+<tspan x="10" dy="16">.connection {</tspan>
+<tspan x="10" dy="16">  stroke-linecap: round;</tspan>
+<tspan x="10" dy="16">  stroke-linejoin: round;</tspan>
+<tspan x="10" dy="16">}</tspan>
+<tspan x="10" dy="16">.blend {</tspan>
+<tspan x="10" dy="16">  mix-blend-mode: multiply;</tspan>
+<tspan x="10" dy="16">  opacity: 0.5;</tspan>
+<tspan x="10" dy="16">}</tspan>
+<tspan x="10" dy="16"></tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-N1{fill:#4c4f69;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-N2{fill:#5c5f77;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-N3{fill:#9499AB;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-N4{fill:#acb0be;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-N5{fill:#ccd0da;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-N6{fill:#EEF1F8;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-N7{fill:#eff1f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-B1{fill:#4c4f69;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-B2{fill:#6c6f85;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-B3{fill:#bcc0cc;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-B4{fill:#ccd0da;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-B5{fill:#dce0e8;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-B6{fill:#eff1f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-AA2{fill:#4A6FF3;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-AA4{fill:#1e66f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-AA5{fill:#7287fd;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-AB4{fill:#8839ef;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .fill-AB5{fill:#dc8a78;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-N1{stroke:#4c4f69;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-N2{stroke:#5c5f77;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-N3{stroke:#9499AB;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-N4{stroke:#acb0be;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-N5{stroke:#ccd0da;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-N6{stroke:#EEF1F8;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-N7{stroke:#eff1f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-B1{stroke:#4c4f69;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-B2{stroke:#6c6f85;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-B3{stroke:#bcc0cc;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-B4{stroke:#ccd0da;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-B5{stroke:#dce0e8;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-B6{stroke:#eff1f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-AA2{stroke:#4A6FF3;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-AA4{stroke:#1e66f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-AA5{stroke:#7287fd;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-AB4{stroke:#8839ef;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .stroke-AB5{stroke:#dc8a78;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-N1{background-color:#4c4f69;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-N2{background-color:#5c5f77;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-N3{background-color:#9499AB;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-N4{background-color:#acb0be;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-N5{background-color:#ccd0da;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-N6{background-color:#EEF1F8;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-N7{background-color:#eff1f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-B1{background-color:#4c4f69;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-B2{background-color:#6c6f85;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-B3{background-color:#bcc0cc;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-B4{background-color:#ccd0da;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-B5{background-color:#dce0e8;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-B6{background-color:#eff1f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-AA2{background-color:#4A6FF3;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-AA4{background-color:#1e66f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-AA5{background-color:#7287fd;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-AB4{background-color:#8839ef;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .background-color-AB5{background-color:#dc8a78;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-N1{color:#4c4f69;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-N2{color:#5c5f77;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-N3{color:#9499AB;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-N4{color:#acb0be;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-N5{color:#ccd0da;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-N6{color:#EEF1F8;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-N7{color:#eff1f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-B1{color:#4c4f69;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-B2{color:#6c6f85;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-B3{color:#bcc0cc;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-B4{color:#ccd0da;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-B5{color:#dce0e8;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-B6{color:#eff1f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-AA2{color:#4A6FF3;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-AA4{color:#1e66f5;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-AA5{color:#7287fd;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-AB4{color:#8839ef;}</tspan>
+<tspan x="10" dy="16">		.d2-466476307 .color-AB5{color:#dc8a78;}.appendix text.text{fill:#4c4f69}.md{--color-fg-default:#4c4f69;--color-fg-muted:#5c5f77;--color-fg-subtle:#9499AB;--c…</tspan>
+<tspan x="10" dy="16">&lt;rect x=&quot;-89&quot; y=&quot;-89&quot; width=&quot;3541&quot; height=&quot;1817&quot; fill=&quot;white&quot;&gt;&lt;/rect&gt;</tspan>
+<tspan x="10" dy="16"></tspan>
+<tspan x="10" dy="16">&lt;/mask&gt;&lt;/svg&gt;&lt;/svg&gt;</tspan>
+<tspan x="10" dy="16">debug: using theme Neutral Default (ID: 0)</tspan>
+<tspan x="10" dy="16">debug: using layout plugin elk (bundled)</tspan>
+<tspan x="10" dy="16">debug: fetching https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/img/grafana_icon.svg remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://cdn.simpleicons.org/redis/d20f39 remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://cdn.simpleicons.org/googlechrome/e64553 remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://cdn.simpleicons.org/nextdotjs/4c4f69 remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://cdn.simpleicons.org/authentik/fe640b remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/rustfs.svg remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://cdn.simpleicons.org/go/04a5e5 remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://cdn.simpleicons.org/meilisearch/ea76cb remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://raw.githubusercontent.com/redpanda-data/redpanda/d17f36726370db7c7044cb12ecc1c46841e8bfa6/docs/icon-redpanda.svg remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://raw.githubusercontent.com/grafana/alloy/refs/heads/main/docs/sources/assets/alloy_icon_orange.svg remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://raw.githubusercontent.com/prometheus/prometheus/refs/heads/main/documentation/images/prometheus-logo.svg remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/app/plugins/datasource/loki/img/loki_icon.svg remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/app/plugins/datasource/tempo/img/tempo_logo.svg remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://cdn.simpleicons.org/traefikproxy/04a5e5 remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://cdn.simpleicons.org/nodedotjs/40a02b remotely</tspan>
+<tspan x="10" dy="16">debug: fetching https://cdn.simpleicons.org/postgresql/7287fd remotely</tspan>
+<tspan x="10" dy="16">debug: fetched https://raw.githubusercontent.com/grafana/alloy/refs/heads/main/docs/sources/assets/alloy_icon_orange.svg remotely - response code 200</tspan>
+<tspan x="10" dy="16">debug: fetched https://raw.githubusercontent.com/prometheus/prometheus/refs/heads/main/documentation/images/prometheus-logo.svg remotely - response code 200</tspan>
+<tspan x="10" dy="16">debug: fetched content type: image/svg+xml, Content length: 2778 bytes</tspan>
+<tspan x="10" dy="16">debug: mimetype provided for https://raw.githubusercontent.com/prometheus/prometheus/refs/heads/main/documentation/images/prometheus-logo.svg: image/svg+xml</tspan>
+<tspan x="10" dy="16">debug: fetched content type: image/svg+xml, Content length: 1731 bytes</tspan>
+<tspan x="10" dy="16">debug: mimetype provided for https://raw.githubusercontent.com/grafana/alloy/refs/heads/main/docs/sources/assets/alloy_icon_orange.svg: image/svg+xml</tspan>
+<tspan x="10" dy="16">debug: fetched https://raw.githubusercontent.com/redpanda-data/redpanda/d17f36726370db7c7044cb12ecc1c46841e8bfa6/docs/icon-redpanda.svg remotely - response code…</tspan>
+<tspan x="10" dy="16">debug: fetched content type: image/svg+xml, Content length: 783 bytes</tspan>
+<tspan x="10" dy="16">debug: mimetype provided for https://raw.githubusercontent.com/redpanda-data/redpanda/d17f36726370db7c7044cb12ecc1c46841e8bfa6/docs/icon-redpanda.svg: image/svg…</tspan>
+<tspan x="10" dy="16">debug: fetched https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/app/plugins/datasource/loki/img/loki_icon.svg remotely - response code 2…</tspan>
+<tspan x="10" dy="16">debug: fetched content type: image/svg+xml, Content length: 6953 bytes</tspan>
+<tspan x="10" dy="16">debug: mimetype provided for https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/app/plugins/datasource/loki/img/loki_icon.svg: image/svg+x…</tspan>
+<tspan x="10" dy="16">debug: fetched https://cdn.simpleicons.org/postgresql/7287fd remotely - response code 403</tspan>
+<tspan x="10" dy="16">err: failed to bundle https://cdn.simpleicons.org/postgresql/7287fd: expected status 200 but got 403 403 Forbidden</tspan>
+<tspan x="10" dy="16">debug: fetched https://cdn.simpleicons.org/redis/d20f39 remotely - response code 403</tspan>
+<tspan x="10" dy="16">err: failed to bundle https://cdn.simpleicons.org/redis/d20f39: expected status 200 but got 403 403 Forbidden</tspan>
+<tspan x="10" dy="16">debug: fetched https://cdn.simpleicons.org/go/04a5e5 remotely - response code 403</tspan>
+<tspan x="10" dy="16">err: failed to bundle https://cdn.simpleicons.org/go/04a5e5: expected status 200 but got 403 403 Forbidden</tspan>
+<tspan x="10" dy="16">debug: fetched https://cdn.simpleicons.org/meilisearch/ea76cb remotely - response code 403</tspan>
+<tspan x="10" dy="16">err: failed to bundle https://cdn.simpleicons.org/meilisearch/ea76cb: expected status 200 but got 403 403 Forbidden</tspan>
+<tspan x="10" dy="16">debug: fetched https://cdn.simpleicons.org/traefikproxy/04a5e5 remotely - response code 403</tspan>
+<tspan x="10" dy="16">err: failed to bundle https://cdn.simpleicons.org/traefikproxy/04a5e5: expected status 200 but got 403 403 Forbidden</tspan>
+<tspan x="10" dy="16">debug: fetched https://cdn.simpleicons.org/authentik/fe640b remotely - response code 403</tspan>
+<tspan x="10" dy="16">err: failed to bundle https://cdn.simpleicons.org/authentik/fe640b: expected status 200 but got 403 403 Forbidden</tspan>
+<tspan x="10" dy="16">debug: fetched https://cdn.simpleicons.org/googlechrome/e64553 remotely - response code 403</tspan>
+<tspan x="10" dy="16">err: failed to bundle https://cdn.simpleicons.org/googlechrome/e64553: expected status 200 but got 403 403 Forbidden</tspan>
+<tspan x="10" dy="16">debug: fetched https://cdn.simpleicons.org/nextdotjs/4c4f69 remotely - response code 403</tspan>
+<tspan x="10" dy="16">debug: fetched https://cdn.simpleicons.org/nodedotjs/40a02b remotely - response code 403</tspan>
+<tspan x="10" dy="16">err: failed to bundle https://cdn.simpleicons.org/nextdotjs/4c4f69: expected status 200 but got 403 403 Forbidden</tspan>
+<tspan x="10" dy="16">err: failed to bundle https://cdn.simpleicons.org/nodedotjs/40a02b: expected status 200 but got 403 403 Forbidden</tspan>
+<tspan x="10" dy="16">debug: fetched https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/img/grafana_icon.svg remotely - response code 200</tspan>
+<tspan x="10" dy="16">debug: fetched content type: image/svg+xml, Content length: 5690 bytes</tspan>
+<tspan x="10" dy="16">debug: mimetype provided for https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/img/grafana_icon.svg: image/svg+xml</tspan>
+<tspan x="10" dy="16">debug: fetched https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/app/plugins/datasource/tempo/img/tempo_logo.svg remotely - response code…</tspan>
+<tspan x="10" dy="16">debug: fetched content type: image/svg+xml, Content length: 1304 bytes</tspan>
+<tspan x="10" dy="16">debug: mimetype provided for https://raw.githubusercontent.com/grafana/grafana/refs/heads/main/public/app/plugins/datasource/tempo/img/tempo_logo.svg: image/svg…</tspan>
+<tspan x="10" dy="16">debug: fetched https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/rustfs.svg remotely - response code 200</tspan>
+<tspan x="10" dy="16">debug: fetched content type: image/svg+xml, Content length: 453 bytes</tspan>
+<tspan x="10" dy="16">debug: mimetype provided for https://cdn.jsdelivr.net/gh/selfhst/icons@main/svg/rustfs.svg: image/svg+xml</tspan>
+<tspan x="10" dy="16">err: failed to compile -: failed to bundle remote images: [https://cdn.simpleicons.org/postgresql/7287fd https://cdn.simpleicons.org/redis/d20f39 https://cdn.si…</tspan>
+<tspan x="10" dy="16"> (exit code 1)</tspan>
+</text>
+<rect fill="#ff3860" width="3" height="2588"/>
+</svg>
