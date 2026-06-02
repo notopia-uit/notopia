@@ -63,6 +63,9 @@
 - [ ] Clean architecture is considerable? `https://www.freecodecamp.org/news/reusable-architecture-for-large-nextjs-applications/`
 - [ ] Add custom theme (or not)
 - [ ] Set up logger
+- [ ] Refactor
+  - [ ] Alert
+  - [ ] Use tanstack for update cache instead invalidate it 
 
 ### Both
 
