@@ -17,6 +17,7 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@notopia-uit/ui/components/shadcn/context-menu';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
@@ -335,22 +336,20 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   }, [workspaceTreeData]);
 
   const dataProvider = useMemo(() => new TreeDataProvider<string>(items), [items]);
-  const getTargetParentId = useCallback(() => {
-    const focusedId = viewState['tree-sample']?.focusedItem;
-    let parentId: TreeItemIndex = rootId;
+  const getTargetParentId = useCallback(
+    (targetId: TreeItemIndex) => {
+      const target = items[targetId];
+      if (!target) return rootId;
 
-    if (focusedId && items[focusedId]) {
-      if (items[focusedId].isFolder) {
-        parentId = focusedId;
-      } else {
-        const parent = Object.values(items).find(
-          (p) => p.isFolder && p.children?.includes(focusedId)
-        );
-        if (parent) parentId = parent.index;
+      if (target.isFolder) {
+        return targetId;
       }
-    }
-    return parentId;
-  }, [viewState, items, rootId]);
+
+      const parent = Object.values(items).find((p) => p.isFolder && p.children?.includes(targetId));
+      return parent ? parent.index : rootId;
+    },
+    [items, rootId]
+  );
 
   const { mutate: moveWorkspaceItems } = useMoveWorkspaceItemsMutation({
     onError: (error) => {
@@ -504,9 +503,20 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   );
 
   const handleCreateItem = useCallback(
-    (isFolder: boolean) => {
-      const parentId = getTargetParentId();
+    (targetId: TreeItemIndex, isFolder: boolean) => {
+      const parentId = getTargetParentId(targetId);
       const defaultName = isFolder ? 'New Folder' : 'New Note';
+
+      setViewState((prevViewState) => ({
+        ...prevViewState,
+        'tree-sample': {
+          ...prevViewState['tree-sample'],
+          expandedItems: [
+            ...(prevViewState['tree-sample']?.expandedItems ?? []).filter((id) => id !== parentId),
+            parentId,
+          ],
+        },
+      }));
 
       if (isFolder) {
         createFolder({
@@ -608,29 +618,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           />
           <Button type="submit">Search</Button>
         </form>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            size-3="true"
-            className="h-8 flex-1 text-xs" // flex-1 makes them share the space equally
-            onClick={() => handleCreateItem(false)}
-          >
-            <FilePlus className="mr-1.5 size-3" />
-            New Note
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            size-3="true"
-            className="h-8 flex-1 text-xs"
-            onClick={() => handleCreateItem(true)}
-          >
-            <FolderPlus className="mr-1.5 size-3" />
-            New Folder
-          </Button>
-        </div>
       </div>
       <div>
         <ControlledTreeEnvironment<string>
@@ -771,6 +758,15 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                     </Button>
                   </ContextMenuTrigger>
                   <ContextMenuContent>
+                    <ContextMenuItem onClick={() => handleCreateItem(item.index, false)}>
+                      <FilePlus className="mr-2 size-4" />
+                      New Note
+                    </ContextMenuItem>
+                    <ContextMenuItem onClick={() => handleCreateItem(item.index, true)}>
+                      <FolderPlus className="mr-2 size-4" />
+                      New Folder
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
                     <ContextMenuItem
                       variant="destructive"
                       onClick={() => handleTrashItem(item.index)}
