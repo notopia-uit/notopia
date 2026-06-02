@@ -17,6 +17,7 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@notopia-uit/ui/components/shadcn/context-menu';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
@@ -241,6 +242,12 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
       queryClient.invalidateQueries({
         queryKey: getNoteOptions({ path: { noteId: variables.path.noteId } }).queryKey,
       });
+      //TODO: ideally we should only update the specific item in the tree instead of refetching the whole tree, but since we don't have an API to get a single item, we have to invalidate the whole tree for now
+      queryClient.invalidateQueries({
+        queryKey: getWorkspaceTreeOptions({
+          path: { workspaceId: currentWorkspaceId },
+        }).queryKey,
+      });
     },
     onError: (error) => {
       showAlert({
@@ -329,22 +336,20 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   }, [workspaceTreeData]);
 
   const dataProvider = useMemo(() => new TreeDataProvider<string>(items), [items]);
-  const getTargetParentId = useCallback(() => {
-    const focusedId = viewState['tree-sample']?.focusedItem;
-    let parentId: TreeItemIndex = rootId;
+  const getTargetParentId = useCallback(
+    (targetId: TreeItemIndex) => {
+      const target = items[targetId];
+      if (!target) return rootId;
 
-    if (focusedId && items[focusedId]) {
-      if (items[focusedId].isFolder) {
-        parentId = focusedId;
-      } else {
-        const parent = Object.values(items).find(
-          (p) => p.isFolder && p.children?.includes(focusedId)
-        );
-        if (parent) parentId = parent.index;
+      if (target.isFolder) {
+        return targetId;
       }
-    }
-    return parentId;
-  }, [viewState, items, rootId]);
+
+      const parent = Object.values(items).find((p) => p.isFolder && p.children?.includes(targetId));
+      return parent ? parent.index : rootId;
+    },
+    [items, rootId]
+  );
 
   const { mutate: moveWorkspaceItems } = useMoveWorkspaceItemsMutation({
     onError: (error) => {
@@ -498,9 +503,20 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
   );
 
   const handleCreateItem = useCallback(
-    (isFolder: boolean) => {
-      const parentId = getTargetParentId();
+    (targetId: TreeItemIndex, isFolder: boolean) => {
+      const parentId = getTargetParentId(targetId);
       const defaultName = isFolder ? 'New Folder' : 'New Note';
+
+      setViewState((prevViewState) => ({
+        ...prevViewState,
+        'tree-sample': {
+          ...prevViewState['tree-sample'],
+          expandedItems: [
+            ...(prevViewState['tree-sample']?.expandedItems ?? []).filter((id) => id !== parentId),
+            parentId,
+          ],
+        },
+      }));
 
       if (isFolder) {
         createFolder({
@@ -602,29 +618,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           />
           <Button type="submit">Search</Button>
         </form>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            size-3="true"
-            className="h-8 flex-1 text-xs" // flex-1 makes them share the space equally
-            onClick={() => handleCreateItem(false)}
-          >
-            <FilePlus className="mr-1.5 size-3" />
-            New Note
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            size-3="true"
-            className="h-8 flex-1 text-xs"
-            onClick={() => handleCreateItem(true)}
-          >
-            <FolderPlus className="mr-1.5 size-3" />
-            New Folder
-          </Button>
-        </div>
       </div>
       <div>
         <ControlledTreeEnvironment<string>
@@ -686,6 +679,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                 focusedItem: item.index,
               },
             }));
+            tree.current?.focusTree();
           }}
           onSelectItems={(selectedItems, treeId) => {
             const selectedId = selectedItems.at(-1) ?? '';
@@ -710,6 +704,24 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           }}
           renderItem={({ title, item, arrow, context, depth, children }) => {
             const indentation = 10 * depth;
+            if (context.isRenaming) {
+              return (
+                <li {...context.itemContainerWithChildrenProps} className="my-px">
+                  <div
+                    {...context.itemContainerWithoutChildrenProps}
+                    {...context.interactiveElementProps}
+                    className="grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 text-xs"
+                    style={{
+                      paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,
+                    }}
+                  >
+                    {item.isFolder && arrow}
+                    {title}
+                  </div>
+                  {children}
+                </li>
+              );
+            }
             return (
               <li
                 {...context.itemContainerWithChildrenProps}
@@ -746,6 +758,15 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                     </Button>
                   </ContextMenuTrigger>
                   <ContextMenuContent>
+                    <ContextMenuItem onClick={() => handleCreateItem(item.index, false)}>
+                      <FilePlus className="mr-2 size-4" />
+                      New Note
+                    </ContextMenuItem>
+                    <ContextMenuItem onClick={() => handleCreateItem(item.index, true)}>
+                      <FolderPlus className="mr-2 size-4" />
+                      New Folder
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
                     <ContextMenuItem
                       variant="destructive"
                       onClick={() => handleTrashItem(item.index)}

@@ -20,22 +20,22 @@ export default function LandingHero() {
       <div className="flex w-full max-w-6xl flex-col items-center gap-12 lg:flex-row lg:items-center">
         <div className="flex flex-1 flex-col justify-center gap-6">
           <div className="flex flex-col gap-3">
-            <h1 className="text-foreground text-4xl leading-tight font-semibold tracking-tight sm:text-5xl lg:text-[52px]">
+            <h1 className="text-foreground text-4xl/tight  font-semibold tracking-tight sm:text-5xl lg:text-[52px]">
               Connect every idea
             </h1>
-            <p className="text-muted-foreground max-w-md text-base leading-relaxed">
+            <p className="text-muted-foreground max-w-md text-base/relaxed ">
               Turn scattered notes into a shared universe. Visualize your team&apos;s knowledge
               graph and collaborate in real-time with Notopia.
             </p>
           </div>
 
           <div className="border-input bg-background flex w-full max-w-sm items-center gap-2 rounded-full border px-4 py-3 shadow-sm">
-            <CircleDashed className="text-muted-foreground h-5 w-5 shrink-0" />
+            <CircleDashed className="text-muted-foreground size-5  shrink-0" />
             <Input
               placeholder="Contact us"
               className="text-foreground placeholder:text-muted-foreground h-auto border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
             />
-            <Inbox className="text-muted-foreground h-5 w-5 shrink-0" />
+            <Inbox className="text-muted-foreground size-5  shrink-0" />
           </div>
 
           <div className="flex items-center gap-3">
@@ -48,10 +48,10 @@ export default function LandingHero() {
           </div>
         </div>
 
-        <div className="from-muted to-muted/40 flex flex-1 flex-col items-center justify-center gap-6 rounded-2xl bg-gradient-to-br p-10">
+        <div className="from-muted to-muted/40 flex flex-1 flex-col items-center justify-center gap-6 rounded-2xl bg-linear-to-br p-10">
           <div className="flex flex-col gap-3 text-center">
             <h2 className="text-foreground text-2xl font-semibold">Visualize Your Knowledge</h2>
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <p className="text-muted-foreground text-sm/relaxed ">
               Notopia transforms the way teams organize, visualize, and collaborate on shared
               information. Create powerful knowledge graphs and unlock new insights.
             </p>
