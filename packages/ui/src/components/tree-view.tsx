@@ -241,6 +241,12 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
       queryClient.invalidateQueries({
         queryKey: getNoteOptions({ path: { noteId: variables.path.noteId } }).queryKey,
       });
+      //TODO: ideally we should only update the specific item in the tree instead of refetching the whole tree, but since we don't have an API to get a single item, we have to invalidate the whole tree for now
+      queryClient.invalidateQueries({
+        queryKey: getWorkspaceTreeOptions({
+          path: { workspaceId: currentWorkspaceId },
+        }).queryKey,
+      });
     },
     onError: (error) => {
       showAlert({
@@ -686,6 +692,7 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                 focusedItem: item.index,
               },
             }));
+            tree.current?.focusTree();
           }}
           onSelectItems={(selectedItems, treeId) => {
             const selectedId = selectedItems.at(-1) ?? '';
@@ -710,6 +717,24 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
           }}
           renderItem={({ title, item, arrow, context, depth, children }) => {
             const indentation = 10 * depth;
+            if (context.isRenaming) {
+              return (
+                <li {...context.itemContainerWithChildrenProps} className="my-px">
+                  <div
+                    {...context.itemContainerWithoutChildrenProps}
+                    {...context.interactiveElementProps}
+                    className="grid h-6 w-full grid-flow-col items-center justify-start gap-0.5 text-xs"
+                    style={{
+                      paddingLeft: `${item.isFolder ? indentation : indentation + 16}px`,
+                    }}
+                  >
+                    {item.isFolder && arrow}
+                    {title}
+                  </div>
+                  {children}
+                </li>
+              );
+            }
             return (
               <li
                 {...context.itemContainerWithChildrenProps}
