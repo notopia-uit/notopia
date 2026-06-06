@@ -10,8 +10,6 @@ vim.filetype.add({
   },
 })
 
-vim.env.EDITING = "true" -- Trick with oxlint, for typeAware false
-
 -- For toggle
 local enable_lsp_watchfile = false
 
@@ -240,6 +238,9 @@ lsp.config("oxlint", {
   root_dir = function(_, on_dir)
     on_dir(root)
   end,
+  settings = {
+    typeAware = false,
+  },
   init_options = {
     {
       workspaceUri = string.format("%s/packages/ui", uri_root),
