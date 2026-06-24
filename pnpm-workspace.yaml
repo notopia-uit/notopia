@@ -20,7 +20,7 @@ catalog:
   "@floating-ui/dom": "^1.7.6"
   "@grpc/grpc-js": "~1.14.3"
   "@grpc/proto-loader": "~0.8.1"
-  "@hey-api/openapi-ts": "0.97.1"
+  "@hey-api/openapi-ts": "0.97.3"
   "@hocuspocus/extension-database": "^4.0.0"
   "@hocuspocus/extension-logger": "^4.0.0"
   "@hocuspocus/provider": "^4.0.0"
