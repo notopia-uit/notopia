@@ -447,7 +447,7 @@ resource "aws_ecs_service" "authorization" {
   }
 
   load_balancer {
-    target_group_arn = var.authz_target_group_arn
+    target_group_arn = var.authorization_target_group_arn
     container_name   = "authorization"
     container_port   = 18089
   }
@@ -465,7 +465,7 @@ resource "aws_lb_listener_rule" "authorization" {
 
   action {
     type             = "forward"
-    target_group_arn = var.authz_target_group_arn
+    target_group_arn = var.authorization_target_group_arn
   }
 
   condition {

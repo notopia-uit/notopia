@@ -79,7 +79,7 @@ resource "aws_lb_target_group" "document" {
   }
 }
 
-resource "aws_lb_target_group" "authz" {
+resource "aws_lb_target_group" "authorization" {
   name        = "${var.project_name}-${var.environment}-authz"
   port        = 18089
   protocol    = "HTTP"
@@ -96,7 +96,7 @@ resource "aws_lb_target_group" "authz" {
   }
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-authz"
+    Name        = "${var.project_name}-${var.environment}-authorization"
     Environment = var.environment
   }
 }

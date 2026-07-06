@@ -85,7 +85,7 @@ variable "document_target_group_arn" {
   type = string
 }
 
-variable "authz_target_group_arn" {
+variable "authorization_target_group_arn" {
   type = string
 }
 

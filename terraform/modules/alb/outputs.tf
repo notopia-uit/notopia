@@ -18,8 +18,8 @@ output "document_target_group_arn" {
   value = aws_lb_target_group.document.arn
 }
 
-output "authz_target_group_arn" {
-  value = aws_lb_target_group.authz.arn
+output "authorization_target_group_arn" {
+  value = aws_lb_target_group.authorization.arn
 }
 
 output "authentik_target_group_arn" {
