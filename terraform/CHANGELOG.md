@@ -1,5 +1,38 @@
 # Terraform Changelog
 
+### 2026-07-06 — Migrate all modules to terraform-aws-modules
+
+Replaced raw AWS resources with community modules across all 9 modules. This improves reliability (maintained by community), reduces boilerplate, and follows AWS best practices baked into each module.
+
+**Modules migrated:**
+
+| Module | Source | Version |
+|---|---|---|
+| networking | `terraform-aws-modules/vpc/aws` | `~> 6.0` |
+| rds | `terraform-aws-modules/rds/aws` | `~> 7.2` |
+| alb | `terraform-aws-modules/alb/aws` | latest |
+| s3 | `terraform-aws-modules/s3-bucket/aws` | `~> 5.0` |
+| elasticache | `terraform-aws-modules/elasticache/aws` | `~> 1.0` |
+| msk | `terraform-aws-modules/msk-kafka-cluster/aws` | `~> 3.0` |
+| security (IAM) | `terraform-aws-modules/iam/aws//modules/iam-role` | `~> 6.0` |
+| ecs | `terraform-aws-modules/ecs/aws` | `~> 6.0` |
+| monitoring | `terraform-aws-modules/cloudwatch/aws//modules/log-group` + `iam/aws` | `~> 5.0`, `~> 6.0` |
+
+**Monitoring module specifics:**
+- `aws_cloudwatch_log_group.ecs` → `module "ecs_log_group"` using cloudwatch log-group submodule
+- `aws_iam_role.grafana` / `aws_iam_role.xray` / `aws_iam_role.prometheus_remote_write` → `module "grafana_role"` / `module "xray_role"` / `module "prometheus_remote_write_role"` using IAM role submodule
+- `aws_cloudwatch_dashboard.main` and `aws_prometheus_workspace.main` remain as raw resources (no community module available)
+- `aws_grafana_workspace.main` remains as raw resource
+
+**Key interface changes:**
+- ALB module creates its own security group (removed `security_group_id` variable)
+- RDS uses `password_wo` (write-only) instead of `password`
+- S3 uses `lifecycle_rule` instead of `lifecycle_configuration`
+- IAM module outputs `arn` instead of `iam_role_arn`
+- ECS cluster uses `module.ecs.cluster_id` instead of `aws_ecs_cluster.main.id`
+
+---
+
 ### 2026-07-06 — Separate RDS instances per service
 
 Refactored from a single Aurora PostgreSQL cluster to 4 independent RDS instances (one per service), matching the Docker Compose architecture. This provides full resource isolation — a compromised credential for one service cannot access another service's database.

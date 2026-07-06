@@ -1,3 +1,24 @@
+module "ecs" {
+  source  = "terraform-aws-modules/ecs/aws"
+  version = "~> 6.0"
+
+  cluster_name = "${var.project_name}-${var.environment}"
+
+  cluster_configuration = {
+    execute_command_configuration = {
+      logging = "OVERRIDE"
+      log_configuration = {
+        cloud_watch_log_group_name = "/ecs/${var.project_name}-${var.environment}/exec-command"
+      }
+    }
+  }
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}"
+    Environment = var.environment
+  }
+}
+
 resource "aws_cloudwatch_log_group" "services" {
   for_each          = toset(var.service_names)
   name              = "/ecs/${var.project_name}-${var.environment}/${each.value}"
@@ -5,20 +26,6 @@ resource "aws_cloudwatch_log_group" "services" {
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-${each.value}"
-    Environment = var.environment
-  }
-}
-
-resource "aws_ecs_cluster" "main" {
-  name = "${var.project_name}-${var.environment}"
-
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
-
-  tags = {
-    Name        = "${var.project_name}-${var.environment}"
     Environment = var.environment
   }
 }
@@ -60,6 +67,8 @@ locals {
     { name = "OTEL_EXPORTER_OTLP_PROTOCOL", value = "http/protobuf" },
     { name = "TZ", value = "UTC" },
   ]
+
+  sd_namespace = aws_service_discovery_private_dns_namespace.main.name
 }
 
 # ──────────────────────────────────────────────
@@ -89,9 +98,9 @@ resource "aws_ecs_task_definition" "web" {
       { name = "BETTER_AUTH_URL", value = "https://${var.domain_name}" },
       { name = "NEXT_PUBLIC_BETTER_AUTH_URL", value = "https://${var.domain_name}" },
       { name = "NEXT_PUBLIC_API_URL", value = "https://${var.domain_name}" },
-      { name = "API_URL", value = "http://${aws_service_discovery_service.services["note"].name}.${aws_service_discovery_private_dns_namespace.main.name}:8081" },
+      { name = "API_URL", value = "http://${aws_service_discovery_service.services["note"].name}.${local.sd_namespace}:8081" },
       { name = "NEXT_PUBLIC_MEILISEARCH_HOST", value = "https://${var.domain_name}" },
-      { name = "MEILISEARCH_HOST", value = "http://${aws_service_discovery_service.services["meilisearch"].name}.${aws_service_discovery_private_dns_namespace.main.name}:7700" },
+      { name = "MEILISEARCH_HOST", value = "http://${aws_service_discovery_service.services["meilisearch"].name}.${local.sd_namespace}:7700" },
       { name = "AUTHENTIK_CLIENT_ID", value = var.authentik_client_id },
       { name = "AUTHENTIK_SECRET", value = var.authentik_secret },
       { name = "AUTHENTIK_DISCOVERY_URL", value = "https://auth.${var.domain_name}/application/o/.well-known/openid-configuration" },
@@ -124,7 +133,7 @@ resource "aws_ecs_task_definition" "web" {
 
 resource "aws_ecs_service" "web" {
   name            = "web"
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = module.ecs.cluster_id
   task_definition = aws_ecs_task_definition.web.arn
   desired_count   = var.service_counts.web
   launch_type     = "FARGATE"
@@ -195,9 +204,9 @@ resource "aws_ecs_task_definition" "note" {
       { name = "NOTOPIA_NOTE_KAFKA_BROKERS", value = var.msk_bootstrap_brokers },
       { name = "NOTOPIA_NOTE_KAFKA_CONSUMER_GROUP", value = "note-${var.environment}" },
       { name = "NOTOPIA_NOTE_REDIS_ADDR", value = "${var.redis_endpoint}:${var.redis_port}" },
-      { name = "NOTOPIA_NOTE_SERVICES_AUTHORIZATION_URL", value = "${aws_service_discovery_service.services["authorization"].name}.${aws_service_discovery_private_dns_namespace.main.name}:18089" },
-      { name = "NOTOPIA_NOTE_SERVICES_AUTHORIZATION_LIVE_URL", value = "${aws_service_discovery_service.services["authorization"].name}.${aws_service_discovery_private_dns_namespace.main.name}:28089" },
-      { name = "NOTOPIA_NOTE_MEILISEARCH_HOST", value = "http://${aws_service_discovery_service.services["meilisearch"].name}.${aws_service_discovery_private_dns_namespace.main.name}:7700" },
+      { name = "NOTOPIA_NOTE_SERVICES_AUTHORIZATION_URL", value = "${aws_service_discovery_service.services["authorization"].name}.${local.sd_namespace}:18089" },
+      { name = "NOTOPIA_NOTE_SERVICES_AUTHORIZATION_LIVE_URL", value = "${aws_service_discovery_service.services["authorization"].name}.${local.sd_namespace}:28089" },
+      { name = "NOTOPIA_NOTE_MEILISEARCH_HOST", value = "http://${aws_service_discovery_service.services["meilisearch"].name}.${local.sd_namespace}:7700" },
       { name = "NOTOPIA_NOTE_AUTHENTIK_HOST", value = "https://auth.${var.domain_name}" },
       { name = "NOTOPIA_NOTE_AUTHENTIK_TOKEN", value = var.authentik_token },
     ])
@@ -232,7 +241,7 @@ resource "aws_ecs_task_definition" "note" {
 
 resource "aws_ecs_service" "note" {
   name            = "note"
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = module.ecs.cluster_id
   task_definition = aws_ecs_task_definition.note.arn
   desired_count   = var.service_counts.note
   launch_type     = "FARGATE"
@@ -301,8 +310,8 @@ resource "aws_ecs_task_definition" "document" {
       { name = "NOTOPIA_DOCUMENT_DB_PORT", value = tostring(var.document_database.port) },
       { name = "NOTOPIA_DOCUMENT_DB_USER", value = var.document_database.username },
       { name = "NOTOPIA_DOCUMENT_DB_PASSWORD", value = var.document_database.password },
-      { name = "NOTOPIA_DOCUMENT_SERVICES_NOTE_GRPC_URL", value = "${aws_service_discovery_service.services["note"].name}.${aws_service_discovery_private_dns_namespace.main.name}:18081" },
-      { name = "NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_GRPC_URL", value = "${aws_service_discovery_service.services["authorization"].name}.${aws_service_discovery_private_dns_namespace.main.name}:18089" },
+      { name = "NOTOPIA_DOCUMENT_SERVICES_NOTE_GRPC_URL", value = "${aws_service_discovery_service.services["note"].name}.${local.sd_namespace}:18081" },
+      { name = "NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_GRPC_URL", value = "${aws_service_discovery_service.services["authorization"].name}.${local.sd_namespace}:18089" },
       { name = "NOTOPIA_DOCUMENT_S3_ENDPOINT", value = "https://s3.${var.aws_region}.amazonaws.com" },
       { name = "NOTOPIA_DOCUMENT_S3_REGION", value = var.aws_region },
       { name = "NOTOPIA_DOCUMENT_S3_BUCKET_NAME", value = var.s3_bucket_name },
@@ -338,7 +347,7 @@ resource "aws_ecs_task_definition" "document" {
 
 resource "aws_ecs_service" "document" {
   name            = "document"
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = module.ecs.cluster_id
   task_definition = aws_ecs_task_definition.document.arn
   desired_count   = var.service_counts.document
   launch_type     = "FARGATE"
@@ -435,7 +444,7 @@ resource "aws_ecs_task_definition" "authorization" {
 
 resource "aws_ecs_service" "authorization" {
   name            = "authorization"
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = module.ecs.cluster_id
   task_definition = aws_ecs_task_definition.authorization.arn
   desired_count   = var.service_counts.authorization
   launch_type     = "FARGATE"
@@ -498,7 +507,7 @@ resource "aws_ecs_task_definition" "search_worker" {
       { name = "NOTOPIA_SEARCH_WORKER_KAFKA_BROKERS", value = var.msk_bootstrap_brokers },
       { name = "NOTOPIA_SEARCH_WORKER_KAFKA_CLIENT_ID", value = "search-worker-${var.environment}" },
       { name = "NOTOPIA_SEARCH_WORKER_KAFKA_GROUP_ID", value = "search-worker-${var.environment}" },
-      { name = "NOTOPIA_SEARCH_WORKER_MEILI_HOST", value = "http://${aws_service_discovery_service.services["meilisearch"].name}.${aws_service_discovery_private_dns_namespace.main.name}:7700" },
+      { name = "NOTOPIA_SEARCH_WORKER_MEILI_HOST", value = "http://${aws_service_discovery_service.services["meilisearch"].name}.${local.sd_namespace}:7700" },
     ])
 
     secrets = [
@@ -531,7 +540,7 @@ resource "aws_ecs_task_definition" "search_worker" {
 
 resource "aws_ecs_service" "search_worker" {
   name            = "search-worker"
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = module.ecs.cluster_id
   task_definition = aws_ecs_task_definition.search_worker.arn
   desired_count   = var.service_counts.search_worker
   launch_type     = "FARGATE"
@@ -639,7 +648,7 @@ resource "aws_ecs_task_definition" "authentik" {
 
 resource "aws_ecs_service" "authentik" {
   name            = "authentik"
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = module.ecs.cluster_id
   task_definition = aws_ecs_task_definition.authentik.arn
   desired_count   = var.service_counts.authentik
   launch_type     = "FARGATE"
@@ -746,7 +755,7 @@ resource "aws_ecs_task_definition" "meilisearch" {
 
 resource "aws_ecs_service" "meilisearch" {
   name            = "meilisearch"
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = module.ecs.cluster_id
   task_definition = aws_ecs_task_definition.meilisearch.arn
   desired_count   = var.service_counts.meilisearch
   launch_type     = "FARGATE"
@@ -836,7 +845,7 @@ resource "aws_ecs_task_definition" "api_web" {
 
 resource "aws_ecs_service" "api_web" {
   name            = "api-web"
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = module.ecs.cluster_id
   task_definition = aws_ecs_task_definition.api_web.arn
   desired_count   = var.service_counts.api_web
   launch_type     = "FARGATE"

@@ -1,4 +1,7 @@
-resource "aws_cloudwatch_log_group" "ecs" {
+module "ecs_log_group" {
+  source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
+  version = "~> 5.0"
+
   name              = "/aws/ecs/${var.project_name}-${var.environment}"
   retention_in_days = var.log_retention_days
 
@@ -17,19 +20,25 @@ resource "aws_prometheus_workspace" "main" {
   }
 }
 
-resource "aws_iam_role" "grafana" {
+module "grafana_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "~> 6.0"
+
   name = "${var.project_name}-${var.environment}-grafana"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "grafana.amazonaws.com"
-      }
-    }]
-  })
+  trust_policy_permissions = {
+    Grafana = {
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["grafana.amazonaws.com"]
+      }]
+    }
+  }
+
+  policies = {
+    AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess"
+  }
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-grafana"
@@ -37,17 +46,12 @@ resource "aws_iam_role" "grafana" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "grafana_admin" {
-  role       = aws_iam_role.grafana.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
-}
-
 resource "aws_grafana_workspace" "main" {
   name                     = "${var.project_name}-${var.environment}"
   account_access_type      = "CURRENT_ACCOUNT"
   authentication_providers = ["AWS_SSO"]
   permission_type          = "SERVICE_MANAGED"
-  role_arn                 = aws_iam_role.grafana.arn
+  role_arn                 = module.grafana_role.arn
   grafana_version          = "11.4.0"
 
   data_sources              = ["PROMETHEUS", "CLOUDWATCH"]
@@ -59,19 +63,25 @@ resource "aws_grafana_workspace" "main" {
   }
 }
 
-resource "aws_iam_role" "xray" {
+module "xray_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "~> 6.0"
+
   name = "${var.project_name}-${var.environment}-xray"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ecs-tasks.amazonaws.com"
-      }
-    }]
-  })
+  trust_policy_permissions = {
+    ECSTasks = {
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["ecs-tasks.amazonaws.com"]
+      }]
+    }
+  }
+
+  policies = {
+    XRay = aws_iam_policy.xray.arn
+  }
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-xray"
@@ -79,9 +89,10 @@ resource "aws_iam_role" "xray" {
   }
 }
 
-resource "aws_iam_role_policy" "xray" {
-  name = "${var.project_name}-${var.environment}-xray"
-  role = aws_iam_role.xray.id
+resource "aws_iam_policy" "xray" {
+  name        = "${var.project_name}-${var.environment}-xray"
+  path        = "/"
+  description = "X-Ray write access"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -99,19 +110,25 @@ resource "aws_iam_role_policy" "xray" {
   })
 }
 
-resource "aws_iam_role" "prometheus_remote_write" {
+module "prometheus_remote_write_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "~> 6.0"
+
   name = "${var.project_name}-${var.environment}-prom-rw"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ecs-tasks.amazonaws.com"
-      }
-    }]
-  })
+  trust_policy_permissions = {
+    ECSTasks = {
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["ecs-tasks.amazonaws.com"]
+      }]
+    }
+  }
+
+  policies = {
+    PrometheusRemoteWrite = aws_iam_policy.prometheus_remote_write.arn
+  }
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-prom-rw"
@@ -119,9 +136,10 @@ resource "aws_iam_role" "prometheus_remote_write" {
   }
 }
 
-resource "aws_iam_role_policy" "prometheus_remote_write" {
-  name = "${var.project_name}-${var.environment}-prom-rw"
-  role = aws_iam_role.prometheus_remote_write.id
+resource "aws_iam_policy" "prometheus_remote_write" {
+  name        = "${var.project_name}-${var.environment}-prom-rw"
+  path        = "/"
+  description = "Prometheus remote write to AMP"
 
   policy = jsonencode({
     Version = "2012-10-17"

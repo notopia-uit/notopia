@@ -6,18 +6,18 @@ AWS infrastructure for Notopia, managed with Terraform and organized by environm
 
 ```
 terraform/
-├── bootstrap/                  # One-time setup: S3 bucket + DynamoDB table for state
+├── bootstrap/                  # One-time setup: S3 bucket for state
 │   └── main.tf
 ├── modules/                    # Reusable infrastructure modules
-│   ├── networking/             # VPC, subnets, NAT gateways, internet gateway
-│   ├── security/               # IAM roles, security groups
-│   ├── rds/                    # PostgreSQL 17 instances (one per service)
-│   ├── elasticache/            # Redis replication group
-│   ├── msk/                    # Amazon MSK (Kafka 3.7.1)
-│   ├── s3/                     # S3 bucket for document attachments
-│   ├── alb/                    # Application Load Balancer + target groups
-│   ├── ecs/                    # ECS Fargate cluster, task definitions, services
-│   └── monitoring/             # AMP, Grafana, CloudWatch dashboard, X-Ray/Prometheus IAM
+│   ├── networking/             # VPC (terraform-aws-modules/vpc/aws ~> 6.0)
+│   ├── security/               # IAM roles (terraform-aws-modules/iam/aws ~> 6.0), security groups
+│   ├── rds/                    # PostgreSQL 17 instances (terraform-aws-modules/rds/aws ~> 7.2)
+│   ├── elasticache/            # Redis (terraform-aws-modules/elasticache/aws ~> 1.0)
+│   ├── msk/                    # Amazon MSK Kafka 3.7.1 (terraform-aws-modules/msk-kafka-cluster/aws ~> 3.0)
+│   ├── s3/                     # S3 bucket (terraform-aws-modules/s3-bucket/aws ~> 5.0)
+│   ├── alb/                    # ALB + target groups (terraform-aws-modules/alb/aws)
+│   ├── ecs/                    # ECS Fargate cluster (terraform-aws-modules/ecs/aws ~> 6.0), services
+│   └── monitoring/             # AMP, Grafana, CloudWatch dashboard, IAM (terraform-aws-modules/cloudwatch/aws, iam)
 └── environments/
     ├── dev/                    # Development environment
     │   ├── versions.tf         # Provider + S3 backend config
@@ -125,6 +125,22 @@ Services will be available at:
 | `/-/authentik*` | Authentik (IdP) |
 | `/search*`, `/indexes*` | Meilisearch |
 | `/docs` | API documentation (Scalar) |
+
+## Community Modules
+
+All modules use [terraform-aws-modules](https://registry.terraform.io/namespaces/terraform-aws-modules) where available:
+
+| Module | Source | Version |
+|---|---|---|
+| VPC | `terraform-aws-modules/vpc/aws` | `~> 6.0` |
+| RDS | `terraform-aws-modules/rds/aws` | `~> 7.2` |
+| ALB | `terraform-aws-modules/alb/aws` | latest |
+| S3 | `terraform-aws-modules/s3-bucket/aws` | `~> 5.0` |
+| ElastiCache | `terraform-aws-modules/elasticache/aws` | `~> 1.0` |
+| MSK | `terraform-aws-modules/msk-kafka-cluster/aws` | `~> 3.0` |
+| IAM | `terraform-aws-modules/iam/aws//modules/iam-role` | `~> 6.0` |
+| ECS | `terraform-aws-modules/ecs/aws` | `~> 6.0` |
+| CloudWatch | `terraform-aws-modules/cloudwatch/aws//modules/log-group` | `~> 5.0` |
 
 ## Dev vs Prod Differences
 

@@ -2,19 +2,25 @@ locals {
   name_prefix = "${var.project_name}-${var.environment}"
 }
 
-resource "aws_iam_role" "ecs_task_execution" {
+module "ecs_task_execution_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "~> 6.0"
+
   name = "${local.name_prefix}-ecs-task-execution"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ecs-tasks.amazonaws.com"
-      }
-    }]
-  })
+  trust_policy_permissions = {
+    ECSTasks = {
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["ecs-tasks.amazonaws.com"]
+      }]
+    }
+  }
+
+  policies = {
+    AmazonECSTaskExecutionRolePolicy = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  }
 
   tags = {
     Name        = "${local.name_prefix}-ecs-task-execution"
@@ -22,24 +28,21 @@ resource "aws_iam_role" "ecs_task_execution" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_task_execution" {
-  role       = aws_iam_role.ecs_task_execution.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
+module "ecs_task_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role"
+  version = "~> 6.0"
 
-resource "aws_iam_role" "ecs_task" {
   name = "${local.name_prefix}-ecs-task"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ecs-tasks.amazonaws.com"
-      }
-    }]
-  })
+  trust_policy_permissions = {
+    ECSTasks = {
+      actions = ["sts:AssumeRole"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["ecs-tasks.amazonaws.com"]
+      }]
+    }
+  }
 
   tags = {
     Name        = "${local.name_prefix}-ecs-task"
@@ -49,7 +52,7 @@ resource "aws_iam_role" "ecs_task" {
 
 resource "aws_iam_role_policy" "ecs_task_s3" {
   name = "${local.name_prefix}-ecs-task-s3"
-  role = aws_iam_role.ecs_task.id
+  role = module.ecs_task_role.name
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -73,7 +76,7 @@ resource "aws_iam_role_policy" "ecs_task_s3" {
 
 resource "aws_iam_role_policy" "ecs_task_ssm" {
   name = "${local.name_prefix}-ecs-task-ssm"
-  role = aws_iam_role.ecs_task.id
+  role = module.ecs_task_role.name
 
   policy = jsonencode({
     Version = "2012-10-17"

@@ -1,11 +1,11 @@
 output "primary_endpoint" {
-  value = aws_elasticache_replication_group.main.primary_endpoint_address
+  value = module.elasticache.replication_group_primary_endpoint_address
 }
 
 output "reader_endpoint" {
-  value = aws_elasticache_replication_group.main.reader_endpoint_address
+  value = module.elasticache.replication_group_reader_endpoint_address
 }
 
 output "port" {
-  value = aws_elasticache_replication_group.main.port
+  value = module.elasticache.replication_group_port
 }

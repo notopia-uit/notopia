@@ -120,7 +120,6 @@ module "alb" {
   environment       = "dev"
   vpc_id            = module.networking.vpc_id
   public_subnet_ids = module.networking.public_subnet_ids
-  security_group_id = module.security.alb_security_group_id
   certificate_arn   = local.certificate_arn
 }
 
@@ -151,14 +150,14 @@ module "ecs" {
   service_counts              = var.service_counts
   domain_name                 = var.domain_name
 
-  https_listener_arn           = module.alb.https_listener_arn
-  web_target_group_arn         = module.alb.web_target_group_arn
-  note_target_group_arn        = module.alb.note_target_group_arn
-  document_target_group_arn    = module.alb.document_target_group_arn
+  https_listener_arn             = module.alb.https_listener_arn
+  web_target_group_arn           = module.alb.web_target_group_arn
+  note_target_group_arn          = module.alb.note_target_group_arn
+  document_target_group_arn      = module.alb.document_target_group_arn
   authorization_target_group_arn = module.alb.authorization_target_group_arn
-  authentik_target_group_arn   = module.alb.authentik_target_group_arn
-  meilisearch_target_group_arn = module.alb.meilisearch_target_group_arn
-  api_web_target_group_arn     = module.alb.api_web_target_group_arn
+  authentik_target_group_arn     = module.alb.authentik_target_group_arn
+  meilisearch_target_group_arn   = module.alb.meilisearch_target_group_arn
+  api_web_target_group_arn       = module.alb.api_web_target_group_arn
 
   redis_endpoint        = module.elasticache.primary_endpoint
   redis_port            = module.elasticache.port

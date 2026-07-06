@@ -1,9 +1,9 @@
 output "cluster_id" {
-  value = aws_ecs_cluster.main.id
+  value = module.ecs.cluster_id
 }
 
 output "cluster_arn" {
-  value = aws_ecs_cluster.main.arn
+  value = module.ecs.cluster_arn
 }
 
 output "service_discovery_namespace_id" {

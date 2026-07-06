@@ -15,9 +15,9 @@ output "grafana_workspace_id" {
 }
 
 output "xray_role_arn" {
-  value = aws_iam_role.xray.arn
+  value = module.xray_role.arn
 }
 
 output "prometheus_remote_write_role_arn" {
-  value = aws_iam_role.prometheus_remote_write.arn
+  value = module.prometheus_remote_write_role.arn
 }

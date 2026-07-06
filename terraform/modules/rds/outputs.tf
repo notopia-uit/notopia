@@ -1,15 +1,15 @@
 output "endpoint" {
-  value = aws_db_instance.main.address
+  value = module.rds.db_instance_address
 }
 
 output "port" {
-  value = aws_db_instance.main.port
+  value = module.rds.db_instance_port
 }
 
 output "database_name" {
-  value = aws_db_instance.main.db_name
+  value = module.rds.db_instance_name
 }
 
 output "instance_id" {
-  value = aws_db_instance.main.id
+  value = module.rds.db_instance_identifier
 }

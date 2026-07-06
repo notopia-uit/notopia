@@ -1,7 +1,7 @@
 output "bucket_id" {
-  value = aws_s3_bucket.document.id
+  value = module.s3.s3_bucket_id
 }
 
 output "bucket_arn" {
-  value = aws_s3_bucket.document.arn
+  value = module.s3.s3_bucket_arn
 }
