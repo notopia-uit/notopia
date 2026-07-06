@@ -102,15 +102,6 @@ variable "api_web_target_group_arn" {
 }
 
 # Infrastructure
-variable "rds_endpoint" {
-  type = string
-}
-
-variable "rds_port" {
-  type    = number
-  default = 5432
-}
-
 variable "redis_endpoint" {
   type = string
 }
@@ -128,13 +119,48 @@ variable "s3_bucket_name" {
   type = string
 }
 
-# Auth
-variable "db_username" {
-  type = string
+# Per-service database configuration
+variable "note_database" {
+  type = object({
+    host     = string
+    port     = number
+    name     = string
+    username = string
+    password = string
+  })
+  sensitive = true
 }
 
-variable "db_password" {
-  type      = string
+variable "document_database" {
+  type = object({
+    host     = string
+    port     = number
+    name     = string
+    username = string
+    password = string
+  })
+  sensitive = true
+}
+
+variable "authorization_database" {
+  type = object({
+    host     = string
+    port     = number
+    name     = string
+    username = string
+    password = string
+  })
+  sensitive = true
+}
+
+variable "authentik_database" {
+  type = object({
+    host     = string
+    port     = number
+    name     = string
+    username = string
+    password = string
+  })
   sensitive = true
 }
 

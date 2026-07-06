@@ -1,19 +1,15 @@
-output "cluster_endpoint" {
-  value = aws_rds_cluster.main.endpoint
+output "endpoint" {
+  value = aws_db_instance.main.address
 }
 
-output "cluster_reader_endpoint" {
-  value = aws_rds_cluster.main.reader_endpoint
-}
-
-output "cluster_port" {
-  value = aws_rds_cluster.main.port
+output "port" {
+  value = aws_db_instance.main.port
 }
 
 output "database_name" {
-  value = aws_rds_cluster.main.database_name
+  value = aws_db_instance.main.db_name
 }
 
-output "cluster_id" {
-  value = aws_rds_cluster.main.id
+output "instance_id" {
+  value = aws_db_instance.main.id
 }

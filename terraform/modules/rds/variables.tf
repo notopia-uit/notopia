@@ -6,6 +6,11 @@ variable "environment" {
   type = string
 }
 
+variable "service_name" {
+  type        = string
+  description = "Name of the service this database belongs to (e.g. note, document, authorization)"
+}
+
 variable "private_subnet_ids" {
   type = list(string)
 }
@@ -15,13 +20,11 @@ variable "security_group_id" {
 }
 
 variable "database_name" {
-  type    = string
-  default = "notopia"
+  type = string
 }
 
 variable "db_username" {
-  type    = string
-  default = "notopia"
+  type = string
 }
 
 variable "db_password" {
@@ -34,7 +37,12 @@ variable "instance_class" {
   default = "db.r6g.large"
 }
 
-variable "instance_count" {
+variable "allocated_storage" {
   type    = number
-  default = 1
+  default = 20
+}
+
+variable "max_allocated_storage" {
+  type    = number
+  default = 100
 }

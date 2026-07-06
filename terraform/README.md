@@ -11,7 +11,7 @@ terraform/
 ├── modules/                    # Reusable infrastructure modules
 │   ├── networking/             # VPC, subnets, NAT gateways, internet gateway
 │   ├── security/               # IAM roles, security groups
-│   ├── rds/                    # Aurora PostgreSQL 17 cluster
+│   ├── rds/                    # PostgreSQL 17 instances (one per service)
 │   ├── elasticache/            # Redis replication group
 │   ├── msk/                    # Amazon MSK (Kafka 3.7.1)
 │   ├── s3/                     # S3 bucket for document attachments
@@ -40,7 +40,7 @@ terraform/
 
 ### 1. Bootstrap state storage (one-time)
 
-The Terraform state is stored in S3 with DynamoDB locking. Create these resources first:
+The Terraform state is stored in S3 with S3-native lockfiles. Create these resources first:
 
 ```bash
 cd terraform/bootstrap
@@ -51,7 +51,6 @@ terraform apply
 This creates:
 
 - **S3 bucket** `notopia-tfstate` — encrypted, versioned, public access blocked
-- **DynamoDB table** `notopia-tflock` — PAY_PER_REQUEST, point-in-time recovery
 
 ### 2. Deploy an environment
 
@@ -133,7 +132,9 @@ Services will be available at:
 | ------------------------ | ----------------- | ------------------ |
 | NAT Gateways             | 1 (cost saving)   | 1 per AZ (3 total) |
 | RDS instance class       | `db.r6g.large`    | `db.r6g.xlarge`    |
-| RDS instances            | 1                 | 2 (Multi-AZ)       |
+| RDS instances            | 4 (per service)   | 4 (per service)    |
+| RDS Multi-AZ             | no                | yes                |
+| RDS deletion protection  | no                | yes                |
 | Redis node type          | `cache.r6g.large` | `cache.r6g.xlarge` |
 | Redis nodes              | 1                 | 2 (failover)       |
 | MSK brokers              | 1                 | 3                  |
@@ -163,7 +164,7 @@ All services run on **ECS Fargate** with **Cloud Map** service discovery (`*.not
 | Resource              | Details                                                    |
 | --------------------- | ---------------------------------------------------------- |
 | **VPC**               | 10.0.0.0/16, 3 AZs, public + private subnets               |
-| **Aurora PostgreSQL** | 17.4, encrypted, per-service databases                     |
+| **PostgreSQL**        | 17.4, 4 isolated instances (per service), encrypted        |
 | **Redis**             | Encryption at rest + in transit                            |
 | **MSK (Kafka)**       | 3.7.1, TLS in transit, KMS encryption                      |
 | **S3**                | Versioned, KMS encrypted, public access blocked            |
@@ -184,7 +185,7 @@ All services run on **ECS Fargate** with **Cloud Map** service discovery (`*.not
 ## State Management
 
 - State stored in S3 bucket `notopia-tfstate`
-- State locking via DynamoDB table `notopia-tflock`
+- State locking via S3-native lockfiles (`use_lockfile = true`)
 - Each environment has its own state key:
   - Dev: `dev/terraform.tfstate`
   - Prod: `prod/terraform.tfstate`

@@ -1,16 +1,16 @@
 resource "aws_db_subnet_group" "main" {
-  name       = "${var.project_name}-${var.environment}-db"
+  name       = "${var.project_name}-${var.environment}-${var.service_name}-db"
   subnet_ids = var.private_subnet_ids
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-db"
+    Name        = "${var.project_name}-${var.environment}-${var.service_name}-db"
     Environment = var.environment
   }
 }
 
 resource "aws_db_parameter_group" "main" {
-  name   = "${var.project_name}-${var.environment}-pg17"
-  family = "aurora-postgresql17"
+  name   = "${var.project_name}-${var.environment}-${var.service_name}-pg17"
+  family = "postgres17"
 
   parameter {
     name  = "log_connections"
@@ -23,41 +23,40 @@ resource "aws_db_parameter_group" "main" {
   }
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-pg17"
+    Name        = "${var.project_name}-${var.environment}-${var.service_name}-pg17"
     Environment = var.environment
   }
 }
 
-resource "aws_rds_cluster" "main" {
-  cluster_identifier              = "${var.project_name}-${var.environment}"
-  engine                          = "aurora-postgresql"
-  engine_version                  = "17.4"
-  database_name                   = var.database_name
-  master_username                 = var.db_username
-  master_password                 = var.db_password
-  db_subnet_group_name            = aws_db_subnet_group.main.name
-  vpc_security_group_ids          = [var.security_group_id]
-  db_cluster_parameter_group_name = aws_db_parameter_group.main.name
-  storage_encrypted               = true
-  skip_final_snapshot             = var.environment != "prod"
-  final_snapshot_identifier       = var.environment == "prod" ? "${var.project_name}-${var.environment}-final" : null
+resource "aws_db_instance" "main" {
+  identifier     = "${var.project_name}-${var.environment}-${var.service_name}"
+  engine         = "postgres"
+  engine_version = "17.4"
+  instance_class = var.instance_class
+
+  allocated_storage     = var.allocated_storage
+  max_allocated_storage = var.max_allocated_storage
+  storage_type          = "gp3"
+  storage_encrypted     = true
+
+  db_name  = var.database_name
+  username = var.db_username
+  password = var.db_password
+
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [var.security_group_id]
+  parameter_group_name   = aws_db_parameter_group.main.name
+  publicly_accessible    = false
+
+  multi_az            = var.environment == "prod"
+  skip_final_snapshot = var.environment != "prod"
+  final_snapshot_identifier = var.environment == "prod" ? "${var.project_name}-${var.environment}-${var.service_name}-final" : null
+
+  backup_retention_period = var.environment == "prod" ? 7 : 1
+  deletion_protection     = var.environment == "prod"
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}"
-    Environment = var.environment
-  }
-}
-
-resource "aws_rds_cluster_instance" "main" {
-  count              = var.instance_count
-  identifier         = "${var.project_name}-${var.environment}-${count.index}"
-  cluster_identifier = aws_rds_cluster.main.id
-  instance_class     = var.instance_class
-  engine             = aws_rds_cluster.main.engine
-  engine_version     = aws_rds_cluster.main.engine_version
-
-  tags = {
-    Name        = "${var.project_name}-${var.environment}-${count.index}"
+    Name        = "${var.project_name}-${var.environment}-${var.service_name}"
     Environment = var.environment
   }
 }

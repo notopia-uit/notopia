@@ -34,18 +34,60 @@ module "security" {
   s3_bucket_arn = module.s3.bucket_arn
 }
 
-module "rds" {
+module "rds_note" {
   source = "../../modules/rds"
 
   project_name       = "notopia"
   environment        = "prod"
+  service_name       = "note"
   private_subnet_ids = module.networking.private_subnet_ids
   security_group_id  = module.security.rds_security_group_id
-  database_name      = "notopia"
+  database_name      = "note"
   db_username        = var.db_username
   db_password        = var.db_password
   instance_class     = "db.r6g.xlarge"
-  instance_count     = 2
+}
+
+module "rds_document" {
+  source = "../../modules/rds"
+
+  project_name       = "notopia"
+  environment        = "prod"
+  service_name       = "document"
+  private_subnet_ids = module.networking.private_subnet_ids
+  security_group_id  = module.security.rds_security_group_id
+  database_name      = "document"
+  db_username        = var.db_username
+  db_password        = var.db_password
+  instance_class     = "db.r6g.xlarge"
+}
+
+module "rds_authorization" {
+  source = "../../modules/rds"
+
+  project_name       = "notopia"
+  environment        = "prod"
+  service_name       = "authorization"
+  private_subnet_ids = module.networking.private_subnet_ids
+  security_group_id  = module.security.rds_security_group_id
+  database_name      = "authorization"
+  db_username        = var.db_username
+  db_password        = var.db_password
+  instance_class     = "db.r6g.xlarge"
+}
+
+module "rds_authentik" {
+  source = "../../modules/rds"
+
+  project_name       = "notopia"
+  environment        = "prod"
+  service_name       = "authentik"
+  private_subnet_ids = module.networking.private_subnet_ids
+  security_group_id  = module.security.rds_security_group_id
+  database_name      = "authentik"
+  db_username        = var.db_username
+  db_password        = var.db_password
+  instance_class     = "db.r6g.xlarge"
 }
 
 module "elasticache" {
@@ -118,15 +160,43 @@ module "ecs" {
   meilisearch_target_group_arn = module.alb.meilisearch_target_group_arn
   api_web_target_group_arn     = module.alb.api_web_target_group_arn
 
-  rds_endpoint          = module.rds.cluster_endpoint
-  rds_port              = module.rds.cluster_port
   redis_endpoint        = module.elasticache.primary_endpoint
   redis_port            = module.elasticache.port
   msk_bootstrap_brokers = module.msk.bootstrap_brokers_tls
   s3_bucket_name        = module.s3.bucket_id
 
-  db_username                 = var.db_username
-  db_password                 = var.db_password
+  note_database = {
+    host     = module.rds_note.endpoint
+    port     = module.rds_note.port
+    name     = module.rds_note.database_name
+    username = var.db_username
+    password = var.db_password
+  }
+
+  document_database = {
+    host     = module.rds_document.endpoint
+    port     = module.rds_document.port
+    name     = module.rds_document.database_name
+    username = var.db_username
+    password = var.db_password
+  }
+
+  authorization_database = {
+    host     = module.rds_authorization.endpoint
+    port     = module.rds_authorization.port
+    name     = module.rds_authorization.database_name
+    username = var.db_username
+    password = var.db_password
+  }
+
+  authentik_database = {
+    host     = module.rds_authentik.endpoint
+    port     = module.rds_authentik.port
+    name     = module.rds_authentik.database_name
+    username = var.db_username
+    password = var.db_password
+  }
+
   authentik_client_id         = var.authentik_client_id
   authentik_secret            = var.authentik_secret
   authentik_token             = var.authentik_token

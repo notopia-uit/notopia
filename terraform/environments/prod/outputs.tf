@@ -10,8 +10,20 @@ output "ecs_cluster_id" {
   value = module.ecs.cluster_id
 }
 
-output "rds_endpoint" {
-  value = module.rds.cluster_endpoint
+output "rds_note_endpoint" {
+  value = module.rds_note.endpoint
+}
+
+output "rds_document_endpoint" {
+  value = module.rds_document.endpoint
+}
+
+output "rds_authorization_endpoint" {
+  value = module.rds_authorization.endpoint
+}
+
+output "rds_authentik_endpoint" {
+  value = module.rds_authentik.endpoint
 }
 
 output "redis_endpoint" {
