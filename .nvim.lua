@@ -393,6 +393,7 @@ lsp.enable({
   "oxlint",
   "redocly_ls",
   "tailwindcss",
+  "terraformls",
   "tsgo",
   "twcssls",
   "yamlls",

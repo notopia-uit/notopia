@@ -44,8 +44,8 @@ resource "aws_msk_cluster" "main" {
 }
 
 resource "aws_msk_configuration" "main" {
-  name              = "${var.project_name}-${var.environment}"
-  kafka_versions    = ["3.7.1"]
+  name           = "${var.project_name}-${var.environment}"
+  kafka_versions = ["3.7.1"]
 
   server_properties = <<PROPERTIES
 auto.create.topics.enable=true

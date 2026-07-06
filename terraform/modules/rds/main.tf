@@ -29,18 +29,18 @@ resource "aws_db_parameter_group" "main" {
 }
 
 resource "aws_rds_cluster" "main" {
-  cluster_identifier     = "${var.project_name}-${var.environment}"
-  engine                 = "aurora-postgresql"
-  engine_version         = "17.4"
-  database_name          = var.database_name
-  master_username        = var.db_username
-  master_password        = var.db_password
-  db_subnet_group_name   = aws_db_subnet_group.main.name
-  vpc_security_group_ids = [var.security_group_id]
+  cluster_identifier              = "${var.project_name}-${var.environment}"
+  engine                          = "aurora-postgresql"
+  engine_version                  = "17.4"
+  database_name                   = var.database_name
+  master_username                 = var.db_username
+  master_password                 = var.db_password
+  db_subnet_group_name            = aws_db_subnet_group.main.name
+  vpc_security_group_ids          = [var.security_group_id]
   db_cluster_parameter_group_name = aws_db_parameter_group.main.name
-  storage_encrypted      = true
-  skip_final_snapshot    = var.environment != "prod"
-  final_snapshot_identifier = var.environment == "prod" ? "${var.project_name}-${var.environment}-final" : null
+  storage_encrypted               = true
+  skip_final_snapshot             = var.environment != "prod"
+  final_snapshot_identifier       = var.environment == "prod" ? "${var.project_name}-${var.environment}-final" : null
 
   tags = {
     Name        = "${var.project_name}-${var.environment}"

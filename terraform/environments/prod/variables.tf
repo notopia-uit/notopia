@@ -29,25 +29,25 @@ variable "ecr_repository_url" {
 
 variable "image_tags" {
   type = object({
-    web            = string
-    document       = string
-    search_worker  = string
-    note           = string
-    authorization  = string
-    api_web        = string
+    web           = string
+    document      = string
+    search_worker = string
+    note          = string
+    authorization = string
+    api_web       = string
   })
 }
 
 variable "service_counts" {
   type = object({
-    web            = number
-    document       = number
-    search_worker  = number
-    note           = number
-    authorization  = number
-    authentik      = number
-    meilisearch    = number
-    api_web        = number
+    web           = number
+    document      = number
+    search_worker = number
+    note          = number
+    authorization = number
+    authentik     = number
+    meilisearch   = number
+    api_web       = number
   })
 }
 

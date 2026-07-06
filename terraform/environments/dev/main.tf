@@ -26,12 +26,12 @@ module "s3" {
 module "security" {
   source = "../../modules/security"
 
-  project_name   = "notopia"
-  environment    = "dev"
-  aws_region     = var.aws_region
-  account_id     = data.aws_caller_identity.current.account_id
-  vpc_id         = module.networking.vpc_id
-  s3_bucket_arn  = module.s3.bucket_arn
+  project_name  = "notopia"
+  environment   = "dev"
+  aws_region    = var.aws_region
+  account_id    = data.aws_caller_identity.current.account_id
+  vpc_id        = module.networking.vpc_id
+  s3_bucket_arn = module.s3.bucket_arn
 }
 
 module "rds" {
@@ -96,18 +96,18 @@ resource "aws_ssm_parameter" "meilisearch_key" {
 module "ecs" {
   source = "../../modules/ecs"
 
-  project_name            = "notopia"
-  environment             = "dev"
-  aws_region              = var.aws_region
-  vpc_id                  = module.networking.vpc_id
-  private_subnet_ids      = module.networking.private_subnet_ids
+  project_name                = "notopia"
+  environment                 = "dev"
+  aws_region                  = var.aws_region
+  vpc_id                      = module.networking.vpc_id
+  private_subnet_ids          = module.networking.private_subnet_ids
   ecs_task_execution_role_arn = module.security.ecs_task_execution_role_arn
-  ecs_task_role_arn       = module.security.ecs_task_role_arn
-  ecs_security_group_id   = module.security.ecs_security_group_id
-  ecr_repository_url      = var.ecr_repository_url
-  image_tags              = var.image_tags
-  service_counts          = var.service_counts
-  domain_name             = var.domain_name
+  ecs_task_role_arn           = module.security.ecs_task_role_arn
+  ecs_security_group_id       = module.security.ecs_security_group_id
+  ecr_repository_url          = var.ecr_repository_url
+  image_tags                  = var.image_tags
+  service_counts              = var.service_counts
+  domain_name                 = var.domain_name
 
   https_listener_arn           = module.alb.https_listener_arn
   web_target_group_arn         = module.alb.web_target_group_arn
@@ -125,27 +125,27 @@ module "ecs" {
   msk_bootstrap_brokers = module.msk.bootstrap_brokers_tls
   s3_bucket_name        = module.s3.bucket_id
 
-  db_username               = var.db_username
-  db_password               = var.db_password
-  authentik_client_id       = var.authentik_client_id
-  authentik_secret          = var.authentik_secret
-  authentik_token           = var.authentik_token
-  authentik_secret_key      = var.authentik_secret_key
-  admin_email               = var.admin_email
-  admin_password            = var.admin_password
+  db_username                 = var.db_username
+  db_password                 = var.db_password
+  authentik_client_id         = var.authentik_client_id
+  authentik_secret            = var.authentik_secret
+  authentik_token             = var.authentik_token
+  authentik_secret_key        = var.authentik_secret_key
+  admin_email                 = var.admin_email
+  admin_password              = var.admin_password
   meilisearch_api_key_ssm_arn = aws_ssm_parameter.meilisearch_key.arn
 
-  xray_role_arn                  = module.monitoring.xray_role_arn
+  xray_role_arn                    = module.monitoring.xray_role_arn
   prometheus_remote_write_role_arn = module.monitoring.prometheus_remote_write_role_arn
-  prometheus_workspace_endpoint  = module.monitoring.prometheus_workspace_endpoint
+  prometheus_workspace_endpoint    = module.monitoring.prometheus_workspace_endpoint
 }
 
 module "monitoring" {
   source = "../../modules/monitoring"
 
-  project_name      = "notopia"
-  environment       = "dev"
-  aws_region        = var.aws_region
-  alb_arn_suffix    = module.alb.alb_arn_suffix
+  project_name       = "notopia"
+  environment        = "dev"
+  aws_region         = var.aws_region
+  alb_arn_suffix     = module.alb.alb_arn_suffix
   log_retention_days = 7
 }

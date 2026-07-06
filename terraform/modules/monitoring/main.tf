@@ -50,7 +50,7 @@ resource "aws_grafana_workspace" "main" {
   role_arn                 = aws_iam_role.grafana.arn
   grafana_version          = "11.4.0"
 
-  data_sources      = ["PROMETHEUS", "CLOUDWATCH"]
+  data_sources              = ["PROMETHEUS", "CLOUDWATCH"]
   notification_destinations = ["SNS"]
 
   tags = {

@@ -75,8 +75,8 @@ resource "aws_ecs_task_definition" "web" {
   task_role_arn            = var.ecs_task_role_arn
 
   container_definitions = jsonencode([{
-    name  = "web"
-    image = "${var.ecr_repository_url}/web:${var.image_tags.web}"
+    name      = "web"
+    image     = "${var.ecr_repository_url}/web:${var.image_tags.web}"
     essential = true
 
     portMappings = [{
@@ -177,8 +177,8 @@ resource "aws_ecs_task_definition" "note" {
   task_role_arn            = var.ecs_task_role_arn
 
   container_definitions = jsonencode([{
-    name  = "note"
-    image = "${var.ecr_repository_url}/note:${var.image_tags.note}"
+    name      = "note"
+    image     = "${var.ecr_repository_url}/note:${var.image_tags.note}"
     essential = true
 
     portMappings = [{
@@ -285,8 +285,8 @@ resource "aws_ecs_task_definition" "document" {
   task_role_arn            = var.ecs_task_role_arn
 
   container_definitions = jsonencode([{
-    name  = "document"
-    image = "${var.ecr_repository_url}/document:${var.image_tags.document}"
+    name      = "document"
+    image     = "${var.ecr_repository_url}/document:${var.image_tags.document}"
     essential = true
 
     portMappings = [{
@@ -391,8 +391,8 @@ resource "aws_ecs_task_definition" "authorization" {
   task_role_arn            = var.ecs_task_role_arn
 
   container_definitions = jsonencode([{
-    name  = "authorization"
-    image = "${var.ecr_repository_url}/authorization:${var.image_tags.authorization}"
+    name      = "authorization"
+    image     = "${var.ecr_repository_url}/authorization:${var.image_tags.authorization}"
     essential = true
 
     portMappings = [{
@@ -488,8 +488,8 @@ resource "aws_ecs_task_definition" "search_worker" {
   task_role_arn            = var.ecs_task_role_arn
 
   container_definitions = jsonencode([{
-    name  = "search-worker"
-    image = "${var.ecr_repository_url}/search-worker:${var.image_tags.search_worker}"
+    name      = "search-worker"
+    image     = "${var.ecr_repository_url}/search-worker:${var.image_tags.search_worker}"
     essential = true
 
     environment = concat(local.common_environment, [
@@ -561,8 +561,8 @@ resource "aws_ecs_task_definition" "authentik" {
 
   container_definitions = jsonencode([
     {
-      name  = "server"
-      image = "ghcr.io/goauthentik/server:2026.2.3"
+      name      = "server"
+      image     = "ghcr.io/goauthentik/server:2026.2.3"
       essential = true
 
       portMappings = [{
@@ -604,10 +604,10 @@ resource "aws_ecs_task_definition" "authentik" {
       }
     },
     {
-      name  = "worker"
-      image = "ghcr.io/goauthentik/server:2026.2.3"
+      name      = "worker"
+      image     = "ghcr.io/goauthentik/server:2026.2.3"
       essential = false
-      command = ["ak", "worker"]
+      command   = ["ak", "worker"]
 
       environment = [
         { name = "AUTHENTIK_REDIS__HOST", value = "${var.redis_endpoint}" },
@@ -696,8 +696,8 @@ resource "aws_ecs_task_definition" "meilisearch" {
   }
 
   container_definitions = jsonencode([{
-    name  = "meilisearch"
-    image = "getmeili/meilisearch:v1.41"
+    name      = "meilisearch"
+    image     = "getmeili/meilisearch:v1.41"
     essential = true
 
     portMappings = [{
@@ -799,8 +799,8 @@ resource "aws_ecs_task_definition" "api_web" {
   task_role_arn            = var.ecs_task_role_arn
 
   container_definitions = jsonencode([{
-    name  = "api-web"
-    image = "${var.ecr_repository_url}/api-web:${var.image_tags.api_web}"
+    name      = "api-web"
+    image     = "${var.ecr_repository_url}/api-web:${var.image_tags.api_web}"
     essential = true
 
     portMappings = [{

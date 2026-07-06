@@ -14,9 +14,9 @@ resource "aws_s3_bucket" "tfstate" {
   bucket = "notopia-tfstate"
 
   tags = {
-    Name        = "notopia-tfstate"
-    Purpose     = "Terraform state storage"
-    ManagedBy   = "terraform-bootstrap"
+    Name      = "notopia-tfstate"
+    Purpose   = "Terraform state storage"
+    ManagedBy = "terraform-bootstrap"
   }
 }
 
@@ -83,9 +83,9 @@ resource "aws_dynamodb_table" "tflock" {
   }
 
   tags = {
-    Name        = "notopia-tflock"
-    Purpose     = "Terraform state locking"
-    ManagedBy   = "terraform-bootstrap"
+    Name      = "notopia-tflock"
+    Purpose   = "Terraform state locking"
+    ManagedBy = "terraform-bootstrap"
   }
 }
 

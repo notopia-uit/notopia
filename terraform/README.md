@@ -18,17 +18,16 @@ terraform/
 │   ├── alb/                    # Application Load Balancer + target groups
 │   ├── ecs/                    # ECS Fargate cluster, task definitions, services
 │   └── monitoring/             # AMP, Grafana, CloudWatch dashboard, X-Ray/Prometheus IAM
-├── environments/
-│   ├── dev/                    # Development environment
-│   │   ├── versions.tf         # Provider + S3 backend config
-│   │   ├── data.tf             # Data sources (account ID, ACM cert, AZs)
-│   │   ├── main.tf             # Module wiring
-│   │   ├── variables.tf        # Input variables
-│   │   ├── outputs.tf          # Output values
-│   │   └── terraform.tfvars    # Variable values (secrets go here)
-│   └── prod/                   # Production environment
-│       └── (same structure)
-└── .gitignore
+└── environments/
+    ├── dev/                    # Development environment
+    │   ├── versions.tf         # Provider + S3 backend config
+    │   ├── data.tf             # Data sources (account ID, ACM cert, AZs)
+    │   ├── main.tf             # Module wiring
+    │   ├── variables.tf        # Input variables
+    │   ├── outputs.tf          # Output values
+    │   └── terraform.tfvars    # Variable values (secrets go here)
+    └── prod/                   # Production environment
+        └── (same structure)
 ```
 
 ## Prerequisites
@@ -50,6 +49,7 @@ terraform apply
 ```
 
 This creates:
+
 - **S3 bucket** `notopia-tfstate` — encrypted, versioned, public access blocked
 - **DynamoDB table** `notopia-tflock` — PAY_PER_REQUEST, point-in-time recovery
 
@@ -113,6 +113,7 @@ terraform output alb_dns_name
 ```
 
 Create a CNAME record in your DNS:
+
 - `dev.notopia.app` → `<alb_dns_name>`
 
 Services will be available at:
@@ -128,48 +129,48 @@ Services will be available at:
 
 ## Dev vs Prod Differences
 
-| Setting | Dev | Prod |
-|---|---|---|
-| NAT Gateways | 1 (cost saving) | 1 per AZ (3 total) |
-| RDS instance class | `db.r6g.large` | `db.r6g.xlarge` |
-| RDS instances | 1 | 2 (Multi-AZ) |
-| Redis node type | `cache.r6g.large` | `cache.r6g.xlarge` |
-| Redis nodes | 1 | 2 (failover) |
-| MSK brokers | 1 | 3 |
-| MSK instance | `kafka.m5.large` | `kafka.m5.xlarge` |
-| MSK EBS | 50 GB | 200 GB |
-| Service desired count | 1 each | 2 each |
-| ALB deletion protection | disabled | enabled |
-| CloudWatch log retention | 7 days | 30 days |
+| Setting                  | Dev               | Prod               |
+| ------------------------ | ----------------- | ------------------ |
+| NAT Gateways             | 1 (cost saving)   | 1 per AZ (3 total) |
+| RDS instance class       | `db.r6g.large`    | `db.r6g.xlarge`    |
+| RDS instances            | 1                 | 2 (Multi-AZ)       |
+| Redis node type          | `cache.r6g.large` | `cache.r6g.xlarge` |
+| Redis nodes              | 1                 | 2 (failover)       |
+| MSK brokers              | 1                 | 3                  |
+| MSK instance             | `kafka.m5.large`  | `kafka.m5.xlarge`  |
+| MSK EBS                  | 50 GB             | 200 GB             |
+| Service desired count    | 1 each            | 2 each             |
+| ALB deletion protection  | disabled          | enabled            |
+| CloudWatch log retention | 7 days            | 30 days            |
 
 ## Services Deployed
 
-| Service | Tech | Port | Health Check |
-|---|---|---|---|
-| **web** | Next.js | 3000 | `GET /` |
-| **note** | Go | 8081 | `GET /healthz` (port 28081) |
-| **document** | NestJS | 8082 | `GET /healthz` |
-| **authorization** | Go | 18089 | `GET /healthz` (port 28089) |
-| **search-worker** | NestJS | — (internal) | `GET /healthz` (port 28083) |
-| **authentik** | Python | 9000 | `GET /-/health/ready` |
-| **meilisearch** | Rust | 7700 | `GET /health` |
-| **api-web** | React SPA | 9080 | `GET /` |
+| Service           | Tech      | Port         | Health Check                |
+| ----------------- | --------- | ------------ | --------------------------- |
+| **web**           | Next.js   | 3000         | `GET /`                     |
+| **note**          | Go        | 8081         | `GET /healthz` (port 28081) |
+| **document**      | NestJS    | 8082         | `GET /healthz`              |
+| **authorization** | Go        | 18089        | `GET /healthz` (port 28089) |
+| **search-worker** | NestJS    | — (internal) | `GET /healthz` (port 28083) |
+| **authentik**     | Python    | 9000         | `GET /-/health/ready`       |
+| **meilisearch**   | Rust      | 7700         | `GET /health`               |
+| **api-web**       | React SPA | 9080         | `GET /`                     |
 
 All services run on **ECS Fargate** with **Cloud Map** service discovery (`*.notopia.local`).
 
 ## Infrastructure
 
-| Resource | Details |
-|---|---|
-| **VPC** | 10.0.0.0/16, 3 AZs, public + private subnets |
-| **Aurora PostgreSQL** | 17.4, encrypted, per-service databases |
-| **Redis** | Encryption at rest + in transit |
-| **MSK (Kafka)** | 3.7.1, TLS in transit, KMS encryption |
-| **S3** | Versioned, KMS encrypted, public access blocked |
-| **ALB** | TLS 1.3, HTTP→HTTPS redirect |
-| **AMP** | Prometheus metrics from ECS tasks |
-| **Grafana** | Managed workspace with Prometheus + CloudWatch datasources |
-| **X-Ray** | Distributed tracing via OTel SDK |
+| Resource              | Details                                                    |
+| --------------------- | ---------------------------------------------------------- |
+| **VPC**               | 10.0.0.0/16, 3 AZs, public + private subnets               |
+| **Aurora PostgreSQL** | 17.4, encrypted, per-service databases                     |
+| **Redis**             | Encryption at rest + in transit                            |
+| **MSK (Kafka)**       | 3.7.1, TLS in transit, KMS encryption                      |
+| **S3**                | Versioned, KMS encrypted, public access blocked            |
+| **ALB**               | TLS 1.3, HTTP→HTTPS redirect                               |
+| **AMP**               | Prometheus metrics from ECS tasks                          |
+| **Grafana**           | Managed workspace with Prometheus + CloudWatch datasources |
+| **X-Ray**             | Distributed tracing via OTel SDK                           |
 
 ## Observability
 
@@ -219,6 +220,7 @@ terraform validate
 Sensitive values (`db_password`, `authentik_*`, `admin_password`, `meilisearch_api_key`) should be set in `terraform.tfvars` which is gitignored. Never commit real secrets.
 
 For production, consider using:
+
 - AWS Secrets Manager for database credentials
 - SSM Parameter Store for API keys (already used for Meilisearch key)
 - Environment variable injection via CI/CD pipeline
@@ -233,6 +235,7 @@ When deploying via CI/CD:
 4. Run `terraform apply tfplan`
 
 Set sensitive variables via environment variables:
+
 ```bash
 export TF_VAR_db_password="$DB_PASSWORD"
 export TF_VAR_authentik_client_id="$AUTHENTIK_CLIENT_ID"
