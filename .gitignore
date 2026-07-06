@@ -49,6 +49,7 @@ vitest.config.*.timestamp*
 .agents/skills/seed-data/
 .agents/skills/ui-ux-pro-max/
 .agents/skills/vercel-react-best-practices/
+.agents/skills/terraform-engineer/
 
 .claude/skills/better-auth-best-practices/
 .claude/skills/ckm-banner-design/
@@ -63,3 +64,4 @@ vitest.config.*.timestamp*
 .claude/skills/seed-data/
 .claude/skills/ui-ux-pro-max/
 .claude/skills/vercel-react-best-practices/
+.claude/skills/terraform-engineer/
