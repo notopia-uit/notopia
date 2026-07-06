@@ -66,36 +66,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "tfstate" {
 }
 
 # ──────────────────────────────────────────────
-# DynamoDB table for state locking
-# ──────────────────────────────────────────────
-resource "aws_dynamodb_table" "tflock" {
-  name         = "notopia-tflock"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-
-  point_in_time_recovery {
-    enabled = true
-  }
-
-  tags = {
-    Name      = "notopia-tflock"
-    Purpose   = "Terraform state locking"
-    ManagedBy = "terraform-bootstrap"
-  }
-}
-
-# ──────────────────────────────────────────────
 # Outputs
 # ──────────────────────────────────────────────
 output "s3_bucket_name" {
   value = aws_s3_bucket.tfstate.id
-}
-
-output "dynamodb_table_name" {
-  value = aws_dynamodb_table.tflock.name
 }

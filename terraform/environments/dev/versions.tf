@@ -9,10 +9,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "notopia-tfstate"
-    key            = "dev/terraform.tfstate"
-    region         = "ap-southeast-1"
-    dynamodb_table = "notopia-tflock"
-    encrypt        = true
+    bucket       = "notopia-tfstate"
+    key          = "dev/terraform.tfstate"
+    region       = "ap-southeast-1"
+    encrypt      = true
+    use_lockfile = true
   }
 }
