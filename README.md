@@ -6,7 +6,7 @@
 
 [![Docs](https://img.shields.io/badge/docs-blue?logo=gitbook)](https://notopia-uit.github.io/notopia/)
 [![API Reference](https://img.shields.io/badge/api-6BA539?logo=openapiinitiative&logoColor=white)](https://notopia-uit.github.io/notopia/api/index.html)
-[![Github Landing](https://img.shields.io/badge/github_landing-yellow?logo=github)](https://github.com/notopia/)
+[![Github Landing](https://img.shields.io/badge/github_landing-yellow?logo=github)](https://github.com/notopia-uit/)
 [![Codecov](https://img.shields.io/codecov/c/github/notopia-uit/notopia)](https://codecov.io/gh/notopia-uit/notopia)
 [![Wakatime](https://wakatime.com/badge/github/notopia-uit/notopia.svg)](https://wakatime.com/badge/github/notopia-uit/notopia)
 
