@@ -12,7 +12,7 @@ COMPOSE_FILE = "./deploy/compose/compose.yaml"
 '_'.path.paths = ["./bin/", "./scripts/", "./node_modules/.bin/"]
 
 [tools]
-"github:pressly/goose" = "3.27.1"
+"github:pressly/goose" = "3.27.2"
 "go:github.com/goforj/wire/cmd/wire" = "1.2.0"
 "go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.7.0"
 buf = "1.65.0"
