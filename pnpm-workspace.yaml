@@ -74,7 +74,7 @@ catalog:
   "@typescript/native-preview": "7.0.0-dev.20260707.2"
   "@vercel/otel": "^2.1.2"
   "@vitejs/plugin-react": "^6.0.0"
-  "@vitejs/plugin-react-swc": "4.3.2"
+  "@vitejs/plugin-react-swc": "4.3.3"
   "@vitest/coverage-v8": "^4.1.6"
   "@vitest/ui": "^4.1.6"
   autoprefixer: "^10.4.27"
