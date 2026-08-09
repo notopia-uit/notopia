@@ -222,6 +222,9 @@ catalogs:
     express:
       specifier: ^5.2.1
       version: 5.2.1
+    jose:
+      specifier: ^6.2.3
+      version: 6.2.8
     kafkajs:
       specifier: ^2.2.4
       version: 2.2.4
@@ -231,9 +234,6 @@ catalogs:
     markdown-to-txt:
       specifier: ^2.0.1
       version: 2.0.1
-    marked:
-      specifier: ^18.0.3
-      version: 18.0.3
     meilisearch:
       specifier: 0.58.0
       version: 0.58.0
@@ -659,7 +659,7 @@ importers:
         version: 2.2.4
       marked:
         specifier: 'catalog:'
-        version: 18.0.3
+        version: 18.0.9
       nestjs-otel:
         specifier: 'catalog:'
         version: 8.0.3(@nestjs/common@11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)
@@ -13615,8 +13615,8 @@ packages:
     engines: {node: '>= 20'}
     hasBin: true
 
-  marked@18.0.3:
-    resolution: {integrity: sha512-7VT90JOkDeaRWpfjOReRGPEKn0ecdARBkDGL+tT1wZY0efPPqkUxLUSmzy/C7TIylQYJC9STISEsCHrqb/7VIA==}
+  marked@18.0.9:
+    resolution: {integrity: sha512-/Sa4qiiHZxf0/FQdBBowr9q4r10krCwMvpK48FUBdXdUXScDxiQGR9zCPrFgRVR5LU3iySOiIjy09ZQvADir1w==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -34851,7 +34851,7 @@ snapshots:
 
   marked@16.4.2: {}
 
-  marked@18.0.3: {}
+  marked@18.0.9: {}
 
   marked@4.3.0: {}
 
