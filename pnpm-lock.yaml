@@ -204,6 +204,9 @@ catalogs:
     autoprefixer:
       specifier: ^10.4.27
       version: 10.4.27
+    better-auth:
+      specifier: ~1.6.11
+      version: 1.6.26
     class-variance-authority:
       specifier: ^0.7.1
       version: 0.7.1
@@ -219,9 +222,6 @@ catalogs:
     express:
       specifier: ^5.2.1
       version: 5.2.1
-    jose:
-      specifier: ^6.2.3
-      version: 6.2.3
     kafkajs:
       specifier: ^2.2.4
       version: 2.2.4
@@ -653,7 +653,7 @@ importers:
         version: 5.2.1
       jose:
         specifier: 'catalog:'
-        version: 6.2.3
+        version: 6.2.8
       kafkajs:
         specifier: 'catalog:'
         version: 2.2.4
@@ -12914,9 +12914,6 @@ packages:
   joi@18.2.1:
     resolution: {integrity: sha512-2/OKlogiESf2Nh3TFCrRjrr9z1DRHeW0I+KReF67+4J0Ns+8hBtHRmoWAZ2OFU6I5+TWLEe6sVlSdXPjHm5UbQ==}
     engines: {node: '>= 20'}
-
-  jose@6.2.3:
-    resolution: {integrity: sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==}
 
   jose@6.2.8:
     resolution: {integrity: sha512-Bsdjwm3Qsd/P0jR+BHDe3LytDfY7WBq2HmCCLIwuVRHMuEC9ae7/R474GIUdF1NgCyZjzVo/A9DOiOBtXq8ZoQ==}
@@ -34149,8 +34146,6 @@ snapshots:
       '@hapi/tlds': 1.1.6
       '@hapi/topo': 6.0.2
       '@standard-schema/spec': 1.1.0
-
-  jose@6.2.3: {}
 
   jose@6.2.8: {}
 
