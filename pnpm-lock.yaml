@@ -204,6 +204,9 @@ catalogs:
     autoprefixer:
       specifier: ^10.4.27
       version: 10.4.27
+    better-auth:
+      specifier: ~1.6.11
+      version: 1.6.29
     class-variance-authority:
       specifier: ^0.7.1
       version: 0.7.1
@@ -219,9 +222,6 @@ catalogs:
     express:
       specifier: ^5.2.1
       version: 5.2.1
-    jose:
-      specifier: ^6.2.3
-      version: 6.2.8
     kafkajs:
       specifier: ^2.2.4
       version: 2.2.4
@@ -653,7 +653,7 @@ importers:
         version: 5.2.1
       jose:
         specifier: 'catalog:'
-        version: 6.2.8
+        version: 6.2.9
       kafkajs:
         specifier: 'catalog:'
         version: 2.2.4
@@ -10911,8 +10911,8 @@ packages:
   dayjs@1.11.20:
     resolution: {integrity: sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ==}
 
-  dayjs@1.11.21:
-    resolution: {integrity: sha512-98IT+HOahAisibz/yjKbzuOBwYcjJ7BCLPzARyHiyEBmRz4fatF+KPJszEHXsGYjUG234aH/cOjW1wwTbKUZlA==}
+  dayjs@1.11.22:
+    resolution: {integrity: sha512-1YRnxzt/AabP3GHxnaB9/b+ZScCKu5TeF+co+BWG+lnWVIwEcTFc1FVE0WLNmNO3sA6GGXL40i5qkHfbLzpwrg==}
 
   de-indent@1.0.2:
     resolution: {integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==}
@@ -12927,9 +12927,6 @@ packages:
   joi@18.2.1:
     resolution: {integrity: sha512-2/OKlogiESf2Nh3TFCrRjrr9z1DRHeW0I+KReF67+4J0Ns+8hBtHRmoWAZ2OFU6I5+TWLEe6sVlSdXPjHm5UbQ==}
     engines: {node: '>= 20'}
-
-  jose@6.2.8:
-    resolution: {integrity: sha512-Bsdjwm3Qsd/P0jR+BHDe3LytDfY7WBq2HmCCLIwuVRHMuEC9ae7/R474GIUdF1NgCyZjzVo/A9DOiOBtXq8ZoQ==}
 
   jose@6.2.9:
     resolution: {integrity: sha512-XrchZOFZUl/T3vTwRe8XK+cJrGtMF4th1ARnDfwbBXFKThGhlsxEE4Zu03AD/bjJSt/9jT/mxrOCkJWOg77aPA==}
@@ -31643,7 +31640,7 @@ snapshots:
 
   dayjs@1.11.20: {}
 
-  dayjs@1.11.21: {}
+  dayjs@1.11.22: {}
 
   de-indent@1.0.2: {}
 
@@ -34150,8 +34147,6 @@ snapshots:
       '@hapi/topo': 6.0.2
       '@standard-schema/spec': 1.1.0
 
-  jose@6.2.8: {}
-
   jose@6.2.9: {}
 
   joycon@3.1.1: {}
@@ -35034,7 +35029,7 @@ snapshots:
       d3: 7.9.0
       d3-sankey: 0.12.3
       dagre-d3-es: 7.0.14
-      dayjs: 1.11.21
+      dayjs: 1.11.22
       dompurify: 3.4.13
       katex: 0.16.47
       khroma: 2.1.0
