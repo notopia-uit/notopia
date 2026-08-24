@@ -52,13 +52,13 @@ services:
 
   authentik_postgresql:
     container_name: notopia-authentik_postgresql
-    image: postgres:18.3-alpine3.23
+    image: postgres:18.6-alpine3.23
     environment:
       POSTGRES_DB: ${AUTHENTIK_POSTGRESQL__NAME:-authentik}
       POSTGRES_PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD:-notopiauit}
       POSTGRES_USER: ${AUTHENTIK_POSTGRESQL__USER:-notopiauit}
     volumes:
-      - authentik_postgresql_data:/var/lib/postgresql/data
+      - authentik_postgresql_data:/var/lib/postgresql
     healthcheck:
       test:
         - CMD-SHELL
