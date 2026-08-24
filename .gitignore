@@ -63,3 +63,4 @@ vitest.config.*.timestamp*
 .claude/skills/seed-data/
 .claude/skills/ui-ux-pro-max/
 .claude/skills/vercel-react-best-practices/
+.claude/skills/terraform-engineer/

@@ -34,4 +34,4 @@ experimental:
   plugins:
     jwt:
       moduleName: github.com/agilezebra/jwt-middleware
-      version: v1.4.0
+      version: v1.6.0

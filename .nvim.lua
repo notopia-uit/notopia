@@ -15,7 +15,7 @@ local enable_lsp_watchfile = false
 
 local allowed_linked_editing_range_clients = {
   html = true,
-  tsgo = true,
+  tsc = true,
 }
 
 lsp.config("*", {
@@ -170,8 +170,8 @@ lsp.config("twcssls", {
   },
 } --[[@as vim.lsp.Config]])
 
-lsp.config("tsgo", {
-  cmd = { "./node_modules/.bin/tsgo", "--lsp", "--stdio" },
+lsp.config("tsc", {
+  cmd = { "tsc", "--lsp", "--stdio" },
   root_dir = function(_, on_dir)
     on_dir(root)
   end,
@@ -393,7 +393,7 @@ lsp.enable({
   "oxlint",
   "redocly_ls",
   "tailwindcss",
-  "tsgo",
+  "tsc",
   "twcssls",
   "yamlls",
   "yamlls",
