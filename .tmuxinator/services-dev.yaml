@@ -7,10 +7,10 @@ windows:
       panes:
         - note:
             - tmux set-option -w pane-border-status top
-            - nx run note --no-tui
+            - mise exec -- nx run note --no-tui
         - authorization:
-            - nx run authorization --no-tui
+            - mise exec -- nx run authorization --no-tui
         - document:
-            - nx run document --no-tui
+            - mise exec -- nx run document --no-tui
         - search-worker:
-            - nx run search-worker --no-tui
+            - mise exec -- nx run search-worker --no-tui

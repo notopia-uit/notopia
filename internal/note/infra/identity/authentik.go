@@ -75,7 +75,7 @@ func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]app.User
 				return errs.NewIdentityUserIDInvalid(id, err)
 			}
 
-			user, _, err := a.client.CoreApi.CoreUsersRetrieve(ctx, int32(userID)).Execute()
+			user, _, err := a.client.CoreAPI.CoreUsersRetrieve(ctx, int32(userID)).Execute()
 			if err != nil {
 				return err
 			}
@@ -94,8 +94,8 @@ func (a *Authentik) GetUsersByIDs(ctx context.Context, ids []string) ([]app.User
 
 func (a *Authentik) SearchUsers(ctx context.Context, params *app.IdentitySvcSearchUsersParams) ([]app.User, error) {
 	ctx = context.WithValue(ctx, api.ContextAccessToken, a.token)
-	query := a.client.CoreApi.CoreUsersList(ctx).
-		Type_([]string{string(api.USERTYPEENUM_INTERNAL), string(api.USERTYPEENUM_EXTERNAL)}).
+	query := a.client.CoreAPI.CoreUsersList(ctx).
+		Type_([]api.UserTypeEnum{api.USERTYPEENUM_INTERNAL, api.USERTYPEENUM_EXTERNAL}).
 		Search(params.Keyword).
 		PageSize(int32(params.Limit))
 	switch params.ActiveStatus {

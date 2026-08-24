@@ -29,6 +29,7 @@ gotestsum = "1.13.0"
 protoc-gen-go = "1.36.11"
 protoc-gen-go-grpc = "1.6.2"
 "npm:ts-proto" = "2.11.8"
+go = "1.27.0"
 
 [tools."http:plantuml"]
 version = "1.2026.2"

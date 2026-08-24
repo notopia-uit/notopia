@@ -4,7 +4,7 @@ import { ModeToggle } from './theme-mode-toggle';
 export default function LandingFooter() {
   return (
     <footer className="border-t">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 p-6  md:flex-row">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 p-6 md:flex-row">
         <div>
           <div className="space-y-1">
             <h4 className="text-sm font-semibold leading-none">Notopia</h4>

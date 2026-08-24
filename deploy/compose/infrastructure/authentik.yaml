@@ -3,7 +3,7 @@
 services:
   authentik_server:
     container_name: notopia-authentik_server
-    image: ghcr.io/goauthentik/server:2026.2.3
+    image: ghcr.io/goauthentik/server:2026.8.0
     command: server
     environment:
       AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql
@@ -28,7 +28,7 @@ services:
 
   authentik_worker:
     container_name: notopia-authentik_worker
-    image: ghcr.io/goauthentik/server:2026.2.3
+    image: ghcr.io/goauthentik/server:2026.8.0
     command: worker
     environment:
       AUTHENTIK_POSTGRESQL__HOST: authentik_postgresql

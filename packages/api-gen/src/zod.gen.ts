@@ -2,6 +2,8 @@
 
 import * as z from 'zod';
 
+import { NoteTrashedBy, NoteWorkspaceRole, ShareTrashedBy, ShareWorkspaceRole } from './types.gen';
+
 export const zShareNoteCreatedEvent = z.object({
     id: z.uuid(),
     workspaceId: z.uuid(),
@@ -29,7 +31,7 @@ export const zShareDocumentCommittedEvent = zShareDocument.and(z.object({
     outgoingLinkIds: z.array(z.uuid())
 }));
 
-export const zShareTrashedBy = z.enum(['purpose', 'parent']);
+export const zShareTrashedBy = z.enum(ShareTrashedBy);
 
 export const zShareTrashed = z.object({
     by: zShareTrashedBy,
@@ -74,11 +76,7 @@ export const zShareWorkspaceMemberRemovedEvent = z.object({
     userId: zShareId
 });
 
-export const zShareWorkspaceRole = z.enum([
-    'owner',
-    'editor',
-    'viewer'
-]);
+export const zShareWorkspaceRole = z.enum(ShareWorkspaceRole);
 
 export const zShareUserWorkspaceRoleUpdatedEvent = z.object({
     workspaceId: zShareId2,
@@ -128,7 +126,7 @@ export const zDocumentRevisionWithContent = zDocumentRevision.and(z.object({
 
 export const zDocumentName = z.string().min(1).max(255).nullable();
 
-export const zNoteTrashedBy = z.enum(['purpose', 'parent']);
+export const zNoteTrashedBy = z.enum(NoteTrashedBy);
 
 export const zNoteFolder = z.object({
     id: z.uuid().readonly(),
@@ -204,11 +202,7 @@ export const zNoteWorkspace = z.object({
 
 export const zNoteId3 = z.uuid().readonly();
 
-export const zNoteWorkspaceRole = z.enum([
-    'owner',
-    'editor',
-    'viewer'
-]);
+export const zNoteWorkspaceRole = z.enum(NoteWorkspaceRole);
 
 export const zNoteUserWorkspace = z.object({
     workspace: zNoteWorkspace,

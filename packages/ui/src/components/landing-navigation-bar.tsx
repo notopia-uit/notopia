@@ -38,7 +38,7 @@ export default function LandingNavigationBar() {
 
       <div className="flex shrink-0 items-center gap-2">
         <Button variant="outline" size="icon" className="rounded-lg" aria-label="GitHub">
-          <Icons.Github className="size-4 " />
+          <Icons.Github className="size-4" />
         </Button>
       </div>
     </div>

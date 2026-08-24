@@ -68,9 +68,9 @@ type MockIntegrationPublisher_Publish_Call struct {
 // Publish is a helper method to define mock.On call
 //   - ctx context.Context
 //   - event ...IntegrationEvent
-func (_e *MockIntegrationPublisher_Expecter) Publish(ctx interface{}, event ...interface{}) *MockIntegrationPublisher_Publish_Call {
+func (_e *MockIntegrationPublisher_Expecter) Publish(ctx any, event ...any) *MockIntegrationPublisher_Publish_Call {
 	return &MockIntegrationPublisher_Publish_Call{Call: _e.mock.On("Publish",
-		append([]interface{}{ctx}, event...)...)}
+		append([]any{ctx}, event...)...)}
 }
 
 func (_c *MockIntegrationPublisher_Publish_Call) Run(run func(ctx context.Context, event ...IntegrationEvent)) *MockIntegrationPublisher_Publish_Call {
