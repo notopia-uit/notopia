@@ -204,6 +204,9 @@ catalogs:
     autoprefixer:
       specifier: ^10.4.27
       version: 10.4.27
+    better-auth:
+      specifier: ~1.6.11
+      version: 1.6.30
     class-variance-authority:
       specifier: ^0.7.1
       version: 0.7.1
@@ -219,9 +222,6 @@ catalogs:
     express:
       specifier: ^5.2.1
       version: 5.2.1
-    jose:
-      specifier: ^6.2.3
-      version: 6.2.9
     kafkajs:
       specifier: ^2.2.4
       version: 2.2.4
@@ -653,7 +653,7 @@ importers:
         version: 5.2.1
       jose:
         specifier: 'catalog:'
-        version: 6.2.9
+        version: 6.2.10
       kafkajs:
         specifier: 'catalog:'
         version: 2.2.4
@@ -12940,9 +12940,6 @@ packages:
 
   jose@6.2.10:
     resolution: {integrity: sha512-iiW7J9qRFlGxvCOIBDBDxFePQSn7ZMAnrYGhrrOo6siO/MIqwfyilLR27pkfDgUk+raLuzADS8A3S/KLBisc0g==}
-
-  jose@6.2.9:
-    resolution: {integrity: sha512-XrchZOFZUl/T3vTwRe8XK+cJrGtMF4th1ARnDfwbBXFKThGhlsxEE4Zu03AD/bjJSt/9jT/mxrOCkJWOg77aPA==}
 
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
@@ -34174,8 +34171,6 @@ snapshots:
       '@standard-schema/spec': 1.1.0
 
   jose@6.2.10: {}
-
-  jose@6.2.9: {}
 
   joycon@3.1.1: {}
 
