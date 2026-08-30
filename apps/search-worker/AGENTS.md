@@ -1,95 +1,29 @@
-# Search Worker
+# Search Worker (nx: `search-worker`)
 
-## Service Purpose
+Pure Kafka consumer → Meilisearch. No HTTP API. Small enough that `src/` is flat:
+`app.controller.ts` (event handlers), `app.service.ts` (indexing), config, otel, errors.
 
-The Search Worker indexes note and document data into Meilisearch to power full-text search across the Notopia application. It is responsible for:
+## Topics consumed (`app.controller.ts`)
 
-- **Note Indexing** — Indexing note metadata (name, workspace, folder, trashed state) on creation and update
-- **Document Content Indexing** — Converting BlockNote structured content to searchable text on document commit
-- **Search Index Maintenance** — Maintaining a searchable index that the frontend queries via scoped tenant tokens
+| Topic | Effect |
+| --- | --- |
+| `events.integration.note.note.created` | Insert note metadata (name, workspace) |
+| `events.integration.note.note.updated` | Update name, folder, trashed state |
+| `events.integration.document.document.committed` | Convert BlockNote blocks → markdown, index as content |
 
-## Architecture Pattern
+Content is only indexed on **commit**, not on edit — an uncommitted document is invisible
+to search. See `apps/document/AGENTS.md`.
 
-Simple NestJS Kafka consumer (microservice pattern). The service has no REST API beyond the implicit health endpoint. It is a pure event-driven consumer.
+## Things worth knowing
 
-### Component Structure
-
-```
-AppModule (root)
-├── ConfigModule       — Zod-validated env config
-├── LoggerModule       — Structured logging
-├── OpenTelemetryModule — Observability
-├── Providers
-│   ├── Meilisearch    — Search index client
-│   ├── BlockNote Schema — Content parsing
-│   └── AppService     — Indexing business logic
-└── Controllers
-    └── AppController  — Kafka event handlers
-```
-
-## High-Level Structure
-
-```
-apps/search-worker/
-├── src/
-│   ├── Bootstrap                  — NestJS application entry and root module
-│   ├── Configuration              — Zod schemas and environment validation
-│   ├── Kafka Transport            — Kafka microservice configuration
-│   ├── Event Handlers             — Kafka event consumer logic
-│   ├── Indexing Service           — Search index operations
-│   ├── Observability              — OpenTelemetry setup
-│   └── Error Handling             — Retry logic and exception filters
-├── seed/                          — Seed data scripts
-├── Build & Deploy Config          — Docker and Nx configuration
-└── Dependencies                   — Package manifest
-```
-
-## API Contracts Served
-
-None. The Search Worker exposes no HTTP API beyond the default health endpoint. It is a pure Kafka consumer.
-
-### Kafka Topics Consumed
-
-The service listens to three integration event topics:
-
-- Note creation events — Index new note metadata
-- Note update events — Update indexed note metadata
-- Document commit events — Index document content
-
-## Communication Pattern
-
-| Channel | Direction | Purpose |
-|---|---|---|
-| **Kafka (Consumer)** | Note Service / Document Service → Worker | Listens to integration events for note lifecycle and document commits |
-| **Meilisearch** | Worker → Search Index | Indexes note metadata and converted document content |
-| **Health Endpoint** | External → Worker | Default NestJS health check |
-
-## Key Technologies & Patterns
-
-### NestJS Kafka Microservice
-Event-driven consumer using NestJS microservices pattern. Event handlers receive typed payloads from generated API types. Error handling with retry logic and max-retry exception filter.
-
-### BlockNote Content Conversion
-BlockNote schema for parsing structured content. Conversion to searchable text format (Markdown) for full-text indexing without storing full JSON structure.
-
-### Meilisearch for Full-Text Search
-Single search index updated via upsert semantics. Supports scoped tenant tokens for frontend queries.
-
-### Generated Event Types
-Event payload types imported from shared API generation package, ensuring type safety across service boundaries.
-
-### Zod Configuration Validation
-All configuration (app, kafka, meilisearch) defined as Zod schemas and validated at startup.
-
-### OpenTelemetry Observability
-Auto-instrumentation for Kafka, logging, and runtime metrics.
-
-### Structured Logging
-JSON logging with pretty-print in development. Exception serialization includes stack traces.
-
-## Dependencies
-
-| Dependency | Purpose |
-|---|---|
-| **Kafka** | Integration event consumer |
-| **Meilisearch** | Full-text search index |
+- Payload types come from `@notopia-uit/api-share-gen`; add new event shapes in
+  `api/share/components/schemas/`, not here.
+- Upsert semantics — a partial document (`model.ts`: `Partial<NoteSearch> & { id }`) is a
+  valid update, which is why the note-created and document-committed handlers can each
+  write disjoint fields of the same record.
+- The frontend never queries Meilisearch with the master key; it uses scoped tenant tokens
+  minted by `internal/note` (`q_workspacesearchtoken.go`). Index-level filterable attributes
+  must line up with the filters those tokens embed.
+- `kafka-max-retry.exception-filter.ts` bounds retries — a handler that throws is retried,
+  then dropped. Don't rely on a throw to reprocess later.
+- `seed/` re-indexes from scratch against a running Meilisearch.

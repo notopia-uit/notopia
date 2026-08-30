@@ -1,1 +1,1 @@
-../../cmd/note/CLAUDE.md
+AGENTS.md
