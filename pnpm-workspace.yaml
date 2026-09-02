@@ -96,7 +96,7 @@ catalog:
   next: "^16.2.6"
   nx-oxlint: "1.0.0-rc1"
   oidc-client-ts: "^3.5.0"
-  oxfmt: "^0.48.0"
+  oxfmt: "^0.66.0"
   oxlint: "^1.63.0"
   oxlint-tsgolint: "^0.22.1"
   pino-http: "^11.0.0"
