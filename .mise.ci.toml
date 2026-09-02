@@ -24,7 +24,7 @@ gotestsum = "1.13.0"
 "go:github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter" = "0.1.0"
 protoc-gen-go = "1.36.11"
 protoc-gen-go-grpc = "1.6.2"
-"npm:ts-proto" = "2.11.8"
+"npm:ts-proto" = "2.11.10"
 
 [tools."http:plantuml"]
 version = "1.2026.2"
