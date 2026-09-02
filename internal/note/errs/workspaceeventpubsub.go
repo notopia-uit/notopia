@@ -2,7 +2,7 @@ package errs
 
 import "github.com/google/uuid"
 
-var (
+const (
 	CodeWorkspaceEventPubSubFailedToCreateMessage Code = "workspaceEventPubSubFailedToCreateMessage"
 	CodeWorkspaceEventPubSubPublishFailed         Code = "workspaceEventPubSubPublishFailed"
 	CodeWorkspaceEventPubSubSubscribeFailed       Code = "workspaceEventPubSubSubscribeFailed"

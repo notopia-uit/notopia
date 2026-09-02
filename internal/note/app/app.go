@@ -134,19 +134,19 @@ func NewQueries(
 ) *Queries {
 	hp := (*commonhandler.HandlerProvider)(handlerProvider)
 	return &Queries{
-		CheckWorkspaceSlugExists: CheckWorkspaceSlugExistsQuery(commonhandler.DecorateQuery(hp, CheckWorkspaceSlugExistsHandler)),
-		GetMyWorkspaces:          GetMyWorkspacesQuery(commonhandler.DecorateQuery(hp, GetMyWorkspacesHandler)),
-		GetNoteGraph:             GetNoteGraphQuery(commonhandler.DecorateQuery(hp, GetNoteGraphHandler)),
-		GetNote:                  GetNoteQuery(commonhandler.DecorateQuery(hp, GetNoteHandler)),
-		GetNoteLinks:             GetNoteLinksQuery(commonhandler.DecorateQuery(hp, GetNoteLinksHandler)),
-		GetWorkspaceByNote:       GetWorkspaceByNoteQuery(commonhandler.DecorateQuery(hp, GetWorkspaceByNoteHandler)),
-		GetWorkspaceGraph:        GetWorkspaceGraphQuery(commonhandler.DecorateQuery(hp, GetWorkspaceGraphHandler)),
-		GetWorkspace:             GetWorkspaceBySlugQuery(commonhandler.DecorateQuery(hp, GetWorkspaceHandler)),
-		GetWorkspaceMembers:      GetWorkspaceMembersQuery(commonhandler.DecorateQuery(hp, GetWorkspaceMembersHandler)),
-		GetWorkspaceSearchToken:  GetWorkspaceSearchTokenQuery(commonhandler.DecorateQuery(hp, GetWorkspaceSearchTokenHandler)),
-		GetWorkspaceTree:         GetWorkspaceTreeQuery(commonhandler.DecorateQuery(hp, GetWorkspaceTreeHandler)),
-		SearchUsers:              SearchUsersQuery(commonhandler.DecorateQuery(hp, SearchUsersHandler)),
-		ShowTrash:                ShowTrashQuery(commonhandler.DecorateQuery(hp, ShowTrashHandler)),
+		CheckWorkspaceSlugExists: commonhandler.DecorateQuery(hp, CheckWorkspaceSlugExistsHandler),
+		GetMyWorkspaces:          commonhandler.DecorateQuery(hp, GetMyWorkspacesHandler),
+		GetNoteGraph:             commonhandler.DecorateQuery(hp, GetNoteGraphHandler),
+		GetNote:                  commonhandler.DecorateQuery(hp, GetNoteHandler),
+		GetNoteLinks:             commonhandler.DecorateQuery(hp, GetNoteLinksHandler),
+		GetWorkspaceByNote:       commonhandler.DecorateQuery(hp, GetWorkspaceByNoteHandler),
+		GetWorkspaceGraph:        commonhandler.DecorateQuery(hp, GetWorkspaceGraphHandler),
+		GetWorkspace:             commonhandler.DecorateQuery(hp, GetWorkspaceHandler),
+		GetWorkspaceMembers:      commonhandler.DecorateQuery(hp, GetWorkspaceMembersHandler),
+		GetWorkspaceSearchToken:  commonhandler.DecorateQuery(hp, GetWorkspaceSearchTokenHandler),
+		GetWorkspaceTree:         commonhandler.DecorateQuery(hp, GetWorkspaceTreeHandler),
+		SearchUsers:              commonhandler.DecorateQuery(hp, SearchUsersHandler),
+		ShowTrash:                commonhandler.DecorateQuery(hp, ShowTrashHandler),
 	}
 }
 
