@@ -3,7 +3,7 @@
 services:
   meilisearch:
     container_name: notopia-meilisearch
-    image: getmeili/meilisearch:v1.41
+    image: getmeili/meilisearch:v1.53
     environment:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-notopiauit}
       MEILI_NO_ANALYTICS: "true"
