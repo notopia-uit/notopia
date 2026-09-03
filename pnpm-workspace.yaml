@@ -52,7 +52,7 @@ catalog:
   "@rsdoctor/rspack-plugin": "^1.5.11"
   "@rspack/cli": "^1.7.11"
   "@rspack/core": "^1.7.11"
-  "@rspack/dev-server": "^1.2.1"
+  "@rspack/dev-server": "^2.0.0"
   "@scalar/cli": "^1.9.2"
   "@suites/di.nestjs": "~3.1.0"
   "@suites/doubles.vitest": "~3.1.0"
