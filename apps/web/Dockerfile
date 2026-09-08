@@ -1,4 +1,4 @@
-FROM node:25.6.1-alpine3.23 AS production
+FROM node:25.9.0-alpine3.23 AS production
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
