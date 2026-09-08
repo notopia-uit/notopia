@@ -1,9 +1,8 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "cn"
 import { Avatar as AvatarPrimitive } from "radix-ui"
-
-import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
 
 function Avatar({
   className,

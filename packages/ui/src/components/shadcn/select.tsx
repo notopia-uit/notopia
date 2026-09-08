@@ -1,9 +1,8 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "cn"
 import { Select as SelectPrimitive } from "radix-ui"
-
-import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
 function Select({

@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "cn"
 import { AlertDialog as AlertDialogPrimitive } from "radix-ui"
 
-import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
 import { Button } from "@notopia-uit/ui/components/shadcn/button"
 
 function AlertDialog({

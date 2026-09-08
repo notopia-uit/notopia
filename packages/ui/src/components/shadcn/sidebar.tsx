@@ -2,10 +2,10 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "cn"
 import { Slot } from "radix-ui"
 
 import { useIsMobile } from "@notopia-uit/ui/hooks/shadcn/use-mobile"
-import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
 import { Button } from "@notopia-uit/ui/components/shadcn/button"
 import { Input } from "@notopia-uit/ui/components/shadcn/input"
 import { Separator } from "@notopia-uit/ui/components/shadcn/separator"
@@ -472,7 +472,7 @@ const sidebarMenuButtonVariants = cva(
       variant: {
         default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         outline:
-          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
+          "bg-background shadow-[0_0_0_1px_var(--sidebar-border)] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_var(--sidebar-accent)]",
       },
       size: {
         default: "h-8 text-sm",

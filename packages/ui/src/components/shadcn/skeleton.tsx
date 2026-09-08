@@ -1,4 +1,4 @@
-import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
+import { cn } from "cn"
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (

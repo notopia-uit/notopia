@@ -1,9 +1,8 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "cn"
 import { Tooltip as TooltipPrimitive } from "radix-ui"
-
-import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
 
 function TooltipProvider({
   delayDuration = 0,

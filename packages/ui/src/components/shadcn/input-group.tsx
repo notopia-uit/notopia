@@ -2,8 +2,8 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "cn"
 
-import { cn } from "@notopia-uit/ui/lib/shadcn/utils"
 import { Button } from "@notopia-uit/ui/components/shadcn/button"
 import { Input } from "@notopia-uit/ui/components/shadcn/input"
 import { Textarea } from "@notopia-uit/ui/components/shadcn/textarea"
