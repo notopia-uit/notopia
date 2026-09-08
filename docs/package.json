@@ -2,7 +2,7 @@
   "name": "@notopia-uit/docs",
   "private": true,
   "dependencies": {
-    "@catppuccin/vitepress": "0.1.2",
+    "@catppuccin/vitepress": "0.1.4",
     "@notopia-uit/api": "workspace:",
     "pagefind": "1.5.2",
     "vitepress-mermaid-renderer": "1.1.24",

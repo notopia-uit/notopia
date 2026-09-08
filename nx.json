@@ -76,7 +76,6 @@
       "plugin": "@nx/js/typescript",
       "exclude": ["packages/api-gen/**"],
       "options": {
-        "compiler": "tsgo",
         "typecheck": {
           "targetName": "typecheck"
         },
@@ -91,7 +90,6 @@
     {
       "plugin": "@nx/vite/plugin",
       "options": {
-        "compiler": "tsgo",
         "buildTargetName": "build",
         "testTargetName": "test",
         "serveTargetName": "serve",
