@@ -33,6 +33,9 @@ catalogs:
     '@floating-ui/dom':
       specifier: ^1.7.6
       version: 1.7.6
+    '@grpc/grpc-js':
+      specifier: ~1.14.3
+      version: 1.14.4
     '@grpc/proto-loader':
       specifier: ~0.8.1
       version: 0.8.1
@@ -231,9 +234,6 @@ catalogs:
     markdown-to-txt:
       specifier: ^2.0.1
       version: 2.0.1
-    marked:
-      specifier: ^18.0.3
-      version: 18.0.11
     meilisearch:
       specifier: 0.58.0
       version: 0.58.0
@@ -548,7 +548,7 @@ importers:
         version: 2.30.6(@opentelemetry/api@1.9.1)(core-js@3.48.0)(css-to-react-native@3.2.0)(encoding@0.1.13)
       '@scalar/cli':
         specifier: 'catalog:'
-        version: 2.1.0(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(encoding@0.1.13)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+        version: 2.1.0(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(encoding@0.1.13)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
 
   apps/api-web:
     dependencies:
@@ -557,7 +557,7 @@ importers:
         version: link:../../api
       '@scalar/api-reference-react':
         specifier: 0.9.38
-        version: 0.9.38(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(jwt-decode@4.0.0)(react@19.2.8)(tailwindcss@4.3.3)(zod@4.5.4)
+        version: 0.9.38(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(jwt-decode@4.0.0)(react@19.2.8)(tailwindcss@4.3.3)(zod@4.5.4)
 
   apps/document:
     dependencies:
@@ -611,7 +611,7 @@ importers:
         version: 11.1.21(@nestjs/common@11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)
       '@nestjs/typeorm':
         specifier: 'catalog:'
-        version: 11.0.3(@nestjs/common@11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.4.1)(@typescript/typescript6@6.0.2)))
+        version: 11.0.3(@nestjs/common@11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.5.0)(@typescript/typescript6@6.0.2)))
       '@notopia-uit/api-document-nestjs-server':
         specifier: 'workspace:'
         version: link:../../packages/api-document-nestjs-server
@@ -659,7 +659,7 @@ importers:
         version: 2.2.4
       marked:
         specifier: 'catalog:'
-        version: 18.0.11
+        version: 18.0.12
       nestjs-otel:
         specifier: 'catalog:'
         version: 8.0.3(@nestjs/common@11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)
@@ -692,7 +692,7 @@ importers:
         version: 2.8.1
       typeorm:
         specifier: 'catalog:'
-        version: 0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.4.1)(@typescript/typescript6@6.0.2))
+        version: 0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.5.0)(@typescript/typescript6@6.0.2))
       ws:
         specifier: 'catalog:'
         version: 8.20.1
@@ -738,7 +738,7 @@ importers:
         version: 4.21.1
       typeorm-extension:
         specifier: 'catalog:'
-        version: 3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.4.1)(@typescript/typescript6@6.0.2)))
+        version: 3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.5.0)(@typescript/typescript6@6.0.2)))
       unplugin-swc:
         specifier: 'catalog:'
         version: 1.5.9(@swc/core@1.15.33(@swc/helpers@0.5.21))(rollup@4.59.0)
@@ -862,7 +862,7 @@ importers:
         version: link:../../packages/ui
       '@tailwindcss/vite':
         specifier: 'catalog:'
-        version: 4.2.4(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
+        version: 4.2.4(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
       oidc-client-ts:
         specifier: 'catalog:'
         version: 3.5.0
@@ -974,20 +974,20 @@ importers:
         version: 1.1.24(mermaid@11.13.0)(vue@3.5.40(@typescript/typescript6@6.0.2))
       vitepress-openapi:
         specifier: 0.1.20
-        version: 0.1.20(vitepress@2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.40(@typescript/typescript6@6.0.2))
+        version: 0.1.20(vitepress@2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.40(@typescript/typescript6@6.0.2))
       vitepress-plugin-pagefind:
         specifier: 0.4.20
-        version: 0.4.20(pagefind@1.5.2)(vitepress@2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.40(@typescript/typescript6@6.0.2))
+        version: 0.4.20(pagefind@1.5.2)(vitepress@2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.40(@typescript/typescript6@6.0.2))
     devDependencies:
       get-port:
         specifier: 7.2.0
         version: 7.2.0
       vitepress:
         specifier: 2.0.0-alpha.17
-        version: 2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+        version: 2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
       vitepress-plugin-diagrams:
         specifier: 1.3.1
-        version: 1.3.1(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
+        version: 1.3.1(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
       vitepress-sidebar:
         specifier: 1.33.2
         version: 1.33.2
@@ -13761,8 +13761,8 @@ packages:
     engines: {node: '>= 20'}
     hasBin: true
 
-  marked@18.0.11:
-    resolution: {integrity: sha512-HnslJfsZkRPBDJRHvVtAaWlZHEpSu7u8LgQuJCELjRKuWR+hpq4A7sLq3p8HaI9ypVoXDXxV34CsQJEe1+J5Aw==}
+  marked@18.0.12:
+    resolution: {integrity: sha512-LEm4ga2YeI2T3GVHj9b0BaDPPk93LLTHMFeMyQbNIzPxc8vCI0y/scy0ZA6z6lXKyT9j9Nhl/OC6ZYKYGuFScA==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -20850,14 +20850,6 @@ snapshots:
       '@types/node': 25.6.2
     optional: true
 
-  '@inquirer/confirm@5.1.21(@types/node@26.4.1)':
-    dependencies:
-      '@inquirer/core': 10.3.2(@types/node@26.4.1)
-      '@inquirer/type': 3.0.10(@types/node@26.4.1)
-    optionalDependencies:
-      '@types/node': 26.4.1
-    optional: true
-
   '@inquirer/confirm@5.1.21(@types/node@26.5.0)':
     dependencies:
       '@inquirer/core': 10.3.2(@types/node@26.5.0)
@@ -20878,20 +20870,6 @@ snapshots:
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
       '@types/node': 25.6.2
-    optional: true
-
-  '@inquirer/core@10.3.2(@types/node@26.4.1)':
-    dependencies:
-      '@inquirer/ansi': 1.0.2
-      '@inquirer/figures': 1.0.15
-      '@inquirer/type': 3.0.10(@types/node@26.4.1)
-      cli-width: 4.1.0
-      mute-stream: 2.0.0
-      signal-exit: 4.1.0
-      wrap-ansi: 6.2.0
-      yoctocolors-cjs: 2.1.3
-    optionalDependencies:
-      '@types/node': 26.4.1
     optional: true
 
   '@inquirer/core@10.3.2(@types/node@26.5.0)':
@@ -20943,11 +20921,6 @@ snapshots:
   '@inquirer/type@3.0.10(@types/node@25.6.2)':
     optionalDependencies:
       '@types/node': 25.6.2
-    optional: true
-
-  '@inquirer/type@3.0.10(@types/node@26.4.1)':
-    optionalDependencies:
-      '@types/node': 26.4.1
     optional: true
 
   '@inquirer/type@3.0.10(@types/node@26.5.0)':
@@ -22175,13 +22148,13 @@ snapshots:
       '@nestjs/microservices': 11.1.21(@grpc/grpc-js@1.14.4)(@nestjs/common@11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(@nestjs/websockets@11.1.20)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express': 11.1.21(@nestjs/common@11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)
 
-  '@nestjs/typeorm@11.0.3(@nestjs/common@11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.4.1)(@typescript/typescript6@6.0.2)))':
+  '@nestjs/typeorm@11.0.3(@nestjs/common@11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.5.0)(@typescript/typescript6@6.0.2)))':
     dependencies:
       '@nestjs/common': 11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.21(@nestjs/common@11.1.21(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.1.21)(@nestjs/platform-express@11.1.21)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
-      typeorm: 0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.4.1)(@typescript/typescript6@6.0.2))
+      typeorm: 0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.5.0)(@typescript/typescript6@6.0.2))
 
   '@nestjs/websockets@11.1.20(@nestjs/common@11.1.17(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.3)(@nestjs/platform-socket.io@11.1.16)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
     dependencies:
@@ -25698,10 +25671,10 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@scalar/agent-chat@0.12.2(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)(zod@4.5.4)':
+  '@scalar/agent-chat@0.12.2(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)(zod@4.5.4)':
     dependencies:
       '@ai-sdk/vue': 3.0.33(vue@3.5.34(@typescript/typescript6@6.0.2))(zod@4.5.4)
-      '@scalar/api-client': 3.8.2(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)
+      '@scalar/api-client': 3.8.2(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)
       '@scalar/components': 0.25.0(@typescript/typescript6@6.0.2)(tailwindcss@4.3.3)
       '@scalar/helpers': 0.8.0
       '@scalar/icons': 0.7.2(@typescript/typescript6@6.0.2)
@@ -25736,7 +25709,7 @@ snapshots:
       - universal-cookie
       - zod
 
-  '@scalar/api-client@3.8.2(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)':
+  '@scalar/api-client@3.8.2(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)':
     dependencies:
       '@headlessui/tailwindcss': 0.2.2(tailwindcss@4.3.3)
       '@headlessui/vue': 1.7.23(vue@3.5.34(@typescript/typescript6@6.0.2))
@@ -25757,7 +25730,7 @@ snapshots:
       '@scalar/workspace-store': 0.51.0(@typescript/typescript6@6.0.2)
       '@types/har-format': 1.2.16
       '@vueuse/core': 13.9.0(vue@3.5.34(@typescript/typescript6@6.0.2))
-      '@vueuse/integrations': 13.9.0(axios@1.18.1)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(jwt-decode@4.0.0)(vue@3.5.34(@typescript/typescript6@6.0.2))
+      '@vueuse/integrations': 13.9.0(axios@1.20.0)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(jwt-decode@4.0.0)(vue@3.5.34(@typescript/typescript6@6.0.2))
       cookie: 1.1.1
       focus-trap: 7.8.0
       fuse.js: 7.1.0
@@ -25786,9 +25759,9 @@ snapshots:
       - typescript
       - universal-cookie
 
-  '@scalar/api-reference-react@0.9.38(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(jwt-decode@4.0.0)(react@19.2.8)(tailwindcss@4.3.3)(zod@4.5.4)':
+  '@scalar/api-reference-react@0.9.38(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(jwt-decode@4.0.0)(react@19.2.8)(tailwindcss@4.3.3)(zod@4.5.4)':
     dependencies:
-      '@scalar/api-reference': 1.57.2(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)(zod@4.5.4)
+      '@scalar/api-reference': 1.57.2(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)(zod@4.5.4)
       '@scalar/types': 0.11.0
       react: 19.2.8
     transitivePeerDependencies:
@@ -25808,11 +25781,11 @@ snapshots:
       - universal-cookie
       - zod
 
-  '@scalar/api-reference@1.57.2(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)(zod@4.5.4)':
+  '@scalar/api-reference@1.57.2(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)(zod@4.5.4)':
     dependencies:
       '@headlessui/vue': 1.7.23(vue@3.5.34(@typescript/typescript6@6.0.2))
-      '@scalar/agent-chat': 0.12.2(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)(zod@4.5.4)
-      '@scalar/api-client': 3.8.2(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)
+      '@scalar/agent-chat': 0.12.2(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)(zod@4.5.4)
+      '@scalar/api-client': 3.8.2(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(jwt-decode@4.0.0)(tailwindcss@4.3.3)
       '@scalar/code-highlight': 0.3.4
       '@scalar/components': 0.25.0(@typescript/typescript6@6.0.2)(tailwindcss@4.3.3)
       '@scalar/helpers': 0.8.0
@@ -25855,7 +25828,7 @@ snapshots:
     dependencies:
       '@scalar/helpers': 0.9.2
 
-  '@scalar/cli@2.1.0(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(encoding@0.1.13)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)':
+  '@scalar/cli@2.1.0(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(encoding@0.1.13)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)':
     dependencies:
       '@clack/prompts': 0.7.0
       '@fastify/static': 9.1.3
@@ -25892,7 +25865,7 @@ snapshots:
       tailwindcss: 4.1.18
       tar-fs: 3.1.2
       undici: 7.28.0
-      vite: 8.0.16(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+      vite: 8.0.16(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - '@vitejs/devtools'
@@ -26975,7 +26948,7 @@ snapshots:
       '@suites/types.di': 3.1.0
       '@suites/types.doubles': 3.1.0
       '@vitest/spy': 5.0.0
-      vitest: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.4.1)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(msw@2.12.10(@types/node@26.4.1)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
+      vitest: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.5.0)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(msw@2.12.10(@types/node@26.5.0)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
 
   '@suites/types.common@3.1.0': {}
 
@@ -27244,12 +27217,12 @@ snapshots:
       postcss: 8.5.28
       tailwindcss: 4.2.4
 
-  '@tailwindcss/vite@4.2.4(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))':
+  '@tailwindcss/vite@4.2.4(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))':
     dependencies:
       '@tailwindcss/node': 4.2.4
       '@tailwindcss/oxide': 4.2.4
       tailwindcss: 4.2.4
-      vite: 8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+      vite: 8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
 
   '@tanstack/query-core@5.90.20': {}
 
@@ -28253,10 +28226,10 @@ snapshots:
       '@rolldown/pluginutils': 1.0.1
       vite: 8.0.13(@types/node@25.6.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
 
-  '@vitejs/plugin-vue@6.0.4(vite@7.3.1(@types/node@26.4.1)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.29(@typescript/typescript6@6.0.2))':
+  '@vitejs/plugin-vue@6.0.4(vite@7.3.1(@types/node@26.5.0)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.29(@typescript/typescript6@6.0.2))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-rc.2
-      vite: 7.3.1(@types/node@26.4.1)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+      vite: 7.3.1(@types/node@26.5.0)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
       vue: 3.5.29(@typescript/typescript6@6.0.2)
 
   '@vitest/coverage-v8@5.0.0(vitest@5.0.0)':
@@ -28269,7 +28242,7 @@ snapshots:
       obug: 2.1.4
       std-env: 4.2.0
       tinyrainbow: 3.1.1
-      vitest: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.4.1)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(msw@2.12.10(@types/node@26.4.1)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
+      vitest: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.5.0)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(msw@2.12.10(@types/node@26.5.0)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
 
   '@vitest/expect@4.1.11':
     dependencies:
@@ -28307,15 +28280,15 @@ snapshots:
       msw: 2.12.10(@types/node@25.6.2)(@typescript/typescript6@6.0.2)
       vite: 8.0.13(@types/node@25.6.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
 
-  '@vitest/mocker@5.0.0(msw@2.12.10(@types/node@26.4.1)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))':
+  '@vitest/mocker@5.0.0(msw@2.12.10(@types/node@26.5.0)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@vitest/spy': 5.0.0
       estree-walker: 3.0.3
       magic-string: 1.2.3
     optionalDependencies:
-      msw: 2.12.10(@types/node@26.4.1)(@typescript/typescript6@6.0.2)
-      vite: 8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+      msw: 2.12.10(@types/node@26.5.0)(@typescript/typescript6@6.0.2)
+      vite: 8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
 
   '@vitest/pretty-format@4.1.11':
     dependencies:
@@ -28353,7 +28326,7 @@ snapshots:
       pathe: 2.0.3
       sirv: 3.0.2
       tinyrainbow: 3.1.1
-      vitest: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.4.1)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(msw@2.12.10(@types/node@26.4.1)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
+      vitest: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.5.0)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(msw@2.12.10(@types/node@26.5.0)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
 
   '@vitest/utils@4.1.11':
     dependencies:
@@ -28636,25 +28609,25 @@ snapshots:
       '@vueuse/shared': 14.2.1(vue@3.5.40(@typescript/typescript6@6.0.2))
       vue: 3.5.40(@typescript/typescript6@6.0.2)
 
-  '@vueuse/integrations@13.9.0(axios@1.18.1)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(jwt-decode@4.0.0)(vue@3.5.34(@typescript/typescript6@6.0.2))':
+  '@vueuse/integrations@13.9.0(axios@1.20.0)(change-case@5.4.4)(focus-trap@7.8.0)(fuse.js@7.1.0)(jwt-decode@4.0.0)(vue@3.5.34(@typescript/typescript6@6.0.2))':
     dependencies:
       '@vueuse/core': 13.9.0(vue@3.5.34(@typescript/typescript6@6.0.2))
       '@vueuse/shared': 13.9.0(vue@3.5.34(@typescript/typescript6@6.0.2))
       vue: 3.5.34(@typescript/typescript6@6.0.2)
     optionalDependencies:
-      axios: 1.18.1
+      axios: 1.20.0
       change-case: 5.4.4
       focus-trap: 7.8.0
       fuse.js: 7.1.0
       jwt-decode: 4.0.0
 
-  '@vueuse/integrations@14.2.1(axios@1.18.1)(change-case@5.4.4)(focus-trap@8.0.1)(fuse.js@7.1.0)(jwt-decode@4.0.0)(vue@3.5.29(@typescript/typescript6@6.0.2))':
+  '@vueuse/integrations@14.2.1(axios@1.20.0)(change-case@5.4.4)(focus-trap@8.0.1)(fuse.js@7.1.0)(jwt-decode@4.0.0)(vue@3.5.29(@typescript/typescript6@6.0.2))':
     dependencies:
       '@vueuse/core': 14.2.1(vue@3.5.29(@typescript/typescript6@6.0.2))
       '@vueuse/shared': 14.2.1(vue@3.5.29(@typescript/typescript6@6.0.2))
       vue: 3.5.29(@typescript/typescript6@6.0.2)
     optionalDependencies:
-      axios: 1.18.1
+      axios: 1.20.0
       change-case: 5.4.4
       focus-trap: 8.0.1
       fuse.js: 7.1.0
@@ -29180,17 +29153,6 @@ snapshots:
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
       - debug
-
-  axios@1.18.1:
-    dependencies:
-      follow-redirects: 1.16.0(debug@4.4.3)
-      form-data: 4.0.6
-      https-proxy-agent: 5.0.1(supports-color@7.2.0)
-      proxy-from-env: 2.1.0
-    transitivePeerDependencies:
-      - debug
-      - supports-color
-    optional: true
 
   axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0):
     dependencies:
@@ -33615,7 +33577,7 @@ snapshots:
 
   marked@16.4.2: {}
 
-  marked@18.0.11: {}
+  marked@18.0.12: {}
 
   marked@4.3.0: {}
 
@@ -34144,9 +34106,9 @@ snapshots:
       - '@types/node'
     optional: true
 
-  msw@2.12.10(@types/node@26.4.1)(@typescript/typescript6@6.0.2):
+  msw@2.12.10(@types/node@26.5.0)(@typescript/typescript6@6.0.2):
     dependencies:
-      '@inquirer/confirm': 5.1.21(@types/node@26.4.1)
+      '@inquirer/confirm': 5.1.21(@types/node@26.5.0)
       '@mswjs/interceptors': 0.41.9
       '@open-draft/deferred-promise': 2.2.0
       '@types/statuses': 2.0.6
@@ -37598,14 +37560,14 @@ snapshots:
       '@swc/core': 1.15.33(@swc/helpers@0.5.21)
     optional: true
 
-  ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.4.1)(@typescript/typescript6@6.0.2):
+  ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.5.0)(@typescript/typescript6@6.0.2):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.13
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 26.4.1
+      '@types/node': 26.5.0
       acorn: 8.18.0
       acorn-walk: 8.3.5
       arg: 4.1.3
@@ -37728,7 +37690,7 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm-extension@3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.4.1)(@typescript/typescript6@6.0.2))):
+  typeorm-extension@3.9.0(@faker-js/faker@10.4.0)(typeorm@0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.5.0)(@typescript/typescript6@6.0.2))):
     dependencies:
       '@faker-js/faker': 10.4.0
       consola: 3.4.2
@@ -37738,10 +37700,10 @@ snapshots:
       rapiq: 0.9.0
       reflect-metadata: 0.2.2
       smob: 1.6.1
-      typeorm: 0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.4.1)(@typescript/typescript6@6.0.2))
+      typeorm: 0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.5.0)(@typescript/typescript6@6.0.2))
       yargs: 18.0.0
 
-  typeorm@0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.4.1)(@typescript/typescript6@6.0.2)):
+  typeorm@0.3.31(babel-plugin-macros@3.1.0)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.5.0)(@typescript/typescript6@6.0.2)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 4.3.1
@@ -37760,7 +37722,7 @@ snapshots:
       yargs: 17.7.3
     optionalDependencies:
       pg: 8.20.0
-      ts-node: 10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.4.1)(@typescript/typescript6@6.0.2)
+      ts-node: 10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.5.0)(@typescript/typescript6@6.0.2)
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -38185,7 +38147,7 @@ snapshots:
       - rollup
       - supports-color
 
-  vite@7.3.1(@types/node@26.4.1)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0):
+  vite@7.3.1(@types/node@26.5.0)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0):
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.5)
@@ -38194,7 +38156,7 @@ snapshots:
       rollup: 4.59.0
       tinyglobby: 0.2.17
     optionalDependencies:
-      '@types/node': 26.4.1
+      '@types/node': 26.5.0
       fsevents: 2.3.3
       jiti: 2.7.0
       less: 4.5.1
@@ -38224,7 +38186,7 @@ snapshots:
       tsx: 4.21.1
       yaml: 2.9.0
 
-  vite@8.0.16(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0):
+  vite@8.0.16(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -38232,26 +38194,7 @@ snapshots:
       rolldown: 1.0.3
       tinyglobby: 0.2.17
     optionalDependencies:
-      '@types/node': 26.4.1
-      esbuild: 0.28.1
-      fsevents: 2.3.3
-      jiti: 2.7.0
-      less: 4.5.1
-      sass: 1.97.3
-      sass-embedded: 1.97.3
-      terser: 5.51.2
-      tsx: 4.21.1
-      yaml: 2.9.0
-
-  vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0):
-    dependencies:
-      lightningcss: 1.33.0
-      picomatch: 4.0.7
-      postcss: 8.5.28
-      rolldown: 1.2.7
-      tinyglobby: 0.2.17
-    optionalDependencies:
-      '@types/node': 26.4.1
+      '@types/node': 26.5.0
       esbuild: 0.28.1
       fsevents: 2.3.3
       jiti: 2.7.0
@@ -38280,14 +38223,13 @@ snapshots:
       terser: 5.51.2
       tsx: 4.21.1
       yaml: 2.9.0
-    optional: true
 
   vitepress-mermaid-renderer@1.1.24(mermaid@11.13.0)(vue@3.5.40(@typescript/typescript6@6.0.2)):
     dependencies:
       mermaid: 11.13.0
       vue: 3.5.40(@typescript/typescript6@6.0.2)
 
-  vitepress-openapi@0.1.20(vitepress@2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.40(@typescript/typescript6@6.0.2)):
+  vitepress-openapi@0.1.20(vitepress@2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.40(@typescript/typescript6@6.0.2)):
     dependencies:
       '@vueuse/core': 14.2.1(vue@3.5.40(@typescript/typescript6@6.0.2))
       class-variance-authority: 0.7.1
@@ -38295,26 +38237,26 @@ snapshots:
       lucide-vue-next: 0.577.0(vue@3.5.40(@typescript/typescript6@6.0.2))
       markdown-it-link-attributes: 4.0.1
       reka-ui: 2.9.0(vue@3.5.40(@typescript/typescript6@6.0.2))
-      vitepress: 2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+      vitepress: 2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
       vue: 3.5.40(@typescript/typescript6@6.0.2)
     transitivePeerDependencies:
       - '@vue/composition-api'
 
-  vitepress-plugin-diagrams@1.3.1(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)):
+  vitepress-plugin-diagrams@1.3.1(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vitepress@2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)):
     dependencies:
       commander: 14.0.3
       markdown-it: 14.1.1
       rimraf: 6.1.3
-      vite: 8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
-      vitepress: 2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+      vite: 8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+      vitepress: 2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
 
-  vitepress-plugin-pagefind@0.4.20(pagefind@1.5.2)(vitepress@2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.40(@typescript/typescript6@6.0.2)):
+  vitepress-plugin-pagefind@0.4.20(pagefind@1.5.2)(vitepress@2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.40(@typescript/typescript6@6.0.2)):
     dependencies:
       '@sugarat/theme-shared': 0.0.7
       '@vueuse/core': 14.2.1(vue@3.5.40(@typescript/typescript6@6.0.2))
       javascript-stringify: 2.1.0
       pagefind: 1.5.2
-      vitepress: 2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+      vitepress: 2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
       vue-command-palette: 0.1.4
     transitivePeerDependencies:
       - vue
@@ -38325,7 +38267,7 @@ snapshots:
       gray-matter: 4.0.3
       qsu: 1.12.0
 
-  vitepress@2.0.0-alpha.17(@types/node@26.4.1)(@typescript/typescript6@6.0.2)(axios@1.18.1)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0):
+  vitepress@2.0.0-alpha.17(@types/node@26.5.0)(@typescript/typescript6@6.0.2)(axios@1.20.0)(change-case@5.4.4)(fuse.js@7.1.0)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.5.1)(lightningcss@1.33.0)(postcss@8.5.28)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0):
     dependencies:
       '@docsearch/css': 4.6.0
       '@docsearch/js': 4.6.0
@@ -38335,16 +38277,16 @@ snapshots:
       '@shikijs/transformers': 3.23.0
       '@shikijs/types': 3.23.0
       '@types/markdown-it': 14.1.2
-      '@vitejs/plugin-vue': 6.0.4(vite@7.3.1(@types/node@26.4.1)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.29(@typescript/typescript6@6.0.2))
+      '@vitejs/plugin-vue': 6.0.4(vite@7.3.1(@types/node@26.5.0)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))(vue@3.5.29(@typescript/typescript6@6.0.2))
       '@vue/devtools-api': 8.0.7
       '@vue/shared': 3.5.29
       '@vueuse/core': 14.2.1(vue@3.5.29(@typescript/typescript6@6.0.2))
-      '@vueuse/integrations': 14.2.1(axios@1.18.1)(change-case@5.4.4)(focus-trap@8.0.1)(fuse.js@7.1.0)(jwt-decode@4.0.0)(vue@3.5.29(@typescript/typescript6@6.0.2))
+      '@vueuse/integrations': 14.2.1(axios@1.20.0)(change-case@5.4.4)(focus-trap@8.0.1)(fuse.js@7.1.0)(jwt-decode@4.0.0)(vue@3.5.29(@typescript/typescript6@6.0.2))
       focus-trap: 8.0.1
       mark.js: 8.11.1
       minisearch: 7.2.0
       shiki: 3.23.0
-      vite: 7.3.1(@types/node@26.4.1)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+      vite: 7.3.1(@types/node@26.5.0)(jiti@2.7.0)(less@4.5.1)(lightningcss@1.33.0)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
       vue: 3.5.29(@typescript/typescript6@6.0.2)
     optionalDependencies:
       postcss: 8.5.28
@@ -38430,10 +38372,10 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  vitest@5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.4.1)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(msw@2.12.10(@types/node@26.4.1)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)):
+  vitest@5.0.0(@opentelemetry/api@1.9.1)(@types/node@26.5.0)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(jsdom@29.1.1(@noble/hashes@2.4.0))(msw@2.12.10(@types/node@26.5.0)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)):
     dependencies:
       '@types/chai': 5.2.3
-      '@vitest/mocker': 5.0.0(msw@2.12.10(@types/node@26.4.1)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
+      '@vitest/mocker': 5.0.0(msw@2.12.10(@types/node@26.5.0)(@typescript/typescript6@6.0.2))(vite@8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0))
       chai: 6.2.2
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
@@ -38444,11 +38386,11 @@ snapshots:
       tinybench: 6.1.4
       tinyexec: 1.3.0
       tinyglobby: 0.2.17
-      vite: 8.2.2(@types/node@26.4.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
+      vite: 8.2.2(@types/node@26.5.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.5.1)(sass-embedded@1.97.3)(sass@1.97.3)(terser@5.51.2)(tsx@4.21.1)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
-      '@types/node': 26.4.1
+      '@types/node': 26.5.0
       '@vitest/coverage-v8': 5.0.0(vitest@5.0.0)
       '@vitest/ui': 5.0.0(vitest@5.0.0)
       jsdom: 29.1.1(@noble/hashes@2.4.0)
