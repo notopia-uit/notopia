@@ -18,6 +18,7 @@ export * from './components/shadcn/skeleton';
 export * from './components/shadcn/tooltip';
 
 export * from './lib/ui';
+export * from './lib/errors';
 export * from './block-note';
 export * from './global.d';
 export * from './contexts/meilisearch-context';
