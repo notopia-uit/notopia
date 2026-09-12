@@ -1,6 +1,6 @@
 import { getMyWorkspacesOptions } from '@notopia-uit/api-gen/index';
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
-import { WorkspaceSwitcher } from '@ui/components/workspace-switcher';
+import { WorkspaceSwitcherWrapper } from './workspace-switcher-wrapper';
 import { fetchAccessTokenServerSide } from '@lib/get-access-token';
 import { notFound } from 'next/navigation';
 
@@ -26,7 +26,7 @@ export default async function WorkspacePage() {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <main className="bg-muted/20 flex min-h-screen flex-col items-center justify-center p-4 md:p-8">
         <div className="w-full max-w-3xl">
-          <WorkspaceSwitcher />
+          <WorkspaceSwitcherWrapper />
         </div>
       </main>
     </HydrationBoundary>

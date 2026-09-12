@@ -11,12 +11,14 @@ interface WorkspaceContentWrapperProps {
   children: React.ReactNode;
   workspaceId: string;
   meilisearchHost?: string;
+  onNavigate: (href: string) => void;
 }
 
 export function WorkspaceContentWrapper({
   children,
   workspaceId,
   meilisearchHost,
+  onNavigate,
 }: WorkspaceContentWrapperProps) {
   if (!meilisearchHost) {
     console.warn(
@@ -39,7 +41,7 @@ export function WorkspaceContentWrapper({
       <WorkspaceEventsProvider workspaceId={workspaceId}>
         {children}
       </WorkspaceEventsProvider>
-      <NoteSearchModal workspaceId={workspaceId} />
+      <NoteSearchModal workspaceId={workspaceId} onNavigate={onNavigate} />
     </MeilisearchProvider>
   );
 }

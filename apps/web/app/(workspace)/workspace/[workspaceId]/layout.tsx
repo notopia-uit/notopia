@@ -2,8 +2,8 @@ import { getMyWorkspacesOptions, getWorkspaceTreeOptions } from '@notopia-uit/ap
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@ui/components/shadcn/sidebar';
 import { ModeToggle } from '@ui/components/theme-mode-toggle';
-import { WorkspaceContentWrapper } from '@ui/components/workspace-content-wrapper';
-import WorkspaceSideBar from '@ui/components/workspace-sidebar';
+import { WorkspaceContentWrapperWithNav } from './workspace-content-wrapper-with-nav';
+import { WorkspaceSideBarWrapper } from './workspace-sidebar-wrapper';
 import { fetchAccessTokenServerSide } from '@lib/get-access-token';
 import { notFound } from 'next/navigation';
 
@@ -45,12 +45,12 @@ export default async function WorkspaceLayout({ children, params }: WorkspaceLay
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <WorkspaceContentWrapper
+      <WorkspaceContentWrapperWithNav
         workspaceId={workspaceId}
         meilisearchHost={process.env.MEILISEARCH_HOST}
       >
         <SidebarProvider defaultOpen={true}>
-          <WorkspaceSideBar currentWorkspaceId={workspaceId} />
+          <WorkspaceSideBarWrapper currentWorkspaceId={workspaceId} />
           <SidebarInset className="min-w-0">
             <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
               <div className="flex items-center gap-2 px-4">
@@ -63,7 +63,7 @@ export default async function WorkspaceLayout({ children, params }: WorkspaceLay
             <div>{children}</div>
           </SidebarInset>
         </SidebarProvider>
-      </WorkspaceContentWrapper>
+      </WorkspaceContentWrapperWithNav>
     </HydrationBoundary>
   );
 }

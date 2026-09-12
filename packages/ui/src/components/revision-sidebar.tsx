@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { History, User } from 'lucide-react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 
 import { ScrollArea } from './shadcn/scroll-area';
 
@@ -42,7 +41,7 @@ const mapDtoToRevisionData = ({
   );
 };
 
-export function RevisionSidebar({ noteId }: { noteId: string }) {
+export function RevisionSidebar({ noteId, activeRevisionId }: { noteId: string; activeRevisionId?: string }) {
   const {
     data: RevisionData,
     isPending,
@@ -59,9 +58,6 @@ export function RevisionSidebar({ noteId }: { noteId: string }) {
   if (isError) {
     throw error;
   }
-
-  const params = useParams();
-  const activeRevisionId = params.revisionId as string;
 
   return isPending ? (
     <Spinner />
