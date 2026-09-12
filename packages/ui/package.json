@@ -64,6 +64,7 @@
   "peerDependencies": {
     "@blocknote/shadcn": "catalog:",
     "@tanstack/react-query": "catalog:",
+    "next": "catalog:",
     "react": "catalog:",
     "tw-animate-css": "catalog:",
     "yjs": "catalog:",

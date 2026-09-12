@@ -29,7 +29,6 @@ import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-hand
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, FilePlus, FolderPlus, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ControlledTreeEnvironment,
@@ -199,7 +198,10 @@ const viewStateInitial: TreeViewState = {
   'tree-sample': {},
 };
 
-const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId }) => {
+const TreeView: React.FC<{ currentWorkspaceId: string; onNavigate: (href: string) => void }> = ({
+  currentWorkspaceId,
+  onNavigate,
+}) => {
   const queryClient = useQueryClient();
   const { retry } = useQueryErrorHandler();
 
@@ -217,7 +219,6 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
 
   const workspaceTreeData = data?.treeData;
   const rootId = data?.rootId ?? '';
-  const router = useRouter();
   const tree = useRef<TreeRef>(null);
 
   const { showAlert } = useAlert();
@@ -728,12 +729,12 @@ const TreeView: React.FC<{ currentWorkspaceId: string }> = ({ currentWorkspaceId
                 className="[&>button]:aria-selected:bg-primary/50 my-px [&>button>svg]:aria-expanded:rotate-90"
                 onClick={() => {
                   if (!item.isFolder) {
-                    router.push(`/workspace/${currentWorkspaceId}/note/${item.index}`);
+                    onNavigate(`/workspace/${currentWorkspaceId}/note/${item.index}`);
                   }
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !item.isFolder) {
-                    router.push(`/workspace/${currentWorkspaceId}/note/${item.index}`);
+                    onNavigate(`/workspace/${currentWorkspaceId}/note/${item.index}`);
                   }
                 }}
               >

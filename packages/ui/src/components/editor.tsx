@@ -9,8 +9,9 @@ import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
 import { getAuthClient } from '@notopia-uit/ui/lib/auth-client';
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { NavigationProvider } from '@notopia-uit/ui/contexts/navigation-context';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { EditorCore } from './editor-core';
@@ -20,9 +21,8 @@ import { NoteTitle } from './note-title';
 import { Button } from './shadcn/button';
 import { TableOfContents } from './table-of-contents';
 
-export default function Editor({ noteId, workspaceId }: { noteId: string; workspaceId?: string }) {
+export default function Editor({ noteId, workspaceId, onNavigate }: { noteId: string; workspaceId?: string; onNavigate: (href: string) => void }) {
   const { data: sessionData } = getAuthClient().useSession();
-  const router = useRouter();
 
   const sessionUser = useMemo(
     () => ({
@@ -47,25 +47,27 @@ export default function Editor({ noteId, workspaceId }: { noteId: string; worksp
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
         e.preventDefault();
-        router.push(`/workspace/${workspaceId}/note/${noteId}/graph`);
+        onNavigate(`/workspace/${workspaceId}/note/${noteId}/graph`);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [router, workspaceId, noteId]);
+  }, [onNavigate, workspaceId, noteId]);
 
   return (
     <div className="relative min-h-screen">
       <NoteTitle noteId={noteId} workspaceId={workspaceId} />
-      <EditorToolbar noteId={noteId} currentEditor={editorRef.current} />
-      <EditorCore
-        ref={editorRef}
-        sessionUser={sessionUser}
-        noteId={noteId}
-        isViewer={isViewer}
-        onEditorReady={setEditorInstance}
-      />
+      <EditorToolbar noteId={noteId} workspaceId={workspaceId ?? ''} currentEditor={editorRef.current} onNavigate={onNavigate} />
+      <NavigationProvider workspaceId={workspaceId ?? ''} onNavigate={onNavigate}>
+        <EditorCore
+          ref={editorRef}
+          sessionUser={sessionUser}
+          noteId={noteId}
+          isViewer={isViewer}
+          onEditorReady={setEditorInstance}
+        />
+      </NavigationProvider>
 
       {editorInstance && <TableOfContents editor={editorInstance} />}
 

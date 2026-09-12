@@ -28,7 +28,6 @@ import {
   Sparkles,
   Trash2,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from './shadcn/avatar';
@@ -205,13 +204,11 @@ const data = [
   },
 ];
 
-export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorkspaceId: string }) {
+export default function WorkspaceSideBar({ currentWorkspaceId, onNavigate }: { currentWorkspaceId: string; onNavigate: (href: string) => void }) {
   const { data: sessionData } = getAuthClient().useSession();
   const { retry } = useQueryErrorHandler();
 
   const [activeWorkspacenow, setActiveWorkspace] = useState<NoteUserWorkspace>();
-
-  const router = useRouter();
 
   const {
     data: allWorkspaceData,
@@ -294,7 +291,7 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
                       key={ws.workspace.name}
                       onClick={() => {
                         setActiveWorkspace(ws);
-                        router.push(`/workspace/${index}`);
+                        onNavigate(`/workspace/${index}`);
                       }}
                       className="gap-2 p-2"
                     >
@@ -322,7 +319,7 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
         <SidebarGroup className="flex flex-col group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarMenu className="flex flex-col">
-            <TreeView currentWorkspaceId={currentWorkspaceId} />
+            <TreeView currentWorkspaceId={currentWorkspaceId} onNavigate={onNavigate} />
           </SidebarMenu>
         </SidebarGroup>
         <SidebarGroup className="shrink-0 group-data-[collapsible=icon]:hidden">
@@ -330,7 +327,7 @@ export default function WorkspaceSideBar({ currentWorkspaceId }: { currentWorksp
           <SidebarMenu>
             {data.map((item) => (
               <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton onClick={() => router.push(item.url(currentWorkspaceId))}>
+                <SidebarMenuButton onClick={() => onNavigate(item.url(currentWorkspaceId))}>
                   <item.icon />
                   <span>{item.name}</span>
                 </SidebarMenuButton>

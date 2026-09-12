@@ -33,7 +33,6 @@ import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-hand
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 import { RoleSelectItems } from './role-select-items';
@@ -63,8 +62,7 @@ const generateSlug = (name: string) => {
     .replace(/^-|-$/g, '');
 };
 
-const WorkspaceSwitcher = () => {
-  const router = useRouter();
+const WorkspaceSwitcher = ({ onNavigate }: { onNavigate: (href: string) => void }) => {
   const queryClient = useQueryClient();
   const { retry } = useQueryErrorHandler();
 
@@ -92,7 +90,7 @@ const WorkspaceSwitcher = () => {
     const workspace = workspaces.find((w) => w.id === workspaceId);
     if (workspace && editingId !== workspaceId) {
       setSelectedId(workspaceId);
-      router.push(`/workspace/${workspaceId}`);
+      onNavigate(`/workspace/${workspaceId}`);
     }
   };
 
