@@ -2,15 +2,16 @@
 
 import { createReactInlineContentSpec } from '@blocknote/react';
 import { HocuspocusProviderWebsocketComponent, HocuspocusRoom } from '@hocuspocus/provider-react';
-import { ReferenceConfig, ReferenceInlineContentSpec } from '@notopia-uit/lib/block-note';
 import { useGetNoteQuery } from '@notopia-uit/api-gen';
+import { ReferenceConfig, ReferenceInlineContentSpec } from '@notopia-uit/lib/block-note';
 import { EditorCore } from '@notopia-uit/ui/components/editor-core';
 import { Dialog, DialogContent } from '@notopia-uit/ui/components/shadcn/dialog';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { getAuthClient } from '@notopia-uit/ui/lib/auth-client';
 import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { getDeterministicColor } from '@notopia-uit/ui/lib/utils/color';
-import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
 
 function ReferencePreview({
   noteId,
@@ -23,8 +24,13 @@ function ReferencePreview({
   onOpenChange: (open: boolean) => void;
   previewWsUrl: string;
 }) {
-  const [token, setToken] = useState<string | null>(null);
   const { data: sessionData } = getAuthClient().useSession();
+
+  const { data: token } = useQuery({
+    queryKey: ['accessToken'],
+    queryFn: fetchAccessTokenClientSide,
+    enabled: open,
+  });
 
   const sessionUser = useMemo(
     () => ({
@@ -34,12 +40,6 @@ function ReferencePreview({
     }),
     [sessionData?.user?.name, sessionData?.user?.id, sessionData?.user?.image]
   );
-
-  useEffect(() => {
-    if (open && !token) {
-      fetchAccessTokenClientSide().then(setToken).catch(console.error);
-    }
-  }, [open, token]);
 
   const handleOpenChange = (open: boolean) => {
     onOpenChange(open);
@@ -69,14 +69,12 @@ function ReferencePreview({
   );
 }
 
-const ReferenceLink = ({
-  noteId,
-  previewWsUrl,
-}: {
-  noteId: string;
-  previewWsUrl: string;
-}) => {
-  const { data: note, isPending, isError } = useGetNoteQuery({
+const ReferenceLink = ({ noteId, previewWsUrl }: { noteId: string; previewWsUrl: string }) => {
+  const {
+    data: note,
+    isPending,
+    isError,
+  } = useGetNoteQuery({
     path: { noteId },
   });
   const [showPreview, setShowPreview] = useState(false);
@@ -116,7 +114,9 @@ export const createBlockNoteReferenceSpec = (apiUrl?: string): ReferenceInlineCo
 
   return createReactInlineContentSpec(ReferenceConfig, {
     render: (props) => {
-      return <ReferenceLink noteId={props.inlineContent.props.noteId} previewWsUrl={previewWsUrl} />;
+      return (
+        <ReferenceLink noteId={props.inlineContent.props.noteId} previewWsUrl={previewWsUrl} />
+      );
     },
     toExternalHTML: (props) => {
       const id = props.inlineContent.props.noteId;

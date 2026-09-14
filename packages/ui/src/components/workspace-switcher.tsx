@@ -78,7 +78,7 @@ const WorkspaceSwitcher = ({ onNavigate }: { onNavigate: (href: string) => void 
     error: getMyWorkspacesError,
   } = _data;
 
-  const [workspaces, setWorkspaces] = useState<UserWorkspace[]>([]);
+  const workspaces = allWorkspaceData ?? [];
   const [selectedId, setSelectedId] = useState<string>();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -94,25 +94,11 @@ const WorkspaceSwitcher = ({ onNavigate }: { onNavigate: (href: string) => void 
     }
   };
 
-  useEffect(() => {
-    if (allWorkspaceData) {
-      setWorkspaces(allWorkspaceData);
-    }
-  }, [allWorkspaceData]);
   const { mutate: createWorkspace, isPending: isCreating } = useCreateWorkspaceMutation({
-    onSuccess: async (responses, variables) => {
+    onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({
         queryKey: getMyWorkspacesOptions({}).queryKey,
       });
-      setWorkspaces((prev) => [
-        ...prev,
-        {
-          id: responses.id,
-          slug: variables.body.slug,
-          name: variables.body.name,
-          userRole: 'owner',
-        },
-      ]);
       setIsAddingNew(false);
       setEditForm({});
       showAlert({
@@ -137,13 +123,6 @@ const WorkspaceSwitcher = ({ onNavigate }: { onNavigate: (href: string) => void 
           queryKey: getMyWorkspacesOptions({}).queryKey,
         });
 
-        setWorkspaces((prev) =>
-          prev.map((workspace) =>
-            workspace.id === variables.path.workspaceId
-              ? { ...workspace, slug: variables.body.slug }
-              : workspace
-          )
-        );
         setEditingId(null);
         setEditForm({});
         showAlert({
@@ -167,9 +146,6 @@ const WorkspaceSwitcher = ({ onNavigate }: { onNavigate: (href: string) => void 
       await queryClient.invalidateQueries({
         queryKey: getMyWorkspacesOptions({}).queryKey,
       });
-      setWorkspaces((prev) =>
-        prev.filter((workspace) => workspace.id !== variables.path.workspaceId)
-      );
       if (selectedId === variables.path.workspaceId) {
         setSelectedId(undefined);
       }

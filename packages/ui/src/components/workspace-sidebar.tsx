@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  NoteUserWorkspace,
   getMyWorkspacesOptions,
   useCreateWorkspaceMutation,
 } from '@notopia-uit/api-gen';
@@ -28,7 +27,7 @@ import {
   Sparkles,
   Trash2,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from './shadcn/avatar';
 import {
@@ -208,8 +207,6 @@ export default function WorkspaceSideBar({ currentWorkspaceId, onNavigate }: { c
   const { data: sessionData } = getAuthClient().useSession();
   const { retry } = useQueryErrorHandler();
 
-  const [activeWorkspacenow, setActiveWorkspace] = useState<NoteUserWorkspace>();
-
   const {
     data: allWorkspaceData,
     isError,
@@ -219,12 +216,6 @@ export default function WorkspaceSideBar({ currentWorkspaceId, onNavigate }: { c
     ...getMyWorkspacesOptions({}),
   });
   const currentWorkspace = allWorkspaceData?.find((ws) => ws.workspace.id === currentWorkspaceId);
-
-  useEffect(() => {
-    if (currentWorkspace) {
-      setActiveWorkspace(currentWorkspace);
-    }
-  }, [currentWorkspaceId, currentWorkspace]);
 
   if (!sessionData) {
     return;
@@ -265,7 +256,7 @@ export default function WorkspaceSideBar({ currentWorkspaceId, onNavigate }: { c
                   </div>
                   <div className="grid flex-1 text-left text-sm/tight">
                     <span className="truncate font-semibold">
-                      {activeWorkspacenow?.workspace.name}
+                      {currentWorkspace?.workspace.name}
                     </span>
                     {/* <span className="truncate text-xs"> */}
                     {/*   {currentWorkspace.plan} */}
@@ -290,8 +281,7 @@ export default function WorkspaceSideBar({ currentWorkspaceId, onNavigate }: { c
                     <DropdownMenuItem
                       key={ws.workspace.name}
                       onClick={() => {
-                        setActiveWorkspace(ws);
-                        onNavigate(`/workspace/${index}`);
+                        onNavigate(`/workspace/${ws.workspace.id}`);
                       }}
                       className="gap-2 p-2"
                     >

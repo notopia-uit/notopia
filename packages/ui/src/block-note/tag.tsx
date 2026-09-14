@@ -7,8 +7,9 @@ import { Dialog, DialogContent } from '@notopia-uit/ui/components/shadcn/dialog'
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { useNavigationContext } from '@notopia-uit/ui/contexts/navigation-context';
+import { useQuery } from '@tanstack/react-query';
 import { FileText } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 function TagPreview({
   tag,
@@ -23,18 +24,13 @@ function TagPreview({
   workspaceId: string;
   onNavigate: (href: string) => void;
 }) {
-  const [notes, setNotes] = useState<SearchResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const meilisearchClient = useMeilisearch();
 
-  useEffect(() => {
-    if (!open || !meilisearchClient) return;
-    setIsLoading(true);
-    searchNotesByTag(meilisearchClient, tag)
-      .then(setNotes)
-      .catch(console.error)
-      .finally(() => setIsLoading(false));
-  }, [open, tag, meilisearchClient]);
+  const { data: notes = [], isPending: isLoading } = useQuery({
+    queryKey: ['tagSearch', tag],
+    queryFn: () => searchNotesByTag(meilisearchClient!, tag),
+    enabled: open && !!meilisearchClient,
+  });
 
   const handleSelect = (noteId: string) => {
     onOpenChange(false);
