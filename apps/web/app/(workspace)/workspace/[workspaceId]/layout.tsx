@@ -2,9 +2,10 @@ import { getMyWorkspacesOptions, getWorkspaceTreeOptions } from '@notopia-uit/ap
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@ui/components/shadcn/sidebar';
 import { ModeToggle } from '@ui/components/theme-mode-toggle';
-import { WorkspaceContentWrapper } from '@ui/components/workspace-content-wrapper';
-import WorkspaceSideBar from '@ui/components/workspace-sidebar';
+import { WorkspaceContentWrapperWithNav } from './workspace-content-wrapper-with-nav';
+import { WorkspaceSideBarWrapper } from './workspace-sidebar-wrapper';
 import { fetchAccessTokenServerSide } from '@lib/get-access-token';
+import { notFound } from 'next/navigation';
 
 import getQueryClient from '#/get-query-client';
 
@@ -13,11 +14,10 @@ interface WorkspaceLayoutProps {
   params: Promise<{ workspaceId: string }>;
 }
 
-//TODO: Prefetch errors will crash the layout / leak via Next.js error boundary.
-// If either getMyWorkspaces or getWorkspaceTree rejects (e.g., invalid workspaceId, unauthenticated user, backend down), Promise.all rejects and the whole workspace layout — including the sidebar chrome — fails to render. Prefer prefetchQuery inside a try/catch or using queryClient.fetchQuery only where hydration is strictly needed, and let the client useSuspenseQuery boundary handle errors with a proper error UI. At minimum, consider an error.tsx boundary for this route segment so users don't see an unstyled error page.
 export default async function WorkspaceLayout({ children, params }: WorkspaceLayoutProps) {
   const { workspaceId } = await params;
   const queryClient = getQueryClient();
+
   const { queryKey: getMyWorkspacesQueryKey, queryFn: getMyworkspacesQueryFn } =
     getMyWorkspacesOptions();
   const { queryKey: getWorkspaceTreeQueryKey, queryFn: getWorkspaceTreeQueryFn } =
@@ -28,25 +28,29 @@ export default async function WorkspaceLayout({ children, params }: WorkspaceLay
       auth: fetchAccessTokenServerSide,
     });
 
-  await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: getMyWorkspacesQueryKey,
-      queryFn: getMyworkspacesQueryFn,
-    }),
-    queryClient.prefetchQuery({
-      queryKey: getWorkspaceTreeQueryKey,
-      queryFn: getWorkspaceTreeQueryFn,
-    }),
-  ]);
+  try {
+    await Promise.all([
+      queryClient.prefetchQuery({
+        queryKey: getMyWorkspacesQueryKey,
+        queryFn: getMyworkspacesQueryFn,
+      }),
+      queryClient.prefetchQuery({
+        queryKey: getWorkspaceTreeQueryKey,
+        queryFn: getWorkspaceTreeQueryFn,
+      }),
+    ]);
+  } catch {
+    notFound();
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <WorkspaceContentWrapper
+      <WorkspaceContentWrapperWithNav
         workspaceId={workspaceId}
         meilisearchHost={process.env.MEILISEARCH_HOST}
       >
         <SidebarProvider defaultOpen={true}>
-          <WorkspaceSideBar currentWorkspaceId={workspaceId} />
+          <WorkspaceSideBarWrapper currentWorkspaceId={workspaceId} />
           <SidebarInset className="min-w-0">
             <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
               <div className="flex items-center gap-2 px-4">
@@ -59,7 +63,7 @@ export default async function WorkspaceLayout({ children, params }: WorkspaceLay
             <div>{children}</div>
           </SidebarInset>
         </SidebarProvider>
-      </WorkspaceContentWrapper>
+      </WorkspaceContentWrapperWithNav>
     </HydrationBoundary>
   );
 }

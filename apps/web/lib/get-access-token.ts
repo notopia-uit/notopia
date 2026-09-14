@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
 
 import { auth } from './auth';
 
@@ -11,7 +12,7 @@ export const fetchAccessTokenServerSide = async (): Promise<string> => {
     headers: h,
   });
   if (!data?.accessToken) {
-    throw new Error('Missing Authentik access token from server side fetch');
+    notFound();
   }
   return data.accessToken;
 };

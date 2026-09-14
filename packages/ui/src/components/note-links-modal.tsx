@@ -4,7 +4,6 @@ import { useGetNoteLinksQuery } from '@notopia-uit/api-gen';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { ArrowUpRight, Link2 } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { Button } from './shadcn/button';
@@ -20,12 +19,12 @@ import { Spinner } from './shadcn/spinner';
 
 interface NoteLinksModalProps {
   noteId: string;
+  workspaceId: string;
+  onNavigate: (href: string) => void;
 }
 
-export function NoteLinksModal({ noteId }: NoteLinksModalProps) {
+export function NoteLinksModal({ noteId, workspaceId, onNavigate }: NoteLinksModalProps) {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
-  const params = useParams();
   const { retry } = useQueryErrorHandler();
 
   const {
@@ -40,11 +39,10 @@ export function NoteLinksModal({ noteId }: NoteLinksModalProps) {
 
   const outgoingLinks = data?.outgoingLinks ?? [];
   const backlinks = data?.backlinks ?? [];
-  const workspaceId = params.workspaceId as string;
 
   const handleLinkClick = (linkId: string) => {
     setOpen(false);
-    router.push(`/workspace/${workspaceId}/note/${linkId}`);
+    onNavigate(`/workspace/${workspaceId}/note/${linkId}`);
   };
 
   const content = () => {
