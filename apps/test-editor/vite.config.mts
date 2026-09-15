@@ -1,4 +1,3 @@
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -16,7 +15,7 @@ export default defineConfig(() => ({
     port: 4201,
     host: true,
   },
-  plugins: [nxViteTsPaths(), tailwindcss(), react()],
+  plugins: [tailwindcss() as any, react()], // tailwindcss vite doesn't conform vite v:
   build: {
     outDir: './dist',
     emptyOutDir: true,

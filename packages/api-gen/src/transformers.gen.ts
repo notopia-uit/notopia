@@ -3,92 +3,92 @@
 import type { GetNoteResponse, GetRevisionsResponse, GetRevisionWithContentResponse, GetWorkspaceSearchTokenResponse, GetWorkspaceTreeResponse, ShowTrashResponse } from './types.gen';
 
 const documentRevisionSchemaResponseTransformer = (data: any) => {
-    data.createdAt = new Date(data.createdAt);
-    return data;
+  data.createdAt = new Date(data.createdAt);
+  return data;
 };
 
 export const getRevisionsResponseTransformer = async (data: any): Promise<GetRevisionsResponse> => {
-    data.data = data.data.map((item: any) => documentRevisionSchemaResponseTransformer(item));
-    return data;
+  data.data = data.data.map((item: any) => documentRevisionSchemaResponseTransformer(item));
+  return data;
 };
 
 const documentRevisionWithContentSchemaResponseTransformer = (data: any) => {
-    data = documentRevisionSchemaResponseTransformer(data);
-    return data;
+  data = documentRevisionSchemaResponseTransformer(data);
+  return data;
 };
 
 export const getRevisionWithContentResponseTransformer = async (data: any): Promise<GetRevisionWithContentResponse> => {
-    data = documentRevisionWithContentSchemaResponseTransformer(data);
-    return data;
+  data = documentRevisionWithContentSchemaResponseTransformer(data);
+  return data;
 };
 
 const noteNoteSchemaResponseTransformer = (data: any) => {
-    data.updatedAt = new Date(data.updatedAt);
-    if (data.trashed) {
-        data.trashed.at = new Date(data.trashed.at);
-    }
-    return data;
+  data.updatedAt = new Date(data.updatedAt);
+  if (data.trashed) {
+    data.trashed.at = new Date(data.trashed.at);
+  }
+  return data;
 };
 
 export const getNoteResponseTransformer = async (data: any): Promise<GetNoteResponse> => {
-    data = noteNoteSchemaResponseTransformer(data);
-    return data;
+  data = noteNoteSchemaResponseTransformer(data);
+  return data;
 };
 
 const noteSearchTokenSchemaResponseTransformer = (data: any) => {
-    data.expiresAt = new Date(data.expiresAt);
-    return data;
+  data.expiresAt = new Date(data.expiresAt);
+  return data;
 };
 
 export const getWorkspaceSearchTokenResponseTransformer = async (data: any): Promise<GetWorkspaceSearchTokenResponse> => {
-    data = noteSearchTokenSchemaResponseTransformer(data);
-    return data;
+  data = noteSearchTokenSchemaResponseTransformer(data);
+  return data;
 };
 
 const noteTrashedSchemaResponseTransformer = (data: any) => {
-    data.at = new Date(data.at);
-    return data;
+  data.at = new Date(data.at);
+  return data;
 };
 
 const noteTrashedNoteSchemaResponseTransformer = (data: any) => {
-    data.trashed = noteTrashedSchemaResponseTransformer(data.trashed);
-    return data;
+  data.trashed = noteTrashedSchemaResponseTransformer(data.trashed);
+  return data;
 };
 
 const noteTrashedFolderSchemaResponseTransformer = (data: any) => {
-    data.trashed = noteTrashedSchemaResponseTransformer(data.trashed);
-    return data;
+  data.trashed = noteTrashedSchemaResponseTransformer(data.trashed);
+  return data;
 };
 
 export const showTrashResponseTransformer = async (data: any): Promise<ShowTrashResponse> => {
-    data.notes = data.notes.map((item: any) => noteTrashedNoteSchemaResponseTransformer(item));
-    data.folders = data.folders.map((item: any) => noteTrashedFolderSchemaResponseTransformer(item));
-    return data;
+  data.notes = data.notes.map((item: any) => noteTrashedNoteSchemaResponseTransformer(item));
+  data.folders = data.folders.map((item: any) => noteTrashedFolderSchemaResponseTransformer(item));
+  return data;
 };
 
 const noteUpdatedAtSchemaResponseTransformer = (data: any) => {
-    data = new Date(data);
-    return data;
+  data = new Date(data);
+  return data;
 };
 
 const noteWorkspaceTreeNoteSchemaResponseTransformer = (data: any) => {
-    data.updatedAt = noteUpdatedAtSchemaResponseTransformer(data.updatedAt);
-    return data;
+  data.updatedAt = noteUpdatedAtSchemaResponseTransformer(data.updatedAt);
+  return data;
 };
 
 const noteUpdatedAt2SchemaResponseTransformer = (data: any) => {
-    data = new Date(data);
-    return data;
+  data = new Date(data);
+  return data;
 };
 
 const noteWorkspaceTreeFolderSchemaResponseTransformer = (data: any) => {
-    data.notes = data.notes.map((item: any) => noteWorkspaceTreeNoteSchemaResponseTransformer(item));
-    data.children = data.children.map((item: any) => noteWorkspaceTreeFolderSchemaResponseTransformer(item));
-    data.updatedAt = noteUpdatedAt2SchemaResponseTransformer(data.updatedAt);
-    return data;
+  data.notes = data.notes.map((item: any) => noteWorkspaceTreeNoteSchemaResponseTransformer(item));
+  data.children = data.children.map((item: any) => noteWorkspaceTreeFolderSchemaResponseTransformer(item));
+  data.updatedAt = noteUpdatedAt2SchemaResponseTransformer(data.updatedAt);
+  return data;
 };
 
 export const getWorkspaceTreeResponseTransformer = async (data: any): Promise<GetWorkspaceTreeResponse> => {
-    data = noteWorkspaceTreeFolderSchemaResponseTransformer(data);
-    return data;
+  data = noteWorkspaceTreeFolderSchemaResponseTransformer(data);
+  return data;
 };

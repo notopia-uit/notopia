@@ -7,36 +7,36 @@ import { changeWorkspaceSlug, checkWorkspaceSlugExists, commitDocument, createFo
 import type { ChangeWorkspaceSlugData, ChangeWorkspaceSlugError, ChangeWorkspaceSlugResponse, CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsError, CommitDocumentData, CommitDocumentError, CommitDocumentResponse, CreateFolderData, CreateFolderError, CreateFolderResponse, CreateNoteData, CreateNoteError, CreateNoteResponse, CreateWorkspaceData, CreateWorkspaceError, CreateWorkspaceResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, EmptyTrashData, EmptyTrashError, EmptyTrashResponse, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetMyWorkspacesData, GetMyWorkspacesError, GetMyWorkspacesResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetRevisionWithContentData, GetRevisionWithContentError, GetRevisionWithContentResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceSearchTokenData, GetWorkspaceSearchTokenError, GetWorkspaceSearchTokenResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, LeaveWorkspaceData, LeaveWorkspaceError, LeaveWorkspaceResponse, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PermanentlyDeleteFolderData, PermanentlyDeleteFolderError, PermanentlyDeleteFolderResponse, PermanentlyDeleteNoteData, PermanentlyDeleteNoteError, PermanentlyDeleteNoteResponse, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsError, PermanentlyDeleteWorkspaceItemsResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchUsersData, SearchUsersError, SearchUsersResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
-    Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
-        _id: string;
-        _infinite?: boolean;
-        tags?: ReadonlyArray<string>;
-    }
+  Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
+    _id: string;
+    _infinite?: boolean;
+    tags?: ReadonlyArray<string>;
+  }
 ];
 
 const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions, infinite?: boolean, tags?: ReadonlyArray<string>): [
-    QueryKey<TOptions>[0]
+  QueryKey<TOptions>[0]
 ] => {
-    const params: QueryKey<TOptions>[0] = { _id: id, baseUrl: options?.baseUrl || (options?.client ?? client).getConfig().baseUrl } as QueryKey<TOptions>[0];
-    if (infinite) {
-        params._infinite = infinite;
-    }
-    if (tags) {
-        params.tags = tags;
-    }
-    if (options?.body) {
-        params.body = options.body;
-    }
-    if (options?.headers) {
-        params.headers = options.headers;
-    }
-    if (options?.path) {
-        params.path = options.path;
-    }
-    if (options?.query) {
-        params.query = options.query;
-    }
-    return [params];
+  const params: QueryKey<TOptions>[0] = { _id: id, baseUrl: options?.baseUrl || (options?.client ?? client).getConfig().baseUrl } as QueryKey<TOptions>[0];
+  if (infinite) {
+    params._infinite = infinite;
+  }
+  if (tags) {
+    params.tags = tags;
+  }
+  if (options?.body) {
+    params.body = options.body;
+  }
+  if (options?.headers) {
+    params.headers = options.headers;
+  }
+  if (options?.path) {
+    params.path = options.path;
+  }
+  if (options?.query) {
+    params.query = options.query;
+  }
+  return [params];
 };
 
 export const getDocumentAttachmentUploadUrlQueryKey = (options: Options<GetDocumentAttachmentUploadUrlData>) => createQueryKey('getDocumentAttachmentUploadUrl', options);
@@ -47,16 +47,16 @@ export const getDocumentAttachmentUploadUrlQueryKey = (options: Options<GetDocum
  * Get presigned URL for document attachment upload
  */
 export const getDocumentAttachmentUploadUrlOptions = (options: Options<GetDocumentAttachmentUploadUrlData>) => queryOptions<GetDocumentAttachmentUploadUrlResponse, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, ReturnType<typeof getDocumentAttachmentUploadUrlQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getDocumentAttachmentUploadUrl({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getDocumentAttachmentUploadUrlQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getDocumentAttachmentUploadUrl({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getDocumentAttachmentUploadUrlQueryKey(options)
 });
 
 /**
@@ -70,17 +70,17 @@ export const useGetDocumentAttachmentUploadUrlQuery = (options: Options<GetDocum
  * Commit document
  */
 export const commitDocumentMutation = (options?: Partial<Options<CommitDocumentData>>): UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> => {
-    const mutationOptions: UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await commitDocument({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await commitDocument({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -94,45 +94,45 @@ export const getRevisionsQueryKey = (options: Options<GetRevisionsData>) => crea
  * Get revisions
  */
 export const getRevisionsOptions = (options: Options<GetRevisionsData>) => queryOptions<GetRevisionsResponse, GetRevisionsError, GetRevisionsResponse, ReturnType<typeof getRevisionsQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getRevisions({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getRevisionsQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getRevisions({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getRevisionsQueryKey(options)
 });
 
 const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
-    const params = { ...queryKey[0] };
-    if (page.body) {
-        params.body = {
-            ...queryKey[0].body as any,
-            ...page.body as any
-        };
-    }
-    if (page.headers) {
-        params.headers = {
-            ...queryKey[0].headers,
-            ...page.headers
-        };
-    }
-    if (page.path) {
-        params.path = {
-            ...queryKey[0].path as any,
-            ...page.path as any
-        };
-    }
-    if (page.query) {
-        params.query = {
-            ...queryKey[0].query as any,
-            ...page.query as any
-        };
-    }
-    return params as unknown as typeof page;
+  const params = { ...queryKey[0] };
+  if (page.body) {
+    params.body = {
+      ...queryKey[0].body as any,
+      ...page.body as any
+    };
+  }
+  if (page.headers) {
+    params.headers = {
+      ...queryKey[0].headers,
+      ...page.headers
+    };
+  }
+  if (page.path) {
+    params.path = {
+      ...queryKey[0].path as any,
+      ...page.path as any
+    };
+  }
+  if (page.query) {
+    params.query = {
+      ...queryKey[0].query as any,
+      ...page.query as any
+    };
+  }
+  return params as unknown as typeof page;
 };
 
 export const getRevisionsInfiniteQueryKey = (options: Options<GetRevisionsData>): QueryKey<Options<GetRevisionsData>> => createQueryKey('getRevisions', options, true);
@@ -140,27 +140,30 @@ export const getRevisionsInfiniteQueryKey = (options: Options<GetRevisionsData>)
 /**
  * Get revisions
  */
-export const getRevisionsInfiniteOptions = (options: Options<GetRevisionsData>) => infiniteQueryOptions<GetRevisionsResponse, GetRevisionsError, InfiniteData<GetRevisionsResponse>, QueryKey<Options<GetRevisionsData>>, number | Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
-// @ts-ignore
-{
+export const getRevisionsInfiniteOptions = (options: Options<GetRevisionsData>) => {
+  const opts = infiniteQueryOptions<GetRevisionsResponse, GetRevisionsError, InfiniteData<GetRevisionsResponse>, QueryKey<Options<GetRevisionsData>>, number | Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+  // @ts-ignore
+  {
     queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
-            query: {
-                page: pageParam
-            }
-        };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await getRevisions({
-            ...options,
-            ...params,
-            signal,
-            throwOnError: true
-        });
-        return data;
+      // @ts-ignore
+      const page: Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+        query: {
+          page: pageParam
+        }
+      };
+      const params = createInfiniteParams(queryKey, page);
+      const { data } = await getRevisions({
+        ...options,
+        ...params,
+        signal,
+        throwOnError: true
+      });
+      return data;
     },
     queryKey: getRevisionsInfiniteQueryKey(options)
-});
+  });
+  return opts as Omit<typeof opts, 'initialData'>;
+};
 
 /**
  * Get revisions
@@ -171,17 +174,17 @@ export const useGetRevisionsQuery = (options: Options<GetRevisionsData>) => useQ
  * Delete revision
  */
 export const deleteRevisionMutation = (options?: Partial<Options<DeleteRevisionData>>): UseMutationOptions<DeleteRevisionResponse, DeleteRevisionError, Options<DeleteRevisionData>> => {
-    const mutationOptions: UseMutationOptions<DeleteRevisionResponse, DeleteRevisionError, Options<DeleteRevisionData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteRevision({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<DeleteRevisionResponse, DeleteRevisionError, Options<DeleteRevisionData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteRevision({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -195,16 +198,16 @@ export const getRevisionWithContentQueryKey = (options: Options<GetRevisionWithC
  * Get revision with content
  */
 export const getRevisionWithContentOptions = (options: Options<GetRevisionWithContentData>) => queryOptions<GetRevisionWithContentResponse, GetRevisionWithContentError, GetRevisionWithContentResponse, ReturnType<typeof getRevisionWithContentQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getRevisionWithContent({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getRevisionWithContentQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getRevisionWithContent({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getRevisionWithContentQueryKey(options)
 });
 
 /**
@@ -216,17 +219,17 @@ export const useGetRevisionWithContentQuery = (options: Options<GetRevisionWithC
  * Rename revision
  */
 export const renameRevisionMutation = (options?: Partial<Options<RenameRevisionData>>): UseMutationOptions<RenameRevisionResponse, RenameRevisionError, Options<RenameRevisionData>> => {
-    const mutationOptions: UseMutationOptions<RenameRevisionResponse, RenameRevisionError, Options<RenameRevisionData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await renameRevision({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<RenameRevisionResponse, RenameRevisionError, Options<RenameRevisionData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await renameRevision({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -238,17 +241,17 @@ export const useRenameRevisionMutation = (mutationOptions?: Partial<Omit<UseMuta
  * Create folder
  */
 export const createFolderMutation = (options?: Partial<Options<CreateFolderData>>): UseMutationOptions<CreateFolderResponse, CreateFolderError, Options<CreateFolderData>> => {
-    const mutationOptions: UseMutationOptions<CreateFolderResponse, CreateFolderError, Options<CreateFolderData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createFolder({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<CreateFolderResponse, CreateFolderError, Options<CreateFolderData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createFolder({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -260,17 +263,17 @@ export const useCreateFolderMutation = (mutationOptions?: Partial<Omit<UseMutati
  * Permanently delete folder
  */
 export const permanentlyDeleteFolderMutation = (options?: Partial<Options<PermanentlyDeleteFolderData>>): UseMutationOptions<PermanentlyDeleteFolderResponse, PermanentlyDeleteFolderError, Options<PermanentlyDeleteFolderData>> => {
-    const mutationOptions: UseMutationOptions<PermanentlyDeleteFolderResponse, PermanentlyDeleteFolderError, Options<PermanentlyDeleteFolderData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await permanentlyDeleteFolder({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<PermanentlyDeleteFolderResponse, PermanentlyDeleteFolderError, Options<PermanentlyDeleteFolderData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await permanentlyDeleteFolder({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -282,17 +285,17 @@ export const usePermanentlyDeleteFolderMutation = (mutationOptions?: Partial<Omi
  * Rename folder
  */
 export const renameFolderMutation = (options?: Partial<Options<RenameFolderData>>): UseMutationOptions<RenameFolderResponse, RenameFolderError, Options<RenameFolderData>> => {
-    const mutationOptions: UseMutationOptions<RenameFolderResponse, RenameFolderError, Options<RenameFolderData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await renameFolder({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<RenameFolderResponse, RenameFolderError, Options<RenameFolderData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await renameFolder({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -304,17 +307,17 @@ export const useRenameFolderMutation = (mutationOptions?: Partial<Omit<UseMutati
  * Create note
  */
 export const createNoteMutation = (options?: Partial<Options<CreateNoteData>>): UseMutationOptions<CreateNoteResponse, CreateNoteError, Options<CreateNoteData>> => {
-    const mutationOptions: UseMutationOptions<CreateNoteResponse, CreateNoteError, Options<CreateNoteData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createNote({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<CreateNoteResponse, CreateNoteError, Options<CreateNoteData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -326,17 +329,17 @@ export const useCreateNoteMutation = (mutationOptions?: Partial<Omit<UseMutation
  * Permanently delete note
  */
 export const permanentlyDeleteNoteMutation = (options?: Partial<Options<PermanentlyDeleteNoteData>>): UseMutationOptions<PermanentlyDeleteNoteResponse, PermanentlyDeleteNoteError, Options<PermanentlyDeleteNoteData>> => {
-    const mutationOptions: UseMutationOptions<PermanentlyDeleteNoteResponse, PermanentlyDeleteNoteError, Options<PermanentlyDeleteNoteData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await permanentlyDeleteNote({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<PermanentlyDeleteNoteResponse, PermanentlyDeleteNoteError, Options<PermanentlyDeleteNoteData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await permanentlyDeleteNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -350,16 +353,16 @@ export const getNoteQueryKey = (options: Options<GetNoteData>) => createQueryKey
  * Get note
  */
 export const getNoteOptions = (options: Options<GetNoteData>) => queryOptions<GetNoteResponse, GetNoteError, GetNoteResponse, ReturnType<typeof getNoteQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getNote({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getNoteQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getNote({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getNoteQueryKey(options)
 });
 
 /**
@@ -373,16 +376,16 @@ export const getNoteGraphQueryKey = (options: Options<GetNoteGraphData>) => crea
  * Get note graph
  */
 export const getNoteGraphOptions = (options: Options<GetNoteGraphData>) => queryOptions<GetNoteGraphResponse, GetNoteGraphError, GetNoteGraphResponse, ReturnType<typeof getNoteGraphQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getNoteGraph({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getNoteGraphQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getNoteGraph({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getNoteGraphQueryKey(options)
 });
 
 /**
@@ -396,16 +399,16 @@ export const getNoteLinksQueryKey = (options: Options<GetNoteLinksData>) => crea
  * Get note links
  */
 export const getNoteLinksOptions = (options: Options<GetNoteLinksData>) => queryOptions<GetNoteLinksResponse, GetNoteLinksError, GetNoteLinksResponse, ReturnType<typeof getNoteLinksQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getNoteLinks({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getNoteLinksQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getNoteLinks({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getNoteLinksQueryKey(options)
 });
 
 /**
@@ -417,17 +420,17 @@ export const useGetNoteLinksQuery = (options: Options<GetNoteLinksData>) => useQ
  * Publish note
  */
 export const publishNoteMutation = (options?: Partial<Options<PublishNoteData>>): UseMutationOptions<PublishNoteResponse, PublishNoteError, Options<PublishNoteData>> => {
-    const mutationOptions: UseMutationOptions<PublishNoteResponse, PublishNoteError, Options<PublishNoteData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await publishNote({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<PublishNoteResponse, PublishNoteError, Options<PublishNoteData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await publishNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -439,17 +442,17 @@ export const usePublishNoteMutation = (mutationOptions?: Partial<Omit<UseMutatio
  * Rename note
  */
 export const renameNoteMutation = (options?: Partial<Options<RenameNoteData>>): UseMutationOptions<RenameNoteResponse, RenameNoteError, Options<RenameNoteData>> => {
-    const mutationOptions: UseMutationOptions<RenameNoteResponse, RenameNoteError, Options<RenameNoteData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await renameNote({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<RenameNoteResponse, RenameNoteError, Options<RenameNoteData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await renameNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -461,17 +464,17 @@ export const useRenameNoteMutation = (mutationOptions?: Partial<Omit<UseMutation
  * Unpublish note
  */
 export const unpublishNoteMutation = (options?: Partial<Options<UnpublishNoteData>>): UseMutationOptions<UnpublishNoteResponse, UnpublishNoteError, Options<UnpublishNoteData>> => {
-    const mutationOptions: UseMutationOptions<UnpublishNoteResponse, UnpublishNoteError, Options<UnpublishNoteData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await unpublishNote({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<UnpublishNoteResponse, UnpublishNoteError, Options<UnpublishNoteData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await unpublishNote({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -485,16 +488,16 @@ export const getWorkspaceQueryKey = (options: Options<GetWorkspaceData>) => crea
  * Get workspace
  */
 export const getWorkspaceOptions = (options: Options<GetWorkspaceData>) => queryOptions<GetWorkspaceResponse, GetWorkspaceError, GetWorkspaceResponse, ReturnType<typeof getWorkspaceQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getWorkspace({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getWorkspaceQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getWorkspace({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getWorkspaceQueryKey(options)
 });
 
 /**
@@ -508,16 +511,16 @@ export const checkWorkspaceSlugExistsQueryKey = (options: Options<CheckWorkspace
  * Check workspace slug exists
  */
 export const checkWorkspaceSlugExistsOptions = (options: Options<CheckWorkspaceSlugExistsData>) => queryOptions<unknown, CheckWorkspaceSlugExistsError, unknown, ReturnType<typeof checkWorkspaceSlugExistsQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await checkWorkspaceSlugExists({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: checkWorkspaceSlugExistsQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await checkWorkspaceSlugExists({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: checkWorkspaceSlugExistsQueryKey(options)
 });
 
 /**
@@ -529,17 +532,17 @@ export const useCheckWorkspaceSlugExistsQuery = (options: Options<CheckWorkspace
  * Create workspace
  */
 export const createWorkspaceMutation = (options?: Partial<Options<CreateWorkspaceData>>): UseMutationOptions<CreateWorkspaceResponse, CreateWorkspaceError, Options<CreateWorkspaceData>> => {
-    const mutationOptions: UseMutationOptions<CreateWorkspaceResponse, CreateWorkspaceError, Options<CreateWorkspaceData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await createWorkspace({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<CreateWorkspaceResponse, CreateWorkspaceError, Options<CreateWorkspaceData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createWorkspace({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -553,16 +556,16 @@ export const getMyWorkspacesQueryKey = (options?: Options<GetMyWorkspacesData>) 
  * Get my workspaces
  */
 export const getMyWorkspacesOptions = (options?: Options<GetMyWorkspacesData>) => queryOptions<GetMyWorkspacesResponse, GetMyWorkspacesError, GetMyWorkspacesResponse, ReturnType<typeof getMyWorkspacesQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getMyWorkspaces({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getMyWorkspacesQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getMyWorkspaces({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getMyWorkspacesQueryKey(options)
 });
 
 /**
@@ -574,17 +577,17 @@ export const useGetMyWorkspacesQuery = (options?: Options<GetMyWorkspacesData>) 
  * Delete workspace
  */
 export const deleteWorkspaceMutation = (options?: Partial<Options<DeleteWorkspaceData>>): UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> => {
-    const mutationOptions: UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteWorkspace({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteWorkspace({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -596,17 +599,17 @@ export const useDeleteWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMut
  * Change workspace slug
  */
 export const changeWorkspaceSlugMutation = (options?: Partial<Options<ChangeWorkspaceSlugData>>): UseMutationOptions<ChangeWorkspaceSlugResponse, ChangeWorkspaceSlugError, Options<ChangeWorkspaceSlugData>> => {
-    const mutationOptions: UseMutationOptions<ChangeWorkspaceSlugResponse, ChangeWorkspaceSlugError, Options<ChangeWorkspaceSlugData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await changeWorkspaceSlug({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<ChangeWorkspaceSlugResponse, ChangeWorkspaceSlugError, Options<ChangeWorkspaceSlugData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await changeWorkspaceSlug({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -618,17 +621,17 @@ export const useChangeWorkspaceSlugMutation = (mutationOptions?: Partial<Omit<Us
  * Empty trash
  */
 export const emptyTrashMutation = (options?: Partial<Options<EmptyTrashData>>): UseMutationOptions<EmptyTrashResponse, EmptyTrashError, Options<EmptyTrashData>> => {
-    const mutationOptions: UseMutationOptions<EmptyTrashResponse, EmptyTrashError, Options<EmptyTrashData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await emptyTrash({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<EmptyTrashResponse, EmptyTrashError, Options<EmptyTrashData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await emptyTrash({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -642,16 +645,16 @@ export const getWorkspaceGraphQueryKey = (options: Options<GetWorkspaceGraphData
  * Get workspace graph
  */
 export const getWorkspaceGraphOptions = (options: Options<GetWorkspaceGraphData>) => queryOptions<GetWorkspaceGraphResponse, GetWorkspaceGraphError, GetWorkspaceGraphResponse, ReturnType<typeof getWorkspaceGraphQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getWorkspaceGraph({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getWorkspaceGraphQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getWorkspaceGraph({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getWorkspaceGraphQueryKey(options)
 });
 
 /**
@@ -663,17 +666,17 @@ export const useGetWorkspaceGraphQuery = (options: Options<GetWorkspaceGraphData
  * Leave workspace
  */
 export const leaveWorkspaceMutation = (options?: Partial<Options<LeaveWorkspaceData>>): UseMutationOptions<LeaveWorkspaceResponse, LeaveWorkspaceError, Options<LeaveWorkspaceData>> => {
-    const mutationOptions: UseMutationOptions<LeaveWorkspaceResponse, LeaveWorkspaceError, Options<LeaveWorkspaceData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await leaveWorkspace({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<LeaveWorkspaceResponse, LeaveWorkspaceError, Options<LeaveWorkspaceData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await leaveWorkspace({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -687,16 +690,16 @@ export const getWorkspaceMembersQueryKey = (options: Options<GetWorkspaceMembers
  * Get workspace members
  */
 export const getWorkspaceMembersOptions = (options: Options<GetWorkspaceMembersData>) => queryOptions<GetWorkspaceMembersResponse, GetWorkspaceMembersError, GetWorkspaceMembersResponse, ReturnType<typeof getWorkspaceMembersQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getWorkspaceMembers({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getWorkspaceMembersQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getWorkspaceMembers({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getWorkspaceMembersQueryKey(options)
 });
 
 /**
@@ -708,17 +711,17 @@ export const useGetWorkspaceMembersQuery = (options: Options<GetWorkspaceMembers
  * Update workspace members
  */
 export const updateWorkspaceMembersMutation = (options?: Partial<Options<UpdateWorkspaceMembersData>>): UseMutationOptions<UpdateWorkspaceMembersResponse, UpdateWorkspaceMembersError, Options<UpdateWorkspaceMembersData>> => {
-    const mutationOptions: UseMutationOptions<UpdateWorkspaceMembersResponse, UpdateWorkspaceMembersError, Options<UpdateWorkspaceMembersData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await updateWorkspaceMembers({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<UpdateWorkspaceMembersResponse, UpdateWorkspaceMembersError, Options<UpdateWorkspaceMembersData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await updateWorkspaceMembers({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -730,17 +733,17 @@ export const useUpdateWorkspaceMembersMutation = (mutationOptions?: Partial<Omit
  * Move workspace's items
  */
 export const moveWorkspaceItemsMutation = (options?: Partial<Options<MoveWorkspaceItemsData>>): UseMutationOptions<MoveWorkspaceItemsResponse, MoveWorkspaceItemsError, Options<MoveWorkspaceItemsData>> => {
-    const mutationOptions: UseMutationOptions<MoveWorkspaceItemsResponse, MoveWorkspaceItemsError, Options<MoveWorkspaceItemsData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await moveWorkspaceItems({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<MoveWorkspaceItemsResponse, MoveWorkspaceItemsError, Options<MoveWorkspaceItemsData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await moveWorkspaceItems({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -752,17 +755,17 @@ export const useMoveWorkspaceItemsMutation = (mutationOptions?: Partial<Omit<Use
  * Permanently delete workspace items
  */
 export const permanentlyDeleteWorkspaceItemsMutation = (options?: Partial<Options<PermanentlyDeleteWorkspaceItemsData>>): UseMutationOptions<PermanentlyDeleteWorkspaceItemsResponse, PermanentlyDeleteWorkspaceItemsError, Options<PermanentlyDeleteWorkspaceItemsData>> => {
-    const mutationOptions: UseMutationOptions<PermanentlyDeleteWorkspaceItemsResponse, PermanentlyDeleteWorkspaceItemsError, Options<PermanentlyDeleteWorkspaceItemsData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await permanentlyDeleteWorkspaceItems({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<PermanentlyDeleteWorkspaceItemsResponse, PermanentlyDeleteWorkspaceItemsError, Options<PermanentlyDeleteWorkspaceItemsData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await permanentlyDeleteWorkspaceItems({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -774,17 +777,17 @@ export const usePermanentlyDeleteWorkspaceItemsMutation = (mutationOptions?: Par
  * Publish workspace
  */
 export const publishWorkspaceMutation = (options?: Partial<Options<PublishWorkspaceData>>): UseMutationOptions<PublishWorkspaceResponse, PublishWorkspaceError, Options<PublishWorkspaceData>> => {
-    const mutationOptions: UseMutationOptions<PublishWorkspaceResponse, PublishWorkspaceError, Options<PublishWorkspaceData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await publishWorkspace({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<PublishWorkspaceResponse, PublishWorkspaceError, Options<PublishWorkspaceData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await publishWorkspace({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -796,17 +799,17 @@ export const usePublishWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMu
  * Rename workspace
  */
 export const renameWorkspaceMutation = (options?: Partial<Options<RenameWorkspaceData>>): UseMutationOptions<RenameWorkspaceResponse, RenameWorkspaceError, Options<RenameWorkspaceData>> => {
-    const mutationOptions: UseMutationOptions<RenameWorkspaceResponse, RenameWorkspaceError, Options<RenameWorkspaceData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await renameWorkspace({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<RenameWorkspaceResponse, RenameWorkspaceError, Options<RenameWorkspaceData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await renameWorkspace({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -818,17 +821,17 @@ export const useRenameWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMut
  * Restore trashed workspace items
  */
 export const restoreTrashedWorkspaceItemsMutation = (options?: Partial<Options<RestoreTrashedWorkspaceItemsData>>): UseMutationOptions<RestoreTrashedWorkspaceItemsResponse, RestoreTrashedWorkspaceItemsError, Options<RestoreTrashedWorkspaceItemsData>> => {
-    const mutationOptions: UseMutationOptions<RestoreTrashedWorkspaceItemsResponse, RestoreTrashedWorkspaceItemsError, Options<RestoreTrashedWorkspaceItemsData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await restoreTrashedWorkspaceItems({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<RestoreTrashedWorkspaceItemsResponse, RestoreTrashedWorkspaceItemsError, Options<RestoreTrashedWorkspaceItemsData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await restoreTrashedWorkspaceItems({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -842,16 +845,16 @@ export const getWorkspaceSearchTokenQueryKey = (options: Options<GetWorkspaceSea
  * Get Workspace Search Token
  */
 export const getWorkspaceSearchTokenOptions = (options: Options<GetWorkspaceSearchTokenData>) => queryOptions<GetWorkspaceSearchTokenResponse, GetWorkspaceSearchTokenError, GetWorkspaceSearchTokenResponse, ReturnType<typeof getWorkspaceSearchTokenQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getWorkspaceSearchToken({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getWorkspaceSearchTokenQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getWorkspaceSearchToken({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getWorkspaceSearchTokenQueryKey(options)
 });
 
 /**
@@ -865,16 +868,16 @@ export const showTrashQueryKey = (options: Options<ShowTrashData>) => createQuer
  * Show trash
  */
 export const showTrashOptions = (options: Options<ShowTrashData>) => queryOptions<ShowTrashResponse, ShowTrashError, ShowTrashResponse, ReturnType<typeof showTrashQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await showTrash({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: showTrashQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await showTrash({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: showTrashQueryKey(options)
 });
 
 /**
@@ -886,17 +889,17 @@ export const useShowTrashQuery = (options: Options<ShowTrashData>) => useQuery(s
  * Trash workspace's items
  */
 export const trashWorkspaceItemsMutation = (options?: Partial<Options<TrashWorkspaceItemsData>>): UseMutationOptions<TrashWorkspaceItemsResponse, TrashWorkspaceItemsError, Options<TrashWorkspaceItemsData>> => {
-    const mutationOptions: UseMutationOptions<TrashWorkspaceItemsResponse, TrashWorkspaceItemsError, Options<TrashWorkspaceItemsData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await trashWorkspaceItems({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<TrashWorkspaceItemsResponse, TrashWorkspaceItemsError, Options<TrashWorkspaceItemsData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await trashWorkspaceItems({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -910,16 +913,16 @@ export const getWorkspaceTreeQueryKey = (options: Options<GetWorkspaceTreeData>)
  * Get workspace tree
  */
 export const getWorkspaceTreeOptions = (options: Options<GetWorkspaceTreeData>) => queryOptions<GetWorkspaceTreeResponse, GetWorkspaceTreeError, GetWorkspaceTreeResponse, ReturnType<typeof getWorkspaceTreeQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getWorkspaceTree({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getWorkspaceTreeQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getWorkspaceTree({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getWorkspaceTreeQueryKey(options)
 });
 
 /**
@@ -931,17 +934,17 @@ export const useGetWorkspaceTreeQuery = (options: Options<GetWorkspaceTreeData>)
  * Unpublish workspace
  */
 export const unpublishWorkspaceMutation = (options?: Partial<Options<UnpublishWorkspaceData>>): UseMutationOptions<UnpublishWorkspaceResponse, UnpublishWorkspaceError, Options<UnpublishWorkspaceData>> => {
-    const mutationOptions: UseMutationOptions<UnpublishWorkspaceResponse, UnpublishWorkspaceError, Options<UnpublishWorkspaceData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await unpublishWorkspace({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
+  const mutationOptions: UseMutationOptions<UnpublishWorkspaceResponse, UnpublishWorkspaceError, Options<UnpublishWorkspaceData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await unpublishWorkspace({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
 };
 
 /**
@@ -955,16 +958,16 @@ export const searchUsersQueryKey = (options: Options<SearchUsersData>) => create
  * Search users
  */
 export const searchUsersOptions = (options: Options<SearchUsersData>) => queryOptions<SearchUsersResponse, SearchUsersError, SearchUsersResponse, ReturnType<typeof searchUsersQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await searchUsers({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: searchUsersQueryKey(options)
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await searchUsers({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: searchUsersQueryKey(options)
 });
 
 /**
