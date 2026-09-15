@@ -98,7 +98,7 @@ WHERE
 var _readGetNotesDynQ = dynCompile(readGetNotes)
 
 type ReadGetNotesParams struct {
-	IDs            *[]uuid.UUID
+	IDs            []uuid.UUID
 	WorkspaceID    *uuid.UUID
 	TrashedBy      *string
 	NonTrashedOnly bool

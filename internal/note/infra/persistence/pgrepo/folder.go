@@ -86,7 +86,7 @@ func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyPa
 
 	folders, err := f.queries.GetFolders(ctx,
 		&pgsqlc.GetFoldersParams{
-			IDs:         ids,
+			IDs:         *ids,
 			WorkspaceID: workspaceID,
 			TrashedBy:   trashedBy,
 			TrashedOnly: params.TrashOnly,
