@@ -92,7 +92,7 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 	}
 
 	notes, err := n.queries.GetNotes(ctx, &pgsqlc.GetNotesParams{
-		IDs:         ids,
+		IDs:         *ids,
 		WorkspaceID: workspaceID,
 		TrashedBy:   trashedBy,
 		TrashedOnly: params.TrashOnly,

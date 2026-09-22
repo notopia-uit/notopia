@@ -99,7 +99,7 @@ FOR UPDATE -- :if $5
 var _getNotesDynQ = dynCompile(getNotes)
 
 type GetNotesParams struct {
-	IDs         *[]uuid.UUID
+	IDs         []uuid.UUID
 	WorkspaceID *uuid.UUID
 	TrashedBy   *string
 	TrashedOnly bool

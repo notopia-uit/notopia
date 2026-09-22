@@ -5,7 +5,7 @@ version: "2"
 linters:
   enable:
     - exhaustive
-    - exhaustruct
+    - exhaustruct_v5
     - sloglint
     - tagalign
     - testifylint
@@ -17,14 +17,15 @@ linters:
       align: true
       sort: true
       strict: true
-    exhaustruct:
+    exhaustruct_v5:
+      explicit-mode: true
       allow-empty: false
       allow-empty-returns: true
       allow-empty-declarations: true
-      include:
-        - github\.com/notopia-uit/notopia/.*\.*
-      exclude:
-        - github\.com/notopia-uit/notopia/.*/errs\.Err
+      enforce-patterns:
+        - ^github\.com/notopia-uit/notopia/.+\..+$
+      ignore-patterns:
+        - ^github\.com/notopia-uit/notopia/.+/errs\.Err$
     sloglint:
       static-msg: true
       no-mixed-args: true
@@ -35,7 +36,7 @@ linters:
     generated: strict
     rules:
       - linters:
-          - exhaustruct
+          - exhaustruct_v5
         path: _test\.go
 
 formatters:

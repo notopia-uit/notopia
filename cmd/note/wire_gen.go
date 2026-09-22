@@ -242,8 +242,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	serverInterface := http.NewHandler(strictHandler)
-	httpHTTP, cleanup8, err := http.New(ctx, engine, serverInterface, configServer, logger)
+	v := http.NewHandler(strictHandler)
+	httpHTTP, cleanup8, err := http.New(ctx, engine, v, configServer, logger)
 	if err != nil {
 		cleanup7()
 		cleanup6()

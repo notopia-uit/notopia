@@ -116,7 +116,7 @@ FOR UPDATE -- :if $5
 var _getFoldersDynQ = dynCompile(getFolders)
 
 type GetFoldersParams struct {
-	IDs         *[]uuid.UUID
+	IDs         []uuid.UUID
 	WorkspaceID *uuid.UUID
 	TrashedBy   *string
 	TrashedOnly bool

@@ -1,2 +1,5 @@
 test-report.junit.xml
 tests-ctrf.json
+
+# idk why it appear at here. Perhaps run via nx test apps/document
+.vitest/junit
