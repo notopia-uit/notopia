@@ -52,15 +52,15 @@ services:
   #   restart: 'no'
 
   rustfs_bucket:
-    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    image: rustfs/rc:v0.1.36
     container_name: notopia-rustfs_bucket
     entrypoint: > # language: sh
       /bin/sh -c '
-        until (/usr/bin/mc alias set rustfs http://rustfs:9000 ${RUSTFS_ACCESS_KEY:-notopiauit} ${RUSTFS_SECRET_KEY:-notopiauit}) do
+        until (/usr/bin/rc alias set rustfs http://rustfs:9000 ${RUSTFS_ACCESS_KEY:-notopiauit} ${RUSTFS_SECRET_KEY:-notopiauit}) do
           sleep 1;
         done
-        /usr/bin/mc mb rustfs/document;
-        /usr/bin/mc anonymous set public rustfs/document;
+        /usr/bin/rc mb rustfs/document;
+        /usr/bin/rc anonymous set public rustfs/document;
       '
     restart: "no"
     depends_on:
