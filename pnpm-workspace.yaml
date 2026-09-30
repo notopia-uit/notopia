@@ -78,7 +78,7 @@ catalog:
   "@vitest/coverage-v8": "^5.0.0"
   "@vitest/ui": "^5.0.0"
   autoprefixer: "^10.4.27"
-  better-auth: "~1.6.11"
+  better-auth: "~1.7.6"
   class-variance-authority: "^0.7.1"
   clsx: "^2.1.1"
   d3: "^7.9.0"
