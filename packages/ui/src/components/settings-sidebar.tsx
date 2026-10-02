@@ -3,14 +3,13 @@
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { CreditCard, Plug, Settings, Shield, Users } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 
 interface SettingsSidebarProps {
   workspaceId: string;
+  pathname: string;
 }
 
-export function SettingsSidebar({ workspaceId }: SettingsSidebarProps) {
-  const pathname = usePathname();
+export function SettingsSidebar({ workspaceId, pathname }: SettingsSidebarProps) {
 
   //TODO: This can be moved to a separate file if we want to reuse it in the future
   const navItems = [

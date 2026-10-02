@@ -5,7 +5,6 @@ import { HighlightedText } from '@notopia-uit/ui/components/highlighted-text';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { FileText, SearchX } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import {
@@ -20,14 +19,14 @@ import { Spinner } from './shadcn/spinner';
 
 interface NoteSearchModalProps {
   workspaceId: string;
+  onNavigate: (href: string) => void;
 }
 
-export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
+export function NoteSearchModal({ workspaceId, onNavigate }: NoteSearchModalProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const meilisearchClient = useMeilisearch();
-  const router = useRouter();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -68,7 +67,7 @@ export function NoteSearchModal({ workspaceId }: NoteSearchModalProps) {
     setOpen(false);
     setQuery('');
     setResults([]);
-    router.push(`/workspace/${workspaceId}/note/${noteId}`);
+    onNavigate(`/workspace/${workspaceId}/note/${noteId}`);
   };
 
   const handleOpenChange = (open: boolean) => {

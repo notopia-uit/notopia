@@ -1,6 +1,7 @@
 import { HocuspocusProviderWebsocketComponent, HocuspocusRoom } from '@hocuspocus/provider-react';
-import { Editor } from '@ui/components/dynamic-editor';
 import { fetchAccessTokenServerSide } from '@lib/get-access-token';
+
+import { EditorBoundary } from './editor-boundary';
 
 export default async function NotePage({
   params,
@@ -15,7 +16,7 @@ export default async function NotePage({
         url={`ws://${process.env.API_URL}/document/ws/document`}
       >
         <HocuspocusRoom name={noteId} token={token}>
-          <Editor noteId={noteId} workspaceId={workspaceId} />
+          <EditorBoundary noteId={noteId} workspaceId={workspaceId} />
         </HocuspocusRoom>
       </HocuspocusProviderWebsocketComponent>
     </div>

@@ -1,4 +1,4 @@
-import LocalNoteGraphView from '@notopia-uit/ui/components/local-note-graph-view';
+import { LocalNoteGraphViewBoundary } from './note-graph-view-boundary';
 
 export default async function GraphPage({
   params,
@@ -8,7 +8,7 @@ export default async function GraphPage({
   const { noteId, workspaceId } = await params;
   return (
     <div className="h-screen w-full">
-      <LocalNoteGraphView noteId={noteId} workspaceId={workspaceId} />
+      <LocalNoteGraphViewBoundary noteId={noteId} workspaceId={workspaceId} />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { getMyWorkspacesOptions } from '@notopia-uit/api-gen/index';
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
 import { WorkspaceWelcome } from '@ui/components/workspace-welcome';
 import { fetchAccessTokenServerSide } from '@lib/get-access-token';
-import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 interface WorkspacePageProps {
   params: Promise<{ workspaceId: string }>;
@@ -18,17 +18,21 @@ export default async function WorkspaceIndexPage({ params }: WorkspacePageProps)
     auth: await fetchAccessTokenServerSide(),
   });
 
-  await queryClient.prefetchQuery({
-    queryKey: queryKey,
-    queryFn: queryFn,
-    staleTime: 1000 * 60 * 60,
-  });
+  try {
+    await queryClient.prefetchQuery({
+      queryKey: queryKey,
+      queryFn: queryFn,
+      staleTime: 1000 * 60 * 60,
+    });
+  } catch {
+    notFound();
+  }
 
   const workspacesData = queryClient.getQueryData<any>(queryKey);
   const currentWorkspace = workspacesData?.find((w: any) => w.workspace.id === workspaceId);
 
   if (!currentWorkspace) {
-    redirect('/workspace');
+    notFound();
   }
 
   return (

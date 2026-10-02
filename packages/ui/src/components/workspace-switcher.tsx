@@ -33,7 +33,6 @@ import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-hand
 import { cn } from '@notopia-uit/ui/lib/shadcn/utils';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { Briefcase, MoreVertical, Pencil, Plus, Save, Shield, Trash2, User, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 import { RoleSelectItems } from './role-select-items';
@@ -63,8 +62,7 @@ const generateSlug = (name: string) => {
     .replace(/^-|-$/g, '');
 };
 
-const WorkspaceSwitcher = () => {
-  const router = useRouter();
+const WorkspaceSwitcher = ({ onNavigate }: { onNavigate: (href: string) => void }) => {
   const queryClient = useQueryClient();
   const { retry } = useQueryErrorHandler();
 
@@ -80,7 +78,7 @@ const WorkspaceSwitcher = () => {
     error: getMyWorkspacesError,
   } = _data;
 
-  const [workspaces, setWorkspaces] = useState<UserWorkspace[]>([]);
+  const workspaces = allWorkspaceData ?? [];
   const [selectedId, setSelectedId] = useState<string>();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -92,29 +90,15 @@ const WorkspaceSwitcher = () => {
     const workspace = workspaces.find((w) => w.id === workspaceId);
     if (workspace && editingId !== workspaceId) {
       setSelectedId(workspaceId);
-      router.push(`/workspace/${workspaceId}`);
+      onNavigate(`/workspace/${workspaceId}`);
     }
   };
 
-  useEffect(() => {
-    if (allWorkspaceData) {
-      setWorkspaces(allWorkspaceData);
-    }
-  }, [allWorkspaceData]);
   const { mutate: createWorkspace, isPending: isCreating } = useCreateWorkspaceMutation({
-    onSuccess: async (responses, variables) => {
+    onSuccess: async (_, variables) => {
       await queryClient.invalidateQueries({
         queryKey: getMyWorkspacesOptions({}).queryKey,
       });
-      setWorkspaces((prev) => [
-        ...prev,
-        {
-          id: responses.id,
-          slug: variables.body.slug,
-          name: variables.body.name,
-          userRole: 'owner',
-        },
-      ]);
       setIsAddingNew(false);
       setEditForm({});
       showAlert({
@@ -139,13 +123,6 @@ const WorkspaceSwitcher = () => {
           queryKey: getMyWorkspacesOptions({}).queryKey,
         });
 
-        setWorkspaces((prev) =>
-          prev.map((workspace) =>
-            workspace.id === variables.path.workspaceId
-              ? { ...workspace, slug: variables.body.slug }
-              : workspace
-          )
-        );
         setEditingId(null);
         setEditForm({});
         showAlert({
@@ -169,9 +146,6 @@ const WorkspaceSwitcher = () => {
       await queryClient.invalidateQueries({
         queryKey: getMyWorkspacesOptions({}).queryKey,
       });
-      setWorkspaces((prev) =>
-        prev.filter((workspace) => workspace.id !== variables.path.workspaceId)
-      );
       if (selectedId === variables.path.workspaceId) {
         setSelectedId(undefined);
       }

@@ -1,4 +1,4 @@
-import { SettingsSidebar } from '@ui/components/settings-sidebar';
+import { SettingsSidebarWrapper } from './settings-sidebar-wrapper';
 import { Separator } from '@ui/components/shadcn/separator';
 
 interface WorkspaceSettingsLayoutProps {
@@ -24,7 +24,7 @@ export default async function WorkspaceSettingsLayout({
 
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
           <aside className="w-full lg:w-1/4">
-            <SettingsSidebar workspaceId={workspaceId} />
+            <SettingsSidebarWrapper workspaceId={workspaceId} />
           </aside>
 
           <div className="max-w-2xl flex-1">{children}</div>

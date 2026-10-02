@@ -1,7 +1,6 @@
 'use client';
 
 import { Network } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
 
 import { Button } from './shadcn/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './shadcn/tooltip';
@@ -10,16 +9,14 @@ import { RevisionModal } from './revision-modal';
 
 interface EditorToolbarProps {
   noteId: string;
+  workspaceId: string;
   currentEditor: any;
+  onNavigate: (href: string) => void;
 }
 
-export function EditorToolbar({ noteId, currentEditor }: EditorToolbarProps) {
-  const router = useRouter();
-  const params = useParams();
-
+export function EditorToolbar({ noteId, workspaceId, currentEditor, onNavigate }: EditorToolbarProps) {
   const handleGraphOpen = () => {
-    const workspaceId = params.workspaceId as string;
-    router.push(`/workspace/${workspaceId}/note/${noteId}/graph`);
+    onNavigate(`/workspace/${workspaceId}/note/${noteId}/graph`);
   };
 
   return (
@@ -41,7 +38,7 @@ export function EditorToolbar({ noteId, currentEditor }: EditorToolbarProps) {
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
-            <NoteLinksModal noteId={noteId} />
+            <NoteLinksModal noteId={noteId} workspaceId={workspaceId} onNavigate={onNavigate} />
           </TooltipTrigger>
           <TooltipContent>View note links</TooltipContent>
         </Tooltip>
