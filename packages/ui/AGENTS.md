@@ -8,7 +8,7 @@ Shared React components and utilities for `@notopia-uit/ui`. Uses shadcn/ui + Ta
 
 | File | Export | Purpose |
 |---|---|---|
-| `components/error-boundary.tsx` | `ErrorBoundary` | Class-based React error boundary with retry. Props: `fallbackTitle`, `fallback` (render prop), `retry` (callback). Default UI shows error badge + retry button. |
+| `components/error-boundary.tsx` | `ErrorBoundary` | Class-based React error boundary with retry. Props: `fallbackTitle`, `fallback` (render prop) Default UI shows error badge + retry button. |
 | `components/not-found.tsx` | `NotFound` | Reusable 404 page. Props: `resource` (optional, e.g. "Note", "Workspace"). Shows 404 badge, title, message, and "Go Home" link. |
 | `components/error-alert.tsx` | `ErrorAlert` | Static destructive alert box for inline error display. |
 | `components/error-button.tsx` | `ErrorButton` | 404 page with "Go Back Home" link button. |
