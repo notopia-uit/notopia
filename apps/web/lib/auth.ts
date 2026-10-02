@@ -3,14 +3,12 @@ import { betterAuth } from 'better-auth';
 import { createAuthMiddleware } from 'better-auth/api';
 import { genericOAuth } from 'better-auth/plugins';
 
-import { fileAdapter } from './auth-file-adapter';
 import { fetchAccessTokenServerSide } from './get-access-token';
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
   secret: process.env.BETTER_AUTH_SECRET,
   appName: 'Notopia',
-  database: fileAdapter(),
   logger: {
     level: 'debug',
   },
@@ -38,5 +36,8 @@ export const auth = betterAuth({
       }
       return Promise.resolve();
     }),
+  },
+  account: {
+    storeAccountCookie: true,
   },
 });

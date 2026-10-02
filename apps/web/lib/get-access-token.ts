@@ -6,14 +6,13 @@ import { auth } from './auth';
 export const fetchAccessTokenServerSide = async (): Promise<string> => {
   const h = await headers();
 
-  const accounts = await auth.api.listUserAccounts({ headers: h });
-  const account = accounts?.find((a) => a.providerId === 'authentik');
-  if (!account) {
-    notFound();
-  }
+  // Stateless flow (no database): resolve the OAuth account from the signed
+  // `account_data` cookie instead of a DB row ID. getAccessToken refreshes
+  // the access token via the provider when expired (preserving the refresh
+  // token per better-auth#8001) and re-persists the cookie.
   const data = await auth.api.getAccessToken({
     body: {
-      accountId: account.id,
+      useAccountCookie: true,
     },
     headers: h,
   });
