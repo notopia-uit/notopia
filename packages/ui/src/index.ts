@@ -24,3 +24,4 @@ export * from './global.d';
 export * from './contexts/meilisearch-context';
 export * from './contexts/workspace-events-context';
 export * from './components/editor-core';
+export * from './components/assistant-view';

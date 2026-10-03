@@ -33,7 +33,7 @@ export default defineConfig({
       },
     },
   ],
-  ignorePatterns: ['**/shadcn/**'],
+  ignorePatterns: ['**/shadcn/**', '**/ai-elements/**'],
   settings: {
     'better-tailwindcss': {
       entryPoint: resolve(import.meta.dirname, 'src/globals.css'),

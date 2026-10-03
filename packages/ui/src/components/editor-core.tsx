@@ -2,8 +2,15 @@
 
 import { BlockNoteEditor } from '@blocknote/core';
 import { MyEditor } from '@blocknote/core';
-import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
+import { en } from '@blocknote/core/locales';
+import {
+  SuggestionMenuController,
+  getDefaultReactSlashMenuItems,
+  useCreateBlockNote,
+} from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
+import { AIExtension, AIMenuController, getAISlashMenuItems } from '@blocknote/xl-ai';
+import { en as aiEn } from '@blocknote/xl-ai/locales';
 import {
   useHocuspocusProvider,
   useHocuspocusAwareness,
@@ -18,10 +25,12 @@ import {
   searchNotesFromMeilisearch,
   searchTagsFromMeilisearch,
 } from '@notopia-uit/ui/block-note';
+import { BLOCKNOTE_AI_API_URL } from '@notopia-uit/ui/block-note/ai';
 import { getMenuItemsWithState } from '@notopia-uit/ui/block-note/menu-states';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { uploadDocumentAttachment } from '@notopia-uit/ui/lib/actions/upload';
+import { DefaultChatTransport } from 'ai';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { forwardRef, useMemo, useCallback, useEffect } from 'react';
@@ -138,6 +147,17 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
 
   const editor = useCreateBlockNote({
     schema: mySchema,
+    dictionary: {
+      ...en,
+      ai: aiEn,
+    },
+    extensions: [
+      AIExtension({
+        transport: new DefaultChatTransport({
+          api: BLOCKNOTE_AI_API_URL,
+        }),
+      }),
+    ],
     collaboration: {
       provider: {
         awareness: provider.awareness ? provider.awareness : undefined,
@@ -155,14 +175,14 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
 
   useEffect(() => {
     if (ref) {
-      (ref as React.MutableRefObject<any>).current = editor;
+      (ref as React.RefObject<any>).current = editor;
     }
     if (onEditorReady) {
       onEditorReady(editor);
     }
     return () => {
       if (ref) {
-        (ref as React.MutableRefObject<any>).current = null;
+        (ref as React.RefObject<any>).current = null;
       }
     };
   }, [editor, ref, onEditorReady]);
@@ -214,10 +234,30 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     [searchTagsWithCache, editor]
   );
 
+  const handleSlashMenuSearch = useCallback(
+    async (query: string) => {
+      const items = [...getAISlashMenuItems(editor), ...getDefaultReactSlashMenuItems(editor)];
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        return items;
+      }
+      return items.filter(
+        (item) =>
+          item.title.toLowerCase().includes(q) ||
+          item.aliases?.some((alias) => alias.toLowerCase().includes(q))
+      );
+    },
+    [editor]
+  );
+
   return (
     <>
       <EditorStatusBar />
       <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'} editable={!isViewer}>
+        <AIMenuController />
+
+        <SuggestionMenuController triggerCharacter={'/'} getItems={handleSlashMenuSearch} />
+
         <SuggestionMenuController triggerCharacter={'#'} getItems={handleTagMenuSearch} />
 
         <SuggestionMenuController

@@ -1,13 +1,14 @@
+import { fetchAccessTokenServerSide } from '@lib/get-access-token';
 import { getMyWorkspacesOptions, getWorkspaceTreeOptions } from '@notopia-uit/api-gen/index';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@ui/components/shadcn/sidebar';
 import { ModeToggle } from '@ui/components/theme-mode-toggle';
-import { WorkspaceContentWrapperWithNav } from './workspace-content-wrapper-with-nav';
-import { WorkspaceSideBarWrapper } from './workspace-sidebar-wrapper';
-import { fetchAccessTokenServerSide } from '@lib/get-access-token';
 import { notFound } from 'next/navigation';
 
 import getQueryClient from '#/get-query-client';
+
+import { WorkspaceContentWrapperWithNav } from './workspace-content-wrapper-with-nav';
+import { WorkspaceSideBarWrapper } from './workspace-sidebar-wrapper';
 
 interface WorkspaceLayoutProps {
   children: React.ReactNode;
@@ -56,7 +57,7 @@ export default async function WorkspaceLayout({ children, params }: WorkspaceLay
               <div className="flex items-center gap-2 px-4">
                 <SidebarTrigger className="-ml-1" />
               </div>
-              <div className="ml-auto mr-4">
+              <div className="mr-4 ml-auto">
                 <ModeToggle />
               </div>
             </header>

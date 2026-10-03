@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  getMyWorkspacesOptions,
-  useCreateWorkspaceMutation,
-} from '@notopia-uit/api-gen';
+import { getMyWorkspacesOptions, useCreateWorkspaceMutation } from '@notopia-uit/api-gen';
 import { Button } from '@notopia-uit/ui/components/shadcn/button';
 import { Input } from '@notopia-uit/ui/components/shadcn/input';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
@@ -14,6 +11,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   BadgeCheck,
   Bell,
+  BotMessageSquare,
   ChevronsUpDown,
   CreditCard,
   Folder,
@@ -201,9 +199,20 @@ const data = [
     url: (workspaceId: string) => `/workspace/${workspaceId}/graph`,
     icon: Sparkles,
   },
+  {
+    name: 'Assistant',
+    url: (workspaceId: string) => `/workspace/${workspaceId}/assistant`,
+    icon: BotMessageSquare,
+  },
 ];
 
-export default function WorkspaceSideBar({ currentWorkspaceId, onNavigate }: { currentWorkspaceId: string; onNavigate: (href: string) => void }) {
+export default function WorkspaceSideBar({
+  currentWorkspaceId,
+  onNavigate,
+}: {
+  currentWorkspaceId: string;
+  onNavigate: (href: string) => void;
+}) {
   const { data: sessionData } = getAuthClient().useSession();
   const { retry } = useQueryErrorHandler();
 
