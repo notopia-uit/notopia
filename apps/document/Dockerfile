@@ -7,4 +7,4 @@ RUN npm install -g pnpm@10.33.2
 COPY apps/document/dist/ .
 RUN pnpm install --frozen-lockfile --prod
 EXPOSE 8082
-CMD ["node", "main.js"]
+CMD ["node", "main.cjs"]
