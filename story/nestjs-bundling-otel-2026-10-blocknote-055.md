@@ -120,6 +120,9 @@ No OTel-instrumented package moved into the bundle.
 
 ### 4.1 `.proto` files at runtime
 
+> Deep dive: [`nestjs-grpc-proto-loader.md`](./nestjs-grpc-proto-loader.md). No `.proto` files are needed,
+> but the `@grpc/proto-loader` _package_ is required eagerly by Nest.
+
 Not needed. The gRPC clients (`apps/document/src/{note,authorization}/*.module.ts`) pass the ts-proto
 generated `packageDefinition` (`NoteServiceService`, `AuthorizationServiceService` from `@notopia-uit/pb`)
 directly — no `protoPath`, so `@grpc/proto-loader` is never used and no `.proto` file must be shipped.
