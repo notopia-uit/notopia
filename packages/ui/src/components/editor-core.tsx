@@ -2,6 +2,7 @@
 
 import { BlockNoteEditor } from '@blocknote/core';
 import { MyEditor } from '@blocknote/core';
+import { withCollaboration } from '@blocknote/core/yjs';
 import { SuggestionMenuController, useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
 import {
@@ -136,22 +137,24 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     return Promise.resolve(url);
   }, []);
 
-  const editor = useCreateBlockNote({
-    schema: mySchema,
-    collaboration: {
-      provider: {
-        awareness: provider.awareness ? provider.awareness : undefined,
+  const editor = useCreateBlockNote(
+    withCollaboration({
+      schema: mySchema,
+      collaboration: {
+        provider: {
+          awareness: provider.awareness ? provider.awareness : undefined,
+        },
+        fragment: provider.document.getXmlFragment('prosemirror'),
+        user: (sessionUser ?? {
+          name: 'Anonymous',
+          color: '#999999',
+          avatar: 'https://placehold.net/default.svg',
+        }) satisfies CollaborationUser,
       },
-      fragment: provider.document.getXmlFragment('prosemirror'),
-      user: (sessionUser ?? {
-        name: 'Anonymous',
-        color: '#999999',
-        avatar: 'https://placehold.net/default.svg',
-      }) satisfies CollaborationUser,
-    },
-    uploadFile,
-    resolveFileUrl,
-  });
+      uploadFile,
+      resolveFileUrl,
+    })
+  );
 
   useEffect(() => {
     if (ref) {

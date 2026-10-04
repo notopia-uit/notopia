@@ -11,8 +11,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "reflect-metadata": "catalog:",
-    "rxjs": "catalog:",
-    "uuid": "catalog:"
+    "rxjs": "catalog:"
   },
   "devDependencies": {
     "@nestjs/schematics": "catalog:",
@@ -61,6 +60,7 @@
     "tailwindcss": "catalog:",
     "tslib": "catalog:",
     "typescript": "catalog:",
+    "uuid": "catalog:",
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",
     "vitest": "catalog:"

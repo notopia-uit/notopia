@@ -23,6 +23,7 @@
     "@opentelemetry/sdk-node": "catalog:",
     "@opentelemetry/semantic-conventions": "catalog:",
     "express": "catalog:",
+    "jsdom": "catalog:",
     "kafkajs": "catalog:",
     "markdown-to-txt": "catalog:",
     "meilisearch": "catalog:",
@@ -33,12 +34,12 @@
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
     "tslib": "catalog:",
-    "uuid": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@nestjs/testing": "catalog:",
-    "webpack-node-externals": "catalog:",
-    "@types/express": "catalog:"
+    "@types/express": "catalog:",
+    "uuid": "catalog:",
+    "webpack-node-externals": "catalog:"
   }
 }

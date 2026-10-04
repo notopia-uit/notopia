@@ -1,4 +1,5 @@
 import '@blocknote/core/fonts/inter.css';
+import { withCollaboration } from '@blocknote/core/yjs';
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
 import { HocuspocusProviderWebsocketComponent, HocuspocusRoom } from '@hocuspocus/provider-react';
@@ -21,20 +22,22 @@ function AuthenticatedEditor({ user }: { user: User }) {
   const schema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
   const connectionStatus = useHocuspocusConnectionStatus();
-  const editor = useCreateBlockNote({
-    schema,
-    collaboration: {
-      provider: {
-        awareness: provider.awareness ?? undefined,
+  const editor = useCreateBlockNote(
+    withCollaboration({
+      schema,
+      collaboration: {
+        provider: {
+          awareness: provider.awareness ?? undefined,
+        },
+        fragment: provider.document.getXmlFragment('prosemirror'),
+        user: {
+          name: user.profile?.name ?? user.profile?.preferred_username ?? 'Anonymous',
+          color: getDeterministicColor(user.profile?.sub ?? 'anonymous'),
+          avatar: user.profile?.picture ?? 'https://placehold.net/default.svg',
+        },
       },
-      fragment: provider.document.getXmlFragment('prosemirror'),
-      user: {
-        name: user.profile?.name ?? user.profile?.preferred_username ?? 'Anonymous',
-        color: getDeterministicColor(user.profile?.sub ?? 'anonymous'),
-        avatar: user.profile?.picture ?? 'https://placehold.net/default.svg',
-      },
-    },
-  });
+    })
+  );
 
   console.log('Connection status:', connectionStatus);
   if (connectionStatus !== 'connected') {
