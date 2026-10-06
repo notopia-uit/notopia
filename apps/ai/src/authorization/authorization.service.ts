@@ -13,8 +13,8 @@ export type WorkspaceSummary = {
 };
 
 @Injectable()
-export class AuthorizationClientService implements OnModuleInit {
-  private readonly logger = new Logger(AuthorizationClientService.name);
+export class AuthorizationService implements OnModuleInit {
+  private readonly logger = new Logger(AuthorizationService.name);
   private client!: AuthorizationServiceClient;
 
   constructor(@Inject(AUTHORIZATION_PACKAGE_NAME) private readonly grpc: ClientGrpc) {}

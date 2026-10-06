@@ -15,9 +15,9 @@ import {
 } from 'ai';
 import { Traceable } from 'nestjs-otel';
 
-import { AuthorizationClientService } from '#/authorization/authorization-client.service';
+import { AuthorizationService } from '#/authorization/authorization.service';
 import { llmConfig } from '#/config.factory';
-import { NoteClientService } from '#/note/note-client.service';
+import { NoteService } from '#/note/note.service';
 import { SearchService } from '#/search/search.service';
 
 import { createCustomTools } from './tools/custom-tools';
@@ -32,9 +32,9 @@ export type BlockNoteChatRequest = {
 export class AiService {
   constructor(
     @Inject(llmConfig.KEY) private readonly llm: ConfigType<typeof llmConfig>,
-    private readonly noteClient: NoteClientService,
+    private readonly noteClient: NoteService,
     private readonly search: SearchService,
-    private readonly authorization: AuthorizationClientService
+    private readonly authorization: AuthorizationService
   ) {}
 
   async streamBlockNoteChat(

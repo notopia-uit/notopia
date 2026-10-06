@@ -6,7 +6,7 @@ import { NOTE_PACKAGE_NAME, NOTE_SERVICE_NAME, NoteServiceService } from '@notop
 import type { ServicesConfig } from '#/config';
 import { SERVICES_CONFIG } from '#/config.factory';
 
-import { NoteClientService } from './note-client.service';
+import { NoteService } from './note.service';
 
 @Module({
   imports: [
@@ -35,7 +35,7 @@ import { NoteClientService } from './note-client.service';
       },
     ]),
   ],
-  providers: [NoteClientService],
-  exports: [NoteClientService],
+  providers: [NoteService],
+  exports: [NoteService],
 })
 export class NoteModule {}

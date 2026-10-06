@@ -14,8 +14,8 @@ export type NoteSummary = {
 };
 
 @Injectable()
-export class NoteClientService implements OnModuleInit {
-  private readonly logger = new Logger(NoteClientService.name);
+export class NoteService implements OnModuleInit {
+  private readonly logger = new Logger(NoteService.name);
   private client!: NoteServiceClient;
 
   constructor(@Inject(NOTE_PACKAGE_NAME) private readonly grpc: ClientGrpc) {}

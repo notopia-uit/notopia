@@ -10,7 +10,7 @@ import {
 import type { ServicesConfig } from '#/config';
 import { SERVICES_CONFIG } from '#/config.factory';
 
-import { AuthorizationClientService } from './authorization-client.service';
+import { AuthorizationService } from './authorization.service';
 
 @Module({
   imports: [
@@ -40,7 +40,7 @@ import { AuthorizationClientService } from './authorization-client.service';
       },
     ]),
   ],
-  providers: [AuthorizationClientService],
-  exports: [AuthorizationClientService],
+  providers: [AuthorizationService],
+  exports: [AuthorizationService],
 })
 export class AuthorizationModule {}

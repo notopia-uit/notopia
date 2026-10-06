@@ -1,15 +1,15 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 
-import type { AuthorizationClientService } from '#/authorization/authorization-client.service';
-import type { NoteClientService } from '#/note/note-client.service';
+import type { AuthorizationService } from '#/authorization/authorization.service';
+import type { NoteService } from '#/note/note.service';
 import type { SearchService } from '#/search/search.service';
 
 export type CustomToolDeps = {
   userId: string;
-  noteClient: NoteClientService;
+  noteClient: NoteService;
   search: SearchService;
-  authorization: AuthorizationClientService;
+  authorization: AuthorizationService;
 };
 
 export function createCustomTools(deps: CustomToolDeps) {
