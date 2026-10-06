@@ -18,11 +18,15 @@ function ReferencePreview({
   open,
   onOpenChange,
   previewWsUrl,
+  aiApiUrl,
+  apiUrl,
 }: {
   noteId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   previewWsUrl: string;
+  aiApiUrl: string;
+  apiUrl: string;
 }) {
   const { data: sessionData } = getAuthClient().useSession();
 
@@ -55,7 +59,13 @@ function ReferencePreview({
           {open && token ? (
             <HocuspocusProviderWebsocketComponent url={previewWsUrl}>
               <HocuspocusRoom name={noteId} token={token}>
-                <EditorCore sessionUser={sessionUser} noteId={noteId} isViewer={true} />
+                <EditorCore
+                  sessionUser={sessionUser}
+                  noteId={noteId}
+                  isViewer={true}
+                  aiApiUrl={aiApiUrl}
+                  apiUrl={apiUrl}
+                />
               </HocuspocusRoom>
             </HocuspocusProviderWebsocketComponent>
           ) : (
@@ -69,7 +79,17 @@ function ReferencePreview({
   );
 }
 
-const ReferenceLink = ({ noteId, previewWsUrl }: { noteId: string; previewWsUrl: string }) => {
+const ReferenceLink = ({
+  noteId,
+  previewWsUrl,
+  aiApiUrl,
+  apiUrl,
+}: {
+  noteId: string;
+  previewWsUrl: string;
+  aiApiUrl: string;
+  apiUrl: string;
+}) => {
   const {
     data: note,
     isPending,
@@ -99,23 +119,29 @@ const ReferenceLink = ({ noteId, previewWsUrl }: { noteId: string; previewWsUrl:
         open={showPreview}
         onOpenChange={setShowPreview}
         previewWsUrl={previewWsUrl}
+        aiApiUrl={aiApiUrl}
+        apiUrl={apiUrl}
       />
     </>
   );
 };
 
-export const createBlockNoteReferenceSpec = (apiUrl?: string): ReferenceInlineContentSpec => {
-  if (!apiUrl) {
-    console.warn(
-      'apiUrl not provided to createBlockNoteReferenceSpec. Falling back to api.notopia.localhost'
-    );
-  }
-  const previewWsUrl = `ws://${apiUrl || 'api.notopia.localhost'}/document/ws/document`;
+export function createBlockNoteReferenceSpec(options: {
+  apiUrl: string;
+  aiApiUrl: string;
+}): ReferenceInlineContentSpec {
+  const { apiUrl, aiApiUrl } = options;
+  const previewWsUrl = `ws://${apiUrl}/document/ws/document`;
 
   return createReactInlineContentSpec(ReferenceConfig, {
     render: (props) => {
       return (
-        <ReferenceLink noteId={props.inlineContent.props.noteId} previewWsUrl={previewWsUrl} />
+        <ReferenceLink
+          noteId={props.inlineContent.props.noteId}
+          previewWsUrl={previewWsUrl}
+          aiApiUrl={aiApiUrl}
+          apiUrl={apiUrl}
+        />
       );
     },
     toExternalHTML: (props) => {
@@ -138,4 +164,4 @@ export const createBlockNoteReferenceSpec = (apiUrl?: string): ReferenceInlineCo
       }
     },
   });
-};
+}

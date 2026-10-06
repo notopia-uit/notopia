@@ -6,12 +6,11 @@ import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
 import { getMyWorkspacesOptions } from '@notopia-uit/api-gen';
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
+import { NavigationProvider } from '@notopia-uit/ui/contexts/navigation-context';
 import { useEditorState } from '@notopia-uit/ui/hooks/use-editor-state';
 import { getAuthClient } from '@notopia-uit/ui/lib/auth-client';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
-
-import { NavigationProvider } from '@notopia-uit/ui/contexts/navigation-context';
 
 import { getDeterministicColor } from './../lib/utils/color';
 import { EditorCore } from './editor-core';
@@ -21,7 +20,19 @@ import { NoteTitle } from './note-title';
 import { Button } from './shadcn/button';
 import { TableOfContents } from './table-of-contents';
 
-export default function Editor({ noteId, workspaceId, onNavigate }: { noteId: string; workspaceId?: string; onNavigate: (href: string) => void }) {
+export default function Editor({
+  noteId,
+  workspaceId,
+  onNavigate,
+  aiApiUrl,
+  apiUrl,
+}: {
+  noteId: string;
+  workspaceId?: string;
+  onNavigate: (href: string) => void;
+  aiApiUrl: string;
+  apiUrl: string;
+}) {
   const { data: sessionData } = getAuthClient().useSession();
 
   const sessionUser = useMemo(
@@ -58,13 +69,20 @@ export default function Editor({ noteId, workspaceId, onNavigate }: { noteId: st
   return (
     <div className="relative min-h-screen">
       <NoteTitle noteId={noteId} workspaceId={workspaceId} />
-      <EditorToolbar noteId={noteId} workspaceId={workspaceId ?? ''} currentEditor={editorRef.current} onNavigate={onNavigate} />
+      <EditorToolbar
+        noteId={noteId}
+        workspaceId={workspaceId ?? ''}
+        currentEditor={editorRef.current}
+        onNavigate={onNavigate}
+      />
       <NavigationProvider workspaceId={workspaceId ?? ''} onNavigate={onNavigate}>
         <EditorCore
           ref={editorRef}
           sessionUser={sessionUser}
           noteId={noteId}
           isViewer={isViewer}
+          aiApiUrl={aiApiUrl}
+          apiUrl={apiUrl}
           onEditorReady={setEditorInstance}
         />
       </NavigationProvider>

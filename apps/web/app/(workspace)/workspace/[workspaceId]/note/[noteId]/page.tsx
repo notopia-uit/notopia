@@ -10,13 +10,20 @@ export default async function NotePage({
 }) {
   const { noteId, workspaceId } = await params;
   const token = await fetchAccessTokenServerSide();
+  const apiUrl = process.env.API_URL;
+  if (!apiUrl) {
+    throw new Error('API_URL is not set');
+  }
   return (
     <div className="p-4">
-      <HocuspocusProviderWebsocketComponent
-        url={`ws://${process.env.API_URL}/document/ws/document`}
-      >
+      <HocuspocusProviderWebsocketComponent url={`ws://${apiUrl}/document/ws/document`}>
         <HocuspocusRoom name={noteId} token={token}>
-          <EditorBoundary noteId={noteId} workspaceId={workspaceId} />
+          <EditorBoundary
+            noteId={noteId}
+            workspaceId={workspaceId}
+            aiApiUrl={`http://${apiUrl}/ai`}
+            apiUrl={apiUrl}
+          />
         </HocuspocusRoom>
       </HocuspocusProviderWebsocketComponent>
     </div>

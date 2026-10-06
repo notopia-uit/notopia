@@ -19,7 +19,14 @@ function getDeterministicColor(id: string): string {
 }
 
 function AuthenticatedEditor({ user }: { user: User }) {
-  const schema = useMemo(() => createBlockNoteSchema(), []);
+  const schema = useMemo(
+    () =>
+      createBlockNoteSchema({
+        apiUrl: import.meta.env.VITE_API_URL ?? 'api.notopia.localhost',
+        aiApiUrl: import.meta.env.VITE_AI_API_URL ?? 'http://api.notopia.localhost/ai',
+      }),
+    []
+  );
   const provider = useHocuspocusProvider();
   const connectionStatus = useHocuspocusConnectionStatus();
   const editor = useCreateBlockNote(

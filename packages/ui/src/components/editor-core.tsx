@@ -26,7 +26,6 @@ import {
   searchNotesFromMeilisearch,
   searchTagsFromMeilisearch,
 } from '@notopia-uit/ui/block-note';
-import { getBlockNoteAiApiUrl } from '@notopia-uit/ui/block-note/ai';
 import { getMenuItemsWithState } from '@notopia-uit/ui/block-note/menu-states';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
@@ -50,7 +49,8 @@ interface EditorCoreProps {
   };
   noteId: string;
   isViewer?: boolean;
-  aiApiUrl?: string;
+  aiApiUrl: string;
+  apiUrl: string;
   onEditorReady?: (editor: MyEditor) => void;
 }
 
@@ -129,14 +129,13 @@ function EditorStatusBar() {
 }
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
-  { sessionUser, noteId, isViewer, aiApiUrl, onEditorReady },
+  { sessionUser, noteId, isViewer, aiApiUrl, apiUrl, onEditorReady },
   ref
 ) {
   const { resolvedTheme } = useTheme();
-  const mySchema = useMemo(() => createBlockNoteSchema(), []);
+  const mySchema = useMemo(() => createBlockNoteSchema({ apiUrl, aiApiUrl }), [apiUrl, aiApiUrl]);
   const provider = useHocuspocusProvider();
   const meilisearchClient = useMeilisearch();
-  const chatApiUrl = useMemo(() => getBlockNoteAiApiUrl(aiApiUrl), [aiApiUrl]);
 
   const uploadFile = useCallback(
     async (file: File): Promise<string> => {
@@ -170,7 +169,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
       extensions: [
         AIExtension({
           transport: new DefaultChatTransport({
-            api: chatApiUrl,
+            api: aiApiUrl,
             headers: async () => ({
               Authorization: `Bearer ${await fetchAccessTokenClientSide()}`,
             }),
