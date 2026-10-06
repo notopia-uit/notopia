@@ -104,6 +104,33 @@
       ]
     },
     {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Debug AI",
+      "runtimeExecutable": "pnpm exec nx",
+      "runtimeArgs": ["run", "ai"],
+      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/apps/ai/dist/**"],
+      "sourceMapPathOverrides": {
+        "webpack://@notopia-uit/ai/./*": "${workspaceFolder}/apps/ai/*",
+        "webpack://@notopia-uit/ai/../../*": "${workspaceFolder}//*"
+      },
+      "outFiles": ["${workspaceFolder}/apps/ai/dist/**/*.(m|c|)js", "!**/node_modules/**"]
+    },
+    {
+      "type": "pwa-node",
+      "request": "attach",
+      "name": "Attach AI",
+      "address": "localhost",
+      "port": 9224,
+      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/apps/ai/dist/**"],
+      "restart": true,
+      "sourceMapPathOverrides": {
+        "webpack://@notopia-uit/ai/./*": "${workspaceFolder}/apps/ai/*",
+        "webpack://@notopia-uit/ai/../../*": "${workspaceFolder}//*"
+      },
+      "outFiles": ["${workspaceFolder}/apps/ai/dist/**/*.(m|c|)js", "!**/node_modules/**"]
+    },
+    {
       "name": "Debug Web (Browser Launch)",
       "type": "chrome",
       "request": "launch",

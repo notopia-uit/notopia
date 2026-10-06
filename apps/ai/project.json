@@ -1,0 +1,80 @@
+{
+  "name": "ai",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "targets": {
+    "prune-lockfile": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "executor": "@nx/js:prune-lockfile",
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "copy-workspace-modules": {
+      "dependsOn": ["build"],
+      "cache": true,
+      "executor": "@nx/js:copy-workspace-modules",
+      "options": {
+        "buildTarget": "build"
+      }
+    },
+    "prune": {
+      "dependsOn": ["prune-lockfile", "copy-workspace-modules"],
+      "executor": "nx:noop"
+    },
+    "build": {
+      "options": {
+        "mode": "development",
+        "args": ["--node-env=development"]
+      },
+      "configurations": {
+        "development": {
+          "mode": "development",
+          "args": ["--node-env=development"]
+        },
+        "production": {
+          "mode": "production",
+          "args": ["--node-env=production"]
+        }
+      }
+    },
+    "run": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "ai:build:development",
+        "inspect": false,
+        "watch": false
+      },
+      "configurations": {
+        "development": {
+          "watch": true
+        }
+      }
+    },
+    "debug": {
+      "continuous": true,
+      "executor": "@nx/js:node",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "ai:build:development",
+        "inspect": "inspect-brk",
+        "port": 9224,
+        "watch": true
+      }
+    },
+    "docker:build": {
+      "dependsOn": ["prune", "build", "^build"]
+    },
+    "nx-release-publish": {
+      "parallelism": false
+    }
+  },
+  "release": {
+    "docker": {
+      "repositoryName": "notopia-uit/ai"
+    }
+  }
+}

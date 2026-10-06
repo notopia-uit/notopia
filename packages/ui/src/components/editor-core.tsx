@@ -26,11 +26,12 @@ import {
   searchNotesFromMeilisearch,
   searchTagsFromMeilisearch,
 } from '@notopia-uit/ui/block-note';
-import { BLOCKNOTE_AI_API_URL } from '@notopia-uit/ui/block-note/ai';
+import { getBlockNoteAiApiUrl } from '@notopia-uit/ui/block-note/ai';
 import { getMenuItemsWithState } from '@notopia-uit/ui/block-note/menu-states';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { uploadDocumentAttachment } from '@notopia-uit/ui/lib/actions/upload';
+import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { DefaultChatTransport } from 'ai';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -49,6 +50,7 @@ interface EditorCoreProps {
   };
   noteId: string;
   isViewer?: boolean;
+  aiApiUrl?: string;
   onEditorReady?: (editor: MyEditor) => void;
 }
 
@@ -127,13 +129,14 @@ function EditorStatusBar() {
 }
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
-  { sessionUser, noteId, isViewer, onEditorReady },
+  { sessionUser, noteId, isViewer, aiApiUrl, onEditorReady },
   ref
 ) {
   const { resolvedTheme } = useTheme();
   const mySchema = useMemo(() => createBlockNoteSchema(), []);
   const provider = useHocuspocusProvider();
   const meilisearchClient = useMeilisearch();
+  const chatApiUrl = useMemo(() => getBlockNoteAiApiUrl(aiApiUrl), [aiApiUrl]);
 
   const uploadFile = useCallback(
     async (file: File): Promise<string> => {
@@ -167,7 +170,10 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
       extensions: [
         AIExtension({
           transport: new DefaultChatTransport({
-            api: BLOCKNOTE_AI_API_URL,
+            api: chatApiUrl,
+            headers: async () => ({
+              Authorization: `Bearer ${await fetchAccessTokenClientSide()}`,
+            }),
           }),
         }),
       ],
