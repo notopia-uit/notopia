@@ -173,10 +173,8 @@
       }
     },
     {
-      "plugin": "nx-oxlint",
-      "options": {
-        "lintTargetName": "lint"
-      }
+      "plugin": "@nx/oxlint",
+      "options": {}
     },
     {
       "plugin": "@nx/vitest",

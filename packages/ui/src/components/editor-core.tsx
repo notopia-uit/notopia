@@ -3,6 +3,7 @@
 import { BlockNoteEditor } from '@blocknote/core';
 import { MyEditor } from '@blocknote/core';
 import { en } from '@blocknote/core/locales';
+import { withCollaboration } from '@blocknote/core/yjs';
 import {
   SuggestionMenuController,
   getDefaultReactSlashMenuItems,
@@ -145,33 +146,35 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
     return Promise.resolve(url);
   }, []);
 
-  const editor = useCreateBlockNote({
-    schema: mySchema,
-    dictionary: {
-      ...en,
-      ai: aiEn,
-    },
-    extensions: [
-      AIExtension({
-        transport: new DefaultChatTransport({
-          api: BLOCKNOTE_AI_API_URL,
-        }),
-      }),
-    ],
-    collaboration: {
-      provider: {
-        awareness: provider.awareness ? provider.awareness : undefined,
+  const editor = useCreateBlockNote(
+    withCollaboration({
+      schema: mySchema,
+      collaboration: {
+        provider: {
+          awareness: provider.awareness ? provider.awareness : undefined,
+        },
+        fragment: provider.document.getXmlFragment('prosemirror'),
+        user: (sessionUser ?? {
+          name: 'Anonymous',
+          color: '#999999',
+          avatar: 'https://placehold.net/default.svg',
+        }) satisfies CollaborationUser,
       },
-      fragment: provider.document.getXmlFragment('prosemirror'),
-      user: (sessionUser ?? {
-        name: 'Anonymous',
-        color: '#999999',
-        avatar: 'https://placehold.net/default.svg',
-      }) satisfies CollaborationUser,
-    },
-    uploadFile,
-    resolveFileUrl,
-  });
+      dictionary: {
+        ...en,
+        ai: aiEn,
+      },
+      extensions: [
+        AIExtension({
+          transport: new DefaultChatTransport({
+            api: BLOCKNOTE_AI_API_URL,
+          }),
+        }),
+      ],
+      uploadFile,
+      resolveFileUrl,
+    })
+  );
 
   useEffect(() => {
     if (ref) {

@@ -1,10 +1,15 @@
 # Bundling the NestJS apps (document / search-worker): OpenTelemetry logs, CJS, and the externals split
 
+> **Update 2026-10:** see [`nestjs-bundling-otel-2026-10-blocknote-055.md`](./nestjs-bundling-otel-2026-10-blocknote-055.md).
+> blocknote 0.55 still ships a broken `.cjs` (hack still needed). Transitive deps of the `keepBundled` cluster
+> are now bundled too (`contextInfo.issuer` rule, §10 below is outdated), and the Docker image was fixed and
+> verified. The §8 `nx run` probe masks resolution failures; use the container probe there instead.
+
 > **Single consolidated story.** Supersedes and merges the two former docs
 > (`js-bundling-rspack.md` — the OTel-logs / bundle-size investigation, and
 > `nestjs-cjs-vs-esm-bundling.md` — why ESM output is a dead end). Read top to
 > bottom. It is self-contained: a fresh session should be able to understand both
-> *what* the build does and *why every alternative was rejected* without re-deriving
+> _what_ the build does and _why every alternative was rejected_ without re-deriving
 > any of it. Long on purpose — the reasoning is the point.
 
 ---
@@ -35,10 +40,10 @@ stack). They all load fine via native `require()`.
 
 Results (verified):
 
-| | before | after |
-|---|---|---|
-| `apps/document/dist/main.cjs` | **98 MB** dev | **~4.6 MB** |
-| `apps/search-worker/dist/main.cjs` | (similar) | **~4.2 MB** |
+|                                             | before                  | after                                                                                                 |
+| ------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------- |
+| `apps/document/dist/main.cjs`               | **98 MB** dev           | **~4.6 MB**                                                                                           |
+| `apps/search-worker/dist/main.cjs`          | (similar)               | **~4.2 MB**                                                                                           |
 | OTel instrumentations that patch (document) | `http`/`dns`/`net` only | `pino`, `pg`, `kafkajs`, `grpc`, `nestjs-core`, `express`, `router`, `aws-sdk` (+ `http`/`dns`/`net`) |
 
 Why this shape and not any of the half-dozen alternatives we tried is the rest of this document.
@@ -59,7 +64,7 @@ require-in-the-middle (RITM) at `require('pino')` time.** No patch → no bridge
 
 ### Things we ruled out (do NOT chase again)
 
-These were investigated and proven harmless; the missing logs were *only* the pino patch:
+These were investigated and proven harmless; the missing logs were _only_ the pino patch:
 
 - **Duplicate `@opentelemetry/api-logs` (0.214 vs 0.215).** Harmless. Both register under the same global
   symbol `Symbol.for('io.opentelemetry.js.api.logs')` with the same `API_BACKWARDS_COMPATIBILITY_VERSION = 1`,
@@ -75,7 +80,7 @@ These were investigated and proven harmless; the missing logs were *only* the pi
 ### The root cause in one line
 
 rspack **bundled `pino` inline**, so there was **no runtime `require('pino')`** for RITM to intercept →
-instrumentation never patched → no logs. In the original 98 MB all-bundled build, only the *core-module*
+instrumentation never patched → no logs. In the original 98 MB all-bundled build, only the _core-module_
 instrumentations patched (`http`, `dns`, `net`); none of `pino`/`pg`/`kafkajs`/`grpc`/`nestjs-core` did.
 
 **The fix direction is therefore forced: the OTel-instrumented packages must be EXTERNAL** (real
@@ -85,7 +90,7 @@ instrumentations patched (`http`, `dns`, `net`); none of `pino`/`pg`/`kafkajs`/`
 
 ## 2. Why CJS output, not ESM (a settled dead end)
 
-Before discussing *which* packages to externalize, settle the module format, because "just switch the bundle
+Before discussing _which_ packages to externalize, settle the module format, because "just switch the bundle
 to ESM" comes up and is wrong. The apps emit **`main.cjs` (`isEsm = false`) deliberately.**
 
 ### 2.1 RITM only intercepts CommonJS `require()`
@@ -95,14 +100,14 @@ In an **ESM** bundle, external deps are pulled with `import`, which RITM cannot 
 needs **import-in-the-middle (IITM)**, a different mechanism hooking Node's ESM loader via
 `module.register()` / `--import`.
 
-### 2.2 A loader hook registered *from inside the graph* is always too late
+### 2.2 A loader hook registered _from inside the graph_ is always too late
 
 ESM links **all** static imports before any module body executes (depth-first, post-order). The bootstrap is
 load-bearing:
 
 ```ts
 // apps/*/src/main.ts
-import './otel';                 // otelSdk.start() → installs the RITM hook
+import './otel'; // otelSdk.start() → installs the RITM hook
 import '@notopia-uit/lib/yjs';
 import 'reflect-metadata';
 // …then NestFactory.create(...)
@@ -111,10 +116,10 @@ import 'reflect-metadata';
 Under **CJS** this works: `import './otel'` runs `otelSdk.start()` **synchronously first**, and the external
 deps are `require()`d **later** (during Nest bootstrap) → intercepted. Under **ESM** in a single bundled
 file, the external `import pino` is a top-level import **hoisted above** the inlined `import './otel'` side
-effect, so `pino` is linked *before* `otelSdk.start()` runs → nothing left to patch. This is structural, not
+effect, so `pino` is linked _before_ `otelSdk.start()` runs → nothing left to patch. This is structural, not
 incidental.
 
-The only ESM-correct fix is to register the hook at the Node CLI level *before* the graph loads
+The only ESM-correct fix is to register the hook at the Node CLI level _before_ the graph loads
 (`node --import @opentelemetry/instrumentation/hook.mjs`), which means abandoning `import './otel'`-first,
 rewiring the `@nx/js:node` run/serve invocation and the Dockerfile entrypoint, **and** trusting
 `instrumentation-pino` to patch a CJS `pino` through the CJS→ESM interop under IITM — unproven for this stack.
@@ -190,34 +195,35 @@ The crash is **purely blocknote's broken published CJS build under Node's `requi
 **NOT** caused by OTel/RITM, **NOT** by rspack, and **NOT** a `.ts`-resolution issue. Proven with plain
 `node` (no bundler, no instrumentation):
 
-| Repro | What Node loads | Result |
-|---|---|---|
-| `require('@blocknote/core')` (plain node) | `dist/*.cjs` (**require** condition) | 💥 `h.default.extend is not a function` |
-| `import` the ESM entry (incl. `ServerBlockNoteEditor.create()`) | `dist/blocknote.js` (**import** condition) | ✅ works |
+| Repro                                                           | What Node loads                            | Result                                  |
+| --------------------------------------------------------------- | ------------------------------------------ | --------------------------------------- |
+| `require('@blocknote/core')` (plain node)                       | `dist/*.cjs` (**require** condition)       | 💥 `h.default.extend is not a function` |
+| `import` the ESM entry (incl. `ServerBlockNoteEditor.create()`) | `dist/blocknote.js` (**import** condition) | ✅ works                                |
 
 - `@blocknote/core@0.50.0` `exports["."]` = `{ import: ./dist/blocknote.js, require: ./dist/blocknote.cjs }`.
   The **`.cjs` build is broken**; the **`.js` (ESM) build is fine**. `h.default.extend` is blocknote's own
   CJS-interop artifact — a `.default` access on a dep that Node's `require(ESM)` shapes differently. The RITM
-  frame in the *original* stack trace was incidental; bare `node` crashes the same way.
+  frame in the _original_ stack trace was incidental; bare `node` crashes the same way.
 - So the lever is **which build loads (ESM good vs CJS broken)**, governed by the **import vs require
   condition**:
   - **Externalize + CJS bundle** → emits `require('@blocknote/core')` → Node picks the **require** condition →
-    broken `.cjs` → crash. *(This is why "externalize blocknote" fails.)*
+    broken `.cjs` → crash. _(This is why "externalize blocknote" fails.)_
   - **Bundle (rspack)** → resolves via `mainFields: ['module','main']` → inlines the **ESM** build → works.
     It works because it pulls the ESM build, not because rspack "fixes" interop.
 - **Upgrade note:** a newer `@blocknote/*` may ship a fixed `.cjs`, which would make plain externalization
   viable. Re-test the bare-node repro after any bump before relying on it.
+  _(Re-tested on 0.55.0 in 2026-10: still broken. See the follow-up story.)_
 
 **Conclusion: `@blocknote/*` MUST be bundled.** That single fact is the seed the whole `keepBundled` list
 grows from.
 
 ### 4.2 The jsdom landmine (the opposite direction)
 
-We use `@blocknote/server-util` → `jsdom`. **BlockNote issue #1939:** *bundling* jsdom bundles its
+We use `@blocknote/server-util` → `jsdom`. **BlockNote issue #1939:** _bundling_ jsdom bundles its
 dynamically-loaded worker file `lib/jsdom/living/xhr/xhr-sync-worker.js`, which rspack doesn't emit →
 runtime `Cannot find module './xhr-sync-worker.js'`. So **jsdom must be EXTERNAL** (it's plain CJS, safe) so
 Node loads it from `node_modules` and finds the worker. Under our default-external rule this is automatic —
-but it's the canonical example that the bundle/externalize decision has failures in *both* directions:
+but it's the canonical example that the bundle/externalize decision has failures in _both_ directions:
 
 - `@blocknote/core` → **must bundle** (externalizing loads the broken `.cjs`).
 - `jsdom` → **must externalize** (bundling drops a worker file).
@@ -231,41 +237,47 @@ There is no universally safe default; you maintain an exception list whichever w
 This is the heart of the doc. Each attempt taught one fact that constrains the final design.
 
 ### Attempt 0 — Bundle everything (the starting state)
+
 - `externalDependencies: 'none'`. `main.cjs` ≈ **98 MB** dev.
 - pino inlined → **no logs** (§1). Slow rebuilds.
 - ❌ Fails the goal.
 
 ### Attempt 1 — Externalize everything (minus workspace libs)
+
 - Bundle shrank to **888 KB** (document) / **72 KB** (search-worker); `pino`/`grpc`/`nestjs-core` patched. 🎉
 - But **crashes** on the blocknote broken `.cjs` (§4.1).
 - ❌ Proves: you cannot blindly externalize; blocknote (and its ilk) must bundle.
 - ✅ Also proved something crucial used later: in that 888 KB build, the app ran **all the way to the
-  blocknote crash with no `MODULE_NOT_FOUND`** — i.e. *externalized transitive deps resolve fine at runtime
-  in this repo's run setup.* (The nx node executor / pnpm layout makes them resolvable.) Keep this in mind.
+  blocknote crash with no `MODULE_NOT_FOUND`** — i.e. _externalized transitive deps resolve fine at runtime
+  in this repo's run setup._ (The nx node executor / pnpm layout makes them resolvable.) Keep this in mind.
 
 ### Attempt 2 — Curated externalize **allowlist** (the first thing that worked)
+
 - Externalize only the OTel-instrumented CJS packages:
   document `['pino','pg','kafkajs','@grpc/grpc-js']`, search-worker `['pino','kafkajs']`.
 - ✅ Works: boots to DB-retry, no blocknote crash, `pino`/`pg`/`kafkajs`/`grpc` patch. Logs bridge attached.
 - ⚠️ Bundle still ≈ 98 MB → slow. **But here we found the real size culprit (below).**
 
 #### 5.a The 98 MB was mostly a **duplicate source map**, not packages
+
 `apps/document` had BOTH `devtool: 'source-map'` **and** a redundant `new rspack.SourceMapDevToolPlugin({})`.
-The plugin inlined a **64 MB base64 source-map data URI** into `main.cjs` *on top of* the external
+The plugin inlined a **64 MB base64 source-map data URI** into `main.cjs` _on top of_ the external
 `main.cjs.map` (35.6 MB of actual code + 64 MB inline map ≈ 99.7 MB). `search-worker` never had that plugin.
-**Removing it dropped `main.cjs` from 99.7 MB → 35.6 MB** with zero behavior change. *Lesson: measure before
-blaming `@aws-sdk`.* (Externalizing `@aws-sdk/*`/`@smithy/*` is a real but secondary win.)
+**Removing it dropped `main.cjs` from 99.7 MB → 35.6 MB** with zero behavior change. _Lesson: measure before
+blaming `@aws-sdk`._ (Externalizing `@aws-sdk/*`/`@smithy/*` is a real but secondary win.)
 
 ### Attempt 3 — Invert to **default-external + `keepBundled` editor list + issuer fallback**
+
 - Rule: externalize everything except a `keepBundled` regex list (the editor/CRDT stack), plus "bundle
-  anything imported *from within* a bundled package" (an issuer-path regex) to drag transitive editor deps in.
+  anything imported _from within_ a bundled package" (an issuer-path regex) to drag transitive editor deps in.
 - Bundle ≈ **18 MB**. Builds.
 - ❌ A static scan of the emitted `require()`s found **41 externalized packages that don't resolve at
   runtime** (`@tiptap/*`, `mdast-util-*`, `micromark-*`, `hast-util-*`, jsdom internals, …). The one-level
   issuer regex only catches direct deps of named packages; deep transitives leak out as broken externals.
-  They'd `MODULE_NOT_FOUND` the moment that editor code path runs — *invisible at boot.*
+  They'd `MODULE_NOT_FOUND` the moment that editor code path runs — _invisible at boot._
 
 ### Attempt 4 — Default-external + **`require.resolve`-based** decision (clever, still wrong)
+
 - Idea: instead of guessing, externalize a package **only if it actually resolves** from the app
   (`createRequire(app).resolve(name)`), else bundle. "Self-validating; MODULE_NOT_FOUND impossible."
 - Bundle ≈ **4 MB**. Booted.
@@ -276,22 +288,24 @@ blaming `@aws-sdk`.* (Externalizing `@aws-sdk/*`/`@smithy/*` is a real but secon
      unresolvable**.
   2. **Build-time vs runtime resolution don't match** under pnpm/Nx — the anchor during the build resolved a
      different set than `apps/<app>/dist/main.cjs` sees at runtime. A resolver-based heuristic is unreliable
-     here. *Lesson: don't decide externalization by filesystem resolution under pnpm isolated.*
+     here. _Lesson: don't decide externalization by filesystem resolution under pnpm isolated._
 
 ### Attempt 5 — Bundle **only `@blocknote/*`** (+ workspace libs + helpers)
+
 - The minimalist reading of "just bundle the broken one." Bundle ≈ **978 KB** / **604 KB**. 🎉 tiny.
-- ❌ Crashes with a *new* error:
+- ❌ Crashes with a _new_ error:
   ```
   No "exports" main defined in .../@handlewithcare/prosemirror-...
   ```
   blocknote → `prosemirror-*` → `@handlewithcare/prosemirror-*`, which ships an **ESM-only `exports` map with
-  no CJS main**. Externalized, Node's native `require()` of it throws. *Lesson: "bundle only blocknote" is
+  no CJS main**. Externalized, Node's native `require()` of it throws. _Lesson: "bundle only blocknote" is
   impossible — its prosemirror editor cluster contains packages that can't be `require()`d natively, so they
-  must bundle with it.*
+  must bundle with it._
 
 ### Attempt 6 — Bundle the **blocknote editor cluster**, externalize everything else ✅ (FINAL)
-- `keepBundled` = blocknote + prosemirror + @handlewithcare + @tiptap + yjs/y-*/lib0 + react/react-dom/
-  scheduler + @floating-ui + @bufbuild/protobuf + @notopia-uit/* + tslib/@swc/helpers (§0).
+
+- `keepBundled` = blocknote + prosemirror + @handlewithcare + @tiptap + yjs/y-_/lib0 + react/react-dom/
+  scheduler + @floating-ui + @bufbuild/protobuf + @notopia-uit/_ + tslib/@swc/helpers (§0).
 - Externals function is **simple** (no resolver, no issuer): bundle app code / aliases / builtins / the
   `keepBundled` cluster; externalize all else.
 - ✅ Bundle ≈ **4.6 MB** / **4.2 MB**. No `Code.extend`, no `No "exports" main`, no `MODULE_NOT_FOUND`, both
@@ -307,16 +321,17 @@ neither blocknote's broken `.cjs` nor `@handlewithcare`'s missing CJS main is ev
 ## 6. The rule of thumb (how to classify a package)
 
 > **Bundle** a package only if it **cannot survive a native `require()`** under CJS. Two sub-cases:
+>
 > 1. **Broken require-condition interop** — e.g. `@blocknote/core` (its `.cjs` throws `Code.extend …`).
 > 2. **ESM-only / no CJS `exports` main** — e.g. `@handlewithcare/prosemirror-*`, prosemirror view layer;
 >    `require()` throws `No "exports" main defined`.
 >
-> Plus, by extension, anything that *imports* a must-bundle package and would otherwise run that import
+> Plus, by extension, anything that _imports_ a must-bundle package and would otherwise run that import
 > natively (`@notopia-uit/*` workspace libs import `@blocknote`), and singletons that must stay one instance
 > while a bundled consumer holds them (`yjs` CRDT identity; `@bufbuild/protobuf` type registry).
 >
 > **Externalize** everything else — it loads fine natively, keeps the bundle small, and (for the
-> OTel-instrumented packages) is the *only* way RITM can patch it. This includes blocknote's own dual-package
+> OTel-instrumented packages) is the _only_ way RITM can patch it. This includes blocknote's own dual-package
 > leaf deps (`unified`/`remark`/`mdast`/`hast`), which are well-behaved CJS.
 
 A new editor dep that's ESM-only may occasionally need adding to `keepBundled`. The failure is **loud**
@@ -331,13 +346,13 @@ This came up repeatedly; the answer is decisive.
 
 1. **It scans a directory; we must decide by name.** `webpack-node-externals` externalizes "whatever package
    folders exist in a scanned `node_modules`." Under pnpm's **isolated** linker that gives the **wrong answer
-   for the single most important package**: `pino` is a *transitive* dep (we depend on `nestjs-pino`/
+   for the single most important package**: `pino` is a _transitive_ dep (we depend on `nestjs-pino`/
    `pino-http`/`pino-pretty`, not `pino`), so it isn't a flat entry in `apps/<app>/node_modules` → a dir-scan
    **bundles** it → `instrumentation-pino` can't patch → **no logs**, the exact bug we set out to fix.
    Pointing it at `.pnpm` doesn't help (the folder is `pino@9.x`, which won't match `require('pino')`).
 2. **The decision axis is "editor cluster vs backend," a name-based regex set** — independent of pnpm's
    on-disk layout. `webpack-node-externals`' `allowlist` could express the keep-bundled side, but you'd write
-   the *same* regex list **and** still be fighting #1. It buys nothing and costs correctness.
+   the _same_ regex list **and** still be fighting #1. It buys nothing and costs correctness.
 3. **Smaller and clearer.** The whole thing is one `keepBundled` array + a ~10-line function. No
    `modulesDir`/`additionalModuleDirs`/`importType` tuning, no dependency on store layout.
 
@@ -374,7 +389,7 @@ grep -aiE "Starting Nest application|Unable to connect to the database" /tmp/doc
   transitive leaked out as a broken external → add it (or its bundled importer) to `keepBundled`. This is how
   Attempts 3/4 were caught.
 
-> Full end-to-end log *record* emission can't be observed locally (no DB → the app exits before NestJS
+> Full end-to-end log _record_ emission can't be observed locally (no DB → the app exits before NestJS
 > flushes pino; Nest uses `bufferLogs: true`, flushed only after `NestFactory.create()` resolves +
 > `app.useLogger(...)`). The instrumentation **patch firing** is the deterministic proof the bridge is in
 > place; records follow against a real DB + collector.
@@ -421,11 +436,18 @@ const keepBundled: RegExp[] = [
   /^prosemirror-/,
   /^@handlewithcare\//,
   /^@tiptap\//,
-  /^yjs$/, /^y-protocols(\/|$)/, /^y-prosemirror$/, /^lib0(\/|$)/,
-  /^react$/, /^react-dom(\/|$)/, /^scheduler(\/|$)/, /^@floating-ui\//,
+  /^yjs$/,
+  /^y-protocols(\/|$)/,
+  /^y-prosemirror$/,
+  /^lib0(\/|$)/,
+  /^react$/,
+  /^react-dom(\/|$)/,
+  /^scheduler(\/|$)/,
+  /^@floating-ui\//,
   /^@bufbuild\/protobuf/,
   /^@notopia-uit\//,
-  /^tslib$/, /^@swc\/helpers/,
+  /^tslib$/,
+  /^@swc\/helpers/,
 ];
 
 class ExternalizePlugin {
@@ -436,16 +458,16 @@ class ExternalizePlugin {
       ({ request }, callback) => {
         if (
           !request ||
-          /^[./]/.test(request) ||           // relative/absolute
-          request.startsWith('@/') ||         // alias
-          request.startsWith('@database') ||  // alias
-          request.startsWith('#/') ||         // package imports field
-          isBuiltin(request)                  // node builtins (preset handles too)
+          /^[./]/.test(request) || // relative/absolute
+          request.startsWith('@/') || // alias
+          request.startsWith('@database') || // alias
+          request.startsWith('#/') || // package imports field
+          isBuiltin(request) // node builtins (preset handles too)
         ) {
-          return callback();                  // → bundle
+          return callback(); // → bundle
         }
         return keepBundled.some((re) => re.test(request))
-          ? callback()                                 // → bundle the editor cluster
+          ? callback() // → bundle the editor cluster
           : callback(undefined, `commonjs ${request}`); // → externalize everything else
       },
     ];
@@ -487,9 +509,9 @@ that double-emits a ~64 MB inline source map into `main.cjs` (§5.a). Use only `
 - Nx externals logic: `@nx/rspack/src/plugins/utils/apply-base-config.js` (`config.externals = externals`
   overwrite; the `externalDependencies` branches).
 - Related already-merged OTel work (don't redo): `fix(otel): connect Go traces, emit gin/grpc metrics, and
-  enable web OTLP logs`; `fix(document,search-worker): externalize npm deps so OTel can instrument them`;
+enable web OTLP logs`; `fix(document,search-worker): externalize npm deps so OTel can instrument them`;
   `chore: move type express to dev deps in nestjs`; `chore(lib,ui,pb): use peerDependencies for host-provided
-  singletons`.
+singletons`.
 
 ---
 
@@ -511,4 +533,7 @@ that double-emits a ~64 MB inline source map into `main.cjs` (§5.a). Use only `
   `generatePackageJson` stops shipping them in the runtime image. Correctness-neutral (dead weight only);
   **externalized packages must stay in `dependencies`.** Skipped to keep the externals↔manifest coupling out
   of scope.
+
+```
+
 ```

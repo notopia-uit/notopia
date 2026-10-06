@@ -18,8 +18,7 @@ const __dirname = import.meta.dirname;
 //
 // Keeping deps external is what lets OpenTelemetry's require-in-the-middle patch
 // them at runtime (pino → logs; kafkajs/nestjs → spans) and keeps the bundle
-// small. Blocknote's own deps (prosemirror, yjs, the markdown stack, …) are
-// externalized too — they load fine natively.
+// small.
 //
 // What MUST be bundled is the blocknote editor cluster — these can't be loaded
 // natively as external CommonJS requires, so rspack has to compile them in:
@@ -39,6 +38,11 @@ const __dirname = import.meta.dirname;
 // @opentelemetry/*) AND blocknote's dual-package leaf deps (the unified/remark/
 // mdast markdown stack) — they load fine natively. Keeping them external is what
 // lets OpenTelemetry's require-in-the-middle patch pino (logs) and kafkajs/nestjs.
+// Deps of an already-bundled third-party module are bundled too (transitively):
+// under pnpm isolated they're not resolvable from dist/ (e.g. prosemirror-model →
+// orderedmap). jsdom is the exception — bundling it drops its xhr-sync-worker file.
+const keepExternal: RegExp[] = [/^jsdom(\/|$)/];
+
 const keepBundled: RegExp[] = [
   /^@blocknote\//,
   /^prosemirror-/,
@@ -63,7 +67,7 @@ class ExternalizePlugin {
     // Overwrite the externals Nx set (it hard-assigns `config.externals`). Runs
     // after NxAppRspackPlugin because it sits later in the `plugins` array.
     compiler.options.externals = [
-      ({ request }, callback) => {
+      ({ request, contextInfo }, callback) => {
         // App code, path aliases (@/, @database, #/) and node builtins → bundle.
         if (
           !request ||
@@ -75,8 +79,11 @@ class ExternalizePlugin {
         ) {
           return callback();
         }
-        // @blocknote + the workspace libs that import it → bundle; rest external.
-        return keepBundled.some((re) => re.test(request))
+        if (keepExternal.some((re) => re.test(request))) {
+          return callback(undefined, `commonjs ${request}`);
+        }
+        return contextInfo?.issuer?.includes('/node_modules/') ||
+          keepBundled.some((re) => re.test(request))
           ? callback()
           : callback(undefined, `commonjs ${request}`);
       },
