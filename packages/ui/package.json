@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
+    "@ai-sdk/react": "catalog:",
     "@blocknote/core": "catalog:",
     "@blocknote/react": "catalog:",
     "@blocknote/xl-ai": "catalog:",

@@ -9,6 +9,9 @@ catalogs:
     '@ai-sdk/openai-compatible':
       specifier: ^2.0.81
       version: 2.0.81
+    '@ai-sdk/react':
+      specifier: ^3.0.303
+      version: 3.0.303
     '@aws-sdk/client-s3':
       specifier: ^3.1008.0
       version: 3.1008.0
@@ -1219,6 +1222,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@ai-sdk/react':
+        specifier: 'catalog:'
+        version: 3.0.303(react@19.2.8)(zod@4.4.3)
       '@base-ui/react':
         specifier: ^1.8.0
         version: 1.8.0(@date-fns/tz@1.4.1)(@types/react@19.2.18)(date-fns@4.1.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)

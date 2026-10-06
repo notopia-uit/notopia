@@ -1,5 +1,6 @@
 'use client';
 
+import { useChat } from '@ai-sdk/react';
 import { getWorkspaceTreeOptions } from '@notopia-uit/api-gen';
 import type { NoteWorkspaceTreeFolder } from '@notopia-uit/api-gen';
 import {
@@ -38,15 +39,13 @@ import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { TooltipProvider } from '@notopia-uit/ui/components/shadcn/tooltip';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
+import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { useQuery } from '@tanstack/react-query';
 import type { UIMessage } from 'ai';
+import { DefaultChatTransport } from 'ai';
 import { BotMessageSquare, Check, FileText, StickyNote, X } from 'lucide-react';
 import { nanoid } from 'nanoid';
-import { useState } from 'react';
-
-// TODO(nest-ai-backend): replace mock state with useChat from @ai-sdk/react:
-
-export const ASSISTANT_API_URL = '/api/ai/chat';
+import { useMemo, useState } from 'react';
 
 interface AttachedNote {
   noteId: string;
@@ -171,10 +170,26 @@ function NotePicker({
   );
 }
 
-export function AssistantView({ workspaceId }: { workspaceId: string }) {
-  const [messages, setMessages] = useState<UIMessage[]>([]);
+export function AssistantView({
+  workspaceId,
+  aiApiUrl,
+}: {
+  workspaceId: string;
+  aiApiUrl: string;
+}) {
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: aiApiUrl,
+        headers: async () => ({
+          Authorization: `Bearer ${await fetchAccessTokenClientSide()}`,
+        }),
+      }),
+    [aiApiUrl]
+  );
+  const { messages, sendMessage, status, error } = useChat({ transport });
+  const isTyping = status === 'streaming' || status === 'submitted';
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [attachedNotes, setAttachedNotes] = useState<AttachedNote[]>([]);
 
   const toggleNote = (note: AttachedNote) => {
@@ -190,6 +205,10 @@ export function AssistantView({ workspaceId }: { workspaceId: string }) {
     if ((!text && attachedNotes.length === 0) || isTyping) {
       return;
     }
+    const context =
+      attachedNotes.length > 0
+        ? `\n\nAttached notes:\n${attachedNotes.map((note) => `- ${note.name} (id: ${note.noteId}, folder: ${note.folderPath})`).join('\n')}`
+        : '';
     const userMessage: UIMessage = {
       id: nanoid(),
       role: 'user',
@@ -198,32 +217,12 @@ export function AssistantView({ workspaceId }: { workspaceId: string }) {
           type: 'data-attached-note' as const,
           data: { noteId: note.noteId, name: note.name },
         })),
-        ...(text ? [{ type: 'text' as const, text }] : []),
+        ...(text || context ? [{ type: 'text' as const, text: `${text}${context}` }] : []),
       ],
     };
-    setMessages((prev) => [...prev, userMessage]);
+    void sendMessage(userMessage);
     setAttachedNotes([]);
     setInput('');
-    setIsTyping(true);
-    const noteCount = attachedNotes.length;
-    window.setTimeout(() => {
-      const detail =
-        noteCount > 0 ? ` with ${noteCount} note${noteCount === 1 ? '' : 's'} attached` : '';
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: nanoid(),
-          role: 'assistant',
-          parts: [
-            {
-              type: 'text',
-              text: `AI backend is not connected yet. You said: "${text}"${detail}.`,
-            },
-          ],
-        },
-      ]);
-      setIsTyping(false);
-    }, 900);
   };
 
   return (
@@ -235,7 +234,7 @@ export function AssistantView({ workspaceId }: { workspaceId: string }) {
               <ConversationEmptyState
                 icon={<BotMessageSquare className="size-12" />}
                 title="Ask your workspace"
-                description="Attach workspace notes, then ask. The AI backend is not connected yet."
+                description="Attach workspace notes, then ask."
               />
             ) : (
               messages.map((message) => (
@@ -270,6 +269,9 @@ export function AssistantView({ workspaceId }: { workspaceId: string }) {
 
         <div className="mx-auto w-full max-w-3xl p-4">
           <PromptInput onSubmit={handleSubmit}>
+            {error && (
+              <p className="text-destructive px-3 pt-2 text-sm">Request failed: {error.message}</p>
+            )}
             <PromptInputHeader>
               {attachedNotes.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 px-3 pt-2">
@@ -305,7 +307,7 @@ export function AssistantView({ workspaceId }: { workspaceId: string }) {
             </PromptInputFooter>
           </PromptInput>
           <p className="text-muted-foreground mt-2 text-center text-xs">
-            Preview UI — answers are mocked until the Nest AI backend is connected.
+            Answers stream from the AI service; attached notes are sent as context.
           </p>
         </div>
       </div>
