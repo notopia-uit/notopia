@@ -103,7 +103,8 @@ env:
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 concurrency:
-  group: ${{ github.ref == 'refs/heads/main' && format('{0}-{1}', github.workflow, github.ref) || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   main:
@@ -114,7 +115,6 @@ jobs:
       contents: write
       actions: write
       packages: write
-      pages: write
       id-token: write
     steps:
       - name: Expose GitHub Runtime
@@ -233,13 +233,6 @@ jobs:
         id: set-shas
         uses: nrwl/nx-set-shas@v5
 
-      - name: Restore Docs diagrams Cache
-        uses: actions/cache/restore@v5
-        if: ${{ github.event.inputs.noRestoreDocsDiagramsCache != 'true' }}
-        with:
-          path: docs/src/public/diagrams/
-          key: docs-diagrams-
-
       - name: Install Node Dependencies
         run: pnpm install
 
@@ -264,6 +257,7 @@ jobs:
             --target build \
             --target test \
             --target upload-codecov \
+            --exclude=docs,page \
             --parallel=${{env.NX_PARALLEL }} \
             --configuration 'production' \
             ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
@@ -290,18 +284,6 @@ jobs:
             git status --short
             exit 1;
           fi
-
-      - name: Nx Deploy Page
-        env:
-          NX_CACHE_ACTION_SKIP_UPLOAD_CACHE: ${{ steps.setup-vars.outputs.NX_CACHE_ACTION_SKIP_UPLOAD_CACHE }}
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: |
-          nx-cache-action -- \
-          pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
-            '--target deployPage' \
-            --parallel=${{env.NX_PARALLEL }} \
-            --configuration 'production' \
-            ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
 
       - name: Github NPM Token
         if: >-
@@ -358,9 +340,96 @@ jobs:
       #     repo: ${{ github.repository_owner }}/infra
       #     token: ${{ steps.get-bot-token.outputs.token }}
 
-      - name: Cache Docs diagrams
-        uses: actions/cache/save@v5
-        if: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
+  docs:
+    name: Docs
+    needs: main
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    env:
+      DOCS_KROKI_URL: http://localhost:8000
+    services:
+      kroki:
+        image: yuzutech/kroki
+        env:
+          KROKI_LISTEN: 0.0.0.0:8000
+        ports:
+          - 8000:8000
+    steps:
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v4
+
+      - name: Setup Git User
+        run: |
+          git config --global user.name github-actions[bot]
+          git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          filter: tree:0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          cache: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .tool-versions
+
+      - name: Setup Mise
+        uses: jdx/mise-action@v4
+        with:
+          experimental: true
+          cache: true
+          install_args: npm:@kevinnitro/nx-cache-action
+
+      - name: Derive SHAs for Nx Affected
+        uses: nrwl/nx-set-shas@v5
+
+      - name: Restore Docs diagrams Cache
+        id: diagrams-cache
+        uses: actions/cache/restore@v5
+        if: ${{ github.event.inputs.noRestoreDocsDiagramsCache != 'true' }}
         with:
           path: docs/src/public/diagrams/
-          key: docs-diagrams-${{ hashFiles('docs/src/public/diagrams/**') }}
+          key: docs-diagrams-
+          restore-keys: |
+            docs-diagrams-
+
+      - name: Install Node Dependencies
+        run: pnpm install
+
+      - name: Nx reset cache
+        if: ${{ github.event.inputs.resetNxCache == 'true' }}
+        run: pnpm exec nx reset
+
+      - name: Nx Build and Deploy Page
+        run: |
+          nx-cache-action -- \
+          pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
+            --projects docs,page \
+            --target build \
+            --target deployPage \
+            --parallel=${{ env.NX_PARALLEL }} \
+            --configuration 'production' \
+            ${{ github.event.inputs.skipNxCache == 'true' && '--skipNxCache' || '' }}
+
+      - name: Calculate Docs diagrams Cache Key
+        id: cache-key
+        run: |
+          mkdir -p docs/src/public/diagrams
+          hash="$(find docs/src/public/diagrams -type f -print0 | sort -z | xargs -0 -r sha256sum | sha256sum | cut -d ' ' -f 1)"
+          echo "cache_key=docs-diagrams-$hash" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Docs diagrams
+        if: ${{ steps.cache-key.outputs.cache_key != steps.diagrams-cache.outputs.cache-matched-key }}
+        uses: actions/cache/save@v5
+        with:
+          path: docs/src/public/diagrams/
+          key: ${{ steps.cache-key.outputs.cache_key }}
