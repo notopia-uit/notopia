@@ -116,6 +116,8 @@ jobs:
       actions: write
       packages: write
       id-token: write
+    outputs:
+      page-affected: ${{ steps.page-affected.outputs.affected }}
     steps:
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v4
@@ -239,6 +241,17 @@ jobs:
       - name: Install Go Dependencies
         run: go mod download
 
+      - name: Detect Page Affected
+        id: page-affected
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          projects="$(pnpm exec nx show projects --affected --with-target deployPage --json)"
+          if [ "$(jq length <<< "$projects")" -gt 0 ]; then
+            echo "affected=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "affected=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Nx reset cache
         if: ${{ github.event.inputs.resetNxCache == 'true' }}
         run: pnpm exec nx reset
@@ -343,7 +356,11 @@ jobs:
   docs:
     name: Docs
     needs: main
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: >-
+      ${{
+        github.ref == 'refs/heads/main' &&
+        (needs.main.outputs.page-affected == 'true' || github.event.inputs.nxAllCmd == 'run-many')
+      }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -418,8 +435,6 @@ jobs:
         run: |
           nx-cache-action -- \
           pnpm exec nx ${{ github.event.inputs.nxAllCmd || 'affected' }} \
-            --projects docs,page \
-            --target build \
             --target deployPage \
             --parallel=${{ env.NX_PARALLEL }} \
             --configuration 'production' \
