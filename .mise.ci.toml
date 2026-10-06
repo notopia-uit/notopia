@@ -5,7 +5,7 @@ REDOCLY_TELEMETRY = "off"
 REDOCLY_SUPPRESS_UPDATE_NOTICE = "true"
 NEXT_TELEMETRY_DISABLED = 1
 MISE_EXPERIMENTAL = 1
-'_'.path.paths = ["./bin/", "./scripts/"]
+'_'.path.paths = ["./scripts/"]
 
 [tools]
 "pipx:codecov-cli" = "11.2.8"
@@ -26,21 +26,10 @@ protoc-gen-go = "1.36.12"
 protoc-gen-go-grpc = "1.6.2"
 "npm:ts-proto" = "2.12.3"
 
-[tools."http:plantuml"]
-version = "1.2026.2"
-url = "https://github.com/plantuml/plantuml/releases/download/v{{ version }}/plantuml.jar"
-
-[tools."http:kroki"]
-url = "https://github.com/yuzutech/kroki/releases/download/v{{ version }}/kroki-standalone-server-v{{ version }}.jar"
-version = "0.30.1"
-bin = "kroki-server.jar"
-
 [shell_alias]
 nx = "pnpm exec nx"
 shadcn = "pnpm exec shadcn"
 tsgo = "pnpm exec tsgo"
-plantuml = "./bin/plantuml"
-kroki = "./bin/kroki"
 
 [settings]
 legacy_version_file = false
