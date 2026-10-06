@@ -382,12 +382,17 @@ jobs:
         with:
           node-version-file: .tool-versions
 
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: .tool-versions
+          cache: true
+
       - name: Setup Mise
         uses: jdx/mise-action@v4
         with:
           experimental: true
           cache: true
-          install_args: npm:@kevinnitro/nx-cache-action
 
       - name: Derive SHAs for Nx Affected
         uses: nrwl/nx-set-shas@v5
