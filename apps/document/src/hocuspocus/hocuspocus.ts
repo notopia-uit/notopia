@@ -19,6 +19,7 @@ import { HocuspocusContext } from './hocuspocus-context';
 export class Hocuspocus {
   private readonly logger = new Logger(Hocuspocus.name);
   readonly hocuspocus: ServerHocuspocus<HocuspocusContext>;
+  private readonly deletedDocumentIds = new Set<string>();
 
   constructor(
     documentService: DocumentService,
@@ -39,6 +40,9 @@ export class Hocuspocus {
         const entity = await documentService.getById(documentName);
         applyStoredModified(document, entity?.modified ?? false);
       },
+      afterUnloadDocument: async ({ documentName }) => {
+        this.deletedDocumentIds.delete(documentName);
+      },
       onAuthenticate: (...args) => this.onAuthenticate(...args),
       onChange: (...args) => this.onChange(...args),
       extensions: [
@@ -53,11 +57,22 @@ export class Hocuspocus {
             return document?.data ?? null;
           },
           store: async ({ documentName: id, state, document }) => {
+            if (this.deletedDocumentIds.has(id)) return;
             await documentService.upsertData(id, state, readModified(document));
           },
         }),
       ],
     });
+  }
+
+  markDeleted(id: string): void {
+    if (this.hocuspocus.documents.has(id)) {
+      this.deletedDocumentIds.add(id);
+    }
+  }
+
+  closeConnections(id: string): void {
+    this.hocuspocus.closeConnections(id);
   }
 
   private async onAuthenticate(

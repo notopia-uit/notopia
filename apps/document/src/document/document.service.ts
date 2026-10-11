@@ -115,6 +115,11 @@ export class DocumentService {
     this.logger.log({ id, dataSize: data.length }, 'upsertData: saved');
   }
 
+  async deleteById(id: string): Promise<void> {
+    await this.repo.delete({ id });
+    this.logger.log({ id }, 'deleteById: document deleted');
+  }
+
   async getById(id: string): Promise<DocumentEntity | null> {
     this.logger.debug({ id }, 'getById: fetching document');
     const document = await this.repo.findOneBy({ id });
