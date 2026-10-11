@@ -7,6 +7,8 @@ import {
   authenticationConfigSchema,
   DatabaseConfig,
   databaseConfigSchema,
+  IdentityConfig,
+  identityConfigSchema,
   KafkaConfig,
   kafkaConfigSchema,
   S3Config,
@@ -88,4 +90,13 @@ export const authenticationConfig = registerAs(AUTHENTICATION_CONFIG, () =>
       .map((v) => v.trim())
       .filter(Boolean),
   } satisfies AuthenticationConfig)
+);
+
+export const IDENTITY_CONFIG = Symbol('IDENTITY_CONFIG');
+
+export const identityConfig = registerAs(IDENTITY_CONFIG, () =>
+  identityConfigSchema.parse({
+    adminGroup: process.env.NOTOPIA_DOCUMENT_IDENTITY_ADMIN_GROUP ?? 'notopia-admins',
+    serviceAccountUserId: process.env.NOTOPIA_DOCUMENT_IDENTITY_SERVICE_ACCOUNT_USER_ID!,
+  } satisfies IdentityConfig)
 );

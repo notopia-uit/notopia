@@ -13,6 +13,7 @@ var ProviderSet = wire.NewSet(
 		"Authentik",
 		"Database",
 		"General",
+		"Identity",
 		"Kafka",
 		"Log",
 		"Meilisearch",

@@ -25,6 +25,8 @@ export const envSchema = z.object({
   NOTOPIA_DOCUMENT_AUTHENTICATION_JWKS_URLS: z.string().default(''),
   NOTOPIA_DOCUMENT_AUTHENTICATION_ISSUERS: z.string().optional(),
   NOTOPIA_DOCUMENT_AUTHENTICATION_AUDIENCES: z.string().optional(),
+  NOTOPIA_DOCUMENT_IDENTITY_ADMIN_GROUP: z.string().default('notopia-admins'),
+  NOTOPIA_DOCUMENT_IDENTITY_SERVICE_ACCOUNT_USER_ID: z.string().min(1),
 });
 
 export type Env = z.infer<typeof envSchema>;
