@@ -186,7 +186,13 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 		inTransaction: n.inTransaction,
 	}, func(params *RunInTxFnParams) error {
 		queries := params.queries
+		var workspaceID uuid.UUID
 		if note.Deleted() {
+			var err error
+			workspaceID, err = queries.GetWorkspaceIDByNoteID(ctx, note.ID())
+			if err != nil {
+				return toErr(err)
+			}
 			if err := queries.PermanentlyDeleteNoteByID(ctx, note.ID()); err != nil {
 				return toErr(err)
 			}
@@ -242,9 +248,12 @@ func (n *Note) Save(ctx context.Context, note *domain.Note) error {
 				return toErr(err)
 			}
 		}
-		workspaceID, err := queries.GetWorkspaceIDByNoteID(ctx, note.ID())
-		if err != nil {
-			return toErr(err)
+		if !note.Deleted() {
+			var err error
+			workspaceID, err = queries.GetWorkspaceIDByNoteID(ctx, note.ID())
+			if err != nil {
+				return toErr(err)
+			}
 		}
 		for _, event := range note.PopEvents() {
 			if err := params.publisher.PublishWorkspaceItem(ctx, event, workspaceID); err != nil {
