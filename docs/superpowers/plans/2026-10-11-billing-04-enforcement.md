@@ -6,7 +6,7 @@
 
 **Architecture:** note gets an `EntitlementSvc` port (gRPC adapter to billing) used by command/query handlers, a trash-purge cron (`pkg/cron`), and a Kafka consumer that forwards billing notifications to the existing `WorkspaceEventHub`. document gets a billing gRPC client, revision/document columns, a transactional `commitIfDue`, a Hocuspocus `AutoCommitExtension`, sweeper + revision-purge crons (`@nestjs/locks`), and an optional Redis scaling mode.
 
-**Tech Stack:** Go (gin strict server, grpc, Watermill, `pkg/cron`), NestJS 11 (TypeORM synchronize in dev, `@nestjs/schedule`, `@nestjs/locks` via `@notopia-uit/lib-server/locks`, Hocuspocus v4.0.0, `@hocuspocus/extension-redis` 4.0.0), vitest + @suites.
+**Tech Stack:** Go (gin strict server, grpc, Watermill, `pkg/cron`), NestJS 11 (TypeORM synchronize in dev, `@nestjs/schedule` 6.1.3, `@nestjs/locks` 0.0.2 via `@notopia-uit/lib-server/locks`, Hocuspocus v4.0.0, `@hocuspocus/extension-redis` 4.0.0), vitest + @suites.
 
 **Spec:** `docs/superpowers/specs/2026-10-11-billing-04-enforcement-design.md`
 

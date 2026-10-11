@@ -6,7 +6,7 @@
 
 **Architecture:** Small additions to `pkg/common`, a new `pkg/cron`, a locks module in `packages/lib-server`, contract files in `api/common` and `proto/`, and one read-model query in note. No billing logic.
 
-**Tech Stack:** Go (gin, viper, gocron v2.22.0, gocron-redis-lock v2.2.1, go-redis v9), NestJS 11 (`@nestjs/schedule` 12.0.2, `@nestjs/locks` 0.0.1, `ioredis` 5.6.1), buf, oapi-codegen, sqlc, Authentik blueprints.
+**Tech Stack:** Go (gin, viper, gocron v2.22.0, gocron-redis-lock v2.2.1, go-redis v9), NestJS 11 (`@nestjs/schedule` 6.1.3, `@nestjs/locks` 0.0.2, `ioredis` 5.6.1), buf, oapi-codegen, sqlc, Authentik blueprints.
 
 **Spec:** `docs/superpowers/specs/2026-10-11-billing-02-foundations-design.md`
 
@@ -16,7 +16,7 @@
 - Admin group default `notopia-admins`; env `NOTOPIA_{SERVICE}_IDENTITY_ADMIN_GROUP`, `NOTOPIA_{SERVICE}_IDENTITY_SERVICE_ACCOUNT_USER_ID`.
 - Service accounts: `note-service` 1001 (exists), `document-service` 1002, `billing-service` 1003. User ids are Authentik pks as strings.
 - Cron timezone `Asia/Ho_Chi_Minh`; lock key = job name, prefixed with the service (`note:...`).
-- `@nestjs/locks` pinned to `0.0.1` (0.0.2 was published 2026-10-08; bump after 2026-10-22). `ioredis` `5.6.1` matches `@hocuspocus/extension-redis@4.0.0` (`~5.6.1`).
+- Repo is on Nest 11 (`@nestjs/*` `^11.2.7`): `@nestjs/schedule` `6.1.3` (peer `^10 || ^11`; 12.x is the Nest 12 line), `@nestjs/locks` `0.0.2` (peer `^11 || ^12`). `ioredis` `5.6.1` matches `@hocuspocus/extension-redis@4.0.0` (`~5.6.1`).
 - Redis used for locks needs `maxmemory-policy noeviction` and persistence (`@nestjs/locks` doc).
 - Codegen: `nx run api:gen`, `nx run proto:gen`, `nx run note:gen:sqlc`, `nx run note:gen:wire`. Never edit generated files.
 - Skip obvious tests. `oxfmt` changed JS, `nx lint <project> --fix` before each commit. Conventional commits.
@@ -514,8 +514,8 @@ git commit -m "feat(pkg): add cron scheduler with redis distributed lock"
 `pnpm-workspace.yaml` catalog:
 
 ```yaml
-  "@nestjs/locks": "0.0.1"
-  "@nestjs/schedule": "12.0.2"
+  "@nestjs/locks": "0.0.2"
+  "@nestjs/schedule": "6.1.3"
   "ioredis": "5.6.1"
 ```
 
