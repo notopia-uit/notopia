@@ -34,6 +34,9 @@ func (a slogAdapter) Warn(msg string, args ...any)  { a.logger.Warn(msg, args...
 func (a slogAdapter) Error(msg string, args ...any) { a.logger.Error(msg, args...) } //nolint:sloglint
 
 func NewScheduler(locker gocron.Locker, logger *slog.Logger, location *time.Location) (*Scheduler, error) {
+	if logger == nil {
+		return nil, errors.New("cron logger is required")
+	}
 	if location == nil {
 		return nil, errors.New("cron location is required")
 	}
@@ -50,6 +53,9 @@ func NewScheduler(locker gocron.Locker, logger *slog.Logger, location *time.Loca
 
 func (s *Scheduler) Register(jobs ...Job) error {
 	for _, job := range jobs {
+		if job.Name == "" || job.Run == nil || job.Timeout <= 0 {
+			return fmt.Errorf("invalid cron job %q: name, run and a positive timeout are required", job.Name)
+		}
 		j, err := s.scheduler.NewJob(
 			gocron.CronJob(job.Schedule, false),
 			gocron.NewTask(s.wrap(job)),
@@ -72,6 +78,7 @@ func (s *Scheduler) wrap(job Job) func() {
 		defer span.End()
 		defer func() {
 			if r := recover(); r != nil {
+				span.RecordError(fmt.Errorf("panic: %v", r))
 				span.SetStatus(codes.Error, fmt.Sprint(r))
 				s.logger.ErrorContext(
 					ctx,
