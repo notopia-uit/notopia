@@ -25,7 +25,7 @@
 - 402 body = `PaymentRequiredError` (`api/common`): `{code: featureNotInPlan|planLimitExceeded, message, details: {kind, key, current?, max?, requiredPlan}}`; `requiredPlan` = cheapest tier (`plus` < `pro`) that unlocks it.
 - `-1` = unlimited; missing feature = false; missing limit = 0.
 - Cron actors: note `NOTOPIA_NOTE_IDENTITY_SERVICE_ACCOUNT_USER_ID=1001`, document `NOTOPIA_DOCUMENT_IDENTITY_SERVICE_ACCOUNT_USER_ID=1002`.
-- Cron time zone `Asia/Ho_Chi_Minh`: note trash purge `0 3 * * *`; document revision purge `30 3 * * *`; document sweeper `*/10 * * * *`.
+- Cron time zone is never hard-coded: Go passes `time.Local`, NestJS `@Cron` omits `timeZone`; both follow the process `TZ` env (else system zone). Schedules: note trash purge `0 3 * * *`; document revision purge `30 3 * * *`; document sweeper `*/10 * * * *`.
 - Hocuspocus facts (v4.0.0): store payload `{clientsCount, document, documentName, instance, lastContext, lastTransactionOrigin}`; `afterStoreDocument` runs in the same `saveMutex` right after `onStoreDocument`; debounce/maxDebounce are server-wide only (defaults 2000/10000).
 - Skip obvious tests. `oxfmt` changed JS; `nx lint <project> --fix`; conventional commits.
 
@@ -51,8 +51,10 @@
 - Produces:
 
 ```go
+type PlanTier uint8 // PlanTierUnspecified (zero), PlanTierFree, PlanTierPlus, PlanTierPro; IsValid(), String()
+
 type Entitlements struct {
-	Plan     string
+	Plan     PlanTier
 	Features map[string]bool
 	Limits   map[string]int64
 }
@@ -60,7 +62,7 @@ func (e Entitlements) Feature(key string) bool
 func (e Entitlements) Limit(key string) int64
 
 type PlanEntitlements struct {
-	Tier     string
+	Tier     PlanTier
 	Features map[string]bool
 	Limits   map[string]int64
 }
@@ -71,9 +73,10 @@ type EntitlementSvc interface {
 	GetPayer(ctx context.Context, workspaceID uuid.UUID) (payerID *string, requiresPayer bool, err error)
 	ListPlans(ctx context.Context) ([]PlanEntitlements, error)
 }
-func RequiredPlanForFeature(plans []PlanEntitlements, key string) string
-func RequiredPlanForLimit(plans []PlanEntitlements, key string, needed int64) string
+func RequiredPlanForFeature(plans []PlanEntitlements, key string) PlanTier
+func RequiredPlanForLimit(plans []PlanEntitlements, key string, needed int64) PlanTier
 ```
+- Mapper (`infra/service/billing.go`): `toAppPlanTier(pb.PlanTier) (app.PlanTier, error)`; `PLAN_TIER_UNSPECIFIED` (or any unknown value) is an internal error, since note has no fallback plan.
 - errs: `NewFeatureNotInPlan(key, requiredPlan string)`, `NewPlanLimitExceeded(key string, current, max int64, requiredPlan string)`, `NewBillingPayerMustTransfer(workspaceID uuid.UUID)`, `NewBillingServiceUnavailable(err error)`.
 
 - [ ] **Step 1: Port + helpers**
@@ -96,8 +99,41 @@ const (
 	Unlimited          int64 = -1
 )
 
+type PlanTier uint8
+
+const (
+	PlanTierUnspecified PlanTier = iota
+	PlanTierFree
+	PlanTierPlus
+	PlanTierPro
+)
+
+func (t PlanTier) IsValid() bool {
+	switch t {
+	case PlanTierFree, PlanTierPlus, PlanTierPro:
+		return true
+	default:
+		return false
+	}
+}
+
+func (t PlanTier) String() string {
+	switch t {
+	case PlanTierUnspecified:
+		return "unspecified"
+	case PlanTierFree:
+		return "free"
+	case PlanTierPlus:
+		return "plus"
+	case PlanTierPro:
+		return "pro"
+	default:
+		return "unknown"
+	}
+}
+
 type Entitlements struct {
-	Plan     string
+	Plan     PlanTier
 	Features map[string]bool
 	Limits   map[string]int64
 }
@@ -106,7 +142,7 @@ func (e Entitlements) Feature(key string) bool { return e.Features[key] }
 func (e Entitlements) Limit(key string) int64  { return e.Limits[key] }
 
 type PlanEntitlements struct {
-	Tier     string
+	Tier     PlanTier
 	Features map[string]bool
 	Limits   map[string]int64
 }
@@ -118,9 +154,9 @@ type EntitlementSvc interface {
 	ListPlans(ctx context.Context) ([]PlanEntitlements, error)
 }
 
-var paidTiers = []string{"plus", "pro"}
+var paidTiers = []PlanTier{PlanTierPlus, PlanTierPro}
 
-func planByTier(plans []PlanEntitlements, tier string) (PlanEntitlements, bool) {
+func planByTier(plans []PlanEntitlements, tier PlanTier) (PlanEntitlements, bool) {
 	for _, p := range plans {
 		if p.Tier == tier {
 			return p, true
@@ -129,16 +165,16 @@ func planByTier(plans []PlanEntitlements, tier string) (PlanEntitlements, bool) 
 	return PlanEntitlements{}, false
 }
 
-func RequiredPlanForFeature(plans []PlanEntitlements, key string) string {
+func RequiredPlanForFeature(plans []PlanEntitlements, key string) PlanTier {
 	for _, tier := range paidTiers {
 		if p, ok := planByTier(plans, tier); ok && p.Features[key] {
 			return tier
 		}
 	}
-	return "pro"
+	return PlanTierPro
 }
 
-func RequiredPlanForLimit(plans []PlanEntitlements, key string, needed int64) string {
+func RequiredPlanForLimit(plans []PlanEntitlements, key string, needed int64) PlanTier {
 	for _, tier := range paidTiers {
 		if p, ok := planByTier(plans, tier); ok {
 			if l := p.Limits[key]; l == Unlimited || l >= needed {
@@ -146,7 +182,7 @@ func RequiredPlanForLimit(plans []PlanEntitlements, key string, needed int64) st
 			}
 		}
 	}
-	return "pro"
+	return PlanTierPro
 }
 ```
 
@@ -201,6 +237,8 @@ func NewBillingServiceUnavailable(err error) *Err {
 }
 ```
 
+`requiredPlan` stays a `string` in `errs`: it is the 402 wire value, so app callers pass `RequiredPlanFor…(…).String()`.
+
 `internal/note/controller/http/err.go`:
 - `strictServerToHTTPErr`: `CodeBillingPayerMustTransfer` → 409, `CodeBillingServiceUnavailable` → 503, `CodeFeatureNotInPlan`/`CodePlanLimitExceeded` → 402.
 - In `strictHandlerError`, before the generic path:
@@ -226,15 +264,34 @@ func NewBillingServiceUnavailable(err error) *Err {
 `cmd/note/.env`:
 
 ```
-NOTOPIA_NOTE_SERVICES_BILLING_URL=localhost:18083
-NOTOPIA_NOTE_SERVICES_BILLING_LIVE_URL=http://localhost:28083/billing/health/live
+NOTOPIA_NOTE_SERVICES_BILLING_URL=localhost:18084
+NOTOPIA_NOTE_SERVICES_BILLING_LIVE_URL=http://localhost:28084/billing/health/live
 ```
 
 `internal/note/infra/service/billing.go`: copy the connection setup of `infra/service/authorization.go` (otelgrpc stats handler, logging interceptor, insecure creds) with `servicesCfg.Billing.URL` and an error interceptor returning `errs.NewBillingServiceUnavailable(err)` for `codes.Unavailable`/`DeadlineExceeded` and wrapping others as internal. Methods:
 
 ```go
-func toEntitlements(e *pb.Entitlements) app.Entitlements {
-	return app.Entitlements{Plan: e.GetPlan(), Features: e.GetFeatures(), Limits: e.GetLimits()}
+func toAppPlanTier(tier pb.PlanTier) (app.PlanTier, error) {
+	switch tier {
+	case pb.PlanTier_PLAN_TIER_FREE:
+		return app.PlanTierFree, nil
+	case pb.PlanTier_PLAN_TIER_PLUS:
+		return app.PlanTierPlus, nil
+	case pb.PlanTier_PLAN_TIER_PRO:
+		return app.PlanTierPro, nil
+	case pb.PlanTier_PLAN_TIER_UNSPECIFIED:
+		return app.PlanTierUnspecified, errs.NewInternal("unspecified plan tier from billing")
+	default:
+		return app.PlanTierUnspecified, errs.NewInternal(fmt.Sprintf("invalid plan tier from billing: %v", tier))
+	}
+}
+
+func toEntitlements(e *pb.Entitlements) (app.Entitlements, error) {
+	plan, err := toAppPlanTier(e.GetPlan())
+	if err != nil {
+		return app.Entitlements{}, err
+	}
+	return app.Entitlements{Plan: plan, Features: e.GetFeatures(), Limits: e.GetLimits()}, nil
 }
 
 func (b *Billing) Get(ctx context.Context, workspaceID uuid.UUID) (app.Entitlements, error) {
@@ -242,7 +299,7 @@ func (b *Billing) Get(ctx context.Context, workspaceID uuid.UUID) (app.Entitleme
 	if err != nil {
 		return app.Entitlements{}, err
 	}
-	return toEntitlements(res.GetEntitlements()), nil
+	return toEntitlements(res.GetEntitlements())
 }
 
 func (b *Billing) BatchGet(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]app.Entitlements, error) {
@@ -262,7 +319,9 @@ func (b *Billing) BatchGet(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]
 			if err != nil {
 				return nil, err
 			}
-			out[id] = toEntitlements(v)
+			if out[id], err = toEntitlements(v); err != nil {
+				return nil, err
+			}
 		}
 	}
 	return out, nil
@@ -283,7 +342,11 @@ func (b *Billing) ListPlans(ctx context.Context) ([]app.PlanEntitlements, error)
 	}
 	out := make([]app.PlanEntitlements, 0, len(res.GetPlans()))
 	for _, p := range res.GetPlans() {
-		out = append(out, app.PlanEntitlements{Tier: p.GetTier(), Features: p.GetFeatures(), Limits: p.GetLimits()})
+		tier, err := toAppPlanTier(p.GetTier())
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, app.PlanEntitlements{Tier: tier, Features: p.GetFeatures(), Limits: p.GetLimits()})
 	}
 	return out, nil
 }
@@ -339,13 +402,13 @@ func (f fakeEntitlements) GetPayer(context.Context, uuid.UUID) (*string, bool, e
 }
 func (f fakeEntitlements) ListPlans(context.Context) ([]PlanEntitlements, error) {
 	return []PlanEntitlements{
-		{Tier: "plus", Limits: map[string]int64{LimitMembers: 10}},
-		{Tier: "pro", Limits: map[string]int64{LimitMembers: Unlimited}},
+		{Tier: PlanTierPlus, Limits: map[string]int64{LimitMembers: 10}},
+		{Tier: PlanTierPro, Limits: map[string]int64{LimitMembers: Unlimited}},
 	}, nil
 }
 
 func TestMembersLimit(t *testing.T) {
-	free := fakeEntitlements{ent: Entitlements{Plan: "free", Limits: map[string]int64{LimitMembers: 3}}}
+	free := fakeEntitlements{ent: Entitlements{Plan: PlanTierFree, Limits: map[string]int64{LimitMembers: 3}}}
 	ws := uuid.New()
 
 	var pr *errs.PaymentRequired
@@ -416,7 +479,7 @@ func checkMembersLimit(ctx context.Context, ent EntitlementSvc, workspaceID uuid
 	if err != nil {
 		return err
 	}
-	return errs.NewPlanLimitExceeded(LimitMembers, int64(requested), limit, RequiredPlanForLimit(plans, LimitMembers, int64(requested)))
+	return errs.NewPlanLimitExceeded(LimitMembers, int64(requested), limit, RequiredPlanForLimit(plans, LimitMembers, int64(requested)).String())
 }
 
 func checkPayerKept(ctx context.Context, ent EntitlementSvc, workspaceID uuid.UUID, members []WorkspaceMemberUpdate) error {
@@ -486,7 +549,7 @@ Wire the gates (inject `entitlementSvc EntitlementSvc` into each handler's const
 		if err != nil {
 			return Graph{}, err
 		}
-		return Graph{}, errs.NewFeatureNotInPlan(FeatureWorkspaceGraph, RequiredPlanForFeature(plans, FeatureWorkspaceGraph))
+		return Graph{}, errs.NewFeatureNotInPlan(FeatureWorkspaceGraph, RequiredPlanForFeature(plans, FeatureWorkspaceGraph).String())
 	}
 ```
 
@@ -508,6 +571,7 @@ git commit -m "feat(note): enforce member limit, payer guard and graph entitleme
 - Modify: `internal/note/app/cmd_permanentlydeleteworkspaceitems.go`, `internal/note/app/cmd_emptytrash.go` (use the helper)
 - Modify: `internal/note/infra/persistence/pgsqlc/workspace_read.sql`, `internal/note/app/readmodel.go`, create `internal/note/infra/persistence/pgreadmodel/trashworkspaces.go`, modify `internal/note/infra/persistence/wire.go`
 - Create: `internal/note/controller/cron/{cron.go,wire.go}`; modify `internal/note/controller/wire.go`, `internal/note/server.go`, `internal/note/app/app.go`, `wire.go`
+- Modify: `deploy/compose/services/note.yaml` (`note_redis` now holds cron locks: `command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]`, same as `billing_redis`/`document_redis`)
 
 **Interfaces:**
 - Consumes: `pkg/cron`, `EntitlementSvc.BatchGet`, `commonconfig.Identity.ServiceAccountUserID`.
@@ -718,7 +782,7 @@ func New(a *app.Server, redis *workspaceevent.RedisClient, logger *slog.Logger) 
 	if err != nil {
 		return nil, err
 	}
-	s, err := pkgcron.NewScheduler(locker, logger)
+	s, err := pkgcron.NewScheduler(locker, logger, time.Local)
 	if err != nil {
 		return nil, err
 	}
@@ -751,7 +815,7 @@ nx run note:gen:sqlc && nx run note:gen:wire && nx build note && nx lint note
 Manual: as admin set free `trash_retention_days` to `0` (`PATCH /billing/admin/plans/free`), trash a note in a free workspace, backdate it (`UPDATE notes SET trashed_at = now() - interval '2 days' WHERE id = …`), temporarily schedule the job `* * * * *` → the note is gone, `note.deleted` published, document row and Meilisearch entry removed (plan 01 consumers). Restore the schedule and the plan limit.
 
 ```bash
-git add internal/note cmd/note/wire_gen.go
+git add internal/note cmd/note/wire_gen.go deploy/compose/services/note.yaml
 git commit -m "feat(note): plan-aware trash purge cron"
 ```
 
@@ -839,7 +903,7 @@ import (
 
 type BillingChanged struct {
 	WorkspaceID uuid.UUID
-	Plan        string
+	Plan        PlanTier
 }
 
 type BillingChangedHandler struct {
@@ -858,7 +922,7 @@ func (h *BillingChangedHandler) Handle(ctx context.Context, ev *BillingChanged) 
 		workspaceEvent[note.WorkspaceBillingChangedEventEvent]{
 			Id:    uuid.Must(uuid.NewV7()),
 			Event: note.WorkspaceBillingChangedEventEventWorkspaceBillingChangedEvent,
-			Data:  note.WorkspaceBillingChangedEventData{WorkspaceId: ev.WorkspaceID, Plan: ev.Plan},
+			Data:  note.WorkspaceBillingChangedEventData{WorkspaceId: ev.WorkspaceID, Plan: ev.Plan.String()},
 		},
 	})
 }
@@ -873,18 +937,37 @@ package event
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 )
 
+func toAppPlanTierFromShare(p share.SubscriptionChangedEventPlan) (app.PlanTier, error) {
+	switch p {
+	case share.SubscriptionChangedEventPlanFree:
+		return app.PlanTierFree, nil
+	case share.SubscriptionChangedEventPlanPlus:
+		return app.PlanTierPlus, nil
+	case share.SubscriptionChangedEventPlanPro:
+		return app.PlanTierPro, nil
+	default:
+		return app.PlanTierUnspecified, fmt.Errorf("invalid plan in SubscriptionChangedEvent: %q", p)
+	}
+}
+
 func (e *Event) subscriptionChangedHandler(msg *message.Message) error {
 	var ev share.SubscriptionChangedEvent
 	if err := json.Unmarshal(msg.Payload, &ev); err != nil {
 		return fmt.Errorf("failed to unmarshal SubscriptionChangedEvent: %w", err)
 	}
-	return e.app.Events.BillingChanged.Handle(msg.Context(), &app.BillingChanged{WorkspaceID: ev.WorkspaceId, Plan: string(ev.Plan)})
+	plan, err := toAppPlanTierFromShare(ev.Plan)
+	if err != nil {
+		slog.WarnContext(msg.Context(), "dropping billing notification", slog.Any("error", err))
+		return nil
+	}
+	return e.app.Events.BillingChanged.Handle(msg.Context(), &app.BillingChanged{WorkspaceID: ev.WorkspaceId, Plan: plan})
 }
 ```
 
@@ -958,24 +1041,27 @@ git commit -m "docs(api): document plan limits on note endpoints"
 - Produces:
 
 ```ts
+export type PlanTier = 'free' | 'plus' | 'pro';
 export interface WorkspaceEntitlements {
-  plan: string;
+  plan: PlanTier;
   features: Record<string, boolean>;
   limits: Record<string, number>;
 }
 class EntitlementService {
   get(workspaceId: string): Promise<WorkspaceEntitlements>;
   batchGet(workspaceIds: string[]): Promise<Map<string, WorkspaceEntitlements>>; // chunks of 500
-  listPlans(): Promise<{ tier: string; limits: Record<string, number> }[]>;
+  listPlans(): Promise<{ tier: PlanTier; limits: Record<string, number> }[]>;
 }
 export const feature = (e: WorkspaceEntitlements, key: string) => e.features[key] ?? false;
 export const limit = (e: WorkspaceEntitlements, key: string) => e.limits[key] ?? 0;
 export const UNLIMITED = -1;
 ```
 
+Mapping: `toPlanTier(PlanTierPb)` converts the generated `PlanTier` enum from `@notopia-uit/pb/billing` into the local `PlanTier` union. For entitlements, `PLAN_TIER_UNSPECIFIED` (or `UNRECOGNIZED`) falls back to `'free'`, the same fallback already used when billing returns no entitlements. For `listPlans` it throws, because there is no fallback for a catalog row.
+
 - [ ] **Step 1: Config**
 
-`servicesConfigSchema`: add `billingUrl: z.string()`; factory: `billingUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_BILLING_GRPC_URL!`; `.env`: `NOTOPIA_DOCUMENT_SERVICES_BILLING_GRPC_URL=localhost:18083`.
+`servicesConfigSchema`: add `billingUrl: z.string()`; factory: `billingUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_BILLING_GRPC_URL!`; `.env`: `NOTOPIA_DOCUMENT_SERVICES_BILLING_GRPC_URL=localhost:18084`.
 
 - [ ] **Step 2: Module + service**
 
@@ -983,19 +1069,22 @@ export const UNLIMITED = -1;
 
 ```ts
 // apps/document/src/entitlement/entitlement.service.ts
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, OnModuleInit } from '@nestjs/common';
 import { type ClientGrpc } from '@nestjs/microservices';
 import {
   BILLING_PACKAGE_NAME,
   BILLING_SERVICE_NAME,
   type BillingServiceClient,
   type Entitlements,
+  PlanTier as PlanTierPb,
 } from '@notopia-uit/pb/billing';
 import { Traceable } from 'nestjs-otel';
 import { firstValueFrom } from 'rxjs';
 
+export type PlanTier = 'free' | 'plus' | 'pro';
+
 export interface WorkspaceEntitlements {
-  plan: string;
+  plan: PlanTier;
   features: Record<string, boolean>;
   limits: Record<string, number>;
 }
@@ -1004,8 +1093,21 @@ export const UNLIMITED = -1;
 export const feature = (e: WorkspaceEntitlements, key: string) => e.features[key] ?? false;
 export const limit = (e: WorkspaceEntitlements, key: string) => e.limits[key] ?? 0;
 
+const toPlanTier = (tier: PlanTierPb): PlanTier | undefined => {
+  switch (tier) {
+    case PlanTierPb.PLAN_TIER_FREE:
+      return 'free';
+    case PlanTierPb.PLAN_TIER_PLUS:
+      return 'plus';
+    case PlanTierPb.PLAN_TIER_PRO:
+      return 'pro';
+    default:
+      return undefined;
+  }
+};
+
 const toEntitlements = (e?: Entitlements): WorkspaceEntitlements => ({
-  plan: e?.plan ?? 'free',
+  plan: (e && toPlanTier(e.plan)) ?? 'free',
   features: e?.features ?? {},
   limits: Object.fromEntries(Object.entries(e?.limits ?? {}).map(([k, v]) => [k, Number(v)])),
 });
@@ -1037,12 +1139,13 @@ export class EntitlementService implements OnModuleInit {
     return out;
   }
 
-  async listPlans(): Promise<{ tier: string; limits: Record<string, number> }[]> {
+  async listPlans(): Promise<{ tier: PlanTier; limits: Record<string, number> }[]> {
     const res = await firstValueFrom(this.client.listPlans({}));
-    return res.plans.map((p) => ({
-      tier: p.tier,
-      limits: Object.fromEntries(Object.entries(p.limits).map(([k, v]) => [k, Number(v)])),
-    }));
+    return res.plans.map((p) => {
+      const tier = toPlanTier(p.tier);
+      if (!tier) throw new InternalServerErrorException(`Invalid plan tier from billing: ${p.tier}`);
+      return { tier, limits: Object.fromEntries(Object.entries(p.limits).map(([k, v]) => [k, Number(v)])) };
+    });
   }
 }
 ```
@@ -1481,7 +1584,7 @@ export class RevisionPurgeCron {
     private readonly entitlementService: EntitlementService
   ) {}
 
-  @Cron('30 3 * * *', { name: 'document-revision-purge', timeZone: 'Asia/Ho_Chi_Minh' })
+  @Cron('30 3 * * *', { name: 'document-revision-purge' })
   @OnOneInstance({ key: 'document:revision-purge' })
   @WithoutOverlapping()
   async purge(): Promise<void> {
@@ -1549,7 +1652,7 @@ export class SweeperCron {
     private readonly entitlementService: EntitlementService
   ) {}
 
-  @Cron('*/10 * * * *', { name: 'document-sweeper', timeZone: 'Asia/Ho_Chi_Minh' })
+  @Cron('*/10 * * * *', { name: 'document-sweeper' })
   @OnOneInstance({ key: 'document:sweeper' })
   @WithoutOverlapping()
   async sweep(): Promise<void> {

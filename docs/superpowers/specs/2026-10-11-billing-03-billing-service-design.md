@@ -174,6 +174,20 @@ Idempotency of webhooks is **not** domain: it is an app port `ProviderEventInbox
 `Entitlements` is a value object computed by the domain service `EntitlementResolver` from
 `Subscription` (nullable → free) + `Plan` + `BillingPolicy`.
 
+Enums (`PlanTier`, `Interval`, `Status`, `RefundReason`, `RefundStatus`, `FeatureKey`,
+`LimitKey`, and app-level `WorkspaceRole`, `WorkspacePermission`, `CheckoutPurpose`,
+`WebhookEventType`) follow the note convention (`internal/note/domain/trashed.go`): `type X uint8`,
+`iota` consts with zero `XUnspecified` (`StatusNone`, `WorkspaceRoleNone`, `WebhookIgnored` where
+"none" is a real state), `IsValid()` and `String()`. `String()` yields the snake-case names used
+on the wire and in logs. Every port maps explicitly (`toX`/`fromX`), never by casting: Postgres
+enums ↔ sqlc string types in `pgrepo`, OpenAPI enums in HTTP `mapin`/`mapout`, proto enums
+(`PlanTier`, `SubscriptionStatus`) in gRPC `mapout`, `api/share` in the notifier, Stripe
+statuses/metadata in the Stripe adapter. Consumers (note, document) map the proto enums into their
+own local types. Feature/limit keys cross ports as `k.String()` and come back through
+`ParseFeatureKey` / `ParseLimitKey`: admin HTTP input rejects unknown keys (400), while reading
+plan JSONB skips unknown keys with a warning. `IsValid()` is false for `Unspecified`, deliberately
+unlike note's `TrashedBy`. `errs.Code` stays a `string` because it is itself the wire error code.
+
 ### 4.2 Class diagram
 
 ```mermaid
@@ -559,10 +573,28 @@ service BillingService {
   rpc ListPlans(ListPlansRequest) returns (ListPlansResponse);
 }
 
+enum PlanTier {
+  PLAN_TIER_UNSPECIFIED = 0;
+  PLAN_TIER_FREE = 1;
+  PLAN_TIER_PLUS = 2;
+  PLAN_TIER_PRO = 3;
+}
+
+enum SubscriptionStatus {
+  SUBSCRIPTION_STATUS_UNSPECIFIED = 0;
+  SUBSCRIPTION_STATUS_NONE = 1;
+  SUBSCRIPTION_STATUS_INCOMPLETE = 2;
+  SUBSCRIPTION_STATUS_ACTIVE = 3;
+  SUBSCRIPTION_STATUS_PAST_DUE = 4;
+  SUBSCRIPTION_STATUS_UNPAID = 5;
+  SUBSCRIPTION_STATUS_CANCELED = 6;
+  SUBSCRIPTION_STATUS_INCOMPLETE_EXPIRED = 7;
+}
+
 message Entitlements {
   string workspace_id = 1;
-  string plan = 2;
-  string status = 3;
+  PlanTier plan = 2 [(buf.validate.field).enum = {defined_only: true, not_in: [0]}];
+  SubscriptionStatus status = 3 [(buf.validate.field).enum = {defined_only: true, not_in: [0]}];
   optional google.protobuf.Timestamp access_until = 4;
   map<string, bool> features = 5;
   map<string, int64> limits = 6;
@@ -583,7 +615,7 @@ message GetWorkspacePayerResponse {
 }
 
 message Plan {
-  string tier = 1;
+  PlanTier tier = 1 [(buf.validate.field).enum = {defined_only: true, not_in: [0]}];
   map<string, bool> features = 2;
   map<string, int64> limits = 3;
 }
@@ -591,8 +623,10 @@ message ListPlansRequest {}
 message ListPlansResponse { repeated Plan plans = 1; }
 ```
 
-Callers check maps with a small helper in each consumer (`ent.Feature("auto_commit")`,
-`ent.Limit("members")`; missing key → feature false, limit 0).
+Feature/limit maps stay string-keyed (proto map keys cannot be enums). Callers check maps with a
+small helper in each consumer (`ent.Feature("auto_commit")`, `ent.Limit("members")`; missing key →
+feature false, limit 0) and map `PlanTier`/`SubscriptionStatus` to their own local types at the
+client; `*_UNSPECIFIED` is an error there.
 
 ## 10. Integration events
 
@@ -718,7 +752,7 @@ CREATE TABLE processed_provider_events (
 
 ## 12. Cron (billing)
 
-| Job | Schedule (`Asia/Ho_Chi_Minh`) | Command |
+| Job | Schedule (process zone, `TZ` env) | Command |
 | --- | --- | --- |
 | reconcile subscriptions | hourly | `ReconcileSubscriptions` (batch 100) |
 | prune `processed_provider_events` older than 30 days | daily 04:00 | `PruneProviderEvents` |

@@ -19,6 +19,11 @@ optional Redis scaling mode.
   `modified` and `lastCommittedAt` before calling billing).
 - Billing unreachable: gates return 503, auto-commit skips (the sweeper catches up), crons skip
   the batch and retry next tick.
+- Billing's proto `PlanTier` enum is mapped at each client into a local type (note: Go `app.PlanTier`
+  `uint8`; document: TS union `'free' | 'plus' | 'pro'` from the `@notopia-uit/pb/billing` enum).
+  `PLAN_TIER_UNSPECIFIED` is an error in note; in document it falls back to `free` for
+  entitlements (existing fallback) and is an error for `ListPlans`. Feature/limit maps stay
+  string-keyed.
 - `-1` = unlimited. Missing feature key = false; missing limit key = 0.
 - Downgrade policy: block growth, never delete user data except via retention crons. No
   post-downgrade buffer; the web warns before downgrade.
@@ -49,7 +54,7 @@ optional Redis scaling mode.
 - Flow: `SELECT DISTINCT workspace_id` of root trashed items (`trashed_by = 'purpose'`) with
   `trashed_at < now − 1 day` → batches of 500 → `BatchGetWorkspaceEntitlements` → for each
   workspace delete root items older than `trash_retention_days` (children cascade as today).
-- `controller/cron/`, daily 03:00 `Asia/Ho_Chi_Minh`, `pkg/cron` with Redis locker on
+- `controller/cron/`, daily 03:00 in the process zone (`TZ` env, passed as `time.Local`), `pkg/cron` with Redis locker on
   `note_redis`, `// NOTE:` move to `cmd/note-worker`.
 
 ### Billing change notifications (SSE)
@@ -142,7 +147,7 @@ NOTOPIA_DOCUMENT_REDIS_URL=              # required only when true (zod refine)
 
 ### Crons and locks
 
-`src/cron/*.cron.ts`: `@Cron(expr, { name, timeZone: 'Asia/Ho_Chi_Minh' })` +
+`src/cron/*.cron.ts`: `@Cron(expr, { name })` (no `timeZone`; process zone from `TZ`) +
 `@OnOneInstance({ key })` + `@WithoutOverlapping()`; `app.enableShutdownHooks()`.
 `// NOTE:` move to a document worker when split.
 
