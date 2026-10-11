@@ -38,8 +38,6 @@ type PermanentlyDeleteWorkspaceItemsCmd commonhandler.Cmd[PermanentlyDeleteWorks
 
 var _ PermanentlyDeleteWorkspaceItemsCmd = (*PermanentlyDeleteWorkspaceItemsHandler)(nil)
 
-// NOTE: We delegate the infra persistence to cascading delete things (folder)
-// Fact, we should handle this in domain, not infra
 func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteWorkspaceItems) error {
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
 	if err != nil {
@@ -53,27 +51,11 @@ func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd
 	}
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		if len(cmd.FolderIDs) > 0 {
-			folderRepo := r.Folder()
-			folders, err := folderRepo.GetMany(ctx,
-				//exhaustruct:ignore
-				&domain.FolderRepoGetManyParams{
-					IDs:       cmd.FolderIDs,
-					ForUpdate: true,
-				})
-			if err != nil {
-				return err
-			}
-			for _, folder := range folders {
-				folder.PermanentlyDelete(cmd.UserID)
-			}
-			if err := folderRepo.SaveMany(ctx, folders); err != nil {
-				return err
-			}
-		}
+		folderRepo := r.Folder()
+		noteRepo := r.Note()
 
+		notesByID := map[uuid.UUID]*domain.Note{}
 		if len(cmd.NoteIDs) > 0 {
-			noteRepo := r.Note()
 			notes, err := noteRepo.GetMany(ctx,
 				//exhaustruct:ignore
 				&domain.NoteRepoGetManyParams{
@@ -83,13 +65,46 @@ func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd
 			if err != nil {
 				return err
 			}
-			for _, note := range notes {
-				note.PermanentlyDelete(cmd.UserID)
-			}
-			if err := noteRepo.SaveMany(ctx, notes); err != nil {
-				return err
+			for _, n := range notes {
+				notesByID[n.ID()] = n
 			}
 		}
-		return nil
+
+		var folders []*domain.Folder
+		if len(cmd.FolderIDs) > 0 {
+			var err error
+			folders, err = folderRepo.GetMany(ctx,
+				//exhaustruct:ignore
+				&domain.FolderRepoGetManyParams{
+					IDs:       cmd.FolderIDs,
+					ForUpdate: true,
+				})
+			if err != nil {
+				return err
+			}
+			for _, folder := range folders {
+				children, err := noteRepo.GetRecursiveChildrenFromFolder(ctx, folder.ID(), true)
+				if err != nil {
+					return err
+				}
+				for _, n := range children {
+					notesByID[n.ID()] = n
+				}
+			}
+		}
+
+		notes := make([]*domain.Note, 0, len(notesByID))
+		for _, n := range notesByID {
+			n.PermanentlyDelete(cmd.UserID)
+			notes = append(notes, n)
+		}
+		if err := noteRepo.SaveMany(ctx, notes); err != nil {
+			return err
+		}
+
+		for _, folder := range folders {
+			folder.PermanentlyDelete(cmd.UserID)
+		}
+		return folderRepo.SaveMany(ctx, folders)
 	})
 }

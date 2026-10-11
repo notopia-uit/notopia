@@ -52,6 +52,23 @@ func (h *EmptyTrashHandler) Handle(ctx context.Context, cmd *EmptyTrash) error {
 		folderRepo := r.Folder()
 		noteRepo := r.Note()
 
+		trashedNotes, err := noteRepo.GetMany(ctx, &domain.NoteRepoGetManyParams{
+			IDs:         nil,
+			WorkspaceID: cmd.WorkspaceID,
+			TrashOnly:   true,
+			TrashedBy:   domain.TrashedByUnspecified,
+			ForUpdate:   true,
+		})
+		if err != nil {
+			return err
+		}
+		for _, note := range trashedNotes {
+			note.PermanentlyDelete(cmd.UserID)
+		}
+		if err := noteRepo.SaveMany(ctx, trashedNotes); err != nil {
+			return err
+		}
+
 		trashedFolders, err := folderRepo.GetMany(ctx, &domain.FolderRepoGetManyParams{
 			IDs:         nil,
 			WorkspaceID: cmd.WorkspaceID,
@@ -67,23 +84,6 @@ func (h *EmptyTrashHandler) Handle(ctx context.Context, cmd *EmptyTrash) error {
 			folder.PermanentlyDelete(cmd.UserID)
 		}
 		if err := folderRepo.SaveMany(ctx, trashedFolders); err != nil {
-			return err
-		}
-
-		trashedNotes, err := noteRepo.GetMany(ctx, &domain.NoteRepoGetManyParams{
-			IDs:         nil,
-			WorkspaceID: cmd.WorkspaceID,
-			TrashOnly:   true,
-			TrashedBy:   domain.TrashedByUnspecified,
-			ForUpdate:   true,
-		})
-		if err != nil {
-			return err
-		}
-		for _, note := range trashedNotes {
-			note.PermanentlyDelete(cmd.UserID)
-		}
-		if err := noteRepo.SaveMany(ctx, trashedNotes); err != nil {
 			return err
 		}
 		return nil
