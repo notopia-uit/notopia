@@ -6,7 +6,7 @@
 
 **Architecture:** Small additions to `pkg/common`, a new `pkg/cron`, a locks module in `packages/lib-server`, contract files in `api/common` and `proto/`, and one read-model query in note. No billing logic.
 
-**Tech Stack:** Go (gin, viper, gocron v2.22.0, gocron-redis-lock v2.2.1, go-redis v9), NestJS 11 (`@nestjs/schedule` 12.0.2, `@nestjs/locks` 0.0.2, `ioredis` 5.6.1), buf, oapi-codegen, sqlc, Authentik blueprints.
+**Tech Stack:** Go (gin, viper, gocron v2.22.0, gocron-redis-lock v2.2.1, go-redis v9), NestJS 11 (`@nestjs/schedule` 12.0.2, `@nestjs/locks` 0.0.2, `ioredis` 5.11.1), buf, oapi-codegen, sqlc, Authentik blueprints.
 
 **Spec:** `docs/superpowers/specs/2026-10-11-billing-02-foundations-design.md`
 
@@ -15,8 +15,8 @@
 - Traefik `agilezebra/jwt-middleware` v1.6.0 forwards array claims as JSON (`json.Marshal`), e.g. `X-Forwarded-Groups: ["notopia-admins"]`.
 - Admin group default `notopia-admins`; env `NOTOPIA_{SERVICE}_IDENTITY_ADMIN_GROUP`, `NOTOPIA_{SERVICE}_IDENTITY_SERVICE_ACCOUNT_USER_ID`.
 - Service accounts: `note-service` 1001 (exists), `document-service` 1002, `billing-service` 1003. User ids are Authentik pks as strings.
-- Cron timezone `Asia/Ho_Chi_Minh`; lock key = job name, prefixed with the service (`note:...`).
-- Repo is on Nest 11 (`@nestjs/*` `^11.2.7`): `@nestjs/schedule` `12.0.2` and `@nestjs/locks` `0.0.2` (both peer `@nestjs/common`/`@nestjs/core` `^11 || ^12`). `ioredis` `5.6.1` matches `@hocuspocus/extension-redis@4.0.0` (`~5.6.1`).
+- Cron timezone is never hard-coded: `pkg/cron.NewScheduler` takes a `*time.Location` param; services pass `time.Local` (Go resolves it from the `TZ` env var, else the system zone; `time/tzdata` is embedded so `TZ=Asia/Ho_Chi_Minh` works in distroless images). NestJS `@Cron` omits `timeZone` so it uses the process zone (`TZ`). Lock key = job name, prefixed with the service (`note:...`).
+- Repo is on Nest 11 (`@nestjs/*` `^11.2.7`): `@nestjs/schedule` `12.0.2` and `@nestjs/locks` `0.0.2` (both peer `@nestjs/common`/`@nestjs/core` `^11 || ^12`). `ioredis` `5.11.1` (latest 5.x; satisfies typeorm peer `^5.0.4`; `@hocuspocus/extension-redis@4.0.0` keeps its own `~5.6.1`).
 - Redis used for locks needs `maxmemory-policy noeviction` and persistence (`@nestjs/locks` doc).
 - Codegen: `nx run api:gen`, `nx run proto:gen`, `nx run note:gen:sqlc`, `nx run note:gen:wire`. Never edit generated files.
 - Skip obvious tests. `oxfmt` changed JS, `nx lint <project> --fix` before each commit. Conventional commits.
@@ -42,7 +42,7 @@
 **Interfaces:**
 - Produces: `commonhttp.User{ID, Email, Name string; Groups, Roles []string}`, `commonhttp.RequireGroup(group string) gin.HandlerFunc`, `commonhttp.(*User).HasGroup(group string) bool`
 
-- [ ] **Step 1: Go user parsing**
+- [x] **Step 1: Go user parsing**
 
 `pkg/common/http/user.go`:
 
@@ -87,7 +87,7 @@ func GatewayUserAuth() gin.HandlerFunc {
 
 Imports: `encoding/json`, `slices`.
 
-- [ ] **Step 2: `RequireGroup`**
+- [x] **Step 2: `RequireGroup`**
 
 ```go
 // pkg/common/http/group.go
@@ -114,7 +114,7 @@ func RequireGroup(group string) gin.HandlerFunc {
 }
 ```
 
-- [ ] **Step 3: Fix document `UserGuard` parser**
+- [x] **Step 3: Fix document `UserGuard` parser**
 
 Replace `parseHeaderList` in `apps/document/src/common/user.guard.ts`:
 
@@ -130,7 +130,7 @@ Replace `parseHeaderList` in `apps/document/src/common/user.guard.ts`:
     };
 ```
 
-- [ ] **Step 4: Build, lint, commit**
+- [x] **Step 4: Build, lint, commit**
 
 ```bash
 go build ./pkg/... && nx lint note
@@ -152,7 +152,7 @@ git commit -m "feat(common): parse gateway groups/roles as JSON and add RequireG
 **Interfaces:**
 - Produces: `commonconfig.Identity{AdminGroup, ServiceAccountUserID string}` provided by wire as `*commonconfig.Identity` in note; document `IDENTITY_CONFIG` token with `IdentityConfig { adminGroup: string; serviceAccountUserId: string }`.
 
-- [ ] **Step 1: Go struct**
+- [x] **Step 1: Go struct**
 
 ```go
 // pkg/common/config/identity.go
@@ -164,7 +164,7 @@ type Identity struct {
 }
 ```
 
-- [ ] **Step 2: Note config**
+- [x] **Step 2: Note config**
 
 `internal/note/config/config.go` `Config`: add
 `Identity commonconfig.Identity \`json:"identity" mapstructure:"identity" validate:"required" yaml:"identity"\``.
@@ -177,7 +177,7 @@ NOTOPIA_NOTE_IDENTITY_SERVICE_ACCOUNT_USER_ID=1001
 
 Run: `nx run note:gen:wire && nx build note`.
 
-- [ ] **Step 3: Document config**
+- [x] **Step 3: Document config**
 
 `config.ts`:
 
@@ -204,7 +204,7 @@ export const identityConfig = registerAs(IDENTITY_CONFIG, () =>
 
 Add `identityConfig` to `ConfigModule.forRoot({ load: [...] })` in `app.module.ts`, and `NOTOPIA_DOCUMENT_IDENTITY_SERVICE_ACCOUNT_USER_ID=1002` to the document dev env file.
 
-- [ ] **Step 4: Blueprint**
+- [x] **Step 4: Blueprint**
 
 Append to `users.yaml` `entries` (same shape as `note-service`; no tokens):
 
@@ -240,11 +240,11 @@ Append to `users.yaml` `entries` (same shape as `note-service`; no tokens):
 
 The `notopia-admins` group entry must come **after** the `admin` user entry.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 `docker compose -f deploy/compose/compose.yaml up -d authentik` (or the project's usual command), wait for blueprint reconcile, log in as `admin`, and decode the access token at jwt.io: `groups` contains `notopia-admins`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 oxfmt apps/document/src && nx lint document --fix && nx lint note
@@ -270,7 +270,7 @@ type Job struct {
 	Timeout  time.Duration
 	Run      func(ctx context.Context) error
 }
-func NewScheduler(locker gocron.Locker, logger *slog.Logger) (*Scheduler, error)
+func NewScheduler(locker gocron.Locker, logger *slog.Logger, location *time.Location) (*Scheduler, error)
 func (s *Scheduler) Register(jobs ...Job) error
 func (s *Scheduler) Start()
 func (s *Scheduler) Shutdown() error
@@ -278,7 +278,7 @@ func (s *Scheduler) RunNow(name string) error // tests and manual triggers
 func NewRedisLocker(client redis.UniversalClient) (gocron.Locker, error)
 ```
 
-- [ ] **Step 1: Dependencies**
+- [x] **Step 1: Dependencies**
 
 ```bash
 go get github.com/go-co-op/gocron/v2@v2.22.0 github.com/go-co-op/gocron-redis-lock/v2@v2.2.1 github.com/alicebob/miniredis/v2@latest
@@ -287,7 +287,7 @@ go mod tidy
 
 Check that `gocron-redis-lock/v2` requires `github.com/redis/go-redis/v9` (`go mod graph | grep gocron-redis-lock`).
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 ```go
 // pkg/cron/cron_test.go
@@ -326,7 +326,7 @@ func TestJobRunsOnceAcrossSchedulers(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		s, err := cron.NewScheduler(locker, slog.Default())
+		s, err := cron.NewScheduler(locker, slog.Default(), time.UTC)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -355,12 +355,12 @@ func TestJobRunsOnceAcrossSchedulers(t *testing.T) {
 }
 ```
 
-- [ ] **Step 3: Run test to verify it fails**
+- [x] **Step 3: Run test to verify it fails**
 
 Run: `go test ./pkg/cron/...`
 Expected: FAIL, package `cron` has no `Job`/`NewScheduler`.
 
-- [ ] **Step 4: Implement**
+- [x] **Step 4: Implement**
 
 ```go
 // pkg/cron/locker.go
@@ -389,6 +389,7 @@ package cron
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -398,8 +399,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
 )
-
-const DefaultLocation = "Asia/Ho_Chi_Minh"
 
 type Job struct {
 	Name     string
@@ -414,13 +413,12 @@ type Scheduler struct {
 	jobs      map[string]gocron.Job
 }
 
-func NewScheduler(locker gocron.Locker, logger *slog.Logger) (*Scheduler, error) {
-	loc, err := time.LoadLocation(DefaultLocation)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load cron location: %w", err)
+func NewScheduler(locker gocron.Locker, logger *slog.Logger, location *time.Location) (*Scheduler, error) {
+	if location == nil {
+		return nil, errors.New("cron location is required")
 	}
 	s, err := gocron.NewScheduler(
-		gocron.WithLocation(loc),
+		gocron.WithLocation(location),
 		gocron.WithDistributedLocker(locker),
 		gocron.WithLogger(logger),
 	)
@@ -484,12 +482,12 @@ func (s *Scheduler) Shutdown() error { return s.scheduler.Shutdown() }
 
 If `gocron.WithLogger` does not accept `*slog.Logger` directly, wrap with `gocron.NewLogger` is not slog — write a 4-method adapter (`Debug/Info/Warn/Error(msg string, args ...any)`) delegating to `logger`.
 
-- [ ] **Step 5: Run test**
+- [x] **Step 5: Run test**
 
 Run: `go test ./pkg/cron/... -run TestJobRunsOnceAcrossSchedulers -v`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 go mod tidy
@@ -509,14 +507,14 @@ git commit -m "feat(pkg): add cron scheduler with redis distributed lock"
 **Interfaces:**
 - Produces: `@notopia-uit/lib-server/locks` exporting `LocksSetupModule.forRoot({ redisUrl?: string, ttl?: string }): DynamicModule`, `RedisLockStore`.
 
-- [ ] **Step 1: Dependencies**
+- [x] **Step 1: Dependencies**
 
 `pnpm-workspace.yaml` catalog:
 
 ```yaml
   "@nestjs/locks": "0.0.2"
   "@nestjs/schedule": "12.0.2"
-  "ioredis": "5.6.1"
+  "ioredis": "5.11.1"
 ```
 
 `packages/lib-server/package.json`:
@@ -540,7 +538,7 @@ git commit -m "feat(pkg): add cron scheduler with redis distributed lock"
 
 (keep existing peers). Run `pnpm install`.
 
-- [ ] **Step 2: Redis store (from the `@nestjs/locks` docs, "The store on Redis")**
+- [x] **Step 2: Redis store (from the `@nestjs/locks` docs, "The store on Redis")**
 
 ```ts
 // packages/lib-server/src/locks/redis-lock.store.ts
@@ -599,7 +597,7 @@ export class RedisLockStore implements LockStore {
 }
 ```
 
-- [ ] **Step 3: Setup module**
+- [x] **Step 3: Setup module**
 
 ```ts
 // packages/lib-server/src/locks/locks-setup.module.ts
@@ -654,7 +652,7 @@ export * from './locks-setup.module';
 export * from './redis-lock.store';
 ```
 
-- [ ] **Step 4: Contract test (runs only with Redis)**
+- [x] **Step 4: Contract test (runs only with Redis)**
 
 ```ts
 // packages/lib-server/src/locks/redis-lock.store.spec.ts
@@ -679,7 +677,7 @@ describe.skipIf(!url)('RedisLockStore contract', () => {
 Run: `LOCKS_TEST_REDIS_URL=redis://localhost:6373 nx test lib-server` (note_redis port from `cmd/note/.env`).
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 oxfmt packages/lib-server && nx lint lib-server --fix
@@ -697,7 +695,7 @@ git commit -m "feat(lib-server): add nestjs locks setup with redis store"
 **Interfaces:**
 - Produces: `$ref: ../../common/components/responses/PaymentRequired.yaml` usable from path files (plan 04); codes `featureNotInPlan`, `planLimitExceeded`.
 
-- [ ] **Step 1: Schema and response**
+- [x] **Step 1: Schema and response**
 
 ```yaml
 # api/common/components/schemas/PaymentRequiredError.yaml
@@ -729,7 +727,7 @@ allOf:
 
 Copy the shape of an existing file in `api/common/components/responses/` (e.g. the 403 one) for `PaymentRequired.yaml`, with description `Feature or limit not included in the workspace plan` and the schema `$ref: ../schemas/PaymentRequiredError.yaml`.
 
-- [ ] **Step 2: Lint, commit**
+- [x] **Step 2: Lint, commit**
 
 ```bash
 nx lint api
@@ -748,7 +746,7 @@ git commit -m "feat(api): add PaymentRequired error contract"
 **Interfaces:**
 - Produces: `share.SubscriptionChangedEvent{WorkspaceId uuid.UUID; Plan, Status string}` (Go) and the TS type in `@notopia-uit/api-share-gen`. Used by billing (plan 03, publisher) and note (plan 04, SSE forwarder).
 
-- [ ] **Step 1: Schemas**
+- [x] **Step 1: Schemas**
 
 ```yaml
 # api/share/components/schemas/SubscriptionChangedEvent.yaml
@@ -769,7 +767,7 @@ required: [workspaceId, plan, status]
 
 Register it under `components.schemas` in `api/share/openapi.yaml`.
 
-- [ ] **Step 2: Generate, lint, commit**
+- [x] **Step 2: Generate, lint, commit**
 
 ```bash
 nx lint api && nx run api:gen
@@ -793,7 +791,7 @@ git commit -m "feat(api): add billing notification event schemas"
 **Interfaces:**
 - Produces: gRPC `note.NoteService/BatchGetNoteWorkspaces`; `app.BatchGetNoteWorkspacesQuery` (`commonhandler.Query[BatchGetNoteWorkspaces, map[uuid.UUID]uuid.UUID]`); TS `NoteService.batchGetNoteWorkspaces(noteIds: string[]): Promise<Map<string, string>>`.
 
-- [ ] **Step 1: Proto**
+- [x] **Step 1: Proto**
 
 Add to `service NoteService`:
 
@@ -819,7 +817,7 @@ message BatchGetNoteWorkspacesResponse {
 
 Run: `nx run proto:gen`.
 
-- [ ] **Step 2: sqlc query**
+- [x] **Step 2: sqlc query**
 
 Append to `note_read.sql`:
 
@@ -838,7 +836,7 @@ WHERE
 
 Run: `nx run note:gen:sqlc`.
 
-- [ ] **Step 3: Read model + query**
+- [x] **Step 3: Read model + query**
 
 `app/readmodel.go`:
 
@@ -925,7 +923,7 @@ func (h *BatchGetNoteWorkspacesHandler) Handle(ctx context.Context, q *BatchGetN
 
 Register in `app/app.go` (`Queries` field `BatchGetNoteWorkspaces BatchGetNoteWorkspacesQuery`, constructor param, `commonhandler.DecorateQuery(hp, BatchGetNoteWorkspacesHandler)`) and `app/wire.go`.
 
-- [ ] **Step 4: gRPC route**
+- [x] **Step 4: gRPC route**
 
 ```go
 func (s *ServiceServer) BatchGetNoteWorkspaces(
@@ -954,7 +952,7 @@ func (s *ServiceServer) BatchGetNoteWorkspaces(
 
 Run: `nx run note:gen:wire && nx build note && nx lint note`.
 
-- [ ] **Step 5: Document client**
+- [x] **Step 5: Document client**
 
 `apps/document/src/note/note.service.ts`:
 
@@ -970,7 +968,7 @@ Run: `nx run note:gen:wire && nx build note && nx lint note`.
 
 Callers chunk to ≤ 500 ids.
 
-- [ ] **Step 6: Verify + commit**
+- [x] **Step 6: Verify + commit**
 
 With note running: `grpcurl -plaintext -d '{"note_ids":["<existing note id>","00000000-0000-4000-8000-000000000999"]}' localhost:18081 note.NoteService/BatchGetNoteWorkspaces` → map with only the existing id (use the note gRPC port from config; reflection must be on, otherwise skip and rely on plan 04 usage).
 
@@ -993,7 +991,7 @@ git commit -m "feat(note): add BatchGetNoteWorkspaces gRPC"
 **Interfaces:**
 - Produces: `WORKSPACE_PERMISSION_BILLING_READ = 4`, `WORKSPACE_PERMISSION_BILLING_MANAGE = 5`; casbin actions `billing_read`, `billing_manage` on object `workspace`.
 
-- [ ] **Step 1: Failing test rows**
+- [x] **Step 1: Failing test rows**
 
 Append to the table in `hasworkspacepermission_test.go`:
 
@@ -1006,7 +1004,7 @@ Append to the table in `hasworkspacepermission_test.go`:
 
 Run: `go test ./internal/authorization/app/...` → FAIL (undefined constants).
 
-- [ ] **Step 2: Implement**
+- [x] **Step 2: Implement**
 
 `common.go`:
 
@@ -1028,11 +1026,11 @@ p, viewer, workspace, billing_read
 
 `service.go` `pbWorkspacePermissionToApp`: add the two cases. Note's `svc_authorization.go` / `infra/service/authorization.go`: add `WorkspacePermissionBillingRead`/`BillingManage` to note's `WorkspacePermission` enum and the app→pb mapping (billing in plan 03 uses its own copy).
 
-- [ ] **Step 3: Run tests**
+- [x] **Step 3: Run tests**
 
 Run: `go test ./internal/authorization/...` → PASS. `nx lint authorization note`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add internal/authorization proto/authorization pkg/pb packages/pb internal/note
@@ -1046,13 +1044,13 @@ git commit -m "feat(authorization): add billing_read and billing_manage permissi
 **Files:**
 - Modify: `pkg/AGENTS.md`, `internal/authorization/AGENTS.md`, `apps/document/AGENTS.md`
 
-- [ ] **Step 1: Update**
+- [x] **Step 1: Update**
 
 - `pkg/AGENTS.md`: table rows for `cron` (gocron v2 + Redis lock, `Job`, register from `controller/cron`) and `common/config.Identity`; `GatewayUserAuth` now reads `X-Forwarded-Groups`/`X-Forwarded-Roles` (JSON arrays) and `RequireGroup`.
 - `internal/authorization/AGENTS.md`: policy now includes `billing_read` / `billing_manage`.
 - `apps/document/AGENTS.md`: `@notopia-uit/lib-server/locks` for crons.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add pkg/AGENTS.md internal/authorization/AGENTS.md apps/document/AGENTS.md

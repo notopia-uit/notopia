@@ -79,13 +79,13 @@ type Scheduler interface {
 	Shutdown() error
 }
 
-func NewScheduler(locker gocron.Locker, logger *slog.Logger, opts ...Option) (Scheduler, error)
+func NewScheduler(locker gocron.Locker, logger *slog.Logger, location *time.Location) (Scheduler, error)
 func NewRedisLocker(client redis.UniversalClient, opts ...redislock.LockerOption) (gocron.Locker, error) // gocron-redis-lock
 ```
 
 - `github.com/go-co-op/gocron/v2`, `github.com/go-co-op/gocron-redis-lock/v2` (pin exact
   versions; check the module path supports go-redis v9, which the repo uses).
-- Location `Asia/Ho_Chi_Minh` default, `WithSingletonMode(LimitModeReschedule)` per job (no
+- Location passed in by the caller (never hard-coded); services pass `time.Local`, which Go resolves from `TZ` or the system zone (`time/tzdata` embedded). `WithSingletonMode(LimitModeReschedule)` per job (no
   self-overlap), otel span `Cron.{Name}` + slog around each run, panic recovery.
 - Distributed lock on every job via `gocron.WithDistributedJobLocker`.
 - Services register jobs from `internal/{svc}/controller/cron/` and start/stop the scheduler
@@ -102,7 +102,7 @@ func NewRedisLocker(client redis.UniversalClient, opts ...redislock.LockerOption
 - `LocksSetupModule.forRoot({ redisUrl?: string })`: no URL → `LocksModule.forRoot({ allowInMemoryStorage: true })`
   (single instance); URL → `LocksModule.forRoot()` + `RedisLockStore` registered via
   `LocksStorage.registerSource`. Closes Redis in `onApplicationShutdown`.
-- Jobs use `@Cron(expr, { name, timeZone: 'Asia/Ho_Chi_Minh' })` +
+- Jobs use `@Cron(expr, { name })` (no `timeZone`: process zone from `TZ`) +
   `@OnOneInstance({ key })` + `@WithoutOverlapping()`; services call
   `app.enableShutdownHooks()`.
 - Test the store with `lockStoreContract()` from `@nestjs/locks/testing` against Redis.

@@ -39,7 +39,7 @@
 **Interfaces:**
 - Produces: `readModified(doc: Y.Doc): boolean`, `applyStoredModified(doc: Y.Doc, modified: boolean): void`, `DocumentService.upsertData(id: string, data: Buffer, modified: boolean): Promise<void>`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // apps/document/src/hocuspocus/document-metadata.spec.ts
@@ -65,12 +65,12 @@ describe('document metadata', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `nx test document -- src/hocuspocus/document-metadata.spec.ts`
 Expected: FAIL, cannot resolve `./document-metadata`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // apps/document/src/hocuspocus/document-metadata.ts
@@ -116,12 +116,12 @@ export const applyStoredModified = (doc: Y.Doc, modified: boolean): void => {
 
 Imports: `import { applyStoredModified, readModified } from './document-metadata';`. `grep -rn updateDataById apps/document/src` must return nothing.
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 Run: `nx test document`
 Expected: PASS.
 
-- [ ] **Step 5: Lint, format, commit**
+- [x] **Step 5: Lint, format, commit**
 
 ```bash
 oxfmt apps/document/src/hocuspocus apps/document/src/document
@@ -145,7 +145,7 @@ git commit -m "fix(document): upsert document state and mirror yjs modified flag
 - Consumes: `NoteDeletedEvent` (`{ id: string }`) from `@notopia-uit/api-share-gen`.
 - Produces: `Hocuspocus.markDeleted(id: string): void`, `DocumentService.deleteById(id: string): Promise<void>`, `HocuspocusService.onNoteDeleted(id: string): Promise<void>`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // apps/document/src/hocuspocus/hocuspocus.service.spec.ts
@@ -180,12 +180,12 @@ describe('HocuspocusService.onNoteDeleted', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `nx test document -- src/hocuspocus/hocuspocus.service.spec.ts`
 Expected: FAIL, `onNoteDeleted` / `markDeleted` not defined.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `hocuspocus.ts` — add to the class and guard the store:
 
@@ -249,12 +249,12 @@ In the server config:
 
 (import `EventPattern` from `@nestjs/microservices`, `NoteDeletedEvent` from `@notopia-uit/api-share-gen`).
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 Run: `nx test document`
 Expected: PASS.
 
-- [ ] **Step 5: Lint, format, commit**
+- [x] **Step 5: Lint, format, commit**
 
 ```bash
 oxfmt apps/document/src
@@ -277,7 +277,7 @@ git commit -m "feat(document): delete document on note.deleted"
 - Consumes: `domain.NoteDeletedEvent` (`BaseEvent.AggregateID` = note id), existing `IntegrationEventNoteDeleted{ID}` and its topic mapping.
 - Produces: `NoteDeletedDomainToIntegrationEventHandler.Handle(ctx, *domain.NoteDeletedEvent) error`
 
-- [ ] **Step 1: Implement the handler**
+- [x] **Step 1: Implement the handler**
 
 ```go
 // internal/note/app/e_notedeletedintegration.go
@@ -312,7 +312,7 @@ func (h *NoteDeletedDomainToIntegrationEventHandler) Handle(ctx context.Context,
 }
 ```
 
-- [ ] **Step 2: Wire it**
+- [x] **Step 2: Wire it**
 
 `app/app.go` `Events` struct: add `NoteDeletedDomainToIntegrationEvent *NoteDeletedDomainToIntegrationEventHandler`.
 `app/wire.go`: add `ProvideNoteDeletedDomainToIntegrationEventHandler` next to `ProvideNoteCreatedDomainToIntegrationEventHandler`.
@@ -335,7 +335,7 @@ func (h *NoteDeletedDomainToIntegrationEventHandler) Handle(ctx context.Context,
 	}
 ```
 
-- [ ] **Step 3: Regenerate wire, build, lint**
+- [x] **Step 3: Regenerate wire, build, lint**
 
 ```bash
 nx run note:gen:wire
@@ -344,7 +344,7 @@ nx lint note
 ```
 Expected: all succeed.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add internal/note cmd/note/wire_gen.go
@@ -362,7 +362,7 @@ git commit -m "fix(note): publish note.created and note.deleted integration even
 **Interfaces:**
 - Consumes: `domain.NoteRepo.GetRecursiveChildrenFromFolder(ctx, folderID uuid.UUID, forUpdate bool) ([]*domain.Note, error)`
 
-- [ ] **Step 1: `PermanentlyDeleteWorkspaceItems` — delete notes first, including folder descendants**
+- [x] **Step 1: `PermanentlyDeleteWorkspaceItems` — delete notes first, including folder descendants**
 
 Replace the body passed to `h.uow.Execute` with:
 
@@ -428,21 +428,21 @@ Replace the body passed to `h.uow.Execute` with:
 
 Remove the old `// NOTE: We delegate the infra persistence to cascading delete things (folder)` comment pair (no longer true for notes). Add `"github.com/google/uuid"` import if missing.
 
-- [ ] **Step 2: `EmptyTrash` — notes before folders**
+- [x] **Step 2: `EmptyTrash` — notes before folders**
 
 Move the `trashedNotes` block (GetMany → `PermanentlyDelete` loop → `SaveMany`) above the `trashedFolders` block. `TrashedBy: domain.TrashedByUnspecified` already includes notes trashed by a parent folder, so every note gets its event before the folder cascade.
 
-- [ ] **Step 3: Build, lint**
+- [x] **Step 3: Build, lint**
 
 ```bash
 nx build note && nx lint note
 ```
 
-- [ ] **Step 4: Manual check (compose up, note running)**
+- [x] **Step 4: Manual check (compose up, note running)**
 
 Create folder A → sub-folder B → note N inside B; trash A; permanently delete A from the trash UI. In the Redpanda console, topic `events.integration.note.note.deleted` has a message with `id = N`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add internal/note/app
@@ -463,7 +463,7 @@ git commit -m "fix(note): emit note deleted events for notes removed with folder
 **Interfaces:**
 - Produces: topic `events.integration.note.workspace.deleted`, payload `share.WorkspaceDeletedIntegrationEvent{Id uuid.UUID}` (TS `WorkspaceDeletedIntegrationEvent { id: string }`). Consumed by billing (plan 03).
 
-- [ ] **Step 1: Schema**
+- [x] **Step 1: Schema**
 
 ```yaml
 # api/share/components/schemas/WorkspaceDeletedIntegrationEvent.yaml
@@ -488,7 +488,7 @@ required:
 
 Run: `nx run api:gen` → `pkg/api/share/share.gen.go` contains `type WorkspaceDeletedIntegrationEvent struct`. Run `nx lint api`.
 
-- [ ] **Step 2: Integration event + topic + payload mapping**
+- [x] **Step 2: Integration event + topic + payload mapping**
 
 `app/integrationevent.go`:
 
@@ -514,7 +514,7 @@ plus `_ IntegrationEvent = (*IntegrationEventWorkspaceDeleted)(nil)` and
 		return &share.WorkspaceDeletedIntegrationEvent{Id: e.ID}, nil
 ```
 
-- [ ] **Step 3: Handler + wiring**
+- [x] **Step 3: Handler + wiring**
 
 ```go
 // internal/note/app/e_workspacedeletedintegration.go
@@ -560,13 +560,13 @@ Add `WorkspaceDeletedDomainToIntegrationEvent *WorkspaceDeletedDomainToIntegrati
 	}
 ```
 
-- [ ] **Step 4: Regenerate, build, lint**
+- [x] **Step 4: Regenerate, build, lint**
 
 ```bash
 nx run note:gen:wire && nx build note && nx lint note
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add api/share internal/note cmd/note/wire_gen.go pkg/api/share packages/api-share-gen
@@ -585,7 +585,7 @@ git commit -m "feat(note): publish workspace.deleted integration event"
 - Consumes: `NoteDeletedEvent` from `@notopia-uit/api-share-gen`.
 - Produces: `AppService.handleNoteDeleted(id: string): Promise<void>`
 
-- [ ] **Step 1: Implement**
+- [x] **Step 1: Implement**
 
 `app.service.ts`:
 
@@ -616,7 +616,7 @@ git commit -m "feat(note): publish workspace.deleted integration event"
 
 (add `NoteDeletedEvent` to the type import).
 
-- [ ] **Step 2: Lint, format, build, commit**
+- [x] **Step 2: Lint, format, build, commit**
 
 ```bash
 oxfmt apps/search-worker/src
@@ -632,13 +632,13 @@ git commit -m "feat(search-worker): remove deleted notes from index"
 **Files:**
 - Modify: `apps/document/AGENTS.md`, `apps/search-worker/AGENTS.md`, `internal/note/AGENTS.md`
 
-- [ ] **Step 1: Update docs**
+- [x] **Step 1: Update docs**
 
 - `apps/document/AGENTS.md` "Yjs / Hocuspocus": store upserts the row and writes `modified` from the Yjs metadata; `afterLoadDocument` syncs the column into metadata with `skipStoreHooks`; `note.deleted` closes connections and deletes the row (store guarded by `deletedDocumentIds`). Remove the "sets `modified = true`" statement.
 - `apps/search-worker/AGENTS.md` topic table: add `events.integration.note.note.deleted` → delete from `notes`.
 - `internal/note/AGENTS.md` "Events": list published integration topics `note.created`, `note.updated`, `note.deleted`, `workspace.deleted`; note that folder deletes emit `NoteDeletedEvent` per descendant note.
 
-- [ ] **Step 2: E2E (compose up; note, document, search-worker running)**
+- [x] **Step 2: E2E (compose up; note, document, search-worker running)**
 
 1. Create a note in web, type text → `SELECT id, modified FROM documents WHERE id = '<id>'` returns a row, `modified = true`.
 2. Commit → wait 10 s → `modified = false` still.
@@ -646,7 +646,7 @@ git commit -m "feat(search-worker): remove deleted notes from index"
 4. Permanently delete the note while it is open in another tab → tab disconnects; `documents` and `revisions` rows gone; Meilisearch `notes` index no longer has the id.
 5. Delete a workspace → `events.integration.note.workspace.deleted` message in the Redpanda console.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add apps/document/AGENTS.md apps/search-worker/AGENTS.md internal/note/AGENTS.md
