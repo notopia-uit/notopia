@@ -9,6 +9,7 @@ Pure Kafka consumer → Meilisearch. No HTTP API. Small enough that `src/` is fl
 | --- | --- |
 | `events.integration.note.note.created` | Insert note metadata (name, workspace) |
 | `events.integration.note.note.updated` | Update name, folder, trashed state |
+| `events.integration.note.note.deleted` | Delete from `notes` |
 | `events.integration.document.document.committed` | Convert BlockNote blocks → markdown, index as content |
 
 Content is only indexed on **commit**, not on edit — an uncommitted document is invisible

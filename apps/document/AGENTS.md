@@ -36,10 +36,15 @@ Commit is currently **manual only** (`POST /document/documents/{id}/commit`).
 
 ## Yjs / Hocuspocus
 
-- `HocuspocusDatabase.store` persists Yjs state and sets `modified = true`; there is no
-  debounce configured, so it fires on the extension's default cadence.
-- The `metadata` Y.Map (`YDocMetadataMap`) carries `{ modified }` to clients;
-  `HocuspocusService.setModified` is how the server pushes that state after a commit.
+- `HocuspocusDatabase.store` upserts the row and writes `modified` from the Yjs metadata
+  (`DocumentService.upsertData`); there is no debounce configured, so it fires on the
+  extension's default cadence.
+- `afterLoadDocument` applies the DB `modified` column into the `metadata` Y.Map
+  (`YDocMetadataMap`) with origin `{ source: 'local', skipStoreHooks: true }`, so loading
+  does not trigger a store. Clients read `{ modified }` from it;
+  `HocuspocusService.setModified` pushes that state after a commit.
+- `note.deleted` → `HocuspocusService.onNoteDeleted` marks the id in `deletedDocumentIds`
+  (the store guard), closes its connections and deletes the row; revisions cascade by FK.
 - `onRoleChanged` / `onMemberRemoved` consume Kafka events from `authorization` and walk
   live connections to flip `readOnly` or close with codes 4001/4002.
 
