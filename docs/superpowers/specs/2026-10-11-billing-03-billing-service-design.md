@@ -9,7 +9,7 @@
 A new Go `billing` service (DDD + CQRS, like `internal/note`) that owns plans, prices,
 subscriptions and entitlements, integrates Stripe (sandbox) through hosted Checkout and
 Customer Portal, and exposes entitlements over gRPC and HTTP. End to end: config, OTLP,
-health, Postgres + goose + sqlc, Watermill outbox, Kafka consumers, cron, compose, Traefik.
+health, Postgres + goose + sqlc, Kafka consumers, cron, compose, Traefik.
 
 ## 0. Decision summary
 
@@ -27,7 +27,7 @@ health, Postgres + goose + sqlc, Watermill outbox, Kafka consumers, cron, compos
 | Catalog | Feature/limit **keys** are enums in code. Their **values** per plan, the billing policy, and all prices live in the billing DB and are **admin-editable** via API. Prices are grandfathered; plan limits apply immediately. |
 | Admin | One app-wide admin group from config (`NOTOPIA_{SERVICE}_ADMIN_GROUP`, default `notopia-admins`), read from `X-Forwarded-Groups`. |
 | Entitlements | Billing returns plan + resolved features + limits. Frontend hardcodes nothing numeric. |
-| Enforcement | note / document (later AI) call billing gRPC, cache 60 s, flush on billing Kafka events. Errors → HTTP 402 conforming to `Error`. |
+| Enforcement | note / document (later AI) call billing gRPC directly on every check, **no cache**. Billing publishes no integration events. Errors → HTTP 402 conforming to `Error`. |
 | Expiry | No "expire at period end" job. Webhooks drive state; hourly reconcile cron is the safety net; `past_due` keeps access for a grace period. |
 | Refund | Immediate cancel → prorated refund. Lifetime → full refund within a window, none after. |
 | Cron | Inside each service, `controller/cron/`, Redis-locked. `// NOTE:` to move into `cmd/{svc}-worker` later. |
@@ -39,7 +39,8 @@ health, Postgres + goose + sqlc, Watermill outbox, Kafka consumers, cron, compos
 
 ## 1. Placement
 
-Mirrors `internal/note` (DDD + CQRS, sqlc + goose, Watermill outbox, wire).
+Mirrors `internal/note` (DDD + CQRS, sqlc + goose, wire). No outbox: billing publishes no
+integration events.
 
 ```
 api/billing/                         # OpenAPI (paths/ + components/), oapi-codegen-server.yaml, oapi-codegen-model.yaml
@@ -63,13 +64,11 @@ internal/billing/
     svc_paymentprovider.go   # port
     svc_authorization.go     # port (owner / member checks)
     svc_providereventinbox.go
-    integrationevent.go  readmodel.go  model.go  wire.go
+    readmodel.go  model.go  wire.go
   errs/
   infra/
     payment/stripe/          # PaymentProvider adapter, webhook signature verify, snapshot mapping
     persistence/pgmigration/ persistence/pgsqlc/ persistence/pgrepo/ persistence/pgreadmodel/ persistence/pginbox/
-    outbox/                  # copy of note's Watermill outbox
-    integrationpublisher/
     service/authorization.go # gRPC client
   controller/
     http/   grpc/   event/   cron/   health/
@@ -484,7 +483,7 @@ our own constants (`CheckoutCompleted`, `SubscriptionChanged`, `InvoicePaid`,
 | `cmd_handleworkspacedeleted.go` | Kafka `note.workspace.deleted` | Recurring → `CancelNow(workspace_deleted)` prorated. Lifetime → refund only inside window. |
 | `cmd_createprice.go` | Admin HTTP | New `Price` + Stripe Price (lookup key transfer) + archive previous active one for same (tier, interval, currency) + update Portal configuration. |
 | `cmd_archiveprice.go` | Admin HTTP | Archive in Stripe + DB, update Portal configuration. |
-| `cmd_updateplan.go` | Admin HTTP | `Plan.Update` → emits `PlanUpdated` → integration `plan.changed`. |
+| `cmd_updateplan.go` | Admin HTTP | `Plan.Update` (emits `PlanUpdated`). Takes effect on the next gRPC call. |
 | `cmd_updatepolicy.go` | Admin HTTP | `BillingPolicy.Update`. |
 | `cmd_seed.go` | `cmd/billingseed` | Insert default plans, policy, prices (+ Stripe products/prices), Portal configuration — only what is missing. |
 | `cmd_reconcilesubscriptions.go` | cron hourly | `ListNeedingReconcile` (current, recurring, and `currentPeriodEnd + 1h < now` or `providerSyncedAt < now − 24h`) → `SyncSubscription` each. |
@@ -599,12 +598,10 @@ Callers check maps with a small helper in each consumer (`ent.Feature("auto_comm
 
 ## 10. Integration events
 
-Schemas in `api/share/components/schemas/`. Published through the Watermill outbox.
-
-| Topic | Payload | Consumers |
-| --- | --- | --- |
-| `events.integration.billing.subscription.changed` | `{workspaceId, plan, status, accessUntil?}` | note, document (flush cache for workspace) |
-| `events.integration.billing.plan.changed` | `{tier}` | note, document (flush whole cache) |
+Billing **publishes none**: note, document and the future AI service read state through gRPC on
+every check, so changes apply immediately. Domain events (section 4.3) are still raised by every
+mutating method and drained by `Save` (logged at debug), so integration publishing can be added
+later without touching the domain.
 
 Billing consumes:
 
@@ -712,7 +709,6 @@ CREATE TABLE processed_provider_events (
 );
 ```
 
-Plus the Watermill outbox tables (same as note).
 
 ## 12. Cron (billing)
 
@@ -749,8 +745,8 @@ NOTOPIA_BILLING_IDENTITY_SERVICE_ACCOUNT_USER_ID=1003
 Mirror `cmd/note` + `internal/note` exactly:
 
 - `cmd/billing/main.go`: `logging.FirstStart("NOTOPIA_BILLING_LOG_LEVEL")`, `InitializeServer(ctx)`
-  (wire), `server.Run(ctx)` running HTTP (gin), gRPC, Kafka router (Watermill), outbox
-  forwarder and the cron scheduler; graceful shutdown on SIGTERM.
+  (wire), `server.Run(ctx)` running HTTP (gin), gRPC, Kafka subscriber router (Watermill)
+  and the cron scheduler; graceful shutdown on SIGTERM.
 - OTLP: `pkg/otel` tracer/meter/logger providers with `metadata.ServiceName = "billing"`;
   `commonhttp.NewGin` (otel + slog middleware); gRPC otel interceptors as in note; Watermill
   otel decorators; `commonhandler.NewTraceCmd/NewLogCmd` wrappers for every handler in
@@ -777,14 +773,15 @@ Mirror `cmd/note` + `internal/note` exactly:
 
 ## 16. Testing
 
+Unit tests only where logic is non-obvious; plumbing is verified by the manual sandbox E2E.
+
 | Layer | How |
 | --- | --- |
-| domain | Table tests: `GrantsAccess`, `ApplySnapshot` event diffs, `QuoteCancelNow` (prorated, lifetime window), refund invariant, payer transitions, plan update validation (unknown keys rejected) |
-| app | Handler tests with fakes for repos, `PaymentProvider`, `AuthorizationService`, inbox (same style as note) |
-| infra/payment/stripe | Snapshot mapping from recorded Stripe JSON fixtures (basil+ item-level periods); webhook signature verify with `webhook.GenerateTestSignedPayload` |
-| persistence | No automated DB tests (repo has none for note either). Verify migrations with `nx goose:validate billing` / `nx lint:goose billing` and exercise repos through the manual E2E |
-| controller/http | Webhook handler: bad signature → 400, duplicate event → 200 no-op, unknown type → 200 |
-| E2E (manual, sandbox) | `stripe listen`; checkout with card `4242 4242 4242 4242` → entitlements `plus`; Portal upgrade → `pro`; Portal cancel at period end; `stripe trigger invoice.payment_failed` → `past_due` still granted within grace; cancel-now → refund visible in dashboard; payer transfer via setup checkout; delete workspace → subscription canceled + refund |
+| domain | Table tests: `GrantsAccess` (grace window, lifetime), `ApplySnapshot` event diffs, `QuoteCancelNow` (prorated, lifetime window), refund invariant |
+| infra/payment/stripe | Snapshot mapping from a recorded Stripe JSON fixture (item-level periods); webhook signature verify with `webhook.GenerateTestSignedPayload` |
+| app | `CompleteCheckout` branches (duplicate, lifetime replaces recurring, payer change) with fakes |
+| persistence | No automated DB tests (none exist for note). `nx goose:validate billing`, `nx lint:goose billing` |
+| E2E (manual, sandbox) | `stripe listen`; checkout with card `4242 4242 4242 4242` → entitlements `plus`; Portal upgrade → `pro`; Portal cancel at period end; `stripe trigger invoice.payment_failed` → `past_due` still granted within grace; cancel-now → refund in dashboard; payer transfer via setup checkout; delete workspace → subscription canceled + refund; replay a webhook → no duplicate effect |
 
 ## 17. Acceptance
 

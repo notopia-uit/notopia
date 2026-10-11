@@ -108,14 +108,12 @@ notes index. Idempotent.
 
 ## Testing
 
+Only non-obvious behaviour is unit-tested; the rest is covered by the manual E2E.
+
 | Item | Test |
 | --- | --- |
-| G1 | Unit: `upsertData` inserts when missing, updates when present. |
-| G2 | Unit: store passes metadata `modified`; `afterLoadDocument` transaction uses `skipStoreHooks`. Manual: commit → column stays `false` after the follow-up store. |
-| G3, G6 | Go unit test per handler: domain event in → integration event published with correct payload. |
-| G4 | Unit: handler deletes row and closes connections; missing row no error. |
-| G5 | Unit: handler calls `deleteDocument`. |
-| E2E (manual, compose up) | Create note in web → edit → `documents` row exists. Permanently delete note → row and revisions gone, Meilisearch doc gone. Delete workspace → message on `events.integration.note.workspace.deleted` (Redpanda console). |
+| G2 | Unit: store writes metadata `modified` (not `true`); `afterLoadDocument` transacts with `skipStoreHooks`. |
+| E2E (manual, compose up) | Create note in web → edit → `documents` row exists. Commit → column stays `false` after the follow-up store. Permanently delete note → row, revisions and Meilisearch doc gone. Delete workspace → message on `events.integration.note.workspace.deleted` (Redpanda console). |
 
 ## Acceptance
 

@@ -35,7 +35,6 @@ error contract, shared event schemas, note batch lookup RPC, billing permissions
   NestJS `UserGuard` / `@User()` in `apps/document/src/common/` parses the same way.
 - `RequireGroup(group string) gin.HandlerFunc` → `403` with `Error{code: "forbidden"}` when
   missing.
-- Unit tests for parsing and the middleware.
 
 ### F2 — Service config additions (`pkg/common/config`)
 
@@ -92,8 +91,7 @@ func NewRedisLocker(client redis.UniversalClient, opts ...redislock.LockerOption
 - Services register jobs from `internal/{svc}/controller/cron/` and start/stop the scheduler
   in their `Server.Run` lifecycle. Each controller file carries
   `// NOTE: move to cmd/{svc}-worker when crons are split out of the API process.`
-- Tests: job runs, overlap is skipped, lock prevents a second scheduler from running the same
-  tick (miniredis or the compose Redis).
+- Test: two schedulers on one Redis run a job once per tick.
 
 ### F5 — NestJS locks (`packages/lib-server`)
 
@@ -121,9 +119,8 @@ func NewRedisLocker(client redis.UniversalClient, opts ...redislock.LockerOption
 
 ### F7 — Shared event schemas (`api/share`)
 
-- `SubscriptionChangedEvent {workspaceId: uuid, plan: free|plus|pro, status: string, accessUntil?: date-time}`
-- `PlanChangedEvent {tier: free|plus|pro}`
-- (`WorkspaceDeletedIntegrationEvent` is added in sub-project 01.)
+- None for billing: consumers call billing gRPC directly, so billing publishes no integration
+  events. (`WorkspaceDeletedIntegrationEvent` is added in sub-project 01.)
 - `nx gen api` → `@notopia-uit/api-share-gen` and `pkg/api/share`.
 
 ### F8 — Note batch lookup RPC (`proto/note/note.proto`)
@@ -156,8 +153,9 @@ plumbing).
 
 ## Testing
 
-Unit tests per component as listed; `nx lint` for every touched project; `nx gen api` and
-`nx gen proto` produce no diff after commit.
+Only the lock behaviour (pkg/cron two-scheduler test, `lockStoreContract()`) is tested.
+Everything else is verified by `nx lint`, `nx gen api` / `nx gen proto` producing no diff, and
+use in sub-projects 03/04.
 
 ## Acceptance
 

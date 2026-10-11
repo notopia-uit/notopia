@@ -14,11 +14,11 @@ optional Redis scaling mode.
 - Entitlements come only from billing gRPC (`GetWorkspaceEntitlements`,
   `BatchGetWorkspaceEntitlements`, `GetWorkspacePayer`, `ListPlans`). No plan data stored in
   note or document.
-- Cache: in-memory, 60 s TTL per workspace. Flush one workspace on
-  `events.integration.billing.subscription.changed`; flush all on
-  `events.integration.billing.plan.changed`.
-- Billing unreachable: fail closed for gates that block growth (return 503), fail open to the
-  last cached value when present. Crons skip the batch and retry next tick.
+- **No cache.** Every check calls billing gRPC directly; upgrades apply immediately. Callers
+  keep hot paths cheap by checking local preconditions first (e.g. auto-commit checks
+  `modified` and `lastCommittedAt` before calling billing).
+- Billing unreachable: gates return 503, auto-commit skips (the sweeper catches up), crons skip
+  the batch and retry next tick.
 - `-1` = unlimited. Missing feature key = false; missing limit key = 0.
 - Downgrade policy: block growth, never delete user data except via retention crons. No
   post-downgrade buffer; the web warns before downgrade.
@@ -31,8 +31,7 @@ optional Redis scaling mode.
 
 | Item | Change |
 | --- | --- |
-| `app/svc_entitlement.go` + `infra/service/billing.go` | Port + gRPC adapter, mirrors `svc_authorization.go` / `infra/service/authorization.go`. Includes the cache. |
-| `controller/event/` | Consume `billing.subscription.changed`, `billing.plan.changed` → cache flush. |
+| `app/svc_entitlement.go` + `infra/service/billing.go` | Port + gRPC adapter, mirrors `svc_authorization.go` / `infra/service/authorization.go`. |
 | `errs/` | `FeatureNotInPlan`, `PlanLimitExceeded` → 402 (`PaymentRequiredError`) in `controller/http/err.go`; `BillingPayerMustTransfer` → 409. |
 | `cmd_updateworkspacemembers.go` | `members` limit when the resulting count grows past it (existing members never removed). Payer guard: demoting or removing the payer while `GetWorkspacePayer.requires_payer` → 409 `billingPayerMustTransfer`. |
 | `cmd_leaveworkspace.go` | Payer guard. |
@@ -57,9 +56,8 @@ optional Redis scaling mode.
 
 ### Entitlement client
 
-`src/entitlement/` gRPC client module to billing (mirrors `src/authorization/`), cache as
-above, Kafka handlers for the two billing topics. Workspace of a document comes from
-`NoteService.getWorkspaceByNote` (cached alongside).
+`src/entitlement/` gRPC client module to billing (mirrors `src/authorization/`). Workspace of a
+document comes from `NoteService.getWorkspaceByNote`.
 
 ### Entities (TypeORM migration)
 
@@ -160,17 +158,14 @@ Reads `ai_credits_monthly` via billing gRPC and keeps its own usage counter. Not
 
 ## Testing
 
+Unit tests only where logic is non-obvious.
+
 | Item | Test |
 | --- | --- |
-| note gates | Handler tests with a fake entitlement port: under limit OK, at limit → `PlanLimitExceeded`, feature missing → `FeatureNotInPlan`, payer guard → `BillingPayerMustTransfer` |
-| note cache | TTL expiry, flush on events |
-| trash purge | Items older than retention deleted, newer kept, events emitted with service-account actor |
-| `commitIfDue` | interval, force, hash-equal skip, contributor copy, author fallback |
-| AutoCommitExtension | free plan → no commit; `clientsCount === 0` → forced |
-| revision purge | keeps latest, respects per-plan days, skips unlimited |
-| sweeper | commits only `auto_commit` workspaces |
-| locks | two app instances on Redis run a cron once per tick |
-| E2E (manual) | free workspace: 4th member → 402 with `requiredPlan: plus`; upgrade in sandbox → allowed within ≤ 60 s or immediately after `subscription.changed`; plus workspace: type, wait > 300 s → auto revision appears; close tab → revision forced |
+| `commitIfDue` | interval vs force, hash-equal skip, author fallback |
+| revision purge | keeps latest, per-plan days, skips unlimited |
+| note limit gates | at limit → `PlanLimitExceeded` with `requiredPlan`; payer guard → `BillingPayerMustTransfer` |
+| E2E (manual) | free workspace: 4th member → 402 `requiredPlan: plus`; upgrade in sandbox → allowed immediately; plus workspace: edit, wait > 300 s → auto revision; close tab → revision forced; trash item past retention purged by cron (temporarily set retention to 0 via admin API) |
 
 ## Acceptance
 
