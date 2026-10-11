@@ -189,6 +189,13 @@ func (e *Event) setup() error {
 		return fmt.Errorf("failed to add event handler NoteDeletedToIntegrationHandler: %w", err)
 	}
 
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"WorkspaceDeletedToIntegrationHandler",
+		e.app.Events.WorkspaceDeletedDomainToIntegrationEvent.Handle,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler WorkspaceDeletedToIntegrationHandler: %w", err)
+	}
+
 	// NOTE: because watermill doesn't support kafka regex (IBM/sarama)
 	// So, we will need to for loop all topic we have, (for note, and folder)
 	workspaceItemUpdatedFolderTopics := []string{

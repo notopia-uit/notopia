@@ -39,6 +39,7 @@ var ProviderSetEvent = wire.NewSet(
 	ProvideNotifyWorkspaceItemsUpdatedHandler,
 	ProvideNotifyWorkspaceRenamedHandler,
 	ProvideNotifyWorkspaceSlugChangedHandler,
+	ProvideWorkspaceDeletedDomainToIntegrationEventHandler,
 	wire.Struct(new(Events), "*"),
 )
 

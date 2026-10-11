@@ -56,6 +56,10 @@ export type UserWorkspaceRoleUpdatedEvent = {
   role: WorkspaceRole;
 };
 
+export type WorkspaceDeletedIntegrationEvent = {
+  id: string;
+};
+
 export type WorkspaceMemberAddedEvent = {
   workspaceId: Id2;
   userId: Id;

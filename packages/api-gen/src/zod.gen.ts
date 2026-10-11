@@ -13,6 +13,10 @@ export const zShareNoteDeletedEvent = z.object({
   id: z.uuid()
 });
 
+export const zShareWorkspaceDeletedIntegrationEvent = z.object({
+  id: z.uuid()
+});
+
 /**
  * BlockNote model
  */

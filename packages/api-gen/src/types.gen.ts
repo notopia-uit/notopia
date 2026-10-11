@@ -56,6 +56,10 @@ export type ShareUserWorkspaceRoleUpdatedEvent = {
   role: ShareWorkspaceRole;
 };
 
+export type ShareWorkspaceDeletedIntegrationEvent = {
+  id: string;
+};
+
 export type ShareWorkspaceMemberAddedEvent = {
   workspaceId: ShareId2;
   userId: ShareId;

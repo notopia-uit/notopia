@@ -153,13 +153,14 @@ func NewQueries(
 var ProvideQueries = NewQueries
 
 type Events struct {
-	DocumentCommitted                   *DocumentCommittedHandler
-	NoteCreatedDomainToIntegrationEvent *NoteCreatedDomainToIntegrationEventHandler
-	NoteDeletedDomainToIntegrationEvent *NoteDeletedDomainToIntegrationEventHandler
-	NoteUpdatedDomainToIntegrationEvent *NoteUpdatedDomainToIntegrationEventHandler
-	NotifyWorkspaceItemsUpdated         *NotifyWorkspaceItemsUpdatedHandler
-	NotifyWorkspaceRenamed              *NotifyWorkspaceRenamedHandler
-	NotifyWorkspaceSlugChanged          *NotifyWorkspaceSlugChangedHandler
+	DocumentCommitted                        *DocumentCommittedHandler
+	NoteCreatedDomainToIntegrationEvent      *NoteCreatedDomainToIntegrationEventHandler
+	NoteDeletedDomainToIntegrationEvent      *NoteDeletedDomainToIntegrationEventHandler
+	NoteUpdatedDomainToIntegrationEvent      *NoteUpdatedDomainToIntegrationEventHandler
+	NotifyWorkspaceItemsUpdated              *NotifyWorkspaceItemsUpdatedHandler
+	NotifyWorkspaceRenamed                   *NotifyWorkspaceRenamedHandler
+	NotifyWorkspaceSlugChanged               *NotifyWorkspaceSlugChangedHandler
+	WorkspaceDeletedDomainToIntegrationEvent *WorkspaceDeletedDomainToIntegrationEventHandler
 }
 
 type Server struct {

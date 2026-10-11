@@ -191,14 +191,16 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	notifyWorkspaceItemsUpdatedHandler := app.NewNotifyWorkspaceItemsUpdatedHandler(workspaceEventHub)
 	notifyWorkspaceRenamedHandler := app.NewNotifyWorkspaceRenamedHandler(workspaceEventHub)
 	notifyWorkspaceSlugChangedHandler := app.NewNotifyWorkspaceSlugChangedHandler(workspaceEventHub)
+	workspaceDeletedDomainToIntegrationEventHandler := app.NewWorkspaceDeletedDomainToIntegrationEventHandler(integrationPublisher)
 	events := &app.Events{
-		DocumentCommitted:                   documentCommittedHandler,
-		NoteCreatedDomainToIntegrationEvent: noteCreatedDomainToIntegrationEventHandler,
-		NoteDeletedDomainToIntegrationEvent: noteDeletedDomainToIntegrationEventHandler,
-		NoteUpdatedDomainToIntegrationEvent: noteUpdatedDomainToIntegrationEventHandler,
-		NotifyWorkspaceItemsUpdated:         notifyWorkspaceItemsUpdatedHandler,
-		NotifyWorkspaceRenamed:              notifyWorkspaceRenamedHandler,
-		NotifyWorkspaceSlugChanged:          notifyWorkspaceSlugChangedHandler,
+		DocumentCommitted:                        documentCommittedHandler,
+		NoteCreatedDomainToIntegrationEvent:      noteCreatedDomainToIntegrationEventHandler,
+		NoteDeletedDomainToIntegrationEvent:      noteDeletedDomainToIntegrationEventHandler,
+		NoteUpdatedDomainToIntegrationEvent:      noteUpdatedDomainToIntegrationEventHandler,
+		NotifyWorkspaceItemsUpdated:              notifyWorkspaceItemsUpdatedHandler,
+		NotifyWorkspaceRenamed:                   notifyWorkspaceRenamedHandler,
+		NotifyWorkspaceSlugChanged:               notifyWorkspaceSlugChangedHandler,
+		WorkspaceDeletedDomainToIntegrationEvent: workspaceDeletedDomainToIntegrationEventHandler,
 	}
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)

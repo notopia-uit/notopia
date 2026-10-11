@@ -131,6 +131,11 @@ type UserWorkspaceRoleUpdatedEvent struct {
 	WorkspaceId *Id2 `json:"workspaceId,omitempty"`
 }
 
+// WorkspaceDeletedIntegrationEvent defines model for WorkspaceDeletedIntegrationEvent.
+type WorkspaceDeletedIntegrationEvent struct {
+	Id openapi_types.UUID `json:"id"`
+}
+
 // WorkspaceMemberAddedEvent defines model for WorkspaceMemberAddedEvent.
 type WorkspaceMemberAddedEvent struct {
 	Role WorkspaceRole `json:"role"`
