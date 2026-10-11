@@ -24,6 +24,8 @@ components:
       $ref: ./components/schemas/NoteSearch.yaml
     NoteUpdatedEvent:
       $ref: ./components/schemas/NoteUpdatedEvent.yaml
+    SubscriptionChangedEvent:
+      $ref: ./components/schemas/SubscriptionChangedEvent.yaml
     UserDeletedEvent:
       $ref: ./components/schemas/UserDeletedEvent.yaml
     UserWorkspaceRoleUpdatedEvent:

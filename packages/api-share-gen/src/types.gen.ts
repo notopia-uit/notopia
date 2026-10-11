@@ -46,6 +46,15 @@ export type NoteUpdatedEvent = {
   updatedAt: Date;
 };
 
+/**
+ * Best-effort notification that a workspace's billing state changed.
+ */
+export type SubscriptionChangedEvent = {
+  workspaceId: string;
+  plan: 'free' | 'plus' | 'pro';
+  status: string;
+};
+
 export type UserDeletedEvent = {
   id: Id;
 };

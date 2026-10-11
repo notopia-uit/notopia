@@ -13,6 +13,19 @@ export const zShareNoteDeletedEvent = z.object({
   id: z.uuid()
 });
 
+/**
+ * Best-effort notification that a workspace's billing state changed.
+ */
+export const zShareSubscriptionChangedEvent = z.object({
+  workspaceId: z.uuid(),
+  plan: z.enum([
+    'free',
+    'plus',
+    'pro'
+  ]),
+  status: z.string()
+});
+
 export const zShareWorkspaceDeletedIntegrationEvent = z.object({
   id: z.uuid()
 });

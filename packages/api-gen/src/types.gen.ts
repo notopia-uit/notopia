@@ -46,6 +46,15 @@ export type ShareNoteUpdatedEvent = {
   updatedAt: Date;
 };
 
+/**
+ * Best-effort notification that a workspace's billing state changed.
+ */
+export type ShareSubscriptionChangedEvent = {
+  workspaceId: string;
+  plan: 'free' | 'plus' | 'pro';
+  status: string;
+};
+
 export type ShareUserDeletedEvent = {
   id: ShareId;
 };

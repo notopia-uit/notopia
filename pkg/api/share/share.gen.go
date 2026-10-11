@@ -9,6 +9,27 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for SubscriptionChangedEventPlan.
+const (
+	Free SubscriptionChangedEventPlan = "free"
+	Plus SubscriptionChangedEventPlan = "plus"
+	Pro  SubscriptionChangedEventPlan = "pro"
+)
+
+// Valid indicates whether the value is a known member of the SubscriptionChangedEventPlan enum.
+func (e SubscriptionChangedEventPlan) Valid() bool {
+	switch e {
+	case Free:
+		return true
+	case Plus:
+		return true
+	case Pro:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for TrashedBy.
 const (
 	Parent  TrashedBy = "parent"
@@ -106,6 +127,16 @@ type NoteUpdatedEvent struct {
 	UpdatedAt   time.Time          `json:"updatedAt"`
 	WorkspaceId openapi_types.UUID `json:"workspaceId"`
 }
+
+// SubscriptionChangedEvent Best-effort notification that a workspace's billing state changed.
+type SubscriptionChangedEvent struct {
+	Plan        SubscriptionChangedEventPlan `json:"plan"`
+	Status      string                       `json:"status"`
+	WorkspaceId openapi_types.UUID           `json:"workspaceId"`
+}
+
+// SubscriptionChangedEventPlan defines model for SubscriptionChangedEvent.Plan.
+type SubscriptionChangedEventPlan string
 
 // Trashed defines model for Trashed.
 type Trashed struct {
