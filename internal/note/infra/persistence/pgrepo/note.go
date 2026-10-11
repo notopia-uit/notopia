@@ -72,11 +72,6 @@ func (n *Note) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*doma
 }
 
 func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams) ([]*domain.Note, error) {
-	var ids *[]uuid.UUID
-	if len(params.IDs) > 0 {
-		ids = &params.IDs
-	}
-
 	var workspaceID *uuid.UUID
 	if params.WorkspaceID != uuid.Nil {
 		workspaceID = &params.WorkspaceID
@@ -92,7 +87,7 @@ func (n *Note) GetMany(ctx context.Context, params *domain.NoteRepoGetManyParams
 	}
 
 	notes, err := n.queries.GetNotes(ctx, &pgsqlc.GetNotesParams{
-		IDs:         *ids,
+		IDs:         params.IDs,
 		WorkspaceID: workspaceID,
 		TrashedBy:   trashedBy,
 		TrashedOnly: params.TrashOnly,
@@ -286,6 +281,17 @@ func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) error {
 			}
 		}
 
+		workspaceIDByNote := map[uuid.UUID]uuid.UUID{}
+		if len(deleteIDs) > 0 {
+			pairs, err := params.queries.GetWorkspaceIDsByNoteIDs(ctx, deleteIDs)
+			if err != nil {
+				return toErr(err)
+			}
+			for _, pair := range pairs {
+				workspaceIDByNote[pair.ID] = pair.WorkspaceID
+			}
+		}
+
 		if err := n.deleteMany(ctx, params.queries, deleteIDs); err != nil {
 			return err
 		}
@@ -294,20 +300,21 @@ func (n *Note) SaveMany(ctx context.Context, notes []*domain.Note) error {
 			return err
 		}
 
-		noteIDs := make([]uuid.UUID, len(notes))
-		for i, note := range notes {
-			noteIDs[i] = note.ID()
-		}
-		noteIDworkspaceIDPairs, err := params.queries.GetWorkspaceIDsByNoteIDs(ctx, noteIDs)
-		noteIDWorkspaceIDMap := make(map[uuid.UUID]uuid.UUID, len(noteIDworkspaceIDPairs))
-		for _, pair := range noteIDworkspaceIDPairs {
-			noteIDWorkspaceIDMap[pair.ID] = pair.WorkspaceID
-		}
-		if err != nil {
-			return toErr(err)
+		if len(upsertNotes) > 0 {
+			upsertIDs := make([]uuid.UUID, len(upsertNotes))
+			for i, note := range upsertNotes {
+				upsertIDs[i] = note.ID()
+			}
+			pairs, err := params.queries.GetWorkspaceIDsByNoteIDs(ctx, upsertIDs)
+			if err != nil {
+				return toErr(err)
+			}
+			for _, pair := range pairs {
+				workspaceIDByNote[pair.ID] = pair.WorkspaceID
+			}
 		}
 		for _, note := range notes {
-			workspaceID, ok := noteIDWorkspaceIDMap[note.ID()]
+			workspaceID, ok := workspaceIDByNote[note.ID()]
 			if !ok {
 				return errs.NewPersistenceInvalid(fmt.Sprintf("failed to find workspace id for note id %s", note.ID()), nil)
 			}
