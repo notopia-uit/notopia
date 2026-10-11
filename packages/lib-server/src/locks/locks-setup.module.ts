@@ -1,8 +1,16 @@
-import { type DynamicModule, Inject, Module, type OnApplicationShutdown } from '@nestjs/common';
+import {
+  type DynamicModule,
+  Inject,
+  Logger,
+  Module,
+  type OnApplicationShutdown,
+} from '@nestjs/common';
 import { type Duration, LocksModule, LocksStorage } from '@nestjs/locks';
 import Redis from 'ioredis';
 
 import { RedisLockStore } from './redis-lock.store';
+
+const logger = new Logger('LocksSetupModule');
 
 const LOCKS_REDIS = Symbol('LOCKS_REDIS');
 
@@ -20,14 +28,29 @@ export class LocksSetupModule implements OnApplicationShutdown {
       return {
         module: LocksSetupModule,
         imports: [LocksModule.forRoot({ ttl, allowInMemoryStorage: true })],
-        providers: [{ provide: LOCKS_REDIS, useValue: null }],
+        providers: [
+          {
+            provide: LOCKS_REDIS,
+            useFactory: () => {
+              logger.warn('locks: no redis url, using in-memory store (single instance only)');
+              return null;
+            },
+          },
+        ],
       };
     }
     return {
       module: LocksSetupModule,
       imports: [LocksModule.forRoot({ ttl })],
       providers: [
-        { provide: LOCKS_REDIS, useFactory: () => new Redis(redisUrl) },
+        {
+          provide: LOCKS_REDIS,
+          useFactory: () => {
+            const client = new Redis(redisUrl);
+            client.on('error', (err) => logger.error(`locks: redis error: ${err.message}`));
+            return client;
+          },
+        },
         {
           provide: RedisLockStore,
           inject: [LOCKS_REDIS, LocksStorage],
