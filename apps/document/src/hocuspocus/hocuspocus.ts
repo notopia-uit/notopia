@@ -12,6 +12,7 @@ import { AuthenticationService } from '../authentication/authentication.service'
 import { AuthorizationService } from '../authorization/authorization.service';
 import { DocumentService } from '../document/document.service';
 import { NoteService } from '../note/note.service';
+import { applyStoredModified, readModified } from './document-metadata';
 import { HocuspocusContext } from './hocuspocus-context';
 
 @Injectable()
@@ -34,6 +35,10 @@ export class Hocuspocus {
         );
         await Promise.resolve();
       },
+      afterLoadDocument: async ({ documentName, document }) => {
+        const entity = await documentService.getById(documentName);
+        applyStoredModified(document, entity?.modified ?? false);
+      },
       onAuthenticate: (...args) => this.onAuthenticate(...args),
       onChange: (...args) => this.onChange(...args),
       extensions: [
@@ -47,8 +52,8 @@ export class Hocuspocus {
             this.logger.log({ documentId: id }, 'Fetched document from database');
             return document?.data ?? null;
           },
-          store: async ({ documentName: id, state }) => {
-            await documentService.updateDataById(id, state);
+          store: async ({ documentName: id, state, document }) => {
+            await documentService.upsertData(id, state, readModified(document));
           },
         }),
       ],
