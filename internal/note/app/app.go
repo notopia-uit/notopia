@@ -155,6 +155,7 @@ var ProvideQueries = NewQueries
 type Events struct {
 	DocumentCommitted                   *DocumentCommittedHandler
 	NoteCreatedDomainToIntegrationEvent *NoteCreatedDomainToIntegrationEventHandler
+	NoteDeletedDomainToIntegrationEvent *NoteDeletedDomainToIntegrationEventHandler
 	NoteUpdatedDomainToIntegrationEvent *NoteUpdatedDomainToIntegrationEventHandler
 	NotifyWorkspaceItemsUpdated         *NotifyWorkspaceItemsUpdatedHandler
 	NotifyWorkspaceRenamed              *NotifyWorkspaceRenamedHandler

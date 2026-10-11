@@ -34,6 +34,7 @@ var ProviderSetCommand = wire.NewSet(
 var ProviderSetEvent = wire.NewSet(
 	ProvideDocumentCommittedHandler,
 	ProvideNoteCreatedDomainToIntegrationEventHandler,
+	ProvideNoteDeletedDomainToIntegrationEventHandler,
 	ProvideNoteUpdatedDomainToIntegrationEventHandler,
 	ProvideNotifyWorkspaceItemsUpdatedHandler,
 	ProvideNotifyWorkspaceRenamedHandler,

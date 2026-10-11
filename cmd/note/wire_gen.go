@@ -184,6 +184,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	getWorkspaceByNote := pgreadmodel.NewGetWorkspaceByNote(queries)
 	noteCreatedDomainToIntegrationEventHandler := app.NewNoteCreatedDomainToIntegrationEventHandler(integrationPublisher, getWorkspaceByNote)
+	noteDeletedDomainToIntegrationEventHandler := app.NewNoteDeletedDomainToIntegrationEventHandler(integrationPublisher)
 	pgreadmodelNote := pgreadmodel.GetNote(queries)
 	getFolder := pgreadmodel.NewGetFolder(queries)
 	noteUpdatedDomainToIntegrationEventHandler := app.NewNoteUpdatedDomainToIntegrationEventHandler(integrationPublisher, pgreadmodelNote, getFolder)
@@ -193,6 +194,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	events := &app.Events{
 		DocumentCommitted:                   documentCommittedHandler,
 		NoteCreatedDomainToIntegrationEvent: noteCreatedDomainToIntegrationEventHandler,
+		NoteDeletedDomainToIntegrationEvent: noteDeletedDomainToIntegrationEventHandler,
 		NoteUpdatedDomainToIntegrationEvent: noteUpdatedDomainToIntegrationEventHandler,
 		NotifyWorkspaceItemsUpdated:         notifyWorkspaceItemsUpdatedHandler,
 		NotifyWorkspaceRenamed:              notifyWorkspaceRenamedHandler,
