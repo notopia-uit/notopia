@@ -16,6 +16,9 @@ var (
 	WorkspacePermissionRead   WorkspacePermission = "read"
 	WorkspacePermissionEdit   WorkspacePermission = "edit"
 	WorkspacePermissionDelete WorkspacePermission = "delete"
+
+	WorkspacePermissionBillingRead   WorkspacePermission = "billing_read"
+	WorkspacePermissionBillingManage WorkspacePermission = "billing_manage"
 )
 
 func (p WorkspacePermission) String() string {

@@ -13,6 +13,8 @@ const (
 	WorkspacePermissionRead
 	WorkspacePermissionEdit
 	WorkspacePermissionDelete
+	WorkspacePermissionBillingRead
+	WorkspacePermissionBillingManage
 )
 
 func (p WorkspacePermission) String() string {
@@ -23,6 +25,10 @@ func (p WorkspacePermission) String() string {
 		return "edit"
 	case WorkspacePermissionDelete:
 		return "delete"
+	case WorkspacePermissionBillingRead:
+		return "billing_read"
+	case WorkspacePermissionBillingManage:
+		return "billing_manage"
 	case WorkspacePermissionUnspecified:
 		return "unspecified"
 	default:

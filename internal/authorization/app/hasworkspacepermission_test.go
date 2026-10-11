@@ -39,6 +39,10 @@ func TestHasWorkspacePermissionHandler(t *testing.T) {
 		{"W110-Owner user 112: Edit Workspace", "112", "00000000-0000-4000-8000-000000000110", app.WorkspacePermissionEdit, true},
 		{"Security: user:111 (Owner of W111) cannot edit W112", "111", "00000000-0000-4000-8000-000000000112", app.WorkspacePermissionEdit, false},
 		{"Security: user:112 (Owner of W112) cannot delete W111", "112", "00000000-0000-4000-8000-000000000111", app.WorkspacePermissionDelete, false},
+		{"W111-Owner: Manage Billing", "111", "00000000-0000-4000-8000-000000000111", app.WorkspacePermissionBillingManage, true},
+		{"W111-Editor: Read Billing", "112", "00000000-0000-4000-8000-000000000111", app.WorkspacePermissionBillingRead, true},
+		{"W111-Editor: CANNOT Manage Billing", "112", "00000000-0000-4000-8000-000000000111", app.WorkspacePermissionBillingManage, false},
+		{"W111-Viewer: Read Billing", "110", "00000000-0000-4000-8000-000000000111", app.WorkspacePermissionBillingRead, true},
 	}
 
 	for _, tc := range tests {
