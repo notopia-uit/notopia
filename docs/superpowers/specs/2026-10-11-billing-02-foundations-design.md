@@ -119,8 +119,9 @@ func NewRedisLocker(client redis.UniversalClient, opts ...redislock.LockerOption
 
 ### F7 — Shared event schemas (`api/share`)
 
-- None for billing: consumers call billing gRPC directly, so billing publishes no integration
-  events. (`WorkspaceDeletedIntegrationEvent` is added in sub-project 01.)
+- `SubscriptionChangedEvent {workspaceId: uuid, plan: free|plus|pro, status: string}` and
+  `PlanChangedEvent {tier: free|plus|pro}` — best-effort client notifications only (no consumer
+  caches; see spec 03 section 10). (`WorkspaceDeletedIntegrationEvent` is added in sub-project 01.)
 - `nx gen api` → `@notopia-uit/api-share-gen` and `pkg/api/share`.
 
 ### F8 — Note batch lookup RPC (`proto/note/note.proto`)

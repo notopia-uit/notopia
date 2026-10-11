@@ -37,9 +37,10 @@
 - Modify: `pkg/common/http/user.go`
 - Create: `pkg/common/http/group.go`
 - Modify: `apps/document/src/common/user.guard.ts`
+- Modify: `deploy/compose/infrastructure/traefik/dynamic/jwt-middleware.yaml` (add `X-Forwarded-Name: name` to `headerMap`)
 
 **Interfaces:**
-- Produces: `commonhttp.User{ID, Email string; Groups, Roles []string}`, `commonhttp.RequireGroup(group string) gin.HandlerFunc`, `commonhttp.(*User).HasGroup(group string) bool`
+- Produces: `commonhttp.User{ID, Email, Name string; Groups, Roles []string}`, `commonhttp.RequireGroup(group string) gin.HandlerFunc`, `commonhttp.(*User).HasGroup(group string) bool`
 
 - [ ] **Step 1: Go user parsing**
 
@@ -49,6 +50,7 @@
 type User struct {
 	ID     string   `json:"id"`
 	Email  string   `json:"email"`
+	Name   string   `json:"name"`
 	Groups []string `json:"groups"`
 	Roles  []string `json:"roles"`
 }
@@ -73,6 +75,7 @@ func GatewayUserAuth() gin.HandlerFunc {
 		user := &User{
 			ID:     c.GetHeader("X-Forwarded-ID"),
 			Email:  c.GetHeader("X-Forwarded-Email"),
+			Name:   c.GetHeader("X-Forwarded-Name"),
 			Groups: unmarshalHeaderList(c.GetHeader("X-Forwarded-Groups")),
 			Roles:  unmarshalHeaderList(c.GetHeader("X-Forwarded-Roles")),
 		}
@@ -132,7 +135,7 @@ Replace `parseHeaderList` in `apps/document/src/common/user.guard.ts`:
 ```bash
 go build ./pkg/... && nx lint note
 oxfmt apps/document/src/common && nx lint document --fix
-git add pkg/common/http apps/document/src/common
+git add pkg/common/http apps/document/src/common deploy/compose/infrastructure/traefik/dynamic/jwt-middleware.yaml
 git commit -m "feat(common): parse gateway groups/roles as JSON and add RequireGroup"
 ```
 
@@ -732,6 +735,58 @@ Copy the shape of an existing file in `api/common/components/responses/` (e.g. t
 nx lint api
 git add api/common
 git commit -m "feat(api): add PaymentRequired error contract"
+```
+
+---
+
+### Task 5b: Billing notification schemas (`api/share`)
+
+**Files:**
+- Create: `api/share/components/schemas/SubscriptionChangedEvent.yaml`, `api/share/components/schemas/PlanChangedEvent.yaml`
+- Modify: `api/share/openapi.yaml`
+
+**Interfaces:**
+- Produces: `share.SubscriptionChangedEvent{WorkspaceId uuid.UUID; Plan, Status string}`, `share.PlanChangedEvent{Tier string}` (Go) and the TS types in `@notopia-uit/api-share-gen`. Used by billing (plan 03, publisher) and note (plan 04, SSE forwarder).
+
+- [ ] **Step 1: Schemas**
+
+```yaml
+# api/share/components/schemas/SubscriptionChangedEvent.yaml
+# vim: ft=yaml.openapi
+type: object
+description: Best-effort notification that a workspace's billing state changed.
+properties:
+  workspaceId:
+    type: string
+    format: uuid
+  plan:
+    type: string
+    enum: [free, plus, pro]
+  status:
+    type: string
+required: [workspaceId, plan, status]
+```
+
+```yaml
+# api/share/components/schemas/PlanChangedEvent.yaml
+# vim: ft=yaml.openapi
+type: object
+description: Best-effort notification that an admin changed a plan's features or limits.
+properties:
+  tier:
+    type: string
+    enum: [free, plus, pro]
+required: [tier]
+```
+
+Register both under `components.schemas` in `api/share/openapi.yaml`.
+
+- [ ] **Step 2: Generate, lint, commit**
+
+```bash
+nx lint api && nx run api:gen
+git add api/share pkg/api/share packages/api-share-gen
+git commit -m "feat(api): add billing notification event schemas"
 ```
 
 ---

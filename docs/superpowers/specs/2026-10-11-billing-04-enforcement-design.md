@@ -52,6 +52,17 @@ optional Redis scaling mode.
 - `controller/cron/`, daily 03:00 `Asia/Ho_Chi_Minh`, `pkg/cron` with Redis locker on
   `note_redis`, `// NOTE:` move to `cmd/note-worker`.
 
+### Billing change notifications (SSE)
+
+- Consume `events.integration.billing.subscription.changed` → publish SSE
+  `WorkspaceBillingChangedEvent {workspaceId}` on that workspace's channel through
+  `WorkspaceEventHub`.
+- Consume `events.integration.billing.plan.changed` → publish the same event to every workspace
+  with connected SSE clients (or a general-topic broadcast if the hub supports it).
+- Schema `api/note/components/schemas/WorkspaceBillingChangedEvent.yaml`, added to the SSE
+  events union in `workspaces_{workspaceId}_events.yaml`.
+- Clients refetch `/billing/workspaces/{id}/entitlements` on that event.
+
 ## document (`apps/document`)
 
 ### Entitlement client
@@ -148,7 +159,7 @@ NOTOPIA_DOCUMENT_REDIS_URL=              # required only when true (zod refine)
 Billing settings tab (plan, status, renewal/access-until, payer, Upgrade, Manage, Cancel now
 with refund preview, Transfer payer); "Claim billing" banner; pricing page from
 `GET /billing/plans` in VND; global 402 handler → upgrade dialog using `details.requiredPlan`;
-`<FeatureGate>` from `/entitlements`; downgrade warning; editor shows "Saved automatically" with
+`<FeatureGate>` from `/entitlements`, refetched on SSE `WorkspaceBillingChangedEvent` and polled every 2 s for up to 20 s after returning from Checkout/Portal; downgrade warning; editor shows "Saved automatically" with
 `auto_commit`, else manual Commit; revision list collapses `auto`; admin pages for plans,
 prices, policy.
 

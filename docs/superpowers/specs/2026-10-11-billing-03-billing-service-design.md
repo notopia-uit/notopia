@@ -474,8 +474,7 @@ our own constants (`CheckoutCompleted`, `SubscriptionChanged`, `InvoicePaid`,
 | `cmd_startportal.go` | HTTP | Owner check. Requires a `BillingAccount`. Return Portal URL. |
 | `cmd_cancelnow.go` | HTTP | Owner check. `QuoteCancelNow` → Stripe cancel (recurring) → `CancelNow` (adds pending `Refund`) → save → `CreateRefund` → `MarkRefundSucceeded/Failed` from response (webhook confirms later). |
 | `q_cancelnowpreview.go` | HTTP | Returns the `RefundQuote`. |
-| `cmd_transferpayer.go` | HTTP | Owner check; target must be an owner. Create Checkout `mode=setup` for the target; target must complete it. |
-| `cmd_claimpayer.go` | HTTP | Owner check; only allowed while `payerMissingSince != nil`. Checkout `mode=setup` for caller. |
+| `cmd_claimpayer.go` | HTTP | Owner check; any owner who is not already the payer (or when the payer is missing). Checkout `mode=setup` for the caller, who becomes payer on completion. This replaces a separate transfer endpoint. |
 | `cmd_completecheckout.go` | webhook `checkout.session.completed` | By `metadata.purpose`: **subscribe** → fetch snapshot, create `Subscription`; if another current one exists → cancel new one at Stripe + full refund `duplicate_checkout`. **lifetime** → if a current recurring exists, `CancelNow(replaced_by_lifetime)` it first (prorated refund), then `NewLifetimeSubscription`. **payer_change** → set default payment method on customer + subscription, detach other methods, `ChangePayer`, update Stripe contact, and if the payer was missing: `ResumeCancel`. |
 | `cmd_syncsubscription.go` | webhook subscription/invoice events, reconcile cron | Fetch snapshot from Stripe (payload ignored → ordering irrelevant) → `ApplySnapshot`. |
 | `cmd_syncrefund.go` | webhook `refund.updated`, `refund.failed`, `charge.refunded` | Match by `metadata.refund_id` or provider refund id → mark succeeded/failed. Unknown refunds (dashboard) → `RecordExternalRefund` with reason `external`. |
@@ -528,7 +527,6 @@ our own constants (`CheckoutCompleted`, `SubscriptionChanged`, `InvoicePaid`,
 | `POST /workspaces/{workspaceId}/portal-session` | owner | → `{url}` |
 | `GET /workspaces/{workspaceId}/subscription/cancel-now/preview` | owner | `RefundQuote` |
 | `POST /workspaces/{workspaceId}/subscription/cancel-now` | owner | → subscription |
-| `POST /workspaces/{workspaceId}/payer/transfer` | owner | `{userId}` → `{url}` (setup checkout for target) |
 | `POST /workspaces/{workspaceId}/payer/claim` | owner | → `{url}` |
 | `GET /admin/plans` / `PATCH /admin/plans/{tier}` | admin | `{features?, limits?}` |
 | `GET /admin/policy` / `PATCH /admin/policy` | admin | `{pastDueGraceDays?, lifetimeRefundWindowDays?}` |
@@ -598,10 +596,18 @@ Callers check maps with a small helper in each consumer (`ent.Feature("auto_comm
 
 ## 10. Integration events
 
-Billing **publishes none**: note, document and the future AI service read state through gRPC on
-every check, so changes apply immediately. Domain events (section 4.3) are still raised by every
-mutating method and drained by `Save` (logged at debug), so integration publishing can be added
-later without touching the domain.
+Billing publishes two **best-effort notifications**, straight to Kafka **after the transaction
+commits** (no outbox). Losing one is harmless: clients catch up on their next entitlements fetch.
+Consumers never cache billing state; note, document and the future AI service read it through
+gRPC on every check.
+
+| Topic | Payload | When | Consumer |
+| --- | --- | --- | --- |
+| `events.integration.billing.subscription.changed` | `{workspaceId, plan, status}` | subscription activated, renewed, past_due, plan changed, cancel scheduled/resumed, ended, canceled-now; payer missing/changed | note → SSE `WorkspaceBillingChangedEvent` |
+| `events.integration.billing.plan.changed` | `{tier}` | admin plan edit | note → SSE to every connected workspace |
+
+Domain events (section 4.3) are still raised by every mutating method; repos drain them on
+`Save`, and the app collects which workspaces changed to publish the notifications above.
 
 Billing consumes:
 
@@ -781,7 +787,7 @@ Unit tests only where logic is non-obvious; plumbing is verified by the manual s
 | infra/payment/stripe | Snapshot mapping from a recorded Stripe JSON fixture (item-level periods); webhook signature verify with `webhook.GenerateTestSignedPayload` |
 | app | `CompleteCheckout` branches (duplicate, lifetime replaces recurring, payer change) with fakes |
 | persistence | No automated DB tests (none exist for note). `nx goose:validate billing`, `nx lint:goose billing` |
-| E2E (manual, sandbox) | `stripe listen`; checkout with card `4242 4242 4242 4242` → entitlements `plus`; Portal upgrade → `pro`; Portal cancel at period end; `stripe trigger invoice.payment_failed` → `past_due` still granted within grace; cancel-now → refund in dashboard; payer transfer via setup checkout; delete workspace → subscription canceled + refund; replay a webhook → no duplicate effect |
+| E2E (manual, sandbox) | `stripe listen`; checkout with card `4242 4242 4242 4242` → entitlements `plus`; Portal upgrade → `pro`; Portal cancel at period end; `stripe trigger invoice.payment_failed` → `past_due` still granted within grace; cancel-now → refund in dashboard; payer claim via setup checkout; delete workspace → subscription canceled + refund; replay a webhook → no duplicate effect |
 
 ## 17. Acceptance
 
