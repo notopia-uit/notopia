@@ -75,6 +75,19 @@ export class AppService {
     }
   }
 
+  async handleNoteDeleted(id: string) {
+    const index = this.meili.index(AppService.noteIndex);
+    try {
+      await index.deleteDocument(id);
+      this.logger.log({ id }, 'handleNoteDeleted: removed');
+    } catch (e) {
+      if (e instanceof MeilisearchError) {
+        throw new MeiliError(e);
+      }
+      throw e;
+    }
+  }
+
   async handleDocumentCommitted(params: HandleDocumentCommittedParams) {
     this.logger.debug(
       { id: params.id, tags: params.tags },
