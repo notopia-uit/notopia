@@ -36,3 +36,8 @@ reviews:
     - "!packages/pb/src/**"
     - "!pkg/api/**"
     - "!pkg/pb/**"
+    - "!**/AGENTS.md"
+    - "!**/CLAUDE.md"
+    - "!**/.gitignore"
+    - "!**/.editorconfig"
+    - "!.claude/settings.json"
