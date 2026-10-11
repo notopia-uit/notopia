@@ -6,7 +6,7 @@
 
 **Architecture:** note gets an `EntitlementSvc` port (gRPC adapter to billing) used by command/query handlers, a trash-purge cron (`pkg/cron`), and a Kafka consumer that forwards billing notifications to the existing `WorkspaceEventHub`. document gets a billing gRPC client, revision/document columns, a transactional `commitIfDue`, a Hocuspocus `AutoCommitExtension`, sweeper + revision-purge crons (`@nestjs/locks`), and an optional Redis scaling mode.
 
-**Tech Stack:** Go (gin strict server, grpc, Watermill, `pkg/cron`), NestJS 11 (TypeORM synchronize in dev, `@nestjs/schedule` 6.1.3, `@nestjs/locks` 0.0.2 via `@notopia-uit/lib-server/locks`, Hocuspocus v4.0.0, `@hocuspocus/extension-redis` 4.0.0), vitest + @suites.
+**Tech Stack:** Go (gin strict server, grpc, Watermill, `pkg/cron`), NestJS 11 (TypeORM synchronize in dev, `@nestjs/schedule` 12.0.2, `@nestjs/locks` 0.0.2 via `@notopia-uit/lib-server/locks`, Hocuspocus v4.0.0, `@hocuspocus/extension-redis` 4.0.0), vitest + @suites.
 
 **Spec:** `docs/superpowers/specs/2026-10-11-billing-04-enforcement-design.md`
 
@@ -15,7 +15,7 @@
 ## Decisions made while planning (confirm in review)
 
 1. **`published_notes` is not enforced yet.** `cmd_publishnote.go` / `cmd_publishworkspace.go` are stubs (`return nil`) and there is no publish column. The limit stays in billing; the gate lands with the publish feature (TODO in `internal/note/AGENTS.md`).
-2. **Plan-change broadcast** uses a reserved hub key `workspace:broadcast` (metadata workspace id = `uuid.Nil`); every SSE subscriber also listens on it.
+2. **Only subscription changes are pushed over SSE.** Admin plan edits are not broadcast; clients see new limits on their next entitlements fetch.
 3. **Members limit** is checked against the *requested* member list of `UpdateWorkspaceMembers` (it replaces the whole list): blocked only when the new count exceeds the limit **and** grows past the current count, so shrinking or role changes on an over-limit workspace still work.
 4. **Document schema** changes rely on TypeORM `synchronize` (dev) like the existing entities; no migration files exist in `apps/document` today.
 
@@ -762,13 +762,13 @@ git commit -m "feat(note): plan-aware trash purge cron"
 **Files:**
 - Create: `api/note/components/schemas/WorkspaceBillingChangedEvent.yaml`
 - Modify: `api/note/paths/workspaces_{workspaceId}_events.yaml`
-- Modify: `internal/note/app/workspaceevent.go`, `internal/note/infra/workspaceevent/workspaceevent.go`
+- Modify: `internal/note/app/workspaceevent.go`
 - Create: `internal/note/app/e_billingchanged.go`, `internal/note/controller/event/billingchanged.go`
 - Modify: `internal/note/controller/event/event.go`, `app.go`, `wire.go`
 
 **Interfaces:**
-- Consumes: `share.SubscriptionChangedEvent`, `share.PlanChangedEvent` (plan 02 Task 5b) on `events.integration.billing.subscription.changed` / `events.integration.billing.plan.changed`.
-- Produces: SSE event `WorkspaceBillingChangedEvent {id, event, data: {workspaceId?, plan?, tier?}}`; hub broadcast key `workspace:broadcast` for `uuid.Nil`.
+- Consumes: `share.SubscriptionChangedEvent` (plan 02 Task 5b) on `events.integration.billing.subscription.changed`.
+- Produces: SSE event `WorkspaceBillingChangedEvent {id, event, data: {workspaceId, plan}}` published on the workspace's existing channel.
 
 - [ ] **Step 1: Schema**
 
@@ -792,16 +792,16 @@ properties:
   data:
     type: object
     x-go-type-name: WorkspaceBillingChangedEventData
-    description: Refetch /billing/workspaces/{id}/entitlements. workspaceId is absent for plan-wide changes.
+    description: Refetch /billing/workspaces/{id}/entitlements.
     properties:
       workspaceId:
         $ref: ./Workspace.yaml#/properties/id
       plan:
         type: string
         example: plus
-      tier:
-        type: string
-        example: free
+    required:
+      - workspaceId
+      - plan
 
 required:
   - id
@@ -811,7 +811,7 @@ required:
 
 Add it to the `oneOf` and the discriminator `mapping` in `workspaces_{workspaceId}_events.yaml`. Run `nx lint api && nx run api:gen`.
 
-- [ ] **Step 2: Event type + hub broadcast**
+- [ ] **Step 2: Event type**
 
 `app/workspaceevent.go`:
 
@@ -821,11 +821,7 @@ type WorkspaceEventBillingChanged struct {
 }
 ```
 
-and a case in `NewEmptyWorkspaceEventFromType` for `note.WorkspaceBillingChangedEventEventWorkspaceBillingChangedEvent`.
-
-`infra/workspaceevent/workspaceevent.go`:
-- `setupRouting`: `internalTopic := fmt.Sprintf("workspace:%s", workspaceID)`; if `workspaceID == uuid.Nil.String()` use `"workspace:broadcast"`.
-- `Subscribe`: subscribe to both `workspace:{id}` and `workspace:broadcast`; run the existing loop for each channel in its own goroutine, close `eventCh` after both exit (`sync.WaitGroup`).
+and a case in `NewEmptyWorkspaceEventFromType` for `note.WorkspaceBillingChangedEventEventWorkspaceBillingChangedEvent`. The hub (`infra/workspaceevent`) is unchanged.
 
 - [ ] **Step 3: Handler + consumer**
 
@@ -842,9 +838,8 @@ import (
 )
 
 type BillingChanged struct {
-	WorkspaceID *uuid.UUID // nil = plan-wide change, broadcast
+	WorkspaceID uuid.UUID
 	Plan        string
-	Tier        string
 }
 
 type BillingChangedHandler struct {
@@ -859,21 +854,11 @@ func NewBillingChangedHandler(publisher WorkspaceEventPublisher, identity *commo
 var ProvideBillingChangedHandler = NewBillingChangedHandler
 
 func (h *BillingChangedHandler) Handle(ctx context.Context, ev *BillingChanged) error {
-	target := uuid.Nil
-	data := note.WorkspaceBillingChangedEventData{}
-	if ev.WorkspaceID != nil {
-		target = *ev.WorkspaceID
-		data.WorkspaceId = ev.WorkspaceID
-	}
-	if ev.Plan != "" {
-		data.Plan = &ev.Plan
-	}
-	if ev.Tier != "" {
-		data.Tier = &ev.Tier
-	}
-	return h.publisher.Publish(ctx, target, h.identity.ServiceAccountUserID, &WorkspaceEventBillingChanged{
+	return h.publisher.Publish(ctx, ev.WorkspaceID, h.identity.ServiceAccountUserID, &WorkspaceEventBillingChanged{
 		workspaceEvent[note.WorkspaceBillingChangedEventEvent]{
-			Id: uuid.Must(uuid.NewV7()), Event: note.WorkspaceBillingChangedEventEventWorkspaceBillingChangedEvent, Data: data,
+			Id:    uuid.Must(uuid.NewV7()),
+			Event: note.WorkspaceBillingChangedEventEventWorkspaceBillingChangedEvent,
+			Data:  note.WorkspaceBillingChangedEventData{WorkspaceId: ev.WorkspaceID, Plan: ev.Plan},
 		},
 	})
 }
@@ -899,16 +884,7 @@ func (e *Event) subscriptionChangedHandler(msg *message.Message) error {
 	if err := json.Unmarshal(msg.Payload, &ev); err != nil {
 		return fmt.Errorf("failed to unmarshal SubscriptionChangedEvent: %w", err)
 	}
-	ws := ev.WorkspaceId
-	return e.app.Events.BillingChanged.Handle(msg.Context(), &app.BillingChanged{WorkspaceID: &ws, Plan: string(ev.Plan)})
-}
-
-func (e *Event) planChangedHandler(msg *message.Message) error {
-	var ev share.PlanChangedEvent
-	if err := json.Unmarshal(msg.Payload, &ev); err != nil {
-		return fmt.Errorf("failed to unmarshal PlanChangedEvent: %w", err)
-	}
-	return e.app.Events.BillingChanged.Handle(msg.Context(), &app.BillingChanged{Tier: string(ev.Tier)})
+	return e.app.Events.BillingChanged.Handle(msg.Context(), &app.BillingChanged{WorkspaceID: ev.WorkspaceId, Plan: string(ev.Plan)})
 }
 ```
 
@@ -916,7 +892,6 @@ func (e *Event) planChangedHandler(msg *message.Message) error {
 
 ```go
 	e.router.AddConsumerHandler("BillingSubscriptionChangedHandler", "events.integration.billing.subscription.changed", e.subcriber, e.subscriptionChangedHandler)
-	e.router.AddConsumerHandler("BillingPlanChangedHandler", "events.integration.billing.plan.changed", e.subcriber, e.planChangedHandler)
 ```
 
 - [ ] **Step 4: Verify, commit**
@@ -925,7 +900,7 @@ func (e *Event) planChangedHandler(msg *message.Message) error {
 nx run note:gen:wire && nx build note && nx lint note
 ```
 
-Manual: open the workspace SSE stream (`curl -N -H 'Authorization: Bearer …' http://api.notopia.localhost/note/workspaces/W/events`), complete a checkout for W → a `WorkspaceBillingChangedEvent` arrives with `workspaceId: W`. Admin plan edit → the event arrives without `workspaceId`.
+Manual: open the workspace SSE stream (`curl -N -H 'Authorization: Bearer …' http://api.notopia.localhost/note/workspaces/W/events`), complete a checkout for W → a `WorkspaceBillingChangedEvent` arrives with `workspaceId: W`.
 
 ```bash
 git add api/note pkg/api/note packages/api-gen internal/note cmd/note/wire_gen.go

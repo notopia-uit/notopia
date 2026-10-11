@@ -4,7 +4,7 @@
 
 **Goal:** A new Go `billing` service owning plans, prices, subscriptions and entitlements, integrated with Stripe (sandbox) via hosted Checkout and Customer Portal, exposing entitlements over gRPC and HTTP.
 
-**Architecture:** Mirrors `internal/note` (DDD + CQRS, wire, sqlc + goose, gin strict server, gRPC, Watermill Kafka subscriber, `pkg/cron`). No outbox: other services read billing over gRPC; billing only publishes best-effort `subscription.changed` / `plan.changed` notifications to Kafka after commit (note forwards them to SSE). Stripe sits behind `app.PaymentProvider`; webhooks use fetch-and-sync and are de-duplicated in the same transaction as their effect.
+**Architecture:** Mirrors `internal/note` (DDD + CQRS, wire, sqlc + goose, gin strict server, gRPC, Watermill Kafka subscriber, `pkg/cron`). No outbox: other services read billing over gRPC; billing only publishes a best-effort `subscription.changed` notification to Kafka after commit (note forwards it to SSE). Admin plan edits are not pushed. Stripe sits behind `app.PaymentProvider`; webhooks use fetch-and-sync and are de-duplicated in the same transaction as their effect.
 
 **Tech Stack:** Go 1.26, gin + oapi-codegen strict server, grpc + protovalidate, pgx v5 + sqlc + goose, Watermill Kafka, go-redis v9 + `pkg/cron`, `github.com/stripe/stripe-go/v87` `v87.0.0`, OpenTelemetry via `pkg/otel`.
 
@@ -30,7 +30,7 @@
 - Webhooks: `webhook.ConstructEventWithOptions(..., webhook.ConstructEventOptions{IgnoreAPIVersionMismatch: true})` — payloads are only used for ids.
 - Every Stripe write that must not duplicate carries an idempotency key (`customer:{workspaceId}`, `refund:{refundId}`, `price:{priceId}`).
 - Every mutating domain method emits a domain event; repos drain them on `Save` and log at debug.
-- Notifications (`events.integration.billing.subscription.changed`, `events.integration.billing.plan.changed`) are published by use cases **after** `uow.Execute` returns nil; publish errors are logged, never returned.
+- The notification (`events.integration.billing.subscription.changed`) is published by use cases **after** `uow.Execute` returns nil; publish errors are logged, never returned.
 - Codegen: `nx run api:gen`, `nx run proto:gen`, `nx run billing:gen:sqlc`, `nx run billing:gen:wire`. Never edit generated files.
 - Skip obvious tests. `nx lint billing` before each commit. Conventional commits.
 
@@ -3111,7 +3111,6 @@ import (
 // Notifier publishes best-effort notifications after commit. Implementations log errors and never fail.
 type Notifier interface {
 	SubscriptionChanged(ctx context.Context, workspaceID uuid.UUID, plan domain.PlanTier, status domain.Status)
-	PlanChanged(ctx context.Context, tier domain.PlanTier)
 }
 
 func notifySubscription(ctx context.Context, n Notifier, s *domain.Subscription) {
@@ -3212,7 +3211,6 @@ import (
 
 const (
 	TopicSubscriptionChanged = "events.integration.billing.subscription.changed"
-	TopicPlanChanged         = "events.integration.billing.plan.changed"
 )
 
 type Kafka struct {
@@ -3248,9 +3246,6 @@ func (k *Kafka) SubscriptionChanged(ctx context.Context, workspaceID uuid.UUID, 
 	})
 }
 
-func (k *Kafka) PlanChanged(ctx context.Context, tier domain.PlanTier) {
-	k.publish(ctx, TopicPlanChanged, &share.PlanChangedEvent{Tier: share.PlanChangedEventTier(tier)})
-}
 ```
 
 (Use the enum type names oapi-codegen generated in `pkg/api/share`; they follow `<Schema><Property>`.)
@@ -5393,13 +5388,10 @@ type UpdatePlan struct {
 	Result   *domain.Plan
 }
 
-type UpdatePlanHandler struct {
-	uow      domain.UnitOfWork
-	notifier Notifier
-}
+type UpdatePlanHandler struct{ uow domain.UnitOfWork }
 
-func NewUpdatePlanHandler(uow domain.UnitOfWork, notifier Notifier) *UpdatePlanHandler {
-	return &UpdatePlanHandler{uow: uow, notifier: notifier}
+func NewUpdatePlanHandler(uow domain.UnitOfWork) *UpdatePlanHandler {
+	return &UpdatePlanHandler{uow: uow}
 }
 
 var ProvideUpdatePlanHandler = NewUpdatePlanHandler
@@ -5420,9 +5412,6 @@ func (h *UpdatePlanHandler) Handle(ctx context.Context, cmd *UpdatePlan) error {
 		cmd.Result = plan
 		return r.Plan().Save(ctx, plan)
 	})
-	if err == nil {
-		h.notifier.PlanChanged(ctx, cmd.Tier)
-	}
 	return err
 }
 ```
@@ -6013,7 +6002,6 @@ func (f *fakeProvider) UpdateCustomerContact(context.Context, string, domain.Pay
 type nopNotifier struct{}
 
 func (nopNotifier) SubscriptionChanged(context.Context, uuid.UUID, domain.PlanTier, domain.Status) {}
-func (nopNotifier) PlanChanged(context.Context, domain.PlanTier)                                  {}
 ```
 
 ```go

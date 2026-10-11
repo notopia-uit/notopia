@@ -596,7 +596,7 @@ Callers check maps with a small helper in each consumer (`ent.Feature("auto_comm
 
 ## 10. Integration events
 
-Billing publishes two **best-effort notifications**, straight to Kafka **after the transaction
+Billing publishes one **best-effort notification**, straight to Kafka **after the transaction
 commits** (no outbox). Losing one is harmless: clients catch up on their next entitlements fetch.
 Consumers never cache billing state; note, document and the future AI service read it through
 gRPC on every check.
@@ -604,10 +604,10 @@ gRPC on every check.
 | Topic | Payload | When | Consumer |
 | --- | --- | --- | --- |
 | `events.integration.billing.subscription.changed` | `{workspaceId, plan, status}` | subscription activated, renewed, past_due, plan changed, cancel scheduled/resumed, ended, canceled-now; payer missing/changed | note → SSE `WorkspaceBillingChangedEvent` |
-| `events.integration.billing.plan.changed` | `{tier}` | admin plan edit | note → SSE to every connected workspace |
 
 Domain events (section 4.3) are still raised by every mutating method; repos drain them on
-`Save`, and the app collects which workspaces changed to publish the notifications above.
+`Save`, and the app publishes the notification above for changed subscriptions. Admin plan edits are
+not pushed: clients see new limits on their next entitlements fetch.
 
 Billing consumes:
 

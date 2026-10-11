@@ -57,8 +57,6 @@ optional Redis scaling mode.
 - Consume `events.integration.billing.subscription.changed` → publish SSE
   `WorkspaceBillingChangedEvent {workspaceId}` on that workspace's channel through
   `WorkspaceEventHub`.
-- Consume `events.integration.billing.plan.changed` → publish the same event to every workspace
-  with connected SSE clients (or a general-topic broadcast if the hub supports it).
 - Schema `api/note/components/schemas/WorkspaceBillingChangedEvent.yaml`, added to the SSE
   events union in `workspaces_{workspaceId}_events.yaml`.
 - Clients refetch `/billing/workspaces/{id}/entitlements` on that event.
