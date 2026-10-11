@@ -1,0 +1,28 @@
+# vim: ft=yaml.openapi
+allOf:
+  - $ref: ./Error.yaml
+  - type: object
+    properties:
+      details:
+        type: object
+        properties:
+          kind:
+            type: string
+            enum: [feature, limit]
+            example: limit
+          key:
+            type: string
+            example: members
+          current:
+            type: integer
+            format: int64
+            example: 5
+          max:
+            type: integer
+            format: int64
+            example: 5
+          requiredPlan:
+            type: string
+            enum: [plus, pro]
+            example: plus
+        required: [kind, key, requiredPlan]
