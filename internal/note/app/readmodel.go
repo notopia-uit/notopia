@@ -79,3 +79,7 @@ type GetWorkspaceTreeReadModelParams struct {
 type GetWorkspaceTreeReadModel interface {
 	Handle(ctx context.Context, p *GetWorkspaceTreeReadModelParams) (WorkspaceTreeFolder, error)
 }
+
+type GetNotesWorkspaceIDsReadModel interface {
+	Handle(ctx context.Context, noteIDs []uuid.UUID) (map[uuid.UUID]uuid.UUID, error)
+}

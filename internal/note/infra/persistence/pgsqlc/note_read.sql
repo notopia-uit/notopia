@@ -86,3 +86,14 @@ FROM
   note_links
 WHERE
   source_id = sqlc.arg('note_id');
+
+-- name: ReadGetNotesWorkspaceIDs :many
+SELECT
+  n.id AS note_id,
+  f.workspace_id
+FROM
+  notes n
+JOIN
+  folders f ON f.id = n.folder_id
+WHERE
+  n.id = ANY(@ids::uuid[]);

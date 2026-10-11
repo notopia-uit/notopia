@@ -202,6 +202,8 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		NotifyWorkspaceSlugChanged:               notifyWorkspaceSlugChangedHandler,
 		WorkspaceDeletedDomainToIntegrationEvent: workspaceDeletedDomainToIntegrationEventHandler,
 	}
+	notesWorkspaceIDs := pgreadmodel.NewNotesWorkspaceIDs(queries)
+	batchGetNoteWorkspacesHandler := app.NewBatchGetNoteWorkspacesHandler(notesWorkspaceIDs)
 	checkWorkspaceSlugExists := pgreadmodel.NewCheckWorkspaceSlugExists(queries)
 	checkWorkspaceSlugExistsHandler := app.NewCheckWorkspaceSlugExistsHandler(checkWorkspaceSlugExists)
 	getWorkspaces := pgreadmodel.NewGetWorkspaces(queries)
@@ -227,7 +229,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	searchUsersHandler := app.NewSearchUsersHandler(identityAuthentik, authorization)
 	showTrash := pgreadmodel.NewShowTrash(queries)
 	showTrashHandler := app.NewShowTrashHandler(authorization, showTrash)
-	appQueries := app.NewQueries(handlerProvider, checkWorkspaceSlugExistsHandler, getMyWorkspacesHandler, getNoteGraphHandler, getNoteHandler, getNoteLinksHandler, getWorkspaceByNoteHandler, getWorkspaceGraphHandler, getWorkspaceBySlugHandler, getWorkspaceMembersHandler, getWorkspaceSearchTokenHandler, getWorkspaceTreeHandler, searchUsersHandler, showTrashHandler)
+	appQueries := app.NewQueries(handlerProvider, batchGetNoteWorkspacesHandler, checkWorkspaceSlugExistsHandler, getMyWorkspacesHandler, getNoteGraphHandler, getNoteHandler, getNoteLinksHandler, getWorkspaceByNoteHandler, getWorkspaceGraphHandler, getWorkspaceBySlugHandler, getWorkspaceMembersHandler, getWorkspaceSearchTokenHandler, getWorkspaceTreeHandler, searchUsersHandler, showTrashHandler)
 	server := &app.Server{
 		Cmds:              cmds,
 		Events:            events,

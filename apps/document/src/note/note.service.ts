@@ -127,6 +127,14 @@ export class NoteService implements OnModuleInit {
     };
   }
 
+  async batchGetNoteWorkspaces(noteIds: string[]): Promise<Map<string, string>> {
+    if (noteIds.length === 0) return new Map();
+    const response = await firstValueFrom(
+      this.noteServiceClient.batchGetNoteWorkspaces({ noteIds })
+    );
+    return new Map(Object.entries(response.workspaceIds));
+  }
+
   toTrashedModel(trashed: Trashed): TrashedModel {
     switch (trashed.by) {
       case TrashedBy.TRASHED_BY_UNSPECIFIED:

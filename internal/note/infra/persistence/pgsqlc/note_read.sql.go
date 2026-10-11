@@ -288,6 +288,45 @@ func (q *Queries) ReadGetNotesInWorkspace(ctx context.Context, arg ReadGetNotesI
 	return items, nil
 }
 
+const readGetNotesWorkspaceIDs = `-- name: ReadGetNotesWorkspaceIDs :many
+SELECT
+  n.id AS note_id,
+  f.workspace_id
+FROM
+  notes n
+JOIN
+  folders f ON f.id = n.folder_id
+WHERE
+  n.id = ANY($1::uuid[])
+`
+
+type ReadGetNotesWorkspaceIDsRow struct {
+	NoteID      uuid.UUID
+	WorkspaceID uuid.UUID
+}
+
+func (q *Queries) ReadGetNotesWorkspaceIDs(ctx context.Context, ids []uuid.UUID) ([]*ReadGetNotesWorkspaceIDsRow, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "ReadGetNotesWorkspaceIDs")
+	defer span.End()
+	rows, err := q.db.Query(ctx, readGetNotesWorkspaceIDs, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*ReadGetNotesWorkspaceIDsRow
+	for rows.Next() {
+		var i ReadGetNotesWorkspaceIDsRow
+		if err := rows.Scan(&i.NoteID, &i.WorkspaceID); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const readGetTrashedNotesByWorkspaceID = `-- name: ReadGetTrashedNotesByWorkspaceID :many
 SELECT
   n.id, n.name, n.icon, n.folder_id, n.tags, n.size, n.created_at, n.updated_at, n.trashed_by, n.trashed_at

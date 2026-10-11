@@ -11,6 +11,7 @@ service NoteService {
   rpc GetNote(GetNoteRequest) returns (GetNoteResponse);
   // NOTE: what, where is this used?
   rpc GetWorkspaceByNote(GetWorkspaceByNoteRequest) returns (GetWorkspaceByNoteResponse);
+  rpc BatchGetNoteWorkspaces(BatchGetNoteWorkspacesRequest) returns (BatchGetNoteWorkspacesResponse);
 }
 
 enum TrashedBy {
@@ -83,4 +84,16 @@ message GetWorkspaceByNoteRequest {
 
 message GetWorkspaceByNoteResponse {
   Workspace workspace = 1 [(buf.validate.field).required = true];
+}
+
+message BatchGetNoteWorkspacesRequest {
+  repeated string note_ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 500
+    items: {string: {uuid: true}}
+  }];
+}
+
+message BatchGetNoteWorkspacesResponse {
+  map<string, string> workspace_ids = 1;
 }

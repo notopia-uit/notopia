@@ -101,6 +101,7 @@ func NewCmds(
 var ProvideCmds = NewCmds
 
 type Queries struct {
+	BatchGetNoteWorkspaces   BatchGetNoteWorkspacesQuery
 	CheckWorkspaceSlugExists CheckWorkspaceSlugExistsQuery
 	GetMyWorkspaces          GetMyWorkspacesQuery
 	GetNoteGraph             GetNoteGraphQuery
@@ -118,6 +119,7 @@ type Queries struct {
 
 func NewQueries(
 	handlerProvider *HandlerProvider,
+	batchGetNoteWorkspacesHandler *BatchGetNoteWorkspacesHandler,
 	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler,
 	GetMyWorkspacesHandler *GetMyWorkspacesHandler,
 	GetNoteGraphHandler *GetNoteGraphHandler,
@@ -134,6 +136,7 @@ func NewQueries(
 ) *Queries {
 	hp := (*commonhandler.HandlerProvider)(handlerProvider)
 	return &Queries{
+		BatchGetNoteWorkspaces:   commonhandler.DecorateQuery(hp, batchGetNoteWorkspacesHandler),
 		CheckWorkspaceSlugExists: commonhandler.DecorateQuery(hp, CheckWorkspaceSlugExistsHandler),
 		GetMyWorkspaces:          commonhandler.DecorateQuery(hp, GetMyWorkspacesHandler),
 		GetNoteGraph:             commonhandler.DecorateQuery(hp, GetNoteGraphHandler),
