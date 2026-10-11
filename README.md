@@ -176,6 +176,10 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 - [ ] Event is tracked by either otel or correlation id.
       But, currently use wotel + kafka tracer, and partially correlation id but not really connected.
 - [ ] Revision endpoints aren't protected with authorization
+- [ ] Caching the subscription in other services, so that it will not harm the billing service
+  > Skipped for simplicity
+- [ ] Consider split the workspace event (SSE) into a dedicated service, not bounded to `note` service
+  > Events from subscription changed
 
 ### Frontend
 

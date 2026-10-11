@@ -130,6 +130,10 @@ deliberately omits.
 - There are many `*.env*` file, which contains safe local development environment variables. Only `*.env.local*` can contain sensitive environment variables, and should be gitignored
 - Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsgo` (replace for `tsc`)
 
+### Superpowers
+
+- Skip unnecessary, obvious cases testing for faster, saving tokens
+
 ### Git
 
 Before commit, make sure to:
