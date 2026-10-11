@@ -4,9 +4,10 @@ Cross-service Go code. Importable by any service; must not import `internal/`.
 
 | Package | Contents |
 | --- | --- |
-| `common/config` | Reusable config structs (`Server`, `Sql`, `Redis`, `Log`, `Event`, `Authentik`, `Meilisearch`, `Service`, `General`). Services embed these |
+| `common/config` | Reusable config structs (`Server`, `Sql`, `Redis`, `Log`, `Event`, `Authentik`, `Meilisearch`, `Service`, `General`, `Identity`). Services embed these. `Identity` holds `AdminGroup` and `ServiceAccountUserID`, set by `NOTOPIA_{SERVICE}_IDENTITY_ADMIN_GROUP` / `..._SERVICE_ACCOUNT_USER_ID` |
 | `common/handler` | `Cmd[C]` / `Query[Q,R]` interfaces + `Log*` and `Trace*` decorators |
-| `common/http` | `NewGin` (recovery + otel + slog middleware), `GatewayUserAuth`, `SSEWrapper` |
+| `common/http` | `NewGin` (recovery + otel + slog middleware), `GatewayUserAuth`, `RequireGroup`, `SSEWrapper` |
+| `cron` | gocron v2 scheduler with a Redis distributed lock (`NewRedisLocker`, `WithTries(1)`, 3s auto-extend). `NewScheduler(locker, logger, time.Local)`; never hard-code the zone. `Job{Name, Schedule, Timeout, Run}` is validated by `Register`. Names are service-prefixed (`note:...`). Register from `internal/{svc}/controller/cron/`. Jobs must be idempotent |
 | `metadata` | `ServiceName` / `ServiceVersion` named types — injected via Wire, used as otel resource attrs |
 | `logging` | slog setup, plus Watermill and stdout adapters |
 | `otel` | Tracer/meter/logger providers, propagator, resource, Watermill-Kafka instrumentation |
@@ -32,8 +33,9 @@ handlers themselves contain no logging or tracing boilerplate.
 
 ## `GatewayUserAuth`
 
-Reads `X-Forwarded-ID` / `X-Forwarded-Email` — headers **injected by Traefik's
+Reads `X-Forwarded-ID` / `X-Forwarded-Email` / `X-Forwarded-Name`, plus `X-Forwarded-Groups`
+and `X-Forwarded-Roles` (JSON arrays) — headers **injected by Traefik's
 jwt-middleware after it validates the Authentik JWT**. It does not verify anything itself,
 so it is only safe behind the gateway; never expose a service port directly. Retrieve with
 `commonhttp.UserFromContext(ctx)` (requires gin's `ContextWithFallback`, already set in
-`NewGin`).
+`NewGin`). `RequireGroup(group)` aborts with 403 `{code: "forbidden"}` when the user lacks the group.

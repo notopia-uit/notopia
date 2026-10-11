@@ -48,6 +48,14 @@ Commit is currently **manual only** (`POST /document/documents/{id}/commit`).
 - `onRoleChanged` / `onMemberRemoved` consume Kafka events from `authorization` and walk
   live connections to flip `readOnly` or close with codes 4001/4002.
 
+## Crons and locks
+
+`@notopia-uit/lib-server/locks` provides `LocksSetupModule.forRoot({ redisUrl?, ttl? })`.
+With no `redisUrl` it uses an in-memory store; with one it uses `RedisLockStore`. The lock
+Redis must run with `noeviction` and persistence, and the app must call
+`app.enableShutdownHooks()`. Crons use `@Cron(expr, { name })` with no `timeZone`, so they
+run in the process TZ.
+
 ## Conventions
 
 - HTTP handlers extend the generated abstract class from
