@@ -25,6 +25,8 @@ retention crons depend on. No billing code here.
 | F3 | `IntegrationEventNoteDeleted` is declared and mapped to `events.integration.note.note.deleted`, but no `e_*` handler emits it. | `internal/note/app/integrationevent.go`, `component/eventtopic.go` |
 | F4 | Nothing consumes `note.deleted`: document keeps `documents` + `revisions`, search-worker keeps the Meilisearch doc. | `apps/document/src/hocuspocus/hocuspocus.controller.ts`, `apps/search-worker/src/app.controller.ts` |
 | F5 | No `workspace.deleted` integration event exists (only the internal domain event and the SSE workspace event). Billing needs it. | `internal/note/component/eventtopic.go` |
+| F6 | `NoteCreatedDomainToIntegrationEventHandler` is wired but never registered in `controller/event/event.go`, so `events.integration.note.note.created` is never published (never was, per git history). | `internal/note/controller/event/event.go` |
+| F7 | Permanently deleting a folder (`cmd_permanentlydeleteworkspaceitems.go`, `cmd_emptytrash.go`) deletes child notes by SQL cascade, so those notes emit no `NoteDeletedEvent`. | `internal/note/app/cmd_permanentlydeleteworkspaceitems.go`, `cmd_emptytrash.go` |
 
 ## Design
 
@@ -80,8 +82,11 @@ Hocuspocus facts used (v4.0.0, installed source + tiptap docs): store payload
 
 New Kafka handler in `apps/document` (`@EventPattern('events.integration.note.note.deleted')`):
 
-1. Close live Hocuspocus connections for that document and unload it (no store).
-2. `DELETE FROM documents WHERE id = $1` — revisions go via existing `onDelete: 'CASCADE'`.
+1. Add the id to an in-memory `deletedDocumentIds` set; the store callback skips ids in it
+   (closing the last connection runs the pending store immediately, and the upsert would
+   recreate the row). The entry is removed in `afterUnloadDocument`.
+2. `closeConnections(id)`.
+3. `DELETE FROM documents WHERE id = $1` — revisions go via existing `onDelete: 'CASCADE'`.
 
 Idempotent: deleting a missing row is a no-op.
 
@@ -100,6 +105,18 @@ notes index. Idempotent.
   integration publisher mapping.
 - Workspace delete stays **soft** (`deleted_at` only). No consumer yet (billing consumes it in
   sub-project 3).
+
+### G7 — Publish `note.created` (F6)
+
+Register `NoteCreatedDomainToIntegrationEvent.Handle` on the event processor
+(`cqrs.NewEventHandler`), like `NotifyWorkspaceRenamed`.
+
+### G8 — Note events on folder delete (F7)
+
+Before saving deleted folders, load their notes with
+`noteRepo.GetRecursiveChildrenFromFolder(folderID, true)`, call `PermanentlyDelete` on each and
+save them first, so every removed note emits `NoteDeletedEvent`. `EmptyTrash` deletes trashed
+notes before trashed folders.
 
 ## Out of scope
 
