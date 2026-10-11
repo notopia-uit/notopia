@@ -5,9 +5,9 @@ content:
     schema:
       $ref: ../schemas/PaymentRequiredError.yaml
     example:
-      code: PAYMENT_REQUIRED
+      code: planLimitExceeded
       message: Feature or limit not included in the workspace plan
-      more_info: https://api.notopia.com/docs/errors/PAYMENT_REQUIRED
+      more_info: https://api.notopia.com/docs/errors/planLimitExceeded
       details:
         kind: limit
         key: members

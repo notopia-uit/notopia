@@ -11,19 +11,19 @@ import (
 
 // Defines values for SubscriptionChangedEventPlan.
 const (
-	Free SubscriptionChangedEventPlan = "free"
-	Plus SubscriptionChangedEventPlan = "plus"
-	Pro  SubscriptionChangedEventPlan = "pro"
+	SubscriptionChangedEventPlanFree SubscriptionChangedEventPlan = "free"
+	SubscriptionChangedEventPlanPlus SubscriptionChangedEventPlan = "plus"
+	SubscriptionChangedEventPlanPro  SubscriptionChangedEventPlan = "pro"
 )
 
 // Valid indicates whether the value is a known member of the SubscriptionChangedEventPlan enum.
 func (e SubscriptionChangedEventPlan) Valid() bool {
 	switch e {
-	case Free:
+	case SubscriptionChangedEventPlanFree:
 		return true
-	case Plus:
+	case SubscriptionChangedEventPlanPlus:
 		return true
-	case Pro:
+	case SubscriptionChangedEventPlanPro:
 		return true
 	default:
 		return false
@@ -130,9 +130,11 @@ type NoteUpdatedEvent struct {
 
 // SubscriptionChangedEvent Best-effort notification that a workspace's billing state changed.
 type SubscriptionChangedEvent struct {
-	Plan        SubscriptionChangedEventPlan `json:"plan"`
-	Status      string                       `json:"status"`
-	WorkspaceId openapi_types.UUID           `json:"workspaceId"`
+	Plan SubscriptionChangedEventPlan `json:"plan"`
+
+	// Status Billing subscription status string
+	Status      string             `json:"status"`
+	WorkspaceId openapi_types.UUID `json:"workspaceId"`
 }
 
 // SubscriptionChangedEventPlan defines model for SubscriptionChangedEvent.Plan.

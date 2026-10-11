@@ -8,6 +8,8 @@ properties:
   plan:
     type: string
     enum: [free, plus, pro]
+    x-enum-varnames: [SubscriptionChangedEventPlanFree, SubscriptionChangedEventPlanPlus, SubscriptionChangedEventPlanPro]
   status:
     type: string
+    description: Billing subscription status string
 required: [workspaceId, plan, status]

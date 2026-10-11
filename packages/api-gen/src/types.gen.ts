@@ -52,6 +52,9 @@ export type ShareNoteUpdatedEvent = {
 export type ShareSubscriptionChangedEvent = {
   workspaceId: string;
   plan: 'free' | 'plus' | 'pro';
+  /**
+   * Billing subscription status string
+   */
   status: string;
 };
 

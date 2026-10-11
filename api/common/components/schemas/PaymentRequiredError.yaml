@@ -1,4 +1,8 @@
 # vim: ft=yaml.openapi
+description: |
+  Error for a request blocked by the workspace plan. `code` is one of:
+  - `featureNotInPlan` (details.kind=feature): the feature is not included in the plan
+  - `planLimitExceeded` (details.kind=limit): the plan's usage limit has been reached
 allOf:
   - $ref: ./Error.yaml
   - type: object
