@@ -34,6 +34,7 @@ tmp
 mise.local.toml
 .nx/self-healing
 vitest.config.*.timestamp*
+.vitest/
 
 # Agent skill
 .agents/skills/better-auth-best-practices/
