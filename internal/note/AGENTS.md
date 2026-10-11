@@ -55,8 +55,8 @@ same transaction as the domain change, then forwarded to Redpanda. This is why
 `IntegrationPublisher.Publish` is safe to call inside `uow.Execute`.
 
 Published integration topics: `note.created`, `note.updated`, `note.deleted`,
-`workspace.deleted`. Permanently deleting a folder or emptying trash deletes its notes
-first, so each nested note emits its own `NoteDeletedEvent`.
+`workspace.deleted`. Every permanent delete (folder, note, trash) deletes the affected
+notes through the note repo first, so each one emits its own `NoteDeletedEvent`.
 
 `e_documentcommitted.go` is the inbound side — consumes the document service's commit event
 and updates note size, tags and outgoing links.

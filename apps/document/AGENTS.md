@@ -45,13 +45,15 @@ Commit is currently **manual only** (`POST /document/documents/{id}/commit`).
   `HocuspocusService.setModified` pushes that state after a commit.
 - `note.deleted` → `HocuspocusService.onNoteDeleted` marks the id in `deletedDocumentIds`
   (the store guard), closes its connections and deletes the row; revisions cascade by FK.
+  The guard is in-process: it assumes a single document instance per document and must move
+  to Redis or pubsub if the service scales out.
 - `onRoleChanged` / `onMemberRemoved` consume Kafka events from `authorization` and walk
   live connections to flip `readOnly` or close with codes 4001/4002.
 
 ## Crons and locks
 
 `@notopia-uit/lib-server/locks` provides `LocksSetupModule.forRoot({ redisUrl?, ttl? })`.
-With no `redisUrl` it uses an in-memory store; with one it uses `RedisLockStore`. The lock
+With no `redisUrl` it uses an in-memory store (single instance only, a warning is logged); with one it uses `RedisLockStore`. The lock
 Redis must run with `noeviction` and persistence, and the app must call
 `app.enableShutdownHooks()`. Crons use `@Cron(expr, { name })` with no `timeZone`, so they
 run in the process TZ.
