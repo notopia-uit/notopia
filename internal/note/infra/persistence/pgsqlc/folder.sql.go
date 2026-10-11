@@ -101,7 +101,8 @@ SELECT
 FROM
   folders
 WHERE
-  id = ANY($1::uuid[]) -- :if $1
+  TRUE
+  AND id = ANY($1::uuid[]) -- :if $1
   AND workspace_id = $2::uuid -- :if $2
   AND ( -- :if $3
     trashed_by = $3::text -- :if $3
@@ -284,7 +285,8 @@ SELECT
 FROM
   child_folders
 WHERE
-  id != $1::uuid -- :if $2
+  TRUE
+  AND id != $1::uuid -- :if $2
 FOR UPDATE -- :if $3
 `
 

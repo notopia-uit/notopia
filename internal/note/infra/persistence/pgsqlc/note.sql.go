@@ -84,7 +84,8 @@ SELECT
 FROM
   notes
 WHERE
-  id = ANY($1::uuid[]) -- :if $1
+  TRUE
+  AND id = ANY($1::uuid[]) -- :if $1
   AND folder_id IN ( -- :if $2
     SELECT id FROM folders WHERE workspace_id = $2::uuid -- :if $2
   ) -- :if $2
