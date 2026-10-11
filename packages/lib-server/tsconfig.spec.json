@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/vitest",
+    "types": ["vitest/globals", "node", "vitest", "vitest/importMeta"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": ["vitest.config.mts", "src/**/*.spec.ts", "src/locks/**/*.ts"],
+  "exclude": ["dist/**/*", "out-tsc/**/*"]
+}
