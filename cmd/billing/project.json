@@ -1,0 +1,153 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "billing",
+  "projectType": "application",
+  "tags": ["scope:service", "type:go"],
+  "namedInputs": {
+    "default": [
+      "goPkgFiles",
+      "goFiles",
+      "{workspaceRoot}/api/**/*.go",
+      "{workspaceRoot}/internal/billing/**/*.go"
+    ],
+    "sqlc": [
+      "{workspaceRoot}/internal/billing/infra/persistence/pgsqlc/*.sql",
+      "{workspaceRoot}/internal/billing/infra/persistence/pgmigration/*.{sql,go}",
+      "{projectRoot}/sqlc.yaml"
+    ],
+    "migrations": ["{workspaceRoot}/internal/billing/infra/persistence/pgmigration/*.{sql,go}"]
+  },
+  "targets": {
+    "gen:wire": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/wire_gen.go"],
+      "options": {
+        "command": "wire",
+        "cwd": "{projectRoot}"
+      },
+      "cache": false
+    },
+    "run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run ./cmd/billing/",
+        "cwd": "{workspaceRoot}",
+        "tty": true
+      },
+      "dependsOn": ["build-deps"],
+      "continuous": true
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go build -o ./cmd/billing/billing ./cmd/billing/",
+        "cwd": "{workspaceRoot}"
+      },
+      "configurations": {
+        "debug": {
+          "command": "go build -gcflags='all=-N -l' -o ./cmd/billing/__debug_bin ./cmd/billing/"
+        },
+        "development": {
+          "command": "go build -o ./cmd/billing/billing ./cmd/billing/"
+        },
+        "production": {
+          "command": "go build -ldflags='-s -w' -o ./cmd/billing/billing ./cmd/billing/"
+        }
+      },
+      "dependsOn": ["gen", "^gen*", "^build*"]
+    },
+    "build-deps": {
+      "executor": "nx:noop",
+      "dependsOn": ["gen", "^gen*", "^build*"]
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "./billing",
+        "cwd": "{projectRoot}",
+        "tty": true
+      },
+      "continuous": true,
+      "dependsOn": ["build"]
+    },
+    "debug": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "dlv debug --headless --listen=127.0.0.1:23453 --accept-multiclient --output ./cmd/billing/__debug_bin ./cmd/billing/",
+        "cwd": "{workspaceRoot}",
+        "tty": true
+      },
+      "dependsOn": ["build-deps"],
+      "continuous": true
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "golangci-lint run ./cmd/billing/... ./internal/billing/...",
+        "cwd": "{workspaceRoot}"
+      },
+      "cache": false,
+      "parallelism": false
+    },
+    "goose": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "goose",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "goose:create": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "goose create",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "goose:up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "goose up",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "goose:down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "goose down",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "goose:validate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "goose validate",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "lint:goose": {
+      "dependsOn": ["migration:validate"]
+    },
+    "gen:sqlc": {
+      "inputs": ["sqlc"],
+      "outputs": ["{workspaceRoot}/internal/billing/infra/persistence/pgsqlc/*.go"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "sqlc generate",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
+    },
+    "gen": {
+      "dependsOn": ["gen:wire", "gen:sqlc"]
+    },
+    "nx-release-publish": {
+      "parallelism": false
+    }
+  },
+  "implicitDependencies": ["pkg"],
+  "release": {
+    "docker": {
+      "repositoryName": "notopia-uit/billing"
+    }
+  }
+}
