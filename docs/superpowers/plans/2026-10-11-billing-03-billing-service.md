@@ -16,12 +16,16 @@
 
 1. **Payer change is claim-only.** `POST /billing/workspaces/{id}/payer/claim` lets any owner who is not the payer become payer by completing Checkout `mode=setup`. No separate "transfer to user X" endpoint: billing cannot get another user's email/name (only the caller's, from gateway headers), and owners are equal anyway. The note-side guard (plan 04) tells the payer "another owner must claim billing first".
 2. **Webhook de-duplication lives in the transaction:** `domain.ProviderEventLog` is part of `RepoRegistry` (not a standalone app port) so "event processed" and its effect commit together.
-3. **Reads go through the unit of work** (read-only transaction) instead of a separate `pgreadmodel` package. Billing tables are small.
+3. **CQRS split in persistence:** writes go through `pgrepo` + domain sqlc queries (`FOR UPDATE -- :if @for_update`); query handlers (`q_*`) go through `app.BillingReadModel` + `pgreadmodel` + separate `Read…` sqlc queries, even where the SQL looks alike. Shared sqlc ↔ domain mapping lives in `pgmapper`.
 4. **Refund webhooks:** `refund.created`, `refund.updated`, `refund.failed` only (`charge.refunded` dropped; the refund events carry everything).
 5. **Portal configuration** is created anew (`Create`) whenever the active price set changes; the newest id is stored in `billing_policy`. Old configurations stay in Stripe unused.
 6. **Payer name** comes from `X-Forwarded-Name` (added to Traefik `headerMap` in plan 02 Task 1); falls back to email when empty.
 7. **Enums are `uint8` in Go; each wire keeps its own enum representation.** Postgres keeps `CREATE TYPE ... AS ENUM`, OpenAPI and `api/share` keep string enums, the proto uses enums `PlanTier`/`SubscriptionStatus` (zero `*_UNSPECIFIED`, required fields `defined_only` + `not_in: [0]`) while feature/limit maps stay string-keyed (proto map keys cannot be enums). Each adapter maps explicitly (see Global Constraints). Feature/limit keys: admin HTTP input rejects unknown keys (400); a DB read skips unknown keys with a warning log, so removing a key from code never breaks entitlement reads.
 8. **Refund quote is per invoice payment.** An upgrade is invoiced immediately (`always_invoice`), so one period can have several paid invoices. Cancel-now quotes every paid invoice payment of the current period on its own coverage window and creates one `Refund` per payment (Stripe refunds per PaymentIntent). The refund cap is per payment.
+9. **The Stripe webhook is an inbound adapter in `controller/http`.** It verifies the signature, reads type and object id, and calls `Cmds.CompleteCheckout` / `SyncSubscription` / `SyncRefund` directly. `PaymentProvider` has no `ParseWebhook`, and there is no `HandleWebhook` command or `WebhookEventType` enum. The endpoint is Stripe-specific anyway (`/billing/webhooks/stripe`, `Stripe-Signature`); another gateway adds its own endpoint that calls the same commands.
+10. **`PaymentProvider` is Stripe-shaped on purpose.** Hosted Checkout, Customer Portal, provider-owned recurring billing and per-invoice refunds are Stripe concepts. A VN gateway without recurring billing needs new use cases (we own renewals), not just a new adapter. The port keeps Stripe types out of `app`/`domain`; it does not promise drop-in replacement.
+11. **App settings are app-owned, mapped at the composition root.** `app.Settings` lists only what use cases need; `internal/billing/settings.go` fills it from the viper-bound `config.Billing`/`commonconfig.Identity`. `app` never imports `config`, and `config` never imports `app`.
+12. **Seed vs fixtures.** `cmd/billingseed` (mandatory catalog: prices, portal configuration) has its own small config (`NOTOPIA_BILLINGSEED_*`: database, Stripe key, catalog, service account) and calls only `EnsureDefaults`, `ListPrices`, `CreatePrice`, `EnsurePortalConfiguration`. `cmd/billingfixtures` (dev-only: lifetime `pro` for workspace 110, payer user 110) saves domain objects through the repositories, with fake Stripe ids. There is no `SeedCatalog` command.
 
 ## Global Constraints
 
@@ -29,7 +33,8 @@
 - Currency `vnd` (zero-decimal: `49000` = 49.000₫). Money is `int64` minor units + `currency`.
 - `-1` = unlimited. Feature keys: `auto_commit`, `workspace_graph`. Limit keys: `members`, `published_notes`, `note_graph_max_depth`, `auto_commit_min_interval_seconds`, `revision_history_days`, `trash_retention_days`, `ai_credits_monthly`.
 - Stripe API version is the one pinned by stripe-go v87 (basil+): periods on `items.data[].current_period_*`; invoice → subscription via `parent.subscription_details.subscription`; invoice payments via `/v1/invoice_payments`.
-- Webhooks: `webhook.ConstructEventWithOptions(..., webhook.ConstructEventOptions{IgnoreAPIVersionMismatch: true})` — payloads are only used for ids.
+- Webhooks: `webhook.ConstructEventWithOptions(..., webhook.ConstructEventOptions{IgnoreAPIVersionMismatch: true})` in `controller/http/webhook.go` — payloads are only used for ids.
+- Stripe tracing comes from an `otelhttp` transport on the stripe-go client; no hand-written spans in the adapter.
 - Every Stripe write that must not duplicate carries an idempotency key (`customer:{workspaceId}`, `refund:{refundId}`, `price:{priceId}`).
 - Every mutating domain method emits a domain event; repos drain them on `Save` and log at debug.
 - The notification (`events.integration.billing.subscription.changed`) is published by use cases **after** `uow.Execute` returns nil; publish errors are logged, never returned.
@@ -882,16 +887,16 @@ type PlanTier uint8
 
 const (
 	PlanTierUnspecified PlanTier = iota
-	TierFree
-	TierPlus
-	TierPro
+	PlanTierFree
+	PlanTierPlus
+	PlanTierPro
 )
 
-var PlanTiers = []PlanTier{TierFree, TierPlus, TierPro}
+var PlanTiers = []PlanTier{PlanTierFree, PlanTierPlus, PlanTierPro}
 
 func (t PlanTier) IsValid() bool {
 	switch t {
-	case TierFree, TierPlus, TierPro:
+	case PlanTierFree, PlanTierPlus, PlanTierPro:
 		return true
 	default:
 		return false
@@ -902,11 +907,11 @@ func (t PlanTier) String() string {
 	switch t {
 	case PlanTierUnspecified:
 		return "unspecified"
-	case TierFree:
+	case PlanTierFree:
 		return "free"
-	case TierPlus:
+	case PlanTierPlus:
 		return "plus"
-	case TierPro:
+	case PlanTierPro:
 		return "pro"
 	default:
 		return "unknown"
@@ -1072,15 +1077,15 @@ type FeatureKey uint8
 
 const (
 	FeatureKeyUnspecified FeatureKey = iota
-	FeatureAutoCommit
-	FeatureWorkspaceGraph
+	FeatureKeyAutoCommit
+	FeatureKeyWorkspaceGraph
 )
 
-var FeatureKeys = []FeatureKey{FeatureAutoCommit, FeatureWorkspaceGraph}
+var FeatureKeys = []FeatureKey{FeatureKeyAutoCommit, FeatureKeyWorkspaceGraph}
 
 func (k FeatureKey) IsValid() bool {
 	switch k {
-	case FeatureAutoCommit, FeatureWorkspaceGraph:
+	case FeatureKeyAutoCommit, FeatureKeyWorkspaceGraph:
 		return true
 	default:
 		return false
@@ -1091,9 +1096,9 @@ func (k FeatureKey) String() string {
 	switch k {
 	case FeatureKeyUnspecified:
 		return "unspecified"
-	case FeatureAutoCommit:
+	case FeatureKeyAutoCommit:
 		return "auto_commit"
-	case FeatureWorkspaceGraph:
+	case FeatureKeyWorkspaceGraph:
 		return "workspace_graph"
 	default:
 		return "unknown"
@@ -1113,24 +1118,24 @@ type LimitKey uint8
 
 const (
 	LimitKeyUnspecified LimitKey = iota
-	LimitMembers
-	LimitPublishedNotes
-	LimitNoteGraphMaxDepth
-	LimitAutoCommitMinInterval
-	LimitRevisionHistoryDays
-	LimitTrashRetentionDays
-	LimitAICreditsMonthly
+	LimitKeyMembers
+	LimitKeyPublishedNotes
+	LimitKeyNoteGraphMaxDepth
+	LimitKeyAutoCommitMinInterval
+	LimitKeyRevisionHistoryDays
+	LimitKeyTrashRetentionDays
+	LimitKeyAICreditsMonthly
 )
 
 var LimitKeys = []LimitKey{
-	LimitMembers, LimitPublishedNotes, LimitNoteGraphMaxDepth, LimitAutoCommitMinInterval,
-	LimitRevisionHistoryDays, LimitTrashRetentionDays, LimitAICreditsMonthly,
+	LimitKeyMembers, LimitKeyPublishedNotes, LimitKeyNoteGraphMaxDepth, LimitKeyAutoCommitMinInterval,
+	LimitKeyRevisionHistoryDays, LimitKeyTrashRetentionDays, LimitKeyAICreditsMonthly,
 }
 
 func (k LimitKey) IsValid() bool {
 	switch k {
-	case LimitMembers, LimitPublishedNotes, LimitNoteGraphMaxDepth, LimitAutoCommitMinInterval,
-		LimitRevisionHistoryDays, LimitTrashRetentionDays, LimitAICreditsMonthly:
+	case LimitKeyMembers, LimitKeyPublishedNotes, LimitKeyNoteGraphMaxDepth, LimitKeyAutoCommitMinInterval,
+		LimitKeyRevisionHistoryDays, LimitKeyTrashRetentionDays, LimitKeyAICreditsMonthly:
 		return true
 	default:
 		return false
@@ -1141,19 +1146,19 @@ func (k LimitKey) String() string {
 	switch k {
 	case LimitKeyUnspecified:
 		return "unspecified"
-	case LimitMembers:
+	case LimitKeyMembers:
 		return "members"
-	case LimitPublishedNotes:
+	case LimitKeyPublishedNotes:
 		return "published_notes"
-	case LimitNoteGraphMaxDepth:
+	case LimitKeyNoteGraphMaxDepth:
 		return "note_graph_max_depth"
-	case LimitAutoCommitMinInterval:
+	case LimitKeyAutoCommitMinInterval:
 		return "auto_commit_min_interval_seconds"
-	case LimitRevisionHistoryDays:
+	case LimitKeyRevisionHistoryDays:
 		return "revision_history_days"
-	case LimitTrashRetentionDays:
+	case LimitKeyTrashRetentionDays:
 		return "trash_retention_days"
-	case LimitAICreditsMonthly:
+	case LimitKeyAICreditsMonthly:
 		return "ai_credits_monthly"
 	default:
 		return "unknown"
@@ -1366,18 +1371,18 @@ func (p *Plan) UpdatedAt() time.Time              { return p.updatedAt }
 func DefaultPlans(now time.Time) []*Plan {
 	mk := func(t PlanTier, autoCommit, graph bool, members, published, depth, interval, revisions, trash, ai int64) *Plan {
 		p, _ := NewPlan(t,
-			map[FeatureKey]bool{FeatureAutoCommit: autoCommit, FeatureWorkspaceGraph: graph},
+			map[FeatureKey]bool{FeatureKeyAutoCommit: autoCommit, FeatureKeyWorkspaceGraph: graph},
 			map[LimitKey]int64{
-				LimitMembers: members, LimitPublishedNotes: published, LimitNoteGraphMaxDepth: depth,
-				LimitAutoCommitMinInterval: interval, LimitRevisionHistoryDays: revisions,
-				LimitTrashRetentionDays: trash, LimitAICreditsMonthly: ai,
+				LimitKeyMembers: members, LimitKeyPublishedNotes: published, LimitKeyNoteGraphMaxDepth: depth,
+				LimitKeyAutoCommitMinInterval: interval, LimitKeyRevisionHistoryDays: revisions,
+				LimitKeyTrashRetentionDays: trash, LimitKeyAICreditsMonthly: ai,
 			}, now)
 		return p
 	}
 	return []*Plan{
-		mk(TierFree, false, false, 3, 3, 5, 0, 7, 7, 0),
-		mk(TierPlus, true, true, 10, Unlimited, Unlimited, 300, 30, 30, 200),
-		mk(TierPro, true, true, Unlimited, Unlimited, Unlimited, 60, Unlimited, 90, 2000),
+		mk(PlanTierFree, false, false, 3, 3, 5, 0, 7, 7, 0),
+		mk(PlanTierPlus, true, true, 10, Unlimited, Unlimited, 300, 30, 30, 200),
+		mk(PlanTierPro, true, true, Unlimited, Unlimited, Unlimited, 60, Unlimited, 90, 2000),
 	}
 }
 ```
@@ -1473,7 +1478,7 @@ func LookupKey(plan PlanTier, interval Interval) string {
 }
 
 func NewPrice(id uuid.UUID, plan PlanTier, interval Interval, amount Money, providerPriceID string, now time.Time, userID string) (*Price, error) {
-	if !plan.IsValid() || plan == TierFree {
+	if !plan.IsValid() || plan == PlanTierFree {
 		return nil, errs.NewInvalid("price plan must be plus or pro")
 	}
 	if !interval.IsValid() {
@@ -1665,7 +1670,7 @@ func TestGrantsAccess(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			s, err := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.TierPlus, domain.IntervalMonth, 49000), snap(c.status, t0, end), t0, "u")
+			s, err := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000), snap(c.status, t0, end), t0, "u")
 			require.NoError(t, err)
 			assert.Equal(t, c.want, s.GrantsAccess(c.now, policy))
 		})
@@ -1673,8 +1678,8 @@ func TestGrantsAccess(t *testing.T) {
 }
 
 func TestApplySnapshotEvents(t *testing.T) {
-	plus := price(t, domain.TierPlus, domain.IntervalMonth, 49000)
-	pro := price(t, domain.TierPro, domain.IntervalMonth, 99000)
+	plus := price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000)
+	pro := price(t, domain.PlanTierPro, domain.IntervalMonth, 99000)
 	end := t0.AddDate(0, 1, 0)
 	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), plus, snap(domain.StatusActive, t0, end), t0, "u")
 	assert.Equal(t, []string{"created", "activated"}, eventNames(s.PopEvents()))
@@ -1693,7 +1698,7 @@ func TestApplySnapshotEvents(t *testing.T) {
 func TestQuoteCancelNow(t *testing.T) {
 	policy := domain.DefaultBillingPolicy(t0)
 	end := t0.Add(30 * 24 * time.Hour)
-	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.TierPlus, domain.IntervalMonth, 49000), snap(domain.StatusActive, t0, end), t0, "u")
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000), snap(domain.StatusActive, t0, end), t0, "u")
 	pay := domain.PaymentInfo{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_1", PaidAt: t0, CoverageStart: t0, CoverageEnd: end}
 
 	q, err := s.QuoteCancelNow(t0.Add(10*24*time.Hour), policy, []domain.PaymentInfo{pay})
@@ -1712,7 +1717,7 @@ func TestQuoteCancelNow(t *testing.T) {
 func TestQuoteCancelNowAfterUpgrade(t *testing.T) {
 	policy := domain.DefaultBillingPolicy(t0)
 	day := func(n int) time.Time { return t0.Add(time.Duration(n) * 24 * time.Hour) }
-	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.TierPro, domain.IntervalMonth, 90000), snap(domain.StatusActive, t0, day(30)), t0, "u")
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPro, domain.IntervalMonth, 90000), snap(domain.StatusActive, t0, day(30)), t0, "u")
 	payments := []domain.PaymentInfo{
 		{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_a", PaidAt: t0, CoverageStart: t0, CoverageEnd: day(30)},
 		{Amount: domain.Money{Amount: 40000, Currency: "vnd"}, PaymentRef: "pi_b", PaidAt: day(10), CoverageStart: day(10), CoverageEnd: day(30)},
@@ -1733,7 +1738,7 @@ func TestQuoteCancelNowAfterUpgrade(t *testing.T) {
 
 func TestLifetimeRefundWindow(t *testing.T) {
 	policy := domain.DefaultBillingPolicy(t0) // 14 days
-	s, _ := domain.NewLifetimeSubscription(uuid.New(), uuid.New(), price(t, domain.TierPro, domain.IntervalLifetime, 2490000), "pi_l", t0, t0, "u")
+	s, _ := domain.NewLifetimeSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPro, domain.IntervalLifetime, 2490000), "pi_l", t0, t0, "u")
 	pay := []domain.PaymentInfo{{Amount: domain.Money{Amount: 2490000, Currency: "vnd"}, PaymentRef: "pi_l", PaidAt: t0}}
 
 	q, err := s.QuoteCancelNow(t0.Add(13*24*time.Hour), policy, pay)
@@ -2197,7 +2202,7 @@ type Entitlements struct {
 }
 
 func ResolveEntitlements(workspaceID uuid.UUID, sub *Subscription, plans map[PlanTier]*Plan, policy *BillingPolicy, now time.Time) Entitlements {
-	tier, status := TierFree, StatusNone
+	tier, status := PlanTierFree, StatusNone
 	var until *time.Time
 	if sub != nil {
 		status = sub.Status()
@@ -2309,16 +2314,19 @@ git commit -m "feat(billing): domain model for plans, prices, accounts and subsc
 **Files:**
 
 - Create: `internal/billing/infra/persistence/pgmigration/00001_init.sql`
-- Create: `internal/billing/infra/persistence/pgsqlc/{plan.sql,policy.sql,price.sql,account.sql,subscription.sql,providerevent.sql}` (+ generated `*.go`)
+- Create: `internal/billing/infra/persistence/pgsqlc/{plan,policy,price,account,subscription}.sql` (domain) and `{plan,policy,price,account,subscription}_read.sql` (read model), `providerevent.sql` (+ generated `*.go`)
 - Create: `internal/billing/infra/persistence/{pg.go,wire.go}`
-- Create: `internal/billing/infra/persistence/pgrepo/{uow.go,plan.go,policy.go,price.go,account.go,subscription.go,providerevent.go,common.go,enum.go}`
+- Create: `internal/billing/infra/persistence/pgrepo/{uow.go,plan.go,policy.go,price.go,account.go,subscription.go,providerevent.go,common.go}` (write side)
+- Create: `internal/billing/infra/persistence/pgreadmodel/billing.go` (read side) and `internal/billing/app/readmodel.go` (port)
+- Create: `internal/billing/infra/persistence/pgmapper/{enum.go,row.go}` (shared sqlc ↔ domain mapping), `internal/billing/infra/persistence/pgjsonb/jsonb.go` (typed JSONB columns)
 - Create: `cmd/billing/sqlc.yaml`, `cmd/billing/project.json` (targets `gen:sqlc`, `goose*`; the rest in Task 4)
 
 **Interfaces:**
 
 - Consumes: domain repo interfaces (Task 2).
 - Produces: `pgrepo.NewUnitOfWork(pool *pgxpool.Pool, queries *pgsqlc.Queries) *UnitOfWork` implementing `domain.UnitOfWork`; `persistence.Pg` with `RunMigrations`, `IsMigrationDone`, `Ping` (same as note).
-- Mappers (`pgrepo/enum.go`, package-private): `fromDomainPlanTier`/`toDomainPlanTier`, `fromDomainInterval`/`toDomainInterval`, `fromDomainStatus`/`toDomainStatus`, `fromDomainRefundReason`/`toDomainRefundReason`, `fromDomainRefundStatus`/`toDomainRefundStatus` (domain `uint8` enum ↔ sqlc string enum), and `marshalKeyed`/`unmarshalKeyed` for the `features`/`limits` JSONB columns (`unmarshalKeyed` skips unknown keys with a warning).
+- Mappers (`pgmapper`, shared by `pgrepo` and `pgreadmodel`): `FromPlanTier`/`ToPlanTier`, `FromInterval`/`ToInterval`, `FromStatus`/`ToStatus`, `FromRefundReason`/`ToRefundReason`, `FromRefundStatus`/`ToRefundStatus` (domain `uint8` enum ↔ sqlc string enum) and `ToPlan`, `ToPlanMap`, `ToPolicy`, `ToPrice(s)`, `ToAccount`, `ToSubscriptions`. The `features`/`limits` JSONB columns are typed via sqlc column overrides to `pgjsonb.Features`/`pgjsonb.Limits` (unknown keys skipped with a warning), so repos never marshal by hand.
+- `app.BillingReadModel` (port) implemented by `pgreadmodel.BillingReadModel`; query handlers use it instead of the unit of work.
 
 Schema notes vs spec: the interval column is named `billing_interval` (`interval` is a SQL keyword); `refunds.payment_ref` added (the payment the refund targets).
 
@@ -2436,9 +2444,22 @@ DROP TYPE plan_tier;
 
 - [ ] **Step 2: sqlc config + nx targets**
 
-`cmd/billing/sqlc.yaml`: copy `cmd/note/sqlc.yaml`; replace `internal/note` with `internal/billing`; remove the `temp_tables.sql` schema entry, the `rename: source_ids/target_ids` entries, the `rules:` block and the `trashed_by` overrides. Keep the uuid/timestamptz overrides and `emit_tracing`.
+`cmd/billing/sqlc.yaml`: copy `cmd/note/sqlc.yaml`; replace `internal/note` with `internal/billing`; remove the `temp_tables.sql` schema entry, the `rename: source_ids/target_ids` entries, the `rules:` block and the `trashed_by` overrides. Keep the uuid/timestamptz overrides, `emit_tracing` and `emit_dynamic_filter: true`. Queries use `sqlc.arg('name')` (never `$N`); for runtime-optional filters use `-- :if @param` with `sqlc.narg` as in `internal/note/infra/persistence/pgsqlc/note_read.sql`.
 
 `cmd/billing/project.json`: copy `cmd/note/project.json`, replace `note` with `billing` everywhere (paths, binary, repository name, `dlv` port `23451` → `23453`). Task 4 relies on all targets.
+
+Add column overrides for the JSONB columns (under `overrides.go.overrides`, next to the uuid/timestamptz ones; sqlc maps `jsonb` to `[]byte` otherwise, and pgx JSON-encodes the typed map):
+
+```yaml
+- column: plans.features
+  go_type:
+    import: github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgjsonb
+    type: Features
+- column: plans.limits
+  go_type:
+    import: github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgjsonb
+    type: Limits
+```
 
 `cmd/billing/.env` (Task 4 adds the rest):
 
@@ -2450,33 +2471,39 @@ GOOSE_MIGRATION_DIR=../../internal/billing/infra/persistence/pgmigration/
 
 - [ ] **Step 3: Queries**
 
+Two query sets live side by side in `pgsqlc/`, both with `sqlc.arg('name')` (never `$N`), even where they look alike:
+
+- **Domain (write side)**, `<aggregate>.sql`: lock-aware lookups used by repos inside `uow.Execute`, plus upserts. Locking is a runtime flag via the dynamic-filter plugin: `FOR UPDATE -- :if @for_update` is the last line (a lone `;` follows on its own line), so one query serves both `forUpdate=true` and `false`. Generated params carry `ForUpdate bool`.
+- **Read model**, `<aggregate>_read.sql`: every query is named `Read…` (as in `internal/note`), never locks, and is used only by `pgreadmodel`.
+
 ```sql
 -- plan.sql
 -- name: GetPlan :one
-SELECT * FROM plans WHERE tier = $1;
-
--- name: GetPlanForUpdate :one
-SELECT * FROM plans WHERE tier = $1 FOR UPDATE;
+SELECT * FROM plans
+WHERE tier = sqlc.arg('tier')
+FOR UPDATE -- :if @for_update
+;
 
 -- name: ListPlans :many
 SELECT * FROM plans ORDER BY tier;
 
 -- name: UpsertPlan :exec
-INSERT INTO plans (tier, features, limits, updated_at) VALUES ($1, $2, $3, $4)
+INSERT INTO plans (tier, features, limits, updated_at)
+VALUES (sqlc.arg('tier'), sqlc.arg('features'), sqlc.arg('limits'), sqlc.arg('updated_at'))
 ON CONFLICT (tier) DO UPDATE SET features = EXCLUDED.features, limits = EXCLUDED.limits, updated_at = EXCLUDED.updated_at;
 ```
 
 ```sql
 -- policy.sql
 -- name: GetPolicy :one
-SELECT * FROM billing_policy WHERE id = 1;
-
--- name: GetPolicyForUpdate :one
-SELECT * FROM billing_policy WHERE id = 1 FOR UPDATE;
+SELECT * FROM billing_policy
+WHERE id = 1
+FOR UPDATE -- :if @for_update
+;
 
 -- name: UpsertPolicy :exec
 INSERT INTO billing_policy (id, past_due_grace_days, lifetime_refund_window_days, portal_configuration_id, updated_at)
-VALUES (1, $1, $2, $3, $4)
+VALUES (1, sqlc.arg('past_due_grace_days'), sqlc.arg('lifetime_refund_window_days'), sqlc.arg('portal_configuration_id'), sqlc.arg('updated_at'))
 ON CONFLICT (id) DO UPDATE SET
   past_due_grace_days = EXCLUDED.past_due_grace_days,
   lifetime_refund_window_days = EXCLUDED.lifetime_refund_window_days,
@@ -2487,19 +2514,19 @@ ON CONFLICT (id) DO UPDATE SET
 ```sql
 -- price.sql
 -- name: GetPrice :one
-SELECT * FROM prices WHERE id = $1;
-
--- name: GetPriceForUpdate :one
-SELECT * FROM prices WHERE id = $1 FOR UPDATE;
+SELECT * FROM prices
+WHERE id = sqlc.arg('id')
+FOR UPDATE -- :if @for_update
+;
 
 -- name: GetPriceByProviderPriceID :one
-SELECT * FROM prices WHERE provider_price_id = $1;
+SELECT * FROM prices WHERE provider_price_id = sqlc.arg('provider_price_id');
 
 -- name: GetActivePrice :one
-SELECT * FROM prices WHERE plan = $1 AND billing_interval = $2 AND currency = $3 AND active;
-
--- name: GetActivePriceForUpdate :one
-SELECT * FROM prices WHERE plan = $1 AND billing_interval = $2 AND currency = $3 AND active FOR UPDATE;
+SELECT * FROM prices
+WHERE plan = sqlc.arg('plan') AND billing_interval = sqlc.arg('billing_interval') AND currency = sqlc.arg('currency') AND active
+FOR UPDATE -- :if @for_update
+;
 
 -- name: ListActivePrices :many
 SELECT * FROM prices WHERE active ORDER BY plan, billing_interval;
@@ -2509,24 +2536,30 @@ SELECT * FROM prices ORDER BY created_at DESC;
 
 -- name: UpsertPrice :exec
 INSERT INTO prices (id, plan, billing_interval, amount, currency, provider_price_id, lookup_key, active, created_at, archived_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+VALUES (
+  sqlc.arg('id'), sqlc.arg('plan'), sqlc.arg('billing_interval'), sqlc.arg('amount'), sqlc.arg('currency'),
+  sqlc.arg('provider_price_id'), sqlc.arg('lookup_key'), sqlc.arg('active'), sqlc.arg('created_at'), sqlc.arg('archived_at')
+)
 ON CONFLICT (id) DO UPDATE SET active = EXCLUDED.active, archived_at = EXCLUDED.archived_at;
 ```
 
 ```sql
 -- account.sql
 -- name: GetBillingAccount :one
-SELECT * FROM billing_accounts WHERE workspace_id = $1;
-
--- name: GetBillingAccountForUpdate :one
-SELECT * FROM billing_accounts WHERE workspace_id = $1 FOR UPDATE;
+SELECT * FROM billing_accounts
+WHERE workspace_id = sqlc.arg('workspace_id')
+FOR UPDATE -- :if @for_update
+;
 
 -- name: ListBillingAccountsByPayer :many
-SELECT * FROM billing_accounts WHERE payer_id = $1;
+SELECT * FROM billing_accounts WHERE payer_id = sqlc.arg('payer_id');
 
 -- name: UpsertBillingAccount :exec
 INSERT INTO billing_accounts (workspace_id, provider_customer_id, payer_id, payer_email, payer_name, payer_missing_since, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+VALUES (
+  sqlc.arg('workspace_id'), sqlc.arg('provider_customer_id'), sqlc.arg('payer_id'), sqlc.arg('payer_email'),
+  sqlc.arg('payer_name'), sqlc.arg('payer_missing_since'), sqlc.arg('created_at'), sqlc.arg('updated_at')
+)
 ON CONFLICT (workspace_id) DO UPDATE SET
   payer_id = EXCLUDED.payer_id,
   payer_email = EXCLUDED.payer_email,
@@ -2538,51 +2571,57 @@ ON CONFLICT (workspace_id) DO UPDATE SET
 ```sql
 -- subscription.sql
 -- name: GetSubscription :one
-SELECT * FROM subscriptions WHERE id = $1;
-
--- name: GetSubscriptionForUpdate :one
-SELECT * FROM subscriptions WHERE id = $1 FOR UPDATE;
+SELECT * FROM subscriptions
+WHERE id = sqlc.arg('id')
+FOR UPDATE -- :if @for_update
+;
 
 -- name: GetCurrentSubscription :one
-SELECT * FROM subscriptions WHERE workspace_id = $1 AND status NOT IN ('canceled', 'incomplete_expired');
-
--- name: GetCurrentSubscriptionForUpdate :one
-SELECT * FROM subscriptions WHERE workspace_id = $1 AND status NOT IN ('canceled', 'incomplete_expired') FOR UPDATE;
+SELECT * FROM subscriptions
+WHERE workspace_id = sqlc.arg('workspace_id') AND status NOT IN ('canceled', 'incomplete_expired')
+FOR UPDATE -- :if @for_update
+;
 
 -- name: GetSubscriptionByProviderSubscriptionID :one
-SELECT * FROM subscriptions WHERE provider_subscription_id = $1;
-
--- name: GetSubscriptionByProviderSubscriptionIDForUpdate :one
-SELECT * FROM subscriptions WHERE provider_subscription_id = $1 FOR UPDATE;
+SELECT * FROM subscriptions
+WHERE provider_subscription_id = sqlc.arg('provider_subscription_id')
+FOR UPDATE -- :if @for_update
+;
 
 -- name: GetSubscriptionByProviderPaymentID :one
-SELECT * FROM subscriptions WHERE provider_payment_id = $1;
-
--- name: GetSubscriptionByProviderPaymentIDForUpdate :one
-SELECT * FROM subscriptions WHERE provider_payment_id = $1 FOR UPDATE;
+SELECT * FROM subscriptions
+WHERE provider_payment_id = sqlc.arg('provider_payment_id')
+FOR UPDATE -- :if @for_update
+;
 
 -- name: GetSubscriptionIDByRefundID :one
-SELECT subscription_id FROM refunds WHERE id = $1;
+SELECT subscription_id FROM refunds WHERE id = sqlc.arg('id');
 
 -- name: ListCurrentSubscriptionsByWorkspaces :many
 SELECT * FROM subscriptions
-WHERE workspace_id = ANY(@workspace_ids::uuid[]) AND status NOT IN ('canceled', 'incomplete_expired');
+WHERE workspace_id = ANY(sqlc.arg('workspace_ids')::uuid[]) AND status NOT IN ('canceled', 'incomplete_expired');
 
 -- name: ListSubscriptionsNeedingReconcile :many
 SELECT * FROM subscriptions
 WHERE status NOT IN ('canceled', 'incomplete_expired')
   AND billing_interval <> 'lifetime'
-  AND (current_period_end + INTERVAL '1 hour' < @now::timestamptz
-       OR provider_synced_at < @now::timestamptz - INTERVAL '24 hours')
+  AND (current_period_end + INTERVAL '1 hour' < sqlc.arg('now')::timestamptz
+       OR provider_synced_at < sqlc.arg('now')::timestamptz - INTERVAL '24 hours')
 ORDER BY provider_synced_at
-LIMIT @row_limit;
+LIMIT sqlc.arg('row_limit');
 
 -- name: UpsertSubscription :exec
 INSERT INTO subscriptions (
   id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id,
   current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at,
   created_at, updated_at
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+) VALUES (
+  sqlc.arg('id'), sqlc.arg('workspace_id'), sqlc.arg('plan'), sqlc.arg('billing_interval'), sqlc.arg('price_id'),
+  sqlc.arg('status'), sqlc.arg('provider_subscription_id'), sqlc.arg('provider_payment_id'),
+  sqlc.arg('current_period_start'), sqlc.arg('current_period_end'), sqlc.arg('cancel_at_period_end'),
+  sqlc.arg('canceled_at'), sqlc.arg('paid_at'), sqlc.arg('provider_synced_at'),
+  sqlc.arg('created_at'), sqlc.arg('updated_at')
+)
 ON CONFLICT (id) DO UPDATE SET
   plan = EXCLUDED.plan,
   billing_interval = EXCLUDED.billing_interval,
@@ -2597,11 +2636,14 @@ ON CONFLICT (id) DO UPDATE SET
   updated_at = EXCLUDED.updated_at;
 
 -- name: ListRefundsBySubscriptionIDs :many
-SELECT * FROM refunds WHERE subscription_id = ANY(@subscription_ids::uuid[]) ORDER BY created_at;
+SELECT * FROM refunds WHERE subscription_id = ANY(sqlc.arg('subscription_ids')::uuid[]) ORDER BY created_at;
 
 -- name: UpsertRefund :exec
 INSERT INTO refunds (id, subscription_id, provider_refund_id, payment_ref, amount, currency, reason, status, failure_message, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+VALUES (
+  sqlc.arg('id'), sqlc.arg('subscription_id'), sqlc.arg('provider_refund_id'), sqlc.arg('payment_ref'), sqlc.arg('amount'),
+  sqlc.arg('currency'), sqlc.arg('reason'), sqlc.arg('status'), sqlc.arg('failure_message'), sqlc.arg('created_at'), sqlc.arg('updated_at')
+)
 ON CONFLICT (id) DO UPDATE SET
   provider_refund_id = EXCLUDED.provider_refund_id,
   status = EXCLUDED.status,
@@ -2612,14 +2654,58 @@ ON CONFLICT (id) DO UPDATE SET
 ```sql
 -- providerevent.sql
 -- name: InsertProviderEvent :execrows
-INSERT INTO processed_provider_events (event_id, event_type, received_at) VALUES ($1, $2, $3)
+INSERT INTO processed_provider_events (event_id, event_type, received_at)
+VALUES (sqlc.arg('event_id'), sqlc.arg('event_type'), sqlc.arg('received_at'))
 ON CONFLICT (event_id) DO NOTHING;
 
 -- name: DeleteProviderEventsBefore :execrows
-DELETE FROM processed_provider_events WHERE received_at < $1;
+DELETE FROM processed_provider_events WHERE received_at < sqlc.arg('received_before');
 ```
 
-Run: `nx run billing:gen:sqlc`. Generated model types: `pgsqlc.Plan`, `BillingPolicy`, `Price`, `BillingAccount`, `Subscription`, `Refund`; string enums `PlanTier`, `BillingInterval`, `SubscriptionStatus`, `RefundReason`, `RefundStatus` (consts `pgsqlc.PlanTierFree`, `pgsqlc.SubscriptionStatusPastDue`, …). The code below uses those names; adjust if sqlc names a field differently (check `models.go`). These sqlc enums never leave `pgrepo`: `enum.go` maps them to the domain `uint8` enums.
+Read-model queries (no locks, no `for_update`):
+
+```sql
+-- plan_read.sql
+-- name: ReadListPlans :many
+SELECT * FROM plans ORDER BY tier;
+```
+
+```sql
+-- policy_read.sql
+-- name: ReadGetPolicy :one
+SELECT * FROM billing_policy WHERE id = 1;
+```
+
+```sql
+-- price_read.sql
+-- name: ReadListActivePrices :many
+SELECT * FROM prices WHERE active ORDER BY plan, billing_interval;
+
+-- name: ReadListPrices :many
+SELECT * FROM prices ORDER BY created_at DESC;
+```
+
+```sql
+-- account_read.sql
+-- name: ReadGetBillingAccount :one
+SELECT * FROM billing_accounts WHERE workspace_id = sqlc.arg('workspace_id');
+```
+
+```sql
+-- subscription_read.sql
+-- name: ReadGetCurrentSubscription :one
+SELECT * FROM subscriptions
+WHERE workspace_id = sqlc.arg('workspace_id') AND status NOT IN ('canceled', 'incomplete_expired');
+
+-- name: ReadListCurrentSubscriptionsByWorkspaces :many
+SELECT * FROM subscriptions
+WHERE workspace_id = ANY(sqlc.arg('workspace_ids')::uuid[]) AND status NOT IN ('canceled', 'incomplete_expired');
+
+-- name: ReadListRefundsBySubscriptionIDs :many
+SELECT * FROM refunds WHERE subscription_id = ANY(sqlc.arg('subscription_ids')::uuid[]) ORDER BY created_at;
+```
+
+Run: `nx run billing:gen:sqlc`. Generated model types: `pgsqlc.Plan`, `BillingPolicy`, `Price`, `BillingAccount`, `Subscription`, `Refund`; string enums `PlanTier`, `BillingInterval`, `SubscriptionStatus`, `RefundReason`, `RefundStatus` (consts `pgsqlc.PlanTierFree`, `pgsqlc.SubscriptionStatusPastDue`, …); `Plan.Features`/`Plan.Limits` are `pgjsonb.Features`/`pgjsonb.Limits` (column overrides, Step 2). The `Read…` queries return the same model structs. The code below uses those names; adjust if sqlc names a field differently (check `models.go`), and if a lock-only query (`GetPolicy`, which has no other param) generates a bare `forUpdate bool` argument instead of a `Params` struct, pass it positionally. These sqlc enums never leave `pgmapper`/`pgrepo`/`pgreadmodel`: `pgmapper/enum.go` maps them to the domain `uint8` enums.
 
 - [ ] **Step 4: Pg + wire**
 
@@ -2632,7 +2718,9 @@ package persistence
 import (
 	"github.com/goforj/wire"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgreadmodel"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgrepo"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
@@ -2644,8 +2732,10 @@ var ProviderSet = wire.NewSet(
 	ProvideSQLCQueries,
 	ProvidePgxPoolStdlib,
 	pgrepo.ProvideUnitOfWork,
+	pgreadmodel.ProvideBillingReadModel,
 	wire.Bind(new(pgsqlc.DBTX), new(*pgxpool.Pool)),
 	wire.Bind(new(domain.UnitOfWork), new(*pgrepo.UnitOfWork)),
+	wire.Bind(new(app.BillingReadModel), new(*pgreadmodel.BillingReadModel)),
 )
 ```
 
@@ -2744,48 +2834,108 @@ func typeName(v any) string {
 }
 ```
 
-`fromDomainX` returns `""` for an Unspecified/unknown value, which the Postgres enum rejects on write. `toDomainX` returns the Unspecified zero for an unknown value; the column's `CREATE TYPE ... AS ENUM` makes that unreachable. `unmarshalKeyed` skips JSONB keys the code no longer knows (warning log) instead of failing, so a removed feature/limit key never breaks entitlement reads; the next `Save` drops it.
+`fromX` (in `pgmapper`) returns `""` for an Unspecified/unknown value, which the Postgres enum rejects on write. `toX` returns the Unspecified zero for an unknown value; the column's `CREATE TYPE ... AS ENUM` makes that unreachable.
+
+The `features`/`limits` JSONB columns need no hand-written marshal calls: sqlc maps `jsonb` to `[]byte` by default (`sqlc-gen-go` `postgresql_type.go`, pgx/v5), but a column `go_type` override swaps in a typed map, and pgx's JSONB codec then runs `json.Marshal`/`json.Unmarshal` on it. The types live in their own package (not `pgmapper`) because the generated `pgsqlc` imports them and `pgmapper` imports `pgsqlc`. `UnmarshalJSON` skips keys the code no longer knows (warning log) instead of failing, so a removed feature/limit key never breaks entitlement reads; the next `Save` drops it.
 
 ```go
-// internal/billing/infra/persistence/pgrepo/enum.go
-package pgrepo
+// internal/billing/infra/persistence/pgjsonb/jsonb.go
+package pgjsonb
 
 import (
-	"context"
 	"encoding/json"
 	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/billing/domain"
+)
+
+type Features map[domain.FeatureKey]bool
+
+func (f Features) MarshalJSON() ([]byte, error) { return marshalKeyed(f) }
+
+func (f *Features) UnmarshalJSON(raw []byte) (err error) {
+	*f, err = unmarshalKeyed[domain.FeatureKey, bool](raw, domain.ParseFeatureKey)
+	return err
+}
+
+type Limits map[domain.LimitKey]int64
+
+func (l Limits) MarshalJSON() ([]byte, error) { return marshalKeyed(l) }
+
+func (l *Limits) UnmarshalJSON(raw []byte) (err error) {
+	*l, err = unmarshalKeyed[domain.LimitKey, int64](raw, domain.ParseLimitKey)
+	return err
+}
+
+type stringKey interface {
+	comparable
+	String() string
+}
+
+func marshalKeyed[K stringKey, V any](m map[K]V) ([]byte, error) {
+	out := make(map[string]V, len(m))
+	for k, v := range m {
+		out[k.String()] = v
+	}
+	return json.Marshal(out)
+}
+
+func unmarshalKeyed[K comparable, V any](raw []byte, parse func(string) (K, error)) (map[K]V, error) {
+	var in map[string]V
+	if err := json.Unmarshal(raw, &in); err != nil {
+		return nil, err
+	}
+	out := make(map[K]V, len(in))
+	for s, v := range in {
+		k, err := parse(s)
+		if err != nil {
+			slog.Warn("skipping unknown plan key", slog.String("key", s))
+			continue
+		}
+		out[k] = v
+	}
+	return out, nil
+}
+```
+
+`pgmapper` is shared by `pgrepo` (write side) and `pgreadmodel` so the sqlc-row → domain mapping exists once. `ToSubscriptions` takes the already-fetched refund rows; each side fetches them with its own query (`ListRefundsBySubscriptionIDs` vs `ReadListRefundsBySubscriptionIDs`).
+
+```go
+// internal/billing/infra/persistence/pgmapper/enum.go
+package pgmapper
+
+import (
+	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
-func fromDomainPlanTier(t domain.PlanTier) pgsqlc.PlanTier {
+func FromPlanTier(t domain.PlanTier) pgsqlc.PlanTier {
 	switch t {
-	case domain.TierFree:
+	case domain.PlanTierFree:
 		return pgsqlc.PlanTierFree
-	case domain.TierPlus:
+	case domain.PlanTierPlus:
 		return pgsqlc.PlanTierPlus
-	case domain.TierPro:
+	case domain.PlanTierPro:
 		return pgsqlc.PlanTierPro
 	default:
 		return ""
 	}
 }
 
-func toDomainPlanTier(t pgsqlc.PlanTier) domain.PlanTier {
+func ToPlanTier(t pgsqlc.PlanTier) domain.PlanTier {
 	switch t {
 	case pgsqlc.PlanTierFree:
-		return domain.TierFree
+		return domain.PlanTierFree
 	case pgsqlc.PlanTierPlus:
-		return domain.TierPlus
+		return domain.PlanTierPlus
 	case pgsqlc.PlanTierPro:
-		return domain.TierPro
+		return domain.PlanTierPro
 	default:
 		return domain.PlanTierUnspecified
 	}
 }
 
-func fromDomainInterval(i domain.Interval) pgsqlc.BillingInterval {
+func FromInterval(i domain.Interval) pgsqlc.BillingInterval {
 	switch i {
 	case domain.IntervalMonth:
 		return pgsqlc.BillingIntervalMonth
@@ -2798,7 +2948,7 @@ func fromDomainInterval(i domain.Interval) pgsqlc.BillingInterval {
 	}
 }
 
-func toDomainInterval(i pgsqlc.BillingInterval) domain.Interval {
+func ToInterval(i pgsqlc.BillingInterval) domain.Interval {
 	switch i {
 	case pgsqlc.BillingIntervalMonth:
 		return domain.IntervalMonth
@@ -2811,7 +2961,7 @@ func toDomainInterval(i pgsqlc.BillingInterval) domain.Interval {
 	}
 }
 
-func fromDomainStatus(s domain.Status) pgsqlc.SubscriptionStatus {
+func FromStatus(s domain.Status) pgsqlc.SubscriptionStatus {
 	switch s {
 	case domain.StatusIncomplete:
 		return pgsqlc.SubscriptionStatusIncomplete
@@ -2830,7 +2980,7 @@ func fromDomainStatus(s domain.Status) pgsqlc.SubscriptionStatus {
 	}
 }
 
-func toDomainStatus(s pgsqlc.SubscriptionStatus) domain.Status {
+func ToStatus(s pgsqlc.SubscriptionStatus) domain.Status {
 	switch s {
 	case pgsqlc.SubscriptionStatusIncomplete:
 		return domain.StatusIncomplete
@@ -2849,7 +2999,7 @@ func toDomainStatus(s pgsqlc.SubscriptionStatus) domain.Status {
 	}
 }
 
-func fromDomainRefundReason(r domain.RefundReason) pgsqlc.RefundReason {
+func FromRefundReason(r domain.RefundReason) pgsqlc.RefundReason {
 	switch r {
 	case domain.RefundReasonCancelNow:
 		return pgsqlc.RefundReasonCancelNow
@@ -2868,7 +3018,7 @@ func fromDomainRefundReason(r domain.RefundReason) pgsqlc.RefundReason {
 	}
 }
 
-func toDomainRefundReason(r pgsqlc.RefundReason) domain.RefundReason {
+func ToRefundReason(r pgsqlc.RefundReason) domain.RefundReason {
 	switch r {
 	case pgsqlc.RefundReasonCancelNow:
 		return domain.RefundReasonCancelNow
@@ -2887,7 +3037,7 @@ func toDomainRefundReason(r pgsqlc.RefundReason) domain.RefundReason {
 	}
 }
 
-func fromDomainRefundStatus(s domain.RefundStatus) pgsqlc.RefundStatus {
+func FromRefundStatus(s domain.RefundStatus) pgsqlc.RefundStatus {
 	switch s {
 	case domain.RefundStatusPending:
 		return pgsqlc.RefundStatusPending
@@ -2902,7 +3052,7 @@ func fromDomainRefundStatus(s domain.RefundStatus) pgsqlc.RefundStatus {
 	}
 }
 
-func toDomainRefundStatus(s pgsqlc.RefundStatus) domain.RefundStatus {
+func ToRefundStatus(s pgsqlc.RefundStatus) domain.RefundStatus {
 	switch s {
 	case pgsqlc.RefundStatusPending:
 		return domain.RefundStatusPending
@@ -2916,35 +3066,77 @@ func toDomainRefundStatus(s pgsqlc.RefundStatus) domain.RefundStatus {
 		return domain.RefundStatusUnspecified
 	}
 }
+```
 
-type stringKey interface {
-	comparable
-	String() string
+```go
+// internal/billing/infra/persistence/pgmapper/row.go
+package pgmapper
+
+import (
+	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
+)
+
+func ToPlan(row *pgsqlc.Plan) *domain.Plan {
+	return domain.UnmarshalPlan(ToPlanTier(row.Tier), row.Features, row.Limits, row.UpdatedAt)
 }
 
-func marshalKeyed[K stringKey, V any](m map[K]V) ([]byte, error) {
-	out := make(map[string]V, len(m))
-	for k, v := range m {
-		out[k.String()] = v
+func ToPlanMap(rows []*pgsqlc.Plan) map[domain.PlanTier]*domain.Plan {
+	out := make(map[domain.PlanTier]*domain.Plan, len(rows))
+	for _, row := range rows {
+		p := ToPlan(row)
+		out[p.Tier()] = p
 	}
-	return json.Marshal(out)
+	return out
 }
 
-func unmarshalKeyed[K comparable, V any](ctx context.Context, raw []byte, parse func(string) (K, error)) (map[K]V, error) {
-	var in map[string]V
-	if err := json.Unmarshal(raw, &in); err != nil {
-		return nil, err
+func ToPolicy(row *pgsqlc.BillingPolicy) *domain.BillingPolicy {
+	return domain.UnmarshalBillingPolicy(int(row.PastDueGraceDays), int(row.LifetimeRefundWindowDays), row.PortalConfigurationID, row.UpdatedAt)
+}
+
+func ToPrice(row *pgsqlc.Price) *domain.Price {
+	return domain.UnmarshalPrice(domain.UnmarshalPriceParams{
+		ID: row.ID, Plan: ToPlanTier(row.Plan), Interval: ToInterval(row.BillingInterval),
+		Amount: domain.Money{Amount: row.Amount, Currency: row.Currency}, ProviderPriceID: row.ProviderPriceID,
+		LookupKey: row.LookupKey, Active: row.Active, CreatedAt: row.CreatedAt, ArchivedAt: row.ArchivedAt,
+	})
+}
+
+func ToPrices(rows []*pgsqlc.Price) []*domain.Price {
+	out := make([]*domain.Price, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, ToPrice(row))
 	}
-	out := make(map[K]V, len(in))
-	for s, v := range in {
-		k, err := parse(s)
-		if err != nil {
-			slog.WarnContext(ctx, "skipping unknown plan key", slog.String("key", s))
-			continue
-		}
-		out[k] = v
+	return out
+}
+
+func ToAccount(row *pgsqlc.BillingAccount) *domain.BillingAccount {
+	return domain.UnmarshalBillingAccount(row.WorkspaceID, row.ProviderCustomerID,
+		domain.Payer{ID: row.PayerID, Email: row.PayerEmail, Name: row.PayerName},
+		row.PayerMissingSince, row.CreatedAt, row.UpdatedAt)
+}
+
+func ToSubscriptions(rows []*pgsqlc.Subscription, refundRows []*pgsqlc.Refund) []*domain.Subscription {
+	refunds := map[uuid.UUID][]*domain.Refund{}
+	for _, rr := range refundRows {
+		refunds[rr.SubscriptionID] = append(refunds[rr.SubscriptionID], domain.UnmarshalRefund(domain.UnmarshalRefundParams{
+			ID: rr.ID, ProviderRefundID: rr.ProviderRefundID, PaymentRef: rr.PaymentRef,
+			Amount: domain.Money{Amount: rr.Amount, Currency: rr.Currency}, Reason: ToRefundReason(rr.Reason),
+			Status: ToRefundStatus(rr.Status), FailureMessage: rr.FailureMessage, CreatedAt: rr.CreatedAt, UpdatedAt: rr.UpdatedAt,
+		}))
 	}
-	return out, nil
+	out := make([]*domain.Subscription, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, domain.UnmarshalSubscription(domain.UnmarshalSubscriptionParams{
+			ID: row.ID, WorkspaceID: row.WorkspaceID, Plan: ToPlanTier(row.Plan), Interval: ToInterval(row.BillingInterval),
+			PriceID: row.PriceID, Status: ToStatus(row.Status), ProviderSubscriptionID: row.ProviderSubscriptionID,
+			ProviderPaymentID: row.ProviderPaymentID, CurrentPeriodStart: row.CurrentPeriodStart, CurrentPeriodEnd: row.CurrentPeriodEnd,
+			CancelAtPeriodEnd: row.CancelAtPeriodEnd, CanceledAt: row.CanceledAt, PaidAt: row.PaidAt,
+			ProviderSyncedAt: row.ProviderSyncedAt, CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt, Refunds: refunds[row.ID],
+		}))
+	}
+	return out
 }
 ```
 
@@ -2960,36 +3152,22 @@ import (
 
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgjsonb"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgmapper"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
 type planRepo struct{ q *pgsqlc.Queries }
 
-func toPlan(ctx context.Context, row *pgsqlc.Plan) (*domain.Plan, error) {
-	features, err := unmarshalKeyed[domain.FeatureKey, bool](ctx, row.Features, domain.ParseFeatureKey)
-	if err != nil {
-		return nil, wrap("decode plan features", err)
-	}
-	limits, err := unmarshalKeyed[domain.LimitKey, int64](ctx, row.Limits, domain.ParseLimitKey)
-	if err != nil {
-		return nil, wrap("decode plan limits", err)
-	}
-	return domain.UnmarshalPlan(toDomainPlanTier(row.Tier), features, limits, row.UpdatedAt), nil
-}
-
 func (r *planRepo) Get(ctx context.Context, tier domain.PlanTier, forUpdate bool) (*domain.Plan, error) {
-	get := r.q.GetPlan
-	if forUpdate {
-		get = r.q.GetPlanForUpdate
-	}
-	row, err := get(ctx, fromDomainPlanTier(tier))
+	row, err := r.q.GetPlan(ctx, &pgsqlc.GetPlanParams{Tier: pgmapper.FromPlanTier(tier), ForUpdate: forUpdate})
 	if notFound(err) {
 		return nil, errs.NewNotFound(fmt.Sprintf("plan %s not found", tier))
 	}
 	if err != nil {
 		return nil, wrap("get plan", err)
 	}
-	return toPlan(ctx, row)
+	return pgmapper.ToPlan(row), nil
 }
 
 func (r *planRepo) ListMap(ctx context.Context) (map[domain.PlanTier]*domain.Plan, error) {
@@ -2997,27 +3175,14 @@ func (r *planRepo) ListMap(ctx context.Context) (map[domain.PlanTier]*domain.Pla
 	if err != nil {
 		return nil, wrap("list plans", err)
 	}
-	out := make(map[domain.PlanTier]*domain.Plan, len(rows))
-	for _, row := range rows {
-		p, err := toPlan(ctx, row)
-		if err != nil {
-			return nil, err
-		}
-		out[p.Tier()] = p
-	}
-	return out, nil
+	return pgmapper.ToPlanMap(rows), nil
 }
 
 func (r *planRepo) Save(ctx context.Context, p *domain.Plan) error {
-	features, err := marshalKeyed(p.Features())
-	if err != nil {
-		return wrap("encode plan features", err)
-	}
-	limits, err := marshalKeyed(p.Limits())
-	if err != nil {
-		return wrap("encode plan limits", err)
-	}
-	err = r.q.UpsertPlan(ctx, &pgsqlc.UpsertPlanParams{Tier: fromDomainPlanTier(p.Tier()), Features: features, Limits: limits, UpdatedAt: p.UpdatedAt()})
+	err := r.q.UpsertPlan(ctx, &pgsqlc.UpsertPlanParams{
+		Tier: pgmapper.FromPlanTier(p.Tier()), Features: pgjsonb.Features(p.Features()),
+		Limits: pgjsonb.Limits(p.Limits()), UpdatedAt: p.UpdatedAt(),
+	})
 	drain(ctx, p.PopEvents())
 	return wrap("save plan", err)
 }
@@ -3032,24 +3197,21 @@ import (
 
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgmapper"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
 type policyRepo struct{ q *pgsqlc.Queries }
 
 func (r *policyRepo) Get(ctx context.Context, forUpdate bool) (*domain.BillingPolicy, error) {
-	get := r.q.GetPolicy
-	if forUpdate {
-		get = r.q.GetPolicyForUpdate
-	}
-	row, err := get(ctx)
+	row, err := r.q.GetPolicy(ctx, forUpdate)
 	if notFound(err) {
 		return nil, errs.NewNotFound("billing policy not seeded")
 	}
 	if err != nil {
 		return nil, wrap("get policy", err)
 	}
-	return domain.UnmarshalBillingPolicy(int(row.PastDueGraceDays), int(row.LifetimeRefundWindowDays), row.PortalConfigurationID, row.UpdatedAt), nil
+	return pgmapper.ToPolicy(row), nil
 }
 
 func (r *policyRepo) Save(ctx context.Context, p *domain.BillingPolicy) error {
@@ -3075,40 +3237,21 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgmapper"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
 type priceRepo struct{ q *pgsqlc.Queries }
 
-func toPrice(row *pgsqlc.Price) *domain.Price {
-	return domain.UnmarshalPrice(domain.UnmarshalPriceParams{
-		ID: row.ID, Plan: toDomainPlanTier(row.Plan), Interval: toDomainInterval(row.BillingInterval),
-		Amount: domain.Money{Amount: row.Amount, Currency: row.Currency}, ProviderPriceID: row.ProviderPriceID,
-		LookupKey: row.LookupKey, Active: row.Active, CreatedAt: row.CreatedAt, ArchivedAt: row.ArchivedAt,
-	})
-}
-
-func toPrices(rows []*pgsqlc.Price) []*domain.Price {
-	out := make([]*domain.Price, 0, len(rows))
-	for _, row := range rows {
-		out = append(out, toPrice(row))
-	}
-	return out
-}
-
 func (r *priceRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Price, error) {
-	get := r.q.GetPrice
-	if forUpdate {
-		get = r.q.GetPriceForUpdate
-	}
-	row, err := get(ctx, id)
+	row, err := r.q.GetPrice(ctx, &pgsqlc.GetPriceParams{ID: id, ForUpdate: forUpdate})
 	if notFound(err) {
 		return nil, errs.NewNotFound(fmt.Sprintf("price %s not found", id))
 	}
 	if err != nil {
 		return nil, wrap("get price", err)
 	}
-	return toPrice(row), nil
+	return pgmapper.ToPrice(row), nil
 }
 
 func (r *priceRepo) GetByProviderPriceID(ctx context.Context, id string) (*domain.Price, error) {
@@ -3119,37 +3262,35 @@ func (r *priceRepo) GetByProviderPriceID(ctx context.Context, id string) (*domai
 	if err != nil {
 		return nil, wrap("get price by provider id", err)
 	}
-	return toPrice(row), nil
+	return pgmapper.ToPrice(row), nil
 }
 
 func (r *priceRepo) GetActive(ctx context.Context, plan domain.PlanTier, interval domain.Interval, currency string, forUpdate bool) (*domain.Price, error) {
-	get := r.q.GetActivePrice
-	if forUpdate {
-		get = r.q.GetActivePriceForUpdate
-	}
-	row, err := get(ctx, &pgsqlc.GetActivePriceParams{Plan: fromDomainPlanTier(plan), BillingInterval: fromDomainInterval(interval), Currency: currency})
+	row, err := r.q.GetActivePrice(ctx, &pgsqlc.GetActivePriceParams{
+		Plan: pgmapper.FromPlanTier(plan), BillingInterval: pgmapper.FromInterval(interval), Currency: currency, ForUpdate: forUpdate,
+	})
 	if notFound(err) {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, wrap("get active price", err)
 	}
-	return toPrice(row), nil
+	return pgmapper.ToPrice(row), nil
 }
 
 func (r *priceRepo) ListActive(ctx context.Context) ([]*domain.Price, error) {
 	rows, err := r.q.ListActivePrices(ctx)
-	return toPrices(rows), wrap("list active prices", err)
+	return pgmapper.ToPrices(rows), wrap("list active prices", err)
 }
 
 func (r *priceRepo) List(ctx context.Context) ([]*domain.Price, error) {
 	rows, err := r.q.ListPrices(ctx)
-	return toPrices(rows), wrap("list prices", err)
+	return pgmapper.ToPrices(rows), wrap("list prices", err)
 }
 
 func (r *priceRepo) Save(ctx context.Context, p *domain.Price) error {
 	err := r.q.UpsertPrice(ctx, &pgsqlc.UpsertPriceParams{
-		ID: p.ID(), Plan: fromDomainPlanTier(p.Plan()), BillingInterval: fromDomainInterval(p.Interval()),
+		ID: p.ID(), Plan: pgmapper.FromPlanTier(p.Plan()), BillingInterval: pgmapper.FromInterval(p.Interval()),
 		Amount: p.Amount().Amount, Currency: p.Amount().Currency, ProviderPriceID: p.ProviderPriceID(),
 		LookupKey: p.LookupKey(), Active: p.Active(), CreatedAt: p.CreatedAt(), ArchivedAt: p.ArchivedAt(),
 	})
@@ -3157,8 +3298,6 @@ func (r *priceRepo) Save(ctx context.Context, p *domain.Price) error {
 	return wrap("save price", err)
 }
 ```
-
-If `GetActivePriceForUpdate` generates a distinct params type (`GetActivePriceForUpdateParams`), call each query in its own branch instead of the shared `get` variable. The same applies to any pair below whose generated signatures differ.
 
 ```go
 // internal/billing/infra/persistence/pgrepo/account.go
@@ -3169,30 +3308,21 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgmapper"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
 type accountRepo struct{ q *pgsqlc.Queries }
 
-func toAccount(row *pgsqlc.BillingAccount) *domain.BillingAccount {
-	return domain.UnmarshalBillingAccount(row.WorkspaceID, row.ProviderCustomerID,
-		domain.Payer{ID: row.PayerID, Email: row.PayerEmail, Name: row.PayerName},
-		row.PayerMissingSince, row.CreatedAt, row.UpdatedAt)
-}
-
 func (r *accountRepo) GetByWorkspace(ctx context.Context, workspaceID uuid.UUID, forUpdate bool) (*domain.BillingAccount, error) {
-	get := r.q.GetBillingAccount
-	if forUpdate {
-		get = r.q.GetBillingAccountForUpdate
-	}
-	row, err := get(ctx, workspaceID)
+	row, err := r.q.GetBillingAccount(ctx, &pgsqlc.GetBillingAccountParams{WorkspaceID: workspaceID, ForUpdate: forUpdate})
 	if notFound(err) {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, wrap("get billing account", err)
 	}
-	return toAccount(row), nil
+	return pgmapper.ToAccount(row), nil
 }
 
 func (r *accountRepo) ListByPayer(ctx context.Context, payerID string) ([]*domain.BillingAccount, error) {
@@ -3202,7 +3332,7 @@ func (r *accountRepo) ListByPayer(ctx context.Context, payerID string) ([]*domai
 	}
 	out := make([]*domain.BillingAccount, 0, len(rows))
 	for _, row := range rows {
-		out = append(out, toAccount(row))
+		out = append(out, pgmapper.ToAccount(row))
 	}
 	return out, nil
 }
@@ -3231,6 +3361,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgmapper"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
 )
 
@@ -3248,25 +3379,7 @@ func (r *subscriptionRepo) hydrate(ctx context.Context, rows []*pgsqlc.Subscript
 	if err != nil {
 		return nil, wrap("list refunds", err)
 	}
-	refunds := map[uuid.UUID][]*domain.Refund{}
-	for _, rr := range refundRows {
-		refunds[rr.SubscriptionID] = append(refunds[rr.SubscriptionID], domain.UnmarshalRefund(domain.UnmarshalRefundParams{
-			ID: rr.ID, ProviderRefundID: rr.ProviderRefundID, PaymentRef: rr.PaymentRef,
-			Amount: domain.Money{Amount: rr.Amount, Currency: rr.Currency}, Reason: toDomainRefundReason(rr.Reason),
-			Status: toDomainRefundStatus(rr.Status), FailureMessage: rr.FailureMessage, CreatedAt: rr.CreatedAt, UpdatedAt: rr.UpdatedAt,
-		}))
-	}
-	out := make([]*domain.Subscription, 0, len(rows))
-	for _, row := range rows {
-		out = append(out, domain.UnmarshalSubscription(domain.UnmarshalSubscriptionParams{
-			ID: row.ID, WorkspaceID: row.WorkspaceID, Plan: toDomainPlanTier(row.Plan), Interval: toDomainInterval(row.BillingInterval),
-			PriceID: row.PriceID, Status: toDomainStatus(row.Status), ProviderSubscriptionID: row.ProviderSubscriptionID,
-			ProviderPaymentID: row.ProviderPaymentID, CurrentPeriodStart: row.CurrentPeriodStart, CurrentPeriodEnd: row.CurrentPeriodEnd,
-			CancelAtPeriodEnd: row.CancelAtPeriodEnd, CanceledAt: row.CanceledAt, PaidAt: row.PaidAt,
-			ProviderSyncedAt: row.ProviderSyncedAt, CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt, Refunds: refunds[row.ID],
-		}))
-	}
-	return out, nil
+	return pgmapper.ToSubscriptions(rows, refundRows), nil
 }
 
 func (r *subscriptionRepo) one(ctx context.Context, row *pgsqlc.Subscription, err error, missingIsNil bool, what string) (*domain.Subscription, error) {
@@ -3287,38 +3400,22 @@ func (r *subscriptionRepo) one(ctx context.Context, row *pgsqlc.Subscription, er
 }
 
 func (r *subscriptionRepo) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*domain.Subscription, error) {
-	get := r.q.GetSubscription
-	if forUpdate {
-		get = r.q.GetSubscriptionForUpdate
-	}
-	row, err := get(ctx, id)
+	row, err := r.q.GetSubscription(ctx, &pgsqlc.GetSubscriptionParams{ID: id, ForUpdate: forUpdate})
 	return r.one(ctx, row, err, false, id.String())
 }
 
 func (r *subscriptionRepo) GetCurrentByWorkspace(ctx context.Context, workspaceID uuid.UUID, forUpdate bool) (*domain.Subscription, error) {
-	get := r.q.GetCurrentSubscription
-	if forUpdate {
-		get = r.q.GetCurrentSubscriptionForUpdate
-	}
-	row, err := get(ctx, workspaceID)
+	row, err := r.q.GetCurrentSubscription(ctx, &pgsqlc.GetCurrentSubscriptionParams{WorkspaceID: workspaceID, ForUpdate: forUpdate})
 	return r.one(ctx, row, err, true, "")
 }
 
 func (r *subscriptionRepo) GetByProviderSubscriptionID(ctx context.Context, id string, forUpdate bool) (*domain.Subscription, error) {
-	get := r.q.GetSubscriptionByProviderSubscriptionID
-	if forUpdate {
-		get = r.q.GetSubscriptionByProviderSubscriptionIDForUpdate
-	}
-	row, err := get(ctx, &id)
+	row, err := r.q.GetSubscriptionByProviderSubscriptionID(ctx, &pgsqlc.GetSubscriptionByProviderSubscriptionIDParams{ProviderSubscriptionID: &id, ForUpdate: forUpdate})
 	return r.one(ctx, row, err, true, "")
 }
 
 func (r *subscriptionRepo) GetByProviderPaymentID(ctx context.Context, id string, forUpdate bool) (*domain.Subscription, error) {
-	get := r.q.GetSubscriptionByProviderPaymentID
-	if forUpdate {
-		get = r.q.GetSubscriptionByProviderPaymentIDForUpdate
-	}
-	row, err := get(ctx, &id)
+	row, err := r.q.GetSubscriptionByProviderPaymentID(ctx, &pgsqlc.GetSubscriptionByProviderPaymentIDParams{ProviderPaymentID: &id, ForUpdate: forUpdate})
 	return r.one(ctx, row, err, true, "")
 }
 
@@ -3351,8 +3448,8 @@ func (r *subscriptionRepo) ListNeedingReconcile(ctx context.Context, now time.Ti
 
 func (r *subscriptionRepo) Save(ctx context.Context, s *domain.Subscription) error {
 	err := r.q.UpsertSubscription(ctx, &pgsqlc.UpsertSubscriptionParams{
-		ID: s.ID(), WorkspaceID: s.WorkspaceID(), Plan: fromDomainPlanTier(s.Plan()), BillingInterval: fromDomainInterval(s.Interval()),
-		PriceID: s.PriceID(), Status: fromDomainStatus(s.Status()), ProviderSubscriptionID: s.ProviderSubscriptionID(),
+		ID: s.ID(), WorkspaceID: s.WorkspaceID(), Plan: pgmapper.FromPlanTier(s.Plan()), BillingInterval: pgmapper.FromInterval(s.Interval()),
+		PriceID: s.PriceID(), Status: pgmapper.FromStatus(s.Status()), ProviderSubscriptionID: s.ProviderSubscriptionID(),
 		ProviderPaymentID: s.ProviderPaymentID(), CurrentPeriodStart: s.CurrentPeriodStart(), CurrentPeriodEnd: s.CurrentPeriodEnd(),
 		CancelAtPeriodEnd: s.CancelAtPeriodEnd(), CanceledAt: s.CanceledAt(), PaidAt: s.PaidAt(),
 		ProviderSyncedAt: s.ProviderSyncedAt(), CreatedAt: s.CreatedAt(), UpdatedAt: s.UpdatedAt(),
@@ -3363,8 +3460,8 @@ func (r *subscriptionRepo) Save(ctx context.Context, s *domain.Subscription) err
 	for _, rf := range s.Refunds() {
 		if err := r.q.UpsertRefund(ctx, &pgsqlc.UpsertRefundParams{
 			ID: rf.ID(), SubscriptionID: s.ID(), ProviderRefundID: rf.ProviderRefundID(), PaymentRef: rf.PaymentRef(),
-			Amount: rf.Amount().Amount, Currency: rf.Amount().Currency, Reason: fromDomainRefundReason(rf.Reason()),
-			Status: fromDomainRefundStatus(rf.Status()), FailureMessage: rf.FailureMessage(), CreatedAt: rf.CreatedAt(), UpdatedAt: rf.UpdatedAt(),
+			Amount: rf.Amount().Amount, Currency: rf.Amount().Currency, Reason: pgmapper.FromRefundReason(rf.Reason()),
+			Status: pgmapper.FromRefundStatus(rf.Status()), FailureMessage: rf.FailureMessage(), CreatedAt: rf.CreatedAt(), UpdatedAt: rf.UpdatedAt(),
 		}); err != nil {
 			return wrap("save refund", err)
 		}
@@ -3401,7 +3498,152 @@ func (l *providerEventLog) PruneBefore(ctx context.Context, before time.Time) (i
 }
 ```
 
-- [ ] **Step 7: Build, validate migration, commit**
+- [ ] **Step 7: Read model**
+
+Query handlers (`q_*`) never open a transaction or take locks: they depend on one `app.BillingReadModel` port, implemented by `pgreadmodel` on top of the `Read…` sqlc queries. Mapping rows to domain objects reuses `pgmapper`; `Unmarshal…` bypasses validation and events, so nothing here can mutate state.
+
+```go
+// internal/billing/app/readmodel.go
+package app
+
+import (
+	"context"
+
+	"github.com/google/uuid"
+	"github.com/notopia-uit/notopia/internal/billing/domain"
+)
+
+type BillingReadModel interface {
+	CurrentSubscription(ctx context.Context, workspaceID uuid.UUID) (*domain.Subscription, error) // nil, nil when none
+	CurrentSubscriptions(ctx context.Context, workspaceIDs []uuid.UUID) ([]*domain.Subscription, error)
+	Account(ctx context.Context, workspaceID uuid.UUID) (*domain.BillingAccount, error) // nil, nil when none
+	Plans(ctx context.Context) (map[domain.PlanTier]*domain.Plan, error)
+	Policy(ctx context.Context) (*domain.BillingPolicy, error)
+	ActivePrices(ctx context.Context) ([]*domain.Price, error)
+	Prices(ctx context.Context) ([]*domain.Price, error)
+}
+```
+
+```go
+// internal/billing/infra/persistence/pgreadmodel/billing.go
+package pgreadmodel
+
+import (
+	"context"
+	"errors"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+	"github.com/notopia-uit/notopia/internal/billing/app"
+	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/notopia-uit/notopia/internal/billing/errs"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgmapper"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgsqlc"
+)
+
+type BillingReadModel struct{ q *pgsqlc.Queries }
+
+var _ app.BillingReadModel = (*BillingReadModel)(nil)
+
+func NewBillingReadModel(q *pgsqlc.Queries) *BillingReadModel { return &BillingReadModel{q: q} }
+
+var ProvideBillingReadModel = NewBillingReadModel
+
+func toErr(msg string, err error) error {
+	if err == nil {
+		return nil
+	}
+	return errs.NewInternal(msg, err)
+}
+
+func (m *BillingReadModel) subscriptions(ctx context.Context, rows []*pgsqlc.Subscription) ([]*domain.Subscription, error) {
+	if len(rows) == 0 {
+		return nil, nil
+	}
+	ids := make([]uuid.UUID, 0, len(rows))
+	for _, row := range rows {
+		ids = append(ids, row.ID)
+	}
+	refundRows, err := m.q.ReadListRefundsBySubscriptionIDs(ctx, ids)
+	if err != nil {
+		return nil, toErr("read refunds", err)
+	}
+	return pgmapper.ToSubscriptions(rows, refundRows), nil
+}
+
+func (m *BillingReadModel) CurrentSubscription(ctx context.Context, workspaceID uuid.UUID) (*domain.Subscription, error) {
+	row, err := m.q.ReadGetCurrentSubscription(ctx, workspaceID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, toErr("read current subscription", err)
+	}
+	subs, err := m.subscriptions(ctx, []*pgsqlc.Subscription{row})
+	if err != nil {
+		return nil, err
+	}
+	return subs[0], nil
+}
+
+func (m *BillingReadModel) CurrentSubscriptions(ctx context.Context, workspaceIDs []uuid.UUID) ([]*domain.Subscription, error) {
+	rows, err := m.q.ReadListCurrentSubscriptionsByWorkspaces(ctx, workspaceIDs)
+	if err != nil {
+		return nil, toErr("read current subscriptions", err)
+	}
+	return m.subscriptions(ctx, rows)
+}
+
+func (m *BillingReadModel) Account(ctx context.Context, workspaceID uuid.UUID) (*domain.BillingAccount, error) {
+	row, err := m.q.ReadGetBillingAccount(ctx, workspaceID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, toErr("read billing account", err)
+	}
+	return pgmapper.ToAccount(row), nil
+}
+
+func (m *BillingReadModel) Plans(ctx context.Context) (map[domain.PlanTier]*domain.Plan, error) {
+	rows, err := m.q.ReadListPlans(ctx)
+	if err != nil {
+		return nil, toErr("read plans", err)
+	}
+	return pgmapper.ToPlanMap(rows), nil
+}
+
+func (m *BillingReadModel) Policy(ctx context.Context) (*domain.BillingPolicy, error) {
+	row, err := m.q.ReadGetPolicy(ctx)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, errs.NewNotFound("billing policy not seeded")
+	}
+	if err != nil {
+		return nil, toErr("read policy", err)
+	}
+	return pgmapper.ToPolicy(row), nil
+}
+
+func (m *BillingReadModel) ActivePrices(ctx context.Context) ([]*domain.Price, error) {
+	rows, err := m.q.ReadListActivePrices(ctx)
+	if err != nil {
+		return nil, toErr("read active prices", err)
+	}
+	return pgmapper.ToPrices(rows), nil
+}
+
+func (m *BillingReadModel) Prices(ctx context.Context) ([]*domain.Price, error) {
+	rows, err := m.q.ReadListPrices(ctx)
+	if err != nil {
+		return nil, toErr("read prices", err)
+	}
+	return pgmapper.ToPrices(rows), nil
+}
+```
+
+The `Read…` queries each take a single param, so sqlc generates positional arguments (as used above).
+
+- [ ] **Step 8: Build, validate migration, commit**
 
 ```bash
 go build ./internal/billing/...
@@ -3418,7 +3660,7 @@ git commit -m "feat(billing): persistence with goose migration, sqlc and reposit
 **Files:**
 
 - Create: `internal/billing/config/{config.go,viper.go,wire.go}`
-- Create: `internal/billing/component/{validator.go,wire.go}`
+- Create: `internal/billing/component/{validator.go,eventtopic.go,wire.go}`
 - Create: `internal/billing/app/{app.go,wire.go,svc_authorization.go,svc_notifier.go}`
 - Create: `internal/billing/infra/{wire.go,redis/redis.go,notifier/kafka.go,notifier/map.go,service/authorization.go}`
 - Create: `internal/billing/controller/{wire.go,http/{http.go,err.go,user.go,unimplemented.go},grpc/{grpc.go,err.go,service.go},health/health.go}`
@@ -3537,6 +3779,23 @@ var ProviderSet = wire.NewSet(
 ```
 
 `component/validator.go` and `component/wire.go`: copy note's `validator.go`; `ProviderSet = wire.NewSet(ProvideValidate)`.
+
+`component/eventtopic.go` is the single place that declares every Kafka topic the service touches, split into published and consumed. The notifier (publish) and `controller/event` (subscribe) import these constants and never inline a topic string. Note keeps its outbound topics in `component/eventtopic.go` but inlines inbound ones in `controller/event`; billing puts both in one file so a topic rename is a one-file diff. Payload types stay in `api/share`.
+
+```go
+// internal/billing/component/eventtopic.go
+package component
+
+const (
+	TopicSubscriptionChanged = "events.integration.billing.subscription.changed"
+)
+
+const (
+	TopicWorkspaceDeleted = "events.integration.note.workspace.deleted"
+	TopicRoleUpdated      = "events.integration.authorization.user_workspace_role_updated"
+	TopicMemberRemoved    = "events.integration.authorization.workspace_member_removed"
+)
+```
 
 - [ ] **Step 2: App skeleton + ports**
 
@@ -3815,14 +4074,11 @@ import (
 	"github.com/google/uuid"
 	wotel "github.com/nkonev/watermill-opentelemetry/pkg/opentelemetry"
 	"github.com/notopia-uit/notopia/internal/billing/app"
+	"github.com/notopia-uit/notopia/internal/billing/component"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/notopia-uit/notopia/pkg/metadata"
-)
-
-const (
-	TopicSubscriptionChanged = "events.integration.billing.subscription.changed"
 )
 
 type Kafka struct {
@@ -3857,11 +4113,11 @@ func (k *Kafka) SubscriptionChanged(ctx context.Context, workspaceID uuid.UUID, 
 	if err == nil {
 		var shareStatus string
 		if shareStatus, err = toShareStatus(status); err == nil {
-			k.publish(ctx, TopicSubscriptionChanged, &share.SubscriptionChangedEvent{WorkspaceId: workspaceID, Plan: sharePlan, Status: shareStatus})
+			k.publish(ctx, component.TopicSubscriptionChanged, &share.SubscriptionChangedEvent{WorkspaceId: workspaceID, Plan: sharePlan, Status: shareStatus})
 			return
 		}
 	}
-	slog.WarnContext(ctx, "billing notification not published", slog.String("topic", TopicSubscriptionChanged), slog.Any("error", err))
+	slog.WarnContext(ctx, "billing notification not published", slog.String("topic", component.TopicSubscriptionChanged), slog.Any("error", err))
 }
 ```
 
@@ -3878,11 +4134,11 @@ import (
 
 func toSharePlan(t domain.PlanTier) (share.SubscriptionChangedEventPlan, error) {
 	switch t {
-	case domain.TierFree:
+	case domain.PlanTierFree:
 		return share.SubscriptionChangedEventPlanFree, nil
-	case domain.TierPlus:
+	case domain.PlanTierPlus:
 		return share.SubscriptionChangedEventPlanPlus, nil
-	case domain.TierPro:
+	case domain.PlanTierPro:
 		return share.SubscriptionChangedEventPlanPro, nil
 	default:
 		return "", fmt.Errorf("invalid plan tier: %v", t)
@@ -3987,16 +4243,16 @@ func currentUser(ctx context.Context) (*commonhttp.User, error) {
 	return u, nil
 }
 
-func currentPayer(ctx context.Context) (domain.Payer, error) {
+func currentPayer(ctx context.Context) (app.Payer, error) {
 	u, err := currentUser(ctx)
 	if err != nil {
-		return domain.Payer{}, err
+		return app.Payer{}, err
 	}
 	name := u.Name
 	if name == "" {
 		name = u.Email
 	}
-	return domain.Payer{ID: u.ID, Email: u.Email, Name: name}, nil
+	return app.Payer{ID: u.ID, Email: u.Email, Name: name}, nil
 }
 
 func (h *StrictHandler) requireAdmin(ctx context.Context) (*commonhttp.User, error) {
@@ -4331,7 +4587,7 @@ Expected: ready returns all checks `up`; migrations applied (`\dt` in `billing` 
 
 - [ ] **Step 8: AGENTS.md + commit**
 
-`internal/billing/AGENTS.md`: purpose, layer table (copy note's, minus outbox/pgreadmodel), Stripe notes (sandbox only, fetch-and-sync webhooks, idempotency keys), crons, "Notifications are best-effort", TODO list (free trial; live payments via a VN gateway behind `PaymentProvider`). `ln -s AGENTS.md internal/billing/CLAUDE.md`. Add `billing/` lines to the root `CLAUDE.md` structure block and the scoped-docs table.
+`internal/billing/AGENTS.md`: purpose, layer table (copy note's, minus outbox; keep pgreadmodel), Stripe notes (sandbox only, fetch-and-sync webhooks, idempotency keys), crons, "Notifications are best-effort", TODO list (free trial; live payments via a VN gateway behind `PaymentProvider`). `ln -s AGENTS.md internal/billing/CLAUDE.md`. Add `billing/` lines to the root `CLAUDE.md` structure block and the scoped-docs table.
 
 ```bash
 git add internal/billing cmd/billing deploy/compose CLAUDE.md
@@ -4344,16 +4600,17 @@ git commit -m "feat(billing): service runtime, config, health, compose and traef
 
 **Files:**
 
-- Create: `internal/billing/app/{model.go,common.go,cmd_ensuredefaults.go,q_getentitlements.go,q_batchgetentitlements.go,q_listplans.go,q_getworkspacebilling.go,q_getworkspacepayer.go}`
+- Create: `internal/billing/app/{model.go,mapper.go,common.go,cmd_ensuredefaults.go,q_getentitlements.go,q_batchgetentitlements.go,q_listplans.go,q_getworkspacebilling.go,q_getworkspacepayer.go}`
 - Modify: `internal/billing/app/app.go`, `internal/billing/app/wire.go`, `internal/billing/server.go`
 - Create: `internal/billing/controller/grpc/{service.go,mapout.go}`
 - Create: `internal/billing/controller/http/{mapout.go,plan.go,workspace.go}`; modify `unimplemented.go` (delete moved stubs)
 
 **Interfaces:**
 
-- Consumes: `domain.UnitOfWork`, `app.AuthorizationSvc`.
-- Produces: `Cmds.EnsureDefaults`, `Queries.GetEntitlements` (`GetEntitlements{WorkspaceID uuid.UUID; UserID string; Internal bool}` → `domain.Entitlements`), `Queries.BatchGetEntitlements` (`[]uuid.UUID` → `map[uuid.UUID]domain.Entitlements`), `Queries.ListPlans` (→ `[]PlanView`), `Queries.GetWorkspaceBilling` (→ `WorkspaceBillingView`), `Queries.GetWorkspacePayer` (→ `PayerView`).
-- Mappers: gRPC `controller/grpc/mapout.go` (`toPBPlanTier`, `toPBStatus`, `toPBFeatures`, `toPBLimits`, `toPBEntitlements`); HTTP `controller/http/mapout.go` (`toPlanTierDTO`, `toBillingIntervalDTO`, `toSubscriptionStatusDTO`, `toRefundReasonDTO`, `toRefundStatusDTO`, `toFeatures`, `toLimits`, and `toEntitlements`/`toPrice`/`toPlan`/`toWorkspaceBilling`, which now return `(T, error)`).
+- Consumes: `domain.UnitOfWork` (commands), `app.BillingReadModel` (queries), `app.AuthorizationSvc`.
+- Produces: `Cmds.EnsureDefaults`, `Queries.GetEntitlements` (`GetEntitlements{WorkspaceID uuid.UUID; UserID string; Internal bool}` → `app.Entitlements`), `Queries.BatchGetEntitlements` (`[]uuid.UUID` → `map[uuid.UUID]app.Entitlements`), `Queries.ListPlans` (→ `[]PlanView`), `Queries.GetWorkspaceBilling` (→ `WorkspaceBillingView`), `Queries.GetWorkspacePayer` (→ `PayerView`).
+- App models (`app/model.go`) are the app's own response shapes and enums (no `domain` import); `app/mapper.go` converts domain values into them. Controllers only see `app.*` types.
+- Mappers: gRPC `controller/grpc/mapout.go` (`toPBPlanTier`, `toPBStatus`, `toPBEntitlements`); HTTP `controller/http/mapout.go` (`toPlanTierDTO`, `toBillingIntervalDTO`, `toSubscriptionStatusDTO`, `toRefundReasonDTO`, `toRefundStatusDTO`, `toFeatures`, `toLimits`, and `toEntitlements`/`toPrice`/`toPlan`/`toWorkspaceBilling`, which now return `(T, error)`).
 
 Default plans and policy are inserted on startup (no Stripe needed). Prices need Stripe and come from the seeder (Task 7).
 
@@ -4366,23 +4623,463 @@ package app
 import (
 	"time"
 
-	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/google/uuid"
 )
 
+type PlanTier uint8
+
+const (
+	PlanTierUnspecified PlanTier = iota
+	PlanTierFree
+	PlanTierPlus
+	PlanTierPro
+)
+
+func (t PlanTier) IsValid() bool { return t >= PlanTierFree && t <= PlanTierPro }
+
+func (t PlanTier) String() string {
+	switch t {
+	case PlanTierFree:
+		return "free"
+	case PlanTierPlus:
+		return "plus"
+	case PlanTierPro:
+		return "pro"
+	default:
+		return "unspecified"
+	}
+}
+
+type BillingInterval uint8
+
+const (
+	BillingIntervalUnspecified BillingInterval = iota
+	BillingIntervalMonth
+	BillingIntervalYear
+	BillingIntervalLifetime
+)
+
+func (i BillingInterval) IsValid() bool {
+	return i >= BillingIntervalMonth && i <= BillingIntervalLifetime
+}
+
+func (i BillingInterval) String() string {
+	switch i {
+	case BillingIntervalMonth:
+		return "month"
+	case BillingIntervalYear:
+		return "year"
+	case BillingIntervalLifetime:
+		return "lifetime"
+	default:
+		return "unspecified"
+	}
+}
+
+// SubscriptionStatusNone is the zero value and a real state: the workspace has no subscription.
+type SubscriptionStatus uint8
+
+const (
+	SubscriptionStatusNone SubscriptionStatus = iota
+	SubscriptionStatusIncomplete
+	SubscriptionStatusActive
+	SubscriptionStatusPastDue
+	SubscriptionStatusUnpaid
+	SubscriptionStatusCanceled
+	SubscriptionStatusIncompleteExpired
+)
+
+func (s SubscriptionStatus) IsValid() bool { return s <= SubscriptionStatusIncompleteExpired }
+
+func (s SubscriptionStatus) String() string {
+	switch s {
+	case SubscriptionStatusNone:
+		return "none"
+	case SubscriptionStatusIncomplete:
+		return "incomplete"
+	case SubscriptionStatusActive:
+		return "active"
+	case SubscriptionStatusPastDue:
+		return "past_due"
+	case SubscriptionStatusUnpaid:
+		return "unpaid"
+	case SubscriptionStatusCanceled:
+		return "canceled"
+	case SubscriptionStatusIncompleteExpired:
+		return "incomplete_expired"
+	default:
+		return "unknown"
+	}
+}
+
+type RefundReason uint8
+
+const (
+	RefundReasonUnspecified RefundReason = iota
+	RefundReasonCancelNow
+	RefundReasonLifetimeWindow
+	RefundReasonReplacedByLifetime
+	RefundReasonWorkspaceDeleted
+	RefundReasonDuplicateCheckout
+	RefundReasonExternal
+)
+
+func (r RefundReason) IsValid() bool { return r >= RefundReasonCancelNow && r <= RefundReasonExternal }
+
+func (r RefundReason) String() string {
+	switch r {
+	case RefundReasonCancelNow:
+		return "cancel_now"
+	case RefundReasonLifetimeWindow:
+		return "lifetime_window"
+	case RefundReasonReplacedByLifetime:
+		return "replaced_by_lifetime"
+	case RefundReasonWorkspaceDeleted:
+		return "workspace_deleted"
+	case RefundReasonDuplicateCheckout:
+		return "duplicate_checkout"
+	case RefundReasonExternal:
+		return "external"
+	default:
+		return "unspecified"
+	}
+}
+
+type RefundStatus uint8
+
+const (
+	RefundStatusUnspecified RefundStatus = iota
+	RefundStatusPending
+	RefundStatusSucceeded
+	RefundStatusFailed
+	RefundStatusCanceled
+)
+
+func (s RefundStatus) IsValid() bool { return s >= RefundStatusPending && s <= RefundStatusCanceled }
+
+func (s RefundStatus) String() string {
+	switch s {
+	case RefundStatusPending:
+		return "pending"
+	case RefundStatusSucceeded:
+		return "succeeded"
+	case RefundStatusFailed:
+		return "failed"
+	case RefundStatusCanceled:
+		return "canceled"
+	default:
+		return "unspecified"
+	}
+}
+
+// Feature and limit keys are plain strings here: both wires (proto map, OpenAPI object) key them by string.
+type Plan struct {
+	Tier     PlanTier
+	Features map[string]bool
+	Limits   map[string]int64
+}
+
+type Price struct {
+	ID         uuid.UUID
+	Plan       PlanTier
+	Interval   BillingInterval
+	Amount     int64
+	Currency   string
+	LookupKey  string
+	Active     bool
+	CreatedAt  time.Time
+	ArchivedAt *time.Time
+}
+
 type PlanView struct {
-	Plan   *domain.Plan
-	Prices []*domain.Price
+	Plan   Plan
+	Prices []Price
+}
+
+type BillingPolicy struct {
+	PastDueGraceDays         int
+	LifetimeRefundWindowDays int
+}
+
+type Entitlements struct {
+	WorkspaceID uuid.UUID
+	Plan        PlanTier
+	Status      SubscriptionStatus
+	AccessUntil *time.Time
+	Features    map[string]bool
+	Limits      map[string]int64
+}
+
+type Refund struct {
+	ID        uuid.UUID
+	Amount    int64
+	Currency  string
+	Reason    RefundReason
+	Status    RefundStatus
+	CreatedAt time.Time
+}
+
+type Subscription struct {
+	ID                 uuid.UUID
+	Plan               PlanTier
+	Interval           BillingInterval
+	Status             SubscriptionStatus
+	CurrentPeriodStart *time.Time
+	CurrentPeriodEnd   *time.Time
+	CancelAtPeriodEnd  bool
+	CanceledAt         *time.Time
+	AccessUntil        *time.Time
+	Refunds            []Refund
+}
+
+type Payer struct {
+	ID           string
+	Email        string
+	Name         string
+	MissingSince *time.Time
 }
 
 type WorkspaceBillingView struct {
-	Subscription *domain.Subscription
-	Account      *domain.BillingAccount
-	AccessUntil  *time.Time
+	Subscription *Subscription
+	Payer        *Payer
 }
 
 type PayerView struct {
 	PayerID       *string
 	RequiresPayer bool
+}
+
+type RefundQuoteLine struct {
+	PaidAmount      int64
+	Amount          int64
+	CoverageSeconds int64
+	UnusedSeconds   int64
+}
+
+type RefundQuote struct {
+	Amount        int64
+	Currency      string
+	UnusedSeconds int64
+	PeriodSeconds int64
+	Lines         []RefundQuoteLine
+}
+```
+
+`app/model.go` imports nothing from `domain`: these are the application's own read/response shapes, so they can diverge from the aggregates. `app/mapper.go` is the only place that converts a domain value into them (explicit switches per enum, like every other port):
+
+```go
+// internal/billing/app/mapper.go
+package app
+
+import "github.com/notopia-uit/notopia/internal/billing/domain"
+
+func newPlanTier(t domain.PlanTier) PlanTier {
+	switch t {
+	case domain.PlanTierFree:
+		return PlanTierFree
+	case domain.PlanTierPlus:
+		return PlanTierPlus
+	case domain.PlanTierPro:
+		return PlanTierPro
+	default:
+		return PlanTierUnspecified
+	}
+}
+
+func newBillingInterval(i domain.Interval) BillingInterval {
+	switch i {
+	case domain.IntervalMonth:
+		return BillingIntervalMonth
+	case domain.IntervalYear:
+		return BillingIntervalYear
+	case domain.IntervalLifetime:
+		return BillingIntervalLifetime
+	default:
+		return BillingIntervalUnspecified
+	}
+}
+
+func newSubscriptionStatus(s domain.Status) SubscriptionStatus {
+	switch s {
+	case domain.StatusIncomplete:
+		return SubscriptionStatusIncomplete
+	case domain.StatusActive:
+		return SubscriptionStatusActive
+	case domain.StatusPastDue:
+		return SubscriptionStatusPastDue
+	case domain.StatusUnpaid:
+		return SubscriptionStatusUnpaid
+	case domain.StatusCanceled:
+		return SubscriptionStatusCanceled
+	case domain.StatusIncompleteExpired:
+		return SubscriptionStatusIncompleteExpired
+	default:
+		return SubscriptionStatusNone
+	}
+}
+
+func newRefundReason(r domain.RefundReason) RefundReason {
+	switch r {
+	case domain.RefundReasonCancelNow:
+		return RefundReasonCancelNow
+	case domain.RefundReasonLifetimeWindow:
+		return RefundReasonLifetimeWindow
+	case domain.RefundReasonReplacedByLifetime:
+		return RefundReasonReplacedByLifetime
+	case domain.RefundReasonWorkspaceDeleted:
+		return RefundReasonWorkspaceDeleted
+	case domain.RefundReasonDuplicateCheckout:
+		return RefundReasonDuplicateCheckout
+	case domain.RefundReasonExternal:
+		return RefundReasonExternal
+	default:
+		return RefundReasonUnspecified
+	}
+}
+
+func newRefundStatus(s domain.RefundStatus) RefundStatus {
+	switch s {
+	case domain.RefundStatusPending:
+		return RefundStatusPending
+	case domain.RefundStatusSucceeded:
+		return RefundStatusSucceeded
+	case domain.RefundStatusFailed:
+		return RefundStatusFailed
+	case domain.RefundStatusCanceled:
+		return RefundStatusCanceled
+	default:
+		return RefundStatusUnspecified
+	}
+}
+
+func newFeatures(m map[domain.FeatureKey]bool) map[string]bool {
+	out := make(map[string]bool, len(m))
+	for k, v := range m {
+		out[k.String()] = v
+	}
+	return out
+}
+
+func newLimits(m map[domain.LimitKey]int64) map[string]int64 {
+	out := make(map[string]int64, len(m))
+	for k, v := range m {
+		out[k.String()] = v
+	}
+	return out
+}
+
+func newPlan(p *domain.Plan) Plan {
+	return Plan{Tier: newPlanTier(p.Tier()), Features: newFeatures(p.Features()), Limits: newLimits(p.Limits())}
+}
+
+func newPrice(p *domain.Price) Price {
+	return Price{
+		ID: p.ID(), Plan: newPlanTier(p.Plan()), Interval: newBillingInterval(p.Interval()),
+		Amount: p.Amount().Amount, Currency: p.Amount().Currency, LookupKey: p.LookupKey(), Active: p.Active(),
+		CreatedAt: p.CreatedAt(), ArchivedAt: p.ArchivedAt(),
+	}
+}
+
+func newPrices(ps []*domain.Price) []Price {
+	out := make([]Price, 0, len(ps))
+	for _, p := range ps {
+		out = append(out, newPrice(p))
+	}
+	return out
+}
+
+func newBillingPolicy(p *domain.BillingPolicy) BillingPolicy {
+	return BillingPolicy{PastDueGraceDays: p.PastDueGraceDays(), LifetimeRefundWindowDays: p.LifetimeRefundWindowDays()}
+}
+
+func newEntitlements(e domain.Entitlements) Entitlements {
+	return Entitlements{
+		WorkspaceID: e.WorkspaceID, Plan: newPlanTier(e.Plan), Status: newSubscriptionStatus(e.Status),
+		AccessUntil: e.AccessUntil, Features: newFeatures(e.Features), Limits: newLimits(e.Limits),
+	}
+}
+
+func newSubscription(s *domain.Subscription, policy *domain.BillingPolicy) Subscription {
+	refunds := make([]Refund, 0, len(s.Refunds()))
+	for _, r := range s.Refunds() {
+		refunds = append(refunds, Refund{
+			ID: r.ID(), Amount: r.Amount().Amount, Currency: r.Amount().Currency,
+			Reason: newRefundReason(r.Reason()), Status: newRefundStatus(r.Status()), CreatedAt: r.CreatedAt(),
+		})
+	}
+	return Subscription{
+		ID: s.ID(), Plan: newPlanTier(s.Plan()), Interval: newBillingInterval(s.Interval()), Status: newSubscriptionStatus(s.Status()),
+		CurrentPeriodStart: s.CurrentPeriodStart(), CurrentPeriodEnd: s.CurrentPeriodEnd(), CancelAtPeriodEnd: s.CancelAtPeriodEnd(),
+		CanceledAt: s.CanceledAt(), AccessUntil: s.AccessUntil(policy), Refunds: refunds,
+	}
+}
+
+func newPayer(a *domain.BillingAccount) Payer {
+	p := a.Payer()
+	return Payer{ID: p.ID, Email: p.Email, Name: p.Name, MissingSince: a.PayerMissingSince()}
+}
+
+func newRefundQuote(q domain.RefundQuote) RefundQuote {
+	lines := make([]RefundQuoteLine, 0, len(q.Lines))
+	for _, l := range q.Lines {
+		lines = append(lines, RefundQuoteLine{PaidAmount: l.PaidAmount.Amount, Amount: l.Amount.Amount, CoverageSeconds: l.CoverageSeconds, UnusedSeconds: l.UnusedSeconds})
+	}
+	return RefundQuote{Amount: q.Amount, Currency: q.Currency, UnusedSeconds: q.UnusedSeconds, PeriodSeconds: q.PeriodSeconds, Lines: lines}
+}
+
+func toDomainPlanTier(t PlanTier) domain.PlanTier {
+	switch t {
+	case PlanTierFree:
+		return domain.PlanTierFree
+	case PlanTierPlus:
+		return domain.PlanTierPlus
+	case PlanTierPro:
+		return domain.PlanTierPro
+	default:
+		return domain.PlanTierUnspecified
+	}
+}
+
+func toDomainInterval(i BillingInterval) domain.Interval {
+	switch i {
+	case BillingIntervalMonth:
+		return domain.IntervalMonth
+	case BillingIntervalYear:
+		return domain.IntervalYear
+	case BillingIntervalLifetime:
+		return domain.IntervalLifetime
+	default:
+		return domain.IntervalUnspecified
+	}
+}
+
+func toDomainPayer(p Payer) domain.Payer {
+	return domain.Payer{ID: p.ID, Email: p.Email, Name: p.Name}
+}
+
+// parseFeatures/parseLimits reject keys the domain does not know (errs.NewInvalid → 400).
+func parseFeatures(in map[string]bool) (map[domain.FeatureKey]bool, error) {
+	out := make(map[domain.FeatureKey]bool, len(in))
+	for s, v := range in {
+		k, err := domain.ParseFeatureKey(s)
+		if err != nil {
+			return nil, err
+		}
+		out[k] = v
+	}
+	return out, nil
+}
+
+func parseLimits(in map[string]int64) (map[domain.LimitKey]int64, error) {
+	out := make(map[domain.LimitKey]int64, len(in))
+	for s, v := range in {
+		k, err := domain.ParseLimitKey(s)
+		if err != nil {
+			return nil, err
+		}
+		out[k] = v
+	}
+	return out, nil
 }
 ```
 
@@ -4477,44 +5174,39 @@ type GetEntitlements struct {
 }
 
 type GetEntitlementsHandler struct {
-	uow   domain.UnitOfWork
+	read  BillingReadModel
 	authz AuthorizationSvc
 }
 
-func NewGetEntitlementsHandler(uow domain.UnitOfWork, authz AuthorizationSvc) *GetEntitlementsHandler {
-	return &GetEntitlementsHandler{uow: uow, authz: authz}
+func NewGetEntitlementsHandler(read BillingReadModel, authz AuthorizationSvc) *GetEntitlementsHandler {
+	return &GetEntitlementsHandler{read: read, authz: authz}
 }
 
 var ProvideGetEntitlementsHandler = NewGetEntitlementsHandler
 
-type GetEntitlementsQuery commonhandler.Query[GetEntitlements, domain.Entitlements]
+type GetEntitlementsQuery commonhandler.Query[GetEntitlements, Entitlements]
 
 var _ GetEntitlementsQuery = (*GetEntitlementsHandler)(nil)
 
-func (h *GetEntitlementsHandler) Handle(ctx context.Context, q *GetEntitlements) (domain.Entitlements, error) {
+func (h *GetEntitlementsHandler) Handle(ctx context.Context, q *GetEntitlements) (Entitlements, error) {
 	if !q.Internal {
 		if err := requirePermission(ctx, h.authz, q.UserID, q.WorkspaceID, WorkspacePermissionBillingRead); err != nil {
-			return domain.Entitlements{}, err
+			return Entitlements{}, err
 		}
 	}
-	var ent domain.Entitlements
-	err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		sub, err := r.Subscription().GetCurrentByWorkspace(ctx, q.WorkspaceID, false)
-		if err != nil {
-			return err
-		}
-		plans, err := r.Plan().ListMap(ctx)
-		if err != nil {
-			return err
-		}
-		policy, err := r.BillingPolicy().Get(ctx, false)
-		if err != nil {
-			return err
-		}
-		ent = domain.ResolveEntitlements(q.WorkspaceID, sub, plans, policy, time.Now())
-		return nil
-	})
-	return ent, err
+	sub, err := h.read.CurrentSubscription(ctx, q.WorkspaceID)
+	if err != nil {
+		return Entitlements{}, err
+	}
+	plans, err := h.read.Plans(ctx)
+	if err != nil {
+		return Entitlements{}, err
+	}
+	policy, err := h.read.Policy(ctx)
+	if err != nil {
+		return Entitlements{}, err
+	}
+	return newEntitlements(domain.ResolveEntitlements(q.WorkspaceID, sub, plans, policy, time.Now())), nil
 }
 ```
 
@@ -4535,44 +5227,41 @@ type BatchGetEntitlements struct {
 	WorkspaceIDs []uuid.UUID
 }
 
-type BatchGetEntitlementsHandler struct{ uow domain.UnitOfWork }
+type BatchGetEntitlementsHandler struct{ read BillingReadModel }
 
-func NewBatchGetEntitlementsHandler(uow domain.UnitOfWork) *BatchGetEntitlementsHandler {
-	return &BatchGetEntitlementsHandler{uow: uow}
+func NewBatchGetEntitlementsHandler(read BillingReadModel) *BatchGetEntitlementsHandler {
+	return &BatchGetEntitlementsHandler{read: read}
 }
 
 var ProvideBatchGetEntitlementsHandler = NewBatchGetEntitlementsHandler
 
-type BatchGetEntitlementsQuery commonhandler.Query[BatchGetEntitlements, map[uuid.UUID]domain.Entitlements]
+type BatchGetEntitlementsQuery commonhandler.Query[BatchGetEntitlements, map[uuid.UUID]Entitlements]
 
 var _ BatchGetEntitlementsQuery = (*BatchGetEntitlementsHandler)(nil)
 
-func (h *BatchGetEntitlementsHandler) Handle(ctx context.Context, q *BatchGetEntitlements) (map[uuid.UUID]domain.Entitlements, error) {
-	out := make(map[uuid.UUID]domain.Entitlements, len(q.WorkspaceIDs))
-	err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		subs, err := r.Subscription().ListCurrentByWorkspaces(ctx, q.WorkspaceIDs)
-		if err != nil {
-			return err
-		}
-		plans, err := r.Plan().ListMap(ctx)
-		if err != nil {
-			return err
-		}
-		policy, err := r.BillingPolicy().Get(ctx, false)
-		if err != nil {
-			return err
-		}
-		byWorkspace := make(map[uuid.UUID]*domain.Subscription, len(subs))
-		for _, s := range subs {
-			byWorkspace[s.WorkspaceID()] = s
-		}
-		now := time.Now()
-		for _, id := range q.WorkspaceIDs {
-			out[id] = domain.ResolveEntitlements(id, byWorkspace[id], plans, policy, now)
-		}
-		return nil
-	})
-	return out, err
+func (h *BatchGetEntitlementsHandler) Handle(ctx context.Context, q *BatchGetEntitlements) (map[uuid.UUID]Entitlements, error) {
+	subs, err := h.read.CurrentSubscriptions(ctx, q.WorkspaceIDs)
+	if err != nil {
+		return nil, err
+	}
+	plans, err := h.read.Plans(ctx)
+	if err != nil {
+		return nil, err
+	}
+	policy, err := h.read.Policy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	byWorkspace := make(map[uuid.UUID]*domain.Subscription, len(subs))
+	for _, s := range subs {
+		byWorkspace[s.WorkspaceID()] = s
+	}
+	now := time.Now()
+	out := make(map[uuid.UUID]Entitlements, len(q.WorkspaceIDs))
+	for _, id := range q.WorkspaceIDs {
+		out[id] = newEntitlements(domain.ResolveEntitlements(id, byWorkspace[id], plans, policy, now))
+	}
+	return out, nil
 }
 ```
 
@@ -4589,9 +5278,9 @@ import (
 
 type ListPlans struct{}
 
-type ListPlansHandler struct{ uow domain.UnitOfWork }
+type ListPlansHandler struct{ read BillingReadModel }
 
-func NewListPlansHandler(uow domain.UnitOfWork) *ListPlansHandler { return &ListPlansHandler{uow: uow} }
+func NewListPlansHandler(read BillingReadModel) *ListPlansHandler { return &ListPlansHandler{read: read} }
 
 var ProvideListPlansHandler = NewListPlansHandler
 
@@ -4600,32 +5289,29 @@ type ListPlansQuery commonhandler.Query[ListPlans, []PlanView]
 var _ ListPlansQuery = (*ListPlansHandler)(nil)
 
 func (h *ListPlansHandler) Handle(ctx context.Context, _ *ListPlans) ([]PlanView, error) {
+	plans, err := h.read.Plans(ctx)
+	if err != nil {
+		return nil, err
+	}
+	prices, err := h.read.ActivePrices(ctx)
+	if err != nil {
+		return nil, err
+	}
 	var views []PlanView
-	err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		plans, err := r.Plan().ListMap(ctx)
-		if err != nil {
-			return err
+	for _, tier := range domain.PlanTiers {
+		p, ok := plans[tier]
+		if !ok {
+			continue
 		}
-		prices, err := r.Price().ListActive(ctx)
-		if err != nil {
-			return err
-		}
-		for _, tier := range domain.PlanTiers {
-			p, ok := plans[tier]
-			if !ok {
-				continue
+		v := PlanView{Plan: newPlan(p)}
+		for _, pr := range prices {
+			if pr.Plan() == tier {
+				v.Prices = append(v.Prices, newPrice(pr))
 			}
-			v := PlanView{Plan: p}
-			for _, pr := range prices {
-				if pr.Plan() == tier {
-					v.Prices = append(v.Prices, pr)
-				}
-			}
-			views = append(views, v)
 		}
-		return nil
-	})
-	return views, err
+		views = append(views, v)
+	}
+	return views, nil
 }
 ```
 
@@ -4637,7 +5323,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/billing/domain"
 	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
@@ -4647,12 +5332,12 @@ type GetWorkspaceBilling struct {
 }
 
 type GetWorkspaceBillingHandler struct {
-	uow   domain.UnitOfWork
+	read  BillingReadModel
 	authz AuthorizationSvc
 }
 
-func NewGetWorkspaceBillingHandler(uow domain.UnitOfWork, authz AuthorizationSvc) *GetWorkspaceBillingHandler {
-	return &GetWorkspaceBillingHandler{uow: uow, authz: authz}
+func NewGetWorkspaceBillingHandler(read BillingReadModel, authz AuthorizationSvc) *GetWorkspaceBillingHandler {
+	return &GetWorkspaceBillingHandler{read: read, authz: authz}
 }
 
 var ProvideGetWorkspaceBillingHandler = NewGetWorkspaceBillingHandler
@@ -4666,24 +5351,27 @@ func (h *GetWorkspaceBillingHandler) Handle(ctx context.Context, q *GetWorkspace
 		return WorkspaceBillingView{}, err
 	}
 	var v WorkspaceBillingView
-	err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		var err error
-		if v.Account, err = r.BillingAccount().GetByWorkspace(ctx, q.WorkspaceID, false); err != nil {
-			return err
+	account, err := h.read.Account(ctx, q.WorkspaceID)
+	if err != nil {
+		return v, err
+	}
+	if account != nil {
+		payer := newPayer(account)
+		v.Payer = &payer
+	}
+	sub, err := h.read.CurrentSubscription(ctx, q.WorkspaceID)
+	if err != nil {
+		return v, err
+	}
+	if sub != nil {
+		policy, err := h.read.Policy(ctx)
+		if err != nil {
+			return v, err
 		}
-		if v.Subscription, err = r.Subscription().GetCurrentByWorkspace(ctx, q.WorkspaceID, false); err != nil {
-			return err
-		}
-		if v.Subscription != nil {
-			policy, err := r.BillingPolicy().Get(ctx, false)
-			if err != nil {
-				return err
-			}
-			v.AccessUntil = v.Subscription.AccessUntil(policy)
-		}
-		return nil
-	})
-	return v, err
+		view := newSubscription(sub, policy)
+		v.Subscription = &view
+	}
+	return v, nil
 }
 ```
 
@@ -4703,10 +5391,10 @@ type GetWorkspacePayer struct {
 	WorkspaceID uuid.UUID
 }
 
-type GetWorkspacePayerHandler struct{ uow domain.UnitOfWork }
+type GetWorkspacePayerHandler struct{ read BillingReadModel }
 
-func NewGetWorkspacePayerHandler(uow domain.UnitOfWork) *GetWorkspacePayerHandler {
-	return &GetWorkspacePayerHandler{uow: uow}
+func NewGetWorkspacePayerHandler(read BillingReadModel) *GetWorkspacePayerHandler {
+	return &GetWorkspacePayerHandler{read: read}
 }
 
 var ProvideGetWorkspacePayerHandler = NewGetWorkspacePayerHandler
@@ -4717,21 +5405,18 @@ var _ GetWorkspacePayerQuery = (*GetWorkspacePayerHandler)(nil)
 
 func (h *GetWorkspacePayerHandler) Handle(ctx context.Context, q *GetWorkspacePayer) (PayerView, error) {
 	var v PayerView
-	err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		account, err := r.BillingAccount().GetByWorkspace(ctx, q.WorkspaceID, false)
-		if err != nil || account == nil {
-			return err
-		}
-		id := account.Payer().ID
-		v.PayerID = &id
-		sub, err := r.Subscription().GetCurrentByWorkspace(ctx, q.WorkspaceID, false)
-		if err != nil {
-			return err
-		}
-		v.RequiresPayer = sub != nil && sub.Interval() != domain.IntervalLifetime && !sub.CancelAtPeriodEnd()
-		return nil
-	})
-	return v, err
+	account, err := h.read.Account(ctx, q.WorkspaceID)
+	if err != nil || account == nil {
+		return v, err
+	}
+	id := account.Payer().ID
+	v.PayerID = &id
+	sub, err := h.read.CurrentSubscription(ctx, q.WorkspaceID)
+	if err != nil {
+		return v, err
+	}
+	v.RequiresPayer = sub != nil && sub.Interval() != domain.IntervalLifetime && !sub.CancelAtPeriodEnd()
+	return v, nil
 }
 ```
 
@@ -4742,7 +5427,7 @@ Register all six in `app.go` (`Cmds.EnsureDefaults EnsureDefaultsCmd`; `Queries.
 
 - [ ] **Step 3: gRPC service**
 
-`plan`/`status`/`tier` are proto enums, mapped by explicit switches; an Unspecified domain value is an internal error (the proto rule `not_in: [0]` forbids sending it). Feature/limit map keys go out as `k.String()`. No billing request carries an enum (all take workspace ids), so there is no gRPC `mapin.go`; add one with `toDomainPlanTier(pb.PlanTier) (domain.PlanTier, error)` if a request ever gains an enum field.
+`plan`/`status`/`tier` are proto enums, mapped by explicit switches; an Unspecified domain value is an internal error (the proto rule `not_in: [0]` forbids sending it). Feature/limit map keys go out as `k.String()`. No billing request carries an enum (all take workspace ids), so there is no gRPC `mapin.go`; add one with `pgmapper.ToPlanTier(pb.PlanTier) (domain.PlanTier, error)` if a request ever gains an enum field.
 
 ```go
 // internal/billing/controller/grpc/mapout.go
@@ -4751,63 +5436,47 @@ package grpc
 import (
 	"fmt"
 
-	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
 	"github.com/notopia-uit/notopia/pkg/pb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func toPBPlanTier(t domain.PlanTier) (pb.PlanTier, error) {
+func toPBPlanTier(t app.PlanTier) (pb.PlanTier, error) {
 	switch t {
-	case domain.TierFree:
+	case app.PlanTierFree:
 		return pb.PlanTier_PLAN_TIER_FREE, nil
-	case domain.TierPlus:
+	case app.PlanTierPlus:
 		return pb.PlanTier_PLAN_TIER_PLUS, nil
-	case domain.TierPro:
+	case app.PlanTierPro:
 		return pb.PlanTier_PLAN_TIER_PRO, nil
 	default:
 		return pb.PlanTier_PLAN_TIER_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid plan tier: %v", t), nil)
 	}
 }
 
-func toPBStatus(s domain.Status) (pb.SubscriptionStatus, error) {
+func toPBStatus(s app.SubscriptionStatus) (pb.SubscriptionStatus, error) {
 	switch s {
-	case domain.StatusNone:
+	case app.SubscriptionStatusNone:
 		return pb.SubscriptionStatus_SUBSCRIPTION_STATUS_NONE, nil
-	case domain.StatusIncomplete:
+	case app.SubscriptionStatusIncomplete:
 		return pb.SubscriptionStatus_SUBSCRIPTION_STATUS_INCOMPLETE, nil
-	case domain.StatusActive:
+	case app.SubscriptionStatusActive:
 		return pb.SubscriptionStatus_SUBSCRIPTION_STATUS_ACTIVE, nil
-	case domain.StatusPastDue:
+	case app.SubscriptionStatusPastDue:
 		return pb.SubscriptionStatus_SUBSCRIPTION_STATUS_PAST_DUE, nil
-	case domain.StatusUnpaid:
+	case app.SubscriptionStatusUnpaid:
 		return pb.SubscriptionStatus_SUBSCRIPTION_STATUS_UNPAID, nil
-	case domain.StatusCanceled:
+	case app.SubscriptionStatusCanceled:
 		return pb.SubscriptionStatus_SUBSCRIPTION_STATUS_CANCELED, nil
-	case domain.StatusIncompleteExpired:
+	case app.SubscriptionStatusIncompleteExpired:
 		return pb.SubscriptionStatus_SUBSCRIPTION_STATUS_INCOMPLETE_EXPIRED, nil
 	default:
 		return pb.SubscriptionStatus_SUBSCRIPTION_STATUS_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid subscription status: %v", s), nil)
 	}
 }
 
-func toPBFeatures(m map[domain.FeatureKey]bool) map[string]bool {
-	out := make(map[string]bool, len(m))
-	for k, v := range m {
-		out[k.String()] = v
-	}
-	return out
-}
-
-func toPBLimits(m map[domain.LimitKey]int64) map[string]int64 {
-	out := make(map[string]int64, len(m))
-	for k, v := range m {
-		out[k.String()] = v
-	}
-	return out
-}
-
-func toPBEntitlements(e domain.Entitlements) (*pb.Entitlements, error) {
+func toPBEntitlements(e app.Entitlements) (*pb.Entitlements, error) {
 	plan, err := toPBPlanTier(e.Plan)
 	if err != nil {
 		return nil, err
@@ -4818,7 +5487,7 @@ func toPBEntitlements(e domain.Entitlements) (*pb.Entitlements, error) {
 	}
 	out := &pb.Entitlements{
 		WorkspaceId: e.WorkspaceID.String(), Plan: plan, Status: status,
-		Features: toPBFeatures(e.Features), Limits: toPBLimits(e.Limits),
+		Features: e.Features, Limits: e.Limits,
 	}
 	if e.AccessUntil != nil {
 		out.AccessUntil = timestamppb.New(*e.AccessUntil)
@@ -4905,11 +5574,11 @@ func (s *ServiceServer) ListPlans(ctx context.Context, _ *pb.ListPlansRequest) (
 	}
 	out := &pb.ListPlansResponse{}
 	for _, v := range views {
-		tier, err := toPBPlanTier(v.Plan.Tier())
+		tier, err := toPBPlanTier(v.Plan.Tier)
 		if err != nil {
 			return nil, err
 		}
-		out.Plans = append(out.Plans, &pb.BillingPlan{Tier: tier, Features: toPBFeatures(v.Plan.Features()), Limits: toPBLimits(v.Plan.Limits())})
+		out.Plans = append(out.Plans, &pb.BillingPlan{Tier: tier, Features: v.Plan.Features, Limits: v.Plan.Limits})
 	}
 	return out, nil
 }
@@ -4928,7 +5597,6 @@ import (
 	"time"
 
 	"github.com/notopia-uit/notopia/internal/billing/app"
-	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
 	"github.com/notopia-uit/notopia/pkg/api/billing"
 	"github.com/oapi-codegen/nullable"
@@ -4941,104 +5609,104 @@ func nullableTime(t *time.Time) nullable.Nullable[time.Time] {
 	return nullable.NewNullableWithValue(*t)
 }
 
-func toPlanTierDTO(t domain.PlanTier) (billing.PlanTier, error) {
+func toPlanTierDTO(t app.PlanTier) (billing.PlanTier, error) {
 	switch t {
-	case domain.TierFree:
+	case app.PlanTierFree:
 		return billing.PlanTierFree, nil
-	case domain.TierPlus:
+	case app.PlanTierPlus:
 		return billing.PlanTierPlus, nil
-	case domain.TierPro:
+	case app.PlanTierPro:
 		return billing.PlanTierPro, nil
 	default:
 		return "", errs.NewInternal(fmt.Sprintf("invalid plan tier: %v", t), nil)
 	}
 }
 
-func toBillingIntervalDTO(i domain.Interval) (billing.BillingInterval, error) {
+func toBillingIntervalDTO(i app.BillingInterval) (billing.BillingInterval, error) {
 	switch i {
-	case domain.IntervalMonth:
+	case app.BillingIntervalMonth:
 		return billing.BillingIntervalMonth, nil
-	case domain.IntervalYear:
+	case app.BillingIntervalYear:
 		return billing.BillingIntervalYear, nil
-	case domain.IntervalLifetime:
+	case app.BillingIntervalLifetime:
 		return billing.BillingIntervalLifetime, nil
 	default:
 		return "", errs.NewInternal(fmt.Sprintf("invalid billing interval: %v", i), nil)
 	}
 }
 
-func toSubscriptionStatusDTO(s domain.Status) (billing.SubscriptionStatus, error) {
+func toSubscriptionStatusDTO(s app.SubscriptionStatus) (billing.SubscriptionStatus, error) {
 	switch s {
-	case domain.StatusNone:
+	case app.SubscriptionStatusNone:
 		return billing.SubscriptionStatusNone, nil
-	case domain.StatusIncomplete:
+	case app.SubscriptionStatusIncomplete:
 		return billing.SubscriptionStatusIncomplete, nil
-	case domain.StatusActive:
+	case app.SubscriptionStatusActive:
 		return billing.SubscriptionStatusActive, nil
-	case domain.StatusPastDue:
+	case app.SubscriptionStatusPastDue:
 		return billing.SubscriptionStatusPastDue, nil
-	case domain.StatusUnpaid:
+	case app.SubscriptionStatusUnpaid:
 		return billing.SubscriptionStatusUnpaid, nil
-	case domain.StatusCanceled:
+	case app.SubscriptionStatusCanceled:
 		return billing.SubscriptionStatusCanceled, nil
-	case domain.StatusIncompleteExpired:
+	case app.SubscriptionStatusIncompleteExpired:
 		return billing.SubscriptionStatusIncompleteExpired, nil
 	default:
 		return "", errs.NewInternal(fmt.Sprintf("invalid subscription status: %v", s), nil)
 	}
 }
 
-func toRefundReasonDTO(r domain.RefundReason) (billing.RefundReason, error) {
+func toRefundReasonDTO(r app.RefundReason) (billing.RefundReason, error) {
 	switch r {
-	case domain.RefundReasonCancelNow:
+	case app.RefundReasonCancelNow:
 		return billing.RefundReasonCancelNow, nil
-	case domain.RefundReasonLifetimeWindow:
+	case app.RefundReasonLifetimeWindow:
 		return billing.RefundReasonLifetimeWindow, nil
-	case domain.RefundReasonReplacedByLifetime:
+	case app.RefundReasonReplacedByLifetime:
 		return billing.RefundReasonReplacedByLifetime, nil
-	case domain.RefundReasonWorkspaceDeleted:
+	case app.RefundReasonWorkspaceDeleted:
 		return billing.RefundReasonWorkspaceDeleted, nil
-	case domain.RefundReasonDuplicateCheckout:
+	case app.RefundReasonDuplicateCheckout:
 		return billing.RefundReasonDuplicateCheckout, nil
-	case domain.RefundReasonExternal:
+	case app.RefundReasonExternal:
 		return billing.RefundReasonExternal, nil
 	default:
 		return "", errs.NewInternal(fmt.Sprintf("invalid refund reason: %v", r), nil)
 	}
 }
 
-func toRefundStatusDTO(s domain.RefundStatus) (billing.RefundStatus, error) {
+func toRefundStatusDTO(s app.RefundStatus) (billing.RefundStatus, error) {
 	switch s {
-	case domain.RefundStatusPending:
+	case app.RefundStatusPending:
 		return billing.RefundStatusPending, nil
-	case domain.RefundStatusSucceeded:
+	case app.RefundStatusSucceeded:
 		return billing.RefundStatusSucceeded, nil
-	case domain.RefundStatusFailed:
+	case app.RefundStatusFailed:
 		return billing.RefundStatusFailed, nil
-	case domain.RefundStatusCanceled:
+	case app.RefundStatusCanceled:
 		return billing.RefundStatusCanceled, nil
 	default:
 		return "", errs.NewInternal(fmt.Sprintf("invalid refund status: %v", s), nil)
 	}
 }
 
-func toFeatures(m map[domain.FeatureKey]bool) billing.Features {
+func toFeatures(m map[string]bool) billing.Features {
 	out := billing.Features{}
 	for k, v := range m {
-		out[k.String()] = v
+		out[k] = v
 	}
 	return out
 }
 
-func toLimits(m map[domain.LimitKey]int64) billing.Limits {
+func toLimits(m map[string]int64) billing.Limits {
 	out := billing.Limits{}
 	for k, v := range m {
-		out[k.String()] = v
+		out[k] = v
 	}
 	return out
 }
 
-func toEntitlements(e domain.Entitlements) (billing.Entitlements, error) {
+func toEntitlements(e app.Entitlements) (billing.Entitlements, error) {
 	plan, err := toPlanTierDTO(e.Plan)
 	if err != nil {
 		return billing.Entitlements{}, err
@@ -5053,23 +5721,23 @@ func toEntitlements(e domain.Entitlements) (billing.Entitlements, error) {
 	}, nil
 }
 
-func toPrice(p *domain.Price) (billing.Price, error) {
-	plan, err := toPlanTierDTO(p.Plan())
+func toPrice(p app.Price) (billing.Price, error) {
+	plan, err := toPlanTierDTO(p.Plan)
 	if err != nil {
 		return billing.Price{}, err
 	}
-	interval, err := toBillingIntervalDTO(p.Interval())
+	interval, err := toBillingIntervalDTO(p.Interval)
 	if err != nil {
 		return billing.Price{}, err
 	}
 	return billing.Price{
-		Id: p.ID(), Plan: plan, Interval: interval,
-		Amount: p.Amount().Amount, Currency: p.Amount().Currency, LookupKey: p.LookupKey(), Active: p.Active(),
-		CreatedAt: p.CreatedAt(), ArchivedAt: nullableTime(p.ArchivedAt()),
+		Id: p.ID, Plan: plan, Interval: interval,
+		Amount: p.Amount, Currency: p.Currency, LookupKey: p.LookupKey, Active: p.Active,
+		CreatedAt: p.CreatedAt, ArchivedAt: nullableTime(p.ArchivedAt),
 	}, nil
 }
 
-func toPrices(ps []*domain.Price) ([]billing.Price, error) {
+func toPrices(ps []app.Price) ([]billing.Price, error) {
 	out := make([]billing.Price, 0, len(ps))
 	for _, p := range ps {
 		dto, err := toPrice(p)
@@ -5082,7 +5750,7 @@ func toPrices(ps []*domain.Price) ([]billing.Price, error) {
 }
 
 func toPlan(v app.PlanView) (billing.Plan, error) {
-	tier, err := toPlanTierDTO(v.Plan.Tier())
+	tier, err := toPlanTierDTO(v.Plan.Tier)
 	if err != nil {
 		return billing.Plan{}, err
 	}
@@ -5090,7 +5758,7 @@ func toPlan(v app.PlanView) (billing.Plan, error) {
 	if err != nil {
 		return billing.Plan{}, err
 	}
-	return billing.Plan{Tier: tier, Features: toFeatures(v.Plan.Features()), Limits: toLimits(v.Plan.Limits()), Prices: prices}, nil
+	return billing.Plan{Tier: tier, Features: toFeatures(v.Plan.Features), Limits: toLimits(v.Plan.Limits), Prices: prices}, nil
 }
 
 func toPlans(views []app.PlanView) ([]billing.Plan, error) {
@@ -5105,36 +5773,36 @@ func toPlans(views []app.PlanView) ([]billing.Plan, error) {
 	return out, nil
 }
 
-func toRefund(r *domain.Refund) (billing.Refund, error) {
-	reason, err := toRefundReasonDTO(r.Reason())
+func toRefund(r app.Refund) (billing.Refund, error) {
+	reason, err := toRefundReasonDTO(r.Reason)
 	if err != nil {
 		return billing.Refund{}, err
 	}
-	status, err := toRefundStatusDTO(r.Status())
+	status, err := toRefundStatusDTO(r.Status)
 	if err != nil {
 		return billing.Refund{}, err
 	}
 	return billing.Refund{
-		Id: r.ID(), Amount: r.Amount().Amount, Currency: r.Amount().Currency,
-		Reason: reason, Status: status, CreatedAt: r.CreatedAt(),
+		Id: r.ID, Amount: r.Amount, Currency: r.Currency,
+		Reason: reason, Status: status, CreatedAt: r.CreatedAt,
 	}, nil
 }
 
-func toSubscription(s *domain.Subscription, accessUntil *time.Time) (billing.Subscription, error) {
-	plan, err := toPlanTierDTO(s.Plan())
+func toSubscription(s app.Subscription) (billing.Subscription, error) {
+	plan, err := toPlanTierDTO(s.Plan)
 	if err != nil {
 		return billing.Subscription{}, err
 	}
-	interval, err := toBillingIntervalDTO(s.Interval())
+	interval, err := toBillingIntervalDTO(s.Interval)
 	if err != nil {
 		return billing.Subscription{}, err
 	}
-	status, err := toSubscriptionStatusDTO(s.Status())
+	status, err := toSubscriptionStatusDTO(s.Status)
 	if err != nil {
 		return billing.Subscription{}, err
 	}
-	refunds := make([]billing.Refund, 0, len(s.Refunds()))
-	for _, r := range s.Refunds() {
+	refunds := make([]billing.Refund, 0, len(s.Refunds))
+	for _, r := range s.Refunds {
 		dto, err := toRefund(r)
 		if err != nil {
 			return billing.Subscription{}, err
@@ -5142,21 +5810,21 @@ func toSubscription(s *domain.Subscription, accessUntil *time.Time) (billing.Sub
 		refunds = append(refunds, dto)
 	}
 	return billing.Subscription{
-		Id: s.ID(), Plan: plan, Interval: interval, Status: status,
-		CurrentPeriodStart: nullableTime(s.CurrentPeriodStart()), CurrentPeriodEnd: nullableTime(s.CurrentPeriodEnd()),
-		CancelAtPeriodEnd: s.CancelAtPeriodEnd(), CanceledAt: nullableTime(s.CanceledAt()),
-		AccessUntil: nullableTime(accessUntil), Refunds: refunds,
+		Id: s.ID, Plan: plan, Interval: interval, Status: status,
+		CurrentPeriodStart: nullableTime(s.CurrentPeriodStart), CurrentPeriodEnd: nullableTime(s.CurrentPeriodEnd),
+		CancelAtPeriodEnd: s.CancelAtPeriodEnd, CanceledAt: nullableTime(s.CanceledAt),
+		AccessUntil: nullableTime(s.AccessUntil), Refunds: refunds,
 	}, nil
 }
 
 func toWorkspaceBilling(v app.WorkspaceBillingView) (billing.WorkspaceBilling, error) {
 	out := billing.WorkspaceBilling{}
-	if v.Account != nil {
-		p := v.Account.Payer()
-		out.Payer = nullable.NewNullableWithValue(billing.Payer{Id: p.ID, Email: p.Email, Name: p.Name, MissingSince: nullableTime(v.Account.PayerMissingSince())})
+	if v.Payer != nil {
+		p := v.Payer
+		out.Payer = nullable.NewNullableWithValue(billing.Payer{Id: p.ID, Email: p.Email, Name: p.Name, MissingSince: nullableTime(p.MissingSince)})
 	}
 	if v.Subscription != nil {
-		sub, err := toSubscription(v.Subscription, v.AccessUntil)
+		sub, err := toSubscription(*v.Subscription)
 		if err != nil {
 			return billing.WorkspaceBilling{}, err
 		}
@@ -5263,13 +5931,14 @@ git commit -m "feat(billing): default catalog, entitlement queries, gRPC and rea
 **Files:**
 
 - Create: `internal/billing/app/svc_paymentprovider.go`
-- Create: `internal/billing/infra/payment/stripe/{provider.go,checkout.go,subscription.go,refund.go,catalog.go,webhook.go,map.go}`
+- Create: `internal/billing/infra/payment/stripe/{provider.go,checkout.go,subscription.go,refund.go,catalog.go,map.go}`
 - Create: `internal/billing/infra/payment/stripe/map_test.go`, `internal/billing/infra/payment/stripe/testdata/subscription.json`
 - Modify: `internal/billing/infra/wire.go`, `go.mod`, `go.sum`
 
 **Interfaces:**
 
-- Produces: `app.PaymentProvider` (below) implemented by `*stripe.Provider` (`stripeadapter` import alias recommended to avoid clashing with `github.com/stripe/stripe-go/v87`); `uint8` enums `app.CheckoutPurpose` (zero `CheckoutPurposeUnspecified`) and `app.WebhookEventType` (zero `WebhookIgnored`).
+- Produces: `app.PaymentProvider` (below) implemented by `*stripe.Provider` (`stripeadapter` import alias recommended to avoid clashing with `github.com/stripe/stripe-go/v87`); `uint8` enum `app.CheckoutPurpose` (zero `CheckoutPurposeUnspecified`; values keep the full type name as prefix: `CheckoutPurposeSubscribe`, `CheckoutPurposeLifetime`, `CheckoutPurposePayerChange`). Webhook verification and parsing are **not** part of the port: they live in the inbound adapter `controller/http` (Task 8).
+- Tracing: no hand-written spans. The Stripe client gets an `otelhttp` transport (same as `internal/note/infra/identity/authentik.go`); stripe-go passes `ctx` to every request, so HTTP spans nest under the use case span from `commonhandler`. Methods drop the named results that existed only for a deferred span.
 - Mappers (`infra/payment/stripe/map.go`): `toDomainStatus` (Stripe subscription status → `domain.Status`), `toDomainRefundStatus`, `toStripeTier` (`domain.PlanTier` → `"plus"`/`"pro"`, used for product id, name, metadata, idempotency key), `toStripeRecurringInterval` (`domain.Interval` → `month`/`year`; lifetime = not recurring), `toStripePurpose` / `toAppCheckoutPurpose` (checkout `purpose` metadata).
 
 - [ ] **Step 1: Port**
@@ -5289,14 +5958,14 @@ type CheckoutPurpose uint8
 
 const (
 	CheckoutPurposeUnspecified CheckoutPurpose = iota
-	PurposeSubscribe
-	PurposeLifetime
-	PurposePayerChange
+	CheckoutPurposeSubscribe
+	CheckoutPurposeLifetime
+	CheckoutPurposePayerChange
 )
 
 func (p CheckoutPurpose) IsValid() bool {
 	switch p {
-	case PurposeSubscribe, PurposeLifetime, PurposePayerChange:
+	case CheckoutPurposeSubscribe, CheckoutPurposeLifetime, CheckoutPurposePayerChange:
 		return true
 	default:
 		return false
@@ -5307,11 +5976,11 @@ func (p CheckoutPurpose) String() string {
 	switch p {
 	case CheckoutPurposeUnspecified:
 		return "unspecified"
-	case PurposeSubscribe:
+	case CheckoutPurposeSubscribe:
 		return "subscribe"
-	case PurposeLifetime:
+	case CheckoutPurposeLifetime:
 		return "lifetime"
-	case PurposePayerChange:
+	case CheckoutPurposePayerChange:
 		return "payer_change"
 	default:
 		return "unknown"
@@ -5358,46 +6027,6 @@ type PriceInput struct {
 	Amount   domain.Money
 }
 
-type WebhookEventType uint8
-
-const (
-	WebhookIgnored WebhookEventType = iota
-	WebhookCheckoutCompleted
-	WebhookSubscriptionChanged
-	WebhookRefundChanged
-)
-
-func (t WebhookEventType) IsValid() bool {
-	switch t {
-	case WebhookIgnored, WebhookCheckoutCompleted, WebhookSubscriptionChanged, WebhookRefundChanged:
-		return true
-	default:
-		return false
-	}
-}
-
-func (t WebhookEventType) String() string {
-	switch t {
-	case WebhookIgnored:
-		return "ignored"
-	case WebhookCheckoutCompleted:
-		return "checkout_completed"
-	case WebhookSubscriptionChanged:
-		return "subscription_changed"
-	case WebhookRefundChanged:
-		return "refund_changed"
-	default:
-		return "unknown"
-	}
-}
-
-type WebhookEvent struct {
-	ID       string
-	RawType  string
-	Type     WebhookEventType
-	ObjectID string
-}
-
 type PaymentProvider interface {
 	CreateCustomer(ctx context.Context, workspaceID uuid.UUID, payer domain.Payer) (string, error)
 	UpdateCustomerContact(ctx context.Context, customerID string, payer domain.Payer) error
@@ -5417,7 +6046,6 @@ type PaymentProvider interface {
 	CreatePrice(ctx context.Context, in PriceInput) (providerPriceID string, err error)
 	ArchivePrice(ctx context.Context, providerPriceID string) error
 	CreatePortalConfiguration(ctx context.Context, activePrices []*domain.Price, returnURL string) (string, error)
-	ParseWebhook(payload []byte, signature string) (WebhookEvent, error)
 }
 ```
 
@@ -5465,12 +6093,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	stripego "github.com/stripe/stripe-go/v87"
-	"github.com/stripe/stripe-go/v87/webhook"
 )
 
 func TestSnapshotFromSubscription(t *testing.T) {
@@ -5485,21 +6111,6 @@ func TestSnapshotFromSubscription(t *testing.T) {
 	assert.True(t, snap.CurrentPeriodEnd.Equal(time.Unix(1761955200, 0)))
 	assert.Equal(t, "00000000-0000-4000-8000-000000000110", snap.WorkspaceID.String())
 }
-
-func TestParseWebhookInvoicePaid(t *testing.T) {
-	payload := []byte(`{"id":"evt_1","object":"event","api_version":"2020-08-27","type":"invoice.paid","data":{"object":{"id":"in_1","object":"invoice","parent":{"subscription_details":{"subscription":"sub_123"}}}}}`)
-	signed := webhook.GenerateTestSignedPayload(&webhook.UnsignedPayload{Payload: payload, Secret: "whsec_test"})
-	p := &Provider{webhookSecret: "whsec_test"}
-
-	ev, err := p.ParseWebhook(signed.Payload, signed.Header)
-	require.NoError(t, err)
-	assert.Equal(t, app.WebhookSubscriptionChanged, ev.Type)
-	assert.Equal(t, "sub_123", ev.ObjectID)
-	assert.Equal(t, "evt_1", ev.ID)
-
-	_, err = p.ParseWebhook(signed.Payload, "t=1,v1=bad")
-	assert.Error(t, err, "bad signature")
-}
 ```
 
 Run: `go test ./internal/billing/infra/payment/stripe/...` → FAIL (package empty).
@@ -5511,41 +6122,46 @@ Run: `go test ./internal/billing/infra/payment/stripe/...` → FAIL (package emp
 package stripe
 
 import (
-	"context"
 	"errors"
+	"net/http"
 
 	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/config"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
 	stripego "github.com/stripe/stripe-go/v87"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	semconv "go.opentelemetry.io/otel/semconv/v1.39.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Provider struct {
-	sc            *stripego.Client
-	webhookSecret string
-	currency      string
+	sc       *stripego.Client
+	currency string
 }
 
 var _ app.PaymentProvider = (*Provider)(nil)
 
+// Spans come from the HTTP transport (same as internal/note/infra/identity/authentik.go);
+// stripe-go forwards ctx to every request, so they nest under the use case span.
 func New(stripeCfg *config.Stripe, billingCfg *config.Billing) *Provider {
-	return &Provider{sc: stripego.NewClient(stripeCfg.SecretKey), webhookSecret: stripeCfg.WebhookSecret, currency: billingCfg.Currency}
+	httpClient := &http.Client{
+		Transport: otelhttp.NewTransport(
+			http.DefaultTransport,
+			otelhttp.WithSpanOptions(trace.WithAttributes(
+				semconv.ServicePeerName("stripe"),
+			)),
+		),
+	}
+	return &Provider{
+		sc: stripego.NewClient(
+			stripeCfg.SecretKey,
+			stripego.WithBackends(stripego.NewBackends(httpClient)),
+		),
+		currency: billingCfg.Currency,
+	}
 }
 
 var Provide = New
-
-func trace(ctx context.Context, op string) (context.Context, func(*error)) {
-	ctx, span := otel.Tracer("billing-stripe").Start(ctx, "Stripe."+op)
-	return ctx, func(errp *error) {
-		if errp != nil && *errp != nil {
-			span.RecordError(*errp)
-			span.SetStatus(codes.Error, (*errp).Error())
-		}
-		span.End()
-	}
-}
 
 func providerErr(op string, err error) error {
 	if err == nil {
@@ -5579,9 +6195,9 @@ import (
 
 func toStripeTier(t domain.PlanTier) (string, error) {
 	switch t {
-	case domain.TierPlus:
+	case domain.PlanTierPlus:
 		return "plus", nil
-	case domain.TierPro:
+	case domain.PlanTierPro:
 		return "pro", nil
 	default:
 		return "", errs.NewInvalid(fmt.Sprintf("plan %v cannot be sold", t))
@@ -5603,11 +6219,11 @@ func toStripeRecurringInterval(i domain.Interval) (string, bool, error) {
 
 func toStripePurpose(p app.CheckoutPurpose) (string, error) {
 	switch p {
-	case app.PurposeSubscribe:
+	case app.CheckoutPurposeSubscribe:
 		return "subscribe", nil
-	case app.PurposeLifetime:
+	case app.CheckoutPurposeLifetime:
 		return "lifetime", nil
-	case app.PurposePayerChange:
+	case app.CheckoutPurposePayerChange:
 		return "payer_change", nil
 	default:
 		return "", errs.NewInternal(fmt.Sprintf("invalid checkout purpose %v", p), nil)
@@ -5618,11 +6234,11 @@ func toStripePurpose(p app.CheckoutPurpose) (string, error) {
 func toAppCheckoutPurpose(s string) app.CheckoutPurpose {
 	switch s {
 	case "subscribe":
-		return app.PurposeSubscribe
+		return app.CheckoutPurposeSubscribe
 	case "lifetime":
-		return app.PurposeLifetime
+		return app.CheckoutPurposeLifetime
 	case "payer_change":
-		return app.PurposePayerChange
+		return app.CheckoutPurposePayerChange
 	default:
 		return app.CheckoutPurposeUnspecified
 	}
@@ -5699,8 +6315,6 @@ import (
 )
 
 func (p *Provider) CreateCustomer(ctx context.Context, workspaceID uuid.UUID, payer domain.Payer) (id string, err error) {
-	ctx, end := trace(ctx, "CreateCustomer")
-	defer end(&err)
 	params := &stripego.CustomerCreateParams{
 		Email: stripego.String(payer.Email), Name: stripego.String(payer.Name),
 		Metadata: map[string]string{"workspace_id": workspaceID.String(), "payer_id": payer.ID},
@@ -5714,8 +6328,6 @@ func (p *Provider) CreateCustomer(ctx context.Context, workspaceID uuid.UUID, pa
 }
 
 func (p *Provider) UpdateCustomerContact(ctx context.Context, customerID string, payer domain.Payer) (err error) {
-	ctx, end := trace(ctx, "UpdateCustomerContact")
-	defer end(&err)
 	_, err = p.sc.V1Customers.Update(ctx, customerID, &stripego.CustomerUpdateParams{
 		Email: stripego.String(payer.Email), Name: stripego.String(payer.Name),
 		Metadata: map[string]string{"payer_id": payer.ID},
@@ -5724,8 +6336,6 @@ func (p *Provider) UpdateCustomerContact(ctx context.Context, customerID string,
 }
 
 func (p *Provider) CreateCheckoutSession(ctx context.Context, in app.CheckoutInput) (url string, err error) {
-	ctx, end := trace(ctx, "CreateCheckoutSession")
-	defer end(&err)
 	purpose, err := toStripePurpose(in.Purpose)
 	if err != nil {
 		return "", err
@@ -5743,15 +6353,15 @@ func (p *Provider) CreateCheckoutSession(ctx context.Context, in app.CheckoutInp
 	}
 	lineItems := []*stripego.CheckoutSessionCreateLineItemParams{{Price: stripego.String(in.ProviderPriceID), Quantity: stripego.Int64(1)}}
 	switch in.Purpose {
-	case app.PurposeSubscribe:
+	case app.CheckoutPurposeSubscribe:
 		params.Mode = stripego.String("subscription")
 		params.LineItems = lineItems
 		params.SubscriptionData = &stripego.CheckoutSessionCreateSubscriptionDataParams{Metadata: meta}
-	case app.PurposeLifetime:
+	case app.CheckoutPurposeLifetime:
 		params.Mode = stripego.String("payment")
 		params.LineItems = lineItems
 		params.PaymentIntentData = &stripego.CheckoutSessionCreatePaymentIntentDataParams{Metadata: meta}
-	case app.PurposePayerChange:
+	case app.CheckoutPurposePayerChange:
 		params.Mode = stripego.String("setup")
 		params.Currency = stripego.String(p.currency)
 		params.SetupIntentData = &stripego.CheckoutSessionCreateSetupIntentDataParams{Metadata: meta}
@@ -5764,8 +6374,6 @@ func (p *Provider) CreateCheckoutSession(ctx context.Context, in app.CheckoutInp
 }
 
 func (p *Provider) GetCheckoutSession(ctx context.Context, id string) (res app.CheckoutSessionResult, err error) {
-	ctx, end := trace(ctx, "GetCheckoutSession")
-	defer end(&err)
 	params := &stripego.CheckoutSessionRetrieveParams{}
 	params.AddExpand("setup_intent")
 	params.AddExpand("payment_intent")
@@ -5799,8 +6407,6 @@ func (p *Provider) GetCheckoutSession(ctx context.Context, id string) (res app.C
 }
 
 func (p *Provider) CreatePortalSession(ctx context.Context, customerID, configurationID, returnURL string) (url string, err error) {
-	ctx, end := trace(ctx, "CreatePortalSession")
-	defer end(&err)
 	s, err := p.sc.V1BillingPortalSessions.Create(ctx, &stripego.BillingPortalSessionCreateParams{
 		Customer: stripego.String(customerID), Configuration: stripego.String(configurationID), ReturnURL: stripego.String(returnURL),
 	})
@@ -5811,8 +6417,6 @@ func (p *Provider) CreatePortalSession(ctx context.Context, customerID, configur
 }
 
 func (p *Provider) SetDefaultPaymentMethod(ctx context.Context, customerID, paymentMethodID string, providerSubscriptionID *string) (err error) {
-	ctx, end := trace(ctx, "SetDefaultPaymentMethod")
-	defer end(&err)
 	if _, err = p.sc.V1Customers.Update(ctx, customerID, &stripego.CustomerUpdateParams{
 		InvoiceSettings: &stripego.CustomerUpdateInvoiceSettingsParams{DefaultPaymentMethod: stripego.String(paymentMethodID)},
 	}); err != nil {
@@ -5825,8 +6429,6 @@ func (p *Provider) SetDefaultPaymentMethod(ctx context.Context, customerID, paym
 }
 
 func (p *Provider) DetachPaymentMethods(ctx context.Context, customerID, keep string) (err error) {
-	ctx, end := trace(ctx, "DetachPaymentMethods")
-	defer end(&err)
 	list := p.sc.V1Customers.ListPaymentMethods(ctx, &stripego.CustomerListPaymentMethodsParams{Customer: stripego.String(customerID)})
 	for pm, lerr := range list.All(ctx) {
 		if lerr != nil {
@@ -5857,8 +6459,6 @@ import (
 )
 
 func (p *Provider) GetSubscriptionSnapshot(ctx context.Context, id string) (snap domain.ProviderSnapshot, err error) {
-	ctx, end := trace(ctx, "GetSubscriptionSnapshot")
-	defer end(&err)
 	s, err := p.sc.V1Subscriptions.Retrieve(ctx, id, nil)
 	if err != nil {
 		return snap, providerErr("retrieve subscription", err)
@@ -5867,15 +6467,11 @@ func (p *Provider) GetSubscriptionSnapshot(ctx context.Context, id string) (snap
 }
 
 func (p *Provider) SetCancelAtPeriodEnd(ctx context.Context, id string, cancel bool) (err error) {
-	ctx, end := trace(ctx, "SetCancelAtPeriodEnd")
-	defer end(&err)
 	_, err = p.sc.V1Subscriptions.Update(ctx, id, &stripego.SubscriptionUpdateParams{CancelAtPeriodEnd: stripego.Bool(cancel)})
 	return providerErr("update subscription cancel_at_period_end", err)
 }
 
 func (p *Provider) CancelSubscriptionNow(ctx context.Context, id string) (err error) {
-	ctx, end := trace(ctx, "CancelSubscriptionNow")
-	defer end(&err)
 	_, err = p.sc.V1Subscriptions.Cancel(ctx, id, &stripego.SubscriptionCancelParams{Prorate: stripego.Bool(false), InvoiceNow: stripego.Bool(false)})
 	if isStripeCode(err, stripego.ErrorCodeResourceMissing) {
 		return nil
@@ -5886,8 +6482,6 @@ func (p *Provider) CancelSubscriptionNow(ctx context.Context, id string) (err er
 // PeriodPayments: a period can hold the renewal invoice plus proration invoices from upgrades
 // (always_invoice). Coverage = the invoice's line periods clipped to the current period.
 func (p *Provider) PeriodPayments(ctx context.Context, id string, periodStart, periodEnd time.Time) (out []domain.PaymentInfo, err error) {
-	ctx, end := trace(ctx, "PeriodPayments")
-	defer end(&err)
 	params := &stripego.InvoiceListParams{Subscription: stripego.String(id), Status: stripego.String("paid")}
 	params.CreatedRange = &stripego.RangeQueryParams{GreaterThanOrEqual: periodStart.Add(-24 * time.Hour).Unix()}
 	for inv, lerr := range p.sc.V1Invoices.List(ctx, params).All(ctx) {
@@ -5935,8 +6529,6 @@ func (p *Provider) PeriodPayments(ctx context.Context, id string, periodStart, p
 }
 
 func (p *Provider) PaymentForIntent(ctx context.Context, paymentIntentID string) (info domain.PaymentInfo, err error) {
-	ctx, end := trace(ctx, "PaymentForIntent")
-	defer end(&err)
 	pi, err := p.sc.V1PaymentIntents.Retrieve(ctx, paymentIntentID, nil)
 	if err != nil {
 		return info, providerErr("retrieve payment intent", err)
@@ -5976,8 +6568,6 @@ func toRefundResult(r *stripego.Refund) app.RefundResult {
 }
 
 func (p *Provider) CreateRefund(ctx context.Context, refundID uuid.UUID, paymentRef string, amount domain.Money) (res app.RefundResult, err error) {
-	ctx, end := trace(ctx, "CreateRefund")
-	defer end(&err)
 	params := &stripego.RefundCreateParams{
 		PaymentIntent: stripego.String(paymentRef), Amount: stripego.Int64(amount.Amount),
 		Metadata: map[string]string{"refund_id": refundID.String()},
@@ -5991,8 +6581,6 @@ func (p *Provider) CreateRefund(ctx context.Context, refundID uuid.UUID, payment
 }
 
 func (p *Provider) GetRefund(ctx context.Context, id string) (res app.RefundResult, err error) {
-	ctx, end := trace(ctx, "GetRefund")
-	defer end(&err)
 	r, err := p.sc.V1Refunds.Retrieve(ctx, id, nil)
 	if err != nil {
 		return res, providerErr("retrieve refund", err)
@@ -6008,8 +6596,8 @@ package stripe
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/app"
-	"github.com/notopia-uit/notopia/internal/billing/domain"
 	stripego "github.com/stripe/stripe-go/v87"
 )
 
@@ -6027,8 +6615,6 @@ func (p *Provider) ensureProduct(ctx context.Context, tier string) error {
 }
 
 func (p *Provider) CreatePrice(ctx context.Context, in app.PriceInput) (id string, err error) {
-	ctx, end := trace(ctx, "CreatePrice")
-	defer end(&err)
 	tier, err := toStripeTier(in.Plan)
 	if err != nil {
 		return "", err
@@ -6057,15 +6643,11 @@ func (p *Provider) CreatePrice(ctx context.Context, in app.PriceInput) (id strin
 }
 
 func (p *Provider) ArchivePrice(ctx context.Context, providerPriceID string) (err error) {
-	ctx, end := trace(ctx, "ArchivePrice")
-	defer end(&err)
 	_, err = p.sc.V1Prices.Update(ctx, providerPriceID, &stripego.PriceUpdateParams{Active: stripego.Bool(false)})
 	return providerErr("archive price", err)
 }
 
 func (p *Provider) CreatePortalConfiguration(ctx context.Context, activePrices []*domain.Price, returnURL string) (id string, err error) {
-	ctx, end := trace(ctx, "CreatePortalConfiguration")
-	defer end(&err)
 	byProduct := map[string][]*string{}
 	for _, pr := range activePrices {
 		if pr.Interval() == domain.IntervalLifetime {
@@ -6109,67 +6691,6 @@ func (p *Provider) CreatePortalConfiguration(ctx context.Context, activePrices [
 }
 ```
 
-```go
-// internal/billing/infra/payment/stripe/webhook.go
-package stripe
-
-import (
-	"encoding/json"
-
-	"github.com/notopia-uit/notopia/internal/billing/app"
-	"github.com/notopia-uit/notopia/internal/billing/errs"
-	"github.com/stripe/stripe-go/v87/webhook"
-)
-
-type rawObject struct {
-	ID     string `json:"id"`
-	Parent *struct {
-		SubscriptionDetails *struct {
-			Subscription json.RawMessage `json:"subscription"`
-		} `json:"subscription_details"`
-	} `json:"parent"`
-}
-
-func idOf(raw json.RawMessage) string {
-	var s string
-	if json.Unmarshal(raw, &s) == nil {
-		return s
-	}
-	var obj struct {
-		ID string `json:"id"`
-	}
-	_ = json.Unmarshal(raw, &obj)
-	return obj.ID
-}
-
-func (p *Provider) ParseWebhook(payload []byte, signature string) (app.WebhookEvent, error) {
-	ev, err := webhook.ConstructEventWithOptions(payload, signature, p.webhookSecret, webhook.ConstructEventOptions{IgnoreAPIVersionMismatch: true})
-	if err != nil {
-		return app.WebhookEvent{}, errs.New(errs.CodeWebhookSignature, "invalid webhook signature", err)
-	}
-	var obj rawObject
-	if err := json.Unmarshal(ev.Data.Raw, &obj); err != nil {
-		return app.WebhookEvent{}, errs.NewInvalid("invalid webhook object")
-	}
-	out := app.WebhookEvent{ID: ev.ID, RawType: string(ev.Type), Type: app.WebhookIgnored, ObjectID: obj.ID}
-	switch string(ev.Type) {
-	case "checkout.session.completed":
-		out.Type = app.WebhookCheckoutCompleted
-	case "customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted":
-		out.Type = app.WebhookSubscriptionChanged
-	case "invoice.paid", "invoice.payment_failed":
-		if obj.Parent != nil && obj.Parent.SubscriptionDetails != nil {
-			if sub := idOf(obj.Parent.SubscriptionDetails.Subscription); sub != "" {
-				out.Type, out.ObjectID = app.WebhookSubscriptionChanged, sub
-			}
-		}
-	case "refund.created", "refund.updated", "refund.failed":
-		out.Type = app.WebhookRefundChanged
-	}
-	return out, nil
-}
-```
-
 `infra/wire.go`: add `stripeadapter.Provide` and `wire.Bind(new(app.PaymentProvider), new(*stripeadapter.Provider))` (import `stripeadapter "github.com/notopia-uit/notopia/internal/billing/infra/payment/stripe"`).
 
 - [ ] **Step 5: Run tests, build, commit**
@@ -6187,16 +6708,17 @@ git commit -m "feat(billing): stripe payment provider adapter"
 
 **Files:**
 
-- Create: `internal/billing/app/{settings.go,catalog.go,cmd_createprice.go,cmd_archiveprice.go,cmd_updateplan.go,cmd_updatepolicy.go,cmd_seedcatalog.go,q_listprices.go,q_getpolicy.go}`
-- Create: `internal/billing/config/appsettings.go`
+- Create: `internal/billing/app/{settings.go,catalog.go,cmd_createprice.go,cmd_archiveprice.go,cmd_updateplan.go,cmd_updatepolicy.go,cmd_ensureportalconfiguration.go,q_listprices.go,q_getprice.go,q_getplan.go,q_getpolicy.go}`
+- Create: `internal/billing/settings.go` (maps config to `app.Settings`; composition root, so `config` never imports `app`)
 - Create: `internal/billing/controller/http/{admin.go,mapin.go}`; modify `unimplemented.go`
-- Create: `cmd/billingseed/{main.go,wire.go,project.json,.env}` (+ generated `wire_gen.go`)
+- Create: `internal/billingseed/{config/{config.go,wire.go},seed.go,wire.go}`, `internal/billingfixtures/{config/{config.go,wire.go},fixtures.go,wire.go}`
+- Create: `cmd/billingseed/{main.go,wire.go,project.json,.env,.gitignore}`, `cmd/billingfixtures/{main.go,wire.go,project.json,.env,.gitignore}` (+ generated `wire_gen.go`)
 - Modify: `justfile`
 
 **Interfaces:**
 
-- Produces: `app.Settings{Currency, WebBaseURL, ServiceAccountUserID string}`; `Cmds.CreatePrice`, `Cmds.ArchivePrice`, `Cmds.UpdatePlan`, `Cmds.UpdatePolicy`, `Cmds.SeedCatalog`; `Queries.ListPrices`, `Queries.GetPolicy`. Commands return results through a `Result` field on the command struct (the `Cmd` interface returns only `error`).
-- Mappers (`controller/http/mapin.go`): `toPlanTier` (`billing.PlanTier` path param), `toCreatePricePlan` (`billing.CreatePriceRequestPlan`), `toInterval` (`billing.BillingInterval`), `toFeatureKeys`/`toLimitKeys` (request maps via `domain.ParseFeatureKey`/`ParseLimitKey`). Unknown values return `errs.NewInvalid` → 400.
+- Produces: `app.Settings{WebBaseURL, ServiceAccountUserID string}`; `Cmds.CreatePrice`, `Cmds.ArchivePrice`, `Cmds.UpdatePlan`, `Cmds.UpdatePolicy`, `Cmds.EnsurePortalConfiguration` (`EnsurePortalConfiguration{UserID string}`: creates the Stripe portal configuration only when `billing_policy` has none); `Queries.ListPrices`, `Queries.GetPrice`, `Queries.GetPlan`, `Queries.GetPolicy`. Commands return only `error` and never carry results: the controller generates ids up front (`CreatePrice.ID`) and, after a command, answers with a query (`GetPrice`, `GetPlan`, `GetPolicy`, `GetWorkspaceBilling`). Command inputs use app types (`app.PlanTier`, `app.BillingInterval`, string-keyed feature/limit maps); handlers map them to domain values in `app/mapper.go`.
+- Mappers (`controller/http/mapin.go`): `toPlanTier` (`billing.PlanTier` path param → `app.PlanTier`), `toCreatePricePlan` (`billing.CreatePriceRequestPlan`), `toInterval` (`billing.BillingInterval` → `app.BillingInterval`), `fromFeatures`/`fromLimits` (request maps, passed through as string-keyed maps). Unknown enum values return `errs.NewInvalid` → 400; unknown feature/limit keys are rejected by the handler (`parseFeatures`/`parseLimits`).
 
 - [ ] **Step 1: Settings**
 
@@ -6205,29 +6727,34 @@ git commit -m "feat(billing): stripe payment provider adapter"
 package app
 
 type Settings struct {
-	Currency             string
 	WebBaseURL           string
 	ServiceAccountUserID string
 }
 ```
 
+`app` declares what it needs and never imports `config`. The composition root (`internal/billing`) does the mapping, so `config` stays a leaf package like `internal/note/config`. Viper and the env vars do not change.
+
 ```go
-// internal/billing/config/appsettings.go
-package config
+// internal/billing/settings.go
+package billing
 
 import (
 	"github.com/notopia-uit/notopia/internal/billing/app"
+	"github.com/notopia-uit/notopia/internal/billing/config"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
-func NewAppSettings(b *Billing, identity *commonconfig.Identity) *app.Settings {
-	return &app.Settings{Currency: b.Currency, WebBaseURL: b.WebBaseURL, ServiceAccountUserID: identity.ServiceAccountUserID}
+func NewAppSettings(billingCfg *config.Billing, identity *commonconfig.Identity) *app.Settings {
+	return &app.Settings{
+		WebBaseURL:           billingCfg.WebBaseURL,
+		ServiceAccountUserID: identity.ServiceAccountUserID,
+	}
 }
 
 var ProvideAppSettings = NewAppSettings
 ```
 
-Add `ProvideAppSettings` to `config.ProviderSet`.
+Add `ProvideAppSettings` to `ProviderSet` in `internal/billing/wire.go`. `cmd/billingseed` uses it too (Step 4).
 
 - [ ] **Step 2: Catalog helpers and commands**
 
@@ -6254,8 +6781,7 @@ func newCatalog(uow domain.UnitOfWork, provider PaymentProvider, settings *Setti
 }
 
 // createPrice creates the Stripe price first (idempotent by our price id), then swaps the active row.
-func (c *catalog) createPrice(ctx context.Context, plan domain.PlanTier, interval domain.Interval, amount domain.Money, userID string) (*domain.Price, error) {
-	id := uuid.Must(uuid.NewV7())
+func (c *catalog) createPrice(ctx context.Context, id uuid.UUID, plan domain.PlanTier, interval domain.Interval, amount domain.Money, userID string) (*domain.Price, error) {
 	providerPriceID, err := c.provider.CreatePrice(ctx, PriceInput{PriceID: id, Plan: plan, Interval: interval, Amount: amount})
 	if err != nil {
 		return nil, err
@@ -6320,16 +6846,18 @@ package app
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
 type CreatePrice struct {
-	Plan     domain.PlanTier
-	Interval domain.Interval
-	Amount   domain.Money
+	ID       uuid.UUID
+	Plan     PlanTier
+	Interval BillingInterval
+	Amount   int64
+	Currency string
 	UserID   string
-	Result   *domain.Price // set by the handler
 }
 
 type CreatePriceHandler struct{ catalog *catalog }
@@ -6345,8 +6873,8 @@ type CreatePriceCmd commonhandler.Cmd[CreatePrice]
 var _ CreatePriceCmd = (*CreatePriceHandler)(nil)
 
 func (h *CreatePriceHandler) Handle(ctx context.Context, cmd *CreatePrice) error {
-	p, err := h.catalog.createPrice(ctx, cmd.Plan, cmd.Interval, cmd.Amount, cmd.UserID)
-	cmd.Result = p
+	_, err := h.catalog.createPrice(ctx, cmd.ID, toDomainPlanTier(cmd.Plan), toDomainInterval(cmd.Interval),
+		domain.Money{Amount: cmd.Amount, Currency: cmd.Currency}, cmd.UserID)
 	return err
 }
 ```
@@ -6367,7 +6895,6 @@ import (
 type ArchivePrice struct {
 	PriceID uuid.UUID
 	UserID  string
-	Result  *domain.Price
 }
 
 type ArchivePriceHandler struct{ catalog *catalog }
@@ -6394,7 +6921,6 @@ func (h *ArchivePriceHandler) Handle(ctx context.Context, cmd *ArchivePrice) err
 	}); err != nil {
 		return err
 	}
-	cmd.Result = price
 	if err := h.catalog.provider.ArchivePrice(ctx, price.ProviderPriceID()); err != nil {
 		return err
 	}
@@ -6415,11 +6941,10 @@ import (
 )
 
 type UpdatePlan struct {
-	Tier     domain.PlanTier
-	Features map[domain.FeatureKey]bool
-	Limits   map[domain.LimitKey]int64
+	Tier     PlanTier
+	Features map[string]bool
+	Limits   map[string]int64
 	UserID   string
-	Result   *domain.Plan
 }
 
 type UpdatePlanHandler struct{ uow domain.UnitOfWork }
@@ -6435,18 +6960,24 @@ type UpdatePlanCmd commonhandler.Cmd[UpdatePlan]
 var _ UpdatePlanCmd = (*UpdatePlanHandler)(nil)
 
 func (h *UpdatePlanHandler) Handle(ctx context.Context, cmd *UpdatePlan) error {
-	err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		plan, err := r.Plan().Get(ctx, cmd.Tier, true)
+	features, err := parseFeatures(cmd.Features)
+	if err != nil {
+		return err
+	}
+	limits, err := parseLimits(cmd.Limits)
+	if err != nil {
+		return err
+	}
+	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		plan, err := r.Plan().Get(ctx, toDomainPlanTier(cmd.Tier), true)
 		if err != nil {
 			return err
 		}
-		if err := plan.Update(cmd.Features, cmd.Limits, time.Now(), cmd.UserID); err != nil {
+		if err := plan.Update(features, limits, time.Now(), cmd.UserID); err != nil {
 			return err
 		}
-		cmd.Result = plan
 		return r.Plan().Save(ctx, plan)
 	})
-	return err
 }
 ```
 
@@ -6466,7 +6997,6 @@ type UpdatePolicy struct {
 	PastDueGraceDays         *int
 	LifetimeRefundWindowDays *int
 	UserID                   string
-	Result                   *domain.BillingPolicy
 }
 
 type UpdatePolicyHandler struct{ uow domain.UnitOfWork }
@@ -6488,14 +7018,13 @@ func (h *UpdatePolicyHandler) Handle(ctx context.Context, cmd *UpdatePolicy) err
 		if err := policy.Update(cmd.PastDueGraceDays, cmd.LifetimeRefundWindowDays, time.Now(), cmd.UserID); err != nil {
 			return err
 		}
-		cmd.Result = policy
 		return r.BillingPolicy().Save(ctx, policy)
 	})
 }
 ```
 
 ```go
-// internal/billing/app/cmd_seedcatalog.go
+// internal/billing/app/cmd_ensureportalconfiguration.go
 package app
 
 import (
@@ -6505,55 +7034,25 @@ import (
 	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
-type SeedCatalog struct{}
-
-type SeedCatalogHandler struct{ catalog *catalog }
-
-func NewSeedCatalogHandler(uow domain.UnitOfWork, provider PaymentProvider, settings *Settings) *SeedCatalogHandler {
-	return &SeedCatalogHandler{catalog: newCatalog(uow, provider, settings)}
+type EnsurePortalConfiguration struct {
+	UserID string
 }
 
-var ProvideSeedCatalogHandler = NewSeedCatalogHandler
+type EnsurePortalConfigurationHandler struct{ catalog *catalog }
 
-type SeedCatalogCmd commonhandler.Cmd[SeedCatalog]
+func NewEnsurePortalConfigurationHandler(uow domain.UnitOfWork, provider PaymentProvider, settings *Settings) *EnsurePortalConfigurationHandler {
+	return &EnsurePortalConfigurationHandler{catalog: newCatalog(uow, provider, settings)}
+}
 
-var _ SeedCatalogCmd = (*SeedCatalogHandler)(nil)
+var ProvideEnsurePortalConfigurationHandler = NewEnsurePortalConfigurationHandler
 
-func (h *SeedCatalogHandler) Handle(ctx context.Context, _ *SeedCatalog) error {
-	actor := h.catalog.settings.ServiceAccountUserID
-	cur := h.catalog.settings.Currency
-	defaults := []struct {
-		plan     domain.PlanTier
-		interval domain.Interval
-		amount   int64
-	}{
-		{domain.TierPlus, domain.IntervalMonth, 49000},
-		{domain.TierPlus, domain.IntervalYear, 470400},
-		{domain.TierPro, domain.IntervalMonth, 99000},
-		{domain.TierPro, domain.IntervalYear, 950400},
-		{domain.TierPro, domain.IntervalLifetime, 2490000},
-	}
-	created := false
-	for _, d := range defaults {
-		var existing *domain.Price
-		if err := h.catalog.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-			var err error
-			existing, err = r.Price().GetActive(ctx, d.plan, d.interval, cur, false)
-			return err
-		}); err != nil {
-			return err
-		}
-		if existing != nil {
-			continue
-		}
-		if _, err := h.catalog.createPrice(ctx, d.plan, d.interval, domain.Money{Amount: d.amount, Currency: cur}, actor); err != nil {
-			return err
-		}
-		created = true
-	}
-	if created {
-		return nil // createPrice already refreshed the portal configuration
-	}
+type EnsurePortalConfigurationCmd commonhandler.Cmd[EnsurePortalConfiguration]
+
+var _ EnsurePortalConfigurationCmd = (*EnsurePortalConfigurationHandler)(nil)
+
+// Handle creates the portal configuration only when billing_policy has none;
+// CreatePrice/ArchivePrice already refresh it when the price set changes.
+func (h *EnsurePortalConfigurationHandler) Handle(ctx context.Context, cmd *EnsurePortalConfiguration) error {
 	var policy *domain.BillingPolicy
 	if err := h.catalog.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		var err error
@@ -6562,14 +7061,14 @@ func (h *SeedCatalogHandler) Handle(ctx context.Context, _ *SeedCatalog) error {
 	}); err != nil {
 		return err
 	}
-	if policy.PortalConfigurationID() == nil {
-		return h.catalog.refreshPortal(ctx, actor)
+	if policy.PortalConfigurationID() != nil {
+		return nil
 	}
-	return nil
+	return h.catalog.refreshPortal(ctx, cmd.UserID)
 }
 ```
 
-`q_listprices.go` (`ListPrices{}` → `[]*domain.Price` via `r.Price().List`) and `q_getpolicy.go` (`GetPolicy{}` → `*domain.BillingPolicy`): same handler shape as `q_listplans.go`.
+`q_getprice.go` (`GetPrice{ID uuid.UUID}` → `Price`; scans `read.Prices` and returns `errs.NewNotFound` when absent, the admin catalog is tiny) and `q_getplan.go` (`GetPlan{Tier PlanTier}` → `PlanView`, same assembly as `q_listplans.go` filtered to one tier via `toDomainPlanTier`). `q_listprices.go` (`ListPrices{}` → `[]Price` via `read.Prices` + `newPrices`) and `q_getpolicy.go` (`GetPolicy{}` → `BillingPolicy` via `read.Policy` + `newBillingPolicy`): same handler shape as `q_listplans.go` (depend on `BillingReadModel`, no unit of work).
 
 Register all in `app.go` / `wire.go`.
 
@@ -6611,27 +7110,23 @@ func (h *StrictHandler) AdminUpdatePlan(ctx context.Context, req billing.AdminUp
 	if err != nil {
 		return nil, err
 	}
-	features, err := toFeatureKeys(req.Body.Features)
-	if err != nil {
-		return nil, err
-	}
-	limits, err := toLimitKeys(req.Body.Limits)
-	if err != nil {
-		return nil, err
-	}
-	cmd := &app.UpdatePlan{Tier: tier, UserID: u.ID, Features: features, Limits: limits}
+	cmd := &app.UpdatePlan{Tier: tier, UserID: u.ID, Features: fromFeatures(req.Body.Features), Limits: fromLimits(req.Body.Limits)}
 	if err := h.App.Cmds.UpdatePlan.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
-	out, err := toPlan(app.PlanView{Plan: cmd.Result})
+	v, err := h.App.Queries.GetPlan.Handle(ctx, &app.GetPlan{Tier: cmd.Tier})
+	if err != nil {
+		return nil, err
+	}
+	out, err := toPlan(v)
 	if err != nil {
 		return nil, err
 	}
 	return billing.AdminUpdatePlan200JSONResponse(out), nil
 }
 
-func toPolicy(p *domain.BillingPolicy) billing.BillingPolicy {
-	return billing.BillingPolicy{PastDueGraceDays: p.PastDueGraceDays(), LifetimeRefundWindowDays: p.LifetimeRefundWindowDays()}
+func toPolicy(p app.BillingPolicy) billing.BillingPolicy {
+	return billing.BillingPolicy{PastDueGraceDays: p.PastDueGraceDays, LifetimeRefundWindowDays: p.LifetimeRefundWindowDays}
 }
 
 func (h *StrictHandler) AdminGetPolicy(ctx context.Context, _ billing.AdminGetPolicyRequestObject) (billing.AdminGetPolicyResponseObject, error) {
@@ -6654,7 +7149,11 @@ func (h *StrictHandler) AdminUpdatePolicy(ctx context.Context, req billing.Admin
 	if err := h.App.Cmds.UpdatePolicy.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
-	return billing.AdminUpdatePolicy200JSONResponse(toPolicy(cmd.Result)), nil
+	p, err := h.App.Queries.GetPolicy.Handle(ctx, &app.GetPolicy{})
+	if err != nil {
+		return nil, err
+	}
+	return billing.AdminUpdatePolicy200JSONResponse(toPolicy(p)), nil
 }
 
 func (h *StrictHandler) AdminListPrices(ctx context.Context, _ billing.AdminListPricesRequestObject) (billing.AdminListPricesResponseObject, error) {
@@ -6686,13 +7185,17 @@ func (h *StrictHandler) AdminCreatePrice(ctx context.Context, req billing.AdminC
 		return nil, err
 	}
 	cmd := &app.CreatePrice{
-		Plan: plan, Interval: interval,
-		Amount: domain.Money{Amount: req.Body.Amount, Currency: req.Body.Currency}, UserID: u.ID,
+		ID: uuid.Must(uuid.NewV7()), Plan: plan, Interval: interval,
+		Amount: req.Body.Amount, Currency: req.Body.Currency, UserID: u.ID,
 	}
 	if err := h.App.Cmds.CreatePrice.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
-	out, err := toPrice(cmd.Result)
+	price, err := h.App.Queries.GetPrice.Handle(ctx, &app.GetPrice{ID: cmd.ID})
+	if err != nil {
+		return nil, err
+	}
+	out, err := toPrice(price)
 	if err != nil {
 		return nil, err
 	}
@@ -6708,7 +7211,11 @@ func (h *StrictHandler) AdminArchivePrice(ctx context.Context, req billing.Admin
 	if err := h.App.Cmds.ArchivePrice.Handle(ctx, cmd); err != nil {
 		return nil, err
 	}
-	out, err := toPrice(cmd.Result)
+	price, err := h.App.Queries.GetPrice.Handle(ctx, &app.GetPrice{ID: req.PriceId})
+	if err != nil {
+		return nil, err
+	}
+	out, err := toPrice(price)
 	if err != nil {
 		return nil, err
 	}
@@ -6723,117 +7230,305 @@ package http
 import (
 	"fmt"
 
-	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
 	"github.com/notopia-uit/notopia/pkg/api/billing"
 )
 
-func toPlanTier(t billing.PlanTier) (domain.PlanTier, error) {
+func toPlanTier(t billing.PlanTier) (app.PlanTier, error) {
 	switch t {
 	case billing.PlanTierFree:
-		return domain.TierFree, nil
+		return app.PlanTierFree, nil
 	case billing.PlanTierPlus:
-		return domain.TierPlus, nil
+		return app.PlanTierPlus, nil
 	case billing.PlanTierPro:
-		return domain.TierPro, nil
+		return app.PlanTierPro, nil
 	default:
-		return domain.PlanTierUnspecified, errs.NewInvalid(fmt.Sprintf("invalid plan tier: %q", t))
+		return app.PlanTierUnspecified, errs.NewInvalid(fmt.Sprintf("invalid plan tier: %q", t))
 	}
 }
 
-func toCreatePricePlan(p billing.CreatePriceRequestPlan) (domain.PlanTier, error) {
+func toCreatePricePlan(p billing.CreatePriceRequestPlan) (app.PlanTier, error) {
 	switch p {
 	case billing.CreatePriceRequestPlanPlus:
-		return domain.TierPlus, nil
+		return app.PlanTierPlus, nil
 	case billing.CreatePriceRequestPlanPro:
-		return domain.TierPro, nil
+		return app.PlanTierPro, nil
 	default:
-		return domain.PlanTierUnspecified, errs.NewInvalid(fmt.Sprintf("invalid price plan: %q", p))
+		return app.PlanTierUnspecified, errs.NewInvalid(fmt.Sprintf("invalid price plan: %q", p))
 	}
 }
 
-func toInterval(i billing.BillingInterval) (domain.Interval, error) {
+func toInterval(i billing.BillingInterval) (app.BillingInterval, error) {
 	switch i {
 	case billing.BillingIntervalMonth:
-		return domain.IntervalMonth, nil
+		return app.BillingIntervalMonth, nil
 	case billing.BillingIntervalYear:
-		return domain.IntervalYear, nil
+		return app.BillingIntervalYear, nil
 	case billing.BillingIntervalLifetime:
-		return domain.IntervalLifetime, nil
+		return app.BillingIntervalLifetime, nil
 	default:
-		return domain.IntervalUnspecified, errs.NewInvalid(fmt.Sprintf("invalid billing interval: %q", i))
+		return app.BillingIntervalUnspecified, errs.NewInvalid(fmt.Sprintf("invalid billing interval: %q", i))
 	}
 }
 
-func toFeatureKeys(in *billing.Features) (map[domain.FeatureKey]bool, error) {
-	out := map[domain.FeatureKey]bool{}
+func fromFeatures(in *billing.Features) map[string]bool {
 	if in == nil {
-		return out, nil
+		return map[string]bool{}
 	}
-	for s, v := range *in {
-		k, err := domain.ParseFeatureKey(s)
-		if err != nil {
-			return nil, err
-		}
-		out[k] = v
-	}
-	return out, nil
+	return map[string]bool(*in)
 }
 
-func toLimitKeys(in *billing.Limits) (map[domain.LimitKey]int64, error) {
-	out := map[domain.LimitKey]int64{}
+func fromLimits(in *billing.Limits) map[string]int64 {
 	if in == nil {
-		return out, nil
+		return map[string]int64{}
 	}
-	for s, v := range *in {
-		k, err := domain.ParseLimitKey(s)
-		if err != nil {
-			return nil, err
-		}
-		out[k] = v
-	}
-	return out, nil
+	return map[string]int64(*in)
 }
 ```
 
 Delete the seven admin stubs from `unimplemented.go`.
 
-- [ ] **Step 4: Seeder binary**
+- [ ] **Step 4: Seed binary (mandatory catalog)**
+
+Naming follows the repo convention: **seed** = mandatory data for every environment (idempotent), **fixtures** = dev-only fake data. The seed creates the default prices in Stripe and the DB and makes sure the portal configuration exists.
+
+Rules:
+
+- Own small config (`NOTOPIA_BILLINGSEED_*`, own `.env`): only database, Stripe secret key, catalog values, service account. No Kafka, Redis, authorization or server settings.
+- Calls only stable app use cases (`EnsureDefaults`, `ListPrices`, `CreatePrice`, `EnsurePortalConfiguration`) as undecorated handlers; no `app.Server`, no billing helpers.
+- Reuses billing infra (`persistence`, `stripeadapter`) through the composition root, which maps the small config onto the types those constructors take.
+- Runs migrations first (goose is idempotent), so it works on a fresh database.
+
+Layout:
+
+```
+cmd/billingseed/            main.go, wire.go, wire_gen.go, project.json, .env, .gitignore
+internal/billingseed/
+  config/                   config.go (own Config + viper), wire.go
+  seed.go                   default prices + Seeder.Run
+  wire.go                   ProviderSet + mappers to billing config / app.Settings
+```
+
+```go
+// internal/billingseed/config/config.go
+package config
+
+import (
+	// … same imports as internal/billing/config/config.go
+)
+
+type Stripe struct {
+	SecretKey string `default:"-" json:"-" mapstructure:"secret_key" validate:"required" yaml:"secret_key"`
+}
+
+type Catalog struct {
+	Currency   string `default:"vnd" json:"currency"   mapstructure:"currency"     validate:"required"     yaml:"currency"`
+	WebBaseURL string `default:"-"   json:"webBaseUrl" mapstructure:"web_base_url" validate:"required,url" yaml:"web_base_url"`
+}
+
+type Config struct {
+	General  commonconfig.General  `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
+	Log      commonconfig.Log      `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
+	Database commonconfig.SQL      `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
+	Stripe   Stripe                `json:"-"        mapstructure:"stripe"   validate:"required"  yaml:"stripe"`
+	Catalog  Catalog               `json:"catalog"  mapstructure:"catalog"  validate:"required"  yaml:"catalog"`
+	Identity commonconfig.Identity `json:"identity" mapstructure:"identity" validate:"required"  yaml:"identity"`
+}
+
+func New(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
+	viper.SetEnvPrefix("notopia_billingseed")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.SetConfigName("billingseed.notopia.config")
+	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
+	// … ReadInConfig, defaults.Set, Unmarshal, log, validate: same steps as internal/billing/config/config.go
+}
+
+var Provide = New
+
+func NewViper() *viper.Viper {
+	return viper.NewWithOptions(viper.ExperimentalBindStruct())
+}
+
+var ProvideViper = NewViper
+
+func NewValidate() *validator.Validate {
+	return validator.New(validator.WithRequiredStructEnabled())
+}
+
+var ProvideValidate = NewValidate
+```
+
+```go
+// internal/billingseed/config/wire.go
+package config
+
+var ProviderSet = wire.NewSet(
+	ProvideValidate,
+	ProvideViper,
+	Provide,
+	wire.FieldsOf(
+		new(*Config),
+		"Catalog",
+		"Database",
+		"General",
+		"Identity",
+		"Log",
+		"Stripe",
+	),
+)
+```
+
+```go
+// internal/billingseed/wire.go
+package billingseed
+
+import (
+	"github.com/goforj/wire"
+	"github.com/notopia-uit/notopia/internal/billing/app"
+	billingconfig "github.com/notopia-uit/notopia/internal/billing/config"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
+	stripeadapter "github.com/notopia-uit/notopia/internal/billing/infra/payment/stripe"
+	"github.com/notopia-uit/notopia/internal/billingseed/config"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	"github.com/notopia-uit/notopia/pkg/logging"
+	"github.com/notopia-uit/notopia/pkg/otel"
+)
+
+// Billing infra constructors take billing's config types; map the small seed config onto them here,
+// so neither config package imports the other or app.
+
+func NewBillingStripeConfig(stripe *config.Stripe) *billingconfig.Stripe {
+	return &billingconfig.Stripe{
+		SecretKey:     stripe.SecretKey,
+		WebhookSecret: "",
+	}
+}
+
+var ProvideBillingStripeConfig = NewBillingStripeConfig
+
+func NewBillingConfig(catalog *config.Catalog) *billingconfig.Billing {
+	return &billingconfig.Billing{
+		Currency:   catalog.Currency,
+		WebBaseURL: catalog.WebBaseURL,
+	}
+}
+
+var ProvideBillingConfig = NewBillingConfig
+
+func NewAppSettings(catalog *config.Catalog, identity *commonconfig.Identity) *app.Settings {
+	return &app.Settings{
+		WebBaseURL:           catalog.WebBaseURL,
+		ServiceAccountUserID: identity.ServiceAccountUserID,
+	}
+}
+
+var ProvideAppSettings = NewAppSettings
+
+var ProviderSet = wire.NewSet(
+	ProvideSeeder,
+	ProvideBillingStripeConfig,
+	ProvideBillingConfig,
+	ProvideAppSettings,
+	config.ProviderSet,
+	persistence.ProviderSet,
+	stripeadapter.Provide,
+	wire.Bind(new(app.PaymentProvider), new(*stripeadapter.Provider)),
+	app.ProvideEnsureDefaultsHandler,
+	app.ProvideListPricesHandler,
+	app.ProvideCreatePriceHandler,
+	app.ProvideEnsurePortalConfigurationHandler,
+	logging.ProviderSet,
+	otel.ProviderSet,
+)
+```
+
+```go
+// internal/billingseed/seed.go
+package billingseed
+
+type defaultPrice struct {
+	plan     app.PlanTier
+	interval app.BillingInterval
+	amount   int64
+}
+
+var defaultPrices = []defaultPrice{
+	{plan: app.PlanTierPlus, interval: app.BillingIntervalMonth, amount: 49000},
+	{plan: app.PlanTierPlus, interval: app.BillingIntervalYear, amount: 470400},
+	{plan: app.PlanTierPro, interval: app.BillingIntervalMonth, amount: 99000},
+	{plan: app.PlanTierPro, interval: app.BillingIntervalYear, amount: 950400},
+	{plan: app.PlanTierPro, interval: app.BillingIntervalLifetime, amount: 2490000},
+}
+
+type Seeder struct {
+	pg             *persistence.Pg
+	ensureDefaults *app.EnsureDefaultsHandler
+	listPrices     *app.ListPricesHandler
+	createPrice    *app.CreatePriceHandler
+	ensurePortal   *app.EnsurePortalConfigurationHandler
+	catalog        *config.Catalog
+	identity       *commonconfig.Identity
+	logger         *slog.Logger
+}
+
+func NewSeeder(/* … every field above */) *Seeder { … }
+
+var ProvideSeeder = NewSeeder
+
+// Run is idempotent: a (plan, interval, currency) that already has an active price is skipped.
+func (s *Seeder) Run(ctx context.Context) error {
+	if err := s.pg.RunMigrations(ctx); err != nil {
+		return err
+	}
+	if err := s.ensureDefaults.Handle(ctx, &app.EnsureDefaults{}); err != nil {
+		return err
+	}
+	prices, err := s.listPrices.Handle(ctx, &app.ListPrices{})
+	if err != nil {
+		return err
+	}
+	actor := s.identity.ServiceAccountUserID
+	for _, d := range defaultPrices {
+		if hasActive(prices, d, s.catalog.Currency) {
+			continue
+		}
+		if err := s.createPrice.Handle(ctx, &app.CreatePrice{
+			ID:       uuid.Must(uuid.NewV7()),
+			Plan:     d.plan,
+			Interval: d.interval,
+			Amount:   d.amount,
+			Currency: s.catalog.Currency,
+			UserID:   actor,
+		}); err != nil {
+			return err
+		}
+		s.logger.InfoContext(
+			ctx,
+			"price created",
+			slog.String("plan", d.plan.String()),
+			slog.String("interval", d.interval.String()),
+		)
+	}
+	return s.ensurePortal.Handle(ctx, &app.EnsurePortalConfiguration{UserID: actor})
+}
+
+func hasActive(prices []app.Price, d defaultPrice, currency string) bool {
+	// … any price with Active && same Plan, Interval, Currency
+}
+```
 
 ```go
 // cmd/billingseed/main.go
-package main
-
-import (
-	"context"
-	"log/slog"
-	"os"
-
-	"github.com/notopia-uit/notopia/internal/billing/app"
-	"github.com/notopia-uit/notopia/pkg/logging"
-)
-
 func main() {
-	if err := logging.FirstStart("NOTOPIA_BILLING_LOG_LEVEL"); err != nil {
-		slog.Error("failed to set up logger", slog.Any("error", err))
-		os.Exit(1)
-	}
+	if err := logging.FirstStart("NOTOPIA_BILLINGSEED_LOG_LEVEL"); err != nil { … os.Exit(1) }
 	ctx := context.Background()
-	server, cleanup, err := InitializeApp(ctx)
-	if err != nil {
-		slog.Error("failed to initialize", slog.Any("error", err))
-		os.Exit(1)
-	}
+	seeder, cleanup, err := InitializeSeeder(ctx)
+	if err != nil { … os.Exit(1) }
 	defer cleanup()
-	if err := server.Cmds.EnsureDefaults.Handle(ctx, &app.EnsureDefaults{}); err != nil {
-		slog.Error("ensure defaults failed", slog.Any("error", err))
-		os.Exit(1)
-	}
-	if err := server.Cmds.SeedCatalog.Handle(ctx, &app.SeedCatalog{}); err != nil {
-		slog.Error("seed catalog failed", slog.Any("error", err))
-		os.Exit(1)
-	}
-	slog.Info("billing catalog seeded")
+	if err := seeder.Run(ctx); err != nil { … os.Exit(1) }
+	slog.Info("billing seed done")
 }
 ```
 
@@ -6841,60 +7536,117 @@ func main() {
 // cmd/billingseed/wire.go
 //go:build wireinject
 
-package main
-
-import (
-	"context"
-
-	"github.com/goforj/wire"
-	"github.com/notopia-uit/notopia/internal/billing/app"
-	"github.com/notopia-uit/notopia/internal/billing/component"
-	"github.com/notopia-uit/notopia/internal/billing/config"
-	"github.com/notopia-uit/notopia/internal/billing/infra"
-	"github.com/notopia-uit/notopia/pkg/logging"
-	"github.com/notopia-uit/notopia/pkg/metadata"
-	"github.com/notopia-uit/notopia/pkg/otel"
-)
-
-func InitializeApp(ctx context.Context) (*app.Server, func(), error) {
+func InitializeSeeder(ctx context.Context) (*billingseed.Seeder, func(), error) {
 	panic(wire.Build(
-		app.ProviderSet, component.ProviderSet, config.ProviderSet, infra.ProviderSet,
-		logging.ProviderSet, otel.ProviderSet,
+		billingseed.ProviderSet,
 		wire.Value(metadata.ServiceName("notopia-billingseed")),
 		wire.Value(metadata.ServiceVersion("v0.0.0")),
 	))
 }
 ```
 
-`cmd/billingseed/project.json`: `gen:wire` (`wire` in `{projectRoot}`), `run` (`go run ./cmd/billingseed/`, `dependsOn: ["gen:wire"]`), `build`, `lint` — shaped like `cmd/note/project.json`. `.env`: symlink to `../billing/.env` (`ln -s ../billing/.env cmd/billingseed/.env`) so it reads the same config, plus the `.env.local` Stripe keys.
+`cmd/billingseed/.env` (own file, no symlink; the Stripe key goes in `.env.local`):
 
-`justfile`:
+```dotenv
+NOTOPIA_BILLINGSEED_GENERAL_APP_ENV="development"
+NOTOPIA_BILLINGSEED_LOG_LEVEL=debug
+NOTOPIA_BILLINGSEED_LOG_PRETTY=true
+NOTOPIA_BILLINGSEED_DATABASE_URL=postgres://notopiauit:notopiauit@localhost:5435/billing?sslmode=disable
+NOTOPIA_BILLINGSEED_CATALOG_WEB_BASE_URL=http://web.notopia.localhost
+NOTOPIA_BILLINGSEED_IDENTITY_SERVICE_ACCOUNT_USER_ID=1003
+OTEL_SERVICE_NAME="billingseed"
+```
+
+`cmd/billingseed/project.json`: `gen:wire`, `run` (`go run ./cmd/billingseed/`, `dependsOn: ["gen:wire"]`), `build`, `lint` (`./cmd/billingseed/... ./internal/billingseed/...`), shaped like `cmd/billing/project.json`. `.gitignore`: `billingseed`.
+
+- [ ] **Step 5: Fixtures binary (dev-only fake data)**
+
+Workspace `00000000-0000-4000-8000-000000000110` gets a `pro` lifetime subscription, payer user `110` (`user@notopia.com`, `User`, from `deploy/compose/infrastructure/authentik-blueprints/users.yaml`). Built with domain constructors and saved through the billing repositories. No Stripe calls: provider ids are fake (`cus_fixture_110`, `pi_fixture_110`), so Stripe actions on this workspace (portal, cancel-now refund, payer claim) fail; entitlements, gRPC and the UI work. Needs the seed first (`pro_lifetime` price).
+
+Layout mirrors the seed: `cmd/billingfixtures/{main.go,wire.go,wire_gen.go,project.json,.env,.gitignore}`, `internal/billingfixtures/{config/{config.go,wire.go},fixtures.go,wire.go}`. Config (`NOTOPIA_BILLINGFIXTURES_*`): `General`, `Log`, `Database` only. `wire.go`: `ProvideFixtures`, `config.ProviderSet`, `persistence.ProviderSet`, `logging.ProviderSet`, `otel.ProviderSet`.
+
+```go
+// internal/billingfixtures/fixtures.go
+package billingfixtures
+
+var (
+	workspaceID = uuid.MustParse("00000000-0000-4000-8000-000000000110")
+	payer       = domain.Payer{ID: "110", Email: "user@notopia.com", Name: "User"}
+)
+
+const actor = "110"
+
+type Fixtures struct {
+	uow    domain.UnitOfWork
+	logger *slog.Logger
+}
+
+// Run is idempotent: skips when the workspace already has a subscription.
+func (f *Fixtures) Run(ctx context.Context) error {
+	now := time.Now()
+	return f.uow.Execute(ctx, func(r domain.RepoRegistry) error {
+		existing, err := r.Subscription().GetCurrentByWorkspace(ctx, workspaceID, true)
+		if err != nil || existing != nil {
+			return err
+		}
+		price, err := r.Price().GetActive(ctx, domain.PlanTierPro, domain.IntervalLifetime, "vnd", false)
+		if err != nil {
+			return err
+		}
+		if price == nil {
+			return errors.New("pro lifetime price missing: run just seed-billing first")
+		}
+		account := domain.OpenBillingAccount(workspaceID, "cus_fixture_110", payer, now, actor)
+		if err := r.BillingAccount().Save(ctx, account); err != nil {
+			return err
+		}
+		sub, err := domain.NewLifetimeSubscription(uuid.Must(uuid.NewV7()), workspaceID, price, "pi_fixture_110", now, now, actor)
+		if err != nil {
+			return err
+		}
+		return r.Subscription().Save(ctx, sub)
+	})
+}
+```
+
+`cmd/billingfixtures/.env`: `NOTOPIA_BILLINGFIXTURES_*` for log + `DATABASE_URL` (same DB as billing), `OTEL_SERVICE_NAME="billingfixtures"`. `project.json` like the seed's.
+
+`justfile` (append to the existing `seed` / `fixtures` flows):
 
 ```just
-billing-seed:
+seed: seed-search seed-billing
+
+seed-billing:
     nx run billingseed:run
+
+fixtures: seed fixtures-note fixtures-document fixtures-search fixtures-billing
+
+fixtures-billing:
+    nx run billingfixtures:run
 
 stripe-listen:
     stripe listen --forward-to http://api.notopia.localhost/billing/webhooks/stripe
 ```
 
-- [ ] **Step 5: Verify (Stripe sandbox)**
+- [ ] **Step 6: Verify (Stripe sandbox)**
 
 ```bash
-nx run billing:gen:wire && nx run billingseed:gen:wire && nx build billing && nx lint billing
-just billing-seed
+nx run billing:gen:wire && nx run billingseed:gen:wire && nx run billingfixtures:gen:wire
+nx build billing && nx lint billing && nx lint billingseed && nx lint billingfixtures
+just seed-billing
 curl -s http://api.notopia.localhost/billing/plans | jq '.[] | {tier, prices: [.prices[].lookupKey]}'
+just fixtures-billing
 ```
 
-Expected: plus has `plus_month`, `plus_year`; pro has `pro_month`, `pro_year`, `pro_lifetime`. Stripe dashboard (test mode) shows products `notopia_plus`/`notopia_pro` and one portal configuration. Running `just billing-seed` again creates nothing new.
+Expected: plus has `plus_month`, `plus_year`; pro has `pro_month`, `pro_year`, `pro_lifetime`. Stripe dashboard (test mode) shows products `notopia_plus`/`notopia_pro` and one portal configuration. Running `just seed-billing` again creates nothing new. After fixtures, gRPC `GetWorkspaceEntitlements` for workspace 110 → `PLAN_TIER_PRO`, `SUBSCRIPTION_STATUS_ACTIVE`; running `just fixtures-billing` again changes nothing.
 
 As `admin` (group `notopia-admins`): `PATCH /billing/admin/plans/free {"limits":{"members":4}}` → 200; `{"limits":{"seats":4}}` → 400 (unknown limit key rejected by `toLimitKeys`); as a normal user → 403. `POST /billing/admin/prices {"plan":"plus","interval":"month","amount":59000,"currency":"vnd"}` → old `plus_month` archived, new one active, a new portal configuration id in `billing_policy`.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add internal/billing cmd/billing cmd/billingseed justfile
-git commit -m "feat(billing): admin catalog APIs, seeder and portal configuration"
+git add internal/billing internal/billingseed internal/billingfixtures cmd/billing cmd/billingseed cmd/billingfixtures justfile
+git commit -m "feat(billing): admin catalog APIs, seed, fixtures and portal configuration"
 ```
 
 ---
@@ -6903,15 +7655,15 @@ git commit -m "feat(billing): admin catalog APIs, seeder and portal configuratio
 
 **Files:**
 
-- Create: `internal/billing/app/{cmd_startcheckout.go,cmd_startportal.go,refunds.go,cmd_completecheckout.go,cmd_syncsubscription.go,cmd_syncrefund.go,cmd_handlewebhook.go}`
+- Create: `internal/billing/app/{q_startcheckout.go,q_startportal.go,refunds.go,cmd_completecheckout.go,cmd_syncsubscription.go,cmd_syncrefund.go}`
 - Create: `internal/billing/app/{fakes_test.go,cmd_completecheckout_test.go}`
-- Create: `internal/billing/controller/http/{checkout.go,webhook.go}`; modify `unimplemented.go`
+- Create: `internal/billing/controller/http/{checkout.go,webhook.go,webhook_test.go}`; modify `http.go` (`NewStrictHandler` takes `*config.Stripe`), `unimplemented.go`
 - Modify: `internal/billing/app/app.go`, `internal/billing/app/wire.go`
 
 **Interfaces:**
 
 - Consumes: `PaymentProvider` (Task 6), `Notifier`, `AuthorizationSvc`, `Settings`.
-- Produces: `Cmds.StartCheckout` (`StartCheckout{WorkspaceID, PriceID uuid.UUID; Payer domain.Payer; URL string}`), `Cmds.StartPortal` (`StartPortal{WorkspaceID uuid.UUID; UserID string; URL string}`), `Cmds.HandleWebhook` (`HandleWebhook{Payload []byte; Signature string}`), `Cmds.SyncSubscription` (`SyncSubscription{EventID string; ProviderSubscriptionID string}` — `EventID` empty when called by the reconcile cron), `RefundRunner.Run(ctx, subscriptionID)` (used by Tasks 9, 10, 11).
+- Produces: `Queries.StartCheckout` (`StartCheckout{WorkspaceID, PriceID uuid.UUID; Payer app.Payer}` → checkout URL `string`), `Queries.StartPortal` (`StartPortal{WorkspaceID uuid.UUID; UserID string}` → portal URL `string`), both modeled as queries because commands only return `error` and the provider session URL is the answer, `Cmds.CompleteCheckout` (`CompleteCheckout{EventID, SessionID string}`), `Cmds.SyncRefund` (`SyncRefund{EventID, EventType, ProviderRefundID string}`), `Cmds.SyncSubscription` (`SyncSubscription{EventID string; ProviderSubscriptionID string}` — `EventID` empty when called by the reconcile cron), `RefundRunner.Run(ctx, subscriptionID)` (used by Tasks 9, 10, 11).
 
 **Ordering rule used by every webhook use case:** provider _mutations that must not be lost_ (cancel a duplicate subscription, change default card) run **before** the write transaction and are idempotent; the write transaction records the event (`ProviderEventLog.MarkProcessed`) together with the state change; **refunds run after commit** with idempotency key `refund:{id}` and are retried by the reconcile cron while `pending` without a provider id.
 
@@ -7171,8 +7923,8 @@ func newFixture(t *testing.T) *fixture {
 	t.Helper()
 	store := newMemStore()
 	now := time.Now()
-	plus, _ := domain.NewPrice(uuid.New(), domain.TierPlus, domain.IntervalMonth, domain.Money{Amount: 30000, Currency: "vnd"}, "price_plus", now, "u")
-	lifetime, _ := domain.NewPrice(uuid.New(), domain.TierPro, domain.IntervalLifetime, domain.Money{Amount: 2490000, Currency: "vnd"}, "price_life", now, "u")
+	plus, _ := domain.NewPrice(uuid.New(), domain.PlanTierPlus, domain.IntervalMonth, domain.Money{Amount: 30000, Currency: "vnd"}, "price_plus", now, "u")
+	lifetime, _ := domain.NewPrice(uuid.New(), domain.PlanTierPro, domain.IntervalLifetime, domain.Money{Amount: 2490000, Currency: "vnd"}, "price_life", now, "u")
 	store.prices[plus.ID()], store.prices[lifetime.ID()] = plus, lifetime
 	ws := uuid.New()
 	store.accounts[ws] = domain.OpenBillingAccount(ws, "cus_1", domain.Payer{ID: "112", Email: "a@b.c", Name: "A"}, now, "112")
@@ -7188,7 +7940,7 @@ func newFixture(t *testing.T) *fixture {
 func (f *fixture) subscribeSession(subID string) {
 	now := time.Now()
 	f.provider.session = CheckoutSessionResult{
-		ID: "cs_" + subID, Purpose: PurposeSubscribe, Complete: true, WorkspaceID: f.ws, PriceID: f.plus.ID(),
+		ID: "cs_" + subID, Purpose: CheckoutPurposeSubscribe, Complete: true, WorkspaceID: f.ws, PriceID: f.plus.ID(),
 		Payer: domain.Payer{ID: "112", Email: "a@b.c", Name: "A"}, CustomerID: "cus_1", ProviderSubscriptionID: subID,
 	}
 	f.provider.snapshots[subID] = domain.ProviderSnapshot{
@@ -7215,7 +7967,7 @@ func TestCompleteCheckoutIsIdempotent(t *testing.T) {
 		require.NoError(t, f.handler.Handle(context.Background(), cmd))
 	}
 	assert.Len(t, f.store.subs, 1)
-	assert.Equal(t, domain.TierPlus, f.current(t).Plan())
+	assert.Equal(t, domain.PlanTierPlus, f.current(t).Plan())
 }
 
 func TestDuplicateCheckoutIsCanceledAndRefunded(t *testing.T) {
@@ -7236,7 +7988,7 @@ func TestLifetimeReplacesRecurring(t *testing.T) {
 	f.subscribeSession("sub_1")
 	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_1", SessionID: "cs_sub_1"}))
 	f.provider.session = CheckoutSessionResult{
-		ID: "cs_life", Purpose: PurposeLifetime, Complete: true, WorkspaceID: f.ws, PriceID: f.lifetime.ID(),
+		ID: "cs_life", Purpose: CheckoutPurposeLifetime, Complete: true, WorkspaceID: f.ws, PriceID: f.lifetime.ID(),
 		Payer: domain.Payer{ID: "112", Email: "a@b.c", Name: "A"}, CustomerID: "cus_1",
 		Payment: domain.PaymentInfo{Amount: domain.Money{Amount: 2490000, Currency: "vnd"}, PaymentRef: "pi_life", PaidAt: time.Now()},
 	}
@@ -7244,7 +7996,7 @@ func TestLifetimeReplacesRecurring(t *testing.T) {
 
 	cur := f.current(t)
 	assert.Equal(t, domain.IntervalLifetime, cur.Interval())
-	assert.Equal(t, domain.TierPro, cur.Plan())
+	assert.Equal(t, domain.PlanTierPro, cur.Plan())
 	assert.Len(t, f.provider.canceled, 1)
 	require.Len(t, f.provider.refunds, 1)
 	assert.Positive(t, f.provider.refunds[0].Amount)
@@ -7372,11 +8124,11 @@ func (h *CompleteCheckoutHandler) Handle(ctx context.Context, cmd *CompleteCheck
 		})
 	}
 	switch session.Purpose {
-	case PurposeSubscribe:
+	case CheckoutPurposeSubscribe:
 		return h.subscribe(ctx, cmd, session)
-	case PurposeLifetime:
+	case CheckoutPurposeLifetime:
 		return h.lifetime(ctx, cmd, session)
-	case PurposePayerChange:
+	case CheckoutPurposePayerChange:
 		return h.payerChange(ctx, cmd, session)
 	}
 	return nil
@@ -7603,7 +8355,7 @@ func (h *CompleteCheckoutHandler) payerChange(ctx context.Context, cmd *Complete
 
 `setPayer` uses `payer.ID` as actor (the user who completed checkout).
 
-- [ ] **Step 4: SyncSubscription, SyncRefund, HandleWebhook, StartCheckout, StartPortal**
+- [ ] **Step 4: SyncSubscription, SyncRefund, StartCheckout (query), StartPortal (query)**
 
 ```go
 // internal/billing/app/cmd_syncsubscription.go
@@ -7749,57 +8501,7 @@ func (h *SyncRefundHandler) Handle(ctx context.Context, cmd *SyncRefund) error {
 ```
 
 ```go
-// internal/billing/app/cmd_handlewebhook.go
-package app
-
-import (
-	"context"
-
-	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
-)
-
-type HandleWebhook struct {
-	Payload   []byte
-	Signature string
-}
-
-type HandleWebhookHandler struct {
-	provider PaymentProvider
-	checkout *CompleteCheckoutHandler
-	sync     *SyncSubscriptionHandler
-	refund   *SyncRefundHandler
-}
-
-func NewHandleWebhookHandler(provider PaymentProvider, checkout *CompleteCheckoutHandler, sync *SyncSubscriptionHandler, refund *SyncRefundHandler) *HandleWebhookHandler {
-	return &HandleWebhookHandler{provider: provider, checkout: checkout, sync: sync, refund: refund}
-}
-
-var ProvideHandleWebhookHandler = NewHandleWebhookHandler
-
-type HandleWebhookCmd commonhandler.Cmd[HandleWebhook]
-
-var _ HandleWebhookCmd = (*HandleWebhookHandler)(nil)
-
-func (h *HandleWebhookHandler) Handle(ctx context.Context, cmd *HandleWebhook) error {
-	ev, err := h.provider.ParseWebhook(cmd.Payload, cmd.Signature)
-	if err != nil {
-		return err
-	}
-	switch ev.Type {
-	case WebhookCheckoutCompleted:
-		return h.checkout.Handle(ctx, &CompleteCheckout{EventID: ev.ID, SessionID: ev.ObjectID})
-	case WebhookSubscriptionChanged:
-		return h.sync.Handle(ctx, &SyncSubscription{EventID: ev.ID, EventType: ev.RawType, ProviderSubscriptionID: ev.ObjectID})
-	case WebhookRefundChanged:
-		return h.refund.Handle(ctx, &SyncRefund{EventID: ev.ID, EventType: ev.RawType, ProviderRefundID: ev.ObjectID})
-	}
-	return nil
-}
-
-```
-
-```go
-// internal/billing/app/cmd_startcheckout.go
+// internal/billing/app/q_startcheckout.go
 package app
 
 import (
@@ -7816,8 +8518,7 @@ import (
 type StartCheckout struct {
 	WorkspaceID uuid.UUID
 	PriceID     uuid.UUID
-	Payer       domain.Payer
-	URL         string
+	Payer       Payer
 }
 
 type StartCheckoutHandler struct {
@@ -7833,9 +8534,9 @@ func NewStartCheckoutHandler(uow domain.UnitOfWork, authz AuthorizationSvc, prov
 
 var ProvideStartCheckoutHandler = NewStartCheckoutHandler
 
-type StartCheckoutCmd commonhandler.Cmd[StartCheckout]
+type StartCheckoutQuery commonhandler.Query[StartCheckout, string]
 
-var _ StartCheckoutCmd = (*StartCheckoutHandler)(nil)
+var _ StartCheckoutQuery = (*StartCheckoutHandler)(nil)
 
 func billingPageURL(settings *Settings, ws uuid.UUID, result string) string {
 	return fmt.Sprintf("%s/workspace/%s/settings/billing?checkout=%s", settings.WebBaseURL, ws, result)
@@ -7867,48 +8568,48 @@ func ensureAccount(ctx context.Context, uow domain.UnitOfWork, provider PaymentP
 	return account, err
 }
 
-func (h *StartCheckoutHandler) Handle(ctx context.Context, cmd *StartCheckout) error {
-	if err := requirePermission(ctx, h.authz, cmd.Payer.ID, cmd.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
-		return err
+func (h *StartCheckoutHandler) Handle(ctx context.Context, q *StartCheckout) (string, error) {
+	if err := requirePermission(ctx, h.authz, q.Payer.ID, q.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
+		return "", err
 	}
 	var price *domain.Price
 	var cur *domain.Subscription
 	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		var err error
-		if price, err = r.Price().GetByID(ctx, cmd.PriceID, false); err != nil {
+		if price, err = r.Price().GetByID(ctx, q.PriceID, false); err != nil {
 			return err
 		}
-		cur, err = r.Subscription().GetCurrentByWorkspace(ctx, cmd.WorkspaceID, false)
+		cur, err = r.Subscription().GetCurrentByWorkspace(ctx, q.WorkspaceID, false)
 		return err
 	}); err != nil {
-		return err
+		return "", err
 	}
 	if !price.Active() {
-		return errs.New(errs.CodePriceNotActive, "price is archived", nil)
+		return "", errs.New(errs.CodePriceNotActive, "price is archived", nil)
 	}
 	lifetimeUpgrade := price.Interval() == domain.IntervalLifetime && cur != nil && cur.Interval() != domain.IntervalLifetime
 	if cur != nil && !lifetimeUpgrade {
-		return errs.New(errs.CodeSubscriptionAlreadyActive, "workspace already has a subscription; use the portal to change plan", nil)
+		return "", errs.New(errs.CodeSubscriptionAlreadyActive, "workspace already has a subscription; use the portal to change plan", nil)
 	}
-	account, err := ensureAccount(ctx, h.uow, h.provider, cmd.WorkspaceID, cmd.Payer)
+	payer := toDomainPayer(q.Payer)
+	account, err := ensureAccount(ctx, h.uow, h.provider, q.WorkspaceID, payer)
 	if err != nil {
-		return err
+		return "", err
 	}
-	purpose := PurposeSubscribe
+	purpose := CheckoutPurposeSubscribe
 	if price.Interval() == domain.IntervalLifetime {
-		purpose = PurposeLifetime
+		purpose = CheckoutPurposeLifetime
 	}
-	cmd.URL, err = h.provider.CreateCheckoutSession(ctx, CheckoutInput{
-		Purpose: purpose, WorkspaceID: cmd.WorkspaceID, CustomerID: account.ProviderCustomerID(), Payer: cmd.Payer,
+	return h.provider.CreateCheckoutSession(ctx, CheckoutInput{
+		Purpose: purpose, WorkspaceID: q.WorkspaceID, CustomerID: account.ProviderCustomerID(), Payer: payer,
 		PriceID: price.ID(), ProviderPriceID: price.ProviderPriceID(),
-		SuccessURL: billingPageURL(h.settings, cmd.WorkspaceID, "success"), CancelURL: billingPageURL(h.settings, cmd.WorkspaceID, "cancel"),
+		SuccessURL: billingPageURL(h.settings, q.WorkspaceID, "success"), CancelURL: billingPageURL(h.settings, q.WorkspaceID, "cancel"),
 	})
-	return err
 }
 ```
 
 ```go
-// internal/billing/app/cmd_startportal.go
+// internal/billing/app/q_startportal.go
 package app
 
 import (
@@ -7924,7 +8625,6 @@ import (
 type StartPortal struct {
 	WorkspaceID uuid.UUID
 	UserID      string
-	URL         string
 }
 
 type StartPortalHandler struct {
@@ -7940,40 +8640,38 @@ func NewStartPortalHandler(uow domain.UnitOfWork, authz AuthorizationSvc, provid
 
 var ProvideStartPortalHandler = NewStartPortalHandler
 
-type StartPortalCmd commonhandler.Cmd[StartPortal]
+type StartPortalQuery commonhandler.Query[StartPortal, string]
 
-var _ StartPortalCmd = (*StartPortalHandler)(nil)
+var _ StartPortalQuery = (*StartPortalHandler)(nil)
 
-func (h *StartPortalHandler) Handle(ctx context.Context, cmd *StartPortal) error {
-	if err := requirePermission(ctx, h.authz, cmd.UserID, cmd.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
-		return err
+func (h *StartPortalHandler) Handle(ctx context.Context, q *StartPortal) (string, error) {
+	if err := requirePermission(ctx, h.authz, q.UserID, q.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
+		return "", err
 	}
 	var account *domain.BillingAccount
 	var policy *domain.BillingPolicy
 	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		var err error
-		if account, err = r.BillingAccount().GetByWorkspace(ctx, cmd.WorkspaceID, false); err != nil {
+		if account, err = r.BillingAccount().GetByWorkspace(ctx, q.WorkspaceID, false); err != nil {
 			return err
 		}
 		policy, err = r.BillingPolicy().Get(ctx, false)
 		return err
 	}); err != nil {
-		return err
+		return "", err
 	}
 	if account == nil {
-		return errs.New(errs.CodeNoBillingAccount, "workspace has no billing account", nil)
+		return "", errs.New(errs.CodeNoBillingAccount, "workspace has no billing account", nil)
 	}
 	if policy.PortalConfigurationID() == nil {
-		return errs.NewInternal("portal configuration missing: run just billing-seed", nil)
+		return "", errs.NewInternal("portal configuration missing: run just seed-billing", nil)
 	}
-	var err error
-	cmd.URL, err = h.provider.CreatePortalSession(ctx, account.ProviderCustomerID(), *policy.PortalConfigurationID(),
-		fmt.Sprintf("%s/workspace/%s/settings/billing?portal=return", h.settings.WebBaseURL, cmd.WorkspaceID))
-	return err
+	return h.provider.CreatePortalSession(ctx, account.ProviderCustomerID(), *policy.PortalConfigurationID(),
+		fmt.Sprintf("%s/workspace/%s/settings/billing?portal=return", h.settings.WebBaseURL, q.WorkspaceID))
 }
 ```
 
-Register `StartCheckout`, `StartPortal`, `CompleteCheckout`, `SyncSubscription`, `SyncRefund`, `HandleWebhook` in `app.go` (Cmds) and the providers + `ProvideRefundRunner` in `wire.go`. `HandleWebhookHandler` takes the concrete handler pointers, so wire passes the undecorated ones; the HTTP layer calls the decorated `Cmds.HandleWebhook`.
+Register `CompleteCheckout`, `SyncSubscription`, `SyncRefund` in `app.go` (Cmds) and `StartCheckout`, `StartPortal` (Queries) and the providers + `ProvideRefundRunner` in `wire.go`. The webhook controller calls the decorated `Cmds.*` directly, one per event type.
 
 - [ ] **Step 5: HTTP**
 
@@ -7993,11 +8691,11 @@ func (h *StrictHandler) CreateCheckoutSession(ctx context.Context, req billing.C
 	if err != nil {
 		return nil, err
 	}
-	cmd := &app.StartCheckout{WorkspaceID: req.WorkspaceId, PriceID: req.Body.PriceId, Payer: payer}
-	if err := h.App.Cmds.StartCheckout.Handle(ctx, cmd); err != nil {
+	url, err := h.App.Queries.StartCheckout.Handle(ctx, &app.StartCheckout{WorkspaceID: req.WorkspaceId, PriceID: req.Body.PriceId, Payer: payer})
+	if err != nil {
 		return nil, err
 	}
-	return billing.CreateCheckoutSession200JSONResponse{Url: cmd.URL}, nil
+	return billing.CreateCheckoutSession200JSONResponse{Url: url}, nil
 }
 
 func (h *StrictHandler) CreatePortalSession(ctx context.Context, req billing.CreatePortalSessionRequestObject) (billing.CreatePortalSessionResponseObject, error) {
@@ -8005,13 +8703,15 @@ func (h *StrictHandler) CreatePortalSession(ctx context.Context, req billing.Cre
 	if err != nil {
 		return nil, err
 	}
-	cmd := &app.StartPortal{WorkspaceID: req.WorkspaceId, UserID: u.ID}
-	if err := h.App.Cmds.StartPortal.Handle(ctx, cmd); err != nil {
+	url, err := h.App.Queries.StartPortal.Handle(ctx, &app.StartPortal{WorkspaceID: req.WorkspaceId, UserID: u.ID})
+	if err != nil {
 		return nil, err
 	}
-	return billing.CreatePortalSession200JSONResponse{Url: cmd.URL}, nil
+	return billing.CreatePortalSession200JSONResponse{Url: url}, nil
 }
 ```
+
+The Stripe webhook is an inbound adapter, like `controller/grpc`: it verifies the signature, reads the event type and object id, and routes to one command. It is the only place outside `infra/payment/stripe` that imports stripe-go (`webhook` package only). `NewStrictHandler` gets `stripeCfg *config.Stripe` and stores `webhookSecret`.
 
 ```go
 // internal/billing/controller/http/webhook.go
@@ -8019,21 +8719,89 @@ package http
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
 	"github.com/notopia-uit/notopia/pkg/api/billing"
+	"github.com/stripe/stripe-go/v87/webhook"
 )
+
+type stripeObject struct {
+	ID     string `json:"id"`
+	Parent *struct {
+		SubscriptionDetails *struct {
+			Subscription json.RawMessage `json:"subscription"`
+		} `json:"subscription_details"`
+	} `json:"parent"`
+}
+
+// stripeID reads an expandable field: either "id" or {"id": ...}.
+func stripeID(raw json.RawMessage) string {
+	var s string
+	if json.Unmarshal(raw, &s) == nil {
+		return s
+	}
+	var obj struct {
+		ID string `json:"id"`
+	}
+	_ = json.Unmarshal(raw, &obj)
+	return obj.ID
+}
 
 func (h *StrictHandler) StripeWebhook(ctx context.Context, req billing.StripeWebhookRequestObject) (billing.StripeWebhookResponseObject, error) {
 	body := rawBody(ctx)
 	if body == nil {
 		return nil, errs.NewInvalid("missing body")
 	}
-	if err := h.App.Cmds.HandleWebhook.Handle(ctx, &app.HandleWebhook{Payload: body, Signature: req.Params.StripeSignature}); err != nil {
+	ev, err := webhook.ConstructEventWithOptions(
+		body,
+		req.Params.StripeSignature,
+		h.webhookSecret,
+		webhook.ConstructEventOptions{IgnoreAPIVersionMismatch: true},
+	)
+	if err != nil {
+		return nil, errs.New(errs.CodeWebhookSignature, "invalid webhook signature", err)
+	}
+	var obj stripeObject
+	if err := json.Unmarshal(ev.Data.Raw, &obj); err != nil {
+		return nil, errs.NewInvalid("invalid webhook object")
+	}
+
+	switch string(ev.Type) {
+	case "checkout.session.completed":
+		err = h.App.Cmds.CompleteCheckout.Handle(ctx, &app.CompleteCheckout{EventID: ev.ID, SessionID: obj.ID})
+	case "customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted":
+		err = h.App.Cmds.SyncSubscription.Handle(ctx, &app.SyncSubscription{EventID: ev.ID, EventType: string(ev.Type), ProviderSubscriptionID: obj.ID})
+	case "invoice.paid", "invoice.payment_failed":
+		if obj.Parent == nil || obj.Parent.SubscriptionDetails == nil {
+			break
+		}
+		if sub := stripeID(obj.Parent.SubscriptionDetails.Subscription); sub != "" {
+			err = h.App.Cmds.SyncSubscription.Handle(ctx, &app.SyncSubscription{EventID: ev.ID, EventType: string(ev.Type), ProviderSubscriptionID: sub})
+		}
+	case "refund.created", "refund.updated", "refund.failed":
+		err = h.App.Cmds.SyncRefund.Handle(ctx, &app.SyncRefund{EventID: ev.ID, EventType: string(ev.Type), ProviderRefundID: obj.ID})
+	}
+	if err != nil {
 		return nil, err
 	}
 	return billing.StripeWebhook204Response{}, nil
+}
+```
+
+`webhook_test.go` (controller test, fake `Cmds` that record calls; build `StrictHandler` by hand, put the payload in ctx the way `captureRawBody` does):
+
+```go
+func TestStripeWebhookInvoicePaidSyncsSubscription(t *testing.T) {
+	payload := []byte(`{"id":"evt_1","object":"event","api_version":"2020-08-27","type":"invoice.paid","data":{"object":{"id":"in_1","object":"invoice","parent":{"subscription_details":{"subscription":"sub_123"}}}}}`)
+	signed := webhook.GenerateTestSignedPayload(&webhook.UnsignedPayload{Payload: payload, Secret: "whsec_test"})
+	// … handler with webhookSecret "whsec_test" and a recording SyncSubscription
+	// call StripeWebhook with signed.Header → 204; recorded {EventID: "evt_1", ProviderSubscriptionID: "sub_123"}
+}
+
+func TestStripeWebhookBadSignature(t *testing.T) {
+	// same payload, header "t=1,v1=bad" → errs.CodeWebhookSignature, no command called
 }
 ```
 
@@ -8261,15 +9029,19 @@ func NewPreviewCancelNowHandler(authz AuthorizationSvc, canceller *Canceller) *P
 
 var ProvidePreviewCancelNowHandler = NewPreviewCancelNowHandler
 
-type PreviewCancelNowQuery commonhandler.Query[PreviewCancelNow, domain.RefundQuote]
+type PreviewCancelNowQuery commonhandler.Query[PreviewCancelNow, RefundQuote]
 
 var _ PreviewCancelNowQuery = (*PreviewCancelNowHandler)(nil)
 
-func (h *PreviewCancelNowHandler) Handle(ctx context.Context, q *PreviewCancelNow) (domain.RefundQuote, error) {
+func (h *PreviewCancelNowHandler) Handle(ctx context.Context, q *PreviewCancelNow) (RefundQuote, error) {
 	if err := requirePermission(ctx, h.authz, q.UserID, q.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
-		return domain.RefundQuote{}, err
+		return RefundQuote{}, err
 	}
-	return h.canceller.Quote(ctx, q.WorkspaceID)
+	quote, err := h.canceller.Quote(ctx, q.WorkspaceID)
+	if err != nil {
+		return RefundQuote{}, err
+	}
+	return newRefundQuote(quote), nil
 }
 ```
 
@@ -8296,7 +9068,7 @@ func (h *StrictHandler) PreviewCancelNow(ctx context.Context, req billing.Previe
 	payments := make([]billing.RefundQuotePayment, 0, len(q.Lines))
 	for _, l := range q.Lines {
 		payments = append(payments, billing.RefundQuotePayment{
-			PaidAmount: l.PaidAmount.Amount, Amount: l.Amount.Amount, CoverageSeconds: l.CoverageSeconds, UnusedSeconds: l.UnusedSeconds,
+			PaidAmount: l.PaidAmount, Amount: l.Amount, CoverageSeconds: l.CoverageSeconds, UnusedSeconds: l.UnusedSeconds,
 		})
 	}
 	return billing.PreviewCancelNow200JSONResponse{
@@ -8346,7 +9118,7 @@ git commit -m "feat(billing): cancel now with prorated refund"
 
 **Files:**
 
-- Create: `internal/billing/app/{cmd_claimpayer.go,cmd_handlepayerremoved.go,cmd_handleworkspacedeleted.go}`
+- Create: `internal/billing/app/{q_claimpayer.go,cmd_handlepayerremoved.go,cmd_handleworkspacedeleted.go}`
 - Create: `internal/billing/controller/http/payer.go`; modify `unimplemented.go`
 - Create: `internal/billing/controller/event/{event.go,wire.go}`
 - Modify: `internal/billing/controller/wire.go`, `internal/billing/server.go`, `internal/billing/app/app.go`, `wire.go`
@@ -8354,12 +9126,12 @@ git commit -m "feat(billing): cancel now with prorated refund"
 **Interfaces:**
 
 - Consumes: Kafka topics `events.integration.note.workspace.deleted` (`share.WorkspaceDeletedIntegrationEvent`), `events.integration.authorization.user_workspace_role_updated` (`share.UserWorkspaceRoleUpdatedEvent`), `events.integration.authorization.workspace_member_removed` (`share.WorkspaceMemberRemovedEvent`).
-- Produces: `Cmds.ClaimPayer` (`ClaimPayer{WorkspaceID uuid.UUID; Payer domain.Payer; URL string}`), `Cmds.HandlePayerRemoved` (`HandlePayerRemoved{WorkspaceID uuid.UUID; UserID string}`), `Cmds.HandleWorkspaceDeleted` (`HandleWorkspaceDeleted{WorkspaceID uuid.UUID}`).
+- Produces: `Queries.ClaimPayer` (`ClaimPayer{WorkspaceID uuid.UUID; Payer app.Payer}` → checkout URL `string`), `Cmds.HandlePayerRemoved` (`HandlePayerRemoved{WorkspaceID uuid.UUID; UserID string}`), `Cmds.HandleWorkspaceDeleted` (`HandleWorkspaceDeleted{WorkspaceID uuid.UUID}`).
 
 - [ ] **Step 1: Commands**
 
 ```go
-// internal/billing/app/cmd_claimpayer.go
+// internal/billing/app/q_claimpayer.go
 package app
 
 import (
@@ -8373,8 +9145,7 @@ import (
 
 type ClaimPayer struct {
 	WorkspaceID uuid.UUID
-	Payer       domain.Payer
-	URL         string
+	Payer       Payer
 }
 
 type ClaimPayerHandler struct {
@@ -8390,34 +9161,32 @@ func NewClaimPayerHandler(uow domain.UnitOfWork, authz AuthorizationSvc, provide
 
 var ProvideClaimPayerHandler = NewClaimPayerHandler
 
-type ClaimPayerCmd commonhandler.Cmd[ClaimPayer]
+type ClaimPayerQuery commonhandler.Query[ClaimPayer, string]
 
-var _ ClaimPayerCmd = (*ClaimPayerHandler)(nil)
+var _ ClaimPayerQuery = (*ClaimPayerHandler)(nil)
 
-func (h *ClaimPayerHandler) Handle(ctx context.Context, cmd *ClaimPayer) error {
-	if err := requirePermission(ctx, h.authz, cmd.Payer.ID, cmd.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
-		return err
+func (h *ClaimPayerHandler) Handle(ctx context.Context, q *ClaimPayer) (string, error) {
+	if err := requirePermission(ctx, h.authz, q.Payer.ID, q.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
+		return "", err
 	}
 	var account *domain.BillingAccount
 	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		var err error
-		account, err = r.BillingAccount().GetByWorkspace(ctx, cmd.WorkspaceID, false)
+		account, err = r.BillingAccount().GetByWorkspace(ctx, q.WorkspaceID, false)
 		return err
 	}); err != nil {
-		return err
+		return "", err
 	}
 	if account == nil {
-		return errs.New(errs.CodeNoBillingAccount, "workspace has no billing account", nil)
+		return "", errs.New(errs.CodeNoBillingAccount, "workspace has no billing account", nil)
 	}
-	if account.Payer().ID == cmd.Payer.ID && account.PayerMissingSince() == nil {
-		return errs.New(errs.CodeAlreadyPayer, "you are already the payer", nil)
+	if account.Payer().ID == q.Payer.ID && account.PayerMissingSince() == nil {
+		return "", errs.New(errs.CodeAlreadyPayer, "you are already the payer", nil)
 	}
-	var err error
-	cmd.URL, err = h.provider.CreateCheckoutSession(ctx, CheckoutInput{
-		Purpose: PurposePayerChange, WorkspaceID: cmd.WorkspaceID, CustomerID: account.ProviderCustomerID(), Payer: cmd.Payer,
-		SuccessURL: billingPageURL(h.settings, cmd.WorkspaceID, "payer"), CancelURL: billingPageURL(h.settings, cmd.WorkspaceID, "cancel"),
+	return h.provider.CreateCheckoutSession(ctx, CheckoutInput{
+		Purpose: CheckoutPurposePayerChange, WorkspaceID: q.WorkspaceID, CustomerID: account.ProviderCustomerID(), Payer: toDomainPayer(q.Payer),
+		SuccessURL: billingPageURL(h.settings, q.WorkspaceID, "payer"), CancelURL: billingPageURL(h.settings, q.WorkspaceID, "cancel"),
 	})
-	return err
 }
 ```
 
@@ -8569,11 +9338,11 @@ func (h *StrictHandler) ClaimPayer(ctx context.Context, req billing.ClaimPayerRe
 	if err != nil {
 		return nil, err
 	}
-	cmd := &app.ClaimPayer{WorkspaceID: req.WorkspaceId, Payer: payer}
-	if err := h.App.Cmds.ClaimPayer.Handle(ctx, cmd); err != nil {
+	url, err := h.App.Queries.ClaimPayer.Handle(ctx, &app.ClaimPayer{WorkspaceID: req.WorkspaceId, Payer: payer})
+	if err != nil {
 		return nil, err
 	}
-	return billing.ClaimPayer200JSONResponse{Url: cmd.URL}, nil
+	return billing.ClaimPayer200JSONResponse{Url: url}, nil
 }
 ```
 
@@ -8597,15 +9366,10 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	wotel "github.com/nkonev/watermill-opentelemetry/pkg/opentelemetry"
 	"github.com/notopia-uit/notopia/internal/billing/app"
+	"github.com/notopia-uit/notopia/internal/billing/component"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/notopia-uit/notopia/pkg/otel"
-)
-
-const (
-	TopicWorkspaceDeleted = "events.integration.note.workspace.deleted"
-	TopicRoleUpdated      = "events.integration.authorization.user_workspace_role_updated"
-	TopicMemberRemoved    = "events.integration.authorization.workspace_member_removed"
 )
 
 type Event struct {
@@ -8629,9 +9393,9 @@ func New(kafkaCfg *commonconfig.Kafka, a *app.Server, tracer kafka.SaramaTracer,
 	router.AddMiddleware(middleware.CorrelationID, middleware.Recoverer, retry.Middleware, wotel.Trace())
 
 	e := &Event{router: router, app: a}
-	router.AddConsumerHandler("WorkspaceDeleted", TopicWorkspaceDeleted, subscriber, e.workspaceDeleted)
-	router.AddConsumerHandler("RoleUpdated", TopicRoleUpdated, subscriber, e.roleUpdated)
-	router.AddConsumerHandler("MemberRemoved", TopicMemberRemoved, subscriber, e.memberRemoved)
+	router.AddConsumerHandler("WorkspaceDeleted", component.TopicWorkspaceDeleted, subscriber, e.workspaceDeleted)
+	router.AddConsumerHandler("RoleUpdated", component.TopicRoleUpdated, subscriber, e.roleUpdated)
+	router.AddConsumerHandler("MemberRemoved", component.TopicMemberRemoved, subscriber, e.memberRemoved)
 	return e, nil
 }
 
@@ -8912,7 +9676,7 @@ git commit -m "feat(billing): reconcile, refund retry and event pruning crons"
 
 - [ ] **Step 1: Docs**
 
-`internal/billing/AGENTS.md` final content: layers; ordering rule for webhook use cases; notifications are best-effort; `just billing-seed`, `just stripe-listen`; test cards; TODO (free trial, live payments via VN gateway, more currencies).
+`internal/billing/AGENTS.md` final content: layers; ordering rule for webhook use cases; notifications are best-effort; `just seed-billing`, `just fixtures-billing`, `just stripe-listen`; test cards; TODO (free trial, live payments via VN gateway, more currencies).
 
 Docs page diagrams:
 

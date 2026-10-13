@@ -185,6 +185,7 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
   > Skipped for simplicity
 - [ ] Consider split the workspace event (SSE) into a dedicated service, not bounded to `note` service
   > Events from subscription changed
+- [ ] Make backend services have an option to must trust request comes from api gateway
 
 ### Frontend
 

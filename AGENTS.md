@@ -91,11 +91,13 @@ deliberately omits.
 - Do not run `go generate`, because we don't mange tool via go tool, but via mise. Stick with nx targets
 - Wiring is google/wire: edit `wire.go`, run `nx wire {service}`, never hand-edit `wire_gen.go`.
   Each package exposes `var ProvideX = NewX`
-- Services are DDD + CQRS — see [`internal/note/AGENTS.md`](./internal/note/AGENTS.md) for the layout
+- Services are DDD + CQRS: layering, command/query rules, domain vs app models, sqlc split are in
+  [`docs/ai/GO_CLEAN_ARCH.md`](./docs/ai/GO_CLEAN_ARCH.md) (read before writing Go service code);
+  concrete layout in [`internal/note/AGENTS.md`](./internal/note/AGENTS.md)
 - Shared building blocks (config, `Cmd`/`Query`, gin, otel) are in [`pkg/`](./pkg/AGENTS.md)
-- Go 1.26 already supports `new(value)` or `new(fn(...))` to get pointer, no need to instantiate struct and take address
-- Go 1.27 supports generic method for struct
-- Prefer testify framework for testing
+- Go 1.26: `new(value)` / `new(fn(...))` returns a pointer; Go 1.27 supports generic methods on structs
+- Prefer testify for testing
+- SQLC custom plugin for dynamic query at runtime <https://raw.githubusercontent.com/vtuanjs/sqlc-gen-go/refs/heads/main/README.md>
 
 ### Messaging
 
@@ -136,11 +138,13 @@ deliberately omits.
 - There are many `*.env*` file, which contains safe local development environment variables. Only `*.env.local*` can contain sensitive environment variables, and should be gitignored
 - Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsgo` (replace for `tsc`)
 - If something is not worth to code/fix, but might have issue in the future, then comments
+- Prefer breakline for human readable, over one-line; code, naming convention over saving token because human still maintain the source code
 
 ### Superpowers
 
 - Skip unnecessary, obvious cases testing for faster, saving tokens
-- Not need to write full code, can use `…`, skip imports, agents later can fill in the details, but should not skip important logic
+- Not need to write full code, can use `…`, skip imports, mapper code, or write comments to note expand the code more while writing;
+  agents later can fill in the details, but should not skip important logic
 
 ### Git
 
