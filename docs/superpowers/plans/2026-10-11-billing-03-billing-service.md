@@ -21,6 +21,7 @@
 5. **Portal configuration** is created anew (`Create`) whenever the active price set changes; the newest id is stored in `billing_policy`. Old configurations stay in Stripe unused.
 6. **Payer name** comes from `X-Forwarded-Name` (added to Traefik `headerMap` in plan 02 Task 1); falls back to email when empty.
 7. **Enums are `uint8` in Go; each wire keeps its own enum representation.** Postgres keeps `CREATE TYPE ... AS ENUM`, OpenAPI and `api/share` keep string enums, the proto uses enums `PlanTier`/`SubscriptionStatus` (zero `*_UNSPECIFIED`, required fields `defined_only` + `not_in: [0]`) while feature/limit maps stay string-keyed (proto map keys cannot be enums). Each adapter maps explicitly (see Global Constraints). Feature/limit keys: admin HTTP input rejects unknown keys (400); a DB read skips unknown keys with a warning log, so removing a key from code never breaks entitlement reads.
+8. **Refund quote is per invoice payment.** An upgrade is invoiced immediately (`always_invoice`), so one period can have several paid invoices. Cancel-now quotes every paid invoice payment of the current period on its own coverage window and creates one `Refund` per payment (Stripe refunds per PaymentIntent). The refund cap is per payment.
 
 ## Global Constraints
 
@@ -42,7 +43,8 @@
 
 - Stripe sends the same `checkout.session.completed` twice or concurrently: one subscription row, no double refund (Task 8 test on `CompleteCheckout` + inbox).
 - Renewal webhook arrives after the stored `current_period_end`: workspace keeps access (status stays `active` until Stripe says otherwise) (Task 2 `GrantsAccess` test).
-- Cancel-now when the latest invoice was already partially refunded: refund never exceeds what was paid (Task 2 refund invariant test).
+- Cancel-now when a payment was already partially refunded: refund never exceeds what that payment paid (Task 2 refund invariant test).
+- Cancel-now after a mid-period upgrade: both the original and the proration invoice are refunded for their unused part (Task 2 `TestQuoteCancelNowAfterUpgrade`).
 - Two checkouts completed for one workspace (two tabs): the second is cancelled and fully refunded (Task 8 test).
 - Webhook with a bad signature or from a different Stripe API version: bad signature → 400; version mismatch accepted (Task 8).
 
@@ -509,7 +511,36 @@ properties:
     type: integer
     format: int64
     example: 2592000
-required: [amount, currency, unusedSeconds, periodSeconds]
+  payments:
+    type: array
+    description: One line per paid invoice payment of the current period
+    items:
+      $ref: ./RefundQuotePayment.yaml
+required: [amount, currency, unusedSeconds, periodSeconds, payments]
+```
+
+```yaml
+# RefundQuotePayment.yaml
+type: object
+properties:
+  paidAmount:
+    type: integer
+    format: int64
+    example: 49000
+  amount:
+    type: integer
+    format: int64
+    description: Refund for this payment
+    example: 24500
+  coverageSeconds:
+    type: integer
+    format: int64
+    example: 2592000
+  unusedSeconds:
+    type: integer
+    format: int64
+    example: 1296000
+required: [paidAmount, amount, coverageSeconds, unusedSeconds]
 ```
 
 ```yaml
@@ -1663,9 +1694,9 @@ func TestQuoteCancelNow(t *testing.T) {
 	policy := domain.DefaultBillingPolicy(t0)
 	end := t0.Add(30 * 24 * time.Hour)
 	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.TierPlus, domain.IntervalMonth, 49000), snap(domain.StatusActive, t0, end), t0, "u")
-	pay := domain.PaymentInfo{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_1", PaidAt: t0}
+	pay := domain.PaymentInfo{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_1", PaidAt: t0, CoverageStart: t0, CoverageEnd: end}
 
-	q, err := s.QuoteCancelNow(t0.Add(10*24*time.Hour), policy, pay)
+	q, err := s.QuoteCancelNow(t0.Add(10*24*time.Hour), policy, []domain.PaymentInfo{pay})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1673,20 +1704,43 @@ func TestQuoteCancelNow(t *testing.T) {
 		t.Fatalf("prorated amount = %d, want 20000", q.Amount.Amount)
 	}
 
-	if _, err := s.CancelNow(t0.Add(10*24*time.Hour), domain.RefundReasonCancelNow, q, uuid.New(), "u"); err != nil {
+	if _, err := s.CancelNow(t0.Add(10*24*time.Hour), domain.RefundReasonCancelNow, q, "u"); err != nil {
 		t.Fatal(err)
 	}
 	// A second refund against the same payment must not exceed what was paid.
-	_, err = s.CancelNow(t0.Add(10*24*time.Hour), domain.RefundReasonCancelNow, domain.RefundQuote{Amount: domain.Money{Amount: 20000, Currency: "vnd"}, PaidAmount: pay.Amount, PaymentRef: "pi_1"}, uuid.New(), "u")
-	if err == nil {
+	over := domain.RefundQuote{Amount: domain.Money{Amount: 20000, Currency: "vnd"}, Lines: []domain.RefundLine{{PaymentRef: "pi_1", PaidAmount: pay.Amount, Amount: domain.Money{Amount: 20000, Currency: "vnd"}}}}
+	if _, err = s.CancelNow(t0.Add(10*24*time.Hour), domain.RefundReasonCancelNow, over, "u"); err == nil {
 		t.Fatal("expected error for cancelling a non-current subscription / over-refund")
+	}
+}
+
+// Plus 30000 paid for day 0-30; upgrade on day 10 invoiced 40000 for day 10-30; cancel on day 20.
+func TestQuoteCancelNowAfterUpgrade(t *testing.T) {
+	policy := domain.DefaultBillingPolicy(t0)
+	day := func(n int) time.Time { return t0.Add(time.Duration(n) * 24 * time.Hour) }
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.TierPro, domain.IntervalMonth, 90000), snap(domain.StatusActive, t0, day(30)), t0, "u")
+	payments := []domain.PaymentInfo{
+		{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_a", PaidAt: t0, CoverageStart: t0, CoverageEnd: day(30)},
+		{Amount: domain.Money{Amount: 40000, Currency: "vnd"}, PaymentRef: "pi_b", PaidAt: day(10), CoverageStart: day(10), CoverageEnd: day(30)},
+	}
+
+	q, err := s.QuoteCancelNow(day(20), policy, payments)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(q.Lines) != 2 || q.Lines[0].Amount.Amount != 10000 || q.Lines[1].Amount.Amount != 20000 || q.Amount.Amount != 30000 {
+		t.Fatalf("quote = %+v, want lines 10000 + 20000 = 30000", q)
+	}
+	refunds, err := s.CancelNow(day(20), domain.RefundReasonCancelNow, q, "u")
+	if err != nil || len(refunds) != 2 || refunds[1].PaymentRef() != "pi_b" {
+		t.Fatalf("refunds = %v, err = %v", refunds, err)
 	}
 }
 
 func TestLifetimeRefundWindow(t *testing.T) {
 	policy := domain.DefaultBillingPolicy(t0) // 14 days
 	s, _ := domain.NewLifetimeSubscription(uuid.New(), uuid.New(), price(t, domain.TierPro, domain.IntervalLifetime, 2490000), "pi_l", t0, t0, "u")
-	pay := domain.PaymentInfo{Amount: domain.Money{Amount: 2490000, Currency: "vnd"}, PaymentRef: "pi_l", PaidAt: t0}
+	pay := []domain.PaymentInfo{{Amount: domain.Money{Amount: 2490000, Currency: "vnd"}, PaymentRef: "pi_l", PaidAt: t0}}
 
 	q, err := s.QuoteCancelNow(t0.Add(13*24*time.Hour), policy, pay)
 	if err != nil || q.Amount.Amount != 2490000 {
@@ -1778,18 +1832,40 @@ type ProviderSnapshot struct {
 	CanceledAt             *time.Time
 }
 
+// PaymentInfo is one paid invoice payment. CoverageStart/End is the service window it paid
+// for (invoice line periods); zero for lifetime.
 type PaymentInfo struct {
-	Amount     Money
-	PaymentRef string
-	PaidAt     time.Time
+	Amount        Money
+	PaymentRef    string
+	PaidAt        time.Time
+	CoverageStart time.Time
+	CoverageEnd   time.Time
 }
 
+type RefundLine struct {
+	PaymentRef      string
+	PaidAmount      Money
+	Amount          Money
+	CoverageSeconds int64
+	UnusedSeconds   int64
+}
+
+// RefundQuote.Amount is the sum of Lines; each line becomes one Refund.
 type RefundQuote struct {
 	Amount        Money
-	PaidAmount    Money
-	PaymentRef    string
 	UnusedSeconds int64
 	PeriodSeconds int64
+	Lines         []RefundLine
+}
+
+// FullRefundQuote refunds every payment in full (duplicate checkout).
+func FullRefundQuote(payments ...PaymentInfo) RefundQuote {
+	var q RefundQuote
+	for _, p := range payments {
+		q.Lines = append(q.Lines, RefundLine{PaymentRef: p.PaymentRef, PaidAmount: p.Amount, Amount: p.Amount})
+		q.Amount = Money{Amount: q.Amount.Amount + p.Amount.Amount, Currency: p.Amount.Currency}
+	}
+	return q
 }
 
 type Subscription struct {
@@ -1931,57 +2007,94 @@ func (s *Subscription) ResumeCancel(now time.Time, userID string) {
 	s.record(&SubscriptionCancelResumedEvent{BaseEvent: s.base(userID)})
 }
 
-func (s *Subscription) refundedTotal() int64 {
+func (s *Subscription) refundedFor(paymentRef string) int64 {
 	var total int64
 	for _, r := range s.refunds {
-		if r.status != RefundStatusFailed && r.status != RefundStatusCanceled {
+		if r.paymentRef == paymentRef && r.status != RefundStatusFailed && r.status != RefundStatusCanceled {
 			total += r.amount.Amount
 		}
 	}
 	return total
 }
 
-func (s *Subscription) QuoteCancelNow(now time.Time, policy *BillingPolicy, payment PaymentInfo) (RefundQuote, error) {
+// QuoteCancelNow quotes each paid payment of the current period on its own coverage window,
+// so an immediately invoiced upgrade does not hide the earlier payment of the same period.
+func (s *Subscription) QuoteCancelNow(now time.Time, policy *BillingPolicy, payments []PaymentInfo) (RefundQuote, error) {
 	if !s.IsCurrent() {
 		return RefundQuote{}, errs.New(errs.CodeNoActiveSubscription, "no active subscription", nil)
 	}
-	q := RefundQuote{PaidAmount: payment.Amount, PaymentRef: payment.PaymentRef, Amount: Money{Currency: payment.Amount.Currency}}
+	var q RefundQuote
+	add := func(p PaymentInfo, amount, coverage, unused int64) {
+		amount = max(min(amount, p.Amount.Amount-s.refundedFor(p.PaymentRef)), 0)
+		q.Lines = append(q.Lines, RefundLine{
+			PaymentRef: p.PaymentRef, PaidAmount: p.Amount, Amount: Money{Amount: amount, Currency: p.Amount.Currency},
+			CoverageSeconds: coverage, UnusedSeconds: unused,
+		})
+		q.Amount = Money{Amount: q.Amount.Amount + amount, Currency: p.Amount.Currency}
+	}
 	if s.interval == IntervalLifetime {
 		if s.paidAt == nil || now.Sub(*s.paidAt) > policy.LifetimeRefundWindow() {
 			return RefundQuote{}, errs.New(errs.CodeRefundWindowExpired, "lifetime refund window expired", nil)
 		}
-		q.Amount.Amount = payment.Amount.Amount - s.refundedTotal()
+		for _, p := range payments {
+			add(p, p.Amount.Amount, 0, 0)
+		}
 		return q, nil
 	}
 	if s.currentPeriodStart == nil || s.currentPeriodEnd == nil {
 		return RefundQuote{}, errs.NewInternal("subscription has no period", nil)
 	}
-	period := int64(s.currentPeriodEnd.Sub(*s.currentPeriodStart).Seconds())
-	unused := max(int64(s.currentPeriodEnd.Sub(now).Seconds()), 0)
-	q.PeriodSeconds, q.UnusedSeconds = period, unused
-	if period > 0 {
-		q.Amount.Amount = payment.Amount.Amount * unused / period
+	q.PeriodSeconds = int64(s.currentPeriodEnd.Sub(*s.currentPeriodStart).Seconds())
+	q.UnusedSeconds = max(int64(s.currentPeriodEnd.Sub(now).Seconds()), 0)
+	for _, p := range payments {
+		start, end := latest(p.CoverageStart, *s.currentPeriodStart), earliest(p.CoverageEnd, *s.currentPeriodEnd)
+		coverage := int64(end.Sub(start).Seconds())
+		if coverage <= 0 {
+			continue
+		}
+		unused := max(int64(end.Sub(latest(now, start)).Seconds()), 0)
+		add(p, p.Amount.Amount*unused/coverage, coverage, unused)
 	}
-	q.Amount.Amount = min(q.Amount.Amount, payment.Amount.Amount-s.refundedTotal())
 	return q, nil
 }
 
-func (s *Subscription) CancelNow(now time.Time, reason RefundReason, quote RefundQuote, refundID uuid.UUID, userID string) (*Refund, error) {
+func latest(a, b time.Time) time.Time {
+	if a.After(b) {
+		return a
+	}
+	return b
+}
+
+func earliest(a, b time.Time) time.Time {
+	if a.Before(b) {
+		return a
+	}
+	return b
+}
+
+// CancelNow adds one pending Refund per quote line with a positive amount.
+func (s *Subscription) CancelNow(now time.Time, reason RefundReason, quote RefundQuote, userID string) ([]*Refund, error) {
 	if !s.IsCurrent() {
 		return nil, errs.New(errs.CodeNoActiveSubscription, "no active subscription", nil)
 	}
-	if quote.Amount.Amount > 0 && s.refundedTotal()+quote.Amount.Amount > quote.PaidAmount.Amount {
-		return nil, errs.NewInvalid(fmt.Sprintf("refund %d exceeds refundable amount", quote.Amount.Amount))
+	for _, l := range quote.Lines {
+		if l.Amount.Amount > 0 && s.refundedFor(l.PaymentRef)+l.Amount.Amount > l.PaidAmount.Amount {
+			return nil, errs.NewInvalid(fmt.Sprintf("refund %d on %s exceeds refundable amount", l.Amount.Amount, l.PaymentRef))
+		}
 	}
 	s.status, s.canceledAt, s.cancelAtPeriodEnd, s.updatedAt = StatusCanceled, &now, false, now
 	s.record(&SubscriptionCanceledNowEvent{BaseEvent: s.base(userID), Reason: reason})
-	if quote.Amount.Amount <= 0 {
-		return nil, nil
+	var refunds []*Refund
+	for _, l := range quote.Lines {
+		if l.Amount.Amount <= 0 {
+			continue
+		}
+		r := &Refund{id: uuid.Must(uuid.NewV7()), paymentRef: l.PaymentRef, amount: l.Amount, reason: reason, status: RefundStatusPending, createdAt: now, updatedAt: now}
+		s.refunds = append(s.refunds, r)
+		s.record(&RefundRequestedEvent{BaseEvent: s.base(userID), RefundID: r.id, Amount: l.Amount})
+		refunds = append(refunds, r)
 	}
-	r := &Refund{id: refundID, paymentRef: quote.PaymentRef, amount: quote.Amount, reason: reason, status: RefundStatusPending, createdAt: now, updatedAt: now}
-	s.refunds = append(s.refunds, r)
-	s.record(&RefundRequestedEvent{BaseEvent: s.base(userID), RefundID: refundID, Amount: quote.Amount})
-	return r, nil
+	return refunds, nil
 }
 
 func (s *Subscription) UpdateRefund(refundID uuid.UUID, providerRefundID string, status RefundStatus, failureMessage *string, now time.Time, userID string) error {
@@ -5293,7 +5406,8 @@ type PaymentProvider interface {
 	GetSubscriptionSnapshot(ctx context.Context, providerSubscriptionID string) (domain.ProviderSnapshot, error)
 	SetCancelAtPeriodEnd(ctx context.Context, providerSubscriptionID string, cancel bool) error
 	CancelSubscriptionNow(ctx context.Context, providerSubscriptionID string) error
-	LatestPayment(ctx context.Context, providerSubscriptionID string) (domain.PaymentInfo, error)
+	// PeriodPayments lists every paid invoice payment whose invoice lines overlap [periodStart, periodEnd).
+	PeriodPayments(ctx context.Context, providerSubscriptionID string, periodStart, periodEnd time.Time) ([]domain.PaymentInfo, error)
 	PaymentForIntent(ctx context.Context, paymentIntentID string) (domain.PaymentInfo, error)
 	CreateRefund(ctx context.Context, refundID uuid.UUID, paymentRef string, amount domain.Money) (RefundResult, error)
 	GetRefund(ctx context.Context, providerRefundID string) (RefundResult, error)
@@ -5776,33 +5890,55 @@ func (p *Provider) CancelSubscriptionNow(ctx context.Context, id string) (err er
 	return providerErr("cancel subscription", err)
 }
 
-func (p *Provider) LatestPayment(ctx context.Context, id string) (info domain.PaymentInfo, err error) {
-	ctx, end := trace(ctx, "LatestPayment")
+// PeriodPayments: a period can hold the renewal invoice plus proration invoices from upgrades
+// (always_invoice). Coverage = the invoice's line periods clipped to the current period.
+func (p *Provider) PeriodPayments(ctx context.Context, id string, periodStart, periodEnd time.Time) (out []domain.PaymentInfo, err error) {
+	ctx, end := trace(ctx, "PeriodPayments")
 	defer end(&err)
-	params := &stripego.SubscriptionRetrieveParams{}
-	params.AddExpand("latest_invoice")
-	s, err := p.sc.V1Subscriptions.Retrieve(ctx, id, params)
-	if err != nil {
-		return info, providerErr("retrieve subscription", err)
-	}
-	if s.LatestInvoice == nil {
-		return info, errs.NewNotFound("subscription has no invoice")
-	}
-	list := p.sc.V1InvoicePayments.List(ctx, &stripego.InvoicePaymentListParams{Invoice: stripego.String(s.LatestInvoice.ID), Status: stripego.String("paid")})
-	for ip, lerr := range list.All(ctx) {
+	params := &stripego.InvoiceListParams{Subscription: stripego.String(id), Status: stripego.String("paid")}
+	params.CreatedRange = &stripego.RangeQueryParams{GreaterThanOrEqual: periodStart.Add(-24 * time.Hour).Unix()}
+	for inv, lerr := range p.sc.V1Invoices.List(ctx, params).All(ctx) {
 		if lerr != nil {
-			return info, providerErr("list invoice payments", lerr)
+			return nil, providerErr("list invoices", lerr)
 		}
-		if ip.Payment == nil || ip.Payment.PaymentIntent == nil {
+		var covStart, covEnd time.Time
+		for _, l := range inv.Lines.Data {
+			if l.Period == nil {
+				continue
+			}
+			ls, le := time.Unix(l.Period.Start, 0), time.Unix(l.Period.End, 0)
+			if covStart.IsZero() || ls.Before(covStart) {
+				covStart = ls
+			}
+			if le.After(covEnd) {
+				covEnd = le
+			}
+		}
+		if !covEnd.After(periodStart) || !covStart.Before(periodEnd) {
 			continue
 		}
-		paidAt := time.Now()
-		if ip.StatusTransitions != nil && ip.StatusTransitions.PaidAt > 0 {
-			paidAt = time.Unix(ip.StatusTransitions.PaidAt, 0)
+		payments := p.sc.V1InvoicePayments.List(ctx, &stripego.InvoicePaymentListParams{Invoice: stripego.String(inv.ID), Status: stripego.String("paid")})
+		for ip, perr := range payments.All(ctx) {
+			if perr != nil {
+				return nil, providerErr("list invoice payments", perr)
+			}
+			if ip.Payment == nil || ip.Payment.PaymentIntent == nil {
+				continue
+			}
+			paidAt := time.Unix(inv.Created, 0)
+			if ip.StatusTransitions != nil && ip.StatusTransitions.PaidAt > 0 {
+				paidAt = time.Unix(ip.StatusTransitions.PaidAt, 0)
+			}
+			out = append(out, domain.PaymentInfo{
+				Amount: domain.Money{Amount: ip.AmountPaid, Currency: string(ip.Currency)}, PaymentRef: ip.Payment.PaymentIntent.ID,
+				PaidAt: paidAt, CoverageStart: covStart, CoverageEnd: covEnd,
+			})
 		}
-		return domain.PaymentInfo{Amount: domain.Money{Amount: ip.AmountPaid, Currency: string(ip.Currency)}, PaymentRef: ip.Payment.PaymentIntent.ID, PaidAt: paidAt}, nil
 	}
-	return info, errs.NewNotFound("latest invoice has no paid payment")
+	if len(out) == 0 {
+		return nil, errs.NewNotFound("no paid payment in the current period")
+	}
+	return out, nil
 }
 
 func (p *Provider) PaymentForIntent(ctx context.Context, paymentIntentID string) (info domain.PaymentInfo, err error) {
@@ -6980,7 +7116,7 @@ type fakeProvider struct {
 	PaymentProvider
 	session   CheckoutSessionResult
 	snapshots map[string]domain.ProviderSnapshot
-	payments  map[string]domain.PaymentInfo
+	payments  map[string][]domain.PaymentInfo
 	canceled  []string
 	refunds   []domain.Money
 }
@@ -6991,7 +7127,7 @@ func (f *fakeProvider) GetCheckoutSession(context.Context, string) (CheckoutSess
 func (f *fakeProvider) GetSubscriptionSnapshot(_ context.Context, id string) (domain.ProviderSnapshot, error) {
 	return f.snapshots[id], nil
 }
-func (f *fakeProvider) LatestPayment(_ context.Context, id string) (domain.PaymentInfo, error) {
+func (f *fakeProvider) PeriodPayments(_ context.Context, id string, _, _ time.Time) ([]domain.PaymentInfo, error) {
 	return f.payments[id], nil
 }
 func (f *fakeProvider) CancelSubscriptionNow(_ context.Context, id string) error {
@@ -7059,7 +7195,10 @@ func (f *fixture) subscribeSession(subID string) {
 		ProviderSubscriptionID: subID, ProviderPriceID: "price_plus", WorkspaceID: f.ws, Status: domain.StatusActive,
 		CurrentPeriodStart: now, CurrentPeriodEnd: now.Add(30 * 24 * time.Hour),
 	}
-	f.provider.payments[subID] = domain.PaymentInfo{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_" + subID, PaidAt: now}
+	f.provider.payments[subID] = []domain.PaymentInfo{{
+		Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_" + subID, PaidAt: now,
+		CoverageStart: now, CoverageEnd: now.Add(30 * 24 * time.Hour),
+	}}
 }
 
 func (f *fixture) current(t *testing.T) *domain.Subscription {
@@ -7289,9 +7428,9 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 		return err
 	}
 	duplicate := cur != nil && (cur.ProviderSubscriptionID() == nil || *cur.ProviderSubscriptionID() != s.ProviderSubscriptionID)
-	var payment domain.PaymentInfo
+	var payments []domain.PaymentInfo
 	if duplicate {
-		if payment, err = h.provider.LatestPayment(ctx, s.ProviderSubscriptionID); err != nil {
+		if payments, err = h.provider.PeriodPayments(ctx, s.ProviderSubscriptionID, snap.CurrentPeriodStart, snap.CurrentPeriodEnd); err != nil {
 			return err
 		}
 		if err := h.provider.CancelSubscriptionNow(ctx, s.ProviderSubscriptionID); err != nil {
@@ -7317,8 +7456,7 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 			return err
 		}
 		if duplicate {
-			quote := domain.RefundQuote{Amount: payment.Amount, PaidAmount: payment.Amount, PaymentRef: payment.PaymentRef}
-			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, quote, uuid.Must(uuid.NewV7()), actor); err != nil {
+			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, domain.FullRefundQuote(payments...), actor); err != nil {
 				return err
 			}
 		} else if err := h.setPayer(ctx, r, s.WorkspaceID, s.Payer, now); err != nil {
@@ -7342,12 +7480,12 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 	if err != nil {
 		return err
 	}
-	var replaced domain.PaymentInfo
+	var replaced []domain.PaymentInfo
 	replacing := cur != nil && cur.Interval() != domain.IntervalLifetime
 	duplicate := cur != nil && cur.Interval() == domain.IntervalLifetime &&
 		(cur.ProviderPaymentID() == nil || *cur.ProviderPaymentID() != s.Payment.PaymentRef)
 	if replacing {
-		if replaced, err = h.provider.LatestPayment(ctx, *cur.ProviderSubscriptionID()); err != nil {
+		if replaced, err = h.provider.PeriodPayments(ctx, *cur.ProviderSubscriptionID(), *cur.CurrentPeriodStart(), *cur.CurrentPeriodEnd()); err != nil {
 			return err
 		}
 		if err := h.provider.CancelSubscriptionNow(ctx, *cur.ProviderSubscriptionID()); err != nil {
@@ -7382,7 +7520,7 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 			if err != nil {
 				return err
 			}
-			if _, err := old.CancelNow(now, domain.RefundReasonReplacedByLifetime, quote, uuid.Must(uuid.NewV7()), actor); err != nil {
+			if _, err := old.CancelNow(now, domain.RefundReasonReplacedByLifetime, quote, actor); err != nil {
 				return err
 			}
 			if err := r.Subscription().Save(ctx, old); err != nil {
@@ -7395,8 +7533,7 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 			return err
 		}
 		if duplicate {
-			quote := domain.RefundQuote{Amount: s.Payment.Amount, PaidAmount: s.Payment.Amount, PaymentRef: s.Payment.PaymentRef}
-			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, quote, uuid.Must(uuid.NewV7()), actor); err != nil {
+			if _, err := sub.CancelNow(now, domain.RefundReasonDuplicateCheckout, domain.FullRefundQuote(s.Payment), actor); err != nil {
 				return err
 			}
 			toRefund = append(toRefund, sub.ID())
@@ -7990,11 +8127,15 @@ func (c *Canceller) load(ctx context.Context, ws uuid.UUID) (*domain.Subscriptio
 	return sub, policy, err
 }
 
-func (c *Canceller) payment(ctx context.Context, sub *domain.Subscription) (domain.PaymentInfo, error) {
+func (c *Canceller) payments(ctx context.Context, sub *domain.Subscription) ([]domain.PaymentInfo, error) {
 	if sub.Interval() == domain.IntervalLifetime {
-		return c.provider.PaymentForIntent(ctx, *sub.ProviderPaymentID())
+		p, err := c.provider.PaymentForIntent(ctx, *sub.ProviderPaymentID())
+		return []domain.PaymentInfo{p}, err
 	}
-	return c.provider.LatestPayment(ctx, *sub.ProviderSubscriptionID())
+	if sub.CurrentPeriodStart() == nil || sub.CurrentPeriodEnd() == nil {
+		return nil, errs.NewInternal("subscription has no period", nil)
+	}
+	return c.provider.PeriodPayments(ctx, *sub.ProviderSubscriptionID(), *sub.CurrentPeriodStart(), *sub.CurrentPeriodEnd())
 }
 
 func (c *Canceller) Quote(ctx context.Context, ws uuid.UUID) (domain.RefundQuote, error) {
@@ -8002,11 +8143,11 @@ func (c *Canceller) Quote(ctx context.Context, ws uuid.UUID) (domain.RefundQuote
 	if err != nil {
 		return domain.RefundQuote{}, err
 	}
-	payment, err := c.payment(ctx, sub)
+	payments, err := c.payments(ctx, sub)
 	if err != nil {
 		return domain.RefundQuote{}, err
 	}
-	return sub.QuoteCancelNow(time.Now(), policy, payment)
+	return sub.QuoteCancelNow(time.Now(), policy, payments)
 }
 
 // CancelNow cancels at the provider first, then locally, then submits the refund.
@@ -8016,17 +8157,17 @@ func (c *Canceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.R
 	if err != nil {
 		return err
 	}
-	payment, err := c.payment(ctx, sub)
+	payments, err := c.payments(ctx, sub)
 	if err != nil {
 		return err
 	}
 	now := time.Now()
-	quote, err := sub.QuoteCancelNow(now, policy, payment)
+	quote, err := sub.QuoteCancelNow(now, policy, payments)
 	if err != nil {
 		if !refundOptional || !hasCode(err, errs.CodeRefundWindowExpired) {
 			return err
 		}
-		quote = domain.RefundQuote{PaidAmount: payment.Amount, PaymentRef: payment.PaymentRef, Amount: domain.Money{Currency: payment.Amount.Currency}}
+		quote = domain.RefundQuote{}
 	}
 	if sub.ProviderSubscriptionID() != nil {
 		if err := c.provider.CancelSubscriptionNow(ctx, *sub.ProviderSubscriptionID()); err != nil {
@@ -8039,7 +8180,7 @@ func (c *Canceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.R
 		if err != nil || !s.IsCurrent() {
 			return err
 		}
-		if _, err := s.CancelNow(now, reason, quote, uuid.Must(uuid.NewV7()), actor); err != nil {
+		if _, err := s.CancelNow(now, reason, quote, actor); err != nil {
 			return err
 		}
 		saved = s
@@ -8164,8 +8305,15 @@ func (h *StrictHandler) PreviewCancelNow(ctx context.Context, req billing.Previe
 	if err != nil {
 		return nil, err
 	}
+	payments := make([]billing.RefundQuotePayment, 0, len(q.Lines))
+	for _, l := range q.Lines {
+		payments = append(payments, billing.RefundQuotePayment{
+			PaidAmount: l.PaidAmount.Amount, Amount: l.Amount.Amount, CoverageSeconds: l.CoverageSeconds, UnusedSeconds: l.UnusedSeconds,
+		})
+	}
 	return billing.PreviewCancelNow200JSONResponse{
 		Amount: q.Amount.Amount, Currency: q.Amount.Currency, UnusedSeconds: q.UnusedSeconds, PeriodSeconds: q.PeriodSeconds,
+		Payments: payments,
 	}, nil
 }
 

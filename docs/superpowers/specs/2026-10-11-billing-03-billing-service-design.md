@@ -112,7 +112,7 @@ subscriptions keep the old Price (grandfathered). New checkouts resolve by `look
 - Since `2025-03-31.basil`, `current_period_start/end` live on **subscription items**
   (`items.data[0].current_period_end`), not the subscription.
 - Since basil, invoices expose payments via `invoice.payments` (InvoicePayment), not
-  `invoice.payment_intent`. Refund target = the PaymentIntent of the latest paid invoice payment.
+  `invoice.payment_intent`. Refund targets = the PaymentIntent of each paid invoice payment of the current period.
 - VND is zero-decimal: `amount: 49000` = 49.000₫.
 
 ### 2.4 Local development
@@ -216,8 +216,8 @@ classDiagram
     +ApplySnapshot(ProviderSnapshot, actor) SubscriptionActivated|Renewed|PastDue|PlanChanged|CancelScheduled|CancelResumed|Ended
     +ScheduleCancel(actor) SubscriptionCancelScheduled
     +ResumeCancel(actor) SubscriptionCancelResumed
-    +QuoteCancelNow(now, policy) RefundQuote
-    +CancelNow(now, reason, quote, actor) SubscriptionCanceledNow + RefundRequested
+    +QuoteCancelNow(now, policy, payments) RefundQuote
+    +CancelNow(now, reason, quote, actor) SubscriptionCanceledNow + RefundRequested per line
     +MarkRefundSucceeded(refundID, providerRefundID) RefundSucceeded
     +MarkRefundFailed(refundID, msg) RefundFailed
     +RecordExternalRefund(...) RefundSucceeded
@@ -300,9 +300,18 @@ classDiagram
   class RefundQuote {
     <<value>>
     amount Money
-    paymentRef string
     unusedSeconds int64
     periodSeconds int64
+    lines []RefundLine
+  }
+
+  class RefundLine {
+    <<value>>
+    paymentRef string
+    paidAmount Money
+    amount Money
+    coverageSeconds int64
+    unusedSeconds int64
   }
 
   class ProviderSnapshot {
@@ -382,15 +391,17 @@ Our stored period end always passes before the renewal webhook arrives.
 
 **Refund quote** (`QuoteCancelNow`):
 
-- recurring: latest paid invoice payment → `amount × unusedSeconds / periodSeconds`, floored
-  (VND integer). `unusedSeconds = max(0, currentPeriodEnd − now)`.
-  Known gap: an upgrade invoiced immediately (`always_invoice`) becomes the latest paid
-  invoice, so a cancel-now after an upgrade only refunds the proration, not the earlier
-  payment for the same period (under-refund, never over-refund). Accepted for now; fixing it
-  means quoting and refunding each paid invoice of the current period separately.
+- recurring: one line per paid invoice payment of the current period. An upgrade is invoiced
+  immediately (`always_invoice`), so a period can hold the renewal payment plus proration
+  payments. Each payment covers its own window (its invoice line periods, clipped to the
+  current period): `line = amount × unused / coverage`, floored (VND integer), where
+  `coverage = coverageEnd − coverageStart` and `unused = max(0, coverageEnd − max(now, coverageStart))`.
+  Quote amount = sum of lines; cancel-now creates one `Refund` per line (Stripe refunds per
+  PaymentIntent). Example: Plus 100k paid day 1–30, upgrade on day 10 invoiced ≈133k for
+  day 10–30, cancel on day 20 → 33k + 66k ≈ 100k (= 10 unused days of Pro).
 - lifetime: full `amount` if `now − paidAt ≤ lifetimeRefundWindowDays`, else error
   `refundWindowExpired` (cancel-now rejected).
-- Invariant: sum of non-failed refunds ≤ amount paid.
+- Invariant: per payment, sum of non-failed refunds against it ≤ that payment's amount.
 
 **One current subscription per workspace**: current = status not in
 (`canceled`, `incomplete_expired`). History rows are kept; re-subscribe creates a new row.
@@ -460,7 +471,7 @@ type PaymentProvider interface {
 	GetSubscriptionSnapshot(ctx context.Context, providerSubscriptionID string) (domain.ProviderSnapshot, error)
 	GetCheckoutSession(ctx context.Context, id string) (CheckoutSessionResult, error)
 	CancelSubscriptionNow(ctx context.Context, providerSubscriptionID string) error
-	LatestPayment(ctx context.Context, providerSubscriptionID string) (PaymentInfo, error) // amount, paymentRef, period
+	PeriodPayments(ctx context.Context, providerSubscriptionID string, periodStart, periodEnd time.Time) ([]PaymentInfo, error) // paid invoice payments overlapping the period, with coverage
 	CreateRefund(ctx context.Context, refundID uuid.UUID, paymentRef string, amount domain.Money) (providerRefundID string, err error)
 	SetDefaultPaymentMethod(ctx context.Context, customerID, paymentMethodID string, providerSubscriptionID *string) error
 	DetachPaymentMethodsExcept(ctx context.Context, customerID, keepPaymentMethodID string) error
@@ -490,7 +501,7 @@ our own constants (`CheckoutCompleted`, `SubscriptionChanged`, `InvoicePaid`,
 | --- | --- | --- |
 | `cmd_startcheckout.go` | HTTP | Owner check. Load or open `BillingAccount` (creates Stripe Customer). Reject `409 subscriptionAlreadyActive` if a current subscription exists, unless buying lifetime. Resolve active Price. Create Checkout (`subscription` or `payment`). Return URL. |
 | `cmd_startportal.go` | HTTP | Owner check. Requires a `BillingAccount`. Return Portal URL. |
-| `cmd_cancelnow.go` | HTTP | Owner check. `QuoteCancelNow` → Stripe cancel (recurring) → `CancelNow` (adds pending `Refund`) → save → `CreateRefund` → `MarkRefundSucceeded/Failed` from response (webhook confirms later). |
+| `cmd_cancelnow.go` | HTTP | Owner check. `QuoteCancelNow` → Stripe cancel (recurring) → `CancelNow` (adds one pending `Refund` per paid payment of the period) → save → `CreateRefund` per refund → `MarkRefundSucceeded/Failed` from response (webhook confirms later). |
 | `q_cancelnowpreview.go` | HTTP | Returns the `RefundQuote`. |
 | `cmd_claimpayer.go` | HTTP | Owner check; any owner who is not already the payer (or when the payer is missing). Checkout `mode=setup` for the caller, who becomes payer on completion. This replaces a separate transfer endpoint. |
 | `cmd_completecheckout.go` | webhook `checkout.session.completed` | By `metadata.purpose`: **subscribe** → fetch snapshot, create `Subscription`; if another current one exists → cancel new one at Stripe + full refund `duplicate_checkout`. **lifetime** → if a current recurring exists, `CancelNow(replaced_by_lifetime)` it first (prorated refund), then `NewLifetimeSubscription`. **payer_change** → set default payment method on customer + subscription, detach other methods, `ChangePayer`, update Stripe contact, and if the payer was missing: `ResumeCancel`. |
@@ -821,7 +832,7 @@ Unit tests only where logic is non-obvious; plumbing is verified by the manual s
 
 | Layer | How |
 | --- | --- |
-| domain | Table tests: `GrantsAccess` (grace window, lifetime), `ApplySnapshot` event diffs, `QuoteCancelNow` (prorated, lifetime window), refund invariant |
+| domain | Table tests: `GrantsAccess` (grace window, lifetime), `ApplySnapshot` event diffs, `QuoteCancelNow` (prorated, after a mid-period upgrade, lifetime window), per-payment refund invariant |
 | infra/payment/stripe | Snapshot mapping from a recorded Stripe JSON fixture (item-level periods); webhook signature verify with `webhook.GenerateTestSignedPayload` |
 | app | `CompleteCheckout` branches (duplicate, lifetime replaces recurring, payer change) with fakes |
 | persistence | No automated DB tests (none exist for note). `nx goose:validate billing`, `nx lint:goose billing` |
