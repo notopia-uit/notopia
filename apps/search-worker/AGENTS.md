@@ -38,3 +38,6 @@ to search. See `apps/document/AGENTS.md`.
   consumer lag plus retries; `..._TOMBSTONE_MAX` caps the in-memory entries.
 - Every Meilisearch write awaits `waitTask()`; a failed task throws `MeiliTaskError` so the
   Kafka retry path sees it.
+- `app.service.spec.ts` covers the tombstone guards and task failure with a fake Meilisearch
+  (no Meilisearch testcontainer for JS). `tmp/search-worker/tombstone.it.ts` is a manual
+  check against the real local Meilisearch + Redis.

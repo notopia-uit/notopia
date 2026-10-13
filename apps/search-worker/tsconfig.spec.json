@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/vitest",
+    "types": ["vitest/globals", "node", "vitest", "vitest/importMeta"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "#/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "vitest.config.mts",
+    "src/**/*.spec.ts",
+    "../../packages/lib-server/src/block-note/types.d.ts"
+  ],
+  "exclude": ["out-tsc/**/*"],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ]
+}
