@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
@@ -49,9 +50,9 @@ func New(
 		topic   string
 		handler message.NoPublishHandlerFunc
 	}{
-		{name: "workspace-deleted", topic: component.TopicWorkspaceDeleted, handler: e.workspaceDeleted},
-		{name: "role-updated", topic: component.TopicRoleUpdated, handler: e.roleUpdated},
-		{name: "member-removed", topic: component.TopicMemberRemoved, handler: e.memberRemoved},
+		{name: "workspace-deleted", topic: component.TopicWorkspaceDeleted, handler: decode(e.workspaceDeleted)},
+		{name: "role-updated", topic: component.TopicRoleUpdated, handler: decode(e.roleUpdated)},
+		{name: "member-removed", topic: component.TopicMemberRemoved, handler: decode(e.memberRemoved)},
 	}
 	// One consumer group per topic: subscribers sharing a group steal each other's partitions.
 	for _, h := range handlers {
@@ -74,37 +75,43 @@ func New(
 
 var Provide = New
 
-func (e *Event) workspaceDeleted(msg *message.Message) error {
-	var ev share.WorkspaceDeletedIntegrationEvent
-	if err := json.Unmarshal(msg.Payload, &ev); err != nil {
-		return fmt.Errorf("failed to unmarshal WorkspaceDeletedIntegrationEvent: %w", err)
+// decode turns a typed handler into a router handler. A payload that does not decode is
+// logged and acked: retrying cannot fix it, and a nack would block the partition.
+func decode[T any](fn func(ctx context.Context, ev *T) error) message.NoPublishHandlerFunc {
+	return func(msg *message.Message) error {
+		var ev T
+		if err := json.Unmarshal(msg.Payload, &ev); err != nil {
+			slog.ErrorContext(
+				msg.Context(), "dropping undecodable event",
+				slog.String("type", fmt.Sprintf("%T", ev)),
+				slog.String("message_uuid", msg.UUID),
+				slog.Any("error", err),
+			)
+			return nil
+		}
+		return fn(msg.Context(), &ev)
 	}
-	return e.app.Cmds.HandleWorkspaceDeleted.Handle(msg.Context(), &app.HandleWorkspaceDeleted{WorkspaceID: ev.Id})
 }
 
-func (e *Event) roleUpdated(msg *message.Message) error {
-	var ev share.UserWorkspaceRoleUpdatedEvent
-	if err := json.Unmarshal(msg.Payload, &ev); err != nil {
-		return fmt.Errorf("failed to unmarshal UserWorkspaceRoleUpdatedEvent: %w", err)
-	}
+func (e *Event) workspaceDeleted(ctx context.Context, ev *share.WorkspaceDeletedIntegrationEvent) error {
+	return e.app.Cmds.HandleWorkspaceDeleted.Handle(ctx, &app.HandleWorkspaceDeleted{WorkspaceID: ev.Id})
+}
+
+func (e *Event) roleUpdated(ctx context.Context, ev *share.UserWorkspaceRoleUpdatedEvent) error {
 	if ev.Role == share.Owner || ev.WorkspaceId == nil {
 		return nil
 	}
-	return e.app.Cmds.HandlePayerRemoved.Handle(msg.Context(), &app.HandlePayerRemoved{
+	return e.app.Cmds.HandlePayerRemoved.Handle(ctx, &app.HandlePayerRemoved{
 		WorkspaceID: *ev.WorkspaceId,
 		UserID:      ev.UserId,
 	})
 }
 
-func (e *Event) memberRemoved(msg *message.Message) error {
-	var ev share.WorkspaceMemberRemovedEvent
-	if err := json.Unmarshal(msg.Payload, &ev); err != nil {
-		return fmt.Errorf("failed to unmarshal WorkspaceMemberRemovedEvent: %w", err)
-	}
+func (e *Event) memberRemoved(ctx context.Context, ev *share.WorkspaceMemberRemovedEvent) error {
 	if ev.WorkspaceId == nil {
 		return nil
 	}
-	return e.app.Cmds.HandlePayerRemoved.Handle(msg.Context(), &app.HandlePayerRemoved{
+	return e.app.Cmds.HandlePayerRemoved.Handle(ctx, &app.HandlePayerRemoved{
 		WorkspaceID: *ev.WorkspaceId,
 		UserID:      ev.UserId,
 	})
