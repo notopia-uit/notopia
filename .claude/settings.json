@@ -23,7 +23,7 @@
   "permissions": {
     "allow": [
       "Bash(buf *)",
-      "Bash(curl -s https://raw.githubusercontent.com/nestjs/docs.nestjs.com/refs/heads/master/content/middlewares.md)",
+      "Bash(curl -s https://raw.githubusercontent.com/*)",
       "Bash(echo \"EXIT:$?\")",
       "Bash(echo \"exit: $?\")",
       "Bash(echo \"exit=$?\")",
@@ -38,8 +38,7 @@
       "Bash(golangci-lint run *)",
       "Bash(node *)",
       "Bash(nx *)",
-      "Bash(pnpm * exec *)",
-      "Bash(pnpm * install *)",
+      "Bash(pnpm *)",
       "Bash(rtk *)",
       "Bash(xargs ls -la)",
       "Read(//tmp/**)",

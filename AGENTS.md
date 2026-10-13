@@ -91,6 +91,7 @@ deliberately omits.
 - Shared building blocks (config, `Cmd`/`Query`, gin, otel) are in [`pkg/`](./pkg/AGENTS.md)
 - Go 1.26 already supports `new(value)` or `new(fn(...))` to get pointer, no need to instantiate struct and take address
 - Go 1.27 supports generic method for struct
+- Prefer testify framework for testing
 
 ### Messaging
 
@@ -135,6 +136,7 @@ deliberately omits.
 ### Superpowers
 
 - Skip unnecessary, obvious cases testing for faster, saving tokens
+- Not need to write full code, can use `…`, skip imports, agents later can fill in the details, but should not skip important logic
 
 ### Git
 
