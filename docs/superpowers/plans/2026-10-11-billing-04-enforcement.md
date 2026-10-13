@@ -533,9 +533,11 @@ Wire the gates (inject `entitlementSvc EntitlementSvc` into each handler's const
 		return Graph{}, err
 	}
 	if maxDepth := ent.Limit(LimitNoteGraphMaxDepth); maxDepth != Unlimited && (query.Depth <= 0 || int64(query.Depth) > maxDepth) {
-		query.Depth = int(maxDepth)
+		query.Depth = int(max(maxDepth, 1))
 	}
 ```
+
+A missing or `0` limit clamps to depth `1`, never `0`: `Depth <= 0` means unlimited below.
 
 - `GetWorkspaceGraphHandler.Handle`, after the permission check:
 
@@ -700,7 +702,7 @@ var _ PurgeExpiredTrashCmd = (*PurgeExpiredTrashHandler)(nil)
 // No permission check: cron-only, runs as the note service account.
 func (h *PurgeExpiredTrashHandler) Handle(ctx context.Context, _ *PurgeExpiredTrash) error {
 	now := time.Now()
-	workspaceIDs, err := h.readModel.Handle(ctx, now.Add(-24*time.Hour))
+	workspaceIDs, err := h.readModel.Handle(ctx, now)
 	if err != nil || len(workspaceIDs) == 0 {
 		return err
 	}
@@ -1430,6 +1432,7 @@ export class AutoCommitExtension implements Extension {
     private readonly documentService: DocumentService,
     private readonly noteService: NoteService,
     private readonly entitlementService: EntitlementService,
+    private readonly serviceAccountUserId: string,
     private readonly onCommitted: (documentId: string) => void
   ) {}
 
@@ -1440,9 +1443,8 @@ export class AutoCommitExtension implements Extension {
       const entity = await this.documentService.getById(documentName);
       if (!entity) return;
       const force = clientsCount === 0;
-      const authorId = entity.pendingContributorIds.at(-1) ?? userId;
-      if (!authorId) return;
-      const workspace = await this.noteService.getWorkspaceByNote({ noteId: documentName, userId: authorId });
+      const lookupUserId = entity.pendingContributorIds.at(-1) ?? userId ?? this.serviceAccountUserId;
+      const workspace = await this.noteService.getWorkspaceByNote({ noteId: documentName, userId: lookupUserId });
       const ent = await this.entitlementService.get(workspace.id);
       if (!feature(ent, 'auto_commit')) return;
       const { revisionId } = await this.documentService.commitIfDue({
@@ -1465,7 +1467,7 @@ Never rethrow: an error in a store hook keeps the document in memory.
 
 Config: `hocuspocusDebounceMs: z.number().default(2000)`, `hocuspocusMaxDebounceMs: z.number().default(10000)` from `NOTOPIA_DOCUMENT_HOCUSPOCUS_DEBOUNCE_MS` / `..._MAX_DEBOUNCE_MS`.
 
-`hocuspocus.ts` constructor: inject `EntitlementService` and `ConfigService`; pass `debounce`/`maxDebounce`; add `new AutoCommitExtension(documentService, noteService, entitlementService, (id) => this.setModifiedFalse(id))` **after** the `HocuspocusDatabase` extension, where `setModifiedFalse` sets the metadata map to `{ modified: false }` on the loaded document with a normal origin (same as `HocuspocusService.setModified`; avoid a circular DI by implementing it inline on `this.hocuspocus.documents.get(id)`).
+`hocuspocus.ts` constructor: inject `EntitlementService` and `ConfigService`; pass `debounce`/`maxDebounce`; add `new AutoCommitExtension(documentService, noteService, entitlementService, identity.serviceAccountUserId, (id) => this.setModifiedFalse(id))` **after** the `HocuspocusDatabase` extension, where `setModifiedFalse` sets the metadata map to `{ modified: false }` on the loaded document with a normal origin (same as `HocuspocusService.setModified`; avoid a circular DI by implementing it inline on `this.hocuspocus.documents.get(id)`).
 
 - [ ] **Step 3: Verify, commit**
 

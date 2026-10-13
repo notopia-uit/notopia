@@ -384,6 +384,10 @@ Our stored period end always passes before the renewal webhook arrives.
 
 - recurring: latest paid invoice payment → `amount × unusedSeconds / periodSeconds`, floored
   (VND integer). `unusedSeconds = max(0, currentPeriodEnd − now)`.
+  Known gap: an upgrade invoiced immediately (`always_invoice`) becomes the latest paid
+  invoice, so a cancel-now after an upgrade only refunds the proration, not the earlier
+  payment for the same period (under-refund, never over-refund). Accepted for now; fixing it
+  means quoting and refunding each paid invoice of the current period separately.
 - lifetime: full `amount` if `now − paidAt ≤ lifetimeRefundWindowDays`, else error
   `refundWindowExpired` (cancel-now rejected).
 - Invariant: sum of non-failed refunds ≤ amount paid.

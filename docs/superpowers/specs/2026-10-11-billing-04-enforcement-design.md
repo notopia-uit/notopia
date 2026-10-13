@@ -40,7 +40,7 @@ optional Redis scaling mode.
 | `errs/` | `FeatureNotInPlan`, `PlanLimitExceeded` → 402 (`PaymentRequiredError`) in `controller/http/err.go`; `BillingPayerMustTransfer` → 409. |
 | `cmd_updateworkspacemembers.go` | `members` limit when the resulting count grows past it (existing members never removed). Payer guard: demoting or removing the payer while `GetWorkspacePayer.requires_payer` → 409 `billingPayerMustTransfer`. |
 | `cmd_leaveworkspace.go` | Payer guard. |
-| `cmd_publishnote.go` | `published_notes` limit (count published notes in the workspace). |
+| `cmd_publishnote.go` | `published_notes` limit (count published notes in the workspace). **Deferred**: publishing is a stub today; the gate lands with the publish feature (plan 04, decision 1). |
 | `q_getnotegraph.go` | Clamp `Depth` to `note_graph_max_depth` before the existing `<= 0 → unlimited` rule. |
 | `q_getworkspacegraph.go` | Require `workspace_graph`. |
 | `cmd_changeworkspaceslug.go`, `cmd_publishworkspace.go`, search token | Not gated. |
