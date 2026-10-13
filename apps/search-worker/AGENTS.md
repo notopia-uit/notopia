@@ -28,3 +28,13 @@ to search. See `apps/document/AGENTS.md`.
 - `kafka-max-retry.exception-filter.ts` bounds retries — a handler that throws is retried,
   then dropped. Don't rely on a throw to reprocess later.
 - `seed/` re-indexes from scratch against a running Meilisearch.
+- Deletion tombstones (`tombstone.ts`): topics are separate, so a late `note.updated` /
+  `document.committed` can arrive after `note.deleted` and upsert the note back.
+  `note.deleted` marks a tombstone before deleting; upserts skip tombstoned ids and re-check
+  after writing (deleting again if a tombstone appeared meanwhile). With
+  `NOTOPIA_SEARCH_WORKER_REDIS_URL` set, tombstones live in Redis (`SET EX`), required when
+  running more than one instance. Unset, an in-memory `lru-cache` is used (single instance,
+  a warning is logged). TTL `..._TOMBSTONE_TTL_SECONDS` (default 86400) must exceed the worst
+  consumer lag plus retries; `..._TOMBSTONE_MAX` caps the in-memory entries.
+- Every Meilisearch write awaits `waitTask()`; a failed task throws `MeiliTaskError` so the
+  Kafka retry path sees it.

@@ -90,6 +90,7 @@ catalog:
   jose: "^6.2.3"
   jsdom: "^29.1.1"
   kafkajs: "^2.2.4"
+  lru-cache: "^11.5.3"
   lucide-react: "^1.6.0"
   markdown-to-txt: "^2.0.1"
   marked: "^18.0.3"

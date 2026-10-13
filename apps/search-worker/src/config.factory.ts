@@ -7,6 +7,8 @@ import {
   kafkaConfigSchema,
   MeiliConfig,
   meiliConfigSchema,
+  TombstoneConfig,
+  tombstoneConfigSchema,
 } from './config';
 
 export const APP_CONFIG = Symbol('APP_CONFIG');
@@ -40,4 +42,14 @@ export const meiliConfig = registerAs(MEILI_CONFIG, () =>
     host: process.env.NOTOPIA_SEARCH_WORKER_MEILI_HOST!,
     apiKey: process.env.NOTOPIA_SEARCH_WORKER_MEILI_API_KEY!,
   } satisfies MeiliConfig)
+);
+
+export const TOMBSTONE_CONFIG = Symbol('TOMBSTONE_CONFIG');
+
+export const tombstoneConfig = registerAs(TOMBSTONE_CONFIG, () =>
+  tombstoneConfigSchema.parse({
+    redisUrl: process.env.NOTOPIA_SEARCH_WORKER_REDIS_URL || undefined,
+    ttlSeconds: parseInt(process.env.NOTOPIA_SEARCH_WORKER_TOMBSTONE_TTL_SECONDS ?? '86400', 10),
+    max: parseInt(process.env.NOTOPIA_SEARCH_WORKER_TOMBSTONE_MAX ?? '100000', 10),
+  } satisfies TombstoneConfig)
 );
