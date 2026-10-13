@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://www.schemastore.org/traefik-v3-file-provider.json
+http:
+  routers:
+    billing:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/billing`) && !PathPrefix(`/billing/health`) && !Path(`/billing/webhooks/stripe`) && !(Path(`/billing/plans`) && Method(`GET`))
+      service: billing
+      middlewares:
+        - cors
+        - jwt
+    billing-public:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && (Path(`/billing/webhooks/stripe`) || (Path(`/billing/plans`) && Method(`GET`)))
+      service: billing
+      middlewares:
+        - cors
+    billing-health:
+      entryPoints:
+        - web
+      rule: Host(`api.notopia.localhost`) && PathPrefix(`/billing/health`)
+      service: billing-health
+
+  services:
+    billing:
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:8084
+    billing-health:
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:28084

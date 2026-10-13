@@ -8,11 +8,12 @@ Manged with Nx. Package manager: pnpm (use ./pnpm-workspace.yaml), go (single go
 api/                            # OpenAPI spec (one dir per API surface)
   common/                       # Shared responses, securitySchemes (OIDC, Oauth2)
   note/                         # note service spec    -> Go server (oapi-codegen)
+  billing/                      # billing service spec -> Go server (oapi-codegen)
   document/                     # document service spec -> NestJS server (openapi-generator)
   share/                        # Cross-service event/DTO schemas -> @notopia-uit/api-share-gen
   bundled/                      # Redocly output (generated, do not edit)
 proto/                          # Protobuf definitions
-  note/, authorization/
+  note/, authorization/, billing/
 apps/                           # JS/TS applications
   document/                     # Document service (NestJS) (nx: document)
   search-worker/                # Search worker (NestJS) sync to meilisearch (nx: search-worker)
@@ -31,10 +32,12 @@ docs/                           # Vitepress Documentation (class, sequence, arch
 cmd/                            # Go services (entrypoint only: main.go + wire)
   note/                         # Note service (nx: note)
   authorization/                # Authorization service (nx: authorization)
+  billing/                      # Billing service, Stripe (nx: billing)
   notecreateseed/               # Seed data generator
 internal/                       # Internal Go packages (the actual service code)
   note/
   authorization/
+  billing/
   notecreateseed/
 pkg/                            # Go packages
   api                           # Code gen from oapi-codegen
@@ -56,6 +59,7 @@ deliberately omits.
 | Contract-first workflow, adding endpoints          | [`api/`](./api/AGENTS.md)                                       |
 | Go DDD/CQRS layout, aggregates, outbox, sqlc/goose | [`internal/note/`](./internal/note/AGENTS.md)                   |
 | Casbin model, roles, policy                        | [`internal/authorization/`](./internal/authorization/AGENTS.md) |
+| Plans, subscriptions, Stripe, entitlements         | [`internal/billing/`](./internal/billing/AGENTS.md)             |
 | Yjs/Hocuspocus, commit pipeline, revisions         | [`apps/document/`](./apps/document/AGENTS.md)                   |
 | Meilisearch indexing                               | [`apps/search-worker/`](./apps/search-worker/AGENTS.md)         |
 | Shared Go packages                                 | [`pkg/`](./pkg/AGENTS.md)                                       |
