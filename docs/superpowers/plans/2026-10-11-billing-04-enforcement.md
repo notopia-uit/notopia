@@ -16,7 +16,7 @@
 
 1. **`published_notes` is not enforced yet.** `cmd_publishnote.go` / `cmd_publishworkspace.go` are stubs (`return nil`) and there is no publish column. The limit stays in billing; the gate lands with the publish feature (TODO in `internal/note/AGENTS.md`).
 2. **Only subscription changes are pushed over SSE.** Admin plan edits are not broadcast; clients see new limits on their next entitlements fetch.
-3. **Members limit** is checked against the *requested* member list of `UpdateWorkspaceMembers` (it replaces the whole list): blocked only when the new count exceeds the limit **and** grows past the current count, so shrinking or role changes on an over-limit workspace still work.
+3. **Members limit** is checked against the _requested_ member list of `UpdateWorkspaceMembers` (it replaces the whole list): blocked only when the new count exceeds the limit **and** grows past the current count, so shrinking or role changes on an over-limit workspace still work.
 4. **Document schema** changes rely on TypeORM `synchronize` (dev) like the existing entities; no migration files exist in `apps/document` today.
 
 ## Global Constraints
@@ -27,7 +27,7 @@
 - Cron actors: note `NOTOPIA_NOTE_IDENTITY_SERVICE_ACCOUNT_USER_ID=1001`, document `NOTOPIA_DOCUMENT_IDENTITY_SERVICE_ACCOUNT_USER_ID=1002`.
 - Cron time zone is never hard-coded: Go passes `time.Local`, NestJS `@Cron` omits `timeZone`; both follow the process `TZ` env (else system zone). Schedules: note trash purge `0 3 * * *`; document revision purge `30 3 * * *`; document sweeper `*/10 * * * *`.
 - Hocuspocus facts (v4.0.0): store payload `{clientsCount, document, documentName, instance, lastContext, lastTransactionOrigin}`; `afterStoreDocument` runs in the same `saveMutex` right after `onStoreDocument`; debounce/maxDebounce are server-wide only (defaults 2000/10000).
-- Skip obvious tests. `oxfmt` changed JS; `nx lint <project> --fix`; conventional commits.
+- Go tests use testify (`require` for preconditions, `assert` for checks); no `t.Fatal`/`t.Errorf` assertions. Skip obvious tests. `oxfmt` changed JS; `nx lint <project> --fix`; conventional commits.
 
 ## Review Focus
 
@@ -44,10 +44,12 @@
 ### Task 1: Entitlement port, billing client, 402/409/503 errors
 
 **Files:**
+
 - Create: `internal/note/app/svc_entitlement.go`, `internal/note/infra/service/billing.go`, `internal/note/errs/billing.go`
 - Modify: `internal/note/config/config.go` (`Services.Billing`), `internal/note/infra/service/wire.go` (or the file holding `service.ProviderSet`), `internal/note/controller/http/err.go`, `cmd/note/.env`
 
 **Interfaces:**
+
 - Produces:
 
 ```go
@@ -76,6 +78,7 @@ type EntitlementSvc interface {
 func RequiredPlanForFeature(plans []PlanEntitlements, key string) PlanTier
 func RequiredPlanForLimit(plans []PlanEntitlements, key string, needed int64) PlanTier
 ```
+
 - Mapper (`infra/service/billing.go`): `toAppPlanTier(pb.PlanTier) (app.PlanTier, error)`; `PLAN_TIER_UNSPECIFIED` (or any unknown value) is an internal error, since note has no fallback plan.
 - errs: `NewFeatureNotInPlan(key, requiredPlan string)`, `NewPlanLimitExceeded(key string, current, max int64, requiredPlan string)`, `NewBillingPayerMustTransfer(workspaceID uuid.UUID)`, `NewBillingServiceUnavailable(err error)`.
 
@@ -240,6 +243,7 @@ func NewBillingServiceUnavailable(err error) *Err {
 `requiredPlan` stays a `string` in `errs`: it is the 402 wire value, so app callers pass `RequiredPlanFor…(…).String()`.
 
 `internal/note/controller/http/err.go`:
+
 - `strictServerToHTTPErr`: `CodeBillingPayerMustTransfer` → 409, `CodeBillingServiceUnavailable` → 503, `CodeFeatureNotInPlan`/`CodePlanLimitExceeded` → 402.
 - In `strictHandlerError`, before the generic path:
 
@@ -367,10 +371,12 @@ git commit -m "feat(note): billing entitlement client and payment-required error
 ### Task 2: Gates — members limit, payer guard, graph
 
 **Files:**
+
 - Modify: `internal/note/app/cmd_updateworkspacemembers.go`, `internal/note/app/cmd_leaveworkspace.go`, `internal/note/app/q_getnotegraph.go`, `internal/note/app/q_getworkspacegraph.go`
 - Create: `internal/note/app/billinggate.go`, `internal/note/app/billinggate_test.go`
 
 **Interfaces:**
+
 - Consumes: `EntitlementSvc`, `AuthorizationSvc.GetWorkspaceMembers(ctx, userID, workspaceID) ([]WorkspaceMember, error)` (existing; `WorkspaceMember{ID string; Role WorkspaceRole}` — check field names in `internal/note/app/model.go`).
 - Produces: `checkMembersLimit(ctx, ent EntitlementSvc, workspaceID uuid.UUID, current, requested int) error`, `checkPayerKept(ctx, ent EntitlementSvc, workspaceID uuid.UUID, members []WorkspaceMemberUpdate) error`, `checkPayerMayLeave(ctx, ent EntitlementSvc, workspaceID uuid.UUID, userID string) error`.
 
@@ -387,6 +393,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type fakeEntitlements struct {
@@ -413,15 +421,12 @@ func TestMembersLimit(t *testing.T) {
 
 	var pr *errs.PaymentRequired
 	err := checkMembersLimit(context.Background(), free, ws, 3, 4)
-	if !errors.As(err, &pr) || pr.RequiredPlan != "plus" || *pr.Max != 3 {
-		t.Fatalf("growing past limit: err = %v", err)
-	}
-	if err := checkMembersLimit(context.Background(), free, ws, 5, 4); err != nil {
-		t.Fatalf("shrinking an over-limit workspace must pass: %v", err)
-	}
-	if err := checkMembersLimit(context.Background(), free, ws, 5, 5); err != nil {
-		t.Fatalf("same count (role change) must pass: %v", err)
-	}
+	require.ErrorAs(t, err, &pr, "growing past limit")
+	assert.Equal(t, "plus", pr.RequiredPlan)
+	assert.EqualValues(t, 3, *pr.Max)
+
+	assert.NoError(t, checkMembersLimit(context.Background(), free, ws, 5, 4), "shrinking an over-limit workspace")
+	assert.NoError(t, checkMembersLimit(context.Background(), free, ws, 5, 5), "same count (role change)")
 }
 
 func TestPayerGuard(t *testing.T) {
@@ -430,16 +435,11 @@ func TestPayerGuard(t *testing.T) {
 	g := fakeEntitlements{payer: &payer, requiresPayer: true}
 
 	demoted := []WorkspaceMemberUpdate{{ID: "112", Role: WorkspaceRoleEditor}, {ID: "111", Role: WorkspaceRoleOwner}}
-	if err := checkPayerKept(context.Background(), g, ws, demoted); !isCode(err, errs.CodeBillingPayerMustTransfer) {
-		t.Fatalf("demoting payer: err = %v", err)
-	}
-	if err := checkPayerMayLeave(context.Background(), g, ws, "112"); !isCode(err, errs.CodeBillingPayerMustTransfer) {
-		t.Fatalf("payer leaving: err = %v", err)
-	}
+	assert.True(t, isCode(checkPayerKept(context.Background(), g, ws, demoted), errs.CodeBillingPayerMustTransfer), "demoting payer")
+	assert.True(t, isCode(checkPayerMayLeave(context.Background(), g, ws, "112"), errs.CodeBillingPayerMustTransfer), "payer leaving")
+
 	lifetime := fakeEntitlements{payer: &payer, requiresPayer: false}
-	if err := checkPayerMayLeave(context.Background(), lifetime, ws, "112"); err != nil {
-		t.Fatalf("no recurring charge: %v", err)
-	}
+	assert.NoError(t, checkPayerMayLeave(context.Background(), lifetime, ws, "112"), "no recurring charge")
 }
 
 func isCode(err error, code errs.Code) bool {
@@ -569,6 +569,7 @@ git commit -m "feat(note): enforce member limit, payer guard and graph entitleme
 ### Task 3: Trash purge cron
 
 **Files:**
+
 - Create: `internal/note/app/trashdelete.go` (shared delete helper), `internal/note/app/cmd_purgeexpiredtrash.go`
 - Modify: `internal/note/app/cmd_permanentlydeleteworkspaceitems.go`, `internal/note/app/cmd_emptytrash.go` (use the helper)
 - Modify: `internal/note/infra/persistence/pgsqlc/workspace_read.sql`, `internal/note/app/readmodel.go`, create `internal/note/infra/persistence/pgreadmodel/trashworkspaces.go`, modify `internal/note/infra/persistence/wire.go`
@@ -576,6 +577,7 @@ git commit -m "feat(note): enforce member limit, payer guard and graph entitleme
 - Modify: `deploy/compose/services/note.yaml` (`note_redis` now holds cron locks: `command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]`, same as `billing_redis`/`document_redis`)
 
 **Interfaces:**
+
 - Consumes: `pkg/cron`, `EntitlementSvc.BatchGet`, `commonconfig.Identity.ServiceAccountUserID`.
 - Produces: `permanentlyDeleteItems(ctx, r domain.RepoRegistry, noteIDs, folderIDs []uuid.UUID, userID string) error`; `Cmds.PurgeExpiredTrash`; `TrashWorkspacesReadModel.Handle(ctx, before time.Time) ([]uuid.UUID, error)`; job `note:purge-expired-trash`.
 
@@ -826,6 +828,7 @@ git commit -m "feat(note): plan-aware trash purge cron"
 ### Task 4: Billing change notifications over SSE
 
 **Files:**
+
 - Create: `api/note/components/schemas/WorkspaceBillingChangedEvent.yaml`
 - Modify: `api/note/paths/workspaces_{workspaceId}_events.yaml`
 - Modify: `internal/note/app/workspaceevent.go`
@@ -833,6 +836,7 @@ git commit -m "feat(note): plan-aware trash purge cron"
 - Modify: `internal/note/controller/event/event.go`, `app.go`, `wire.go`
 
 **Interfaces:**
+
 - Consumes: `share.SubscriptionChangedEvent` (plan 02 Task 5b) on `events.integration.billing.subscription.changed`.
 - Produces: SSE event `WorkspaceBillingChangedEvent {id, event, data: {workspaceId, plan}}` published on the workspace's existing channel.
 
@@ -997,25 +1001,26 @@ git commit -m "feat(note): forward billing changes to workspace SSE"
 ### Task 5: Plan notes in the note OpenAPI
 
 **Files:**
+
 - Modify: `api/note/paths/workspaces_{workspaceId}_members.yaml`, `workspaces_{workspaceId}_leave.yaml`, `notes_{noteId}_graph.yaml`, `workspaces_{workspaceId}_graph.yaml`, `workspaces_{workspaceId}_show-trash.yaml`
 
 - [ ] **Step 1: Descriptions + responses**
 
 Append to each operation's `description` (add `description` if missing):
 
-| File | Line |
-| --- | --- |
+| File                | Line                                                                                                                                                                                                                  |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | members (PUT/PATCH) | "Plan limit `members` (free 3, plus 10, pro unlimited). Adding beyond the limit returns 402. The billing payer cannot lose the owner role while a recurring subscription is active (409 `billingPayerMustTransfer`)." |
-| leave | "The billing payer cannot leave while a recurring subscription is active (409 `billingPayerMustTransfer`)." |
-| note graph | "`depth` is capped by plan limit `note_graph_max_depth` (free 5)." |
-| workspace graph | "Requires feature `workspace_graph` (plus, pro); free returns 402." |
-| show-trash | "Trashed items older than the plan's `trash_retention_days` are purged daily." |
+| leave               | "The billing payer cannot leave while a recurring subscription is active (409 `billingPayerMustTransfer`)."                                                                                                           |
+| note graph          | "`depth` is capped by plan limit `note_graph_max_depth` (free 5)."                                                                                                                                                    |
+| workspace graph     | "Requires feature `workspace_graph` (plus, pro); free returns 402."                                                                                                                                                   |
+| show-trash          | "Trashed items older than the plan's `trash_retention_days` are purged daily."                                                                                                                                        |
 
 Add responses where a gate applies:
 
 ```yaml
-    402:
-      $ref: ../../common/components/responses/PaymentRequired.yaml
+402:
+  $ref: ../../common/components/responses/PaymentRequired.yaml
 ```
 
 and `409` (inline `Error`) on members/leave, `503` (`InternalServerError` shape, description "Billing service unavailable") on gated operations.
@@ -1035,11 +1040,13 @@ git commit -m "docs(api): document plan limits on note endpoints"
 ### Task 6: Billing gRPC client in document
 
 **Files:**
+
 - Create: `apps/document/src/entitlement/{entitlement.module.ts,entitlement.service.ts,index.ts}`
 - Modify: `apps/document/src/config/config.ts`, `config.factory.ts` (`billingUrl`), `apps/document/.env`, `apps/document/src/app.module.ts`
 - Modify: `packages/pb/package.json` (export `./billing` if `nx run proto:gen` did not add it — mirror `./note`)
 
 **Interfaces:**
+
 - Produces:
 
 ```ts
@@ -1145,8 +1152,12 @@ export class EntitlementService implements OnModuleInit {
     const res = await firstValueFrom(this.client.listPlans({}));
     return res.plans.map((p) => {
       const tier = toPlanTier(p.tier);
-      if (!tier) throw new InternalServerErrorException(`Invalid plan tier from billing: ${p.tier}`);
-      return { tier, limits: Object.fromEntries(Object.entries(p.limits).map(([k, v]) => [k, Number(v)])) };
+      if (!tier)
+        throw new InternalServerErrorException(`Invalid plan tier from billing: ${p.tier}`);
+      return {
+        tier,
+        limits: Object.fromEntries(Object.entries(p.limits).map(([k, v]) => [k, Number(v)])),
+      };
     });
   }
 }
@@ -1167,6 +1178,7 @@ git commit -m "feat(document): billing entitlement grpc client"
 ### Task 7: Revision metadata, contributors and `commitIfDue`
 
 **Files:**
+
 - Modify: `apps/document/src/document/document.entity.ts`, `apps/document/src/revision/revision.entity.ts`
 - Modify: `apps/document/src/document/document.service.ts` (`commitIfDue`, `upsertData` with contributors, manual commit through `commitIfDue`)
 - Create: `apps/document/src/hocuspocus/contributor-tracker.ts`
@@ -1175,6 +1187,7 @@ git commit -m "feat(document): billing entitlement grpc client"
 - Create: `apps/document/src/document/commit-policy.spec.ts`
 
 **Interfaces:**
+
 - Produces:
 
 ```ts
@@ -1261,10 +1274,42 @@ describe('commit policy', () => {
 
   it('respects the min interval unless forced', () => {
     const last = new Date('2026-10-11T09:58:00Z'); // 120 s ago
-    expect(shouldCommit({ modified: true, lastCommittedAt: last, now, force: false, minIntervalSeconds: 300 })).toBe(false);
-    expect(shouldCommit({ modified: true, lastCommittedAt: last, now, force: true, minIntervalSeconds: 300 })).toBe(true);
-    expect(shouldCommit({ modified: true, lastCommittedAt: last, now, force: false, minIntervalSeconds: 60 })).toBe(true);
-    expect(shouldCommit({ modified: false, lastCommittedAt: null, now, force: true, minIntervalSeconds: 0 })).toBe(false);
+    expect(
+      shouldCommit({
+        modified: true,
+        lastCommittedAt: last,
+        now,
+        force: false,
+        minIntervalSeconds: 300,
+      })
+    ).toBe(false);
+    expect(
+      shouldCommit({
+        modified: true,
+        lastCommittedAt: last,
+        now,
+        force: true,
+        minIntervalSeconds: 300,
+      })
+    ).toBe(true);
+    expect(
+      shouldCommit({
+        modified: true,
+        lastCommittedAt: last,
+        now,
+        force: false,
+        minIntervalSeconds: 60,
+      })
+    ).toBe(true);
+    expect(
+      shouldCommit({
+        modified: false,
+        lastCommittedAt: null,
+        now,
+        force: true,
+        minIntervalSeconds: 0,
+      })
+    ).toBe(false);
   });
 
   it('hashes equal content equally', () => {
@@ -1405,10 +1450,12 @@ git commit -m "feat(document): revision author, trigger, contributors and commit
 ### Task 8: Auto-commit extension
 
 **Files:**
+
 - Create: `apps/document/src/hocuspocus/auto-commit.extension.ts`
 - Modify: `apps/document/src/hocuspocus/hocuspocus.ts` (extensions, debounce config), `apps/document/src/config/*` (`hocuspocusDebounceMs`, `hocuspocusMaxDebounceMs`), `apps/document/src/hocuspocus/hocuspocus.module.ts` (import `EntitlementModule`)
 
 **Interfaces:**
+
 - Consumes: `EntitlementService.get`, `NoteService.getWorkspaceByNote({ noteId, userId })`, `DocumentService.commitIfDue`, `HocuspocusService.setModified`.
 - Produces: `AutoCommitExtension implements Extension` (`afterStoreDocument`).
 
@@ -1436,15 +1483,24 @@ export class AutoCommitExtension implements Extension {
     private readonly onCommitted: (documentId: string) => void
   ) {}
 
-  async afterStoreDocument({ documentName, document, clientsCount, lastContext }: afterStoreDocumentPayload<HocuspocusContext>) {
+  async afterStoreDocument({
+    documentName,
+    document,
+    clientsCount,
+    lastContext,
+  }: afterStoreDocumentPayload<HocuspocusContext>) {
     if (!readModified(document)) return;
     const userId = lastContext?.user?.id;
     try {
       const entity = await this.documentService.getById(documentName);
       if (!entity) return;
       const force = clientsCount === 0;
-      const lookupUserId = entity.pendingContributorIds.at(-1) ?? userId ?? this.serviceAccountUserId;
-      const workspace = await this.noteService.getWorkspaceByNote({ noteId: documentName, userId: lookupUserId });
+      const lookupUserId =
+        entity.pendingContributorIds.at(-1) ?? userId ?? this.serviceAccountUserId;
+      const workspace = await this.noteService.getWorkspaceByNote({
+        noteId: documentName,
+        userId: lookupUserId,
+      });
       const ent = await this.entitlementService.get(workspace.id);
       if (!feature(ent, 'auto_commit')) return;
       const { revisionId } = await this.documentService.commitIfDue({
@@ -1487,10 +1543,12 @@ git commit -m "feat(document): auto-commit on paid plans via hocuspocus extensio
 ### Task 9: Sweeper + revision purge crons, scaling toggle
 
 **Files:**
+
 - Create: `apps/document/src/cron/{cron.module.ts,sweeper.cron.ts,revision-purge.cron.ts,revision-purge.ts,revision-purge.spec.ts}`
 - Modify: `apps/document/src/app.module.ts` (`ScheduleModule.forRoot()`, `LocksSetupModule.forRoot(...)`, `CronModule`), `apps/document/src/config/*` (`scalingEnabled`, `redisUrl`), `apps/document/src/hocuspocus/hocuspocus.ts` (Redis extension), `apps/document/package.json` (deps), `deploy/compose/services/document.yaml` (optional redis)
 
 **Interfaces:**
+
 - Consumes: `@notopia-uit/lib-server/locks` (`LocksSetupModule`), `NoteService.batchGetNoteWorkspaces`, `EntitlementService.batchGet/listPlans`.
 - Produces: `planRevisionDeletes(revisions: {id, documentId, createdAt}[], retentionDaysByDocument: Map<string, number>, now: Date): string[]` (pure, tested).
 
@@ -1511,7 +1569,10 @@ describe('planRevisionDeletes', () => {
       { id: 'r2', documentId: 'a', createdAt: d('2026-09-02T00:00:00Z') },
       { id: 'r3', documentId: 'b', createdAt: d('2026-09-01T00:00:00Z') },
     ];
-    const retention = new Map([['a', 7], ['b', 7]]);
+    const retention = new Map([
+      ['a', 7],
+      ['b', 7],
+    ]);
     expect(planRevisionDeletes(revisions, retention, now)).toEqual(['r1']);
   });
 
@@ -1591,7 +1652,9 @@ export class RevisionPurgeCron {
   @WithoutOverlapping()
   async purge(): Promise<void> {
     const plans = await this.entitlementService.listPlans();
-    const days = plans.map((p) => limit({ plan: p.tier, features: {}, limits: p.limits }, 'revision_history_days')).filter((d) => d >= 0);
+    const days = plans
+      .map((p) => limit({ plan: p.tier, features: {}, limits: p.limits }, 'revision_history_days'))
+      .filter((d) => d >= 0);
     if (days.length === 0) return;
     const minDays = Math.min(...days);
     const repo = this.dataSource.getRepository(RevisionEntity);
@@ -1670,7 +1733,12 @@ export class SweeperCron {
       const e = ents.get(ws);
       if (!e || !feature(e, 'auto_commit')) continue;
       try {
-        await this.documentService.commitIfDue({ documentId, trigger: 'sweeper', force: true, minIntervalSeconds: 0 });
+        await this.documentService.commitIfDue({
+          documentId,
+          trigger: 'sweeper',
+          force: true,
+          minIntervalSeconds: 0,
+        });
       } catch (err) {
         this.logger.warn({ err, documentId }, 'sweeper commit failed');
       }
@@ -1688,7 +1756,9 @@ Config (`config.ts` / `config.factory.ts`):
 ```ts
 export const scalingConfigSchema = z
   .object({ enabled: z.boolean(), redisUrl: z.string().optional() })
-  .refine((c) => !c.enabled || !!c.redisUrl, { message: 'NOTOPIA_DOCUMENT_REDIS_URL is required when scaling is enabled' });
+  .refine((c) => !c.enabled || !!c.redisUrl, {
+    message: 'NOTOPIA_DOCUMENT_REDIS_URL is required when scaling is enabled',
+  });
 ```
 
 from `NOTOPIA_DOCUMENT_SCALING_ENABLED === 'true'` and `NOTOPIA_DOCUMENT_REDIS_URL`.
@@ -1702,13 +1772,13 @@ Dependencies (`apps/document/package.json`, via catalog): `@nestjs/schedule`, `@
 `deploy/compose/services/document.yaml`: add
 
 ```yaml
-  document_redis:
-    container_name: notopia-document_redis
-    image: redis:8.4.3-alpine3.22
-    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
-    profiles: ["scaling"]
-    ports:
-      - 6374:6379
+document_redis:
+  container_name: notopia-document_redis
+  image: redis:8.4.3-alpine3.22
+  command: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
+  profiles: ['scaling']
+  ports:
+    - 6374:6379
 ```
 
 - [ ] **Step 5: Tests, build, verify, commit**
@@ -1730,6 +1800,7 @@ git commit -m "feat(document): sweeper and revision purge crons with optional re
 ### Task 10: Docs, API descriptions, web outline, E2E
 
 **Files:**
+
 - Modify: `apps/document/AGENTS.md`, `internal/note/AGENTS.md`, `api/document/paths/*` (commit + revisions descriptions)
 - Create: `docs/superpowers/notes/billing-web-outline.md` (handoff for the frontend owner)
 

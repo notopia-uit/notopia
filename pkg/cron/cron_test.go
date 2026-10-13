@@ -10,6 +10,8 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	"github.com/notopia-uit/notopia/pkg/cron"
 	"github.com/redis/go-redis/v9"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestJobRunsOnceAcrossSchedulers(t *testing.T) {
@@ -34,45 +36,33 @@ func TestJobRunsOnceAcrossSchedulers(t *testing.T) {
 		client := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 		t.Cleanup(func() { _ = client.Close() })
 		locker, err := cron.NewRedisLocker(client)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		s, err := cron.NewScheduler(locker, slog.Default(), time.UTC)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if err := s.Register(job); err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
+		require.NoError(t, s.Register(job))
 		s.Start()
 		t.Cleanup(func() { _ = s.Shutdown() })
 		schedulers[i] = s
 	}
 
-	if err := schedulers[0].RunNow("test:job"); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, schedulers[0].RunNow("test:job"))
 	select {
 	case <-started:
 	case <-time.After(3 * time.Second):
-		t.Fatal("first run did not start")
+		require.FailNow(t, "first run did not start")
 	}
 
-	if err := schedulers[1].RunNow("test:job"); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, schedulers[1].RunNow("test:job"))
 	select {
 	case <-started:
-		t.Fatal("second scheduler ran the job while the lock was held")
+		require.FailNow(t, "second scheduler ran the job while the lock was held")
 	case <-time.After(300 * time.Millisecond):
 	}
 
 	close(release)
 	time.Sleep(200 * time.Millisecond)
 
-	if got := runs.Load(); got != 1 {
-		t.Fatalf("runs = %d, want 1", got)
-	}
+	assert.EqualValues(t, 1, runs.Load())
 }
 
 func TestRegisterRejectsInvalidJob(t *testing.T) {
@@ -80,13 +70,9 @@ func TestRegisterRejectsInvalidJob(t *testing.T) {
 	client := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = client.Close() })
 	locker, err := cron.NewRedisLocker(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	s, err := cron.NewScheduler(locker, slog.Default(), time.UTC)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	t.Cleanup(func() { _ = s.Shutdown() })
 
 	run := func(context.Context) error { return nil }
@@ -98,13 +84,10 @@ func TestRegisterRejectsInvalidJob(t *testing.T) {
 	}
 	for name, job := range tests {
 		t.Run(name, func(t *testing.T) {
-			if err := s.Register(job); err == nil {
-				t.Fatal("expected error")
-			}
+			assert.Error(t, s.Register(job))
 		})
 	}
 
-	if _, err := cron.NewScheduler(locker, nil, time.UTC); err == nil {
-		t.Fatal("expected error for nil logger")
-	}
+	_, err = cron.NewScheduler(locker, nil, time.UTC)
+	assert.Error(t, err, "nil logger")
 }

@@ -37,7 +37,7 @@
 - `IsValid()` returns false for the `Unspecified` zero (true for real "none" states such as `StatusNone`), deliberately unlike note's `TrashedBy.IsValid()`, which accepts `Unspecified`.
 - Exception: `errs.Code` stays `type Code string`, because it is the wire error code itself (same as `internal/note/errs/common.go`).
 - Codegen: `nx run api:gen`, `nx run proto:gen`, `nx run billing:gen:sqlc`, `nx run billing:gen:wire`. Never edit generated files.
-- Skip obvious tests. `nx lint billing` before each commit. Conventional commits.
+- Go tests use testify (`require` for preconditions, `assert` for checks); no `t.Fatal`/`t.Errorf` assertions. Skip obvious tests. `nx lint billing` before each commit. Conventional commits.
 
 ## Review Focus
 
@@ -53,12 +53,14 @@
 ### Task 1: Contracts — proto and OpenAPI
 
 **Files:**
+
 - Create: `proto/billing/billing.proto`
 - Create: `api/billing/openapi.yaml`, `api/billing/project.json`, `api/billing/oapi-codegen-server.yaml`, `api/billing/oapi-codegen-model.yaml`
 - Create: `api/billing/paths/*.yaml` (listed below), `api/billing/components/schemas/*.yaml`, `api/billing/components/parameters/*.yaml`
 - Modify: `api/redocly.yaml`, `api/project.json` (`implicitDependencies`), `api/package.json` (`redocly:join`), `api/api.go` (`BillingSpec`), `apps/api-web/project.json` (sources/dependsOn, mirror the `api/note` entries)
 
 **Interfaces:**
+
 - Produces: `pb.BillingServiceServer/Client` with `GetWorkspaceEntitlements`, `BatchGetWorkspaceEntitlements`, `GetWorkspacePayer`, `ListPlans`; proto enums `pb.PlanTier` (`PLAN_TIER_UNSPECIFIED = 0`, `FREE`, `PLUS`, `PRO`) and `pb.SubscriptionStatus` (`SUBSCRIPTION_STATUS_UNSPECIFIED = 0`, `NONE`, `INCOMPLETE`, `ACTIVE`, `PAST_DUE`, `UNPAID`, `CANCELED`, `INCOMPLETE_EXPIRED`), used by `Entitlements.plan`/`status` and `BillingPlan.tier` (TS: `PlanTier`, `SubscriptionStatus` enums in `@notopia-uit/pb/billing`); Go package `pkg/api/billing` with `StrictServerInterface`; TS `@notopia-uit/pb/billing`; `api.BillingSpec`.
 
 - [ ] **Step 1: Proto**
@@ -277,7 +279,7 @@ example: month
 ```yaml
 # SubscriptionStatus.yaml
 type: string
-description: "`none` when the workspace never subscribed."
+description: '`none` when the workspace never subscribed.'
 enum: [none, incomplete, active, past_due, unpaid, canceled, incomplete_expired]
 example: active
 ```
@@ -400,7 +402,15 @@ properties:
     example: vnd
   reason:
     type: string
-    enum: [cancel_now, lifetime_window, replaced_by_lifetime, workspace_deleted, duplicate_checkout, external]
+    enum:
+      [
+        cancel_now,
+        lifetime_window,
+        replaced_by_lifetime,
+        workspace_deleted,
+        duplicate_checkout,
+        external,
+      ]
     example: cancel_now
   status:
     type: string
@@ -419,7 +429,7 @@ type: object
 properties:
   id:
     type: string
-    example: "112"
+    example: '112'
   email:
     type: string
     example: owner@notopia.com
@@ -627,22 +637,22 @@ required: [plan, interval, amount, currency]
 
 Path files (`paths/`). Authenticated operations use the same `security` block as `api/note/paths/workspaces_{workspaceId}_publish.yaml`; public ones use `security: []`. Every operation lists `400`, `401` (authenticated only), `500` from `../../common/components/responses/`; add `403` / `404` where stated.
 
-| File | Method | operationId | Tag | Request | 2xx | Extra errors |
-| --- | --- | --- | --- | --- | --- | --- |
-| `plans.yaml` | get | `listPlans` | Plan | — | 200 `Plan[]` | — (public) |
-| `workspaces_{workspaceId}_entitlements.yaml` | get | `getWorkspaceEntitlements` | WorkspaceBilling | — | 200 `Entitlements` | 403 |
-| `workspaces_{workspaceId}_subscription.yaml` | get | `getWorkspaceBilling` | WorkspaceBilling | — | 200 `WorkspaceBilling` | 403 |
-| `workspaces_{workspaceId}_checkout-session.yaml` | post | `createCheckoutSession` | WorkspaceBilling | `CheckoutSessionRequest` | 200 `RedirectURL` | 403, 404, 409 |
-| `workspaces_{workspaceId}_portal-session.yaml` | post | `createPortalSession` | WorkspaceBilling | — | 200 `RedirectURL` | 403, 404 |
-| `workspaces_{workspaceId}_subscription_cancel-now_preview.yaml` | get | `previewCancelNow` | WorkspaceBilling | — | 200 `RefundQuote` | 403, 404, 409 |
-| `workspaces_{workspaceId}_subscription_cancel-now.yaml` | post | `cancelNow` | WorkspaceBilling | — | 200 `WorkspaceBilling` | 403, 404, 409 |
-| `workspaces_{workspaceId}_payer_claim.yaml` | post | `claimPayer` | WorkspaceBilling | — | 200 `RedirectURL` | 403, 404, 409 |
-| `admin_plans.yaml` | get | `adminListPlans` | BillingAdmin | — | 200 `Plan[]` | 403 |
-| `admin_plans_{tier}.yaml` | patch | `adminUpdatePlan` | BillingAdmin | `UpdatePlanRequest` | 200 `Plan` | 403, 404 |
-| `admin_policy.yaml` | get / patch | `adminGetPolicy` / `adminUpdatePolicy` | BillingAdmin | — / `UpdatePolicyRequest` | 200 `BillingPolicy` | 403 |
-| `admin_prices.yaml` | get / post | `adminListPrices` / `adminCreatePrice` | BillingAdmin | — / `CreatePriceRequest` | 200 `Price[]` / 201 `Price` | 403 |
-| `admin_prices_{priceId}_archive.yaml` | post | `adminArchivePrice` | BillingAdmin | — | 200 `Price` | 403, 404 |
-| `webhooks_stripe.yaml` | post | `stripeWebhook` | Webhook | header `Stripe-Signature` (required, string); body `application/json` free-form object | 204 | 400 (public) |
+| File                                                            | Method      | operationId                            | Tag              | Request                                                                                | 2xx                         | Extra errors  |
+| --------------------------------------------------------------- | ----------- | -------------------------------------- | ---------------- | -------------------------------------------------------------------------------------- | --------------------------- | ------------- |
+| `plans.yaml`                                                    | get         | `listPlans`                            | Plan             | —                                                                                      | 200 `Plan[]`                | — (public)    |
+| `workspaces_{workspaceId}_entitlements.yaml`                    | get         | `getWorkspaceEntitlements`             | WorkspaceBilling | —                                                                                      | 200 `Entitlements`          | 403           |
+| `workspaces_{workspaceId}_subscription.yaml`                    | get         | `getWorkspaceBilling`                  | WorkspaceBilling | —                                                                                      | 200 `WorkspaceBilling`      | 403           |
+| `workspaces_{workspaceId}_checkout-session.yaml`                | post        | `createCheckoutSession`                | WorkspaceBilling | `CheckoutSessionRequest`                                                               | 200 `RedirectURL`           | 403, 404, 409 |
+| `workspaces_{workspaceId}_portal-session.yaml`                  | post        | `createPortalSession`                  | WorkspaceBilling | —                                                                                      | 200 `RedirectURL`           | 403, 404      |
+| `workspaces_{workspaceId}_subscription_cancel-now_preview.yaml` | get         | `previewCancelNow`                     | WorkspaceBilling | —                                                                                      | 200 `RefundQuote`           | 403, 404, 409 |
+| `workspaces_{workspaceId}_subscription_cancel-now.yaml`         | post        | `cancelNow`                            | WorkspaceBilling | —                                                                                      | 200 `WorkspaceBilling`      | 403, 404, 409 |
+| `workspaces_{workspaceId}_payer_claim.yaml`                     | post        | `claimPayer`                           | WorkspaceBilling | —                                                                                      | 200 `RedirectURL`           | 403, 404, 409 |
+| `admin_plans.yaml`                                              | get         | `adminListPlans`                       | BillingAdmin     | —                                                                                      | 200 `Plan[]`                | 403           |
+| `admin_plans_{tier}.yaml`                                       | patch       | `adminUpdatePlan`                      | BillingAdmin     | `UpdatePlanRequest`                                                                    | 200 `Plan`                  | 403, 404      |
+| `admin_policy.yaml`                                             | get / patch | `adminGetPolicy` / `adminUpdatePolicy` | BillingAdmin     | — / `UpdatePolicyRequest`                                                              | 200 `BillingPolicy`         | 403           |
+| `admin_prices.yaml`                                             | get / post  | `adminListPrices` / `adminCreatePrice` | BillingAdmin     | — / `CreatePriceRequest`                                                               | 200 `Price[]` / 201 `Price` | 403           |
+| `admin_prices_{priceId}_archive.yaml`                           | post        | `adminArchivePrice`                    | BillingAdmin     | —                                                                                      | 200 `Price`                 | 403, 404      |
+| `webhooks_stripe.yaml`                                          | post        | `stripeWebhook`                        | Webhook          | header `Stripe-Signature` (required, string); body `application/json` free-form object | 204                         | 400 (public)  |
 
 409 responses reuse `../../common/components/responses/BadRequestError.yaml` shape inline (schema `../../common/components/schemas/Error.yaml`, description `Conflict with current billing state`).
 
@@ -748,9 +758,9 @@ output-options:
 `api/redocly.yaml` `apis`: add
 
 ```yaml
-  billing:
-    root: ./billing/openapi.yaml
-    output: ./bundled/billing.json
+billing:
+  root: ./billing/openapi.yaml
+  output: ./bundled/billing.json
 ```
 
 `api/project.json` `implicitDependencies`: add `"api/billing"`. `api/package.json` `redocly:join`: insert `./bundled/billing.json` after `./bundled/note.json`. `api/api.go`: `BillingSpec Spec = "billing.json"`. `apps/api-web/project.json`: add `api/billing` wherever `api/note` appears.
@@ -774,11 +784,13 @@ git commit -m "feat(billing): add billing OpenAPI and proto contracts"
 ### Task 2: Domain
 
 **Files:**
+
 - Create: `internal/billing/domain/{types.go,event.go,plan.go,policy.go,price.go,billingaccount.go,subscription.go,refund.go,entitlement.go,repo.go,wire.go}`
 - Create: `internal/billing/domain/subscription_test.go`
 - Create: `internal/billing/errs/errs.go`
 
 **Interfaces:**
+
 - Produces (used by every later task):
   - `uint8` enums `PlanTier` (zero `PlanTierUnspecified`), `Interval` (`IntervalUnspecified`), `Status` (`StatusNone`), `RefundReason` (`RefundReasonUnspecified`), `RefundStatus` (`RefundStatusUnspecified`), `FeatureKey` (`FeatureKeyUnspecified`), `LimitKey` (`LimitKeyUnspecified`), each with `IsValid()` (false for the Unspecified zero) and `String()`; `ParseFeatureKey(string) (FeatureKey, error)`, `ParseLimitKey(string) (LimitKey, error)`; `Money{Amount int64; Currency string}`; `Payer{ID, Email, Name string}`.
   - `ProviderSnapshot`, `PaymentInfo`, `RefundQuote`, `Entitlements`.
@@ -1590,6 +1602,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var t0 = time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
@@ -1597,9 +1611,7 @@ var t0 = time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
 func price(t *testing.T, plan domain.PlanTier, interval domain.Interval, amount int64) *domain.Price {
 	t.Helper()
 	p, err := domain.NewPrice(uuid.New(), plan, interval, domain.Money{Amount: amount, Currency: "vnd"}, "price_x", t0, "u")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	return p
 }
 
@@ -1654,12 +1666,8 @@ func TestGrantsAccess(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			s, err := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.TierPlus, domain.IntervalMonth, 49000), snap(c.status, t0, end), t0, "u")
-			if err != nil {
-				t.Fatal(err)
-			}
-			if got := s.GrantsAccess(c.now, policy); got != c.want {
-				t.Fatalf("GrantsAccess = %v, want %v", got, c.want)
-			}
+			require.NoError(t, err)
+			assert.Equal(t, c.want, s.GrantsAccess(c.now, policy))
 		})
 	}
 }
@@ -1669,25 +1677,17 @@ func TestApplySnapshotEvents(t *testing.T) {
 	pro := price(t, domain.TierPro, domain.IntervalMonth, 99000)
 	end := t0.AddDate(0, 1, 0)
 	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), plus, snap(domain.StatusActive, t0, end), t0, "u")
-	if got := eventNames(s.PopEvents()); len(got) != 2 || got[0] != "created" || got[1] != "activated" {
-		t.Fatalf("create events = %v", got)
-	}
+	assert.Equal(t, []string{"created", "activated"}, eventNames(s.PopEvents()))
 
 	s.ApplySnapshot(snap(domain.StatusActive, end, end.AddDate(0, 1, 0)), plus, end, "u")
-	if got := eventNames(s.PopEvents()); len(got) != 1 || got[0] != "renewed" {
-		t.Fatalf("renew events = %v", got)
-	}
+	assert.Equal(t, []string{"renewed"}, eventNames(s.PopEvents()))
 
 	s.ApplySnapshot(snap(domain.StatusPastDue, end, end.AddDate(0, 1, 0)), pro, end, "u")
-	if got := eventNames(s.PopEvents()); len(got) != 2 || got[0] != "past_due" || got[1] != "plan_changed" {
-		t.Fatalf("past_due+plan events = %v", got)
-	}
+	assert.Equal(t, []string{"past_due", "plan_changed"}, eventNames(s.PopEvents()))
 
 	ended := snap(domain.StatusCanceled, end, end.AddDate(0, 1, 0))
 	s.ApplySnapshot(ended, pro, end, "u")
-	if got := eventNames(s.PopEvents()); len(got) != 1 || got[0] != "ended" {
-		t.Fatalf("end events = %v", got)
-	}
+	assert.Equal(t, []string{"ended"}, eventNames(s.PopEvents()))
 }
 
 func TestQuoteCancelNow(t *testing.T) {
@@ -1697,21 +1697,15 @@ func TestQuoteCancelNow(t *testing.T) {
 	pay := domain.PaymentInfo{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_1", PaidAt: t0, CoverageStart: t0, CoverageEnd: end}
 
 	q, err := s.QuoteCancelNow(t0.Add(10*24*time.Hour), policy, []domain.PaymentInfo{pay})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if q.Amount.Amount != 20000 {
-		t.Fatalf("prorated amount = %d, want 20000", q.Amount.Amount)
-	}
+	require.NoError(t, err)
+	assert.EqualValues(t, 20000, q.Amount.Amount)
 
-	if _, err := s.CancelNow(t0.Add(10*24*time.Hour), domain.RefundReasonCancelNow, q, "u"); err != nil {
-		t.Fatal(err)
-	}
+	_, err = s.CancelNow(t0.Add(10*24*time.Hour), domain.RefundReasonCancelNow, q, "u")
+	require.NoError(t, err)
 	// A second refund against the same payment must not exceed what was paid.
 	over := domain.RefundQuote{Amount: domain.Money{Amount: 20000, Currency: "vnd"}, Lines: []domain.RefundLine{{PaymentRef: "pi_1", PaidAmount: pay.Amount, Amount: domain.Money{Amount: 20000, Currency: "vnd"}}}}
-	if _, err = s.CancelNow(t0.Add(10*24*time.Hour), domain.RefundReasonCancelNow, over, "u"); err == nil {
-		t.Fatal("expected error for cancelling a non-current subscription / over-refund")
-	}
+	_, err = s.CancelNow(t0.Add(10*24*time.Hour), domain.RefundReasonCancelNow, over, "u")
+	assert.Error(t, err, "non-current subscription / over-refund")
 }
 
 // Plus 30000 paid for day 0-30; upgrade on day 10 invoiced 40000 for day 10-30; cancel on day 20.
@@ -1725,16 +1719,16 @@ func TestQuoteCancelNowAfterUpgrade(t *testing.T) {
 	}
 
 	q, err := s.QuoteCancelNow(day(20), policy, payments)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(q.Lines) != 2 || q.Lines[0].Amount.Amount != 10000 || q.Lines[1].Amount.Amount != 20000 || q.Amount.Amount != 30000 {
-		t.Fatalf("quote = %+v, want lines 10000 + 20000 = 30000", q)
-	}
+	require.NoError(t, err)
+	require.Len(t, q.Lines, 2)
+	assert.EqualValues(t, 10000, q.Lines[0].Amount.Amount)
+	assert.EqualValues(t, 20000, q.Lines[1].Amount.Amount)
+	assert.EqualValues(t, 30000, q.Amount.Amount)
+
 	refunds, err := s.CancelNow(day(20), domain.RefundReasonCancelNow, q, "u")
-	if err != nil || len(refunds) != 2 || refunds[1].PaymentRef() != "pi_b" {
-		t.Fatalf("refunds = %v, err = %v", refunds, err)
-	}
+	require.NoError(t, err)
+	require.Len(t, refunds, 2)
+	assert.Equal(t, "pi_b", refunds[1].PaymentRef())
 }
 
 func TestLifetimeRefundWindow(t *testing.T) {
@@ -1743,15 +1737,12 @@ func TestLifetimeRefundWindow(t *testing.T) {
 	pay := []domain.PaymentInfo{{Amount: domain.Money{Amount: 2490000, Currency: "vnd"}, PaymentRef: "pi_l", PaidAt: t0}}
 
 	q, err := s.QuoteCancelNow(t0.Add(13*24*time.Hour), policy, pay)
-	if err != nil || q.Amount.Amount != 2490000 {
-		t.Fatalf("within window: q=%+v err=%v", q, err)
-	}
-	if _, err := s.QuoteCancelNow(t0.Add(15*24*time.Hour), policy, pay); err == nil {
-		t.Fatal("expected refundWindowExpired after 14 days")
-	}
-	if !s.GrantsAccess(t0.AddDate(5, 0, 0), policy) {
-		t.Fatal("lifetime must grant access forever")
-	}
+	require.NoError(t, err)
+	assert.EqualValues(t, 2490000, q.Amount.Amount)
+
+	_, err = s.QuoteCancelNow(t0.Add(15*24*time.Hour), policy, pay)
+	assert.Error(t, err, "refundWindowExpired after 14 days")
+	assert.True(t, s.GrantsAccess(t0.AddDate(5, 0, 0), policy), "lifetime grants access forever")
 }
 ```
 
@@ -2316,6 +2307,7 @@ git commit -m "feat(billing): domain model for plans, prices, accounts and subsc
 ### Task 3: Persistence — migration, sqlc, repositories, unit of work
 
 **Files:**
+
 - Create: `internal/billing/infra/persistence/pgmigration/00001_init.sql`
 - Create: `internal/billing/infra/persistence/pgsqlc/{plan.sql,policy.sql,price.sql,account.sql,subscription.sql,providerevent.sql}` (+ generated `*.go`)
 - Create: `internal/billing/infra/persistence/{pg.go,wire.go}`
@@ -2323,6 +2315,7 @@ git commit -m "feat(billing): domain model for plans, prices, accounts and subsc
 - Create: `cmd/billing/sqlc.yaml`, `cmd/billing/project.json` (targets `gen:sqlc`, `goose*`; the rest in Task 4)
 
 **Interfaces:**
+
 - Consumes: domain repo interfaces (Task 2).
 - Produces: `pgrepo.NewUnitOfWork(pool *pgxpool.Pool, queries *pgsqlc.Queries) *UnitOfWork` implementing `domain.UnitOfWork`; `persistence.Pg` with `RunMigrations`, `IsMigrationDone`, `Ping` (same as note).
 - Mappers (`pgrepo/enum.go`, package-private): `fromDomainPlanTier`/`toDomainPlanTier`, `fromDomainInterval`/`toDomainInterval`, `fromDomainStatus`/`toDomainStatus`, `fromDomainRefundReason`/`toDomainRefundReason`, `fromDomainRefundStatus`/`toDomainRefundStatus` (domain `uint8` enum ↔ sqlc string enum), and `marshalKeyed`/`unmarshalKeyed` for the `features`/`limits` JSONB columns (`unmarshalKeyed` skips unknown keys with a warning).
@@ -2955,7 +2948,6 @@ func unmarshalKeyed[K comparable, V any](ctx context.Context, raw []byte, parse 
 }
 ```
 
-
 - [ ] **Step 6: Repositories**
 
 ```go
@@ -3424,6 +3416,7 @@ git commit -m "feat(billing): persistence with goose migration, sqlc and reposit
 ### Task 4: Service runtime — config, app skeleton, HTTP/gRPC/health, notifier, compose, Traefik
 
 **Files:**
+
 - Create: `internal/billing/config/{config.go,viper.go,wire.go}`
 - Create: `internal/billing/component/{validator.go,wire.go}`
 - Create: `internal/billing/app/{app.go,wire.go,svc_authorization.go,svc_notifier.go}`
@@ -3435,6 +3428,7 @@ git commit -m "feat(billing): persistence with goose migration, sqlc and reposit
 - Modify: `deploy/compose/compose.yaml` (include billing), `.gitignore` if `cmd/*/` binaries are listed per service
 
 **Interfaces:**
+
 - Produces: `app.Server{Cmds *Cmds; Queries *Queries}` (fields added by later tasks), `app.AuthorizationSvc`, `app.WorkspaceRole` (`uint8`, zero `WorkspaceRoleNone`), `app.Notifier`; mappers `service.toAppWorkspaceRole` (pb → app) and `notifier.toSharePlan`/`toShareStatus` (domain → `api/share`); `http.StrictHandler{App *app.Server; Identity *commonconfig.Identity}`, `grpc.ServiceServer{app *app.Server}`, `billing.Server.Run(ctx)`.
 
 - [ ] **Step 1: Config**
@@ -3933,6 +3927,7 @@ var ProviderSet = wire.NewSet(
 - [ ] **Step 4: Controllers**
 
 HTTP — `internal/billing/controller/http/http.go`: copy `internal/note/controller/http/http.go` and change:
+
 - imports `internal/billing/app`, `internal/billing/config`, `pkg/api/billing` (alias `billing`), plus `commonconfig`;
 - `IHandler = billing.ServerInterface`, `IStrictHandler = billing.StrictServerInterface`;
 - `StrictHandler` → `type StrictHandler struct { App *app.Server; Identity *commonconfig.Identity }`, constructor `NewStrictHandler(app *app.Server, identity *commonconfig.Identity) *StrictHandler`;
@@ -4275,7 +4270,7 @@ services:
   billing_redis:
     container_name: notopia-billing_redis
     image: redis:8.4.3-alpine3.22
-    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    command: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
     ports:
       - 6375:6379
 
@@ -4331,6 +4326,7 @@ nx run billing:run   # separate terminal; needs authorization + redpanda up
 curl -s http://localhost:28084/billing/health/ready
 curl -s http://api.notopia.localhost/billing/health/live
 ```
+
 Expected: ready returns all checks `up`; migrations applied (`\dt` in `billing` DB lists the 7 tables + `goose_db_version`); traces for the health/HTTP calls appear in Tempo (Grafana).
 
 - [ ] **Step 8: AGENTS.md + commit**
@@ -4347,12 +4343,14 @@ git commit -m "feat(billing): service runtime, config, health, compose and traef
 ### Task 5: Default catalog, entitlement queries, gRPC, read endpoints
 
 **Files:**
+
 - Create: `internal/billing/app/{model.go,common.go,cmd_ensuredefaults.go,q_getentitlements.go,q_batchgetentitlements.go,q_listplans.go,q_getworkspacebilling.go,q_getworkspacepayer.go}`
 - Modify: `internal/billing/app/app.go`, `internal/billing/app/wire.go`, `internal/billing/server.go`
 - Create: `internal/billing/controller/grpc/{service.go,mapout.go}`
 - Create: `internal/billing/controller/http/{mapout.go,plan.go,workspace.go}`; modify `unimplemented.go` (delete moved stubs)
 
 **Interfaces:**
+
 - Consumes: `domain.UnitOfWork`, `app.AuthorizationSvc`.
 - Produces: `Cmds.EnsureDefaults`, `Queries.GetEntitlements` (`GetEntitlements{WorkspaceID uuid.UUID; UserID string; Internal bool}` → `domain.Entitlements`), `Queries.BatchGetEntitlements` (`[]uuid.UUID` → `map[uuid.UUID]domain.Entitlements`), `Queries.ListPlans` (→ `[]PlanView`), `Queries.GetWorkspaceBilling` (→ `WorkspaceBillingView`), `Queries.GetWorkspacePayer` (→ `PayerView`).
 - Mappers: gRPC `controller/grpc/mapout.go` (`toPBPlanTier`, `toPBStatus`, `toPBFeatures`, `toPBLimits`, `toPBEntitlements`); HTTP `controller/http/mapout.go` (`toPlanTierDTO`, `toBillingIntervalDTO`, `toSubscriptionStatusDTO`, `toRefundReasonDTO`, `toRefundStatusDTO`, `toFeatures`, `toLimits`, and `toEntitlements`/`toPrice`/`toPlan`/`toWorkspaceBilling`, which now return `(T, error)`).
@@ -5248,6 +5246,7 @@ nx run billing:run
 curl -s http://api.notopia.localhost/billing/plans | jq '.[].tier'          # "free" "plus" "pro", prices []
 grpcurl -plaintext -d '{"workspace_id":"00000000-0000-4000-8000-000000000110"}' localhost:18084 billing.BillingService/GetWorkspaceEntitlements
 ```
+
 Expected: entitlements `plan: "PLAN_TIER_FREE"`, `status: "SUBSCRIPTION_STATUS_NONE"` (grpcurl prints enum names), free limits (members 3). (If gRPC reflection is not registered, skip grpcurl; plan 04 exercises it.)
 
 - [ ] **Step 6: Commit**
@@ -5262,12 +5261,14 @@ git commit -m "feat(billing): default catalog, entitlement queries, gRPC and rea
 ### Task 6: Payment provider port + Stripe adapter
 
 **Files:**
+
 - Create: `internal/billing/app/svc_paymentprovider.go`
 - Create: `internal/billing/infra/payment/stripe/{provider.go,checkout.go,subscription.go,refund.go,catalog.go,webhook.go,map.go}`
 - Create: `internal/billing/infra/payment/stripe/map_test.go`, `internal/billing/infra/payment/stripe/testdata/subscription.json`
 - Modify: `internal/billing/infra/wire.go`, `go.mod`, `go.sum`
 
 **Interfaces:**
+
 - Produces: `app.PaymentProvider` (below) implemented by `*stripe.Provider` (`stripeadapter` import alias recommended to avoid clashing with `github.com/stripe/stripe-go/v87`); `uint8` enums `app.CheckoutPurpose` (zero `CheckoutPurposeUnspecified`) and `app.WebhookEventType` (zero `WebhookIgnored`).
 - Mappers (`infra/payment/stripe/map.go`): `toDomainStatus` (Stripe subscription status → `domain.Status`), `toDomainRefundStatus`, `toStripeTier` (`domain.PlanTier` → `"plus"`/`"pro"`, used for product id, name, metadata, idempotency key), `toStripeRecurringInterval` (`domain.Interval` → `month`/`year`; lifetime = not recurring), `toStripePurpose` / `toAppCheckoutPurpose` (checkout `purpose` metadata).
 
@@ -5438,7 +5439,7 @@ go get github.com/stripe/stripe-go/v87@v87.0.0 && go mod tidy
   "cancel_at_period_end": false,
   "cancel_at": null,
   "canceled_at": null,
-  "metadata": {"workspace_id": "00000000-0000-4000-8000-000000000110"},
+  "metadata": { "workspace_id": "00000000-0000-4000-8000-000000000110" },
   "items": {
     "object": "list",
     "data": [
@@ -5447,7 +5448,7 @@ go get github.com/stripe/stripe-go/v87@v87.0.0 && go mod tidy
         "object": "subscription_item",
         "current_period_start": 1759276800,
         "current_period_end": 1761955200,
-        "price": {"id": "price_plus_month", "object": "price"}
+        "price": { "id": "price_plus_month", "object": "price" }
       }
     ]
   }
@@ -5466,29 +5467,23 @@ import (
 
 	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	stripego "github.com/stripe/stripe-go/v87"
 	"github.com/stripe/stripe-go/v87/webhook"
 )
 
 func TestSnapshotFromSubscription(t *testing.T) {
 	raw, err := os.ReadFile("testdata/subscription.json")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	var s stripego.Subscription
-	if err := json.Unmarshal(raw, &s); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, json.Unmarshal(raw, &s))
 	snap, err := snapshotFromSubscription(&s)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if snap.ProviderPriceID != "price_plus_month" || snap.Status != domain.StatusActive {
-		t.Fatalf("snap = %+v", snap)
-	}
-	if !snap.CurrentPeriodEnd.Equal(time.Unix(1761955200, 0)) || snap.WorkspaceID.String() != "00000000-0000-4000-8000-000000000110" {
-		t.Fatalf("period/workspace wrong: %+v", snap)
-	}
+	require.NoError(t, err)
+	assert.Equal(t, "price_plus_month", snap.ProviderPriceID)
+	assert.Equal(t, domain.StatusActive, snap.Status)
+	assert.True(t, snap.CurrentPeriodEnd.Equal(time.Unix(1761955200, 0)))
+	assert.Equal(t, "00000000-0000-4000-8000-000000000110", snap.WorkspaceID.String())
 }
 
 func TestParseWebhookInvoicePaid(t *testing.T) {
@@ -5497,15 +5492,13 @@ func TestParseWebhookInvoicePaid(t *testing.T) {
 	p := &Provider{webhookSecret: "whsec_test"}
 
 	ev, err := p.ParseWebhook(signed.Payload, signed.Header)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if ev.Type != app.WebhookSubscriptionChanged || ev.ObjectID != "sub_123" || ev.ID != "evt_1" {
-		t.Fatalf("ev = %+v", ev)
-	}
-	if _, err := p.ParseWebhook(signed.Payload, "t=1,v1=bad"); err == nil {
-		t.Fatal("expected signature error")
-	}
+	require.NoError(t, err)
+	assert.Equal(t, app.WebhookSubscriptionChanged, ev.Type)
+	assert.Equal(t, "sub_123", ev.ObjectID)
+	assert.Equal(t, "evt_1", ev.ID)
+
+	_, err = p.ParseWebhook(signed.Payload, "t=1,v1=bad")
+	assert.Error(t, err, "bad signature")
 }
 ```
 
@@ -6193,6 +6186,7 @@ git commit -m "feat(billing): stripe payment provider adapter"
 ### Task 7: Catalog management — admin APIs, seeder, portal configuration
 
 **Files:**
+
 - Create: `internal/billing/app/{settings.go,catalog.go,cmd_createprice.go,cmd_archiveprice.go,cmd_updateplan.go,cmd_updatepolicy.go,cmd_seedcatalog.go,q_listprices.go,q_getpolicy.go}`
 - Create: `internal/billing/config/appsettings.go`
 - Create: `internal/billing/controller/http/{admin.go,mapin.go}`; modify `unimplemented.go`
@@ -6200,6 +6194,7 @@ git commit -m "feat(billing): stripe payment provider adapter"
 - Modify: `justfile`
 
 **Interfaces:**
+
 - Produces: `app.Settings{Currency, WebBaseURL, ServiceAccountUserID string}`; `Cmds.CreatePrice`, `Cmds.ArchivePrice`, `Cmds.UpdatePlan`, `Cmds.UpdatePolicy`, `Cmds.SeedCatalog`; `Queries.ListPrices`, `Queries.GetPolicy`. Commands return results through a `Result` field on the command struct (the `Cmd` interface returns only `error`).
 - Mappers (`controller/http/mapin.go`): `toPlanTier` (`billing.PlanTier` path param), `toCreatePricePlan` (`billing.CreatePriceRequestPlan`), `toInterval` (`billing.BillingInterval`), `toFeatureKeys`/`toLimitKeys` (request maps via `domain.ParseFeatureKey`/`ParseLimitKey`). Unknown values return `errs.NewInvalid` → 400.
 
@@ -6890,6 +6885,7 @@ nx run billing:gen:wire && nx run billingseed:gen:wire && nx build billing && nx
 just billing-seed
 curl -s http://api.notopia.localhost/billing/plans | jq '.[] | {tier, prices: [.prices[].lookupKey]}'
 ```
+
 Expected: plus has `plus_month`, `plus_year`; pro has `pro_month`, `pro_year`, `pro_lifetime`. Stripe dashboard (test mode) shows products `notopia_plus`/`notopia_pro` and one portal configuration. Running `just billing-seed` again creates nothing new.
 
 As `admin` (group `notopia-admins`): `PATCH /billing/admin/plans/free {"limits":{"members":4}}` → 200; `{"limits":{"seats":4}}` → 400 (unknown limit key rejected by `toLimitKeys`); as a normal user → 403. `POST /billing/admin/prices {"plan":"plus","interval":"month","amount":59000,"currency":"vnd"}` → old `plus_month` archived, new one active, a new portal configuration id in `billing_policy`.
@@ -6906,16 +6902,18 @@ git commit -m "feat(billing): admin catalog APIs, seeder and portal configuratio
 ### Task 8: Checkout, portal, webhook pipeline
 
 **Files:**
+
 - Create: `internal/billing/app/{cmd_startcheckout.go,cmd_startportal.go,refunds.go,cmd_completecheckout.go,cmd_syncsubscription.go,cmd_syncrefund.go,cmd_handlewebhook.go}`
 - Create: `internal/billing/app/{fakes_test.go,cmd_completecheckout_test.go}`
 - Create: `internal/billing/controller/http/{checkout.go,webhook.go}`; modify `unimplemented.go`
 - Modify: `internal/billing/app/app.go`, `internal/billing/app/wire.go`
 
 **Interfaces:**
+
 - Consumes: `PaymentProvider` (Task 6), `Notifier`, `AuthorizationSvc`, `Settings`.
 - Produces: `Cmds.StartCheckout` (`StartCheckout{WorkspaceID, PriceID uuid.UUID; Payer domain.Payer; URL string}`), `Cmds.StartPortal` (`StartPortal{WorkspaceID uuid.UUID; UserID string; URL string}`), `Cmds.HandleWebhook` (`HandleWebhook{Payload []byte; Signature string}`), `Cmds.SyncSubscription` (`SyncSubscription{EventID string; ProviderSubscriptionID string}` — `EventID` empty when called by the reconcile cron), `RefundRunner.Run(ctx, subscriptionID)` (used by Tasks 9, 10, 11).
 
-**Ordering rule used by every webhook use case:** provider *mutations that must not be lost* (cancel a duplicate subscription, change default card) run **before** the write transaction and are idempotent; the write transaction records the event (`ProviderEventLog.MarkProcessed`) together with the state change; **refunds run after commit** with idempotency key `refund:{id}` and are retried by the reconcile cron while `pending` without a provider id.
+**Ordering rule used by every webhook use case:** provider _mutations that must not be lost_ (cancel a duplicate subscription, change default card) run **before** the write transaction and are idempotent; the write transaction records the event (`ProviderEventLog.MarkProcessed`) together with the state change; **refunds run after commit** with idempotency key `refund:{id}` and are retried by the reconcile cron while `pending` without a provider id.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -7156,6 +7154,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type fixture struct {
@@ -7212,56 +7212,42 @@ func TestCompleteCheckoutIsIdempotent(t *testing.T) {
 	f.subscribeSession("sub_1")
 	cmd := &CompleteCheckout{EventID: "evt_1", SessionID: "cs_sub_1"}
 	for range 2 {
-		if err := f.handler.Handle(context.Background(), cmd); err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, f.handler.Handle(context.Background(), cmd))
 	}
-	if len(f.store.subs) != 1 || f.current(t).Plan() != domain.TierPlus {
-		t.Fatalf("want one plus subscription, got %d", len(f.store.subs))
-	}
+	assert.Len(t, f.store.subs, 1)
+	assert.Equal(t, domain.TierPlus, f.current(t).Plan())
 }
 
 func TestDuplicateCheckoutIsCanceledAndRefunded(t *testing.T) {
 	f := newFixture(t)
 	f.subscribeSession("sub_1")
-	if err := f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_1", SessionID: "cs_sub_1"}); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_1", SessionID: "cs_sub_1"}))
 	f.subscribeSession("sub_2")
-	if err := f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_2", SessionID: "cs_sub_2"}); err != nil {
-		t.Fatal(err)
-	}
-	if got := *f.current(t).ProviderSubscriptionID(); got != "sub_1" {
-		t.Fatalf("current = %s, want sub_1", got)
-	}
-	if len(f.provider.canceled) != 1 || f.provider.canceled[0] != "sub_2" {
-		t.Fatalf("canceled = %v", f.provider.canceled)
-	}
-	if len(f.provider.refunds) != 1 || f.provider.refunds[0].Amount != 30000 {
-		t.Fatalf("refunds = %v", f.provider.refunds)
-	}
+	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_2", SessionID: "cs_sub_2"}))
+
+	assert.Equal(t, "sub_1", *f.current(t).ProviderSubscriptionID())
+	assert.Equal(t, []string{"sub_2"}, f.provider.canceled)
+	require.Len(t, f.provider.refunds, 1)
+	assert.EqualValues(t, 30000, f.provider.refunds[0].Amount)
 }
 
 func TestLifetimeReplacesRecurring(t *testing.T) {
 	f := newFixture(t)
 	f.subscribeSession("sub_1")
-	if err := f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_1", SessionID: "cs_sub_1"}); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_1", SessionID: "cs_sub_1"}))
 	f.provider.session = CheckoutSessionResult{
 		ID: "cs_life", Purpose: PurposeLifetime, Complete: true, WorkspaceID: f.ws, PriceID: f.lifetime.ID(),
 		Payer: domain.Payer{ID: "112", Email: "a@b.c", Name: "A"}, CustomerID: "cus_1",
 		Payment: domain.PaymentInfo{Amount: domain.Money{Amount: 2490000, Currency: "vnd"}, PaymentRef: "pi_life", PaidAt: time.Now()},
 	}
-	if err := f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_2", SessionID: "cs_life"}); err != nil {
-		t.Fatal(err)
-	}
-	if cur := f.current(t); cur.Interval() != domain.IntervalLifetime || cur.Plan() != domain.TierPro {
-		t.Fatalf("current = %v %v", cur.Interval(), cur.Plan())
-	}
-	if len(f.provider.canceled) != 1 || len(f.provider.refunds) != 1 || f.provider.refunds[0].Amount <= 0 {
-		t.Fatalf("canceled=%v refunds=%v", f.provider.canceled, f.provider.refunds)
-	}
+	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_2", SessionID: "cs_life"}))
+
+	cur := f.current(t)
+	assert.Equal(t, domain.IntervalLifetime, cur.Interval())
+	assert.Equal(t, domain.TierPro, cur.Plan())
+	assert.Len(t, f.provider.canceled, 1)
+	require.Len(t, f.provider.refunds, 1)
+	assert.Positive(t, f.provider.refunds[0].Amount)
 }
 ```
 
@@ -8075,11 +8061,13 @@ git commit -m "feat(billing): checkout, portal and stripe webhook processing"
 ### Task 9: Cancel now with refund
 
 **Files:**
+
 - Create: `internal/billing/app/{canceller.go,cmd_cancelnow.go,q_previewcancelnow.go}`
 - Create: `internal/billing/controller/http/cancel.go`; modify `unimplemented.go`
 - Modify: `internal/billing/app/app.go`, `wire.go`
 
 **Interfaces:**
+
 - Produces: `Canceller.CancelNow(ctx, workspaceID uuid.UUID, reason domain.RefundReason, actor string, refundOptional bool) error` (reused by Task 10); `Cmds.CancelNow` (`CancelNow{WorkspaceID uuid.UUID; UserID string}`); `Queries.PreviewCancelNow` (`PreviewCancelNow{WorkspaceID; UserID}` → `domain.RefundQuote`).
 
 - [ ] **Step 1: Canceller**
@@ -8357,12 +8345,14 @@ git commit -m "feat(billing): cancel now with prorated refund"
 ### Task 10: Payer claim, payer removal, workspace deletion (Kafka)
 
 **Files:**
+
 - Create: `internal/billing/app/{cmd_claimpayer.go,cmd_handlepayerremoved.go,cmd_handleworkspacedeleted.go}`
 - Create: `internal/billing/controller/http/payer.go`; modify `unimplemented.go`
 - Create: `internal/billing/controller/event/{event.go,wire.go}`
 - Modify: `internal/billing/controller/wire.go`, `internal/billing/server.go`, `internal/billing/app/app.go`, `wire.go`
 
 **Interfaces:**
+
 - Consumes: Kafka topics `events.integration.note.workspace.deleted` (`share.WorkspaceDeletedIntegrationEvent`), `events.integration.authorization.user_workspace_role_updated` (`share.UserWorkspaceRoleUpdatedEvent`), `events.integration.authorization.workspace_member_removed` (`share.WorkspaceMemberRemovedEvent`).
 - Produces: `Cmds.ClaimPayer` (`ClaimPayer{WorkspaceID uuid.UUID; Payer domain.Payer; URL string}`), `Cmds.HandlePayerRemoved` (`HandlePayerRemoved{WorkspaceID uuid.UUID; UserID string}`), `Cmds.HandleWorkspaceDeleted` (`HandleWorkspaceDeleted{WorkspaceID uuid.UUID}`).
 
@@ -8693,6 +8683,7 @@ nx run billing:gen:wire && nx build billing && nx lint billing
 ```
 
 E2E (workspace on `plus`, payer `kevinnitro`, second owner `ntgnguyen`):
+
 1. Demote `kevinnitro` to editor through note's members API (plan 04 adds the guard; before plan 04 it is allowed) → billing logs `PayerMissing`; Stripe subscription shows "cancels at period end"; customer has no payment methods.
 2. As `ntgnguyen`: `POST /billing/workspaces/W/payer/claim` → complete setup checkout with `4242…` → `GET .../subscription` shows payer `ntgnguyen`, `missingSince: null`, `cancelAtPeriodEnd: false`.
 3. Delete the workspace (note API) → subscription canceled, prorated refund in Stripe.
@@ -8707,12 +8698,14 @@ git commit -m "feat(billing): payer claim and kafka handlers for payer removal a
 ### Task 11: Crons — reconcile, refund retry, event pruning
 
 **Files:**
+
 - Modify: `internal/billing/domain/repo.go` (add `ListIDsWithUnsubmittedRefunds`), `internal/billing/infra/persistence/pgsqlc/subscription.sql`, `internal/billing/infra/persistence/pgrepo/subscription.go`, `internal/billing/app/fakes_test.go`
 - Create: `internal/billing/app/{cmd_reconcilesubscriptions.go,cmd_pruneproviderevents.go}`
 - Create: `internal/billing/controller/cron/{cron.go,wire.go}`
 - Modify: `internal/billing/controller/wire.go`, `internal/billing/server.go`, `app.go`, `wire.go`
 
 **Interfaces:**
+
 - Consumes: `pkg/cron` (`cron.Job`, `cron.NewScheduler(locker, logger, location)`, `cron.NewRedisLocker`) from plan 02. Location is `time.Local` (zone from `TZ` env or system), never hard-coded.
 - Produces: jobs `billing:reconcile-subscriptions` (hourly) and `billing:prune-provider-events` (daily 04:00).
 
@@ -8913,6 +8906,7 @@ git commit -m "feat(billing): reconcile, refund retry and event pruning crons"
 ### Task 12: Docs and full sandbox E2E
 
 **Files:**
+
 - Modify: `internal/billing/AGENTS.md`, root `CLAUDE.md`
 - Create: `docs/src/<billing page>.md` (follow the existing VitePress layout in `docs/src`): context diagram, webhook sequence, subscription state diagram (mermaid)
 
