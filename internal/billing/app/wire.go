@@ -7,10 +7,15 @@ var ProviderSet = wire.NewSet(
 	ProvideCmds,
 	ProvideQueries,
 
+	ProvideRefundRunner,
+
 	ProvideArchivePriceHandler,
+	ProvideCompleteCheckoutHandler,
 	ProvideCreatePriceHandler,
 	ProvideEnsureDefaultsHandler,
 	ProvideEnsurePortalConfigurationHandler,
+	ProvideSyncRefundHandler,
+	ProvideSyncSubscriptionHandler,
 	ProvideUpdatePlanHandler,
 	ProvideUpdatePolicyHandler,
 
@@ -23,5 +28,7 @@ var ProviderSet = wire.NewSet(
 	ProvideGetWorkspacePayerHandler,
 	ProvideListPlansHandler,
 	ProvideListPricesHandler,
+	ProvideStartCheckoutHandler,
+	ProvideStartPortalHandler,
 	wire.Struct(new(Server), "*"),
 )

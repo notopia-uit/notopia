@@ -20,9 +20,12 @@ var ProvideHandlerProvider = NewHandlerProvider
 
 type Cmds struct {
 	ArchivePrice              ArchivePriceCmd
+	CompleteCheckout          CompleteCheckoutCmd
 	CreatePrice               CreatePriceCmd
 	EnsureDefaults            EnsureDefaultsCmd
 	EnsurePortalConfiguration EnsurePortalConfigurationCmd
+	SyncRefund                SyncRefundCmd
+	SyncSubscription          SyncSubscriptionCmd
 	UpdatePlan                UpdatePlanCmd
 	UpdatePolicy              UpdatePolicyCmd
 }
@@ -30,18 +33,24 @@ type Cmds struct {
 func NewCmds(
 	handlerProvider *HandlerProvider,
 	archivePriceHandler *ArchivePriceHandler,
+	completeCheckoutHandler *CompleteCheckoutHandler,
 	createPriceHandler *CreatePriceHandler,
 	ensureDefaultsHandler *EnsureDefaultsHandler,
 	ensurePortalConfigurationHandler *EnsurePortalConfigurationHandler,
+	syncRefundHandler *SyncRefundHandler,
+	syncSubscriptionHandler *SyncSubscriptionHandler,
 	updatePlanHandler *UpdatePlanHandler,
 	updatePolicyHandler *UpdatePolicyHandler,
 ) *Cmds {
 	hp := (*commonhandler.HandlerProvider)(handlerProvider)
 	return &Cmds{
 		ArchivePrice:              commonhandler.DecorateCmd(hp, archivePriceHandler),
+		CompleteCheckout:          commonhandler.DecorateCmd(hp, completeCheckoutHandler),
 		CreatePrice:               commonhandler.DecorateCmd(hp, createPriceHandler),
 		EnsureDefaults:            commonhandler.DecorateCmd(hp, ensureDefaultsHandler),
 		EnsurePortalConfiguration: commonhandler.DecorateCmd(hp, ensurePortalConfigurationHandler),
+		SyncRefund:                commonhandler.DecorateCmd(hp, syncRefundHandler),
+		SyncSubscription:          commonhandler.DecorateCmd(hp, syncSubscriptionHandler),
 		UpdatePlan:                commonhandler.DecorateCmd(hp, updatePlanHandler),
 		UpdatePolicy:              commonhandler.DecorateCmd(hp, updatePolicyHandler),
 	}
@@ -59,6 +68,8 @@ type Queries struct {
 	GetWorkspacePayer    GetWorkspacePayerQuery
 	ListPlans            ListPlansQuery
 	ListPrices           ListPricesQuery
+	StartCheckout        StartCheckoutQuery
+	StartPortal          StartPortalQuery
 }
 
 func NewQueries(
@@ -72,6 +83,8 @@ func NewQueries(
 	getWorkspacePayerHandler *GetWorkspacePayerHandler,
 	listPlansHandler *ListPlansHandler,
 	listPricesHandler *ListPricesHandler,
+	startCheckoutHandler *StartCheckoutHandler,
+	startPortalHandler *StartPortalHandler,
 ) *Queries {
 	hp := (*commonhandler.HandlerProvider)(handlerProvider)
 	return &Queries{
@@ -84,6 +97,8 @@ func NewQueries(
 		GetWorkspacePayer:    commonhandler.DecorateQuery(hp, getWorkspacePayerHandler),
 		ListPlans:            commonhandler.DecorateQuery(hp, listPlansHandler),
 		ListPrices:           commonhandler.DecorateQuery(hp, listPricesHandler),
+		StartCheckout:        commonhandler.DecorateQuery(hp, startCheckoutHandler),
+		StartPortal:          commonhandler.DecorateQuery(hp, startPortalHandler),
 	}
 }
 

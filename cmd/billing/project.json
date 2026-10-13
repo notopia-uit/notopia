@@ -138,13 +138,16 @@
       "cache": true
     },
     "gen": {
-      "dependsOn": ["gen:wire", "gen:sqlc"]
+      "dependsOn": ["gen:wire", "gen:sqlc", "gen:mockery"]
     },
     "nx-release-publish": {
       "parallelism": false
+    },
+    "gen:mockery": {
+      "dependsOn": ["^gen:mockery"]
     }
   },
-  "implicitDependencies": ["pkg"],
+  "implicitDependencies": ["pkg", "internal/billing"],
   "release": {
     "docker": {
       "repositoryName": "notopia-uit/billing"

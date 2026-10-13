@@ -27,16 +27,18 @@ type (
 )
 
 type StrictHandler struct {
-	App      *app.Server
-	Identity *commonconfig.Identity
+	App           *app.Server
+	Identity      *commonconfig.Identity
+	webhookSecret string
 }
 
 var _ IStrictHandler = (*StrictHandler)(nil)
 
-func NewStrictHandler(app *app.Server, identity *commonconfig.Identity) *StrictHandler {
+func NewStrictHandler(app *app.Server, identity *commonconfig.Identity, stripeCfg *config.Stripe) *StrictHandler {
 	return &StrictHandler{
-		App:      app,
-		Identity: identity,
+		App:           app,
+		Identity:      identity,
+		webhookSecret: stripeCfg.WebhookSecret,
 	}
 }
 
