@@ -1,4 +1,7 @@
 language: en-GB
+
+inheritance: true
+
 reviews:
   profile: assertive
   poem: false
@@ -22,12 +25,64 @@ reviews:
       enabled: false
 
   path_instructions:
+    - path: api/**
+      instructions: |
+        - OpenAPI spec 3.0.4: <https://spec.openapis.org/oas/v3.0.4.html>
+        - In the future, might migrate to 3.1, not today
+        - Strict schema, modular design
+
     - path: internal/note/**
       instructions: |
         - Strictly applying clean architecture, DDD, CQRS, Event Driven Architecture
+
+    - path: internal/billing/**
+      instructions: |
+        - Strictly applying clean architecture, DDD, CQRS, Event Driven Architecture
+
     - path: internal/authorization/**
       instructions: |
         - Loosely applying layered architecture
+        - Casbin source: <https://github.com/apache/casbin>
+
+    - path: apps/documents/**
+      instructions: |
+        To concisely reviewing the code, please refer to the following documentation:
+        - Hocuspocus documentation:
+          - Docs: <https://github.com/ueberdosis/tiptap-docs/tree/main/src/content/hocuspocus>
+          - Source: <https://github.com/ueberdosis/hocuspocus>
+        - BlockNote:
+          - Docs: <https://github.com/TypeCellOS/BlockNote/tree/main/docs/content>
+          - Source: <https://github.com/TypeCellOS/BlockNote>
+
+    - path: apps/search-worker/**
+      instructions: |
+        To concisely reviewing the code, please refer to the following documentation:
+        - Hocuspocus documentation:
+          - Docs: <https://github.com/ueberdosis/tiptap-docs/tree/main/src/content/hocuspocus>
+          - Source: <https://github.com/ueberdosis/hocuspocus>
+        - BlockNote:
+          - Docs: <https://github.com/TypeCellOS/BlockNote/tree/main/docs/content>
+          - Source: <https://github.com/TypeCellOS/BlockNote>
+
+    - path: apps/web/**
+      instructions: |
+        To concisely reviewing the code, please refer to the following documentation:
+        - Hocuspocus documentation:
+          - Docs: <https://github.com/ueberdosis/tiptap-docs/tree/main/src/content/hocuspocus>
+          - Source: <https://github.com/ueberdosis/hocuspocus>
+        - BlockNote:
+          - Docs: <https://github.com/TypeCellOS/BlockNote/tree/main/docs/content>
+          - Source: <https://github.com/TypeCellOS/BlockNote>
+
+    - path: packages/ui/**
+      instructions: |
+        To concisely reviewing the code, please refer to the following documentation:
+        - Hocuspocus documentation:
+          - Docs: <https://github.com/ueberdosis/tiptap-docs/tree/main/src/content/hocuspocus>
+          - Source: <https://github.com/ueberdosis/hocuspocus>
+        - BlockNote:
+          - Docs: <https://github.com/TypeCellOS/BlockNote/tree/main/docs/content>
+          - Source: <https://github.com/TypeCellOS/BlockNote>
 
   path_filters:
     - "!packages/api-gen/src/**"

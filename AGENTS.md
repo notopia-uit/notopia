@@ -129,6 +129,7 @@ deliberately omits.
 - While writing code, try **not to write unnecessary comments** into code
 - There are many `*.env*` file, which contains safe local development environment variables. Only `*.env.local*` can contain sensitive environment variables, and should be gitignored
 - Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsgo` (replace for `tsc`)
+- If something is not worth to code/fix, but might have issue in the future, then comments
 
 ### Superpowers
 

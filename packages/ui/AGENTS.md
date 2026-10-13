@@ -69,3 +69,7 @@ export function MyComponentBoundary(props: Props) {
 ```
 
 Then import the boundary wrapper in the server component page instead of the component directly.
+
+### Avoid access process.env here
+
+We will pass the from the consumer packages like `apps/web` as props. This is guarded by oxlint
