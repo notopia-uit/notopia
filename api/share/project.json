@@ -53,7 +53,7 @@
       "inputs": ["openapiFilesWithCommon"]
     },
     "gen:go": {
-      "inputs": ["{projectRoot}/oapi-codegen.yaml", "openapiFiles"],
+      "inputs": ["{projectRoot}/oapi-codegen.yaml", "openapiFiles", "oapiCodegenVersion"],
       "outputs": ["{workspaceRoot}/pkg/api/share/share.gen.go"],
       "executor": "nx:run-commands",
       "options": {
