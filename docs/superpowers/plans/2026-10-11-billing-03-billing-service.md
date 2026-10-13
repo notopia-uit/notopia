@@ -5941,7 +5941,7 @@ git commit -m "feat(billing): default catalog, entitlement queries, gRPC and rea
 - Tracing: no hand-written spans. The Stripe client gets an `otelhttp` transport (same as `internal/note/infra/identity/authentik.go`); stripe-go passes `ctx` to every request, so HTTP spans nest under the use case span from `commonhandler`. Methods drop the named results that existed only for a deferred span.
 - Mappers (`infra/payment/stripe/map.go`): `toDomainStatus` (Stripe subscription status → `domain.Status`), `toDomainRefundStatus`, `toStripeTier` (`domain.PlanTier` → `"plus"`/`"pro"`, used for product id, name, metadata, idempotency key), `toStripeRecurringInterval` (`domain.Interval` → `month`/`year`; lifetime = not recurring), `toStripePurpose` / `toAppCheckoutPurpose` (checkout `purpose` metadata).
 
-- [ ] **Step 1: Port**
+- [x] **Step 1: Port**
 
 ```go
 // internal/billing/app/svc_paymentprovider.go
@@ -6049,13 +6049,13 @@ type PaymentProvider interface {
 }
 ```
 
-- [ ] **Step 2: Dependency**
+- [x] **Step 2: Dependency**
 
 ```bash
 go get github.com/stripe/stripe-go/v87@v87.0.0 && go mod tidy
 ```
 
-- [ ] **Step 3: Write the failing mapping tests**
+- [x] **Step 3: Write the failing mapping tests**
 
 `testdata/subscription.json` — a minimal subscription in the v87 API shape:
 
@@ -6115,7 +6115,7 @@ func TestSnapshotFromSubscription(t *testing.T) {
 
 Run: `go test ./internal/billing/infra/payment/stripe/...` → FAIL (package empty).
 
-- [ ] **Step 4: Adapter**
+- [x] **Step 4: Adapter**
 
 ```go
 // internal/billing/infra/payment/stripe/provider.go
@@ -6693,7 +6693,7 @@ func (p *Provider) CreatePortalConfiguration(ctx context.Context, activePrices [
 
 `infra/wire.go`: add `stripeadapter.Provide` and `wire.Bind(new(app.PaymentProvider), new(*stripeadapter.Provider))` (import `stripeadapter "github.com/notopia-uit/notopia/internal/billing/infra/payment/stripe"`).
 
-- [ ] **Step 5: Run tests, build, commit**
+- [x] **Step 5: Run tests, build, commit**
 
 ```bash
 go test ./internal/billing/infra/payment/stripe/...
@@ -6720,7 +6720,7 @@ git commit -m "feat(billing): stripe payment provider adapter"
 - Produces: `app.Settings{WebBaseURL, ServiceAccountUserID string}`; `Cmds.CreatePrice`, `Cmds.ArchivePrice`, `Cmds.UpdatePlan`, `Cmds.UpdatePolicy`, `Cmds.EnsurePortalConfiguration` (`EnsurePortalConfiguration{UserID string}`: creates the Stripe portal configuration only when `billing_policy` has none); `Queries.ListPrices`, `Queries.GetPrice`, `Queries.GetPlan`, `Queries.GetPolicy`. Commands return only `error` and never carry results: the controller generates ids up front (`CreatePrice.ID`) and, after a command, answers with a query (`GetPrice`, `GetPlan`, `GetPolicy`, `GetWorkspaceBilling`). Command inputs use app types (`app.PlanTier`, `app.BillingInterval`, string-keyed feature/limit maps); handlers map them to domain values in `app/mapper.go`.
 - Mappers (`controller/http/mapin.go`): `toPlanTier` (`billing.PlanTier` path param → `app.PlanTier`), `toCreatePricePlan` (`billing.CreatePriceRequestPlan`), `toInterval` (`billing.BillingInterval` → `app.BillingInterval`), `fromFeatures`/`fromLimits` (request maps, passed through as string-keyed maps). Unknown enum values return `errs.NewInvalid` → 400; unknown feature/limit keys are rejected by the handler (`parseFeatures`/`parseLimits`).
 
-- [ ] **Step 1: Settings**
+- [x] **Step 1: Settings**
 
 ```go
 // internal/billing/app/settings.go
@@ -6756,7 +6756,7 @@ var ProvideAppSettings = NewAppSettings
 
 Add `ProvideAppSettings` to `ProviderSet` in `internal/billing/wire.go`. `cmd/billingseed` uses it too (Step 4).
 
-- [ ] **Step 2: Catalog helpers and commands**
+- [x] **Step 2: Catalog helpers and commands**
 
 ```go
 // internal/billing/app/catalog.go
@@ -7072,7 +7072,7 @@ func (h *EnsurePortalConfigurationHandler) Handle(ctx context.Context, cmd *Ensu
 
 Register all in `app.go` / `wire.go`.
 
-- [ ] **Step 3: Admin HTTP**
+- [x] **Step 3: Admin HTTP**
 
 ```go
 // internal/billing/controller/http/admin.go
@@ -7289,7 +7289,7 @@ func fromLimits(in *billing.Limits) map[string]int64 {
 
 Delete the seven admin stubs from `unimplemented.go`.
 
-- [ ] **Step 4: Seed binary (mandatory catalog)**
+- [x] **Step 4: Seed binary (mandatory catalog)**
 
 Naming follows the repo convention: **seed** = mandatory data for every environment (idempotent), **fixtures** = dev-only fake data. The seed creates the default prices in Stripe and the DB and makes sure the portal configuration exists.
 
@@ -7559,7 +7559,7 @@ OTEL_SERVICE_NAME="billingseed"
 
 `cmd/billingseed/project.json`: `gen:wire`, `run` (`go run ./cmd/billingseed/`, `dependsOn: ["gen:wire"]`), `build`, `lint` (`./cmd/billingseed/... ./internal/billingseed/...`), shaped like `cmd/billing/project.json`. `.gitignore`: `billingseed`.
 
-- [ ] **Step 5: Fixtures binary (dev-only fake data)**
+- [x] **Step 5: Fixtures binary (dev-only fake data)**
 
 Workspace `00000000-0000-4000-8000-000000000110` gets a `pro` lifetime subscription, payer user `110` (`user@notopia.com`, `User`, from `deploy/compose/infrastructure/authentik-blueprints/users.yaml`). Built with domain constructors and saved through the billing repositories. No Stripe calls: provider ids are fake (`cus_fixture_110`, `pi_fixture_110`), so Stripe actions on this workspace (portal, cancel-now refund, payer claim) fail; entitlements, gRPC and the UI work. Needs the seed first (`pro_lifetime` price).
 
@@ -7628,7 +7628,7 @@ stripe-listen:
     stripe listen --forward-to http://api.notopia.localhost/billing/webhooks/stripe
 ```
 
-- [ ] **Step 6: Verify (Stripe sandbox)**
+- [x] **Step 6: Verify (Stripe sandbox)**
 
 ```bash
 nx run billing:gen:wire && nx run billingseed:gen:wire && nx run billingfixtures:gen:wire
@@ -7642,7 +7642,7 @@ Expected: plus has `plus_month`, `plus_year`; pro has `pro_month`, `pro_year`, `
 
 As `admin` (group `notopia-admins`): `PATCH /billing/admin/plans/free {"limits":{"members":4}}` → 200; `{"limits":{"seats":4}}` → 400 (unknown limit key rejected by `toLimitKeys`); as a normal user → 403. `POST /billing/admin/prices {"plan":"plus","interval":"month","amount":59000,"currency":"vnd"}` → old `plus_month` archived, new one active, a new portal configuration id in `billing_policy`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add internal/billing internal/billingseed internal/billingfixtures cmd/billing cmd/billingseed cmd/billingfixtures justfile
