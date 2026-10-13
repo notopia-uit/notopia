@@ -16,6 +16,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
 	"github.com/notopia-uit/notopia/internal/billing/controller/http"
+	"github.com/notopia-uit/notopia/internal/billing/infra/payment/stripe"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgreadmodel"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgrepo"
@@ -75,8 +76,18 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	}
 	queries := persistence.NewSQLCQueries(pool)
 	unitOfWork := pgrepo.NewUnitOfWork(pool, queries)
+	configStripe := &configConfig.Stripe
+	configBilling := &configConfig.Billing
+	provider := stripe.New(configStripe, configBilling)
+	identity := &configConfig.Identity
+	settings := billing.NewAppSettings(configBilling, identity)
+	archivePriceHandler := app.NewArchivePriceHandler(unitOfWork, provider, settings)
+	createPriceHandler := app.NewCreatePriceHandler(unitOfWork, provider, settings)
 	ensureDefaultsHandler := app.NewEnsureDefaultsHandler(unitOfWork)
-	cmds := app.NewCmds(handlerProvider, ensureDefaultsHandler)
+	ensurePortalConfigurationHandler := app.NewEnsurePortalConfigurationHandler(unitOfWork, provider, settings)
+	updatePlanHandler := app.NewUpdatePlanHandler(unitOfWork)
+	updatePolicyHandler := app.NewUpdatePolicyHandler(unitOfWork)
+	cmds := app.NewCmds(handlerProvider, archivePriceHandler, createPriceHandler, ensureDefaultsHandler, ensurePortalConfigurationHandler, updatePlanHandler, updatePolicyHandler)
 	billingReadModel := pgreadmodel.NewBillingReadModel(queries)
 	batchGetEntitlementsHandler := app.NewBatchGetEntitlementsHandler(billingReadModel)
 	services := &configConfig.Services
@@ -90,16 +101,20 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		return nil, nil, err
 	}
 	getEntitlementsHandler := app.NewGetEntitlementsHandler(billingReadModel, authorization)
+	getPlanHandler := app.NewGetPlanHandler(billingReadModel)
+	getPolicyHandler := app.NewGetPolicyHandler(billingReadModel)
+	getPriceHandler := app.NewGetPriceHandler(billingReadModel)
 	getWorkspaceBillingHandler := app.NewGetWorkspaceBillingHandler(billingReadModel, authorization)
 	getWorkspacePayerHandler := app.NewGetWorkspacePayerHandler(billingReadModel)
 	listPlansHandler := app.NewListPlansHandler(billingReadModel)
-	appQueries := app.NewQueries(handlerProvider, batchGetEntitlementsHandler, getEntitlementsHandler, getWorkspaceBillingHandler, getWorkspacePayerHandler, listPlansHandler)
+	listPricesHandler := app.NewListPricesHandler(billingReadModel)
+	appQueries := app.NewQueries(handlerProvider, batchGetEntitlementsHandler, getEntitlementsHandler, getPlanHandler, getPolicyHandler, getPriceHandler, getWorkspaceBillingHandler, getWorkspacePayerHandler, listPlansHandler, listPricesHandler)
 	server := &app.Server{
 		Cmds:    cmds,
 		Queries: appQueries,
 	}
 	db := persistence.NewPgxPoolStdlib(pool)
-	provider, err := persistence.NewGooseProvider(db, logger)
+	gooseProvider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -108,7 +123,7 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	pg, err := persistence.NewPg(pool, provider)
+	pg, err := persistence.NewPg(pool, gooseProvider)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -120,7 +135,6 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger, global)
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, global)
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
-	identity := &configConfig.Identity
 	strictHandler := http.NewStrictHandler(server, identity)
 	v := http.NewHandler(strictHandler)
 	configServer := &configConfig.Server

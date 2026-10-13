@@ -240,3 +240,10 @@ func toWorkspaceBilling(v app.WorkspaceBillingView) (billing.WorkspaceBilling, e
 	}
 	return out, nil
 }
+
+func toPolicy(p app.BillingPolicy) billing.BillingPolicy {
+	return billing.BillingPolicy{
+		PastDueGraceDays:         p.PastDueGraceDays,
+		LifetimeRefundWindowDays: p.LifetimeRefundWindowDays,
+	}
+}
