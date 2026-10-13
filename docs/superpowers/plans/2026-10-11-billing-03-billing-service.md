@@ -7672,24 +7672,24 @@ git commit -m "feat(billing): admin catalog APIs, seed, fixtures and portal conf
 
 Mocks come from mockery (`mise.toml` pins it), same setup as `internal/authorization` (`internal/authorization/.mockery.yaml` + `internal/authorization/project.json` `gen:mockery`, pulled in by `cmd/authorization` `gen`). Mock only the ports whose calls a test asserts:
 
-| Interface | Why a mock |
-| --- | --- |
-| `app.PaymentProvider` | External system; tests assert cancel/refund calls and stub snapshots/payments |
-| `app.Notifier` | Fire-and-forget side effect; tests only allow it (`.Maybe()`) |
-| `app.CompleteCheckoutCmd`, `app.SyncSubscriptionCmd`, `app.SyncRefundCmd` | Webhook controller test asserts which command the event routes to |
+| Interface                                                                 | Why a mock                                                                    |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `app.PaymentProvider`                                                     | External system; tests assert cancel/refund calls and stub snapshots/payments |
+| `app.Notifier`                                                            | Fire-and-forget side effect; tests only allow it (`.Maybe()`)                 |
+| `app.CompleteCheckoutCmd`, `app.SyncSubscriptionCmd`, `app.SyncRefundCmd` | Webhook controller test asserts which command the event routes to             |
 
 Not mocked: `domain.UnitOfWork` / repositories. Idempotency and "one current subscription" are state, so tests use the small in-memory `memStore` below; scripting every repo call with expectations would test the call order, not the behaviour. `AuthorizationSvc`, `BillingReadModel` and the other `Cmds`/`Queries` stay unmocked until a test needs them.
 
 ```yaml
 # internal/billing/.mockery.yaml
 template: testify
-dir: "{{ .InterfaceDir }}"
+dir: '{{ .InterfaceDir }}'
 filename: mock.go
-pkgname: "{{ .SrcPackageName }}"
+pkgname: '{{ .SrcPackageName }}'
 packages:
   github.com/notopia-uit/notopia/internal/billing/app:
     config:
-      include-interface-regex: "^(PaymentProvider|Notifier|CompleteCheckoutCmd|SyncSubscriptionCmd|SyncRefundCmd)$"
+      include-interface-regex: '^(PaymentProvider|Notifier|CompleteCheckoutCmd|SyncSubscriptionCmd|SyncRefundCmd)$'
 ```
 
 ```json
@@ -9777,3 +9777,23 @@ sequenceDiagram
 git add internal/billing/AGENTS.md CLAUDE.md docs/src
 git commit -m "docs(billing): service guide and diagrams"
 ```
+
+---
+
+## Status log
+
+### 2026-10-13: end of session
+
+**Done:** Tasks 1–10 (checkboxes ticked). Commits after Task 10: `4d59961b` typed kafka decode, `27e3d62b`/`71c6380e` stripe CLI + `stripe-listen --all-snapshot`, `2c307bd4` oapi-codegen version in nx inputs, `97cdbcf7` `commonconfig.Secret` redaction, `24c6f124` authorization bootstraps policies from `policy.csv` with `AddPoliciesEx`. Stories: `story/watermill-event-gaps.md`, `story/BILLING_PAYMENT_PROVIDERS.md`. Manual guide: `tmp/TEST_FLOW_BILLING.md` (gitignored).
+
+**E2E against Stripe sandbox (subagent run):** PASS: seed (idempotent), checkout + webhooks, event resend idempotency, portal session, bad signature → 400, cancel-now + refund, workspace deleted → cancel + refund.
+Not yet tested: payer removal + `payer/claim` (Task 10), plan change inside the portal, failing/3DS cards, duplicate-checkout guard, crons.
+
+**Open issues**
+
+1. Authorization with `APP_ENV=development` denies DB-persisted memberships after restart (runtime-created workspaces get 403, even reads). `APP_ENV=production` works. The suspected `LoadPoliciesFromString` sharing the model is probably not it (casbin `LoadPolicy` works on `model.Copy()`). Root cause unknown; check `LoadFixtures` order vs `LoadPolicy` in `internal/authorization`. Verify DB memberships survive restart now that bootstrap uses the same loader.
+2. Plain shells resolve a stale oapi-codegen 2.7.0 on PATH; mise pins 2.8.0. Run nx via `mise exec -- nx …` or an activated mise shell, or gen output drifts.
+3. Webhook bad-signature request without `Content-Type: application/json` returns 400 `invalid` instead of `webhookSignatureInvalid` (request validator runs first). Real Stripe always sends JSON. Minor.
+4. Stripe events delivered while infra was down got 502 and were not redelivered (seed-time `price.created` etc.); harmless, but remember `stripe events resend` when debugging.
+5. Final whole-branch review (executing-plans) is not done yet: run after Tasks 11+.
+6. Tasks 11–12 on hold pending research. OpenAPI 3.1 conversion parked (redocly join needs all specs on one version; patch was in the old session scratchpad, recreate if needed).
