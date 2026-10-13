@@ -145,7 +145,7 @@ deliberately omits.
 - Temp file must be go into `./tmp/{projectName}`, avoid writing to `/tmp/` when things need to be persisted
 - While writing code, try **not to write unnecessary comments** into code
 - There are many `*.env*` file, which contains safe local development environment variables. Only `*.env.local*` can contain sensitive environment variables, and should be gitignored
-- Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsgo` (replace for `tsc`)
+- Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsc`
 - If something is not worth to code/fix, but might have issue in the future, then comments
 - Prefer breakline for human readable, over one-line; code, naming convention over saving token because human still maintain the source code
 

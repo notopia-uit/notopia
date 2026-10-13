@@ -33,7 +33,6 @@ go = "1.27.1"
 
 [shell_alias]
 shadcn = "pnpm exec shadcn"
-tsgo = "pnpm exec tsgo"
 compose = "docker compose"
 p = "pnpm"
 oxlint = "pnpm exec oxlint"
