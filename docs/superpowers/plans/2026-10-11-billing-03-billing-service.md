@@ -7656,21 +7656,71 @@ git commit -m "feat(billing): admin catalog APIs, seed, fixtures and portal conf
 **Files:**
 
 - Create: `internal/billing/app/{q_startcheckout.go,q_startportal.go,refunds.go,cmd_completecheckout.go,cmd_syncsubscription.go,cmd_syncrefund.go}`
-- Create: `internal/billing/app/{fakes_test.go,cmd_completecheckout_test.go}`
+- Create: `internal/billing/app/{memstore_test.go,cmd_completecheckout_test.go}`
+- Create: `internal/billing/.mockery.yaml`, `internal/billing/project.json` (nx `internal/billing`, target `gen:mockery`); modify `cmd/billing/project.json` (`gen:mockery` → `^gen:mockery`, `gen` depends on it); generated `internal/billing/app/mock.go` (committed, never hand-edited)
 - Create: `internal/billing/controller/http/{checkout.go,webhook.go,webhook_test.go}`; modify `http.go` (`NewStrictHandler` takes `*config.Stripe`), `unimplemented.go`
 - Modify: `internal/billing/app/app.go`, `internal/billing/app/wire.go`
 
 **Interfaces:**
 
 - Consumes: `PaymentProvider` (Task 6), `Notifier`, `AuthorizationSvc`, `Settings`.
-- Produces: `Queries.StartCheckout` (`StartCheckout{WorkspaceID, PriceID uuid.UUID; Payer app.Payer}` → checkout URL `string`), `Queries.StartPortal` (`StartPortal{WorkspaceID uuid.UUID; UserID string}` → portal URL `string`), both modeled as queries because commands only return `error` and the provider session URL is the answer, `Cmds.CompleteCheckout` (`CompleteCheckout{EventID, SessionID string}`), `Cmds.SyncRefund` (`SyncRefund{EventID, EventType, ProviderRefundID string}`), `Cmds.SyncSubscription` (`SyncSubscription{EventID string; ProviderSubscriptionID string}` — `EventID` empty when called by the reconcile cron), `RefundRunner.Run(ctx, subscriptionID)` (used by Tasks 9, 10, 11).
+- Produces: `Queries.StartCheckout` (`StartCheckout{WorkspaceID, PriceID uuid.UUID; Payer app.Payer}` → checkout URL `string`), `Queries.StartPortal` (`StartPortal{WorkspaceID uuid.UUID; UserID string}` → portal URL `string`), both modeled as queries because commands only return `error` and the provider session URL is the answer, `Cmds.CompleteCheckout` (`CompleteCheckout{EventID, SessionID string}`), `Cmds.SyncRefund` (`SyncRefund{EventID, EventType, ProviderRefundID string}`), `Cmds.SyncSubscription` (`SyncSubscription{EventID, EventType, ProviderSubscriptionID string}` — `EventID`/`EventType` empty when called by the reconcile cron), `RefundRunner.Run(ctx, subscriptionID)` (used by Tasks 9, 10, 11).
 
 **Ordering rule used by every webhook use case:** provider _mutations that must not be lost_ (cancel a duplicate subscription, change default card) run **before** the write transaction and are idempotent; the write transaction records the event (`ProviderEventLog.MarkProcessed`) together with the state change; **refunds run after commit** with idempotency key `refund:{id}` and are retried by the reconcile cron while `pending` without a provider id.
 
-- [ ] **Step 1: Write the failing tests**
+- [ ] **Step 1: Mocks and failing tests**
+
+Mocks come from mockery (`mise.toml` pins it), same setup as `internal/authorization` (`internal/authorization/.mockery.yaml` + `internal/authorization/project.json` `gen:mockery`, pulled in by `cmd/authorization` `gen`). Mock only the ports whose calls a test asserts:
+
+| Interface | Why a mock |
+| --- | --- |
+| `app.PaymentProvider` | External system; tests assert cancel/refund calls and stub snapshots/payments |
+| `app.Notifier` | Fire-and-forget side effect; tests only allow it (`.Maybe()`) |
+| `app.CompleteCheckoutCmd`, `app.SyncSubscriptionCmd`, `app.SyncRefundCmd` | Webhook controller test asserts which command the event routes to |
+
+Not mocked: `domain.UnitOfWork` / repositories. Idempotency and "one current subscription" are state, so tests use the small in-memory `memStore` below; scripting every repo call with expectations would test the call order, not the behaviour. `AuthorizationSvc`, `BillingReadModel` and the other `Cmds`/`Queries` stay unmocked until a test needs them.
+
+```yaml
+# internal/billing/.mockery.yaml
+template: testify
+dir: "{{ .InterfaceDir }}"
+filename: mock.go
+pkgname: "{{ .SrcPackageName }}"
+packages:
+  github.com/notopia-uit/notopia/internal/billing/app:
+    config:
+      include-interface-regex: "^(PaymentProvider|Notifier|CompleteCheckoutCmd|SyncSubscriptionCmd|SyncRefundCmd)$"
+```
+
+```json
+// internal/billing/project.json
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "internal/billing",
+  "projectType": "library",
+  "tags": ["scope:library", "type:go"],
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*.go", "!{projectRoot}/**/*_test.go", "!{projectRoot}/**/mock.go"]
+  },
+  "targets": {
+    "gen:mockery": {
+      "executor": "nx:run-commands",
+      "inputs": ["default", "{projectRoot}/.mockery.yaml"],
+      "outputs": ["{projectRoot}/app/mock.go"],
+      "options": {
+        "command": "mockery",
+        "cwd": "{projectRoot}"
+      }
+    }
+  },
+  "implicitDependencies": ["pkg"]
+}
+```
+
+`cmd/billing/project.json`: add `"gen:mockery": {"dependsOn": ["^gen:mockery"]}` and make `gen` depend on `["gen:wire", "gen:sqlc", "gen:mockery"]`. Generate after Step 4 adds the `Sync*`/`CompleteCheckout` command types: `nx run billing:gen:mockery`. Generated types: `MockPaymentProvider`, `MockNotifier`, `MockCompleteCheckoutCmd`, … with `NewMockX(t)` (expectations asserted on cleanup) and `.EXPECT()`.
 
 ```go
-// internal/billing/app/fakes_test.go
+// internal/billing/app/memstore_test.go
 package app
 
 import (
@@ -7860,39 +7910,6 @@ func (r memEvents) MarkProcessed(_ context.Context, id, _ string) (bool, error) 
 	return true, nil
 }
 func (r memEvents) PruneBefore(context.Context, time.Time) (int64, error) { return 0, nil }
-
-// fakeProvider overrides only what a test needs; other methods panic via the nil embedded interface.
-type fakeProvider struct {
-	PaymentProvider
-	session   CheckoutSessionResult
-	snapshots map[string]domain.ProviderSnapshot
-	payments  map[string][]domain.PaymentInfo
-	canceled  []string
-	refunds   []domain.Money
-}
-
-func (f *fakeProvider) GetCheckoutSession(context.Context, string) (CheckoutSessionResult, error) {
-	return f.session, nil
-}
-func (f *fakeProvider) GetSubscriptionSnapshot(_ context.Context, id string) (domain.ProviderSnapshot, error) {
-	return f.snapshots[id], nil
-}
-func (f *fakeProvider) PeriodPayments(_ context.Context, id string, _, _ time.Time) ([]domain.PaymentInfo, error) {
-	return f.payments[id], nil
-}
-func (f *fakeProvider) CancelSubscriptionNow(_ context.Context, id string) error {
-	f.canceled = append(f.canceled, id)
-	return nil
-}
-func (f *fakeProvider) CreateRefund(_ context.Context, id uuid.UUID, ref string, amount domain.Money) (RefundResult, error) {
-	f.refunds = append(f.refunds, amount)
-	return RefundResult{ProviderRefundID: "re_" + id.String(), RefundID: &id, PaymentRef: ref, Amount: amount, Status: domain.RefundStatusSucceeded}, nil
-}
-func (f *fakeProvider) UpdateCustomerContact(context.Context, string, domain.Payer) error { return nil }
-
-type nopNotifier struct{}
-
-func (nopNotifier) SubscriptionChanged(context.Context, uuid.UUID, domain.PlanTier, domain.Status) {}
 ```
 
 ```go
@@ -7907,12 +7924,15 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
+var testPayer = domain.Payer{ID: "112", Email: "a@b.c", Name: "A"}
+
 type fixture struct {
 	store    *memStore
-	provider *fakeProvider
+	provider *MockPaymentProvider
 	handler  *CompleteCheckoutHandler
 	ws       uuid.UUID
 	plus     *domain.Price
@@ -7927,30 +7947,55 @@ func newFixture(t *testing.T) *fixture {
 	lifetime, _ := domain.NewPrice(uuid.New(), domain.PlanTierPro, domain.IntervalLifetime, domain.Money{Amount: 2490000, Currency: "vnd"}, "price_life", now, "u")
 	store.prices[plus.ID()], store.prices[lifetime.ID()] = plus, lifetime
 	ws := uuid.New()
-	store.accounts[ws] = domain.OpenBillingAccount(ws, "cus_1", domain.Payer{ID: "112", Email: "a@b.c", Name: "A"}, now, "112")
-	provider := &fakeProvider{snapshots: map[string]domain.ProviderSnapshot{}, payments: map[string]domain.PaymentInfo{}}
-	settings := &Settings{Currency: "vnd", ServiceAccountUserID: "1003"}
+	store.accounts[ws] = domain.OpenBillingAccount(ws, "cus_1", testPayer, now, "112")
+
+	provider := NewMockPaymentProvider(t)
+	provider.EXPECT().UpdateCustomerContact(mock.Anything, mock.Anything, mock.Anything).Return(nil).Maybe()
+	notifier := NewMockNotifier(t)
+	notifier.EXPECT().SubscriptionChanged(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Maybe()
+
+	settings := &Settings{WebBaseURL: "http://web.test", ServiceAccountUserID: "1003"}
 	refunds := NewRefundRunner(store, provider, settings)
 	return &fixture{
-		store: store, provider: provider, ws: ws, plus: plus, lifetime: lifetime,
-		handler: NewCompleteCheckoutHandler(store, provider, nopNotifier{}, settings, refunds),
+		store:    store,
+		provider: provider,
+		ws:       ws,
+		plus:     plus,
+		lifetime: lifetime,
+		handler:  NewCompleteCheckoutHandler(store, provider, notifier, settings, refunds),
 	}
 }
 
-func (f *fixture) subscribeSession(subID string) {
+// expectSubscribeSession stubs a paid plus-monthly checkout that created Stripe subscription subID.
+func (f *fixture) expectSubscribeSession(subID string) {
 	now := time.Now()
-	f.provider.session = CheckoutSessionResult{
+	end := now.Add(30 * 24 * time.Hour)
+	f.provider.EXPECT().GetCheckoutSession(mock.Anything, "cs_"+subID).Return(CheckoutSessionResult{
 		ID: "cs_" + subID, Purpose: CheckoutPurposeSubscribe, Complete: true, WorkspaceID: f.ws, PriceID: f.plus.ID(),
-		Payer: domain.Payer{ID: "112", Email: "a@b.c", Name: "A"}, CustomerID: "cus_1", ProviderSubscriptionID: subID,
-	}
-	f.provider.snapshots[subID] = domain.ProviderSnapshot{
+		Payer: testPayer, CustomerID: "cus_1", ProviderSubscriptionID: subID,
+	}, nil)
+	f.provider.EXPECT().GetSubscriptionSnapshot(mock.Anything, subID).Return(domain.ProviderSnapshot{
 		ProviderSubscriptionID: subID, ProviderPriceID: "price_plus", WorkspaceID: f.ws, Status: domain.StatusActive,
-		CurrentPeriodStart: now, CurrentPeriodEnd: now.Add(30 * 24 * time.Hour),
-	}
-	f.provider.payments[subID] = []domain.PaymentInfo{{
+		CurrentPeriodStart: now, CurrentPeriodEnd: end,
+	}, nil).Maybe()
+	f.provider.EXPECT().PeriodPayments(mock.Anything, subID, mock.Anything, mock.Anything).Return([]domain.PaymentInfo{{
 		Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_" + subID, PaidAt: now,
-		CoverageStart: now, CoverageEnd: now.Add(30 * 24 * time.Hour),
-	}}
+		CoverageStart: now, CoverageEnd: end,
+	}}, nil).Maybe()
+}
+
+// expectRefund accepts one refund and reports it succeeded; returns the captured amount.
+func (f *fixture) expectRefund() *domain.Money {
+	var got domain.Money
+	f.provider.EXPECT().CreateRefund(mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		RunAndReturn(func(_ context.Context, id uuid.UUID, ref string, amount domain.Money) (RefundResult, error) {
+			got = amount
+			return RefundResult{
+				ProviderRefundID: "re_" + id.String(), RefundID: &id, PaymentRef: ref,
+				Amount: amount, Status: domain.RefundStatusSucceeded, FailureMessage: nil,
+			}, nil
+		}).Once()
+	return &got
 }
 
 func (f *fixture) current(t *testing.T) *domain.Subscription {
@@ -7961,45 +8006,48 @@ func (f *fixture) current(t *testing.T) *domain.Subscription {
 
 func TestCompleteCheckoutIsIdempotent(t *testing.T) {
 	f := newFixture(t)
-	f.subscribeSession("sub_1")
+	f.expectSubscribeSession("sub_1")
 	cmd := &CompleteCheckout{EventID: "evt_1", SessionID: "cs_sub_1"}
 	for range 2 {
 		require.NoError(t, f.handler.Handle(context.Background(), cmd))
 	}
 	assert.Len(t, f.store.subs, 1)
 	assert.Equal(t, domain.PlanTierPlus, f.current(t).Plan())
+	// no CancelSubscriptionNow / CreateRefund expectation: the mock fails the test if either is called
 }
 
 func TestDuplicateCheckoutIsCanceledAndRefunded(t *testing.T) {
 	f := newFixture(t)
-	f.subscribeSession("sub_1")
+	f.expectSubscribeSession("sub_1")
 	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_1", SessionID: "cs_sub_1"}))
-	f.subscribeSession("sub_2")
+
+	f.expectSubscribeSession("sub_2")
+	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_2").Return(nil).Once()
+	refunded := f.expectRefund()
 	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_2", SessionID: "cs_sub_2"}))
 
 	assert.Equal(t, "sub_1", *f.current(t).ProviderSubscriptionID())
-	assert.Equal(t, []string{"sub_2"}, f.provider.canceled)
-	require.Len(t, f.provider.refunds, 1)
-	assert.EqualValues(t, 30000, f.provider.refunds[0].Amount)
+	assert.EqualValues(t, 30000, refunded.Amount)
 }
 
 func TestLifetimeReplacesRecurring(t *testing.T) {
 	f := newFixture(t)
-	f.subscribeSession("sub_1")
+	f.expectSubscribeSession("sub_1")
 	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_1", SessionID: "cs_sub_1"}))
-	f.provider.session = CheckoutSessionResult{
+
+	f.provider.EXPECT().GetCheckoutSession(mock.Anything, "cs_life").Return(CheckoutSessionResult{
 		ID: "cs_life", Purpose: CheckoutPurposeLifetime, Complete: true, WorkspaceID: f.ws, PriceID: f.lifetime.ID(),
-		Payer: domain.Payer{ID: "112", Email: "a@b.c", Name: "A"}, CustomerID: "cus_1",
+		Payer: testPayer, CustomerID: "cus_1",
 		Payment: domain.PaymentInfo{Amount: domain.Money{Amount: 2490000, Currency: "vnd"}, PaymentRef: "pi_life", PaidAt: time.Now()},
-	}
+	}, nil)
+	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").Return(nil).Once()
+	refunded := f.expectRefund()
 	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_2", SessionID: "cs_life"}))
 
 	cur := f.current(t)
 	assert.Equal(t, domain.IntervalLifetime, cur.Interval())
 	assert.Equal(t, domain.PlanTierPro, cur.Plan())
-	assert.Len(t, f.provider.canceled, 1)
-	require.Len(t, f.provider.refunds, 1)
-	assert.Positive(t, f.provider.refunds[0].Amount)
+	assert.Positive(t, refunded.Amount)
 }
 ```
 
@@ -8790,18 +8838,19 @@ func (h *StrictHandler) StripeWebhook(ctx context.Context, req billing.StripeWeb
 }
 ```
 
-`webhook_test.go` (controller test, fake `Cmds` that record calls; build `StrictHandler` by hand, put the payload in ctx the way `captureRawBody` does):
+`webhook_test.go` (controller test; build `StrictHandler` by hand with `&app.Server{Cmds: &app.Cmds{CompleteCheckout: app.NewMockCompleteCheckoutCmd(t), SyncSubscription: …, SyncRefund: …}}`, put the payload in ctx the way `captureRawBody` does). A mock with no expectation fails the test when called, so "no other command ran" needs no extra assert:
 
 ```go
 func TestStripeWebhookInvoicePaidSyncsSubscription(t *testing.T) {
 	payload := []byte(`{"id":"evt_1","object":"event","api_version":"2020-08-27","type":"invoice.paid","data":{"object":{"id":"in_1","object":"invoice","parent":{"subscription_details":{"subscription":"sub_123"}}}}}`)
 	signed := webhook.GenerateTestSignedPayload(&webhook.UnsignedPayload{Payload: payload, Secret: "whsec_test"})
-	// … handler with webhookSecret "whsec_test" and a recording SyncSubscription
-	// call StripeWebhook with signed.Header → 204; recorded {EventID: "evt_1", ProviderSubscriptionID: "sub_123"}
+	// … handler with webhookSecret "whsec_test"
+	// syncSub.EXPECT().Handle(mock.Anything, &app.SyncSubscription{EventID: "evt_1", EventType: "invoice.paid", ProviderSubscriptionID: "sub_123"}).Return(nil).Once()
+	// call StripeWebhook with signed.Header → 204
 }
 
 func TestStripeWebhookBadSignature(t *testing.T) {
-	// same payload, header "t=1,v1=bad" → errs.CodeWebhookSignature, no command called
+	// same payload, header "t=1,v1=bad" → errs.CodeWebhookSignature; mocks have no expectations, so any call fails
 }
 ```
 
@@ -8810,7 +8859,7 @@ func TestStripeWebhookBadSignature(t *testing.T) {
 - [ ] **Step 6: Run tests, build, E2E**
 
 ```bash
-go test ./internal/billing/...
+nx run billing:gen:mockery && go test ./internal/billing/...
 nx run billing:gen:wire && nx build billing && nx lint billing
 just stripe-listen            # copy the whsec_ into cmd/billing/.env.local, restart billing
 ```
@@ -8820,7 +8869,7 @@ As owner of workspace W (user `kevinnitro`): `POST /billing/workspaces/W/checkou
 - [ ] **Step 7: Commit**
 
 ```bash
-git add internal/billing cmd/billing/wire_gen.go
+git add internal/billing cmd/billing/wire_gen.go cmd/billing/project.json
 git commit -m "feat(billing): checkout, portal and stripe webhook processing"
 ```
 
@@ -9463,7 +9512,7 @@ git commit -m "feat(billing): payer claim and kafka handlers for payer removal a
 
 **Files:**
 
-- Modify: `internal/billing/domain/repo.go` (add `ListIDsWithUnsubmittedRefunds`), `internal/billing/infra/persistence/pgsqlc/subscription.sql`, `internal/billing/infra/persistence/pgrepo/subscription.go`, `internal/billing/app/fakes_test.go`
+- Modify: `internal/billing/domain/repo.go` (add `ListIDsWithUnsubmittedRefunds`), `internal/billing/infra/persistence/pgsqlc/subscription.sql`, `internal/billing/infra/persistence/pgrepo/subscription.go`, `internal/billing/app/memstore_test.go`
 - Create: `internal/billing/app/{cmd_reconcilesubscriptions.go,cmd_pruneproviderevents.go}`
 - Create: `internal/billing/controller/cron/{cron.go,wire.go}`
 - Modify: `internal/billing/controller/wire.go`, `internal/billing/server.go`, `app.go`, `wire.go`
@@ -9495,7 +9544,7 @@ func (r *subscriptionRepo) ListIDsWithUnsubmittedRefunds(ctx context.Context, li
 }
 ```
 
-`fakes_test.go` `memSubs`: `func (r memSubs) ListIDsWithUnsubmittedRefunds(context.Context, int) ([]uuid.UUID, error) { return nil, nil }`. Run `nx run billing:gen:sqlc`.
+`memstore_test.go` `memSubs`: `func (r memSubs) ListIDsWithUnsubmittedRefunds(context.Context, int) ([]uuid.UUID, error) { return nil, nil }`. Run `nx run billing:gen:sqlc`.
 
 - [ ] **Step 2: Commands**
 
