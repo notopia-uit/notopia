@@ -9,11 +9,11 @@ import (
 
 func toSharePlan(t domain.PlanTier) (share.SubscriptionChangedEventPlan, error) {
 	switch t {
-	case domain.TierFree:
+	case domain.PlanTierFree:
 		return share.SubscriptionChangedEventPlanFree, nil
-	case domain.TierPlus:
+	case domain.PlanTierPlus:
 		return share.SubscriptionChangedEventPlanPlus, nil
-	case domain.TierPro:
+	case domain.PlanTierPro:
 		return share.SubscriptionChangedEventPlanPro, nil
 	case domain.PlanTierUnspecified:
 	}

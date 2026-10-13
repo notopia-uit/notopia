@@ -91,17 +91,17 @@ func (p *Plan) UpdatedAt() time.Time          { return p.updatedAt }
 func DefaultPlans(now time.Time) []*Plan {
 	mk := func(t PlanTier, autoCommit, graph bool, members, published, depth, interval, revisions, trash, ai int64) *Plan {
 		p, _ := NewPlan(t,
-			map[FeatureKey]bool{FeatureAutoCommit: autoCommit, FeatureWorkspaceGraph: graph},
+			map[FeatureKey]bool{FeatureKeyAutoCommit: autoCommit, FeatureKeyWorkspaceGraph: graph},
 			map[LimitKey]int64{
-				LimitMembers: members, LimitPublishedNotes: published, LimitNoteGraphMaxDepth: depth,
-				LimitAutoCommitMinInterval: interval, LimitRevisionHistoryDays: revisions,
-				LimitTrashRetentionDays: trash, LimitAICreditsMonthly: ai,
+				LimitKeyMembers: members, LimitKeyPublishedNotes: published, LimitKeyNoteGraphMaxDepth: depth,
+				LimitKeyAutoCommitMinInterval: interval, LimitKeyRevisionHistoryDays: revisions,
+				LimitKeyTrashRetentionDays: trash, LimitKeyAICreditsMonthly: ai,
 			}, now)
 		return p
 	}
 	return []*Plan{
-		mk(TierFree, false, false, 3, 3, 5, 0, 7, 7, 0),
-		mk(TierPlus, true, true, 10, Unlimited, Unlimited, 300, 30, 30, 200),
-		mk(TierPro, true, true, Unlimited, Unlimited, Unlimited, 60, Unlimited, 90, 2000),
+		mk(PlanTierFree, false, false, 3, 3, 5, 0, 7, 7, 0),
+		mk(PlanTierPlus, true, true, 10, Unlimited, Unlimited, 300, 30, 30, 200),
+		mk(PlanTierPro, true, true, Unlimited, Unlimited, Unlimited, 60, Unlimited, 90, 2000),
 	}
 }

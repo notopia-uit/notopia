@@ -7,11 +7,11 @@ import (
 
 func FromPlanTier(t domain.PlanTier) pgsqlc.PlanTier {
 	switch t {
-	case domain.TierFree:
+	case domain.PlanTierFree:
 		return pgsqlc.PlanTierFree
-	case domain.TierPlus:
+	case domain.PlanTierPlus:
 		return pgsqlc.PlanTierPlus
-	case domain.TierPro:
+	case domain.PlanTierPro:
 		return pgsqlc.PlanTierPro
 	case domain.PlanTierUnspecified:
 		return ""
@@ -22,11 +22,11 @@ func FromPlanTier(t domain.PlanTier) pgsqlc.PlanTier {
 func ToPlanTier(t pgsqlc.PlanTier) domain.PlanTier {
 	switch t {
 	case pgsqlc.PlanTierFree:
-		return domain.TierFree
+		return domain.PlanTierFree
 	case pgsqlc.PlanTierPlus:
-		return domain.TierPlus
+		return domain.PlanTierPlus
 	case pgsqlc.PlanTierPro:
-		return domain.TierPro
+		return domain.PlanTierPro
 	default:
 		return domain.PlanTierUnspecified
 	}

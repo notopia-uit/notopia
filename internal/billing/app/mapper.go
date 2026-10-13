@@ -4,11 +4,11 @@ import "github.com/notopia-uit/notopia/internal/billing/domain"
 
 func newPlanTier(t domain.PlanTier) PlanTier {
 	switch t {
-	case domain.TierFree:
+	case domain.PlanTierFree:
 		return PlanTierFree
-	case domain.TierPlus:
+	case domain.PlanTierPlus:
 		return PlanTierPlus
-	case domain.TierPro:
+	case domain.PlanTierPro:
 		return PlanTierPro
 	case domain.PlanTierUnspecified:
 	}
@@ -159,11 +159,11 @@ func newRefundQuote(q domain.RefundQuote) RefundQuote {
 func toDomainPlanTier(t PlanTier) domain.PlanTier {
 	switch t {
 	case PlanTierFree:
-		return domain.TierFree
+		return domain.PlanTierFree
 	case PlanTierPlus:
-		return domain.TierPlus
+		return domain.PlanTierPlus
 	case PlanTierPro:
-		return domain.TierPro
+		return domain.PlanTierPro
 	case PlanTierUnspecified:
 	}
 	return domain.PlanTierUnspecified

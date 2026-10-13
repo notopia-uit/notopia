@@ -26,7 +26,7 @@ func LookupKey(plan PlanTier, interval Interval) string {
 }
 
 func NewPrice(id uuid.UUID, plan PlanTier, interval Interval, amount Money, providerPriceID string, now time.Time, userID string) (*Price, error) {
-	if !plan.IsValid() || plan == TierFree {
+	if !plan.IsValid() || plan == PlanTierFree {
 		return nil, errs.NewInvalid("price plan must be plus or pro")
 	}
 	if !interval.IsValid() {

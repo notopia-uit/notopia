@@ -69,7 +69,7 @@ func TestGrantsAccess(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			s, err := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.TierPlus, domain.IntervalMonth, 49000), snap(c.status, t0, end), t0, "u")
+			s, err := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000), snap(c.status, t0, end), t0, "u")
 			require.NoError(t, err)
 			assert.Equal(t, c.want, s.GrantsAccess(c.now, policy))
 		})
@@ -77,8 +77,8 @@ func TestGrantsAccess(t *testing.T) {
 }
 
 func TestApplySnapshotEvents(t *testing.T) {
-	plus := price(t, domain.TierPlus, domain.IntervalMonth, 49000)
-	pro := price(t, domain.TierPro, domain.IntervalMonth, 99000)
+	plus := price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000)
+	pro := price(t, domain.PlanTierPro, domain.IntervalMonth, 99000)
 	end := t0.AddDate(0, 1, 0)
 	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), plus, snap(domain.StatusActive, t0, end), t0, "u")
 	assert.Equal(t, []string{"created", "activated"}, eventNames(s.PopEvents()))
@@ -97,7 +97,7 @@ func TestApplySnapshotEvents(t *testing.T) {
 func TestQuoteCancelNow(t *testing.T) {
 	policy := domain.DefaultBillingPolicy(t0)
 	end := t0.Add(30 * 24 * time.Hour)
-	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.TierPlus, domain.IntervalMonth, 49000), snap(domain.StatusActive, t0, end), t0, "u")
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000), snap(domain.StatusActive, t0, end), t0, "u")
 	pay := domain.PaymentInfo{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_1", PaidAt: t0, CoverageStart: t0, CoverageEnd: end}
 
 	q, err := s.QuoteCancelNow(t0.Add(10*24*time.Hour), policy, []domain.PaymentInfo{pay})
@@ -116,7 +116,7 @@ func TestQuoteCancelNow(t *testing.T) {
 func TestQuoteCancelNowAfterUpgrade(t *testing.T) {
 	policy := domain.DefaultBillingPolicy(t0)
 	day := func(n int) time.Time { return t0.Add(time.Duration(n) * 24 * time.Hour) }
-	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.TierPro, domain.IntervalMonth, 90000), snap(domain.StatusActive, t0, day(30)), t0, "u")
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPro, domain.IntervalMonth, 90000), snap(domain.StatusActive, t0, day(30)), t0, "u")
 	payments := []domain.PaymentInfo{
 		{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_a", PaidAt: t0, CoverageStart: t0, CoverageEnd: day(30)},
 		{Amount: domain.Money{Amount: 40000, Currency: "vnd"}, PaymentRef: "pi_b", PaidAt: day(10), CoverageStart: day(10), CoverageEnd: day(30)},
@@ -137,7 +137,7 @@ func TestQuoteCancelNowAfterUpgrade(t *testing.T) {
 
 func TestLifetimeRefundWindow(t *testing.T) {
 	policy := domain.DefaultBillingPolicy(t0) // 14 days
-	s, _ := domain.NewLifetimeSubscription(uuid.New(), uuid.New(), price(t, domain.TierPro, domain.IntervalLifetime, 2490000), "pi_l", t0, t0, "u")
+	s, _ := domain.NewLifetimeSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPro, domain.IntervalLifetime, 2490000), "pi_l", t0, t0, "u")
 	pay := []domain.PaymentInfo{{Amount: domain.Money{Amount: 2490000, Currency: "vnd"}, PaymentRef: "pi_l", PaidAt: t0}}
 
 	q, err := s.QuoteCancelNow(t0.Add(13*24*time.Hour), policy, pay)

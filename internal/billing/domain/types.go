@@ -10,16 +10,16 @@ type PlanTier uint8
 
 const (
 	PlanTierUnspecified PlanTier = iota
-	TierFree
-	TierPlus
-	TierPro
+	PlanTierFree
+	PlanTierPlus
+	PlanTierPro
 )
 
-var PlanTiers = []PlanTier{TierFree, TierPlus, TierPro}
+var PlanTiers = []PlanTier{PlanTierFree, PlanTierPlus, PlanTierPro}
 
 func (t PlanTier) IsValid() bool {
 	switch t {
-	case TierFree, TierPlus, TierPro:
+	case PlanTierFree, PlanTierPlus, PlanTierPro:
 		return true
 	case PlanTierUnspecified:
 		return false
@@ -31,11 +31,11 @@ func (t PlanTier) String() string {
 	switch t {
 	case PlanTierUnspecified:
 		return "unspecified"
-	case TierFree:
+	case PlanTierFree:
 		return "free"
-	case TierPlus:
+	case PlanTierPlus:
 		return "plus"
-	case TierPro:
+	case PlanTierPro:
 		return "pro"
 	default:
 		return "unknown"
@@ -204,15 +204,15 @@ type FeatureKey uint8
 
 const (
 	FeatureKeyUnspecified FeatureKey = iota
-	FeatureAutoCommit
-	FeatureWorkspaceGraph
+	FeatureKeyAutoCommit
+	FeatureKeyWorkspaceGraph
 )
 
-var FeatureKeys = []FeatureKey{FeatureAutoCommit, FeatureWorkspaceGraph}
+var FeatureKeys = []FeatureKey{FeatureKeyAutoCommit, FeatureKeyWorkspaceGraph}
 
 func (k FeatureKey) IsValid() bool {
 	switch k {
-	case FeatureAutoCommit, FeatureWorkspaceGraph:
+	case FeatureKeyAutoCommit, FeatureKeyWorkspaceGraph:
 		return true
 	case FeatureKeyUnspecified:
 		return false
@@ -224,9 +224,9 @@ func (k FeatureKey) String() string {
 	switch k {
 	case FeatureKeyUnspecified:
 		return "unspecified"
-	case FeatureAutoCommit:
+	case FeatureKeyAutoCommit:
 		return "auto_commit"
-	case FeatureWorkspaceGraph:
+	case FeatureKeyWorkspaceGraph:
 		return "workspace_graph"
 	default:
 		return "unknown"
@@ -246,24 +246,24 @@ type LimitKey uint8
 
 const (
 	LimitKeyUnspecified LimitKey = iota
-	LimitMembers
-	LimitPublishedNotes
-	LimitNoteGraphMaxDepth
-	LimitAutoCommitMinInterval
-	LimitRevisionHistoryDays
-	LimitTrashRetentionDays
-	LimitAICreditsMonthly
+	LimitKeyMembers
+	LimitKeyPublishedNotes
+	LimitKeyNoteGraphMaxDepth
+	LimitKeyAutoCommitMinInterval
+	LimitKeyRevisionHistoryDays
+	LimitKeyTrashRetentionDays
+	LimitKeyAICreditsMonthly
 )
 
 var LimitKeys = []LimitKey{
-	LimitMembers, LimitPublishedNotes, LimitNoteGraphMaxDepth, LimitAutoCommitMinInterval,
-	LimitRevisionHistoryDays, LimitTrashRetentionDays, LimitAICreditsMonthly,
+	LimitKeyMembers, LimitKeyPublishedNotes, LimitKeyNoteGraphMaxDepth, LimitKeyAutoCommitMinInterval,
+	LimitKeyRevisionHistoryDays, LimitKeyTrashRetentionDays, LimitKeyAICreditsMonthly,
 }
 
 func (k LimitKey) IsValid() bool {
 	switch k {
-	case LimitMembers, LimitPublishedNotes, LimitNoteGraphMaxDepth, LimitAutoCommitMinInterval,
-		LimitRevisionHistoryDays, LimitTrashRetentionDays, LimitAICreditsMonthly:
+	case LimitKeyMembers, LimitKeyPublishedNotes, LimitKeyNoteGraphMaxDepth, LimitKeyAutoCommitMinInterval,
+		LimitKeyRevisionHistoryDays, LimitKeyTrashRetentionDays, LimitKeyAICreditsMonthly:
 		return true
 	case LimitKeyUnspecified:
 		return false
@@ -275,19 +275,19 @@ func (k LimitKey) String() string {
 	switch k {
 	case LimitKeyUnspecified:
 		return "unspecified"
-	case LimitMembers:
+	case LimitKeyMembers:
 		return "members"
-	case LimitPublishedNotes:
+	case LimitKeyPublishedNotes:
 		return "published_notes"
-	case LimitNoteGraphMaxDepth:
+	case LimitKeyNoteGraphMaxDepth:
 		return "note_graph_max_depth"
-	case LimitAutoCommitMinInterval:
+	case LimitKeyAutoCommitMinInterval:
 		return "auto_commit_min_interval_seconds"
-	case LimitRevisionHistoryDays:
+	case LimitKeyRevisionHistoryDays:
 		return "revision_history_days"
-	case LimitTrashRetentionDays:
+	case LimitKeyTrashRetentionDays:
 		return "trash_retention_days"
-	case LimitAICreditsMonthly:
+	case LimitKeyAICreditsMonthly:
 		return "ai_credits_monthly"
 	default:
 		return "unknown"

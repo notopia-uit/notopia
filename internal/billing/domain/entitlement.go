@@ -16,7 +16,7 @@ type Entitlements struct {
 }
 
 func ResolveEntitlements(workspaceID uuid.UUID, sub *Subscription, plans map[PlanTier]*Plan, policy *BillingPolicy, now time.Time) Entitlements {
-	tier, status := TierFree, StatusNone
+	tier, status := PlanTierFree, StatusNone
 	var until *time.Time
 	if sub != nil {
 		status = sub.Status()
