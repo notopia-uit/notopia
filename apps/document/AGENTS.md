@@ -57,7 +57,7 @@ Commit is currently **manual only** (`POST /document/documents/{id}/commit`).
 ## Crons and locks
 
 `@notopia-uit/lib-server/locks` provides `LocksSetupModule.forRoot({ redisUrl?, ttl? })`.
-With no `redisUrl` it uses an in-memory store (single instance only, a warning is logged); with one it uses `RedisLockStore`. The lock
+With no `redisUrl` it uses an in-memory store (single instance only, a warning is logged, intended even in production, see `packages/lib-server/AGENTS.md`); with one it uses `RedisLockStore`. The lock
 Redis must run with `noeviction` and persistence, and the app must call
 `app.enableShutdownHooks()`. Crons use `@Cron(expr, { name })` with no `timeZone`, so they
 run in the process TZ.

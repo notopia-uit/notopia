@@ -59,6 +59,7 @@ deliberately omits.
 | Yjs/Hocuspocus, commit pipeline, revisions         | [`apps/document/`](./apps/document/AGENTS.md)                   |
 | Meilisearch indexing                               | [`apps/search-worker/`](./apps/search-worker/AGENTS.md)         |
 | Shared Go packages                                 | [`pkg/`](./pkg/AGENTS.md)                                       |
+| Shared NestJS code, locks module                   | [`packages/lib-server/`](./packages/lib-server/AGENTS.md)       |
 | Scalar API reference site                          | [`apps/api-web/`](./apps/api-web/AGENTS.md)                     |
 | Authentik, Traefik routing, local hosts            | [`deploy/compose/`](./deploy/compose/AGENTS.md)                 |
 
