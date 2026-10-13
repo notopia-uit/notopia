@@ -12,7 +12,7 @@ import (
 )
 
 type Stripe struct {
-	SecretKey string `default:"-" json:"-" mapstructure:"secret_key" validate:"required" yaml:"secret_key"`
+	SecretKey commonconfig.Secret `default:"-" json:"-" mapstructure:"secret_key" validate:"required" yaml:"secret_key"`
 }
 
 type Catalog struct {

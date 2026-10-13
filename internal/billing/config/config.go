@@ -23,8 +23,8 @@ type Services struct {
 }
 
 type Stripe struct {
-	SecretKey     string `default:"-" json:"-" mapstructure:"secret_key"     validate:"required" yaml:"secret_key"`
-	WebhookSecret string `default:"-" json:"-" mapstructure:"webhook_secret" validate:"required" yaml:"webhook_secret"`
+	SecretKey     commonconfig.Secret `default:"-" json:"-" mapstructure:"secret_key"     validate:"required" yaml:"secret_key"`
+	WebhookSecret commonconfig.Secret `default:"-" json:"-" mapstructure:"webhook_secret" validate:"required" yaml:"webhook_secret"`
 }
 
 type Billing struct {

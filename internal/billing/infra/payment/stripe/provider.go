@@ -32,7 +32,7 @@ func New(stripeCfg *config.Stripe, billingCfg *config.Billing) *Provider {
 	}
 	return &Provider{
 		sc: stripego.NewClient(
-			stripeCfg.SecretKey,
+			stripeCfg.SecretKey.Reveal(),
 			stripego.WithBackends(stripego.NewBackends(httpClient)),
 		),
 		currency: billingCfg.Currency,

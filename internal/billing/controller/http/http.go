@@ -38,7 +38,7 @@ func NewStrictHandler(app *app.Server, identity *commonconfig.Identity, stripeCf
 	return &StrictHandler{
 		App:           app,
 		Identity:      identity,
-		webhookSecret: stripeCfg.WebhookSecret,
+		webhookSecret: stripeCfg.WebhookSecret.Reveal(),
 	}
 }
 
