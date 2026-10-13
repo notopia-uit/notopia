@@ -77,10 +77,12 @@ func (WorkspaceRole) EnumDescriptor() ([]byte, []int) {
 type WorkspacePermission int32
 
 const (
-	WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED WorkspacePermission = 0
-	WorkspacePermission_WORKSPACE_PERMISSION_READ        WorkspacePermission = 1
-	WorkspacePermission_WORKSPACE_PERMISSION_EDIT        WorkspacePermission = 2
-	WorkspacePermission_WORKSPACE_PERMISSION_DELETE      WorkspacePermission = 3
+	WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED    WorkspacePermission = 0
+	WorkspacePermission_WORKSPACE_PERMISSION_READ           WorkspacePermission = 1
+	WorkspacePermission_WORKSPACE_PERMISSION_EDIT           WorkspacePermission = 2
+	WorkspacePermission_WORKSPACE_PERMISSION_DELETE         WorkspacePermission = 3
+	WorkspacePermission_WORKSPACE_PERMISSION_BILLING_READ   WorkspacePermission = 4
+	WorkspacePermission_WORKSPACE_PERMISSION_BILLING_MANAGE WorkspacePermission = 5
 )
 
 // Enum value maps for WorkspacePermission.
@@ -90,12 +92,16 @@ var (
 		1: "WORKSPACE_PERMISSION_READ",
 		2: "WORKSPACE_PERMISSION_EDIT",
 		3: "WORKSPACE_PERMISSION_DELETE",
+		4: "WORKSPACE_PERMISSION_BILLING_READ",
+		5: "WORKSPACE_PERMISSION_BILLING_MANAGE",
 	}
 	WorkspacePermission_value = map[string]int32{
-		"WORKSPACE_PERMISSION_UNSPECIFIED": 0,
-		"WORKSPACE_PERMISSION_READ":        1,
-		"WORKSPACE_PERMISSION_EDIT":        2,
-		"WORKSPACE_PERMISSION_DELETE":      3,
+		"WORKSPACE_PERMISSION_UNSPECIFIED":    0,
+		"WORKSPACE_PERMISSION_READ":           1,
+		"WORKSPACE_PERMISSION_EDIT":           2,
+		"WORKSPACE_PERMISSION_DELETE":         3,
+		"WORKSPACE_PERMISSION_BILLING_READ":   4,
+		"WORKSPACE_PERMISSION_BILLING_MANAGE": 5,
 	}
 )
 
@@ -1213,12 +1219,14 @@ const file_authorization_proto_rawDesc = "" +
 	"\x1aWORKSPACE_ROLE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14WORKSPACE_ROLE_OWNER\x10\x01\x12\x19\n" +
 	"\x15WORKSPACE_ROLE_EDITOR\x10\x02\x12\x19\n" +
-	"\x15WORKSPACE_ROLE_VIEWER\x10\x03*\x9a\x01\n" +
+	"\x15WORKSPACE_ROLE_VIEWER\x10\x03*\xea\x01\n" +
 	"\x13WorkspacePermission\x12$\n" +
 	" WORKSPACE_PERMISSION_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19WORKSPACE_PERMISSION_READ\x10\x01\x12\x1d\n" +
 	"\x19WORKSPACE_PERMISSION_EDIT\x10\x02\x12\x1f\n" +
-	"\x1bWORKSPACE_PERMISSION_DELETE\x10\x03*\xb3\x01\n" +
+	"\x1bWORKSPACE_PERMISSION_DELETE\x10\x03\x12%\n" +
+	"!WORKSPACE_PERMISSION_BILLING_READ\x10\x04\x12'\n" +
+	"#WORKSPACE_PERMISSION_BILLING_MANAGE\x10\x05*\xb3\x01\n" +
 	"\x17WorkspaceItemPermission\x12)\n" +
 	"%WORKSPACE_ITEM_PERMISSION_UNSPECIFIED\x10\x00\x12\"\n" +
 	"\x1eWORKSPACE_ITEM_PERMISSION_READ\x10\x01\x12#\n" +

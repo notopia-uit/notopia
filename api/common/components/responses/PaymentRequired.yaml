@@ -1,0 +1,16 @@
+# vim: ft=yaml.openapi
+description: Feature or limit not included in the workspace plan
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/PaymentRequiredError.yaml
+    example:
+      code: planLimitExceeded
+      message: Feature or limit not included in the workspace plan
+      more_info: https://api.notopia.com/docs/errors/planLimitExceeded
+      details:
+        kind: limit
+        key: members
+        current: 5
+        max: 5
+        requiredPlan: plus

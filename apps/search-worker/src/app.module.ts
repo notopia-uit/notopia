@@ -8,17 +8,27 @@ import pretty from 'pino-pretty';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AppConfig, MeiliConfig } from './config';
-import { APP_CONFIG, KAFKA_CONFIG, MEILI_CONFIG, appConfig, kafkaConfig, meiliConfig } from './config.factory';
+import { AppConfig, MeiliConfig, TombstoneConfig } from './config';
+import {
+  APP_CONFIG,
+  KAFKA_CONFIG,
+  MEILI_CONFIG,
+  TOMBSTONE_CONFIG,
+  appConfig,
+  kafkaConfig,
+  meiliConfig,
+  tombstoneConfig,
+} from './config.factory';
 import { validate } from './env.validation';
 import { BLOCKNOTE_SCHEMA } from './token';
+import { MemoryTombstoneStore, RedisTombstoneStore, TombstoneStore } from './tombstone';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
-      load: [appConfig, kafkaConfig, meiliConfig],
+      load: [appConfig, kafkaConfig, meiliConfig, tombstoneConfig],
     }),
     OpenTelemetryModule.forRoot({
       metrics: {
@@ -82,6 +92,19 @@ import { BLOCKNOTE_SCHEMA } from './token';
       inject: [ConfigService],
     },
     {
+      provide: TombstoneStore,
+      useFactory: (configService: ConfigService) => {
+        const config = configService.get<TombstoneConfig>(TOMBSTONE_CONFIG);
+        if (!config) {
+          throw new Error('TOMBSTONE_CONFIG not found');
+        }
+        return config.redisUrl
+          ? new RedisTombstoneStore(config.redisUrl, config.ttlSeconds)
+          : new MemoryTombstoneStore(config.ttlSeconds, config.max);
+      },
+      inject: [ConfigService],
+    },
+    {
       provide: BLOCKNOTE_SCHEMA,
       useFactory: createSchema,
     },
@@ -92,14 +115,18 @@ import { BLOCKNOTE_SCHEMA } from './token';
 export class AppModule implements OnModuleInit {
   constructor(
     private readonly configService: ConfigService,
-    private readonly logger: Logger,
+    private readonly logger: Logger
   ) {}
 
   onModuleInit() {
-    this.logger.log({
-      app: this.configService.get(APP_CONFIG),
-      kafka: this.configService.get(KAFKA_CONFIG),
-      meili: { ...this.configService.get(MEILI_CONFIG), apiKey: '***' },
-    }, 'Application configuration loaded');
+    this.logger.log(
+      {
+        app: this.configService.get(APP_CONFIG),
+        kafka: this.configService.get(KAFKA_CONFIG),
+        meili: { ...this.configService.get(MEILI_CONFIG), apiKey: '***' },
+        tombstone: { ...this.configService.get(TOMBSTONE_CONFIG), redisUrl: undefined },
+      },
+      'Application configuration loaded'
+    );
   }
 }

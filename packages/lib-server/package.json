@@ -8,14 +8,32 @@
       "@nx/source": "./src/block-note/index.ts",
       "types": "./dist/block-note/index.d.ts",
       "default": "./dist/block-note/index.js"
+    },
+    "./locks": {
+      "@nx/source": "./src/locks/index.ts",
+      "types": "./dist/locks/index.d.ts",
+      "default": "./dist/locks/index.js"
     }
   },
   "dependencies": {
     "@blocknote/core": "catalog:",
     "@notopia-uit/lib": "workspace:"
   },
+  "devDependencies": {
+    "@d2t/vitest-ctrf-json-reporter": "catalog:",
+    "@nestjs/common": "catalog:",
+    "@nestjs/core": "catalog:",
+    "@nestjs/locks": "catalog:",
+    "ioredis": "catalog:",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:",
+    "unplugin-swc": "catalog:"
+  },
   "peerDependencies": {
     "@blocknote/server-util": "catalog:",
-    "@floating-ui/dom": "catalog:"
+    "@floating-ui/dom": "catalog:",
+    "@nestjs/common": "catalog:",
+    "@nestjs/locks": "catalog:",
+    "ioredis": "catalog:"
   }
 }

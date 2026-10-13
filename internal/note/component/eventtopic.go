@@ -70,6 +70,8 @@ func IntegrationEventToTopic(event app.IntegrationEvent) (string, error) {
 		return IntegrationEventTopicPrefix + "note.deleted", nil
 	case app.IntegrationEventNoteUpdated:
 		return IntegrationEventTopicPrefix + "note.updated", nil
+	case app.IntegrationEventWorkspaceDeleted:
+		return IntegrationEventTopicPrefix + "workspace.deleted", nil
 	}
 	return "", fmt.Errorf("unknown integration event type: %T", event)
 }

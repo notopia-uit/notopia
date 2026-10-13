@@ -19,6 +19,7 @@ import {
   authenticationConfig,
   DATABASE_CONFIG,
   databaseConfig,
+  identityConfig,
   KAFKA_CONFIG,
   kafkaConfig,
   S3_CONFIG,
@@ -47,6 +48,7 @@ import { StorageModule } from './storage';
         s3Config,
         kafkaConfig,
         authenticationConfig,
+        identityConfig,
       ],
     }),
     OpenTelemetryModule.forRoot({
@@ -130,22 +132,25 @@ export class AppModule implements OnModuleInit {
   constructor(
     @Inject(KAFKA_CLIENT) private readonly kafkaClient: ClientKafka,
     private readonly configService: ConfigService,
-    private readonly logger: Logger,
+    private readonly logger: Logger
   ) {}
 
   async onModuleInit() {
     await this.kafkaClient.connect();
-    this.logger.log({
-      app: this.configService.get(APP_CONFIG),
-      database: { ...this.configService.get(DATABASE_CONFIG), password: '***' },
-      services: this.configService.get(SERVICE_CONFIG),
-      s3: {
-        ...this.configService.get(S3_CONFIG),
-        accessKeyId: '***',
-        secretAccessKey: '***',
+    this.logger.log(
+      {
+        app: this.configService.get(APP_CONFIG),
+        database: { ...this.configService.get(DATABASE_CONFIG), password: '***' },
+        services: this.configService.get(SERVICE_CONFIG),
+        s3: {
+          ...this.configService.get(S3_CONFIG),
+          accessKeyId: '***',
+          secretAccessKey: '***',
+        },
+        kafka: this.configService.get(KAFKA_CONFIG),
+        authentication: this.configService.get(AUTHENTICATION_CONFIG),
       },
-      kafka: this.configService.get(KAFKA_CONFIG),
-      authentication: this.configService.get(AUTHENTICATION_CONFIG),
-    }, 'Application configuration loaded');
+      'Application configuration loaded'
+    );
   }
 }

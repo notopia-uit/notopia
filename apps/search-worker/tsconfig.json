@@ -9,6 +9,9 @@
     },
     {
       "path": "./tsconfig.seed.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
     }
   ]
 }

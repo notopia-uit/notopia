@@ -22,5 +22,6 @@
     {
       "path": "../../packages/api-share-gen/tsconfig.lib.json"
     }
-  ]
+  ],
+  "exclude": ["src/**/*.spec.ts"]
 }

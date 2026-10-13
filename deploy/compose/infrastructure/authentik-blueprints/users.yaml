@@ -79,3 +79,31 @@ entries:
       managed: null
       intent: api
       user: !KeyOf note-service
+
+  - model: authentik_core.user
+    id: document-service
+    identifiers:
+      pk: 1002
+    attrs:
+      username: document-service
+      name: Document Service
+      type: service_account
+      path: goauthentik.io/service-accounts
+
+  - model: authentik_core.user
+    id: billing-service
+    identifiers:
+      pk: 1003
+    attrs:
+      username: billing-service
+      name: Billing Service
+      type: service_account
+      path: goauthentik.io/service-accounts
+
+  - model: authentik_core.group
+    id: notopia-admins
+    identifiers:
+      name: notopia-admins
+    attrs:
+      users:
+        - !Find [authentik_core.user, [username, admin]]

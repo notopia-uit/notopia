@@ -26,11 +26,12 @@ func NewNote(
 	name string,
 	icon string,
 	folderID uuid.UUID,
+	userID string,
 ) *Note {
 	if name == "" {
 		name = "Untitled Note"
 	}
-	return &Note{
+	note := &Note{
 		id:            id,
 		name:          name,
 		icon:          icon,
@@ -43,6 +44,14 @@ func NewNote(
 
 		events: []Event{},
 	}
+	note.addEvent(
+		&NoteCreatedEvent{
+			BaseEvent: NewBaseEvent(note.id, userID),
+			Name:      note.name,
+			Icon:      note.icon,
+		},
+	)
+	return note
 }
 
 func UnmarshalNote(

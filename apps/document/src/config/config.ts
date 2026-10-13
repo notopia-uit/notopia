@@ -45,3 +45,9 @@ export const authenticationConfigSchema = z.object({
   audiences: z.array(z.string()).optional(),
 });
 export type AuthenticationConfig = z.infer<typeof authenticationConfigSchema>;
+
+export const identityConfigSchema = z.object({
+  adminGroup: z.string().min(1),
+  serviceAccountUserId: z.string().min(1),
+});
+export type IdentityConfig = z.infer<typeof identityConfigSchema>;

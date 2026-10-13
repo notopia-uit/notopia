@@ -255,6 +255,10 @@ func pbWorkspacePermissionToApp(perm pb.WorkspacePermission) app.WorkspacePermis
 		return app.WorkspacePermissionEdit
 	case pb.WorkspacePermission_WORKSPACE_PERMISSION_DELETE:
 		return app.WorkspacePermissionDelete
+	case pb.WorkspacePermission_WORKSPACE_PERMISSION_BILLING_READ:
+		return app.WorkspacePermissionBillingRead
+	case pb.WorkspacePermission_WORKSPACE_PERMISSION_BILLING_MANAGE:
+		return app.WorkspacePermissionBillingManage
 	case pb.WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED:
 		panic("invalid workspace permission")
 	default:

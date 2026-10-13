@@ -14,6 +14,7 @@ Layout:
   > If you need debugging, use curl or anything related.
 - Frontend App in `./deploy/compose/infrastructure/authentik-blueprints/app-web.yaml`
   (includes JWKS, callback URL, etc.)
+- Blueprint docs at: <https://github.com/goauthentik/authentik/tree/main/website/docs/customize/blueprints>
 - When editing a blueprint, authentik will reconcile itself
 
 #### Traefik

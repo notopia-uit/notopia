@@ -21,7 +21,8 @@ SELECT
 FROM
   notes
 WHERE
-  id = ANY(sqlc.narg('ids')::uuid[]) -- :if @ids
+  TRUE
+  AND id = ANY(sqlc.narg('ids')::uuid[]) -- :if @ids
   AND folder_id IN ( -- :if @workspace_id
     SELECT id FROM folders WHERE workspace_id = sqlc.narg('workspace_id')::uuid
   )
@@ -85,3 +86,14 @@ FROM
   note_links
 WHERE
   source_id = sqlc.arg('note_id');
+
+-- name: ReadGetNotesWorkspaceIDs :many
+SELECT
+  n.id AS note_id,
+  f.workspace_id
+FROM
+  notes n
+JOIN
+  folders f ON f.id = n.folder_id
+WHERE
+  n.id = ANY(@ids::uuid[]);

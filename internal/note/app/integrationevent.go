@@ -28,6 +28,10 @@ type IntegrationEventNoteDeleted struct {
 	ID uuid.UUID
 }
 
+type IntegrationEventWorkspaceDeleted struct {
+	ID uuid.UUID
+}
+
 type IntegrationEventNoteUpdated struct {
 	ID          uuid.UUID
 	WorkspaceID uuid.UUID
@@ -44,8 +48,10 @@ var (
 	_ IntegrationEvent = (*IntegrationEventNoteCreated)(nil)
 	_ IntegrationEvent = (*IntegrationEventNoteDeleted)(nil)
 	_ IntegrationEvent = (*IntegrationEventNoteUpdated)(nil)
+	_ IntegrationEvent = (*IntegrationEventWorkspaceDeleted)(nil)
 )
 
-func (e IntegrationEventNoteCreated) isIntegrationEvent() {}
-func (e IntegrationEventNoteDeleted) isIntegrationEvent() {}
-func (e IntegrationEventNoteUpdated) isIntegrationEvent() {}
+func (e IntegrationEventNoteCreated) isIntegrationEvent()      {}
+func (e IntegrationEventNoteDeleted) isIntegrationEvent()      {}
+func (e IntegrationEventNoteUpdated) isIntegrationEvent()      {}
+func (e IntegrationEventWorkspaceDeleted) isIntegrationEvent() {}

@@ -12,12 +12,15 @@ import { AuthenticationService } from '../authentication/authentication.service'
 import { AuthorizationService } from '../authorization/authorization.service';
 import { DocumentService } from '../document/document.service';
 import { NoteService } from '../note/note.service';
+import { applyStoredModified, readModified } from './document-metadata';
 import { HocuspocusContext } from './hocuspocus-context';
 
 @Injectable()
 export class Hocuspocus {
   private readonly logger = new Logger(Hocuspocus.name);
   readonly hocuspocus: ServerHocuspocus<HocuspocusContext>;
+  private readonly deletedDocumentIds = new Set<string>();
+  private readonly pendingStores = new Map<string, Set<Promise<void>>>();
 
   constructor(
     documentService: DocumentService,
@@ -34,6 +37,13 @@ export class Hocuspocus {
         );
         await Promise.resolve();
       },
+      afterLoadDocument: async ({ documentName, document }) => {
+        const entity = await documentService.getById(documentName);
+        applyStoredModified(document, entity?.modified ?? false);
+      },
+      afterUnloadDocument: async ({ documentName }) => {
+        this.deletedDocumentIds.delete(documentName);
+      },
       onAuthenticate: (...args) => this.onAuthenticate(...args),
       onChange: (...args) => this.onChange(...args),
       extensions: [
@@ -47,12 +57,46 @@ export class Hocuspocus {
             this.logger.log({ documentId: id }, 'Fetched document from database');
             return document?.data ?? null;
           },
-          store: async ({ documentName: id, state }) => {
-            await documentService.updateDataById(id, state);
+          store: async ({ documentName: id, state, document }) => {
+            if (this.deletedDocumentIds.has(id)) return;
+            await this.trackStore(
+              id,
+              documentService.upsertData(id, state, readModified(document))
+            );
           },
         }),
       ],
     });
+  }
+
+  markDeleted(id: string): void {
+    if (this.hocuspocus.documents.has(id)) {
+      this.deletedDocumentIds.add(id);
+    }
+  }
+
+  async waitForPendingStores(id: string): Promise<void> {
+    const pending = this.pendingStores.get(id);
+    if (pending) await Promise.allSettled(pending);
+  }
+
+  private async trackStore(id: string, store: Promise<void>): Promise<void> {
+    let pending = this.pendingStores.get(id);
+    if (!pending) {
+      pending = new Set();
+      this.pendingStores.set(id, pending);
+    }
+    pending.add(store);
+    try {
+      await store;
+    } finally {
+      pending.delete(store);
+      if (pending.size === 0) this.pendingStores.delete(id);
+    }
+  }
+
+  closeConnections(id: string): void {
+    this.hocuspocus.closeConnections(id);
   }
 
   private async onAuthenticate(

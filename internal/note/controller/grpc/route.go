@@ -57,3 +57,26 @@ func (s *ServiceServer) GetWorkspaceByNote(
 		Workspace: workspaceDTO,
 	}, nil
 }
+
+func (s *ServiceServer) BatchGetNoteWorkspaces(
+	ctx context.Context,
+	req *pb.BatchGetNoteWorkspacesRequest,
+) (*pb.BatchGetNoteWorkspacesResponse, error) {
+	ids := make([]uuid.UUID, 0, len(req.NoteIds))
+	for _, raw := range req.NoteIds {
+		id, err := uuid.Parse(raw)
+		if err != nil {
+			return nil, errs.NewInvalid(fmt.Sprintf("invalid note id: %v", err))
+		}
+		ids = append(ids, id)
+	}
+	result, err := s.app.Queries.BatchGetNoteWorkspaces.Handle(ctx, &app.BatchGetNoteWorkspaces{NoteIDs: ids})
+	if err != nil {
+		return nil, err
+	}
+	out := make(map[string]string, len(result))
+	for noteID, workspaceID := range result {
+		out[noteID.String()] = workspaceID.String()
+	}
+	return &pb.BatchGetNoteWorkspacesResponse{WorkspaceIds: out}, nil
+}

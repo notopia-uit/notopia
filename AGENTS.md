@@ -51,16 +51,17 @@ pkg/                            # Go packages
 Read the one for the area you're touching before exploring; they hold the details this file
 deliberately omits.
 
-| Area | Doc |
-| --- | --- |
-| Contract-first workflow, adding endpoints | [`api/`](./api/AGENTS.md) |
-| Go DDD/CQRS layout, aggregates, outbox, sqlc/goose | [`internal/note/`](./internal/note/AGENTS.md) |
-| Casbin model, roles, policy | [`internal/authorization/`](./internal/authorization/AGENTS.md) |
-| Yjs/Hocuspocus, commit pipeline, revisions | [`apps/document/`](./apps/document/AGENTS.md) |
-| Meilisearch indexing | [`apps/search-worker/`](./apps/search-worker/AGENTS.md) |
-| Shared Go packages | [`pkg/`](./pkg/AGENTS.md) |
-| Scalar API reference site | [`apps/api-web/`](./apps/api-web/AGENTS.md) |
-| Authentik, Traefik routing, local hosts | [`deploy/compose/`](./deploy/compose/AGENTS.md) |
+| Area                                               | Doc                                                             |
+| -------------------------------------------------- | --------------------------------------------------------------- |
+| Contract-first workflow, adding endpoints          | [`api/`](./api/AGENTS.md)                                       |
+| Go DDD/CQRS layout, aggregates, outbox, sqlc/goose | [`internal/note/`](./internal/note/AGENTS.md)                   |
+| Casbin model, roles, policy                        | [`internal/authorization/`](./internal/authorization/AGENTS.md) |
+| Yjs/Hocuspocus, commit pipeline, revisions         | [`apps/document/`](./apps/document/AGENTS.md)                   |
+| Meilisearch indexing                               | [`apps/search-worker/`](./apps/search-worker/AGENTS.md)         |
+| Shared Go packages                                 | [`pkg/`](./pkg/AGENTS.md)                                       |
+| Shared NestJS code, locks module                   | [`packages/lib-server/`](./packages/lib-server/AGENTS.md)       |
+| Scalar API reference site                          | [`apps/api-web/`](./apps/api-web/AGENTS.md)                     |
+| Authentik, Traefik routing, local hosts            | [`deploy/compose/`](./deploy/compose/AGENTS.md)                 |
 
 ## Technologies
 
@@ -88,6 +89,8 @@ deliberately omits.
   Each package exposes `var ProvideX = NewX`
 - Services are DDD + CQRS — see [`internal/note/AGENTS.md`](./internal/note/AGENTS.md) for the layout
 - Shared building blocks (config, `Cmd`/`Query`, gin, otel) are in [`pkg/`](./pkg/AGENTS.md)
+- Go 1.26 already supports `new(value)` or `new(fn(...))` to get pointer, no need to instantiate struct and take address
+- Go 1.27 supports generic method for struct
 
 ### Messaging
 
@@ -124,9 +127,14 @@ deliberately omits.
 ## General Rules
 
 - Temp file must be go into `./tmp/{projectName}`, avoid writing to `/tmp/` when things need to be persisted
-- While writing code, try to not write unnecessary comment into code
+- While writing code, try **not to write unnecessary comments** into code
 - There are many `*.env*` file, which contains safe local development environment variables. Only `*.env.local*` can contain sensitive environment variables, and should be gitignored
 - Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsgo` (replace for `tsc`)
+- If something is not worth to code/fix, but might have issue in the future, then comments
+
+### Superpowers
+
+- Skip unnecessary, obvious cases testing for faster, saving tokens
 
 ### Git
 

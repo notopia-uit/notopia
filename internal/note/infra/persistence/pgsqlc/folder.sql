@@ -112,7 +112,8 @@ SELECT
 FROM
   folders
 WHERE
-  id = ANY(sqlc.narg('ids')::uuid[]) -- :if @ids
+  TRUE
+  AND id = ANY(sqlc.narg('ids')::uuid[]) -- :if @ids
   AND workspace_id = sqlc.narg('workspace_id')::uuid -- :if @workspace_id
   AND ( -- :if @trashed_by
     trashed_by = sqlc.narg('trashed_by')::text
@@ -144,7 +145,8 @@ SELECT
 FROM
   child_folders
 WHERE
-  id != sqlc.arg('id')::uuid -- :if @exclude_root
+  TRUE
+  AND id != sqlc.arg('id')::uuid -- :if @exclude_root
 FOR UPDATE -- :if @for_update
 ;
 

@@ -34,13 +34,13 @@ Notopia is a markdown note-taking app with real-time collaboration, graph-based 
 
 **Service responsibilities:**
 
-| Service | Role |
-| --- | --- |
-| **Note** | Core business logic — workspaces, folders, notes, members |
-| **Document** | Editor backend — real-time collab, revision history, file storage |
-| **Authorization** | RBAC policy enforcement via Casbin |
-| **Search Worker** | Indexes note content into Meilisearch via Kafka events |
-| **Web** | Next.js frontend |
+| Service           | Role                                                              |
+| ----------------- | ----------------------------------------------------------------- |
+| **Note**          | Core business logic — workspaces, folders, notes, members         |
+| **Document**      | Editor backend — real-time collab, revision history, file storage |
+| **Authorization** | RBAC policy enforcement via Casbin                                |
+| **Search Worker** | Indexes note content into Meilisearch via Kafka events            |
+| **Web**           | Next.js frontend                                                  |
 
 ---
 
@@ -67,15 +67,15 @@ compose --profile "dev-ui" up -d  # + DbGate, Redpanda Console
 
 Local domains via Traefik (add to `/etc/hosts`):
 
-| Domain | Service |
-| --- | --- |
-| `web.notopia.localhost` | Web frontend |
-| `api.notopia.localhost` | API gateway |
-| `authentik.notopia.localhost` | Identity provider |
-| `meilisearch.notopia.localhost` | Search |
-| `rustfs-api.notopia.localhost` | S3 storage |
-| `redpanda.notopia.localhost` | Kafka console |
-| `dbgate.notopia.localhost` | DB admin |
+| Domain                          | Service           |
+| ------------------------------- | ----------------- |
+| `web.notopia.localhost`         | Web frontend      |
+| `api.notopia.localhost`         | API gateway       |
+| `authentik.notopia.localhost`   | Identity provider |
+| `meilisearch.notopia.localhost` | Search            |
+| `rustfs-api.notopia.localhost`  | S3 storage        |
+| `redpanda.notopia.localhost`    | Kafka console     |
+| `dbgate.notopia.localhost`      | DB admin          |
 
 Default credentials: `notopiauit` / `notopiauit`
 
@@ -147,6 +147,17 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 
 ---
 
+## Limitation
+
+### Our
+
+### Third-party
+
+- Blocknote collaboration does not support undo ("Ctrl Z")
+- No integration test for Meilisearch JS <https://testcontainers.com/modules/meilisearch/>
+
+---
+
 ## ☑️ TO-DO
 
 ### Backend
@@ -170,6 +181,10 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 - [ ] Event is tracked by either otel or correlation id.
       But, currently use wotel + kafka tracer, and partially correlation id but not really connected.
 - [ ] Revision endpoints aren't protected with authorization
+- [ ] Caching the subscription in other services so that it will not harm the billing service
+  > Skipped for simplicity
+- [ ] Consider split the workspace event (SSE) into a dedicated service, not bounded to `note` service
+  > Events from subscription changed
 
 ### Frontend
 
@@ -189,3 +204,12 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 - [ ] Those NestJS logging, we need to find a better way to wrap those controller log. NestJS Pino only http? not microservice.
       And guess that we should either using middleware or interceptor
 - [ ] Mutating `update, add, delete` workspace member doesn't send event to user client
+
+---
+
+## Use cases... missing?
+
+- Delete note, then the document would also be cleaned
+- Delete workspace, then note, document, search index, authorization cleaned?
+- App Admin, logic, and the UI for admin to mutate things
+- We don't have Authentik delete user event emission? Only when we control the UI management UI, else, we cannot

@@ -69,6 +69,8 @@ func transformIntegrationEvent(event app.IntegrationEvent) (any, error) {
 		return &share.NoteDeletedEvent{
 			Id: e.ID,
 		}, nil
+	case app.IntegrationEventWorkspaceDeleted:
+		return &share.WorkspaceDeletedIntegrationEvent{Id: e.ID}, nil
 	case app.IntegrationEventNoteUpdated:
 		var icon *string
 		if e.Icon != "" {

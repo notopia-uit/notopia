@@ -9,6 +9,27 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for SubscriptionChangedEventPlan.
+const (
+	SubscriptionChangedEventPlanFree SubscriptionChangedEventPlan = "free"
+	SubscriptionChangedEventPlanPlus SubscriptionChangedEventPlan = "plus"
+	SubscriptionChangedEventPlanPro  SubscriptionChangedEventPlan = "pro"
+)
+
+// Valid indicates whether the value is a known member of the SubscriptionChangedEventPlan enum.
+func (e SubscriptionChangedEventPlan) Valid() bool {
+	switch e {
+	case SubscriptionChangedEventPlanFree:
+		return true
+	case SubscriptionChangedEventPlanPlus:
+		return true
+	case SubscriptionChangedEventPlanPro:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for TrashedBy.
 const (
 	Parent  TrashedBy = "parent"
@@ -107,6 +128,18 @@ type NoteUpdatedEvent struct {
 	WorkspaceId openapi_types.UUID `json:"workspaceId"`
 }
 
+// SubscriptionChangedEvent Best-effort notification that a workspace's billing state changed.
+type SubscriptionChangedEvent struct {
+	Plan SubscriptionChangedEventPlan `json:"plan"`
+
+	// Status Billing subscription status string
+	Status      string             `json:"status"`
+	WorkspaceId openapi_types.UUID `json:"workspaceId"`
+}
+
+// SubscriptionChangedEventPlan defines model for SubscriptionChangedEvent.Plan.
+type SubscriptionChangedEventPlan string
+
 // Trashed defines model for Trashed.
 type Trashed struct {
 	At time.Time `json:"at"`
@@ -129,6 +162,11 @@ type UserWorkspaceRoleUpdatedEvent struct {
 	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 	UserId      Id   `json:"userId"`
 	WorkspaceId *Id2 `json:"workspaceId,omitempty"`
+}
+
+// WorkspaceDeletedIntegrationEvent defines model for WorkspaceDeletedIntegrationEvent.
+type WorkspaceDeletedIntegrationEvent struct {
+	Id openapi_types.UUID `json:"id"`
 }
 
 // WorkspaceMemberAddedEvent defines model for WorkspaceMemberAddedEvent.

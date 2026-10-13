@@ -4,6 +4,7 @@ import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
 import { Traceable } from 'nestjs-otel';
 
 import { AuthorizationService } from '../authorization/authorization.service';
+import { DocumentService } from '../document/document.service';
 import { WorkspaceModel } from '../note/models';
 import { NoteService } from '../note/note.service';
 import { WorkspaceNoteNotFoundException } from '../note/workspace-note-not-found.exception';
@@ -16,8 +17,16 @@ export class HocuspocusService {
   constructor(
     private readonly noteService: NoteService,
     private readonly hocuspocus: Hocuspocus,
-    private readonly authorizationService: AuthorizationService
+    private readonly authorizationService: AuthorizationService,
+    private readonly documentService: DocumentService
   ) {}
+
+  async onNoteDeleted(id: string): Promise<void> {
+    this.hocuspocus.markDeleted(id);
+    this.hocuspocus.closeConnections(id);
+    await this.hocuspocus.waitForPendingStores(id);
+    await this.documentService.deleteById(id);
+  }
 
   // NOTE: We don't really need to check the permission canRead, because yeah
   // Because based on the casbin rules, it will be always canRead when this event fired

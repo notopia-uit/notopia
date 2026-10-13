@@ -19,3 +19,10 @@ export const meiliConfigSchema = z.object({
   apiKey: z.string(),
 });
 export type MeiliConfig = z.infer<typeof meiliConfigSchema>;
+
+export const tombstoneConfigSchema = z.object({
+  redisUrl: z.string().url().optional(),
+  ttlSeconds: z.number().int().positive(),
+  max: z.number().int().positive(),
+});
+export type TombstoneConfig = z.infer<typeof tombstoneConfigSchema>;

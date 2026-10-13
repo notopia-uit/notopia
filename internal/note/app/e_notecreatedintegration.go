@@ -2,10 +2,12 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
 	"github.com/notopia-uit/notopia/internal/note/domain"
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 type NoteCreatedDomainToIntegrationEventHandler struct {
@@ -29,6 +31,11 @@ func (h *NoteCreatedDomainToIntegrationEventHandler) Handle(ctx context.Context,
 	slog.DebugContext(ctx, "Handling note created integration event", slog.String("note_id", event.AggregateID.String()))
 	workspace, err := h.getWorkspaceByNoteReadModel.Handle(ctx, event.AggregateID)
 	if err != nil {
+		var notFound *errs.WorkspaceByNoteNotFound
+		if errors.As(err, &notFound) {
+			slog.DebugContext(ctx, "Skipping note created integration event, note no longer exists", slog.String("note_id", event.AggregateID.String()))
+			return nil
+		}
 		return fmt.Errorf("failed to get workspace for note: %w", err)
 	}
 	integrationEvent := IntegrationEventNoteCreated{

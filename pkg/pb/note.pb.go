@@ -564,6 +564,94 @@ func (x *GetWorkspaceByNoteResponse) GetWorkspace() *Workspace {
 	return nil
 }
 
+type BatchGetNoteWorkspacesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NoteIds       []string               `protobuf:"bytes,1,rep,name=note_ids,json=noteIds,proto3" json:"note_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BatchGetNoteWorkspacesRequest) Reset() {
+	*x = BatchGetNoteWorkspacesRequest{}
+	mi := &file_note_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BatchGetNoteWorkspacesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchGetNoteWorkspacesRequest) ProtoMessage() {}
+
+func (x *BatchGetNoteWorkspacesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_note_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchGetNoteWorkspacesRequest.ProtoReflect.Descriptor instead.
+func (*BatchGetNoteWorkspacesRequest) Descriptor() ([]byte, []int) {
+	return file_note_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *BatchGetNoteWorkspacesRequest) GetNoteIds() []string {
+	if x != nil {
+		return x.NoteIds
+	}
+	return nil
+}
+
+type BatchGetNoteWorkspacesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WorkspaceIds  map[string]string      `protobuf:"bytes,1,rep,name=workspace_ids,json=workspaceIds,proto3" json:"workspace_ids,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BatchGetNoteWorkspacesResponse) Reset() {
+	*x = BatchGetNoteWorkspacesResponse{}
+	mi := &file_note_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BatchGetNoteWorkspacesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchGetNoteWorkspacesResponse) ProtoMessage() {}
+
+func (x *BatchGetNoteWorkspacesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_note_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchGetNoteWorkspacesResponse.ProtoReflect.Descriptor instead.
+func (*BatchGetNoteWorkspacesResponse) Descriptor() ([]byte, []int) {
+	return file_note_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *BatchGetNoteWorkspacesResponse) GetWorkspaceIds() map[string]string {
+	if x != nil {
+		return x.WorkspaceIds
+	}
+	return nil
+}
+
 var File_note_proto protoreflect.FileDescriptor
 
 const file_note_proto_rawDesc = "" +
@@ -604,15 +692,23 @@ const file_note_proto_rawDesc = "" +
 	"\anote_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\xb0\x01\x01R\x06noteId\x12\x1f\n" +
 	"\auser_id\x18\x02 \x01(\tB\x06\xbaH\x03\xc8\x01\x01R\x06userId\"S\n" +
 	"\x1aGetWorkspaceByNoteResponse\x125\n" +
-	"\tworkspace\x18\x01 \x01(\v2\x0f.note.WorkspaceB\x06\xbaH\x03\xc8\x01\x01R\tworkspace*V\n" +
+	"\tworkspace\x18\x01 \x01(\v2\x0f.note.WorkspaceB\x06\xbaH\x03\xc8\x01\x01R\tworkspace\"N\n" +
+	"\x1dBatchGetNoteWorkspacesRequest\x12-\n" +
+	"\bnote_ids\x18\x01 \x03(\tB\x12\xbaH\x0f\x92\x01\f\b\x01\x10\xf4\x03\"\x05r\x03\xb0\x01\x01R\anoteIds\"\xbe\x01\n" +
+	"\x1eBatchGetNoteWorkspacesResponse\x12[\n" +
+	"\rworkspace_ids\x18\x01 \x03(\v26.note.BatchGetNoteWorkspacesResponse.WorkspaceIdsEntryR\fworkspaceIds\x1a?\n" +
+	"\x11WorkspaceIdsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01*V\n" +
 	"\tTrashedBy\x12\x1a\n" +
 	"\x16TRASHED_BY_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12TRASHED_BY_PURPOSE\x10\x01\x12\x15\n" +
-	"\x11TRASHED_BY_PARENT\x10\x022\xe2\x01\n" +
+	"\x11TRASHED_BY_PARENT\x10\x022\xc7\x02\n" +
 	"\vNoteService\x12B\n" +
 	"\vGetNoteName\x12\x18.note.GetNoteNameRequest\x1a\x19.note.GetNoteNameResponse\x126\n" +
 	"\aGetNote\x12\x14.note.GetNoteRequest\x1a\x15.note.GetNoteResponse\x12W\n" +
-	"\x12GetWorkspaceByNote\x12\x1f.note.GetWorkspaceByNoteRequest\x1a .note.GetWorkspaceByNoteResponseBl\n" +
+	"\x12GetWorkspaceByNote\x12\x1f.note.GetWorkspaceByNoteRequest\x1a .note.GetWorkspaceByNoteResponse\x12c\n" +
+	"\x16BatchGetNoteWorkspaces\x12#.note.BatchGetNoteWorkspacesRequest\x1a$.note.BatchGetNoteWorkspacesResponseBl\n" +
 	"\bcom.noteB\tNoteProtoP\x01Z%github.com/notopia-uit/notopia/pkg/pb\xa2\x02\x03NXX\xaa\x02\x04Note\xca\x02\x04Note\xe2\x02\x10Note\\GPBMetadata\xea\x02\x04Noteb\x06proto3"
 
 var (
@@ -628,38 +724,44 @@ func file_note_proto_rawDescGZIP() []byte {
 }
 
 var file_note_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_note_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_note_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_note_proto_goTypes = []any{
-	(TrashedBy)(0),                     // 0: note.TrashedBy
-	(*Trashed)(nil),                    // 1: note.Trashed
-	(*Note)(nil),                       // 2: note.Note
-	(*Workspace)(nil),                  // 3: note.Workspace
-	(*GetNoteNameRequest)(nil),         // 4: note.GetNoteNameRequest
-	(*GetNoteNameResponse)(nil),        // 5: note.GetNoteNameResponse
-	(*GetNoteRequest)(nil),             // 6: note.GetNoteRequest
-	(*GetNoteResponse)(nil),            // 7: note.GetNoteResponse
-	(*GetWorkspaceByNoteRequest)(nil),  // 8: note.GetWorkspaceByNoteRequest
-	(*GetWorkspaceByNoteResponse)(nil), // 9: note.GetWorkspaceByNoteResponse
-	(*timestamppb.Timestamp)(nil),      // 10: google.protobuf.Timestamp
+	(TrashedBy)(0),                         // 0: note.TrashedBy
+	(*Trashed)(nil),                        // 1: note.Trashed
+	(*Note)(nil),                           // 2: note.Note
+	(*Workspace)(nil),                      // 3: note.Workspace
+	(*GetNoteNameRequest)(nil),             // 4: note.GetNoteNameRequest
+	(*GetNoteNameResponse)(nil),            // 5: note.GetNoteNameResponse
+	(*GetNoteRequest)(nil),                 // 6: note.GetNoteRequest
+	(*GetNoteResponse)(nil),                // 7: note.GetNoteResponse
+	(*GetWorkspaceByNoteRequest)(nil),      // 8: note.GetWorkspaceByNoteRequest
+	(*GetWorkspaceByNoteResponse)(nil),     // 9: note.GetWorkspaceByNoteResponse
+	(*BatchGetNoteWorkspacesRequest)(nil),  // 10: note.BatchGetNoteWorkspacesRequest
+	(*BatchGetNoteWorkspacesResponse)(nil), // 11: note.BatchGetNoteWorkspacesResponse
+	nil,                                    // 12: note.BatchGetNoteWorkspacesResponse.WorkspaceIdsEntry
+	(*timestamppb.Timestamp)(nil),          // 13: google.protobuf.Timestamp
 }
 var file_note_proto_depIdxs = []int32{
 	0,  // 0: note.Trashed.by:type_name -> note.TrashedBy
-	10, // 1: note.Trashed.at:type_name -> google.protobuf.Timestamp
-	10, // 2: note.Note.updated_at:type_name -> google.protobuf.Timestamp
+	13, // 1: note.Trashed.at:type_name -> google.protobuf.Timestamp
+	13, // 2: note.Note.updated_at:type_name -> google.protobuf.Timestamp
 	1,  // 3: note.Note.trashed:type_name -> note.Trashed
 	2,  // 4: note.GetNoteResponse.note:type_name -> note.Note
 	3,  // 5: note.GetWorkspaceByNoteResponse.workspace:type_name -> note.Workspace
-	4,  // 6: note.NoteService.GetNoteName:input_type -> note.GetNoteNameRequest
-	6,  // 7: note.NoteService.GetNote:input_type -> note.GetNoteRequest
-	8,  // 8: note.NoteService.GetWorkspaceByNote:input_type -> note.GetWorkspaceByNoteRequest
-	5,  // 9: note.NoteService.GetNoteName:output_type -> note.GetNoteNameResponse
-	7,  // 10: note.NoteService.GetNote:output_type -> note.GetNoteResponse
-	9,  // 11: note.NoteService.GetWorkspaceByNote:output_type -> note.GetWorkspaceByNoteResponse
-	9,  // [9:12] is the sub-list for method output_type
-	6,  // [6:9] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	12, // 6: note.BatchGetNoteWorkspacesResponse.workspace_ids:type_name -> note.BatchGetNoteWorkspacesResponse.WorkspaceIdsEntry
+	4,  // 7: note.NoteService.GetNoteName:input_type -> note.GetNoteNameRequest
+	6,  // 8: note.NoteService.GetNote:input_type -> note.GetNoteRequest
+	8,  // 9: note.NoteService.GetWorkspaceByNote:input_type -> note.GetWorkspaceByNoteRequest
+	10, // 10: note.NoteService.BatchGetNoteWorkspaces:input_type -> note.BatchGetNoteWorkspacesRequest
+	5,  // 11: note.NoteService.GetNoteName:output_type -> note.GetNoteNameResponse
+	7,  // 12: note.NoteService.GetNote:output_type -> note.GetNoteResponse
+	9,  // 13: note.NoteService.GetWorkspaceByNote:output_type -> note.GetWorkspaceByNoteResponse
+	11, // 14: note.NoteService.BatchGetNoteWorkspaces:output_type -> note.BatchGetNoteWorkspacesResponse
+	11, // [11:15] is the sub-list for method output_type
+	7,  // [7:11] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_note_proto_init() }
@@ -674,7 +776,7 @@ func file_note_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_note_proto_rawDesc), len(file_note_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   9,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

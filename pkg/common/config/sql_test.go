@@ -207,6 +207,7 @@ func TestGetURL(t *testing.T) {
 		{
 			name: "constructs URL from fields",
 			cfg: commonconfig.SQL{
+				Scheme:   "postgres",
 				Host:     "localhost",
 				Port:     5432,
 				User:     "testuser",
@@ -214,7 +215,7 @@ func TestGetURL(t *testing.T) {
 				Name:     "testdb",
 				SSLMode:  "require",
 			},
-			expected: "host=localhost port=5432 user=testuser password=testpass dbname=testdb sslmode=require",
+			expected: "postgres://testuser:testpass@localhost:5432/testdb?sslmode=require",
 		},
 	}
 
@@ -225,5 +226,20 @@ func TestGetURL(t *testing.T) {
 				t.Errorf("GetURL() = %q, want %q", got, tt.expected)
 			}
 		})
+	}
+}
+
+func TestGetDSN(t *testing.T) {
+	cfg := commonconfig.SQL{
+		Host:     "localhost",
+		Port:     5432,
+		User:     "testuser",
+		Password: "testpass",
+		Name:     "testdb",
+		SSLMode:  "require",
+	}
+	want := "host=localhost port=5432 user=testuser password=testpass dbname=testdb sslmode=require"
+	if got := cfg.GetDSN(); got != want {
+		t.Errorf("GetDSN() = %q, want %q", got, want)
 	}
 }

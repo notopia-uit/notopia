@@ -46,6 +46,12 @@ func TestModels(t *testing.T) {
 		{"W111-Viewer: Read Note", "user:110", "workspace:00000000-0000-4000-8000-000000000111", "note", "read", true},
 		{"W111-Viewer: CANNOT Write Note", "user:110", "workspace:00000000-0000-4000-8000-000000000111", "note", "write", false},
 		{"W111-Viewer: CANNOT Delete Folder", "user:110", "workspace:00000000-0000-4000-8000-000000000111", "folder", "delete", false},
+		{"W111-Owner: Billing Read", "user:111", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_read", true},
+		{"W111-Owner: Billing Manage", "user:111", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_manage", true},
+		{"W111-Editor: Billing Read", "user:112", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_read", true},
+		{"W111-Editor: CANNOT Billing Manage", "user:112", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_manage", false},
+		{"W111-Viewer: Billing Read", "user:110", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_read", true},
+		{"W111-Viewer: CANNOT Billing Manage", "user:110", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_manage", false},
 
 		// =====================================================================
 		// WORKSPACE 00000000-0000-4000-8000-000000000112: Owner(112), Editor(111), No Role(110)

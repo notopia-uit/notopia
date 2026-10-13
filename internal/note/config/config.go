@@ -59,6 +59,7 @@ type Config struct {
 	Redis       commonconfig.Redis     `json:"redis"       mapstructure:"redis"       validate:"required"  yaml:"redis"`
 	Authentik   commonconfig.Authentik `json:"authentik"   mapstructure:"authentik"   validate:"required"  yaml:"authentik"`
 	Meilisearch Meilisearch            `json:"meilisearch" mapstructure:"meilisearch" validate:"required"  yaml:"meilisearch"`
+	Identity    commonconfig.Identity  `json:"identity"    mapstructure:"identity"    validate:"required"  yaml:"identity"`
 	Services    Services               `json:"services"    mapstructure:"services"    validate:"required"  yaml:"services"`
 	Advanced    Advanced               `json:"advanced"    mapstructure:"advanced"    validate:"omitempty" yaml:"advanced"`
 }

@@ -36,12 +36,31 @@ Commit is currently **manual only** (`POST /document/documents/{id}/commit`).
 
 ## Yjs / Hocuspocus
 
-- `HocuspocusDatabase.store` persists Yjs state and sets `modified = true`; there is no
-  debounce configured, so it fires on the extension's default cadence.
-- The `metadata` Y.Map (`YDocMetadataMap`) carries `{ modified }` to clients;
-  `HocuspocusService.setModified` is how the server pushes that state after a commit.
+- `HocuspocusDatabase.store` upserts the row and writes `modified` from the Yjs metadata
+  (`DocumentService.upsertData`); there is no debounce configured, so it fires on the
+  extension's default cadence.
+- `afterLoadDocument` applies the DB `modified` column into the `metadata` Y.Map
+  (`YDocMetadataMap`) with origin `{ source: 'local', skipStoreHooks: true }`, so loading
+  does not trigger a store. Clients read `{ modified }` from it;
+  `HocuspocusService.setModified` pushes that state after a commit.
+- `note.deleted` → `HocuspocusService.onNoteDeleted` marks the id in `deletedDocumentIds`
+  (the store guard), closes its connections, waits for in-flight stores
+  (`waitForPendingStores`) and deletes the row; revisions cascade by FK. Without the guard,
+  the final store on unload would upsert the row back. The set only holds loaded documents
+  and is cleared in `afterUnloadDocument`, so it does not grow.
+  Scaling out: the instance consuming `note.deleted` may not hold the live document, so a
+  shared set (Redis) does not help. The event must reach every instance (one consumer group
+  per instance, or Hocuspocus Redis extension).
 - `onRoleChanged` / `onMemberRemoved` consume Kafka events from `authorization` and walk
   live connections to flip `readOnly` or close with codes 4001/4002.
+
+## Crons and locks
+
+`@notopia-uit/lib-server/locks` provides `LocksSetupModule.forRoot({ redisUrl?, ttl? })`.
+With no `redisUrl` it uses an in-memory store (single instance only, a warning is logged, intended even in production, see `packages/lib-server/AGENTS.md`); with one it uses `RedisLockStore`. The lock
+Redis must run with `noeviction` and persistence, and the app must call
+`app.enableShutdownHooks()`. Crons use `@Cron(expr, { name })` with no `timeZone`, so they
+run in the process TZ.
 
 ## Conventions
 

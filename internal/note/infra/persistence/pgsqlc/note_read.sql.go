@@ -83,7 +83,8 @@ SELECT
 FROM
   notes
 WHERE
-  id = ANY($1::uuid[]) -- :if $1
+  TRUE
+  AND id = ANY($1::uuid[]) -- :if $1
   AND folder_id IN ( -- :if $2
     SELECT id FROM folders WHERE workspace_id = $2::uuid -- :if $2
   ) -- :if $2
@@ -277,6 +278,45 @@ func (q *Queries) ReadGetNotesInWorkspace(ctx context.Context, arg ReadGetNotesI
 			&i.TrashedBy,
 			&i.TrashedAt,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const readGetNotesWorkspaceIDs = `-- name: ReadGetNotesWorkspaceIDs :many
+SELECT
+  n.id AS note_id,
+  f.workspace_id
+FROM
+  notes n
+JOIN
+  folders f ON f.id = n.folder_id
+WHERE
+  n.id = ANY($1::uuid[])
+`
+
+type ReadGetNotesWorkspaceIDsRow struct {
+	NoteID      uuid.UUID
+	WorkspaceID uuid.UUID
+}
+
+func (q *Queries) ReadGetNotesWorkspaceIDs(ctx context.Context, ids []uuid.UUID) ([]*ReadGetNotesWorkspaceIDsRow, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "ReadGetNotesWorkspaceIDs")
+	defer span.End()
+	rows, err := q.db.Query(ctx, readGetNotesWorkspaceIDs, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*ReadGetNotesWorkspaceIDsRow
+	for rows.Next() {
+		var i ReadGetNotesWorkspaceIDsRow
+		if err := rows.Scan(&i.NoteID, &i.WorkspaceID); err != nil {
 			return nil, err
 		}
 		items = append(items, &i)

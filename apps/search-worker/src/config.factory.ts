@@ -7,6 +7,8 @@ import {
   kafkaConfigSchema,
   MeiliConfig,
   meiliConfigSchema,
+  TombstoneConfig,
+  tombstoneConfigSchema,
 } from './config';
 
 export const APP_CONFIG = Symbol('APP_CONFIG');
@@ -16,7 +18,7 @@ export const appConfig = registerAs(APP_CONFIG, () =>
     env: (process.env.NODE_ENV as AppConfig['env'] | undefined) ?? 'production',
     logLevel:
       (process.env.NOTOPIA_SEARCH_WORKER_LOG_LEVEL as AppConfig['logLevel'] | undefined) ?? 'warn',
-    port: parseInt(process.env.NOTOPIA_SEARCH_WORKER_PORT ?? '8084', 10),
+    port: parseInt(process.env.NOTOPIA_SEARCH_WORKER_PORT ?? '8083', 10),
   } satisfies AppConfig)
 );
 
@@ -40,4 +42,14 @@ export const meiliConfig = registerAs(MEILI_CONFIG, () =>
     host: process.env.NOTOPIA_SEARCH_WORKER_MEILI_HOST!,
     apiKey: process.env.NOTOPIA_SEARCH_WORKER_MEILI_API_KEY!,
   } satisfies MeiliConfig)
+);
+
+export const TOMBSTONE_CONFIG = Symbol('TOMBSTONE_CONFIG');
+
+export const tombstoneConfig = registerAs(TOMBSTONE_CONFIG, () =>
+  tombstoneConfigSchema.parse({
+    redisUrl: process.env.NOTOPIA_SEARCH_WORKER_REDIS_URL || undefined,
+    ttlSeconds: parseInt(process.env.NOTOPIA_SEARCH_WORKER_TOMBSTONE_TTL_SECONDS ?? '86400', 10),
+    max: parseInt(process.env.NOTOPIA_SEARCH_WORKER_TOMBSTONE_MAX ?? '100000', 10),
+  } satisfies TombstoneConfig)
 );

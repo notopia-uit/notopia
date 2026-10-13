@@ -33,6 +33,9 @@ can do; it is not per-tenant data.
 
 Note `editor` may `delete` a `workspace_item` but only `read` the `workspace` itself.
 
+Billing permissions on `workspace`: `billing_read` (owner, editor, viewer) and
+`billing_manage` (owner only).
+
 ## Adding a permission or role
 
 1. Add the `p` lines to `app/policy.csv` (and a `g2` line if it's a new object type)

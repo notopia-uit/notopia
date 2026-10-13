@@ -36,8 +36,14 @@ export abstract class UserGuard implements CanActivate {
 
     const parseHeaderList = (header?: string): string[] => {
       if (!header) return [];
-      const cleaned = header.replace(/^\[|\]$/g, '').trim();
-      return cleaned === '' ? [] : cleaned.split(/\s+/);
+      try {
+        const parsed: unknown = JSON.parse(header);
+        return Array.isArray(parsed)
+          ? parsed.filter((v): v is string => typeof v === 'string')
+          : [];
+      } catch {
+        return [];
+      }
     };
 
     const groupsList = parseHeaderList(headers['x-forwarded-groups'] as string | undefined);

@@ -276,6 +276,10 @@ func (a *Authorization) toAppWorkspacePermission(permission app.WorkspacePermiss
 		return pb.WorkspacePermission_WORKSPACE_PERMISSION_EDIT, nil
 	case app.WorkspacePermissionDelete:
 		return pb.WorkspacePermission_WORKSPACE_PERMISSION_DELETE, nil
+	case app.WorkspacePermissionBillingRead:
+		return pb.WorkspacePermission_WORKSPACE_PERMISSION_BILLING_READ, nil
+	case app.WorkspacePermissionBillingManage:
+		return pb.WorkspacePermission_WORKSPACE_PERMISSION_BILLING_MANAGE, nil
 	case app.WorkspacePermissionUnspecified:
 		return pb.WorkspacePermission_WORKSPACE_PERMISSION_UNSPECIFIED, errs.NewInternal(fmt.Sprintf("invalid workspace permission: %v", permission))
 	default:

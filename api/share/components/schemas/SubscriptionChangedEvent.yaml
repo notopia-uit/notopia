@@ -1,0 +1,15 @@
+# vim: ft=yaml.openapi
+type: object
+description: Best-effort notification that a workspace's billing state changed.
+properties:
+  workspaceId:
+    type: string
+    format: uuid
+  plan:
+    type: string
+    enum: [free, plus, pro]
+    x-enum-varnames: [SubscriptionChangedEventPlanFree, SubscriptionChangedEventPlanPlus, SubscriptionChangedEventPlanPro]
+  status:
+    type: string
+    description: Billing subscription status string
+required: [workspaceId, plan, status]

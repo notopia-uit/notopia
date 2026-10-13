@@ -36,8 +36,6 @@ type PermanentlyDeleteFolderCmd commonhandler.Cmd[PermanentlyDeleteFolder]
 
 var _ PermanentlyDeleteFolderCmd = (*PermanentlyDeleteFolderHandler)(nil)
 
-// NOTE: We delegate the infra persistence to cascading delete things
-// Fact, we should handle this in domain, not infra
 func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteFolder) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
@@ -58,8 +56,18 @@ func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *Perman
 		if err != nil {
 			return err
 		}
+		noteRepo := r.Note()
+		notes, err := noteRepo.GetRecursiveChildrenFromFolder(ctx, cmd.ID, true)
+		if err != nil {
+			return err
+		}
+		for _, n := range notes {
+			n.PermanentlyDelete(cmd.UserID)
+		}
+		if err := noteRepo.SaveMany(ctx, notes); err != nil {
+			return err
+		}
 		folder.PermanentlyDelete(cmd.UserID)
-		err = folderRepo.Save(ctx, folder)
-		return err
+		return folderRepo.Save(ctx, folder)
 	})
 }

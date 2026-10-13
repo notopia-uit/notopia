@@ -109,10 +109,15 @@ export class DocumentService {
     };
   }
 
-  async updateDataById(id: string, data: Buffer): Promise<void> {
-    this.logger.debug({ id, dataSize: data.length }, 'updateDataById: updating document data');
-    await this.repo.update(id, { data, modified: true });
-    this.logger.log({ id, dataSize: data.length }, 'updateDataById: document data updated');
+  async upsertData(id: string, data: Buffer, modified: boolean): Promise<void> {
+    this.logger.debug({ id, dataSize: data.length, modified }, 'upsertData: saving');
+    await this.repo.upsert({ id, data, modified }, ['id']);
+    this.logger.log({ id, dataSize: data.length }, 'upsertData: saved');
+  }
+
+  async deleteById(id: string): Promise<void> {
+    await this.repo.delete({ id });
+    this.logger.log({ id }, 'deleteById: document deleted');
   }
 
   async getById(id: string): Promise<DocumentEntity | null> {
