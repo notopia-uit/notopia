@@ -1,20 +1,20 @@
-# Note service seed
+# Note service fixtures
 
 Purpose
-- Seed the note service with workspace/folder/note metadata derived from the
+- Load fixtures into the note service with workspace/folder/note metadata derived from the
   Obsidian vault.
 
 Source data
 - Obsidian vault: `submodule/trshpuppy-obsidian-notes/`
 
 Workspace context
-- Workspace id comes from authorization seed data:
-  `internal/authorization/app/policy_test.csv`.
-- The note seed uses workspace id `00000000-0000-0000-0000-000000000110` with
+- Workspace id comes from authorization fixture data:
+  `internal/authorization/app/policy_fixtures.csv`.
+- The note fixtures use workspace id `00000000-0000-0000-0000-000000000110` with
   slug `notopia` and name `Notopia`.
 
 Business expectations
-- A single workspace is created for the seeded vault.
+- A single workspace is created for the vault fixtures.
 - Folder hierarchy mirrors the vault directory structure.
 - Root folder has an empty name and no parent.
 - No icons, no trashed fields.
@@ -29,5 +29,5 @@ Notes
   resolve to another vault note.
 
 Where it lands
-- SQL seed: `internal/note/seed.sql`
+- SQL fixtures: `internal/notefixturegen/fixtures.sql` and generated `fixtures.gen.sql`
 - Migration schema: `internal/note/infra/persistence/pgmigration/00001_init.sql`

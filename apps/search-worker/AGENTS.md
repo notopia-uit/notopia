@@ -27,7 +27,8 @@ to search. See `apps/document/AGENTS.md`.
   must line up with the filters those tokens embed.
 - `kafka-max-retry.exception-filter.ts` bounds retries — a handler that throws is retried,
   then dropped. Don't rely on a throw to reprocess later.
-- `seed/` re-indexes from scratch against a running Meilisearch.
+- `seed/` (`nx run search-worker:seed`) ensures the Meilisearch index and settings exist; idempotent, needed in every environment.
+- `fixtures/` (`nx run search-worker:fixtures`, after `fixtures:transform`) loads dev-only fake documents into the index.
 - Deletion tombstones (`tombstone.ts`): topics are separate, so a late `note.updated` /
   `document.committed` can arrive after `note.deleted` and upsert the note back.
   `note.deleted` marks a tombstone before deleting; upserts skip tombstoned ids and re-check

@@ -6,7 +6,7 @@ import type { MyBlock, MySchema } from '@blocknote/core';
 import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { createSchema } from '@notopia-uit/lib-server/block-note';
 
-import { parseSeedMarkdownToBlocks } from './blocknote-seed-transform';
+import { parseFixtureMarkdownToBlocks } from './blocknote-fixture-transform';
 
 function countInlineTypes(blocks: MyBlock[]): {
   references: number;
@@ -44,7 +44,7 @@ const testCases = [
   ['00d2e172-1642-52d7-adf3-a40ff4587f66.md', 'LDAP', 11, 0],
 ] as const;
 
-describe('seed markdown parsing', () => {
+describe('fixture markdown parsing', () => {
   let schema: MySchema;
   let editor: ServerBlockNoteEditor;
 
@@ -59,11 +59,11 @@ describe('seed markdown parsing', () => {
   test.for(testCases)(
     'parses %s (%s)',
     async ([file, _name, expectedRefs, expectedTags], { expect, skip }) => {
-      const filePath = path.join(__dirname, '..', 'seed-data', file);
+      const filePath = path.join(__dirname, '..', 'fixture-data', file);
       skip(!existsSync(filePath));
 
       const markdown = await readFile(filePath, 'utf-8');
-      const blocks = await parseSeedMarkdownToBlocks(editor, markdown);
+      const blocks = await parseFixtureMarkdownToBlocks(editor, markdown);
       const counts = countInlineTypes(blocks);
 
       expect(blocks.length).toBeGreaterThan(0);

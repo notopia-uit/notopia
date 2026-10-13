@@ -112,13 +112,17 @@ nx run note:goose:down             # Rollback
 nx run note:goose:create           # Create new migration
 ```
 
-### Seed Data
+### Seed and Fixtures
+
+- **seed**: mandatory data needed in every environment, prod included (idempotent)
+- **fixtures**: fake data for local development only (demo workspaces, notes, documents, search index)
 
 ```bash
-just seed-init                     # Seed all services
-just seed-init-note                # Seed note service only
-just seed-init-document            # Seed document service only
-just seed-init-search              # Seed search index
+just seed                          # Mandatory data (Meilisearch index config)
+just fixtures                      # Seed + all dev fixtures
+just fixtures-note                 # Note service fixtures only
+just fixtures-document             # Document service fixtures only
+just fixtures-search               # Search index fixtures only
 ```
 
 ### Conventions

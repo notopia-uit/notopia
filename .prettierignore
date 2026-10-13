@@ -16,7 +16,7 @@ packages/api-gen/src/**
 docs/godoc/**
 api/bundled/**/*.json
 submodule/**
-**/seed-data/**
+**/fixture-data/**
 packages/ui/src/**/shadcn/**
 packages/pb/src/**
 .nx/self-healing

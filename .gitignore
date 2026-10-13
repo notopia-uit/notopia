@@ -47,7 +47,7 @@ vitest.config.*.timestamp*
 .agents/skills/next-best-practices/
 .agents/skills/next-cache-components/
 .agents/skills/next-upgrade/
-.agents/skills/seed-data/
+.agents/skills/fixtures-data/
 .agents/skills/ui-ux-pro-max/
 .agents/skills/vercel-react-best-practices/
 
@@ -61,7 +61,7 @@ vitest.config.*.timestamp*
 .claude/skills/next-best-practices/
 .claude/skills/next-cache-components/
 .claude/skills/next-upgrade/
-.claude/skills/seed-data/
+.claude/skills/fixtures-data/
 .claude/skills/ui-ux-pro-max/
 .claude/skills/vercel-react-best-practices/
 .claude/skills/terraform-engineer/

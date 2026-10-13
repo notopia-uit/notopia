@@ -34,31 +34,30 @@ export-authentik-blueprint:
 shadcnadd component:
     pnpm exec shadcn add {{ component }} -c ./packages/ui/
 
-seed-init: seed-init-note seed-init-document seed-init-search
-
-seed-init-note: prepare-seed-note seed-note
-
-seed-init-document: prepare-seed-document seed-document
-
-seed-init-search: prepare-seed-search seed-search
-
-seed-note db-connection=note-db-connection: prepare-seed-note
-    psql {{ db-connection }} \
-      -f ./internal/notecreateseed/seed.sql \
-      -f ./internal/notecreateseed/seed.gen.sql
-
-prepare-seed-note:
-    nx run note:goose:up
-    go run ./cmd/notecreateseed/...
-
-seed-document:
-    nx run document:typeorm-extension:seed
-
-prepare-seed-document:
-    go run ./apps/document/database/transform-data.go
+seed: seed-search
 
 seed-search:
     nx run search-worker:seed
 
-prepare-seed-search:
-    nx run search-worker:seed:transform
+fixtures: seed fixtures-note fixtures-document fixtures-search
+
+fixtures-note db-connection=note-db-connection: prepare-fixtures-note
+    psql {{ db-connection }} \
+      -f ./internal/notefixturegen/fixtures.sql \
+      -f ./internal/notefixturegen/fixtures.gen.sql
+
+prepare-fixtures-note:
+    nx run note:goose:up
+    go run ./cmd/notefixturegen/...
+
+fixtures-document: prepare-fixtures-document
+    nx run document:fixtures
+
+prepare-fixtures-document:
+    go run ./apps/document/database/transform-data.go
+
+fixtures-search: prepare-fixtures-search
+    nx run search-worker:fixtures
+
+prepare-fixtures-search:
+    nx run search-worker:fixtures:transform

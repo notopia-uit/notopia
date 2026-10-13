@@ -60,7 +60,7 @@ func GetLocalEnforcer(t testing.TB, params *GetLocalEnforcerParams) (*casbin.Tra
 		// Build combined policy CSV
 		policy := app.PolicyCSV
 		if params.LoadTestPolicies {
-			policy += "\n" + app.PolicyTestCSV
+			policy += "\n" + app.PolicyFixturesCSV
 		}
 
 		// Load policies using stringadapter to maintain compatibility with g2 rules
@@ -74,7 +74,7 @@ func GetLocalEnforcer(t testing.TB, params *GetLocalEnforcerParams) (*casbin.Tra
 	// Use string adapter (non-transactional)
 	policy := app.PolicyCSV
 	if params.LoadTestPolicies {
-		policy += "\n" + app.PolicyTestCSV
+		policy += "\n" + app.PolicyFixturesCSV
 	}
 	adapter := stringadapter.NewAdapter(policy)
 

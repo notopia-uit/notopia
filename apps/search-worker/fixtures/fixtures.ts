@@ -23,21 +23,21 @@ async function run() {
     (file) => JSON.parse(fs.readFileSync(path.join(DATA_DIR, file), 'utf-8')) as NoteSearch
   );
 
-  console.log(`Seeding ${documents.length} documents to Meilisearch...`);
+  console.log(`Loading fixtures: ${documents.length} documents to Meilisearch...`);
   const taskPromise = index.addDocuments(documents);
   const { taskUid } = await taskPromise;
   console.log(`Documents added with task ID: ${taskUid}`);
   console.log('Waiting for indexing to complete..., you can close this process');
   const task = await taskPromise.waitTask();
   if (task.status === 'succeeded') {
-    console.log('Seeding completed successfully!');
+    console.log('Loading fixtures: completed successfully!');
   } else {
-    console.error(`Seeding failed with status: ${task.status}`, task.error);
+    console.error(`Loading fixtures: failed with status: ${task.status}`, task.error);
     process.exit(1);
   }
 }
 
-export { run as SeedMeilisearch };
+export { run as FixturesMeilisearch };
 
 if (require.main === module) {
   import('./config')
@@ -52,7 +52,7 @@ if (require.main === module) {
       return run();
     })
     .catch((error) => {
-      console.error('Error seeding Meilisearch:', error);
+      console.error('Error loading fixtures into Meilisearch:', error);
       process.exit(2);
     });
 }

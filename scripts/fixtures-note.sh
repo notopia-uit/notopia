@@ -10,7 +10,7 @@ PG_PASSWORD="${PG_PASSWORD:-${PGPASSWORD:-}}"
 PG_DATABASE="${PG_DATABASE:-${PGDATABASE:-notopia}}"
 
 # Parse command-line arguments
-# Usage: ./scripts/seed-note.sh [--host HOST] [--port PORT] [--user USER] [--password PASSWORD] [--db DATABASE]
+# Usage: ./scripts/fixtures-note.sh [--host HOST] [--port PORT] [--user USER] [--password PASSWORD] [--db DATABASE]
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --host)
@@ -47,14 +47,14 @@ if [[ -z "$PG_HOST" ]] || [[ -z "$PG_USER" ]] || [[ -z "$PG_DATABASE" ]]; then
   exit 1
 fi
 
-# Seed file path (relative to script location)
+# Fixtures file path (relative to script location)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-SEED_FILE="$REPO_ROOT/internal/notecreateseed/seed.sql"
+FIXTURES_FILE="$REPO_ROOT/internal/notefixturegen/fixtures.sql"
 
-if [[ ! -f "$SEED_FILE" ]]; then
-  echo "Error: Seed file not found: $SEED_FILE" >&2
-  echo "Run 'go run ./cmd/notecreateseed' to generate it first" >&2
+if [[ ! -f "$FIXTURES_FILE" ]]; then
+  echo "Error: Fixtures file not found: $FIXTURES_FILE" >&2
+  echo "Run 'go run ./cmd/notefixturegen' to generate it first" >&2
   exit 1
 fi
 
@@ -69,7 +69,7 @@ else
   exit 1
 fi
 
-echo "🌱 Seeding note service..."
+echo "🌱 Loading note fixtures..."
 echo "  Client: $SQL_CLIENT"
 echo "  Host: $PG_HOST"
 echo "  Port: $PG_PORT"
@@ -77,7 +77,7 @@ echo "  User: $PG_USER"
 echo "  Database: $PG_DATABASE"
 echo ""
 
-# Build connection string and execute seed
+# Build connection string and execute fixtures
 export PGHOST="$PG_HOST"
 export PGPORT="$PG_PORT"
 export PGUSER="$PG_USER"
@@ -88,9 +88,9 @@ if [[ -n "$PG_PASSWORD" ]]; then
 fi
 
 if [[ "$SQL_CLIENT" == "pgcli" ]]; then
-  pgcli --file "$SEED_FILE"
+  pgcli --file "$FIXTURES_FILE"
 else
-  psql -f "$SEED_FILE"
+  psql -f "$FIXTURES_FILE"
 fi
 
-echo "✅ Note service seeded successfully!"
+echo "✅ Note service fixtures loaded successfully!"

@@ -67,7 +67,7 @@ function transformBlock(block: MyBlock): MyBlock {
   return transformed;
 }
 
-export async function parseSeedMarkdownToBlocks(
+export async function parseFixtureMarkdownToBlocks(
   editor: ServerBlockNoteEditor,
   markdown: string
 ): Promise<MyBlock[]> {

@@ -15,8 +15,8 @@ var ModelConf string
 //go:embed policy.csv
 var PolicyCSV string
 
-//go:embed policy_test.csv
-var PolicyTestCSV string
+//go:embed policy_fixtures.csv
+var PolicyFixturesCSV string
 
 type CasbinAdapter any
 

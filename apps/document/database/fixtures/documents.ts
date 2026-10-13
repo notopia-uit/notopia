@@ -10,39 +10,41 @@ import { encodeStateAsUpdate } from 'yjs';
 
 import { DocumentEntity } from '#/document/document.entity';
 
-import { parseSeedMarkdownToBlocks } from './blocknote-seed-transform';
+import { parseFixtureMarkdownToBlocks } from './blocknote-fixture-transform';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export default class DocumentSeeder implements Seeder {
+export default class DocumentFixtures implements Seeder {
   constructor(private editor: ServerBlockNoteEditor) {}
 
   public async run(dataSource: DataSource): Promise<void> {
     const documentRepo = dataSource.getRepository(DocumentEntity);
-    const seedDataDir = path.join(__dirname, '../seed-data');
+    const fixtureDataDir = path.join(__dirname, '../fixture-data');
 
-    const files = (await readdir(seedDataDir)).filter((file) => file.endsWith('.md'));
+    const files = (await readdir(fixtureDataDir)).filter((file) => file.endsWith('.md'));
 
-    console.log(`Found ${files.length} markdown files to seed`);
+    console.log(`Found ${files.length} markdown files to load`);
 
-    const seedPromises = files.map((file) => this.seedDocument(file, seedDataDir, documentRepo));
+    const fixturePromises = files.map((file) =>
+      this.fixtureDocument(file, fixtureDataDir, documentRepo)
+    );
 
-    await Promise.all(seedPromises);
-    console.log(`Successfully seeded ${files.length} documents`);
+    await Promise.all(fixturePromises);
+    console.log(`Successfully loaded ${files.length} documents`);
   }
 
-  private async seedDocument(
+  private async fixtureDocument(
     fileName: string,
-    seedDataDir: string,
+    fixtureDataDir: string,
     documentRepo: Repository<DocumentEntity>
   ): Promise<void> {
     try {
-      const filePath = path.join(seedDataDir, fileName);
+      const filePath = path.join(fixtureDataDir, fileName);
       const content = await readFile(filePath, 'utf-8');
 
       const id = fileName.replace('.md', '');
 
-      const blocks = await parseSeedMarkdownToBlocks(this.editor, content);
+      const blocks = await parseFixtureMarkdownToBlocks(this.editor, content);
       const yDoc = blocksToYDoc(this.editor.editor, blocks);
       const encodedData = encodeStateAsUpdate(yDoc);
 
@@ -53,9 +55,9 @@ export default class DocumentSeeder implements Seeder {
       });
 
       await documentRepo.save(document);
-      console.log(`Seeded document: ${id}`);
+      console.log(`Loaded fixture document: ${id}`);
     } catch (error) {
-      console.error(`Failed to seed document ${fileName}:`, error);
+      console.error(`Failed to load fixture document ${fileName}:`, error);
       throw error;
     }
   }

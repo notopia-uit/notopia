@@ -31,6 +31,10 @@ Two grouping relations, easy to confuse:
 over `workspace` and `workspace_item`. It is static config: change it to change what a role
 can do; it is not per-tenant data.
 
+`BootStrapPolicies` loads that matrix on every start (seed). `LoadFixtures` loads
+`app/policy_fixtures.csv` (dev memberships) only when `AppEnv` is development; the same file is
+reused by tests.
+
 Note `editor` may `delete` a `workspace_item` but only `read` the `workspace` itself.
 
 Billing permissions on `workspace`: `billing_read` (owner, editor, viewer) and
@@ -41,7 +45,7 @@ Billing permissions on `workspace`: `billing_read` (owner, editor, viewer) and
 1. Add the `p` lines to `app/policy.csv` (and a `g2` line if it's a new object type)
 2. Extend the enum in `proto/authorization/authorization.proto`, run `nx gen proto`
 3. Map the enum in `controller/grpc/service.go` and in each caller's `svc_authorization.go`
-4. `app/model_test.go` and `policy_test.csv` cover the matrix — extend them
+4. `app/model_test.go` and `policy_fixtures.csv` cover the matrix — extend them
 
 ## Consumers
 

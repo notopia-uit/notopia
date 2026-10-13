@@ -9,24 +9,24 @@ import { Seeder } from 'typeorm-extension';
 import { DocumentEntity } from '#/document/document.entity';
 import { RevisionEntity } from '#/revision/revision.entity';
 
-import { parseSeedMarkdownToBlocks } from './blocknote-seed-transform';
+import { parseFixtureMarkdownToBlocks } from './blocknote-fixture-transform';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export default class RevisionSeeder implements Seeder {
+export default class RevisionFixtures implements Seeder {
   constructor(private editor: ServerBlockNoteEditor) {}
 
   public async run(dataSource: DataSource): Promise<void> {
     const documentRepo = dataSource.getRepository(DocumentEntity);
     const revisionRepo = dataSource.getRepository(RevisionEntity);
-    const seedDataDir = path.join(__dirname, '../seed-data');
+    const fixtureDataDir = path.join(__dirname, '../fixture-data');
 
-    const files = (await readdir(seedDataDir)).filter((file) => file.endsWith('.md'));
+    const files = (await readdir(fixtureDataDir)).filter((file) => file.endsWith('.md'));
 
     console.log(`Found ${files.length} markdown files to create revisions for`);
 
     const revisionPromises = files.map((file) =>
-      this.createRevision(file, seedDataDir, documentRepo, revisionRepo)
+      this.createRevision(file, fixtureDataDir, documentRepo, revisionRepo)
     );
 
     await Promise.all(revisionPromises);
@@ -35,12 +35,12 @@ export default class RevisionSeeder implements Seeder {
 
   private async createRevision(
     fileName: string,
-    seedDataDir: string,
+    fixtureDataDir: string,
     documentRepo: Repository<DocumentEntity>,
     revisionRepo: Repository<RevisionEntity>
   ): Promise<void> {
     try {
-      const filePath = path.join(seedDataDir, fileName);
+      const filePath = path.join(fixtureDataDir, fileName);
       const content = await readFile(filePath, 'utf-8');
 
       const documentId = fileName.replace('.md', '');
@@ -51,7 +51,7 @@ export default class RevisionSeeder implements Seeder {
         return;
       }
 
-      const blocks = await parseSeedMarkdownToBlocks(this.editor, content);
+      const blocks = await parseFixtureMarkdownToBlocks(this.editor, content);
 
       const revision = revisionRepo.create({
         id: documentId,

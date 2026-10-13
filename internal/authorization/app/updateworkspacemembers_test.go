@@ -20,7 +20,7 @@ func TestUpdateWorkspaceMembersHandler(t *testing.T) {
 		expectedEventType []string
 	}{
 		{
-			// W111 initial state from policy_test.csv: {111: owner, 112: editor, 110: viewer}
+			// W111 initial state from policy_fixtures.csv: {111: owner, 112: editor, 110: viewer}
 			name:        "W111-Owner can update members - add new member",
 			requesterID: "111",
 			workspaceID: "00000000-0000-4000-8000-000000000111",
