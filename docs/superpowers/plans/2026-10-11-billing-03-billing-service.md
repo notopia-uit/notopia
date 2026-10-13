@@ -7668,7 +7668,7 @@ git commit -m "feat(billing): admin catalog APIs, seed, fixtures and portal conf
 
 **Ordering rule used by every webhook use case:** provider _mutations that must not be lost_ (cancel a duplicate subscription, change default card) run **before** the write transaction and are idempotent; the write transaction records the event (`ProviderEventLog.MarkProcessed`) together with the state change; **refunds run after commit** with idempotency key `refund:{id}` and are retried by the reconcile cron while `pending` without a provider id.
 
-- [ ] **Step 1: Mocks and failing tests**
+- [x] **Step 1: Mocks and failing tests**
 
 Mocks come from mockery (`mise.toml` pins it), same setup as `internal/authorization` (`internal/authorization/.mockery.yaml` + `internal/authorization/project.json` `gen:mockery`, pulled in by `cmd/authorization` `gen`). Mock only the ports whose calls a test asserts:
 
@@ -8053,7 +8053,7 @@ func TestLifetimeReplacesRecurring(t *testing.T) {
 
 Run: `go test ./internal/billing/app/...` → FAIL (handlers missing).
 
-- [ ] **Step 2: Refund runner**
+- [x] **Step 2: Refund runner**
 
 ```go
 // internal/billing/app/refunds.go
@@ -8120,7 +8120,7 @@ func (r *RefundRunner) Run(ctx context.Context, subscriptionID uuid.UUID) error 
 }
 ```
 
-- [ ] **Step 3: CompleteCheckout**
+- [x] **Step 3: CompleteCheckout**
 
 ```go
 // internal/billing/app/cmd_completecheckout.go
@@ -8403,7 +8403,7 @@ func (h *CompleteCheckoutHandler) payerChange(ctx context.Context, cmd *Complete
 
 `setPayer` uses `payer.ID` as actor (the user who completed checkout).
 
-- [ ] **Step 4: SyncSubscription, SyncRefund, StartCheckout (query), StartPortal (query)**
+- [x] **Step 4: SyncSubscription, SyncRefund, StartCheckout (query), StartPortal (query)**
 
 ```go
 // internal/billing/app/cmd_syncsubscription.go
@@ -8721,7 +8721,7 @@ func (h *StartPortalHandler) Handle(ctx context.Context, q *StartPortal) (string
 
 Register `CompleteCheckout`, `SyncSubscription`, `SyncRefund` in `app.go` (Cmds) and `StartCheckout`, `StartPortal` (Queries) and the providers + `ProvideRefundRunner` in `wire.go`. The webhook controller calls the decorated `Cmds.*` directly, one per event type.
 
-- [ ] **Step 5: HTTP**
+- [x] **Step 5: HTTP**
 
 ```go
 // internal/billing/controller/http/checkout.go
@@ -8856,7 +8856,7 @@ func TestStripeWebhookBadSignature(t *testing.T) {
 
 (`Url` may be generated as `Url` or `URL`; `StripeSignature` is the header param field name — check `server.gen.go`.) Delete the three stubs.
 
-- [ ] **Step 6: Run tests, build, E2E**
+- [x] **Step 6: Run tests, build, E2E**
 
 ```bash
 nx run billing:gen:mockery && go test ./internal/billing/...
@@ -8866,7 +8866,7 @@ just stripe-listen            # copy the whsec_ into cmd/billing/.env.local, res
 
 As owner of workspace W (user `kevinnitro`): `POST /billing/workspaces/W/checkout-session {"priceId":"<plus_month id>"}` → open the URL, pay with `4242 4242 4242 4242`. Then `GET /billing/workspaces/W/entitlements` → `plan: plus`, `status: active`. In `stripe listen` output every event returns 204. Replaying the last event from the Stripe dashboard ("Resend") changes nothing. `POST .../portal-session` opens the Portal; switching to `pro` monthly updates entitlements to `pro` after the `customer.subscription.updated` webhook.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add internal/billing cmd/billing/wire_gen.go cmd/billing/project.json
@@ -8887,7 +8887,7 @@ git commit -m "feat(billing): checkout, portal and stripe webhook processing"
 
 - Produces: `Canceller.CancelNow(ctx, workspaceID uuid.UUID, reason domain.RefundReason, actor string, refundOptional bool) error` (reused by Task 10); `Cmds.CancelNow` (`CancelNow{WorkspaceID uuid.UUID; UserID string}`); `Queries.PreviewCancelNow` (`PreviewCancelNow{WorkspaceID; UserID}` → `domain.RefundQuote`).
 
-- [ ] **Step 1: Canceller**
+- [x] **Step 1: Canceller**
 
 ```go
 // internal/billing/app/canceller.go
@@ -9000,7 +9000,7 @@ func (c *Canceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.R
 
 Lifetime `reason`: callers pass `RefundReasonLifetimeWindow` when the subscription is lifetime and the reason is a user cancel (see Step 2).
 
-- [ ] **Step 2: Command, query, HTTP**
+- [x] **Step 2: Command, query, HTTP**
 
 ```go
 // internal/billing/app/cmd_cancelnow.go
@@ -9148,7 +9148,7 @@ func (h *StrictHandler) CancelNow(ctx context.Context, req billing.CancelNowRequ
 
 Note `GetWorkspaceBilling` returns only the **current** subscription, which is now none: the response shows `subscription: null` and the payer. Register handlers + `ProvideCanceller` in `wire.go`; delete the two stubs.
 
-- [ ] **Step 3: Build, E2E, commit**
+- [x] **Step 3: Build, E2E, commit**
 
 ```bash
 nx run billing:gen:wire && nx build billing && nx lint billing && go test ./internal/billing/...
@@ -9177,7 +9177,7 @@ git commit -m "feat(billing): cancel now with prorated refund"
 - Consumes: Kafka topics `events.integration.note.workspace.deleted` (`share.WorkspaceDeletedIntegrationEvent`), `events.integration.authorization.user_workspace_role_updated` (`share.UserWorkspaceRoleUpdatedEvent`), `events.integration.authorization.workspace_member_removed` (`share.WorkspaceMemberRemovedEvent`).
 - Produces: `Queries.ClaimPayer` (`ClaimPayer{WorkspaceID uuid.UUID; Payer app.Payer}` → checkout URL `string`), `Cmds.HandlePayerRemoved` (`HandlePayerRemoved{WorkspaceID uuid.UUID; UserID string}`), `Cmds.HandleWorkspaceDeleted` (`HandleWorkspaceDeleted{WorkspaceID uuid.UUID}`).
 
-- [ ] **Step 1: Commands**
+- [x] **Step 1: Commands**
 
 ```go
 // internal/billing/app/q_claimpayer.go
@@ -9369,7 +9369,7 @@ func (h *HandleWorkspaceDeletedHandler) Handle(ctx context.Context, cmd *HandleW
 }
 ```
 
-- [ ] **Step 2: HTTP claim**
+- [x] **Step 2: HTTP claim**
 
 ```go
 // internal/billing/controller/http/payer.go
@@ -9397,7 +9397,7 @@ func (h *StrictHandler) ClaimPayer(ctx context.Context, req billing.ClaimPayerRe
 
 `unimplemented.go` should now be empty: delete the file.
 
-- [ ] **Step 3: Kafka consumer controller**
+- [x] **Step 3: Kafka consumer controller**
 
 ```go
 // internal/billing/controller/event/event.go
@@ -9489,7 +9489,7 @@ Type conversions: `share.Id`, `share.Id2` are aliases of `openapi_types.UUID` (=
 
 `controller/event/wire.go`: `ProviderSet = wire.NewSet(Provide)`; add to `controller.ProviderSet`. `server.go`: add `event *event.Event` and a `g.Go(func() error { return s.event.Run(ctx) })`.
 
-- [ ] **Step 4: Build, E2E, commit**
+- [x] **Step 4: Build, E2E, commit**
 
 ```bash
 nx run billing:gen:wire && nx build billing && nx lint billing
