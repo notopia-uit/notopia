@@ -483,7 +483,7 @@ func (h *StrictHandler) GetWorkspaceTree(
 			}
 		}
 		if request.Params.Sort.UpdatedAt != nil {
-			if *request.Params.Sort.UpdatedAt == note.Desc {
+			if *request.Params.Sort.UpdatedAt == note.GetWorkspaceTreeParamsSortUpdatedAtDesc {
 				sortQuery.UpdatedAt = app.SortOrderDesc
 			} else {
 				sortQuery.UpdatedAt = app.SortOrderAsc
