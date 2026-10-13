@@ -13,6 +13,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/component"
 	"github.com/notopia-uit/notopia/internal/billing/config"
+	"github.com/notopia-uit/notopia/internal/billing/controller/event"
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
 	"github.com/notopia-uit/notopia/internal/billing/controller/http"
@@ -112,13 +113,16 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	createPriceHandler := app.NewCreatePriceHandler(unitOfWork, provider, settings)
 	ensureDefaultsHandler := app.NewEnsureDefaultsHandler(unitOfWork)
 	ensurePortalConfigurationHandler := app.NewEnsurePortalConfigurationHandler(unitOfWork, provider, settings)
+	handlePayerRemovedHandler := app.NewHandlePayerRemovedHandler(unitOfWork, provider, notifierKafka, settings)
+	handleWorkspaceDeletedHandler := app.NewHandleWorkspaceDeletedHandler(canceller, settings)
 	syncRefundHandler := app.NewSyncRefundHandler(unitOfWork, provider, settings)
 	syncSubscriptionHandler := app.NewSyncSubscriptionHandler(unitOfWork, provider, notifierKafka, settings)
 	updatePlanHandler := app.NewUpdatePlanHandler(unitOfWork)
 	updatePolicyHandler := app.NewUpdatePolicyHandler(unitOfWork)
-	cmds := app.NewCmds(handlerProvider, archivePriceHandler, cancelNowHandler, completeCheckoutHandler, createPriceHandler, ensureDefaultsHandler, ensurePortalConfigurationHandler, syncRefundHandler, syncSubscriptionHandler, updatePlanHandler, updatePolicyHandler)
+	cmds := app.NewCmds(handlerProvider, archivePriceHandler, cancelNowHandler, completeCheckoutHandler, createPriceHandler, ensureDefaultsHandler, ensurePortalConfigurationHandler, handlePayerRemovedHandler, handleWorkspaceDeletedHandler, syncRefundHandler, syncSubscriptionHandler, updatePlanHandler, updatePolicyHandler)
 	billingReadModel := pgreadmodel.NewBillingReadModel(queries)
 	batchGetEntitlementsHandler := app.NewBatchGetEntitlementsHandler(billingReadModel)
+	claimPayerHandler := app.NewClaimPayerHandler(unitOfWork, authorization, provider, settings)
 	getEntitlementsHandler := app.NewGetEntitlementsHandler(billingReadModel, authorization)
 	getPlanHandler := app.NewGetPlanHandler(billingReadModel)
 	getPolicyHandler := app.NewGetPolicyHandler(billingReadModel)
@@ -130,7 +134,7 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	previewCancelNowHandler := app.NewPreviewCancelNowHandler(authorization, canceller)
 	startCheckoutHandler := app.NewStartCheckoutHandler(unitOfWork, authorization, provider, settings)
 	startPortalHandler := app.NewStartPortalHandler(unitOfWork, authorization, provider, settings)
-	appQueries := app.NewQueries(handlerProvider, batchGetEntitlementsHandler, getEntitlementsHandler, getPlanHandler, getPolicyHandler, getPriceHandler, getWorkspaceBillingHandler, getWorkspacePayerHandler, listPlansHandler, listPricesHandler, previewCancelNowHandler, startCheckoutHandler, startPortalHandler)
+	appQueries := app.NewQueries(handlerProvider, batchGetEntitlementsHandler, claimPayerHandler, getEntitlementsHandler, getPlanHandler, getPolicyHandler, getPriceHandler, getWorkspaceBillingHandler, getWorkspacePayerHandler, listPlansHandler, listPricesHandler, previewCancelNowHandler, startCheckoutHandler, startPortalHandler)
 	server := &app.Server{
 		Cmds:    cmds,
 		Queries: appQueries,
@@ -184,6 +188,18 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
+	eventEvent, err := event.New(kafka, server, watermillKafkaTracer, loggerAdapter, global)
+	if err != nil {
+		cleanup8()
+		cleanup7()
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	commonconfigRedis := &configConfig.Redis
 	client, cleanup9, err := redis.NewClient(ctx, commonconfigRedis)
 	if err != nil {
@@ -198,7 +214,7 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		return nil, nil, err
 	}
 	healthHealth := health.New(pg, configServer, kafka, client, services)
-	billingServer := billing.NewServer(server, pg, httpHTTP, grpcGRPC, healthHealth, logger, global)
+	billingServer := billing.NewServer(server, pg, httpHTTP, grpcGRPC, eventEvent, healthHealth, logger, global)
 	return billingServer, func() {
 		cleanup9()
 		cleanup8()

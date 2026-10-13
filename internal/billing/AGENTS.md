@@ -12,7 +12,7 @@ Spec and plans: `docs/superpowers/specs/2026-10-11-billing-03-*`, `docs/superpow
 | `domain/` | Aggregates (`Subscription` + `Refund`, `BillingAccount`, `Price`, `Plan`, `BillingPolicy`), `ResolveEntitlements`, repo interfaces, `UnitOfWork`, `ProviderEventLog` | Pure. `uint8` enums with `IsValid`/`String` |
 | `app/` | `cmd_*` / `q_*` use cases, ports (`svc_*`, `readmodel.go`), app models | Commands use `domain.UnitOfWork`; queries use `app.BillingReadModel` only |
 | `infra/` | `persistence/` (pgrepo, pgreadmodel, pgmapper, pgjsonb, pgsqlc, pgmigration), `notifier/` (Kafka), `service/` (authorization gRPC), `redis/` | Each adapter maps enums explicitly (`toX`/`fromX`), never casts |
-| `controller/` | `http/` (gin strict server), `grpc/`, `health/` | Thin — translate, don't decide |
+| `controller/` | `http/` (gin strict server, Stripe webhook), `grpc/`, `event/` (Kafka consumers, one consumer group per topic), `health/` | Thin — translate, don't decide |
 | `component/` | Validator, `eventtopic.go` (every topic published or consumed) | No inline topic strings elsewhere |
 | `errs/` | Typed errors (`Code` is the wire code) | Mapped in `controller/http/err.go` and `controller/grpc/err.go` |
 

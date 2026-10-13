@@ -25,6 +25,8 @@ type Cmds struct {
 	CreatePrice               CreatePriceCmd
 	EnsureDefaults            EnsureDefaultsCmd
 	EnsurePortalConfiguration EnsurePortalConfigurationCmd
+	HandlePayerRemoved        HandlePayerRemovedCmd
+	HandleWorkspaceDeleted    HandleWorkspaceDeletedCmd
 	SyncRefund                SyncRefundCmd
 	SyncSubscription          SyncSubscriptionCmd
 	UpdatePlan                UpdatePlanCmd
@@ -39,6 +41,8 @@ func NewCmds(
 	createPriceHandler *CreatePriceHandler,
 	ensureDefaultsHandler *EnsureDefaultsHandler,
 	ensurePortalConfigurationHandler *EnsurePortalConfigurationHandler,
+	handlePayerRemovedHandler *HandlePayerRemovedHandler,
+	handleWorkspaceDeletedHandler *HandleWorkspaceDeletedHandler,
 	syncRefundHandler *SyncRefundHandler,
 	syncSubscriptionHandler *SyncSubscriptionHandler,
 	updatePlanHandler *UpdatePlanHandler,
@@ -52,6 +56,8 @@ func NewCmds(
 		CreatePrice:               commonhandler.DecorateCmd(hp, createPriceHandler),
 		EnsureDefaults:            commonhandler.DecorateCmd(hp, ensureDefaultsHandler),
 		EnsurePortalConfiguration: commonhandler.DecorateCmd(hp, ensurePortalConfigurationHandler),
+		HandlePayerRemoved:        commonhandler.DecorateCmd(hp, handlePayerRemovedHandler),
+		HandleWorkspaceDeleted:    commonhandler.DecorateCmd(hp, handleWorkspaceDeletedHandler),
 		SyncRefund:                commonhandler.DecorateCmd(hp, syncRefundHandler),
 		SyncSubscription:          commonhandler.DecorateCmd(hp, syncSubscriptionHandler),
 		UpdatePlan:                commonhandler.DecorateCmd(hp, updatePlanHandler),
@@ -63,6 +69,7 @@ var ProvideCmds = NewCmds
 
 type Queries struct {
 	BatchGetEntitlements BatchGetEntitlementsQuery
+	ClaimPayer           ClaimPayerQuery
 	GetEntitlements      GetEntitlementsQuery
 	GetPlan              GetPlanQuery
 	GetPolicy            GetPolicyQuery
@@ -79,6 +86,7 @@ type Queries struct {
 func NewQueries(
 	handlerProvider *HandlerProvider,
 	batchGetEntitlementsHandler *BatchGetEntitlementsHandler,
+	claimPayerHandler *ClaimPayerHandler,
 	getEntitlementsHandler *GetEntitlementsHandler,
 	getPlanHandler *GetPlanHandler,
 	getPolicyHandler *GetPolicyHandler,
@@ -94,6 +102,7 @@ func NewQueries(
 	hp := (*commonhandler.HandlerProvider)(handlerProvider)
 	return &Queries{
 		BatchGetEntitlements: commonhandler.DecorateQuery(hp, batchGetEntitlementsHandler),
+		ClaimPayer:           commonhandler.DecorateQuery(hp, claimPayerHandler),
 		GetEntitlements:      commonhandler.DecorateQuery(hp, getEntitlementsHandler),
 		GetPlan:              commonhandler.DecorateQuery(hp, getPlanHandler),
 		GetPolicy:            commonhandler.DecorateQuery(hp, getPolicyHandler),

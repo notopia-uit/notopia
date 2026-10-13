@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/notopia-uit/notopia/internal/billing/app"
+	"github.com/notopia-uit/notopia/internal/billing/controller/event"
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
 	"github.com/notopia-uit/notopia/internal/billing/controller/http"
@@ -20,6 +21,7 @@ type Server struct {
 	persistence *persistence.Pg
 	http        *http.HTTP
 	grpc        *grpc.GRPC
+	event       *event.Event
 	health      *health.Health
 	logger      *slog.Logger
 }
@@ -29,6 +31,7 @@ func NewServer(
 	persistence *persistence.Pg,
 	http *http.HTTP,
 	grpc *grpc.GRPC,
+	event *event.Event,
 	health *health.Health,
 	logger *slog.Logger,
 	_ otel.Global,
@@ -40,6 +43,7 @@ func NewServer(
 		persistence: persistence,
 		http:        http,
 		grpc:        grpc,
+		event:       event,
 		health:      health,
 		logger:      logger,
 	}
@@ -93,6 +97,13 @@ func (s *Server) Run(ctx context.Context) error {
 		}()
 		if err := s.grpc.Run(); err != nil {
 			return fmt.Errorf("failed to run grpc server: %w", err)
+		}
+		return nil
+	})
+
+	g.Go(func() error {
+		if err := s.event.Run(ctx); err != nil {
+			return fmt.Errorf("failed to run event router: %w", err)
 		}
 		return nil
 	})
