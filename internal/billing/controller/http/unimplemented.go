@@ -35,10 +35,6 @@ func (h *StrictHandler) AdminArchivePrice(ctx context.Context, _ billing.AdminAr
 	return nil, errs.New(errs.CodeInternal, "not implemented", nil)
 }
 
-func (h *StrictHandler) ListPlans(ctx context.Context, _ billing.ListPlansRequestObject) (billing.ListPlansResponseObject, error) {
-	return nil, errs.New(errs.CodeInternal, "not implemented", nil)
-}
-
 func (h *StrictHandler) StripeWebhook(ctx context.Context, _ billing.StripeWebhookRequestObject) (billing.StripeWebhookResponseObject, error) {
 	return nil, errs.New(errs.CodeInternal, "not implemented", nil)
 }
@@ -47,19 +43,11 @@ func (h *StrictHandler) CreateCheckoutSession(ctx context.Context, _ billing.Cre
 	return nil, errs.New(errs.CodeInternal, "not implemented", nil)
 }
 
-func (h *StrictHandler) GetWorkspaceEntitlements(ctx context.Context, _ billing.GetWorkspaceEntitlementsRequestObject) (billing.GetWorkspaceEntitlementsResponseObject, error) {
-	return nil, errs.New(errs.CodeInternal, "not implemented", nil)
-}
-
 func (h *StrictHandler) ClaimPayer(ctx context.Context, _ billing.ClaimPayerRequestObject) (billing.ClaimPayerResponseObject, error) {
 	return nil, errs.New(errs.CodeInternal, "not implemented", nil)
 }
 
 func (h *StrictHandler) CreatePortalSession(ctx context.Context, _ billing.CreatePortalSessionRequestObject) (billing.CreatePortalSessionResponseObject, error) {
-	return nil, errs.New(errs.CodeInternal, "not implemented", nil)
-}
-
-func (h *StrictHandler) GetWorkspaceBilling(ctx context.Context, _ billing.GetWorkspaceBillingRequestObject) (billing.GetWorkspaceBillingResponseObject, error) {
 	return nil, errs.New(errs.CodeInternal, "not implemented", nil)
 }
 

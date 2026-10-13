@@ -17,7 +17,10 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
 	"github.com/notopia-uit/notopia/internal/billing/controller/http"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgreadmodel"
+	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgrepo"
 	"github.com/notopia-uit/notopia/internal/billing/infra/redis"
+	"github.com/notopia-uit/notopia/internal/billing/infra/service"
 	"github.com/notopia-uit/notopia/pkg/common/http"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
@@ -26,29 +29,36 @@ import (
 // Injectors from wire.go:
 
 func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
-	validate := component.ProvideValidate()
-	viper := config.NewViper()
-	configConfig, err := config.New(validate, viper)
-	if err != nil {
-		return nil, nil, err
-	}
-	sql := &configConfig.Database
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
 	if err != nil {
 		return nil, nil, err
 	}
-	loggerProvider, cleanup, err := otel.NewLoggerProvider(ctx, resource)
+	tracerProvider, cleanup, err := otel.NewTracerProvider(ctx, resource)
 	if err != nil {
 		return nil, nil, err
 	}
-	meterProvider, cleanup2, err := otel.NewMeterProvider(ctx, resource)
+	validate := component.ProvideValidate()
+	viper := config.NewViper()
+	configConfig, err := config.New(validate, viper)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
 	}
-	tracerProvider, cleanup3, err := otel.NewTracerProvider(ctx, resource)
+	log := &configConfig.Log
+	general := &configConfig.General
+	stdoutHandler := logging.NewStdoutHandler(log, general)
+	loggerProvider, cleanup2, err := otel.NewLoggerProvider(ctx, resource)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
+	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
+	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
+	sql := &configConfig.Database
+	meterProvider, cleanup3, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
 		cleanup2()
 		cleanup()
@@ -63,14 +73,35 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
+	queries := persistence.NewSQLCQueries(pool)
+	unitOfWork := pgrepo.NewUnitOfWork(pool, queries)
+	ensureDefaultsHandler := app.NewEnsureDefaultsHandler(unitOfWork)
+	cmds := app.NewCmds(handlerProvider, ensureDefaultsHandler)
+	billingReadModel := pgreadmodel.NewBillingReadModel(queries)
+	batchGetEntitlementsHandler := app.NewBatchGetEntitlementsHandler(billingReadModel)
+	services := &configConfig.Services
+	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
+	authorization, cleanup5, err := service.NewAuthorization(services, loggingLogger, global)
+	if err != nil {
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	getEntitlementsHandler := app.NewGetEntitlementsHandler(billingReadModel, authorization)
+	getWorkspaceBillingHandler := app.NewGetWorkspaceBillingHandler(billingReadModel, authorization)
+	getWorkspacePayerHandler := app.NewGetWorkspacePayerHandler(billingReadModel)
+	listPlansHandler := app.NewListPlansHandler(billingReadModel)
+	appQueries := app.NewQueries(handlerProvider, batchGetEntitlementsHandler, getEntitlementsHandler, getWorkspaceBillingHandler, getWorkspacePayerHandler, listPlansHandler)
+	server := &app.Server{
+		Cmds:    cmds,
+		Queries: appQueries,
+	}
 	db := persistence.NewPgxPoolStdlib(pool)
-	log := &configConfig.Log
-	general := &configConfig.General
-	stdoutHandler := logging.NewStdoutHandler(log, general)
-	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
-	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
 	provider, err := persistence.NewGooseProvider(db, logger)
 	if err != nil {
+		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
@@ -79,6 +110,7 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	}
 	pg, err := persistence.NewPg(pool, provider)
 	if err != nil {
+		cleanup5()
 		cleanup4()
 		cleanup3()
 		cleanup2()
@@ -88,28 +120,11 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger, global)
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, global)
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
-	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
-	cmds := app.NewCmds(handlerProvider)
-	queries := app.NewQueries(handlerProvider)
-	server := &app.Server{
-		Cmds:    cmds,
-		Queries: queries,
-	}
 	identity := &configConfig.Identity
 	strictHandler := http.NewStrictHandler(server, identity)
 	v := http.NewHandler(strictHandler)
 	configServer := &configConfig.Server
-	httpHTTP, cleanup5, err := http.New(ctx, engine, v, configServer, logger)
-	if err != nil {
-		cleanup4()
-		cleanup3()
-		cleanup2()
-		cleanup()
-		return nil, nil, err
-	}
-	serviceServer := grpc.NewServiceServer(server)
-	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	grpcGRPC, cleanup6, err := grpc.New(ctx, serviceServer, configServer, loggingLogger, global)
+	httpHTTP, cleanup6, err := http.New(ctx, engine, v, configServer, logger)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -118,9 +133,8 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	kafka := &configConfig.Kafka
-	commonconfigRedis := &configConfig.Redis
-	client, cleanup7, err := redis.NewClient(ctx, commonconfigRedis)
+	serviceServer := grpc.NewServiceServer(server)
+	grpcGRPC, cleanup7, err := grpc.New(ctx, serviceServer, configServer, loggingLogger, global)
 	if err != nil {
 		cleanup6()
 		cleanup5()
@@ -130,10 +144,23 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	services := &configConfig.Services
+	kafka := &configConfig.Kafka
+	commonconfigRedis := &configConfig.Redis
+	client, cleanup8, err := redis.NewClient(ctx, commonconfigRedis)
+	if err != nil {
+		cleanup7()
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	healthHealth := health.New(pg, configServer, kafka, client, services)
-	billingServer := billing.NewServer(pg, httpHTTP, grpcGRPC, healthHealth, logger, global)
+	billingServer := billing.NewServer(server, pg, httpHTTP, grpcGRPC, healthHealth, logger, global)
 	return billingServer, func() {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()

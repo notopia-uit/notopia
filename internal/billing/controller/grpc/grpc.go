@@ -17,10 +17,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 )
 
-// TODO(billing task 5): drop UnimplementedBillingServiceServer once service.go implements every RPC.
 type ServiceServer struct {
-	pb.UnimplementedBillingServiceServer
-
 	app *app.Server
 }
 
@@ -28,8 +25,7 @@ var _ pb.BillingServiceServer = (*ServiceServer)(nil)
 
 func NewServiceServer(app *app.Server) *ServiceServer {
 	return &ServiceServer{
-		UnimplementedBillingServiceServer: pb.UnimplementedBillingServiceServer{},
-		app:                               app,
+		app: app,
 	}
 }
 

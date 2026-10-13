@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
 	"github.com/notopia-uit/notopia/internal/billing/controller/http"
@@ -15,6 +16,7 @@ import (
 )
 
 type Server struct {
+	app         *app.Server
 	persistence *persistence.Pg
 	http        *http.HTTP
 	grpc        *grpc.GRPC
@@ -23,6 +25,7 @@ type Server struct {
 }
 
 func NewServer(
+	app *app.Server,
 	persistence *persistence.Pg,
 	http *http.HTTP,
 	grpc *grpc.GRPC,
@@ -33,6 +36,7 @@ func NewServer(
 	slog.SetDefault(logger)
 
 	return &Server{
+		app:         app,
 		persistence: persistence,
 		http:        http,
 		grpc:        grpc,
@@ -46,6 +50,9 @@ var ProvideServer = NewServer
 func (s *Server) Run(ctx context.Context) error {
 	if err := s.persistence.RunMigrations(ctx); err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
+	}
+	if err := s.app.Cmds.EnsureDefaults.Handle(ctx, &app.EnsureDefaults{}); err != nil {
+		return fmt.Errorf("failed to ensure billing defaults: %w", err)
 	}
 
 	g, ctx := errgroup.WithContext(ctx)
