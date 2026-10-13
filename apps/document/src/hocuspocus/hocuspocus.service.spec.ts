@@ -21,12 +21,15 @@ describe('HocuspocusService.onNoteDeleted', () => {
     ctx = await setup();
   });
 
-  it('blocks stores before closing connections, then deletes the row', async () => {
+  it('blocks stores, closes connections, drains in-flight stores, then deletes the row', async () => {
     const { service, hocuspocus, documentService } = ctx;
     const calls: string[] = [];
     (hocuspocus.markDeleted as unknown as Mock).mockImplementation(() => void calls.push('mark'));
     (hocuspocus.closeConnections as unknown as Mock).mockImplementation(
       () => void calls.push('close')
+    );
+    (hocuspocus.waitForPendingStores as unknown as Mock).mockImplementation(
+      async () => void calls.push('drain')
     );
     (documentService.deleteById as unknown as Mock).mockImplementation(
       async () => void calls.push('delete')
@@ -34,6 +37,6 @@ describe('HocuspocusService.onNoteDeleted', () => {
 
     await service.onNoteDeleted('n1');
 
-    expect(calls).toEqual(['mark', 'close', 'delete']);
+    expect(calls).toEqual(['mark', 'close', 'drain', 'delete']);
   });
 });

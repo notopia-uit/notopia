@@ -20,6 +20,7 @@ export class Hocuspocus {
   private readonly logger = new Logger(Hocuspocus.name);
   readonly hocuspocus: ServerHocuspocus<HocuspocusContext>;
   private readonly deletedDocumentIds = new Set<string>();
+  private readonly pendingStores = new Map<string, Set<Promise<void>>>();
 
   constructor(
     documentService: DocumentService,
@@ -58,7 +59,10 @@ export class Hocuspocus {
           },
           store: async ({ documentName: id, state, document }) => {
             if (this.deletedDocumentIds.has(id)) return;
-            await documentService.upsertData(id, state, readModified(document));
+            await this.trackStore(
+              id,
+              documentService.upsertData(id, state, readModified(document))
+            );
           },
         }),
       ],
@@ -68,6 +72,26 @@ export class Hocuspocus {
   markDeleted(id: string): void {
     if (this.hocuspocus.documents.has(id)) {
       this.deletedDocumentIds.add(id);
+    }
+  }
+
+  async waitForPendingStores(id: string): Promise<void> {
+    const pending = this.pendingStores.get(id);
+    if (pending) await Promise.allSettled(pending);
+  }
+
+  private async trackStore(id: string, store: Promise<void>): Promise<void> {
+    let pending = this.pendingStores.get(id);
+    if (!pending) {
+      pending = new Set();
+      this.pendingStores.set(id, pending);
+    }
+    pending.add(store);
+    try {
+      await store;
+    } finally {
+      pending.delete(store);
+      if (pending.size === 0) this.pendingStores.delete(id);
     }
   }
 

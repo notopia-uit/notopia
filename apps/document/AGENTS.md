@@ -44,9 +44,13 @@ Commit is currently **manual only** (`POST /document/documents/{id}/commit`).
   does not trigger a store. Clients read `{ modified }` from it;
   `HocuspocusService.setModified` pushes that state after a commit.
 - `note.deleted` → `HocuspocusService.onNoteDeleted` marks the id in `deletedDocumentIds`
-  (the store guard), closes its connections and deletes the row; revisions cascade by FK.
-  The guard is in-process: it assumes a single document instance per document and must move
-  to Redis or pubsub if the service scales out.
+  (the store guard), closes its connections, waits for in-flight stores
+  (`waitForPendingStores`) and deletes the row; revisions cascade by FK. Without the guard,
+  the final store on unload would upsert the row back. The set only holds loaded documents
+  and is cleared in `afterUnloadDocument`, so it does not grow.
+  Scaling out: the instance consuming `note.deleted` may not hold the live document, so a
+  shared set (Redis) does not help. The event must reach every instance (one consumer group
+  per instance, or Hocuspocus Redis extension).
 - `onRoleChanged` / `onMemberRemoved` consume Kafka events from `authorization` and walk
   live connections to flip `readOnly` or close with codes 4001/4002.
 

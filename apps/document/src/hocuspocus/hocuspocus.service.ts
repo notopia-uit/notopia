@@ -24,6 +24,7 @@ export class HocuspocusService {
   async onNoteDeleted(id: string): Promise<void> {
     this.hocuspocus.markDeleted(id);
     this.hocuspocus.closeConnections(id);
+    await this.hocuspocus.waitForPendingStores(id);
     await this.documentService.deleteById(id);
   }
 
