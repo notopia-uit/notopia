@@ -158,5 +158,8 @@ func New(
 var Provide = New
 
 func (h *Health) Run() error {
-	return h.ListenAndServe()
+	if err := h.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+	return nil
 }
