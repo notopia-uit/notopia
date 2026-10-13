@@ -1,0 +1,36 @@
+# vim: ft=yaml.openapi
+post:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - WorkspaceBilling
+  summary: Cancel the subscription now with a prorated refund (owner only)
+  operationId: cancelNow
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  responses:
+    200:
+      description: Workspace billing state after cancel
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/WorkspaceBilling.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    409:
+      description: Conflict with current billing state
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/components/schemas/Error.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

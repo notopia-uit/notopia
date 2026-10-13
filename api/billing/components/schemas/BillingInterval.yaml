@@ -1,0 +1,4 @@
+# vim: ft=yaml.openapi
+type: string
+enum: [month, year, lifetime]
+example: month

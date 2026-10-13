@@ -1,0 +1,36 @@
+# vim: ft=yaml.openapi
+patch:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - BillingAdmin
+  summary: Update plan features and limits (admin)
+  operationId: adminUpdatePlan
+  parameters:
+    - $ref: ../components/parameters/tierPath.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/UpdatePlanRequest.yaml
+  responses:
+    200:
+      description: Updated plan
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Plan.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

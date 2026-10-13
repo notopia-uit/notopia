@@ -1,0 +1,12 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  pastDueGraceDays:
+    type: integer
+    minimum: 0
+    example: 3
+  lifetimeRefundWindowDays:
+    type: integer
+    minimum: 0
+    example: 14
+required: [pastDueGraceDays, lifetimeRefundWindowDays]

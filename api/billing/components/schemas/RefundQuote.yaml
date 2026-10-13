@@ -1,0 +1,24 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  amount:
+    type: integer
+    format: int64
+    example: 24500
+  currency:
+    type: string
+    example: vnd
+  unusedSeconds:
+    type: integer
+    format: int64
+    example: 1296000
+  periodSeconds:
+    type: integer
+    format: int64
+    example: 2592000
+  payments:
+    type: array
+    description: One line per paid invoice payment of the current period
+    items:
+      $ref: ./RefundQuotePayment.yaml
+required: [amount, currency, unusedSeconds, periodSeconds, payments]

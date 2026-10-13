@@ -1,0 +1,6 @@
+# vim: ft=yaml.openapi
+name: tier
+in: path
+required: true
+schema:
+  $ref: ../schemas/PlanTier.yaml

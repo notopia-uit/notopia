@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oapi-codegen/oapi-codegen/HEAD/configuration-schema.json
+package: billing
+generate:
+  models: true
+output: ../../pkg/api/billing/model.gen.go
+compatibility:
+  always-prefix-enum-values: true
+output-options:
+  nullable-type: true

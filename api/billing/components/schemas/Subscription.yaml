@@ -1,0 +1,41 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+    example: 0192f0a0-0000-7000-8000-000000000003
+  plan:
+    $ref: ./PlanTier.yaml
+  interval:
+    $ref: ./BillingInterval.yaml
+  status:
+    $ref: ./SubscriptionStatus.yaml
+  currentPeriodStart:
+    type: string
+    format: date-time
+    nullable: true
+    example: 2026-10-11T00:00:00Z
+  currentPeriodEnd:
+    type: string
+    format: date-time
+    nullable: true
+    example: 2026-11-11T00:00:00Z
+  cancelAtPeriodEnd:
+    type: boolean
+    example: false
+  canceledAt:
+    type: string
+    format: date-time
+    nullable: true
+    example: 2026-10-20T00:00:00Z
+  accessUntil:
+    type: string
+    format: date-time
+    nullable: true
+    example: 2026-11-11T00:00:00Z
+  refunds:
+    type: array
+    items:
+      $ref: ./Refund.yaml
+required: [id, plan, interval, status, cancelAtPeriodEnd, refunds]

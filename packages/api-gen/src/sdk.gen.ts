@@ -2,8 +2,8 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, ServerSentEventsResult, TDataShape } from './client';
 import { client } from './client.gen';
-import { getNoteResponseTransformer, getRevisionsResponseTransformer, getRevisionWithContentResponseTransformer, getWorkspaceSearchTokenResponseTransformer, getWorkspaceTreeResponseTransformer, showTrashResponseTransformer } from './transformers.gen';
-import type { ChangeWorkspaceSlugData, ChangeWorkspaceSlugErrors, ChangeWorkspaceSlugResponses, CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsErrors, CheckWorkspaceSlugExistsResponses, CommitDocumentData, CommitDocumentErrors, CommitDocumentResponses, CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateNoteData, CreateNoteErrors, CreateNoteResponses, CreateWorkspaceData, CreateWorkspaceErrors, CreateWorkspaceResponses, DeleteRevisionData, DeleteRevisionErrors, DeleteRevisionResponses, DeleteWorkspaceData, DeleteWorkspaceErrors, DeleteWorkspaceResponses, EmptyTrashData, EmptyTrashErrors, EmptyTrashResponses, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlErrors, GetDocumentAttachmentUploadUrlResponses, GetMyWorkspacesData, GetMyWorkspacesErrors, GetMyWorkspacesResponses, GetNoteData, GetNoteErrors, GetNoteGraphData, GetNoteGraphErrors, GetNoteGraphResponses, GetNoteLinksData, GetNoteLinksErrors, GetNoteLinksResponses, GetNoteResponses, GetRevisionsData, GetRevisionsErrors, GetRevisionsResponses, GetRevisionWithContentData, GetRevisionWithContentErrors, GetRevisionWithContentResponses, GetWorkspaceData, GetWorkspaceErrors, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponse, GetWorkspaceEventsResponses, GetWorkspaceGraphData, GetWorkspaceGraphErrors, GetWorkspaceGraphResponses, GetWorkspaceMembersData, GetWorkspaceMembersErrors, GetWorkspaceMembersResponses, GetWorkspaceResponses, GetWorkspaceSearchTokenData, GetWorkspaceSearchTokenErrors, GetWorkspaceSearchTokenResponses, GetWorkspaceTreeData, GetWorkspaceTreeErrors, GetWorkspaceTreeResponses, LeaveWorkspaceData, LeaveWorkspaceErrors, LeaveWorkspaceResponses, MoveWorkspaceItemsData, MoveWorkspaceItemsErrors, MoveWorkspaceItemsResponses, PermanentlyDeleteFolderData, PermanentlyDeleteFolderErrors, PermanentlyDeleteFolderResponses, PermanentlyDeleteNoteData, PermanentlyDeleteNoteErrors, PermanentlyDeleteNoteResponses, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsErrors, PermanentlyDeleteWorkspaceItemsResponses, PublishNoteData, PublishNoteErrors, PublishNoteResponses, PublishWorkspaceData, PublishWorkspaceErrors, PublishWorkspaceResponses, RenameFolderData, RenameFolderErrors, RenameFolderResponses, RenameNoteData, RenameNoteErrors, RenameNoteResponses, RenameRevisionData, RenameRevisionErrors, RenameRevisionResponses, RenameWorkspaceData, RenameWorkspaceErrors, RenameWorkspaceResponses, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsErrors, RestoreTrashedWorkspaceItemsResponses, SearchUsersData, SearchUsersErrors, SearchUsersResponses, ShowTrashData, ShowTrashErrors, ShowTrashResponses, TrashWorkspaceItemsData, TrashWorkspaceItemsErrors, TrashWorkspaceItemsResponses, UnpublishNoteData, UnpublishNoteErrors, UnpublishNoteResponses, UnpublishWorkspaceData, UnpublishWorkspaceErrors, UnpublishWorkspaceResponses, UpdateWorkspaceMembersData, UpdateWorkspaceMembersErrors, UpdateWorkspaceMembersResponses } from './types.gen';
+import { adminArchivePriceResponseTransformer, adminCreatePriceResponseTransformer, adminListPlansResponseTransformer, adminListPricesResponseTransformer, adminUpdatePlanResponseTransformer, cancelNowResponseTransformer, getNoteResponseTransformer, getRevisionsResponseTransformer, getRevisionWithContentResponseTransformer, getWorkspaceBillingResponseTransformer, getWorkspaceEntitlementsResponseTransformer, getWorkspaceSearchTokenResponseTransformer, getWorkspaceTreeResponseTransformer, listPlansResponseTransformer, previewCancelNowResponseTransformer, showTrashResponseTransformer } from './transformers.gen';
+import type { AdminArchivePriceData, AdminArchivePriceErrors, AdminArchivePriceResponses, AdminCreatePriceData, AdminCreatePriceErrors, AdminCreatePriceResponses, AdminGetPolicyData, AdminGetPolicyErrors, AdminGetPolicyResponses, AdminListPlansData, AdminListPlansErrors, AdminListPlansResponses, AdminListPricesData, AdminListPricesErrors, AdminListPricesResponses, AdminUpdatePlanData, AdminUpdatePlanErrors, AdminUpdatePlanResponses, AdminUpdatePolicyData, AdminUpdatePolicyErrors, AdminUpdatePolicyResponses, CancelNowData, CancelNowErrors, CancelNowResponses, ChangeWorkspaceSlugData, ChangeWorkspaceSlugErrors, ChangeWorkspaceSlugResponses, CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsErrors, CheckWorkspaceSlugExistsResponses, ClaimPayerData, ClaimPayerErrors, ClaimPayerResponses, CommitDocumentData, CommitDocumentErrors, CommitDocumentResponses, CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateNoteData, CreateNoteErrors, CreateNoteResponses, CreatePortalSessionData, CreatePortalSessionErrors, CreatePortalSessionResponses, CreateWorkspaceData, CreateWorkspaceErrors, CreateWorkspaceResponses, DeleteRevisionData, DeleteRevisionErrors, DeleteRevisionResponses, DeleteWorkspaceData, DeleteWorkspaceErrors, DeleteWorkspaceResponses, EmptyTrashData, EmptyTrashErrors, EmptyTrashResponses, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlErrors, GetDocumentAttachmentUploadUrlResponses, GetMyWorkspacesData, GetMyWorkspacesErrors, GetMyWorkspacesResponses, GetNoteData, GetNoteErrors, GetNoteGraphData, GetNoteGraphErrors, GetNoteGraphResponses, GetNoteLinksData, GetNoteLinksErrors, GetNoteLinksResponses, GetNoteResponses, GetRevisionsData, GetRevisionsErrors, GetRevisionsResponses, GetRevisionWithContentData, GetRevisionWithContentErrors, GetRevisionWithContentResponses, GetWorkspaceBillingData, GetWorkspaceBillingErrors, GetWorkspaceBillingResponses, GetWorkspaceData, GetWorkspaceEntitlementsData, GetWorkspaceEntitlementsErrors, GetWorkspaceEntitlementsResponses, GetWorkspaceErrors, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponse, GetWorkspaceEventsResponses, GetWorkspaceGraphData, GetWorkspaceGraphErrors, GetWorkspaceGraphResponses, GetWorkspaceMembersData, GetWorkspaceMembersErrors, GetWorkspaceMembersResponses, GetWorkspaceResponses, GetWorkspaceSearchTokenData, GetWorkspaceSearchTokenErrors, GetWorkspaceSearchTokenResponses, GetWorkspaceTreeData, GetWorkspaceTreeErrors, GetWorkspaceTreeResponses, LeaveWorkspaceData, LeaveWorkspaceErrors, LeaveWorkspaceResponses, ListPlansData, ListPlansErrors, ListPlansResponses, MoveWorkspaceItemsData, MoveWorkspaceItemsErrors, MoveWorkspaceItemsResponses, PermanentlyDeleteFolderData, PermanentlyDeleteFolderErrors, PermanentlyDeleteFolderResponses, PermanentlyDeleteNoteData, PermanentlyDeleteNoteErrors, PermanentlyDeleteNoteResponses, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsErrors, PermanentlyDeleteWorkspaceItemsResponses, PreviewCancelNowData, PreviewCancelNowErrors, PreviewCancelNowResponses, PublishNoteData, PublishNoteErrors, PublishNoteResponses, PublishWorkspaceData, PublishWorkspaceErrors, PublishWorkspaceResponses, RenameFolderData, RenameFolderErrors, RenameFolderResponses, RenameNoteData, RenameNoteErrors, RenameNoteResponses, RenameRevisionData, RenameRevisionErrors, RenameRevisionResponses, RenameWorkspaceData, RenameWorkspaceErrors, RenameWorkspaceResponses, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsErrors, RestoreTrashedWorkspaceItemsResponses, SearchUsersData, SearchUsersErrors, SearchUsersResponses, ShowTrashData, ShowTrashErrors, ShowTrashResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses, TrashWorkspaceItemsData, TrashWorkspaceItemsErrors, TrashWorkspaceItemsResponses, UnpublishNoteData, UnpublishNoteErrors, UnpublishNoteResponses, UnpublishWorkspaceData, UnpublishWorkspaceErrors, UnpublishWorkspaceResponses, UpdateWorkspaceMembersData, UpdateWorkspaceMembersErrors, UpdateWorkspaceMembersResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
   /**
@@ -757,4 +757,288 @@ export const searchUsers = <ThrowOnError extends boolean = false>(options: Optio
     }],
   url: '/note/search-users',
   ...options
+});
+
+/**
+ * List plans with features, limits and active prices
+ */
+export const listPlans = <ThrowOnError extends boolean = false>(options?: Options<ListPlansData, ThrowOnError>): RequestResult<ListPlansResponses, ListPlansErrors, ThrowOnError> => (options?.client ?? client).get<ListPlansResponses, ListPlansErrors, ThrowOnError>({
+  responseTransformer: listPlansResponseTransformer,
+  url: '/billing/plans',
+  ...options
+});
+
+/**
+ * Get workspace entitlements (member)
+ */
+export const getWorkspaceEntitlements = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceEntitlementsData, ThrowOnError>): RequestResult<GetWorkspaceEntitlementsResponses, GetWorkspaceEntitlementsErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceEntitlementsResponses, GetWorkspaceEntitlementsErrors, ThrowOnError>({
+  responseTransformer: getWorkspaceEntitlementsResponseTransformer,
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/workspaces/{workspaceId}/entitlements',
+  ...options
+});
+
+/**
+ * Get workspace subscription, payer and refunds (owner only)
+ */
+export const getWorkspaceBilling = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceBillingData, ThrowOnError>): RequestResult<GetWorkspaceBillingResponses, GetWorkspaceBillingErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceBillingResponses, GetWorkspaceBillingErrors, ThrowOnError>({
+  responseTransformer: getWorkspaceBillingResponseTransformer,
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/workspaces/{workspaceId}/subscription',
+  ...options
+});
+
+/**
+ * Start Stripe Checkout for a plan price (owner only)
+ */
+export const createCheckoutSession = <ThrowOnError extends boolean = false>(options: Options<CreateCheckoutSessionData, ThrowOnError>): RequestResult<CreateCheckoutSessionResponses, CreateCheckoutSessionErrors, ThrowOnError> => (options.client ?? client).post<CreateCheckoutSessionResponses, CreateCheckoutSessionErrors, ThrowOnError>({
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/workspaces/{workspaceId}/checkout-session',
+  ...options,
+  headers: {
+    'Content-Type': 'application/json',
+    ...options.headers
+  }
+});
+
+/**
+ * Open Stripe Customer Portal (owner only)
+ */
+export const createPortalSession = <ThrowOnError extends boolean = false>(options: Options<CreatePortalSessionData, ThrowOnError>): RequestResult<CreatePortalSessionResponses, CreatePortalSessionErrors, ThrowOnError> => (options.client ?? client).post<CreatePortalSessionResponses, CreatePortalSessionErrors, ThrowOnError>({
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/workspaces/{workspaceId}/portal-session',
+  ...options
+});
+
+/**
+ * Preview the refund of cancelling now (owner only)
+ */
+export const previewCancelNow = <ThrowOnError extends boolean = false>(options: Options<PreviewCancelNowData, ThrowOnError>): RequestResult<PreviewCancelNowResponses, PreviewCancelNowErrors, ThrowOnError> => (options.client ?? client).get<PreviewCancelNowResponses, PreviewCancelNowErrors, ThrowOnError>({
+  responseTransformer: previewCancelNowResponseTransformer,
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/workspaces/{workspaceId}/subscription/cancel-now/preview',
+  ...options
+});
+
+/**
+ * Cancel the subscription now with a prorated refund (owner only)
+ */
+export const cancelNow = <ThrowOnError extends boolean = false>(options: Options<CancelNowData, ThrowOnError>): RequestResult<CancelNowResponses, CancelNowErrors, ThrowOnError> => (options.client ?? client).post<CancelNowResponses, CancelNowErrors, ThrowOnError>({
+  responseTransformer: cancelNowResponseTransformer,
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/workspaces/{workspaceId}/subscription/cancel-now',
+  ...options
+});
+
+/**
+ * Become the payer by completing a setup Checkout (owner only)
+ */
+export const claimPayer = <ThrowOnError extends boolean = false>(options: Options<ClaimPayerData, ThrowOnError>): RequestResult<ClaimPayerResponses, ClaimPayerErrors, ThrowOnError> => (options.client ?? client).post<ClaimPayerResponses, ClaimPayerErrors, ThrowOnError>({
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/workspaces/{workspaceId}/payer/claim',
+  ...options
+});
+
+/**
+ * List plans (admin)
+ */
+export const adminListPlans = <ThrowOnError extends boolean = false>(options?: Options<AdminListPlansData, ThrowOnError>): RequestResult<AdminListPlansResponses, AdminListPlansErrors, ThrowOnError> => (options?.client ?? client).get<AdminListPlansResponses, AdminListPlansErrors, ThrowOnError>({
+  responseTransformer: adminListPlansResponseTransformer,
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/admin/plans',
+  ...options
+});
+
+/**
+ * Update plan features and limits (admin)
+ */
+export const adminUpdatePlan = <ThrowOnError extends boolean = false>(options: Options<AdminUpdatePlanData, ThrowOnError>): RequestResult<AdminUpdatePlanResponses, AdminUpdatePlanErrors, ThrowOnError> => (options.client ?? client).patch<AdminUpdatePlanResponses, AdminUpdatePlanErrors, ThrowOnError>({
+  responseTransformer: adminUpdatePlanResponseTransformer,
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/admin/plans/{tier}',
+  ...options,
+  headers: {
+    'Content-Type': 'application/json',
+    ...options.headers
+  }
+});
+
+/**
+ * Get billing policy (admin)
+ */
+export const adminGetPolicy = <ThrowOnError extends boolean = false>(options?: Options<AdminGetPolicyData, ThrowOnError>): RequestResult<AdminGetPolicyResponses, AdminGetPolicyErrors, ThrowOnError> => (options?.client ?? client).get<AdminGetPolicyResponses, AdminGetPolicyErrors, ThrowOnError>({
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/admin/policy',
+  ...options
+});
+
+/**
+ * Update billing policy (admin)
+ */
+export const adminUpdatePolicy = <ThrowOnError extends boolean = false>(options: Options<AdminUpdatePolicyData, ThrowOnError>): RequestResult<AdminUpdatePolicyResponses, AdminUpdatePolicyErrors, ThrowOnError> => (options.client ?? client).patch<AdminUpdatePolicyResponses, AdminUpdatePolicyErrors, ThrowOnError>({
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/admin/policy',
+  ...options,
+  headers: {
+    'Content-Type': 'application/json',
+    ...options.headers
+  }
+});
+
+/**
+ * List all prices including archived (admin)
+ */
+export const adminListPrices = <ThrowOnError extends boolean = false>(options?: Options<AdminListPricesData, ThrowOnError>): RequestResult<AdminListPricesResponses, AdminListPricesErrors, ThrowOnError> => (options?.client ?? client).get<AdminListPricesResponses, AdminListPricesErrors, ThrowOnError>({
+  responseTransformer: adminListPricesResponseTransformer,
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/admin/prices',
+  ...options
+});
+
+/**
+ * Create a price, replacing the active one for the same plan and interval (admin)
+ */
+export const adminCreatePrice = <ThrowOnError extends boolean = false>(options: Options<AdminCreatePriceData, ThrowOnError>): RequestResult<AdminCreatePriceResponses, AdminCreatePriceErrors, ThrowOnError> => (options.client ?? client).post<AdminCreatePriceResponses, AdminCreatePriceErrors, ThrowOnError>({
+  responseTransformer: adminCreatePriceResponseTransformer,
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/admin/prices',
+  ...options,
+  headers: {
+    'Content-Type': 'application/json',
+    ...options.headers
+  }
+});
+
+/**
+ * Archive a price (admin)
+ */
+export const adminArchivePrice = <ThrowOnError extends boolean = false>(options: Options<AdminArchivePriceData, ThrowOnError>): RequestResult<AdminArchivePriceResponses, AdminArchivePriceErrors, ThrowOnError> => (options.client ?? client).post<AdminArchivePriceResponses, AdminArchivePriceErrors, ThrowOnError>({
+  responseTransformer: adminArchivePriceResponseTransformer,
+  security: [{
+      key: 'billing_Oauth2',
+      scheme: 'bearer',
+      type: 'http'
+    }, {
+      key: 'billing_OIDC',
+      scheme: 'bearer',
+      type: 'http'
+    }],
+  url: '/billing/admin/prices/{priceId}/archive',
+  ...options
+});
+
+/**
+ * Stripe webhook endpoint (signature verified against the raw body)
+ */
+export const stripeWebhook = <ThrowOnError extends boolean = false>(options: Options<StripeWebhookData, ThrowOnError>): RequestResult<StripeWebhookResponses, StripeWebhookErrors, ThrowOnError> => (options.client ?? client).post<StripeWebhookResponses, StripeWebhookErrors, ThrowOnError>({
+  url: '/billing/webhooks/stripe',
+  ...options,
+  headers: {
+    'Content-Type': 'application/json',
+    ...options.headers
+  }
 });

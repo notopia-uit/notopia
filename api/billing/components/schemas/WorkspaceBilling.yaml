@@ -1,0 +1,13 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  subscription:
+    type: object
+    allOf:
+      - $ref: ./Subscription.yaml
+    nullable: true
+  payer:
+    type: object
+    allOf:
+      - $ref: ./Payer.yaml
+    nullable: true

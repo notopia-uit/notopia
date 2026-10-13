@@ -1,0 +1,18 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  plan:
+    type: string
+    enum: [plus, pro]
+    example: plus
+  interval:
+    $ref: ./BillingInterval.yaml
+  amount:
+    type: integer
+    format: int64
+    minimum: 1
+    example: 49000
+  currency:
+    type: string
+    example: vnd
+required: [plan, interval, amount, currency]

@@ -1,0 +1,66 @@
+## yaml-language-server: $schema=https://www.schemastore.org/openapi-3.X.json
+# vim: ft=yaml.openapi
+openapi: 3.0.4
+
+servers:
+  - url: http://api.notopia.localhost
+
+info:
+  description: >
+    Notopia Billing API - plans, subscriptions (Stripe) and workspace entitlements.
+  version: 0.0.0
+  title: Notopia API
+  license:
+    name: MIT
+    url: https://github.com/notopia-uit/notopia/blob/main/LICENSE
+  x-apiName: billing
+
+tags:
+  - name: Plan
+    description: Public plan catalog
+  - name: WorkspaceBilling
+    description: Subscription, entitlements and payer of a workspace
+  - name: BillingAdmin
+    description: Admin-only catalog management (group notopia-admins)
+  - name: Webhook
+    description: Payment provider webhooks
+
+paths:
+  /billing/plans:
+    $ref: ./paths/plans.yaml
+  /billing/workspaces/{workspaceId}/entitlements:
+    $ref: ./paths/workspaces_{workspaceId}_entitlements.yaml
+  /billing/workspaces/{workspaceId}/subscription:
+    $ref: ./paths/workspaces_{workspaceId}_subscription.yaml
+  /billing/workspaces/{workspaceId}/checkout-session:
+    $ref: ./paths/workspaces_{workspaceId}_checkout-session.yaml
+  /billing/workspaces/{workspaceId}/portal-session:
+    $ref: ./paths/workspaces_{workspaceId}_portal-session.yaml
+  /billing/workspaces/{workspaceId}/subscription/cancel-now/preview:
+    $ref: ./paths/workspaces_{workspaceId}_subscription_cancel-now_preview.yaml
+  /billing/workspaces/{workspaceId}/subscription/cancel-now:
+    $ref: ./paths/workspaces_{workspaceId}_subscription_cancel-now.yaml
+  /billing/workspaces/{workspaceId}/payer/claim:
+    $ref: ./paths/workspaces_{workspaceId}_payer_claim.yaml
+  /billing/admin/plans:
+    $ref: ./paths/admin_plans.yaml
+  /billing/admin/plans/{tier}:
+    $ref: ./paths/admin_plans_{tier}.yaml
+  /billing/admin/policy:
+    $ref: ./paths/admin_policy.yaml
+  /billing/admin/prices:
+    $ref: ./paths/admin_prices.yaml
+  /billing/admin/prices/{priceId}/archive:
+    $ref: ./paths/admin_prices_{priceId}_archive.yaml
+  /billing/webhooks/stripe:
+    $ref: ./paths/webhooks_stripe.yaml
+
+components:
+  securitySchemes:
+    OIDC:
+      $ref: ../common/components/securitySchemes/OIDC.yaml
+    Oauth2:
+      $ref: ../common/components/securitySchemes/Oauth2.yaml
+
+externalDocs:
+  url: https://notopia-uit.github.io/notopia

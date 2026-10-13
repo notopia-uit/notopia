@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, useMutation, type UseMutationOptions, useQuery } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { changeWorkspaceSlug, checkWorkspaceSlugExists, commitDocument, createFolder, createNote, createWorkspace, deleteRevision, deleteWorkspace, emptyTrash, getDocumentAttachmentUploadUrl, getMyWorkspaces, getNote, getNoteGraph, getNoteLinks, getRevisions, getRevisionWithContent, getWorkspace, getWorkspaceGraph, getWorkspaceMembers, getWorkspaceSearchToken, getWorkspaceTree, leaveWorkspace, moveWorkspaceItems, type Options, permanentlyDeleteFolder, permanentlyDeleteNote, permanentlyDeleteWorkspaceItems, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchUsers, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceMembers } from '../sdk.gen';
-import type { ChangeWorkspaceSlugData, ChangeWorkspaceSlugError, ChangeWorkspaceSlugResponse, CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsError, CommitDocumentData, CommitDocumentError, CommitDocumentResponse, CreateFolderData, CreateFolderError, CreateFolderResponse, CreateNoteData, CreateNoteError, CreateNoteResponse, CreateWorkspaceData, CreateWorkspaceError, CreateWorkspaceResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, EmptyTrashData, EmptyTrashError, EmptyTrashResponse, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetMyWorkspacesData, GetMyWorkspacesError, GetMyWorkspacesResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetRevisionWithContentData, GetRevisionWithContentError, GetRevisionWithContentResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceSearchTokenData, GetWorkspaceSearchTokenError, GetWorkspaceSearchTokenResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, LeaveWorkspaceData, LeaveWorkspaceError, LeaveWorkspaceResponse, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PermanentlyDeleteFolderData, PermanentlyDeleteFolderError, PermanentlyDeleteFolderResponse, PermanentlyDeleteNoteData, PermanentlyDeleteNoteError, PermanentlyDeleteNoteResponse, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsError, PermanentlyDeleteWorkspaceItemsResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchUsersData, SearchUsersError, SearchUsersResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse } from '../types.gen';
+import { adminArchivePrice, adminCreatePrice, adminGetPolicy, adminListPlans, adminListPrices, adminUpdatePlan, adminUpdatePolicy, cancelNow, changeWorkspaceSlug, checkWorkspaceSlugExists, claimPayer, commitDocument, createCheckoutSession, createFolder, createNote, createPortalSession, createWorkspace, deleteRevision, deleteWorkspace, emptyTrash, getDocumentAttachmentUploadUrl, getMyWorkspaces, getNote, getNoteGraph, getNoteLinks, getRevisions, getRevisionWithContent, getWorkspace, getWorkspaceBilling, getWorkspaceEntitlements, getWorkspaceGraph, getWorkspaceMembers, getWorkspaceSearchToken, getWorkspaceTree, leaveWorkspace, listPlans, moveWorkspaceItems, type Options, permanentlyDeleteFolder, permanentlyDeleteNote, permanentlyDeleteWorkspaceItems, previewCancelNow, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchUsers, showTrash, stripeWebhook, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceMembers } from '../sdk.gen';
+import type { AdminArchivePriceData, AdminArchivePriceError, AdminArchivePriceResponse, AdminCreatePriceData, AdminCreatePriceError, AdminCreatePriceResponse, AdminGetPolicyData, AdminGetPolicyError, AdminGetPolicyResponse, AdminListPlansData, AdminListPlansError, AdminListPlansResponse, AdminListPricesData, AdminListPricesError, AdminListPricesResponse, AdminUpdatePlanData, AdminUpdatePlanError, AdminUpdatePlanResponse, AdminUpdatePolicyData, AdminUpdatePolicyError, AdminUpdatePolicyResponse, CancelNowData, CancelNowError, CancelNowResponse, ChangeWorkspaceSlugData, ChangeWorkspaceSlugError, ChangeWorkspaceSlugResponse, CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsError, ClaimPayerData, ClaimPayerError, ClaimPayerResponse, CommitDocumentData, CommitDocumentError, CommitDocumentResponse, CreateCheckoutSessionData, CreateCheckoutSessionError, CreateCheckoutSessionResponse, CreateFolderData, CreateFolderError, CreateFolderResponse, CreateNoteData, CreateNoteError, CreateNoteResponse, CreatePortalSessionData, CreatePortalSessionError, CreatePortalSessionResponse, CreateWorkspaceData, CreateWorkspaceError, CreateWorkspaceResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, EmptyTrashData, EmptyTrashError, EmptyTrashResponse, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetMyWorkspacesData, GetMyWorkspacesError, GetMyWorkspacesResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetRevisionWithContentData, GetRevisionWithContentError, GetRevisionWithContentResponse, GetWorkspaceBillingData, GetWorkspaceBillingError, GetWorkspaceBillingResponse, GetWorkspaceData, GetWorkspaceEntitlementsData, GetWorkspaceEntitlementsError, GetWorkspaceEntitlementsResponse, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceSearchTokenData, GetWorkspaceSearchTokenError, GetWorkspaceSearchTokenResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, LeaveWorkspaceData, LeaveWorkspaceError, LeaveWorkspaceResponse, ListPlansData, ListPlansError, ListPlansResponse, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PermanentlyDeleteFolderData, PermanentlyDeleteFolderError, PermanentlyDeleteFolderResponse, PermanentlyDeleteNoteData, PermanentlyDeleteNoteError, PermanentlyDeleteNoteResponse, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsError, PermanentlyDeleteWorkspaceItemsResponse, PreviewCancelNowData, PreviewCancelNowError, PreviewCancelNowResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchUsersData, SearchUsersError, SearchUsersResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, StripeWebhookData, StripeWebhookError, StripeWebhookResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
   Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -974,3 +974,362 @@ export const searchUsersOptions = (options: Options<SearchUsersData>) => queryOp
  * Search users
  */
 export const useSearchUsersQuery = (options: Options<SearchUsersData>) => useQuery(searchUsersOptions(options));
+
+export const listPlansQueryKey = (options?: Options<ListPlansData>) => createQueryKey('listPlans', options);
+
+/**
+ * List plans with features, limits and active prices
+ */
+export const listPlansOptions = (options?: Options<ListPlansData>) => queryOptions<ListPlansResponse, ListPlansError, ListPlansResponse, ReturnType<typeof listPlansQueryKey>>({
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await listPlans({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: listPlansQueryKey(options)
+});
+
+/**
+ * List plans with features, limits and active prices
+ */
+export const useListPlansQuery = (options?: Options<ListPlansData>) => useQuery(listPlansOptions(options));
+
+export const getWorkspaceEntitlementsQueryKey = (options: Options<GetWorkspaceEntitlementsData>) => createQueryKey('getWorkspaceEntitlements', options);
+
+/**
+ * Get workspace entitlements (member)
+ */
+export const getWorkspaceEntitlementsOptions = (options: Options<GetWorkspaceEntitlementsData>) => queryOptions<GetWorkspaceEntitlementsResponse, GetWorkspaceEntitlementsError, GetWorkspaceEntitlementsResponse, ReturnType<typeof getWorkspaceEntitlementsQueryKey>>({
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getWorkspaceEntitlements({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getWorkspaceEntitlementsQueryKey(options)
+});
+
+/**
+ * Get workspace entitlements (member)
+ */
+export const useGetWorkspaceEntitlementsQuery = (options: Options<GetWorkspaceEntitlementsData>) => useQuery(getWorkspaceEntitlementsOptions(options));
+
+export const getWorkspaceBillingQueryKey = (options: Options<GetWorkspaceBillingData>) => createQueryKey('getWorkspaceBilling', options);
+
+/**
+ * Get workspace subscription, payer and refunds (owner only)
+ */
+export const getWorkspaceBillingOptions = (options: Options<GetWorkspaceBillingData>) => queryOptions<GetWorkspaceBillingResponse, GetWorkspaceBillingError, GetWorkspaceBillingResponse, ReturnType<typeof getWorkspaceBillingQueryKey>>({
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await getWorkspaceBilling({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: getWorkspaceBillingQueryKey(options)
+});
+
+/**
+ * Get workspace subscription, payer and refunds (owner only)
+ */
+export const useGetWorkspaceBillingQuery = (options: Options<GetWorkspaceBillingData>) => useQuery(getWorkspaceBillingOptions(options));
+
+/**
+ * Start Stripe Checkout for a plan price (owner only)
+ */
+export const createCheckoutSessionMutation = (options?: Partial<Options<CreateCheckoutSessionData>>): UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> => {
+  const mutationOptions: UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createCheckoutSession({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
+};
+
+/**
+ * Start Stripe Checkout for a plan price (owner only)
+ */
+export const useCreateCheckoutSessionMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>>, 'mutationFn'>>) => useMutation({ ...createCheckoutSessionMutation(), ...mutationOptions });
+
+/**
+ * Open Stripe Customer Portal (owner only)
+ */
+export const createPortalSessionMutation = (options?: Partial<Options<CreatePortalSessionData>>): UseMutationOptions<CreatePortalSessionResponse, CreatePortalSessionError, Options<CreatePortalSessionData>> => {
+  const mutationOptions: UseMutationOptions<CreatePortalSessionResponse, CreatePortalSessionError, Options<CreatePortalSessionData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await createPortalSession({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
+};
+
+/**
+ * Open Stripe Customer Portal (owner only)
+ */
+export const useCreatePortalSessionMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CreatePortalSessionResponse, CreatePortalSessionError, Options<CreatePortalSessionData>>, 'mutationFn'>>) => useMutation({ ...createPortalSessionMutation(), ...mutationOptions });
+
+export const previewCancelNowQueryKey = (options: Options<PreviewCancelNowData>) => createQueryKey('previewCancelNow', options);
+
+/**
+ * Preview the refund of cancelling now (owner only)
+ */
+export const previewCancelNowOptions = (options: Options<PreviewCancelNowData>) => queryOptions<PreviewCancelNowResponse, PreviewCancelNowError, PreviewCancelNowResponse, ReturnType<typeof previewCancelNowQueryKey>>({
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await previewCancelNow({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: previewCancelNowQueryKey(options)
+});
+
+/**
+ * Preview the refund of cancelling now (owner only)
+ */
+export const usePreviewCancelNowQuery = (options: Options<PreviewCancelNowData>) => useQuery(previewCancelNowOptions(options));
+
+/**
+ * Cancel the subscription now with a prorated refund (owner only)
+ */
+export const cancelNowMutation = (options?: Partial<Options<CancelNowData>>): UseMutationOptions<CancelNowResponse, CancelNowError, Options<CancelNowData>> => {
+  const mutationOptions: UseMutationOptions<CancelNowResponse, CancelNowError, Options<CancelNowData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await cancelNow({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
+};
+
+/**
+ * Cancel the subscription now with a prorated refund (owner only)
+ */
+export const useCancelNowMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CancelNowResponse, CancelNowError, Options<CancelNowData>>, 'mutationFn'>>) => useMutation({ ...cancelNowMutation(), ...mutationOptions });
+
+/**
+ * Become the payer by completing a setup Checkout (owner only)
+ */
+export const claimPayerMutation = (options?: Partial<Options<ClaimPayerData>>): UseMutationOptions<ClaimPayerResponse, ClaimPayerError, Options<ClaimPayerData>> => {
+  const mutationOptions: UseMutationOptions<ClaimPayerResponse, ClaimPayerError, Options<ClaimPayerData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await claimPayer({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
+};
+
+/**
+ * Become the payer by completing a setup Checkout (owner only)
+ */
+export const useClaimPayerMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<ClaimPayerResponse, ClaimPayerError, Options<ClaimPayerData>>, 'mutationFn'>>) => useMutation({ ...claimPayerMutation(), ...mutationOptions });
+
+export const adminListPlansQueryKey = (options?: Options<AdminListPlansData>) => createQueryKey('adminListPlans', options);
+
+/**
+ * List plans (admin)
+ */
+export const adminListPlansOptions = (options?: Options<AdminListPlansData>) => queryOptions<AdminListPlansResponse, AdminListPlansError, AdminListPlansResponse, ReturnType<typeof adminListPlansQueryKey>>({
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await adminListPlans({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: adminListPlansQueryKey(options)
+});
+
+/**
+ * List plans (admin)
+ */
+export const useAdminListPlansQuery = (options?: Options<AdminListPlansData>) => useQuery(adminListPlansOptions(options));
+
+/**
+ * Update plan features and limits (admin)
+ */
+export const adminUpdatePlanMutation = (options?: Partial<Options<AdminUpdatePlanData>>): UseMutationOptions<AdminUpdatePlanResponse, AdminUpdatePlanError, Options<AdminUpdatePlanData>> => {
+  const mutationOptions: UseMutationOptions<AdminUpdatePlanResponse, AdminUpdatePlanError, Options<AdminUpdatePlanData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminUpdatePlan({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update plan features and limits (admin)
+ */
+export const useAdminUpdatePlanMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminUpdatePlanResponse, AdminUpdatePlanError, Options<AdminUpdatePlanData>>, 'mutationFn'>>) => useMutation({ ...adminUpdatePlanMutation(), ...mutationOptions });
+
+export const adminGetPolicyQueryKey = (options?: Options<AdminGetPolicyData>) => createQueryKey('adminGetPolicy', options);
+
+/**
+ * Get billing policy (admin)
+ */
+export const adminGetPolicyOptions = (options?: Options<AdminGetPolicyData>) => queryOptions<AdminGetPolicyResponse, AdminGetPolicyError, AdminGetPolicyResponse, ReturnType<typeof adminGetPolicyQueryKey>>({
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await adminGetPolicy({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: adminGetPolicyQueryKey(options)
+});
+
+/**
+ * Get billing policy (admin)
+ */
+export const useAdminGetPolicyQuery = (options?: Options<AdminGetPolicyData>) => useQuery(adminGetPolicyOptions(options));
+
+/**
+ * Update billing policy (admin)
+ */
+export const adminUpdatePolicyMutation = (options?: Partial<Options<AdminUpdatePolicyData>>): UseMutationOptions<AdminUpdatePolicyResponse, AdminUpdatePolicyError, Options<AdminUpdatePolicyData>> => {
+  const mutationOptions: UseMutationOptions<AdminUpdatePolicyResponse, AdminUpdatePolicyError, Options<AdminUpdatePolicyData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminUpdatePolicy({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
+};
+
+/**
+ * Update billing policy (admin)
+ */
+export const useAdminUpdatePolicyMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminUpdatePolicyResponse, AdminUpdatePolicyError, Options<AdminUpdatePolicyData>>, 'mutationFn'>>) => useMutation({ ...adminUpdatePolicyMutation(), ...mutationOptions });
+
+export const adminListPricesQueryKey = (options?: Options<AdminListPricesData>) => createQueryKey('adminListPrices', options);
+
+/**
+ * List all prices including archived (admin)
+ */
+export const adminListPricesOptions = (options?: Options<AdminListPricesData>) => queryOptions<AdminListPricesResponse, AdminListPricesError, AdminListPricesResponse, ReturnType<typeof adminListPricesQueryKey>>({
+  queryFn: async ({ queryKey, signal }) => {
+    const { data } = await adminListPrices({
+      ...options,
+      ...queryKey[0],
+      signal,
+      throwOnError: true
+    });
+    return data;
+  },
+  queryKey: adminListPricesQueryKey(options)
+});
+
+/**
+ * List all prices including archived (admin)
+ */
+export const useAdminListPricesQuery = (options?: Options<AdminListPricesData>) => useQuery(adminListPricesOptions(options));
+
+/**
+ * Create a price, replacing the active one for the same plan and interval (admin)
+ */
+export const adminCreatePriceMutation = (options?: Partial<Options<AdminCreatePriceData>>): UseMutationOptions<AdminCreatePriceResponse, AdminCreatePriceError, Options<AdminCreatePriceData>> => {
+  const mutationOptions: UseMutationOptions<AdminCreatePriceResponse, AdminCreatePriceError, Options<AdminCreatePriceData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminCreatePrice({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
+};
+
+/**
+ * Create a price, replacing the active one for the same plan and interval (admin)
+ */
+export const useAdminCreatePriceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminCreatePriceResponse, AdminCreatePriceError, Options<AdminCreatePriceData>>, 'mutationFn'>>) => useMutation({ ...adminCreatePriceMutation(), ...mutationOptions });
+
+/**
+ * Archive a price (admin)
+ */
+export const adminArchivePriceMutation = (options?: Partial<Options<AdminArchivePriceData>>): UseMutationOptions<AdminArchivePriceResponse, AdminArchivePriceError, Options<AdminArchivePriceData>> => {
+  const mutationOptions: UseMutationOptions<AdminArchivePriceResponse, AdminArchivePriceError, Options<AdminArchivePriceData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await adminArchivePrice({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
+};
+
+/**
+ * Archive a price (admin)
+ */
+export const useAdminArchivePriceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminArchivePriceResponse, AdminArchivePriceError, Options<AdminArchivePriceData>>, 'mutationFn'>>) => useMutation({ ...adminArchivePriceMutation(), ...mutationOptions });
+
+/**
+ * Stripe webhook endpoint (signature verified against the raw body)
+ */
+export const stripeWebhookMutation = (options?: Partial<Options<StripeWebhookData>>): UseMutationOptions<StripeWebhookResponse, StripeWebhookError, Options<StripeWebhookData>> => {
+  const mutationOptions: UseMutationOptions<StripeWebhookResponse, StripeWebhookError, Options<StripeWebhookData>> = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await stripeWebhook({
+        ...options,
+        ...fnOptions,
+        throwOnError: true
+      });
+      return data;
+    }
+  };
+  return mutationOptions;
+};
+
+/**
+ * Stripe webhook endpoint (signature verified against the raw body)
+ */
+export const useStripeWebhookMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<StripeWebhookResponse, StripeWebhookError, Options<StripeWebhookData>>, 'mutationFn'>>) => useMutation({ ...stripeWebhookMutation(), ...mutationOptions });

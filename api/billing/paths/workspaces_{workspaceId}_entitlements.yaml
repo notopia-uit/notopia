@@ -1,0 +1,28 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - WorkspaceBilling
+  summary: Get workspace entitlements (member)
+  operationId: getWorkspaceEntitlements
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  responses:
+    200:
+      description: Entitlements of the workspace
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Entitlements.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pkg/api/billing",
+  "projectType": "library",
+  "targets": {
+    "gen": {
+      "dependsOn": [{ "projects": ["api/billing"], "target": "gen:go" }]
+    }
+  }
+}
