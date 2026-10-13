@@ -149,7 +149,12 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 
 ## Limitation
 
+### Our
+
+### Third-party
+
 - Blocknote collaboration does not support undo ("Ctrl Z")
+- No integration test for Meilisearch JS <https://testcontainers.com/modules/meilisearch/>
 
 ---
 
