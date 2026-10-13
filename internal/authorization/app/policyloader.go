@@ -9,7 +9,8 @@ import (
 
 // LoadPoliciesFromString loads policies from a CSV string into a Casbin enforcer.
 // It uses a temporary string adapter to parse the CSV correctly (handles g, g2, g3 rules)
-// and then copies all policies to the target enforcer.
+// and then copies all policies to the target enforcer, skipping rules that already exist
+// while still adding the missing ones.
 func LoadPoliciesFromString(enforcer *casbin.TransactionalEnforcer, csv string) error {
 	// Use string adapter to parse the CSV correctly (handles g2 rules properly)
 	tempAdapter := stringadapter.NewAdapter(csv)
@@ -25,7 +26,7 @@ func LoadPoliciesFromString(enforcer *casbin.TransactionalEnforcer, csv string) 
 		return fmt.Errorf("failed to get policies from temp enforcer: %w", err)
 	}
 	if len(policies) > 0 {
-		if _, err := enforcer.AddPolicies(policies); err != nil {
+		if _, err := enforcer.AddPoliciesEx(policies); err != nil {
 			return fmt.Errorf("failed to add policies: %w", err)
 		}
 	}
@@ -36,7 +37,7 @@ func LoadPoliciesFromString(enforcer *casbin.TransactionalEnforcer, csv string) 
 		return fmt.Errorf("failed to get grouping policies from temp enforcer: %w", err)
 	}
 	if len(gPolicies) > 0 {
-		if _, err := enforcer.AddGroupingPolicies(gPolicies); err != nil {
+		if _, err := enforcer.AddGroupingPoliciesEx(gPolicies); err != nil {
 			return fmt.Errorf("failed to add grouping policies: %w", err)
 		}
 	}
@@ -47,7 +48,7 @@ func LoadPoliciesFromString(enforcer *casbin.TransactionalEnforcer, csv string) 
 		return fmt.Errorf("failed to get g2 policies from temp enforcer: %w", err)
 	}
 	if len(g2Policies) > 0 {
-		if _, err := enforcer.AddNamedGroupingPolicies("g2", g2Policies); err != nil {
+		if _, err := enforcer.AddNamedGroupingPoliciesEx("g2", g2Policies); err != nil {
 			return fmt.Errorf("failed to add g2 policies: %w", err)
 		}
 	}
@@ -61,7 +62,7 @@ func LoadPoliciesFromString(enforcer *casbin.TransactionalEnforcer, csv string) 
 			return fmt.Errorf("failed to get g3 policies from temp enforcer: %w", err)
 		}
 		if len(g3Policies) > 0 {
-			if _, err := enforcer.AddNamedGroupingPolicies("g3", g3Policies); err != nil {
+			if _, err := enforcer.AddNamedGroupingPoliciesEx("g3", g3Policies); err != nil {
 				return fmt.Errorf("failed to add g3 policies: %w", err)
 			}
 		}
