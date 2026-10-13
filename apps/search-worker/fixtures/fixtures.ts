@@ -40,7 +40,7 @@ async function run() {
 export { run as FixturesMeilisearch };
 
 if (require.main === module) {
-  import('./config')
+  import('../seed/seed')
     .then(({ ConfigMeilisearch }) => {
       return ConfigMeilisearch();
     })
