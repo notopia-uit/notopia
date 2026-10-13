@@ -68,5 +68,8 @@ prepare-fixtures-search:
 fixtures-billing:
     nx run billingfixtures:run
 
+# Events must match the switch in internal/billing/controller/http/webhook.go
 stripe-listen:
-    stripe listen --forward-to http://api.notopia.localhost/billing/webhooks/stripe
+    stripe listen \
+      --events checkout.session.completed,customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,invoice.paid,invoice.payment_failed,refund.created,refund.updated,refund.failed \
+      --forward-to http://api.notopia.localhost/billing/webhooks/stripe
