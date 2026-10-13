@@ -20,6 +20,7 @@ var ProvideHandlerProvider = NewHandlerProvider
 
 type Cmds struct {
 	ArchivePrice              ArchivePriceCmd
+	CancelNow                 CancelNowCmd
 	CompleteCheckout          CompleteCheckoutCmd
 	CreatePrice               CreatePriceCmd
 	EnsureDefaults            EnsureDefaultsCmd
@@ -33,6 +34,7 @@ type Cmds struct {
 func NewCmds(
 	handlerProvider *HandlerProvider,
 	archivePriceHandler *ArchivePriceHandler,
+	cancelNowHandler *CancelNowHandler,
 	completeCheckoutHandler *CompleteCheckoutHandler,
 	createPriceHandler *CreatePriceHandler,
 	ensureDefaultsHandler *EnsureDefaultsHandler,
@@ -45,6 +47,7 @@ func NewCmds(
 	hp := (*commonhandler.HandlerProvider)(handlerProvider)
 	return &Cmds{
 		ArchivePrice:              commonhandler.DecorateCmd(hp, archivePriceHandler),
+		CancelNow:                 commonhandler.DecorateCmd(hp, cancelNowHandler),
 		CompleteCheckout:          commonhandler.DecorateCmd(hp, completeCheckoutHandler),
 		CreatePrice:               commonhandler.DecorateCmd(hp, createPriceHandler),
 		EnsureDefaults:            commonhandler.DecorateCmd(hp, ensureDefaultsHandler),
@@ -68,6 +71,7 @@ type Queries struct {
 	GetWorkspacePayer    GetWorkspacePayerQuery
 	ListPlans            ListPlansQuery
 	ListPrices           ListPricesQuery
+	PreviewCancelNow     PreviewCancelNowQuery
 	StartCheckout        StartCheckoutQuery
 	StartPortal          StartPortalQuery
 }
@@ -83,6 +87,7 @@ func NewQueries(
 	getWorkspacePayerHandler *GetWorkspacePayerHandler,
 	listPlansHandler *ListPlansHandler,
 	listPricesHandler *ListPricesHandler,
+	previewCancelNowHandler *PreviewCancelNowHandler,
 	startCheckoutHandler *StartCheckoutHandler,
 	startPortalHandler *StartPortalHandler,
 ) *Queries {
@@ -97,6 +102,7 @@ func NewQueries(
 		GetWorkspacePayer:    commonhandler.DecorateQuery(hp, getWorkspacePayerHandler),
 		ListPlans:            commonhandler.DecorateQuery(hp, listPlansHandler),
 		ListPrices:           commonhandler.DecorateQuery(hp, listPricesHandler),
+		PreviewCancelNow:     commonhandler.DecorateQuery(hp, previewCancelNowHandler),
 		StartCheckout:        commonhandler.DecorateQuery(hp, startCheckoutHandler),
 		StartPortal:          commonhandler.DecorateQuery(hp, startPortalHandler),
 	}

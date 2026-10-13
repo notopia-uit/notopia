@@ -83,10 +83,9 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	identity := &configConfig.Identity
 	settings := billing.NewAppSettings(configBilling, identity)
 	archivePriceHandler := app.NewArchivePriceHandler(unitOfWork, provider, settings)
-	kafka := &configConfig.Kafka
-	loggerAdapter := logging.NewWatermill(logger)
-	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	notifierKafka, cleanup5, err := notifier.NewKafka(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
+	services := &configConfig.Services
+	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
+	authorization, cleanup5, err := service.NewAuthorization(services, loggingLogger, global)
 	if err != nil {
 		cleanup4()
 		cleanup3()
@@ -94,21 +93,10 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	refundRunner := app.NewRefundRunner(unitOfWork, provider, settings)
-	completeCheckoutHandler := app.NewCompleteCheckoutHandler(unitOfWork, provider, notifierKafka, settings, refundRunner)
-	createPriceHandler := app.NewCreatePriceHandler(unitOfWork, provider, settings)
-	ensureDefaultsHandler := app.NewEnsureDefaultsHandler(unitOfWork)
-	ensurePortalConfigurationHandler := app.NewEnsurePortalConfigurationHandler(unitOfWork, provider, settings)
-	syncRefundHandler := app.NewSyncRefundHandler(unitOfWork, provider, settings)
-	syncSubscriptionHandler := app.NewSyncSubscriptionHandler(unitOfWork, provider, notifierKafka, settings)
-	updatePlanHandler := app.NewUpdatePlanHandler(unitOfWork)
-	updatePolicyHandler := app.NewUpdatePolicyHandler(unitOfWork)
-	cmds := app.NewCmds(handlerProvider, archivePriceHandler, completeCheckoutHandler, createPriceHandler, ensureDefaultsHandler, ensurePortalConfigurationHandler, syncRefundHandler, syncSubscriptionHandler, updatePlanHandler, updatePolicyHandler)
-	billingReadModel := pgreadmodel.NewBillingReadModel(queries)
-	batchGetEntitlementsHandler := app.NewBatchGetEntitlementsHandler(billingReadModel)
-	services := &configConfig.Services
-	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
-	authorization, cleanup6, err := service.NewAuthorization(services, loggingLogger, global)
+	kafka := &configConfig.Kafka
+	loggerAdapter := logging.NewWatermill(logger)
+	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
+	notifierKafka, cleanup6, err := notifier.NewKafka(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
 	if err != nil {
 		cleanup5()
 		cleanup4()
@@ -117,6 +105,20 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
+	refundRunner := app.NewRefundRunner(unitOfWork, provider, settings)
+	canceller := app.NewCanceller(unitOfWork, provider, notifierKafka, refundRunner)
+	cancelNowHandler := app.NewCancelNowHandler(authorization, canceller)
+	completeCheckoutHandler := app.NewCompleteCheckoutHandler(unitOfWork, provider, notifierKafka, settings, refundRunner)
+	createPriceHandler := app.NewCreatePriceHandler(unitOfWork, provider, settings)
+	ensureDefaultsHandler := app.NewEnsureDefaultsHandler(unitOfWork)
+	ensurePortalConfigurationHandler := app.NewEnsurePortalConfigurationHandler(unitOfWork, provider, settings)
+	syncRefundHandler := app.NewSyncRefundHandler(unitOfWork, provider, settings)
+	syncSubscriptionHandler := app.NewSyncSubscriptionHandler(unitOfWork, provider, notifierKafka, settings)
+	updatePlanHandler := app.NewUpdatePlanHandler(unitOfWork)
+	updatePolicyHandler := app.NewUpdatePolicyHandler(unitOfWork)
+	cmds := app.NewCmds(handlerProvider, archivePriceHandler, cancelNowHandler, completeCheckoutHandler, createPriceHandler, ensureDefaultsHandler, ensurePortalConfigurationHandler, syncRefundHandler, syncSubscriptionHandler, updatePlanHandler, updatePolicyHandler)
+	billingReadModel := pgreadmodel.NewBillingReadModel(queries)
+	batchGetEntitlementsHandler := app.NewBatchGetEntitlementsHandler(billingReadModel)
 	getEntitlementsHandler := app.NewGetEntitlementsHandler(billingReadModel, authorization)
 	getPlanHandler := app.NewGetPlanHandler(billingReadModel)
 	getPolicyHandler := app.NewGetPolicyHandler(billingReadModel)
@@ -125,9 +127,10 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	getWorkspacePayerHandler := app.NewGetWorkspacePayerHandler(billingReadModel)
 	listPlansHandler := app.NewListPlansHandler(billingReadModel)
 	listPricesHandler := app.NewListPricesHandler(billingReadModel)
+	previewCancelNowHandler := app.NewPreviewCancelNowHandler(authorization, canceller)
 	startCheckoutHandler := app.NewStartCheckoutHandler(unitOfWork, authorization, provider, settings)
 	startPortalHandler := app.NewStartPortalHandler(unitOfWork, authorization, provider, settings)
-	appQueries := app.NewQueries(handlerProvider, batchGetEntitlementsHandler, getEntitlementsHandler, getPlanHandler, getPolicyHandler, getPriceHandler, getWorkspaceBillingHandler, getWorkspacePayerHandler, listPlansHandler, listPricesHandler, startCheckoutHandler, startPortalHandler)
+	appQueries := app.NewQueries(handlerProvider, batchGetEntitlementsHandler, getEntitlementsHandler, getPlanHandler, getPolicyHandler, getPriceHandler, getWorkspaceBillingHandler, getWorkspacePayerHandler, listPlansHandler, listPricesHandler, previewCancelNowHandler, startCheckoutHandler, startPortalHandler)
 	server := &app.Server{
 		Cmds:    cmds,
 		Queries: appQueries,
