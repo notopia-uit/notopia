@@ -37,8 +37,8 @@ func NewServer(
 		return nil, fmt.Errorf("failed to bootstrap policies: %w", err)
 	}
 	if generalCfg.AppEnv == commonconfig.AppEnvDevelopment {
-		if err := authApp.SeedDev(ctx); err != nil {
-			return nil, fmt.Errorf("failed to seed dev policies: %w", err)
+		if err := authApp.LoadFixtures(ctx); err != nil {
+			return nil, fmt.Errorf("failed to load dev fixture policies: %w", err)
 		}
 	}
 

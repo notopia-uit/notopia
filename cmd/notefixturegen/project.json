@@ -1,13 +1,13 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "notecreateseed",
+  "name": "notefixturegen",
   "projectType": "application",
   "tags": ["type:go"],
   "namedInputs": {
     "default": [
       "goFiles",
       "{workspaceRoot}/api/**/*.go",
-      "{workspaceRoot}/internal/notecreateseed/**/*.go"
+      "{workspaceRoot}/internal/notefixturegen/**/*.go"
     ]
   },
   "targets": {
@@ -15,7 +15,7 @@
       "executor": "nx:run-commands",
       "inputs": ["default"],
       "options": {
-        "command": "go run ./cmd/notecreateseed/...",
+        "command": "go run ./cmd/notefixturegen/...",
         "cwd": "{workspaceRoot}",
         "tty": true
       },
@@ -24,7 +24,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "golangci-lint run ./cmd/notecreateseed/... ./internal/notecreateseed/...",
+        "command": "golangci-lint run ./cmd/notefixturegen/... ./internal/notefixturegen/...",
         "cwd": "{workspaceRoot}"
       },
       "cache": false,

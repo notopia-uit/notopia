@@ -129,14 +129,14 @@ func (a *App) BootStrapPolicies(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) SeedDev(ctx context.Context) error {
-	slog.DebugContext(ctx, "SeedDev: seeding dev user workspace policies")
+func (a *App) LoadFixtures(ctx context.Context) error {
+	slog.DebugContext(ctx, "LoadFixtures: loading dev fixture policies")
 
-	if err := LoadPoliciesFromString(a.Enforcer, PolicyTestCSV); err != nil {
-		slog.ErrorContext(ctx, "SeedDev: failed to load test policies", slog.Any("error", err))
-		return fmt.Errorf("failed to seed dev policies: %w", err)
+	if err := LoadPoliciesFromString(a.Enforcer, PolicyFixturesCSV); err != nil {
+		slog.ErrorContext(ctx, "LoadFixtures: failed to load fixture policies", slog.Any("error", err))
+		return fmt.Errorf("failed to load dev fixture policies: %w", err)
 	}
 
-	slog.InfoContext(ctx, "SeedDev: dev user workspace policies seeded")
+	slog.InfoContext(ctx, "LoadFixtures: dev fixture policies loaded")
 	return nil
 }

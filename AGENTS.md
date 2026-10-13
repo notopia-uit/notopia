@@ -33,12 +33,12 @@ cmd/                            # Go services (entrypoint only: main.go + wire)
   note/                         # Note service (nx: note)
   authorization/                # Authorization service (nx: authorization)
   billing/                      # Billing service, Stripe (nx: billing)
-  notecreateseed/               # Seed data generator
+  notefixturegen/               # Dev fixture generator (fake notes from Obsidian vault)
 internal/                       # Internal Go packages (the actual service code)
   note/
   authorization/
   billing/
-  notecreateseed/
+  notefixturegen/
 pkg/                            # Go packages
   api                           # Code gen from oapi-codegen
   common                        # Including commonhttp, commonconfig, commonhandler
@@ -130,6 +130,15 @@ deliberately omits.
 - Run `nx lint {projectsName}` for golangcilint for those go projects (especially in `cmd/` dir)
 - Should run lint whenever changing code
 - Run `nx` directly, not need to via `pnpm exec nx`
+
+## Seed vs Fixtures
+
+- **seed**: mandatory data the app needs in every environment, prod included (reference data,
+  default plans, role→permission matrix). Must be idempotent. `just seed`
+- **fixtures**: fake data for local development only (demo workspaces, notes, memberships,
+  documents, search index content). `just fixtures` (runs seed first)
+- Per-service recipes: `just fixtures-note|fixtures-document|fixtures-search`. New services
+  follow the same naming: `seed` target for mandatory data, `fixtures` target for dev fake data
 
 ## General Rules
 

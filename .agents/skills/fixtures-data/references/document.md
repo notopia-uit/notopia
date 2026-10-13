@@ -1,12 +1,12 @@
-# Document service seed
+# Document service fixtures
 
 Purpose
-- Seed the document service with parsed BlockNote content and revisions derived
+- Load fixtures into the document service with parsed BlockNote content and revisions derived
   from the Obsidian vault.
 
 Source data
 - Obsidian vault: `submodule/trshpuppy-obsidian-notes/`
-- Intermediate markdown: `apps/document/database/seed-data/`
+- Intermediate markdown: `apps/document/database/fixture-data/`
 
 UUID mapping
 - Use deterministic UUIDs derived from vault-relative paths without `.md`.
@@ -30,5 +30,5 @@ Transform behavior
   nodes intact.
 
 Operational references
-- Transform tool and seeders live under `apps/document/database/`.
-- Seeding uses BlockNote server utilities and Yjs.
+- Transform tool and fixture seeders live under `apps/document/database/`.
+- Fixtures use BlockNote server utilities and Yjs.

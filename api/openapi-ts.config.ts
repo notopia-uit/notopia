@@ -17,7 +17,7 @@ export default defineConfig({
     'zod',
     {
       name: '@hey-api/sdk',
-      validator: false, // temp: because our seeded data bruh the id
+      validator: false, // temp: because our fixture data bruh the id
       transformer: true,
     },
     {

@@ -2,9 +2,9 @@
   "name": "@notopia-uit/search-worker",
   "private": true,
   "scripts": {
-    "config": "tsx ./seed/config.ts",
-    "seed": "tsx ./seed/seed.ts",
-    "seed:transform": "tsx ./seed/transform.ts"
+    "seed": "tsx ./seed/config.ts",
+    "fixtures": "tsx ./fixtures/fixtures.ts",
+    "fixtures:transform": "tsx ./fixtures/transform.ts"
   },
   "dependencies": {
     "@blocknote/core": "catalog:",

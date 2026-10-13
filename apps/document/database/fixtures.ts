@@ -6,8 +6,8 @@ import { ServerBlockNoteEditor } from '@blocknote/server-util';
 import { createSchema } from '@notopia-uit/lib-server/block-note';
 
 import datasource from './datasource';
-import DocumentSeeder from './seeds/documents';
-import RevisionSeeder from './seeds/revisions';
+import DocumentFixtures from './fixtures/documents';
+import RevisionFixtures from './fixtures/revisions';
 
 async function run() {
   try {
@@ -20,24 +20,24 @@ async function run() {
       schema: blockNoteSchema,
     });
 
-    console.log('🏃 Running Seeders...');
-    const documentSeeder = new DocumentSeeder(editor);
-    const revisionSeeder = new RevisionSeeder(editor);
+    console.log('🏃 Running fixtures...');
+    const documentFixtures = new DocumentFixtures(editor);
+    const revisionFixtures = new RevisionFixtures(editor);
 
-    await documentSeeder.run(datasource);
-    await revisionSeeder.run(datasource);
+    await documentFixtures.run(datasource);
+    await revisionFixtures.run(datasource);
 
-    console.log('✅ Seeding completed!');
+    console.log('✅ Fixtures completed!');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Seeding failed:', error);
+    console.error('❌ Fixtures failed:', error);
     process.exit(1);
   }
 }
 
 if (import.meta.main) {
   run().catch((error) => {
-    console.error('Error during seeding:', error);
+    console.error('Error during fixtures:', error);
     process.exit(1);
   });
 }
