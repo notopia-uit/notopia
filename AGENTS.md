@@ -28,7 +28,8 @@ packages/                       # JS packages
   lib-server/                   # Shared server-side (node-only) code
   pb/                           # Protobuf generated code, use grpc, protovalidate
   ui/                           # React UI components, using shadcn/ui (@notopia-uit/ui)
-docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.)
+docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.), and AI (superpowers,...)
+story/                          # The stories/blogs while doing this project (AI/human written)
 cmd/                            # Go services (entrypoint only: main.go + wire)
   note/                         # Note service (nx: note)
   authorization/                # Authorization service (nx: authorization)
@@ -96,8 +97,9 @@ deliberately omits.
   concrete layout in [`internal/note/AGENTS.md`](./internal/note/AGENTS.md)
 - Shared building blocks (config, `Cmd`/`Query`, gin, otel) are in [`pkg/`](./pkg/AGENTS.md)
 - Go 1.26: `new(value)` / `new(fn(...))` returns a pointer; Go 1.27 supports generic methods on structs
-- Prefer testify for testing
+- Prefer testify for testing, mockery if need interface mocking (list only necessary interfaces)
 - SQLC custom plugin for dynamic query at runtime <https://raw.githubusercontent.com/vtuanjs/sqlc-gen-go/refs/heads/main/README.md>
+- If a (pointer?) struct implement an interface, add e.g. `var _ Interface = (*Struct)(nil)`
 
 ### Messaging
 
@@ -148,6 +150,7 @@ deliberately omits.
 - Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsc`
 - If something is not worth to code/fix, but might have issue in the future, then comments
 - Prefer breakline for human readable, over one-line; code, naming convention over saving token because human still maintain the source code
+- Do not swallow errors/exceptions in code, always log, or throw/return to caller
 
 ### Superpowers
 
