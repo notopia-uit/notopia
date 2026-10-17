@@ -40,6 +40,10 @@ user: User {
   }
 }
 
+payment_provider: Payment Provider (Stripe sandbox) {
+  icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/stripe.svg
+}
+
 gateway: Gateway {
   icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/traefikproxy.svg
 }
@@ -100,6 +104,20 @@ services: Services {
     authorization_service -> database
   }
 
+  billing: Billing Service Group {
+    billing_service: Billing Service {
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/go.svg
+    }
+    database: Database {
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/postgresql.svg
+    }
+    cron_lock: Cron Lock {
+      icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/redis.svg
+    }
+    billing_service -> database
+    billing_service -> cron_lock
+  }
+
   search: Search Service Group {
     search_service: Meilisearch {
       icon: https://cdn.jsdelivr.net/npm/simple-icons@16/icons/meilisearch.svg
@@ -158,6 +176,7 @@ gateway -> services.document
 gateway -> services.note
 gateway -> services.identity_provider
 gateway -> services.object_storage
+gateway -> services.billing
 gateway -> services.search
 gateway -> services.monotoring
 
@@ -170,6 +189,11 @@ services.note <-> services.event_bus
 services.note -> services.authorization
 
 services.authorization <- services.event_bus
+
+services.billing <-> services.event_bus
+services.billing -> services.authorization
+services.billing -> payment_provider: checkout, refunds
+payment_provider -> gateway: webhooks
 
 services.search <- services.event_bus
 

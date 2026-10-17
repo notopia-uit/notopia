@@ -2,7 +2,7 @@
   "name": "@notopia-uit/search-worker",
   "private": true,
   "scripts": {
-    "seed": "tsx ./seed/config.ts",
+    "seed": "tsx ./seed/seed.ts",
     "fixtures": "tsx ./fixtures/fixtures.ts",
     "fixtures:transform": "tsx ./fixtures/transform.ts"
   },

@@ -1,0 +1,21 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "internal/billing",
+  "projectType": "library",
+  "tags": ["scope:library", "type:go"],
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*.go", "!{projectRoot}/**/*_test.go", "!{projectRoot}/**/mock.go"]
+  },
+  "targets": {
+    "gen:mockery": {
+      "executor": "nx:run-commands",
+      "inputs": ["default", "{projectRoot}/.mockery.yaml"],
+      "outputs": ["{projectRoot}/app/mock.go"],
+      "options": {
+        "command": "mockery",
+        "cwd": "{projectRoot}"
+      }
+    }
+  },
+  "implicitDependencies": ["pkg"]
+}

@@ -4,6 +4,9 @@ apis:
   note:
     root: ./note/openapi.yaml
     output: ./bundled/note.json
+  billing:
+    root: ./billing/openapi.yaml
+    output: ./bundled/billing.json
   document:
     root: ./document/openapi.yaml
     output: ./bundled/document.json

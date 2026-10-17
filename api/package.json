@@ -6,13 +6,14 @@
     "./share": "./bundled/share.json",
     "./document": "./bundled/document.json",
     "./note": "./bundled/note.json",
+    "./billing": "./bundled/billing.json",
     "./openapi": "./bundled/openapi.json"
   },
   "scripts": {
     "openapi-generator-cli": "openapi-generator-cli",
     "openapi-ts": "openapi-ts",
     "redocly": "redocly",
-    "redocly:join": "redocly join ./openapi.yaml ./bundled/share.json ./bundled/document.json ./bundled/note.json --prefix-components-with-info-prop x-apiName -o ./bundled/openapi.json",
+    "redocly:join": "redocly join ./openapi.yaml ./bundled/share.json ./bundled/document.json ./bundled/note.json ./bundled/billing.json --prefix-components-with-info-prop x-apiName -o ./bundled/openapi.json",
     "scalar": "scalar"
   },
   "devDependencies": {

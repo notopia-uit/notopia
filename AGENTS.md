@@ -8,11 +8,12 @@ Manged with Nx. Package manager: pnpm (use ./pnpm-workspace.yaml), go (single go
 api/                            # OpenAPI spec (one dir per API surface)
   common/                       # Shared responses, securitySchemes (OIDC, Oauth2)
   note/                         # note service spec    -> Go server (oapi-codegen)
+  billing/                      # billing service spec -> Go server (oapi-codegen)
   document/                     # document service spec -> NestJS server (openapi-generator)
   share/                        # Cross-service event/DTO schemas -> @notopia-uit/api-share-gen
   bundled/                      # Redocly output (generated, do not edit)
 proto/                          # Protobuf definitions
-  note/, authorization/
+  note/, authorization/, billing/
 apps/                           # JS/TS applications
   document/                     # Document service (NestJS) (nx: document)
   search-worker/                # Search worker (NestJS) sync to meilisearch (nx: search-worker)
@@ -27,15 +28,22 @@ packages/                       # JS packages
   lib-server/                   # Shared server-side (node-only) code
   pb/                           # Protobuf generated code, use grpc, protovalidate
   ui/                           # React UI components, using shadcn/ui (@notopia-uit/ui)
-docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.)
+docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.), and AI (superpowers,...)
+story/                          # The stories/blogs while doing this project (AI/human written)
 cmd/                            # Go services (entrypoint only: main.go + wire)
   note/                         # Note service (nx: note)
   authorization/                # Authorization service (nx: authorization)
+  billing/                      # Billing service, Stripe (nx: billing)
   notefixturegen/               # Dev fixture generator (fake notes from Obsidian vault)
+  billingseed/                  # Billing seed: Stripe prices + portal config (nx: billingseed)
+  billingfixtures/              # Billing dev fixtures (nx: billingfixtures)
 internal/                       # Internal Go packages (the actual service code)
   note/
   authorization/
+  billing/
   notefixturegen/
+  billingseed/
+  billingfixtures/
 pkg/                            # Go packages
   api                           # Code gen from oapi-codegen
   common                        # Including commonhttp, commonconfig, commonhandler
@@ -56,6 +64,7 @@ deliberately omits.
 | Contract-first workflow, adding endpoints          | [`api/`](./api/AGENTS.md)                                       |
 | Go DDD/CQRS layout, aggregates, outbox, sqlc/goose | [`internal/note/`](./internal/note/AGENTS.md)                   |
 | Casbin model, roles, policy                        | [`internal/authorization/`](./internal/authorization/AGENTS.md) |
+| Plans, subscriptions, Stripe, entitlements         | [`internal/billing/`](./internal/billing/AGENTS.md)             |
 | Yjs/Hocuspocus, commit pipeline, revisions         | [`apps/document/`](./apps/document/AGENTS.md)                   |
 | Meilisearch indexing                               | [`apps/search-worker/`](./apps/search-worker/AGENTS.md)         |
 | Shared Go packages                                 | [`pkg/`](./pkg/AGENTS.md)                                       |
@@ -87,11 +96,14 @@ deliberately omits.
 - Do not run `go generate`, because we don't mange tool via go tool, but via mise. Stick with nx targets
 - Wiring is google/wire: edit `wire.go`, run `nx wire {service}`, never hand-edit `wire_gen.go`.
   Each package exposes `var ProvideX = NewX`
-- Services are DDD + CQRS — see [`internal/note/AGENTS.md`](./internal/note/AGENTS.md) for the layout
+- Services are DDD + CQRS: layering, command/query rules, domain vs app models, sqlc split are in
+  [`docs/ai/GO_CLEAN_ARCH.md`](./docs/ai/GO_CLEAN_ARCH.md) (read before writing Go service code);
+  concrete layout in [`internal/note/AGENTS.md`](./internal/note/AGENTS.md)
 - Shared building blocks (config, `Cmd`/`Query`, gin, otel) are in [`pkg/`](./pkg/AGENTS.md)
-- Go 1.26 already supports `new(value)` or `new(fn(...))` to get pointer, no need to instantiate struct and take address
-- Go 1.27 supports generic method for struct
-- Prefer testify framework for testing
+- Go 1.26: `new(value)` / `new(fn(...))` returns a pointer; Go 1.27 supports generic methods on structs
+- Prefer testify for testing, mockery if need interface mocking (list only necessary interfaces)
+- SQLC custom plugin for dynamic query at runtime <https://raw.githubusercontent.com/vtuanjs/sqlc-gen-go/refs/heads/main/README.md>
+- If a (pointer?) struct implement an interface, add e.g. `var _ Interface = (*Struct)(nil)`
 
 ### Messaging
 
@@ -139,13 +151,17 @@ deliberately omits.
 - Temp file must be go into `./tmp/{projectName}`, avoid writing to `/tmp/` when things need to be persisted
 - While writing code, try **not to write unnecessary comments** into code
 - There are many `*.env*` file, which contains safe local development environment variables. Only `*.env.local*` can contain sensitive environment variables, and should be gitignored
-- Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsgo` (replace for `tsc`)
+- Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsc`
 - If something is not worth to code/fix, but might have issue in the future, then comments
+- Prefer breakline for human readable, over one-line; code, naming convention over saving token because human still maintain the source code
+- Do not swallow errors/exceptions in code, always log, or throw/return to caller
+- Some hard string (e.g. concurrency `VND`, `USD`, or others) should be defined in a constant/enum. Don't pass arbitrary string.
 
 ### Superpowers
 
 - Skip unnecessary, obvious cases testing for faster, saving tokens
-- Not need to write full code, can use `…`, skip imports, agents later can fill in the details, but should not skip important logic
+- Not need to write full code, can use `…`, skip imports, mapper code, or write comments to note expand the code more while writing;
+  agents later can fill in the details, but should not skip important logic
 
 ### Git
 

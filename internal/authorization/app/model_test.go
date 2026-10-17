@@ -1,14 +1,25 @@
 package app_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 // Shared at https://editor.casbin.org/#GURKL5ZXW
+// Runs the matrix against casbin's own CSV loading (string adapter) and against
+// BootStrapPolicies + LoadFixtures syncing into a database, so both must agree.
 func TestModels(t *testing.T) {
-	e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: true})
+	for _, useTransaction := range []bool{false, true} {
+		t.Run(fmt.Sprintf("useTransaction=%t", useTransaction), func(t *testing.T) {
+			testModels(t, useTransaction)
+		})
+	}
+}
+
+func testModels(t *testing.T, useTransaction bool) {
+	e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: true, UseTransaction: useTransaction})
 	require.NoError(t, err, "Failed to create enforcer")
 
 	tests := []struct {

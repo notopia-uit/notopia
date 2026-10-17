@@ -1,0 +1,14 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  tier:
+    $ref: ./PlanTier.yaml
+  features:
+    $ref: ./Features.yaml
+  limits:
+    $ref: ./Limits.yaml
+  prices:
+    type: array
+    items:
+      $ref: ./Price.yaml
+required: [tier, features, limits, prices]

@@ -34,12 +34,15 @@ export-authentik-blueprint:
 shadcnadd component:
     pnpm exec shadcn add {{ component }} -c ./packages/ui/
 
-seed: seed-search
+seed: seed-search seed-billing
 
 seed-search:
     nx run search-worker:seed
 
-fixtures: seed fixtures-note fixtures-document fixtures-search
+seed-billing:
+    nx run billingseed:run
+
+fixtures: seed fixtures-note fixtures-document fixtures-search fixtures-billing
 
 fixtures-note db-connection=note-db-connection: prepare-fixtures-note
     psql {{ db-connection }} \
@@ -61,3 +64,11 @@ fixtures-search: prepare-fixtures-search
 
 prepare-fixtures-search:
     nx run search-worker:fixtures:transform
+
+fixtures-billing:
+    nx run billingfixtures:run
+
+stripe-listen:
+    stripe listen \
+      --all-snapshot \
+      --forward-to http://api.notopia.localhost/billing/webhooks/stripe

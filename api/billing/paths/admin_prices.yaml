@@ -1,0 +1,59 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - BillingAdmin
+  summary: List all prices including archived (admin)
+  operationId: adminListPrices
+  responses:
+    200:
+      description: Prices
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/Price.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml
+post:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - BillingAdmin
+  summary: Create a price, replacing the active one for the same plan and interval (admin)
+  operationId: adminCreatePrice
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/CreatePriceRequest.yaml
+  responses:
+    201:
+      description: Created price
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Price.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

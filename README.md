@@ -128,7 +128,7 @@ just fixtures-search               # Search index fixtures only
 ### Conventions
 
 - **Do not source `.env`** — Nx auto-loads them; sourced env vars won't be overridden
-- **JS/TS**: `oxlint` lint, `oxfmt` format, `tsgo` typecheck (not `tsc`)
+- **JS/TS**: `oxlint` lint, `oxfmt` format, `tsc` typecheck
 - **Go**: `golangci-lint` lint, `go fmt` format
 - **Commits**: conventional commit format
 - **API contracts**: change specs in `api/` or `proto/`, never modify generated code directly
@@ -189,6 +189,7 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
   > Skipped for simplicity
 - [ ] Consider split the workspace event (SSE) into a dedicated service, not bounded to `note` service
   > Events from subscription changed
+- [ ] Make backend services have an option to must trust request comes from api gateway
 
 ### Frontend
 

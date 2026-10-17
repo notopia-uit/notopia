@@ -47,7 +47,7 @@ func NewMeilisearch(
 	}
 	client := meilisearch.New(
 		cfg.Host,
-		meilisearch.WithAPIKey(cfg.APIKey),
+		meilisearch.WithAPIKey(cfg.APIKey.Reveal()),
 		meilisearch.WithCustomClient(httpClient),
 	)
 	return &Meilisearch{

@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=https://www.schemastore.org/sqlc-2.0.json
+version: "2"
+
+plugins:
+  - name: golang
+    wasm:
+      url: https://github.com/vtuanjs/sqlc-gen-go/releases/download/v3.2.1/sqlc-gen-go.wasm
+      sha256: 2f6799f25e4e8750551ccbe1073bf8a612683e287956eef97a913d37c8ab43c2
+
+sql:
+  - engine: postgresql
+    schema:
+      - ../../internal/billing/infra/persistence/pgmigration/
+    queries: ../../internal/billing/infra/persistence/pgsqlc/
+    codegen:
+      - plugin: golang
+        out: ../../internal/billing/infra/persistence/pgsqlc/
+        options:
+          emit_result_struct_pointers: true
+          emit_params_struct_pointers: true
+          emit_pointers_for_null_types: true
+          emit_enum_valid_method: true
+          emit_all_enum_values: true
+          sql_driver: github.com/jackc/pgx/v5
+          sql_package: pgx/v5
+          initialisms:
+            - id
+            - url
+          package: pgsqlc
+          emit_dynamic_filter: true
+          emit_tracing:
+            import: go.opentelemetry.io/otel
+            package: otel
+            code:
+              - ctx, span := otel.Tracer("{{.StructName}}").Start(ctx, "{{.MethodName}}")
+              - defer span.End()
+
+overrides:
+  go: &golangOptions
+    rename:
+      ids: IDs
+      urls: URLs
+    overrides:
+      - db_type: uuid
+        nullable: false
+        go_type:
+          import: github.com/google/uuid
+          type: UUID
+      - db_type: uuid
+        nullable: true
+        go_type:
+          import: github.com/google/uuid
+          type: UUID
+          pointer: true
+      - db_type: timestamptz
+        nullable: true
+        go_type:
+          import: time
+          type: Time
+          pointer: true
+      - db_type: timestamptz
+        nullable: false
+        go_type:
+          import: time
+          type: Time
+          pointer: false
+      - column: plans.features
+        go_type:
+          import: github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgjsonb
+          type: Features
+      - column: plans.limits
+        go_type:
+          import: github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgjsonb
+          type: Limits
+
+options:
+  golang: *golangOptions

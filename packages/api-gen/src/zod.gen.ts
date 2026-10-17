@@ -348,6 +348,166 @@ export const zNoteUser = z.object({
   email: z.email().nullable()
 });
 
+export const zBillingPlanTier = z.enum([
+  'free',
+  'plus',
+  'pro'
+]);
+
+/**
+ * Feature flags by key (auto_commit, workspace_graph).
+ */
+export const zBillingFeatures = z.record(z.string(), z.boolean());
+
+/**
+ * Limits by key. -1 means unlimited.
+ */
+export const zBillingLimits = z.record(z.string(), z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }));
+
+export const zBillingBillingInterval = z.enum([
+  'month',
+  'year',
+  'lifetime'
+]);
+
+export const zBillingPrice = z.object({
+  id: z.uuid(),
+  plan: zBillingPlanTier,
+  interval: zBillingBillingInterval,
+  amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+  currency: z.string(),
+  lookupKey: z.string(),
+  active: z.boolean(),
+  createdAt: z.iso.datetime(),
+  archivedAt: z.iso.datetime().nullish()
+});
+
+export const zBillingPlan = z.object({
+  tier: zBillingPlanTier,
+  features: zBillingFeatures,
+  limits: zBillingLimits,
+  prices: z.array(zBillingPrice)
+});
+
+export const zBillingError = z.object({
+  code: z.string(),
+  message: z.string(),
+  more_info: z.string().optional()
+});
+
+/**
+ * `none` when the workspace never subscribed.
+ */
+export const zBillingSubscriptionStatus = z.enum([
+  'none',
+  'incomplete',
+  'active',
+  'past_due',
+  'unpaid',
+  'canceled',
+  'incomplete_expired'
+]);
+
+export const zBillingEntitlements = z.object({
+  workspaceId: z.uuid(),
+  plan: zBillingPlanTier,
+  status: zBillingSubscriptionStatus,
+  accessUntil: z.iso.datetime().nullish(),
+  features: zBillingFeatures,
+  limits: zBillingLimits
+});
+
+export const zBillingRefund = z.object({
+  id: z.uuid(),
+  amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+  currency: z.string(),
+  reason: z.enum([
+    'cancel_now',
+    'lifetime_window',
+    'replaced_by_lifetime',
+    'workspace_deleted',
+    'duplicate_checkout',
+    'external'
+  ]),
+  status: z.enum([
+    'pending',
+    'succeeded',
+    'failed',
+    'canceled'
+  ]),
+  createdAt: z.iso.datetime()
+});
+
+export const zBillingSubscription = z.object({
+  id: z.uuid(),
+  plan: zBillingPlanTier,
+  interval: zBillingBillingInterval,
+  status: zBillingSubscriptionStatus,
+  currentPeriodStart: z.iso.datetime().nullish(),
+  currentPeriodEnd: z.iso.datetime().nullish(),
+  cancelAtPeriodEnd: z.boolean(),
+  canceledAt: z.iso.datetime().nullish(),
+  accessUntil: z.iso.datetime().nullish(),
+  refunds: z.array(zBillingRefund)
+});
+
+export const zBillingPayer = z.object({
+  id: z.string(),
+  email: z.string(),
+  name: z.string(),
+  missingSince: z.iso.datetime().nullish()
+});
+
+export const zBillingWorkspaceBilling = z.object({
+  subscription: zBillingSubscription.nullish(),
+  payer: zBillingPayer.nullish()
+});
+
+export const zBillingCheckoutSessionRequest = z.object({
+  priceId: z.uuid()
+});
+
+export const zBillingRedirectUrl = z.object({
+  url: z.url()
+});
+
+export const zBillingRefundQuotePayment = z.object({
+  paidAmount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+  amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+  coverageSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+  unusedSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
+});
+
+export const zBillingRefundQuote = z.object({
+  amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+  currency: z.string(),
+  unusedSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+  periodSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+  payments: z.array(zBillingRefundQuotePayment)
+});
+
+export const zBillingUpdatePlanRequest = z.object({
+  features: zBillingFeatures.optional(),
+  limits: zBillingLimits.optional()
+});
+
+export const zBillingBillingPolicy = z.object({
+  pastDueGraceDays: z.int().gte(0),
+  lifetimeRefundWindowDays: z.int().gte(0)
+});
+
+export const zBillingUpdatePolicyRequest = z.object({
+  pastDueGraceDays: z.int().gte(0).optional(),
+  lifetimeRefundWindowDays: z.int().gte(0).optional()
+});
+
+export const zBillingCreatePriceRequest = z.object({
+  plan: z.enum(['plus', 'pro']),
+  interval: zBillingBillingInterval,
+  amount: z.coerce.bigint().gte(BigInt(1)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+  currency: z.string()
+});
+
 export const zShareUserWorkspaceRoleUpdatedEventWritable = z.object({
   userId: zShareId,
   role: zShareWorkspaceRole
@@ -497,6 +657,12 @@ export const zNoteWorkspaceIdPath = zNoteId3;
  * Number of items per page
  */
 export const zNoteLimitQuery = z.int().gte(1).lte(100).default(20);
+
+export const zBillingWorkspaceIdPath = z.uuid();
+
+export const zBillingTierPath = zBillingPlanTier;
+
+export const zBillingPriceIdPath = z.uuid();
 
 export const zGetDocumentAttachmentUploadUrlPath = z.object({
   documentId: zDocumentId
@@ -949,3 +1115,133 @@ export const zSearchUsersQuery = z.object({
  * A list of workspace members
  */
 export const zSearchUsersResponse = z.array(zNoteUser);
+
+/**
+ * Plans
+ */
+export const zListPlansResponse = z.array(zBillingPlan);
+
+export const zGetWorkspaceEntitlementsPath = z.object({
+  workspaceId: z.uuid()
+});
+
+/**
+ * Entitlements of the workspace
+ */
+export const zGetWorkspaceEntitlementsResponse = zBillingEntitlements;
+
+export const zGetWorkspaceBillingPath = z.object({
+  workspaceId: z.uuid()
+});
+
+/**
+ * Workspace billing state
+ */
+export const zGetWorkspaceBillingResponse = zBillingWorkspaceBilling;
+
+export const zCreateCheckoutSessionBody = zBillingCheckoutSessionRequest;
+
+export const zCreateCheckoutSessionPath = z.object({
+  workspaceId: z.uuid()
+});
+
+/**
+ * Redirect the browser to this URL
+ */
+export const zCreateCheckoutSessionResponse = zBillingRedirectUrl;
+
+export const zCreatePortalSessionPath = z.object({
+  workspaceId: z.uuid()
+});
+
+/**
+ * Redirect the browser to this URL
+ */
+export const zCreatePortalSessionResponse = zBillingRedirectUrl;
+
+export const zPreviewCancelNowPath = z.object({
+  workspaceId: z.uuid()
+});
+
+/**
+ * Refund quote
+ */
+export const zPreviewCancelNowResponse = zBillingRefundQuote;
+
+export const zCancelNowPath = z.object({
+  workspaceId: z.uuid()
+});
+
+/**
+ * Workspace billing state after cancel
+ */
+export const zCancelNowResponse = zBillingWorkspaceBilling;
+
+export const zClaimPayerPath = z.object({
+  workspaceId: z.uuid()
+});
+
+/**
+ * Redirect the browser to this URL
+ */
+export const zClaimPayerResponse = zBillingRedirectUrl;
+
+/**
+ * Plans
+ */
+export const zAdminListPlansResponse = z.array(zBillingPlan);
+
+export const zAdminUpdatePlanBody = zBillingUpdatePlanRequest;
+
+export const zAdminUpdatePlanPath = z.object({
+  tier: zBillingPlanTier
+});
+
+/**
+ * Updated plan
+ */
+export const zAdminUpdatePlanResponse = zBillingPlan;
+
+/**
+ * Billing policy
+ */
+export const zAdminGetPolicyResponse = zBillingBillingPolicy;
+
+export const zAdminUpdatePolicyBody = zBillingUpdatePolicyRequest;
+
+/**
+ * Updated billing policy
+ */
+export const zAdminUpdatePolicyResponse = zBillingBillingPolicy;
+
+/**
+ * Prices
+ */
+export const zAdminListPricesResponse = z.array(zBillingPrice);
+
+export const zAdminCreatePriceBody = zBillingCreatePriceRequest;
+
+/**
+ * Created price
+ */
+export const zAdminCreatePriceResponse = zBillingPrice;
+
+export const zAdminArchivePricePath = z.object({
+  priceId: z.uuid()
+});
+
+/**
+ * Archived price
+ */
+export const zAdminArchivePriceResponse = zBillingPrice;
+
+export const zStripeWebhookBody = z.record(z.string(), z.unknown());
+
+export const zStripeWebhookHeaders = z.object({
+  'Stripe-Signature': z.string()
+});
+
+/**
+ * Event accepted
+ */
+export const zStripeWebhookResponse = z.void();

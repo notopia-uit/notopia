@@ -5,6 +5,8 @@ modules:
     name: notopia/notopia/note
   - path: ./proto/authorization/
     name: notopia/notopia/authorization
+  - path: ./proto/billing/
+    name: notopia/notopia/billing
 lint:
   use:
     - STANDARD

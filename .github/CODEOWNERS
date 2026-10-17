@@ -1,12 +1,14 @@
-/api/ @notopia-uit/team-backend @notopia-uit/team-backend
-/proto/ @notopia-uit/team-backend
-/docs/ @notopia-uit/team-backend @notopia-uit/team-backend
-/packages/api-web/ @notopia-uit/team-frontend @notopia-uit/team-backend
+/api/      @NTGNguyen @KevinNitroG
+/proto/    @NTGNguyen @KevinNitroG
+/docs/     @NTGNguyen @KevinNitroG
+/apps/     @NTGNguyen @KevinNitroG
+/packages/ @NTGNguyen @KevinNitroG
 
-/apps/web/ @notopia-uit/team-frontend
-/packages/api-gen/ @notopia-uit/team-frontend
+/apps/web/         @NTGNguyen
+/apps/ai/          @NTGNguyen
+/packages/api-gen/ @NTGNguyen
 
-/packages/api-document-nestjs-server/ @notopia-uit/team-backend
-/packages/api-pb/ @notopia-uit/team-backend
-/cmd/ @notopia-uit/team-backend
-/internal/ @notopia-uit/team-backend
+/packages/api-document-nestjs-server/ @KevinNitroG
+/packages/api-pb/ @KevinNitroG
+/cmd/ @KevinNitroG
+/internal/ @KevinNitroG

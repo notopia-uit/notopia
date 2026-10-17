@@ -13,29 +13,28 @@ health, Postgres + goose + sqlc, Kafka consumers, cron, compose, Traefik.
 
 ## 0. Decision summary
 
-| Topic | Decision |
-| --- | --- |
-| Billed entity | Workspace. One **payer** (`payerId`, AWS term) per workspace; payer must be a workspace owner. Any owner may manage billing. |
-| Provider | Stripe, **test mode / sandbox only**. Stripe does not onboard Vietnam-registered businesses for live payouts. Provider sits behind `app.PaymentProvider` so a VN gateway can replace it. |
-| SDK | `github.com/stripe/stripe-go/v87` (MIT, free). |
-| Stripe Customer | One per **workspace**, mapping stored only in billing DB. Authentik is not touched. |
-| Stripe UI | Stripe-hosted **Checkout** (purchase, card replacement) + Stripe-hosted **Customer Portal** (card, invoices, cancel at period end, plan switch). Our API only does what those cannot. |
-| Product type | Stripe Billing subscriptions (`mode=subscription`) for month/year; one-time Price (`mode=payment`) for lifetime. No raw PaymentIntents. |
-| Tiers | `free`, `plus`, `pro`. Lifetime grants `pro`. |
-| Intervals | `month`, `year` (≈20% off, separate Price), `lifetime`. |
-| Currency | VND only (zero-decimal). Schema keeps `currency` so other currencies can be added as rows. |
-| Catalog | Feature/limit **keys** are enums in code. Their **values** per plan, the billing policy, and all prices live in the billing DB and are **admin-editable** via API. Prices are grandfathered; plan limits apply immediately. |
-| Admin | One app-wide admin group from config (`NOTOPIA_{SERVICE}_ADMIN_GROUP`, default `notopia-admins`), read from `X-Forwarded-Groups`. |
-| Entitlements | Billing returns plan + resolved features + limits. Frontend hardcodes nothing numeric. |
-| Enforcement | note / document (later AI) call billing gRPC directly on every check, **no cache**. Billing publishes no integration events. Errors → HTTP 402 conforming to `Error`. |
-| Expiry | No "expire at period end" job. Webhooks drive state; hourly reconcile cron is the safety net; `past_due` keeps access for a grace period. |
-| Refund | Immediate cancel → prorated refund. Lifetime → full refund within a window, none after. |
-| Cron | Inside each service, `controller/cron/`, Redis-locked. `// NOTE:` to move into `cmd/{svc}-worker` later. |
-| System actor | Authentik service account per service (`note-service` 1001, `document-service` 1002, `billing-service` 1003). No `"system"` string. |
-| Trial | None (TODO). |
+| Topic           | Decision                                                                                                                                                                                                                    |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Billed entity   | Workspace. One **payer** (`payerId`, AWS term) per workspace; payer must be a workspace owner. Any owner may manage billing.                                                                                                |
+| Provider        | Stripe, **test mode / sandbox only**. Stripe does not onboard Vietnam-registered businesses for live payouts. Provider sits behind `app.PaymentProvider` so a VN gateway can replace it.                                    |
+| SDK             | `github.com/stripe/stripe-go/v87` (MIT, free).                                                                                                                                                                              |
+| Stripe Customer | One per **workspace**, mapping stored only in billing DB. Authentik is not touched.                                                                                                                                         |
+| Stripe UI       | Stripe-hosted **Checkout** (purchase, card replacement) + Stripe-hosted **Customer Portal** (card, invoices, cancel at period end, plan switch). Our API only does what those cannot.                                       |
+| Product type    | Stripe Billing subscriptions (`mode=subscription`) for month/year; one-time Price (`mode=payment`) for lifetime. No raw PaymentIntents.                                                                                     |
+| Tiers           | `free`, `plus`, `pro`. Lifetime grants `pro`.                                                                                                                                                                               |
+| Intervals       | `month`, `year` (≈20% off, separate Price), `lifetime`.                                                                                                                                                                     |
+| Currency        | VND only (zero-decimal). Schema keeps `currency` so other currencies can be added as rows.                                                                                                                                  |
+| Catalog         | Feature/limit **keys** are enums in code. Their **values** per plan, the billing policy, and all prices live in the billing DB and are **admin-editable** via API. Prices are grandfathered; plan limits apply immediately. |
+| Admin           | One app-wide admin group from config (`NOTOPIA_{SERVICE}_ADMIN_GROUP`, default `notopia-admins`), read from `X-Forwarded-Groups`.                                                                                           |
+| Entitlements    | Billing returns plan + resolved features + limits. Frontend hardcodes nothing numeric.                                                                                                                                      |
+| Enforcement     | note / document (later AI) call billing gRPC directly on every check, **no cache**. Billing publishes no integration events. Errors → HTTP 402 conforming to `Error`.                                                       |
+| Expiry          | No "expire at period end" job. Webhooks drive state; hourly reconcile cron is the safety net; `past_due` keeps access for a grace period.                                                                                   |
+| Refund          | Immediate cancel → prorated refund. Lifetime → full refund within a window, none after.                                                                                                                                     |
+| Cron            | Inside each service, `controller/cron/`, Redis-locked. `// NOTE:` to move into `cmd/{svc}-worker` later.                                                                                                                    |
+| System actor    | Authentik service account per service (`note-service` 1001, `document-service` 1002, `billing-service` 1003). No `"system"` string.                                                                                         |
+| Trial           | None (TODO).                                                                                                                                                                                                                |
 
 ---
-
 
 ## 1. Placement
 
@@ -82,16 +81,16 @@ Infra: `deploy/compose/services/billing.yaml` (`billing_postgresql`, `billing_re
 
 ### 2.1 Objects we create (all through code, never the dashboard)
 
-| Stripe object | Created by | Key / metadata |
-| --- | --- | --- |
-| Product per paid tier | `seed` | `metadata.tier`, id `notopia_plus`, `notopia_pro` |
-| Price | `seed`, admin `CreatePrice` | `lookup_key = {tier}_{interval}`, `transfer_lookup_key=true` on replace, `metadata.price_id` (our uuid). Recurring for month/year, one-time for lifetime. |
-| Customer | `StartCheckout` (first time) | idempotency key `customer:{workspaceId}`, `metadata.workspace_id`, email/name = payer |
-| Checkout Session | `StartCheckout`, `ChangePayer` | `client_reference_id = workspaceId`; `metadata {workspace_id, payer_id, price_id, purpose}` where `purpose ∈ subscribe, lifetime, payer_change` |
-| Subscription | Stripe (from Checkout) | `subscription_data.metadata.workspace_id` |
-| Portal configuration | `seed`, after every price change | id stored in `billing_policy.portal_configuration_id` |
-| Portal session | `StartPortal` | `configuration`, `return_url` |
-| Refund | `CancelNow`, `CompleteCheckout` (duplicate), lifetime refund | idempotency key `refund:{refundId}`, `metadata.refund_id` |
+| Stripe object         | Created by                                                   | Key / metadata                                                                                                                                            |
+| --------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Product per paid tier | `seed`                                                       | `metadata.tier`, id `notopia_plus`, `notopia_pro`                                                                                                         |
+| Price                 | `seed`, admin `CreatePrice`                                  | `lookup_key = {tier}_{interval}`, `transfer_lookup_key=true` on replace, `metadata.price_id` (our uuid). Recurring for month/year, one-time for lifetime. |
+| Customer              | `StartCheckout` (first time)                                 | idempotency key `customer:{workspaceId}`, `metadata.workspace_id`, email/name = payer                                                                     |
+| Checkout Session      | `StartCheckout`, `ChangePayer`                               | `client_reference_id = workspaceId`; `metadata {workspace_id, payer_id, price_id, purpose}` where `purpose ∈ subscribe, lifetime, payer_change`           |
+| Subscription          | Stripe (from Checkout)                                       | `subscription_data.metadata.workspace_id`                                                                                                                 |
+| Portal configuration  | `seed`, after every price change                             | id stored in `billing_policy.portal_configuration_id`                                                                                                     |
+| Portal session        | `StartPortal`                                                | `configuration`, `return_url`                                                                                                                             |
+| Refund                | `CancelNow`, `CompleteCheckout` (duplicate), lifetime refund | idempotency key `refund:{refundId}`, `metadata.refund_id`                                                                                                 |
 
 Prices are immutable in Stripe. "Changing a price" = new Price + archive old. Existing
 subscriptions keep the old Price (grandfathered). New checkouts resolve by `lookup_key`.
@@ -120,7 +119,7 @@ subscriptions keep the old Price (grandfathered). New checkouts resolve by `look
 - Stripe sandbox (free), test cards.
 - `stripe listen --forward-to api.notopia.localhost/billing/webhooks/stripe` → prints the
   webhook secret for `.env.local`.
-- `just billing-seed` → `nx run billingseed:run` (idempotent; inserts defaults only when empty).
+- `just seed-billing` → `nx run billingseed:run` (idempotent; inserts defaults only when empty).
 - `stripe-mock` is not used (no webhooks).
 
 ## 3. Plans, features, limits
@@ -128,30 +127,30 @@ subscriptions keep the old Price (grandfathered). New checkouts resolve by `look
 Keys are enums in code (`domain/entitlement.go`). Admin edits values only; unknown keys are
 rejected. `-1` = unlimited. Defaults written by `seed`:
 
-| Key | Kind | Meaning | free | plus | pro |
-| --- | --- | --- | --- | --- | --- |
-| `auto_commit` | feature | document auto-commits revisions | ✗ | ✓ | ✓ |
-| `workspace_graph` | feature | whole-workspace graph endpoint | ✗ | ✓ | ✓ |
-| `members` | limit | max members per workspace | 3 | 10 | -1 |
-| `published_notes` | limit | max published notes per workspace | 3 | -1 | -1 |
-| `note_graph_max_depth` | limit | depth clamp on note graph | 5 | -1 | -1 |
-| `auto_commit_min_interval_seconds` | limit | min gap between auto revisions | 0 | 300 | 60 |
-| `revision_history_days` | limit | revisions older than this are purged (latest always kept) | 7 | 30 | -1 |
-| `trash_retention_days` | limit | trashed items older than this are purged | 7 | 30 | 90 |
-| `ai_credits_monthly` | limit | AI quota, enforced by the future AI service | 0 | 200 | 2000 |
+| Key                                | Kind    | Meaning                                                   | free | plus | pro  |
+| ---------------------------------- | ------- | --------------------------------------------------------- | ---- | ---- | ---- |
+| `auto_commit`                      | feature | document auto-commits revisions                           | ✗    | ✓    | ✓    |
+| `workspace_graph`                  | feature | whole-workspace graph endpoint                            | ✗    | ✓    | ✓    |
+| `members`                          | limit   | max members per workspace                                 | 3    | 10   | -1   |
+| `published_notes`                  | limit   | max published notes per workspace                         | 3    | -1   | -1   |
+| `note_graph_max_depth`             | limit   | depth clamp on note graph                                 | 5    | -1   | -1   |
+| `auto_commit_min_interval_seconds` | limit   | min gap between auto revisions                            | 0    | 300  | 60   |
+| `revision_history_days`            | limit   | revisions older than this are purged (latest always kept) | 7    | 30   | -1   |
+| `trash_retention_days`             | limit   | trashed items older than this are purged                  | 7    | 30   | 90   |
+| `ai_credits_monthly`               | limit   | AI quota, enforced by the future AI service               | 0    | 200  | 2000 |
 
 Custom slug is free for everyone (not a key). Storage quota and owned-workspace count are not
 limits.
 
 Default prices (VND, admin-editable):
 
-| lookup_key | amount |
-| --- | --- |
-| `plus_month` | 49 000 |
-| `plus_year` | 470 400 (49 000 × 12 × 0.8) |
-| `pro_month` | 99 000 |
-| `pro_year` | 950 400 |
-| `pro_lifetime` | 2 490 000 (placeholder) |
+| lookup_key     | amount                      |
+| -------------- | --------------------------- |
+| `plus_month`   | 49 000                      |
+| `plus_year`    | 470 400 (49 000 × 12 × 0.8) |
+| `pro_month`    | 99 000                      |
+| `pro_year`     | 950 400                     |
+| `pro_lifetime` | 2 490 000 (placeholder)     |
 
 Billing policy defaults (admin-editable): `pastDueGraceDays = 3`,
 `lifetimeRefundWindowDays = 14`.
@@ -160,13 +159,13 @@ Billing policy defaults (admin-editable): `pastDueGraceDays = 3`,
 
 ### 4.1 Aggregates
 
-| Aggregate root | Contains | Repo |
-| --- | --- | --- |
-| `Subscription` | child entity `Refund`; VOs `Money`, `ProviderSnapshot`, `RefundQuote` | `SubscriptionRepo` |
-| `BillingAccount` | payer + provider customer | `BillingAccountRepo` |
-| `Price` | `Money` | `PriceRepo` |
-| `Plan` | features / limits maps | `PlanRepo` |
-| `BillingPolicy` | singleton | `BillingPolicyRepo` |
+| Aggregate root   | Contains                                                              | Repo                 |
+| ---------------- | --------------------------------------------------------------------- | -------------------- |
+| `Subscription`   | child entity `Refund`; VOs `Money`, `ProviderSnapshot`, `RefundQuote` | `SubscriptionRepo`   |
+| `BillingAccount` | payer + provider customer                                             | `BillingAccountRepo` |
+| `Price`          | `Money`                                                               | `PriceRepo`          |
+| `Plan`           | features / limits maps                                                | `PlanRepo`           |
+| `BillingPolicy`  | singleton                                                             | `BillingPolicyRepo`  |
 
 `Refund` lives inside `Subscription` because "refunded total ≤ paid" is a subscription invariant.
 Idempotency of webhooks is **not** domain: it is an app port `ProviderEventInbox`.
@@ -365,13 +364,13 @@ classDiagram
 Every mutating method emits an event (`BaseEvent{ID, OccurredAt, AggregateID, UserID}`;
 `UserID` = acting user or the billing service account `1003`).
 
-| Aggregate | Events |
-| --- | --- |
-| Subscription | `SubscriptionCreated`, `SubscriptionActivated`, `SubscriptionRenewed`, `SubscriptionPastDue`, `SubscriptionPlanChanged`, `SubscriptionCancelScheduled`, `SubscriptionCancelResumed`, `SubscriptionCanceledNow`, `SubscriptionEnded`, `RefundRequested`, `RefundSucceeded`, `RefundFailed` |
-| BillingAccount | `BillingAccountOpened`, `PayerChanged`, `PayerMissing`, `BillingContactUpdated` |
-| Price | `PriceCreated`, `PriceArchived` |
-| Plan | `PlanUpdated` |
-| BillingPolicy | `BillingPolicyUpdated`, `PortalConfigurationChanged` |
+| Aggregate      | Events                                                                                                                                                                                                                                                                                    |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Subscription   | `SubscriptionCreated`, `SubscriptionActivated`, `SubscriptionRenewed`, `SubscriptionPastDue`, `SubscriptionPlanChanged`, `SubscriptionCancelScheduled`, `SubscriptionCancelResumed`, `SubscriptionCanceledNow`, `SubscriptionEnded`, `RefundRequested`, `RefundSucceeded`, `RefundFailed` |
+| BillingAccount | `BillingAccountOpened`, `PayerChanged`, `PayerMissing`, `BillingContactUpdated`                                                                                                                                                                                                           |
+| Price          | `PriceCreated`, `PriceArchived`                                                                                                                                                                                                                                                           |
+| Plan           | `PlanUpdated`                                                                                                                                                                                                                                                                             |
+| BillingPolicy  | `BillingPolicyUpdated`, `PortalConfigurationChanged`                                                                                                                                                                                                                                      |
 
 `ApplySnapshot` diffs old vs new state and emits only the events that apply.
 
@@ -382,23 +381,34 @@ Every mutating method emits an event (`BaseEvent{ID, OccurredAt, AggregateID, Us
 - `interval = lifetime` and `status = active` → true, `AccessUntil = nil`.
 - `status = active` → true (also while `cancelAtPeriodEnd`; Stripe sends
   `customer.subscription.deleted` at period end).
-- `status = past_due` and `now < currentPeriodEnd + pastDueGraceDays` → true.
+- `status = past_due` and `now < pastDueSince + pastDueGraceDays` → true. `pastDueSince` is set when a
+  snapshot moves the subscription into `past_due` and cleared when it leaves; rows without it fall
+  back to `currentPeriodStart`. `AccessUntil` is `pastDueSince + pastDueGraceDays`.
 - otherwise false → resolver returns the `free` plan with `status` preserved for UI.
 
 Why no local expiry: at period end Stripe creates the renewal invoice, finalizes it about 1 h
 later, then charges; failures move to `past_due` and Smart Retries continue for up to ~2 weeks.
-Our stored period end always passes before the renewal webhook arrives.
+Our stored period end always passes before the renewal webhook arrives, which is why an `active`
+subscription keeps access. After a failed renewal Stripe has already advanced the period, so the
+stored period end is the next one; the grace is therefore measured from `past_due_since`, not from
+the period end.
 
 **Refund quote** (`QuoteCancelNow`):
 
-- recurring: one line per paid invoice payment of the current period. An upgrade is invoiced
-  immediately (`always_invoice`), so a period can hold the renewal payment plus proration
-  payments. Each payment covers its own window (its invoice line periods, clipped to the
-  current period): `line = amount × unused / coverage`, floored (VND integer), where
+- recurring: one line per paid invoice payment whose coverage overlaps the current period. An
+  upgrade is invoiced immediately (`always_invoice`), so a period can hold the renewal payment
+  plus proration payments. Each payment covers its own window (its invoice line periods, **not**
+  clipped to the current period): `line = amount × unused / coverage`, floored (VND integer), where
   `coverage = coverageEnd − coverageStart` and `unused = max(0, coverageEnd − max(now, coverageStart))`.
   Quote amount = sum of lines; cancel-now creates one `Refund` per line (Stripe refunds per
   PaymentIntent). Example: Plus 100k paid day 1–30, upgrade on day 10 invoiced ≈133k for
   day 10–30, cancel on day 20 → 33k + 66k ≈ 100k (= 10 unused days of Pro).
+  A month→year change in the Portal resets the period to `[t, t+1y]` and credits the unused
+  monthly time into the yearly invoice, so the original monthly invoice (created before the new
+  period) still counts with its own window: cancelling right away refunds the unused half month
+  of the monthly payment plus the yearly invoice, i.e. the full yearly price. Because of this the
+  adapter looks back one longest interval (1y + 1d) for invoices and filters by coverage overlap;
+  a payment of the previous period (coverage ends at the period start) contributes 0.
 - lifetime: full `amount` if `now − paidAt ≤ lifetimeRefundWindowDays`, else error
   `refundWindowExpired` (cancel-now rejected).
 - Invariant: per payment, sum of non-failed refunds against it ≤ that payment's amount.
@@ -497,18 +507,20 @@ our own constants (`CheckoutCompleted`, `SubscriptionChanged`, `InvoicePaid`,
 
 ## 6. Use cases
 
-| File | Trigger | Behaviour |
-| --- | --- | --- |
-| `cmd_startcheckout.go` | HTTP | Owner check. Load or open `BillingAccount` (creates Stripe Customer). Reject `409 subscriptionAlreadyActive` if a current subscription exists, unless buying lifetime. Resolve active Price. Create Checkout (`subscription` or `payment`). Return URL. |
-| `cmd_startportal.go` | HTTP | Owner check. Requires a `BillingAccount`. Return Portal URL. |
-| `cmd_cancelnow.go` | HTTP | Owner check. `QuoteCancelNow` → Stripe cancel (recurring) → `CancelNow` (adds one pending `Refund` per paid payment of the period) → save → `CreateRefund` per refund → `MarkRefundSucceeded/Failed` from response (webhook confirms later). |
-| `q_cancelnowpreview.go` | HTTP | Returns the `RefundQuote`. |
-| `cmd_claimpayer.go` | HTTP | Owner check; any owner who is not already the payer (or when the payer is missing). Checkout `mode=setup` for the caller, who becomes payer on completion. This replaces a separate transfer endpoint. |
-| `cmd_completecheckout.go` | webhook `checkout.session.completed` | By `metadata.purpose`: **subscribe** → fetch snapshot, create `Subscription`; if another current one exists → cancel new one at Stripe + full refund `duplicate_checkout`. **lifetime** → if a current recurring exists, `CancelNow(replaced_by_lifetime)` it first (prorated refund), then `NewLifetimeSubscription`. **payer_change** → set default payment method on customer + subscription, detach other methods, `ChangePayer`, update Stripe contact, and if the payer was missing: `ResumeCancel`. |
-| `cmd_syncsubscription.go` | webhook subscription/invoice events, reconcile cron | Fetch snapshot from Stripe (payload ignored → ordering irrelevant) → `ApplySnapshot`. |
-| `cmd_syncrefund.go` | webhook `refund.updated`, `refund.failed`, `charge.refunded` | Match by `metadata.refund_id` or provider refund id → mark succeeded/failed. Unknown refunds (dashboard) → `RecordExternalRefund` with reason `external`. |
-| `cmd_handlepayerremoved.go` | Kafka authorization role/member events | If the user is payer of a workspace with a current recurring subscription: `MarkPayerMissing`, Stripe `cancel_at_period_end=true`, detach all payment methods. |
-| `cmd_handleworkspacedeleted.go` | Kafka `note.workspace.deleted` | Recurring → `CancelNow(workspace_deleted)` prorated. Lifetime → refund only inside window. |
+| File                            | Trigger                                                     | Behaviour                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cmd_startcheckout.go`          | HTTP                                                        | Owner check. Load or open `BillingAccount` (creates Stripe Customer). Reject `409 subscriptionAlreadyActive` if a current subscription exists, unless buying lifetime. Resolve active Price. Create Checkout (`subscription` or `payment`). Return URL.                                                                                                                                                                                                                                                                                                 |
+| `cmd_startportal.go`            | HTTP                                                        | Owner check. Requires a `BillingAccount`. Return Portal URL.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `cmd_cancelnow.go`              | HTTP                                                        | Owner check. `QuoteCancelNow` → `CancelNow` (adds one pending `Refund` per paid payment of the period) → save and commit → Stripe cancel (recurring; failure logged, retried by reconcile) → `CreateRefund` per refund → `MarkRefundSucceeded/Failed` from response (webhook confirms later).                                                                                                                                                                                                                                                           |
+| `q_cancelnowpreview.go`         | HTTP                                                        | Returns the `RefundQuote`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `cmd_claimpayer.go`             | HTTP                                                        | Owner check; any owner who is not already the payer (or when the payer is missing). Checkout `mode=setup` for the caller, who becomes payer on completion. This replaces a separate transfer endpoint.                                                                                                                                                                                                                                                                                                                                                  |
+| `cmd_completecheckout.go`       | webhook `checkout.session.completed`                        | By `metadata.purpose`: **subscribe** → fetch snapshot, create `Subscription`; if another current one exists → save the new one canceled with a full refund `duplicate_checkout`, then cancel it at Stripe after commit. **lifetime** → if a current recurring exists, `CancelNow(replaced_by_lifetime)` it first (prorated refund), then `NewLifetimeSubscription`. **payer_change** → set default payment method on customer + subscription, detach other methods, `ChangePayer`, update Stripe contact, and if the payer was missing: `ResumeCancel`. |
+| `cmd_syncsubscription.go`       | webhook subscription/invoice events, reconcile cron         | Fetch snapshot from Stripe (payload ignored → ordering irrelevant) → `ApplySnapshot`. A row already canceled locally is never resurrected: if Stripe still shows it live → cancel at Stripe, else mark it provider-synced. Reconcile also picks canceled rows whose `provider_synced_at <= canceled_at`.                                                                                                                                                                                                                                                |
+| `cmd_syncrefund.go`             | webhook `refund.created`, `refund.updated`, `refund.failed` | Match by `metadata.refund_id` or provider refund id → mark succeeded/failed. Unknown refunds (dashboard) → `RecordExternalRefund` with reason `external` on the lifetime row owning the payment, or on the subscription owning the invoice payment (recurring). A refund Stripe rejects permanently (`invalid_request_error`) is marked `failed`; transient errors stay `pending` for the reconcile cron.                                                                                                                                               |
+| `cmd_handlepayerremoved.go`     | Kafka authorization role/member events                      | If the user is payer of a workspace with a current recurring subscription: `MarkPayerMissing`, Stripe `cancel_at_period_end=true`, detach all payment methods.                                                                                                                                                                                                                                                                                                                                                                                          |
+| `cmd_handleworkspacedeleted.go` | Kafka `note.workspace.deleted`                              | Recurring → `CancelNow(workspace_deleted)` prorated (a `past_due` period with no paid payment refunds 0). Lifetime → refund only inside window.                                                                                                                                                                                                                                                                                                                                                                                                         |
+
+Kafka consumers (`controller/event`): one consumer group per topic; an undecodable payload or a permanent use-case error (`notFound`, `invalid`) is logged and acked, other errors are retried (Watermill retry, then redelivery).
 | `cmd_createprice.go` | Admin HTTP | New `Price` + Stripe Price (lookup key transfer) + archive previous active one for same (tier, interval, currency) + update Portal configuration. |
 | `cmd_archiveprice.go` | Admin HTTP | Archive in Stripe + DB, update Portal configuration. |
 | `cmd_updateplan.go` | Admin HTTP | `Plan.Update` (emits `PlanUpdated`). Takes effect on the next gRPC call. |
@@ -537,31 +549,31 @@ our own constants (`CheckoutCompleted`, `SubscriptionChanged`, `InvoicePaid`,
   case, so a failed use case does not mark the event processed).
 - Synchronous inside the request.
 
-| Stripe event | Use case |
-| --- | --- |
-| `checkout.session.completed` | `CompleteCheckout` |
-| `customer.subscription.created`, `.updated`, `.deleted` | `SyncSubscription` |
-| `invoice.paid`, `invoice.payment_failed` | `SyncSubscription` (subscription id from invoice) |
-| `refund.updated`, `refund.failed`, `charge.refunded` | `SyncRefund` |
-| anything else | ignored, 200 |
+| Stripe event                                            | Use case                                                          |
+| ------------------------------------------------------- | ----------------------------------------------------------------- |
+| `checkout.session.completed`                            | `CompleteCheckout`                                                |
+| `customer.subscription.created`, `.updated`, `.deleted` | `SyncSubscription`                                                |
+| `invoice.paid`, `invoice.payment_failed`                | `SyncSubscription` (subscription id from invoice)                 |
+| `refund.created`, `refund.updated`, `refund.failed`     | `SyncRefund` (the refund object carries our `metadata.refund_id`) |
+| anything else                                           | ignored, 200                                                      |
 
 ## 8. HTTP API (`api/billing/`, base `/billing`)
 
-| Method & path | Who | Body / result |
-| --- | --- | --- |
-| `GET /plans` | public (no JWT) | plans + features + limits + active prices |
-| `GET /workspaces/{workspaceId}/entitlements` | workspace member | `Entitlements` |
-| `GET /workspaces/{workspaceId}/subscription` | owner | subscription, payer, refunds; 404-free (null when none) |
-| `POST /workspaces/{workspaceId}/checkout-session` | owner | `{priceId}` → `{url}` |
-| `POST /workspaces/{workspaceId}/portal-session` | owner | → `{url}` |
-| `GET /workspaces/{workspaceId}/subscription/cancel-now/preview` | owner | `RefundQuote` |
-| `POST /workspaces/{workspaceId}/subscription/cancel-now` | owner | → subscription |
-| `POST /workspaces/{workspaceId}/payer/claim` | owner | → `{url}` |
-| `GET /admin/plans` / `PATCH /admin/plans/{tier}` | admin | `{features?, limits?}` |
-| `GET /admin/policy` / `PATCH /admin/policy` | admin | `{pastDueGraceDays?, lifetimeRefundWindowDays?}` |
-| `GET /admin/prices` / `POST /admin/prices` | admin | `{plan, interval, amount, currency}` |
-| `POST /admin/prices/{priceId}/archive` | admin | |
-| `POST /webhooks/stripe` | Stripe (no JWT) | raw body |
+| Method & path                                                   | Who              | Body / result                                           |
+| --------------------------------------------------------------- | ---------------- | ------------------------------------------------------- |
+| `GET /plans`                                                    | public (no JWT)  | plans + features + limits + active prices               |
+| `GET /workspaces/{workspaceId}/entitlements`                    | workspace member | `Entitlements`                                          |
+| `GET /workspaces/{workspaceId}/subscription`                    | owner            | subscription, payer, refunds; 404-free (null when none) |
+| `POST /workspaces/{workspaceId}/checkout-session`               | owner            | `{priceId}` → `{url}`                                   |
+| `POST /workspaces/{workspaceId}/portal-session`                 | owner            | → `{url}`                                               |
+| `GET /workspaces/{workspaceId}/subscription/cancel-now/preview` | owner            | `RefundQuote`                                           |
+| `POST /workspaces/{workspaceId}/subscription/cancel-now`        | owner            | → subscription                                          |
+| `POST /workspaces/{workspaceId}/payer/claim`                    | owner            | → `{url}`                                               |
+| `GET /admin/plans` / `PATCH /admin/plans/{tier}`                | admin            | `{features?, limits?}`                                  |
+| `GET /admin/policy` / `PATCH /admin/policy`                     | admin            | `{pastDueGraceDays?, lifetimeRefundWindowDays?}`        |
+| `GET /admin/prices` / `POST /admin/prices`                      | admin            | `{plan, interval, amount, currency}`                    |
+| `POST /admin/prices/{priceId}/archive`                          | admin            |                                                         |
+| `POST /webhooks/stripe`                                         | Stripe (no JWT)  | raw body                                                |
 
 Errors use `api/common` `Error`. New codes: `subscriptionAlreadyActive`,
 `noBillingAccount`, `refundWindowExpired`, `payerNotMissing`, `targetNotOwner`,
@@ -650,8 +662,8 @@ commits** (no outbox). Losing one is harmless: clients catch up on their next en
 Consumers never cache billing state; note, document and the future AI service read it through
 gRPC on every check.
 
-| Topic | Payload | When | Consumer |
-| --- | --- | --- | --- |
+| Topic                                             | Payload                       | When                                                                                                                          | Consumer                                  |
+| ------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
 | `events.integration.billing.subscription.changed` | `{workspaceId, plan, status}` | subscription activated, renewed, past_due, plan changed, cancel scheduled/resumed, ended, canceled-now; payer missing/changed | note → SSE `WorkspaceBillingChangedEvent` |
 
 Domain events (section 4.3) are still raised by every mutating method; repos drain them on
@@ -660,11 +672,11 @@ not pushed: clients see new limits on their next entitlements fetch.
 
 Billing consumes:
 
-| Topic | Use case |
-| --- | --- |
-| `events.integration.note.workspace.deleted` (added in sub-project 01) | `HandleWorkspaceDeleted` |
-| `events.integration.authorization.user_workspace_role_updated` | `HandlePayerRemoved` (payer no longer owner) |
-| `events.integration.authorization.workspace_member_removed` | `HandlePayerRemoved` |
+| Topic                                                                 | Use case                                     |
+| --------------------------------------------------------------------- | -------------------------------------------- |
+| `events.integration.note.workspace.deleted` (added in sub-project 01) | `HandleWorkspaceDeleted`                     |
+| `events.integration.authorization.user_workspace_role_updated`        | `HandlePayerRemoved` (payer no longer owner) |
+| `events.integration.authorization.workspace_member_removed`           | `HandlePayerRemoved`                         |
 
 Authentik user deletion is not observed: Authentik emits no event we consume, and
 `UserDeletedEvent` in `api/share` has no producer. A deleted payer is only caught through the
@@ -733,6 +745,7 @@ CREATE TABLE subscriptions (
   current_period_end TIMESTAMPTZ,
   cancel_at_period_end BOOLEAN NOT NULL DEFAULT FALSE,
   canceled_at TIMESTAMPTZ,
+  past_due_since TIMESTAMPTZ, -- set on entering past_due, cleared on leaving
   paid_at TIMESTAMPTZ,
   provider_synced_at TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ NOT NULL,
@@ -764,13 +777,12 @@ CREATE TABLE processed_provider_events (
 );
 ```
 
-
 ## 12. Cron (billing)
 
-| Job | Schedule (process zone, `TZ` env) | Command |
-| --- | --- | --- |
-| reconcile subscriptions | hourly | `ReconcileSubscriptions` (batch 100) |
-| prune `processed_provider_events` older than 30 days | daily 04:00 | `PruneProviderEvents` |
+| Job                                                  | Schedule (process zone, `TZ` env) | Command                              |
+| ---------------------------------------------------- | --------------------------------- | ------------------------------------ |
+| reconcile subscriptions                              | hourly                            | `ReconcileSubscriptions` (batch 100) |
+| prune `processed_provider_events` older than 30 days | daily 04:00                       | `PruneProviderEvents`                |
 
 `controller/cron/` registers jobs on `pkg/cron.Scheduler`. Locking: `gocron-redis-lock` on
 `billing_redis`. `// NOTE:` move `controller/cron` into `cmd/billing-worker` when splitting.
@@ -794,7 +806,6 @@ NOTOPIA_BILLING_IDENTITY_ADMIN_GROUP=notopia-admins          # pkg/common/config
 NOTOPIA_BILLING_IDENTITY_SERVICE_ACCOUNT_USER_ID=1003
 ```
 
-
 ## 14. Runtime, observability, health
 
 Mirror `cmd/note` + `internal/note` exactly:
@@ -812,30 +823,30 @@ Mirror `cmd/note` + `internal/note` exactly:
 
 ## 15. Infrastructure and tooling
 
-| Item | Content |
-| --- | --- |
-| `deploy/compose/services/billing.yaml` | `billing_postgresql`, `billing_redis` (`--maxmemory-policy noeviction --appendonly yes`) |
-| `deploy/compose/infrastructure/traefik/dynamic/billing.yaml` | `/billing` with `jwt` + `cors`; separate routers without JWT for `/billing/health`, `/billing/plans` (GET), `/billing/webhooks/stripe` |
-| `cmd/billing/project.json` | targets copied from `cmd/note/project.json`: `build`, `run`, `debug`, `lint`, `gen`, `gen:sqlc`, `gen:wire`, `goose*`, `lint:goose` |
-| `cmd/billingseed/project.json` | `build`, `run`, `gen:wire`, `lint` |
-| `cmd/billing/sqlc.yaml` | like `cmd/note/sqlc.yaml`, pointing at `internal/billing/infra/persistence` |
-| `api/billing/` | `openapi.yaml`, `paths/`, `components/`, `oapi-codegen-server.yaml` (gin + strict, `nullable-type: true`), `oapi-codegen-model.yaml`, `project.json`; register in `api/project.json` `implicitDependencies`, `api/redocly.yaml`, `apps/api-web/project.json` |
-| `proto/billing/billing.proto` | `nx gen proto` → `pkg/pb/billing`, `packages/pb` |
-| `.env` / `.env.local` | non-secret defaults in `cmd/billing/.env`; Stripe keys only in `.env.local` |
-| `justfile` | `billing-seed`, `stripe-listen` (`stripe listen --forward-to http://api.notopia.localhost/billing/webhooks/stripe`) |
-| `docs/` | billing context diagram, webhook sequence, subscription state diagram (VitePress `src/`) |
-| `internal/billing/AGENTS.md` + root `CLAUDE.md` structure table | document the service; TODO: free trial, live payments |
+| Item                                                            | Content                                                                                                                                                                                                                                                      |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `deploy/compose/services/billing.yaml`                          | `billing_postgresql`, `billing_redis` (`--maxmemory-policy noeviction --appendonly yes`)                                                                                                                                                                     |
+| `deploy/compose/infrastructure/traefik/dynamic/billing.yaml`    | `/billing` with `jwt` + `cors`; separate routers without JWT for `/billing/health`, `/billing/plans` (GET), `/billing/webhooks/stripe`                                                                                                                       |
+| `cmd/billing/project.json`                                      | targets copied from `cmd/note/project.json`: `build`, `run`, `debug`, `lint`, `gen`, `gen:sqlc`, `gen:wire`, `goose*`, `lint:goose`                                                                                                                          |
+| `cmd/billingseed/project.json`                                  | `build`, `run`, `gen:wire`, `lint`                                                                                                                                                                                                                           |
+| `cmd/billing/sqlc.yaml`                                         | like `cmd/note/sqlc.yaml`, pointing at `internal/billing/infra/persistence`                                                                                                                                                                                  |
+| `api/billing/`                                                  | `openapi.yaml`, `paths/`, `components/`, `oapi-codegen-server.yaml` (gin + strict, `nullable-type: true`), `oapi-codegen-model.yaml`, `project.json`; register in `api/project.json` `implicitDependencies`, `api/redocly.yaml`, `apps/api-web/project.json` |
+| `proto/billing/billing.proto`                                   | `nx gen proto` → `pkg/pb/billing`, `packages/pb`                                                                                                                                                                                                             |
+| `.env` / `.env.local`                                           | non-secret defaults in `cmd/billing/.env`; Stripe keys only in `.env.local`                                                                                                                                                                                  |
+| `justfile`                                                      | `billing-seed`, `stripe-listen` (`stripe listen --forward-to http://api.notopia.localhost/billing/webhooks/stripe`)                                                                                                                                          |
+| `docs/`                                                         | billing context diagram, webhook sequence, subscription state diagram (VitePress `src/`)                                                                                                                                                                     |
+| `internal/billing/AGENTS.md` + root `CLAUDE.md` structure table | document the service; TODO: free trial, live payments                                                                                                                                                                                                        |
 
 ## 16. Testing
 
 Unit tests only where logic is non-obvious; plumbing is verified by the manual sandbox E2E.
 
-| Layer | How |
-| --- | --- |
-| domain | Table tests: `GrantsAccess` (grace window, lifetime), `ApplySnapshot` event diffs, `QuoteCancelNow` (prorated, after a mid-period upgrade, lifetime window), per-payment refund invariant |
-| infra/payment/stripe | Snapshot mapping from a recorded Stripe JSON fixture (item-level periods); webhook signature verify with `webhook.GenerateTestSignedPayload` |
-| app | `CompleteCheckout` branches (duplicate, lifetime replaces recurring, payer change) with fakes |
-| persistence | No automated DB tests (none exist for note). `nx goose:validate billing`, `nx lint:goose billing` |
+| Layer                 | How                                                                                                                                                                                                                                                                                                                                                                                |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| domain                | Table tests: `GrantsAccess` (grace window, lifetime), `ApplySnapshot` event diffs, `QuoteCancelNow` (prorated, after a mid-period upgrade, lifetime window), per-payment refund invariant                                                                                                                                                                                          |
+| infra/payment/stripe  | Snapshot mapping from a recorded Stripe JSON fixture (item-level periods); webhook signature verify with `webhook.GenerateTestSignedPayload`                                                                                                                                                                                                                                       |
+| app                   | `CompleteCheckout` branches (duplicate, lifetime replaces recurring, payer change) with fakes                                                                                                                                                                                                                                                                                      |
+| persistence           | No automated DB tests (none exist for note). `nx goose:validate billing`, `nx lint:goose billing`                                                                                                                                                                                                                                                                                  |
 | E2E (manual, sandbox) | `stripe listen`; checkout with card `4242 4242 4242 4242` → entitlements `plus`; Portal upgrade → `pro`; Portal cancel at period end; `stripe trigger invoice.payment_failed` → `past_due` still granted within grace; cancel-now → refund in dashboard; payer claim via setup checkout; delete workspace → subscription canceled + refund; replay a webhook → no duplicate effect |
 
 ## 17. Acceptance

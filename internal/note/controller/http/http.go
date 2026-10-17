@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -132,7 +133,10 @@ func New(
 }
 
 func (h *HTTP) Run() error {
-	return h.ListenAndServe()
+	if err := h.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+	return nil
 }
 
 var Provide = New

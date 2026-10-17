@@ -1,0 +1,56 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "billingseed",
+  "projectType": "application",
+  "tags": ["type:go"],
+  "namedInputs": {
+    "default": [
+      "goPkgFiles",
+      "goFiles",
+      "{workspaceRoot}/internal/billing/**/*.go",
+      "{workspaceRoot}/internal/billingseed/**/*.go"
+    ]
+  },
+  "targets": {
+    "gen:wire": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/wire_gen.go"],
+      "options": {
+        "command": "wire",
+        "cwd": "{projectRoot}"
+      },
+      "cache": false
+    },
+    "gen": {
+      "dependsOn": ["gen:wire"]
+    },
+    "run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run ./cmd/billingseed/",
+        "cwd": "{workspaceRoot}",
+        "tty": true
+      },
+      "dependsOn": ["gen"],
+      "continuous": false
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go build -o ./cmd/billingseed/billingseed ./cmd/billingseed/",
+        "cwd": "{workspaceRoot}"
+      },
+      "dependsOn": ["gen"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "golangci-lint run ./cmd/billingseed/... ./internal/billingseed/...",
+        "cwd": "{workspaceRoot}"
+      },
+      "cache": false,
+      "parallelism": false
+    }
+  },
+  "implicitDependencies": ["pkg", "billing"]
+}

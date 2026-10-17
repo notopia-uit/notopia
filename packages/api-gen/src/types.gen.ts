@@ -429,6 +429,182 @@ export type NoteUser = {
   email: string | null;
 };
 
+export const BillingPlanTier = {
+  FREE: 'free',
+  PLUS: 'plus',
+  PRO: 'pro'
+} as const;
+
+export type BillingPlanTier = typeof BillingPlanTier[keyof typeof BillingPlanTier];
+
+/**
+ * Feature flags by key (auto_commit, workspace_graph).
+ */
+export type BillingFeatures = {
+  [key: string]: boolean;
+};
+
+/**
+ * Limits by key. -1 means unlimited.
+ */
+export type BillingLimits = {
+  [key: string]: bigint;
+};
+
+export const BillingBillingInterval = {
+  MONTH: 'month',
+  YEAR: 'year',
+  LIFETIME: 'lifetime'
+} as const;
+
+export type BillingBillingInterval = typeof BillingBillingInterval[keyof typeof BillingBillingInterval];
+
+export type BillingPrice = {
+  id: string;
+  plan: BillingPlanTier;
+  interval: BillingBillingInterval;
+  amount: bigint;
+  currency: string;
+  lookupKey: string;
+  active: boolean;
+  createdAt: Date;
+  archivedAt?: Date | null;
+};
+
+export type BillingPlan = {
+  tier: BillingPlanTier;
+  features: BillingFeatures;
+  limits: BillingLimits;
+  prices: Array<BillingPrice>;
+};
+
+export type BillingError = {
+  /**
+   * Error code
+   */
+  code: string;
+  /**
+   * Human-readable error message
+   */
+  message: string;
+  /**
+   * URL with more information about the error
+   */
+  more_info?: string;
+};
+
+/**
+ * `none` when the workspace never subscribed.
+ */
+export const BillingSubscriptionStatus = {
+  NONE: 'none',
+  INCOMPLETE: 'incomplete',
+  ACTIVE: 'active',
+  PAST_DUE: 'past_due',
+  UNPAID: 'unpaid',
+  CANCELED: 'canceled',
+  INCOMPLETE_EXPIRED: 'incomplete_expired'
+} as const;
+
+/**
+ * `none` when the workspace never subscribed.
+ */
+export type BillingSubscriptionStatus = typeof BillingSubscriptionStatus[keyof typeof BillingSubscriptionStatus];
+
+export type BillingEntitlements = {
+  workspaceId: string;
+  plan: BillingPlanTier;
+  status: BillingSubscriptionStatus;
+  accessUntil?: Date | null;
+  features: BillingFeatures;
+  limits: BillingLimits;
+};
+
+export type BillingRefund = {
+  id: string;
+  amount: bigint;
+  currency: string;
+  reason: 'cancel_now' | 'lifetime_window' | 'replaced_by_lifetime' | 'workspace_deleted' | 'duplicate_checkout' | 'external';
+  status: 'pending' | 'succeeded' | 'failed' | 'canceled';
+  createdAt: Date;
+};
+
+export type BillingSubscription = {
+  id: string;
+  plan: BillingPlanTier;
+  interval: BillingBillingInterval;
+  status: BillingSubscriptionStatus;
+  currentPeriodStart?: Date | null;
+  currentPeriodEnd?: Date | null;
+  cancelAtPeriodEnd: boolean;
+  canceledAt?: Date | null;
+  accessUntil?: Date | null;
+  refunds: Array<BillingRefund>;
+};
+
+export type BillingPayer = {
+  id: string;
+  email: string;
+  name: string;
+  missingSince?: Date | null;
+};
+
+export type BillingWorkspaceBilling = {
+  subscription?: BillingSubscription | null;
+  payer?: BillingPayer | null;
+};
+
+export type BillingCheckoutSessionRequest = {
+  priceId: string;
+};
+
+export type BillingRedirectUrl = {
+  url: string;
+};
+
+export type BillingRefundQuotePayment = {
+  paidAmount: bigint;
+  /**
+   * Refund for this payment
+   */
+  amount: bigint;
+  coverageSeconds: bigint;
+  unusedSeconds: bigint;
+};
+
+export type BillingRefundQuote = {
+  amount: bigint;
+  currency: string;
+  unusedSeconds: bigint;
+  periodSeconds: bigint;
+  /**
+   * One line per paid invoice payment of the current period
+   */
+  payments: Array<BillingRefundQuotePayment>;
+};
+
+export type BillingUpdatePlanRequest = {
+  features?: BillingFeatures;
+  limits?: BillingLimits;
+};
+
+export type BillingBillingPolicy = {
+  pastDueGraceDays: number;
+  lifetimeRefundWindowDays: number;
+};
+
+export type BillingUpdatePolicyRequest = {
+  pastDueGraceDays?: number;
+  lifetimeRefundWindowDays?: number;
+};
+
+export type BillingCreatePriceRequest = {
+  plan: 'plus' | 'pro';
+  interval: BillingBillingInterval;
+  amount: bigint;
+  currency: string;
+};
+
 export type ShareUserWorkspaceRoleUpdatedEventWritable = {
   userId: ShareId;
   role: ShareWorkspaceRole;
@@ -581,6 +757,12 @@ export type NoteWorkspaceIdPath = NoteId3;
  * Number of items per page
  */
 export type NoteLimitQuery = number;
+
+export type BillingWorkspaceIdPath = string;
+
+export type BillingTierPath = BillingPlanTier;
+
+export type BillingPriceIdPath = string;
 
 export type GetDocumentAttachmentUploadUrlData = {
   body?: never;
@@ -2326,3 +2508,674 @@ export type SearchUsersResponses = {
 };
 
 export type SearchUsersResponse = SearchUsersResponses[keyof SearchUsersResponses];
+
+export type ListPlansData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/billing/plans';
+};
+
+export type ListPlansErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type ListPlansError = ListPlansErrors[keyof ListPlansErrors];
+
+export type ListPlansResponses = {
+  /**
+   * Plans
+   */
+  200: Array<BillingPlan>;
+};
+
+export type ListPlansResponse = ListPlansResponses[keyof ListPlansResponses];
+
+export type GetWorkspaceEntitlementsData = {
+  body?: never;
+  path: {
+    workspaceId: string;
+  };
+  query?: never;
+  url: '/billing/workspaces/{workspaceId}/entitlements';
+};
+
+export type GetWorkspaceEntitlementsErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type GetWorkspaceEntitlementsError = GetWorkspaceEntitlementsErrors[keyof GetWorkspaceEntitlementsErrors];
+
+export type GetWorkspaceEntitlementsResponses = {
+  /**
+   * Entitlements of the workspace
+   */
+  200: BillingEntitlements;
+};
+
+export type GetWorkspaceEntitlementsResponse = GetWorkspaceEntitlementsResponses[keyof GetWorkspaceEntitlementsResponses];
+
+export type GetWorkspaceBillingData = {
+  body?: never;
+  path: {
+    workspaceId: string;
+  };
+  query?: never;
+  url: '/billing/workspaces/{workspaceId}/subscription';
+};
+
+export type GetWorkspaceBillingErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type GetWorkspaceBillingError = GetWorkspaceBillingErrors[keyof GetWorkspaceBillingErrors];
+
+export type GetWorkspaceBillingResponses = {
+  /**
+   * Workspace billing state
+   */
+  200: BillingWorkspaceBilling;
+};
+
+export type GetWorkspaceBillingResponse = GetWorkspaceBillingResponses[keyof GetWorkspaceBillingResponses];
+
+export type CreateCheckoutSessionData = {
+  body: BillingCheckoutSessionRequest;
+  path: {
+    workspaceId: string;
+  };
+  query?: never;
+  url: '/billing/workspaces/{workspaceId}/checkout-session';
+};
+
+export type CreateCheckoutSessionErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Not Found Error response
+   */
+  404: BillingError;
+  /**
+   * Conflict with current billing state
+   */
+  409: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type CreateCheckoutSessionError = CreateCheckoutSessionErrors[keyof CreateCheckoutSessionErrors];
+
+export type CreateCheckoutSessionResponses = {
+  /**
+   * Redirect the browser to this URL
+   */
+  200: BillingRedirectUrl;
+};
+
+export type CreateCheckoutSessionResponse = CreateCheckoutSessionResponses[keyof CreateCheckoutSessionResponses];
+
+export type CreatePortalSessionData = {
+  body?: never;
+  path: {
+    workspaceId: string;
+  };
+  query?: never;
+  url: '/billing/workspaces/{workspaceId}/portal-session';
+};
+
+export type CreatePortalSessionErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Not Found Error response
+   */
+  404: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type CreatePortalSessionError = CreatePortalSessionErrors[keyof CreatePortalSessionErrors];
+
+export type CreatePortalSessionResponses = {
+  /**
+   * Redirect the browser to this URL
+   */
+  200: BillingRedirectUrl;
+};
+
+export type CreatePortalSessionResponse = CreatePortalSessionResponses[keyof CreatePortalSessionResponses];
+
+export type PreviewCancelNowData = {
+  body?: never;
+  path: {
+    workspaceId: string;
+  };
+  query?: never;
+  url: '/billing/workspaces/{workspaceId}/subscription/cancel-now/preview';
+};
+
+export type PreviewCancelNowErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Not Found Error response
+   */
+  404: BillingError;
+  /**
+   * Conflict with current billing state
+   */
+  409: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type PreviewCancelNowError = PreviewCancelNowErrors[keyof PreviewCancelNowErrors];
+
+export type PreviewCancelNowResponses = {
+  /**
+   * Refund quote
+   */
+  200: BillingRefundQuote;
+};
+
+export type PreviewCancelNowResponse = PreviewCancelNowResponses[keyof PreviewCancelNowResponses];
+
+export type CancelNowData = {
+  body?: never;
+  path: {
+    workspaceId: string;
+  };
+  query?: never;
+  url: '/billing/workspaces/{workspaceId}/subscription/cancel-now';
+};
+
+export type CancelNowErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Not Found Error response
+   */
+  404: BillingError;
+  /**
+   * Conflict with current billing state
+   */
+  409: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type CancelNowError = CancelNowErrors[keyof CancelNowErrors];
+
+export type CancelNowResponses = {
+  /**
+   * Workspace billing state after cancel
+   */
+  200: BillingWorkspaceBilling;
+};
+
+export type CancelNowResponse = CancelNowResponses[keyof CancelNowResponses];
+
+export type ClaimPayerData = {
+  body?: never;
+  path: {
+    workspaceId: string;
+  };
+  query?: never;
+  url: '/billing/workspaces/{workspaceId}/payer/claim';
+};
+
+export type ClaimPayerErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Not Found Error response
+   */
+  404: BillingError;
+  /**
+   * Conflict with current billing state
+   */
+  409: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type ClaimPayerError = ClaimPayerErrors[keyof ClaimPayerErrors];
+
+export type ClaimPayerResponses = {
+  /**
+   * Redirect the browser to this URL
+   */
+  200: BillingRedirectUrl;
+};
+
+export type ClaimPayerResponse = ClaimPayerResponses[keyof ClaimPayerResponses];
+
+export type AdminListPlansData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/billing/admin/plans';
+};
+
+export type AdminListPlansErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type AdminListPlansError = AdminListPlansErrors[keyof AdminListPlansErrors];
+
+export type AdminListPlansResponses = {
+  /**
+   * Plans
+   */
+  200: Array<BillingPlan>;
+};
+
+export type AdminListPlansResponse = AdminListPlansResponses[keyof AdminListPlansResponses];
+
+export type AdminUpdatePlanData = {
+  body: BillingUpdatePlanRequest;
+  path: {
+    tier: BillingPlanTier;
+  };
+  query?: never;
+  url: '/billing/admin/plans/{tier}';
+};
+
+export type AdminUpdatePlanErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Not Found Error response
+   */
+  404: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type AdminUpdatePlanError = AdminUpdatePlanErrors[keyof AdminUpdatePlanErrors];
+
+export type AdminUpdatePlanResponses = {
+  /**
+   * Updated plan
+   */
+  200: BillingPlan;
+};
+
+export type AdminUpdatePlanResponse = AdminUpdatePlanResponses[keyof AdminUpdatePlanResponses];
+
+export type AdminGetPolicyData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/billing/admin/policy';
+};
+
+export type AdminGetPolicyErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type AdminGetPolicyError = AdminGetPolicyErrors[keyof AdminGetPolicyErrors];
+
+export type AdminGetPolicyResponses = {
+  /**
+   * Billing policy
+   */
+  200: BillingBillingPolicy;
+};
+
+export type AdminGetPolicyResponse = AdminGetPolicyResponses[keyof AdminGetPolicyResponses];
+
+export type AdminUpdatePolicyData = {
+  body: BillingUpdatePolicyRequest;
+  path?: never;
+  query?: never;
+  url: '/billing/admin/policy';
+};
+
+export type AdminUpdatePolicyErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type AdminUpdatePolicyError = AdminUpdatePolicyErrors[keyof AdminUpdatePolicyErrors];
+
+export type AdminUpdatePolicyResponses = {
+  /**
+   * Updated billing policy
+   */
+  200: BillingBillingPolicy;
+};
+
+export type AdminUpdatePolicyResponse = AdminUpdatePolicyResponses[keyof AdminUpdatePolicyResponses];
+
+export type AdminListPricesData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/billing/admin/prices';
+};
+
+export type AdminListPricesErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type AdminListPricesError = AdminListPricesErrors[keyof AdminListPricesErrors];
+
+export type AdminListPricesResponses = {
+  /**
+   * Prices
+   */
+  200: Array<BillingPrice>;
+};
+
+export type AdminListPricesResponse = AdminListPricesResponses[keyof AdminListPricesResponses];
+
+export type AdminCreatePriceData = {
+  body: BillingCreatePriceRequest;
+  path?: never;
+  query?: never;
+  url: '/billing/admin/prices';
+};
+
+export type AdminCreatePriceErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type AdminCreatePriceError = AdminCreatePriceErrors[keyof AdminCreatePriceErrors];
+
+export type AdminCreatePriceResponses = {
+  /**
+   * Created price
+   */
+  201: BillingPrice;
+};
+
+export type AdminCreatePriceResponse = AdminCreatePriceResponses[keyof AdminCreatePriceResponses];
+
+export type AdminArchivePriceData = {
+  body?: never;
+  path: {
+    priceId: string;
+  };
+  query?: never;
+  url: '/billing/admin/prices/{priceId}/archive';
+};
+
+export type AdminArchivePriceErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Unauthorized Error response
+   */
+  401: {
+    [key: string]: unknown;
+  };
+  /**
+   * Forbidden Error response
+   */
+  403: BillingError;
+  /**
+   * Not Found Error response
+   */
+  404: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type AdminArchivePriceError = AdminArchivePriceErrors[keyof AdminArchivePriceErrors];
+
+export type AdminArchivePriceResponses = {
+  /**
+   * Archived price
+   */
+  200: BillingPrice;
+};
+
+export type AdminArchivePriceResponse = AdminArchivePriceResponses[keyof AdminArchivePriceResponses];
+
+export type StripeWebhookData = {
+  body: {
+    [key: string]: unknown;
+  };
+  headers: {
+    'Stripe-Signature': string;
+  };
+  path?: never;
+  query?: never;
+  url: '/billing/webhooks/stripe';
+};
+
+export type StripeWebhookErrors = {
+  /**
+   * Bad Request Error response
+   */
+  400: BillingError;
+  /**
+   * Internal Server Error response
+   */
+  500: BillingError;
+};
+
+export type StripeWebhookError = StripeWebhookErrors[keyof StripeWebhookErrors];
+
+export type StripeWebhookResponses = {
+  /**
+   * Event accepted
+   */
+  204: void;
+};
+
+export type StripeWebhookResponse = StripeWebhookResponses[keyof StripeWebhookResponses];
