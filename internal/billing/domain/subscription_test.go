@@ -148,3 +148,19 @@ func TestLifetimeRefundWindow(t *testing.T) {
 	require.Error(t, err, "refundWindowExpired after 14 days")
 	assert.True(t, s.GrantsAccess(t0.AddDate(5, 0, 0), policy), "lifetime grants access forever")
 }
+
+func TestQuoteCancelNowWithoutPayments(t *testing.T) {
+	policy := domain.DefaultBillingPolicy(t0)
+	end := t0.AddDate(0, 1, 0)
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000), snap(domain.StatusPastDue, t0, end), t0, "u")
+
+	q, err := s.QuoteCancelNow(t0.Add(time.Hour), policy, nil)
+	require.NoError(t, err)
+	assert.Zero(t, q.Amount.Amount)
+	assert.Empty(t, q.Lines)
+
+	refunds, err := s.CancelNow(t0.Add(time.Hour), domain.RefundReasonCancelNow, q, "u")
+	require.NoError(t, err)
+	assert.Empty(t, refunds)
+	assert.Equal(t, domain.StatusCanceled, s.Status())
+}

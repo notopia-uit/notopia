@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/notopia-uit/notopia/internal/billing/domain"
-	"github.com/notopia-uit/notopia/internal/billing/errs"
 	stripego "github.com/stripe/stripe-go/v87"
 )
 
@@ -36,7 +35,7 @@ func (p *Provider) CancelSubscriptionNow(ctx context.Context, providerSubscripti
 }
 
 // PeriodPayments: a period can hold the renewal invoice plus proration invoices from upgrades
-// (always_invoice). Coverage = the invoice's line periods clipped to the current period.
+// (always_invoice). A past_due subscription has none paid yet: the result is empty, not an error. Coverage = the invoice's line periods clipped to the current period.
 func (p *Provider) PeriodPayments(
 	ctx context.Context,
 	providerSubscriptionID string,
@@ -63,9 +62,6 @@ func (p *Provider) PeriodPayments(
 			return nil, err
 		}
 		out = append(out, payments...)
-	}
-	if len(out) == 0 {
-		return nil, errs.NewNotFound("no paid payment in the current period")
 	}
 	return out, nil
 }

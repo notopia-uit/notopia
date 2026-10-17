@@ -3,6 +3,7 @@ package event
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -14,6 +15,7 @@ import (
 	wotel "github.com/nkonev/watermill-opentelemetry/pkg/opentelemetry"
 	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/component"
+	"github.com/notopia-uit/notopia/internal/billing/errs"
 	"github.com/notopia-uit/notopia/pkg/api/share"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/notopia-uit/notopia/pkg/otel"
@@ -76,7 +78,8 @@ func New(
 var Provide = New
 
 // decode turns a typed handler into a router handler. A payload that does not decode is
-// logged and acked: retrying cannot fix it, and a nack would block the partition.
+// logged and acked: retrying cannot fix it, and a nack would block the partition. The same holds for
+// handler errors coded NotFound or Invalid; any other error is returned so the router retries.
 func decode[T any](fn func(ctx context.Context, ev *T) error) message.NoPublishHandlerFunc {
 	return func(msg *message.Message) error {
 		var ev T
@@ -89,8 +92,26 @@ func decode[T any](fn func(ctx context.Context, ev *T) error) message.NoPublishH
 			)
 			return nil
 		}
-		return fn(msg.Context(), &ev)
+		err := fn(msg.Context(), &ev)
+		if hasPermanentCode(err) {
+			slog.ErrorContext(
+				msg.Context(), "dropping event the handler can never process",
+				slog.String("type", fmt.Sprintf("%T", ev)),
+				slog.String("message_uuid", msg.UUID),
+				slog.Any("error", err),
+			)
+			return nil
+		}
+		return err
 	}
+}
+
+func hasPermanentCode(err error) bool {
+	var e errs.Error
+	if !errors.As(err, &e) {
+		return false
+	}
+	return e.Code() == errs.CodeNotFound || e.Code() == errs.CodeInvalid
 }
 
 func (e *Event) workspaceDeleted(ctx context.Context, ev *share.WorkspaceDeletedIntegrationEvent) error {
