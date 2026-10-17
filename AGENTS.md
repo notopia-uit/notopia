@@ -35,11 +35,15 @@ cmd/                            # Go services (entrypoint only: main.go + wire)
   authorization/                # Authorization service (nx: authorization)
   billing/                      # Billing service, Stripe (nx: billing)
   notefixturegen/               # Dev fixture generator (fake notes from Obsidian vault)
+  billingseed/                  # Billing seed: Stripe prices + portal config (nx: billingseed)
+  billingfixtures/              # Billing dev fixtures (nx: billingfixtures)
 internal/                       # Internal Go packages (the actual service code)
   note/
   authorization/
   billing/
   notefixturegen/
+  billingseed/
+  billingfixtures/
 pkg/                            # Go packages
   api                           # Code gen from oapi-codegen
   common                        # Including commonhttp, commonconfig, commonhandler

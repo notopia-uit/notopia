@@ -12,7 +12,7 @@ Spec and plans: `docs/superpowers/specs/2026-10-11-billing-03-*`, `docs/superpow
 | `domain/` | Aggregates (`Subscription` + `Refund`, `BillingAccount`, `Price`, `Plan`, `BillingPolicy`), `ResolveEntitlements`, repo interfaces, `UnitOfWork`, `ProviderEventLog` | Pure. `uint8` enums with `IsValid`/`String` |
 | `app/` | `cmd_*` / `q_*` use cases, ports (`svc_*`, `readmodel.go`), app models | Commands use `domain.UnitOfWork`; queries use `app.BillingReadModel` only |
 | `infra/` | `persistence/` (pgrepo, pgreadmodel, pgmapper, pgjsonb, pgsqlc, pgmigration), `notifier/` (Kafka), `service/` (authorization gRPC), `redis/` | Each adapter maps enums explicitly (`toX`/`fromX`), never casts |
-| `controller/` | `http/` (gin strict server, Stripe webhook), `grpc/`, `event/` (Kafka consumers, one consumer group per topic), `health/` | Thin — translate, don't decide |
+| `controller/` | `http/` (gin strict server, Stripe webhook), `grpc/`, `event/` (Kafka consumers, one consumer group per topic, typed via `decode[T]`), `cron/`, `health/` | Thin — translate, don't decide |
 | `component/` | Validator, `eventtopic.go` (every topic published or consumed) | No inline topic strings elsewhere |
 | `errs/` | Typed errors (`Code` is the wire code) | Mapped in `controller/http/err.go` and `controller/grpc/err.go` |
 
@@ -28,7 +28,17 @@ Spec and plans: `docs/superpowers/specs/2026-10-11-billing-03-*`, `docs/superpow
 - Sandbox only. Stripe does not onboard VN businesses for live payouts; a VN gateway can replace it behind `app.PaymentProvider`.
 - Webhooks are fetch-and-sync: payloads are used for ids only, state is read back from Stripe, so ordering does not matter.
 - Every Stripe write that must not duplicate carries an idempotency key (`customer:{workspaceId}`, `refund:{refundId}`, `price:{priceId}`).
-- Local: `stripe listen --forward-to http://api.notopia.localhost/billing/webhooks/stripe`; keys go in `cmd/billing/.env.local`.
+- Webhook use-case ordering: provider mutations that must not be lost (cancel a duplicate, change default card) run **before** the write transaction and are idempotent; the transaction records the event (`ProviderEventLog.MarkProcessed`) with the state change; refunds run **after** commit via `RefundRunner` and the reconcile cron retries `pending` refunds without a provider id.
+- `PaymentProvider` is the only port to Stripe; stripe-go is imported only in `infra/payment/stripe` and `controller/http/webhook.go`.
+
+## Local development
+
+- Keys: `cmd/billing/.env.local` (`NOTOPIA_BILLING_STRIPE_SECRET_KEY`, `NOTOPIA_BILLING_STRIPE_WEBHOOK_SECRET`), `cmd/billingseed/.env.local` (`NOTOPIA_BILLINGSEED_STRIPE_SECRET_KEY`).
+- `just seed-billing`: Stripe products/prices + portal configuration, idempotent (needed in every environment).
+- `just fixtures-billing`: dev-only workspace with fake Stripe ids (no Stripe calls).
+- `just stripe-listen`: forwards sandbox events to `http://api.notopia.localhost/billing/webhooks/stripe`; put the printed `whsec_` in `.env.local`.
+- Test cards: `4242 4242 4242 4242` (succeeds), `4000 0000 0000 0341` (card saves, charge fails → `past_due`), `4000 0025 0000 3155` (3-D Secure), `4000 0000 0000 9995` (declined). Any future expiry and CVC.
+- Full manual walkthrough: `tmp/TEST_FLOW_BILLING.md`; diagrams: `docs/src/references/sequence/billing.md`.
 
 ## Notifications
 
@@ -43,4 +53,5 @@ Spec and plans: `docs/superpowers/specs/2026-10-11-billing-03-*`, `docs/superpow
 ## TODO
 
 - Free trial
-- Live payments via a VN gateway behind `PaymentProvider`
+- Live payments via a VN gateway behind `PaymentProvider` (see `story/BILLING_PAYMENT_PROVIDERS.md`)
+- More currencies (prices are VND, zero-decimal)
