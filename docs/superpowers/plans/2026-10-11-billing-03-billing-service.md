@@ -9844,3 +9844,7 @@ Deferred minors from the final review (not fixed):
 - A refund record update failure after a successful cancel returns 5xx to the client.
 - Authorization `syncPolicies` prunes and adds in separate writes (not one transaction).
 - Request-body logging may include payer email (inherited `pkg/common/http` sloggin config).
+
+### 2026-10-17: re-test after review fixes
+
+Stripe sandbox, fresh workspace per scenario: PASS for past-due cancel-now / lifetime replacement / workspace deletion, grace from `past_due_since` (and cleared on recovery), local cancel before provider cancel (`provider_synced_at` bumped after the delete webhook), duplicate checkout, lifetime replacing monthly, dashboard refund on a recurring payment reducing the next quote, month→year upgrade refund (470398 of 470400), regression smoke, webhook resend. Not forced live (unit-tested only): reconcile retry of a failed provider cancel, refund rejected by Stripe → `failed`. Billing log: no ERR/WRN. Phase complete.
