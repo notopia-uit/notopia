@@ -403,6 +403,22 @@ func (s *Subscription) UpdateRefund(refundID uuid.UUID, providerRefundID string,
 	return errs.NewNotFound(fmt.Sprintf("refund %s not found", refundID))
 }
 
+// FailRefund marks a refund the provider will never accept; it keeps no provider refund id.
+func (s *Subscription) FailRefund(refundID uuid.UUID, failureMessage string, now time.Time, userID string) error {
+	for _, r := range s.refunds {
+		if r.id != refundID {
+			continue
+		}
+		if r.status == RefundStatusFailed {
+			return nil
+		}
+		r.status, r.failureMessage, r.updatedAt = RefundStatusFailed, &failureMessage, now
+		s.record(&RefundFailedEvent{BaseEvent: s.base(userID), RefundID: refundID})
+		return nil
+	}
+	return errs.NewNotFound(fmt.Sprintf("refund %s not found", refundID))
+}
+
 func (s *Subscription) RefundByProviderID(providerRefundID string) *Refund {
 	for _, r := range s.refunds {
 		if r.providerRefundID != nil && *r.providerRefundID == providerRefundID {

@@ -79,7 +79,7 @@ func TestCancelNowCancelsLocallyBeforeProviderAndSurvivesProviderFailure(t *test
 			submitted++
 			return RefundResult{
 				ProviderRefundID: "re_1", RefundID: &id, PaymentRef: ref, Amount: amount,
-				Status: domain.RefundStatusSucceeded, FailureMessage: nil,
+				Status: domain.RefundStatusSucceeded, FailureMessage: nil, ProviderSubscriptionID: "",
 			}, nil
 		}).Once()
 

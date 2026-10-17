@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
+	"github.com/notopia-uit/notopia/internal/billing/errs"
 )
 
 type RefundRunner struct {
@@ -40,6 +41,17 @@ func (r *RefundRunner) Run(ctx context.Context, subscriptionID uuid.UUID) error 
 	}
 	for _, rf := range pending {
 		res, err := r.provider.CreateRefund(ctx, rf.ID(), rf.PaymentRef(), rf.Amount())
+		if hasCode(err, errs.CodeInvalid) {
+			slog.ErrorContext(
+				ctx, "refund rejected by the provider; marking it failed",
+				slog.String("refund_id", rf.ID().String()),
+				slog.Any("error", err),
+			)
+			if err := r.failRefund(ctx, subscriptionID, rf.ID(), err.Error()); err != nil {
+				return err
+			}
+			continue
+		}
 		if err != nil {
 			slog.ErrorContext(
 				ctx, "refund submission failed; cron will retry",
@@ -62,4 +74,17 @@ func (r *RefundRunner) Run(ctx context.Context, subscriptionID uuid.UUID) error 
 		}
 	}
 	return nil
+}
+
+func (r *RefundRunner) failRefund(ctx context.Context, subscriptionID, refundID uuid.UUID, message string) error {
+	return r.uow.Execute(ctx, func(reg domain.RepoRegistry) error {
+		sub, err := reg.Subscription().GetByID(ctx, subscriptionID, true)
+		if err != nil {
+			return err
+		}
+		if err := sub.FailRefund(refundID, message, time.Now(), r.settings.ServiceAccountUserID); err != nil {
+			return err
+		}
+		return reg.Subscription().Save(ctx, sub)
+	})
 }

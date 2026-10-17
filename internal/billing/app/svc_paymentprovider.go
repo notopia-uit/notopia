@@ -73,6 +73,8 @@ type RefundResult struct {
 	Amount           domain.Money
 	Status           domain.RefundStatus
 	FailureMessage   *string
+	// ProviderSubscriptionID owns the refunded payment; set by GetRefund for dashboard refunds, empty when unknown.
+	ProviderSubscriptionID string
 }
 
 type PriceInput struct {

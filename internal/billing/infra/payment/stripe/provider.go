@@ -53,6 +53,11 @@ func isStripeCode(err error, code stripego.ErrorCode) bool {
 	return errors.As(err, &se) && se.Code == code
 }
 
+func isInvalidRequest(err error) bool {
+	var se *stripego.Error
+	return errors.As(err, &se) && se.Type == stripego.ErrorTypeInvalidRequest
+}
+
 func productID(tier string) string {
 	return "notopia_" + tier
 }

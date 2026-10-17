@@ -76,7 +76,7 @@ func (f *fixture) expectRefund() *domain.Money {
 			got = amount
 			return RefundResult{
 				ProviderRefundID: "re_" + id.String(), RefundID: &id, PaymentRef: ref,
-				Amount: amount, Status: domain.RefundStatusSucceeded, FailureMessage: nil,
+				Amount: amount, Status: domain.RefundStatusSucceeded, FailureMessage: nil, ProviderSubscriptionID: "",
 			}, nil
 		}).Once()
 	return &got
