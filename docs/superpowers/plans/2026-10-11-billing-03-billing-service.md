@@ -9522,7 +9522,7 @@ git commit -m "feat(billing): payer claim and kafka handlers for payer removal a
 - Consumes: `pkg/cron` (`cron.Job`, `cron.NewScheduler(locker, logger, location)`, `cron.NewRedisLocker`) from plan 02. Location is `time.Local` (zone from `TZ` env or system), never hard-coded.
 - Produces: jobs `billing:reconcile-subscriptions` (hourly) and `billing:prune-provider-events` (daily 04:00).
 
-- [ ] **Step 1: Repo addition**
+- [x] **Step 1: Repo addition**
 
 `domain/repo.go` `SubscriptionRepo`: `ListIDsWithUnsubmittedRefunds(ctx context.Context, limit int) ([]uuid.UUID, error)`.
 
@@ -9546,7 +9546,7 @@ func (r *subscriptionRepo) ListIDsWithUnsubmittedRefunds(ctx context.Context, li
 
 `memstore_test.go` `memSubs`: `func (r memSubs) ListIDsWithUnsubmittedRefunds(context.Context, int) ([]uuid.UUID, error) { return nil, nil }`. Run `nx run billing:gen:sqlc`.
 
-- [ ] **Step 2: Commands**
+- [x] **Step 2: Commands**
 
 ```go
 // internal/billing/app/cmd_reconcilesubscriptions.go
@@ -9641,7 +9641,7 @@ func (h *PruneProviderEventsHandler) Handle(ctx context.Context, _ *PruneProvide
 }
 ```
 
-- [ ] **Step 3: Cron controller**
+- [x] **Step 3: Cron controller**
 
 ```go
 // internal/billing/controller/cron/cron.go
@@ -9701,7 +9701,7 @@ func (c *Cron) Run(ctx context.Context) error {
 
 `controller/cron/wire.go`: `ProviderSet = wire.NewSet(Provide)`; add to `controller.ProviderSet`. `server.go`: add `cron *cron.Cron`, `g.Go(func() error { return s.cron.Run(ctx) })`. Register the two commands in `app.go`/`wire.go`.
 
-- [ ] **Step 4: Verify, commit**
+- [x] **Step 4: Verify, commit**
 
 ```bash
 nx run billing:gen:sqlc && nx run billing:gen:wire && nx build billing && nx lint billing && go test ./internal/billing/...
@@ -9723,7 +9723,7 @@ git commit -m "feat(billing): reconcile, refund retry and event pruning crons"
 - Modify: `internal/billing/AGENTS.md`, root `CLAUDE.md`
 - Create: `docs/src/<billing page>.md` (follow the existing VitePress layout in `docs/src`): context diagram, webhook sequence, subscription state diagram (mermaid)
 
-- [ ] **Step 1: Docs**
+- [x] **Step 1: Docs**
 
 `internal/billing/AGENTS.md` final content: layers; ordering rule for webhook use cases; notifications are best-effort; `just seed-billing`, `just fixtures-billing`, `just stripe-listen`; test cards; TODO (free trial, live payments via VN gateway, more currencies).
 
@@ -9757,7 +9757,7 @@ sequenceDiagram
   Billing-->>Stripe: 204
 ```
 
-- [ ] **Step 2: Full E2E checklist (sandbox, `just stripe-listen` running)**
+- [x] **Step 2: Full E2E checklist (sandbox, `just stripe-listen` running)**
 
 1. Free workspace → `GET entitlements` = free.
 2. Checkout `plus_month` (`4242 4242 4242 4242`) → plus.
@@ -9771,7 +9771,7 @@ sequenceDiagram
 10. Workspace deleted → canceled + refunded.
 11. Resend any webhook from the dashboard → no state change, 204.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add internal/billing/AGENTS.md CLAUDE.md docs/src
@@ -9797,3 +9797,18 @@ Not yet tested: payer removal + `payer/claim` (Task 10), plan change inside the 
 4. Stripe events delivered while infra was down got 502 and were not redelivered (seed-time `price.created` etc.); harmless, but remember `stripe events resend` when debugging.
 5. Final whole-branch review (executing-plans) is not done yet: run after Tasks 11+.
 6. Tasks 11–12 on hold pending research. OpenAPI 3.1 conversion parked (redocly join needs all specs on one version; patch was in the old session scratchpad, recreate if needed).
+
+### 2026-10-17: Tasks 11–12 done
+
+- Task 11 `215463a2`: reconcile (hourly) + prune (daily 04:00) crons, Redis-locked. Two-instance manual check skipped: covered by `pkg/cron` `TestJobRunsOnceAcrossSchedulers`.
+- Task 12 `994bab4f`, `ec535af3`: billing sequence/state docs, billing in architecture diagrams, AGENTS updates.
+- Full sandbox E2E (Step 2): all 11 checklist items PASS, plus authorization dev-mode restart check. Payment failure was forced via the Stripe CLI (failing card + `always_invoice` upgrade) since `--billing-cycle-anchor now` is rejected by the current API version.
+- Authorization: `8e55c60d` fixed the role-manager clobber regression introduced by `24c6f124` (both prod and dev now keep DB memberships across restart); `f85c26e5` runs the 36-case matrix through both the string adapter and the CSV sync. Story: `story/casbin-role-manager-clobber.md`.
+- Open issues 1–4 of 2026-10-13 are resolved or dismissed (1: fixed; 2: stale PATH, nx runtime input in place; 3, 4: no action).
+
+**Still open**
+
+- Final whole-branch review (executing-plans) not run yet.
+- Authorization seed/fixtures refactor to `cmd/authorizationseed` + `cmd/authorizationfixtures`: proposed, awaiting approval.
+- Cron startup log doesn't name registered jobs; registration can only be seen in code. Minor.
+- OpenAPI 3.1 conversion parked.
