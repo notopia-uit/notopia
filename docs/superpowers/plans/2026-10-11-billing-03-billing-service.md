@@ -7666,7 +7666,7 @@ git commit -m "feat(billing): admin catalog APIs, seed, fixtures and portal conf
 - Consumes: `PaymentProvider` (Task 6), `Notifier`, `AuthorizationSvc`, `Settings`.
 - Produces: `Queries.StartCheckout` (`StartCheckout{WorkspaceID, PriceID uuid.UUID; Payer app.Payer}` → checkout URL `string`), `Queries.StartPortal` (`StartPortal{WorkspaceID uuid.UUID; UserID string}` → portal URL `string`), both modeled as queries because commands only return `error` and the provider session URL is the answer, `Cmds.CompleteCheckout` (`CompleteCheckout{EventID, SessionID string}`), `Cmds.SyncRefund` (`SyncRefund{EventID, EventType, ProviderRefundID string}`), `Cmds.SyncSubscription` (`SyncSubscription{EventID, EventType, ProviderSubscriptionID string}` — `EventID`/`EventType` empty when called by the reconcile cron), `RefundRunner.Run(ctx, subscriptionID)` (used by Tasks 9, 10, 11).
 
-**Ordering rule used by every webhook use case:** provider _mutations that must not be lost_ (cancel a duplicate subscription, change default card) run **before** the write transaction and are idempotent; the write transaction records the event (`ProviderEventLog.MarkProcessed`) together with the state change; **refunds run after commit** with idempotency key `refund:{id}` and are retried by the reconcile cron while `pending` without a provider id.
+**Ordering rule used by every webhook use case:** (_superseded by the final review, `9124e755`: cancelling a provider subscription now runs **after** the local cancel commits, retried by reconcile_) provider _mutations that must not be lost_ (cancel a duplicate subscription, change default card) run **before** the write transaction and are idempotent; the write transaction records the event (`ProviderEventLog.MarkProcessed`) together with the state change; **refunds run after commit** with idempotency key `refund:{id}` and are retried by the reconcile cron while `pending` without a provider id.
 
 - [x] **Step 1: Mocks and failing tests**
 
@@ -9819,3 +9819,28 @@ Not yet tested: payer removal + `payer/claim` (Task 10), plan change inside the 
 - Reconcile cron observed live (12:00 `cron job done`).
 - Deferred minors (8) and rulings are in the executing-plans ledger and the final session report.
 - Not re-run against Stripe after the fixes: cancel-now, duplicate checkout, lifetime replacement, past-due grace and refund sync changed behaviour.
+
+### Implementation notes (deviations, deferred minors)
+
+Deviations from the plan text (details in the executing-plans ledger):
+
+- Code adjusted to the repo's golangci rules everywhere (exhaustruct explicit fields, exhaustive enum switches incl. `Unspecified`, sloglint multi-line attrs); behaviour unchanged.
+- Commands return only `error`; `catalog.createPrice` too. Checkout and portal are queries (`StartCheckout`, `StartPortal`) because the session URL is the answer.
+- Mocks via mockery (`internal/billing/.mockery.yaml`, nx `internal/billing:gen:mockery`), not hand-written fakes; repositories use the in-memory `memStore`.
+- Webhook: unknown checkout purpose is logged and marked processed; `stripeID` returns an error instead of discarding it.
+- Kafka: one consumer group per topic; typed handlers through `decode[T]` (not Watermill's CQRS processor, see `story/watermill-event-gaps.md`); undecodable payloads and permanent use-case errors are logged and acked.
+- Provider cancel moved after the local commit (final review); refunds are quoted over each payment's own coverage; past-due grace measured from `past_due_since`.
+- Migrations merged into `00001_init.sql` while in development (`past_due_since` is the last column of `subscriptions`).
+- `stripe-listen` forwards `--all-snapshot` events; unrouted types return 204.
+- Task 11 manual two-instance cron check skipped (covered by `pkg/cron` `TestJobRunsOnceAcrossSchedulers`); reconcile observed live.
+
+Deferred minors from the final review (not fixed):
+
+- `SyncSubscription` fetches the snapshot before taking the row lock; two concurrent webhooks can commit the older snapshot last (reconcile corrects within 24 h).
+- `controller/http/err.go` does not log the cause of 5xx responses (same as note).
+- Completing a payer-change / subscribe checkout doesn't recheck the payer is still an owner; payer change notifies with the pre-resume subscription.
+- Corrupt `workspace_id` / `price_id` checkout metadata becomes `uuid.Nil` → retried until Stripe gives up, instead of a logged drop.
+- `ResolveEntitlements` panics on a missing plan tier row (seed not run).
+- A refund record update failure after a successful cancel returns 5xx to the client.
+- Authorization `syncPolicies` prunes and adds in separate writes (not one transaction).
+- Request-body logging may include payer email (inherited `pkg/common/http` sloggin config).

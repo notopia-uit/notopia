@@ -63,11 +63,11 @@ sequenceDiagram
     S->>+B: POST /billing/webhooks/stripe (signed)
     B->>B: Verify signature on the raw body
     B->>S: GET checkout session / subscription / refund (fetch-and-sync)
-    opt Duplicate or replaced subscription
-        B->>S: Cancel provider subscription (before the transaction, idempotent)
-    end
     B->>DB: tx: MarkProcessed(event.id) + apply state
     Note over B,DB: An event id already processed → no-op
+    opt Duplicate or replaced subscription
+        B->>S: Cancel provider subscription (after commit, idempotent; reconcile retries on failure)
+    end
     opt Refund due
         B->>S: Create refund (idempotency key refund:{id})
         B->>DB: Save provider refund id + status
@@ -78,7 +78,7 @@ sequenceDiagram
 
 Ordering rule for every webhook use case:
 
-1. Provider mutations that must not be lost (cancel a duplicate subscription, change the default card) run **before** the write transaction and are idempotent.
+1. Provider reads and idempotent mutations that must not be lost (change the default card) run **before** the write transaction. Cancelling a provider subscription runs **after** the local cancel commits; if it fails, the reconcile cron retries it, and a locally canceled row is never resurrected.
 2. The write transaction records the event (`processed_provider_events`) together with the state change.
 3. Refunds run **after** commit. A refund that fails to submit stays `pending` without a provider id, and the hourly reconcile cron retries it.
 
@@ -97,8 +97,8 @@ sequenceDiagram
     B->>S: Period payments (recurring) / payment intent (lifetime)
     B-->>-U: Refund quote (unused share of the period)
     U->>+B: POST .../subscription/cancel-now
-    B->>S: Cancel subscription now
     B->>DB: tx: Subscription canceled + pending Refund
+    B->>S: Cancel subscription now (after commit)
     B->>S: Create refund (refund:{id})
     B->>DB: Refund submitted
     B-->>-U: Workspace billing (subscription: null)
