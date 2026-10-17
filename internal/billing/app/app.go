@@ -27,6 +27,8 @@ type Cmds struct {
 	EnsurePortalConfiguration EnsurePortalConfigurationCmd
 	HandlePayerRemoved        HandlePayerRemovedCmd
 	HandleWorkspaceDeleted    HandleWorkspaceDeletedCmd
+	PruneProviderEvents       PruneProviderEventsCmd
+	ReconcileSubscriptions    ReconcileSubscriptionsCmd
 	SyncRefund                SyncRefundCmd
 	SyncSubscription          SyncSubscriptionCmd
 	UpdatePlan                UpdatePlanCmd
@@ -43,6 +45,8 @@ func NewCmds(
 	ensurePortalConfigurationHandler *EnsurePortalConfigurationHandler,
 	handlePayerRemovedHandler *HandlePayerRemovedHandler,
 	handleWorkspaceDeletedHandler *HandleWorkspaceDeletedHandler,
+	pruneProviderEventsHandler *PruneProviderEventsHandler,
+	reconcileSubscriptionsHandler *ReconcileSubscriptionsHandler,
 	syncRefundHandler *SyncRefundHandler,
 	syncSubscriptionHandler *SyncSubscriptionHandler,
 	updatePlanHandler *UpdatePlanHandler,
@@ -58,6 +62,8 @@ func NewCmds(
 		EnsurePortalConfiguration: commonhandler.DecorateCmd(hp, ensurePortalConfigurationHandler),
 		HandlePayerRemoved:        commonhandler.DecorateCmd(hp, handlePayerRemovedHandler),
 		HandleWorkspaceDeleted:    commonhandler.DecorateCmd(hp, handleWorkspaceDeletedHandler),
+		PruneProviderEvents:       commonhandler.DecorateCmd(hp, pruneProviderEventsHandler),
+		ReconcileSubscriptions:    commonhandler.DecorateCmd(hp, reconcileSubscriptionsHandler),
 		SyncRefund:                commonhandler.DecorateCmd(hp, syncRefundHandler),
 		SyncSubscription:          commonhandler.DecorateCmd(hp, syncSubscriptionHandler),
 		UpdatePlan:                commonhandler.DecorateCmd(hp, updatePlanHandler),

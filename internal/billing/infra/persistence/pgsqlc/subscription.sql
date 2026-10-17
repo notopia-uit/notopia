@@ -38,6 +38,11 @@ WHERE status NOT IN ('canceled', 'incomplete_expired')
 ORDER BY provider_synced_at
 LIMIT sqlc.arg('row_limit');
 
+-- name: ListSubscriptionIDsWithUnsubmittedRefunds :many
+SELECT DISTINCT subscription_id FROM refunds
+WHERE status = 'pending' AND provider_refund_id IS NULL
+LIMIT sqlc.arg('row_limit');
+
 -- name: UpsertSubscription :exec
 INSERT INTO subscriptions (
   id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id,

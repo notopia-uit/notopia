@@ -13,6 +13,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/component"
 	"github.com/notopia-uit/notopia/internal/billing/config"
+	"github.com/notopia-uit/notopia/internal/billing/controller/cron"
 	"github.com/notopia-uit/notopia/internal/billing/controller/event"
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
@@ -115,11 +116,13 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	ensurePortalConfigurationHandler := app.NewEnsurePortalConfigurationHandler(unitOfWork, provider, settings)
 	handlePayerRemovedHandler := app.NewHandlePayerRemovedHandler(unitOfWork, provider, notifierKafka, settings)
 	handleWorkspaceDeletedHandler := app.NewHandleWorkspaceDeletedHandler(canceller, settings)
-	syncRefundHandler := app.NewSyncRefundHandler(unitOfWork, provider, settings)
+	pruneProviderEventsHandler := app.NewPruneProviderEventsHandler(unitOfWork)
 	syncSubscriptionHandler := app.NewSyncSubscriptionHandler(unitOfWork, provider, notifierKafka, settings)
+	reconcileSubscriptionsHandler := app.NewReconcileSubscriptionsHandler(unitOfWork, syncSubscriptionHandler, refundRunner)
+	syncRefundHandler := app.NewSyncRefundHandler(unitOfWork, provider, settings)
 	updatePlanHandler := app.NewUpdatePlanHandler(unitOfWork)
 	updatePolicyHandler := app.NewUpdatePolicyHandler(unitOfWork)
-	cmds := app.NewCmds(handlerProvider, archivePriceHandler, cancelNowHandler, completeCheckoutHandler, createPriceHandler, ensureDefaultsHandler, ensurePortalConfigurationHandler, handlePayerRemovedHandler, handleWorkspaceDeletedHandler, syncRefundHandler, syncSubscriptionHandler, updatePlanHandler, updatePolicyHandler)
+	cmds := app.NewCmds(handlerProvider, archivePriceHandler, cancelNowHandler, completeCheckoutHandler, createPriceHandler, ensureDefaultsHandler, ensurePortalConfigurationHandler, handlePayerRemovedHandler, handleWorkspaceDeletedHandler, pruneProviderEventsHandler, reconcileSubscriptionsHandler, syncRefundHandler, syncSubscriptionHandler, updatePlanHandler, updatePolicyHandler)
 	billingReadModel := pgreadmodel.NewBillingReadModel(queries)
 	batchGetEntitlementsHandler := app.NewBatchGetEntitlementsHandler(billingReadModel)
 	claimPayerHandler := app.NewClaimPayerHandler(unitOfWork, authorization, provider, settings)
@@ -213,8 +216,21 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
+	cronCron, err := cron.New(server, client, logger)
+	if err != nil {
+		cleanup9()
+		cleanup8()
+		cleanup7()
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
 	healthHealth := health.New(pg, configServer, kafka, client, services)
-	billingServer := billing.NewServer(server, pg, httpHTTP, grpcGRPC, eventEvent, healthHealth, logger, global)
+	billingServer := billing.NewServer(server, pg, httpHTTP, grpcGRPC, eventEvent, cronCron, healthHealth, logger, global)
 	return billingServer, func() {
 		cleanup9()
 		cleanup8()

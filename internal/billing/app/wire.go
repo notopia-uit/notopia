@@ -18,6 +18,8 @@ var ProviderSet = wire.NewSet(
 	ProvideEnsurePortalConfigurationHandler,
 	ProvideHandlePayerRemovedHandler,
 	ProvideHandleWorkspaceDeletedHandler,
+	ProvidePruneProviderEventsHandler,
+	ProvideReconcileSubscriptionsHandler,
 	ProvideSyncRefundHandler,
 	ProvideSyncSubscriptionHandler,
 	ProvideUpdatePlanHandler,

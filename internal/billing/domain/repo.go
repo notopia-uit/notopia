@@ -15,6 +15,7 @@ type SubscriptionRepo interface {
 	GetByRefundID(ctx context.Context, refundID uuid.UUID, forUpdate bool) (*Subscription, error)            // nil, nil when none
 	ListCurrentByWorkspaces(ctx context.Context, workspaceIDs []uuid.UUID) ([]*Subscription, error)
 	ListNeedingReconcile(ctx context.Context, now time.Time, limit int) ([]*Subscription, error)
+	ListIDsWithUnsubmittedRefunds(ctx context.Context, limit int) ([]uuid.UUID, error)
 	Save(ctx context.Context, s *Subscription) error
 }
 

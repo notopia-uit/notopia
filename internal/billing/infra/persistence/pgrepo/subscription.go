@@ -85,6 +85,14 @@ func (r *subscriptionRepo) ListCurrentByWorkspaces(ctx context.Context, workspac
 	return r.hydrate(ctx, rows)
 }
 
+func (r *subscriptionRepo) ListIDsWithUnsubmittedRefunds(ctx context.Context, limit int) ([]uuid.UUID, error) {
+	ids, err := r.q.ListSubscriptionIDsWithUnsubmittedRefunds(ctx, int32(limit))
+	if err != nil {
+		return nil, wrap("list subscriptions with unsubmitted refunds", err)
+	}
+	return ids, nil
+}
+
 func (r *subscriptionRepo) ListNeedingReconcile(ctx context.Context, now time.Time, limit int) ([]*domain.Subscription, error) {
 	rows, err := r.q.ListSubscriptionsNeedingReconcile(ctx, &pgsqlc.ListSubscriptionsNeedingReconcileParams{Now: now, RowLimit: int32(limit)})
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/notopia-uit/notopia/internal/billing/app"
+	"github.com/notopia-uit/notopia/internal/billing/controller/cron"
 	"github.com/notopia-uit/notopia/internal/billing/controller/event"
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
@@ -22,6 +23,7 @@ type Server struct {
 	http        *http.HTTP
 	grpc        *grpc.GRPC
 	event       *event.Event
+	cron        *cron.Cron
 	health      *health.Health
 	logger      *slog.Logger
 }
@@ -32,6 +34,7 @@ func NewServer(
 	http *http.HTTP,
 	grpc *grpc.GRPC,
 	event *event.Event,
+	cron *cron.Cron,
 	health *health.Health,
 	logger *slog.Logger,
 	_ otel.Global,
@@ -44,6 +47,7 @@ func NewServer(
 		http:        http,
 		grpc:        grpc,
 		event:       event,
+		cron:        cron,
 		health:      health,
 		logger:      logger,
 	}
@@ -104,6 +108,13 @@ func (s *Server) Run(ctx context.Context) error {
 	g.Go(func() error {
 		if err := s.event.Run(ctx); err != nil {
 			return fmt.Errorf("failed to run event router: %w", err)
+		}
+		return nil
+	})
+
+	g.Go(func() error {
+		if err := s.cron.Run(ctx); err != nil {
+			return fmt.Errorf("failed to run cron scheduler: %w", err)
 		}
 		return nil
 	})

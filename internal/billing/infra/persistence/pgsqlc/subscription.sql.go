@@ -268,6 +268,34 @@ func (q *Queries) ListRefundsBySubscriptionIDs(ctx context.Context, subscription
 	return items, nil
 }
 
+const listSubscriptionIDsWithUnsubmittedRefunds = `-- name: ListSubscriptionIDsWithUnsubmittedRefunds :many
+SELECT DISTINCT subscription_id FROM refunds
+WHERE status = 'pending' AND provider_refund_id IS NULL
+LIMIT $1
+`
+
+func (q *Queries) ListSubscriptionIDsWithUnsubmittedRefunds(ctx context.Context, rowLimit int32) ([]uuid.UUID, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "ListSubscriptionIDsWithUnsubmittedRefunds")
+	defer span.End()
+	rows, err := q.db.Query(ctx, listSubscriptionIDsWithUnsubmittedRefunds, rowLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var subscription_id uuid.UUID
+		if err := rows.Scan(&subscription_id); err != nil {
+			return nil, err
+		}
+		items = append(items, subscription_id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listSubscriptionsNeedingReconcile = `-- name: ListSubscriptionsNeedingReconcile :many
 SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at FROM subscriptions
 WHERE status NOT IN ('canceled', 'incomplete_expired')

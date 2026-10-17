@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/goforj/wire"
+	"github.com/notopia-uit/notopia/internal/billing/controller/cron"
 	"github.com/notopia-uit/notopia/internal/billing/controller/event"
 	"github.com/notopia-uit/notopia/internal/billing/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/billing/controller/health"
@@ -9,6 +10,7 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
+	cron.ProviderSet,
 	event.ProviderSet,
 	grpc.ProviderSet,
 	http.ProviderSet,

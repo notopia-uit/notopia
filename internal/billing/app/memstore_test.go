@@ -103,6 +103,10 @@ func (r memSubs) ListNeedingReconcile(context.Context, time.Time, int) ([]*domai
 	return nil, nil
 }
 
+func (r memSubs) ListIDsWithUnsubmittedRefunds(context.Context, int) ([]uuid.UUID, error) {
+	return nil, nil
+}
+
 func (r memSubs) Save(_ context.Context, s *domain.Subscription) error {
 	if s.IsCurrent() {
 		if cur := r.find(func(o *domain.Subscription) bool {
