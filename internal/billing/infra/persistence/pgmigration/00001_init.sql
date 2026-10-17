@@ -63,6 +63,7 @@ CREATE TABLE subscriptions (
   provider_synced_at TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL,
+  past_due_since TIMESTAMPTZ,
   CHECK ((billing_interval = 'lifetime') = (provider_subscription_id IS NULL))
 );
 CREATE UNIQUE INDEX uq_subscriptions_current ON subscriptions(workspace_id)
