@@ -9812,3 +9812,10 @@ Not yet tested: payer removal + `payer/claim` (Task 10), plan change inside the 
 - Authorization seed/fixtures refactor to `cmd/authorizationseed` + `cmd/authorizationfixtures`: proposed, awaiting approval.
 - Cron startup log doesn't name registered jobs; registration can only be seen in code. Minor.
 - OpenAPI 3.1 conversion parked.
+
+### 2026-10-17: final review
+
+- Opus whole-branch review: 1 critical + 4 important fixed test-first (`ed99e7f9`, `6e1b8157`, `9124e755`, `4a428b60`, `ffdab6e9`). New migration `00002_subscription_past_due_since.sql` applies on the next billing start.
+- Reconcile cron observed live (12:00 `cron job done`).
+- Deferred minors (8) and rulings are in the executing-plans ledger and the final session report.
+- Not re-run against Stripe after the fixes: cancel-now, duplicate checkout, lifetime replacement, past-due grace and refund sync changed behaviour.
