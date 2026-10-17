@@ -289,8 +289,10 @@ func (s *Subscription) refundedFor(paymentRef string) int64 {
 	return total
 }
 
-// QuoteCancelNow quotes each paid payment of the current period on its own coverage window,
-// so an immediately invoiced upgrade does not hide the earlier payment of the same period.
+// QuoteCancelNow quotes each paid payment on its own coverage window, not clipped to the current period:
+// an immediately invoiced upgrade does not hide the earlier payment, and a month-to-year change
+// (which resets the period and credits the unused month into the yearly invoice) still refunds the
+// original monthly payment's unused part.
 func (s *Subscription) QuoteCancelNow(now time.Time, policy *BillingPolicy, payments []PaymentInfo) (RefundQuote, error) {
 	if !s.IsCurrent() {
 		return RefundQuote{}, errs.New(errs.CodeNoActiveSubscription, "no active subscription", nil)
@@ -322,12 +324,11 @@ func (s *Subscription) QuoteCancelNow(now time.Time, policy *BillingPolicy, paym
 	q.PeriodSeconds = int64(s.currentPeriodEnd.Sub(*s.currentPeriodStart).Seconds())
 	q.UnusedSeconds = max(int64(s.currentPeriodEnd.Sub(now).Seconds()), 0)
 	for _, p := range payments {
-		start, end := latest(p.CoverageStart, *s.currentPeriodStart), earliest(p.CoverageEnd, *s.currentPeriodEnd)
-		coverage := int64(end.Sub(start).Seconds())
+		coverage := int64(p.CoverageEnd.Sub(p.CoverageStart).Seconds())
 		if coverage <= 0 {
 			continue
 		}
-		unused := max(int64(end.Sub(latest(now, start)).Seconds()), 0)
+		unused := max(int64(p.CoverageEnd.Sub(latest(now, p.CoverageStart)).Seconds()), 0)
 		add(p, p.Amount.Amount*unused/coverage, coverage, unused)
 	}
 	return q, nil
@@ -335,13 +336,6 @@ func (s *Subscription) QuoteCancelNow(now time.Time, policy *BillingPolicy, paym
 
 func latest(a, b time.Time) time.Time {
 	if a.After(b) {
-		return a
-	}
-	return b
-}
-
-func earliest(a, b time.Time) time.Time {
-	if a.Before(b) {
 		return a
 	}
 	return b

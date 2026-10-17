@@ -204,3 +204,43 @@ func TestPastDueWithoutRecordedStartFallsBackToPeriodStart(t *testing.T) {
 	require.NotNil(t, s.PastDueSince())
 	assert.True(t, s.PastDueSince().Equal(t0))
 }
+
+// Plus monthly 30000 paid day 0-30; on day 15 the portal moves to yearly (300000): Stripe resets the
+// period to [day 15, +365d] and credits the unused half month, so the yearly invoice is 285000.
+func TestQuoteCancelNowAfterMonthToYearUpgrade(t *testing.T) {
+	policy := domain.DefaultBillingPolicy(t0)
+	day := func(n int) time.Time { return t0.Add(time.Duration(n) * 24 * time.Hour) }
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPro, domain.IntervalYear, 300000), snap(domain.StatusActive, day(15), day(15+365)), day(15), "u")
+	payments := []domain.PaymentInfo{
+		{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_m", PaidAt: t0, CoverageStart: t0, CoverageEnd: day(30)},
+		{Amount: domain.Money{Amount: 285000, Currency: "vnd"}, PaymentRef: "pi_y", PaidAt: day(15), CoverageStart: day(15), CoverageEnd: day(15 + 365)},
+	}
+
+	q, err := s.QuoteCancelNow(day(15), policy, payments)
+
+	require.NoError(t, err)
+	require.Len(t, q.Lines, 2)
+	assert.EqualValues(t, 15000, q.Lines[0].Amount.Amount)
+	assert.EqualValues(t, 285000, q.Lines[1].Amount.Amount)
+	assert.EqualValues(t, 300000, q.Amount.Amount)
+}
+
+func TestQuoteCancelNowIgnoresPaymentOfPreviousPeriod(t *testing.T) {
+	policy := domain.DefaultBillingPolicy(t0)
+	day := func(n int) time.Time { return t0.Add(time.Duration(n) * 24 * time.Hour) }
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), price(t, domain.PlanTierPlus, domain.IntervalMonth, 30000), snap(domain.StatusActive, t0, day(30)), t0, "u")
+	payments := []domain.PaymentInfo{
+		{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_prev", PaidAt: day(-30), CoverageStart: day(-30), CoverageEnd: t0},
+		{Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_cur", PaidAt: t0, CoverageStart: t0, CoverageEnd: day(30)},
+	}
+
+	q, err := s.QuoteCancelNow(day(5), policy, payments)
+
+	require.NoError(t, err)
+	assert.EqualValues(t, 25000, q.Amount.Amount)
+	for _, l := range q.Lines {
+		if l.PaymentRef == "pi_prev" {
+			assert.Zero(t, l.Amount.Amount)
+		}
+	}
+}

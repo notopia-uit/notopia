@@ -396,14 +396,20 @@ the period end.
 
 **Refund quote** (`QuoteCancelNow`):
 
-- recurring: one line per paid invoice payment of the current period. An upgrade is invoiced
-  immediately (`always_invoice`), so a period can hold the renewal payment plus proration
-  payments. Each payment covers its own window (its invoice line periods, clipped to the
-  current period): `line = amount × unused / coverage`, floored (VND integer), where
+- recurring: one line per paid invoice payment whose coverage overlaps the current period. An
+  upgrade is invoiced immediately (`always_invoice`), so a period can hold the renewal payment
+  plus proration payments. Each payment covers its own window (its invoice line periods, **not**
+  clipped to the current period): `line = amount × unused / coverage`, floored (VND integer), where
   `coverage = coverageEnd − coverageStart` and `unused = max(0, coverageEnd − max(now, coverageStart))`.
   Quote amount = sum of lines; cancel-now creates one `Refund` per line (Stripe refunds per
   PaymentIntent). Example: Plus 100k paid day 1–30, upgrade on day 10 invoiced ≈133k for
   day 10–30, cancel on day 20 → 33k + 66k ≈ 100k (= 10 unused days of Pro).
+  A month→year change in the Portal resets the period to `[t, t+1y]` and credits the unused
+  monthly time into the yearly invoice, so the original monthly invoice (created before the new
+  period) still counts with its own window: cancelling right away refunds the unused half month
+  of the monthly payment plus the yearly invoice, i.e. the full yearly price. Because of this the
+  adapter looks back one longest interval (1y + 1d) for invoices and filters by coverage overlap;
+  a payment of the previous period (coverage ends at the period start) contributes 0.
 - lifetime: full `amount` if `now − paidAt ≤ lifetimeRefundWindowDays`, else error
   `refundWindowExpired` (cancel-now rejected).
 - Invariant: per payment, sum of non-failed refunds against it ≤ that payment's amount.

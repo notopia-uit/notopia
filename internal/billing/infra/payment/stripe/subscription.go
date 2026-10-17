@@ -34,8 +34,13 @@ func (p *Provider) CancelSubscriptionNow(ctx context.Context, providerSubscripti
 	return providerErr("cancel subscription", err)
 }
 
+// invoiceLookback reaches the longest billing interval (a year) back: a month-to-year change resets the
+// period but its credit lines cover the earlier monthly invoice, which was created before the new period.
+const invoiceLookback = (366 + 1) * 24 * time.Hour
+
 // PeriodPayments: a period can hold the renewal invoice plus proration invoices from upgrades
-// (always_invoice). A past_due subscription has none paid yet: the result is empty, not an error. Coverage = the invoice's line periods clipped to the current period.
+// (always_invoice). Coverage = the invoice's own line periods; an invoice is included when that
+// coverage overlaps the current period. A past_due subscription may have none: empty, not an error.
 func (p *Provider) PeriodPayments(
 	ctx context.Context,
 	providerSubscriptionID string,
@@ -45,7 +50,7 @@ func (p *Provider) PeriodPayments(
 		Subscription: stripego.String(providerSubscriptionID),
 		Status:       stripego.String(string(stripego.InvoiceStatusPaid)),
 		CreatedRange: &stripego.RangeQueryParams{
-			GreaterThanOrEqual: periodStart.Add(-24 * time.Hour).Unix(),
+			GreaterThanOrEqual: periodStart.Add(-invoiceLookback).Unix(),
 		},
 	}
 	var out []domain.PaymentInfo
