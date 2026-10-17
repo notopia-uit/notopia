@@ -35,13 +35,17 @@ type ReconcileSubscriptionsCmd commonhandler.Cmd[ReconcileSubscriptions]
 var _ ReconcileSubscriptionsCmd = (*ReconcileSubscriptionsHandler)(nil)
 
 // Handle re-syncs subscriptions whose provider state may be stale and retries refunds
-// that were never submitted. Per-item failures are logged; the next tick retries them.
+// that were never submitted. Locally canceled subscriptions are synced too, which retries a failed provider cancel. Per-item failures are logged; the next tick retries them.
 func (h *ReconcileSubscriptionsHandler) Handle(ctx context.Context, _ *ReconcileSubscriptions) error {
 	var stale []*domain.Subscription
+	var canceled []*domain.Subscription
 	var refundSubs []uuid.UUID
 	if err := h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		var err error
 		if stale, err = r.Subscription().ListNeedingReconcile(ctx, time.Now(), reconcileBatchSize); err != nil {
+			return err
+		}
+		if canceled, err = r.Subscription().ListCanceledAwaitingProviderCancel(ctx, reconcileBatchSize); err != nil {
 			return err
 		}
 		refundSubs, err = r.Subscription().ListIDsWithUnsubmittedRefunds(ctx, reconcileBatchSize)
@@ -49,7 +53,7 @@ func (h *ReconcileSubscriptionsHandler) Handle(ctx context.Context, _ *Reconcile
 	}); err != nil {
 		return err
 	}
-	for _, s := range stale {
+	for _, s := range append(stale, canceled...) {
 		if s.ProviderSubscriptionID() == nil {
 			continue
 		}

@@ -190,6 +190,56 @@ func (q *Queries) GetSubscriptionIDByRefundID(ctx context.Context, id uuid.UUID)
 	return subscription_id, err
 }
 
+const listCanceledSubscriptionsAwaitingProviderCancel = `-- name: ListCanceledSubscriptionsAwaitingProviderCancel :many
+SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at, past_due_since FROM subscriptions
+WHERE status = 'canceled'
+  AND provider_subscription_id IS NOT NULL
+  AND canceled_at IS NOT NULL
+  AND provider_synced_at <= canceled_at
+ORDER BY canceled_at
+LIMIT $1
+`
+
+func (q *Queries) ListCanceledSubscriptionsAwaitingProviderCancel(ctx context.Context, rowLimit int32) ([]*Subscription, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "ListCanceledSubscriptionsAwaitingProviderCancel")
+	defer span.End()
+	rows, err := q.db.Query(ctx, listCanceledSubscriptionsAwaitingProviderCancel, rowLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Subscription
+	for rows.Next() {
+		var i Subscription
+		if err := rows.Scan(
+			&i.ID,
+			&i.WorkspaceID,
+			&i.Plan,
+			&i.BillingInterval,
+			&i.PriceID,
+			&i.Status,
+			&i.ProviderSubscriptionID,
+			&i.ProviderPaymentID,
+			&i.CurrentPeriodStart,
+			&i.CurrentPeriodEnd,
+			&i.CancelAtPeriodEnd,
+			&i.CanceledAt,
+			&i.PaidAt,
+			&i.ProviderSyncedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.PastDueSince,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listCurrentSubscriptionsByWorkspaces = `-- name: ListCurrentSubscriptionsByWorkspaces :many
 SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at, past_due_since FROM subscriptions
 WHERE workspace_id = ANY($1::uuid[]) AND status NOT IN ('canceled', 'incomplete_expired')

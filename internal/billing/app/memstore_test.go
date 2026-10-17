@@ -103,6 +103,20 @@ func (r memSubs) ListNeedingReconcile(context.Context, time.Time, int) ([]*domai
 	return nil, nil
 }
 
+func (r memSubs) ListCanceledAwaitingProviderCancel(_ context.Context, limit int) ([]*domain.Subscription, error) {
+	var out []*domain.Subscription
+	for _, s := range r.m.subs {
+		if len(out) == limit {
+			break
+		}
+		if s.Status() == domain.StatusCanceled && s.ProviderSubscriptionID() != nil && s.CanceledAt() != nil &&
+			!s.ProviderSyncedAt().After(*s.CanceledAt()) {
+			out = append(out, s)
+		}
+	}
+	return out, nil
+}
+
 func (r memSubs) ListIDsWithUnsubmittedRefunds(context.Context, int) ([]uuid.UUID, error) {
 	return nil, nil
 }

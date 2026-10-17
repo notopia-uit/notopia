@@ -37,6 +37,7 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 		return err
 	}
 	var changed *domain.Subscription
+	cancelRemotely := false
 	err = h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		if cmd.EventID != "" {
 			if first, err := r.ProviderEventLog().MarkProcessed(ctx, cmd.EventID, cmd.EventType); err != nil || !first {
@@ -48,7 +49,13 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 			return err // unknown yet: checkout.session.completed creates it
 		}
 		if !sub.IsCurrent() {
-			return nil // canceled locally (cancel-now / duplicate / replaced): never resurrect
+			// canceled locally (cancel-now / duplicate / replaced): never resurrect
+			if snap.Status == domain.StatusCanceled || snap.Status == domain.StatusIncompleteExpired {
+				sub.MarkProviderSynced(time.Now())
+				return r.Subscription().Save(ctx, sub)
+			}
+			cancelRemotely = true
+			return nil
 		}
 		price, err := r.Price().GetByProviderPriceID(ctx, snap.ProviderPriceID)
 		if err != nil {
@@ -63,6 +70,9 @@ func (h *SyncSubscriptionHandler) Handle(ctx context.Context, cmd *SyncSubscript
 		}
 		return r.Subscription().Save(ctx, sub)
 	})
+	if err == nil && cancelRemotely {
+		cancelAtProvider(ctx, h.provider, cmd.ProviderSubscriptionID)
+	}
 	if err == nil {
 		notifySubscription(ctx, h.notifier, changed)
 	}

@@ -101,6 +101,14 @@ func (r *subscriptionRepo) ListNeedingReconcile(ctx context.Context, now time.Ti
 	return r.hydrate(ctx, rows)
 }
 
+func (r *subscriptionRepo) ListCanceledAwaitingProviderCancel(ctx context.Context, limit int) ([]*domain.Subscription, error) {
+	rows, err := r.q.ListCanceledSubscriptionsAwaitingProviderCancel(ctx, int32(limit))
+	if err != nil {
+		return nil, wrap("list canceled subscriptions awaiting provider cancel", err)
+	}
+	return r.hydrate(ctx, rows)
+}
+
 func (r *subscriptionRepo) Save(ctx context.Context, s *domain.Subscription) error {
 	err := r.q.UpsertSubscription(ctx, &pgsqlc.UpsertSubscriptionParams{
 		ID: s.ID(), WorkspaceID: s.WorkspaceID(), Plan: pgmapper.FromPlanTier(s.Plan()), BillingInterval: pgmapper.FromInterval(s.Interval()),

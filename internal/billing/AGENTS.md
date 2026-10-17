@@ -28,7 +28,7 @@ Spec and plans: `docs/superpowers/specs/2026-10-11-billing-03-*`, `docs/superpow
 - Sandbox only. Stripe does not onboard VN businesses for live payouts; a VN gateway can replace it behind `app.PaymentProvider`.
 - Webhooks are fetch-and-sync: payloads are used for ids only, state is read back from Stripe, so ordering does not matter.
 - Every Stripe write that must not duplicate carries an idempotency key (`customer:{workspaceId}`, `refund:{refundId}`, `price:{priceId}`).
-- Webhook use-case ordering: provider mutations that must not be lost (cancel a duplicate, change default card) run **before** the write transaction and are idempotent; the transaction records the event (`ProviderEventLog.MarkProcessed`) with the state change; refunds run **after** commit via `RefundRunner` and the reconcile cron retries `pending` refunds without a provider id.
+- Webhook use-case ordering: provider reads and idempotent mutations that must not be lost (change default card) run **before** the write transaction; cancelling a subscription runs **after** the local cancel commits (failures are logged, and reconcile retries canceled rows the provider has not confirmed); the transaction records the event (`ProviderEventLog.MarkProcessed`) with the state change; refunds run **after** commit via `RefundRunner` and the reconcile cron retries `pending` refunds without a provider id.
 - `PaymentProvider` is the only port to Stripe; stripe-go is imported only in `infra/payment/stripe` and `controller/http/webhook.go`.
 
 ## Local development

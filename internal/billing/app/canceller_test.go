@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -58,4 +59,34 @@ func TestCancelNowPastDueWithoutPeriodPayments(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, domain.StatusCanceled, f.store.subs[f.sub.ID()].Status())
 	assert.Empty(t, f.store.subs[f.sub.ID()].Refunds())
+}
+
+func TestCancelNowCancelsLocallyBeforeProviderAndSurvivesProviderFailure(t *testing.T) {
+	f := newCancellerFixture(t, domain.StatusActive)
+	now := time.Now()
+	f.provider.EXPECT().PeriodPayments(mock.Anything, "sub_1", mock.Anything, mock.Anything).Return([]domain.PaymentInfo{{
+		Amount: domain.Money{Amount: 30000, Currency: "vnd"}, PaymentRef: "pi_1", PaidAt: now,
+		CoverageStart: now, CoverageEnd: now.Add(30 * 24 * time.Hour),
+	}}, nil).Once()
+	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").
+		RunAndReturn(func(context.Context, string) error {
+			assert.Equal(t, domain.StatusCanceled, f.store.subs[f.sub.ID()].Status(), "local cancel is committed first")
+			return errors.New("stripe down")
+		}).Once()
+	submitted := 0
+	f.provider.EXPECT().CreateRefund(mock.Anything, mock.Anything, "pi_1", mock.Anything).
+		RunAndReturn(func(_ context.Context, id uuid.UUID, ref string, amount domain.Money) (RefundResult, error) {
+			submitted++
+			return RefundResult{
+				ProviderRefundID: "re_1", RefundID: &id, PaymentRef: ref, Amount: amount,
+				Status: domain.RefundStatusSucceeded, FailureMessage: nil,
+			}, nil
+		}).Once()
+
+	err := f.canceller.CancelNow(context.Background(), f.ws, domain.RefundReasonCancelNow, "u", false)
+
+	require.NoError(t, err)
+	assert.Equal(t, 1, submitted)
+	require.Len(t, f.store.subs[f.sub.ID()].Refunds(), 1)
+	assert.Equal(t, domain.RefundStatusSucceeded, f.store.subs[f.sub.ID()].Refunds()[0].Status())
 }

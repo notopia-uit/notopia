@@ -38,6 +38,15 @@ WHERE status NOT IN ('canceled', 'incomplete_expired')
 ORDER BY provider_synced_at
 LIMIT sqlc.arg('row_limit');
 
+-- name: ListCanceledSubscriptionsAwaitingProviderCancel :many
+SELECT * FROM subscriptions
+WHERE status = 'canceled'
+  AND provider_subscription_id IS NOT NULL
+  AND canceled_at IS NOT NULL
+  AND provider_synced_at <= canceled_at
+ORDER BY canceled_at
+LIMIT sqlc.arg('row_limit');
+
 -- name: ListSubscriptionIDsWithUnsubmittedRefunds :many
 SELECT DISTINCT subscription_id FROM refunds
 WHERE status = 'pending' AND provider_refund_id IS NULL

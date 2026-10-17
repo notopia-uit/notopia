@@ -88,6 +88,11 @@ func (f *fixture) current(t *testing.T) *domain.Subscription {
 	return s
 }
 
+func (f *fixture) byProviderSubscription(id string) *domain.Subscription {
+	s, _ := f.store.Subscription().GetByProviderSubscriptionID(context.Background(), id, false)
+	return s
+}
+
 func TestCompleteCheckoutIsIdempotent(t *testing.T) {
 	f := newFixture(t)
 	f.expectSubscribeSession("sub_1")
@@ -106,7 +111,13 @@ func TestDuplicateCheckoutIsCanceledAndRefunded(t *testing.T) {
 	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_1", SessionID: "cs_sub_1"}))
 
 	f.expectSubscribeSession("sub_2")
-	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_2").Return(nil).Once()
+	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_2").
+		RunAndReturn(func(context.Context, string) error {
+			dup := f.byProviderSubscription("sub_2")
+			require.NotNil(t, dup, "duplicate row is committed before the provider cancel")
+			assert.Equal(t, domain.StatusCanceled, dup.Status())
+			return nil
+		}).Once()
 	refunded := f.expectRefund()
 	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_2", SessionID: "cs_sub_2"}))
 
@@ -124,7 +135,14 @@ func TestLifetimeReplacesRecurring(t *testing.T) {
 		Payer: testPayer, CustomerID: "cus_1",
 		Payment: domain.PaymentInfo{Amount: domain.Money{Amount: 2490000, Currency: "vnd"}, PaymentRef: "pi_life", PaidAt: time.Now()},
 	}, nil)
-	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").Return(nil).Once()
+	f.provider.EXPECT().CancelSubscriptionNow(mock.Anything, "sub_1").
+		RunAndReturn(func(context.Context, string) error {
+			old := f.byProviderSubscription("sub_1")
+			require.NotNil(t, old)
+			assert.Equal(t, domain.StatusCanceled, old.Status(), "old subscription is canceled locally before the provider cancel")
+			assert.Equal(t, domain.IntervalLifetime, f.current(t).Interval(), "lifetime is already committed")
+			return nil
+		}).Once()
 	refunded := f.expectRefund()
 	require.NoError(t, f.handler.Handle(context.Background(), &CompleteCheckout{EventID: "evt_2", SessionID: "cs_life"}))
 

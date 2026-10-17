@@ -103,9 +103,6 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 		if payments, err = h.provider.PeriodPayments(ctx, s.ProviderSubscriptionID, snap.CurrentPeriodStart, snap.CurrentPeriodEnd); err != nil {
 			return err
 		}
-		if err := h.provider.CancelSubscriptionNow(ctx, s.ProviderSubscriptionID); err != nil {
-			return err
-		}
 	}
 
 	now, actor := time.Now(), h.settings.ServiceAccountUserID
@@ -139,6 +136,7 @@ func (h *CompleteCheckoutHandler) subscribe(ctx context.Context, cmd *CompleteCh
 		return err
 	}
 	if duplicate {
+		cancelAtProvider(ctx, h.provider, s.ProviderSubscriptionID)
 		return h.refunds.Run(ctx, saved.ID())
 	}
 	notifySubscription(ctx, h.notifier, saved)
@@ -156,9 +154,6 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 		(cur.ProviderPaymentID() == nil || *cur.ProviderPaymentID() != s.Payment.PaymentRef)
 	if replacing {
 		if replaced, err = h.provider.PeriodPayments(ctx, *cur.ProviderSubscriptionID(), *cur.CurrentPeriodStart(), *cur.CurrentPeriodEnd()); err != nil {
-			return err
-		}
-		if err := h.provider.CancelSubscriptionNow(ctx, *cur.ProviderSubscriptionID()); err != nil {
 			return err
 		}
 	}
@@ -215,6 +210,9 @@ func (h *CompleteCheckoutHandler) lifetime(ctx context.Context, cmd *CompleteChe
 	})
 	if err != nil || saved == nil {
 		return err
+	}
+	if replacing {
+		cancelAtProvider(ctx, h.provider, *cur.ProviderSubscriptionID())
 	}
 	for _, id := range toRefund {
 		if err := h.refunds.Run(ctx, id); err != nil {

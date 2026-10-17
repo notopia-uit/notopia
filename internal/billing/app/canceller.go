@@ -62,7 +62,8 @@ func (c *Canceller) Quote(ctx context.Context, ws uuid.UUID) (domain.RefundQuote
 	return sub.QuoteCancelNow(time.Now(), policy, payments)
 }
 
-// CancelNow cancels at the provider first, then locally, then submits the refund.
+// CancelNow cancels locally and commits, then cancels at the provider (retried by reconcile on
+// failure), then submits the refunds.
 // refundOptional=true (workspace deleted) cancels even when no refund is due (lifetime past its window).
 func (c *Canceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.RefundReason, actor string, refundOptional bool) error {
 	sub, policy, err := c.load(ctx, ws)
@@ -82,11 +83,6 @@ func (c *Canceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.R
 		var noRefund domain.RefundQuote
 		quote = noRefund
 	}
-	if sub.ProviderSubscriptionID() != nil {
-		if err := c.provider.CancelSubscriptionNow(ctx, *sub.ProviderSubscriptionID()); err != nil {
-			return err
-		}
-	}
 	var saved *domain.Subscription
 	if err := c.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		s, err := r.Subscription().GetByID(ctx, sub.ID(), true)
@@ -100,6 +96,9 @@ func (c *Canceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.R
 		return r.Subscription().Save(ctx, s)
 	}); err != nil || saved == nil {
 		return err
+	}
+	if saved.ProviderSubscriptionID() != nil {
+		cancelAtProvider(ctx, c.provider, *saved.ProviderSubscriptionID())
 	}
 	notifySubscription(ctx, c.notifier, saved)
 	return c.refunds.Run(ctx, saved.ID())

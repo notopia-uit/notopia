@@ -254,6 +254,11 @@ func (s *Subscription) pastDueStart() *time.Time {
 	return s.currentPeriodStart
 }
 
+// MarkProviderSynced records that the provider confirmed this (locally canceled) subscription ended.
+func (s *Subscription) MarkProviderSynced(now time.Time) {
+	s.providerSyncedAt, s.updatedAt = now, now
+}
+
 func (s *Subscription) ScheduleCancel(now time.Time, userID string) error {
 	if s.interval == IntervalLifetime {
 		return errs.NewInvalid("lifetime subscriptions cannot be scheduled for cancellation")
