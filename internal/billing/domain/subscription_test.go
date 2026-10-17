@@ -62,8 +62,8 @@ func TestGrantsAccess(t *testing.T) {
 		want   bool
 	}{
 		{"active after stored period end (renewal webhook late)", domain.StatusActive, end.Add(2 * time.Hour), true},
-		{"past_due within grace", domain.StatusPastDue, end.Add(48 * time.Hour), true},
-		{"past_due after grace", domain.StatusPastDue, end.Add(96 * time.Hour), false},
+		{"past_due within grace", domain.StatusPastDue, t0.Add(48 * time.Hour), true},
+		{"past_due after grace", domain.StatusPastDue, t0.Add(96 * time.Hour), false},
 		{"canceled", domain.StatusCanceled, t0, false},
 		{"unpaid", domain.StatusUnpaid, t0, false},
 	}
@@ -163,4 +163,44 @@ func TestQuoteCancelNowWithoutPayments(t *testing.T) {
 	require.NoError(t, err)
 	assert.Empty(t, refunds)
 	assert.Equal(t, domain.StatusCanceled, s.Status())
+}
+
+func TestPastDueGraceStartsWhenSubscriptionBecomesPastDue(t *testing.T) {
+	policy := domain.DefaultBillingPolicy(t0) // 3 days grace
+	plus := price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000)
+	end := t0.AddDate(0, 1, 0)
+	s, _ := domain.NewSubscription(uuid.New(), uuid.New(), plus, snap(domain.StatusActive, t0, end), t0, "u")
+
+	s.ApplySnapshot(snap(domain.StatusPastDue, end, end.AddDate(0, 1, 0)), plus, end, "u")
+
+	assert.True(t, s.GrantsAccess(end.Add(48*time.Hour), policy))
+	assert.False(t, s.GrantsAccess(end.Add(96*time.Hour), policy))
+	require.NotNil(t, s.AccessUntil(policy))
+	assert.True(t, s.AccessUntil(policy).Equal(end.Add(72*time.Hour)))
+
+	s.ApplySnapshot(snap(domain.StatusPastDue, end, end.AddDate(0, 1, 0)), plus, end.Add(24*time.Hour), "u")
+	assert.True(t, s.AccessUntil(policy).Equal(end.Add(72*time.Hour)), "a repeated past_due snapshot keeps the original start")
+
+	recovered := end.Add(48 * time.Hour)
+	s.ApplySnapshot(snap(domain.StatusActive, end, end.AddDate(0, 1, 0)), plus, recovered, "u")
+	assert.Nil(t, s.PastDueSince())
+	assert.True(t, s.AccessUntil(policy).Equal(end.AddDate(0, 1, 0)))
+}
+
+func TestPastDueWithoutRecordedStartFallsBackToPeriodStart(t *testing.T) {
+	policy := domain.DefaultBillingPolicy(t0)
+	end := t0.AddDate(0, 1, 0)
+	s := domain.UnmarshalSubscription(domain.UnmarshalSubscriptionParams{
+		ID: uuid.New(), WorkspaceID: uuid.New(), Plan: domain.PlanTierPlus, Interval: domain.IntervalMonth, PriceID: uuid.New(),
+		Status: domain.StatusPastDue, CurrentPeriodStart: &t0, CurrentPeriodEnd: &end,
+		ProviderSyncedAt: t0, CreatedAt: t0, UpdatedAt: t0,
+	})
+
+	assert.True(t, s.AccessUntil(policy).Equal(t0.Add(72*time.Hour)))
+	assert.True(t, s.GrantsAccess(t0.Add(48*time.Hour), policy))
+	assert.False(t, s.GrantsAccess(t0.Add(96*time.Hour), policy))
+
+	s.ApplySnapshot(snap(domain.StatusPastDue, t0, end), price(t, domain.PlanTierPlus, domain.IntervalMonth, 49000), t0.Add(24*time.Hour), "u")
+	require.NotNil(t, s.PastDueSince())
+	assert.True(t, s.PastDueSince().Equal(t0))
 }

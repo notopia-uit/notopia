@@ -75,6 +75,7 @@ type Subscription struct {
 	currentPeriodEnd       *time.Time
 	cancelAtPeriodEnd      bool
 	canceledAt             *time.Time
+	pastDueSince           *time.Time
 	paidAt                 *time.Time
 	providerSyncedAt       time.Time
 	createdAt              time.Time
@@ -103,6 +104,7 @@ func NewSubscription(id, workspaceID uuid.UUID, price *Price, snap ProviderSnaps
 		currentPeriodEnd:       nil,
 		cancelAtPeriodEnd:      false,
 		canceledAt:             nil,
+		pastDueSince:           nil,
 		paidAt:                 nil,
 		providerSyncedAt:       now,
 		createdAt:              now,
@@ -132,6 +134,7 @@ func NewLifetimeSubscription(id, workspaceID uuid.UUID, price *Price, providerPa
 		currentPeriodEnd:       nil,
 		cancelAtPeriodEnd:      false,
 		canceledAt:             nil,
+		pastDueSince:           nil,
 		paidAt:                 &paidAt,
 		providerSyncedAt:       now,
 		createdAt:              now,
@@ -156,6 +159,7 @@ type UnmarshalSubscriptionParams struct {
 	CurrentPeriodEnd       *time.Time
 	CancelAtPeriodEnd      bool
 	CanceledAt             *time.Time
+	PastDueSince           *time.Time
 	PaidAt                 *time.Time
 	ProviderSyncedAt       time.Time
 	CreatedAt              time.Time
@@ -178,6 +182,7 @@ func UnmarshalSubscription(p UnmarshalSubscriptionParams) *Subscription {
 		currentPeriodEnd:       p.CurrentPeriodEnd,
 		cancelAtPeriodEnd:      p.CancelAtPeriodEnd,
 		canceledAt:             p.CanceledAt,
+		pastDueSince:           p.PastDueSince,
 		paidAt:                 p.PaidAt,
 		providerSyncedAt:       p.ProviderSyncedAt,
 		createdAt:              p.CreatedAt,
@@ -188,7 +193,7 @@ func UnmarshalSubscription(p UnmarshalSubscriptionParams) *Subscription {
 
 func (s *Subscription) ApplySnapshot(snap ProviderSnapshot, price *Price, now time.Time, userID string) {
 	prevStatus, prevPlan, prevCancel := s.status, s.plan, s.cancelAtPeriodEnd
-	prevEnd := s.currentPeriodEnd
+	prevEnd, prevStart := s.currentPeriodEnd, s.currentPeriodStart
 	isNew := prevStatus == StatusIncomplete && prevEnd == nil
 
 	start, end := snap.CurrentPeriodStart, snap.CurrentPeriodEnd
@@ -198,6 +203,7 @@ func (s *Subscription) ApplySnapshot(snap ProviderSnapshot, price *Price, now ti
 	s.cancelAtPeriodEnd = snap.CancelAtPeriodEnd
 	s.canceledAt = snap.CanceledAt
 	s.providerSyncedAt, s.updatedAt = now, now
+	s.trackPastDue(prevStatus, prevStart, now)
 
 	switch {
 	case s.status == StatusActive && prevStatus != StatusActive:
@@ -222,6 +228,30 @@ func (s *Subscription) ApplySnapshot(snap ProviderSnapshot, price *Price, now ti
 	if !s.IsCurrent() && (prevStatus != s.status) && !isNew {
 		s.record(&SubscriptionEndedEvent{BaseEvent: s.base(userID)})
 	}
+}
+
+func (s *Subscription) trackPastDue(prevStatus Status, prevStart *time.Time, now time.Time) {
+	switch {
+	case s.status != StatusPastDue:
+		s.pastDueSince = nil
+	case prevStatus != StatusPastDue:
+		s.pastDueSince = &now
+	case s.pastDueSince == nil:
+		since := now
+		if prevStart != nil {
+			since = *prevStart
+		}
+		s.pastDueSince = &since
+	}
+}
+
+// pastDueStart is when the grace window began. Rows saved before past_due_since existed fall back
+// to the period start, which never cuts paid time.
+func (s *Subscription) pastDueStart() *time.Time {
+	if s.pastDueSince != nil {
+		return s.pastDueSince
+	}
+	return s.currentPeriodStart
 }
 
 func (s *Subscription) ScheduleCancel(now time.Time, userID string) error {
@@ -406,7 +436,8 @@ func (s *Subscription) GrantsAccess(now time.Time, policy *BillingPolicy) bool {
 	case StatusActive:
 		return true
 	case StatusPastDue:
-		return s.currentPeriodEnd != nil && now.Before(s.currentPeriodEnd.Add(policy.PastDueGrace()))
+		since := s.pastDueStart()
+		return since != nil && now.Before(since.Add(policy.PastDueGrace()))
 	case StatusNone, StatusIncomplete, StatusUnpaid, StatusCanceled, StatusIncompleteExpired:
 		return false
 	default:
@@ -419,7 +450,11 @@ func (s *Subscription) AccessUntil(policy *BillingPolicy) *time.Time {
 	case s.interval == IntervalLifetime || s.currentPeriodEnd == nil:
 		return nil
 	case s.status == StatusPastDue:
-		t := s.currentPeriodEnd.Add(policy.PastDueGrace())
+		since := s.pastDueStart()
+		if since == nil {
+			return nil
+		}
+		t := since.Add(policy.PastDueGrace())
 		return &t
 	case s.status == StatusActive:
 		return s.currentPeriodEnd
@@ -440,6 +475,7 @@ func (s *Subscription) CurrentPeriodStart() *time.Time  { return s.currentPeriod
 func (s *Subscription) CurrentPeriodEnd() *time.Time    { return s.currentPeriodEnd }
 func (s *Subscription) CancelAtPeriodEnd() bool         { return s.cancelAtPeriodEnd }
 func (s *Subscription) CanceledAt() *time.Time          { return s.canceledAt }
+func (s *Subscription) PastDueSince() *time.Time        { return s.pastDueSince }
 func (s *Subscription) PaidAt() *time.Time              { return s.paidAt }
 func (s *Subscription) ProviderSyncedAt() time.Time     { return s.providerSyncedAt }
 func (s *Subscription) CreatedAt() time.Time            { return s.createdAt }

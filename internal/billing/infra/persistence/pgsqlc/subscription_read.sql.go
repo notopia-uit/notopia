@@ -13,7 +13,7 @@ import (
 )
 
 const readGetCurrentSubscription = `-- name: ReadGetCurrentSubscription :one
-SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at FROM subscriptions
+SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at, past_due_since FROM subscriptions
 WHERE workspace_id = $1 AND status NOT IN ('canceled', 'incomplete_expired')
 `
 
@@ -39,12 +39,13 @@ func (q *Queries) ReadGetCurrentSubscription(ctx context.Context, workspaceID uu
 		&i.ProviderSyncedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PastDueSince,
 	)
 	return &i, err
 }
 
 const readListCurrentSubscriptionsByWorkspaces = `-- name: ReadListCurrentSubscriptionsByWorkspaces :many
-SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at FROM subscriptions
+SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at, past_due_since FROM subscriptions
 WHERE workspace_id = ANY($1::uuid[]) AND status NOT IN ('canceled', 'incomplete_expired')
 `
 
@@ -76,6 +77,7 @@ func (q *Queries) ReadListCurrentSubscriptionsByWorkspaces(ctx context.Context, 
 			&i.ProviderSyncedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.PastDueSince,
 		); err != nil {
 			return nil, err
 		}

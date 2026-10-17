@@ -46,13 +46,13 @@ LIMIT sqlc.arg('row_limit');
 -- name: UpsertSubscription :exec
 INSERT INTO subscriptions (
   id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id,
-  current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at,
+  current_period_start, current_period_end, cancel_at_period_end, canceled_at, past_due_since, paid_at, provider_synced_at,
   created_at, updated_at
 ) VALUES (
   sqlc.arg('id'), sqlc.arg('workspace_id'), sqlc.arg('plan'), sqlc.arg('billing_interval'), sqlc.arg('price_id'),
   sqlc.arg('status'), sqlc.arg('provider_subscription_id'), sqlc.arg('provider_payment_id'),
   sqlc.arg('current_period_start'), sqlc.arg('current_period_end'), sqlc.arg('cancel_at_period_end'),
-  sqlc.arg('canceled_at'), sqlc.arg('paid_at'), sqlc.arg('provider_synced_at'),
+  sqlc.arg('canceled_at'), sqlc.arg('past_due_since'), sqlc.arg('paid_at'), sqlc.arg('provider_synced_at'),
   sqlc.arg('created_at'), sqlc.arg('updated_at')
 )
 ON CONFLICT (id) DO UPDATE SET
@@ -64,6 +64,7 @@ ON CONFLICT (id) DO UPDATE SET
   current_period_end = EXCLUDED.current_period_end,
   cancel_at_period_end = EXCLUDED.cancel_at_period_end,
   canceled_at = EXCLUDED.canceled_at,
+  past_due_since = EXCLUDED.past_due_since,
   paid_at = EXCLUDED.paid_at,
   provider_synced_at = EXCLUDED.provider_synced_at,
   updated_at = EXCLUDED.updated_at;

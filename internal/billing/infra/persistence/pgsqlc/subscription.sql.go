@@ -14,7 +14,7 @@ import (
 )
 
 const getCurrentSubscription = `-- name: GetCurrentSubscription :one
-SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at FROM subscriptions
+SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at, past_due_since FROM subscriptions
 WHERE workspace_id = $1 AND status NOT IN ('canceled', 'incomplete_expired')
 FOR UPDATE -- :if $2
 `
@@ -49,12 +49,13 @@ func (q *Queries) GetCurrentSubscription(ctx context.Context, arg GetCurrentSubs
 		&i.ProviderSyncedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PastDueSince,
 	)
 	return &i, err
 }
 
 const getSubscription = `-- name: GetSubscription :one
-SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at FROM subscriptions
+SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at, past_due_since FROM subscriptions
 WHERE id = $1
 FOR UPDATE -- :if $2
 `
@@ -89,12 +90,13 @@ func (q *Queries) GetSubscription(ctx context.Context, arg GetSubscriptionParams
 		&i.ProviderSyncedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PastDueSince,
 	)
 	return &i, err
 }
 
 const getSubscriptionByProviderPaymentID = `-- name: GetSubscriptionByProviderPaymentID :one
-SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at FROM subscriptions
+SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at, past_due_since FROM subscriptions
 WHERE provider_payment_id = $1
 FOR UPDATE -- :if $2
 `
@@ -129,12 +131,13 @@ func (q *Queries) GetSubscriptionByProviderPaymentID(ctx context.Context, arg Ge
 		&i.ProviderSyncedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PastDueSince,
 	)
 	return &i, err
 }
 
 const getSubscriptionByProviderSubscriptionID = `-- name: GetSubscriptionByProviderSubscriptionID :one
-SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at FROM subscriptions
+SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at, past_due_since FROM subscriptions
 WHERE provider_subscription_id = $1
 FOR UPDATE -- :if $2
 `
@@ -169,6 +172,7 @@ func (q *Queries) GetSubscriptionByProviderSubscriptionID(ctx context.Context, a
 		&i.ProviderSyncedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.PastDueSince,
 	)
 	return &i, err
 }
@@ -187,7 +191,7 @@ func (q *Queries) GetSubscriptionIDByRefundID(ctx context.Context, id uuid.UUID)
 }
 
 const listCurrentSubscriptionsByWorkspaces = `-- name: ListCurrentSubscriptionsByWorkspaces :many
-SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at FROM subscriptions
+SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at, past_due_since FROM subscriptions
 WHERE workspace_id = ANY($1::uuid[]) AND status NOT IN ('canceled', 'incomplete_expired')
 `
 
@@ -219,6 +223,7 @@ func (q *Queries) ListCurrentSubscriptionsByWorkspaces(ctx context.Context, work
 			&i.ProviderSyncedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.PastDueSince,
 		); err != nil {
 			return nil, err
 		}
@@ -297,7 +302,7 @@ func (q *Queries) ListSubscriptionIDsWithUnsubmittedRefunds(ctx context.Context,
 }
 
 const listSubscriptionsNeedingReconcile = `-- name: ListSubscriptionsNeedingReconcile :many
-SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at FROM subscriptions
+SELECT id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id, current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at, created_at, updated_at, past_due_since FROM subscriptions
 WHERE status NOT IN ('canceled', 'incomplete_expired')
   AND billing_interval <> 'lifetime'
   AND (current_period_end + INTERVAL '1 hour' < $1::timestamptz
@@ -339,6 +344,7 @@ func (q *Queries) ListSubscriptionsNeedingReconcile(ctx context.Context, arg *Li
 			&i.ProviderSyncedAt,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.PastDueSince,
 		); err != nil {
 			return nil, err
 		}
@@ -399,14 +405,14 @@ func (q *Queries) UpsertRefund(ctx context.Context, arg *UpsertRefundParams) err
 const upsertSubscription = `-- name: UpsertSubscription :exec
 INSERT INTO subscriptions (
   id, workspace_id, plan, billing_interval, price_id, status, provider_subscription_id, provider_payment_id,
-  current_period_start, current_period_end, cancel_at_period_end, canceled_at, paid_at, provider_synced_at,
+  current_period_start, current_period_end, cancel_at_period_end, canceled_at, past_due_since, paid_at, provider_synced_at,
   created_at, updated_at
 ) VALUES (
   $1, $2, $3, $4, $5,
   $6, $7, $8,
   $9, $10, $11,
-  $12, $13, $14,
-  $15, $16
+  $12, $13, $14, $15,
+  $16, $17
 )
 ON CONFLICT (id) DO UPDATE SET
   plan = EXCLUDED.plan,
@@ -417,6 +423,7 @@ ON CONFLICT (id) DO UPDATE SET
   current_period_end = EXCLUDED.current_period_end,
   cancel_at_period_end = EXCLUDED.cancel_at_period_end,
   canceled_at = EXCLUDED.canceled_at,
+  past_due_since = EXCLUDED.past_due_since,
   paid_at = EXCLUDED.paid_at,
   provider_synced_at = EXCLUDED.provider_synced_at,
   updated_at = EXCLUDED.updated_at
@@ -435,6 +442,7 @@ type UpsertSubscriptionParams struct {
 	CurrentPeriodEnd       *time.Time
 	CancelAtPeriodEnd      bool
 	CanceledAt             *time.Time
+	PastDueSince           *time.Time
 	PaidAt                 *time.Time
 	ProviderSyncedAt       time.Time
 	CreatedAt              time.Time
@@ -457,6 +465,7 @@ func (q *Queries) UpsertSubscription(ctx context.Context, arg *UpsertSubscriptio
 		arg.CurrentPeriodEnd,
 		arg.CancelAtPeriodEnd,
 		arg.CanceledAt,
+		arg.PastDueSince,
 		arg.PaidAt,
 		arg.ProviderSyncedAt,
 		arg.CreatedAt,

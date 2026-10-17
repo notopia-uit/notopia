@@ -60,7 +60,7 @@ func ToSubscriptions(rows []*pgsqlc.Subscription, refundRows []*pgsqlc.Refund) [
 			ID: row.ID, WorkspaceID: row.WorkspaceID, Plan: ToPlanTier(row.Plan), Interval: ToInterval(row.BillingInterval),
 			PriceID: row.PriceID, Status: ToStatus(row.Status), ProviderSubscriptionID: row.ProviderSubscriptionID,
 			ProviderPaymentID: row.ProviderPaymentID, CurrentPeriodStart: row.CurrentPeriodStart, CurrentPeriodEnd: row.CurrentPeriodEnd,
-			CancelAtPeriodEnd: row.CancelAtPeriodEnd, CanceledAt: row.CanceledAt, PaidAt: row.PaidAt,
+			CancelAtPeriodEnd: row.CancelAtPeriodEnd, CanceledAt: row.CanceledAt, PastDueSince: row.PastDueSince, PaidAt: row.PaidAt,
 			ProviderSyncedAt: row.ProviderSyncedAt, CreatedAt: row.CreatedAt, UpdatedAt: row.UpdatedAt, Refunds: refunds[row.ID],
 		}))
 	}

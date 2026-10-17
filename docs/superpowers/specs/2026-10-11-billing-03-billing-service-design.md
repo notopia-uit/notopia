@@ -382,12 +382,17 @@ Every mutating method emits an event (`BaseEvent{ID, OccurredAt, AggregateID, Us
 - `interval = lifetime` and `status = active` → true, `AccessUntil = nil`.
 - `status = active` → true (also while `cancelAtPeriodEnd`; Stripe sends
   `customer.subscription.deleted` at period end).
-- `status = past_due` and `now < currentPeriodEnd + pastDueGraceDays` → true.
+- `status = past_due` and `now < pastDueSince + pastDueGraceDays` → true. `pastDueSince` is set when a
+  snapshot moves the subscription into `past_due` and cleared when it leaves; rows without it fall
+  back to `currentPeriodStart`. `AccessUntil` is `pastDueSince + pastDueGraceDays`.
 - otherwise false → resolver returns the `free` plan with `status` preserved for UI.
 
 Why no local expiry: at period end Stripe creates the renewal invoice, finalizes it about 1 h
 later, then charges; failures move to `past_due` and Smart Retries continue for up to ~2 weeks.
-Our stored period end always passes before the renewal webhook arrives.
+Our stored period end always passes before the renewal webhook arrives, which is why an `active`
+subscription keeps access. After a failed renewal Stripe has already advanced the period, so the
+stored period end is the next one; the grace is therefore measured from `past_due_since`, not from
+the period end.
 
 **Refund quote** (`QuoteCancelNow`):
 
@@ -733,6 +738,7 @@ CREATE TABLE subscriptions (
   current_period_end TIMESTAMPTZ,
   cancel_at_period_end BOOLEAN NOT NULL DEFAULT FALSE,
   canceled_at TIMESTAMPTZ,
+  past_due_since TIMESTAMPTZ, -- set on entering past_due, cleared on leaving
   paid_at TIMESTAMPTZ,
   provider_synced_at TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ NOT NULL,

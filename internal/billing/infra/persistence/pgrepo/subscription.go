@@ -106,7 +106,7 @@ func (r *subscriptionRepo) Save(ctx context.Context, s *domain.Subscription) err
 		ID: s.ID(), WorkspaceID: s.WorkspaceID(), Plan: pgmapper.FromPlanTier(s.Plan()), BillingInterval: pgmapper.FromInterval(s.Interval()),
 		PriceID: s.PriceID(), Status: pgmapper.FromStatus(s.Status()), ProviderSubscriptionID: s.ProviderSubscriptionID(),
 		ProviderPaymentID: s.ProviderPaymentID(), CurrentPeriodStart: s.CurrentPeriodStart(), CurrentPeriodEnd: s.CurrentPeriodEnd(),
-		CancelAtPeriodEnd: s.CancelAtPeriodEnd(), CanceledAt: s.CanceledAt(), PaidAt: s.PaidAt(),
+		CancelAtPeriodEnd: s.CancelAtPeriodEnd(), CanceledAt: s.CanceledAt(), PastDueSince: s.PastDueSince(), PaidAt: s.PaidAt(),
 		ProviderSyncedAt: s.ProviderSyncedAt(), CreatedAt: s.CreatedAt(), UpdatedAt: s.UpdatedAt(),
 	})
 	if err != nil {

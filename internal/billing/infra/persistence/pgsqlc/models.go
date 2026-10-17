@@ -415,4 +415,5 @@ type Subscription struct {
 	ProviderSyncedAt       time.Time
 	CreatedAt              time.Time
 	UpdatedAt              time.Time
+	PastDueSince           *time.Time
 }
