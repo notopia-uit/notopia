@@ -7,7 +7,7 @@ Entrypoint: `cmd/authorization/`. Contract: `proto/authorization/authorization.p
 
 - `app/` — flat, one file per RPC (`createworkspace.go`, `hasworkspacepermission.go`, …),
   each with a `_test.go`. No `cmd_`/`q_` prefixes here, unlike `internal/note/`.
-- `app/casbin.go`, `policyloader.go` — enforcer setup and policy loading
+- `app/casbin.go`, `policysync.go` — enforcer setup and policy syncing
 - `infra/` — `db.go` (Casbin postgres adapter), `casbin.go`, `integrationevent.go`
 - `controller/grpc/` — RPC handlers; `errs/` → gRPC status in `controller/grpc/err.go`
 
@@ -31,9 +31,12 @@ Two grouping relations, easy to confuse:
 over `workspace` and `workspace_item`. It is static config: change it to change what a role
 can do; it is not per-tenant data.
 
-`BootStrapPolicies` loads that matrix on every start (seed). `LoadFixtures` loads
-`app/policy_fixtures.csv` (dev memberships) only when `AppEnv` is development; the same file is
-reused by tests.
+`policy.csv` is the single source of truth for the static matrix (`p` + `g2`). `BootStrapPolicies`
+syncs it on every start: adds missing rows and prunes stale `p` rows from the DB.
+`policy_fixtures.csv` holds dev memberships (`g`), add-only, loaded by `LoadFixtures` only when
+`AppEnv` is development; tests reuse it. DB `g` rows are runtime memberships and are never pruned.
+Sync parses CSV into a standalone model and applies rules to the real enforcer; never build a second
+enforcer on the shared model, it replaces the role manager and drops loaded `g` links.
 
 Note `editor` may `delete` a `workspace_item` but only `read` the `workspace` itself.
 

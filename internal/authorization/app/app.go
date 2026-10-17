@@ -89,7 +89,7 @@ type App struct {
 func (a *App) BootStrapPolicies(ctx context.Context) error {
 	slog.DebugContext(ctx, "BootStrapPolicies: adding permission policies")
 
-	if err := LoadPoliciesFromString(a.Enforcer, PolicyCSV); err != nil {
+	if err := syncPolicies(a.Enforcer, PolicyCSV, true); err != nil {
 		slog.ErrorContext(ctx, "BootStrapPolicies: failed to add policies", slog.Any("error", err))
 		return fmt.Errorf("failed to bootstrap policies: %w", err)
 	}
@@ -101,7 +101,7 @@ func (a *App) BootStrapPolicies(ctx context.Context) error {
 func (a *App) LoadFixtures(ctx context.Context) error {
 	slog.DebugContext(ctx, "LoadFixtures: loading dev fixture policies")
 
-	if err := LoadPoliciesFromString(a.Enforcer, PolicyFixturesCSV); err != nil {
+	if err := syncPolicies(a.Enforcer, PolicyFixturesCSV, false); err != nil {
 		slog.ErrorContext(ctx, "LoadFixtures: failed to load fixture policies", slog.Any("error", err))
 		return fmt.Errorf("failed to load dev fixture policies: %w", err)
 	}

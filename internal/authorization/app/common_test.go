@@ -1,6 +1,7 @@
 package app_test
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 	"testing"
@@ -57,15 +58,15 @@ func GetLocalEnforcer(t testing.TB, params *GetLocalEnforcerParams) (*casbin.Tra
 			return nil, fmt.Errorf("failed to create Casbin enforcer: %w", err)
 		}
 
-		// Build combined policy CSV
-		policy := app.PolicyCSV
-		if params.LoadTestPolicies {
-			policy += "\n" + app.PolicyFixturesCSV
+		a := &app.App{Enforcer: enforcer}
+		ctx := context.Background()
+		if err := a.BootStrapPolicies(ctx); err != nil {
+			return nil, fmt.Errorf("failed to bootstrap policies: %w", err)
 		}
-
-		// Load policies using stringadapter to maintain compatibility with g2 rules
-		if err := app.LoadPoliciesFromString(enforcer, policy); err != nil {
-			return nil, fmt.Errorf("failed to load policies: %w", err)
+		if params.LoadTestPolicies {
+			if err := a.LoadFixtures(ctx); err != nil {
+				return nil, fmt.Errorf("failed to load fixtures: %w", err)
+			}
 		}
 
 		return enforcer, nil
