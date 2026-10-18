@@ -246,6 +246,8 @@ export const getNote = <ThrowOnError extends boolean = false>(options: Options<G
 
 /**
  * Get note graph
+ *
+ * `depth` is capped by plan limit `note_graph_max_depth` (free 5).
  */
 export const getNoteGraph = <ThrowOnError extends boolean = false>(options: Options<GetNoteGraphData, ThrowOnError>): RequestResult<GetNoteGraphResponses, GetNoteGraphErrors, ThrowOnError> => (options.client ?? client).get<GetNoteGraphResponses, GetNoteGraphErrors, ThrowOnError>({
   security: [{
@@ -479,6 +481,8 @@ export const getWorkspaceEvents = <ThrowOnError extends boolean = false>(options
 
 /**
  * Get workspace graph
+ *
+ * Requires feature `workspace_graph` (plus, pro); free returns 402.
  */
 export const getWorkspaceGraph = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceGraphData, ThrowOnError>): RequestResult<GetWorkspaceGraphResponses, GetWorkspaceGraphErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceGraphResponses, GetWorkspaceGraphErrors, ThrowOnError>({
   security: [{
@@ -496,6 +500,8 @@ export const getWorkspaceGraph = <ThrowOnError extends boolean = false>(options:
 
 /**
  * Leave workspace
+ *
+ * The billing payer cannot leave while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const leaveWorkspace = <ThrowOnError extends boolean = false>(options: Options<LeaveWorkspaceData, ThrowOnError>): RequestResult<LeaveWorkspaceResponses, LeaveWorkspaceErrors, ThrowOnError> => (options.client ?? client).post<LeaveWorkspaceResponses, LeaveWorkspaceErrors, ThrowOnError>({
   security: [{
@@ -530,6 +536,8 @@ export const getWorkspaceMembers = <ThrowOnError extends boolean = false>(option
 
 /**
  * Update workspace members
+ *
+ * Plan limit `members` (free 3, plus 10, pro unlimited). Adding beyond the limit returns 402. The billing payer cannot lose the owner role while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const updateWorkspaceMembers = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceMembersData, ThrowOnError>): RequestResult<UpdateWorkspaceMembersResponses, UpdateWorkspaceMembersErrors, ThrowOnError> => (options.client ?? client).put<UpdateWorkspaceMembersResponses, UpdateWorkspaceMembersErrors, ThrowOnError>({
   security: [{
@@ -670,6 +678,8 @@ export const getWorkspaceSearchToken = <ThrowOnError extends boolean = false>(op
 
 /**
  * Show trash
+ *
+ * Trashed items older than the plan's `trash_retention_days` are purged daily.
  */
 export const showTrash = <ThrowOnError extends boolean = false>(options: Options<ShowTrashData, ThrowOnError>): RequestResult<ShowTrashResponses, ShowTrashErrors, ThrowOnError> => (options.client ?? client).get<ShowTrashResponses, ShowTrashErrors, ThrowOnError>({
   responseTransformer: showTrashResponseTransformer,

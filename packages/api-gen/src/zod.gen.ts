@@ -291,6 +291,22 @@ export const zNoteWorkspaceSlugChangedEvent = z.object({
 });
 
 /**
+ * Error for a request blocked by the workspace plan. `code` is one of:
+ * - `featureNotInPlan` (details.kind=feature): the feature is not included in the plan
+ * - `planLimitExceeded` (details.kind=limit): the plan's usage limit has been reached
+ *
+ */
+export const zNotePaymentRequiredError = zNoteError.and(z.object({
+  details: z.object({
+    kind: z.enum(['feature', 'limit']),
+    key: z.string(),
+    current: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+    max: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+    requiredPlan: z.enum(['plus', 'pro'])
+  }).optional()
+}));
+
+/**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
 export const zNoteId4 = z.string();

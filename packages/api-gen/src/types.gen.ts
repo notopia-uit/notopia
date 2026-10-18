@@ -360,6 +360,22 @@ export type NoteWorkspaceSlugChangedEvent = {
 };
 
 /**
+ * Error for a request blocked by the workspace plan. `code` is one of:
+ * - `featureNotInPlan` (details.kind=feature): the feature is not included in the plan
+ * - `planLimitExceeded` (details.kind=limit): the plan's usage limit has been reached
+ *
+ */
+export type NotePaymentRequiredError = NoteError & {
+  details?: {
+    kind: 'feature' | 'limit';
+    key: string;
+    current?: bigint;
+    max?: bigint;
+    requiredPlan: 'plus' | 'pro';
+  };
+};
+
+/**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
  */
 export type NoteId4 = string;
@@ -1355,6 +1371,10 @@ export type GetNoteGraphErrors = {
    * Internal Server Error response
    */
   500: NoteError;
+  /**
+   * Billing service unavailable
+   */
+  503: NoteError;
 };
 
 export type GetNoteGraphError = GetNoteGraphErrors[keyof GetNoteGraphErrors];
@@ -1894,6 +1914,10 @@ export type GetWorkspaceGraphErrors = {
     [key: string]: unknown;
   };
   /**
+   * Feature or limit not included in the workspace plan
+   */
+  402: NotePaymentRequiredError;
+  /**
    * Forbidden Error response
    */
   403: NoteError;
@@ -1905,6 +1929,10 @@ export type GetWorkspaceGraphErrors = {
    * Internal Server Error response
    */
   500: NoteError;
+  /**
+   * Billing service unavailable
+   */
+  503: NoteError;
 };
 
 export type GetWorkspaceGraphError = GetWorkspaceGraphErrors[keyof GetWorkspaceGraphErrors];
@@ -1943,9 +1971,17 @@ export type LeaveWorkspaceErrors = {
    */
   404: NoteError;
   /**
+   * The billing payer must transfer the owner role before leaving while a recurring subscription is active
+   */
+  409: NoteError;
+  /**
    * Internal Server Error response
    */
   500: NoteError;
+  /**
+   * Billing service unavailable
+   */
+  503: NoteError;
 };
 
 export type LeaveWorkspaceError = LeaveWorkspaceErrors[keyof LeaveWorkspaceErrors];
@@ -2021,13 +2057,25 @@ export type UpdateWorkspaceMembersErrors = {
     [key: string]: unknown;
   };
   /**
+   * Feature or limit not included in the workspace plan
+   */
+  402: NotePaymentRequiredError;
+  /**
    * Not Found Error response
    */
   404: NoteError;
   /**
+   * The billing payer must transfer the owner role before it can be removed while a recurring subscription is active
+   */
+  409: NoteError;
+  /**
    * Internal Server Error response
    */
   500: NoteError;
+  /**
+   * Billing service unavailable
+   */
+  503: NoteError;
 };
 
 export type UpdateWorkspaceMembersError = UpdateWorkspaceMembersErrors[keyof UpdateWorkspaceMembersErrors];

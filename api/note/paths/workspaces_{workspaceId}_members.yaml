@@ -38,6 +38,7 @@ put:
   tags:
     - Workspace
   summary: Update workspace members
+  description: "Plan limit `members` (free 3, plus 10, pro unlimited). Adding beyond the limit returns 402. The billing payer cannot lose the owner role while a recurring subscription is active (409 `billingPayerMustTransfer`)."
   operationId: updateWorkspaceMembers
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
@@ -56,7 +57,25 @@ put:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
+    402:
+      $ref: ../../common/components/responses/PaymentRequired.yaml
     404:
       $ref: ../../common/components/responses/NotFoundError.yaml
+    409:
+      description: The billing payer must transfer the owner role before it can be removed while a recurring subscription is active
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/components/schemas/Error.yaml
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml
+    503:
+      description: Billing service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/components/schemas/Error.yaml
+          example:
+            code: SERVICE_UNAVAILABLE
+            message: Billing service unavailable. Please try again later
+            more_info: https://api.notopia.com/docs/errors/SERVICE_UNAVAILABLE

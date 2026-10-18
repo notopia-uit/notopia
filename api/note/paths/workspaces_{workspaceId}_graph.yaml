@@ -8,6 +8,7 @@ get:
   tags:
     - Workspace
   summary: Get workspace graph
+  description: "Requires feature `workspace_graph` (plus, pro); free returns 402."
   operationId: getWorkspaceGraph
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
@@ -31,9 +32,21 @@ get:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
+    402:
+      $ref: ../../common/components/responses/PaymentRequired.yaml
     403:
       $ref: ../../common/components/responses/ForbiddenError.yaml
     404:
       $ref: ../../common/components/responses/NotFoundError.yaml
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml
+    503:
+      description: Billing service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/components/schemas/Error.yaml
+          example:
+            code: SERVICE_UNAVAILABLE
+            message: Billing service unavailable. Please try again later
+            more_info: https://api.notopia.com/docs/errors/SERVICE_UNAVAILABLE

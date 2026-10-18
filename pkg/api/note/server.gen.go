@@ -1116,6 +1116,8 @@ type InternalServerErrorJSONResponse Error
 
 type NotFoundErrorJSONResponse Error
 
+type PaymentRequiredJSONResponse PaymentRequiredError
+
 type UnauthorizedErrorJSONResponse map[string]interface{}
 
 type CreateFolderRequestObject struct {
@@ -1703,6 +1705,20 @@ func (response GetNoteGraph500JSONResponse) VisitGetNoteGraphResponse(w http.Res
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetNoteGraph503JSONResponse Error
+
+func (response GetNoteGraph503JSONResponse) VisitGetNoteGraphResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(503)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -2722,6 +2738,20 @@ func (response GetWorkspaceGraph401JSONResponse) VisitGetWorkspaceGraphResponse(
 	return err
 }
 
+type GetWorkspaceGraph402JSONResponse struct{ PaymentRequiredJSONResponse }
+
+func (response GetWorkspaceGraph402JSONResponse) VisitGetWorkspaceGraphResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(402)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetWorkspaceGraph403JSONResponse struct{ ForbiddenErrorJSONResponse }
 
 func (response GetWorkspaceGraph403JSONResponse) VisitGetWorkspaceGraphResponse(w http.ResponseWriter) error {
@@ -2762,6 +2792,20 @@ func (response GetWorkspaceGraph500JSONResponse) VisitGetWorkspaceGraphResponse(
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetWorkspaceGraph503JSONResponse Error
+
+func (response GetWorkspaceGraph503JSONResponse) VisitGetWorkspaceGraphResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(503)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -2824,6 +2868,20 @@ func (response LeaveWorkspace404JSONResponse) VisitLeaveWorkspaceResponse(w http
 	return err
 }
 
+type LeaveWorkspace409JSONResponse Error
+
+func (response LeaveWorkspace409JSONResponse) VisitLeaveWorkspaceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type LeaveWorkspace500JSONResponse struct {
 	InternalServerErrorJSONResponse
 }
@@ -2836,6 +2894,20 @@ func (response LeaveWorkspace500JSONResponse) VisitLeaveWorkspaceResponse(w http
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type LeaveWorkspace503JSONResponse Error
+
+func (response LeaveWorkspace503JSONResponse) VisitLeaveWorkspaceResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(503)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -2965,6 +3037,20 @@ func (response UpdateWorkspaceMembers401JSONResponse) VisitUpdateWorkspaceMember
 	return err
 }
 
+type UpdateWorkspaceMembers402JSONResponse struct{ PaymentRequiredJSONResponse }
+
+func (response UpdateWorkspaceMembers402JSONResponse) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(402)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type UpdateWorkspaceMembers404JSONResponse struct{ NotFoundErrorJSONResponse }
 
 func (response UpdateWorkspaceMembers404JSONResponse) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {
@@ -2975,6 +3061,20 @@ func (response UpdateWorkspaceMembers404JSONResponse) VisitUpdateWorkspaceMember
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateWorkspaceMembers409JSONResponse Error
+
+func (response UpdateWorkspaceMembers409JSONResponse) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -2991,6 +3091,20 @@ func (response UpdateWorkspaceMembers500JSONResponse) VisitUpdateWorkspaceMember
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type UpdateWorkspaceMembers503JSONResponse Error
+
+func (response UpdateWorkspaceMembers503JSONResponse) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(503)
 	_, err := buf.WriteTo(w)
 	return err
 }

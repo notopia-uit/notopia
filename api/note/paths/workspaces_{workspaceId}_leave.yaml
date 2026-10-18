@@ -8,6 +8,7 @@ post:
   tags:
     - Workspace
   summary: Leave workspace
+  description: "The billing payer cannot leave while a recurring subscription is active (409 `billingPayerMustTransfer`)."
   operationId: leaveWorkspace
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml
@@ -20,5 +21,21 @@ post:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
     404:
       $ref: ../../common/components/responses/NotFoundError.yaml
+    409:
+      description: The billing payer must transfer the owner role before leaving while a recurring subscription is active
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/components/schemas/Error.yaml
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml
+    503:
+      description: Billing service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/components/schemas/Error.yaml
+          example:
+            code: SERVICE_UNAVAILABLE
+            message: Billing service unavailable. Please try again later
+            more_info: https://api.notopia.com/docs/errors/SERVICE_UNAVAILABLE

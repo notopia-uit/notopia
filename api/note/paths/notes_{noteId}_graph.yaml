@@ -8,6 +8,7 @@ get:
   tags:
     - Note
   summary: Get note graph
+  description: "`depth` is capped by plan limit `note_graph_max_depth` (free 5)."
   operationId: getNoteGraph
   parameters:
     - $ref: ../components/parameters/noteIdPath.yaml
@@ -38,3 +39,13 @@ get:
       $ref: ../../common/components/responses/NotFoundError.yaml
     500:
       $ref: ../../common/components/responses/InternalServerError.yaml
+    503:
+      description: Billing service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/components/schemas/Error.yaml
+          example:
+            code: SERVICE_UNAVAILABLE
+            message: Billing service unavailable. Please try again later
+            more_info: https://api.notopia.com/docs/errors/SERVICE_UNAVAILABLE

@@ -8,6 +8,7 @@ get:
   tags:
     - Workspace
   summary: Show trash
+  description: "Trashed items older than the plan's `trash_retention_days` are purged daily."
   operationId: showTrash
   parameters:
     - $ref: ../components/parameters/workspaceIdPath.yaml

@@ -43,6 +43,42 @@ func (e HeartBeatWorkspaceEventEvent) Valid() bool {
 	}
 }
 
+// Defines values for PaymentRequiredErrorDetailsKind.
+const (
+	Feature PaymentRequiredErrorDetailsKind = "feature"
+	Limit   PaymentRequiredErrorDetailsKind = "limit"
+)
+
+// Valid indicates whether the value is a known member of the PaymentRequiredErrorDetailsKind enum.
+func (e PaymentRequiredErrorDetailsKind) Valid() bool {
+	switch e {
+	case Feature:
+		return true
+	case Limit:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PaymentRequiredErrorDetailsRequiredPlan.
+const (
+	Plus PaymentRequiredErrorDetailsRequiredPlan = "plus"
+	Pro  PaymentRequiredErrorDetailsRequiredPlan = "pro"
+)
+
+// Valid indicates whether the value is a known member of the PaymentRequiredErrorDetailsRequiredPlan enum.
+func (e PaymentRequiredErrorDetailsRequiredPlan) Valid() bool {
+	switch e {
+	case Plus:
+		return true
+	case Pro:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for TrashedBy.
 const (
 	Parent  TrashedBy = "parent"
@@ -376,6 +412,48 @@ type NoteLink struct {
 	// Example: PowerUp.ps1
 	Name Name2 `json:"name"`
 }
+
+// PaymentRequiredError Error for a request blocked by the workspace plan. `code` is one of:
+// - `featureNotInPlan` (details.kind=feature): the feature is not included in the plan
+// - `planLimitExceeded` (details.kind=limit): the plan's usage limit has been reached
+type PaymentRequiredError struct {
+	// Code Error code
+	//
+	// Example: EXAMPLE_CODE
+	Code    string `json:"code"`
+	Details *struct {
+		// Current Example: 5
+		Current *int64 `json:"current,omitempty"`
+
+		// Key Example: members
+		Key string `json:"key"`
+
+		// Kind Example: limit
+		Kind PaymentRequiredErrorDetailsKind `json:"kind"`
+
+		// Max Example: 5
+		Max *int64 `json:"max,omitempty"`
+
+		// RequiredPlan Example: plus
+		RequiredPlan PaymentRequiredErrorDetailsRequiredPlan `json:"requiredPlan"`
+	} `json:"details,omitempty"`
+
+	// Message Human-readable error message
+	//
+	// Example: Example error
+	Message string `json:"message"`
+
+	// MoreInfo URL with more information about the error
+	//
+	// Example: https://api.notopia.com/docs/errors/EXAMPLE_CODE
+	MoreInfo *string `json:"more_info,omitempty"`
+}
+
+// PaymentRequiredErrorDetailsKind Example: limit
+type PaymentRequiredErrorDetailsKind string
+
+// PaymentRequiredErrorDetailsRequiredPlan Example: plus
+type PaymentRequiredErrorDetailsRequiredPlan string
 
 // SearchToken defines model for SearchToken.
 type SearchToken struct {
@@ -717,6 +795,11 @@ type InternalServerError = Error
 
 // NotFoundError defines model for NotFoundError.
 type NotFoundError = Error
+
+// PaymentRequired Error for a request blocked by the workspace plan. `code` is one of:
+// - `featureNotInPlan` (details.kind=feature): the feature is not included in the plan
+// - `planLimitExceeded` (details.kind=limit): the plan's usage limit has been reached
+type PaymentRequired = PaymentRequiredError
 
 // UnauthorizedError defines model for UnauthorizedError.
 type UnauthorizedError = map[string]interface{}
