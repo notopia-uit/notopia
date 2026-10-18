@@ -36,10 +36,16 @@ export const envSchema = z
     NOTOPIA_DOCUMENT_CRON_SWEEPER_NAME: z.string().min(1).default('document:sweeper'),
     NOTOPIA_DOCUMENT_CRON_SWEEPER_SCHEDULE: z.string().min(1).default('*/10 * * * *'),
     NOTOPIA_DOCUMENT_CRON_SWEEPER_ENABLED: booleanString.default('true'),
+    NOTOPIA_DOCUMENT_CRON_SWEEPER_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(300),
     NOTOPIA_DOCUMENT_CRON_SWEEPER_IDLE_SECONDS: z.coerce.number().int().positive().default(600),
     NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_NAME: z.string().min(1).default('document:revision-purge'),
     NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_SCHEDULE: z.string().min(1).default('30 3 * * *'),
     NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_ENABLED: booleanString.default('true'),
+    NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_TIMEOUT_SECONDS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(1800),
     NOTOPIA_DOCUMENT_REDIS_URL: z.preprocess(
       (v) => (v === '' ? undefined : v),
       z.string().url().optional()

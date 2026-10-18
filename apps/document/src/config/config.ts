@@ -63,6 +63,7 @@ export const cronJobConfigSchema = z.object({
   name: z.string().min(1),
   schedule: z.string().min(1),
   enabled: z.boolean(),
+  timeoutSeconds: z.number().int().positive(),
 });
 export type CronJobConfig = z.infer<typeof cronJobConfigSchema>;
 

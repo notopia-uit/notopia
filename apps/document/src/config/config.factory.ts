@@ -127,12 +127,16 @@ export const cronConfig = registerAs(CRON_CONFIG, () =>
       name: process.env.NOTOPIA_DOCUMENT_CRON_SWEEPER_NAME ?? 'document:sweeper',
       schedule: process.env.NOTOPIA_DOCUMENT_CRON_SWEEPER_SCHEDULE ?? '*/10 * * * *',
       enabled: process.env.NOTOPIA_DOCUMENT_CRON_SWEEPER_ENABLED !== 'false',
+      timeoutSeconds: Number(process.env.NOTOPIA_DOCUMENT_CRON_SWEEPER_TIMEOUT_SECONDS ?? 300),
       idleSeconds: Number(process.env.NOTOPIA_DOCUMENT_CRON_SWEEPER_IDLE_SECONDS ?? 600),
     },
     revisionPurge: {
       name: process.env.NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_NAME ?? 'document:revision-purge',
       schedule: process.env.NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_SCHEDULE ?? '30 3 * * *',
       enabled: process.env.NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_ENABLED !== 'false',
+      timeoutSeconds: Number(
+        process.env.NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_TIMEOUT_SECONDS ?? 1800
+      ),
     },
   } satisfies CronConfig)
 );

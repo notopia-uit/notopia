@@ -8,7 +8,7 @@ Yjs WebSocket + Kafka producer/consumer. Spec: `api/document/`.
 | Module | Note |
 | --- | --- |
 | `document/` | `DocumentEntity` (Yjs state as `bytea` + `modified` flag), commit workflow, attachment URLs |
-| `revision/` | Revision snapshots, paginated read, rename, soft-delete |
+| `revision/` | Revision snapshots, paginated read, rename, hard delete |
 | `hocuspocus/` | Yjs server, connection auth, live permission revocation |
 | `blocknote/` | Schema provider + YDoc↔blocks conversion, tag/link extraction |
 | `note/`, `authorization/` | gRPC clients (generated from `proto/`) |
@@ -68,8 +68,20 @@ Redis must run with `noeviction` and persistence, and the app must call
 
 Crons (`src/cron/`) are not `@Cron` decorators (those cannot read config): `CronRegistrar`
 adds them to `SchedulerRegistry` in `onModuleInit` from `NOTOPIA_DOCUMENT_CRON_*` (name = lock
-key, schedule, enabled), with no `timeZone`, so they run in the process TZ. Each tick runs in
-`Locks.withLock(name, …)`; `LockNotAcquiredError` means another instance has it.
+key, schedule, enabled, timeout seconds), with no `timeZone`, so they run in the process TZ.
+Each tick runs in `Locks.withLock(name, …)`; `LockNotAcquiredError` means another instance has
+it. Jobs get an `AbortSignal` (lock lost or timeout) and stop between batches when it aborts.
+
+## Revisions are hard-deleted
+
+Revisions have no `deletedAt` (no soft delete); the API delete and the revision purge cron
+remove rows. There are no migration files (TypeORM `synchronize` outside production), so an
+environment with existing data must run this **before** deploying, otherwise dropping the
+column brings soft-deleted rows back:
+
+```sql
+DELETE FROM revisions WHERE "deletedAt" IS NOT NULL;
+```
 
 ## Conventions
 

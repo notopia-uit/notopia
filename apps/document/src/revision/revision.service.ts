@@ -70,7 +70,10 @@ export class RevisionService {
 
   async deleteRevision(revisionId: string): Promise<void> {
     this.logger.debug({ revisionId }, 'deleteRevision');
-    await this.dataSource.getRepository(RevisionEntity).softDelete(revisionId);
+    const result = await this.dataSource.getRepository(RevisionEntity).delete(revisionId);
+    if (result.affected === 0) {
+      throw new RevisionNotFoundException(revisionId);
+    }
     this.logger.log({ revisionId }, 'deleteRevision: done');
   }
 }

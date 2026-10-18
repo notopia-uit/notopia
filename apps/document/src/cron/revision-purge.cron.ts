@@ -12,6 +12,7 @@ import {
 } from '../billing';
 import { NoteService } from '../note/note.service';
 import { RevisionEntity } from '../revision/revision.entity';
+import { abortReason } from './abort-reason';
 import { planRevisionDeletes, type RevisionRef } from './revision-purge';
 
 @Injectable()
@@ -26,9 +27,9 @@ export class RevisionPurgeCron {
     private readonly billingService: BillingService
   ) {}
 
-  async purge(): Promise<void> {
+  async purge(signal: AbortSignal): Promise<void> {
     try {
-      await this.purgeAll();
+      await this.purgeAll(signal);
     } catch (err) {
       if (err instanceof BillingUnavailableException) {
         this.logger.warn({ err }, 'billing unavailable, revision purge skipped until next tick');
@@ -38,7 +39,7 @@ export class RevisionPurgeCron {
     }
   }
 
-  private async purgeAll(): Promise<void> {
+  private async purgeAll(signal: AbortSignal): Promise<void> {
     const plans = await this.billingService.listPlans();
     const days = plans
       .map((plan) => limit(plan, PlanLimit.RevisionHistoryDays))
@@ -56,6 +57,13 @@ export class RevisionPurgeCron {
     const documentIds = rows.map((r) => r.documentId);
     let deleted = 0;
     for (let i = 0; i < documentIds.length; i += RevisionPurgeCron.batchSize) {
+      if (signal.aborted) {
+        this.logger.warn(
+          { reason: abortReason(signal), documents: documentIds.length, done: i, deleted },
+          'revision purge stopped'
+        );
+        return;
+      }
       deleted += await this.purgeBatch(documentIds.slice(i, i + RevisionPurgeCron.batchSize));
     }
     this.logger.log({ minDays, documents: documentIds.length, deleted }, 'revision purge done');
@@ -63,9 +71,16 @@ export class RevisionPurgeCron {
 
   private async purgeBatch(documentIds: string[]): Promise<number> {
     const workspaces = await this.noteService.batchGetNoteWorkspaces(documentIds);
-    const entitlements = await this.billingService.batchGetEntitlements([
-      ...new Set(workspaces.values()),
-    ]);
+    const workspaceIds = [...new Set(workspaces.values())];
+    const entitlements = await this.billingService.batchGetEntitlements(workspaceIds);
+    const documentsWithoutNote = documentIds.length - workspaces.size;
+    const workspacesWithoutEntitlements = workspaceIds.length - entitlements.size;
+    if (documentsWithoutNote > 0 || workspacesWithoutEntitlements > 0) {
+      this.logger.warn(
+        { documentsWithoutNote, workspacesWithoutEntitlements },
+        'revision purge skipped documents missing from note or billing'
+      );
+    }
     const retentionDaysByDocument = new Map<string, number>();
     for (const [documentId, workspaceId] of workspaces) {
       const workspaceEntitlements = entitlements.get(workspaceId);

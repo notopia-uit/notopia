@@ -1,13 +1,5 @@
 import { MyBlock } from '@blocknote/core';
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryColumn,
-  type Relation,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, type Relation } from 'typeorm';
 
 import { REVISION_TRIGGERS, type RevisionTrigger } from '../document/commit-policy';
 import { DocumentEntity } from '../document/document.entity';
@@ -42,7 +34,4 @@ export class RevisionEntity {
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
-
-  @DeleteDateColumn({ type: 'timestamptz' })
-  deletedAt!: Date | null;
 }

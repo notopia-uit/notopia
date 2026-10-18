@@ -9,7 +9,7 @@ import {
   onChangePayload,
   Hocuspocus as ServerHocuspocus,
 } from '@hocuspocus/server';
-import { Injectable, Logger } from '@nestjs/common';
+import { BeforeApplicationShutdown, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
 
@@ -33,13 +33,15 @@ import { applyStoredModified, readModified } from './document-metadata';
 import { HocuspocusContext } from './hocuspocus-context';
 
 const DEFAULT_REDIS_PORT = 6379;
+const SHUTDOWN_UNLOAD_TIMEOUT_MS = 10_000;
 
 @Injectable()
-export class Hocuspocus {
+export class Hocuspocus implements BeforeApplicationShutdown {
   private readonly logger = new Logger(Hocuspocus.name);
   readonly hocuspocus: ServerHocuspocus<HocuspocusContext>;
   private readonly deletedDocumentIds = new Set<string>();
   private readonly pendingStores = new Map<string, Set<Promise<void>>>();
+  private onAllUnloaded: (() => void) | undefined;
 
   constructor(
     documentService: DocumentService,
@@ -77,6 +79,7 @@ export class Hocuspocus {
       afterUnloadDocument: async ({ documentName }) => {
         this.deletedDocumentIds.delete(documentName);
         this.contributors.forget(documentName);
+        if (this.hocuspocus.getDocumentsCount() === 0) this.onAllUnloaded?.();
       },
       onAuthenticate: (...args) => this.onAuthenticate(...args),
       onChange: (...args) => this.onChange(...args),
@@ -108,6 +111,8 @@ export class Hocuspocus {
 
   // Hooks run by priority, not array order: the Redis extension (1000) runs after
   // ContributorFlushExtension (1100) and before the Database extension (100).
+  // Its afterStoreDocument waits disconnectDelay (~1 s) for local-origin stores inside the
+  // saveMutex, which delays AutoCommitExtension (50) by that much; accepted, do not reorder.
   private scalingExtensions(scalingCfg: ScalingConfig, redisCfg: RedisConfig): Extension[] {
     if (!scalingCfg.enabled) return [];
     const redisUrl = redisCfg.url;
@@ -128,6 +133,34 @@ export class Hocuspocus {
         },
       }),
     ];
+  }
+
+  // Runs in beforeApplicationShutdown, not onApplicationShutdown: TypeORM closes its DataSource
+  // in onApplicationShutdown, and the final stores still need it. HocuspocusGateway already
+  // closed every connection in onModuleDestroy, which triggers those stores.
+  async beforeApplicationShutdown(): Promise<void> {
+    await this.waitForUnload();
+    await Promise.allSettled([...this.pendingStores.values()].flatMap((stores) => [...stores]));
+    await this.hocuspocus.hooks('onDestroy', { instance: this.hocuspocus });
+  }
+
+  private async waitForUnload(): Promise<void> {
+    if (this.hocuspocus.getDocumentsCount() === 0) return;
+    let timer: NodeJS.Timeout | undefined;
+    const unloaded = new Promise<boolean>((resolve) => {
+      this.onAllUnloaded = () => resolve(true);
+      timer = setTimeout(() => resolve(false), SHUTDOWN_UNLOAD_TIMEOUT_MS);
+    });
+    this.hocuspocus.flushPendingStores();
+    const done = await unloaded;
+    clearTimeout(timer);
+    this.onAllUnloaded = undefined;
+    if (!done) {
+      this.logger.warn(
+        { documents: this.hocuspocus.getDocumentsCount() },
+        'documents still loaded at shutdown'
+      );
+    }
   }
 
   markDeleted(id: string): void {

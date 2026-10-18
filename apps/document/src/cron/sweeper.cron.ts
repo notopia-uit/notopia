@@ -10,11 +10,12 @@ import { DocumentEntity } from '../document/document.entity';
 import { DocumentService } from '../document/document.service';
 import { HocuspocusService } from '../hocuspocus/hocuspocus.service';
 import { NoteService } from '../note/note.service';
+import { abortReason } from './abort-reason';
 
 @Injectable()
 @Traceable()
 export class SweeperCron {
-  private static readonly batchSize = 500;
+  static readonly batchSize = 500;
   private readonly logger = new Logger(SweeperCron.name);
   private readonly cronConfig: CronConfig;
 
@@ -33,12 +34,12 @@ export class SweeperCron {
     this.cronConfig = cronConfig;
   }
 
-  async sweep(): Promise<void> {
+  async sweep(signal: AbortSignal): Promise<void> {
     const idleBefore = new Date(Date.now() - this.cronConfig.sweeper.idleSeconds * 1000);
     let afterId: string | undefined;
     let committed = 0;
     try {
-      for (;;) {
+      while (!signal.aborted) {
         const stale = await this.repo.find({
           select: { id: true },
           where: {
@@ -51,7 +52,10 @@ export class SweeperCron {
         });
         if (stale.length === 0) break;
         afterId = stale.at(-1)!.id;
-        committed += await this.sweepBatch(stale.map((d) => d.id));
+        committed += await this.sweepBatch(
+          stale.map((d) => d.id),
+          signal
+        );
         if (stale.length < SweeperCron.batchSize) break;
       }
     } catch (err) {
@@ -61,20 +65,25 @@ export class SweeperCron {
       }
       throw err;
     }
+    if (signal.aborted) {
+      this.logger.warn({ reason: abortReason(signal), committed }, 'sweeper stopped');
+      return;
+    }
     this.logger.log({ committed }, 'sweeper done');
   }
 
-  private async sweepBatch(documentIds: string[]): Promise<number> {
+  private async sweepBatch(documentIds: string[], signal: AbortSignal): Promise<number> {
     const workspaces = await this.noteService.batchGetNoteWorkspaces(documentIds);
-    const entitlements = await this.billingService.batchGetEntitlements([
-      ...new Set(workspaces.values()),
-    ]);
+    const workspaceIds = [...new Set(workspaces.values())];
+    const entitlements = await this.billingService.batchGetEntitlements(workspaceIds);
+    this.warnMissing(documentIds.length - workspaces.size, workspaceIds.length - entitlements.size);
     let committed = 0;
     for (const [documentId, workspaceId] of workspaces) {
       const workspaceEntitlements = entitlements.get(workspaceId);
       if (!workspaceEntitlements || !feature(workspaceEntitlements, PlanFeature.AutoCommit)) {
         continue;
       }
+      if (signal.aborted) break;
       try {
         const { revisionId, modifiedCleared, committedContentHash } =
           await this.documentService.commitIfDue({
@@ -92,5 +101,14 @@ export class SweeperCron {
       }
     }
     return committed;
+  }
+
+  private warnMissing(documentsWithoutNote: number, workspacesWithoutEntitlements: number) {
+    if (documentsWithoutNote > 0 || workspacesWithoutEntitlements > 0) {
+      this.logger.warn(
+        { documentsWithoutNote, workspacesWithoutEntitlements },
+        'sweeper skipped documents missing from note or billing'
+      );
+    }
   }
 }
