@@ -40,3 +40,43 @@ describe('HocuspocusService.onNoteDeleted', () => {
     expect(calls).toEqual(['mark', 'close', 'drain', 'delete']);
   });
 });
+
+describe('HocuspocusService.flushStore', () => {
+  function setupFlush(debounced: boolean) {
+    const unlock = Promise.withResolvers<void>();
+    const saveMutex = { waitForUnlock: vi.fn<() => Promise<void>>(() => unlock.promise) };
+    const debouncer = {
+      isDebounced: vi.fn<(id: string) => boolean>().mockReturnValue(debounced),
+      executeNow: vi.fn<(id: string) => Promise<void>>().mockResolvedValue(undefined),
+    };
+    const hocuspocus = {
+      hocuspocus: { documents: new Map([['d1', { saveMutex }]]), debouncer },
+    } as unknown as Hocuspocus;
+    const service = new HocuspocusService({} as never, hocuspocus, {} as never, {} as never);
+    return { service, debouncer, unlock };
+  }
+
+  it('runs the debounced store now', async () => {
+    const { service, debouncer } = setupFlush(true);
+    await service.flushStore('d1');
+    expect(debouncer.executeNow).toHaveBeenCalledWith('onStoreDocument-d1');
+  });
+
+  it('waits for a store already running', async () => {
+    const { service, debouncer, unlock } = setupFlush(false);
+    let flushed = false;
+    const flush = service.flushStore('d1').then(() => (flushed = true));
+    await Promise.resolve();
+    expect(flushed).toBe(false);
+    unlock.resolve();
+    await flush;
+    expect(flushed).toBe(true);
+    expect(debouncer.executeNow).not.toHaveBeenCalled();
+  });
+
+  it('does nothing for a document not loaded here', async () => {
+    const { service, debouncer } = setupFlush(true);
+    await service.flushStore('other');
+    expect(debouncer.executeNow).not.toHaveBeenCalled();
+  });
+});

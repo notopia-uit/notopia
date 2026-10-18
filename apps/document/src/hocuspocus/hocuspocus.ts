@@ -2,7 +2,7 @@ import { hostname } from 'node:os';
 
 import { Database as HocuspocusDatabase } from '@hocuspocus/extension-database';
 import { Logger as HocuspocusLogger } from '@hocuspocus/extension-logger';
-import { Redis as HocuspocusRedis } from '@hocuspocus/extension-redis';
+import { Redis as HocuspocusRedis, type RedisInstance } from '@hocuspocus/extension-redis';
 import {
   type Extension,
   onAuthenticatePayload,
@@ -12,11 +12,14 @@ import {
 import { BeforeApplicationShutdown, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
+import Redis from 'ioredis';
 
 import { AuthenticationService } from '../authentication/authentication.service';
 import { AuthorizationService } from '../authorization/authorization.service';
 import { BillingService } from '../billing';
 import {
+  AUTO_COMMIT_CONFIG,
+  AutoCommitConfig,
   HOCUSPOCUS_CONFIG,
   HocuspocusConfig,
   REDIS_CONFIG,
@@ -32,7 +35,6 @@ import { ContributorTracker } from './contributor-tracker';
 import { applyStoredModified, readModified } from './document-metadata';
 import { HocuspocusContext } from './hocuspocus-context';
 
-const DEFAULT_REDIS_PORT = 6379;
 const SHUTDOWN_UNLOAD_TIMEOUT_MS = 10_000;
 
 @Injectable()
@@ -55,6 +57,10 @@ export class Hocuspocus implements BeforeApplicationShutdown {
     const hocuspocusCfg = configService.get<HocuspocusConfig>(HOCUSPOCUS_CONFIG);
     if (!hocuspocusCfg) {
       throw new Error('HOCUSPOCUS_CONFIG not found');
+    }
+    const autoCommitCfg = configService.get<AutoCommitConfig>(AUTO_COMMIT_CONFIG);
+    if (!autoCommitCfg) {
+      throw new Error('AUTO_COMMIT_CONFIG not found');
     }
     const scalingCfg = configService.get<ScalingConfig>(SCALING_CONFIG);
     const redisCfg = configService.get<RedisConfig>(REDIS_CONFIG);
@@ -104,7 +110,12 @@ export class Hocuspocus implements BeforeApplicationShutdown {
             );
           },
         }),
-        new AutoCommitExtension(documentService, noteService, billingService),
+        new AutoCommitExtension(
+          documentService,
+          noteService,
+          billingService,
+          autoCommitCfg.checkFloorSeconds
+        ),
       ],
     });
   }
@@ -119,18 +130,11 @@ export class Hocuspocus implements BeforeApplicationShutdown {
     if (!redisUrl) {
       throw new Error('NOTOPIA_DOCUMENT_REDIS_URL is required when scaling is enabled');
     }
-    // The extension bundles its own ioredis, so it gets connection options instead of a client.
-    const url = new URL(redisUrl);
+    // The extension depends on ioredis 5.6.1, whose URL parsing calls the deprecated url.parse();
+    // clients from the app's ioredis parse the URL with WHATWG URL instead.
     return [
       new HocuspocusRedis({
-        host: url.hostname,
-        port: url.port ? Number(url.port) : DEFAULT_REDIS_PORT,
-        options: {
-          username: url.username ? decodeURIComponent(url.username) : undefined,
-          password: url.password ? decodeURIComponent(url.password) : undefined,
-          db: url.pathname.length > 1 ? Number(url.pathname.slice(1)) : undefined,
-          tls: url.protocol === 'rediss:' ? {} : undefined,
-        },
+        createClient: () => new Redis(redisUrl) as unknown as RedisInstance,
       }),
     ];
   }

@@ -25,7 +25,8 @@ export class AutoCommitExtension implements Extension {
   constructor(
     private readonly documentService: DocumentService,
     private readonly noteService: NoteService,
-    private readonly billingService: BillingService
+    private readonly billingService: BillingService,
+    private readonly checkFloorSeconds: number
   ) {}
 
   async afterStoreDocument({
@@ -34,6 +35,13 @@ export class AutoCommitExtension implements Extension {
   }: afterStoreDocumentPayload<HocuspocusContext>): Promise<void> {
     if (!readModified(document)) return;
     try {
+      if (await this.committedWithinFloor(documentName)) {
+        this.logger.debug(
+          { documentId: documentName },
+          'committed within floor, auto-commit skipped'
+        );
+        return;
+      }
       // HACK: bypasses the auth check (internal lookup with no user). The proper fix is a
       // read-only service-account role in authorization so getWorkspaceByNote can be used.
       const workspaceIds = await this.noteService.batchGetNoteWorkspaces([documentName]);
@@ -69,5 +77,15 @@ export class AutoCommitExtension implements Extension {
       }
       this.logger.error({ err, documentId: documentName }, 'auto-commit skipped');
     }
+  }
+
+  // Cheap local precondition: no plan allows auto-commits more often than the floor (the shortest
+  // plan interval), so the note/billing calls are skipped. The real interval still comes from
+  // the plan entitlements in commitIfDue.
+  private async committedWithinFloor(documentId: string): Promise<boolean> {
+    if (this.checkFloorSeconds <= 0) return false;
+    const lastCommittedAt = await this.documentService.getLastCommittedAt(documentId);
+    if (!lastCommittedAt) return false;
+    return Date.now() - lastCommittedAt.getTime() < this.checkFloorSeconds * 1000;
   }
 }

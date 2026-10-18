@@ -13,6 +13,8 @@ const entitlements = (autoCommit: boolean) => ({
   limits: { auto_commit_min_interval_seconds: 300 },
 });
 
+const CHECK_FLOOR_SECONDS = 60;
+
 function setup() {
   const documentService = {
     commitIfDue: vi.fn().mockResolvedValue({
@@ -21,6 +23,7 @@ function setup() {
       committedContentHash: 'h',
     }),
     clearModifiedIfCommitted: vi.fn(),
+    getLastCommittedAt: vi.fn<(id: string) => Promise<Date | null>>().mockResolvedValue(null),
   };
   const noteService = {
     batchGetNoteWorkspaces: vi.fn().mockResolvedValue(new Map([['d1', 'w1']])),
@@ -29,7 +32,8 @@ function setup() {
   const extension = new AutoCommitExtension(
     documentService as unknown as DocumentService,
     noteService as unknown as NoteService,
-    billingService as unknown as BillingService
+    billingService as unknown as BillingService,
+    CHECK_FLOOR_SECONDS
   );
   const document = new Y.Doc();
   applyStoredModified(document, true);
@@ -71,5 +75,24 @@ describe('AutoCommitExtension', () => {
     await extension.afterStoreDocument(payload);
     expect(billingService.getEntitlements).not.toHaveBeenCalled();
     expect(documentService.commitIfDue).not.toHaveBeenCalled();
+  });
+
+  it('skips note and billing calls when committed within the floor', async () => {
+    const { extension, documentService, noteService, billingService, payload } = setup();
+    documentService.getLastCommittedAt.mockResolvedValue(new Date(Date.now() - 10_000));
+    await extension.afterStoreDocument(payload);
+    expect(noteService.batchGetNoteWorkspaces).not.toHaveBeenCalled();
+    expect(billingService.getEntitlements).not.toHaveBeenCalled();
+    expect(documentService.commitIfDue).not.toHaveBeenCalled();
+  });
+
+  it('checks the plan when the last commit is older than the floor', async () => {
+    const { extension, documentService, billingService, payload } = setup();
+    documentService.getLastCommittedAt.mockResolvedValue(
+      new Date(Date.now() - (CHECK_FLOOR_SECONDS + 1) * 1000)
+    );
+    billingService.getEntitlements.mockResolvedValue(entitlements(true));
+    await extension.afterStoreDocument(payload);
+    expect(documentService.commitIfDue).toHaveBeenCalled();
   });
 });

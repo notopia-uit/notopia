@@ -62,8 +62,15 @@ Extension hooks run by descending priority, not array order:
 | `AutoCommitExtension` | 50 | Must run after the row is stored. No forced commit on disconnect (the sweeper covers idle docs). Resolves the workspace with `NoteService.batchGetNoteWorkspaces` (no auth, marked `HACK:`; should become a service-account role) |
 
 - `HocuspocusDatabase.store` upserts the row and writes `modified` from the Yjs metadata
-  (`DocumentService.upsertData`); there is no debounce configured, so it fires on the
-  extension's default cadence.
+  (`DocumentService.upsertData`). Stores are debounced server-wide by
+  `NOTOPIA_DOCUMENT_HOCUSPOCUS_DEBOUNCE_MS` (default 2000) and
+  `NOTOPIA_DOCUMENT_HOCUSPOCUS_MAX_DEBOUNCE_MS` (default 10000). The manual commit calls
+  `HocuspocusService.flushStore` first, so edits still in the debounce are stored before
+  `commitIfDue` reads the row.
+- `AutoCommitExtension` skips the note/billing calls when `lastCommittedAt` is less than
+  `NOTOPIA_DOCUMENT_AUTO_COMMIT_CHECK_FLOOR_SECONDS` (default 60, the shortest plan interval;
+  `0` disables) ago. Only a cheap local precondition, not a cache: the real interval comes
+  from the plan's `auto_commit_min_interval_seconds`.
 - `afterLoadDocument` applies the DB `modified` column into the `metadata` Y.Map
   (`YDocMetadataMap`) with origin `{ source: 'local', skipStoreHooks: true }`, so loading
   does not trigger a store. Clients read `{ modified }` from it.
@@ -89,7 +96,9 @@ With no `redisUrl` it uses an in-memory store (single instance only, a warning i
 Redis must run with `noeviction` and persistence, and the app must call
 `app.enableShutdownHooks()`. `redis.url` (`NOTOPIA_DOCUMENT_REDIS_URL`) picks the lock store;
 `scaling.enabled` (`NOTOPIA_DOCUMENT_SCALING_ENABLED`, requires the URL) only adds
-`@hocuspocus/extension-redis`. Local compose Redis for this service is `document_redis`.
+`@hocuspocus/extension-redis`. Its clients come from the app's ioredis via `createClient` (the
+extension's own ioredis 5.6.1 parses URLs with the deprecated `url.parse()`). Local compose
+Redis for this service is `document_redis`.
 
 Crons (`src/cron/`) are not `@Cron` decorators (those cannot read config): `CronRegistrar`
 adds them to `SchedulerRegistry` in `onModuleInit` from `NOTOPIA_DOCUMENT_CRON_*` (name = lock

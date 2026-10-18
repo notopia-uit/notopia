@@ -31,6 +31,11 @@ export const envSchema = z
     NOTOPIA_DOCUMENT_AUTHENTICATION_AUDIENCES: z.string().optional(),
     NOTOPIA_DOCUMENT_HOCUSPOCUS_DEBOUNCE_MS: z.coerce.number().int().positive().default(2000),
     NOTOPIA_DOCUMENT_HOCUSPOCUS_MAX_DEBOUNCE_MS: z.coerce.number().int().positive().default(10000),
+    NOTOPIA_DOCUMENT_AUTO_COMMIT_CHECK_FLOOR_SECONDS: z.coerce
+      .number()
+      .int()
+      .nonnegative()
+      .default(60),
     NOTOPIA_DOCUMENT_IDENTITY_ADMIN_GROUP: z.string().default('notopia-admins'),
     NOTOPIA_DOCUMENT_IDENTITY_SERVICE_ACCOUNT_USER_ID: z.string().min(1),
     NOTOPIA_DOCUMENT_CRON_SWEEPER_NAME: z.string().min(1).default('document:sweeper'),

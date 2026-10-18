@@ -5,6 +5,8 @@ import {
   appConfigSchema,
   AuthenticationConfig,
   authenticationConfigSchema,
+  AutoCommitConfig,
+  autoCommitConfigSchema,
   CronConfig,
   cronConfigSchema,
   DatabaseConfig,
@@ -117,6 +119,14 @@ export const hocuspocusConfig = registerAs(HOCUSPOCUS_CONFIG, () =>
     debounceMs: Number(process.env.NOTOPIA_DOCUMENT_HOCUSPOCUS_DEBOUNCE_MS ?? 2000),
     maxDebounceMs: Number(process.env.NOTOPIA_DOCUMENT_HOCUSPOCUS_MAX_DEBOUNCE_MS ?? 10000),
   } satisfies HocuspocusConfig)
+);
+
+export const AUTO_COMMIT_CONFIG = Symbol('AUTO_COMMIT_CONFIG');
+
+export const autoCommitConfig = registerAs(AUTO_COMMIT_CONFIG, () =>
+  autoCommitConfigSchema.parse({
+    checkFloorSeconds: Number(process.env.NOTOPIA_DOCUMENT_AUTO_COMMIT_CHECK_FLOOR_SECONDS ?? 60),
+  } satisfies AutoCommitConfig)
 );
 
 export const CRON_CONFIG = Symbol('CRON_CONFIG');

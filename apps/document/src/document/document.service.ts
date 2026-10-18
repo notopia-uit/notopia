@@ -244,6 +244,14 @@ export class DocumentService {
     this.logger.log({ id }, 'deleteById: document deleted');
   }
 
+  async getLastCommittedAt(id: string): Promise<Date | null> {
+    const document = await this.repo.findOne({
+      select: { id: true, lastCommittedAt: true },
+      where: { id },
+    });
+    return document?.lastCommittedAt ?? null;
+  }
+
   async getById(id: string): Promise<DocumentEntity | null> {
     this.logger.debug({ id }, 'getById: fetching document');
     const document = await this.repo.findOneBy({ id });

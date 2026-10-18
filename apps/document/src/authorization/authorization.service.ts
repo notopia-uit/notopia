@@ -1,4 +1,5 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { status } from '@grpc/grpc-js';
+import { HttpException, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InternalServerErrorException, UnprocessableEntityException } from '@nestjs/common';
 import { type ClientGrpc } from '@nestjs/microservices';
 import {
@@ -8,6 +9,8 @@ import {
   WorkspaceItemPermission as WorkspaceItemPermissionPb,
 } from '@notopia-uit/pb/authorization';
 import { firstValueFrom } from 'rxjs';
+
+import { isGrpcError } from '#/common';
 
 import { NoteService } from '../note/note.service';
 import { UserNotePermissions as UserNotePermission, WorkspaceItemPermission } from './models';
@@ -65,6 +68,13 @@ export class AuthorizationService implements OnModuleInit {
       );
       return response.hasPermission;
     } catch (error) {
+      // note's GetWorkspaceByNote answers PERMISSION_DENIED for non-members
+      if (isGrpcError(error) && error.code === status.PERMISSION_DENIED) {
+        return false;
+      }
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new InternalServerErrorException(
         `Failed to check note permission: ${error instanceof Error ? error.message : String(error)}`
       );

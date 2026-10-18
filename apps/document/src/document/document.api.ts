@@ -42,6 +42,8 @@ export class DocumentApi extends DocumentApiDefinition {
       if (!canWrite) {
         throw new DocumentPermissionException(documentId, user.id);
       }
+      // commitIfDue reads the stored row; edits still in the store debounce would be missed
+      await this.hocuspocusService.flushStore(documentId);
       const { revisionId, modifiedCleared, committedContentHash } =
         await this.documentService.commitIfDue({
           documentId,

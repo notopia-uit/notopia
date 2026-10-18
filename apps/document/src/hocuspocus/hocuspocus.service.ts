@@ -10,6 +10,9 @@ import { WorkspaceNoteNotFoundException } from '../note/workspace-note-not-found
 import { Hocuspocus } from './hocuspocus';
 import { HocuspocusContext } from './hocuspocus-context';
 
+// Debounce id used by @hocuspocus/server 4.0.0 storeDocumentHooks
+const STORE_DEBOUNCE_ID_PREFIX = 'onStoreDocument-';
+
 @Injectable()
 @Traceable()
 export class HocuspocusService {
@@ -104,6 +107,25 @@ export class HocuspocusService {
         });
       }
     }
+  }
+
+  /**
+   * Runs the store pending in the Hocuspocus debounce now (or waits for the one running), so a
+   * caller reading `documents.data` sees the latest edits. A document not loaded here is a no-op.
+   */
+  async flushStore(documentId: string): Promise<void> {
+    const document = this.hocuspocus.hocuspocus.documents.get(documentId);
+    if (!document) {
+      return;
+    }
+    const { debouncer } = this.hocuspocus.hocuspocus;
+    const debounceId = `${STORE_DEBOUNCE_ID_PREFIX}${documentId}`;
+    if (debouncer.isDebounced(debounceId)) {
+      // executeNow awaits a running execution before starting the debounced one
+      await debouncer.executeNow(debounceId);
+      return;
+    }
+    await document.saveMutex.waitForUnlock();
   }
 
   /**

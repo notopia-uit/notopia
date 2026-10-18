@@ -59,6 +59,11 @@ export const hocuspocusConfigSchema = z.object({
 });
 export type HocuspocusConfig = z.infer<typeof hocuspocusConfigSchema>;
 
+export const autoCommitConfigSchema = z.object({
+  checkFloorSeconds: z.number().int().nonnegative(),
+});
+export type AutoCommitConfig = z.infer<typeof autoCommitConfigSchema>;
+
 export const cronJobConfigSchema = z.object({
   name: z.string().min(1),
   schedule: z.string().min(1),
