@@ -4,4 +4,4 @@ enum:
   - owner
   - editor
   - viewer
-example: owner
+examples: [owner]

@@ -4,9 +4,9 @@ properties:
   pastDueGraceDays:
     type: integer
     minimum: 0
-    example: 3
+    examples: [3]
   lifetimeRefundWindowDays:
     type: integer
     minimum: 0
-    example: 14
+    examples: [14]
 required: [pastDueGraceDays, lifetimeRefundWindowDays]

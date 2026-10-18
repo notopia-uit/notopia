@@ -32,7 +32,7 @@ export type ShareNoteSearch = {
    */
   plainTextContent: string;
   tags: Array<string>;
-  trashed?: ShareTrashed;
+  trashed: ShareTrashed | null;
 };
 
 export type ShareNoteUpdatedEvent = {
@@ -42,7 +42,7 @@ export type ShareNoteUpdatedEvent = {
   icon: string | null;
   folderId: string;
   folderName: string;
-  trashed?: ShareTrashed;
+  trashed: ShareTrashed | null;
   updatedAt: Date;
 };
 
@@ -190,16 +190,23 @@ export type DocumentPagination = {
   hasPrev: boolean;
 };
 
+export type DocumentName = string | null;
+
+/**
+ * Who the revision is attributed to. Null for revisions created before authors were recorded
+ */
+export type DocumentAuthorId = string | null;
+
 /**
  * BlockNote model
  */
 export type DocumentDocumentContent = Array<unknown>;
 
 export type DocumentRevisionWithContent = DocumentRevision & {
+  name?: DocumentName;
+  authorId?: DocumentAuthorId;
   content: DocumentDocumentContent;
 };
-
-export type DocumentName = string | null;
 
 export const NoteTrashedBy = { PURPOSE: 'purpose', PARENT: 'parent' } as const;
 
@@ -408,7 +415,7 @@ export type NoteName4 = string | null;
 
 export type NoteWorkspaceMember = {
   id: NoteId4;
-  name?: NoteName4;
+  readonly name?: NoteName4;
   role: NoteWorkspaceRole;
 };
 
@@ -688,6 +695,7 @@ export type DocumentRevisionWritable = {
 export type DocumentDocumentContentWritable = Array<unknown>;
 
 export type DocumentRevisionWithContentWritable = DocumentRevisionWritable & {
+  name?: DocumentName;
   content: DocumentDocumentContentWritable;
 };
 

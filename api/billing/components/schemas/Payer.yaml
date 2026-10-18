@@ -3,16 +3,15 @@ type: object
 properties:
   id:
     type: string
-    example: "112"
+    examples: ["112"]
   email:
     type: string
-    example: owner@notopia.com
+    examples: [owner@notopia.com]
   name:
     type: string
-    example: Kevin Nitro
+    examples: [Kevin Nitro]
   missingSince:
-    type: string
+    type: [string, "null"]
     format: date-time
-    nullable: true
-    example: 2026-10-11T00:00:00Z
+    examples: [2026-10-11T00:00:00Z]
 required: [id, email, name]

@@ -5,44 +5,42 @@ properties:
   id:
     type: string
     format: uuid
-    example: 000c2575-1847-5293-8117-2415a2328ef8
+    examples: [000c2575-1847-5293-8117-2415a2328ef8]
     readOnly: true
 
   name:
     type: string
     minLength: 1
     maxLength: 255
-    example: PowerUp.ps1
+    examples: [PowerUp.ps1]
     description: Can be empty string when creating but will be set to "Untitled Note" internally
 
   icon:
-    type: string
-    nullable: true
-    example: 📓
+    type: [string, "null"]
+    examples: [📓]
 
   folderId:
     type: string
     format: uuid
-    example: 123e4567-e89b-12d3-a456-426614174000
+    examples: [123e4567-e89b-12d3-a456-426614174000]
 
   tags:
     type: array
     items:
       type: string
-    example:
-      - work
-      - meeting
+    examples:
+      - - work
+        - meeting
     readOnly: true
 
   updatedAt:
     type: string
     format: date-time
-    example: 2024-06-01T12:34:56Z
+    examples: [2024-06-01T12:34:56Z]
     readOnly: true
 
   trashed:
-    type: object
-    nullable: true
+    type: [object, "null"]
     readOnly: true
     x-go-type-name: NoteTrashed
     properties:
@@ -52,7 +50,7 @@ properties:
       at:
         type: string
         format: date-time
-        example: 2024-06-01T12:00:00Z
+        examples: [2024-06-01T12:00:00Z]
 
     required:
       - by

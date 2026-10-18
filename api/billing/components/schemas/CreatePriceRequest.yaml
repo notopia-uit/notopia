@@ -4,15 +4,15 @@ properties:
   plan:
     type: string
     enum: [plus, pro]
-    example: plus
+    examples: [plus]
   interval:
     $ref: ./BillingInterval.yaml
   amount:
     type: integer
     format: int64
     minimum: 1
-    example: 49000
+    examples: [49000]
   currency:
     type: string
-    example: vnd
+    examples: [vnd]
 required: [plan, interval, amount, currency]

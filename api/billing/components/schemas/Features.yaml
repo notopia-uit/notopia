@@ -3,6 +3,6 @@ type: object
 description: Feature flags by key (auto_commit, workspace_graph).
 additionalProperties:
   type: boolean
-example:
-  auto_commit: true
-  workspace_graph: true
+examples:
+  - auto_commit: true
+    workspace_graph: true

@@ -4,6 +4,6 @@ description: Limits by key. -1 means unlimited.
 additionalProperties:
   type: integer
   format: int64
-example:
-  members: 10
-  revision_history_days: 30
+examples:
+  - members: 10
+    revision_history_days: 30

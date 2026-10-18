@@ -2,12 +2,10 @@
 type: object
 properties:
   subscription:
-    type: object
+    type: [object, "null"]
     allOf:
       - $ref: ./Subscription.yaml
-    nullable: true
   payer:
-    type: object
+    type: [object, "null"]
     allOf:
       - $ref: ./Payer.yaml
-    nullable: true

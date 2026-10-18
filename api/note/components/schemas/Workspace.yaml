@@ -5,18 +5,18 @@ properties:
   id:
     type: string
     format: uuid
-    example: 00000000-0000-4000-8000-000000000110
+    examples: [00000000-0000-4000-8000-000000000110]
     readOnly: true
 
   slug:
     type: string
-    example: notopia
+    examples: [notopia]
 
   name:
     type: string
     minLength: 1
     maxLength: 255
-    example: Notopia
+    examples: [Notopia]
 
 required:
   - id

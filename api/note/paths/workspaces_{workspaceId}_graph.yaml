@@ -18,7 +18,7 @@ get:
       schema:
         type: boolean
         default: false
-        example: true
+        examples: [true]
   responses:
     200:
       description: Workspace graph

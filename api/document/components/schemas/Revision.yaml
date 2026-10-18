@@ -5,27 +5,25 @@ properties:
   id:
     type: string
     format: uuid
-    example: 000c2575-1847-5293-8117-2415a2328ef8
+    examples: [000c2575-1847-5293-8117-2415a2328ef8]
     readOnly: true
 
   name:
-    type: string
-    nullable: true
+    type: [string, "null"]
     minLength: 1
     maxLength: 255
-    example: Initial Draft
+    examples: [Initial Draft]
 
   createdAt:
     type: string
     format: date-time
-    example: 2024-01-01T12:00:00Z
+    examples: [2024-01-01T12:00:00Z]
     readOnly: true
 
   authorId:
-    type: string
-    nullable: true
+    type: [string, "null"]
     description: Who the revision is attributed to. Null for revisions created before authors were recorded
-    example: "42"
+    examples: ["42"]
     readOnly: true
 
   trigger:
@@ -36,7 +34,7 @@ properties:
     description: Users who edited the document since the previous revision, most recent last
     items:
       type: string
-    example: ["41", "42"]
+    examples: [["41", "42"]]
     readOnly: true
 
 required:

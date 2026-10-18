@@ -157,66 +157,66 @@ func (e SubscriptionStatus) Valid() bool {
 	}
 }
 
-// BillingInterval Example: month
+// BillingInterval Examples: month
 type BillingInterval string
 
 // BillingPolicy defines model for BillingPolicy.
 type BillingPolicy struct {
-	// LifetimeRefundWindowDays Example: 14
+	// LifetimeRefundWindowDays Examples: 14
 	LifetimeRefundWindowDays int `json:"lifetimeRefundWindowDays"`
 
-	// PastDueGraceDays Example: 3
+	// PastDueGraceDays Examples: 3
 	PastDueGraceDays int `json:"pastDueGraceDays"`
 }
 
 // CheckoutSessionRequest defines model for CheckoutSessionRequest.
 type CheckoutSessionRequest struct {
-	// PriceId Example: 0192f0a0-0000-7000-8000-000000000001
+	// PriceId Examples: 0192f0a0-0000-7000-8000-000000000001
 	PriceId openapi_types.UUID `json:"priceId"`
 }
 
 // CreatePriceRequest defines model for CreatePriceRequest.
 type CreatePriceRequest struct {
-	// Amount Example: 49000
+	// Amount Examples: 49000
 	Amount int64 `json:"amount"`
 
-	// Currency Example: vnd
+	// Currency Examples: vnd
 	Currency string `json:"currency"`
 
-	// Interval Example: month
+	// Interval Examples: month
 	Interval BillingInterval `json:"interval"`
 
-	// Plan Example: plus
+	// Plan Examples: plus
 	Plan CreatePriceRequestPlan `json:"plan"`
 }
 
-// CreatePriceRequestPlan Example: plus
+// CreatePriceRequestPlan Examples: plus
 type CreatePriceRequestPlan string
 
 // Entitlements defines model for Entitlements.
 type Entitlements struct {
-	// AccessUntil Example: 2026-11-11T00:00:00Z
+	// AccessUntil Examples: 2026-11-11T00:00:00Z
 	AccessUntil nullable.Nullable[time.Time] `json:"accessUntil,omitempty"`
 
 	// Features Feature flags by key (auto_commit, workspace_graph).
 	//
-	// Example: {"auto_commit":true,"workspace_graph":true}
+	// Examples: {"auto_commit":true,"workspace_graph":true}
 	Features Features `json:"features"`
 
 	// Limits Limits by key. -1 means unlimited.
 	//
-	// Example: {"members":10,"revision_history_days":30}
+	// Examples: {"members":10,"revision_history_days":30}
 	Limits Limits `json:"limits"`
 
-	// Plan Example: plus
+	// Plan Examples: plus
 	Plan PlanTier `json:"plan"`
 
 	// Status `none` when the workspace never subscribed.
 	//
-	// Example: active
+	// Examples: active
 	Status SubscriptionStatus `json:"status"`
 
-	// WorkspaceId Example: 00000000-0000-4000-8000-000000000110
+	// WorkspaceId Examples: 00000000-0000-4000-8000-000000000110
 	WorkspaceId openapi_types.UUID `json:"workspaceId"`
 }
 
@@ -224,42 +224,42 @@ type Entitlements struct {
 type Error struct {
 	// Code Error code
 	//
-	// Example: EXAMPLE_CODE
+	// Examples: EXAMPLE_CODE
 	Code string `json:"code"`
 
 	// Message Human-readable error message
 	//
-	// Example: Example error
+	// Examples: Example error
 	Message string `json:"message"`
 
 	// MoreInfo URL with more information about the error
 	//
-	// Example: https://api.notopia.com/docs/errors/EXAMPLE_CODE
+	// Examples: https://api.notopia.com/docs/errors/EXAMPLE_CODE
 	MoreInfo *string `json:"more_info,omitempty"`
 }
 
 // Features Feature flags by key (auto_commit, workspace_graph).
 //
-// Example: {"auto_commit":true,"workspace_graph":true}
+// Examples: {"auto_commit":true,"workspace_graph":true}
 type Features map[string]bool
 
 // Limits Limits by key. -1 means unlimited.
 //
-// Example: {"members":10,"revision_history_days":30}
+// Examples: {"members":10,"revision_history_days":30}
 type Limits map[string]int64
 
 // Payer defines model for Payer.
 type Payer struct {
-	// Email Example: owner@notopia.com
+	// Email Examples: owner@notopia.com
 	Email string `json:"email"`
 
-	// Id Example: 112
+	// Id Examples: 112
 	Id string `json:"id"`
 
-	// MissingSince Example: 2026-10-11T00:00:00Z
+	// MissingSince Examples: 2026-10-11T00:00:00Z
 	MissingSince nullable.Nullable[time.Time] `json:"missingSince,omitempty"`
 
-	// Name Example: Kevin Nitro
+	// Name Examples: Kevin Nitro
 	Name string `json:"name"`
 }
 
@@ -267,100 +267,100 @@ type Payer struct {
 type Plan struct {
 	// Features Feature flags by key (auto_commit, workspace_graph).
 	//
-	// Example: {"auto_commit":true,"workspace_graph":true}
+	// Examples: {"auto_commit":true,"workspace_graph":true}
 	Features Features `json:"features"`
 
 	// Limits Limits by key. -1 means unlimited.
 	//
-	// Example: {"members":10,"revision_history_days":30}
+	// Examples: {"members":10,"revision_history_days":30}
 	Limits Limits  `json:"limits"`
 	Prices []Price `json:"prices"`
 
-	// Tier Example: plus
+	// Tier Examples: plus
 	Tier PlanTier `json:"tier"`
 }
 
-// PlanTier Example: plus
+// PlanTier Examples: plus
 type PlanTier string
 
 // Price defines model for Price.
 type Price struct {
-	// Active Example: true
+	// Active Examples: true
 	Active bool `json:"active"`
 
-	// Amount Example: 49000
+	// Amount Examples: 49000
 	Amount int64 `json:"amount"`
 
-	// ArchivedAt Example: 2026-10-12T00:00:00Z
+	// ArchivedAt Examples: 2026-10-12T00:00:00Z
 	ArchivedAt nullable.Nullable[time.Time] `json:"archivedAt,omitempty"`
 
-	// CreatedAt Example: 2026-10-11T00:00:00Z
+	// CreatedAt Examples: 2026-10-11T00:00:00Z
 	CreatedAt time.Time `json:"createdAt"`
 
-	// Currency Example: vnd
+	// Currency Examples: vnd
 	Currency string `json:"currency"`
 
-	// Id Example: 0192f0a0-0000-7000-8000-000000000001
+	// Id Examples: 0192f0a0-0000-7000-8000-000000000001
 	Id openapi_types.UUID `json:"id"`
 
-	// Interval Example: month
+	// Interval Examples: month
 	Interval BillingInterval `json:"interval"`
 
-	// LookupKey Example: plus_month
+	// LookupKey Examples: plus_month
 	LookupKey string `json:"lookupKey"`
 
-	// Plan Example: plus
+	// Plan Examples: plus
 	Plan PlanTier `json:"plan"`
 }
 
 // RedirectURL defines model for RedirectURL.
 type RedirectURL struct {
-	// Url Example: https://checkout.stripe.com/c/pay/cs_test_123
+	// Url Examples: https://checkout.stripe.com/c/pay/cs_test_123
 	Url string `json:"url"`
 }
 
 // Refund defines model for Refund.
 type Refund struct {
-	// Amount Example: 24500
+	// Amount Examples: 24500
 	Amount int64 `json:"amount"`
 
-	// CreatedAt Example: 2026-10-11T00:00:00Z
+	// CreatedAt Examples: 2026-10-11T00:00:00Z
 	CreatedAt time.Time `json:"createdAt"`
 
-	// Currency Example: vnd
+	// Currency Examples: vnd
 	Currency string `json:"currency"`
 
-	// Id Example: 0192f0a0-0000-7000-8000-000000000002
+	// Id Examples: 0192f0a0-0000-7000-8000-000000000002
 	Id openapi_types.UUID `json:"id"`
 
-	// Reason Example: cancel_now
+	// Reason Examples: cancel_now
 	Reason RefundReason `json:"reason"`
 
-	// Status Example: succeeded
+	// Status Examples: succeeded
 	Status RefundStatus `json:"status"`
 }
 
-// RefundReason Example: cancel_now
+// RefundReason Examples: cancel_now
 type RefundReason string
 
-// RefundStatus Example: succeeded
+// RefundStatus Examples: succeeded
 type RefundStatus string
 
 // RefundQuote defines model for RefundQuote.
 type RefundQuote struct {
-	// Amount Example: 24500
+	// Amount Examples: 24500
 	Amount int64 `json:"amount"`
 
-	// Currency Example: vnd
+	// Currency Examples: vnd
 	Currency string `json:"currency"`
 
 	// Payments One line per paid invoice payment of the current period
 	Payments []RefundQuotePayment `json:"payments"`
 
-	// PeriodSeconds Example: 2592000
+	// PeriodSeconds Examples: 2592000
 	PeriodSeconds int64 `json:"periodSeconds"`
 
-	// UnusedSeconds Example: 1296000
+	// UnusedSeconds Examples: 1296000
 	UnusedSeconds int64 `json:"unusedSeconds"`
 }
 
@@ -368,76 +368,76 @@ type RefundQuote struct {
 type RefundQuotePayment struct {
 	// Amount Refund for this payment
 	//
-	// Example: 24500
+	// Examples: 24500
 	Amount int64 `json:"amount"`
 
-	// CoverageSeconds Example: 2592000
+	// CoverageSeconds Examples: 2592000
 	CoverageSeconds int64 `json:"coverageSeconds"`
 
-	// PaidAmount Example: 49000
+	// PaidAmount Examples: 49000
 	PaidAmount int64 `json:"paidAmount"`
 
-	// UnusedSeconds Example: 1296000
+	// UnusedSeconds Examples: 1296000
 	UnusedSeconds int64 `json:"unusedSeconds"`
 }
 
 // Subscription defines model for Subscription.
 type Subscription struct {
-	// AccessUntil Example: 2026-11-11T00:00:00Z
+	// AccessUntil Examples: 2026-11-11T00:00:00Z
 	AccessUntil nullable.Nullable[time.Time] `json:"accessUntil,omitempty"`
 
-	// CancelAtPeriodEnd Example: false
+	// CancelAtPeriodEnd Examples: false
 	CancelAtPeriodEnd bool `json:"cancelAtPeriodEnd"`
 
-	// CanceledAt Example: 2026-10-20T00:00:00Z
+	// CanceledAt Examples: 2026-10-20T00:00:00Z
 	CanceledAt nullable.Nullable[time.Time] `json:"canceledAt,omitempty"`
 
-	// CurrentPeriodEnd Example: 2026-11-11T00:00:00Z
+	// CurrentPeriodEnd Examples: 2026-11-11T00:00:00Z
 	CurrentPeriodEnd nullable.Nullable[time.Time] `json:"currentPeriodEnd,omitempty"`
 
-	// CurrentPeriodStart Example: 2026-10-11T00:00:00Z
+	// CurrentPeriodStart Examples: 2026-10-11T00:00:00Z
 	CurrentPeriodStart nullable.Nullable[time.Time] `json:"currentPeriodStart,omitempty"`
 
-	// Id Example: 0192f0a0-0000-7000-8000-000000000003
+	// Id Examples: 0192f0a0-0000-7000-8000-000000000003
 	Id openapi_types.UUID `json:"id"`
 
-	// Interval Example: month
+	// Interval Examples: month
 	Interval BillingInterval `json:"interval"`
 
-	// Plan Example: plus
+	// Plan Examples: plus
 	Plan    PlanTier `json:"plan"`
 	Refunds []Refund `json:"refunds"`
 
 	// Status `none` when the workspace never subscribed.
 	//
-	// Example: active
+	// Examples: active
 	Status SubscriptionStatus `json:"status"`
 }
 
 // SubscriptionStatus `none` when the workspace never subscribed.
 //
-// Example: active
+// Examples: active
 type SubscriptionStatus string
 
 // UpdatePlanRequest defines model for UpdatePlanRequest.
 type UpdatePlanRequest struct {
 	// Features Feature flags by key (auto_commit, workspace_graph).
 	//
-	// Example: {"auto_commit":true,"workspace_graph":true}
+	// Examples: {"auto_commit":true,"workspace_graph":true}
 	Features *Features `json:"features,omitempty"`
 
 	// Limits Limits by key. -1 means unlimited.
 	//
-	// Example: {"members":10,"revision_history_days":30}
+	// Examples: {"members":10,"revision_history_days":30}
 	Limits *Limits `json:"limits,omitempty"`
 }
 
 // UpdatePolicyRequest defines model for UpdatePolicyRequest.
 type UpdatePolicyRequest struct {
-	// LifetimeRefundWindowDays Example: 14
+	// LifetimeRefundWindowDays Examples: 14
 	LifetimeRefundWindowDays *int `json:"lifetimeRefundWindowDays,omitempty"`
 
-	// PastDueGraceDays Example: 3
+	// PastDueGraceDays Examples: 3
 	PastDueGraceDays *int `json:"pastDueGraceDays,omitempty"`
 }
 
@@ -450,7 +450,7 @@ type WorkspaceBilling struct {
 // PriceIdPath defines model for priceIdPath.
 type PriceIdPath = openapi_types.UUID
 
-// TierPath Example: plus
+// TierPath Examples: plus
 type TierPath = PlanTier
 
 // WorkspaceIdPath defines model for workspaceIdPath.

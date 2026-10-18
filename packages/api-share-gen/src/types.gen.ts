@@ -32,7 +32,7 @@ export type NoteSearch = {
    */
   plainTextContent: string;
   tags: Array<string>;
-  trashed?: Trashed;
+  trashed: Trashed | null;
 };
 
 export type NoteUpdatedEvent = {
@@ -42,7 +42,7 @@ export type NoteUpdatedEvent = {
   icon: string | null;
   folderId: string;
   folderName: string;
-  trashed?: Trashed;
+  trashed: Trashed | null;
   updatedAt: Date;
 };
 

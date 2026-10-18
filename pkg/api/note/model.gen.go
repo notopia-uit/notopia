@@ -266,48 +266,48 @@ func (e GetWorkspaceTreeParamsSortUpdatedAt) Valid() bool {
 type Error struct {
 	// Code Error code
 	//
-	// Example: EXAMPLE_CODE
+	// Examples: EXAMPLE_CODE
 	Code string `json:"code"`
 
 	// Message Human-readable error message
 	//
-	// Example: Example error
+	// Examples: Example error
 	Message string `json:"message"`
 
 	// MoreInfo URL with more information about the error
 	//
-	// Example: https://api.notopia.com/docs/errors/EXAMPLE_CODE
+	// Examples: https://api.notopia.com/docs/errors/EXAMPLE_CODE
 	MoreInfo *string `json:"more_info,omitempty"`
 }
 
 // Folder defines model for Folder.
 type Folder struct {
-	// Icon Example: 📁
+	// Icon Examples: 📁
 	Icon nullable.Nullable[string] `json:"icon"`
 
-	// Id Example: 123e4567-e89b-12d3-a456-426614174000
+	// Id Examples: 123e4567-e89b-12d3-a456-426614174000
 	Id *openapi_types.UUID `json:"id,omitempty"`
 
-	// Name Example: Work Notes
+	// Name Examples: Work Notes
 	Name string `json:"name"`
 
-	// ParentId Example: cc7a2e47-6267-4c60-8d36-257f849777e4
+	// ParentId Examples: cc7a2e47-6267-4c60-8d36-257f849777e4
 	ParentId nullable.Nullable[openapi_types.UUID] `json:"parentId"`
 	Trashed  nullable.Nullable[FolderTrashed]      `json:"trashed,omitempty"`
 
-	// UpdatedAt Example: 2024-06-01T12:00:00Z
+	// UpdatedAt Examples: 2024-06-01T12:00:00Z
 	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 
-	// WorkspaceId Example: 00000000-0000-4000-8000-000000000110
+	// WorkspaceId Examples: 00000000-0000-4000-8000-000000000110
 	WorkspaceId openapi_types.UUID `json:"workspaceId"`
 }
 
 // FolderTrashed defines model for Folder.trashed.
 type FolderTrashed struct {
-	// At Example: 2024-06-01T12:00:00Z
+	// At Examples: 2024-06-01T12:00:00Z
 	At time.Time `json:"at"`
 
-	// By Example: purpose
+	// By Examples: purpose
 	By TrashedBy `json:"by"`
 }
 
@@ -321,95 +321,95 @@ type Graph struct {
 type GraphLink struct {
 	// Source The ID of the source node (note id or hashtag prefixed tag name)
 	//
-	// Example: 000c2575-1847-5293-8117-2415a2328ef8
+	// Examples: 000c2575-1847-5293-8117-2415a2328ef8
 	Source string `json:"source"`
 
 	// Target The ID of the target node (note id or hashtag prefixed tag name)
 	//
-	// Example: #socks4
+	// Examples: #socks4
 	Target string `json:"target"`
 }
 
-// GraphNodesType Example: note
+// GraphNodesType Examples: note
 type GraphNodesType string
 
 // GraphNode defines model for Graph.nodes.
 type GraphNode struct {
 	// Id Can be either a note ID or a hashtag prefixed tag name
 	//
-	// Example: 000c2575-1847-5293-8117-2415a2328ef8
+	// Examples: 000c2575-1847-5293-8117-2415a2328ef8
 	Id string `json:"id"`
 
 	// Name Can be either a note name or a tag name (no hashtag prefix)
 	//
-	// Example: PowerUp.ps1
+	// Examples: PowerUp.ps1
 	Name string `json:"name"`
 
-	// Type Example: note
+	// Type Examples: note
 	Type GraphNodesType `json:"type"`
 
 	// Weight Optional weight for the note node, rounded to 1 decimal place
 	//
-	// Example: 0.8
+	// Examples: 0.8
 	Weight *float32 `json:"weight,omitempty"`
 }
 
 // HeartBeatWorkspaceEvent defines model for HeartBeatWorkspaceEvent.
 type HeartBeatWorkspaceEvent struct {
-	// Event Example: HeartBeatWorkspaceEvent
+	// Event Examples: HeartBeatWorkspaceEvent
 	Event HeartBeatWorkspaceEventEvent `json:"event"`
 
-	// Timestamp Example: 2024-01-01T00:00:00Z
+	// Timestamp Examples: 2024-01-01T00:00:00Z
 	Timestamp time.Time `json:"timestamp"`
 }
 
-// HeartBeatWorkspaceEventEvent Example: HeartBeatWorkspaceEvent
+// HeartBeatWorkspaceEventEvent Examples: HeartBeatWorkspaceEvent
 type HeartBeatWorkspaceEventEvent string
 
 // Note defines model for Note.
 type Note struct {
-	// FolderId Example: 123e4567-e89b-12d3-a456-426614174000
+	// FolderId Examples: 123e4567-e89b-12d3-a456-426614174000
 	FolderId openapi_types.UUID `json:"folderId"`
 
-	// Icon Example: 📓
+	// Icon Examples: 📓
 	Icon nullable.Nullable[string] `json:"icon"`
 
-	// Id Example: 000c2575-1847-5293-8117-2415a2328ef8
+	// Id Examples: 000c2575-1847-5293-8117-2415a2328ef8
 	Id *openapi_types.UUID `json:"id,omitempty"`
 
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	//
-	// Example: PowerUp.ps1
+	// Examples: PowerUp.ps1
 	Name string `json:"name"`
 
-	// Tags Example: ["work","meeting"]
+	// Tags Examples: ["work","meeting"]
 	Tags    *[]string                      `json:"tags,omitempty"`
 	Trashed nullable.Nullable[NoteTrashed] `json:"trashed,omitempty"`
 
-	// UpdatedAt Example: 2024-06-01T12:34:56Z
+	// UpdatedAt Examples: 2024-06-01T12:34:56Z
 	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 }
 
 // NoteTrashed defines model for Note.trashed.
 type NoteTrashed struct {
-	// At Example: 2024-06-01T12:00:00Z
+	// At Examples: 2024-06-01T12:00:00Z
 	At time.Time `json:"at"`
 
-	// By Example: purpose
+	// By Examples: purpose
 	By TrashedBy `json:"by"`
 }
 
 // NoteLink defines model for NoteLink.
 type NoteLink struct {
-	// Icon Example: 📓
+	// Icon Examples: 📓
 	Icon nullable.Nullable[Icon] `json:"icon"`
 
-	// Id Example: 000c2575-1847-5293-8117-2415a2328ef8
+	// Id Examples: 000c2575-1847-5293-8117-2415a2328ef8
 	Id *Id2 `json:"id,omitempty"`
 
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	//
-	// Example: PowerUp.ps1
+	// Examples: PowerUp.ps1
 	Name Name2 `json:"name"`
 }
 
@@ -419,81 +419,81 @@ type NoteLink struct {
 type PaymentRequiredError struct {
 	// Code Error code
 	//
-	// Example: EXAMPLE_CODE
+	// Examples: EXAMPLE_CODE
 	Code    string `json:"code"`
 	Details *struct {
-		// Current Example: 5
+		// Current Examples: 5
 		Current *int64 `json:"current,omitempty"`
 
-		// Key Example: members
+		// Key Examples: members
 		Key string `json:"key"`
 
-		// Kind Example: limit
+		// Kind Examples: limit
 		Kind PaymentRequiredErrorDetailsKind `json:"kind"`
 
-		// Max Example: 5
+		// Max Examples: 5
 		Max *int64 `json:"max,omitempty"`
 
-		// RequiredPlan Example: plus
+		// RequiredPlan Examples: plus
 		RequiredPlan PaymentRequiredErrorDetailsRequiredPlan `json:"requiredPlan"`
 	} `json:"details,omitempty"`
 
 	// Message Human-readable error message
 	//
-	// Example: Example error
+	// Examples: Example error
 	Message string `json:"message"`
 
 	// MoreInfo URL with more information about the error
 	//
-	// Example: https://api.notopia.com/docs/errors/EXAMPLE_CODE
+	// Examples: https://api.notopia.com/docs/errors/EXAMPLE_CODE
 	MoreInfo *string `json:"more_info,omitempty"`
 }
 
-// PaymentRequiredErrorDetailsKind Example: limit
+// PaymentRequiredErrorDetailsKind Examples: limit
 type PaymentRequiredErrorDetailsKind string
 
-// PaymentRequiredErrorDetailsRequiredPlan Example: plus
+// PaymentRequiredErrorDetailsRequiredPlan Examples: plus
 type PaymentRequiredErrorDetailsRequiredPlan string
 
 // SearchToken defines model for SearchToken.
 type SearchToken struct {
-	// ExpiresAt Example: 2024-06-30T12:00:00Z
+	// ExpiresAt Examples: 2024-06-30T12:00:00Z
 	ExpiresAt time.Time `json:"expiresAt"`
 
 	// Token Meilisearch token already filter for workspace
 	//
-	// Example: jwt
+	// Examples: jwt
 	Token string `json:"token"`
 }
 
 // Trashed defines model for Trashed.
 type Trashed struct {
-	// At Example: 2024-06-01T12:00:00Z
+	// At Examples: 2024-06-01T12:00:00Z
 	At time.Time `json:"at"`
 
-	// By Example: purpose
+	// By Examples: purpose
 	By TrashedBy `json:"by"`
 }
 
-// TrashedBy Example: purpose
+// TrashedBy Examples: purpose
 type TrashedBy string
 
 // TrashedFolder defines model for TrashedFolder.
 type TrashedFolder struct {
-	// Id Example: 123e4567-e89b-12d3-a456-426614174000
+	// Id Examples: 123e4567-e89b-12d3-a456-426614174000
 	Id openapi_types.UUID `json:"id"`
 
-	// Name Example: Work Notes
+	// Name Examples: Work Notes
 	Name    *string `json:"name,omitempty"`
 	Trashed Trashed `json:"trashed"`
 }
 
 // TrashedNote defines model for TrashedNote.
 type TrashedNote struct {
-	// Id Example: 000c2575-1847-5293-8117-2415a2328ef8
+	// Id Examples: 000c2575-1847-5293-8117-2415a2328ef8
 	Id openapi_types.UUID `json:"id"`
 
-	// Name Example: PowerUp.ps1
+	// Name Examples: PowerUp.ps1
 	Name    *string `json:"name,omitempty"`
 	Trashed Trashed `json:"trashed"`
 }
@@ -502,41 +502,41 @@ type TrashedNote struct {
 type User struct {
 	// Email Email from Authentik
 	//
-	// Example: user@notopia.com
+	// Examples: user@notopia.com
 	Email nullable.Nullable[openapi_types.Email] `json:"email"`
 
 	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 	//
-	// Example: 100
+	// Examples: 100
 	Id string `json:"id"`
 
 	// Name Full name from Authentik
 	//
-	// Example: User
+	// Examples: User
 	Name nullable.Nullable[string] `json:"name"`
 
 	// Username Username from Authentik
 	//
-	// Example: user
+	// Examples: user
 	Username string `json:"username"`
 }
 
 // UserWorkspace defines model for UserWorkspace.
 type UserWorkspace struct {
-	// Role Example: owner
+	// Role Examples: owner
 	Role      WorkspaceRole `json:"role"`
 	Workspace Workspace     `json:"workspace"`
 }
 
 // Workspace defines model for Workspace.
 type Workspace struct {
-	// Id Example: 00000000-0000-4000-8000-000000000110
+	// Id Examples: 00000000-0000-4000-8000-000000000110
 	Id *openapi_types.UUID `json:"id,omitempty"`
 
-	// Name Example: Notopia
+	// Name Examples: Notopia
 	Name string `json:"name"`
 
-	// Slug Example: notopia
+	// Slug Examples: notopia
 	Slug string `json:"slug"`
 }
 
@@ -545,78 +545,78 @@ type WorkspaceBillingChangedEvent struct {
 	// Data Refetch /billing/workspaces/{id}/entitlements.
 	Data WorkspaceBillingChangedEventData `json:"data"`
 
-	// Event Example: WorkspaceBillingChangedEvent
+	// Event Examples: WorkspaceBillingChangedEvent
 	Event WorkspaceBillingChangedEventEvent `json:"event"`
 
-	// Id Example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+	// Id Examples: dd57d134-d23b-457f-88fc-a4d7d6b284e5
 	Id openapi_types.UUID `json:"id"`
 }
 
 // WorkspaceBillingChangedEventData Refetch /billing/workspaces/{id}/entitlements.
 type WorkspaceBillingChangedEventData struct {
-	// Plan Example: plus
+	// Plan Examples: plus
 	Plan string `json:"plan"`
 
-	// WorkspaceId Example: 00000000-0000-4000-8000-000000000110
+	// WorkspaceId Examples: 00000000-0000-4000-8000-000000000110
 	WorkspaceId *Id3 `json:"workspaceId,omitempty"`
 }
 
-// WorkspaceBillingChangedEventEvent Example: WorkspaceBillingChangedEvent
+// WorkspaceBillingChangedEventEvent Examples: WorkspaceBillingChangedEvent
 type WorkspaceBillingChangedEventEvent string
 
 // WorkspaceDeletedEvent defines model for WorkspaceDeletedEvent.
 type WorkspaceDeletedEvent struct {
 	Data WorkspaceDeletedEventData `json:"data"`
 
-	// Event Example: WorkspaceDeletedEvent
+	// Event Examples: WorkspaceDeletedEvent
 	Event WorkspaceDeletedEventEvent `json:"event"`
 
-	// Id Example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+	// Id Examples: dd57d134-d23b-457f-88fc-a4d7d6b284e5
 	Id openapi_types.UUID `json:"id"`
 }
 
 // WorkspaceDeletedEventData defines model for WorkspaceDeletedEvent.data.
 type WorkspaceDeletedEventData struct {
-	// Id Example: 00000000-0000-4000-8000-000000000110
+	// Id Examples: 00000000-0000-4000-8000-000000000110
 	Id *Id3 `json:"id,omitempty"`
 }
 
-// WorkspaceDeletedEventEvent Example: WorkspaceDeletedEvent
+// WorkspaceDeletedEventEvent Examples: WorkspaceDeletedEvent
 type WorkspaceDeletedEventEvent string
 
 // WorkspaceItemsUpdatedEvent defines model for WorkspaceItemsUpdatedEvent.
 type WorkspaceItemsUpdatedEvent struct {
 	Data WorkspaceItemsUpdatedEventData `json:"data"`
 
-	// Event Example: WorkspaceItemsUpdatedEvent
+	// Event Examples: WorkspaceItemsUpdatedEvent
 	Event WorkspaceItemsUpdatedEventEvent `json:"event"`
 
-	// Id Example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+	// Id Examples: dd57d134-d23b-457f-88fc-a4d7d6b284e5
 	Id openapi_types.UUID `json:"id"`
 }
 
 // WorkspaceItemsUpdatedEventData defines model for WorkspaceItemsUpdatedEvent.data.
 type WorkspaceItemsUpdatedEventData struct {
-	// WorkspaceId Example: 00000000-0000-4000-8000-000000000110
+	// WorkspaceId Examples: 00000000-0000-4000-8000-000000000110
 	WorkspaceId *Id3 `json:"workspaceId,omitempty"`
 }
 
-// WorkspaceItemsUpdatedEventEvent Example: WorkspaceItemsUpdatedEvent
+// WorkspaceItemsUpdatedEventEvent Examples: WorkspaceItemsUpdatedEvent
 type WorkspaceItemsUpdatedEventEvent string
 
 // WorkspaceMember defines model for WorkspaceMember.
 type WorkspaceMember struct {
 	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 	//
-	// Example: 100
+	// Examples: 100
 	Id Id4 `json:"id"`
 
 	// Name Full name from Authentik
 	//
-	// Example: User
+	// Examples: User
 	Name nullable.Nullable[Name4] `json:"name,omitempty"`
 
-	// Role Example: owner
+	// Role Examples: owner
 	Role WorkspaceRole `json:"role"`
 }
 
@@ -624,164 +624,164 @@ type WorkspaceMember struct {
 type WorkspaceMembersUpdatedEvent struct {
 	Data WorkspaceMembersUpdatedEventData `json:"data"`
 
-	// Event Example: WorkspaceMembersUpdatedEvent
+	// Event Examples: WorkspaceMembersUpdatedEvent
 	Event WorkspaceMembersUpdatedEventEvent `json:"event"`
 
-	// Id Example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+	// Id Examples: dd57d134-d23b-457f-88fc-a4d7d6b284e5
 	Id openapi_types.UUID `json:"id"`
 }
 
 // WorkspaceMembersUpdatedEventData defines model for WorkspaceMembersUpdatedEvent.data.
 type WorkspaceMembersUpdatedEventData struct {
-	// WorkspaceId Example: 00000000-0000-4000-8000-000000000110
+	// WorkspaceId Examples: 00000000-0000-4000-8000-000000000110
 	WorkspaceId *Id3 `json:"workspaceId,omitempty"`
 }
 
-// WorkspaceMembersUpdatedEventEvent Example: WorkspaceMembersUpdatedEvent
+// WorkspaceMembersUpdatedEventEvent Examples: WorkspaceMembersUpdatedEvent
 type WorkspaceMembersUpdatedEventEvent string
 
 // WorkspaceRenamedEvent defines model for WorkspaceRenamedEvent.
 type WorkspaceRenamedEvent struct {
 	Data WorkspaceRenamedEventData `json:"data"`
 
-	// Event Example: WorkspaceRenamedEvent
+	// Event Examples: WorkspaceRenamedEvent
 	Event WorkspaceRenamedEventEvent `json:"event"`
 
-	// Id Example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+	// Id Examples: dd57d134-d23b-457f-88fc-a4d7d6b284e5
 	Id openapi_types.UUID `json:"id"`
 }
 
 // WorkspaceRenamedEventData defines model for WorkspaceRenamedEvent.data.
 type WorkspaceRenamedEventData struct {
-	// Id Example: 00000000-0000-4000-8000-000000000110
+	// Id Examples: 00000000-0000-4000-8000-000000000110
 	Id *Id3 `json:"id,omitempty"`
 
-	// Name Example: Notopia
+	// Name Examples: Notopia
 	Name Name3 `json:"name"`
 }
 
-// WorkspaceRenamedEventEvent Example: WorkspaceRenamedEvent
+// WorkspaceRenamedEventEvent Examples: WorkspaceRenamedEvent
 type WorkspaceRenamedEventEvent string
 
-// WorkspaceRole Example: owner
+// WorkspaceRole Examples: owner
 type WorkspaceRole string
 
 // WorkspaceSlugChangedEvent defines model for WorkspaceSlugChangedEvent.
 type WorkspaceSlugChangedEvent struct {
 	Data WorkspaceSlugChangedEventData `json:"data"`
 
-	// Event Example: WorkspaceSlugChangedEvent
+	// Event Examples: WorkspaceSlugChangedEvent
 	Event WorkspaceSlugChangedEventEvent `json:"event"`
 
-	// Id Example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+	// Id Examples: dd57d134-d23b-457f-88fc-a4d7d6b284e5
 	Id openapi_types.UUID `json:"id"`
 }
 
 // WorkspaceSlugChangedEventData defines model for WorkspaceSlugChangedEvent.data.
 type WorkspaceSlugChangedEventData struct {
-	// Id Example: 00000000-0000-4000-8000-000000000110
+	// Id Examples: 00000000-0000-4000-8000-000000000110
 	Id *Id3 `json:"id,omitempty"`
 
-	// Slug Example: notopia
+	// Slug Examples: notopia
 	Slug Slug `json:"slug"`
 }
 
-// WorkspaceSlugChangedEventEvent Example: WorkspaceSlugChangedEvent
+// WorkspaceSlugChangedEventEvent Examples: WorkspaceSlugChangedEvent
 type WorkspaceSlugChangedEventEvent string
 
 // WorkspaceTreeFolder defines model for WorkspaceTreeFolder.
 type WorkspaceTreeFolder struct {
 	Children []WorkspaceTreeFolder `json:"children"`
 
-	// Icon Example: 📁
+	// Icon Examples: 📁
 	Icon nullable.Nullable[Icon2] `json:"icon"`
 
-	// Id Example: 123e4567-e89b-12d3-a456-426614174000
+	// Id Examples: 123e4567-e89b-12d3-a456-426614174000
 	Id *Id `json:"id,omitempty"`
 
-	// Name Example: Work Notes
+	// Name Examples: Work Notes
 	Name  Name                `json:"name"`
 	Notes []WorkspaceTreeNote `json:"notes"`
 
-	// UpdatedAt Example: 2024-06-01T12:00:00Z
+	// UpdatedAt Examples: 2024-06-01T12:00:00Z
 	UpdatedAt *UpdatedAt2 `json:"updatedAt,omitempty"`
 }
 
 // WorkspaceTreeNote defines model for WorkspaceTreeNote.
 type WorkspaceTreeNote struct {
-	// Icon Example: 📓
+	// Icon Examples: 📓
 	Icon nullable.Nullable[Icon] `json:"icon"`
 
-	// Id Example: 000c2575-1847-5293-8117-2415a2328ef8
+	// Id Examples: 000c2575-1847-5293-8117-2415a2328ef8
 	Id *Id2 `json:"id,omitempty"`
 
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	//
-	// Example: PowerUp.ps1
+	// Examples: PowerUp.ps1
 	Name Name2 `json:"name"`
 
-	// UpdatedAt Example: 2024-06-01T12:34:56Z
+	// UpdatedAt Examples: 2024-06-01T12:34:56Z
 	UpdatedAt *UpdatedAt `json:"updatedAt,omitempty"`
 }
 
-// Icon Example: 📓
+// Icon Examples: 📓
 type Icon = string
 
-// Icon2 Example: 📁
+// Icon2 Examples: 📁
 type Icon2 = string
 
-// Id Example: 123e4567-e89b-12d3-a456-426614174000
+// Id Examples: 123e4567-e89b-12d3-a456-426614174000
 type Id = openapi_types.UUID
 
-// Id2 Example: 000c2575-1847-5293-8117-2415a2328ef8
+// Id2 Examples: 000c2575-1847-5293-8117-2415a2328ef8
 type Id2 = openapi_types.UUID
 
-// Id3 Example: 00000000-0000-4000-8000-000000000110
+// Id3 Examples: 00000000-0000-4000-8000-000000000110
 type Id3 = openapi_types.UUID
 
 // Id4 User ID from Authentik (need to change subject mode to User's ID instead of hashed)
 //
-// Example: 100
+// Examples: 100
 type Id4 = string
 
-// Name Example: Work Notes
+// Name Examples: Work Notes
 type Name = string
 
 // Name2 Can be empty string when creating but will be set to "Untitled Note" internally
 //
-// Example: PowerUp.ps1
+// Examples: PowerUp.ps1
 type Name2 = string
 
-// Name3 Example: Notopia
+// Name3 Examples: Notopia
 type Name3 = string
 
 // Name4 Full name from Authentik
 //
-// Example: User
+// Examples: User
 type Name4 = string
 
-// Slug Example: notopia
+// Slug Examples: notopia
 type Slug = string
 
-// UpdatedAt Example: 2024-06-01T12:34:56Z
+// UpdatedAt Examples: 2024-06-01T12:34:56Z
 type UpdatedAt = time.Time
 
-// UpdatedAt2 Example: 2024-06-01T12:00:00Z
+// UpdatedAt2 Examples: 2024-06-01T12:00:00Z
 type UpdatedAt2 = time.Time
 
-// FolderIdPath Example: 123e4567-e89b-12d3-a456-426614174000
+// FolderIdPath Examples: 123e4567-e89b-12d3-a456-426614174000
 type FolderIdPath = Id
 
 // LimitQuery defines model for limitQuery.
 type LimitQuery = int
 
-// NoteIdPath Example: 000c2575-1847-5293-8117-2415a2328ef8
+// NoteIdPath Examples: 000c2575-1847-5293-8117-2415a2328ef8
 type NoteIdPath = Id2
 
-// WorkspaceIdPath Example: 00000000-0000-4000-8000-000000000110
+// WorkspaceIdPath Examples: 00000000-0000-4000-8000-000000000110
 type WorkspaceIdPath = Id3
 
-// WorkspaceSlugPath Example: notopia
+// WorkspaceSlugPath Examples: notopia
 type WorkspaceSlugPath = Slug
 
 // BadRequestError defines model for BadRequestError.
@@ -806,19 +806,19 @@ type UnauthorizedError = map[string]interface{}
 
 // CreateFolderResponse defines parameters for CreateFolder.
 type CreateFolderResponse struct {
-	// Id Example: 123e4567-e89b-12d3-a456-426614174000
+	// Id Examples: 123e4567-e89b-12d3-a456-426614174000
 	Id *Id `json:"id,omitempty"`
 }
 
 // RenameFolderJSONBody defines parameters for RenameFolder.
 type RenameFolderJSONBody struct {
-	// Name Example: Work Notes
+	// Name Examples: Work Notes
 	Name Name `json:"name"`
 }
 
 // CreateNoteResponse defines parameters for CreateNote.
 type CreateNoteResponse struct {
-	// Id Example: 000c2575-1847-5293-8117-2415a2328ef8
+	// Id Examples: 000c2575-1847-5293-8117-2415a2328ef8
 	Id *Id2 `json:"id,omitempty"`
 }
 
@@ -842,7 +842,7 @@ type GetNoteLinksParams struct {
 type RenameNoteJSONBody struct {
 	// Name Can be empty string when creating but will be set to "Untitled Note" internally
 	//
-	// Example: PowerUp.ps1
+	// Examples: PowerUp.ps1
 	Name Name2 `json:"name"`
 }
 
@@ -865,13 +865,13 @@ type SearchUsersParams struct {
 
 // CreateWorkspaceResponse defines parameters for CreateWorkspace.
 type CreateWorkspaceResponse struct {
-	// Id Example: 00000000-0000-4000-8000-000000000110
+	// Id Examples: 00000000-0000-4000-8000-000000000110
 	Id *Id3 `json:"id,omitempty"`
 }
 
 // ChangeWorkspaceSlugJSONBody defines parameters for ChangeWorkspaceSlug.
 type ChangeWorkspaceSlugJSONBody struct {
-	// Slug Example: notopia
+	// Slug Examples: notopia
 	Slug Slug `json:"slug"`
 }
 
@@ -886,7 +886,7 @@ type UpdateWorkspaceMembersJSONBody = []WorkspaceMember
 
 // MoveWorkspaceItemsJSONBody defines parameters for MoveWorkspaceItems.
 type MoveWorkspaceItemsJSONBody struct {
-	// DestinationFolderId Example: 123e4567-e89b-12d3-a456-426614174000
+	// DestinationFolderId Examples: 123e4567-e89b-12d3-a456-426614174000
 	DestinationFolderId openapi_types.UUID    `json:"destinationFolderId"`
 	FolderIds           *[]openapi_types.UUID `json:"folderIds,omitempty"`
 	NoteIds             *[]openapi_types.UUID `json:"noteIds,omitempty"`
@@ -900,7 +900,7 @@ type PermanentlyDeleteWorkspaceItemsJSONBody struct {
 
 // RenameWorkspaceJSONBody defines parameters for RenameWorkspace.
 type RenameWorkspaceJSONBody struct {
-	// Name Example: Notopia
+	// Name Examples: Notopia
 	Name Name3 `json:"name"`
 }
 
@@ -935,13 +935,13 @@ type GetWorkspaceTreeParamsSortUpdatedAt string
 
 // WorkspaceTreeSort defines parameters for GetWorkspaceTree.
 type WorkspaceTreeSort struct {
-	// CreatedAt Example: asc
+	// CreatedAt Examples: asc
 	CreatedAt *GetWorkspaceTreeParamsSortCreatedAt `json:"createdAt,omitempty"`
 
-	// Name Example: asc
+	// Name Examples: asc
 	Name *GetWorkspaceTreeParamsSortName `json:"name,omitempty"`
 
-	// UpdatedAt Example: asc
+	// UpdatedAt Examples: asc
 	UpdatedAt *GetWorkspaceTreeParamsSortUpdatedAt `json:"updatedAt,omitempty"`
 }
 

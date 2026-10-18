@@ -61,7 +61,7 @@ export const zShareNoteSearch = z.object({
   name: z.string(),
   plainTextContent: z.string(),
   tags: z.array(z.string()),
-  trashed: zShareTrashed.optional()
+  trashed: zShareTrashed.nullable()
 });
 
 export const zShareNoteUpdatedEvent = z.object({
@@ -71,7 +71,7 @@ export const zShareNoteUpdatedEvent = z.object({
   icon: z.string().nullable(),
   folderId: z.uuid(),
   folderName: z.string(),
-  trashed: zShareTrashed.optional(),
+  trashed: zShareTrashed.nullable(),
   updatedAt: z.iso.datetime()
 });
 
@@ -147,16 +147,23 @@ export const zDocumentPagination = z.object({
   hasPrev: z.boolean()
 });
 
+export const zDocumentName = z.string().min(1).max(255).nullable();
+
+/**
+ * Who the revision is attributed to. Null for revisions created before authors were recorded
+ */
+export const zDocumentAuthorId = z.string().readonly().nullable();
+
 /**
  * BlockNote model
  */
 export const zDocumentDocumentContent = z.array(z.unknown());
 
 export const zDocumentRevisionWithContent = zDocumentRevision.and(z.object({
+  name: zDocumentName.optional(),
+  authorId: zDocumentAuthorId.optional(),
   content: zDocumentDocumentContent
 }));
-
-export const zDocumentName = z.string().min(1).max(255).nullable();
 
 export const zNoteTrashedBy = z.enum(['purpose', 'parent']);
 
@@ -331,7 +338,7 @@ export const zNoteName4 = z.string().nullable();
 
 export const zNoteWorkspaceMember = z.object({
   id: zNoteId4,
-  name: zNoteName4.optional(),
+  name: zNoteName4.readonly().optional(),
   role: zNoteWorkspaceRole
 });
 
@@ -578,6 +585,7 @@ export const zDocumentRevisionWritable = z.object({
 export const zDocumentDocumentContentWritable = z.array(z.unknown());
 
 export const zDocumentRevisionWithContentWritable = zDocumentRevisionWritable.and(z.object({
+  name: zDocumentName.optional(),
   content: zDocumentDocumentContentWritable
 }));
 

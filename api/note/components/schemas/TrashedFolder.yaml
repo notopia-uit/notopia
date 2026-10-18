@@ -5,13 +5,13 @@ properties:
   id:
     type: string
     format: uuid
-    example: 123e4567-e89b-12d3-a456-426614174000
+    examples: [123e4567-e89b-12d3-a456-426614174000]
 
   name:
     type: string
     minLength: 1
     maxLength: 255
-    example: Work Notes
+    examples: [Work Notes]
     readOnly: true
 
   trashed:

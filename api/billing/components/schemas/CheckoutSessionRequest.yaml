@@ -4,5 +4,5 @@ properties:
   priceId:
     type: string
     format: uuid
-    example: 0192f0a0-0000-7000-8000-000000000001
+    examples: [0192f0a0-0000-7000-8000-000000000001]
 required: [priceId]

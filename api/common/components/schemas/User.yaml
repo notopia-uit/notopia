@@ -5,25 +5,23 @@ properties:
   id:
     type: string
     description: User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-    example: "100"
+    examples: ["100"]
 
   username:
     type: string
     description: Username from Authentik
-    example: user
+    examples: [user]
 
   name:
-    type: string
+    type: [string, "null"]
     description: Full name from Authentik
-    example: User
-    nullable: true
+    examples: [User]
 
   email:
-    type: string
+    type: [string, "null"]
     format: email
     description: Email from Authentik
-    example: user@notopia.com
-    nullable: true
+    examples: [user@notopia.com]
 
 required:
   - id

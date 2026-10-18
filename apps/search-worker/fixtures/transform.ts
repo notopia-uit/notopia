@@ -56,6 +56,7 @@ async function processFile(filePath: string): Promise<void> {
     name: path.basename(pathWithoutExt),
     plainTextContent: markdownToPlainText(content),
     tags: extractTags(content),
+    trashed: null,
   };
 
   await fs.writeFile(path.join(OUTPUT_DIR, `${id}.json`), JSON.stringify(note, null, 2));

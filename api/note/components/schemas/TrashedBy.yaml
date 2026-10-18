@@ -3,4 +3,4 @@ type: string
 enum:
   - purpose
   - parent
-example: purpose
+examples: [purpose]

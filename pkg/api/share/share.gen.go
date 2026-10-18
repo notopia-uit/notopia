@@ -72,22 +72,14 @@ func (e WorkspaceRole) Valid() bool {
 // Document defines model for Document.
 type Document struct {
 	// Content BlockNote model
-	//
-	// Example: [{"content":"Welcome to this demo!","type":"paragraph"},{"type":"paragraph"},{"content":[{"styles":{"bold":true},"text":"Blocks:","type":"text"}],"type":"paragraph"},{"content":"Paragraph","type":"paragraph"},{"content":"Heading","type":"heading"},{"content":"Toggle Heading","id":"toggle-heading","props":{"isToggleable":true},"type":"heading"},{"content":"Quote","type":"quote"},{"content":"Bullet List Item","type":"bulletListItem"},{"content":"Numbered List Item","type":"numberedListItem"},{"content":"Check List Item","type":"checkListItem"},{"content":"Toggle List Item","id":"toggle-list-item","type":"toggleListItem"},{"content":"console.log('Hello, world!');","props":{"language":"javascript"},"type":"codeBlock"},{"content":{"rows":[{"cells":["Table Cell","Table Cell","Table Cell"]},{"cells":["Table Cell","Table Cell","Table Cell"]},{"cells":["Table Cell","Table Cell","Table Cell"]}],"type":"tableContent"},"type":"table"},{"type":"file"},{"props":{"caption":"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg","url":"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg"},"type":"image"},{"props":{"caption":"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm","url":"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"},"type":"video"},{"props":{"caption":"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3","url":"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"},"type":"audio"},{"type":"paragraph"},{"content":[{"styles":{"bold":true},"text":"Inline Content:","type":"text"}],"type":"paragraph"},{"content":[{"styles":{"backgroundColor":"blue","bold":true,"italic":true,"textColor":"red"},"text":"Styled Text","type":"text"},{"styles":{},"text":" ","type":"text"},{"content":"Link","href":"https://www.blocknotejs.org","type":"link"}],"type":"paragraph"},{"type":"paragraph"}]
-	Content DocumentContent `json:"content"`
-
-	// Id Example: 000c2575-1847-5293-8117-2415a2328ef8
-	Id openapi_types.UUID `json:"id"`
+	Content DocumentContent    `json:"content"`
+	Id      openapi_types.UUID `json:"id"`
 }
 
 // DocumentCommittedEvent defines model for DocumentCommittedEvent.
 type DocumentCommittedEvent struct {
 	// Content BlockNote model
-	//
-	// Example: [{"content":"Welcome to this demo!","type":"paragraph"},{"type":"paragraph"},{"content":[{"styles":{"bold":true},"text":"Blocks:","type":"text"}],"type":"paragraph"},{"content":"Paragraph","type":"paragraph"},{"content":"Heading","type":"heading"},{"content":"Toggle Heading","id":"toggle-heading","props":{"isToggleable":true},"type":"heading"},{"content":"Quote","type":"quote"},{"content":"Bullet List Item","type":"bulletListItem"},{"content":"Numbered List Item","type":"numberedListItem"},{"content":"Check List Item","type":"checkListItem"},{"content":"Toggle List Item","id":"toggle-list-item","type":"toggleListItem"},{"content":"console.log('Hello, world!');","props":{"language":"javascript"},"type":"codeBlock"},{"content":{"rows":[{"cells":["Table Cell","Table Cell","Table Cell"]},{"cells":["Table Cell","Table Cell","Table Cell"]},{"cells":["Table Cell","Table Cell","Table Cell"]}],"type":"tableContent"},"type":"table"},{"type":"file"},{"props":{"caption":"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg","url":"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg"},"type":"image"},{"props":{"caption":"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm","url":"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"},"type":"video"},{"props":{"caption":"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3","url":"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"},"type":"audio"},{"type":"paragraph"},{"content":[{"styles":{"bold":true},"text":"Inline Content:","type":"text"}],"type":"paragraph"},{"content":[{"styles":{"backgroundColor":"blue","bold":true,"italic":true,"textColor":"red"},"text":"Styled Text","type":"text"},{"styles":{},"text":" ","type":"text"},{"content":"Link","href":"https://www.blocknotejs.org","type":"link"}],"type":"paragraph"},{"type":"paragraph"}]
-	Content DocumentContent `json:"content"`
-
-	// Id Example: 000c2575-1847-5293-8117-2415a2328ef8
+	Content         DocumentContent      `json:"content"`
 	Id              openapi_types.UUID   `json:"id"`
 	OutgoingLinkIds []openapi_types.UUID `json:"outgoingLinkIds"`
 	Tags            []string             `json:"tags"`
@@ -95,8 +87,6 @@ type DocumentCommittedEvent struct {
 }
 
 // DocumentContent BlockNote model
-//
-// Example: [{"content":"Welcome to this demo!","type":"paragraph"},{"type":"paragraph"},{"content":[{"styles":{"bold":true},"text":"Blocks:","type":"text"}],"type":"paragraph"},{"content":"Paragraph","type":"paragraph"},{"content":"Heading","type":"heading"},{"content":"Toggle Heading","id":"toggle-heading","props":{"isToggleable":true},"type":"heading"},{"content":"Quote","type":"quote"},{"content":"Bullet List Item","type":"bulletListItem"},{"content":"Numbered List Item","type":"numberedListItem"},{"content":"Check List Item","type":"checkListItem"},{"content":"Toggle List Item","id":"toggle-list-item","type":"toggleListItem"},{"content":"console.log('Hello, world!');","props":{"language":"javascript"},"type":"codeBlock"},{"content":{"rows":[{"cells":["Table Cell","Table Cell","Table Cell"]},{"cells":["Table Cell","Table Cell","Table Cell"]},{"cells":["Table Cell","Table Cell","Table Cell"]}],"type":"tableContent"},"type":"table"},{"type":"file"},{"props":{"caption":"From https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg","url":"https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg"},"type":"image"},{"props":{"caption":"From https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm","url":"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"},"type":"video"},{"props":{"caption":"From https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3","url":"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"},"type":"audio"},{"type":"paragraph"},{"content":[{"styles":{"bold":true},"text":"Inline Content:","type":"text"}],"type":"paragraph"},{"content":[{"styles":{"backgroundColor":"blue","bold":true,"italic":true,"textColor":"red"},"text":"Styled Text","type":"text"},{"styles":{},"text":" ","type":"text"},{"content":"Link","href":"https://www.blocknotejs.org","type":"link"}],"type":"paragraph"},{"type":"paragraph"}]
 type DocumentContent = []map[string]interface{}
 
 // NoteCreatedEvent defines model for NoteCreatedEvent.
@@ -122,7 +112,7 @@ type NoteSearch struct {
 	// PlainTextContent Plain text content
 	PlainTextContent string             `json:"plainTextContent"`
 	Tags             []string           `json:"tags"`
-	Trashed          *Trashed           `json:"trashed,omitempty"`
+	Trashed          *Trashed           `json:"trashed"`
 	WorkspaceId      openapi_types.UUID `json:"workspaceId"`
 }
 
@@ -133,7 +123,7 @@ type NoteUpdatedEvent struct {
 	Icon        *string            `json:"icon"`
 	Id          openapi_types.UUID `json:"id"`
 	Name        string             `json:"name"`
-	Trashed     *Trashed           `json:"trashed,omitempty"`
+	Trashed     *Trashed           `json:"trashed"`
 	UpdatedAt   time.Time          `json:"updatedAt"`
 	WorkspaceId openapi_types.UUID `json:"workspaceId"`
 }
@@ -152,35 +142,25 @@ type SubscriptionChangedEventPlan string
 
 // Trashed defines model for Trashed.
 type Trashed struct {
-	// At Example: 2024-06-01T12:00:00Z
 	At time.Time `json:"at"`
-
-	// By Example: purpose
 	By TrashedBy `json:"by"`
 }
 
-// TrashedBy Example: purpose
+// TrashedBy defines model for TrashedBy.
 type TrashedBy string
 
 // UserDeletedEvent defines model for UserDeletedEvent.
 type UserDeletedEvent struct {
 	// Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	//
-	// Example: 100
 	Id Id `json:"id"`
 }
 
 // UserWorkspaceRoleUpdatedEvent defines model for UserWorkspaceRoleUpdatedEvent.
 type UserWorkspaceRoleUpdatedEvent struct {
-	// Role Example: owner
 	Role WorkspaceRole `json:"role"`
 
 	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	//
-	// Example: 100
-	UserId Id `json:"userId"`
-
-	// WorkspaceId Example: 00000000-0000-4000-8000-000000000110
+	UserId      Id   `json:"userId"`
 	WorkspaceId *Id2 `json:"workspaceId,omitempty"`
 }
 
@@ -191,36 +171,25 @@ type WorkspaceDeletedIntegrationEvent struct {
 
 // WorkspaceMemberAddedEvent defines model for WorkspaceMemberAddedEvent.
 type WorkspaceMemberAddedEvent struct {
-	// Role Example: owner
 	Role WorkspaceRole `json:"role"`
 
 	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	//
-	// Example: 100
-	UserId Id `json:"userId"`
-
-	// WorkspaceId Example: 00000000-0000-4000-8000-000000000110
+	UserId      Id   `json:"userId"`
 	WorkspaceId *Id2 `json:"workspaceId,omitempty"`
 }
 
 // WorkspaceMemberRemovedEvent defines model for WorkspaceMemberRemovedEvent.
 type WorkspaceMemberRemovedEvent struct {
 	// UserId User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-	//
-	// Example: 100
-	UserId Id `json:"userId"`
-
-	// WorkspaceId Example: 00000000-0000-4000-8000-000000000110
+	UserId      Id   `json:"userId"`
 	WorkspaceId *Id2 `json:"workspaceId,omitempty"`
 }
 
-// WorkspaceRole Example: owner
+// WorkspaceRole defines model for WorkspaceRole.
 type WorkspaceRole string
 
 // Id User ID from Authentik (need to change subject mode to User's ID instead of hashed)
-//
-// Example: 100
 type Id = string
 
-// Id2 Example: 00000000-0000-4000-8000-000000000110
+// Id2 defines model for id-2.
 type Id2 = openapi_types.UUID

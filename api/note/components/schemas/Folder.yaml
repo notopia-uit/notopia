@@ -5,41 +5,38 @@ properties:
   id:
     type: string
     format: uuid
-    example: 123e4567-e89b-12d3-a456-426614174000
+    examples: [123e4567-e89b-12d3-a456-426614174000]
     readOnly: true
 
   name:
     type: string
     minLength: 1
     maxLength: 255
-    example: Work Notes
+    examples: [Work Notes]
 
   icon:
-    type: string
-    nullable: true
-    example: 📁
+    type: [string, "null"]
+    examples: [📁]
 
   parentId:
-    type: string
+    type: [string, "null"]
     format: uuid
-    example: cc7a2e47-6267-4c60-8d36-257f849777e4
-    nullable: true
+    examples: [cc7a2e47-6267-4c60-8d36-257f849777e4]
 
   # This ref to ./Workspace.yaml#/properties/id
   workspaceId:
     type: string
     format: uuid
-    example: 00000000-0000-4000-8000-000000000110
+    examples: [00000000-0000-4000-8000-000000000110]
 
   updatedAt:
     type: string
     format: date-time
-    example: 2024-06-01T12:00:00Z
+    examples: [2024-06-01T12:00:00Z]
     readOnly: true
 
   trashed:
-    type: object
-    nullable: true
+    type: [object, "null"]
     readOnly: true
     x-go-type-name: FolderTrashed
     properties:
@@ -49,7 +46,7 @@ properties:
       at:
         type: string
         format: date-time
-        example: 2024-06-01T12:00:00Z
+        examples: [2024-06-01T12:00:00Z]
 
     required:
       - by

@@ -4,4 +4,4 @@ enum:
   - manual
   - auto
   - sweeper
-example: manual
+examples: [manual]

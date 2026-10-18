@@ -3,6 +3,12 @@ allOf:
   - $ref: ./Revision.yaml
   - type: object
     properties:
+      # Re-declared so openapi-generator keeps the nullable type: it drops nullability
+      # for properties only inherited through an allOf $ref.
+      name:
+        $ref: ./Revision.yaml#/properties/name
+      authorId:
+        $ref: ./Revision.yaml#/properties/authorId
       content:
         $ref: ./DocumentContent.yaml
     required:

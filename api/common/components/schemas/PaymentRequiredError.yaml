@@ -13,20 +13,20 @@ allOf:
           kind:
             type: string
             enum: [feature, limit]
-            example: limit
+            examples: [limit]
           key:
             type: string
-            example: members
+            examples: [members]
           current:
             type: integer
             format: int64
-            example: 5
+            examples: [5]
           max:
             type: integer
             format: int64
-            example: 5
+            examples: [5]
           requiredPlan:
             type: string
             enum: [plus, pro]
-            example: plus
+            examples: [plus]
         required: [kind, key, requiredPlan]

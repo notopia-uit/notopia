@@ -4,14 +4,14 @@ properties:
   id:
     type: string
     format: uuid
-    example: 0192f0a0-0000-7000-8000-000000000002
+    examples: [0192f0a0-0000-7000-8000-000000000002]
   amount:
     type: integer
     format: int64
-    example: 24500
+    examples: [24500]
   currency:
     type: string
-    example: vnd
+    examples: [vnd]
   reason:
     type: string
     enum:
@@ -23,13 +23,13 @@ properties:
         duplicate_checkout,
         external,
       ]
-    example: cancel_now
+    examples: [cancel_now]
   status:
     type: string
     enum: [pending, succeeded, failed, canceled]
-    example: succeeded
+    examples: [succeeded]
   createdAt:
     type: string
     format: date-time
-    example: 2026-10-11T00:00:00Z
+    examples: [2026-10-11T00:00:00Z]
 required: [id, amount, currency, reason, status, createdAt]

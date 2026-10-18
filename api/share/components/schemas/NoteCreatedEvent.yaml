@@ -14,8 +14,7 @@ properties:
     type: string
 
   icon:
-    type: string
-    nullable: true
+    type: [string, "null"]
 
 required:
   - id
