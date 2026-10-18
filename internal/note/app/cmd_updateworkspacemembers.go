@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/note/errs"
@@ -54,6 +55,20 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateW
 	}
 	if !anyOwner {
 		return errs.NewWorkspaceMustHaveAtLeastOneOwner(cmd.WorkspaceID)
+	}
+	hasPermission, err := h.authorizationSvc.HasWorkspacePermission(
+		ctx,
+		cmd.UserID,
+		cmd.WorkspaceID,
+		WorkspacePermissionEdit,
+	)
+	if err != nil {
+		return err
+	}
+	if !hasPermission {
+		return errs.NewForbidden(
+			fmt.Sprintf("user %s does not have permission to update members of workspace %s", cmd.UserID, cmd.WorkspaceID),
+		)
 	}
 	current, err := h.authorizationSvc.GetWorkspaceMembers(ctx, cmd.UserID, cmd.WorkspaceID)
 	if err != nil {
