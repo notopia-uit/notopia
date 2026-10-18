@@ -27,9 +27,9 @@ reviews:
   path_instructions:
     - path: api/**
       instructions: |
-        - OpenAPI spec 3.0.4: <https://spec.openapis.org/oas/v3.0.4.html>
-        - In the future, might migrate to 3.1, not today
+        - OpenAPI spec 3.1.2: <https://spec.openapis.org/oas/v3.1.2.html>
         - Strict schema, modular design
+        - Prefer JSON Schema 2020-12: use `type: [T, "null"]` over `nullable`, `oneOf`/anyOf` for ref unions
 
     - path: internal/note/**
       instructions: |
