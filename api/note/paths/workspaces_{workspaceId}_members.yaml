@@ -59,6 +59,8 @@ put:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
     402:
       $ref: ../../common/components/responses/PaymentRequired.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
     404:
       $ref: ../../common/components/responses/NotFoundError.yaml
     409:

@@ -93,6 +93,9 @@ func (h *PurgeExpiredTrashHandler) Handle(ctx context.Context, _ *PurgeExpiredTr
 		return err
 	}
 	for _, c := range expiredTrashCutoffs(ctx, now, workspaceIDs, ents) {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 		if err := h.purgeWorkspace(ctx, c.workspaceID, c.cutoff); err != nil {
 			slog.ErrorContext(ctx, "trash purge failed",
 				slog.String("workspace_id", c.workspaceID.String()),

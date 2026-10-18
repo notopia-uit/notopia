@@ -11,8 +11,10 @@ func checkMembersLimit(
 	ctx context.Context,
 	billingSvc BillingSvc,
 	workspaceID uuid.UUID,
-	current, requested int,
+	current int,
+	members []WorkspaceMemberUpdate,
 ) error {
+	requested := distinctMemberCount(members)
 	if requested <= current {
 		return nil
 	}
@@ -34,6 +36,14 @@ func checkMembersLimit(
 		int64(quota),
 		RequiredPlanForLimit(plans, PlanLimitMembers, int64(requested)).String(),
 	)
+}
+
+func distinctMemberCount(members []WorkspaceMemberUpdate) int {
+	ids := make(map[string]struct{}, len(members))
+	for _, m := range members {
+		ids[m.ID] = struct{}{}
+	}
+	return len(ids)
 }
 
 func checkPayerKept(

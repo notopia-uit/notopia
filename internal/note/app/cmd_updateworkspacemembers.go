@@ -74,7 +74,7 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateW
 	if err != nil {
 		return err
 	}
-	if err := checkMembersLimit(ctx, h.billingSvc, cmd.WorkspaceID, len(current), len(cmd.Members)); err != nil {
+	if err := checkMembersLimit(ctx, h.billingSvc, cmd.WorkspaceID, len(current), cmd.Members); err != nil {
 		return err
 	}
 	if err := checkPayerKept(ctx, h.billingSvc, cmd.WorkspaceID, cmd.Members); err != nil {

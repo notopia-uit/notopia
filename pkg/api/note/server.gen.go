@@ -3051,6 +3051,20 @@ func (response UpdateWorkspaceMembers402JSONResponse) VisitUpdateWorkspaceMember
 	return err
 }
 
+type UpdateWorkspaceMembers403JSONResponse struct{ ForbiddenErrorJSONResponse }
+
+func (response UpdateWorkspaceMembers403JSONResponse) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type UpdateWorkspaceMembers404JSONResponse struct{ NotFoundErrorJSONResponse }
 
 func (response UpdateWorkspaceMembers404JSONResponse) VisitUpdateWorkspaceMembersResponse(w http.ResponseWriter) error {

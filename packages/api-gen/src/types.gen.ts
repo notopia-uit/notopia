@@ -2106,6 +2106,10 @@ export type UpdateWorkspaceMembersErrors = {
    */
   402: NotePaymentRequiredError;
   /**
+   * Forbidden Error response
+   */
+  403: NoteError;
+  /**
    * Not Found Error response
    */
   404: NoteError;

@@ -37,14 +37,27 @@ func TestMembersLimit(t *testing.T) {
 	free := fakeBilling{ent: Entitlements{Plan: PlanTierFree, Limits: map[PlanLimit]PlanQuota{PlanLimitMembers: 3}}}
 	ws := uuid.New()
 
-	err := checkMembersLimit(context.Background(), free, ws, 3, 4)
+	members := func(ids ...string) []WorkspaceMemberUpdate {
+		out := make([]WorkspaceMemberUpdate, 0, len(ids))
+		for _, id := range ids {
+			out = append(out, WorkspaceMemberUpdate{ID: id, Role: WorkspaceRoleEditor})
+		}
+		return out
+	}
+
+	err := checkMembersLimit(context.Background(), free, ws, 3, members("1", "2", "3", "4"))
 	pr, ok := errors.AsType[*errs.PaymentRequired](err)
 	require.True(t, ok, "growing past limit")
 	assert.Equal(t, PlanTierPlus.String(), pr.RequiredPlan)
 	assert.EqualValues(t, 3, *pr.Max)
 
-	require.NoError(t, checkMembersLimit(context.Background(), free, ws, 5, 4), "shrinking an over-limit workspace")
-	require.NoError(t, checkMembersLimit(context.Background(), free, ws, 5, 5), "same count (role change)")
+	require.NoError(t, checkMembersLimit(context.Background(), free, ws, 5, members("1", "2", "3", "4")), "shrinking an over-limit workspace")
+	require.NoError(t, checkMembersLimit(context.Background(), free, ws, 5, members("1", "2", "3", "4", "5")), "same count (role change)")
+	require.NoError(
+		t,
+		checkMembersLimit(context.Background(), free, ws, 3, members("1", "2", "3", "3", "1")),
+		"duplicate ids count once",
+	)
 }
 
 func TestPayerGuard(t *testing.T) {
