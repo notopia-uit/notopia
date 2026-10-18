@@ -1,6 +1,10 @@
+import { hostname } from 'node:os';
+
 import { Database as HocuspocusDatabase } from '@hocuspocus/extension-database';
 import { Logger as HocuspocusLogger } from '@hocuspocus/extension-logger';
+import { Redis as HocuspocusRedis } from '@hocuspocus/extension-redis';
 import {
+  type Extension,
   onAuthenticatePayload,
   onChangePayload,
   Hocuspocus as ServerHocuspocus,
@@ -12,7 +16,14 @@ import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
 import { AuthenticationService } from '../authentication/authentication.service';
 import { AuthorizationService } from '../authorization/authorization.service';
 import { BillingService } from '../billing';
-import { HOCUSPOCUS_CONFIG, HocuspocusConfig } from '../config';
+import {
+  HOCUSPOCUS_CONFIG,
+  HocuspocusConfig,
+  REDIS_CONFIG,
+  RedisConfig,
+  SCALING_CONFIG,
+  ScalingConfig,
+} from '../config';
 import { DocumentService } from '../document/document.service';
 import { NoteService } from '../note/note.service';
 import { AutoCommitExtension } from './auto-commit.extension';
@@ -20,6 +31,8 @@ import { ContributorFlushExtension } from './contributor-flush.extension';
 import { ContributorTracker } from './contributor-tracker';
 import { applyStoredModified, readModified } from './document-metadata';
 import { HocuspocusContext } from './hocuspocus-context';
+
+const DEFAULT_REDIS_PORT = 6379;
 
 @Injectable()
 export class Hocuspocus {
@@ -41,8 +54,13 @@ export class Hocuspocus {
     if (!hocuspocusCfg) {
       throw new Error('HOCUSPOCUS_CONFIG not found');
     }
+    const scalingCfg = configService.get<ScalingConfig>(SCALING_CONFIG);
+    const redisCfg = configService.get<RedisConfig>(REDIS_CONFIG);
+    if (!scalingCfg || !redisCfg) {
+      throw new Error('SCALING_CONFIG or REDIS_CONFIG not found');
+    }
     this.hocuspocus = new ServerHocuspocus<HocuspocusContext>({
-      name: 'document', // TODO: Inject host
+      name: hostname(),
       debounce: hocuspocusCfg.debounceMs,
       maxDebounce: hocuspocusCfg.maxDebounceMs,
       onLoadDocument: async (data) => {
@@ -64,6 +82,7 @@ export class Hocuspocus {
       onChange: (...args) => this.onChange(...args),
       extensions: [
         new ContributorFlushExtension(contributors, documentService),
+        ...this.scalingExtensions(scalingCfg, redisCfg),
         new HocuspocusLogger({
           log: (message) => this.logger.log(message),
         }),
@@ -85,6 +104,30 @@ export class Hocuspocus {
         new AutoCommitExtension(documentService, noteService, billingService),
       ],
     });
+  }
+
+  // Hooks run by priority, not array order: the Redis extension (1000) runs after
+  // ContributorFlushExtension (1100) and before the Database extension (100).
+  private scalingExtensions(scalingCfg: ScalingConfig, redisCfg: RedisConfig): Extension[] {
+    if (!scalingCfg.enabled) return [];
+    const redisUrl = redisCfg.url;
+    if (!redisUrl) {
+      throw new Error('NOTOPIA_DOCUMENT_REDIS_URL is required when scaling is enabled');
+    }
+    // The extension bundles its own ioredis, so it gets connection options instead of a client.
+    const url = new URL(redisUrl);
+    return [
+      new HocuspocusRedis({
+        host: url.hostname,
+        port: url.port ? Number(url.port) : DEFAULT_REDIS_PORT,
+        options: {
+          username: url.username ? decodeURIComponent(url.username) : undefined,
+          password: url.password ? decodeURIComponent(url.password) : undefined,
+          db: url.pathname.length > 1 ? Number(url.pathname.slice(1)) : undefined,
+          tls: url.protocol === 'rediss:' ? {} : undefined,
+        },
+      }),
+    ];
   }
 
   markDeleted(id: string): void {

@@ -20,5 +20,12 @@ services:
       start_interval: 1s
     restart: unless-stopped
 
+  document_redis:
+    container_name: notopia-document_redis
+    image: redis:8.4.3-alpine3.22
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports:
+      - 6374:6379
+
 volumes:
   document_postgresql_data:

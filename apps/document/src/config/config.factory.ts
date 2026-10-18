@@ -5,6 +5,8 @@ import {
   appConfigSchema,
   AuthenticationConfig,
   authenticationConfigSchema,
+  CronConfig,
+  cronConfigSchema,
   DatabaseConfig,
   databaseConfigSchema,
   HocuspocusConfig,
@@ -13,8 +15,12 @@ import {
   identityConfigSchema,
   KafkaConfig,
   kafkaConfigSchema,
+  RedisConfig,
+  redisConfigSchema,
   S3Config,
   s3ConfigSchema,
+  ScalingConfig,
+  scalingConfigSchema,
   ServicesConfig,
   servicesConfigSchema,
 } from './config';
@@ -111,4 +117,39 @@ export const hocuspocusConfig = registerAs(HOCUSPOCUS_CONFIG, () =>
     debounceMs: Number(process.env.NOTOPIA_DOCUMENT_HOCUSPOCUS_DEBOUNCE_MS ?? 2000),
     maxDebounceMs: Number(process.env.NOTOPIA_DOCUMENT_HOCUSPOCUS_MAX_DEBOUNCE_MS ?? 10000),
   } satisfies HocuspocusConfig)
+);
+
+export const CRON_CONFIG = Symbol('CRON_CONFIG');
+
+export const cronConfig = registerAs(CRON_CONFIG, () =>
+  cronConfigSchema.parse({
+    sweeper: {
+      name: process.env.NOTOPIA_DOCUMENT_CRON_SWEEPER_NAME ?? 'document:sweeper',
+      schedule: process.env.NOTOPIA_DOCUMENT_CRON_SWEEPER_SCHEDULE ?? '*/10 * * * *',
+      enabled: process.env.NOTOPIA_DOCUMENT_CRON_SWEEPER_ENABLED !== 'false',
+      idleSeconds: Number(process.env.NOTOPIA_DOCUMENT_CRON_SWEEPER_IDLE_SECONDS ?? 600),
+    },
+    revisionPurge: {
+      name: process.env.NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_NAME ?? 'document:revision-purge',
+      schedule: process.env.NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_SCHEDULE ?? '30 3 * * *',
+      enabled: process.env.NOTOPIA_DOCUMENT_CRON_REVISION_PURGE_ENABLED !== 'false',
+    },
+  } satisfies CronConfig)
+);
+
+export const REDIS_CONFIG = Symbol('REDIS_CONFIG');
+
+export const getRedisConfig = () =>
+  redisConfigSchema.parse({
+    url: process.env.NOTOPIA_DOCUMENT_REDIS_URL || undefined,
+  } satisfies RedisConfig);
+
+export const redisConfig = registerAs(REDIS_CONFIG, getRedisConfig);
+
+export const SCALING_CONFIG = Symbol('SCALING_CONFIG');
+
+export const scalingConfig = registerAs(SCALING_CONFIG, () =>
+  scalingConfigSchema.parse({
+    enabled: process.env.NOTOPIA_DOCUMENT_SCALING_ENABLED === 'true',
+  } satisfies ScalingConfig)
 );

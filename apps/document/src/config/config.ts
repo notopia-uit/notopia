@@ -58,3 +58,26 @@ export const hocuspocusConfigSchema = z.object({
   maxDebounceMs: z.number().int().positive(),
 });
 export type HocuspocusConfig = z.infer<typeof hocuspocusConfigSchema>;
+
+export const cronJobConfigSchema = z.object({
+  name: z.string().min(1),
+  schedule: z.string().min(1),
+  enabled: z.boolean(),
+});
+export type CronJobConfig = z.infer<typeof cronJobConfigSchema>;
+
+export const cronConfigSchema = z.object({
+  sweeper: cronJobConfigSchema.extend({ idleSeconds: z.number().int().positive() }),
+  revisionPurge: cronJobConfigSchema,
+});
+export type CronConfig = z.infer<typeof cronConfigSchema>;
+
+export const redisConfigSchema = z.object({
+  url: z.string().url().optional(),
+});
+export type RedisConfig = z.infer<typeof redisConfigSchema>;
+
+export const scalingConfigSchema = z.object({
+  enabled: z.boolean(),
+});
+export type ScalingConfig = z.infer<typeof scalingConfigSchema>;

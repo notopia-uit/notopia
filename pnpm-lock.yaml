@@ -48,6 +48,9 @@ catalogs:
     '@hocuspocus/extension-logger':
       specifier: ^4.0.0
       version: 4.0.0
+    '@hocuspocus/extension-redis':
+      specifier: 4.0.0
+      version: 4.0.0
     '@hocuspocus/provider':
       specifier: ^4.0.0
       version: 4.0.0
@@ -72,6 +75,9 @@ catalogs:
     '@nestjs/platform-express':
       specifier: ^11.2.7
       version: 11.2.7
+    '@nestjs/schedule':
+      specifier: 12.0.2
+      version: 12.0.2
     '@nestjs/schematics':
       specifier: ^11.1.0
       version: 11.1.0
@@ -207,6 +213,9 @@ catalogs:
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
+    cron:
+      specifier: 4.4.0
+      version: 4.4.0
     d3:
       specifier: ^7.9.0
       version: 7.9.0
@@ -595,6 +604,9 @@ importers:
       '@hocuspocus/extension-logger':
         specifier: 'catalog:'
         version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
+      '@hocuspocus/extension-redis':
+        specifier: 'catalog:'
+        version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
       '@hocuspocus/server':
         specifier: 'catalog:'
         version: 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
@@ -607,12 +619,18 @@ importers:
       '@nestjs/core':
         specifier: ^11.2.7
         version: 11.2.7(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.2.7)(@nestjs/platform-express@11.2.7)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/locks':
+        specifier: 'catalog:'
+        version: 0.0.2(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.7)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/microservices':
         specifier: 'catalog:'
         version: 11.2.7(@grpc/grpc-js@1.14.4)(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.7)(@nestjs/websockets@11.1.20)(ioredis@5.11.1)(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: 'catalog:'
         version: 11.2.7(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.7)
+      '@nestjs/schedule':
+        specifier: 'catalog:'
+        version: 12.0.2(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.7)
       '@nestjs/typeorm':
         specifier: 'catalog:'
         version: 11.0.3(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.7)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.31(babel-plugin-macros@3.1.0)(ioredis@5.11.1)(pg@8.20.0)(ts-node@10.9.2(@swc/core@1.15.33(@swc/helpers@0.5.21))(@types/node@26.6.4)(typescript@7.0.2)))
@@ -652,9 +670,15 @@ importers:
       '@opentelemetry/semantic-conventions':
         specifier: 'catalog:'
         version: 1.40.0
+      cron:
+        specifier: 'catalog:'
+        version: 4.4.0
       express:
         specifier: 'catalog:'
         version: 5.2.1
+      ioredis:
+        specifier: 'catalog:'
+        version: 5.11.1
       jose:
         specifier: 'catalog:'
         version: 6.2.12
@@ -3086,6 +3110,12 @@ packages:
   '@hocuspocus/extension-logger@4.0.0':
     resolution: {integrity: sha512-9eWfWx5VE/Ef9rWfHWhUC26aMrGKwNcLy2D/Uxf5tIBdcW2ohQpeWlriz1uTCHahyOogu6uRFKaAddZnEZDlJA==}
 
+  '@hocuspocus/extension-redis@4.0.0':
+    resolution: {integrity: sha512-3IHjPKjxxspPn8fVg0Se1tas6sVJyVXJ1rV9VWHOkH10yvz19V/OYRbcysKyUclylHnZGrrKDOFxft2a7/Utdw==}
+    peerDependencies:
+      y-protocols: ^1.0.6
+      yjs: ^13.6.8
+
   '@hocuspocus/provider-react@4.0.0':
     resolution: {integrity: sha512-gmTKXloWA2+phfYzkfionh4RSILVnXOwM/z89BvPJBidJBhUyKTAvvNV3zfaq33wjxpcQ5XF+/137W1RxnadVA==}
     peerDependencies:
@@ -4129,6 +4159,13 @@ packages:
       '@nestjs/common': ^11.2.7
       '@nestjs/websockets': ^11.0.0
       rxjs: ^7.1.0
+
+  '@nestjs/schedule@12.0.2':
+    resolution: {integrity: sha512-5iAvJEtk0njbfTrG4JQr+SXw8ZrqgDM1wJH9nUs6tVLCX5pWGd1LJ0a8b089UT1FDeDWaThRRfSLixFz9zztcA==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      '@nestjs/common': ^11.2.7
+      '@nestjs/core': ^11.2.7
 
   '@nestjs/schematics@11.1.0':
     resolution: {integrity: sha512-lVxGZ46tcdItFMoXr6vyKWlnOsm1SZm/GUqAEDvy2RL4Q4O+3bkziAhrO7Y8JLssFUUvNFEGqAizI52WAxhjDw==}
@@ -7427,6 +7464,12 @@ packages:
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
 
+  '@sesamecare-oss/redlock@1.4.0':
+    resolution: {integrity: sha512-2z589R+yxKLN4CgKxP1oN4dsg6Y548SE4bVYam/R0kHk7Q9VrQ9l66q+k1ehhSLLY4or9hcchuF9/MhuuZdjJg==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      ioredis: '>=5'
+
   '@shadcn/react@0.3.1':
     resolution: {integrity: sha512-2gOR0HDMtWeRsCZfNDaU0YDFdgH3zsDQ6lz67Fv/y/qjY9y+R8kJqAn6q56phqv7/zHi0wqURjntrNO9zL7vnQ==}
     peerDependencies:
@@ -8598,6 +8641,9 @@ packages:
 
   '@types/linkify-it@5.0.0':
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}
+
+  '@types/luxon@3.7.6':
+    resolution: {integrity: sha512-6KSjliQAXK8ZLgFQO4B7iE4Rpf/B3rItzCFuXezBY/XIAGxOdLd7vRNK9/StRPwiS/yJsVbB7HKpW46B8tcEuQ==}
 
   '@types/markdown-it@14.1.2':
     resolution: {integrity: sha512-promo4eFwuiW+TfGxhi+0x3czqTYJkG8qB17ZUJiVF10Xm7NLVRSLUsfRTU/6h1e24VvRnXCx+hG7li58lkzog==}
@@ -10697,6 +10743,10 @@ packages:
     engines: {node: '>=12.0.0'}
     deprecated: v4 is no longer maintained, upgrade to v5
 
+  cron@4.4.0:
+    resolution: {integrity: sha512-fkdfq+b+AHI4cKdhZlppHveI/mgz2qpiYxcm+t5E5TsxX7QrLS1VE0+7GENEk9z0EeGPcpSciGv6ez24duWhwQ==}
+    engines: {node: '>=18.x'}
+
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
@@ -12454,6 +12504,10 @@ packages:
     resolution: {integrity: sha512-ehuGcf94bQXhfagULNXrJdfnWO38v070jxSx/qE87Kjzmu2fU7ro5EFAb+OPituLqgfyuQaym5DlrNydW2sJ9A==}
     engines: {node: '>=12.22.0'}
 
+  ioredis@5.6.1:
+    resolution: {integrity: sha512-UxC0Yv1Y4WRJiGQxQkP0hfdL0/5/6YvdfOOClRgJ0qppSarkhneSa6UvkMkms0AkdGimSH3Ikqm+6mkMmX7vGA==}
+    engines: {node: '>=12.22.0'}
+
   ioredis@6.0.0:
     resolution: {integrity: sha512-f+Dtubxfpf6KYFq7WVXJoOLn0bk4TJrMrN9SzeE+jrWrCWj7XX3fA6vkryafhADX+GMymRxgDJDOI33COkJc0w==}
     engines: {node: '>=20.0.0'}
@@ -13423,11 +13477,17 @@ packages:
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
 
+  lodash.defaults@4.2.0:
+    resolution: {integrity: sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==}
+
   lodash.escape@4.0.1:
     resolution: {integrity: sha512-nXEOnb/jK9g0DYMr1/Xvq6l5xMD7GDG55+GSYIYmS0G4tBk/hURD4JR9WCavs04t33WmJx9kCyp9vJ+mr4BOUw==}
 
   lodash.includes@4.3.0:
     resolution: {integrity: sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w==}
+
+  lodash.isarguments@3.1.0:
+    resolution: {integrity: sha512-chi4NHZlZqZD18a0imDHnZPrDeBbTtVN7GXMwuGdRH9qotxAjYs3aVLKc7zNOG9eddR5Ksd8rvFEBc9SsggPpg==}
 
   lodash.isboolean@3.0.3:
     resolution: {integrity: sha512-Bz5mupy2SVbPHURB98VAcw+aHh4vRV5IPNhILUCsOzRmsTmSQ17jIuqopAentWoehktxGd9e/hbIXq980/1QJg==}
@@ -20178,6 +20238,19 @@ snapshots:
       - y-protocols
       - yjs
 
+  '@hocuspocus/extension-redis@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)':
+    dependencies:
+      '@hocuspocus/common': 4.0.0
+      '@hocuspocus/server': 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
+      '@sesamecare-oss/redlock': 1.4.0(ioredis@5.6.1)
+      ioredis: 5.6.1
+      kleur: 4.1.5
+      y-protocols: 1.0.7(yjs@13.6.30)
+      yjs: 13.6.30
+    transitivePeerDependencies:
+      - srvx
+      - supports-color
+
   '@hocuspocus/provider-react@4.0.0(@hocuspocus/provider@4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30))(react@19.2.8)(yjs@13.6.30)':
     dependencies:
       '@hocuspocus/provider': 4.0.0(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30)
@@ -21524,6 +21597,12 @@ snapshots:
       - supports-color
       - utf-8-validate
     optional: true
+
+  '@nestjs/schedule@12.0.2(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.7)':
+    dependencies:
+      '@nestjs/common': 11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.2.7(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/microservices@11.2.7)(@nestjs/platform-express@11.2.7)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      cron: 4.4.0
 
   '@nestjs/schematics@11.1.0(@typescript/typescript6@6.0.2)':
     dependencies:
@@ -25541,6 +25620,10 @@ snapshots:
 
   '@sec-ant/readable-stream@0.4.1': {}
 
+  '@sesamecare-oss/redlock@1.4.0(ioredis@5.6.1)':
+    dependencies:
+      ioredis: 5.6.1
+
   '@shadcn/react@0.3.1(@types/react@19.2.18)(react@19.2.8)':
     optionalDependencies:
       '@types/react': 19.2.18
@@ -27029,6 +27112,8 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/linkify-it@5.0.0': {}
+
+  '@types/luxon@3.7.6': {}
 
   '@types/markdown-it@14.1.2':
     dependencies:
@@ -29365,6 +29450,11 @@ snapshots:
       luxon: 3.7.2
     optional: true
 
+  cron@4.4.0:
+    dependencies:
+      '@types/luxon': 3.7.6
+      luxon: 3.7.2
+
   cross-spawn@7.0.6:
     dependencies:
       path-key: 3.1.1
@@ -31561,6 +31651,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  ioredis@5.6.1:
+    dependencies:
+      '@ioredis/commands': 1.10.0
+      cluster-key-slot: 1.1.1
+      debug: 4.4.3(supports-color@7.2.0)
+      denque: 2.1.0
+      lodash.defaults: 4.2.0
+      lodash.isarguments: 3.1.0
+      redis-errors: 1.2.0
+      redis-parser: 3.0.0
+      standard-as-callback: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+
   ioredis@6.0.0:
     dependencies:
       '@ioredis/commands': 2.0.0
@@ -32635,10 +32739,14 @@ snapshots:
 
   lodash.debounce@4.0.8: {}
 
+  lodash.defaults@4.2.0: {}
+
   lodash.escape@4.0.1: {}
 
   lodash.includes@4.3.0:
     optional: true
+
+  lodash.isarguments@3.1.0: {}
 
   lodash.isboolean@3.0.3:
     optional: true
@@ -32760,8 +32868,7 @@ snapshots:
 
   lunr@2.3.9: {}
 
-  luxon@3.7.2:
-    optional: true
+  luxon@3.7.2: {}
 
   magic-string@0.25.9:
     dependencies:

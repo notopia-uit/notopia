@@ -62,8 +62,14 @@ Commit is currently **manual only** (`POST /document/documents/{id}/commit`).
 `@notopia-uit/lib-server/locks` provides `LocksSetupModule.forRoot({ redisUrl?, ttl? })`.
 With no `redisUrl` it uses an in-memory store (single instance only, a warning is logged, intended even in production, see `packages/lib-server/AGENTS.md`); with one it uses `RedisLockStore`. The lock
 Redis must run with `noeviction` and persistence, and the app must call
-`app.enableShutdownHooks()`. Crons use `@Cron(expr, { name })` with no `timeZone`, so they
-run in the process TZ.
+`app.enableShutdownHooks()`. `redis.url` (`NOTOPIA_DOCUMENT_REDIS_URL`) picks the lock store;
+`scaling.enabled` (`NOTOPIA_DOCUMENT_SCALING_ENABLED`, requires the URL) only adds
+`@hocuspocus/extension-redis`.
+
+Crons (`src/cron/`) are not `@Cron` decorators (those cannot read config): `CronRegistrar`
+adds them to `SchedulerRegistry` in `onModuleInit` from `NOTOPIA_DOCUMENT_CRON_*` (name = lock
+key, schedule, enabled), with no `timeZone`, so they run in the process TZ. Each tick runs in
+`Locks.withLock(name, …)`; `LockNotAcquiredError` means another instance has it.
 
 ## Conventions
 

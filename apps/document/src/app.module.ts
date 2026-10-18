@@ -2,7 +2,9 @@ import { HttpException, Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ClientKafka } from '@nestjs/microservices';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ApiModule } from '@notopia-uit/api-document-nestjs-server';
+import { LocksSetupModule } from '@notopia-uit/lib-server/locks';
 import { OpenTelemetryModule } from 'nestjs-otel';
 import { Logger, LoggerModule } from 'nestjs-pino';
 import pretty from 'pino-pretty';
@@ -18,18 +20,27 @@ import {
   appConfig,
   AUTHENTICATION_CONFIG,
   authenticationConfig,
+  CRON_CONFIG,
+  cronConfig,
   DATABASE_CONFIG,
   databaseConfig,
+  getRedisConfig,
   hocuspocusConfig,
   identityConfig,
   KAFKA_CONFIG,
   kafkaConfig,
+  REDIS_CONFIG,
+  RedisConfig,
+  redisConfig,
   S3_CONFIG,
   s3Config,
+  SCALING_CONFIG,
+  scalingConfig,
   SERVICE_CONFIG,
   servicesConfig,
   validate,
 } from './config';
+import { CronModule } from './cron';
 import { DatabaseModule } from './database';
 import { DocumentApi, DocumentModule } from './document';
 import { HocuspocusModule } from './hocuspocus';
@@ -52,8 +63,13 @@ import { StorageModule } from './storage';
         authenticationConfig,
         identityConfig,
         hocuspocusConfig,
+        cronConfig,
+        redisConfig,
+        scalingConfig,
       ],
     }),
+    ScheduleModule.forRoot(),
+    LocksSetupModule.forRoot({ redisUrl: getRedisConfig().url }),
     OpenTelemetryModule.forRoot({
       metrics: {
         hostMetrics: true,
@@ -112,6 +128,7 @@ import { StorageModule } from './storage';
     HocuspocusModule,
     DocumentModule,
     RevisionModule,
+    CronModule,
     Object.assign(
       ApiModule.forRoot({
         apiImplementations: {
@@ -159,6 +176,9 @@ export class AppModule implements OnModuleInit {
         },
         kafka: this.configService.get(KAFKA_CONFIG),
         authentication: this.configService.get(AUTHENTICATION_CONFIG),
+        cron: this.configService.get(CRON_CONFIG),
+        redis: { configured: Boolean(this.configService.get<RedisConfig>(REDIS_CONFIG)?.url) },
+        scaling: this.configService.get(SCALING_CONFIG),
       },
       'Application configuration loaded'
     );
