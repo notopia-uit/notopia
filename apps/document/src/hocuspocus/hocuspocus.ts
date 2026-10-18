@@ -6,12 +6,16 @@ import {
   Hocuspocus as ServerHocuspocus,
 } from '@hocuspocus/server';
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
 
 import { AuthenticationService } from '../authentication/authentication.service';
 import { AuthorizationService } from '../authorization/authorization.service';
+import { BillingService } from '../billing';
+import { HOCUSPOCUS_CONFIG, HocuspocusConfig } from '../config';
 import { DocumentService } from '../document/document.service';
 import { NoteService } from '../note/note.service';
+import { AutoCommitExtension } from './auto-commit.extension';
 import { ContributorFlushExtension } from './contributor-flush.extension';
 import { ContributorTracker } from './contributor-tracker';
 import { applyStoredModified, readModified } from './document-metadata';
@@ -29,10 +33,18 @@ export class Hocuspocus {
     private readonly noteService: NoteService,
     private readonly authorizationService: AuthorizationService,
     private readonly authenticationService: AuthenticationService,
-    private readonly contributors: ContributorTracker
+    private readonly contributors: ContributorTracker,
+    billingService: BillingService,
+    configService: ConfigService
   ) {
+    const hocuspocusCfg = configService.get<HocuspocusConfig>(HOCUSPOCUS_CONFIG);
+    if (!hocuspocusCfg) {
+      throw new Error('HOCUSPOCUS_CONFIG not found');
+    }
     this.hocuspocus = new ServerHocuspocus<HocuspocusContext>({
       name: 'document', // TODO: Inject host
+      debounce: hocuspocusCfg.debounceMs,
+      maxDebounce: hocuspocusCfg.maxDebounceMs,
       onLoadDocument: async (data) => {
         this.logger.debug(
           { documentId: data.documentName, documentMetadata: data.document.getMap('metadata') },
@@ -70,6 +82,7 @@ export class Hocuspocus {
             );
           },
         }),
+        new AutoCommitExtension(documentService, noteService, billingService),
       ],
     });
   }

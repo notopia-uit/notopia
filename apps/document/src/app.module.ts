@@ -20,6 +20,7 @@ import {
   authenticationConfig,
   DATABASE_CONFIG,
   databaseConfig,
+  hocuspocusConfig,
   identityConfig,
   KAFKA_CONFIG,
   kafkaConfig,
@@ -50,6 +51,7 @@ import { StorageModule } from './storage';
         kafkaConfig,
         authenticationConfig,
         identityConfig,
+        hocuspocusConfig,
       ],
     }),
     OpenTelemetryModule.forRoot({

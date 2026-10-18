@@ -7,6 +7,8 @@ import {
   authenticationConfigSchema,
   DatabaseConfig,
   databaseConfigSchema,
+  HocuspocusConfig,
+  hocuspocusConfigSchema,
   IdentityConfig,
   identityConfigSchema,
   KafkaConfig,
@@ -100,4 +102,13 @@ export const identityConfig = registerAs(IDENTITY_CONFIG, () =>
     adminGroup: process.env.NOTOPIA_DOCUMENT_IDENTITY_ADMIN_GROUP ?? 'notopia-admins',
     serviceAccountUserId: process.env.NOTOPIA_DOCUMENT_IDENTITY_SERVICE_ACCOUNT_USER_ID!,
   } satisfies IdentityConfig)
+);
+
+export const HOCUSPOCUS_CONFIG = Symbol('HOCUSPOCUS_CONFIG');
+
+export const hocuspocusConfig = registerAs(HOCUSPOCUS_CONFIG, () =>
+  hocuspocusConfigSchema.parse({
+    debounceMs: Number(process.env.NOTOPIA_DOCUMENT_HOCUSPOCUS_DEBOUNCE_MS ?? 2000),
+    maxDebounceMs: Number(process.env.NOTOPIA_DOCUMENT_HOCUSPOCUS_MAX_DEBOUNCE_MS ?? 10000),
+  } satisfies HocuspocusConfig)
 );

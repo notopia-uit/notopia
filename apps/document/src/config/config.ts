@@ -52,3 +52,9 @@ export const identityConfigSchema = z.object({
   serviceAccountUserId: z.string().min(1),
 });
 export type IdentityConfig = z.infer<typeof identityConfigSchema>;
+
+export const hocuspocusConfigSchema = z.object({
+  debounceMs: z.number().int().positive(),
+  maxDebounceMs: z.number().int().positive(),
+});
+export type HocuspocusConfig = z.infer<typeof hocuspocusConfigSchema>;
