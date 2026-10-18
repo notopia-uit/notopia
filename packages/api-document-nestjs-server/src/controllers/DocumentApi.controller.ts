@@ -2,14 +2,14 @@ import { Body, Controller, DefaultValuePipe, Get, Post, Param, ParseIntPipe, Par
 import { Observable } from 'rxjs';
 import { Cookies, Headers } from '../decorators';
 import { DocumentApi } from '../api';
-import { CommitDocument201Response, GetDocumentAttachmentUploadUrl200Response,  } from '../models';
+import { CommittedRevision, GetDocumentAttachmentUploadUrl200Response,  } from '../models';
 
 @Controller()
 export class DocumentApiController {
   constructor(private readonly documentApi: DocumentApi) {}
 
   @Post('/document/documents/:documentId/commit')
-  commitDocument(@Param('documentId') documentId: string, @Req() request: Request): CommitDocument201Response | Promise<CommitDocument201Response> | Observable<CommitDocument201Response> {
+  commitDocument(@Param('documentId') documentId: string, @Req() request: Request): CommittedRevision | Promise<CommittedRevision> | Observable<CommittedRevision> {
     return this.documentApi.commitDocument(documentId, request);
   }
 

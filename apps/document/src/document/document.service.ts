@@ -8,6 +8,7 @@ import { Traceable } from 'nestjs-otel';
 import { lastValueFrom } from 'rxjs';
 import { DataSource, Repository } from 'typeorm';
 import { v7 as uuidv7 } from 'uuid';
+import * as Y from 'yjs';
 
 import { IDENTITY_CONFIG, IdentityConfig } from '#/config';
 
@@ -25,6 +26,11 @@ import { DocumentEntity } from './document.entity';
 export type CommitResult = {
   revisionId: string | null;
   modifiedCleared: boolean;
+  /**
+   * State vector of the stored data this commit read; set whenever `modifiedCleared`.
+   * Callers pass it to `clearModifiedIfCommitted` so unstored newer edits keep `modified`.
+   */
+  committedStateVector: Uint8Array | null;
 };
 
 @Injectable()
@@ -82,8 +88,9 @@ export class DocumentService {
         })
       ) {
         this.logger.debug({ documentId, trigger }, 'commitIfDue: not due');
-        return { revisionId: null, modifiedCleared: false };
+        return { revisionId: null, modifiedCleared: false, committedStateVector: null };
       }
+      const committedStateVector = Y.encodeStateVectorFromUpdate(new Uint8Array(document.data));
       const blocknoteEditorService = new BlocknoteEditorService({
         schema: this.blocknoteSchema,
         initialContent: document.data,
@@ -101,7 +108,7 @@ export class DocumentService {
           { documentId, trigger, revisionId: latest.id },
           'commitIfDue: content unchanged, cleared modified'
         );
-        return { revisionId: null, modifiedCleared: true };
+        return { revisionId: null, modifiedCleared: true, committedStateVector };
       }
       const contributorIds = document.pendingContributorIds;
       const author = selectAuthor({
@@ -138,7 +145,7 @@ export class DocumentService {
         } satisfies DocumentCommittedEvent)
       );
       this.logger.log({ documentId, revisionId, trigger }, 'commitIfDue: done');
-      return { revisionId, modifiedCleared: true };
+      return { revisionId, modifiedCleared: true, committedStateVector };
     });
   }
 

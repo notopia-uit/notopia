@@ -119,6 +119,10 @@ export const zDocumentError = z.object({
 
 export const zDocumentId2 = z.uuid().readonly();
 
+export const zDocumentCommittedRevision = z.object({
+  id: zDocumentId2
+});
+
 export const zDocumentRevisionTrigger = z.enum([
   'manual',
   'auto',
@@ -561,6 +565,8 @@ export const zShareWorkspaceMemberRemovedEventWritable = z.object({
  */
 export const zShareDocumentContentWritable = z.array(z.unknown());
 
+export const zDocumentCommittedRevisionWritable = z.record(z.string(), z.unknown());
+
 export const zDocumentRevisionWritable = z.object({
   name: z.string().min(1).max(255).nullable(),
   trigger: zDocumentRevisionTrigger
@@ -732,12 +738,10 @@ export const zCommitDocumentPath = z.object({
   documentId: zDocumentId
 });
 
-/**
- * Document revision committed successfully
- */
-export const zCommitDocumentResponse = z.object({
-  id: zDocumentId2
-});
+export const zCommitDocumentResponse = z.union([
+  zDocumentCommittedRevision,
+  z.void()
+]);
 
 export const zGetRevisionsQuery = z.object({
   documentId: zDocumentId,

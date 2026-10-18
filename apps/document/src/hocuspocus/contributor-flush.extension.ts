@@ -1,4 +1,8 @@
-import type { Extension, onStoreDocumentPayload } from '@hocuspocus/server';
+import type {
+  afterStoreDocumentPayload,
+  Extension,
+  onStoreDocumentPayload,
+} from '@hocuspocus/server';
 import { Logger } from '@nestjs/common';
 
 import { DocumentService } from '../document/document.service';
@@ -18,6 +22,17 @@ export class ContributorFlushExtension implements Extension {
   ) {}
 
   async onStoreDocument({ documentName }: onStoreDocumentPayload): Promise<void> {
+    await this.flush(documentName);
+  }
+
+  // A brand-new document has no row during its first onStoreDocument (the Database extension
+  // creates it later in the same store), so that flush finds nothing to update. Retry once the
+  // store is done; otherwise a document unloaded after a single store would lose its editors.
+  async afterStoreDocument({ documentName }: afterStoreDocumentPayload): Promise<void> {
+    await this.flush(documentName);
+  }
+
+  private async flush(documentName: string): Promise<void> {
     const contributors = this.tracker.peek(documentName);
     if (contributors.length === 0) return;
     try {

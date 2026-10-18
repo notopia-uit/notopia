@@ -1,6 +1,5 @@
 import { Connection } from '@hocuspocus/server';
 import { Injectable } from '@nestjs/common';
-import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
 import { Traceable } from 'nestjs-otel';
 
 import { AuthorizationService } from '../authorization/authorization.service';
@@ -8,6 +7,7 @@ import { DocumentService } from '../document/document.service';
 import { WorkspaceModel } from '../note/models';
 import { NoteService } from '../note/note.service';
 import { WorkspaceNoteNotFoundException } from '../note/workspace-note-not-found.exception';
+import { clearModifiedIfCommitted } from './document-metadata';
 import { Hocuspocus } from './hocuspocus';
 import { HocuspocusContext } from './hocuspocus-context';
 
@@ -107,12 +107,16 @@ export class HocuspocusService {
     }
   }
 
-  setModified(documentId: string, modified: boolean): void {
+  /**
+   * After a commit, clears the loaded doc's `modified` flag unless it holds edits newer than
+   * the committed data (see `clearModifiedIfCommitted`). A document not loaded here has nothing
+   * to clear.
+   */
+  clearModifiedIfCommitted(documentId: string, committedStateVector: Uint8Array): boolean {
     const document = this.hocuspocus.hocuspocus.documents.get(documentId);
     if (!document) {
-      return;
+      return false;
     }
-    const metadata = document.getMap('metadata') as YDocMetadataMap;
-    metadata.set('metadata', { modified });
+    return clearModifiedIfCommitted(document, committedStateVector);
   }
 }

@@ -136,6 +136,10 @@ export type DocumentError = {
 
 export type DocumentId2 = string;
 
+export type DocumentCommittedRevision = {
+  id: DocumentId2;
+};
+
 export const DocumentRevisionTrigger = {
   MANUAL: 'manual',
   AUTO: 'auto',
@@ -669,6 +673,10 @@ export type ShareWorkspaceMemberRemovedEventWritable = {
  */
 export type ShareDocumentContentWritable = Array<unknown>;
 
+export type DocumentCommittedRevisionWritable = {
+  [key: string]: unknown;
+};
+
 export type DocumentRevisionWritable = {
   name: string | null;
   trigger: DocumentRevisionTrigger;
@@ -899,6 +907,10 @@ export type CommitDocumentErrors = {
     [key: string]: unknown;
   };
   /**
+   * Forbidden Error response
+   */
+  403: DocumentError;
+  /**
    * Not Found Error response
    */
   404: DocumentError;
@@ -912,11 +924,17 @@ export type CommitDocumentError = CommitDocumentErrors[keyof CommitDocumentError
 
 export type CommitDocumentResponses = {
   /**
+   * Nothing changed since the last revision; returns the latest revision
+   */
+  200: DocumentCommittedRevision;
+  /**
    * Document revision committed successfully
    */
-  201: {
-    id: DocumentId2;
-  };
+  201: DocumentCommittedRevision;
+  /**
+   * Nothing changed and the document has no revision yet
+   */
+  204: void;
 };
 
 export type CommitDocumentResponse = CommitDocumentResponses[keyof CommitDocumentResponses];

@@ -12,21 +12,26 @@ post:
   parameters:
     - $ref: ../components/parameters/documentIdPath.yaml
   responses:
+    200:
+      description: Nothing changed since the last revision; returns the latest revision
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/CommittedRevision.yaml
     201:
       description: Document revision committed successfully
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              id:
-                $ref: ../components/schemas/Revision.yaml#/properties/id
-            required:
-              - id
+            $ref: ../components/schemas/CommittedRevision.yaml
+    204:
+      description: Nothing changed and the document has no revision yet
     400:
       $ref: ../../common/components/responses/BadRequestError.yaml
     401:
       $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
     404:
       $ref: ../../common/components/responses/NotFoundError.yaml
     500:
