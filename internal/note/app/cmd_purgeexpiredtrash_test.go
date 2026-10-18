@@ -22,6 +22,6 @@ func TestExpiredTrashCutoffs(t *testing.T) {
 	got := expiredTrashCutoffs(context.Background(), now, []uuid.UUID{zero, week, unlimited, missing}, ents)
 
 	require.Len(t, got, 2)
-	assert.Equal(t, workspaceCutoff{workspaceID: zero, cutoff: now}, got[0])
+	assert.Equal(t, workspaceCutoff{workspaceID: zero, cutoff: now.Add(-24 * time.Hour)}, got[0])
 	assert.Equal(t, workspaceCutoff{workspaceID: week, cutoff: now.Add(-7 * 24 * time.Hour)}, got[1])
 }

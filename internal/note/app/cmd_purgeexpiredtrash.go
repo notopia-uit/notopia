@@ -67,9 +67,12 @@ func expiredTrashCutoffs(
 		if days.IsUnlimited() {
 			continue
 		}
+		// Items stay at least purgeMinTrashAge: with retention 0 the cutoff would otherwise be now,
+		// purging fresh items depending on whether unrelated old items put the workspace in the batch.
+		retention := max(time.Duration(days)*24*time.Hour, purgeMinTrashAge)
 		cutoffs = append(cutoffs, workspaceCutoff{
 			workspaceID: workspaceID,
-			cutoff:      now.Add(-time.Duration(days) * 24 * time.Hour),
+			cutoff:      now.Add(-retention),
 		})
 	}
 	return cutoffs
