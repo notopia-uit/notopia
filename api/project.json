@@ -35,6 +35,10 @@
     "bundle": {
       "dependsOn": ["join"]
     },
+    "build": {
+      "executor": "nx:noop",
+      "dependsOn": ["join"]
+    },
     "watch-bundle:json": {
       "dependsOn": ["^watch-bundle:json"]
     },
