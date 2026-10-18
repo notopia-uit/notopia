@@ -12,7 +12,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/authorization/app"
 	"github.com/notopia-uit/notopia/internal/authorization/infra"
 	"github.com/notopia-uit/notopia/internal/authorizationseed"
-	"github.com/notopia-uit/notopia/internal/authorizationseed/config"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -20,15 +19,15 @@ import (
 // Injectors from wire.go:
 
 func InitializeSeeder(ctx context.Context) (*authorizationseed.Seeder, func(), error) {
-	validate := config.NewValidate()
-	viper := config.NewViper()
-	configConfig, err := config.New(validate, viper)
+	validate := authorizationseed.NewValidate()
+	viper := authorizationseed.NewViper()
+	config, err := authorizationseed.NewConfig(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
-	sql := &configConfig.Database
-	log := &configConfig.Log
-	general := &configConfig.General
+	sql := &config.Database
+	log := &config.Log
+	general := &config.General
 	stdoutHandler := logging.NewStdoutHandler(log, general)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue

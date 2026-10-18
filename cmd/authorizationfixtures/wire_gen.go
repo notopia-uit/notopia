@@ -12,7 +12,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/authorization/app"
 	"github.com/notopia-uit/notopia/internal/authorization/infra"
 	"github.com/notopia-uit/notopia/internal/authorizationfixtures"
-	"github.com/notopia-uit/notopia/internal/authorizationfixtures/config"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -20,15 +19,15 @@ import (
 // Injectors from wire.go:
 
 func InitializeFixtures(ctx context.Context) (*authorizationfixtures.Fixtures, func(), error) {
-	validate := config.NewValidate()
-	viper := config.NewViper()
-	configConfig, err := config.New(validate, viper)
+	validate := authorizationfixtures.NewValidate()
+	viper := authorizationfixtures.NewViper()
+	config, err := authorizationfixtures.NewConfig(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
-	sql := &configConfig.Database
-	log := &configConfig.Log
-	general := &configConfig.General
+	sql := &config.Database
+	log := &config.Log
+	general := &config.General
 	stdoutHandler := logging.NewStdoutHandler(log, general)
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue

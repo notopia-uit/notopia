@@ -12,7 +12,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgrepo"
 	"github.com/notopia-uit/notopia/internal/billingfixtures"
-	"github.com/notopia-uit/notopia/internal/billingfixtures/config"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -20,13 +19,13 @@ import (
 // Injectors from wire.go:
 
 func InitializeFixtures(ctx context.Context) (*billingfixtures.Fixtures, func(), error) {
-	validate := config.NewValidate()
-	viper := config.NewViper()
-	configConfig, err := config.New(validate, viper)
+	validate := billingfixtures.NewValidate()
+	viper := billingfixtures.NewViper()
+	config, err := billingfixtures.NewConfig(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
-	sql := &configConfig.Database
+	sql := &config.Database
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
@@ -59,8 +58,8 @@ func InitializeFixtures(ctx context.Context) (*billingfixtures.Fixtures, func(),
 	}
 	queries := persistence.NewSQLCQueries(pool)
 	unitOfWork := pgrepo.NewUnitOfWork(pool, queries)
-	log := &configConfig.Log
-	general := &configConfig.General
+	log := &config.Log
+	general := &config.General
 	stdoutHandler := logging.NewStdoutHandler(log, general)
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.NewSlog(stdoutHandler, slogHandler, log)

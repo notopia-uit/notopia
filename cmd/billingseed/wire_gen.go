@@ -15,7 +15,6 @@ import (
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgreadmodel"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence/pgrepo"
 	"github.com/notopia-uit/notopia/internal/billingseed"
-	"github.com/notopia-uit/notopia/internal/billingseed/config"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -23,13 +22,13 @@ import (
 // Injectors from wire.go:
 
 func InitializeSeeder(ctx context.Context) (*billingseed.Seeder, func(), error) {
-	validate := config.NewValidate()
-	viper := config.NewViper()
-	configConfig, err := config.New(validate, viper)
+	validate := billingseed.NewValidate()
+	viper := billingseed.NewViper()
+	config, err := billingseed.NewConfig(validate, viper)
 	if err != nil {
 		return nil, nil, err
 	}
-	sql := &configConfig.Database
+	sql := &config.Database
 	serviceName := _wireServiceNameValue
 	serviceVersion := _wireServiceVersionValue
 	resource, err := otel.NewResource(ctx, serviceName, serviceVersion)
@@ -61,8 +60,8 @@ func InitializeSeeder(ctx context.Context) (*billingseed.Seeder, func(), error) 
 		return nil, nil, err
 	}
 	db := persistence.NewPgxPoolStdlib(pool)
-	log := &configConfig.Log
-	general := &configConfig.General
+	log := &config.Log
+	general := &config.General
 	stdoutHandler := logging.NewStdoutHandler(log, general)
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
@@ -87,12 +86,12 @@ func InitializeSeeder(ctx context.Context) (*billingseed.Seeder, func(), error) 
 	ensureDefaultsHandler := app.NewEnsureDefaultsHandler(unitOfWork)
 	billingReadModel := pgreadmodel.NewBillingReadModel(queries)
 	listPricesHandler := app.NewListPricesHandler(billingReadModel)
-	configStripe := &configConfig.Stripe
-	stripe2 := billingseed.NewBillingStripeConfig(configStripe)
-	catalog := &configConfig.Catalog
+	billingseedStripe := &config.Stripe
+	configStripe := billingseed.NewBillingStripeConfig(billingseedStripe)
+	catalog := &config.Catalog
 	billing := billingseed.NewBillingConfig(catalog)
-	stripeProvider := stripe.New(stripe2, billing)
-	identity := &configConfig.Identity
+	stripeProvider := stripe.New(configStripe, billing)
+	identity := &config.Identity
 	settings := billingseed.NewAppSettings(catalog, identity)
 	createPriceHandler := app.NewCreatePriceHandler(unitOfWork, stripeProvider, settings)
 	ensurePortalConfigurationHandler := app.NewEnsurePortalConfigurationHandler(unitOfWork, stripeProvider, settings)

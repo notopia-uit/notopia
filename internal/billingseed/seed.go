@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/app"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
-	"github.com/notopia-uit/notopia/internal/billingseed/config"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
@@ -31,7 +30,7 @@ type Seeder struct {
 	listPrices     *app.ListPricesHandler
 	createPrice    *app.CreatePriceHandler
 	ensurePortal   *app.EnsurePortalConfigurationHandler
-	catalog        *config.Catalog
+	catalog        *Catalog
 	identity       *commonconfig.Identity
 	logger         *slog.Logger
 }
@@ -42,7 +41,7 @@ func NewSeeder(
 	listPrices *app.ListPricesHandler,
 	createPrice *app.CreatePriceHandler,
 	ensurePortal *app.EnsurePortalConfigurationHandler,
-	catalog *config.Catalog,
+	catalog *Catalog,
 	identity *commonconfig.Identity,
 	logger *slog.Logger,
 ) *Seeder {
