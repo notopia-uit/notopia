@@ -139,21 +139,19 @@ catalog:
 overrides:
   "@nestjs/common": "catalog:"
   "@nestjs/core": "catalog:"
-onlyBuiltDependencies:
-  - "@bufbuild/buf"
-  - "@nestjs/core"
-  - "@openapitools/openapi-generator-cli"
-  - "@parcel/watcher"
-  - "@scarf/scarf"
-  - "@suites/di.nestjs"
-  - "@suites/doubles.vitest"
-  - "@swc/core"
-  - "core-js"
-  - "esbuild"
-  - "less"
-  - "msw"
-  - "nx"
-  - "protobufjs"
-  - "sharp"
-  - "unrs-resolver"
-  - "vue-demi"
+allowBuilds:
+  '@openapitools/openapi-generator-cli': true
+  '@parcel/watcher': true
+  '@scarf/scarf': true
+  '@suites/di.nestjs': true
+  '@suites/doubles.vitest': true
+  '@swc/core': true
+  core-js: true
+  esbuild: true
+  less: true
+  msw: true
+  nx: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+  vue-demi: true
