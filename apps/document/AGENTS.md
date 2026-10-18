@@ -22,7 +22,7 @@ gets a raw JWT in the connect payload and validates it itself in
 
 ## The commit pipeline
 
-`DocumentService.commitDocument()` is the hinge of the whole system. In one transaction
+`DocumentService.commitIfDue()` is the hinge of the whole system. In one transaction
 (pessimistic write lock on the document) it: saves a `RevisionEntity` of the current
 blocks, clears `modified`, and emits
 `events.integration.document.document.committed`.
@@ -41,8 +41,11 @@ Commit is currently **manual only** (`POST /document/documents/{id}/commit`).
   extension's default cadence.
 - `afterLoadDocument` applies the DB `modified` column into the `metadata` Y.Map
   (`YDocMetadataMap`) with origin `{ source: 'local', skipStoreHooks: true }`, so loading
-  does not trigger a store. Clients read `{ modified }` from it;
-  `HocuspocusService.setModified` pushes that state after a commit.
+  does not trigger a store. Clients read `{ modified }` from it.
+  After a commit, callers use `HocuspocusService.clearModifiedIfCommitted` (or
+  `DocumentService.clearModifiedIfCommitted` with the loaded `Y.Doc`), which clears the flag
+  only when the loaded doc's content hash equals the committed one, so edits not stored yet
+  keep `modified`.
 - `note.deleted` → `HocuspocusService.onNoteDeleted` marks the id in `deletedDocumentIds`
   (the store guard), closes its connections, waits for in-flight stores
   (`waitForPendingStores`) and deletes the row; revisions cascade by FK. Without the guard,

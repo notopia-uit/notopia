@@ -92,7 +92,7 @@ describe('DocumentService.commitIfDue', () => {
     expect(result).toEqual({
       revisionId: null,
       modifiedCleared: false,
-      committedStateVector: null,
+      committedContentHash: null,
     });
     expect(manager.update).not.toHaveBeenCalled();
   });
@@ -112,7 +112,7 @@ describe('DocumentService.commitIfDue', () => {
 
     expect(result.revisionId).toBeNull();
     expect(result.modifiedCleared).toBe(true);
-    expect(result.committedStateVector).toBeInstanceOf(Uint8Array);
+    expect(result.committedContentHash).toBe(contentHash(BLOCKS));
     expect(manager.save).not.toHaveBeenCalled();
     expect(manager.update).toHaveBeenCalledWith(DocumentEntity, { id: 'd1' }, { modified: false });
     expect(kafkaClient.emit).not.toHaveBeenCalled();

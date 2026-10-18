@@ -15,6 +15,7 @@ import { IDENTITY_CONFIG, IdentityConfig } from '#/config';
 import { AuthorizationService } from '../authorization/authorization.service';
 import { BLOCKNOTE_SCHEMA } from '../blocknote';
 import { BlocknoteEditorService } from '../blocknote/blocknote-editor.service';
+import { writeModified } from '../hocuspocus/document-metadata';
 import { KAFKA_CLIENT } from '../kafka/token';
 import { RevisionEntity } from '../revision/revision.entity';
 import { StorageService } from '../storage/storage.service';
@@ -27,10 +28,10 @@ export type CommitResult = {
   revisionId: string | null;
   modifiedCleared: boolean;
   /**
-   * State vector of the stored data this commit read; set whenever `modifiedCleared`.
+   * `contentHash` of the stored data this commit read; set whenever `modifiedCleared`.
    * Callers pass it to `clearModifiedIfCommitted` so unstored newer edits keep `modified`.
    */
-  committedStateVector: Uint8Array | null;
+  committedContentHash: string | null;
 };
 
 @Injectable()
@@ -88,13 +89,9 @@ export class DocumentService {
         })
       ) {
         this.logger.debug({ documentId, trigger }, 'commitIfDue: not due');
-        return { revisionId: null, modifiedCleared: false, committedStateVector: null };
+        return { revisionId: null, modifiedCleared: false, committedContentHash: null };
       }
-      const committedStateVector = Y.encodeStateVectorFromUpdate(new Uint8Array(document.data));
-      const blocknoteEditorService = new BlocknoteEditorService({
-        schema: this.blocknoteSchema,
-        initialContent: document.data,
-      });
+      const blocknoteEditorService = this.editorFor(document.data);
       const blocks = blocknoteEditorService.blocks();
       const hash = contentHash(blocks);
       const latest = await manager.findOne(RevisionEntity, {
@@ -108,7 +105,7 @@ export class DocumentService {
           { documentId, trigger, revisionId: latest.id },
           'commitIfDue: content unchanged, cleared modified'
         );
-        return { revisionId: null, modifiedCleared: true, committedStateVector };
+        return { revisionId: null, modifiedCleared: true, committedContentHash: hash };
       }
       const contributorIds = document.pendingContributorIds;
       const author = selectAuthor({
@@ -145,8 +142,39 @@ export class DocumentService {
         } satisfies DocumentCommittedEvent)
       );
       this.logger.log({ documentId, revisionId, trigger }, 'commitIfDue: done');
-      return { revisionId, modifiedCleared: true, committedStateVector };
+      return { revisionId, modifiedCleared: true, committedContentHash: hash };
     });
+  }
+
+  /**
+   * Clears the loaded doc's in-memory `modified` flag after a commit, but only when the doc
+   * still holds exactly the content that was committed.
+   *
+   * Why: a commit reads `documents.data`, i.e. the last *stored* state. Edits can already be in
+   * memory but not stored yet (inside the Hocuspocus debounce window, or made while the commit
+   * transaction ran). Clearing the flag then would be wrong: `onChange` only sets `modified`
+   * when it is false, so it would not set it again, the next store would write the newer
+   * content with `modified=false`, and auto-commit / the sweeper would never commit it.
+   *
+   * Content hashes are compared instead of Yjs state vectors: a delete-only edit does not
+   * advance the state vector, so state vectors would miss it. The hash also ignores the
+   * `metadata` map, which the server itself writes.
+   *
+   * Returns true when the flag was cleared.
+   */
+  clearModifiedIfCommitted(doc: Y.Doc, committedContentHash: string): boolean {
+    const loadedHash = contentHash(
+      this.editorFor(Buffer.from(Y.encodeStateAsUpdate(doc))).blocks()
+    );
+    if (loadedHash !== committedContentHash) {
+      return false;
+    }
+    writeModified(doc, false);
+    return true;
+  }
+
+  private editorFor(data: Buffer): BlocknoteEditorService {
+    return new BlocknoteEditorService({ schema: this.blocknoteSchema, initialContent: data });
   }
 
   async getLatestRevisionId(documentId: string): Promise<string | null> {

@@ -7,7 +7,6 @@ import { DocumentService } from '../document/document.service';
 import { WorkspaceModel } from '../note/models';
 import { NoteService } from '../note/note.service';
 import { WorkspaceNoteNotFoundException } from '../note/workspace-note-not-found.exception';
-import { clearModifiedIfCommitted } from './document-metadata';
 import { Hocuspocus } from './hocuspocus';
 import { HocuspocusContext } from './hocuspocus-context';
 
@@ -108,15 +107,15 @@ export class HocuspocusService {
   }
 
   /**
-   * After a commit, clears the loaded doc's `modified` flag unless it holds edits newer than
-   * the committed data (see `clearModifiedIfCommitted`). A document not loaded here has nothing
+   * Clears the loaded doc's `modified` flag after a commit unless it holds newer content
+   * (see `DocumentService.clearModifiedIfCommitted`). A document not loaded here has nothing
    * to clear.
    */
-  clearModifiedIfCommitted(documentId: string, committedStateVector: Uint8Array): boolean {
+  clearModifiedIfCommitted(documentId: string, committedContentHash: string): boolean {
     const document = this.hocuspocus.hocuspocus.documents.get(documentId);
     if (!document) {
       return false;
     }
-    return clearModifiedIfCommitted(document, committedStateVector);
+    return this.documentService.clearModifiedIfCommitted(document, committedContentHash);
   }
 }

@@ -42,7 +42,7 @@ export class DocumentApi extends DocumentApiDefinition {
       if (!canWrite) {
         throw new DocumentPermissionException(documentId, user.id);
       }
-      const { revisionId, modifiedCleared, committedStateVector } =
+      const { revisionId, modifiedCleared, committedContentHash } =
         await this.documentService.commitIfDue({
           documentId,
           trigger: 'manual',
@@ -50,8 +50,8 @@ export class DocumentApi extends DocumentApiDefinition {
           force: true,
           minIntervalSeconds: 0,
         });
-      if (modifiedCleared && committedStateVector) {
-        this.hocuspocusService.clearModifiedIfCommitted(documentId, committedStateVector);
+      if (modifiedCleared && committedContentHash) {
+        this.hocuspocusService.clearModifiedIfCommitted(documentId, committedContentHash);
       }
       // The generated controller has no per-response status, but Nest sets the route's default
       // status (201 for POST) before calling the handler and does not set it again when
