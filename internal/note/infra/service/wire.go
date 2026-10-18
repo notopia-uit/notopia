@@ -8,4 +8,6 @@ import (
 var ProviderSet = wire.NewSet(
 	ProvideAuthorization,
 	wire.Bind(new(app.AuthorizationSvc), new(*Authorization)),
+	ProvideBilling,
+	wire.Bind(new(app.BillingSvc), new(*Billing)),
 )

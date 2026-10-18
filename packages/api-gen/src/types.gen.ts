@@ -136,10 +136,31 @@ export type DocumentError = {
 
 export type DocumentId2 = string;
 
+export type DocumentCommittedRevision = {
+  id: DocumentId2;
+};
+
+export const DocumentRevisionTrigger = {
+  MANUAL: 'manual',
+  AUTO: 'auto',
+  SWEEPER: 'sweeper'
+} as const;
+
+export type DocumentRevisionTrigger = typeof DocumentRevisionTrigger[keyof typeof DocumentRevisionTrigger];
+
 export type DocumentRevision = {
   readonly id: string;
   name: string | null;
   readonly createdAt: Date;
+  /**
+   * Who the revision is attributed to. Null for revisions created before authors were recorded
+   */
+  readonly authorId: string | null;
+  trigger: DocumentRevisionTrigger;
+  /**
+   * Users who edited the document since the previous revision, most recent last
+   */
+  readonly contributorIds: Array<string>;
 };
 
 export type DocumentPagination = {
@@ -303,6 +324,18 @@ export type NoteHeartBeatWorkspaceEvent = {
   timestamp: Date;
 };
 
+export type NoteWorkspaceBillingChangedEvent = {
+  id: string;
+  event: 'WorkspaceBillingChangedEvent';
+  /**
+   * Refetch /billing/workspaces/{id}/entitlements.
+   */
+  data: {
+    workspaceId: NoteId3;
+    plan: string;
+  };
+};
+
 export type NoteWorkspaceDeletedEvent = {
   id: string;
   event: 'WorkspaceDeletedEvent';
@@ -344,6 +377,22 @@ export type NoteWorkspaceSlugChangedEvent = {
   data: {
     id: NoteId3;
     slug: NoteSlug;
+  };
+};
+
+/**
+ * Error for a request blocked by the workspace plan. `code` is one of:
+ * - `featureNotInPlan` (details.kind=feature): the feature is not included in the plan
+ * - `planLimitExceeded` (details.kind=limit): the plan's usage limit has been reached
+ *
+ */
+export type NotePaymentRequiredError = NoteError & {
+  details?: {
+    kind: 'feature' | 'limit';
+    key: string;
+    current?: bigint;
+    max?: bigint;
+    requiredPlan: 'plus' | 'pro';
   };
 };
 
@@ -624,8 +673,13 @@ export type ShareWorkspaceMemberRemovedEventWritable = {
  */
 export type ShareDocumentContentWritable = Array<unknown>;
 
+export type DocumentCommittedRevisionWritable = {
+  [key: string]: unknown;
+};
+
 export type DocumentRevisionWritable = {
   name: string | null;
+  trigger: DocumentRevisionTrigger;
 };
 
 /**
@@ -666,6 +720,17 @@ export type NoteWorkspaceWritable = {
 export type NoteUserWorkspaceWritable = {
   workspace: NoteWorkspaceWritable;
   role: NoteWorkspaceRole;
+};
+
+export type NoteWorkspaceBillingChangedEventWritable = {
+  id: string;
+  event: 'WorkspaceBillingChangedEvent';
+  /**
+   * Refetch /billing/workspaces/{id}/entitlements.
+   */
+  data: {
+    plan: string;
+  };
 };
 
 export type NoteWorkspaceDeletedEventWritable = {
@@ -742,6 +807,11 @@ export type DocumentPageQuery = number;
  * Number of items per page
  */
 export type DocumentLimitQuery = number;
+
+/**
+ * Only return revisions created by this trigger
+ */
+export type DocumentRevisionTriggerQuery = DocumentRevisionTrigger;
 
 export type DocumentRevisionIdPath = DocumentId2;
 
@@ -837,6 +907,10 @@ export type CommitDocumentErrors = {
     [key: string]: unknown;
   };
   /**
+   * Forbidden Error response
+   */
+  403: DocumentError;
+  /**
    * Not Found Error response
    */
   404: DocumentError;
@@ -850,11 +924,17 @@ export type CommitDocumentError = CommitDocumentErrors[keyof CommitDocumentError
 
 export type CommitDocumentResponses = {
   /**
+   * Nothing changed since the last revision; returns the latest revision
+   */
+  200: DocumentCommittedRevision;
+  /**
    * Document revision committed successfully
    */
-  201: {
-    id: DocumentId2;
-  };
+  201: DocumentCommittedRevision;
+  /**
+   * Nothing changed and the document has no revision yet
+   */
+  204: void;
 };
 
 export type CommitDocumentResponse = CommitDocumentResponses[keyof CommitDocumentResponses];
@@ -872,6 +952,10 @@ export type GetRevisionsData = {
      * Number of items per page
      */
     limit?: number;
+    /**
+     * Only return revisions created by this trigger
+     */
+    trigger?: DocumentRevisionTrigger;
   };
   url: '/document/revisions';
 };
@@ -1332,6 +1416,10 @@ export type GetNoteGraphErrors = {
    * Internal Server Error response
    */
   500: NoteError;
+  /**
+   * Billing service unavailable
+   */
+  503: NoteError;
 };
 
 export type GetNoteGraphError = GetNoteGraphErrors[keyof GetNoteGraphErrors];
@@ -1829,6 +1917,8 @@ export type GetWorkspaceEventsResponses = {
   200: ({
     event: 'HeartBeatWorkspaceEvent';
   } & NoteHeartBeatWorkspaceEvent) | ({
+    event: 'WorkspaceBillingChangedEvent';
+  } & NoteWorkspaceBillingChangedEvent) | ({
     event: 'WorkspaceDeletedEvent';
   } & NoteWorkspaceDeletedEvent) | ({
     event: 'WorkspaceItemsUpdatedEvent';
@@ -1869,6 +1959,10 @@ export type GetWorkspaceGraphErrors = {
     [key: string]: unknown;
   };
   /**
+   * Feature or limit not included in the workspace plan
+   */
+  402: NotePaymentRequiredError;
+  /**
    * Forbidden Error response
    */
   403: NoteError;
@@ -1880,6 +1974,10 @@ export type GetWorkspaceGraphErrors = {
    * Internal Server Error response
    */
   500: NoteError;
+  /**
+   * Billing service unavailable
+   */
+  503: NoteError;
 };
 
 export type GetWorkspaceGraphError = GetWorkspaceGraphErrors[keyof GetWorkspaceGraphErrors];
@@ -1918,9 +2016,17 @@ export type LeaveWorkspaceErrors = {
    */
   404: NoteError;
   /**
+   * The billing payer must transfer the owner role before leaving while a recurring subscription is active
+   */
+  409: NoteError;
+  /**
    * Internal Server Error response
    */
   500: NoteError;
+  /**
+   * Billing service unavailable
+   */
+  503: NoteError;
 };
 
 export type LeaveWorkspaceError = LeaveWorkspaceErrors[keyof LeaveWorkspaceErrors];
@@ -1996,13 +2102,29 @@ export type UpdateWorkspaceMembersErrors = {
     [key: string]: unknown;
   };
   /**
+   * Feature or limit not included in the workspace plan
+   */
+  402: NotePaymentRequiredError;
+  /**
+   * Forbidden Error response
+   */
+  403: NoteError;
+  /**
    * Not Found Error response
    */
   404: NoteError;
   /**
+   * The billing payer must transfer the owner role before it can be removed while a recurring subscription is active
+   */
+  409: NoteError;
+  /**
    * Internal Server Error response
    */
   500: NoteError;
+  /**
+   * Billing service unavailable
+   */
+  503: NoteError;
 };
 
 export type UpdateWorkspaceMembersError = UpdateWorkspaceMembersErrors[keyof UpdateWorkspaceMembersErrors];

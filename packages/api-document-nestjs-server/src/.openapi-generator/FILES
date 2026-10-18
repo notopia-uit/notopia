@@ -10,12 +10,13 @@ decorators/cookies-decorator.ts
 decorators/headers-decorator.ts
 decorators/index.ts
 index.ts
-models/commit-document-201-response.ts
+models/committed-revision.ts
 models/error.ts
 models/get-document-attachment-upload-url-200-response.ts
 models/get-revisions-200-response.ts
 models/index.ts
 models/pagination.ts
 models/rename-revision-request.ts
+models/revision-trigger.ts
 models/revision-with-content.ts
 models/revision.ts

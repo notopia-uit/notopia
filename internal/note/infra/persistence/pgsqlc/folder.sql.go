@@ -105,7 +105,7 @@ WHERE
   AND id = ANY($1::uuid[]) -- :if $1
   AND workspace_id = $2::uuid -- :if $2
   AND ( -- :if $3
-    trashed_by = $3::text -- :if $3
+    trashed_by::text = $3::text -- :if $3
     OR trashed_by IS NULL -- :if $3
   ) -- :if $3
   AND trashed_by IS NOT NULL -- :if $4

@@ -79,8 +79,8 @@ The "notes + descendant notes first, then folders" delete is duplicated in
 - `controller/cron/`, default daily 03:00 in the process zone (`TZ` env, passed as `time.Local`),
   `pkg/cron` with the injected `Locker`, `// NOTE:` move to `cmd/note-worker`.
 - note's Redis client moves from `infra/workspaceevent` into `infra/common` (next to the Kafka
-  publisher), shared by the SSE hub and the cron locker. The hard-coded `DB: 1` goes away (SSE
-  uses pub/sub, which ignores the database number).
+  publisher), shared by the SSE hub and the cron locker. The hard-coded `DB: 1` goes away: the SSE
+  hub uses Redis streams, which are per database, so its streams move from DB 1 to DB 0.
 
 ### Billing change notifications (SSE)
 

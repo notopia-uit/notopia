@@ -11,6 +11,7 @@ var ProviderSet = wire.NewSet(
 		new(*Config),
 		"Advanced",
 		"Authentik",
+		"Cron",
 		"Database",
 		"General",
 		"Identity",

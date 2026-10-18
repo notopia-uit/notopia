@@ -41,3 +41,22 @@ SELECT EXISTS(
     slug = sqlc.arg('slug')::text
     AND deleted_at IS NULL
 ) AS exists;
+
+-- name: ReadWorkspaceIDsWithTrashBefore :many
+SELECT DISTINCT
+  f.workspace_id
+FROM
+  folders f
+WHERE
+  f.trashed_by = 'purpose'
+  AND f.trashed_at < @before::timestamptz
+UNION
+SELECT DISTINCT
+  f.workspace_id
+FROM
+  notes n
+JOIN
+  folders f ON f.id = n.folder_id
+WHERE
+  n.trashed_by = 'purpose'
+  AND n.trashed_at < @before::timestamptz;

@@ -21,17 +21,20 @@ type GetNoteGraph struct {
 type GetNoteGraphHandler struct {
 	authorizationSvc AuthorizationSvc
 	noteRepo         domain.NoteRepo
+	billingSvc       BillingSvc
 	readModel        GetNoteGraphReadModel
 }
 
 func NewGetNoteGraphHandler(
 	authorizationSvc AuthorizationSvc,
 	noteRepo domain.NoteRepo,
+	billingSvc BillingSvc,
 	readModel GetNoteGraphReadModel,
 ) *GetNoteGraphHandler {
 	return &GetNoteGraphHandler{
 		authorizationSvc: authorizationSvc,
 		noteRepo:         noteRepo,
+		billingSvc:       billingSvc,
 		readModel:        readModel,
 	}
 }
@@ -60,6 +63,14 @@ func (h *GetNoteGraphHandler) Handle(ctx context.Context, query *GetNoteGraph) (
 		return Graph{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read note graph %s", query.UserID, query.ID),
 		)
+	}
+	ent, err := h.billingSvc.GetEntitlements(ctx, workspaceID)
+	if err != nil {
+		return Graph{}, err
+	}
+	maxDepth := ent.Limit(PlanLimitNoteGraphMaxDepth)
+	if !maxDepth.IsUnlimited() && (query.Depth <= 0 || !maxDepth.Allows(int64(query.Depth))) {
+		query.Depth = int(max(maxDepth, 1))
 	}
 	if query.Depth <= 0 {
 		query.Depth = math.MaxInt

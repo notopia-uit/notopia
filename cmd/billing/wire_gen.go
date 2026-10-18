@@ -216,7 +216,21 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	cronCron, err := cron.New(server, client, logger)
+	v2, err := redis.NewCronLocker(client)
+	if err != nil {
+		cleanup9()
+		cleanup8()
+		cleanup7()
+		cleanup6()
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	configCron := &configConfig.Cron
+	cronCron, err := cron.New(server, v2, configCron, logger)
 	if err != nil {
 		cleanup9()
 		cleanup8()

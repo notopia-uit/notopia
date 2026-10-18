@@ -155,7 +155,8 @@ deliberately omits.
 - If something is not worth to code/fix, but might have issue in the future, then comments
 - Prefer breakline for human readable, over one-line; code, naming convention over saving token because human still maintain the source code
 - Do not swallow errors/exceptions in code, always log, or throw/return to caller
-- Some hard string (e.g. concurrency `VND`, `USD`, or others) should be defined in a constant/enum. Don't pass arbitrary string.
+- Constant/enum Some over hard string (e.g. concurrency `VND`, `USD`, or others), easier for expansion, testing, type safety
+- Maintainable over fast, technical debt
 
 ### Superpowers
 

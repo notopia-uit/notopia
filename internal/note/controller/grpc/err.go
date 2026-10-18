@@ -58,6 +58,12 @@ func toGRPCError(err error) error {
 			return status.Error(codes.AlreadyExists, cerr.Error())
 		case errs.CodeAuthorizationServiceInternalError:
 			return status.Error(codes.Internal, cerr.Error())
+		case errs.CodeFeatureNotInPlan,
+			errs.CodePlanLimitExceeded,
+			errs.CodeBillingPayerMustTransfer:
+			return status.Error(codes.FailedPrecondition, cerr.Error())
+		case errs.CodeBillingServiceUnavailable:
+			return status.Error(codes.Unavailable, cerr.Error())
 		default:
 			return status.Error(codes.Unknown, cerr.Error())
 		}

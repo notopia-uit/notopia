@@ -23,6 +23,7 @@ func TestJobRunsOnceAcrossSchedulers(t *testing.T) {
 		Name:     "test:job",
 		Schedule: "0 0 1 1 *",
 		Timeout:  5 * time.Second,
+		Enabled:  true,
 		Run: func(ctx context.Context) error {
 			runs.Add(1)
 			started <- struct{}{}
@@ -90,4 +91,26 @@ func TestRegisterRejectsInvalidJob(t *testing.T) {
 
 	_, err = cron.NewScheduler(locker, nil, time.UTC)
 	assert.Error(t, err, "nil logger")
+}
+
+func TestRegisterSkipsDisabledJob(t *testing.T) {
+	mr := miniredis.RunT(t)
+	client := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = client.Close() })
+	locker, err := cron.NewRedisLocker(client)
+	require.NoError(t, err)
+	s, err := cron.NewScheduler(locker, slog.Default(), time.UTC)
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = s.Shutdown() })
+
+	job := cron.Job{
+		Name:     "test:disabled",
+		Schedule: "* * * * *",
+		Timeout:  time.Second,
+		Enabled:  false,
+		Run:      func(context.Context) error { return nil },
+	}
+	require.NoError(t, s.Register(job))
+
+	assert.ErrorContains(t, s.RunNow("test:disabled"), "unknown cron job")
 }

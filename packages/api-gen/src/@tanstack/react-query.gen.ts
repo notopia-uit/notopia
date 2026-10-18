@@ -68,6 +68,8 @@ export const useGetDocumentAttachmentUploadUrlQuery = (options: Options<GetDocum
 
 /**
  * Commit document
+ *
+ * Creates a revision of the current content. Requires write permission. Plus/pro workspaces also auto-commit (`auto_commit`), so this is only needed to force a revision earlier.
  */
 export const commitDocumentMutation = (options?: Partial<Options<CommitDocumentData>>): UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> => {
   const mutationOptions: UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> = {
@@ -85,6 +87,8 @@ export const commitDocumentMutation = (options?: Partial<Options<CommitDocumentD
 
 /**
  * Commit document
+ *
+ * Creates a revision of the current content. Requires write permission. Plus/pro workspaces also auto-commit (`auto_commit`), so this is only needed to force a revision earlier.
  */
 export const useCommitDocumentMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>>, 'mutationFn'>>) => useMutation({ ...commitDocumentMutation(), ...mutationOptions });
 
@@ -92,6 +96,8 @@ export const getRevisionsQueryKey = (options: Options<GetRevisionsData>) => crea
 
 /**
  * Get revisions
+ *
+ * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const getRevisionsOptions = (options: Options<GetRevisionsData>) => queryOptions<GetRevisionsResponse, GetRevisionsError, GetRevisionsResponse, ReturnType<typeof getRevisionsQueryKey>>({
   queryFn: async ({ queryKey, signal }) => {
@@ -139,6 +145,8 @@ export const getRevisionsInfiniteQueryKey = (options: Options<GetRevisionsData>)
 
 /**
  * Get revisions
+ *
+ * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const getRevisionsInfiniteOptions = (options: Options<GetRevisionsData>) => {
   const opts = infiniteQueryOptions<GetRevisionsResponse, GetRevisionsError, InfiniteData<GetRevisionsResponse>, QueryKey<Options<GetRevisionsData>>, number | Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
@@ -167,6 +175,8 @@ export const getRevisionsInfiniteOptions = (options: Options<GetRevisionsData>) 
 
 /**
  * Get revisions
+ *
+ * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const useGetRevisionsQuery = (options: Options<GetRevisionsData>) => useQuery(getRevisionsOptions(options));
 
@@ -374,6 +384,8 @@ export const getNoteGraphQueryKey = (options: Options<GetNoteGraphData>) => crea
 
 /**
  * Get note graph
+ *
+ * `depth` is capped by plan limit `note_graph_max_depth` (free 5).
  */
 export const getNoteGraphOptions = (options: Options<GetNoteGraphData>) => queryOptions<GetNoteGraphResponse, GetNoteGraphError, GetNoteGraphResponse, ReturnType<typeof getNoteGraphQueryKey>>({
   queryFn: async ({ queryKey, signal }) => {
@@ -390,6 +402,8 @@ export const getNoteGraphOptions = (options: Options<GetNoteGraphData>) => query
 
 /**
  * Get note graph
+ *
+ * `depth` is capped by plan limit `note_graph_max_depth` (free 5).
  */
 export const useGetNoteGraphQuery = (options: Options<GetNoteGraphData>) => useQuery(getNoteGraphOptions(options));
 
@@ -643,6 +657,8 @@ export const getWorkspaceGraphQueryKey = (options: Options<GetWorkspaceGraphData
 
 /**
  * Get workspace graph
+ *
+ * Requires feature `workspace_graph` (plus, pro); free returns 402.
  */
 export const getWorkspaceGraphOptions = (options: Options<GetWorkspaceGraphData>) => queryOptions<GetWorkspaceGraphResponse, GetWorkspaceGraphError, GetWorkspaceGraphResponse, ReturnType<typeof getWorkspaceGraphQueryKey>>({
   queryFn: async ({ queryKey, signal }) => {
@@ -659,11 +675,15 @@ export const getWorkspaceGraphOptions = (options: Options<GetWorkspaceGraphData>
 
 /**
  * Get workspace graph
+ *
+ * Requires feature `workspace_graph` (plus, pro); free returns 402.
  */
 export const useGetWorkspaceGraphQuery = (options: Options<GetWorkspaceGraphData>) => useQuery(getWorkspaceGraphOptions(options));
 
 /**
  * Leave workspace
+ *
+ * The billing payer cannot leave while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const leaveWorkspaceMutation = (options?: Partial<Options<LeaveWorkspaceData>>): UseMutationOptions<LeaveWorkspaceResponse, LeaveWorkspaceError, Options<LeaveWorkspaceData>> => {
   const mutationOptions: UseMutationOptions<LeaveWorkspaceResponse, LeaveWorkspaceError, Options<LeaveWorkspaceData>> = {
@@ -681,6 +701,8 @@ export const leaveWorkspaceMutation = (options?: Partial<Options<LeaveWorkspaceD
 
 /**
  * Leave workspace
+ *
+ * The billing payer cannot leave while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const useLeaveWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<LeaveWorkspaceResponse, LeaveWorkspaceError, Options<LeaveWorkspaceData>>, 'mutationFn'>>) => useMutation({ ...leaveWorkspaceMutation(), ...mutationOptions });
 
@@ -709,6 +731,8 @@ export const useGetWorkspaceMembersQuery = (options: Options<GetWorkspaceMembers
 
 /**
  * Update workspace members
+ *
+ * Plan limit `members` (free 3, plus 10, pro unlimited). Adding beyond the limit returns 402. The billing payer cannot lose the owner role while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const updateWorkspaceMembersMutation = (options?: Partial<Options<UpdateWorkspaceMembersData>>): UseMutationOptions<UpdateWorkspaceMembersResponse, UpdateWorkspaceMembersError, Options<UpdateWorkspaceMembersData>> => {
   const mutationOptions: UseMutationOptions<UpdateWorkspaceMembersResponse, UpdateWorkspaceMembersError, Options<UpdateWorkspaceMembersData>> = {
@@ -726,6 +750,8 @@ export const updateWorkspaceMembersMutation = (options?: Partial<Options<UpdateW
 
 /**
  * Update workspace members
+ *
+ * Plan limit `members` (free 3, plus 10, pro unlimited). Adding beyond the limit returns 402. The billing payer cannot lose the owner role while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const useUpdateWorkspaceMembersMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<UpdateWorkspaceMembersResponse, UpdateWorkspaceMembersError, Options<UpdateWorkspaceMembersData>>, 'mutationFn'>>) => useMutation({ ...updateWorkspaceMembersMutation(), ...mutationOptions });
 
@@ -866,6 +892,8 @@ export const showTrashQueryKey = (options: Options<ShowTrashData>) => createQuer
 
 /**
  * Show trash
+ *
+ * Trashed items older than the plan's `trash_retention_days` are purged daily.
  */
 export const showTrashOptions = (options: Options<ShowTrashData>) => queryOptions<ShowTrashResponse, ShowTrashError, ShowTrashResponse, ReturnType<typeof showTrashQueryKey>>({
   queryFn: async ({ queryKey, signal }) => {
@@ -882,6 +910,8 @@ export const showTrashOptions = (options: Options<ShowTrashData>) => queryOption
 
 /**
  * Show trash
+ *
+ * Trashed items older than the plan's `trash_retention_days` are purged daily.
  */
 export const useShowTrashQuery = (options: Options<ShowTrashData>) => useQuery(showTrashOptions(options));
 

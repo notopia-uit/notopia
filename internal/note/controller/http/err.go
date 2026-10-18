@@ -57,6 +57,14 @@ func strictServerToHTTPErr(err errs.Error) (
 	case errs.CodeAuthorizationServiceInternalError:
 		statusCode = 503
 
+	case errs.CodeFeatureNotInPlan,
+		errs.CodePlanLimitExceeded:
+		statusCode = 402
+	case errs.CodeBillingPayerMustTransfer:
+		statusCode = 409
+	case errs.CodeBillingServiceUnavailable:
+		statusCode = 503
+
 	case errs.CodeTrashedInValid:
 		statusCode = 400
 
@@ -135,6 +143,21 @@ func strictHandlerRequestErrorHandler(c *gin.Context, err error) {
 }
 
 func strictHandlerError(c *gin.Context, err error) {
+	if pr, ok := errors.AsType[*errs.PaymentRequired](err); ok {
+		details := gin.H{"kind": pr.Kind, "key": pr.Key, "requiredPlan": pr.RequiredPlan}
+		if pr.Current != nil {
+			details["current"] = *pr.Current
+		}
+		if pr.Max != nil {
+			details["max"] = *pr.Max
+		}
+		c.JSON(http.StatusPaymentRequired, gin.H{
+			"code":    pr.Code().String(),
+			"message": pr.Message(),
+			"details": details,
+		})
+		return
+	}
 	var message string
 	var code string
 	var statusCode int

@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryColumn, type Relation } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn, type Relation, UpdateDateColumn } from 'typeorm';
 
 import { RevisionEntity } from '../revision/revision.entity';
 
@@ -12,6 +12,15 @@ export class DocumentEntity {
 
   @Column({ type: 'boolean', default: false })
   modified!: boolean;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  lastCommittedAt!: Date | null;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt!: Date;
+
+  @Column({ type: 'text', array: true, default: () => "'{}'" })
+  pendingContributorIds!: string[];
 
   @OneToMany(() => RevisionEntity, (revision) => revision.document, {
     cascade: true,

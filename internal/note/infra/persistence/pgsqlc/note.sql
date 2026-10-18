@@ -116,7 +116,7 @@ WHERE
     SELECT id FROM folders WHERE workspace_id = sqlc.narg('workspace_id')::uuid
   )
   AND ( -- :if @trashed_by
-    trashed_by = sqlc.narg('trashed_by')::text
+    trashed_by::text = sqlc.narg('trashed_by')::text
     OR trashed_by IS NULL
   )
   AND trashed_by IS NOT NULL -- :if @trashed_only

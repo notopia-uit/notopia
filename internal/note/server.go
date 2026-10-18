@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/notopia-uit/notopia/internal/note/controller/cron"
 	"github.com/notopia-uit/notopia/internal/note/controller/event"
 	"github.com/notopia-uit/notopia/internal/note/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/note/controller/health"
@@ -22,6 +23,7 @@ type Server struct {
 	http              *http.HTTP
 	grpc              *grpc.GRPC
 	event             *event.Event
+	cron              *cron.Cron
 	workspaceEventHub *workspaceevent.WorkspaceEventHub
 	outbox            *outbox.Outbox
 	health            *health.Health
@@ -34,6 +36,7 @@ func NewServer(
 	http *http.HTTP,
 	grpc *grpc.GRPC,
 	event *event.Event,
+	cron *cron.Cron,
 	workspaceEventHub *workspaceevent.WorkspaceEventHub,
 	outbox *outbox.Outbox,
 	health *health.Health,
@@ -47,6 +50,7 @@ func NewServer(
 		http:              http,
 		grpc:              grpc,
 		event:             event,
+		cron:              cron,
 		workspaceEventHub: workspaceEventHub,
 		outbox:            outbox,
 		health:            health,
@@ -120,6 +124,12 @@ func (s *Server) Run(ctx context.Context) error {
 		// This has context passed down, so we don't really to close/stop it
 		if err := s.event.Run(ctx); err != nil {
 			return fmt.Errorf("failed to run integration event listener: %w", err)
+		}
+		return nil
+	})
+	g.Go(func() error {
+		if err := s.cron.Run(ctx); err != nil {
+			return fmt.Errorf("failed to run cron scheduler: %w", err)
 		}
 		return nil
 	})

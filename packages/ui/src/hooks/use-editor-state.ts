@@ -12,11 +12,19 @@ export const useEditorState = (noteId: string) => {
   const { isModified } = useIsDocModified(provider.document);
 
   const { mutate: commitDocument, isPending: isCommitingDocument } = useCommitDocumentMutation({
-    onSuccess: (responses) => {
+    onSuccess: (response) => {
+      if (!response) {
+        showAlert({
+          type: 'success',
+          title: 'Nothing to commit',
+          message: 'Your note has no changes yet.',
+        });
+        return;
+      }
       showAlert({
         type: 'success',
         title: 'Document committed successfully!',
-        message: `Your note ${responses.id} changes were committed.`,
+        message: `Your note ${response.id} changes were committed.`,
       });
     },
     onError: (error) => {

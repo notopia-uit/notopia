@@ -1,10 +1,11 @@
-package workspaceevent
+package common
 
 import (
 	"context"
 	"log/slog"
 
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	pkgcron "github.com/notopia-uit/notopia/pkg/cron"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -19,7 +20,6 @@ func NewRedisClient(
 ) (*RedisClient, func()) {
 	client := redis.NewClient(&redis.Options{
 		Addr: cfg.Addr,
-		DB:   1,
 	})
 	cleanup := func() {
 		if err := client.Close(); err != nil {
@@ -30,3 +30,9 @@ func NewRedisClient(
 }
 
 var ProvideRedisClient = NewRedisClient
+
+func NewCronLocker(client *RedisClient) (pkgcron.Locker, error) {
+	return pkgcron.NewRedisLocker(client.Client)
+}
+
+var ProvideCronLocker = NewCronLocker

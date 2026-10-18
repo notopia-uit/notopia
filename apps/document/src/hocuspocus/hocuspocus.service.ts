@@ -1,6 +1,5 @@
 import { Connection } from '@hocuspocus/server';
 import { Injectable } from '@nestjs/common';
-import { YDocMetadataMap } from '@notopia-uit/lib/yjs';
 import { Traceable } from 'nestjs-otel';
 
 import { AuthorizationService } from '../authorization/authorization.service';
@@ -10,6 +9,9 @@ import { NoteService } from '../note/note.service';
 import { WorkspaceNoteNotFoundException } from '../note/workspace-note-not-found.exception';
 import { Hocuspocus } from './hocuspocus';
 import { HocuspocusContext } from './hocuspocus-context';
+
+// Debounce id used by @hocuspocus/server 4.0.0 storeDocumentHooks
+const STORE_DEBOUNCE_ID_PREFIX = 'onStoreDocument-';
 
 @Injectable()
 @Traceable()
@@ -107,12 +109,35 @@ export class HocuspocusService {
     }
   }
 
-  setModified(documentId: string, modified: boolean): void {
+  /**
+   * Runs the store pending in the Hocuspocus debounce now (or waits for the one running), so a
+   * caller reading `documents.data` sees the latest edits. A document not loaded here is a no-op.
+   */
+  async flushStore(documentId: string): Promise<void> {
     const document = this.hocuspocus.hocuspocus.documents.get(documentId);
     if (!document) {
       return;
     }
-    const metadata = document.getMap('metadata') as YDocMetadataMap;
-    metadata.set('metadata', { modified });
+    const { debouncer } = this.hocuspocus.hocuspocus;
+    const debounceId = `${STORE_DEBOUNCE_ID_PREFIX}${documentId}`;
+    if (debouncer.isDebounced(debounceId)) {
+      // executeNow awaits a running execution before starting the debounced one
+      await debouncer.executeNow(debounceId);
+      return;
+    }
+    await document.saveMutex.waitForUnlock();
+  }
+
+  /**
+   * Clears the loaded doc's `modified` flag after a commit unless it holds newer content
+   * (see `DocumentService.clearModifiedIfCommitted`). A document not loaded here has nothing
+   * to clear.
+   */
+  clearModifiedIfCommitted(documentId: string, committedContentHash: string): boolean {
+    const document = this.hocuspocus.hocuspocus.documents.get(documentId);
+    if (!document) {
+      return false;
+    }
+    return this.documentService.clearModifiedIfCommitted(document, committedContentHash);
   }
 }

@@ -192,6 +192,7 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 - [ ] NestJS service doesn't have a polite migration mechanism for production
 - [ ] OpenAPI upgrade 3.1
 - [ ] App admin edit doesn't propagate the SSE to web client. We only have workspace event SSE
+- [ ] Service-account role: replace the `HACK:` lookup with a read-only service-account role in authorization
 - [x] no env validation for document, search-worker
 
 ### Frontend

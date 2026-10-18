@@ -11,3 +11,7 @@ export const applyStoredModified = (doc: Y.Doc, modified: boolean): void => {
   const origin: LocalTransactionOrigin = { source: 'local', skipStoreHooks: true };
   doc.transact(() => metadataOf(doc).set('metadata', { modified }), origin);
 };
+
+export const writeModified = (doc: Y.Doc, modified: boolean): void => {
+  metadataOf(doc).set('metadata', { modified });
+};

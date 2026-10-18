@@ -119,10 +119,23 @@ export const zDocumentError = z.object({
 
 export const zDocumentId2 = z.uuid().readonly();
 
+export const zDocumentCommittedRevision = z.object({
+  id: zDocumentId2
+});
+
+export const zDocumentRevisionTrigger = z.enum([
+  'manual',
+  'auto',
+  'sweeper'
+]);
+
 export const zDocumentRevision = z.object({
   id: z.uuid().readonly(),
   name: z.string().min(1).max(255).nullable(),
-  createdAt: z.iso.datetime().readonly()
+  createdAt: z.iso.datetime().readonly(),
+  authorId: z.string().readonly().nullable(),
+  trigger: zDocumentRevisionTrigger,
+  contributorIds: z.array(z.string()).readonly()
 });
 
 export const zDocumentPagination = z.object({
@@ -237,6 +250,15 @@ export const zNoteHeartBeatWorkspaceEvent = z.object({
   timestamp: z.iso.datetime()
 });
 
+export const zNoteWorkspaceBillingChangedEvent = z.object({
+  id: z.uuid(),
+  event: z.enum(['WorkspaceBillingChangedEvent']),
+  data: z.object({
+    workspaceId: zNoteId3,
+    plan: z.string()
+  })
+});
+
 export const zNoteWorkspaceDeletedEvent = z.object({
   id: z.uuid(),
   event: z.enum(['WorkspaceDeletedEvent']),
@@ -280,6 +302,22 @@ export const zNoteWorkspaceSlugChangedEvent = z.object({
     slug: zNoteSlug
   })
 });
+
+/**
+ * Error for a request blocked by the workspace plan. `code` is one of:
+ * - `featureNotInPlan` (details.kind=feature): the feature is not included in the plan
+ * - `planLimitExceeded` (details.kind=limit): the plan's usage limit has been reached
+ *
+ */
+export const zNotePaymentRequiredError = zNoteError.and(z.object({
+  details: z.object({
+    kind: z.enum(['feature', 'limit']),
+    key: z.string(),
+    current: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+    max: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+    requiredPlan: z.enum(['plus', 'pro'])
+  }).optional()
+}));
 
 /**
  * User ID from Authentik (need to change subject mode to User's ID instead of hashed)
@@ -527,8 +565,11 @@ export const zShareWorkspaceMemberRemovedEventWritable = z.object({
  */
 export const zShareDocumentContentWritable = z.array(z.unknown());
 
+export const zDocumentCommittedRevisionWritable = z.record(z.string(), z.unknown());
+
 export const zDocumentRevisionWritable = z.object({
-  name: z.string().min(1).max(255).nullable()
+  name: z.string().min(1).max(255).nullable(),
+  trigger: zDocumentRevisionTrigger
 });
 
 /**
@@ -566,6 +607,14 @@ export const zNoteWorkspaceWritable = z.object({
 export const zNoteUserWorkspaceWritable = z.object({
   workspace: zNoteWorkspaceWritable,
   role: zNoteWorkspaceRole
+});
+
+export const zNoteWorkspaceBillingChangedEventWritable = z.object({
+  id: z.uuid(),
+  event: z.enum(['WorkspaceBillingChangedEvent']),
+  data: z.object({
+    plan: z.string()
+  })
 });
 
 export const zNoteWorkspaceDeletedEventWritable = z.object({
@@ -643,6 +692,11 @@ export const zDocumentPageQuery = z.int().gte(1).default(1);
  */
 export const zDocumentLimitQuery = z.int().gte(1).lte(100).default(20);
 
+/**
+ * Only return revisions created by this trigger
+ */
+export const zDocumentRevisionTriggerQuery = zDocumentRevisionTrigger;
+
 export const zDocumentRevisionIdPath = zDocumentId2;
 
 export const zNoteFolderIdPath = zNoteId;
@@ -684,17 +738,16 @@ export const zCommitDocumentPath = z.object({
   documentId: zDocumentId
 });
 
-/**
- * Document revision committed successfully
- */
-export const zCommitDocumentResponse = z.object({
-  id: zDocumentId2
-});
+export const zCommitDocumentResponse = z.union([
+  zDocumentCommittedRevision,
+  z.void()
+]);
 
 export const zGetRevisionsQuery = z.object({
   documentId: zDocumentId,
   page: z.int().gte(1).optional().default(1),
-  limit: z.int().gte(1).lte(100).optional().default(20)
+  limit: z.int().gte(1).lte(100).optional().default(20),
+  trigger: zDocumentRevisionTrigger.optional()
 });
 
 /**
@@ -926,6 +979,7 @@ export const zGetWorkspaceEventsPath = z.object({
  */
 export const zGetWorkspaceEventsResponse = z.discriminatedUnion('event', [
   zNoteHeartBeatWorkspaceEvent.extend({ event: z.literal('HeartBeatWorkspaceEvent') }),
+  zNoteWorkspaceBillingChangedEvent.extend({ event: z.literal('WorkspaceBillingChangedEvent') }),
   zNoteWorkspaceDeletedEvent.extend({ event: z.literal('WorkspaceDeletedEvent') }),
   zNoteWorkspaceItemsUpdatedEvent.extend({ event: z.literal('WorkspaceItemsUpdatedEvent') }),
   zNoteWorkspaceMembersUpdatedEvent.extend({ event: z.literal('WorkspaceMembersUpdatedEvent') }),

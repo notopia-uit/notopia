@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"time"
 
 	"github.com/creasty/defaults"
 	"github.com/go-playground/validator/v10"
@@ -32,6 +33,11 @@ type Billing struct {
 	WebBaseURL string `default:"-"   json:"webBaseUrl" mapstructure:"web_base_url" validate:"required,url" yaml:"web_base_url"`
 }
 
+type Cron struct {
+	ReconcileSubscriptions commonconfig.CronJob `json:"reconcileSubscriptions" mapstructure:"reconcile_subscriptions" validate:"required" yaml:"reconcile_subscriptions"`
+	PruneProviderEvents    commonconfig.CronJob `json:"pruneProviderEvents"    mapstructure:"prune_provider_events"   validate:"required" yaml:"prune_provider_events"`
+}
+
 type Config struct {
 	General  commonconfig.General  `json:"general"  mapstructure:"general"  validate:"omitempty" yaml:"general"`
 	Log      commonconfig.Log      `json:"log"      mapstructure:"log"      validate:"omitempty" yaml:"log"`
@@ -43,6 +49,29 @@ type Config struct {
 	Services Services              `json:"services" mapstructure:"services" validate:"required"  yaml:"services"`
 	Stripe   Stripe                `json:"-"        mapstructure:"stripe"   validate:"required"  yaml:"stripe"`
 	Billing  Billing               `json:"billing"  mapstructure:"billing"  validate:"required"  yaml:"billing"`
+	Cron     Cron                  `json:"cron"     mapstructure:"cron"     validate:"required"  yaml:"cron"`
+}
+
+var (
+	defaultReconcileSubscriptions = commonconfig.CronJob{
+		Name:     "billing:reconcile-subscriptions",
+		Schedule: "0 * * * *",
+		Timeout:  15 * time.Minute,
+		Enabled:  true,
+	}
+	defaultPruneProviderEvents = commonconfig.CronJob{
+		Name:     "billing:prune-provider-events",
+		Schedule: "0 4 * * *",
+		Timeout:  5 * time.Minute,
+		Enabled:  true,
+	}
+)
+
+func setCronDefaults(v *viper.Viper, key string, job commonconfig.CronJob) {
+	v.SetDefault(key+".name", job.Name)
+	v.SetDefault(key+".schedule", job.Schedule)
+	v.SetDefault(key+".timeout", job.Timeout)
+	v.SetDefault(key+".enabled", job.Enabled)
 }
 
 func New(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
@@ -51,6 +80,8 @@ func New(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
 	viper.SetConfigName("billing.notopia.config")
 	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
+	setCronDefaults(viper, "cron.reconcile_subscriptions", defaultReconcileSubscriptions)
+	setCronDefaults(viper, "cron.prune_provider_events", defaultPruneProviderEvents)
 	if err := viper.ReadInConfig(); err == nil {
 		slog.Info("configuration loaded", slog.String("file", viper.ConfigFileUsed()))
 	}

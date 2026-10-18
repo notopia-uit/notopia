@@ -16,4 +16,6 @@ var KafkaPublisherProviderSet = wire.NewSet(
 
 var ProviderSet = wire.NewSet(
 	KafkaPublisherProviderSet,
+	ProvideRedisClient,
+	ProvideCronLocker,
 )
