@@ -40,6 +40,8 @@ export const getDocumentAttachmentUploadUrl = <ThrowOnError extends boolean = fa
 
 /**
  * Commit document
+ *
+ * Creates a revision of the current content. Requires write permission. Plus/pro workspaces also auto-commit (`auto_commit`), so this is only needed to force a revision earlier.
  */
 export const commitDocument = <ThrowOnError extends boolean = false>(options: Options<CommitDocumentData, ThrowOnError>): RequestResult<CommitDocumentResponses, CommitDocumentErrors, ThrowOnError> => (options.client ?? client).post<CommitDocumentResponses, CommitDocumentErrors, ThrowOnError>({
   security: [{
@@ -57,6 +59,8 @@ export const commitDocument = <ThrowOnError extends boolean = false>(options: Op
 
 /**
  * Get revisions
+ *
+ * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const getRevisions = <ThrowOnError extends boolean = false>(options: Options<GetRevisionsData, ThrowOnError>): RequestResult<GetRevisionsResponses, GetRevisionsErrors, ThrowOnError> => (options.client ?? client).get<GetRevisionsResponses, GetRevisionsErrors, ThrowOnError>({
   responseTransformer: getRevisionsResponseTransformer,

@@ -25,16 +25,41 @@ gets a raw JWT in the connect payload and validates it itself in
 `DocumentService.commitIfDue()` is the hinge of the whole system. In one transaction
 (pessimistic write lock on the document) it: saves a `RevisionEntity` of the current
 blocks, clears `modified`, and emits
-`events.integration.document.document.committed`.
+`events.integration.document.document.committed`. Three callers, one revision when they race
+(row lock + min-interval/hash check):
+
+| Trigger | Caller | Gate |
+| --- | --- | --- |
+| `manual` | `POST /document/documents/{id}/commit` | write permission (viewers 403); always commits changed content |
+| `auto` | `AutoCommitExtension.afterStoreDocument` | plan feature `auto_commit` + `auto_commit_min_interval_seconds` |
+| `sweeper` | `SweeperCron` | stale `modified` docs idle ≥ `idleSeconds`; walks all of them in batches of 500 per tick |
+
+Manual responses: `201 {revisionId}` revision created, `200 {revisionId}` content equals the
+latest revision (returns it), `204` nothing changed and no revision exists. When the content
+hash equals the latest revision only `modified` is cleared; `pendingContributorIds` is kept
+for the next real commit.
+
+Callers clear the in-memory `modified` flag only when the loaded Y.Doc's content hash equals
+the committed one (state vectors miss delete-only edits).
+
+Billing unreachable: auto-commit is skipped (warn), the sweeper and purge skip the batch,
+editing continues.
 
 Downstream: `internal/note` (`e_documentcommitted.go`) updates note size/tags/outgoing
 links; `search-worker` indexes the content into Meilisearch. **Nothing else re-indexes** —
 if a document is never committed, its content is never searchable and its links never
 appear in the graph.
 
-Commit is currently **manual only** (`POST /document/documents/{id}/commit`).
-
 ## Yjs / Hocuspocus
+
+Extension hooks run by descending priority, not array order:
+
+| Extension | Priority | Role |
+| --- | --- | --- |
+| `ContributorFlushExtension` | 1100 | Flushes tracked editors to `pendingContributorIds` in `onStoreDocument`, and retries in `afterStoreDocument` (a brand-new document has no row yet during its first store) |
+| `@hocuspocus/extension-redis` | 1000 | Store lock; an instance missing it throws `SkipFurtherHooksError`, skipping later hooks, hence the flush runs before it |
+| Database (`HocuspocusDatabase`) | 100 | Upserts the row |
+| `AutoCommitExtension` | 50 | Must run after the row is stored. No forced commit on disconnect (the sweeper covers idle docs). Resolves the workspace with `NoteService.batchGetNoteWorkspaces` (no auth, marked `HACK:`; should become a service-account role) |
 
 - `HocuspocusDatabase.store` upserts the row and writes `modified` from the Yjs metadata
   (`DocumentService.upsertData`); there is no debounce configured, so it fires on the
@@ -64,13 +89,17 @@ With no `redisUrl` it uses an in-memory store (single instance only, a warning i
 Redis must run with `noeviction` and persistence, and the app must call
 `app.enableShutdownHooks()`. `redis.url` (`NOTOPIA_DOCUMENT_REDIS_URL`) picks the lock store;
 `scaling.enabled` (`NOTOPIA_DOCUMENT_SCALING_ENABLED`, requires the URL) only adds
-`@hocuspocus/extension-redis`.
+`@hocuspocus/extension-redis`. Local compose Redis for this service is `document_redis`.
 
 Crons (`src/cron/`) are not `@Cron` decorators (those cannot read config): `CronRegistrar`
 adds them to `SchedulerRegistry` in `onModuleInit` from `NOTOPIA_DOCUMENT_CRON_*` (name = lock
 key, schedule, enabled, timeout seconds), with no `timeZone`, so they run in the process TZ.
 Each tick runs in `Locks.withLock(name, …)`; `LockNotAcquiredError` means another instance has
 it. Jobs get an `AbortSignal` (lock lost or timeout) and stop between batches when it aborts.
+Defaults: `document:sweeper` `*/10 * * * *` (timeout 300 s, idle 600 s),
+`document:revision-purge` `30 3 * * *` (timeout 1800 s); each has `_ENABLED=false` to disable.
+Revision purge deletes revisions older than the plan's `revision_history_days` and always keeps
+the latest one.
 
 ## Revisions are hard-deleted
 

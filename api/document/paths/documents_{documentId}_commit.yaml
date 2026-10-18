@@ -8,6 +8,10 @@ post:
   tags:
     - Document
   summary: Commit document
+  description: >-
+    Creates a revision of the current content. Requires write permission. Plus/pro
+    workspaces also auto-commit (`auto_commit`), so this is only needed to force a
+    revision earlier.
   operationId: commitDocument
   parameters:
     - $ref: ../components/parameters/documentIdPath.yaml

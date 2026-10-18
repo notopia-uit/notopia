@@ -8,6 +8,9 @@ get:
   tags:
     - Revision
   summary: Get revisions
+  description: >-
+    Revisions older than the plan `revision_history_days` are purged daily; the latest is
+    always kept. Filter with `trigger`.
   operationId: getRevisions
   parameters:
     - $ref: ../components/parameters/documentIdQuery.yaml

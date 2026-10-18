@@ -68,6 +68,8 @@ export const useGetDocumentAttachmentUploadUrlQuery = (options: Options<GetDocum
 
 /**
  * Commit document
+ *
+ * Creates a revision of the current content. Requires write permission. Plus/pro workspaces also auto-commit (`auto_commit`), so this is only needed to force a revision earlier.
  */
 export const commitDocumentMutation = (options?: Partial<Options<CommitDocumentData>>): UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> => {
   const mutationOptions: UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> = {
@@ -85,6 +87,8 @@ export const commitDocumentMutation = (options?: Partial<Options<CommitDocumentD
 
 /**
  * Commit document
+ *
+ * Creates a revision of the current content. Requires write permission. Plus/pro workspaces also auto-commit (`auto_commit`), so this is only needed to force a revision earlier.
  */
 export const useCommitDocumentMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>>, 'mutationFn'>>) => useMutation({ ...commitDocumentMutation(), ...mutationOptions });
 
@@ -92,6 +96,8 @@ export const getRevisionsQueryKey = (options: Options<GetRevisionsData>) => crea
 
 /**
  * Get revisions
+ *
+ * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const getRevisionsOptions = (options: Options<GetRevisionsData>) => queryOptions<GetRevisionsResponse, GetRevisionsError, GetRevisionsResponse, ReturnType<typeof getRevisionsQueryKey>>({
   queryFn: async ({ queryKey, signal }) => {
@@ -139,6 +145,8 @@ export const getRevisionsInfiniteQueryKey = (options: Options<GetRevisionsData>)
 
 /**
  * Get revisions
+ *
+ * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const getRevisionsInfiniteOptions = (options: Options<GetRevisionsData>) => {
   const opts = infiniteQueryOptions<GetRevisionsResponse, GetRevisionsError, InfiniteData<GetRevisionsResponse>, QueryKey<Options<GetRevisionsData>>, number | Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
@@ -167,6 +175,8 @@ export const getRevisionsInfiniteOptions = (options: Options<GetRevisionsData>) 
 
 /**
  * Get revisions
+ *
+ * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const useGetRevisionsQuery = (options: Options<GetRevisionsData>) => useQuery(getRevisionsOptions(options));
 
