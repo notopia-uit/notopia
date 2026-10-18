@@ -124,7 +124,16 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	createWorkspaceHandler := app.NewCreateWorkspaceHandler(unitOfWork, authorization)
 	deleteWorkspaceHandler := app.NewDeleteWorkspaceHandler(authorization, unitOfWork)
 	emptyTrashHandler := app.NewEmptyTrashHandler(authorization, unitOfWork)
-	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(authorization)
+	billing, cleanup6, err := service.NewBilling(services, loggingLogger, global)
+	if err != nil {
+		cleanup5()
+		cleanup4()
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	leaveWorkspaceHandler := app.NewLeaveWorkspaceHandler(authorization, billing)
 	moveWorkspaceItemsHandler := app.NewMoveWorkspaceItemsHandler(authorization, unitOfWork)
 	permanentlyDeleteFolderHandler := app.NewPermanentlyDeleteFolderHandler(authorization, unitOfWork)
 	permanentlyDeleteNoteHandler := app.NewPermanentlyDeleteNoteHandler(authorization, unitOfWork)
@@ -144,9 +153,10 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	unpublishWorkspaceHandler := app.NewUnpublishWorkspaceHandler(workspace)
 	workspaceEvent := &advanced.WorkspaceEvent
 	redis := &configConfig.Redis
-	redisClient, cleanup6 := workspaceevent.NewRedisClient(ctx, redis, logger)
+	redisClient, cleanup7 := workspaceevent.NewRedisClient(ctx, redis, logger)
 	workspaceEventHub, err := workspaceevent.NewWorkspaceEventHub(workspaceEvent, loggerAdapter, redisClient, serviceName, global)
 	if err != nil {
+		cleanup7()
 		cleanup6()
 		cleanup5()
 		cleanup4()
@@ -155,14 +165,15 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		cleanup()
 		return nil, nil, err
 	}
-	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization)
+	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization, billing)
 	cmds := app.NewCmds(handlerProvider, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, emptyTrashHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
 	kafka := &configConfig.Kafka
 	watermillKafkaTracer := otel.NewOTELSaramaTracer(tracerProvider)
-	kafkaPublisher, cleanup7, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
+	kafkaPublisher, cleanup8, err := common.NewKafkaPublisher(kafka, loggerAdapter, watermillKafkaTracer, serviceName)
 	if err != nil {
+		cleanup7()
 		cleanup6()
 		cleanup5()
 		cleanup4()
@@ -173,6 +184,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	integrationPublisher, err := integrationpublisher.NewIntegrationPublisher(kafkaPublisher)
 	if err != nil {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()
@@ -209,13 +221,13 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	getWorkspaces := pgreadmodel.NewGetWorkspaces(queries)
 	getMyWorkspacesHandler := app.NewGetMyWorkspacesHandler(authorization, getWorkspaces)
 	noteGraph := pgreadmodel.NewNoteGraph(queries)
-	getNoteGraphHandler := app.NewGetNoteGraphHandler(authorization, pgrepoNote, noteGraph)
+	getNoteGraphHandler := app.NewGetNoteGraphHandler(authorization, pgrepoNote, billing, noteGraph)
 	getNoteHandler := app.NewGetNoteHandler(authorization, pgrepoNote, pgreadmodelNote)
 	noteLinks := pgreadmodel.GetNoteLinks(queries)
 	getNoteLinksHandler := app.NewGetNoteLinksHandler(authorization, pgrepoNote, noteLinks)
 	getWorkspaceByNoteHandler := app.NewGetWorkspaceByNoteHandler(authorization, getWorkspaceByNote)
 	workspaceGraph := pgreadmodel.GetWorkspaceGraph(queries)
-	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(authorization, workspaceGraph)
+	getWorkspaceGraphHandler := app.NewGetWorkspaceGraphHandler(authorization, billing, workspaceGraph)
 	workspaceBySlug := pgreadmodel.NewWorkspaceBySlug(queries)
 	getWorkspaceBySlugHandler := app.NewGetWorkspaceBySlugHandler(authorization, workspaceBySlug)
 	authentik := &configConfig.Authentik
@@ -239,6 +251,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	configServer := &configConfig.Server
 	strictHandler, err := http.NewStrictHandler(server, configServer, workspaceEventHub)
 	if err != nil {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()
@@ -249,8 +262,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	v := http.NewHandler(strictHandler)
-	httpHTTP, cleanup8, err := http.New(ctx, engine, v, configServer, logger)
+	httpHTTP, cleanup9, err := http.New(ctx, engine, v, configServer, logger)
 	if err != nil {
+		cleanup8()
 		cleanup7()
 		cleanup6()
 		cleanup5()
@@ -261,8 +275,9 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	serviceServer := grpc.NewServiceServer(server)
-	grpcGRPC, cleanup9, err := grpc.New(ctx, serviceServer, configServer, loggingLogger, global)
+	grpcGRPC, cleanup10, err := grpc.New(ctx, serviceServer, configServer, loggingLogger, global)
 	if err != nil {
+		cleanup9()
 		cleanup8()
 		cleanup7()
 		cleanup6()
@@ -275,6 +290,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	eventEvent, err := event.NewEvent(general, kafka, server, watermillKafkaTracer, loggerAdapter, jsonMarshaler, configDomainEvent, kafkaPublisher, global)
 	if err != nil {
+		cleanup10()
 		cleanup9()
 		cleanup8()
 		cleanup7()
@@ -288,6 +304,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	outboxOutbox, err := outbox.NewOutbox(kafkaPublisher, loggerAdapter, defaultPostgreSQLSchema, pool)
 	if err != nil {
+		cleanup10()
 		cleanup9()
 		cleanup8()
 		cleanup7()
@@ -302,6 +319,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	healthHealth := health.New(pg, configServer, kafka, workspaceEventHub, redisClient, authentik, services)
 	noteServer := note.NewServer(pg, httpHTTP, grpcGRPC, eventEvent, workspaceEventHub, outboxOutbox, healthHealth, logger, global)
 	return noteServer, func() {
+		cleanup10()
 		cleanup9()
 		cleanup8()
 		cleanup7()

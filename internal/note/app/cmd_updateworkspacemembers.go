@@ -18,15 +18,18 @@ type UpdateWorkspaceMembers struct {
 type UpdateWorkspaceMembersHandler struct {
 	workspaceEventPublisher WorkspaceEventPublisher
 	authorizationSvc        AuthorizationSvc
+	billingSvc              BillingSvc
 }
 
 func NewUpdateWorkspaceMembersHandler(
 	workspaceEventPublisher WorkspaceEventPublisher,
 	authorizationSvc AuthorizationSvc,
+	billingSvc BillingSvc,
 ) *UpdateWorkspaceMembersHandler {
 	return &UpdateWorkspaceMembersHandler{
 		workspaceEventPublisher: workspaceEventPublisher,
 		authorizationSvc:        authorizationSvc,
+		billingSvc:              billingSvc,
 	}
 }
 
@@ -51,6 +54,16 @@ func (h *UpdateWorkspaceMembersHandler) Handle(ctx context.Context, cmd *UpdateW
 	}
 	if !anyOwner {
 		return errs.NewWorkspaceMustHaveAtLeastOneOwner(cmd.WorkspaceID)
+	}
+	current, err := h.authorizationSvc.GetWorkspaceMembers(ctx, cmd.UserID, cmd.WorkspaceID)
+	if err != nil {
+		return err
+	}
+	if err := checkMembersLimit(ctx, h.billingSvc, cmd.WorkspaceID, len(current), len(cmd.Members)); err != nil {
+		return err
+	}
+	if err := checkPayerKept(ctx, h.billingSvc, cmd.WorkspaceID, cmd.Members); err != nil {
+		return err
 	}
 	if err := h.authorizationSvc.UpdateWorkspaceMembers(ctx, cmd.UserID, cmd.WorkspaceID, cmd.Members); err != nil {
 		return err
