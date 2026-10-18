@@ -9,6 +9,7 @@ import (
 	_ "time/tzdata"
 
 	"github.com/go-co-op/gocron/v2"
+	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
 )
@@ -17,6 +18,7 @@ type Job struct {
 	Name     string
 	Schedule string
 	Timeout  time.Duration
+	Enabled  bool
 	Run      func(ctx context.Context) error
 }
 
@@ -33,7 +35,17 @@ func (a slogAdapter) Info(msg string, args ...any)  { a.logger.Info(msg, args...
 func (a slogAdapter) Warn(msg string, args ...any)  { a.logger.Warn(msg, args...) }  //nolint:sloglint
 func (a slogAdapter) Error(msg string, args ...any) { a.logger.Error(msg, args...) } //nolint:sloglint
 
-func NewScheduler(locker gocron.Locker, logger *slog.Logger, location *time.Location) (*Scheduler, error) {
+func JobFromConfig(cfg commonconfig.CronJob, run func(ctx context.Context) error) Job {
+	return Job{
+		Name:     cfg.Name,
+		Schedule: cfg.Schedule,
+		Timeout:  cfg.Timeout,
+		Enabled:  cfg.Enabled,
+		Run:      run,
+	}
+}
+
+func NewScheduler(locker Locker, logger *slog.Logger, location *time.Location) (*Scheduler, error) {
 	if logger == nil {
 		return nil, errors.New("cron logger is required")
 	}
@@ -55,6 +67,10 @@ func (s *Scheduler) Register(jobs ...Job) error {
 	for _, job := range jobs {
 		if job.Name == "" || job.Run == nil || job.Timeout <= 0 {
 			return fmt.Errorf("invalid cron job %q: name, run and a positive timeout are required", job.Name)
+		}
+		if !job.Enabled {
+			s.logger.Info("cron job disabled, skipping", slog.String("job", job.Name))
+			continue
 		}
 		j, err := s.scheduler.NewJob(
 			gocron.CronJob(job.Schedule, false),

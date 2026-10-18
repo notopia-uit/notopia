@@ -13,6 +13,7 @@ import (
 var ProviderSet = wire.NewSet(
 	persistence.ProviderSet,
 	redis.ProvideClient,
+	redis.ProvideCronLocker,
 	notifier.ProvideKafka,
 	service.ProvideAuthorization,
 	stripeadapter.Provide,

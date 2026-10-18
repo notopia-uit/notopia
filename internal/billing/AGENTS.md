@@ -48,6 +48,7 @@ Spec and plans: `docs/superpowers/specs/2026-10-11-billing-03-*`, `docs/superpow
 ## Crons
 
 `controller/cron/`, Redis-locked on `billing_redis`: hourly reconcile, daily prune of processed provider events.
+Each job is configured by `NOTOPIA_BILLING_CRON_{RECONCILE_SUBSCRIPTIONS|PRUNE_PROVIDER_EVENTS}_{NAME|SCHEDULE|TIMEOUT|ENABLED}` (defaults in `config.New`; `..._ENABLED=false` disables).
 `// NOTE:` move into `cmd/billing-worker` when splitting.
 
 ## TODO

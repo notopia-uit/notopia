@@ -9,9 +9,11 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+type Locker = gocron.Locker
+
 const lockAutoExtend = 3 * time.Second
 
-func NewRedisLocker(client redis.UniversalClient) (gocron.Locker, error) {
+func NewRedisLocker(client redis.UniversalClient) (Locker, error) {
 	locker, err := redislock.NewRedisLockerWithOptions(
 		client,
 		redislock.WithRedsyncOptions(redislock.WithTries(1)),
