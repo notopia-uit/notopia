@@ -82,11 +82,11 @@
     },
     "lint": {
       "executor": "nx:run-commands",
+      "inputs": ["default", "goLint"],
       "options": {
         "command": "golangci-lint run ./cmd/note/... ./internal/note/...",
         "cwd": "{workspaceRoot}"
       },
-      "cache": false,
       "parallelism": false
     },
     "goose": {

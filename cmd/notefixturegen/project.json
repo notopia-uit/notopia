@@ -23,11 +23,11 @@
     },
     "lint": {
       "executor": "nx:run-commands",
+      "inputs": ["default", "goLint"],
       "options": {
         "command": "golangci-lint run ./cmd/notefixturegen/... ./internal/notefixturegen/...",
         "cwd": "{workspaceRoot}"
       },
-      "cache": false,
       "parallelism": false
     }
   }

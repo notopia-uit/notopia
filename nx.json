@@ -23,6 +23,12 @@
       "!{workspaceRoot}/pkg/**/*_test.{go}"
     ],
     "goFiles": ["{workspaceRoot}/go.mod", "{workspaceRoot}/go.sum", "{projectRoot}/**/*.go"],
+    "goLint": [
+      "{workspaceRoot}/.golangci.yaml",
+      {
+        "runtime": "golangci-lint --version"
+      }
+    ],
     "protoFiles": [
       "{projectRoot}/**/*.proto",
       "{workspaceRoot}/buf.gen.yaml",
