@@ -34,7 +34,10 @@ export-authentik-blueprint:
 shadcnadd component:
     pnpm exec shadcn add {{ component }} -c ./packages/ui/
 
-seed: seed-search seed-billing
+seed: seed-authorization seed-search seed-billing
+
+seed-authorization:
+    nx run authorizationseed:run
 
 seed-search:
     nx run search-worker:seed
@@ -42,7 +45,7 @@ seed-search:
 seed-billing:
     nx run billingseed:run
 
-fixtures: seed fixtures-note fixtures-document fixtures-search fixtures-billing
+fixtures: seed fixtures-authorization fixtures-note fixtures-document fixtures-search fixtures-billing
 
 fixtures-note db-connection=note-db-connection: prepare-fixtures-note
     psql {{ db-connection }} \
@@ -67,6 +70,9 @@ prepare-fixtures-search:
 
 fixtures-billing:
     nx run billingfixtures:run
+
+fixtures-authorization:
+    nx run authorizationfixtures:run
 
 stripe-listen:
     stripe listen \

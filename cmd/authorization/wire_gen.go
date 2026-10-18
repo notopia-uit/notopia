@@ -121,7 +121,7 @@ func InitializeServer(ctx context.Context) (*authorization.Server, func(), error
 		cleanup()
 		return nil, nil, err
 	}
-	healthHealth := health.New(db, serverConfig, kafka)
+	healthHealth := health.New(db, transactionalEnforcer, serverConfig, kafka)
 	authorizationServer, err := authorization.NewServer(ctx, server, healthHealth, logger, global, general, appApp)
 	if err != nil {
 		cleanup6()

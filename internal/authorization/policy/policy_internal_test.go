@@ -1,4 +1,4 @@
-package app
+package policy
 
 import (
 	"testing"
@@ -26,7 +26,7 @@ func TestParsePolicyCSV(t *testing.T) {
 }
 
 func TestParsePolicyCSVEmbeddedFiles(t *testing.T) {
-	m, err := parsePolicyCSV(PolicyCSV)
+	m, err := parsePolicyCSV(CSV)
 	require.NoError(t, err)
 	p, err := m.GetPolicy("p", "p")
 	require.NoError(t, err)
@@ -35,7 +35,7 @@ func TestParsePolicyCSVEmbeddedFiles(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, g2, 2)
 
-	_, err = parsePolicyCSV(PolicyFixturesCSV)
+	_, err = parsePolicyCSV(FixturesCSV)
 	require.NoError(t, err)
 }
 

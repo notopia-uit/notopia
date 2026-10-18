@@ -1,0 +1,56 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "authorizationfixtures",
+  "projectType": "application",
+  "tags": ["type:go"],
+  "namedInputs": {
+    "default": [
+      "goPkgFiles",
+      "goFiles",
+      "{workspaceRoot}/internal/authorization/**/*.go",
+      "{workspaceRoot}/internal/authorizationfixtures/**/*.go"
+    ]
+  },
+  "targets": {
+    "gen:wire": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/wire_gen.go"],
+      "options": {
+        "command": "wire",
+        "cwd": "{projectRoot}"
+      },
+      "cache": false
+    },
+    "gen": {
+      "dependsOn": ["gen:wire"]
+    },
+    "run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run ./cmd/authorizationfixtures/",
+        "cwd": "{workspaceRoot}",
+        "tty": true
+      },
+      "dependsOn": ["gen"],
+      "continuous": false
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go build -o ./cmd/authorizationfixtures/authorizationfixtures ./cmd/authorizationfixtures/",
+        "cwd": "{workspaceRoot}"
+      },
+      "dependsOn": ["gen"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "inputs": ["default", "goLint"],
+      "options": {
+        "command": "golangci-lint run ./cmd/authorizationfixtures/... ./internal/authorizationfixtures/...",
+        "cwd": "{workspaceRoot}"
+      },
+      "parallelism": false
+    }
+  },
+  "implicitDependencies": ["pkg", "internal/authorization"]
+}

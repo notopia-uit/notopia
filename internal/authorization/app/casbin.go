@@ -1,22 +1,13 @@
 package app
 
 import (
-	_ "embed"
 	"fmt"
 
 	"github.com/casbin/casbin/v3"
 	"github.com/casbin/casbin/v3/log"
 	"github.com/casbin/casbin/v3/model"
+	"github.com/notopia-uit/notopia/internal/authorization/policy"
 )
-
-//go:embed model.conf
-var ModelConf string
-
-//go:embed policy.csv
-var PolicyCSV string
-
-//go:embed policy_fixtures.csv
-var PolicyFixturesCSV string
 
 type CasbinAdapter any
 
@@ -24,7 +15,7 @@ func NewCasbinEnforcer(
 	adapter CasbinAdapter,
 	log log.Logger,
 ) (*casbin.TransactionalEnforcer, error) {
-	model, err := model.NewModelFromString(ModelConf)
+	model, err := model.NewModelFromString(policy.ModelConf)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load Casbin model: %w", err)
 	}

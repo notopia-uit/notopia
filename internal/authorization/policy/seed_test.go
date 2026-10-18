@@ -1,7 +1,6 @@
-package app_test
+package policy_test
 
 import (
-	"context"
 	"path/filepath"
 	"testing"
 
@@ -9,17 +8,15 @@ import (
 	"github.com/casbin/casbin/v3/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/glebarez/sqlite"
-	"github.com/notopia-uit/notopia/internal/authorization/app"
+	"github.com/notopia-uit/notopia/internal/authorization/policy"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 )
 
-func TestBootStrapPolicies_AddsMissingRowsOnExistingDatabase(t *testing.T) {
-	enforcer, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{UseTransaction: true})
-	require.NoError(t, err)
-
-	_, err = enforcer.RemovePolicies([][]string{
+func TestSeed_AddsMissingRowsOnExistingDatabase(t *testing.T) {
+	enforcer := newPersistentEnforcer(t, filepath.Join(t.TempDir(), "casbin.db"))
+	_, err := enforcer.RemovePolicies([][]string{
 		{"owner", "workspace", "billing_read"},
 		{"owner", "workspace", "billing_manage"},
 		{"editor", "workspace", "billing_read"},
@@ -31,8 +28,7 @@ func TestBootStrapPolicies_AddsMissingRowsOnExistingDatabase(t *testing.T) {
 	require.NoError(t, err)
 	require.False(t, hasBilling)
 
-	a := &app.App{Enforcer: enforcer}
-	require.NoError(t, a.BootStrapPolicies(context.Background()))
+	require.NoError(t, policy.Seed(enforcer))
 
 	for _, rule := range [][]string{
 		{"owner", "workspace", "read"},
@@ -46,7 +42,7 @@ func TestBootStrapPolicies_AddsMissingRowsOnExistingDatabase(t *testing.T) {
 		assert.True(t, ok, rule)
 	}
 
-	require.NoError(t, a.BootStrapPolicies(context.Background()), "bootstrap must be idempotent")
+	require.NoError(t, policy.Seed(enforcer), "seed must be idempotent")
 
 	require.NoError(t, enforcer.LoadPolicy())
 	ok, err := enforcer.HasPolicy("viewer", "workspace", "billing_read")
@@ -57,7 +53,7 @@ func TestBootStrapPolicies_AddsMissingRowsOnExistingDatabase(t *testing.T) {
 func newPersistentEnforcer(t *testing.T, path string) *casbin.TransactionalEnforcer {
 	t.Helper()
 
-	m, err := model.NewModelFromString(app.ModelConf)
+	m, err := model.NewModelFromString(policy.ModelConf)
 	require.NoError(t, err)
 
 	db, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
@@ -76,26 +72,24 @@ func newPersistentEnforcer(t *testing.T, path string) *casbin.TransactionalEnfor
 	return enforcer
 }
 
-func TestBootStrapPolicies_KeepsPersistedMembershipsAcrossRestart(t *testing.T) {
+func TestSeed_KeepsPersistedMembershipsAcrossRestart(t *testing.T) {
 	const workspace = "workspace:aaaaaaaa-0000-4000-8000-000000000001"
 	path := filepath.Join(t.TempDir(), "casbin.db")
-	ctx := context.Background()
 
 	first := newPersistentEnforcer(t, path)
-	require.NoError(t, (&app.App{Enforcer: first}).BootStrapPolicies(ctx))
+	require.NoError(t, policy.Seed(first))
 	added, err := first.AddGroupingPolicy("user:999", "owner", workspace)
 	require.NoError(t, err)
 	require.True(t, added)
 
 	restarted := newPersistentEnforcer(t, path)
-	a := &app.App{Enforcer: restarted}
-	require.NoError(t, a.BootStrapPolicies(ctx))
+	require.NoError(t, policy.Seed(restarted))
 
 	ok, err := restarted.Enforce("user:999", workspace, "workspace", "read")
 	require.NoError(t, err)
-	assert.True(t, ok, "persisted membership must survive bootstrap")
+	assert.True(t, ok, "persisted membership must survive seed")
 
-	require.NoError(t, a.LoadFixtures(ctx))
+	require.NoError(t, policy.LoadFixtures(restarted))
 
 	ok, err = restarted.Enforce("user:999", workspace, "workspace", "read")
 	require.NoError(t, err)
@@ -111,16 +105,13 @@ func TestBootStrapPolicies_KeepsPersistedMembershipsAcrossRestart(t *testing.T) 
 	assert.True(t, ok, "fixture membership must be effective")
 }
 
-func TestBootStrapPolicies_PrunesStalePolicies(t *testing.T) {
-	enforcer, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{UseTransaction: true})
+func TestSeed_PrunesStalePolicies(t *testing.T) {
+	enforcer := newPersistentEnforcer(t, filepath.Join(t.TempDir(), "casbin.db"))
+	_, err := enforcer.AddPolicy("viewer", "workspace", "delete")
 	require.NoError(t, err)
 
-	_, err = enforcer.AddPolicy("viewer", "workspace", "delete")
-	require.NoError(t, err)
-
-	a := &app.App{Enforcer: enforcer}
-	require.NoError(t, a.BootStrapPolicies(context.Background()))
-	require.NoError(t, a.BootStrapPolicies(context.Background()))
+	require.NoError(t, policy.Seed(enforcer))
+	require.NoError(t, policy.Seed(enforcer))
 
 	stale, err := enforcer.HasPolicy("viewer", "workspace", "delete")
 	require.NoError(t, err)
@@ -134,4 +125,18 @@ func TestBootStrapPolicies_PrunesStalePolicies(t *testing.T) {
 	stale, err = enforcer.HasPolicy("viewer", "workspace", "delete")
 	require.NoError(t, err)
 	assert.False(t, stale, "prune must be persisted")
+}
+
+func TestMissingRules(t *testing.T) {
+	enforcer := newPersistentEnforcer(t, filepath.Join(t.TempDir(), "casbin.db"))
+
+	missing, err := policy.MissingRules(enforcer)
+	require.NoError(t, err)
+	assert.NotEmpty(t, missing)
+
+	require.NoError(t, policy.Seed(enforcer))
+
+	missing, err = policy.MissingRules(enforcer)
+	require.NoError(t, err)
+	assert.Empty(t, missing)
 }

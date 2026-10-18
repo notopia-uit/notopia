@@ -1,7 +1,6 @@
 package app_test
 
 import (
-	"context"
 	_ "embed"
 	"fmt"
 	"testing"
@@ -11,7 +10,7 @@ import (
 	stringadapter "github.com/casbin/casbin/v3/persist/string-adapter"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/glebarez/sqlite"
-	"github.com/notopia-uit/notopia/internal/authorization/app"
+	"github.com/notopia-uit/notopia/internal/authorization/policy"
 	"gorm.io/gorm"
 )
 
@@ -27,7 +26,7 @@ func GetLocalEnforcer(t testing.TB, params *GetLocalEnforcerParams) (*casbin.Tra
 		params = &GetLocalEnforcerParams{}
 	}
 
-	m, err := model.NewModelFromString(app.ModelConf)
+	m, err := model.NewModelFromString(policy.ModelConf)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load Casbin model: %w", err)
 	}
@@ -58,13 +57,11 @@ func GetLocalEnforcer(t testing.TB, params *GetLocalEnforcerParams) (*casbin.Tra
 			return nil, fmt.Errorf("failed to create Casbin enforcer: %w", err)
 		}
 
-		a := &app.App{Enforcer: enforcer}
-		ctx := context.Background()
-		if err := a.BootStrapPolicies(ctx); err != nil {
-			return nil, fmt.Errorf("failed to bootstrap policies: %w", err)
+		if err := policy.Seed(enforcer); err != nil {
+			return nil, err
 		}
 		if params.LoadTestPolicies {
-			if err := a.LoadFixtures(ctx); err != nil {
+			if err := policy.LoadFixtures(enforcer); err != nil {
 				return nil, fmt.Errorf("failed to load fixtures: %w", err)
 			}
 		}
@@ -73,11 +70,11 @@ func GetLocalEnforcer(t testing.TB, params *GetLocalEnforcerParams) (*casbin.Tra
 	}
 
 	// Use string adapter (non-transactional)
-	policy := app.PolicyCSV
+	rules := policy.CSV
 	if params.LoadTestPolicies {
-		policy += "\n" + app.PolicyFixturesCSV
+		rules += "\n" + policy.FixturesCSV
 	}
-	adapter := stringadapter.NewAdapter(policy)
+	adapter := stringadapter.NewAdapter(rules)
 
 	enforcer, err := casbin.NewTransactionalEnforcer(m, adapter)
 	if err != nil {
