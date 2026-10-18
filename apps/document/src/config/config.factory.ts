@@ -48,6 +48,7 @@ export const servicesConfig = registerAs(SERVICE_CONFIG, () =>
   servicesConfigSchema.parse({
     noteUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_NOTE_GRPC_URL!,
     authorizationUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_GRPC_URL!,
+    billingUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_BILLING_GRPC_URL!,
   } satisfies ServicesConfig)
 );
 

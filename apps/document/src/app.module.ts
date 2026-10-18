@@ -9,6 +9,7 @@ import pretty from 'pino-pretty';
 
 import { AuthenticationModule } from './authentication';
 import { AuthorizationModule } from './authorization';
+import { BillingModule } from './billing';
 import { BlockNoteModule } from './blocknote';
 import { HttpUserGuard } from './common';
 import {
@@ -102,6 +103,7 @@ import { StorageModule } from './storage';
     KafkaModule,
     AuthenticationModule,
     AuthorizationModule,
+    BillingModule,
     NoteModule,
     DatabaseModule,
     BlockNoteModule,

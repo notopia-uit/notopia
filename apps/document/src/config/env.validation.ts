@@ -14,6 +14,7 @@ export const envSchema = z.object({
   NOTOPIA_DOCUMENT_DB_NAME: z.string().default('document'),
   NOTOPIA_DOCUMENT_SERVICES_NOTE_GRPC_URL: z.string().default(''),
   NOTOPIA_DOCUMENT_SERVICES_AUTHORIZATION_GRPC_URL: z.string().default(''),
+  NOTOPIA_DOCUMENT_SERVICES_BILLING_GRPC_URL: z.string().default(''),
   NOTOPIA_DOCUMENT_S3_ENDPOINT: z.string().default(''),
   NOTOPIA_DOCUMENT_S3_REGION: z.string().default('us-east-1'),
   NOTOPIA_DOCUMENT_S3_ACCESS_KEY_ID: z.string().default(''),

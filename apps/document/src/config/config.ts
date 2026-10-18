@@ -20,6 +20,7 @@ export type DatabaseConfig = z.infer<typeof databaseConfigSchema>;
 export const servicesConfigSchema = z.object({
   noteUrl: z.string(),
   authorizationUrl: z.string(),
+  billingUrl: z.string(),
 });
 export type ServicesConfig = z.infer<typeof servicesConfigSchema>;
 
