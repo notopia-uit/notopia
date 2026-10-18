@@ -22,6 +22,7 @@ type Server struct {
 
 type Services struct {
 	Authorization commonconfig.Service `json:"authorization" mapstructure:"authorization" validate:"required" yaml:"authorization"`
+	Billing       commonconfig.Service `json:"billing"       mapstructure:"billing"       validate:"required" yaml:"billing"`
 }
 
 type Meilisearch struct {

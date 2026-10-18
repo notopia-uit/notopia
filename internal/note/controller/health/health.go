@@ -125,6 +125,17 @@ func New(
 			15*time.Second,
 			3*time.Second,
 			health.Check{
+				Name: "billingService",
+				Check: httpCheck.New(httpCheck.Config{
+					URL: servicesCfg.Billing.LiveURL,
+				}),
+			},
+		),
+
+		health.WithPeriodicCheck(
+			15*time.Second,
+			3*time.Second,
+			health.Check{
 				Name: "authentik",
 				Check: httpCheck.New(httpCheck.Config{
 					URL: authentikCfg.HealthLiveURL(),
