@@ -82,11 +82,11 @@ type CronJob struct {
 func JobFromConfig(cfg commonconfig.CronJob, run func(ctx context.Context) error) Job
 ```
 
-- [ ] **Step 1: pkg/cron + commonconfig.CronJob**
+- [x] **Step 1: pkg/cron + commonconfig.CronJob**
 
 `Locker` alias, `Enabled` on `Job`, `pkgcron.JobFromConfig(cfg, run)` helper (config stays free of runtime imports). Extend `pkg/cron/cron_test.go` with one case: a disabled job is not registered (`RunNow` returns unknown job).
 
-- [ ] **Step 2: billing config**
+- [x] **Step 2: billing config**
 
 ```go
 type Cron struct {
@@ -97,7 +97,7 @@ type Cron struct {
 
 Defaults in `New` (same style as the port defaults): `billing:reconcile-subscriptions` / `0 * * * *` / 15m / enabled; `billing:prune-provider-events` / `0 4 * * *` / 5m / enabled. Env e.g. `NOTOPIA_BILLING_CRON_RECONCILE_SUBSCRIPTIONS_SCHEDULE`. Check viper binds nested env keys without a config file (`AutomaticEnv` only resolves keys viper knows; register them with `viper.SetDefault` if `Unmarshal` misses them). Expose `*config.Cron` through the config provider set like the other sections.
 
-- [ ] **Step 3: locker in infra, controller without Redis**
+- [x] **Step 3: locker in infra, controller without Redis**
 
 `infra/redis/redis.go`: `func NewCronLocker(client *goredis.Client) (pkgcron.Locker, error) { return pkgcron.NewRedisLocker(client) }`, `var ProvideCronLocker = NewCronLocker`, add to the infra provider set.
 
@@ -120,7 +120,7 @@ func New(a *app.Server, locker pkgcron.Locker, cfg *config.Cron, logger *slog.Lo
 
 No `goredis` import left in `controller/`.
 
-- [ ] **Step 4: Verify, commit**
+- [x] **Step 4: Verify, commit**
 
 ```bash
 go test ./pkg/cron/...
@@ -180,7 +180,7 @@ func RequiredPlanForLimit(plans []PlanEntitlements, l PlanLimit, needed int64) P
 - Mapper (`infra/service/billing.go`): `toAppPlanTier(pb.PlanTier) (app.PlanTier, error)`; `PLAN_TIER_UNSPECIFIED` (or any unknown value) is an internal error. Feature/limit maps: `app.ParsePlanFeature` / `app.ParsePlanLimit`; keys note does not use (`auto_commit`, …) are skipped silently.
 - errs: `NewFeatureNotInPlan(key, requiredPlan string)`, `NewPlanLimitExceeded(key string, current, max int64, requiredPlan string)`, `NewBillingPayerMustTransfer(workspaceID uuid.UUID)`, `NewBillingServiceUnavailable(err error)`.
 
-- [ ] **Step 1: Plan types + port**
+- [x] **Step 1: Plan types + port**
 
 ```go
 // internal/note/app/plan.go
@@ -273,7 +273,7 @@ type BillingSvc interface {
 }
 ```
 
-- [ ] **Step 2: Errors**
+- [x] **Step 2: Errors**
 
 ```go
 // internal/note/errs/billing.go
@@ -336,7 +336,7 @@ func NewBillingServiceUnavailable(err error) *Err {
 	}
 ```
 
-- [ ] **Step 3: gRPC adapter**
+- [x] **Step 3: gRPC adapter**
 
 `internal/note/config/config.go` `Services`: add `Billing commonconfig.Service \`json:"billing" mapstructure:"billing" validate:"required" yaml:"billing"\``.
 `cmd/note/.env`:
@@ -399,7 +399,7 @@ func (b *Billing) GetEntitlements(ctx context.Context, workspaceID uuid.UUID) (a
 
 `var ProvideBilling = NewBilling`, `var _ app.BillingSvc = (*Billing)(nil)`; add to the service `ProviderSet` with `wire.Bind(new(app.BillingSvc), new(*Billing))`. Health (`controller/health/health.go`): add a `billingService` readiness check on `servicesCfg.Billing.LiveURL` like `authorizationService`.
 
-- [ ] **Step 4: Build, commit**
+- [x] **Step 4: Build, commit**
 
 ```bash
 nx run note:gen:wire && nx build note && nx lint note
@@ -421,7 +421,7 @@ git commit -m "feat(note): billing client, typed plan keys and payment-required 
 - Consumes: `BillingSvc`, `AuthorizationSvc.GetWorkspaceMembers(ctx, userID, workspaceID) ([]WorkspaceMember, error)` (existing; check field names in `internal/note/app/model.go`).
 - Produces: `checkMembersLimit(ctx, billingSvc BillingSvc, workspaceID uuid.UUID, current, requested int) error`, `checkPayerKept(ctx, billingSvc BillingSvc, workspaceID uuid.UUID, members []WorkspaceMemberUpdate) error`, `checkPayerMayLeave(ctx, billingSvc BillingSvc, workspaceID uuid.UUID, userID string) error`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```go
 // internal/note/app/billinggate_test.go
@@ -480,7 +480,7 @@ func isCode(err error, code errs.Code) bool {
 
 Run: `go test ./internal/note/app/ -run 'TestMembersLimit|TestPayerGuard'` → FAIL. (Adjust `WorkspaceMemberUpdate{ID, Role}` field names to the existing struct.)
 
-- [ ] **Step 2: Implement gates**
+- [x] **Step 2: Implement gates**
 
 ```go
 // internal/note/app/billinggate.go
@@ -590,7 +590,7 @@ A missing or `0` limit clamps to depth `1`, never `0`: `Depth <= 0` means unlimi
 	}
 ```
 
-- [ ] **Step 3: Tests, build, commit**
+- [x] **Step 3: Tests, build, commit**
 
 ```bash
 go test ./internal/note/app/...
@@ -629,11 +629,11 @@ func savePermanentDeleteTargets(ctx context.Context, r domain.RepoRegistry, t pe
 
 Notes are deleted (and saved) before folders so each note emits `NotePermanentlyDeletedEvent` instead of disappearing through the SQL cascade.
 
-- [ ] **Step 1: Domain + loader**
+- [x] **Step 1: Domain + loader**
 
 `loadPermanentDeleteTargets` is the body of today's `PermanentlyDeleteWorkspaceItemsHandler` up to the delete loop (`GetMany` with `ForUpdate`, `GetRecursiveChildrenFromFolder`, map dedupe). Folder children are passed to `PermanentlyDeleteFoldersWithChildren`; requested notes to `PermanentlyDeleteNotes`.
 
-- [ ] **Step 2: Use it in the three handlers**
+- [x] **Step 2: Use it in the three handlers**
 
 - `PermanentlyDeleteWorkspaceItems`: permission check, then load → domain → save.
 - `PermanentlyDeleteFolder`: same with `folderIDs = {cmd.ID}`.
@@ -641,7 +641,7 @@ Notes are deleted (and saved) before folders so each note emits `NotePermanently
 
 Behaviour is unchanged; no new tests (covered by the existing flows, check manually: empty trash, delete folder with nested notes → `note.deleted` per note).
 
-- [ ] **Step 3: Verify, commit**
+- [x] **Step 3: Verify, commit**
 
 ```bash
 nx run note:gen:wire && nx build note && nx lint note
@@ -667,7 +667,7 @@ git commit -m "refactor(note): share permanent delete through TrashService"
 - Consumes: Task 0 (`pkgcron.Locker`, `pkgcron.JobFromConfig`, `commonconfig.CronJob`), Task 3 (`loadPermanentDeleteTargets`, `TrashService`), `BillingSvc.BatchGetEntitlements`, `commonconfig.Identity.ServiceAccountUserID`.
 - Produces: `common.RedisClient` (shared), `common.ProvideCronLocker`; `Cmds.PurgeExpiredTrash`; `TrashWorkspacesReadModel.Handle(ctx, before time.Time) ([]uuid.UUID, error)`; job default `note:purge-expired-trash`.
 
-- [ ] **Step 1: Shared Redis client + locker**
+- [x] **Step 1: Shared Redis client + locker**
 
 Move `RedisClient` / `NewRedisClient` to `infra/common/redis.go` and drop the hard-coded `DB: 1` (the SSE hub uses pub/sub, which ignores the database number). Add:
 
@@ -681,7 +681,7 @@ var ProvideCronLocker = NewCronLocker
 
 `common.ProviderSet` gains `ProvideRedisClient`, `ProvideCronLocker`; `workspaceevent.ProviderSet` drops `ProvideRedisClient` and the hub takes `*common.RedisClient`.
 
-- [ ] **Step 2: Read model for workspaces with old trash**
+- [x] **Step 2: Read model for workspaces with old trash**
 
 `workspace_read.sql`:
 
@@ -696,7 +696,7 @@ WHERE n.trashed_by = 'purpose' AND n.trashed_at < @before::timestamptz;
 
 `readmodel.go`: `type TrashWorkspacesReadModel interface { Handle(ctx context.Context, before time.Time) ([]uuid.UUID, error) }`; `pgreadmodel/trashworkspaces.go` implements it with `ReadWorkspaceIDsWithTrashBefore` (same shape as `pgreadmodel/notesworkspaces.go` from plan 02); bind in `persistence/wire.go`. Run `nx run note:gen:sqlc`.
 
-- [ ] **Step 3: Purge command**
+- [x] **Step 3: Purge command**
 
 ```go
 // internal/note/app/cmd_purgeexpiredtrash.go
@@ -756,7 +756,7 @@ func (h *PurgeExpiredTrashHandler) purgeWorkspace(ctx context.Context, workspace
 
 (Match the exact split between "requested notes" and "folder children" chosen in Task 3.) Register in `app.go` (`Cmds.PurgeExpiredTrash`) and `wire.go`.
 
-- [ ] **Step 4: Config + cron controller**
+- [x] **Step 4: Config + cron controller**
 
 `config.go`:
 
@@ -801,7 +801,7 @@ func (c *Cron) Run(ctx context.Context) error {
 
 `controller/cron/wire.go`: `ProviderSet = wire.NewSet(Provide)`; add to `controller.ProviderSet`; `internal/note/server.go`: add `cron *cron.Cron` to `Server`/`NewServer` and `g.Go(func() error { return s.cron.Run(ctx) })`.
 
-- [ ] **Step 5: Verify, commit**
+- [x] **Step 5: Verify, commit**
 
 ```bash
 nx run note:gen:sqlc && nx run note:gen:wire && nx build note && nx lint note
@@ -831,7 +831,7 @@ git commit -m "feat(note): plan-aware trash purge cron"
 - Consumes: `share.SubscriptionChangedEvent` (plan 02 Task 5b) on `events.integration.billing.subscription.changed`.
 - Produces: SSE event `WorkspaceBillingChangedEvent {id, event, data: {workspaceId, plan}}` published on the workspace's existing channel.
 
-- [ ] **Step 1: Schema**
+- [x] **Step 1: Schema**
 
 ```yaml
 # api/note/components/schemas/WorkspaceBillingChangedEvent.yaml
@@ -872,7 +872,7 @@ required:
 
 Add it to the `oneOf` and the discriminator `mapping` in `workspaces_{workspaceId}_events.yaml`. Run `nx lint api && nx run api:gen`.
 
-- [ ] **Step 2: Event type**
+- [x] **Step 2: Event type**
 
 `app/workspaceevent.go`:
 
@@ -884,7 +884,7 @@ type WorkspaceEventBillingChanged struct {
 
 and a case in `NewEmptyWorkspaceEventFromType` for `note.WorkspaceBillingChangedEventEventWorkspaceBillingChangedEvent`. The hub (`infra/workspaceevent`) is unchanged.
 
-- [ ] **Step 3: Handler + consumer**
+- [x] **Step 3: Handler + consumer**
 
 ```go
 // internal/note/app/e_billingchanged.go
@@ -974,7 +974,7 @@ func (e *Event) subscriptionChangedHandler(msg *message.Message) error {
 	e.router.AddConsumerHandler("BillingSubscriptionChangedHandler", "events.integration.billing.subscription.changed", e.subcriber, e.subscriptionChangedHandler)
 ```
 
-- [ ] **Step 4: Verify, commit**
+- [x] **Step 4: Verify, commit**
 
 ```bash
 nx run note:gen:wire && nx build note && nx lint note
@@ -995,7 +995,7 @@ git commit -m "feat(note): forward billing changes to workspace SSE"
 
 - Modify: `api/note/paths/workspaces_{workspaceId}_members.yaml`, `workspaces_{workspaceId}_leave.yaml`, `notes_{noteId}_graph.yaml`, `workspaces_{workspaceId}_graph.yaml`, `workspaces_{workspaceId}_show-trash.yaml`
 
-- [ ] **Step 1: Descriptions + responses**
+- [x] **Step 1: Descriptions + responses**
 
 Append to each operation's `description` (add `description` if missing):
 
@@ -1016,7 +1016,7 @@ Add responses where a gate applies:
 
 and `409` (inline `Error`) on members/leave, `503` (`InternalServerError` shape, description "Billing service unavailable") on gated operations.
 
-- [ ] **Step 2: Generate, lint, commit**
+- [x] **Step 2: Generate, lint, commit**
 
 ```bash
 nx lint api && nx run api:gen && nx build note
@@ -1080,11 +1080,11 @@ class BillingService {
 
 Mapping: `toPlanTier(PlanTierPb)` converts the generated `PlanTier` enum from `@notopia-uit/pb/billing` into the local `PlanTier`; `PLAN_TIER_UNSPECIFIED` / `UNRECOGNIZED` throws (no fallback plan, same as note). A missing `entitlements` message in the response also throws. Feature/limit maps keep only the keys listed in `PlanFeature` / `PlanLimit`.
 
-- [ ] **Step 1: Config**
+- [x] **Step 1: Config**
 
 `servicesConfigSchema`: add `billingUrl: z.string()`; factory: `billingUrl: process.env.NOTOPIA_DOCUMENT_SERVICES_BILLING_GRPC_URL!`; `.env`: `NOTOPIA_DOCUMENT_SERVICES_BILLING_GRPC_URL=127.0.0.1:18084`.
 
-- [ ] **Step 2: Module + service**
+- [x] **Step 2: Module + service**
 
 `billing.module.ts`: copy `authorization/authorization.module.ts`, replacing the package/service constants with `BILLING_PACKAGE_NAME`, `BILLING_SERVICE_NAME`, `BillingServiceService` from `@notopia-uit/pb/billing`, url `servicesCfg.billingUrl`, provider/export `BillingService`.
 
@@ -1162,7 +1162,7 @@ export class BillingService implements OnModuleInit {
 
 Import `BillingModule` in `app.module.ts`.
 
-- [ ] **Step 3: Build, commit**
+- [x] **Step 3: Build, commit**
 
 ```bash
 oxfmt apps/document/src && nx lint document --fix && nx build document
@@ -1203,7 +1203,7 @@ ContributorTracker.clear(documentId: string, flushed: string[]): void; // remove
 ContributorFlushExtension implements Extension // onStoreDocument
 ```
 
-- [ ] **Step 1: Entities**
+- [x] **Step 1: Entities**
 
 `document.entity.ts`:
 
@@ -1236,7 +1236,7 @@ ContributorFlushExtension implements Extension // onStoreDocument
 
 TypeORM `synchronize` (non-production) adds the columns on start.
 
-- [ ] **Step 2: Contributor tracker + flush extension**
+- [x] **Step 2: Contributor tracker + flush extension**
 
 ```ts
 // apps/document/src/hocuspocus/contributor-tracker.ts
@@ -1296,7 +1296,7 @@ Why a separate extension, registered **first** (before the Hocuspocus Redis exte
 
 In `hocuspocus.ts` `onChange`: when `data.connection` exists, `this.contributors.add(data.documentName, data.context.user.id)`. `upsertData` is unchanged.
 
-- [ ] **Step 3: Write the failing test**
+- [x] **Step 3: Write the failing test**
 
 ```ts
 // apps/document/src/document/commit-policy.spec.ts
@@ -1357,7 +1357,7 @@ describe('commit policy', () => {
 
 Run: `nx test document -- src/document/commit-policy.spec.ts` → FAIL.
 
-- [ ] **Step 4: Commit policy + `commitIfDue`**
+- [x] **Step 4: Commit policy + `commitIfDue`**
 
 ```ts
 // apps/document/src/document/commit-policy.ts
@@ -1466,7 +1466,7 @@ Manual commit (`document.api.ts`): `const { revisionId } = await this.documentSe
 
 Revision list: `getRevisionsByDocumentId(documentId, page, limit, trigger?)` adds `...(trigger && { trigger })` to `where` and `order: { createdAt: 'DESC' }`; the revision schema in `api/document/components/schemas/` gains `authorId` (nullable string), `trigger` (enum), `contributorIds` (string[]); the list path gains an optional `trigger` query param. Run `nx run api:gen` and map the fields in `revision.api.ts`.
 
-- [ ] **Step 5: Tests, build, commit**
+- [x] **Step 5: Tests, build, commit**
 
 ```bash
 nx test document
@@ -1489,7 +1489,7 @@ git commit -m "feat(document): revision author, trigger, contributors and commit
 - Consumes: `BillingService.getEntitlements`, `NoteService.getWorkspaceByNote({ noteId, userId })`, `DocumentService.commitIfDue`, `HocuspocusService.setModified`.
 - Produces: `AutoCommitExtension implements Extension` (`afterStoreDocument`).
 
-- [ ] **Step 1: Extension**
+- [x] **Step 1: Extension**
 
 ```ts
 // apps/document/src/hocuspocus/auto-commit.extension.ts
@@ -1546,13 +1546,13 @@ No forced commit when the last client leaves: `clientsCount` is per instance, so
 
 Never rethrow: an error in a store hook keeps the document in memory.
 
-- [ ] **Step 2: Register + debounce config**
+- [x] **Step 2: Register + debounce config**
 
 Config: `hocuspocusDebounceMs: z.number().default(2000)`, `hocuspocusMaxDebounceMs: z.number().default(10000)` from `NOTOPIA_DOCUMENT_HOCUSPOCUS_DEBOUNCE_MS` / `..._MAX_DEBOUNCE_MS`.
 
 `hocuspocus.ts` constructor: inject `BillingService`, `ContributorTracker` and `ConfigService`; pass `debounce`/`maxDebounce`; extensions in order: `ContributorFlushExtension`, (Redis, Task 10), `HocuspocusDatabase`, `new AutoCommitExtension(documentService, noteService, billingService, identity.serviceAccountUserId, (id) => this.setModifiedFalse(id))`, where `setModifiedFalse` sets the metadata map to `{ modified: false }` on the loaded document with a normal origin (same as `HocuspocusService.setModified`; avoid a circular DI by implementing it inline on `this.hocuspocus.documents.get(id)`).
 
-- [ ] **Step 3: Verify, commit**
+- [x] **Step 3: Verify, commit**
 
 ```bash
 oxfmt apps/document/src && nx lint document --fix && nx build document
@@ -1579,7 +1579,7 @@ git commit -m "feat(document): auto-commit on paid plans via hocuspocus extensio
 - Consumes: `@notopia-uit/lib-server/locks` (`LocksSetupModule`), `@nestjs/locks` `Locks.withLock`, `@nestjs/schedule` `SchedulerRegistry`, `NoteService.batchGetNoteWorkspaces`, `BillingService.batchGetEntitlements/listPlans`.
 - Produces: `planRevisionDeletes(revisions: {id, documentId, createdAt}[], retentionDaysByDocument: Map<string, number>, now: Date): string[]` (pure, tested).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // apps/document/src/cron/revision-purge.spec.ts
@@ -1617,7 +1617,7 @@ describe('planRevisionDeletes', () => {
 
 Run: `nx test document -- src/cron/revision-purge.spec.ts` → FAIL.
 
-- [ ] **Step 2: Purge logic**
+- [x] **Step 2: Purge logic**
 
 ```ts
 // apps/document/src/cron/revision-purge.ts
@@ -1650,7 +1650,7 @@ export const planRevisionDeletes = (
 
 The cron loads, for documents having revisions older than `minDays`, **all** their revisions' `(id, documentId, createdAt)` so "latest" is correct.
 
-- [ ] **Step 3: Crons (config-driven)**
+- [x] **Step 3: Crons (config-driven)**
 
 `@Cron(expr)` is evaluated when the class loads, so it cannot read config. Jobs are registered at runtime instead; the lock key is the configured job name.
 
@@ -1833,7 +1833,7 @@ The sweeper is also what turns the last edits into a revision after everyone lea
 
 `cron.module.ts`: imports `DocumentModule`, `NoteModule`, `BillingModule`, `TypeOrmModule.forFeature([DocumentEntity, RevisionEntity])`; providers `SweeperCron`, `RevisionPurgeCron`, `CronRegistrar`.
 
-- [ ] **Step 4: Redis and scaling config + app module**
+- [x] **Step 4: Redis and scaling config + app module**
 
 Two separate config sections (`config.ts` / `config.factory.ts`):
 
@@ -1864,7 +1864,7 @@ document_redis:
     - 6374:6379
 ```
 
-- [ ] **Step 5: Tests, build, verify, commit**
+- [x] **Step 5: Tests, build, verify, commit**
 
 ```bash
 nx test document
@@ -1887,13 +1887,13 @@ git commit -m "feat(document): config-driven crons, separate redis and scaling c
 - Modify: `apps/document/AGENTS.md`, `internal/note/AGENTS.md`, `api/document/paths/*` (commit + revisions descriptions)
 - Create: `docs/superpowers/notes/billing-web-outline.md` (handoff for the frontend owner)
 
-- [ ] **Step 1: Docs**
+- [x] **Step 1: Docs**
 
 - `apps/document/AGENTS.md`: commit pipeline now `commitIfDue` (manual/auto/sweeper), contributors (`ContributorFlushExtension` before the Redis extension), `AutoCommitExtension` (no forced commit on disconnect), config-driven crons (`CronRegistrar`), separate `redis` / `scaling` config; remove "Commit is currently manual only".
 - `internal/note/AGENTS.md`: entitlement gates (members, payer guard, graph), trash purge cron, billing SSE event, TODO: gate `published_notes` when publishing is implemented.
 - `api/document` descriptions: commit → "Plus/pro workspaces also auto-commit (`auto_commit`)"; revisions → "Revisions older than plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`."
 
-- [ ] **Step 2: Web outline (no code)**
+- [x] **Step 2: Web outline (no code)**
 
 `docs/superpowers/notes/billing-web-outline.md`: billing settings tab (plan, status, renewal/access-until, payer + claim button, Upgrade → checkout URL, Manage → portal URL, Cancel now with `GET …/cancel-now/preview` amount); pricing page from `GET /billing/plans` (VND formatting `Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })`); global 402 handler on `@notopia-uit/api-gen` → upgrade dialog with `details.requiredPlan`; 409 `billingPayerMustTransfer` message; `<FeatureGate>` reading entitlements, refetched on SSE `WorkspaceBillingChangedEvent` and polled every 2 s (max 20 s) after returning with `?checkout=success|payer` or `?portal=return`; downgrade warning about retention; editor "Saved automatically" when `auto_commit`; revision list collapses `trigger=auto`; admin pages for plans/prices/policy (group `notopia-admins`).
 
@@ -1907,7 +1907,7 @@ git commit -m "feat(document): config-driven crons, separate redis and scaling c
 6. Trash purge and revision purge with shortened retention (admin API) and a `* * * * *` schedule from env; `…_ENABLED=false` disables a job.
 7. Stop billing → member add returns 503; editing continues (auto-commit skipped, logged).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 nx lint api && nx run api:gen
