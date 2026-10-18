@@ -65,13 +65,16 @@ sequenceDiagram
     B->>S: GET checkout session / subscription / refund (fetch-and-sync)
     B->>DB: tx: MarkProcessed(event.id) + apply state
     Note over B,DB: An event id already processed → no-op
+
     opt Duplicate or replaced subscription
-        B->>S: Cancel provider subscription (after commit, idempotent; reconcile retries on failure)
+        B->>S: Cancel provider subscription (after commit, idempotent)
     end
+
     opt Refund due
         B->>S: Create refund (idempotency key refund:{id})
         B->>DB: Save provider refund id + status
     end
+
     B--)K: subscription.changed (best-effort, after commit)
     B-->>-S: 204
 ```
