@@ -303,6 +303,18 @@ export type NoteHeartBeatWorkspaceEvent = {
   timestamp: Date;
 };
 
+export type NoteWorkspaceBillingChangedEvent = {
+  id: string;
+  event: 'WorkspaceBillingChangedEvent';
+  /**
+   * Refetch /billing/workspaces/{id}/entitlements.
+   */
+  data: {
+    workspaceId: NoteId3;
+    plan: string;
+  };
+};
+
 export type NoteWorkspaceDeletedEvent = {
   id: string;
   event: 'WorkspaceDeletedEvent';
@@ -666,6 +678,17 @@ export type NoteWorkspaceWritable = {
 export type NoteUserWorkspaceWritable = {
   workspace: NoteWorkspaceWritable;
   role: NoteWorkspaceRole;
+};
+
+export type NoteWorkspaceBillingChangedEventWritable = {
+  id: string;
+  event: 'WorkspaceBillingChangedEvent';
+  /**
+   * Refetch /billing/workspaces/{id}/entitlements.
+   */
+  data: {
+    plan: string;
+  };
 };
 
 export type NoteWorkspaceDeletedEventWritable = {
@@ -1829,6 +1852,8 @@ export type GetWorkspaceEventsResponses = {
   200: ({
     event: 'HeartBeatWorkspaceEvent';
   } & NoteHeartBeatWorkspaceEvent) | ({
+    event: 'WorkspaceBillingChangedEvent';
+  } & NoteWorkspaceBillingChangedEvent) | ({
     event: 'WorkspaceDeletedEvent';
   } & NoteWorkspaceDeletedEvent) | ({
     event: 'WorkspaceItemsUpdatedEvent';

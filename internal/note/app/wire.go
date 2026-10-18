@@ -33,6 +33,7 @@ var ProviderSetCommand = wire.NewSet(
 )
 
 var ProviderSetEvent = wire.NewSet(
+	ProvideBillingChangedHandler,
 	ProvideDocumentCommittedHandler,
 	ProvideNoteCreatedDomainToIntegrationEventHandler,
 	ProvideNoteDeletedDomainToIntegrationEventHandler,

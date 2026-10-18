@@ -61,6 +61,21 @@ func (e TrashedBy) Valid() bool {
 	}
 }
 
+// Defines values for WorkspaceBillingChangedEventEvent.
+const (
+	WorkspaceBillingChangedEventEventWorkspaceBillingChangedEvent WorkspaceBillingChangedEventEvent = "WorkspaceBillingChangedEvent"
+)
+
+// Valid indicates whether the value is a known member of the WorkspaceBillingChangedEventEvent enum.
+func (e WorkspaceBillingChangedEventEvent) Valid() bool {
+	switch e {
+	case WorkspaceBillingChangedEventEventWorkspaceBillingChangedEvent:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for WorkspaceDeletedEventEvent.
 const (
 	WorkspaceDeletedEventEventWorkspaceDeletedEvent WorkspaceDeletedEventEvent = "WorkspaceDeletedEvent"
@@ -446,6 +461,30 @@ type Workspace struct {
 	// Slug Example: notopia
 	Slug string `json:"slug"`
 }
+
+// WorkspaceBillingChangedEvent defines model for WorkspaceBillingChangedEvent.
+type WorkspaceBillingChangedEvent struct {
+	// Data Refetch /billing/workspaces/{id}/entitlements.
+	Data WorkspaceBillingChangedEventData `json:"data"`
+
+	// Event Example: WorkspaceBillingChangedEvent
+	Event WorkspaceBillingChangedEventEvent `json:"event"`
+
+	// Id Example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+	Id openapi_types.UUID `json:"id"`
+}
+
+// WorkspaceBillingChangedEventData Refetch /billing/workspaces/{id}/entitlements.
+type WorkspaceBillingChangedEventData struct {
+	// Plan Example: plus
+	Plan string `json:"plan"`
+
+	// WorkspaceId Example: 00000000-0000-4000-8000-000000000110
+	WorkspaceId *Id3 `json:"workspaceId,omitempty"`
+}
+
+// WorkspaceBillingChangedEventEvent Example: WorkspaceBillingChangedEvent
+type WorkspaceBillingChangedEventEvent string
 
 // WorkspaceDeletedEvent defines model for WorkspaceDeletedEvent.
 type WorkspaceDeletedEvent struct {

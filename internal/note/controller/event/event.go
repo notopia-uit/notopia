@@ -161,6 +161,13 @@ func (e *Event) setup() error {
 		e.documentCommittedHandler,
 	)
 
+	e.router.AddConsumerHandler(
+		"BillingSubscriptionChangedHandler",
+		"events.integration.billing.subscription.changed",
+		e.subcriber,
+		e.subscriptionChangedHandler,
+	)
+
 	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
 		"NotifyWorkspaceRenamedHandler",
 		e.app.Events.NotifyWorkspaceRenamed.Handle,

@@ -171,6 +171,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization, billing)
 	cmds := app.NewCmds(handlerProvider, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, emptyTrashHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, purgeExpiredTrashHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
+	billingChangedHandler := app.NewBillingChangedHandler(workspaceEventHub, commonconfigIdentity)
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
 	kafka := &configConfig.Kafka
@@ -209,6 +210,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	notifyWorkspaceSlugChangedHandler := app.NewNotifyWorkspaceSlugChangedHandler(workspaceEventHub)
 	workspaceDeletedDomainToIntegrationEventHandler := app.NewWorkspaceDeletedDomainToIntegrationEventHandler(integrationPublisher)
 	events := &app.Events{
+		BillingChanged:                           billingChangedHandler,
 		DocumentCommitted:                        documentCommittedHandler,
 		NoteCreatedDomainToIntegrationEvent:      noteCreatedDomainToIntegrationEventHandler,
 		NoteDeletedDomainToIntegrationEvent:      noteDeletedDomainToIntegrationEventHandler,

@@ -159,6 +159,7 @@ func NewQueries(
 var ProvideQueries = NewQueries
 
 type Events struct {
+	BillingChanged                           *BillingChangedHandler
 	DocumentCommitted                        *DocumentCommittedHandler
 	NoteCreatedDomainToIntegrationEvent      *NoteCreatedDomainToIntegrationEventHandler
 	NoteDeletedDomainToIntegrationEvent      *NoteDeletedDomainToIntegrationEventHandler

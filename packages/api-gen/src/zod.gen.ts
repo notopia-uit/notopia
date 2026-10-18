@@ -237,6 +237,15 @@ export const zNoteHeartBeatWorkspaceEvent = z.object({
   timestamp: z.iso.datetime()
 });
 
+export const zNoteWorkspaceBillingChangedEvent = z.object({
+  id: z.uuid(),
+  event: z.enum(['WorkspaceBillingChangedEvent']),
+  data: z.object({
+    workspaceId: zNoteId3,
+    plan: z.string()
+  })
+});
+
 export const zNoteWorkspaceDeletedEvent = z.object({
   id: z.uuid(),
   event: z.enum(['WorkspaceDeletedEvent']),
@@ -566,6 +575,14 @@ export const zNoteWorkspaceWritable = z.object({
 export const zNoteUserWorkspaceWritable = z.object({
   workspace: zNoteWorkspaceWritable,
   role: zNoteWorkspaceRole
+});
+
+export const zNoteWorkspaceBillingChangedEventWritable = z.object({
+  id: z.uuid(),
+  event: z.enum(['WorkspaceBillingChangedEvent']),
+  data: z.object({
+    plan: z.string()
+  })
 });
 
 export const zNoteWorkspaceDeletedEventWritable = z.object({
@@ -926,6 +943,7 @@ export const zGetWorkspaceEventsPath = z.object({
  */
 export const zGetWorkspaceEventsResponse = z.discriminatedUnion('event', [
   zNoteHeartBeatWorkspaceEvent.extend({ event: z.literal('HeartBeatWorkspaceEvent') }),
+  zNoteWorkspaceBillingChangedEvent.extend({ event: z.literal('WorkspaceBillingChangedEvent') }),
   zNoteWorkspaceDeletedEvent.extend({ event: z.literal('WorkspaceDeletedEvent') }),
   zNoteWorkspaceItemsUpdatedEvent.extend({ event: z.literal('WorkspaceItemsUpdatedEvent') }),
   zNoteWorkspaceMembersUpdatedEvent.extend({ event: z.literal('WorkspaceMembersUpdatedEvent') }),

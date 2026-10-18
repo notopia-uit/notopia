@@ -74,6 +74,10 @@ type WorkspaceEventWorkspaceDeleted struct {
 	workspaceEvent[note.WorkspaceDeletedEventEvent]
 }
 
+type WorkspaceEventBillingChanged struct {
+	workspaceEvent[note.WorkspaceBillingChangedEventEvent]
+}
+
 // NOTE: This is just used under infra? Consider move it to infra
 func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
 	switch t {
@@ -92,6 +96,9 @@ func NewEmptyWorkspaceEventFromType(t string) (WorkspaceEvent, bool) {
 	case string(note.WorkspaceDeletedEventEventWorkspaceDeletedEvent):
 		//exhaustruct:ignore
 		return &WorkspaceEventWorkspaceDeleted{}, true
+	case string(note.WorkspaceBillingChangedEventEventWorkspaceBillingChangedEvent):
+		//exhaustruct:ignore
+		return &WorkspaceEventBillingChanged{}, true
 	default:
 		return nil, false
 	}
