@@ -17,15 +17,18 @@ type PermanentlyDeleteFolder struct {
 
 type PermanentlyDeleteFolderHandler struct {
 	authorizationSvc AuthorizationSvc
+	trashService     *domain.TrashService
 	uow              domain.UnitOfWork
 }
 
 func NewPermanentlyDeleteFolderHandler(
 	authorizationSvc AuthorizationSvc,
+	trashService *domain.TrashService,
 	uow domain.UnitOfWork,
 ) *PermanentlyDeleteFolderHandler {
 	return &PermanentlyDeleteFolderHandler{
 		authorizationSvc: authorizationSvc,
+		trashService:     trashService,
 		uow:              uow,
 	}
 }
@@ -52,22 +55,11 @@ func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *Perman
 				fmt.Sprintf("user %s does not have permission to delete folder %s", cmd.UserID, cmd.ID),
 			)
 		}
-		folder, err := folderRepo.GetByID(ctx, cmd.ID, true)
+		targets, err := loadPermanentDeleteTargets(ctx, r, nil, []uuid.UUID{cmd.ID})
 		if err != nil {
 			return err
 		}
-		noteRepo := r.Note()
-		notes, err := noteRepo.GetRecursiveChildrenFromFolder(ctx, cmd.ID, true)
-		if err != nil {
-			return err
-		}
-		for _, n := range notes {
-			n.PermanentlyDelete(cmd.UserID)
-		}
-		if err := noteRepo.SaveMany(ctx, notes); err != nil {
-			return err
-		}
-		folder.PermanentlyDelete(cmd.UserID)
-		return folderRepo.Save(ctx, folder)
+		targets.delete(h.trashService, cmd.UserID)
+		return savePermanentDeleteTargets(ctx, r, targets)
 	})
 }

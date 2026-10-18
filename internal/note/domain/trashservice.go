@@ -79,3 +79,21 @@ func (s *TrashService) RestoreFoldersWithChildren(
 
 	return nil
 }
+
+func (s *TrashService) PermanentlyDeleteNotes(notes []*Note, userID string) {
+	for i := range notes {
+		notes[i].PermanentlyDelete(userID)
+	}
+}
+
+func (s *TrashService) PermanentlyDeleteFoldersWithChildren(
+	folders []*Folder,
+	childNotes []*Note,
+	userID string,
+) {
+	s.PermanentlyDeleteNotes(childNotes, userID)
+
+	for i := range folders {
+		folders[i].PermanentlyDelete(userID)
+	}
+}
