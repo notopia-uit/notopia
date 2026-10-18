@@ -38,6 +38,7 @@ type Cmds struct {
 	PermanentlyDeleteWorkspaceItems PermanentlyDeleteWorkspaceItemsCmd
 	PublishNote                     PublishNoteCmd
 	PublishWorkspace                PublishWorkspaceCmd
+	PurgeExpiredTrash               PurgeExpiredTrashCmd
 	RenameFolder                    RenameFolderCmd
 	RenameNote                      RenameNoteCmd
 	RenameWorkspace                 RenameWorkspaceCmd
@@ -63,6 +64,7 @@ func NewCmds(
 	permanentlyDeleteWorkspaceItemsHandler *PermanentlyDeleteWorkspaceItemsHandler,
 	publishNoteHandler *PublishNoteHandler,
 	publishWorkspaceHandler *PublishWorkspaceHandler,
+	purgeExpiredTrashHandler *PurgeExpiredTrashHandler,
 	renameFolderHandler *RenameFolderHandler,
 	renameNoteHandler *RenameNoteHandler,
 	renameWorkspaceHandler *RenameWorkspaceHandler,
@@ -87,6 +89,7 @@ func NewCmds(
 		PermanentlyDeleteWorkspaceItems: commonhandler.DecorateCmd(hp, permanentlyDeleteWorkspaceItemsHandler),
 		PublishNote:                     commonhandler.DecorateCmd(hp, publishNoteHandler),
 		PublishWorkspace:                commonhandler.DecorateCmd(hp, publishWorkspaceHandler),
+		PurgeExpiredTrash:               commonhandler.DecorateCmd(hp, purgeExpiredTrashHandler),
 		RenameFolder:                    commonhandler.DecorateCmd(hp, renameFolderHandler),
 		RenameNote:                      commonhandler.DecorateCmd(hp, renameNoteHandler),
 		RenameWorkspace:                 commonhandler.DecorateCmd(hp, renameWorkspaceHandler),

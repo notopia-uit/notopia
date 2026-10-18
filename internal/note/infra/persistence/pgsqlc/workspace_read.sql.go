@@ -7,6 +7,7 @@ package pgsqlc
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"go.opentelemetry.io/otel"
@@ -123,6 +124,48 @@ func (q *Queries) ReadGetWorkspacesByIDs(ctx context.Context, ids []uuid.UUID) (
 			return nil, err
 		}
 		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const readWorkspaceIDsWithTrashBefore = `-- name: ReadWorkspaceIDsWithTrashBefore :many
+SELECT DISTINCT
+  f.workspace_id
+FROM
+  folders f
+WHERE
+  f.trashed_by = 'purpose'
+  AND f.trashed_at < $1::timestamptz
+UNION
+SELECT DISTINCT
+  f.workspace_id
+FROM
+  notes n
+JOIN
+  folders f ON f.id = n.folder_id
+WHERE
+  n.trashed_by = 'purpose'
+  AND n.trashed_at < $1::timestamptz
+`
+
+func (q *Queries) ReadWorkspaceIDsWithTrashBefore(ctx context.Context, before time.Time) ([]uuid.UUID, error) {
+	ctx, span := otel.Tracer("Queries").Start(ctx, "ReadWorkspaceIDsWithTrashBefore")
+	defer span.End()
+	rows, err := q.db.Query(ctx, readWorkspaceIDsWithTrashBefore, before)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []uuid.UUID
+	for rows.Next() {
+		var workspace_id uuid.UUID
+		if err := rows.Scan(&workspace_id); err != nil {
+			return nil, err
+		}
+		items = append(items, workspace_id)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

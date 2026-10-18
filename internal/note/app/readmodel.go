@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -82,4 +83,8 @@ type GetWorkspaceTreeReadModel interface {
 
 type GetNotesWorkspaceIDsReadModel interface {
 	Handle(ctx context.Context, noteIDs []uuid.UUID) (map[uuid.UUID]uuid.UUID, error)
+}
+
+type TrashWorkspacesReadModel interface {
+	Handle(ctx context.Context, before time.Time) ([]uuid.UUID, error)
 }
