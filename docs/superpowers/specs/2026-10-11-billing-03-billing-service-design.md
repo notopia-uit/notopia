@@ -13,26 +13,26 @@ health, Postgres + goose + sqlc, Kafka consumers, cron, compose, Traefik.
 
 ## 0. Decision summary
 
-| Topic           | Decision                                                                                                                                                                                                                    |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Billed entity   | Workspace. One **payer** (`payerId`, AWS term) per workspace; payer must be a workspace owner. Any owner may manage billing.                                                                                                |
-| Provider        | Stripe, **test mode / sandbox only**. Stripe does not onboard Vietnam-registered businesses for live payouts. Provider sits behind `app.PaymentProvider` so a VN gateway can replace it.                                    |
-| SDK             | `github.com/stripe/stripe-go/v87` (MIT, free).                                                                                                                                                                              |
-| Stripe Customer | One per **workspace**, mapping stored only in billing DB. Authentik is not touched.                                                                                                                                         |
-| Stripe UI       | Stripe-hosted **Checkout** (purchase, card replacement) + Stripe-hosted **Customer Portal** (card, invoices, cancel at period end, plan switch). Our API only does what those cannot.                                       |
-| Product type    | Stripe Billing subscriptions (`mode=subscription`) for month/year; one-time Price (`mode=payment`) for lifetime. No raw PaymentIntents.                                                                                     |
-| Tiers           | `free`, `plus`, `pro`. Lifetime grants `pro`.                                                                                                                                                                               |
-| Intervals       | `month`, `year` (≈20% off, separate Price), `lifetime`.                                                                                                                                                                     |
-| Currency        | VND only (zero-decimal). Schema keeps `currency` so other currencies can be added as rows.                                                                                                                                  |
-| Catalog         | Feature/limit **keys** are enums in code. Their **values** per plan, the billing policy, and all prices live in the billing DB and are **admin-editable** via API. Prices are grandfathered; plan limits apply immediately. |
-| Admin           | One app-wide admin group from config (`NOTOPIA_{SERVICE}_ADMIN_GROUP`, default `notopia-admins`), read from `X-Forwarded-Groups`.                                                                                           |
-| Entitlements    | Billing returns plan + resolved features + limits. Frontend hardcodes nothing numeric.                                                                                                                                      |
-| Enforcement     | note / document (later AI) call billing gRPC directly on every check, **no cache**. Billing publishes no integration events. Errors → HTTP 402 conforming to `Error`.                                                       |
-| Expiry          | No "expire at period end" job. Webhooks drive state; hourly reconcile cron is the safety net; `past_due` keeps access for a grace period.                                                                                   |
-| Refund          | Immediate cancel → prorated refund. Lifetime → full refund within a window, none after.                                                                                                                                     |
-| Cron            | Inside each service, `controller/cron/`, Redis-locked. `// NOTE:` to move into `cmd/{svc}-worker` later.                                                                                                                    |
-| System actor    | Authentik service account per service (`note-service` 1001, `document-service` 1002, `billing-service` 1003). No `"system"` string.                                                                                         |
-| Trial           | None (TODO).                                                                                                                                                                                                                |
+| Topic           | Decision                                                                                                                                                                                                                                    |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Billed entity   | Workspace. One **payer** (`payerId`, AWS term) per workspace; payer must be a workspace owner. Any owner may manage billing.                                                                                                                |
+| Provider        | Stripe, **test mode / sandbox only**. Stripe does not onboard Vietnam-registered businesses for live payouts. Provider sits behind `app.PaymentProvider` so a VN gateway can replace it.                                                    |
+| SDK             | `github.com/stripe/stripe-go/v87` (MIT, free).                                                                                                                                                                                              |
+| Stripe Customer | One per **workspace**, mapping stored only in billing DB. Authentik is not touched.                                                                                                                                                         |
+| Stripe UI       | Stripe-hosted **Checkout** (purchase, card replacement) + Stripe-hosted **Customer Portal** (card, invoices, cancel at period end, plan switch). Our API only does what those cannot.                                                       |
+| Product type    | Stripe Billing subscriptions (`mode=subscription`) for month/year; one-time Price (`mode=payment`) for lifetime. No raw PaymentIntents.                                                                                                     |
+| Tiers           | `free`, `plus`, `pro`. Lifetime grants `pro`.                                                                                                                                                                                               |
+| Intervals       | `month`, `year` (≈20% off, separate Price), `lifetime`.                                                                                                                                                                                     |
+| Currency        | VND only (zero-decimal). Schema keeps `currency` so other currencies can be added as rows.                                                                                                                                                  |
+| Catalog         | Feature/limit **keys** are enums in code. Their **values** per plan, the billing policy, and all prices live in the billing DB and are **admin-editable** via API. Prices are grandfathered; plan limits apply immediately.                 |
+| Admin           | One app-wide admin group from config (`NOTOPIA_{SERVICE}_ADMIN_GROUP`, default `notopia-admins`), read from `X-Forwarded-Groups`.                                                                                                           |
+| Entitlements    | Billing returns plan + resolved features + limits. Frontend hardcodes nothing numeric.                                                                                                                                                      |
+| Enforcement     | note / document (later AI) call billing gRPC directly on every check, **no cache**. Billing publishes only the best-effort `subscription.changed` notification (section 10), never state to cache. Errors → HTTP 402 conforming to `Error`. |
+| Expiry          | No "expire at period end" job. Webhooks drive state; hourly reconcile cron is the safety net; `past_due` keeps access for a grace period.                                                                                                   |
+| Refund          | Immediate cancel → prorated refund. Lifetime → full refund within a window, none after.                                                                                                                                                     |
+| Cron            | Inside each service, `controller/cron/`, Redis-locked. `// NOTE:` to move into `cmd/{svc}-worker` later.                                                                                                                                    |
+| System actor    | Authentik service account per service (`note-service` 1001, `document-service` 1002, `billing-service` 1003). No `"system"` string.                                                                                                         |
+| Trial           | None (TODO).                                                                                                                                                                                                                                |
 
 ---
 
@@ -532,7 +532,7 @@ Kafka consumers (`controller/event`): one consumer group per topic; an undecodab
 | `q_getsubscription.go` | HTTP (owner) | Subscription + billing account (payer, payerMissingSince) + refunds. |
 | `q_listplans.go` | HTTP public, gRPC | Plans with features, limits, active prices. |
 | `q_listprices.go` | Admin HTTP | All prices including archived. |
-| `q_getworkspacepayer.go` | gRPC | `{payerId, requiresPayer}`; `requiresPayer` = current recurring subscription exists. |
+| `q_getworkspacepayer.go` | gRPC | `{payerId, requiresPayer}`; `requiresPayer` = a current recurring subscription exists and is not cancelling at period end (lifetime and cancelling subscriptions never charge again). |
 | `q_getpolicy.go` | Admin HTTP | |
 
 ## 7. Webhook
@@ -653,7 +653,8 @@ message ListPlansResponse { repeated Plan plans = 1; }
 Feature/limit maps stay string-keyed (proto map keys cannot be enums). Callers check maps with a
 small helper in each consumer (`ent.Feature("auto_commit")`, `ent.Limit("members")`; missing key →
 feature false, limit 0) and map `PlanTier`/`SubscriptionStatus` to their own local types at the
-client; `*_UNSPECIFIED` is an error there.
+client; `*_UNSPECIFIED` (or any unknown value) is an error in every consumer, with no fallback
+plan.
 
 ## 10. Integration events
 
@@ -793,16 +794,17 @@ viper `SetEnvPrefix("notopia_billing")` with `.` → `_`, same as note. Every va
 prefixed `NOTOPIA_BILLING_`.
 
 ```
-NOTOPIA_BILLING_HTTP_PORT, NOTOPIA_BILLING_GRPC_PORT
-NOTOPIA_BILLING_POSTGRES_*
-NOTOPIA_BILLING_REDIS_*
-NOTOPIA_BILLING_KAFKA_BROKERS
-NOTOPIA_BILLING_AUTHORIZATION_GRPC_ADDR
-NOTOPIA_BILLING_STRIPE_SECRET_KEY        # .env.local
-NOTOPIA_BILLING_STRIPE_WEBHOOK_SECRET    # .env.local
-NOTOPIA_BILLING_WEB_BASE_URL             # success/cancel/return URLs
-NOTOPIA_BILLING_CURRENCY=vnd
-NOTOPIA_BILLING_IDENTITY_ADMIN_GROUP=notopia-admins          # pkg/common/config.Identity (sub-project 02)
+NOTOPIA_BILLING_SERVER_URL
+NOTOPIA_BILLING_SERVER_{HTTP,GRPC,HEALTH}_PORT                 # defaults 8084 / 18084 / 28084
+NOTOPIA_BILLING_DATABASE_URL
+NOTOPIA_BILLING_REDIS_ADDR
+NOTOPIA_BILLING_KAFKA_BROKERS, NOTOPIA_BILLING_KAFKA_CONSUMER_GROUP   # group default billing-service
+NOTOPIA_BILLING_SERVICES_AUTHORIZATION_URL, NOTOPIA_BILLING_SERVICES_AUTHORIZATION_LIVE_URL
+NOTOPIA_BILLING_STRIPE_SECRET_KEY                              # .env.local
+NOTOPIA_BILLING_STRIPE_WEBHOOK_SECRET                          # .env.local
+NOTOPIA_BILLING_BILLING_WEB_BASE_URL                           # success/cancel/return URLs
+NOTOPIA_BILLING_BILLING_CURRENCY=vnd
+NOTOPIA_BILLING_IDENTITY_ADMIN_GROUP=notopia-admins            # pkg/common/config.Identity (sub-project 02)
 NOTOPIA_BILLING_IDENTITY_SERVICE_ACCOUNT_USER_ID=1003
 ```
 
