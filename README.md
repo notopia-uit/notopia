@@ -178,7 +178,6 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 - [ ] Authorization service
   - [ ] Health check
 - [ ] Cannot deal with `domain.com:8080/api/v1` base path
-- [ ] no env validation for document, search-worker
 - [ ] Health check to other services (api service, meili, postgres...)
 - [ ] Connection pool max connections, idle, timeout for database, meili
 - [ ] gin should be protected with `SetTrustedProxies`
@@ -190,6 +189,10 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 - [ ] Consider split the workspace event (SSE) into a dedicated service, not bounded to `note` service
   > Events from subscription changed
 - [ ] Make backend services have an option to must trust request comes from api gateway
+- [ ] NestJS service doesn't have a polite migration mechanism for production
+- [ ] OpenAPI upgrade 3.1
+- [ ] App admin edit doesn't propagate the SSE to web client. We only have workspace event SSE
+- [x] no env validation for document, search-worker
 
 ### Frontend
 

@@ -16,14 +16,14 @@ oxlint=$CLAUDE_PROJECT_DIR/node_modules/.bin/oxlint
 oxfmt=$CLAUDE_PROJECT_DIR/node_modules/.bin/oxfmt
 
 case "$file" in
-  *.js | *.jsx | *.ts | *.tsx)
-    # run_if_found "$oxlint" --fix "$file"
-    run_if_found "$oxfmt" "$file"
-    ;;
-  *.go)
-    run_if_found gofumpt -w "$file"
-    # run_if_found golangci-lint run --fix "$file"
-    ;;
+*.js | *.jsx | *.ts | *.tsx | *.json | *.css | *.scss | *.md)
+  # run_if_found "$oxlint" --fix "$file"
+  run_if_found "$oxfmt" "$file"
+  ;;
+*.go)
+  run_if_found gofumpt -w "$file"
+  # run_if_found golangci-lint run --fix "$file"
+  ;;
 esac
 
 exit 0
