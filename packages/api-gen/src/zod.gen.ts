@@ -119,10 +119,19 @@ export const zDocumentError = z.object({
 
 export const zDocumentId2 = z.uuid().readonly();
 
+export const zDocumentRevisionTrigger = z.enum([
+  'manual',
+  'auto',
+  'sweeper'
+]);
+
 export const zDocumentRevision = z.object({
   id: z.uuid().readonly(),
   name: z.string().min(1).max(255).nullable(),
-  createdAt: z.iso.datetime().readonly()
+  createdAt: z.iso.datetime().readonly(),
+  authorId: z.string().readonly().nullable(),
+  trigger: zDocumentRevisionTrigger,
+  contributorIds: z.array(z.string()).readonly()
 });
 
 export const zDocumentPagination = z.object({
@@ -553,7 +562,8 @@ export const zShareWorkspaceMemberRemovedEventWritable = z.object({
 export const zShareDocumentContentWritable = z.array(z.unknown());
 
 export const zDocumentRevisionWritable = z.object({
-  name: z.string().min(1).max(255).nullable()
+  name: z.string().min(1).max(255).nullable(),
+  trigger: zDocumentRevisionTrigger
 });
 
 /**
@@ -676,6 +686,11 @@ export const zDocumentPageQuery = z.int().gte(1).default(1);
  */
 export const zDocumentLimitQuery = z.int().gte(1).lte(100).default(20);
 
+/**
+ * Only return revisions created by this trigger
+ */
+export const zDocumentRevisionTriggerQuery = zDocumentRevisionTrigger;
+
 export const zDocumentRevisionIdPath = zDocumentId2;
 
 export const zNoteFolderIdPath = zNoteId;
@@ -727,7 +742,8 @@ export const zCommitDocumentResponse = z.object({
 export const zGetRevisionsQuery = z.object({
   documentId: zDocumentId,
   page: z.int().gte(1).optional().default(1),
-  limit: z.int().gte(1).lte(100).optional().default(20)
+  limit: z.int().gte(1).lte(100).optional().default(20),
+  trigger: zDocumentRevisionTrigger.optional()
 });
 
 /**

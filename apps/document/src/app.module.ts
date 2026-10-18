@@ -118,7 +118,13 @@ import { StorageModule } from './storage';
         },
       }),
       {
-        imports: [ConfigModule, DocumentModule, HocuspocusModule, RevisionModule],
+        imports: [
+          ConfigModule,
+          AuthorizationModule,
+          DocumentModule,
+          HocuspocusModule,
+          RevisionModule,
+        ],
       }
     ),
   ],

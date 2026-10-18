@@ -12,6 +12,8 @@ import { AuthenticationService } from '../authentication/authentication.service'
 import { AuthorizationService } from '../authorization/authorization.service';
 import { DocumentService } from '../document/document.service';
 import { NoteService } from '../note/note.service';
+import { ContributorFlushExtension } from './contributor-flush.extension';
+import { ContributorTracker } from './contributor-tracker';
 import { applyStoredModified, readModified } from './document-metadata';
 import { HocuspocusContext } from './hocuspocus-context';
 
@@ -26,7 +28,8 @@ export class Hocuspocus {
     documentService: DocumentService,
     private readonly noteService: NoteService,
     private readonly authorizationService: AuthorizationService,
-    private readonly authenticationService: AuthenticationService
+    private readonly authenticationService: AuthenticationService,
+    private readonly contributors: ContributorTracker
   ) {
     this.hocuspocus = new ServerHocuspocus<HocuspocusContext>({
       name: 'document', // TODO: Inject host
@@ -43,10 +46,12 @@ export class Hocuspocus {
       },
       afterUnloadDocument: async ({ documentName }) => {
         this.deletedDocumentIds.delete(documentName);
+        this.contributors.forget(documentName);
       },
       onAuthenticate: (...args) => this.onAuthenticate(...args),
       onChange: (...args) => this.onChange(...args),
       extensions: [
+        new ContributorFlushExtension(contributors, documentService),
         new HocuspocusLogger({
           log: (message) => this.logger.log(message),
         }),
@@ -129,6 +134,8 @@ export class Hocuspocus {
     data: onChangePayload<HocuspocusContext>
   ): Promise<HocuspocusContext | void> {
     if (!data.connection) return Promise.resolve();
+
+    this.contributors.add(data.documentName, data.context.user.id);
 
     const metadata = data.document.getMap('metadata') as YDocMetadataMap;
     const existing = metadata.get('metadata');

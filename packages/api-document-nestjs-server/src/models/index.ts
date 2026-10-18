@@ -5,5 +5,6 @@ export * from './error';
 export * from './pagination';
 export * from './rename-revision-request';
 export * from './revision';
+export * from './revision-trigger';
 export * from './revision-with-content';
  

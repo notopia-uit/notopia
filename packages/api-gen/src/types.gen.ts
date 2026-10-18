@@ -136,10 +136,27 @@ export type DocumentError = {
 
 export type DocumentId2 = string;
 
+export const DocumentRevisionTrigger = {
+  MANUAL: 'manual',
+  AUTO: 'auto',
+  SWEEPER: 'sweeper'
+} as const;
+
+export type DocumentRevisionTrigger = typeof DocumentRevisionTrigger[keyof typeof DocumentRevisionTrigger];
+
 export type DocumentRevision = {
   readonly id: string;
   name: string | null;
   readonly createdAt: Date;
+  /**
+   * Who the revision is attributed to. Null for revisions created before authors were recorded
+   */
+  readonly authorId: string | null;
+  trigger: DocumentRevisionTrigger;
+  /**
+   * Users who edited the document since the previous revision, most recent last
+   */
+  readonly contributorIds: Array<string>;
 };
 
 export type DocumentPagination = {
@@ -654,6 +671,7 @@ export type ShareDocumentContentWritable = Array<unknown>;
 
 export type DocumentRevisionWritable = {
   name: string | null;
+  trigger: DocumentRevisionTrigger;
 };
 
 /**
@@ -781,6 +799,11 @@ export type DocumentPageQuery = number;
  * Number of items per page
  */
 export type DocumentLimitQuery = number;
+
+/**
+ * Only return revisions created by this trigger
+ */
+export type DocumentRevisionTriggerQuery = DocumentRevisionTrigger;
 
 export type DocumentRevisionIdPath = DocumentId2;
 
@@ -911,6 +934,10 @@ export type GetRevisionsData = {
      * Number of items per page
      */
     limit?: number;
+    /**
+     * Only return revisions created by this trigger
+     */
+    trigger?: DocumentRevisionTrigger;
   };
   url: '/document/revisions';
 };

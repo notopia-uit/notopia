@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { GetRevisions200Response, RenameRevisionRequest, RevisionWithContent,  } from '../models';
+import { GetRevisions200Response, RenameRevisionRequest, RevisionTrigger, RevisionWithContent,  } from '../models';
 
 
 @Injectable()
@@ -12,7 +12,7 @@ export abstract class RevisionApi {
   abstract getRevisionWithContent(revisionId: string,  request: Request): RevisionWithContent | Promise<RevisionWithContent> | Observable<RevisionWithContent>;
 
 
-  abstract getRevisions(documentId: string, page: number | undefined, limit: number | undefined,  request: Request): GetRevisions200Response | Promise<GetRevisions200Response> | Observable<GetRevisions200Response>;
+  abstract getRevisions(documentId: string, page: number | undefined, limit: number | undefined, trigger: RevisionTrigger | undefined,  request: Request): GetRevisions200Response | Promise<GetRevisions200Response> | Observable<GetRevisions200Response>;
 
 
   abstract renameRevision(revisionId: string, renameRevisionRequest: RenameRevisionRequest,  request: Request): void | Promise<void> | Observable<void>;

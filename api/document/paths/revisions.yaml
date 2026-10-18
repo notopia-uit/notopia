@@ -13,6 +13,7 @@ get:
     - $ref: ../components/parameters/documentIdQuery.yaml
     - $ref: ../../common/components/parameters/pageQuery.yaml
     - $ref: ../../common/components/parameters/limitQuery.yaml
+    - $ref: ../components/parameters/revisionTriggerQuery.yaml
   responses:
     200:
       description: Revisions

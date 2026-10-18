@@ -1,3 +1,5 @@
+export * from './commit-policy';
+export * from './document-no-revision.exception';
 export * from './document-not-found.exception';
 export * from './document-permission.exception';
 export * from './document.api';

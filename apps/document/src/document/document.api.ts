@@ -4,8 +4,11 @@ import { CommitDocument201Response } from '@notopia-uit/api-document-nestjs-serv
 import { Traceable } from 'nestjs-otel';
 
 import { User } from '#/common';
-import { HocuspocusService } from '../hocuspocus';
 
+import { AuthorizationService } from '../authorization/authorization.service';
+import { HocuspocusService } from '../hocuspocus';
+import { DocumentNoRevisionException } from './document-no-revision.exception';
+import { DocumentPermissionException } from './document-permission.exception';
 import { DocumentService } from './document.service';
 
 @Traceable()
@@ -14,7 +17,8 @@ export class DocumentApi extends DocumentApiDefinition {
 
   constructor(
     private readonly documentService: DocumentService,
-    private readonly hocuspocusService: HocuspocusService
+    private readonly hocuspocusService: HocuspocusService,
+    private readonly authorizationService: AuthorizationService
   ) {
     super();
   }
@@ -29,10 +33,30 @@ export class DocumentApi extends DocumentApiDefinition {
       throw new UnauthorizedException('User not authenticated');
     }
     try {
-      const revisionId = await this.documentService.commitDocument({ documentId, userId: user.id });
-      this.hocuspocusService.setModified(documentId, false);
-      const response = { id: revisionId } as CommitDocument201Response;
-      this.logger.log({ documentId }, 'commitDocument: done');
+      const canWrite = await this.authorizationService.hasNotePermission({
+        documentId,
+        memberId: user.id,
+        permission: 'write',
+      });
+      if (!canWrite) {
+        throw new DocumentPermissionException(documentId, user.id);
+      }
+      const { revisionId, modifiedCleared } = await this.documentService.commitIfDue({
+        documentId,
+        trigger: 'manual',
+        authorId: user.id,
+        force: true,
+        minIntervalSeconds: 0,
+      });
+      if (modifiedCleared) {
+        this.hocuspocusService.setModified(documentId, false);
+      }
+      const id = revisionId ?? (await this.documentService.getLatestRevisionId(documentId));
+      if (!id) {
+        throw new DocumentNoRevisionException(documentId);
+      }
+      const response = { id } as CommitDocument201Response;
+      this.logger.log({ documentId, committed: revisionId !== null }, 'commitDocument: done');
       this.logger.debug({ response }, 'commitDocument: response');
       return response;
     } catch (error) {
