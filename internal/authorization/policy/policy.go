@@ -48,12 +48,7 @@ func syncRules(e *casbin.TransactionalEnforcer, csv string, prune bool) error {
 			return fmt.Errorf("failed to read current p rules: %w", err)
 		}
 
-		var stale [][]string
-		for _, rule := range current {
-			if !slices.ContainsFunc(policies, func(r []string) bool { return slices.Equal(r, rule) }) {
-				stale = append(stale, rule)
-			}
-		}
+		stale := rulesNotIn(current, policies)
 		if len(stale) > 0 {
 			if _, err := e.RemovePolicies(stale); err != nil {
 				return fmt.Errorf("failed to remove stale p rules: %w", err)
@@ -97,43 +92,64 @@ func LoadFixtures(e *casbin.TransactionalEnforcer) error {
 	return nil
 }
 
-// MissingRules checks the enforcer's in-memory policy, which is loaded once at
+func rulesNotIn(rules, reference [][]string) [][]string {
+	var result [][]string
+	for _, rule := range rules {
+		if !slices.ContainsFunc(reference, func(r []string) bool { return slices.Equal(r, rule) }) {
+			result = append(result, rule)
+		}
+	}
+	return result
+}
+
+// Drift is the difference between the embedded policy matrix and the enforcer.
+type Drift struct {
+	Missing    [][]string
+	Unexpected [][]string
+}
+
+func (d Drift) IsEmpty() bool {
+	return len(d.Missing) == 0 && len(d.Unexpected) == 0
+}
+
+// DetectDrift checks the enforcer's in-memory policy, which is loaded once at
 // startup, so a seed applied afterwards is only picked up by a restart.
-func MissingRules(e *casbin.TransactionalEnforcer) ([][]string, error) {
+// Only `p` rules can be unexpected, `g` rules are runtime memberships.
+func DetectDrift(e *casbin.TransactionalEnforcer) (Drift, error) {
 	desired, err := parsePolicyCSV(CSV)
 	if err != nil {
-		return nil, err
+		return Drift{}, err
 	}
 
-	var missing [][]string
+	var drift Drift
 
 	policies, err := desired.GetPolicy("p", "p")
 	if err != nil {
-		return nil, fmt.Errorf("failed to read p rules: %w", err)
+		return Drift{}, fmt.Errorf("failed to read p rules: %w", err)
 	}
-	for _, rule := range policies {
-		ok, err := e.HasPolicy(rule)
-		if err != nil {
-			return nil, fmt.Errorf("failed to check p rule: %w", err)
-		}
-		if !ok {
-			missing = append(missing, append([]string{"p"}, rule...))
-		}
+
+	current, err := e.GetPolicy()
+	if err != nil {
+		return Drift{}, fmt.Errorf("failed to read current p rules: %w", err)
 	}
+	for _, rule := range rulesNotIn(policies, current) {
+		drift.Missing = append(drift.Missing, append([]string{"p"}, rule...))
+	}
+	drift.Unexpected = rulesNotIn(current, policies)
 
 	rules, err := desired.GetPolicy("g", "g2")
 	if err != nil {
-		return nil, fmt.Errorf("failed to read g2 rules: %w", err)
+		return Drift{}, fmt.Errorf("failed to read g2 rules: %w", err)
 	}
 	for _, rule := range rules {
 		ok, err := e.HasNamedGroupingPolicy("g2", rule)
 		if err != nil {
-			return nil, fmt.Errorf("failed to check g2 rule: %w", err)
+			return Drift{}, fmt.Errorf("failed to check g2 rule: %w", err)
 		}
 		if !ok {
-			missing = append(missing, append([]string{"g2"}, rule...))
+			drift.Missing = append(drift.Missing, append([]string{"g2"}, rule...))
 		}
 	}
 
-	return missing, nil
+	return drift, nil
 }

@@ -8,7 +8,7 @@ Entrypoint: `cmd/authorization/`. Contract: `proto/authorization/authorization.p
 - `app/` — flat, one file per RPC (`createworkspace.go`, `hasworkspacepermission.go`, …),
   each with a `_test.go`. No `cmd_`/`q_` prefixes here, unlike `internal/note/`.
 - `app/casbin.go` — enforcer setup
-- `policy/` — embedded `model.conf`, `policy.csv`, `policy_fixtures.csv`; `Seed`, `LoadFixtures`, `MissingRules`
+- `policy/` — embedded `model.conf`, `policy.csv`, `policy_fixtures.csv`; `Seed`, `LoadFixtures`, `DetectDrift`
 - `infra/` — `db.go` (Casbin postgres adapter), `casbin.go`, `integrationevent.go`
 - `controller/grpc/` — RPC handlers; `errs/` → gRPC status in `controller/grpc/err.go`
 
@@ -44,8 +44,8 @@ authorization infra (DB, Casbin adapter): `cmd/authorizationseed` (`internal/aut
 (`internal/authorizationfixtures`, runs `policy.LoadFixtures`, `just fixtures-authorization`). Nothing
 is auto-loaded in development.
 
-At startup the service calls `policy.MissingRules` once (every `p`/`g2` rule of `policy.csv` absent from
-the in-memory policy). If any are missing it logs an error and keeps running instead of crashing. The
+At startup the service calls `policy.DetectDrift` once (every `p`/`g2` rule of `policy.csv` absent from
+the in-memory policy, or any `p` rule in it that `policy.csv` does not contain). On drift it logs an error and keeps running instead of crashing. The
 `policy` startup health check (`controller/health`) fails with the same condition, so the pod stays not
 ready. The check is in-memory on purpose: the enforcer does not watch the DB, so only a restart picks up a seed.
 

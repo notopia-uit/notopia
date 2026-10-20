@@ -34,7 +34,7 @@ func NewServer(
 ) (*Server, error) {
 	slog.SetDefault(logger)
 
-	missing, err := policy.MissingRules(authApp.Enforcer)
+	drift, err := policy.DetectDrift(authApp.Enforcer)
 	switch {
 	case err != nil:
 		logger.ErrorContext(
@@ -42,11 +42,12 @@ func NewServer(
 			"failed to verify authorization policy matrix, the service must be seeded before start",
 			slog.Any("error", err),
 		)
-	case len(missing) > 0:
+	case !drift.IsEmpty():
 		logger.ErrorContext(
 			ctx,
 			"authorization policy matrix is missing or outdated, the service must be seeded before start",
-			slog.Int("missing_rules", len(missing)),
+			slog.Int("missing_rules", len(drift.Missing)),
+			slog.Int("unexpected_rules", len(drift.Unexpected)),
 		)
 	}
 

@@ -16,13 +16,16 @@ import (
 
 func TestSeed_AddsMissingRowsOnExistingDatabase(t *testing.T) {
 	enforcer := newPersistentEnforcer(t, filepath.Join(t.TempDir(), "casbin.db"))
-	_, err := enforcer.RemovePolicies([][]string{
+	require.NoError(t, policy.Seed(enforcer))
+
+	removed, err := enforcer.RemovePolicies([][]string{
 		{"owner", "workspace", "billing_read"},
 		{"owner", "workspace", "billing_manage"},
 		{"editor", "workspace", "billing_read"},
 		{"viewer", "workspace", "billing_read"},
 	})
 	require.NoError(t, err)
+	require.True(t, removed)
 
 	hasBilling, err := enforcer.HasPolicy("owner", "workspace", "billing_read")
 	require.NoError(t, err)
@@ -127,16 +130,24 @@ func TestSeed_PrunesStalePolicies(t *testing.T) {
 	assert.False(t, stale, "prune must be persisted")
 }
 
-func TestMissingRules(t *testing.T) {
+func TestDetectDrift(t *testing.T) {
 	enforcer := newPersistentEnforcer(t, filepath.Join(t.TempDir(), "casbin.db"))
 
-	missing, err := policy.MissingRules(enforcer)
+	drift, err := policy.DetectDrift(enforcer)
 	require.NoError(t, err)
-	assert.NotEmpty(t, missing)
+	assert.NotEmpty(t, drift.Missing)
 
 	require.NoError(t, policy.Seed(enforcer))
 
-	missing, err = policy.MissingRules(enforcer)
+	drift, err = policy.DetectDrift(enforcer)
 	require.NoError(t, err)
-	assert.Empty(t, missing)
+	assert.True(t, drift.IsEmpty())
+
+	_, err = enforcer.AddPolicy("viewer", "workspace", "delete")
+	require.NoError(t, err)
+
+	drift, err = policy.DetectDrift(enforcer)
+	require.NoError(t, err)
+	assert.Empty(t, drift.Missing)
+	assert.Equal(t, [][]string{{"viewer", "workspace", "delete"}}, drift.Unexpected)
 }

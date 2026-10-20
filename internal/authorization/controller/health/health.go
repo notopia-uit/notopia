@@ -46,12 +46,16 @@ func New(
 			health.Check{
 				Name: "policy",
 				Check: func(ctx context.Context) error {
-					missing, err := policy.MissingRules(enforcer)
+					drift, err := policy.DetectDrift(enforcer)
 					if err != nil {
 						return fmt.Errorf("failed to verify policy matrix: %w", err)
 					}
-					if len(missing) > 0 {
-						return fmt.Errorf("policy matrix is missing %d rules, seed required", len(missing))
+					if !drift.IsEmpty() {
+						return fmt.Errorf(
+							"policy matrix drifted (%d missing, %d unexpected rules), seed required",
+							len(drift.Missing),
+							len(drift.Unexpected),
+						)
 					}
 					return nil
 				},
