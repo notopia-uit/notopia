@@ -6,16 +6,15 @@ import (
 	billingconfig "github.com/notopia-uit/notopia/internal/billing/config"
 	stripeadapter "github.com/notopia-uit/notopia/internal/billing/infra/payment/stripe"
 	"github.com/notopia-uit/notopia/internal/billing/infra/persistence"
-	"github.com/notopia-uit/notopia/internal/billingseed/config"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/notopia-uit/notopia/pkg/logging"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
 
 // Billing infra constructors take billing's config types; the small seed config is mapped onto
-// them here, so neither config package imports the other or app.
+// them here, so the seed config does not import billing config or app.
 
-func NewBillingStripeConfig(stripe *config.Stripe) *billingconfig.Stripe {
+func NewBillingStripeConfig(stripe *Stripe) *billingconfig.Stripe {
 	return &billingconfig.Stripe{
 		SecretKey:     stripe.SecretKey,
 		WebhookSecret: "",
@@ -24,7 +23,7 @@ func NewBillingStripeConfig(stripe *config.Stripe) *billingconfig.Stripe {
 
 var ProvideBillingStripeConfig = NewBillingStripeConfig
 
-func NewBillingConfig(catalog *config.Catalog) *billingconfig.Billing {
+func NewBillingConfig(catalog *Catalog) *billingconfig.Billing {
 	return &billingconfig.Billing{
 		Currency:   catalog.Currency,
 		WebBaseURL: catalog.WebBaseURL,
@@ -33,7 +32,7 @@ func NewBillingConfig(catalog *config.Catalog) *billingconfig.Billing {
 
 var ProvideBillingConfig = NewBillingConfig
 
-func NewAppSettings(catalog *config.Catalog, identity *commonconfig.Identity) *app.Settings {
+func NewAppSettings(catalog *Catalog, identity *commonconfig.Identity) *app.Settings {
 	return &app.Settings{
 		WebBaseURL:           catalog.WebBaseURL,
 		ServiceAccountUserID: identity.ServiceAccountUserID,
@@ -47,7 +46,18 @@ var ProviderSet = wire.NewSet(
 	ProvideBillingStripeConfig,
 	ProvideBillingConfig,
 	ProvideAppSettings,
-	config.ProviderSet,
+	ProvideValidate,
+	ProvideViper,
+	ProvideConfig,
+	wire.FieldsOf(
+		new(*Config),
+		"Catalog",
+		"Database",
+		"General",
+		"Identity",
+		"Log",
+		"Stripe",
+	),
 	persistence.ProviderSet,
 	stripeadapter.Provide,
 	wire.Bind(new(app.PaymentProvider), new(*stripeadapter.Provider)),

@@ -4,7 +4,7 @@
   "projectType": "library",
   "tags": ["scope:library", "type:go"],
   "namedInputs": {
-    "default": ["{projectRoot}/**/*.go", "{projectRoot}/app/*.conf", "{projectRoot}/app/*.csv", "!{projectRoot}/_test.go"]
+    "default": ["{projectRoot}/**/*.go", "{projectRoot}/policy/*.conf", "{projectRoot}/policy/*.csv", "!{projectRoot}/_test.go"]
   },
   "targets": {
     "gen:mockery": {

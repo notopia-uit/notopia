@@ -1,4 +1,4 @@
-package config
+package billingseed
 
 import (
 	"fmt"
@@ -29,7 +29,7 @@ type Config struct {
 	Identity commonconfig.Identity `json:"identity" mapstructure:"identity" validate:"required"  yaml:"identity"`
 }
 
-func New(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
+func NewConfig(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
 	viper.SetEnvPrefix("notopia_billingseed")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.SetConfigName("billingseed.notopia.config")
@@ -53,7 +53,7 @@ func New(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
 	return cfg, nil
 }
 
-var Provide = New
+var ProvideConfig = NewConfig
 
 func NewViper() *viper.Viper {
 	return viper.NewWithOptions(

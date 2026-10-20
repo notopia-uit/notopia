@@ -9,6 +9,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/authorization/app"
 	"github.com/notopia-uit/notopia/internal/authorization/controller/grpc"
 	"github.com/notopia-uit/notopia/internal/authorization/controller/health"
+	"github.com/notopia-uit/notopia/internal/authorization/policy"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"github.com/notopia-uit/notopia/pkg/otel"
 	"golang.org/x/sync/errgroup"
@@ -33,13 +34,21 @@ func NewServer(
 ) (*Server, error) {
 	slog.SetDefault(logger)
 
-	if err := authApp.BootStrapPolicies(ctx); err != nil {
-		return nil, fmt.Errorf("failed to bootstrap policies: %w", err)
-	}
-	if generalCfg.AppEnv == commonconfig.AppEnvDevelopment {
-		if err := authApp.LoadFixtures(ctx); err != nil {
-			return nil, fmt.Errorf("failed to load dev fixture policies: %w", err)
-		}
+	drift, err := policy.DetectDrift(authApp.Enforcer)
+	switch {
+	case err != nil:
+		logger.ErrorContext(
+			ctx,
+			"failed to verify authorization policy matrix, the service must be seeded before start",
+			slog.Any("error", err),
+		)
+	case !drift.IsEmpty():
+		logger.ErrorContext(
+			ctx,
+			"authorization policy matrix is missing or outdated, the service must be seeded before start",
+			slog.Int("missing_rules", len(drift.Missing)),
+			slog.Int("unexpected_rules", len(drift.Unexpected)),
+		)
 	}
 
 	return &Server{

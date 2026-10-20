@@ -1,4 +1,4 @@
-package config
+package authorizationfixtures
 
 import (
 	"fmt"
@@ -17,10 +17,10 @@ type Config struct {
 	Database commonconfig.SQL     `json:"database" mapstructure:"database" validate:"required"  yaml:"database"`
 }
 
-func New(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
-	viper.SetEnvPrefix("notopia_billingfixtures")
+func NewConfig(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
+	viper.SetEnvPrefix("notopia_authorizationfixtures")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.SetConfigName("billingfixtures.notopia.config")
+	viper.SetConfigName("authorizationfixtures.notopia.config")
 	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err == nil {
@@ -41,7 +41,7 @@ func New(validate *validator.Validate, viper *viper.Viper) (*Config, error) {
 	return cfg, nil
 }
 
-var Provide = New
+var ProvideConfig = NewConfig
 
 func NewViper() *viper.Viper {
 	return viper.NewWithOptions(

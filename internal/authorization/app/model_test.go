@@ -9,7 +9,7 @@ import (
 
 // Shared at https://editor.casbin.org/#GURKL5ZXW
 // Runs the matrix against casbin's own CSV loading (string adapter) and against
-// BootStrapPolicies + LoadFixtures syncing into a database, so both must agree.
+// policy.Seed + policy.LoadFixtures syncing into a database, so both must agree.
 func TestModels(t *testing.T) {
 	for _, useTransaction := range []bool{false, true} {
 		t.Run(fmt.Sprintf("useTransaction=%t", useTransaction), func(t *testing.T) {
