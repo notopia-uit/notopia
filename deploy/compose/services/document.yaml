@@ -22,7 +22,7 @@ services:
 
   document_redis:
     container_name: notopia-document_redis
-    image: redis:8.4.3-alpine3.22
+    image: redis:8.4.7-alpine3.22
     command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
     ports:
       - 6374:6379
