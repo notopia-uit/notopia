@@ -3,7 +3,7 @@ module github.com/notopia-uit/notopia
 go 1.27.0
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260709200747-435963d16310.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2
 	buf.build/go/protovalidate v1.3.0
 	github.com/IBM/sarama v1.60.2
 	github.com/ThreeDotsLabs/watermill v1.5.2
