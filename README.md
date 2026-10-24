@@ -110,7 +110,16 @@ nx gen proto   # Generate protobuf code (Go, TypeScript)
 nx run note:goose:up               # Apply note service migrations
 nx run note:goose:down             # Rollback
 nx run note:goose:create           # Create new migration
+
+nx run document:db:sync            # Document (TypeORM), dev only: sync schema to entities
+nx run document:db:generate -- database/migrations/Name   # Generate migration from entity diff
+nx run document:db:create -- database/migrations/Name     # Empty migration
+nx run document:db:migrate         # Apply document migrations (prod path)
+nx run document:db:revert          # Revert last document migration
+nx run document:db:status          # List document migrations
 ```
+
+The document service never syncs its schema on startup; run `db:sync` (dev) or `db:migrate` first.
 
 ### Seed and Fixtures
 
@@ -121,7 +130,7 @@ nx run note:goose:create           # Create new migration
 just seed                          # Mandatory data (Meilisearch index config)
 just fixtures                      # Seed + all dev fixtures
 just fixtures-note                 # Note service fixtures only
-just fixtures-document             # Document service fixtures only
+just fixtures-document             # Document service fixtures only (runs db:sync first)
 just fixtures-search               # Search index fixtures only
 ```
 
@@ -189,7 +198,7 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 - [ ] Consider split the workspace event (SSE) into a dedicated service, not bounded to `note` service
   > Events from subscription changed
 - [ ] Make backend services have an option to must trust request comes from api gateway
-- [ ] NestJS service doesn't have a polite migration mechanism for production
+- [x] NestJS service doesn't have a polite migration mechanism for production (document: TypeORM CLI, no migration files generated yet)
 - [ ] OpenAPI upgrade 3.1
 - [ ] App admin edit doesn't propagate the SSE to web client. We only have workspace event SSE
 - [ ] Service-account role: replace the `HACK:` lookup with a read-only service-account role in authorization

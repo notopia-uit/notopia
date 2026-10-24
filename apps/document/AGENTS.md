@@ -129,3 +129,10 @@ DELETE FROM revisions WHERE "deletedAt" IS NOT NULL;
 - Kafka payload types come from `@notopia-uit/api-share-gen` (defined in `api/share/`),
   never hand-written interfaces.
 - `@Traceable()` on services; structured logger calls are `this.logger.log({...}, 'msg')`.
+
+## Database schema and migrations
+
+No sync or migrate on startup (`synchronize: false`). Schema changes go through the TypeORM
+CLI via `nx run document:db:{sync,generate,create,migrate,revert,status}` (see `package.json`).
+`db:sync` is dev only and destructive; prod uses `db:migrate`. `just fixtures-document` runs
+`db:sync` first.
