@@ -48,7 +48,7 @@
     "jiti": "2.7.0",
     "jsdom": "~28.1.0",
     "nestjs-doctor": "0.4.33",
-    "nestjs-doctor-lsp": "0.1.2",
+    "nestjs-doctor-lsp": "4.1.2",
     "nx": "23.2.1",
     "nx-github-pages": "1.2.1",
     "oxfmt": "catalog:",
