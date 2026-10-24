@@ -433,8 +433,8 @@ catalogs:
       specifier: ^18.0.3
       version: 18.0.14
     meilisearch:
-      specifier: 0.58.0
-      version: 0.58.0
+      specifier: 0.62.0
+      version: 0.62.0
     nestjs-otel:
       specifier: ^8.0.2
       version: 8.0.3
@@ -563,7 +563,7 @@ importers:
         version: 11.2.7(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@11.2.7)(supports-color@7.2.0)
       meilisearch:
         specifier: 'catalog:'
-        version: 0.58.0
+        version: 0.62.0
       next:
         specifier: 'catalog:'
         version: 16.2.12(@babel/core@7.29.7(supports-color@7.2.0))(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(sass@1.97.3)
@@ -1030,7 +1030,7 @@ importers:
         version: 2.0.1
       meilisearch:
         specifier: 'catalog:'
-        version: 0.58.0
+        version: 0.62.0
       nestjs-otel:
         specifier: 'catalog:'
         version: 8.0.3(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)
@@ -13591,8 +13591,8 @@ packages:
     resolution: {integrity: sha512-aisnrDP4GNe06UcKFnV5bfMNPBUw4jsLGaWwWfnH3v02GnBuXX2MCVn5RbrWo0j3pczUilYblq7fQ7Nw2t5XKw==}
     engines: {node: '>= 0.8'}
 
-  meilisearch@0.58.0:
-    resolution: {integrity: sha512-MXFlU+JVG2I3tDI4brS3UHxEv2fjOROP24TPP16c8dGHTulb1kxMgXvKP0x4ImvUcsVVJFi4QXP0JNDS/TaWaw==}
+  meilisearch@0.62.0:
+    resolution: {integrity: sha512-/ETDW7mmWI2NcSmtJdTPhbjsIbs3VcuapszX5X6JhdHB0XbszPOhqd3EB2bEylL0HK7dgwh/4Z3MdyuycWVf5A==}
     engines: {node: ^20.19.0 || >=22.12.0}
 
   memfs@4.56.11:
@@ -33114,7 +33114,7 @@ snapshots:
 
   media-typer@1.1.0: {}
 
-  meilisearch@0.58.0: {}
+  meilisearch@0.62.0: {}
 
   memfs@4.56.11(tslib@2.8.1):
     dependencies:
