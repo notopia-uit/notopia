@@ -219,7 +219,7 @@ jobs:
           skip-save-cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'false' }}
 
       - name: Setup Mise
-        uses: jdx/mise-action@v4
+        uses: jdx/mise-action@v5
         with:
           experimental: true
           cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
@@ -406,7 +406,7 @@ jobs:
           cache: true
 
       - name: Setup Mise
-        uses: jdx/mise-action@v4
+        uses: jdx/mise-action@v5
         with:
           experimental: true
           cache: true
