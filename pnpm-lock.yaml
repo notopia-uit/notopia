@@ -437,7 +437,7 @@ catalogs:
       version: 0.58.0
     nestjs-otel:
       specifier: ^8.0.2
-      version: 8.0.3
+      version: 8.1.1
     nestjs-pino:
       specifier: ^4.6.1
       version: 4.6.1
@@ -876,7 +876,7 @@ importers:
         version: 18.0.14
       nestjs-otel:
         specifier: 'catalog:'
-        version: 8.0.3(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)
+        version: 8.1.1(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)(rxjs@7.8.2)
       nestjs-pino:
         specifier: 'catalog:'
         version: 4.6.1(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2)
@@ -1033,7 +1033,7 @@ importers:
         version: 0.58.0
       nestjs-otel:
         specifier: 'catalog:'
-        version: 8.0.3(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)
+        version: 8.1.1(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)(rxjs@7.8.2)
       nestjs-pino:
         specifier: 'catalog:'
         version: 4.6.1(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2)
@@ -13955,12 +13955,13 @@ packages:
     resolution: {integrity: sha512-q+YowSgeLaMeejzbhYEfZlAo1lBHzrZFoqpqO+zKHayMdj/nGXVAfX4ZEOJ4KMwzLcYgy8G7VcCeE7iYErXmjw==}
     hasBin: true
 
-  nestjs-otel@8.0.3:
-    resolution: {integrity: sha512-48W0ksSnvRZSO7GUY3R76TeHtPwThAhjPOeyH7EOzhLnsrPQ7Msk8nPrU5FpTiIzUapoubdx+jfolRlJC8L21g==}
+  nestjs-otel@8.1.1:
+    resolution: {integrity: sha512-7JJuMCJcamiNC0xgDh745PZt8LQDaF6WmK+FaTEu74G1BM9Sbo4rTw4CHVKkHbxKynIUqzeaYN5m+rRdGsoRSg==}
     engines: {node: '>= 22'}
     peerDependencies:
       '@nestjs/common': ^11.2.7
       '@nestjs/core': ^11.2.7
+      rxjs: ^7.1.0
 
   nestjs-pino@4.6.1:
     resolution: {integrity: sha512-nuARXa0xpdJ1lY2+fgycIQr6H3g0VgqAWNK3xMYjOFcj2DoPETNXj0lV3Y86nRuI7BUfQp5PGiVoZvT4dTWbpQ==}
@@ -33591,12 +33592,13 @@ snapshots:
       tinyglobby: 0.2.17
       ts-morph: 27.0.2
 
-  nestjs-otel@8.0.3(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7):
+  nestjs-otel@8.1.1(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)(rxjs@7.8.2):
     dependencies:
       '@nestjs/common': 11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/core': 11.2.7(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.7)(@nestjs/platform-express@11.2.7)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/host-metrics': 0.38.3(@opentelemetry/api@1.9.1)
+      rxjs: 7.8.2
 
   nestjs-pino@4.6.1(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2):
     dependencies:
