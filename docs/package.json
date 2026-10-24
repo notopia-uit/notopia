@@ -6,7 +6,7 @@
     "@notopia-uit/api": "workspace:",
     "pagefind": "1.5.2",
     "vitepress-mermaid-renderer": "1.2.3",
-    "vitepress-openapi": "0.1.20",
+    "vitepress-openapi": "0.2.5",
     "vitepress-plugin-pagefind": "0.4.25"
   },
   "devDependencies": {
