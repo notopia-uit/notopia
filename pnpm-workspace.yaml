@@ -52,7 +52,7 @@ catalog:
   "@opentelemetry/sdk-node": "0.215.0"
   "@opentelemetry/sdk-trace-node": "~2.7.1"
   "@opentelemetry/semantic-conventions": "~1.40.0"
-  "@redocly/cli": "~2.30.5"
+  "@redocly/cli": "~2.71.0"
   "@rsdoctor/rspack-plugin": "^1.6.4"
   "@rspack/cli": "^2.2.8"
   "@rspack/core": "^2.2.8"
