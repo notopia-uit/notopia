@@ -132,14 +132,7 @@ DELETE FROM revisions WHERE "deletedAt" IS NOT NULL;
 
 ## Database schema and migrations
 
-The app never syncs or migrates the schema on startup (`synchronize: false`). All schema
-changes go through the TypeORM CLI against `database/datasource.ts`:
-
-| Target (`nx run document:…`) | Use |
-| --- | --- |
-| `db:sync` | Dev only: `schema:sync`, forces the DB to match the entities. Destructive, never on prod |
-| `db:generate -- database/migrations/Name` | Diff entities against the DB and write a migration. Review it before committing |
-| `db:create -- database/migrations/Name` | Empty migration for hand-written changes |
-| `db:migrate` / `db:revert` / `db:status` | Run, undo the last, or list migrations |
-
-`just fixtures-document` runs `db:sync` first, since fixtures need the tables to exist.
+No sync or migrate on startup (`synchronize: false`). Schema changes go through the TypeORM
+CLI via `nx run document:db:{sync,generate,create,migrate,revert,status}` (see `package.json`).
+`db:sync` is dev only and destructive; prod uses `db:migrate`. `just fixtures-document` runs
+`db:sync` first.
