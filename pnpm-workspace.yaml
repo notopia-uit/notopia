@@ -102,7 +102,7 @@ catalog:
   next: "^16.2.6"
   oidc-client-ts: "^3.5.0"
   oxfmt: "^0.74.0"
-  oxlint: "^1.83.0"
+  oxlint: "^1.89.0"
   oxlint-tsgolint: "^7.0.2001"
   pino-http: "^11.0.0"
   pino-pretty: "^13.1.3"
