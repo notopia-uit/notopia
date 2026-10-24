@@ -425,7 +425,7 @@ catalogs:
       version: 11.5.3
     lucide-react:
       specifier: ^1.6.0
-      version: 1.6.0
+      version: 1.61.0
     markdown-to-txt:
       specifier: ^2.0.1
       version: 2.0.1
@@ -1154,7 +1154,7 @@ importers:
         version: 2.1.1
       lucide-react:
         specifier: 'catalog:'
-        version: 1.6.0(react@19.2.9)
+        version: 1.61.0(@types/react@19.2.18)(react@19.2.9)
       next:
         specifier: 'catalog:'
         version: 16.2.12(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(sass@1.97.3)
@@ -1413,7 +1413,7 @@ importers:
         version: 1.5.0(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.6.0(react@19.2.9)
+        version: 1.61.0(@types/react@19.2.18)(react@19.2.9)
       next:
         specifier: 'catalog:'
         version: 16.2.12(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(sass@1.97.3)
@@ -13452,10 +13452,14 @@ packages:
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  lucide-react@1.6.0:
-    resolution: {integrity: sha512-YxLKVCOF5ZDI1AhKQE5IBYMY9y/Nr4NT15+7QEWpsTSVCdn4vmZhww+6BP76jWYjQx8rSz1Z+gGme1f+UycWEw==}
+  lucide-react@1.61.0:
+    resolution: {integrity: sha512-v2SQPPPNjnr+BlhL9Spuzmo5yR+hLkftfuE4E3jaxdNPgSH0hJKPcLJBP7yAta87jQNPsSERS59PJjCJ/CorBA==}
     peerDependencies:
+      '@types/react': '*'
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   lucide-vue-next@0.577.0:
     resolution: {integrity: sha512-py05bAfv9SHVJqscbiOnjcnLlEmOffA58a+7XhZuFxrs6txe1E8VoR1ngWGTYO+9aVKABAz8l3ee3PqiQN9QPA==}
@@ -32904,9 +32908,11 @@ snapshots:
     dependencies:
       react: 19.2.9
 
-  lucide-react@1.6.0(react@19.2.9):
+  lucide-react@1.61.0(@types/react@19.2.18)(react@19.2.9):
     dependencies:
       react: 19.2.9
+    optionalDependencies:
+      '@types/react': 19.2.18
 
   lucide-vue-next@0.577.0(vue@3.5.44(@typescript/typescript6@6.0.2)):
     dependencies:
