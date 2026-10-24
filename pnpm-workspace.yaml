@@ -140,12 +140,12 @@ overrides:
   "@nestjs/common": "catalog:"
   "@nestjs/core": "catalog:"
 allowBuilds:
-  '@openapitools/openapi-generator-cli': true
-  '@parcel/watcher': true
-  '@scarf/scarf': true
-  '@suites/di.nestjs': true
-  '@suites/doubles.vitest': true
-  '@swc/core': true
+  "@openapitools/openapi-generator-cli": true
+  "@parcel/watcher": true
+  "@scarf/scarf": true
+  "@suites/di.nestjs": true
+  "@suites/doubles.vitest": true
+  "@swc/core": true
   core-js: true
   esbuild: true
   less: true
@@ -155,3 +155,4 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   vue-demi: true
+minimumReleaseAge: 0
