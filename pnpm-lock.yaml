@@ -208,8 +208,8 @@ catalogs:
       specifier: 0.55.0
       version: 0.55.0
     '@bufbuild/protobuf':
-      specifier: 2.11.0
-      version: 2.11.0
+      specifier: 2.16.0
+      version: 2.16.0
     '@d2t/vitest-ctrf-json-reporter':
       specifier: ~1.3.0
       version: 1.3.0
@@ -771,7 +771,7 @@ importers:
         version: 0.55.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@noble/hashes@2.4.0)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))
       '@bufbuild/protobuf':
         specifier: 'catalog:'
-        version: 2.11.0
+        version: 2.16.0
       '@floating-ui/dom':
         specifier: 'catalog:'
         version: 1.7.6
@@ -1335,7 +1335,7 @@ importers:
     dependencies:
       '@bufbuild/protobuf':
         specifier: 'catalog:'
-        version: 2.11.0
+        version: 2.16.0
       '@grpc/grpc-js':
         specifier: 'catalog:'
         version: 1.14.6
@@ -2576,6 +2576,9 @@ packages:
 
   '@bufbuild/protobuf@2.11.0':
     resolution: {integrity: sha512-sBXGT13cpmPR5BMgHE6UEEfEaShh5Ror6rfN3yEK5si7QVrtZg8LEPQb0VVhiLRUslD2yLnXtnRzG035J/mZXQ==}
+
+  '@bufbuild/protobuf@2.16.0':
+    resolution: {integrity: sha512-FWa0sPlqYGJgpTs6OxBRcL/AW4JT0OIO+W1ajerluoTVh8CV0B7XM1qsNCRgnkSCkRCgOICKHRQlY17jrsm0+Q==}
 
   '@catppuccin/vitepress@0.1.4':
     resolution: {integrity: sha512-jWCMNAtmo3L8QZeae1sL6Z0IfHqtEKoLXrTvQlfLdYkf1OD3cUlveKJfXe4sUWjfuxDB90aRg4jWrIqmFmcetQ==}
@@ -19487,6 +19490,8 @@ snapshots:
       css-tree: 3.2.1
 
   '@bufbuild/protobuf@2.11.0': {}
+
+  '@bufbuild/protobuf@2.16.0': {}
 
   '@catppuccin/vitepress@0.1.4(@typescript/typescript6@6.0.2)':
     dependencies:
