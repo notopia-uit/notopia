@@ -8,6 +8,12 @@
   "scripts": {
     "typeorm": "tsx ./node_modules/typeorm/cli.js",
     "typeorm-extension": "tsx ./node_modules/typeorm-extension/bin/cli.mjs",
+    "db:sync": "pnpm typeorm schema:sync -d database/datasource.ts",
+    "db:migrate": "pnpm typeorm migration:run -d database/datasource.ts",
+    "db:revert": "pnpm typeorm migration:revert -d database/datasource.ts",
+    "db:status": "pnpm typeorm migration:show -d database/datasource.ts",
+    "db:generate": "pnpm typeorm migration:generate -d database/datasource.ts",
+    "db:create": "pnpm typeorm migration:create",
     "fixtures": "SWCRC=true SWC_CONFIG_FILE=.swcrc-database.json node --import @swc-node/register/esm-register ./database/fixtures.ts"
   },
   "dependencies": {

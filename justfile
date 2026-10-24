@@ -57,6 +57,7 @@ prepare-fixtures-note:
     go run ./cmd/notefixturegen/...
 
 fixtures-document: prepare-fixtures-document
+    nx run document:db:sync
     nx run document:fixtures
 
 prepare-fixtures-document:
