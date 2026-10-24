@@ -431,7 +431,7 @@ catalogs:
       version: 2.0.1
     marked:
       specifier: ^18.0.3
-      version: 18.0.14
+      version: 18.1.1
     meilisearch:
       specifier: 0.58.0
       version: 0.58.0
@@ -873,7 +873,7 @@ importers:
         version: 2.2.4
       marked:
         specifier: 'catalog:'
-        version: 18.0.14
+        version: 18.1.1
       nestjs-otel:
         specifier: 'catalog:'
         version: 8.0.3(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)
@@ -13524,8 +13524,8 @@ packages:
     engines: {node: '>= 20'}
     hasBin: true
 
-  marked@18.0.14:
-    resolution: {integrity: sha512-mBHK6FBHuBAlhgRe88w9F0O1AbwwXJUcQibUbC/QcdTbVGAD7aWza+xt3N6oT/jCZx3/OMeS+8rnuiHZcQ9s7A==}
+  marked@18.1.1:
+    resolution: {integrity: sha512-zEGgrtUG8crk+TrMacJSVABU4DYDDkS8uqgU3ohrn/2fW9C2AEfUrO3m6IhpIpQpl7YcVpiXXC9cSMWDANT3dg==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -32984,7 +32984,7 @@ snapshots:
 
   marked@16.4.2: {}
 
-  marked@18.0.14: {}
+  marked@18.1.1: {}
 
   marked@4.3.0: {}
 
