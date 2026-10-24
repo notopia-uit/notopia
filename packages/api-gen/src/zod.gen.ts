@@ -3,31 +3,31 @@
 import * as z from 'zod';
 
 export const zShareNoteCreatedEvent = z.object({
-  id: z.uuid(),
-  workspaceId: z.uuid(),
-  name: z.string(),
-  icon: z.string().nullable()
+    id: z.uuid(),
+    workspaceId: z.uuid(),
+    name: z.string(),
+    icon: z.string().nullable()
 });
 
 export const zShareNoteDeletedEvent = z.object({
-  id: z.uuid()
+    id: z.uuid()
 });
 
 /**
  * Best-effort notification that a workspace's billing state changed.
  */
 export const zShareSubscriptionChangedEvent = z.object({
-  workspaceId: z.uuid(),
-  plan: z.enum([
-    'free',
-    'plus',
-    'pro'
-  ]),
-  status: z.string()
+    workspaceId: z.uuid(),
+    plan: z.enum([
+        'free',
+        'plus',
+        'pro'
+    ]),
+    status: z.string()
 });
 
 export const zShareWorkspaceDeletedIntegrationEvent = z.object({
-  id: z.uuid()
+    id: z.uuid()
 });
 
 /**
@@ -36,43 +36,43 @@ export const zShareWorkspaceDeletedIntegrationEvent = z.object({
 export const zShareDocumentContent = z.array(z.unknown());
 
 export const zShareDocument = z.object({
-  id: z.uuid(),
-  content: zShareDocumentContent
+    id: z.uuid(),
+    content: zShareDocumentContent
 });
 
 export const zShareDocumentCommittedEvent = zShareDocument.and(z.object({
-  userId: z.string(),
-  tags: z.array(z.string()),
-  outgoingLinkIds: z.array(z.uuid())
+    userId: z.string(),
+    tags: z.array(z.string()),
+    outgoingLinkIds: z.array(z.uuid())
 }));
 
 export const zShareTrashedBy = z.enum(['purpose', 'parent']);
 
 export const zShareTrashed = z.object({
-  by: zShareTrashedBy,
-  at: z.iso.datetime()
+    by: zShareTrashedBy,
+    at: z.iso.datetime()
 });
 
 export const zShareNoteSearch = z.object({
-  id: z.uuid(),
-  workspaceId: z.uuid(),
-  folderId: z.uuid(),
-  folderName: z.string(),
-  name: z.string(),
-  plainTextContent: z.string(),
-  tags: z.array(z.string()),
-  trashed: zShareTrashed.nullable()
+    id: z.uuid(),
+    workspaceId: z.uuid(),
+    folderId: z.uuid(),
+    folderName: z.string(),
+    name: z.string(),
+    plainTextContent: z.string(),
+    tags: z.array(z.string()),
+    trashed: zShareTrashed.nullable()
 });
 
 export const zShareNoteUpdatedEvent = z.object({
-  id: z.uuid(),
-  workspaceId: z.uuid(),
-  name: z.string(),
-  icon: z.string().nullable(),
-  folderId: z.uuid(),
-  folderName: z.string(),
-  trashed: zShareTrashed.nullable(),
-  updatedAt: z.iso.datetime()
+    id: z.uuid(),
+    workspaceId: z.uuid(),
+    name: z.string(),
+    icon: z.string().nullable(),
+    folderId: z.uuid(),
+    folderName: z.string(),
+    trashed: zShareTrashed.nullable(),
+    updatedAt: z.iso.datetime()
 });
 
 /**
@@ -81,70 +81,70 @@ export const zShareNoteUpdatedEvent = z.object({
 export const zShareId = z.string();
 
 export const zShareUserDeletedEvent = z.object({
-  id: zShareId
+    id: zShareId
 });
 
 export const zShareId2 = z.uuid().readonly();
 
 export const zShareWorkspaceMemberRemovedEvent = z.object({
-  workspaceId: zShareId2,
-  userId: zShareId
+    workspaceId: zShareId2,
+    userId: zShareId
 });
 
 export const zShareWorkspaceRole = z.enum([
-  'owner',
-  'editor',
-  'viewer'
+    'owner',
+    'editor',
+    'viewer'
 ]);
 
 export const zShareUserWorkspaceRoleUpdatedEvent = z.object({
-  workspaceId: zShareId2,
-  userId: zShareId,
-  role: zShareWorkspaceRole
+    workspaceId: zShareId2,
+    userId: zShareId,
+    role: zShareWorkspaceRole
 });
 
 export const zShareWorkspaceMemberAddedEvent = z.object({
-  workspaceId: zShareId2,
-  userId: zShareId,
-  role: zShareWorkspaceRole
+    workspaceId: zShareId2,
+    userId: zShareId,
+    role: zShareWorkspaceRole
 });
 
 export const zDocumentId = z.uuid();
 
 export const zDocumentError = z.object({
-  code: z.string(),
-  message: z.string(),
-  more_info: z.string().optional()
+    code: z.string(),
+    message: z.string(),
+    more_info: z.string().optional()
 });
 
 export const zDocumentId2 = z.uuid().readonly();
 
 export const zDocumentCommittedRevision = z.object({
-  id: zDocumentId2
+    id: zDocumentId2
 });
 
 export const zDocumentRevisionTrigger = z.enum([
-  'manual',
-  'auto',
-  'sweeper'
+    'manual',
+    'auto',
+    'sweeper'
 ]);
 
 export const zDocumentRevision = z.object({
-  id: z.uuid().readonly(),
-  name: z.string().min(1).max(255).nullable(),
-  createdAt: z.iso.datetime().readonly(),
-  authorId: z.string().readonly().nullable(),
-  trigger: zDocumentRevisionTrigger,
-  contributorIds: z.array(z.string()).readonly()
+    id: z.uuid().readonly(),
+    name: z.string().min(1).max(255).nullable(),
+    createdAt: z.iso.datetime().readonly(),
+    authorId: z.string().readonly().nullable(),
+    trigger: zDocumentRevisionTrigger,
+    contributorIds: z.array(z.string()).readonly()
 });
 
 export const zDocumentPagination = z.object({
-  page: z.int().gte(1),
-  currentTotal: z.int().gte(0),
-  total: z.int().gte(0),
-  totalPages: z.int().gte(0),
-  hasNext: z.boolean(),
-  hasPrev: z.boolean()
+    page: z.int().gte(1),
+    currentTotal: z.int().gte(0),
+    total: z.int().gte(0),
+    totalPages: z.int().gte(0),
+    hasNext: z.boolean(),
+    hasPrev: z.boolean()
 });
 
 export const zDocumentName = z.string().min(1).max(255).nullable();
@@ -160,62 +160,62 @@ export const zDocumentAuthorId = z.string().readonly().nullable();
 export const zDocumentDocumentContent = z.array(z.unknown());
 
 export const zDocumentRevisionWithContent = zDocumentRevision.and(z.object({
-  name: zDocumentName.optional(),
-  authorId: zDocumentAuthorId.optional(),
-  content: zDocumentDocumentContent
+    name: zDocumentName.optional(),
+    authorId: zDocumentAuthorId.optional(),
+    content: zDocumentDocumentContent
 }));
 
 export const zNoteTrashedBy = z.enum(['purpose', 'parent']);
 
 export const zNoteFolder = z.object({
-  id: z.uuid().readonly(),
-  name: z.string().min(1).max(255),
-  icon: z.string().nullable(),
-  parentId: z.uuid().nullable(),
-  workspaceId: z.uuid(),
-  updatedAt: z.iso.datetime().readonly(),
-  trashed: z.object({
-    by: zNoteTrashedBy,
-    at: z.iso.datetime()
-  }).readonly().nullable()
+    id: z.uuid().readonly(),
+    name: z.string().min(1).max(255),
+    icon: z.string().nullable(),
+    parentId: z.uuid().nullable(),
+    workspaceId: z.uuid(),
+    updatedAt: z.iso.datetime().readonly(),
+    trashed: z.object({
+        by: zNoteTrashedBy,
+        at: z.iso.datetime()
+    }).readonly().nullable()
 });
 
 export const zNoteId = z.uuid().readonly();
 
 export const zNoteError = z.object({
-  code: z.string(),
-  message: z.string(),
-  more_info: z.string().optional()
+    code: z.string(),
+    message: z.string(),
+    more_info: z.string().optional()
 });
 
 export const zNoteName = z.string().min(1).max(255);
 
 export const zNoteNote = z.object({
-  id: z.uuid().readonly(),
-  name: z.string().min(1).max(255),
-  icon: z.string().nullable(),
-  folderId: z.uuid(),
-  tags: z.array(z.string()).readonly(),
-  updatedAt: z.iso.datetime().readonly(),
-  trashed: z.object({
-    by: zNoteTrashedBy,
-    at: z.iso.datetime()
-  }).readonly().nullable()
+    id: z.uuid().readonly(),
+    name: z.string().min(1).max(255),
+    icon: z.string().nullable(),
+    folderId: z.uuid(),
+    tags: z.array(z.string()).readonly(),
+    updatedAt: z.iso.datetime().readonly(),
+    trashed: z.object({
+        by: zNoteTrashedBy,
+        at: z.iso.datetime()
+    }).readonly().nullable()
 });
 
 export const zNoteId2 = z.uuid().readonly();
 
 export const zNoteGraph = z.object({
-  nodes: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    type: z.enum(['note', 'tag']),
-    weight: z.number().gte(0.5).lte(1).optional()
-  })),
-  links: z.array(z.object({
-    source: z.string(),
-    target: z.string()
-  }))
+    nodes: z.array(z.object({
+        id: z.string(),
+        name: z.string(),
+        type: z.enum(['note', 'tag']),
+        weight: z.number().gte(0.5).lte(1).optional()
+    })),
+    links: z.array(z.object({
+        source: z.string(),
+        target: z.string()
+    }))
 });
 
 /**
@@ -226,88 +226,88 @@ export const zNoteName2 = z.string().min(1).max(255);
 export const zNoteIcon = z.string().nullable();
 
 export const zNoteNoteLink = z.object({
-  id: zNoteId2,
-  name: zNoteName2,
-  icon: zNoteIcon
+    id: zNoteId2,
+    name: zNoteName2,
+    icon: zNoteIcon
 });
 
 export const zNoteSlug = z.string();
 
 export const zNoteWorkspace = z.object({
-  id: z.uuid().readonly(),
-  slug: z.string(),
-  name: z.string().min(1).max(255)
+    id: z.uuid().readonly(),
+    slug: z.string(),
+    name: z.string().min(1).max(255)
 });
 
 export const zNoteId3 = z.uuid().readonly();
 
 export const zNoteWorkspaceRole = z.enum([
-  'owner',
-  'editor',
-  'viewer'
+    'owner',
+    'editor',
+    'viewer'
 ]);
 
 export const zNoteUserWorkspace = z.object({
-  workspace: zNoteWorkspace,
-  role: zNoteWorkspaceRole
+    workspace: zNoteWorkspace,
+    role: zNoteWorkspaceRole
 });
 
 export const zNoteHeartBeatWorkspaceEvent = z.object({
-  event: z.enum(['HeartBeatWorkspaceEvent']),
-  timestamp: z.iso.datetime()
+    event: z.enum(['HeartBeatWorkspaceEvent']),
+    timestamp: z.iso.datetime()
 });
 
 export const zNoteWorkspaceBillingChangedEvent = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceBillingChangedEvent']),
-  data: z.object({
-    workspaceId: zNoteId3,
-    plan: z.string()
-  })
+    id: z.uuid(),
+    event: z.enum(['WorkspaceBillingChangedEvent']),
+    data: z.object({
+        workspaceId: zNoteId3,
+        plan: z.string()
+    })
 });
 
 export const zNoteWorkspaceDeletedEvent = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceDeletedEvent']),
-  data: z.object({
-    id: zNoteId3
-  })
+    id: z.uuid(),
+    event: z.enum(['WorkspaceDeletedEvent']),
+    data: z.object({
+        id: zNoteId3
+    })
 });
 
 export const zNoteWorkspaceItemsUpdatedEvent = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceItemsUpdatedEvent']),
-  data: z.object({
-    workspaceId: zNoteId3
-  })
+    id: z.uuid(),
+    event: z.enum(['WorkspaceItemsUpdatedEvent']),
+    data: z.object({
+        workspaceId: zNoteId3
+    })
 });
 
 export const zNoteWorkspaceMembersUpdatedEvent = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceMembersUpdatedEvent']),
-  data: z.object({
-    workspaceId: zNoteId3
-  })
+    id: z.uuid(),
+    event: z.enum(['WorkspaceMembersUpdatedEvent']),
+    data: z.object({
+        workspaceId: zNoteId3
+    })
 });
 
 export const zNoteName3 = z.string().min(1).max(255);
 
 export const zNoteWorkspaceRenamedEvent = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceRenamedEvent']),
-  data: z.object({
-    id: zNoteId3,
-    name: zNoteName3
-  })
+    id: z.uuid(),
+    event: z.enum(['WorkspaceRenamedEvent']),
+    data: z.object({
+        id: zNoteId3,
+        name: zNoteName3
+    })
 });
 
 export const zNoteWorkspaceSlugChangedEvent = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceSlugChangedEvent']),
-  data: z.object({
-    id: zNoteId3,
-    slug: zNoteSlug
-  })
+    id: z.uuid(),
+    event: z.enum(['WorkspaceSlugChangedEvent']),
+    data: z.object({
+        id: zNoteId3,
+        slug: zNoteSlug
+    })
 });
 
 /**
@@ -317,13 +317,13 @@ export const zNoteWorkspaceSlugChangedEvent = z.object({
  *
  */
 export const zNotePaymentRequiredError = zNoteError.and(z.object({
-  details: z.object({
-    kind: z.enum(['feature', 'limit']),
-    key: z.string(),
-    current: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
-    max: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
-    requiredPlan: z.enum(['plus', 'pro'])
-  }).optional()
+    details: z.object({
+        kind: z.enum(['feature', 'limit']),
+        key: z.string(),
+        current: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+        max: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }).optional(),
+        requiredPlan: z.enum(['plus', 'pro'])
+    }).optional()
 }));
 
 /**
@@ -337,31 +337,31 @@ export const zNoteId4 = z.string();
 export const zNoteName4 = z.string().nullable();
 
 export const zNoteWorkspaceMember = z.object({
-  id: zNoteId4,
-  name: zNoteName4.readonly().optional(),
-  role: zNoteWorkspaceRole
+    id: zNoteId4,
+    name: zNoteName4.readonly().optional(),
+    role: zNoteWorkspaceRole
 });
 
 export const zNoteSearchToken = z.object({
-  token: z.string(),
-  expiresAt: z.iso.datetime()
+    token: z.string(),
+    expiresAt: z.iso.datetime()
 });
 
 export const zNoteTrashed = z.object({
-  by: zNoteTrashedBy,
-  at: z.iso.datetime()
+    by: zNoteTrashedBy,
+    at: z.iso.datetime()
 });
 
 export const zNoteTrashedNote = z.object({
-  id: z.uuid(),
-  name: z.string().min(1).max(255).readonly(),
-  trashed: zNoteTrashed
+    id: z.uuid(),
+    name: z.string().min(1).max(255).readonly(),
+    trashed: zNoteTrashed
 });
 
 export const zNoteTrashedFolder = z.object({
-  id: z.uuid(),
-  name: z.string().min(1).max(255).readonly(),
-  trashed: zNoteTrashed
+    id: z.uuid(),
+    name: z.string().min(1).max(255).readonly(),
+    trashed: zNoteTrashed
 });
 
 export const zNoteIcon2 = z.string().nullable();
@@ -369,34 +369,34 @@ export const zNoteIcon2 = z.string().nullable();
 export const zNoteUpdatedAt = z.iso.datetime().readonly();
 
 export const zNoteWorkspaceTreeNote = z.object({
-  id: zNoteId2,
-  name: zNoteName2,
-  icon: zNoteIcon,
-  updatedAt: zNoteUpdatedAt
+    id: zNoteId2,
+    name: zNoteName2,
+    icon: zNoteIcon,
+    updatedAt: zNoteUpdatedAt
 });
 
 export const zNoteUpdatedAt2 = z.iso.datetime().readonly();
 
 export const zNoteWorkspaceTreeFolder = z.object({
-  id: zNoteId,
-  name: zNoteName,
-  icon: zNoteIcon2,
-  notes: z.array(zNoteWorkspaceTreeNote),
-  children: z.array(z.lazy((): any => zNoteWorkspaceTreeFolder)),
-  updatedAt: zNoteUpdatedAt2
+    id: zNoteId,
+    name: zNoteName,
+    icon: zNoteIcon2,
+    notes: z.array(zNoteWorkspaceTreeNote),
+    children: z.array(z.lazy((): any => zNoteWorkspaceTreeFolder)),
+    updatedAt: zNoteUpdatedAt2
 });
 
 export const zNoteUser = z.object({
-  id: z.string(),
-  username: z.string(),
-  name: z.string().nullable(),
-  email: z.email().nullable()
+    id: z.string(),
+    username: z.string(),
+    name: z.string().nullable(),
+    email: z.email().nullable()
 });
 
 export const zBillingPlanTier = z.enum([
-  'free',
-  'plus',
-  'pro'
+    'free',
+    'plus',
+    'pro'
 ]);
 
 /**
@@ -410,161 +410,161 @@ export const zBillingFeatures = z.record(z.string(), z.boolean());
 export const zBillingLimits = z.record(z.string(), z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }));
 
 export const zBillingBillingInterval = z.enum([
-  'month',
-  'year',
-  'lifetime'
+    'month',
+    'year',
+    'lifetime'
 ]);
 
 export const zBillingPrice = z.object({
-  id: z.uuid(),
-  plan: zBillingPlanTier,
-  interval: zBillingBillingInterval,
-  amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-  currency: z.string(),
-  lookupKey: z.string(),
-  active: z.boolean(),
-  createdAt: z.iso.datetime(),
-  archivedAt: z.iso.datetime().nullish()
+    id: z.uuid(),
+    plan: zBillingPlanTier,
+    interval: zBillingBillingInterval,
+    amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    currency: z.string(),
+    lookupKey: z.string(),
+    active: z.boolean(),
+    createdAt: z.iso.datetime(),
+    archivedAt: z.iso.datetime().nullish()
 });
 
 export const zBillingPlan = z.object({
-  tier: zBillingPlanTier,
-  features: zBillingFeatures,
-  limits: zBillingLimits,
-  prices: z.array(zBillingPrice)
+    tier: zBillingPlanTier,
+    features: zBillingFeatures,
+    limits: zBillingLimits,
+    prices: z.array(zBillingPrice)
 });
 
 export const zBillingError = z.object({
-  code: z.string(),
-  message: z.string(),
-  more_info: z.string().optional()
+    code: z.string(),
+    message: z.string(),
+    more_info: z.string().optional()
 });
 
 /**
  * `none` when the workspace never subscribed.
  */
 export const zBillingSubscriptionStatus = z.enum([
-  'none',
-  'incomplete',
-  'active',
-  'past_due',
-  'unpaid',
-  'canceled',
-  'incomplete_expired'
+    'none',
+    'incomplete',
+    'active',
+    'past_due',
+    'unpaid',
+    'canceled',
+    'incomplete_expired'
 ]);
 
 export const zBillingEntitlements = z.object({
-  workspaceId: z.uuid(),
-  plan: zBillingPlanTier,
-  status: zBillingSubscriptionStatus,
-  accessUntil: z.iso.datetime().nullish(),
-  features: zBillingFeatures,
-  limits: zBillingLimits
+    workspaceId: z.uuid(),
+    plan: zBillingPlanTier,
+    status: zBillingSubscriptionStatus,
+    accessUntil: z.iso.datetime().nullish(),
+    features: zBillingFeatures,
+    limits: zBillingLimits
 });
 
 export const zBillingRefund = z.object({
-  id: z.uuid(),
-  amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-  currency: z.string(),
-  reason: z.enum([
-    'cancel_now',
-    'lifetime_window',
-    'replaced_by_lifetime',
-    'workspace_deleted',
-    'duplicate_checkout',
-    'external'
-  ]),
-  status: z.enum([
-    'pending',
-    'succeeded',
-    'failed',
-    'canceled'
-  ]),
-  createdAt: z.iso.datetime()
+    id: z.uuid(),
+    amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    currency: z.string(),
+    reason: z.enum([
+        'cancel_now',
+        'lifetime_window',
+        'replaced_by_lifetime',
+        'workspace_deleted',
+        'duplicate_checkout',
+        'external'
+    ]),
+    status: z.enum([
+        'pending',
+        'succeeded',
+        'failed',
+        'canceled'
+    ]),
+    createdAt: z.iso.datetime()
 });
 
 export const zBillingSubscription = z.object({
-  id: z.uuid(),
-  plan: zBillingPlanTier,
-  interval: zBillingBillingInterval,
-  status: zBillingSubscriptionStatus,
-  currentPeriodStart: z.iso.datetime().nullish(),
-  currentPeriodEnd: z.iso.datetime().nullish(),
-  cancelAtPeriodEnd: z.boolean(),
-  canceledAt: z.iso.datetime().nullish(),
-  accessUntil: z.iso.datetime().nullish(),
-  refunds: z.array(zBillingRefund)
+    id: z.uuid(),
+    plan: zBillingPlanTier,
+    interval: zBillingBillingInterval,
+    status: zBillingSubscriptionStatus,
+    currentPeriodStart: z.iso.datetime().nullish(),
+    currentPeriodEnd: z.iso.datetime().nullish(),
+    cancelAtPeriodEnd: z.boolean(),
+    canceledAt: z.iso.datetime().nullish(),
+    accessUntil: z.iso.datetime().nullish(),
+    refunds: z.array(zBillingRefund)
 });
 
 export const zBillingPayer = z.object({
-  id: z.string(),
-  email: z.string(),
-  name: z.string(),
-  missingSince: z.iso.datetime().nullish()
+    id: z.string(),
+    email: z.string(),
+    name: z.string(),
+    missingSince: z.iso.datetime().nullish()
 });
 
 export const zBillingWorkspaceBilling = z.object({
-  subscription: zBillingSubscription.nullish(),
-  payer: zBillingPayer.nullish()
+    subscription: zBillingSubscription.nullish(),
+    payer: zBillingPayer.nullish()
 });
 
 export const zBillingCheckoutSessionRequest = z.object({
-  priceId: z.uuid()
+    priceId: z.uuid()
 });
 
 export const zBillingRedirectUrl = z.object({
-  url: z.url()
+    url: z.url()
 });
 
 export const zBillingRefundQuotePayment = z.object({
-  paidAmount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-  amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-  coverageSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-  unusedSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
+    paidAmount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    coverageSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    unusedSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' })
 });
 
 export const zBillingRefundQuote = z.object({
-  amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-  currency: z.string(),
-  unusedSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-  periodSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-  payments: z.array(zBillingRefundQuotePayment)
+    amount: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    currency: z.string(),
+    unusedSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    periodSeconds: z.coerce.bigint().min(BigInt('-9223372036854775808'), { error: 'Invalid value: Expected int64 to be >= -9223372036854775808' }).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    payments: z.array(zBillingRefundQuotePayment)
 });
 
 export const zBillingUpdatePlanRequest = z.object({
-  features: zBillingFeatures.optional(),
-  limits: zBillingLimits.optional()
+    features: zBillingFeatures.optional(),
+    limits: zBillingLimits.optional()
 });
 
 export const zBillingBillingPolicy = z.object({
-  pastDueGraceDays: z.int().gte(0),
-  lifetimeRefundWindowDays: z.int().gte(0)
+    pastDueGraceDays: z.int().gte(0),
+    lifetimeRefundWindowDays: z.int().gte(0)
 });
 
 export const zBillingUpdatePolicyRequest = z.object({
-  pastDueGraceDays: z.int().gte(0).optional(),
-  lifetimeRefundWindowDays: z.int().gte(0).optional()
+    pastDueGraceDays: z.int().gte(0).optional(),
+    lifetimeRefundWindowDays: z.int().gte(0).optional()
 });
 
 export const zBillingCreatePriceRequest = z.object({
-  plan: z.enum(['plus', 'pro']),
-  interval: zBillingBillingInterval,
-  amount: z.coerce.bigint().gte(BigInt(1)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
-  currency: z.string()
+    plan: z.enum(['plus', 'pro']),
+    interval: zBillingBillingInterval,
+    amount: z.coerce.bigint().gte(BigInt(1)).max(BigInt('9223372036854775807'), { error: 'Invalid value: Expected int64 to be <= 9223372036854775807' }),
+    currency: z.string()
 });
 
 export const zShareUserWorkspaceRoleUpdatedEventWritable = z.object({
-  userId: zShareId,
-  role: zShareWorkspaceRole
+    userId: zShareId,
+    role: zShareWorkspaceRole
 });
 
 export const zShareWorkspaceMemberAddedEventWritable = z.object({
-  userId: zShareId,
-  role: zShareWorkspaceRole
+    userId: zShareId,
+    role: zShareWorkspaceRole
 });
 
 export const zShareWorkspaceMemberRemovedEventWritable = z.object({
-  userId: zShareId
+    userId: zShareId
 });
 
 /**
@@ -575,8 +575,8 @@ export const zShareDocumentContentWritable = z.array(z.unknown());
 export const zDocumentCommittedRevisionWritable = z.record(z.string(), z.unknown());
 
 export const zDocumentRevisionWritable = z.object({
-  name: z.string().min(1).max(255).nullable(),
-  trigger: zDocumentRevisionTrigger
+    name: z.string().min(1).max(255).nullable(),
+    trigger: zDocumentRevisionTrigger
 });
 
 /**
@@ -585,102 +585,102 @@ export const zDocumentRevisionWritable = z.object({
 export const zDocumentDocumentContentWritable = z.array(z.unknown());
 
 export const zDocumentRevisionWithContentWritable = zDocumentRevisionWritable.and(z.object({
-  name: zDocumentName.optional(),
-  content: zDocumentDocumentContentWritable
+    name: zDocumentName.optional(),
+    content: zDocumentDocumentContentWritable
 }));
 
 export const zNoteFolderWritable = z.object({
-  name: z.string().min(1).max(255),
-  icon: z.string().nullable(),
-  parentId: z.uuid().nullable(),
-  workspaceId: z.uuid()
+    name: z.string().min(1).max(255),
+    icon: z.string().nullable(),
+    parentId: z.uuid().nullable(),
+    workspaceId: z.uuid()
 });
 
 export const zNoteNoteWritable = z.object({
-  name: z.string().min(1).max(255),
-  icon: z.string().nullable(),
-  folderId: z.uuid()
+    name: z.string().min(1).max(255),
+    icon: z.string().nullable(),
+    folderId: z.uuid()
 });
 
 export const zNoteNoteLinkWritable = z.object({
-  name: zNoteName2,
-  icon: zNoteIcon
+    name: zNoteName2,
+    icon: zNoteIcon
 });
 
 export const zNoteWorkspaceWritable = z.object({
-  slug: z.string(),
-  name: z.string().min(1).max(255)
+    slug: z.string(),
+    name: z.string().min(1).max(255)
 });
 
 export const zNoteUserWorkspaceWritable = z.object({
-  workspace: zNoteWorkspaceWritable,
-  role: zNoteWorkspaceRole
+    workspace: zNoteWorkspaceWritable,
+    role: zNoteWorkspaceRole
 });
 
 export const zNoteWorkspaceBillingChangedEventWritable = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceBillingChangedEvent']),
-  data: z.object({
-    plan: z.string()
-  })
+    id: z.uuid(),
+    event: z.enum(['WorkspaceBillingChangedEvent']),
+    data: z.object({
+        plan: z.string()
+    })
 });
 
 export const zNoteWorkspaceDeletedEventWritable = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceDeletedEvent'])
+    id: z.uuid(),
+    event: z.enum(['WorkspaceDeletedEvent'])
 });
 
 export const zNoteWorkspaceItemsUpdatedEventWritable = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceItemsUpdatedEvent'])
+    id: z.uuid(),
+    event: z.enum(['WorkspaceItemsUpdatedEvent'])
 });
 
 export const zNoteWorkspaceMembersUpdatedEventWritable = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceMembersUpdatedEvent'])
+    id: z.uuid(),
+    event: z.enum(['WorkspaceMembersUpdatedEvent'])
 });
 
 export const zNoteWorkspaceRenamedEventWritable = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceRenamedEvent']),
-  data: z.object({
-    name: zNoteName3
-  })
+    id: z.uuid(),
+    event: z.enum(['WorkspaceRenamedEvent']),
+    data: z.object({
+        name: zNoteName3
+    })
 });
 
 export const zNoteWorkspaceSlugChangedEventWritable = z.object({
-  id: z.uuid(),
-  event: z.enum(['WorkspaceSlugChangedEvent']),
-  data: z.object({
-    slug: zNoteSlug
-  })
+    id: z.uuid(),
+    event: z.enum(['WorkspaceSlugChangedEvent']),
+    data: z.object({
+        slug: zNoteSlug
+    })
 });
 
 export const zNoteWorkspaceMemberWritable = z.object({
-  id: zNoteId4,
-  role: zNoteWorkspaceRole
+    id: zNoteId4,
+    role: zNoteWorkspaceRole
 });
 
 export const zNoteTrashedNoteWritable = z.object({
-  id: z.uuid(),
-  trashed: zNoteTrashed
+    id: z.uuid(),
+    trashed: zNoteTrashed
 });
 
 export const zNoteTrashedFolderWritable = z.object({
-  id: z.uuid(),
-  trashed: zNoteTrashed
+    id: z.uuid(),
+    trashed: zNoteTrashed
 });
 
 export const zNoteWorkspaceTreeNoteWritable = z.object({
-  name: zNoteName2,
-  icon: zNoteIcon
+    name: zNoteName2,
+    icon: zNoteIcon
 });
 
 export const zNoteWorkspaceTreeFolderWritable = z.object({
-  name: zNoteName,
-  icon: zNoteIcon2,
-  notes: z.array(zNoteWorkspaceTreeNoteWritable),
-  children: z.array(z.lazy((): any => zNoteWorkspaceTreeFolderWritable))
+    name: zNoteName,
+    icon: zNoteIcon2,
+    notes: z.array(zNoteWorkspaceTreeNoteWritable),
+    children: z.array(z.lazy((): any => zNoteWorkspaceTreeFolderWritable))
 });
 
 /**
@@ -727,47 +727,47 @@ export const zBillingTierPath = zBillingPlanTier;
 export const zBillingPriceIdPath = z.uuid();
 
 export const zGetDocumentAttachmentUploadUrlPath = z.object({
-  documentId: zDocumentId
+    documentId: zDocumentId
 });
 
 export const zGetDocumentAttachmentUploadUrlQuery = z.object({
-  filename: z.string()
+    filename: z.string()
 });
 
 /**
  * Presigned URL
  */
 export const zGetDocumentAttachmentUploadUrlResponse = z.object({
-  uploadUrl: z.url(),
-  url: z.url()
+    uploadUrl: z.url(),
+    url: z.url()
 });
 
 export const zCommitDocumentPath = z.object({
-  documentId: zDocumentId
+    documentId: zDocumentId
 });
 
 export const zCommitDocumentResponse = z.union([
-  zDocumentCommittedRevision,
-  z.void()
+    zDocumentCommittedRevision,
+    z.void()
 ]);
 
 export const zGetRevisionsQuery = z.object({
-  documentId: zDocumentId,
-  page: z.int().gte(1).optional().default(1),
-  limit: z.int().gte(1).lte(100).optional().default(20),
-  trigger: zDocumentRevisionTrigger.optional()
+    documentId: zDocumentId,
+    page: z.int().gte(1).optional().default(1),
+    limit: z.int().gte(1).lte(100).optional().default(20),
+    trigger: zDocumentRevisionTrigger.optional()
 });
 
 /**
  * Revisions
  */
 export const zGetRevisionsResponse = z.object({
-  data: z.array(zDocumentRevision),
-  pagination: zDocumentPagination
+    data: z.array(zDocumentRevision),
+    pagination: zDocumentPagination
 });
 
 export const zDeleteRevisionPath = z.object({
-  revisionId: zDocumentId2
+    revisionId: zDocumentId2
 });
 
 /**
@@ -776,7 +776,7 @@ export const zDeleteRevisionPath = z.object({
 export const zDeleteRevisionResponse = z.void();
 
 export const zGetRevisionWithContentPath = z.object({
-  revisionId: zDocumentId2
+    revisionId: zDocumentId2
 });
 
 /**
@@ -785,11 +785,11 @@ export const zGetRevisionWithContentPath = z.object({
 export const zGetRevisionWithContentResponse = zDocumentRevisionWithContent;
 
 export const zRenameRevisionBody = z.object({
-  name: zDocumentName
+    name: zDocumentName
 });
 
 export const zRenameRevisionPath = z.object({
-  revisionId: zDocumentId2
+    revisionId: zDocumentId2
 });
 
 /**
@@ -803,11 +803,11 @@ export const zCreateFolderBody = zNoteFolderWritable;
  * Folder successfully created
  */
 export const zCreateFolderResponse = z.object({
-  id: zNoteId
+    id: zNoteId
 });
 
 export const zPermanentlyDeleteFolderPath = z.object({
-  folderId: zNoteId
+    folderId: zNoteId
 });
 
 /**
@@ -816,11 +816,11 @@ export const zPermanentlyDeleteFolderPath = z.object({
 export const zPermanentlyDeleteFolderResponse = z.void();
 
 export const zRenameFolderBody = z.object({
-  name: zNoteName
+    name: zNoteName
 });
 
 export const zRenameFolderPath = z.object({
-  folderId: zNoteId
+    folderId: zNoteId
 });
 
 /**
@@ -834,11 +834,11 @@ export const zCreateNoteBody = zNoteNoteWritable;
  * Note successfully created
  */
 export const zCreateNoteResponse = z.object({
-  id: zNoteId2
+    id: zNoteId2
 });
 
 export const zPermanentlyDeleteNotePath = z.object({
-  noteId: zNoteId2
+    noteId: zNoteId2
 });
 
 /**
@@ -847,11 +847,11 @@ export const zPermanentlyDeleteNotePath = z.object({
 export const zPermanentlyDeleteNoteResponse = z.void();
 
 export const zGetNotePath = z.object({
-  noteId: zNoteId2
+    noteId: zNoteId2
 });
 
 export const zGetNoteQuery = z.object({
-  includeTrashed: z.boolean().optional().default(true)
+    includeTrashed: z.boolean().optional().default(true)
 });
 
 /**
@@ -860,11 +860,11 @@ export const zGetNoteQuery = z.object({
 export const zGetNoteResponse = zNoteNote;
 
 export const zGetNoteGraphPath = z.object({
-  noteId: zNoteId2
+    noteId: zNoteId2
 });
 
 export const zGetNoteGraphQuery = z.object({
-  depth: z.int().gte(1).lte(500).optional().default(100)
+    depth: z.int().gte(1).lte(500).optional().default(100)
 });
 
 /**
@@ -873,24 +873,24 @@ export const zGetNoteGraphQuery = z.object({
 export const zGetNoteGraphResponse = zNoteGraph;
 
 export const zGetNoteLinksPath = z.object({
-  noteId: zNoteId2
+    noteId: zNoteId2
 });
 
 export const zGetNoteLinksQuery = z.object({
-  outgoingLinks: z.boolean().optional().default(true),
-  backlinks: z.boolean().optional().default(true)
+    outgoingLinks: z.boolean().optional().default(true),
+    backlinks: z.boolean().optional().default(true)
 });
 
 /**
  * Note links
  */
 export const zGetNoteLinksResponse = z.object({
-  outgoingLinks: z.array(zNoteNoteLink).optional(),
-  backlinks: z.array(zNoteNoteLink).optional()
+    outgoingLinks: z.array(zNoteNoteLink).optional(),
+    backlinks: z.array(zNoteNoteLink).optional()
 });
 
 export const zPublishNotePath = z.object({
-  noteId: zNoteId2
+    noteId: zNoteId2
 });
 
 /**
@@ -899,11 +899,11 @@ export const zPublishNotePath = z.object({
 export const zPublishNoteResponse = z.void();
 
 export const zRenameNoteBody = z.object({
-  name: zNoteName2
+    name: zNoteName2
 });
 
 export const zRenameNotePath = z.object({
-  noteId: zNoteId2
+    noteId: zNoteId2
 });
 
 /**
@@ -912,7 +912,7 @@ export const zRenameNotePath = z.object({
 export const zRenameNoteResponse = z.void();
 
 export const zUnpublishNotePath = z.object({
-  noteId: zNoteId2
+    noteId: zNoteId2
 });
 
 /**
@@ -921,7 +921,7 @@ export const zUnpublishNotePath = z.object({
 export const zUnpublishNoteResponse = z.void();
 
 export const zGetWorkspacePath = z.object({
-  workspaceSlug: zNoteSlug
+    workspaceSlug: zNoteSlug
 });
 
 /**
@@ -930,7 +930,7 @@ export const zGetWorkspacePath = z.object({
 export const zGetWorkspaceResponse = zNoteWorkspace;
 
 export const zCheckWorkspaceSlugExistsPath = z.object({
-  workspaceSlug: zNoteSlug
+    workspaceSlug: zNoteSlug
 });
 
 export const zCreateWorkspaceBody = zNoteWorkspaceWritable;
@@ -939,7 +939,7 @@ export const zCreateWorkspaceBody = zNoteWorkspaceWritable;
  * Workspace successfully created
  */
 export const zCreateWorkspaceResponse = z.object({
-  id: zNoteId3
+    id: zNoteId3
 });
 
 /**
@@ -948,7 +948,7 @@ export const zCreateWorkspaceResponse = z.object({
 export const zGetMyWorkspacesResponse = z.array(zNoteUserWorkspace);
 
 export const zDeleteWorkspacePath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -957,11 +957,11 @@ export const zDeleteWorkspacePath = z.object({
 export const zDeleteWorkspaceResponse = z.void();
 
 export const zChangeWorkspaceSlugBody = z.object({
-  slug: zNoteSlug
+    slug: zNoteSlug
 });
 
 export const zChangeWorkspaceSlugPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -970,7 +970,7 @@ export const zChangeWorkspaceSlugPath = z.object({
 export const zChangeWorkspaceSlugResponse = z.void();
 
 export const zEmptyTrashPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -979,28 +979,28 @@ export const zEmptyTrashPath = z.object({
 export const zEmptyTrashResponse = z.void();
 
 export const zGetWorkspaceEventsPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
  * A persistent stream of events
  */
 export const zGetWorkspaceEventsResponse = z.discriminatedUnion('event', [
-  zNoteHeartBeatWorkspaceEvent.extend({ event: z.literal('HeartBeatWorkspaceEvent') }),
-  zNoteWorkspaceBillingChangedEvent.extend({ event: z.literal('WorkspaceBillingChangedEvent') }),
-  zNoteWorkspaceDeletedEvent.extend({ event: z.literal('WorkspaceDeletedEvent') }),
-  zNoteWorkspaceItemsUpdatedEvent.extend({ event: z.literal('WorkspaceItemsUpdatedEvent') }),
-  zNoteWorkspaceMembersUpdatedEvent.extend({ event: z.literal('WorkspaceMembersUpdatedEvent') }),
-  zNoteWorkspaceRenamedEvent.extend({ event: z.literal('WorkspaceRenamedEvent') }),
-  zNoteWorkspaceSlugChangedEvent.extend({ event: z.literal('WorkspaceSlugChangedEvent') })
+    zNoteHeartBeatWorkspaceEvent.extend({ event: z.literal('HeartBeatWorkspaceEvent') }),
+    zNoteWorkspaceBillingChangedEvent.extend({ event: z.literal('WorkspaceBillingChangedEvent') }),
+    zNoteWorkspaceDeletedEvent.extend({ event: z.literal('WorkspaceDeletedEvent') }),
+    zNoteWorkspaceItemsUpdatedEvent.extend({ event: z.literal('WorkspaceItemsUpdatedEvent') }),
+    zNoteWorkspaceMembersUpdatedEvent.extend({ event: z.literal('WorkspaceMembersUpdatedEvent') }),
+    zNoteWorkspaceRenamedEvent.extend({ event: z.literal('WorkspaceRenamedEvent') }),
+    zNoteWorkspaceSlugChangedEvent.extend({ event: z.literal('WorkspaceSlugChangedEvent') })
 ]);
 
 export const zGetWorkspaceGraphPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 export const zGetWorkspaceGraphQuery = z.object({
-  includeOrphans: z.boolean().optional().default(false)
+    includeOrphans: z.boolean().optional().default(false)
 });
 
 /**
@@ -1009,7 +1009,7 @@ export const zGetWorkspaceGraphQuery = z.object({
 export const zGetWorkspaceGraphResponse = zNoteGraph;
 
 export const zLeaveWorkspacePath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1018,7 +1018,7 @@ export const zLeaveWorkspacePath = z.object({
 export const zLeaveWorkspaceResponse = z.void();
 
 export const zGetWorkspaceMembersPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1029,7 +1029,7 @@ export const zGetWorkspaceMembersResponse = z.array(zNoteWorkspaceMember);
 export const zUpdateWorkspaceMembersBody = z.array(zNoteWorkspaceMemberWritable);
 
 export const zUpdateWorkspaceMembersPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1038,13 +1038,13 @@ export const zUpdateWorkspaceMembersPath = z.object({
 export const zUpdateWorkspaceMembersResponse = z.void();
 
 export const zMoveWorkspaceItemsBody = z.object({
-  noteIds: z.array(z.uuid()).optional(),
-  folderIds: z.array(z.uuid()).optional(),
-  destinationFolderId: z.uuid()
+    noteIds: z.array(z.uuid()).optional(),
+    folderIds: z.array(z.uuid()).optional(),
+    destinationFolderId: z.uuid()
 });
 
 export const zMoveWorkspaceItemsPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1053,12 +1053,12 @@ export const zMoveWorkspaceItemsPath = z.object({
 export const zMoveWorkspaceItemsResponse = z.void();
 
 export const zPermanentlyDeleteWorkspaceItemsBody = z.object({
-  noteIds: z.array(z.uuid()).optional(),
-  folderIds: z.array(z.uuid()).optional()
+    noteIds: z.array(z.uuid()).optional(),
+    folderIds: z.array(z.uuid()).optional()
 });
 
 export const zPermanentlyDeleteWorkspaceItemsPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1067,7 +1067,7 @@ export const zPermanentlyDeleteWorkspaceItemsPath = z.object({
 export const zPermanentlyDeleteWorkspaceItemsResponse = z.void();
 
 export const zPublishWorkspacePath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1076,11 +1076,11 @@ export const zPublishWorkspacePath = z.object({
 export const zPublishWorkspaceResponse = z.void();
 
 export const zRenameWorkspaceBody = z.object({
-  name: zNoteName3
+    name: zNoteName3
 });
 
 export const zRenameWorkspacePath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1089,12 +1089,12 @@ export const zRenameWorkspacePath = z.object({
 export const zRenameWorkspaceResponse = z.void();
 
 export const zRestoreTrashedWorkspaceItemsBody = z.object({
-  noteIds: z.array(z.uuid()).optional(),
-  folderIds: z.array(z.uuid()).optional()
+    noteIds: z.array(z.uuid()).optional(),
+    folderIds: z.array(z.uuid()).optional()
 });
 
 export const zRestoreTrashedWorkspaceItemsPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1103,7 +1103,7 @@ export const zRestoreTrashedWorkspaceItemsPath = z.object({
 export const zRestoreTrashedWorkspaceItemsResponse = z.void();
 
 export const zGetWorkspaceSearchTokenPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1112,24 +1112,24 @@ export const zGetWorkspaceSearchTokenPath = z.object({
 export const zGetWorkspaceSearchTokenResponse = zNoteSearchToken;
 
 export const zShowTrashPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
  * Trash
  */
 export const zShowTrashResponse = z.object({
-  notes: z.array(zNoteTrashedNote),
-  folders: z.array(zNoteTrashedFolder)
+    notes: z.array(zNoteTrashedNote),
+    folders: z.array(zNoteTrashedFolder)
 });
 
 export const zTrashWorkspaceItemsBody = z.object({
-  noteIds: z.array(z.uuid()).optional(),
-  folderIds: z.array(z.uuid()).optional()
+    noteIds: z.array(z.uuid()).optional(),
+    folderIds: z.array(z.uuid()).optional()
 });
 
 export const zTrashWorkspaceItemsPath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1138,18 +1138,18 @@ export const zTrashWorkspaceItemsPath = z.object({
 export const zTrashWorkspaceItemsResponse = z.void();
 
 export const zGetWorkspaceTreePath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 export const zGetWorkspaceTreeQuery = z.object({
-  rootFolderId: zNoteId.optional(),
-  includeTrashed: z.boolean().optional().default(false),
-  depth: z.int().gte(1).optional(),
-  sort: z.object({
-    name: z.enum(['asc', 'desc']).optional().default('asc'),
-    createdAt: z.enum(['asc', 'desc']).optional(),
-    updatedAt: z.enum(['asc', 'desc']).optional()
-  }).optional()
+    rootFolderId: zNoteId.optional(),
+    includeTrashed: z.boolean().optional().default(false),
+    depth: z.int().gte(1).optional(),
+    sort: z.object({
+        name: z.enum(['asc', 'desc']).optional().default('asc'),
+        createdAt: z.enum(['asc', 'desc']).optional(),
+        updatedAt: z.enum(['asc', 'desc']).optional()
+    }).optional()
 });
 
 /**
@@ -1158,7 +1158,7 @@ export const zGetWorkspaceTreeQuery = z.object({
 export const zGetWorkspaceTreeResponse = zNoteWorkspaceTreeFolder;
 
 export const zUnpublishWorkspacePath = z.object({
-  workspaceId: zNoteId3
+    workspaceId: zNoteId3
 });
 
 /**
@@ -1167,10 +1167,10 @@ export const zUnpublishWorkspacePath = z.object({
 export const zUnpublishWorkspaceResponse = z.void();
 
 export const zSearchUsersQuery = z.object({
-  keyword: z.string(),
-  isActive: z.boolean().optional(),
-  limit: z.int().gte(1).lte(100).optional().default(20),
-  excludeMemberInWorkspaceId: zNoteId3.optional()
+    keyword: z.string(),
+    isActive: z.boolean().optional(),
+    limit: z.int().gte(1).lte(100).optional().default(20),
+    excludeMemberInWorkspaceId: zNoteId3.optional()
 });
 
 /**
@@ -1184,7 +1184,7 @@ export const zSearchUsersResponse = z.array(zNoteUser);
 export const zListPlansResponse = z.array(zBillingPlan);
 
 export const zGetWorkspaceEntitlementsPath = z.object({
-  workspaceId: z.uuid()
+    workspaceId: z.uuid()
 });
 
 /**
@@ -1193,7 +1193,7 @@ export const zGetWorkspaceEntitlementsPath = z.object({
 export const zGetWorkspaceEntitlementsResponse = zBillingEntitlements;
 
 export const zGetWorkspaceBillingPath = z.object({
-  workspaceId: z.uuid()
+    workspaceId: z.uuid()
 });
 
 /**
@@ -1204,7 +1204,7 @@ export const zGetWorkspaceBillingResponse = zBillingWorkspaceBilling;
 export const zCreateCheckoutSessionBody = zBillingCheckoutSessionRequest;
 
 export const zCreateCheckoutSessionPath = z.object({
-  workspaceId: z.uuid()
+    workspaceId: z.uuid()
 });
 
 /**
@@ -1213,7 +1213,7 @@ export const zCreateCheckoutSessionPath = z.object({
 export const zCreateCheckoutSessionResponse = zBillingRedirectUrl;
 
 export const zCreatePortalSessionPath = z.object({
-  workspaceId: z.uuid()
+    workspaceId: z.uuid()
 });
 
 /**
@@ -1222,7 +1222,7 @@ export const zCreatePortalSessionPath = z.object({
 export const zCreatePortalSessionResponse = zBillingRedirectUrl;
 
 export const zPreviewCancelNowPath = z.object({
-  workspaceId: z.uuid()
+    workspaceId: z.uuid()
 });
 
 /**
@@ -1231,7 +1231,7 @@ export const zPreviewCancelNowPath = z.object({
 export const zPreviewCancelNowResponse = zBillingRefundQuote;
 
 export const zCancelNowPath = z.object({
-  workspaceId: z.uuid()
+    workspaceId: z.uuid()
 });
 
 /**
@@ -1240,7 +1240,7 @@ export const zCancelNowPath = z.object({
 export const zCancelNowResponse = zBillingWorkspaceBilling;
 
 export const zClaimPayerPath = z.object({
-  workspaceId: z.uuid()
+    workspaceId: z.uuid()
 });
 
 /**
@@ -1256,7 +1256,7 @@ export const zAdminListPlansResponse = z.array(zBillingPlan);
 export const zAdminUpdatePlanBody = zBillingUpdatePlanRequest;
 
 export const zAdminUpdatePlanPath = z.object({
-  tier: zBillingPlanTier
+    tier: zBillingPlanTier
 });
 
 /**
@@ -1289,7 +1289,7 @@ export const zAdminCreatePriceBody = zBillingCreatePriceRequest;
 export const zAdminCreatePriceResponse = zBillingPrice;
 
 export const zAdminArchivePricePath = z.object({
-  priceId: z.uuid()
+    priceId: z.uuid()
 });
 
 /**
@@ -1300,7 +1300,7 @@ export const zAdminArchivePriceResponse = zBillingPrice;
 export const zStripeWebhookBody = z.record(z.string(), z.unknown());
 
 export const zStripeWebhookHeaders = z.object({
-  'Stripe-Signature': z.string()
+    'Stripe-Signature': z.string()
 });
 
 /**

@@ -6,17 +6,17 @@ import { adminArchivePriceResponseTransformer, adminCreatePriceResponseTransform
 import type { AdminArchivePriceData, AdminArchivePriceErrors, AdminArchivePriceResponses, AdminCreatePriceData, AdminCreatePriceErrors, AdminCreatePriceResponses, AdminGetPolicyData, AdminGetPolicyErrors, AdminGetPolicyResponses, AdminListPlansData, AdminListPlansErrors, AdminListPlansResponses, AdminListPricesData, AdminListPricesErrors, AdminListPricesResponses, AdminUpdatePlanData, AdminUpdatePlanErrors, AdminUpdatePlanResponses, AdminUpdatePolicyData, AdminUpdatePolicyErrors, AdminUpdatePolicyResponses, CancelNowData, CancelNowErrors, CancelNowResponses, ChangeWorkspaceSlugData, ChangeWorkspaceSlugErrors, ChangeWorkspaceSlugResponses, CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsErrors, CheckWorkspaceSlugExistsResponses, ClaimPayerData, ClaimPayerErrors, ClaimPayerResponses, CommitDocumentData, CommitDocumentErrors, CommitDocumentResponses, CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, CreateFolderData, CreateFolderErrors, CreateFolderResponses, CreateNoteData, CreateNoteErrors, CreateNoteResponses, CreatePortalSessionData, CreatePortalSessionErrors, CreatePortalSessionResponses, CreateWorkspaceData, CreateWorkspaceErrors, CreateWorkspaceResponses, DeleteRevisionData, DeleteRevisionErrors, DeleteRevisionResponses, DeleteWorkspaceData, DeleteWorkspaceErrors, DeleteWorkspaceResponses, EmptyTrashData, EmptyTrashErrors, EmptyTrashResponses, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlErrors, GetDocumentAttachmentUploadUrlResponses, GetMyWorkspacesData, GetMyWorkspacesErrors, GetMyWorkspacesResponses, GetNoteData, GetNoteErrors, GetNoteGraphData, GetNoteGraphErrors, GetNoteGraphResponses, GetNoteLinksData, GetNoteLinksErrors, GetNoteLinksResponses, GetNoteResponses, GetRevisionsData, GetRevisionsErrors, GetRevisionsResponses, GetRevisionWithContentData, GetRevisionWithContentErrors, GetRevisionWithContentResponses, GetWorkspaceBillingData, GetWorkspaceBillingErrors, GetWorkspaceBillingResponses, GetWorkspaceData, GetWorkspaceEntitlementsData, GetWorkspaceEntitlementsErrors, GetWorkspaceEntitlementsResponses, GetWorkspaceErrors, GetWorkspaceEventsData, GetWorkspaceEventsErrors, GetWorkspaceEventsResponse, GetWorkspaceEventsResponses, GetWorkspaceGraphData, GetWorkspaceGraphErrors, GetWorkspaceGraphResponses, GetWorkspaceMembersData, GetWorkspaceMembersErrors, GetWorkspaceMembersResponses, GetWorkspaceResponses, GetWorkspaceSearchTokenData, GetWorkspaceSearchTokenErrors, GetWorkspaceSearchTokenResponses, GetWorkspaceTreeData, GetWorkspaceTreeErrors, GetWorkspaceTreeResponses, LeaveWorkspaceData, LeaveWorkspaceErrors, LeaveWorkspaceResponses, ListPlansData, ListPlansErrors, ListPlansResponses, MoveWorkspaceItemsData, MoveWorkspaceItemsErrors, MoveWorkspaceItemsResponses, PermanentlyDeleteFolderData, PermanentlyDeleteFolderErrors, PermanentlyDeleteFolderResponses, PermanentlyDeleteNoteData, PermanentlyDeleteNoteErrors, PermanentlyDeleteNoteResponses, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsErrors, PermanentlyDeleteWorkspaceItemsResponses, PreviewCancelNowData, PreviewCancelNowErrors, PreviewCancelNowResponses, PublishNoteData, PublishNoteErrors, PublishNoteResponses, PublishWorkspaceData, PublishWorkspaceErrors, PublishWorkspaceResponses, RenameFolderData, RenameFolderErrors, RenameFolderResponses, RenameNoteData, RenameNoteErrors, RenameNoteResponses, RenameRevisionData, RenameRevisionErrors, RenameRevisionResponses, RenameWorkspaceData, RenameWorkspaceErrors, RenameWorkspaceResponses, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsErrors, RestoreTrashedWorkspaceItemsResponses, SearchUsersData, SearchUsersErrors, SearchUsersResponses, ShowTrashData, ShowTrashErrors, ShowTrashResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses, TrashWorkspaceItemsData, TrashWorkspaceItemsErrors, TrashWorkspaceItemsResponses, UnpublishNoteData, UnpublishNoteErrors, UnpublishNoteResponses, UnpublishWorkspaceData, UnpublishWorkspaceErrors, UnpublishWorkspaceResponses, UpdateWorkspaceMembersData, UpdateWorkspaceMembersErrors, UpdateWorkspaceMembersResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
-  /**
-   * You can provide a client instance returned by `createClient()` instead of
-   * individual options. This might be also useful if you want to implement a
-   * custom client.
-   */
-  client?: Client;
-  /**
-   * You can pass arbitrary values through the `meta` object. This can be
-   * used to access values that aren't defined as part of the SDK function.
-   */
-  meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
+    /**
+     * You can provide a client instance returned by `createClient()` instead of
+     * individual options. This might be also useful if you want to implement a
+     * custom client.
+     */
+    client?: Client;
+    /**
+     * You can pass arbitrary values through the `meta` object. This can be
+     * used to access values that aren't defined as part of the SDK function.
+     */
+    meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
 
 /**
@@ -25,17 +25,17 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  * Get presigned URL for document attachment upload
  */
 export const getDocumentAttachmentUploadUrl = <ThrowOnError extends boolean = false>(options: Options<GetDocumentAttachmentUploadUrlData, ThrowOnError>): RequestResult<GetDocumentAttachmentUploadUrlResponses, GetDocumentAttachmentUploadUrlErrors, ThrowOnError> => (options.client ?? client).get<GetDocumentAttachmentUploadUrlResponses, GetDocumentAttachmentUploadUrlErrors, ThrowOnError>({
-  security: [{
-      key: 'document_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'document_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/document/documents/{documentId}/attachment-url',
-  ...options
+    security: [{
+            key: 'document_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'document_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/document/documents/{documentId}/attachment-url',
+    ...options
 });
 
 /**
@@ -44,17 +44,17 @@ export const getDocumentAttachmentUploadUrl = <ThrowOnError extends boolean = fa
  * Creates a revision of the current content. Requires write permission. Plus/pro workspaces also auto-commit (`auto_commit`), so this is only needed to force a revision earlier.
  */
 export const commitDocument = <ThrowOnError extends boolean = false>(options: Options<CommitDocumentData, ThrowOnError>): RequestResult<CommitDocumentResponses, CommitDocumentErrors, ThrowOnError> => (options.client ?? client).post<CommitDocumentResponses, CommitDocumentErrors, ThrowOnError>({
-  security: [{
-      key: 'document_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'document_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/document/documents/{documentId}/commit',
-  ...options
+    security: [{
+            key: 'document_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'document_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/document/documents/{documentId}/commit',
+    ...options
 });
 
 /**
@@ -63,189 +63,189 @@ export const commitDocument = <ThrowOnError extends boolean = false>(options: Op
  * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const getRevisions = <ThrowOnError extends boolean = false>(options: Options<GetRevisionsData, ThrowOnError>): RequestResult<GetRevisionsResponses, GetRevisionsErrors, ThrowOnError> => (options.client ?? client).get<GetRevisionsResponses, GetRevisionsErrors, ThrowOnError>({
-  responseTransformer: getRevisionsResponseTransformer,
-  security: [{
-      key: 'document_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'document_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/document/revisions',
-  ...options
+    responseTransformer: getRevisionsResponseTransformer,
+    security: [{
+            key: 'document_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'document_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/document/revisions',
+    ...options
 });
 
 /**
  * Delete revision
  */
 export const deleteRevision = <ThrowOnError extends boolean = false>(options: Options<DeleteRevisionData, ThrowOnError>): RequestResult<DeleteRevisionResponses, DeleteRevisionErrors, ThrowOnError> => (options.client ?? client).delete<DeleteRevisionResponses, DeleteRevisionErrors, ThrowOnError>({
-  security: [{
-      key: 'document_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'document_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/document/revisions/{revisionId}',
-  ...options
+    security: [{
+            key: 'document_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'document_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/document/revisions/{revisionId}',
+    ...options
 });
 
 /**
  * Get revision with content
  */
 export const getRevisionWithContent = <ThrowOnError extends boolean = false>(options: Options<GetRevisionWithContentData, ThrowOnError>): RequestResult<GetRevisionWithContentResponses, GetRevisionWithContentErrors, ThrowOnError> => (options.client ?? client).get<GetRevisionWithContentResponses, GetRevisionWithContentErrors, ThrowOnError>({
-  responseTransformer: getRevisionWithContentResponseTransformer,
-  security: [{
-      key: 'document_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'document_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/document/revisions/{revisionId}',
-  ...options
+    responseTransformer: getRevisionWithContentResponseTransformer,
+    security: [{
+            key: 'document_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'document_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/document/revisions/{revisionId}',
+    ...options
 });
 
 /**
  * Rename revision
  */
 export const renameRevision = <ThrowOnError extends boolean = false>(options: Options<RenameRevisionData, ThrowOnError>): RequestResult<RenameRevisionResponses, RenameRevisionErrors, ThrowOnError> => (options.client ?? client).post<RenameRevisionResponses, RenameRevisionErrors, ThrowOnError>({
-  security: [{
-      key: 'document_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'document_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/document/revisions/{revisionId}/rename',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'document_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'document_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/document/revisions/{revisionId}/rename',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Create folder
  */
 export const createFolder = <ThrowOnError extends boolean = false>(options: Options<CreateFolderData, ThrowOnError>): RequestResult<CreateFolderResponses, CreateFolderErrors, ThrowOnError> => (options.client ?? client).post<CreateFolderResponses, CreateFolderErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/folders',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/folders',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Permanently delete folder
  */
 export const permanentlyDeleteFolder = <ThrowOnError extends boolean = false>(options: Options<PermanentlyDeleteFolderData, ThrowOnError>): RequestResult<PermanentlyDeleteFolderResponses, PermanentlyDeleteFolderErrors, ThrowOnError> => (options.client ?? client).delete<PermanentlyDeleteFolderResponses, PermanentlyDeleteFolderErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/folders/{folderId}',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/folders/{folderId}',
+    ...options
 });
 
 /**
  * Rename folder
  */
 export const renameFolder = <ThrowOnError extends boolean = false>(options: Options<RenameFolderData, ThrowOnError>): RequestResult<RenameFolderResponses, RenameFolderErrors, ThrowOnError> => (options.client ?? client).post<RenameFolderResponses, RenameFolderErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/folders/{folderId}/rename',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/folders/{folderId}/rename',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Create note
  */
 export const createNote = <ThrowOnError extends boolean = false>(options: Options<CreateNoteData, ThrowOnError>): RequestResult<CreateNoteResponses, CreateNoteErrors, ThrowOnError> => (options.client ?? client).post<CreateNoteResponses, CreateNoteErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/notes',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/notes',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Permanently delete note
  */
 export const permanentlyDeleteNote = <ThrowOnError extends boolean = false>(options: Options<PermanentlyDeleteNoteData, ThrowOnError>): RequestResult<PermanentlyDeleteNoteResponses, PermanentlyDeleteNoteErrors, ThrowOnError> => (options.client ?? client).delete<PermanentlyDeleteNoteResponses, PermanentlyDeleteNoteErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/notes/{noteId}',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/notes/{noteId}',
+    ...options
 });
 
 /**
  * Get note
  */
 export const getNote = <ThrowOnError extends boolean = false>(options: Options<GetNoteData, ThrowOnError>): RequestResult<GetNoteResponses, GetNoteErrors, ThrowOnError> => (options.client ?? client).get<GetNoteResponses, GetNoteErrors, ThrowOnError>({
-  responseTransformer: getNoteResponseTransformer,
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/notes/{noteId}',
-  ...options
+    responseTransformer: getNoteResponseTransformer,
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/notes/{noteId}',
+    ...options
 });
 
 /**
@@ -254,233 +254,233 @@ export const getNote = <ThrowOnError extends boolean = false>(options: Options<G
  * `depth` is capped by plan limit `note_graph_max_depth` (free 5).
  */
 export const getNoteGraph = <ThrowOnError extends boolean = false>(options: Options<GetNoteGraphData, ThrowOnError>): RequestResult<GetNoteGraphResponses, GetNoteGraphErrors, ThrowOnError> => (options.client ?? client).get<GetNoteGraphResponses, GetNoteGraphErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/notes/{noteId}/graph',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/notes/{noteId}/graph',
+    ...options
 });
 
 /**
  * Get note links
  */
 export const getNoteLinks = <ThrowOnError extends boolean = false>(options: Options<GetNoteLinksData, ThrowOnError>): RequestResult<GetNoteLinksResponses, GetNoteLinksErrors, ThrowOnError> => (options.client ?? client).get<GetNoteLinksResponses, GetNoteLinksErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/notes/{noteId}/links',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/notes/{noteId}/links',
+    ...options
 });
 
 /**
  * Publish note
  */
 export const publishNote = <ThrowOnError extends boolean = false>(options: Options<PublishNoteData, ThrowOnError>): RequestResult<PublishNoteResponses, PublishNoteErrors, ThrowOnError> => (options.client ?? client).post<PublishNoteResponses, PublishNoteErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/notes/{noteId}/publish',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/notes/{noteId}/publish',
+    ...options
 });
 
 /**
  * Rename note
  */
 export const renameNote = <ThrowOnError extends boolean = false>(options: Options<RenameNoteData, ThrowOnError>): RequestResult<RenameNoteResponses, RenameNoteErrors, ThrowOnError> => (options.client ?? client).post<RenameNoteResponses, RenameNoteErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/notes/{noteId}/rename',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/notes/{noteId}/rename',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Unpublish note
  */
 export const unpublishNote = <ThrowOnError extends boolean = false>(options: Options<UnpublishNoteData, ThrowOnError>): RequestResult<UnpublishNoteResponses, UnpublishNoteErrors, ThrowOnError> => (options.client ?? client).post<UnpublishNoteResponses, UnpublishNoteErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/notes/{noteId}/unpublish',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/notes/{noteId}/unpublish',
+    ...options
 });
 
 /**
  * Get workspace
  */
 export const getWorkspace = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceData, ThrowOnError>): RequestResult<GetWorkspaceResponses, GetWorkspaceErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceResponses, GetWorkspaceErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces-by-slug/{workspaceSlug}',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces-by-slug/{workspaceSlug}',
+    ...options
 });
 
 /**
  * Check workspace slug exists
  */
 export const checkWorkspaceSlugExists = <ThrowOnError extends boolean = false>(options: Options<CheckWorkspaceSlugExistsData, ThrowOnError>): RequestResult<CheckWorkspaceSlugExistsResponses, CheckWorkspaceSlugExistsErrors, ThrowOnError> => (options.client ?? client).get<CheckWorkspaceSlugExistsResponses, CheckWorkspaceSlugExistsErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces-by-slug/{workspaceSlug}/exists',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces-by-slug/{workspaceSlug}/exists',
+    ...options
 });
 
 /**
  * Create workspace
  */
 export const createWorkspace = <ThrowOnError extends boolean = false>(options: Options<CreateWorkspaceData, ThrowOnError>): RequestResult<CreateWorkspaceResponses, CreateWorkspaceErrors, ThrowOnError> => (options.client ?? client).post<CreateWorkspaceResponses, CreateWorkspaceErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Get my workspaces
  */
 export const getMyWorkspaces = <ThrowOnError extends boolean = false>(options?: Options<GetMyWorkspacesData, ThrowOnError>): RequestResult<GetMyWorkspacesResponses, GetMyWorkspacesErrors, ThrowOnError> => (options?.client ?? client).get<GetMyWorkspacesResponses, GetMyWorkspacesErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/me',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/me',
+    ...options
 });
 
 /**
  * Delete workspace
  */
 export const deleteWorkspace = <ThrowOnError extends boolean = false>(options: Options<DeleteWorkspaceData, ThrowOnError>): RequestResult<DeleteWorkspaceResponses, DeleteWorkspaceErrors, ThrowOnError> => (options.client ?? client).delete<DeleteWorkspaceResponses, DeleteWorkspaceErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}',
+    ...options
 });
 
 /**
  * Change workspace slug
  */
 export const changeWorkspaceSlug = <ThrowOnError extends boolean = false>(options: Options<ChangeWorkspaceSlugData, ThrowOnError>): RequestResult<ChangeWorkspaceSlugResponses, ChangeWorkspaceSlugErrors, ThrowOnError> => (options.client ?? client).post<ChangeWorkspaceSlugResponses, ChangeWorkspaceSlugErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/change-slug',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/change-slug',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Empty trash
  */
 export const emptyTrash = <ThrowOnError extends boolean = false>(options: Options<EmptyTrashData, ThrowOnError>): RequestResult<EmptyTrashResponses, EmptyTrashErrors, ThrowOnError> => (options.client ?? client).delete<EmptyTrashResponses, EmptyTrashErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/empty-trash',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/empty-trash',
+    ...options
 });
 
 /**
  * SSE workspace updates
  */
 export const getWorkspaceEvents = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceEventsData, ThrowOnError, GetWorkspaceEventsResponse>): Promise<ServerSentEventsResult<GetWorkspaceEventsResponses>> => (options.client ?? client).sse.get<GetWorkspaceEventsResponses, GetWorkspaceEventsErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/events',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/events',
+    ...options
 });
 
 /**
@@ -489,17 +489,17 @@ export const getWorkspaceEvents = <ThrowOnError extends boolean = false>(options
  * Requires feature `workspace_graph` (plus, pro); free returns 402.
  */
 export const getWorkspaceGraph = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceGraphData, ThrowOnError>): RequestResult<GetWorkspaceGraphResponses, GetWorkspaceGraphErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceGraphResponses, GetWorkspaceGraphErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/graph',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/graph',
+    ...options
 });
 
 /**
@@ -508,34 +508,34 @@ export const getWorkspaceGraph = <ThrowOnError extends boolean = false>(options:
  * The billing payer cannot leave while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const leaveWorkspace = <ThrowOnError extends boolean = false>(options: Options<LeaveWorkspaceData, ThrowOnError>): RequestResult<LeaveWorkspaceResponses, LeaveWorkspaceErrors, ThrowOnError> => (options.client ?? client).post<LeaveWorkspaceResponses, LeaveWorkspaceErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/leave',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/leave',
+    ...options
 });
 
 /**
  * Get workspace members
  */
 export const getWorkspaceMembers = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceMembersData, ThrowOnError>): RequestResult<GetWorkspaceMembersResponses, GetWorkspaceMembersErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceMembersResponses, GetWorkspaceMembersErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/members',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/members',
+    ...options
 });
 
 /**
@@ -544,140 +544,140 @@ export const getWorkspaceMembers = <ThrowOnError extends boolean = false>(option
  * Plan limit `members` (free 3, plus 10, pro unlimited). Adding beyond the limit returns 402. The billing payer cannot lose the owner role while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const updateWorkspaceMembers = <ThrowOnError extends boolean = false>(options: Options<UpdateWorkspaceMembersData, ThrowOnError>): RequestResult<UpdateWorkspaceMembersResponses, UpdateWorkspaceMembersErrors, ThrowOnError> => (options.client ?? client).put<UpdateWorkspaceMembersResponses, UpdateWorkspaceMembersErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/members',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/members',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Move workspace's items
  */
 export const moveWorkspaceItems = <ThrowOnError extends boolean = false>(options: Options<MoveWorkspaceItemsData, ThrowOnError>): RequestResult<MoveWorkspaceItemsResponses, MoveWorkspaceItemsErrors, ThrowOnError> => (options.client ?? client).post<MoveWorkspaceItemsResponses, MoveWorkspaceItemsErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/move-items',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/move-items',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Permanently delete workspace items
  */
 export const permanentlyDeleteWorkspaceItems = <ThrowOnError extends boolean = false>(options: Options<PermanentlyDeleteWorkspaceItemsData, ThrowOnError>): RequestResult<PermanentlyDeleteWorkspaceItemsResponses, PermanentlyDeleteWorkspaceItemsErrors, ThrowOnError> => (options.client ?? client).post<PermanentlyDeleteWorkspaceItemsResponses, PermanentlyDeleteWorkspaceItemsErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/permanently-delete-items',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/permanently-delete-items',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Publish workspace
  */
 export const publishWorkspace = <ThrowOnError extends boolean = false>(options: Options<PublishWorkspaceData, ThrowOnError>): RequestResult<PublishWorkspaceResponses, PublishWorkspaceErrors, ThrowOnError> => (options.client ?? client).post<PublishWorkspaceResponses, PublishWorkspaceErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/publish',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/publish',
+    ...options
 });
 
 /**
  * Rename workspace
  */
 export const renameWorkspace = <ThrowOnError extends boolean = false>(options: Options<RenameWorkspaceData, ThrowOnError>): RequestResult<RenameWorkspaceResponses, RenameWorkspaceErrors, ThrowOnError> => (options.client ?? client).post<RenameWorkspaceResponses, RenameWorkspaceErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/rename',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/rename',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Restore trashed workspace items
  */
 export const restoreTrashedWorkspaceItems = <ThrowOnError extends boolean = false>(options: Options<RestoreTrashedWorkspaceItemsData, ThrowOnError>): RequestResult<RestoreTrashedWorkspaceItemsResponses, RestoreTrashedWorkspaceItemsErrors, ThrowOnError> => (options.client ?? client).post<RestoreTrashedWorkspaceItemsResponses, RestoreTrashedWorkspaceItemsErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/restore-trashed-items',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/restore-trashed-items',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Get Workspace Search Token
  */
 export const getWorkspaceSearchToken = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceSearchTokenData, ThrowOnError>): RequestResult<GetWorkspaceSearchTokenResponses, GetWorkspaceSearchTokenErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceSearchTokenResponses, GetWorkspaceSearchTokenErrors, ThrowOnError>({
-  responseTransformer: getWorkspaceSearchTokenResponseTransformer,
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/search-token',
-  ...options
+    responseTransformer: getWorkspaceSearchTokenResponseTransformer,
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/search-token',
+    ...options
 });
 
 /**
@@ -686,373 +686,373 @@ export const getWorkspaceSearchToken = <ThrowOnError extends boolean = false>(op
  * Trashed items older than the plan's `trash_retention_days` are purged daily.
  */
 export const showTrash = <ThrowOnError extends boolean = false>(options: Options<ShowTrashData, ThrowOnError>): RequestResult<ShowTrashResponses, ShowTrashErrors, ThrowOnError> => (options.client ?? client).get<ShowTrashResponses, ShowTrashErrors, ThrowOnError>({
-  responseTransformer: showTrashResponseTransformer,
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/show-trash',
-  ...options
+    responseTransformer: showTrashResponseTransformer,
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/show-trash',
+    ...options
 });
 
 /**
  * Trash workspace's items
  */
 export const trashWorkspaceItems = <ThrowOnError extends boolean = false>(options: Options<TrashWorkspaceItemsData, ThrowOnError>): RequestResult<TrashWorkspaceItemsResponses, TrashWorkspaceItemsErrors, ThrowOnError> => (options.client ?? client).post<TrashWorkspaceItemsResponses, TrashWorkspaceItemsErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/trash-items',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/trash-items',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Get workspace tree
  */
 export const getWorkspaceTree = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceTreeData, ThrowOnError>): RequestResult<GetWorkspaceTreeResponses, GetWorkspaceTreeErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceTreeResponses, GetWorkspaceTreeErrors, ThrowOnError>({
-  responseTransformer: getWorkspaceTreeResponseTransformer,
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/tree',
-  ...options
+    responseTransformer: getWorkspaceTreeResponseTransformer,
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/tree',
+    ...options
 });
 
 /**
  * Unpublish workspace
  */
 export const unpublishWorkspace = <ThrowOnError extends boolean = false>(options: Options<UnpublishWorkspaceData, ThrowOnError>): RequestResult<UnpublishWorkspaceResponses, UnpublishWorkspaceErrors, ThrowOnError> => (options.client ?? client).post<UnpublishWorkspaceResponses, UnpublishWorkspaceErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/workspaces/{workspaceId}/unpublish',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/workspaces/{workspaceId}/unpublish',
+    ...options
 });
 
 /**
  * Search users
  */
 export const searchUsers = <ThrowOnError extends boolean = false>(options: Options<SearchUsersData, ThrowOnError>): RequestResult<SearchUsersResponses, SearchUsersErrors, ThrowOnError> => (options.client ?? client).get<SearchUsersResponses, SearchUsersErrors, ThrowOnError>({
-  security: [{
-      key: 'note_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'note_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/note/search-users',
-  ...options
+    security: [{
+            key: 'note_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'note_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/note/search-users',
+    ...options
 });
 
 /**
  * List plans with features, limits and active prices
  */
 export const listPlans = <ThrowOnError extends boolean = false>(options?: Options<ListPlansData, ThrowOnError>): RequestResult<ListPlansResponses, ListPlansErrors, ThrowOnError> => (options?.client ?? client).get<ListPlansResponses, ListPlansErrors, ThrowOnError>({
-  responseTransformer: listPlansResponseTransformer,
-  url: '/billing/plans',
-  ...options
+    responseTransformer: listPlansResponseTransformer,
+    url: '/billing/plans',
+    ...options
 });
 
 /**
  * Get workspace entitlements (member)
  */
 export const getWorkspaceEntitlements = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceEntitlementsData, ThrowOnError>): RequestResult<GetWorkspaceEntitlementsResponses, GetWorkspaceEntitlementsErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceEntitlementsResponses, GetWorkspaceEntitlementsErrors, ThrowOnError>({
-  responseTransformer: getWorkspaceEntitlementsResponseTransformer,
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/workspaces/{workspaceId}/entitlements',
-  ...options
+    responseTransformer: getWorkspaceEntitlementsResponseTransformer,
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/workspaces/{workspaceId}/entitlements',
+    ...options
 });
 
 /**
  * Get workspace subscription, payer and refunds (owner only)
  */
 export const getWorkspaceBilling = <ThrowOnError extends boolean = false>(options: Options<GetWorkspaceBillingData, ThrowOnError>): RequestResult<GetWorkspaceBillingResponses, GetWorkspaceBillingErrors, ThrowOnError> => (options.client ?? client).get<GetWorkspaceBillingResponses, GetWorkspaceBillingErrors, ThrowOnError>({
-  responseTransformer: getWorkspaceBillingResponseTransformer,
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/workspaces/{workspaceId}/subscription',
-  ...options
+    responseTransformer: getWorkspaceBillingResponseTransformer,
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/workspaces/{workspaceId}/subscription',
+    ...options
 });
 
 /**
  * Start Stripe Checkout for a plan price (owner only)
  */
 export const createCheckoutSession = <ThrowOnError extends boolean = false>(options: Options<CreateCheckoutSessionData, ThrowOnError>): RequestResult<CreateCheckoutSessionResponses, CreateCheckoutSessionErrors, ThrowOnError> => (options.client ?? client).post<CreateCheckoutSessionResponses, CreateCheckoutSessionErrors, ThrowOnError>({
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/workspaces/{workspaceId}/checkout-session',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/workspaces/{workspaceId}/checkout-session',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Open Stripe Customer Portal (owner only)
  */
 export const createPortalSession = <ThrowOnError extends boolean = false>(options: Options<CreatePortalSessionData, ThrowOnError>): RequestResult<CreatePortalSessionResponses, CreatePortalSessionErrors, ThrowOnError> => (options.client ?? client).post<CreatePortalSessionResponses, CreatePortalSessionErrors, ThrowOnError>({
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/workspaces/{workspaceId}/portal-session',
-  ...options
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/workspaces/{workspaceId}/portal-session',
+    ...options
 });
 
 /**
  * Preview the refund of cancelling now (owner only)
  */
 export const previewCancelNow = <ThrowOnError extends boolean = false>(options: Options<PreviewCancelNowData, ThrowOnError>): RequestResult<PreviewCancelNowResponses, PreviewCancelNowErrors, ThrowOnError> => (options.client ?? client).get<PreviewCancelNowResponses, PreviewCancelNowErrors, ThrowOnError>({
-  responseTransformer: previewCancelNowResponseTransformer,
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/workspaces/{workspaceId}/subscription/cancel-now/preview',
-  ...options
+    responseTransformer: previewCancelNowResponseTransformer,
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/workspaces/{workspaceId}/subscription/cancel-now/preview',
+    ...options
 });
 
 /**
  * Cancel the subscription now with a prorated refund (owner only)
  */
 export const cancelNow = <ThrowOnError extends boolean = false>(options: Options<CancelNowData, ThrowOnError>): RequestResult<CancelNowResponses, CancelNowErrors, ThrowOnError> => (options.client ?? client).post<CancelNowResponses, CancelNowErrors, ThrowOnError>({
-  responseTransformer: cancelNowResponseTransformer,
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/workspaces/{workspaceId}/subscription/cancel-now',
-  ...options
+    responseTransformer: cancelNowResponseTransformer,
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/workspaces/{workspaceId}/subscription/cancel-now',
+    ...options
 });
 
 /**
  * Become the payer by completing a setup Checkout (owner only)
  */
 export const claimPayer = <ThrowOnError extends boolean = false>(options: Options<ClaimPayerData, ThrowOnError>): RequestResult<ClaimPayerResponses, ClaimPayerErrors, ThrowOnError> => (options.client ?? client).post<ClaimPayerResponses, ClaimPayerErrors, ThrowOnError>({
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/workspaces/{workspaceId}/payer/claim',
-  ...options
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/workspaces/{workspaceId}/payer/claim',
+    ...options
 });
 
 /**
  * List plans (admin)
  */
 export const adminListPlans = <ThrowOnError extends boolean = false>(options?: Options<AdminListPlansData, ThrowOnError>): RequestResult<AdminListPlansResponses, AdminListPlansErrors, ThrowOnError> => (options?.client ?? client).get<AdminListPlansResponses, AdminListPlansErrors, ThrowOnError>({
-  responseTransformer: adminListPlansResponseTransformer,
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/admin/plans',
-  ...options
+    responseTransformer: adminListPlansResponseTransformer,
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/admin/plans',
+    ...options
 });
 
 /**
  * Update plan features and limits (admin)
  */
 export const adminUpdatePlan = <ThrowOnError extends boolean = false>(options: Options<AdminUpdatePlanData, ThrowOnError>): RequestResult<AdminUpdatePlanResponses, AdminUpdatePlanErrors, ThrowOnError> => (options.client ?? client).patch<AdminUpdatePlanResponses, AdminUpdatePlanErrors, ThrowOnError>({
-  responseTransformer: adminUpdatePlanResponseTransformer,
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/admin/plans/{tier}',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    responseTransformer: adminUpdatePlanResponseTransformer,
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/admin/plans/{tier}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Get billing policy (admin)
  */
 export const adminGetPolicy = <ThrowOnError extends boolean = false>(options?: Options<AdminGetPolicyData, ThrowOnError>): RequestResult<AdminGetPolicyResponses, AdminGetPolicyErrors, ThrowOnError> => (options?.client ?? client).get<AdminGetPolicyResponses, AdminGetPolicyErrors, ThrowOnError>({
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/admin/policy',
-  ...options
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/admin/policy',
+    ...options
 });
 
 /**
  * Update billing policy (admin)
  */
 export const adminUpdatePolicy = <ThrowOnError extends boolean = false>(options: Options<AdminUpdatePolicyData, ThrowOnError>): RequestResult<AdminUpdatePolicyResponses, AdminUpdatePolicyErrors, ThrowOnError> => (options.client ?? client).patch<AdminUpdatePolicyResponses, AdminUpdatePolicyErrors, ThrowOnError>({
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/admin/policy',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/admin/policy',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * List all prices including archived (admin)
  */
 export const adminListPrices = <ThrowOnError extends boolean = false>(options?: Options<AdminListPricesData, ThrowOnError>): RequestResult<AdminListPricesResponses, AdminListPricesErrors, ThrowOnError> => (options?.client ?? client).get<AdminListPricesResponses, AdminListPricesErrors, ThrowOnError>({
-  responseTransformer: adminListPricesResponseTransformer,
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/admin/prices',
-  ...options
+    responseTransformer: adminListPricesResponseTransformer,
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/admin/prices',
+    ...options
 });
 
 /**
  * Create a price, replacing the active one for the same plan and interval (admin)
  */
 export const adminCreatePrice = <ThrowOnError extends boolean = false>(options: Options<AdminCreatePriceData, ThrowOnError>): RequestResult<AdminCreatePriceResponses, AdminCreatePriceErrors, ThrowOnError> => (options.client ?? client).post<AdminCreatePriceResponses, AdminCreatePriceErrors, ThrowOnError>({
-  responseTransformer: adminCreatePriceResponseTransformer,
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/admin/prices',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    responseTransformer: adminCreatePriceResponseTransformer,
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/admin/prices',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
  * Archive a price (admin)
  */
 export const adminArchivePrice = <ThrowOnError extends boolean = false>(options: Options<AdminArchivePriceData, ThrowOnError>): RequestResult<AdminArchivePriceResponses, AdminArchivePriceErrors, ThrowOnError> => (options.client ?? client).post<AdminArchivePriceResponses, AdminArchivePriceErrors, ThrowOnError>({
-  responseTransformer: adminArchivePriceResponseTransformer,
-  security: [{
-      key: 'billing_Oauth2',
-      scheme: 'bearer',
-      type: 'http'
-    }, {
-      key: 'billing_OIDC',
-      scheme: 'bearer',
-      type: 'http'
-    }],
-  url: '/billing/admin/prices/{priceId}/archive',
-  ...options
+    responseTransformer: adminArchivePriceResponseTransformer,
+    security: [{
+            key: 'billing_Oauth2',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'billing_OIDC',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/billing/admin/prices/{priceId}/archive',
+    ...options
 });
 
 /**
  * Stripe webhook endpoint (signature verified against the raw body)
  */
 export const stripeWebhook = <ThrowOnError extends boolean = false>(options: Options<StripeWebhookData, ThrowOnError>): RequestResult<StripeWebhookResponses, StripeWebhookErrors, ThrowOnError> => (options.client ?? client).post<StripeWebhookResponses, StripeWebhookErrors, ThrowOnError>({
-  url: '/billing/webhooks/stripe',
-  ...options,
-  headers: {
-    'Content-Type': 'application/json',
-    ...options.headers
-  }
+    url: '/billing/webhooks/stripe',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
