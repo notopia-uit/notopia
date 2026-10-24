@@ -184,8 +184,6 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
     > If do, should create a guard outside of it
   - [ ] Health check
   - [ ] Consider merging blocknote & hocuspocus into editor module
-- [ ] Authorization service
-  - [ ] Health check
 - [ ] Cannot deal with `domain.com:8080/api/v1` base path
 - [ ] Health check to other services (api service, meili, postgres...)
 - [ ] Connection pool max connections, idle, timeout for database, meili
@@ -198,11 +196,12 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 - [ ] Consider split the workspace event (SSE) into a dedicated service, not bounded to `note` service
   > Events from subscription changed
 - [ ] Make backend services have an option to must trust request comes from api gateway
-- [x] NestJS service doesn't have a polite migration mechanism for production (document: TypeORM CLI, no migration files generated yet)
 - [ ] OpenAPI upgrade 3.1
 - [ ] App admin edit doesn't propagate the SSE to web client. We only have workspace event SSE
 - [ ] Service-account role: replace the `HACK:` lookup with a read-only service-account role in authorization
+- [x] Authorization service health check
 - [x] no env validation for document, search-worker
+- [x] NestJS service doesn't have a polite migration mechanism for production (document: TypeORM CLI, no migration files generated yet)
 
 ### Frontend
 
