@@ -8,11 +8,12 @@ Manged with Nx. Package manager: pnpm (use ./pnpm-workspace.yaml), go (single go
 api/                            # OpenAPI spec (one dir per API surface)
   common/                       # Shared responses, securitySchemes (OIDC, Oauth2)
   note/                         # note service spec    -> Go server (oapi-codegen)
+  billing/                      # billing service spec -> Go server (oapi-codegen)
   document/                     # document service spec -> NestJS server (openapi-generator)
   share/                        # Cross-service event/DTO schemas -> @notopia-uit/api-share-gen
   bundled/                      # Redocly output (generated, do not edit)
 proto/                          # Protobuf definitions
-  note/, authorization/
+  note/, authorization/, billing/
 apps/                           # JS/TS applications
   document/                     # Document service (NestJS) (nx: document)
   search-worker/                # Search worker (NestJS) sync to meilisearch (nx: search-worker)
@@ -27,15 +28,26 @@ packages/                       # JS packages
   lib-server/                   # Shared server-side (node-only) code
   pb/                           # Protobuf generated code, use grpc, protovalidate
   ui/                           # React UI components, using shadcn/ui (@notopia-uit/ui)
-docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.)
+docs/                           # Vitepress Documentation (class, sequence, architecture diagrams, database, etc.), and AI (superpowers,...)
+story/                          # The stories/blogs while doing this project (AI/human written)
 cmd/                            # Go services (entrypoint only: main.go + wire)
   note/                         # Note service (nx: note)
   authorization/                # Authorization service (nx: authorization)
-  notecreateseed/               # Seed data generator
+  authorizationseed/            # Authorization seed: Casbin policy matrix (nx: authorizationseed)
+  authorizationfixtures/        # Authorization dev fixtures: memberships (nx: authorizationfixtures)
+  billing/                      # Billing service, Stripe (nx: billing)
+  notefixturegen/               # Dev fixture generator (fake notes from Obsidian vault)
+  billingseed/                  # Billing seed: Stripe prices + portal config (nx: billingseed)
+  billingfixtures/              # Billing dev fixtures (nx: billingfixtures)
 internal/                       # Internal Go packages (the actual service code)
   note/
   authorization/
-  notecreateseed/
+  authorizationseed/
+  authorizationfixtures/
+  billing/
+  notefixturegen/
+  billingseed/
+  billingfixtures/
 pkg/                            # Go packages
   api                           # Code gen from oapi-codegen
   common                        # Including commonhttp, commonconfig, commonhandler
@@ -51,16 +63,18 @@ pkg/                            # Go packages
 Read the one for the area you're touching before exploring; they hold the details this file
 deliberately omits.
 
-| Area | Doc |
-| --- | --- |
-| Contract-first workflow, adding endpoints | [`api/`](./api/AGENTS.md) |
-| Go DDD/CQRS layout, aggregates, outbox, sqlc/goose | [`internal/note/`](./internal/note/AGENTS.md) |
-| Casbin model, roles, policy | [`internal/authorization/`](./internal/authorization/AGENTS.md) |
-| Yjs/Hocuspocus, commit pipeline, revisions | [`apps/document/`](./apps/document/AGENTS.md) |
-| Meilisearch indexing | [`apps/search-worker/`](./apps/search-worker/AGENTS.md) |
-| Shared Go packages | [`pkg/`](./pkg/AGENTS.md) |
-| Scalar API reference site | [`apps/api-web/`](./apps/api-web/AGENTS.md) |
-| Authentik, Traefik routing, local hosts | [`deploy/compose/`](./deploy/compose/AGENTS.md) |
+| Area                                               | Doc                                                             |
+| -------------------------------------------------- | --------------------------------------------------------------- |
+| Contract-first workflow, adding endpoints          | [`api/`](./api/AGENTS.md)                                       |
+| Go DDD/CQRS layout, aggregates, outbox, sqlc/goose | [`internal/note/`](./internal/note/AGENTS.md)                   |
+| Casbin model, roles, policy                        | [`internal/authorization/`](./internal/authorization/AGENTS.md) |
+| Plans, subscriptions, Stripe, entitlements         | [`internal/billing/`](./internal/billing/AGENTS.md)             |
+| Yjs/Hocuspocus, commit pipeline, revisions         | [`apps/document/`](./apps/document/AGENTS.md)                   |
+| Meilisearch indexing                               | [`apps/search-worker/`](./apps/search-worker/AGENTS.md)         |
+| Shared Go packages                                 | [`pkg/`](./pkg/AGENTS.md)                                       |
+| Shared NestJS code, locks module                   | [`packages/lib-server/`](./packages/lib-server/AGENTS.md)       |
+| Scalar API reference site                          | [`apps/api-web/`](./apps/api-web/AGENTS.md)                     |
+| Authentik, Traefik routing, local hosts            | [`deploy/compose/`](./deploy/compose/AGENTS.md)                 |
 
 ## Technologies
 
@@ -86,8 +100,14 @@ deliberately omits.
 - Do not run `go generate`, because we don't mange tool via go tool, but via mise. Stick with nx targets
 - Wiring is google/wire: edit `wire.go`, run `nx wire {service}`, never hand-edit `wire_gen.go`.
   Each package exposes `var ProvideX = NewX`
-- Services are DDD + CQRS — see [`internal/note/AGENTS.md`](./internal/note/AGENTS.md) for the layout
+- Services are DDD + CQRS: layering, command/query rules, domain vs app models, sqlc split are in
+  [`docs/ai/GO_CLEAN_ARCH.md`](./docs/ai/GO_CLEAN_ARCH.md) (read before writing Go service code);
+  concrete layout in [`internal/note/AGENTS.md`](./internal/note/AGENTS.md)
 - Shared building blocks (config, `Cmd`/`Query`, gin, otel) are in [`pkg/`](./pkg/AGENTS.md)
+- Go 1.26: `new(value)` / `new(fn(...))` returns a pointer; Go 1.27 supports generic methods on structs
+- Prefer testify for testing, mockery if need interface mocking (list only necessary interfaces)
+- SQLC custom plugin for dynamic query at runtime <https://raw.githubusercontent.com/vtuanjs/sqlc-gen-go/refs/heads/main/README.md>
+- If a (pointer?) struct implement an interface, add e.g. `var _ Interface = (*Struct)(nil)`
 
 ### Messaging
 
@@ -121,12 +141,32 @@ deliberately omits.
 - Should run lint whenever changing code
 - Run `nx` directly, not need to via `pnpm exec nx`
 
+## Seed vs Fixtures
+
+- **seed**: mandatory data the app needs in every environment, prod included (reference data,
+  default plans, role→permission matrix). Must be idempotent. `just seed`
+- **fixtures**: fake data for local development only (demo workspaces, notes, memberships,
+  documents, search index content). `just fixtures` (runs seed first)
+- Per-service recipes: `just fixtures-note|fixtures-document|fixtures-search`. New services
+  follow the same naming: `seed` target for mandatory data, `fixtures` target for dev fake data
+
 ## General Rules
 
 - Temp file must be go into `./tmp/{projectName}`, avoid writing to `/tmp/` when things need to be persisted
-- While writing code, try to not write unnecessary comment into code
+- While writing code, try **not to write unnecessary comments** into code
 - There are many `*.env*` file, which contains safe local development environment variables. Only `*.env.local*` can contain sensitive environment variables, and should be gitignored
-- Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsgo` (replace for `tsc`)
+- Do not run `npx`, or `npx tsc`. Prefer using `pnpm dlx`, `pnpm exec`, `tsc`
+- If something is not worth to code/fix, but might have issue in the future, then comments
+- Prefer breakline for human readable, over one-line; code, naming convention over saving token because human still maintain the source code
+- Do not swallow errors/exceptions in code, always log, or throw/return to caller
+- Constant/enum Some over hard string (e.g. concurrency `VND`, `USD`, or others), easier for expansion, testing, type safety
+- Maintainable over fast, technical debt
+
+### Superpowers
+
+- Skip unnecessary, obvious cases testing for faster, saving tokens
+- Not need to write full code, can use `…`, skip imports, mapper code, or write comments to note expand the code more while writing;
+  agents later can fill in the details, but should not skip important logic
 
 ### Git
 

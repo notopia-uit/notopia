@@ -1,6 +1,7 @@
 import { Controller, Logger } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import type {
+  NoteDeletedEvent,
   UserWorkspaceRoleUpdatedEvent,
   WorkspaceMemberRemovedEvent,
 } from '@notopia-uit/api-share-gen';
@@ -43,5 +44,11 @@ export class HocuspocusController {
       { workspaceId: data.workspaceId, userId: data.userId },
       'handleWorkspaceMemberRemoved: done'
     );
+  }
+
+  @EventPattern('events.integration.note.note.deleted')
+  async handleNoteDeleted(@Payload() data: NoteDeletedEvent) {
+    this.logger.log({ id: data.id }, 'handleNoteDeleted: received');
+    await this.hocuspocusService.onNoteDeleted(data.id);
   }
 }

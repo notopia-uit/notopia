@@ -17,15 +17,18 @@ type PermanentlyDeleteFolder struct {
 
 type PermanentlyDeleteFolderHandler struct {
 	authorizationSvc AuthorizationSvc
+	trashService     *domain.TrashService
 	uow              domain.UnitOfWork
 }
 
 func NewPermanentlyDeleteFolderHandler(
 	authorizationSvc AuthorizationSvc,
+	trashService *domain.TrashService,
 	uow domain.UnitOfWork,
 ) *PermanentlyDeleteFolderHandler {
 	return &PermanentlyDeleteFolderHandler{
 		authorizationSvc: authorizationSvc,
+		trashService:     trashService,
 		uow:              uow,
 	}
 }
@@ -36,8 +39,6 @@ type PermanentlyDeleteFolderCmd commonhandler.Cmd[PermanentlyDeleteFolder]
 
 var _ PermanentlyDeleteFolderCmd = (*PermanentlyDeleteFolderHandler)(nil)
 
-// NOTE: We delegate the infra persistence to cascading delete things
-// Fact, we should handle this in domain, not infra
 func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteFolder) error {
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		folderRepo := r.Folder()
@@ -54,12 +55,11 @@ func (h *PermanentlyDeleteFolderHandler) Handle(ctx context.Context, cmd *Perman
 				fmt.Sprintf("user %s does not have permission to delete folder %s", cmd.UserID, cmd.ID),
 			)
 		}
-		folder, err := folderRepo.GetByID(ctx, cmd.ID, true)
+		targets, err := loadPermanentDeleteTargets(ctx, r, nil, []uuid.UUID{cmd.ID})
 		if err != nil {
 			return err
 		}
-		folder.PermanentlyDelete(cmd.UserID)
-		err = folderRepo.Save(ctx, folder)
-		return err
+		targets.delete(h.trashService, cmd.UserID)
+		return savePermanentDeleteTargets(ctx, r, targets)
 	})
 }

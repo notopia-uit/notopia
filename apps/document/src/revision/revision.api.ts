@@ -1,13 +1,50 @@
-import { Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { RevisionApi as RevisionApiDefinition } from '@notopia-uit/api-document-nestjs-server/api';
-import type {
-  GetRevisions200Response,
-  RenameRevisionRequest,
-  RevisionWithContent,
+import {
+  type GetRevisions200Response,
+  type RenameRevisionRequest,
+  type Revision,
+  RevisionTrigger as RevisionTriggerDto,
+  type RevisionWithContent,
 } from '@notopia-uit/api-document-nestjs-server/models';
 import { Traceable } from 'nestjs-otel';
 
+import { type RevisionTrigger } from '../document/commit-policy';
+import { RevisionEntity } from './revision.entity';
 import { RevisionService } from './revision.service';
+
+const toRevisionTrigger = (trigger: RevisionTriggerDto): RevisionTrigger => {
+  switch (trigger) {
+    case RevisionTriggerDto.Manual:
+      return 'manual';
+    case RevisionTriggerDto.Auto:
+      return 'auto';
+    case RevisionTriggerDto.Sweeper:
+      return 'sweeper';
+    default:
+      throw new BadRequestException(`Invalid revision trigger: ${String(trigger)}`);
+  }
+};
+
+const toRevisionTriggerDto = (trigger: RevisionTrigger): RevisionTriggerDto => {
+  switch (trigger) {
+    case 'manual':
+      return RevisionTriggerDto.Manual;
+    case 'auto':
+      return RevisionTriggerDto.Auto;
+    case 'sweeper':
+      return RevisionTriggerDto.Sweeper;
+  }
+};
+
+const toRevisionDto = (revision: RevisionEntity): Revision => ({
+  id: revision.id,
+  name: revision.name,
+  createdAt: revision.createdAt.toISOString(),
+  authorId: revision.authorId,
+  trigger: toRevisionTriggerDto(revision.trigger),
+  contributorIds: revision.contributorIds,
+});
 
 @Traceable()
 export class RevisionApi extends RevisionApiDefinition {
@@ -33,10 +70,8 @@ export class RevisionApi extends RevisionApiDefinition {
     try {
       const revisionEntity = await this.revisionService.getRevision(revisionId);
       const response: RevisionWithContent = {
-        id: revisionEntity.id,
-        name: revisionEntity.name,
+        ...toRevisionDto(revisionEntity),
         content: revisionEntity.content,
-        createdAt: revisionEntity.createdAt.toISOString(),
       };
       this.logger.log({ revisionId }, 'getRevisionWithContent: done');
       this.logger.debug(
@@ -53,18 +88,20 @@ export class RevisionApi extends RevisionApiDefinition {
   override async getRevisions(
     documentId: string,
     page: number,
-    limit: number
+    limit: number,
+    trigger: RevisionTriggerDto | undefined
   ): Promise<GetRevisions200Response> {
-    this.logger.log({ documentId, page, limit }, 'getRevisions: received');
+    this.logger.log({ documentId, page, limit, trigger }, 'getRevisions: received');
     try {
-      const result = await this.revisionService.getRevisionsByDocumentId(documentId, page, limit);
-      const totalPages = Math.ceil(result.total / result.currentTotal);
+      const result = await this.revisionService.getRevisionsByDocumentId(
+        documentId,
+        page,
+        limit,
+        trigger === undefined ? undefined : toRevisionTrigger(trigger)
+      );
+      const totalPages = Math.ceil(result.total / limit);
       const response: GetRevisions200Response = {
-        data: result.data.map((r) => ({
-          id: r.id,
-          name: r.name,
-          createdAt: r.createdAt.toISOString(),
-        })),
+        data: result.data.map(toRevisionDto),
         pagination: {
           page: result.page,
           totalPages,

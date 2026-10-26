@@ -161,6 +161,13 @@ func (e *Event) setup() error {
 		e.documentCommittedHandler,
 	)
 
+	e.router.AddConsumerHandler(
+		"BillingSubscriptionChangedHandler",
+		"events.integration.billing.subscription.changed",
+		e.subcriber,
+		e.subscriptionChangedHandler,
+	)
+
 	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
 		"NotifyWorkspaceRenamedHandler",
 		e.app.Events.NotifyWorkspaceRenamed.Handle,
@@ -173,6 +180,27 @@ func (e *Event) setup() error {
 		e.app.Events.NotifyWorkspaceSlugChanged.Handle,
 	)); err != nil {
 		return fmt.Errorf("failed to add event handler NotifyWorkspaceSlugChangedHandler: %w", err)
+	}
+
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"NoteCreatedToIntegrationHandler",
+		e.app.Events.NoteCreatedDomainToIntegrationEvent.Handle,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler NoteCreatedToIntegrationHandler: %w", err)
+	}
+
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"NoteDeletedToIntegrationHandler",
+		e.app.Events.NoteDeletedDomainToIntegrationEvent.Handle,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler NoteDeletedToIntegrationHandler: %w", err)
+	}
+
+	if _, err := e.eventProcessor.AddHandler(cqrs.NewEventHandler(
+		"WorkspaceDeletedToIntegrationHandler",
+		e.app.Events.WorkspaceDeletedDomainToIntegrationEvent.Handle,
+	)); err != nil {
+		return fmt.Errorf("failed to add event handler WorkspaceDeletedToIntegrationHandler: %w", err)
 	}
 
 	// NOTE: because watermill doesn't support kafka regex (IBM/sarama)

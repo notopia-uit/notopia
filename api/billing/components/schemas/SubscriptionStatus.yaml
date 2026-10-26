@@ -1,0 +1,5 @@
+# vim: ft=yaml.openapi
+type: string
+description: "`none` when the workspace never subscribed."
+enum: [none, incomplete, active, past_due, unpaid, canceled, incomplete_expired]
+examples: [active]

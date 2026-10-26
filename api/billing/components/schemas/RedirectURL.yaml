@@ -1,0 +1,8 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  url:
+    type: string
+    format: uri
+    examples: [https://checkout.stripe.com/c/pay/cs_test_123]
+required: [url]

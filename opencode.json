@@ -1,33 +1,36 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "plugins": ["superpowers@git+https://github.com/obra/superpowers.git"],
   "mcp": {
-    "nx-mcp": {
-      "type": "local",
-      "command": ["pnpm", "exec", "nx", "mcp"],
-      "enabled": false
-    },
-    "shadcn": {
-      "type": "local",
-      "command": [
-        "mise",
-        "exec",
-        "npm:shadcn@latest",
-        "--",
-        "shadcn",
-        "mcp",
-        "--cwd",
-        "packages/ui"
-      ],
-      "enabled": false
-    },
-    "grafana": {
-      "type": "local",
-      "command": ["mcp-grafana"],
-      "environment": {
-        "GRAFANA_URL": "http://grafana.notopia.localhost",
-        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:GRAFANA_SERVICE_ACCOUNT_TOKEN}"
+    "servers": {
+      "nx-mcp": {
+        "type": "local",
+        "command": ["pnpm", "exec", "nx", "mcp"],
+        "disabled": true
       },
-      "enabled": false
+      "shadcn": {
+        "type": "local",
+        "command": [
+          "mise",
+          "exec",
+          "npm:shadcn@latest",
+          "--",
+          "shadcn",
+          "mcp",
+          "--cwd",
+          "packages/ui"
+        ],
+        "disabled": true
+      },
+      "grafana": {
+        "type": "local",
+        "command": ["mcp-grafana"],
+        "environment": {
+          "GRAFANA_URL": "http://grafana.notopia.localhost",
+          "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:GRAFANA_SERVICE_ACCOUNT_TOKEN}"
+        },
+        "disabled": true
+      }
     }
   }
 }

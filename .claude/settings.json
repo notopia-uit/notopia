@@ -1,0 +1,59 @@
+{
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": false,
+    "typescript-lsp@claude-plugins-official": false
+  },
+  "env": {
+    "ENABLE_LSP_TOOL": "1"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-lint.sh\""
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(buf *)",
+      "Bash(curl -s https://raw.githubusercontent.com/*)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(echo \"exit: $?\")",
+      "Bash(echo \"exit=$?\")",
+      "Bash(gh api *)",
+      "Bash(gh issue *)",
+      "Bash(gh search *)",
+      "Bash(git add *)",
+      "Bash(git checkout *)",
+      "Bash(git commit *)",
+      "Bash(go build *)",
+      "Bash(go get *)",
+      "Bash(golangci-lint run *)",
+      "Bash(node *)",
+      "Bash(nx *)",
+      "Bash(pnpm *)",
+      "Bash(rtk *)",
+      "Bash(xargs ls -la)",
+      "Read(//tmp/**)",
+      "Skill(claude-api)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:docs.nestjs.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:nx.dev)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:rspack.rs)",
+      "WebSearch",
+      "mcp__claude_ai_Context7__query-docs",
+      "mcp__claude_ai_Context7__resolve-library-id",
+      "mcp__exa__web_fetch_exa",
+      "mcp__exa__web_search_exa"
+    ]
+  }
+}

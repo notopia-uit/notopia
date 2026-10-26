@@ -1,0 +1,20 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  workspaceId:
+    type: string
+    format: uuid
+    examples: [00000000-0000-4000-8000-000000000110]
+  plan:
+    $ref: ./PlanTier.yaml
+  status:
+    $ref: ./SubscriptionStatus.yaml
+  accessUntil:
+    type: [string, "null"]
+    format: date-time
+    examples: [2026-11-11T00:00:00Z]
+  features:
+    $ref: ./Features.yaml
+  limits:
+    $ref: ./Limits.yaml
+required: [workspaceId, plan, status, features, limits]

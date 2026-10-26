@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NoteService_GetNoteName_FullMethodName        = "/note.NoteService/GetNoteName"
-	NoteService_GetNote_FullMethodName            = "/note.NoteService/GetNote"
-	NoteService_GetWorkspaceByNote_FullMethodName = "/note.NoteService/GetWorkspaceByNote"
+	NoteService_GetNoteName_FullMethodName            = "/note.NoteService/GetNoteName"
+	NoteService_GetNote_FullMethodName                = "/note.NoteService/GetNote"
+	NoteService_GetWorkspaceByNote_FullMethodName     = "/note.NoteService/GetWorkspaceByNote"
+	NoteService_BatchGetNoteWorkspaces_FullMethodName = "/note.NoteService/BatchGetNoteWorkspaces"
 )
 
 // NoteServiceClient is the client API for NoteService service.
@@ -33,6 +34,7 @@ type NoteServiceClient interface {
 	GetNote(ctx context.Context, in *GetNoteRequest, opts ...grpc.CallOption) (*GetNoteResponse, error)
 	// NOTE: what, where is this used?
 	GetWorkspaceByNote(ctx context.Context, in *GetWorkspaceByNoteRequest, opts ...grpc.CallOption) (*GetWorkspaceByNoteResponse, error)
+	BatchGetNoteWorkspaces(ctx context.Context, in *BatchGetNoteWorkspacesRequest, opts ...grpc.CallOption) (*BatchGetNoteWorkspacesResponse, error)
 }
 
 type noteServiceClient struct {
@@ -73,6 +75,16 @@ func (c *noteServiceClient) GetWorkspaceByNote(ctx context.Context, in *GetWorks
 	return out, nil
 }
 
+func (c *noteServiceClient) BatchGetNoteWorkspaces(ctx context.Context, in *BatchGetNoteWorkspacesRequest, opts ...grpc.CallOption) (*BatchGetNoteWorkspacesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BatchGetNoteWorkspacesResponse)
+	err := c.cc.Invoke(ctx, NoteService_BatchGetNoteWorkspaces_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NoteServiceServer is the server API for NoteService service.
 // All implementations should embed UnimplementedNoteServiceServer
 // for forward compatibility.
@@ -82,6 +94,7 @@ type NoteServiceServer interface {
 	GetNote(context.Context, *GetNoteRequest) (*GetNoteResponse, error)
 	// NOTE: what, where is this used?
 	GetWorkspaceByNote(context.Context, *GetWorkspaceByNoteRequest) (*GetWorkspaceByNoteResponse, error)
+	BatchGetNoteWorkspaces(context.Context, *BatchGetNoteWorkspacesRequest) (*BatchGetNoteWorkspacesResponse, error)
 }
 
 // UnimplementedNoteServiceServer should be embedded to have
@@ -99,6 +112,9 @@ func (UnimplementedNoteServiceServer) GetNote(context.Context, *GetNoteRequest) 
 }
 func (UnimplementedNoteServiceServer) GetWorkspaceByNote(context.Context, *GetWorkspaceByNoteRequest) (*GetWorkspaceByNoteResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetWorkspaceByNote not implemented")
+}
+func (UnimplementedNoteServiceServer) BatchGetNoteWorkspaces(context.Context, *BatchGetNoteWorkspacesRequest) (*BatchGetNoteWorkspacesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method BatchGetNoteWorkspaces not implemented")
 }
 func (UnimplementedNoteServiceServer) testEmbeddedByValue() {}
 
@@ -174,6 +190,24 @@ func _NoteService_GetWorkspaceByNote_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NoteService_BatchGetNoteWorkspaces_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchGetNoteWorkspacesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NoteServiceServer).BatchGetNoteWorkspaces(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NoteService_BatchGetNoteWorkspaces_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NoteServiceServer).BatchGetNoteWorkspaces(ctx, req.(*BatchGetNoteWorkspacesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NoteService_ServiceDesc is the grpc.ServiceDesc for NoteService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -192,6 +226,10 @@ var NoteService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWorkspaceByNote",
 			Handler:    _NoteService_GetWorkspaceByNote_Handler,
+		},
+		{
+			MethodName: "BatchGetNoteWorkspaces",
+			Handler:    _NoteService_BatchGetNoteWorkspaces_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

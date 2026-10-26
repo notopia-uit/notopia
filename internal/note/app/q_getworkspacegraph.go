@@ -18,15 +18,18 @@ type GetWorkspaceGraph struct {
 
 type GetWorkspaceGraphHandler struct {
 	authorizationSvc AuthorizationSvc
+	billingSvc       BillingSvc
 	readModel        GetWorkspaceGraphReadModel
 }
 
 func NewGetWorkspaceGraphHandler(
 	authorizationSvc AuthorizationSvc,
+	billingSvc BillingSvc,
 	readModel GetWorkspaceGraphReadModel,
 ) *GetWorkspaceGraphHandler {
 	return &GetWorkspaceGraphHandler{
 		authorizationSvc: authorizationSvc,
+		billingSvc:       billingSvc,
 		readModel:        readModel,
 	}
 }
@@ -50,6 +53,20 @@ func (h *GetWorkspaceGraphHandler) Handle(ctx context.Context, query *GetWorkspa
 	if !hasPermission {
 		return Graph{}, errs.NewForbidden(
 			fmt.Sprintf("user %s does not have permission to read workspace graph %s", query.UserID, query.ID),
+		)
+	}
+	ent, err := h.billingSvc.GetEntitlements(ctx, query.ID)
+	if err != nil {
+		return Graph{}, err
+	}
+	if !ent.Feature(PlanFeatureWorkspaceGraph) {
+		plans, err := h.billingSvc.ListPlans(ctx)
+		if err != nil {
+			return Graph{}, err
+		}
+		return Graph{}, errs.NewFeatureNotInPlan(
+			PlanFeatureWorkspaceGraph.String(),
+			RequiredPlanForFeature(plans, PlanFeatureWorkspaceGraph).String(),
 		)
 	}
 	graph, err := h.readModel.Handle(ctx, &GetWorkspaceGraphReadModelParams{

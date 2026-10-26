@@ -1,13 +1,6 @@
-import * as fs from 'fs';
-import { fileURLToPath } from 'node:url';
-import * as path from 'path';
-
 import { NoteSearch } from '@notopia-uit/api-share-gen';
-import { Meilisearch } from 'meilisearch';
+import { Meilisearch, MeilisearchApiError, type Settings } from 'meilisearch';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const DATA_DIR = path.join(__dirname, 'data');
 const MEILI_HOST =
   process.env.NOTOPIA_SEARCH_WORKER_MEILI_HOST || 'http://meilisearch.notopia.localhost';
 const MEILI_MASTER_KEY = process.env.NOTOPIA_SEARCH_WORKER_MEILI_API_KEY || 'notopiauit';
@@ -18,41 +11,94 @@ async function run() {
     apiKey: MEILI_MASTER_KEY,
   });
   const index = client.index('notes');
-  const files = fs.readdirSync(DATA_DIR);
-  const documents = files.map(
-    (file) => JSON.parse(fs.readFileSync(path.join(DATA_DIR, file), 'utf-8')) as NoteSearch
-  );
+  console.log('Ensuring index exists and has correct primary key...');
+  try {
+    const indexInfo = await index.getRawInfo();
+    if (indexInfo.primaryKey !== 'id') {
+      console.log(`Index primary key is '${indexInfo.primaryKey}', updating to 'id'...`);
+      await index.update({ primaryKey: 'id' }).waitTask();
+    } else {
+      console.log('Index primary key is already set to "id", skipping update.');
+    }
+  } catch (error) {
+    if (error instanceof MeilisearchApiError) {
+      console.log('Index not found, creating it with primary key "id"...');
+      await index.update({ primaryKey: 'id' }).waitTask();
+      console.log('Index created successfully.');
+    } else {
+      console.error('Error checking/creating index:', error);
+      process.exit(1);
+    }
+  }
 
-  console.log(`Seeding ${documents.length} documents to Meilisearch...`);
-  const taskPromise = index.addDocuments(documents);
-  const { taskUid } = await taskPromise;
-  console.log(`Documents added with task ID: ${taskUid}`);
-  console.log('Waiting for indexing to complete..., you can close this process');
-  const task = await taskPromise.waitTask();
-  if (task.status === 'succeeded') {
-    console.log('Seeding completed successfully!');
-  } else {
-    console.error(`Seeding failed with status: ${task.status}`, task.error);
-    process.exit(1);
+  const settings: Settings = {
+    searchableAttributes: [
+      'name',
+      'folderName',
+      'plainTextContent',
+      'tags',
+    ] satisfies (keyof NoteSearch)[],
+    filterableAttributes: ['workspaceId', 'tags'] satisfies (keyof NoteSearch)[],
+    sortableAttributes: ['name'] satisfies (keyof NoteSearch)[],
+  };
+
+  console.log('Get current index settings...');
+  try {
+    const existedSettings = await index.getSettings();
+    console.log('Checking if existing settings match desired settings...');
+    const settingsMatch = JSON.stringify(existedSettings) === JSON.stringify(settings);
+    if (settingsMatch) {
+      console.log('Existing settings match desired settings, skipping update.');
+    } else {
+      console.log('Existing settings do not match desired settings, updating...');
+      await index.updateSettings(settings).waitTask();
+      console.log('Index settings updated successfully.');
+    }
+  } catch (error) {
+    if (error instanceof MeilisearchApiError) {
+      console.log('Index not found, creating it with settings...');
+      await index.updateSettings(settings).waitTask();
+      console.log('Index created successfully.');
+    } else {
+      console.error('Error checking/creating index:', error);
+      process.exit(1);
+    }
+  }
+
+  console.log('Check if default search API key exists...');
+  const searchApiKey = '00000000-0000-4000-8000-000000000001';
+  try {
+    await client.getKey(searchApiKey);
+    console.log('Default search API key already exists, skipping creation.');
+  } catch (error) {
+    if (error instanceof MeilisearchApiError) {
+      console.log('Default search API key not found, creating it...');
+      const key = await client.createKey({
+        uid: searchApiKey,
+        actions: ['search'],
+        indexes: ['notes'],
+        expiresAt: null,
+        name: 'Default Note Index Search Key',
+      });
+      console.log('Default search API key created successfully');
+      console.log(`Key UID: ${key.uid}`);
+      console.log(`Key: ${key.key}`);
+      console.log(
+        `Please save the Key to cmd/note/.env.local as
+NOTOPIA_NOTE_MEILISEARCH_API_KEY=${key.key}`
+      );
+    } else {
+      console.error('Error checking/creating default search API key:', error);
+      process.exit(1);
+    }
   }
 }
 
-export { run as SeedMeilisearch };
+export { run as ConfigMeilisearch };
 
 if (require.main === module) {
-  import('./config')
-    .then(({ ConfigMeilisearch }) => {
-      return ConfigMeilisearch();
-    })
-    .catch((error) => {
-      console.error('Error configuring Meilisearch:', error);
-      process.exit(1);
-    })
-    .then(() => {
-      return run();
-    })
-    .catch((error) => {
-      console.error('Error seeding Meilisearch:', error);
-      process.exit(2);
-    });
+  run().catch((error) => {
+    console.error('Error configuring Meilisearch:', error);
+    process.exit(1);
+  });
 }

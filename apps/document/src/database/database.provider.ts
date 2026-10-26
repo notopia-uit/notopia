@@ -8,12 +8,10 @@ import { RevisionEntity } from '../revision/revision.entity';
 
 export const createDatasourceOptions = ({
   databaseCfg,
-  synchronize,
   logger = 'simple-console',
   logging = ['error'],
 }: {
   databaseCfg: DatabaseConfig;
-  synchronize: boolean;
   logger?: BaseDataSourceOptions['logger'];
   logging?: BaseDataSourceOptions['logging'];
 }) => {
@@ -25,7 +23,7 @@ export const createDatasourceOptions = ({
     password: databaseCfg.password,
     database: databaseCfg.database,
     entities: [DocumentEntity, RevisionEntity],
-    synchronize,
+    synchronize: false,
     logging,
     logger: logger,
   } satisfies DataSourceOptions;

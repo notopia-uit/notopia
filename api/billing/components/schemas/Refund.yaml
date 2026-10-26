@@ -1,0 +1,35 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+    examples: [0192f0a0-0000-7000-8000-000000000002]
+  amount:
+    type: integer
+    format: int64
+    examples: [24500]
+  currency:
+    type: string
+    examples: [vnd]
+  reason:
+    type: string
+    enum:
+      [
+        cancel_now,
+        lifetime_window,
+        replaced_by_lifetime,
+        workspace_deleted,
+        duplicate_checkout,
+        external,
+      ]
+    examples: [cancel_now]
+  status:
+    type: string
+    enum: [pending, succeeded, failed, canceled]
+    examples: [succeeded]
+  createdAt:
+    type: string
+    format: date-time
+    examples: [2026-10-11T00:00:00Z]
+required: [id, amount, currency, reason, status, createdAt]

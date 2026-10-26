@@ -14,6 +14,7 @@ type Spec string
 
 var (
 	NoteSpec     Spec = "note.json"
+	BillingSpec  Spec = "billing.json"
 	DocumentSpec Spec = "document.json"
 	OpenapiSpec  Spec = "openapi.json"
 )

@@ -1,9 +1,10 @@
-export * from './commit-document-201-response';
+export * from './committed-revision';
 export * from './get-document-attachment-upload-url-200-response';
 export * from './get-revisions-200-response';
 export * from './error';
 export * from './pagination';
 export * from './rename-revision-request';
 export * from './revision';
+export * from './revision-trigger';
 export * from './revision-with-content';
  

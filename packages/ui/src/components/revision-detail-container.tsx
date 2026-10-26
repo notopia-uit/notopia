@@ -73,7 +73,7 @@ export function RevisionDetailContainer({
       showAlert({
         type: 'success',
         title: 'Version restored successfully!',
-        message: `The version ${data?.name} of ${responses.id} was restored.`,
+        message: `The version ${data?.name} of ${responses?.id ?? documentId} was restored.`,
       });
     },
     onError: (error) => {

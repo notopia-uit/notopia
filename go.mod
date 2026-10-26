@@ -3,7 +3,7 @@ module github.com/notopia-uit/notopia
 go 1.27.0
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260709200747-435963d16310.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2
 	buf.build/go/protovalidate v1.3.0
 	github.com/IBM/sarama v1.60.2
 	github.com/ThreeDotsLabs/watermill v1.5.2
@@ -11,6 +11,7 @@ require (
 	github.com/ThreeDotsLabs/watermill-redisstream v1.4.5
 	github.com/ThreeDotsLabs/watermill-sql/v4 v4.1.5
 	github.com/alexliesenfeld/health v0.8.1
+	github.com/alicebob/miniredis/v2 v2.40.0
 	github.com/bep/debounce v1.2.1
 	github.com/casbin/casbin/v3 v3.11.0
 	github.com/casbin/gorm-adapter/v3 v3.41.0
@@ -20,6 +21,8 @@ require (
 	github.com/getkin/kin-openapi v0.147.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/glebarez/sqlite v1.11.0
+	github.com/go-co-op/gocron-redis-lock/v2 v2.2.1
+	github.com/go-co-op/gocron/v2 v2.22.0
 	github.com/go-playground/validator/v10 v10.30.3
 	github.com/goforj/wire v1.2.0
 	github.com/google/uuid v1.6.0
@@ -40,24 +43,25 @@ require (
 	github.com/samber/slog-multi v1.8.0
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.12.1
-	go.opentelemetry.io/contrib/bridges/otelslog v0.20.0
+	github.com/stripe/stripe-go/v87 v87.0.0
+	go.opentelemetry.io/contrib/bridges/otelslog v0.20.1
 	go.opentelemetry.io/contrib/exporters/autoexport v0.70.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.70.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.70.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.70.0
 	go.opentelemetry.io/contrib/propagators/autoprop v0.70.0
-	go.opentelemetry.io/otel v1.45.0
-	go.opentelemetry.io/otel/log v0.21.0
-	go.opentelemetry.io/otel/metric v1.45.0
+	go.opentelemetry.io/otel v1.46.0
+	go.opentelemetry.io/otel/log v0.22.0
+	go.opentelemetry.io/otel/metric v1.46.0
 	go.opentelemetry.io/otel/sdk v1.45.0
 	go.opentelemetry.io/otel/sdk/log v0.21.0
 	go.opentelemetry.io/otel/sdk/metric v1.45.0
-	go.opentelemetry.io/otel/trace v1.45.0
-	goauthentik.io/api/v3 v3.2026080.0
+	go.opentelemetry.io/otel/trace v1.46.0
+	goauthentik.io/api/v3 v3.2026080.5
 	golang.org/x/sync v0.22.0
-	google.golang.org/grpc v1.83.1
+	google.golang.org/grpc v1.83.2
 	google.golang.org/protobuf v1.36.12
-	gorm.io/driver/postgres v1.6.2
+	gorm.io/driver/postgres v1.6.3
 	gorm.io/gorm v1.31.2
 	gorm.io/plugin/opentelemetry v0.1.16
 )
@@ -96,6 +100,7 @@ require (
 	github.com/go-openapi/testify/v2 v2.6.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-redsync/redsync/v4 v4.13.0 // indirect
 	github.com/go-sql-driver/mysql v1.10.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/goccy/go-json v0.10.6 // indirect
@@ -122,6 +127,7 @@ require (
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.19.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.4.0 // indirect
@@ -152,6 +158,7 @@ require (
 	github.com/quic-go/quic-go v0.61.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/samber/lo v1.53.0 // indirect
 	github.com/samber/slog-common v0.22.0 // indirect
@@ -168,6 +175,7 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.2 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
+	github.com/yuin/gopher-lua v1.1.1 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.8.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/bridges/prometheus v0.70.0 // indirect

@@ -1,0 +1,17 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  id:
+    type: string
+    examples: ["112"]
+  email:
+    type: string
+    examples: [owner@notopia.com]
+  name:
+    type: string
+    examples: [Kevin Nitro]
+  missingSince:
+    type: [string, "null"]
+    format: date-time
+    examples: [2026-10-11T00:00:00Z]
+required: [id, email, name]

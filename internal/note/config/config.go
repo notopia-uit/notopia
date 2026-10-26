@@ -22,6 +22,7 @@ type Server struct {
 
 type Services struct {
 	Authorization commonconfig.Service `json:"authorization" mapstructure:"authorization" validate:"required" yaml:"authorization"`
+	Billing       commonconfig.Service `json:"billing"       mapstructure:"billing"       validate:"required" yaml:"billing"`
 }
 
 type Meilisearch struct {
@@ -50,6 +51,10 @@ type Advanced struct {
 	WorkspaceEvent WorkspaceEvent `json:"workspaceEvent" mapstructure:"workspace_event" validate:"omitempty" yaml:"workspace_event"`
 }
 
+type Cron struct {
+	PurgeExpiredTrash commonconfig.CronJob `json:"purgeExpiredTrash" mapstructure:"purge_expired_trash" validate:"required" yaml:"purge_expired_trash"`
+}
+
 type Config struct {
 	General     commonconfig.General   `json:"general"     mapstructure:"general"     validate:"omitempty" yaml:"general"`
 	Log         commonconfig.Log       `json:"log"         mapstructure:"log"         validate:"omitempty" yaml:"log"`
@@ -59,8 +64,24 @@ type Config struct {
 	Redis       commonconfig.Redis     `json:"redis"       mapstructure:"redis"       validate:"required"  yaml:"redis"`
 	Authentik   commonconfig.Authentik `json:"authentik"   mapstructure:"authentik"   validate:"required"  yaml:"authentik"`
 	Meilisearch Meilisearch            `json:"meilisearch" mapstructure:"meilisearch" validate:"required"  yaml:"meilisearch"`
+	Identity    commonconfig.Identity  `json:"identity"    mapstructure:"identity"    validate:"required"  yaml:"identity"`
 	Services    Services               `json:"services"    mapstructure:"services"    validate:"required"  yaml:"services"`
 	Advanced    Advanced               `json:"advanced"    mapstructure:"advanced"    validate:"omitempty" yaml:"advanced"`
+	Cron        Cron                   `json:"cron"        mapstructure:"cron"        validate:"required"  yaml:"cron"`
+}
+
+var defaultPurgeExpiredTrash = commonconfig.CronJob{
+	Name:     "note:purge-expired-trash",
+	Schedule: "0 3 * * *",
+	Timeout:  30 * time.Minute,
+	Enabled:  true,
+}
+
+func setCronDefaults(v *viper.Viper, key string, job commonconfig.CronJob) {
+	v.SetDefault(key+".name", job.Name)
+	v.SetDefault(key+".schedule", job.Schedule)
+	v.SetDefault(key+".timeout", job.Timeout)
+	v.SetDefault(key+".enabled", job.Enabled)
 }
 
 func New(
@@ -74,6 +95,7 @@ func New(
 	viper.AddConfigPath(".")
 
 	viper.AutomaticEnv()
+	setCronDefaults(viper, "cron.purge_expired_trash", defaultPurgeExpiredTrash)
 	if err := viper.ReadInConfig(); err == nil {
 		slog.Info("configuration loaded", slog.String("file", viper.ConfigFileUsed()))
 	}

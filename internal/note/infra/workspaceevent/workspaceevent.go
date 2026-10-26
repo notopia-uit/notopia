@@ -18,6 +18,7 @@ import (
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
 	"github.com/notopia-uit/notopia/internal/note/errs"
+	"github.com/notopia-uit/notopia/internal/note/infra/common"
 	"github.com/notopia-uit/notopia/pkg/metadata"
 	"github.com/notopia-uit/notopia/pkg/otel"
 )
@@ -39,7 +40,7 @@ var _ app.WorkspaceEventHub = (*WorkspaceEventHub)(nil)
 func NewWorkspaceEventHub(
 	workspaceEventCfg *config.WorkspaceEvent,
 	logger watermill.LoggerAdapter,
-	redisClient *RedisClient,
+	redisClient *common.RedisClient,
 	serviceName metadata.ServiceName,
 	_ otel.Global,
 ) (*WorkspaceEventHub, error) {

@@ -1,14 +1,25 @@
 package app_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 // Shared at https://editor.casbin.org/#GURKL5ZXW
+// Runs the matrix against casbin's own CSV loading (string adapter) and against
+// policy.Seed + policy.LoadFixtures syncing into a database, so both must agree.
 func TestModels(t *testing.T) {
-	e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: true})
+	for _, useTransaction := range []bool{false, true} {
+		t.Run(fmt.Sprintf("useTransaction=%t", useTransaction), func(t *testing.T) {
+			testModels(t, useTransaction)
+		})
+	}
+}
+
+func testModels(t *testing.T, useTransaction bool) {
+	e, err := GetLocalEnforcer(t, &GetLocalEnforcerParams{LoadTestPolicies: true, UseTransaction: useTransaction})
 	require.NoError(t, err, "Failed to create enforcer")
 
 	tests := []struct {
@@ -46,6 +57,12 @@ func TestModels(t *testing.T) {
 		{"W111-Viewer: Read Note", "user:110", "workspace:00000000-0000-4000-8000-000000000111", "note", "read", true},
 		{"W111-Viewer: CANNOT Write Note", "user:110", "workspace:00000000-0000-4000-8000-000000000111", "note", "write", false},
 		{"W111-Viewer: CANNOT Delete Folder", "user:110", "workspace:00000000-0000-4000-8000-000000000111", "folder", "delete", false},
+		{"W111-Owner: Billing Read", "user:111", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_read", true},
+		{"W111-Owner: Billing Manage", "user:111", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_manage", true},
+		{"W111-Editor: Billing Read", "user:112", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_read", true},
+		{"W111-Editor: CANNOT Billing Manage", "user:112", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_manage", false},
+		{"W111-Viewer: Billing Read", "user:110", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_read", true},
+		{"W111-Viewer: CANNOT Billing Manage", "user:110", "workspace:00000000-0000-4000-8000-000000000111", "workspace", "billing_manage", false},
 
 		// =====================================================================
 		// WORKSPACE 00000000-0000-4000-8000-000000000112: Owner(112), Editor(111), No Role(110)

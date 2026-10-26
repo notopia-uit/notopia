@@ -8,7 +8,10 @@
       "path": "./tsconfig.app.json"
     },
     {
-      "path": "./tsconfig.seed.json"
+      "path": "./tsconfig.scripts.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
     }
   ]
 }

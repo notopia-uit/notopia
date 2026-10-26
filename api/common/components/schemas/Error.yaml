@@ -4,15 +4,15 @@ properties:
   code:
     type: string
     description: Error code
-    example: EXAMPLE_CODE
+    examples: [EXAMPLE_CODE]
   message:
     type: string
     description: Human-readable error message
-    example: Example error
+    examples: [Example error]
   more_info:
     type: string
     description: URL with more information about the error
-    example: https://api.notopia.com/docs/errors/EXAMPLE_CODE
+    examples: [https://api.notopia.com/docs/errors/EXAMPLE_CODE]
 required:
   - code
   - message

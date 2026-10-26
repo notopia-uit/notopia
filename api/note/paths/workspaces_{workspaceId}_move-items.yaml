@@ -23,17 +23,17 @@ post:
               items:
                 type: string
                 format: uuid
-                example: 000c2575-1847-5293-8117-2415a2328ef8
+                examples: [000c2575-1847-5293-8117-2415a2328ef8]
             folderIds:
               type: array
               items:
                 type: string
                 format: uuid
-                example: 123e4567-e89b-12d3-a456-426614174000
+                examples: [123e4567-e89b-12d3-a456-426614174000]
             destinationFolderId:
               type: string
               format: uuid
-              example: 123e4567-e89b-12d3-a456-426614174000
+              examples: [123e4567-e89b-12d3-a456-426614174000]
           required:
             - destinationFolderId
   responses:

@@ -27,6 +27,7 @@ import { WorkspaceNoteNotFoundException } from './workspace-note-not-found.excep
 @Injectable()
 export class NoteService implements OnModuleInit {
   private readonly logger = new Logger(NoteService.name);
+  private static readonly batchGetNoteWorkspacesLimit = 500;
   private noteServiceClient!: NoteServiceClient;
 
   constructor(@Inject(NOTE_PACKAGE_NAME) private readonly client: ClientGrpc) {}
@@ -125,6 +126,23 @@ export class NoteService implements OnModuleInit {
       name: workspace.name,
       slug: workspace.slug,
     };
+  }
+
+  // NOTE: Keys are the canonical lowercase UUIDs returned by the note service. Callers pass
+  // our own IDs (already lowercase); normalize first if this ever takes user input.
+  async batchGetNoteWorkspaces(noteIds: string[]): Promise<Map<string, string>> {
+    const result = new Map<string, string>();
+    for (let i = 0; i < noteIds.length; i += NoteService.batchGetNoteWorkspacesLimit) {
+      const response = await firstValueFrom(
+        this.noteServiceClient.batchGetNoteWorkspaces({
+          noteIds: noteIds.slice(i, i + NoteService.batchGetNoteWorkspacesLimit),
+        })
+      );
+      for (const [noteId, workspaceId] of Object.entries(response.workspaceIds)) {
+        result.set(noteId, workspaceId);
+      }
+    }
+    return result;
   }
 
   toTrashedModel(trashed: Trashed): TrashedModel {

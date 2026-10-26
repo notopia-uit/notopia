@@ -65,11 +65,6 @@ func (f *Folder) GetByID(ctx context.Context, id uuid.UUID, forUpdate bool) (*do
 }
 
 func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyParams) ([]*domain.Folder, error) {
-	var ids *[]uuid.UUID
-	if len(params.IDs) > 0 {
-		ids = &params.IDs
-	}
-
 	var workspaceID *uuid.UUID
 	if params.WorkspaceID != uuid.Nil {
 		workspaceID = &params.WorkspaceID
@@ -86,7 +81,7 @@ func (f *Folder) GetMany(ctx context.Context, params *domain.FolderRepoGetManyPa
 
 	folders, err := f.queries.GetFolders(ctx,
 		&pgsqlc.GetFoldersParams{
-			IDs:         *ids,
+			IDs:         params.IDs,
 			WorkspaceID: workspaceID,
 			TrashedBy:   trashedBy,
 			TrashedOnly: params.TrashOnly,

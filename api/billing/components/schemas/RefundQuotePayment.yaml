@@ -1,0 +1,21 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  paidAmount:
+    type: integer
+    format: int64
+    examples: [49000]
+  amount:
+    type: integer
+    format: int64
+    description: Refund for this payment
+    examples: [24500]
+  coverageSeconds:
+    type: integer
+    format: int64
+    examples: [2592000]
+  unusedSeconds:
+    type: integer
+    format: int64
+    examples: [1296000]
+required: [paidAmount, amount, coverageSeconds, unusedSeconds]

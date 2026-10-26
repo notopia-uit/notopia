@@ -1,0 +1,74 @@
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+
+import type { MyBlock, MySchema } from '@blocknote/core';
+import { ServerBlockNoteEditor } from '@blocknote/server-util';
+import { createSchema } from '@notopia-uit/lib-server/block-note';
+
+import { parseFixtureMarkdownToBlocks } from './blocknote-fixture-transform';
+
+function countInlineTypes(blocks: MyBlock[]): {
+  references: number;
+  tags: number;
+} {
+  let references = 0;
+  let tags = 0;
+
+  const walk = (block: MyBlock): void => {
+    if (Array.isArray(block.content)) {
+      for (const inline of block.content) {
+        if (inline.type === 'reference') {
+          references += 1;
+        } else if (inline.type === 'tag') {
+          tags += 1;
+        }
+      }
+    }
+
+    for (const child of block.children) {
+      walk(child as MyBlock);
+    }
+  };
+
+  for (const block of blocks) {
+    walk(block);
+  }
+
+  return { references, tags };
+}
+
+const testCases = [
+  ['000c2575-1847-5293-8117-2415a2328ef8.md', 'PowerUp.ps1', 4, 0],
+  ['0093caa1-295e-5100-b082-4a562d3f1f2c.md', 'Directory Busting', 8, 0],
+  ['00d2e172-1642-52d7-adf3-a40ff4587f66.md', 'LDAP', 11, 0],
+] as const;
+
+describe('fixture markdown parsing', () => {
+  let schema: MySchema;
+  let editor: ServerBlockNoteEditor;
+
+  beforeAll(() => {
+    schema = createSchema();
+  });
+
+  beforeEach(() => {
+    editor = ServerBlockNoteEditor.create({ schema });
+  });
+
+  test.for(testCases)(
+    'parses %s (%s)',
+    async ([file, _name, expectedRefs, expectedTags], { expect, skip }) => {
+      const filePath = path.join(__dirname, '..', 'fixture-data', file);
+      skip(!existsSync(filePath));
+
+      const markdown = await readFile(filePath, 'utf-8');
+      const blocks = await parseFixtureMarkdownToBlocks(editor, markdown);
+      const counts = countInlineTypes(blocks);
+
+      expect(blocks.length).toBeGreaterThan(0);
+      expect(counts.references).toBe(expectedRefs);
+      expect(counts.tags).toBe(expectedTags);
+    }
+  );
+});

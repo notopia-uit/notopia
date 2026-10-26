@@ -35,6 +35,10 @@
     "bundle": {
       "dependsOn": ["join"]
     },
+    "build": {
+      "executor": "nx:noop",
+      "dependsOn": ["join"]
+    },
     "watch-bundle:json": {
       "dependsOn": ["^watch-bundle:json"]
     },
@@ -115,5 +119,5 @@
       "dependsOn": ["^gen:go", "gen:hey-api", "^gen:hey-api", "gen:document-nestjs-server"]
     }
   },
-  "implicitDependencies": ["api/note", "api/document", "api/share"]
+  "implicitDependencies": ["api/note", "api/billing", "api/document", "api/share"]
 }

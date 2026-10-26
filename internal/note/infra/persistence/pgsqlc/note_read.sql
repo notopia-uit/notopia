@@ -21,12 +21,13 @@ SELECT
 FROM
   notes
 WHERE
-  id = ANY(sqlc.narg('ids')::uuid[]) -- :if @ids
+  TRUE
+  AND id = ANY(sqlc.narg('ids')::uuid[]) -- :if @ids
   AND folder_id IN ( -- :if @workspace_id
     SELECT id FROM folders WHERE workspace_id = sqlc.narg('workspace_id')::uuid
   )
   AND ( -- :if @trashed_by
-    trashed_by = sqlc.narg('trashed_by')::text
+    trashed_by::text = sqlc.narg('trashed_by')::text
     OR trashed_by IS NULL
   )
   AND trashed_by IS NULL -- :if @non_trashed_only
@@ -85,3 +86,14 @@ FROM
   note_links
 WHERE
   source_id = sqlc.arg('note_id');
+
+-- name: ReadGetNotesWorkspaceIDs :many
+SELECT
+  n.id AS note_id,
+  f.workspace_id
+FROM
+  notes n
+JOIN
+  folders f ON f.id = n.folder_id
+WHERE
+  n.id = ANY(@ids::uuid[]);

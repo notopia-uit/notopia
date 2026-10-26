@@ -18,7 +18,9 @@ var PGReadModelProviderSet = wire.NewSet(
 	pgreadmodel.ProvideNote,
 	pgreadmodel.ProvideNoteGraph,
 	pgreadmodel.ProvideNoteLinks,
+	pgreadmodel.ProvideNotesWorkspaceIDs,
 	pgreadmodel.ProvideShowTrash,
+	pgreadmodel.ProvideTrashWorkspaces,
 	pgreadmodel.ProvideWorkspaceBySlug,
 	pgreadmodel.ProvideWorkspaceGraph,
 	pgreadmodel.ProvideWorkspaceTree,
@@ -27,11 +29,13 @@ var PGReadModelProviderSet = wire.NewSet(
 	wire.Bind(new(app.GetNoteGraphReadModel), new(*pgreadmodel.NoteGraph)),
 	wire.Bind(new(app.GetNoteLinksReadModel), new(*pgreadmodel.NoteLinks)),
 	wire.Bind(new(app.GetNoteReadModel), new(*pgreadmodel.Note)),
+	wire.Bind(new(app.GetNotesWorkspaceIDsReadModel), new(*pgreadmodel.NotesWorkspaceIDs)),
 	wire.Bind(new(app.GetWorkspaceByNoteReadModel), new(*pgreadmodel.GetWorkspaceByNote)),
 	wire.Bind(new(app.GetWorkspaceGraphReadModel), new(*pgreadmodel.WorkspaceGraph)),
 	wire.Bind(new(app.GetWorkspaceTreeReadModel), new(*pgreadmodel.WorkspaceTree)),
 	wire.Bind(new(app.GetWorkspacesReadModel), new(*pgreadmodel.GetWorkspaces)),
 	wire.Bind(new(app.ShowTrashReadModel), new(*pgreadmodel.ShowTrash)),
+	wire.Bind(new(app.TrashWorkspacesReadModel), new(*pgreadmodel.TrashWorkspaces)),
 	wire.Bind(new(app.WorkspaceBySlugReadModel), new(*pgreadmodel.WorkspaceBySlug)),
 )
 

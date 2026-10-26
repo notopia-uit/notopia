@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
 services:
   redpanda:
-    image: redpandadata/redpanda:v26.1.8
+    image: redpandadata/redpanda:v26.1.19
     command:
       - redpanda start
       - --smp 1
@@ -31,7 +31,7 @@ services:
       - redpanda_data:/var/lib/redpanda/data
 
   redpanda_console:
-    image: redpandadata/console:v3.7.2
+    image: redpandadata/console:v3.7.4
     container_name: notopia-redpanda_console
     environment:
       CONFIG_FILEPATH: /etc/redpanda/config.yaml

@@ -4,6 +4,7 @@ import { EventPattern, Payload } from '@nestjs/microservices';
 import type {
   DocumentCommittedEvent,
   NoteCreatedEvent,
+  NoteDeletedEvent,
   NoteUpdatedEvent,
 } from '@notopia-uit/api-share-gen';
 
@@ -48,6 +49,17 @@ export class AppController {
       throw error;
     }
     this.logger.log({ id: data.id }, 'handleNoteUpdated: done');
+  }
+
+  @EventPattern('events.integration.note.note.deleted')
+  async handleNoteDeleted(@Payload() data: NoteDeletedEvent) {
+    this.logger.log({ id: data.id }, 'handleNoteDeleted: received');
+    try {
+      await this.appService.handleNoteDeleted(data.id);
+    } catch (error) {
+      this.logger.error({ err: error, id: data.id }, 'handleNoteDeleted: error');
+      throw error;
+    }
   }
 
   @EventPattern('events.integration.document.document.committed')

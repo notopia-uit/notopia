@@ -1,0 +1,33 @@
+# vim: ft=yaml.openapi
+type: object
+
+properties:
+  id:
+    type: string
+    format: uuid
+    examples: [dd57d134-d23b-457f-88fc-a4d7d6b284e5]
+
+  event:
+    type: string
+    enum:
+      - WorkspaceBillingChangedEvent
+    examples: [WorkspaceBillingChangedEvent]
+
+  data:
+    type: object
+    x-go-type-name: WorkspaceBillingChangedEventData
+    description: Refetch /billing/workspaces/{id}/entitlements.
+    properties:
+      workspaceId:
+        $ref: ./Workspace.yaml#/properties/id
+      plan:
+        type: string
+        examples: [plus]
+    required:
+      - workspaceId
+      - plan
+
+required:
+  - id
+  - event
+  - data

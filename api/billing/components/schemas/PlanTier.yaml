@@ -1,0 +1,4 @@
+# vim: ft=yaml.openapi
+type: string
+enum: [free, plus, pro]
+examples: [plus]

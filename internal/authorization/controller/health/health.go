@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"github.com/alexliesenfeld/health"
+	"github.com/casbin/casbin/v3"
 	"github.com/notopia-uit/notopia/internal/authorization/config"
+	"github.com/notopia-uit/notopia/internal/authorization/policy"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 	"gorm.io/gorm"
 )
@@ -20,6 +22,7 @@ type Health struct {
 
 func New(
 	db *gorm.DB,
+	enforcer *casbin.TransactionalEnforcer,
 	serverCfg *config.ServerConfig,
 	kafkaCfg *commonconfig.Kafka,
 ) *Health {
@@ -36,6 +39,25 @@ func New(
 						return err
 					}
 					return sqlDB.PingContext(ctx)
+				},
+			},
+		),
+		health.WithCheck(
+			health.Check{
+				Name: "policy",
+				Check: func(ctx context.Context) error {
+					drift, err := policy.DetectDrift(enforcer)
+					if err != nil {
+						return fmt.Errorf("failed to verify policy matrix: %w", err)
+					}
+					if !drift.IsEmpty() {
+						return fmt.Errorf(
+							"policy matrix drifted (%d missing, %d unexpected rules), seed required",
+							len(drift.Missing),
+							len(drift.Unexpected),
+						)
+					}
+					return nil
 				},
 			},
 		),

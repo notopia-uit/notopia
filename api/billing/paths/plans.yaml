@@ -1,0 +1,20 @@
+# vim: ft=yaml.openapi
+get:
+  security: []
+  tags:
+    - Plan
+  summary: List plans with features, limits and active prices
+  operationId: listPlans
+  responses:
+    200:
+      description: Plans
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: ../components/schemas/Plan.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

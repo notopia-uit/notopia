@@ -19,15 +19,18 @@ type PermanentlyDeleteWorkspaceItems struct {
 
 type PermanentlyDeleteWorkspaceItemsHandler struct {
 	authorizationSvc AuthorizationSvc
+	trashService     *domain.TrashService
 	uow              domain.UnitOfWork
 }
 
 func NewPermanentlyDeleteWorkspaceItemsHandler(
 	authorizationSvc AuthorizationSvc,
+	trashService *domain.TrashService,
 	uow domain.UnitOfWork,
 ) *PermanentlyDeleteWorkspaceItemsHandler {
 	return &PermanentlyDeleteWorkspaceItemsHandler{
 		authorizationSvc: authorizationSvc,
+		trashService:     trashService,
 		uow:              uow,
 	}
 }
@@ -38,8 +41,6 @@ type PermanentlyDeleteWorkspaceItemsCmd commonhandler.Cmd[PermanentlyDeleteWorks
 
 var _ PermanentlyDeleteWorkspaceItemsCmd = (*PermanentlyDeleteWorkspaceItemsHandler)(nil)
 
-// NOTE: We delegate the infra persistence to cascading delete things (folder)
-// Fact, we should handle this in domain, not infra
 func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd *PermanentlyDeleteWorkspaceItems) error {
 	hasPermission, err := h.authorizationSvc.HasWorkspaceItemPermission(ctx, cmd.UserID, cmd.WorkspaceID, WorkspaceItemPermissionDelete)
 	if err != nil {
@@ -53,43 +54,11 @@ func (h *PermanentlyDeleteWorkspaceItemsHandler) Handle(ctx context.Context, cmd
 	}
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		if len(cmd.FolderIDs) > 0 {
-			folderRepo := r.Folder()
-			folders, err := folderRepo.GetMany(ctx,
-				//exhaustruct:ignore
-				&domain.FolderRepoGetManyParams{
-					IDs:       cmd.FolderIDs,
-					ForUpdate: true,
-				})
-			if err != nil {
-				return err
-			}
-			for _, folder := range folders {
-				folder.PermanentlyDelete(cmd.UserID)
-			}
-			if err := folderRepo.SaveMany(ctx, folders); err != nil {
-				return err
-			}
+		targets, err := loadPermanentDeleteTargets(ctx, r, cmd.NoteIDs, cmd.FolderIDs)
+		if err != nil {
+			return err
 		}
-
-		if len(cmd.NoteIDs) > 0 {
-			noteRepo := r.Note()
-			notes, err := noteRepo.GetMany(ctx,
-				//exhaustruct:ignore
-				&domain.NoteRepoGetManyParams{
-					IDs:       cmd.NoteIDs,
-					ForUpdate: true,
-				})
-			if err != nil {
-				return err
-			}
-			for _, note := range notes {
-				note.PermanentlyDelete(cmd.UserID)
-			}
-			if err := noteRepo.SaveMany(ctx, notes); err != nil {
-				return err
-			}
-		}
-		return nil
+		targets.delete(h.trashService, cmd.UserID)
+		return savePermanentDeleteTargets(ctx, r, targets)
 	})
 }

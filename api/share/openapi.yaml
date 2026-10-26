@@ -1,6 +1,6 @@
 ## yaml-language-server: $schema=https://www.schemastore.org/openapi-3.X.json
 # vim: ft=yaml.openapi
-openapi: 3.0.4
+openapi: 3.1.2
 
 info:
   version: 0.0.0
@@ -24,10 +24,14 @@ components:
       $ref: ./components/schemas/NoteSearch.yaml
     NoteUpdatedEvent:
       $ref: ./components/schemas/NoteUpdatedEvent.yaml
+    SubscriptionChangedEvent:
+      $ref: ./components/schemas/SubscriptionChangedEvent.yaml
     UserDeletedEvent:
       $ref: ./components/schemas/UserDeletedEvent.yaml
     UserWorkspaceRoleUpdatedEvent:
       $ref: ./components/schemas/UserWorkspaceRoleUpdatedEvent.yaml
+    WorkspaceDeletedIntegrationEvent:
+      $ref: ./components/schemas/WorkspaceDeletedIntegrationEvent.yaml
     WorkspaceMemberAddedEvent:
       $ref: ./components/schemas/WorkspaceMemberAddedEvent.yaml
     WorkspaceMemberRemovedEvent:

@@ -2,10 +2,13 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
 	"github.com/google/uuid"
+
+	"github.com/notopia-uit/notopia/internal/note/errs"
 )
 
 // This is used for register multiple domain event
@@ -36,6 +39,11 @@ func (h *NoteUpdatedDomainToIntegrationEventHandler) Handle(ctx context.Context,
 		ExcludeTrashed: false,
 	})
 	if err != nil {
+		var notFound *errs.NoteNotFound
+		if errors.As(err, &notFound) {
+			slog.DebugContext(ctx, "Skipping note updated integration event, note no longer exists", slog.String("note_id", noteID.String()))
+			return nil
+		}
 		return fmt.Errorf("failed to get note for note updated event: %w", err)
 	}
 	folder, err := h.getFolderReadModel.Handle(ctx, &GetFolderReadModelParams{

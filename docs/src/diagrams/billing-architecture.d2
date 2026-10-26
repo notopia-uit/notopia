@@ -1,0 +1,68 @@
+direction: right
+
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-overrides: {
+      N1: "#4c4f69"
+      N2: "#5c5f77"
+      N4: "#acb0be"
+      N5: "#ccd0da"
+      N7: "#eff1f5"
+      B1: "#4c4f69"
+      B2: "#6c6f85"
+      B3: "#bcc0cc"
+      B4: "#ccd0da"
+      B5: "#dce0e8"
+      B6: "#eff1f5"
+      AA4: "#1e66f5"
+      AA5: "#7287fd"
+      AB4: "#8839ef"
+      AB5: "#dc8a78"
+    }
+  }
+}
+
+controllers: Controllers {
+  http: HTTP (gin strict) {
+    api: Workspace + admin APIs
+    webhook: Stripe webhook
+  }
+  grpc: gRPC (entitlements)
+  event: Kafka consumers
+  cron: Crons (Redis-locked)
+}
+
+application: Application {
+  cmds: Commands
+  queries: Queries
+}
+
+domain: Domain {
+  subscription: Subscription + Refund
+  account: BillingAccount
+  catalog: Price / Plan / BillingPolicy
+}
+
+infrastructure: Infrastructure {
+  persistence: Postgres (sqlc)
+  stripe: Stripe adapter
+  notifier: Kafka notifier
+  authorization: Authorization gRPC client
+  redis: Redis (cron locks)
+}
+
+stripe_cloud: Stripe {shape: cloud}
+kafka: Redpanda {shape: queue}
+authz: Authorization Service
+note: Note Service
+
+controllers -> application
+application -> domain
+application -> infrastructure
+infrastructure.stripe -> stripe_cloud
+stripe_cloud -> controllers.http.webhook: webhook events
+infrastructure.notifier -> kafka: subscription.changed (best-effort)
+kafka -> controllers.event: workspace.deleted\nrole_updated\nmember_removed
+infrastructure.authorization -> authz
+note -> controllers.grpc: entitlement checks

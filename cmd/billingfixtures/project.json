@@ -1,0 +1,56 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "billingfixtures",
+  "projectType": "application",
+  "tags": ["type:go"],
+  "namedInputs": {
+    "default": [
+      "goPkgFiles",
+      "goFiles",
+      "{workspaceRoot}/internal/billing/**/*.go",
+      "{workspaceRoot}/internal/billingfixtures/**/*.go"
+    ]
+  },
+  "targets": {
+    "gen:wire": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/wire_gen.go"],
+      "options": {
+        "command": "wire",
+        "cwd": "{projectRoot}"
+      },
+      "cache": false
+    },
+    "gen": {
+      "dependsOn": ["gen:wire"]
+    },
+    "run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run ./cmd/billingfixtures/",
+        "cwd": "{workspaceRoot}",
+        "tty": true
+      },
+      "dependsOn": ["gen"],
+      "continuous": false
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go build -o ./cmd/billingfixtures/billingfixtures ./cmd/billingfixtures/",
+        "cwd": "{workspaceRoot}"
+      },
+      "dependsOn": ["gen"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "inputs": ["default", "goLint"],
+      "options": {
+        "command": "golangci-lint run ./cmd/billingfixtures/... ./internal/billingfixtures/...",
+        "cwd": "{workspaceRoot}"
+      },
+      "parallelism": false
+    }
+  },
+  "implicitDependencies": ["pkg", "billing"]
+}

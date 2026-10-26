@@ -17,15 +17,18 @@ type EmptyTrash struct {
 
 type EmptyTrashHandler struct {
 	authorizationSvc AuthorizationSvc
+	trashService     *domain.TrashService
 	uow              domain.UnitOfWork
 }
 
 func NewEmptyTrashHandler(
 	authorizationSvc AuthorizationSvc,
+	trashService *domain.TrashService,
 	uow domain.UnitOfWork,
 ) *EmptyTrashHandler {
 	return &EmptyTrashHandler{
 		authorizationSvc: authorizationSvc,
+		trashService:     trashService,
 		uow:              uow,
 	}
 }
@@ -49,10 +52,17 @@ func (h *EmptyTrashHandler) Handle(ctx context.Context, cmd *EmptyTrash) error {
 	}
 
 	return h.uow.Execute(ctx, func(r domain.RepoRegistry) error {
-		folderRepo := r.Folder()
-		noteRepo := r.Note()
-
-		trashedFolders, err := folderRepo.GetMany(ctx, &domain.FolderRepoGetManyParams{
+		trashedNotes, err := r.Note().GetMany(ctx, &domain.NoteRepoGetManyParams{
+			IDs:         nil,
+			WorkspaceID: cmd.WorkspaceID,
+			TrashOnly:   true,
+			TrashedBy:   domain.TrashedByUnspecified,
+			ForUpdate:   true,
+		})
+		if err != nil {
+			return err
+		}
+		trashedFolders, err := r.Folder().GetMany(ctx, &domain.FolderRepoGetManyParams{
 			IDs:         nil,
 			WorkspaceID: cmd.WorkspaceID,
 			TrashOnly:   true,
@@ -63,29 +73,20 @@ func (h *EmptyTrashHandler) Handle(ctx context.Context, cmd *EmptyTrash) error {
 			return err
 		}
 
-		for _, folder := range trashedFolders {
-			folder.PermanentlyDelete(cmd.UserID)
+		noteIDs := make([]uuid.UUID, 0, len(trashedNotes))
+		for _, n := range trashedNotes {
+			noteIDs = append(noteIDs, n.ID())
 		}
-		if err := folderRepo.SaveMany(ctx, trashedFolders); err != nil {
-			return err
+		folderIDs := make([]uuid.UUID, 0, len(trashedFolders))
+		for _, f := range trashedFolders {
+			folderIDs = append(folderIDs, f.ID())
 		}
 
-		trashedNotes, err := noteRepo.GetMany(ctx, &domain.NoteRepoGetManyParams{
-			IDs:         nil,
-			WorkspaceID: cmd.WorkspaceID,
-			TrashOnly:   true,
-			TrashedBy:   domain.TrashedByUnspecified,
-			ForUpdate:   true,
-		})
+		targets, err := loadPermanentDeleteTargets(ctx, r, noteIDs, folderIDs)
 		if err != nil {
 			return err
 		}
-		for _, note := range trashedNotes {
-			note.PermanentlyDelete(cmd.UserID)
-		}
-		if err := noteRepo.SaveMany(ctx, trashedNotes); err != nil {
-			return err
-		}
-		return nil
+		targets.delete(h.trashService, cmd.UserID)
+		return savePermanentDeleteTargets(ctx, r, targets)
 	})
 }

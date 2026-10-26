@@ -1,0 +1,21 @@
+{
+  "id": "sub_123",
+  "object": "subscription",
+  "status": "active",
+  "cancel_at_period_end": false,
+  "cancel_at": null,
+  "canceled_at": null,
+  "metadata": { "workspace_id": "00000000-0000-4000-8000-000000000110" },
+  "items": {
+    "object": "list",
+    "data": [
+      {
+        "id": "si_1",
+        "object": "subscription_item",
+        "current_period_start": 1759276800,
+        "current_period_end": 1761955200,
+        "price": { "id": "price_plus_month", "object": "price" }
+      }
+    ]
+  }
+}

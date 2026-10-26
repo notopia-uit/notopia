@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { Traceable } from 'nestjs-otel';
 import { DataSource } from 'typeorm';
 
+import { type RevisionTrigger } from '../document/commit-policy';
 import { RevisionNotFoundException } from './revision-not-found.exception';
 import { RevisionEntity } from './revision.entity';
 
@@ -34,15 +35,18 @@ export class RevisionService {
   async getRevisionsByDocumentId(
     documentId: string,
     page: number,
-    limit: number
+    limit: number,
+    trigger?: RevisionTrigger
   ): Promise<PaginatedRevisions> {
-    this.logger.debug({ documentId, page, limit }, 'getRevisionsByDocumentId');
+    this.logger.debug({ documentId, page, limit, trigger }, 'getRevisionsByDocumentId');
     const [revisions, total] = await this.dataSource.getRepository(RevisionEntity).findAndCount({
       where: {
         document: {
           id: documentId,
         },
+        ...(trigger && { trigger }),
       },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -66,7 +70,10 @@ export class RevisionService {
 
   async deleteRevision(revisionId: string): Promise<void> {
     this.logger.debug({ revisionId }, 'deleteRevision');
-    await this.dataSource.getRepository(RevisionEntity).softDelete(revisionId);
+    const result = await this.dataSource.getRepository(RevisionEntity).delete(revisionId);
+    if (result.affected === 0) {
+      throw new RevisionNotFoundException(revisionId);
+    }
     this.logger.log({ revisionId }, 'deleteRevision: done');
   }
 }

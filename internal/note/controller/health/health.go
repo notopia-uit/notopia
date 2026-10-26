@@ -12,8 +12,8 @@ import (
 	httpCheck "github.com/hellofresh/health-go/v5/checks/http"
 	"github.com/notopia-uit/notopia/internal/note/app"
 	"github.com/notopia-uit/notopia/internal/note/config"
+	"github.com/notopia-uit/notopia/internal/note/infra/common"
 	"github.com/notopia-uit/notopia/internal/note/infra/persistence"
-	"github.com/notopia-uit/notopia/internal/note/infra/workspaceevent"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
 )
 
@@ -26,7 +26,7 @@ func New(
 	serverCfg *config.Server,
 	kafkaCfg *commonconfig.Kafka,
 	workspaceEventHub app.WorkspaceEventHub,
-	redisClient *workspaceevent.RedisClient,
+	redisClient *common.RedisClient,
 	authentikCfg *commonconfig.Authentik,
 	servicesCfg *config.Services,
 ) *Health {
@@ -125,6 +125,17 @@ func New(
 			15*time.Second,
 			3*time.Second,
 			health.Check{
+				Name: "billingService",
+				Check: httpCheck.New(httpCheck.Config{
+					URL: servicesCfg.Billing.LiveURL,
+				}),
+			},
+		),
+
+		health.WithPeriodicCheck(
+			15*time.Second,
+			3*time.Second,
+			health.Check{
 				Name: "authentik",
 				Check: httpCheck.New(httpCheck.Config{
 					URL: authentikCfg.HealthLiveURL(),
@@ -174,5 +185,8 @@ func New(
 var Provide = New
 
 func (h *Health) Run() error {
-	return h.ListenAndServe()
+	if err := h.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+	return nil
 }

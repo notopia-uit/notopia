@@ -1,0 +1,42 @@
+# vim: ft=yaml.openapi
+post:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - WorkspaceBilling
+  summary: Start Stripe Checkout for a plan price (owner only)
+  operationId: createCheckoutSession
+  parameters:
+    - $ref: ../components/parameters/workspaceIdPath.yaml
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/CheckoutSessionRequest.yaml
+  responses:
+    200:
+      description: Redirect the browser to this URL
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/RedirectURL.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    404:
+      $ref: ../../common/components/responses/NotFoundError.yaml
+    409:
+      description: Conflict with current billing state
+      content:
+        application/json:
+          schema:
+            $ref: ../../common/components/schemas/Error.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

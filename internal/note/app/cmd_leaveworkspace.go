@@ -15,13 +15,16 @@ type LeaveWorkspace struct {
 
 type LeaveWorkspaceHandler struct {
 	authorizationSvc AuthorizationSvc
+	billingSvc       BillingSvc
 }
 
 func NewLeaveWorkspaceHandler(
 	authorizationSvc AuthorizationSvc,
+	billingSvc BillingSvc,
 ) *LeaveWorkspaceHandler {
 	return &LeaveWorkspaceHandler{
 		authorizationSvc: authorizationSvc,
+		billingSvc:       billingSvc,
 	}
 }
 
@@ -38,6 +41,9 @@ func (h *LeaveWorkspaceHandler) Handle(ctx context.Context, cmd *LeaveWorkspace)
 	}
 	if len(members) == 1 {
 		return errs.NewCannotLeaveWorkspaceWithOnlyOneMember(cmd.WorkspaceID)
+	}
+	if err := checkPayerMayLeave(ctx, h.billingSvc, cmd.WorkspaceID, cmd.UserID); err != nil {
+		return err
 	}
 	return h.authorizationSvc.LeaveWorkspace(ctx, cmd.UserID, cmd.WorkspaceID)
 }

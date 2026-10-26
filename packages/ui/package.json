@@ -51,7 +51,7 @@
     "react-complex-tree": "^2.6.1",
     "react-day-picker": "^10.0.1",
     "react-resizable-panels": "^4.12.4",
-    "recharts": "3.8.0",
+    "recharts": "3.8.1",
     "shadcn": "catalog:",
     "sonner": "^2.0.8",
     "streamdown": "catalog:",

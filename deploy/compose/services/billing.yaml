@@ -1,0 +1,31 @@
+# vim:ft=yaml.docker-compose:
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json
+services:
+  billing_postgresql:
+    container_name: notopia-billing_postgresql
+    image: postgres:18.6-alpine3.23
+    environment:
+      POSTGRES_DB: ${BILLING_POSTGRESQL_DB:-billing}
+      POSTGRES_USER: ${BILLING_POSTGRESQL_USER:-notopiauit}
+      POSTGRES_PASSWORD: ${BILLING_POSTGRESQL_PASSWORD:-notopiauit}
+    ports:
+      - ${BILLING_POSTGRESQL_PORT:-5435}:5432
+    volumes:
+      - billing_postgresql_data:/var/lib/postgresql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      start_period: 10s
+      start_interval: 1s
+    restart: unless-stopped
+
+  billing_redis:
+    container_name: notopia-billing_redis
+    image: redis:8.4.7-alpine3.22
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports:
+      - 6375:6379
+
+volumes:
+  billing_postgresql_data:

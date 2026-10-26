@@ -9,6 +9,11 @@
       "types": "./dist/note.d.ts",
       "import": "./dist/note.js"
     },
+    "./billing": {
+      "@nx/source": "./src/billing.ts",
+      "types": "./dist/billing.d.ts",
+      "import": "./dist/billing.js"
+    },
     "./authorization": {
       "@nx/source": "./src/authorization.ts",
       "types": "./dist/authorization.d.ts",

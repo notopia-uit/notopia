@@ -6,12 +6,12 @@ properties:
     type: string
     enum:
       - HeartBeatWorkspaceEvent
-    example: HeartBeatWorkspaceEvent
+    examples: [HeartBeatWorkspaceEvent]
 
   timestamp:
     type: string
     format: date-time
-    example: 2024-01-01T00:00:00Z
+    examples: [2024-01-01T00:00:00Z]
 
 required:
   - event

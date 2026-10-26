@@ -12,5 +12,6 @@ http:
           headerMap:
             X-Forwarded-ID: sub
             X-Forwarded-Email: email
+            X-Forwarded-Name: name
             X-Forwarded-Roles: roles
             X-Forwarded-Groups: groups

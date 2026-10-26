@@ -1,0 +1,7 @@
+# vim: ft=yaml.openapi
+name: trigger
+in: query
+required: false
+description: Only return revisions created by this trigger
+schema:
+  $ref: ../schemas/RevisionTrigger.yaml

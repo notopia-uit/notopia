@@ -1,0 +1,7 @@
+# vim: ft=yaml.openapi
+type: object
+properties:
+  id:
+    $ref: ./Revision.yaml#/properties/id
+required:
+  - id

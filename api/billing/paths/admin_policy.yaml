@@ -1,0 +1,57 @@
+# vim: ft=yaml.openapi
+get:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - BillingAdmin
+  summary: Get billing policy (admin)
+  operationId: adminGetPolicy
+  responses:
+    200:
+      description: Billing policy
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/BillingPolicy.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml
+patch:
+  security:
+    - Oauth2:
+        - openid
+    - OIDC:
+        - openid
+  tags:
+    - BillingAdmin
+  summary: Update billing policy (admin)
+  operationId: adminUpdatePolicy
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/UpdatePolicyRequest.yaml
+  responses:
+    200:
+      description: Updated billing policy
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/BillingPolicy.yaml
+    400:
+      $ref: ../../common/components/responses/BadRequestError.yaml
+    401:
+      $ref: ../../common/components/responses/UnauthorizedError.yaml
+    403:
+      $ref: ../../common/components/responses/ForbiddenError.yaml
+    500:
+      $ref: ../../common/components/responses/InternalServerError.yaml

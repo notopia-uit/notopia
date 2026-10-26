@@ -34,13 +34,13 @@ Notopia is a markdown note-taking app with real-time collaboration, graph-based 
 
 **Service responsibilities:**
 
-| Service | Role |
-| --- | --- |
-| **Note** | Core business logic — workspaces, folders, notes, members |
-| **Document** | Editor backend — real-time collab, revision history, file storage |
-| **Authorization** | RBAC policy enforcement via Casbin |
-| **Search Worker** | Indexes note content into Meilisearch via Kafka events |
-| **Web** | Next.js frontend |
+| Service           | Role                                                              |
+| ----------------- | ----------------------------------------------------------------- |
+| **Note**          | Core business logic — workspaces, folders, notes, members         |
+| **Document**      | Editor backend — real-time collab, revision history, file storage |
+| **Authorization** | RBAC policy enforcement via Casbin                                |
+| **Search Worker** | Indexes note content into Meilisearch via Kafka events            |
+| **Web**           | Next.js frontend                                                  |
 
 ---
 
@@ -67,15 +67,15 @@ compose --profile "dev-ui" up -d  # + DbGate, Redpanda Console
 
 Local domains via Traefik (add to `/etc/hosts`):
 
-| Domain | Service |
-| --- | --- |
-| `web.notopia.localhost` | Web frontend |
-| `api.notopia.localhost` | API gateway |
-| `authentik.notopia.localhost` | Identity provider |
-| `meilisearch.notopia.localhost` | Search |
-| `rustfs-api.notopia.localhost` | S3 storage |
-| `redpanda.notopia.localhost` | Kafka console |
-| `dbgate.notopia.localhost` | DB admin |
+| Domain                          | Service           |
+| ------------------------------- | ----------------- |
+| `web.notopia.localhost`         | Web frontend      |
+| `api.notopia.localhost`         | API gateway       |
+| `authentik.notopia.localhost`   | Identity provider |
+| `meilisearch.notopia.localhost` | Search            |
+| `rustfs-api.notopia.localhost`  | S3 storage        |
+| `redpanda.notopia.localhost`    | Kafka console     |
+| `dbgate.notopia.localhost`      | DB admin          |
 
 Default credentials: `notopiauit` / `notopiauit`
 
@@ -110,21 +110,34 @@ nx gen proto   # Generate protobuf code (Go, TypeScript)
 nx run note:goose:up               # Apply note service migrations
 nx run note:goose:down             # Rollback
 nx run note:goose:create           # Create new migration
+
+nx run document:db:sync            # Document (TypeORM), dev only: sync schema to entities
+nx run document:db:generate -- database/migrations/Name   # Generate migration from entity diff
+nx run document:db:create -- database/migrations/Name     # Empty migration
+nx run document:db:migrate         # Apply document migrations (prod path)
+nx run document:db:revert          # Revert last document migration
+nx run document:db:status          # List document migrations
 ```
 
-### Seed Data
+The document service never syncs its schema on startup; run `db:sync` (dev) or `db:migrate` first.
+
+### Seed and Fixtures
+
+- **seed**: mandatory data needed in every environment, prod included (idempotent)
+- **fixtures**: fake data for local development only (demo workspaces, notes, documents, search index)
 
 ```bash
-just seed-init                     # Seed all services
-just seed-init-note                # Seed note service only
-just seed-init-document            # Seed document service only
-just seed-init-search              # Seed search index
+just seed                          # Mandatory data (Meilisearch index config)
+just fixtures                      # Seed + all dev fixtures
+just fixtures-note                 # Note service fixtures only
+just fixtures-document             # Document service fixtures only (runs db:sync first)
+just fixtures-search               # Search index fixtures only
 ```
 
 ### Conventions
 
 - **Do not source `.env`** — Nx auto-loads them; sourced env vars won't be overridden
-- **JS/TS**: `oxlint` lint, `oxfmt` format, `tsgo` typecheck (not `tsc`)
+- **JS/TS**: `oxlint` lint, `oxfmt` format, `tsc` typecheck
 - **Go**: `golangci-lint` lint, `go fmt` format
 - **Commits**: conventional commit format
 - **API contracts**: change specs in `api/` or `proto/`, never modify generated code directly
@@ -147,6 +160,17 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 
 ---
 
+## Limitation
+
+### Our
+
+### Third-party
+
+- Blocknote collaboration does not support undo ("Ctrl Z")
+- No integration test for Meilisearch JS <https://testcontainers.com/modules/meilisearch/>
+
+---
+
 ## ☑️ TO-DO
 
 ### Backend
@@ -160,16 +184,24 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
     > If do, should create a guard outside of it
   - [ ] Health check
   - [ ] Consider merging blocknote & hocuspocus into editor module
-- [ ] Authorization service
-  - [ ] Health check
 - [ ] Cannot deal with `domain.com:8080/api/v1` base path
-- [ ] no env validation for document, search-worker
 - [ ] Health check to other services (api service, meili, postgres...)
 - [ ] Connection pool max connections, idle, timeout for database, meili
 - [ ] gin should be protected with `SetTrustedProxies`
 - [ ] Event is tracked by either otel or correlation id.
       But, currently use wotel + kafka tracer, and partially correlation id but not really connected.
 - [ ] Revision endpoints aren't protected with authorization
+- [ ] Caching the subscription in other services so that it will not harm the billing service
+  > Skipped for simplicity
+- [ ] Consider split the workspace event (SSE) into a dedicated service, not bounded to `note` service
+  > Events from subscription changed
+- [ ] Make backend services have an option to must trust request comes from api gateway
+- [ ] OpenAPI upgrade 3.1
+- [ ] App admin edit doesn't propagate the SSE to web client. We only have workspace event SSE
+- [ ] Service-account role: replace the `HACK:` lookup with a read-only service-account role in authorization
+- [x] Authorization service health check
+- [x] no env validation for document, search-worker
+- [x] NestJS service doesn't have a polite migration mechanism for production (document: TypeORM CLI, no migration files generated yet)
 
 ### Frontend
 
@@ -189,3 +221,12 @@ find . -type l ! -exec test -e {} \; -print -delete   # Remove broken symlinks
 - [ ] Those NestJS logging, we need to find a better way to wrap those controller log. NestJS Pino only http? not microservice.
       And guess that we should either using middleware or interceptor
 - [ ] Mutating `update, add, delete` workspace member doesn't send event to user client
+
+---
+
+## Use cases... missing?
+
+- Delete note, then the document would also be cleaned
+- Delete workspace, then note, document, search index, authorization cleaned?
+- App Admin, logic, and the UI for admin to mutate things
+- We don't have Authentik delete user event emission? Only when we control the UI management UI, else, we cannot

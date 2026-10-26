@@ -682,5 +682,8 @@
       "children": []
     }
   ],
-  "createdAt": "2026-04-27T10:16:34.910Z"
+  "createdAt": "2026-04-27T10:16:34.910Z",
+  "authorId": "42",
+  "trigger": "manual",
+  "contributorIds": ["41", "42"]
 }

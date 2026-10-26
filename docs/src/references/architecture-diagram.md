@@ -41,3 +41,11 @@ order: 1
 ```
 
 <!-- diagram id="architecture-search-worker-diagram" -->
+
+## Billing Architecture
+
+```d2
+@file:../diagrams/billing-architecture.d2
+```
+
+<!-- diagram id="architecture-billing-diagram" -->

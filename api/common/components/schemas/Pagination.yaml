@@ -5,30 +5,30 @@ properties:
     type: integer
     description: Current page number, starting from 1
     minimum: 1
-    example: 1
+    examples: [1]
   currentTotal:
     type: integer
     description: Number of items in the current page
     minimum: 0
-    example: 20
+    examples: [20]
   total:
     type: integer
     description: Total items across all pages
     minimum: 0
-    example: 100
+    examples: [100]
   totalPages:
     type: integer
     description: Total number of pages
     minimum: 0
-    example: 5
+    examples: [5]
   hasNext:
     type: boolean
     description: Whether there is a next page
-    example: true
+    examples: [true]
   hasPrev:
     type: boolean
     description: Whether there is a previous page
-    example: false
+    examples: [false]
 required:
   - page
   - currentTotal

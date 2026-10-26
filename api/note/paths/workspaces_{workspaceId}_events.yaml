@@ -19,6 +19,7 @@ get:
           schema:
             oneOf:
               - $ref: ../components/schemas/HeartBeatWorkspaceEvent.yaml
+              - $ref: ../components/schemas/WorkspaceBillingChangedEvent.yaml
               - $ref: ../components/schemas/WorkspaceDeletedEvent.yaml
               - $ref: ../components/schemas/WorkspaceItemsUpdatedEvent.yaml
               - $ref: ../components/schemas/WorkspaceMembersUpdatedEvent.yaml
@@ -28,6 +29,7 @@ get:
               propertyName: event
               mapping:
                 HeartBeatWorkspaceEvent: ../components/schemas/HeartBeatWorkspaceEvent.yaml
+                WorkspaceBillingChangedEvent: ../components/schemas/WorkspaceBillingChangedEvent.yaml
                 WorkspaceDeletedEvent: ../components/schemas/WorkspaceDeletedEvent.yaml
                 WorkspaceItemsUpdatedEvent: ../components/schemas/WorkspaceItemsUpdatedEvent.yaml
                 WorkspaceMembersUpdatedEvent: ../components/schemas/WorkspaceMembersUpdatedEvent.yaml

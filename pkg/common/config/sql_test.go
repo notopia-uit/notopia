@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	commonconfig "github.com/notopia-uit/notopia/pkg/common/config"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPostGresConfigValidation(t *testing.T) {
@@ -184,9 +186,11 @@ func TestPostGresConfigValidation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := v.Struct(tt.cfg)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("validation failed: got error = %v, wantErr = %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
 			}
+			require.NoError(t, err)
 		})
 	}
 }
@@ -207,6 +211,7 @@ func TestGetURL(t *testing.T) {
 		{
 			name: "constructs URL from fields",
 			cfg: commonconfig.SQL{
+				Scheme:   "postgres",
 				Host:     "localhost",
 				Port:     5432,
 				User:     "testuser",
@@ -214,16 +219,26 @@ func TestGetURL(t *testing.T) {
 				Name:     "testdb",
 				SSLMode:  "require",
 			},
-			expected: "host=localhost port=5432 user=testuser password=testpass dbname=testdb sslmode=require",
+			expected: "postgres://testuser:testpass@localhost:5432/testdb?sslmode=require",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.cfg.GetURL()
-			if got != tt.expected {
-				t.Errorf("GetURL() = %q, want %q", got, tt.expected)
-			}
+			assert.Equal(t, tt.expected, tt.cfg.GetURL())
 		})
 	}
+}
+
+func TestGetDSN(t *testing.T) {
+	cfg := commonconfig.SQL{
+		Host:     "localhost",
+		Port:     5432,
+		User:     "testuser",
+		Password: "testpass",
+		Name:     "testdb",
+		SSLMode:  "require",
+	}
+	want := "host=localhost port=5432 user=testuser password=testpass dbname=testdb sslmode=require"
+	assert.Equal(t, want, cfg.GetDSN())
 }

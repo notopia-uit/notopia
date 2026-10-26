@@ -38,6 +38,7 @@ type Cmds struct {
 	PermanentlyDeleteWorkspaceItems PermanentlyDeleteWorkspaceItemsCmd
 	PublishNote                     PublishNoteCmd
 	PublishWorkspace                PublishWorkspaceCmd
+	PurgeExpiredTrash               PurgeExpiredTrashCmd
 	RenameFolder                    RenameFolderCmd
 	RenameNote                      RenameNoteCmd
 	RenameWorkspace                 RenameWorkspaceCmd
@@ -63,6 +64,7 @@ func NewCmds(
 	permanentlyDeleteWorkspaceItemsHandler *PermanentlyDeleteWorkspaceItemsHandler,
 	publishNoteHandler *PublishNoteHandler,
 	publishWorkspaceHandler *PublishWorkspaceHandler,
+	purgeExpiredTrashHandler *PurgeExpiredTrashHandler,
 	renameFolderHandler *RenameFolderHandler,
 	renameNoteHandler *RenameNoteHandler,
 	renameWorkspaceHandler *RenameWorkspaceHandler,
@@ -87,6 +89,7 @@ func NewCmds(
 		PermanentlyDeleteWorkspaceItems: commonhandler.DecorateCmd(hp, permanentlyDeleteWorkspaceItemsHandler),
 		PublishNote:                     commonhandler.DecorateCmd(hp, publishNoteHandler),
 		PublishWorkspace:                commonhandler.DecorateCmd(hp, publishWorkspaceHandler),
+		PurgeExpiredTrash:               commonhandler.DecorateCmd(hp, purgeExpiredTrashHandler),
 		RenameFolder:                    commonhandler.DecorateCmd(hp, renameFolderHandler),
 		RenameNote:                      commonhandler.DecorateCmd(hp, renameNoteHandler),
 		RenameWorkspace:                 commonhandler.DecorateCmd(hp, renameWorkspaceHandler),
@@ -101,6 +104,7 @@ func NewCmds(
 var ProvideCmds = NewCmds
 
 type Queries struct {
+	BatchGetNoteWorkspaces   BatchGetNoteWorkspacesQuery
 	CheckWorkspaceSlugExists CheckWorkspaceSlugExistsQuery
 	GetMyWorkspaces          GetMyWorkspacesQuery
 	GetNoteGraph             GetNoteGraphQuery
@@ -118,6 +122,7 @@ type Queries struct {
 
 func NewQueries(
 	handlerProvider *HandlerProvider,
+	batchGetNoteWorkspacesHandler *BatchGetNoteWorkspacesHandler,
 	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler,
 	GetMyWorkspacesHandler *GetMyWorkspacesHandler,
 	GetNoteGraphHandler *GetNoteGraphHandler,
@@ -134,6 +139,7 @@ func NewQueries(
 ) *Queries {
 	hp := (*commonhandler.HandlerProvider)(handlerProvider)
 	return &Queries{
+		BatchGetNoteWorkspaces:   commonhandler.DecorateQuery(hp, batchGetNoteWorkspacesHandler),
 		CheckWorkspaceSlugExists: commonhandler.DecorateQuery(hp, CheckWorkspaceSlugExistsHandler),
 		GetMyWorkspaces:          commonhandler.DecorateQuery(hp, GetMyWorkspacesHandler),
 		GetNoteGraph:             commonhandler.DecorateQuery(hp, GetNoteGraphHandler),
@@ -153,12 +159,15 @@ func NewQueries(
 var ProvideQueries = NewQueries
 
 type Events struct {
-	DocumentCommitted                   *DocumentCommittedHandler
-	NoteCreatedDomainToIntegrationEvent *NoteCreatedDomainToIntegrationEventHandler
-	NoteUpdatedDomainToIntegrationEvent *NoteUpdatedDomainToIntegrationEventHandler
-	NotifyWorkspaceItemsUpdated         *NotifyWorkspaceItemsUpdatedHandler
-	NotifyWorkspaceRenamed              *NotifyWorkspaceRenamedHandler
-	NotifyWorkspaceSlugChanged          *NotifyWorkspaceSlugChangedHandler
+	BillingChanged                           *BillingChangedHandler
+	DocumentCommitted                        *DocumentCommittedHandler
+	NoteCreatedDomainToIntegrationEvent      *NoteCreatedDomainToIntegrationEventHandler
+	NoteDeletedDomainToIntegrationEvent      *NoteDeletedDomainToIntegrationEventHandler
+	NoteUpdatedDomainToIntegrationEvent      *NoteUpdatedDomainToIntegrationEventHandler
+	NotifyWorkspaceItemsUpdated              *NotifyWorkspaceItemsUpdatedHandler
+	NotifyWorkspaceRenamed                   *NotifyWorkspaceRenamedHandler
+	NotifyWorkspaceSlugChanged               *NotifyWorkspaceSlugChangedHandler
+	WorkspaceDeletedDomainToIntegrationEvent *WorkspaceDeletedDomainToIntegrationEventHandler
 }
 
 type Server struct {

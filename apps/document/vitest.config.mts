@@ -9,6 +9,7 @@ export default defineConfig({
   },
   plugins: [
     swc.vite({
+      tsconfigFile: 'tsconfig.spec.json',
       module: {
         type: 'es6',
       },

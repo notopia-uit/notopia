@@ -9,17 +9,17 @@ OPENCODE_EXPERIMENTAL = "true"
 OPENCODE_EXPERIMENTAL_OXFMT = "true"
 OPENCODE_EXPERIMENTAL_EXA = "true"
 COMPOSE_FILE = "./deploy/compose/compose.yaml"
-'_'.path.paths = ["./bin/", "./scripts/", "./node_modules/.bin/"]
+'_'.path.paths = ["./scripts/", "./node_modules/.bin/"]
 
 [tools]
 "github:pressly/goose" = "3.27.3"
 "go:github.com/goforj/wire/cmd/wire" = "1.2.0"
-"go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.7.0"
+"go:github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen" = "2.8.0"
 buf = "1.65.0"
-pnpm = "10.33.4"
+pnpm = "12.14.0"
 sqlc = "1.31.1"
 java = "26.0.1"
-mockery = "3.7.4"
+mockery = "3.8.1"
 "github:go-delve/delve" = "1.26.3"
 d2 = "0.7.1"
 "npm:@tailwindcss/language-server" = "0.14.29"
@@ -28,25 +28,14 @@ gotestsum = "1.13.0"
 "go:github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter" = "0.1.0"
 protoc-gen-go = "1.36.12"
 protoc-gen-go-grpc = "1.6.2"
-"npm:ts-proto" = "2.12.3"
-go = "1.27.1"
-
-[tools."http:plantuml"]
-version = "1.2026.2"
-url = "https://github.com/plantuml/plantuml/releases/download/v{{ version }}/plantuml.jar"
-
-[tools."http:kroki"]
-url = "https://github.com/yuzutech/kroki/releases/download/v{{ version }}/kroki-standalone-server-v{{ version }}.jar"
-version = "0.30.1"
-bin = "kroki-server.jar"
+"npm:ts-proto" = "2.12.4"
+go = "1.27.3"
+stripe = "latest"
 
 [shell_alias]
 shadcn = "pnpm exec shadcn"
-tsgo = "pnpm exec tsgo"
 compose = "docker compose"
 p = "pnpm"
-plantuml = "./bin/plantuml"
-kroki = "./bin/kroki"
 oxlint = "pnpm exec oxlint"
 oxfmt = "pnpm exec oxfmt"
 lazydocker = "lazydocker -f ./deploy/compose/compose.yaml"

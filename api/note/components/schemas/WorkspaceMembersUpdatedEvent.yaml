@@ -5,13 +5,13 @@ properties:
   id:
     type: string
     format: uuid
-    example: dd57d134-d23b-457f-88fc-a4d7d6b284e5
+    examples: [dd57d134-d23b-457f-88fc-a4d7d6b284e5]
 
   event:
     type: string
     enum:
       - WorkspaceMembersUpdatedEvent
-    example: WorkspaceMembersUpdatedEvent
+    examples: [WorkspaceMembersUpdatedEvent]
 
   data:
     type: object

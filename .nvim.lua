@@ -296,6 +296,15 @@ lsp.config("oxlint", {
         typeAware = false,
       },
     },
+    {
+      workspaceUri = string.format("%s/apps/ai", uri_root),
+      options = {
+        configPath = string.format("%s/apps/ai/oxlint.config.ts", root),
+        fixKind = "all",
+        run = "onSave",
+        typeAware = false,
+      },
+    },
   },
   workspace_folders = {
     {
@@ -321,6 +330,10 @@ lsp.config("oxlint", {
     {
       name = "search-worker",
       uri = string.format("%s/apps/search-worker", uri_root),
+    },
+    {
+      name = "ai",
+      uri = string.format("%s/apps/ai", uri_root),
     },
   },
   on_attach = function(client, bufnr)
@@ -393,6 +406,7 @@ lsp.enable({
   "oxlint",
   "redocly_ls",
   "tailwindcss",
+  "taplo",
   "tsc",
   "twcssls",
   "yamlls",

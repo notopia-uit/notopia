@@ -6,7 +6,6 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
-	ProvideRedisClient,
 	ProvideWorkspaceEventHub,
 	wire.Bind(new(app.WorkspaceEventPublisher), new(*WorkspaceEventHub)),
 	wire.Bind(new(app.WorkspaceEventSubscriber), new(*WorkspaceEventHub)),

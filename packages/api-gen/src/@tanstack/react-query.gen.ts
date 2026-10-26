@@ -3,40 +3,40 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, useMutation, type UseMutationOptions, useQuery } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { changeWorkspaceSlug, checkWorkspaceSlugExists, commitDocument, createFolder, createNote, createWorkspace, deleteRevision, deleteWorkspace, emptyTrash, getDocumentAttachmentUploadUrl, getMyWorkspaces, getNote, getNoteGraph, getNoteLinks, getRevisions, getRevisionWithContent, getWorkspace, getWorkspaceGraph, getWorkspaceMembers, getWorkspaceSearchToken, getWorkspaceTree, leaveWorkspace, moveWorkspaceItems, type Options, permanentlyDeleteFolder, permanentlyDeleteNote, permanentlyDeleteWorkspaceItems, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchUsers, showTrash, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceMembers } from '../sdk.gen';
-import type { ChangeWorkspaceSlugData, ChangeWorkspaceSlugError, ChangeWorkspaceSlugResponse, CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsError, CommitDocumentData, CommitDocumentError, CommitDocumentResponse, CreateFolderData, CreateFolderError, CreateFolderResponse, CreateNoteData, CreateNoteError, CreateNoteResponse, CreateWorkspaceData, CreateWorkspaceError, CreateWorkspaceResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, EmptyTrashData, EmptyTrashError, EmptyTrashResponse, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetMyWorkspacesData, GetMyWorkspacesError, GetMyWorkspacesResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetRevisionWithContentData, GetRevisionWithContentError, GetRevisionWithContentResponse, GetWorkspaceData, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceSearchTokenData, GetWorkspaceSearchTokenError, GetWorkspaceSearchTokenResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, LeaveWorkspaceData, LeaveWorkspaceError, LeaveWorkspaceResponse, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PermanentlyDeleteFolderData, PermanentlyDeleteFolderError, PermanentlyDeleteFolderResponse, PermanentlyDeleteNoteData, PermanentlyDeleteNoteError, PermanentlyDeleteNoteResponse, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsError, PermanentlyDeleteWorkspaceItemsResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchUsersData, SearchUsersError, SearchUsersResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse } from '../types.gen';
+import { adminArchivePrice, adminCreatePrice, adminGetPolicy, adminListPlans, adminListPrices, adminUpdatePlan, adminUpdatePolicy, cancelNow, changeWorkspaceSlug, checkWorkspaceSlugExists, claimPayer, commitDocument, createCheckoutSession, createFolder, createNote, createPortalSession, createWorkspace, deleteRevision, deleteWorkspace, emptyTrash, getDocumentAttachmentUploadUrl, getMyWorkspaces, getNote, getNoteGraph, getNoteLinks, getRevisions, getRevisionWithContent, getWorkspace, getWorkspaceBilling, getWorkspaceEntitlements, getWorkspaceGraph, getWorkspaceMembers, getWorkspaceSearchToken, getWorkspaceTree, leaveWorkspace, listPlans, moveWorkspaceItems, type Options, permanentlyDeleteFolder, permanentlyDeleteNote, permanentlyDeleteWorkspaceItems, previewCancelNow, publishNote, publishWorkspace, renameFolder, renameNote, renameRevision, renameWorkspace, restoreTrashedWorkspaceItems, searchUsers, showTrash, stripeWebhook, trashWorkspaceItems, unpublishNote, unpublishWorkspace, updateWorkspaceMembers } from '../sdk.gen';
+import type { AdminArchivePriceData, AdminArchivePriceError, AdminArchivePriceResponse, AdminCreatePriceData, AdminCreatePriceError, AdminCreatePriceResponse, AdminGetPolicyData, AdminGetPolicyError, AdminGetPolicyResponse, AdminListPlansData, AdminListPlansError, AdminListPlansResponse, AdminListPricesData, AdminListPricesError, AdminListPricesResponse, AdminUpdatePlanData, AdminUpdatePlanError, AdminUpdatePlanResponse, AdminUpdatePolicyData, AdminUpdatePolicyError, AdminUpdatePolicyResponse, CancelNowData, CancelNowError, CancelNowResponse, ChangeWorkspaceSlugData, ChangeWorkspaceSlugError, ChangeWorkspaceSlugResponse, CheckWorkspaceSlugExistsData, CheckWorkspaceSlugExistsError, ClaimPayerData, ClaimPayerError, ClaimPayerResponse, CommitDocumentData, CommitDocumentError, CommitDocumentResponse, CreateCheckoutSessionData, CreateCheckoutSessionError, CreateCheckoutSessionResponse, CreateFolderData, CreateFolderError, CreateFolderResponse, CreateNoteData, CreateNoteError, CreateNoteResponse, CreatePortalSessionData, CreatePortalSessionError, CreatePortalSessionResponse, CreateWorkspaceData, CreateWorkspaceError, CreateWorkspaceResponse, DeleteRevisionData, DeleteRevisionError, DeleteRevisionResponse, DeleteWorkspaceData, DeleteWorkspaceError, DeleteWorkspaceResponse, EmptyTrashData, EmptyTrashError, EmptyTrashResponse, GetDocumentAttachmentUploadUrlData, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, GetMyWorkspacesData, GetMyWorkspacesError, GetMyWorkspacesResponse, GetNoteData, GetNoteError, GetNoteGraphData, GetNoteGraphError, GetNoteGraphResponse, GetNoteLinksData, GetNoteLinksError, GetNoteLinksResponse, GetNoteResponse, GetRevisionsData, GetRevisionsError, GetRevisionsResponse, GetRevisionWithContentData, GetRevisionWithContentError, GetRevisionWithContentResponse, GetWorkspaceBillingData, GetWorkspaceBillingError, GetWorkspaceBillingResponse, GetWorkspaceData, GetWorkspaceEntitlementsData, GetWorkspaceEntitlementsError, GetWorkspaceEntitlementsResponse, GetWorkspaceError, GetWorkspaceGraphData, GetWorkspaceGraphError, GetWorkspaceGraphResponse, GetWorkspaceMembersData, GetWorkspaceMembersError, GetWorkspaceMembersResponse, GetWorkspaceResponse, GetWorkspaceSearchTokenData, GetWorkspaceSearchTokenError, GetWorkspaceSearchTokenResponse, GetWorkspaceTreeData, GetWorkspaceTreeError, GetWorkspaceTreeResponse, LeaveWorkspaceData, LeaveWorkspaceError, LeaveWorkspaceResponse, ListPlansData, ListPlansError, ListPlansResponse, MoveWorkspaceItemsData, MoveWorkspaceItemsError, MoveWorkspaceItemsResponse, PermanentlyDeleteFolderData, PermanentlyDeleteFolderError, PermanentlyDeleteFolderResponse, PermanentlyDeleteNoteData, PermanentlyDeleteNoteError, PermanentlyDeleteNoteResponse, PermanentlyDeleteWorkspaceItemsData, PermanentlyDeleteWorkspaceItemsError, PermanentlyDeleteWorkspaceItemsResponse, PreviewCancelNowData, PreviewCancelNowError, PreviewCancelNowResponse, PublishNoteData, PublishNoteError, PublishNoteResponse, PublishWorkspaceData, PublishWorkspaceError, PublishWorkspaceResponse, RenameFolderData, RenameFolderError, RenameFolderResponse, RenameNoteData, RenameNoteError, RenameNoteResponse, RenameRevisionData, RenameRevisionError, RenameRevisionResponse, RenameWorkspaceData, RenameWorkspaceError, RenameWorkspaceResponse, RestoreTrashedWorkspaceItemsData, RestoreTrashedWorkspaceItemsError, RestoreTrashedWorkspaceItemsResponse, SearchUsersData, SearchUsersError, SearchUsersResponse, ShowTrashData, ShowTrashError, ShowTrashResponse, StripeWebhookData, StripeWebhookError, StripeWebhookResponse, TrashWorkspaceItemsData, TrashWorkspaceItemsError, TrashWorkspaceItemsResponse, UnpublishNoteData, UnpublishNoteError, UnpublishNoteResponse, UnpublishWorkspaceData, UnpublishWorkspaceError, UnpublishWorkspaceResponse, UpdateWorkspaceMembersData, UpdateWorkspaceMembersError, UpdateWorkspaceMembersResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
-  Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
-    _id: string;
-    _infinite?: boolean;
-    tags?: ReadonlyArray<string>;
-  }
+    Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
+        _id: string;
+        _infinite?: boolean;
+        tags?: ReadonlyArray<string>;
+    }
 ];
 
 const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions, infinite?: boolean, tags?: ReadonlyArray<string>): [
-  QueryKey<TOptions>[0]
+    QueryKey<TOptions>[0]
 ] => {
-  const params: QueryKey<TOptions>[0] = { _id: id, baseUrl: options?.baseUrl || (options?.client ?? client).getConfig().baseUrl } as QueryKey<TOptions>[0];
-  if (infinite) {
-    params._infinite = infinite;
-  }
-  if (tags) {
-    params.tags = tags;
-  }
-  if (options?.body) {
-    params.body = options.body;
-  }
-  if (options?.headers) {
-    params.headers = options.headers;
-  }
-  if (options?.path) {
-    params.path = options.path;
-  }
-  if (options?.query) {
-    params.query = options.query;
-  }
-  return [params];
+    const params: QueryKey<TOptions>[0] = { _id: id, baseUrl: options?.baseUrl || (options?.client ?? client).getConfig().baseUrl } as QueryKey<TOptions>[0];
+    if (infinite) {
+        params._infinite = infinite;
+    }
+    if (tags) {
+        params.tags = tags;
+    }
+    if (options?.body) {
+        params.body = options.body;
+    }
+    if (options?.headers) {
+        params.headers = options.headers;
+    }
+    if (options?.path) {
+        params.path = options.path;
+    }
+    if (options?.query) {
+        params.query = options.query;
+    }
+    return [params];
 };
 
 export const getDocumentAttachmentUploadUrlQueryKey = (options: Options<GetDocumentAttachmentUploadUrlData>) => createQueryKey('getDocumentAttachmentUploadUrl', options);
@@ -47,16 +47,16 @@ export const getDocumentAttachmentUploadUrlQueryKey = (options: Options<GetDocum
  * Get presigned URL for document attachment upload
  */
 export const getDocumentAttachmentUploadUrlOptions = (options: Options<GetDocumentAttachmentUploadUrlData>) => queryOptions<GetDocumentAttachmentUploadUrlResponse, GetDocumentAttachmentUploadUrlError, GetDocumentAttachmentUploadUrlResponse, ReturnType<typeof getDocumentAttachmentUploadUrlQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getDocumentAttachmentUploadUrl({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getDocumentAttachmentUploadUrlQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getDocumentAttachmentUploadUrl({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getDocumentAttachmentUploadUrlQueryKey(options)
 });
 
 /**
@@ -68,23 +68,27 @@ export const useGetDocumentAttachmentUploadUrlQuery = (options: Options<GetDocum
 
 /**
  * Commit document
+ *
+ * Creates a revision of the current content. Requires write permission. Plus/pro workspaces also auto-commit (`auto_commit`), so this is only needed to force a revision earlier.
  */
 export const commitDocumentMutation = (options?: Partial<Options<CommitDocumentData>>): UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> => {
-  const mutationOptions: UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await commitDocument({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await commitDocument({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
  * Commit document
+ *
+ * Creates a revision of the current content. Requires write permission. Plus/pro workspaces also auto-commit (`auto_commit`), so this is only needed to force a revision earlier.
  */
 export const useCommitDocumentMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CommitDocumentResponse, CommitDocumentError, Options<CommitDocumentData>>, 'mutationFn'>>) => useMutation({ ...commitDocumentMutation(), ...mutationOptions });
 
@@ -92,81 +96,87 @@ export const getRevisionsQueryKey = (options: Options<GetRevisionsData>) => crea
 
 /**
  * Get revisions
+ *
+ * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const getRevisionsOptions = (options: Options<GetRevisionsData>) => queryOptions<GetRevisionsResponse, GetRevisionsError, GetRevisionsResponse, ReturnType<typeof getRevisionsQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getRevisions({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getRevisionsQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getRevisions({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getRevisionsQueryKey(options)
 });
 
 const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
-  const params = { ...queryKey[0] };
-  if (page.body) {
-    params.body = {
-      ...queryKey[0].body as any,
-      ...page.body as any
-    };
-  }
-  if (page.headers) {
-    params.headers = {
-      ...queryKey[0].headers,
-      ...page.headers
-    };
-  }
-  if (page.path) {
-    params.path = {
-      ...queryKey[0].path as any,
-      ...page.path as any
-    };
-  }
-  if (page.query) {
-    params.query = {
-      ...queryKey[0].query as any,
-      ...page.query as any
-    };
-  }
-  return params as unknown as typeof page;
+    const params = { ...queryKey[0] };
+    if (page.body) {
+        params.body = {
+            ...queryKey[0].body as any,
+            ...page.body as any
+        };
+    }
+    if (page.headers) {
+        params.headers = {
+            ...queryKey[0].headers,
+            ...page.headers
+        };
+    }
+    if (page.path) {
+        params.path = {
+            ...queryKey[0].path as any,
+            ...page.path as any
+        };
+    }
+    if (page.query) {
+        params.query = {
+            ...queryKey[0].query as any,
+            ...page.query as any
+        };
+    }
+    return params as unknown as typeof page;
 };
 
 export const getRevisionsInfiniteQueryKey = (options: Options<GetRevisionsData>): QueryKey<Options<GetRevisionsData>> => createQueryKey('getRevisions', options, true);
 
 /**
  * Get revisions
+ *
+ * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const getRevisionsInfiniteOptions = (options: Options<GetRevisionsData>) => {
-  const opts = infiniteQueryOptions<GetRevisionsResponse, GetRevisionsError, InfiniteData<GetRevisionsResponse>, QueryKey<Options<GetRevisionsData>>, number | Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
-  // @ts-ignore
-  {
-    queryFn: async ({ pageParam, queryKey, signal }) => {
-      // @ts-ignore
-      const page: Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
-        query: {
-          page: pageParam
-        }
-      };
-      const params = createInfiniteParams(queryKey, page);
-      const { data } = await getRevisions({
-        ...options,
-        ...params,
-        signal,
-        throwOnError: true
-      });
-      return data;
-    },
-    queryKey: getRevisionsInfiniteQueryKey(options)
-  });
-  return opts as Omit<typeof opts, 'initialData'>;
+    const opts = infiniteQueryOptions<GetRevisionsResponse, GetRevisionsError, InfiniteData<GetRevisionsResponse>, QueryKey<Options<GetRevisionsData>>, number | Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<GetRevisionsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    page: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await getRevisions({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: getRevisionsInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
 };
 
 /**
  * Get revisions
+ *
+ * Revisions older than the plan `revision_history_days` are purged daily; the latest is always kept. Filter with `trigger`.
  */
 export const useGetRevisionsQuery = (options: Options<GetRevisionsData>) => useQuery(getRevisionsOptions(options));
 
@@ -174,17 +184,17 @@ export const useGetRevisionsQuery = (options: Options<GetRevisionsData>) => useQ
  * Delete revision
  */
 export const deleteRevisionMutation = (options?: Partial<Options<DeleteRevisionData>>): UseMutationOptions<DeleteRevisionResponse, DeleteRevisionError, Options<DeleteRevisionData>> => {
-  const mutationOptions: UseMutationOptions<DeleteRevisionResponse, DeleteRevisionError, Options<DeleteRevisionData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await deleteRevision({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<DeleteRevisionResponse, DeleteRevisionError, Options<DeleteRevisionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteRevision({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -198,16 +208,16 @@ export const getRevisionWithContentQueryKey = (options: Options<GetRevisionWithC
  * Get revision with content
  */
 export const getRevisionWithContentOptions = (options: Options<GetRevisionWithContentData>) => queryOptions<GetRevisionWithContentResponse, GetRevisionWithContentError, GetRevisionWithContentResponse, ReturnType<typeof getRevisionWithContentQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getRevisionWithContent({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getRevisionWithContentQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getRevisionWithContent({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getRevisionWithContentQueryKey(options)
 });
 
 /**
@@ -219,17 +229,17 @@ export const useGetRevisionWithContentQuery = (options: Options<GetRevisionWithC
  * Rename revision
  */
 export const renameRevisionMutation = (options?: Partial<Options<RenameRevisionData>>): UseMutationOptions<RenameRevisionResponse, RenameRevisionError, Options<RenameRevisionData>> => {
-  const mutationOptions: UseMutationOptions<RenameRevisionResponse, RenameRevisionError, Options<RenameRevisionData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await renameRevision({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<RenameRevisionResponse, RenameRevisionError, Options<RenameRevisionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await renameRevision({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -241,17 +251,17 @@ export const useRenameRevisionMutation = (mutationOptions?: Partial<Omit<UseMuta
  * Create folder
  */
 export const createFolderMutation = (options?: Partial<Options<CreateFolderData>>): UseMutationOptions<CreateFolderResponse, CreateFolderError, Options<CreateFolderData>> => {
-  const mutationOptions: UseMutationOptions<CreateFolderResponse, CreateFolderError, Options<CreateFolderData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await createFolder({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<CreateFolderResponse, CreateFolderError, Options<CreateFolderData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createFolder({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -263,17 +273,17 @@ export const useCreateFolderMutation = (mutationOptions?: Partial<Omit<UseMutati
  * Permanently delete folder
  */
 export const permanentlyDeleteFolderMutation = (options?: Partial<Options<PermanentlyDeleteFolderData>>): UseMutationOptions<PermanentlyDeleteFolderResponse, PermanentlyDeleteFolderError, Options<PermanentlyDeleteFolderData>> => {
-  const mutationOptions: UseMutationOptions<PermanentlyDeleteFolderResponse, PermanentlyDeleteFolderError, Options<PermanentlyDeleteFolderData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await permanentlyDeleteFolder({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<PermanentlyDeleteFolderResponse, PermanentlyDeleteFolderError, Options<PermanentlyDeleteFolderData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await permanentlyDeleteFolder({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -285,17 +295,17 @@ export const usePermanentlyDeleteFolderMutation = (mutationOptions?: Partial<Omi
  * Rename folder
  */
 export const renameFolderMutation = (options?: Partial<Options<RenameFolderData>>): UseMutationOptions<RenameFolderResponse, RenameFolderError, Options<RenameFolderData>> => {
-  const mutationOptions: UseMutationOptions<RenameFolderResponse, RenameFolderError, Options<RenameFolderData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await renameFolder({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<RenameFolderResponse, RenameFolderError, Options<RenameFolderData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await renameFolder({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -307,17 +317,17 @@ export const useRenameFolderMutation = (mutationOptions?: Partial<Omit<UseMutati
  * Create note
  */
 export const createNoteMutation = (options?: Partial<Options<CreateNoteData>>): UseMutationOptions<CreateNoteResponse, CreateNoteError, Options<CreateNoteData>> => {
-  const mutationOptions: UseMutationOptions<CreateNoteResponse, CreateNoteError, Options<CreateNoteData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await createNote({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<CreateNoteResponse, CreateNoteError, Options<CreateNoteData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createNote({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -329,17 +339,17 @@ export const useCreateNoteMutation = (mutationOptions?: Partial<Omit<UseMutation
  * Permanently delete note
  */
 export const permanentlyDeleteNoteMutation = (options?: Partial<Options<PermanentlyDeleteNoteData>>): UseMutationOptions<PermanentlyDeleteNoteResponse, PermanentlyDeleteNoteError, Options<PermanentlyDeleteNoteData>> => {
-  const mutationOptions: UseMutationOptions<PermanentlyDeleteNoteResponse, PermanentlyDeleteNoteError, Options<PermanentlyDeleteNoteData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await permanentlyDeleteNote({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<PermanentlyDeleteNoteResponse, PermanentlyDeleteNoteError, Options<PermanentlyDeleteNoteData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await permanentlyDeleteNote({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -353,16 +363,16 @@ export const getNoteQueryKey = (options: Options<GetNoteData>) => createQueryKey
  * Get note
  */
 export const getNoteOptions = (options: Options<GetNoteData>) => queryOptions<GetNoteResponse, GetNoteError, GetNoteResponse, ReturnType<typeof getNoteQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getNote({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getNoteQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getNote({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getNoteQueryKey(options)
 });
 
 /**
@@ -374,22 +384,26 @@ export const getNoteGraphQueryKey = (options: Options<GetNoteGraphData>) => crea
 
 /**
  * Get note graph
+ *
+ * `depth` is capped by plan limit `note_graph_max_depth` (free 5).
  */
 export const getNoteGraphOptions = (options: Options<GetNoteGraphData>) => queryOptions<GetNoteGraphResponse, GetNoteGraphError, GetNoteGraphResponse, ReturnType<typeof getNoteGraphQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getNoteGraph({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getNoteGraphQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getNoteGraph({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getNoteGraphQueryKey(options)
 });
 
 /**
  * Get note graph
+ *
+ * `depth` is capped by plan limit `note_graph_max_depth` (free 5).
  */
 export const useGetNoteGraphQuery = (options: Options<GetNoteGraphData>) => useQuery(getNoteGraphOptions(options));
 
@@ -399,16 +413,16 @@ export const getNoteLinksQueryKey = (options: Options<GetNoteLinksData>) => crea
  * Get note links
  */
 export const getNoteLinksOptions = (options: Options<GetNoteLinksData>) => queryOptions<GetNoteLinksResponse, GetNoteLinksError, GetNoteLinksResponse, ReturnType<typeof getNoteLinksQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getNoteLinks({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getNoteLinksQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getNoteLinks({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getNoteLinksQueryKey(options)
 });
 
 /**
@@ -420,17 +434,17 @@ export const useGetNoteLinksQuery = (options: Options<GetNoteLinksData>) => useQ
  * Publish note
  */
 export const publishNoteMutation = (options?: Partial<Options<PublishNoteData>>): UseMutationOptions<PublishNoteResponse, PublishNoteError, Options<PublishNoteData>> => {
-  const mutationOptions: UseMutationOptions<PublishNoteResponse, PublishNoteError, Options<PublishNoteData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await publishNote({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<PublishNoteResponse, PublishNoteError, Options<PublishNoteData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await publishNote({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -442,17 +456,17 @@ export const usePublishNoteMutation = (mutationOptions?: Partial<Omit<UseMutatio
  * Rename note
  */
 export const renameNoteMutation = (options?: Partial<Options<RenameNoteData>>): UseMutationOptions<RenameNoteResponse, RenameNoteError, Options<RenameNoteData>> => {
-  const mutationOptions: UseMutationOptions<RenameNoteResponse, RenameNoteError, Options<RenameNoteData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await renameNote({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<RenameNoteResponse, RenameNoteError, Options<RenameNoteData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await renameNote({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -464,17 +478,17 @@ export const useRenameNoteMutation = (mutationOptions?: Partial<Omit<UseMutation
  * Unpublish note
  */
 export const unpublishNoteMutation = (options?: Partial<Options<UnpublishNoteData>>): UseMutationOptions<UnpublishNoteResponse, UnpublishNoteError, Options<UnpublishNoteData>> => {
-  const mutationOptions: UseMutationOptions<UnpublishNoteResponse, UnpublishNoteError, Options<UnpublishNoteData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await unpublishNote({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<UnpublishNoteResponse, UnpublishNoteError, Options<UnpublishNoteData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await unpublishNote({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -488,16 +502,16 @@ export const getWorkspaceQueryKey = (options: Options<GetWorkspaceData>) => crea
  * Get workspace
  */
 export const getWorkspaceOptions = (options: Options<GetWorkspaceData>) => queryOptions<GetWorkspaceResponse, GetWorkspaceError, GetWorkspaceResponse, ReturnType<typeof getWorkspaceQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getWorkspace({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getWorkspaceQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getWorkspace({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getWorkspaceQueryKey(options)
 });
 
 /**
@@ -511,16 +525,16 @@ export const checkWorkspaceSlugExistsQueryKey = (options: Options<CheckWorkspace
  * Check workspace slug exists
  */
 export const checkWorkspaceSlugExistsOptions = (options: Options<CheckWorkspaceSlugExistsData>) => queryOptions<unknown, CheckWorkspaceSlugExistsError, unknown, ReturnType<typeof checkWorkspaceSlugExistsQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await checkWorkspaceSlugExists({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: checkWorkspaceSlugExistsQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await checkWorkspaceSlugExists({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: checkWorkspaceSlugExistsQueryKey(options)
 });
 
 /**
@@ -532,17 +546,17 @@ export const useCheckWorkspaceSlugExistsQuery = (options: Options<CheckWorkspace
  * Create workspace
  */
 export const createWorkspaceMutation = (options?: Partial<Options<CreateWorkspaceData>>): UseMutationOptions<CreateWorkspaceResponse, CreateWorkspaceError, Options<CreateWorkspaceData>> => {
-  const mutationOptions: UseMutationOptions<CreateWorkspaceResponse, CreateWorkspaceError, Options<CreateWorkspaceData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await createWorkspace({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<CreateWorkspaceResponse, CreateWorkspaceError, Options<CreateWorkspaceData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createWorkspace({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -556,16 +570,16 @@ export const getMyWorkspacesQueryKey = (options?: Options<GetMyWorkspacesData>) 
  * Get my workspaces
  */
 export const getMyWorkspacesOptions = (options?: Options<GetMyWorkspacesData>) => queryOptions<GetMyWorkspacesResponse, GetMyWorkspacesError, GetMyWorkspacesResponse, ReturnType<typeof getMyWorkspacesQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getMyWorkspaces({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getMyWorkspacesQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getMyWorkspaces({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getMyWorkspacesQueryKey(options)
 });
 
 /**
@@ -577,17 +591,17 @@ export const useGetMyWorkspacesQuery = (options?: Options<GetMyWorkspacesData>) 
  * Delete workspace
  */
 export const deleteWorkspaceMutation = (options?: Partial<Options<DeleteWorkspaceData>>): UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> => {
-  const mutationOptions: UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await deleteWorkspace({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<DeleteWorkspaceResponse, DeleteWorkspaceError, Options<DeleteWorkspaceData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteWorkspace({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -599,17 +613,17 @@ export const useDeleteWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMut
  * Change workspace slug
  */
 export const changeWorkspaceSlugMutation = (options?: Partial<Options<ChangeWorkspaceSlugData>>): UseMutationOptions<ChangeWorkspaceSlugResponse, ChangeWorkspaceSlugError, Options<ChangeWorkspaceSlugData>> => {
-  const mutationOptions: UseMutationOptions<ChangeWorkspaceSlugResponse, ChangeWorkspaceSlugError, Options<ChangeWorkspaceSlugData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await changeWorkspaceSlug({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<ChangeWorkspaceSlugResponse, ChangeWorkspaceSlugError, Options<ChangeWorkspaceSlugData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await changeWorkspaceSlug({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -621,17 +635,17 @@ export const useChangeWorkspaceSlugMutation = (mutationOptions?: Partial<Omit<Us
  * Empty trash
  */
 export const emptyTrashMutation = (options?: Partial<Options<EmptyTrashData>>): UseMutationOptions<EmptyTrashResponse, EmptyTrashError, Options<EmptyTrashData>> => {
-  const mutationOptions: UseMutationOptions<EmptyTrashResponse, EmptyTrashError, Options<EmptyTrashData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await emptyTrash({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<EmptyTrashResponse, EmptyTrashError, Options<EmptyTrashData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await emptyTrash({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -643,44 +657,52 @@ export const getWorkspaceGraphQueryKey = (options: Options<GetWorkspaceGraphData
 
 /**
  * Get workspace graph
+ *
+ * Requires feature `workspace_graph` (plus, pro); free returns 402.
  */
 export const getWorkspaceGraphOptions = (options: Options<GetWorkspaceGraphData>) => queryOptions<GetWorkspaceGraphResponse, GetWorkspaceGraphError, GetWorkspaceGraphResponse, ReturnType<typeof getWorkspaceGraphQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getWorkspaceGraph({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getWorkspaceGraphQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getWorkspaceGraph({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getWorkspaceGraphQueryKey(options)
 });
 
 /**
  * Get workspace graph
+ *
+ * Requires feature `workspace_graph` (plus, pro); free returns 402.
  */
 export const useGetWorkspaceGraphQuery = (options: Options<GetWorkspaceGraphData>) => useQuery(getWorkspaceGraphOptions(options));
 
 /**
  * Leave workspace
+ *
+ * The billing payer cannot leave while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const leaveWorkspaceMutation = (options?: Partial<Options<LeaveWorkspaceData>>): UseMutationOptions<LeaveWorkspaceResponse, LeaveWorkspaceError, Options<LeaveWorkspaceData>> => {
-  const mutationOptions: UseMutationOptions<LeaveWorkspaceResponse, LeaveWorkspaceError, Options<LeaveWorkspaceData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await leaveWorkspace({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<LeaveWorkspaceResponse, LeaveWorkspaceError, Options<LeaveWorkspaceData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await leaveWorkspace({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
  * Leave workspace
+ *
+ * The billing payer cannot leave while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const useLeaveWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<LeaveWorkspaceResponse, LeaveWorkspaceError, Options<LeaveWorkspaceData>>, 'mutationFn'>>) => useMutation({ ...leaveWorkspaceMutation(), ...mutationOptions });
 
@@ -690,16 +712,16 @@ export const getWorkspaceMembersQueryKey = (options: Options<GetWorkspaceMembers
  * Get workspace members
  */
 export const getWorkspaceMembersOptions = (options: Options<GetWorkspaceMembersData>) => queryOptions<GetWorkspaceMembersResponse, GetWorkspaceMembersError, GetWorkspaceMembersResponse, ReturnType<typeof getWorkspaceMembersQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getWorkspaceMembers({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getWorkspaceMembersQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getWorkspaceMembers({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getWorkspaceMembersQueryKey(options)
 });
 
 /**
@@ -709,23 +731,27 @@ export const useGetWorkspaceMembersQuery = (options: Options<GetWorkspaceMembers
 
 /**
  * Update workspace members
+ *
+ * Plan limit `members` (free 3, plus 10, pro unlimited). Adding beyond the limit returns 402. The billing payer cannot lose the owner role while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const updateWorkspaceMembersMutation = (options?: Partial<Options<UpdateWorkspaceMembersData>>): UseMutationOptions<UpdateWorkspaceMembersResponse, UpdateWorkspaceMembersError, Options<UpdateWorkspaceMembersData>> => {
-  const mutationOptions: UseMutationOptions<UpdateWorkspaceMembersResponse, UpdateWorkspaceMembersError, Options<UpdateWorkspaceMembersData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await updateWorkspaceMembers({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<UpdateWorkspaceMembersResponse, UpdateWorkspaceMembersError, Options<UpdateWorkspaceMembersData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateWorkspaceMembers({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
  * Update workspace members
+ *
+ * Plan limit `members` (free 3, plus 10, pro unlimited). Adding beyond the limit returns 402. The billing payer cannot lose the owner role while a recurring subscription is active (409 `billingPayerMustTransfer`).
  */
 export const useUpdateWorkspaceMembersMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<UpdateWorkspaceMembersResponse, UpdateWorkspaceMembersError, Options<UpdateWorkspaceMembersData>>, 'mutationFn'>>) => useMutation({ ...updateWorkspaceMembersMutation(), ...mutationOptions });
 
@@ -733,17 +759,17 @@ export const useUpdateWorkspaceMembersMutation = (mutationOptions?: Partial<Omit
  * Move workspace's items
  */
 export const moveWorkspaceItemsMutation = (options?: Partial<Options<MoveWorkspaceItemsData>>): UseMutationOptions<MoveWorkspaceItemsResponse, MoveWorkspaceItemsError, Options<MoveWorkspaceItemsData>> => {
-  const mutationOptions: UseMutationOptions<MoveWorkspaceItemsResponse, MoveWorkspaceItemsError, Options<MoveWorkspaceItemsData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await moveWorkspaceItems({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<MoveWorkspaceItemsResponse, MoveWorkspaceItemsError, Options<MoveWorkspaceItemsData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await moveWorkspaceItems({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -755,17 +781,17 @@ export const useMoveWorkspaceItemsMutation = (mutationOptions?: Partial<Omit<Use
  * Permanently delete workspace items
  */
 export const permanentlyDeleteWorkspaceItemsMutation = (options?: Partial<Options<PermanentlyDeleteWorkspaceItemsData>>): UseMutationOptions<PermanentlyDeleteWorkspaceItemsResponse, PermanentlyDeleteWorkspaceItemsError, Options<PermanentlyDeleteWorkspaceItemsData>> => {
-  const mutationOptions: UseMutationOptions<PermanentlyDeleteWorkspaceItemsResponse, PermanentlyDeleteWorkspaceItemsError, Options<PermanentlyDeleteWorkspaceItemsData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await permanentlyDeleteWorkspaceItems({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<PermanentlyDeleteWorkspaceItemsResponse, PermanentlyDeleteWorkspaceItemsError, Options<PermanentlyDeleteWorkspaceItemsData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await permanentlyDeleteWorkspaceItems({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -777,17 +803,17 @@ export const usePermanentlyDeleteWorkspaceItemsMutation = (mutationOptions?: Par
  * Publish workspace
  */
 export const publishWorkspaceMutation = (options?: Partial<Options<PublishWorkspaceData>>): UseMutationOptions<PublishWorkspaceResponse, PublishWorkspaceError, Options<PublishWorkspaceData>> => {
-  const mutationOptions: UseMutationOptions<PublishWorkspaceResponse, PublishWorkspaceError, Options<PublishWorkspaceData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await publishWorkspace({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<PublishWorkspaceResponse, PublishWorkspaceError, Options<PublishWorkspaceData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await publishWorkspace({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -799,17 +825,17 @@ export const usePublishWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMu
  * Rename workspace
  */
 export const renameWorkspaceMutation = (options?: Partial<Options<RenameWorkspaceData>>): UseMutationOptions<RenameWorkspaceResponse, RenameWorkspaceError, Options<RenameWorkspaceData>> => {
-  const mutationOptions: UseMutationOptions<RenameWorkspaceResponse, RenameWorkspaceError, Options<RenameWorkspaceData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await renameWorkspace({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<RenameWorkspaceResponse, RenameWorkspaceError, Options<RenameWorkspaceData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await renameWorkspace({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -821,17 +847,17 @@ export const useRenameWorkspaceMutation = (mutationOptions?: Partial<Omit<UseMut
  * Restore trashed workspace items
  */
 export const restoreTrashedWorkspaceItemsMutation = (options?: Partial<Options<RestoreTrashedWorkspaceItemsData>>): UseMutationOptions<RestoreTrashedWorkspaceItemsResponse, RestoreTrashedWorkspaceItemsError, Options<RestoreTrashedWorkspaceItemsData>> => {
-  const mutationOptions: UseMutationOptions<RestoreTrashedWorkspaceItemsResponse, RestoreTrashedWorkspaceItemsError, Options<RestoreTrashedWorkspaceItemsData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await restoreTrashedWorkspaceItems({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<RestoreTrashedWorkspaceItemsResponse, RestoreTrashedWorkspaceItemsError, Options<RestoreTrashedWorkspaceItemsData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await restoreTrashedWorkspaceItems({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -845,16 +871,16 @@ export const getWorkspaceSearchTokenQueryKey = (options: Options<GetWorkspaceSea
  * Get Workspace Search Token
  */
 export const getWorkspaceSearchTokenOptions = (options: Options<GetWorkspaceSearchTokenData>) => queryOptions<GetWorkspaceSearchTokenResponse, GetWorkspaceSearchTokenError, GetWorkspaceSearchTokenResponse, ReturnType<typeof getWorkspaceSearchTokenQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getWorkspaceSearchToken({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getWorkspaceSearchTokenQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getWorkspaceSearchToken({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getWorkspaceSearchTokenQueryKey(options)
 });
 
 /**
@@ -866,22 +892,26 @@ export const showTrashQueryKey = (options: Options<ShowTrashData>) => createQuer
 
 /**
  * Show trash
+ *
+ * Trashed items older than the plan's `trash_retention_days` are purged daily.
  */
 export const showTrashOptions = (options: Options<ShowTrashData>) => queryOptions<ShowTrashResponse, ShowTrashError, ShowTrashResponse, ReturnType<typeof showTrashQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await showTrash({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: showTrashQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await showTrash({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: showTrashQueryKey(options)
 });
 
 /**
  * Show trash
+ *
+ * Trashed items older than the plan's `trash_retention_days` are purged daily.
  */
 export const useShowTrashQuery = (options: Options<ShowTrashData>) => useQuery(showTrashOptions(options));
 
@@ -889,17 +919,17 @@ export const useShowTrashQuery = (options: Options<ShowTrashData>) => useQuery(s
  * Trash workspace's items
  */
 export const trashWorkspaceItemsMutation = (options?: Partial<Options<TrashWorkspaceItemsData>>): UseMutationOptions<TrashWorkspaceItemsResponse, TrashWorkspaceItemsError, Options<TrashWorkspaceItemsData>> => {
-  const mutationOptions: UseMutationOptions<TrashWorkspaceItemsResponse, TrashWorkspaceItemsError, Options<TrashWorkspaceItemsData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await trashWorkspaceItems({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<TrashWorkspaceItemsResponse, TrashWorkspaceItemsError, Options<TrashWorkspaceItemsData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await trashWorkspaceItems({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -913,16 +943,16 @@ export const getWorkspaceTreeQueryKey = (options: Options<GetWorkspaceTreeData>)
  * Get workspace tree
  */
 export const getWorkspaceTreeOptions = (options: Options<GetWorkspaceTreeData>) => queryOptions<GetWorkspaceTreeResponse, GetWorkspaceTreeError, GetWorkspaceTreeResponse, ReturnType<typeof getWorkspaceTreeQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await getWorkspaceTree({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: getWorkspaceTreeQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getWorkspaceTree({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getWorkspaceTreeQueryKey(options)
 });
 
 /**
@@ -934,17 +964,17 @@ export const useGetWorkspaceTreeQuery = (options: Options<GetWorkspaceTreeData>)
  * Unpublish workspace
  */
 export const unpublishWorkspaceMutation = (options?: Partial<Options<UnpublishWorkspaceData>>): UseMutationOptions<UnpublishWorkspaceResponse, UnpublishWorkspaceError, Options<UnpublishWorkspaceData>> => {
-  const mutationOptions: UseMutationOptions<UnpublishWorkspaceResponse, UnpublishWorkspaceError, Options<UnpublishWorkspaceData>> = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await unpublishWorkspace({
-        ...options,
-        ...fnOptions,
-        throwOnError: true
-      });
-      return data;
-    }
-  };
-  return mutationOptions;
+    const mutationOptions: UseMutationOptions<UnpublishWorkspaceResponse, UnpublishWorkspaceError, Options<UnpublishWorkspaceData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await unpublishWorkspace({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 /**
@@ -958,19 +988,378 @@ export const searchUsersQueryKey = (options: Options<SearchUsersData>) => create
  * Search users
  */
 export const searchUsersOptions = (options: Options<SearchUsersData>) => queryOptions<SearchUsersResponse, SearchUsersError, SearchUsersResponse, ReturnType<typeof searchUsersQueryKey>>({
-  queryFn: async ({ queryKey, signal }) => {
-    const { data } = await searchUsers({
-      ...options,
-      ...queryKey[0],
-      signal,
-      throwOnError: true
-    });
-    return data;
-  },
-  queryKey: searchUsersQueryKey(options)
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await searchUsers({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: searchUsersQueryKey(options)
 });
 
 /**
  * Search users
  */
 export const useSearchUsersQuery = (options: Options<SearchUsersData>) => useQuery(searchUsersOptions(options));
+
+export const listPlansQueryKey = (options?: Options<ListPlansData>) => createQueryKey('listPlans', options);
+
+/**
+ * List plans with features, limits and active prices
+ */
+export const listPlansOptions = (options?: Options<ListPlansData>) => queryOptions<ListPlansResponse, ListPlansError, ListPlansResponse, ReturnType<typeof listPlansQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listPlans({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listPlansQueryKey(options)
+});
+
+/**
+ * List plans with features, limits and active prices
+ */
+export const useListPlansQuery = (options?: Options<ListPlansData>) => useQuery(listPlansOptions(options));
+
+export const getWorkspaceEntitlementsQueryKey = (options: Options<GetWorkspaceEntitlementsData>) => createQueryKey('getWorkspaceEntitlements', options);
+
+/**
+ * Get workspace entitlements (member)
+ */
+export const getWorkspaceEntitlementsOptions = (options: Options<GetWorkspaceEntitlementsData>) => queryOptions<GetWorkspaceEntitlementsResponse, GetWorkspaceEntitlementsError, GetWorkspaceEntitlementsResponse, ReturnType<typeof getWorkspaceEntitlementsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getWorkspaceEntitlements({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getWorkspaceEntitlementsQueryKey(options)
+});
+
+/**
+ * Get workspace entitlements (member)
+ */
+export const useGetWorkspaceEntitlementsQuery = (options: Options<GetWorkspaceEntitlementsData>) => useQuery(getWorkspaceEntitlementsOptions(options));
+
+export const getWorkspaceBillingQueryKey = (options: Options<GetWorkspaceBillingData>) => createQueryKey('getWorkspaceBilling', options);
+
+/**
+ * Get workspace subscription, payer and refunds (owner only)
+ */
+export const getWorkspaceBillingOptions = (options: Options<GetWorkspaceBillingData>) => queryOptions<GetWorkspaceBillingResponse, GetWorkspaceBillingError, GetWorkspaceBillingResponse, ReturnType<typeof getWorkspaceBillingQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getWorkspaceBilling({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getWorkspaceBillingQueryKey(options)
+});
+
+/**
+ * Get workspace subscription, payer and refunds (owner only)
+ */
+export const useGetWorkspaceBillingQuery = (options: Options<GetWorkspaceBillingData>) => useQuery(getWorkspaceBillingOptions(options));
+
+/**
+ * Start Stripe Checkout for a plan price (owner only)
+ */
+export const createCheckoutSessionMutation = (options?: Partial<Options<CreateCheckoutSessionData>>): UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> => {
+    const mutationOptions: UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createCheckoutSession({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Start Stripe Checkout for a plan price (owner only)
+ */
+export const useCreateCheckoutSessionMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CreateCheckoutSessionResponse, CreateCheckoutSessionError, Options<CreateCheckoutSessionData>>, 'mutationFn'>>) => useMutation({ ...createCheckoutSessionMutation(), ...mutationOptions });
+
+/**
+ * Open Stripe Customer Portal (owner only)
+ */
+export const createPortalSessionMutation = (options?: Partial<Options<CreatePortalSessionData>>): UseMutationOptions<CreatePortalSessionResponse, CreatePortalSessionError, Options<CreatePortalSessionData>> => {
+    const mutationOptions: UseMutationOptions<CreatePortalSessionResponse, CreatePortalSessionError, Options<CreatePortalSessionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createPortalSession({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Open Stripe Customer Portal (owner only)
+ */
+export const useCreatePortalSessionMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CreatePortalSessionResponse, CreatePortalSessionError, Options<CreatePortalSessionData>>, 'mutationFn'>>) => useMutation({ ...createPortalSessionMutation(), ...mutationOptions });
+
+export const previewCancelNowQueryKey = (options: Options<PreviewCancelNowData>) => createQueryKey('previewCancelNow', options);
+
+/**
+ * Preview the refund of cancelling now (owner only)
+ */
+export const previewCancelNowOptions = (options: Options<PreviewCancelNowData>) => queryOptions<PreviewCancelNowResponse, PreviewCancelNowError, PreviewCancelNowResponse, ReturnType<typeof previewCancelNowQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await previewCancelNow({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: previewCancelNowQueryKey(options)
+});
+
+/**
+ * Preview the refund of cancelling now (owner only)
+ */
+export const usePreviewCancelNowQuery = (options: Options<PreviewCancelNowData>) => useQuery(previewCancelNowOptions(options));
+
+/**
+ * Cancel the subscription now with a prorated refund (owner only)
+ */
+export const cancelNowMutation = (options?: Partial<Options<CancelNowData>>): UseMutationOptions<CancelNowResponse, CancelNowError, Options<CancelNowData>> => {
+    const mutationOptions: UseMutationOptions<CancelNowResponse, CancelNowError, Options<CancelNowData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await cancelNow({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Cancel the subscription now with a prorated refund (owner only)
+ */
+export const useCancelNowMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<CancelNowResponse, CancelNowError, Options<CancelNowData>>, 'mutationFn'>>) => useMutation({ ...cancelNowMutation(), ...mutationOptions });
+
+/**
+ * Become the payer by completing a setup Checkout (owner only)
+ */
+export const claimPayerMutation = (options?: Partial<Options<ClaimPayerData>>): UseMutationOptions<ClaimPayerResponse, ClaimPayerError, Options<ClaimPayerData>> => {
+    const mutationOptions: UseMutationOptions<ClaimPayerResponse, ClaimPayerError, Options<ClaimPayerData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await claimPayer({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Become the payer by completing a setup Checkout (owner only)
+ */
+export const useClaimPayerMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<ClaimPayerResponse, ClaimPayerError, Options<ClaimPayerData>>, 'mutationFn'>>) => useMutation({ ...claimPayerMutation(), ...mutationOptions });
+
+export const adminListPlansQueryKey = (options?: Options<AdminListPlansData>) => createQueryKey('adminListPlans', options);
+
+/**
+ * List plans (admin)
+ */
+export const adminListPlansOptions = (options?: Options<AdminListPlansData>) => queryOptions<AdminListPlansResponse, AdminListPlansError, AdminListPlansResponse, ReturnType<typeof adminListPlansQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await adminListPlans({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: adminListPlansQueryKey(options)
+});
+
+/**
+ * List plans (admin)
+ */
+export const useAdminListPlansQuery = (options?: Options<AdminListPlansData>) => useQuery(adminListPlansOptions(options));
+
+/**
+ * Update plan features and limits (admin)
+ */
+export const adminUpdatePlanMutation = (options?: Partial<Options<AdminUpdatePlanData>>): UseMutationOptions<AdminUpdatePlanResponse, AdminUpdatePlanError, Options<AdminUpdatePlanData>> => {
+    const mutationOptions: UseMutationOptions<AdminUpdatePlanResponse, AdminUpdatePlanError, Options<AdminUpdatePlanData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await adminUpdatePlan({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update plan features and limits (admin)
+ */
+export const useAdminUpdatePlanMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminUpdatePlanResponse, AdminUpdatePlanError, Options<AdminUpdatePlanData>>, 'mutationFn'>>) => useMutation({ ...adminUpdatePlanMutation(), ...mutationOptions });
+
+export const adminGetPolicyQueryKey = (options?: Options<AdminGetPolicyData>) => createQueryKey('adminGetPolicy', options);
+
+/**
+ * Get billing policy (admin)
+ */
+export const adminGetPolicyOptions = (options?: Options<AdminGetPolicyData>) => queryOptions<AdminGetPolicyResponse, AdminGetPolicyError, AdminGetPolicyResponse, ReturnType<typeof adminGetPolicyQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await adminGetPolicy({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: adminGetPolicyQueryKey(options)
+});
+
+/**
+ * Get billing policy (admin)
+ */
+export const useAdminGetPolicyQuery = (options?: Options<AdminGetPolicyData>) => useQuery(adminGetPolicyOptions(options));
+
+/**
+ * Update billing policy (admin)
+ */
+export const adminUpdatePolicyMutation = (options?: Partial<Options<AdminUpdatePolicyData>>): UseMutationOptions<AdminUpdatePolicyResponse, AdminUpdatePolicyError, Options<AdminUpdatePolicyData>> => {
+    const mutationOptions: UseMutationOptions<AdminUpdatePolicyResponse, AdminUpdatePolicyError, Options<AdminUpdatePolicyData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await adminUpdatePolicy({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update billing policy (admin)
+ */
+export const useAdminUpdatePolicyMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminUpdatePolicyResponse, AdminUpdatePolicyError, Options<AdminUpdatePolicyData>>, 'mutationFn'>>) => useMutation({ ...adminUpdatePolicyMutation(), ...mutationOptions });
+
+export const adminListPricesQueryKey = (options?: Options<AdminListPricesData>) => createQueryKey('adminListPrices', options);
+
+/**
+ * List all prices including archived (admin)
+ */
+export const adminListPricesOptions = (options?: Options<AdminListPricesData>) => queryOptions<AdminListPricesResponse, AdminListPricesError, AdminListPricesResponse, ReturnType<typeof adminListPricesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await adminListPrices({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: adminListPricesQueryKey(options)
+});
+
+/**
+ * List all prices including archived (admin)
+ */
+export const useAdminListPricesQuery = (options?: Options<AdminListPricesData>) => useQuery(adminListPricesOptions(options));
+
+/**
+ * Create a price, replacing the active one for the same plan and interval (admin)
+ */
+export const adminCreatePriceMutation = (options?: Partial<Options<AdminCreatePriceData>>): UseMutationOptions<AdminCreatePriceResponse, AdminCreatePriceError, Options<AdminCreatePriceData>> => {
+    const mutationOptions: UseMutationOptions<AdminCreatePriceResponse, AdminCreatePriceError, Options<AdminCreatePriceData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await adminCreatePrice({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Create a price, replacing the active one for the same plan and interval (admin)
+ */
+export const useAdminCreatePriceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminCreatePriceResponse, AdminCreatePriceError, Options<AdminCreatePriceData>>, 'mutationFn'>>) => useMutation({ ...adminCreatePriceMutation(), ...mutationOptions });
+
+/**
+ * Archive a price (admin)
+ */
+export const adminArchivePriceMutation = (options?: Partial<Options<AdminArchivePriceData>>): UseMutationOptions<AdminArchivePriceResponse, AdminArchivePriceError, Options<AdminArchivePriceData>> => {
+    const mutationOptions: UseMutationOptions<AdminArchivePriceResponse, AdminArchivePriceError, Options<AdminArchivePriceData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await adminArchivePrice({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Archive a price (admin)
+ */
+export const useAdminArchivePriceMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<AdminArchivePriceResponse, AdminArchivePriceError, Options<AdminArchivePriceData>>, 'mutationFn'>>) => useMutation({ ...adminArchivePriceMutation(), ...mutationOptions });
+
+/**
+ * Stripe webhook endpoint (signature verified against the raw body)
+ */
+export const stripeWebhookMutation = (options?: Partial<Options<StripeWebhookData>>): UseMutationOptions<StripeWebhookResponse, StripeWebhookError, Options<StripeWebhookData>> => {
+    const mutationOptions: UseMutationOptions<StripeWebhookResponse, StripeWebhookError, Options<StripeWebhookData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await stripeWebhook({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Stripe webhook endpoint (signature verified against the raw body)
+ */
+export const useStripeWebhookMutation = (mutationOptions?: Partial<Omit<UseMutationOptions<StripeWebhookResponse, StripeWebhookError, Options<StripeWebhookData>>, 'mutationFn'>>) => useMutation({ ...stripeWebhookMutation(), ...mutationOptions });

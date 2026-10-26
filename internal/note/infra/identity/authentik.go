@@ -52,7 +52,7 @@ func NewAuthentik(
 	client := api.NewAPIClient(authentikCfg)
 	return &Authentik{
 		client: client,
-		token:  cfg.Token,
+		token:  cfg.Token.Reveal(),
 	}
 }
 

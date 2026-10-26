@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package billing;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+service BillingService {
+  rpc GetWorkspaceEntitlements(GetWorkspaceEntitlementsRequest) returns (GetWorkspaceEntitlementsResponse);
+  rpc BatchGetWorkspaceEntitlements(BatchGetWorkspaceEntitlementsRequest) returns (BatchGetWorkspaceEntitlementsResponse);
+  rpc GetWorkspacePayer(GetWorkspacePayerRequest) returns (GetWorkspacePayerResponse);
+  rpc ListPlans(ListPlansRequest) returns (ListPlansResponse);
+}
+
+enum PlanTier {
+  PLAN_TIER_UNSPECIFIED = 0;
+  PLAN_TIER_FREE = 1;
+  PLAN_TIER_PLUS = 2;
+  PLAN_TIER_PRO = 3;
+}
+
+enum SubscriptionStatus {
+  SUBSCRIPTION_STATUS_UNSPECIFIED = 0;
+  SUBSCRIPTION_STATUS_NONE = 1;
+  SUBSCRIPTION_STATUS_INCOMPLETE = 2;
+  SUBSCRIPTION_STATUS_ACTIVE = 3;
+  SUBSCRIPTION_STATUS_PAST_DUE = 4;
+  SUBSCRIPTION_STATUS_UNPAID = 5;
+  SUBSCRIPTION_STATUS_CANCELED = 6;
+  SUBSCRIPTION_STATUS_INCOMPLETE_EXPIRED = 7;
+}
+
+// features/limits stay string-keyed (proto map keys cannot be enums): keys are FeatureKey/LimitKey names.
+message Entitlements {
+  string workspace_id = 1;
+  PlanTier plan = 2 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  SubscriptionStatus status = 3 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  optional google.protobuf.Timestamp access_until = 4;
+  map<string, bool> features = 5;
+  map<string, int64> limits = 6;
+}
+
+message GetWorkspaceEntitlementsRequest {
+  string workspace_id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message GetWorkspaceEntitlementsResponse {
+  Entitlements entitlements = 1;
+}
+
+message BatchGetWorkspaceEntitlementsRequest {
+  repeated string workspace_ids = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 500
+    items: {
+      string: {uuid: true}
+    }
+  }];
+}
+
+message BatchGetWorkspaceEntitlementsResponse {
+  map<string, Entitlements> entitlements = 1;
+}
+
+message GetWorkspacePayerRequest {
+  string workspace_id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message GetWorkspacePayerResponse {
+  optional string payer_id = 1;
+  bool requires_payer = 2;
+}
+
+message BillingPlan {
+  PlanTier tier = 1 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  map<string, bool> features = 2;
+  map<string, int64> limits = 3;
+}
+
+message ListPlansRequest {}
+
+message ListPlansResponse {
+  repeated BillingPlan plans = 1;
+}

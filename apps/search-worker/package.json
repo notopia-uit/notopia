@@ -2,9 +2,9 @@
   "name": "@notopia-uit/search-worker",
   "private": true,
   "scripts": {
-    "config": "tsx ./seed/config.ts",
     "seed": "tsx ./seed/seed.ts",
-    "seed:transform": "tsx ./seed/transform.ts"
+    "fixtures": "tsx ./fixtures/fixtures.ts",
+    "fixtures:transform": "tsx ./fixtures/transform.ts"
   },
   "dependencies": {
     "@blocknote/core": "catalog:",
@@ -23,8 +23,10 @@
     "@opentelemetry/sdk-node": "catalog:",
     "@opentelemetry/semantic-conventions": "catalog:",
     "express": "catalog:",
+    "ioredis": "catalog:",
     "jsdom": "catalog:",
     "kafkajs": "catalog:",
+    "lru-cache": "catalog:",
     "markdown-to-txt": "catalog:",
     "meilisearch": "catalog:",
     "nestjs-otel": "catalog:",
@@ -37,8 +39,10 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@d2t/vitest-ctrf-json-reporter": "catalog:",
     "@nestjs/testing": "catalog:",
     "@types/express": "catalog:",
+    "unplugin-swc": "catalog:",
     "uuid": "catalog:",
     "webpack-node-externals": "catalog:"
   }

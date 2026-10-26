@@ -84,11 +84,11 @@
     },
     "lint": {
       "executor": "nx:run-commands",
+      "inputs": ["default", "goLint"],
       "options": {
         "command": "golangci-lint run ./cmd/authorization/... ./internal/authorization/...",
         "cwd": "{workspaceRoot}"
       },
-      "cache": false,
       "parallelism": false
     },
     "gen": {

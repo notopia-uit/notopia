@@ -14,8 +14,7 @@ properties:
     type: string
 
   icon:
-    type: string
-    nullable: true
+    type: [string, "null"]
 
   folderId:
     type: string
@@ -24,10 +23,10 @@ properties:
   folderName:
     type: string
 
-  # This should be nullable, but oapi codegen cannot
-  # So, we decided to not make it required instead
   trashed:
-    $ref: ../../../note/components/schemas/Trashed.yaml
+    oneOf:
+      - $ref: ../../../note/components/schemas/Trashed.yaml
+      - type: "null"
 
   updatedAt:
     type: string
@@ -40,4 +39,5 @@ required:
   - icon
   - folderId
   - folderName
+  - trashed
   - updatedAt

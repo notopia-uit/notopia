@@ -44,16 +44,16 @@ get:
           name:
             type: string
             enum: [asc, desc]
-            example: asc
+            examples: [asc]
             default: asc
           createdAt:
             type: string
             enum: [asc, desc]
-            example: asc
+            examples: [asc]
           updatedAt:
             type: string
             enum: [asc, desc]
-            example: asc
+            examples: [asc]
   responses:
     200:
       description: OK
