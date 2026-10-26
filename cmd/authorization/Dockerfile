@@ -9,7 +9,7 @@ RUN CGO_ENABLED=0 \
   -o authorization \
   ./cmd/authorization
 
-FROM alpine:3.23 AS final
+FROM alpine:3.24 AS final
 WORKDIR /app
 COPY --from=builder /app/authorization .
 EXPOSE 8089 18089 28089
