@@ -88,7 +88,7 @@ catalog:
   eslint-plugin-better-tailwindcss: "^4.7.0"
   express: "^5.2.1"
   google-protobuf: "~4.0.2"
-  ioredis: "5.11.1"
+  ioredis: "6.0.0"
   jose: "^6.2.3"
   jsdom: "^29.1.1"
   kafkajs: "^2.2.4"
