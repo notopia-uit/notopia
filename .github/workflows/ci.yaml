@@ -206,7 +206,7 @@ jobs:
           node-version-file: .tool-versions
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: .tool-versions
           cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
@@ -400,7 +400,7 @@ jobs:
           node-version-file: .tool-versions
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: .tool-versions
           cache: true
