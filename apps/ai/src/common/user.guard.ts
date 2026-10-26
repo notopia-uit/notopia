@@ -7,15 +7,15 @@ export abstract class UserGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const headers = context.switchToHttp().getRequest().headers as Record<string, unknown>;
 
-    const id = headers['x-forwarded-id'] as string | undefined;
+    const id = headers['x-forwarded-id'];
 
-    if (!id) {
+    if (typeof id !== 'string' || !id.trim() || id.length > 200) {
       this.throwException('Missing Gateway Headers');
       return false;
     }
 
     const parseHeaderList = (header?: string): string[] => {
-      if (!header) return [];
+      if (typeof header !== 'string' || !header) return [];
       const cleaned = header.replace(/^\[|\]$/g, '').trim();
       return cleaned === '' ? [] : cleaned.split(/\s+/);
     };

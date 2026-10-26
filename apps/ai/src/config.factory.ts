@@ -7,6 +7,7 @@ import {
   llmConfigSchema,
   ServicesConfig,
   servicesConfigSchema,
+  usageConfigSchema,
 } from './config';
 
 export const APP_CONFIG = Symbol('APP_CONFIG');
@@ -39,7 +40,20 @@ export const servicesConfig = registerAs(SERVICES_CONFIG, () =>
   servicesConfigSchema.parse({
     noteGrpcUrl: process.env.NOTOPIA_AI_SERVICES_NOTE_GRPC_URL!,
     authorizationGrpcUrl: process.env.NOTOPIA_AI_SERVICES_AUTHORIZATION_GRPC_URL!,
+    billingGrpcUrl: process.env.NOTOPIA_AI_SERVICES_BILLING_GRPC_URL!,
     meiliHost: process.env.NOTOPIA_AI_MEILI_HOST!,
     meiliApiKey: process.env.NOTOPIA_AI_MEILI_API_KEY ?? '',
   } satisfies ServicesConfig)
+);
+
+export const USAGE_CONFIG = Symbol('USAGE_CONFIG');
+export const usageConfig = registerAs(USAGE_CONFIG, () =>
+  usageConfigSchema.parse({
+    redisUrl: process.env.NOTOPIA_AI_REDIS_URL || undefined,
+    requestsPerMinute: Number(process.env.NOTOPIA_AI_REQUESTS_PER_MINUTE ?? 20),
+    concurrentStreams: Number(process.env.NOTOPIA_AI_CONCURRENT_STREAMS ?? 2),
+    timeoutMs: Number(process.env.NOTOPIA_AI_TIMEOUT_MS ?? 120000),
+    maxOutputTokens: Number(process.env.NOTOPIA_AI_MAX_OUTPUT_TOKENS ?? 4096),
+    maxSteps: Number(process.env.NOTOPIA_AI_MAX_STEPS ?? 10),
+  })
 );

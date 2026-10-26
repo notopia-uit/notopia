@@ -24,13 +24,11 @@ export default function Editor({
   noteId,
   workspaceId,
   onNavigate,
-  aiApiUrl,
   apiUrl,
 }: {
   noteId: string;
   workspaceId?: string;
   onNavigate: (href: string) => void;
-  aiApiUrl: string;
   apiUrl: string;
 }) {
   const { data: sessionData } = getAuthClient().useSession();
@@ -81,7 +79,6 @@ export default function Editor({
           sessionUser={sessionUser}
           noteId={noteId}
           isViewer={isViewer}
-          aiApiUrl={aiApiUrl}
           apiUrl={apiUrl}
           onEditorReady={setEditorInstance}
         />
@@ -89,15 +86,12 @@ export default function Editor({
 
       {editorInstance && <TableOfContents editor={editorInstance} />}
 
-      {isModified && (
+      {!isViewer && (isModified || isCommitingDocument) && (
         <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-10 left-1/2 -translate-x-1/2 duration-300">
-          {isCommitingDocument ? (
-            <Spinner />
-          ) : (
-            <Button variant="outline" size="icon" aria-label="save" onClick={handleSave}>
-              <Icons.Save />
-            </Button>
-          )}
+          <Button variant="outline" onClick={handleSave} disabled={isCommitingDocument}>
+            {isCommitingDocument ? <Spinner /> : <Icons.Save />}
+            {isCommitingDocument ? 'Committing…' : 'Commit changes'}
+          </Button>
         </div>
       )}
     </div>

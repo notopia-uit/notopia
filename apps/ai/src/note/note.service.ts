@@ -2,7 +2,7 @@ import { status } from '@grpc/grpc-js';
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import type { ClientGrpc } from '@nestjs/microservices';
 import { NOTE_PACKAGE_NAME, NOTE_SERVICE_NAME, type NoteServiceClient } from '@notopia-uit/pb/note';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout } from 'rxjs';
 
 import { isGrpcError } from '#/common';
 
@@ -24,6 +24,13 @@ export class NoteService implements OnModuleInit {
     this.client = this.grpc.getService<NoteServiceClient>(NOTE_SERVICE_NAME);
   }
 
+  async getNoteWorkspace(userId: string, noteId: string) {
+    const response = await firstValueFrom(
+      this.client.getWorkspaceByNote({ userId, noteId }).pipe(timeout(5000))
+    );
+    return response.workspace;
+  }
+
   async getNote({
     userId,
     noteId,
@@ -34,7 +41,7 @@ export class NoteService implements OnModuleInit {
     this.logger.debug({ noteId }, 'Fetching note for tool call');
     try {
       const response = await firstValueFrom(
-        this.client.getNote({ id: noteId, userId, excludeTrashed: true })
+        this.client.getNote({ id: noteId, userId, excludeTrashed: true }).pipe(timeout(5000))
       );
       const note = response.note;
       if (!note) {

@@ -28,14 +28,14 @@ import {
 } from '@notopia-uit/ui/block-note';
 import { getMenuItemsWithState } from '@notopia-uit/ui/block-note/menu-states';
 import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
+import { useAiTransport } from '@notopia-uit/ui/hooks/use-ai-transport';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { uploadDocumentAttachment } from '@notopia-uit/ui/lib/actions/upload';
-import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
-import { DefaultChatTransport } from 'ai';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { forwardRef, useMemo, useCallback, useEffect } from 'react';
 
+import { EditorAiError } from './editor-ai-error';
 import { NoteSuggestionMenu } from './note-suggestion-menu';
 import { Avatar, AvatarImage, AvatarFallback } from './shadcn/avatar';
 import { Badge } from './shadcn/badge';
@@ -49,7 +49,6 @@ interface EditorCoreProps {
   };
   noteId: string;
   isViewer?: boolean;
-  aiApiUrl: string;
   apiUrl: string;
   onEditorReady?: (editor: MyEditor) => void;
 }
@@ -129,11 +128,12 @@ function EditorStatusBar() {
 }
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
-  { sessionUser, noteId, isViewer, aiApiUrl, apiUrl, onEditorReady },
+  { sessionUser, noteId, isViewer, apiUrl, onEditorReady },
   ref
 ) {
   const { resolvedTheme } = useTheme();
-  const mySchema = useMemo(() => createBlockNoteSchema({ apiUrl, aiApiUrl }), [apiUrl, aiApiUrl]);
+  const mySchema = useMemo(() => createBlockNoteSchema({ apiUrl }), [apiUrl]);
+  const transport = useAiTransport({ noteId });
   const provider = useHocuspocusProvider();
   const meilisearchClient = useMeilisearch();
 
@@ -168,12 +168,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
       },
       extensions: [
         AIExtension({
-          transport: new DefaultChatTransport({
-            api: aiApiUrl,
-            headers: async () => ({
-              Authorization: `Bearer ${await fetchAccessTokenClientSide()}`,
-            }),
-          }),
+          transport,
         }),
       ],
       uploadFile,
@@ -261,6 +256,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
   return (
     <>
       <EditorStatusBar />
+      <EditorAiError editor={editor} />
       <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'} editable={!isViewer}>
         <AIMenuController />
 

@@ -18,14 +18,12 @@ function ReferencePreview({
   open,
   onOpenChange,
   previewWsUrl,
-  aiApiUrl,
   apiUrl,
 }: {
   noteId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   previewWsUrl: string;
-  aiApiUrl: string;
   apiUrl: string;
 }) {
   const { data: sessionData } = getAuthClient().useSession();
@@ -60,10 +58,10 @@ function ReferencePreview({
             <HocuspocusProviderWebsocketComponent url={previewWsUrl}>
               <HocuspocusRoom name={noteId} token={token}>
                 <EditorCore
+                  key={noteId}
                   sessionUser={sessionUser}
                   noteId={noteId}
                   isViewer={true}
-                  aiApiUrl={aiApiUrl}
                   apiUrl={apiUrl}
                 />
               </HocuspocusRoom>
@@ -82,12 +80,10 @@ function ReferencePreview({
 const ReferenceLink = ({
   noteId,
   previewWsUrl,
-  aiApiUrl,
   apiUrl,
 }: {
   noteId: string;
   previewWsUrl: string;
-  aiApiUrl: string;
   apiUrl: string;
 }) => {
   const {
@@ -119,7 +115,6 @@ const ReferenceLink = ({
         open={showPreview}
         onOpenChange={setShowPreview}
         previewWsUrl={previewWsUrl}
-        aiApiUrl={aiApiUrl}
         apiUrl={apiUrl}
       />
     </>
@@ -128,9 +123,8 @@ const ReferenceLink = ({
 
 export function createBlockNoteReferenceSpec(options: {
   apiUrl: string;
-  aiApiUrl: string;
 }): ReferenceInlineContentSpec {
-  const { apiUrl, aiApiUrl } = options;
+  const { apiUrl } = options;
   const previewWsUrl = `ws://${apiUrl}/document/ws/document`;
 
   return createReactInlineContentSpec(ReferenceConfig, {
@@ -139,7 +133,6 @@ export function createBlockNoteReferenceSpec(options: {
         <ReferenceLink
           noteId={props.inlineContent.props.noteId}
           previewWsUrl={previewWsUrl}
-          aiApiUrl={aiApiUrl}
           apiUrl={apiUrl}
         />
       );

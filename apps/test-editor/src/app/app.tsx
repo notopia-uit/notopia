@@ -5,6 +5,7 @@ import { BlockNoteView } from '@blocknote/shadcn';
 import { HocuspocusProviderWebsocketComponent, HocuspocusRoom } from '@hocuspocus/provider-react';
 import { useHocuspocusProvider, useHocuspocusConnectionStatus } from '@hocuspocus/provider-react';
 import { createBlockNoteSchema } from '@notopia-uit/ui';
+import { AiProvider } from '@notopia-uit/ui/contexts/ai-context';
 import type { User } from 'oidc-client-ts';
 import { useMemo } from 'react';
 import { useAuth } from 'react-oidc-context';
@@ -23,7 +24,6 @@ function AuthenticatedEditor({ user }: { user: User }) {
     () =>
       createBlockNoteSchema({
         apiUrl: import.meta.env.VITE_API_URL ?? 'api.notopia.localhost',
-        aiApiUrl: import.meta.env.VITE_AI_API_URL ?? 'http://api.notopia.localhost/ai',
       }),
     []
   );
@@ -106,40 +106,42 @@ export function App() {
   }
 
   return (
-    <div>
-      <HocuspocusProviderWebsocketComponent url={hocuspocusUrl}>
-        <HocuspocusRoom
-          name={noteId}
-          token={auth.user.access_token}
-          onOpen={(data) => {
-            console.log('Room opened', data);
-          }}
-          onConnect={() => {
-            console.log('Connected to room');
-          }}
-          onDisconnect={(data) => {
-            console.log('Disconnected from room', data);
-          }}
-          onClose={(data) => {
-            console.log('Room closed', data);
-          }}
-          onAuthenticated={() => {
-            console.log('Authenticated');
-          }}
-          onSynced={(data) => {
-            console.log('Synced', data);
-          }}
-          onAuthenticationFailed={(data) => {
-            console.log('Authentication failed', data);
-          }}
-          onDestroy={() => {
-            console.log('Room destroyed');
-          }}
-        >
-          <AuthenticatedEditor user={auth.user} />
-        </HocuspocusRoom>
-      </HocuspocusProviderWebsocketComponent>
-    </div>
+    <AiProvider aiApiUrl={import.meta.env.VITE_AI_API_URL ?? 'http://api.notopia.localhost/ai'}>
+      <div>
+        <HocuspocusProviderWebsocketComponent url={hocuspocusUrl}>
+          <HocuspocusRoom
+            name={noteId}
+            token={auth.user.access_token}
+            onOpen={(data) => {
+              console.log('Room opened', data);
+            }}
+            onConnect={() => {
+              console.log('Connected to room');
+            }}
+            onDisconnect={(data) => {
+              console.log('Disconnected from room', data);
+            }}
+            onClose={(data) => {
+              console.log('Room closed', data);
+            }}
+            onAuthenticated={() => {
+              console.log('Authenticated');
+            }}
+            onSynced={(data) => {
+              console.log('Synced', data);
+            }}
+            onAuthenticationFailed={(data) => {
+              console.log('Authentication failed', data);
+            }}
+            onDestroy={() => {
+              console.log('Room destroyed');
+            }}
+          >
+            <AuthenticatedEditor user={auth.user} />
+          </HocuspocusRoom>
+        </HocuspocusProviderWebsocketComponent>
+      </div>
+    </AiProvider>
   );
 }
 

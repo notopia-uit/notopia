@@ -38,14 +38,24 @@ import { Popover, PopoverContent, PopoverTrigger } from '@notopia-uit/ui/compone
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { TooltipProvider } from '@notopia-uit/ui/components/shadcn/tooltip';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
+import { useAiTransport } from '@notopia-uit/ui/hooks/use-ai-transport';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
-import { fetchAccessTokenClientSide } from '@notopia-uit/ui/lib/get-access-token-client-side';
 import { useQuery } from '@tanstack/react-query';
-import type { UIMessage } from 'ai';
-import { DefaultChatTransport } from 'ai';
+import { isToolUIPart, getToolName, type UIMessage } from 'ai';
 import { BotMessageSquare, Check, FileText, StickyNote, X } from 'lucide-react';
 import { nanoid } from 'nanoid';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+
+import { Alert, AlertTitle, AlertDescription } from './shadcn/alert';
+import { Button } from './shadcn/button';
+
+const toolLabels: Record<string, string> = {
+  searchNotes: 'Search notes',
+  getNote: 'Read note details',
+  getNoteWorkspace: 'Check note workspace',
+  readIndexedNoteContent: 'Read committed note',
+  listWorkspaces: 'Find workspaces',
+};
 
 interface AttachedNote {
   noteId: string;
@@ -170,26 +180,17 @@ function NotePicker({
   );
 }
 
-export function AssistantView({
-  workspaceId,
-  aiApiUrl,
-}: {
-  workspaceId: string;
-  aiApiUrl: string;
-}) {
-  const transport = useMemo(
-    () =>
-      new DefaultChatTransport({
-        api: aiApiUrl,
-        headers: async () => ({
-          Authorization: `Bearer ${await fetchAccessTokenClientSide()}`,
-        }),
-      }),
-    [aiApiUrl]
-  );
-  const { messages, sendMessage, status, error } = useChat({ transport });
+export function AssistantView({ workspaceId }: { workspaceId: string }) {
+  const transport = useAiTransport({ workspaceId });
+  const { messages, sendMessage, status, error, stop, clearError } = useChat({
+    id: `workspace-assistant-${workspaceId}`,
+    transport,
+  });
   const isTyping = status === 'streaming' || status === 'submitted';
   const [input, setInput] = useState('');
+  const [lastPrompt, setLastPrompt] = useState<{ text: string; notes: AttachedNote[] } | null>(
+    null
+  );
   const [attachedNotes, setAttachedNotes] = useState<AttachedNote[]>([]);
 
   const toggleNote = (note: AttachedNote) => {
@@ -220,6 +221,8 @@ export function AssistantView({
         ...(text || context ? [{ type: 'text' as const, text: `${text}${context}` }] : []),
       ],
     };
+    setLastPrompt({ text, notes: attachedNotes });
+    clearError();
     void sendMessage(userMessage);
     setAttachedNotes([]);
     setInput('');
@@ -248,6 +251,27 @@ export function AssistantView({
                           </MessageResponse>
                         );
                       }
+                      if (isToolUIPart(part)) {
+                        const label = toolLabels[getToolName(part)] ?? 'Use workspace tool';
+                        const state =
+                          part.state === 'output-available'
+                            ? 'Complete'
+                            : part.state === 'output-error'
+                              ? 'Failed'
+                              : 'Working…';
+                        return (
+                          <div
+                            key={part.toolCallId}
+                            className="text-muted-foreground rounded-md border px-3 py-2 text-sm"
+                            role="status"
+                          >
+                            {label} · {state}
+                            {part.state === 'output-error' && (
+                              <p className="text-destructive mt-1">{part.errorText}</p>
+                            )}
+                          </div>
+                        );
+                      }
                       if (part.type === 'data-attached-note') {
                         const data = part.data as { noteId: string; name: string };
                         return (
@@ -270,7 +294,25 @@ export function AssistantView({
         <div className="mx-auto w-full max-w-3xl p-4">
           <PromptInput onSubmit={handleSubmit}>
             {error && (
-              <p className="text-destructive px-3 pt-2 text-sm">Request failed: {error.message}</p>
+              <Alert variant="destructive" className="mb-2">
+                <AlertTitle>AI request failed</AlertTitle>
+                <AlertDescription>{error.message}</AlertDescription>
+                {lastPrompt && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 w-fit"
+                    onClick={() => {
+                      setInput(lastPrompt.text);
+                      setAttachedNotes(lastPrompt.notes);
+                      clearError();
+                    }}
+                  >
+                    Edit prompt
+                  </Button>
+                )}
+              </Alert>
             )}
             <PromptInputHeader>
               {attachedNotes.length > 0 && (
@@ -289,6 +331,7 @@ export function AssistantView({
               <PromptInputTextarea
                 value={input}
                 onChange={(event) => setInput(event.currentTarget.value)}
+                aria-label="Message the workspace assistant"
                 placeholder="Ask about your notes…"
               />
             </PromptInputBody>
@@ -301,13 +344,15 @@ export function AssistantView({
                 />
               </PromptInputTools>
               <PromptInputSubmit
-                status={isTyping ? 'streaming' : 'ready'}
-                disabled={(!input.trim() && attachedNotes.length === 0) || isTyping}
+                status={status}
+                onStop={() => void stop()}
+                aria-label={isTyping ? 'Stop generating' : 'Send message'}
+                disabled={!isTyping && !input.trim() && attachedNotes.length === 0}
               />
             </PromptInputFooter>
           </PromptInput>
           <p className="text-muted-foreground mt-2 text-center text-xs">
-            Answers stream from the AI service; attached notes are sent as context.
+            The assistant can read committed notes. Recent edits may not appear until committed.
           </p>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { fetchAccessTokenServerSide } from '@lib/get-access-token';
 import { getMyWorkspacesOptions, getWorkspaceTreeOptions } from '@notopia-uit/api-gen/index';
+import { AiProvider } from '@notopia-uit/ui/contexts/ai-context';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@ui/components/shadcn/sidebar';
 import { ModeToggle } from '@ui/components/theme-mode-toggle';
@@ -17,6 +18,8 @@ interface WorkspaceLayoutProps {
 
 export default async function WorkspaceLayout({ children, params }: WorkspaceLayoutProps) {
   const { workspaceId } = await params;
+  const apiUrl = process.env.API_URL;
+  if (!apiUrl) throw new Error('API_URL is not set');
   const queryClient = getQueryClient();
 
   const { queryKey: getMyWorkspacesQueryKey, queryFn: getMyworkspacesQueryFn } =
@@ -45,26 +48,28 @@ export default async function WorkspaceLayout({ children, params }: WorkspaceLay
   }
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <WorkspaceContentWrapperWithNav
-        workspaceId={workspaceId}
-        meilisearchHost={process.env.MEILISEARCH_HOST}
-      >
-        <SidebarProvider defaultOpen={true}>
-          <WorkspaceSideBarWrapper currentWorkspaceId={workspaceId} />
-          <SidebarInset className="min-w-0">
-            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-              <div className="flex items-center gap-2 px-4">
-                <SidebarTrigger className="-ml-1" />
-              </div>
-              <div className="mr-4 ml-auto">
-                <ModeToggle />
-              </div>
-            </header>
-            <div>{children}</div>
-          </SidebarInset>
-        </SidebarProvider>
-      </WorkspaceContentWrapperWithNav>
-    </HydrationBoundary>
+    <AiProvider aiApiUrl={`http://${apiUrl}/ai`}>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <WorkspaceContentWrapperWithNav
+          workspaceId={workspaceId}
+          meilisearchHost={process.env.MEILISEARCH_HOST}
+        >
+          <SidebarProvider defaultOpen={true}>
+            <WorkspaceSideBarWrapper currentWorkspaceId={workspaceId} />
+            <SidebarInset className="min-w-0">
+              <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+                <div className="flex items-center gap-2 px-4">
+                  <SidebarTrigger className="-ml-1" />
+                </div>
+                <div className="mr-4 ml-auto">
+                  <ModeToggle />
+                </div>
+              </header>
+              <div>{children}</div>
+            </SidebarInset>
+          </SidebarProvider>
+        </WorkspaceContentWrapperWithNav>
+      </HydrationBoundary>
+    </AiProvider>
   );
 }

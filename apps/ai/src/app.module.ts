@@ -11,7 +11,14 @@ import pretty from 'pino-pretty';
 
 import { AiModule } from './ai/ai.module';
 import type { AppConfig, LlmConfig } from './config';
-import { APP_CONFIG, LLM_CONFIG, appConfig, llmConfig, servicesConfig } from './config.factory';
+import {
+  APP_CONFIG,
+  LLM_CONFIG,
+  appConfig,
+  llmConfig,
+  servicesConfig,
+  usageConfig,
+} from './config.factory';
 import { validate } from './env.validation';
 import { HealthController } from './health.controller';
 
@@ -20,7 +27,7 @@ import { HealthController } from './health.controller';
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
-      load: [appConfig, llmConfig, servicesConfig],
+      load: [appConfig, llmConfig, servicesConfig, usageConfig],
     }),
     OpenTelemetryModule.forRoot({
       metrics: {

@@ -18,12 +18,7 @@ export default async function NotePage({
     <div className="p-4">
       <HocuspocusProviderWebsocketComponent url={`ws://${apiUrl}/document/ws/document`}>
         <HocuspocusRoom name={noteId} token={token}>
-          <EditorBoundary
-            noteId={noteId}
-            workspaceId={workspaceId}
-            aiApiUrl={`http://${apiUrl}/ai`}
-            apiUrl={apiUrl}
-          />
+          <EditorBoundary noteId={noteId} workspaceId={workspaceId} apiUrl={apiUrl} />
         </HocuspocusRoom>
       </HocuspocusProviderWebsocketComponent>
     </div>

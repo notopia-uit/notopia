@@ -1,48 +1,31 @@
-# How to add custom tools
+# AI tools
 
-Custom tools live in `src/ai/tools/` and are merged with BlockNote's own
-document-editing tools on every chat request (`AiService.streamBlockNoteChat`).
+Tools live in `src/ai/tools/custom-tools.ts`. `createCustomTools` receives authenticated
+`userId`, the resolved billing `workspaceId`, service adapters, and the request abort signal.
+Never accept the acting user or billing workspace from model arguments.
 
-## Add a tool in 3 steps
+Existing tools:
 
-1. **Provide the data source** as a flat top-level NestJS module (`src/note/`,
-   `src/authorization/`, `src/search/` — never nested inside `src/ai/`).
-   Existing examples:
-   - `src/note/` — gRPC client for the note service, same pattern as
-     `apps/document/src/note/` (`ClientsModule.registerAsync` +
-     `ClientGrpc.getService(...)` + `firstValueFrom(...)`).
-   - `src/authorization/` — gRPC client for the authorization service.
-   - `src/search/` — plain `Meilisearch` HTTP client.
-2. **Declare the tool** in `src/ai/tools/custom-tools.ts` with `tool()` from
-   the `ai` package:
+| Tool | Data source |
+| --- | --- |
+| `listWorkspaces` | Authorization gRPC; general chat only |
+| `searchNotes` | Workspace-filtered Meilisearch, followed by live note checks |
+| `getNote` | User-aware note metadata gRPC; not document content |
+| `getNoteWorkspace` | User-aware note gRPC; restricted to the active workspace |
+| `readIndexedNoteContent` | Last committed search content, at most 20,000 characters, marked potentially stale |
 
-   ```ts
-   myTool: tool({
-     description: 'What it does, when the model should call it.',
-     inputSchema: z.object({
-       someId: z.string().describe('What this field is.'),
-     }),
-     execute: async ({ someId }) => deps.myClient.fetch({ userId: deps.userId, someId }),
-   }),
-   ```
+Use `tool()` from `ai`, bounded Zod schemas and the existing execution wrapper, which rechecks
+read permission and sanitizes failures. Return `null` for missing/trashed records. Check the
+note's live workspace before returning content; search data alone is not authoritative.
+New data sources belong in top-level NestJS modules. Internal service calls use existing
+gRPC contracts; adding a tool must not silently add dependencies on public REST endpoints.
 
-   Anything JSON-serializable returned from `execute` is sent back to the
-   model. Return `null` (not throw) for "not found" — throwing reads as a
-   system error to the model.
+The AI service merges server tools with the allowlisted BlockNote client editing tool.
+Only `applyDocumentOperations` definitions are accepted and only for users with write
+permission. These operations execute in the browser. Reuse BlockNote's exported integration
+rather than copying its internal implementation. Additional editor tools, live document reads,
+workspace trees and graphs require separate integration work when suitable contracts exist.
 
-3. **Thread dependencies through `CustomToolDeps`** (`userId` is already
-   there — the controller resolves it from `@ReqUser()` so tools always act
-   as the calling user).
-
-No registration step: `createCustomTools()` output is spread into `streamText`
-next to `toolDefinitionsToToolSet(...)`.
-
-## Rules worth knowing
-
-- `toolChoice` is `'auto'` (not `'required'`) so the model can pick BlockNote
-  tools, custom tools, or plain text. `stopWhen: stepCountIs(5)` lets it chain
-  calls (e.g. `searchNotes` → `getNote`) up to 5 steps.
-- Keep `execute` fast and scoped to the user: always pass `userId` into
-  downstream calls (gRPC `GetNote`, Meilisearch filters).
-- New external URL/key? Add it to `config.ts` (`servicesConfigSchema`) +
-  `env.validation.ts` + `.env`, following the existing `NOTOPIA_AI_*` names.
+Tool choice remains automatic. `NOTOPIA_AI_MAX_STEPS` bounds the server-side loop; all steps
+within one accepted generation consume one credit. A tool failure must not expose raw gRPC,
+Redis, search-provider or model-provider errors to the client/model. Log details server-side.
