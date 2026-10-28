@@ -17,7 +17,7 @@ sqlc = "1.31.1"
 java = "26.0.1"
 "npm:@kevinnitro/nx-cache-action" = { version = "0.1.1", allow_low_downloads = true }
 mockery = "3.8.1"
-d2 = "0.7.1"
+d2 = "0.9.0"
 python = "3.13.18"
 uv = "0.11.33"
 gotestsum = "1.13.0"
