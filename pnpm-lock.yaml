@@ -268,8 +268,8 @@ catalogs:
       specifier: ^11.2.7
       version: 11.2.8
     '@nestjs/typeorm':
-      specifier: ^11.0.3
-      version: 11.0.3
+      specifier: ^12.0.0
+      version: 12.0.2
     '@openapitools/openapi-generator-cli':
       specifier: 2.31.1
       version: 2.31.1
@@ -816,7 +816,7 @@ importers:
         version: 12.0.2(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)
       '@nestjs/typeorm':
         specifier: 'catalog:'
-        version: 11.0.3(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.2(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.20.0)(supports-color@8.1.1)(ts-node@10.9.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(@types/node@25.9.9)(@typescript/typescript6@6.0.2)))
+        version: 12.0.2(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.2(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.20.0)(supports-color@8.1.1)(ts-node@10.9.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(@types/node@25.9.9)(@typescript/typescript6@6.0.2)))
       '@notopia-uit/api-document-nestjs-server':
         specifier: 'workspace:'
         version: link:../../packages/api-document-nestjs-server
@@ -4195,8 +4195,9 @@ packages:
       '@nestjs/platform-express':
         optional: true
 
-  '@nestjs/typeorm@11.0.3':
-    resolution: {integrity: sha512-zJ+E5l7auVVA7c0PsvcMdyvRPKTUqU5s2ToYmOA2QEsXQ42qbUGtK4+1HlRfpHqBkCSXP+phiH4luvf9DyJNog==}
+  '@nestjs/typeorm@12.0.2':
+    resolution: {integrity: sha512-16b8s8mGkQdTH4i+dhhCwYkfuhWpLMdtuK82vOMjwa5ZpKYjFohU2jvbqkEJmx03fVO4HEpb0aw4VQXo+lxdKw==}
+    engines: {node: '>=20.19.0'}
     peerDependencies:
       '@nestjs/common': ^11.2.7
       '@nestjs/core': ^11.2.7
@@ -20767,7 +20768,7 @@ snapshots:
       '@nestjs/microservices': 11.2.8(@grpc/grpc-js@1.14.6)(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)(@nestjs/websockets@11.1.20)(ioredis@5.11.1(supports-color@8.1.1))(kafkajs@2.2.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express': 11.2.8(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)(supports-color@8.1.1)
 
-  '@nestjs/typeorm@11.0.3(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.2(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.20.0)(supports-color@8.1.1)(ts-node@10.9.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(@types/node@25.9.9)(@typescript/typescript6@6.0.2)))':
+  '@nestjs/typeorm@12.0.2(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@11.2.7)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@1.1.2(babel-plugin-macros@3.1.0)(ioredis@5.11.1(supports-color@8.1.1))(pg@8.20.0)(supports-color@8.1.1)(ts-node@10.9.2(@swc/core@1.15.47(@swc/helpers@0.5.23))(@types/node@25.9.9)(@typescript/typescript6@6.0.2)))':
     dependencies:
       '@nestjs/common': 11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/core': 11.2.7(@nestjs/common@11.2.7(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@11.2.8)(@nestjs/platform-express@11.2.8)(@nestjs/websockets@11.1.20)(reflect-metadata@0.2.2)(rxjs@7.8.2)
