@@ -49,7 +49,7 @@ export const servicesConfig = registerAs(SERVICES_CONFIG, () =>
 export const USAGE_CONFIG = Symbol('USAGE_CONFIG');
 export const usageConfig = registerAs(USAGE_CONFIG, () =>
   usageConfigSchema.parse({
-    redisUrl: process.env.NOTOPIA_AI_REDIS_URL || undefined,
+    redisUrl: process.env.NOTOPIA_AI_REDIS_URL!,
     requestsPerMinute: Number(process.env.NOTOPIA_AI_REQUESTS_PER_MINUTE ?? 20),
     concurrentStreams: Number(process.env.NOTOPIA_AI_CONCURRENT_STREAMS ?? 2),
     timeoutMs: Number(process.env.NOTOPIA_AI_TIMEOUT_MS ?? 120000),

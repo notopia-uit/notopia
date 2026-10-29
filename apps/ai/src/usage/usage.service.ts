@@ -21,28 +21,39 @@ export function usagePeriod(now = new Date()) {
 @Injectable()
 export class UsageService implements OnModuleDestroy {
   private readonly logger = new Logger(UsageService.name);
-  private readonly redis?: Redis;
+  private readonly redis: Redis;
 
   constructor(@Inject(usageConfig.KEY) private readonly config: ConfigType<typeof usageConfig>) {
-    if (config.redisUrl) {
-      this.redis = new Redis(config.redisUrl, {
-        connectTimeout: 3000,
-        commandTimeout: 5000,
-        maxRetriesPerRequest: 1,
-        enableOfflineQueue: false,
-        autoResendUnfulfilledCommands: false,
-      });
-      this.redis.on('error', (error) => this.logger.error({ err: error }, 'AI Redis unavailable'));
-    }
+    this.redis = new Redis(config.redisUrl, {
+      connectTimeout: 3000,
+      commandTimeout: 5000,
+      maxRetriesPerRequest: 1,
+      enableOfflineQueue: false,
+      autoResendUnfulfilledCommands: false,
+    });
+    this.redis.on('error', (error) => this.logger.error({ err: error }, 'AI Redis unavailable'));
   }
 
   onModuleDestroy() {
-    this.redis?.disconnect();
+    this.redis.disconnect();
+  }
+
+  async pingRedis(timeoutMs = 750): Promise<void> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([
+        this.redis.ping(),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => reject(new Error('Redis ping timed out')), timeoutMs);
+        }),
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
   }
 
   private async eval(script: string, keys: string[], args: (string | number)[]) {
     try {
-      if (!this.redis) throw new Error('NOTOPIA_AI_REDIS_URL is not configured');
       return await this.redis.eval(script, keys.length, ...keys, ...args);
     } catch (error) {
       this.logger.error({ err: error }, 'AI usage accounting unavailable');

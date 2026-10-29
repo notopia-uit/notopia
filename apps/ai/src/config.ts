@@ -24,7 +24,7 @@ export const servicesConfigSchema = z.object({
 export type ServicesConfig = z.infer<typeof servicesConfigSchema>;
 
 export const usageConfigSchema = z.object({
-  redisUrl: z.string().url().optional(),
+  redisUrl: z.string().url(),
   requestsPerMinute: z.number().int().positive().default(20),
   concurrentStreams: z.number().int().positive().default(2),
   timeoutMs: z.number().int().min(1000).max(600000).default(120000),

@@ -18,7 +18,8 @@ uses note, authorization and billing gRPC, Meilisearch, and Redis for shared acc
 ## Request flow and context
 
 Browser → Traefik JWT middleware → `POST /ai` → LLM → AI SDK SSE response.
-There is no web proxy. `GET /ai/health` remains unauthenticated.
+There is no web proxy. `GET /ai/health` (alias of `/live`) and
+`/ai/health/{live,startup,ready}` remain unauthenticated.
 
 Requests contain `messages`, optional BlockNote `toolDefinitions`, and context supplied as
 `workspaceId`, `noteId`, or `X-Workspace-Id`. Conflicting contexts are rejected. `noteId`
@@ -38,7 +39,10 @@ Billing owns subscriptions and resolves `ai_credits_monthly`. AI fetches it on e
 unlimited. Permission is checked before billing. Billing failure → 503
 `billingServiceUnavailable`; exhausted quota → 402 `planLimitExceeded` with the same
 `details` shape as note/document (`kind`, `key`, `current`, `max`, `requiredPlan`) and `resetAt`.
-Upgrade options come from billing's `ListPlans`, not hardcoded quota values.
+Upgrade options come from billing's `ListPlans`, not hardcoded quota values. `requiredPlan()`
+returns the cheapest tier whose live `ai_credits_monthly` exceeds the exhausted limit; it never
+invents a tier. A missing/invalid plan limit, or no tier above the current limit, fails closed
+with 503 `billingServiceUnavailable`.
 
 Policy: one credit per accepted generation, including server tool steps. Usage resets at
 00:00 UTC on the first of each calendar month, not the payment-provider renewal date (the
@@ -52,11 +56,13 @@ without another debit or replaying a response. Retry/regenerate with a new user 
 Requests must end with a user prompt; client tool-result-only continuation is not supported.
 BlockNote's streamed editor tools and server tool loops are supported within a generation.
 
-`NOTOPIA_AI_REDIS_URL` must point to a dedicated, persistent, **noeviction** Redis 6.2+.
-There is no in-memory fallback for quota accounting; missing/down Redis returns 503
-`aiUsageUnavailable`. The Lua scripts use multiple keys and require standalone Redis (not
-Redis Cluster). Counters/deduplication survive until seven days after the month resets;
-active stream leases expire after the bounded request timeout plus a grace period.
+`NOTOPIA_AI_REDIS_URL` is required: the service refuses to boot without it. It must point to a
+dedicated, persistent, **noeviction** Redis 6.2+. There is no in-memory fallback for quota
+accounting; a down Redis fails `/ai/health/ready` with 503 and returns 503 `aiUsageUnavailable`
+to requests. Liveness never checks Redis, so an outage drains traffic without restarting pods.
+The Lua scripts use multiple keys and require standalone Redis (not Redis Cluster).
+Counters/deduplication survive until seven days after the month resets; active stream leases
+expire after the bounded request timeout plus a grace period.
 Redis loss can lose usage history: persistence/backups are an operational requirement.
 
 ## Tools and errors

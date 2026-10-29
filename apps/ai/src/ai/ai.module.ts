@@ -12,6 +12,6 @@ import { AiService } from './ai.service';
   imports: [NoteModule, SearchModule, AuthorizationModule, BillingModule],
   controllers: [AiController],
   providers: [AiService, UsageService],
-  exports: [AiService],
+  exports: [AiService, UsageService],
 })
 export class AiModule {}

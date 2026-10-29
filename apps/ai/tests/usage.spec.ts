@@ -3,8 +3,9 @@ import { randomUUID } from 'node:crypto';
 import { Redis } from 'ioredis';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
+import { usageConfigSchema } from '../src/config';
 import { RELEASE, RESERVE, START, THROTTLE } from '../src/usage/usage.scripts';
-import { UsageService, usagePeriod } from '../src/usage/usage.service';
+import { usagePeriod } from '../src/usage/usage.service';
 
 it('uses UTC calendar months and keeps accounting through the reset grace period', () => {
   expect(usagePeriod(new Date('2026-12-31T23:59:59Z'))).toEqual({
@@ -13,20 +14,11 @@ it('uses UTC calendar months and keeps accounting through the reset grace period
     expiresAt: Date.parse('2027-01-08T00:00:00Z') / 1000,
   });
 });
-it('fails closed when shared accounting is not configured', async () => {
-  const service = new UsageService({
-    requestsPerMinute: 20,
-    concurrentStreams: 2,
-    timeoutMs: 1000,
-    maxOutputTokens: 10,
-    maxSteps: 1,
-  });
-  await expect(service.reserve(randomUUID(), 'user', 'message', 200)).rejects.toMatchObject({
-    status: 503,
-  });
-  await expect(service.reserve(randomUUID(), 'user', 'message', 0)).rejects.toMatchObject({
-    status: 402,
-  });
+it('requires shared accounting to be configured', () => {
+  expect(() => usageConfigSchema.parse({})).toThrow();
+  expect(usageConfigSchema.parse({ redisUrl: 'redis://127.0.0.1:6376' }).redisUrl).toBe(
+    'redis://127.0.0.1:6376'
+  );
 });
 
 describe.skipIf(!process.env.AI_TEST_REDIS_URL)('Redis atomic AI accounting', () => {

@@ -12,7 +12,7 @@ export const envSchema = z.object({
   NOTOPIA_AI_SERVICES_NOTE_GRPC_URL: z.string().default(''),
   NOTOPIA_AI_SERVICES_AUTHORIZATION_GRPC_URL: z.string().default(''),
   NOTOPIA_AI_SERVICES_BILLING_GRPC_URL: z.string().min(1),
-  NOTOPIA_AI_REDIS_URL: z.string().url().optional(),
+  NOTOPIA_AI_REDIS_URL: z.string().url(),
   NOTOPIA_AI_REQUESTS_PER_MINUTE: z.coerce.number().int().positive().default(20),
   NOTOPIA_AI_CONCURRENT_STREAMS: z.coerce.number().int().positive().default(2),
   NOTOPIA_AI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(600000).default(120000),

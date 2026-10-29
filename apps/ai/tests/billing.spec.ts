@@ -61,4 +61,28 @@ describe('AI billing integration', () => {
     expect(await service.requiredPlan(0)).toBe('plus');
     expect(await service.requiredPlan(200)).toBe('pro');
   });
+  it('skips a tier the billing service does not offer', async () => {
+    const { client, service } = setup({});
+    client.listPlans.mockReturnValue(
+      of({ plans: [{ tier: 3, limits: { ai_credits_monthly: 2000 } }] })
+    );
+    expect(await service.requiredPlan(0)).toBe('pro');
+  });
+  it.each([
+    { label: 'no plans', plans: [] },
+    { label: 'no higher plan', plans: [{ tier: 2, limits: { ai_credits_monthly: 200 } }] },
+  ])('fails closed when there is $label', async ({ plans }) => {
+    const { client, service } = setup({});
+    client.listPlans.mockReturnValue(of({ plans }));
+    await expect(service.requiredPlan(200)).rejects.toMatchObject({ status: 503 });
+  });
+  it.each([
+    { tier: 2, limits: {} },
+    { tier: 2, limits: { ai_credits_monthly: -2 } },
+    { tier: 2, limits: { ai_credits_monthly: '9007199254740993' } },
+  ])('rejects an unrecognised plan limit %#', async (plan) => {
+    const { client, service } = setup({});
+    client.listPlans.mockReturnValue(of({ plans: [plan] }));
+    await expect(service.requiredPlan(0)).rejects.toMatchObject({ status: 503 });
+  });
 });
