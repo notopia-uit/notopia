@@ -9,6 +9,7 @@ Existing tools:
 | Tool | Data source |
 | --- | --- |
 | `listWorkspaces` | Authorization gRPC; general chat only |
+| `openNoteForEditing` | Assistant-only browser handoff; live note/workspace/write authorization before exposing input |
 | `searchNotes` | Workspace-filtered Meilisearch, followed by live note checks |
 | `getNote` | User-aware note metadata gRPC; not document content |
 | `getNoteWorkspace` | User-aware note gRPC; restricted to the active workspace |

@@ -91,3 +91,13 @@ rejects duplicate generation IDs. Keep chat/editor state scoped to its workspace
 `nx test packages/ui` verifies transport context, BlockNote tool-body merging, SSE preservation,
 and readable HTTP errors. Commit actions remain separate from collaborative persistence:
 committing updates the content available to search and the assistant.
+
+Workspace note editing uses `useAssistantChat`, `AssistantRunner`, and one shared Chat.
+`AssistantEditorSession` gates execution on an authenticated, initially synced Hocuspocus
+room. The assistant transport sends server-issued continuation tokens and matching results,
+never replacement history. `AssistantAiBridge` uses BlockNote's exported full-document
+request/executor helpers and fork-based accept/reject; do not implement snapshot rollback.
+Its guarded, delay-free executors prevent queued operations from running after Stop/review.
+Resolve suggestions before another prompt or Commit. API/WebSocket URLs come from web props.
+The deterministic real-editor browser fixture lives in `tests/browser/`; setup and evidence
+limits are documented in `docs/ai/ASSISTANT_NOTE_EDITING.md`.

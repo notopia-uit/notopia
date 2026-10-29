@@ -70,6 +70,21 @@ Existing tests are under `apps/ai/tests/` and colocated UI `*.spec.ts`. Recheck 
 - [ ] Run the focused tests against real Redis; assert original usage tests still pass. Format and run `nx lint ai` and `nx typecheck ai`.
 - [ ] Commit only this task's changes: `feat(ai): track bounded assistant continuations`.
 
+## Implementation checkpoint — 2026-10-30
+
+Backend and frontend core are integrated. See `docs/ai/ASSISTANT_NOTE_EDITING.md` for
+the implemented flow, deterministic evidence, and remaining live-stack verification limits.
+
+- **Task 1 complete:** commit `e1ad05f` adds Redis task state, one-shot continuation tokens, fixed deadlines, cumulative step bounds, cancellation, and continuation leases without another credit debit.
+- **Tasks 2–4 implemented:** HTTP routing, authoritative continuation history, single-debit
+  admission, authorized buffered handoff, live target session, shared Chat/BlockNote bridge,
+  review and Commit UI. Integrated tasks share one wire/executor contract.
+- **Task 5 evidence:** independent review completed and three important findings fixed with
+  regression evidence. Real-browser scripted editing/rejection preserves collaborator changes.
+  AI/UI tests, typechecks, lint and AI/web builds ran. Redis and authenticated live-stack Commit
+  verification remain limited by local prerequisites. The unchecked checklist below records
+  the original evidence target, including scenarios that must not be inferred to have passed.
+
 ### Task 2: Authorized open-note handoff and resumable generation
 
 **Files:** Create `assistant-stream.ts`, `tools/open-note.ts`, `apps/ai/tests/assistant-stream.spec.ts`; modify AI DTO/controller/service/module, request/access/stream tests, and task types from Task 1.

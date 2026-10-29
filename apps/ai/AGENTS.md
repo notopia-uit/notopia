@@ -53,8 +53,12 @@ A crash or uncertain Redis write is conservatively not refunded automatically.
 
 Last user message IDs deduplicate requests per user/workspace/month. A duplicate returns 409
 without another debit or replaying a response. Retry/regenerate with a new user message ID.
-Requests must end with a user prompt; client tool-result-only continuation is not supported.
-BlockNote's streamed editor tools and server tool loops are supported within a generation.
+Initial requests must end with a user prompt. Workspace assistant requests opt in with
+`assistantMode: true`. Their tool-result continuations use `action: 'continue'`, a one-shot
+Redis token, and exactly the recorded tool results; replacement history is rejected.
+Continuations acquire rate/concurrency leases without another monthly debit or billing check.
+The original deadline and cumulative model-step budget remain fixed. `action: 'cancel'`
+invalidates a task between streams. See `docs/ai/ASSISTANT_NOTE_EDITING.md`.
 
 `NOTOPIA_AI_REDIS_URL` is required: the service refuses to boot without it. It must point to a
 dedicated, persistent, **noeviction** Redis 6.2+. There is no in-memory fallback for quota
