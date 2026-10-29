@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { AiService } from '../src/ai/ai.service';
 import type { BlockNoteChatBody } from '../src/ai/chat-request.dto';
 import { createCustomTools } from '../src/ai/tools/custom-tools';
+import { authorizeEditingTarget } from '../src/ai/tools/open-note';
 
 const workspaceId = '00000000-0000-4000-8000-000000000001';
 const other = '00000000-0000-4000-8000-000000000002';
@@ -39,6 +40,35 @@ const service = (deps: ReturnType<typeof makeDeps>) =>
 const options = { toolCallId: 'call', messages: [] };
 
 describe('AI workspace authorization', () => {
+  it('authorizes a live editing target in the current workspace', async () => {
+    expect(await authorizeEditingTarget(makeDeps() as any, noteId)).toBe(noteId);
+  });
+  it('rejects opening for viewers', async () => {
+    const deps = makeDeps();
+    deps.authorization.permissions.mockResolvedValue({ canRead: true, canWrite: false });
+    await expect(authorizeEditingTarget(deps as any, noteId)).rejects.toMatchObject({
+      status: 403,
+    });
+  });
+  it('rejects missing or trashed editing targets', async () => {
+    const deps = makeDeps();
+    deps.noteClient.getNote.mockResolvedValue(null);
+    await expect(authorizeEditingTarget(deps as any, noteId)).rejects.toMatchObject({
+      status: 404,
+    });
+  });
+  it('rejects cross-workspace editing targets', async () => {
+    const deps = makeDeps();
+    deps.noteClient.getNoteWorkspace.mockResolvedValue({ id: other });
+    await expect(authorizeEditingTarget(deps as any, noteId)).rejects.toMatchObject({
+      status: 403,
+    });
+  });
+  it('does not switch an existing task target', async () => {
+    await expect(authorizeEditingTarget(makeDeps() as any, noteId, other)).rejects.toMatchObject({
+      status: 409,
+    });
+  });
   it('uses the sole workspace for existing clients', async () => {
     const deps = makeDeps();
     expect(await service(deps).resolveWorkspace(body(), 'user')).toBe(workspaceId);

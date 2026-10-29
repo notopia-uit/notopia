@@ -17,7 +17,7 @@ import { AiError, AiExceptionFilter } from '#/common/ai-error';
 import { usageConfig } from '#/config.factory';
 
 import { AiService } from './ai.service';
-import { parseChatRequest } from './chat-request.dto';
+import { parseAiRequest } from './chat-request.dto';
 
 @Controller('ai')
 @UseFilters(AiExceptionFilter)
@@ -42,18 +42,16 @@ export class AiController {
     );
     const close = () => {
       clearTimeout(timer);
-      abort.abort();
+      if (!res.writableFinished) abort.abort();
     };
     res.once('close', close);
-    res.once('finish', close);
     try {
-      const body = await parseChatRequest(input);
-      const stream = await this.aiService.streamBlockNoteChat(
-        body,
-        user.id,
-        abort.signal,
-        workspaceId
-      );
+      const body = await parseAiRequest(input);
+      const stream = await this.aiService.streamRequest(body, user.id, abort.signal, workspaceId);
+      if (!stream) {
+        res.status(204).end();
+        return;
+      }
       if (abort.signal.aborted) {
         await stream.cancel();
         return;
@@ -62,8 +60,6 @@ export class AiController {
     } finally {
       clearTimeout(timer);
       res.off('close', close);
-      res.off('finish', close);
-      abort.abort();
     }
   }
 }

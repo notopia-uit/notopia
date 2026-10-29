@@ -1,5 +1,6 @@
 'use client';
 
+import type { Chat } from '@ai-sdk/react';
 import { BlockNoteEditor } from '@blocknote/core';
 import { MyEditor } from '@blocknote/core';
 import { en } from '@blocknote/core/locales';
@@ -31,6 +32,7 @@ import { useMeilisearch } from '@notopia-uit/ui/contexts/meilisearch-context';
 import { useAiTransport } from '@notopia-uit/ui/hooks/use-ai-transport';
 import { useSearchCache } from '@notopia-uit/ui/hooks/use-search-cache';
 import { uploadDocumentAttachment } from '@notopia-uit/ui/lib/actions/upload';
+import type { UIMessage } from 'ai';
 import { CloudCheck, CloudUpload, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { forwardRef, useMemo, useCallback, useEffect } from 'react';
@@ -51,6 +53,7 @@ interface EditorCoreProps {
   isViewer?: boolean;
   apiUrl: string;
   onEditorReady?: (editor: MyEditor) => void;
+  assistantChat?: Chat<UIMessage>;
 }
 
 function EditorStatusBar() {
@@ -128,7 +131,7 @@ function EditorStatusBar() {
 }
 
 export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(function EditorCore(
-  { sessionUser, noteId, isViewer, apiUrl, onEditorReady },
+  { sessionUser, noteId, isViewer, apiUrl, onEditorReady, assistantChat },
   ref
 ) {
   const { resolvedTheme } = useTheme();
@@ -167,9 +170,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
         ai: aiEn,
       },
       extensions: [
-        AIExtension({
-          transport,
-        }),
+        AIExtension(assistantChat ? { chatProvider: () => assistantChat } : { transport }),
       ],
       uploadFile,
       resolveFileUrl,
@@ -239,7 +240,10 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
 
   const handleSlashMenuSearch = useCallback(
     async (query: string) => {
-      const items = [...getAISlashMenuItems(editor), ...getDefaultReactSlashMenuItems(editor)];
+      const items = [
+        ...(assistantChat ? [] : getAISlashMenuItems(editor)),
+        ...getDefaultReactSlashMenuItems(editor),
+      ];
       const q = query.trim().toLowerCase();
       if (!q) {
         return items;
@@ -250,7 +254,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
           item.aliases?.some((alias) => alias.toLowerCase().includes(q))
       );
     },
-    [editor]
+    [editor, assistantChat]
   );
 
   return (
@@ -258,7 +262,7 @@ export const EditorCore = forwardRef<BlockNoteEditor | null, EditorCoreProps>(fu
       <EditorStatusBar />
       <EditorAiError editor={editor} />
       <BlockNoteView editor={editor} theme={resolvedTheme as 'light' | 'dark'} editable={!isViewer}>
-        <AIMenuController />
+        {!assistantChat && <AIMenuController />}
 
         <SuggestionMenuController triggerCharacter={'/'} getItems={handleSlashMenuSearch} />
 

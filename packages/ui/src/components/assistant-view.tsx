@@ -1,6 +1,5 @@
 'use client';
 
-import { useChat } from '@ai-sdk/react';
 import { getWorkspaceTreeOptions } from '@notopia-uit/api-gen';
 import type { NoteWorkspaceTreeFolder } from '@notopia-uit/api-gen';
 import {
@@ -38,16 +37,21 @@ import { Popover, PopoverContent, PopoverTrigger } from '@notopia-uit/ui/compone
 import { Spinner } from '@notopia-uit/ui/components/shadcn/spinner';
 import { TooltipProvider } from '@notopia-uit/ui/components/shadcn/tooltip';
 import { QueryErrorFallback } from '@notopia-uit/ui/hooks/query-error-fallback';
-import { useAiTransport } from '@notopia-uit/ui/hooks/use-ai-transport';
+import { useAssistantChat } from '@notopia-uit/ui/hooks/use-assistant-chat';
 import { useQueryErrorHandler } from '@notopia-uit/ui/hooks/use-query-error-handler';
 import { useQuery } from '@tanstack/react-query';
 import { isToolUIPart, getToolName, type UIMessage } from 'ai';
 import { BotMessageSquare, Check, FileText, StickyNote, X } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { useState } from 'react';
+import { lazy, Suspense, useCallback } from 'react';
 
 import { Alert, AlertTitle, AlertDescription } from './shadcn/alert';
 import { Button } from './shadcn/button';
+
+const AssistantNoteEditor = lazy(() =>
+  import('./assistant-note-editor').then((module) => ({ default: module.AssistantNoteEditor }))
+);
 
 const toolLabels: Record<string, string> = {
   searchNotes: 'Search notes',
@@ -55,6 +59,8 @@ const toolLabels: Record<string, string> = {
   getNoteWorkspace: 'Check note workspace',
   readIndexedNoteContent: 'Read committed note',
   listWorkspaces: 'Find workspaces',
+  openNoteForEditing: 'Open target note',
+  applyDocumentOperations: 'Edit live note',
 };
 
 interface AttachedNote {
@@ -180,13 +186,33 @@ function NotePicker({
   );
 }
 
-export function AssistantView({ workspaceId }: { workspaceId: string }) {
-  const transport = useAiTransport({ workspaceId });
-  const { messages, sendMessage, status, error, stop, clearError } = useChat({
-    id: `workspace-assistant-${workspaceId}`,
-    transport,
-  });
-  const isTyping = status === 'streaming' || status === 'submitted';
+export function AssistantView({
+  workspaceId,
+  apiUrl,
+  documentWsUrl,
+}: {
+  workspaceId: string;
+  apiUrl: string;
+  documentWsUrl: string;
+}) {
+  const {
+    messages,
+    error,
+    busy: isTyping,
+    review,
+    target,
+    session,
+    chat,
+    runner,
+  } = useAssistantChat(workspaceId);
+  const status = isTyping ? 'streaming' : error ? 'error' : 'ready';
+  const clearError = () => runner.clearError();
+  const editorError = useCallback(
+    (error: Error) => {
+      void runner.stop(error);
+    },
+    [runner]
+  );
   const [input, setInput] = useState('');
   const [lastPrompt, setLastPrompt] = useState<{ text: string; notes: AttachedNote[] } | null>(
     null
@@ -203,7 +229,7 @@ export function AssistantView({ workspaceId }: { workspaceId: string }) {
 
   const handleSubmit = (message: PromptInputMessage) => {
     const text = message.text.trim();
-    if ((!text && attachedNotes.length === 0) || isTyping) {
+    if ((!text && attachedNotes.length === 0) || isTyping || review) {
       return;
     }
     const context =
@@ -223,138 +249,170 @@ export function AssistantView({ workspaceId }: { workspaceId: string }) {
     };
     setLastPrompt({ text, notes: attachedNotes });
     clearError();
-    void sendMessage(userMessage);
+    void runner.submit(userMessage);
     setAttachedNotes([]);
     setInput('');
   };
 
   return (
     <TooltipProvider>
-      <div className="flex h-full min-h-0 flex-col">
-        <Conversation className="min-h-0 flex-1">
-          <ConversationContent>
-            {messages.length === 0 ? (
-              <ConversationEmptyState
-                icon={<BotMessageSquare className="size-12" />}
-                title="Ask your workspace"
-                description="Attach workspace notes, then ask."
-              />
-            ) : (
-              messages.map((message) => (
-                <Message from={message.role} key={message.id}>
-                  <MessageContent>
-                    {message.parts.map((part, index) => {
-                      if (part.type === 'text') {
-                        return (
-                          <MessageResponse key={`${message.id}-${index}`}>
-                            {part.text}
-                          </MessageResponse>
-                        );
-                      }
-                      if (isToolUIPart(part)) {
-                        const label = toolLabels[getToolName(part)] ?? 'Use workspace tool';
-                        const state =
-                          part.state === 'output-available'
-                            ? 'Complete'
-                            : part.state === 'output-error'
-                              ? 'Failed'
-                              : 'Working…';
-                        return (
-                          <div
-                            key={part.toolCallId}
-                            className="text-muted-foreground rounded-md border px-3 py-2 text-sm"
-                            role="status"
-                          >
-                            {label} · {state}
-                            {part.state === 'output-error' && (
-                              <p className="text-destructive mt-1">{part.errorText}</p>
-                            )}
-                          </div>
-                        );
-                      }
-                      if (part.type === 'data-attached-note') {
-                        const data = part.data as { noteId: string; name: string };
-                        return (
-                          <AttachedNoteChip
-                            key={`${message.id}-${index}`}
-                            note={{ noteId: data.noteId, name: data.name, folderPath: '' }}
-                          />
-                        );
-                      }
-                      return null;
-                    })}
-                  </MessageContent>
-                </Message>
-              ))
-            )}
-          </ConversationContent>
-          <ConversationScrollButton />
-        </Conversation>
-
-        <div className="mx-auto w-full max-w-3xl p-4">
-          <PromptInput onSubmit={handleSubmit}>
-            {error && (
-              <Alert variant="destructive" className="mb-2">
-                <AlertTitle>AI request failed</AlertTitle>
-                <AlertDescription>{error.message}</AlertDescription>
-                {lastPrompt && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="mt-2 w-fit"
-                    onClick={() => {
-                      setInput(lastPrompt.text);
-                      setAttachedNotes(lastPrompt.notes);
-                      clearError();
-                    }}
-                  >
-                    Edit prompt
-                  </Button>
-                )}
-              </Alert>
-            )}
-            <PromptInputHeader>
-              {attachedNotes.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 px-3 pt-2">
-                  {attachedNotes.map((note) => (
-                    <AttachedNoteChip
-                      key={note.noteId}
-                      note={note}
-                      onRemove={() => toggleNote(note)}
-                    />
-                  ))}
-                </div>
-              )}
-            </PromptInputHeader>
-            <PromptInputBody>
-              <PromptInputTextarea
-                value={input}
-                onChange={(event) => setInput(event.currentTarget.value)}
-                aria-label="Message the workspace assistant"
-                placeholder="Ask about your notes…"
-              />
-            </PromptInputBody>
-            <PromptInputFooter>
-              <PromptInputTools>
-                <NotePicker
-                  workspaceId={workspaceId}
-                  attached={attachedNotes}
-                  onToggle={toggleNote}
+      <div className="flex h-full min-h-0 flex-col lg:flex-row">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <Conversation className="min-h-0 flex-1">
+            <ConversationContent>
+              {messages.length === 0 ? (
+                <ConversationEmptyState
+                  icon={<BotMessageSquare className="size-12" />}
+                  title="Ask your workspace"
+                  description="Attach workspace notes, then ask."
                 />
-              </PromptInputTools>
-              <PromptInputSubmit
-                status={status}
-                onStop={() => void stop()}
-                aria-label={isTyping ? 'Stop generating' : 'Send message'}
-                disabled={!isTyping && !input.trim() && attachedNotes.length === 0}
-              />
-            </PromptInputFooter>
-          </PromptInput>
-          <p className="text-muted-foreground mt-2 text-center text-xs">
-            The assistant can read committed notes. Recent edits may not appear until committed.
-          </p>
+              ) : (
+                messages.map((message) => (
+                  <Message from={message.role} key={message.id}>
+                    <MessageContent>
+                      {message.parts.map((part, index) => {
+                        if (part.type === 'text') {
+                          return (
+                            <MessageResponse key={`${message.id}-${index}`}>
+                              {part.text}
+                            </MessageResponse>
+                          );
+                        }
+                        if (isToolUIPart(part)) {
+                          const label = toolLabels[getToolName(part)] ?? 'Use workspace tool';
+                          const state =
+                            part.state === 'output-available'
+                              ? 'Complete'
+                              : part.state === 'output-error'
+                                ? 'Failed'
+                                : 'Working…';
+                          return (
+                            <div
+                              key={part.toolCallId}
+                              className="text-muted-foreground rounded-md border px-3 py-2 text-sm"
+                              role="status"
+                            >
+                              {label} · {state}
+                              {part.state === 'output-error' && (
+                                <p className="text-destructive mt-1">{part.errorText}</p>
+                              )}
+                            </div>
+                          );
+                        }
+                        if (part.type === 'data-attached-note') {
+                          const data = part.data as { noteId: string; name: string };
+                          return (
+                            <AttachedNoteChip
+                              key={`${message.id}-${index}`}
+                              note={{ noteId: data.noteId, name: data.name, folderPath: '' }}
+                            />
+                          );
+                        }
+                        return null;
+                      })}
+                    </MessageContent>
+                  </Message>
+                ))
+              )}
+            </ConversationContent>
+            <ConversationScrollButton />
+          </Conversation>
+
+          <div className="mx-auto w-full max-w-3xl p-4">
+            <PromptInput onSubmit={handleSubmit}>
+              {error && (
+                <Alert variant="destructive" className="mb-2">
+                  <AlertTitle>AI request failed</AlertTitle>
+                  <AlertDescription>{error.message}</AlertDescription>
+                  {lastPrompt && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-2 w-fit"
+                      onClick={() => {
+                        setInput(lastPrompt.text);
+                        setAttachedNotes(lastPrompt.notes);
+                        clearError();
+                      }}
+                    >
+                      Edit prompt
+                    </Button>
+                  )}
+                </Alert>
+              )}
+              <PromptInputHeader>
+                {attachedNotes.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 px-3 pt-2">
+                    {attachedNotes.map((note) => (
+                      <AttachedNoteChip
+                        key={note.noteId}
+                        note={note}
+                        onRemove={() => toggleNote(note)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </PromptInputHeader>
+              <PromptInputBody>
+                <PromptInputTextarea
+                  value={input}
+                  onChange={(event) => setInput(event.currentTarget.value)}
+                  aria-label="Message the workspace assistant"
+                  placeholder="Ask about your notes…"
+                  disabled={review}
+                />
+              </PromptInputBody>
+              <PromptInputFooter>
+                <PromptInputTools>
+                  <NotePicker
+                    workspaceId={workspaceId}
+                    attached={attachedNotes}
+                    onToggle={toggleNote}
+                  />
+                </PromptInputTools>
+                <PromptInputSubmit
+                  status={status}
+                  onStop={() => void runner.stop()}
+                  aria-label={isTyping ? 'Stop generating' : 'Send message'}
+                  disabled={review || (!isTyping && !input.trim() && attachedNotes.length === 0)}
+                />
+              </PromptInputFooter>
+            </PromptInput>
+            <p className="text-muted-foreground mt-2 text-center text-xs">
+              {review
+                ? 'Accept or discard the current suggestions before sending another prompt.'
+                : 'Ask to find and edit a note. Other attached notes are references.'}
+            </p>
+          </div>
         </div>
+        {target && (
+          <aside className="h-1/2 min-h-64 min-w-0 border-t lg:h-full lg:w-1/2 lg:border-t-0 lg:border-l">
+            <Suspense
+              fallback={
+                <div className="p-4" role="status">
+                  Loading editor…
+                </div>
+              }
+            >
+              <AssistantNoteEditor
+                key={target.sessionId}
+                workspaceId={workspaceId}
+                apiUrl={apiUrl}
+                documentWsUrl={documentWsUrl}
+                target={target}
+                session={session}
+                chat={chat}
+                busy={isTyping}
+                review={review}
+                onAccept={() => runner.accept()}
+                onReject={() => runner.reject()}
+                onClose={() => runner.close()}
+                onError={editorError}
+              />
+            </Suspense>
+          </aside>
+        )}
       </div>
     </TooltipProvider>
   );

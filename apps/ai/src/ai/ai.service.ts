@@ -21,10 +21,15 @@ import { AiError } from '#/common/ai-error';
 import { llmConfig, usageConfig } from '#/config.factory';
 import { NoteService } from '#/note/note.service';
 import { SearchService } from '#/search/search.service';
+import { AssistantTaskService } from '#/usage/assistant-task.service';
 import { UsageService } from '#/usage/usage.service';
 
-import type { BlockNoteChatBody } from './chat-request.dto';
+import { applyAssistantResults } from './assistant-results';
+import { streamAssistantTask } from './assistant-stream';
+import type { AssistantTask } from './assistant-task.types';
+import type { AiRequestBody, BlockNoteChatBody } from './chat-request.dto';
 import { createCustomTools } from './tools/custom-tools';
+import { authorizeEditingTarget } from './tools/open-note';
 
 @Injectable()
 export class AiService {
@@ -37,8 +42,110 @@ export class AiService {
     private readonly search: SearchService,
     private readonly authorization: AuthorizationService,
     private readonly billing: BillingService,
-    private readonly usage: UsageService
+    private readonly usage: UsageService,
+    private readonly tasks: AssistantTaskService = new AssistantTaskService(usage)
   ) {}
+
+  async streamRequest(
+    body: AiRequestBody,
+    userId: string,
+    signal: AbortSignal,
+    headerWorkspace?: string
+  ): Promise<ReadableStream<UIMessageChunk> | null> {
+    if (!('action' in body) && !body.assistantMode) {
+      return this.streamBlockNoteChat(body, userId, signal, headerWorkspace);
+    }
+    if ('action' in body && body.action === 'cancel') {
+      if (headerWorkspace && headerWorkspace !== body.workspaceId)
+        throw new AiError(400, 'invalidWorkspace', 'Workspace contexts do not match.');
+      await this.tasks.finish({ userId, workspaceId: body.workspaceId }, body.taskId, 'cancelled');
+      return null;
+    }
+    let task: AssistantTask | undefined;
+    let release: (() => Promise<void>) | undefined;
+    let started = false;
+    try {
+      await this.usage.throttle(userId);
+      const workspaceId = await this.resolveWorkspace(
+        { ...body, messages: 'messages' in body ? body.messages : [] },
+        userId,
+        headerWorkspace
+      );
+      const deps = {
+        userId,
+        workspaceId,
+        noteClient: this.noteClient,
+        authorization: this.authorization,
+        search: this.search,
+        abortSignal: signal,
+      };
+      const { canWrite } = await this.authorization.permissions(userId, workspaceId);
+      if ('action' in body) {
+        task = await this.tasks.claim({ userId, workspaceId }, body.taskId, body.token);
+        task.messages = applyAssistantResults(task, body);
+        if (task.targetNoteId) await authorizeEditingTarget(deps, task.targetNoteId);
+        const lease = await this.usage.acquireContinuationLease(userId);
+        release = () => lease.release();
+      } else {
+        if (body.noteId) await authorizeEditingTarget(deps, body.noteId);
+        const credits = await this.billing.monthlyCredits(workspaceId);
+        const reservation = await this.usage.reserve(
+          workspaceId,
+          userId,
+          body.messages.at(-1)!.id,
+          credits
+        );
+        release = () => reservation.release(!started);
+        task = await this.tasks.create(
+          { userId, workspaceId },
+          body.messages.at(-1)!.id,
+          body.messages,
+          this.config
+        );
+        task.targetNoteId = body.noteId;
+        signal.throwIfAborted();
+        await reservation.start();
+        started = true;
+      }
+      const activeTask = task;
+      const tools: ToolSet = createCustomTools(deps);
+      delete tools.listWorkspaces;
+      if (task.targetNoteId)
+        Object.assign(
+          tools,
+          toolDefinitionsToToolSet(
+            (body.toolDefinitions as Parameters<typeof toolDefinitionsToToolSet>[0]) ?? {}
+          )
+        );
+      return await streamAssistantTask({
+        task,
+        tools,
+        signal,
+        canEdit: canWrite,
+        maxOutputTokens: this.config.maxOutputTokens,
+        model: createOpenAICompatible({
+          baseURL: this.llm.baseUrl,
+          apiKey: this.llm.apiKey,
+          name: 'llm',
+        })(this.llm.model),
+        authorize: (noteId, current) => authorizeEditingTarget(deps, noteId, current),
+        suspend: (messages, calls, target, steps) =>
+          this.tasks.suspend(activeTask.id, activeTask.revision, messages, calls, target, steps),
+        finish: (outcome) => this.tasks.finish(activeTask.owner, activeTask.id, outcome),
+        release,
+      });
+    } catch (error) {
+      if (task) {
+        try {
+          await this.tasks.finish(task.owner, task.id, 'failed');
+        } catch (finishError) {
+          this.logger.error({ err: finishError }, 'Failed to terminate assistant task');
+        }
+      }
+      await release?.();
+      throw error;
+    }
+  }
 
   async resolveWorkspace(body: BlockNoteChatBody, userId: string, headerWorkspace?: string) {
     if (headerWorkspace && !z.uuid().safeParse(headerWorkspace).success) {
