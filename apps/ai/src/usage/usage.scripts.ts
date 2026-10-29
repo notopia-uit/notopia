@@ -32,6 +32,19 @@ redis.call('ZREM', KEYS[3], ARGV[1])
 return 1
 `;
 
+export const CONTINUATION_LEASE = `
+local now = tonumber(ARGV[1])
+redis.call('ZREMRANGEBYSCORE', KEYS[1], '-inf', now)
+if redis.call('ZCARD', KEYS[1]) >= tonumber(ARGV[2]) then return 'concurrency' end
+if tonumber(redis.call('GET', KEYS[2]) or '0') >= tonumber(ARGV[3]) then return 'rate' end
+redis.call('ZADD', KEYS[1], now + tonumber(ARGV[4]), ARGV[5])
+redis.call('PEXPIRE', KEYS[1], tonumber(ARGV[4]) + 1000)
+if redis.call('INCR', KEYS[2]) == 1 then redis.call('EXPIRE', KEYS[2], 60) end
+return 'ok'
+`;
+
+export const RELEASE_LEASE = `return redis.call('ZREM', KEYS[1], ARGV[1])`;
+
 export const THROTTLE = `
 local count = redis.call('INCR', KEYS[1])
 if count == 1 then redis.call('EXPIRE', KEYS[1], 60) end

@@ -7,7 +7,14 @@ import { Redis } from 'ioredis';
 import { AiError } from '#/common/ai-error';
 import { usageConfig } from '#/config.factory';
 
-import { RELEASE, RESERVE, START, THROTTLE } from './usage.scripts';
+import {
+  CONTINUATION_LEASE,
+  RELEASE,
+  RELEASE_LEASE,
+  RESERVE,
+  START,
+  THROTTLE,
+} from './usage.scripts';
 
 export function usagePeriod(now = new Date()) {
   const resetAt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
@@ -52,7 +59,7 @@ export class UsageService implements OnModuleDestroy {
     }
   }
 
-  private async eval(script: string, keys: string[], args: (string | number)[]) {
+  async eval(script: string, keys: string[], args: (string | number)[]) {
     try {
       return await this.redis.eval(script, keys.length, ...keys, ...args);
     } catch (error) {
@@ -74,6 +81,32 @@ export class UsageService implements OnModuleDestroy {
     );
     if (accepted !== 1)
       throw new AiError(429, 'aiRateLimited', 'Too many AI requests. Please retry later.');
+  }
+
+  async acquireContinuationLease(userId: string) {
+    const user = createHash('sha256').update(userId).digest('hex');
+    const key = `ai:streams:${user}`;
+    const id = randomUUID();
+    const result = await this.eval(
+      CONTINUATION_LEASE,
+      [key, `ai:rate:${user}`],
+      [
+        Date.now(),
+        this.config.concurrentStreams,
+        this.config.requestsPerMinute,
+        this.config.timeoutMs + 5000,
+        id,
+      ]
+    );
+    if (result === 'rate' || result === 'concurrency')
+      throw new AiError(429, 'aiRateLimited', 'Too many AI requests. Please retry later.');
+    if (result !== 'ok')
+      throw new AiError(503, 'aiUsageUnavailable', 'Could not acquire stream capacity.');
+    return {
+      release: async () => {
+        await this.eval(RELEASE_LEASE, [key], [id]);
+      },
+    };
   }
 
   async reserve(workspaceId: string, userId: string, messageId: string, credits: number) {
