@@ -6,7 +6,7 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "typeorm": "tsx ./node_modules/typeorm/cli.js",
+    "typeorm": "SWCRC=true SWC_CONFIG_FILE=.swcrc-database.json node --import @swc-node/register/esm-register ./node_modules/typeorm/cli.js",
     "typeorm-extension": "tsx ./node_modules/typeorm-extension/bin/cli.mjs",
     "db:sync": "pnpm typeorm schema:sync -d database/datasource.ts",
     "db:migrate": "pnpm typeorm migration:run -d database/datasource.ts",
@@ -58,6 +58,7 @@
     "marked": "catalog:",
     "nestjs-otel": "catalog:",
     "nestjs-pino": "catalog:",
+    "pg": "catalog:",
     "pino-http": "catalog:",
     "pino-pretty": "catalog:",
     "protobufjs": "catalog:",
