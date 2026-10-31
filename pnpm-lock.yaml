@@ -196,17 +196,17 @@ catalogs:
       specifier: ^3.1008.0
       version: 3.1008.0
     '@blocknote/core':
-      specifier: 0.55.0
-      version: 0.55.0
+      specifier: 0.57.0
+      version: 0.57.0
     '@blocknote/react':
-      specifier: 0.55.0
-      version: 0.55.0
+      specifier: 0.57.0
+      version: 0.57.0
     '@blocknote/server-util':
-      specifier: 0.55.0
-      version: 0.55.0
+      specifier: 0.57.0
+      version: 0.57.0
     '@blocknote/shadcn':
-      specifier: 0.55.0
-      version: 0.55.0
+      specifier: 0.57.0
+      version: 0.57.0
     '@bufbuild/protobuf':
       specifier: 2.11.0
       version: 2.11.0
@@ -765,10 +765,10 @@ importers:
         version: 3.1008.0
       '@blocknote/core':
         specifier: 'catalog:'
-        version: 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@blocknote/server-util':
         specifier: 'catalog:'
-        version: 0.55.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@noble/hashes@2.4.0)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))
+        version: 0.57.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@noble/hashes@2.4.0)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(@typescript/typescript6@6.0.2)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))
       '@bufbuild/protobuf':
         specifier: 'catalog:'
         version: 2.11.0
@@ -967,10 +967,10 @@ importers:
     dependencies:
       '@blocknote/core':
         specifier: 'catalog:'
-        version: 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@blocknote/server-util':
         specifier: 'catalog:'
-        version: 0.55.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@noble/hashes@2.4.0)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))
+        version: 0.57.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@noble/hashes@2.4.0)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))
       '@floating-ui/dom':
         specifier: 'catalog:'
         version: 1.7.6
@@ -1079,13 +1079,13 @@ importers:
     dependencies:
       '@blocknote/core':
         specifier: 'catalog:'
-        version: 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@blocknote/react':
         specifier: 'catalog:'
-        version: 0.55.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@blocknote/shadcn':
         specifier: 'catalog:'
-        version: 0.55.0(@date-fns/tz@1.4.1)(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(date-fns@4.1.0)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(tailwindcss@4.2.4)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@date-fns/tz@1.4.1)(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(date-fns@4.1.0)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(tailwindcss@4.2.4)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/provider-react':
         specifier: 'catalog:'
         version: 4.8.0(@hocuspocus/provider@4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(react@19.2.9)(yjs@13.6.33)
@@ -1112,7 +1112,7 @@ importers:
     dependencies:
       '@blocknote/shadcn':
         specifier: 'catalog:'
-        version: 0.55.0(@date-fns/tz@1.4.1)(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(date-fns@4.1.0)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(tailwindcss@4.2.4)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@date-fns/tz@1.4.1)(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(date-fns@4.1.0)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(tailwindcss@4.2.4)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@floating-ui/dom':
         specifier: 'catalog:'
         version: 1.7.6
@@ -1277,10 +1277,10 @@ importers:
     dependencies:
       '@blocknote/core':
         specifier: 'catalog:'
-        version: 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@blocknote/react':
         specifier: 'catalog:'
-        version: 0.55.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(@typescript/typescript6@6.0.2)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/provider':
         specifier: 'catalog:'
         version: 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
@@ -1295,10 +1295,10 @@ importers:
     dependencies:
       '@blocknote/core':
         specifier: 'catalog:'
-        version: 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@blocknote/server-util':
         specifier: 'catalog:'
-        version: 0.55.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@noble/hashes@2.4.0)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))
+        version: 0.57.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@noble/hashes@2.4.0)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))
       '@floating-ui/dom':
         specifier: 'catalog:'
         version: 1.7.6
@@ -1356,10 +1356,10 @@ importers:
         version: 1.8.0(@date-fns/tz@1.4.1)(@types/react@19.2.18)(date-fns@4.1.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       '@blocknote/core':
         specifier: 'catalog:'
-        version: 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@blocknote/react':
         specifier: 'catalog:'
-        version: 0.55.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@hocuspocus/provider':
         specifier: 'catalog:'
         version: 4.8.0(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
@@ -1456,7 +1456,7 @@ importers:
     devDependencies:
       '@blocknote/shadcn':
         specifier: 'catalog:'
-        version: 0.55.0(@date-fns/tz@1.4.1)(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(date-fns@4.1.0)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(tailwindcss@4.2.4)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+        version: 0.57.0(@date-fns/tz@1.4.1)(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(date-fns@4.1.0)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(tailwindcss@4.2.4)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.21(react@19.2.9)
@@ -2505,15 +2505,15 @@ packages:
   '@better-fetch/fetch@1.3.3':
     resolution: {integrity: sha512-U6SlDt/GUWtK2JAxS/NhdoYTEim+EL1G5byz2TUj83KjLZBUpYzb5SmX0aXaCnbGkAjFKnV/o/0+cyXMbEcqqg==}
 
-  '@blocknote/core@0.55.0':
-    resolution: {integrity: sha512-QRRnOuVDrt0pPwaCXQ/dc4gxQ3KEGkBC8Hh4hyl4lxOU+5TMLNKKX9gZgeGkq7WKVK2EZbnPea6pcx25aS5SGA==}
+  '@blocknote/core@0.57.0':
+    resolution: {integrity: sha512-zoNZwhhP/eL8T3aSZ4+lKJ/2Xs3aJYrF21AC3BiEgvb8hKX4VDAXq7iOMWTvgIcrDh05fpWfX7ZRqbXVc+3SKg==}
     peerDependencies:
-      '@y/prosemirror': ^2.0.0-6
+      '@y/prosemirror': ^2.0.0-15
       '@y/protocols': ^1.0.6-rc.1
-      '@y/y': ^14.0.0-rc.23
+      '@y/y': ^14.0.0-rc.26
       y-prosemirror: ^1.3.7
       y-protocols: ^1.0.6
-      yjs: ^13.6.27
+      yjs: ^13.6.33
     peerDependenciesMeta:
       '@y/prosemirror':
         optional: true
@@ -2528,20 +2528,20 @@ packages:
       yjs:
         optional: true
 
-  '@blocknote/react@0.55.0':
-    resolution: {integrity: sha512-t+4N8+3xHhlnesxpWhF3FZnoHcnwhO+VgHiz6WEx7kTOTgk2YH84EOD7FsPh/hCm3I9MH9cHuiMfo6W6PHj/9w==}
+  '@blocknote/react@0.57.0':
+    resolution: {integrity: sha512-YW5voLS39cwuD4M5sk3Mf0rERAorssLVeqHUM3XAi5PbKAmMPQOS2l3/8nvxhgzvd1XYTJqq8mk5IY48x87FTg==}
     peerDependencies:
       react: ^18.0 || ^19.0 || >= 19.0.0-rc
       react-dom: ^18.0 || ^19.0 || >= 19.0.0-rc
 
-  '@blocknote/server-util@0.55.0':
-    resolution: {integrity: sha512-OLtUfFme33T6i0aqFbBo5XjjNZjLZjmyjFrA70lC4YMd/bhFcsVd2dOx06Da9M9oVMcT5PuV6AiKQVjA7sCGaQ==}
+  '@blocknote/server-util@0.57.0':
+    resolution: {integrity: sha512-I6S6/xHaBMC3dSpMz0+hH0WA8Mj6cZaRPSVB2LqeOqqf6zk3uHuLlIOBPA45wfw/TTM0UgLAGpLuzhM1a4rsrQ==}
     peerDependencies:
       react: ^18.0 || ^19.0 || >= 19.0.0-rc
       react-dom: ^18.0 || ^19.0 || >= 19.0.0-rc
 
-  '@blocknote/shadcn@0.55.0':
-    resolution: {integrity: sha512-r00Rijcn0Gb9btkjEf1ojthQuJ5hxsHMRo/ljrk3xIlC7hlskEyR9/50E1Su9CIYTf61nzebTtHUZiXYyNx59A==}
+  '@blocknote/shadcn@0.57.0':
+    resolution: {integrity: sha512-+crQURdk5Vv3jvk8IXcwOIS2aAEQrYOm6ICezi4gGC4JXV0xQEv7KJPHDZ9B7U6cU7FQ0j8i2bl9K1vq//WarQ==}
     peerDependencies:
       react: ^18.0 || ^19.0 || >= 19.0.0-rc
       react-dom: ^18.0 || ^19.0 || >= 19.0.0-rc
@@ -2739,9 +2739,6 @@ packages:
 
   '@emnapi/wasi-threads@1.2.3':
     resolution: {integrity: sha512-ELEBe8PsLvvJ6QMr0zLt8ffvOHW/dc1m3CEzNMg7aJUv3bMaoDtw2TXyDAwkYBuroxxuHEwhRTLJSe5sya547g==}
-
-  '@emoji-mart/data@1.2.1':
-    resolution: {integrity: sha512-no2pQMWiBy6gpBEiqGeU77/bFejDqUTRY7KX+0+iur13op3bqUsXdnwoZs6Xb1zbv0gAj5VvS1PWoUUckSr5Dw==}
 
   '@emotion/is-prop-valid@1.4.0':
     resolution: {integrity: sha512-QgD4fyscGcbbKwJmqNvUMSE02OsHUa+lAWKdEUIJKgqe5IwRSKd7+KhibEWdaKwgjLj0DRSHA9biAIqGBk05lw==}
@@ -7447,6 +7444,7 @@ packages:
   '@smithy/smithy-client@4.12.5':
     resolution: {integrity: sha512-UqwYawyqSr/aog8mnLnfbPurS0gi4G7IYDcD28cUIBhsvWs1+rQcL2IwkUQ+QZ7dibaoRzhNF99fAQ9AUcO00w==}
     engines: {node: '>=18.0.0'}
+    deprecated: Deprecated due to a bug in custom logger data redaction. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/types@4.13.1':
     resolution: {integrity: sha512-787F3yzE2UiJIQ+wYW1CVg2odHjmaWLGksnKQHUrK/lYZSEcy1msuLVvxaR/sI2/aDe9U+TBuLsXnr3vod1g0g==}
@@ -10873,9 +10871,6 @@ packages:
     resolution: {integrity: sha512-DeWwawk6r5yR9jFgnDKYt4sLS0LmHJJi3ZOnb5/JdbYwj3nW+FxQnHIjhBKz8YLC7oRNPVM9NQ47I3CVx34eqQ==}
     engines: {node: '>=12'}
 
-  emoji-mart@5.6.0:
-    resolution: {integrity: sha512-eJp3QRe79pjwa+duv+n7+5YsNhRcMl812EcFVwrnRvYKoNPoQb5qxU8DG6Bgwji0akHdp6D4Ln6tYLG58MFSow==}
-
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
 
@@ -11461,6 +11456,15 @@ packages:
   fresh@2.0.0:
     resolution: {integrity: sha512-Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==}
     engines: {node: '>= 0.8'}
+
+  frimousse@0.4.0:
+    resolution: {integrity: sha512-wA/1Xt9UTk51wYNpy+EvHKPUA4jdm4NuEFzSNNZxqT0Nxrj4RFwYByjRMuaq4qSLOco/ikDCpLKesB8W1w2q+Q==}
+    peerDependencies:
+      react: ^18 || ^19
+      typescript: '>=5.1.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   fs-constants@1.0.0:
     resolution: {integrity: sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==}
@@ -12710,8 +12714,8 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  lib0@1.0.0-rc.22:
-    resolution: {integrity: sha512-KNefJloRQIsWncTF2tIcRqQXSQ7bDRYHwVSUhf1lY2P65Rej4WWFnen6L8L+odJQIo1ZNJGVVjK2WzqB9a+B/g==}
+  lib0@1.0.0-rc.36:
+    resolution: {integrity: sha512-7t/I+PCQqakal22rhXq5giOUtDP/RfecQtdeKvzCtnAvPkxSLAE+/Zvzi/kJDopg+hBAYKo46qmxmlkhX0tYlQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -15787,9 +15791,6 @@ packages:
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
 
-  tabbable@6.4.0:
-    resolution: {integrity: sha512-05PUHKSNE8ou2dwIxTngl4EzcnsCDZGJ/iCLtDflR/SHB/ny14rXc+qU5P4mG9JkusiV7EivzY9Mhm55AzAvCg==}
-
   tabbable@6.5.0:
     resolution: {integrity: sha512-wieBHXygIm7OyQOu5hQlkk62/WyCFYGlWg7L6/ZCUZwx0o398Zkn4pVmMyfYhfMG8kGrj/Krt8eIk6UKC6VzwA==}
 
@@ -18743,9 +18744,8 @@ snapshots:
 
   '@better-fetch/fetch@1.3.3': {}
 
-  '@blocknote/core@0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@blocknote/core@0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
-      '@emoji-mart/data': 1.2.1
       '@handlewithcare/prosemirror-inputrules': 0.1.4(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)
       '@shikijs/types': 4.5.0
       '@tiptap/core': 3.31.4(@tiptap/pm@3.31.4)
@@ -18757,9 +18757,8 @@ snapshots:
       '@tiptap/extension-underline': 3.31.4(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))
       '@tiptap/extensions': 3.31.4(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4)
       '@tiptap/pm': 3.31.4
-      emoji-mart: 5.6.0
       fast-deep-equal: 3.1.3
-      lib0: 1.0.0-rc.22
+      lib0: 1.0.0-rc.36
       prosemirror-highlight: 0.15.3(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@shikijs/types@4.5.0)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-transform@1.12.2)(prosemirror-view@1.42.6)
       prosemirror-model: 1.25.12
       prosemirror-state: 1.4.4
@@ -18779,16 +18778,15 @@ snapshots:
       - refractor
       - sugar-high
 
-  '@blocknote/react@0.55.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@blocknote/react@0.57.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(@typescript/typescript6@6.0.2)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
-      '@blocknote/core': 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
-      '@emoji-mart/data': 1.2.1
+      '@blocknote/core': 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@floating-ui/react': 0.27.19(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       '@tiptap/core': 3.31.4(@tiptap/pm@3.31.4)
       '@tiptap/pm': 3.31.4
       '@tiptap/react': 3.31.4(@floating-ui/dom@1.7.6)(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
-      emoji-mart: 5.6.0
       fast-deep-equal: 3.1.3
+      frimousse: 0.4.0(@typescript/typescript6@6.0.2)(react@19.2.9)
       react: 19.2.9
       react-dom: 19.2.9(react@19.2.9)
       use-sync-external-store: 1.6.0(react@19.2.9)
@@ -18808,20 +18806,53 @@ snapshots:
       - lowlight
       - refractor
       - sugar-high
+      - typescript
       - y-prosemirror
       - y-protocols
       - yjs
 
-  '@blocknote/react@0.55.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@blocknote/react@0.57.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
-      '@blocknote/core': 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
-      '@emoji-mart/data': 1.2.1
+      '@blocknote/core': 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@floating-ui/react': 0.27.19(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      '@tiptap/core': 3.31.4(@tiptap/pm@3.31.4)
+      '@tiptap/pm': 3.31.4
+      '@tiptap/react': 3.31.4(@floating-ui/dom@1.7.6)(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      fast-deep-equal: 3.1.3
+      frimousse: 0.4.0(react@19.2.9)(typescript@6.0.3)
+      react: 19.2.9
+      react-dom: 19.2.9(react@19.2.9)
+      use-sync-external-store: 1.6.0(react@19.2.9)
+    optionalDependencies:
+      '@types/use-sync-external-store': 1.5.0
+    transitivePeerDependencies:
+      - '@floating-ui/dom'
+      - '@lezer/common'
+      - '@lezer/highlight'
+      - '@types/hast'
+      - '@types/react'
+      - '@types/react-dom'
+      - '@y/prosemirror'
+      - '@y/protocols'
+      - '@y/y'
+      - highlight.js
+      - lowlight
+      - refractor
+      - sugar-high
+      - typescript
+      - y-prosemirror
+      - y-protocols
+      - yjs
+
+  '@blocknote/react@0.57.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(@typescript/typescript6@6.0.2)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+    dependencies:
+      '@blocknote/core': 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@floating-ui/react': 0.27.19(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       '@tiptap/core': 3.31.4(@tiptap/pm@3.31.4)
       '@tiptap/pm': 3.31.4
       '@tiptap/react': 3.31.4(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
-      emoji-mart: 5.6.0
       fast-deep-equal: 3.1.3
+      frimousse: 0.4.0(@typescript/typescript6@6.0.2)(react@19.2.9)
       react: 19.2.9
       react-dom: 19.2.9(react@19.2.9)
       use-sync-external-store: 1.6.0(react@19.2.9)
@@ -18841,14 +18872,48 @@ snapshots:
       - lowlight
       - refractor
       - sugar-high
+      - typescript
       - y-prosemirror
       - y-protocols
       - yjs
 
-  '@blocknote/server-util@0.55.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@noble/hashes@2.4.0)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))':
+  '@blocknote/react@0.57.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
-      '@blocknote/core': 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
-      '@blocknote/react': 0.55.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@blocknote/core': 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@floating-ui/react': 0.27.19(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      '@tiptap/core': 3.31.4(@tiptap/pm@3.31.4)
+      '@tiptap/pm': 3.31.4
+      '@tiptap/react': 3.31.4(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      fast-deep-equal: 3.1.3
+      frimousse: 0.4.0(react@19.2.9)(typescript@6.0.3)
+      react: 19.2.9
+      react-dom: 19.2.9(react@19.2.9)
+      use-sync-external-store: 1.6.0(react@19.2.9)
+    optionalDependencies:
+      '@types/use-sync-external-store': 1.5.0
+    transitivePeerDependencies:
+      - '@floating-ui/dom'
+      - '@lezer/common'
+      - '@lezer/highlight'
+      - '@types/hast'
+      - '@types/react'
+      - '@types/react-dom'
+      - '@y/prosemirror'
+      - '@y/protocols'
+      - '@y/y'
+      - highlight.js
+      - lowlight
+      - refractor
+      - sugar-high
+      - typescript
+      - y-prosemirror
+      - y-protocols
+      - yjs
+
+  '@blocknote/server-util@0.57.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@noble/hashes@2.4.0)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(@typescript/typescript6@6.0.2)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))':
+    dependencies:
+      '@blocknote/core': 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@blocknote/react': 0.57.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(@typescript/typescript6@6.0.2)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       '@tiptap/pm': 3.31.4
       jsdom: 29.1.1(@noble/hashes@2.4.0)
       react: 19.2.9
@@ -18870,14 +18935,44 @@ snapshots:
       - lowlight
       - refractor
       - sugar-high
+      - typescript
       - y-prosemirror
       - y-protocols
 
-  '@blocknote/shadcn@0.55.0(@date-fns/tz@1.4.1)(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(date-fns@4.1.0)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(tailwindcss@4.2.4)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@blocknote/server-util@0.57.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@noble/hashes@2.4.0)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))':
+    dependencies:
+      '@blocknote/core': 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@blocknote/react': 0.57.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@tiptap/pm': 3.31.4
+      jsdom: 29.1.1(@noble/hashes@2.4.0)
+      react: 19.2.9
+      react-dom: 19.2.9(react@19.2.9)
+      yjs: 13.6.33
+    transitivePeerDependencies:
+      - '@floating-ui/dom'
+      - '@lezer/common'
+      - '@lezer/highlight'
+      - '@noble/hashes'
+      - '@types/hast'
+      - '@types/react'
+      - '@types/react-dom'
+      - '@y/prosemirror'
+      - '@y/protocols'
+      - '@y/y'
+      - canvas
+      - highlight.js
+      - lowlight
+      - refractor
+      - sugar-high
+      - typescript
+      - y-prosemirror
+      - y-protocols
+
+  '@blocknote/shadcn@0.57.0(@date-fns/tz@1.4.1)(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(date-fns@4.1.0)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(tailwindcss@4.2.4)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
       '@base-ui/react': 1.8.0(@date-fns/tz@1.4.1)(@types/react@19.2.18)(date-fns@4.1.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
-      '@blocknote/core': 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
-      '@blocknote/react': 0.55.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@blocknote/core': 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@blocknote/react': 0.57.0(@floating-ui/dom@1.7.6)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       lucide-react: 0.525.0(react@19.2.9)
@@ -18901,15 +18996,16 @@ snapshots:
       - lowlight
       - refractor
       - sugar-high
+      - typescript
       - y-prosemirror
       - y-protocols
       - yjs
 
-  '@blocknote/shadcn@0.55.0(@date-fns/tz@1.4.1)(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(date-fns@4.1.0)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(tailwindcss@4.2.4)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
+  '@blocknote/shadcn@0.57.0(@date-fns/tz@1.4.1)(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(date-fns@4.1.0)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(tailwindcss@4.2.4)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)':
     dependencies:
       '@base-ui/react': 1.8.0(@date-fns/tz@1.4.1)(@types/react@19.2.18)(date-fns@4.1.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
-      '@blocknote/core': 0.55.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
-      '@blocknote/react': 0.55.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@blocknote/core': 0.57.0(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(highlight.js@11.11.1)(lowlight@3.3.0)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
+      '@blocknote/react': 0.57.0(@floating-ui/dom@1.8.0)(@lezer/common@1.5.1)(@lezer/highlight@1.2.3)(@types/hast@3.0.5)(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@6.0.3)(y-prosemirror@1.3.7(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33))(y-protocols@1.0.7(yjs@13.6.33))(yjs@13.6.33)
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       lucide-react: 0.525.0(react@19.2.9)
@@ -18933,6 +19029,7 @@ snapshots:
       - lowlight
       - refractor
       - sugar-high
+      - typescript
       - y-prosemirror
       - y-protocols
       - yjs
@@ -19231,8 +19328,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
-
-  '@emoji-mart/data@1.2.1': {}
 
   '@emotion/is-prop-valid@1.4.0':
     dependencies:
@@ -19539,7 +19634,7 @@ snapshots:
       '@floating-ui/utils': 0.2.12
       react: 19.2.9
       react-dom: 19.2.9(react@19.2.9)
-      tabbable: 6.4.0
+      tabbable: 6.5.0
 
   '@floating-ui/utils@0.2.10': {}
 
@@ -28976,8 +29071,6 @@ snapshots:
 
   emittery@0.13.1: {}
 
-  emoji-mart@5.6.0: {}
-
   emoji-regex@10.6.0: {}
 
   emoji-regex@8.0.0: {}
@@ -29881,6 +29974,18 @@ snapshots:
     optional: true
 
   fresh@2.0.0: {}
+
+  frimousse@0.4.0(@typescript/typescript6@6.0.2)(react@19.2.9):
+    dependencies:
+      react: 19.2.9
+    optionalDependencies:
+      typescript: '@typescript/typescript6@6.0.2'
+
+  frimousse@0.4.0(react@19.2.9)(typescript@6.0.3):
+    dependencies:
+      react: 19.2.9
+    optionalDependencies:
+      typescript: 6.0.3
 
   fs-constants@1.0.0: {}
 
@@ -31490,7 +31595,7 @@ snapshots:
     dependencies:
       isomorphic.js: 0.2.5
 
-  lib0@1.0.0-rc.22: {}
+  lib0@1.0.0-rc.36: {}
 
   libphonenumber-js@1.13.14:
     optional: true
@@ -35330,8 +35435,6 @@ snapshots:
       '@pkgr/core': 0.3.6
 
   systeminformation@5.31.6: {}
-
-  tabbable@6.4.0: {}
 
   tabbable@6.5.0: {}
 
