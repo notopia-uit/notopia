@@ -190,7 +190,7 @@ jobs:
         id: setup-buildx
         if: ${{ steps.setup-vars.outputs.SHOULD_RELEASE == 'true' }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           filter: tree:0
@@ -201,12 +201,12 @@ jobs:
           cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .tool-versions
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: .tool-versions
           cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
@@ -219,13 +219,13 @@ jobs:
           skip-save-cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'false' }}
 
       - name: Setup Mise
-        uses: jdx/mise-action@v4
+        uses: jdx/mise-action@v5
         with:
           experimental: true
           cache: ${{ steps.setup-vars.outputs.SHOULD_CACHE == 'true' }}
 
       - name: Cache Buf dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.cache/buf
           key: ${{ runner.os }}-buf-${{ hashFiles('**/buf.lock') }}
@@ -384,7 +384,7 @@ jobs:
           git config --global user.name github-actions[bot]
           git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           filter: tree:0
@@ -395,18 +395,18 @@ jobs:
           cache: true
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .tool-versions
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: .tool-versions
           cache: true
 
       - name: Setup Mise
-        uses: jdx/mise-action@v4
+        uses: jdx/mise-action@v5
         with:
           experimental: true
           cache: true
@@ -416,7 +416,7 @@ jobs:
 
       - name: Restore Docs diagrams Cache
         id: diagrams-cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         if: ${{ github.event.inputs.noRestoreDocsDiagramsCache != 'true' }}
         with:
           path: docs/src/public/diagrams/
@@ -449,7 +449,7 @@ jobs:
 
       - name: Cache Docs diagrams
         if: ${{ steps.cache-key.outputs.cache_key != steps.diagrams-cache.outputs.cache-matched-key }}
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: docs/src/public/diagrams/
           key: ${{ steps.cache-key.outputs.cache_key }}
