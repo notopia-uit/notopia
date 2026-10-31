@@ -58,24 +58,6 @@ pkg/                            # Go packages
   pb
 ```
 
-### Scoped docs
-
-Read the one for the area you're touching before exploring; they hold the details this file
-deliberately omits.
-
-| Area                                               | Doc                                                             |
-| -------------------------------------------------- | --------------------------------------------------------------- |
-| Contract-first workflow, adding endpoints          | [`api/`](./api/AGENTS.md)                                       |
-| Go DDD/CQRS layout, aggregates, outbox, sqlc/goose | [`internal/note/`](./internal/note/AGENTS.md)                   |
-| Casbin model, roles, policy                        | [`internal/authorization/`](./internal/authorization/AGENTS.md) |
-| Plans, subscriptions, Stripe, entitlements         | [`internal/billing/`](./internal/billing/AGENTS.md)             |
-| Yjs/Hocuspocus, commit pipeline, revisions         | [`apps/document/`](./apps/document/AGENTS.md)                   |
-| Meilisearch indexing                               | [`apps/search-worker/`](./apps/search-worker/AGENTS.md)         |
-| Shared Go packages                                 | [`pkg/`](./pkg/AGENTS.md)                                       |
-| Shared NestJS code, locks module                   | [`packages/lib-server/`](./packages/lib-server/AGENTS.md)       |
-| Scalar API reference site                          | [`apps/api-web/`](./apps/api-web/AGENTS.md)                     |
-| Authentik, Traefik routing, local hosts            | [`deploy/compose/`](./deploy/compose/AGENTS.md)                 |
-
 ## Technologies
 
 ### API
