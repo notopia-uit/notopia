@@ -536,7 +536,7 @@ catalogs:
       version: 3.0.0
     ws:
       specifier: ^8.19.0
-      version: 8.20.1
+      version: 8.22.1
     yjs:
       specifier: ^13.6.30
       version: 13.6.33
@@ -912,7 +912,7 @@ importers:
         version: 14.0.3
       ws:
         specifier: 'catalog:'
-        version: 8.20.1
+        version: 8.22.1
       yjs:
         specifier: 'catalog:'
         version: 13.6.33
@@ -16957,8 +16957,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.20.1:
-    resolution: {integrity: sha512-It4dO0K5v//JtTXuPkfEOaI3uUN87iYPnqo/ZzqCoG3g8uhA66QUMs/SrM0YK7/NAu+r4LMh/9dq2A7k+rHs+w==}
+  ws@8.21.3:
+    resolution: {integrity: sha512-201TZ/kPWxoPr/OKWjquZR1SWKXcvxdH+e1xrx89b3YbmzLMFCLfnaG1HFIgWzJOEWZ7MvpK++odZufgYR50Rw==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -16969,8 +16969,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.21.3:
-    resolution: {integrity: sha512-201TZ/kPWxoPr/OKWjquZR1SWKXcvxdH+e1xrx89b3YbmzLMFCLfnaG1HFIgWzJOEWZ7MvpK++odZufgYR50Rw==}
+  ws@8.22.1:
+    resolution: {integrity: sha512-oyL6OPYme/CmiFvNuGzeoxCJ4nOrZE2O1FwM9MWM1AsGri6nLXB2pg+lNA8aLeXMSav0J6eIVS1j6vUPzUtK9g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -19752,7 +19752,7 @@ snapshots:
     dependencies:
       '@hono/node-server': 2.0.1(hono@4.12.30)
       hono: 4.12.30
-      ws: 8.21.3
+      ws: 8.22.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -24647,7 +24647,7 @@ snapshots:
       '@scalar/helpers': 0.9.2
       hono: 4.12.30
       js-base64: 3.9.1
-      ws: 8.21.3
+      ws: 8.22.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -36699,9 +36699,9 @@ snapshots:
 
   ws@7.5.10: {}
 
-  ws@8.20.1: {}
-
   ws@8.21.3: {}
+
+  ws@8.22.1: {}
 
   wsl-utils@0.3.1:
     dependencies:
