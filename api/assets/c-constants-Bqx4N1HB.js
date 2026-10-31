@@ -1,0 +1,1 @@
+var e=`https://scalar.cal.com/marc/30min`,t=`https://x.com/messages/compose?recipient_id=321010445`,n={card:`scalar-explore-card`,portals:`scalar-explore-sticker-portals`,sdks:`scalar-explore-sticker-sdks`,agent:`scalar-explore-sticker-agent`},r=`data-scalar-explore-vt`;export{t as i,n,r,e as t};
