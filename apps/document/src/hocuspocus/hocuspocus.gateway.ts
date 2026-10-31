@@ -44,6 +44,8 @@ export class HocuspocusGateway implements OnModuleInit, OnModuleDestroy {
         clientConnection.handleMessage(new Uint8Array(data));
       });
 
+      ws.on('pong', () => clientConnection.touch());
+
       ws.on('close', (code: number, reason: Buffer) => {
         clientConnection.handleClose({ code, reason: reason.toString() });
       });

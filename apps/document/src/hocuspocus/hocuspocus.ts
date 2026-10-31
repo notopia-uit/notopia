@@ -32,7 +32,7 @@ import { NoteService } from '../note/note.service';
 import { AutoCommitExtension } from './auto-commit.extension';
 import { ContributorFlushExtension } from './contributor-flush.extension';
 import { ContributorTracker } from './contributor-tracker';
-import { applyStoredModified, readModified } from './document-metadata';
+import { applyStoredModified, hasModifiedMetadata, readModified } from './document-metadata';
 import { HocuspocusContext } from './hocuspocus-context';
 
 const SHUTDOWN_UNLOAD_TIMEOUT_MS = 10_000;
@@ -79,6 +79,9 @@ export class Hocuspocus implements BeforeApplicationShutdown {
         await Promise.resolve();
       },
       afterLoadDocument: async ({ documentName, document }) => {
+        // The Redis extension (priority 1000) runs first and may have merged a peer's in-memory
+        // state, whose metadata is newer than the DB column.
+        if (hasModifiedMetadata(document)) return;
         const entity = await documentService.getById(documentName);
         applyStoredModified(document, entity?.modified ?? false);
       },
