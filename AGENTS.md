@@ -90,6 +90,7 @@ pkg/                            # Go packages
 - Prefer testify for testing, mockery if need interface mocking (list only necessary interfaces)
 - SQLC custom plugin for dynamic query at runtime <https://raw.githubusercontent.com/vtuanjs/sqlc-gen-go/refs/heads/main/README.md>
 - If a (pointer?) struct implement an interface, add e.g. `var _ Interface = (*Struct)(nil)`
+- Do not wrap small/obvious logic (error handling, simple mapping) into a function, inline it for readability
 
 ### Messaging
 
