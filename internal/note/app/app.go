@@ -7,22 +7,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type HandlerProvider commonhandler.HandlerProvider
-
-func NewHandlerProvider(
-	traceProvider trace.TracerProvider,
-	logger *slog.Logger,
-) *HandlerProvider {
-	tracer := traceProvider.Tracer("note-app")
-	return (*HandlerProvider)(
-		commonhandler.NewHandlerProvider(
-			commonhandler.WithTracer(tracer),
-			commonhandler.WithLogger(logger),
-		),
-	)
-}
-
-var ProvideHandlerProvider = NewHandlerProvider
+const tracerName = "note-app"
 
 type Cmds struct {
 	ChangeWorkspaceSlug             ChangeWorkspaceSlugCmd
@@ -50,7 +35,8 @@ type Cmds struct {
 }
 
 func NewCmds(
-	handlerProvider *HandlerProvider,
+	traceProvider trace.TracerProvider,
+	logger *slog.Logger,
 	changeWorkspaceSlugHandler *ChangeWorkspaceSlugHandler,
 	createFolderHandler *CreateFolderHandler,
 	createNoteHandler *CreateNoteHandler,
@@ -74,30 +60,33 @@ func NewCmds(
 	unpublishWorkspaceHandler *UnpublishWorkspaceHandler,
 	updateWorkspaceMembersHandler *UpdateWorkspaceMembersHandler,
 ) *Cmds {
-	hp := (*commonhandler.HandlerProvider)(handlerProvider)
+	d := commonhandler.NewDecorator(
+		commonhandler.WithTracer(traceProvider.Tracer(tracerName)),
+		commonhandler.WithLogger(logger),
+	)
 	return &Cmds{
-		ChangeWorkspaceSlug:             commonhandler.DecorateCmd(hp, changeWorkspaceSlugHandler),
-		CreateFolder:                    commonhandler.DecorateCmd(hp, createFolderHandler),
-		CreateNote:                      commonhandler.DecorateCmd(hp, createNoteHandler),
-		CreateWorkspace:                 commonhandler.DecorateCmd(hp, createWorkspaceHandler),
-		DeleteWorkspace:                 commonhandler.DecorateCmd(hp, deleteWorkspaceHandler),
-		EmptyTrash:                      commonhandler.DecorateCmd(hp, emptyTrashHandler),
-		LeaveWorkspace:                  commonhandler.DecorateCmd(hp, leaveWorkspaceHandler),
-		MoveWorkspaceItems:              commonhandler.DecorateCmd(hp, moveWorkspaceItemsHandler),
-		DeleteFolder:                    commonhandler.DecorateCmd(hp, permanentlyDeleteFolderHandler),
-		DeleteNote:                      commonhandler.DecorateCmd(hp, permanentlyDeleteNoteHandler),
-		PermanentlyDeleteWorkspaceItems: commonhandler.DecorateCmd(hp, permanentlyDeleteWorkspaceItemsHandler),
-		PublishNote:                     commonhandler.DecorateCmd(hp, publishNoteHandler),
-		PublishWorkspace:                commonhandler.DecorateCmd(hp, publishWorkspaceHandler),
-		PurgeExpiredTrash:               commonhandler.DecorateCmd(hp, purgeExpiredTrashHandler),
-		RenameFolder:                    commonhandler.DecorateCmd(hp, renameFolderHandler),
-		RenameNote:                      commonhandler.DecorateCmd(hp, renameNoteHandler),
-		RenameWorkspace:                 commonhandler.DecorateCmd(hp, renameWorkspaceHandler),
-		RestoreTrashedWorkspaceItems:    commonhandler.DecorateCmd(hp, restoreTrashedWorkspaceItemsHandler),
-		TrashWorkspaceItems:             commonhandler.DecorateCmd(hp, trashWorkspaceItemsHandler),
-		UnpublishNote:                   commonhandler.DecorateCmd(hp, unpublishNoteHandler),
-		UnpublishWorkspace:              commonhandler.DecorateCmd(hp, unpublishWorkspaceHandler),
-		UpdateWorkspaceMembers:          commonhandler.DecorateCmd(hp, updateWorkspaceMembersHandler),
+		ChangeWorkspaceSlug:             d.Cmd(changeWorkspaceSlugHandler),
+		CreateFolder:                    d.Cmd(createFolderHandler),
+		CreateNote:                      d.Cmd(createNoteHandler),
+		CreateWorkspace:                 d.Cmd(createWorkspaceHandler),
+		DeleteWorkspace:                 d.Cmd(deleteWorkspaceHandler),
+		EmptyTrash:                      d.Cmd(emptyTrashHandler),
+		LeaveWorkspace:                  d.Cmd(leaveWorkspaceHandler),
+		MoveWorkspaceItems:              d.Cmd(moveWorkspaceItemsHandler),
+		DeleteFolder:                    d.Cmd(permanentlyDeleteFolderHandler),
+		DeleteNote:                      d.Cmd(permanentlyDeleteNoteHandler),
+		PermanentlyDeleteWorkspaceItems: d.Cmd(permanentlyDeleteWorkspaceItemsHandler),
+		PublishNote:                     d.Cmd(publishNoteHandler),
+		PublishWorkspace:                d.Cmd(publishWorkspaceHandler),
+		PurgeExpiredTrash:               d.Cmd(purgeExpiredTrashHandler),
+		RenameFolder:                    d.Cmd(renameFolderHandler),
+		RenameNote:                      d.Cmd(renameNoteHandler),
+		RenameWorkspace:                 d.Cmd(renameWorkspaceHandler),
+		RestoreTrashedWorkspaceItems:    d.Cmd(restoreTrashedWorkspaceItemsHandler),
+		TrashWorkspaceItems:             d.Cmd(trashWorkspaceItemsHandler),
+		UnpublishNote:                   d.Cmd(unpublishNoteHandler),
+		UnpublishWorkspace:              d.Cmd(unpublishWorkspaceHandler),
+		UpdateWorkspaceMembers:          d.Cmd(updateWorkspaceMembersHandler),
 	}
 }
 
@@ -121,7 +110,8 @@ type Queries struct {
 }
 
 func NewQueries(
-	handlerProvider *HandlerProvider,
+	traceProvider trace.TracerProvider,
+	logger *slog.Logger,
 	batchGetNoteWorkspacesHandler *BatchGetNoteWorkspacesHandler,
 	CheckWorkspaceSlugExistsHandler *CheckWorkspaceSlugExistsHandler,
 	GetMyWorkspacesHandler *GetMyWorkspacesHandler,
@@ -137,22 +127,25 @@ func NewQueries(
 	SearchUsersHandler *SearchUsersHandler,
 	ShowTrashHandler *ShowTrashHandler,
 ) *Queries {
-	hp := (*commonhandler.HandlerProvider)(handlerProvider)
+	d := commonhandler.NewDecorator(
+		commonhandler.WithTracer(traceProvider.Tracer(tracerName)),
+		commonhandler.WithLogger(logger),
+	)
 	return &Queries{
-		BatchGetNoteWorkspaces:   commonhandler.DecorateQuery(hp, batchGetNoteWorkspacesHandler),
-		CheckWorkspaceSlugExists: commonhandler.DecorateQuery(hp, CheckWorkspaceSlugExistsHandler),
-		GetMyWorkspaces:          commonhandler.DecorateQuery(hp, GetMyWorkspacesHandler),
-		GetNoteGraph:             commonhandler.DecorateQuery(hp, GetNoteGraphHandler),
-		GetNote:                  commonhandler.DecorateQuery(hp, GetNoteHandler),
-		GetNoteLinks:             commonhandler.DecorateQuery(hp, GetNoteLinksHandler),
-		GetWorkspaceByNote:       commonhandler.DecorateQuery(hp, GetWorkspaceByNoteHandler),
-		GetWorkspaceGraph:        commonhandler.DecorateQuery(hp, GetWorkspaceGraphHandler),
-		GetWorkspace:             commonhandler.DecorateQuery(hp, GetWorkspaceHandler),
-		GetWorkspaceMembers:      commonhandler.DecorateQuery(hp, GetWorkspaceMembersHandler),
-		GetWorkspaceSearchToken:  commonhandler.DecorateQuery(hp, GetWorkspaceSearchTokenHandler),
-		GetWorkspaceTree:         commonhandler.DecorateQuery(hp, GetWorkspaceTreeHandler),
-		SearchUsers:              commonhandler.DecorateQuery(hp, SearchUsersHandler),
-		ShowTrash:                commonhandler.DecorateQuery(hp, ShowTrashHandler),
+		BatchGetNoteWorkspaces:   d.Query(batchGetNoteWorkspacesHandler),
+		CheckWorkspaceSlugExists: d.Query(CheckWorkspaceSlugExistsHandler),
+		GetMyWorkspaces:          d.Query(GetMyWorkspacesHandler),
+		GetNoteGraph:             d.Query(GetNoteGraphHandler),
+		GetNote:                  d.Query(GetNoteHandler),
+		GetNoteLinks:             d.Query(GetNoteLinksHandler),
+		GetWorkspaceByNote:       d.Query(GetWorkspaceByNoteHandler),
+		GetWorkspaceGraph:        d.Query(GetWorkspaceGraphHandler),
+		GetWorkspace:             d.Query(GetWorkspaceHandler),
+		GetWorkspaceMembers:      d.Query(GetWorkspaceMembersHandler),
+		GetWorkspaceSearchToken:  d.Query(GetWorkspaceSearchTokenHandler),
+		GetWorkspaceTree:         d.Query(GetWorkspaceTreeHandler),
+		SearchUsers:              d.Query(SearchUsersHandler),
+		ShowTrash:                d.Query(ShowTrashHandler),
 	}
 }
 

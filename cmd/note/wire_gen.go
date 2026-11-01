@@ -100,7 +100,6 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	ginSlogHandlerFunc := commonhttp.NewGinSlogHandler(log, logger, global)
 	otelGinHandlerFunc := commonhttp.NewOtelGinHandler(serviceName, global)
 	engine := commonhttp.NewGin(ginSlogHandlerFunc, otelGinHandlerFunc, general)
-	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
 	services := &configConfig.Services
 	loggingLogger := otel.MapSlogToGRPCMiddlewareLogger(logger)
 	authorization, cleanup5, err := service.NewAuthorization(services, loggingLogger, global)
@@ -171,7 +170,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 		return nil, nil, err
 	}
 	updateWorkspaceMembersHandler := app.NewUpdateWorkspaceMembersHandler(workspaceEventHub, authorization, billing)
-	cmds := app.NewCmds(handlerProvider, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, emptyTrashHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, purgeExpiredTrashHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
+	cmds := app.NewCmds(tracerProvider, logger, changeWorkspaceSlugHandler, createFolderHandler, createNoteHandler, createWorkspaceHandler, deleteWorkspaceHandler, emptyTrashHandler, leaveWorkspaceHandler, moveWorkspaceItemsHandler, permanentlyDeleteFolderHandler, permanentlyDeleteNoteHandler, permanentlyDeleteWorkspaceItemsHandler, publishNoteHandler, publishWorkspaceHandler, purgeExpiredTrashHandler, renameFolderHandler, renameNoteHandler, renameWorkspaceHandler, restoreTrashedWorkspaceItemsHandler, trashWorkspaceItemsHandler, unpublishNoteHandler, unpublishWorkspaceHandler, updateWorkspaceMembersHandler)
 	billingChangedHandler := app.NewBillingChangedHandler(workspaceEventHub, commonconfigIdentity)
 	updateNoteSizeService := domain.NewUpdateNoteSizeService()
 	documentCommittedHandler := app.NewDocumentCommittedHandler(pgrepoNote, updateNoteSizeService)
@@ -248,7 +247,7 @@ func InitializeServer(ctx context.Context) (*note.Server, func(), error) {
 	searchUsersHandler := app.NewSearchUsersHandler(identityAuthentik, authorization)
 	showTrash := pgreadmodel.NewShowTrash(queries)
 	showTrashHandler := app.NewShowTrashHandler(authorization, showTrash)
-	appQueries := app.NewQueries(handlerProvider, batchGetNoteWorkspacesHandler, checkWorkspaceSlugExistsHandler, getMyWorkspacesHandler, getNoteGraphHandler, getNoteHandler, getNoteLinksHandler, getWorkspaceByNoteHandler, getWorkspaceGraphHandler, getWorkspaceBySlugHandler, getWorkspaceMembersHandler, getWorkspaceSearchTokenHandler, getWorkspaceTreeHandler, searchUsersHandler, showTrashHandler)
+	appQueries := app.NewQueries(tracerProvider, logger, batchGetNoteWorkspacesHandler, checkWorkspaceSlugExistsHandler, getMyWorkspacesHandler, getNoteGraphHandler, getNoteHandler, getNoteLinksHandler, getWorkspaceByNoteHandler, getWorkspaceGraphHandler, getWorkspaceBySlugHandler, getWorkspaceMembersHandler, getWorkspaceSearchTokenHandler, getWorkspaceTreeHandler, searchUsersHandler, showTrashHandler)
 	server := &app.Server{
 		Cmds:              cmds,
 		Events:            events,

@@ -61,7 +61,6 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	}
 	slogHandler := otel.NewSlogHandler(serviceName, loggerProvider)
 	logger := logging.NewSlog(stdoutHandler, slogHandler, log)
-	handlerProvider := app.NewHandlerProvider(tracerProvider, logger)
 	sql := &configConfig.Database
 	meterProvider, cleanup3, err := otel.NewMeterProvider(ctx, resource)
 	if err != nil {
@@ -126,7 +125,7 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	syncRefundHandler := app.NewSyncRefundHandler(unitOfWork, provider, settings)
 	updatePlanHandler := app.NewUpdatePlanHandler(unitOfWork)
 	updatePolicyHandler := app.NewUpdatePolicyHandler(unitOfWork)
-	cmds := app.NewCmds(handlerProvider, archivePriceHandler, cancelNowHandler, cancelProviderSubscriptionHandler, completeCheckoutHandler, createPriceHandler, ensureDefaultsHandler, ensurePortalConfigurationHandler, handlePayerRemovedHandler, handleWorkspaceDeletedHandler, pruneProviderEventsHandler, reconcileSubscriptionsHandler, submitRefundHandler, syncRefundHandler, syncSubscriptionHandler, updatePlanHandler, updatePolicyHandler)
+	cmds := app.NewCmds(tracerProvider, logger, archivePriceHandler, cancelNowHandler, cancelProviderSubscriptionHandler, completeCheckoutHandler, createPriceHandler, ensureDefaultsHandler, ensurePortalConfigurationHandler, handlePayerRemovedHandler, handleWorkspaceDeletedHandler, pruneProviderEventsHandler, reconcileSubscriptionsHandler, submitRefundHandler, syncRefundHandler, syncSubscriptionHandler, updatePlanHandler, updatePolicyHandler)
 	billingReadModel := pgreadmodel.NewBillingReadModel(queries)
 	batchGetEntitlementsHandler := app.NewBatchGetEntitlementsHandler(billingReadModel)
 	claimPayerHandler := app.NewClaimPayerHandler(accountRepo, authorization, provider, settings)
@@ -141,7 +140,7 @@ func InitializeServer(ctx context.Context) (*billing.Server, func(), error) {
 	previewCancelNowHandler := app.NewPreviewCancelNowHandler(authorization, subscriptionCanceller)
 	startCheckoutHandler := app.NewStartCheckoutHandler(unitOfWork, accountRepo, priceRepo, subscriptionRepo, authorization, provider, settings)
 	startPortalHandler := app.NewStartPortalHandler(accountRepo, policyRepo, authorization, provider, settings)
-	appQueries := app.NewQueries(handlerProvider, batchGetEntitlementsHandler, claimPayerHandler, getEntitlementsHandler, getPlanHandler, getPolicyHandler, getPriceHandler, getWorkspaceBillingHandler, getWorkspacePayerHandler, listPlansHandler, listPricesHandler, previewCancelNowHandler, startCheckoutHandler, startPortalHandler)
+	appQueries := app.NewQueries(tracerProvider, logger, batchGetEntitlementsHandler, claimPayerHandler, getEntitlementsHandler, getPlanHandler, getPolicyHandler, getPriceHandler, getWorkspaceBillingHandler, getWorkspacePayerHandler, listPlansHandler, listPricesHandler, previewCancelNowHandler, startCheckoutHandler, startPortalHandler)
 	server := &app.Server{
 		Cmds:    cmds,
 		Queries: appQueries,
