@@ -3,7 +3,7 @@
 services:
   tempo:
     container_name: notopia-tempo
-    image: grafana/tempo:2.10.10
+    image: grafana/tempo:3.1.1
     command:
       - -config.file=/etc/tempo/config.yaml
     environment:
