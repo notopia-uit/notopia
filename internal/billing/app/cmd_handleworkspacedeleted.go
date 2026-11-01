@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
 	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
@@ -30,7 +29,7 @@ type HandleWorkspaceDeletedCmd commonhandler.Cmd[HandleWorkspaceDeleted]
 var _ HandleWorkspaceDeletedCmd = (*HandleWorkspaceDeletedHandler)(nil)
 
 func (h *HandleWorkspaceDeletedHandler) Handle(ctx context.Context, cmd *HandleWorkspaceDeleted) error {
-	err := h.subscriptionCanceller.CancelNow(ctx, cmd.WorkspaceID, domain.RefundReasonWorkspaceDeleted, h.settings.ServiceAccountUserID, true)
+	err := h.subscriptionCanceller.CancelNow(ctx, cmd.WorkspaceID, CancelNowCauseWorkspaceDeleted, h.settings.ServiceAccountUserID)
 	var errsErr errs.Error
 	if errors.As(err, &errsErr) && errsErr.Code() == errs.CodeNoActiveSubscription {
 		return nil

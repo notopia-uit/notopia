@@ -46,7 +46,7 @@ func TestCancelNowPastDueWithoutPeriodPayments(t *testing.T) {
 	f := newCancellerFixture(t, domain.SubscriptionStatusPastDue)
 	f.provider.EXPECT().PeriodPayments(mock.Anything, "sub_1", mock.Anything, mock.Anything).Return(nil, nil).Once()
 
-	err := f.subscriptionCanceller.CancelNow(context.Background(), f.ws, domain.RefundReasonWorkspaceDeleted, "u", true)
+	err := f.subscriptionCanceller.CancelNow(context.Background(), f.ws, CancelNowCauseWorkspaceDeleted, "u")
 
 	require.NoError(t, err)
 	assert.Equal(t, domain.SubscriptionStatusCanceled, f.store.subs[f.sub.ID()].Status())
@@ -59,7 +59,7 @@ func TestCancelNowEndsAtCommitWithPendingRefund(t *testing.T) {
 	f.provider.EXPECT().PeriodPayments(mock.Anything, "sub_1", mock.Anything, mock.Anything).Return([]domain.PaymentInfo{newTestPayment(t, 30000, "pi_1", now, now, now.Add(30*24*time.Hour))}, nil).Once()
 	f.store.published = nil
 
-	err := f.subscriptionCanceller.CancelNow(context.Background(), f.ws, domain.RefundReasonCancelNow, "u", false)
+	err := f.subscriptionCanceller.CancelNow(context.Background(), f.ws, CancelNowCauseUser, "u")
 
 	require.NoError(t, err)
 	saved := f.store.subs[f.sub.ID()]

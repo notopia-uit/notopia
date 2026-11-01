@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/notopia-uit/notopia/internal/billing/domain"
 	commonhandler "github.com/notopia-uit/notopia/pkg/common/handler"
 )
 
@@ -32,13 +31,5 @@ func (h *CancelNowHandler) Handle(ctx context.Context, cmd *CancelNow) error {
 	if err := requirePermission(ctx, h.authz, cmd.UserID, cmd.WorkspaceID, WorkspacePermissionBillingManage); err != nil {
 		return err
 	}
-	sub, _, err := h.subscriptionCanceller.load(ctx, cmd.WorkspaceID)
-	if err != nil {
-		return err
-	}
-	reason := domain.RefundReasonCancelNow
-	if sub.Interval() == domain.IntervalLifetime {
-		reason = domain.RefundReasonLifetimeWindow
-	}
-	return h.subscriptionCanceller.CancelNow(ctx, cmd.WorkspaceID, reason, cmd.UserID, false)
+	return h.subscriptionCanceller.CancelNow(ctx, cmd.WorkspaceID, CancelNowCauseUser, cmd.UserID)
 }

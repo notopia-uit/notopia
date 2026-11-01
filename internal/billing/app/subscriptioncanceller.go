@@ -3,11 +3,21 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/notopia-uit/notopia/internal/billing/domain"
 	"github.com/notopia-uit/notopia/internal/billing/errs"
+)
+
+// CancelNowCause is who asked for the cancel-now; it decides the refund reason and whether a refund is required.
+type CancelNowCause uint8
+
+const (
+	CancelNowCauseUnspecified CancelNowCause = iota
+	CancelNowCauseUser
+	CancelNowCauseWorkspaceDeleted
 )
 
 type SubscriptionCanceller struct {
@@ -68,11 +78,24 @@ func (c *SubscriptionCanceller) Quote(ctx context.Context, ws uuid.UUID) (domain
 
 // CancelNow cancels locally and requests the refunds in one transaction; the outbox events drive
 // the provider cancel (CancelProviderSubscription) and the refund submission (SubmitRefund).
-// refundOptional=true (workspace deleted) cancels even when no refund is due (lifetime past its window).
-func (c *SubscriptionCanceller) CancelNow(ctx context.Context, ws uuid.UUID, reason domain.RefundReason, actor string, refundOptional bool) error {
+// A deleted workspace cancels even when no refund is due (lifetime past its window).
+// It is idempotent: a subscription already canceled by a concurrent call is left as is.
+func (c *SubscriptionCanceller) CancelNow(ctx context.Context, ws uuid.UUID, cause CancelNowCause, actor string) error {
 	sub, policy, err := c.load(ctx, ws)
 	if err != nil {
 		return err
+	}
+	var reason domain.RefundReason
+	switch cause {
+	case CancelNowCauseUser:
+		reason = domain.RefundReasonCancelNow
+		if sub.Interval() == domain.IntervalLifetime {
+			reason = domain.RefundReasonLifetimeWindow
+		}
+	case CancelNowCauseWorkspaceDeleted:
+		reason = domain.RefundReasonWorkspaceDeleted
+	case CancelNowCauseUnspecified:
+		return errs.NewInternal(fmt.Sprintf("unknown cancel-now cause %d", cause), nil)
 	}
 	payments, err := c.payments(ctx, sub)
 	if err != nil {
@@ -83,7 +106,7 @@ func (c *SubscriptionCanceller) CancelNow(ctx context.Context, ws uuid.UUID, rea
 	if err != nil {
 		var errsErr errs.Error
 		isRefundWindowExpired := errors.As(err, &errsErr) && errsErr.Code() == errs.CodeRefundWindowExpired
-		if !refundOptional || !isRefundWindowExpired {
+		if cause != CancelNowCauseWorkspaceDeleted || !isRefundWindowExpired {
 			return err
 		}
 		if quote, err = domain.NewRefundQuote(nil, 0, 0); err != nil {
@@ -92,8 +115,11 @@ func (c *SubscriptionCanceller) CancelNow(ctx context.Context, ws uuid.UUID, rea
 	}
 	return c.uow.Execute(ctx, func(r domain.RepoRegistry) error {
 		s, err := r.Subscription().GetByID(ctx, sub.ID(), true)
-		if err != nil || !s.IsCurrent() {
+		if err != nil {
 			return err
+		}
+		if !s.IsCurrent() {
+			return nil
 		}
 		if _, err := s.CancelNow(now, reason, quote, actor); err != nil {
 			return err
