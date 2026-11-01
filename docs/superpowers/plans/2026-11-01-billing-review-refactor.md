@@ -74,5 +74,5 @@ Deferred (not this PR): handler decorator refactor, see `tmp/billing/deferred-ha
 
 ## T9 Billing docs (sonnet, after T1–T7)
 
-- [ ] `services/billing/domain.md` PlantUML class diagram (domain + app); `services/billing/data.md` d2 db diagram from migrations (no outbox table)
-- [ ] Update `docs/superpowers/specs/2026-10-11-billing-03-billing-service-design.md` and `internal/billing/AGENTS.md`
+- [x] `services/billing/domain.md` PlantUML class diagram (domain + app); `services/billing/data.md` d2 db diagram from migrations (no outbox table)
+- [x] Update `docs/superpowers/specs/2026-10-11-billing-03-billing-service-design.md` and `internal/billing/AGENTS.md`

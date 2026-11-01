@@ -70,24 +70,26 @@ sequenceDiagram
     B->>DB: tx: MarkProcessed(event.id) + apply state
     Note over B,DB: An event id already processed → no-op
 
-    opt Duplicate or replaced subscription
-        B->>S: Cancel provider subscription (after commit, idempotent)
-    end
+    Note over B,DB: Save also writes the aggregate's events to outbox_messages (same tx)
+    B-->>-S: 204
 
+    DB--)K: outbox forwarder: subscription.changed, subscription.canceled_now, subscription.refund_requested, ...
+    K--)B: Phase 2 (own events): CancelProviderSubscription / SubmitRefund
+    opt Duplicate or replaced subscription
+        B->>S: Cancel provider subscription (idempotent), then MarkProviderSynced
+    end
     opt Refund due
         B->>S: Create refund (idempotency key refund:{id})
         B->>DB: Save provider refund id + status
     end
-
-    B--)K: subscription.changed (best-effort, after commit)
-    B-->>-S: 204
 ```
 
 Ordering rule for every webhook use case:
 
-1. Provider reads and idempotent mutations that must not be lost (change the default card) run **before** the write transaction. Cancelling a provider subscription runs **after** the local cancel commits; if it fails, the reconcile cron retries it, and a locally canceled row is never resurrected.
-2. The write transaction records the event (`processed_provider_events`) together with the state change.
-3. Refunds run **after** commit. A refund that fails to submit stays `pending` without a provider id, and the hourly reconcile cron retries it.
+1. Provider reads and idempotent mutations that must not be lost (change the default card) run **before** the write transaction.
+2. The write transaction records the event (`processed_provider_events`) together with the state change and the outbox events. Handlers end at commit.
+3. **Phase 2** is driven by billing's own outbox events, consumed in `controller/event`: `subscription.canceled_now` runs `CancelProviderSubscription` (cancel at the provider, then `MarkProviderSynced`), and `subscription.refund_requested` runs `SubmitRefund` (`CreateRefund` keyed by the refund id; a provider `invalid` error marks the refund `failed`). A locally canceled row is never resurrected.
+4. The hourly reconcile cron is the safety net: it retries provider cancels and refund submissions for rows still awaiting them.
 
 ## Cancel Now
 
@@ -104,11 +106,13 @@ sequenceDiagram
     B->>S: Period payments (recurring) / payment intent (lifetime)
     B-->>-U: Refund quote (unused share of the period)
     U->>+B: POST .../subscription/cancel-now
-    B->>DB: tx: Subscription canceled + pending Refund
-    B->>S: Cancel subscription now (after commit)
+    B->>DB: tx: Subscription canceled + pending Refund + outbox events
+    B-->>-U: Workspace billing (subscription: null)
+    DB--)B: outbox: subscription.canceled_now
+    B->>S: Cancel subscription now, then MarkProviderSynced
+    DB--)B: outbox: subscription.refund_requested
     B->>S: Create refund (refund:{id})
     B->>DB: Refund submitted
-    B-->>-U: Workspace billing (subscription: null)
     S->>B: refund.updated webhook → refund succeeded
 ```
 
@@ -138,9 +142,9 @@ sequenceDiagram
 
 ## Crons
 
-| Job                               | Schedule                   | Effect                                                                                           |
-| --------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------ |
-| `billing:reconcile-subscriptions` | hourly                     | Re-syncs subscriptions past their period end or not synced for 24 h; retries unsubmitted refunds |
-| `billing:prune-provider-events`   | daily 04:00 (process `TZ`) | Deletes processed webhook event ids older than 30 days                                           |
+| Job                               | Schedule                   | Effect                                                                                                                             |
+| --------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `billing:reconcile-subscriptions` | hourly                     | Re-syncs subscriptions past their period end or not synced for 24 h; retries provider cancels and refund submissions still pending |
+| `billing:prune-provider-events`   | daily 04:00 (process `TZ`) | Deletes processed webhook event ids older than 30 days                                                                             |
 
 Both use a Redis lock (`billing_redis`), so with several billing instances each tick runs once.

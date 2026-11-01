@@ -80,7 +80,7 @@ pkg/                            # Go packages
 ### Go
 
 - Do not run `go generate`, because we don't mange tool via go tool, but via mise. Stick with nx targets
-- Wiring is google/wire: edit `wire.go`, run `nx wire {service}`, never hand-edit `wire_gen.go`.
+- Wiring is google/wire: edit `wire.go`, run `nx run {service}:gen:wire`, never hand-edit `wire_gen.go`.
   Each package exposes `var ProvideX = NewX`
 - Services are DDD + CQRS: layering, command/query rules, domain vs app models, sqlc split are in
   [`docs/ai/GO_CLEAN_ARCH.md`](./docs/ai/GO_CLEAN_ARCH.md) (read before writing Go service code);

@@ -3,14 +3,15 @@
 Plans, prices, subscriptions, entitlements. Stripe (sandbox) through hosted Checkout and
 Customer Portal. DDD + CQRS like `internal/note`, with a Watermill transactional outbox (`infra/outbox`).
 Entrypoint: `cmd/billing/`. HTTP spec: `api/billing/`. gRPC: `proto/billing/`.
-Spec and plans: `docs/superpowers/specs/2026-10-11-billing-03-*`, `docs/superpowers/plans/2026-10-11-billing-03-*`.
+Spec and plans: `docs/superpowers/specs/2026-10-11-billing-03-*` (see its Revision 2026-11-01 note), `docs/superpowers/plans/2026-10-11-billing-03-*`.
+Docs: `docs/src/services/billing/` (domain and data diagrams are inline; update them with model or schema changes).
 
 ## Layers
 
 | Dir | Contains | Rules |
 | --- | --- | --- |
-| `domain/` | Aggregates (`Subscription` + `Refund`, `BillingAccount`, `Price`, `Plan`, `BillingPolicy`), `ResolveEntitlements`, repo interfaces, `UnitOfWork`, `ProviderEventLog` | Pure. `uint8` enums with `IsValid`/`String` |
-| `app/` | `cmd_*` / `q_*` use cases, ports (`svc_*`, `readmodel.go`), app models | Commands use `domain.UnitOfWork`; queries use `app.BillingReadModel` only |
+| `domain/` | Aggregates (`Subscription` + `Refund`, `BillingAccount`, `Price`, `Plan`, `BillingPolicy`), `ResolveEntitlements`, repo interfaces, `UnitOfWork`, `ProviderEventLog` | Pure. `uint8` enums with `IsValid`/`String` (incl. `Currency`). Value objects (`Money`, `Payer`, `ProviderSnapshot`, `PaymentInfo`, `RefundLine`, `RefundQuote`) are immutable: unexported fields, validated `NewX`, getters, defensive copies |
+| `app/` | `cmd_*` / `q_*` use cases, `SubscriptionCanceller` (quote + cancel-now), ports (`svc_*`, `readmodel.go`), app models | Commands use `domain.UnitOfWork`; queries use `app.BillingReadModel` only |
 | `infra/` | `persistence/` (pgrepo, pgreadmodel, pgmapper, pgjsonb, pgsqlc, pgmigration), `outbox/` (per-tx publisher + forwarder to Kafka), `service/` (authorization gRPC), `redis/` | Each adapter maps enums explicitly (`toX`/`fromX`), never casts |
 | `controller/` | `http/` (gin strict server, Stripe webhook), `grpc/`, `event/` (Kafka consumers, one consumer group per topic, typed via `decode[T]`), `cron/`, `health/` | Thin — translate, don't decide |
 | `component/` | Validator, `eventtopic.go` (every topic published or consumed) | No inline topic strings elsewhere |
@@ -18,6 +19,7 @@ Spec and plans: `docs/superpowers/specs/2026-10-11-billing-03-*`, `docs/superpow
 
 ## Persistence
 
+- Repos are singletons: injected directly for reads, and `pgrepo.registry` hands the tx-bound ones to `UnitOfWork.Execute`. `Save` and `forUpdate` reads fail outside a unit of work (`guard.go`), so writes always run in a tx.
 - Write side: `pgsqlc/<aggregate>.sql`, lock-aware via `FOR UPDATE -- :if @for_update` (dynamic filter plugin).
 - Read side: `pgsqlc/<aggregate>_read.sql`, every query named `Read…`, used only by `pgreadmodel`.
 - `plans.features` / `plans.limits` are typed JSONB (`pgjsonb.Features`/`Limits`); unknown keys are skipped with a warning.
@@ -42,18 +44,19 @@ Spec and plans: `docs/superpowers/specs/2026-10-11-billing-03-*`, `docs/superpow
 
 ## Events
 
-Repo `Save` writes the aggregate's popped events into `outbox_messages` in the same transaction
+Repo `Save` writes the aggregate's popped events into `outbox_messages` (Watermill `queue` schema, `pgmigration/00002_outbox.sql`) in the same transaction
 (`pgrepo.PublisherFactory` → `outbox.PublisherFactory`); `outbox.Forwarder` relays them to Kafka, keyed by
 the `partition_key` metadata (aggregate id, workspace id for integration events). Topics are in
 `component/eventtopic.go`: domain events go to `events.internal.billing.{aggregate}.{event}`;
 `SubscriptionStateChangedEvent` (recorded whenever plan or status changes) is mapped to
 `share.SubscriptionChangedEvent` on `events.integration.billing.subscription.changed`.
-Consumers never cache billing state; they call gRPC on every check.
+Billing also consumes its own `subscription.canceled_now` and `subscription.refund_requested` topics (phase 2 above). There is no Kafka `Notifier` or `RefundRunner`; do not publish to Kafka outside the outbox.
+Consumers of the integration event never cache billing state; they call gRPC on every check.
 
 ## Crons
 
 `controller/cron/`, Redis-locked on `billing_redis`: hourly reconcile, daily prune of processed provider events.
-Each job is configured by `NOTOPIA_BILLING_CRON_{RECONCILE_SUBSCRIPTIONS|PRUNE_PROVIDER_EVENTS}_{NAME|SCHEDULE|TIMEOUT|ENABLED}` (defaults in `config.New`; `..._ENABLED=false` disables).
+`pkg/cron.Scheduler` takes `gocron.Locker` and `*slog.Logger` directly. The reconcile job re-syncs stale subscriptions and is the safety net for phase 2 (retries provider cancels and refund submissions still pending). Each job is configured by `NOTOPIA_BILLING_CRON_{RECONCILE_SUBSCRIPTIONS|PRUNE_PROVIDER_EVENTS}_{NAME|SCHEDULE|TIMEOUT|ENABLED}` (defaults in `config.New`; `..._ENABLED=false` disables).
 `// NOTE:` move into `cmd/billing-worker` when splitting.
 
 ## TODO
